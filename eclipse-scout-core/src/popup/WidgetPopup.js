@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons} from '../index';
-import {Popup} from '../index';
-import {WidgetPopupLayout} from '../index';
+import {icons, Popup, scout, WidgetPopupLayout} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 export default class WidgetPopup extends Popup {
 

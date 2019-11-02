@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../index';
-import {FormField} from '../../index';
+import {FormField, scout} from '../../index';
 
 export default class OutlineTileField extends FormField {
 

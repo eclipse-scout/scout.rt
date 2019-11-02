@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TileGrid} from '../../../index';
-import {KeyStrokeContext} from '../../../index';
-import {scout} from '../../../index';
-import {PageTileGridSelectKeyStroke} from '../../../index';
+import {KeyStrokeContext, PageTileGridSelectKeyStroke, scout, TileGrid} from '../../../index';
 
 export default class PageTileGrid extends TileGrid {
 

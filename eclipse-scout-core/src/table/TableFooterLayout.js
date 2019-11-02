@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {AbstractLayout} from '../index';
+import {AbstractLayout, graphics} from '../index';
 import * as $ from 'jquery';
 
 export default class TableFooterLayout extends AbstractLayout {

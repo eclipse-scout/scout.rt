@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device} from '../index';
-import {HtmlComponent} from '../index';
-import {Widget} from '../index';
-import {scout} from '../index';
+import {Device, HtmlComponent, scout, Widget} from '../index';
 
 export default class IFrame extends Widget {
 

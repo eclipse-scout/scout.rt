@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TouchPopup} from '../../../index';
-import {scout} from '../../../index';
+import {scout, TouchPopup} from '../../../index';
 
 /**
  * Info: this class must have the same interface as SmartFieldPopup. That's why there's some

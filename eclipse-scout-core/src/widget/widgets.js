@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../index';
+import {arrays, Widget} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
 
 
 let uniqueIdSeqNo = 0;

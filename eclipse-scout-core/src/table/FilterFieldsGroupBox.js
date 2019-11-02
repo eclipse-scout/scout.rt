@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GroupBox} from '../index';
-import {scout} from '../index';
+import {GroupBox, scout} from '../index';
 
 export default class FilterFieldsGroupBox extends GroupBox {
 

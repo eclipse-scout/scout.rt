@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventSupport} from '../index';
-import {styles} from '../index';
-import {scout} from '../index';
-import {App} from '../index';
+import {App, EventSupport, scout, styles} from '../index';
 
 let instance;
 /**

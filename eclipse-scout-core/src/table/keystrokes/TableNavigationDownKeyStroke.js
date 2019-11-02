@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../index';
-import {AbstractTableNavigationKeyStroke} from '../../index';
-import {keys} from '../../index';
-import {arrays} from '../../index';
+import {AbstractTableNavigationKeyStroke, arrays, keys, scout} from '../../index';
 
 export default class TableNavigationDownKeyStroke extends AbstractTableNavigationKeyStroke {
 

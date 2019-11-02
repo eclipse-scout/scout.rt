@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent} from '../../../index';
-import {scout} from '../../../index';
-import {Widget} from '../../../index';
-import {GroupBoxMenuItemsOrder} from '../../../index';
-import {TabBoxHeaderLayout} from '../../../index';
+import {GroupBoxMenuItemsOrder, HtmlComponent, scout, TabBoxHeaderLayout, Widget} from '../../../index';
 
 export default class TabBoxHeader extends Widget {
 

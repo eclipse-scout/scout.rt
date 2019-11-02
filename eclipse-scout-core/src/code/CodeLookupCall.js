@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {StaticLookupCall} from '../index';
-import {strings} from '../index';
-import {codes} from '../index';
-import {scout} from '../index';
+import {codes, scout, StaticLookupCall, strings} from '../index';
 
 export default class CodeLookupCall extends StaticLookupCall {
 

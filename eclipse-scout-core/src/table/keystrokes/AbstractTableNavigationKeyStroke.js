@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {KeyStroke} from '../../index';
-import {graphics} from '../../index';
-import {arrays} from '../../index';
+import {arrays, graphics, KeyStroke} from '../../index';
 
 export default class AbstractTableNavigationKeyStroke extends KeyStroke {
 

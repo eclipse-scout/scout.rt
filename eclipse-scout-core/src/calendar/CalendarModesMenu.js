@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Calendar} from '../index';
-import {Menu} from '../index';
-import {arrays} from '../index';
-import {scout} from '../index';
+import {arrays, Calendar, Menu, scout} from '../index';
 
 export default class CalendarModesMenu extends Menu {
 

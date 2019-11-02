@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventDelegator} from '../../../index';
-import {FormField} from '../../../index';
+import {EventDelegator, FormField} from '../../../index';
 
 export default class TileField extends FormField {
 

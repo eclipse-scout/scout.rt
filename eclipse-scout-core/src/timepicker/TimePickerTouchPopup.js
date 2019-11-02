@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TimePickerTouchPopupLayout} from '../index';
-import {TouchPopup} from '../index';
-import {scout} from '../index';
+import {scout, TimePickerTouchPopupLayout, TouchPopup} from '../index';
 
 export default class TimePickerTouchPopup extends TouchPopup {
 

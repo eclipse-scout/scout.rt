@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldLayout} from '../../../index';
-import {scrollbars} from '../../../index';
+import {FormFieldLayout, scrollbars} from '../../../index';
 
 export default class ImageFieldLayout extends FormFieldLayout {
 

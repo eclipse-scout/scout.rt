@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SmartField} from '../../index';
-import {LookupCall} from '../../index';
-import {strings} from '../../index';
-import {scout} from '../../index';
-import {Column} from '../../index';
+import {Column, LookupCall, scout, SmartField, strings} from '../../index';
 
 export default class SmartColumn extends Column {
 

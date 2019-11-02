@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys} from '../../../index';
-import {KeyStroke} from '../../../index';
+import {keys, KeyStroke, TagBar} from '../../../index';
 import * as $ from 'jquery';
-import {TagBar} from '../../../index';
 
 
 /**

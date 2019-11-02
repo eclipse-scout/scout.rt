@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {strings} from '../index';
+import {graphics, scout, strings} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 
 let _deferred = $.Deferred();

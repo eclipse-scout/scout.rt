@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateFormat} from '../../index';
-import {scout} from '../../index';
-import {comparators} from '../../index';
-import {dates} from '../../index';
-import {Column} from '../../index';
+import {Column, comparators, DateFormat, dates, scout} from '../../index';
 
 export default class DateColumn extends Column {
 

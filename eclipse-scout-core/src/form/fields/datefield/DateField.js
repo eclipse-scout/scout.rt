@@ -8,25 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DatePickerPopup} from '../../../index';
-import {focusUtils} from '../../../index';
-import {dates} from '../../../index';
-import {TimePickerPopup} from '../../../index';
-import {fields} from '../../../index';
-import {Status} from '../../../index';
-import {keys} from '../../../index';
-import {Device} from '../../../index';
-import {FormField} from '../../../index';
+import {
+  DateFormat,
+  DatePickerPopup,
+  dates,
+  DateTimeCompositeLayout,
+  Device,
+  fields,
+  focusUtils,
+  FormField,
+  HtmlComponent,
+  InputFieldKeyStrokeContext,
+  keys,
+  objects,
+  scout,
+  Status,
+  strings,
+  styles,
+  TimePickerPopup,
+  ValueField
+} from '../../../index';
 import * as $ from 'jquery';
-import {ValueField} from '../../../index';
-import {DateTimeCompositeLayout} from '../../../index';
-import {strings} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {scout} from '../../../index';
-import {DateFormat} from '../../../index';
-import {InputFieldKeyStrokeContext} from '../../../index';
-import {objects} from '../../../index';
-import {styles} from '../../../index';
 
 export default class DateField extends ValueField {
 

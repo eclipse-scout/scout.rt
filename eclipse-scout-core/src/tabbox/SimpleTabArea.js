@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SimpleTabAreaLayout} from '../index';
-import {HtmlComponent} from '../index';
-import {Widget} from '../index';
+import {HtmlComponent, SimpleTabAreaLayout, Widget} from '../index';
 
 export default class SimpleTabArea extends Widget {
 

@@ -8,23 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {fields} from '../../../index';
-import {Status} from '../../../index';
-import {keys} from '../../../index';
-import {Device} from '../../../index';
-import {SmartFieldLayout} from '../../../index';
-import {SmartFieldCancelKeyStroke} from '../../../index';
-import {FormField} from '../../../index';
+import {
+  arrays,
+  Device,
+  fields,
+  FormField,
+  InputFieldKeyStrokeContext,
+  keys,
+  LookupCall,
+  objects,
+  QueryBy,
+  scout,
+  SimpleLoadingSupport,
+  SmartFieldCancelKeyStroke,
+  SmartFieldLayout,
+  Status,
+  strings,
+  ValueField
+} from '../../../index';
 import * as $ from 'jquery';
-import {ValueField} from '../../../index';
-import {strings} from '../../../index';
-import {scout} from '../../../index';
-import {InputFieldKeyStrokeContext} from '../../../index';
-import {QueryBy} from '../../../index';
-import {objects} from '../../../index';
-import {SimpleLoadingSupport} from '../../../index';
-import {LookupCall} from '../../../index';
-import {arrays} from '../../../index';
 
 export default class SmartField extends ValueField {
 

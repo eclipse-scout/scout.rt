@@ -8,12 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device} from '../index';
-import {Form} from '../index';
-import {DeferredGlassPaneTarget} from '../index';
+import {arrays, DeferredGlassPaneTarget, Device, Form, scout} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
-import {scout} from '../index';
 
 /**
  * Renders glassPanes over the 'glassPaneTargets' of a widget.

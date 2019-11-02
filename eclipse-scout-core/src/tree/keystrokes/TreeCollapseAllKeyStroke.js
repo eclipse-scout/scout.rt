@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HAlign} from '../../index';
-import {keys} from '../../index';
-import {AbstractTreeNavigationKeyStroke} from '../../index';
+import {AbstractTreeNavigationKeyStroke, HAlign, keys} from '../../index';
 
 export default class TreeCollapseAllKeyStroke extends AbstractTreeNavigationKeyStroke {
 

@@ -8,15 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SingleLayout} from '../../../index';
-import {scrollbars} from '../../../index';
-import {ImageFieldLayout} from '../../../index';
-import {FileInput} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {Device} from '../../../index';
-import {scout} from '../../../index';
-import {FormField} from '../../../index';
-import {arrays} from '../../../index';
+import {arrays, Device, FileInput, FormField, HtmlComponent, ImageFieldLayout, scout, scrollbars, SingleLayout} from '../../../index';
 import * as $ from 'jquery';
 
 export default class ImageField extends FormField {

@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RoundingMode} from '../index';
-import {objects} from '../index';
-import {strings} from '../index';
+import {objects, RoundingMode, strings} from '../index';
 
 
 /**

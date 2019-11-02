@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension} from '../index';
-import {HtmlComponent} from '../index';
+import {Dimension, graphics, HtmlComponent} from '../index';
 import * as $ from 'jquery';
-import {graphics} from '../index';
 
 /**
  * Abstract layout class with functions used by all layout algorithms.

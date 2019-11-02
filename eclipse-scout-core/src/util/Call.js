@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../index';
-import {arrays} from '../index';
-import {strings} from '../index';
+import {arrays, objects, scout, strings} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 /**
  * Represents a robust "call" that, when it fails, is retried automatically for a specific

@@ -8,29 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device} from '../index';
-import {DeferredGlassPaneTarget} from '../index';
-import {FileChooserController} from '../index';
-import {Form} from '../index';
-import {HtmlEnvironment} from '../index';
-import {Event} from '../index';
-import {HtmlComponent} from '../index';
-import {KeyStrokeContext} from '../index';
-import {DesktopNavigation} from '../index';
-import {DisableBrowserTabSwitchingKeyStroke} from '../index';
-import {cookies} from '../index';
+import {
+  arrays,
+  BenchColumnLayoutData,
+  cookies,
+  DeferredGlassPaneTarget,
+  DesktopLayout,
+  DesktopNavigation,
+  Device,
+  DisableBrowserF5ReloadKeyStroke,
+  DisableBrowserTabSwitchingKeyStroke,
+  Event,
+  FileChooserController,
+  Form,
+  HtmlComponent,
+  HtmlEnvironment,
+  KeyStrokeContext,
+  MessageBoxController,
+  Outline,
+  scout,
+  styles,
+  Tree,
+  webstorage,
+  Widget
+} from '../index';
 import * as $ from 'jquery';
-import {Outline} from '../index';
-import {scout} from '../index';
-import {MessageBoxController} from '../index';
-import {DisableBrowserF5ReloadKeyStroke} from '../index';
-import {DesktopLayout} from '../index';
-import {Tree} from '../index';
-import {Widget} from '../index';
-import {webstorage} from '../index';
-import {styles} from '../index';
-import {arrays} from '../index';
-import {BenchColumnLayoutData} from '../index';
 
 export default class Desktop extends Widget {
 

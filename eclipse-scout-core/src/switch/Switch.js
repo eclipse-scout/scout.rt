@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event} from '../index';
-import {Widget} from '../index';
+import {Event, Widget} from '../index';
 
 export default class Switch extends Widget {
 

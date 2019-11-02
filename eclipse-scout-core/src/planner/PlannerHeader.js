@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Planner} from '../index';
-import {Widget} from '../index';
+import {Planner, Widget} from '../index';
 import * as $ from 'jquery';
 
 export default class PlannerHeader extends Widget {

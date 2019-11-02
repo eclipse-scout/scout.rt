@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {InputFieldKeyStrokeContext} from '../../index';
-import {scout} from '../../index';
-import {keyStrokeModifier} from '../../index';
-import {Outline} from '../../index';
-import {SearchOutlineLayout} from '../../index';
-import {keys} from '../../index';
+import {InputFieldKeyStrokeContext, keys, keyStrokeModifier, Outline, scout, SearchOutlineLayout} from '../../index';
 import * as $ from 'jquery';
 
 export default class SearchOutline extends Outline {

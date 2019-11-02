@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {texts} from '../index';
-import {HtmlComponent} from '../index';
-import {Status} from '../index';
-import {strings} from '../index';
-import {Widget} from '../index';
-import {scout} from '../index';
+import {HtmlComponent, scout, Status, strings, texts, Widget} from '../index';
 
 export default class Notification extends Widget {
 

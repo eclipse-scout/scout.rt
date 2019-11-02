@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons} from '../index';
-import {Menu} from '../index';
+import {icons, Menu} from '../index';
 
 export default class EllipsisMenu extends Menu {
 

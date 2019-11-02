@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings} from '../../index';
-import {TableUserFilter} from '../../index';
-import {EventSupport} from '../../index';
-import {TableMatrix} from '../../index';
-import {comparators} from '../../index';
+import {comparators, EventSupport, strings, TableMatrix, TableUserFilter} from '../../index';
 
 export default class ColumnUserFilter extends TableUserFilter {
 

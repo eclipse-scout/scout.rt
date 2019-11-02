@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MenuBox} from '../../index';
-import {strings} from '../../index';
-import {Popup} from '../../index';
+import {MenuBox, Popup, strings} from '../../index';
 
 export default class DesktopToolBox extends MenuBox {
 

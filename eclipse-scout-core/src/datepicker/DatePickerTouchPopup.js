@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DatePickerTouchPopupLayout} from '../index';
-import {TouchPopup} from '../index';
-import {scout} from '../index';
+import {DatePickerTouchPopupLayout, scout, TouchPopup} from '../index';
 
 export default class DatePickerTouchPopup extends TouchPopup {
 

@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../index';
-import {HtmlComponent} from '../index';
+import {HtmlComponent, Widget} from '../index';
 
 export default class Composite extends Widget {
 

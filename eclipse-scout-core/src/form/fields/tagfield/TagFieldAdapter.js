@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../../index';
-import {LookupFieldAdapter} from '../../../index';
+import {LookupFieldAdapter, scout} from '../../../index';
 
 export default class TagFieldAdapter extends LookupFieldAdapter {
 

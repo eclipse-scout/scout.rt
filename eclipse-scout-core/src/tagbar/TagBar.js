@@ -8,15 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device} from '../index';
-import {tooltips} from '../index';
-import {HtmlComponent} from '../index';
-import {TagBarLayout} from '../index';
-import {FormField} from '../index';
-import {Widget} from '../index';
+import {arrays, Device, FormField, HtmlComponent, scout, TagBarLayout, tooltips, Widget} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
-import {scout} from '../index';
 
 
 export default class TagBar extends Widget {

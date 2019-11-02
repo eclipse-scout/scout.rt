@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device} from '../index';
-import {TextMap} from '../index';
-import {strings} from '../index';
-import {Box} from '../index';
+import {Box, Device, strings, TextMap} from '../index';
 import * as $ from 'jquery';
 
 export default class LoginBox extends Box {

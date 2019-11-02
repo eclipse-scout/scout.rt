@@ -8,14 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SmartField} from '../../../index';
-import {fields} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {SmartFieldLayout} from '../../../index';
-import {graphics} from '../../../index';
-import {SmartFieldMultilineLayout} from '../../../index';
-import {FormField} from '../../../index';
-import {arrays} from '../../../index';
+import {arrays, fields, FormField, graphics, HtmlComponent, SmartField, SmartFieldLayout, SmartFieldMultilineLayout} from '../../../index';
 
 export default class SmartFieldMultiline extends SmartField {
 

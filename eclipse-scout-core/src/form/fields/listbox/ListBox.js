@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Table} from '../../../index';
-import {ValueField} from '../../../index';
-import {LookupBox} from '../../../index';
-import {ListBoxLayout} from '../../../index';
-import {scout} from '../../../index';
-import {arrays} from '../../../index';
+import {arrays, ListBoxLayout, LookupBox, scout, Table, ValueField} from '../../../index';
 
 export default class ListBox extends LookupBox {
 

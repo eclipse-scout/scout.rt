@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../../index';
-import {ColumnUserFilter} from '../../index';
+import {ColumnUserFilter, objects} from '../../index';
 import * as $ from 'jquery';
 
 export default class NumberColumnUserFilter extends ColumnUserFilter {

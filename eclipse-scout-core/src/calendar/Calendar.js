@@ -8,20 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates} from '../index';
-import {menus as menus_1} from '../index';
-import {objects} from '../index';
-import {HtmlComponent} from '../index';
-import {CalendarListComponent} from '../index';
-import {KeyStrokeContext} from '../index';
+import {CalendarComponent, CalendarLayout, CalendarListComponent, DateRange, dates, HtmlComponent, KeyStrokeContext, menus as menus_1, objects, scout, scrollbars, strings, Widget} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {scrollbars} from '../index';
-import {CalendarLayout} from '../index';
-import {strings} from '../index';
-import {Widget} from '../index';
-import {DateRange} from '../index';
-import {CalendarComponent} from '../index';
 
 
 export default class Calendar extends Widget {

@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../index';
-import {arrays} from '../index';
+import {arrays, objects, scout} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 export default class EventSupport {
 

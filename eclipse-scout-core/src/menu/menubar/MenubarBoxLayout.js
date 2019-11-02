@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../../index';
-import {Dimension} from '../../index';
+import {AbstractLayout, Dimension} from '../../index';
 
 export default class MenubarBoxLayout extends AbstractLayout {
 

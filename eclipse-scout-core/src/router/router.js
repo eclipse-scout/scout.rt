@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventSupport} from '../index';
-import {strings} from '../index';
-import {router} from '../index';
+import {EventSupport, router, strings} from '../index';
 import * as $ from 'jquery';
 
 

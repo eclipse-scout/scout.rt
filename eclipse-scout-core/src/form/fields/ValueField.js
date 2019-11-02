@@ -8,16 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings} from '../../index';
-import {Status} from '../../index';
-import {objects} from '../../index';
-import {scout} from '../../index';
-import {menus as menus_1} from '../../index';
-import {Event} from '../../index';
-import {FormField} from '../../index';
-import {arrays} from '../../index';
+import {arrays, Event, focusUtils, FormField, menus as menus_1, objects, scout, Status, strings} from '../../index';
 import * as $ from 'jquery';
-import {focusUtils} from '../../index';
 
 /**
  * @abstract

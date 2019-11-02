@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {AbstractLayout} from '../index';
+import {AbstractLayout, Dimension, graphics, scout} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {Dimension} from '../index';
 
 export default class SimpleTabAreaLayout extends AbstractLayout {
 

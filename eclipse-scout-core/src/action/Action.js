@@ -8,16 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Icon} from '../index';
-import {Device} from '../index';
-import {tooltips} from '../index';
-import {HtmlComponent} from '../index';
-import {KeyStrokeContext} from '../index';
-import {NullLayout} from '../index';
-import {Widget} from '../index';
-import {ActionKeyStroke} from '../index';
+import {ActionKeyStroke, Device, HtmlComponent, Icon, KeyStrokeContext, NullLayout, scout, tooltips, Widget} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 export default class Action extends Widget {
 

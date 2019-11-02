@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {KeyStroke} from '../index';
-import {keys} from '../index';
-import {Action} from '../index';
+import {Action, keys, KeyStroke} from '../index';
 
 /**
  * Global key stroke on the desktop that prevents 'leaking' of the F5 keystroke to the browser.

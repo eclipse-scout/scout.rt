@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LogicalGridLayout} from '../../../index';
-import {HtmlEnvironment} from '../../../index';
+import {HtmlEnvironment, LogicalGridLayout} from '../../../index';
 
 export default class RadioButtonGroupLayout extends LogicalGridLayout {
 

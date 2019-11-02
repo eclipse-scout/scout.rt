@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../../../index';
-import {SplitBox} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {graphics} from '../../../index';
-import {Dimension} from '../../../index';
-import {Rectangle} from '../../../index';
+import {AbstractLayout, Dimension, graphics, HtmlComponent, Rectangle, SplitBox} from '../../../index';
 import * as $ from 'jquery';
 
 export default class SplitBoxLayout extends AbstractLayout {

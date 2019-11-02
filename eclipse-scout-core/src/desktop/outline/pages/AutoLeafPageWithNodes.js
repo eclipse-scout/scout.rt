@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableRow} from '../../../index';
-import {scout} from '../../../index';
-import {Page} from '../../../index';
+import {Page, scout, TableRow} from '../../../index';
 
 /**
  * @class

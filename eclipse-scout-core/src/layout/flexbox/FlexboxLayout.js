@@ -8,12 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {webstorage} from '../../index';
-import {HtmlComponent} from '../../index';
-import {Rectangle} from '../../index';
-import {Dimension} from '../../index';
+import {AbstractLayout, Dimension, HtmlComponent, Rectangle, webstorage} from '../../index';
 import * as $ from 'jquery';
-import {AbstractLayout} from '../../index';
 
 export default class FlexboxLayout extends AbstractLayout {
 

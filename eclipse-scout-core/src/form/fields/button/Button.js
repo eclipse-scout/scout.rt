@@ -8,16 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons} from '../../../index';
-import {KeyStrokeContext} from '../../../index';
-import {ButtonKeyStroke} from '../../../index';
-import {Device} from '../../../index';
-import {scout} from '../../../index';
-import {ButtonLayout} from '../../../index';
-import {LoadingSupport} from '../../../index';
-import {styles} from '../../../index';
-import {tooltips} from '../../../index';
-import {FormField} from '../../../index';
+import {ButtonKeyStroke, ButtonLayout, Device, FormField, icons, KeyStrokeContext, LoadingSupport, scout, styles, tooltips} from '../../../index';
 
 export default class Button extends FormField {
 

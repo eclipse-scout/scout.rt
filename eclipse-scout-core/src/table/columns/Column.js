@@ -8,21 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings} from '../../index';
-import {icons} from '../../index';
-import {scout} from '../../index';
-import {Table} from '../../index';
-import {Cell} from '../../index';
-import {TableRow} from '../../index';
-import {ColumnOptimalWidthMeasurer} from '../../index';
+import {Cell, ColumnOptimalWidthMeasurer, comparators, EventSupport, FormField, GridData, icons, objects, scout, strings, styles, Table, TableRow, texts} from '../../index';
 import * as $ from 'jquery';
-import {styles} from '../../index';
-import {GridData} from '../../index';
-import {objects} from '../../index';
-import {comparators} from '../../index';
-import {EventSupport} from '../../index';
-import {FormField} from '../../index';
-import {texts} from '../../index';
 
 export default class Column {
 

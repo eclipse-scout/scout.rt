@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings} from '../../index';
-import {Notification} from '../../index';
-import {Device} from '../../index';
+import {Device, Notification, strings} from '../../index';
 import * as $ from 'jquery';
 
 export default class DesktopNotification extends Notification {

@@ -8,15 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {scrollbars} from '../index';
-import {PopupWithHeadLayout} from '../index';
-import {Popup} from '../index';
-import {HtmlComponent} from '../index';
-import {Point} from '../index';
-import {NullLayout} from '../index';
+import {graphics, HtmlComponent, NullLayout, Point, Popup, PopupWithHeadLayout, scout, scrollbars} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 export default class PopupWithHead extends Popup {
 

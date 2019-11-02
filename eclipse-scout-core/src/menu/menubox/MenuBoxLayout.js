@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../../index';
-import {graphics} from '../../index';
-import {menus} from '../../index';
+import {AbstractLayout, graphics, menus} from '../../index';
 
 export default class MenuBoxLayout extends AbstractLayout {
 

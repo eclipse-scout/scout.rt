@@ -8,18 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../../index';
-import {HtmlComponent} from '../../index';
-import {Insets} from '../../index';
-import {scout} from '../../index';
-import {Dimension} from '../../index';
-import {graphics} from '../../index';
-import {Device} from '../../index';
-import {FormField} from '../../index';
-import {BasicField} from '../../index';
-import {HtmlEnvironment} from '../../index';
-import {Rectangle} from '../../index';
-import {scrollbars} from '../../index';
+import {AbstractLayout, BasicField, Device, Dimension, FormField, graphics, HtmlComponent, HtmlEnvironment, Insets, Rectangle, scout, scrollbars} from '../../index';
 
 /**
  * Form-Field Layout, for a form-field with label, status, mandatory-indicator and a field.

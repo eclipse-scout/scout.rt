@@ -8,13 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {fields} from '../../../index';
-import {Button} from '../../../index';
-import {RadioButtonKeyStroke} from '../../../index';
-import {Device} from '../../../index';
-import {scout} from '../../../index';
-import {RadioButtonLayout} from '../../../index';
-import {tooltips} from '../../../index';
+import {Button, Device, fields, RadioButtonKeyStroke, RadioButtonLayout, scout, tooltips} from '../../../index';
 
 export default class RadioButton extends Button {
 

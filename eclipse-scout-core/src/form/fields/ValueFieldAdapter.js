@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {comparators} from '../../index';
-import {FormFieldAdapter} from '../../index';
+import {comparators, FormFieldAdapter} from '../../index';
 
 export default class ValueFieldAdapter extends FormFieldAdapter {
 

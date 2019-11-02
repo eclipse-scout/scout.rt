@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ProposalChooser} from '../../../index';
-import {scout} from '../../../index';
-import {objects} from '../../../index';
-import {LookupRow} from '../../../index';
-import {arrays} from '../../../index';
-import {Tree} from '../../../index';
+import {arrays, LookupRow, objects, ProposalChooser, scout, Tree} from '../../../index';
 
 export default class TreeProposalChooser extends ProposalChooser {
 

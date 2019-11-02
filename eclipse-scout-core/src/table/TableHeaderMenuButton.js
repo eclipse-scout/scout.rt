@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableHeaderMenuButtonKeyStroke} from '../index';
-import {Action} from '../index';
+import {Action, TableHeaderMenuButtonKeyStroke} from '../index';
 
 export default class TableHeaderMenuButton extends Action {
 

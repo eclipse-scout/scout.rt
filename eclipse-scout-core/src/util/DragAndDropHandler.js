@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dragAndDrop} from '../index';
-import {arrays} from '../index';
+import {arrays, dragAndDrop} from '../index';
 import * as $ from 'jquery';
 
 export default class DragAndDropHandler {

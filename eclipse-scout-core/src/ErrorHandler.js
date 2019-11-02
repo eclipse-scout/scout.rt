@@ -8,12 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings} from './index';
-import {AjaxError} from './index';
-import {scout} from './index';
-import {NullLogger} from './index';
+import {AjaxError, App, NullLogger, scout, strings} from './index';
 import * as $ from 'jquery';
-import {App} from './index';
 
 export default class ErrorHandler {
 

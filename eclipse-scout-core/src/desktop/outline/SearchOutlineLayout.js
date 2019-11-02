@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {OutlineLayout} from '../../index';
-import {graphics} from '../../index';
+import {graphics, OutlineLayout} from '../../index';
 
 export default class SearchOutlineLayout extends OutlineLayout {
 

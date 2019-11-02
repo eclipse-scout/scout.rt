@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Point} from '../index';
-import {Dimension} from '../index';
+import {Dimension, Point} from '../index';
 
 
 /**

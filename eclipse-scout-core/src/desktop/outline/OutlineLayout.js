@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TreeLayout} from '../../index';
-import {Dimension} from '../../index';
-import {graphics} from '../../index';
+import {Dimension, graphics, TreeLayout} from '../../index';
 
 export default class OutlineLayout extends TreeLayout {
 

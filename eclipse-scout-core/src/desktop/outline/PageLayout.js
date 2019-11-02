@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../../index';
-import {Dimension} from '../../index';
-import {graphics} from '../../index';
+import {AbstractLayout, Dimension, graphics} from '../../index';
 
 export default class PageLayout extends AbstractLayout {
 

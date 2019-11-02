@@ -1,7 +1,5 @@
-import {numbers} from '../index';
-import {Range} from '../index';
+import {numbers, Range, scout} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 export default class VirtualScrolling {
 

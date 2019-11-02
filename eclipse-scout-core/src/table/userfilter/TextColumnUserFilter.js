@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings} from '../../index';
-import {scout} from '../../index';
-import {ColumnUserFilter} from '../../index';
+import {ColumnUserFilter, scout, strings} from '../../index';
 import * as $ from 'jquery';
 
 export default class TextColumnUserFilter extends ColumnUserFilter {

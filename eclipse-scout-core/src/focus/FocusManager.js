@@ -8,14 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {filters} from '../index';
-import {Device} from '../index';
-import {FocusContext} from '../index';
-import {FocusRule} from '../index';
-import {focusUtils} from '../index';
+import {arrays, Device, filters, FocusContext, FocusRule, focusUtils, scout} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
-import {scout} from '../index';
 
 /**
  * The focus manager ensures proper focus handling based on focus contexts.

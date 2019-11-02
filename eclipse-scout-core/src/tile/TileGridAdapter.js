@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../index';
-import {ModelAdapter} from '../index';
-import {scout} from '../index';
+import {ModelAdapter, objects, scout} from '../index';
 
 export default class TileGridAdapter extends ModelAdapter {
 

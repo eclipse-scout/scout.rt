@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MenuNavigationExecKeyStroke} from '../index';
-import {keys} from '../index';
-import {menuNavigationKeyStrokes} from '../index';
+import {keys, MenuNavigationExecKeyStroke, menuNavigationKeyStrokes} from '../index';
 
 export default class SubCloseKeyStroke extends MenuNavigationExecKeyStroke {
 

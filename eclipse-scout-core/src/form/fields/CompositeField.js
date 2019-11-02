@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {widgets} from '../../index';
-import {TreeVisitResult} from '../../index';
-import {FormField} from '../../index';
-import {fields} from '../../index';
+import {fields, FormField, TreeVisitResult, widgets} from '../../index';
 
 export default class CompositeField extends FormField {
 

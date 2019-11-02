@@ -8,13 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates} from '../index';
-import {Popup} from '../index';
-import {Range} from '../index';
-import {strings} from '../index';
-import {Widget} from '../index';
+import {dates, Popup, Range, scout, strings, Widget} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 export default class CalendarComponent extends Widget {
 

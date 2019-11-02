@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ModeSelectorLayout} from '../index';
-import {HtmlComponent} from '../index';
-import {Widget} from '../index';
-import {arrays} from '../index';
+import {arrays, HtmlComponent, ModeSelectorLayout, Widget} from '../index';
 
 export default class ModeSelector extends Widget {
 

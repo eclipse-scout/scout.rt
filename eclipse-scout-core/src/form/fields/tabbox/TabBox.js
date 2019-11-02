@@ -8,14 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SingleLayout} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {CompositeField} from '../../../index';
-import {scout} from '../../../index';
-import {TabArea} from '../../../index';
-import {TabBoxLayout} from '../../../index';
-import {FormField} from '../../../index';
-import {arrays} from '../../../index';
+import {arrays, CompositeField, FormField, HtmlComponent, scout, SingleLayout, TabArea, TabBoxLayout} from '../../../index';
 import * as $ from 'jquery';
 
 /**

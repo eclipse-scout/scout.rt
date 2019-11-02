@@ -8,13 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MessageBoxes} from '../index';
-import {objects} from '../index';
-import {Status} from '../index';
-import {EventSupport} from '../index';
-import {MessageBox} from '../index';
+import {EventSupport, MessageBox, MessageBoxes, objects, scout, Status} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 /**
  * Abstract base class for validation lifecycles as used for forms.

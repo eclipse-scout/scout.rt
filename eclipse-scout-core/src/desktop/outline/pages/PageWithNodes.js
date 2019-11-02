@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MenuBar} from '../../../index';
-import {scout} from '../../../index';
-import {Page} from '../../../index';
+import {MenuBar, Page, scout} from '../../../index';
 import * as $ from 'jquery';
 
 /**

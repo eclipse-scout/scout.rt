@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from './index';
-import {objects} from './index';
-import {App} from './index';
+import {App, defaultValues, objects, scout} from './index';
 import * as $ from 'jquery';
-import {defaultValues} from './index';
 
 export default class RemoteApp extends App {
 

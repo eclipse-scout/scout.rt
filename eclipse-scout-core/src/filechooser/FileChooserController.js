@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form} from '../index';
-import {arrays} from '../index';
-import {scout} from '../index';
+import {arrays, Form, scout} from '../index';
 
 /**
  * Controller with functionality to register and render file choosers.

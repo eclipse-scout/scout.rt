@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons} from '../../../index';
-import {NavigateButton} from '../../../index';
+import {icons, NavigateButton} from '../../../index';
 import * as $ from 'jquery';
 
 export default class NavigateUpButton extends NavigateButton {

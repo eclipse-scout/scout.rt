@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HorizontalGridMatrix} from '../../index';
-import {AbstractGrid} from '../../index';
+import {AbstractGrid, HorizontalGridMatrix} from '../../index';
 
 export default class HorizontalGrid extends AbstractGrid {
 

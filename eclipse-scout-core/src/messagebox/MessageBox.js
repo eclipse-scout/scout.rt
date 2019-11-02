@@ -8,24 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device} from '../index';
-import {ClickActiveElementKeyStroke} from '../index';
-import {Form} from '../index';
-import {objects} from '../index';
-import {HtmlComponent} from '../index';
-import {Status} from '../index';
-import {keys} from '../index';
-import {KeyStrokeContext} from '../index';
-import {clipboard} from '../index';
-import {CopyKeyStroke} from '../index';
-import {AbortKeyStroke} from '../index';
-import {strings} from '../index';
-import {GlassPaneRenderer} from '../index';
-import {BoxButtons} from '../index';
-import {Widget} from '../index';
-import {MessageBoxLayout} from '../index';
-import {FocusAdjacentElementKeyStroke} from '../index';
-import {FocusRule} from '../index';
+import {
+  AbortKeyStroke,
+  BoxButtons,
+  ClickActiveElementKeyStroke,
+  clipboard,
+  CopyKeyStroke,
+  Device,
+  FocusAdjacentElementKeyStroke,
+  FocusRule,
+  Form,
+  GlassPaneRenderer,
+  HtmlComponent,
+  keys,
+  KeyStrokeContext,
+  MessageBoxLayout,
+  objects,
+  Status,
+  strings,
+  Widget
+} from '../index';
 
 export default class MessageBox extends Widget {
 

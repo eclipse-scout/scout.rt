@@ -8,16 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ClickActiveElementKeyStroke} from '../index';
-import {strings} from '../index';
-import {keys} from '../index';
-import {GlassPaneRenderer} from '../index';
-import {KeyStrokeContext} from '../index';
-import {BoxButtons} from '../index';
-import {Widget} from '../index';
-import {FocusRule} from '../index';
-import {scout} from '../index';
-import {CloseKeyStroke} from '../index';
+import {BoxButtons, ClickActiveElementKeyStroke, CloseKeyStroke, FocusRule, GlassPaneRenderer, keys, KeyStrokeContext, scout, strings, Widget} from '../index';
 
 export default class BusyIndicator extends Widget {
 

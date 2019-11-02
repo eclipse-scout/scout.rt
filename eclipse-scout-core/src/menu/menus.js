@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons} from '../index';
-import {MenuDestinations} from '../index';
+import {arrays, icons, MenuDestinations, scout} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
-import {scout} from '../index';
 
 
 export function filterAccordingToSelection(prefix, selectionLength, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {

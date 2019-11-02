@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../../index';
-import {scout} from '../../index';
-import {App} from '../../index';
-import {TreeAdapter} from '../../index';
-import {Outline} from '../../index';
+import {App, objects, Outline, scout, TreeAdapter} from '../../index';
 
 export default class OutlineAdapter extends TreeAdapter {
 

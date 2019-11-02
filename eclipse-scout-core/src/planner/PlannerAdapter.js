@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates} from '../index';
-import {DateRange} from '../index';
-import {ModelAdapter} from '../index';
+import {DateRange, dates, ModelAdapter} from '../index';
 
 export default class PlannerAdapter extends ModelAdapter {
 

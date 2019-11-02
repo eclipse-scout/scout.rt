@@ -8,14 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../../index';
-import {HtmlComponent} from '../../index';
-import {strings} from '../../index';
-import {Status} from '../../index';
-import {scout} from '../../index';
-import {Event} from '../../index';
-import {FormField} from '../../index';
-import {arrays} from '../../index';
+import {arrays, Event, FormField, HtmlComponent, scout, Status, strings, Widget} from '../../index';
 
 export default class FieldStatus extends Widget {
 

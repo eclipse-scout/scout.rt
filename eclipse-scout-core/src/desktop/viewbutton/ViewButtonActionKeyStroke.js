@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HAlign} from '../../index';
-import {ActionKeyStroke} from '../../index';
+import {ActionKeyStroke, HAlign} from '../../index';
 
 export default class ViewButtonActionKeyStroke extends ActionKeyStroke {
 

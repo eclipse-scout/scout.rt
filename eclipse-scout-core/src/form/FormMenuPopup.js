@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupWithHead} from '../index';
-import {FormMenuPopupLayout} from '../index';
+import {FormMenuPopupLayout, PopupWithHead} from '../index';
 
 export default class FormMenuPopup extends PopupWithHead {
 

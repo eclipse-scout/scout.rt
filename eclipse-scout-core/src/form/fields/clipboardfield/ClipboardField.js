@@ -8,14 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ValueField} from '../../../index';
-import {strings} from '../../../index';
-import {keys} from '../../../index';
-import {Device} from '../../../index';
-import {scout} from '../../../index';
-import {InputFieldKeyStrokeContext} from '../../../index';
-import {dragAndDrop} from '../../../index';
-import {mimeTypes} from '../../../index';
+import {Device, dragAndDrop, InputFieldKeyStrokeContext, keys, mimeTypes, scout, strings, ValueField} from '../../../index';
 import * as $ from 'jquery';
 
 export default class ClipboardField extends ValueField {

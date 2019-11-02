@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys} from '../../../index';
-import {TileButton} from '../../../index';
-import {RangeKeyStroke} from '../../../index';
+import {keys, RangeKeyStroke, TileButton} from '../../../index';
 
 export default class PageTileGridSelectKeyStroke extends RangeKeyStroke {
 

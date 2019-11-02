@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TabItemLayout} from '../../../index';
-import {GroupBox} from '../../../index';
+import {GroupBox, TabItemLayout} from '../../../index';
 
 export default class TabItem extends GroupBox {
 

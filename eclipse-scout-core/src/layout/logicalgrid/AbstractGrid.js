@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GridData} from '../../index';
-import {LogicalGrid} from '../../index';
+import {GridData, LogicalGrid} from '../../index';
 
 /**
  * @abstract

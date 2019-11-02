@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../index';
-import {AggregateTableControl} from '../index';
+import {AggregateTableControl, arrays, scout, Widget} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
-import {scout} from '../index';
 
 
 /**

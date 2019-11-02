@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {defaultValues} from '../index';
-import {Tree} from '../index';
-import {objects} from '../index';
-import {ModelAdapter} from '../index';
-import {arrays} from '../index';
+import {arrays, defaultValues, ModelAdapter, objects, Tree} from '../index';
 
 export default class TreeAdapter extends ModelAdapter {
 

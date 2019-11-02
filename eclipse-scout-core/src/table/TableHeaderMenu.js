@@ -8,19 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NumberColumn} from '../index';
-import {Device} from '../index';
-import {TableHeaderMenuGroup} from '../index';
-import {HtmlComponent} from '../index';
-import {Point} from '../index';
-import {scout} from '../index';
-import {graphics} from '../index';
-import {scrollbars} from '../index';
-import {Table} from '../index';
-import {TableHeaderMenuLayout} from '../index';
-import {Popup} from '../index';
-import {RowLayout} from '../index';
-import {arrays} from '../index';
+import {arrays, Device, graphics, HtmlComponent, NumberColumn, Point, Popup, RowLayout, scout, scrollbars, Table, TableHeaderMenuGroup, TableHeaderMenuLayout} from '../index';
 
 export default class TableHeaderMenu extends Popup {
 

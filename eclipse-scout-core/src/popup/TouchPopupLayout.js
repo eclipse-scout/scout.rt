@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {Rectangle} from '../index';
-import {HtmlEnvironment} from '../index';
-import {PopupLayout} from '../index';
-import {Dimension} from '../index';
+import {Dimension, graphics, HtmlEnvironment, PopupLayout, Rectangle} from '../index';
 
 export default class TouchPopupLayout extends PopupLayout {
 

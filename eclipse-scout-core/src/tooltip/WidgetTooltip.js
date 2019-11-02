@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Tooltip} from '../index';
-import {keys} from '../index';
-import {KeyStrokeContext} from '../index';
-import {FocusRule} from '../index';
-import {scout} from '../index';
+import {FocusRule, keys, KeyStrokeContext, scout, Tooltip} from '../index';
 
 export default class WidgetTooltip extends Tooltip {
 

@@ -8,28 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device} from '../index';
-import {ClickActiveElementKeyStroke} from '../index';
-import {Form} from '../index';
-import {Event} from '../index';
-import {HtmlComponent} from '../index';
-import {Status} from '../index';
-import {dragAndDrop} from '../index';
-import {keys} from '../index';
-import {FormLayout} from '../index';
-import {KeyStrokeContext} from '../index';
+import {
+  arrays,
+  BoxButtons,
+  ClickActiveElementKeyStroke,
+  CloseKeyStroke,
+  Device,
+  dragAndDrop,
+  Event,
+  FileInput,
+  FocusAdjacentElementKeyStroke,
+  FocusRule,
+  Form,
+  FormLayout,
+  GlassPaneRenderer,
+  HtmlComponent,
+  keys,
+  KeyStrokeContext,
+  MessageBoxes,
+  scout,
+  scrollbars,
+  Status,
+  Widget
+} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {CloseKeyStroke} from '../index';
-import {scrollbars} from '../index';
-import {FileInput} from '../index';
-import {MessageBoxes} from '../index';
-import {GlassPaneRenderer} from '../index';
-import {BoxButtons} from '../index';
-import {Widget} from '../index';
-import {FocusAdjacentElementKeyStroke} from '../index';
-import {FocusRule} from '../index';
-import {arrays} from '../index';
 
 export default class FileChooser extends Widget {
 

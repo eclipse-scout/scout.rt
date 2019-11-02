@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HorizontalGrid} from '../index';
-import {PlaceholderTile} from '../index';
+import {arrays, HorizontalGrid, PlaceholderTile} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
 
 export default class TileGridSelectionHandler {
 

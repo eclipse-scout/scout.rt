@@ -8,13 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TouchPopupLayout} from '../index';
-import {Popup} from '../index';
-import {ValueField} from '../index';
-import {HtmlComponent} from '../index';
-import {Point} from '../index';
-import {FormField} from '../index';
-import {SingleLayout} from '../index';
+import {FormField, HtmlComponent, Point, Popup, SingleLayout, TouchPopupLayout, ValueField} from '../index';
 
 export default class TouchPopup extends Popup {
 

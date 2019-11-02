@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {AbstractLayout} from '../index';
-import {HtmlComponent} from '../index';
+import {AbstractLayout, graphics, HtmlComponent} from '../index';
 import * as $ from 'jquery';
 
 export default class FormLayout extends AbstractLayout {

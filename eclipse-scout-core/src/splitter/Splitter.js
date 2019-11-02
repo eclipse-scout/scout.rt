@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {HtmlComponent} from '../index';
-import {Widget} from '../index';
+import {graphics, HtmlComponent, Widget} from '../index';
 import * as $ from 'jquery';
 
 export default class Splitter extends Widget {

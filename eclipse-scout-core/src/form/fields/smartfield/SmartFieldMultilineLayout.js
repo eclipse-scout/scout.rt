@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../../../index';
-import {HtmlEnvironment} from '../../../index';
-import {HtmlComponent} from '../../../index';
+import {AbstractLayout, HtmlComponent, HtmlEnvironment} from '../../../index';
 
 /**
  * This layout only layouts the INPUT and DIV part of the multi-line smart-field, not the entire form-field.

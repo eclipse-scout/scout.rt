@@ -8,19 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Icon} from '../index';
-import {HtmlComponent} from '../index';
-import {Insets} from '../index';
-import {KeyStrokeContext} from '../index';
+import {Dimension, graphics, GroupLayout, GroupToggleCollapseKeyStroke, HtmlComponent, Icon, Insets, KeyStrokeContext, LoadingSupport, scout, tooltips, Widget} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {GroupToggleCollapseKeyStroke} from '../index';
-import {graphics} from '../index';
-import {GroupLayout} from '../index';
-import {tooltips} from '../index';
-import {LoadingSupport} from '../index';
-import {Widget} from '../index';
-import {Dimension} from '../index';
 
 
 export default class Group extends Widget {

@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Desktop} from '../index';
-import {Device} from '../index';
+import {Desktop, Device, PopupBlockerHandler, scout} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {PopupBlockerHandler} from '../index';
 
 export default class OpenUriHandler {
 

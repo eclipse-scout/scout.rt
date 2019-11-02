@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons} from '../../index';
-import {graphics} from '../../index';
-import {arrays} from '../../index';
-import {TableControl} from '../../index';
+import {arrays, graphics, icons, TableControl} from '../../index';
 import * as $ from 'jquery';
 
 export default class AggregateTableControl extends TableControl {

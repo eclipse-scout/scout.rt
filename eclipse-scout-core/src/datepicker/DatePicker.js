@@ -8,17 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {Device} from '../index';
-import {DateFormat} from '../index';
-import {dates} from '../index';
-import {objects} from '../index';
-import {HtmlComponent} from '../index';
-import {Widget} from '../index';
-import {events} from '../index';
+import {arrays, DateFormat, dates, Device, events, graphics, HtmlComponent, objects, scout, Widget} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
-import {scout} from '../index';
 
 export default class DatePicker extends Widget {
 

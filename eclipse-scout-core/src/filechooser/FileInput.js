@@ -8,14 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {InputFieldKeyStrokeContext} from '../index';
-import {Device} from '../index';
-import {strings} from '../index';
-import {dragAndDrop} from '../index';
-import {Widget} from '../index';
-import {URL} from '../index';
+import {arrays, Device, dragAndDrop, InputFieldKeyStrokeContext, strings, URL, Widget} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
 
 export default class FileInput extends Widget {
 

@@ -8,14 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CheckBoxToggleKeyStroke} from '../../../index';
-import {ValueField} from '../../../index';
-import {KeyStrokeContext} from '../../../index';
-import {fields} from '../../../index';
-import {Device} from '../../../index';
-import {scout} from '../../../index';
-import {styles} from '../../../index';
-import {tooltips} from '../../../index';
+import {CheckBoxToggleKeyStroke, Device, fields, KeyStrokeContext, scout, styles, tooltips, ValueField} from '../../../index';
 
 export default class CheckBoxField extends ValueField {
 

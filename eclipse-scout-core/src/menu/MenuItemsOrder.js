@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {menus} from '../index';
-import {scout} from '../index';
+import {menus, scout} from '../index';
 
 export default class MenuItemsOrder {
 

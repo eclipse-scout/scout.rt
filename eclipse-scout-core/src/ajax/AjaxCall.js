@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Call} from '../index';
-import {URL} from '../index';
+import {Call, URL} from '../index';
 import * as $ from 'jquery';
 
 export default class AjaxCall extends Call {

@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {KeyStroke} from '../../index';
-import {keys} from '../../index';
+import {keys, KeyStroke} from '../../index';
 import * as $ from 'jquery';
 
 export default class AppLinkKeyStroke extends KeyStroke {

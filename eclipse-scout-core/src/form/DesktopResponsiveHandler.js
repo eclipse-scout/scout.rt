@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ResponsiveManager} from '../index';
-import {ResponsiveHandler} from '../index';
+import {ResponsiveHandler, ResponsiveManager} from '../index';
 
 export default class DesktopResponsiveHandler extends ResponsiveHandler {
 

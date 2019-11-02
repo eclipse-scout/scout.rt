@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {widgets} from '../index';
-import {Widget} from '../index';
-import {scout} from '../index';
+import {scout, Widget, widgets} from '../index';
 
 export default class TableHeaderMenuGroup extends Widget {
 

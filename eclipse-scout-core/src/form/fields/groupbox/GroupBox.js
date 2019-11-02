@@ -8,30 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TabItemKeyStroke} from '../../../index';
-import {GroupBoxMenuItemsOrder} from '../../../index';
-import {LogicalGridData} from '../../../index';
-import {LogicalGridLayoutConfig} from '../../../index';
-import {ResponsiveManager} from '../../../index';
-import {TabBox} from '../../../index';
-import {tooltips} from '../../../index';
-import {FormField} from '../../../index';
-import {GroupBoxLayout} from '../../../index';
+import {
+  arrays,
+  Button,
+  ButtonAdapterMenu,
+  CompositeField,
+  Form,
+  FormField,
+  GroupBoxGridConfig,
+  GroupBoxLayout,
+  GroupBoxMenuItemsOrder,
+  HAlign,
+  HtmlComponent,
+  LogicalGridData,
+  LogicalGridLayout,
+  LogicalGridLayoutConfig,
+  MenuBar,
+  ResponsiveManager,
+  scout,
+  SplitBox,
+  strings,
+  TabBox,
+  TabItemKeyStroke,
+  tooltips,
+  WrappedFormField
+} from '../../../index';
 import * as $ from 'jquery';
-import {SplitBox} from '../../../index';
-import {Form} from '../../../index';
-import {LogicalGridLayout} from '../../../index';
-import {MenuBar} from '../../../index';
-import {ButtonAdapterMenu} from '../../../index';
-import {strings} from '../../../index';
-import {Button} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {CompositeField} from '../../../index';
-import {scout} from '../../../index';
-import {GroupBoxGridConfig} from '../../../index';
-import {WrappedFormField} from '../../../index';
-import {HAlign} from '../../../index';
-import {arrays} from '../../../index';
 
 export default class GroupBox extends CompositeField {
 

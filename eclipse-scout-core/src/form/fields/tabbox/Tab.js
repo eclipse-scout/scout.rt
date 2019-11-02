@@ -8,15 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlEnvironment} from '../../../index';
-import {strings} from '../../../index';
-import {Status} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {Device} from '../../../index';
-import {scout} from '../../../index';
-import {Widget} from '../../../index';
-import {tooltips} from '../../../index';
-import {FormField} from '../../../index';
+import {Device, FormField, HtmlComponent, HtmlEnvironment, scout, Status, strings, tooltips, Widget} from '../../../index';
 
 export default class Tab extends Widget {
 

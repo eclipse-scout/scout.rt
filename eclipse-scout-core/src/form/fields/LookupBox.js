@@ -8,13 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent} from '../../index';
-import {LookupCall} from '../../index';
-import {strings} from '../../index';
-import {Status} from '../../index';
-import {objects} from '../../index';
-import {ValueField} from '../../index';
-import {arrays} from '../../index';
+import {arrays, HtmlComponent, LookupCall, objects, Status, strings, ValueField} from '../../index';
 import * as $ from 'jquery';
 
 export default class LookupBox extends ValueField {

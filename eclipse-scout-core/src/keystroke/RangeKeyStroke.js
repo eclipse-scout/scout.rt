@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Key} from '../index';
-import {KeyStroke} from '../index';
+import {Key, KeyStroke} from '../index';
 
 /**
  * KeyStroke which is bound to a range of keys, e.g. ctrl-1 ... ctrl-9.

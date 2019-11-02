@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ProposalChooser} from '../../../index';
-import {Column} from '../../../index';
-import {lookupField} from '../../../index';
-import {scout} from '../../../index';
-import {objects} from '../../../index';
-import {arrays} from '../../../index';
+import {arrays, Column, lookupField, objects, ProposalChooser, scout} from '../../../index';
 
 export default class TableProposalChooser extends ProposalChooser {
 

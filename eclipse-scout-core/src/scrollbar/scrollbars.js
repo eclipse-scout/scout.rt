@@ -8,13 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {Device} from '../index';
-import {objects} from '../index';
-import {HtmlComponent} from '../index';
+import {arrays, Device, graphics, HtmlComponent, objects, scout} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
-import {scout} from '../index';
 
 
 /**

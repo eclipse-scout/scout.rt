@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FocusRule} from '../index';
+import {FocusRule, scout, Status} from '../index';
 import * as $ from 'jquery';
-import {Status} from '../index';
-import {scout} from '../index';
 
 
 /**

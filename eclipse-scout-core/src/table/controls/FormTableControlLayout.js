@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../../index';
-import {graphics} from '../../index';
-import {TabBox} from '../../index';
+import {AbstractLayout, graphics, scrollbars, TabBox} from '../../index';
 import * as $ from 'jquery';
-import {scrollbars} from '../../index';
 
 export default class FormTableControlLayout extends AbstractLayout {
 

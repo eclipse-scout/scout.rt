@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LookupBox} from '../../../index';
-import {TreeBoxLayout} from '../../../index';
-import {scout} from '../../../index';
-import {objects} from '../../../index';
-import {arrays} from '../../../index';
+import {arrays, LookupBox, objects, scout, TreeBoxLayout} from '../../../index';
 
 export default class TreeBox extends LookupBox {
 

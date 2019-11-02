@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {LocaleSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
-import {DecimalFormat, Device, Range, RemoteEvent, Status, styles} from '../../../src/index';
+import {DecimalFormat, Range, RemoteEvent, Status, styles} from '../../../src/index';
 
 
 /* global LocaleSpecHelper */

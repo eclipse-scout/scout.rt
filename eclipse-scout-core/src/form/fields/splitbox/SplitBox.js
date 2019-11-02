@@ -8,19 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SplitBoxCollapseKeyStroke} from '../../../index';
-import {graphics} from '../../../index';
-import {GroupBox} from '../../../index';
+import {
+  CollapseHandle,
+  CompositeField,
+  graphics,
+  GroupBox,
+  HtmlComponent,
+  HtmlEnvironment,
+  KeyStroke,
+  scout,
+  SplitBoxCollapseKeyStroke,
+  SplitBoxFirstCollapseKeyStroke,
+  SplitBoxLayout,
+  SplitBoxSecondCollapseKeyStroke
+} from '../../../index';
 import * as $ from 'jquery';
-import {SplitBoxLayout} from '../../../index';
-import {HtmlEnvironment} from '../../../index';
-import {SplitBoxFirstCollapseKeyStroke} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {CompositeField} from '../../../index';
-import {scout} from '../../../index';
-import {CollapseHandle} from '../../../index';
-import {KeyStroke} from '../../../index';
-import {SplitBoxSecondCollapseKeyStroke} from '../../../index';
 
 export default class SplitBox extends CompositeField {
 

@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons} from '../index';
-import {StaticLookupCall} from '../index';
-import {scout} from '../index';
+import {icons, scout, StaticLookupCall} from '../index';
 
 export default class TileTableHeaderSortByLookupCall extends StaticLookupCall {
 

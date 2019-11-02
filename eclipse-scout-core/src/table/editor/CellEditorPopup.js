@@ -8,15 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CellEditorTabKeyStroke} from '../../index';
-import {CellEditorPopupLayout} from '../../index';
-import {scout} from '../../index';
-import {Popup} from '../../index';
-import {graphics} from '../../index';
-import {Point} from '../../index';
-import {FormField} from '../../index';
-import {CellEditorCompleteEditKeyStroke} from '../../index';
-import {CellEditorCancelEditKeyStroke} from '../../index';
+import {CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorTabKeyStroke, FormField, graphics, Point, Popup, scout} from '../../index';
 import * as $ from 'jquery';
 
 export default class CellEditorPopup extends Popup {

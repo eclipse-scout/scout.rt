@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates} from '../index';
-import {ModelAdapter} from '../index';
+import {dates, ModelAdapter} from '../index';
 
 export default class CalendarAdapter extends ModelAdapter {
 

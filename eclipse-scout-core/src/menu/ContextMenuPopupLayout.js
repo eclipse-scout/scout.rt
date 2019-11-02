@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupWithHeadLayout} from '../index';
-import {HtmlComponent} from '../index';
+import {HtmlComponent, PopupWithHeadLayout} from '../index';
 import * as $ from 'jquery';
 
 export default class ContextMenuPopupLayout extends PopupWithHeadLayout {

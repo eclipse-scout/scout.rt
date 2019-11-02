@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractTableNavigationKeyStroke} from '../../index';
-import {keys} from '../../index';
-import {arrays} from '../../index';
+import {AbstractTableNavigationKeyStroke, arrays, keys} from '../../index';
 
 export default class TableNavigationPageUpKeyStroke extends AbstractTableNavigationKeyStroke {
 

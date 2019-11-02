@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent} from '../index';
-import {strings} from '../index';
-import {Widget} from '../index';
-import {arrays} from '../index';
+import {arrays, HtmlComponent, strings, Widget} from '../index';
 
 export default class TableRowDetail extends Widget {
 

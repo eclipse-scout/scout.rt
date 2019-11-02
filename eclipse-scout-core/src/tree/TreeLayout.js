@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {scrollbars} from '../index';
-import {AbstractLayout} from '../index';
-import {MenuBarLayout} from '../index';
+import {AbstractLayout, graphics, MenuBarLayout, scrollbars} from '../index';
 
 export default class TreeLayout extends AbstractLayout {
 

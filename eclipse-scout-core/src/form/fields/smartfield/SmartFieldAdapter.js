@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings} from '../../../index';
-import {scout} from '../../../index';
-import {LookupFieldAdapter} from '../../../index';
+import {LookupFieldAdapter, scout, strings} from '../../../index';
 
 export default class SmartFieldAdapter extends LookupFieldAdapter {
 

@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../../index';
-import {HtmlComponent} from '../../index';
-import {Dimension} from '../../index';
-import {HtmlEnvironment} from '../../index';
+import {AbstractLayout, Dimension, HtmlComponent, HtmlEnvironment} from '../../index';
 
 export default class LookupBoxLayout extends AbstractLayout {
 

@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TagFieldDeleteKeyStroke} from '../index';
-import {PopupWithHead} from '../index';
-import {TagBar} from '../index';
-import {TagFieldNavigationKeyStroke} from '../index';
-import {arrays} from '../index';
+import {arrays, PopupWithHead, TagBar, TagFieldDeleteKeyStroke, TagFieldNavigationKeyStroke} from '../index';
 
 export default class TagBarOverflowPopup extends PopupWithHead {
 

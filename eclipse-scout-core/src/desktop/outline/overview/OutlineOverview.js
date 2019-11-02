@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent} from '../../../index';
-import {scout} from '../../../index';
-import {Widget} from '../../../index';
-import {Outline} from '../../../index';
+import {HtmlComponent, Outline, scout, Widget} from '../../../index';
 
 export default class OutlineOverview extends Widget {
 

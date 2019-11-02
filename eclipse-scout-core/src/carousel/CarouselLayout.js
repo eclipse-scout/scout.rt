@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../index';
-import {HtmlComponent} from '../index';
-import {Dimension} from '../index';
+import {AbstractLayout, Dimension, HtmlComponent} from '../index';
 
 export default class CarouselLayout extends AbstractLayout {
 

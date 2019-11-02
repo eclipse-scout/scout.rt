@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SimpleTabBoxController} from '../index';
-import {scout} from '../index';
+import {scout, SimpleTabBoxController} from '../index';
 
 
 export default class DesktopTabBoxController extends SimpleTabBoxController {

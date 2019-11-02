@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../index';
-import {arrays} from '../index';
+import {arrays, Widget} from '../index';
 
 export default class PopupManager extends Widget {
 

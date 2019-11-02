@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ResponsiveManager} from '../../../index';
-import {GridData} from '../../../index';
-import {CompositeFieldAdapter} from '../../../index';
+import {CompositeFieldAdapter, GridData, ResponsiveManager} from '../../../index';
 
 export default class GroupBoxAdapter extends CompositeFieldAdapter {
 

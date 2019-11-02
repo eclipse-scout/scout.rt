@@ -8,15 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../../index';
-import {Desktop} from '../../index';
-import {CollapseHandle} from '../../index';
-import {HtmlComponent} from '../../index';
-import {Tree} from '../../index';
-import {SingleLayout} from '../../index';
-import {scout} from '../../index';
-import {DesktopNavigationLayout} from '../../index';
-import {styles} from '../../index';
+import {CollapseHandle, Desktop, DesktopNavigationLayout, HtmlComponent, scout, SingleLayout, styles, Tree, Widget} from '../../index';
 
 export default class DesktopNavigation extends Widget {
 

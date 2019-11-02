@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {AbstractLayout} from '../index';
-import {HtmlComponent} from '../index';
+import {AbstractLayout, Dimension, graphics, HtmlComponent} from '../index';
 import * as $ from 'jquery';
-import {Dimension} from '../index';
 
 export default class TagBarLayout extends AbstractLayout {
 

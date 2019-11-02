@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Table} from '../index';
-import {objects} from '../index';
-import {arrays} from '../index';
+import {arrays, objects, Table} from '../index';
 
 export default class TableUpdateBuffer {
 

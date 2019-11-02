@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../../../index';
-import {HtmlEnvironment} from '../../../index';
-import {Insets} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {graphics} from '../../../index';
-import {Dimension} from '../../../index';
+import {AbstractLayout, Dimension, graphics, HtmlComponent, HtmlEnvironment, Insets} from '../../../index';
 
 export default class DateTimeCompositeLayout extends AbstractLayout {
 

@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MenuAdapter} from '../../../index';
-import {GridData} from '../../../index';
+import {GridData, MenuAdapter} from '../../../index';
 
 export default class FormFieldMenuAdapter extends MenuAdapter {
 

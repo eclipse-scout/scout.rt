@@ -8,13 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {Rectangle} from '../index';
-import {Popup} from '../index';
-import {AbstractLayout} from '../index';
-import {Insets} from '../index';
-import {scout} from '../index';
-import {Dimension} from '../index';
+import {AbstractLayout, Dimension, graphics, Insets, Popup, Rectangle, scout} from '../index';
 
 export default class PopupLayout extends AbstractLayout {
 

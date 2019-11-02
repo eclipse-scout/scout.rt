@@ -8,14 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Rectangle} from '../index';
-import {HtmlComponent} from '../index';
-import {EventSupport} from '../index';
-import {polyfills} from '../index';
-import {SingleLayout} from '../index';
+import {Dimension, EventSupport, HtmlComponent, polyfills, Rectangle, scout, SingleLayout} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {Dimension} from '../index';
 
 export default class PopupWindow {
 

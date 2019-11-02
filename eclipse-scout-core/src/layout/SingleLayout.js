@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../index';
-import {Dimension} from '../index';
-import {HtmlComponent} from '../index';
+import {AbstractLayout, Dimension, graphics, HtmlComponent} from '../index';
 import * as $ from 'jquery';
-import {graphics} from '../index';
 
 /**
  * Resizes the child so it has the same size as the container.<br>

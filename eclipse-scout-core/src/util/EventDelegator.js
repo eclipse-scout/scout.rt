@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../index';
-import {arrays} from '../index';
-import {scout} from '../index';
+import {arrays, objects, scout} from '../index';
 
 /**
  * Helper to support clone property and event handling between original and clone.

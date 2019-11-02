@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {scout} from '../../../index';
-import {TabArea} from '../../../index';
-import {graphics} from '../../../index';
-import {Dimension} from '../../../index';
+import {AbstractLayout, Dimension, graphics, HtmlComponent, scout, TabArea} from '../../../index';
 import * as $ from 'jquery';
 
 export default class TabAreaLayout extends AbstractLayout {

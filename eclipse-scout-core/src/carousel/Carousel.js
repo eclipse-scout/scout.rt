@@ -8,13 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CarouselLayout} from '../index';
-import {HtmlComponent} from '../index';
-import {SingleLayout} from '../index';
-import {Widget} from '../index';
-import {events} from '../index';
-import {GridData} from '../index';
-import {arrays} from '../index';
+import {arrays, CarouselLayout, events, GridData, HtmlComponent, SingleLayout, Widget} from '../index';
 
 export default class Carousel extends Widget {
 

@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RoundingMode} from '../index';
-import {numbers} from '../index';
-import {strings} from '../index';
-import {scout} from '../index';
+import {numbers, RoundingMode, scout, strings} from '../index';
 
 /**
  * Provides formatting of numbers using java format pattern.

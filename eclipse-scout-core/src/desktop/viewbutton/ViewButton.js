@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action} from '../../index';
-import {ViewButtonActionKeyStroke} from '../../index';
+import {Action, ViewButtonActionKeyStroke} from '../../index';
 
 export default class ViewButton extends Action {
 

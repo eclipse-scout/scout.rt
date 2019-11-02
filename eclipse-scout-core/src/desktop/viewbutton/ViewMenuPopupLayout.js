@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ViewMenuPopup} from '../../index';
-import {PopupWithHeadLayout} from '../../index';
+import {PopupWithHeadLayout, ViewMenuPopup} from '../../index';
 
 export default class ViewMenuPopupLayout extends PopupWithHeadLayout {
 

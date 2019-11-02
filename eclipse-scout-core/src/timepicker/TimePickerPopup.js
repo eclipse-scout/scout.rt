@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TimePickerPopupLayout} from '../index';
-import {Popup} from '../index';
-import {HtmlComponent} from '../index';
-import {FormField} from '../index';
-import {scout} from '../index';
+import {FormField, HtmlComponent, Popup, scout, TimePickerPopupLayout} from '../index';
 
 export default class TimePickerPopup extends Popup {
 

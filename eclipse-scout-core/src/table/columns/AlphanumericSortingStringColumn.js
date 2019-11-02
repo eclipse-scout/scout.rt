@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {comparators} from '../../index';
-import {Column} from '../../index';
+import {Column, comparators} from '../../index';
 
 export default class AlphanumericSortingStringColumn extends Column {
 

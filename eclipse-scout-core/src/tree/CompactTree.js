@@ -8,17 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Tree} from '../index';
-import {CompactTreeRightKeyStroke} from '../index';
-import {HtmlComponent} from '../index';
-import {Range} from '../index';
-import {CompactTreeUpKeyStroke} from '../index';
-import {CompactTreeDownKeyStroke} from '../index';
-import {MenuItemsOrder} from '../index';
-import {CompactTreeLeftKeyStroke} from '../index';
-import {TreeLayout} from '../index';
-import {arrays} from '../index';
-import {scout} from '../index';
+import {arrays, CompactTreeDownKeyStroke, CompactTreeLeftKeyStroke, CompactTreeRightKeyStroke, CompactTreeUpKeyStroke, HtmlComponent, MenuItemsOrder, Range, scout, Tree, TreeLayout} from '../index';
 
 export default class CompactTree extends Tree {
 

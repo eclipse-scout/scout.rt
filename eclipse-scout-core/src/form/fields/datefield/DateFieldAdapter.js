@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateField} from '../../../index';
-import {dates} from '../../../index';
-import {ValueFieldAdapter} from '../../../index';
-import {Status} from '../../../index';
-import {arrays} from '../../../index';
+import {arrays, DateField, dates, Status, ValueFieldAdapter} from '../../../index';
 
 export default class DateFieldAdapter extends ValueFieldAdapter {
 

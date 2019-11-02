@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractCompactTreeControlKeyStroke} from '../../index';
-import {keys} from '../../index';
-import {arrays} from '../../index';
+import {AbstractCompactTreeControlKeyStroke, arrays, keys} from '../../index';
 
 export default class CompactTreeDownKeyStroke extends AbstractCompactTreeControlKeyStroke {
 

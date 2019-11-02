@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../index';
-import {SimpleTab} from '../../index';
-import {arrays} from '../../index';
+import {arrays, scout, SimpleTab} from '../../index';
 
 export default class DesktopTab extends SimpleTab {
 

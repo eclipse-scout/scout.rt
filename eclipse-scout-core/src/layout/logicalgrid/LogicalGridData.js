@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../../index';
-import {graphics} from '../../index';
-import {CompositeField} from '../../index';
-import {objects} from '../../index';
-import {FormField} from '../../index';
+import {CompositeField, FormField, graphics, objects, Widget} from '../../index';
 
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFormFieldGridData.

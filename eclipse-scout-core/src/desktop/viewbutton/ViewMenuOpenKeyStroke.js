@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {KeyStroke} from '../../index';
-import {keys} from '../../index';
+import {keys, KeyStroke} from '../../index';
 
 /**
  * Keystroke to open the 'ViewMenuPopup' on 'F2'.

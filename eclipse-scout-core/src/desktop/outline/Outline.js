@@ -8,38 +8,40 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NavigateUpButton} from '../../index';
-import {PageLayout} from '../../index';
-import {OutlineLayout} from '../../index';
-import {Page} from '../../index';
-import {NavigateButton} from '../../index';
+import {
+  arrays,
+  defaultValues,
+  DetailTableTreeFilter,
+  Device,
+  FileChooserController,
+  Form,
+  GroupBoxMenuItemsOrder,
+  HtmlComponent,
+  inspector,
+  keyStrokeModifier,
+  MenuBar,
+  menus as menus_1,
+  MessageBoxController,
+  NavigateButton,
+  NavigateDownButton,
+  NavigateUpButton,
+  OutlineKeyStrokeContext,
+  OutlineLayout,
+  OutlineNavigateToTopKeyStroke,
+  Page,
+  PageLayout,
+  scout,
+  TableControlAdapterMenu,
+  TableRow,
+  TableRowDetail,
+  Tree,
+  TreeCollapseOrDrillUpKeyStroke,
+  TreeExpandOrDrillDownKeyStroke,
+  TreeNavigationDownKeyStroke,
+  TreeNavigationEndKeyStroke,
+  TreeNavigationUpKeyStroke
+} from '../../index';
 import * as $ from 'jquery';
-import {HtmlComponent} from '../../index';
-import {TreeNavigationEndKeyStroke} from '../../index';
-import {TreeCollapseOrDrillUpKeyStroke} from '../../index';
-import {Form} from '../../index';
-import {menus as menus_1} from '../../index';
-import {TreeExpandOrDrillDownKeyStroke} from '../../index';
-import {OutlineKeyStrokeContext} from '../../index';
-import {MessageBoxController} from '../../index';
-import {NavigateDownButton} from '../../index';
-import {TreeNavigationUpKeyStroke} from '../../index';
-import {inspector} from '../../index';
-import {Tree} from '../../index';
-import {defaultValues} from '../../index';
-import {scout} from '../../index';
-import {TableRow} from '../../index';
-import {GroupBoxMenuItemsOrder} from '../../index';
-import {keyStrokeModifier} from '../../index';
-import {arrays} from '../../index';
-import {TableControlAdapterMenu} from '../../index';
-import {TreeNavigationDownKeyStroke} from '../../index';
-import {MenuBar} from '../../index';
-import {TableRowDetail} from '../../index';
-import {FileChooserController} from '../../index';
-import {DetailTableTreeFilter} from '../../index';
-import {Device} from '../../index';
-import {OutlineNavigateToTopKeyStroke} from '../../index';
 
 /**
  * @extends {Tree}

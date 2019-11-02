@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ResponsiveManager} from '../index';
-import {objects} from '../index';
+import {arrays, objects, ResponsiveManager} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
 
 export default class ResponsiveHandler {
 

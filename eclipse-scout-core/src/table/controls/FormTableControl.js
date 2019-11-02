@@ -8,13 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form} from '../../index';
-import {Device} from '../../index';
-import {TabBox} from '../../index';
-import {FormField} from '../../index';
-import {TableControl} from '../../index';
-import {GroupBox} from '../../index';
-import {FormTableControlLayout} from '../../index';
+import {Device, Form, FormField, FormTableControlLayout, GroupBox, TabBox, TableControl} from '../../index';
 
 export default class FormTableControl extends TableControl {
 

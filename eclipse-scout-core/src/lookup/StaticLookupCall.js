@@ -8,15 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../index';
-import {strings} from '../index';
-import {LookupCall} from '../index';
-import {LookupRow} from '../index';
-import {QueryBy} from '../index';
-import {HierarchicalLookupResultBuilder} from '../index';
+import {arrays, HierarchicalLookupResultBuilder, LookupCall, LookupRow, objects, QueryBy, scout, strings} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
-import {scout} from '../index';
 
 /**
  * Base class for lookup calls with static or local data. Implement the _data() and _dataToLookupRow()

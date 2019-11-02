@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../../../index';
-import {scrollbars} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {scout} from '../../../index';
-import {graphics} from '../../../index';
-import {Dimension} from '../../../index';
+import {AbstractLayout, Dimension, graphics, HtmlComponent, scout, scrollbars} from '../../../index';
 
 export default class ProposalChooserLayout extends AbstractLayout {
 

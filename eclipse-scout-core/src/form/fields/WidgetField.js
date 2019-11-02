@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {WidgetFieldLayout} from '../../index';
-import {FormField} from '../../index';
+import {FormField, WidgetFieldLayout} from '../../index';
 
 export default class WidgetField extends FormField {
 

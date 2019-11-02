@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form} from '../index';
-import {Desktop} from '../index';
-import {arrays} from '../index';
-import {scout} from '../index';
-import {DialogLayout} from '../index';
-import {Outline} from '../index';
+import {arrays, Desktop, DialogLayout, Form, Outline, scout} from '../index';
 
 /**
  * Controller with functionality to register and render views and dialogs.

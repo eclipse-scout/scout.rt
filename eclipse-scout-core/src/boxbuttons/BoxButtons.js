@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device} from '../index';
+import {Device, scout} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 /**
  * Button utility class for a set of buttons, where each button has an option value.

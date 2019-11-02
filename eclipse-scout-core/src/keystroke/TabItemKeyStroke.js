@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HAlign} from '../index';
-import {KeyStroke} from '../index';
+import {HAlign, KeyStroke} from '../index';
 
 export default class TabItemKeyStroke extends KeyStroke {
 

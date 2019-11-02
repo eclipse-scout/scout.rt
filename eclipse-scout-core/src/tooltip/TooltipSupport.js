@@ -1,6 +1,5 @@
-import {tooltips} from '../index';
+import {scout, tooltips} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 
 /*

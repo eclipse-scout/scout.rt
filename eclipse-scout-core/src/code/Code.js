@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TreeVisitResult} from '../index';
-import {texts} from '../index';
-import {codes} from '../index';
-import {scout} from '../index';
+import {codes, scout, texts, TreeVisitResult} from '../index';
 
 export default class Code {
 

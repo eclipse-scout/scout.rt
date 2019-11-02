@@ -8,20 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Splitter} from '../../index';
-import {BenchColumn} from '../../index';
-import {scout} from '../../index';
-import {FlexboxLayoutData} from '../../index';
-import {arrays} from '../../index';
+import {arrays, BenchColumn, DesktopTabSelectKeyStroke, FlexboxLayout, FlexboxLayoutData, HtmlComponent, KeyStrokeContext, scout, Splitter, styles, Table, Widget, widgets} from '../../index';
 import * as $ from 'jquery';
-import {Table} from '../../index';
-import {styles} from '../../index';
-import {Widget} from '../../index';
-import {widgets} from '../../index';
-import {HtmlComponent} from '../../index';
-import {DesktopTabSelectKeyStroke} from '../../index';
-import {FlexboxLayout} from '../../index';
-import {KeyStrokeContext} from '../../index';
 
 export default class DesktopBench extends Widget {
 

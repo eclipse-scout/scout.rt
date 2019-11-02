@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device} from '../index';
-import {FormMenuActionKeyStroke} from '../index';
-import {Menu} from '../index';
-import {ContextMenuPopup} from '../index';
-import {GroupBox} from '../index';
-import {scout} from '../index';
+import {ContextMenuPopup, Device, FormMenuActionKeyStroke, GroupBox, Menu, scout} from '../index';
 
 export default class FormMenu extends Menu {
 

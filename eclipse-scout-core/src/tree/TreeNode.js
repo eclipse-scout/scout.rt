@@ -8,14 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {defaultValues} from '../index';
-import {icons} from '../index';
-import {Tree} from '../index';
-import {texts} from '../index';
-import {objects} from '../index';
-import {styles} from '../index';
+import {defaultValues, icons, objects, scout, styles, texts, Tree} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 /**
  * @class

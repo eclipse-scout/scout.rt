@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Tile} from '../index';
-import {HtmlComponent} from '../index';
+import {HtmlComponent, Tile} from '../index';
 
 export default class HtmlTile extends Tile {
 

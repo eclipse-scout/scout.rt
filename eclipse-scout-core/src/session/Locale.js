@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateFormat} from '../index';
-import {locales} from '../index';
-import {DecimalFormat} from '../index';
-import {scout} from '../index';
+import {DateFormat, DecimalFormat, locales, scout} from '../index';
 
 export default class Locale {
 

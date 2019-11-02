@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ImageLayout} from '../index';
-import {HtmlComponent} from '../index';
-import {Widget} from '../index';
+import {HtmlComponent, ImageLayout, Widget} from '../index';
 
 export default class Image extends Widget {
 

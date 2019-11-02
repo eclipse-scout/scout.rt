@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Status} from '../../index';
-import {Form} from '../../index';
-import {scout} from '../../index';
-import {arrays} from '../../index';
+import {arrays, Form, scout, Status} from '../../index';
 
 export default class UnsavedFormChangesForm extends Form {
 

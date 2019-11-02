@@ -8,12 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {texts} from '../index';
-import {objects} from '../index';
-import {arrays} from '../index';
+import {arrays, Locale, objects, scout, texts} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {Locale} from '../index';
 
 
 let localesMap = {};

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {scout, Form} from '../../src/index';
+import {Form, scout} from '../../src/index';
 
 describe('WidgetPopup', function() {
   var session;

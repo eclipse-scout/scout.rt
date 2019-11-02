@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../../index';
-import {HtmlComponent} from '../../index';
-import {MenuBar} from '../../index';
-import {MenubarBoxLayout} from '../../index';
-import {arrays} from '../../index';
+import {arrays, HtmlComponent, MenuBar, MenubarBoxLayout, Widget} from '../../index';
 
 export default class MenubarBox extends Widget {
 

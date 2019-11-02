@@ -8,15 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action} from '../../index';
-import {HtmlComponent} from '../../index';
-import {NullLayout} from '../../index';
-import {scout} from '../../index';
-import {TableControlActionKeyStroke} from '../../index';
-import {Table} from '../../index';
-import {KeyStrokeContext} from '../../index';
-import {TableControlCloseKeyStroke} from '../../index';
-import {styles} from '../../index';
+import {Action, HtmlComponent, KeyStrokeContext, NullLayout, scout, styles, Table, TableControlActionKeyStroke, TableControlCloseKeyStroke} from '../../index';
 
 export default class TableControl extends Action {
 

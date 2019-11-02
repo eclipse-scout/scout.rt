@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../../index';
-import {SimpleTabAreaLayout} from '../../index';
-import {Dimension} from '../../index';
-import {graphics} from '../../index';
+import {AbstractLayout, Dimension, graphics, SimpleTabAreaLayout} from '../../index';
 
 export default class DesktopHeaderLayout extends AbstractLayout {
 

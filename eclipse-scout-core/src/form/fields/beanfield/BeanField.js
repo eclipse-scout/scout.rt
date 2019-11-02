@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ValueField} from '../../../index';
-import {AppLinkKeyStroke} from '../../../index';
+import {AppLinkKeyStroke, ValueField} from '../../../index';
 import * as $ from 'jquery';
 
 /**

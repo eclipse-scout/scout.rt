@@ -8,13 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SimpleTabBoxLayout} from '../index';
-import {SimpleTabBoxController} from '../index';
-import {SimpleTabViewContentLayout} from '../index';
-import {HtmlComponent} from '../index';
-import {Widget} from '../index';
-import {arrays} from '../index';
-import {scout} from '../index';
+import {arrays, HtmlComponent, scout, SimpleTabBoxController, SimpleTabBoxLayout, SimpleTabViewContentLayout, Widget} from '../index';
 
 export default class SimpleTabBox extends Widget {
 

@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GridData} from '../index';
-import {LogicalGrid} from '../index';
+import {GridData, LogicalGrid} from '../index';
 
 /**
  * Dummy grid for the form which actually just creates the actual grid data for the root group box from the hints.

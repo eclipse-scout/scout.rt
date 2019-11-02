@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HAlign} from '../../index';
-import {keys} from '../../index';
-import {RangeKeyStroke} from '../../index';
+import {HAlign, keys, RangeKeyStroke} from '../../index';
 
 /**
  * Composite keystroke to provide a numeric keystroke to select view tabs.

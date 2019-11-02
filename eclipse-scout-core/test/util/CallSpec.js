@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Call, scout} from '../../src/index';
+import {Call} from '../../src/index';
 
 
 describe('scout.Call', function() {

@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Popup} from '../index';
-import {HtmlComponent} from '../index';
-import {FormField} from '../index';
-import {DatePickerPopupLayout} from '../index';
-import {scout} from '../index';
+import {DatePickerPopupLayout, FormField, HtmlComponent, Popup, scout} from '../index';
 
 export default class DatePickerPopup extends Popup {
 

@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ValueFieldAdapter} from '../../../index';
-import {strings} from '../../../index';
-import {QueryBy} from '../../../index';
-import {objects} from '../../../index';
+import {objects, QueryBy, strings, ValueFieldAdapter} from '../../../index';
 
 
 /**

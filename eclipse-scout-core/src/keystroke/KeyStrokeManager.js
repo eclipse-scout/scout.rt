@@ -8,15 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {filters as filters_1} from '../index';
-import {keys} from '../index';
-import {KeyStroke} from '../index';
-import {ValueField} from '../index';
-import {EventSupport} from '../index';
-import {Action} from '../index';
-import {VirtualKeyStrokeEvent} from '../index';
+import {Action, arrays, EventSupport, filters as filters_1, keys, KeyStroke, ValueField, VirtualKeyStrokeEvent} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
 
 export default class KeyStrokeManager {
 

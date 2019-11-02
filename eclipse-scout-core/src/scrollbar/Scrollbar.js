@@ -8,13 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {Insets} from '../index';
-import {Widget} from '../index';
-import {events} from '../index';
-import {scrollbars} from '../index';
+import {events, graphics, Insets, scout, scrollbars, Widget} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 export default class Scrollbar extends Widget {
 

@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../../index';
-import {HtmlComponent} from '../../index';
-import {ViewButtonBoxLayout} from '../../index';
-import {scout} from '../../index';
-import {OutlineViewButton} from '../../index';
+import {HtmlComponent, OutlineViewButton, scout, ViewButtonBoxLayout, Widget} from '../../index';
 
 export default class ViewButtonBox extends Widget {
 

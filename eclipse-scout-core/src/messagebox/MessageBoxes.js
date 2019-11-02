@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MessageBox} from '../index';
-import {Status} from '../index';
-import {strings} from '../index';
+import {MessageBox, scout, Status, strings} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 /**
  * This class is a convenient builder for creating message boxes. Use the static functions to

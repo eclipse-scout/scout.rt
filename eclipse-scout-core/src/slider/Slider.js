@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../index';
-import {HtmlComponent} from '../index';
-import {SliderLayout} from '../index';
-import {Widget} from '../index';
-import {scout} from '../index';
+import {HtmlComponent, objects, scout, SliderLayout, Widget} from '../index';
 
 export default class Slider extends Widget {
 

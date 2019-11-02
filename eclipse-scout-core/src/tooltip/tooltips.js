@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TooltipSupport} from '../index';
-import {Device} from '../index';
+import {Device, TooltipSupport} from '../index';
 import * as $ from 'jquery';
 
 

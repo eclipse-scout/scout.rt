@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {IconDesc} from '../index';
-import {strings} from '../index';
+import {IconDesc, strings} from '../index';
 import * as $ from 'jquery';
 
 

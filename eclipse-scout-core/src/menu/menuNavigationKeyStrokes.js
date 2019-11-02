@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MenuNavigationUpKeyStroke} from '../index';
-import {MenuNavigationExecKeyStroke} from '../index';
-import {MenuExecByNumberKeyStroke} from '../index';
-import {MenuNavigationDownKeyStroke} from '../index';
-import {SubCloseKeyStroke} from '../index';
+import {MenuExecByNumberKeyStroke, MenuNavigationDownKeyStroke, MenuNavigationExecKeyStroke, MenuNavigationUpKeyStroke, SubCloseKeyStroke} from '../index';
 
 
 export function registerKeyStrokes(keyStrokeContext, popup, menuItemClass) {

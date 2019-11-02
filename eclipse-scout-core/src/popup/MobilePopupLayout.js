@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {Point} from '../index';
-import {PopupLayout} from '../index';
-import {Dimension} from '../index';
+import {Dimension, graphics, Point, PopupLayout} from '../index';
 
 export default class MobilePopupLayout extends PopupLayout {
 

@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu} from '../../index';
-import {Action} from '../../index';
-import {Button} from '../../index';
-import {scout} from '../../index';
-import {Form} from '../../index';
-import {Event} from '../../index';
+import {Action, Button, Event, Form, Menu, scout} from '../../index';
 
 export default class CloseMenu extends Menu {
 

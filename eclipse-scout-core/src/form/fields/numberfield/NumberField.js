@@ -8,13 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DecimalFormat} from '../../../index';
-import {fields} from '../../../index';
-import {numbers} from '../../../index';
-import {InputFieldKeyStrokeContext} from '../../../index';
-import {BasicField} from '../../../index';
-import {objects} from '../../../index';
-import {Calculator} from '../../../index';
+import {BasicField, Calculator, DecimalFormat, fields, InputFieldKeyStrokeContext, numbers, objects} from '../../../index';
 
 export default class NumberField extends BasicField {
 

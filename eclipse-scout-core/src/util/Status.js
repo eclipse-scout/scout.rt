@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../index';
-import {arrays} from '../index';
-import {strings} from '../index';
+import {arrays, objects, strings} from '../index';
 import * as $ from 'jquery';
 
 export default class Status {

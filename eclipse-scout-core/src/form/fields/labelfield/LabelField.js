@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ValueField} from '../../../index';
-import {strings} from '../../../index';
-import {texts} from '../../../index';
+import {strings, texts, ValueField} from '../../../index';
 
 export default class LabelField extends ValueField {
 

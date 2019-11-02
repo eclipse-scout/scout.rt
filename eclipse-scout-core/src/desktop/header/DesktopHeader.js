@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../../index';
-import {Desktop} from '../../index';
-import {HtmlComponent} from '../../index';
-import {Form} from '../../index';
-import {scout} from '../../index';
-import {DesktopHeaderLayout} from '../../index';
+import {Desktop, DesktopHeaderLayout, Form, HtmlComponent, scout, Widget} from '../../index';
 
 export default class DesktopHeader extends Widget {
 

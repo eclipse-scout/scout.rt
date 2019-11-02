@@ -8,14 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {scrollbars} from '../index';
-import {AbstractLayout} from '../index';
-import {HtmlComponent} from '../index';
-import {Planner} from '../index';
-import {MenuBarLayout} from '../index';
+import {AbstractLayout, graphics, HtmlComponent, MenuBarLayout, Planner, scout, scrollbars} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 export default class PlannerLayout extends AbstractLayout {
 

@@ -8,14 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RemoteLookupRequest} from '../index';
-import {objects} from '../index';
-import {LookupCall} from '../index';
-import {LookupRow} from '../index';
-import {QueryBy} from '../index';
+import {arrays, LookupCall, LookupRow, objects, QueryBy, RemoteLookupRequest, scout} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
-import {scout} from '../index';
 
 export default class RemoteLookupCall extends LookupCall {
 

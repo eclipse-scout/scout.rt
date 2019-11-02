@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableField} from '../../../index';
-import {FormFieldTile} from '../../../index';
+import {FormFieldTile, TableField} from '../../../index';
 import * as $ from 'jquery';
 
 export default class TileTableField extends TableField {

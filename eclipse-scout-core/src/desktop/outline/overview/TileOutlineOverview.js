@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TileOutlineOverviewLayout} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {scout} from '../../../index';
-import {OutlineOverview} from '../../../index';
+import {HtmlComponent, OutlineOverview, scout, TileOutlineOverviewLayout} from '../../../index';
 
 export default class TileOutlineOverview extends OutlineOverview {
 

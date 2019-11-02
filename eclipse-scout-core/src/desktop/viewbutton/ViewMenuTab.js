@@ -8,13 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../../index';
-import {HtmlComponent} from '../../index';
-import {ViewMenuOpenKeyStroke} from '../../index';
-import {scout} from '../../index';
-import {icons} from '../../index';
-import {graphics} from '../../index';
-import {KeyStrokeContext} from '../../index';
+import {graphics, HtmlComponent, icons, KeyStrokeContext, scout, ViewMenuOpenKeyStroke, Widget} from '../../index';
 
 /**
  * Shows a list of view buttons with displayStyle=MENU

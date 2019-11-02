@@ -8,15 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {KeyStrokeContext} from '../../../index';
-import {strings} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {scout} from '../../../index';
-import {Widget} from '../../../index';
-import {TabAreaLayout} from '../../../index';
-import {arrays} from '../../../index';
-import {TabAreaLeftKeyStroke} from '../../../index';
-import {TabAreaRightKeyStroke} from '../../../index';
+import {arrays, HtmlComponent, KeyStrokeContext, scout, strings, TabAreaLayout, TabAreaLeftKeyStroke, TabAreaRightKeyStroke, Widget} from '../../../index';
 
 export default class TabArea extends Widget {
 

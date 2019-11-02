@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {StaticLookupCall} from '../index';
-import {scout} from '../index';
+import {scout, StaticLookupCall} from '../index';
 
 export default class TileTableHeaderGroupByLookupCall extends StaticLookupCall {
 

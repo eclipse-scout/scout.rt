@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Tree} from '../index';
-import {AbstractLayout} from '../index';
-import {DesktopNavigation} from '../index';
-import {ResponsiveManager} from '../index';
-import {Dimension} from '../index';
+import {AbstractLayout, DesktopNavigation, Dimension, ResponsiveManager, Tree} from '../index';
 
 export default class DesktopLayout extends AbstractLayout {
 

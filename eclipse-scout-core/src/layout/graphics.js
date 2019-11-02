@@ -8,15 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device} from '../index';
-import {scrollbars} from '../index';
-import {Point} from '../index';
-import {Dimension} from '../index';
-import {Rectangle} from '../index';
-import {Insets} from '../index';
+import {arrays, Device, Dimension, Insets, Point, Rectangle, scout, scrollbars} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
-import {scout} from '../index';
 
 /**
  * This file contains helpers for graphical operations

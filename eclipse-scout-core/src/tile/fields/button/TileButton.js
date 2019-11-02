@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NullLayout} from '../../../index';
-import {strings} from '../../../index';
-import {FormFieldTile} from '../../../index';
-import {Button} from '../../../index';
-import {tooltips} from '../../../index';
+import {Button, FormFieldTile, NullLayout, strings, tooltips} from '../../../index';
 
 export default class TileButton extends Button {
 

@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LogicalGridMatrixCursor} from '../../../index';
-import {LogicalGridMatrix} from '../../../index';
-import {GridData} from '../../../index';
-import {LogicalGridMatrixCell} from '../../../index';
+import {GridData, LogicalGridMatrix, LogicalGridMatrixCell, LogicalGridMatrixCursor} from '../../../index';
 
 export default class HorizontalGridMatrix extends LogicalGridMatrix {
 

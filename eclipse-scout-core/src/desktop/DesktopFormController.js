@@ -8,12 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupWindow} from '../index';
-import {FormController} from '../index';
+import {arrays, Dimension, FormController, PopupBlockerHandler, PopupWindow} from '../index';
 import * as $ from 'jquery';
-import {arrays} from '../index';
-import {PopupBlockerHandler} from '../index';
-import {Dimension} from '../index';
 
 export default class DesktopFormController extends FormController {
 

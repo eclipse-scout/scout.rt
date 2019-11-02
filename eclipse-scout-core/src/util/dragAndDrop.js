@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays} from '../index';
-import {DragAndDropHandler} from '../index';
+import {arrays, DragAndDropHandler} from '../index';
 
 
 const SCOUT_TYPES = {

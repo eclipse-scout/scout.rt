@@ -8,21 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys} from '../../../index';
-import {TagFieldNavigationKeyStroke} from '../../../index';
-import {TagFieldOpenPopupKeyStroke} from '../../../index';
-import {ValueField} from '../../../index';
-import {TagFieldDeleteKeyStroke} from '../../../index';
-import {TagFieldLayout} from '../../../index';
-import {strings} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {TagFieldCancelKeyStroke} from '../../../index';
-import {TagFieldEnterKeyStroke} from '../../../index';
-import {scout} from '../../../index';
-import {InputFieldKeyStrokeContext} from '../../../index';
-import {LookupCall} from '../../../index';
-import {TagFieldContainerLayout} from '../../../index';
-import {arrays} from '../../../index';
+import {
+  arrays,
+  HtmlComponent,
+  InputFieldKeyStrokeContext,
+  keys,
+  LookupCall,
+  scout,
+  strings,
+  TagFieldCancelKeyStroke,
+  TagFieldContainerLayout,
+  TagFieldDeleteKeyStroke,
+  TagFieldEnterKeyStroke,
+  TagFieldLayout,
+  TagFieldNavigationKeyStroke,
+  TagFieldOpenPopupKeyStroke,
+  ValueField
+} from '../../../index';
 
 export default class TagField extends ValueField {
 

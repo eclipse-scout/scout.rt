@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {WidgetTile} from '../../index';
-import {BrowserField} from '../../index';
-import {Tile} from '../../index';
+import {BrowserField, Tile, WidgetTile} from '../../index';
 
 export default class FormFieldTile extends WidgetTile {
 

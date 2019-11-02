@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ValueField} from '../../../index';
-import {scout} from '../../../index';
+import {scout, ValueField} from '../../../index';
 import * as $ from 'jquery';
 
 export default class SliderField extends ValueField {

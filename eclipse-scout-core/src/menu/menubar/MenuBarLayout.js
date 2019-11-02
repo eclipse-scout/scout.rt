@@ -8,13 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../../index';
-import {HtmlComponent} from '../../index';
-import {MenuBar} from '../../index';
-import {scout} from '../../index';
-import {Dimension} from '../../index';
-import {graphics} from '../../index';
-import {arrays} from '../../index';
+import {AbstractLayout, arrays, Dimension, graphics, HtmlComponent, MenuBar, scout} from '../../index';
 
 export default class MenuBarLayout extends AbstractLayout {
 

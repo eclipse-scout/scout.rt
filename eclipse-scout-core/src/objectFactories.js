@@ -9,11 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {scout} from './index';
-import {Action} from './index';
-import {ActionAdapter} from './index';
-import {TreeField} from './index';
-import {TreeFieldAdapter} from './index';
+import {Action, ActionAdapter, scout, TreeField, TreeFieldAdapter} from './index';
 
 scout.addObjectFactories({
   'KeyStroke': function() {

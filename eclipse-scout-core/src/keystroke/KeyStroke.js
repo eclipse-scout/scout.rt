@@ -8,12 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Key} from '../index';
-import {keys} from '../index';
-import {HAlign} from '../index';
-import {Action} from '../index';
+import {Action, HAlign, Key, keys, scout} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 export default class KeyStroke {
 

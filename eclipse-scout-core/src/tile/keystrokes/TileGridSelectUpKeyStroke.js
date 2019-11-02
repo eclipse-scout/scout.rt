@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TileGridSelectKeyStroke} from '../../index';
-import {keys} from '../../index';
+import {keys, TileGridSelectKeyStroke} from '../../index';
 
 export default class TileGridSelectUpKeyStroke extends TileGridSelectKeyStroke {
 

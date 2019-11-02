@@ -8,16 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {defaultValues} from '../index';
-import {Table} from '../index';
-import {objects} from '../index';
-import {ModelAdapter} from '../index';
-import {TableUserFilter} from '../index';
-import {BooleanColumn} from '../index';
+import {App, BooleanColumn, Column, defaultValues, ModelAdapter, objects, scout, Table, TableUserFilter} from '../index';
 import * as $ from 'jquery';
-import {Column} from '../index';
-import {scout} from '../index';
-import {App} from '../index';
 
 export default class TableAdapter extends ModelAdapter {
 

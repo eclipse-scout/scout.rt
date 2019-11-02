@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnUserFilter} from '../../index';
-import {dates} from '../../index';
-import {TableMatrix} from '../../index';
+import {ColumnUserFilter, dates, TableMatrix} from '../../index';
 import * as $ from 'jquery';
 
 export default class DateColumnUserFilter extends ColumnUserFilter {

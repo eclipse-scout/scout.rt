@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys} from '../index';
-import {MenuNavigationKeyStroke} from '../index';
-import {menuNavigationKeyStrokes} from '../index';
+import {keys, MenuNavigationKeyStroke, menuNavigationKeyStrokes} from '../index';
 
 export default class MenuNavigationExecKeyStroke extends MenuNavigationKeyStroke {
 

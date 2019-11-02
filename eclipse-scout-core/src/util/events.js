@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../index';
-import {arrays} from '../index';
-import {strings} from '../index';
-import {Device} from '../index';
+import {arrays, Device, objects, strings} from '../index';
 
 
 /**

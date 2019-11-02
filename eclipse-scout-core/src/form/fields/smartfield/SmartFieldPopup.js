@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Popup} from '../../../index';
-import {SmartFieldPopupLayout} from '../../../index';
-import {Device} from '../../../index';
-import {scout} from '../../../index';
-import {FormField} from '../../../index';
+import {Device, FormField, Popup, scout, SmartFieldPopupLayout} from '../../../index';
 
 export default class SmartFieldPopup extends Popup {
 

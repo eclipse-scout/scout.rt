@@ -1,5 +1,4 @@
-import {Tile} from '../index';
-import {HtmlComponent} from '../index';
+import {HtmlComponent, Tile} from '../index';
 import * as $ from 'jquery';
 
 export default class BeanTile extends Tile {

@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys} from '../../index';
-import {AbstractTreeNavigationKeyStroke} from '../../index';
-import {arrays} from '../../index';
+import {AbstractTreeNavigationKeyStroke, arrays, keys} from '../../index';
 
 export default class TreeNavigationEndKeyStroke extends AbstractTreeNavigationKeyStroke {
 

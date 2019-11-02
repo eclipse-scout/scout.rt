@@ -8,28 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MenuBar} from '../index';
-import {dates} from '../index';
-import {menus as menus_1} from '../index';
-import {objects} from '../index';
-import {HtmlComponent} from '../index';
-import {KeyStrokeContext} from '../index';
+import {
+  arrays,
+  DateFormat,
+  DateRange,
+  dates,
+  defaultValues,
+  graphics,
+  HtmlComponent,
+  KeyStrokeContext,
+  MenuBar,
+  menus as menus_1,
+  objects,
+  PlannerLayout,
+  PlannerMenuItemsOrder,
+  Range,
+  scout,
+  scrollbars,
+  strings,
+  styles,
+  tooltips,
+  TooltipSupport,
+  Widget
+} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {TooltipSupport} from '../index';
-import {graphics} from '../index';
-import {defaultValues} from '../index';
-import {scrollbars} from '../index';
-import {DateFormat} from '../index';
-import {tooltips} from '../index';
-import {Range} from '../index';
-import {strings} from '../index';
-import {DateRange} from '../index';
-import {PlannerMenuItemsOrder} from '../index';
-import {PlannerLayout} from '../index';
-import {Widget} from '../index';
-import {styles} from '../index';
-import {arrays} from '../index';
 
 export default class Planner extends Widget {
 

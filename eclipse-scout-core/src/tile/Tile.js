@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent} from '../index';
-import {strings} from '../index';
-import {LoadingSupport} from '../index';
-import {SingleLayout} from '../index';
-import {Widget} from '../index';
-import {GridData} from '../index';
+import {GridData, HtmlComponent, LoadingSupport, SingleLayout, strings, Widget} from '../index';
 import * as $ from 'jquery';
 
 export default class Tile extends Widget {

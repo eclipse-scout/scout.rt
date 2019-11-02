@@ -8,13 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FileChooserFieldDeleteKeyStroke} from '../../../index';
-import {ValueField} from '../../../index';
-import {FileInput} from '../../../index';
-import {scout} from '../../../index';
-import {objects} from '../../../index';
-import {arrays} from '../../../index';
-import {FileChooserFieldBrowseKeyStroke} from '../../../index';
+import {arrays, FileChooserFieldBrowseKeyStroke, FileChooserFieldDeleteKeyStroke, FileInput, objects, scout, ValueField} from '../../../index';
 
 export default class FileChooserField extends ValueField {
 

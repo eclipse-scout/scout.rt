@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableRow} from '../../../index';
-import {EventDelegator} from '../../../index';
-import {scout} from '../../../index';
-import {objects} from '../../../index';
-import {FormField} from '../../../index';
-import {arrays} from '../../../index';
+import {arrays, EventDelegator, FormField, objects, scout, TableRow} from '../../../index';
 
 export default class TableField extends FormField {
 

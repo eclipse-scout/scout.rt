@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../index';
-import {Form} from '../../index';
-import {Lifecycle} from '../../index';
-import {ValueField} from '../../index';
+import {Form, Lifecycle, scout, ValueField} from '../../index';
 
 export default class FormLifecycle extends Lifecycle {
 

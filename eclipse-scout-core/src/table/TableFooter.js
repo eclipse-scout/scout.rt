@@ -8,19 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent} from '../index';
-import {Status} from '../index';
-import {MenuBarLayout} from '../index';
+import {fields, graphics, HtmlComponent, InputFieldKeyStrokeContext, MenuBarLayout, scout, Status, strings, Table, TableFooterLayout, TableTextUserFilter, Widget} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {TableFooterLayout} from '../index';
-import {InputFieldKeyStrokeContext} from '../index';
-import {graphics} from '../index';
-import {Table} from '../index';
-import {TableTextUserFilter} from '../index';
-import {strings} from '../index';
-import {Widget} from '../index';
-import {fields} from '../index';
 
 export default class TableFooter extends Widget {
 

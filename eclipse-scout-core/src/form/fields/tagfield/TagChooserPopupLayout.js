@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupLayout} from '../../../index';
-import {scout} from '../../../index';
+import {PopupLayout, scout} from '../../../index';
 
 export default class TagChooserPopupLayout extends PopupLayout {
 

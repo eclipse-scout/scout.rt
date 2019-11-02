@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons} from '../../../index';
-import {MenuBar} from '../../../index';
-import {TableRow} from '../../../index';
-import {TreeNode} from '../../../index';
-import {Outline} from '../../../index';
+import {icons, MenuBar, Outline, TableRow, TreeNode} from '../../../index';
 import * as $ from 'jquery';
 
 /**

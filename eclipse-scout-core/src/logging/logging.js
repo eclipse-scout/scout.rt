@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NullLogger} from '../index';
-import {URL} from '../index';
+import {NullLogger, scout, URL} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 /* global log4javascript */
 

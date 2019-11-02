@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays} from '../index';
-import {strings} from '../index';
-import {numbers} from '../index';
+import {arrays, numbers, scout, strings} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 
 /**

@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {texts} from '../index';
-import {ObjectFactory} from '../index';
+import {App, ObjectFactory, scout, texts} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {App} from '../index';
 
 /**
  * init options:

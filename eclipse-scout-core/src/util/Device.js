@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../index';
+import {App, objects, scout} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {App} from '../index';
 
 let instance;
 /* global FastClick */

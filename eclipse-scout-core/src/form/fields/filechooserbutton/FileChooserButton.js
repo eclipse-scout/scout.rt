@@ -8,14 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SingleLayout} from '../../../index';
-import {ValueField} from '../../../index';
-import {strings} from '../../../index';
-import {FileInput} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {Device} from '../../../index';
-import {scout} from '../../../index';
-import {arrays} from '../../../index';
+import {arrays, Device, FileInput, HtmlComponent, scout, SingleLayout, strings, ValueField} from '../../../index';
 
 export default class FileChooserButton extends ValueField {
 

@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings} from '../../../index';
-import {keys} from '../../../index';
-import {KeyStroke} from '../../../index';
+import {keys, KeyStroke, strings} from '../../../index';
 
 export default class TagFieldEnterKeyStroke extends KeyStroke {
 

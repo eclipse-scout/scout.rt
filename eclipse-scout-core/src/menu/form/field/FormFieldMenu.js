@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu} from '../../../index';
-import {LogicalGridData} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {ColumnLayout} from '../../../index';
-import {GridData} from '../../../index';
+import {ColumnLayout, GridData, HtmlComponent, LogicalGridData, Menu} from '../../../index';
 
 export default class FormFieldMenu extends Menu {
 

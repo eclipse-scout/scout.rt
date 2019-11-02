@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Status} from '../../index';
-import {scout} from '../../index';
-import {MessageBoxes} from '../../index';
+import {MessageBoxes, scout, Status} from '../../index';
 import * as $ from 'jquery';
 
 /**

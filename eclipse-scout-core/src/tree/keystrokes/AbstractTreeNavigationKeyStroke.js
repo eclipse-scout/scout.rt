@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HAlign} from '../../index';
-import {keyStrokeModifier} from '../../index';
-import {KeyStroke} from '../../index';
+import {HAlign, KeyStroke, keyStrokeModifier} from '../../index';
 
 export default class AbstractTreeNavigationKeyStroke extends KeyStroke {
 

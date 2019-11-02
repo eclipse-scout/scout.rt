@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DialogLayout} from '../index';
-import {graphics} from '../index';
-import {scrollbars} from '../index';
-import {AbstractLayout} from '../index';
-import {HtmlComponent} from '../index';
+import {AbstractLayout, DialogLayout, graphics, HtmlComponent, scrollbars} from '../index';
 
 export default class MessageBoxLayout extends AbstractLayout {
 

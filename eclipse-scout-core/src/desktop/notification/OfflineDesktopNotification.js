@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Status} from '../../index';
-import {DesktopNotification} from '../../index';
+import {DesktopNotification, Status} from '../../index';
 
 export default class OfflineDesktopNotification extends DesktopNotification {
 

@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../index';
-import {App} from '../index';
+import {App, scout} from '../index';
 
 let instance;
 export default class ResponsiveManager {

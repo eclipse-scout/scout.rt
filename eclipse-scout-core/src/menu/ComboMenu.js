@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent} from '../index';
-import {Menu} from '../index';
+import {HtmlComponent, Menu} from '../index';
 
 export default class ComboMenu extends Menu {
 

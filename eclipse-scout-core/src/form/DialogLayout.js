@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {HtmlComponent} from '../index';
-import {Point} from '../index';
-import {Insets} from '../index';
-import {FormLayout} from '../index';
-import {Dimension} from '../index';
+import {Dimension, FormLayout, graphics, HtmlComponent, Insets, Point} from '../index';
 
 export default class DialogLayout extends FormLayout {
 

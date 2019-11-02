@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys} from '../../../index';
-import {KeyStroke} from '../../../index';
+import {keys, KeyStroke} from '../../../index';
 
 export default class TabAreaRightKeyStroke extends KeyStroke {
 

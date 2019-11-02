@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {tooltips} from '../index';
-import {strings} from '../index';
-import {Widget} from '../index';
+import {strings, tooltips, Widget} from '../index';
 
 export default class SimpleTab extends Widget {
 

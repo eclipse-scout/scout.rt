@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu} from '../../../index';
-import {Action} from '../../../index';
+import {Action, Menu} from '../../../index';
 import * as $ from 'jquery';
 
 /**

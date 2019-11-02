@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GroupBox} from '../index';
-import {SmartField} from '../index';
-import {ValueField} from '../index';
-import {FormField} from '../index';
-import {arrays} from '../index';
-import {scout} from '../index';
+import {arrays, FormField, GroupBox, scout, SmartField, ValueField} from '../index';
 
 export default class TileTableHeaderBox extends GroupBox {
 

@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device} from '../index';
-import {Widget} from '../index';
+import {Device, scout, Widget} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 export default class GlassPane extends Widget {
 

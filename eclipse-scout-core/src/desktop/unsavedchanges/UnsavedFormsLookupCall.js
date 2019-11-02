@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {UnsavedFormChangesForm} from '../../index';
-import {StaticLookupCall} from '../../index';
+import {StaticLookupCall, UnsavedFormChangesForm} from '../../index';
 
 export default class UnsavedFormsLookupCall extends StaticLookupCall {
 

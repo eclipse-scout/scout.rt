@@ -8,16 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../../index';
-import {widgets} from '../../index';
-import {HtmlComponent} from '../../index';
-import {strings} from '../../index';
-import {Splitter} from '../../index';
-import {scout} from '../../index';
-import {SimpleTabBox} from '../../index';
-import {FlexboxLayout} from '../../index';
-import {FlexboxLayoutData} from '../../index';
-import {arrays} from '../../index';
+import {arrays, FlexboxLayout, FlexboxLayoutData, HtmlComponent, scout, SimpleTabBox, Splitter, strings, Widget, widgets} from '../../index';
 
 export default class BenchColumn extends Widget {
 

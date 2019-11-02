@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings} from '../../index';
-import {Column} from '../../index';
+import {Column, strings} from '../../index';
 import * as $ from 'jquery';
 
 export default class BeanColumn extends Column {

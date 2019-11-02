@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TileGridSelectionHandler} from '../../index';
-import {HorizontalGrid} from '../../index';
+import {HorizontalGrid, TileGridSelectionHandler} from '../../index';
 
 export default class TileAccordionSelectionHandler extends TileGridSelectionHandler {
 

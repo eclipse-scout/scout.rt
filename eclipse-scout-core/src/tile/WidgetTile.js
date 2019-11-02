@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Tile} from '../index';
-import {Widget} from '../index';
-import {scout} from '../index';
+import {scout, Tile, Widget} from '../index';
 
 /**
  * A tile containing a widget. The widget will be rendered and its $container used as $container for the tile.

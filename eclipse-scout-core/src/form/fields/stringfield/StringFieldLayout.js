@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldLayout} from '../../../index';
-import {graphics} from '../../../index';
+import {FormFieldLayout, graphics} from '../../../index';
 
 export default class StringFieldLayout extends FormFieldLayout {
 

@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupLayout} from '../../../index';
-import {HtmlEnvironment} from '../../../index';
-import {graphics} from '../../../index';
-import {SmartFieldPopup} from '../../../index';
-import {Dimension} from '../../../index';
+import {Dimension, graphics, HtmlEnvironment, PopupLayout, SmartFieldPopup} from '../../../index';
 
 /**
  * The popup layout is different from other layouts, since it can determine its own size

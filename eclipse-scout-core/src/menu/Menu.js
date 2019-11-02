@@ -8,19 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event} from '../index';
-import {objects} from '../index';
-import {HtmlComponent} from '../index';
-import {scout} from '../index';
-import {MenuExecKeyStroke} from '../index';
-import {ContextMenuPopup} from '../index';
-import {TreeVisitResult} from '../index';
-import {icons} from '../index';
-import {tooltips} from '../index';
-import {strings} from '../index';
-import {Action} from '../index';
-import {MenuKeyStroke} from '../index';
-import {arrays} from '../index';
+import {Action, arrays, ContextMenuPopup, Event, HtmlComponent, icons, MenuExecKeyStroke, MenuKeyStroke, objects, scout, strings, tooltips, TreeVisitResult} from '../index';
 
 export default class Menu extends Action {
 

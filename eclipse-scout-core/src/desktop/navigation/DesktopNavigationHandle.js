@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CollapseHandle} from '../../index';
-import {EnlargeNavigationKeyStroke} from '../../index';
-import {KeyStrokeContext} from '../../index';
-import {ShrinkNavigationKeyStroke} from '../../index';
+import {CollapseHandle, EnlargeNavigationKeyStroke, KeyStrokeContext, ShrinkNavigationKeyStroke} from '../../index';
 
 export default class DesktopNavigationHandle extends CollapseHandle {
 

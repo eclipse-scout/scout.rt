@@ -8,23 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device} from '../index';
-import {MenuBar} from '../index';
-import {inspector} from '../index';
-import {GroupBoxMenuItemsOrder} from '../index';
+import {arrays, Column, ColumnUserFilter, Device, graphics, GroupBoxMenuItemsOrder, inspector, MenuBar, MenuDestinations, scout, scrollbars, strings, styles, Table, tooltips, Widget} from '../index';
 import * as $ from 'jquery';
-import {Column} from '../index';
-import {scout} from '../index';
-import {graphics} from '../index';
-import {scrollbars} from '../index';
-import {Table} from '../index';
-import {MenuDestinations} from '../index';
-import {ColumnUserFilter} from '../index';
-import {tooltips} from '../index';
-import {strings} from '../index';
-import {Widget} from '../index';
-import {styles} from '../index';
-import {arrays} from '../index';
 
 export default class TableHeader extends Widget {
 

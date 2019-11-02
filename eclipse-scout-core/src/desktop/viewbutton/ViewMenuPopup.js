@@ -8,12 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {menuNavigationKeyStrokes} from '../../index';
-import {ViewMenuPopupLayout} from '../../index';
-import {graphics} from '../../index';
-import {Point} from '../../index';
-import {PopupWithHead} from '../../index';
-import {arrays} from '../../index';
+import {arrays, graphics, menuNavigationKeyStrokes, Point, PopupWithHead, ViewMenuPopupLayout} from '../../index';
 
 /**
  * Popup menu to switch between outlines.

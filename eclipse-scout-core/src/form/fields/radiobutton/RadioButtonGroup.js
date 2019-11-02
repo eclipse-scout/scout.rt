@@ -8,23 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RadioButtonGroupLayout} from '../../../index';
-import {RadioButton} from '../../../index';
-import {LogicalGridData} from '../../../index';
-import {Status} from '../../../index';
-import {LogicalGridLayoutConfig} from '../../../index';
+import {
+  arrays,
+  HtmlComponent,
+  LoadingSupport,
+  LogicalGridData,
+  LogicalGridLayoutConfig,
+  LookupCall,
+  objects,
+  RadioButton,
+  RadioButtonGroupGridConfig,
+  RadioButtonGroupLayout,
+  RadioButtonGroupLeftKeyStroke,
+  RadioButtonGroupRightKeyStroke,
+  scout,
+  Status,
+  TreeVisitResult,
+  ValueField
+} from '../../../index';
 import * as $ from 'jquery';
-import {RadioButtonGroupRightKeyStroke} from '../../../index';
-import {ValueField} from '../../../index';
-import {RadioButtonGroupGridConfig} from '../../../index';
-import {RadioButtonGroupLeftKeyStroke} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {scout} from '../../../index';
-import {LoadingSupport} from '../../../index';
-import {objects} from '../../../index';
-import {TreeVisitResult} from '../../../index';
-import {LookupCall} from '../../../index';
-import {arrays} from '../../../index';
 
 export default class RadioButtonGroup extends ValueField {
 

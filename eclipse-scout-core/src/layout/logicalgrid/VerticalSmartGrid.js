@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {VerticalGridMatrix} from '../../index';
-import {AbstractGrid} from '../../index';
+import {AbstractGrid, VerticalGridMatrix} from '../../index';
 
 export default class VerticalSmartGrid extends AbstractGrid {
 

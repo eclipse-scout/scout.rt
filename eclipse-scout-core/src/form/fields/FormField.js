@@ -8,25 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings} from '../../index';
-import {Status} from '../../index';
-import {clipboard} from '../../index';
-import {scout} from '../../index';
-import {dragAndDrop} from '../../index';
-import {tooltips} from '../../index';
-import {LoadingSupport} from '../../index';
+import {
+  clipboard,
+  Device,
+  dragAndDrop,
+  Event,
+  fields,
+  FormFieldLayout,
+  GridData,
+  GroupBox,
+  HtmlComponent,
+  KeyStrokeContext,
+  LoadingSupport,
+  objects,
+  scout,
+  Status,
+  strings,
+  styles,
+  tooltips,
+  Widget
+} from '../../index';
 import * as $ from 'jquery';
-import {styles} from '../../index';
-import {Widget} from '../../index';
-import {HtmlComponent} from '../../index';
-import {objects} from '../../index';
-import {FormFieldLayout} from '../../index';
-import {Event} from '../../index';
-import {GroupBox} from '../../index';
-import {Device} from '../../index';
-import {KeyStrokeContext} from '../../index';
-import {fields} from '../../index';
-import {GridData} from '../../index';
 
 /**
  * Abstract class for all form-fields.

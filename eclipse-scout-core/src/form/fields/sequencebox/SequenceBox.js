@@ -8,16 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SequenceBoxLayout} from '../../../index';
-import {dates} from '../../../index';
-import {CheckBoxField} from '../../../index';
-import {LogicalGridData} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {CompositeField} from '../../../index';
-import {scout} from '../../../index';
-import {LogicalGridLayoutConfig} from '../../../index';
-import {DateField} from '../../../index';
-import {SequenceBoxGridConfig} from '../../../index';
+import {CheckBoxField, CompositeField, DateField, dates, HtmlComponent, LogicalGridData, LogicalGridLayoutConfig, scout, SequenceBoxGridConfig, SequenceBoxLayout} from '../../../index';
 
 export default class SequenceBox extends CompositeField {
 

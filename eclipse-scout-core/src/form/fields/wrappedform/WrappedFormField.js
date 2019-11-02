@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField} from '../../../index';
-import {Form} from '../../../index';
+import {Form, FormField} from '../../../index';
 
 export default class WrappedFormField extends FormField {
 

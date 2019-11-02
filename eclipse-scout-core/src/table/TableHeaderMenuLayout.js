@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {HtmlComponent} from '../index';
-import {PopupLayout} from '../index';
-import {Dimension} from '../index';
+import {Dimension, graphics, HtmlComponent, PopupLayout} from '../index';
 
 export default class TableHeaderMenuLayout extends PopupLayout {
 

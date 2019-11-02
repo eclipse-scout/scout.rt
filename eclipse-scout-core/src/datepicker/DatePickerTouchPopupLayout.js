@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {TouchPopupLayout} from '../index';
-import {HtmlEnvironment} from '../index';
-import {Dimension} from '../index';
+import {Dimension, graphics, HtmlEnvironment, TouchPopupLayout} from '../index';
 
 export default class DatePickerTouchPopupLayout extends TouchPopupLayout {
 

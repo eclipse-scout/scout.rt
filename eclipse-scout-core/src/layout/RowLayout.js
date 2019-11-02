@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../index';
-import {Dimension} from '../index';
-import {HtmlComponent} from '../index';
+import {AbstractLayout, Dimension, HtmlComponent, scout} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 export default class RowLayout extends AbstractLayout {
 

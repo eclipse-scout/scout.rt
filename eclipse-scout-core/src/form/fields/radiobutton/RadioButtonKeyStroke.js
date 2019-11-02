@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ButtonKeyStroke} from '../../../index';
-import {HAlign} from '../../../index';
+import {ButtonKeyStroke, HAlign} from '../../../index';
 
 export default class RadioButtonKeyStroke extends ButtonKeyStroke {
 

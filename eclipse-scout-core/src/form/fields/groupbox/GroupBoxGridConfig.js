@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LogicalGridConfig} from '../../../index';
-import {scout} from '../../../index';
+import {LogicalGridConfig, scout} from '../../../index';
 
 export default class GroupBoxGridConfig extends LogicalGridConfig {
 

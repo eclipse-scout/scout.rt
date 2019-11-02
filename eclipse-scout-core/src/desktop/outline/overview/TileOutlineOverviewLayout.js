@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../../../index';
-import {graphics} from '../../../index';
+import {AbstractLayout, graphics} from '../../../index';
 
 export default class TileOutlineOverviewLayout extends AbstractLayout {
 

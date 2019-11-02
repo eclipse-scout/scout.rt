@@ -8,15 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NumberColumn} from '../index';
-import {DateColumn} from '../index';
-import {DateFormat} from '../index';
-import {IconColumn} from '../index';
-import {dates} from '../index';
-import {comparators} from '../index';
-import {BooleanColumn} from '../index';
-import {arrays} from '../index';
-import {scout} from '../index';
+import {arrays, BooleanColumn, comparators, DateColumn, DateFormat, dates, IconColumn, NumberColumn, scout} from '../index';
 
 export default class TableMatrix {
 

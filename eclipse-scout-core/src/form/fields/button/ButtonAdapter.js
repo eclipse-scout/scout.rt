@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Button} from '../../../index';
-import {FormFieldAdapter} from '../../../index';
+import {Button, FormFieldAdapter} from '../../../index';
 
 export default class ButtonAdapter extends FormFieldAdapter {
 

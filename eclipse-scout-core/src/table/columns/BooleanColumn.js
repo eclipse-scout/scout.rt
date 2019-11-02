@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../index';
-import {comparators} from '../../index';
-import {Column} from '../../index';
+import {Column, comparators, scout} from '../../index';
 
 /**
  * May be an ordinary boolean column or the table's checkable column (table.checkableColumn)

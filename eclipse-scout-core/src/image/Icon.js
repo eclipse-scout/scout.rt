@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Image} from '../index';
-import {IconDesc} from '../index';
-import {HtmlComponent} from '../index';
-import {Widget} from '../index';
-import {scout} from '../index';
+import {HtmlComponent, IconDesc, Image, scout, Widget} from '../index';
 
 /**
  * Widget representing an icon. It may be a font icon or an image icon. Depending on the type, either a span or an img tag will be rendered.

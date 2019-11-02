@@ -8,16 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Table} from '../../../index';
-import {SmartField} from '../../../index';
-import {ProposalField} from '../../../index';
-import {Status} from '../../../index';
-import {HtmlComponent} from '../../../index';
-import {scout} from '../../../index';
-import {Widget} from '../../../index';
-import {objects} from '../../../index';
+import {HtmlComponent, objects, ProposalChooserLayout, ProposalField, scout, SmartField, Status, Table, Widget} from '../../../index';
 import * as $ from 'jquery';
-import {ProposalChooserLayout} from '../../../index';
 
 export default class ProposalChooser extends Widget {
 

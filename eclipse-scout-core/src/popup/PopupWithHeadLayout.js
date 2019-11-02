@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../index';
-import {HtmlComponent} from '../index';
-import {Insets} from '../index';
-import {PopupLayout} from '../index';
+import {graphics, HtmlComponent, Insets, PopupLayout} from '../index';
 
 export default class PopupWithHeadLayout extends PopupLayout {
 

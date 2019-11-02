@@ -8,20 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ResponsiveManager} from '../index';
-import {GridData} from '../index';
-import {HtmlEnvironment} from '../index';
-import {CompositeField} from '../index';
-import {TreeVisitResult} from '../index';
-import {Button} from '../index';
-import {ResponsiveHandler} from '../index';
-import {LabelField} from '../index';
-import {FormField} from '../index';
-import {PlaceholderField} from '../index';
-import {SequenceBox} from '../index';
-import {GroupBox} from '../index';
-import {CheckBoxField} from '../index';
-import {arrays} from '../index';
+import {
+  arrays,
+  Button,
+  CheckBoxField,
+  CompositeField,
+  FormField,
+  GridData,
+  GroupBox,
+  HtmlEnvironment,
+  LabelField,
+  PlaceholderField,
+  ResponsiveHandler,
+  ResponsiveManager,
+  SequenceBox,
+  TreeVisitResult
+} from '../index';
 
 export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
 
