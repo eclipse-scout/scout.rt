@@ -135,9 +135,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     AtomicReference<List<IMenu>> ref = new AtomicReference<>();
     createDisplayParentRunContext()
         .run(
-            () -> runInExtensionContext(() -> {
-              ref.set(super.lazyCreateAndInitializeMenus());
-            }));
+            () -> runInExtensionContext(() -> ref.set(super.lazyCreateAndInitializeMenus())));
     return ref.get();
   }
 

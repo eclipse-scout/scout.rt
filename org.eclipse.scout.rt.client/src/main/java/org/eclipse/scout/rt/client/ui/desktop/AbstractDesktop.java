@@ -2695,14 +2695,12 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       return true;
     }
 
-    formSet = formSet.stream().filter(form -> {
-      return getForms(form)
-          .stream()
-          .filter(IForm::isModal)
-          .findAny()
-          .map(f -> false)
-          .orElse(true);
-    }).collect(Collectors.toSet());
+    formSet = formSet.stream().filter(form -> getForms(form)
+        .stream()
+        .filter(IForm::isModal)
+        .findAny()
+        .map(f -> false)
+        .orElse(true)).collect(Collectors.toSet());
 
     // if formSet contains only one element simply call doCancel on that form. Using the UnsavedFormChangesForm is not necessary in this case.
     if (!alwaysShowUnsavedChangesForm && formSet.size() == 1) {

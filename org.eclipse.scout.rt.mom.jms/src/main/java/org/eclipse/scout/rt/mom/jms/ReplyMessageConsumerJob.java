@@ -50,9 +50,7 @@ public class ReplyMessageConsumerJob<REQUEST, REPLY> extends AbstractMessageCons
 
     // Read and process the message asynchronously because JMS session is single-threaded. This allows concurrent message processing.
     // Unlike AutoAcknowledgeSubscriptionStrategy, a job is scheduled for 'single-threaded' mode to support cancellation (execution hint).
-    final IFuture<Void> future = Jobs.schedule(() -> {
-      handleMessageInRunContext(jmsRequest, replyId);
-    }, m_mom.newJobInput()
+    final IFuture<Void> future = Jobs.schedule(() -> handleMessageInRunContext(jmsRequest, replyId), m_mom.newJobInput()
         .withName("Receiving JMS message [dest={}]", m_destination)
         .withExecutionHint(replyId)); // Register for cancellation
 

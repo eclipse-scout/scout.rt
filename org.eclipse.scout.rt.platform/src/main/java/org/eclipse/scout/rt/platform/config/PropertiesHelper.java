@@ -1009,9 +1009,7 @@ public class PropertiesHelper {
     // try system properties
     value = System.getProperties().entrySet().stream()
         .map(e -> new AbstractMap.SimpleEntry<>(keyNormalizer.apply(e.getKey()), e.getValue().toString()))
-        .filter(e -> {
-          return e.getKey().equals(key);
-        })
+        .filter(e -> e.getKey().equals(key))
         .map(SimpleEntry::getValue)
         .findFirst().orElse(value);
     // skip unresolved path variables (used for development mode)

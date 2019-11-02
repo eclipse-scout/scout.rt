@@ -73,13 +73,9 @@ public class ListenerListMonitorMBean implements IListenerListMonitorMBean {
               String className = listenerList.getClass().getName();
               listenerListCount.put(className, listenerListCount.getOrDefault(className, 0) + 1);
               Map<String, List<String>> mergedTypes = listenerListTypes.computeIfAbsent(className, className2 -> new TreeMap<>());
-              types.forEach((type, listeners) -> {
-                listeners.forEach(listener -> {
-                  mergedTypes
-                      .computeIfAbsent(type, type2 -> new ArrayList<>())
-                      .add(listener.getClass().getName());
-                });
-              });
+              types.forEach((type, listeners) -> listeners.forEach(listener -> mergedTypes
+                    .computeIfAbsent(type, type2 -> new ArrayList<>())
+                    .add(listener.getClass().getName())));
             });
     return listenerListTypes
         .entrySet()

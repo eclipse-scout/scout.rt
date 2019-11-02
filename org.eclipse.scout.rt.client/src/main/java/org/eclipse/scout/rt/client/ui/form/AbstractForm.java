@@ -268,9 +268,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     m_callingModelContext = ModelContext.copyCurrent();
 
     // Run the initialization on behalf of this Form.
-    ClientRunContexts.copyCurrent().withForm(this).run(() -> {
-      m_objectExtensions.initConfig(createLocalExtension(), this::initConfig);
-    });
+    ClientRunContexts.copyCurrent().withForm(this).run(() -> m_objectExtensions.initConfig(createLocalExtension(), this::initConfig));
 
     FormUtility.rebuildFieldGrid(this, true);
   }

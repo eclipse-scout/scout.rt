@@ -397,24 +397,22 @@ public class ApiDocGenerator {
         elements.add(HTML.div(HTML.raw(r.getDescription().toHtml())).cssClass("resource-description"));
       }
 
-      r.getMethods().stream().forEach(m -> {
-        elements.add(HTML.div(
-            HTML.div(
-                HTML.div(m.getHttpMethod()).cssClass("http " + m.getHttpMethod().toLowerCase()),
-                HTML.div(
-                    HTML.span(r.getPath()).cssClass("resource"),
-                    HTML.span(StringUtility.box("/", m.getPath(), "")).cssClass("method")).cssClass("path"))
-                .cssClass("header"),
-            HTML.div(
-                HTML.div(HTML.raw(m.getDescription().toHtml())).cssClass("description"),
-                HTML.div(m.getSignature()).cssClass("signature"),
-                HTML.div(
-                    StringUtility.hasText(m.getConsumes()) ? HTML.div(HTML.span("Consumes ").cssClass("k"), HTML.span(m.getConsumes()).cssClass("v")).cssClass("line") : null,
-                    StringUtility.hasText(m.getProduces()) ? HTML.div(HTML.span("Produces ").cssClass("k"), HTML.span(m.getProduces()).cssClass("v")).cssClass("line") : null)
-                    .cssClass("consumes-produces"))
-                .cssClass("body"))
-            .cssClass("operation"));
-      });
+      r.getMethods().stream().forEach(m -> elements.add(HTML.div(
+          HTML.div(
+              HTML.div(m.getHttpMethod()).cssClass("http " + m.getHttpMethod().toLowerCase()),
+              HTML.div(
+                  HTML.span(r.getPath()).cssClass("resource"),
+                  HTML.span(StringUtility.box("/", m.getPath(), "")).cssClass("method")).cssClass("path"))
+              .cssClass("header"),
+          HTML.div(
+              HTML.div(HTML.raw(m.getDescription().toHtml())).cssClass("description"),
+              HTML.div(m.getSignature()).cssClass("signature"),
+              HTML.div(
+                  StringUtility.hasText(m.getConsumes()) ? HTML.div(HTML.span("Consumes ").cssClass("k"), HTML.span(m.getConsumes()).cssClass("v")).cssClass("line") : null,
+                  StringUtility.hasText(m.getProduces()) ? HTML.div(HTML.span("Produces ").cssClass("k"), HTML.span(m.getProduces()).cssClass("v")).cssClass("line") : null)
+                  .cssClass("consumes-produces"))
+              .cssClass("body"))
+          .cssClass("operation")));
     });
 
     final String title = generateTitle();
@@ -541,26 +539,24 @@ public class ApiDocGenerator {
     sb.append(TEXT_LINE_SEPARATOR);
 
     // append all resources and methods
-    resourceDescriptors.stream().forEach(r -> {
-      r.getMethods().stream().forEach(m -> {
-        sb.append(r.getName());
-        sb.append(TEXT_ELEMENT_SEPARATOR);
-        sb.append(m.getHttpMethod());
-        sb.append(TEXT_ELEMENT_SEPARATOR);
-        sb.append(r.getPath());
-        if (!StringUtility.isNullOrEmpty(m.getPath())) {
-          sb.append("/");
-          sb.append(m.getPath());
-        }
-        sb.append(TEXT_ELEMENT_SEPARATOR);
-        sb.append(StringUtility.emptyIfNull(m.getConsumes()));
-        sb.append(TEXT_ELEMENT_SEPARATOR);
-        sb.append(StringUtility.emptyIfNull(m.getProduces()));
-        sb.append(TEXT_ELEMENT_SEPARATOR);
-        sb.append(m.getDescription().toPlainText(true));
-        sb.append(TEXT_LINE_SEPARATOR);
-      });
-    });
+    resourceDescriptors.stream().forEach(r -> r.getMethods().stream().forEach(m -> {
+      sb.append(r.getName());
+      sb.append(TEXT_ELEMENT_SEPARATOR);
+      sb.append(m.getHttpMethod());
+      sb.append(TEXT_ELEMENT_SEPARATOR);
+      sb.append(r.getPath());
+      if (!StringUtility.isNullOrEmpty(m.getPath())) {
+        sb.append("/");
+        sb.append(m.getPath());
+      }
+      sb.append(TEXT_ELEMENT_SEPARATOR);
+      sb.append(StringUtility.emptyIfNull(m.getConsumes()));
+      sb.append(TEXT_ELEMENT_SEPARATOR);
+      sb.append(StringUtility.emptyIfNull(m.getProduces()));
+      sb.append(TEXT_ELEMENT_SEPARATOR);
+      sb.append(m.getDescription().toPlainText(true));
+      sb.append(TEXT_LINE_SEPARATOR);
+    }));
     return sb.toString();
   }
 
@@ -589,17 +585,15 @@ public class ApiDocGenerator {
   protected String toJsonString(List<ResourceDescriptor> resourceDescriptors) {
     List<DoEntity> jsonMethods = resourceDescriptors.stream()
         .flatMap(r -> r.getMethods().stream()
-            .map(m -> {
-              return BEANS.get(DoEntityBuilder.class)
-                  .put("resource", r.getName())
-                  .put("method", m.getHttpMethod())
-                  .put("path", StringUtility.join("/", r.getPath(), m.getPath()))
-                  .put("description", m.getDescription().toPlainText(false))
-                  .put("signature", m.getSignature())
-                  .putIf("consumes", m.getConsumes(), Objects::nonNull)
-                  .putIf("produces", m.getProduces(), Objects::nonNull)
-                  .build();
-            }))
+            .map(m -> BEANS.get(DoEntityBuilder.class)
+                .put("resource", r.getName())
+                .put("method", m.getHttpMethod())
+                .put("path", StringUtility.join("/", r.getPath(), m.getPath()))
+                .put("description", m.getDescription().toPlainText(false))
+                .put("signature", m.getSignature())
+                .putIf("consumes", m.getConsumes(), Objects::nonNull)
+                .putIf("produces", m.getProduces(), Objects::nonNull)
+                .build()))
         .collect(Collectors.toList());
     return BEANS.get(IPrettyPrintDataObjectMapper.class).writeValue(jsonMethods);
   }
