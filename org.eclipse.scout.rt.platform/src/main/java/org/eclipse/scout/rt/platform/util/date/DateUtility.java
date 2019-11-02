@@ -767,12 +767,12 @@ public final class DateUtility {
     Calendar c = Calendar.getInstance();
     c.setTime(time);
     double t = ((c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(Calendar.MINUTE)) * 60 + c.get(Calendar.SECOND)) * 1000 + c.get(Calendar.MILLISECOND);
-    Double d = t / DAY_MILLIS;
+    double d = t / DAY_MILLIS;
     // range check
-    if (d.doubleValue() < 0) {
+    if ((double) d < 0) {
       d = 0d;
     }
-    if (d.doubleValue() > 1) {
+    if ((double) d > 1) {
       d = 1d;
     }
     return d;

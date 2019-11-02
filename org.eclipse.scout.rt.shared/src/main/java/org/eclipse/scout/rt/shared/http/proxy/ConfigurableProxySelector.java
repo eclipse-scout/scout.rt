@@ -95,7 +95,7 @@ public class ConfigurableProxySelector extends ProxySelector {
         Pattern pattern = Pattern.compile(proxyConfiguration.substring(0, proxyConfiguration.lastIndexOf('=')), Pattern.CASE_INSENSITIVE);
         String proxyAddress = proxyConfiguration.substring(proxyConfiguration.lastIndexOf('=') + 1);
         String hostname = proxyAddress.substring(0, proxyAddress.lastIndexOf(':'));
-        Integer port = Integer.valueOf(proxyAddress.substring(proxyAddress.lastIndexOf(':') + 1));
+        int port = Integer.parseInt(proxyAddress.substring(proxyAddress.lastIndexOf(':') + 1));
         Proxy proxy = new Proxy(Type.HTTP, new InetSocketAddress(hostname, port));
         m_proxyMap.put(pattern, proxy);
       }
