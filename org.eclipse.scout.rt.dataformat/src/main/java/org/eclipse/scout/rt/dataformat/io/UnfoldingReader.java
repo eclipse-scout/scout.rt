@@ -138,7 +138,7 @@ public class UnfoldingReader extends BufferedReader {
     }
     parameterList.add(parametersPart.substring(nextParamStart));
 
-    Property property = parseParameters(parameterList.toArray(new String[parameterList.size()]));
+    Property property = parseParameters(parameterList.toArray(new String[0]));
 
     /**************
      * READ VALUE *
@@ -259,7 +259,7 @@ public class UnfoldingReader extends BufferedReader {
       }
       else if (VCardProperties.PARAM_NAME_TYPE.equalsIgnoreCase(name)) {
         // add values for parameter TYPE directly as property parameters for easier accessibility
-        for (String v : values.toArray(new String[values.size()])) {
+        for (String v : values.toArray(new String[0])) {
           // the parameter values of the parameter "TYPE" are case-insensitive for all properties defined in RFC-2426
           v = v.toUpperCase();
           if (VCardProperties.PARAM_VALUE_CAR.equals(v)) {
@@ -284,10 +284,10 @@ public class UnfoldingReader extends BufferedReader {
             property.addParameters(VCardProperties.PARAM_WORK);
           }
         }
-        property.addParameters(new PropertyParameter(VCardProperties.PARAM_NAME_TYPE, values.isEmpty() ? null : values.toArray(new String[values.size()])));
+        property.addParameters(new PropertyParameter(VCardProperties.PARAM_NAME_TYPE, values.isEmpty() ? null : values.toArray(new String[0])));
       }
       else {
-        PropertyParameter p = new PropertyParameter(name, values.isEmpty() ? null : values.toArray(new String[values.size()]));
+        PropertyParameter p = new PropertyParameter(name, values.isEmpty() ? null : values.toArray(new String[0]));
         property.addParameters(p);
       }
     }

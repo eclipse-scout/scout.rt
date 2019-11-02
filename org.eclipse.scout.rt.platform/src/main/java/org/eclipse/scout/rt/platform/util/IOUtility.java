@@ -452,7 +452,7 @@ public final class IOUtility {
   public static File[] listFilesInSubtree(File dir, FileFilter filter) {
     ArrayList<File> list = new ArrayList<>();
     listFilesRec(dir, filter, list);
-    return list.toArray(new File[list.size()]);
+    return list.toArray(new File[0]);
   }
 
   private static void listFilesRec(File dir, FileFilter filter, ArrayList<File> intoList) {

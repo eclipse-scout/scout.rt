@@ -28,7 +28,7 @@ public class FastBeanInfo {
   public FastBeanInfo(Class<?> beanClass, Class<?> stopClass) {
     m_beanClass = beanClass;
     m_propertyMap = Collections.unmodifiableMap(FastBeanUtility.createPropertyDescriptorMap(beanClass, stopClass));
-    m_propertyArray = m_propertyMap.values().toArray(new FastPropertyDescriptor[m_propertyMap.size()]);
+    m_propertyArray = m_propertyMap.values().toArray(new FastPropertyDescriptor[0]);
   }
 
   public Class getBeanClass() {

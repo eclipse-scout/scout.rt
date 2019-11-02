@@ -326,7 +326,7 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
 
         //
         if (!batchCall.isEmpty()) {
-          ITableRow[] tableRows = batchRowList.toArray(new ITableRow[batchRowList.size()]);
+          ITableRow[] tableRows = batchRowList.toArray(new ITableRow[0]);
           IBatchLookupService service = BEANS.get(IBatchLookupService.class);
           List<List<ILookupRow<?>>> resultArray = service.getBatchDataByKey(batchCall);
           for (int i = 0; i < tableRows.length; i++) {

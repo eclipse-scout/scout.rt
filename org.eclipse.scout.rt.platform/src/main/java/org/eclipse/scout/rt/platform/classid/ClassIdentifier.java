@@ -117,7 +117,7 @@ public class ClassIdentifier implements Serializable {
         result.add(new ClassIdentifier(c));
       }
     }
-    return result.toArray(new ClassIdentifier[result.size()]);
+    return result.toArray(new ClassIdentifier[0]);
   }
 
   @Override

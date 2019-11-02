@@ -44,7 +44,7 @@ public class FutureFilter implements Predicate<IFuture<?>>, IAdaptable {
   @Override
   public <T> T getAdapter(final Class<T> type) {
     if (type == IFuture[].class) {
-      return (T) m_futures.toArray(new IFuture[m_futures.size()]);
+      return (T) m_futures.toArray(new IFuture[0]);
     }
     return null;
   }

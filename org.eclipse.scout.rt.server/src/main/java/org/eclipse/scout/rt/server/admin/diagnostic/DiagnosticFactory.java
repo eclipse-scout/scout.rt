@@ -52,7 +52,7 @@ public final class DiagnosticFactory {
 
   public static IDiagnostic[] getDiagnosticProviders() {
     synchronized (DIAGNOSTIC_STATUS_PROVIDERS) {
-      IDiagnostic[] copy = DIAGNOSTIC_STATUS_PROVIDERS.toArray(new IDiagnostic[DIAGNOSTIC_STATUS_PROVIDERS.size()]);
+      IDiagnostic[] copy = DIAGNOSTIC_STATUS_PROVIDERS.toArray(new IDiagnostic[0]);
       return copy;
     }
   }

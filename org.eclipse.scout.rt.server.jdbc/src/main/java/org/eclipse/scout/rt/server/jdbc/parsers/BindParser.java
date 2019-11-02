@@ -89,7 +89,7 @@ public class BindParser {
     if (m_pos.getIndex() < m_str.length()) {
       LOG.warn("statement not fully parsed (index {}): {}", m_pos.getIndex(), m_str);
     }
-    return new BindModel(m_tokenList.toArray(new IToken[m_tokenList.size()]));
+    return new BindModel(m_tokenList.toArray(new IToken[0]));
   }
 
   private boolean parseStatement() {

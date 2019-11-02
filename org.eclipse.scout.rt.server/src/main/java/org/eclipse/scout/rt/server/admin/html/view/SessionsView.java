@@ -97,7 +97,7 @@ public class SessionsView extends DefaultView {
       long lastAccess = NumberUtility.nvl(sessionInspectors[i].getInfo().getLastAccessedTime(), 0L);
       userAndTimeToSessions.put(new CompositeObject(lastAccess, user, i), sessionInspectors[i]);
     }
-    return userAndTimeToSessions.values().toArray(new SessionInspector[userAndTimeToSessions.size()]);
+    return userAndTimeToSessions.values().toArray(new SessionInspector[0]);
   }
 
   protected void renderSessionTableHeader(HtmlTable table) {

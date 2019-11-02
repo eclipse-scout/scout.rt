@@ -138,7 +138,7 @@ public class ProcessingException extends PlatformException {
       list.addAll(0, Arrays.asList(t.getStackTrace()));
       t = t.getCause();
     }
-    return list.toArray(new StackTraceElement[list.size()]);
+    return list.toArray(new StackTraceElement[0]);
   }
 
   @Override

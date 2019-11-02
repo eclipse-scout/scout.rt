@@ -598,7 +598,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
             names.add(((Bookmark) bookmark.getCell().getValue()).getTitle());
           }
         }
-        if (MessageBoxes.showDeleteConfirmationMessage(names.toArray(new String[names.size()]))) {
+        if (MessageBoxes.showDeleteConfirmationMessage(names.toArray(new String[0]))) {
           // delete bookmarks
           for (ITreeNode bookmark : bookmarks) {
             tree.removeNode(bookmark);

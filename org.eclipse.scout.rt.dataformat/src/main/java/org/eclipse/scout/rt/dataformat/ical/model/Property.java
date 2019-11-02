@@ -80,7 +80,7 @@ public class Property implements Serializable {
       for (PropertyParameter parameter : propertyParameters) {
         if (m_parameters.containsKey(parameter.getName())) {
           PropertyParameter existingParameter = m_parameters.get(parameter.getName());
-          existingParameter.addValues(parameter.getValueSet().toArray(new String[parameter.getValueSet().size()]));
+          existingParameter.addValues(parameter.getValueSet().toArray(new String[0]));
         }
         else {
           m_parameters.put(parameter.getName(), parameter);

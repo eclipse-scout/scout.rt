@@ -61,7 +61,7 @@ public class ServicesView extends DefaultView {
       for (IService service : BEANS.all(IService.class)) {
         list.add(new ServiceInspector(service));
       }
-      m_serviceInspectors = list.toArray(new ServiceInspector[list.size()]);
+      m_serviceInspectors = list.toArray(new ServiceInspector[0]);
     }
     catch (Exception e) { // NOSONAR
       // nop

@@ -2246,7 +2246,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
           xmlFieldIds.add(element.getAttribute("fieldId"));
         }
         xmlFieldIds.add(xField.getAttribute("fieldId"));
-        FindFieldByXmlIdsVisitor v = new FindFieldByXmlIdsVisitor(xmlFieldIds.toArray(new String[xmlFieldIds.size()]));
+        FindFieldByXmlIdsVisitor v = new FindFieldByXmlIdsVisitor(xmlFieldIds.toArray(new String[0]));
         visit(v, IFormField.class);
         IFormField f = v.getField();
         if (f != null) {

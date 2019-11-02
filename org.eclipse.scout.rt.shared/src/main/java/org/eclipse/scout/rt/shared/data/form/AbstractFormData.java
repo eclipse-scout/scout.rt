@@ -114,7 +114,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
 
   @Override
   public AbstractPropertyData[] getAllProperties() {
-    return m_propertyMap != null ? m_propertyMap.values().toArray(new AbstractPropertyData[m_propertyMap.size()]) : new AbstractPropertyData[0];
+    return m_propertyMap != null ? m_propertyMap.values().toArray(new AbstractPropertyData[0]) : new AbstractPropertyData[0];
   }
 
   public AbstractFormFieldData getFieldById(String id) {
@@ -167,7 +167,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    * @return all fields of the form data itself, not including fields in external field templates
    */
   public AbstractFormFieldData[] getFields() {
-    return m_fieldMap.values().toArray(new AbstractFormFieldData[m_fieldMap.size()]);
+    return m_fieldMap.values().toArray(new AbstractFormFieldData[0]);
   }
 
   /**

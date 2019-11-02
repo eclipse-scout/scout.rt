@@ -64,7 +64,7 @@ public class SearchFilter implements Serializable {
   }
 
   public String[] getDisplayTexts() {
-    return m_displayTexts.toArray(new String[m_displayTexts.size()]);
+    return m_displayTexts.toArray(new String[0]);
   }
 
   public void setDisplayTexts(String[] displayTexts) {

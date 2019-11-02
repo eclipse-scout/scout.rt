@@ -42,7 +42,7 @@ public class SplitBoxGrid implements ICompositeFieldGrid<ISplitBox> {
         f.setGridDataInternal(data);
       }
     }
-    m_fields = list.toArray(new IFormField[list.size()]);
+    m_fields = list.toArray(new IFormField[0]);
     layoutStatic();
   }
 

@@ -123,7 +123,7 @@ public final class FastBeanUtility {
         }
       }
     }
-    return methodsList.toArray(new Method[methodsList.size()]);
+    return methodsList.toArray(new Method[0]);
   }
 
 }

@@ -176,7 +176,7 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
 
   @Override
   public String[] getRecipientEmail() {
-    return m_recipientEmail.toArray(new String[m_recipientEmail.size()]);
+    return m_recipientEmail.toArray(new String[0]);
   }
 
   public void addRecipientEmail(String recipientEmail) {

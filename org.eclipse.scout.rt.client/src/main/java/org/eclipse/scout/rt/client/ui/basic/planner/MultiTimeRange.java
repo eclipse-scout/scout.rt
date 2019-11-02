@@ -191,7 +191,7 @@ class MultiTimeRange {
    * @return an {@link Iterator} containing elememts of type {@link TimeRange}.
    */
   public TimeRange[] getTimeRanges() {
-    return m_multipleTimeRangeMap.values().toArray(new TimeRange[m_multipleTimeRangeMap.size()]);
+    return m_multipleTimeRangeMap.values().toArray(new TimeRange[0]);
   }
 
   /**

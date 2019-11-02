@@ -103,7 +103,7 @@ public class FutureFilterBuilder {
    * To match all jobs which are represented by one of the given Futures.
    */
   public <RESULT> FutureFilterBuilder andMatchFuture(final List<IFuture<RESULT>> futures) {
-    andMatch(new FutureFilter(futures.toArray(new IFuture<?>[futures.size()])));
+    andMatch(new FutureFilter(futures.toArray(new IFuture<?>[0])));
     return this;
   }
 
@@ -127,7 +127,7 @@ public class FutureFilterBuilder {
    * To match all jobs which are not represented by any of the given Futures.
    */
   public <RESULT> FutureFilterBuilder andMatchNotFuture(final List<IFuture<RESULT>> futures) {
-    andMatchNot(new FutureFilter(futures.toArray(new IFuture<?>[futures.size()])));
+    andMatchNot(new FutureFilter(futures.toArray(new IFuture<?>[0])));
     return this;
   }
 

@@ -35,7 +35,7 @@ public class BindModel {
         ioList.add(token);
       }
     }
-    m_ioTokens = ioList.toArray(new IToken[ioList.size()]);
+    m_ioTokens = ioList.toArray(new IToken[0]);
   }
 
   public IToken[] getAllTokens() {

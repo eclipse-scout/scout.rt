@@ -59,7 +59,7 @@ public final class ReflectionUtility {
       interfaces.addAll(Arrays.asList(clazz.getInterfaces()));
       clazz = clazz.getSuperclass();
     }
-    return interfaces.toArray(new Class<?>[interfaces.size()]);
+    return interfaces.toArray(new Class<?>[0]);
   }
 
   /**

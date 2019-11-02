@@ -1500,8 +1500,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
 
   @SuppressWarnings("squid:S138")
   public String createSqlOpValuePart(Integer aggregationType, String sql, int operation, List<String> bindNames, List<Object> bindValues, boolean plainBind) {
-    String[] names = (bindNames != null ? bindNames.toArray(new String[bindNames.size()]) : new String[0]);
-    Object[] values = (bindValues != null ? bindValues.toArray(new Object[bindValues.size()]) : new Object[0]);
+    String[] names = (bindNames != null ? bindNames.toArray(new String[0]) : new String[0]);
+    Object[] values = (bindValues != null ? bindValues.toArray(new Object[0]) : new Object[0]);
     if (plainBind && operation != OPERATOR_NONE) {
       //rewrite bindNames by plain values
       for (int i = 0; i < names.length; i++) {

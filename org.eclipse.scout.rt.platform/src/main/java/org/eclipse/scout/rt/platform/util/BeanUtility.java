@@ -159,7 +159,7 @@ public final class BeanUtility {
         filteredProperties.add(pd);
       }
     }
-    return filteredProperties.toArray(new FastPropertyDescriptor[filteredProperties.size()]);
+    return filteredProperties.toArray(new FastPropertyDescriptor[0]);
   }
 
   /**

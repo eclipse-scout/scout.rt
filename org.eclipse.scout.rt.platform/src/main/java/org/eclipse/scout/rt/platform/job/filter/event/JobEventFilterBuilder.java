@@ -132,7 +132,7 @@ public class JobEventFilterBuilder {
    * To match all events for jobs which belong to one of the given Futures.
    */
   public <RESULT> JobEventFilterBuilder andMatchFuture(final List<IFuture<RESULT>> futures) {
-    andMatch(new FutureFilterWrapperJobEventFilter(new FutureFilter(futures.toArray(new IFuture<?>[futures.size()]))));
+    andMatch(new FutureFilterWrapperJobEventFilter(new FutureFilter(futures.toArray(new IFuture<?>[0]))));
     return this;
   }
 
@@ -156,7 +156,7 @@ public class JobEventFilterBuilder {
    * To match all events for jobs which do not belong to any of the given Futures.
    */
   public <RESULT> JobEventFilterBuilder andMatchNotFuture(final List<IFuture<RESULT>> futures) {
-    andMatchNot(new FutureFilterWrapperJobEventFilter(new FutureFilter(futures.toArray(new IFuture<?>[futures.size()]))));
+    andMatchNot(new FutureFilterWrapperJobEventFilter(new FutureFilter(futures.toArray(new IFuture<?>[0]))));
     return this;
   }
 
@@ -260,7 +260,7 @@ public class JobEventFilterBuilder {
         return null; // NOSONAR
       }
 
-      return intersection.toArray(new IFuture<?>[intersection.size()]);
+      return intersection.toArray(new IFuture<?>[0]);
     }
 
     @SuppressWarnings("unchecked")

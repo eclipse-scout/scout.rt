@@ -42,7 +42,7 @@ public class TabBoxGrid implements ICompositeFieldGrid<ITabBox> {
         f.setGridDataInternal(data);
       }
     }
-    m_fields = list.toArray(new IFormField[list.size()]);
+    m_fields = list.toArray(new IFormField[0]);
     layoutStatic();
   }
 

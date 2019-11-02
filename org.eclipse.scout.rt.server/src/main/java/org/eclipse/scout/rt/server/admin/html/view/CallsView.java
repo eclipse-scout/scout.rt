@@ -87,7 +87,7 @@ public class CallsView extends DefaultView {
       long startTime = callInspectors[i].getInfo().getStartTime();
       timeToCalls.put(new CompositeObject(startTime, i), callInspectors[i]);
     }
-    CallInspector[] sorted = timeToCalls.values().toArray(new CallInspector[timeToCalls.size()]);
+    CallInspector[] sorted = timeToCalls.values().toArray(new CallInspector[0]);
     p.bold("Calls");
     p.startTable(1, 0, 3);
     p.startTableRow();

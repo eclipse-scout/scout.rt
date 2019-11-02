@@ -99,7 +99,7 @@ public class BasicTransaction implements ITransaction {
   }
 
   private ITransactionMember[] getMembersNoLocking() {
-    return m_memberMap.values().toArray(new ITransactionMember[m_memberMap.size()]);
+    return m_memberMap.values().toArray(new ITransactionMember[0]);
   }
 
   @Override
@@ -198,7 +198,7 @@ public class BasicTransaction implements ITransaction {
 
   @Override
   public Throwable[] getFailures() {
-    return m_failures.toArray(new Throwable[m_failures.size()]);
+    return m_failures.toArray(new Throwable[0]);
   }
 
   @Override

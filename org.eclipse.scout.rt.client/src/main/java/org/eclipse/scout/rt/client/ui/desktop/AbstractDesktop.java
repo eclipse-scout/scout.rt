@@ -654,7 +654,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
     // add dynamic keyStrokes
     List<IKeyStroke> ksList = new ActionFinder().findActions(actionList, IKeyStroke.class, true);
-    addKeyStrokes(ksList.toArray(new IKeyStroke[ksList.size()]));
+    addKeyStrokes(ksList.toArray(new IKeyStroke[0]));
     addPropertyChangeListener(new P_LocalPropertyChangeListener());
 
     addAddOn(BEANS.get(PopupManager.class));

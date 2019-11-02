@@ -782,7 +782,7 @@ public class MailHelper {
         addrList.add(internetAddress);
       }
     }
-    return addrList.toArray(new InternetAddress[addrList.size()]);
+    return addrList.toArray(new InternetAddress[0]);
   }
 
   /**

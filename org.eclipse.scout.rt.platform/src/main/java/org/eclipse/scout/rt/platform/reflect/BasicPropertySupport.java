@@ -529,7 +529,7 @@ public class BasicPropertySupport implements IListenerListWithManagement {
     PropertyChangeEvent[] a = null;
     synchronized (m_listenerLock) {
       if (m_propertyEventBuffer != null) {
-        a = m_propertyEventBuffer.toArray(new PropertyChangeEvent[m_propertyEventBuffer.size()]);
+        a = m_propertyEventBuffer.toArray(new PropertyChangeEvent[0]);
       }
       m_propertyEventBuffer = null;
     }

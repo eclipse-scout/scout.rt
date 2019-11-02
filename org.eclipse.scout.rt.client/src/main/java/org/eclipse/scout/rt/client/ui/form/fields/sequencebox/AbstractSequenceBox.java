@@ -235,7 +235,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     //fields with equal types
     ArrayList<IValueField> valueFieldList = getComparableValueFields();
     if (valueFieldList.size() >= 2) {
-      final IValueField[] valueFields = valueFieldList.toArray(new IValueField[valueFieldList.size()]);
+      final IValueField[] valueFields = valueFieldList.toArray(new IValueField[0]);
       for (int i = 0; i < valueFields.length; i++) {
         final int index = i;
         valueFields[index].addPropertyChangeListener(
