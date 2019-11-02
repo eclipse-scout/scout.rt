@@ -38,13 +38,11 @@ public class HtmlDocumentParserTest {
 
   @BeforeClass
   public static void beforeClass() {
-    BEANS.getBeanManager().registerClass(TestWebContentService.class);
     BEANS.getBeanManager().registerClass(TestTextProviderService.class);
   }
 
   @AfterClass
   public static void afterClass() {
-    BEANS.getBeanManager().unregisterClass(TestWebContentService.class);
     BEANS.getBeanManager().unregisterClass(TestTextProviderService.class);
   }
 
@@ -53,7 +51,12 @@ public class HtmlDocumentParserTest {
   @Before
   public void before() {
     HtmlDocumentParserParameters params = new HtmlDocumentParserParameters("html/path", "testTheme", false, false, "base-path");
-    m_parser = new HtmlDocumentParser(params);
+    m_parser = new HtmlDocumentParser(params){
+      @Override
+      protected URL resolveInclude(String includeName) {
+        return HtmlDocumentParserTest.class.getResource("include.html");
+      }
+    };
   }
 
   private byte[] read(String filename) throws IOException {
@@ -82,20 +85,6 @@ public class HtmlDocumentParserTest {
   @Test
   public void testHtmlDocumentParser_02() throws IOException {
     testParser("test02_input.html", "test02_output.html");
-  }
-
-  @Order(Double.MIN_VALUE)
-  public static class TestWebContentService implements IWebContentService {
-
-    @Override
-    public URL getScriptSource(String path) {
-      throw new AssertionError("This method should never be called during this test");
-    }
-
-    @Override
-    public URL getWebContentResource(String path) {
-      return HtmlDocumentParserTest.class.getResource("include.html");
-    }
   }
 
   /**

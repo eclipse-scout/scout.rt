@@ -235,17 +235,7 @@ public class HtmlDocumentParser {
     StringBuffer sb = new StringBuffer();
     while (m.find()) {
       String includeName = m.group(1);
-      URL includeUrl;
-      if (WebResourceResolvers.isNewMode()) {
-        includeUrl = WebResourceResolvers.create()
-            .resolveWebResource(includeName, m_params.isMinify())
-            .map(WebResourceDescriptor::getUrl)
-            .orElse(null);
-      }
-      else {
-        includeUrl = BEANS.get(IWebContentService.class).getWebContentResource("/includes/" + includeName);
-      }
-
+      URL includeUrl = resolveInclude(includeName);
       if (includeUrl == null) {
         throw new IOException("Could not resolve include '" + includeName + "'");
       }
@@ -260,6 +250,18 @@ public class HtmlDocumentParser {
     }
     m.appendTail(sb);
     m_workingContent = sb.toString();
+  }
+
+  protected URL resolveInclude(String includeName) {
+    if (WebResourceResolvers.isNewMode()) {
+      return WebResourceResolvers.create()
+          .resolveWebResource(includeName, m_params.isMinify())
+          .map(WebResourceDescriptor::getUrl)
+          .orElse(null);
+    }
+    else {
+      return BEANS.get(IWebContentService.class).getWebContentResource("/includes/" + includeName);
+    }
   }
 
   @SuppressWarnings("squid:S1149")
