@@ -13,6 +13,10 @@
 
   <artifactId>eclipse-scout-core</artifactId>
 
+  <properties>
+    <master_skip_copy_webpack_build_output>true</master_skip_copy_webpack_build_output>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
