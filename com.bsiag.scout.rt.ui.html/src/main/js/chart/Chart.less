@@ -260,7 +260,7 @@ textPath.chart-x-axis-label {
 .wire-legend-background-box {
   fill: @background-color;
   #scout.tile-colors(fill);
-  stroke-width: 0px;
+  stroke-width: 0;
 }
 
 /* --- PieChart / Donutchart --- */
@@ -294,7 +294,7 @@ text.pie-chart-percentage {
 /* --- FulfillmentChart --- */
 
 path.fulfillment-chart {
-  stroke-width: 0px;
+  stroke-width: 0;
 
   .clickable & {
     cursor: pointer;
@@ -410,7 +410,7 @@ path.line-chart-line {
 
 rect.bar-chart-bar {
   stroke: @palette-white;
-  stroke-width: 0px;
+  stroke-width: 0;
 
   &:hover {
     fill: @chart-data-active-color;
