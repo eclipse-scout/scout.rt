@@ -59,6 +59,7 @@ module.exports = {
     'linebreak-style': ['error', 'unix'],
     'newline-per-chained-call': ['error', {'ignoreChainWithDepth': 2}],
     'no-lonely-if': 'error',
+    'new-cap': ['error', {'capIsNewExceptions': ['Deferred']}],
     'no-multi-assign': 'error',
     'no-unused-vars': 'off',
     'require-jsdoc': 'off',
