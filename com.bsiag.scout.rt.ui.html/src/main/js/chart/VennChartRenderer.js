@@ -7,10 +7,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {VennCircle} from '../index';
-import {VennCircleHelper} from '../index';
-import {VennAsync3Calculator} from '../index';
-import {AbstractGridChartRenderer} from '../index';
+import {AbstractGridChartRenderer, VennAsync3Calculator, VennCircle, VennCircleHelper} from '../index';
 import * as $ from 'jquery';
 
 export default class VennChartRenderer extends AbstractGridChartRenderer {

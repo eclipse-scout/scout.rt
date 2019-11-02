@@ -7,7 +7,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings, tooltips, scout, ObjectFactory} from '@eclipse-scout/core';
+import {ObjectFactory, scout, strings, tooltips} from '@eclipse-scout/core';
 import * as $ from 'jquery';
 import {Chart} from '../index';
 

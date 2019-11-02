@@ -7,10 +7,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings, scout} from '@eclipse-scout/core';
-import {AbstractCircleChartRenderer} from '../index';
+import {scout, strings} from '@eclipse-scout/core';
+import {AbstractCircleChartRenderer, Chart} from '../index';
 import * as $ from 'jquery';
-import {Chart} from '../index';
 
 export default class PieChartRenderer extends AbstractCircleChartRenderer {
 

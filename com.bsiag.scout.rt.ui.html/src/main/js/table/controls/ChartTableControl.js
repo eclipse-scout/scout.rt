@@ -7,11 +7,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableControl, TableMatrix, DateColumn, NumberColumn, scrollbars, strings, tooltips, icons, objects, scout} from '@eclipse-scout/core';
-import {Chart} from '../../index';
-import {ChartTableControlLayout} from '../../index';
+import {DateColumn, icons, NumberColumn, objects, scout, scrollbars, strings, TableControl, TableMatrix, tooltips} from '@eclipse-scout/core';
+import {Chart, ChartTableControlLayout, ChartTableUserFilter} from '../../index';
 import * as $ from 'jquery';
-import {ChartTableUserFilter} from '../../index';
 
 export default class ChartTableControl extends TableControl {
 

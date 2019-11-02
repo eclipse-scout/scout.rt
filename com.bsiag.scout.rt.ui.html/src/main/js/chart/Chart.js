@@ -7,18 +7,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FulfillmentChartRenderer} from '../index';
-import {ScatterChartRenderer} from '../index';
-import {Widget, HtmlComponent} from '@eclipse-scout/core';
-import {VennChartRenderer} from '../index';
-import {DonutChartRenderer} from '../index';
-import {ChartLayout} from '../index';
-import {BarChartRenderer} from '../index';
-import {BarHorizontalChartRenderer} from '../index';
-import {SalesfunnelChartRenderer} from '../index';
-import {SpeedoChartRenderer} from '../index';
-import {PieChartRenderer} from '../index';
-import {LineChartRenderer} from '../index';
+import {
+  BarChartRenderer,
+  BarHorizontalChartRenderer,
+  ChartLayout,
+  DonutChartRenderer,
+  FulfillmentChartRenderer,
+  LineChartRenderer,
+  PieChartRenderer,
+  SalesfunnelChartRenderer,
+  ScatterChartRenderer,
+  SpeedoChartRenderer,
+  VennChartRenderer
+} from '../index';
+import {HtmlComponent, Widget} from '@eclipse-scout/core';
 
 export default class Chart extends Widget {
 

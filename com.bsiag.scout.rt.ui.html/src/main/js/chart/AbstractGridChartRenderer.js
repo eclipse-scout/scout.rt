@@ -8,9 +8,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {strings} from '@eclipse-scout/core';
-import {AbstractChartRenderer} from '../index';
+import {AbstractChartRenderer, Chart} from '../index';
 import * as $ from 'jquery';
-import {Chart} from '../index';
 
 export default class AbstractGridChartRenderer extends AbstractChartRenderer {
 

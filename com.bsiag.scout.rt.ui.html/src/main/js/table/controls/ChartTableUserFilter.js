@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableUserFilter, TableMatrix} from '@eclipse-scout/core';
+import {TableMatrix, TableUserFilter} from '@eclipse-scout/core';
 
 export default class ChartTableUserFilter extends TableUserFilter {
 

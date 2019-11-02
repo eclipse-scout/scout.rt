@@ -9,7 +9,7 @@
  */
 /* global sandboxSession, createSimpleModel*/
 
-import {SpeedoChartRenderer, Chart} from '../../../main/js/index';
+import {Chart, SpeedoChartRenderer} from '../../../main/js/index';
 import {scout} from '@eclipse-scout/core';
 import {LocaleSpecHelper} from '@eclipse-scout/testing';
 
