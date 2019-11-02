@@ -8,40 +8,40 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LayoutValidator} from '../index';
-import {ObjectFactory} from '../index';
-import {AjaxCall} from '../index';
-import {FocusManager} from '../index';
-import {MessageBox} from '../index';
+import {
+  AjaxCall,
+  App,
+  arrays,
+  BackgroundJobPollingStatus,
+  BackgroundJobPollingSupport,
+  Device,
+  EventSupport,
+  FileInput,
+  FocusManager,
+  fonts,
+  LayoutValidator,
+  Locale,
+  MessageBox,
+  ModelAdapter,
+  NullWidget,
+  ObjectFactory,
+  objects,
+  Reconnector,
+  RemoteEvent,
+  ResponseQueue,
+  scout,
+  Status,
+  strings,
+  TextMap,
+  texts,
+  TypeDescriptor,
+  URL,
+  UserAgent,
+  webstorage
+} from '../index';
 import * as $ from 'jquery';
-import {Locale} from '../index';
-import {scout} from '../index';
-import {ModelAdapter} from '../index';
-import {texts} from '../index';
-import {TextMap} from '../index';
-import {Device} from '../index';
-import {BackgroundJobPollingSupport} from '../index';
-import {BackgroundJobPollingStatus} from '../index';
-import {FileInput} from '../index';
-import {Reconnector} from '../index';
-import {objects} from '../index';
-import {Status} from '../index';
-import {EventSupport} from '../index';
-import {RemoteEvent} from '../index';
-import {fonts} from '../index';
-import {UserAgent} from '../index';
-import {App} from '../index';
-import {NullWidget} from '../index';
-import {strings} from '../index';
-import {TypeDescriptor} from '../index';
-import {webstorage} from '../index';
-import {URL} from '../index';
-import {arrays} from '../index';
-import {ResponseQueue} from '../index';
-import {comparators} from '../index';
 
 export default class Session {
-
   constructor() {
     this.$entryPoint = null;
     this.partId = 0;
@@ -115,7 +115,7 @@ export default class Session {
     this.events = this._createEventSupport();
   }
 
-// Corresponds to constants in JsonResponse
+  // Corresponds to constants in JsonResponse
   static JsonResponseError = {
     STARTUP_FAILED: 5,
     SESSION_TIMEOUT: 10,
@@ -642,7 +642,8 @@ export default class Session {
       urlHint = 'sync';
     }
     if (urlHint) {
-      url = new URL(url).addParameter(urlHint).toString();
+      url = new URL(url).addParameter(urlHint)
+        .toString();
     }
     return url;
   }
@@ -671,9 +672,9 @@ export default class Session {
       // Replacer function that filter certain properties from the resulting JSON string.
       // See https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
       var ignore =
-        (this === request && key === 'showBusyIndicator') ||
-        (this instanceof RemoteEvent && scout.isOneOf(key, 'showBusyIndicator', 'coalesce', 'newRequest'));
-      return (ignore ? undefined : value);
+        this === request && key === 'showBusyIndicator' ||
+        this instanceof RemoteEvent && scout.isOneOf(key, 'showBusyIndicator', 'coalesce', 'newRequest');
+      return ignore ? undefined : value;
     });
   }
 
@@ -960,12 +961,12 @@ export default class Session {
     // Show error message
     var boxOptions = {
       header: this.optText('ui.NetworkError', 'Network error'),
-      body: strings.join(' ', (jqXHR.status || ''), errorThrown),
+      body: strings.join(' ', jqXHR.status || '', errorThrown),
       yesButtonText: this.optText('ui.Reload', 'Reload'),
       yesButtonAction: function() {
         scout.reloadPage();
       },
-      noButtonText: (this.ready ? this.optText('ui.Ignore', 'Ignore') : null)
+      noButtonText: this.ready ? this.optText('ui.Ignore', 'Ignore') : null
     };
     this.showFatalMessage(boxOptions, jqXHR.status + '.net');
   }
@@ -1098,7 +1099,7 @@ export default class Session {
         var filename = scout.nvl(value.scoutName, value.name, ''); // see ClipboardField for comments on "scoutName"
         formData.append('files', value, filename);
       }
-    }.bind(this));
+    });
 
     // 50 MB as default maximum size
     maxTotalSize = scout.nvl(maxTotalSize, FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE);
@@ -1107,7 +1108,7 @@ export default class Session {
     if (totalSize > maxTotalSize) {
       var boxOptions = {
         header: this.text('ui.FileSizeLimitTitle'),
-        body: this.text('ui.FileSizeLimit', (maxTotalSize / 1024 / 1024)),
+        body: this.text('ui.FileSizeLimit', maxTotalSize / 1024 / 1024),
         yesButtonText: this.optText('Ok', 'Ok')
       };
 
@@ -1329,7 +1330,7 @@ export default class Session {
     // Set "canceling" state in busy indicator (after 100ms, would not look good otherwise)
     setTimeout(function() {
       busyIndicator.cancelled();
-    }.bind(this), 100);
+    }, 100);
 
     this._sendCancelRequest();
   }
@@ -1392,8 +1393,10 @@ export default class Session {
     var $loadingRoot = $('body').appendDiv('application-loading-root')
       .addClass('application-loading-root')
       .fadeIn();
-    $loadingRoot.appendDiv('application-loading01').hide().fadeIn();
-    $loadingRoot.appendDiv('application-loading02').hide().fadeIn();
+    $loadingRoot.appendDiv('application-loading01').hide()
+      .fadeIn();
+    $loadingRoot.appendDiv('application-loading02').hide()
+      .fadeIn();
   }
 
   _removeApplicationLoading() {
@@ -1421,7 +1424,7 @@ export default class Session {
         // encountered before the "showForm" event has been processed. If the target adapter cannot be
         // resolved, we try the other events first, expecting them to trigger the creation of the event
         // adapter. As soon as a event could be processed successfully, we try our postponed event again.
-        $.log.isDebugEnabled() && $.log.debug("Postponing '" + event.type + "' for adapter with ID " + event.target);
+        $.log.isDebugEnabled() && $.log.debug('Postponing \'' + event.type + '\' for adapter with ID ' + event.target);
         i++;
         continue;
       }
@@ -1430,7 +1433,7 @@ export default class Session {
       events.splice(i, 1);
       i = 0;
 
-      $.log.isDebugEnabled() && $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
+      $.log.isDebugEnabled() && $.log.debug('Processing event \'' + event.type + '\' for adapter with ID ' + event.target);
       adapter.onModelEvent(event);
       adapter.resetEventFilters();
     }
@@ -1519,15 +1522,15 @@ export default class Session {
     } else {
       // remember current url to not lose query parameters (such as debug; however, ignore deeplinks)
       var url = new URL();
-      url.removeParameter('dl'); //deeplink
-      url.removeParameter('i'); //deeplink info
+      url.removeParameter('dl'); // deeplink
+      url.removeParameter('i'); // deeplink info
       webstorage.setItem(sessionStorage, 'scout:loginUrl', url.toString());
       // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
       setTimeout(function() {
         scout.reloadPage({
           redirectUrl: logoutUrl
         });
-      }.bind(this));
+      });
     }
   }
 
@@ -1611,7 +1614,7 @@ export default class Session {
     return this.textMap.exists(textKey);
   }
 
-//--- Event handling methods ---
+  // --- Event handling methods ---
   _createEventSupport() {
     return new EventSupport();
   }

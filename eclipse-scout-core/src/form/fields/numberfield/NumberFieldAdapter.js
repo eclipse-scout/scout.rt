@@ -8,14 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BasicFieldAdapter} from '../../../index';
-import {App} from '../../../index';
-import {NumberField} from '../../../index';
-import {scout} from '../../../index';
-import {objects} from '../../../index';
+import {App, BasicFieldAdapter, NumberField, objects} from '../../../index';
 
 export default class NumberFieldAdapter extends BasicFieldAdapter {
-
   constructor() {
     super();
   }
@@ -42,7 +37,7 @@ export default class NumberFieldAdapter extends BasicFieldAdapter {
     objects.replacePrototypeFunction(NumberField, 'clearErrorStatus', function() {
       if (this.modelAdapter) {
         // Don't do anything -> let server handle it
-        return;
+
       } else {
         return this.clearErrorStatusOrig();
       }

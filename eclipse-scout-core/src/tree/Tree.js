@@ -8,46 +8,46 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent} from '../index';
-import {keys} from '../index';
-import {KeyStrokeContext} from '../index';
-import {TreeCollapseOrDrillUpKeyStroke} from '../index';
-import {LazyNodeFilter} from '../index';
-import {MenuItemsOrder} from '../index';
+import {
+  arrays,
+  ContextMenuPopup,
+  defaultValues,
+  Device,
+  DoubleClickSupport,
+  dragAndDrop,
+  HtmlComponent,
+  keys,
+  KeyStrokeContext,
+  keyStrokeModifier,
+  LazyNodeFilter,
+  MenuBar,
+  MenuDestinations,
+  MenuItemsOrder,
+  menus as menus_1,
+  objects,
+  Range,
+  scout,
+  scrollbars,
+  tooltips,
+  TreeBreadcrumbFilter,
+  TreeCollapseAllKeyStroke,
+  TreeCollapseOrDrillUpKeyStroke,
+  TreeExpandOrDrillDownKeyStroke,
+  TreeLayout,
+  TreeNavigationDownKeyStroke,
+  TreeNavigationEndKeyStroke,
+  TreeNavigationUpKeyStroke,
+  TreeNode,
+  TreeSpaceKeyStroke,
+  Widget
+} from '../index';
 import * as $ from 'jquery';
-import {TreeExpandOrDrillDownKeyStroke} from '../index';
-import {scout} from '../index';
-import {TreeNavigationUpKeyStroke} from '../index';
-import {defaultValues} from '../index';
-import {MenuDestinations} from '../index';
-import {tooltips} from '../index';
-import {Range} from '../index';
-import {TreeNavigationDownKeyStroke} from '../index';
-import {TreeNode} from '../index';
-import {TreeBreadcrumbFilter} from '../index';
-import {TreeNavigationEndKeyStroke} from '../index';
-import {Device} from '../index';
-import {MenuBar} from '../index';
-import {Table} from '../index';
-import {menus as menus_1} from '../index';
-import {objects} from '../index';
-import {dragAndDrop} from '../index';
-import {TreeSpaceKeyStroke} from '../index';
-import {DoubleClickSupport} from '../index';
-import {ContextMenuPopup} from '../index';
-import {TreeLayout} from '../index';
-import {scrollbars} from '../index';
-import {TreeCollapseAllKeyStroke} from '../index';
-import {keyStrokeModifier} from '../index';
-import {Widget} from '../index';
-import {arrays} from '../index';
 
 /**
  * @class
  * @constructor
  */
 export default class Tree extends Widget {
-
   constructor() {
     super();
 
@@ -259,14 +259,13 @@ export default class Tree extends Widget {
   isSelectedNode(node) {
     if (this.initialTraversing) {
       return this.selectedNodes.indexOf(node.id) > -1;
-    } else {
-      return this.selectedNodes.indexOf(node) > -1;
     }
+    return this.selectedNodes.indexOf(node) > -1;
   }
 
   _updateFlatListAndSelectionPath(node, parentNode) {
     // if this node is selected all parent nodes have to be added to selectionPath
-    if (this.isSelectedNode(node) && ((node.parentNode && !this.visibleNodesMap[node.parentNode.id]) || node.level === 0)) {
+    if (this.isSelectedNode(node) && (node.parentNode && !this.visibleNodesMap[node.parentNode.id] || node.level === 0)) {
       var p = node;
       while (p) {
         this._inSelectionPathList[p.id] = true;
@@ -661,7 +660,7 @@ export default class Tree extends Widget {
       // Do not remove nodes which are removed using an animation
       return;
     }
-    //only remove node
+    // only remove node
     $node.detach();
     node.attached = false;
   }
@@ -671,7 +670,6 @@ export default class Tree extends Widget {
    */
   _renderViewRange(viewRange) {
     if (viewRange.from === this.viewRangeRendered.from && viewRange.to === this.viewRangeRendered.to && !this.viewRangeDirty) {
-
       // When node with has changed (because of changes in layout) we must at least
       // update the internal node width even though the view-range has not changed.
       if (this.nodeWidthDirty) {
@@ -698,7 +696,7 @@ export default class Tree extends Widget {
         this._renderNodesInRange(range);
       }.bind(this));
     } else {
-      //expansion changed
+      // expansion changed
       this.viewRangeRendered = viewRange;
       this.ensureRangeVisible(viewRange);
     }
@@ -929,8 +927,8 @@ export default class Tree extends Widget {
       }
     }, this);
 
-    //If every child node was deleted mark node as collapsed (independent of the model state)
-    //--> makes it consistent with addNodes and expand (expansion is not allowed if there are no child nodes)
+    // If every child node was deleted mark node as collapsed (independent of the model state)
+    // --> makes it consistent with addNodes and expand (expansion is not allowed if there are no child nodes)
     arrays.ensure(parentNode).forEach(function(p) {
       if (p && p.$node && p.childNodes.length === 0) {
         p.$node.removeClass('expanded lazy');
@@ -1007,7 +1005,7 @@ export default class Tree extends Widget {
   _renderCheckable() {
     // Define helper functions
     var isNodeRendered = function(node) {
-      return !!node.$node;
+      return Boolean(node.$node);
     };
     var updateCheckableStateRec = function(node) {
       var $node = node.$node;
@@ -1123,7 +1121,7 @@ export default class Tree extends Widget {
       }
       var node = this.visibleNodesFlat[i];
       if (node && node.rendered) {
-        node.$node.toggleClass('group', !!this.groupedNodes[node.id]);
+        node.$node.toggleClass('group', Boolean(this.groupedNodes[node.id]));
       }
     }
 
@@ -1223,7 +1221,7 @@ export default class Tree extends Widget {
           properties.nodeId = node.id;
         }
         return properties;
-      }.bind(this)
+      }
     });
     this.dragAndDropHandler.install(this.$container, '.tree-data,.tree-node');
   }
@@ -1274,7 +1272,7 @@ export default class Tree extends Widget {
 
     var stateChanged = false;
     if (!checked && !init) {
-      //node was unchecked check siblings
+      // node was unchecked check siblings
       var hasCheckedSiblings = false;
       for (var i = 0; i < node.parentNode.childNodes.length > 0; i++) {
         var siblingNode = node.parentNode.childNodes[i];
@@ -1284,12 +1282,12 @@ export default class Tree extends Widget {
         }
       }
       if (hasCheckedSiblings !== node.parentNode.childrenChecked) {
-        //parentNode.checked should be false
+        // parentNode.checked should be false
         node.parentNode.childrenChecked = hasCheckedSiblings;
         stateChanged = true;
       }
     }
-    if ((checked && !node.parentNode.childrenChecked)) {
+    if (checked && !node.parentNode.childrenChecked) {
       node.parentNode.childrenChecked = true;
       stateChanged = true;
     }
@@ -1478,12 +1476,10 @@ export default class Tree extends Widget {
         if (node.parentNode) {
           // ensure node is visible under the parent node if there is a parent.
           this._rebuildParent(node.parentNode, opts);
+        } else if (node.filterAccepted) {
+          this._addToVisibleFlatList(node, false);
         } else {
-          if (node.filterAccepted) {
-            this._addToVisibleFlatList(node, false);
-          } else {
-            this._removeFromFlatList(node, false);
-          }
+          this._removeFromFlatList(node, false);
         }
       } else if (renderExpansionOpts.expandLazyChanged) {
         node.childNodes.forEach(function(child) {
@@ -1565,7 +1561,7 @@ export default class Tree extends Widget {
         if (this.visibleNodesFlat[i].level > parentLevel) {
           var node = this.visibleNodesFlat[i];
           if (this.isHorizontalScrollingEnabled()) {
-            //if node is the node which defines the widest width then recalculate width for render
+            // if node is the node which defines the widest width then recalculate width for render
             if (node.width === this.maxNodeWidth) {
               this.maxNodeWidth = 0;
               this.nodeWidthDirty = true;
@@ -1617,7 +1613,7 @@ export default class Tree extends Widget {
       return removedNodes;
     }
 
-    //----- Helper functions -----
+    // ----- Helper functions -----
     function onAnimationComplete(affectedNodes) {
       affectedNodes.forEach(function(node) {
         node.$node.detach();
@@ -1630,7 +1626,6 @@ export default class Tree extends Widget {
       }
       this.runningAnimationsFinishFunc();
     }
-
   }
 
   _removeFromFlatList(node, animatedRemove) {
@@ -1639,7 +1634,7 @@ export default class Tree extends Widget {
       var index = this.visibleNodesFlat.indexOf(node);
       this._removeChildrenFromFlatList(node, false);
       if (this.isHorizontalScrollingEnabled()) {
-        //if node is the node which defines the widest width then recalculate width for render
+        // if node is the node which defines the widest width then recalculate width for render
         if (node.width === this.maxNodeWidth) {
           this.maxNodeWidth = 0;
           this.nodeWidthDirty = true;
@@ -1660,7 +1655,7 @@ export default class Tree extends Widget {
     // if node already is in visible list don't do anything. If no parentNode is available this node is on toplevel, if a parent is available
     // it has to be in visible list and also be expanded
     if (!this.visibleNodesMap[node.id] && node.isFilterAccepted() && (!node.parentNode ||
-      (node.parentNode.expanded && this.visibleNodesMap[node.parentNode.id]))) {
+      node.parentNode.expanded && this.visibleNodesMap[node.parentNode.id])) {
       if (this.initialTraversing) {
         // for faster index calculation
         this._addToVisibleFlatListNoCheck(node, this.visibleNodesFlat.length, renderingAnimated);
@@ -1671,18 +1666,18 @@ export default class Tree extends Widget {
     }
   }
 
-// TODO [7.0] CGU applies to all the add/remove to/from flat list methods:
-// Is it really necessary to update dom on every operation? why not just update the list and renderViewport at the end?
-// The update of the flat list is currently implemented quite complicated -> it should be simplified.
-// And: because add to flat list renders all the children the rendered node count is greater than the viewRangeSize until
-// the layout renders the viewport again -> this must not happen (can be seen when a node gets expanded)
+  // TODO [7.0] CGU applies to all the add/remove to/from flat list methods:
+  // Is it really necessary to update dom on every operation? why not just update the list and renderViewport at the end?
+  // The update of the flat list is currently implemented quite complicated -> it should be simplified.
+  // And: because add to flat list renders all the children the rendered node count is greater than the viewRangeSize until
+  // the layout renders the viewport again -> this must not happen (can be seen when a node gets expanded)
   _addChildrenToFlatList(parentNode, parentIndex, animatedRendering, insertBatch, forceFilter) {
     // add nodes recursively
     if (!this.visibleNodesMap[parentNode.id]) {
       return 0;
     }
 
-    var isSubAdding = !!insertBatch;
+    var isSubAdding = Boolean(insertBatch);
     parentIndex = parentIndex ? parentIndex : this.visibleNodesFlat.indexOf(parentNode);
     animatedRendering = animatedRendering && this.rendered; // don't animate while rendering (not necessary, or may even lead to timing issues)
     if (this._$animationWrapper && !isSubAdding) {
@@ -1777,7 +1772,7 @@ export default class Tree extends Widget {
     // in the visible nodes map)
     var thatNode = node;
     var siblings = childNodes.filter(function(node) {
-      return !!this.visibleNodesMap[node.id] || node === thatNode;
+      return Boolean(this.visibleNodesMap[node.id]) || node === thatNode;
     }.bind(this));
 
     // when there are no visible siblings, insert below the parent node
@@ -1868,9 +1863,8 @@ export default class Tree extends Widget {
       lastBatchInsertIndex: function() {
         if (this.isEmpty()) {
           return this.insertAt();
-        } else {
-          return this.insertAt() + this.insertNodes.length - 3;
         }
+        return this.insertAt() + this.insertNodes.length - 3;
       },
       nextBatchInsertIndex: function() {
         // only NBU knows what this means
@@ -1896,12 +1890,12 @@ export default class Tree extends Widget {
 
   checkAndHandleBatchAnimationWrapper(parentNode, animatedRendering, insertBatch) {
     if (animatedRendering && this.viewRangeRendered.from <= insertBatch.lastBatchInsertIndex() && this.viewRangeRendered.to >= insertBatch.lastBatchInsertIndex() && !insertBatch.$animationWrapper) {
-      //we are in visible area so we need a animation wrapper
-      //if parent is in visible area insert after parent else insert before first node.
+      // we are in visible area so we need a animation wrapper
+      // if parent is in visible area insert after parent else insert before first node.
       var lastNodeIndex = insertBatch.lastBatchInsertIndex() - 1,
         nodeBefore = this.viewRangeRendered.from === insertBatch.lastBatchInsertIndex() ? null : this.visibleNodesFlat[lastNodeIndex];
       if (nodeBefore && lastNodeIndex >= this.viewRangeRendered.from && lastNodeIndex < this.viewRangeRendered.to && !nodeBefore.attached) {
-        //ensure node before is visible
+        // ensure node before is visible
         this.showNode(nodeBefore, false, lastNodeIndex);
       }
       if (nodeBefore && nodeBefore.attached) {
@@ -1918,7 +1912,7 @@ export default class Tree extends Widget {
       this._$expandAnimationWrappers.push(insertBatch.$animationWrapper);
     }
 
-    //----- Helper functions ----- //
+    // ----- Helper functions ----- //
 
     function onAnimationComplete() {
       insertBatch.$animationWrapper.replaceWith(insertBatch.$animationWrapper.contents());
@@ -1930,14 +1924,14 @@ export default class Tree extends Widget {
 
   checkAndHandleBatch(insertBatch, parentNode, animatedRendering) {
     if (this.viewRangeRendered.from - 1 === insertBatch.lastBatchInsertIndex()) {
-      //do immediate rendering because list could be longer
+      // do immediate rendering because list could be longer
       this.insertBatchInVisibleNodes(insertBatch, false, false);
       insertBatch = this.newInsertBatch(insertBatch.lastBatchInsertIndex() + 1);
     }
     this.checkAndHandleBatchAnimationWrapper(parentNode, animatedRendering, insertBatch);
 
     if (this.viewRangeRendered.from + this.viewRangeSize - 1 === insertBatch.lastBatchInsertIndex()) {
-      //do immediate rendering because list could be longer
+      // do immediate rendering because list could be longer
       this.insertBatchInVisibleNodes(insertBatch, true, animatedRendering);
       insertBatch = this.newInsertBatch(insertBatch.lastBatchInsertIndex() + 1);
     }
@@ -2237,14 +2231,14 @@ export default class Tree extends Widget {
           if (parentNode.childNodes.indexOf(entry) < 0) {
             arrays.insert(parentNode.childNodes, entry, entry.childNodeIndex);
           }
-        }.bind(this));
+        });
         this._updateChildNodeIndex(parentNode.childNodes, nodes[0].childNodeIndex);
       } else {
         nodes.forEach(function(entry) {
           parentNode.childNodes.push(entry);
-        }.bind(this));
+        });
       }
-      //initialize node and add to visible list if node is visible
+      // initialize node and add to visible list if node is visible
       Tree.visitNodes(this._initTreeNode.bind(this), nodes, parentNode);
       Tree.visitNodes(this._updateFlatListAndSelectionPath.bind(this), nodes, parentNode);
       if (this.groupedNodes[parentNode.id]) {
@@ -2269,7 +2263,7 @@ export default class Tree extends Widget {
       } else {
         arrays.pushAll(this.nodes, nodes);
       }
-      //initialize node and add to visible list if node is visible
+      // initialize node and add to visible list if node is visible
       Tree.visitNodes(this._initTreeNode.bind(this), nodes, parentNode);
       Tree.visitNodes(this._updateFlatListAndSelectionPath.bind(this), nodes, parentNode);
     }
@@ -2502,12 +2496,12 @@ export default class Tree extends Widget {
     $.extend(opts, options);
     var updatedNodes = [];
     // use enabled computed because when the parent of the table is disabled, it should not be allowed to check rows
-    if (!this.checkable || (!this.enabledComputed && opts.checkOnlyEnabled)) {
+    if (!this.checkable || !this.enabledComputed && opts.checkOnlyEnabled) {
       return;
     }
     nodes = arrays.ensure(nodes);
     nodes.forEach(function(node) {
-      if ((!node.enabled && opts.checkOnlyEnabled) || node.checked === opts.checked) {
+      if (!node.enabled && opts.checkOnlyEnabled || node.checked === opts.checked) {
         if (opts.checkChildren) {
           this.checkNodes(node.childNodes, opts);
         }
@@ -2604,7 +2598,7 @@ export default class Tree extends Widget {
   _onNodeMouseDown(event) {
     this._doubleClickSupport.mousedown(event);
     if (this._doubleClickSupport.doubleClicked()) {
-      //don't execute on double click events
+      // don't execute on double click events
       return false;
     }
 
@@ -2632,7 +2626,7 @@ export default class Tree extends Widget {
 
   _onNodeMouseUp(event) {
     if (this._doubleClickSupport.doubleClicked()) {
-      //don't execute on double click events
+      // don't execute on double click events
       return false;
     }
 
@@ -2707,7 +2701,7 @@ export default class Tree extends Widget {
       addToGroup.call(this, node.childNodes);
     }
 
-    //------ helper function ------//
+    // ------ helper function ------//
 
     function addToGroup(nodes) {
       nodes.forEach(function(node) {
@@ -2763,7 +2757,7 @@ export default class Tree extends Widget {
   }
 
   filter(notAnimated) {
-    var useAnimation = !!!notAnimated,
+    var useAnimation = Boolean(!notAnimated),
       changedNodes = [],
       newHiddenNodes = [];
     // Filter nodes
@@ -2843,11 +2837,9 @@ export default class Tree extends Widget {
         node.filterAccepted = true;
         changed = true;
       }
-    } else {
-      if (node.filterAccepted) {
-        node.filterAccepted = false;
-        changed = true;
-      }
+    } else if (node.filterAccepted) {
+      node.filterAccepted = false;
+      changed = true;
     }
     if (changed) {
       node.filterDirty = false;
@@ -3002,7 +2994,6 @@ export default class Tree extends Widget {
         }
       });
     }
-
   }
 
   hideNode(node, useAnimation, suppressDetachHandling) {
@@ -3013,7 +3004,7 @@ export default class Tree extends Widget {
     var that = this,
       $node = node.$node;
     if (!$node) {
-      //node is not rendered
+      // node is not rendered
       return;
     }
 
@@ -3064,7 +3055,7 @@ export default class Tree extends Widget {
    * Checks whether the given node is contained in the tree. Uses the id of the node for the lookup.
    */
   hasNode(node) {
-    return !!this._nodeById(node.id);
+    return Boolean(this._nodeById(node.id));
   }
 
   _onNodeDoubleClick(event) {
@@ -3094,7 +3085,7 @@ export default class Tree extends Widget {
   _onNodeControlMouseDown(event) {
     this._doubleClickSupport.mousedown(event);
     if (this._doubleClickSupport.doubleClicked()) {
-      //don't execute on double click events
+      // don't execute on double click events
       return false;
     }
 
@@ -3161,7 +3152,7 @@ export default class Tree extends Widget {
     });
   }
 
-// same as on Table.prototype._onDesktopPopupOpen
+  // same as on Table.prototype._onDesktopPopupOpen
   _onDesktopPopupOpen(event) {
     var popup = event.popup;
     if (!this.enabledComputed) {

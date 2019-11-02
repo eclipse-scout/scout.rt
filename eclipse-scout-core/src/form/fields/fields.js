@@ -8,13 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../../index';
-import {widgets} from '../../index';
-import {strings} from '../../index';
-import {scout} from '../../index';
-import {Device} from '../../index';
-import {FormField} from '../../index';
-import * as $ from 'jquery';
+import {Device, FormField, scout, strings, Widget, widgets} from '../../index';
 
 
 /**
@@ -77,9 +71,8 @@ export function valOrText($field, text) {
 export function makeInputOrDiv(field, cssClass) {
   if (field.touchMode) {
     return makeInputDiv(field, cssClass);
-  } else {
-    return makeTextField(field.$container, cssClass);
   }
+  return makeTextField(field.$container, cssClass);
 }
 
 /**

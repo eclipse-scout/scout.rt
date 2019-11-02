@@ -8,19 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Point} from '../index';
-import {Dimension} from '../index';
-import {Insets} from '../index';
-import {NullLayout} from '../index';
+import {Dimension, graphics, Insets, NullLayout, scout} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {graphics} from '../index';
 
 /**
  * Wrapper for a JQuery selector. Used as replacement for javax.swing.JComponent.
  */
 export default class HtmlComponent {
-
   constructor($comp, session) {
     if (!session) {
       throw new Error('session must be defined for ' + this.debug());
@@ -68,9 +62,8 @@ export default class HtmlComponent {
     var $parent = this.$comp.parent();
     if ($parent.length === 0) {
       return null;
-    } else {
-      return HtmlComponent.optGet($parent);
     }
+    return HtmlComponent.optGet($parent);
   }
 
   /**

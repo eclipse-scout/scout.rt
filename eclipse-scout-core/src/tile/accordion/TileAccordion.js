@@ -8,17 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../../index';
-import {scout} from '../../index';
-import {Tile} from '../../index';
-import {TileAccordionSelectionHandler} from '../../index';
-import {arrays} from '../../index';
-import {EventDelegator} from '../../index';
-import {Accordion} from '../../index';
-import {Group} from '../../index';
+import {Accordion, arrays, EventDelegator, Group, objects, scout, TileAccordionSelectionHandler} from '../../index';
 
 export default class TileAccordion extends Accordion {
-
   constructor() {
     super();
     this.exclusiveExpand = false;

@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateFormatPatternType} from '../index';
 
 /**
  * Definition of a date format pattern.
@@ -72,7 +71,6 @@ import {DateFormatPatternType} from '../index';
  *            A string with the matched part of the input, or null if it did not match.
  */
 export default class DateFormatPatternDefinition {
-
   constructor(options) { // NOSONAR
     options = options || {};
     this.type = options.type;

@@ -8,27 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event} from '../index';
-import {objects} from '../index';
-import {EventSupport} from '../index';
-import {PropertyChangeEventFilter} from '../index';
-import {WidgetEventTypeFilter} from '../index';
-import {RemoteEvent} from '../index';
+import {App, arrays, defaultValues, EventSupport, objects, PropertyChangeEventFilter, RemoteEvent, scout, strings, Widget, WidgetEventTypeFilter} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {App} from '../index';
-import {defaultValues} from '../index';
-import {strings} from '../index';
-import {DateRange} from '../index';
-import {Widget} from '../index';
-import {arrays} from '../index';
 
 /**
  * A model adapter is the connector with the server, it takes the events sent from the server and calls the corresponding methods on the widget.
  * It also sends events to the server whenever an action happens on the widget.
  */
 export default class ModelAdapter {
-
   constructor() {
     this.initialized = false;
     this.attached = false;
@@ -455,7 +442,7 @@ export default class ModelAdapter {
       // If the widget has a model adapter use getOrCreateWidget of the session to resolve the child widget
       // The model normally is a String containing the (remote) object ID.
       // If it is not a string it may be a local model -> use default local case instead
-      if (this.modelAdapter && typeof model == 'string') {
+      if (this.modelAdapter && typeof model === 'string') {
         return this.session.getOrCreateWidget(model, this);
       }
 

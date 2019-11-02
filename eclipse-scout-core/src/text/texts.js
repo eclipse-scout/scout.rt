@@ -10,8 +10,6 @@
  */
 import {TextMap} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-
 
 const TEXT_KEY_REGEX = /\$\{textKey\:([^\}]*)\}/;
 
@@ -22,12 +20,12 @@ export function bootstrap(url) {
   return promise.then(_preInit.bind(this, url));
 }
 
-//private
+// private
 export function _setTextsByLocale(val) {
   textsByLocale = val;
 }
 
-//private
+// private
 export function _preInit(url, data) {
   if (data && data.error) {
     // The result may contain a json error (e.g. session timeout) -> abort processing
@@ -109,7 +107,7 @@ export function get(languageTag) {
   return texts;
 }
 
-//private
+// private
 export function _get(languageTag) {
   return textsByLocale[languageTag];
 }

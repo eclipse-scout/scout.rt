@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../index';
-import {LookupRow} from '../index';
-import {QueryBy} from '../index';
+import {objects, QueryBy, scout} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 /**
  * Base class for lookup calls. A concrete implementation of LookupCall.js which uses resources over a network
@@ -20,7 +17,6 @@ import {scout} from '../index';
  * The lookup call must _always_ return a result, otherwise the SmartField cannot work properly.
  */
 export default class LookupCall {
-
   constructor() {
     this.session = null;
     this.hierarchical = false;
@@ -218,7 +214,7 @@ export default class LookupCall {
     // NOP. Implement in subclasses if necessary.
   }
 
-// ---- static helpers ----
+  // ---- static helpers ----
 
   static ensure(lookupCall, session) {
     if (lookupCall instanceof LookupCall) {

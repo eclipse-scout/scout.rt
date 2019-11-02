@@ -8,17 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../index';
-import {HtmlComponent} from '../index';
-import {LoadingSupport} from '../index';
-import {widgets} from '../index';
-import {Widget} from '../index';
-import {RowLayout} from '../index';
-import {Group} from '../index';
-import {arrays} from '../index';
+import {arrays, HtmlComponent, LoadingSupport, objects, RowLayout, Widget, widgets} from '../index';
 
 export default class Accordion extends Widget {
-
   constructor() {
     super();
     this.comparator = null;

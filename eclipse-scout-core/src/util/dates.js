@@ -8,10 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateFormat} from '../index';
-import {strings} from '../index';
-import {scout} from '../index';
-import {Locale} from '../index';
+import {DateFormat, scout, strings} from '../index';
 
 
 /**
@@ -79,9 +76,8 @@ export function shiftToPreviousDayOfType(date, day) {
 export function shiftToNextOrPrevDayOfType(date, day, direction) {
   if (direction > 0) {
     return shiftToNextDayOfType(date, day);
-  } else {
-    return shiftToPreviousDayOfType(date, day);
   }
+  return shiftToPreviousDayOfType(date, day);
 }
 
 export function shiftToNextOrPrevMonday(date, direction) {
@@ -157,7 +153,7 @@ export function compareMonths(date1, date2) {
  * @return the difference of the two dates in number of days.
  */
 export function compareDays(date1, date2) {
-  return ((trunc(date1) - trunc(date2)) - (date1.getTimezoneOffset() - date2.getTimezoneOffset()) * 60000) / (3600000 * 24);
+  return (trunc(date1) - trunc(date2) - (date1.getTimezoneOffset() - date2.getTimezoneOffset()) * 60000) / (3600000 * 24);
 }
 
 /**
@@ -172,7 +168,7 @@ export function timestamp(date, utc) {
   var d = date || new Date();
   if (utc) {
     return strings.padZeroLeft(d.getUTCFullYear(), 4) +
-      strings.padZeroLeft((d.getUTCMonth() + 1), 2) +
+      strings.padZeroLeft(d.getUTCMonth() + 1, 2) +
       strings.padZeroLeft(d.getUTCDate(), 2) +
       strings.padZeroLeft(d.getUTCHours(), 2) +
       strings.padZeroLeft(d.getUTCMinutes(), 2) +
@@ -180,7 +176,7 @@ export function timestamp(date, utc) {
       strings.padZeroLeft(d.getUTCMilliseconds(), 3);
   }
   return strings.padZeroLeft(d.getFullYear(), 4) +
-    strings.padZeroLeft((d.getMonth() + 1), 2) +
+    strings.padZeroLeft(d.getMonth() + 1, 2) +
     strings.padZeroLeft(d.getDate(), 2) +
     strings.padZeroLeft(d.getHours(), 2) +
     strings.padZeroLeft(d.getMinutes(), 2) +
@@ -245,7 +241,7 @@ export function weekInYear(date, option) {
   return 1 + Math.round(diffInDays / 7);
 }
 
-//private
+// private
 export function _thursdayOfWeek(date, firstDayOfWeekArg) {
   if (!date || typeof firstDayOfWeekArg !== 'number') {
     return undefined;
@@ -268,7 +264,7 @@ export function firstDayOfWeek(date, firstDayOfWeekArg) {
   }
   var firstDay = new Date(date.valueOf());
   if (firstDay.getDay() !== firstDayOfWeekArg) {
-    firstDay.setDate(firstDay.getDate() - ((firstDay.getDay() + 7 - firstDayOfWeekArg) % 7));
+    firstDay.setDate(firstDay.getDate() - (firstDay.getDay() + 7 - firstDayOfWeekArg) % 7);
   }
   return firstDay;
 }
@@ -303,7 +299,7 @@ export function parseJsonDate(jsonDate) {
     minutes = matches[5];
     seconds = matches[6];
     milliseconds = matches[7];
-    utc = (matches[8] === 'Z');
+    utc = matches[8] === 'Z';
   } else {
     // Date only
     matches = /^(\d{4})-(\d{2})-(\d{2})(Z?)$/.exec(jsonDate);
@@ -311,7 +307,7 @@ export function parseJsonDate(jsonDate) {
       year = matches[1];
       month = matches[2];
       day = matches[3];
-      utc = (matches[4] === 'Z');
+      utc = matches[4] === 'Z';
     } else {
       // Time only
       matches = /^(\d{2}):(\d{2}):(\d{2})\.(\d{3})(Z?)$/.exec(jsonDate);
@@ -320,7 +316,7 @@ export function parseJsonDate(jsonDate) {
         minutes = matches[2];
         seconds = matches[3];
         milliseconds = matches[4];
-        utc = (matches[5] === 'Z');
+        utc = matches[5] === 'Z';
       } else {
         throw new Error('Unparsable date: ' + jsonDate);
       }
@@ -330,13 +326,13 @@ export function parseJsonDate(jsonDate) {
   var result;
   if (utc) {
     // UTC date
-    result = new Date(Date.UTC(year, (month - 1), day, hours, minutes, seconds, milliseconds));
+    result = new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds, milliseconds));
     if (year < 100) { // fix "two-digit years between 1900 and 1999" logic
       result.setUTCFullYear(year);
     }
   } else {
     // local date
-    result = new Date(year, (month - 1), day, hours, minutes, seconds, milliseconds);
+    result = new Date(year, month - 1, day, hours, minutes, seconds, milliseconds);
     if (year < 100) { // fix "two-digit years between 1900 and 1999" logic
       result.setFullYear(year);
     }
@@ -366,7 +362,7 @@ export function toJsonDate(date, utc, includeDate, includeTime) {
   if (utc) {
     // (note: month is 0-indexed)
     datePart = strings.padZeroLeft(date.getUTCFullYear(), 4) + '-' +
-      strings.padZeroLeft((date.getUTCMonth() + 1), 2) + '-' +
+      strings.padZeroLeft(date.getUTCMonth() + 1, 2) + '-' +
       strings.padZeroLeft(date.getUTCDate(), 2);
     timePart = strings.padZeroLeft(date.getUTCHours(), 2) + ':' +
       strings.padZeroLeft(date.getUTCMinutes(), 2) + ':' +
@@ -376,7 +372,7 @@ export function toJsonDate(date, utc, includeDate, includeTime) {
   } else {
     // (note: month is 0-indexed)
     datePart = strings.padZeroLeft(date.getFullYear(), 4) + '-' +
-      strings.padZeroLeft((date.getMonth() + 1), 2) + '-' +
+      strings.padZeroLeft(date.getMonth() + 1, 2) + '-' +
       strings.padZeroLeft(date.getDate(), 2);
     timePart = strings.padZeroLeft(date.getHours(), 2) + ':' +
       strings.padZeroLeft(date.getMinutes(), 2) + ':' +
@@ -427,22 +423,22 @@ export function create(dateString) {
     if (matches[8] === 'Z') {
       date = new Date(Date.UTC(
         matches[1], // fullYear
-        ((matches[2] || 1) - 1), // month (0-indexed)
-        (matches[3] || 1), // day of month
-        (matches[4] || 0), // hours
-        (matches[5] || 0), // minutes
-        (matches[6] || 0), // seconds
-        (matches[7] || 0) // milliseconds
+        (matches[2] || 1) - 1, // month (0-indexed)
+        matches[3] || 1, // day of month
+        matches[4] || 0, // hours
+        matches[5] || 0, // minutes
+        matches[6] || 0, // seconds
+        matches[7] || 0 // milliseconds
       ));
     } else {
       date = new Date(
         matches[1], // fullYear
-        ((matches[2] || 1) - 1), // month (0-indexed)
-        (matches[3] || 1), // day of month
-        (matches[4] || 0), // hours
-        (matches[5] || 0), // minutes
-        (matches[6] || 0), // seconds
-        (matches[7] || 0) // milliseconds
+        (matches[2] || 1) - 1, // month (0-indexed)
+        matches[3] || 1, // day of month
+        matches[4] || 0, // hours
+        matches[5] || 0, // minutes
+        matches[6] || 0, // seconds
+        matches[7] || 0 // milliseconds
       );
     }
     return date;
@@ -529,7 +525,7 @@ export function isLeapYear(year) {
     return false;
   }
   var date = new Date(year, 1, 29);
-  return (date.getDate() === 29);
+  return date.getDate() === 29;
 }
 
 /**
@@ -577,7 +573,7 @@ export function ceil(date, minutesResolution, createCopy) {
 
     date.setSeconds(0, 0); // clear seconds and millis
 
-    m = (parseInt((date.getMinutes() + mResulution) / mResulution) * mResulution);
+    m = parseInt((date.getMinutes() + mResulution) / mResulution) * mResulution;
     h = date.getHours();
     if (m >= 60) {
       h++;

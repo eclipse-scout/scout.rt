@@ -8,13 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Button} from '../index';
-import {Menu} from '../index';
-import {Action} from '../index';
-import {MenuBar} from '../index';
+import {Action, Button, Menu} from '../index';
 
 export default class ButtonAdapterMenu extends Menu {
-
   constructor() {
     super();
     this._removeWidgetProperties('childActions'); // managed by button
@@ -124,7 +120,7 @@ export default class ButtonAdapterMenu extends Menu {
 
     // Properties requiring special handling (non-trivial mapping)
     menuProperties.text = buttonProperties.label;
-    menuProperties.horizontalAlignment = (buttonProperties.gridData ? buttonProperties.gridData.horizontalAlignment : undefined);
+    menuProperties.horizontalAlignment = buttonProperties.gridData ? buttonProperties.gridData.horizontalAlignment : undefined;
     menuProperties.actionStyle = buttonStyleToActionStyle(buttonProperties.displayStyle);
     menuProperties.toggleAction = buttonProperties.displayStyle === Button.DisplayStyle.TOGGLE;
     menuProperties.childActions = buttonProperties.menus;
@@ -152,9 +148,8 @@ export default class ButtonAdapterMenu extends Menu {
       }
       if (buttonStyle === Button.DisplayStyle.LINK) {
         return Action.ActionStyle.DEFAULT;
-      } else {
-        return Action.ActionStyle.BUTTON;
       }
+      return Action.ActionStyle.BUTTON;
     }
   }
 }

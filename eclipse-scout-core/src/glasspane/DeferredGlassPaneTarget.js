@@ -8,13 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../index';
 
 /**
  * Is used to render glasspane after the glasspane targets are set. This case occurs when a child is rendered before a parent is rendered-> on reload page.
  */
 export default class DeferredGlassPaneTarget {
-
   constructor() {
     this.$glassPaneTargets;
     this.glassPaneRenderer;
@@ -64,7 +62,7 @@ export default class DeferredGlassPaneTarget {
     widget.one('render', renderedHandler);
     widget.one('destroy', function() {
       widget.off('render', renderedHandler);
-    }.bind(widget));
+    });
     return [deferred];
   }
 }

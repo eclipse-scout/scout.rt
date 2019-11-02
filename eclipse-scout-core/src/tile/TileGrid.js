@@ -8,38 +8,38 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TileGridLayoutConfig} from '../index';
-import {TileGridSelectAllKeyStroke} from '../index';
-import {HtmlComponent} from '../index';
-import {KeyStrokeContext} from '../index';
-import {TileGridSelectionHandler} from '../index';
+import {
+  arrays,
+  ContextMenuKeyStroke,
+  DoubleClickSupport,
+  HtmlComponent,
+  KeyStrokeContext,
+  LoadingSupport,
+  LogicalGridData,
+  MenuDestinations,
+  menus as menus_1,
+  numbers,
+  objects,
+  PlaceholderTile,
+  Range,
+  scout,
+  TileGridGridConfig,
+  TileGridLayout,
+  TileGridLayoutConfig,
+  TileGridSelectAllKeyStroke,
+  TileGridSelectDownKeyStroke,
+  TileGridSelectFirstKeyStroke,
+  TileGridSelectionHandler,
+  TileGridSelectLastKeyStroke,
+  TileGridSelectLeftKeyStroke,
+  TileGridSelectRightKeyStroke,
+  TileGridSelectUpKeyStroke,
+  VirtualScrolling,
+  Widget
+} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {MenuDestinations} from '../index';
-import {numbers} from '../index';
-import {Range} from '../index';
-import {LoadingSupport} from '../index';
-import {TileGridSelectUpKeyStroke} from '../index';
-import {TileGridSelectLastKeyStroke} from '../index';
-import {menus as menus_1} from '../index';
-import {objects} from '../index';
-import {TileGridSelectLeftKeyStroke} from '../index';
-import {DoubleClickSupport} from '../index';
-import {TileGridGridConfig} from '../index';
-import {TileGridSelectDownKeyStroke} from '../index';
-import {ContextMenuKeyStroke} from '../index';
-import {TileGridLayout} from '../index';
-import {TileGridSelectRightKeyStroke} from '../index';
-import {Tile} from '../index';
-import {TileGridSelectFirstKeyStroke} from '../index';
-import {LogicalGridData} from '../index';
-import {VirtualScrolling} from '../index';
-import {PlaceholderTile} from '../index';
-import {Widget} from '../index';
-import {arrays} from '../index';
 
 export default class TileGrid extends Widget {
-
   constructor() {
     super();
     this.animateTileRemoval = true;
@@ -564,7 +564,7 @@ export default class TileGrid extends Widget {
     // horizontal (x-axis) scrollbar is only installed when minWidth is > 0
     if (this.scrollable) {
       this._installScrollbars({
-        axis: ((this.layoutConfig.minWidth > 0) ? 'both' : 'y')
+        axis: this.layoutConfig.minWidth > 0 ? 'both' : 'y'
       });
     } else if (this.layoutConfig.minWidth > 0) {
       this._installScrollbars({
@@ -1079,11 +1079,9 @@ export default class TileGrid extends Widget {
         tile.setFilterAccepted(true);
         return true;
       }
-    } else {
-      if (tile.filterAccepted) {
-        tile.setFilterAccepted(false);
-        return true;
-      }
+    } else if (tile.filterAccepted) {
+      tile.setFilterAccepted(false);
+      return true;
     }
     return false;
   }

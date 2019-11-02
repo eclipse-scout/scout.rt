@@ -8,14 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../index';
-import {LookupCall} from '../index';
-import {LookupRow} from '../index';
+import {LookupCall, objects, scout} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 export default class HierarchicalLookupResultBuilder {
-
   constructor(lookupCall) {
     scout.assertParameter('lookupCall', lookupCall);
     this.lookupCall = lookupCall;

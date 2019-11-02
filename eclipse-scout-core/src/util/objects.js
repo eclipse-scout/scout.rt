@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays} from '../index';
-import {FormField} from '../index';
-import {strings} from '../index';
+import {arrays, scout, strings} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 
 const CONST_REGEX = /\$\{const\:([^\}]*)\}/;
@@ -306,7 +303,7 @@ export function equals(objA, objB) {
     return true;
   }
   // both objects have an equals() method
-  if ((objA && objB) && (objA.equals && objB.equals)) {
+  if (objA && objB && (objA.equals && objB.equals)) {
     return objA.equals(objB);
   }
   return false;
@@ -336,13 +333,13 @@ export function equalsRecursive(objA, objB) {
   } else if (isArray(objA) && isArray(objB)) {
     if (objA.length !== objB.length) {
       return false;
-    } else {
-      for (i = 0; i < objA.length; i++) {
-        if (!equalsRecursive(objA[i], objB[i])) {
-          return false;
-        }
+    }
+    for (i = 0; i < objA.length; i++) {
+      if (!equalsRecursive(objA[i], objB[i])) {
+        return false;
       }
     }
+
     return true;
   }
   return objA === objB;
@@ -461,7 +458,7 @@ export function checkFunctionOverrides() {
             if (mismatch && whitelist.indexOf(fname) === -1) { // && args.length !== parentArgs.length) {
               // Collect found mismatch
               var result = fname + '(' + args.join(', ') + ') does not correctly override ' + getPrototypeOwner(parentFn) + '.' + name + '(' + parentArgs.join(', ') + ')';
-              var includesSuperCall = (fn.toString().match(new RegExp('scout.' + strings.quote(prop) + '.parent.prototype.' + strings.quote(name) + '.call\\(')) !== null);
+              var includesSuperCall = fn.toString().match(new RegExp('scout.' + strings.quote(prop) + '.parent.prototype.' + strings.quote(name) + '.call\\(')) !== null;
               var parentFunctionUsesArguments = false;
               if (includesSuperCall) {
                 for (var j = 0; j < parentArgs.length; j++) {
@@ -472,7 +469,7 @@ export function checkFunctionOverrides() {
                   }
                 }
               }
-              result = (includesSuperCall ? (parentFunctionUsesArguments ? '[!]' : ' ~ ') : '   ') + ' ' + result;
+              result = (includesSuperCall ? parentFunctionUsesArguments ? '[!]' : ' ~ ' : '   ') + ' ' + result;
               if (args.length !== parentArgs.length) {
                 result1.push(result);
               } else {
@@ -499,7 +496,8 @@ export function checkFunctionOverrides() {
       throw new Error('Argument is not a function: ' + fn);
     }
 
-    var m = fn.toString().replace(FN_COMMENTS, '').match(FN_ARGS);
+    var m = fn.toString().replace(FN_COMMENTS, '')
+      .match(FN_ARGS);
     var args = [];
     if (m !== null) {
       m[1].split(',').forEach(function(arg, i) {

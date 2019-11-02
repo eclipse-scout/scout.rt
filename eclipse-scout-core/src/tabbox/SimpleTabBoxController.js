@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SimpleTabArea} from '../index';
-import {objects} from '../index';
-import {SimpleTabBox} from '../index';
+import {objects, scout} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
 
 
 /**
@@ -23,7 +20,6 @@ import {scout} from '../index';
  * updates the {@link {@link SimpleTabArea}}.
  */
 export default class SimpleTabBoxController {
-
   constructor(tabBox, tabArea) {
     this.tabBox = null;
     this._viewAddHandler = this._onViewAdd.bind(this);

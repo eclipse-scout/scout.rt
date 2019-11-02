@@ -8,22 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {fields} from '../../../index';
-import {Status} from '../../../index';
-import {StringFieldLayout} from '../../../index';
-import {StringFieldCtrlEnterKeyStroke} from '../../../index';
-import {texts} from '../../../index';
-import {strings} from '../../../index';
-import {scout} from '../../../index';
-import {InputFieldKeyStrokeContext} from '../../../index';
-import {BasicField} from '../../../index';
-import {StringFieldEnterKeyStroke} from '../../../index';
-import {objects} from '../../../index';
-import {arrays} from '../../../index';
-import {Scrollbar} from '../../../index';
+import {
+  arrays,
+  BasicField,
+  fields,
+  InputFieldKeyStrokeContext,
+  objects,
+  scout,
+  Status,
+  StringFieldCtrlEnterKeyStroke,
+  StringFieldEnterKeyStroke,
+  StringFieldLayout,
+  strings,
+  texts
+} from '../../../index';
 
 export default class StringField extends BasicField {
-
   constructor() {
     super();
 
@@ -260,7 +260,7 @@ export default class StringField extends BasicField {
     if (this.multilineText) {
       return;
     }
-    this.$field.attr('type', (this.inputMasked ? 'password' : 'text'));
+    this.$field.attr('type', this.inputMasked ? 'password' : 'text');
   }
 
   _renderInputObfuscated() {
@@ -421,7 +421,7 @@ export default class StringField extends BasicField {
   _renderGridData() {
     super._renderGridData();
     this.updateInnerAlignment({
-      useHorizontalAlignment: (this.multilineText ? false : true)
+      useHorizontalAlignment: this.multilineText ? false : true
     });
   }
 
@@ -485,7 +485,7 @@ export default class StringField extends BasicField {
     this.selectionStart = this.$field[0].selectionStart;
     this.selectionEnd = this.$field[0].selectionEnd;
     if (this.selectionTrackingEnabled) {
-      var selectionChanged = (this.selectionStart !== oldSelectionStart || this.selectionEnd !== oldSelectionEnd);
+      var selectionChanged = this.selectionStart !== oldSelectionStart || this.selectionEnd !== oldSelectionEnd;
       if (selectionChanged) {
         this.triggerSelectionChange();
       }
@@ -603,7 +603,6 @@ export default class StringField extends BasicField {
       if (text.length > this.maxLength) {
         this._showNotification('ui.PastedTextTooLong');
       }
-
     }.bind(this));
   }
 

@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DesktopTabBoxController} from '../../index';
-import {SimpleTabArea} from '../../index';
-import {scout} from '../../index';
-import {SimpleTabBox} from '../../index';
-import {SimpleTabBoxController} from '../../index';
+import {DesktopTabBoxController, scout, SimpleTabBoxController} from '../../index';
 
 /**
  * The {@link {@link scout.HeaderViewTabAreaController}} is used to link the center {@link {@link SimpleTabBox}} (all forms with displayViewId='C')
@@ -22,7 +18,6 @@ import {SimpleTabBoxController} from '../../index';
  * @see SimpleTabBoxController
  */
 export default class HeaderTabBoxController extends DesktopTabBoxController {
-
   constructor() {
     super();
 

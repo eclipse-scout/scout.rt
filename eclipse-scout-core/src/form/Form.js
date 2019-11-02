@@ -8,29 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FileChooserController} from '../index';
-import {Event} from '../index';
-import {HtmlComponent} from '../index';
-import {Status} from '../index';
-import {Button} from '../index';
-import {WrappedFormField} from '../index';
+import {
+  Button,
+  DialogLayout,
+  Event,
+  FileChooserController,
+  FocusRule,
+  FormLayout,
+  GlassPaneRenderer,
+  GroupBox,
+  HtmlComponent,
+  MessageBoxController,
+  Rectangle,
+  scout,
+  Status,
+  strings,
+  tooltips,
+  webstorage,
+  Widget,
+  WrappedFormField
+} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {DialogLayout} from '../index';
-import {MessageBoxController} from '../index';
-import {Rectangle} from '../index';
-import {FormField} from '../index';
-import {tooltips} from '../index';
-import {strings} from '../index';
-import {GlassPaneRenderer} from '../index';
-import {FormLayout} from '../index';
-import {Widget} from '../index';
-import {webstorage} from '../index';
-import {GroupBox} from '../index';
-import {FocusRule} from '../index';
 
 export default class Form extends Widget {
-
   constructor() {
     super();
     this._addWidgetProperties(['rootGroupBox', 'views', 'dialogs', 'initialFocus', 'messageBoxes', 'fileChoosers']);
@@ -141,7 +141,6 @@ export default class Form extends Widget {
     if (this._glassPaneRenderer) {
       this._glassPaneRenderer.renderGlassPanes();
     }
-
   }
 
   _destroy() {
@@ -691,9 +690,8 @@ export default class Form extends Widget {
       }
       $statusIcon.prependTo(this.$statusContainer);
       return $statusIcon;
-    } else {
-      return $prevIcon;
     }
+    return $prevIcon;
   }
 
   _updateTitleForWindow() {
@@ -853,7 +851,7 @@ export default class Form extends Widget {
 
     // form is attached even if children are not yet
     if ((this.isView() || this.isDialog()) && !this.detailForm) {
-      //notify model this form is active
+      // notify model this form is active
       this.session.desktop._setFormActivated(this);
     }
     super._attach();
@@ -867,7 +865,6 @@ export default class Form extends Widget {
    * @override Widget.js
    */
   _postAttach() {
-
     // Attach child dialogs, message boxes and file choosers.
     this.formController.attachDialogs();
     this.messageBoxController.attach();

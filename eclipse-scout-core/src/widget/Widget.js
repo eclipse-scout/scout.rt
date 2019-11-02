@@ -8,35 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LoadingSupport} from '../index';
-import {LogicalGrid} from '../index';
-import {KeyStrokeContext} from '../index';
-import {widgets} from '../index';
+import {
+  arrays,
+  DeferredGlassPaneTarget,
+  Desktop,
+  Device,
+  Event,
+  EventDelegator,
+  EventSupport,
+  filters,
+  focusUtils,
+  Form,
+  graphics,
+  icons,
+  inspector,
+  KeyStrokeContext,
+  LoadingSupport,
+  LogicalGrid,
+  objects,
+  scout,
+  scrollbars,
+  strings,
+  texts,
+  TreeVisitResult,
+  widgets
+} from '../index';
 import * as $ from 'jquery';
-import {scout} from '../index';
-import {EventDelegator} from '../index';
-import {filters} from '../index';
-import {icons} from '../index';
-import {texts} from '../index';
-import {DeferredGlassPaneTarget} from '../index';
-import {Device} from '../index';
-import {Form} from '../index';
-import {Desktop} from '../index';
-import {Event} from '../index';
-import {objects} from '../index';
-import {EventSupport} from '../index';
-import {inspector} from '../index';
-import {focusUtils} from '../index';
-import {graphics} from '../index';
-import {TreeVisitResult} from '../index';
-import {scrollbars} from '../index';
-import {strings} from '../index';
-import {LogicalGridLayout} from '../index';
-import {models} from '../index';
-import {arrays} from '../index';
 
 export default class Widget {
-
   constructor() {
     this.session = null;
 
@@ -198,7 +197,7 @@ export default class Widget {
    * may override this method to load or extend a JSON model with models.getModel or models.extend.
    */
   _jsonModel() {
-  };
+  }
 
   /**
    * Creates the widgets using the given models, or returns the widgets if the given models already are widgets.
@@ -443,12 +442,13 @@ export default class Widget {
       this._$lastFocusedElement = null;
     }
     // remove children in reverse order.
-    this.children.slice().reverse().forEach(function(child) {
+    this.children.slice().reverse()
+      .forEach(function(child) {
       // Only remove the child if this widget is the current parent (if that is not the case this widget is the owner)
-      if (child.parent === this) {
-        child.remove();
-      }
-    }, this);
+        if (child.parent === this) {
+          child.remove();
+        }
+      }, this);
 
     if (!this.rendered) {
       // The widget may have been removed already by one of the above remove() calls (e.g. by a remove listener)
@@ -927,7 +927,7 @@ export default class Widget {
     this.loadingSupport.renderLoading();
   }
 
-//--- Layouting / HtmlComponent methods ---
+  // --- Layouting / HtmlComponent methods ---
 
   pack() {
     if (!this.rendered || this.removing) {
@@ -1085,7 +1085,7 @@ export default class Widget {
     this.invalidateLogicalGrid();
   }
 
-//--- Event handling methods ---
+  // --- Event handling methods ---
   _createEventSupport() {
     return new EventSupport();
   }
@@ -1139,12 +1139,12 @@ export default class Widget {
 
   window(domElement) {
     var $el = this.$container || this.$parent;
-    return $el ? $el.window(domElement) : (domElement ? null : $(null));
+    return $el ? $el.window(domElement) : domElement ? null : $(null);
   }
 
   document(domElement) {
     var $el = this.$container || this.$parent;
-    return $el ? $el.document(domElement) : (domElement ? null : $(null));
+    return $el ? $el.document(domElement) : domElement ? null : $(null);
   }
 
   /**
@@ -1279,7 +1279,7 @@ export default class Widget {
    * implementation sets this.attached to false.
    */
   _detach() {
-  };
+  }
 
   _uninstallFocusContext() {
     // NOP
@@ -1478,9 +1478,8 @@ export default class Widget {
           return arrays.ensure($elements);
         }
         return [];
-      }.bind(this));
+      });
       return targets.concat(this._glassPaneTargets(element));
-
     }.bind(this);
     if (this.rendered) {
       return resolveGlassPanes(element);
@@ -1621,7 +1620,7 @@ export default class Widget {
       func(propertyName, value);
     }
 
-    //Loop through adapter properties (any order will do).
+    // Loop through adapter properties (any order will do).
     for (i = 0; i < this._widgetProperties.length; i++) {
       propertyName = this._widgetProperties[i];
       value = model[propertyName];
@@ -1729,22 +1728,18 @@ export default class Widget {
             return val.clone({
               parent: clone
             }, options);
-          }.bind(this));
-
+          });
         } else {
           clonedProperty = propertyValue.clone({
             parent: clone
           }, options);
         }
+      } else if (Array.isArray(propertyValue)) {
+        clonedProperty = propertyValue.map(function(val) {
+          return val;
+        });
       } else {
-        if (Array.isArray(propertyValue)) {
-          clonedProperty = propertyValue.map(function(val) {
-            return val;
-          });
-
-        } else {
-          clonedProperty = propertyValue;
-        }
+        clonedProperty = propertyValue;
       }
       clone[property] = clonedProperty;
     }.bind(this));
@@ -1801,7 +1796,7 @@ export default class Widget {
     var eventDelegatorIndex = arrays.findIndex(this.eventDelegators, function(eventDelegator) {
         return eventDelegator.clone === target;
       }),
-      eventDelegator = (eventDelegatorIndex > -1) ? (this.eventDelegators.splice(eventDelegatorIndex, 1)[0]) : null;
+      eventDelegator = eventDelegatorIndex > -1 ? this.eventDelegators.splice(eventDelegatorIndex, 1)[0] : null;
     if (!eventDelegator) {
       return;
     }
@@ -2101,7 +2096,7 @@ export default class Widget {
       // Don't do anything for non scrollable elements. Also, reading $scrollable[0].scrollTop must not be done while rendering because it would provoke a reflow
       return;
     }
-    if (this.rendering || (this.htmlComp && !this.htmlComp.layouted && !this.htmlComp.layouting)) {
+    if (this.rendering || this.htmlComp && !this.htmlComp.layouted && !this.htmlComp.layouting) {
       // If the widget is not layouted yet (which is always true while rendering), the scroll position cannot be updated -> do it after the layout
       // If scroll top is set while layouting, layout obviously wants to set it -> do it
       this.session.layoutValidator.schedulePostValidateFunction(this._renderScrollTop.bind(this));
@@ -2130,7 +2125,7 @@ export default class Widget {
       // Don't do anything for non scrollable elements. Also, reading $scrollable[0].scrollLeft must not be done while rendering because it would provoke a reflow
       return;
     }
-    if (this.rendering || (this.htmlComp && !this.htmlComp.layouted && !this.htmlComp.layouting)) {
+    if (this.rendering || this.htmlComp && !this.htmlComp.layouted && !this.htmlComp.layouting) {
       // If the widget is not layouted yet (which is always true while rendering), the scroll position cannot be updated -> do it after the layout
       // If scroll left is set while layouting, layout obviously wants to set it -> do it
       this.session.layoutValidator.schedulePostValidateFunction(this._renderScrollLeft.bind(this));

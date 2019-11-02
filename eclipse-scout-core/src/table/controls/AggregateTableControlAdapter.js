@@ -8,14 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AggregateTableControl} from '../../index';
-import {objects} from '../../index';
-import {scout} from '../../index';
-import {App} from '../../index';
-import {TableControlAdapter} from '../../index';
+import {AggregateTableControl, App, objects, TableControlAdapter} from '../../index';
 
 export default class AggregateTableControlAdapter extends TableControlAdapter {
-
   constructor() {
     super();
   }

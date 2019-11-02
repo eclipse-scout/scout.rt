@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CalendarComponent} from '../index';
 
 /**
  * Calendar component as used in the list panel of the calendar.
@@ -18,7 +17,6 @@ import {CalendarComponent} from '../index';
  * in the calendar, but the CalendarComponent instance is always the same.
  */
 export default class CalendarListComponent {
-
   constructor(partDay, source) {
     this.partDay = partDay;
     this.source = source;

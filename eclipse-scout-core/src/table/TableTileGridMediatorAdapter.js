@@ -1,9 +1,3 @@
-import {TableTileGridMediator} from '../index';
-import {objects} from '../index';
-import {ModelAdapter} from '../index';
-import {scout} from '../index';
-import {App} from '../index';
-
 /*******************************************************************************
  * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
@@ -14,8 +8,10 @@ import {App} from '../index';
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-export default class TableTileGridMediatorAdapter extends ModelAdapter {
 
+import {App, ModelAdapter, objects, TableTileGridMediator} from '../index';
+
+export default class TableTileGridMediatorAdapter extends ModelAdapter {
   constructor() {
     super();
   }

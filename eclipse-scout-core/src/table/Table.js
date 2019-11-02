@@ -8,61 +8,61 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AppLinkKeyStroke} from '../index';
-import {keys} from '../index';
-import {KeyStrokeContext} from '../index';
-import {TableUserFilter} from '../index';
-import {TableCopyKeyStroke} from '../index';
-import {TableSelectionHandler} from '../index';
-import {MenuItemsOrder} from '../index';
-import {TableNavigationUpKeyStroke} from '../index';
-import {scout} from '../index';
-import {TableNavigationEndKeyStroke} from '../index';
-import {Range} from '../index';
-import {TableFocusFilterFieldKeyStroke} from '../index';
-import {AggregateTableControl} from '../index';
-import {NumberColumn} from '../index';
-import {Device} from '../index';
-import {MenuBar} from '../index';
-import {TableSelectAllKeyStroke} from '../index';
-import {Status} from '../index';
-import {dragAndDrop} from '../index';
-import {DoubleClickSupport} from '../index';
-import {ContextMenuPopup} from '../index';
-import {ContextMenuKeyStroke} from '../index';
-import {Column} from '../index';
-import {TableNavigationPageUpKeyStroke} from '../index';
-import {TableRow} from '../index';
-import {TableToggleRowKeyStroke} from '../index';
-import {Tree} from '../index';
-import {strings} from '../index';
-import {Widget} from '../index';
-import {styles} from '../index';
-import {arrays} from '../index';
-import {HtmlComponent} from '../index';
-import {clipboard} from '../index';
+import {
+  AggregateTableControl,
+  AppLinkKeyStroke,
+  arrays,
+  BooleanColumn,
+  clipboard,
+  Column,
+  ContextMenuKeyStroke,
+  ContextMenuPopup,
+  Device,
+  DoubleClickSupport,
+  dragAndDrop,
+  Event,
+  graphics,
+  HtmlComponent,
+  keys,
+  KeyStrokeContext,
+  LoadingSupport,
+  MenuBar,
+  MenuDestinations,
+  MenuItemsOrder,
+  menus as menus_1,
+  NumberColumn,
+  objects,
+  Range,
+  scout,
+  scrollbars,
+  Status,
+  strings,
+  styles,
+  TableCopyKeyStroke,
+  TableFocusFilterFieldKeyStroke,
+  TableLayout,
+  TableNavigationCollapseKeyStroke,
+  TableNavigationDownKeyStroke,
+  TableNavigationEndKeyStroke,
+  TableNavigationExpandKeyStroke,
+  TableNavigationHomeKeyStroke,
+  TableNavigationPageDownKeyStroke,
+  TableNavigationPageUpKeyStroke,
+  TableNavigationUpKeyStroke,
+  TableRefreshKeyStroke,
+  TableRow,
+  TableSelectAllKeyStroke,
+  TableSelectionHandler,
+  TableStartCellEditKeyStroke,
+  TableToggleRowKeyStroke,
+  TableUpdateBuffer,
+  TableUserFilter,
+  tooltips as tooltips_1,
+  Widget
+} from '../index';
 import * as $ from 'jquery';
-import {MenuDestinations} from '../index';
-import {tooltips as tooltips_1} from '../index';
-import {LoadingSupport} from '../index';
-import {TableNavigationPageDownKeyStroke} from '../index';
-import {TableNavigationCollapseKeyStroke} from '../index';
-import {TableLayout} from '../index';
-import {BooleanColumn} from '../index';
-import {TableStartCellEditKeyStroke} from '../index';
-import {menus as menus_1} from '../index';
-import {Event} from '../index';
-import {objects} from '../index';
-import {TableNavigationExpandKeyStroke} from '../index';
-import {TableNavigationHomeKeyStroke} from '../index';
-import {graphics} from '../index';
-import {scrollbars} from '../index';
-import {TableNavigationDownKeyStroke} from '../index';
-import {TableUpdateBuffer} from '../index';
-import {TableRefreshKeyStroke} from '../index';
 
 export default class Table extends Widget {
-
   constructor() {
     super();
 
@@ -153,7 +153,7 @@ export default class Table extends Widget {
   }
 
 
-// TODO [7.0] cgu create StringColumn.js incl. defaultValues from defaultValues.json
+  // TODO [7.0] cgu create StringColumn.js incl. defaultValues from defaultValues.json
 
   static HierarchicalStyle = {
     DEFAULT: 'default',
@@ -913,7 +913,7 @@ export default class Table extends Widget {
         var cell = column.cell(row);
         var text;
         if (column instanceof BooleanColumn) {
-          text = (cell.value ? 'X' : '');
+          text = cell.value ? 'X' : '';
         } else if (cell.htmlEnabled) {
           text = strings.plainText(cell.text);
         } else {
@@ -1028,7 +1028,7 @@ export default class Table extends Widget {
         }
       }
       return 0;
-    }.bind(this);
+    };
 
     if (this.hierarchical) {
       // sort tree and set flat row array afterwards.
@@ -1036,7 +1036,7 @@ export default class Table extends Widget {
       var sortedFlatRows = [];
       this.visitRows(function(row) {
         sortedFlatRows.push(row);
-      }.bind(this));
+      });
       this.rows = sortedFlatRows;
     } else {
       // sort the flat rows and set the rootRows afterwards.
@@ -1210,7 +1210,7 @@ export default class Table extends Widget {
       // if not already sorted set the appropriate sort index (check for sortIndex necessary if called by _onColumnHeadersUpdated)
       if (!column.sortActive || column.sortIndex === -1) {
         sortIndex = Math.max(-1, arrays.max(this.columns.map(function(c) {
-          return (c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd) ? -1 : c.sortIndex;
+          return c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd ? -1 : c.sortIndex;
         })));
         column.sortIndex = sortIndex + 1;
 
@@ -1233,7 +1233,7 @@ export default class Table extends Widget {
       }.bind(this));
 
       // set correct sort index for all permanent tail sort columns
-      deviation = (column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd) ? 0 : 1;
+      deviation = column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd ? 0 : 1;
       this._permanentTailSortColumns.forEach(function(c, index) {
         c.sortIndex = this._permanentHeadSortColumns.length + deviation + index;
       }, this);
@@ -1348,9 +1348,8 @@ export default class Table extends Widget {
     if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
       // do not update sort index for permanent head/tail sort columns, their order is fixed (see ColumnSet.java)
       if (multiGroup) {
-
         sortIndex = Math.max(-1, arrays.max(this.columns.map(function(c) {
-          return (c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd || !c.grouped) ? -1 : c.sortIndex;
+          return c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd || !c.grouped ? -1 : c.sortIndex;
         })));
 
         if (!column.sortActive) {
@@ -1373,8 +1372,8 @@ export default class Table extends Widget {
           // move all sort columns between the newly determined sortindex and the old sortindex by one.
           arrays.eachSibling(this.columns, column, function(siblingColumn) {
             if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
-              (siblingColumn.sortIndex > sortIndex) &&
-              (siblingColumn.sortIndex < column.sortIndex)) {
+              siblingColumn.sortIndex > sortIndex &&
+              siblingColumn.sortIndex < column.sortIndex) {
               siblingColumn.sortIndex++;
             }
           });
@@ -1389,13 +1388,13 @@ export default class Table extends Widget {
           // move all sort columns between the newly determined sortindex and the old sortindex by one.
           arrays.eachSibling(this.columns, column, function(siblingColumn) {
             if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
-              (siblingColumn.sortIndex >= sortIndex) &&
-              (siblingColumn.sortIndex < column.sortIndex)) {
+              siblingColumn.sortIndex >= sortIndex &&
+              siblingColumn.sortIndex < column.sortIndex) {
               siblingColumn.sortIndex++;
             }
           });
           column.sortIndex = sortIndex;
-        } else { //not sorted yet
+        } else { // not sorted yet
           arrays.eachSibling(this.columns, column, function(siblingColumn) {
             if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex >= sortIndex) {
               siblingColumn.sortIndex++;
@@ -1416,19 +1415,13 @@ export default class Table extends Widget {
             siblingColumn.grouped = false;
           }
         });
-
       }
 
       column.sortAscending = direction === 'asc' ? true : false;
       column.sortActive = true;
-
-    } else {
-
-      if (column.initialAlwaysIncludeSortAtBegin) {
-        // do not change order or direction. just set grouped to true.
-        column.grouped = true;
-      }
-
+    } else if (column.initialAlwaysIncludeSortAtBegin) {
+      // do not change order or direction. just set grouped to true.
+      column.grouped = true;
     }
 
     column.grouped = true;
@@ -1569,12 +1562,10 @@ export default class Table extends Widget {
       } else {
         $rows = $rows.prependTo(this.$data);
       }
+    } else if (this.$fillAfter) {
+      $rows = $rows.insertBefore(this.$fillAfter);
     } else {
-      if (this.$fillAfter) {
-        $rows = $rows.insertBefore(this.$fillAfter);
-      } else {
-        $rows = $rows.appendTo(this.$data);
-      }
+      $rows = $rows.appendTo(this.$data);
     }
 
     $rows.each(function(index, rowObject) {
@@ -1683,7 +1674,6 @@ export default class Table extends Widget {
         // no previous sibling
         return;
       }
-
     } else {
       sibling = this.visibleRows[visibleIndex - 1];
       if (!sibling) {
@@ -1720,7 +1710,6 @@ export default class Table extends Widget {
         // no following sibling
         return;
       }
-
     } else {
       sibling = this.visibleRows[visibleIndex + 1];
       if (!sibling) {
@@ -1807,7 +1796,7 @@ export default class Table extends Widget {
         // row is not visible
         return;
       }
-      var rowRendered = !!row.$row;
+      var rowRendered = Boolean(row.$row);
       var rowInViewRange = this.viewRangeRendered.contains(rowIndex);
 
       // Note: these checks can only be done, when table is rendered _and_ attached. When the table is detached it can
@@ -2250,7 +2239,7 @@ export default class Table extends Widget {
       // test if sum should be shown, if yes: reset sum-array
       nextRow = rows[r + 1];
       // test if group is finished
-      newGroup = (r === rows.length - 1) || this._isNewGroup(groupColumns, row, nextRow);
+      newGroup = r === rows.length - 1 || this._isNewGroup(groupColumns, row, nextRow);
       // if group is finished: add group row
       if (newGroup) {
         // finish aggregation
@@ -2277,14 +2266,14 @@ export default class Table extends Widget {
       hasCellTextForGroupingFunction;
 
     if (!nextRow) {
-      return true; //row is last row
+      return true; // row is last row
     }
 
     for (i = 0; i < groupedColumns.length; i++) {
       col = groupedColumns[i];
       hasCellTextForGroupingFunction = col && col.cellTextForGrouping && typeof col.cellTextForGrouping === 'function';
-      newRow = newRow || (hasCellTextForGroupingFunction && col.cellTextForGrouping(row) !== col.cellTextForGrouping(nextRow)); // NOSONAR
-      newRow = newRow || (!hasCellTextForGroupingFunction && this.cellText(col, row) !== this.cellText(col, nextRow));
+      newRow = newRow || hasCellTextForGroupingFunction && col.cellTextForGrouping(row) !== col.cellTextForGrouping(nextRow); // NOSONAR
+      newRow = newRow || !hasCellTextForGroupingFunction && this.cellText(col, row) !== this.cellText(col, nextRow);
       if (newRow) {
         return true;
       }
@@ -2350,7 +2339,7 @@ export default class Table extends Widget {
         return;
       }
 
-      refRow = (onTop ? aggregateRow.nextRow : aggregateRow.prevRow);
+      refRow = onTop ? aggregateRow.nextRow : aggregateRow.prevRow;
       if (!refRow || !refRow.$row) {
         return;
       }
@@ -2500,12 +2489,12 @@ export default class Table extends Widget {
     }, options);
     var checkedRows = [];
     // use enabled computed because when the parent of the table is disabled, it should not be allowed to check rows
-    if (!this.checkable || (!this.enabledComputed && opts.checkOnlyEnabled)) {
+    if (!this.checkable || !this.enabledComputed && opts.checkOnlyEnabled) {
       return;
     }
     rows = arrays.ensure(rows);
     rows.forEach(function(row) {
-      if ((!row.enabled && opts.checkOnlyEnabled) || row.checked === opts.checked) {
+      if (!row.enabled && opts.checkOnlyEnabled || row.checked === opts.checked) {
         return;
       }
       if (!this.multiCheck && opts.checked) {
@@ -2584,7 +2573,7 @@ export default class Table extends Widget {
             rowsForAnimation.push(row);
           }
         }
-      }.bind(this), rows);
+      }, rows);
     } else {
       changedRows = rows.filter(function(row) {
         var changed = row.expanded !== expanded;
@@ -3017,9 +3006,9 @@ export default class Table extends Widget {
       if (saveEditorValue) {
         var column = context.column;
         var row = context.row;
-        this.setCellErrorStatus(column, row, field.errorStatus); //always get the errorStatus from the editor
+        this.setCellErrorStatus(column, row, field.errorStatus); // always get the errorStatus from the editor
         if (field.errorStatus) {
-          //if there is an error from the editor, the displayText of the cell has to be updated
+          // if there is an error from the editor, the displayText of the cell has to be updated
           this.setCellText(column, row, field.displayText);
         } else {
           this.setCellValue(column, row, field.value);
@@ -3107,9 +3096,8 @@ export default class Table extends Widget {
   get$Scrollable() {
     if (this.$data) {
       return this.$data;
-    } else {
-      return this.$container;
     }
+    return this.$container;
   }
 
   setScrollToSelection(scrollToSelection) {
@@ -3155,7 +3143,7 @@ export default class Table extends Widget {
    * Checks whether the given row is contained in the table. Uses the id of the row for the lookup.
    */
   hasRow(row) {
-    return !!this.rowsMap[row.id];
+    return Boolean(this.rowsMap[row.id]);
   }
 
   /**
@@ -3276,7 +3264,7 @@ export default class Table extends Widget {
   selectRows(rows, debounceSend) {
     // Exclude rows that are currently not visible because of a filter (they cannot be selected)
     rows = arrays.ensure(rows).filter(function(row) {
-      return !!this.visibleRowsMap[row.id];
+      return Boolean(this.visibleRowsMap[row.id]);
     }, this);
 
     var selectedEqualRows = arrays.equalsIgnoreOrder(rows, this.selectedRows);
@@ -3480,7 +3468,7 @@ export default class Table extends Widget {
   }
 
   _updateFilteredRows(applyFilters, changed) {
-    changed = !!changed;
+    changed = Boolean(changed);
     applyFilters = scout.nvl(applyFilters, true);
     this._filteredRows = this.rows.filter(function(row) {
       if (applyFilters) {
@@ -3530,7 +3518,7 @@ export default class Table extends Widget {
 
   visibleChildRows(row) {
     return row.childRows.filter(function(child) {
-      return !!this.visibleRowsMap[child.id];
+      return Boolean(this.visibleRowsMap[child.id]);
     }, this);
   }
 
@@ -3642,11 +3630,9 @@ export default class Table extends Widget {
         row.filterAccepted = true;
         return true;
       }
-    } else {
-      if (row.filterAccepted) {
-        row.filterAccepted = false;
-        return true;
-      }
+    } else if (row.filterAccepted) {
+      row.filterAccepted = false;
+      return true;
     }
     return false;
   }
@@ -3869,7 +3855,7 @@ export default class Table extends Widget {
       for (i = 0; i < that.columns.length; i++) {
         column = that.columns[i];
 
-        //Find $cell for given column
+        // Find $cell for given column
         for (j = 0; j < oldColumnOrder.length; j++) {
           if (oldColumnOrder[j] === column) {
             $cell = $cells[j];
@@ -4573,7 +4559,7 @@ export default class Table extends Widget {
           properties.rowId = row.id;
         }
         return properties;
-      }.bind(this)
+      }
     });
     this.dragAndDropHandler.install(this.$container, '.table-data,.table-row');
   }
@@ -4839,7 +4825,7 @@ export default class Table extends Widget {
   _applyFillerStyle($filler) {
     var lineColor = $filler.css('background-color');
     // In order to get a 1px border we need to get the right value in percentage for the linear gradient
-    var lineWidth = ((1 - (1 / this.rowHeight)) * 100).toFixed(2) + '%';
+    var lineWidth = ((1 - 1 / this.rowHeight) * 100).toFixed(2) + '%';
     $filler.css({
       background: 'linear-gradient(to bottom, transparent, transparent ' + lineWidth + ', ' + lineColor + ' ' + lineWidth + ', ' + lineColor + ')',
       backgroundSize: '100% ' + this.rowHeight + 'px',
@@ -5059,7 +5045,7 @@ export default class Table extends Widget {
     }, this);
   }
 
-// same as on Tree.prototype._onDesktopPopupOpen
+  // same as on Tree.prototype._onDesktopPopupOpen
   _onDesktopPopupOpen(event) {
     var popup = event.popup;
     if (!this.enabledComputed) {
