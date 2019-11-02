@@ -77,7 +77,7 @@ public abstract class AbstractHttpServlet extends HttpServlet {
   }
 
   @FunctionalInterface
-  protected static interface HttpServletConsumer {
+  protected interface HttpServletConsumer {
 
     void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
   }

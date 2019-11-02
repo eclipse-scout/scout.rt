@@ -84,17 +84,17 @@ public class RestApplication extends Application {
   }
 
   @ApplicationScoped
-  public static interface IRestApplicationClassesContributor {
+  public interface IRestApplicationClassesContributor {
     Set<Class<?>> contribute();
   }
 
   @ApplicationScoped
-  public static interface IRestApplicationSingletonsContributor {
+  public interface IRestApplicationSingletonsContributor {
     Set<Object> contribute();
   }
 
   @ApplicationScoped
-  public static interface IRestApplicationPropertiesContributor {
+  public interface IRestApplicationPropertiesContributor {
     Map<String, Object> contribute();
   }
 }

@@ -25,7 +25,7 @@ public interface IServerSessionCacheMBean {
 
   ServerSessionCacheEntry[] getEntries();
 
-  public class ServerSessionCacheEntry {
+  class ServerSessionCacheEntry {
 
     private final String m_scoutSessionId;
     private final int m_numHttpSessions;

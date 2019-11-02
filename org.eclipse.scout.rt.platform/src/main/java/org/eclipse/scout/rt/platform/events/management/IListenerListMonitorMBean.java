@@ -33,7 +33,7 @@ public interface IListenerListMonitorMBean {
 
   ListenerListInfo[] getListenerListInfos();
 
-  public class ListenerListInfo {
+  class ListenerListInfo {
     private final String m_listenerListClassName;
     private final int m_listenerListInstances;
     private final EventType[] m_listenerTypes;
@@ -71,7 +71,7 @@ public interface IListenerListMonitorMBean {
     }
   }
 
-  public class EventType {
+  class EventType {
     private final String m_eventType;
     private final ListenerInfo[] m_listenerInfos;
 
@@ -101,7 +101,7 @@ public interface IListenerListMonitorMBean {
     }
   }
 
-  public class ListenerInfo {
+  class ListenerInfo {
     private final String m_listenerClassName;
     private final int m_listenerCount;
 

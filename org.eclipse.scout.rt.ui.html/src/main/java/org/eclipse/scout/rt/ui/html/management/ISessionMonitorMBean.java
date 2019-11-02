@@ -42,7 +42,7 @@ public interface ISessionMonitorMBean {
    */
   List<String> getSessionTable();
 
-  public class SessionDetail {
+  class SessionDetail {
     private final String m_httpSessionId;
     private final String m_clientSessionId;
     private final String m_uiSessionId;

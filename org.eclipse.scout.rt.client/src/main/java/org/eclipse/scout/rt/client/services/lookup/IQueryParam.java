@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.services.lookup;
 
 public interface IQueryParam<T> {
 
-  public enum QueryBy {
+  enum QueryBy {
     ALL,
     TEXT,
     KEY,
