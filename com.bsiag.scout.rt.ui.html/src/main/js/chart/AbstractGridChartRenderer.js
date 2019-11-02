@@ -36,11 +36,9 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
 
 
   _validate() {
-    if (this.chart.chartData.axes.length === 0 ||
-      this.chart.chartData.chartValueGroups.length === 0) {
-      return false;
-    }
-    return true;
+    return !(this.chart.chartData.axes.length === 0 ||
+      this.chart.chartData.chartValueGroups.length === 0);
+
   }
 
   _render() {
