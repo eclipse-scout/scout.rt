@@ -34,6 +34,6 @@ public interface ICacheValueResolver<K, V> {
    * @return non null modifiable map
    */
   default Map<K, V> resolveAll(Set<K> keys) {
-    return keys.stream().collect(Collectors.toMap(key -> key, key -> resolve(key)));
+    return keys.stream().collect(Collectors.toMap(key -> key, this::resolve));
   }
 }

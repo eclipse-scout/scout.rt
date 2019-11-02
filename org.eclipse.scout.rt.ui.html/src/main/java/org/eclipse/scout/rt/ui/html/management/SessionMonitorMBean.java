@@ -10,12 +10,14 @@
  */
 package org.eclipse.scout.rt.ui.html.management;
 
+import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,7 @@ import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.context.PlatformIdentifier;
 import org.eclipse.scout.rt.platform.jmx.MBeanUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 
 @ApplicationScoped
@@ -83,8 +86,8 @@ public class SessionMonitorMBean implements ISessionMonitorMBean {
     return (int) m_httpSessionRefs
         .keySet()
         .stream()
-        .map(ref -> ref.get())
-        .filter(obj -> obj != null)
+        .map(Reference::get)
+        .filter(Objects::nonNull)
         .count();
   }
 
@@ -93,8 +96,8 @@ public class SessionMonitorMBean implements ISessionMonitorMBean {
     return (int) m_uiSessionRefs
         .keySet()
         .stream()
-        .map(ref -> ref.get())
-        .filter(obj -> obj != null)
+        .map(Reference::get)
+        .filter(Objects::nonNull)
         .count();
   }
 
@@ -103,8 +106,8 @@ public class SessionMonitorMBean implements ISessionMonitorMBean {
     return (int) m_clientSessionRefs
         .keySet()
         .stream()
-        .map(ref -> ref.get())
-        .filter(obj -> obj != null)
+        .map(Reference::get)
+        .filter(Objects::nonNull)
         .count();
   }
 
@@ -125,15 +128,15 @@ public class SessionMonitorMBean implements ISessionMonitorMBean {
         m_clientSessionRefs
             .keySet()
             .stream()
-            .map(ref -> ref.get())
-            .filter(obj -> obj != null)
-            .collect(Collectors.toMap(c -> c.getId(), c -> c));
+            .map(Reference::get)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toMap(ISession::getId, c -> c));
     Map<String, List<IUiSession>> clientToUis =
         m_uiSessionRefs
             .keySet()
             .stream()
-            .map(ref -> ref.get())
-            .filter(obj -> obj != null)
+            .map(Reference::get)
+            .filter(Objects::nonNull)
             .collect(Collectors.groupingBy(uiSession -> ObjectUtility.nvl(uiSession.getClientSessionId(), "[Unmapped]")));
     //add client sessions that are not referenced by any uiSession
     clients
@@ -147,9 +150,9 @@ public class SessionMonitorMBean implements ISessionMonitorMBean {
             .forEach(uiSession -> list.add(createSessionInfo(uiSession, clients.get(clientSessionId)))));
 
     Comparator<SessionDetail> comp = Comparator
-        .<SessionDetail, String> comparing(info -> info.getHttpSessionId())
-        .thenComparing(info -> info.getUiSessionId())
-        .thenComparing(info -> info.getClientSessionId());
+        .<SessionDetail, String> comparing(SessionDetail::getHttpSessionId)
+        .thenComparing(SessionDetail::getUiSessionId)
+        .thenComparing(SessionDetail::getClientSessionId);
     Collections.sort(list, comp);
     return list;
   }

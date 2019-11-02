@@ -53,7 +53,7 @@ public class ListenerListSnapshot {
 
   public void dump(PrintWriter out) {
     m_map.forEach((listenerList, map2) -> {
-      out.println("LIST " + listenerList.getClass().getName() + " " + map2.values().stream().mapToInt(list -> list.size()).sum());
+      out.println("LIST " + listenerList.getClass().getName() + " " + map2.values().stream().mapToInt(List::size).sum());
       map2.forEach((context, listeners) -> {
         out.println("  TYPE " + context + " " + listeners.size());
         listeners

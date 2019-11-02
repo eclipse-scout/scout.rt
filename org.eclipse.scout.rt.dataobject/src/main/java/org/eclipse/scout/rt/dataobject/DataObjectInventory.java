@@ -68,13 +68,13 @@ public class DataObjectInventory {
         .getKnownAnnotatedTypes(TypeName.class)
         .stream()
         .map(IClassInfo::resolveClass)
-        .forEach(c -> registerClassByTypeName(c));
+        .forEach(this::registerClassByTypeName);
 
     ClassInventory.get()
         .getKnownAnnotatedTypes(TypeVersion.class)
         .stream()
         .map(IClassInfo::resolveClass)
-        .forEach(c -> registerClassByTypeVersion(c));
+        .forEach(this::registerClassByTypeVersion);
 
     LOG.info("Registry initialized, found {} {} implementations with @{} annotation and {} implementations with @{} annotation.",
         m_typeNameToClassMap.size(), IDoEntity.class.getSimpleName(), TypeName.class.getSimpleName(),
@@ -214,7 +214,7 @@ public class DataObjectInventory {
    * Ensures that attribute definition for specified {@code entityClass} is loaded and cached.
    */
   protected void ensureEntityDefinitionLoaded(Class<? extends IDoEntity> entityClass) {
-    m_classAttributeMap.computeIfAbsent(entityClass, e -> createAllAttributes(e));
+    m_classAttributeMap.computeIfAbsent(entityClass, this::createAllAttributes);
   }
 
   /**

@@ -22,6 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -2378,7 +2379,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         m_rowsByKey.values().remove(row);
         m_rowsByKey.put(new CompositeObject(row.getKeyValues()), row);
       }
-      if (CollectionUtility.containsAny(changedColumnValues, getColumnSet().getSortColumns().stream().map(col -> col.getColumnIndex()).collect(Collectors.toSet()))) {
+      if (CollectionUtility.containsAny(changedColumnValues, getColumnSet().getSortColumns().stream().map(IColumn::getColumnIndex).collect(Collectors.toSet()))) {
         // sort has to be updated
         // restore order of rows according to sort criteria
         if (isTableChanging()) {
@@ -3163,7 +3164,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     Map<ITableRow/*parent*/, List<ITableRow> /*child rows*/> parentToChildren = new HashMap<>();
     m_rows.forEach(row -> {
       List<Object> parentRowKeys = getParentRowKeys(row);
-      if (parentRowKeys.stream().filter(k -> k != null).findAny().orElse(null) != null) {
+      if (parentRowKeys.stream().filter(Objects::nonNull).findAny().orElse(null) != null) {
         ITableRow parentRow = getRowByKey(parentRowKeys);
         if (parentRow == null) {
           throw new IllegalArgumentException("Could not find the parent row of '" + row + "'. parent keys are defined.");
@@ -3321,9 +3322,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     if (rows != existingRows) {
       rows = resolveRows(rows);
       CollectingVisitor<ITableRow> collector = new CollectingVisitor<>();
-      rows.forEach(parent -> TreeTraversals.create(collector, node -> {
-        return node.getChildRows();
-      }).traverse(parent));
+      rows.forEach(parent -> TreeTraversals.create(collector, ITableRow::getChildRows).traverse(parent));
       rows = collector.getCollection();
     }
     if (!CollectionUtility.hasElements(rows)) {

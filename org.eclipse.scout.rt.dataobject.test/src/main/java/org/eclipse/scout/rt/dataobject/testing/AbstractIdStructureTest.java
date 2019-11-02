@@ -49,7 +49,7 @@ public abstract class AbstractIdStructureTest {
     return ClassInventory.get().getAllKnownSubClasses(IId.class).stream()
         .filter(ci -> !ci.isAbstract() && !ci.isInterface())
         .sorted(Comparator.comparing(IClassInfo::name))
-        .map(ci -> ci.resolveClass())
+        .map(IClassInfo::resolveClass)
         .filter(c -> packageNameFilter == null || c.getName().startsWith(packageNameFilter))
         .map(c -> c.asSubclass(IId.class));
   }

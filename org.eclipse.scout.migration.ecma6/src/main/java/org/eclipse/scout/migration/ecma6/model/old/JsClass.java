@@ -76,7 +76,7 @@ public class JsClass extends AbstractJsElement{
 
   public JsFunction getConstructor() {
     return m_functions.stream()
-        .filter(f -> f.isConstructor())
+        .filter(JsFunction::isConstructor)
         .findFirst().orElse(null);
   }
 

@@ -2,6 +2,7 @@ package org.eclipse.scout.migration.ecma6.task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -84,7 +85,7 @@ public class T500_CreateClasses extends AbstractTask {
     //find first element start position
     int startPos = elements
         .stream()
-        .filter(e -> e != null)
+        .filter(Objects::nonNull)
         .filter(e -> e.getSource() != null)
         .mapToInt(e -> {
           int i = source.indexOf(e.getSource());
@@ -98,7 +99,7 @@ public class T500_CreateClasses extends AbstractTask {
     //find last element end position
     int endPos = elements
         .stream()
-        .filter(e -> e != null)
+        .filter(Objects::nonNull)
         .filter(e -> e.getSource() != null)
         .mapToInt(e -> {
           int i = source.indexOf(e.getSource());

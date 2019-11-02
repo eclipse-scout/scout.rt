@@ -77,7 +77,7 @@ public class DevelopmentScriptFileCacheInitialLoader implements IPlatformListene
       try {
         DevelopmentScriptfileCache cache = BEANS.get(DevelopmentScriptfileCache.class);
         m_cachedKeys = loadCachedKeys();
-        m_cachedKeys.forEach(key -> cache.scheduleBuildScriptFile(key));
+        m_cachedKeys.forEach(cache::scheduleBuildScriptFile);
       }
       catch (ClassNotFoundException | IOException e) {
         LOG.warn("Could not load cached resources (HttpCacheKeys) from user.home.", e);
@@ -112,7 +112,7 @@ public class DevelopmentScriptFileCacheInitialLoader implements IPlatformListene
       if (LOG.isInfoEnabled()) {
         LOG.info("Load keys from persist cache in user.home '{}'.", loadedFiles
             .stream()
-            .map(k -> k.getResourcePath())
+            .map(HttpCacheKey::getResourcePath)
             .collect(Collectors.joining(", ")));
       }
       return loadedFiles;
@@ -139,7 +139,7 @@ public class DevelopmentScriptFileCacheInitialLoader implements IPlatformListene
     if (LOG.isInfoEnabled()) {
       LOG.info("Persist cache keys for development script cache '{}'.", keys
           .stream()
-          .map(k -> k.getResourcePath())
+          .map(HttpCacheKey::getResourcePath)
           .collect(Collectors.joining(", ")));
     }
     ObjectOutputStream oos = null;

@@ -43,7 +43,7 @@ public abstract class AbstractStringIdStructureTest extends AbstractIdStructureT
 
   protected static Stream<Class<? extends IStringId>> streamStringIdClasses(String packageNameFilter) {
     return streamIdClasses(packageNameFilter)
-        .filter(c -> IStringId.class.isAssignableFrom(c))
+        .filter(IStringId.class::isAssignableFrom)
         .map(c -> c.asSubclass(IStringId.class));
   }
 

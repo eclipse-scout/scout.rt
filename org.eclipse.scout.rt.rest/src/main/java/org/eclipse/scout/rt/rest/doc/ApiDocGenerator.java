@@ -303,7 +303,7 @@ public class ApiDocGenerator {
     }
     String ex = "";
     if (m.getExceptionTypes().length > 0) {
-      ex = " throws " + Arrays.stream(m.getExceptionTypes()).map(e -> e.getSimpleName()).collect(Collectors.joining(", "));
+      ex = " throws " + Arrays.stream(m.getExceptionTypes()).map(Class::getSimpleName).collect(Collectors.joining(", "));
     }
     return m.getReturnType().getSimpleName() + " " + m.getName() + "(" + sb.toString() + ")" + ex;
   }

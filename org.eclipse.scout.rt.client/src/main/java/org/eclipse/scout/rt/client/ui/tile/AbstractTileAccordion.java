@@ -389,7 +389,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
 
   @Override
   public void deleteTiles(Collection<T> tiles) {
-    tiles.forEach(tile -> this.deleteTile(tile));
+    tiles.forEach(this::deleteTile);
   }
 
   @Override

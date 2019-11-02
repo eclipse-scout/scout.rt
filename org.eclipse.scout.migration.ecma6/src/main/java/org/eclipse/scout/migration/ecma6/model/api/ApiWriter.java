@@ -91,7 +91,7 @@ public class ApiWriter {
         .collect(Collectors.toList()));
     cz.addChildren(jsClass.getVariables()
         .stream()
-        .filter(v -> v.isConst())
+        .filter(JsClassVariable::isConst)
         .map(v -> createConstant(v, cz))
         .collect(Collectors.toList()));
     cz.addChildren(jsClass.getEnums()

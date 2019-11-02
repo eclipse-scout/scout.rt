@@ -35,6 +35,6 @@ public class DownloadHttpResponseInterceptor implements IHttpResponseInterceptor
 
   @Override
   public void intercept(HttpServletRequest req, HttpServletResponse resp) {
-    m_downloadHeaders.forEach((header, value) -> resp.setHeader(header, value));
+    m_downloadHeaders.forEach(resp::setHeader);
   }
 }

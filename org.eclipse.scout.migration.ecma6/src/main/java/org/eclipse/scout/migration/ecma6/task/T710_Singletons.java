@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * FROM:
- * 
+ *
  * <pre>
  *   scout.addAppListener('prepare', function() {
  *   if (scout.device) {
@@ -126,7 +126,7 @@ public class T710_Singletons extends AbstractTask {
       return source;
     }
     JsFunction instanceGetter = jsClass.getFunctions().stream()
-      .filter(fun -> fun.isStatic())
+      .filter(JsFunction::isStatic)
       .filter(fun -> "get".equals(fun.getName()))
       .findFirst().orElse(null);
     if(instanceGetter == null){

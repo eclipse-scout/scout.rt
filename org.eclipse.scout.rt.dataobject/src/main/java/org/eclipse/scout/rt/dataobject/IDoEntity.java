@@ -159,7 +159,7 @@ public interface IDoEntity extends IDataObject {
    */
   default <T> List<T> getList(String attributeName, Function<Object, T> mapper) {
     Assertions.assertNotNull(mapper, "provided mapper function is null");
-    return getList(attributeName).stream().map(item -> mapper.apply(item)).collect(Collectors.toList());
+    return getList(attributeName).stream().map(mapper::apply).collect(Collectors.toList());
   }
 
   /**

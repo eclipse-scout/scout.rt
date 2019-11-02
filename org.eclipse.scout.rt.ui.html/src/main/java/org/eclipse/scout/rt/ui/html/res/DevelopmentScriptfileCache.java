@@ -167,7 +167,7 @@ public class DevelopmentScriptfileCache {
       m_pendingScriptFiles.clear();
       m_scriptCache.keySet().stream()
           .filter(key -> matcher.matches(Paths.get(key.getResourcePath())))
-          .forEach(key -> scheduleBuildScriptFile(key));
+          .forEach(this::scheduleBuildScriptFile);
     }
   }
 

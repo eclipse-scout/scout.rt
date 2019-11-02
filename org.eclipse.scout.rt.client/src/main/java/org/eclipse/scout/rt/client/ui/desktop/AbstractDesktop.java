@@ -1035,7 +1035,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     final IOutline newOutline = resolveOutline(outline);
     if (m_outline == newOutline) {
       if (m_outline != null && getActiveForm() != null) {
-        m_outline.createDisplayParentRunContext().run(() -> fireOutlineContentActivate());
+        m_outline.createDisplayParentRunContext().run(this::fireOutlineContentActivate);
       }
       return;
     }
@@ -2247,7 +2247,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   public <T> T getAddOn(Class<T> addOnClass) {
     return m_addOns.stream()
         .filter(a -> addOnClass.isAssignableFrom(a.getClass()))
-        .map(a -> addOnClass.cast(a))
+        .map(addOnClass::cast)
         .findAny().orElse(null);
   }
 
@@ -2698,7 +2698,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     formSet = formSet.stream().filter(form -> {
       return getForms(form)
           .stream()
-          .filter(f -> f.isModal())
+          .filter(IForm::isModal)
           .findAny()
           .map(f -> false)
           .orElse(true);

@@ -59,7 +59,7 @@ public interface IListenerListMonitorMBean {
 
     public int getListenerCount() {
       return Arrays.stream(m_listenerTypes)
-          .mapToInt(l -> l.getListenerCount())
+          .mapToInt(EventType::getListenerCount)
           .sum();
     }
 
@@ -91,7 +91,7 @@ public interface IListenerListMonitorMBean {
 
     public int getListenerCount() {
       return Arrays.stream(m_listenerInfos)
-          .mapToInt(l -> l.getListenerCount())
+          .mapToInt(ListenerInfo::getListenerCount)
           .sum();
     }
 

@@ -36,7 +36,7 @@ public class JsonViewButton<VIEW_BUTTON extends IViewButton> extends JsonAction<
     putJsonProperty(new JsonProperty<VIEW_BUTTON>(IViewButton.PROP_DISPLAY_STYLE, model) {
       @Override
       protected String modelValue() {
-        return Optional.ofNullable(getModel().getDisplayStyle()).map(displayStyle -> displayStyle.toString()).orElse(null);
+        return Optional.ofNullable(getModel().getDisplayStyle()).map(Enum::toString).orElse(null);
       }
     });
   }

@@ -169,7 +169,7 @@ public final class StreamUtility {
     // ArrayList would require O(n) for every insertion at the beginning, resulting in total costs of O(n^2)!
     return Collector.of(
         LinkedList::new,
-        (l, b) -> l.addFirst(b),
+      LinkedList::addFirst,
         (l1, l2) -> {
           l2.addAll(l1);
           return l2;

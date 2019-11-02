@@ -160,7 +160,7 @@ public class UriBuilder {
 
   public UriBuilder parameters(Map<String, String> parameters) {
     if (parameters != null) {
-      parameters.forEach((name, value) -> parameter(name, value));
+      parameters.forEach(this::parameter);
     }
     return this;
   }

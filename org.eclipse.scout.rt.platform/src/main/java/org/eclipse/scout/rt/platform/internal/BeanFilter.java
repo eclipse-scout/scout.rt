@@ -63,7 +63,7 @@ public class BeanFilter {
     // find all classes that are somehow annotated with @Bean
     candidates
         .parallelStream()
-        .forEach(ci -> collectWithSubClasses(ci));
+        .forEach(this::collectWithSubClasses);
 
     return m_allBeans;
   }

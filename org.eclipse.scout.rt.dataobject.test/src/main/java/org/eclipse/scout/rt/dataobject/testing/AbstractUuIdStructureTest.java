@@ -44,7 +44,7 @@ public abstract class AbstractUuIdStructureTest extends AbstractIdStructureTest 
 
   protected static Stream<Class<? extends IUuId>> streamUuIdClasses(String packageNameFilter) {
     return streamIdClasses(packageNameFilter)
-        .filter(c -> IUuId.class.isAssignableFrom(c))
+        .filter(IUuId.class::isAssignableFrom)
         .map(c -> c.asSubclass(IUuId.class));
   }
 

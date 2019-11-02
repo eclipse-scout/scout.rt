@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.config;
 
 import java.net.URL;
 import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -132,7 +133,7 @@ public class PropertiesHelper {
               }
               return true;
             })
-            .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
       }
     }
     finally {
@@ -1003,7 +1004,7 @@ public class PropertiesHelper {
     value = System.getenv().entrySet().stream()
         .map(e -> new AbstractMap.SimpleEntry<>(keyNormalizer.apply(e.getKey()), e.getValue()))
         .filter(e -> e.getKey().equals(key))
-        .map(e -> e.getValue())
+        .map(SimpleEntry::getValue)
         .findFirst().orElse(value);
     // try system properties
     value = System.getProperties().entrySet().stream()
@@ -1011,7 +1012,7 @@ public class PropertiesHelper {
         .filter(e -> {
           return e.getKey().equals(key);
         })
-        .map(e -> e.getValue())
+        .map(SimpleEntry::getValue)
         .findFirst().orElse(value);
     // skip unresolved path variables (used for development mode)
     if (PATH_PLACEHOLDER_PATTERN.matcher(value).matches()) {

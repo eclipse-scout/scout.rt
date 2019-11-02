@@ -42,8 +42,8 @@ public class ApiParser {
     Libraries allLibs = new Libraries();
     //noinspection resource
     allLibs.addChildren(Files.list(m_directory)
-        .sorted((a, b) -> a.compareTo(b))
-        .map(libJson -> parseLibrary(libJson))
+        .sorted(Path::compareTo)
+        .map(this::parseLibrary)
         // do not include current migration source as library
         .filter(lib -> ObjectUtility.notEquals(Configuration.get().getPersistLibraryName(), lib.getCustomAttributeString(INamedElement.LIBRARY_MODULE_NAME)))
         .collect(Collectors.toList()));

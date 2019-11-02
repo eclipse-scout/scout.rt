@@ -46,7 +46,7 @@ public class T5000_ResolveStaticFunctionReferencesAndCreateImports extends Abstr
         .stream()
         .flatMap(jsClass -> jsClass.getFunctions()
             .stream()
-            .filter(f -> f.isStatic()))
+            .filter(JsFunction::isStatic))
         .collect(Collectors.toList());
     if (staticFunctions.size() == 0) {
       return source;

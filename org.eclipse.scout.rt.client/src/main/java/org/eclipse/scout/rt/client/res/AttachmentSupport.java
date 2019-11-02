@@ -37,7 +37,7 @@ public class AttachmentSupport {
     return m_attachments.values().stream()
         .filter(attachment -> (uploaded == null || BooleanUtility.nvl(uploaded) == attachment.isUploaded()) &&
             (referenced == null || BooleanUtility.nvl(referenced) == attachment.isReferenced()))
-        .map(attachment -> attachment.getBinaryResource())
+        .map(Attachment::getBinaryResource)
         .collect(Collectors.toSet());
   }
 
