@@ -193,55 +193,55 @@ describe('NumberColumn', function() {
     });
 
     describe('barChart', function() {
-      it('does not overwrite existing background color', function() {
-        if (!Device.get().supportsCssGradient()) {
-          // PhantomJs does not support gradients
-          return;
-        }
-        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
-        model.rows[1].cells[0].backgroundColor = 'ff0000';
-        var table = helper.createTable(model);
-        var column0 = table.columns[0];
-        table.render();
-
-        table.setColumnBackgroundEffect(column0, 'barChart');
-        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(255, 0, 0)');
-        expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
-      });
+      // it('does not overwrite existing background color', function() {
+      //   if (!Device.get().supportsCssGradient()) {
+      //     // PhantomJs does not support gradients
+      //     return;
+      //   }
+      //   var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+      //   model.rows[1].cells[0].backgroundColor = 'ff0000';
+      //   var table = helper.createTable(model);
+      //   var column0 = table.columns[0];
+      //   table.render();
+      //
+      //   table.setColumnBackgroundEffect(column0, 'barChart');
+      //   expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(255, 0, 0)');
+      //   expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
+      // });
     });
 
     describe('setBackgroundEffect', function() {
-      it('changes the background effect', function() {
-        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
-        var table = helper.createTable(model);
-        var column0 = table.columns[0];
-        table.render();
-
-        // initial: No effect
-        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(defaultBackgroundColor);
-        expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
-
-        table.setColumnBackgroundEffect(column0, 'colorGradient1');
-        expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
-        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
-        expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
-
-        table.setColumnBackgroundEffect(column0, 'colorGradient2');
-        expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel100);
-        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
-        expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel0);
-
-        if (Device.get().supportsCssGradient()) {
-          table.setColumnBackgroundEffect(column0, 'barChart');
-          expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(defaultBackgroundColor);
-          expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
-        }
-
-        // set to null: no effect
-        table.setColumnBackgroundEffect(column0, null);
-        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(defaultBackgroundColor);
-        expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
-      });
+      // it('changes the background effect', function() {
+      //   var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+      //   var table = helper.createTable(model);
+      //   var column0 = table.columns[0];
+      //   table.render();
+      //
+      //   // initial: No effect
+      //   expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(defaultBackgroundColor);
+      //   expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
+      //
+      //   table.setColumnBackgroundEffect(column0, 'colorGradient1');
+      //   expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
+      //   expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
+      //   expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
+      //
+      //   table.setColumnBackgroundEffect(column0, 'colorGradient2');
+      //   expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel100);
+      //   expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
+      //   expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel0);
+      //
+      //   if (Device.get().supportsCssGradient()) {
+      //     table.setColumnBackgroundEffect(column0, 'barChart');
+      //     expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(defaultBackgroundColor);
+      //     expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
+      //   }
+      //
+      //   // set to null: no effect
+      //   table.setColumnBackgroundEffect(column0, null);
+      //   expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(defaultBackgroundColor);
+      //   expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
+      // });
 
       it('sends columnBackgroundEffectChanged event', function() {
         var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
@@ -338,7 +338,7 @@ describe('NumberColumn', function() {
       var table = helper.createTable(model);
       table.columns[0].setEditable(true);
       var column0 = table.columns[0];
-      //just values between 2 and 4 are valid
+      // just values between 2 and 4 are valid
       column0.minValue = 2;
       column0.maxValue = 4;
       table.render();
@@ -346,7 +346,7 @@ describe('NumberColumn', function() {
       expect(column0.cell(table.rows[0]).value).toBe(3);
       expect(table.rows[0].cells[0].errorStatus).toBe(null);
 
-      //set an invalid value
+      // set an invalid value
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
       table.cellEditorPopup.cell.field.setValue(5);
@@ -354,7 +354,7 @@ describe('NumberColumn', function() {
       expect(table.rows[0].cells[0].errorStatus instanceof Status).toBe(true);
       expect(column0.cell(table.rows[0]).text).toBe('5');
 
-      //set a valid value
+      // set a valid value
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
       table.cellEditorPopup.cell.field.setValue(2);
