@@ -57,7 +57,6 @@
       <!-- only used that the IDEs create a module dependency from here to the js code (code completion) -->
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>eclipse-scout-core</artifactId>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 
