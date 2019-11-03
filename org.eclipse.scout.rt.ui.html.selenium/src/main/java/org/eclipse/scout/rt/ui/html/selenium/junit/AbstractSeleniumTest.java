@@ -237,7 +237,7 @@ public abstract class AbstractSeleniumTest {
   }
 
   public void waitUntilScoutSession() {
-    waitUntil(SeleniumExpectedConditions.scriptToReturnTrue("return !!(scout && scout.sessions && scout.sessions.length && scout.sessions[0])"));
+    waitUntil(SeleniumExpectedConditions.scriptToReturnTrue("return !!(scout.App.get() && scout.App.get().sessions && scout.App.get().sessions.length && scout.App.get().sessions[0])"));
   }
 
   /**
