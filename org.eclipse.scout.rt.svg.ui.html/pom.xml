@@ -22,7 +22,6 @@
   </parent>
 
   <artifactId>org.eclipse.scout.rt.svg.ui.html</artifactId>
-  <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
   <properties>
@@ -32,6 +31,7 @@
     <master_skip_pnpm_install_dev>true</master_skip_pnpm_install_dev>
     <master_skip_pnpm_install_prod>true</master_skip_pnpm_install_prod>
     <master_webTest_skip>true</master_webTest_skip>
+    <master_skip_copy_webpack_build_output>true</master_skip_copy_webpack_build_output>
   </properties>
 
   <dependencies>
