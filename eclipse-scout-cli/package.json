@@ -23,6 +23,7 @@
   ],
   "scripts": {
     "snapshot-version": "node scripts/snapshot-version",
+    "release-version": "node scripts/release-version",
     "snapshot-cleanup": "node scripts/snapshot-cleanup"
   },
   "dependencies": {

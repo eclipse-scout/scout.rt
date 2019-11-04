@@ -60,6 +60,10 @@ switch (script) {
     require('../scripts/snapshot-version');
     break;
   }
+  case 'release-version': {
+    require('../scripts/release-version');
+    break;
+  }
   case 'snapshot-cleanup': {
     require('../scripts/snapshot-cleanup');
     break;

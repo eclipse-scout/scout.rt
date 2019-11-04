@@ -32,6 +32,7 @@
     "build:all": "scout-scripts build:dev && scout-scripts build:prod",
     "build:dev:watch": "scout-scripts build:dev:watch",
     "snapshot-version": "scout-scripts snapshot-version",
+    "release-version": "scout-scripts release-version",
     "snapshot-cleanup": "scout-scripts snapshot-cleanup"
   },
   "devDependencies": {
