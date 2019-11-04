@@ -18,6 +18,11 @@ describe('TileGrid', function() {
     session = sandboxSession();
   });
 
+  afterEach(function() {
+    // Stop all running animations to not influence other specs
+    $(':animated').finish();
+  });
+
   function createTileGrid(numTiles, model) {
     var tiles = [];
     for (var i = 0; i < numTiles; i++) {

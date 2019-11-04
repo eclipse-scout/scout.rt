@@ -38,7 +38,7 @@ describe('NumberColumn', function() {
     var rgbLevel50 = 'rgb(213, 195, 161)';
     var rgbLevel100 = 'rgb(171, 214, 147)';
     var barChartColor = 'rgb(128, 193, 208)';
-    var imageLevel50 = 'linear-gradient(to left, ' + barChartColor + ' 0%, ' + barChartColor + ' 50%, transparent 50%, transparent 100%)';
+    var imageLevel50 = 'linear-gradient(to left, ' + barChartColor + ' 0%, ' + barChartColor + ' 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0) 100%)';
     var defaultBackgroundColor;
 
     beforeEach(function() {
@@ -192,55 +192,49 @@ describe('NumberColumn', function() {
     });
 
     describe('barChart', function() {
-      // it('does not overwrite existing background color', function() {
-      //   if (!Device.get().supportsCssGradient()) {
-      //     // PhantomJs does not support gradients
-      //     return;
-      //   }
-      //   var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
-      //   model.rows[1].cells[0].backgroundColor = 'ff0000';
-      //   var table = helper.createTable(model);
-      //   var column0 = table.columns[0];
-      //   table.render();
-      //
-      //   table.setColumnBackgroundEffect(column0, 'barChart');
-      //   expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(255, 0, 0)');
-      //   expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
-      // });
+      it('does not overwrite existing background color', function() {
+        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+        model.rows[1].cells[0].backgroundColor = 'ff0000';
+        var table = helper.createTable(model);
+        var column0 = table.columns[0];
+        table.render();
+
+        table.setColumnBackgroundEffect(column0, 'barChart');
+        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(255, 0, 0)');
+        expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
+      });
     });
 
     describe('setBackgroundEffect', function() {
-      // it('changes the background effect', function() {
-      //   var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
-      //   var table = helper.createTable(model);
-      //   var column0 = table.columns[0];
-      //   table.render();
-      //
-      //   // initial: No effect
-      //   expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(defaultBackgroundColor);
-      //   expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
-      //
-      //   table.setColumnBackgroundEffect(column0, 'colorGradient1');
-      //   expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
-      //   expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
-      //   expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
-      //
-      //   table.setColumnBackgroundEffect(column0, 'colorGradient2');
-      //   expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel100);
-      //   expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
-      //   expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel0);
-      //
-      //   if (Device.get().supportsCssGradient()) {
-      //     table.setColumnBackgroundEffect(column0, 'barChart');
-      //     expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(defaultBackgroundColor);
-      //     expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
-      //   }
-      //
-      //   // set to null: no effect
-      //   table.setColumnBackgroundEffect(column0, null);
-      //   expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(defaultBackgroundColor);
-      //   expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
-      // });
+      it('changes the background effect', function() {
+        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+        var table = helper.createTable(model);
+        var column0 = table.columns[0];
+        table.render();
+
+        // initial: No effect
+        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(defaultBackgroundColor);
+        expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
+
+        table.setColumnBackgroundEffect(column0, 'colorGradient1');
+        expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
+        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
+        expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
+
+        table.setColumnBackgroundEffect(column0, 'colorGradient2');
+        expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel100);
+        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
+        expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel0);
+
+        table.setColumnBackgroundEffect(column0, 'barChart');
+        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(defaultBackgroundColor);
+        expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
+
+        // set to null: no effect
+        table.setColumnBackgroundEffect(column0, null);
+        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(defaultBackgroundColor);
+        expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
+      });
 
       it('sends columnBackgroundEffectChanged event', function() {
         var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');

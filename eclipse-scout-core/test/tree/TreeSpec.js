@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, Page, Range, scout, strings, Tree} from '../../src/index';
+import {graphics, objects, Page, Range, scout, scrollbars, strings, Tree} from '../../src/index';
 import {TreeSpecHelper} from '@eclipse-scout/testing';
 
 describe('Tree', function() {
@@ -1459,24 +1459,24 @@ describe('Tree', function() {
       node1 = nodes[1];
     });
 
-    // it("sets css class child-of-selected on direct children if the expanded node is selected", function() {
-    //   tree.render();
-    //
-    //   tree.selectNodes(node1);
-    //   var $children = tree.$data.find('.tree-node.child-of-selected');
-    //   expect($children.length).toBe(0);
-    //
-    //   tree.expandNode(node1);
-    //   $children = tree.$data.find('.tree-node.child-of-selected');
-    //   expect($children.length).toBe(3);
-    //   expect($children.eq(0)[0]).toBe(nodes[1].childNodes[0].$node[0]);
-    //   expect($children.eq(1)[0]).toBe(nodes[1].childNodes[1].$node[0]);
-    //   expect($children.eq(2)[0]).toBe(nodes[1].childNodes[2].$node[0]);
-    //
-    //   tree.collapseNode(node1);
-    //   $children = tree.$data.find('.tree-node.child-of-selected');
-    //   expect($children.length).toBe(0);
-    // });
+    it('sets css class child-of-selected on direct children if the expanded node is selected', function() {
+      tree.render();
+
+      tree.selectNodes(node1);
+      var $children = tree.$data.find('.tree-node.child-of-selected');
+      expect($children.length).toBe(0);
+
+      tree.expandNode(node1);
+      $children = tree.$data.find('.tree-node.child-of-selected');
+      expect($children.length).toBe(3);
+      expect($children.eq(0)[0]).toBe(nodes[1].childNodes[0].$node[0]);
+      expect($children.eq(1)[0]).toBe(nodes[1].childNodes[1].$node[0]);
+      expect($children.eq(2)[0]).toBe(nodes[1].childNodes[2].$node[0]);
+
+      tree.collapseNode(node1);
+      $children = tree.$data.find('.tree-node.child-of-selected');
+      expect($children.length).toBe(0);
+    });
 
     it('renders the child nodes if parent is expanded', function() {
       tree.render();
@@ -1791,30 +1791,30 @@ describe('Tree', function() {
       expect($childNodes.eq(2).data('node').id).toBe(childNode0.id);
     });
 
-    // it("considers view range when updating child node order", function() {
-    //   var parentNode = nodes[0];
-    //   var childNode0 = parentNode.childNodes[0];
-    //   var childNode1 = parentNode.childNodes[1];
-    //   var childNode2 = parentNode.childNodes[2];
-    //   tree.viewRangeSize = 3;
-    //   tree.render();
-    //   tree.expandNode(parentNode);
-    //
-    //   // Needs explicit rendering of the viewport because this would be done later by the layout
-    //   tree._renderViewport();
-    //   tree.updateNodeOrder([childNode2, childNode1, childNode0], parentNode);
-    //   // Needs explicit rendering again...
-    //   tree._renderViewport();
-    //
-    //   expect(tree.viewRangeRendered).toEqual(new Range(0, 3));
-    //   var $nodes = tree.$nodes();
-    //   expect($nodes.length).toBe(3);
-    //   expect(tree.nodes.length).toBe(3);
-    //   expect(parentNode.childNodes.length).toBe(3);
-    //   expect($nodes.eq(0).data('node').id).toBe(parentNode.id);
-    //   expect($nodes.eq(1).data('node').id).toBe(childNode2.id);
-    //   expect($nodes.eq(2).data('node').id).toBe(childNode1.id);
-    // });
+    it('considers view range when updating child node order', function() {
+      var parentNode = nodes[0];
+      var childNode0 = parentNode.childNodes[0];
+      var childNode1 = parentNode.childNodes[1];
+      var childNode2 = parentNode.childNodes[2];
+      tree.viewRangeSize = 3;
+      tree.render();
+      tree.expandNode(parentNode);
+
+      // Needs explicit rendering of the viewport because this would be done later by the layout
+      tree._renderViewport();
+      tree.updateNodeOrder([childNode2, childNode1, childNode0], parentNode);
+      // Needs explicit rendering again...
+      tree._renderViewport();
+
+      expect(tree.viewRangeRendered).toEqual(new Range(0, 3));
+      var $nodes = tree.$nodes();
+      expect($nodes.length).toBe(3);
+      expect(tree.nodes.length).toBe(3);
+      expect(parentNode.childNodes.length).toBe(3);
+      expect($nodes.eq(0).data('node').id).toBe(parentNode.id);
+      expect($nodes.eq(1).data('node').id).toBe(childNode2.id);
+      expect($nodes.eq(2).data('node').id).toBe(childNode1.id);
+    });
 
     it('reorders expanded child nodes if parent is given (model)', function() {
       var parentNode = nodes[1];
@@ -2520,35 +2520,34 @@ describe('Tree', function() {
       nodeHeight = tree.nodeHeight;
     });
 
-    // it("scrolls current node to the top when expanding a large child set", function() {
-    //   expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[1].$node), $scrollable)).toBe(true);
-    //   expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[9].$node), $scrollable)).toBe(false);
-    //   expect(nodes[7].expanded).toBe(false);
-    //   tree.selectNode(nodes[7]);
-    //   tree.setNodeExpanded(nodes[7], true);
-    //   expect(nodes[7].expanded).toBe(true);
-    //   // node6 should be visible (one above the expanded node)
-    //   expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[6].$node), $scrollable)).toBe(true);
-    //   expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[7].$node), $scrollable)).toBe(true);
-    //   // node8 isn't visible anymore since node7's children use up all the space
-    //   expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[8].$node), $scrollable)).toBe(false);
-    // });
-    //
-    // it("scrolls current node up so that the full expansion is visible plus half a node at the bottom", function() {
-    //   nodes[7].childNodes = [nodes[7].childNodes[0], nodes[7].childNodes[1]];
-    //   tree.selectNode(nodes[7]);
-    //   tree.setNodeExpanded(nodes[7], true);
-    //   expect(nodes[7].expanded).toBe(true);
-    //   // first visible row should be row3 (one above the expanded node)
-    //   expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[6].$node), $scrollable)).toBe(true);
-    //   expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[7].$node), $scrollable)).toBe(true);
-    //   expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[7].childNodes[0].$node), $scrollable)).toBe(true);
-    //   expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[7].childNodes[1].$node), $scrollable)).toBe(true);
-    //   // half of row8 should still be visible after the expansion
-    //   expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[8].$node), $scrollable)).toBe(true);
-    //   expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[9].$node), $scrollable)).toBe(false);
-    // });
+    it('scrolls current node to the top when expanding a large child set', function() {
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[1].$node), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[9].$node), $scrollable)).toBe(false);
+      expect(nodes[7].expanded).toBe(false);
+      tree.selectNode(nodes[7]);
+      tree.setNodeExpanded(nodes[7], true);
+      expect(nodes[7].expanded).toBe(true);
+      // node6 should be visible (one above the expanded node)
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[6].$node), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[7].$node), $scrollable)).toBe(true);
+      // node8 isn't visible anymore since node7's children use up all the space
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[8].$node), $scrollable)).toBe(false);
+    });
 
+    it('scrolls current node up so that the full expansion is visible plus half a node at the bottom', function() {
+      nodes[7].childNodes = [nodes[7].childNodes[0], nodes[7].childNodes[1]];
+      tree.selectNode(nodes[7]);
+      tree.setNodeExpanded(nodes[7], true);
+      expect(nodes[7].expanded).toBe(true);
+      // first visible row should be row3 (one above the expanded node)
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[6].$node), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[7].$node), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[7].childNodes[0].$node), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[7].childNodes[1].$node), $scrollable)).toBe(true);
+      // half of row8 should still be visible after the expansion
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[8].$node), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[9].$node), $scrollable)).toBe(false);
+    });
   });
 
   describe('invisible', function() {

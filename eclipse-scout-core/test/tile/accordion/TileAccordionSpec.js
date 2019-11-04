@@ -18,6 +18,11 @@ describe('TileAccordion', function() {
     session = sandboxSession();
   });
 
+  afterEach(function() {
+    // Stop all running animations to not influence other specs
+    $(':animated').finish();
+  });
+
   function createAccordion(numGroups, model) {
     var groups = [];
     for (var i = 0; i < numGroups; i++) {
