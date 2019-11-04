@@ -34,30 +34,30 @@ export default class TableTileGridMediatorAdapter extends ModelAdapter {
     }, true);
 
     // handled by the java mediator
-    objects.replacePrototypeFunction(TableTileGridMediator, '_onTableRowsInserted', function() {
+    objects.replacePrototypeFunction(TableTileGridMediator, '_onTableRowsInserted', function(event) {
       if (this.modelAdapter) {
         // nop in classic mode
         return;
       }
-      return this._onTableRowsInsertedOrig();
+      return this._onTableRowsInsertedOrig(event);
     }, true);
 
     // handled by the java mediator
-    objects.replacePrototypeFunction(TableTileGridMediator, '_onTableRowsDeleted', function() {
+    objects.replacePrototypeFunction(TableTileGridMediator, '_onTableRowsDeleted', function(event) {
       if (this.modelAdapter) {
         // nop in classic mode
         return;
       }
-      return this._onTableRowsDeletedOrig();
+      return this._onTableRowsDeletedOrig(event);
     }, true);
 
     // handled by the java mediator
-    objects.replacePrototypeFunction(TableTileGridMediator, '_onTableAllRowsDeleted', function() {
+    objects.replacePrototypeFunction(TableTileGridMediator, '_onTableAllRowsDeleted', function(event) {
       if (this.modelAdapter) {
         // nop in classic mode
         return;
       }
-      return this._onTableAllRowsDeletedOrig();
+      return this._onTableAllRowsDeletedOrig(event);
     }, true);
   }
 }

@@ -657,12 +657,12 @@ export default class TableAdapter extends ModelAdapter {
     }, true);
 
     // not used in classic mode since tiles are created by the server
-    objects.replacePrototypeFunction(Table, 'createTiles', function() {
+    objects.replacePrototypeFunction(Table, 'createTiles', function(rows) {
       if (this.modelAdapter) {
         // nop in classic mode
         return;
       }
-      return this.createTilesOrig();
+      return this.createTilesOrig(rows);
     }, true);
   }
 
