@@ -42,6 +42,7 @@ public class HtmlFileLoader extends AbstractResourceLoader {
 
   private static final String THEME_KEY = "ui.theme";
   private static final String LOCALE_KEY = "ui.locale";
+  private static final String MINIFY_KEY = "ui.minify";
 
   private final String m_theme;
   private final boolean m_minify;
@@ -63,6 +64,7 @@ public class HtmlFileLoader extends AbstractResourceLoader {
       attrs.put(LOCALE_KEY, locale.toString());
     }
     attrs.put(THEME_KEY, m_theme);
+    attrs.put(MINIFY_KEY, Boolean.toString(m_minify));
     return new HttpCacheKey(pathInfo, attrs);
   }
 

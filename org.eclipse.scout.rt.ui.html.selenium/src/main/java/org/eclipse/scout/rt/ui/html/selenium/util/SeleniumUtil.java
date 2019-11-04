@@ -29,7 +29,7 @@ public final class SeleniumUtil {
 
   private static final String DEFAULT_WEB_APP_URL = "http://localhost:8082/";
 
-  private static final String DEFAULT_QUERY_PARAMS = "cache=true&debug=true"; // /&logging=1
+  private static final String DEFAULT_QUERY_PARAMS = "debug=true"; // /&logging=1
 
   /**
    * DOM attribute as used by Scout widgets to identify the Scout Java model class.

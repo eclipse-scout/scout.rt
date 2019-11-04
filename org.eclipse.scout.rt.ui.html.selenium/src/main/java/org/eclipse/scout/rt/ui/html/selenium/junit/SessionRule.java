@@ -35,7 +35,6 @@ public class SessionRule extends TestWatcher {
   private static final String URL_PARAM_CLEAR_CACHE = "clearCache";
 
   private final WebDriver m_driver;
-  private static boolean s_firstRequest = true;
 
   public SessionRule(AbstractSeleniumTest test) {
     m_driver = test.getDriver();
@@ -53,15 +52,6 @@ public class SessionRule extends TestWatcher {
         webAppUrl = builder.createURL();
       }
     }
-    // The first request to the UI server must clear the cache, in order to load the most
-    // current version of script and less files.
-    if (s_firstRequest) {
-      webAppUrl = new UriBuilder(webAppUrl)
-          .parameter(URL_PARAM_CLEAR_CACHE, "true")
-          .createURL();
-      s_firstRequest = false;
-    }
-
     m_driver.get(webAppUrl.toString());
   }
 

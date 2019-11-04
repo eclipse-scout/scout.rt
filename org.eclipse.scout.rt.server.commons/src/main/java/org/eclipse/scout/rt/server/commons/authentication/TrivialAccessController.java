@@ -88,7 +88,11 @@ public class TrivialAccessController implements IAccessController {
     // Is a request to base URL? (copy from UiServlet.doGet)
     final String contextPath = request.getServletContext().getContextPath();
     if (StringUtility.hasText(contextPath) && request.getRequestURI().endsWith(contextPath)) {
-      response.sendRedirect(request.getRequestURI() + "/");
+      StringBuilder uriBuilder = new StringBuilder(request.getRequestURI()).append("/");
+      if(StringUtility.hasText(request.getQueryString() )){
+        uriBuilder.append("?").append(request.getQueryString());
+      }
+      response.sendRedirect(uriBuilder.toString());
       return true;
     }
 
