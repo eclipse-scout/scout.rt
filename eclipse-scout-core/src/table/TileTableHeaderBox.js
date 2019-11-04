@@ -49,6 +49,7 @@ export default class TileTableHeaderBox extends GroupBox {
     this._installListeners();
 
     this.insertField(scout.create('PlaceholderField', {
+      id: 'PlaceholderField',
       parent: this,
       gridDataHints: {
         w: 5
@@ -57,6 +58,7 @@ export default class TileTableHeaderBox extends GroupBox {
 
     // Group By Field
     this.groupByField = scout.create('SmartField', {
+      id: 'GroupByField',
       parent: this,
       label: this.session.text('GroupBy'),
       labelPosition: FormField.LabelPosition.ON_FIELD,
@@ -72,6 +74,7 @@ export default class TileTableHeaderBox extends GroupBox {
 
     // Sort By Field
     this.sortByField = scout.create('SmartField', {
+      id: 'SortByField',
       parent: this,
       label: this.session.text('SortBy'),
       labelPosition: FormField.LabelPosition.ON_FIELD,
