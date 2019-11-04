@@ -21,7 +21,7 @@ import {DummyLookupCall, FormSpecHelper} from '@eclipse-scout/testing';
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-describe("TreeBox", function() {
+describe('TreeBox', function() {
   var session, field, helper;
 
   beforeEach(function() {
@@ -374,7 +374,7 @@ describe("TreeBox", function() {
       expect(treeBox.displayText).toBe('');
     });
 
-    it("does not auto-check child nodes if node is checked by model", function() {
+    it('does not auto-check child nodes if node is checked by model', function() {
       var model = helper.createFieldModel('TreeBox', session.desktop, {
         lookupCall: lookupCall
       });

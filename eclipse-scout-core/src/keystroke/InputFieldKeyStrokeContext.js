@@ -91,7 +91,6 @@ export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
     ]);
   }
 
-
   _applyPropagationFlags(event) {
     super._applyPropagationFlags(event);
 

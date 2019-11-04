@@ -27,7 +27,7 @@ export default class Status {
     if (model && model.children && Array.isArray(model.children)) {
       this.children = model.children.map(function(child) {
         return Status.ensure(child);
-      }.bind(this));
+      });
     }
   }
 

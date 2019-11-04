@@ -17,7 +17,6 @@ export default class GroupLayout extends AbstractLayout {
     this.group = group;
   }
 
-
   layout($container) {
     var htmlComp = this.group.htmlComp;
     var containerSize = htmlComp.availableSize()
@@ -43,7 +42,8 @@ export default class GroupLayout extends AbstractLayout {
 
     // 1st condition: Set size only if group is expanded
     // 2nd condition: There is no need to update it during the expand animation (the body will be layouted correctly before the animation starts)
-    // 3rd condition: When Group.setCollapsed(false) has been called an event is triggered that might causes invalidating layout on other all groups (inclusive currently expanding group). The body of the currently expanding group is not rendered at this time.
+    // 3rd condition: When Group.setCollapsed(false) has been called an event is triggered that might causes invalidating layout on other all groups (inclusive currently expanding group).
+    //                The body of the currently expanding group is not rendered at this time.
     // 4th condition: When body is invisible by property (bodyVisible)
     if (this.group.collapsed || this.group.bodyAnimating || !this.group.body.rendered || !this.group.body.isVisible()) {
       return;

@@ -26,7 +26,6 @@ export default class WizardProgressField extends FormField {
     this.stepsMap = {};
   }
 
-
   _init(model) {
     super._init(model);
     this._updateStepsMap();

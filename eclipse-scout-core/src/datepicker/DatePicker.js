@@ -33,7 +33,6 @@ export default class DatePicker extends Widget {
     this.touch = Device.get().supportsTouch();
   }
 
-
   _init(options) {
     super._init(options);
     this._setDateFormat(this.dateFormat);

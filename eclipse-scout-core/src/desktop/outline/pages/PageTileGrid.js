@@ -23,7 +23,6 @@ export default class PageTileGrid extends TileGrid {
     this._outlineStructureChangedHandler = this._onOutlineStructureChanged.bind(this);
   }
 
-
   _init(model) {
     super._init(model);
     this._setOutline(this.outline);

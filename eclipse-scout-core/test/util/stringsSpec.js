@@ -11,11 +11,11 @@
 
 import * as strings from './../../src/util/strings';
 
-describe("strings", function() {
+describe('strings', function() {
 
-  describe("nl2br", function() {
+  describe('nl2br', function() {
 
-    it("can convert newlines to br tags", function() {
+    it('can convert newlines to br tags', function() {
       expect(strings.nl2br()).toBe(undefined);
       expect(strings.nl2br(null)).toBe(null);
       expect(strings.nl2br('')).toBe('');
@@ -27,16 +27,16 @@ describe("strings", function() {
       expect(strings.nl2br(123)).toBe('123');
     });
 
-    it("encodes html, if the parameter is set to true (default)", function() {
+    it('encodes html, if the parameter is set to true (default)', function() {
       expect(strings.nl2br('<b>Hello</b>\nGoodbye')).toBe('&lt;b&gt;Hello&lt;/b&gt;<br>Goodbye');
       expect(strings.nl2br('Hello\n<br>\nGoodbye')).toBe('Hello<br>&lt;br&gt;<br>Goodbye');
     });
 
   });
 
-  describe("hasText", function() {
+  describe('hasText', function() {
 
-    it("can check if string has text", function() {
+    it('can check if string has text', function() {
       expect(strings.hasText()).toBe(false);
       expect(strings.hasText('')).toBe(false);
       expect(strings.hasText(' ')).toBe(false);
@@ -50,9 +50,9 @@ describe("strings", function() {
 
   });
 
-  describe("repeat", function() {
+  describe('repeat', function() {
 
-    it("can repeat strings", function() {
+    it('can repeat strings', function() {
       expect(strings.repeat()).toBe(undefined);
       expect(strings.repeat('')).toBe('');
       expect(strings.repeat('X')).toBe('');
@@ -64,9 +64,9 @@ describe("strings", function() {
 
   });
 
-  describe("padZeroLeft", function() {
+  describe('padZeroLeft', function() {
 
-    it("can pad strings with 0", function() {
+    it('can pad strings with 0', function() {
       expect(strings.padZeroLeft()).toBe(undefined);
       expect(strings.padZeroLeft('')).toBe('');
       expect(strings.padZeroLeft('X')).toBe('X');
@@ -79,9 +79,9 @@ describe("strings", function() {
 
   });
 
-  describe("startsWith", function() {
+  describe('startsWith', function() {
 
-    it("can check if a string starts with another", function() {
+    it('can check if a string starts with another', function() {
       expect(strings.startsWith('abc', 'a')).toBe(true);
       expect(strings.startsWith('abc', 'b')).toBe(false);
       expect(strings.startsWith('äabc', 'ä')).toBe(true);
@@ -107,9 +107,9 @@ describe("strings", function() {
 
   });
 
-  describe("endsWith", function() {
+  describe('endsWith', function() {
 
-    it("can check if a string ends with another", function() {
+    it('can check if a string ends with another', function() {
       expect(strings.endsWith('abc', 'c')).toBe(true);
       expect(strings.endsWith('abc', 'b')).toBe(false);
       expect(strings.endsWith('abcä', 'ä')).toBe(true);
@@ -128,9 +128,9 @@ describe("strings", function() {
 
   });
 
-  describe("count", function() {
+  describe('count', function() {
 
-    it("can count occurrences", function() {
+    it('can count occurrences', function() {
       expect(strings.count()).toBe(0);
       expect(strings.count('hello')).toBe(0);
       expect(strings.count('hello', 'xxx')).toBe(0);
@@ -148,16 +148,16 @@ describe("strings", function() {
 
   });
 
-  describe("encode", function() {
+  describe('encode', function() {
 
-    it("encodes html", function() {
+    it('encodes html', function() {
       expect(strings.encode()).toBeUndefined();
       expect(strings.encode('hello')).toBe('hello');
       expect(strings.encode('<b>hello</b>')).toBe('&lt;b&gt;hello&lt;/b&gt;');
       expect(strings.encode(123)).toBe('123');
     });
 
-    it("does not try to encode empty strings", function() {
+    it('does not try to encode empty strings', function() {
       strings._setEncodeElement(null);
 
       expect(strings.encode('')).toBe('');
@@ -167,7 +167,7 @@ describe("strings", function() {
       expect(strings._getEncodeElement()).not.toBe(null);
     });
 
-    it("caches the html element used for encoding", function() {
+    it('caches the html element used for encoding', function() {
       strings._setEncodeElement(null);
 
       expect(strings.encode('hi')).toBe('hi');
@@ -181,9 +181,9 @@ describe("strings", function() {
 
   });
 
-  describe("join", function() {
+  describe('join', function() {
 
-    it("joins strings", function() {
+    it('joins strings', function() {
       expect(strings.join()).toBe('');
       expect(strings.join('')).toBe('');
       expect(strings.join(' ')).toBe('');
@@ -201,15 +201,15 @@ describe("strings", function() {
       expect(strings.join(2, 0, 0, 0)).toBe('02020');
     });
 
-    it("join works with array as second parameter", function() {
+    it('join works with array as second parameter', function() {
       expect(strings.join('-', ['hello', 'world'])).toBe('hello-world');
     });
 
   });
 
-  describe("box", function() {
+  describe('box', function() {
 
-    it("boxes strings", function() {
+    it('boxes strings', function() {
       expect(strings.box()).toBe('');
       expect(strings.box('(')).toBe('');
       expect(strings.box('(', undefined)).toBe('');
@@ -226,9 +226,9 @@ describe("strings", function() {
 
   });
 
-  describe("lowercaseFirstLetter", function() {
+  describe('lowercaseFirstLetter', function() {
 
-    it("converts first letter to lowercase", function() {
+    it('converts first letter to lowercase', function() {
       expect(strings.lowercaseFirstLetter()).toBe(undefined);
       expect(strings.lowercaseFirstLetter(null)).toBe(null);
       expect(strings.lowercaseFirstLetter(0)).toBe('0');
@@ -240,9 +240,9 @@ describe("strings", function() {
 
   });
 
-  describe("uppercaseFirstLetter", function() {
+  describe('uppercaseFirstLetter', function() {
 
-    it("converts first letter to uppercase", function() {
+    it('converts first letter to uppercase', function() {
       expect(strings.uppercaseFirstLetter()).toBe(undefined);
       expect(strings.uppercaseFirstLetter(null)).toBe(null);
       expect(strings.uppercaseFirstLetter(0)).toBe('0');
@@ -254,9 +254,9 @@ describe("strings", function() {
 
   });
 
-  describe("quote", function() {
+  describe('quote', function() {
 
-    it("quotes special characters for regexp", function() {
+    it('quotes special characters for regexp', function() {
       expect(strings.quote()).toBe(undefined);
       expect(strings.quote(null)).toBe(null);
       expect(strings.quote('bla')).toBe('bla');
@@ -267,9 +267,9 @@ describe("strings", function() {
 
   });
 
-  describe("asString", function() {
+  describe('asString', function() {
 
-    it("converts input to string", function() {
+    it('converts input to string', function() {
       expect(strings.asString()).toBe(undefined);
       expect(strings.asString(null)).toBe(null);
       expect(strings.asString('bla')).toBe('bla');
@@ -281,8 +281,8 @@ describe("strings", function() {
 
   });
 
-  describe("plainText", function() {
-    it("converts html to plain text", function() {
+  describe('plainText', function() {
+    it('converts html to plain text', function() {
       var htmlText = '<b>hello</b>';
       expect(strings.plainText(htmlText)).toBe('hello');
 
@@ -290,13 +290,13 @@ describe("strings", function() {
       expect(strings.plainText(htmlText)).toBe('hello world! Some more html...');
     });
 
-    it("does not try to get plaintext of empty strings", function() {
+    it('does not try to get plaintext of empty strings', function() {
       strings._setPlainTextElement(null);
       expect(strings.plainText('')).toBe('');
       expect(strings._getPlainTextElement()).toBe(null);
     });
 
-    it("caches the html element used for getting plain text", function() {
+    it('caches the html element used for getting plain text', function() {
       strings._setPlainTextElement(null);
 
       expect(strings.plainText('hi')).toBe('hi');
@@ -308,7 +308,7 @@ describe("strings", function() {
       expect(first).toBe(second);
     });
 
-    it("considers upper and lower case tags", function() {
+    it('considers upper and lower case tags', function() {
       var htmlText = '<B>hello</B>';
       expect(strings.plainText(htmlText)).toBe('hello');
 
@@ -316,7 +316,7 @@ describe("strings", function() {
       expect(strings.plainText(htmlText)).toBe('hello world! Some more html...');
     });
 
-    it("converts br, p, div into new lines", function() {
+    it('converts br, p, div into new lines', function() {
       var htmlText = '<b>1. line</b><br><i>2. line</i>';
       expect(strings.plainText(htmlText)).toBe('1. line\n2. line');
 
@@ -330,7 +330,7 @@ describe("strings", function() {
       expect(strings.plainText(htmlText)).toBe('1. line\n2. line');
     });
 
-    it("converts li, tr into new lines", function() {
+    it('converts li, tr into new lines', function() {
       var htmlText = '<ul><li><b>1. line</b></li><li><i>2. line</i></li></ul>';
       expect(strings.plainText(htmlText)).toBe('1. line\n2. line\n');
 
@@ -338,7 +338,7 @@ describe("strings", function() {
       expect(strings.plainText(htmlText)).toBe('1. line\n2. line\n');
     });
 
-    it("converts td into whitespaces", function() {
+    it('converts td into whitespaces', function() {
       var htmlText = '<table><tr><td>1. cell</td><td>2. cell</td></tr></table>';
       expect(strings.plainText(htmlText)).toBe('1. cell 2. cell\n');
 
@@ -350,7 +350,7 @@ describe("strings", function() {
       expect(strings.plainText(htmlText)).toBe('1. cell 2. cell\n1. cell(r2) 2. cell(r2)\n');
     });
 
-    it("converts &nbsp;, &amp;, &gt;, &lt;", function() {
+    it('converts &nbsp;, &amp;, &gt;, &lt;', function() {
       var htmlText = '<b>first&nbsp;word</b>&nbsp;next word';
       expect(strings.plainText(htmlText)).toBe('first word next word');
 
@@ -364,29 +364,28 @@ describe("strings", function() {
       expect(strings.plainText(htmlText)).toBe('first<word>next word');
     });
 
-    it("preserves tabs", function() {
+    it('preserves tabs', function() {
       var htmlText = '\t\t';
       expect(strings.plainText(htmlText)).toBe('\t\t');
     });
 
-    it("removes leading and trailing newlines if configured", function() {
+    it('removes leading and trailing newlines if configured', function() {
       var htmlText = '\n\nHello!\n\n';
       expect(strings.plainText(htmlText, {trim: true})).toBe('Hello!');
     });
 
-    it("leaves multiple newlines alone unless configured", function() {
+    it('leaves multiple newlines alone unless configured', function() {
       var htmlText = 'Hello!\n\n\nI like coding!';
       expect(strings.plainText(htmlText)).toBe('Hello!\n\n\nI like coding!');
       expect(strings.plainText(htmlText, {compact: false})).toBe('Hello!\n\n\nI like coding!');
       expect(strings.plainText(htmlText, {compact: true})).toBe('Hello!\n\nI like coding!');
     });
 
-
   });
 
-  describe("insertAt", function() {
+  describe('insertAt', function() {
 
-    it("can insert strings into other strings", function() {
+    it('can insert strings into other strings', function() {
       expect(strings.insertAt()).toBe(undefined);
       expect(strings.insertAt(null)).toBe(null);
       expect(strings.insertAt('')).toBe('');
@@ -400,9 +399,9 @@ describe("strings", function() {
 
   });
 
-  describe("nvl", function() {
+  describe('nvl', function() {
 
-    it("returns an empty string when input is null or undefined", function() {
+    it('returns an empty string when input is null or undefined', function() {
       expect(strings.nvl(null)).toBe('');
       expect(strings.nvl(undefined)).toBe('');
       expect(strings.nvl('')).toBe('');
@@ -411,19 +410,19 @@ describe("strings", function() {
 
   });
 
-  describe("countCodePoints", function() {
+  describe('countCodePoints', function() {
 
-    it("returns the number of codepoints in a string", function() {
+    it('returns the number of codepoints in a string', function() {
       expect(strings.countCodePoints('')).toBe(0);
       expect(strings.countCodePoints('foo')).toBe(3);
-      expect(strings.countCodePoints('\uD83D\uDC4D')).toBe(1); //\uD83D\uDC4D is Unicode Character 'THUMBS UP SIGN' (U+1F44D)
+      expect(strings.countCodePoints('\uD83D\uDC4D')).toBe(1); // \uD83D\uDC4D is Unicode Character 'THUMBS UP SIGN' (U+1F44D)
     });
 
   });
 
-  describe("splitMax", function() {
+  describe('splitMax', function() {
 
-    it("returns not more than limit elements", function() {
+    it('returns not more than limit elements', function() {
       expect(strings.splitMax()).toEqual([]);
       expect(strings.splitMax('')).toEqual(['']);
       expect(strings.splitMax('abc')).toEqual(['abc']);
@@ -440,14 +439,14 @@ describe("strings", function() {
 
   });
 
-  describe("removePrefix and removeSuffix", function() {
+  describe('removePrefix and removeSuffix', function() {
 
-    it("removePrefix", function() {
+    it('removePrefix', function() {
       expect(strings.removePrefix('crm.CodeType', 'crm.')).toBe('CodeType');
       expect(strings.removePrefix('crm.CodeType', 'foo.')).toBe('crm.CodeType');
     });
 
-    it("removeSuffix", function() {
+    it('removeSuffix', function() {
       expect(strings.removeSuffix('avatar.gif', '.gif')).toBe('avatar');
       expect(strings.removeSuffix('avatar.gif', '.exe')).toBe('avatar.gif');
     });

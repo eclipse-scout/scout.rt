@@ -10,7 +10,6 @@
  */
 import {TestingApp} from '@eclipse-scout/testing';
 
-
 describe('RemoteApp', function() {
   var session;
 

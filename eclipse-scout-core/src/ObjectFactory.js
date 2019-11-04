@@ -82,10 +82,9 @@ export default class ObjectFactory {
         throw new Error('Failed to create object for objectType "' + objectType + '": Factory function did not return a valid object');
       }
       return scoutObject;
-    } else {
-      // 2. - Resolve class by name
-      return TypeDescriptor.newInstance(objectType, options);
     }
+    // 2. - Resolve class by name
+    return TypeDescriptor.newInstance(objectType, options);
   }
 
   /**

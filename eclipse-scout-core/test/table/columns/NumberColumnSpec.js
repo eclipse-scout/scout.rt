@@ -11,7 +11,6 @@
 import {LocaleSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
 import {DecimalFormat, Range, RemoteEvent, Status, styles} from '../../../src/index';
 
-
 /* global LocaleSpecHelper */
 /* global linkWidgetAndAdapter */
 describe('NumberColumn', function() {

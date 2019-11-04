@@ -31,7 +31,6 @@ export default class Icon extends Widget {
     this.prepend = false;
   }
 
-
   _init(model) {
     super._init(model);
     this._setIconDesc(this.iconDesc);

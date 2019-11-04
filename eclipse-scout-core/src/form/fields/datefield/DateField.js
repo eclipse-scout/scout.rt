@@ -72,7 +72,6 @@ export default class DateField extends ValueField {
     this._addCloneProperties(['hasDate', 'hasTime', 'dateFormatPattern', 'timeFormatPattern', 'allowedDates', 'autoDate']);
   }
 
-
   static ErrorCode = {
     PARSE_ERROR: -1
   };
@@ -524,7 +523,7 @@ export default class DateField extends ValueField {
   }
 
   _errorStatusClass() {
-    return !!this.errorStatus ? 'has-' + this.errorStatus.cssClass() : '';
+    return this.errorStatus ? 'has-' + this.errorStatus.cssClass() : '';
   }
 
   /**
@@ -744,7 +743,6 @@ export default class DateField extends ValueField {
       this.preselectTime(this._referenceDate(), false);
     }
     event.preventDefault();
-    return;
   }
 
   _onTimeIconMouseDown(event) {
@@ -941,7 +939,6 @@ export default class DateField extends ValueField {
         this._updateDisplayText(this.getDatePicker().selectedDate);
       }
       $.suppressEvent(event);
-      return;
     }
   }
 
@@ -1132,7 +1129,6 @@ export default class DateField extends ValueField {
           this._updateDisplayText(this.getTimePicker().selectedTime);
         }
         $.suppressEvent(event);
-        return;
       } else {
         // without picker
         if (!this._tempTimeDate) {
@@ -1154,7 +1150,6 @@ export default class DateField extends ValueField {
         this._updateDisplayText(this._tempTimeDate);
         this._setTimeValid(true);
         $.suppressEvent(event);
-        return;
       }
     }
   }

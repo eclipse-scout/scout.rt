@@ -85,9 +85,7 @@ export default class FocusContext {
           focusedElement = $focusableElements.get(activeElementIndex + 1);
           // Note: event is _not_ suppressed here --> will be handled by browser
         }
-      }
-      // Backward Tab (Shift+TAB)
-      else {
+      } else { // Backward Tab (Shift+TAB)
         // If the first focusable element is focused, or the focus is on the container, set the focus to the last focusable element
         if (lastFocusableElement && (activeElement === firstFocusableElement || activeElement === this.$container[0])) {
           $.suppressEvent(event);

@@ -22,7 +22,6 @@ export default class FocusAdjacentElementKeyStroke extends KeyStroke {
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
   }
 
-
   handle(event) {
     var activeElement = this.field.$container.activeElement(true),
       $focusableElements = this.field.$container.find(':focusable');

@@ -11,7 +11,6 @@
 import {dates} from '../../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-
 /* global LocaleSpecHelper */
 /* global linkWidgetAndAdapter */
 describe('DateColumn', function() {

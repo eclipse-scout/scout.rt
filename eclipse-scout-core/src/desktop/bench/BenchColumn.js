@@ -27,7 +27,6 @@ export default class BenchColumn extends Widget {
     this._viewDeactivateHandler = this._onViewDeactivate.bind(this);
   }
 
-
   static TAB_BOX_INDEX = {
     TOP: 0,
     CENTER: 1,

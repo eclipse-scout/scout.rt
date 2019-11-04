@@ -10,7 +10,6 @@
  */
 import {NavigateUpButton} from '../../../../src/index';
 
-
 describe('NavigateUpButton', function() {
 
   var session, outline, menu, node = {};

@@ -11,8 +11,7 @@
 import {TableRow} from '../../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("TableField", function() {
+describe('TableField', function() {
   var session;
   var helper;
   /** @type {TableSpecHelper} */

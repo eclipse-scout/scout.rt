@@ -16,7 +16,6 @@ export default class RadioButtonGroupAdapter extends ValueFieldAdapter {
     super();
   }
 
-
   /**
    * @override
    */

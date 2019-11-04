@@ -25,7 +25,6 @@ export default class PopupWithHead extends Popup {
     this.windowResizeType = 'remove';
   }
 
-
   _createLayout() {
     return new PopupWithHeadLayout(this);
   }

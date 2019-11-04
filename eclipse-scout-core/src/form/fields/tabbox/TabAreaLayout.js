@@ -26,7 +26,6 @@ export default class TabAreaLayout extends AbstractLayout {
     }.bind(this));
   }
 
-
   layout($container) {
     var ellipsis = this.tabArea.ellipsis,
       htmlContainer = HtmlComponent.get($container),
@@ -68,7 +67,7 @@ export default class TabAreaLayout extends AbstractLayout {
         ellipsis.popup.close();
         tab.select();
         tab.focus();
-      }.bind(this));
+      });
       return menu;
     }, this));
 
@@ -108,7 +107,7 @@ export default class TabAreaLayout extends AbstractLayout {
 
     this.overflowTabs = [];
 
-    //consider avoid falsy 0 in tabboxes a 0 withHint will be used to calculate the minimum width
+    // consider avoid falsy 0 in tabboxes a 0 withHint will be used to calculate the minimum width
     if (options.widthHint === 0 || options.widthHint) {
       prefWidth = options.widthHint - htmlComp.insets().horizontal();
     }

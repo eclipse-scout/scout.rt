@@ -24,7 +24,6 @@ export default class DesktopFormController extends FormController {
     $(document).on('popupWindowReady', this._documentPopupWindowReadyHandler);
   }
 
-
   render() {
     super.render();
     var activeForm = this.desktop.activeForm;
@@ -138,7 +137,7 @@ export default class DesktopFormController extends FormController {
         $.log.isDebugEnabled() && $.log.debug('Popup window for form ID ' + form.id + ' has been closed');
         form.close();
       }
-    }.bind(this), 250);
+    }, 250);
   }
 
   /**

@@ -24,7 +24,6 @@ export default class CloseKeyStroke extends KeyStroke {
     };
   }
 
-
   handle(event) {
     this.field.close();
   }

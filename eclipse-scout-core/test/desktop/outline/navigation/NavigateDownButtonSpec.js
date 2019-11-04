@@ -10,7 +10,6 @@
  */
 import {NullWidget, scout} from '../../../../src/index';
 
-
 describe('NavigateDownButton', function() {
 
   var session, outline, menu, node;

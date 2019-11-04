@@ -24,7 +24,6 @@ export default class Splitter extends Widget {
     this._mouseDownHandler = this._onMouseDown.bind(this);
   }
 
-
   _init(model) {
     super._init(model);
     this.setPosition(this.position);
@@ -91,9 +90,8 @@ export default class Splitter extends Widget {
     });
     if (this.splitHorizontal) {
       return anchorBounds.x + anchorBounds.width;
-    } else {
-      return anchorBounds.y + anchorBounds.height;
     }
+    return anchorBounds.y + anchorBounds.height;
   }
 
   _setPosition(position) {
@@ -171,10 +169,10 @@ export default class Splitter extends Widget {
     if (this.splitHorizontal) {
       var x = event.pageX + this._cursorOffset.left - rootBounds.x;
       return (this.orientation === 'right' ? rootBounds.width - x : x);
-    } else {
-      var y = event.pageY + this._cursorOffset.top - rootBounds.y;
-      return (this.orientation === 'bottom' ? rootBounds.height - y : y);
     }
+    var y = event.pageY + this._cursorOffset.top - rootBounds.y;
+    return (this.orientation === 'bottom' ? rootBounds.height - y : y);
+
   }
 
   _onMouseMove(event) {

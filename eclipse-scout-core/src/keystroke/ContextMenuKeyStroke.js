@@ -26,7 +26,6 @@ export default class ContextMenuKeyStroke extends KeyStroke {
     this.stopPropagation = true;
   }
 
-
   /**
    * @override KeyStroke.js
    */

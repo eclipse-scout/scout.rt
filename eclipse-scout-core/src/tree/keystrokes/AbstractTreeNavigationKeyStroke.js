@@ -26,7 +26,6 @@ export default class AbstractTreeNavigationKeyStroke extends KeyStroke {
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     if (!accepted) {

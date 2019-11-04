@@ -56,7 +56,7 @@ export default class EventSupport {
       offFunc = function(event) {
         that.off(type, offFunc);
         func(event);
-      }.bind(this);
+      };
     return this.on(type, offFunc, func);
   }
 

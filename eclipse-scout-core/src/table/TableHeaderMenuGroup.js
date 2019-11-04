@@ -21,7 +21,6 @@ export default class TableHeaderMenuGroup extends Widget {
     this.last = false;
   }
 
-
   _init(options) {
     super._init(options);
     this.text = scout.nvl(this.text, this.session.text(this.textKey));

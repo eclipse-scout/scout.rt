@@ -29,7 +29,6 @@ export default class TableFooter extends Widget {
     this._tablePropertyChangeHandler = this._onTablePropertyChange.bind(this);
   }
 
-
   _init(options) {
     super._init(options);
 
@@ -410,7 +409,7 @@ export default class TableFooter extends Widget {
           if (complete) {
             complete();
           }
-        }.bind(this)
+        }
       };
       // Save complete function so that layout may use it
       $info.data('animationComplete', animationOpts.complete);
@@ -453,8 +452,8 @@ export default class TableFooter extends Widget {
     }
   }
 
-//n: row count
-//m: total count, optional. Meaning is '3 of 10 rows'
+  // n: row count
+  // m: total count, optional. Meaning is '3 of 10 rows'
   computeCountInfo(n, m) {
     n = scout.nvl(n, 0);
     if (m) {
@@ -467,14 +466,14 @@ export default class TableFooter extends Widget {
     if (n === 0) {
       if (this._compactStyle) {
         return this.session.text('ui.TableRowCount', 0);
-      } else {
-        return this.session.text('ui.TableRowCount0');
       }
+      return this.session.text('ui.TableRowCount0');
+
     } else if (n === 1) {
       return this.session.text('ui.TableRowCount1');
-    } else {
-      return this.session.text('ui.TableRowCount', this.session.locale.decimalFormat.format(n));
     }
+    return this.session.text('ui.TableRowCount', this.session.locale.decimalFormat.format(n));
+
   }
 
   /* open, close and resize of the container */

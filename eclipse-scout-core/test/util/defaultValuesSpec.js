@@ -10,7 +10,6 @@
  */
 import {defaultValues} from '../../src/index';
 
-
 describe('scout.defaultValues', function() {
 
   afterEach(function() {
@@ -252,7 +251,7 @@ describe('scout.defaultValues', function() {
       }, {
         'id': '3',
         'objectType': 'Table',
-        rows: ['three']
+        'rows': ['three']
       }];
       defaultValues.applyTo(testObjects);
 

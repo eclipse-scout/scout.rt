@@ -11,7 +11,6 @@
 import {BeanColumn, NullWidget, ObjectFactory, scout} from '../../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('TableTextUserFilter', function() {
   var session;
   var helper;

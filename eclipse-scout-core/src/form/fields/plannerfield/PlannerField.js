@@ -19,7 +19,6 @@ export default class PlannerField extends FormField {
     this.gridDataHints.weightY = 1.0;
   }
 
-
   _render() {
     this.addContainer(this.$parent, 'planner-field');
     this.addLabel();

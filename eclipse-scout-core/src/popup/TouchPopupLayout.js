@@ -17,7 +17,6 @@ export default class TouchPopupLayout extends PopupLayout {
     this.doubleCalcPrefSize = false;
   }
 
-
   layout($container) {
     super.layout($container);
 

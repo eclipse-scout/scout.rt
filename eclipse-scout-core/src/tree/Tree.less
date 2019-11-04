@@ -21,6 +21,7 @@
     }
 
     /* first child is the scrollbar */
+
     .tree-node:nth-of-type(1).selected {
       border-top-color: @item-selection-nonfocus-background-color;
     }
@@ -39,6 +40,7 @@
   width: 100%; /* expand to outer container, needed for breadcrumb */
 
   /* required because text shouldn't go into ellipsis mode when scrollbars are enabled */
+
   &.scrollable-tree {
     overflow-anchor: none;
 
@@ -100,6 +102,7 @@
   }
 
   /*first child is the scrollbar*/
+
   &:nth-of-type(1).selected {
     border-top-color: @item-selection-nonfocus-background-color;
   }
@@ -175,6 +178,7 @@
       &::before {
         #scout.checkbox-before-disabled();
       }
+
       :hover::before {
         #scout.checkbox-before-disabled();
       }
@@ -253,6 +257,7 @@
       }
 
       /* arrow is created using ::before and ::after*/
+
       &.ancestor-of-selected::before,
       &.ancestor-of-selected::after,
       &.selected::before,

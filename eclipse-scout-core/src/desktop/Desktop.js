@@ -89,7 +89,6 @@ export default class Desktop extends Widget {
     this._benchActiveViewChangedHandler = this._onBenchActivateViewChanged.bind(this);
   }
 
-
   static DisplayStyle = {
     DEFAULT: 'default',
     BENCH: 'bench',
@@ -1327,7 +1326,7 @@ export default class Desktop extends Widget {
         if (arrays.containsAll(overlaysToMove, [overlay])) {
           $(overlay).insertBefore($targetOverlay);
         }
-      }.bind(this));
+      });
 
     // Activate the focus context of the form (will restore the previously focused field)
     // This must not be done when the currently focused element is part of this dialog's DOM

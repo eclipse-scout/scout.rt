@@ -20,7 +20,6 @@ export default class ModeSelectorField extends ValueField {
     this._modeSelectorPropertyChangeHandler = this._onModeSelectorPropertyChange.bind(this);
   }
 
-
   _render() {
     this.addContainer(this.$parent, 'mode-selector-field');
     this.addLabel();
@@ -31,7 +30,7 @@ export default class ModeSelectorField extends ValueField {
     }
   }
 
-// Will also be called by model adapter on property change event
+  // Will also be called by model adapter on property change event
   _renderModeSelector() {
     this.modeSelector.render();
     this.addField(this.modeSelector.$container);

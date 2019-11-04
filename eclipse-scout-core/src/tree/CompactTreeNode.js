@@ -19,7 +19,6 @@ export default class CompactTreeNode extends TreeNode {
     super(tree);
   }
 
-
   /**
    * @override
    */

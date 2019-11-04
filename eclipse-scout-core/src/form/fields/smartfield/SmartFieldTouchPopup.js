@@ -20,7 +20,6 @@ export default class SmartFieldTouchPopup extends TouchPopup {
     super();
   }
 
-
   _init(options) {
     options.withFocusContext = false;
     options.smartField = options.parent; // alias for parent (required by proposal chooser)

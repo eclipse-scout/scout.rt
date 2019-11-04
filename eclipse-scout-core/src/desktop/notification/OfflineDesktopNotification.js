@@ -18,7 +18,6 @@ export default class OfflineDesktopNotification extends DesktopNotification {
     this.connectFailedReset = null;
   }
 
-
   _init(model) {
     super._init(model);
     this.closable = false;

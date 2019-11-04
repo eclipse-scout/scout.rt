@@ -16,7 +16,6 @@ export default class SequenceBoxAdapter extends CompositeFieldAdapter {
     super();
   }
 
-
   /**
    * @override
    */

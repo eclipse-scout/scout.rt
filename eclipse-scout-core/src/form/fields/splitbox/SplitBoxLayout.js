@@ -18,7 +18,6 @@ export default class SplitBoxLayout extends AbstractLayout {
     this.splitBox = splitBox;
   }
 
-
   layout($container) {
     // Extract components
     var htmlContainer = HtmlComponent.get($container), // = split-area
@@ -69,9 +68,8 @@ export default class SplitBoxLayout extends AbstractLayout {
       }
       htmlFirstField.setBounds(firstFieldBounds);
       htmlSecondField.setBounds(secondFieldBounds);
-    }
-    // Special case: only one field (or none at all)
-    else {
+    } else {
+      // Special case: only one field (or none at all)
       if (hasOneField) {
         var singleField = hasFirstField ? htmlFirstField : htmlSecondField,
           singleFieldSize = availableSize.subtract(singleField.margins());
@@ -90,8 +88,8 @@ export default class SplitBoxLayout extends AbstractLayout {
 
       var x = null;
       if (hasTwoFields) {
-        //- if 1st field is collapsible -> align button on the right side of the field (there is not enough space on the left side)
-        //- if 2nd field is collapsible -> button is always aligned on the right side using CSS
+        // - if 1st field is collapsible -> align button on the right side of the field (there is not enough space on the left side)
+        // - if 2nd field is collapsible -> button is always aligned on the right side using CSS
         if (this.splitBox.collapsibleField === this.splitBox.firstField) {
           var collapseHandleSize = graphics.size($collapseHandle);
           x = firstFieldBounds.width - collapseHandleSize.width;

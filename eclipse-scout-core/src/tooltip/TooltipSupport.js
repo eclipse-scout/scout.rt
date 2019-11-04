@@ -1,7 +1,6 @@
 import {scout, tooltips} from '../index';
 import * as $ from 'jquery';
 
-
 /*
  * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials

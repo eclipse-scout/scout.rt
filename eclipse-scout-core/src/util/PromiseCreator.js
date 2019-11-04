@@ -10,7 +10,6 @@
  */
 import {objects} from '../index';
 
-
 /**
  * The PromiseCreator is used to work with code that creates a lot of promises.
  * In some situations (e.g. file system access) only a few of the created promises can actually do work

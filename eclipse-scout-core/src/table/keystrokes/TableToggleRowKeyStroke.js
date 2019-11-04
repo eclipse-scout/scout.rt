@@ -21,7 +21,6 @@ export default class TableToggleRowKeyStroke extends KeyStroke {
     this.renderingHints.render = false;
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     return accepted &&

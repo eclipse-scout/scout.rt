@@ -34,7 +34,6 @@ export default class ColumnUserFilter extends TableUserFilter {
     this.selectedValues = [];
   }
 
-
   static TYPE = 'column';
 
   axisGroup() {
@@ -60,6 +59,7 @@ export default class ColumnUserFilter extends TableUserFilter {
           containsSelectedValue = true;
           return true;
         }
+        return false;
       }, this);
 
       if (!containsSelectedValue) {

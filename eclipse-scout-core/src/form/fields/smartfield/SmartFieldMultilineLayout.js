@@ -28,7 +28,6 @@ export default class SmartFieldMultilineLayout extends AbstractLayout {
     }.bind(this));
   }
 
-
   _initDefaults() {
     this.rowHeight = HtmlEnvironment.get().formRowHeight;
   }

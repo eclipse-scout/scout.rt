@@ -22,7 +22,6 @@ export default class OutlineNavigateToTopKeyStroke extends AbstractTreeNavigatio
     }.bind(this);
   }
 
-
   handle(event) {
     this.field.navigateToTop();
   }

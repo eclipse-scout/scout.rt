@@ -11,8 +11,7 @@
 import {arrays, Device, Range, Table} from '../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("Table Grouping", function() {
+describe('Table Grouping', function() {
 
   var session, helper, model, table, column0, column1, column2, column3, column4, rows, columns, adapter;
   var $colHeaders, $header0, $header1;
@@ -115,7 +114,7 @@ describe("Table Grouping", function() {
   }
 
   function removeGrouping(table, column) {
-    table.groupColumn(column, "", 'asc', true);
+    table.groupColumn(column, '', 'asc', true);
   }
 
   function assertGroupingProperty(table) {
@@ -158,7 +157,7 @@ describe("Table Grouping", function() {
     }, session);
   }
 
-  it("renders an aggregate row for each group", function() {
+  it('renders an aggregate row for each group', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -173,7 +172,7 @@ describe("Table Grouping", function() {
     expect(table._aggregateRows.length).toBe(2);
   });
 
-  it("considers groupingStyle -> aggregate rows must be rendered previous to the grouped rows", function() {
+  it('considers groupingStyle -> aggregate rows must be rendered previous to the grouped rows', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -196,7 +195,7 @@ describe("Table Grouping", function() {
     expect(aggrRow2Pos < rowLastPos).toBe(true);
   });
 
-  it("considers view range -> only renders an aggregate row for rendered rows", function() {
+  it('considers view range -> only renders an aggregate row for rendered rows', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -218,7 +217,7 @@ describe("Table Grouping", function() {
     expect(table._aggregateRows[1].$row).toBeFalsy();
   });
 
-  it("considers view range -> doesn't render an aggregate row if the last row of the group is not rendered", function() {
+  it('considers view range -> doesn\'t render an aggregate row if the last row of the group is not rendered', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -252,7 +251,7 @@ describe("Table Grouping", function() {
     expect(table._aggregateRows[1].$row).toBeFalsy();
   });
 
-  it("regroups if rows get inserted", function() {
+  it('regroups if rows get inserted', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -279,7 +278,7 @@ describe("Table Grouping", function() {
     assertGroupingValues(table, column4, ['50', '78']);
   });
 
-  it("regroups if rows get inserted, event is from server and table was empty", function() {
+  it('regroups if rows get inserted, event is from server and table was empty', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -303,7 +302,7 @@ describe("Table Grouping", function() {
     assertGroupingValues(table, column4, ['20']);
   });
 
-  it("does not regroup if rows get inserted, event is from server and table was not empty", function() {
+  it('does not regroup if rows get inserted, event is from server and table was not empty', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -331,7 +330,7 @@ describe("Table Grouping", function() {
     assertGroupingValues(table, column4, ['30', '78']);
   });
 
-  it("regroups when a filter is applied", function() {
+  it('regroups when a filter is applied', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -351,7 +350,7 @@ describe("Table Grouping", function() {
 
   });
 
-  it("regroups if rows get deleted", function() {
+  it('regroups if rows get deleted', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -381,7 +380,7 @@ describe("Table Grouping", function() {
     assertGroupingValues(table, column4, ['78']);
   });
 
-  it("removes aggregate rows if all rows get deleted", function() {
+  it('removes aggregate rows if all rows get deleted', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -403,7 +402,7 @@ describe("Table Grouping", function() {
     assertGroupingProperty(table, 0);
   });
 
-  it("regroups if rows get updated", function() {
+  it('regroups if rows get updated', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -430,7 +429,7 @@ describe("Table Grouping", function() {
     assertGroupingValues(table, column4, ['44', '78']);
   });
 
-  it("may group column 0 only", function() {
+  it('may group column 0 only', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -449,7 +448,7 @@ describe("Table Grouping", function() {
     assertGroupingProperty(table);
   });
 
-  it("may group column 1 only", function() {
+  it('may group column 1 only', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -468,7 +467,7 @@ describe("Table Grouping", function() {
     assertGroupingProperty(table);
   });
 
-  it("may group columns 0 (avg) and 1 (sum)", function() {
+  it('may group columns 0 (avg) and 1 (sum)', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -490,7 +489,7 @@ describe("Table Grouping", function() {
 
   });
 
-  it("may group columns 0, 1 and 2", function() {
+  it('may group columns 0, 1 and 2', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -515,7 +514,7 @@ describe("Table Grouping", function() {
   });
 
   // vary order
-  it("may group columns 2 and 1", function() {
+  it('may group columns 2 and 1', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -537,7 +536,7 @@ describe("Table Grouping", function() {
 
   });
 
-  it("may group column 1 only after grouping column 0 first", function() {
+  it('may group column 1 only after grouping column 0 first', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -558,7 +557,7 @@ describe("Table Grouping", function() {
     assertGroupingProperty(table);
   });
 
-  it("may group column 1 and 2 after grouping column 0 first", function() {
+  it('may group column 1 and 2 after grouping column 0 first', function() {
     if (!Device.get().supportsInternationalization()) {
       return;
     }

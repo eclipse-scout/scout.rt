@@ -16,7 +16,6 @@ export default class TableProposalChooser extends ProposalChooser {
     super();
   }
 
-
   _createModel() {
     var headerVisible = false,
       columns = [],

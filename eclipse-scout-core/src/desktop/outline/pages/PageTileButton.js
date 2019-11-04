@@ -17,7 +17,6 @@ export default class PageTileButton extends TileButton {
     this.page = null;
   }
 
-
   _init(model) {
     super._init(model);
 

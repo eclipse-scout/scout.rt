@@ -31,7 +31,6 @@ export default class TileTableHeaderBox extends GroupBox {
     this._destroyHandler = this._uninstallListeners.bind(this);
   }
 
-
   _installListeners() {
     this.table.on('group', this._tableGroupHandler);
     this.table.on('sort', this._tableSortHandler);

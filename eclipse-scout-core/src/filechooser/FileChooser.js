@@ -43,7 +43,6 @@ export default class FileChooser extends Widget {
     this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
   }
 
-
   _init(model) {
     super._init(model);
     this._setDisplayParent(this.displayParent);

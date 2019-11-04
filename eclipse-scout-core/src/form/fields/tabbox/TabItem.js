@@ -17,7 +17,6 @@ export default class TabItem extends GroupBox {
     this.marked = false;
   }
 
-
   _init(model) {
     super._init(model);
     this._setMenusVisible(this.menusVisible);

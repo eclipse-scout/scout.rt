@@ -18,7 +18,6 @@ export default class TileAccordionSelectionHandler extends TileGridSelectionHand
     this.tileAccordion = this.tileGrid;
   }
 
-
   /**
    * @override
    */

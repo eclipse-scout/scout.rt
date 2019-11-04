@@ -10,7 +10,6 @@
  */
 import {icons} from '../index';
 
-
 export function sumStart() {
   return null;
 }
@@ -96,7 +95,6 @@ export function maxFinish(currentState) {
 }
 
 let maxSymbol = icons.MAX_BOLD;
-
 
 export default {
   avgFinish,

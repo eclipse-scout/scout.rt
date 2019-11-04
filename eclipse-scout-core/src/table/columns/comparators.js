@@ -11,7 +11,6 @@
 import {Device, objects} from '../../index';
 import * as $ from 'jquery';
 
-
 /**
  * Text comparator, used to compare strings with support for internationalization (i18n).
  * The collator object is only installed once.
@@ -165,7 +164,6 @@ const ALPHANUMERIC = {
     return 1;
   }
 };
-
 
 export default {
   ALPHANUMERIC,

@@ -20,7 +20,6 @@ export default class MenuNavigationExecKeyStroke extends MenuNavigationKeyStroke
     this.renderingHints.render = false;
   }
 
-
   handle(event) {
     var $menuItem = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass).$selected;
     if ($menuItem.length > 0) {

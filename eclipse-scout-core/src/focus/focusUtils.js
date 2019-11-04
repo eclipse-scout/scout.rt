@@ -14,7 +14,6 @@ import * as $ from 'jquery';
  * Utility methods for focus.
  */
 
-
 /**
  * @return whether the given element is focusable by mouse.
  * @memberOf scout.focusUtils
@@ -98,7 +97,6 @@ export function isActiveElement(element) {
   }
   return activeElement === element;
 }
-
 
 export default {
   containsParentFocusableByMouse,

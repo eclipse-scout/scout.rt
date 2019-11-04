@@ -25,7 +25,6 @@ export default class FileChooserFieldDeleteKeyStroke extends KeyStroke {
     }.bind(this);
   }
 
-
   /**
    * @override KeyStroke.js
    */

@@ -17,7 +17,6 @@ export default class TableUserFilter extends TableFilter {
     super();
   }
 
-
   init(model) {
     this.session = model.session;
     if (!this.session) {

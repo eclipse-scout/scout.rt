@@ -10,8 +10,7 @@
  */
 import {MenuItemsOrder, NullWidget} from '../../src/index';
 
-
-describe("MenuItemsOrder", function() {
+describe('MenuItemsOrder', function() {
 
   var session, menuItemsOrder;
 
@@ -24,7 +23,7 @@ describe("MenuItemsOrder", function() {
     menuItemsOrder.menuBar = nullWidget;
   });
 
-  it("_createSeparator", function() {
+  it('_createSeparator', function() {
     var separator = menuItemsOrder._createSeparator();
     expect(separator.separator).toBe(true);
     expect(separator.session).toBeTruthy();
@@ -33,7 +32,7 @@ describe("MenuItemsOrder", function() {
     expect(separator.selected).toBe(false);
   });
 
-  it("_menuTypes", function() {
+  it('_menuTypes', function() {
     var menuTypes = menuItemsOrder._menuTypes();
     expect(menuTypes.length).toBe(0);
     menuTypes = menuItemsOrder._menuTypes(['Foo']);

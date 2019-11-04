@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+// eslint-disable-next-line max-classes-per-file
 import {Dimension, HtmlComponent, Popup, scout, Widget} from '../../src/index';
 
-
-describe("Popup", function() {
+describe('Popup', function() {
   var session, $desktop;
 
   beforeEach(function() {
@@ -35,7 +35,6 @@ describe("Popup", function() {
       '</style>').appendTo($('#sandbox'));
   });
 
-
   class WrappingContent extends Widget {
     constructor() {
       super();
@@ -53,7 +52,6 @@ describe("Popup", function() {
 
   window.scouttests = window.scouttests || {};
   window.scouttests.WrappingContent = WrappingContent;
-
 
   class LargeContent extends Widget {
     constructor() {
@@ -569,7 +567,7 @@ describe("Popup", function() {
           $anchor: $anchor,
           windowPaddingX: 0,
           widget: {
-            objectType: "scouttests.WrappingContent",
+            objectType: 'scouttests.WrappingContent',
             numBlocks: 3
           }
         });
@@ -591,7 +589,7 @@ describe("Popup", function() {
           $anchor: $anchor,
           windowPaddingX: 0,
           widget: {
-            objectType: "scouttests.WrappingContent",
+            objectType: 'scouttests.WrappingContent',
             numBlocks: 3
           }
         });
@@ -616,7 +614,7 @@ describe("Popup", function() {
           $anchor: $anchor,
           windowPaddingX: 0,
           widget: {
-            objectType: "scouttests.WrappingContent",
+            objectType: 'scouttests.WrappingContent',
             numBlocks: 4
           }
         });
@@ -642,7 +640,7 @@ describe("Popup", function() {
           $anchor: $anchor,
           windowPaddingY: 0,
           widget: {
-            objectType: "scouttests.LargeContent",
+            objectType: 'scouttests.LargeContent',
             numBlocks: 3
           }
         });
@@ -663,7 +661,7 @@ describe("Popup", function() {
           $anchor: $anchor,
           windowPaddingY: 0,
           widget: {
-            objectType: "scouttests.LargeContent",
+            objectType: 'scouttests.LargeContent',
             numBlocks: 3
           }
         });
@@ -684,7 +682,7 @@ describe("Popup", function() {
           $anchor: $anchor,
           windowPaddingY: 0,
           widget: {
-            objectType: "scouttests.LargeContent",
+            objectType: 'scouttests.LargeContent',
             numBlocks: 10
           }
         });
@@ -707,7 +705,7 @@ describe("Popup", function() {
           $anchor: $anchor,
           windowPaddingY: 0,
           widget: {
-            objectType: "scouttests.LargeContent",
+            objectType: 'scouttests.LargeContent',
             numBlocks: 20
           }
         });
@@ -732,7 +730,7 @@ describe("Popup", function() {
           $anchor: $anchor,
           windowPaddingY: 0,
           widget: {
-            objectType: "scouttests.LargeContent",
+            objectType: 'scouttests.LargeContent',
             numBlocks: 4
           }
         });
@@ -860,7 +858,7 @@ describe("Popup", function() {
           $anchor: $anchor,
           windowPaddingY: 0,
           widget: {
-            objectType: "scouttests.LargeContent",
+            objectType: 'scouttests.LargeContent',
             numBlocks: 5
           }
         });
@@ -881,7 +879,7 @@ describe("Popup", function() {
           $anchor: $anchor,
           windowPaddingY: 0,
           widget: {
-            objectType: "scouttests.LargeContent",
+            objectType: 'scouttests.LargeContent',
             numBlocks: 5
           }
         });
@@ -979,7 +977,7 @@ describe("Popup", function() {
           $anchor: $anchor,
           windowPaddingX: 0,
           widget: {
-            objectType: "scouttests.WrappingContent",
+            objectType: 'scouttests.WrappingContent',
             numBlocks: 5
           }
         });
@@ -1000,7 +998,7 @@ describe("Popup", function() {
           $anchor: $anchor,
           windowPaddingX: 0,
           widget: {
-            objectType: "scouttests.WrappingContent",
+            objectType: 'scouttests.WrappingContent',
             numBlocks: 5
           }
         });

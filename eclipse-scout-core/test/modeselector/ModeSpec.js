@@ -10,8 +10,7 @@
  */
 import {Mode} from '../../src/index';
 
-
-describe("Mode", function() {
+describe('Mode', function() {
   var session;
 
   beforeEach(function() {

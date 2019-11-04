@@ -11,8 +11,7 @@
 import {Action, Button, ButtonAdapterMenu, Dimension, GroupBoxMenuItemsOrder, HtmlComponent, MenuBar, MenuItemsOrder, menus, scout} from '../../src/index';
 import {MenuSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("MenuBar", function() {
+describe('MenuBar', function() {
   var helper, session;
 
   beforeEach(function() {

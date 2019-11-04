@@ -19,7 +19,6 @@ export default class TileOutlineOverview extends OutlineOverview {
     this._addWidgetProperties(['pageTileGrid']);
   }
 
-
   _init(model) {
     super._init(model);
     if (!this.pageTileGrid) {

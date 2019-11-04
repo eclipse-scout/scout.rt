@@ -22,7 +22,6 @@ export default class RadioButton extends Button {
     this.radioValue = null;
   }
 
-
   /**
    * @override Button.js
    */

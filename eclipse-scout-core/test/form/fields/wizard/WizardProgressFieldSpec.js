@@ -43,13 +43,13 @@ describe('WizardProgressField', function() {
       field.render();
       field.setProperty('activeStepIndex', 1);
       field.setProperty('steps', [{
-        "index": 0,
-        "enabled": true,
-        "actionEnabled": true
+        'index': 0,
+        'enabled': true,
+        'actionEnabled': true
       }, {
-        "index": 1,
-        "enabled": true,
-        "actionEnabled": true
+        'index': 1,
+        'enabled': true,
+        'actionEnabled': true
       }]);
 
       var $steps = field.$container.find('.wizard-step');

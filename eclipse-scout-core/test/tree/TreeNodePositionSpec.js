@@ -11,7 +11,6 @@
 import {Dimension} from '../../src/index';
 import {TreeSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('TreeNodePosition', function() {
 
   /** @type {TreeSpecHelper} */
@@ -118,9 +117,8 @@ describe('TreeNodePosition', function() {
       node1.expanded = true;
       node1.childNodes = [node10, node11];
 
-      node2 = helper.createModelNode('0_2', 'node2'),
-
-        tree.render();
+      node2 = helper.createModelNode('0_2', 'node2');
+      tree.render();
       tree.insertNodes([node0, node2], rootNode);
       tree.insertNodes([node1], rootNode);
 

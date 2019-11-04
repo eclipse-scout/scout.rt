@@ -11,8 +11,7 @@
 import {Action, scout, tooltips} from '../../src/index';
 import {MenuSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("Menu", function() {
+describe('Menu', function() {
 
   var helper, session, $sandbox, menu1, menu2;
 

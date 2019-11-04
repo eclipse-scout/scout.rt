@@ -11,8 +11,7 @@
 import {DialogLayout, FormField, GroupBox, HorizontalGrid, scout, VerticalSmartGrid} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("GroupBox", function() {
+describe('GroupBox', function() {
   var session;
   var helper;
 
@@ -42,12 +41,12 @@ describe("GroupBox", function() {
     }
   }
 
-  describe("_render", function() {
+  describe('_render', function() {
 
-    it("adds group-box div when label is set", function() {
+    it('adds group-box div when label is set', function() {
       var model = {
         id: '2',
-        label: "fooBar",
+        label: 'fooBar',
         gridDataHints: {
           x: 0,
           y: 0
@@ -59,14 +58,14 @@ describe("GroupBox", function() {
       expect($('#sandbox')).toContainElement('div.group-box-title');
     });
 
-    it("renders controls initially if expanded", function() {
+    it('renders controls initially if expanded', function() {
       var groupBox = helper.createGroupBoxWithOneField(session.desktop);
       spyOn(groupBox, '_renderControls');
       groupBox.render();
       expect(groupBox._renderControls.calls.count()).toEqual(1);
     });
 
-    it("does not render controls initially if collapsed, but on expand", function() {
+    it('does not render controls initially if collapsed, but on expand', function() {
       var groupBox = helper.createGroupBoxWithOneField(session.desktop);
       spyOn(groupBox, '_renderControls');
       groupBox.setExpanded(false);
@@ -76,7 +75,7 @@ describe("GroupBox", function() {
       expect(groupBox._renderControls.calls.count()).toEqual(1);
     });
 
-    it("automatically hides the label if it is empty", function() {
+    it('automatically hides the label if it is empty', function() {
       // Test 1: render first
       var groupBox = createField({});
       groupBox.render();

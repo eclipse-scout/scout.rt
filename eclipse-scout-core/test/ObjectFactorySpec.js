@@ -11,7 +11,6 @@
 import {Action, ObjectFactory, scout, StringField} from '../src/index';
 import {LocaleSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('ObjectFactory', function() {
   var session;
   beforeEach(function() {
@@ -27,7 +26,6 @@ describe('ObjectFactory', function() {
   afterEach(function() {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
-    //Device.get().type = Device.Type.DESKTOP;
   });
 
   /**
@@ -178,7 +176,6 @@ describe('ObjectFactory', function() {
       var object = ObjectFactory.get()._createObjectByType('my.StringField');
       expect(object instanceof my.StringField).toBe(true);
     });
-
 
     it('considers variants', function() {
       window.test = {};

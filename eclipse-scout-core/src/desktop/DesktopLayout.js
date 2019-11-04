@@ -17,7 +17,6 @@ export default class DesktopLayout extends AbstractLayout {
     this.desktop = desktop;
   }
 
-
   layout($container) {
     var navigationSize, headerSize, htmlHeader, htmlBench, benchSize, htmlNavigation, animationProps,
       navigationWidth = 0,

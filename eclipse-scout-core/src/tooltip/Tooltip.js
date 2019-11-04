@@ -46,7 +46,6 @@ export default class Tooltip extends Widget {
     this._openLater = false;
   }
 
-
   render($parent) {
     // Use entry point by default
     var $tooltipParent = $parent || this.entryPoint();

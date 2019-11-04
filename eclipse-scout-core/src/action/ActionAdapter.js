@@ -17,7 +17,6 @@ export default class ActionAdapter extends ModelAdapter {
     this._addRemoteProperties(['selected']);
   }
 
-
   _goOffline() {
     this._enabledBeforeOffline = this.widget.enabled;
     this.widget.setEnabled(false);

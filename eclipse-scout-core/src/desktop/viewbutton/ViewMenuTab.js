@@ -28,7 +28,6 @@ export default class ViewMenuTab extends Widget {
     this._addWidgetProperties(['selectedButton']);
   }
 
-
   _init(model) {
     super._init(model);
     this.dropdown = scout.create('Menu', {

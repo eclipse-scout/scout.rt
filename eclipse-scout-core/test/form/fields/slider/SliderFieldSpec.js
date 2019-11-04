@@ -11,8 +11,7 @@
 import {SliderField} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("SliderField", function() {
+describe('SliderField', function() {
   var session, helper, field;
 
   beforeEach(function() {
@@ -39,9 +38,9 @@ describe("SliderField", function() {
     return helper.createFieldModel();
   }
 
-  describe("slider", function() {
+  describe('slider', function() {
 
-    it("accepts the value", function() {
+    it('accepts the value', function() {
       field.render();
       field.setValue(25);
 

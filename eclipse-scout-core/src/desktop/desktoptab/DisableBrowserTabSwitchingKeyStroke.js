@@ -37,7 +37,6 @@ export default class DisableBrowserTabSwitchingKeyStroke extends RangeKeyStroke 
     this.preventDefault = true;
   }
 
-
   /**
    * @override KeyStroke.js
    */

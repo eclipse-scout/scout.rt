@@ -10,8 +10,7 @@
  */
 import {Dimension, Popup, scout} from '../../src/index';
 
-
-describe("PopupWithHead", function() {
+describe('PopupWithHead', function() {
   var helper, session, $desktop;
 
   beforeEach(function() {

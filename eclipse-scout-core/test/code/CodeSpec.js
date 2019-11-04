@@ -10,7 +10,6 @@
  */
 import {Code, codes, Locale, texts} from '../../src/index';
 
-
 describe('Code', function() {
 
   afterEach(function() {

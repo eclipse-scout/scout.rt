@@ -16,5 +16,4 @@ export default class ListBoxLayout extends LookupBoxLayout {
     super(listBox, table, filterBox);
   }
 
-
 }

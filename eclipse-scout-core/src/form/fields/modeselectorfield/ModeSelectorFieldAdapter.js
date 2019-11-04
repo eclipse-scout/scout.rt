@@ -16,7 +16,6 @@ export default class ModeSelectorFieldAdapter extends ValueFieldAdapter {
     super();
   }
 
-
   _createWidget(model) {
     this._addModeSelector(model);
     return super._createWidget(model);

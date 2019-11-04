@@ -18,7 +18,6 @@ export default class TreeLayout extends AbstractLayout {
     this.nodeDimensionsDirty = false;
   }
 
-
   layout($container) {
     this._layout($container);
     scrollbars.update(this.tree.$data);

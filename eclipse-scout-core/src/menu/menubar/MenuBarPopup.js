@@ -25,7 +25,6 @@ export default class MenuBarPopup extends ContextMenuPopup {
     this.parentMenuPropertyChangeHandler = this._onParentMenuPropertyChange.bind(this);
   }
 
-
   _init(options) {
     options.$anchor = options.menu.$container;
     super._init(options);

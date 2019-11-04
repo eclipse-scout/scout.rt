@@ -10,9 +10,8 @@
  */
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-
 /* global removePopups */
-describe("TableUpdateBuffer", function() {
+describe('TableUpdateBuffer', function() {
   var session, helper;
 
   beforeEach(function() {
@@ -26,8 +25,7 @@ describe("TableUpdateBuffer", function() {
     jasmine.clock().uninstall();
   });
 
-
-  it("buffers updateRow calls and processes them when all promises resolve", function(done) {
+  it('buffers updateRow calls and processes them when all promises resolve', function(done) {
     var table = helper.createTable(helper.createModelFixture(2, 2));
     table.render();
 
@@ -53,7 +51,7 @@ describe("TableUpdateBuffer", function() {
     deferred.resolve();
   });
 
-  it("prevents rendering viewport while buffering", function(done) {
+  it('prevents rendering viewport while buffering', function(done) {
     var table = helper.createTable(helper.createModelFixture(2, 0));
     table.render();
 
@@ -83,7 +81,7 @@ describe("TableUpdateBuffer", function() {
     deferred.resolve();
   });
 
-  it("processes immediately when a resolved promise is added", function() {
+  it('processes immediately when a resolved promise is added', function() {
     var table = helper.createTable(helper.createModelFixture(2, 2));
     table.render();
 

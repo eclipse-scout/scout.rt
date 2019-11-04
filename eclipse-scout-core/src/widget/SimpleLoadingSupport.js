@@ -20,7 +20,6 @@ export default class SimpleLoadingSupport extends LoadingSupport {
     super(options);
   }
 
-
   _renderLoadingIndicator() {
     if (this.widget.rendered || this.widget.rendering) {
       this.$container.addClass('loading');

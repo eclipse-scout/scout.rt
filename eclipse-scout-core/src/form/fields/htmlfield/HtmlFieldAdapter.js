@@ -16,7 +16,6 @@ export default class HtmlFieldAdapter extends ValueFieldAdapter {
     super();
   }
 
-
   _initProperties(model) {
     if (model.scrollToEnd !== undefined) {
       // ignore pseudo property initially (to prevent the function StringField#scrollToEnd() to be replaced)

@@ -39,7 +39,6 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     this._htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
   }
 
-
   static TransformationType = {
     LABEL_POSITION_ON_FIELD: 'labelPositionOnField',
     LABEL_POSITION_ON_TOP: 'labelPositionOnTop',
@@ -243,12 +242,12 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     }
   }
 
-// Scoutjs specific method. This methods will be overridden by GroupBoxAdapter for scout classic case.
+  // Scoutjs specific method. This methods will be overridden by GroupBoxAdapter for scout classic case.
   getGridData(field) {
     return new GridData(field.gridDataHints);
   }
 
-//Scoutjs specific method. This methods will be overridden by GroupBoxAdapter for scout classic case.
+  // Scoutjs specific method. This methods will be overridden by GroupBoxAdapter for scout classic case.
   setGridData(field, gridData) {
     field.setGridDataHints(gridData);
   }

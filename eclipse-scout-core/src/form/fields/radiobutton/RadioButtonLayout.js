@@ -17,7 +17,6 @@ export default class RadioButtonLayout extends ButtonLayout {
     this.radioButton = radioButton;
   }
 
-
   layout($container) {
     super.layout($container);
 

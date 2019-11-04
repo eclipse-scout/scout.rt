@@ -42,7 +42,7 @@ import {GroupBoxSpecHelper} from '@eclipse-scout/testing';
  * @since 4.0.0 M6 25.02.2014
  */
 // see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout07Test
-describe("AbstractGrid07", function() {
+describe('AbstractGrid07', function() {
   var session;
 
   beforeEach(function() {
@@ -56,15 +56,15 @@ describe("AbstractGrid07", function() {
     });
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
-      label: "Field 01"
+      label: 'Field 01'
     }));
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
-      label: "Field 02"
+      label: 'Field 02'
     }));
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
-      label: "Field 03",
+      label: 'Field 03',
       gridDataHints: new GridData({
         h: 2,
         w: 2
@@ -72,17 +72,17 @@ describe("AbstractGrid07", function() {
     }));
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
-      label: "Field 04",
+      label: 'Field 04',
       gridDataHints: new GridData({})
     }));
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
-      label: "Field 05",
+      label: 'Field 05',
       gridDataHints: new GridData({})
     }));
     this.fields.push(scout.create('Button', {
       parent: this.groupBox,
-      label: "Close",
+      label: 'Close',
       systemType: Button.SystemType.CLOSE
     }));
     this.groupBox.setProperty('fields', this.fields);

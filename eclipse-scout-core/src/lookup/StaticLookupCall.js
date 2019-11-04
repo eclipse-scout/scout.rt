@@ -32,7 +32,6 @@ export default class StaticLookupCall extends LookupCall {
     this.active = true;
   }
 
-
   static MAX_ROW_COUNT = 100;
 
   _init(model) {
@@ -116,7 +115,7 @@ export default class StaticLookupCall extends LookupCall {
           text: text,
           lookupRows: lookupRows
         });
-      }.bind(this))
+      })
       .fail(function(error) {
         throw error;
       });

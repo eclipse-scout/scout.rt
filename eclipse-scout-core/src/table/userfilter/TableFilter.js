@@ -11,7 +11,7 @@
 export default class TableFilter {
 
   constructor() {
-  };
+  }
 
   createKey() {
     return 'filterKey';

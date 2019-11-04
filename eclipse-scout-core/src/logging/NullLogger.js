@@ -10,7 +10,6 @@
  */
 import {objects, strings} from '../index';
 
-
 /**
  * A NullLogger instance is installed when Log4Javascript is not active (the popup
  * is not opened). In that case we write WARN, ERROR and FATAL to the console output

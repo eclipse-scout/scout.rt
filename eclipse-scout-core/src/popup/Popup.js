@@ -99,8 +99,7 @@ export default class Popup extends Widget {
     this._addPreserveOnPropertyChangeProperties(['anchor']);
   }
 
-
-// Note that these strings are also used as CSS classes
+  // Note that these strings are also used as CSS classes
   static Alignment = {
     LEFT: 'left',
     LEFTEDGE: 'leftedge',

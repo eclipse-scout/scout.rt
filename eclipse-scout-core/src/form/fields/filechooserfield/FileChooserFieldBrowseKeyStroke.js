@@ -24,7 +24,6 @@ export default class FileChooserFieldBrowseKeyStroke extends KeyStroke {
     }.bind(this);
   }
 
-
   /**
    * @override KeyStroke.js
    */

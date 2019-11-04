@@ -10,8 +10,7 @@
  */
 import {MenuSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("MenuBarPopup", function() {
+describe('MenuBarPopup', function() {
 
   var helper, session, $sandbox, modelMenu1, modelMenu2, menu1, menu2;
 

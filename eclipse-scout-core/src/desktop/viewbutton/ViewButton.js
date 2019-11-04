@@ -19,7 +19,6 @@ export default class ViewButton extends Action {
     this._renderedAsMenu = false;
   }
 
-
   renderAsMenuItem($parent) {
     this._renderedAsMenu = true;
     super.render($parent);

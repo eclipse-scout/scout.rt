@@ -110,7 +110,7 @@
     &:hover::before {
       color: @hover-color;
 
-     .disabled & {
+      .disabled & {
         color: @text-disabled-color;
       }
     }
@@ -175,6 +175,7 @@
   }
 
   /* position scrollbar as right as possible to prevent overlapping field parts. */
+
   & > .scrollbar {
     #scout.scrollbar-y-padding(8px, 6px);
   }

@@ -10,8 +10,7 @@
  */
 import {graphics, NullWidget, scrollbars} from '../../src/index';
 
-
-describe("scrollbars", function() {
+describe('scrollbars', function() {
   var session;
 
   beforeEach(function() {
@@ -34,9 +33,9 @@ describe("scrollbars", function() {
       .appendTo($parent);
   }
 
-  describe("onScroll", function() {
+  describe('onScroll', function() {
 
-    it("attaches handler to scrolling parents which execute when scrolling", function() {
+    it('attaches handler to scrolling parents which execute when scrolling', function() {
       var exec = false;
       var handler = function() {
         exec = true;
@@ -55,9 +54,9 @@ describe("scrollbars", function() {
 
   });
 
-  describe("offScroll", function() {
+  describe('offScroll', function() {
 
-    it("detaches handler from scrolling parents", function() {
+    it('detaches handler from scrolling parents', function() {
       var exec = false;
       var handler = function() {
         exec = true;
@@ -81,7 +80,7 @@ describe("scrollbars", function() {
 
   });
 
-  describe("isLocationInView", function() {
+  describe('isLocationInView', function() {
     var $scrollable, scrollableBounds, $element;
 
     beforeEach(function() {
@@ -94,7 +93,7 @@ describe("scrollbars", function() {
         .appendTo($('#sandbox'));
     });
 
-    it("returns true if the given location is inside the given $scrollable", function() {
+    it('returns true if the given location is inside the given $scrollable', function() {
       $element
         .cssLeft(scrollableBounds.x)
         .cssTop(scrollableBounds.y);
@@ -102,7 +101,7 @@ describe("scrollbars", function() {
       expect(scrollbars.isLocationInView(bounds, $scrollable)).toBe(true);
     });
 
-    it("returns false if x of the given location is outside of the given $scrollable (smaller)", function() {
+    it('returns false if x of the given location is outside of the given $scrollable (smaller)', function() {
       $element
         .cssLeft(scrollableBounds.x - 1)
         .cssTop(scrollableBounds.y);
@@ -110,7 +109,7 @@ describe("scrollbars", function() {
       expect(scrollbars.isLocationInView(bounds, $scrollable)).toBe(false);
     });
 
-    it("returns false if y of the given location is outside of the given $scrollable (smaller)", function() {
+    it('returns false if y of the given location is outside of the given $scrollable (smaller)', function() {
       $element
         .cssLeft(scrollableBounds.x)
         .cssTop(scrollableBounds.y - 1);
@@ -118,7 +117,7 @@ describe("scrollbars", function() {
       expect(scrollbars.isLocationInView(bounds, $scrollable)).toBe(false);
     });
 
-    it("returns false if x of the given location is outside of the given $scrollable (greater)", function() {
+    it('returns false if x of the given location is outside of the given $scrollable (greater)', function() {
       $element
         .cssLeft(scrollableBounds.x + scrollableBounds.width + 1)
         .cssTop(scrollableBounds.y);
@@ -126,7 +125,7 @@ describe("scrollbars", function() {
       expect(scrollbars.isLocationInView(bounds, $scrollable)).toBe(false);
     });
 
-    it("returns false if y of the given location is outside of the given $scrollable (greater)", function() {
+    it('returns false if y of the given location is outside of the given $scrollable (greater)', function() {
       $element
         .cssLeft(scrollableBounds.x)
         .cssTop(scrollableBounds.y + scrollableBounds.height + 1);
@@ -136,9 +135,9 @@ describe("scrollbars", function() {
 
   });
 
-  describe("render", function() {
+  describe('render', function() {
 
-    it("ensures parent has position absolute or relative", function() {
+    it('ensures parent has position absolute or relative', function() {
       // Create scrollable without explicit position
       var $scrollable = $('<div>')
         .css('height', '50px')

@@ -22,8 +22,7 @@ export default class ClipboardField extends ValueField {
     this._fullSelectionLength = 0;
   }
 
-
-// Keys that don't alter the content of a text field and are therefore always allowed in the clipboard field
+  // Keys that don't alter the content of a text field and are therefore always allowed in the clipboard field
   static NON_DESTRUCTIVE_KEYS = [
     // Default form handling
     keys.ESC,
@@ -53,7 +52,7 @@ export default class ClipboardField extends ValueField {
     keys.F12
   ];
 
-// Keys that always alter the content of a text field, independent from the modifier keys
+  // Keys that always alter the content of a text field, independent from the modifier keys
   static ALWAYS_DESTRUCTIVE_KEYS = [
     keys.BACKSPACE,
     keys.DELETE
@@ -134,13 +133,13 @@ export default class ClipboardField extends ValueField {
     }
   }
 
-// Because a <div> is used as field, jQuery's val() used in ValueField.js is not working here, so
-// the content of displayText variable is used instead.
-// (For reading the displayText innerHmtl() _could_ be used on the div-field, but some browsers
-// would collapse whitespaces which would also collapse multiple tabs when coping some table rows.
-// So instead of reading the effective displayText from the field, the internal displayText value
-// will be reused without actual reading. Parsing of pasted content is handled onPaste() and stored
-// in this.displayText.)
+  // Because a <div> is used as field, jQuery's val() used in ValueField.js is not working here, so
+  // the content of displayText variable is used instead.
+  // (For reading the displayText innerHmtl() _could_ be used on the div-field, but some browsers
+  // would collapse whitespaces which would also collapse multiple tabs when coping some table rows.
+  // So instead of reading the effective displayText from the field, the internal displayText value
+  // will be reused without actual reading. Parsing of pasted content is handled onPaste() and stored
+  // in this.displayText.)
   _readDisplayText() {
     return this.displayText;
   }
@@ -419,11 +418,11 @@ export default class ClipboardField extends ValueField {
 
       // do not trigger any other actions
       return false;
-    } else {
-      uploadContentFunction();
-
-      // trigger other actions to catch content
-      return true;
     }
+    uploadContentFunction();
+
+    // trigger other actions to catch content
+    return true;
+
   }
 }

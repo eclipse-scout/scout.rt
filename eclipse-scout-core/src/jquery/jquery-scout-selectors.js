@@ -27,7 +27,6 @@ export default class JQuerySelectors/* extends $*/ {
       JQuerySelectors.visible(element);
   }
 
-
   static visible(element) {
     return $.expr.filters.visible(element) &&
       !$(element).parents().addBack().filter(function() {

@@ -26,7 +26,6 @@ export default class FieldStatus extends Widget {
     this._parentHierarchyChangeListener = this._onParentHierarchyChange.bind(this);
   }
 
-
   _render() {
     this.$container = this.$parent.appendSpan('status')
       .on('mousedown', this._onStatusMouseDown.bind(this));
@@ -74,16 +73,6 @@ export default class FieldStatus extends Widget {
   }
 
   _renderStatus() {
-    if (!this.updating) {
-      this._updatePopup();
-    }
-  }
-
-  setAutoRemove(autoRemove) {
-    this.setProperty('autoRemove', autoRemove);
-  }
-
-  _renderAutoRemove(autoRemove) {
     if (!this.updating) {
       this._updatePopup();
     }

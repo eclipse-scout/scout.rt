@@ -345,7 +345,7 @@ export default class FocusManager {
       $boxButtons = $candidate.parents('.box-buttons');
       if (($menuParents.length > 0 || $tabParents.length > 0 || $boxButtons.length > 0) && !firstButton && ($candidate.hasClass('button') || $candidate.hasClass('menu-item'))) {
         firstButton = candidate;
-      } else if (!$menuParents.length && !$tabParents.length && !$boxButtons.length && typeof candidate.focus === 'function') { //inline buttons and menues are selectable before choosing button or menu from bar
+      } else if (!$menuParents.length && !$tabParents.length && !$boxButtons.length && typeof candidate.focus === 'function') { // inline buttons and menues are selectable before choosing button or menu from bar
         return candidate;
       }
     }

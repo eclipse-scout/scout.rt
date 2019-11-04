@@ -11,7 +11,6 @@
 import {DateColumnUserFilter, dates, FilterFieldsGroupBox, scout} from '../../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('DateColumnUserFilter', function() {
   var session;
   var helper;

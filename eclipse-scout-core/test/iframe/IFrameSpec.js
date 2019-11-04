@@ -10,7 +10,6 @@
  */
 import {scout} from '../../src/index';
 
-
 describe('IFrame', function() {
   var session;
 

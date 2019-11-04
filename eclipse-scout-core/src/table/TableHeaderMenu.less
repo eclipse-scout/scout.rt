@@ -82,6 +82,7 @@
 
   &.buttons {
     padding-bottom: 35px;
+
     &.last {
       padding-bottom: 29px;
     }
@@ -189,7 +190,7 @@
   }
 
   &.move-down > .icon::before {
-   content: @icon-angle-right;
+    content: @icon-angle-right;
   }
 
   &.move-bottom > .icon::before {
@@ -214,9 +215,9 @@
     }
 
     &.selected > .icon::after {
-       content: attr(data-icon);
-       font-size: 12px;
-       line-height: 12px; /* limit height otherwise arrow would move up in some browsers */
+      content: attr(data-icon);
+      font-size: 12px;
+      line-height: 12px; /* limit height otherwise arrow would move up in some browsers */
     }
   }
 
@@ -264,9 +265,9 @@
     }
 
     &.selected > .icon::after {
-       content: attr(data-icon);
-       font-size: 12px;
-       line-height: 12px; /* limit height otherwise arrow would move up in some browsers */
+      content: attr(data-icon);
+      font-size: 12px;
+      line-height: 12px; /* limit height otherwise arrow would move up in some browsers */
     }
   }
 
@@ -302,7 +303,7 @@
   }
 
   &.color-bar-chart {
-    background-image: linear-gradient(to right, @column-background-effect-bar-chart-background-color 0, @column-background-effect-bar-chart-background-color  65%, @palette-white 65%, @palette-white 100% );
+    background-image: linear-gradient(to right, @column-background-effect-bar-chart-background-color 0, @column-background-effect-bar-chart-background-color 65%, @palette-white 65%, @palette-white 100%);
     background-color: transparent;
   }
 

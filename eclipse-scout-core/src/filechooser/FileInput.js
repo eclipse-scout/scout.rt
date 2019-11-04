@@ -23,7 +23,6 @@ export default class FileInput extends Widget {
     this.text = null;
   }
 
-
   static DEFAULT_MAXIMUM_UPLOAD_SIZE = 50 * 1024 * 1024; // 50 MB
 
   _init(model) {

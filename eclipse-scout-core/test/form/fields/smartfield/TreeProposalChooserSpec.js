@@ -10,7 +10,6 @@
  */
 import {scout} from '../../../../src/index';
 
-
 describe('TreeProposalChooser', function() {
 
   var session;

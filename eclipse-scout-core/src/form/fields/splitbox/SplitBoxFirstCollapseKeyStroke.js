@@ -18,7 +18,6 @@ export default class SplitBoxFirstCollapseKeyStroke extends KeyStroke {
     this.parseAndSetKeyStroke(keyStroke);
   }
 
-
   handle(event) {
     this.field.collapseHandleButtonPressed({
       left: true

@@ -16,7 +16,6 @@ export default class DatePickerTouchPopupLayout extends TouchPopupLayout {
     super(popup);
   }
 
-
   /**
    * @override
    */

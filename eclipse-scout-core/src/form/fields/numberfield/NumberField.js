@@ -22,7 +22,6 @@ export default class NumberField extends BasicField {
     this.gridDataHints.horizontalAlignment = 1; // number fields are right aligned by default.
   }
 
-
   _init(model) {
     super._init(model);
     this._setMinValue(this.minValue);
@@ -148,16 +147,16 @@ export default class NumberField extends BasicField {
 
   _onNumberTooLarge() {
     if (objects.isNullOrUndefined(this.minValue)) {
-      throw this.session.text("NumberTooLargeMessageX", this._formatValue(this.maxValue));
+      throw this.session.text('NumberTooLargeMessageX', this._formatValue(this.maxValue));
     }
-    throw this.session.text("NumberTooLargeMessageXY", this._formatValue(this.minValue), this._formatValue(this.maxValue));
+    throw this.session.text('NumberTooLargeMessageXY', this._formatValue(this.minValue), this._formatValue(this.maxValue));
   }
 
   _onNumberTooSmall() {
     if (objects.isNullOrUndefined(this.maxValue)) {
-      throw this.session.text("NumberTooSmallMessageX", this._formatValue(this.minValue));
+      throw this.session.text('NumberTooSmallMessageX', this._formatValue(this.minValue));
     }
-    throw this.session.text("NumberTooSmallMessageXY", this._formatValue(this.minValue), this._formatValue(this.maxValue));
+    throw this.session.text('NumberTooSmallMessageXY', this._formatValue(this.minValue), this._formatValue(this.maxValue));
   }
 
   /**

@@ -10,12 +10,11 @@
  */
 import {FormField, objects} from '../../src/index';
 
+describe('scout.objects', function() {
 
-describe("scout.objects", function() {
+  describe('copyProperties', function() {
 
-  describe("copyProperties", function() {
-
-    it("copies all properties", function() {
+    it('copies all properties', function() {
       var dest = {},
         source = {
           foo: 6,
@@ -26,7 +25,7 @@ describe("scout.objects", function() {
       expect(dest.bar).toBe(7);
     });
 
-    it("copies the properties from prototype as well", function() {
+    it('copies the properties from prototype as well', function() {
       var dest = {};
       var TestConstructor = function() {
         this.foo = 6;
@@ -41,7 +40,7 @@ describe("scout.objects", function() {
       expect(dest.qux).toBe(8);
     });
 
-    it("copies only the properties specified by the filter, if there is one", function() {
+    it('copies only the properties specified by the filter, if there is one', function() {
       var dest = {};
       var TestConstructor = function() {
         this.foo = 6;
@@ -64,9 +63,9 @@ describe("scout.objects", function() {
 
   });
 
-  describe("copyOwnProperties", function() {
+  describe('copyOwnProperties', function() {
 
-    it("copies all properties", function() {
+    it('copies all properties', function() {
       var dest = {},
         source = {
           foo: 6,
@@ -77,7 +76,7 @@ describe("scout.objects", function() {
       expect(dest.bar).toBe(7);
     });
 
-    it("does not copy the properties from prototype", function() {
+    it('does not copy the properties from prototype', function() {
       var dest = {};
       var TestConstructor = function() {
         this.foo = 6;
@@ -92,7 +91,7 @@ describe("scout.objects", function() {
       expect(dest.qux).toBe(8);
     });
 
-    it("copies only the properties specified by the filter, if there is one", function() {
+    it('copies only the properties specified by the filter, if there is one', function() {
       var dest = {},
         source = {
           foo: 6,
@@ -108,9 +107,9 @@ describe("scout.objects", function() {
 
   });
 
-  describe("countOwnProperties", function() {
+  describe('countOwnProperties', function() {
 
-    it("counts all own properties", function() {
+    it('counts all own properties', function() {
       var o = {
         first: 1,
         second: 2
@@ -132,7 +131,7 @@ describe("scout.objects", function() {
       expect(objects.countOwnProperties(y)).toBe(4); // foo, bar, anotherProp, qux (because copyProperties also copies properties from prototype)
     });
 
-    it("works for objects created with createMap() function", function() {
+    it('works for objects created with createMap() function', function() {
       var map = objects.createMap();
       expect(objects.countOwnProperties(map)).toBe(0);
       map = objects.createMap({foo: 1});
@@ -141,9 +140,9 @@ describe("scout.objects", function() {
 
   });
 
-  describe("valueCopy", function() {
+  describe('valueCopy', function() {
 
-    it("copies an object by value", function() {
+    it('copies an object by value', function() {
       var o = {
         first: 1,
         second: 2,
@@ -190,7 +189,7 @@ describe("scout.objects", function() {
       expect(o2.hamlet.refs.length).toBe(2);
     });
 
-    it("works for objects created with createMap() function", function() {
+    it('works for objects created with createMap() function', function() {
       // Top-level map
       var map = objects.createMap();
       map.name = 'Linda';
@@ -507,16 +506,16 @@ describe("scout.objects", function() {
       expect(objects.resolveConst('${const:scout.FormField.LabelPosition.RIGHT}')).toBe(FormField.LabelPosition.RIGHT);
       expect(objects.resolveConst('${const:myConst}')).toBe(6);
       expect(objects.resolveConst(3)).toBe(3); // everything that is not a string, should be returned unchanged
-      expect(objects.resolveConst("foo")).toBe("foo"); // a string that is not a constant should be returned unchanged too
+      expect(objects.resolveConst('foo')).toBe('foo'); // a string that is not a constant should be returned unchanged too
 
       // resolve a constant that does not exist, this will also write a warning in the output
-      expect(objects.resolveConst("${const:scout.FormField.LabelPosition.XXX}")).toBe("${const:scout.FormField.LabelPosition.XXX}");
+      expect(objects.resolveConst('${const:scout.FormField.LabelPosition.XXX}')).toBe('${const:scout.FormField.LabelPosition.XXX}');
     });
 
     it('resolveConstProperty', function() {
       // case 1: provide the 'enum' object as constType - resolver takes that object as starting point
       var model = {
-        labelPosition: "${const:RIGHT}"
+        labelPosition: '${const:RIGHT}'
       };
       objects.resolveConstProperty(model, {
         property: 'labelPosition',
@@ -526,7 +525,7 @@ describe("scout.objects", function() {
 
       // case 2: provide the 'Window' object as constType - resolver takes that object as starting point
       model = {
-        labelPosition: "${const:scout.FormField.LabelPosition.RIGHT}"
+        labelPosition: '${const:scout.FormField.LabelPosition.RIGHT}'
       };
       objects.resolveConstProperty(model, {
         property: 'labelPosition',

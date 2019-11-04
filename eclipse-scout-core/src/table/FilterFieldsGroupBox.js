@@ -18,7 +18,6 @@ export default class FilterFieldsGroupBox extends GroupBox {
     this.cssClass = 'filter-fields';
   }
 
-
   _init(model) {
     super._init(model);
     this.filter.addFilterFields(this);
@@ -45,8 +44,8 @@ export default class FilterFieldsGroupBox extends GroupBox {
     return field;
   }
 
-// Info from awe, cgu: Added '0' to the name to avoid temporarily to avoid naming conflict with FormField#addField
-// This should be refactored in a future release
+  // Info from awe, cgu: Added '0' to the name to avoid temporarily to avoid naming conflict with FormField#addField
+  // This should be refactored in a future release
   addField0(field) {
     this.fields.push(field);
     this._prepareFields();

@@ -10,7 +10,6 @@
  */
 import {Device} from '../../src/index';
 
-
 describe('Device', function() {
 
   function test(userAgent, expectedDevice) {

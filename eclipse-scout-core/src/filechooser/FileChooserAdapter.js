@@ -16,7 +16,6 @@ export default class FileChooserAdapter extends ModelAdapter {
     super();
   }
 
-
   _onWidgetCancel(event) {
     // Do not close the file chooser immediately, server will send the close event
     event.preventDefault();

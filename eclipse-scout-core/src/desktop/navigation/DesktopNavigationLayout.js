@@ -17,7 +17,6 @@ export default class DesktopNavigationLayout extends AbstractLayout {
     this.navigation = navigation;
   }
 
-
   layout($container) {
     var bodySize, viewButtonBoxSize, viewButtonBoxPrefSize,
       htmlContainer = this.navigation.htmlComp,

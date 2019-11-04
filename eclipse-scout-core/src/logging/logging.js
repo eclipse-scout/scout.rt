@@ -13,7 +13,6 @@ import * as $ from 'jquery';
 
 /* global log4javascript */
 
-
 const DEFAULT_LEVEL = 'trace';
 let initialized = false;
 let _appendersToAdd = [];
@@ -110,7 +109,6 @@ export function addAppender(factoryName, options) {
   var factory = scout.create(factoryName, options);
   $.log.addAppender(factory.create());
 }
-
 
 export default {
   DEFAULT_LEVEL,

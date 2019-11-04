@@ -19,7 +19,6 @@ export default class CellEditorCompleteEditKeyStroke extends KeyStroke {
     this.stopPropagation = true;
   }
 
-
   handle(event) {
     this.field.completeEdit();
   }

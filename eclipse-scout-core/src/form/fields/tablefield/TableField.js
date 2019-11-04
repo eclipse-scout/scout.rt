@@ -26,7 +26,6 @@ export default class TableField extends FormField {
     this._addWidgetProperties(['table']);
   }
 
-
   static TABLE_CHANGE_EVENTS = 'rowsInserted rowsDeleted allRowsDeleted rowsUpdated rowsChecked';
 
   _init(model) {
@@ -65,10 +64,6 @@ export default class TableField extends FormField {
       table.setLoading(this.loading);
       table.setScrollTop(this.scrollTop);
     }
-  }
-
-  setTable(table) {
-    this.setProperty('table', table);
   }
 
   _renderTable() {
@@ -182,6 +177,7 @@ export default class TableField extends FormField {
           validByMandatory = validByMandatory && ret.validByMandatory;
           return !(validByErrorStatus || validByMandatory);
         }
+        return false;
       }, this);
     }, this);
 

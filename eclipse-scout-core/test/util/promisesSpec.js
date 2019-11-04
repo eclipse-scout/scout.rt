@@ -10,8 +10,7 @@
  */
 import {arrays, PromiseCreator, promises} from '../../src/index';
 
-
-describe("scout.promises", function() {
+describe('scout.promises', function() {
 
   function createDeferredArray(len) {
     return arrays.init(len, null);
@@ -26,7 +25,7 @@ describe("scout.promises", function() {
     }));
   }
 
-  it("oneByOne stops executing after failure", function(done) {
+  it('oneByOne stops executing after failure', function(done) {
     var deferredArray = createDeferredArray(3);
     var promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
     promises.oneByOne(promiseCreator).then(function() {
@@ -40,7 +39,7 @@ describe("scout.promises", function() {
     setTimeout(deferredArray[0].reject.bind(deferredArray[0], 'Foo'));
   });
 
-  it("groupwise stops executing after failed group", function(done) {
+  it('groupwise stops executing after failed group', function(done) {
     var deferredArray = createDeferredArray(3);
     var promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
     promises.groupwise(2, promiseCreator).then(function() {
@@ -54,7 +53,7 @@ describe("scout.promises", function() {
     setTimeout(deferredArray[0].reject.bind(deferredArray[0], 'Bar'));
   });
 
-  it("parallel stops executing after failed promise", function(done) {
+  it('parallel stops executing after failed promise', function(done) {
     var deferredArray = createDeferredArray(9);
     var promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
     promises.parallel(3, promiseCreator).then(function() {
@@ -94,7 +93,7 @@ describe("scout.promises", function() {
     deferredArray[1].resolve(1);
   });
 
-  it("does not cut off error arguments", function(done) {
+  it('does not cut off error arguments', function(done) {
     var deferredArray = createDeferredArray(1);
     var promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
     promises.oneByOne(promiseCreator).then(function() {
@@ -109,7 +108,7 @@ describe("scout.promises", function() {
     setTimeout(deferredArray[0].reject.bind(deferredArray[0], 'Foo', 'Bar'));
   });
 
-  it("adds all result arguments, one for each deferred", function(done) {
+  it('adds all result arguments, one for each deferred', function(done) {
     var deferredArray = arrays.init(3, null).map(function() {
       return new $.Deferred();
     });

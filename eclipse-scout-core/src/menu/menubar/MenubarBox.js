@@ -20,7 +20,6 @@ export default class MenubarBox extends Widget {
     this._menuItemPropertyChangeHandler = this._onMenuItemPropertyChange.bind(this);
   }
 
-
   _destroy() {
     super._destroy();
     this._removeMenuHandlers();
@@ -68,7 +67,7 @@ export default class MenubarBox extends Widget {
     this.menuItems.forEach(function(item) {
       item.overflow = false;
       item.remove();
-    }.bind(this));
+    });
   }
 
   _renderMenuItems() {

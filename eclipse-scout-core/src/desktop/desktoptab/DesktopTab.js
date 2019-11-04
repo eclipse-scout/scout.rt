@@ -16,7 +16,6 @@ export default class DesktopTab extends SimpleTab {
     super();
   }
 
-
   _render() {
     super._render();
     this.$container.addClass('desktop-tab');

@@ -10,8 +10,7 @@
  */
 import {HtmlComponent, scout} from '../../src/index';
 
-
-describe("LayoutValidator", function() {
+describe('LayoutValidator', function() {
   var session;
 
   beforeEach(function() {
@@ -22,9 +21,9 @@ describe("LayoutValidator", function() {
     session.desktop.$container.removeData('htmlComponent');
   });
 
-  describe("invalidateTree", function() {
+  describe('invalidateTree', function() {
 
-    it("keeps track of invalid html components", function() {
+    it('keeps track of invalid html components', function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
       var htmlComp = HtmlComponent.install($comp, session);
 
@@ -33,7 +32,7 @@ describe("LayoutValidator", function() {
       expect(session.layoutValidator._invalidComponents[0]).toBe(htmlComp);
     });
 
-    it("considers only the topmost component", function() {
+    it('considers only the topmost component', function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
       var htmlComp = HtmlComponent.install($comp, session);
 
@@ -45,7 +44,7 @@ describe("LayoutValidator", function() {
       expect(session.layoutValidator._invalidComponents[0]).toBe(htmlComp);
     });
 
-    it("and validate roots", function() {
+    it('and validate roots', function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
       HtmlComponent.install($comp, session);
 
@@ -58,7 +57,7 @@ describe("LayoutValidator", function() {
       expect(session.layoutValidator._invalidComponents[0]).toBe(htmlCompChild);
     });
 
-    it("makes sure parent components are put in front of child components", function() {
+    it('makes sure parent components are put in front of child components', function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
       var htmlComp = HtmlComponent.install($comp, session);
       var $grandchild = $comp.appendDiv().appendDiv();
@@ -75,9 +74,9 @@ describe("LayoutValidator", function() {
     });
   });
 
-  describe("validate", function() {
+  describe('validate', function() {
 
-    it("calls layout for each invalid html component", function() {
+    it('calls layout for each invalid html component', function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
       var htmlComp = HtmlComponent.install($comp, session);
       spyOn(htmlComp.layout, 'layout');
@@ -88,7 +87,7 @@ describe("LayoutValidator", function() {
       expect(htmlComp.layout.layout.calls.count()).toEqual(1);
     });
 
-    it("does not call layout if component has been removed", function() {
+    it('does not call layout if component has been removed', function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
       var htmlComp = HtmlComponent.install($comp, session);
       spyOn(htmlComp.layout, 'layout');
@@ -99,7 +98,7 @@ describe("LayoutValidator", function() {
       expect(htmlComp.layout.layout).not.toHaveBeenCalled();
     });
 
-    it("does not call layout if component has been detached, but does not remove from invalid components either", function() {
+    it('does not call layout if component has been detached, but does not remove from invalid components either', function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
       var htmlComp = HtmlComponent.install($comp, session);
       spyOn(htmlComp.layout, 'layout');
@@ -115,7 +114,7 @@ describe("LayoutValidator", function() {
       expect(session.layoutValidator._invalidComponents[0]).toBe(htmlComp);
     });
 
-    it("removes the component from the list of invalidate components after validation", function() {
+    it('removes the component from the list of invalidate components after validation', function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
       var htmlComp = HtmlComponent.install($comp, session);
       spyOn(htmlComp.layout, 'layout');
@@ -132,9 +131,9 @@ describe("LayoutValidator", function() {
 
   });
 
-  describe("cleanupInvalidObjects", function() {
+  describe('cleanupInvalidObjects', function() {
 
-    it("removes the widget from invalid components when a widget gets removed", function() {
+    it('removes the widget from invalid components when a widget gets removed', function() {
       var widget = scout.create('StringField', {
         parent: session.desktop
       });

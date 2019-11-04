@@ -11,8 +11,7 @@
 import {GroupBox, GroupBoxGridConfig, HorizontalGrid, scout} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("GroupBox", function() {
+describe('GroupBox', function() {
   var session;
   var helper;
   var cloneHelper;
@@ -44,9 +43,9 @@ describe("GroupBox", function() {
     }
   }
 
-  describe("clone", function() {
+  describe('clone', function() {
 
-    it("considers the clone properties and deep clones fields and menus", function() {
+    it('considers the clone properties and deep clones fields and menus', function() {
       var groupBox = scout.create('GroupBox', {
         parent: session.desktop,
         id: 'gb01',
@@ -57,7 +56,7 @@ describe("GroupBox", function() {
           objectType: 'StringField'
         }, {
           objectType: 'SmartField',
-          label: "a label"
+          label: 'a label'
         }, {
           objectType: 'DateField'
         }],
@@ -85,7 +84,7 @@ describe("GroupBox", function() {
       expect(clone.logicalGrid.gridConfig instanceof GroupBoxGridConfig).toBe(true);
     });
 
-    it("does not render the cloned box", function() {
+    it('does not render the cloned box', function() {
       var clone,
         groupBox = scout.create('GroupBox', {
           parent: session.desktop,

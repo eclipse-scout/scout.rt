@@ -20,7 +20,6 @@ export default class RangeKeyStroke extends KeyStroke {
     this.ranges = [];
   }
 
-
   registerRange(from, to) {
     this.ranges.push({
       from: from,
@@ -32,7 +31,7 @@ export default class RangeKeyStroke extends KeyStroke {
    * @override KeyStroke.js
    */
   _accept(event) {
-    //event.ctrlKey||event.metaKey  --> some keystrokes with ctrl modifier are captured and suppressed by osx use in this cases command key
+    // event.ctrlKey||event.metaKey  --> some keystrokes with ctrl modifier are captured and suppressed by osx use in this cases command key
     if ((event.ctrlKey || event.metaKey) !== this.ctrl ||
       event.altKey !== this.alt ||
       event.shiftKey !== this.shift

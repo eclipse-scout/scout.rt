@@ -22,7 +22,6 @@ export default class SimpleTabBox extends Widget {
     this._removeViewInProgress = 0;
   }
 
-
   _init(model) {
     super._init(model);
     this.cssClass = model.cssClass;

@@ -30,7 +30,6 @@ export default class RowLayout extends AbstractLayout {
     // +-----------------+
   }
 
-
   layout($container) {
     var htmlComp = HtmlComponent.get($container);
     var containerSize = htmlComp.availableSize()

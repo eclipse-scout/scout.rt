@@ -16,7 +16,6 @@ export default class RadioButtonGroupGridConfig extends LogicalGridConfig {
     super();
   }
 
-
   getGridColumnCount() {
     return this.widget.gridColumnCount;
   }

@@ -18,7 +18,6 @@ export default class CompactTree extends Tree {
     this._scrolldirections = 'y';
   }
 
-
   /**
    * @override Tree.js
    */
@@ -84,7 +83,7 @@ export default class CompactTree extends Tree {
     if (!visibleNodeBefore) {
       node.$node.prependTo(this.$nodesContainer);
     } else if (visibleNodeBefore.level < node.level) {
-      //insert after first child node (title from the level above)
+      // insert after first child node (title from the level above)
       node.$node.insertAfter(visibleNodeBefore.$node.children()[0]);
     } else {
       n = visibleNodeBefore.$node;

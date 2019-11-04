@@ -23,7 +23,6 @@ export default class DesktopNavigation extends Widget {
     this._viewButtonBoxPropertyChangeHandler = this._onViewButtonBoxPropertyChange.bind(this);
   }
 
-
   static DEFAULT_STYLE_WIDTH = null; // Configured in sizes.css
   static BREADCRUMB_STYLE_WIDTH = null; // Configured in sizes.css
   static MIN_WIDTH = null; // Configured in sizes.css

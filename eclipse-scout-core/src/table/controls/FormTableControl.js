@@ -19,7 +19,6 @@ export default class FormTableControl extends TableControl {
     this._formDestroyedHandler = this._onFormDestroyed.bind(this);
   }
 
-
   _init(model) {
     super._init(model);
     this._setForm(this.form);

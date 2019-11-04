@@ -23,7 +23,6 @@ export default class NavigateDownButton extends NavigateButton {
     this._outlinePageRowLinkHandler = this._onOutlinePageRowLink.bind(this);
   }
 
-
   _init(options) {
     super._init(options);
 

@@ -10,7 +10,6 @@
  */
 import {Dimension, Point} from '../index';
 
-
 /**
  * JavaScript port from java.awt.Rectangle.
  */

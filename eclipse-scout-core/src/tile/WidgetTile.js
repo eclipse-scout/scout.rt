@@ -24,7 +24,6 @@ export default class WidgetTile extends Tile {
     this._widgetPropertyChangeHandler = this._onWidgetPropertyChange.bind(this);
   }
 
-
   _init(model) {
     super._init(model);
     scout.assertProperty(this, 'tileWidget', Widget);

@@ -17,7 +17,6 @@ export default class MenubarBoxLayout extends AbstractLayout {
     this.menubox = menubox;
   }
 
-
   layout($container) {
     // void since the menu items are floated inline block.
   }

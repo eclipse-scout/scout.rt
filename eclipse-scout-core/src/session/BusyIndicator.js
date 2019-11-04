@@ -20,7 +20,6 @@ export default class BusyIndicator extends Widget {
     this.details = null;
   }
 
-
   /**
    * @override
    */

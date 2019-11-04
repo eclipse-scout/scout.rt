@@ -17,7 +17,6 @@ export default class FormMenuPopupLayout extends PopupWithHeadLayout {
     this.popup = popup;
   }
 
-
   _setSize(prefSize) {
     var popupSize,
       htmlForm = this.popup.form.htmlComp;

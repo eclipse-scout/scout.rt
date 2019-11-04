@@ -30,8 +30,7 @@ export default class FormFieldLayout extends AbstractLayout {
     }.bind(this));
   }
 
-
-// Minimum field with to normal state, for smaller widths the "compact" style is applied.
+  // Minimum field with to normal state, for smaller widths the "compact" style is applied.
   static MIN_FIELD_WIDTH = 61;
 
   _initDefaults() {

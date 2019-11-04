@@ -11,7 +11,6 @@
 import {scout} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper, MenuSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('SequenceBoxAdapter', function() {
   var session, helper, menuHelper;
 
@@ -22,8 +21,8 @@ describe('SequenceBoxAdapter', function() {
     menuHelper = new MenuSpecHelper(session);
   });
 
-  describe("clone", function() {
-    it("does not accidentally create a logical grid", function() {
+  describe('clone', function() {
+    it('does not accidentally create a logical grid', function() {
       var cloneHelper = new CloneSpecHelper();
       var model = {
         id: 'seq01',

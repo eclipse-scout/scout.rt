@@ -10,7 +10,6 @@
  */
 import {objects, scout} from '../index';
 
-
 /**
  * @param text
  * @param encodeHtml defaults to true
@@ -273,7 +272,6 @@ export function uppercaseFirstLetter(string) {
   return _changeFirstLetter(string, 'toUpperCase');
 }
 
-//private
 export function _changeFirstLetter(string, funcName) {
   if (string === undefined || string === null) {
     return string;
@@ -388,9 +386,8 @@ export function equals(a, b, ignoreCase) {
   }
   if (ignoreCase) {
     return a.toLowerCase() === b.toLowerCase();
-  } else {
-    return a === b;
   }
+  return a === b;
 }
 
 export function equalsIgnoreCase(a, b) {
@@ -413,26 +410,21 @@ export function removeSuffix(string, suffix) {
   return s;
 }
 
-//private
 export function _setPlainTextElement(el) {
   plainTextElement = el;
 }
 
-//private
 export function _getPlainTextElement() {
   return plainTextElement;
 }
 
-//private
 export function _setEncodeElement(el) {
   _encodeElement = el;
 }
 
-//private
 export function _getEncodeElement() {
   return _encodeElement;
 }
-
 
 export default {
   asString,

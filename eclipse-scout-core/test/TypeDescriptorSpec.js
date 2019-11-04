@@ -10,7 +10,6 @@
  */
 import {arrays, TypeDescriptor} from '../src/index';
 
-
 describe('ObjectInfo', function() {
 
   describe('parse', function() {

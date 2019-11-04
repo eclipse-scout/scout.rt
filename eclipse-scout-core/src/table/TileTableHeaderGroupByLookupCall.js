@@ -17,7 +17,6 @@ export default class TileTableHeaderGroupByLookupCall extends StaticLookupCall {
     this.table = null;
   }
 
-
   _init(model) {
     super._init(model);
   }

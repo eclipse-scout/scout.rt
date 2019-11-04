@@ -18,7 +18,6 @@ export default class AccordionField extends FormField {
     this._addWidgetProperties(['accordion']);
   }
 
-
   _init(model) {
     super._init(model);
 

@@ -17,7 +17,6 @@ export default class BenchRowLayoutData extends FlexboxLayoutData {
     this._ensureRows();
   }
 
-
   _prepare() {
     super._prepare();
     this.rows = [null, null, null];

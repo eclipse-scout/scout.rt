@@ -11,8 +11,7 @@
 import {BasicFieldAdapter, RemoteEvent, scout} from '../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("BasicField", function() {
+describe('BasicField', function() {
   var session, helper, field;
 
   beforeEach(function() {
@@ -41,8 +40,8 @@ describe("BasicField", function() {
     return helper.createFieldModel();
   }
 
-  describe("acceptInput must always be sent to server at the end of input, if at least one change has been made", function() {
-    it("updateDisplayTextOnModify = true, with changed text", function() {
+  describe('acceptInput must always be sent to server at the end of input, if at least one change has been made', function() {
+    it('updateDisplayTextOnModify = true, with changed text', function() {
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test1');
@@ -65,7 +64,7 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it("updateDisplayTextOnModify = true, with custom delay", function() {
+    it('updateDisplayTextOnModify = true, with custom delay', function() {
       field.updateDisplayTextOnModify = true;
       field.updateDisplayTextOnModifyDelay = 20;
       field.render();
@@ -85,7 +84,7 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it("updateDisplayTextOnModify = true, with no delay", function() {
+    it('updateDisplayTextOnModify = true, with no delay', function() {
       field.updateDisplayTextOnModify = true;
       field.updateDisplayTextOnModifyDelay = 0;
       field.render();
@@ -100,7 +99,7 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it("updateDisplayTextOnModify = false, with changed text", function() {
+    it('updateDisplayTextOnModify = false, with changed text', function() {
       field.updateDisplayTextOnModify = false;
       field.render();
       field.$field.val('Test2');
@@ -122,7 +121,7 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it("updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with changed text", function() {
+    it('updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with changed text', function() {
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test3');
@@ -146,7 +145,7 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it("updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with *pending* changed text", function() {
+    it('updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with *pending* changed text', function() {
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test3');
@@ -174,7 +173,7 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it("updateDisplayTextOnModify = true, then acceptInput(false) is fired. -> send should be done immediately", function() {
+    it('updateDisplayTextOnModify = true, then acceptInput(false) is fired. -> send should be done immediately', function() {
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test3');
@@ -189,7 +188,7 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it("updateDisplayTextOnModify = true, w/o changed text", function() {
+    it('updateDisplayTextOnModify = true, w/o changed text', function() {
       field.updateDisplayTextOnModify = true;
       field.render();
       field.displayText = 'Test4'; // fake previous display text
@@ -212,7 +211,7 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
     });
 
-    it("updateDisplayTextOnModify = false, w/o changed text", function() {
+    it('updateDisplayTextOnModify = false, w/o changed text', function() {
       field.updateDisplayTextOnModify = false;
       field.render();
       field.displayText = 'Test5'; // fake previous display text
@@ -235,7 +234,7 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
     });
 
-    it("does not fail if field is removed while acceptInput is still pending", function() {
+    it('does not fail if field is removed while acceptInput is still pending', function() {
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test1');

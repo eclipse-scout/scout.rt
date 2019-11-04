@@ -20,7 +20,6 @@ export default class FormLifecycle extends Lifecycle {
     this.saveChangesQuestionTextKey = 'FormSaveChangesQuestion';
   }
 
-
   init(model) {
     scout.assertParameter('widget', model.widget, Form);
     super.init(model);

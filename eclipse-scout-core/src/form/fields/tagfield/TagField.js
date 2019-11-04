@@ -39,7 +39,6 @@ export default class TagField extends ValueField {
     this.tagBar = null;
   }
 
-
   _init(model) {
     super._init(model);
 

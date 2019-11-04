@@ -10,8 +10,7 @@
  */
 import {keys, KeyStroke} from '../../src/index';
 
-
-describe("KeyStroke", function() {
+describe('KeyStroke', function() {
   var session;
 
   var spyable = function() {
@@ -20,7 +19,7 @@ describe("KeyStroke", function() {
   class TestingKeyStroke extends KeyStroke {
     constructor() {
       super();
-      this.parseAndSetKeyStroke("enter");
+      this.parseAndSetKeyStroke('enter');
     }
 
     handle() {
@@ -38,7 +37,7 @@ describe("KeyStroke", function() {
     session = null;
   });
 
-  describe("unrepeatability", function() {
+  describe('unrepeatability', function() {
 
     var testImpl = function(keyDownCount) {
       var keyStroke = new TestingKeyStroke();
@@ -53,16 +52,16 @@ describe("KeyStroke", function() {
       session.desktop.$container.triggerKeyUpCapture(keys.ENTER);
 
       expect(keyStroke.handle.calls.count())
-        .toEqual(1, "because an unrepeatable keystroke should only be invoked once before the closing keyup event");
+        .toEqual(1, 'because an unrepeatable keystroke should only be invoked once before the closing keyup event');
       expect(keyStroke._handleExecuted)
-        .toBe(false, "because an unrepeatable keystroke should be reset after the closing keyup event");
+        .toBe(false, 'because an unrepeatable keystroke should be reset after the closing keyup event');
     };
 
-    it("means that an unrepeatable KeyStroke is triggered exactly once per keyup event, even given three keydown events", function() {
+    it('means that an unrepeatable KeyStroke is triggered exactly once per keyup event, even given three keydown events', function() {
       testImpl(3);
     });
 
-    it("means that an unrepeatable KeyStroke is triggered exactly once given the sequence (keydown, keyup)", function() {
+    it('means that an unrepeatable KeyStroke is triggered exactly once given the sequence (keydown, keyup)', function() {
       testImpl(1);
     });
   });

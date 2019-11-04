@@ -29,7 +29,6 @@ export default class TileAccordion extends Accordion {
     this._groupBodyHeightChangeHandler = this._onGroupBodyHeightChange.bind(this);
   }
 
-
   /**
    * @override
    */
@@ -473,6 +472,7 @@ export default class TileAccordion extends Accordion {
         focusedTile = group.body.focusedTile;
         return true;
       }
+      return false;
     });
     return focusedTile;
   }
@@ -520,6 +520,7 @@ export default class TileAccordion extends Accordion {
         return true;
       }
       currentIndex += rowCount;
+      return false;
     });
     if (!found) {
       return -1;

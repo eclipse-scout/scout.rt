@@ -24,7 +24,6 @@ export default class DateColumnUserFilter extends ColumnUserFilter {
     this.hasFilterFields = true;
   }
 
-
   /**
    * @override TableUserFilter.js
    */
@@ -41,10 +40,9 @@ export default class DateColumnUserFilter extends ColumnUserFilter {
     if (this.column.hasDate) {
       // Default grouping for date columns is year
       return TableMatrix.DateGroup.YEAR;
-    } else {
-      // No grouping for time columns
-      return TableMatrix.DateGroup.NONE;
     }
+    // No grouping for time columns
+    return TableMatrix.DateGroup.NONE;
   }
 
   /**

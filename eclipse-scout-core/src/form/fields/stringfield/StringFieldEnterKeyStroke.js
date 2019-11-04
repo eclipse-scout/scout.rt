@@ -20,7 +20,6 @@ export default class StringFieldEnterKeyStroke extends KeyStroke {
     this.preventDefault = false;
   }
 
-
   _applyPropagationFlags(event) {
     super._applyPropagationFlags(event);
 

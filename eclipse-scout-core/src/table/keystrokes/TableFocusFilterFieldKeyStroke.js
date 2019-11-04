@@ -27,13 +27,12 @@ export default class TableFocusFilterFieldKeyStroke extends KeyStroke {
 
     this.renderingHints.$drawingArea = function($drawingArea, event) {
       return event._$filterInput;
-    }.bind(this);
+    };
 
     this.virtualKeyStrokeWhich = 'a-Z;a-z;0-9';
     this.preventDefault = false; // false so that the key is inserted into the search field.
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
   }
-
 
   /**
    * @override KeyStroke.js
@@ -55,9 +54,8 @@ export default class TableFocusFilterFieldKeyStroke extends KeyStroke {
       event._$filterInput = $filterInput;
       this._isKeyStrokeInRange(event);
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   /**

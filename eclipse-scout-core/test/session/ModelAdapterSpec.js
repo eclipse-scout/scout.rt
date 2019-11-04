@@ -11,7 +11,6 @@
 import {FormSpecHelper} from '@eclipse-scout/testing';
 import {ModelAdapter, ObjectFactory, RemoteEvent, scout} from '../../src/index';
 
-
 describe('ModelAdapter', function() {
 
   var session, $sandbox, myObjectFactory, helper,
@@ -334,7 +333,6 @@ describe('ModelAdapter', function() {
       });
 
     });
-
 
     describe('export adapter', function() {
 

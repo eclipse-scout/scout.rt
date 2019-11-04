@@ -18,7 +18,6 @@ export default class TableHeaderMenuButton extends Action {
     this.tabbable = true;
   }
 
-
   /**
    * @override
    */
@@ -42,7 +41,7 @@ export default class TableHeaderMenuButton extends Action {
     this._renderToggleAction();
   }
 
-// Show 'remove' text when button is already selected
+  // Show 'remove' text when button is already selected
   _onMouseOver() {
     var text = this.selected ?
       this.session.text('ui.remove') : this.text;

@@ -20,9 +20,8 @@ export default class MenuExecByNumberKeyStroke extends MenuNavigationExecKeyStro
     this.renderingHints.hAlign = HAlign.RIGHT;
     this.renderingHints.$drawingArea = function($drawingArea, event) {
       return event.$menuItem;
-    }.bind(this);
+    };
   }
-
 
   _accept(event) {
     var accepted = super._accept(event);

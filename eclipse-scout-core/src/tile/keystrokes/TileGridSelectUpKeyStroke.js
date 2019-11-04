@@ -20,7 +20,6 @@ export default class TileGridSelectUpKeyStroke extends TileGridSelectKeyStroke {
     this.renderingHints.text = '↑';
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     if (!accepted) {

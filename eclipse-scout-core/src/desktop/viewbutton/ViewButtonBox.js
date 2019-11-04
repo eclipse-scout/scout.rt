@@ -23,7 +23,6 @@ export default class ViewButtonBox extends Widget {
     this._addWidgetProperties(['tabButtons']);
   }
 
-
   _init(model) {
     super._init(model);
     this.desktop = this.session.desktop;

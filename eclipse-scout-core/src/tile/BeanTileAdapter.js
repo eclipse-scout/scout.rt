@@ -6,7 +6,6 @@ export default class BeanTileAdapter extends TileAdapter {
     super();
   }
 
-
   _onWidgetAppLinkAction(event) {
     this._send('appLinkAction', {
       ref: event.ref

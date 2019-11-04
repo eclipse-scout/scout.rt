@@ -11,7 +11,6 @@
 import {focusUtils} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('WrappedForm', function() {
   var session;
   var helper;

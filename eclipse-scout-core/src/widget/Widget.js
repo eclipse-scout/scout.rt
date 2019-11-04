@@ -444,7 +444,7 @@ export default class Widget {
     // remove children in reverse order.
     this.children.slice().reverse()
       .forEach(function(child) {
-      // Only remove the child if this widget is the current parent (if that is not the case this widget is the owner)
+        // Only remove the child if this widget is the current parent (if that is not the case this widget is the owner)
         if (child.parent === this) {
           child.remove();
         }
@@ -1537,6 +1537,7 @@ export default class Widget {
         str += '\n';
       }
       str += ancestor.toString();
+      return false;
     });
     return str;
   }

@@ -18,7 +18,6 @@ export default class TreeBox extends LookupBox {
     this._addWidgetProperties(['tree', 'filterBox']);
   }
 
-
   _init(model) {
     super._init(model);
     this.tree.on('nodesChecked', this._onTreeNodesChecked.bind(this));

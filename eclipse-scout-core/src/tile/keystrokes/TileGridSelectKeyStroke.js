@@ -24,7 +24,6 @@ export default class TileGridSelectKeyStroke extends KeyStroke {
     }.bind(this);
   }
 
-
   /**
    * Selection handler should be used for every interaction with the tileGrid.
    * This is necessary to provide the same selection behavior for the tile accordion which uses multiple tile grids

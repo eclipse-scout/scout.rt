@@ -18,7 +18,6 @@ export default class CarouselLayout extends AbstractLayout {
     this.carousel = carousel;
   }
 
-
   layout($container) {
     // recalculate style transformation after layout
     this.carousel.recalcTransformation();

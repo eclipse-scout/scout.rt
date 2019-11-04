@@ -16,7 +16,6 @@ export default class TableControlAdapter extends ActionAdapter {
     super();
   }
 
-
   _goOffline() {
     if (this.widget.isContentAvailable()) {
       return;

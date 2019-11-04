@@ -10,8 +10,7 @@
  */
 import {Button, icons, scout} from '../../../../src/index';
 
-
-describe("Button", function() {
+describe('Button', function() {
   var session;
 
   beforeEach(function() {

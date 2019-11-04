@@ -20,7 +20,6 @@ export default class RadioButtonGroupRightKeyStroke extends KeyStroke {
     this.renderingHints.render = false;
   }
 
-
   handle(event) {
     var fieldBefore,
       focusedButton = $(event.target).data('radiobutton');
@@ -34,6 +33,7 @@ export default class RadioButtonGroupRightKeyStroke extends KeyStroke {
       if (radioButton === focusedButton && radioButton.enabledComputed && radioButton.visible) {
         fieldBefore = radioButton;
       }
+      return false;
     }, this);
   }
 }

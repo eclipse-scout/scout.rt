@@ -10,8 +10,7 @@
  */
 import {keys, scout} from '../../../../src/index';
 
-
-describe("RadioButton", function() {
+describe('RadioButton', function() {
   var session;
 
   beforeEach(function() {

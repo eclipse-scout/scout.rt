@@ -16,7 +16,6 @@ export default class TagFieldAdapter extends LookupFieldAdapter {
     super();
   }
 
-
   _initProperties(model) {
     if (model.insertText !== undefined) {
       // ignore pseudo property initially (to prevent the function StringField#insertText() to be replaced)

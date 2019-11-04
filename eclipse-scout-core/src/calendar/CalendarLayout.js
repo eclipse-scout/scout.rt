@@ -19,7 +19,6 @@ export default class CalendarLayout extends AbstractLayout {
     this.compacted = false;
   }
 
-
   layout($container) {
     var height = 0,
       headerHeight = 0,

@@ -10,7 +10,6 @@
  */
 import {objects, QueryBy} from '../index';
 
-
 /**
  * This class is used to remember what lookup is called (=request) and to compare that
  * request with the result. Each result from the Scout server contains the lookup parameters

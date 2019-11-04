@@ -39,7 +39,6 @@ export default class LogicalGridLayout extends AbstractLayout {
 
   }
 
-
   _initDefaults() {
     var env = HtmlEnvironment.get();
     this.hgap = env.formColumnGap;

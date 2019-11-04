@@ -21,7 +21,6 @@ export default class SequenceBox extends CompositeField {
     this.fields = [];
   }
 
-
   _init(model) {
     super._init(model);
 
@@ -301,7 +300,7 @@ export default class SequenceBox extends CompositeField {
     return newAutoDate;
   }
 
-// The new sequence-box sets the label to invisible on the model.
+  // The new sequence-box sets the label to invisible on the model.
   _modifyLabel(field) {
     if (field instanceof CheckBoxField) {
       field.labelVisible = false;

@@ -31,7 +31,6 @@ export default class AggregateTableControl extends TableControl {
     this.resizerVisible = false;
   }
 
-
   static CONTAINER_ANIMATE_DURATION = 200;
 
   _init(model) {

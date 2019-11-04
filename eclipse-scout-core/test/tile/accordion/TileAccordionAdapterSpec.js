@@ -10,8 +10,7 @@
  */
 import {scout} from '../../../src/index';
 
-
-describe("TileAccordionAdapter", function() {
+describe('TileAccordionAdapter', function() {
   var session;
 
   beforeEach(function() {
@@ -38,9 +37,9 @@ describe("TileAccordionAdapter", function() {
     return tileAccordionAdapter.createWidget(model, model.parent);
   }
 
-  describe("initProperties", function() {
+  describe('initProperties', function() {
 
-    it("does not take filters from tile grid in remote case", function() {
+    it('does not take filters from tile grid in remote case', function() {
       var filter = scout.create('RemoteTileFilter');
       var accordion = createTileAccordion({
         groups: [{

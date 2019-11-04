@@ -19,7 +19,6 @@ export default class PopupBlockerDesktopNotification extends DesktopNotification
     this.preserveOpener = false;
   }
 
-
   _init(model) {
     super._init(model);
     this.linkText = scout.nvl(this.linkText, this.session.text('ui.OpenManually'));

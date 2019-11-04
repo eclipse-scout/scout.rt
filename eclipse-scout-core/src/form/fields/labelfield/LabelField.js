@@ -19,7 +19,6 @@ export default class LabelField extends ValueField {
     this.wrapText = false;
   }
 
-
   /**
    * Resolves the text key if value contains one.
    * This cannot be done in _init because the value field would call _setValue first

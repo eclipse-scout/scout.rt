@@ -53,7 +53,6 @@ export default class RadioButtonGroup extends ValueField {
     this._buttonPropertyChangeHandler = this._onButtonPropertyChange.bind(this);
   }
 
-
   static DEFAULT_GRID_COLUMN_COUNT = -1;
 
   static ErrorCode = {

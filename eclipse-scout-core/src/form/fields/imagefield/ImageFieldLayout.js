@@ -16,7 +16,6 @@ export default class ImageFieldLayout extends FormFieldLayout {
     super(imageField);
   }
 
-
   layout($container) {
     super.layout($container);
     scrollbars.update(this.formField.$fieldContainer);

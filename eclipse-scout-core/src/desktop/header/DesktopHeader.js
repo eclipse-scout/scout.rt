@@ -24,7 +24,6 @@ export default class DesktopHeader extends Widget {
     this._viewButtonBoxPropertyChangeHandler = this._onViewButtonBoxPropertyChange.bind(this);
   }
 
-
   _init(model) {
     super._init(model);
     this.desktop = this.session.desktop;

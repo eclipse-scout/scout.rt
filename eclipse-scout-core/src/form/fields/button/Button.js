@@ -34,7 +34,6 @@ export default class Button extends FormField {
     this._addCloneProperties(['defaultButton', 'displayStyle', 'iconId', 'keyStroke', 'processButton', 'selected', 'systemType', 'preventDoubleClick', 'stackable', 'shrinkable']);
   }
 
-
   static SystemType = {
     NONE: 0,
     CANCEL: 1,
@@ -422,9 +421,8 @@ export default class Button extends FormField {
   getFocusableElement() {
     if (this.adaptedBy) {
       return this.adaptedBy.getFocusableElement();
-    } else {
-      return super.getFocusableElement();
     }
+    return super.getFocusableElement();
   }
 
   /**
@@ -433,9 +431,8 @@ export default class Button extends FormField {
   isFocusable() {
     if (this.adaptedBy) {
       return this.adaptedBy.isFocusable();
-    } else {
-      return super.isFocusable();
     }
+    return super.isFocusable();
   }
 
   /**
@@ -444,8 +441,7 @@ export default class Button extends FormField {
   focus() {
     if (this.adaptedBy) {
       return this.adaptedBy.focus();
-    } else {
-      return super.focus();
     }
+    return super.focus();
   }
 }

@@ -10,7 +10,6 @@
  */
 import {scout} from '../../../src/index';
 
-
 describe('ViewButtonBox', function() {
   var session, desktop, outlineHelper;
 

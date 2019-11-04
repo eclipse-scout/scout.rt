@@ -18,7 +18,6 @@ export default class TagChooserPopup extends Popup {
     this.table = null;
   }
 
-
   _init(model) {
     super._init(model);
 

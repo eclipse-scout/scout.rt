@@ -11,8 +11,7 @@
 import {FormField, GroupBox, HtmlEnvironment, ResponsiveManager, scout} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("GroupBoxResponsiveHandler", function() {
+describe('GroupBoxResponsiveHandler', function() {
   var session;
   var helper;
 
@@ -102,14 +101,14 @@ describe("GroupBoxResponsiveHandler", function() {
     }
   }
 
-  describe("handleResponsive", function() {
+  describe('handleResponsive', function() {
     var groupBox;
 
     beforeEach(function() {
       groupBox = createGroupBox();
     });
 
-    it("switches to condensed mode if width under threshold", function() {
+    it('switches to condensed mode if width under threshold', function() {
       // normal state
       groupBox.render($('#sandbox'));
       groupBox.$container.cssWidth(normalWidth);
@@ -132,7 +131,7 @@ describe("GroupBoxResponsiveHandler", function() {
 
     });
 
-    it("switches to compact mode if width under threshold", function() {
+    it('switches to compact mode if width under threshold', function() {
       // normal state
       groupBox.render($('#sandbox'));
       groupBox.$container.cssWidth(normalWidth);
@@ -159,7 +158,7 @@ describe("GroupBoxResponsiveHandler", function() {
       expectNormal(groupBox);
     });
 
-    it("does not switch inner group box to condensed mode if inner group box is not responsive", function() {
+    it('does not switch inner group box to condensed mode if inner group box is not responsive', function() {
       groupBox.fields[3].setResponsive(false);
 
       // normal state
@@ -182,7 +181,7 @@ describe("GroupBoxResponsiveHandler", function() {
       expectNormal(groupBox);
     });
 
-    it("reacts to dynamically inserted field", function() {
+    it('reacts to dynamically inserted field', function() {
       groupBox.fields[3].setResponsive(false);
 
       // normal state
@@ -215,14 +214,14 @@ describe("GroupBoxResponsiveHandler", function() {
     });
   });
 
-  describe("setResponsive", function() {
+  describe('setResponsive', function() {
     var groupBox;
 
     beforeEach(function() {
       groupBox = createGroupBox();
     });
 
-    it("switches the responsive state for the inner group box", function() {
+    it('switches the responsive state for the inner group box', function() {
       // normal state
       groupBox.render($('#sandbox'));
       groupBox.$container.cssWidth(normalWidth);

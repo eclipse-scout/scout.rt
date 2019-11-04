@@ -10,8 +10,7 @@
  */
 import {Range, scout} from '../../src/index';
 
-
-describe("VirtualTileGrid", function() {
+describe('VirtualTileGrid', function() {
   var session;
 
   beforeEach(function() {
@@ -24,7 +23,7 @@ describe("VirtualTileGrid", function() {
     for (var i = 0; i < numTiles; i++) {
       tiles.push({
         objectType: 'Tile',
-        label: "Tile " + i
+        label: 'Tile ' + i
       });
     }
     var defaults = {
@@ -444,13 +443,13 @@ describe("VirtualTileGrid", function() {
         viewRangeSize: 1
       });
       var tile0 = createTile({
-        label: "a"
+        label: 'a'
       });
       var tile1 = createTile({
-        label: "b"
+        label: 'b'
       });
       var tile2 = createTile({
-        label: "c"
+        label: 'c'
       });
       tileGrid.insertTiles([tile0, tile1]);
 
@@ -605,10 +604,10 @@ describe("VirtualTileGrid", function() {
         viewRangeSize: 1
       });
       var tile3 = createTile({
-        label: "Tile 3"
+        label: 'Tile 3'
       });
       var tile4 = createTile({
-        label: "Tile 4"
+        label: 'Tile 4'
       });
       expect(tileGrid.tiles.length).toBe(3);
 

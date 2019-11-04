@@ -23,7 +23,6 @@ export default class BasicField extends ValueField {
     this.updateDisplayTextOnModifyDelay = 250; // in milliseconds
   }
 
-
   addField($field) {
     super.addField($field);
     if ($field) {

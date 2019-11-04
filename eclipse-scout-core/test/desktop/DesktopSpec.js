@@ -11,7 +11,6 @@
 import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
 import {arrays, Desktop, Device, Form, RemoteEvent, scout, Status, strings, Widget} from '../../src/index';
 
-
 describe('Desktop', function() {
   var session, desktop, outlineHelper, formHelper;
 

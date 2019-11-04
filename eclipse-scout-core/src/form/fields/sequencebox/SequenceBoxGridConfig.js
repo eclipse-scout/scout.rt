@@ -16,7 +16,6 @@ export default class SequenceBoxGridConfig extends LogicalGridConfig {
     super();
   }
 
-
   getGridColumnCount() {
     return this.widget.fields.length;
   }

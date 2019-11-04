@@ -62,7 +62,6 @@ export default class TableHeaderMenu extends Popup {
     this.inheritAccessibility = false;
   }
 
-
   static CheckedMode = {
     ALL: {
       checkAll: true,
@@ -944,8 +943,8 @@ export default class TableHeaderMenu extends Popup {
     this._updateFilterTableActions();
   }
 
-// When no filter value is selected, we change the selection mode to ALL
-// since it makes no sense to choose NONE when no value is currently selected
+  // When no filter value is selected, we change the selection mode to ALL
+  // since it makes no sense to choose NONE when no value is currently selected
   _updateFilterTableCheckedMode() {
     if (this.filter.selectedValues.length === 0) {
       this.filterCheckedMode = TableHeaderMenu.CheckedMode.ALL;

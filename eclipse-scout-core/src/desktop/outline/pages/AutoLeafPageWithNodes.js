@@ -22,7 +22,6 @@ export default class AutoLeafPageWithNodes extends Page {
     this.leaf = true;
   }
 
-
   /**
    * @override Page.js
    */

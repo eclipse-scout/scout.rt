@@ -24,7 +24,6 @@ export default class TreeNavigationDownKeyStroke extends AbstractTreeNavigationK
     }.bind(this);
   }
 
-
   _computeNewSelection(currentNode) {
     var nodes = this.field.visibleNodesFlat;
     if (nodes.length === 0) {

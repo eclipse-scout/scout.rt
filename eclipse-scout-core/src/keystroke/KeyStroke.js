@@ -34,9 +34,8 @@ export default class KeyStroke {
       render: function() {
         if (this.field && this.field.rendered !== undefined) {
           return this.field.rendered; // only render key if associated field is visible.
-        } else {
-          return true; // by default, keystrokes are rendered
         }
+        return true; // by default, keystrokes are rendered
       }.bind(this),
       gap: 4,
       offset: 4,
@@ -63,7 +62,9 @@ export default class KeyStroke {
    * Parses the given keystroke name into the key parts like 'ctrl', 'shift', 'alt' and 'which'.
    */
   parseAndSetKeyStroke(keyStrokeName) {
-    this.alt = this.ctrl = this.shift = false;
+    this.alt = false;
+    this.ctrl = false;
+    this.shift = false;
     this.which = [];
     if (keyStrokeName) {
       $.extend(this, KeyStroke.parseKeyStroke(keyStrokeName));
@@ -85,7 +86,7 @@ export default class KeyStroke {
 
     // Apply propagation flags to the event.
     this._applyPropagationFlags(event);
-    //only accept on correct event type -> keyup or keydown. But propagation flags should be set to prevent execution of upper keyStrokes.
+    // only accept on correct event type -> keyup or keydown. But propagation flags should be set to prevent execution of upper keyStrokes.
     return event.type === this.keyStrokeMode;
   }
 
@@ -244,7 +245,7 @@ export default class KeyStroke {
    * Method invoked after this keystroke was rendered, and is typically overwritten to reposition the visual representation.
    */
   _postRenderKeyBox($drawingArea) {
-  };
+  }
 
   /**
    * Removes the visual representation of this keystroke.
@@ -261,7 +262,7 @@ export default class KeyStroke {
     DOWN: 'keydown'
   };
 
-// --- Static helpers --- //
+  // --- Static helpers --- //
 
   /**
    * Parses the given keystroke name into the key parts like 'ctrl', 'shift', 'alt' and 'which'.
@@ -302,7 +303,7 @@ export default class KeyStroke {
     if (!keyStroke) {
       return false;
     }
-    //event.ctrlKey||event.metaKey  --> some keystrokes with ctrl modifier are captured and suppressed by osx use in this cases command key
+    // event.ctrlKey||event.metaKey  --> some keystrokes with ctrl modifier are captured and suppressed by osx use in this cases command key
     return KeyStroke._acceptModifier(keyStroke.ctrl, (event.ctrlKey || event.metaKey)) &&
       KeyStroke._acceptModifier(keyStroke.alt, event.altKey) &&
       KeyStroke._acceptModifier(keyStroke.shift, event.shiftKey) &&

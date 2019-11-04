@@ -24,7 +24,6 @@ export default class EllipsisMenu extends Menu {
     this._addPreserveOnPropertyChangeProperties(['childActions']);
   }
 
-
   _render() {
     super._render();
     this.$container.addClass('ellipsis');
@@ -46,7 +45,7 @@ export default class EllipsisMenu extends Menu {
     this._renderHidden();
   }
 
-// add the set hidden function to the ellipsis
+  // add the set hidden function to the ellipsis
   setHidden(hidden) {
     this.setProperty('hidden', hidden);
   }

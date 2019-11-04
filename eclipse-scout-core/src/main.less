@@ -22,7 +22,7 @@ body {
   /* Prevent mobile safari from adjusting text, due to our dynamic layouting it will be always wrong */
   -webkit-text-size-adjust: none;
   /* Disable highlight color. May be enabled for specific elements if required */
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
   &.ios {
     /* Body can be moved on ios even if it isn't scrollable. Prevent it by using position: fixed.
@@ -38,6 +38,7 @@ body {
 ::-moz-selection {
   #scout.text-selection();
 }
+
 ::selection {
   #scout.text-selection();
 }
@@ -45,12 +46,15 @@ body {
 ::-webkit-input-placeholder {
   #scout.placeholder();
 }
+
 :-moz-placeholder { /* older versions of firefox */
   #scout.placeholder();
 }
+
 ::-moz-placeholder {
   #scout.placeholder();
 }
+
 :-ms-input-placeholder {
   #scout.placeholder();
 }
@@ -63,6 +67,7 @@ body {
   width: 0;
   height: 0;
 }
+
 ::-ms-reveal {
   width: 0;
   height: 0;
@@ -72,6 +77,7 @@ body {
   &::-moz-selection {
     #scout.text-selection-disabled();
   }
+
   &::selection {
     #scout.text-selection-disabled();
   }
@@ -81,12 +87,15 @@ body {
     /* Fill color is inherited, make sure it is ignored and the current color is used instead. Needed for iOS, see usage of -webkit-text-fill-color below*/
     -webkit-text-fill-color: currentcolor;
   }
+
   &:-moz-placeholder { /* older versions of firefox */
     #scout.placeholder-disabled();
   }
+
   &::-moz-placeholder {
     #scout.placeholder-disabled();
   }
+
   &:-ms-input-placeholder {
     #scout.placeholder-disabled();
   }
@@ -435,6 +444,7 @@ textarea {
 .col-resize * { /* NOSONAR (universal selector is okay here) */
   cursor: col-resize !important; /* NOSONAR (!important is okay here) */
 }
+
 .row-resize,
 .row-resize * { /* NOSONAR (universal selector is okay here) */
   cursor: row-resize !important; /* NOSONAR (!important is okay here) */

@@ -18,7 +18,6 @@ export default class PlannerLayout extends AbstractLayout {
     this.planner = planner;
   }
 
-
   layout($container) {
     var menuBarSize,
       $header = this.planner._header.$container,
@@ -148,7 +147,7 @@ export default class PlannerLayout extends AbstractLayout {
       cellInsets = graphics.insets($scaleItemsSmall, {
         includeBorder: false
       }),
-      minWidth = numScaleItemsSmall * cellInsets.horizontal(); //no matter what, this width must never be deceeded
+      minWidth = numScaleItemsSmall * cellInsets.horizontal(); // no matter what, this width must never be deceeded
 
     if (this.planner.displayMode === displayMode.DAY) {
       return Math.max(minWidth, numScaleItemsLarge * 52);

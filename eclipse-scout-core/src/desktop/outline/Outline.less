@@ -15,7 +15,7 @@
     color: @outline-in-background-selection-color;
   }
 
-  & > .tree-data  {
+  & > .tree-data {
 
     & > .scrollbar {
 
@@ -146,7 +146,7 @@
         }
       }
 
-      & > .menu-item:not(.menu-textandicon):focus::after  {
+      & > .menu-item:not(.menu-textandicon):focus::after {
         #scout.focus-border-inverted();
       }
     }
@@ -275,8 +275,8 @@
 
   & > .tree-data {
 
-    & > .tree-node  {
-       padding: 0;
+    & > .tree-node {
+      padding: 0;
 
       & > .text {
         display: inline-block;
@@ -317,12 +317,24 @@
   }
 }
 
-  /*** Previous Selection Animation ***/
+/*** Previous Selection Animation ***/
 
-  .keyframes-tree-node-prev-selection() {
-    00%  { background-color: @outline-breadcrumb-child-active-background-color; }
-    100%  { background-color: @outline-breadcrumb-child-background-color; }
+.keyframes-tree-node-prev-selection() {
+  00% {
+    background-color: @outline-breadcrumb-child-active-background-color;
   }
+  100% {
+    background-color: @outline-breadcrumb-child-background-color;
+  }
+}
 
-  @-webkit-keyframes tree-node-prev-selection { .keyframes-tree-node-prev-selection(); } /* NOSONAR */
-  @keyframes tree-node-prev-selection { .keyframes-tree-node-prev-selection(); } /* NOSONAR */
+@-webkit-keyframes tree-node-prev-selection {
+  .keyframes-tree-node-prev-selection();
+}
+
+/* NOSONAR */
+@keyframes tree-node-prev-selection {
+  .keyframes-tree-node-prev-selection();
+}
+
+/* NOSONAR */

@@ -10,7 +10,6 @@
  */
 import {Action, GroupBoxMenuItemsOrder, NullWidget, scout} from '../../../../src/index';
 
-
 describe('GroupBoxMenuItemsOrder', function() {
 
   beforeEach(function() {

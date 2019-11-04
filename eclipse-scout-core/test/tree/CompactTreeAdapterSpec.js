@@ -11,8 +11,7 @@
 import {RemoteEvent} from '../../src/index';
 import {TreeSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("CompactTreeAdapter", function() {
+describe('CompactTreeAdapter', function() {
   var session;
   var helper;
 
@@ -32,9 +31,9 @@ describe("CompactTreeAdapter", function() {
     $.fx.off = false;
   });
 
-  describe("selectNodes", function() {
+  describe('selectNodes', function() {
 
-    it("selects child node and notifies server if server selects the first title node", function() {
+    it('selects child node and notifies server if server selects the first title node', function() {
       var model = helper.createModelFixture(2, 1, true);
       var adapter = helper.createCompactTreeAdapter(model);
       var tree = adapter.createWidget(model, session.desktop);

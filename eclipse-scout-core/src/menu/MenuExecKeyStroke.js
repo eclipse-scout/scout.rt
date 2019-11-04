@@ -24,7 +24,6 @@ export default class MenuExecKeyStroke extends KeyStroke {
     }.bind(this);
   }
 
-
   /**
    * @override KeyStroke.js
    */

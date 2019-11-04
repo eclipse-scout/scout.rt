@@ -17,7 +17,6 @@ export default class TileTableHeaderSortByLookupCall extends StaticLookupCall {
     this.table = null;
   }
 
-
   _init(model) {
     super._init(model);
   }
@@ -26,16 +25,20 @@ export default class TileTableHeaderSortByLookupCall extends StaticLookupCall {
     var lookupRows = [];
     this.table.visibleColumns().forEach(function(column) {
       if (column.isSortingPossible()) {
-        lookupRows.push([{
-          column: column,
-          asc: true
-        }, scout.nvl(column.text, column.headerTooltipText) + ' (' + this.session.text('ui.ascending') + ')',
+        lookupRows.push([
+          {
+            column: column,
+            asc: true
+          },
+          scout.nvl(column.text, column.headerTooltipText) + ' (' + this.session.text('ui.ascending') + ')',
           icons.LONG_ARROW_UP_BOLD
         ]);
-        lookupRows.push([{
-          column: column,
-          asc: false
-        }, scout.nvl(column.text, column.headerTooltipText) + ' (' + this.session.text('ui.descending') + ')',
+        lookupRows.push([
+          {
+            column: column,
+            asc: false
+          },
+          scout.nvl(column.text, column.headerTooltipText) + ' (' + this.session.text('ui.descending') + ')',
           icons.LONG_ARROW_DOWN_BOLD
         ]);
       }

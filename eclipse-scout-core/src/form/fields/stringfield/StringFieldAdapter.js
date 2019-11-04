@@ -16,7 +16,6 @@ export default class StringFieldAdapter extends BasicFieldAdapter {
     super();
   }
 
-
   _initProperties(model) {
     if (model.insertText !== undefined) {
       // ignore pseudo property initially (to prevent the function StringField#insertText() to be replaced)

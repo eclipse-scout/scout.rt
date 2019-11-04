@@ -18,7 +18,6 @@ export default class TimePickerPopupLayout extends PopupLayout {
     this.doubleCalcPrefSize = false;
   }
 
-
   layout($container) {
     var size,
       htmlComp = this.popup.htmlComp,

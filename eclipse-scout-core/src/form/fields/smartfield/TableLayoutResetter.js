@@ -10,7 +10,6 @@
  */
 import * as $ from 'jquery';
 
-
 /**
  * This class is used to reset and restore styles in the DOM, so we can measure the preferred size of the table.
  */

@@ -16,7 +16,6 @@ export default class MessageBoxAdapter extends ModelAdapter {
     super();
   }
 
-
   _onWidgetAction(event) {
     this._send('action', {
       option: event.option

@@ -15,7 +15,6 @@ import * as $ from 'jquery';
  * This file contains helpers for graphical operations
  */
 
-
 /**
  * Returns the preferred size of $elem.
  * Precondition: $elem and it's parents must not be hidden (display: none. Visibility: hidden would be ok
@@ -414,7 +413,6 @@ export function offset($elem) {
   return new Point(pos.left, pos.top);
 }
 
-//private
 export function _bounds($elem, pos, options) {
   var s = size($elem, options);
   return new Rectangle(pos.left, pos.top, s.width, s.height);

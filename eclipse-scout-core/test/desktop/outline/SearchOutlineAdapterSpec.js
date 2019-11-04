@@ -11,8 +11,7 @@
 import {scout} from '../../../src/index';
 import {OutlineSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("SearchOutlineAdapter", function() {
+describe('SearchOutlineAdapter', function() {
   var helper, session;
 
   beforeEach(function() {
@@ -28,11 +27,11 @@ describe("SearchOutlineAdapter", function() {
     jasmine.clock().uninstall();
   });
 
-  describe("onModelPropertyChange", function() {
+  describe('onModelPropertyChange', function() {
 
-    describe("requestFocusQueryField", function() {
+    describe('requestFocusQueryField', function() {
 
-      it("may be called multiple times", function() {
+      it('may be called multiple times', function() {
         var outline = scout.create(createSimpleModel('SearchOutline', session));
         linkWidgetAndAdapter(outline, 'SearchOutlineAdapter');
         outline.render();

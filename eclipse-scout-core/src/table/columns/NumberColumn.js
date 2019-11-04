@@ -29,7 +29,6 @@ export default class NumberColumn extends Column {
     this.allowedAggregationFunctions = ['sum', 'avg', 'min', 'max', 'none'];
   }
 
-
   /**
    * @override Column.js
    */

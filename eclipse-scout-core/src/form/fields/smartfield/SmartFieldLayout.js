@@ -20,7 +20,6 @@ export default class SmartFieldLayout extends FormFieldLayout {
     this._smartField = smartField;
   }
 
-
   layout($container) {
     super.layout($container);
 

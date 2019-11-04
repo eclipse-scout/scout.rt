@@ -141,6 +141,7 @@ export default class LogicalGridLayoutInfo {
       // Use explicit width hint, if set
       if (cons.widthHint > 0) {
         size.width = cons.widthHint;
+        // eslint-disable-next-line brace-style
       }
       // Calculate preferred width otherwise
       // This size is needed by _initializeColumns
@@ -151,10 +152,9 @@ export default class LogicalGridLayoutInfo {
       // Use explicit height hint, if set
       if (cons.heightHint > 0) {
         size.height = cons.heightHint;
-      }
-      // Otherwise check if preferred height should be calculated.
-      // Don't do it now because because weightX need to be calculated first to get the correct width hints
-      else if (cons.useUiHeight || !cons.fillVertical) {
+      } else if (cons.useUiHeight || !cons.fillVertical) {
+        // Otherwise check if preferred height should be calculated.
+        // Don't do it now because because weightX need to be calculated first to get the correct width hints
         uiHeightElements.push({
           cons: cons,
           $comp: $comp,
@@ -469,7 +469,7 @@ export default class LogicalGridLayoutInfo {
     // expand or shrink
     if (Math.abs(deltaInt) > 0) {
       // setup accumulators
-      /*float[]*/
+      /* float[] */
       var accWeight = arrays.init(tmpWeight.length, 0.0);
       var hasTargets;
       if (deltaInt > 0) {

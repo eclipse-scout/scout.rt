@@ -17,7 +17,6 @@ export default class Notification extends Widget {
     this.status = Status.info();
   }
 
-
   _init(model) {
     super._init(model);
 

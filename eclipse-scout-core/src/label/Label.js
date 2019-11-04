@@ -10,7 +10,6 @@ export default class Label extends Widget {
     this.scrollable = false;
   }
 
-
   /**
    * @override
    */

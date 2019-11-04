@@ -10,10 +10,9 @@
  */
 import {CheckBoxField, ValueField} from '../../../../src/index';
 
+describe('CheckBoxFieldWithTriState', function() {
 
-describe("CheckBoxFieldWithTriState", function() {
-
-  describe("inheritance", function() {
+  describe('inheritance', function() {
 
     var session;
     var checkBoxField;
@@ -28,11 +27,11 @@ describe("CheckBoxFieldWithTriState", function() {
       checkBoxField.init(model);
     });
 
-    it("inherits from ValueField", function() {
+    it('inherits from ValueField', function() {
       expect(ValueField.prototype.isPrototypeOf(checkBoxField)).toBe(true);
     });
 
-    it("_renderValue sets checked and undefined classes", function() {
+    it('_renderValue sets checked and undefined classes', function() {
       var $div = $('<div>');
       checkBoxField.render($div);
 
@@ -50,7 +49,7 @@ describe("CheckBoxFieldWithTriState", function() {
       expect(checkBoxField.$checkBox.hasClass('undefined')).toBe(false);
     });
 
-    it("_renderValue sets disabled property", function() {
+    it('_renderValue sets disabled property', function() {
       var $div = $('<div>');
       checkBoxField.render($div);
 

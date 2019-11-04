@@ -11,7 +11,6 @@
 import {FormField, GridData, RadioButtonGroup, scout, Status, StringField, TreeVisitResult, Widget} from '../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('FormField', function() {
   var session;
   var helper;

@@ -34,7 +34,6 @@ export default class ValueField extends FormField {
     this._addCloneProperties(['value', 'displayText', 'clearable']);
   }
 
-
   static Clearable = {
     /**
      * The clear icon is showed when the field has text.
@@ -603,7 +602,7 @@ export default class ValueField extends FormField {
     this.empty = this.value === null || this.value === undefined;
   }
 
-// ==== static helper methods ==== //
+  // ==== static helper methods ==== //
 
   /**
    * Invokes 'ValueField.aboutToBlurByMouseDown' on the currently active value field.

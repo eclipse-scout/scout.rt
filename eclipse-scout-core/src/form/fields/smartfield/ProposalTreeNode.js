@@ -17,7 +17,6 @@ export default class ProposalTreeNode extends TreeNode {
     super();
   }
 
-
   _init(model) {
     super._init(model);
   }

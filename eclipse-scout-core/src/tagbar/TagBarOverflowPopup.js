@@ -26,7 +26,6 @@ export default class TagBarOverflowPopup extends PopupWithHead {
     };
   }
 
-
   _init(options) {
     super._init(options);
     this._tagBarPropertyChangeListener = this._onTagBarPropertyChange.bind(this);

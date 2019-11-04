@@ -17,7 +17,6 @@ export default class TileButton extends Button {
     this.processButton = false;
   }
 
-
   _render() {
     if (this.parent.displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
       super._render();

@@ -20,7 +20,6 @@ export default class TagFieldOpenPopupKeyStroke extends KeyStroke {
     this.preventDefault = false;
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     if (!accepted) {

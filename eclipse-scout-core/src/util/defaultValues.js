@@ -11,7 +11,6 @@
 import {objects, strings, TypeDescriptor} from '../index';
 import * as $ from 'jquery';
 
-
 /**
  * map of "objectType" -> { defaultValuesObject }
  */
@@ -50,7 +49,6 @@ export function init(data) {
   }, this);
 }
 
-//private
 export function _generateObjectTypeHierarchyRec(json, currentParentObjectTypes, targetMap) {
   if (!json) {
     return;
@@ -95,7 +93,6 @@ export function applyTo(object, objectType) {
   }
 }
 
-//private
 export function _applyToInternal(object, objectType) {
   var objectTypeHierarchy = _objectTypeHierarchyFlat[objectType];
   if (!objectTypeHierarchy) {
@@ -115,7 +112,6 @@ export function _applyToInternal(object, objectType) {
   }
 }
 
-//private
 export function _extendWithDefaults(object, defaults) {
   if (object === undefined || defaults === undefined) {
     return;
@@ -132,15 +128,13 @@ export function _extendWithDefaults(object, defaults) {
     // If property does not exist, set the default value and return.
     if (object[realProp] === undefined) {
       object[realProp] = objects.valueCopy(defaults[realProp]);
-    }
-    // Special case: "default objects". If the property value is an object and default
-    // value is also an object, extend the property value instead of replacing it.
-    else if (objects.isPlainObject(object[realProp]) && objects.isPlainObject(defaults[prop])) {
+    } else if (objects.isPlainObject(object[realProp]) && objects.isPlainObject(defaults[prop])) {
+      // Special case: "default objects". If the property value is an object and default
+      // value is also an object, extend the property value instead of replacing it.
       _extendWithDefaults(object[realProp], defaults[prop]);
-    }
-    // Special case: "array of default objects": If the property value is an array of objects and
-    // the default value is an object, extend each object in the array with the default value.
-    else if (Array.isArray(object[realProp]) && objects.isPlainObject(defaults[prop])) {
+    } else if (Array.isArray(object[realProp]) && objects.isPlainObject(defaults[prop])) {
+      // Special case: "array of default objects": If the property value is an array of objects and
+      // the default value is an object, extend each object in the array with the default value.
       var objectArray = object[realProp];
       for (var i = 0; i < objectArray.length; i++) {
         if (objects.isPlainObject(objectArray[i])) {
@@ -150,7 +144,6 @@ export function _extendWithDefaults(object, defaults) {
     }
   }, this);
 }
-
 
 export default {
   applyTo,

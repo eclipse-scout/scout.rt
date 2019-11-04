@@ -11,7 +11,6 @@
 import {arrays, keys, scout, TagChooserPopup, TagField} from '../../../../src/index';
 import {DummyLookupCall, FormSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('TagField', function() {
 
   var session, field, lookupRow, helper;
@@ -38,6 +37,7 @@ describe('TagField', function() {
     var $input = field.$container.find('input');
     $input.val(text);
     $input.focus();
+    // eslint-disable-next-line new-cap
     $input.trigger(jQuery.Event('keyup', {
       keyCode: keyCode
     }));
@@ -108,6 +108,7 @@ describe('TagField', function() {
       // trigger a keydown event, all the flags are required  to pass
       // the accept-checks in KeyStroke.js
       var $input = field.$container.find('input');
+      // eslint-disable-next-line new-cap
       $input.trigger(jQuery.Event('keydown', {
         keyCode: keys.ENTER,
         which: keys.ENTER,

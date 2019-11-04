@@ -18,7 +18,6 @@ export default class TileTableHierarchyFilter extends TableFilter {
     $.extend(this, model);
   }
 
-
   createKey() {
     return 'TileTableHierarchyFilter';
   }

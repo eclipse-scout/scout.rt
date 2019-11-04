@@ -64,6 +64,7 @@ import * as $ from 'jquery';
 
 export default class Table extends Widget {
   constructor() {
+
     super();
 
     this.autoResizeColumns = false;
@@ -151,7 +152,6 @@ export default class Table extends Widget {
     this.$data = null;
     this.$emptyData = null;
   }
-
 
   // TODO [7.0] cgu create StringColumn.js incl. defaultValues from defaultValues.json
 
@@ -2851,6 +2851,7 @@ export default class Table extends Widget {
             row.status = TableRow.Status.UPDATED;
             return true; // break "some()" loop
           }
+          return false;
         });
       }
       // selection
@@ -3667,13 +3668,10 @@ export default class Table extends Widget {
   }
 
   hasUserFilter() {
-    return Object.keys(this._filterMap).map(function(key) {
-      this._filterMap[key];
-    }, this)
-      .filter(function(filter) {
+    return Object.values(this._filterMap)
+      .some(function(filter) {
         return filter instanceof TableUserFilter;
-      })
-      .length > 0;
+      });
   }
 
   resizeToFit(column, maxWidth) {

@@ -11,7 +11,6 @@
 import {BooleanColumn} from '../../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('BooleanColumn', function() {
   var session;
   var helper;

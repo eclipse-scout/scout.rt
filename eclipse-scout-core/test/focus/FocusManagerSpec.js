@@ -11,7 +11,6 @@
 import {FocusManagerSpecHelper, FormSpecHelper, TableSpecHelper, TreeSpecHelper} from '@eclipse-scout/testing';
 import {Device, focusUtils, scout} from '../../src/index';
 
-
 /* global FocusManagerSpecHelper */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 describe('scout.FocusManager', function() {
@@ -169,7 +168,6 @@ describe('scout.FocusManager', function() {
         $firstField.remove();
         expect($secondField).toBeFocused();
       });
-
 
       it('Must focus another valid field if the focused field is hidden', function() {
         var $firstField = form.rootGroupBox.fields[0].$field,

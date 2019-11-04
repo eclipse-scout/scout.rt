@@ -20,7 +20,6 @@ export default class PopupLayout extends AbstractLayout {
     this.autoSize = true;
   }
 
-
   layout($container) {
     if (this.popup.isOpeningAnimationRunning()) {
       this.popup.$container.oneAnimationEnd(this.layout.bind(this, $container));

@@ -11,7 +11,6 @@
 import {arrays, Device, FormField, HtmlComponent, scout, TagBarLayout, tooltips, Widget} from '../index';
 import * as $ from 'jquery';
 
-
 export default class TagBar extends Widget {
 
   constructor() {
@@ -29,7 +28,6 @@ export default class TagBar extends Widget {
      */
     this.clickable = false;
   }
-
 
   _render() {
     this.$container = this.$parent.appendDiv('tag-bar');
@@ -233,7 +231,7 @@ export default class TagBar extends Widget {
     return tags;
   }
 
-//--- static helpers ---
+  // --- static helpers ---
 
   static findFocusedTagElement($container) {
     return $container.find('.tag-element.focused');

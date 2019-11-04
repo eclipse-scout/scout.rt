@@ -10,7 +10,7 @@
  */
 import * as models from '../../src/util/models';
 
-describe("scout.models", function() {
+describe('scout.models', function() {
 
   describe('get', function() {
 

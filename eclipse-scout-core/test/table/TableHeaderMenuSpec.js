@@ -11,7 +11,6 @@
 import {ColumnUserFilter, TableHeaderMenu} from '../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('TableHeaderMenu', function() {
   var session;
   var helper;

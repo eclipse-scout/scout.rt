@@ -24,7 +24,6 @@ export default class TreeNavigationUpKeyStroke extends AbstractTreeNavigationKey
     }.bind(this);
   }
 
-
   _computeNewSelection(currentNode) {
     var nodes = this.field.visibleNodesFlat;
     if (nodes.length === 0) {

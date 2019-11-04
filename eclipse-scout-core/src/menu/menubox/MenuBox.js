@@ -19,7 +19,6 @@ export default class MenuBox extends Widget {
     this._addWidgetProperties('menus');
   }
 
-
   _init(options) {
     super._init(options);
     this.menus = options.menus || [];

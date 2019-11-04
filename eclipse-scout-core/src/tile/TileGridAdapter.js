@@ -18,7 +18,6 @@ export default class TileGridAdapter extends ModelAdapter {
     this._tileFilter = null;
   }
 
-
   _syncSelectedTiles(tiles) {
     // TileGrid.js won't modify the selectedTiles array while processing the response -> ignore every selectedTiles property change
     this.addFilterForPropertyName('selectedTiles');

@@ -23,7 +23,6 @@ export default class TableSelectAllKeyStroke extends KeyStroke {
     }.bind(this);
   }
 
-
   handle(event) {
     var table = this.field;
     table.toggleSelection();

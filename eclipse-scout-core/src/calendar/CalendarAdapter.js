@@ -16,7 +16,6 @@ export default class CalendarAdapter extends ModelAdapter {
     super();
   }
 
-
   /**
    * We must send the view-range to the client-model on the server. The view-range is determined by the UI.
    * Thus the calendar cannot be completely initialized without the view-range from the UI.

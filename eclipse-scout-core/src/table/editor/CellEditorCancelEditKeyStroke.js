@@ -19,7 +19,6 @@ export default class CellEditorCancelEditKeyStroke extends KeyStroke {
     this.stopPropagation = true;
   }
 
-
   handle(event) {
     this.field.cancelEdit();
   }

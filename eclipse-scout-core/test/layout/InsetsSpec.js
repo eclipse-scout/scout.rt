@@ -21,9 +21,9 @@ import {Insets} from '../../src/index';
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-describe("Insets", function() {
+describe('Insets', function() {
 
-  it("equals", function() {
+  it('equals', function() {
     var i1 = new Insets(0, 0, 10, 5);
     var i2 = new Insets(0, 0, 20, -1);
     var i3 = new Insets(0, 0, 20, -1);

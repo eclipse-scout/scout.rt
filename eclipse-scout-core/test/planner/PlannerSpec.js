@@ -10,8 +10,7 @@
  */
 import {DateRange, dates, ObjectFactory, Planner} from '../../src/index';
 
-
-describe("Planner", function() {
+describe('Planner', function() {
   var session;
   var helper;
 
@@ -69,7 +68,7 @@ describe("Planner", function() {
     return resource.$cells.children('.planner-activity');
   }
 
-  describe("deleteResources", function() {
+  describe('deleteResources', function() {
     var model, planner, resource0, resource1, resource2;
 
     beforeEach(function() {
@@ -80,7 +79,7 @@ describe("Planner", function() {
       resource2 = model.resources[2];
     });
 
-    it("deletes resources from model", function() {
+    it('deletes resources from model', function() {
       expect(planner.resources.length).toBe(3);
       expect(planner.resources[0]).toBe(resource0);
       expect(Object.keys(planner.resourceMap).length).toBe(3);
@@ -103,7 +102,7 @@ describe("Planner", function() {
       expect(planner.activityMap.length).toBe(0);
     });
 
-    it("deletes resources from html document", function() {
+    it('deletes resources from html document', function() {
       planner.render();
       expect(find$Resources(planner).length).toBe(3);
 
@@ -115,7 +114,7 @@ describe("Planner", function() {
       expect(find$Resources(planner).length).toBe(0);
     });
 
-    it("also adjusts selectedResources and selectionRange if deleted resource was selected", function() {
+    it('also adjusts selectedResources and selectionRange if deleted resource was selected', function() {
       planner.selectedResources = [resource0];
       expect(planner.selectedResources.length).toBe(1);
       planner.deleteResources([resource0]);
@@ -126,7 +125,7 @@ describe("Planner", function() {
 
   });
 
-  describe("updateResources", function() {
+  describe('updateResources', function() {
     var model, planner, resource0, resource1, resource2, $resource1;
 
     beforeEach(function() {
@@ -137,7 +136,7 @@ describe("Planner", function() {
       resource2 = model.resources[2];
     });
 
-    it("updates resources in model", function() {
+    it('updates resources in model', function() {
       expect(planner.resources[1]).toBe(resource1);
       expect(planner.resources[1].resourceCell.text).toBe('resource1');
       expect(planner.resourceMap[resource1.id]).toBe(planner.resources[1]);
@@ -150,7 +149,7 @@ describe("Planner", function() {
       expect(planner.resourceMap[resource1.id]).toBe(planner.resources[1]);
     });
 
-    it("updates resources in html document", function() {
+    it('updates resources in html document', function() {
       planner.render();
       $resource1 = find$Resources(planner).eq(1);
       expect($resource1.children('.resource-title').text()).toBe('resource1');
@@ -165,7 +164,7 @@ describe("Planner", function() {
       expect($resource1.data('resource')).toBe(updatedResource);
     });
 
-    it("updates activities", function() {
+    it('updates activities', function() {
       planner.render();
       $resource1 = find$Resources(planner).eq(1);
       var $activity0 = find$ActivitiesForResource(resource1);
@@ -186,7 +185,7 @@ describe("Planner", function() {
     });
   });
 
-  describe("renderScale", function() {
+  describe('renderScale', function() {
     var model, planner;
 
     beforeEach(function() {
@@ -196,7 +195,7 @@ describe("Planner", function() {
       planner.displayModeOptions = {};
     });
 
-    describe("displayMode: DAY", function() {
+    describe('displayMode: DAY', function() {
 
       beforeEach(function() {
         planner.displayMode = Planner.DisplayMode.DAY;
@@ -233,7 +232,7 @@ describe("Planner", function() {
         }
       }
 
-      it("draws scale for whole day", function() {
+      it('draws scale for whole day', function() {
         planner.displayModeOptions[planner.displayMode] = {
           interval: 30,
           labelPeriod: 1,
@@ -242,7 +241,7 @@ describe("Planner", function() {
         };
       });
 
-      it("draws scale for one hour", function() {
+      it('draws scale for one hour', function() {
         planner.displayModeOptions[planner.displayMode] = {
           interval: 30,
           labelPeriod: 1,
@@ -251,7 +250,7 @@ describe("Planner", function() {
         };
       });
 
-      it("draws scale for two hour interval", function() {
+      it('draws scale for two hour interval', function() {
         planner.displayModeOptions[planner.displayMode] = {
           interval: 120,
           labelPeriod: 1,
@@ -260,7 +259,7 @@ describe("Planner", function() {
         };
       });
 
-      it("draws scale with only showing every second label", function() {
+      it('draws scale with only showing every second label', function() {
         planner.displayModeOptions[planner.displayMode] = {
           interval: 30,
           labelPeriod: 2,
@@ -271,7 +270,7 @@ describe("Planner", function() {
 
     });
 
-    describe("displayMode: WEEK / WORK_WEEK", function() {
+    describe('displayMode: WEEK / WORK_WEEK', function() {
 
       beforeEach(function() {
         planner.displayMode = Planner.DisplayMode.WEEK;
@@ -313,7 +312,7 @@ describe("Planner", function() {
         }
       }
 
-      it("draws scale for WEEK for whole day with 6h interval", function() {
+      it('draws scale for WEEK for whole day with 6h interval', function() {
         planner.displayModeOptions[planner.displayMode] = {
           interval: 360,
           labelPeriod: 1,
@@ -322,7 +321,7 @@ describe("Planner", function() {
         };
       });
 
-      it("draws scale for WEEK with only showing every second label", function() {
+      it('draws scale for WEEK with only showing every second label', function() {
         planner.displayModeOptions[planner.displayMode] = {
           interval: 360,
           labelPeriod: 2,
@@ -331,7 +330,7 @@ describe("Planner", function() {
         };
       });
 
-      it("draws scale for WEEK with changing month", function() {
+      it('draws scale for WEEK with changing month', function() {
         planner.viewRange = new DateRange(dates.create('2016-06-27'), dates.create('2016-07-04'));
         planner.displayModeOptions[planner.displayMode] = {
           interval: 360,
@@ -341,7 +340,7 @@ describe("Planner", function() {
         };
       });
 
-      it("draws scale for WORK_WEEK for whole day with 6h interval", function() {
+      it('draws scale for WORK_WEEK for whole day with 6h interval', function() {
         planner.displayMode = Planner.DisplayMode.WORK_WEEK;
         planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-25'));
         planner.displayModeOptions[planner.displayMode] = {
@@ -352,7 +351,7 @@ describe("Planner", function() {
         };
       });
 
-      it("draws scale for WORK_WEEK with only showing every second label", function() {
+      it('draws scale for WORK_WEEK with only showing every second label', function() {
         planner.displayMode = Planner.DisplayMode.WORK_WEEK;
         planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-25'));
         planner.displayModeOptions[planner.displayMode] = {
@@ -364,7 +363,7 @@ describe("Planner", function() {
       });
     });
 
-    describe("displayMode: MONTH", function() {
+    describe('displayMode: MONTH', function() {
 
       beforeEach(function() {
         planner.displayMode = Planner.DisplayMode.MONTH;
@@ -400,13 +399,13 @@ describe("Planner", function() {
         }
       }
 
-      it("draws scale", function() {
+      it('draws scale', function() {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 1
         };
       });
 
-      it("draws scale with only showing every second label", function() {
+      it('draws scale with only showing every second label', function() {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 2
         };
@@ -414,7 +413,7 @@ describe("Planner", function() {
 
     });
 
-    describe("displayMode: CALENDAR_WEEK", function() {
+    describe('displayMode: CALENDAR_WEEK', function() {
 
       beforeEach(function() {
         planner.displayMode = Planner.DisplayMode.CALENDAR_WEEK;
@@ -454,19 +453,19 @@ describe("Planner", function() {
         }
       }
 
-      it("draws scale for CALENDAR_WEEK displayMode", function() {
+      it('draws scale for CALENDAR_WEEK displayMode', function() {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 1
         };
       });
 
-      it("draws scale with only showing every second label", function() {
+      it('draws scale with only showing every second label', function() {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 2
         };
       });
 
-      it("draws scale with only showing every third label", function() {
+      it('draws scale with only showing every third label', function() {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 3
         };
@@ -474,7 +473,7 @@ describe("Planner", function() {
 
     });
 
-    describe("displayMode: YEAR", function() {
+    describe('displayMode: YEAR', function() {
 
       beforeEach(function() {
         planner.displayMode = Planner.DisplayMode.YEAR;
@@ -507,19 +506,19 @@ describe("Planner", function() {
         }
       }
 
-      it("draws scale for YEAR displayMode", function() {
+      it('draws scale for YEAR displayMode', function() {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 1
         };
       });
 
-      it("draws scale with only showing every second label", function() {
+      it('draws scale with only showing every second label', function() {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 2
         };
       });
 
-      it("draws scale with only showing every third label", function() {
+      it('draws scale with only showing every third label', function() {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 3
         };
@@ -528,7 +527,7 @@ describe("Planner", function() {
 
   });
 
-  describe("transformLeft/transformWidth", function() {
+  describe('transformLeft/transformWidth', function() {
     var model, planner;
 
     beforeEach(function() {
@@ -538,7 +537,7 @@ describe("Planner", function() {
       planner.displayModeOptions = {};
     });
 
-    it("calculates left and width in WEEK mode for whole days", function() {
+    it('calculates left and width in WEEK mode for whole days', function() {
       planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
       planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {
@@ -558,7 +557,7 @@ describe("Planner", function() {
       expect(planner.transformWidth(dates.create('2016-06-20 06:00:00'), dates.create('2016-06-21 12:00:00'))).toBeCloseTo(5 * cellWidthPercent, 5);
     });
 
-    it("calculates left and width in WEEK mode for limitted day range", function() {
+    it('calculates left and width in WEEK mode for limitted day range', function() {
       planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
       planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {
@@ -607,7 +606,7 @@ describe("Planner", function() {
       expect(planner.transformLeft(dates.create('2016-06-22 09:00:00'))).toBeCloseTo(21 * cellWidthPercent, 5);
     });
 
-    it("calculates left and width in WEEK mode for limitted day range (only firstHourOfDay set)", function() {
+    it('calculates left and width in WEEK mode for limitted day range (only firstHourOfDay set)', function() {
       planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
       planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {
@@ -638,7 +637,7 @@ describe("Planner", function() {
     });
   });
 
-  describe("select", function() {
+  describe('select', function() {
     var model, planner;
 
     beforeEach(function() {
@@ -647,7 +646,7 @@ describe("Planner", function() {
       planner.render();
     });
 
-    it("selects at least the number of intervals configured by display mode options", function() {
+    it('selects at least the number of intervals configured by display mode options', function() {
       planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
       planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {
@@ -689,7 +688,7 @@ describe("Planner", function() {
       expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-20 17:00:00').toISOString());
     });
 
-    it("respects end of day if minSelectionIntervalCount is set", function() {
+    it('respects end of day if minSelectionIntervalCount is set', function() {
       planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
       planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {

@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+// eslint-disable-next-line max-classes-per-file
 import {AbstractLayout, Dimension, HtmlComponent, Insets} from '../../src/index';
 
-
-describe("HtmlComponent", function() {
+describe('HtmlComponent', function() {
   setFixtures(sandbox());
   var session;
 
@@ -27,7 +27,7 @@ describe("HtmlComponent", function() {
 
   class LayoutMock extends AbstractLayout {
     layout() {
-    };
+    }
   }
 
   class StaticLayout extends AbstractLayout {
@@ -41,7 +41,6 @@ describe("HtmlComponent", function() {
       return this.prefSize;
     }
   }
-
 
   var addWidthHeightMock = function(jqueryMock) {
     jqueryMock.width = function(val) {
@@ -72,15 +71,15 @@ describe("HtmlComponent", function() {
     };
   };
 
-  describe("install", function() {
+  describe('install', function() {
 
-    it("does NOT set data 'htmlComponent' when constructor is called", function() {
+    it('does NOT set data \'htmlComponent\' when constructor is called', function() {
       spyOn(jqueryMock, 'data');
       var htmlComp = new HtmlComponent(jqueryMock, session);
       expect(jqueryMock.data).not.toHaveBeenCalled();
     });
 
-    it("sets data 'htmlComponent' when install() is called", function() {
+    it('sets data \'htmlComponent\' when install() is called', function() {
       spyOn(jqueryMock, 'data');
       var htmlComp = HtmlComponent.install(jqueryMock, session);
       expect(jqueryMock.data).toHaveBeenCalledWith('htmlComponent', htmlComp);
@@ -88,11 +87,11 @@ describe("HtmlComponent", function() {
 
   });
 
-  describe("size", function() {
+  describe('size', function() {
 
     addWidthHeightMock(jqueryMock);
 
-    it("returns getBoundingClientRect() of JQuery comp", function() {
+    it('returns getBoundingClientRect() of JQuery comp', function() {
       var htmlComp = HtmlComponent.install(jqueryMock, session);
       var size = htmlComp.size();
       expect(size.width).toBe(6);
@@ -100,7 +99,7 @@ describe("HtmlComponent", function() {
     });
   });
 
-  describe("setSize", function() {
+  describe('setSize', function() {
     var $comp;
     var htmlComp;
 
@@ -113,7 +112,7 @@ describe("HtmlComponent", function() {
       htmlComp.layout = new LayoutMock();
     });
 
-    it("accepts Dimension as single argument", function() {
+    it('accepts Dimension as single argument', function() {
       spyOn($comp, 'css').and.callThrough();
       htmlComp.setSize(new Dimension(6, 7));
       var size = htmlComp.size();
@@ -123,7 +122,7 @@ describe("HtmlComponent", function() {
       expect($comp.css).toHaveBeenCalledWith('height', '7px');
     });
 
-    it("calls invalidate on layout when size has changed", function() {
+    it('calls invalidate on layout when size has changed', function() {
       spyOn(htmlComp.layout, 'invalidate');
       htmlComp.setSize(new Dimension(1, 2));
       expect(htmlComp.layout.invalidate).toHaveBeenCalled();
@@ -131,9 +130,9 @@ describe("HtmlComponent", function() {
 
   });
 
-  describe("insets", function() {
+  describe('insets', function() {
 
-    it("reads padding, margin and border correctly", function() {
+    it('reads padding, margin and border correctly', function() {
       var jqueryObj = $('<div>').css({
         marginTop: '1px',
         marginRight: '2px',
@@ -161,7 +160,7 @@ describe("HtmlComponent", function() {
 
   });
 
-  describe("validateLayout", function() {
+  describe('validateLayout', function() {
     var $comp;
     var $child;
     var htmlComp;
@@ -174,33 +173,33 @@ describe("HtmlComponent", function() {
       htmlChild = HtmlComponent.install($child, session);
     });
 
-    it("calls htmlComp.layout", function() {
+    it('calls htmlComp.layout', function() {
       spyOn(htmlComp.layout, 'layout').and.callThrough();
       htmlComp.validateLayout();
       expect(htmlComp.layout.layout).toHaveBeenCalled();
     });
 
-    it("calls layout of the child component", function() {
+    it('calls layout of the child component', function() {
       spyOn(htmlChild.layout, 'layout').and.callThrough();
       htmlComp.validateLayout();
       expect(htmlChild.layout.layout).toHaveBeenCalled();
     });
 
-    it("does not layout invisible components", function() {
+    it('does not layout invisible components', function() {
       $comp.setVisible(false);
       spyOn(htmlComp.layout, 'layout').and.callThrough();
       htmlComp.validateLayout();
       expect(htmlComp.layout.layout).not.toHaveBeenCalled();
     });
 
-    it("does not layout components with an invisible parent", function() {
+    it('does not layout components with an invisible parent', function() {
       $comp.setVisible(false);
       spyOn(htmlChild.layout, 'layout').and.callThrough();
       htmlComp.validateLayout();
       expect(htmlChild.layout.layout).not.toHaveBeenCalled();
     });
 
-    it("does not call isParentVisible too many times", function() {
+    it('does not call isParentVisible too many times', function() {
       spyOn(htmlComp.$comp, 'isEveryParentVisible').and.callThrough();
       spyOn(htmlChild.$comp, 'isEveryParentVisible').and.callThrough();
       htmlComp.validateLayout();
@@ -210,7 +209,7 @@ describe("HtmlComponent", function() {
 
   });
 
-  describe("prefSize", function() {
+  describe('prefSize', function() {
     var $comp;
     var htmlComp;
 
@@ -226,28 +225,28 @@ describe("HtmlComponent", function() {
       htmlComp.setLayout(new StaticLayout());
     });
 
-    it("returns preferred size of the component", function() {
+    it('returns preferred size of the component', function() {
       htmlComp.layout.prefSize = new Dimension(15, 13);
       var size = htmlComp.prefSize();
       expect(size.width).toBe(15);
       expect(size.height).toBe(13);
     });
 
-    it("considers max width/height set by CSS", function() {
+    it('considers max width/height set by CSS', function() {
       htmlComp.layout.prefSize = new Dimension(500, 500);
       var size = htmlComp.prefSize();
       expect(size.width).toBe(20);
       expect(size.height).toBe(30);
     });
 
-    it("considers min width/height set by CSS", function() {
+    it('considers min width/height set by CSS', function() {
       htmlComp.layout.prefSize = new Dimension(2, 3);
       var size = htmlComp.prefSize();
       expect(size.width).toBe(10);
       expect(size.height).toBe(5);
     });
 
-    it("returns zero size for invisible components", function() {
+    it('returns zero size for invisible components', function() {
       htmlComp.validateLayout();
       spyOn(htmlComp.layout, 'preferredLayoutSize').and.callThrough();
 

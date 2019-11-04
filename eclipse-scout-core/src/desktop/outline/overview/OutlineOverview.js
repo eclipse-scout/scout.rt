@@ -17,7 +17,6 @@ export default class OutlineOverview extends Widget {
     this.outline = null;
   }
 
-
   _init(model) {
     super._init(model);
     if (!this.outline && this.parent instanceof Outline) {

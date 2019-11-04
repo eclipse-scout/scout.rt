@@ -18,7 +18,6 @@ export default class TableAdapter extends ModelAdapter {
     this._addRemoteProperties(['contextColumn']);
   }
 
-
   _postCreateWidget() {
     // if a newly created table has already a userfilter defined, we need to fire the filter event after creation
     // because the original event had been fired before the eventhandler was registered.
@@ -714,9 +713,8 @@ export default class TableAdapter extends ModelAdapter {
         }
         defaultValues.applyTo(model, 'Cell');
         return scout.create('Cell', model);
-      } else {
-        return this._ensureCellOrig(vararg);
       }
+      return this._ensureCellOrig(vararg);
     }, true);
 
     // uiSortPossible

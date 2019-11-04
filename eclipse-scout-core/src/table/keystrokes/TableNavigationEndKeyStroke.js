@@ -24,7 +24,6 @@ export default class TableNavigationEndKeyStroke extends AbstractTableNavigation
     }.bind(this);
   }
 
-
   handle(event) {
     var table = this.field,
       rows = table.visibleRows,

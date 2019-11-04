@@ -17,7 +17,6 @@ export default class SimpleTabViewContentLayout extends AbstractLayout {
     this.tabBox = tabBox;
   }
 
-
   layout($container) {
     var currentView = this.tabBox.currentView;
     if (!currentView || !currentView.rendered || !currentView.htmlComp) {

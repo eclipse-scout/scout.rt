@@ -25,7 +25,6 @@ export default class CheckBoxToggleKeyStroke extends KeyStroke {
     }.bind(this);
   }
 
-
   /**
    * @override KeyStroke.js
    */

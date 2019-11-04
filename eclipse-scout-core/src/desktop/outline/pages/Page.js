@@ -51,7 +51,6 @@ export default class Page extends TreeNode {
     this.overviewIconId = null;
   }
 
-
   /**
    * This enum defines a node-type. This is basically used for the online case where we only have instances
    * of Page, but never instances of PageWithTable or PageWithNodes. The server simply sets a nodeType
@@ -147,14 +146,14 @@ export default class Page extends TreeNode {
     this.setDetailForm(form);
   }
 
-// see Java: AbstractPage#pageActivatedNotify
+  // see Java: AbstractPage#pageActivatedNotify
   activate() {
     this._ensureDetailForm();
   }
 
-// see Java: AbstractPage#pageDeactivatedNotify
+  // see Java: AbstractPage#pageDeactivatedNotify
   deactivate() {
-  };
+  }
 
   /**
    * @returns {Outline} the tree / outline / parent instance. it's all the same,

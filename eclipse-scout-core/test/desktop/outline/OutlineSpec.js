@@ -11,8 +11,7 @@
 import {ObjectFactory, objects, OutlineOverview, scout, Status, TileOutlineOverview, Tree} from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper, OutlineSpecHelper, TreeSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("Outline", function() {
+describe('Outline', function() {
   var helper, menuHelper, formHelper, session;
 
   beforeEach(function() {
@@ -47,9 +46,9 @@ describe("Outline", function() {
     };
   }
 
-  describe("collapsing", function() {
+  describe('collapsing', function() {
     // Regression test for erroneous behavior of MessageBoxController
-    it("still allows a messagebox to be shown", function() {
+    it('still allows a messagebox to be shown', function() {
       var outline = helper.createOutlineWithOneDetailTable();
       session.desktop.outline = outline;
 
@@ -70,7 +69,7 @@ describe("Outline", function() {
     });
   });
 
-  describe("dispose", function() {
+  describe('dispose', function() {
     var model, tree, node0;
 
     beforeEach(function() {
@@ -80,13 +79,13 @@ describe("Outline", function() {
       node0 = tree.nodes[0];
     });
 
-    it("calls onNodeDeleted for every node to be able to cleanup", function() {
+    it('calls onNodeDeleted for every node to be able to cleanup', function() {
       spyOn(tree, '_onNodeDeleted');
       tree.destroy();
       expect(tree._onNodeDeleted.calls.count()).toBe(39);
     });
 
-    it("calls onNodeDeleted for every node (which was not already deleted before) to be able to cleanup", function() {
+    it('calls onNodeDeleted for every node (which was not already deleted before) to be able to cleanup', function() {
       spyOn(tree, '_onNodeDeleted');
 
       tree.deleteNodes([node0]);
@@ -99,7 +98,7 @@ describe("Outline", function() {
 
   });
 
-  describe("deleteNodes", function() {
+  describe('deleteNodes', function() {
     var model, tree, node0;
 
     beforeEach(function() {
@@ -109,7 +108,7 @@ describe("Outline", function() {
       node0 = tree.nodes[0];
     });
 
-    it("calls onNodeDeleted for every node to be able to cleanup", function() {
+    it('calls onNodeDeleted for every node to be able to cleanup', function() {
       spyOn(tree, '_onNodeDeleted');
 
       tree.deleteNodes([node0]);
@@ -118,7 +117,7 @@ describe("Outline", function() {
 
   });
 
-  describe("deleteAllChildNodes", function() {
+  describe('deleteAllChildNodes', function() {
     var model, tree;
 
     beforeEach(function() {
@@ -127,7 +126,7 @@ describe("Outline", function() {
       tree = helper.createOutline(model);
     });
 
-    it("calls onNodeDeleted for every node to be able to cleanup", function() {
+    it('calls onNodeDeleted for every node to be able to cleanup', function() {
       spyOn(tree, '_onNodeDeleted');
 
       tree.deleteAllChildNodes();
@@ -137,9 +136,9 @@ describe("Outline", function() {
 
   });
 
-  describe("navigateToTop", function() {
+  describe('navigateToTop', function() {
 
-    it("collapses all nodes in bread crumb mode", function() {
+    it('collapses all nodes in bread crumb mode', function() {
       var model = helper.createModelFixture(1, 1);
       var tree = helper.createOutline(model);
       var node0 = tree.nodes[0];
@@ -159,7 +158,7 @@ describe("Outline", function() {
     });
   });
 
-  describe("selectNodes", function() {
+  describe('selectNodes', function() {
     var model, outline, node;
 
     beforeEach(function() {
@@ -168,7 +167,7 @@ describe("Outline", function() {
       node = outline.nodes[0];
     });
 
-    it("handle navigateUp only once", function() {
+    it('handle navigateUp only once', function() {
       outline.selectNodes(node);
       outline.navigateUpInProgress = true;
       outline.selectNodes([]);
@@ -177,7 +176,7 @@ describe("Outline", function() {
 
     // we must override the _render* methods for this test-case, since we had to
     // implement a lot more of set-up code to make these methods work.
-    it("otherwise handle single selection (or do nothing when selection is != 1 node)", function() {
+    it('otherwise handle single selection (or do nothing when selection is != 1 node)', function() {
       node.detailFormVisibleByUi = false;
       outline.navigateUpInProgress = false;
       outline._renderSelection = function() {
@@ -196,9 +195,9 @@ describe("Outline", function() {
 
   });
 
-  describe("updateDetailMenus", function() {
+  describe('updateDetailMenus', function() {
 
-    it("adds the empty space menus of the detail table to the detail menu bar", function() {
+    it('adds the empty space menus of the detail table to the detail menu bar', function() {
       var outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
@@ -219,7 +218,7 @@ describe("Outline", function() {
       expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[1]);
     });
 
-    it("adds the single selection menus of the parent detail table to the detail menu bar", function() {
+    it('adds the single selection menus of the parent detail table to the detail menu bar', function() {
       var outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
@@ -240,7 +239,7 @@ describe("Outline", function() {
       expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
     });
 
-    it("attaches a listener to the detail table to get dynamic menu changes", function() {
+    it('attaches a listener to the detail table to get dynamic menu changes', function() {
       var outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
@@ -260,7 +259,7 @@ describe("Outline", function() {
       expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
     });
 
-    it("removes the listener from the detail tables on selection changes and destroy", function() {
+    it('removes the listener from the detail tables on selection changes and destroy', function() {
       var outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
@@ -284,7 +283,7 @@ describe("Outline", function() {
       expect(node0.detailTable.events._eventListeners.length).toBe(0); // every listener should be removed now
     });
 
-    it("makes sure table does not update the menu parent for empty space menus", function() {
+    it('makes sure table does not update the menu parent for empty space menus', function() {
       var outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
@@ -315,7 +314,7 @@ describe("Outline", function() {
       outline.validateLayout();
     });
 
-    it("makes sure table does not update the menu parent for single selection menus", function() {
+    it('makes sure table does not update the menu parent for single selection menus', function() {
       var outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
@@ -347,7 +346,7 @@ describe("Outline", function() {
       outline.validateLayout();
     });
 
-    it("does not fail if same menus are set again", function() {
+    it('does not fail if same menus are set again', function() {
       var outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
@@ -384,9 +383,9 @@ describe("Outline", function() {
 
   });
 
-  describe("detailContent", function() {
+  describe('detailContent', function() {
 
-    it("is shown when a node is selected", function() {
+    it('is shown when a node is selected', function() {
       var outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
@@ -409,9 +408,9 @@ describe("Outline", function() {
       expect(outline.detailContent.rendered).toBe(true);
     });
 
-    describe("click on a node inside the detail content", function() {
+    describe('click on a node inside the detail content', function() {
 
-      it("does not modify the outline", function() {
+      it('does not modify the outline', function() {
         var outline = helper.createOutline(helper.createModelFixture(3, 2));
         outline.setCompact(true);
         outline.setEmbedDetailContent(true);
@@ -439,7 +438,7 @@ describe("Outline", function() {
     });
   });
 
-  describe("outlineOverview", function() {
+  describe('outlineOverview', function() {
 
     beforeEach(function() {
       session = sandboxSession({
@@ -451,7 +450,7 @@ describe("Outline", function() {
       });
     });
 
-    it("is displayed when no node is selected", function() {
+    it('is displayed when no node is selected', function() {
       var outline = helper.createOutline(helper.createModelFixture(3, 2));
       session.desktop.setOutline(outline);
       expect(outline.outlineOverview.rendered).toBe(true);
@@ -460,7 +459,7 @@ describe("Outline", function() {
       expect(outline.outlineOverview.rendered).toBe(false);
     });
 
-    it("is not displayed if outlineOverviewVisible is false", function() {
+    it('is not displayed if outlineOverviewVisible is false', function() {
       var outline = helper.createOutline(helper.createModelFixture(3, 2));
       session.desktop.setOutline(outline);
       expect(outline.outlineOverview.rendered).toBe(true);
@@ -472,13 +471,13 @@ describe("Outline", function() {
       expect(outline.outlineOverview.rendered).toBe(true);
     });
 
-    it("uses the TileOutlineOverview by default", function() {
+    it('uses the TileOutlineOverview by default', function() {
       var outline = helper.createOutline(helper.createModelFixture(3, 2));
       session.desktop.setOutline(outline);
       expect(outline.outlineOverview instanceof TileOutlineOverview).toBe(true);
     });
 
-    it("may be replaced by another OutlineOverview", function() {
+    it('may be replaced by another OutlineOverview', function() {
       var model = helper.createModelFixture(3, 2);
       model.outlineOverview = {
         objectType: 'OutlineOverview'
@@ -494,7 +493,7 @@ describe("Outline", function() {
       expect(outline.outlineOverview).toBe(outlineOverview);
     });
 
-    it("is replaced by the default detail form if there is one", function() {
+    it('is replaced by the default detail form if there is one', function() {
       var outline = helper.createOutline(helper.createModelFixture(3, 2));
       session.desktop.setOutline(outline);
       expect(outline.outlineOverview.rendered).toBe(true);

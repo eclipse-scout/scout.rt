@@ -22,7 +22,6 @@ export default class SearchOutline extends Outline {
     this.$queryField = null;
   }
 
-
   /**
    * @override Tree.js
    */

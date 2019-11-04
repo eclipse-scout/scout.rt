@@ -24,7 +24,6 @@ export default class TableNavigationPageUpKeyStroke extends AbstractTableNavigat
     }.bind(this);
   }
 
-
   handle(event) {
     var table = this.field,
       viewport = this._viewportInfo(),

@@ -37,6 +37,7 @@
   }
 
   /* Used for scout.Table.CheckableStyle.TABLE_ROW */
+
   &.table-row-check {
 
     & > .table-data > .table-row {
@@ -72,6 +73,7 @@
       & > .table-data > .table-row {
         &.selected {
           /* "Selection" marker */
+
           &::before {
             #scout.font-icon();
             content: @icon-angle-right;
@@ -89,7 +91,7 @@
     }
   }
 
-  &.checkable.header-invisible > .table-data > .table-row.selected.first  {
+  &.checkable.header-invisible > .table-data > .table-row.selected.first {
     border-top-color: @control-background-color;
   }
 
@@ -406,6 +408,7 @@
   }
 
   /* if aggregation is based on selected rows */
+
   &.selection,
   &.selection > .table-cell-icon {
     color: @table-aggregate-cell-selection-color;
@@ -451,6 +454,7 @@
 @-webkit-keyframes expand-rotate {
   .keyframes-expand-rotate();
 }
+
 @keyframes expand-rotate {
   .keyframes-expand-rotate();
 }
@@ -484,6 +488,7 @@
 @-webkit-keyframes collapse-rotate {
   .keyframes-collapse-rotate();
 }
+
 @keyframes collapse-rotate {
   .keyframes-collapse-rotate();
 }

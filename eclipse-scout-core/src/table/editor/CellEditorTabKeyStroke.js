@@ -19,7 +19,6 @@ export default class CellEditorTabKeyStroke extends KeyStroke {
     this.shift = undefined; // to tab forward and backward
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     return accepted && !this.field.isCompleteCellEditRequested(); // Make sure events (complete, prepare) don't get sent twice since it will lead to exceptions. This may happen if user presses and holds the tab key.

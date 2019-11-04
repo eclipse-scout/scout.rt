@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.GroupBoxSpecHelper = {
-};
+scout.GroupBoxSpecHelper = {};
 
-scout.GroupBoxSpecHelper.assertGridData = function (x, y, w, h, gd) {
+scout.GroupBoxSpecHelper.assertGridData = function(x, y, w, h, gd) {
   expect(gd.x).toEqual(x); // GridData[x]
   expect(gd.y).toEqual(y); // GridData[y]
   expect(gd.w).toEqual(w); // GridData[w]

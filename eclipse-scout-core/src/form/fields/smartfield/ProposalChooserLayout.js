@@ -18,7 +18,6 @@ export default class ProposalChooserLayout extends AbstractLayout {
     this._typeHandler = this._createTypeHandler(proposalChooser);
   }
 
-
   /**
    * This factory creates type handlers for the various proposal types. By default we support Table and Tree.
    * If one must support other types, a LayoutResetter class must be implemented for that type.

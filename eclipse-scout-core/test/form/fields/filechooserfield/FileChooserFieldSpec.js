@@ -11,7 +11,6 @@
 import {Device, scout, Status} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('FileChooserField', function() {
   var session;
   var helper;
@@ -97,7 +96,6 @@ describe('FileChooserField', function() {
       expect(field.value).toBe(largeFile);
     });
   });
-
 
   describe('label', function() {
 

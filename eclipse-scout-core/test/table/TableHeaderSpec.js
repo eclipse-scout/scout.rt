@@ -10,8 +10,7 @@
  */
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("TableHeaderSpec", function() {
+describe('TableHeaderSpec', function() {
   var session;
   var helper;
 
@@ -29,9 +28,9 @@ describe("TableHeaderSpec", function() {
     jasmine.clock().uninstall();
   });
 
-  describe("render", function() {
+  describe('render', function() {
 
-    it("attaches listener to the table but only once", function() {
+    it('attaches listener to the table but only once', function() {
       var model = helper.createModelFixture(2);
       var table = helper.createTable(model);
       table.render();

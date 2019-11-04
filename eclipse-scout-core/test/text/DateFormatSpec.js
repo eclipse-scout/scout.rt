@@ -11,8 +11,7 @@
 import {DateFormat, dates, strings} from '../../src/index';
 import {LocaleSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("DateFormat", function() {
+describe('DateFormat', function() {
   var locale;
   var helper;
 
@@ -26,9 +25,9 @@ describe("DateFormat", function() {
     locale = null;
   });
 
-  describe("format", function() {
+  describe('format', function() {
 
-    it("considers d M y", function() {
+    it('considers d M y', function() {
       var pattern = 'dd.MM.yy';
       var dateFormat = new DateFormat(locale, pattern);
 
@@ -48,7 +47,7 @@ describe("DateFormat", function() {
       expect(dateFormat.format(dates.create('2017-01-16'))).toBe('16.01.17 00:00');
     });
 
-    it("considers h H m a", function() {
+    it('considers h H m a', function() {
       var pattern = 'HH:mm';
       var dateFormat = new DateFormat(locale, pattern);
 
@@ -83,7 +82,7 @@ describe("DateFormat", function() {
       expect(dateFormat.format(dates.create('2017-01-01 01:01'))).toBe('01:01 AM');
     });
 
-    it("considers E", function() {
+    it('considers E', function() {
       var pattern = 'E, dd.MM.yy';
       var dateFormat = new DateFormat(locale, pattern);
 
@@ -102,7 +101,7 @@ describe("DateFormat", function() {
       expect(dateFormat.format(dates.create('2014-03-21'))).toBe('Freitag, 21.03.14');
     });
 
-    it("considers ss SSS Z", function() {
+    it('considers ss SSS Z', function() {
       var date = dates.create('2014-03-21 13:01'),
         offset = Math.abs(date.getTimezoneOffset()),
         isNegative = offset !== date.getTimezoneOffset(),
@@ -124,9 +123,9 @@ describe("DateFormat", function() {
 
   });
 
-  describe("parse", function() {
+  describe('parse', function() {
 
-    it("considers d M y", function() {
+    it('considers d M y', function() {
       var pattern = 'dd.MM.yy';
       var dateFormat = new DateFormat(locale, pattern);
 
@@ -142,7 +141,7 @@ describe("DateFormat", function() {
       expect(dateFormat.parse('1.3.04').getTime()).toBe(dates.create('2004-03-01').getTime());
     });
 
-    it("considers h H m a", function() {
+    it('considers h H m a', function() {
       var pattern = 'yyyy-MM-dd HH:mm';
       var dateFormat = new DateFormat(locale, pattern);
 
@@ -176,7 +175,7 @@ describe("DateFormat", function() {
       expect(dateFormat.parse('2017-01-01 12:00 AM').getTime()).toBe(dates.create('2017-01-01 00:00').getTime());
     });
 
-    it("considers ss SSS Z", function() {
+    it('considers ss SSS Z', function() {
       var pattern = 'yyyy-MM-dd HH:mm:ss';
       var dateFormat = new DateFormat(locale, pattern);
 
@@ -199,8 +198,8 @@ describe("DateFormat", function() {
     });
   });
 
-  describe("analyze", function() {
-    describe("analyzes the text and returns an object with months, years and days", function() {
+  describe('analyze', function() {
+    describe('analyzes the text and returns an object with months, years and days', function() {
       it('considers pattern dd.MM.yyyy', function() {
         var pattern = 'dd.MM.yyyy';
         var dateFormat = new DateFormat(locale, pattern);

@@ -10,13 +10,11 @@
  */
 import {scout, SimpleTabBoxController} from '../index';
 
-
 export default class DesktopTabBoxController extends SimpleTabBoxController {
 
   constructor() {
     super();
   }
-
 
   _createTab(view) {
     return scout.create('DesktopTab', {

@@ -27,7 +27,6 @@ export default class IFrame extends Widget {
     this._loadHandler = this._onLoad.bind(this);
   }
 
-
   _render() {
     if (this.wrapIframe) {
       this.$container = this.$parent.appendDiv('iframe-wrapper');

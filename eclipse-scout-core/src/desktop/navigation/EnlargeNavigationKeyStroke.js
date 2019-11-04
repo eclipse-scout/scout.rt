@@ -24,7 +24,6 @@ export default class EnlargeNavigationKeyStroke extends KeyStroke {
     }.bind(this);
   }
 
-
   _isEnabled() {
     var enabled = super._isEnabled();
     return enabled && this.field.rightVisible;

@@ -11,7 +11,6 @@
 import {FormSpecHelper} from '@eclipse-scout/testing';
 import {scout, Status} from '../../src/index';
 
-
 describe('FormLifecycle', function() {
 
   var session, helper, form, field;
@@ -98,7 +97,7 @@ describe('FormLifecycle', function() {
         return $.resolvedPromise(Status.error({
           message: 'This is a fatal error'
         }));
-      }.bind(form2.lifecycle);
+      };
       var lifecycleComplete = false;
       form2.lifecycle.on('close', function() {
         lifecycleComplete = true;
@@ -121,7 +120,7 @@ describe('FormLifecycle', function() {
         return $.resolvedPromise(Status.warning({
           message: 'This is only a warning'
         }));
-      }.bind(form2.lifecycle);
+      };
       var lifecycleComplete = false;
       form2.lifecycle.on('close', function() {
         lifecycleComplete = true;

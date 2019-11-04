@@ -15,7 +15,7 @@
     -moz-@{property}: @value;
     -ms-@{property}: @value;
     -o-@{property}: @value;
-    @{property}: @value;
+      @{property}: @value;
   }
 
   .glow(@color, @radius: 5px) {
@@ -430,6 +430,7 @@
   }
 
   /* Mixin for chooser popups as used in smart-field */
+
   .chooser-popup {
     position: absolute;
     border: solid 1px @control-popup-border-color;
@@ -482,10 +483,12 @@
   /*
   * Hides the scrollbars but lets the user still scroll (e.g. using mousewheel or touch). Does not work for Firefox.
   */
+
   .hide-scrollbars {
     &::-webkit-scrollbar {
       display: none;
     }
+
     -ms-overflow-style: none;
   }
 

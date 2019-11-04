@@ -19,7 +19,6 @@ export default class CarouselField extends FormField {
     this._addWidgetProperties(['carousel']);
   }
 
-
   _render() {
     this.addContainer(this.$parent, 'carousel-field');
     this.addLabel();

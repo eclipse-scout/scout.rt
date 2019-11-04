@@ -35,7 +35,6 @@ import * as $ from 'jquery';
  * @abstract
  */
 export default class FormField extends Widget {
-
   constructor() {
     super();
 
@@ -96,7 +95,6 @@ export default class FormField extends Widget {
       'tooltipText', 'tooltipAnchor']);
   }
 
-
   static FieldStyle = {
     CLASSIC: 'classic',
     ALTERNATIVE: 'alternative'
@@ -128,7 +126,7 @@ export default class FormField extends Widget {
     UI: -1
   };
 
-// see org.eclipse.scout.rt.client.ui.form.fields.IFormField.FULL_WIDTH
+  // see org.eclipse.scout.rt.client.ui.form.fields.IFormField.FULL_WIDTH
   static FULL_WIDTH = 0;
 
   static Mode = {
@@ -510,7 +508,6 @@ export default class FormField extends Widget {
       // If there are menus, show them in the tooltip. But only if there is a tooltipText, don't do it if there is an error status.
       // Menus make most likely no sense if an error status is displayed
       menus = this._getCurrentMenus();
-
     } else {
       // If there are menus, show them in the tooltip. But only if there is a tooltipText, don't do it if there is an error status.
       // Menus make most likely no sense if an error status is displayed
@@ -552,7 +549,7 @@ export default class FormField extends Widget {
     this.setProperty('labelPosition', labelPosition);
   }
 
-// Don't include in renderProperties, it is not necessary to execute it initially because the positioning is done by _renderLabel
+  // Don't include in renderProperties, it is not necessary to execute it initially because the positioning is done by _renderLabel
   _renderLabelPosition(position) {
     this._renderLabel();
     if (this.rendered) {
@@ -684,7 +681,7 @@ export default class FormField extends Widget {
   _getMenusForStatus(status) {
     return this.statusMenuMappings.filter(function(mapping) {
       if (!mapping.menu || !mapping.menu.visible) {
-        return;
+        return false;
       }
       // Show the menus which are mapped to the status code and severity (if set)
       return (mapping.codes.length === 0 || mapping.codes.indexOf(status.code) > -1) &&
@@ -724,7 +721,6 @@ export default class FormField extends Widget {
 
   _renderMenusVisible() {
     this._updateMenus();
-
   }
 
   _setKeyStrokes(keyStrokes) {

@@ -20,7 +20,6 @@ export default class NullLayout extends AbstractLayout {
     super();
   }
 
-
   layout($container) {
     $container.children().each(function() {
       var htmlComp = HtmlComponent.optGet($(this));

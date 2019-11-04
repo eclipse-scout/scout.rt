@@ -23,7 +23,6 @@ export default class ActionKeyStroke extends KeyStroke {
     this.stopImmediatePropagation = true;
   }
 
-
   _isEnabled() {
     if (!this.which.length) {
       return false; // actions without a keystroke are not enabled.

@@ -16,7 +16,6 @@ export default class TileAccordionAdapter extends AccordionAdapter {
     super();
   }
 
-
   /**
    * @override
    */

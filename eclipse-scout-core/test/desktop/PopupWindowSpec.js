@@ -10,7 +10,6 @@
  */
 import {HtmlComponent, PopupWindow} from '../../src/index';
 
-
 describe('PopupWindow', function() {
   var session, helper, $sandbox, origDevice, myForm, myWindow,
     myErrorHandler = function() {

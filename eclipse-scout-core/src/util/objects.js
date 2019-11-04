@@ -11,7 +11,6 @@
 import {arrays, scout, strings} from '../index';
 import * as $ from 'jquery';
 
-
 const CONST_REGEX = /\$\{const\:([^\}]*)\}/;
 
 /**
@@ -574,7 +573,6 @@ export function resolveConstProperty(object, config) {
     object[config.property] = resolvedValue;
   }
 }
-
 
 export default {
   CONST_REGEX,

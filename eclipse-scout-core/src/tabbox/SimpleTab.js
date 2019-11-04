@@ -46,7 +46,6 @@ export default class SimpleTab extends Widget {
     }.bind(this);
   }
 
-
   _init(model) {
     super._init(model);
 
@@ -316,7 +315,7 @@ export default class SimpleTab extends Widget {
 
     this._statusIconDivs.forEach(function($statusIcon) {
       $statusIcon.remove();
-    }.bind(this));
+    });
     this._statusIconDivs = [];
 
     if (this.status) {

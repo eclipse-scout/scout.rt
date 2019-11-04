@@ -14,7 +14,6 @@
 import * as $ from 'jquery';
 import {arrays, Device, Dimension, events, IconDesc, icons, objects, scout, strings} from '../index';
 
-
 const __origCleanData = $.cleanData;
 const __origHide = $.fn.hide;
 const __origWidth = $.fn.width;
@@ -47,7 +46,7 @@ export default class JQueryUtils extends $ {
    * @typedef {object} Promise
    */
 
-// === internal methods ===
+  // === internal methods ===
 
   /**
    * Returns false when the component display is 'none', otherwise true.
@@ -110,11 +109,11 @@ export default class JQueryUtils extends $ {
       }
     });
     return newProperties;
-  };
+  }
 
-// === $ extensions ===
+  // === $ extensions ===
 
-  /*!
+  /* !
    * jQuery UI Widget 1.11.2
    * http://jqueryui.com
    *
@@ -143,14 +142,14 @@ export default class JQueryUtils extends $ {
       }
     }
     __origCleanData(elems);
-  };
+  }
 
   /**
    * Used by some animate functions.
    */
   static removeThis() {
     $(this).remove();
-  };
+  }
 
   /**
    * Convenience function that can be used as an jQuery event handler, when this
@@ -166,7 +165,7 @@ export default class JQueryUtils extends $ {
       event.stopPropagation();
       event.stopImmediatePropagation();
     }
-  };
+  }
 
   /**
    * If the event target is disabled (according to $.fn.isEnabled()), the event is suppressed
@@ -179,7 +178,7 @@ export default class JQueryUtils extends $ {
       return true;
     }
     return false;
-  };
+  }
 
   /**
    * Implements the 'debounce' pattern. The given function fx is executed after a certain delay
@@ -244,7 +243,7 @@ export default class JQueryUtils extends $ {
       return false;
     };
     return fn;
-  };
+  }
 
   /**
    * Executes the given function. Further calls to the same function are delayed by the given delay
@@ -272,7 +271,7 @@ export default class JQueryUtils extends $ {
         callFx();
       }
     };
-  };
+  }
 
   /**
    * Returns a function which negates the return value of the given function when called.
@@ -281,7 +280,7 @@ export default class JQueryUtils extends $ {
     return function() {
       return !fx.apply(this, arguments);
     };
-  };
+  }
 
   /**
    * color calculation
@@ -303,7 +302,7 @@ export default class JQueryUtils extends $ {
     }
 
     return rgb;
-  };
+  }
 
   /**
    * CSP-safe method to dynamically load and execute a script from server.
@@ -350,7 +349,7 @@ export default class JQueryUtils extends $ {
     myDocument.head.appendChild(linkTag);
 
     return deferred.promise();
-  };
+  }
 
   /**
    * CSP-safe method to dynamically load a style sheet from server.
@@ -392,7 +391,7 @@ export default class JQueryUtils extends $ {
     myDocument.head.appendChild(linkTag);
 
     return deferred.promise();
-  };
+  }
 
   /**
    * Dynamically adds styles to the document.
@@ -420,7 +419,7 @@ export default class JQueryUtils extends $ {
     myDocument.head.appendChild(styleTag);
 
     return $styleTag;
-  };
+  }
 
   static pxToNumber(pixel) {
     if (!pixel) {
@@ -429,7 +428,7 @@ export default class JQueryUtils extends $ {
     }
     // parseFloat ignores 'px' and just extracts the number
     return parseFloat(pixel, 10);
-  };
+  }
 
   /**
    * Use this function as shorthand of this:
@@ -442,7 +441,7 @@ export default class JQueryUtils extends $ {
     var deferred = $.Deferred();
     deferred.resolve.apply(deferred, arguments);
     return deferred;
-  };
+  }
 
   /**
    * Use this function as shorthand of this:
@@ -455,7 +454,7 @@ export default class JQueryUtils extends $ {
     var deferred = $.Deferred();
     deferred.resolve.apply(deferred, arguments);
     return deferred.promise();
-  };
+  }
 
   /**
    * Use this function as shorthand of this:
@@ -468,7 +467,7 @@ export default class JQueryUtils extends $ {
     var deferred = $.Deferred();
     deferred.reject.apply(deferred, arguments);
     return deferred.promise();
-  };
+  }
 
   /**
    * Creates a new promise which resolves when all promises resolve and fails when the first promise fails.
@@ -490,7 +489,7 @@ export default class JQueryUtils extends $ {
       deferred.reject.apply(this, arguments);
     });
     return deferred.promise();
-  };
+  }
 
   /**
    * Shorthand for an AJAX request for a JSON file with UTF8 encoding.
@@ -511,7 +510,7 @@ export default class JQueryUtils extends $ {
       args.push(this);
       return $.rejectedPromise.apply($, args);
     });
-  };
+  }
 
   /**
    * Ensures the given parameter is a jQuery object.<p>
@@ -525,24 +524,23 @@ export default class JQueryUtils extends $ {
       return $elem;
     }
     return $($elem);
-  };
+  }
 
   /**
    * Helper function to determine if an object is of type "jqXHR" (http://api.jquery.com/jQuery.ajax/#jqXHR)
    */
   static isJqXHR(obj) {
     return (typeof obj === 'object' && obj.hasOwnProperty('readyState') && obj.hasOwnProperty('status') && obj.hasOwnProperty('statusText'));
-  };
+  }
 
-
-// === $.prototype extensions ===
+  // === $.prototype extensions ===
 
   static nvl($element) {
     if (this.length || !($element instanceof $)) {
       return this;
     }
     return $element;
-  };
+  }
 
   /**
    * @param element string. Example = &lt;input&gt;
@@ -562,7 +560,7 @@ export default class JQueryUtils extends $ {
       $element.text(text);
     }
     return $element;
-  };
+  }
 
   /**
    * Creates a DIV element in the current document.
@@ -572,11 +570,11 @@ export default class JQueryUtils extends $ {
    */
   static makeDiv(cssClass, text) {
     return this.makeElement('<div>', cssClass, text);
-  };
+  }
 
   static makeSpan(cssClass, text) {
     return this.makeElement('<span>', cssClass, text);
-  };
+  }
 
   /**
    * @returns HTML document reference (ownerDocument) of the HTML element.
@@ -585,7 +583,7 @@ export default class JQueryUtils extends $ {
   static document(domElement) {
     var myDocument = this.length ? (this[0] instanceof Document ? this[0] : this[0].ownerDocument) : null;
     return domElement ? myDocument : $(myDocument);
-  };
+  }
 
   /**
    * @returns HTML window reference (defaultView) of the HTML element
@@ -595,7 +593,7 @@ export default class JQueryUtils extends $ {
     var myDocument = this.document(true),
       myWindow = myDocument ? myDocument.defaultView : null;
     return domElement ? myWindow : $(myWindow);
-  };
+  }
 
   /**
    * @returns the active element of the current document
@@ -605,7 +603,7 @@ export default class JQueryUtils extends $ {
     var myDocument = this.document(true),
       activeElement = myDocument ? myDocument.activeElement : null;
     return domElement ? activeElement : $(activeElement);
-  };
+  }
 
   /**
    * @returns the BODY element of the HTML document in which the current HTML element is placed.
@@ -614,7 +612,7 @@ export default class JQueryUtils extends $ {
   static body(domElement) {
     var $body = $('body', this.document(true));
     return domElement ? $body[0] : $body;
-  };
+  }
 
   /**
    * @returns the closest DOM element that has the 'scout' class.
@@ -623,7 +621,7 @@ export default class JQueryUtils extends $ {
   static entryPoint(domElement) {
     var $element = this.closest('.scout');
     return domElement ? $element[0] : $element;
-  };
+  }
 
   /**
    * @returns {Dimension} size of the window (width and height)
@@ -631,7 +629,7 @@ export default class JQueryUtils extends $ {
   static windowSize() {
     var $window = this.window();
     return new Dimension($window.width(), $window.height());
-  };
+  }
 
   /**
    * Returns the element at the given point considering only child elements and elements matching the selector, if specified.
@@ -652,6 +650,7 @@ export default class JQueryUtils extends $ {
       return $();
     }
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       $element = $(doc.elementFromPoint(x, y));
       if ($element.length === 0 || $element[0] === doc.documentElement) {
@@ -681,47 +680,47 @@ export default class JQueryUtils extends $ {
       $element.removeClass('invisible');
     });
     return $element;
-  };
+  }
 
-// prepend - and return new div for chaining
+  // prepend - and return new div for chaining
   static prependDiv(cssClass, text) {
     return this.makeDiv(cssClass, text).prependTo(this);
-  };
+  }
 
-// append - and return new div for chaining
+  // append - and return new div for chaining
   static appendDiv(cssClass, text) {
     return this.makeDiv(cssClass, text).appendTo(this);
-  };
+  }
 
   static prependElement(element, cssClass, text) {
     return this.makeElement(element, cssClass, text).prependTo(this);
-  };
+  }
 
   static appendElement(element, cssClass, text) {
     return this.makeElement(element, cssClass, text).appendTo(this);
-  };
+  }
 
-// insert after - and return new div for chaining
+  // insert after - and return new div for chaining
   static afterDiv(cssClass, text) {
     return this.makeDiv(cssClass, text).insertAfter(this);
-  };
+  }
 
-// insert before - and return new div for chaining
+  // insert before - and return new div for chaining
   static beforeDiv(cssClass, text) {
     return this.makeDiv(cssClass, text).insertBefore(this);
-  };
+  }
 
   static appendSpan(cssClass, text) {
     return this.makeSpan(cssClass, text).appendTo(this);
-  };
+  }
 
   static appendBr(cssClass) {
     return this.makeElement('<br>', cssClass).appendTo(this);
-  };
+  }
 
   static appendTextNode(text) {
     return $(this.document(true).createTextNode(text)).appendTo(this);
-  };
+  }
 
   /**
    * @param {IconDesc|string} iconId
@@ -745,7 +744,7 @@ export default class JQueryUtils extends $ {
     }
     return this.appendImg(icon.iconUrl, cssClass)
       .addClass('icon image-icon');
-  };
+  }
 
   static appendImg(imageSrc, cssClass) {
     var $icon = this.appendElement('<img>', cssClass);
@@ -753,7 +752,7 @@ export default class JQueryUtils extends $ {
       $icon.attr('src', imageSrc);
     }
     return $icon;
-  };
+  }
 
   static makeSVG(type, cssClass, text, id) {
     var myDocument = this.document(true);
@@ -771,12 +770,12 @@ export default class JQueryUtils extends $ {
       $svg.attr('id', id);
     }
     return $svg;
-  };
+  }
 
-// append SVG
+  // append SVG
   static appendSVG(type, cssClass, text, id) {
     return this.makeSVG(type, cssClass, text, id).appendTo(this);
-  };
+  }
 
   static attrXLINK(attributeName, value) {
     if (this.length === 0) { // shortcut for empty collections
@@ -789,7 +788,7 @@ export default class JQueryUtils extends $ {
     return this.each(function() {
       this.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:' + attributeName, value);
     });
-  };
+  }
 
   /**
    * This function adds a device specific CSS class to the current element.
@@ -807,22 +806,22 @@ export default class JQueryUtils extends $ {
       this.addClass('ios');
     }
     return this;
-  };
+  }
 
-// select one and deselect siblings
+  // select one and deselect siblings
   static selectOne() {
     this.siblings().removeClass('selected');
     this.addClass('selected');
     return this;
-  };
+  }
 
   static select(selected) {
     return this.toggleClass('selected', !!selected);
-  };
+  }
 
   static isSelected() {
     return this.hasClass('selected');
-  };
+  }
 
   static setEnabled(enabled) {
     enabled = !!enabled;
@@ -833,11 +832,11 @@ export default class JQueryUtils extends $ {
     }
     this.trigger(enabled ? 'enable' : 'disable');
     return this;
-  };
+  }
 
   static isEnabled() {
     return !this.hasClass('disabled');
-  };
+  }
 
   static setVisible(visible) {
     var isVisible = !this.hasClass('hidden');
@@ -852,19 +851,19 @@ export default class JQueryUtils extends $ {
       this.trigger('show');
     }
     return this;
-  };
+  }
 
   static isDisplayNone() {
     return this.css('display') === 'none';
-  };
+  }
 
   static setTabbable(tabbable) {
     return this.attr('tabIndex', tabbable ? 0 : null);
-  };
+  }
 
   static isTabbable() {
     return this.attr('tabIndex') >= 0;
-  };
+  }
 
   /**
    * @param {string} iconId
@@ -919,18 +918,18 @@ export default class JQueryUtils extends $ {
       }
       this.removeData('$icon');
     }
-  };
+  }
 
   static placeholder(placeholder) {
     return this.toggleAttr('placeholder', !!placeholder, placeholder);
-  };
+  }
 
   static isVisible() {
     if (this.hasClass('hidden')) {
       return false;
     }
     return JQueryUtils.elemVisible(this[0]);
-  };
+  }
 
   static isEveryParentVisible() {
     var everyParentVisible = true;
@@ -941,14 +940,14 @@ export default class JQueryUtils extends $ {
       }
     });
     return everyParentVisible;
-  };
+  }
 
   /**
    * @return true if the element is attached (= is in the dom tree), false if not
    */
   static isAttached() {
     return $.contains(this.document(true).documentElement, this[0]);
-  };
+  }
 
   /**
    * @returns the current element if it is scrollable, otherwise the first parent which is scrollable
@@ -962,7 +961,7 @@ export default class JQueryUtils extends $ {
       $elem = $elem.parent();
     }
     return $();
-  };
+  }
 
   /**
    * Returns every parent which is scrollable
@@ -978,9 +977,9 @@ export default class JQueryUtils extends $ {
       $elem = $elem.parent();
     }
     return $scrollParents;
-  };
+  }
 
-// most used animate
+  // most used animate
   static animateAVCSD(attr, value, complete, step, duration) {
     var properties = {};
     var options = {};
@@ -999,9 +998,9 @@ export default class JQueryUtils extends $ {
 
     this.animate(properties, options);
     return this;
-  };
+  }
 
-// SVG animate, array contains attr, endValue + startValue
+  // SVG animate, array contains attr, endValue + startValue
   static animateSVG(attr, endValue, duration, complete, withoutTabIndex) {
     return this.each(function() {
       var startValue = parseFloat($(this).attr(attr));
@@ -1025,7 +1024,7 @@ export default class JQueryUtils extends $ {
         queue: false
       });
     });
-  };
+  }
 
   static addClassForAnimation(className, options) {
     var defaultOptions = {
@@ -1039,11 +1038,11 @@ export default class JQueryUtils extends $ {
       this.removeClass(options.classesToRemove);
     }.bind(this));
     return this;
-  };
+  }
 
   static oneAnimationEnd(selector, data, handler) {
     return this.one('animationend webkitAnimationEnd', selector, data, handler);
-  };
+  }
 
   /**
    * Animates from old to new width
@@ -1061,7 +1060,7 @@ export default class JQueryUtils extends $ {
     }, opts);
 
     return this;
-  };
+  }
 
   static cssHeightAnimated(oldHeight, newHeight, opts) {
     opts = opts || {};
@@ -1076,7 +1075,7 @@ export default class JQueryUtils extends $ {
     }, opts);
 
     return this;
-  };
+  }
 
   static cssLeftAnimated(from, to, opts) {
     opts = opts || {};
@@ -1091,7 +1090,7 @@ export default class JQueryUtils extends $ {
     }, opts);
 
     return this;
-  };
+  }
 
   static cssTopAnimated(from, to, opts) {
     opts = opts || {};
@@ -1106,7 +1105,7 @@ export default class JQueryUtils extends $ {
     }, opts);
 
     return this;
-  };
+  }
 
   static cssAnimated(fromVals, toVals, opts) {
     opts = opts || {};
@@ -1118,16 +1117,16 @@ export default class JQueryUtils extends $ {
     // Then animate to new pos
     this.animate(toVals, opts);
     return this;
-  };
+  }
 
-// over engineered animate
+  // over engineered animate
   static widthToContent(opts) {
     var oldW = this.outerWidth(),
       newW = this.css('width', 'auto').outerWidth();
 
     this.cssWidthAnimated(oldW, newW, opts);
     return this;
-  };
+  }
 
   /**
    * Offset to a specific ancestor and not to the document as offset() would do.
@@ -1141,7 +1140,7 @@ export default class JQueryUtils extends $ {
       top: offset.top - toOffset.top,
       left: offset.left - toOffset.left
     };
-  };
+  }
 
   static cssPxValue(prop, value) {
     if (value === undefined) {
@@ -1154,15 +1153,15 @@ export default class JQueryUtils extends $ {
       return this.css(prop, value);
     }
     return this.css(prop, value + 'px');
-  };
+  }
 
   static cssLeft(position) {
     return this.cssPxValue('left', position);
-  };
+  }
 
   static cssTop(position) {
     return this.cssPxValue('top', position);
-  };
+  }
 
   /**
    * Sets the CSS properties 'left' and 'top' based on the x and y properties of the given point instance.
@@ -1171,19 +1170,19 @@ export default class JQueryUtils extends $ {
    */
   static cssPosition(point) {
     return this.cssLeft(point.x).cssTop(point.y);
-  };
+  }
 
   static cssBottom(position) {
     return this.cssPxValue('bottom', position);
-  };
+  }
 
   static cssRight(position) {
     return this.cssPxValue('right', position);
-  };
+  }
 
   static cssWidth(width) {
     return this.cssPxValue('width', width);
-  };
+  }
 
   static cssMinWidth(minWidth) {
     if (minWidth === undefined) {
@@ -1194,7 +1193,7 @@ export default class JQueryUtils extends $ {
       return $.pxToNumber(value);
     }
     return this.cssPxValue('min-width', minWidth);
-  };
+  }
 
   /**
    * @returns the max-width as number. If max-width is not set (resp. defaults to 'none') Number.MAX_VALUE is returned.
@@ -1208,11 +1207,11 @@ export default class JQueryUtils extends $ {
       return $.pxToNumber(value);
     }
     return this.cssPxValue('max-width', maxWidth);
-  };
+  }
 
   static cssHeight(height) {
     return this.cssPxValue('height', height);
-  };
+  }
 
   static cssMinHeight(minHeight) {
     if (minHeight === undefined) {
@@ -1223,7 +1222,7 @@ export default class JQueryUtils extends $ {
       return $.pxToNumber(value);
     }
     return this.cssPxValue('min-height', minHeight);
-  };
+  }
 
   /**
    * @returns the max-height as number. If max-height is not set (resp. defaults to 'none') Number.MAX_VALUE is returned.
@@ -1237,27 +1236,27 @@ export default class JQueryUtils extends $ {
       return $.pxToNumber(value);
     }
     return this.cssPxValue('max-height', maxHeight);
-  };
+  }
 
   static cssLineHeight(height) {
     return this.cssPxValue('line-height', height);
-  };
+  }
 
   static cssMarginLeft(value) {
     return this.cssPxValue('margin-left', value);
-  };
+  }
 
   static cssMarginBottom(value) {
     return this.cssPxValue('margin-bottom', value);
-  };
+  }
 
   static cssMarginRight(value) {
     return this.cssPxValue('margin-right', value);
-  };
+  }
 
   static cssMarginTop(value) {
     return this.cssPxValue('margin-top', value);
-  };
+  }
 
   static cssMarginX(value) {
     if (value === undefined) {
@@ -1266,7 +1265,7 @@ export default class JQueryUtils extends $ {
     this.cssMarginLeft(value);
     this.cssMarginRight(value);
     return this;
-  };
+  }
 
   static cssMarginY(value) {
     if (value === undefined) {
@@ -1275,23 +1274,23 @@ export default class JQueryUtils extends $ {
     this.cssMarginTop(value);
     this.cssMarginBottom(value);
     return this;
-  };
+  }
 
   static cssPaddingTop(value) {
     return this.cssPxValue('padding-top', value);
-  };
+  }
 
   static cssPaddingRight(value) {
     return this.cssPxValue('padding-right', value);
-  };
+  }
 
   static cssPaddingBottom(value) {
     return this.cssPxValue('padding-bottom', value);
-  };
+  }
 
   static cssPaddingLeft(value) {
     return this.cssPxValue('padding-left', value);
-  };
+  }
 
   static cssPaddingX(value) {
     if (value === undefined) {
@@ -1300,7 +1299,7 @@ export default class JQueryUtils extends $ {
     this.cssPaddingLeft(value);
     this.cssPaddingRight(value);
     return this;
-  };
+  }
 
   static cssPaddingY(value) {
     if (value === undefined) {
@@ -1309,23 +1308,23 @@ export default class JQueryUtils extends $ {
     this.cssPaddingTop(value);
     this.cssPaddingBottom(value);
     return this;
-  };
+  }
 
   static cssBorderBottomWidth(value) {
     return this.cssPxValue('border-bottom-width', value);
-  };
+  }
 
   static cssBorderLeftWidth(value) {
     return this.cssPxValue('border-left-width', value);
-  };
+  }
 
   static cssBorderRightWidth(value) {
     return this.cssPxValue('border-right-width', value);
-  };
+  }
 
   static cssBorderTopWidth(value) {
     return this.cssPxValue('border-top-width', value);
-  };
+  }
 
   static cssBorderWidthY(value) {
     if (value === undefined) {
@@ -1333,7 +1332,7 @@ export default class JQueryUtils extends $ {
     }
     this.cssBorderTopWidth(value);
     this.cssBorderBottomWidth(value);
-  };
+  }
 
   static cssBorderWidthX(value) {
     if (value === undefined) {
@@ -1341,21 +1340,21 @@ export default class JQueryUtils extends $ {
     }
     this.cssBorderLeftWidth(value);
     this.cssBorderRightWidth(value);
-  };
+  }
 
   /**
    * Bottom of a html element without margin and border relative to offset parent. Expects border-box model.
    */
   static innerBottom() {
     return this.position().top + this.outerHeight(true) - this.cssMarginBottom() - this.cssBorderBottomWidth();
-  };
+  }
 
   /**
    * Right of a html element without margin and border relative to offset parent. Expects border-box model.
    */
   static innerRight() {
     return this.position().left + this.outerWidth(true) - this.cssMarginRight() - this.cssBorderRightWidth();
-  };
+  }
 
   static copyCss($origin, props) {
     var properties = props.split(' ');
@@ -1365,7 +1364,7 @@ export default class JQueryUtils extends $ {
       $this.css(prop, $origin.css(prop));
     });
     return $this;
-  };
+  }
 
   static copyCssIfGreater($origin, props) {
     var properties = props.split(' ');
@@ -1379,7 +1378,7 @@ export default class JQueryUtils extends $ {
       }
     });
     return $this;
-  };
+  }
 
   static copyCssClasses($other, classString) {
     var classes = classString.split(' ');
@@ -1390,11 +1389,11 @@ export default class JQueryUtils extends $ {
       }
     });
     return $this;
-  };
+  }
 
   static disableSpellcheck() {
     return this.attr('spellcheck', false);
-  };
+  }
 
   /**
    * Returns whether the current element is the given element or has a child which is the given element.
@@ -1404,7 +1403,7 @@ export default class JQueryUtils extends $ {
       elem = elem[0];
     }
     return this[0] === elem || this.has(elem).length > 0;
-  };
+  }
 
   /**
    * Makes the current element resizable, which means DIVs for resize-handling are added to the DOM
@@ -1420,7 +1419,7 @@ export default class JQueryUtils extends $ {
     resizable = scout.create('Resizable', $this);
     $this.data('resizable', resizable);
     return this;
-  };
+  }
 
   /**
    * Removes the resize handles and event handlers in order to make the element un resizable again.
@@ -1433,7 +1432,7 @@ export default class JQueryUtils extends $ {
       $this.removeData('resizable');
     }
     return this;
-  };
+  }
 
   /**
    * Makes any element movable with the mouse. If the argument '$handle' is missing, the entire
@@ -1475,7 +1474,7 @@ export default class JQueryUtils extends $ {
         });
       event.preventDefault();
     });
-  };
+  }
 
   /**
    *
@@ -1485,7 +1484,7 @@ export default class JQueryUtils extends $ {
     var $draggable = this;
     $handle = $handle || $draggable;
     return $handle.off('mousedown.draggable');
-  };
+  }
 
   /**
    * Calls jQuery.fadeOut() and then removes the element from the DOM.
@@ -1503,7 +1502,7 @@ export default class JQueryUtils extends $ {
         callback.call(this);
       }
     });
-  };
+  }
 
   static removeAnimated(cssClass, callback) {
     if (callback === undefined && typeof cssClass === 'function') {
@@ -1525,7 +1524,7 @@ export default class JQueryUtils extends $ {
         callback && callback.call(this);
       });
     }
-  };
+  }
 
   /**
    * This function is required because most jQuery functions can be used with or without arguments
@@ -1539,23 +1538,23 @@ export default class JQueryUtils extends $ {
   static hide() {
     this.trigger('hide');
     return __origHide.apply(this, arguments);
-  };
+  }
 
   static width() {
     return JQueryUtils._ceilNumber(__origWidth.apply(this, arguments));
-  };
+  }
 
   static outerWidth() {
     return JQueryUtils._ceilNumber(__origOuterWidth.apply(this, arguments));
-  };
+  }
 
   static height() {
     return JQueryUtils._ceilNumber(__origHeight.apply(this, arguments));
-  };
+  }
 
   static outerHeight() {
     return JQueryUtils._ceilNumber(__origOuterHeight.apply(this, arguments));
-  };
+  }
 
   /**
    * Sets the given 'text' as text to the jQuery element, using the text() function (i.e. HTML is encoded automatically).
@@ -1575,7 +1574,7 @@ export default class JQueryUtils extends $ {
       }
     }
     return this;
-  };
+  }
 
   /**
    * Same as "textOrNbsp", but with html (caller is responsible for encoding).
@@ -1593,7 +1592,7 @@ export default class JQueryUtils extends $ {
       }
     }
     return this;
-  };
+  }
 
   /**
    * Like toggleClass(), this toggles a HTML attribute on a set of jquery elements.
@@ -1629,7 +1628,7 @@ export default class JQueryUtils extends $ {
         $element.removeAttr(attr);
       }
     });
-  };
+  }
 
   static backupSelection() {
     var field = this[0];
@@ -1641,7 +1640,7 @@ export default class JQueryUtils extends $ {
       };
     }
     return null;
-  };
+  }
 
   static restoreSelection(selection) {
     var field = this[0];
@@ -1649,7 +1648,7 @@ export default class JQueryUtils extends $ {
       field.setSelectionRange(selection.selectionStart, selection.selectionEnd, selection.selectionDirection);
     }
     return this;
-  };
+  }
 
   /**
    * If the given value is "truthy", it is set as attribute on the target. Otherwise, the attribute is removed.
@@ -1661,11 +1660,11 @@ export default class JQueryUtils extends $ {
       this.removeAttr(attributeName);
     }
     return this;
-  };
+  }
 
   static appendAppLink(appLinkBean, func) {
     return this.appendSpan().appLink(appLinkBean, func);
-  };
+  }
 
   /**
    * @param appLinkBean
@@ -1708,7 +1707,7 @@ export default class JQueryUtils extends $ {
         .attr('data-ref', appLinkBean.ref);
     }
     return this;
-  };
+  }
 
   /**
    * Adds the class 'unfocusable' to current result set. The class is not used for styling purposes
@@ -1716,7 +1715,7 @@ export default class JQueryUtils extends $ {
    */
   static unfocusable() {
     return this.addClass('unfocusable');
-  };
+  }
 
   /**
    * Select all text within an element, e.g. within a content editable div element.
@@ -1746,7 +1745,7 @@ export default class JQueryUtils extends $ {
     }
 
     return this;
-  };
+  }
 
   static _getClientAndScrollWidthRounded() {
     var element = this[0];
@@ -1763,7 +1762,7 @@ export default class JQueryUtils extends $ {
       clientWidth: element.clientWidth,
       scrollWidth: element.scrollWidth
     };
-  };
+  }
 
   static _getClientAndScrollWidthReliable() {
     var widths = this._getClientAndScrollWidthRounded();
@@ -1806,7 +1805,7 @@ export default class JQueryUtils extends $ {
       clientWidth: clientWidth,
       scrollWidth: scrollWidth
     };
-  };
+  }
 
   /**
    * Checks if content is truncated.
@@ -1816,7 +1815,7 @@ export default class JQueryUtils extends $ {
     if (widths.scrollWidth > widths.clientWidth) {
       return true;
     }
-  };
+  }
 
   /**
    * This function is used to distinct between single and double clicks.
@@ -1843,53 +1842,53 @@ export default class JQueryUtils extends $ {
         }
       });
     });
-  };
+  }
 
   static onPassive(eventType, handler) {
     var options = events.passiveOptions();
     this[0].addEventListener(eventType, handler, options);
     return this;
-  };
+  }
 
   static offPassive(eventType, handler) {
     var options = events.passiveOptions();
     this[0].removeEventListener(eventType, handler, options);
     return this;
-  };
+  }
 
   // ------------------------------------------------------------------
 
   static appendTable(cssClass) {
     return this.appendElement('<table>', cssClass);
-  };
+  }
 
   static appendColgroup(cssClass) {
     return this.appendElement('<colgroup>', cssClass);
-  };
+  }
 
   static appendCol(cssClass) {
     return this.appendElement('<col>', cssClass);
-  };
+  }
 
   static appendTr(cssClass) {
     return this.appendElement('<tr>', cssClass);
-  };
+  }
 
   static appendTd(cssClass, text) {
     return this.appendElement('<td>', cssClass, text);
-  };
+  }
 
   static appendTh(cssClass, text) {
     return this.appendElement('<th>', cssClass, text);
-  };
+  }
 
   static appendUl(cssClass) {
     return this.appendElement('<ul>', cssClass);
-  };
+  }
 
   static appendLi(cssClass, text) {
     return this.appendElement('<li>', cssClass, text);
-  };
+  }
 
 }
 
@@ -2043,7 +2042,6 @@ $.extend($.fn, {
   appendLi: JQueryUtils.appendLi
 });
 
-
 // === $.easing extensions ===
 
 $.extend($.easing, {
@@ -2080,6 +2078,7 @@ $.extend($.easing, {
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+// eslint-disable-next-line no-shadow-restricted-names
 (function($, undefined) {
 
   // use this transport for "binary" data type

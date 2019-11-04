@@ -11,7 +11,7 @@
 import {Calendar, dates} from '../../src/index';
 import {CalendarSpecHelper} from '@eclipse-scout/testing';
 
-describe("Calendar", function() {
+describe('Calendar', function() {
   var session, helper;
 
   beforeEach(function() {
@@ -29,20 +29,20 @@ describe("Calendar", function() {
     jasmine.clock().uninstall();
   });
 
-  describe("init", function() {
+  describe('init', function() {
 
-    it("creates an empty calendar", function() {
+    it('creates an empty calendar', function() {
       var cal = helper.createCalendar(helper.createSimpleModel());
       expect(cal.viewRange).toBeDefined();
     });
 
   });
 
-  describe("dayPosition", function() {
+  describe('dayPosition', function() {
 
-    it("calculates the day position", function() {
+    it('calculates the day position', function() {
       var cal = helper.createCalendar(helper.createSimpleModel());
-      //fix total size: 80
+      // fix total size: 80
       // All day event. Not relevant since in top grid
       expect(cal._dayPosition(-1, 0)).toBe(0);
       expect(cal._dayPosition(0, 0)).toBe(0);
@@ -58,39 +58,39 @@ describe("Calendar", function() {
 
   });
 
-  describe("component", function() {
+  describe('component', function() {
     var cal, c1, c2, c3, c4, c5, c6, c7, c8;
     var day = dates.parseJsonDate('2016-07-20 00:00:00.000');
     var day2 = dates.parseJsonDate('2016-07-21 00:00:00.000');
     var option1 = {
-      fromDate: "2016-07-20 12:00:00.000",
-      toDate: "2016-07-20 12:30:00.000"
+      fromDate: '2016-07-20 12:00:00.000',
+      toDate: '2016-07-20 12:30:00.000'
     };
     var option2 = {
-      fromDate: "2016-07-20 12:30:00.000",
-      toDate: "2016-07-20 13:00:00.000"
+      fromDate: '2016-07-20 12:30:00.000',
+      toDate: '2016-07-20 13:00:00.000'
     };
     var option3 = {
-      fromDate: "2016-07-20 13:00:00.000",
-      toDate: "2016-07-20 20:00:00.000"
+      fromDate: '2016-07-20 13:00:00.000',
+      toDate: '2016-07-20 20:00:00.000'
     };
     var option4 = {
-      fromDate: "2016-07-20 13:30:00.000",
-      toDate: "2016-07-20 15:00:00.000"
+      fromDate: '2016-07-20 13:30:00.000',
+      toDate: '2016-07-20 15:00:00.000'
     };
     var option5 = {
-      fromDate: "2016-07-20 12:15:00.000",
-      toDate: "2016-07-20 16:00:00.000"
+      fromDate: '2016-07-20 12:15:00.000',
+      toDate: '2016-07-20 16:00:00.000'
     };
 
     var optionSmall1 = {
-      fromDate: "2016-07-20 11:59:00.000",
-      toDate: "2016-07-20 12:00:00.000"
+      fromDate: '2016-07-20 11:59:00.000',
+      toDate: '2016-07-20 12:00:00.000'
     };
 
     var option8 = {
-      fromDate: "2016-07-20 12:00:00.000",
-      toDate: "2016-07-21 08:00:00.000"
+      fromDate: '2016-07-20 12:00:00.000',
+      toDate: '2016-07-21 08:00:00.000'
     };
 
     beforeEach(function() {
@@ -105,15 +105,15 @@ describe("Calendar", function() {
       c8 = helper.createComponent(option8, cal);
     });
 
-    describe("part day position", function() {
+    describe('part day position', function() {
 
-      it("calculates the part day position", function() {
+      it('calculates the part day position', function() {
         var posRange = c4.getPartDayPosition(day);
         expect(posRange.from).toBe(56.25);
         expect(posRange.to).toBe(62.5);
       });
 
-      it("calculates the part day position for a range smaller than the minimum", function() {
+      it('calculates the part day position for a range smaller than the minimum', function() {
         var posRange = c7.getPartDayPosition(day);
         var minRange = 1.04; // Rounded to two digits: 15min (default division in calendar)
         expect(posRange.from).toBe(49.93);
@@ -122,25 +122,25 @@ describe("Calendar", function() {
 
     });
 
-    describe("sort", function() {
-      it("sorts first from then to", function() {
+    describe('sort', function() {
+      it('sorts first from then to', function() {
         var components = [c4, c2, c1];
         cal._sort(components, day);
-        expect(components[0] == c1).toBe(true);
-        expect(components[1] == c2).toBe(true);
-        expect(components[2] == c4).toBe(true);
+        expect(components[0] === c1).toBe(true);
+        expect(components[1] === c2).toBe(true);
+        expect(components[2] === c4).toBe(true);
       });
     });
 
-    describe("arrangeComponents", function() {
+    describe('arrangeComponents', function() {
 
-      it("does nothing for no components", function() {
+      it('does nothing for no components', function() {
         var components = [];
         cal._arrange(components, day);
         expect(components).toEqual([]);
       });
 
-      it("arranges a single component", function() {
+      it('arranges a single component', function() {
         var components = [c1];
         cal._arrange(components, day);
         expect(components[0]).toEqual(c1);
@@ -148,7 +148,7 @@ describe("Calendar", function() {
         expect(c1.stack[day].w).toEqual(1);
       });
 
-      it("arranges intersecting components", function() {
+      it('arranges intersecting components', function() {
         var components = [c5, c1];
         cal._arrange(components, day);
         expect(components[0]).toEqual(c1);
@@ -159,7 +159,7 @@ describe("Calendar", function() {
         expect(c5.stack[day].w).toEqual(2);
       });
 
-      it("arranges equal components", function() {
+      it('arranges equal components', function() {
         var components = [c6, c7];
         cal._arrange(components, day);
         expect(components[0]).toEqual(c6);
@@ -170,7 +170,7 @@ describe("Calendar", function() {
         expect(c7.stack[day].w).toEqual(2);
       });
 
-      it("arranges intersecting and non-intersecting components", function() {
+      it('arranges intersecting and non-intersecting components', function() {
         var components = [c1, c2, c3, c4, c5, c6];
         cal._arrange(components, day);
         expect(components[0]).toEqual(c6);
@@ -194,7 +194,7 @@ describe("Calendar", function() {
         expect(c4.stack[day].x).toEqual(2);
       });
 
-      it("reduces rows when arranging components", function() {
+      it('reduces rows when arranging components', function() {
         var components = [c1, c3, c6];
         cal._arrange(components, day);
         expect(components[0]).toEqual(c6);
@@ -209,7 +209,7 @@ describe("Calendar", function() {
         expect(c3.stack[day].x).toEqual(0);
       });
 
-      it("arranges intersecting components spanning more than one day", function() {
+      it('arranges intersecting components spanning more than one day', function() {
         var day1 = day;
         var components = [c8, c3];
 
@@ -226,15 +226,15 @@ describe("Calendar", function() {
     });
   });
 
-  describe("navigation", function() {
+  describe('navigation', function() {
 
-    it("navigate forward and back (with first day of month selected)", function() {
+    it('navigate forward and back (with first day of month selected)', function() {
       // empty parent div
       var $div = $('<div/>');
 
       // init model
       var model = helper.createSimpleModel();
-      model.selectedDate = "2016-01-01 12:00:00.000";
+      model.selectedDate = '2016-01-01 12:00:00.000';
       model.displayMode = Calendar.DisplayMode.MONTH;
 
       // init and render calendar
@@ -262,13 +262,13 @@ describe("Calendar", function() {
       expect(cal.selectedDate).toEqual(selectedDate);
     });
 
-    it("navigate forward and back (with last day of month selected)", function() {
+    it('navigate forward and back (with last day of month selected)', function() {
       // empty parent div
       var $div = $('<div/>');
 
       // init model
       var model = helper.createSimpleModel();
-      model.selectedDate = "2016-01-31 12:00:00.000";
+      model.selectedDate = '2016-01-31 12:00:00.000';
       model.displayMode = Calendar.DisplayMode.MONTH;
 
       // init and render calendar
@@ -294,7 +294,7 @@ describe("Calendar", function() {
 
       // expect selectedDate is the same as 2016-01-29,
       // because the day was shifted to 29 while navigating over Feb. 2016
-      expect(cal.selectedDate).toEqual(dates.parseJsonDate("2016-01-29 12:00:00.000"));
+      expect(cal.selectedDate).toEqual(dates.parseJsonDate('2016-01-29 12:00:00.000'));
     });
 
   });

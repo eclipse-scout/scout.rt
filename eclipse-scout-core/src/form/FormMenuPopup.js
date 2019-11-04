@@ -19,7 +19,6 @@ export default class FormMenuPopup extends PopupWithHead {
     this._addWidgetProperties('form');
   }
 
-
   _init(options) {
     options.form = options.formMenu.form;
     options.initialFocus = options.formMenu.form._initialFocusElement.bind(options.formMenu.form);

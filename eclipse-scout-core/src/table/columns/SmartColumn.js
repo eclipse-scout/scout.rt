@@ -23,7 +23,6 @@ export default class SmartColumn extends Column {
     this.activeFilterEnabled = false;
   }
 
-
   /**
    * @override
    */

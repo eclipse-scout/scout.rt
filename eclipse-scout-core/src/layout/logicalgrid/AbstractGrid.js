@@ -21,7 +21,6 @@ export default class AbstractGrid extends LogicalGrid {
     this.gridColumns = 0;
   }
 
-
   /**
    * Expects this.gridConfig to be set
    * @override
@@ -49,7 +48,7 @@ export default class AbstractGrid extends LogicalGrid {
         var gd = GridData.createFromHints(widget, 1);
         widget.gridData = gd;
       }
-    }.bind(this));
+    });
     if (containingGridXYCount > 0 && notContainingGridXYCount === 0) {
       this.layoutAllStatic(widgets);
     } else {

@@ -25,7 +25,6 @@ export default class ImageField extends FormField {
     this._clickHandler = null;
   }
 
-
   _init(model) {
     super._init(model);
 

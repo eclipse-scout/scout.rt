@@ -22,7 +22,6 @@ export default class ListBox extends LookupBox {
     this._addWidgetProperties(['table', 'filterBox']);
   }
 
-
   _init(model) {
     super._init(model);
     this.table.on('rowsChecked', this._onTableRowsChecked.bind(this));
@@ -194,7 +193,7 @@ export default class ListBox extends LookupBox {
       headerVisible: false,
       footerVisible: false,
       columns: [{
-        objectType: "Column"
+        objectType: 'Column'
       }]
     });
   }

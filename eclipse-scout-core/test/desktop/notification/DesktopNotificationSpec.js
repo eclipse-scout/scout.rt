@@ -10,7 +10,6 @@
  */
 import {DesktopNotification, scout, Status, Widget} from '../../../src/index';
 
-
 describe('DesktopNotification', function() {
   var session, helper, $sandbox,
     parent = new Widget();

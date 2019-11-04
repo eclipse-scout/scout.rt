@@ -11,7 +11,6 @@
 import {CalendarComponent, CalendarLayout, CalendarListComponent, DateRange, dates, HtmlComponent, KeyStrokeContext, menus as menus_1, objects, scout, scrollbars, strings, Widget} from '../index';
 import * as $ from 'jquery';
 
-
 export default class Calendar extends Widget {
 
   constructor() {
@@ -66,7 +65,6 @@ export default class Calendar extends Widget {
 
     this._addWidgetProperties(['components', 'menus', 'selectedComponent']);
   }
-
 
   init(model, session, register) {
     super.init(model, session, register);
@@ -533,11 +531,11 @@ export default class Calendar extends Widget {
     $('div', this.$container).removeData(['new-width', 'new-height']);
 
     if (this._isMonth()) {
-      this.$topGrid.addClass("calendar-top-grid-short");
-      this.$grid.removeClass("calendar-grid-short");
+      this.$topGrid.addClass('calendar-top-grid-short');
+      this.$grid.removeClass('calendar-grid-short');
     } else {
-      this.$topGrid.removeClass("calendar-top-grid-short");
-      this.$grid.addClass("calendar-grid-short");
+      this.$topGrid.removeClass('calendar-top-grid-short');
+      this.$grid.addClass('calendar-grid-short');
     }
 
     // init vars (Selected: Day)
@@ -1010,7 +1008,6 @@ export default class Calendar extends Widget {
       }
     }
 
-
     scrollbars.uninstall(this.$grid, this.session);
     if (this._isMonth()) {
       this.$grid.removeClass('calendar-scrollable-components');
@@ -1046,10 +1043,10 @@ export default class Calendar extends Widget {
     var i, j, c, r, k,
       columns = [];
 
-    //ordered by from, to
+    // ordered by from, to
     this._sort(components);
 
-    //clear existing placement
+    // clear existing placement
     for (i = 0; i < components.length; i++) {
       c = components[i];
       if (!c.stack) {
@@ -1062,15 +1059,15 @@ export default class Calendar extends Widget {
       c = components[i];
       r = c.getPartDayPosition(day); // Range [from,to]
 
-      //reduce number of columns, if all components end before this one
+      // reduce number of columns, if all components end before this one
       if (columns.length > 0 && this._allEndBefore(columns, r.from, day)) {
         columns = [];
       }
 
-      //replace an component that ends before and can be replaced
+      // replace an component that ends before and can be replaced
       k = this._findReplacableColumn(columns, r.from, day);
 
-      //insert
+      // insert
       if (k >= 0) {
         columns[k] = c;
         c.stack[day].x = k;
@@ -1079,7 +1076,7 @@ export default class Calendar extends Widget {
         c.stack[day].x = columns.length - 1;
       }
 
-      //update stackW
+      // update stackW
       for (j = 0; j < columns.length; j++) {
         columns[j].stack[day].w = columns.length;
       }

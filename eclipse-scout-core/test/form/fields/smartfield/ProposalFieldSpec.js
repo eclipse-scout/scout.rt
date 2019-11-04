@@ -10,7 +10,6 @@
  */
 import {scout, Status} from '../../../../src/index';
 
-
 describe('ProposalField', function() {
 
   var session, field, lookupRow;

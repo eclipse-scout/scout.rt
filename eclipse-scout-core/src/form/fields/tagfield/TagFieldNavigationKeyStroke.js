@@ -11,7 +11,6 @@
 import {keys, KeyStroke, TagBar} from '../../../index';
 import * as $ from 'jquery';
 
-
 /**
  * @param fieldAdapter acts as an interface so we can use the same key-stroke for TagField and TagFieldPopup.
  *
@@ -25,7 +24,6 @@ export default class TagFieldNavigationKeyStroke extends KeyStroke {
     this.preventDefault = false;
     this.preventInvokeAcceptInputOnActiveValueField = true;
   }
-
 
   _accept(event) {
     var accepted = super._accept(event);

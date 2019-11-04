@@ -16,7 +16,6 @@ export default class AbortKeyStroke extends CloseKeyStroke {
     super(field, $drawingArea);
   }
 
-
   handle(event) {
     this.field.abort();
   }

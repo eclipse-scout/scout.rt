@@ -17,7 +17,6 @@ export default class ContextMenuPopupLayout extends PopupWithHeadLayout {
     super(popup);
   }
 
-
   layout($container) {
     var $menuItems = this.popup.$visibleMenuItems();
     this._adjustTextAlignment($menuItems);
@@ -72,7 +71,7 @@ export default class ContextMenuPopupLayout extends PopupWithHeadLayout {
       if (menu.$text) {
         menu.$text.css('max-width', '');
       }
-    }.bind(this));
+    });
   }
 
   _setMaxWidthFor($menuItems) {

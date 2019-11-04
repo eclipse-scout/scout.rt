@@ -16,7 +16,6 @@ export default class WidgetFieldLayout extends FormFieldLayout {
     super(formField);
   }
 
-
   layout($container) {
     super.layout($container);
     scrollbars.update(this.$fieldContainer);

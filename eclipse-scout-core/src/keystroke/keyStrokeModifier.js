@@ -34,13 +34,11 @@ export function isAlt(modifierBitMask) {
   return _eval(modifierBitMask, ALT, ALT_UNDEFINED);
 }
 
-//private
 export function _eval(testee, modifier, modifierUndefined) {
   if ((modifierUndefined & testee) > 0) { // NOSONAR
     return undefined;
-  } else {
-    return (modifier & testee) > 0; // NOSONAR
   }
+  return (modifier & testee) > 0; // NOSONAR
 }
 
 export function toModifierBitMask(event) {

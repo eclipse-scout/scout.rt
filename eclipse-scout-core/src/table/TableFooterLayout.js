@@ -18,7 +18,6 @@ export default class TableFooterLayout extends AbstractLayout {
     this._tableFooter = tableFooter;
   }
 
-
   /**
    * @override
    */

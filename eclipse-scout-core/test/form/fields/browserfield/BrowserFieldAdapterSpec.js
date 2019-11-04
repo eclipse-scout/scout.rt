@@ -10,7 +10,6 @@
  */
 import {RemoteEvent, scout} from '../../../../src/index';
 
-
 describe('BrowserFieldAdapter', function() {
 
   var session;

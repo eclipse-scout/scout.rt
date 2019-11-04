@@ -11,8 +11,7 @@
 import {Range} from '../../src/index';
 import {TreeSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("Compacttree", function() {
+describe('Compacttree', function() {
   var session;
   var helper;
 
@@ -32,10 +31,10 @@ describe("Compacttree", function() {
     $.fx.off = false;
   });
 
-  describe("creation", function() {
+  describe('creation', function() {
 
-    it("adds no empty section node", function() {
-      //top-level node (section) is only rendered, if there are child nodes
+    it('adds no empty section node', function() {
+      // top-level node (section) is only rendered, if there are child nodes
       var model = helper.createModelFixture(1);
       var tree = helper.createCompactTree(model);
       var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 1));
@@ -43,7 +42,7 @@ describe("Compacttree", function() {
       expect(tree.nodes.length).toBe(1);
     });
 
-    it("adds a node with child node", function() {
+    it('adds a node with child node', function() {
       var model = helper.createModelFixture(1, 1, true);
       var tree = helper.createCompactTree(model);
       var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 4));
@@ -52,7 +51,7 @@ describe("Compacttree", function() {
       expect(tree.visibleNodesFlat.length).toBe(2);
     });
 
-    it("adds a node with child nodes in correct order", function() {
+    it('adds a node with child nodes in correct order', function() {
       var model = helper.createModelFixture(2, 1, true);
       var tree = helper.createCompactTree(model);
       var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
@@ -60,18 +59,18 @@ describe("Compacttree", function() {
       expect(tree.nodes.length).toBe(2);
       expect(tree.visibleNodesFlat.length).toBe(6);
 
-      //check $node
+      // check $node
       var firstNode = tree.nodes[0].$node.children();
-      expect($(firstNode[0]).hasClass("title")).toBe(true);
-      expect($(firstNode[0]).text()).toBe("node 0");
-      expect($(firstNode[1]).hasClass("section-node")).toBe(true);
-      expect($(firstNode[1]).text()).toBe("node 0_0");
-      expect($(firstNode[2]).hasClass("section-node")).toBe(true);
-      expect($(firstNode[2]).text()).toBe("node 0_1");
+      expect($(firstNode[0]).hasClass('title')).toBe(true);
+      expect($(firstNode[0]).text()).toBe('node 0');
+      expect($(firstNode[1]).hasClass('section-node')).toBe(true);
+      expect($(firstNode[1]).text()).toBe('node 0_0');
+      expect($(firstNode[2]).hasClass('section-node')).toBe(true);
+      expect($(firstNode[2]).text()).toBe('node 0_1');
     });
 
-    //deletion
-    it("deletes a node", function() {
+    // deletion
+    it('deletes a node', function() {
       var model = helper.createModelFixture(2, 1, true);
       var tree = helper.createCompactTree(model);
       var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
@@ -80,16 +79,16 @@ describe("Compacttree", function() {
       expect(tree.nodes.length).toBe(2);
       expect(tree.visibleNodesFlat.length).toBe(5);
 
-      //check $node
+      // check $node
       var firstNode = tree.nodes[0].$node.children();
-      expect($(firstNode[0]).hasClass("title")).toBe(true);
-      expect($(firstNode[0]).text()).toBe("node 0");
-      expect($(firstNode[1]).hasClass("section-node")).toBe(true);
-      expect($(firstNode[1]).text()).toBe("node 0_1");
+      expect($(firstNode[0]).hasClass('title')).toBe(true);
+      expect($(firstNode[0]).text()).toBe('node 0');
+      expect($(firstNode[1]).hasClass('section-node')).toBe(true);
+      expect($(firstNode[1]).text()).toBe('node 0_1');
     });
 
-    //insertions
-    it("inserts a child node", function() {
+    // insertions
+    it('inserts a child node', function() {
       var model = helper.createModelFixture(2, 1, true);
       var tree = helper.createCompactTree(model);
       var parent0 = tree.nodes[0];
@@ -102,21 +101,21 @@ describe("Compacttree", function() {
       expect(tree.nodes.length).toBe(2);
       expect(tree.visibleNodesFlat.length).toBe(6);
 
-      //check $node
+      // check $node
       var firstNode = parent0.$node.children();
-      expect($(firstNode[0]).hasClass("title")).toBe(true);
-      expect($(firstNode[0]).text()).toBe("node 0");
-      expect($(firstNode[1]).hasClass("section-node")).toBe(true);
-      expect($(firstNode[1]).text()).toBe("node 0_0");
-      expect($(firstNode[2]).hasClass("section-node")).toBe(true);
-      expect($(firstNode[2]).text()).toBe("node 0_1");
+      expect($(firstNode[0]).hasClass('title')).toBe(true);
+      expect($(firstNode[0]).text()).toBe('node 0');
+      expect($(firstNode[1]).hasClass('section-node')).toBe(true);
+      expect($(firstNode[1]).text()).toBe('node 0_0');
+      expect($(firstNode[2]).hasClass('section-node')).toBe(true);
+      expect($(firstNode[2]).text()).toBe('node 0_1');
     });
 
   });
 
-  describe("node click", function() {
+  describe('node click', function() {
 
-    it("calls selectNodes", function() {
+    it('calls selectNodes', function() {
       var model = helper.createModelFixture(2, 1, true);
       var tree = helper.createCompactTree(model);
       spyOn(tree, 'selectNodes');

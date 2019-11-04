@@ -10,12 +10,11 @@
  */
 import {Status} from '../../src/index';
 
+describe('scout.Status', function() {
 
-describe("scout.Status", function() {
+  describe('convenience functions', function() {
 
-  describe("convenience functions", function() {
-
-    it("create valid status objects", function() {
+    it('create valid status objects', function() {
       var status;
 
       // 1. Options argument (default)

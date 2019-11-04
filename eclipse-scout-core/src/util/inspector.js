@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-
 /**
  * Adds inspector info (e.g. classId) from the given 'model' to the DOM. The target element
  * is either the given '$container' or model.$container. Nothing happens if model or target
@@ -27,7 +26,6 @@ export function applyInfo(model, $container) {
   $container.toggleAttr('data-modelclass', !!model.modelClass, model.modelClass);
   $container.toggleAttr('data-classid', !!model.classId, model.classId);
 }
-
 
 export default {
   applyInfo

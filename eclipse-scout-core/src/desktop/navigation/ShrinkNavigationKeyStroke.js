@@ -23,7 +23,6 @@ export default class ShrinkNavigationKeyStroke extends KeyStroke {
     }.bind(this);
   }
 
-
   _isEnabled() {
     var enabled = super._isEnabled();
     return enabled && this.field.leftVisible;

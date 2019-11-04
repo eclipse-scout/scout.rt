@@ -89,7 +89,6 @@ export default class Outline extends Tree {
     this._addWidgetProperties(['defaultDetailForm', 'views', 'selectedViewTabs', 'dialogs', 'messageBoxes', 'fileChoosers']);
   }
 
-
   _init(model) {
     // add filter before first traversal of tree -> tree is only traversed once.
     this.addFilter(new DetailTableTreeFilter(), true);
@@ -157,7 +156,7 @@ export default class Outline extends Tree {
   }
 
   _filterMenus(menus, destination, onlyVisible, enableDisableKeyStroke) {
-    //show no contextmenues
+    // show no contextmenues
     return [];
   }
 
@@ -356,12 +355,12 @@ export default class Outline extends Tree {
     }
   }
 
-// Info: we pass the keyStrokeContext of the parent (table or form) to
-// the created buttons, we cannot use keyStrokeContext of the outline
-// because that context is disabled when the outline is collapsed. We
-// cannot set the property 'keyStrokeContext' because this would interfere
-// with the default keyStrokeContext which is already created when the CTOR
-// of Widget runs.
+  // Info: we pass the keyStrokeContext of the parent (table or form) to
+  // the created buttons, we cannot use keyStrokeContext of the outline
+  // because that context is disabled when the outline is collapsed. We
+  // cannot set the property 'keyStrokeContext' because this would interfere
+  // with the default keyStrokeContext which is already created when the CTOR
+  // of Widget runs.
   _createNavigateButtons(node, parent) {
     var menus = arrays.ensure(parent.staticMenus);
     if (!this._hasMenu(menus, NavigateUpButton)) {
@@ -1116,7 +1115,7 @@ export default class Outline extends Tree {
     return this.session.desktop.outline === this;
   }
 
-// see Java: AbstractOutline#makeActivePageToContextPage
+  // see Java: AbstractOutline#makeActivePageToContextPage
   activateCurrentPage() {
     var activePage = this.activePage();
     if (activePage) {

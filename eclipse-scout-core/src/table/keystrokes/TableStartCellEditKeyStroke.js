@@ -29,7 +29,6 @@ export default class TableStartCellEditKeyStroke extends KeyStroke {
     }.bind(this);
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     if (!accepted) {
@@ -50,9 +49,8 @@ export default class TableStartCellEditKeyStroke extends KeyStroke {
     if (position) {
       event._editPosition = position;
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   handle(event) {

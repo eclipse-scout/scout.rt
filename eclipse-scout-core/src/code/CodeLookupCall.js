@@ -17,7 +17,6 @@ export default class CodeLookupCall extends StaticLookupCall {
     this.codeType = null;
   }
 
-
   _lookupRowByKey(key) {
     var codeType = codes.codeType(this.codeType, true);
     if (!codeType) {

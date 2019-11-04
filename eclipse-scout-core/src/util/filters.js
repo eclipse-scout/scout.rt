@@ -10,7 +10,6 @@
  */
 import * as $ from 'jquery';
 
-
 /**
  * Ensures the given parameter is an array
  */

@@ -16,7 +16,6 @@ export default class DesktopNotificationAdapter extends NotificationAdapter {
     super();
   }
 
-
   _onWidgetClose(event) {
     this._send('close', {
       ref: event.ref

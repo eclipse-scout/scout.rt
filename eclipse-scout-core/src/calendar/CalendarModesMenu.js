@@ -18,7 +18,6 @@ export default class CalendarModesMenu extends Menu {
     this.displayMode;
   }
 
-
   _init(model) {
     super._init(model);
     this.calendar = this.parent;

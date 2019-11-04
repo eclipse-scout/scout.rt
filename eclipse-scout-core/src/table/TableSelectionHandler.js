@@ -41,7 +41,7 @@ export default class TableSelectionHandler {
     this.lastActionRow = undefined;
   }
 
-// TODO [7.0] bsh: Table Selection | Try to merge this with TableKeystrokeContext
+  // TODO [7.0] bsh: Table Selection | Try to merge this with TableKeystrokeContext
   onMouseDown(event) {
     var $row = $(event.currentTarget),
       row = $row.data('row'),

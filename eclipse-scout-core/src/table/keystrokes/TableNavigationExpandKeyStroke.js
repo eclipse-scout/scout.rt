@@ -25,7 +25,6 @@ export default class TableNavigationExpandKeyStroke extends AbstractTableNavigat
     }.bind(this);
   }
 
-
   _accept(event) {
     var accepted = super._accept(event),
       selectedRow = this.field.selectedRows[0];

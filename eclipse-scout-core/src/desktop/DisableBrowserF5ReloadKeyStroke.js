@@ -35,7 +35,6 @@ export default class DisableBrowserF5ReloadKeyStroke extends KeyStroke {
     this.renderingHints.render = false;
   }
 
-
   /**
    * @override KeyStroke.js
    */

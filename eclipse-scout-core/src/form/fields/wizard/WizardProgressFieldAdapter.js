@@ -16,7 +16,6 @@ export default class WizardProgressFieldAdapter extends FormFieldAdapter {
     super();
   }
 
-
   _onWidgetStepAction(event) {
     this._send('doStepAction', {
       stepIndex: event.stepIndex

@@ -17,7 +17,6 @@ export default class ViewButtonActionKeyStroke extends ActionKeyStroke {
 
   }
 
-
   _postRenderKeyBox($drawingArea) {
     if (this.field.iconId && !this.field._isMenuItem) {
       var width = $drawingArea.outerWidth();

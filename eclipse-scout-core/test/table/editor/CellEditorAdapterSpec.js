@@ -11,8 +11,7 @@
 import {RemoteEvent, StringFieldAdapter} from '../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("CellEditorAdapter", function() {
+describe('CellEditorAdapter', function() {
   var session;
   var helper;
   var formHelper;
@@ -63,7 +62,7 @@ describe("CellEditorAdapter", function() {
     return findPopup();
   }
 
-  describe("endCellEdit event", function() {
+  describe('endCellEdit event', function() {
 
     function createEndCellEditEvent(model, fieldId) {
       return {
@@ -73,7 +72,7 @@ describe("CellEditorAdapter", function() {
       };
     }
 
-    it("destroys the field", function() {
+    it('destroys the field', function() {
       var popup = createTableAndStartCellEdit();
       var field = popup.cell.field;
 
@@ -86,7 +85,7 @@ describe("CellEditorAdapter", function() {
       expect(session.getModelAdapter(field.id)).toBeFalsy();
     });
 
-    it("removes the cell editor popup", function() {
+    it('removes the cell editor popup', function() {
       var popup = createTableAndStartCellEdit();
       var field = popup.cell.field;
 
@@ -104,9 +103,9 @@ describe("CellEditorAdapter", function() {
 
   });
 
-  describe("completeEdit", function() {
+  describe('completeEdit', function() {
 
-    it("sends completeCellEdit", function(done) {
+    it('sends completeCellEdit', function(done) {
       var popup = createTableAndStartCellEdit();
       popup.completeEdit()
         .then(function() {
@@ -120,7 +119,7 @@ describe("CellEditorAdapter", function() {
       jasmine.clock().tick(5);
     });
 
-    it("sends completeCellEdit only once", function(done) {
+    it('sends completeCellEdit only once', function(done) {
       var popup = createTableAndStartCellEdit();
       var doneFunc = function() {
         sendQueuedAjaxCalls();
@@ -139,7 +138,7 @@ describe("CellEditorAdapter", function() {
       jasmine.clock().tick(5);
     });
 
-    it("does not remove the popup and its field (will be done by endCellEdit)", function() {
+    it('does not remove the popup and its field (will be done by endCellEdit)', function() {
       var popup = createTableAndStartCellEdit();
       popup.completeEdit();
 
@@ -151,9 +150,9 @@ describe("CellEditorAdapter", function() {
 
   });
 
-  describe("cancelEdit", function() {
+  describe('cancelEdit', function() {
 
-    it("sends cancelCellEdit", function() {
+    it('sends cancelCellEdit', function() {
       var popup = createTableAndStartCellEdit();
       popup.cancelEdit();
       sendQueuedAjaxCalls();
@@ -164,7 +163,7 @@ describe("CellEditorAdapter", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it("removes the popup and its field", function() {
+    it('removes the popup and its field', function() {
       var popup = createTableAndStartCellEdit();
       popup.cancelEdit();
 

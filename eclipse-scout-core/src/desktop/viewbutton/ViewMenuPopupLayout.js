@@ -16,7 +16,6 @@ export default class ViewMenuPopupLayout extends PopupWithHeadLayout {
     super(popup);
   }
 
-
   preferredLayoutSize($container) {
     var prefSize = super.preferredLayoutSize($container);
 

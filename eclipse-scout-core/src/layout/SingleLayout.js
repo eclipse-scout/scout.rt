@@ -22,7 +22,6 @@ export default class SingleLayout extends AbstractLayout {
     this._htmlChild = htmlChild;
   }
 
-
   layout($container) {
     var htmlContainer = HtmlComponent.get($container);
     var childSize = htmlContainer.availableSize()

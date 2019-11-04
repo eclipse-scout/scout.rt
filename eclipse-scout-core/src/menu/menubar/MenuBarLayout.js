@@ -22,7 +22,6 @@ export default class MenuBarLayout extends AbstractLayout {
     this.collapsed = false;
   }
 
-
   layout($container) {
     var menuItems = this._menuBar.orderedMenuItems.left.concat(this._menuBar.orderedMenuItems.right),
       htmlContainer = HtmlComponent.get($container),
@@ -100,7 +99,7 @@ export default class MenuBarLayout extends AbstractLayout {
     }
     // shortcut for minimum size.
     if (prefWidth <= 0) {
-      //reset overflown
+      // reset overflown
       overflowMenuItems.forEach(function(menuItem) {
         menuItem._setOverflown(true);
       });
@@ -134,7 +133,7 @@ export default class MenuBarLayout extends AbstractLayout {
       prefSize = this._prefSize(visibleMenuItems);
     }
 
-    //reset overflown
+    // reset overflown
     overflowMenuItems.forEach(function(menuItem) {
       menuItem._setOverflown(true);
     });

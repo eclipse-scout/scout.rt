@@ -11,8 +11,7 @@
 import {RadioButtonGroup, scout} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("RadioButtonGroup", function() {
+describe('RadioButtonGroup', function() {
   var session;
   var helper;
 

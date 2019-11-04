@@ -28,7 +28,6 @@ export default class SmartFieldPopupLayout extends PopupLayout {
     this.doubleCalcPrefSize = false;
   }
 
-
   layout($container) {
     var size, popupSize,
       htmlProposalChooser = this._htmlProposalChooser();

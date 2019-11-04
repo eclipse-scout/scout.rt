@@ -34,7 +34,6 @@ export default class TabBox extends CompositeField {
     this._tabBoxHeaderPropertyChangeHander = this._onTabBoxHeaderPropertyChange.bind(this);
   }
 
-
   /**
    * @override FormField.js
    */

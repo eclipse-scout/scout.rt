@@ -18,7 +18,6 @@ export default class CalendarField extends FormField {
     this._addWidgetProperties(['calendar']);
   }
 
-
   _render() {
     this.addContainer(this.$parent, 'calendar-field');
     this.addLabel();

@@ -10,7 +10,6 @@
  */
 import {Action, keys, scout} from '../../src/index';
 
-
 describe('Action', function() {
   var $sandbox, session;
 

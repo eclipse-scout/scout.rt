@@ -17,7 +17,6 @@ export default class HtmlTile extends Tile {
     this.content = null;
   }
 
-
   _render() {
     this.$container = this.$parent.appendDiv('html-tile');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);

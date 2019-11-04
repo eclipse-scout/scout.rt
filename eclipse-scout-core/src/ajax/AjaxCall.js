@@ -18,7 +18,6 @@ export default class AjaxCall extends Call {
     this.type = 'ajax';
   }
 
-
   init(model) {
     if (!model) {
       throw new Error('Missing argument "model"');
@@ -32,7 +31,7 @@ export default class AjaxCall extends Call {
     super.init(model);
   }
 
-// ==================================================================================
+  // ==================================================================================
 
   _callImpl() {
     // Mark retries by adding an URL parameter

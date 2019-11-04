@@ -36,7 +36,6 @@ export default class LoginBox extends Box {
     };
   }
 
-
   init(options) {
     options = options || {};
     options.texts = new TextMap($.extend(this.texts, options.texts));
@@ -170,7 +169,7 @@ export default class LoginBox extends Box {
     }.bind(this));
   }
 
-// ----- Helper functions -----
+  // ----- Helper functions -----
 
   static prepareRedirectUrl(url) {
     var urlParts = /^([^?#]*)(\?[^#]*)?(#.*)?$/.exec(url || ''); // $1 = baseUrl, $2 = queryPart, $3 = hashPart

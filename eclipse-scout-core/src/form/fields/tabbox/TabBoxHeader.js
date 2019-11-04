@@ -25,7 +25,6 @@ export default class TabBoxHeader extends Widget {
     this._tabAreaPropertyChangeHandler = this._onTabAreaPropertyChange.bind(this);
   }
 
-
   _init(options) {
     super._init(options);
     this.tabBox = options.tabBox;

@@ -20,7 +20,6 @@ export default class OutlineTileField extends FormField {
     this.tileOutlineOverview = null;
   }
 
-
   _render() {
     this._ensureTileOutlineOverview();
     this.addContainer(this.$parent, 'outline-tile-field');

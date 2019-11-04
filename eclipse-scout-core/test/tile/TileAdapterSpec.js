@@ -10,8 +10,7 @@
  */
 import {scout} from '../../src/index';
 
-
-describe("TileGridAdapter", function() {
+describe('TileGridAdapter', function() {
   var session;
 
   beforeEach(function() {
@@ -48,9 +47,9 @@ describe("TileGridAdapter", function() {
     return tile;
   }
 
-  describe("initProperties", function() {
+  describe('initProperties', function() {
 
-    it("creates a tile filter if tiles are filtered by the server", function() {
+    it('creates a tile filter if tiles are filtered by the server', function() {
       var tile0 = createTile();
       var tile1 = createTile();
       var tile2 = createTile();
@@ -79,9 +78,9 @@ describe("TileGridAdapter", function() {
 
   });
 
-  describe("_syncFilteredTiles", function() {
+  describe('_syncFilteredTiles', function() {
 
-    it("creates a tile filter if tiles are filtered by the server", function() {
+    it('creates a tile filter if tiles are filtered by the server', function() {
       var tile0 = createTile();
       var tile1 = createTile();
       var tile2 = createTile();

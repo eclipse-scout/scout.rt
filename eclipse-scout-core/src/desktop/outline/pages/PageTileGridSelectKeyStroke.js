@@ -35,7 +35,6 @@ export default class PageTileGridSelectKeyStroke extends RangeKeyStroke {
     }.bind(this);
   }
 
-
   /**
    * @override
    */

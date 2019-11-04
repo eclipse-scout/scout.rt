@@ -26,7 +26,6 @@ export default class BooleanColumn extends Column {
     this.textBased = false;
   }
 
-
   /**
    * @override
    */

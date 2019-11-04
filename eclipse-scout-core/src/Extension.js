@@ -38,9 +38,6 @@ import {scout} from './index';
  */
 export default class Extension {
 
-  constructor() {
-  };
-
   extend(extended, funcName) {
     var origFunc = extended[funcName];
     var extension = this;

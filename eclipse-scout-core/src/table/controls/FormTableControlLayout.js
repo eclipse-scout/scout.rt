@@ -18,7 +18,6 @@ export default class FormTableControlLayout extends AbstractLayout {
     this.control = control;
   }
 
-
   layout($container) {
     if (!this.control.contentRendered || !this.control.form) {
       return;

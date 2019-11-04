@@ -20,7 +20,6 @@ export default class TableHeaderMenuButtonKeyStroke extends KeyStroke {
     this.stopPropagation = true;
   }
 
-
   handle(event) {
     this.field.doAction();
   }

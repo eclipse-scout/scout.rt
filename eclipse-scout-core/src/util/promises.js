@@ -11,7 +11,6 @@
 import {PromiseCreator} from '../index';
 import * as $ from 'jquery';
 
-
 /**
  * Use a promise creator to create a promise and wait until each promise has been done before the next
  * promise is created and executed.
@@ -109,7 +108,7 @@ export function parallel(maxPoolSize, promiseCreator, timeout) {
   }
 
   function _startNext(promiseCreator) {
-    if (deferred.state() !== "pending") {
+    if (deferred.state() !== 'pending') {
       // deferred has already been rejected or resolved, do not start anymore promises or call done handler
       return;
     }
@@ -122,7 +121,6 @@ export function parallel(maxPoolSize, promiseCreator, timeout) {
     }
   }
 }
-
 
 export default {
   groupwise,

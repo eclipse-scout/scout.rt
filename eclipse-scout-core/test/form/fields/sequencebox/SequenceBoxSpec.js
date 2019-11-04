@@ -11,7 +11,6 @@
 import {dates, scout, SequenceBoxGridConfig, Status} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper, MenuSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('SequenceBox', function() {
   var session, helper, menuHelper;
 
@@ -515,8 +514,8 @@ describe('SequenceBox', function() {
 
   });
 
-  describe("clone", function() {
-    it("considers the clone properties and deep clones fields", function() {
+  describe('clone', function() {
+    it('considers the clone properties and deep clones fields', function() {
       var cloneHelper = new CloneSpecHelper();
       var seqBox = scout.create('SequenceBox', {
         parent: session.desktop,

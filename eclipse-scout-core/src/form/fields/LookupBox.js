@@ -30,7 +30,6 @@ export default class LookupBox extends ValueField {
     this._addCloneProperties(['lookupCall']);
   }
 
-
   static ErrorCode = {
     NO_DATA: 1
   };
@@ -155,10 +154,6 @@ export default class LookupBox extends ValueField {
         result: result
       });
     }
-  }
-
-  _clearLookupStatus() {
-    this.setLookupStatus(null);
   }
 
   _errorStatus() {

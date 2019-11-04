@@ -21,7 +21,6 @@ export default class TileTableField extends TableField {
     this._menuBarPropertyChangeHandler = this._onMenuBarPropertyChange.bind(this);
   }
 
-
   /**
    * @override
    */

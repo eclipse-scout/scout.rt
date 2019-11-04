@@ -11,7 +11,6 @@
 import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
 import {Form, NullWidget, Rectangle, scout, Status, webstorage} from '../../src/index';
 
-
 describe('Form', function() {
   var session, helper, outlineHelper;
 

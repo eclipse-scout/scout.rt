@@ -10,16 +10,15 @@
  */
 import {Dimension, Insets, LogicalGridData, LogicalGridLayoutInfo, Rectangle} from '../../../src/index';
 
-
 /* This test also exists as Java code, to make sure Java and JS code produces the same results */
-describe("LogicalGridLayoutInfo", function() {
+describe('LogicalGridLayoutInfo', function() {
 
-  describe("Rectangle.union", function() {
+  describe('Rectangle.union', function() {
 
     var r1 = new Rectangle(0, 0, 675, 558);
     var r2 = new Rectangle(687, 0, 674, 558);
 
-    it("produces same results as java.awt.Rectangle", function() {
+    it('produces same results as java.awt.Rectangle', function() {
       var r = r1.union(r2);
       var expected = new Rectangle(0, 0, 1361, 558);
       expect(expected.equals(r)).toBe(true);
@@ -27,7 +26,7 @@ describe("LogicalGridLayoutInfo", function() {
 
   });
 
-  describe("layoutCellBounds", function() {
+  describe('layoutCellBounds', function() {
     // Create some mock-objects for JQuery selector- and HtmlComponent instances.
     var mockJquery = function(compName) {
       var jquery = this;
@@ -82,7 +81,7 @@ describe("LogicalGridLayoutInfo", function() {
     var parentSize = new Dimension(500, 23);
     var parentInsets = new Insets(0, 0, 0, 0);
 
-    it("calculates bounds", function() {
+    it('calculates bounds', function() {
       lgli.layoutCellBounds(parentSize, parentInsets);
 
       var rows = lgli.layoutCellBounds(parentSize, parentInsets);

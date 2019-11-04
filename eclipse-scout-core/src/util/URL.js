@@ -158,7 +158,7 @@ export default class URL {
    *
    * @memberOf URL
    */
-//
+  //
   static _formatQueryParam(key, value) {
     var s = encodeURIComponent(key);
     if (value !== undefined && value !== null) {
@@ -175,10 +175,10 @@ export default class URL {
    */
   static _addToMap(map, key, value) {
     if (map === undefined) {
-      throw new Error("Argument 'map' must not be null");
+      throw new Error('Argument \'map\' must not be null');
     }
     if (key === undefined) {
-      throw new Error("Argument 'key' must not be null");
+      throw new Error('Argument \'key\' must not be null');
     }
     if (key in map) {
       var oldValue = map[key];

@@ -41,7 +41,6 @@ export default class Action extends Widget {
     this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
   }
 
-
   static ActionStyle = {
     DEFAULT: 0,
     BUTTON: 1

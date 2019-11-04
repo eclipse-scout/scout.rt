@@ -10,7 +10,6 @@
  */
 import {QueryBy, scout} from '../../../../src/index';
 
-
 describe('SmartFieldMultiline', function() {
 
   var session, field;

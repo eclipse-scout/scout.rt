@@ -10,11 +10,8 @@
  */
 export default class OutlineMediator {
 
-  constructor() {
-  };
-
   init(model) {
-  };
+  }
 
   _skipEvent(page) {
     return page === null || page.getOutline() === null || page.leaf;

@@ -18,7 +18,6 @@ export default class TileField extends FormField {
     this._addWidgetProperties(['tileGrid']);
   }
 
-
   _init(model) {
     super._init(model);
 

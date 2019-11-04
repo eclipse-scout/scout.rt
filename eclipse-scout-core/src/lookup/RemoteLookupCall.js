@@ -19,7 +19,6 @@ export default class RemoteLookupCall extends LookupCall {
     this.deferred = null;
   }
 
-
   /**
    * To be implemented by the subclass.
    *

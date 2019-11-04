@@ -25,7 +25,6 @@ export default class ViewMenuPopup extends PopupWithHead {
     this._viewMenuActionHandler = this._onViewMenuAction.bind(this);
   }
 
-
   static MAX_MENU_WIDTH = 300;
 
   _init(options) {

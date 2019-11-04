@@ -23,7 +23,6 @@ export default class ModeSelector extends Widget {
     this._modePropertyChangeHandler = this._onModePropertyChange.bind(this);
   }
 
-
   _init(model) {
     super._init(model);
     this._setModes(this.modes);

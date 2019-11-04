@@ -11,7 +11,6 @@
 import {keys, scout} from '../../../../src/index';
 import {TabBoxSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('TabBox', function() {
   var session;
   var helper;
@@ -112,10 +111,10 @@ describe('TabBox', function() {
         parent: session.desktop,
         tabItems: [{
           objectType: 'TabItem',
-          label: "first"
+          label: 'first'
         }, {
           objectType: 'TabItem',
-          label: "second"
+          label: 'second'
         }]
       });
       // set the tab-item to inline-block to ensure correct width calculation (e.g. PhantomJS)
@@ -136,14 +135,14 @@ describe('TabBox', function() {
         parent: session.desktop,
         tabItems: [{
           objectType: 'TabItem',
-          label: "first",
+          label: 'first',
           visible: false
         }, {
           objectType: 'TabItem',
-          label: "second"
+          label: 'second'
         }, {
           objectType: 'TabItem',
-          label: "third"
+          label: 'third'
         }]
       });
       tabBox.render();

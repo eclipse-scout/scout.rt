@@ -18,7 +18,6 @@ export default class TableHeaderMenuLayout extends PopupLayout {
     this.doubleCalcPrefSize = false;
   }
 
-
   static TABLE_MAX_HEIGHT = 330;
 
   /**
@@ -121,7 +120,7 @@ export default class TableHeaderMenuLayout extends PopupLayout {
     return super._adjustSizeWithAnchor(prefSize);
   }
 
-// group title (size used for table + field container)
+  // group title (size used for table + field container)
   _groupTitleHeight($group) {
     return graphics.size($group.find('.table-header-menu-group-text'), true).height;
   }

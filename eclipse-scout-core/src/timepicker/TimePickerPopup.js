@@ -16,7 +16,6 @@ export default class TimePickerPopup extends Popup {
     super();
   }
 
-
   _init(options) {
     options.scrollType = options.scrollType || 'layoutAndPosition';
     options.withFocusContext = false;

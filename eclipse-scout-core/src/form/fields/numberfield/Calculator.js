@@ -21,7 +21,7 @@
 export default class Calculator {
 
   constructor() {
-  };
+  }
 
   isFormula(input) {
     return input.match(/^[\d\(\)\+\-\*\/\.]+$/);
@@ -53,7 +53,7 @@ export default class Calculator {
     return this._sum();
   }
 
-//a+b+...
+  // a+b+...
   _sum() {
     var v = this._prod();
     while (this._next() === '+' || this._next() === '-') {
@@ -69,7 +69,7 @@ export default class Calculator {
     return v;
   }
 
-//a*b*...
+  // a*b*...
   _prod() {
     var v = this._unary();
     while (this._next() === '*' || this._next() === '/') {
@@ -85,7 +85,7 @@ export default class Calculator {
     return v;
   }
 
-//[+-]123, [+-](a)
+  // [+-]123, [+-](a)
   _unary() {
     var qualifier = 1;
     if (this._next() === '+') {
@@ -98,12 +98,12 @@ export default class Calculator {
     if ((v = this._group()) !== undefined) {
       return qualifier * v;
     }
-    //must be num
+    // must be num
     v = this._consumeNext();
     return qualifier * v;
   }
 
-//(a)
+  // (a)
   _group() {
     if (this._next() === '(') {
       this._consumeNext();

@@ -22,7 +22,6 @@ export default class AppLinkKeyStroke extends KeyStroke {
     this.renderingHints.render = false;
   }
 
-
   /**
    * @override KeyStroke.js
    */

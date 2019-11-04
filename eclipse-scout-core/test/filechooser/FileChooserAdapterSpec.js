@@ -10,7 +10,6 @@
  */
 import {RemoteEvent, scout} from '../../src/index';
 
-
 describe('FileChooserAdapter', function() {
   var session;
 

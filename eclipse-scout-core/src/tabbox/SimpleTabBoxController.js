@@ -11,7 +11,6 @@
 import {objects, scout} from '../index';
 import * as $ from 'jquery';
 
-
 /**
  * The {@link {@link SimpleTabBoxController}} is used to link a {@link {@link SimpleTabBox}} with a {@link {@link SimpleTabArea}}.
  * There are {@link {@link SimpleTabBox}} with more than one {@link {@link SimpleTabArea}} to actualized.

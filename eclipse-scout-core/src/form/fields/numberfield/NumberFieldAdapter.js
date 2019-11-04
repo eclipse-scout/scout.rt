@@ -15,7 +15,6 @@ export default class NumberFieldAdapter extends BasicFieldAdapter {
     super();
   }
 
-
   _onWidgetParseError(event) {
     // The parsing might fail on JS side, but it might succeed on server side -> Don't show an error status, instead let the server decide
     event.preventDefault();

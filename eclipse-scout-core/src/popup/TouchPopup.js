@@ -30,7 +30,6 @@ export default class TouchPopup extends Popup {
     this._touchFieldPropertyChangeListener = this._onTouchFieldPropertyChange.bind(this);
   }
 
-
   _init(options) {
     super._init(options);
     this._touchField = options.field;

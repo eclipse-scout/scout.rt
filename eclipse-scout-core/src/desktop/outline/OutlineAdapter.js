@@ -18,7 +18,6 @@ export default class OutlineAdapter extends TreeAdapter {
     this._detailTableRowInitHandler = this._onDetailTableRowInit.bind(this);
   }
 
-
   /**
    * We must call onWidgetPageInit because this adapter cannot process the 'pageInit' event
    * while the widget is initialized, since the listener is not attached until the widget

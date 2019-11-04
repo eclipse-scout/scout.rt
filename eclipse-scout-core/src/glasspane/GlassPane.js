@@ -17,7 +17,6 @@ export default class GlassPane extends Widget {
     super();
   }
 
-
   _render() {
     this.$container = this.$parent
       .appendDiv('glasspane')

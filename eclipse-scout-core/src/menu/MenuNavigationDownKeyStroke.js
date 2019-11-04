@@ -19,7 +19,6 @@ export default class MenuNavigationDownKeyStroke extends MenuNavigationKeyStroke
     this.renderingHints.render = false;
   }
 
-
   handle(event) {
     var menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
     if (menuItems.$selected.length > 0) {

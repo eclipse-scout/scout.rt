@@ -9,7 +9,6 @@ export default class BeanTile extends Tile {
     this.bean = null;
   }
 
-
   _render() {
     this.$container = this.$parent.appendDiv('bean-tile');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);

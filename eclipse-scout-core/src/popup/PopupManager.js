@@ -19,7 +19,6 @@ export default class PopupManager extends Widget {
     this._addPreserveOnPropertyChangeProperties(['popups']);
   }
 
-
   _init(model) {
     super._init(model);
     this.session.layoutValidator.schedulePostValidateFunction(function() {

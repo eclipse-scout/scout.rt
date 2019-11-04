@@ -16,7 +16,6 @@ export default class WizardProgressFieldLayout extends FormFieldLayout {
     super(formField);
   }
 
-
   layout($container) {
     super.layout($container);
 

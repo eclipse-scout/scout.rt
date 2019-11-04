@@ -11,7 +11,6 @@
 import {arrays, CodeType, objects, scout, texts} from '../index';
 import * as $ from 'jquery';
 
-
 /**
  * This default language is used whenever a code registers its texts in scout.texts.
  */
@@ -24,7 +23,6 @@ export function bootstrap(url) {
   return promise.then(_preInit.bind(this, url));
 }
 
-//private
 export function _preInit(url, data) {
   if (data && data.error) {
     // The result may contain a json error (e.g. session timeout) -> abort processing
@@ -109,7 +107,6 @@ export function optGet(vararg, codeId) {
   return _get('optGet', objects.argumentsToArray(arguments));
 }
 
-//private
 export function _get(funcName, funcArgs) {
   var codeTypeId, codeId;
   if (funcArgs.length === 2) {
@@ -165,7 +162,6 @@ export function registerTexts(code, textsArg) {
   }
   return key;
 }
-
 
 export default {
   add,

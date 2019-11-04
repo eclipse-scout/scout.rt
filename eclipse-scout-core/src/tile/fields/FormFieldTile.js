@@ -17,7 +17,6 @@ export default class FormFieldTile extends WidgetTile {
     this.displayStyle = FormFieldTile.DisplayStyle.DASHBOARD;
   }
 
-
   static DisplayStyle = {
     DEFAULT: Tile.DEFAULT,
     PLAIN: Tile.PLAIN,

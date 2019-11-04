@@ -28,7 +28,6 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
     this.tabAreaInHeader = false;
   }
 
-
   install(bench, tabArea) {
     this.bench = scout.assertParameter('bench', bench);
 

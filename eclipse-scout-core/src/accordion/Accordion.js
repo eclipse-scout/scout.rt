@@ -25,7 +25,6 @@ export default class Accordion extends Widget {
     this._groupPropertyChangeHandler = this._onGroupPropertyChange.bind(this);
   }
 
-
   _init(model) {
     super._init(model);
     this._initGroups(this.groups);

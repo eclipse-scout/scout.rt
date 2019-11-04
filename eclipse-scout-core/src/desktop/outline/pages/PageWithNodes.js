@@ -23,7 +23,6 @@ export default class PageWithNodes extends Page {
     this.nodeType = Page.NodeType.NODES;
   }
 
-
   /**
    * @override Page.js
    */

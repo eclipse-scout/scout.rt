@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-.string-field  {
+.string-field {
 
   & > textarea.ie9 { /* NOSONAR overqualify by purpose to only modify textareas on IE 9*/
     width: 100%;
@@ -37,6 +37,7 @@
   }
 
   /* adjust paddings in case of both icons (icon and clear-icon) are visible */
+
   &.has-icon.clearable-always.has-text:not(.loading):not(.disabled):not(.compact),
   &.has-icon.clearable-focused.has-text.focused:not(.loading):not(.disabled):not(.compact) {
 
@@ -49,7 +50,7 @@
       padding-right: @text-field-padding-x + 15px;
     }
 
-    > .icon{
+    > .icon {
       display: block;
     }
   }

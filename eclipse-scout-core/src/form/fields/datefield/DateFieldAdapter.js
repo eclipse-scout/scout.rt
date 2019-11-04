@@ -18,7 +18,6 @@ export default class DateFieldAdapter extends ValueFieldAdapter {
     this._errorStatusDisplayText = null;
   }
 
-
   static PROPERTIES_ORDER = ['hasTime', 'hasDate'];
 
   /**

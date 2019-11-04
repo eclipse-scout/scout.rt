@@ -68,7 +68,6 @@ export default class SmartField extends ValueField {
     ]);
   }
 
-
   static DisplayStyle = {
     DEFAULT: 'default',
     DROPDOWN: 'dropdown'
@@ -576,10 +575,6 @@ export default class SmartField extends ValueField {
 
   _setLookupCall(lookupCall) {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
-  }
-
-  _setCodeType(codeType) {
-    this.setProperty('codeType', codeType);
   }
 
   _setCodeType(codeType) {
@@ -1518,9 +1513,9 @@ export default class SmartField extends ValueField {
     if (textLines.length > 1) {
       textLines.shift();
       return textLines;
-    } else {
-      return null;
     }
+    return null;
+
   }
 
   _createLoadingSupport() {

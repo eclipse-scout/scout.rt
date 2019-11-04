@@ -11,14 +11,12 @@
 import {FormFieldLayout} from '../../../index';
 import * as $ from 'jquery';
 
-
 export default class BrowserFieldLayout extends FormFieldLayout {
 
   constructor(browserField) {
     super(browserField);
     this.browserField = browserField;
   }
-
 
   preferredLayoutSize($container, options) {
     var prefSize = super.preferredLayoutSize($container, options);

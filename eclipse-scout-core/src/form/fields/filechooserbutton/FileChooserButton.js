@@ -22,7 +22,6 @@ export default class FileChooserButton extends ValueField {
     this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
   }
 
-
   _init(model) {
     super._init(model);
 

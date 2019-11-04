@@ -10,8 +10,7 @@
  */
 import {arrays, keys, scout} from '../../../src/index';
 
-
-describe("TileAccordionKeyStrokes", function() {
+describe('TileAccordionKeyStrokes', function() {
   var session;
 
   beforeEach(function() {
@@ -32,7 +31,7 @@ describe("TileAccordionKeyStrokes", function() {
     for (var i = 0; i < numGroups; i++) {
       groups.push({
         objectType: 'Group',
-        label: "Group " + i,
+        label: 'Group ' + i,
         body: {
           objectType: 'TileGrid',
           scrollable: false,
@@ -169,7 +168,7 @@ describe("TileAccordionKeyStrokes", function() {
   });
 
   describe('key right', function() {
-    it("selects the first tile of the next group if selected tile is the last one in the current group", function() {
+    it('selects the first tile of the next group if selected tile is the last one in the current group', function() {
       var accordion = createAccordion(2, {
         selectable: true
       });
@@ -187,7 +186,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.RIGHT);
     });
 
-    it("selects the first tile of the next group if selected tile is the last one in the current group but only if next group is not collapsed", function() {
+    it('selects the first tile of the next group if selected tile is the last one in the current group but only if next group is not collapsed', function() {
       var accordion = createAccordion(3, {
         selectable: true
       });
@@ -208,7 +207,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.RIGHT);
     });
 
-    it("selects the first tile if no tile is selected yet", function() {
+    it('selects the first tile if no tile is selected yet', function() {
       var accordion = createAccordion(2, {
         selectable: true
       });
@@ -225,7 +224,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.RIGHT);
     });
 
-    it("does nothing if the last tile is already selected", function() {
+    it('does nothing if the last tile is already selected', function() {
       var accordion = createAccordion(2, {
         selectable: true
       });
@@ -243,7 +242,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.RIGHT);
     });
 
-    it("selects the only tile if there is only one", function() {
+    it('selects the only tile if there is only one', function() {
       var accordion = createAccordion(2, {
         selectable: true
       });
@@ -269,7 +268,7 @@ describe("TileAccordionKeyStrokes", function() {
     });
 
     describe('with shift', function() {
-      it("adds the tile of the next group to the selection if the focused tile is the last tile of the current group", function() {
+      it('adds the tile of the next group to the selection if the focused tile is the last tile of the current group', function() {
         var accordion = createAccordion(2, {
           selectable: true
         });
@@ -291,7 +290,7 @@ describe("TileAccordionKeyStrokes", function() {
         accordion.groups[1].body.$container.triggerKeyUpCapture(keys.RIGHT, 'shift');
       });
 
-      it("removes the next tile from the selection if the focused tile is the first tile of the selection", function() {
+      it('removes the next tile from the selection if the focused tile is the first tile of the selection', function() {
         var accordion = createAccordion(2, {
           selectable: true
         });
@@ -315,7 +314,7 @@ describe("TileAccordionKeyStrokes", function() {
         expect(accordion.getSelectedTiles()).toEqual([tiles[3], tiles[4]]);
       });
 
-      it("does nothing if the last tile is already selected", function() {
+      it('does nothing if the last tile is already selected', function() {
         var accordion = createAccordion(2, {
           selectable: true
         });
@@ -337,7 +336,7 @@ describe("TileAccordionKeyStrokes", function() {
         accordion.groups[1].body.$container.triggerKeyUpCapture(keys.RIGHT, 'shift');
       });
 
-      it("adds the correct tile to the selection if the focused tile gets invisible", function() {
+      it('adds the correct tile to the selection if the focused tile gets invisible', function() {
         var accordion = createAccordion(4, {
           selectable: true
         });
@@ -367,7 +366,7 @@ describe("TileAccordionKeyStrokes", function() {
         expect(accordion.getSelectedTiles()).toEqual([tiles[2], tiles[3]]);
       });
 
-      it("connects two selections blocks and sets the focused tile to the beginning of the new block", function() {
+      it('connects two selections blocks and sets the focused tile to the beginning of the new block', function() {
         var accordion = createAccordion(2, {
           selectable: true
         });
@@ -397,7 +396,7 @@ describe("TileAccordionKeyStrokes", function() {
   });
 
   describe('key left', function() {
-    it("selects the last tile of the previous group if selected tile is the first one in the current group", function() {
+    it('selects the last tile of the previous group if selected tile is the first one in the current group', function() {
       var accordion = createAccordion(2, {
         selectable: true
       });
@@ -415,7 +414,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.LEFT);
     });
 
-    it("selects the last tile of the previous group if selected tile is the first one in the current group but only if the group is not collapsed", function() {
+    it('selects the last tile of the previous group if selected tile is the first one in the current group but only if the group is not collapsed', function() {
       var accordion = createAccordion(3, {
         selectable: true
       });
@@ -436,7 +435,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.LEFT);
     });
 
-    it("selects the last tile if no tile is selected yet", function() {
+    it('selects the last tile if no tile is selected yet', function() {
       var accordion = createAccordion(2, {
         selectable: true
       });
@@ -453,7 +452,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.LEFT);
     });
 
-    it("does nothing if the first tile is already selected", function() {
+    it('does nothing if the first tile is already selected', function() {
       var accordion = createAccordion(2, {
         selectable: true
       });
@@ -471,7 +470,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.LEFT);
     });
 
-    it("selects the only tile if there is only one", function() {
+    it('selects the only tile if there is only one', function() {
       var accordion = createAccordion(2, {
         selectable: true
       });
@@ -497,7 +496,7 @@ describe("TileAccordionKeyStrokes", function() {
     });
 
     describe('with shift', function() {
-      it("adds the previous tile to the selection", function() {
+      it('adds the previous tile to the selection', function() {
         var accordion = createAccordion(2, {
           selectable: true
         });
@@ -519,7 +518,7 @@ describe("TileAccordionKeyStrokes", function() {
         accordion.groups[1].body.$container.triggerKeyUpCapture(keys.LEFT, 'shift');
       });
 
-      it("does nothing if the first tile is already selected", function() {
+      it('does nothing if the first tile is already selected', function() {
         var accordion = createAccordion(2, {
           selectable: true
         });
@@ -541,7 +540,7 @@ describe("TileAccordionKeyStrokes", function() {
         accordion.groups[0].body.$container.triggerKeyUpCapture(keys.LEFT, 'shift');
       });
 
-      it("removes the previous tile from the selection if the next tile is already selected", function() {
+      it('removes the previous tile from the selection if the next tile is already selected', function() {
         var accordion = createAccordion(2, {
           selectable: true
         });
@@ -565,7 +564,7 @@ describe("TileAccordionKeyStrokes", function() {
         expect(accordion.getSelectedTiles()).toEqual([tiles[0], tiles[1]]);
       });
 
-      it("adds the correct tile to the selection if the focused tile gets invisible", function() {
+      it('adds the correct tile to the selection if the focused tile gets invisible', function() {
         var accordion = createAccordion(2, {
           selectable: true
         });
@@ -595,7 +594,7 @@ describe("TileAccordionKeyStrokes", function() {
         expect(accordion.getSelectedTiles()).toEqual([tiles[0], tiles[1]]);
       });
 
-      it("connects two selections blocks and sets the focused tile to the beginning of the new block", function() {
+      it('connects two selections blocks and sets the focused tile to the beginning of the new block', function() {
         var accordion = createAccordion(2, {
           selectable: true
         });
@@ -627,7 +626,7 @@ describe("TileAccordionKeyStrokes", function() {
   });
 
   describe('key down', function() {
-    it("selects the tile in the grid below if the selected tile is in the last line of the current group", function() {
+    it('selects the tile in the grid below if the selected tile is in the last line of the current group', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
@@ -650,7 +649,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[1].body.$container.triggerKeyUpCapture(keys.DOWN);
     });
 
-    it("selects the tile in the grid below if the selected tile is in the last line of the current group but only if the group is not collapsed", function() {
+    it('selects the tile in the grid below if the selected tile is in the last line of the current group but only if the group is not collapsed', function() {
       var accordion = createAccordion(3, {
         selectable: true,
         gridColumnCount: 3
@@ -672,7 +671,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.DOWN);
     });
 
-    it("considers filtered tiles", function() {
+    it('considers filtered tiles', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
@@ -706,7 +705,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[1].body.$container.triggerKeyUpCapture(keys.DOWN);
     });
 
-    it("selects the first tile if no tile is selected yet", function() {
+    it('selects the first tile if no tile is selected yet', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
@@ -724,7 +723,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.DOWN);
     });
 
-    it("selects the first tile if no tile is selected yet or the focused tile was in a collapsed group", function() {
+    it('selects the first tile if no tile is selected yet or the focused tile was in a collapsed group', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
@@ -750,7 +749,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[1].body.$container.triggerKeyUpCapture(keys.DOWN);
     });
 
-    it("does nothing if a tile in the last row is already selected", function() {
+    it('does nothing if a tile in the last row is already selected', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
@@ -777,7 +776,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[1].body.$container.triggerKeyUpCapture(keys.DOWN);
     });
 
-    it("selects the only tile if there is only one", function() {
+    it('selects the only tile if there is only one', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
@@ -805,7 +804,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[1].body.$container.triggerKeyUpCapture(keys.DOWN);
     });
 
-    it("selects the last tile if below the focused tile is no tile", function() {
+    it('selects the last tile if below the focused tile is no tile', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
@@ -831,7 +830,7 @@ describe("TileAccordionKeyStrokes", function() {
     });
 
     describe('with shift', function() {
-      it("adds the tiles between the focused and the newly focused tile to the selection", function() {
+      it('adds the tiles between the focused and the newly focused tile to the selection', function() {
         var accordion = createAccordion(2, {
           selectable: true,
           gridColumnCount: 3
@@ -855,7 +854,7 @@ describe("TileAccordionKeyStrokes", function() {
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8], tiles[9]]);
       });
 
-      it("removes the tiles between the focused and the newly focused tiles from the selection if the focused tile is the first tile of the selection", function() {
+      it('removes the tiles between the focused and the newly focused tiles from the selection if the focused tile is the first tile of the selection', function() {
         var accordion = createAccordion(2, {
           selectable: true,
           gridColumnCount: 3
@@ -880,7 +879,7 @@ describe("TileAccordionKeyStrokes", function() {
         expect(accordion.getSelectedTiles()).toEqual([tiles[6], tiles[7], tiles[8], tiles[9]]);
       });
 
-      it("does nothing if a tile in the last row is already selected", function() {
+      it('does nothing if a tile in the last row is already selected', function() {
         var accordion = createAccordion(2, {
           selectable: true,
           gridColumnCount: 3
@@ -898,7 +897,7 @@ describe("TileAccordionKeyStrokes", function() {
         expect(accordion.getSelectedTiles()).toEqual([tiles[2], tiles[3]]);
       });
 
-      it("adds the correct tile to the selection if the focused tile gets invisible", function() {
+      it('adds the correct tile to the selection if the focused tile gets invisible', function() {
         var accordion = createAccordion(2, {
           selectable: true,
           gridColumnCount: 3
@@ -930,7 +929,7 @@ describe("TileAccordionKeyStrokes", function() {
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2], tiles[3], tiles[4]]);
       });
 
-      it("connects two selections blocks and sets the focused tile to the beginning of the new block", function() {
+      it('connects two selections blocks and sets the focused tile to the beginning of the new block', function() {
         var accordion = createAccordion(2, {
           selectable: true,
           gridColumnCount: 3
@@ -959,7 +958,7 @@ describe("TileAccordionKeyStrokes", function() {
   });
 
   describe('key up', function() {
-    it("selects the tile in the grid above if the selected tile is in the first line of the current group", function() {
+    it('selects the tile in the grid above if the selected tile is in the first line of the current group', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
@@ -978,7 +977,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[1].body.$container.triggerKeyUpCapture(keys.UP);
     });
 
-    it("selects the tile in the grid above if the selected tile is in the first line of the current group but only if the group is not collapsed", function() {
+    it('selects the tile in the grid above if the selected tile is in the first line of the current group but only if the group is not collapsed', function() {
       var accordion = createAccordion(3, {
         selectable: true,
         gridColumnCount: 3
@@ -1000,7 +999,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[2].body.$container.triggerKeyUpCapture(keys.UP);
     });
 
-    it("selects the last tile if no tile is selected yet", function() {
+    it('selects the last tile if no tile is selected yet', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
@@ -1018,7 +1017,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[1].body.$container.triggerKeyUpCapture(keys.UP);
     });
 
-    it("does nothing if a tile in the first row is already selected", function() {
+    it('does nothing if a tile in the first row is already selected', function() {
       var accordion = createAccordion(8, {
         selectable: true,
         gridColumnCount: 3
@@ -1044,7 +1043,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.UP);
     });
 
-    it("selects the only tile if there is only one", function() {
+    it('selects the only tile if there is only one', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
@@ -1073,7 +1072,7 @@ describe("TileAccordionKeyStrokes", function() {
     });
 
     describe('with shift', function() {
-      it("adds the tiles between the focused and the newly focused tile to the selection", function() {
+      it('adds the tiles between the focused and the newly focused tile to the selection', function() {
         var accordion = createAccordion(2, {
           selectable: true,
           gridColumnCount: 3
@@ -1091,7 +1090,7 @@ describe("TileAccordionKeyStrokes", function() {
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2], tiles[3], tiles[4]]);
       });
 
-      it("removes the tiles between the focused and the newly focused tiles from the selection if the focused tile is the first tile of the selection", function() {
+      it('removes the tiles between the focused and the newly focused tiles from the selection if the focused tile is the first tile of the selection', function() {
         var accordion = createAccordion(2, {
           selectable: true,
           gridColumnCount: 3
@@ -1110,7 +1109,7 @@ describe("TileAccordionKeyStrokes", function() {
         expect(accordion.getSelectedTiles()).toEqual([tiles[1]]);
       });
 
-      it("does nothing if a tile in the first row is already selected", function() {
+      it('does nothing if a tile in the first row is already selected', function() {
         var accordion = createAccordion(2, {
           selectable: true,
           gridColumnCount: 3
@@ -1129,7 +1128,7 @@ describe("TileAccordionKeyStrokes", function() {
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2], tiles[3]]);
       });
 
-      it("adds the correct tile to the selection if the focused tile gets invisible", function() {
+      it('adds the correct tile to the selection if the focused tile gets invisible', function() {
         var accordion = createAccordion(2, {
           selectable: true,
           gridColumnCount: 3
@@ -1161,7 +1160,7 @@ describe("TileAccordionKeyStrokes", function() {
         expect(accordion.getSelectedTiles()).toEqual([tiles[0], tiles[1], tiles[3], tiles[4]]);
       });
 
-      it("connects two selections blocks and sets the focused tile to the beginning of the new block", function() {
+      it('connects two selections blocks and sets the focused tile to the beginning of the new block', function() {
         var accordion = createAccordion(2, {
           selectable: true,
           gridColumnCount: 3
@@ -1189,7 +1188,7 @@ describe("TileAccordionKeyStrokes", function() {
   });
 
   describe('home', function() {
-    it("selects the first tile", function() {
+    it('selects the first tile', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
@@ -1208,7 +1207,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.HOME);
     });
 
-    it("selects the first tile but only if the group is not collapsed", function() {
+    it('selects the first tile but only if the group is not collapsed', function() {
       var accordion = createAccordion(3, {
         selectable: true,
         gridColumnCount: 3
@@ -1230,7 +1229,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[1].body.$container.triggerKeyUpCapture(keys.HOME);
     });
 
-    it("does nothing if the first tile is already selected", function() {
+    it('does nothing if the first tile is already selected', function() {
       var accordion = createAccordion(2, {
         selectable: true
       });
@@ -1248,7 +1247,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.HOME);
     });
 
-    it("selects only the first tile if first and other tiles are selected", function() {
+    it('selects only the first tile if first and other tiles are selected', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
@@ -1268,7 +1267,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.HOME);
     });
 
-    it("selects the only tile if there is only one", function() {
+    it('selects the only tile if there is only one', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
@@ -1297,7 +1296,7 @@ describe("TileAccordionKeyStrokes", function() {
     });
 
     describe('with shift', function() {
-      it("adds the tiles between the focused and the newly focused tile to the selection", function() {
+      it('adds the tiles between the focused and the newly focused tile to the selection', function() {
         var accordion = createAccordion(2, {
           selectable: true,
           gridColumnCount: 3
@@ -1319,7 +1318,7 @@ describe("TileAccordionKeyStrokes", function() {
   });
 
   describe('end', function() {
-    it("selects the last tile", function() {
+    it('selects the last tile', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
@@ -1337,7 +1336,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.END);
     });
 
-    it("selects the last tile but only if the group is not collapsed", function() {
+    it('selects the last tile but only if the group is not collapsed', function() {
       var accordion = createAccordion(3, {
         selectable: true,
         gridColumnCount: 3
@@ -1358,7 +1357,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.END);
     });
 
-    it("does nothing if the last tile is already selected", function() {
+    it('does nothing if the last tile is already selected', function() {
       var accordion = createAccordion(4, {
         selectable: true
       });
@@ -1376,7 +1375,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.END);
     });
 
-    it("selects only the last tile if last and other tiles are selected", function() {
+    it('selects only the last tile if last and other tiles are selected', function() {
       var accordion = createAccordion(4, {
         selectable: true,
         gridColumnCount: 3
@@ -1396,7 +1395,7 @@ describe("TileAccordionKeyStrokes", function() {
       accordion.groups[0].body.$container.triggerKeyUpCapture(keys.END);
     });
 
-    it("selects the only tile if there is only one", function() {
+    it('selects the only tile if there is only one', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
@@ -1425,7 +1424,7 @@ describe("TileAccordionKeyStrokes", function() {
     });
 
     describe('with shift', function() {
-      it("adds the tiles between the focused and the newly focused tile to the selection", function() {
+      it('adds the tiles between the focused and the newly focused tile to the selection', function() {
         var accordion = createAccordion(2, {
           selectable: true,
           gridColumnCount: 3

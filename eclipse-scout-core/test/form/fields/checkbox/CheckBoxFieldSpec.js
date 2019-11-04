@@ -10,8 +10,7 @@
  */
 import {CheckBoxField, keys, scout, ValueField} from '../../../../src/index';
 
-
-describe("CheckBoxField", function() {
+describe('CheckBoxField', function() {
   var session;
 
   beforeEach(function() {
@@ -19,7 +18,7 @@ describe("CheckBoxField", function() {
     session = sandboxSession();
   });
 
-  describe("inheritance", function() {
+  describe('inheritance', function() {
     var checkBox;
     var model;
 
@@ -29,11 +28,11 @@ describe("CheckBoxField", function() {
       checkBox.init(model);
     });
 
-    it("inherits from ValueField", function() {
+    it('inherits from ValueField', function() {
       expect(ValueField.prototype.isPrototypeOf(checkBox)).toBe(true);
     });
 
-    it("_renderValue sets checked property", function() {
+    it('_renderValue sets checked property', function() {
       var $div = $('<div>');
       checkBox.render($div);
 
@@ -43,7 +42,7 @@ describe("CheckBoxField", function() {
       expect(checkBox.$checkBox.hasClass('checked')).toBe(false);
     });
 
-    it("_renderValue sets disabled property", function() {
+    it('_renderValue sets disabled property', function() {
       var $div = $('<div>');
       checkBox.render($div);
 

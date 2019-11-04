@@ -18,7 +18,6 @@ export default class GroupToggleCollapseKeyStroke extends KeyStroke {
     this.which = [keys.SPACE];
   }
 
-
   handle(event) {
     this.field.toggleCollapse();
   }

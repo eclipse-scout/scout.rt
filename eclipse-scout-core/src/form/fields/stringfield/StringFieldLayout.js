@@ -16,7 +16,6 @@ export default class StringFieldLayout extends FormFieldLayout {
     super(stringField);
   }
 
-
   _layoutClearIcon(formField, fieldBounds, right, top) {
     if (formField.$icon && formField.$icon.isVisible()) {
       right += graphics.prefSize(formField.$icon, true).width;

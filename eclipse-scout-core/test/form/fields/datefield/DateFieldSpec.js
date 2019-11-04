@@ -11,7 +11,6 @@
 import {DateFormat, DatePickerTouchPopup, dates, keys, RemoteEvent, scout, Status, TimePickerTouchPopup} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('DateField', function() {
   var session;
   var helper;
@@ -123,7 +122,7 @@ describe('DateField', function() {
     return $box.find('.date-picker-day').filter(function(i, elem) {
       var $day = $(elem);
       return (dates.isSameDay(date, $day.data('date')));
-    }.bind(this));
+    });
   }
 
   describe('displayText', function() {
@@ -920,7 +919,7 @@ describe('DateField', function() {
     it('_referenceDate returns only allowed date - only one date', function() {
       var dateField = scout.create('DateField', {
         parent: session.desktop,
-        allowedDates: ["2016-04-15"]
+        allowedDates: ['2016-04-15']
       });
 
       var date = dateField._referenceDate();
@@ -930,7 +929,7 @@ describe('DateField', function() {
     it('_referenceDate returns only allowed date - choose nearest date in the future', function() {
       var dateField = scout.create('DateField', {
         parent: session.desktop,
-        allowedDates: ["2016-03-14", "2016-04-16", "2016-04-17"],
+        allowedDates: ['2016-03-14', '2016-04-16', '2016-04-17'],
         autoDate: '2016-04-15'
       });
       var date = dateField._referenceDate();
@@ -940,7 +939,7 @@ describe('DateField', function() {
     it('_referenceDate returns only allowed date - when no date in future is available, choose nearest date in past', function() {
       var dateField = scout.create('DateField', {
         parent: session.desktop,
-        allowedDates: ["2016-02-14", "2016-03-16", "2016-04-03"],
+        allowedDates: ['2016-02-14', '2016-03-16', '2016-04-03'],
         autoDate: '2016-04-15'
       });
       var date = dateField._referenceDate();
@@ -951,7 +950,7 @@ describe('DateField', function() {
       var dateField = scout.create('DateField', {
         parent: session.desktop
       });
-      dateField._setAllowedDates(["2016-02-14"]);
+      dateField._setAllowedDates(['2016-02-14']);
       expectDate(dateField.allowedDates[0], 2016, 2, 14);
     });
 

@@ -11,7 +11,6 @@
 import {arrays, Widget} from '../index';
 import * as $ from 'jquery';
 
-
 let uniqueIdSeqNo = 0;
 
 /**

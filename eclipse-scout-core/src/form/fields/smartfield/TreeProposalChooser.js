@@ -16,7 +16,6 @@ export default class TreeProposalChooser extends ProposalChooser {
     super();
   }
 
-
   _createModel() {
     var tree = scout.create('Tree', {
       parent: this,
@@ -131,12 +130,6 @@ export default class TreeProposalChooser extends ProposalChooser {
     });
     if (treeNode) {
       this.model.selectNode(treeNode);
-    }
-  }
-
-  selectFirstLookupRow() {
-    if (this.model.nodes.length) {
-      this.model.selectNode(this.model.nodes[0]);
     }
   }
 

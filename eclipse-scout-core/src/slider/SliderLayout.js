@@ -17,7 +17,6 @@ export default class SliderLayout extends AbstractLayout {
     this.slider = slider;
   }
 
-
   layout($container) {
     var size = graphics.size($container);
     this.slider.$sliderInput.css('height', size.height);

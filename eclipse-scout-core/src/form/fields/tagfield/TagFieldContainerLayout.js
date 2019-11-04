@@ -17,7 +17,6 @@ export default class TagFieldContainerLayout extends AbstractLayout {
     this.tagField = tagField;
   }
 
-
   /**
    * When there is not a lot of space in a single line field, the input field should at least
    * have 33% of the available width, which means 66% is used to display tags.

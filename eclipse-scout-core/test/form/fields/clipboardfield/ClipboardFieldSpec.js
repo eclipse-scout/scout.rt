@@ -11,7 +11,6 @@
 import {Device} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('ClipboardField', function() {
   var session, helper, $sandbox, origDevice;
 
@@ -28,7 +27,6 @@ describe('ClipboardField', function() {
   afterEach(function() {
     jasmine.clock().uninstall();
     jasmine.Ajax.uninstall();
-    //Device.get() = origDevice;
   });
 
   function createField() {

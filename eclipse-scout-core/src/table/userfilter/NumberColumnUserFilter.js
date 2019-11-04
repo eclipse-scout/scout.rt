@@ -24,7 +24,6 @@ export default class NumberColumnUserFilter extends ColumnUserFilter {
     this.hasFilterFields = true;
   }
 
-
   /**
    * @override ColumnUserFilter
    */

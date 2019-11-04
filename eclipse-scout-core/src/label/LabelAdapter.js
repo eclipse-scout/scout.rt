@@ -16,7 +16,6 @@ export default class LabelAdapter extends ModelAdapter {
     super();
   }
 
-
   _onWidgetAppLinkAction(event) {
     this._send('appLinkAction', {
       ref: event.ref

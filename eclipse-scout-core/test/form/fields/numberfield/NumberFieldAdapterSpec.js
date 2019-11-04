@@ -10,7 +10,6 @@
  */
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('NumberFieldAdapter', function() {
   var session;
   var helper;

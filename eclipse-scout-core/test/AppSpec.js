@@ -10,7 +10,6 @@
  */
 import {App} from '../src/index';
 
-
 describe('App', function() {
 
   beforeEach(function() {

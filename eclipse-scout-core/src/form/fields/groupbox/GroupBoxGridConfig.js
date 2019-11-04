@@ -16,7 +16,6 @@ export default class GroupBoxGridConfig extends LogicalGridConfig {
     super();
   }
 
-
   getGridWidgets() {
     return this.widget.controls;
   }

@@ -17,7 +17,6 @@ export default class OutlineKeyStrokeContext extends KeyStrokeContext {
     this._outline = outline;
   }
 
-
   /**
    * Returns true if this event is handled by this context, and if so sets the propagation flags accordingly.
    */

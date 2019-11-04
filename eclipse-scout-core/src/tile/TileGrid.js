@@ -84,7 +84,6 @@ export default class TileGrid extends Widget {
     this.$fillAfter = null;
   }
 
-
   _init(model) {
     super._init(model);
     this._setGridColumnCount(this.gridColumnCount);
@@ -1095,6 +1094,7 @@ export default class TileGrid extends Widget {
       if (!filter.accept(tile)) {
         return true;
       }
+      return false;
     });
   }
 

@@ -18,7 +18,6 @@ export default class SmartFieldMultiline extends SmartField {
     this._$multilineLines;
   }
 
-
   _render() {
     var $input, htmlComp;
 

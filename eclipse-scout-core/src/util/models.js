@@ -11,7 +11,6 @@
 import {arrays, objects, scout} from '../index';
 import * as $ from 'jquery';
 
-
 let modelMap = {};
 
 /**
@@ -23,7 +22,6 @@ export function bootstrap(url) {
   return promise.then(_preInit.bind(this, url));
 }
 
-//private
 export function _preInit(url, data) {
   if (data && data.error) {
     // The result may contain a json error (e.g. session timeout) -> abort processing
@@ -84,7 +82,7 @@ export function getExtension(extensionId) {
  *          Expected type of the requested object ('model' or 'extension')
  * @returns {Object}
  */
-//private
+
 export function _get(id, type) {
   var model = modelMap[id];
   if (!model) {
@@ -198,7 +196,7 @@ export function extend(extension, parentModel) {
       var insertAt = _findExtensionIndex(target, targetArray);
       arrays.insertAll(targetArray, extensionArray, insertAt);
     }
-  }.bind(this));
+  });
 
   return parentModel;
 }
@@ -212,7 +210,7 @@ export function extend(extension, parentModel) {
  *          array to search the extension index in.
  * @returns extension index between 0 and targetArray.length or targetArray.length if no index is found.
  */
-//private
+
 export function _findExtensionIndex(target, targetArray) {
   var insertAt = targetArray.length;
   if (target.before) {
@@ -246,7 +244,7 @@ export function _findExtensionIndex(target, targetArray) {
  * @param extensionsArray
  *          extensions to bind
  */
-//private
+
 export function _bindExtensionsToBeforeOrAfter(target, extensionsArray) {
   var beforeOrAfter = target.before || target.after;
   if (beforeOrAfter && target.groupWithTarget) {
@@ -255,7 +253,6 @@ export function _bindExtensionsToBeforeOrAfter(target, extensionsArray) {
     });
   }
 }
-
 
 export default {
   bootstrap,

@@ -10,8 +10,7 @@
  */
 import {scout} from '../../src/index';
 
-
-describe("BusyIndicator", function() {
+describe('BusyIndicator', function() {
   var helper, session;
 
   beforeEach(function() {

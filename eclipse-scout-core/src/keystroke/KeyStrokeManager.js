@@ -34,11 +34,11 @@ export default class KeyStrokeManager {
       // Swallow F1 (online help) key stroke
       helpHandler = function(event) {
         return event.which !== keys.F1;
-      }.bind(this),
+      },
       // Swallow Backspace (browser navigation) key stroke
       backspaceHandler = function(event) {
         return event.which !== keys.BACKSPACE;
-      }.bind(this);
+      };
 
     if (this.swallowF1) {
       $container
@@ -271,7 +271,7 @@ export default class KeyStrokeManager {
     arrays.remove(this.filters, filter);
   }
 
-//--- Event handling methods ---
+  // --- Event handling methods ---
   _createEventSupport() {
     return new EventSupport();
   }

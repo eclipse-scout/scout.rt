@@ -25,7 +25,6 @@ export default class TabArea extends Widget {
     this.$selectionMarker = null;
   }
 
-
   static DisplayStyle = {
     DEFAULT: 'default',
     SPREAD_EVEN: 'spreadEven'
@@ -218,26 +217,6 @@ export default class TabArea extends Widget {
   _renderHasSubLabel() {
     this.$container.toggleClass('has-sub-label', this.hasSubLabel);
     this.invalidateLayoutTree();
-  }
-
-  selectNextTab() {
-    var currentIndex = this.tabs.indexOf(this.selectedTab),
-      nextTab;
-    if (this.tabss.length > currentIndex + 1) {
-      nextTab = this.tabs[currentIndex + 1];
-      this.setSelectedTab(nextTab);
-      nextTab.focus();
-    }
-  }
-
-  selectPreviousTab() {
-    var currentIndex = this.tabs.indexOf(this.selectedTab),
-      previousTab;
-    if (currentIndex - 1 > -1) {
-      previousTab = this.tabs[currentIndex - 1];
-      this.setSelectedTab(previousTab);
-      previousTab.focus();
-    }
   }
 
   selectNextTab(focusTab) {

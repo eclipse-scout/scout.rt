@@ -18,7 +18,6 @@ export default class FormLayout extends AbstractLayout {
     this.form = form;
   }
 
-
   layout($container) {
     var htmlContainer = HtmlComponent.get($container),
       htmlRootGb = this._htmlRootGroupBox(),

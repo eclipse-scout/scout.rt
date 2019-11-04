@@ -54,6 +54,7 @@
   }
 
   /* Define a short transition for opacity changes on all field elements (used in .loading state) */
+
   & > label,
   & > .mandatory-indicator,
   & > .field,
@@ -77,6 +78,7 @@
   }
 
   /* Don't show underline decoration for links inside certain tiles */
+
   &.html-field .app-link,
   &.tile-list-field .app-link,
   &.tile-attributes-field .app-link,
@@ -106,6 +108,7 @@
     }
 
     /* Override link style in inverted tiles, otherwise app-links would not be readable */
+
     & .app-link,
     & a {
       color: @tile-default-inverted-color;
@@ -123,7 +126,7 @@
     &.has-tooltip > .status,
     &.has-menus > .status {
 
-      &::before  {
+      &::before {
         color: @icon-inverted-color;
       }
 
@@ -134,7 +137,7 @@
 
     &.has-error > .status {
 
-      &::before  {
+      &::before {
         color: @palette-red-1;
       }
 
@@ -192,7 +195,7 @@
     &.has-tooltip > .status,
     &.has-menus > .status {
 
-      &::before  {
+      &::before {
         color: @icon-inverted-color;
       }
 
@@ -203,7 +206,7 @@
 
     &.has-error > .status {
 
-      &::before  {
+      &::before {
         color: @palette-red-1;
       }
 
@@ -222,12 +225,14 @@
   &.browser-field > .field {
     border-radius: 0;
   }
+
   &.browser-field.inverted > .field {
     border: 0;
   }
 
   /* Move part of the tile's padding (@offset) to the inner div. */
   /* This makes it possible to draw the scrollbar (seemingly) outside the field. */
+
   &.scrollbar-y-outside {
     @offset: 14px;
     padding-right: @tile-field-padding - @offset;

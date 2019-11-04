@@ -22,7 +22,6 @@ export default class GroupBoxLayout extends AbstractLayout {
     HtmlEnvironment.get().on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
   }
 
-
   _initDefaults() {
     this._statusWidth = HtmlEnvironment.get().fieldStatusWidth;
   }

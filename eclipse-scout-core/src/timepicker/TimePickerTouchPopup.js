@@ -16,7 +16,6 @@ export default class TimePickerTouchPopup extends TouchPopup {
     super();
   }
 
-
   _init(options) {
     super._init(options);
     this._field.on('acceptInput', this._onFieldAcceptInput.bind(this));

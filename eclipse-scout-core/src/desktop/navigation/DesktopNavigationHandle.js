@@ -16,7 +16,6 @@ export default class DesktopNavigationHandle extends CollapseHandle {
     super();
   }
 
-
   _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 

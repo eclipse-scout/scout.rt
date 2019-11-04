@@ -17,7 +17,6 @@ export default class RadioButtonKeyStroke extends ButtonKeyStroke {
     this.renderingHints.hAlign = HAlign.LEFT;
   }
 
-
   /**
    * @override ButtonKeyStroke.js
    *

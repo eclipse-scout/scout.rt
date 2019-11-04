@@ -220,6 +220,7 @@ export function getSession(partId) {
   for (var i = 0; i < sessions.length; i++) {
     var session = sessions[i];
     // noinspection EqualityComparisonWithCoercionJS
+    // eslint-disable-next-line eqeqeq
     if (session.partId == partId) { // <-- compare with '==' is intentional! (NOSONAR)
       return session;
     }
@@ -335,7 +336,7 @@ export function cloneShallow(template, properties, createUniqueId) {
   assertParameter('template', template);
   var clone = Object.create(Object.getPrototypeOf(template));
   Object.getOwnPropertyNames(template)
-    .forEach((key) => {
+    .forEach(key => {
       clone[key] = template[key];
     });
   if (properties) {
@@ -369,4 +370,4 @@ export default {
   addObjectFactories,
   objectFactories,
   cloneShallow
-}
+};

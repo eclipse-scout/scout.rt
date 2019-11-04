@@ -11,8 +11,7 @@
 import {scout} from '../../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("TableFieldAdapter", function() {
+describe('TableFieldAdapter', function() {
   var session, helper, tableHelper;
 
   beforeEach(function() {

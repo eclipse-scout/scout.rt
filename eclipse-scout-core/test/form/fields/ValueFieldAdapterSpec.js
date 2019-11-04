@@ -11,7 +11,6 @@
 import {Device, ValueFieldAdapter} from '../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('ValueFieldAdapter', function() {
   var session, helper;
 

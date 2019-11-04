@@ -20,7 +20,6 @@ export default class OkMenu extends Menu {
     this.systemType = Button.SystemType.OK;
   }
 
-
   _init(model) {
     super._init(model);
     this.text = scout.nvl(this.text, this.session.text('OkButton'));

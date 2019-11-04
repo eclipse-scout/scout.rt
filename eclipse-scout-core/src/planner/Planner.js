@@ -76,7 +76,6 @@ export default class Planner extends Widget {
     this._addWidgetProperties(['menus']);
   }
 
-
   static Direction = {
     BACKWARD: -1,
     FORWARD: 1
@@ -187,9 +186,9 @@ export default class Planner extends Widget {
       text: function($comp) {
         if (this._activityById($comp.attr('data-id'))) {
           return this._activityById($comp.attr('data-id')).tooltipText;
-        } else {
-          return undefined;
         }
+        return undefined;
+
       }.bind(this)
     });
 
@@ -761,9 +760,8 @@ export default class Planner extends Widget {
       return this._dateFormat(from, 'd.') + toText + this._dateFormat(to, 'd. MMMM yyyy');
     } else if (from.getFullYear() === to.getFullYear()) {
       return this._dateFormat(from, 'd. MMMM') + toText + this._dateFormat(to, 'd. MMMM yyyy');
-    } else {
-      return this._dateFormat(from, 'd. MMMM yyyy') + toText + this._dateFormat(to, 'd. MMMM yyyy');
     }
+    return this._dateFormat(from, 'd. MMMM yyyy') + toText + this._dateFormat(to, 'd. MMMM yyyy');
   }
 
   /* --  render resources, activities --------------------------------- */

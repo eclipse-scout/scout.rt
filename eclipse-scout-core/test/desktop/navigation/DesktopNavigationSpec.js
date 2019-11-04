@@ -11,7 +11,6 @@
 import {scout, Tree} from '../../../src/index';
 import {OutlineSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('DesktopNavigation', function() {
   var session, desktop, outlineHelper;
 
@@ -101,14 +100,14 @@ describe('DesktopNavigation', function() {
       desktop.shrinkNavigation();
       expect(desktop.navigationVisible).toBe(false); // complete navigation invisible, handle-visibility not updated
 
-      //enlarge to breadcrumb
+      // enlarge to breadcrumb
       desktop.enlargeNavigation();
       expect(desktop.navigationVisible).toBe(true);
       expect(desktop.outline.displayStyle).toBe(Tree.DisplayStyle.BREADCRUMB);
       expect(desktop.navigation.handle.leftVisible).toBe(true);
       expect(desktop.navigation.handle.rightVisible).toBe(true);
 
-      //enlarge to default
+      // enlarge to default
       desktop.enlargeNavigation();
       expect(desktop.navigationVisible).toBe(true);
       expect(desktop.outline.displayStyle).toBe(Tree.DisplayStyle.DEFAULT);
@@ -127,7 +126,7 @@ describe('DesktopNavigation', function() {
       desktop.shrinkNavigation();
       expect(desktop.navigationVisible).toBe(false); // complete navigation invisible, handle-visibility not updated
 
-      //enlarge to default
+      // enlarge to default
       desktop.enlargeNavigation();
       expect(desktop.navigationVisible).toBe(true);
       expect(desktop.outline.displayStyle).toBe(Tree.DisplayStyle.DEFAULT);

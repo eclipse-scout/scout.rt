@@ -20,7 +20,6 @@ export default class StatusMenuMapping extends Widget {
     this._addWidgetProperties(['menu']);
   }
 
-
   _createChild(model) {
     if (typeof model === 'string') {
       // If the model is a string it is probably the id of the menu.

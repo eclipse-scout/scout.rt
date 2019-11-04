@@ -10,10 +10,9 @@
  */
 import {URL} from '../../src/index';
 
+describe('scout.URL', function() {
 
-describe("scout.URL", function() {
-
-  it("can parse super-simple URL", function() {
+  it('can parse super-simple URL', function() {
     var u = new URL(encodeURI('http://www.simple.example/dir/file.html'));
     expect(u).toBeDefined();
     expect(u.baseUrlRaw).toBe('http://www.simple.example/dir/file.html');
@@ -22,12 +21,12 @@ describe("scout.URL", function() {
     expect(u.getParameter('sort')).toBeUndefined();
   });
 
-  it("can parse empty hash", function() {
+  it('can parse empty hash', function() {
     var u = new URL(encodeURI('http://www.simple.example/dir/file.html#'));
     expect(u.hashPartRaw).toBe('');
   });
 
-  it("can parse a moderately simple URL", function() {
+  it('can parse a moderately simple URL', function() {
     var u = new URL(encodeURI('http://www.simple.example/dir/file.html?query=search&action=&sort#bottom'));
     expect(u).toBeDefined();
     expect(u.baseUrlRaw).toBe('http://www.simple.example/dir/file.html');
@@ -40,13 +39,13 @@ describe("scout.URL", function() {
     expect(u.getParameter('bottom')).toBeUndefined();
   });
 
-  it("can convert the URL to string (only changed in order of arguments)", function() {
+  it('can convert the URL to string (only changed in order of arguments)', function() {
     var u = new URL(encodeURI('http://www.simple.example/dir/file.html?query=search&action=&sort#bottom'));
     expect(u).toBeDefined();
     expect(u.toString()).toBe('http://www.simple.example/dir/file.html?action=&query=search&sort#bottom');
   });
 
-  it("can handle multi-valued parameters", function() {
+  it('can handle multi-valued parameters', function() {
     var u = new URL(encodeURI('http://www.simple.example/dir/file.html?query=search&action=&query&sort&query=go#bottom'));
     expect(u).toBeDefined();
     expect(u.queryPartRaw).toBe('query=search&action=&query&sort&query=go');
@@ -54,7 +53,7 @@ describe("scout.URL", function() {
     expect(u.toString()).toBe('http://www.simple.example/dir/file.html?action=&query&query=go&query=search&sort#bottom');
   });
 
-  it("can add parameters", function() {
+  it('can add parameters', function() {
     var u = new URL(encodeURI('http://www.simple.example/dir/file.html?user=hugo&submit=yes&debug#66627'));
     u.addParameter('check', 'no');
     try {
@@ -73,7 +72,7 @@ describe("scout.URL", function() {
     expect(u.toString()).toBe('http://www.simple.example/dir/file.html?check=no&debug&print&slow&submit=yes&user=admin&user=hugo&x=#66627');
   });
 
-  it("can remove parameters", function() {
+  it('can remove parameters', function() {
     var u = new URL(encodeURI('http://www.simple.example/dir/file.html?user=hugo&submit=yes&debug&user=peter#66627'));
     u.removeParameter('user');
     u.removeParameter(''); // should do nothing
@@ -83,7 +82,7 @@ describe("scout.URL", function() {
     expect(u.toString()).toBe('http://www.simple.example/dir/file.html#66627');
   });
 
-  it("can create or replace parameters", function() {
+  it('can create or replace parameters', function() {
     var u = new URL(encodeURI('http://www.simple.example/dir/file.html?user=hugo&submit=yes&debug&user=peter#66627'));
     u.addParameter('user', 'test');
     u.setParameter('user', 'hans');
@@ -97,7 +96,7 @@ describe("scout.URL", function() {
     expect(u.toString()).toBe('http://www.simple.example/dir/file.html?check&debug&submit=&user=hans#66627');
   });
 
-  it("can handle non-ascii characters", function() {
+  it('can handle non-ascii characters', function() {
     var u = new URL(encodeURI('http://www.menükarte.example/dir/à la carte.php?query=search&wine=château lafite#\u1F603'));
     expect(u).toBeDefined();
     expect(decodeURIComponent(u.baseUrlRaw)).toBe('http://www.menükarte.example/dir/à la carte.php');
@@ -108,7 +107,7 @@ describe("scout.URL", function() {
     expect(u.getParameter('wine')).toBe('château lafite');
   });
 
-  it("can sort parameters", function() {
+  it('can sort parameters', function() {
     var u = new URL(encodeURI('http://www.simple.example/dir/file.html?user=hugo&submit=yes&debug#66627'));
     u.addParameter('check', 'no');
     u.addParameter('print');

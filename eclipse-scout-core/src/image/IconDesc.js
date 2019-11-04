@@ -32,9 +32,8 @@ export default class IconDesc {
   cssClass() {
     if (this.isFontIcon() && this.font !== IconDesc.DEFAULT_FONT) {
       return 'font-' + this.font;
-    } else {
-      return '';
     }
+    return '';
   }
 
   /**
@@ -44,9 +43,8 @@ export default class IconDesc {
     var additionalCssClass = this.cssClass();
     if (additionalCssClass.length > 0) {
       return cssClass + ' ' + additionalCssClass;
-    } else {
-      return cssClass;
     }
+    return cssClass;
   }
 
   isFontIcon() {

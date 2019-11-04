@@ -19,7 +19,6 @@ export default class VerticalGridMatrix extends LogicalGridMatrix {
     this._widgetGridDatas = [];
   }
 
-
   resetAll(columnCount, rowCount) {
     this._widgetGridDatas = [];
     this._assignedCells = [];
@@ -130,9 +129,7 @@ export default class VerticalGridMatrix extends LogicalGridMatrix {
             setOccupiedCell(idx.x, idx.y, cell);
             usedCells++;
             minY = Math.min(idx.y, minY);
-          }
-          // includes
-          else {
+          } else {
             // add widget to reorganization
             this._setAssignedCell(idx, null);
             addWidgetToReorganize(cell.widget);

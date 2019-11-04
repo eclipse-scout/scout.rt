@@ -16,12 +16,10 @@ export default class MenuKeyStroke extends ActionKeyStroke {
     super(action);
   }
 
-
   _isEnabled() {
     if (this.field.excludedByFilter) {
       return false;
-    } else {
-      return super._isEnabled();
     }
+    return super._isEnabled();
   }
 }

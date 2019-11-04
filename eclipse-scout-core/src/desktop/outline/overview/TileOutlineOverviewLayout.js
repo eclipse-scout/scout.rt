@@ -17,7 +17,6 @@ export default class TileOutlineOverviewLayout extends AbstractLayout {
     this.tileOutlineOverview = tileOutlineOverview;
   }
 
-
   layout($container) {
     var htmlContainer = this.tileOutlineOverview.htmlComp;
     var pageTileGrid = this.tileOutlineOverview.pageTileGrid;

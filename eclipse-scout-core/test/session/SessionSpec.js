@@ -10,8 +10,7 @@
  */
 import {BackgroundJobPollingStatus, Device, RemoteEvent, TextMap, UserAgent} from '../../src/index';
 
-
-/*global receiveResponseForAjaxCall */
+/* global receiveResponseForAjaxCall */
 describe('Session', function() {
 
   beforeEach(function() {
@@ -579,7 +578,7 @@ describe('Session', function() {
       var requestData = mostRecentJsonRequest();
       expect(requestData.startup).toBe(true);
 
-      //don't send it on subsequent requests
+      // don't send it on subsequent requests
       send(session, 1, 'nodeClick');
       sendQueuedAjaxCalls();
 

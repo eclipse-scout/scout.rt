@@ -10,7 +10,6 @@
  */
 import {EventSupport} from '../../src/index';
 
-
 describe('EventSupport', function() {
 
   var count, events;

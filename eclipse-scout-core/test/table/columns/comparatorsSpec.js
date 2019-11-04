@@ -10,10 +10,9 @@
  */
 import {comparators} from '../../../src/index';
 
+describe('scout.comparators', function() {
 
-describe("scout.comparators", function() {
-
-  it("tests 'compare' method of TEXT comparator", function() {
+  it('tests \'compare\' method of TEXT comparator', function() {
     var comparator = comparators.TEXT;
 
     expect(comparator.compare(null, null)).toBe(0);
@@ -24,7 +23,7 @@ describe("scout.comparators", function() {
     expect(comparator.compare('b', 'a')).toBe(1);
   });
 
-  it("tests 'compareIgnoreCase' method of TEXT comparator", function() {
+  it('tests \'compareIgnoreCase\' method of TEXT comparator', function() {
     var comparator = comparators.TEXT;
 
     expect(comparator.compareIgnoreCase(null, null)).toBe(0);
@@ -32,7 +31,6 @@ describe("scout.comparators", function() {
     expect(comparator.compareIgnoreCase(undefined, null)).toBe(0);
     expect(comparator.compareIgnoreCase(undefined, '')).toBe(0);
     expect(comparator.compareIgnoreCase('', '')).toBe(0);
-
 
     expect(comparator.compareIgnoreCase(null, 'a')).toBe(-1);
     expect(comparator.compareIgnoreCase('a', null)).toBe(1);
@@ -50,7 +48,7 @@ describe("scout.comparators", function() {
     expect(comparator.compare('B', 'a')).toBe(-1);
   });
 
-  it("tests 'compare' method of NUMERIC comparator", function() {
+  it('tests \'compare\' method of NUMERIC comparator', function() {
     var comparator = comparators.NUMERIC;
 
     expect(comparator.compare(undefined, undefined)).toBe(0);
@@ -82,7 +80,7 @@ describe("scout.comparators", function() {
     expect(comparator.compare('1.9999', '1.9998')).toBe(1);
   });
 
-  it("tests 'compare' method of ALPHANUMERIC comparator", function() {
+  it('tests \'compare\' method of ALPHANUMERIC comparator', function() {
     var comparator = comparators.ALPHANUMERIC;
 
     expect(comparator.compare(undefined, undefined)).toBe(0);
@@ -99,7 +97,7 @@ describe("scout.comparators", function() {
     expect(comparator.compare('doc 9 .txt 10', 'doc 9')).toBe(1);
   });
 
-  it("tests 'compareIgnoreCase' method of ALPHANUMERIC comparator", function() {
+  it('tests \'compareIgnoreCase\' method of ALPHANUMERIC comparator', function() {
     var comparator = comparators.ALPHANUMERIC;
 
     expect(comparator.compareIgnoreCase(undefined, undefined)).toBe(0);
@@ -133,7 +131,7 @@ describe("scout.comparators", function() {
     expect(comparator.compareIgnoreCase('doc\n9', 'DOC\n\n9')).toBe(-1);
   });
 
-  it("tests 'compareIgnoreCase' method of ALPHANUMERIC comparator with session", function() {
+  it('tests \'compareIgnoreCase\' method of ALPHANUMERIC comparator with session', function() {
     var comparator = comparators.ALPHANUMERIC;
     comparator.install(createSession());
     expect(comparator.compareIgnoreCase('doc8', 'doc8')).toBe(0);

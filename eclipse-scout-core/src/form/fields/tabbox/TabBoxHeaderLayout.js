@@ -25,7 +25,6 @@ export default class TabBoxHeaderLayout extends AbstractLayout {
     }.bind(this));
   }
 
-
   _initDefaults() {
     this.fieldStatusWidth = HtmlEnvironment.get().fieldStatusWidth;
   }

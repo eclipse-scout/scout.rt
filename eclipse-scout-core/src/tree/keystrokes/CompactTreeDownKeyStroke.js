@@ -18,14 +18,12 @@ export default class CompactTreeDownKeyStroke extends AbstractCompactTreeControl
     this.renderingHints.text = '↓';
   }
 
-
   _findNextNode($currentNode, currentNode) {
     if (currentNode) {
       // Find first process node, or first process node in next section.
       return $currentNode.next('.section-node').data('node') || $currentNode.parent().next('.section').children('.section-node').first().data('node');
-    } else {
-      // Find first process node.
-      return arrays.first(arrays.first(this.field.nodes).childNodes);
     }
+    // Find first process node.
+    return arrays.first(arrays.first(this.field.nodes).childNodes);
   }
 }

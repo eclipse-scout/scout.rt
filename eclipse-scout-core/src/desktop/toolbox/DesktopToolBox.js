@@ -16,7 +16,6 @@ export default class DesktopToolBox extends MenuBox {
     super();
   }
 
-
   _init(options) {
     options.uiMenuCssClass = strings.join(' ', options.uiMenuCssClass, 'desktop-tool-box-item');
     super._init(options);

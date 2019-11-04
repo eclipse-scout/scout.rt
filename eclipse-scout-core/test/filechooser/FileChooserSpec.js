@@ -10,7 +10,6 @@
  */
 import {Device, scout} from '../../src/index';
 
-
 describe('FileChooser', function() {
   var session;
 

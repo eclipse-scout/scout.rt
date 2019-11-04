@@ -17,7 +17,6 @@ export default class BrowserFieldAdapter extends ValueFieldAdapter {
     this._addRemoteProperties(['location']);
   }
 
-
   _onWidgetMessage(event) {
     this._send('postMessage', {
       data: event.data,

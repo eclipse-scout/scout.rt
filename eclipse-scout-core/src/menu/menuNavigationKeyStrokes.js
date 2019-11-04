@@ -10,7 +10,6 @@
  */
 import {MenuExecByNumberKeyStroke, MenuNavigationDownKeyStroke, MenuNavigationExecKeyStroke, MenuNavigationUpKeyStroke, SubCloseKeyStroke} from '../index';
 
-
 export function registerKeyStrokes(keyStrokeContext, popup, menuItemClass) {
   keyStrokeContext.registerKeyStroke([
     new MenuNavigationUpKeyStroke(popup, menuItemClass),
@@ -21,7 +20,6 @@ export function registerKeyStrokes(keyStrokeContext, popup, menuItemClass) {
   ]);
 }
 
-//private
 export function _findMenuItems(popup, menuItemClass) {
   return {
     $all: popup.$body.find('.' + menuItemClass),
@@ -30,17 +28,16 @@ export function _findMenuItems(popup, menuItemClass) {
   };
 }
 
-//private
 export function _changeSelection($oldItem, $newItem) {
   if ($newItem.length === 0) {
     // do not change selection
     return;
-  } else {
-    $newItem.select(true).focus();
-    if (field.updateNextToSelected) {
-      field.updateNextToSelected(_menuItemClass, $newItem);
-    }
   }
+  $newItem.select(true).focus();
+  if (field.updateNextToSelected) {
+    field.updateNextToSelected(_menuItemClass, $newItem);
+  }
+
   if ($oldItem.length > 0) {
     $oldItem.select(false);
   }

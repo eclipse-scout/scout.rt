@@ -11,7 +11,6 @@
 import {Dimension, graphics, GroupLayout, GroupToggleCollapseKeyStroke, HtmlComponent, Icon, Insets, KeyStrokeContext, LoadingSupport, scout, tooltips, Widget} from '../index';
 import * as $ from 'jquery';
 
-
 export default class Group extends Widget {
 
   constructor() {
@@ -42,7 +41,6 @@ export default class Group extends Widget {
     this._addWidgetProperties(['header']);
     this._addWidgetProperties(['body']);
   }
-
 
   static CollapseStyle = {
     LEFT: 'left',

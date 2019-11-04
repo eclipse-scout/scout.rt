@@ -36,7 +36,6 @@ export default class WidgetTooltip extends Tooltip {
     this.focusableContainer = false;
   }
 
-
   _createKeyStrokeContext() {
     return new KeyStrokeContext();
   }

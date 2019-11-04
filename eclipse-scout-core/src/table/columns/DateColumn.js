@@ -23,7 +23,6 @@ export default class DateColumn extends Column {
     this.textBased = false;
   }
 
-
   _init(model) {
     super._init(model);
 
@@ -37,7 +36,7 @@ export default class DateColumn extends Column {
     }
     this._setFormat(format);
     if (this.initialized) {
-      //if format changes on the fly, just update the cell text
+      // if format changes on the fly, just update the cell text
       this.table.rows.forEach(function(row) {
         this._updateCellText(row, this.cell(row));
       }.bind(this));
@@ -58,7 +57,7 @@ export default class DateColumn extends Column {
     }
     this._setGroupFormat(format);
     if (this.initialized) {
-      //if format changes on the fly, just update the cell text
+      // if format changes on the fly, just update the cell text
       this.table.rows.forEach(function(row) {
         this._updateCellText(row, this.cell(row));
       }.bind(this));

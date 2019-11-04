@@ -17,7 +17,6 @@ export default class TableTextUserFilter extends TableUserFilter {
     this.filterType = TableTextUserFilter.TYPE;
   }
 
-
   static TYPE = 'text';
 
   /**

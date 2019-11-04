@@ -17,7 +17,6 @@ export default class MessageBoxLayout extends AbstractLayout {
     this.messageBox = messageBox;
   }
 
-
   layout($container) {
     var htmlComp = HtmlComponent.get($container),
       windowSize = $container.windowSize(),

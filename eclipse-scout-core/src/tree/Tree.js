@@ -122,7 +122,6 @@ export default class Tree extends Widget {
     this.requestFocusOnNodeControlMouseDown = true;
   }
 
-
   static DisplayStyle = {
     DEFAULT: 'default',
     BREADCRUMB: 'breadcrumb'
@@ -2406,14 +2405,6 @@ export default class Tree extends Widget {
       nodes: nodes,
       parentNode: parentNode
     });
-  }
-
-  deselectNodes(nodes) {
-    nodes = arrays.ensure(nodes);
-    var selectedNodes = this.selectedNodes.slice(); // copy
-    if (arrays.removeAll(selectedNodes, nodes)) {
-      this.selectNodes(selectedNodes);
-    }
   }
 
   deleteAllChildNodes(parentNode) {

@@ -24,7 +24,6 @@ export default class TabItemKeyStroke extends KeyStroke {
     }.bind(this);
   }
 
-
   /**
    * @override KeyStroke.js
    */

@@ -10,7 +10,6 @@
  */
 import {arrays, Device, objects, strings} from '../index';
 
-
 /**
  * @returns the x coordinate where the event happened, works for touch events as well.
  */

@@ -36,6 +36,7 @@
       }
 
       /* | */
+
       &.x-axis {
         height: 100%;
         width: @split-box-x-splitter-size;
@@ -45,6 +46,7 @@
       }
 
       /* -- */
+
       &.y-axis {
         margin-left: @mandatory-indicator-width;
         width: calc(~'100% - ' @mandatory-indicator-width);
@@ -64,11 +66,13 @@
     }
 
     /* used while dragging */
+
     & > .temp-splitter {
       position: absolute;
       z-index: 2;
 
       /* | */
+
       &.x-axis {
         height: 100%;
         width: @temp-splitter-line-size;
@@ -78,6 +82,7 @@
       }
 
       /* -- */
+
       &.y-axis {
         margin-left: @mandatory-indicator-width;
         width: calc(~'100% - ' @mandatory-indicator-width);
@@ -112,10 +117,13 @@
 
 .split-box:not(.second-field-collapsed) > .split-area > .first-field {
   /* | */
+
   &.x-axis {
     margin-right: @split-box-x-splitter-size;
   }
+
   /* -- */
+
   &.y-axis {
     margin-bottom: @split-box-y-splitter-size;
   }

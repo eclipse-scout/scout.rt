@@ -22,7 +22,6 @@ export default class NavigateUpButton extends NavigateButton {
     this.keyStroke = 'backspace';
   }
 
-
   _render() {
     super._render();
     this.$container.addClass('up');

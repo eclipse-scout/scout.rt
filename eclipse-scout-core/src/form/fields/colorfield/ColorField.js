@@ -16,7 +16,6 @@ export default class ColorField extends ValueField {
     super();
   }
 
-
   _render() {
     this.addContainer(this.$parent, 'color-field');
     this.addLabel();

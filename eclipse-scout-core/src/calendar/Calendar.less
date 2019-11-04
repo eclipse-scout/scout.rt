@@ -182,7 +182,7 @@
 .calendar-toggle-list {
   margin-left: 5px;
 
-  &:hover::before{
+  &:hover::before {
     color: @hover-color;
   }
 }
@@ -238,6 +238,7 @@
   }
 
   /* Colors for type Appointment */
+
   &.calendar-appointment {
     background-color: @palette-orange-0;
 
@@ -253,7 +254,7 @@
       background-color: @palette-orange-3;
     }
 
-    &:hover .comp-selected > .calendar-component-leftcolorborder  {
+    &:hover .comp-selected > .calendar-component-leftcolorborder {
       background-color: @palette-orange-4;
     }
 
@@ -261,12 +262,13 @@
       background-color: @palette-orange-3;
     }
 
-    &.comp-selected > .calendar-component-leftcolorborder  {
+    &.comp-selected > .calendar-component-leftcolorborder {
       background-color: @palette-orange-4;
     }
   }
 
   /* Colors for type Task */
+
   &.calendar-task {
     background-color: @palette-cyan-0;
 
@@ -286,7 +288,7 @@
       background-color: @palette-cyan-3;
     }
 
-    &.comp-selected > .calendar-component-leftcolorborder  {
+    &.comp-selected > .calendar-component-leftcolorborder {
       background-color: @palette-cyan-4;
     }
   }
@@ -419,6 +421,7 @@
 
   &.out {
     background-color: @calendar-out-background-color;
+
     &::before {
       color: @calendar-out-color;
     }
@@ -430,6 +433,7 @@
 
   &.weekend-out {
     background-color: @calendar-weekend-out-background-color;
+
     &::before {
       color: @calendar-weekend-out-color;
     }
@@ -441,6 +445,7 @@
   }
 
   /* helps to center days between 10 and 19 nicer */
+
   &.selected.center-nice::before {
     padding-right: 2px;
   }
@@ -472,6 +477,7 @@
       padding-top: 10px;
 
       /* Compensate for open top padding */
+
       & > .calendar-component-leftcolorborder {
         height: calc(~'100% + 10px');
         top: -10px;
@@ -509,28 +515,27 @@
   }
 }
 
-  .calendar-day.selected.now::before {
-    left: 4px;
-    top: 3px;
-    font-weight: normal;
-    border: solid 4px @highlight-inverted-background-color;
-    border-radius: 50%;
-    background-color: @highlight-inverted-background-color;
-    color: @palette-white;
-  }
+.calendar-day.selected.now::before {
+  left: 4px;
+  top: 3px;
+  font-weight: normal;
+  border: solid 4px @highlight-inverted-background-color;
+  border-radius: 50%;
+  background-color: @highlight-inverted-background-color;
+  color: @palette-white;
+}
 
-  .calendar-day.selected::before {
-    text-align: center;
-    left: 4px;
-    top: 3px;
-    width: @calendar-day-selected-circle-size;
-    height: @calendar-day-selected-circle-size;
-    border: solid 4px @calendar-day-selected-background-color;
-    border-radius: 50%;
-    background-color: @calendar-day-selected-background-color;
-    color: @calendar-day-selected-color;
-  }
-
+.calendar-day.selected::before {
+  text-align: center;
+  left: 4px;
+  top: 3px;
+  width: @calendar-day-selected-circle-size;
+  height: @calendar-day-selected-circle-size;
+  border: solid 4px @calendar-day-selected-background-color;
+  border-radius: 50%;
+  background-color: @calendar-day-selected-background-color;
+  color: @calendar-day-selected-color;
+}
 
 
 .calendar-week-name {

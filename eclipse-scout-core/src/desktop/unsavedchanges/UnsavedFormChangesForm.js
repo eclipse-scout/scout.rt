@@ -18,7 +18,6 @@ export default class UnsavedFormChangesForm extends Form {
     this.unsavedForms = [];
   }
 
-
   _jsonModel() {
     return {
       id: 'scout.UnsavedFormChangesForm',
@@ -65,7 +64,7 @@ export default class UnsavedFormChangesForm extends Form {
 
     this.openFormsField.table.one('rowsInserted', function(event) {
       event.source.checkAll(true);
-    }.bind(this));
+    });
 
     var checkAllMenu = scout.create('Menu', {
       parent: this.openFormsField.table,

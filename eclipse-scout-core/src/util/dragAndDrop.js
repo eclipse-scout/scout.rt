@@ -10,7 +10,6 @@
  */
 import {arrays, DragAndDropHandler} from '../index';
 
-
 const SCOUT_TYPES = {
   FILE_TRANSFER: 1 << 0, // IDNDSupport.TYPE_FILE_TRANSFER (NOSONAR)
   JAVA_ELEMENT_TRANSFER: 1 << 1, // IDNDSupport.TYPE_JAVA_ELEMENT_TRANSFER (NOSONAR)

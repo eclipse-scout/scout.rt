@@ -83,6 +83,7 @@
   }
 
   /* Hover effect is disabled on touch devices because the hover effect does not vanish on touch end which is annoying especially when swiping. */
+
   &:active:not(.disabled),
   .date-picker:not(.touch) &:hover:not(.disabled) {
     & > .text {
@@ -137,7 +138,7 @@
   &.selected {
     color: @date-picker-day-selected-color;
 
-    & > .text{
+    & > .text {
       background-color: @date-picker-day-selected-background-color;
     }
 
@@ -151,6 +152,7 @@
   }
 
   /* Must be after other style definitions, because 'disabled' should overrule other definitions */
+
   &.disabled {
     color: @date-picker-day-disabled-color;
   }
@@ -164,6 +166,7 @@
   border-bottom: 1px solid @border-color;
 
   /* Additional space between navigation buttons on touch devices */
+
   &.touch {
     padding-left: 18px;
     padding-right: 18px;
@@ -171,6 +174,7 @@
     & > .date-picker-left-m {
       margin-left: 26px;
     }
+
     & > .date-picker-right-m {
       margin-right: 26px;
     }

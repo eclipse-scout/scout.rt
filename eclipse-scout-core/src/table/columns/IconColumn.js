@@ -19,7 +19,6 @@ export default class IconColumn extends Column {
     this.textBased = false;
   }
 
-
   /**
    * @override
    */

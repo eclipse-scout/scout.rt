@@ -65,9 +65,8 @@ export default class TableMatrix {
       dataAxis.norm = function(f) {
         if (isNaN(f) || f === null || f === '') {
           return null;
-        } else {
-          return parseFloat(f);
         }
+        return parseFloat(f);
       };
       dataAxis.group = function(array) {
         return array.reduce(function(a, b) {
@@ -78,9 +77,8 @@ export default class TableMatrix {
       dataAxis.norm = function(f) {
         if (isNaN(f) || f === null || f === '') {
           return null;
-        } else {
-          return parseFloat(f);
         }
+        return parseFloat(f);
       };
       dataAxis.group = function(array) {
         var sum = array.reduce(function(a, b) {
@@ -92,16 +90,15 @@ export default class TableMatrix {
 
         if (count === 0) {
           return null;
-        } else {
-          return sum / count;
         }
+        return sum / count;
+
       };
     }
-
     return dataAxis;
   }
 
-//add x or y Axis
+  // add x or y Axis
   addAxis(axis, axisGroup) {
     var keyAxis = [],
       locale = this.locale,
@@ -140,21 +137,18 @@ export default class TableMatrix {
     keyAxis.norm = function(f) {
       if (f === null || f === '') {
         return null;
-      } else {
-        var index = keyAxis.normTable.indexOf(f);
-        if (index === -1) {
-          return keyAxis.normTable.push(f) - 1;
-        } else {
-          return index;
-        }
       }
+      var index = keyAxis.normTable.indexOf(f);
+      if (index === -1) {
+        return keyAxis.normTable.push(f) - 1;
+      }
+      return index;
     };
     keyAxis.format = function(n) {
       if (n === null) {
         return emptyCell;
-      } else {
-        return keyAxis.normTable[n];
       }
+      return keyAxis.normTable[n];
     };
 
     // norm and format depends of datatype and group functionality
@@ -163,114 +157,105 @@ export default class TableMatrix {
         keyAxis.norm = function(f) {
           if (f === null || f === '') {
             return null;
-          } else {
-            return f.getTime();
           }
+          return f.getTime();
+
         };
         keyAxis.format = function(n) {
           if (n === null) {
             return null;
-          } else {
-            var format = axis.format;
-            if (format) {
-              format = DateFormat.ensure(locale, format);
-            } else {
-              format = locale.dateFormat;
-            }
-            return format.format(new Date(n));
           }
+          var format = axis.format;
+          if (format) {
+            format = DateFormat.ensure(locale, format);
+          } else {
+            format = locale.dateFormat;
+          }
+          return format.format(new Date(n));
         };
       } else if (axisGroup === TableMatrix.DateGroup.YEAR) {
         keyAxis.norm = function(f) {
           if (f === null || f === '') {
             return null;
-          } else {
-            return f.getFullYear();
           }
+          return f.getFullYear();
+
         };
         keyAxis.format = function(n) {
           if (n === null) {
             return emptyCell;
-          } else {
-            return String(n);
           }
+          return String(n);
+
         };
       } else if (axisGroup === TableMatrix.DateGroup.MONTH) {
         keyAxis.norm = function(f) {
           if (f === null || f === '') {
             return null;
-          } else {
-            return f.getMonth();
           }
+          return f.getMonth();
+
         };
         keyAxis.format = function(n) {
           if (n === null) {
             return emptyCell;
-          } else {
-            return locale.dateFormatSymbols.months[n];
           }
+          return locale.dateFormatSymbols.months[n];
+
         };
       } else if (axisGroup === TableMatrix.DateGroup.WEEKDAY) {
         keyAxis.norm = function(f) {
           if (f === null || f === '') {
             return null;
-          } else {
-            var b = (f.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
-            return b;
           }
+          var b = (f.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
+          return b;
         };
         keyAxis.format = function(n) {
           if (n === null) {
             return emptyCell;
-          } else {
-            return locale.dateFormatSymbols.weekdaysOrdered[n];
           }
+          return locale.dateFormatSymbols.weekdaysOrdered[n];
         };
       } else if (axisGroup === TableMatrix.DateGroup.DATE) {
         keyAxis.norm = function(f) {
           if (f === null || f === '') {
             return null;
-          } else {
-            return dates.trunc(f).getTime();
           }
+          return dates.trunc(f).getTime();
         };
         keyAxis.format = function(n) {
           if (n === null) {
             return emptyCell;
-          } else {
-            return dates.format(new Date(n), locale, locale.dateFormatPatternDefault);
           }
+          return dates.format(new Date(n), locale, locale.dateFormatPatternDefault);
         };
       }
     } else if (axis instanceof NumberColumn) {
       keyAxis.norm = function(f) {
         if (isNaN(f) || f === null || f === '') {
           return null;
-        } else {
-          return parseFloat(f);
         }
+        return parseFloat(f);
       };
       keyAxis.format = function(n) {
         if (isNaN(n) || n === null) {
           return emptyCell;
-        } else {
-          return axis.decimalFormat.format(n);
         }
+        return axis.decimalFormat.format(n);
       };
     } else if (axis instanceof BooleanColumn) {
       keyAxis.norm = function(f) {
         if (!f) {
           return 0;
-        } else {
-          return 1;
         }
+        return 1;
       };
       keyAxis.format = function(n) {
         if (n === 0) {
           return getText('ui.BooleanColumnGroupingFalse');
-        } else {
-          return getText('ui.BooleanColumnGroupingTrue');
         }
+        return getText('ui.BooleanColumnGroupingTrue');
       };
     } else if (axis instanceof IconColumn) {
       keyAxis.textIsIcon = true;
@@ -292,7 +277,6 @@ export default class TableMatrix {
         });
       };
     }
-
     return keyAxis;
   }
 
@@ -372,7 +356,7 @@ export default class TableMatrix {
         }
       }
 
-      //To calculate correct y axis scale data.max must not be 0. If data.max===0-> log(data.max)=-infinity
+      // To calculate correct y axis scale data.max must not be 0. If data.max===0-> log(data.max)=-infinity
       if (scout.nvl(data.max, 0) === 0) {
         data.max = 0.1;
       }
@@ -404,9 +388,9 @@ export default class TableMatrix {
 
       if (cube.hasOwnProperty(keys)) {
         return cube[keys];
-      } else {
-        return null;
       }
+      return null;
+
     };
 
     return cube;

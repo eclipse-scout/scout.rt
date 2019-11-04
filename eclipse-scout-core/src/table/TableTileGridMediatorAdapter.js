@@ -16,7 +16,6 @@ export default class TableTileGridMediatorAdapter extends ModelAdapter {
     super();
   }
 
-
   /**
    * Static method to modify the prototype of TableTileGridMediatorAdapter.
    */

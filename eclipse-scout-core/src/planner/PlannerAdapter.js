@@ -17,7 +17,6 @@ export default class PlannerAdapter extends ModelAdapter {
     this._addRemoteProperties(['displayMode', 'viewRange', 'selectionRange', 'selectedActivity']);
   }
 
-
   _sendViewRange(viewRange) {
     this._send('property', {
       viewRange: dates.toJsonDateRange(viewRange)

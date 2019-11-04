@@ -60,8 +60,8 @@ export default class LogicalGridMatrix {
     return this._assignedCells.slice(x, x + w).every(function(valX) {
       return (valX || []).slice(y, y + h).every(function(valY) {
         return !valY;
-      }.bind(this));
-    }.bind(this));
+      });
+    });
   }
 
   toString() {

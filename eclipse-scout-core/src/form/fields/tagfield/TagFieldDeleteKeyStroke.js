@@ -10,7 +10,6 @@
  */
 import {keys, KeyStroke, TagBar} from '../../../index';
 
-
 /**
  * @param fieldAdapter acts as an interface so we can use the same key-stroke for TagField and TagFieldPopup.
  *
@@ -24,7 +23,6 @@ export default class TagFieldDeleteKeyStroke extends KeyStroke {
     this.renderingHints.render = false;
     this.preventDefault = false;
   }
-
 
   _accept(event) {
     var accepted = super._accept(event);

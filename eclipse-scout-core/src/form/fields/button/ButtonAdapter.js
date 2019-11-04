@@ -17,7 +17,6 @@ export default class ButtonAdapter extends FormFieldAdapter {
     this._addRemoteProperties(['selected']);
   }
 
-
   _onWidgetClick(event) {
     if (this.widget.displayStyle === Button.DisplayStyle.TOGGLE || this.widget.menus.length > 0) {
       return;

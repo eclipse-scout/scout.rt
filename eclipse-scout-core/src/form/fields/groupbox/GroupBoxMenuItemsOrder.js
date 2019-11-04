@@ -10,9 +10,6 @@
  */
 export default class GroupBoxMenuItemsOrder {
 
-  constructor() {
-  };
-
   /**
    * Sorts the given menus item by horizontal alignment and divides the items in two groups for each alignment.
    * The result looks as follows:

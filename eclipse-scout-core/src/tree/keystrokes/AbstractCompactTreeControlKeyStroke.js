@@ -19,7 +19,6 @@ export default class AbstractCompactTreeControlKeyStroke extends KeyStroke {
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     if (!accepted) {
@@ -37,9 +36,8 @@ export default class AbstractCompactTreeControlKeyStroke extends KeyStroke {
     if (nextNode) {
       event._nextNode = nextNode;
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   handle(event) {

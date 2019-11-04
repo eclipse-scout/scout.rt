@@ -11,7 +11,6 @@
 import {arrays, Locale, objects, scout, texts} from '../index';
 import * as $ from 'jquery';
 
-
 let localesMap = {};
 
 export function bootstrap(url) {
@@ -19,7 +18,6 @@ export function bootstrap(url) {
   return promise.then(_preInit.bind(this, url));
 }
 
-//private
 export function _preInit(url, data) {
   if (data && data.error) {
     // The result may contain a json error (e.g. session timeout) -> abort processing
@@ -37,7 +35,6 @@ export function init(data) {
   }, this);
 }
 
-//private
 export function _get(languageTag) {
   return localesMap[languageTag];
 }
@@ -66,9 +63,7 @@ export function get(languageTag) {
 
   tags.some(function(tag) {
     locale = _get(tag);
-    if (locale) {
-      return true;
-    }
+    return !!locale;
   }, this);
 
   if (!locale) {
@@ -145,7 +140,6 @@ export function splitLanguageTag(languageTag) {
   }
   return languageTag.split('-');
 }
-
 
 export default {
   bootstrap,

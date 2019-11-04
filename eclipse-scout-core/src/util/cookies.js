@@ -10,7 +10,6 @@
  */
 import {scout} from '../index';
 
-
 export function get(name, doc) {
   doc = doc || document;
   var prefix = name + '=';

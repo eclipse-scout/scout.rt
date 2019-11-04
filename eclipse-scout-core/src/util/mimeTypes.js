@@ -49,7 +49,6 @@ export function isJavaScript(mimeType) {
     APPLICATION_JAVASCRIPT);
 }
 
-
 export default {
   APPLICATION_JAVASCRIPT,
   APPLICATION_JSON,

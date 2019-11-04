@@ -17,7 +17,6 @@ export default class ModeSelectorLayout extends AbstractLayout {
     this.modeSelector = modeSelector;
   }
 
-
   preferredLayoutSize($container, options) {
     var prefSize = super.preferredLayoutSize($container, options);
 

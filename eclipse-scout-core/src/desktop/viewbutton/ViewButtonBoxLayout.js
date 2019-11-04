@@ -17,7 +17,6 @@ export default class ViewButtonBoxLayout extends AbstractLayout {
     this.viewButtonBox = viewButtonBox;
   }
 
-
   layout($container) {
     var tabs = this.viewButtonBox.tabButtons.filter(function(tab) {
         return tab.visible;

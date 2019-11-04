@@ -11,8 +11,7 @@
 import {FormSpecHelper} from '@eclipse-scout/testing';
 import {scout} from '../../src/index';
 
-
-describe("ModeSelector", function() {
+describe('ModeSelector', function() {
   var session;
   var helper;
 
@@ -54,10 +53,9 @@ describe("ModeSelector", function() {
   describe('init', function() {
     it('sets the selectedMode if it is provided', function() {
       var mode1 = scout.create('Mode', {
-          parent: session.desktop,
-          ref: 1
-        }
-      );
+        parent: session.desktop,
+        ref: 1
+      });
       var modeSelector = scout.create('ModeSelector', {
         objectType: 'ModeSelector',
         parent: session.desktop,

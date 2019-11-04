@@ -42,7 +42,7 @@ export default class Lifecycle {
     };
   }
 
-// Info: doExportXml, doImportXml, doSaveWithoutMarkerChange is not supported in Html UI
+  // Info: doExportXml, doImportXml, doSaveWithoutMarkerChange is not supported in Html UI
 
   init(model) {
     scout.assertParameter('widget', model.widget);
@@ -121,9 +121,8 @@ export default class Lifecycle {
         this.askIfNeedSaveText,
         this.ok.bind(this),
         this.close.bind(this));
-    } else {
-      return this.close();
     }
+    return this.close();
   }
 
   /**

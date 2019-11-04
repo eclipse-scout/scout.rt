@@ -18,7 +18,6 @@ export default class SimpleTabArea extends Widget {
     this._selectedViewTab = null;
   }
 
-
   _init(model) {
     super._init(model);
 

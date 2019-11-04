@@ -11,7 +11,6 @@
 import {HtmlComponent} from '../../../../src/index';
 import {TabBoxSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('TabItem', function() {
   var session;
   var helper;

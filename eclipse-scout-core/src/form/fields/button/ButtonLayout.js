@@ -17,7 +17,6 @@ export default class ButtonLayout extends FormFieldLayout {
     this.button = button;
   }
 
-
   layout($container) {
     super.layout($container);
 

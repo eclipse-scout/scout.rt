@@ -39,7 +39,7 @@ export default class App {
     this.initialized = false;
     this.sessions = [];
 
-    /// register the listeners which were added to scout before the app is created
+    // register the listeners which were added to scout before the app is created
     listeners.forEach(function(listener) {
       this.addListener(listener);
     }, this);
@@ -406,7 +406,7 @@ export default class App {
     // NOP
   }
 
-//--- Event handling methods ---
+  // --- Event handling methods ---
   _createEventSupport() {
     return new EventSupport();
   }

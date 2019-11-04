@@ -11,8 +11,7 @@
 import {StringField} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("StringFieldAdapter", function() {
+describe('StringFieldAdapter', function() {
   var session, helper;
 
   beforeEach(function() {
@@ -38,11 +37,11 @@ describe("StringFieldAdapter", function() {
     return helper.createFieldModel();
   }
 
-  describe("onModelPropertyChange", function() {
+  describe('onModelPropertyChange', function() {
 
-    describe("insertText", function() {
+    describe('insertText', function() {
 
-      it("may be called multiple times with the same text", function() {
+      it('may be called multiple times with the same text', function() {
         var field = createField(createModel());
         linkWidgetAndAdapter(field, 'StringFieldAdapter');
         field.render();

@@ -17,7 +17,6 @@ export default class GroupBoxAdapter extends CompositeFieldAdapter {
     this._addRemoteProperties(['expanded']);
   }
 
-
   /**
    * @override
    */
@@ -29,7 +28,7 @@ export default class GroupBoxAdapter extends CompositeFieldAdapter {
     return model;
   }
 
-// Replace method on responsive handler.
+  // Replace method on responsive handler.
   _postCreateWidget() {
     super._postCreateWidget();
 

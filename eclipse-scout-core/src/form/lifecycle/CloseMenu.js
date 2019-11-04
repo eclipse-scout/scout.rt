@@ -21,7 +21,6 @@ export default class CloseMenu extends Menu {
     this.inheritAccessibility = false;
   }
 
-
   _init(model) {
     super._init(model);
     this.text = scout.nvl(this.text, this.session.text('CloseButton'));

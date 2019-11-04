@@ -17,7 +17,6 @@ export default class SimpleTabBoxLayout extends AbstractLayout {
     this.tabBox = tabBox;
   }
 
-
   layout($container) {
     var containerSize, viewContentSize,
       htmlContainer = HtmlComponent.get($container),

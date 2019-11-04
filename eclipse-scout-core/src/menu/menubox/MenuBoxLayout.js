@@ -20,7 +20,6 @@ export default class MenuBoxLayout extends AbstractLayout {
     this.lastMenu = null;
   }
 
-
   /**
    * @override AbstractLayout.js
    */

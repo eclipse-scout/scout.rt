@@ -17,7 +17,6 @@ export default class DialogLayout extends FormLayout {
     this.autoSize = true;
   }
 
-
   layout($container) {
     if (!this.autoSize) {
       super.layout($container);

@@ -11,8 +11,7 @@
 import {FormSpecHelper} from '@eclipse-scout/testing';
 import {tooltips, ValueField} from '../../src/index';
 
-
-describe("scout.tooltips", function() {
+describe('scout.tooltips', function() {
 
   var session, helper, formField, model;
 
@@ -41,7 +40,7 @@ describe("scout.tooltips", function() {
     jasmine.clock().uninstall();
   });
 
-  it("can be installed and uninstalled for a form field", function() {
+  it('can be installed and uninstalled for a form field', function() {
     tooltips.install(formField.$container, {
       parent: session.desktop,
       session: session,
@@ -52,7 +51,7 @@ describe("scout.tooltips", function() {
     expect(formField.$container.data('tooltipSupport')).toBeUndefined();
   });
 
-  it("creates a tooltip on mouseenter and removes it on mouseleave", function() {
+  it('creates a tooltip on mouseenter and removes it on mouseleave', function() {
     tooltips.install(formField.$container, {
       parent: session.desktop,
       session: session,
@@ -79,9 +78,9 @@ describe("scout.tooltips", function() {
     tooltips.uninstall(formField.$container);
   });
 
-  describe("if text", function() {
+  describe('if text', function() {
 
-    it("is empty no tooltip will be shown", function() {
+    it('is empty no tooltip will be shown', function() {
       tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
@@ -100,7 +99,7 @@ describe("scout.tooltips", function() {
       tooltips.uninstall(formField.$container);
     });
 
-    it("is a function, it will be called for tooltip text", function() {
+    it('is a function, it will be called for tooltip text', function() {
       tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
@@ -123,7 +122,7 @@ describe("scout.tooltips", function() {
       tooltips.uninstall(formField.$container);
     });
 
-    it("is undefined no tooltip will be shown", function() {
+    it('is undefined no tooltip will be shown', function() {
       tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
@@ -144,7 +143,7 @@ describe("scout.tooltips", function() {
       tooltips.uninstall(formField.$container);
     });
 
-    it("is provided by component, it will be used as tooltip text", function() {
+    it('is provided by component, it will be used as tooltip text', function() {
       tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
@@ -165,7 +164,7 @@ describe("scout.tooltips", function() {
       tooltips.uninstall(formField.$container);
     });
 
-    it("is provided as function by component, it will be called and used as tooltip text", function() {
+    it('is provided as function by component, it will be called and used as tooltip text', function() {
       tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
@@ -188,7 +187,7 @@ describe("scout.tooltips", function() {
       tooltips.uninstall(formField.$container);
     });
 
-    it("is provided using options and by component, text provided using options will be used", function() {
+    it('is provided using options and by component, text provided using options will be used', function() {
       tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
@@ -210,12 +209,12 @@ describe("scout.tooltips", function() {
       tooltips.uninstall(formField.$container);
     });
 
-    it("is a function, component is passed as first and only argument", function() {
+    it('is a function, component is passed as first and only argument', function() {
       tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
         text: function() {
-          return (formField.$container.is(arguments[0]) && arguments.length == 1) ? 'Test8' : 'InvalidArguments';
+          return (formField.$container.is(arguments[0]) && arguments.length === 1) ? 'Test8' : 'InvalidArguments';
         },
         delay: 0
       });
@@ -235,7 +234,7 @@ describe("scout.tooltips", function() {
 
   });
 
-  it("can update the text of an already visible tooltip", function() {
+  it('can update the text of an already visible tooltip', function() {
     // 1. Test with 'tooltipText' data attribute in DOM
     var $testElement = session.$entryPoint.appendDiv('tooltip-test')
       .data('tooltipText', 'initial text');

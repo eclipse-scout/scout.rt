@@ -11,7 +11,6 @@
 import {FormSpecHelper} from '@eclipse-scout/testing';
 import {FormMenu, menus, scout} from '../../src/index';
 
-
 /* global linkWidgetAndAdapter */
 describe('FormMenu', function() {
   var session, desktop, helper;

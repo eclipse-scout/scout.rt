@@ -24,12 +24,12 @@ describe('ResponseQueue', function() {
       rq.add({id: 1});
       rq.add({id: 3});
       rq.add({id: 2});
-      rq.add({'#': 100, id: 4});
+      rq.add({'#': 100, 'id': 4});
       rq.add({id: 7});
-      rq.add({'#': 300, id: 5});
-      rq.add({'#': 200, id: 6});
+      rq.add({'#': 300, 'id': 5});
+      rq.add({'#': 200, 'id': 6});
       rq.add({id: 8});
-      rq.add({'#': 150, id: 9});
+      rq.add({'#': 150, 'id': 9});
 
       expect(rq.queue.length).toBe(9);
       expect(rq.queue[0].id).toBe(1);
@@ -51,13 +51,13 @@ describe('ResponseQueue', function() {
 
       expect(rq.nextExpectedSequenceNo).toBe(1);
 
-      rq.add({'#': 1, id: 1});
-      rq.add({'#': 2, id: 2});
-      rq.add({'#': 4, id: 4});
-      rq.add({'#': 8, combined: true, id: 8});
-      rq.add({'#': 3, id: 3});
-      rq.add({'#': 6, combined: true, id: 6});
-      rq.add({'#': 9, id: 9});
+      rq.add({'#': 1, 'id': 1});
+      rq.add({'#': 2, 'id': 2});
+      rq.add({'#': 4, 'id': 4});
+      rq.add({'#': 8, 'combined': true, 'id': 8});
+      rq.add({'#': 3, 'id': 3});
+      rq.add({'#': 6, 'combined': true, 'id': 6});
+      rq.add({'#': 9, 'id': 9});
 
       expect(rq.queue.length).toBe(2);
       expect(rq.queue[0].id).toBe(8);
@@ -87,13 +87,13 @@ describe('ResponseQueue', function() {
       rq.add({id: 1});
       rq.add({id: 3});
       rq.add({id: 2});
-      rq.add({'#': 1, id: 4});
+      rq.add({'#': 1, 'id': 4});
       rq.add({id: 7});
-      rq.add({'#': 3, id: 5});
-      rq.add({'#': 2, id: 6});
+      rq.add({'#': 3, 'id': 5});
+      rq.add({'#': 2, 'id': 6});
       rq.add({id: 8});
 
-      var success = rq.process({'#': 4, id: 9});
+      var success = rq.process({'#': 4, 'id': 9});
 
       expect(rq.queue.length).toBe(0);
       expect(rq.nextExpectedSequenceNo).toBe(5);
@@ -113,15 +113,15 @@ describe('ResponseQueue', function() {
 
       expect(rq.nextExpectedSequenceNo).toBe(1);
 
-      rq.add({'#': 2, id: 1});
-      var success = rq.process({'#': 3, id: 2});
+      rq.add({'#': 2, 'id': 1});
+      var success = rq.process({'#': 3, 'id': 2});
       expect(success).toBe(true);
       expect(rq.queue.length).toBe(2); // not processed!
 
       // wait 5s
       jasmine.clock().tick(5000);
 
-      success = rq.process({'#': 4, id: 3});
+      success = rq.process({'#': 4, 'id': 3});
       expect(success).toBe(true);
       expect(rq.queue.length).toBe(3); // still not processed
       expect(rq.nextExpectedSequenceNo).toBe(1);
@@ -148,10 +148,10 @@ describe('ResponseQueue', function() {
 
       expect(rq.nextExpectedSequenceNo).toBe(1);
 
-      rq.add({'#': 1, id: 4});
-      rq.add({'#': 3, id: 5});
-      rq.add({'#': 2, id: 6});
-      var success = rq.process({'#': 4, id: 9});
+      rq.add({'#': 1, 'id': 4});
+      rq.add({'#': 3, 'id': 5});
+      rq.add({'#': 2, 'id': 6});
+      var success = rq.process({'#': 4, 'id': 9});
 
       expect(rq.queue.length).toBe(0);
       expect(rq.lastProcessedSequenceNo).toBe(4);
@@ -160,7 +160,7 @@ describe('ResponseQueue', function() {
       expect(success).toBe(true);
 
       // add an older element than current seqNo -> ignore
-      success = rq.process({'#': 1, id: 4});
+      success = rq.process({'#': 1, 'id': 4});
       expect(success).toBe(true);
       expect(rq.queue.length).toBe(0);
       expect(rq.lastProcessedSequenceNo).toBe(4);

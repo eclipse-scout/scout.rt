@@ -18,7 +18,6 @@ export default class HorizontalGridMatrix extends LogicalGridMatrix {
     this.rowCount = 0;
   }
 
-
   computeGridData(widgets) {
     widgets.forEach(function(widget) {
       var hints = GridData.createFromHints(widget, this.getColumnCount());

@@ -10,7 +10,6 @@
  */
 import {Device, FormField, scout, strings, Widget, widgets} from '../../index';
 
-
 /**
  * @param $parent used to determine which HTML document is used to create the new HTML element
  * @returns an INPUT element as used in Scout forms.
@@ -123,7 +122,6 @@ export function linkElementWithLabel($elem, $label) {
   }
   $elem.attr('aria-labelledby', labelId);
 }
-
 
 export default {
   activateFirstField,

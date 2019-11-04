@@ -43,17 +43,17 @@ export default class Reconnector {
     setTimeout(this._ping.bind(this), delay);
   }
 
-//
-//   [START]
-//      |
-//      v
-// +---------+          .--------.  (yes)
-// | _ping() | ------> < success? > ------> [END]
-// +---------+          '--------'
-//      ^                   |(no)
-//      |                   |
-//      +-------------------+
-//
+  //
+  //   [START]
+  //      |
+  //      v
+  // +---------+          .--------.  (yes)
+  // | _ping() | ------> < success? > ------> [END]
+  // +---------+          '--------'
+  //      ^                   |(no)
+  //      |                   |
+  //      +-------------------+
+  //
   _ping() {
     this.session.onReconnecting();
 

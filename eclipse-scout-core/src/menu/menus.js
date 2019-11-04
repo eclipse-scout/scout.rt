@@ -11,7 +11,6 @@
 import {arrays, icons, MenuDestinations, scout} from '../index';
 import * as $ from 'jquery';
 
-
 export function filterAccordingToSelection(prefix, selectionLength, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
   var allowedTypes = [];
 
@@ -31,7 +30,7 @@ export function filterAccordingToSelection(prefix, selectionLength, menus, desti
   }
   notAllowedTypes = arrays.ensure(notAllowedTypes);
   var fixedNotAllowedTypes = [];
-  //ensure prefix
+  // ensure prefix
   prefix = prefix + '.';
   notAllowedTypes.forEach(function(type) {
     if (type.slice(0, prefix.length) !== prefix) {
@@ -66,8 +65,8 @@ export function filter(menus, types, onlyVisible, enableDisableKeyStrokes, notAl
         _enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
         return;
       }
-    } // Don't check the menu type for a group
-    else if (!_checkType(menu, types) || (notAllowedTypes.length !== 0 && _checkType(menu, notAllowedTypes))) {
+    } else if (!_checkType(menu, types) || (notAllowedTypes.length !== 0 && _checkType(menu, notAllowedTypes))) {
+      // Don't check the menu type for a group
       _enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
       return;
     }
@@ -139,7 +138,6 @@ export function checkType(menu, types) {
   return _checkType(menu, types);
 }
 
-//private
 export function _enableDisableMenuKeyStroke(menu, activated, exclude) {
   if (activated) {
     menu.excludedByFilter = exclude;
@@ -149,7 +147,7 @@ export function _enableDisableMenuKeyStroke(menu, activated, exclude) {
 /**
  * Checks the type of a menu. Don't use this for menu groups.
  */
-//private
+
 export function _checkType(menu, types) {
   if (!types || types.length === 0) {
     return false;

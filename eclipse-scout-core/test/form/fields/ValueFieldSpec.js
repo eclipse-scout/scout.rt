@@ -11,7 +11,6 @@
 import {scout, Status, StringField, ValueField} from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper} from '@eclipse-scout/testing';
 
-
 /* global removePopups */
 describe('ValueField', function() {
   var session, helper, menuHelper;
@@ -100,7 +99,7 @@ describe('ValueField', function() {
     it('does not set value if value is invalid initially', function() {
       var field = new StringField();
       field.setValidator(function(value) {
-        throw "Validation failed";
+        throw 'Validation failed';
       });
       field.init({
         parent: session.desktop,
@@ -126,7 +125,7 @@ describe('ValueField', function() {
       // Don't override error status, otherwise specifying the error status would not have any effect
       var field = new StringField();
       field.setValidator(function(value) {
-        throw "Validation failed";
+        throw 'Validation failed';
       });
       field.init({
         parent: session.desktop,
@@ -187,7 +186,7 @@ describe('ValueField', function() {
       field.setValue('Foo');
       expect(field.value).toBe(null);
       expect(field.errorStatus instanceof Status).toBe(true);
-      expect(field.displayText).toBe("Foo");
+      expect(field.displayText).toBe('Foo');
     });
 
     it('deletes the error status if value is valid', function() {
@@ -289,7 +288,7 @@ describe('ValueField', function() {
     it('may throw a message if value is invalid', function() {
       var field = helper.createField('StringField');
       field.setValidator(function(value) {
-        throw "Invalid value";
+        throw 'Invalid value';
       });
       field.setValue('Foo');
       expect(field.value).toBe(null);

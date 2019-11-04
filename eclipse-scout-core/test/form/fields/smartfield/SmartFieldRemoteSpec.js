@@ -11,7 +11,6 @@
 import {QueryBy, RemoteEvent, scout, SmartField, Status} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
 /* global linkWidgetAndAdapter */
 describe('SmartFieldRemote', function() {
 

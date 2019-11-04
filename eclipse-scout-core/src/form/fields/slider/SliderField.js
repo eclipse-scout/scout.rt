@@ -18,7 +18,6 @@ export default class SliderField extends ValueField {
     this.slider;
   }
 
-
   _init(model) {
     super._init(model);
     var sliderOptions = $.extend({

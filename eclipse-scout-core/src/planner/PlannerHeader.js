@@ -19,7 +19,6 @@ export default class PlannerHeader extends Widget {
     this.availableDisplayModes = [];
   }
 
-
   _render() {
     this.$container = this.$parent.appendDiv('planner-header');
     this.$range = this.$container.appendDiv('planner-range');

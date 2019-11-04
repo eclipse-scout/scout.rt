@@ -38,7 +38,7 @@ import {GroupBoxSpecHelper} from '@eclipse-scout/testing';
  * @since 4.0.0 M6 25.02.2014
  */
 // see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout05Test
-describe("AbstractGrid05", function() {
+describe('AbstractGrid05', function() {
   var session;
 
   beforeEach(function() {
@@ -52,7 +52,7 @@ describe("AbstractGrid05", function() {
     });
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
-      label: "Field 01",
+      label: 'Field 01',
       gridDataHints: new GridData({
         h: 2,
         w: 2
@@ -60,16 +60,16 @@ describe("AbstractGrid05", function() {
     }));
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
-      label: "Field 02"
+      label: 'Field 02'
     }));
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
-      label: "Field 03",
+      label: 'Field 03',
       gridDataHints: new GridData()
     }));
     this.fields.push(scout.create('Button', {
       parent: this.groupBox,
-      label: "Close",
+      label: 'Close',
       systemType: Button.SystemType.CLOSE
     }));
     this.groupBox.setProperty('fields', this.fields);

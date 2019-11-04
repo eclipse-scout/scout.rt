@@ -16,7 +16,6 @@ export default class BeanFieldAdapter extends ValueFieldAdapter {
     super();
   }
 
-
   _onWidgetAppLinkAction(event) {
     this._send('appLinkAction', {
       ref: event.ref

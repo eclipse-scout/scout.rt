@@ -10,7 +10,6 @@
  */
 import {IconDesc, icons} from '../../src/index';
 
-
 describe('scout.icons', function() {
 
   var icon;

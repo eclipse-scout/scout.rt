@@ -18,7 +18,6 @@ export default class TileGridSelectLastKeyStroke extends TileGridSelectKeyStroke
     this.which = [keys.END];
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     if (!accepted) {

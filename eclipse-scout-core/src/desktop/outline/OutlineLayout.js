@@ -17,7 +17,6 @@ export default class OutlineLayout extends TreeLayout {
     this.outline = outline;
   }
 
-
   _layout($container) {
     var containerSize,
       htmlContainer = this.outline.htmlComp;

@@ -13,9 +13,6 @@ import * as $ from 'jquery';
 
 export default class OpenUriHandler {
 
-  constructor() {
-  };
-
   init(model) {
     this.session = model.session;
   }

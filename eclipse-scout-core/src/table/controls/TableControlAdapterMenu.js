@@ -21,7 +21,6 @@ export default class TableControlAdapterMenu extends FormMenu {
     this._addCloneProperties(['tableControl']);
   }
 
-
   /**
    * @override Action.js
    */

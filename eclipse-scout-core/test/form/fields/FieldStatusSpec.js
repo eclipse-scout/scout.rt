@@ -11,7 +11,6 @@
 import {scout, Status, StringField} from '../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('FieldStatus', function() {
   var session, helper;
 

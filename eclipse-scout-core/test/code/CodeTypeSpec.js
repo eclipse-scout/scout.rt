@@ -10,7 +10,6 @@
  */
 import {Code, codes} from '../../src/index';
 
-
 describe('CodeType', function() {
 
   beforeEach(function() {

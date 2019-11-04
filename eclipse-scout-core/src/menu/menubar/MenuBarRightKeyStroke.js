@@ -21,7 +21,6 @@ export default class MenuBarRightKeyStroke extends KeyStroke {
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
   }
 
-
   handle(event) {
     var menuItems = this.field.orderedMenuItems.all,
       $menuItemFocused = this.field.$container.find(':focus'),

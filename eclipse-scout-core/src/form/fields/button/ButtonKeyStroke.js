@@ -25,7 +25,6 @@ export default class ButtonKeyStroke extends KeyStroke {
     }.bind(this);
   }
 
-
   /**
    * @override KeyStroke.js
    */

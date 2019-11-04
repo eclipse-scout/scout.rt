@@ -19,7 +19,6 @@ export default class Composite extends Widget {
     this._addWidgetProperties(['widgets']);
   }
 
-
   _render() {
     this.$container = this.$parent.appendDiv();
     this.htmlComp = HtmlComponent.install(this.$container, this.session);

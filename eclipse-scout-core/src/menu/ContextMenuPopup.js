@@ -23,7 +23,6 @@ export default class ContextMenuPopup extends PopupWithHead {
     this._toggleSubMenuQueue = [];
   }
 
-
   _init(options) {
     options.focusableContainer = true; // In order to allow keyboard navigation, the popup must gain focus. Because menu-items are not focusable, make the container focusable instead.
 
@@ -127,7 +126,7 @@ export default class ContextMenuPopup extends PopupWithHead {
         duration: duration,
         queue: false,
         complete: function() {
-          if (parentMenu.$container) { //check if $container is not removed before by closing operation.
+          if (parentMenu.$container) { // check if $container is not removed before by closing operation.
             scrollbars.uninstall(parentMenu.$subMenuBody, this.session);
             parentMenu.$placeHolder.replaceWith(parentMenu.$container);
             parentMenu.$container.toggleClass('expanded', false);
@@ -366,8 +365,11 @@ export default class ContextMenuPopup extends PopupWithHead {
   }
 
   _handleInitialSubMenus(initialSubMenuRendering) {
+    if (initialSubMenuRendering) {
+      return;
+    }
     var menusObj;
-    while (this.initialSubMenusToRender && !initialSubMenuRendering) {
+    while (this.initialSubMenusToRender) {
       menusObj = this.initialSubMenusToRender;
       this.initialSubMenusToRender = undefined;
       this.renderSubMenuItems(menusObj.parentMenu, menusObj.menus, false, true);

@@ -17,7 +17,6 @@ export default class TabBoxAdapter extends CompositeFieldAdapter {
     this._addRemoteProperties(['selectedTab']);
   }
 
-
   /**
    * @override ModelAdapter.js
    */

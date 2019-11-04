@@ -20,7 +20,6 @@ export default class TreeField extends FormField {
     this._addWidgetProperties(['tree']);
   }
 
-
   _render() {
     this.addContainer(this.$parent, 'tree-field');
     this.addLabel();

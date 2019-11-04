@@ -11,6 +11,7 @@
 .tile.table-field.dashboard {
 
   /* adjust menu bar when visible */
+
   &.has-menubar {
     padding-bottom: 10px;
 
@@ -44,6 +45,7 @@
       }
 
       /* show separator on mouseover only */
+
       &:hover > .table-header-resize {
         display: inline-block;
       }
@@ -55,12 +57,14 @@
     }
 
     /* No selection color for non-focused table tiles */
+
     &:not(:focus):not(.focused) > .table-data > .table-row {
       background-color: transparent;
       border-top-color: transparent;
     }
 
     /* Draw left and right selection border (because tile tables have on border) */
+
     & > .table-data > .table-row {
       /* Do not use transparent left/right border, because otherwise the corners would not look good. */
       /* Instead, a padding is used, which is replaced by a border in the selected state. */

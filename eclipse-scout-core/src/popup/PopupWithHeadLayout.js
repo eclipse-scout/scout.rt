@@ -16,7 +16,6 @@ export default class PopupWithHeadLayout extends PopupLayout {
     super(popup);
   }
 
-
   _setSize(prefSize) {
     super._setSize(prefSize);
 

@@ -10,7 +10,6 @@
  */
 import {Code, codes, CodeType} from '../../src/index';
 
-
 describe('scout.codes', function() {
 
   var CODE_TYPE = 12345;

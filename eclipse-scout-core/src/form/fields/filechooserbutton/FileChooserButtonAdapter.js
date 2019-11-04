@@ -16,7 +16,6 @@ export default class FileChooserButtonAdapter extends ValueFieldAdapter {
     super();
   }
 
-
   _onWidgetPropertyChange(event) {
     super._onWidgetPropertyChange(event);
 

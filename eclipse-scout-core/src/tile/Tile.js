@@ -24,8 +24,7 @@ export default class Tile extends Widget {
     this.selectable = false;
   }
 
-
-// These constants need to correspond to the IDs defined in TileColorScheme.java
+  // These constants need to correspond to the IDs defined in TileColorScheme.java
   static ColorSchemeId = {
     DEFAULT: 'default',
     ALTERNATIVE: 'alternative',

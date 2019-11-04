@@ -31,7 +31,6 @@ export default class Carousel extends Widget {
     this.positionX = 0; // last translation position
   }
 
-
   _init(model) {
     super._init(model);
     this._setGridData(this.gridData);

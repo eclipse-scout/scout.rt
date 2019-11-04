@@ -17,7 +17,6 @@ export default class FormFieldMenu extends Menu {
     this._addWidgetProperties('field');
   }
 
-
   _render() {
     this.$container = this.$parent.appendDiv('menu-item');
     this.$container.addClass('form-field-menu');

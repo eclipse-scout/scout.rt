@@ -11,7 +11,6 @@
 import {keys, scout, Widget} from '../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('CellEditor', function() {
   var session;
   var helper;

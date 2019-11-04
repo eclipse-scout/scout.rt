@@ -31,7 +31,6 @@ export default class BrowserField extends ValueField {
     this._externalWindowButton = null;
   }
 
-
   static WindowStates = {
     WINDOW_OPEN: 'true',
     WINDOW_CLOSED: 'false'

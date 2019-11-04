@@ -33,7 +33,6 @@ export default class WidgetPopup extends Popup {
     this._addWidgetProperties(['widget']);
   }
 
-
   _createLayout() {
     return new WidgetPopupLayout(this);
   }

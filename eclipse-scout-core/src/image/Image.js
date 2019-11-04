@@ -19,7 +19,6 @@ export default class Image extends Widget {
     this.prepend = false;
   }
 
-
   _render() {
     this.$container = this.$parent.makeElement('<img>', 'image')
       .on('load', this._onImageLoad.bind(this))

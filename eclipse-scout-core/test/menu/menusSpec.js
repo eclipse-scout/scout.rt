@@ -11,8 +11,7 @@
 import {menus, scout} from '../../src/index';
 import {MenuSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("menus", function() {
+describe('menus', function() {
   var helper, session;
 
   beforeEach(function() {
@@ -21,15 +20,15 @@ describe("menus", function() {
     helper = new MenuSpecHelper(session);
   });
 
-  describe("filter", function() {
+  describe('filter', function() {
 
-    it("does nothing if no menus are given", function() {
+    it('does nothing if no menus are given', function() {
       var items;
       items = menus.filter(items);
       expect(items).toBeUndefined();
     });
 
-    it("returns no menus if no types are given", function() {
+    it('returns no menus if no types are given', function() {
       var items, menu1, menu2, menu3;
       menu1 = helper.createMenu(helper.createModel(1));
       menu2 = helper.createMenu(helper.createModel(2));
@@ -40,7 +39,7 @@ describe("menus", function() {
       expect(items).toEqual([]);
     });
 
-    it("only returns visible menus, if onlyVisible param is set to true", function() {
+    it('only returns visible menus, if onlyVisible param is set to true', function() {
       var items, menu1, menu2, menu3;
       menu1 = helper.createMenu(helper.createModel(1));
       menu1.menuTypes = ['SingleSelection'];
@@ -55,7 +54,7 @@ describe("menus", function() {
       expect(items).toEqual([menu1, menu2]);
     });
 
-    it("only returns menus with given type (even when menu is not visible)", function() {
+    it('only returns menus with given type (even when menu is not visible)', function() {
       var items, menu1, menu2, menu3;
       menu1 = helper.createMenu(helper.createModel(1));
       menu1.menuTypes = ['MultiSelection', 'SingleSelection'];
@@ -70,7 +69,7 @@ describe("menus", function() {
       expect(items).toEqual([menu1, menu3]);
     });
 
-    it("only returns parent menus if child menus should be displayed", function() {
+    it('only returns parent menus if child menus should be displayed', function() {
       var items, menu1, menu2, menu3;
       menu1 = helper.createMenu(helper.createModel(1));
       menu1.menuTypes = ['MultiSelection', 'SingleSelection'];
@@ -88,7 +87,7 @@ describe("menus", function() {
       expect(items).toEqual([menu1, menu2]);
     });
 
-    it("only returns parent menus if child menus have correct type", function() {
+    it('only returns parent menus if child menus have correct type', function() {
       var items, parentMenu, menu1, menu2;
       parentMenu = helper.createMenu(helper.createModel(1));
       parentMenu.menuTypes = [];
@@ -108,8 +107,8 @@ describe("menus", function() {
 
   });
 
-  describe("updateSeparatorVisibility", function() {
-    it("makes leading separators invisible", function() {
+  describe('updateSeparatorVisibility', function() {
+    it('makes leading separators invisible', function() {
       var menu1 = scout.create('Menu', {
         parent: session.desktop,
         separator: true
@@ -123,7 +122,7 @@ describe("menus", function() {
       expect(items[1].visible).toBe(true);
     });
 
-    it("makes trailing separators invisible", function() {
+    it('makes trailing separators invisible', function() {
       var menu1 = scout.create('Menu', {
         parent: session.desktop
       });
@@ -137,7 +136,7 @@ describe("menus", function() {
       expect(items[1].visible).toBe(false);
     });
 
-    it("makes duplicate separators invisible", function() {
+    it('makes duplicate separators invisible', function() {
       var menu0 = scout.create('Menu', {
         parent: session.desktop
       });
@@ -160,7 +159,7 @@ describe("menus", function() {
       expect(items[3].visible).toBe(true);
     });
 
-    it("makes all separators invisible if there are no other visible menus", function() {
+    it('makes all separators invisible if there are no other visible menus', function() {
       var menu0 = scout.create('Menu', {
         parent: session.desktop,
         separator: true
@@ -175,7 +174,7 @@ describe("menus", function() {
       expect(items[1].visible).toBe(false);
     });
 
-    it("reverts to old state if sibling menus get visible", function() {
+    it('reverts to old state if sibling menus get visible', function() {
       var menu0 = scout.create('Menu', {
         parent: session.desktop,
         visible: false
@@ -200,7 +199,7 @@ describe("menus", function() {
       expect(items[2].visible).toBe(true);
     });
 
-    it("considers all rules", function() {
+    it('considers all rules', function() {
       var menu0 = scout.create('Menu', {
         parent: session.desktop,
         visible: false

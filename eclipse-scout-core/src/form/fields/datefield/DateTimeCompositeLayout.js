@@ -31,7 +31,6 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
     }.bind(this));
   }
 
-
   _initDefaults() {
     this.hgap = HtmlEnvironment.get().smallColumnGap;
   }
@@ -122,9 +121,7 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
         graphics.setSize($predictTimeField, timeFieldSize);
         $predictTimeField.cssRight(0);
       }
-    }
-    // --- Date only ---
-    else if (hasDate) {
+    } else if (hasDate) { // --- Date only ---
       // Field size
       dateFieldSize = availableSize.subtract(htmlDateField.margins());
       htmlDateField.setSize(dateFieldSize);
@@ -149,9 +146,7 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
       if ($predictDateField) {
         graphics.setSize($predictDateField, dateFieldSize);
       }
-    }
-    // --- Time only ---
-    else if (hasTime) {
+    } else if (hasTime) { // --- Time only ---
       // Field size
       timeFieldSize = availableSize.subtract(htmlTimeField.margins());
       htmlTimeField.setSize(timeFieldSize);
@@ -201,15 +196,12 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
     if (hasDate && hasTime) {
       prefSize = graphics.prefSize(this._dateField.$dateField);
       prefSize.width = this.PREF_DATE_FIELD_WIDTH + this._hgap() + this.PREF_TIME_FIELD_WIDTH;
-    }
-
-    // --- Date only ---
-    else if (hasDate) {
+    } else if (hasDate) {
+      // --- Date only ---
       prefSize = graphics.prefSize(this._dateField.$dateField);
       prefSize.width = this.PREF_DATE_FIELD_WIDTH;
-    }
-    // --- Time only ---
-    else if (hasTime) {
+    } else if (hasTime) {
+      // --- Time only ---
       prefSize = graphics.prefSize(this._dateField.$timeField);
       prefSize.width = this.PREF_TIME_FIELD_WIDTH;
     }

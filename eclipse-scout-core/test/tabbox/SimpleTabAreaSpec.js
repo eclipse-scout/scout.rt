@@ -10,7 +10,6 @@
  */
 import {scout} from '../../src/index';
 
-
 describe('SimpleTabArea', function() {
   var session;
 

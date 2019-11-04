@@ -16,7 +16,6 @@ export default class CompositeField extends FormField {
     super();
   }
 
-
   /**
    * @returns {FormField[]} an array of child-fields.
    */

@@ -27,7 +27,6 @@ export default class TimePicker extends Widget {
     this.touch = Device.get().supportsTouch();
   }
 
-
   _init(options) {
     super._init(options);
     this.resolution = options.timeResolution;

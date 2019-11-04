@@ -96,9 +96,9 @@ export default class PopupWindow {
     this.events.trigger('init');
   }
 
-// Note: currently _onResize is only called when the window is resized, but not when the position of the window changes.
-// if we need to do that in a later release we should take a look on the SO-post below:
-// http://stackoverflow.com/questions/4319487/detecting-if-the-browser-window-is-moved-with-javascript
+  // Note: currently _onResize is only called when the window is resized, but not when the position of the window changes.
+  // if we need to do that in a later release we should take a look on the SO-post below:
+  // http://stackoverflow.com/questions/4319487/detecting-if-the-browser-window-is-moved-with-javascript
   _onResize() {
     var $myWindow = $(this.myWindow),
       width = $myWindow.width(),

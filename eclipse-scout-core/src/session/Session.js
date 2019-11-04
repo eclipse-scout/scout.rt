@@ -516,6 +516,7 @@ export default class Session {
         return true;
       }
       events.push(event);
+      return false;
     });
     var request = this._newRequest({
       events: events

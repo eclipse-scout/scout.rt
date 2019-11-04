@@ -11,8 +11,7 @@
 import {arrays} from '../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("HierarchicalTableSpec", function() {
+describe('HierarchicalTableSpec', function() {
   var session;
   var helper;
 
@@ -60,7 +59,7 @@ describe("HierarchicalTableSpec", function() {
     var flatTreeRows = [];
     table.visitRows(function(row) {
       flatTreeRows.push(row);
-    }.bind(this));
+    });
     return flatTreeRows;
   }
 
@@ -76,11 +75,11 @@ describe("HierarchicalTableSpec", function() {
       if (row.expanded && row.childRows.length > 0) {
         expandedRows.push(row);
       }
-    }.bind(this));
+    });
     return expandedRows;
   }
 
-  describe("add", function() {
+  describe('add', function() {
     var table, rowIds, rows;
 
     /**
@@ -98,14 +97,14 @@ describe("HierarchicalTableSpec", function() {
         return rowData;
       });
       var model = helper.createModel(helper.createModelColumns(1), rows);
-      table = helper.createTable(model),
-        rows = table.rows;
+      table = helper.createTable(model);
+      rows = table.rows;
       rows[1].parentRow = rows[0].id;
       table.updateRows(rows);
       table.render();
     });
 
-    it("a root row", function() {
+    it('a root row', function() {
       table.insertRow(helper.createModelRow(33, ['newRow']));
       expect(table.rows.length).toBe(4);
       expect(table._filteredRows.length).toBe(4);
@@ -122,7 +121,7 @@ describe("HierarchicalTableSpec", function() {
       expectRowIds(getUiRows(table), expectedRowIds);
     });
 
-    it("a child row to a row which is already a parent row (by id)", function() {
+    it('a child row to a row which is already a parent row (by id)', function() {
       var newRow = helper.createModelRow(33, ['newRow']),
         parentRow = table.rows[0];
       newRow.parentRow = parentRow.id;
@@ -144,7 +143,7 @@ describe("HierarchicalTableSpec", function() {
 
     });
 
-    it("a child row to a row which is already a parent row (by TableRow)", function() {
+    it('a child row to a row which is already a parent row (by TableRow)', function() {
       var newRow = helper.createModelRow(33, ['newRow']),
         pseudoParentRow = {
           id: '0'
@@ -167,7 +166,7 @@ describe("HierarchicalTableSpec", function() {
       expectRowIds(getUiRows(table), expectedRowIds);
     });
 
-    it("a child row to a row which is already a parent row (by pseudo row)", function() {
+    it('a child row to a row which is already a parent row (by pseudo row)', function() {
       var newRow = helper.createModelRow(33, ['newRow']),
         parentRow = table.rows[0];
 
@@ -189,7 +188,7 @@ describe("HierarchicalTableSpec", function() {
       expectRowIds(getUiRows(table), expectedRowIds);
     });
 
-    it("a child row to a row which is leaf", function() {
+    it('a child row to a row which is leaf', function() {
       var newRow = helper.createModelRow(33, ['newRow']),
         parentRow = table.rows[2];
       newRow.parentRow = parentRow.id;
@@ -210,7 +209,7 @@ describe("HierarchicalTableSpec", function() {
       expectRowIds(getUiRows(table), expectedRowIds);
     });
 
-    it("a child row to a collapsed row", function() {
+    it('a child row to a collapsed row', function() {
       var newRow = helper.createModelRow(33, ['newRow']),
         parentRow = table.rows[0];
       newRow.parentRow = parentRow.id;
@@ -228,7 +227,7 @@ describe("HierarchicalTableSpec", function() {
     });
   });
 
-  describe("delete", function() {
+  describe('delete', function() {
     var table, rows, rowIds;
     /**
      * initial table
@@ -249,8 +248,8 @@ describe("HierarchicalTableSpec", function() {
         return rowData;
       });
       var model = helper.createModel(helper.createModelColumns(1), rows);
-      table = helper.createTable(model),
-        rows = table.rows;
+      table = helper.createTable(model);
+      rows = table.rows;
       rows[1].parentRow = rows[0].id;
       rows[2].parentRow = rows[1].id;
       rows[4].parentRow = rows[3].id;
@@ -259,7 +258,7 @@ describe("HierarchicalTableSpec", function() {
       table.render();
     });
 
-    it("leaf row and expect the row structure to be valid", function() {
+    it('leaf row and expect the row structure to be valid', function() {
       table.deleteRow(rows[5]);
       expect(table.visibleRows.indexOf(rows[5])).toBe(-1);
       expect(rows[3].childRows.length).toBe(1);
@@ -273,7 +272,7 @@ describe("HierarchicalTableSpec", function() {
       expectRowIds(getUiRows(table), expectedRowIds);
     });
 
-    it("leaf row with collapsed parent and expect the structure to be valid", function() {
+    it('leaf row with collapsed parent and expect the structure to be valid', function() {
       table.collapseRow(rows[3]);
       expect(table.visibleRows.length).toBe(5);
       table.deleteRow(rows[5]);
@@ -292,7 +291,7 @@ describe("HierarchicalTableSpec", function() {
       expectRowIds(getUiRows(table), expectedRowIds);
     });
 
-    it("a parent row and expect all children are deleted cascading.", function() {
+    it('a parent row and expect all children are deleted cascading.', function() {
       table.deleteRow(rows[3]);
       expect(table.visibleRows.indexOf(rows[3])).toBe(-1);
       expect(table.visibleRows.indexOf(rows[4])).toBe(-1);
@@ -309,7 +308,7 @@ describe("HierarchicalTableSpec", function() {
     });
   });
 
-  describe("structure", function() {
+  describe('structure', function() {
     var table, rows, rowIds;
     /**
      * initial table
@@ -327,15 +326,15 @@ describe("HierarchicalTableSpec", function() {
         return rowData;
       });
       var model = helper.createModel(helper.createModelColumns(1), rows);
-      table = helper.createTable(model),
-        rows = table.rows;
+      table = helper.createTable(model);
+      rows = table.rows;
       rows[1].parentRow = rows[0].id;
       rows[2].parentRow = rows[1].id;
       table.updateRows(rows);
       table.render();
     });
 
-    it("is updated when insert a new child row", function() {
+    it('is updated when insert a new child row', function() {
       var row = helper.createModelRow(33, ['newRow']),
         spyRenderViewPort = spyOn(table, '_renderViewport').and.callThrough();
 
@@ -351,7 +350,7 @@ describe("HierarchicalTableSpec", function() {
       expect(row.parentRow).toBe(rows[0]);
     });
 
-    it("is updated when deleting a child row", function() {
+    it('is updated when deleting a child row', function() {
       var expectedRowIds = [0, 1, 3];
       table.deleteRow(rows[2]);
       expectRowIds(table.rows, expectedRowIds);
@@ -361,7 +360,7 @@ describe("HierarchicalTableSpec", function() {
       expectRowIds(getUiRows(table), expectedRowIds);
     });
 
-    it("is updated when deleting a row and its children", function() {
+    it('is updated when deleting a row and its children', function() {
       // cascade deleted row
       var childRowToBeDeleted = rows[2],
         expectedRowIds = [0, 3];
@@ -376,7 +375,7 @@ describe("HierarchicalTableSpec", function() {
 
   });
 
-  describe("expanded rows", function() {
+  describe('expanded rows', function() {
     var table, rowIds, rows;
     /**
      * initial table
@@ -394,15 +393,15 @@ describe("HierarchicalTableSpec", function() {
         return rowData;
       });
       var model = helper.createModel(helper.createModelColumns(1), rows);
-      table = helper.createTable(model),
-        rows = table.rows;
+      table = helper.createTable(model);
+      rows = table.rows;
       rows[1].parentRow = rows[0].id;
       rows[2].parentRow = rows[1].id;
       table.updateRows(rows);
       table.render();
     });
 
-    it("are valid after expand parent and its child row and expand parent again.", function() {
+    it('are valid after expand parent and its child row and expand parent again.', function() {
       var expectedRowIds = [0, 1, 2, 3];
       expectRowIds(table.rows, expectedRowIds);
       expectRowIds(getTreeRows(table), expectedRowIds);
@@ -440,7 +439,7 @@ describe("HierarchicalTableSpec", function() {
 
     });
 
-    it("are valid after expand all and collapse all.", function() {
+    it('are valid after expand all and collapse all.', function() {
 
       var expectedRowIds = [0, 1, 2, 3];
       expectRowIds(table.rows, expectedRowIds);
@@ -471,7 +470,7 @@ describe("HierarchicalTableSpec", function() {
 
   });
 
-  describe("selection", function() {
+  describe('selection', function() {
     var table, rowIds, rows;
     /**
      * initial table
@@ -492,8 +491,8 @@ describe("HierarchicalTableSpec", function() {
         return rowData;
       });
       var model = helper.createModel(helper.createModelColumns(1), rows);
-      table = helper.createTable(model),
-        rows = table.rows;
+      table = helper.createTable(model);
+      rows = table.rows;
       rows[1].parentRow = rows[0].id;
       rows[2].parentRow = rows[1].id;
       rows[4].parentRow = rows[3].id;
@@ -502,7 +501,7 @@ describe("HierarchicalTableSpec", function() {
       table.render();
     });
 
-    it("of all rows is valid if parent rows do not match a filter condition", function() {
+    it('of all rows is valid if parent rows do not match a filter condition', function() {
       // expects 1 row and its parents are visible
       createAndRegisterColumnFilter(table, table.columns[0], ['row2']);
       table.filter();
@@ -515,7 +514,7 @@ describe("HierarchicalTableSpec", function() {
       expectRowIds(table.selectedRows, expectedRowIds);
     });
 
-    it("a single row matching the filter", function() {
+    it('a single row matching the filter', function() {
       // expects 1 row and its parents are visible
       createAndRegisterColumnFilter(table, table.columns[0], ['row4']);
       table.filter();
@@ -525,7 +524,7 @@ describe("HierarchicalTableSpec", function() {
       expectRowIds(table.selectedRows, [4]);
     });
 
-    it("a single row which is a parent row of a row matching the filter", function() {
+    it('a single row which is a parent row of a row matching the filter', function() {
       // expects 1 row and its parents are visible
       createAndRegisterColumnFilter(table, table.columns[0], ['row4']);
       table.filter();
@@ -535,7 +534,7 @@ describe("HierarchicalTableSpec", function() {
       expectRowIds(table.selectedRows, [3]);
     });
 
-    it("of a not visible row due to a filter", function() {
+    it('of a not visible row due to a filter', function() {
       // expects 1 row and its parents are visible
       createAndRegisterColumnFilter(table, table.columns[0], ['row4']);
       table.filter();
@@ -545,7 +544,7 @@ describe("HierarchicalTableSpec", function() {
       expectRowIds(table.selectedRows, []);
     });
 
-    it("changes when selected rows gets invisible due to collapse of a parent row.", function() {
+    it('changes when selected rows gets invisible due to collapse of a parent row.', function() {
       var initialSelection = [rows[2], rows[5]];
       table.selectRows(initialSelection);
       expect(table.selectedRows).toEqual(initialSelection);
@@ -561,7 +560,7 @@ describe("HierarchicalTableSpec", function() {
       expect(table.selectedRows).toEqual([]);
     });
 
-    it("of a row is still the same if the row gets collapsed. ", function() {
+    it('of a row is still the same if the row gets collapsed. ', function() {
       var initialSelection = [rows[1], rows[2]];
       table.selectRows(initialSelection);
       expect(table.selectedRows).toEqual(initialSelection);
@@ -573,7 +572,7 @@ describe("HierarchicalTableSpec", function() {
       expect(table.selectedRows).toEqual([rows[1]]);
     });
 
-    it("is still the same after inserting rows", function() {
+    it('is still the same after inserting rows', function() {
       var initialSelection = [rows[1], rows[2]];
       table.selectRows(initialSelection);
       expect(table.selectedRows).toEqual(initialSelection);
@@ -585,7 +584,7 @@ describe("HierarchicalTableSpec", function() {
       expect(table.selectedRows).toEqual(initialSelection);
     });
 
-    it("is still the same after deleting an not selected row", function() {
+    it('is still the same after deleting an not selected row', function() {
       var initialSelection = [rows[1], rows[2]];
       table.selectRows(initialSelection);
       expect(table.selectedRows).toEqual(initialSelection);
@@ -596,13 +595,13 @@ describe("HierarchicalTableSpec", function() {
       expect(table.selectedRows).toEqual(initialSelection);
       expect(table.visibleRows.length).toBe(6);
 
-      //delete a parent
+      // delete a parent
       table.deleteRow(rows[3]);
       expect(table.selectedRows).toEqual(initialSelection);
       expect(table.visibleRows.length).toBe(4);
     });
 
-    it("gets adjusted when deleting a selected row", function() {
+    it('gets adjusted when deleting a selected row', function() {
       var initialSelection = [rows[2], rows[4]];
       table.selectRows(initialSelection);
       expect(table.selectedRows).toEqual(initialSelection);
@@ -613,7 +612,7 @@ describe("HierarchicalTableSpec", function() {
       expect(table.selectedRows).toEqual([rows[4]]);
       expect(table.visibleRows.length).toBe(6);
 
-      //delete a parent
+      // delete a parent
       table.deleteRow(rows[3]);
       expect(table.selectedRows).toEqual([]);
       expect(table.visibleRows.length).toBe(3);
@@ -621,7 +620,7 @@ describe("HierarchicalTableSpec", function() {
 
   });
 
-  describe("update row", function() {
+  describe('update row', function() {
     var table, rowIds, rows;
     /**
      * initial table
@@ -639,8 +638,8 @@ describe("HierarchicalTableSpec", function() {
         return rowData;
       });
       var model = helper.createModel(helper.createModelColumns(1), rows);
-      table = helper.createTable(model),
-        rows = table.rows;
+      table = helper.createTable(model);
+      rows = table.rows;
       // create hierarchie
       rows[1].parentRow = rows[0].id;
       rows[2].parentRow = rows[1].id;
@@ -648,7 +647,7 @@ describe("HierarchicalTableSpec", function() {
       table.render();
     });
 
-    it("by changing the parent key", function() {
+    it('by changing the parent key', function() {
       table.rows[1].parentRow = table.rows[3];
       table.updateRow(table.rows[1]);
 
@@ -663,7 +662,7 @@ describe("HierarchicalTableSpec", function() {
       expectRowIds(table.rootRows, [0, 3]);
     });
 
-    it("by removing the parent key", function() {
+    it('by removing the parent key', function() {
       table.rows[1].parentRow = null;
       table.updateRow(table.rows[1]);
 
@@ -678,7 +677,7 @@ describe("HierarchicalTableSpec", function() {
       expectRowIds(table.rootRows, [0, 1, 3]);
     });
 
-    it("by adding the parent key", function() {
+    it('by adding the parent key', function() {
       table.rows[3].parentRow = table.rows[2];
       table.updateRow(table.rows[1]);
 
@@ -695,7 +694,7 @@ describe("HierarchicalTableSpec", function() {
 
   });
 
-  describe("filtered visible", function() {
+  describe('filtered visible', function() {
     var table, rowIds, rows;
     /**
      * initial table
@@ -713,8 +712,8 @@ describe("HierarchicalTableSpec", function() {
         return rowData;
       });
       var model = helper.createModel(helper.createModelColumns(1), rows);
-      table = helper.createTable(model),
-        rows = table.rows;
+      table = helper.createTable(model);
+      rows = table.rows;
       // create hierarchie
       rows[1].parentRow = rows[0].id;
       rows[2].parentRow = rows[1].id;
@@ -722,7 +721,7 @@ describe("HierarchicalTableSpec", function() {
       table.render();
     });
 
-    it("rows are correct after when a child row matches a filter in of a collapsed parent row.", function() {
+    it('rows are correct after when a child row matches a filter in of a collapsed parent row.', function() {
       var column0 = table.columns[0];
 
       // expects 1 row and its parents are visible
@@ -745,7 +744,7 @@ describe("HierarchicalTableSpec", function() {
 
   });
 
-  describe("move", function() {
+  describe('move', function() {
     var table, rowIds, rows;
     /**
      * initial table
@@ -765,8 +764,8 @@ describe("HierarchicalTableSpec", function() {
         return rowData;
       });
       var model = helper.createModel(helper.createModelColumns(1), rows);
-      table = helper.createTable(model),
-        rows = table.rows;
+      table = helper.createTable(model);
+      rows = table.rows;
       // create hierarchie
 
       rows[2].parentRow = rows[1].id;
@@ -775,19 +774,19 @@ describe("HierarchicalTableSpec", function() {
       table.render();
     });
 
-    it("row down and expect to be moved after the next sibling on the same level.", function() {
+    it('row down and expect to be moved after the next sibling on the same level.', function() {
       expectRowIds(table.rows, [0, 1, 2, 3, 4, 5]);
       table.moveRowDown(rows[0]);
       expectRowIds(table.rows, [1, 2, 3, 0, 4, 5]);
     });
 
-    it("row up and expect to be moved before the next sibling on the same level.", function() {
+    it('row up and expect to be moved before the next sibling on the same level.', function() {
       expectRowIds(table.rows, [0, 1, 2, 3, 4, 5]);
       table.moveRowUp(rows[4]);
       expectRowIds(table.rows, [0, 4, 1, 2, 3, 5]);
     });
 
-    it("child row down and expect it will not be moved away of its siblings.", function() {
+    it('child row down and expect it will not be moved away of its siblings.', function() {
       expectRowIds(table.rows, [0, 1, 2, 3, 4, 5]);
       table.moveRowDown(rows[2]);
       expectRowIds(table.rows, [0, 1, 3, 2, 4, 5]);
@@ -796,7 +795,7 @@ describe("HierarchicalTableSpec", function() {
       expectRowIds(table.rows, [0, 1, 3, 2, 4, 5]);
     });
 
-    it("child row up and expect it will not be moved away of its siblings.", function() {
+    it('child row up and expect it will not be moved away of its siblings.', function() {
       expectRowIds(table.rows, [0, 1, 2, 3, 4, 5]);
       table.moveRowUp(rows[3]);
       expectRowIds(table.rows, [0, 1, 3, 2, 4, 5]);
@@ -807,7 +806,7 @@ describe("HierarchicalTableSpec", function() {
 
   });
 
-  describe("move visible row", function() {
+  describe('move visible row', function() {
     var table, rowIds, rows;
     /**
      * initial table
@@ -830,8 +829,8 @@ describe("HierarchicalTableSpec", function() {
         return rowData;
       }, this);
       var model = helper.createModel(helper.createModelColumns(1), rows);
-      table = helper.createTable(model),
-        rows = table.rows;
+      table = helper.createTable(model);
+      rows = table.rows;
       // create hierarchie
 
       rows[3].parentRow = rows[2].id;
@@ -840,7 +839,7 @@ describe("HierarchicalTableSpec", function() {
       table.render();
     });
 
-    it("up - expect the row gets moved above the previous visible row", function() {
+    it('up - expect the row gets moved above the previous visible row', function() {
       createAndRegisterColumnFilter(table, table.columns[0], ['a']);
       table.filter();
       expectRowIds(table.visibleRows, [1, 2, 3, 6]);
@@ -860,7 +859,7 @@ describe("HierarchicalTableSpec", function() {
 
     });
 
-    it("down - expect the row gets moved below the next visible row", function() {
+    it('down - expect the row gets moved below the next visible row', function() {
       createAndRegisterColumnFilter(table, table.columns[0], ['a']);
       table.filter();
       expectRowIds(table.visibleRows, [1, 2, 3, 6]);

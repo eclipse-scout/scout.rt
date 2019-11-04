@@ -23,7 +23,6 @@ export default class FormFieldAdapter extends ModelAdapter {
 
   }
 
-
   _goOffline() {
     if (this.enabledWhenOffline) {
       return;

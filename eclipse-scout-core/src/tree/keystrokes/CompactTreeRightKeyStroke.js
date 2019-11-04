@@ -18,7 +18,6 @@ export default class CompactTreeRightKeyStroke extends AbstractCompactTreeContro
     this.which = [keys.RIGHT];
   }
 
-
   _findNextNode($currentNode, currentNode) {
     // Find first process node of next section.
     return $currentNode.parent().next('.section').children('.section-node').first().data('node');

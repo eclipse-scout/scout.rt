@@ -22,7 +22,6 @@ export default class LogoutApp extends App {
     super();
   }
 
-
   /**
    * Default adds polyfills too, not required here
    * @override

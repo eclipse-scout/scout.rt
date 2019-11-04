@@ -23,9 +23,12 @@ export default class PopupBlockerHandler {
 
   /**
    * @param {String} uri The URI for the window to open
-   * @param {optional String} windowName An optional string name for the new window. The name can be used as the target of links and forms using the target attribute of an 'a' or 'form' element. The name should not contain any blank space. Note that the window name does not specify the title of the new window.
-   * @param {optional String} windowSpecs Optional parameter listing the features (size, position, scrollbars, etc.) of the new window. The string must not contain any blank space, each feature name and value must be separated by a comma.
-   * @param {optional function} onWindowOpened Optional function to call when the window has been successfully opened. Due to popup-blockers this may not necessarily be directly after the call to this method but may be later when the popup-blocker-notification-link is manually activated by the user.
+   * @param {optional String} windowName An optional string name for the new window. The name can be used as the target of links and forms using the target attribute of an 'a' or 'form' element. The name should not contain any blank space.
+   *         Note that the window name does not specify the title of the new window.
+   * @param {optional String} windowSpecs Optional parameter listing the features (size, position, scrollbars, etc.) of the new window.
+   *         The string must not contain any blank space, each feature name and value must be separated by a comma.
+   * @param {optional function} onWindowOpened Optional function to call when the window has been successfully opened.
+   *         Due to popup-blockers this may not necessarily be directly after the call to this method but may be later when the popup-blocker-notification-link is manually activated by the user.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/open
    */
@@ -54,7 +57,7 @@ export default class PopupBlockerHandler {
     }
   }
 
-// Shows a notification when popup-blocker has been detected
+  // Shows a notification when popup-blocker has been detected
   showNotification(vararg) {
     var notification, linkUrl,
       desktop = this.session.desktop;

@@ -18,7 +18,6 @@ export default class TableLayout extends AbstractLayout {
     this._dataHeightPositive = false;
   }
 
-
   layout($container) {
     var menuBarHeight = 0,
       footerHeight = 0,
@@ -108,7 +107,7 @@ export default class TableLayout extends AbstractLayout {
         if (tooltip.rendered) {
           tooltip.position();
         }
-      }.bind(this));
+      });
       if (this.table.cellEditorPopup && this.table.cellEditorPopup.rendered) {
         this.table.cellEditorPopup.position();
         this.table.cellEditorPopup.pack();
@@ -165,7 +164,7 @@ export default class TableLayout extends AbstractLayout {
         currentWidth += column.width;
         totalInitialWidth += column.initialWidth;
       }
-    }.bind(this));
+    });
 
     if (availableWidth === currentWidth) {
       // Columns already use the available space, no need to resize
@@ -191,7 +190,7 @@ export default class TableLayout extends AbstractLayout {
         return true;
       }
       return false;
-    }.bind(this));
+    });
 
     // Resize them to their minimal width
     minWidthColumns.forEach(function(column, index) {

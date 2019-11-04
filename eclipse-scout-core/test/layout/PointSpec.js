@@ -20,9 +20,9 @@ import {Point} from '../../src/index';
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-describe("Point", function() {
+describe('Point', function() {
 
-  it("equals", function() {
+  it('equals', function() {
     var p1 = new Point(10, 5);
     var p2 = new Point(20, -1);
     var p3 = new Point(20, -1);

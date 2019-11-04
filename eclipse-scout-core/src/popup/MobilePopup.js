@@ -26,7 +26,6 @@ export default class MobilePopup extends Popup {
     this._addWidgetProperties('widget');
   }
 
-
   _createLayout() {
     return new MobilePopupLayout(this);
   }

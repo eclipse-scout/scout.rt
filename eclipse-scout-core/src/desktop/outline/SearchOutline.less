@@ -39,6 +39,7 @@
 
   &.has-text {
     padding-right: @text-field-padding-x + 15px;
+
     & ~ .clear-icon {
       display: block;
     }
@@ -53,7 +54,8 @@
     line-height: 35px;
     padding-right: @text-field-padding-x;
     cursor: pointer;
-    &::before{
+
+    &::before {
       #scout.font-icon();
       font-size: 13px;
       content: @icon-remove-bold;

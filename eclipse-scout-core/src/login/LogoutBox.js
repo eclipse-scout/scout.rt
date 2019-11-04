@@ -17,7 +17,6 @@ export default class LogoutBox extends Box {
     super();
   }
 
-
   init(opts) {
     var defaultOpts = {
       loginUrl: webstorage.getItem(sessionStorage, 'scout:loginUrl') || './',

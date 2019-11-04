@@ -11,8 +11,7 @@
 import {scout} from '../../src/index';
 import {MenuSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("ContextMenuPopup", function() {
+describe('ContextMenuPopup', function() {
   var helper, session;
 
   beforeEach(function() {

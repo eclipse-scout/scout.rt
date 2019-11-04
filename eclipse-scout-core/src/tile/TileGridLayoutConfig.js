@@ -16,7 +16,6 @@ export default class TileGridLayoutConfig extends LogicalGridLayoutConfig {
     super(options);
   }
 
-
   _extend(options) {
     super._extend(options);
     options = options || {};

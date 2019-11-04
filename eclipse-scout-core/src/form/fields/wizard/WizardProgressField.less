@@ -41,6 +41,7 @@
   padding-right: @wizard-progress-content-h-padding;
 
   /* Step content */
+
   & > .wizard-step-content {
     display: inline-table;
     line-height: normal;
@@ -58,6 +59,7 @@
       padding: @wizard-progress-icon-container-padding;
       margin-right: @wizard-progress-icon-container-margin-right;
       font-weight: bold;
+
       & > .wizard-step-content-icon {
         text-align: center;
         height: 100%;
@@ -71,6 +73,7 @@
     & > .wizard-step-content-text {
       vertical-align: middle;
       display: inline-block;
+
       & > .wizard-step-title {
         #scout.overflow-ellipsis-nowrap();
         font-weight: bold;
@@ -82,14 +85,17 @@
       }
     }
   }
+
   &.first {
     padding-left: @wizard-progress-content-h-padding;
   }
+
   &.last > .wizard-step-content {
     max-width: none;
   }
 
   /* Hover state */
+
   &.action-enabled:hover {
     cursor: pointer;
 
@@ -99,6 +105,7 @@
   }
 
   /* Step types */
+
   &.active-step {
     & > .wizard-step-content > .wizard-step-content-icon-container {
       padding: @wizard-progress-icon-container-padding - @wizard-progress-icon-container-border-width;
@@ -106,6 +113,7 @@
       #scout.glow(@wizard-step-active-step-border-color, 3px);
     }
   }
+
   &.disabled {
     #scout.wizard-step-color(@wizard-step-disabled-text-color);
 
@@ -115,15 +123,18 @@
       border-color: @wizard-step-disabled-border-color;
     }
   }
+
   &:not(.disabled) {
     &.active-step {
       #scout.wizard-step-color(@wizard-step-active-step-text-color);
+
       & > .wizard-step-content > .wizard-step-content-icon-container > .wizard-step-content-icon {
         background-color: @wizard-step-active-step-background-color;
         color: @wizard-step-active-step-color;
         border-color: @wizard-step-active-step-border-color;
       }
     }
+
     &.before-active {
       & > .wizard-step-content > .wizard-step-content-icon-container > .wizard-step-content-icon {
         background-color: @wizard-step-before-active-step-background-color;
@@ -131,6 +142,7 @@
         border-color: @wizard-step-before-active-step-border-color;
       }
     }
+
     &.after-active {
       & > .wizard-step-content > .wizard-step-content-icon-container > .wizard-step-content-icon {
         background-color: @wizard-step-after-active-step-background-color;
@@ -163,11 +175,13 @@
 
   /* If wizard progress field is in the root-group-box, use negative margins to */
   /* draw it up to the border of the form (like the main-menubar itself). */
+
   & > .group-box-body > .wizard-progress-field > .wizard-steps {
     margin-left: -@root-group-box-padding-left;
     margin-right: -@root-group-box-padding-right;
 
     /* Align first and last step content with form fields */
+
     & > .wizard-steps-body {
       border-left: 0;
       border-right: 0;
@@ -175,6 +189,7 @@
       & > .wizard-step.first {
         padding-left: @root-group-box-padding-left + @mandatory-indicator-width;
       }
+
       & > .wizard-step.last {
         padding-right: @root-group-box-padding-right;
       }

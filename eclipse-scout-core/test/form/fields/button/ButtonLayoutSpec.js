@@ -10,7 +10,6 @@
  */
 import {Button, FormField, graphics, HtmlEnvironment} from '../../../../src/index';
 
-
 describe('ButtonLayout', function() {
   var session;
 
@@ -32,7 +31,6 @@ describe('ButtonLayout', function() {
       });
     }
   }
-
 
   beforeEach(function() {
     setFixtures(sandbox());

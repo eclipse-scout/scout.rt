@@ -103,15 +103,15 @@ const keys = {
   DIVIDE: 111,
   NUM_LOCK: 144,
   SCROLL_LOCK: 145,
-  SEMICOLON: 186, //ü
+  SEMICOLON: 186, // ü
   DASH: 189,
   COMMA: 188,
   POINT: 190,
-  FORWARD_SLASH: 191, //§
-  OPEN_BRACKET: 219, //'
-  BACK_SLASH: 220, //ä
-  CLOSE_BRACKET: 221, //^
-  SINGLE_QUOTE: 222, //ö,
+  FORWARD_SLASH: 191, // §
+  OPEN_BRACKET: 219, // '
+  BACK_SLASH: 220, // ä
+  CLOSE_BRACKET: 221, // ^
+  SINGLE_QUOTE: 222, // ö,
   ANGULAR_BRACKET: 226,
 
   codesToKeys: {
@@ -204,7 +204,7 @@ const keys = {
     111: '/',
     144: 'Num lock',
     145: 'Scroll lock',
-    186: 'ü', //ü
+    186: 'ü', // ü
     189: '-',
     188: ',',
     190: '.',
@@ -216,6 +216,5 @@ const keys = {
     226: '<'
   }
 };
-
 
 export default keys;

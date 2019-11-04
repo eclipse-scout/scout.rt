@@ -26,7 +26,6 @@ export default class TableHeader extends Widget {
     this._renderedColumns = [];
   }
 
-
   _init(options) {
     super._init(options);
 
@@ -701,9 +700,8 @@ export default class TableHeader extends Widget {
     function realMiddle($div) {
       if ($div.hasClass('halign-right')) {
         return $div.offset().left + $div.outerWidth() - realWidth($div) / 2;
-      } else {
-        return $div.offset().left + realWidth($div) / 2;
       }
+      return $div.offset().left + realWidth($div) / 2;
     }
 
     function dragEnd(event) {

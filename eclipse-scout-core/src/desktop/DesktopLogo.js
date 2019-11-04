@@ -16,7 +16,6 @@ export default class DesktopLogo extends Widget {
     super();
   }
 
-
   _init(model) {
     super._init(model);
     this.url = model.url;

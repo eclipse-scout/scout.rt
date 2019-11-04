@@ -16,7 +16,6 @@ export default class ImageFieldAdapter extends FormFieldAdapter {
     super();
   }
 
-
   _onWidgetEvent(event) {
     if (event.type === 'fileUpload') {
       this._onFileUpload(event);

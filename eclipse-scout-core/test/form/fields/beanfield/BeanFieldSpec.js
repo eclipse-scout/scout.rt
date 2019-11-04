@@ -10,8 +10,7 @@
  */
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("BeanField", function() {
+describe('BeanField', function() {
   var session, helper, field;
 
   beforeEach(function() {
@@ -37,14 +36,14 @@ describe("BeanField", function() {
     });
   }
 
-  it("renders the bean", function() {
+  it('renders the bean', function() {
     field.render();
     expect(field.$container).toHaveClass('test-bean-field');
     expect(field.$field.children('.msg-from').text()).toBe('Message from Jasmine Test Runner');
     expect(field.$field.children('.msg-text').text()).toBe('It works!');
   });
 
-  it("updates properties correctly", function() {
+  it('updates properties correctly', function() {
     field.render();
     expect(field.value.sender).toBe('Jasmine Test Runner');
     expect(field.displayText).toBe(null);
@@ -57,7 +56,7 @@ describe("BeanField", function() {
     expect(field.value.sender).toBe('Test Method');
     expect(field.displayText).toBe(null);
 
-    field.setDisplayText('XXX');  // should not change anything
+    field.setDisplayText('XXX'); // should not change anything
     expect(field.$field.children('.msg-from').text()).toBe('Message from Test Method');
     expect(field.$field.children('.msg-text').text()).toBe('\u00A0'); // &nbsp;
     expect(field.value.sender).toBe('Test Method');

@@ -16,7 +16,6 @@ export default class FormFieldMenuAdapter extends MenuAdapter {
     super();
   }
 
-
   /**
    * @override
    */

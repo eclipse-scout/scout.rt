@@ -6,7 +6,6 @@ import * as $ from 'jquery';
  * It basically uses the class {@link AjaxCall} and provides some common functions to call a REST backend.
  */
 
-
 /**
  * Performs a HTTP GET request.
  * @param [options] additional settings for the request.
@@ -182,7 +181,7 @@ export function call(options) {
         errorThrown: errorThrown,
         requestOptions: opts
       }));
-    }.bind(this));
+    });
 }
 
 export default {

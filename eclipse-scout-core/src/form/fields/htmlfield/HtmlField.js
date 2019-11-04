@@ -19,7 +19,6 @@ export default class HtmlField extends ValueField {
     this.preventInitialFocus = true;
   }
 
-
   /**
    * @override FormField.js
    */

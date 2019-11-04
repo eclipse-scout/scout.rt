@@ -16,7 +16,6 @@ export default class TableInfoLoadTooltip extends Tooltip {
     super();
   }
 
-
   _init(options) {
     super._init(options);
 

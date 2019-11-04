@@ -16,7 +16,6 @@ export default class TabItemLayout extends GroupBoxLayout {
     super(tabItem);
   }
 
-
   _layoutStatus() {
     // NOP: $status width is set in TabItem.addStatus()
   }

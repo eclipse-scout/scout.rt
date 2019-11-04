@@ -16,7 +16,6 @@ export default class FormMenuActionKeyStroke extends ActionKeyStroke {
     super(action);
   }
 
-
   handle(event) {
     this.field.toggle();
   }

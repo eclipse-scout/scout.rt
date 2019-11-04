@@ -16,7 +16,6 @@ export default class ValueFieldAdapter extends FormFieldAdapter {
     super();
   }
 
-
   _onWidgetAcceptInput(event) {
     this._send('acceptInput', {
       displayText: event.displayText,

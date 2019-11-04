@@ -10,7 +10,6 @@
  */
 import {objects, strings} from '../index';
 
-
 /**
  * Ensures the given parameter is an array
  * @memberOf scout.arrays
@@ -329,17 +328,15 @@ export function find(arr, predicate, thisArg) {
 export function findFrom(arr, startIndex, predicate, reverse) {
   if (reverse) {
     return findFromReverse(arr, startIndex, predicate);
-  } else {
-    return findFromForward(arr, startIndex, predicate);
   }
+  return findFromForward(arr, startIndex, predicate);
 }
 
 export function findIndexFrom(arr, startIndex, predicate, reverse) {
   if (reverse) {
     return findIndexFromReverse(arr, startIndex, predicate);
-  } else {
-    return findIndexFromForward(arr, startIndex, predicate);
   }
+  return findIndexFromForward(arr, startIndex, predicate);
 }
 
 export function findFromForward(arr, startIndex, predicate) {

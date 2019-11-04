@@ -10,7 +10,6 @@
  */
 import {codes, scout} from '../../src/index';
 
-
 describe('CodeLookupCall', function() {
   var session, codeType123;
 

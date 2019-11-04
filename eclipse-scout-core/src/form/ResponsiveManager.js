@@ -27,12 +27,12 @@ export default class ResponsiveManager {
   };
 
   init() {
-  };
+  }
 
   destroy() {
     this._responsiveHandlers.forEach(function(handler) {
       handler.destroy();
-    }.bind(this));
+    });
   }
 
   /**
@@ -114,7 +114,6 @@ export default class ResponsiveManager {
     return instance;
   }
 }
-
 
 App.addListener('prepare', function() {
   if (instance) {

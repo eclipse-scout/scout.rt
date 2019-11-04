@@ -43,7 +43,6 @@ export default class Menu extends Action {
     this._addWidgetProperties('childActions');
   }
 
-
   static SUBMENU_ICON = icons.ANGLE_DOWN_BOLD;
 
   /**
@@ -177,7 +176,7 @@ export default class Menu extends Action {
       this.parent.renderSubMenuItems(parentMenu, menus, true);
       var closeHandler = function(event) {
         parentMenu.setSelected(false);
-      }.bind(this);
+      };
       var propertyChangeHandler = function(event) {
         if (event.propertyName === 'selected' && event.newValue === false) {
           this.parent.off('close', closeHandler);

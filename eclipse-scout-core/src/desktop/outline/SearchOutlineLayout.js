@@ -17,7 +17,6 @@ export default class SearchOutlineLayout extends OutlineLayout {
     this.outline = outline;
   }
 
-
   _setDataHeight(heightOffset) {
     // Add search panel height to heightOffset
     var searchPanelSize = graphics.size(this.outline.$searchPanel, true);

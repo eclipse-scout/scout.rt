@@ -17,7 +17,6 @@ export default class SplitBoxAdapter extends CompositeFieldAdapter {
     this._addRemoteProperties(['collapsibleField', 'fieldCollapsed', 'minSplitterPosition', 'fieldMinimized']);
   }
 
-
   _onWidgetPositionChange(event) {
     this._send('setSplitterPosition', {
       splitterPosition: event.position

@@ -10,18 +10,17 @@
  */
 import {Key, KeyStroke} from '../../src/index';
 
+describe('Key', function() {
 
-describe("Key", function() {
+  describe('toKeyStrokeString', function() {
 
-  describe("toKeyStrokeString", function() {
-
-    it("creates a string representing that key", function() {
+    it('creates a string representing that key', function() {
       var key = new Key(new KeyStroke());
       key.which = 13;
       expect(key.toKeyStrokeString()).toBe('Enter');
     });
 
-    it("considers modifiers", function() {
+    it('considers modifiers', function() {
       var key = new Key(new KeyStroke());
       key.ctrl = true;
       key.which = 13;

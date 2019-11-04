@@ -21,7 +21,6 @@ export default class TabAreaLeftKeyStroke extends KeyStroke {
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
   }
 
-
   handle(event) {
     this.field.selectPreviousTab(true);
   }

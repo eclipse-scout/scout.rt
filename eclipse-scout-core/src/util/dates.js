@@ -10,7 +10,6 @@
  */
 import {DateFormat, scout, strings} from '../index';
 
-
 /**
  * @memberOf scout.dates
  */
@@ -212,9 +211,8 @@ export function weekInYear(date, option) {
     // DateFormat
     if (option.symbols !== undefined && option.symbols.firstDayOfWeek !== undefined) {
       firstDayOfWeekArg = option.symbols.firstDayOfWeek;
-    }
-    // Locale
-    else if (option.decimalFormatSymbols !== undefined && option.decimalFormatSymbols.firstDayOfWeek !== undefined) {
+    } else if (option.decimalFormatSymbols !== undefined && option.decimalFormatSymbols.firstDayOfWeek !== undefined) {
+      // Locale
       firstDayOfWeekArg = option.decimalFormatSymbols.firstDayOfWeek;
     }
   } else if (typeof option === 'number') {

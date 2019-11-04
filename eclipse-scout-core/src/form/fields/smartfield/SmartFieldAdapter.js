@@ -18,7 +18,6 @@ export default class SmartFieldAdapter extends LookupFieldAdapter {
     this._addRemoteProperties(['activeFilter']);
   }
 
-
   /**
    * Property lookup-row must be handled before value, since the smart-field has either a lookup-row
    * or a value but never both (when we only have a value, the smart-field must perform a lookup by key
@@ -42,7 +41,7 @@ export default class SmartFieldAdapter extends LookupFieldAdapter {
     }
   }
 
-// When displayText comes from the server we must not call parseAndSetValue here.
+  // When displayText comes from the server we must not call parseAndSetValue here.
   _syncDisplayText(displayText) {
     this.widget.setDisplayText(displayText);
   }

@@ -23,7 +23,6 @@ export default class TreeNavigationEndKeyStroke extends AbstractTreeNavigationKe
     }.bind(this);
   }
 
-
   handle(event) {
     var newSelection = this._computeNewSelection(event._treeCurrentNode);
     if (newSelection) {

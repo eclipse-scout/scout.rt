@@ -17,7 +17,6 @@ export default class SmartFieldPopup extends Popup {
     this.animateRemoval = SmartFieldPopup.hasPopupAnimation();
   }
 
-
   _init(options) {
     options.withFocusContext = false;
     super._init(options);
@@ -65,9 +64,8 @@ export default class SmartFieldPopup extends Popup {
     var lookupRow = this.proposalChooser.getSelectedLookupRow();
     if (lookupRow && lookupRow.enabled) {
       return lookupRow;
-    } else {
-      return null;
     }
+    return null;
   }
 
   setStatus(status) {
@@ -107,7 +105,7 @@ export default class SmartFieldPopup extends Popup {
     return false;
   }
 
-// when smart-field is removed, also remove popup. Don't animate removal in that case
+  // when smart-field is removed, also remove popup. Don't animate removal in that case
   _onRemoveSmartField(event) {
     this.animateRemoval = false;
     this.remove();
@@ -124,7 +122,7 @@ export default class SmartFieldPopup extends Popup {
     this.proposalChooser.updateScrollbars();
   }
 
-//--- static helpers --- //
+  // --- static helpers --- //
 
   /**
    * Don't do popup animation on Internet Explorer, because IE is slow when

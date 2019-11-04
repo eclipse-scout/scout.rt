@@ -11,7 +11,6 @@
 import {EventSupport, router, strings} from '../index';
 import * as $ from 'jquery';
 
-
 let routes = []; // array with Routes
 let events = new EventSupport();
 let currentRoute = null;
@@ -98,7 +97,6 @@ export function updateLocation(routeRef) {
   var location = '#' + routeRef;
   window.location.replace(location);
 }
-
 
 export default {
   activate,

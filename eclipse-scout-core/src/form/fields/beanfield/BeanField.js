@@ -22,7 +22,6 @@ export default class BeanField extends ValueField {
     this.preventInitialFocus = true;
   }
 
-
   _render() {
     this.addContainer(this.$parent, 'bean-field');
     this.addLabel();

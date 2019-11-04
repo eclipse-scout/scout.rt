@@ -24,7 +24,6 @@ export default class Slider extends Widget {
     this.$sliderValue = null;
   }
 
-
   _init(options) {
     super._init(options);
     this.value = options.value;

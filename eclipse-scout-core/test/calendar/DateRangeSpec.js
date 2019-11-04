@@ -10,7 +10,6 @@
  */
 import {DateRange, dates} from '../../src/index';
 
-
 describe('DateRange', function() {
 
   it('equals', function() {

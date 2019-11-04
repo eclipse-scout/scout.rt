@@ -16,7 +16,6 @@ export default class SequenceBoxLayout extends LogicalGridLayout {
     super(widget, layoutConfig);
   }
 
-
   /**
    * @override LogicalGridLayout.js
    */

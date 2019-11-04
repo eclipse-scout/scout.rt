@@ -20,9 +20,9 @@ import {Rectangle} from '../../src/index';
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-describe("Rectangle", function() {
+describe('Rectangle', function() {
 
-  it("equals", function() {
+  it('equals', function() {
     var r1 = new Rectangle(0, 0, 10, 5);
     var r2 = new Rectangle(0, 0, 20, -1);
     var r3 = new Rectangle(0, 0, 20, -1);
@@ -40,7 +40,7 @@ describe("Rectangle", function() {
     expect(r5.equals(r6)).toBe(false);
   });
 
-  it("intersects", function() {
+  it('intersects', function() {
     var r1 = new Rectangle(0, 0, 10, 5);
     var r2 = new Rectangle(0, 0, 20, -1);
     var r3 = new Rectangle(9, 0, 10, 5);

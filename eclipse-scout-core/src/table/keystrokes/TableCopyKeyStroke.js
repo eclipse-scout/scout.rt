@@ -20,7 +20,6 @@ export default class TableCopyKeyStroke extends KeyStroke {
     this.renderingHints.render = false;
   }
 
-
   handle(event) {
     this.field.exportToClipboard();
   }

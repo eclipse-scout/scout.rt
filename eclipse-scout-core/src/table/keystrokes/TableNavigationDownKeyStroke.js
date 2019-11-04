@@ -24,7 +24,6 @@ export default class TableNavigationDownKeyStroke extends AbstractTableNavigatio
     }.bind(this);
   }
 
-
   handle(event) {
     var table = this.field,
       rows = table.visibleRows,

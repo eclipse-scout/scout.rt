@@ -16,7 +16,6 @@ export default class FormAdapter extends ModelAdapter {
     super();
   }
 
-
   /**
    * @override
    */

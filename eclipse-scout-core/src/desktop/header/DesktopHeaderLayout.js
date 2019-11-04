@@ -18,7 +18,6 @@ export default class DesktopHeaderLayout extends AbstractLayout {
     this.desktop = header.desktop;
   }
 
-
   /**
    * @override AbstractLayout.js
    */

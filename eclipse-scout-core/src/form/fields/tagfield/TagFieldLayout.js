@@ -16,7 +16,6 @@ export default class TagFieldLayout extends FormFieldLayout {
     super(field);
   }
 
-
   _$elementForIconLayout() {
     // The field container has the border and not the input ($field) element
     return this.formField.$fieldContainer;

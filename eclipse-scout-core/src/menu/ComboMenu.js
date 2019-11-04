@@ -16,7 +16,6 @@ export default class ComboMenu extends Menu {
     super();
   }
 
-
   _render() {
     this.$container = this.$parent.appendDiv('menu-item combo-menu');
     if (this.uiCssClass) {
@@ -31,7 +30,7 @@ export default class ComboMenu extends Menu {
     });
   }
 
-// @override
+  // @override
   _togglesSubMenu() {
     return false;
   }

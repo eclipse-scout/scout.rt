@@ -11,8 +11,7 @@
 import {Form} from '../../../src/index';
 import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("DesktopBench", function() {
+describe('DesktopBench', function() {
   var helper, session, desktop, formHelper;
 
   beforeEach(function() {
@@ -34,7 +33,7 @@ describe("DesktopBench", function() {
     jasmine.clock().uninstall();
   });
 
-  describe("updateOutlineContent", function() {
+  describe('updateOutlineContent', function() {
     var outline, bench, model, node;
 
     beforeEach(function() {
@@ -47,13 +46,13 @@ describe("DesktopBench", function() {
       desktop.setOutline(outline);
     });
 
-    it("called when an outline page gets selected", function() {
+    it('called when an outline page gets selected', function() {
       spyOn(bench, 'updateOutlineContent');
       outline.selectNodes(outline.nodes[1]);
       expect(bench.updateOutlineContent.calls.count()).toEqual(1);
     });
 
-    it("doesn't get called if page already is selected", function() {
+    it('doesn\'t get called if page already is selected', function() {
       spyOn(bench, 'updateOutlineContent');
       outline.selectNodes(outline.nodes[1]);
       expect(bench.updateOutlineContent.calls.count()).toEqual(1);
@@ -68,7 +67,7 @@ describe("DesktopBench", function() {
       expect(bench.updateOutlineContent.calls.count()).toEqual(2);
     });
 
-    it("sets detailForm as outlineContent if node gets selected", function() {
+    it('sets detailForm as outlineContent if node gets selected', function() {
       // node 0 has a detail form
       outline.selectNodes(outline.nodes[1]);
       expect(outline.selectedNodes[0].detailForm).toBeFalsy();
@@ -83,7 +82,7 @@ describe("DesktopBench", function() {
       expect(bench.outlineContent).toBeFalsy();
     });
 
-    it("preserves desktop.inBackground when updating outline content", function() {
+    it('preserves desktop.inBackground when updating outline content', function() {
       // select node 0 (which will be in foreground)
       outline.selectNodes(outline.nodes[0]);
       expect(desktop.inBackground).toBeFalsy();
@@ -112,7 +111,7 @@ describe("DesktopBench", function() {
       expect(desktop.inBackground).toBeTruthy();
     });
 
-    it("preserves desktop.inBackground when switching nodes", function() {
+    it('preserves desktop.inBackground when switching nodes', function() {
       // select node 0 (which will be in foreground)
       outline.selectNodes(outline.nodes[0]);
       expect(desktop.inBackground).toBeFalsy();

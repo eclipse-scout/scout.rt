@@ -48,7 +48,6 @@ export default class SplitBox extends CompositeField {
     this._$splitter = null;
   }
 
-
   static SPLITTER_POSITION_TYPE_RELATIVE_FIRST = 'relativeFirst';
   static SPLITTER_POSITION_TYPE_RELATIVE_SECOND = 'relativeSecond';
   static SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST = 'absoluteFirst';
@@ -489,9 +488,8 @@ export default class SplitBox extends CompositeField {
   getEffectiveSplitterPosition() {
     if (this._isMinimizable() && this.fieldMinimized) {
       return this.minSplitterPosition;
-    } else {
-      return this.splitterPosition;
     }
+    return this.splitterPosition;
   }
 
   setMinSplitterPosition(minSplitterPosition) {

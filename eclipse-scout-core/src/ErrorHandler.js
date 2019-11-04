@@ -32,8 +32,8 @@ export default class ErrorHandler {
     $.extend(this, options);
   }
 
-// Signature matches the "window.onerror" event handler
-// https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
+  // Signature matches the "window.onerror" event handler
+  // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
   _onWindowError(errorMessage, fileName, lineNumber, columnNumber, error) {
     try {
       if (error instanceof Error) {

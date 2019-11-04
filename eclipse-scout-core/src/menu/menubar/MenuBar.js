@@ -49,7 +49,6 @@ export default class MenuBar extends Widget {
     this._addWidgetProperties('menuItems');
   }
 
-
   static EllipsisPosition = {
     LEFT: 'left',
     RIGHT: 'right'

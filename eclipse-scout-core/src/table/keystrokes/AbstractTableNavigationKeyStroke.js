@@ -21,7 +21,6 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     if (!accepted) {

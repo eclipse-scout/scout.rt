@@ -21,7 +21,6 @@ export default class TagFieldEnterKeyStroke extends KeyStroke {
     this.stopPropagation = true;
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     if (!accepted) {

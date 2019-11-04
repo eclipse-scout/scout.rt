@@ -23,7 +23,6 @@ export default class CalendarComponent extends Widget {
     this._$parts = [];
   }
 
-
   /**
    * If day of a month is smaller than 100px, the components get the class compact
    */
@@ -58,9 +57,8 @@ export default class CalendarComponent extends Widget {
     // start date is either beginning of the component or beginning of viewRange
     if (dates.compare(this.coveredDaysRange.from, this.parent.viewRange.from) > 0) {
       return this.coveredDaysRange.from;
-    } else {
-      return this.parent.viewRange.from;
     }
+    return this.parent.viewRange.from;
   }
 
   _render() {
@@ -261,7 +259,7 @@ export default class CalendarComponent extends Widget {
         y: event.originalEvent.y
       },
       widget: {
-        objectType: "Label",
+        objectType: 'Label',
         htmlEnabled: true,
         cssClass: 'tooltip-content',
         value: this._description()

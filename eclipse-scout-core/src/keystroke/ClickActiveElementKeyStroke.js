@@ -23,7 +23,6 @@ export default class ClickActiveElementKeyStroke extends KeyStroke {
     };
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     if (!accepted) {

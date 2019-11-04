@@ -16,7 +16,6 @@ export default class VerticalSmartGrid extends AbstractGrid {
     super(options);
   }
 
-
   layoutAllDynamic(widgets) {
     var cellCount = 0;
     widgets.forEach(function(f) {

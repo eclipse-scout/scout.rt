@@ -26,7 +26,6 @@ export default class TreeExpandOrDrillDownKeyStroke extends AbstractTreeNavigati
     }.bind(this);
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     var currentNode = event._treeCurrentNode;

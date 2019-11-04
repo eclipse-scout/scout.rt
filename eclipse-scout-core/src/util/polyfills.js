@@ -33,7 +33,7 @@ export function install(window) {
 /**
  * Polyfills for "Math"
  */
-//private
+
 export function _installPolyfillMath(window) {
   if (Math.sign) {
     return; // Nothing to do
@@ -51,7 +51,7 @@ export function _installPolyfillMath(window) {
 /**
  * Polyfills for "FormData"
  */
-//private
+
 export function _installPolyfillFormData(window) {
   if (window.FormData) {
     return; // Nothing to do
@@ -91,7 +91,7 @@ export function _installPolyfillFormData(window) {
         result += _crlf;
         result += value + _crlf;
       }
-    }.bind(this));
+    });
     result += '--' + _boundary + '--';
     return result;
   };

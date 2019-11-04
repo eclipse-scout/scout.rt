@@ -17,7 +17,6 @@ export default class TreeAdapter extends ModelAdapter {
     this._addRemoteProperties(['displayStyle']);
   }
 
-
   _sendNodesSelected(nodeIds, debounceSend) {
     var eventData = {
       nodeIds: nodeIds
@@ -186,7 +185,7 @@ export default class TreeAdapter extends ModelAdapter {
         affectedNodesMap[widgetEvent.node.id] &&
         event.expanded === widgetEvent.expanded &&
         event.expandedLazy === widgetEvent.expandedLazy;
-    }.bind(this));
+    });
 
     this.widget.setNodeExpanded(node, event.expanded, options);
     if (event.recursive) {

@@ -24,7 +24,6 @@ export default class PageWithTable extends Page {
     this.alwaysCreateChildPage = false;
   }
 
-
   /**
    * @override Page
    */

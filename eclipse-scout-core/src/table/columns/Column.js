@@ -288,10 +288,9 @@ export default class Column {
     if (icon.isFontIcon()) {
       cssClass += ' font-icon';
       return '<span class="' + icon.appendCssClass(cssClass) + '">' + icon.iconCharacter + '</span>';
-    } else {
-      cssClass += ' image-icon';
-      return '<img class="' + cssClass + '" src="' + icon.iconUrl + '">';
     }
+    cssClass += ' image-icon';
+    return '<img class="' + cssClass + '" src="' + icon.iconUrl + '">';
   }
 
   _text(cell) {
@@ -408,9 +407,8 @@ export default class Column {
   cellValueOrText(row) {
     if (this.textBased) {
       return this.table.cellText(this, row);
-    } else {
-      return this.table.cellValue(this, row);
     }
+    return this.table.cellValue(this, row);
   }
 
   /**
@@ -835,7 +833,7 @@ export default class Column {
     }
   }
 
-//--- Event handling methods ---
+  // --- Event handling methods ---
   _createEventSupport() {
     return new EventSupport();
   }

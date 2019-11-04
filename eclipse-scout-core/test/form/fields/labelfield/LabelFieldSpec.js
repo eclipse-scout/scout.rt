@@ -10,8 +10,7 @@
  */
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("LabelField", function() {
+describe('LabelField', function() {
   var session;
   var helper;
   var field;
@@ -23,30 +22,30 @@ describe("LabelField", function() {
     field = helper.createField('LabelField');
   });
 
-  describe("HtmlEnabled", function() {
+  describe('HtmlEnabled', function() {
 
-    it("if false, encodes html in display text", function() {
+    it('if false, encodes html in display text', function() {
       field.htmlEnabled = false;
       field.displayText = '<b>Hello</b>';
       field.render();
       expect(field.$field.html()).toBe('&lt;b&gt;Hello&lt;/b&gt;');
     });
 
-    it("if true, does not encode html in display text", function() {
+    it('if true, does not encode html in display text', function() {
       field.htmlEnabled = true;
       field.displayText = '<b>Hello</b>';
       field.render();
       expect(field.$field.html()).toBe('<b>Hello</b>');
     });
 
-    it("if false, replaces \n with br tag and encodes other text", function() {
+    it('if false, replaces \n with br tag and encodes other text', function() {
       field.htmlEnabled = false;
       field.displayText = '<b>Hello</b>\nGoodbye';
       field.render();
       expect(field.$field.html()).toBe('&lt;b&gt;Hello&lt;/b&gt;<br>Goodbye');
     });
 
-    it("if true, does not replace \n with br tag and does not encode other text", function() {
+    it('if true, does not replace \n with br tag and does not encode other text', function() {
       field.htmlEnabled = true;
       field.displayText = '<b>Hello</b>\nGoodbye';
       field.render();
@@ -54,13 +53,13 @@ describe("LabelField", function() {
     });
   });
 
-  describe("acceptInput", function() {
+  describe('acceptInput', function() {
 
     /**
      * If acceptInput wasn't overridden this test would call parseValue and set the touched property.
      */
-    it("must be a NOP operation", function() {
-      field.setValue("foo");
+    it('must be a NOP operation', function() {
+      field.setValue('foo');
       field.markAsSaved();
       expect(field.touched).toBe(false);
       field.acceptInput();

@@ -19,7 +19,6 @@ export default class LookupBoxLayout extends AbstractLayout {
     this.filterBox = filterBox;
   }
 
-
   layout($container) {
     var htmlContainer = HtmlComponent.get($container),
       size = htmlContainer.size(),

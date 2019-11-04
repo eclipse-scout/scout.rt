@@ -17,7 +17,6 @@ export default class MenuNavigationKeyStroke extends KeyStroke {
     this.field = popup;
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     if (!accepted || this.field.bodyAnimating) {

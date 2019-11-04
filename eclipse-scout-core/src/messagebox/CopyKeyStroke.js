@@ -24,7 +24,6 @@ export default class CopyKeyStroke extends KeyStroke {
     };
   }
 
-
   handle(event) {
     this.field.copy();
   }

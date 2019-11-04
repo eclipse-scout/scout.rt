@@ -35,12 +35,13 @@
 .day-table {
   display: table;
   width: 100%;
+
   & > .hour-row {
     display: table-row;
     padding-left: 20px;
     padding-right: 20px;
 
-    &:hover{
+    &:hover {
       & > .label {
         font-weight: bold;
         color: @button-color;
@@ -62,12 +63,15 @@
 
       &:first-child {
         padding-left: 7px;
+
         .time-picker.touch & {
           padding-left: 15px;
         }
       }
+
       &:last-child {
         padding-right: 12px;
+
         .time-picker.touch & {
           padding-right: 20px;
         }
@@ -145,6 +149,7 @@
         }
 
         /* Hover effect is disabled on touch devices because the hover effect does not vanish on touch end which is annoying especially when swiping. */
+
         &:active:not(.disabled),
         .time-picker:not(.touch) &:hover:not(.disabled) {
           & > .text {

@@ -10,8 +10,7 @@
  */
 import {scout} from '../../src/index';
 
-
-describe("TileGrid", function() {
+describe('TileGrid', function() {
   var session;
 
   beforeEach(function() {
@@ -24,7 +23,7 @@ describe("TileGrid", function() {
     for (var i = 0; i < numTiles; i++) {
       tiles.push({
         objectType: 'Tile',
-        label: "Tile " + i
+        label: 'Tile ' + i
       });
     }
     var defaults = {
@@ -491,13 +490,13 @@ describe("TileGrid", function() {
     it('uses the comparator to sort the tiles and filteredTiles', function() {
       var tileGrid = createTileGrid(0);
       var tile0 = createTile({
-        label: "a"
+        label: 'a'
       });
       var tile1 = createTile({
-        label: "b"
+        label: 'b'
       });
       var tile2 = createTile({
-        label: "c"
+        label: 'c'
       });
       tileGrid.insertTiles([tile0, tile1, tile2]);
 
@@ -529,13 +528,13 @@ describe("TileGrid", function() {
     it('is executed when new tiles are added', function() {
       var tileGrid = createTileGrid(0);
       var tile0 = createTile({
-        label: "a"
+        label: 'a'
       });
       var tile1 = createTile({
-        label: "b"
+        label: 'b'
       });
       var tile2 = createTile({
-        label: "c"
+        label: 'c'
       });
       tileGrid.insertTiles([tile0, tile1]);
 
@@ -561,13 +560,13 @@ describe("TileGrid", function() {
     it('reorders the DOM elements accordingly', function() {
       var tileGrid = createTileGrid(0);
       var tile0 = createTile({
-        label: "a"
+        label: 'a'
       });
       var tile1 = createTile({
-        label: "b"
+        label: 'b'
       });
       var tile2 = createTile({
-        label: "c"
+        label: 'c'
       });
       tileGrid.insertTiles([tile0, tile1, tile2]);
 
@@ -963,10 +962,10 @@ describe("TileGrid", function() {
     it('considers newly inserted tiles', function() {
       var tileGrid = createTileGrid(3);
       var tile3 = createTile({
-        label: "Tile 3"
+        label: 'Tile 3'
       });
       var tile4 = createTile({
-        label: "Tile 4"
+        label: 'Tile 4'
       });
       expect(tileGrid.tiles.length).toBe(3);
 

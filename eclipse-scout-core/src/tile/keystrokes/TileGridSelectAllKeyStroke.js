@@ -26,7 +26,6 @@ export default class TileGridSelectAllKeyStroke extends TileGridSelectKeyStroke 
     }.bind(this);
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     if (!accepted) {

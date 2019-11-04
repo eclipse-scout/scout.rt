@@ -16,7 +16,6 @@ export default class TileGridGridConfig extends LogicalGridConfig {
     super();
   }
 
-
   getGridWidgets() {
     return this.widget.filteredTiles;
   }

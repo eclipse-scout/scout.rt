@@ -27,7 +27,6 @@ export default class ViewMenuOpenKeyStroke extends KeyStroke {
     }.bind(this);
   }
 
-
   /**
    * @override KeyStroke.js
    */

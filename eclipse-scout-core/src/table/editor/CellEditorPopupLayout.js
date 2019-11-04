@@ -19,7 +19,6 @@ export default class CellEditorPopupLayout extends AbstractLayout {
     this._htmlContainer = cellEditorPopup.htmlComp;
   }
 
-
   layout($container) {
     var size,
       htmlField = this._field.htmlComp;

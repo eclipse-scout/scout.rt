@@ -11,9 +11,8 @@
 import * as texts from '../../src/text/texts';
 import TextMap from '../../src/text/TextMap';
 
-
-/*jshint sub:true */
-describe("scout.texts", function() {
+/* jshint sub:true */
+describe('scout.texts', function() {
 
   var model = {
     'default': {
@@ -38,9 +37,9 @@ describe("scout.texts", function() {
     texts._setTextsByLocale({});
   });
 
-  describe("init", function() {
+  describe('init', function() {
 
-    it("creates Texts objects for each language tag given in the model", function() {
+    it('creates Texts objects for each language tag given in the model', function() {
       texts.init(model);
       expect(texts._get('default')._exists('defaultKey1')).toBe(true);
       expect(texts._get('default')._exists('deKey1')).toBe(false);
@@ -52,14 +51,14 @@ describe("scout.texts", function() {
       expect(texts._get('de-CH')._exists('deKey1')).toBe(false);
     });
 
-    it("links Texts objects according the sub tags of the language tag", function() {
+    it('links Texts objects according the sub tags of the language tag', function() {
       texts.init(model);
       expect(texts._get('default').parent).toBeUndefined();
       expect(texts._get('de').parent).toBe(texts._get('default'));
       expect(texts._get('de-CH').parent).toBe(texts._get('de'));
     });
 
-    it("does not override existing text maps", function() {
+    it('does not override existing text maps', function() {
       texts.get('de-CH').add('existingKey', 'existingText');
       texts.get('de').add('existingDeKey', 'existingDeText');
       texts.get('de').add('theKey', 'thePreviousText');
@@ -82,9 +81,9 @@ describe("scout.texts", function() {
 
   });
 
-  describe("get", function() {
+  describe('get', function() {
 
-    it("returns the Texts for the given language tag", function() {
+    it('returns the Texts for the given language tag', function() {
       texts.init(model);
       var textMap = texts.get('de');
       expect(textMap instanceof TextMap).toBe(true);
@@ -92,7 +91,7 @@ describe("scout.texts", function() {
       expect(textMap._exists('deCHKey')).toBe(false);
     });
 
-    it("returns a Texts object with correct linking", function() {
+    it('returns a Texts object with correct linking', function() {
       texts.init(model);
       var textMap = texts.get('de-CH');
       expect(textMap.get('theKey')).toBe('deCH');
@@ -111,7 +110,7 @@ describe("scout.texts", function() {
       expect(textMap.exists('defaultKey1')).toBe(true);
     });
 
-    it("creates an empty Texts object with correct linking if language tag is unknown", function() {
+    it('creates an empty Texts object with correct linking if language tag is unknown', function() {
       texts.init(model);
       var textMap = texts.get('de-AT');
       expect(textMap instanceof TextMap).toBe(true);

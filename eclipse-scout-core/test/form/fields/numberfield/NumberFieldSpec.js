@@ -11,7 +11,6 @@
 import {FormSpecHelper, LocaleSpecHelper} from '@eclipse-scout/testing';
 import {DecimalFormat, scout, Status} from '../../../../src/index';
 
-
 describe('NumberField', function() {
   var session;
   var helper;
@@ -65,7 +64,7 @@ describe('NumberField', function() {
       field.setValue('abc');
       expect(field.value).toBe(null);
       expect(field.errorStatus instanceof Status).toBe(true);
-      expect(field.displayText).toBe("abc");
+      expect(field.displayText).toBe('abc');
     });
 
     it('uses another invalidation message than the value field', function() {
@@ -298,7 +297,7 @@ describe('NumberField', function() {
       field.acceptInput();
       expect(field.$field[0].value).toBe('20.003,1');
 
-      //point is stripped and 20+31 is 51
+      // point is stripped and 20+31 is 51
       field.resetValue();
       field.$field.val('2.0+3.1');
       field.acceptInput();

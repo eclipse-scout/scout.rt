@@ -12,7 +12,7 @@ import {GridData, GroupBoxGridConfig, HorizontalGrid, scout, VerticalSmartGrid} 
 import {GroupBoxSpecHelper} from '@eclipse-scout/testing';
 
 // see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout01Test
-describe("AbstractGrid01", function() {
+describe('AbstractGrid01', function() {
   var session;
 
   beforeEach(function() {
@@ -25,26 +25,26 @@ describe("AbstractGrid01", function() {
     });
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
-      label: "Field 01",
+      label: 'Field 01',
       gridDataHints: new GridData({})
     }));
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
-      label: "Field 02",
+      label: 'Field 02',
       gridDataHints: new GridData({
         h: 2
       })
     }));
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
-      label: "Field 03",
+      label: 'Field 03',
       gridDataHints: new GridData({
         h: 2
       })
     }));
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
-      label: "Field 04",
+      label: 'Field 04',
       gridDataHints: new GridData({})
     }));
     this.groupBox.setProperty('fields', this.fields);

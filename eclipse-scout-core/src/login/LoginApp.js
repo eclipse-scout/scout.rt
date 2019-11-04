@@ -28,7 +28,6 @@ export default class LoginApp extends App {
     super();
   }
 
-
   /**
    * Default adds polyfills too, not required here
    * @override

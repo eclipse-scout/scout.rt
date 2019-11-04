@@ -10,8 +10,7 @@
  */
 import {scout, TileGridLayoutConfig} from '../../../src/index';
 
-
-describe("TileAccordion", function() {
+describe('TileAccordion', function() {
   var session;
 
   beforeEach(function() {
@@ -24,7 +23,7 @@ describe("TileAccordion", function() {
     for (var i = 0; i < numGroups; i++) {
       groups.push({
         objectType: 'Group',
-        label: "Group " + i,
+        label: 'Group ' + i,
         body: {
           objectType: 'TileGrid',
           scrollable: false
@@ -563,7 +562,7 @@ describe("TileAccordion", function() {
       expect(selectedTiles[1]).toBe(tile1);
     });
 
-    it("does not select tiles in a collapsed group", function() {
+    it('does not select tiles in a collapsed group', function() {
       var accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3

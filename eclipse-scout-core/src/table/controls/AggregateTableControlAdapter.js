@@ -15,7 +15,6 @@ export default class AggregateTableControlAdapter extends TableControlAdapter {
     super();
   }
 
-
   static modifyAggregateTableControlPrototype() {
     if (!App.get().remote) {
       return;

@@ -10,7 +10,6 @@
  */
 import {objects, QueryBy, strings, ValueFieldAdapter} from '../../../index';
 
-
 /**
  * Use this base class for field-adapters that work with lookup-calls like SmartField and TagField.
  */
@@ -19,7 +18,6 @@ export default class LookupFieldAdapter extends ValueFieldAdapter {
   constructor() {
     super();
   }
-
 
   /**
    * @param {QueryBy} queryBy

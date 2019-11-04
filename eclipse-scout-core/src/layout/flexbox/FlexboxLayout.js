@@ -29,8 +29,7 @@ export default class FlexboxLayout extends AbstractLayout {
     }
   }
 
-
-// constants
+  // constants
   static Direction = {
     COLUMN: 0,
     ROW: 1
@@ -97,7 +96,7 @@ export default class FlexboxLayout extends AbstractLayout {
     return this.cacheKey + '-' + childCount;
   }
 
-// layout functions
+  // layout functions
   layout($container) {
     var children = this._getChildren($container),
       htmlContainer = HtmlComponent.get($container),
@@ -114,10 +113,8 @@ export default class FlexboxLayout extends AbstractLayout {
 
     if (splitterWithDelta) {
       this._layoutDelta(children, splitterWithDelta, containerSize);
-      return;
     } else {
       this._layoutComponents(children, containerSize);
-      return;
     }
   }
 
@@ -167,7 +164,7 @@ export default class FlexboxLayout extends AbstractLayout {
 
     this._layoutFromLayoutDataWithCache(children, containerSize);
 
-    /*private functions*/
+    /* private functions */
     function _distributeDelta(components, delta, applyDelta) {
       return components.reduce(function(diff, c) {
         if (diff !== 0) {
@@ -297,7 +294,7 @@ export default class FlexboxLayout extends AbstractLayout {
     this._writeCache(children.length, value);
   }
 
-//functions differ from row to column mode
+  // functions differ from row to column mode
 
   preferredLayoutSizeColumn($container, options) {
     return this._getChildren($container).reduce(function(size, c) {

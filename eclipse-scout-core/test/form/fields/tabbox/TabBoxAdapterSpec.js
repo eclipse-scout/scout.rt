@@ -10,7 +10,6 @@
  */
 import {TabBoxSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('TabBoxAdapter', function() {
   var session;
   var helper;

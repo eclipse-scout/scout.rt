@@ -10,7 +10,6 @@
  */
 import {dates, scout} from '../../src/index';
 
-
 describe('DatePicker', function() {
   var session;
 

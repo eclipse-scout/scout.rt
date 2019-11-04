@@ -18,8 +18,9 @@
     font-size: 16px;
   }
 
-  & > input.alternative:-webkit-autofill { /* NOSONAR (for some reason, rule "less:overqualified-elements" is illegitimately triggered here)
-    /* Improve Chrome's auto-fill style by overriding the forced yellow background and black text color. */
+  & > input.alternative:-webkit-autofill {
+    /* NOSONAR (for some reason, rule "less:overqualified-elements" is illegitimately triggered here)
+       /* Improve Chrome's auto-fill style by overriding the forced yellow background and black text color. */
     /* (Requires some hacks, see http://webagility.com/posts/remove-forced-yellow-input-background-in-chrome) */
     border-top-width: 0;
     padding-top: @text-field-padding-top-compensation + 1px;
@@ -53,6 +54,7 @@
     background-color: @palette-red-4;
 
     /* Also change color of focus glow */
+
     &:focus::before {
       border-color: @palette-red-4;
       #scout.glow(@palette-red-4);

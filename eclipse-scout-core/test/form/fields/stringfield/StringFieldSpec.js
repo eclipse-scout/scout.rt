@@ -11,8 +11,7 @@
 import {RemoteEvent, scout, StringField} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("StringField", function() {
+describe('StringField', function() {
   var session, helper, field;
 
   beforeEach(function() {
@@ -40,14 +39,14 @@ describe("StringField", function() {
     return helper.createFieldModel();
   }
 
-  describe("inputMasked", function() {
-    it("sets the field into password mode, if true", function() {
+  describe('inputMasked', function() {
+    it('sets the field into password mode, if true', function() {
       field.inputMasked = true;
       field.render();
       expect(field.$field.attr('type')).toBe('password');
     });
 
-    it("unsets the password mode, if false", function() {
+    it('unsets the password mode, if false', function() {
       field.inputMasked = false;
       field.render();
       expect(field.$field.attr('type')).toBe('text');
@@ -55,26 +54,26 @@ describe("StringField", function() {
 
   });
 
-  describe("insertText", function() {
-    it("expects empty field at the beginning", function() {
+  describe('insertText', function() {
+    it('expects empty field at the beginning', function() {
       field.render();
       expect(field.$field[0].value).toBe('');
     });
 
-    it("inserts text into an empty field", function() {
+    it('inserts text into an empty field', function() {
       field.render();
       field.insertText('Test1');
       expect(field.$field[0].value).toBe('Test1');
     });
 
-    it("appends text to the previous value (if no text is selected)", function() {
+    it('appends text to the previous value (if no text is selected)', function() {
       field.render();
       field.insertText('Test1');
       field.insertText('ABC2');
       expect(field.$field[0].value).toBe('Test1ABC2');
     });
 
-    it("replaces selection #1 (if part of the text is selected, selection does not start at the beginning)", function() {
+    it('replaces selection #1 (if part of the text is selected, selection does not start at the beginning)', function() {
       field.render();
       field.insertText('Test1');
       field.$field[0].selectionStart = 2;
@@ -83,7 +82,7 @@ describe("StringField", function() {
       expect(field.$field[0].value).toBe('Testen21');
     });
 
-    it("replaces selection #2 (if part of the text is selected, start at the beginning)", function() {
+    it('replaces selection #2 (if part of the text is selected, start at the beginning)', function() {
       field.render();
       field.insertText('Test1');
       field.$field[0].selectionStart = 0;
@@ -92,7 +91,7 @@ describe("StringField", function() {
       expect(field.$field[0].value).toBe('ABC21');
     });
 
-    it("replaces selection #3 (if whole content is selected)", function() {
+    it('replaces selection #3 (if whole content is selected)', function() {
       field.render();
       field.insertText('Test1');
       field.$field[0].select();
@@ -100,7 +99,7 @@ describe("StringField", function() {
       expect(field.$field[0].value).toBe('ABC2');
     });
 
-    it("sends display text changed to server using accept text", function() {
+    it('sends display text changed to server using accept text', function() {
       field.render();
       field.insertText('Test1');
       sendQueuedAjaxCalls();
@@ -124,7 +123,7 @@ describe("StringField", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it("sends display text changed to server using accept text, twice, if updateDisplayTextOnModify=true", function() {
+    it('sends display text changed to server using accept text, twice, if updateDisplayTextOnModify=true', function() {
       field.updateDisplayTextOnModify = true;
       field.render();
       var message = {

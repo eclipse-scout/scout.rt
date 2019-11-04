@@ -24,7 +24,6 @@ export default class CheckBoxField extends ValueField {
     this.$checkBoxLabel = null;
   }
 
-
   _init(model) {
     super._init(model);
     this._setKeyStroke(this.keyStroke);
@@ -76,7 +75,6 @@ export default class CheckBoxField extends ValueField {
     this.addStatus();
     this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
   }
-
 
   _renderProperties() {
     super._renderProperties();

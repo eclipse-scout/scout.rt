@@ -23,7 +23,6 @@ export default class CellEditorPopup extends Popup {
     this._keyStrokeHandler = this._onKeyStroke.bind(this);
   }
 
-
   _init(options) {
     options.scrollType = options.scrollType || 'position';
     super._init(options);

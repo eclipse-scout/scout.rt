@@ -39,7 +39,6 @@ export default class DesktopBench extends Widget {
     this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
   }
 
-
   static VIEW_MIN_HEIGHT = null; // Configured in sizes.css
   static VIEW_MIN_WIDTH = null; // Configured in sizes.css
 

@@ -19,7 +19,6 @@ export default class FormMenu extends Menu {
     this._addWidgetProperties('form');
   }
 
-
   static PopupStyle = {
     DEFAULT: 'default',
     MOBILE: 'mobile'

@@ -19,7 +19,6 @@ export default class OutlineViewButton extends ViewButton {
     this._addCloneProperties(['outline']);
   }
 
-
   _init(model) {
     super._init(model);
     this._setOutline(this.outline);

@@ -17,7 +17,6 @@ export default class ImageLayout extends AbstractLayout {
     this.image = image;
   }
 
-
   preferredLayoutSize($container, options) {
     var img = $container[0];
     if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {

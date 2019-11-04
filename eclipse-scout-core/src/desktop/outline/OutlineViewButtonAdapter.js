@@ -16,7 +16,6 @@ export default class OutlineViewButtonAdapter extends ViewButtonAdapter {
     super();
   }
 
-
   _goOffline() {
     // Disable only if outline has not been loaded yet
     if (this.widget.outline) {

@@ -23,7 +23,6 @@ export default class Switch extends Widget {
     this.$switchButton = null;
   }
 
-
   _render() {
     this.$container = this.$parent.appendDiv('switch');
     this.$switchLabel = this.$container.appendDiv('switch-label');

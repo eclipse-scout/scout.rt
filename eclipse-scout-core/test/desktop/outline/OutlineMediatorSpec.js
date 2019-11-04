@@ -11,7 +11,6 @@
 import {Device, Outline, scout} from '../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('OutlineMediator', function() {
 
   var session, tableModel, detailTable, page, firstColumn;

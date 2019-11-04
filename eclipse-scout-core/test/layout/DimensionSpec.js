@@ -20,15 +20,15 @@ import {Dimension} from '../../src/index';
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-describe("Dimension", function() {
+describe('Dimension', function() {
 
-  it("accepts two numbers as width and height arguments", function() {
+  it('accepts two numbers as width and height arguments', function() {
     var dim = new Dimension(6, 7);
     expect(dim.width).toBe(6);
     expect(dim.height).toBe(7);
   });
 
-  it("accepts a single Dimension argument", function() {
+  it('accepts a single Dimension argument', function() {
     var dim1 = new Dimension(6, 7);
     var dim2 = new Dimension(dim1);
     expect(dim2.width).toBe(6);
@@ -36,7 +36,7 @@ describe("Dimension", function() {
     expect(dim1).toEqual(dim2);
   });
 
-  it("equals", function() {
+  it('equals', function() {
     var d1 = new Dimension(10, 5);
     var d2 = new Dimension(20, 20);
     var d3 = new Dimension(d2);

@@ -20,7 +20,6 @@ export default class WidgetField extends FormField {
     this._addWidgetProperties(['fieldWidget']);
   }
 
-
   _init(model) {
     super._init(model);
   }

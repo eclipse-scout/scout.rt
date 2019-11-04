@@ -212,13 +212,10 @@ export default class Device {
     browser = scout.nvl(browser, this.browser);
     version = scout.nvl(version, this.browserVersion);
     var browsers = Device.Browser;
-    if ((browser === browsers.INTERNET_EXPLORER && version < 11) ||
+    return !((browser === browsers.INTERNET_EXPLORER && version < 11) ||
       (browser === browsers.CHROME && version < 40) ||
       (browser === browsers.FIREFOX && version < 35) ||
-      (browser === browsers.SAFARI && version < 8)) {
-      return false;
-    }
-    return true;
+      (browser === browsers.SAFARI && version < 8));
   }
 
   /**
@@ -228,15 +225,13 @@ export default class Device {
     if (Device.System.ANDROID === this.system) {
       if (userAgent.indexOf('Mobile') > -1) {
         return Device.Type.MOBILE;
-      } else {
-        return Device.Type.TABLET;
       }
+      return Device.Type.TABLET;
     } else if (Device.System.IOS === this.system) {
       if (userAgent.indexOf('iPad') > -1) {
         return Device.Type.TABLET;
-      } else {
-        return Device.Type.MOBILE;
       }
+      return Device.Type.MOBILE;
     } else if (this.isWindowsTabletMode()) {
       return Device.Type.TABLET;
     }
@@ -478,7 +473,7 @@ export default class Device {
         passiveSupported = false;
       }
       return passiveSupported;
-    }.bind(this));
+    });
   }
 
   checkCssValue(property, value, checkFunc) {

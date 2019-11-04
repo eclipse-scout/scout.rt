@@ -11,8 +11,7 @@
 import {RemoteEvent, scout, TableControlAdapter} from '../../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("TableControl", function() {
+describe('TableControl', function() {
   var session;
   var tableHelper;
 
@@ -52,14 +51,14 @@ describe("TableControl", function() {
     return tableHelper.createTable(tableModel);
   }
 
-  describe("selected", function() {
+  describe('selected', function() {
     var table;
 
     beforeEach(function() {
       table = createTable();
     });
 
-    it("opens and closes the control container", function() {
+    it('opens and closes the control container', function() {
       var action = createAction(createModel());
       table._setTableControls([action]);
       table.render();
@@ -73,7 +72,7 @@ describe("TableControl", function() {
       expect($controlContainer).toBeHidden();
     });
 
-    it("removes the content of the previous selected control without closing the container", function() {
+    it('removes the content of the previous selected control without closing the container', function() {
       var action = createAction(createModel());
       var action2 = createAction(createModel());
       table._setTableControls([action, action2]);
@@ -99,7 +98,7 @@ describe("TableControl", function() {
       expect(action.selected).toBe(false);
     });
 
-    it("sends selected events (for current and previous selection)", function() {
+    it('sends selected events (for current and previous selection)', function() {
       var model = createModel();
       var adapter = createTableControlAdapter(model);
       var action = adapter.createWidget(model, session.desktop);

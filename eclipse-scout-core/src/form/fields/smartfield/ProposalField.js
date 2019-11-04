@@ -28,7 +28,6 @@ export default class ProposalField extends SmartField {
     this.lookupOnAcceptByText = false;
   }
 
-
   _getValueFromLookupRow(lookupRow) {
     return lookupRow.text;
   }

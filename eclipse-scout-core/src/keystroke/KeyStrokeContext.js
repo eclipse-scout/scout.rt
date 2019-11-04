@@ -151,9 +151,8 @@ export default class KeyStrokeContext {
       return keyStroke;
     } else if (keyStroke instanceof Action) {
       return keyStroke.actionKeyStroke;
-    } else {
-      throw new Error('unsupported keystroke: ' + keyStroke);
     }
+    throw new Error('unsupported keystroke: ' + keyStroke);
   }
 
   /**

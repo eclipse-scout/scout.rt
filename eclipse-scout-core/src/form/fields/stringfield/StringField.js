@@ -43,7 +43,6 @@ export default class StringField extends BasicField {
     this._onSelectionChangingActionHandler = this._onSelectionChangingAction.bind(this);
   }
 
-
   static Format = {
     LOWER: 'a' /* IStringField.FORMAT_LOWER */,
     UPPER: 'A' /* IStringField.FORMAT_UPPER */

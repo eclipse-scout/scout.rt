@@ -38,7 +38,6 @@ export default class DesktopTabSelectKeyStroke extends RangeKeyStroke {
     }.bind(this);
   }
 
-
   /**
    * @override KeyStroke.js
    */
@@ -53,7 +52,7 @@ export default class DesktopTabSelectKeyStroke extends RangeKeyStroke {
   handle(event) {
     var viewIndex = event.which - keys['1'];
 
-    if (this._viewTabs().length && (viewIndex < this._viewTabs().length)) {
+    if (this._viewTabs().length && viewIndex < this._viewTabs().length) {
       var viewTab = this._viewTabs()[viewIndex];
       if (this.field.bench) {
         this.field.bench.activateView(viewTab.view);

@@ -25,7 +25,6 @@ export default class ColumnLayout extends AbstractLayout {
     // +------+---+------+
   }
 
-
   layout($container) {
     var htmlComp = HtmlComponent.get($container);
     var containerSize = htmlComp.availableSize()
@@ -82,7 +81,7 @@ export default class ColumnLayout extends AbstractLayout {
       childPrefSize = childPrefSize.add(htmlChild.margins());
       prefSize.width = prefSize.width + childPrefSize.width;
       prefSize.height = Math.max(prefSize.height, childPrefSize.height);
-    }.bind(this));
+    });
 
     prefSize = prefSize.add(htmlContainer.insets());
     return prefSize;

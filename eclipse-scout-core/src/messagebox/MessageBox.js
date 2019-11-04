@@ -53,7 +53,6 @@ export default class MessageBox extends Widget {
     this.displayParent = null;
   }
 
-
   static Buttons = {
     YES: 'yes',
     NO: 'no',

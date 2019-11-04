@@ -19,7 +19,6 @@ export default class DesktopResponsiveHandler extends ResponsiveHandler {
     this.allowedStates = [ResponsiveManager.ResponsiveState.NORMAL, ResponsiveManager.ResponsiveState.COMPACT];
   }
 
-
   init(model) {
     super.init(model);
 

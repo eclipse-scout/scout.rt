@@ -36,7 +36,7 @@ export default class DateFormat {
   constructor(locale, pattern, options) { // NOSONAR
     options = options || {};
 
-    /*jshint sub:true*/
+    /* jshint sub:true */
     this.locale = locale;
     scout.assertParameter('locale', this.locale);
     this.pattern = pattern || locale.dateFormatPatternDefault;
@@ -513,17 +513,17 @@ export default class DateFormat {
             parseContext.hints.am = true;
             parseContext.dateInfo.hours = parseContext.dateInfo.hours % 12;
             return m[1];
-          } else {
-            re = new RegExp('^(' + strings.quote(this.dateFormat.symbols.pm) + ')(.*)$', 'i');
-            m = re.exec(parseContext.inputString);
-            if (m) { // match found
-              parseContext.matchInfo.ampm = m[1];
-              parseContext.inputString = m[2];
-              parseContext.hints.pm = true;
-              parseContext.dateInfo.hours = (parseContext.dateInfo.hours % 12) + 12;
-              return m[1];
-            }
           }
+          re = new RegExp('^(' + strings.quote(this.dateFormat.symbols.pm) + ')(.*)$', 'i');
+          m = re.exec(parseContext.inputString);
+          if (m) { // match found
+            parseContext.matchInfo.ampm = m[1];
+            parseContext.inputString = m[2];
+            parseContext.hints.pm = true;
+            parseContext.dateInfo.hours = (parseContext.dateInfo.hours % 12) + 12;
+            return m[1];
+          }
+
           // No match found so far. In analyze mode, check prefixes.
           if (parseContext.analyze) {
             re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
@@ -963,9 +963,8 @@ export default class DateFormat {
         if (!scout.isOneOf(validMonth, monthsWithThirthyOneDays)) {
           validMonth = validMonth + 1;
         }
-      }
-      // If day is "29" or "30" and month is february, use next month (except day is "29" and the year is a leap year)
-      else if (dateInfo.day >= 29 && validMonth === 1) {
+      } else if (dateInfo.day >= 29 && validMonth === 1) {
+        // If day is "29" or "30" and month is february, use next month (except day is "29" and the year is a leap year)
         if (dateInfo.day > 29 || !dates.isLeapYear(validYear)) {
           validMonth = validMonth + 1;
         }

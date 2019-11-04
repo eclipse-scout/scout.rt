@@ -10,7 +10,6 @@
  */
 import {objects, RoundingMode, strings} from '../index';
 
-
 /**
  * Converts the given decimal number to base-62 (i.e. the same value, but
  * represented by [a-zA-Z0-9] instead of only [0-9].
@@ -215,11 +214,9 @@ export function isNumber(number) {
   return typeof number === 'number' && !isNaN(number);
 }
 
-//private
 export function _setCorrelationCounter(val) {
   _correlationCounter = val;
 }
-
 
 export default {
   correlationId,

@@ -11,7 +11,6 @@
 import {arrays, numbers, scout, strings} from '../index';
 import * as $ from 'jquery';
 
-
 /**
  * @memberOf scout.styles
  */
@@ -77,9 +76,8 @@ export function getSize(cssClass, cssProperty, property, defaultSize, additional
   var size = get(cssClass, cssProperty, additionalClass)[property];
   if ('auto' === size) {
     return defaultSize;
-  } else {
-    return $.pxToNumber(size);
   }
+  return $.pxToNumber(size);
 }
 
 export function put(cssClass, style) {

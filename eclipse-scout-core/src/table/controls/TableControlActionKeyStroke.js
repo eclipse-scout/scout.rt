@@ -17,7 +17,6 @@ export default class TableControlActionKeyStroke extends ActionKeyStroke {
     this.renderingHints.offset = 6;
   }
 
-
   handle(event) {
     this.field.toggle();
   }

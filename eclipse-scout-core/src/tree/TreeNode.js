@@ -96,7 +96,7 @@ export default class TreeNode {
   }
 
   _jsonModel() {
-  };
+  }
 
   hasChildNodes() {
     return this.childNodes.length > 0;
@@ -287,7 +287,7 @@ export default class TreeNode {
         if (tree.visibleNodesMap[childNode.id]) {
           return true;
         }
-      }.bind(this));
+      });
       if (!hasVisibleNodes && this.parentNode.$node) {
         // Remove 'lazy' from parent
         this.parentNode.$node.removeClass('lazy');

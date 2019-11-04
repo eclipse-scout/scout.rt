@@ -16,7 +16,6 @@ export default class PopupAdapter extends ModelAdapter {
     super();
   }
 
-
   _onWidgetClose(event) {
     // Do not close the popup immediately, server will send the close event
     event.preventDefault();

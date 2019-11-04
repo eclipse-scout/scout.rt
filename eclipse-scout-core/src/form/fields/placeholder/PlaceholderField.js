@@ -16,7 +16,6 @@ export default class PlaceholderField extends FormField {
     super();
   }
 
-
   _render() {
     this.addContainer(this.$parent, 'placeholder-field');
   }

@@ -10,7 +10,6 @@
  */
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
 /* global linkWidgetAndAdapter */
 describe('FormAdapter', function() {
   var session, helper;

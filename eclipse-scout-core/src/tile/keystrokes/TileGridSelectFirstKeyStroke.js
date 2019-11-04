@@ -18,7 +18,6 @@ export default class TileGridSelectFirstKeyStroke extends TileGridSelectKeyStrok
     this.which = [keys.HOME];
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     if (!accepted) {

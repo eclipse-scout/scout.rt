@@ -19,7 +19,6 @@ export default class ResetMenu extends Menu {
     this.systemType = Button.SystemType.RESET;
   }
 
-
   _init(model) {
     super._init(model);
     this.text = scout.nvl(this.text, this.session.text('ResetButton'));

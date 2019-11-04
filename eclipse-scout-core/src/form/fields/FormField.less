@@ -27,7 +27,7 @@
       text-overflow: clip;
     }
 
-    .disabled&{
+    .disabled& {
       color: @text-disabled-color;
     }
 
@@ -66,6 +66,7 @@
   }
 
   /* Class that applies the same vertical padding to the .field as to the label (useful e.g. for html fields) */
+
   &.borderless-field-padding-y > .field {
     padding-top: @borderless-field-padding-y;
     padding-bottom: @borderless-field-padding-y;
@@ -90,9 +91,11 @@
   }
 
   /* Convenience class to add to a field when the mandatory indicator should not be displayed (e.g. inside a FormFieldMenu) */
+
   &.no-mandatory-indicator > .mandatory-indicator {
     display: none;
   }
+
   &.no-mandatory-indicator > label.top {
     margin-left: 0;
   }

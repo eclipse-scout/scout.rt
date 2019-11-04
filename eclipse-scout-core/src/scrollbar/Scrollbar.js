@@ -52,7 +52,6 @@ export default class Scrollbar extends Widget {
     this._unfixScrollbarHandler = this._unfixScrollbar.bind(this);
   }
 
-
   _render() {
     this._ensureParentPosition();
 
@@ -398,25 +397,24 @@ export default class Scrollbar extends Widget {
     // ignore event if container is too small for thumb movement
     if (this._isContainerTooSmallForThumb()) {
       return true; // let _onScrollbarMouseDown handle the click event
-    } else {
-      this.notifyBeforeScroll();
-      // calculate thumbCenterOffset in px (offset from clicked point to thumb center)
-      var clipped = (this.axis === 'x' ? this._thumbClipping.horizontal() : this._thumbClipping.vertical());
-      var thumbSize = clipped + this._$thumb['outer' + this._dim](true); //including border, margin and padding
-      var thumbClippingOffset = (this.axis === 'x' ? this._thumbClipping.left : this._thumbClipping.top);
-      var thumbCenter = this._$thumb.offset()[this._dir] + Math.floor(thumbSize / 2) - thumbClippingOffset;
-      var thumbCenterOffset = Math.round((this.axis === 'x' ? event.pageX : event.pageY) - thumbCenter);
-
-      this._$thumb.addClass('scrollbar-thumb-move');
-      this._$thumb
-        .document()
-        .on('mousemove', {
-          'thumbCenterOffset': thumbCenterOffset
-        }, this._onDocumentMousemoveHandler)
-        .one('mouseup', this._onDocumentMouseUpHandler);
-
-      return false;
     }
+    this.notifyBeforeScroll();
+    // calculate thumbCenterOffset in px (offset from clicked point to thumb center)
+    var clipped = (this.axis === 'x' ? this._thumbClipping.horizontal() : this._thumbClipping.vertical());
+    var thumbSize = clipped + this._$thumb['outer' + this._dim](true); // including border, margin and padding
+    var thumbClippingOffset = (this.axis === 'x' ? this._thumbClipping.left : this._thumbClipping.top);
+    var thumbCenter = this._$thumb.offset()[this._dir] + Math.floor(thumbSize / 2) - thumbClippingOffset;
+    var thumbCenterOffset = Math.round((this.axis === 'x' ? event.pageX : event.pageY) - thumbCenter);
+
+    this._$thumb.addClass('scrollbar-thumb-move');
+    this._$thumb
+      .document()
+      .on('mousemove', {
+        'thumbCenterOffset': thumbCenterOffset
+      }, this._onDocumentMousemoveHandler)
+      .one('mouseup', this._onDocumentMouseUpHandler);
+
+    return false;
   }
 
   _onDocumentMousemove(event) {
@@ -429,7 +427,7 @@ export default class Scrollbar extends Widget {
     var thumbCenterOffset = event.data.thumbCenterOffset;
 
     var clipped = (this.axis === 'x' ? this._thumbClipping.horizontal() : this._thumbClipping.vertical());
-    var thumbSize = clipped + this._$thumb['outer' + this._dim](true); //including border, margin and padding
+    var thumbSize = clipped + this._$thumb['outer' + this._dim](true); // including border, margin and padding
     var size = this.$container[this._dim.toLowerCase()]() - thumbSize; // size of div excluding margin/padding/border
     var offset = this.$container.offset()[this._dir] + (thumbSize / 2);
 

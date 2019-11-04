@@ -21,7 +21,6 @@ export default class TileGridLayout extends LogicalGridLayout {
     this._calculatingPrimitivePrefSize = false;
   }
 
-
   static _DEFAULTSIZE = undefined;
 
   static getTileDimensions() {

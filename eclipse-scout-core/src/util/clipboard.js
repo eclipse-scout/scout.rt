@@ -11,7 +11,6 @@
 import {FocusRule, scout, Status} from '../index';
 import * as $ from 'jquery';
 
-
 /**
  * Copies the given text to the clipboard. To make this work, the method must be called inside
  * a "user action" (i.e. mouse or keyboard event handler). For security reasons, the access to
@@ -59,7 +58,6 @@ export function copyText(options) {
   return promise;
 }
 
-//private
 export function _copyText(options) {
   // Modern clipboard API
   // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
@@ -98,7 +96,6 @@ export function _copyText(options) {
   return deferred.promise();
 }
 
-//private
 export function _showNotification(options, promise) {
   var status = _successStatus(options.parent.session);
   promise
@@ -109,7 +106,6 @@ export function _showNotification(options, promise) {
     .then(showNotification.bind(this, options.parent, status));
 }
 
-//private
 export function _successStatus(session) {
   return new Status({
     message: session.text('ui.CopyToClipboardSuccessStatus'),
@@ -117,7 +113,6 @@ export function _successStatus(session) {
   });
 }
 
-//private
 export function _failedStatus(session) {
   return new Status({
     message: session.text('ui.CopyToClipboardFailedStatus'),
@@ -143,7 +138,6 @@ export function showNotification(parent, status) {
   });
   notification.show();
 }
-
 
 export default {
   copyText,

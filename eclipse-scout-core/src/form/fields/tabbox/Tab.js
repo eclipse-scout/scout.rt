@@ -28,7 +28,6 @@ export default class Tab extends Widget {
     this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   }
 
-
   _init(options) {
     super._init(options);
     this.visible = this.tabItem.visible;
@@ -85,7 +84,6 @@ export default class Tab extends Widget {
     this._renderTooltipText();
     this._renderErrorStatus();
   }
-
 
   _renderVisible() {
     super._renderVisible();

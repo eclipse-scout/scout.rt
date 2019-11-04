@@ -17,7 +17,6 @@ export default class BeanColumn extends Column {
     super();
   }
 
-
   buildCellForRow(row) {
     var cell = this.cell(row);
     var cssClass = this._cellCssClass(cell);

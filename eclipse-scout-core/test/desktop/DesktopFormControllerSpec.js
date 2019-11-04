@@ -10,7 +10,6 @@
  */
 import {DesktopFormController} from '../../src/index';
 
-
 describe('DesktopFormController', function() {
 
   var ctrl, session, $sandbox, popupWindow,

@@ -22,7 +22,6 @@ export default class DesktopNotification extends Notification {
     this._removing = false;
   }
 
-
   /**
    * When duration is set to INFINITE, the notification is not removed automatically.
    */

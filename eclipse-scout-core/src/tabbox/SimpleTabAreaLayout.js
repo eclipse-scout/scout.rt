@@ -20,7 +20,6 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
     this._overflowTabsIndizes = [];
   }
 
-
   static TAB_WIDTH_LARGE = 220;
   static TAB_WIDTH_SMALL = 130;
   static OVERFLOW_MENU_WIDTH = 30;

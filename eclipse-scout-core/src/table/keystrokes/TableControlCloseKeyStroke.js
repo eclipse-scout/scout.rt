@@ -20,7 +20,6 @@ export default class TableControlCloseKeyStroke extends KeyStroke {
     this.renderingHints.render = false;
   }
 
-
   /**
    * @override KeyStroke.js
    */

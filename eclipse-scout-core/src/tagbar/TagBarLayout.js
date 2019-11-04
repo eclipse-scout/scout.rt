@@ -18,7 +18,6 @@ export default class TagBarLayout extends AbstractLayout {
     this.tagBar = tagBar;
   }
 
-
   layout($container) {
     var htmlContainer = HtmlComponent.get($container);
     var hasTags = this.tagBar.tags && this.tagBar.tags.length > 0;

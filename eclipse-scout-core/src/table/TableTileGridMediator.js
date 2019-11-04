@@ -11,7 +11,6 @@
 import {AggregateTableControl, arrays, scout, Widget} from '../index';
 import * as $ from 'jquery';
 
-
 /**
  * Delegates events between the Table and it's internal TileGrid.
  *
@@ -60,7 +59,6 @@ export default class TableTileGridMediator extends Widget {
 
     this._addWidgetProperties(['tileAccordion', 'tiles', 'tileMappings']);
   }
-
 
   init(model) {
     super._init(model);
@@ -185,7 +183,7 @@ export default class TableTileGridMediator extends Widget {
     this._syncSelectionFromTableToTile();
   }
 
-// only used in ScoutJS, see TableAdapter.modifyTablePrototype()
+  // only used in ScoutJS, see TableAdapter.modifyTablePrototype()
   loadTiles() {
     // hierarchy is not supported in tile mode. There is no way to visualize a parent-child hierarchy in the tileGrid. Therefore only top level rows are displayed.
     var rows = this.table.rows.filter(function(row) {
@@ -205,7 +203,7 @@ export default class TableTileGridMediator extends Widget {
     return tile;
   }
 
-//update tilesMap with the given tiles or recreate tilesMap completely in case of null given
+  // update tilesMap with the given tiles or recreate tilesMap completely in case of null given
   _refreshTilesMap(tiles) {
     if (!tiles) {
       tiles = this.tiles;
@@ -266,7 +264,7 @@ export default class TableTileGridMediator extends Widget {
   }
 
   _createTileGroup(groupId, htmlEnabled) {
-    return new scout.create('Group', {
+    return scout.create('Group', {
       parent: this.tileAccordion,
       id: groupId,
       headerVisible: groupId === 'default' ? false : true,
@@ -287,7 +285,7 @@ export default class TableTileGridMediator extends Widget {
     }
 
     // hide aggregation table control
-    this.table.tableControls.filter(function(control) {
+    this.table.tableControls.forEach(function(control) {
       if (control instanceof AggregateTableControl) {
         control.setVisible(false);
       }
@@ -305,7 +303,7 @@ export default class TableTileGridMediator extends Widget {
 
     if (hasHierarchy) {
       // add the hierarchyFilter since the tileMode doesn't support hierarchy
-      this.table.addFilter(new scout.create('TileTableHierarchyFilter', {
+      this.table.addFilter(scout.create('TileTableHierarchyFilter', {
         table: this.table
       }));
       this.table.filter();
@@ -319,7 +317,7 @@ export default class TableTileGridMediator extends Widget {
 
   deactivate() {
     // show aggregation table control
-    this.table.tableControls.filter(function(control) {
+    this.table.tableControls.forEach(function(control) {
       if (control instanceof AggregateTableControl) {
         control.setVisible(true);
       }
@@ -334,7 +332,7 @@ export default class TableTileGridMediator extends Widget {
       this.table.loadingSupport.options$Container = this.tableState.loadingSupportContainer;
     }
 
-    this.table.removeFilter(new scout.create('TileTableHierarchyFilter'));
+    this.table.removeFilter(scout.create('TileTableHierarchyFilter'));
     this.table.filter();
 
     this._syncScrollTopFromTileGridToTable();
@@ -514,9 +512,9 @@ export default class TableTileGridMediator extends Widget {
         var rowForTile = this.table.rowsMap[tile.rowId];
         if (rowForTile) {
           return tableFilter.accept(rowForTile);
-        } else {
-          return false;
         }
+        return false;
+
       }
     };
     var key = tableFilter.createKey();

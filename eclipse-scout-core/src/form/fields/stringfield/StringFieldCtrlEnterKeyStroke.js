@@ -19,7 +19,6 @@ export default class StringFieldCtrlEnterKeyStroke extends KeyStroke {
     this.ctrl = true;
   }
 
-
   _accept(event) {
     var accepted = super._accept(event);
     return accepted && this.field.hasAction;

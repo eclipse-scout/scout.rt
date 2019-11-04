@@ -10,8 +10,7 @@
  */
 import {dates, keys, RemoteEvent, scout} from '../../../../src/index';
 
-
-describe("DateFieldAdapter", function() {
+describe('DateFieldAdapter', function() {
   var session;
   var helper;
 
@@ -61,7 +60,7 @@ describe("DateFieldAdapter", function() {
     return $box.find('.date-picker-day').filter(function(i, elem) {
       var $day = $(elem);
       return (dates.isSameDay(date, $day.data('date')));
-    }.bind(this));
+    });
   }
 
   describe('parseValue', function() {

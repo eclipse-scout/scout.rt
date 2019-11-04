@@ -26,7 +26,6 @@ export default class ProposalChooser extends Widget {
     this.touch = false;
   }
 
-
   _init(model) {
     super._init(model);
 

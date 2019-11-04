@@ -8,6 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+// eslint-disable-next-line max-classes-per-file
 import {HtmlComponent, NullWidget, scout, TreeVisitResult, Widget} from '../../src/index';
 
 describe('Widget', function() {
@@ -1244,9 +1245,9 @@ describe('Widget', function() {
     });
   });
 
-  describe("property css class", function() {
+  describe('property css class', function() {
 
-    it("adds or removes custom css class", function() {
+    it('adds or removes custom css class', function() {
       var widget = createWidget({
         parent: parent
       });
@@ -1259,7 +1260,7 @@ describe('Widget', function() {
       expect(widget.$container).not.toHaveClass('custom-class');
     });
 
-    it("does not accidentally remove other css classes on a property change", function() {
+    it('does not accidentally remove other css classes on a property change', function() {
       var widget = createWidget({
         parent: parent
       });
@@ -1276,9 +1277,9 @@ describe('Widget', function() {
       expect(widget.$container).toHaveClass('xy');
     });
 
-    describe("addCssClass", function() {
+    describe('addCssClass', function() {
 
-      it("adds the cssClass to the existing classes", function() {
+      it('adds the cssClass to the existing classes', function() {
         var widget = createWidget({
           parent: parent
         });
@@ -1293,7 +1294,7 @@ describe('Widget', function() {
         expect(widget.$container).toHaveClass('another-class2');
       });
 
-      it("does not add the same class multiple times", function() {
+      it('does not add the same class multiple times', function() {
         var widget = createWidget({
           parent: parent
         });
@@ -1310,9 +1311,9 @@ describe('Widget', function() {
 
     });
 
-    describe("removeCssClass", function() {
+    describe('removeCssClass', function() {
 
-      it("removes the cssClass from the existing classes", function() {
+      it('removes the cssClass from the existing classes', function() {
         var widget = createWidget({
           parent: parent
         });
@@ -1334,9 +1335,9 @@ describe('Widget', function() {
 
     });
 
-    describe("toggleCssClass", function() {
+    describe('toggleCssClass', function() {
 
-      it("toggles the cssClass based on a predicate", function() {
+      it('toggles the cssClass based on a predicate', function() {
         var widget = createWidget({
           parent: parent
         });
@@ -1364,7 +1365,7 @@ describe('Widget', function() {
 
   describe('focus', function() {
 
-    it("sets the focus on the container", function() {
+    it('sets the focus on the container', function() {
       var widget = createWidget({
         parent: parent
       });
@@ -1373,7 +1374,7 @@ describe('Widget', function() {
       expect(document.activeElement).toBe(widget.$container[0]);
     });
 
-    it("schedules the focus request if the widget is not rendered", function() {
+    it('schedules the focus request if the widget is not rendered', function() {
       var widget = createWidget({
         parent: parent
       });
@@ -1422,7 +1423,7 @@ describe('Widget', function() {
 
   describe('Widget properties', function() {
 
-    it("automatically resolves referenced widgets", function() {
+    it('automatically resolves referenced widgets', function() {
       window.testns = {};
 
       class ComplexTestWidget extends Widget {
@@ -1520,7 +1521,7 @@ describe('Widget', function() {
       jasmine.clock().uninstall();
     });
 
-    it("is stored on scroll if scrollbars are installed", function() {
+    it('is stored on scroll if scrollbars are installed', function() {
       var widget = new ScrollableWidget();
       widget.init({
         parent: parent,
@@ -1532,7 +1533,7 @@ describe('Widget', function() {
       expect(widget.scrollTop).toBe(40);
     });
 
-    it("is not stored on scroll if scrollbars are not installed", function() {
+    it('is not stored on scroll if scrollbars are not installed', function() {
       var widget = createWidget({
         parent: parent
       });
@@ -1545,7 +1546,7 @@ describe('Widget', function() {
       expect(widget.scrollTop).toBe(null);
     });
 
-    it("is applied again on render after remove", function() {
+    it('is applied again on render after remove', function() {
       var widget = new ScrollableWidget();
       widget.init({
         parent: parent,
@@ -1568,7 +1569,7 @@ describe('Widget', function() {
       expect(widget.$container[0].scrollTop).toBe(40);
     });
 
-    it("is set to null if scrollbars are not installed", function() {
+    it('is set to null if scrollbars are not installed', function() {
       var widget = createWidget({
         parent: parent
       });
@@ -1581,7 +1582,7 @@ describe('Widget', function() {
       expect(widget._renderScrollTop.calls.count()).toBe(1); // Must not be executed again for non scrollable widgets
     });
 
-    it("is set to null if scrollbars are uninstalled on the fly", function() {
+    it('is set to null if scrollbars are uninstalled on the fly', function() {
       var widget = new ScrollableWidget();
       widget.init({
         parent: parent,

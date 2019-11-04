@@ -24,7 +24,6 @@ export default class TableControl extends Action {
     this.showTooltipWhenSelected = false;
   }
 
-
   static CONTAINER_SIZE = 345; // Defined in sizes.less
   static CONTAINER_ANIMATE_DURATION = 350;
 

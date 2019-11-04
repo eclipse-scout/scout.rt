@@ -18,7 +18,6 @@ export default class PageLayout extends AbstractLayout {
     this.page = page;
   }
 
-
   layout($container) {
     var containerSize, detailMenuBarSize,
       htmlContainer = this.page.htmlComp,

@@ -11,7 +11,6 @@
 import {BasicField, FormField, graphics, HtmlComponent, HtmlEnvironment} from '../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('FormFieldLayout', function() {
   var session;
   var helper;
@@ -60,7 +59,6 @@ describe('FormFieldLayout', function() {
       });
     }
   }
-
 
   beforeEach(function() {
     setFixtures(sandbox());

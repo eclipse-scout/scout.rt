@@ -23,7 +23,6 @@ export default class ButtonAdapterMenu extends Menu {
     this.menubar = null;
   }
 
-
   /**
    * @override Action.js
    */

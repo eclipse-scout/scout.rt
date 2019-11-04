@@ -23,7 +23,6 @@ export default class YearPanel extends Widget {
     this.alwaysSelectFirstDay;
   }
 
-
   _init(model) {
     super._init(model);
 
@@ -301,7 +300,7 @@ export default class YearPanel extends Widget {
     });
   }
 
-// remove all hover effects
+  // remove all hover effects
   _onYearHoverOut(event) {
     $('.year-day.year-hover, .year-day.year-hover-day', this.$yearList).removeClass('year-hover year-hover-day');
   }

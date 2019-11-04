@@ -16,7 +16,6 @@ export default class CalendarModeMenu extends Menu {
     super();
   }
 
-
   doAction() {
     if (!this.prepareDoAction()) {
       return false;

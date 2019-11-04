@@ -11,8 +11,7 @@
 import {ListBox, QueryBy, scout, Status} from '../../../../src/index';
 import {DummyLookupCall, FormSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("ListBox", function() {
+describe('ListBox', function() {
   var session, field, helper;
 
   beforeEach(function() {

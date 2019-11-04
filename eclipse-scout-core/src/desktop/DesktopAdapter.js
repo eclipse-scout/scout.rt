@@ -17,7 +17,6 @@ export default class DesktopAdapter extends ModelAdapter {
     this._addRemoteProperties(['benchVisible', 'navigationVisible', 'navigationHandleVisible', 'headerVisible', 'geolocationServiceAvailable', 'inBackground']);
   }
 
-
   _goOffline() {
     this.widget.goOffline();
   }
@@ -80,7 +79,7 @@ export default class DesktopAdapter extends ModelAdapter {
       if (!hasPendingFormActivateEvent) {
         this.addFilterForWidgetEvent(function(widgetEvent) {
           return (widgetEvent.type === 'formActivate' && widgetEvent.form === form);
-        }.bind(this));
+        });
       }
 
       this.widget.showForm(form, event.position);

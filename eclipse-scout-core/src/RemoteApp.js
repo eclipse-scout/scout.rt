@@ -18,7 +18,6 @@ export default class RemoteApp extends App {
     this.remote = true;
   }
 
-
   /**
    * @override
    */

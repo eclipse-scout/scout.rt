@@ -21,7 +21,6 @@ export default class TableRowDetail extends Widget {
     this._tableRowsInsertedHandler = this._onTableRowsInserted.bind(this);
   }
 
-
   _init(model) {
     super._init(model);
     this.row = this.page.row;

@@ -11,7 +11,6 @@
 import {NavigateDownButton, NavigateUpButton} from '../../../../src/index';
 import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('NavigateButton', function() {
 
   var session, helper, formHelper;

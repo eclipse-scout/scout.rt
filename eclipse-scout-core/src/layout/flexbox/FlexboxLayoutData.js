@@ -22,8 +22,8 @@ export default class FlexboxLayoutData {
     this.order = 0;
     $.extend(this, model);
     // ui properties
-    this.sizePx; /*current display size in pixel*/
-    this.initialPx; /*initial in pixel */
+    this.sizePx; // current display size in pixel
+    this.initialPx; // initial in pixel
     this.delta;
   }
 
@@ -39,9 +39,9 @@ export default class FlexboxLayoutData {
   acceptDelta(delta, apply) {
     if (delta > 0) {
       return this._grow(delta, apply);
-    } else {
-      return this._shrink(delta, apply);
     }
+    return this._shrink(delta, apply);
+
   }
 
   validate(size) {
@@ -85,7 +85,7 @@ export default class FlexboxLayoutData {
     return delta - consumedDelta;
   }
 
-  /*Static functions*/
+  /* Static functions */
   static fixed(size) {
     var layoutData = new FlexboxLayoutData();
     layoutData.relative = false;

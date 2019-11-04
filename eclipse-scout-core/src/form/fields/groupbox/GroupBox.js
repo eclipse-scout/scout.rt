@@ -74,7 +74,6 @@ export default class GroupBox extends CompositeField {
     this.$subLabel = null;
   }
 
-
   static BorderDecoration = {
     AUTO: 'auto',
     EMPTY: 'empty',
@@ -189,9 +188,8 @@ export default class GroupBox extends CompositeField {
       $drawingArea: function($drawingArea, event) {
         if (this.labelVisible) {
           return this.$title;
-        } else {
-          return this.$body;
         }
+        return this.$body;
       }.bind(this)
     };
 
@@ -516,7 +514,7 @@ export default class GroupBox extends CompositeField {
     this.setProperty('borderDecoration', borderDecoration);
   }
 
-// Don't include in renderProperties, it is not necessary to execute it initially because renderBorderVisible is executed already
+  // Don't include in renderProperties, it is not necessary to execute it initially because renderBorderVisible is executed already
   _renderBorderDecoration() {
     this._renderBorderVisible();
   }

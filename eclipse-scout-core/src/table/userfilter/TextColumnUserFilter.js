@@ -21,7 +21,6 @@ export default class TextColumnUserFilter extends ColumnUserFilter {
     this.hasFilterFields = true;
   }
 
-
   /**
    * @override ColumnUserFilter.js
    */

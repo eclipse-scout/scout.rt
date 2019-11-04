@@ -10,8 +10,7 @@
  */
 import {scout} from '../../src/index';
 
-
-describe("Accordion", function() {
+describe('Accordion', function() {
   var session;
 
   beforeEach(function() {
@@ -24,7 +23,7 @@ describe("Accordion", function() {
     for (var i = 0; i < numGroups; i++) {
       groups.push({
         objectType: 'Group',
-        label: "Group " + i
+        label: 'Group ' + i
       });
     }
     var defaults = {
@@ -244,9 +243,9 @@ describe("Accordion", function() {
 
     it('uses the comparator to sort the groups', function() {
       var accordion = createAccordion(0);
-      var group0 = createGroup({label: "a"});
-      var group1 = createGroup({label: "b"});
-      var group2 = createGroup({label: "c"});
+      var group0 = createGroup({label: 'a'});
+      var group1 = createGroup({label: 'b'});
+      var group2 = createGroup({label: 'c'});
       accordion.insertGroups([group0, group1, group2]);
 
       accordion.setComparator(function(g0, g1) {
@@ -270,9 +269,9 @@ describe("Accordion", function() {
 
     it('is executed when new groups are added', function() {
       var accordion = createAccordion(0);
-      var group0 = createGroup({label: "a"});
-      var group1 = createGroup({label: "b"});
-      var group2 = createGroup({label: "c"});
+      var group0 = createGroup({label: 'a'});
+      var group1 = createGroup({label: 'b'});
+      var group2 = createGroup({label: 'c'});
 
       accordion.setComparator(function(g0, g1) {
         // desc
@@ -290,9 +289,9 @@ describe("Accordion", function() {
 
     it('reorders the DOM elements accordingly', function() {
       var accordion = createAccordion(0);
-      var group0 = createGroup({label: "a"});
-      var group1 = createGroup({label: "b"});
-      var group2 = createGroup({label: "c"});
+      var group0 = createGroup({label: 'a'});
+      var group1 = createGroup({label: 'b'});
+      var group2 = createGroup({label: 'c'});
       accordion.insertGroups([group0, group1, group2]);
       accordion.render();
 

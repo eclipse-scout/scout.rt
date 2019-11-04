@@ -23,9 +23,8 @@ export default class TreeCollapseOrDrillUpKeyStroke extends AbstractTreeNavigati
       } else if (currentNode.parentNode) {
         return currentNode.parentNode.$node;
       }
-    }.bind(this);
+    };
   }
-
 
   _accept(event) {
     var accepted = super._accept(event);

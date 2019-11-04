@@ -19,7 +19,6 @@ export default class CollapseHandle extends Widget {
     this.horizontalAlignment = CollapseHandle.HorizontalAlignment.LEFT;
   }
 
-
   static HorizontalAlignment = {
     LEFT: 'left',
     RIGHT: 'right'

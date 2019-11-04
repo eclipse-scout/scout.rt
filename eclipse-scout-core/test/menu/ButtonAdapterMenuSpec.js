@@ -10,7 +10,6 @@
  */
 import {Button, ButtonAdapterMenu} from '../../src/index';
 
-
 describe('ButtonAdapterMenu', function() {
 
   var helper, session, $sandbox, button, adapterMenu;

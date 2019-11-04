@@ -11,7 +11,6 @@
 import {arrays, Outline, PageWithTable, scout} from '../../../../src/index';
 import {OutlineSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('PageWithTable', function() {
 
   var session, helper;

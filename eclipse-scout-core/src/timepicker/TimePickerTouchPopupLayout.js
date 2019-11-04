@@ -16,7 +16,6 @@ export default class TimePickerTouchPopupLayout extends TouchPopupLayout {
     super(popup);
   }
 
-
   layout($container) {
     super.layout($container);
     var htmlPicker = this.popup.getTimePicker().htmlComp;

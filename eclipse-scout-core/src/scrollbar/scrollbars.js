@@ -11,7 +11,6 @@
 import {arrays, Device, graphics, HtmlComponent, objects, scout} from '../index';
 import * as $ from 'jquery';
 
-
 /**
  * Static function to install a scrollbar on a container.
  * When the client supports pretty native scrollbars, we use them by default.
@@ -92,7 +91,6 @@ export function install($container, options) {
   return $container;
 }
 
-//private
 export function _installNative($container, options) {
   if (Device.get().isIos()) {
     // On ios, container sometimes is not scrollable when installing too early
@@ -103,7 +101,6 @@ export function _installNative($container, options) {
   }
 }
 
-//private
 export function _installNativeInternal($container, options) {
   $.log.isTraceEnabled() && $.log.trace('use native scrollbars for container ' + graphics.debugOutput($container));
   if (options.axis === 'x') {
@@ -132,7 +129,6 @@ export function isJsScrolling($scrollable) {
   return !!$scrollable.data('scrollbars');
 }
 
-//private
 export function _installJs($container, options) {
   $.log.isTraceEnabled() && $.log.trace('installing JS-scrollbars for container ' + graphics.debugOutput($container));
   var scrollbars = arrays.ensure($container.data('scrollbars'));
@@ -217,11 +213,10 @@ export function update($scrollable, immediate) {
   setTimeout(function() {
     _update(scrollbars);
     $scrollable.removeData('scrollbarUpdatePending');
-  }.bind(this), 0);
+  }, 0);
   $scrollable.data('scrollbarUpdatePending', true);
 }
 
-//private
 export function _update(scrollbars) {
   // Reset the scrollbars first to make sure they don't extend the scrollSize
   scrollbars.forEach(function(scrollbar) {
@@ -245,7 +240,7 @@ export function _update(scrollbars) {
  * This happens only if -webkit-overflow-scrolling is set to touch.
  * To workaround this bug the flag -webkit-overflow-scrolling will be removed if the scrollable component won't display any scrollbars
  */
-//private
+
 export function _handleIosPaintBug($scrollable) {
   if ($scrollable.data('scrollbarUpdatePending')) {
     return;
@@ -358,7 +353,6 @@ export function scrollTo($scrollable, $element, options) {
   }
 }
 
-//private
 export function _createDefaultScrollToOptions(options) {
   var defaults = {
     anmiate: false,
@@ -546,10 +540,9 @@ export function unfix($elem, timeoutId, immediate) {
   }
   return setTimeout(function() {
     _unfix($elem);
-  }.bind(this), 50);
+  }, 50);
 }
 
-//private
 export function _unfix($elem) {
   $elem.css({
     position: 'absolute',
@@ -645,7 +638,6 @@ export function opacity($scrollable, opacity) {
   });
 }
 
-//private
 export function _getCompleteChildRowsHeightRecursive(children, getChildren, isExpanded, defaultChildHeight) {
   var height = 0;
   children.forEach(function(child) {
@@ -658,7 +650,7 @@ export function _getCompleteChildRowsHeightRecursive(children, getChildren, isEx
     if (isExpanded(child) && getChildren(child).length > 0) {
       height += _getCompleteChildRowsHeightRecursive(getChildren(child), getChildren, isExpanded, defaultChildHeight);
     }
-  }.bind(this));
+  });
   return height;
 }
 

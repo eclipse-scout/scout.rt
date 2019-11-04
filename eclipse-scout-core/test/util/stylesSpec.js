@@ -10,7 +10,6 @@
  */
 import {styles} from '../../src/index';
 
-
 describe('scout.styles', function() {
   var $sandbox;
 

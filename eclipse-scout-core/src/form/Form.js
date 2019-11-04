@@ -78,7 +78,6 @@ export default class Form extends Widget {
     this.$subTitle = null;
   }
 
-
   static DisplayHint = {
     DIALOG: 'dialog',
     POPUP_WINDOW: 'popupWindow',

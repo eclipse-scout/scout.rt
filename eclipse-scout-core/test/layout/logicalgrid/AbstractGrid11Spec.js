@@ -42,7 +42,7 @@ import {GroupBoxSpecHelper} from '@eclipse-scout/testing';
  * @since 4.0.0 M6 13.03.2014
  */
 // see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout11Test
-describe("AbstractGrid11", function() {
+describe('AbstractGrid11', function() {
   var session;
 
   beforeEach(function() {
@@ -56,14 +56,14 @@ describe("AbstractGrid11", function() {
     });
     this.fields.push(scout.create('GroupBox', {
       parent: this.groupBox,
-      label: "Field 01",
+      label: 'Field 01',
       gridDataHints: new GridData({
         w: FormField.FULL_WIDTH
       })
     }));
     this.fields.push(scout.create('GroupBox', {
       parent: this.groupBox,
-      label: "Field 02",
+      label: 'Field 02',
       gridColumnCount: 1,
       gridDataHints: new GridData({
         w: 1
@@ -71,7 +71,7 @@ describe("AbstractGrid11", function() {
     }));
     this.fields.push(scout.create('GroupBox', {
       parent: this.groupBox,
-      label: "Field 03",
+      label: 'Field 03',
       gridColumnCount: 1,
       gridDataHints: new GridData({
         w: 1
@@ -79,19 +79,19 @@ describe("AbstractGrid11", function() {
     }));
     this.fields.push(scout.create('GroupBox', {
       parent: this.groupBox,
-      label: "Field 04",
+      label: 'Field 04',
       gridDataHints: new GridData({
         w: 2
       })
     }));
     this.fields.push(scout.create('Button', {
       parent: this.groupBox,
-      label: "Ok",
+      label: 'Ok',
       systemType: Button.SystemType.OK
     }));
     this.fields.push(scout.create('Button', {
       parent: this.groupBox,
-      label: "Cancel",
+      label: 'Cancel',
       systemType: Button.SystemType.CANCEL
     }));
     this.groupBox.setProperty('fields', this.fields);

@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+// eslint-disable-next-line max-classes-per-file
 import {Extension, scout, StringField} from '../src/index';
 import {LocaleSpecHelper} from '@eclipse-scout/testing';
-
 
 describe('Extension', function() {
   var session;
@@ -36,21 +36,21 @@ describe('Extension', function() {
         this.extend(proto, '_init');
         this.extend(proto, '_renderProperties');
         this.extend(proto, '_renderInputMasked');
-      };
+      }
 
       _init(model) {
         this.next(model);
         this.extended.setProperty('foo', 'bar');
-      };
+      }
 
       _renderProperties() {
         this.next();
         this._renderFoo();
-      };
+      }
 
       _renderFoo() {
         this.extended.$container.appendDiv('foo').text(this.extended.foo);
-      };
+      }
 
       _renderInputMasked = function() {
         this.extended.$field.attr('type', 'ext-password');
@@ -59,32 +59,30 @@ describe('Extension', function() {
 
     window.scout.MyExtension1 = MyExtension1;
 
-
     // ---- extension #2 ----
     class MyExtension2 extends Extension {
       init() {
         var proto = MyStringField.prototype;
         this.extend(proto, '_init');
         this.extend(proto, '_renderProperties');
-      };
+      }
 
       _init(model) {
         this.next(model);
         this.extended.setProperty('bar', 'foo');
-      };
+      }
 
       _renderProperties() {
         this.next();
         this._renderBar();
-      };
+      }
 
       _renderBar() {
         this.extended.$container.appendDiv('bar').text(this.extended.bar);
-      };
+      }
     }
 
     window.scout.MyExtension2 = MyExtension2;
-
 
     // ---- Spec starts here ----
 

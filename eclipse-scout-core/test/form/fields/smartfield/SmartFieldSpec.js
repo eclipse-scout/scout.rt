@@ -11,7 +11,6 @@
 import {fields, keys, QueryBy, scout, SmartField, Status, strings} from '../../../../src/index';
 import {DummyLookupCall, FormSpecHelper} from '@eclipse-scout/testing';
 
-
 describe('SmartField', function() {
 
   var session, field, lookupRow, helper;
@@ -967,9 +966,9 @@ describe('SmartField', function() {
       field.$field.val('Bar');
       field._onFieldKeyUp({});
       jasmine.clock().tick(500);
-      expect(field.popup.proposalChooser.model.rows[0].cells[0].text).toBe("Bar");
-      expect(field.popup.proposalChooser.model.rows[0].cells[1].text).toBe("Bar column1");
-      expect(field.popup.proposalChooser.model.rows[0].cells[2].text).toBe("Bar column2");
+      expect(field.popup.proposalChooser.model.rows[0].cells[0].text).toBe('Bar');
+      expect(field.popup.proposalChooser.model.rows[0].cells[1].text).toBe('Bar column1');
+      expect(field.popup.proposalChooser.model.rows[0].cells[2].text).toBe('Bar column2');
     });
 
     it('with default lookup column in the middle renders lookup row column in the middle', function() {
@@ -993,10 +992,10 @@ describe('SmartField', function() {
       field.$field.val('Bar');
       field._onFieldKeyUp({});
       jasmine.clock().tick(500);
-      expect(field.popup.proposalChooser.model.rows[0].cells[0].text).toBe("Bar column1");
-      expect(field.popup.proposalChooser.model.rows[0].cells[1].text).toBe("Bar");
-      expect(field.popup.proposalChooser.model.rows[0].cells[2].text).toBe("Bar column2");
-      expect(field.popup.proposalChooser.model.rows[0].cells[2].cssClass).toBe("css-column2");
+      expect(field.popup.proposalChooser.model.rows[0].cells[0].text).toBe('Bar column1');
+      expect(field.popup.proposalChooser.model.rows[0].cells[1].text).toBe('Bar');
+      expect(field.popup.proposalChooser.model.rows[0].cells[2].text).toBe('Bar column2');
+      expect(field.popup.proposalChooser.model.rows[0].cells[2].cssClass).toBe('css-column2');
     });
   });
 

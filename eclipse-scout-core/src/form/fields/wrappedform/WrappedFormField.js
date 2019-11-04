@@ -21,7 +21,6 @@ export default class WrappedFormField extends FormField {
     this._formDestroyHandler = this._onInnerFormDestroy.bind(this);
   }
 
-
   _init(model) {
     super._init(model);
     this._setInnerForm(this.innerForm);

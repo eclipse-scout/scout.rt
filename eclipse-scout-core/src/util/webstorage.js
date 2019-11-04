@@ -48,7 +48,6 @@ export function clear(storage) {
   }
 }
 
-
 export default {
   clear,
   getItem,

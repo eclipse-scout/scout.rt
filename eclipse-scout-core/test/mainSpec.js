@@ -10,7 +10,6 @@
  */
 import {Menu, NullWidget, ObjectFactory, objects, scout, Status, Tooltip} from '../src/index';
 
-
 describe('main', function() {
   var session;
 

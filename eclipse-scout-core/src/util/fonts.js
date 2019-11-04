@@ -11,7 +11,6 @@
 import {graphics, scout, strings} from '../index';
 import * as $ from 'jquery';
 
-
 let _deferred = $.Deferred();
 
 /**
@@ -50,7 +49,7 @@ export function bootstrap(fonts) {
       }
       loadingComplete = true;
       _deferred.resolve();
-    }.bind(this)
+    }
   });
 
   return $.resolvedPromise();
@@ -197,7 +196,7 @@ export function preload(options) {
       // Remember DIV
       divs.push($div);
     }
-  }.bind(this));
+  });
   if (divs.length === 0) {
     // No fonts need to be watched, everything is loaded already
     complete(true);
@@ -212,7 +211,7 @@ export function preload(options) {
     timeoutTimerId = setTimeout(function() {
       clearTimeout(watchTimerId);
       complete(false);
-    }.bind(this), timeout);
+    }, timeout);
     onFinished = function() {
       clearTimeout(timeoutTimerId);
       complete(true);

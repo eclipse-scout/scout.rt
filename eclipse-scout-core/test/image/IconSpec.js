@@ -10,7 +10,6 @@
  */
 import {icons, scout} from '../../src/index';
 
-
 describe('Icon', function() {
 
   var session;

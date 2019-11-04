@@ -19,7 +19,6 @@ export default class Mode extends Action {
     this.ref = null; // Arbitrary reference value, can be used to find and select modes (see ModeSelector.js)
   }
 
-
   _init(model) {
     model.owner = model.parent;
     super._init(model);

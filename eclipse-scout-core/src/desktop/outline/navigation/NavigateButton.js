@@ -35,7 +35,6 @@ export default class NavigateButton extends Menu {
     this.inheritAccessibility = false;
   }
 
-
   /**
    * @override
    */

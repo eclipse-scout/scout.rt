@@ -11,8 +11,7 @@
 import {DecimalFormat, RoundingMode} from '../../src/index';
 import {LocaleSpecHelper} from '@eclipse-scout/testing';
 
-
-describe("DecimalFormat", function() {
+describe('DecimalFormat', function() {
   var locale;
   var helper;
 
@@ -26,24 +25,24 @@ describe("DecimalFormat", function() {
     locale = null;
   });
 
-  describe("constructor", function() {
-    it("uses the pattern from the options", function() {
+  describe('constructor', function() {
+    it('uses the pattern from the options', function() {
       var decimalFormat = new DecimalFormat(locale, {
         pattern: '###0.00'
       });
       expect(decimalFormat.pattern).toBe('###0.00');
     });
 
-    it("if the options parameter is a string, it assumes it is the pattern", function() {
+    it('if the options parameter is a string, it assumes it is the pattern', function() {
       // mainly done to be consistent with the DateFormat.js
       var decimalFormat = new DecimalFormat(locale, '###0.00');
       expect(decimalFormat.pattern).toBe('###0.00');
     });
   });
 
-  describe("format", function() {
+  describe('format', function() {
 
-    it("considers decimal separators", function() {
+    it('considers decimal separators', function() {
       var decimalFormat = new DecimalFormat(locale, {
         pattern: '###0.00'
       });
@@ -75,7 +74,7 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(1000.1234)).toBe('1000,12');
     });
 
-    it("considers grouping separators", function() {
+    it('considers grouping separators', function() {
       var decimalFormat = new DecimalFormat(locale, {
         pattern: '#,##0.00'
       });
@@ -100,7 +99,7 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(100005121000.1234)).toBe('100.005.121.000,12');
     });
 
-    it("can swap the position of the minus sign", function() {
+    it('can swap the position of the minus sign', function() {
       var decimalFormat = new DecimalFormat(locale, {
         pattern: '0.0-' // Group separator after decimal separator, 0 after #
       });
@@ -110,7 +109,7 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(-14.234)).toBe('14.2-');
     });
 
-    it("can handle invalid patterns", function() {
+    it('can handle invalid patterns', function() {
       var decimalFormat = new DecimalFormat(locale, {
         pattern: '#.##0,00' // Group separator after decimal separator, 0 after #
       });
@@ -121,7 +120,7 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(50121000.1234567)).toBe('50121000.12346');
     });
 
-    it("distinguishes digits and zero digits", function() {
+    it('distinguishes digits and zero digits', function() {
       var decimalFormat = new DecimalFormat(locale, {
         pattern: '##0.#'
       });
@@ -159,7 +158,7 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(112)).toBe('112');
     });
 
-    it("can handle positive and negative subpattern", function() {
+    it('can handle positive and negative subpattern', function() {
       var decimalFormat = new DecimalFormat(locale, {
         pattern: '###0.00;minus 00.0#'
       });
@@ -209,7 +208,7 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(-924.566)).toBe('924.57-');
     });
 
-    it("can handle exotic symbols", function() {
+    it('can handle exotic symbols', function() {
       locale.decimalFormatSymbols.minusSign = 'M';
       locale.decimalFormatSymbols.decimalSeparator = '!!';
       locale.decimalFormatSymbols.groupingSeparator = '~';
@@ -229,7 +228,7 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(-1)).toBe('M1!!00');
     });
 
-    it("can handle percentages, format taken from application", function() {
+    it('can handle percentages, format taken from application', function() {
       locale.decimalFormatSymbols.minusSign = 'M';
       locale.decimalFormatSymbols.decimalSeparator = '!';
       locale.decimalFormatSymbols.groupingSeparator = '~';
@@ -246,7 +245,7 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(-1)).toBe('M1!00%');
     });
 
-    it("can handle multiplier", function() {
+    it('can handle multiplier', function() {
       locale.decimalFormatSymbols.minusSign = 'M';
       locale.decimalFormatSymbols.decimalSeparator = '!';
       locale.decimalFormatSymbols.groupingSeparator = '~';
@@ -292,7 +291,7 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.round(-1.008)).toBe(-1.01);
     });
 
-    it("can handle rounding mode", function() {
+    it('can handle rounding mode', function() {
       locale.decimalFormatSymbols.minusSign = 'M';
       locale.decimalFormatSymbols.decimalSeparator = '!';
       locale.decimalFormatSymbols.groupingSeparator = '~';
@@ -320,8 +319,8 @@ describe("DecimalFormat", function() {
 
   });
 
-  describe("round", function() {
-    it("can handle rounding modes", function() {
+  describe('round', function() {
+    it('can handle rounding modes', function() {
       locale.decimalFormatSymbols.minusSign = 'M';
       locale.decimalFormatSymbols.decimalSeparator = '!';
       locale.decimalFormatSymbols.groupingSeparator = '~';

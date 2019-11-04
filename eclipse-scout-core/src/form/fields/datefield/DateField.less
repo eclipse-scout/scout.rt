@@ -54,8 +54,8 @@
     color: @text-field-icon-focus-color;
   }
 
-  &:not(.disabled)&:not(.compact-date) > .field {
-    & > .icon.date{
+  &:not(.disabled) &:not(.compact-date) > .field {
+    & > .icon.date {
       display: block;
     }
 
@@ -68,8 +68,8 @@
     }
   }
 
-  &:not(.disabled)&:not(.compact-time) > .field {
-    & > .icon.time{
+  &:not(.disabled) &:not(.compact-time) > .field {
+    & > .icon.time {
       display: block;
     }
 
@@ -101,7 +101,7 @@
       color: @highlight-color;
     }
 
-    & > .field >  .date-clear {
+    & > .field > .date-clear {
       display: block;
     }
 
@@ -137,7 +137,7 @@
       color: @highlight-color;
     }
 
-    & > .field >  .time-clear {
+    & > .field > .time-clear {
       display: block;
     }
 
@@ -166,6 +166,7 @@
   }
 
   /** Prediction input field is in the back of the actual input field -> make actual input field transparent */
+
   & > .predict {
     color: @disabled-color;
     background-color: @control-background-color;
