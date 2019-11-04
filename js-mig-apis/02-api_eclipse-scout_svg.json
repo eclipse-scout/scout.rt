@@ -1,0 +1,66 @@
+{
+  "name" : "scout",
+  "type" : "Library",
+  "fullyQualifiedName" : "scout",
+  "customAttributes" : {
+    "lib-moduleName" : "@eclipse-scout/svg"
+  },
+  "children" : [ {
+    "name" : "SvgFieldAdapter",
+    "type" : "Class",
+    "fullyQualifiedName" : "scout.SvgFieldAdapter",
+    "children" : [ {
+      "type" : "Constructor",
+      "fullyQualifiedName" : "scout.SvgFieldAdapter"
+    }, {
+      "name" : "_onWidgetAppLinkAction",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.SvgFieldAdapter._onWidgetAppLinkAction"
+    }, {
+      "name" : "_onWidgetEvent",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.SvgFieldAdapter._onWidgetEvent"
+    } ]
+  }, {
+    "name" : "SvgField",
+    "type" : "Class",
+    "fullyQualifiedName" : "scout.SvgField",
+    "children" : [ {
+      "type" : "Constructor",
+      "fullyQualifiedName" : "scout.SvgField"
+    }, {
+      "name" : "_render",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.SvgField._render"
+    }, {
+      "name" : "_renderProperties",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.SvgField._renderProperties"
+    }, {
+      "name" : "_initKeyStrokeContext",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.SvgField._initKeyStrokeContext"
+    }, {
+      "name" : "_renderSvgDocument",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.SvgField._renderSvgDocument"
+    }, {
+      "name" : "_onAppLinkAction",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.SvgField._onAppLinkAction"
+    }, {
+      "name" : "_triggerAppLinkAction",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.SvgField._triggerAppLinkAction"
+    } ]
+  }, {
+    "name" : "window",
+    "type" : "Utility",
+    "fullyQualifiedName" : "window",
+    "children" : [ {
+      "name" : "scout",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "window.scout"
+    } ]
+  } ]
+}
