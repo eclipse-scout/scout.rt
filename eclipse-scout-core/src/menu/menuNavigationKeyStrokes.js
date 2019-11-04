@@ -28,23 +28,7 @@ export function _findMenuItems(popup, menuItemClass) {
   };
 }
 
-export function _changeSelection($oldItem, $newItem) {
-  if ($newItem.length === 0) {
-    // do not change selection
-    return;
-  }
-  $newItem.select(true).focus();
-  if (field.updateNextToSelected) {
-    field.updateNextToSelected(_menuItemClass, $newItem);
-  }
-
-  if ($oldItem.length > 0) {
-    $oldItem.select(false);
-  }
-}
-
 export default {
   registerKeyStrokes,
-  _findMenuItems,
-  _changeSelection
+  _findMenuItems
 };

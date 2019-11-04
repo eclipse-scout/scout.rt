@@ -103,7 +103,7 @@ public final class SeleniumJavaScript {
    * Enables/Disables responsive mode.
    */
   public static void setResponsiveEnabled(AbstractSeleniumTest test, boolean enabled) {
-    executeScript(test, "scout.responsiveManager.setActive(" + ((enabled) ? "true" : "false") + ");");
+    executeScript(test, "scout.ResponsiveManager.get().setActive(" + ((enabled) ? "true" : "false") + ");");
   }
 
 }

@@ -22,9 +22,9 @@ export default class MenuNavigationDownKeyStroke extends MenuNavigationKeyStroke
   handle(event) {
     var menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
     if (menuItems.$selected.length > 0) {
-      menuNavigationKeyStrokes._changeSelection.call(this, menuItems.$selected, menuItems.$selected.nextAll(':visible').first());
+      this._changeSelection(menuItems.$selected, menuItems.$selected.nextAll(':visible').first());
     } else {
-      menuNavigationKeyStrokes._changeSelection.call(this, menuItems.$selected, menuItems.$allVisible.first());
+      this._changeSelection(menuItems.$selected, menuItems.$allVisible.first());
     }
   }
 }
