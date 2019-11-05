@@ -815,7 +815,7 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
         this.responseQueue.process(data);
       }
     } else if (data.sessionTerminated) {
-      $.log.warn('Session terminated, stopped polling for background jobs');
+      $.log.info('Session terminated, stopped polling for background jobs');
       this.backgroundJobPollingSupport.setStopped();
       // If were are not yet logged out, redirect to the logout URL (the session that initiated the
       // session invalidation will receive a dedicated logout event, redirect is handled there).
