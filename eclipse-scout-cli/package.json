@@ -22,9 +22,9 @@
     "scripts"
   ],
   "scripts": {
-    "snapshot-version": "node scripts/snapshot-version",
-    "release-version": "node scripts/release-version",
-    "snapshot-cleanup": "node scripts/snapshot-cleanup"
+    "snapshot-version": "node bin/scout-scripts snapshot-version",
+    "release-version": "node bin/scout-scripts release-version",
+    "snapshot-cleanup": "node bin/scout-scripts snapshot-cleanup"
   },
   "dependencies": {
     "@babel/cli": "7.6.4",
