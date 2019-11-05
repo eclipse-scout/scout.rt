@@ -62,6 +62,14 @@
             <include>**/*.less</include>
           </includes>
         </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+          <directory></directory>
+          <includes>
+            <include>**/*.gitignore</include>
+            <include>**/*.js</include>
+            <include>**/*.json</include>
+          </includes>
+        </fileSet>
         <fileSet filtered="false" encoding="UTF-8">
           <directory>src/main/resources</directory>
           <includes>
@@ -71,8 +79,7 @@
         </fileSet>
       </fileSets>
     </module>
-    <module id="app.dev" dir="__rootArtifactId__.app.dev"
-      name="app.dev">
+    <module id="app.dev" dir="__rootArtifactId__.app.dev" name="app.dev">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
           <directory></directory>
@@ -96,8 +103,7 @@
         </fileSet>
       </fileSets>
     </module>
-    <module id="app.war" dir="__rootArtifactId__.app.war"
-      name="app.war">
+    <module id="app.war" dir="__rootArtifactId__.app.war" name="app.war">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/resources</directory>
@@ -143,8 +149,7 @@
         </fileSet>
       </fileSets>
     </module>
-    <module id="core.test" dir="__rootArtifactId__.core.test"
-      name="core.test">
+    <module id="core.test" dir="__rootArtifactId__.core.test" name="core.test">
       <fileSets>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">
           <directory>src/test/java</directory>
@@ -200,8 +205,7 @@
         </fileSet>
       </fileSets>
     </module>
-    <module id="persistence" dir="__rootArtifactId__.persistence"
-      name="persistence">
+    <module id="persistence" dir="__rootArtifactId__.persistence" name="persistence">
       <fileSets>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">
           <directory>src/generated/java</directory>
@@ -223,8 +227,7 @@
         </fileSet>
       </fileSets>
     </module>
-    <module id="persistence.test"
-      dir="__rootArtifactId__.persistence.test" name="persistence.test">
+    <module id="persistence.test" dir="__rootArtifactId__.persistence.test" name="persistence.test">
       <fileSets>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">
           <directory>src/test/java</directory>
@@ -248,13 +251,15 @@
           <includes>
             <include>**/*.launch</include>
             <include>**/*.jshintrc</include>
+            <include>**/*.gitignore</include>
+            <include>**/*.json</include>
+            <include>**/*.js</include>
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/js</directory>
           <includes>
             <include>**/*.js</include>
-            <include>**/*.json</include>
             <include>**/*.less</include>
           </includes>
         </fileSet>
@@ -268,9 +273,7 @@
           <directory>src/test/js</directory>
           <includes>
             <include>**/*.js</include>
-            <include>**/*.json</include>
             <include>**/*.less</include>
-            <include>**/*.html</include>
           </includes>
         </fileSet>
       </fileSets>

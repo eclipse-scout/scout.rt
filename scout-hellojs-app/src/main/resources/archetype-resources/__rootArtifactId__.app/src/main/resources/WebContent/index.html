@@ -3,16 +3,15 @@
   <head>
     <meta charset="UTF-8">
     <title>${displayName}</title>
-    <scout:include template="head.html" />
-    <scout:stylesheet src="res/libs-all-macro.less" />
-    <scout:stylesheet src="res/${simpleArtifactName}-all-macro.less" />
-    <scout:script src="res/libs-all-macro.js" />
-    <scout:script src="res/${simpleArtifactName}-all-macro.js" />
-    <scout:script src="res/index.js" />
+    <scout:include template="includes/head.html" />
+    <scout:stylesheet src="${simpleArtifactName}-theme.css" />
   </head>
   <body>
-    <scout:include template="no-script.html" />
+    <scout:include template="includes/no-script.html" />
     <div class="scout" data-partid="1"></div>
     <scout:version />
+    <scout:script src="jquery.js"/>
+    <scout:script src="eclipse-scout.js"/>
+    <scout:script src="${simpleArtifactName}.js"/>
   </body>
 </html>

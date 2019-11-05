@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8">
     <title><scout:message key="ui.LoadingPopupWindow" /></title>
-    <scout:include template="head.html" />
-    <scout:stylesheet src="res/${simpleArtifactName}-all-macro.less" />
+    <scout:include template="includes/head.html" />
+    <scout:stylesheet src="${simpleArtifactName}-theme.css" />
   </head>
   <body>
     <div class="scout"></div>
-    <scout:script src="res/popup-window.js" />
+    <scout:script src="popup-window.js" />
   </body>
 </html>
