@@ -57,11 +57,25 @@ switch (script) {
     break;
   }
   case 'snapshot-version': {
-    require('../scripts/snapshot-version');
+    const updateVersionScript = require('../scripts/updateVersion');
+    updateVersionScript.generateSnapshotVersion()
+      .then(() => console.log('snapshot version done'))
+      .catch(e => {
+        console.error('snapshot version failed');
+        console.error(e);
+        process.exit(1);
+      });
     break;
   }
   case 'release-version': {
-    require('../scripts/release-version');
+    const updateVersionScript = require('../scripts/updateVersion');
+    updateVersionScript.updateVersionAndDependencies()
+      .then(() => console.log('Update version done'))
+      .catch(e => {
+        console.error('Update version failed');
+        console.error(e);
+        process.exit(1);
+      });
     break;
   }
   case 'snapshot-cleanup': {

@@ -3,53 +3,33 @@ Creates a snapshot version by using the prerelease tag snapshot and appending th
 The package.json is updated with the new version and the package is ready to be published.
 After the publish you should revert the package.json to its initial state.
  */
-const path = require('path');
-const packageJson = require(path.resolve('./package.json'));
 
-let timestamp = new Date().toISOString(); // UTC
+const generateSnapshotVersion = async() => {
+  const path = require('path');
+  const filename = './package.json';
+  const packageJson = require(path.resolve(filename));
 
-// Create a string with the pattern yyyyMMddHHmmss
-timestamp = timestamp.replace(/[-:.TZ]/g, '');
-timestamp = timestamp.substr(0, timestamp.length - 3);
+  let timestamp = new Date().toISOString(); // UTC
 
-const oldVersion = packageJson.version;
-const cleanedVersion = oldVersion.replace(/-snapshot(.)*/i, '');
-const newVersion = `${cleanedVersion}-snapshot.${timestamp}`;
+  // Create a string with the pattern yyyyMMddHHmmss
+  timestamp = timestamp.replace(/[-:.TZ]/g, '');
+  timestamp = timestamp.substr(0, timestamp.length - 3);
 
-const npmlog = require('npm/node_modules/npmlog');
-const npm = require('npm');
+  const oldVersion = packageJson.version;
+  const cleanedVersion = oldVersion.replace(/-snapshot(.)*/i, '');
+  const newVersion = `${cleanedVersion}-snapshot.${timestamp}`;
 
-npmlog.on('log', msg => {
-  const {level} = msg;
-  if (level === 'info' || level === 'error' || level === 'warn') {
-    console.log({msg});
-  }
-});
+  console.log(`New Version: ${newVersion}`);
+  packageJson.version = newVersion;
 
-npm.load({
-  'loaded': false,
-  'progress': false,
-  'no-audit': true
-}, err => {
-  // handle errors
-  if (err) {
-    console.error(err);
-  }
+  const fsp = require('fs').promises;
+  await fsp.writeFile(filename, JSON.stringify(packageJson, null, 2));
+};
 
-  // install module
-  npm.commands.version([newVersion], (er, data) => {
-    if (err) {
-      console.error(err);
-    }
-    // log errors or data
-    if (data) {
-      console.log('done');
-    }
+generateSnapshotVersion()
+  .then(() => console.log('snapshot version done'))
+  .catch(e => {
+    console.error('snapshot version failed');
+    console.error(e);
+    process.exit(1);
   });
-
-  npm.on('log', message => {
-    // log installation progress
-    console.log(message);
-  });
-});
-console.log(`New Version: ${newVersion}`);

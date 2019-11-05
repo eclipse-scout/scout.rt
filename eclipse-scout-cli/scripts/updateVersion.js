@@ -40,7 +40,7 @@ const updateDepencies = (dependencies, regex, version, verbose) => {
   }
 };
 
-const updateVersion = async() => {
+const updateVersionAndDependencies = async() => {
   const yargs = require('yargs');
   const path = require('path');
   const argv = yargs
@@ -88,10 +88,40 @@ const updateVersion = async() => {
   await writeFile(fileName, packageJson, argv.verbose);
 };
 
-updateVersion()
-  .then(() => console.log('Update version done'))
-  .catch(e => {
-    console.error('Update version failed');
-    console.error(e);
-    process.exit(1);
-  });
+const generateSnapshotVersion = async() => {
+  const yargs = require('yargs');
+  const path = require('path');
+  const argv = yargs
+    .option('verbose', {
+      description: 'More Logging',
+      type: 'boolean',
+      default: false
+    })
+    .argv;
+
+  const filename = './package.json';
+  const packageJson = require(path.resolve(filename));
+
+  let timestamp = new Date().toISOString(); // UTC
+
+  // Create a string with the pattern yyyyMMddHHmmss
+  timestamp = timestamp.replace(/[-:.TZ]/g, '');
+  timestamp = timestamp.substr(0, timestamp.length - 3);
+
+  const oldVersion = packageJson.version;
+  const cleanedVersion = oldVersion.replace(/-snapshot(.)*/i, '');
+  const newVersion = `${cleanedVersion}-snapshot.${timestamp}`;
+
+  if (argv.verbose) {
+    console.log(`old version was: ${oldVersion}`);
+  }
+  console.log(`New Version: ${newVersion}`);
+  packageJson.version = newVersion;
+
+  await writeFile(filename, packageJson, argv.verbose);
+};
+
+module.exports = {
+  generateSnapshotVersion,
+  updateVersionAndDependencies
+};
