@@ -1,0 +1,33 @@
+{
+  "name": "${rootArtifactId}",
+  "version": "${version}",
+  "engines": {
+    "node": ">=12.1.0",
+    "npm": ">=6.9.0",
+    "pnpm": ">=4"
+  },
+  "main": "./src/main/js/index.js",
+  "files": [
+    "dist",
+    "src/main/js"
+  ],
+  "scripts": {
+    "testserver:start": "scout-scripts test-server:start",
+    "testserver:stop": "scout-scripts test-server:stop",
+    "test:ci": "scout-scripts test:ci",
+    "build:dev": "scout-scripts build:dev",
+    "build:prod": "scout-scripts build:prod",
+    "build:all": "scout-scripts build:dev && scout-scripts build:prod",
+    "build:dev:watch": "scout-scripts build:dev:watch",
+    "snapshot-version": "scout-scripts snapshot-version",
+    "snapshot-cleanup": "scout-scripts snapshot-cleanup"
+  },
+  "devDependencies": {
+    "@eclipse-scout/cli": "^10.0.0-snapshot",
+    "@eclipse-scout/testing": "^10.0.0-snapshot"
+  },
+  "dependencies": {
+    "@eclipse-scout/core": "^10.0.0-snapshot",
+    "jquery": "3.4.1"
+  }
+}

@@ -3,14 +3,15 @@
   <head>
     <meta charset="UTF-8">
     <title>${displayName}</title>
-    <scout:include template="head.html" />
-    <scout:stylesheet src="res/scout-login-module.less" />
-    <scout:script src="res/jquery-all-macro.js" />
-    <scout:script src="res/scout-login-module.js" />
-    <scout:script src="res/login.js" />
+    <scout:include template="includes/head.html" />
+    <scout:stylesheet src="theme.css" />
   </head>
   <body>
-    <scout:include template="no-script.html" />
+    <scout:include template="includes/no-script.html" />
+    <div class="scout" data-partid="1"></div>
     <scout:message style="tag" key="ui.Login" key="ui.LoginFailed" key="ui.User" key="ui.Password" />
+    <scout:script src="jquery.js"/>
+    <scout:script src="eclipse-scout.js"/>
+    <scout:script src="login.js" />
   </body>
 </html>
