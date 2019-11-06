@@ -16,7 +16,6 @@
     <orderEntry type="library" name="Maven: org.jboss:jandex:2.0.5.Final" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:2.3.2" level="project" />
-    <orderEntry type="library" name="Maven: com.zaxxer:HikariCP-java7:2.4.13" level="project" />
     <orderEntry type="library" name="Maven: javax.ws.rs:javax.ws.rs-api:2.1.1" level="project" />
     <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.3.1" level="project" />
     <orderEntry type="library" name="Maven: javax.activation:javax.activation-api:1.2.0" level="project" />
