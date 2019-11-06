@@ -160,15 +160,19 @@ export function _get(id, type) {
  *
  * The extension property can be an object or an array of objects.
  *
- * @param extension
- *          extension to the parentModel
- * @param parentModel
+ * @param extension {Object|string|function|}
+ *          extension to the parentModel.
+ * @param parentModel {Object}
  *          object which contains id's as properties
  * @returns parentModel extended by extension
  */
 export function extend(extension, parentModel) {
   if (typeof extension === 'string') {
     extension = getExtension(extension);
+  }
+
+  if (typeof extension === 'function') {
+    extension = extension();
   }
 
   scout.assertParameter('extensions', extension.extensions);
