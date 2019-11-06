@@ -15,28 +15,27 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.commons.authentication.DevelopmentAccessController;
-import org.eclipse.scout.rt.server.commons.authentication.DevelopmentAccessController.DevelopmentAuthConfig;
+import org.eclipse.scout.rt.server.commons.authentication.AnonymousAccessController;
 
 /**
  * <h3>{@link RestAuthFilter}</h3>
  */
 public class RestAuthFilter implements Filter {
 
-  private DevelopmentAccessController m_developmentAccessController;
+  private AnonymousAccessController m_anonymousAccessController;
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
-    m_developmentAccessController = BEANS.get(DevelopmentAccessController.class).init(new DevelopmentAuthConfig()
-        .withPutPrincipalOnSession(false));
+    m_anonymousAccessController = BEANS.get(AnonymousAccessController.class).init();
   }
 
   @Override
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+      throws IOException, ServletException {
     final HttpServletRequest req = (HttpServletRequest) request;
     final HttpServletResponse resp = (HttpServletResponse) response;
 
-    if (m_developmentAccessController.handle(req, resp, chain)) {
+    if (m_anonymousAccessController.handle(req, resp, chain)) {
       return;
     }
 
@@ -45,6 +44,6 @@ public class RestAuthFilter implements Filter {
 
   @Override
   public void destroy() {
-    m_developmentAccessController.destroy();
+    m_anonymousAccessController.destroy();
   }
 }
