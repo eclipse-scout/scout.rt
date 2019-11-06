@@ -2743,8 +2743,9 @@ export default class Tree extends Widget {
   }
 
   removeFilter(filter, notAnimated) {
-    arrays.remove(this._filters, filter);
-    this.filter(notAnimated);
+    if (arrays.remove(this._filters, filter)) {
+      this.filter(notAnimated);
+    }
   }
 
   filter(notAnimated) {
