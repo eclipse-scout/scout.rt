@@ -481,6 +481,10 @@ export default class DatePicker extends Widget {
       event.preventDefault();
     });
 
+    this.$scrollable.on('remove', function(event) {
+      $window.off('.datepickerDrag');
+    });
+
     this.$scrollable.on(events.touchdown(this.touch), function(event) {
       var origPageX = events.pageX(event);
       var moveX = 0;
