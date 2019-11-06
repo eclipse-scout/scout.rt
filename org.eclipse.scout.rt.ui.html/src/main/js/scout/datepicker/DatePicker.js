@@ -477,6 +477,10 @@ scout.DatePicker.prototype._registerSwipeHandlers = function() {
     event.preventDefault();
   });
 
+  this.$scrollable.on('remove', function(event) {
+    $window.off('.datepickerDrag');
+  });
+
   this.$scrollable.on(scout.events.touchdown(this.touch), function(event) {
     var origPageX = scout.events.pageX(event);
     var moveX = 0;
