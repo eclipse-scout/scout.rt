@@ -129,9 +129,8 @@ window.stripCommentsFromJson = function(input) {
           break; // end of string
         }
       }
-    }
-    // Handle multi-line comments
-    else if (currentCharacter === '/' && nextCharacter === '*') {
+    } else if (currentCharacter === '/' && nextCharacter === '*') {
+      // Handle multi-line comments
       for (i++; i < input.length; i++) {
         previousCharacter = input.charAt(i - 1);
         currentCharacter = input.charAt(i);
@@ -140,9 +139,8 @@ window.stripCommentsFromJson = function(input) {
           break; // end of multi-line comment
         }
       }
-    }
-    // Handle single-line comment
-    else if (currentCharacter === '/' && nextCharacter === '/') {
+    } else if (currentCharacter === '/' && nextCharacter === '/') {
+      // Handle single-line comment
       for (i++; i < input.length; i++) {
         previousCharacter = input.charAt(i - 1);
         currentCharacter = input.charAt(i);
@@ -151,9 +149,8 @@ window.stripCommentsFromJson = function(input) {
           break; // end of single-line comment
         }
       }
-    }
-    // regular character
-    else {
+    } else {
+      // regular character
       // Flush whitespace to result
       result += whitespaceBuffer;
       whitespaceBuffer = '';

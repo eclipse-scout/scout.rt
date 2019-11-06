@@ -96,7 +96,7 @@ export default class TreeSpecHelper {
     var tree = new TreeAdapter();
     tree.init(model);
     return tree;
-  };
+  }
 
   findAllNodes(tree) {
     return tree.$container.find('.tree-node');

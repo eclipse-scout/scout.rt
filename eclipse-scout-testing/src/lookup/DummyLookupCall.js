@@ -24,7 +24,7 @@ export default class DummyLookupCall extends StaticLookupCall {
       [2, 'Bar', 1],
       [3, 'Baz', 1]
     ];
-  };
+  }
 
   _dataToLookupRow(data) {
     var lookupRow = super._dataToLookupRow(data);
@@ -35,6 +35,5 @@ export default class DummyLookupCall extends StaticLookupCall {
       lookupRow.text = '1:' + lookupRow.text + '\n2:' + lookupRow.text;
     }
     return lookupRow;
-  };
-
+  }
 }

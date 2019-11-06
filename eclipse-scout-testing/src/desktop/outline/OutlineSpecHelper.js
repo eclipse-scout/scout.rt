@@ -12,7 +12,6 @@ import {Outline, OutlineAdapter} from '@eclipse-scout/core';
 import {FormSpecHelper, TableSpecHelper} from '../../index';
 import * as $ from 'jquery';
 
-
 export default class OutlineSpecHelper {
   constructor(session) {
     this.session = session;
@@ -20,7 +19,7 @@ export default class OutlineSpecHelper {
 
   createModelFixture(nodeCount, depth, expanded) {
     return this.createModel(this.createModelNodes(nodeCount, depth, expanded));
-  };
+  }
 
   createModel(nodes) {
     var model = createSimpleModel('Outline', this.session);
@@ -28,18 +27,18 @@ export default class OutlineSpecHelper {
       model.nodes = nodes;
     }
     return model;
-  };
+  }
 
   createModelNode(id, text) {
     return {
-      "id": id,
-      "text": text
+      'id': id,
+      'text': text
     };
-  };
+  }
 
   createModelNodes(nodeCount, depth, expanded) {
     return this.createModelNodesInternal(nodeCount, depth, expanded);
-  };
+  }
 
   createModelNodesInternal(nodeCount, depth, expanded, parentNode) {
     if (!nodeCount) {
@@ -63,7 +62,7 @@ export default class OutlineSpecHelper {
       }
     }
     return nodes;
-  };
+  }
 
   createOutline(model) {
     var defaults = {
@@ -73,13 +72,13 @@ export default class OutlineSpecHelper {
     var tree = new Outline();
     tree.init(model);
     return tree;
-  };
+  }
 
   createOutlineAdapter(model) {
     var outlineAdapter = new OutlineAdapter();
     outlineAdapter.init(model);
     return outlineAdapter;
-  };
+  }
 
   /**
    * Creates an outline with 3 nodes, the first node has a visible detail form
@@ -93,7 +92,7 @@ export default class OutlineSpecHelper {
     });
     node.detailFormVisible = true;
     return outline;
-  };
+  }
 
   /**
    * Creates an outline with 3 nodes, the first node has a visible detail table
@@ -105,6 +104,6 @@ export default class OutlineSpecHelper {
     node.detailTable = new TableSpecHelper(this.session).createTableWithOneColumn();
     node.detailTableVisible = true;
     return outline;
-  };
+  }
 
 }

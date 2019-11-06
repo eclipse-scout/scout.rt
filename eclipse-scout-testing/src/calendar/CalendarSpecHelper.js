@@ -33,7 +33,7 @@ export default class CalendarSpecHelper {
 
   createSimpleModel() {
     var c = createSimpleModel('Calendar', this.session);
-    c.selectedDate = "2016-07-20 14:09:28.556";
+    c.selectedDate = '2016-07-20 14:09:28.556';
     c.startHour = 6;
     c.displayMode = Calendar.DisplayMode.DAY;
     return c;
@@ -54,4 +54,4 @@ export default class CalendarSpecHelper {
     }
     return c;
   }
-};
+}

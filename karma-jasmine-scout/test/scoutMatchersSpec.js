@@ -9,9 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-describe("JasmineScout", function() {
+describe('JasmineScout', function() {
 
-  describe("toContainEventTypesExactly", function() {
+  describe('toContainEventTypesExactly', function() {
 
     function createRequestDataFixture() {
       var requestData = {};
@@ -23,7 +23,7 @@ describe("JasmineScout", function() {
       return requestData;
     }
 
-    it("checks whether event types in correct order", function() {
+    it('checks whether event types in correct order', function() {
       var matcher = jasmineScoutMatchers.toContainEventTypesExactly(jasmine.matchersUtil),
         result;
 
@@ -39,7 +39,7 @@ describe("JasmineScout", function() {
       expect(result.pass).toBeFalsy();
     });
 
-    it("checks whether event types are complete", function() {
+    it('checks whether event types are complete', function() {
       var matcher = jasmineScoutMatchers.toContainEventTypesExactly(jasmine.matchersUtil),
         result;
 
@@ -52,7 +52,7 @@ describe("JasmineScout", function() {
       expect(result.pass).toBeFalsy();
     });
 
-    it("considers empty values", function() {
+    it('considers empty values', function() {
       var matcher = jasmineScoutMatchers.toContainEventTypesExactly(jasmine.matchersUtil),
         result;
 

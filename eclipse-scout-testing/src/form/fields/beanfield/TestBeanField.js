@@ -14,7 +14,7 @@ export default class TestBeanField extends BeanField {
   _render() {
     super._render();
     this.$container.addClass('test-bean-field');
-  };
+  }
 
   _renderValue() {
     this.$field.empty();
@@ -27,5 +27,5 @@ export default class TestBeanField extends BeanField {
 
     this.$field.appendDiv('msg-text')
       .textOrNbsp(this.value.message);
-  };
+  }
 }

@@ -21,7 +21,7 @@ export default class TableSpecHelper {
   createModel(columns, rows) {
     var model = createSimpleModel('Table', this.session);
 
-    //Server will never send undefined -> don't create model with undefined properties.
+    // Server will never send undefined -> don't create model with undefined properties.
     if (rows) {
       model.rows = rows;
     }

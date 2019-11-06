@@ -20,7 +20,7 @@ export default class FormSpecHelper {
     var form = this.createFormWithOneField(model);
     form.displayHint = Form.DisplayHint.VIEW;
     return form;
-  };
+  }
 
   createFormWithOneField(model) {
     var defaults = {
@@ -31,11 +31,11 @@ export default class FormSpecHelper {
     var rootGroupBox = this.createGroupBoxWithFields(form, 1);
     form._setRootGroupBox(rootGroupBox);
     return form;
-  };
+  }
 
   createGroupBoxWithOneField(parent, numFields) {
     return this.createGroupBoxWithFields(parent, 1);
-  };
+  }
 
   createGroupBoxWithFields(parent, numFields) {
     parent = scout.nvl(parent, this.session.desktop);
@@ -52,7 +52,7 @@ export default class FormSpecHelper {
     }
     groupBox.setProperty('fields', fields);
     return groupBox;
-  };
+  }
 
   createRadioButtonGroup(parent, numRadioButtons) {
     parent = scout.nvl(parent, this.session.desktop);
@@ -67,7 +67,7 @@ export default class FormSpecHelper {
       parent: parent,
       fields: fields
     });
-  };
+  }
 
   createFormWithFields(parent, isModal, numFields) {
     parent = scout.nvl(parent, this.session.desktop);
@@ -78,7 +78,7 @@ export default class FormSpecHelper {
     var rootGroupBox = this.createGroupBoxWithFields(form, numFields);
     form._setRootGroupBox(rootGroupBox);
     return form;
-  };
+  }
 
   createFieldModel(objectType, parent, modelProperties) {
     parent = scout.nvl(parent, this.session.desktop);
@@ -88,12 +88,12 @@ export default class FormSpecHelper {
       $.extend(model, modelProperties);
     }
     return model;
-  };
+  }
 
   createField(objectType, parent, modelProperties) {
     parent = parent || this.session.desktop;
     return scout.create(objectType, this.createFieldModel(objectType, parent, modelProperties));
-  };
+  }
 
   createModeSelector(parent, numModes) {
     parent = scout.nvl(parent, this.session.desktop);
@@ -108,6 +108,6 @@ export default class FormSpecHelper {
       parent: parent,
       modes: modes
     });
-  };
+  }
 
 }

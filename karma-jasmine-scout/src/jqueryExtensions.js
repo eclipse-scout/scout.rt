@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 /*
  * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials

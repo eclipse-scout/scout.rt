@@ -69,7 +69,7 @@ const jasmineScoutCloneMatchers = {
             pass: true
           };
 
-        }.bind(this);
+        };
         if (original[property] === clone[property]) {
           return {
             pass: false,

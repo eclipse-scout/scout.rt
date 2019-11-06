@@ -137,13 +137,12 @@ window.createSimpleModel = function(objectType, session, id) {
   };
 };
 
-
-export function startApp(app) {
+export function startApp(App) {
   // App initialization uses promises which are executed asynchronously
   // -> Use the clock to make sure all promise callbacks are executed before any test starts.
   jasmine.clock().install();
 
-  new app().init();
+  new App().init();
 
   jasmine.clock().tick(1000);
   jasmine.clock().uninstall();
@@ -155,4 +154,4 @@ export default {
     context.keys().forEach(context);
   },
   startApp
-}
+};

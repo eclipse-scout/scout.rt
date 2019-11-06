@@ -33,9 +33,8 @@ export default class LanguageDummyLookupCall extends StaticLookupCall {
       }
       if (this.multiline) {
         return '1:' + text + '\n2:' + text;
-      } else {
-        return text;
       }
+      return text;
     }
-  };
+  }
 }

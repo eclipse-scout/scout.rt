@@ -25,5 +25,5 @@ export default class ColumnDescriptorDummyLookupCall extends DummyLookupCall {
       column2: lookupRow.text + ' column2'
     };
     return lookupRow;
-  };
+  }
 }
