@@ -23,10 +23,10 @@
     "snapshot-cleanup": "scout-scripts snapshot-cleanup"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": "^10.0.0-snapshot"
+    "@eclipse-scout/cli": ">=10.0.0-snapshot <10.0.0"
   },
   "dependencies": {
-    "@eclipse-scout/core": "^10.0.0-snapshot",
+    "@eclipse-scout/core": ">=10.0.0-snapshot <10.0.0",
     "@${simpleArtifactName}/ui": "file:../${rootArtifactId}.ui/"
   }
 }
