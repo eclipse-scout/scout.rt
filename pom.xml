@@ -55,4 +55,30 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>release.checkin</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <defaultGoal>scm:add scm:checkin</defaultGoal>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-scm-plugin</artifactId>
+            <configuration>
+              <connectionType>developerConnection</connectionType>
+              <message>${master_release_checkinMessage}</message>
+              <basedir>${project.basedir}/..</basedir>
+              <includes>pom.xml,*/pom.xml,package.json,*/package.json</includes>
+              <excludes>**/node_modules/**</excludes>
+              <pushChanges>${master_release_pushChanges}</pushChanges>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
