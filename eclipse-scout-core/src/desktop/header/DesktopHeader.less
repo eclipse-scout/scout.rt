@@ -79,8 +79,14 @@
         color: @header-view-button-tab-color;
       }
     }
+  }
+}
 
-    :not(.in-background) &.selected {
+.desktop-header:not(.in-background) > .view-button-box {
+  & > .view-button-tab,
+  & > .view-tab > .view-button-tab,
+  & > .view-tab > .view-menu {
+    &.selected {
       background-color: @header-view-button-tab-active-background-color;
       color: @header-view-button-tab-active-color;
       height: 100%;
