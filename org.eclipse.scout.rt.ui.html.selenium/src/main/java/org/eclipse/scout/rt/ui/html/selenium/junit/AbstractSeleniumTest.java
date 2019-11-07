@@ -470,12 +470,14 @@ public abstract class AbstractSeleniumTest {
     return Keys.chord(getOsDependentCtrlKey(), "a");
   }
 
-  public CharSequence getCopyKeys() {
-    return Keys.chord(getOsDependentCtrlKey(), "c");
+  public void copy(WebElement element) {
+    Actions actions = new Actions(getDriver());
+    actions.moveToElement(element).keyDown(getOsDependentCtrlKey()).sendKeys("c").keyUp(getOsDependentCtrlKey()).build().perform();
   }
 
-  public CharSequence getPasteKeys() {
-    return Keys.chord(getOsDependentCtrlKey(), "v");
+  public void paste(WebElement element) {
+    Actions actions = new Actions(getDriver());
+    actions.moveToElement(element).keyDown(getOsDependentCtrlKey()).sendKeys("v").keyUp(getOsDependentCtrlKey()).build().perform();
   }
 
   public void doubleClickOnElement(WebElement element) {
