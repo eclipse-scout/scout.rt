@@ -30,12 +30,14 @@ const writeFile = async(fileName, file, verbose) => {
 };
 
 const updateDepencies = (dependencies, regex, version, verbose) => {
-  for (const moduleName of Object.keys(dependencies)) {
-    if (regex.test(moduleName)) {
-      if (verbose) {
-        console.log(`updating dependency: ${moduleName}: ${version}`);
+  if (dependencies) {
+    for (const moduleName of Object.keys(dependencies)) {
+      if (regex.test(moduleName)) {
+        if (verbose) {
+          console.log(`updating dependency: ${moduleName}: ${version}`);
+        }
+        dependencies[moduleName] = version;
       }
-      dependencies[moduleName] = version;
     }
   }
 };

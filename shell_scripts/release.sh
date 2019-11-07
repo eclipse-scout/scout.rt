@@ -60,6 +60,59 @@ _MAVEN_OPTS="$_MAVEN_OPTS -e -B"
 mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -T1 -Dmaster_test_forkCount=1 -f org.eclipse.scout.rt -N $_MAVEN_OPTS
 processError
 
+# Create workspace
+touch pnpm-workspace.yaml
+
+# Install node in eclipse-scout-cli
+mvn -f eclipse-scout-cli generate-resources
+
+export NODE=../eclipse-scout-cli/target/node/node
+export NPM_CLI=../eclipse-scout-cli/target/node/node_modules/npm/bin/npm-cli.js
+export PNPM=../eclipse-scout-cli/target/node/lib/node_modules/pnpm/bin/pnpm.js
+
+# Update versions
+cd eclipse-scout-cli
+$NODE $PNPM update
+$NODE $NPM_CLI run release-version --scripts-prepend-node-path -- --newVersion $TAG --mapping.0.regex @eclipse-scout --mapping.0.version $TAG
+processError
+cd ..
+
+cd karma-jasmine-scout
+$NODE $PNPM update
+$NODE $NPM_CLI run release-version --scripts-prepend-node-path -- --newVersion $TAG --mapping.0.regex @eclipse-scout --mapping.0.version $TAG
+processError
+cd ..
+
+cd eslint-config
+$NODE $PNPM update
+$NODE $NPM_CLI run release-version --scripts-prepend-node-path -- --newVersion $TAG --mapping.0.regex @eclipse-scout --mapping.0.version $TAG
+processError
+cd ..
+
+cd eclipse-scout-testing
+$NODE $PNPM update
+$NODE $NPM_CLI run release-version --scripts-prepend-node-path -- --newVersion $TAG --mapping.0.regex @eclipse-scout --mapping.0.version $TAG
+processError
+cd ..
+
+cd eclipse-scout-core
+$NODE $PNPM update
+$NODE $NPM_CLI run release-version --scripts-prepend-node-path -- --newVersion $TAG --mapping.0.regex @eclipse-scout --mapping.0.version $TAG
+processError
+cd ..
+
+cd eclipse-scout-testing
+$NODE $PNPM update
+$NODE $NPM_CLI run release-version --scripts-prepend-node-path -- --newVersion $TAG --mapping.0.regex @eclipse-scout --mapping.0.version $TAG
+processError
+cd ..
+
+cd org.eclipse.scout.rt.svg.ui.html
+$NODE $PNPM update
+$NODE $NPM_CLI run release-version --scripts-prepend-node-path -- --newVersion $TAG --mapping.0.regex @eclipse-scout --mapping.0.version $TAG
+processError
+cd ..
+
 $BASEDIR/build.sh -Dmaster_unitTest_failureIgnore=false $_MAVEN_OPTS
 processError
 
