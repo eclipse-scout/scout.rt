@@ -522,6 +522,22 @@ public abstract class AbstractSeleniumTest {
     return Keys.chord(getOsDependentCtrlKey(), "a");
   }
 
+  /**
+   * @deprecated use {@link AbstractSeleniumTest#copy(WebElement)} instead
+   */
+  @Deprecated
+  public CharSequence getCopyKeys() {
+    return Keys.chord(getOsDependentCtrlKey(), "c");
+  }
+
+  /**
+   * @deprecated use {@link AbstractSeleniumTest#paste(WebElement)} instead
+   */
+  @Deprecated
+  public CharSequence getPasteKeys() {
+    return Keys.chord(getOsDependentCtrlKey(), "v");
+  }
+
   public void copy(WebElement element) {
     Actions actions = new Actions(getDriver());
     actions.moveToElement(element).keyDown(getOsDependentCtrlKey()).sendKeys("c").keyUp(getOsDependentCtrlKey()).build().perform();
