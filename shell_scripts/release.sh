@@ -116,6 +116,9 @@ cd ..
 $BASEDIR/build.sh -Dmaster_unitTest_failureIgnore=false $_MAVEN_OPTS
 processError
 
+# cleanup node modules to avoid out-of-memory errors (java heap space) during scm-checkin
+find . -maxdepth 2 -type d -name node_modules -prune -exec rm -r {} \;
+
 mvn -Prelease.checkin -Declipse_gerrit_username=$GIT_USERNAME -f org.eclipse.scout.rt $_MAVEN_OPTS
 processError
 
