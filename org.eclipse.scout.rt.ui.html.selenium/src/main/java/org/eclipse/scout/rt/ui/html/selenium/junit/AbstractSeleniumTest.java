@@ -40,6 +40,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.common.base.Function;
 
+/**
+ *
+ */
 public abstract class AbstractSeleniumTest {
 
   public static final int DEFAULT_WAIT_UNTIL_TIMEOUT = 10; // seconds
@@ -521,6 +524,22 @@ public abstract class AbstractSeleniumTest {
 
   public CharSequence getSelectAllKeys() {
     return Keys.chord(getOsDependentCtrlKey(), "a");
+  }
+
+  /**
+   * @deprecated use {@link AbstractSeleniumTest#copy(WebElement)} instead
+   */
+  @Deprecated
+  public CharSequence getCopyKeys() {
+    return Keys.chord(getOsDependentCtrlKey(), "c");
+  }
+
+  /**
+   * @deprecated use {@link AbstractSeleniumTest#paste(WebElement)} instead
+   */
+  @Deprecated
+  public CharSequence getPasteKeys() {
+    return Keys.chord(getOsDependentCtrlKey(), "v");
   }
 
   public void copy(WebElement element) {
