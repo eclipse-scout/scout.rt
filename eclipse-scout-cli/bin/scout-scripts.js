@@ -163,6 +163,7 @@ function logWebpack(err, stats) {
   const info = stats.toJson();
   if (stats.hasErrors()) {
     console.error(info.errors);
+    process.exitCode = 1; // let the webpack build fail on errors
   }
   if (stats.hasWarnings()) {
     console.warn(info.warnings);
