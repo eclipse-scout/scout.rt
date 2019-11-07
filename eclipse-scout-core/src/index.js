@@ -657,6 +657,13 @@ export {default as LogoutApp} from './login/LogoutApp';
 export {default as LogoutBox} from './login/LogoutBox';
 
 import * as self from './index.js';
-
 export default self;
-window.scout = Object.assign(window.scout || {}, self);
+
+// Add all functions from the scout object to the scout object on the window
+import * as scout from './scout';
+var windowScout = {...self, ...scout};
+// noinspection JSUnresolvedVariable
+delete windowScout.scout;
+
+// Add the scout object to the window
+window.scout = Object.assign(window.scout || {}, windowScout);
