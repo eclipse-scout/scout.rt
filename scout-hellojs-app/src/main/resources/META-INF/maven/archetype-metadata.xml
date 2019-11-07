@@ -29,6 +29,7 @@
         <fileSet filtered="true" encoding="UTF-8">
           <directory></directory>
           <includes>
+            <include>**/*.launch</include>
             <include>**/*.xml</include>
           </includes>
         </fileSet>
@@ -67,6 +68,7 @@
           <includes>
             <include>**/*.gitignore</include>
             <include>**/*.js</include>
+            <include>**/*.launch</include>
             <include>**/*.json</include>
           </includes>
         </fileSet>

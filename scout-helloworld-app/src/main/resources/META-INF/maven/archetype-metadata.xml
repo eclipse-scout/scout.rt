@@ -42,6 +42,7 @@
           <directory></directory>
           <includes>
             <include>**/*.xml</include>
+            <include>**/*.launch</include>
           </includes>
         </fileSet>
       </fileSets>
@@ -185,16 +186,12 @@
     </module>
     <module id="ui.html" dir="__rootArtifactId__.ui.html" name="ui.html">
       <fileSets>
-        <fileSet filtered="false" encoding="UTF-8">
-          <directory></directory>
-          <includes>
-            <include>**/*.gitignore</include>
-          </includes>
-        </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
           <directory></directory>
           <includes>
+            <include>**/*.gitignore</include>
             <include>**/*.json</include>
+            <include>**/*.launch</include>
             <include>**/*.js</include>
           </includes>
         </fileSet>
