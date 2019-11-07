@@ -203,6 +203,22 @@
                   <unescape>true</unescape>
                 </configuration>
               </execution>
+              <execution>
+                <id>replace_scout_version_package_json</id>
+                <goals>
+                  <goal>replace</goal>
+                </goals>
+                <phase>generate-resources</phase>
+                <configuration>
+                  <basedir>${project.basedir}/src/main/resources/archetype-resources</basedir>
+                  <includes>
+                    <include>**/package.json</include>
+                  </includes>
+                  <token>"\\x3e?=?\\^?[\\d\\.]+-snapshot\\s*\\x3c?[\\d\\.]*"</token>
+                  <value>"${org.eclipse.scout.rt_version}"</value>
+                  <unescape>true</unescape>
+                </configuration>
+              </execution>
             </executions>
           </plugin>
         </plugins>
