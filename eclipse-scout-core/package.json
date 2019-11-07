@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/core",
-  "version": "10.0.0",
+  "version": "10.0.0-alpha.2",
   "description": "Eclipse Scout",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
@@ -36,8 +36,8 @@
     "snapshot-cleanup": "scout-scripts snapshot-cleanup"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": "^10.0.0-snapshot",
-    "@eclipse-scout/testing": "^10.0.0-snapshot"
+    "@eclipse-scout/cli": "10.0.0-alpha.2",
+    "@eclipse-scout/testing": "10.0.0-alpha.2"
   },
   "dependencies": {
     "jquery": "3.4.1"
