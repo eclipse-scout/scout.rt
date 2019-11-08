@@ -425,7 +425,7 @@ public class MailHelper {
           relatedPart.addBodyPart(plainHtmlPart);
 
           for (MailAttachment attachment : inlineAttachments) {
-            relatedPart.addBodyPart(createAttachmentPart(attachment, true));
+            relatedPart.addBodyPart(createAttachmentPart(attachment, true, m.getEncoding()));
           }
 
           m.setContent(relatedPart);
@@ -452,7 +452,7 @@ public class MailHelper {
           }
 
           for (MailAttachment attachment : attachments) {
-            multiPart.addBodyPart(createAttachmentPart(attachment, false));
+            multiPart.addBodyPart(createAttachmentPart(attachment, false, m.getEncoding()));
           }
 
           m.setContent(multiPart);
@@ -493,12 +493,12 @@ public class MailHelper {
    * @param inline
    *          <code>true</code> if it's an inline attachment, <code>false</code> otherwise.
    */
-  protected MimeBodyPart createAttachmentPart(MailAttachment attachment, boolean inline) throws MessagingException {
+  protected MimeBodyPart createAttachmentPart(MailAttachment attachment, boolean inline, String encoding) throws MessagingException {
     MimeBodyPart part = new MimeBodyPart();
     DataHandler handler = new DataHandler(attachment.getDataSource());
     part.setDataHandler(handler);
     if (StringUtility.hasText(attachment.getDataSource().getName())) {
-      part.setFileName(attachment.getDataSource().getName());
+      part.setFileName(encodeAttachmentFilename(attachment.getDataSource().getName(), encoding, null));
     }
     else {
       // part.setFilename would implicitly set disposition to attachment, but filename is null and therefore can not be set (would result in an npe)
@@ -589,7 +589,7 @@ public class MailHelper {
         MimeBodyPart bodyPart = new MimeBodyPart();
         DataSource source = new FileDataSource(attachment);
         bodyPart.setDataHandler(new DataHandler(source));
-        bodyPart.setFileName(MimeUtility.encodeText(attachment.getName(), "UTF-8", null));
+        bodyPart.setFileName(encodeAttachmentFilename(attachment.getName(), msg.getEncoding(), null));
         multiPart.addBodyPart(bodyPart);
       }
       msg.saveChanges();
@@ -622,7 +622,7 @@ public class MailHelper {
         MimeBodyPart bodyPart = new MimeBodyPart();
         DataSource source = new BinaryResourceDataSource(attachment);
         bodyPart.setDataHandler(new DataHandler(source));
-        bodyPart.setFileName(MimeUtility.encodeText(attachment.getFilename(), "UTF-8", null));
+        bodyPart.setFileName(encodeAttachmentFilename(attachment.getFilename(), msg.getEncoding(), null));
         multiPart.addBodyPart(bodyPart);
       }
       msg.saveChanges();
@@ -1032,6 +1032,29 @@ public class MailHelper {
     }
     catch (Exception e) {
       LOG.warn("Failed to clean attachment filename", e);
+      return filename;
+    }
+  }
+
+  /**
+   * Encodes an attachment filename.
+   *
+   * @param filename
+   * @param charset
+   * @param encoding
+   */
+  protected String encodeAttachmentFilename(String filename, String charset, String encoding) {
+    if (filename == null) {
+      return null;
+    }
+    if (StringUtility.isNullOrEmpty(charset)) {
+      charset = "UTF-8";
+    }
+    try {
+      return MimeUtility.encodeText(filename, charset, encoding);
+    }
+    catch (UnsupportedEncodingException e) {
+      LOG.warn("Failed to encode attachment filename", e);
       return filename;
     }
   }
