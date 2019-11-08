@@ -8,8 +8,7 @@
   },
   "main": "./src/main/js/index.js",
   "files": [
-    "dist",
-    "src/main/resources/WebContent"
+    "dist"
   ],
   "scripts": {
     "testserver:start": "scout-scripts test-server:start",

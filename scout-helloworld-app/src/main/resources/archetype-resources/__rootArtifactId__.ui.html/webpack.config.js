@@ -5,11 +5,11 @@ module.exports = (env, args) => {
   const config = baseConfig(env, args);
 
   config.entry = {
-    'index': './src/main/js/index.js',
+    '${simpleArtifactName}': './src/main/js/index.js',
     'login': './src/main/js/login.js',
     'logout': './src/main/js/logout.js',
-    'theme': './src/main/js/theme.less',
-    'theme-dark': './src/main/js/theme-dark.less'
+    '${simpleArtifactName}-theme': './src/main/js/theme.less',
+    '${simpleArtifactName}-theme-dark': './src/main/js/theme-dark.less'
   };
 
   return config;

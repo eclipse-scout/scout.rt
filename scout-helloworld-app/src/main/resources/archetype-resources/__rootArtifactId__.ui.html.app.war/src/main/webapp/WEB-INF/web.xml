@@ -27,7 +27,7 @@
         /jquery*.js
         /login*.js
         /logout*.js
-        /theme*.css
+        /${simpleArtifactName}-theme*.css
         /eclipse-scout*.js
       </param-value>
     </init-param>
