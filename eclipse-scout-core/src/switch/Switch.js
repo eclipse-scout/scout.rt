@@ -16,24 +16,24 @@ export default class Switch extends Widget {
     super();
 
     this.activated = false;
-    this.switchLabel = null;
+    this.label = null;
     this.htmlEnabled = false;
 
-    this.$switchLabel = null;
-    this.$switchButton = null;
+    this.$label = null;
+    this.$button = null;
   }
 
   _render() {
     this.$container = this.$parent.appendDiv('switch');
-    this.$switchLabel = this.$container.appendDiv('switch-label');
-    this.$switchButton = this.$container.appendDiv('switch-button')
+    this.$label = this.$container.appendDiv('switch-label');
+    this.$button = this.$container.appendDiv('switch-button')
       .on('click', this._onSwitchButtonClick.bind(this));
   }
 
   _renderProperties() {
     super._renderProperties();
     this._renderActivated();
-    this._renderSwitchLabel();
+    this._renderLabel();
   }
 
   _onSwitchButtonClick() {
@@ -44,15 +44,15 @@ export default class Switch extends Widget {
     }
   }
 
-  setSwitchLabel(switchLabel) {
-    this.setProperty('switchLabel', switchLabel);
+  setLabel(label) {
+    this.setProperty('label', label);
   }
 
-  _renderSwitchLabel() {
+  _renderLabel() {
     if (this.htmlEnabled) {
-      this.$switchLabel.html(this.switchLabel);
+      this.$label.html(this.label);
     } else {
-      this.$switchLabel.text(this.switchLabel);
+      this.$label.text(this.label);
     }
   }
 
@@ -61,6 +61,6 @@ export default class Switch extends Widget {
   }
 
   _renderActivated() {
-    this.$switchButton.toggleClass('activated', this.activated);
+    this.$button.toggleClass('activated', this.activated);
   }
 }
