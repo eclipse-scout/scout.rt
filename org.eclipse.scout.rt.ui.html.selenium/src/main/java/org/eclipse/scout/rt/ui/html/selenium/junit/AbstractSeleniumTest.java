@@ -510,13 +510,19 @@ public abstract class AbstractSeleniumTest {
       ((JavascriptExecutor) getDriver()).executeScript("arguments[0].select();", element);
     }
     else {
-      element.sendKeys(getSelectAllKeys());
+      Actions actions = new Actions(getDriver());
+      actions.moveToElement(element).keyDown(getOsDependentCtrlKey()).sendKeys("a").keyUp(getOsDependentCtrlKey()).build().perform();
     }
   }
 
+  /**
+   * @deprecated use {@link AbstractSeleniumTest#selectAll(WebElement)} instead will be removed in 11.0
+   */
+  @Deprecated
   public CharSequence getSelectAllKeys() {
     return Keys.chord(getOsDependentCtrlKey(), "a");
   }
+
 
   public void copy(WebElement element) {
     Actions actions = new Actions(getDriver());
