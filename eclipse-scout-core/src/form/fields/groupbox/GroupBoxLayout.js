@@ -19,14 +19,14 @@ export default class GroupBoxLayout extends AbstractLayout {
 
     this._initDefaults();
 
-    HtmlEnvironment.get().on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
+    HtmlEnvironment.get().on('propertyChange', this._onHtmlEnvironmentPropertyChange.bind(this));
   }
 
   _initDefaults() {
     this._statusWidth = HtmlEnvironment.get().fieldStatusWidth;
   }
 
-  _onHtmlEnvironmenPropertyChange() {
+  _onHtmlEnvironmentPropertyChange() {
     this._initDefaults();
     this.groupBox.invalidateLayoutTree();
   }
@@ -207,7 +207,7 @@ export default class GroupBoxLayout extends AbstractLayout {
         .add(htmlGbBody.margins());
 
       htmlMenuBar = this._htmlMenuBar();
-      if (htmlMenuBar) {
+      if (htmlMenuBar && this.groupBox.menuBarPosition !== GroupBox.MenuBarPosition.TITLE) {
         prefSize.height += htmlMenuBar.prefSize(options).height;
       }
     } else {
