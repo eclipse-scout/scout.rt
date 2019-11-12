@@ -23,9 +23,11 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
+import org.eclipse.scout.rt.platform.transaction.TransactionCancelledError;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.concurrent.AbstractInterruptionError;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
@@ -156,7 +158,7 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
       else if (isInterruption(e)) {
         if (isCancellation(e)) {
           // cancelled by client
-          LOG.debug("Future cancelled", e);
+          LOG.debug("Cancelled by client", e);
           servletResponse.sendError(HttpServletResponse.SC_ACCEPTED, "Request processing was cancelled");
         }
         else {
@@ -312,6 +314,12 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
     Throwable cause = e;
     while (cause != null) {
       if (cause instanceof FutureCancelledError) {
+        return true;
+      }
+      if (cause instanceof TransactionCancelledError) {
+        return true;
+      }
+      if (cause instanceof ThreadInterruptedError) {
         return true;
       }
       // next
