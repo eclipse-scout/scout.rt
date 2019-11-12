@@ -27,6 +27,9 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.concurrent.AbstractInterruptionError;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
@@ -124,10 +127,22 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
         }
       }, DefaultExceptionTranslator.class);
     }
-    catch (Exception e) {
+    catch (Throwable e) {//NOSONAR
       if (isConnectionError(e)) {
         // Ignore disconnect errors: we do not want to throw an exception, if the client closed the connection.
-        LOG.debug("Connection Error: ", e);
+        LOG.debug("Connection Error", e);
+      }
+      else if (isInterruption(e)) {
+        if (isCancellation(e)) {
+          // cancelled by client
+          LOG.debug("Cancelled by client", e);
+          servletResponse.sendError(HttpServletResponse.SC_ACCEPTED, "Request processing was cancelled");
+        }
+        else {
+          // other interruption
+          LOG.info("Interruption", e);
+          servletResponse.sendError(HttpServletResponse.SC_ACCEPTED, "Request processing was interrupted");
+        }
       }
       else {
         LOG.error("Client={}@{}/{}", servletRequest.getRemoteUser(), servletRequest.getRemoteAddr(), servletRequest.getRemoteHost(), e);
@@ -255,16 +270,46 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
 
   // === Helper methods ===
 
-  protected boolean isConnectionError(Exception e) {
+  protected boolean isConnectionError(Throwable e) {
     Throwable cause = e;
     while (cause != null) {
       if (cause instanceof SocketException) {
         return true;
       }
-      else if ("EofException".equalsIgnoreCase(cause.getClass().getSimpleName())) {
+      if ("EofException".equalsIgnoreCase(cause.getClass().getSimpleName())) {
         return true;
       }
-      else if (cause instanceof InterruptedIOException) {
+      if (cause instanceof InterruptedIOException) {
+        return true;
+      }
+      // next
+      cause = cause.getCause();
+    }
+    return false;
+  }
+
+  protected boolean isInterruption(Throwable e) {
+    Throwable cause = e;
+    while (cause != null) {
+      if (cause instanceof AbstractInterruptionError) {
+        return true;
+      }
+      // next
+      cause = cause.getCause();
+    }
+    return false;
+  }
+
+  /**
+   * Special case of {@link AbstractInterruptionError}.
+   */
+  protected boolean isCancellation(Throwable e) {
+    Throwable cause = e;
+    while (cause != null) {
+      if (cause instanceof FutureCancelledError) {
+        return true;
+      }
+      if (cause instanceof ThreadInterruptedError) {
         return true;
       }
       // next
