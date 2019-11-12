@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+
+import * as $ from 'jquery';
+
 describe('jquery-scout', function() {
 
   var $e;

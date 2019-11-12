@@ -22,12 +22,21 @@
     "src"
   ],
   "scripts": {
+    "testserver:start": "scout-scripts test-server:start",
+    "testserver:stop": "scout-scripts test-server:stop",
+    "test:ci": "scout-scripts test:ci",
     "snapshot-version": "scout-scripts snapshot-version",
     "release-version": "scout-scripts release-version",
     "snapshot-cleanup": "scout-scripts snapshot-cleanup"
   },
   "devDependencies": {
     "@eclipse-scout/cli": "^10.0.0-snapshot"
+  },
+  "dependencies": {
+    "jquery": "3.4.1"
+  },
+  "peerDependencies": {
+    "jquery": "3.4.1"
   },
   "keywords": [
     "karma",

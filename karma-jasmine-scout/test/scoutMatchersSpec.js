@@ -16,10 +16,9 @@ describe('JasmineScout', function() {
     function createRequestDataFixture() {
       var requestData = {};
       requestData.events = [];
-      requestData.events.push(new RemoteEvent(1, 'event1'));
-      requestData.events.push(new RemoteEvent(1, 'event2'));
-      requestData.events.push(new RemoteEvent(1, 'event3'));
-
+      requestData.events.push({target: 1, type: 'event1'});
+      requestData.events.push({target: 1, type: 'event2'});
+      requestData.events.push({target: 1, type: 'event3'});
       return requestData;
     }
 
