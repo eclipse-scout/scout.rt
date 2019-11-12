@@ -526,12 +526,12 @@ public abstract class AbstractSeleniumTest {
 
   public void copy(WebElement element) {
     Actions actions = new Actions(getDriver());
-    actions.moveToElement(element).click().keyDown(getOsDependentCtrlKey()).sendKeys("c").keyUp(getOsDependentCtrlKey()).build().perform();
+    actions.moveToElement(element).keyDown(getOsDependentCtrlKey()).sendKeys("c").keyUp(getOsDependentCtrlKey()).build().perform();
   }
 
   public void paste(WebElement element) {
     Actions actions = new Actions(getDriver());
-    actions.moveToElement(element).click().keyDown(getOsDependentCtrlKey()).sendKeys("v").keyUp(getOsDependentCtrlKey()).build().perform();
+    actions.moveToElement(element).keyDown(getOsDependentCtrlKey()).sendKeys("v").keyUp(getOsDependentCtrlKey()).build().perform();
   }
 
   public void doubleClickOnElement(WebElement element) {
