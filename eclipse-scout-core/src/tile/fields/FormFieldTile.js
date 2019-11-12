@@ -18,8 +18,8 @@ export default class FormFieldTile extends WidgetTile {
   }
 
   static DisplayStyle = {
-    DEFAULT: Tile.DEFAULT,
-    PLAIN: Tile.PLAIN,
+    DEFAULT: Tile.DisplayStyle.DEFAULT,
+    PLAIN: Tile.DisplayStyle.PLAIN,
     DASHBOARD: 'dashboard'
   };
 

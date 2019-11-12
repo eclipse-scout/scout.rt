@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-.tile.table-field.dashboard {
+.tile.dashboard > .table-field {
 
   /* adjust menu bar when visible */
 
@@ -98,8 +98,11 @@
       padding-top: 0;
     }
   }
+}
 
-  &.inverted > .table {
+.tile.dashboard {
+
+  &.inverted > .table-field > .table {
 
     &:focus,
     &.focused {
@@ -124,7 +127,7 @@
     }
   }
 
-  &.color-alternative > .table {
+  &.color-alternative > .table-field > .table {
 
     &:focus,
     &.focused {
@@ -136,7 +139,7 @@
     }
   }
 
-  &.color-alternative.inverted > .table {
+  &.color-alternative.inverted > .table-field > .table {
 
     &:focus,
     &.focused {

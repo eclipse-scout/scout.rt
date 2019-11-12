@@ -1085,7 +1085,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     return row.isRejectedByUser();
   }
 
-  protected List<ITableRow> extractTableRows(JSONObject json) {
+  public List<ITableRow> extractTableRows(JSONObject json) {
     JSONArray rowIds = json.getJSONArray(PROP_ROW_IDS);
     List<ITableRow> rows = new ArrayList<>(rowIds.length());
     for (int i = 0; i < rowIds.length(); i++) {

@@ -135,6 +135,7 @@ export default class TableTileGridMediator extends Widget {
   }
 
   _setTileMappings(tableRowTileMappings) {
+    this._setProperty('tileMappings', tableRowTileMappings);
     if (!tableRowTileMappings) {
       return;
     }
@@ -297,9 +298,9 @@ export default class TableTileGridMediator extends Widget {
     }.bind(this);
 
     // check if there exists a hierarchy within the tableRows
-    var hasHierarchy = this.table.rows.find(function(row) {
+    var hasHierarchy = arrays.find(this.table.rows, function(row) {
       return row.parentRow;
-    }) !== undefined;
+    }) !== null;
 
     if (hasHierarchy) {
       // add the hierarchyFilter since the tileMode doesn't support hierarchy
@@ -347,6 +348,11 @@ export default class TableTileGridMediator extends Widget {
     this.groupForTileMap = {};
     this.tileAccordion.deleteAllTiles();
     this.tileAccordion.deleteAllGroups();
+
+    // destroy tiles manually since owner is the mediator thus the tileGrid can't destroy them
+    this.tiles.forEach(function(tile) {
+      tile.destroy();
+    });
   }
 
   renderTileMode() {
@@ -369,7 +375,7 @@ export default class TableTileGridMediator extends Widget {
   }
 
   destroy() {
-    // destroy tiles manually since owner is this.table thus the tileGrid can't destroy them
+    // destroy tiles manually since owner is the mediator thus the tileGrid can't destroy them
     this.tiles.forEach(function(tile) {
       tile.destroy();
     });
@@ -514,7 +520,6 @@ export default class TableTileGridMediator extends Widget {
           return tableFilter.accept(rowForTile);
         }
         return false;
-
       }
     };
     var key = tableFilter.createKey();
@@ -543,7 +548,7 @@ export default class TableTileGridMediator extends Widget {
       var selectedRows = selectedTiles.map(function(tile) {
         return this.table.rowsMap[tile.rowId];
       }, this).filter(function(t) {
-        return !!t;
+        return Boolean(t);
       });
       this.table.selectRows(selectedRows);
     }

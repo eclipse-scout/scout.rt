@@ -8,23 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-.tile.tile-button.dashboard {
+.tile.dashboard > .form-field.tile-button {
   padding-top: 0;
   padding-bottom: 0;
   cursor: pointer;
-
-  &:not(.disabled):hover > .field {
-
-    & > .icon-container > .font-icon,
-    & > .label {
-      color: @tile-button-default-hover-color;
-    }
-  }
-
-  &:not(.disabled):active,
-  &:not(.disabled).active {
-    background-color: @tile-button-default-active-background-color;
-  }
 
   & > .field {
     position: relative;
@@ -65,11 +52,26 @@
       #scout.overflow-ellipsis();
     }
   }
+}
+
+.tile.dashboard {
+  &:not(.disabled):hover > .form-field.tile-button > .field {
+
+    & > .icon-container > .font-icon,
+    & > .label {
+      color: @tile-button-default-hover-color;
+    }
+  }
+
+  &:not(.disabled):active > .form-field.tile-button,
+  &:not(.disabled).active > .form-field.tile-button {
+    background-color: @tile-button-default-active-background-color;
+  }
 
   &.inverted {
 
-    &:not(.disabled) > .field,
-    &:not(.disabled):hover > .field {
+    &:not(.disabled) > .form-field.tile-button > .field,
+    &:not(.disabled):hover > .form-field.tile-button > .field {
 
       & > .icon-container > .font-icon,
       & > .label {
@@ -77,8 +79,8 @@
       }
     }
 
-    &:not(.disabled):active,
-    &:not(.disabled).active {
+    &:not(.disabled):active > .form-field.tile-button,
+    &:not(.disabled).active > .form-field.tile-button {
       background-color: @tile-button-default-inverted-active-background-color;
       border-color: @tile-button-default-inverted-active-background-color;
     }
@@ -86,11 +88,11 @@
 
   &.color-alternative {
 
-    & > .field > .icon-container > .font-icon {
+    & > .form-field.tile-button > .field > .icon-container > .font-icon {
       color: @tile-button-alternative-icon-color;
     }
 
-    &:not(.disabled):hover > .field {
+    &:not(.disabled):hover > .form-field.tile-button > .field {
 
       & > .icon-container > .font-icon,
       & > .label {
@@ -98,16 +100,16 @@
       }
     }
 
-    &:not(.disabled):active,
-    &:not(.disabled).active {
+    &:not(.disabled):active > .form-field.tile-button,
+    &:not(.disabled).active > .form-field.tile-button {
       background-color: @tile-button-alternative-active-background-color;
     }
   }
 
   &.color-alternative.inverted {
 
-    &:not(.disabled) > .field,
-    &:not(.disabled):hover > .field {
+    &:not(.disabled) > .form-field.tile-button > .field,
+    &:not(.disabled):hover > .form-field.tile-button > .field {
 
       & > .icon-container > .font-icon,
       & > .label {
@@ -115,15 +117,15 @@
       }
     }
 
-    &:not(.disabled):active,
-    &:not(.disabled).active {
+    &:not(.disabled):active > .form-field.tile-button,
+    &:not(.disabled).active > .form-field.tile-button {
       background-color: @tile-button-alternative-inverted-active-background-color;
       border-color: @tile-button-alternative-inverted-active-background-color;
     }
   }
 
-  &.disabled,
-  &.disabled:hover {
+  &.disabled > .form-field.tile-button,
+  &.disabled:hover > .form-field.tile-button {
     background-color: @tile-default-inner-border-color;
     border-color: @button-disabled-border-color;
     cursor: default;

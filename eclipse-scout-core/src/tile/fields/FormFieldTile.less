@@ -8,66 +8,132 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-.tile.form-field.dashboard {
+.tile.dashboard {
   border: 1px solid @tile-default-border-color;
   border-radius: @border-radius;
   background-color: @tile-default-background-color;
   color: @tile-default-color;
-  padding: @tile-field-padding;
-  padding-top: 12px;
   overflow: hidden;
 
-  &.label-hidden {
-    padding-top: @tile-field-padding;
-  }
+  & > .form-field {
+    padding: @tile-field-padding;
+    padding-top: 12px;
 
-  &.no-padding {
-    padding: 0;
+    &.label-hidden {
+      padding-top: @tile-field-padding;
+    }
+
+    &.no-padding {
+      padding: 0;
+      /* set padding-top explicitly to override label-hidden */
+      padding-top: 0;
+
+      & > .field {
+        border: 0;
+        border-radius: 0;
+      }
+    }
+
+    & > label {
+      color: @tile-default-label-color;
+      margin: 0;
+      font-size: 18px;
+      padding-top: 0;
+      padding-bottom: @dashboard-tile-label-padding-bottom;
+      font-weight: bold;
+    }
 
     & > .field {
-      border: 0;
-      border-radius: 0;
+      margin-left: 0;
+      overflow: hidden;
     }
-  }
 
-  & > label {
-    color: @tile-default-label-color;
-    margin: 0;
-    font-size: 18px;
-    padding-top: 0;
-    padding-bottom: @dashboard-tile-label-padding-bottom;
-    font-weight: bold;
-  }
+    & > .mandatory-indicator {
+      display: none;
+    }
 
-  &.html-field > label,
-  &.bean-field > label {
-    padding-bottom: @dashboard-tile-label-large-padding-bottom;
-  }
+    /* Define a short transition for opacity changes on all field elements (used in .loading state) */
 
-  & > .field {
-    margin-left: 0;
-    overflow: hidden;
-  }
-
-  & > .mandatory-indicator {
-    display: none;
-  }
-
-  /* Define a short transition for opacity changes on all field elements (used in .loading state) */
-
-  & > label,
-  & > .mandatory-indicator,
-  & > .field,
-  & > .status {
-    transition: opacity 0.15s; /* Same time is used in animation() of .loading-indicator */
-    opacity: 1;
-  }
-
-  &.loading {
     & > label,
     & > .mandatory-indicator,
     & > .field,
     & > .status {
+      transition: opacity 0.15s; /* Same time is used in animation() of .loading-indicator */
+      opacity: 1;
+    }
+
+    /* Move part of the tile's padding (@offset) to the inner div. */
+    /* This makes it possible to draw the scrollbar (seemingly) outside the field. */
+
+    &.scrollbar-y-outside {
+      @offset: 14px;
+      padding-right: @tile-field-padding - @offset;
+
+      & > label {
+        margin-right: @offset;
+      }
+
+      &.label-hidden > .status {
+        /* increase space between status and field if label is hidden (= status is displayed on the field's right side) */
+        margin-left: @field-status-margin-left + 10px;
+      }
+
+      & > .field {
+        padding-right: @offset;
+
+        & > .scrollbar.y-axis {
+          /* Remove margin top/bottom, because root-group-box already provides a padding */
+          height: 100%;
+          margin-top: 0;
+          margin-bottom: 0;
+        }
+      }
+    }
+
+
+    /* --- Special rules for specific tile fields --- */
+
+    &.browser-field > .field {
+      border-radius: 0;
+    }
+
+    &.browser-field.inverted > .field {
+      border: 0;
+    }
+
+    &.html-field > label,
+    &.bean-field > label {
+      padding-bottom: @dashboard-tile-label-large-padding-bottom;
+    }
+
+    /* Don't show underline decoration for links inside certain tiles */
+
+    &.html-field .app-link,
+    &.tile-list-field .app-link,
+    &.tile-attributes-field .app-link,
+    &.html-field a,
+    &.tile-list-field a,
+    &.tile-attributes-field a {
+      text-decoration: none;
+      color: @tile-default-link-color;
+
+      &:hover {
+        color: @tile-default-link-hover-color;
+      }
+
+      &:active {
+        color: @tile-default-link-active-color;
+      }
+    }
+  }
+
+  &.loading {
+    border-style: dashed;
+
+    & > .form-field > label,
+    & > .form-field > .mandatory-indicator,
+    & > .form-field > .field,
+    & > .form-field > .status {
       /* Same as 'visibility: hidden', except it can be animated with CSS transitions */
       opacity: 0;
     }
@@ -77,74 +143,57 @@
     }
   }
 
-  /* Don't show underline decoration for links inside certain tiles */
-
-  &.html-field .app-link,
-  &.tile-list-field .app-link,
-  &.tile-attributes-field .app-link,
-  &.html-field a,
-  &.tile-list-field a,
-  &.tile-attributes-field a {
-    text-decoration: none;
-    color: @tile-default-link-color;
-
-    &:hover {
-      color: @tile-default-link-hover-color;
-    }
-
-    &:active {
-      color: @tile-default-link-active-color;
-    }
-  }
-
   &.inverted {
     border-color: transparent;
     border-radius: @border-radius;
     background-color: @tile-default-inverted-background-color;
     color: @tile-default-inverted-color;
 
-    & > label {
-      color: @tile-default-inverted-label-color;
+    & > .form-field {
+      & > label {
+        color: @tile-default-inverted-label-color;
+      }
+
+      /* Override link style in inverted tiles, otherwise app-links would not be readable */
+
+      & .app-link,
+      & a {
+        color: @tile-default-inverted-color;
+        text-decoration: underline;
+
+        &:hover {
+          color: @tile-default-inverted-link-hover-color;
+        }
+
+        &:active {
+          color: @tile-default-inverted-link-active-color;
+        }
+      }
+
+      &.has-tooltip > .status,
+      &.has-menus > .status {
+
+        &::before {
+          color: @icon-inverted-color;
+        }
+
+        &:hover::before {
+          color: @palette-blue-2;
+        }
+      }
+
+      &.has-error > .status {
+
+        &::before {
+          color: @palette-red-1;
+        }
+
+        &:hover::before {
+          color: @palette-red-2;
+        }
+      }
     }
 
-    /* Override link style in inverted tiles, otherwise app-links would not be readable */
-
-    & .app-link,
-    & a {
-      color: @tile-default-inverted-color;
-      text-decoration: underline;
-
-      &:hover {
-        color: @tile-default-inverted-link-hover-color;
-      }
-
-      &:active {
-        color: @tile-default-inverted-link-active-color;
-      }
-    }
-
-    &.has-tooltip > .status,
-    &.has-menus > .status {
-
-      &::before {
-        color: @icon-inverted-color;
-      }
-
-      &:hover::before {
-        color: @palette-blue-2;
-      }
-    }
-
-    &.has-error > .status {
-
-      &::before {
-        color: @palette-red-1;
-      }
-
-      &:hover::before {
-        color: @palette-red-2;
-      }
-    }
   }
 
   &.color-alternative {
@@ -152,20 +201,22 @@
     background-color: @tile-alternative-background-color;
     color: @tile-alternative-color;
 
-    & > label {
-      color: @tile-alternative-label-color;
-    }
-
-    & .app-link,
-    & a {
-      color: @tile-alternative-link-color;
-
-      &:hover {
-        color: @tile-alternative-link-hover-color;
+    & > .form-field {
+      & > label {
+        color: @tile-alternative-label-color;
       }
 
-      &:active {
-        color: @tile-alternative-link-active-color;
+      & .app-link,
+      & a {
+        color: @tile-alternative-link-color;
+
+        &:hover {
+          color: @tile-alternative-link-hover-color;
+        }
+
+        &:active {
+          color: @tile-alternative-link-active-color;
+        }
       }
     }
   }
@@ -175,85 +226,45 @@
     background-color: @tile-alternative-inverted-background-color;
     color: @tile-alternative-inverted-color;
 
-    & > label {
-      color: @tile-alternative-inverted-label-color;
-    }
-
-    & .app-link,
-    & a {
-      color: @tile-alternative-inverted-color;
-
-      &:hover {
-        color: @tile-alternative-inverted-link-hover-color;
+    & > .form-field {
+      & > label {
+        color: @tile-alternative-inverted-label-color;
       }
 
-      &:active {
-        color: @tile-alternative-inverted-link-active-color;
-      }
-    }
+      & .app-link,
+      & a {
+        color: @tile-alternative-inverted-color;
 
-    &.has-tooltip > .status,
-    &.has-menus > .status {
+        &:hover {
+          color: @tile-alternative-inverted-link-hover-color;
+        }
 
-      &::before {
-        color: @icon-inverted-color;
-      }
-
-      &:hover::before {
-        color: @palette-cyan-0;
-      }
-    }
-
-    &.has-error > .status {
-
-      &::before {
-        color: @palette-red-1;
+        &:active {
+          color: @tile-alternative-inverted-link-active-color;
+        }
       }
 
-      &:hover::before {
-        color: @palette-red-0;
+      &.has-tooltip > .status,
+      &.has-menus > .status {
+
+        &::before {
+          color: @icon-inverted-color;
+        }
+
+        &:hover::before {
+          color: @palette-cyan-0;
+        }
       }
-    }
-  }
 
-  &.loading {
-    border-style: dashed;
-  }
+      &.has-error > .status {
 
-  /* --- Special rules for specific tile fields --- */
+        &::before {
+          color: @palette-red-1;
+        }
 
-  &.browser-field > .field {
-    border-radius: 0;
-  }
-
-  &.browser-field.inverted > .field {
-    border: 0;
-  }
-
-  /* Move part of the tile's padding (@offset) to the inner div. */
-  /* This makes it possible to draw the scrollbar (seemingly) outside the field. */
-
-  &.scrollbar-y-outside {
-    @offset: 14px;
-    padding-right: @tile-field-padding - @offset;
-
-    & > label {
-      margin-right: @offset;
-    }
-
-    &.label-hidden > .status {
-      /* increase space between status and field if label is hidden (= status is displayed on the field's right side) */
-      margin-left: @field-status-margin-left + 10px;
-    }
-
-    & > .field {
-      padding-right: @offset;
-
-      & > .scrollbar.y-axis {
-        /* Remove margin top/bottom, because root-group-box already provides a padding */
-        height: 100%;
-        margin-top: 0;
-        margin-bottom: 0;
+        &:hover::before {
+          color: @palette-red-0;
+        }
       }
     }
   }
@@ -263,7 +274,7 @@
     background-color: mix(@control-background-color, @item-selection-background-color, 35%);
 
     /* For selection we want a wider border but changing the border width would cause the content box to change.
-    To avoid this we create a pseudo element with a border as well. Then we have to border of the main element
+    To avoid this we create a pseudo element with a border as well. Then we have the border of the main element
     plus the pseudo element's border leading to a 2px border. */
     border: 1px solid @item-selection-border-color;
 
