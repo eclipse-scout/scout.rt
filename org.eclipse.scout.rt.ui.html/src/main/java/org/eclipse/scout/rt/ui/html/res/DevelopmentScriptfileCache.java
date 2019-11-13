@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
-import org.eclipse.scout.rt.shared.ui.webresource.WebResourceResolvers;
+import org.eclipse.scout.rt.shared.ui.webresource.WebResources;
 import org.eclipse.scout.rt.ui.html.AbstractClasspathFileWatcher;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.ScriptfileBuildProperty;
 import org.eclipse.scout.rt.ui.html.res.loader.ScriptFileLoader;
@@ -69,7 +69,7 @@ public class DevelopmentScriptfileCache {
 
   @PostConstruct
   public void init() {
-    if (WebResourceResolvers.isNewMode()) {
+    if (WebResources.isNewMode()) {
       m_active = false;
     }
     else {

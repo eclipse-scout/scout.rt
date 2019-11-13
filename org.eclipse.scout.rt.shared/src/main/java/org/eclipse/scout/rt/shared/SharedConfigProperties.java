@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.AbstractBinaryConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
@@ -59,6 +60,26 @@ public final class SharedConfigProperties {
     public String description() {
       return String.format("Specifies the Base64 encoded public key used to validate signed requests on the backend server. The public key must match the private key stored in the property '%s' on the UI server.\n" +
           "New public-private-key-pairs can be created by invoking the class '%s' on the command line.", BEANS.get(AuthTokenPrivateKeyProperty.class).getKey(), SecurityUtility.class.getName());
+    }
+  }
+
+  public static class LoadWebResourcesFromFilesystemConfigProperty extends AbstractBooleanConfigProperty {
+    @Override
+    public Boolean getDefaultValue() {
+      return Platform.get().inDevelopmentMode();
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.loadWebResourcesFromFilesystem";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies if the application should look for web resources (like .js, .html or .css) on the local filesystem. " +
+        "If true, the resources will be searched in modules that follow the Scout naming conventions (e.g. name.ui.app.dev, name.ui.app, name.ui) on the local filesystem first and (if not found) on the classpath second. " +
+        "If false, the resources are searched on the Java classpath only. " +
+        "By default this property is true in dev mode and false otherwise.";
     }
   }
 

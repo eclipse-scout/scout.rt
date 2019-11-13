@@ -12,22 +12,19 @@ import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
-import org.eclipse.scout.rt.shared.ui.webresource.IWebResourceResolver;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
-import org.eclipse.scout.rt.shared.ui.webresource.WebResourceResolvers;
+import org.eclipse.scout.rt.shared.ui.webresource.WebResources;
 
 public class WebResourceLoader extends AbstractResourceLoader {
 
   private final boolean m_minify;
   private final boolean m_cacheEnabled;
   private final String m_theme;
-  private final IWebResourceResolver m_helper;
 
   public WebResourceLoader(boolean minify, boolean cacheEnabled, String theme) {
     m_minify = minify;
     m_cacheEnabled = cacheEnabled;
     m_theme = theme;
-    m_helper = WebResourceResolvers.create();
   }
 
   @Override
@@ -48,9 +45,9 @@ public class WebResourceLoader extends AbstractResourceLoader {
   }
 
   protected Optional<ImmutablePair<WebResourceDescriptor, Integer>> lookupResource(String file) {
-    return m_helper.resolveScriptResource(file, m_minify, m_theme)
+    return WebResources.resolveScriptResource(file, m_minify, m_theme)
         .map(descriptor -> Optional.of(new ImmutablePair<>(descriptor, HttpCacheControl.MAX_AGE_ONE_YEAR)))
-        .orElseGet(() -> m_helper.resolveWebResource(file, m_minify)
+        .orElseGet(() -> WebResources.resolveWebResource(file, m_minify)
             .map(descriptor -> new ImmutablePair<>(descriptor, HttpCacheControl.MAX_AGE_4_HOURS)));
   }
 

@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.shared.ui.webresource.ScriptRequest;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
-import org.eclipse.scout.rt.shared.ui.webresource.WebResourceResolvers;
+import org.eclipse.scout.rt.shared.ui.webresource.WebResources;
 import org.eclipse.scout.rt.ui.html.UiThemeHelper;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.slf4j.Logger;
@@ -107,7 +107,7 @@ public class HtmlDocumentParser {
    * deals with caching, since we must build a script file first, before we can calculate its fingerprint.
    */
   protected String createExternalPath(String internalPath) throws IOException {
-    if (WebResourceResolvers.isNewMode()) {
+    if (WebResources.isNewMode()) {
       String theme = UiThemeHelper.get().isDefaultTheme(m_params.getTheme()) ? null : m_params.getTheme();
       return new WebResourceLoader(m_params.isMinify(), false, theme)
           .resolveResource(internalPath)
@@ -253,8 +253,8 @@ public class HtmlDocumentParser {
   }
 
   protected URL resolveInclude(String includeName) {
-    if (WebResourceResolvers.isNewMode()) {
-      return WebResourceResolvers.create()
+    if (WebResources.isNewMode()) {
+      return WebResources
           .resolveWebResource(includeName, m_params.isMinify())
           .map(WebResourceDescriptor::getUrl)
           .orElse(null);

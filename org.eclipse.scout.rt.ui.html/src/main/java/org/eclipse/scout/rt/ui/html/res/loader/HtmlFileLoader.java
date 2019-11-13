@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResponseHeaderContributor;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ExternalBaseUrlProperty;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
-import org.eclipse.scout.rt.shared.ui.webresource.WebResourceResolvers;
+import org.eclipse.scout.rt.shared.ui.webresource.WebResources;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 
 /**
@@ -97,8 +97,8 @@ public class HtmlFileLoader extends AbstractResourceLoader {
   @Override
   public BinaryResource loadResource(String pathInfo) throws IOException {
     URL url;
-    if (WebResourceResolvers.isNewMode()) {
-      url = WebResourceResolvers.create()
+    if (WebResources.isNewMode()) {
+      url = WebResources
           .resolveWebResource(pathInfo, m_minify)
           .map(WebResourceDescriptor::getUrl)
           .orElse(null);

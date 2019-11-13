@@ -50,6 +50,9 @@ public abstract class AbstractWebResourceResolver implements IWebResourceResolve
 
   @Override
   public Optional<WebResourceDescriptor> resolveWebResource(String path, boolean minified) {
+    if (path == null) {
+      return Optional.empty();
+    }
     return lookupResource(path, path, WEB_RESOURCE_FOLDER_NAME, minified);
   }
 
