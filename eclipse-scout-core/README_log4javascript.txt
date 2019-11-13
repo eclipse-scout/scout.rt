@@ -5,10 +5,10 @@ https://sourceforge.net/projects/log4javascript/files/log4javascript/1.4.9/
 
 ORIGINAL FILE                      TARGET FILE
 ---------------------------------------------------------------------------------------------------
-log4javascript_uncompressed.js     src/main/resources/WebContent/res/log4javascript-1.4.9/log4javascript.js
-log4javascript.js                  src/main/resources/WebContent/res/log4javascript-1.4.9/log4javascript.min.js
-console_uncompressed.html          src/main/resources/WebContent/res/log4javascript-1.4.9/console_uncompressed.html
-console.html                       src/main/resources/WebContent/res/log4javascript-1.4.9/console.html
+log4javascript_uncompressed.js     res/log4javascript-1.4.9/log4javascript.js
+log4javascript.js                  res/log4javascript-1.4.9/log4javascript.min.js
+console_uncompressed.html          res/log4javascript-1.4.9/console_uncompressed.html
+console.html                       res/log4javascript-1.4.9/console.html
 
 Because the default CSP rules forbid inline javascript code, the original code has been modified:
 
