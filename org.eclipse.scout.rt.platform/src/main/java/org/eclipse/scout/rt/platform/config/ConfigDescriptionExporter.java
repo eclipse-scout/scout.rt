@@ -11,15 +11,11 @@
 package org.eclipse.scout.rt.platform.config;
 
 import static java.nio.CharBuffer.wrap;
-import static java.nio.file.Files.createDirectories;
-import static java.nio.file.Files.write;
+import static java.nio.file.Files.*;
 import static java.util.Comparator.comparing;
-import static org.eclipse.scout.rt.platform.BEANS.all;
-import static org.eclipse.scout.rt.platform.BEANS.get;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
-import static org.eclipse.scout.rt.platform.util.StringUtility.hasText;
-import static org.eclipse.scout.rt.platform.util.StringUtility.replace;
+import static org.eclipse.scout.rt.platform.BEANS.*;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
+import static org.eclipse.scout.rt.platform.util.StringUtility.*;
 import static org.eclipse.scout.rt.platform.util.TypeCastUtility.getGenericsParameterClass;
 
 import java.io.IOException;
@@ -27,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +41,7 @@ public class ConfigDescriptionExporter {
 
   private static final Logger LOG = LoggerFactory.getLogger(ConfigDescriptionExporter.class);
 
-  private Predicate<IConfigProperty> m_filter;
+  private Predicate<IConfigProperty<?>> m_filter;
 
   public static void main(final String[] args) {
     final Path outFile;
@@ -71,24 +68,29 @@ public class ConfigDescriptionExporter {
 
   public void exportUsing(final IConfigPropertyDescriptionWriter writer) {
     LOG.info("Exporting config property descriptions using exporter '{}'.", assertNotNull(writer).getClass().getName());
-    final List<IConfigProperty> allProperties = all(IConfigProperty.class);
+    //noinspection rawtypes
+    List<IConfigProperty> rawProps = all(IConfigProperty.class);
+    final List<IConfigProperty<?>> allProperties = new ArrayList<>(rawProps.size());
+    for (IConfigProperty<?> prop : rawProps) {
+      allProperties.add(prop);
+    }
     allProperties.sort(comparing(IConfigProperty::getKey));
     writer.accept(allProperties.stream()
         .filter(filter().orElseGet(() -> p -> true)));
   }
 
-  public Optional<Predicate<IConfigProperty>> filter() {
+  public Optional<Predicate<IConfigProperty<?>>> filter() {
     return Optional.ofNullable(m_filter);
   }
 
-  public ConfigDescriptionExporter withFilter(final Predicate<IConfigProperty> filter) {
+  public ConfigDescriptionExporter withFilter(final Predicate<IConfigProperty<?>> filter) {
     m_filter = filter;
     return this;
   }
 
   @Bean
   @FunctionalInterface
-  public interface IConfigPropertyDescriptionWriter extends Consumer<Stream<IConfigProperty>> {
+  public interface IConfigPropertyDescriptionWriter extends Consumer<Stream<IConfigProperty<?>>> {
   }
 
   public static class AsciiDoctorConfigWriter implements IConfigPropertyDescriptionWriter {
@@ -97,7 +99,7 @@ public class ConfigDescriptionExporter {
 
     @Override
     @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE") // targetFile() cannot be null
-    public void accept(final Stream<IConfigProperty> configProperties) {
+    public void accept(final Stream<IConfigProperty<?>> configProperties) {
       final StringBuilder adoc = asciiDoctorDescFor(configProperties);
       final byte[] rawContent = StandardCharsets.UTF_8.encode(wrap(adoc)).array();
       try {
@@ -110,7 +112,7 @@ public class ConfigDescriptionExporter {
       }
     }
 
-    protected StringBuilder asciiDoctorDescFor(final Stream<IConfigProperty> configProperties) {
+    protected StringBuilder asciiDoctorDescFor(final Stream<IConfigProperty<?>> configProperties) {
       final AsciiDoctorTableBuilder builder = get(AsciiDoctorTableBuilder.class);
       builder
           .withName("Config Properties")
