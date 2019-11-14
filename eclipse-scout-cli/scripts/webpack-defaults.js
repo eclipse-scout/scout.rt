@@ -11,12 +11,9 @@
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
 const AfterEmitWebpackPlugin = require('./AfterEmitWebpackPlugin');
 
 const path = require('path');
-const webpack = require('webpack');
 const scoutBuildConstants = require('./constants');
 
 module.exports = (env, args) => {
@@ -38,7 +35,7 @@ module.exports = (env, args) => {
   const config = {
     target: 'web',
     mode: args.mode,
-    devtool: devMode ? 'inline-module-source-map' : undefined,
+    devtool: devMode ? 'inline-cheap-module-source-map' : undefined,
     output: {
       filename: jsFilename,
       path: outDir,
@@ -91,6 +88,8 @@ module.exports = (env, args) => {
           loader: require.resolve('babel-loader'),
           options: {
             compact: false,
+            cacheDirectory: true,
+            cacheCompression: false,
             sourceMaps: devMode ? 'inline' : undefined,
             plugins: [
               require.resolve('@babel/plugin-transform-object-assign'),
@@ -123,27 +122,9 @@ module.exports = (env, args) => {
         outDir: outDir
       }),
       // # Copy resources
-      new CopyPlugin(copyPluginConfig),
-      // Shows progress information in the console
-      new webpack.ProgressPlugin()
+      new CopyPlugin(copyPluginConfig)
     ],
     optimization: {
-      minimizer: [
-        // minify css
-        new OptimizeCssAssetsPlugin({
-          assetNameRegExp: /\.min\.css$/g,
-          cssProcessorPluginOptions: {
-            preset: ['default', {
-              discardComments: {removeAll: true}
-            }]
-          }
-        }),
-        // minify js
-        new TerserPlugin({
-          test: /\.js(\?.*)?$/i,
-          sourceMap: devMode
-        })
-      ],
       splitChunks: {
         chunks: 'all',
         cacheGroups: {
@@ -168,7 +149,34 @@ module.exports = (env, args) => {
     }
   };
 
-  const isWatchMode = args && !!args.watch;
+  if (devMode) {
+    // Shows progress information in the console in dev mode
+    const webpack = require('webpack');
+    config.plugins.push(new webpack.ProgressPlugin());
+  } else {
+    const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+    const TerserPlugin = require('terser-webpack-plugin');
+    config.optimization.minimizer = [
+      // minify css
+      new OptimizeCssAssetsPlugin({
+        assetNameRegExp: /\.min\.css$/g,
+        cssProcessorPluginOptions: {
+          preset: ['default', {
+            discardComments: {removeAll: true}
+          }]
+        }
+      }),
+      // minify js
+      new TerserPlugin({
+        test: /\.js(\?.*)?$/i,
+        sourceMap: devMode,
+        cache: true,
+        parallel: true
+      })
+    ];
+  }
+
+  const isWatchMode = args && args.watch;
   if (!isWatchMode) {
     // see: https://webpack.js.org/guides/output-management/#cleaning-up-the-dist-folder
     config.plugins.push(new CleanWebpackPlugin());
