@@ -107,17 +107,25 @@ public class SequenceNumberDuplicateDetectorTest {
     assertFalse(det.accept(1));
 
     setCurrentTime(22);
-    assertTrue(det.accept(2));
-    assertFalse(det.accept(0));//cache has minimum size 2
+    assertTrue(det.accept(2));//0,1,2
+    assertFalse(det.accept(0));
     assertFalse(det.accept(1));
     assertFalse(det.accept(2));
 
     setCurrentTime(33);
-    assertTrue(det.accept(3));
+    assertTrue(det.accept(3));//0,1,2,3
     assertFalse(det.accept(0));
     assertFalse(det.accept(1));
     assertFalse(det.accept(2));
     assertFalse(det.accept(3));
+
+    setCurrentTime(44);
+    assertTrue(det.accept(4));//3,4
+    assertFalse(det.accept(3));
+    // this will produce a warning: SequenceNumberDuplicateDetector - Potential duplicate request id 2. The cache size is 2, the window is 3, 4. Assuming new key is valid.
+    assertTrue(det.accept(2));//2,3,4
+    // this will produce a warning: SequenceNumberDuplicateDetector - Potential duplicate request id 1. The cache size is 3, the window is 2, 4. Assuming new key is valid.
+    assertTrue(det.accept(1));//1,2,3,4
   }
 
   /**

@@ -32,6 +32,8 @@ import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandl
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpHeaders;
@@ -43,6 +45,7 @@ import com.google.api.client.http.HttpResponse;
  * Abstract tunnel used to invoke a service through HTTP.
  */
 public class HttpServiceTunnel extends AbstractServiceTunnel {
+  private static final Logger LOG = LoggerFactory.getLogger(HttpServiceTunnel.class);
 
   public static final String TOKEN_AUTH_HTTP_HEADER = "X-ScoutAccessToken";
 
@@ -201,6 +204,9 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
 
   @Override
   protected ServiceTunnelResponse tunnel(final ServiceTunnelRequest serviceRequest) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("requestSequence {} {}.{}", serviceRequest.getRequestSequence(), serviceRequest.getServiceInterfaceClassName(), serviceRequest.getOperation());
+    }
     final long requestSequence = serviceRequest.getRequestSequence();
 
     // Create the Callable to be given to the job manager for execution.
