@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.rest.jersey;
 
+import java.util.Map;
+
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
@@ -21,6 +23,10 @@ public class RestClientTestEchoResponse extends DoEntity {
 
   public DoValue<RestClientTestEchoDo> echo() {
     return doValue("echo");
+  }
+
+  public DoValue<Map<String, String>> receivedHeaders() {
+    return doValue("receivedHeaders");
   }
 
   /* **************************************************************************
@@ -36,5 +42,16 @@ public class RestClientTestEchoResponse extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public RestClientTestEchoDo getEcho() {
     return echo().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public RestClientTestEchoResponse withReceivedHeaders(Map<String, String> receivedHeaders) {
+    receivedHeaders().set(receivedHeaders);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Map<String, String> getReceivedHeaders() {
+    return receivedHeaders().get();
   }
 }

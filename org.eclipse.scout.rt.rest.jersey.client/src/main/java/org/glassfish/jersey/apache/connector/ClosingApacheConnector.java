@@ -44,6 +44,8 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.protocol.HTTP;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
@@ -78,6 +80,9 @@ class ClosingApacheConnector extends ApacheConnector {
   @SuppressWarnings({"resource", "squid:S1141", "squid:RedundantThrowsDeclarationCheck"})
   public ClientResponse apply(final ClientRequest clientRequest) throws ProcessingException {
     final HttpUriRequest request = getUriHttpRequest(clientRequest);
+
+    // Work around for rare abnormal connection terminations (258238)
+    ensureHttpHeaderCloseConnection(clientRequest.getHeaders(), request);
     final Map<String, String> clientHeadersSnapshot = writeOutBoundHeaders(clientRequest.getHeaders(), request);
 
     final IRegistrationHandle cancellableHandle = registerCancellable(request);
@@ -147,6 +152,18 @@ class ClosingApacheConnector extends ApacheConnector {
   }
 
   /**
+   * Adds the HTTP header {@code Connection: close} if {@link RestEnsureHttpHeaderConnectionCloseProperty} is
+   * {@code true} and the given {@code headers} do not contain the key {@code Connection}.
+   */
+  protected void ensureHttpHeaderCloseConnection(MultivaluedMap<String, Object> headers, HttpUriRequest request) {
+    if (CONFIG.getPropertyValue(RestEnsureHttpHeaderConnectionCloseProperty.class).booleanValue()
+        && !headers.containsKey(HTTP.CONN_DIRECTIVE)) {
+      LOGGER.finest("Adding HTTP header '" + HTTP.CONN_DIRECTIVE + ": " + HTTP.CONN_CLOSE + "'");
+      request.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);
+    }
+  }
+
+  /**
    * Registers an {@link ICancellable} if this method is invoked in the context of a {@link RunMonitor} (i.e.
    * {@link RunMonitor#CURRENT} is not {@code null}).
    */
@@ -204,7 +221,6 @@ class ClosingApacheConnector extends ApacheConnector {
         }
       }
     };
-
   }
 
   // --- Helper methods for accessing private methods and fields in super class --------------------
