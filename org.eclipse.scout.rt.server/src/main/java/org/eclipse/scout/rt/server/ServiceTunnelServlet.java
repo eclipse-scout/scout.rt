@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.SocketException;
 import java.security.AccessController;
+import java.util.concurrent.TimeUnit;
+import java.util.function.LongPredicate;
 
 import javax.security.auth.Subject;
 import javax.servlet.ServletException;
@@ -55,19 +57,18 @@ import org.slf4j.LoggerFactory;
  * {@link IServiceTunnelResponse} and any {@link IServiceTunnelContentHandler} implementation.
  */
 public class ServiceTunnelServlet extends AbstractHttpServlet {
-
-  private static final String ADMIN_SESSION_KEY = AdminSession.class.getName();
-  private static final String DUPLICATE_REQUEST_DETECTOR_SESSION_KEY = "DuplicateRequestDetector";
-
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(ServiceTunnelServlet.class);
 
-  private transient IServiceTunnelContentHandler m_contentHandler;
-  private transient LazyValue<HttpServerRunContextProducer> m_serverRunContextProducer = new LazyValue<>(HttpServerRunContextProducer.class);
-  private transient LazyValue<HttpServletControl> m_httpServletControl = new LazyValue<>(HttpServletControl.class);
-  private transient LazyValue<HttpCacheControl> m_httpCacheControl = new LazyValue<>(HttpCacheControl.class);
-  private transient LazyValue<ServiceOperationInvoker> m_svcInvoker = new LazyValue<>(ServiceOperationInvoker.class);
-  private transient LazyValue<RunMonitorCancelRegistry> m_runMonCancelRegistry = new LazyValue<>(RunMonitorCancelRegistry.class);
+  protected static final String ADMIN_SESSION_KEY = "AdminSessionKey";
+  protected static final String DUPLICATE_REQUEST_DETECTOR_SESSION_KEY = "DuplicateRequestDetector";
+
+  protected transient IServiceTunnelContentHandler m_contentHandler;
+  protected transient LazyValue<HttpServerRunContextProducer> m_serverRunContextProducer = new LazyValue<>(HttpServerRunContextProducer.class);
+  protected transient LazyValue<HttpServletControl> m_httpServletControl = new LazyValue<>(HttpServletControl.class);
+  protected transient LazyValue<HttpCacheControl> m_httpCacheControl = new LazyValue<>(HttpCacheControl.class);
+  protected transient LazyValue<ServiceOperationInvoker> m_svcInvoker = new LazyValue<>(ServiceOperationInvoker.class);
+  protected transient LazyValue<RunMonitorCancelRegistry> m_runMonCancelRegistry = new LazyValue<>(RunMonitorCancelRegistry.class);
 
   // === HTTP-GET ===
 
@@ -175,6 +176,10 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
   }
 
   protected ServiceTunnelResponse doPost(ServiceTunnelRequest serviceRequest) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("requestSequence {} {}.{}", serviceRequest.getRequestSequence(), serviceRequest.getServiceInterfaceClassName(), serviceRequest.getOperation());
+    }
+
     final ServerRunContext serverRunContext = createServiceTunnelRunContext(serviceRequest);
     final IRegistrationHandle registrationHandle = registerForCancellation(serverRunContext, serviceRequest);
     try {
@@ -201,9 +206,9 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
       serverRunContext.withSession(session);
 
       // duplicate detection
-      SequenceNumberDuplicateDetector duplicateRequestDetector = (SequenceNumberDuplicateDetector) session
-          .computeDataIfAbsent(DUPLICATE_REQUEST_DETECTOR_SESSION_KEY, SequenceNumberDuplicateDetector::new);
-      if (!duplicateRequestDetector.accept(serviceRequest.getRequestSequence())) {
+      LongPredicate duplicateRequestDetector = (LongPredicate) session
+          .computeDataIfAbsent(DUPLICATE_REQUEST_DETECTOR_SESSION_KEY, this::createRequestSequenceValidator);
+      if (!duplicateRequestDetector.test(serviceRequest.getRequestSequence())) {
         StringBuilder buf = new StringBuilder()
             .append("clientNodeId: ").append(serviceRequest.getClientNodeId())
             .append(", ")
@@ -214,6 +219,13 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
       }
     }
     return serverRunContext;
+  }
+
+  /**
+   * @return a function that returns true for valid request numbers and false for duplicate request number
+   */
+  protected LongPredicate createRequestSequenceValidator() {
+    return new SequenceNumberDuplicateDetector(100, 1, TimeUnit.MINUTES, true);
   }
 
   protected IRegistrationHandle registerForCancellation(ServerRunContext runContext, ServiceTunnelRequest req) {
