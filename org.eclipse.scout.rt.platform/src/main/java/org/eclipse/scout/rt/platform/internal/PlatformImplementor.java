@@ -47,8 +47,8 @@ public class PlatformImplementor implements IPlatform {
 
   private static final Logger LOG = LoggerFactory.getLogger(PlatformImplementor.class);
 
-  private static final String SCOUT_HEADLESS_PROPERTY = "scout.headless";
-  private static final String AWT_HEADLESS_PROPERTY = "java.awt.headless";
+  public static final String SCOUT_HEADLESS_PROPERTY = "scout.headless";
+  public static final String AWT_HEADLESS_PROPERTY = "java.awt.headless";
 
   private final ReentrantReadWriteLock m_platformLock = new ReentrantReadWriteLock(true);
   private volatile CountDownLatch m_platformStarted = new CountDownLatch(1);

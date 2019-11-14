@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.config;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.internal.PlatformImplementor;
 import org.eclipse.scout.rt.platform.inventory.internal.JandexInventoryBuilder.RebuildStrategy;
 
 public final class PlatformConfigProperties {
@@ -34,6 +35,25 @@ public final class PlatformConfigProperties {
     @Override
     public Boolean getDefaultValue() {
       return Boolean.FALSE;
+    }
+  }
+
+  public static class PlatformHeadlessProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return PlatformImplementor.SCOUT_HEADLESS_PROPERTY;
+    }
+
+    @Override
+    public String description() {
+      return String.format("Specifies if the Scout Platform runs in headless mode." +
+          " If true, the Java system property '%s' is set to true as well (if not already set). The default value is true.", PlatformImplementor.AWT_HEADLESS_PROPERTY);
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return Boolean.TRUE;
     }
   }
 
