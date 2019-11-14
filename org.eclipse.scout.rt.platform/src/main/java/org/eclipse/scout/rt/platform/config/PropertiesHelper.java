@@ -157,7 +157,7 @@ public class PropertiesHelper {
           return;
         }
         else {
-          LOG.warn("Duplicate config key: '{}'. Old value '{}' replaced with '{}'.", key, m_configProperties.get(key), value);
+          LOG.info("Duplicate config key: '{}'. Old value '{}' replaced with '{}'.", key, m_configProperties.get(key), value);
         }
 
       }
