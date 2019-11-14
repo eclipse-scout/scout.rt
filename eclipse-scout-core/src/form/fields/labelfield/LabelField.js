@@ -66,9 +66,14 @@ export default class LabelField extends ValueField {
     var displayText = this.displayText || '';
     if (this.htmlEnabled) {
       this.$field.html(displayText);
+
+      // Add action to app-links
+      this.$field.find('.app-link')
+        .on('click', this._onAppLinkAction.bind(this));
     } else {
       this.$field.html(strings.nl2br(displayText));
     }
+
     this.invalidateLayoutTree();
   }
 
@@ -92,6 +97,18 @@ export default class LabelField extends ValueField {
     super._renderGridDataHints();
     this.updateInnerAlignment({
       useHorizontalAlignment: true
+    });
+  }
+
+  _onAppLinkAction(event) {
+    var $target = $(event.delegateTarget);
+    var ref = $target.data('ref');
+    this.triggerAppLinkAction(ref);
+  }
+
+  triggerAppLinkAction(ref) {
+    this.trigger('appLinkAction', {
+      ref: ref
     });
   }
 }

@@ -10,14 +10,26 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.labelfield;
 
+import java.util.List;
+
+import org.eclipse.scout.rt.client.ModelContextProxy;
+import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.labelfield.ILabelFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.labelfield.LabelFieldChains.LabelFieldAppLinkActionChain;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("7e531d93-ad27-4316-9529-7766059b3886")
 public abstract class AbstractLabelField extends AbstractValueField<String> implements ILabelField {
+
+  private ILabelFieldUIFacade m_uiFacade;
+
   public AbstractLabelField() {
     this(true);
   }
@@ -59,6 +71,7 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
 
   @Override
   protected void initConfig() {
+    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     super.initConfig();
     setWrapText(getConfiguredWrapText());
     setSelectable(getConfiguredSelectable());
@@ -77,8 +90,13 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
   }
 
   @Override
-  public void setWrapText(boolean b) {
-    propertySupport.setPropertyBool(PROP_WRAP_TEXT, b);
+  public ILabelFieldUIFacade getUIFacade() {
+    return m_uiFacade;
+  }
+
+  @Override
+  public void setWrapText(boolean wrapText) {
+    propertySupport.setPropertyBool(PROP_WRAP_TEXT, wrapText);
   }
 
   @Override
@@ -87,8 +105,8 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
   }
 
   @Override
-  public void setSelectable(boolean b) {
-    propertySupport.setPropertyBool(PROP_SELECTABLE, b);
+  public void setSelectable(boolean selectable) {
+    propertySupport.setPropertyBool(PROP_SELECTABLE, selectable);
   }
 
   @Override
@@ -97,8 +115,8 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
   }
 
   @Override
-  public void setHtmlEnabled(boolean enabled) {
-    propertySupport.setPropertyBool(PROP_HTML_ENABLED, enabled);
+  public void setHtmlEnabled(boolean htmlEnabled) {
+    propertySupport.setPropertyBool(PROP_HTML_ENABLED, htmlEnabled);
   }
 
   @Override
@@ -115,10 +133,44 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
     return text;
   }
 
+  /**
+   * Called when an app link has been clicked.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   */
+  @ConfigOperation
+  @Order(100)
+  protected void execAppLinkAction(String ref) {
+  }
+
+  @Override
+  public void doAppLinkAction(String ref) {
+    interceptAppLinkAction(ref);
+  }
+
+  protected final void interceptAppLinkAction(String ref) {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    LabelFieldAppLinkActionChain chain = new LabelFieldAppLinkActionChain(extensions);
+    chain.execAppLinkAction(ref);
+  }
+
+  protected class P_UIFacade implements ILabelFieldUIFacade {
+
+    @Override
+    public void fireAppLinkActionFromUI(String ref) {
+      doAppLinkAction(ref);
+    }
+  }
+
   protected static class LocalLabelFieldExtension<OWNER extends AbstractLabelField> extends LocalValueFieldExtension<String, OWNER> implements ILabelFieldExtension<OWNER> {
 
     public LocalLabelFieldExtension(OWNER owner) {
       super(owner);
+    }
+
+    @Override
+    public void execAppLinkAction(LabelFieldAppLinkActionChain chain, String ref) {
+      getOwner().execAppLinkAction(ref);
     }
   }
 

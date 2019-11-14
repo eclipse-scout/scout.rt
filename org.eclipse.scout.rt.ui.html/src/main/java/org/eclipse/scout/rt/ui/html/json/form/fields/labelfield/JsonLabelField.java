@@ -14,6 +14,8 @@ import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
@@ -49,5 +51,20 @@ public class JsonLabelField<LABEL_FIELD extends ILabelField> extends JsonValueFi
         return getModel().isHtmlEnabled();
       }
     });
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event) {
+    if (JsonEventType.APP_LINK_ACTION.matches(event.getType())) {
+      handleUiAppLinkAction(event);
+    }
+    else {
+      super.handleUiEvent(event);
+    }
+  }
+
+  protected void handleUiAppLinkAction(JsonEvent event) {
+    String ref = event.getData().optString("ref", null);
+    getModel().getUIFacade().fireAppLinkActionFromUI(ref);
   }
 }

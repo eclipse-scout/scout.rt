@@ -24,7 +24,7 @@ public interface IHtmlCapable {
    * Enable or disable the rendering of HTML.<br>
    * Make sure that any user input (or other insecure input) is encoded (security)
    */
-  void setHtmlEnabled(boolean enabled);
+  void setHtmlEnabled(boolean htmlEnabled);
 
   /**
    * @return true, if the cell may contain html that needs to be rendered. false otherwise.

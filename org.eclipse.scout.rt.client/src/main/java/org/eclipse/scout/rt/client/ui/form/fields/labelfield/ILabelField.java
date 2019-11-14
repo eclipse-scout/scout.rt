@@ -10,10 +10,11 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.labelfield;
 
+import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
-public interface ILabelField extends IValueField<String>, IHtmlCapable {
+public interface ILabelField extends IValueField<String>, IHtmlCapable, IAppLinkCapable {
 
   String PROP_WRAP_TEXT = "wrapText";
   String PROP_SELECTABLE = "selectable";
@@ -33,5 +34,7 @@ public interface ILabelField extends IValueField<String>, IHtmlCapable {
    * returns <code>true</code> if the label is selectable, <code>false</code> otherwise
    */
   boolean isSelectable();
+
+  ILabelFieldUIFacade getUIFacade();
 
 }
