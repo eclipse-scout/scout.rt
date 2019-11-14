@@ -18,6 +18,8 @@ import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.STATUS;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
@@ -88,11 +90,18 @@ public class RestClientTestEchoServlet extends HttpServlet {
       return;
     }
 
+    Map<String, String> receivedHeaders = new HashMap<>();
+    for (Enumeration<String> headerNames = req.getHeaderNames(); headerNames.hasMoreElements();) {
+      String headerName = headerNames.nextElement();
+      receivedHeaders.put(headerName, req.getHeader(headerName));
+    }
+
     RestClientTestEchoResponse echoResponse = BEANS.get(RestClientTestEchoResponse.class)
         .withEcho(BEANS.get(RestClientTestEchoDo.class)
             .withHttpMethod(req.getMethod())
             .withCode(statusCode)
-            .withInfo(status == null ? "unknown" : status.getReasonPhrase()));
+            .withInfo(status == null ? "unknown" : status.getReasonPhrase()))
+        .withReceivedHeaders(receivedHeaders);
 
     if (req.getParameter(LARGE_MESSAGE) != null) {
       StringBuilder sb = new StringBuilder();
