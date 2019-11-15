@@ -74,9 +74,16 @@ public interface DataModelConstants {
    */
   int TYPE_FULL_TEXT = 18;
   /**
-   * Attribute used for rich text searches
+   * Attribute used for rich text searches. Note: since 16.2 this type is only used to store data from the old RichTextField (RichTextData).
+   * Now the SimpleHtmlEditorField is used in place of the old RichTextField. Like the regular HtmlEditorField this field produces a HTML
+   * string and uses the {@link #TYPE_HTML}. You should not use this type anymore.
    */
   int TYPE_RICH_TEXT = 19;
+  /**
+   * Attribute used for HTML content (which is basically a simple string, but we need to distinct between regular strings and HTML strings because
+   * we must apply htmlEncode on regular strings but not on HTML strings.
+   */
+  int TYPE_HTML = 20;
 
   /**
    * marker operator that does nothing, no "attribute" "op" "value" pattern is used but simply "attribute"

@@ -208,6 +208,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
         break;
       }
       case IDataModelAttribute.TYPE_RICH_TEXT:
+      case IDataModelAttribute.TYPE_HTML:
       case IDataModelAttribute.TYPE_FULL_TEXT: {
         operatorList.add(DataModelAttributeOp.create(OPERATOR_CONTAINS));
         if (attribute.isNotOperatorEnabled()) {
