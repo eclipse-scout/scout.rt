@@ -245,10 +245,8 @@ export default class FocusContext {
       return;
     }
 
-    var $elementToFocus = $(elementToFocus);
-
     // Focus the requested element
-    $elementToFocus.focus();
+    elementToFocus.focus();
 
     $.log.isDebugEnabled() && $.log.debug('Focus set to ' + graphics.debugOutput(elementToFocus));
   }
