@@ -1,0 +1,36 @@
+{
+  "name": "@eclipse-scout/releng",
+  "version": "10.0.0",
+  "description": "Release Engineering module for Eclipse Scout",
+  "author": "BSI Business Systems Integration AG",
+  "homepage": "https://www.eclipse.org/scout",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git.eclipse.org:29418/scout/org.eclipse.scout.rt"
+  },
+  "license": "EPL-1.0",
+  "publishConfig": {
+    "registry": "https://scout.bsiag.com/repository/api/npm/com.bsiag.scout-npm-local/"
+  },
+  "engines": {
+    "node": ">=12.2.0",
+    "npm": ">=6.9.0",
+    "pnpm": ">=4"
+  },
+  "files": [
+    "bin",
+    "scripts"
+  ],
+  "scripts": {
+    "snapshot-version": "node bin/releng-scripts snapshot-version",
+    "release-version": "node bin/releng-scripts release-version",
+    "snapshot-cleanup": "node bin/releng-scripts snapshot-cleanup"
+  },
+  "dependencies": {
+    "axios": "0.19.0",
+    "yargs": "14.2.0"
+  },
+  "bin": {
+    "releng-scripts": "./bin/releng-scripts.js"
+  }
+}

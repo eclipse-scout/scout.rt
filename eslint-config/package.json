@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/eslint-config",
-  "version": "10.0.0",
+  "version": "10.0.0-snapshot",
   "description": "ESLint shareable config for the Scout style",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
@@ -42,12 +42,15 @@
     "src"
   ],
   "scripts": {
-    "snapshot-version": "scout-scripts snapshot-version",
-    "release-version": "scout-scripts release-version",
-    "snapshot-cleanup": "scout-scripts snapshot-cleanup"
+    "snapshot-cleanup": "releng-scripts snapshot-cleanup",
+    "snapshot-predependency": "releng-scripts snapshot-install-dependency",
+    "snapshot-postdependency": "releng-scripts snapshot-publish-dependency",
+    "release-predependency": "releng-scripts release-install-dependency",
+    "release-postdependency": "releng-scripts release-publish-dependency"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": "^10.0.0-snapshot",
+    "@eclipse-scout/cli": "10.0.0-snapshot",
+    "@eclipse-scout/releng": "10.0.0",
     "eslint": "6.5.1"
   },
   "peerDependencies": {

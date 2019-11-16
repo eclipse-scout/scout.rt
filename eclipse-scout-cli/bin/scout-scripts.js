@@ -56,32 +56,6 @@ switch (script) {
     runWebpackWatch({mode: 'development'});
     break;
   }
-  case 'snapshot-version': {
-    const updateVersionScript = require('../scripts/updateVersion');
-    updateVersionScript.generateSnapshotVersion()
-      .then(() => console.log('snapshot version done'))
-      .catch(e => {
-        console.error('snapshot version failed');
-        console.error(e);
-        process.exit(1);
-      });
-    break;
-  }
-  case 'release-version': {
-    const updateVersionScript = require('../scripts/updateVersion');
-    updateVersionScript.updateVersionAndDependencies()
-      .then(() => console.log('Update version done'))
-      .catch(e => {
-        console.error('Update version failed');
-        console.error(e);
-        process.exit(1);
-      });
-    break;
-  }
-  case 'snapshot-cleanup': {
-    require('../scripts/snapshot-cleanup');
-    break;
-  }
   default:
     console.log(`Unknown script "${script}"`);
     break;

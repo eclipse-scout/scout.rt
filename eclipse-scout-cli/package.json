@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/cli",
-  "version": "10.0.0",
+  "version": "10.0.0-snapshot",
   "description": "CLI for Eclipse Scout",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
@@ -22,9 +22,11 @@
     "scripts"
   ],
   "scripts": {
-    "snapshot-version": "node bin/scout-scripts snapshot-version",
-    "release-version": "node bin/scout-scripts release-version",
-    "snapshot-cleanup": "node bin/scout-scripts snapshot-cleanup"
+    "snapshot-cleanup": "releng-scripts snapshot-cleanup",
+    "snapshot-predependency": "releng-scripts snapshot-install-dependency",
+    "snapshot-postdependency": "releng-scripts snapshot-publish-dependency",
+    "release-predependency": "releng-scripts release-install-dependency",
+    "release-postdependency": "releng-scripts release-publish-dependency"
   },
   "dependencies": {
     "@babel/cli": "7.6.4",
@@ -33,7 +35,6 @@
     "@babel/plugin-proposal-object-rest-spread": "7.6.2",
     "@babel/plugin-transform-object-assign": "7.2.0",
     "@babel/preset-env": "7.6.3",
-    "axios": "0.19.0",
     "babel-loader": "8.0.6",
     "clean-webpack-plugin": "3.0.0",
     "copy-webpack-plugin": "5.0.4",
@@ -44,7 +45,7 @@
     "karma-jasmine": "2.0.1",
     "karma-jasmine-jquery": "0.1.1",
     "karma-jasmine-ajax": "0.1.13",
-    "@eclipse-scout/karma-jasmine-scout": "^10.0.0-snapshot",
+    "@eclipse-scout/karma-jasmine-scout": "10.0.0-snapshot",
     "karma-jasmine-html-reporter": "1.4.2",
     "karma-junit-reporter": "2.0.1",
     "karma-webpack": "4.0.2",
@@ -57,8 +58,10 @@
     "webpack": "4.41.2",
     "webpack-cli": "3.3.9",
     "webpack-dev-server": "3.8.2",
-    "webpack-shell-plugin": "0.5.0",
-    "yargs": "14.2.0"
+    "webpack-shell-plugin": "0.5.0"
+  },
+  "devDependencies": {
+    "@eclipse-scout/releng": "10.0.0"
   },
   "bin": {
     "scout-scripts": "./bin/scout-scripts.js"

@@ -1,13 +1,7 @@
 #!/usr/bin/env node
 /*
- * Copyright (c) 2014-2019 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
+ * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
+ * http://www.bsiag.com/
  */
 
 const axios = require('axios');
@@ -36,7 +30,7 @@ const getPackageName = itemName => {
   return itemName.replace(NAME_REGEX, '');
 };
 
-const getSnapshots = async (artifactoryUrl, repoName, config, verbose) => {
+const getSnapshots = async(artifactoryUrl, repoName, config, verbose) => {
   const AQL_API = 'api/search/aql'; // use aql for search
   const searchUrl = `${artifactoryUrl}${AQL_API}`;
   const query = `items.find({"repo":"${repoName}","name":{"$match":"*snapshot.*tgz"}})`;
@@ -71,7 +65,7 @@ const getSnapshots = async (artifactoryUrl, repoName, config, verbose) => {
   return snapshotMap;
 };
 
-const calculateItemsToDelete = async (itemMap, noToKeep) => {
+const calculateItemsToDelete = async(itemMap, noToKeep) => {
   const toDelete = [];
   for (const itemSet of itemMap.values()) {
     // order the snapshots of each package by date and select the oldest items to delete
@@ -83,7 +77,7 @@ const calculateItemsToDelete = async (itemMap, noToKeep) => {
   return toDelete;
 };
 
-const deleteItems = async (artifactoryUrl, items, config, dryrun) => {
+const deleteItems = async(artifactoryUrl, items, config, dryrun) => {
   let success = true;
   if (!items || items.length === 0) {
     console.log('Nothing to cleanup');
@@ -109,49 +103,11 @@ const deleteItems = async (artifactoryUrl, items, config, dryrun) => {
   }
 };
 
-const doCleanup = async () => {
-  const yargs = require('yargs');
-  const argv = yargs
-    .option('apikey', {
-      description: 'API Key for authentication',
-      type: 'string'
-    })
-    .option('url', {
-      description: 'URL of the artifactory',
-      type: 'string'
-    })
-    .option('user', {
-      description: 'username',
-      type: 'string'
-    })
-    .option('pwd', {
-      description: 'password',
-      type: 'string'
-    })
-    .option('reponame', {
-      description: 'name of the repository',
-      type: 'string'
-    })
-    .option('dryrun', {
-      description: 'If true, the command only indicates which artifacts would have been deleted.',
-      type: 'boolean',
-      default: false
-    })
-    .option('keep', {
-      description: 'Number of Artifacts to keep',
-      type: 'number',
-      default: 5
-    })
-    .option('verbose', {
-      description: 'More Logging',
-      type: 'boolean',
-      default: false
-    })
-    .argv;
+const doCleanup = async({url, apikey, user, pwd, reponame, keep = 5, dryrun = false, verbose = false}) => {
 
-  console.log(`Input arguments: url=${argv.url}; repo-name=${argv.reponame}; number of artifacts to keep=${argv.keep}; dry-run=${argv.dryrun}; verbose=${argv.verbose}`);
+  console.log(`Input arguments: url=${url}; repo-name=${reponame}; number of artifacts to keep=${keep}; dry-run=${dryrun}; verbose=${verbose}`);
 
-  if (!argv.reponame || !argv.url) {
+  if (!reponame || !url) {
     throw new Error('Please provide arguments for --url and --repo-name');
   }
 
@@ -159,32 +115,27 @@ const doCleanup = async () => {
     'Content-Type': 'text/plain'
   };
 
-  if (argv.apikey) {
-    headers['X-JFrog-Art-Api'] = argv.apikey;
+  if (apikey) {
+    headers['X-JFrog-Art-Api'] = apikey;
   }
 
   const config = {
     headers: headers
   };
 
-  if (!argv.apikey && argv.user && argv.pwd) {
+  if (!apikey && user && pwd) {
     config.auth = {
-      username: argv.user,
-      password: argv.pwd
+      username: user,
+      password: pwd
     };
   }
 
-  const foundItems = await getSnapshots(argv.url, argv.reponame, config, argv.verbose);
-  const itemsToDelete = await calculateItemsToDelete(foundItems, argv.keep);
-  await deleteItems(argv.url, itemsToDelete, config, argv.dryrun);
+  const foundItems = await getSnapshots(url, reponame, config, verbose);
+  const itemsToDelete = await calculateItemsToDelete(foundItems, keep);
+  await deleteItems(url, itemsToDelete, config, dryrun);
 };
 
-doCleanup()
-  .then(() => console.log('Repository cleanup done'))
-  .catch(e => {
-    console.error('Repository cleanup failed');
-    console.error(e);
-    process.exit(1);
-  });
-
+module.exports = {
+  doCleanup
+};
 
