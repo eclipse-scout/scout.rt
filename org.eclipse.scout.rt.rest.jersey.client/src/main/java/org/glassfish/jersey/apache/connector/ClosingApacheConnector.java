@@ -46,6 +46,7 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.glassfish.jersey.client.ClientRequest;
 import org.glassfish.jersey.client.ClientResponse;
@@ -79,7 +80,7 @@ class ClosingApacheConnector extends ApacheConnector {
     final HttpUriRequest request = getUriHttpRequest(clientRequest);
     final Map<String, String> clientHeadersSnapshot = writeOutBoundHeaders(clientRequest.getHeaders(), request);
 
-    registerCancellable(request);
+    final IRegistrationHandle cancellableHandle = registerCancellable(request);
 
     try {
       final CloseableHttpResponse response;
@@ -140,30 +141,35 @@ class ClosingApacheConnector extends ApacheConnector {
     catch (final Exception e) {
       throw new ProcessingException(e);
     }
+    finally {
+      cancellableHandle.dispose();
+    }
   }
 
   /**
    * Registers an {@link ICancellable} if this method is invoked in the context of a {@link RunMonitor} (i.e.
    * {@link RunMonitor#CURRENT} is not {@code null}).
    */
-  protected void registerCancellable(final HttpUriRequest request) {
-    RunMonitor runMonitor = RunMonitor.CURRENT.get();
-    if (runMonitor != null) {
-      runMonitor.registerCancellable(new ICancellable() {
-
-        @Override
-        public boolean isCancelled() {
-          return request.isAborted();
-        }
-
-        @Override
-        public boolean cancel(boolean interruptIfRunning) {
-          LOGGER.fine("Aborting HTTP REST request");
-          request.abort();
-          return true;
-        }
-      });
+  protected IRegistrationHandle registerCancellable(final HttpUriRequest request) {
+    final RunMonitor runMonitor = RunMonitor.CURRENT.get();
+    if (runMonitor == null) {
+      return IRegistrationHandle.NULL_HANDLE;
     }
+    ICancellable cancellable = new ICancellable() {
+      @Override
+      public boolean isCancelled() {
+        return request.isAborted();
+      }
+
+      @Override
+      public boolean cancel(boolean interruptIfRunning) {
+        LOGGER.fine("Aborting HTTP REST request");
+        request.abort();
+        return true;
+      }
+    };
+    runMonitor.registerCancellable(cancellable);
+    return () -> runMonitor.unregisterCancellable(cancellable);
   }
 
   private static InputStream getInputStream(final CloseableHttpResponse response) throws IOException {
