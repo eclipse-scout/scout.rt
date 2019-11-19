@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -740,6 +741,22 @@ public final class CollectionUtility {
     }
 
     HashMap<T, U> hashMap = new HashMap<>();
+    for (Pair<T, U> entry : entries) {
+      if (entry == null) {
+        continue;
+      }
+      hashMap.put(entry.getLeft(), entry.getRight());
+    }
+    return hashMap;
+  }
+
+  @SafeVarargs
+  public static <T, U> LinkedHashMap<T, U> orderedHashMap(Pair<T, U>... entries) {
+    if (entries == null || entries.length < 1) {
+      return new LinkedHashMap<>(0);
+    }
+
+    LinkedHashMap<T, U> hashMap = new LinkedHashMap<>(0);
     for (Pair<T, U> entry : entries) {
       if (entry == null) {
         continue;

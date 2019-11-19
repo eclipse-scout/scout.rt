@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -442,6 +443,22 @@ public class CollectionUtilityTest {
     // test that it inserts null keys / values
     assertEquals("test", CollectionUtility.hashMap(new ImmutablePair<Integer, String>(null, "test")).get(null));
     assertEquals(null, CollectionUtility.hashMap(new ImmutablePair<String, String>("test", null)).get("test"));
+  }
+
+  @Test
+  public void testOrderedHashMap() {
+    // test that it is null safe
+    assertEquals(1, CollectionUtility.orderedHashMap(null, new ImmutablePair<>(2, "test")).size());
+    LinkedHashMap<Integer, String> map = CollectionUtility.orderedHashMap();
+    assertNotNull(map);
+    assertTrue(map.isEmpty());
+    // test that it is a mutable map
+    map.put(1, "test");
+    assertEquals(1, map.size());
+
+    // test that it inserts null keys / values
+    assertEquals("test", CollectionUtility.orderedHashMap(new ImmutablePair<Integer, String>(null, "test")).get(null));
+    assertEquals(null, CollectionUtility.orderedHashMap(new ImmutablePair<String, String>("test", null)).get("test"));
   }
 
   @Test
