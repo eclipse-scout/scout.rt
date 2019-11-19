@@ -38,9 +38,9 @@ const setInstallSnapshotDependencies = args => {
 const setPublishSnapshotDependencies = args => {
   const script = require('../scripts/updateVersion');
   script.setPrePublishSnapshotDependencies({verbose: args.verbose, dryrun: args.dryrun, excludeFolderOverride: args.excludeFolderOverride})
-    .then(() => console.log('setPublishSnapshotDependencies version done'))
+    .then(() => console.log('setPrePublishSnapshotDependencies version done'))
     .catch(e => {
-      console.error('setPublishSnapshotDependencies version failed');
+      console.error('setPrePublishSnapshotDependencies version failed');
       console.error(e);
       process.exit(1);
     });
@@ -49,9 +49,9 @@ const setPublishSnapshotDependencies = args => {
 const setInstallReleaseDependencies = args => {
   const script = require('../scripts/updateVersion');
   script.setPreInstallReleaseDependencies({mapping: args.mapping, verbose: args.verbose, dryrun: args.dryrun, excludeFolderOverride: args.excludeFolderOverride})
-    .then(() => console.log('setInstallReleaseDependencies version done'))
+    .then(() => console.log('setPreInstallReleaseDependencies version done'))
     .catch(e => {
-      console.error('setInstallReleaseDependencies version failed');
+      console.error('setPreInstallReleaseDependencies version failed');
       console.error(e);
       process.exit(1);
     });
@@ -63,9 +63,9 @@ const setPublishReleaseDependencies = args => {
   }
   const script = require('../scripts/updateVersion');
   script.setPrePublishReleaseDependencies({mapping: args.mapping, newVersion: args.newVersion, useRegexMap: args.useRegexMap, verbose: args.verbose, dryrun: args.dryrun, excludeFolderOverride: args.excludeFolderOverride})
-    .then(() => console.log('setPublishReleaseDependencies version done'))
+    .then(() => console.log('setPrePublishReleaseDependencies version done'))
     .catch(e => {
-      console.error('setPublishReleaseDependencies version failed');
+      console.error('setPrePublishReleaseDependencies version failed');
       console.error(e);
       process.exit(1);
     });

@@ -59,7 +59,7 @@ const generateSnapshotVersion = ({moduleVersion, timestamp, verbose}) => {
   if (verbose) {
     console.log(`old version was: ${moduleVersion}`);
   }
-  console.log(`New Version: ${newVersion}`);
+  console.log(`new Version: ${newVersion}`);
   return newVersion;
 };
 
@@ -269,7 +269,6 @@ const setPrePublishSnapshotDependencies = async({verbose, dryrun, excludeFolderO
 
 const setPreInstallReleaseDependencies = async({mapping, verbose, dryrun, excludeFolderOverride}) => {
   await updateAllPackageJsons({isSnapshot: false, updateWorkspaceDependencies: false, releaseDependencyMapping: mapping, verbose, dryrun, excludeFolderOverride});
-
 };
 
 const setPrePublishReleaseDependencies = async({mapping, newVersion, verbose, dryrun, useRegexMap, excludeFolderOverride}) => {
