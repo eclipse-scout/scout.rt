@@ -278,6 +278,33 @@
     plus the pseudo element's border leading to a 2px border. */
     border: 1px solid @item-selection-border-color;
 
+    &.inverted {
+      background-color: mix(@tile-default-inverted-background-color, @tile-default-inverted-selection-background-color, 35%);
+      border-color: @tile-default-inverted-background-color;
+
+      &::before {
+        border-color: @tile-default-inverted-background-color;
+      }
+    }
+
+    &.color-alternative {
+      background-color: mix(@tile-alternative-background-color, @item-selection-background-color, 35%);
+      border-color: @item-selection-border-color;
+
+      &::before {
+        border-color: @item-selection-border-color;
+      }
+    }
+
+    &.inverted.color-alternative {
+      background-color: mix(@tile-alternative-inverted-background-color, @tile-alternative-inverted-selection-background-color, 35%);
+      border-color: @tile-alternative-inverted-background-color;
+
+      &::before {
+        border-color: @tile-alternative-inverted-background-color;
+      }
+    }
+
     &::before {
       content: '';
       pointer-events: none;

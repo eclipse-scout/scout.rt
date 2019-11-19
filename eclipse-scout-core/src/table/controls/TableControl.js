@@ -132,9 +132,9 @@ export default class TableControl extends Action {
     return this.$contentContainer;
   }
 
-  _renderSelected(selected, closeWhenUnselected) {
+  _renderSelected(selected, options) {
     selected = scout.nvl(selected, this.selected);
-    closeWhenUnselected = scout.nvl(closeWhenUnselected, true);
+    options = options || {closeWhenUnselected: true};
 
     this.$container.select(selected);
 
@@ -146,10 +146,10 @@ export default class TableControl extends Action {
       // Don't modify the state initially, only on property change events
       if (this.rendered) {
 
-        if (closeWhenUnselected && this === this.tableFooter.selectedControl) {
+        if (options.closeWhenUnselected && this === this.tableFooter.selectedControl) {
           // Don't remove immediately, wait for the animation to finish (handled by onControlContainerClosed)
           this.tableFooter.onControlSelected(null);
-          this.tableFooter.closeControlContainer(this);
+          this.tableFooter.closeControlContainer(this, options);
         } else {
           this.removeContent();
         }
@@ -177,7 +177,7 @@ export default class TableControl extends Action {
     }
   }
 
-  setSelected(selected, closeWhenUnselected) {
+  setSelected(selected, options) {
     if (selected && !this.visible) {
       return;
     }
@@ -186,16 +186,16 @@ export default class TableControl extends Action {
     }
 
     if (this.tableFooter && this.tableFooter.selectedControl && this.tableFooter.selectedControl !== this) {
-      this.tableFooter.selectedControl.setSelected(false, false);
+      this.tableFooter.selectedControl.setSelected(false, {closeWhenUnselected: false});
     }
 
     // Instead of calling parent.setSelected(), we manually execute the required code. Otherwise
     // we would not be able to pass 'closeWhenUnselected' to _renderSelected().
     this._setSelected(selected);
-    closeWhenUnselected = scout.nvl(closeWhenUnselected, true);
+    options = options || {closeWhenUnselected: true};
     if (this.rendered) {
-      this._renderSelected(selected, closeWhenUnselected);
-    } else if (closeWhenUnselected && this.tableFooter && this === this.tableFooter.selectedControl && !selected) {
+      this._renderSelected(selected, options);
+    } else if (options.closeWhenUnselected && this.tableFooter && this === this.tableFooter.selectedControl && !selected) {
       this.tableFooter.onControlSelected(null);
     }
   }

@@ -524,24 +524,31 @@ export default class TableFooter extends Widget {
     });
   }
 
-  closeControlContainer(control) {
+  closeControlContainer(control, options) {
     if (!this.open) {
       return;
     }
+    options = options || {animate: true};
     this.open = false;
     this.animating = true;
     this.table.invalidateLayoutTree();
 
-    this.$controlContainer.stop(true).show().animate({
-      height: 0
-    }, {
-      duration: control.animateDuration,
-      complete: function() {
-        this.animating = false;
-        this.$controlContainer.hide();
-        control.onControlContainerClosed();
-      }.bind(this)
-    });
+    var completeFunc = function() {
+      this.animating = false;
+      this.$controlContainer.hide();
+      control.onControlContainerClosed();
+    }.bind(this);
+
+    if (options.animate) {
+      this.$controlContainer.stop(true).show().animate({
+        height: 0
+      }, {
+        duration: control.animateDuration,
+        complete: completeFunc
+      });
+    } else {
+      completeFunc();
+    }
   }
 
   computeControlContainerHeight(table, control, growControl) {

@@ -47,7 +47,6 @@ export default class TableTileGridMediator extends Widget {
     this._tableRowsDeletedHandler = this._onTableRowsDeleted.bind(this);
     this._tableAllRowsDeletedHandler = this._onTableAllRowsDeleted.bind(this);
     this._tableRowOrderChangedHandler = this._onTableRowOrderChangedHandler.bind(this);
-    this._tableRenderHandler = this._onTableRenderHandler.bind(this);
 
     this._destroyHandler = this._uninstallListeners.bind(this);
 
@@ -88,7 +87,6 @@ export default class TableTileGridMediator extends Widget {
     this.table.on('rowsDeleted', this._tableRowsDeletedHandler);
     this.table.on('allRowsDeleted', this._tableAllRowsDeletedHandler);
     this.table.on('rowOrderChanged', this._tableRowOrderChangedHandler);
-    this.table.on('render', this._tableRenderHandler);
 
     this.tileAccordion.on('destroy', this._destroyHandler);
     this.table.on('destroy', this._destroyHandler);
@@ -107,7 +105,6 @@ export default class TableTileGridMediator extends Widget {
     this.table.off('rowsDeleted', this._tableRowsDeletedHandler);
     this.table.off('allRowsDeleted', this._tableAllRowsDeletedHandler);
     this.table.off('rowOrderChanged', this._tableRowOrderChangedHandler);
-    this.table.off('render', this._tableRenderHandler);
 
     this.tileAccordion.off('destroy', this._destroyHandler);
     this.table.off('destroy', this._destroyHandler);
@@ -249,6 +246,8 @@ export default class TableTileGridMediator extends Widget {
     tileGrid.showContextMenu = function(options) {
       this.session.onRequestsDone(this.table._showContextMenu.bind(this.table, options));
     }.bind(this);
+    // use the table's keyStrokeContext bindTarget for each tileGrid as well to ensure that the tileGrid's keyStrokes are active when the table is active
+    tileGrid.keyStrokeContext.$bindTarget = this.table.keyStrokeContext.$bindTarget;
   }
 
   _createTileAccordion() {
@@ -288,9 +287,14 @@ export default class TableTileGridMediator extends Widget {
     // hide aggregation table control
     this.table.tableControls.forEach(function(control) {
       if (control instanceof AggregateTableControl) {
+        this.tableState.aggregateTableControlSelected = control.selected;
+        control.setSelected(false, {
+          closeWhenUnselected: true,
+          animate: false
+        });
         control.setVisible(false);
       }
-    });
+    }, this);
 
     this.tableState.loadingSupportContainer = this.table.loadingSupport.options$Container;
     this.table.loadingSupport.options$Container = function() {
@@ -322,7 +326,8 @@ export default class TableTileGridMediator extends Widget {
       if (control instanceof AggregateTableControl) {
         control.setVisible(true);
       }
-    });
+    }, this);
+
     // use _setProperty to avoid instant rendering, render manually later on (this is necessary since TableHeader depends upon table.$data)
     this.table._setProperty('headerVisible', this.tableState.headerVisible);
     if (this.table.tileTableHeader) {
@@ -363,13 +368,19 @@ export default class TableTileGridMediator extends Widget {
       }
       this._renderTileTableHeader();
       this._renderTileAccordion();
-      this.session.keyStrokeManager.uninstallKeyStrokeContext(this.table.keyStrokeContext);
     } else {
       this._removeTileTableHeader();
       this._removeTileAccordion();
       this.table._renderData();
       this.table._renderTableHeader();
-      this.session.keyStrokeManager.installKeyStrokeContext(this.table.keyStrokeContext);
+
+      // restore selected state of the aggregationTableControl here since it depends on table.$data
+      if (this.tableState.aggregateTableControlSelected) {
+        arrays.find(this.table.tableControls,
+          control => control instanceof AggregateTableControl)
+          .setSelected(true);
+      }
+
     }
     this.table._refreshMenuBarPosition();
   }
@@ -475,15 +486,6 @@ export default class TableTileGridMediator extends Widget {
       return this.tilesMap[row.id];
     }, this);
     this.tileAccordion.setTiles(this.tiles);
-  }
-
-  _onTableRenderHandler(event) {
-    if (this.table.tileMode) {
-      // the table's keyStrokeContext is actually un/installed in renderTileMode.
-      // When refreshing the whole page or getConfiguredTileMode is true renderTileMode is called before the table in Widget.render installs it's context.
-      // For this case this 'additional' uninstall is necessary.
-      this.session.keyStrokeManager.uninstallKeyStrokeContext(this.table.keyStrokeContext);
-    }
   }
 
   _onTableGroup(event) {

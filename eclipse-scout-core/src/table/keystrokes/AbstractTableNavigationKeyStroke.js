@@ -189,4 +189,8 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
       return !viewportBounds.contains(nextRowOffsetBounds.x, nextRowOffsetBounds.y + nextRowOffsetBounds.height - 1);
     });
   }
+
+  _isEnabled() {
+    return !this.field.tileMode;
+  }
 }
