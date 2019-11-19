@@ -49,7 +49,6 @@
     "release-postdependency": "releng-scripts release-publish-dependency"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": "10.0.0-snapshot",
     "@eclipse-scout/releng": "10.0.0",
     "eslint": "6.5.1"
   },

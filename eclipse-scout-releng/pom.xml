@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.scout.rt</groupId>
+    <artifactId>org.eclipse.scout.rt</artifactId>
+    <version>10.0.0-SNAPSHOT</version>
+    <relativePath>../org.eclipse.scout.rt/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>eclipse-scout-releng</artifactId>
+
+  <properties>
+    <master_skip_pnpm_install_dev>true</master_skip_pnpm_install_dev>
+    <master_skip_pnpm_install_prod>true</master_skip_pnpm_install_prod>
+    <master_skip_karma_test>true</master_skip_karma_test>
+    <master_skip_copy_webpack_build_output>true</master_skip_copy_webpack_build_output>
+  </properties>
+
+</project>

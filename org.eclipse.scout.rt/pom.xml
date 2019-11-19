@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_rt_plugin_config-master</artifactId>
-    <version>3.6.0</version>
+    <version>3.7.0-SNAPSHOT</version>
     <relativePath></relativePath>
   </parent>
 
@@ -79,6 +79,7 @@
     <module>../org.eclipse.scout.rt-settings</module>
     <module>../org.eclipse.scout.migration.ecma6</module>
 
+    <module>../eclipse-scout-releng</module>
     <module>../eclipse-scout-cli</module>
     <module>../eclipse-scout-core</module>
     <module>../eclipse-scout-testing</module>

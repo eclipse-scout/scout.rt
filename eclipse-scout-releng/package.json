@@ -22,9 +22,11 @@
     "scripts"
   ],
   "scripts": {
-    "snapshot-version": "node bin/releng-scripts snapshot-version",
-    "release-version": "node bin/releng-scripts release-version",
-    "snapshot-cleanup": "node bin/releng-scripts snapshot-cleanup"
+    "snapshot-cleanup": "node bin/releng-scripts snapshot-cleanup",
+    "snapshot-predependency": "node bin/releng-scripts snapshot-install-dependency",
+    "snapshot-postdependency": "node bin/releng-scripts snapshot-publish-dependency",
+    "release-predependency": "node bin/releng-scripts release-install-dependency",
+    "release-postdependency": "node bin/releng-scripts release-publish-dependency"
   },
   "dependencies": {
     "axios": "0.19.0",
