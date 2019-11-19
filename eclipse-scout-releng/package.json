@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "axios": "0.19.0",
-    "yargs": "14.2.0"
+    "yargs": "15.0.2"
   },
   "bin": {
     "releng-scripts": "./bin/releng-scripts.js"
