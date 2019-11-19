@@ -33,9 +33,17 @@ scout.ProposalField2.prototype.cssClassName = function() {
 };
 
 scout.ProposalField2.prototype._handleEnterKey = function(event) {
+  // The state of 'this.popup' is different on various browsers. On some browsers (IE11) we don't
+  // do CSS animations. This means IE11 sets the popup to null immediately whereas other browsers
+  // use a timeout. Anyway: in case the popup is open at the time the user presses enter, we must
+  // stop propagation (e.g. to avoid calls of other registered enter key-shortcuts, like the default
+  // button on a form). See Widget.js for details about removing with or without CSS animations.
+  var hasPopup = !!this.popup;
   this.acceptInput();
   if (this.popup) {
     this.closePopup();
+  }
+  if (hasPopup) {
     event.stopPropagation();
   }
 };
