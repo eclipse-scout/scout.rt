@@ -528,7 +528,7 @@ export default class TableFooter extends Widget {
     if (!this.open) {
       return;
     }
-    options = options || {animate: true};
+    options = $.extend({}, {animate: true}, options);
     this.open = false;
     this.animating = true;
     this.table.invalidateLayoutTree();

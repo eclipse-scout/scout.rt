@@ -134,7 +134,7 @@ export default class TableControl extends Action {
 
   _renderSelected(selected, options) {
     selected = scout.nvl(selected, this.selected);
-    options = options || {closeWhenUnselected: true};
+    options = $.extend({}, {closeWhenUnselected: true}, options);
 
     this.$container.select(selected);
 
@@ -192,7 +192,7 @@ export default class TableControl extends Action {
     // Instead of calling parent.setSelected(), we manually execute the required code. Otherwise
     // we would not be able to pass 'closeWhenUnselected' to _renderSelected().
     this._setSelected(selected);
-    options = options || {closeWhenUnselected: true};
+    options = $.extend({}, {closeWhenUnselected: true}, options);
     if (this.rendered) {
       this._renderSelected(selected, options);
     } else if (options.closeWhenUnselected && this.tableFooter && this === this.tableFooter.selectedControl && !selected) {
