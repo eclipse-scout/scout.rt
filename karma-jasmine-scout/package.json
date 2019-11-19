@@ -22,9 +22,6 @@
     "src"
   ],
   "scripts": {
-    "testserver:start": "scout-scripts test-server:start",
-    "testserver:stop": "scout-scripts test-server:stop",
-    "test:ci": "scout-scripts test:ci",
     "snapshot-cleanup": "releng-scripts snapshot-cleanup",
     "snapshot-predependency": "releng-scripts snapshot-install-dependency",
     "snapshot-postdependency": "releng-scripts snapshot-publish-dependency",
@@ -32,7 +29,6 @@
     "release-postdependency": "releng-scripts release-publish-dependency"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": "10.0.0-snapshot",
     "@eclipse-scout/releng": "10.0.0"
   },
   "dependencies": {
