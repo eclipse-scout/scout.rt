@@ -3,7 +3,7 @@
 // Our CSP rule prohibits inline scripts. That's why we refactored the original console_uncompressed.html
 // from the log4javascript distribution, so it loads a regular script file. Because of this we also changed
 // the IE and "old IE" detection used by log4javascript. We simply ask Scout what browser is used.
-var isIe = window.opener.scout.device.isInternetExplorer();
+var isIe = window.opener.scout.Device.get().isInternetExplorer();
 var isIePre7 = false; // not supported anymore, flag is always false
 
 // Inline event handlers are not allowed -> attach them here
