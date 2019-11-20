@@ -2784,7 +2784,7 @@ scout.Table.prototype.updateRows = function(rows) {
     if (row.parentRow && !scout.objects.isNullOrUndefined(row.parentRow.id)) {
       parentRowId = row.parentRow.id;
     }
-    structureChanged = structureChanged || row._parentRowId !== parentRowId;
+    structureChanged = structureChanged || (scout.nvl(oldRow._parentRowId, null) !== scout.nvl(parentRowId, null));
     row = this._initRow(row);
     // Check if cell values have changed
     if (row.status === scout.TableRow.Status.NON_CHANGED) {
