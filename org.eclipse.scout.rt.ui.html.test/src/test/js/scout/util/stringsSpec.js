@@ -407,6 +407,10 @@ describe("scout.strings", function() {
       expect(scout.strings.nvl('foo')).toBe('foo');
     });
 
+    it("should throw an error when called with more than one parameter", function() {
+      expect(function() { scout.strings.nvl(null, 'foo'); }).toThrow();
+    });
+
   });
 
   describe("countCodePoints", function() {
@@ -416,7 +420,6 @@ describe("scout.strings", function() {
       expect(scout.strings.countCodePoints('foo')).toBe(3);
       expect(scout.strings.countCodePoints('\uD83D\uDC4D')).toBe(1); //\uD83D\uDC4D is Unicode Character 'THUMBS UP SIGN' (U+1F44D)
     });
-
   });
 
   describe("splitMax", function() {

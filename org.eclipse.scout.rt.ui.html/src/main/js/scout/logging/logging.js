@@ -29,9 +29,8 @@ scout.logging = {
     options = scout.nvl(options, {});
 
     var enabled = !!(options.enabled || logging),
-      showPopup = !!(options.showPopup || logging);
-
-    var resourceUrl = scout.strings.nvl(options.resourceUrl, 'res/');
+      showPopup = !!(options.showPopup || logging),
+      resourceUrl = scout.nvl(options.resourceUrl, 'res/');
 
     $.log = new scout.NullLogger();
     if (!enabled) {
