@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.cache;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -42,6 +43,16 @@ public class ClientCacheBuilder<K, V> extends CacheBuilder<K, V> {
       cache = new ClientNotificationClientCacheWrapper<>(cache);
     }
     return cache;
+  }
+
+  @Override
+  protected Map<K, V> createCacheMap() {
+    if (isTransactional()) {
+      // Caches in the client should not be transactional. The transactional complexity is important in the server, where transactional maps are necessary.
+      // Cache notifications to the client are mostly a result of a committed transaction in the server and therefore need not be transactional itself.
+      return new ConcurrentHashMap<>();
+    }
+    return super.createCacheMap();
   }
 
   /**
