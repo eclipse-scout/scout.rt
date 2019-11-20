@@ -21,7 +21,7 @@ const path = require('path');
 const fs = require('fs');
 const fsp = fs.promises;
 
-const writeFile = async(fileName, file, verbose) => {
+const writeFile = async (fileName, file, verbose) => {
   const stringified = JSON.stringify(file, null, 2);
   if (verbose) {
     console.log(`file: ${fileName}; new content:\n${stringified}`);
@@ -62,7 +62,6 @@ const generateSnapshotVersion = ({moduleVersion, timestamp, verbose}) => {
   console.log(`new Version: ${newVersion}`);
   return newVersion;
 };
-
 
 const updateSnapshotVersion = async verbose => {
   const filename = './package.json';
@@ -112,8 +111,7 @@ const createReleaseVersionConstraint = ({moduleName, mapping, newModuleVersion, 
  */
 const createSnapshotVersionConstraint = oldConstraint => {
   const cleanedModuleVersion = oldConstraint.replace(/-snapshot(.)*/i, '');
-  const versionConstraint = `>=${cleanedModuleVersion}-snapshot <${cleanedModuleVersion}`; // ">=10.0.0-snapshot <10.0.0"
-  return versionConstraint;
+  return `>=${cleanedModuleVersion}-snapshot <${cleanedModuleVersion}`; // ">=10.0.0-snapshot <10.0.0"
 };
 
 const updateDependencyConstraints = ({dependencies, modulesInWorkspace = [], updateWorkspaceDependencies, isSnapshot, mapping, verbose, newModuleVersion, useRegexMap}) => {
@@ -147,7 +145,7 @@ const updateDependencyConstraints = ({dependencies, modulesInWorkspace = [], upd
  * @param verbose more logging
  * @returns {Promise<*>}
  */
-const findWorkspaceFileDir = async(dir, verbose) => {
+const findWorkspaceFileDir = async (dir, verbose) => {
   const filePath = path.join(dir, 'pnpm-workspace.yaml');
   if (fs.existsSync(filePath)) {
     if (verbose) {
@@ -158,7 +156,7 @@ const findWorkspaceFileDir = async(dir, verbose) => {
 
   const parentDir = path.join(dir, '../');
   if (dir === parentDir) {
-    throw new Error('there is no workspace file');
+    return null;
   }
   return findWorkspaceFileDir(parentDir, verbose);
 };
@@ -181,7 +179,7 @@ const getExcludedFolders = excludeFolderOverride => {
  * @param result
  * @returns {Promise<Array>} key is the name of the module, value is the path to the package.json file
  */
-const findNpmModules = async({dir, verbose, result = [], excludeFolderOverride}) => {
+const findNpmModules = async ({dir, verbose, result = [], excludeFolderOverride}) => {
   const excludedFolders = getExcludedFolders(excludeFolderOverride);
   const files = await fsp.readdir(dir);
   for (const file of files) {
@@ -191,7 +189,7 @@ const findNpmModules = async({dir, verbose, result = [], excludeFolderOverride})
       // go deeper
       await findNpmModules({dir: filePath, verbose, result, excludeFolderOverride});
     } else {
-      if (file === 'package.json' ) {
+      if (file === 'package.json') {
         if (verbose) {
           console.log(`found a package.json here: ${filePath}`);
         }
@@ -205,15 +203,17 @@ const findNpmModules = async({dir, verbose, result = [], excludeFolderOverride})
   return result;
 };
 
-const collectModulesInWorkspace = async(startDir, excludeFolderOverride, verbose) => {
-  const root = await findWorkspaceFileDir(startDir, verbose);
-  console.log('start searching for package.json files...');
-  const result = await findNpmModules({dir: root, verbose, excludeFolderOverride});
-  return result;
+const collectModulesInWorkspace = async (startDir, excludeFolderOverride, verbose) => {
+  let root = await findWorkspaceFileDir(startDir, verbose);
+  if (!root) {
+    root = path.join(startDir, '../'); // parent folder as default if no workspace file could be found
+    console.log(`unable to find workspace file. Use parent directory as workspace root: ${root}`);
+  }
+  console.log(`start searching for package.json files at ${root}`);
+  return findNpmModules({dir: root, verbose, excludeFolderOverride});
 };
 
-
-const updateAllPackageJsons = async({isSnapshot = true, updateWorkspaceDependencies = false, releaseDependencyMapping = {}, newVersion, useRegexMap = false, verbose = false, dryrun = false, excludeFolderOverride}) => {
+const updateAllPackageJsons = async ({isSnapshot = true, updateWorkspaceDependencies = false, releaseDependencyMapping = {}, newVersion, useRegexMap = false, verbose = false, dryrun = false, excludeFolderOverride}) => {
   const filename = './package.json';
   const filePath = path.resolve(filename);
   const dir = path.dirname(filePath);
@@ -258,20 +258,20 @@ const updateAllPackageJsons = async({isSnapshot = true, updateWorkspaceDependenc
   }
 };
 
-const setPreInstallSnapshotDependencies = async({verbose, dryrun, excludeFolderOverride}) => {
+const setPreInstallSnapshotDependencies = async ({verbose, dryrun, excludeFolderOverride}) => {
   await updateAllPackageJsons({isSnapshot: true, updateWorkspaceDependencies: false, verbose, dryrun, excludeFolderOverride});
 };
 
-const setPrePublishSnapshotDependencies = async({verbose, dryrun, excludeFolderOverride}) => {
+const setPrePublishSnapshotDependencies = async ({verbose, dryrun, excludeFolderOverride}) => {
   const timeStamp = generateTimeStamp();
   await updateAllPackageJsons({isSnapshot: true, updateWorkspaceDependencies: true, newVersion: timeStamp, verbose, dryrun, excludeFolderOverride});
 };
 
-const setPreInstallReleaseDependencies = async({mapping, verbose, dryrun, excludeFolderOverride}) => {
+const setPreInstallReleaseDependencies = async ({mapping, verbose, dryrun, excludeFolderOverride}) => {
   await updateAllPackageJsons({isSnapshot: false, updateWorkspaceDependencies: false, releaseDependencyMapping: mapping, verbose, dryrun, excludeFolderOverride});
 };
 
-const setPrePublishReleaseDependencies = async({mapping, newVersion, verbose, dryrun, useRegexMap, excludeFolderOverride}) => {
+const setPrePublishReleaseDependencies = async ({mapping, newVersion, verbose, dryrun, useRegexMap, excludeFolderOverride}) => {
   await updateAllPackageJsons({isSnapshot: false, updateWorkspaceDependencies: true, releaseDependencyMapping: mapping, newVersion, useRegexMap, verbose, dryrun, excludeFolderOverride});
 };
 
