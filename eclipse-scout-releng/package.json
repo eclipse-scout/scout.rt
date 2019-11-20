@@ -1,7 +1,7 @@
 {
   "name": "@eclipse-scout/releng",
-  "version": "10.0.0",
-  "description": "Release Engineering module for Eclipse Scout",
+  "version": "10.0.1",
+  "description": "Release engineering module for Eclipse Scout",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
   "repository": {

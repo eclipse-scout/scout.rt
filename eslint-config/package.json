@@ -49,7 +49,7 @@
     "release-postdependency": "releng-scripts release-publish-dependency"
   },
   "devDependencies": {
-    "@eclipse-scout/releng": "10.0.0",
+    "@eclipse-scout/releng": "^10.0.0",
     "eslint": "6.5.1"
   },
   "peerDependencies": {
