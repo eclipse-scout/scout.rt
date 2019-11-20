@@ -1583,9 +1583,8 @@ export default class Table extends Widget {
 
   _rowsRenderedInfo() {
     var numRenderedRows = this.$rows().length,
-      renderedRowsRange = '(' + this.viewRangeRendered + ')',
-      text = numRenderedRows + ' rows rendered ' + renderedRowsRange;
-    return text;
+      renderedRowsRange = '(' + this.viewRangeRendered + ')';
+    return numRenderedRows + ' rows rendered ' + renderedRowsRange;
   }
 
   /**
@@ -2841,7 +2840,7 @@ export default class Table extends Widget {
       if (row.parentRow && !objects.isNullOrUndefined(row.parentRow.id)) {
         parentRowId = row.parentRow.id;
       }
-      structureChanged = structureChanged || row._parentRowId !== parentRowId;
+      structureChanged = structureChanged || (scout.nvl(oldRow._parentRowId, null) !== scout.nvl(parentRowId, null));
       row = this._initRow(row);
       // Check if cell values have changed
       if (row.status === TableRow.Status.NON_CHANGED) {
