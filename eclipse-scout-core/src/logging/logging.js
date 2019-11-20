@@ -10,6 +10,7 @@
  */
 import {NullLogger, scout, URL} from '../index';
 import * as $ from 'jquery';
+import strings from '../util/strings';
 
 /* global log4javascript */
 
@@ -31,9 +32,8 @@ export function bootstrap(options) {
   options = scout.nvl(options, {});
 
   var enabled = !!(options.enabled || logging),
-    showPopup = !!(options.showPopup || logging);
-
-  var resourceUrl = scout.nvl(options.resourceUrl, '');
+    showPopup = !!(options.showPopup || logging),
+    resourceUrl = strings.nvl(options.resourceUrl);
 
   $.log = new NullLogger();
   if (!enabled) {

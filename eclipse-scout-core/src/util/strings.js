@@ -311,10 +311,14 @@ export function asString(input) {
 }
 
 /**
- * Returns an empty string '', when given string is null or undefined.
  * This is a shortcut for <code>scout.nvl(string, '')</code>.
+ * @param {string} string String to check
+ * @returns {string} Empty string '' when given string is null or undefined.
  */
 export function nvl(string) {
+  if (arguments.length > 1) {
+    throw new Error('strings.nvl only accepts one argument. Use scout.nvl if you need to handle multiple arguments');
+  }
   return scout.nvl(string, '');
 }
 

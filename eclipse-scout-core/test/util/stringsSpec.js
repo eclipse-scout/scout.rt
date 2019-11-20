@@ -408,6 +408,12 @@ describe('strings', function() {
       expect(strings.nvl('foo')).toBe('foo');
     });
 
+    it('should throw an error when called with more than one parameter', function() {
+      expect(function() {
+        strings.nvl(null, 'foo');
+      }).toThrow();
+    });
+
   });
 
   describe('countCodePoints', function() {
