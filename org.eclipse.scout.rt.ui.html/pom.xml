@@ -43,10 +43,6 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.json</artifactId>
     </dependency>
     <dependency>

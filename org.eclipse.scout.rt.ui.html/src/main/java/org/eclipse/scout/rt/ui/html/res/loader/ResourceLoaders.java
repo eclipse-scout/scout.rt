@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
-import org.eclipse.scout.rt.shared.ui.webresource.WebResources;
 import org.eclipse.scout.rt.ui.html.UiThemeHelper;
 
 @ApplicationScoped
@@ -25,7 +24,6 @@ public class ResourceLoaders {
   protected static final Pattern ICON_PATTERN = Pattern.compile("^/icon/.*");
   protected static final Pattern DYNAMIC_RESOURCES_PATTERN = Pattern.compile("^/" + DynamicResourceInfo.PATH_PREFIX + "/.*");
   protected static final Pattern DEFAULT_VALUES_PATTERN = Pattern.compile("^/defaultValues$");
-
 
   public IResourceLoader create(HttpServletRequest req, String resourcePath) {
     if (resourcePath == null) {
@@ -38,28 +36,6 @@ public class ResourceLoaders {
     if (DYNAMIC_RESOURCES_PATTERN.matcher(resourcePath).matches()) {
       return new DynamicResourceLoader(req);
     }
-    UiThemeHelper uiThemeHelper = UiThemeHelper.get();
-    String theme = uiThemeHelper.getTheme(req);
-    if (resourcePath.endsWith(".html")) {
-      boolean cacheEnabled = UrlHints.isCacheHint(req);
-      boolean minify = UrlHints.isMinifyHint(req);
-      return new HtmlFileLoader(theme, minify, cacheEnabled);
-    }
-    boolean newMode = WebResources.isNewMode();
-    boolean minify = UrlHints.isMinifyHint(req);
-    if (newMode) {
-      boolean cacheEnabled = UrlHints.isCacheHint(req);
-      WebResourceLoader loader = new WebResourceLoader(minify, cacheEnabled, uiThemeHelper.isDefaultTheme(theme) ? null : theme);
-      if (loader.acceptFile(resourcePath)) {
-        return loader;
-      }
-    }
-    else {
-      // TODO [mvi]: remove old (legacy loader)
-      if (ScriptFileLoader.acceptFile(resourcePath)) {
-        return new ScriptFileLoader(theme, minify);
-      }
-    }
     if (DEFAULT_VALUES_PATTERN.matcher(resourcePath).matches()) {
       return new DefaultValuesLoader();
     }
@@ -70,15 +46,19 @@ public class ResourceLoaders {
       return new TextsLoader();
     }
 
-    if (newMode) {
-      return null;
+    UiThemeHelper uiThemeHelper = UiThemeHelper.get();
+    String theme = uiThemeHelper.getTheme(req);
+    boolean minify = UrlHints.isMinifyHint(req);
+    boolean cacheEnabled = UrlHints.isCacheHint(req);
+
+    if (resourcePath.endsWith(".html")) {
+      return new HtmlFileLoader(theme, minify, cacheEnabled);
     }
-    if (resourcePath.endsWith(".json")) {
-      if (JsonModelsLoader.acceptFile(resourcePath)) {
-        return new JsonModelsLoader();
-      }
-      return new JsonFileLoader();
+
+    WebResourceLoader loader = new WebResourceLoader(minify, cacheEnabled, uiThemeHelper.isDefaultTheme(theme) ? null : theme);
+    if (loader.acceptFile(resourcePath)) {
+      return loader;
     }
-    return new BinaryFileLoader();
+    return null;
   }
 }

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-  <classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
-  <classpathentry kind="src" path="src/main/js" excluding="*-module.js"/>
-  <classpathentry kind="lib" path="src/main/resources/WebContent/res" excluding="*-macro.js"/>
-  <classpathentry exported="true" kind="con" path="org.eclipse.wst.jsdt.launching.baseBrowserLibrary"/>
-  <classpathentry kind="output" path=""/>
-</classpath>

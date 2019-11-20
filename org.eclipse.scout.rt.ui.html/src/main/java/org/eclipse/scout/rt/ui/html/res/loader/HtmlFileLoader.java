@@ -20,7 +20,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -33,7 +32,6 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResponseHeaderContr
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ExternalBaseUrlProperty;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResources;
-import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 
 /**
  * This class loads and parses HTML files from WebContent/ folder.
@@ -96,16 +94,11 @@ public class HtmlFileLoader extends AbstractResourceLoader {
 
   @Override
   public BinaryResource loadResource(String pathInfo) throws IOException {
-    URL url;
-    if (WebResources.isNewMode()) {
-      url = WebResources
-          .resolveWebResource(pathInfo, m_minify)
-          .map(WebResourceDescriptor::getUrl)
-          .orElse(null);
-    }
-    else {
-      url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
-    }
+    URL url = WebResources
+        .resolveWebResource(pathInfo, m_minify)
+        .map(WebResourceDescriptor::getUrl)
+        .orElse(null);
+
     if (url == null) {
       return null; // not handled here
     }

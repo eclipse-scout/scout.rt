@@ -31,11 +31,9 @@
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1375704042674_2" label="scout.rt.client" name="scout.rt.client">
     <item elementID="=org.eclipse.scout.rt.svg.ui.html" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
     <item elementID="=org.eclipse.scout.rt.svg.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-    <item elementID="=org.eclipse.scout.rt.ui.html.scriptprocessor.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
     <item elementID="=org.eclipse.scout.rt.ui.html.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
     <item elementID="=org.eclipse.scout.rt.ui.html.selenium" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
     <item elementID="=org.eclipse.scout.rt.svg.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-    <item elementID="=org.eclipse.scout.rt.ui.html.scriptprocessor" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
     <item elementID="=org.eclipse.scout.rt.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
     <item elementID="=org.eclipse.scout.rt.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
     <item elementID="=org.eclipse.scout.rt.ui.html" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>

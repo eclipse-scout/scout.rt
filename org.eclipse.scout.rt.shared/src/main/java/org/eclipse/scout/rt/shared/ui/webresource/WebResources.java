@@ -65,12 +65,4 @@ public class WebResources {
     }
     return path.trim();
   }
-
-  /**
-   * TODO: delete this method
-   */
-  public static boolean isNewMode() {
-    String newModeValue = System.getProperty("newMode");
-    return !StringUtility.hasText(newModeValue) || "true".equalsIgnoreCase(newModeValue);
-  }
 }

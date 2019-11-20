@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.text.ITextProviderService;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -51,7 +50,7 @@ public class HtmlDocumentParserTest {
   @Before
   public void before() {
     HtmlDocumentParserParameters params = new HtmlDocumentParserParameters("html/path", "testTheme", false, false, "base-path");
-    m_parser = new HtmlDocumentParser(params){
+    m_parser = new HtmlDocumentParser(params) {
       @Override
       protected URL resolveInclude(String includeName) {
         return HtmlDocumentParserTest.class.getResource("include.html");

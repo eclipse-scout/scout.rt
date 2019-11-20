@@ -69,7 +69,6 @@ public final class ClientConfigProperties {
     @Override
     public String description() {
       return "Specifies the maximal time (in seconds) to wait until running jobs are cancelled on session shutdown.\n"
-          + "Should be smaller than 'scout.ui.sessionstore.housekeepingMaxWaitForShutdown'.\n"
           + "The default value is 10 seconds.";
     }
 

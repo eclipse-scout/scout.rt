@@ -23,20 +23,13 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.text.TEXTS;
-import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.platform.util.ImmutablePair;
-import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.GlobalHttpResourceCache;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
-import org.eclipse.scout.rt.shared.ui.webresource.ScriptRequest;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResources;
 import org.eclipse.scout.rt.ui.html.UiThemeHelper;
-import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,67 +100,11 @@ public class HtmlDocumentParser {
    * deals with caching, since we must build a script file first, before we can calculate its fingerprint.
    */
   protected String createExternalPath(String internalPath) throws IOException {
-    if (WebResources.isNewMode()) {
-      String theme = UiThemeHelper.get().isDefaultTheme(m_params.getTheme()) ? null : m_params.getTheme();
-      return new WebResourceLoader(m_params.isMinify(), false, theme)
-          .resolveResource(internalPath)
-          .map(WebResourceDescriptor::getResolvedPath)
-          .orElse(internalPath);
-    }
-    else {
-      String[] filenameParts = FileUtility.getFilenameParts(internalPath);
-      Pair<HttpCacheObject, String> scriptAndFingerprint = null;
-
-      // When caching is enabled we must calculate the fingerprint for the script file
-      if (m_params.isCacheEnabled()) {
-        scriptAndFingerprint = getScriptAndFingerprint(internalPath);
-      }
-
-      String extension = getScriptFileExtension(filenameParts[1]);
-      String pathAndBaseName = getScriptFileName(filenameParts[0]);
-      String externalPath = ScriptRequest.toFullPath(null, pathAndBaseName, scriptAndFingerprint == null ? null : scriptAndFingerprint.getRight(), m_params.isMinify(), extension);
-
-      // we must put the same resource into the cache with two different cache keys:
-      // 1. the 'internal' cache key is the path as it is used when the HTML file is parsed by the HtmlDocumenParser. Example: '/res/scout-all-macro.js'
-      // 2. the 'external' cache key is the path as it is used in the browser. Example: '/res/scout-all-0ac567fe1.min.js'
-      // We have kind of a chicken/egg problem here: in order to get the fingerprint we must first read and parse the file. So when the parser builds
-      // a HTML file it cannot now the fingerprint in advance. That's why we put the 'internal' path into the cache. Later, when the browser requests
-      // the script with the 'external' URL, we want to access the already built and cached file. That's why we must also store the external form of
-      // the path. Additionally the same script may be used in another HTML file, which is also processed by the HtmlDocumentParser, then again we need
-      // want to access the cached file by its internal path.
-      if (scriptAndFingerprint != null) {
-        HttpCacheObject internalCacheObject = scriptAndFingerprint.getLeft();
-        HttpCacheKey externalCacheKey = createScriptFileLoader().createCacheKey("/" + externalPath);
-        HttpCacheObject externalCacheObject = new HttpCacheObject(externalCacheKey, internalCacheObject.getResource());
-        m_cache.put(internalCacheObject);
-        m_cache.put(externalCacheObject);
-      }
-
-      return externalPath;
-    }
-  }
-
-  protected ScriptFileLoader createScriptFileLoader() {
-    return new ScriptFileLoader(m_params.getTheme(), m_params.isMinify());
-  }
-
-  /**
-   * Returns the external script name including a content-based fingerprint.
-   */
-  protected Pair<HttpCacheObject, String> getScriptAndFingerprint(String internalPath) throws IOException {
-    ScriptFileLoader scriptLoader = createScriptFileLoader();
-    HttpCacheKey cacheKey = scriptLoader.createCacheKey(internalPath);
-    HttpCacheObject script = m_cache.get(cacheKey);
-    if (script == null) {
-      // cache miss: try to load script
-      script = scriptLoader.loadResource(cacheKey);
-    }
-    if (script == null) {
-      // script not found -> no fingerprint
-      LOG.warn("Failed to locate script referenced in html file '{}': {}", m_params.getHtmlPath(), internalPath);
-      return null;
-    }
-    return new ImmutablePair<>(script, script.getResource().getFingerprintAsHexString());
+    String theme = UiThemeHelper.get().isDefaultTheme(m_params.getTheme()) ? null : m_params.getTheme();
+    return new WebResourceLoader(m_params.isMinify(), false, theme)
+        .resolveResource(internalPath)
+        .map(WebResourceDescriptor::getResolvedPath)
+        .orElse(internalPath);
   }
 
   /**
@@ -253,15 +190,10 @@ public class HtmlDocumentParser {
   }
 
   protected URL resolveInclude(String includeName) {
-    if (WebResources.isNewMode()) {
-      return WebResources
-          .resolveWebResource(includeName, m_params.isMinify())
-          .map(WebResourceDescriptor::getUrl)
-          .orElse(null);
-    }
-    else {
-      return BEANS.get(IWebContentService.class).getWebContentResource("/includes/" + includeName);
-    }
+    return WebResources
+        .resolveWebResource(includeName, m_params.isMinify())
+        .map(WebResourceDescriptor::getUrl)
+        .orElse(null);
   }
 
   @SuppressWarnings("squid:S1149")

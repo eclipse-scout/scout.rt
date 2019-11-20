@@ -10,28 +10,18 @@
  */
 package org.eclipse.scout.rt.ui.html;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown;
-import org.eclipse.scout.rt.client.session.ClientSessionStopHelper;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
-import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.ui.html.res.loader.HtmlDocumentParser;
-import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
 /**
  * This class provides all properties configured in the config.properties file that affect the HTML UI module.
@@ -58,59 +48,6 @@ public final class UiHtmlConfigProperties {
     @Override
     public String getDefaultValue() {
       return DEFAULT_THEME;
-    }
-  }
-
-  public static class UiPrebuildProperty extends AbstractBooleanConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.ui.prebuild";
-    }
-
-    @Override
-    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
-    public String description() {
-      return String.format("When this property returns true, file pre-building is performed when the UI application server starts up.\n" +
-          "This means the application start takes more time, but in return the first user request takes less time.\n" +
-          "'File' in this context means web-resources like HTML, CSS and JS.\n" +
-          "These files are typically processed by Scout's '%s' and '%s'.\n" +
-          "By default this property is enabled when the application is not running in development mode (property '%s' is false).",
-          ScriptProcessor.class.getSimpleName(), HtmlDocumentParser.class.getName(), BEANS.get(PlatformDevModeProperty.class).getKey());
-    }
-
-    @Override
-    public Boolean getDefaultValue() {
-      return !Platform.get().inDevelopmentMode();
-    }
-  }
-
-  public static class UiPrebuildFilesProperty extends AbstractConfigProperty<List<String>, String> {
-
-    @Override
-    public String getKey() {
-      return "scout.ui.prebuild.files";
-    }
-
-    @Override
-    protected List<String> parse(String value) {
-      String[] tokens = StringUtility.tokenize(value, ',');
-      // Prevent accidental modification by returning an unmodifiable list because property is cached and always returns the same instance
-      return unmodifiableList(asList(tokens));
-    }
-
-    @Override
-    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
-    public String description() {
-      return String.format("Contains a comma separated list of files in '/WebContent/res' that should be pre-built when the (UI) application server starts up.\n" +
-          "Since it takes a while to build files, especially JS and CSS (LESS) files, we want to do this when the server starts. Otherwise its always the first user who must wait a long time until all files are built.\n" +
-          "Since CSS and JS files are always referenced by a HTML file, we simply specify the main HTML files in this property.\n"
-          + "By default no files are prebuild. This property only has an effect if property '%s' is enabled.", BEANS.get(UiPrebuildProperty.class).getKey());
-    }
-
-    @Override
-    public List<String> getDefaultValue() {
-      return emptyList();
     }
   }
 
@@ -216,122 +153,6 @@ public final class UiHtmlConfigProperties {
     @Override
     public Integer getDefaultValue() {
       return 30;
-    }
-  }
-
-  /**
-   * @deprecated since 6.1 not used anymore, see {@link ClientSessionStopHelper}
-   */
-  @Deprecated
-  public static class SessionStoreHousekeepingMaxWaitShutdownProperty extends AbstractPositiveIntegerConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.ui.sessionstore.housekeepingMaxWaitForShutdown";
-    }
-
-    @Override
-    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
-    public String description() {
-      return String.format("Maximum time in seconds to wait for a client session to be stopped by the housekeeping job.\n" +
-          "The value should be smaller than the session timeout (typically defined in the web.xml) and greater than the value of property '%s'\n"
-          + "By default this property is set to 1 minute.", BEANS.get(JobCompletionDelayOnSessionShutdown.class).getKey());
-    }
-
-    @Override
-    public Integer getDefaultValue() {
-      return 60; // 1 minute
-    }
-  }
-
-  /**
-   * @deprecated since 6.1 not used anymore, see {@link ClientSessionStopHelper}
-   */
-  @Deprecated
-  public static class SessionStoreMaxWaitWriteLockProperty extends AbstractPositiveIntegerConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.ui.sessionStore.valueUnboundMaxWaitForWriteLock";
-    }
-
-    @Override
-    public String description() {
-      return "Maximum time in seconds to wait for the write lock when the session store is unbound from the HTTP session.\n"
-          + "This value should not be too large because waiting on the lock might suspend background processes of the application server.\n"
-          + "By default this property is set to 5 seconds.";
-    }
-
-    @Override
-    public Integer getDefaultValue() {
-      return 5;
-    }
-  }
-
-  /**
-   * @deprecated since 6.1 not used anymore, see {@link ClientSessionStopHelper}
-   */
-  @Deprecated
-  public static class SessionStoreMaxWaitAllShutdownProperty extends AbstractPositiveIntegerConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.ui.sessionStore.maxWaitForAllShutdown";
-    }
-
-    @Override
-    public String description() {
-      return "Maximum time in second to wait for all client sessions to be stopped after the HTTP session has become invalid.\n" +
-          "After this number of seconds a 'leak detection' test is performed. You are advised to change this value only if your sessions need an unusual long time to shutdown.\n"
-          + "By default this property is set to 1 minute.";
-    }
-
-    @Override
-    public Integer getDefaultValue() {
-      return 60; // 1 minute
-    }
-  }
-
-  public static class ScriptfileBuildProperty extends AbstractBooleanConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.dev.scriptfile.rebuild";
-    }
-
-    @Override
-    public String description() {
-      return "Specifies if scriptfiles (*.js, *.less) should be rebuilt only when the files change or with every page reload.\n" +
-          "True = Build on every page reload. False = Build only when a file is modified. The default value is false.";
-    }
-
-    @Override
-    protected Boolean parse(String value) {
-      if (!Platform.get().inDevelopmentMode()) {
-        return true;
-      }
-      // only works in development mode
-      return super.parse(value);
-    }
-
-    @Override
-    public Boolean getDefaultValue() {
-      return false;
-    }
-  }
-
-  public static class ScriptfileBuilderDevCacheKey extends AbstractStringConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.dev.scriptfile.persist.key";
-    }
-
-    @Override
-    public String description() {
-      return "Specifies a key to store the keys (HttpCacheKey) scripts in development cache. "
-          + "The keys of the last application start in dev mode will be stored in the user.home/.eclipse/org.eclipse.scout.dev/scriptfile_cache_{key}.obj. "
-          + "For the next run in dev mode the keys stored under this key are preloaded.";
     }
   }
 }
