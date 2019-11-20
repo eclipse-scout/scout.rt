@@ -23,6 +23,7 @@ import {
   scout,
   Widget
 } from '../../index';
+import ComboMenu from '../ComboMenu';
 
 export default class MenuBar extends Widget {
 
@@ -455,4 +456,14 @@ export default class MenuBar extends Widget {
       this.updateLeftOfButtonMarker();
     }
   }
+
+  _allMenusAsFlatList() {
+    return this.orderedMenuItems.all.flatMap(item => {
+      if (item instanceof ComboMenu) {
+        return item.childActions;
+      }
+      return [item];
+    });
+  }
+
 }
