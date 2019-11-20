@@ -69,7 +69,11 @@ module.exports = {
     'require-jsdoc': 'off',
     'no-plusplus': 'off',
     'no-trailing-spaces': 'error',
-    'space-before-function-paren': ['error', 'never'],
+    'space-before-function-paren': ['error', {
+      'anonymous': 'never',
+      'named': 'never',
+      'asyncArrow': 'always'
+    }],
     'curly': ['error', 'all'],
     'eqeqeq': ['error', 'always', {'null': 'ignore'}],
     'spaced-comment': ['error', 'always', {'exceptions': ['*']}],
