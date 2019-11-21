@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {codes, Device, EventSupport, fonts, locales, logging, models, numbers, ObjectFactory, objects, polyfills, scout, Session, texts, webstorage} from './index';
+import {codes, Device, EventSupport, fonts, locales, logging, numbers, ObjectFactory, objects, polyfills, scout, Session, texts, webstorage} from './index';
 import * as $ from 'jquery';
 
 let instance = null;
@@ -121,7 +121,6 @@ export default class App {
     return [
       Device.get().bootstrap(),
       fonts.bootstrap(options.fonts),
-      models.bootstrap(options.modelsUrl),
       locales.bootstrap(options.localesUrl),
       texts.bootstrap(options.textsUrl),
       codes.bootstrap(options.codesUrl)

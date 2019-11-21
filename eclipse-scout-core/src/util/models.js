@@ -13,43 +13,14 @@ import * as $ from 'jquery';
 
 let modelMap = {};
 
-/**
- * @param {string} url
- *       relative URL points to the *-models.json file. Example: 'res/myproject-all.json'.
- */
-export function bootstrap(url) {
-  var promise = url ? $.ajaxJson(url) : $.resolvedPromise({});
-  return promise.then(_preInit.bind(this, url));
-}
-
-export function _preInit(url, data) {
-  if (data && data.error) {
-    // The result may contain a json error (e.g. session timeout) -> abort processing
-    throw {
-      error: data.error,
-      url: url
-    };
-  }
-  init(data);
-}
-
 export function init(data) {
   modelMap = data;
-}
-
-export function getModel(modelId, parent) {
-  var model = _get(modelId, 'model');
-  if (parent) {
-    model.parent = parent;
-  }
-  return model;
 }
 
 /**
  * Returns a new instance of a model supplied by the given model func
  *
- * @param {Object} modelOwner The owner of the model. This instance is passed to the given modelFunc as the only argument.
- * @param {Function} modelFunc A function that returns the model instance. The given modelOwner is passed to the function.
+ * @param {Function} modelFunc A function that returns the model instance.
  * @param {Object} [parent]
  *          Optional parent that is set on the returned object.
  * @returns {Object}
@@ -259,11 +230,9 @@ export function _bindExtensionsToBeforeOrAfter(target, extensionsArray) {
 }
 
 export default {
-  bootstrap,
+  init,
   extend,
   get,
   getExtension,
-  getModel,
-  init,
   modelMap
 };
