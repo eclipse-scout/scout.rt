@@ -67,7 +67,7 @@ processError
 mvn -f org.eclipse.scout.rt -Dmaster_release_milestoneVersion=$RELEASE -N -P npm-run-full-build process-sources -Dmaster_npm_release_build=true $_MAVEN_OPTS
 processError
 
-$BASEDIR/build.sh -Dmaster_unitTest_failureIgnore=false $_MAVEN_OPTS
+$BASEDIR/build.sh -Dmaster_unitTest_failureIgnore=false -Dmaster_npm_release_build=false $_MAVEN_OPTS
 processError
 
 # cleanup node modules to avoid out-of-memory errors (java heap space) during scm-checkin
