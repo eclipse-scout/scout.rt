@@ -45,6 +45,34 @@
     margin-left: @bench-padding-x;
     margin-right: @bench-padding-x;
   }
+
+  .menubar-focus() {
+    &:focus {
+      outline: none;
+
+      &:not(.disabled) {
+        color: @hover-color;
+
+        &:not(.menu-button) {
+          color: @focus-color;
+
+          &::after {
+            color: @focus-color;
+          }
+        }
+
+        /* Draw border for icon only items */
+
+        &.menu-icononly::after {
+          #scout.button-focus();
+        }
+
+        &:not(.menu-icononly):not(.menu-button) > .text {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
 }
 
 /* Styles */
@@ -85,7 +113,13 @@
       }
     }
 
-    & > .menu-item {
+    /* child menus of combo-menu must have the same padding, but not the all the other styles of > .menu-item */
+    & > .combo-menu > .menu-item {
+      padding-top: @menubar-item-padding-y;
+      padding-bottom: @menubar-item-padding-y;
+    }
+
+    & > .menu-item  {
       display: inline-block;
       padding-top: @menubar-item-padding-y;
       padding-bottom: @menubar-item-padding-y;
@@ -97,31 +131,7 @@
         display: none;
       }
 
-      &:focus {
-        outline: none;
-
-        &:not(.disabled) {
-          color: @hover-color;
-
-          &:not(.menu-button) {
-            color: @focus-color;
-
-            &::after {
-              color: @focus-color;
-            }
-          }
-
-          /* Draw border for icon only items */
-
-          &.menu-icononly::after {
-            #scout.button-focus();
-          }
-
-          &:not(.menu-icononly):not(.menu-button) > .text {
-            text-decoration: underline;
-          }
-        }
-      }
+      #scout.menubar-focus();
 
       &:not(.last) {
         margin-right: @menu-item-margin-right;
@@ -240,6 +250,11 @@
         }
       }
     }
+
+    /* Menu items within a top-level combo-menu should have a focus-border too */
+    & > .combo-menu > .menu-item {
+      #scout.menubar-focus();
+    }
   }
 }
 
@@ -250,7 +265,7 @@
 
   & > .menubox {
 
-    & > .menu-item {
+    & > .menu-item, & > .combo-menu > .menu-item  {
       margin-top: 8px;
       margin-bottom: 7px;
 
@@ -275,6 +290,15 @@
 
     & > .menu-separator {
       height: @logical-grid-row-height - 12px;
+    }
+
+    /* combo-menu itself should have no margins and no padding so its child menus
+     * can render a focus border like regular top-level menus.  */
+    & > .combo-menu.menu-item {
+      margin-top: 0;
+      margin-bottom: 0;
+      padding-top: 0;
+      padding-bottom: 0;
     }
   }
 }
