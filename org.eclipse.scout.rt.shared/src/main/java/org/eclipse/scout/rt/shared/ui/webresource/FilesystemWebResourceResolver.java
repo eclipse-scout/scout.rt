@@ -28,8 +28,13 @@ public class FilesystemWebResourceResolver extends AbstractWebResourceResolver {
 
   @Override
   protected URL getResourceImpl(String resourcePath) {
-    Path candidate = m_root.resolve(resourcePath);
-    return toUrl(candidate);
+    try {
+      Path candidate = m_root.resolve(resourcePath);
+      return toUrl(candidate);
+    } catch (java.nio.file.InvalidPathException e){
+      // filesystem implementation does not understand/allow this path
+      return null;
+    }
   }
 
   protected static URL toUrl(Path path) {
