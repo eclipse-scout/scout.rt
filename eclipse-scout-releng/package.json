@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/releng",
-  "version": "10.0.1",
+  "version": "10.0.2",
   "description": "Release engineering module for Eclipse Scout",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
@@ -9,9 +9,6 @@
     "url": "ssh://git.eclipse.org:29418/scout/org.eclipse.scout.rt"
   },
   "license": "EPL-1.0",
-  "publishConfig": {
-    "registry": "https://scout.bsiag.com/repository/api/npm/com.bsiag.scout-npm-local/"
-  },
   "engines": {
     "node": ">=12.2.0",
     "npm": ">=6.9.0",
