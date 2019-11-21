@@ -56,62 +56,16 @@ if [[ "$TAG" ]]; then
 fi
 _MAVEN_OPTS="$_MAVEN_OPTS -e -B"
 
-# No parallel executions of maven modules and tests.
-mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -T1 -Dmaster_test_forkCount=1 -f org.eclipse.scout.rt -N $_MAVEN_OPTS
-processError
-
-# Create workspace
+# Create pnpm workspace
 touch pnpm-workspace.yaml
 
-# Install node in eclipse-scout-cli
-mvn -f eclipse-scout-cli generate-resources
-
-export NODE=../eclipse-scout-cli/target/node/node
-export NPM_CLI=../eclipse-scout-cli/target/node/node_modules/npm/bin/npm-cli.js
-export PNPM=../eclipse-scout-cli/target/node/lib/node_modules/pnpm/bin/pnpm.js
-
-# Update versions
-cd eclipse-scout-cli
-$NODE $PNPM update
-$NODE $NPM_CLI run release-version --scripts-prepend-node-path -- --newVersion $TAG --mapping.0.regex @eclipse-scout --mapping.0.version $TAG
+# Update versions in pom.xml files (java)
+mvn -f org.eclipse.scout.rt -Dmaster_release_milestoneVersion=$RELEASE -N -P release.setversion -T1 -Dmaster_test_forkCount=1 $_MAVEN_OPTS
 processError
-cd ..
 
-cd karma-jasmine-scout
-$NODE $PNPM update
-$NODE $NPM_CLI run release-version --scripts-prepend-node-path -- --newVersion $TAG --mapping.0.regex @eclipse-scout --mapping.0.version $TAG
+# Update versions in package.json files (javascript)
+mvn -f org.eclipse.scout.rt -Dmaster_release_milestoneVersion=$RELEASE -N -P npm-run-full-build process-sources -Dmaster_npm_release_build=true $_MAVEN_OPTS
 processError
-cd ..
-
-cd eslint-config
-$NODE $PNPM update
-$NODE $NPM_CLI run release-version --scripts-prepend-node-path -- --newVersion $TAG --mapping.0.regex @eclipse-scout --mapping.0.version $TAG
-processError
-cd ..
-
-cd eclipse-scout-testing
-$NODE $PNPM update
-$NODE $NPM_CLI run release-version --scripts-prepend-node-path -- --newVersion $TAG --mapping.0.regex @eclipse-scout --mapping.0.version $TAG
-processError
-cd ..
-
-cd eclipse-scout-core
-$NODE $PNPM update
-$NODE $NPM_CLI run release-version --scripts-prepend-node-path -- --newVersion $TAG --mapping.0.regex @eclipse-scout --mapping.0.version $TAG
-processError
-cd ..
-
-cd eclipse-scout-testing
-$NODE $PNPM update
-$NODE $NPM_CLI run release-version --scripts-prepend-node-path -- --newVersion $TAG --mapping.0.regex @eclipse-scout --mapping.0.version $TAG
-processError
-cd ..
-
-cd org.eclipse.scout.rt.svg.ui.html
-$NODE $PNPM update
-$NODE $NPM_CLI run release-version --scripts-prepend-node-path -- --newVersion $TAG --mapping.0.regex @eclipse-scout --mapping.0.version $TAG
-processError
-cd ..
 
 $BASEDIR/build.sh -Dmaster_unitTest_failureIgnore=false $_MAVEN_OPTS
 processError
@@ -119,10 +73,10 @@ processError
 # cleanup node modules to avoid out-of-memory errors (java heap space) during scm-checkin
 find . -maxdepth 2 -type d -name node_modules -prune -exec rm -r {} \;
 
-mvn -Prelease.checkin -Declipse_gerrit_username=$GIT_USERNAME -f org.eclipse.scout.rt $_MAVEN_OPTS
+mvn -f org.eclipse.scout.rt -P release.checkin -Declipse_gerrit_username=$GIT_USERNAME $_MAVEN_OPTS
 processError
 
-mvn -Prelease.tag -Declipse_gerrit_username=$GIT_USERNAME -Dmaster_release_pushChanges=true -f org.eclipse.scout.rt $_MAVEN_OPTS
+mvn -f org.eclipse.scout.rt -P release.tag -Declipse_gerrit_username=$GIT_USERNAME -Dmaster_release_pushChanges=true $_MAVEN_OPTS
 processError
 
 git reset HEAD~1 --hard
