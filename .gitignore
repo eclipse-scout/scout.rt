@@ -12,7 +12,7 @@
 
 *.log
 
-# DebugClasses 
+# DebugClasses
 *_gitignore.js
 *_gitignore.java
 
@@ -36,3 +36,4 @@ target/
 
 # node
 /node
+node_modules
