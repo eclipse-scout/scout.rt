@@ -23,14 +23,11 @@ scout.CancelMenu.prototype._init = function(model) {
   this.text = scout.nvl(this.text, this.session.text('CancelButton'));
 };
 
-scout.CancelMenu.prototype.getForm = function() {
-  return scout.Form.findForm(this);
-};
-
 scout.CancelMenu.prototype._doAction = function() {
+  var form = this.getForm();
   var event = new scout.Event();
   this.trigger('action', event);
   if (!event.defaultPrevented) {
-    this.getForm().cancel();
+    form.cancel();
   }
 };

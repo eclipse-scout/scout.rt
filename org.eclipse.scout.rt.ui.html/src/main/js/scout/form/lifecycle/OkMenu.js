@@ -22,14 +22,11 @@ scout.OkMenu.prototype._init = function(model) {
   this.text = scout.nvl(this.text, this.session.text('OkButton'));
 };
 
-scout.OkMenu.prototype.getForm = function() {
-  return scout.Form.findForm(this);
-};
-
 scout.OkMenu.prototype._doAction = function() {
+  var form = this.getForm();
   var event = new scout.Event();
   this.trigger('action', event);
   if (!event.defaultPrevented) {
-    this.getForm().ok();
+    form.ok();
   }
 };

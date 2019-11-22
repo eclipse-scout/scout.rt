@@ -21,14 +21,11 @@ scout.ResetMenu.prototype._init = function(model) {
   this.text = scout.nvl(this.text, this.session.text('ResetButton'));
 };
 
-scout.ResetMenu.prototype.getForm = function() {
-  return scout.Form.findForm(this);
-};
-
 scout.ResetMenu.prototype._doAction = function() {
+  var form = this.getForm();
   var event = new scout.Event();
   this.trigger('action', event);
   if (!event.defaultPrevented) {
-    this.getForm().reset();
+    form.reset();
   }
 };
