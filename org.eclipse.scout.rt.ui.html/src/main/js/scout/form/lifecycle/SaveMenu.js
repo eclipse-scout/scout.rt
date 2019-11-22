@@ -22,14 +22,11 @@ scout.SaveMenu.prototype._init = function(model) {
   this.text = scout.nvl(this.text, this.session.text('SaveButton'));
 };
 
-scout.SaveMenu.prototype.getForm = function() {
-  return scout.Form.findForm(this);
-};
-
 scout.SaveMenu.prototype._doAction = function() {
+  var form = this.getForm();
   var event = new scout.Event();
   this.trigger('action', event);
   if (!event.defaultPrevented) {
-    this.getForm().save();
+    form.save();
   }
 };
