@@ -143,28 +143,31 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
           }, DefaultExceptionTranslator.class);
     }
     catch (DuplicateRequestException e) {
-      if (Thread.currentThread().isInterrupted()) {
-        LOG.debug("Duplicate Request", e);
+      final boolean interrupted = Thread.interrupted();
+      if (interrupted) {
+        LOG.debug("Duplicate Request{}", interruptInfo(interrupted), e);
       }
       else {
-        LOG.warn("Duplicate Request", e);
+        LOG.warn("Duplicate Request{}", interruptInfo(interrupted), e);
       }
       servletResponse.sendError(HttpServletResponse.SC_CONFLICT, "Request is a duplicate");
     }
     catch (Throwable e) {//NOSONAR
+      final boolean interrupted = Thread.interrupted();
       if (isConnectionError(e)) {
         // Ignore disconnect errors: we do not want to throw an exception, if the client closed the connection.
-        LOG.debug("Connection Error", e);
+        LOG.debug("Connection Error{}", interruptInfo(interrupted), e);
+        servletResponse.sendError(HttpServletResponse.SC_ACCEPTED, "Connection probably dropped by client");
       }
       else if (isInterruption(e)) {
         if (isCancellation(e)) {
           // cancelled by client
-          LOG.debug("Cancelled by client", e);
+          LOG.debug("Cancelled by client{}", interruptInfo(interrupted), e);
           servletResponse.sendError(HttpServletResponse.SC_ACCEPTED, "Request processing was cancelled");
         }
         else {
           // other interruption
-          LOG.info("Interruption", e);
+          LOG.info("Interruption{}", interruptInfo(interrupted), e);
           servletResponse.sendError(HttpServletResponse.SC_ACCEPTED, "Request processing was interrupted");
         }
       }
@@ -191,6 +194,10 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
     finally {
       registrationHandle.unregister();
     }
+  }
+
+  protected String interruptInfo(boolean interrupted) {
+    return interrupted ? ", thread was interrupted" : ", thread was not interrupted";
   }
 
   protected ServerRunContext createServiceTunnelRunContext(ServiceTunnelRequest serviceRequest) {
