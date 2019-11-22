@@ -28,6 +28,7 @@ public class UiTextContributor implements IUiTextContributor {
         "FormEmptyMandatoryFieldsMessage",
         "FormInvalidFieldsMessage",
         "FormSaveChangesQuestion",
+        "ConfirmApplyChanges",
         "GroupBy",
         "NoGrouping",
         "InactiveState",
