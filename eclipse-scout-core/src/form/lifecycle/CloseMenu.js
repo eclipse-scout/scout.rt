@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Button, Event, Form, Menu, scout} from '../../index';
+import {Action, Button, Event, Menu, scout} from '../../index';
 
 export default class CloseMenu extends Menu {
 
@@ -26,15 +26,12 @@ export default class CloseMenu extends Menu {
     this.text = scout.nvl(this.text, this.session.text('CloseButton'));
   }
 
-  getForm() {
-    return Form.findForm(this);
-  }
-
   _doAction() {
+    var form = this.getForm();
     var event = new Event();
     this.trigger('action', event);
     if (!event.defaultPrevented) {
-      this.getForm().close();
+      form.close();
     }
   }
 }
