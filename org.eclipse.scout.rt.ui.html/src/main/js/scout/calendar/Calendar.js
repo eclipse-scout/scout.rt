@@ -421,10 +421,10 @@ scout.Calendar.prototype._onListClick = function(event) {
 
 scout.Calendar.prototype._onDayMouseDown = function(event) {
   // we cannot use event.stopPropagation() in CalendarComponent.js because this would
-  // prevent context-menus from being closed. With this awkward if-statement we only
-  // process the event, when it is not bubbling up from somewhere else (= from mousedown
-  // event on component).
-  if (event.eventPhase === Event.AT_TARGET) {
+  // prevent context-menus from being closed.
+  // With the following if-statement we check that we only process event that
+  // don't have a calendar-component as original target.
+  if (!$(event.target).hasClass('calendar-component')) {
     var selectedDate = $(event.delegateTarget).data('date');
     this._setSelection(selectedDate, null);
   }
