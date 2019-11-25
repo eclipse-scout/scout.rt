@@ -48,6 +48,16 @@ public class HttpServletControl implements Serializable {
 
   public static final String CSP_REPORT_URL = "csp-report";
 
+  /**
+   * The X-Content-Type-Options response HTTP header is a marker used by the server to indicate that the MIME types
+   * advertised in the Content-Type headers should not be changed and be followed. This allows to opt-out of MIME type
+   * sniffing, or, in other words, it is a way to say that the webmasters knew what they were doing.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
+   */
+  public static final String HTTP_HEADER_X_CONTENT_TYPE_OPTIONS = "X-Content-Type-Options";
+  public static final String CONTENT_TYPE_OPTION_NO_SNIFF = "nosniff";
+
   // Content Security Policy (CSP) token (built only once to eliminate overhead with each request)
   private String m_cspToken;
 
@@ -84,6 +94,7 @@ public class HttpServletControl implements Serializable {
     }
     resp.setHeader(HTTP_HEADER_X_FRAME_OPTIONS, SAMEORIGIN);
     resp.setHeader(HTTP_HEADER_X_XSS_PROTECTION, XSS_MODE_BLOCK);
+    resp.setHeader(HTTP_HEADER_X_CONTENT_TYPE_OPTIONS, CONTENT_TYPE_OPTION_NO_SNIFF);
 
     if (CONFIG.getPropertyValue(CspEnabledProperty.class)) {
       if (HttpClientInfo.get(req).isMshtml()) {
