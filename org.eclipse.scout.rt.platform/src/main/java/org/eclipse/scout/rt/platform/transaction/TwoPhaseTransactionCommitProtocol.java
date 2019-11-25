@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.transaction;
 
+import org.eclipse.scout.rt.platform.util.concurrent.AbstractInterruptionError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,8 +45,19 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
           return;
         }
       }
-      catch (RuntimeException | Error e) {
-        LOG.error("Unexpected error during commit of XA transaction [2PC-phase='voting', tx={}]", tx, e);
+      catch (AbstractInterruptionError e) {
+        LOG.debug("Exception during commit of XA transaction [2PC-phase='voting', tx={}] due to interruption.", tx, e);
+        tx.addFailure(e);
+        rollback(tx);
+        throw e;
+      }
+      catch (RuntimeException | Error e) { // NOSONAR
+        if (Thread.currentThread().isInterrupted()) {
+          LOG.debug("Exception during commit of XA transaction [2PC-phase='voting', tx={}] due to interruption.", tx, e);
+        }
+        else {
+          LOG.error("Unexpected error during commit of XA transaction [2PC-phase='voting', tx={}]", tx, e);
+        }
         tx.addFailure(e);
         rollback(tx);
         throw e;
@@ -55,8 +67,19 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
       try {
         commitPhase2(tx);
       }
-      catch (RuntimeException | Error e) {
-        LOG.error("Unexpected error during commit of XA transaction [2PC-phase='commit', tx={}]", tx, e);
+      catch (AbstractInterruptionError e) {
+        LOG.debug("Exception during commit of XA transaction [2PC-phase='commit', tx={}] due to interruption.", tx, e);
+        tx.addFailure(e);
+        rollback(tx);
+        throw e;
+      }
+      catch (RuntimeException | Error e) { // NOSONAR
+        if (Thread.currentThread().isInterrupted()) {
+          LOG.debug("Exception during commit of XA transaction [2PC-phase='commit', tx={}] due to interruption.", tx, e);
+        }
+        else{
+          LOG.error("Unexpected error during commit of XA transaction [2PC-phase='commit', tx={}]", tx, e);
+        }
         tx.addFailure(e);
         rollback(tx);
         throw e;

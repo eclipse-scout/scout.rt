@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.job.internal;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
+import org.eclipse.scout.rt.platform.util.concurrent.AbstractInterruptionError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,14 +41,18 @@ public class CallableChainExceptionHandler<RESULT> implements ICallableIntercept
       }
       throw e;
     }
-    catch (Exception | Error err) { // NOSONAR
+    catch (AbstractInterruptionError | InterruptedException e) {
+      LOG.debug("Exception in callable chain due to interruption.", e);
+      throw e;
+    }
+    catch (Exception | Error e) { // NOSONAR
       if (Thread.currentThread().isInterrupted()) {
-        LOG.debug("Exception in callable chain due to interruption.", err);
+        LOG.debug("Exception in callable chain due to interruption.", e);
       }
       else {
-        LOG.warn("Exception in callable chain.", err);
+        LOG.warn("Exception in callable chain.", e);
       }
-      throw err;
+      throw e;
     }
   }
 
