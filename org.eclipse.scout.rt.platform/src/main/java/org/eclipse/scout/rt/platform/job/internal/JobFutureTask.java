@@ -125,6 +125,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       public RESULT intercept(Chain<RESULT> chain) throws Exception {
         // do not run task if run monitor is cancelled, return null as FutureTask must have been cancelled as well
         // (JobFutureTask is registered as a child of the run monitor), IFuture.awaitDoneAndGet will throw a FutureCancelledError
+        JobFutureTask.this.cancel(false);
         return null;
       }
 
