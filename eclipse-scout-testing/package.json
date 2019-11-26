@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/testing",
-  "version": "10.0.0-snapshot",
+  "version": "10.0.0-beta.5",
   "description": "Eclipse Scout",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
@@ -28,10 +28,10 @@
   "devDependencies": {
     "@eclipse-scout/releng": "^10.0.0",
     "jquery": "3.4.1",
-    "@eclipse-scout/core": "10.0.0-snapshot"
+    "@eclipse-scout/core": "10.0.0-beta.5"
   },
   "peerDependencies": {
     "jquery": "3.4.1",
-    "@eclipse-scout/core": "10.0.0-snapshot"
+    "@eclipse-scout/core": "10.0.0-beta.5"
   }
 }
