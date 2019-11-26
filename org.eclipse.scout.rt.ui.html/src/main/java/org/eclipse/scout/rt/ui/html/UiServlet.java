@@ -64,10 +64,13 @@ public class UiServlet extends AbstractHttpServlet {
   private static final Set<String> HTTP_METHODS_SUPPORTED_BY_JAVAX_HTTP_SERVLET = new HashSet<>(Arrays.asList(
       "GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "TRACE"));
 
+  // Remember bean instances to save lookups on each request
   private final HttpServletControl m_httpServletControl;
+  private final UiThreadInterruption m_uiThreadInterruption;
 
   public UiServlet() {
     m_httpServletControl = BEANS.get(HttpServletControl.class);
+    m_uiThreadInterruption = BEANS.get(UiThreadInterruption.class);
   }
 
   protected boolean isHttpMethodSupportedByJavaxHttpServlet(String method) {
@@ -214,7 +217,7 @@ public class UiServlet extends AbstractHttpServlet {
    * @return <code>true</code> if request was handled, <code>false</code> otherwise.
    */
   protected boolean handleRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    BEANS.get(UiThreadInterruption.class).detectAndClear(this, "handleRequest");
+    m_uiThreadInterruption.detectAndClear(this, "handleRequest");
     m_httpServletControl.doDefaults(this, req, resp);
     try {
       return createServletRunContext(req, resp).call(() -> handleRequestInternal(req, resp), DefaultExceptionTranslator.class);
