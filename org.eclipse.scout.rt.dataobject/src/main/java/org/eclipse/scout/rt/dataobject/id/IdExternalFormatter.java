@@ -112,6 +112,13 @@ public class IdExternalFormatter {
   }
 
   /**
+   * @return id class which declares {@link IdTypeName} with {@code typeName}
+   */
+  public Class<? extends IId<?>> getIdClass(String typeName) {
+    return m_nameToClassMap.get(typeName);
+  }
+
+  /**
    * @return the type name of the {@link IId} as defined by the {@link IdTypeName} annotation or <code>null</code> if
    *         the annotation is not present.
    */

@@ -11,11 +11,14 @@
 package org.eclipse.scout.rt.dataobject;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.UUID;
 
+import org.eclipse.scout.rt.dataobject.fixture.FixtureLongId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
+import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IIds;
 import org.eclipse.scout.rt.dataobject.id.IdExternalFormatter;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -53,5 +56,19 @@ public class IdExternalFormatterTest {
   public void testFromExternalForm_UnknownType() {
     FixtureUuId id = BEANS.get(IdExternalFormatter.class).fromExternalForm("DoesNotExist:" + TEST_UUID.toString());
     assertEquals(id, id);
+  }
+
+  @Test
+  public void testGetIdClass() {
+    assertEquals(FixtureUuId.class, BEANS.get(IdExternalFormatter.class).getIdClass("scout.FixtureUuId"));
+    assertNull(BEANS.get(IdExternalFormatter.class).getIdClass("scout.FixtureUuIdUnknown"));
+    assertNull(BEANS.get(IdExternalFormatter.class).getIdClass(null));
+  }
+
+  @Test
+  public void testGetTypeName() {
+    assertEquals("scout.FixtureUuId", BEANS.get(IdExternalFormatter.class).getTypeName(FixtureUuId.class));
+    assertNull(BEANS.get(IdExternalFormatter.class).getTypeName(FixtureLongId.class));
+    assertNull(BEANS.get(IdExternalFormatter.class).getTypeName((Class<? extends IId<?>>) null));
   }
 }
