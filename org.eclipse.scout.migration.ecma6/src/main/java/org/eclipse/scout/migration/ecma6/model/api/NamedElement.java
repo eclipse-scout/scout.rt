@@ -15,7 +15,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -150,7 +152,11 @@ public class NamedElement implements INamedElement {
   }
 
   void addChildren(List<INamedElement> children) {
-    m_children.addAll(children);
+    Set<String> fqns = children.stream().map(c -> c.getFullyQualifiedName()).collect(Collectors.toSet());
+    List<INamedElement> newKids = m_children.stream().filter(c -> !fqns.contains(c.getFullyQualifiedName())).collect(Collectors.toList());
+    children.forEach(c -> c.setParent(this));
+    newKids.addAll(children);
+    m_children = newKids;
   }
 
   @Override

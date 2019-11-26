@@ -12,6 +12,8 @@ package org.eclipse.scout.migration.ecma6;
 
 import java.nio.file.Path;
 
+import org.eclipse.scout.migration.ecma6.configuration.Configuration;
+
 public class ManualFixes {
   public void apply(WorkingCopy wc) {
     String namespace = Configuration.get().getNamespace();

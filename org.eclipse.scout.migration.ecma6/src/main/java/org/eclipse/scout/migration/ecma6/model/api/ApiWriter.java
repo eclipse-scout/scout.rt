@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.migration.ecma6.Configuration;
+import org.eclipse.scout.migration.ecma6.configuration.Configuration;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
 import org.eclipse.scout.migration.ecma6.model.old.FrameworkExtensionMarker;
@@ -29,6 +29,7 @@ import org.eclipse.scout.migration.ecma6.model.old.JsTopLevelEnum;
 import org.eclipse.scout.migration.ecma6.model.old.JsUtility;
 import org.eclipse.scout.migration.ecma6.model.old.JsUtilityFunction;
 import org.eclipse.scout.migration.ecma6.model.old.JsUtilityVariable;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,11 +45,19 @@ public class ApiWriter {
     defaultJacksonObjectMapper.writeValue(Files.newBufferedWriter(libraryFile), createLibraryFromCurrentModule(libName, context));
   }
 
-  @FrameworkExtensionMarker
   public INamedElement createLibraryFromCurrentModule(String libName, Context context) {
-    NamedElement lib = new NamedElement(Type.Library, Configuration.get().getNamespace());
-    lib.addCustomAttribute(INamedElement.LIBRARY_MODULE_NAME, libName);
+    NamedElement lib = context.getLibraries().getChildren().stream()
+        .filter(l -> ObjectUtility.equals(l.getCustomAttribute(INamedElement.LIBRARY_MODULE_NAME), libName))
+        .findFirst().map(l -> (NamedElement) l).orElse(null);
+    if (lib == null) {
+      lib = new NamedElement(Type.Library, Configuration.get().getNamespace());
+      lib.addCustomAttribute(INamedElement.LIBRARY_MODULE_NAME, libName);
+    }
+    return fillLibraryFromCurrentModule(lib, context);
+  }
 
+  @FrameworkExtensionMarker
+  public INamedElement fillLibraryFromCurrentModule(NamedElement lib, Context context) {
     List<INamedElement> allElements = new ArrayList<>();
     allElements.addAll(context
         .getAllJsClasses()
@@ -67,7 +76,7 @@ public class ApiWriter {
         .stream()
         .map(jsEnum -> createTopLevelEnum(jsEnum, lib))
         .collect(Collectors.toList()));
-    lib.setChildren(allElements);
+    lib.addChildren(allElements);
     return lib;
   }
 

@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.migration.ecma6.task;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -61,7 +62,7 @@ public class T5030_ResolveClassConstructorReferencesAndCreateImports extends Abs
   protected String updateForeignReferences(JsFile jsFile, String source, Context context) {
     Set<String> currentClassesFqn = jsFile.getJsClasses().stream().map(JsClass::getFullyQualifiedName).collect(Collectors.toSet());
 
-    List<INamedElement> constructors = context.getApi().getElements(Type.Constructor, fun -> !currentClassesFqn.contains(fun.getAncestor(Type.Class).getFullyQualifiedName()));
+    Collection<INamedElement> constructors = context.getApi().getElements(Type.Constructor, fun -> !currentClassesFqn.contains(fun.getAncestor(Type.Class).getFullyQualifiedName()));
     constructors.addAll(context.getLibraries().getElements(Type.Constructor));
 
     for (INamedElement constructor : constructors) {

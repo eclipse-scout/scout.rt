@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
+import org.eclipse.scout.migration.ecma6.configuration.Configuration;
 import org.eclipse.scout.migration.ecma6.task.T1100_ObjectFactories;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -651,7 +651,7 @@ public class JsFileParser {
   }
 
   private JsClassVariable readClassConstant(Matcher matcher) throws IOException {
-    JsClass clazz = m_jsFile.getLastClassOrAppend(matcher.group(1));
+    JsClass clazz = m_jsFile.getClassOrAppend(matcher.group(1));
     JsClassVariable v = new JsClassVariable(clazz, matcher.group(2), true);
     v.setSource(matcher.group());
     clazz.addVariable(v);

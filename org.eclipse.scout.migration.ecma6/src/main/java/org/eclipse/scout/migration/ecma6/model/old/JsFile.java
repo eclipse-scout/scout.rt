@@ -12,11 +12,11 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
+import org.eclipse.scout.migration.ecma6.configuration.Configuration;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
@@ -107,6 +107,16 @@ public class JsFile extends AbstractJsElement {
     Assertions.assertNotNullOrEmpty(fqn, "fqn is empty");
     jsClass = new JsClass(fqn, this);
     m_jsClasses.add(jsClass);
+    return jsClass;
+  }
+
+  public JsClass getClassOrAppend(String fqn) {
+    Assertions.assertNotNullOrEmpty(fqn, "fqn is empty");
+    JsClass jsClass = m_jsClasses.stream().filter(jsc -> jsc.getFullyQualifiedName().equals(fqn)).findFirst().orElse(null);
+    if (jsClass == null) {
+      jsClass = new JsClass(fqn, this);
+      m_jsClasses.add(jsClass);
+    }
     return jsClass;
   }
 

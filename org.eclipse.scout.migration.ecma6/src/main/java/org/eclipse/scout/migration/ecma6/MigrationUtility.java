@@ -1,5 +1,7 @@
 package org.eclipse.scout.migration.ecma6;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -106,5 +108,17 @@ public final class MigrationUtility {
       }
     }
     workingCopy.setSource(sourceBuilder.toString());
+  }
+
+  public static Path getModuleDirectory(Path anyFile) throws IOException {
+    if (anyFile == null) {
+      return null;
+    }
+    if (Files.isDirectory(anyFile)) {
+      if (Files.list(anyFile).anyMatch(path -> FileUtility.hasExtension(path, "iml"))) {
+        return anyFile;
+      }
+    }
+    return getModuleDirectory(anyFile.getParent());
   }
 }

@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.PathInfo;
+import org.eclipse.scout.migration.ecma6.configuration.Configuration;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

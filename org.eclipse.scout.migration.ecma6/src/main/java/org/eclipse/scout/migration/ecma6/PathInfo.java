@@ -2,6 +2,8 @@ package org.eclipse.scout.migration.ecma6;
 
 import java.nio.file.Path;
 
+import org.eclipse.scout.migration.ecma6.configuration.Configuration;
+
 public class PathInfo {
 
   private final Path m_path;

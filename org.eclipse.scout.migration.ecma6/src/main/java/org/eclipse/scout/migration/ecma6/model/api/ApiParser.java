@@ -15,7 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.migration.ecma6.Configuration;
+import org.eclipse.scout.migration.ecma6.configuration.Configuration;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
@@ -45,7 +45,7 @@ public class ApiParser {
         .sorted(Path::compareTo)
         .map(this::parseLibrary)
         // do not include current migration source as library
-        .filter(lib -> ObjectUtility.notEquals(Configuration.get().getPersistLibraryName(), lib.getCustomAttributeString(INamedElement.LIBRARY_MODULE_NAME)))
+        .filter(lib -> Configuration.get().isParseOnlyIncludeFiles() || ObjectUtility.notEquals(Configuration.get().getPersistLibraryName(), lib.getCustomAttributeString(INamedElement.LIBRARY_MODULE_NAME)))
         .collect(Collectors.toList()));
     allLibs.ensureParents();
     return allLibs;

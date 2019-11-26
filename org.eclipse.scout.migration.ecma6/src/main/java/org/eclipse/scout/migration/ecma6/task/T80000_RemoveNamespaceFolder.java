@@ -13,9 +13,9 @@ package org.eclipse.scout.migration.ecma6.task;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
+import org.eclipse.scout.migration.ecma6.configuration.Configuration;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.rt.platform.Order;
 import org.slf4j.Logger;

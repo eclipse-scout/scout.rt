@@ -8,16 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.migration.ecma6;
+package org.eclipse.scout.migration.ecma6.configuration;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.eclipse.scout.migration.ecma6.configuration.MigrationConfigProperties.ApiBaseProperty;
+import org.eclipse.scout.migration.ecma6.configuration.MigrationConfigProperties.IncludeFilesProperty;
+import org.eclipse.scout.migration.ecma6.configuration.MigrationConfigProperties.ModuleNameProperty;
+import org.eclipse.scout.migration.ecma6.configuration.MigrationConfigProperties.ParseOnlyIncludeFilesProperty;
+import org.eclipse.scout.migration.ecma6.configuration.MigrationConfigProperties.SourceBaseProperty;
+import org.eclipse.scout.migration.ecma6.configuration.MigrationConfigProperties.TargetBaseProperty;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -32,8 +40,8 @@ public class Configuration {
     return BEANS.get(Configuration.class);
   }
 
-  private String m_sourceModuleDirectory;
-  private String m_targetModuleDirectory;
+  private Path m_sourceModuleDirectory;
+  private Path m_targetModuleDirectory;
   private String m_namespace;
   private String m_jsFolderName;
   private String m_persistLibraryName;
@@ -41,38 +49,46 @@ public class Configuration {
   private boolean m_removeJsFolder = true;
   private boolean m_useIndexJs = true;
   private String m_stepConfigTypeName;
+  private List<Path> m_includeFiles;
+  private boolean m_parseOnlyIncludeFiles;
+
+  private Path m_apiBase;
 
   /**
    * Paths and names based on Taskliste-IntelliJ-Ecma.xlsx
    */
   protected Configuration() {
-    String sourceBase = getConfiguredSourceBase();
-    String targetBase = getConfiguredTargetBase();
+    setApiBase(getConfiguredApiBase());
+    setIncludeFiles(getConfiguredIncludeFiles());
+    setParseOnlyIncludeFiles(getConfiguredParseOnlyIncludedFiles());
+    Path sourceBase = getConfiguredSourceBase();
+    Path targetBase = getConfiguredTargetBase();
     String moduleName = getConfiguredModule();
+
     if (moduleName == null) {
       return;
     }
 
     switch (moduleName) {
       case "org.eclipse.scout.rt.ui.html":
-        setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.rt/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/org.eclipse.scout.rt/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("org.eclipse.scout.rt", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("org.eclipse.scout.rt", moduleName)));
         setNamespace("scout");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@eclipse-scout/core");
         setPersistLibraryFileName("01-api_eclipse-scout_core.json");
         break;
       case "org.eclipse.scout.rt.svg.ui.html":
-        setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.rt/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/org.eclipse.scout.rt/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("org.eclipse.scout.rt", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("org.eclipse.scout.rt", moduleName)));
         setNamespace("scout");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@eclipse-scout/svg");
         setPersistLibraryFileName("02-api_eclipse-scout_svg.json");
         break;
       case "org.eclipse.scout.jswidgets.ui.html":
-        setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("org.eclipse.scout.docs/code/widgets/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("org.eclipse.scout.docs/code/widgets/", moduleName)));
         setNamespace("jswidgets");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@eclipse-scout/demo-jswidgets");
@@ -80,24 +96,24 @@ public class Configuration {
         break;
 
       case "org.eclipse.scout.widgets.heatmap.ui.html":
-        setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("org.eclipse.scout.docs/code/widgets/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("org.eclipse.scout.docs/code/widgets/", moduleName)));
         setNamespace("scout");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@eclipse-scout/demo-widgets-heatmap");
         setPersistLibraryFileName("40-api_demo-widgets-heatmap.json");
         break;
       case "org.eclipse.scout.widgets.ui.html":
-        setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("org.eclipse.scout.docs/code/widgets/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("org.eclipse.scout.docs/code/widgets/", moduleName)));
         setNamespace("widgets");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@eclipse-scout/demo-widgets");
         setPersistLibraryFileName("41-api_demo-widgets.json");
         break;
       case "org.eclipse.scout.contacts.ui.html":
-        setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/contacts/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/contacts/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("org.eclipse.scout.docs/code/contacts/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("org.eclipse.scout.docs/code/contacts/", moduleName)));
         setNamespace("contacts");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@eclipse-scout/demo-contacts");
@@ -105,56 +121,56 @@ public class Configuration {
         break;
 
       case "com.bsiag.scout.rt.ui.html":
-        setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
         setNamespace("scout");
         setJsFolderName("bsiscout");
         setPersistLibraryName("@bsi-scout/core");
         setPersistLibraryFileName("50-api_bsi_scout_core.json");
         break;
       case "com.bsiag.scout.rt.pdfviewer.ui.html":
-        setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
         setNamespace("scout");
         setJsFolderName("bsiscout");
         setPersistLibraryName("@bsi-scout/pdfviewer");
         setPersistLibraryFileName("52-api_bsi_scout_pdfviewer.json");
         break;
       case "com.bsiag.scout.rt.officeaddin.ui.html":
-        setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
         setNamespace("scout");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-scout/officeaddin");
         setPersistLibraryFileName("54-api_bsi_scout_officeaddin.json");
         break;
       case "com.bsiag.scout.rt.htmleditor.ui.html":
-        setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
         setNamespace("scout");
         setJsFolderName("bsiscout");
         setPersistLibraryName("@bsi-scout/htmleditor");
         setPersistLibraryFileName("56-api_bsi_scout_htmleditor.json");
         break;
       case "com.bsiag.widgets.ui.html":
-        setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
         setNamespace("scout");
         setJsFolderName("bsiwidgets");
         setPersistLibraryName("@bsi-scout/demo-widgets");
         setPersistLibraryFileName("80-api_bsi_demo_widgets.json");
         break;
       case "com.bsiag.studio.ui.html":
-        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-studio/core");
         setPersistLibraryFileName("112-api_bsi_studio_core.json");
         break;
       case "com.bsiag.studio.ui.html.test": {
-        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-studio/testing");
@@ -162,24 +178,24 @@ public class Configuration {
         break;
       }
       case "com.bsiag.crm.ui.html.graph":
-        setSourceModuleDirectory(sourceBase + "/bsicrm/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsicrm/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsicrm/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsicrm/", moduleName)));
         setNamespace("scout");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-crm/graph");
         setPersistLibraryFileName("100-api_bsicrm_graph.json");
         break;
       case "com.bsiag.crm.ui.html.core":
-        setSourceModuleDirectory(sourceBase + "/bsicrm/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsicrm/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsicrm/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsicrm/", moduleName)));
         setNamespace("crm");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-crm/core");
         setPersistLibraryFileName("110-api_bsicrm_core.json");
         break;
       case "com.bsiag.crm.studio.ui.html":
-        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studiocrm");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-crm/studio");
@@ -187,8 +203,8 @@ public class Configuration {
         break;
 
       case "com.bsiag.studio.step.base":
-        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-studio/step");
@@ -198,8 +214,8 @@ public class Configuration {
         setStepConfigTypeName("steps");
         break;
       case "com.bsiag.studio.step.crm":
-        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-studio/step-crm");
@@ -209,8 +225,8 @@ public class Configuration {
         setStepConfigTypeName("steps");
         break;
       case "com.bsiag.studio.step.weather":
-        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-studio/step-weather");
@@ -220,8 +236,8 @@ public class Configuration {
         setStepConfigTypeName("steps");
         break;
       case "com.bsiag.studio.step.media":
-        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-studio/step-media");
@@ -231,8 +247,8 @@ public class Configuration {
         setStepConfigTypeName("steps");
         break;
       case "com.bsiag.studio.step.example":
-        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-studio/step-example");
@@ -242,8 +258,8 @@ public class Configuration {
         setStepConfigTypeName("steps");
         break;
       case "com.bsiag.studio.step.prototyping":
-        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-studio/step-prototyping");
@@ -253,8 +269,8 @@ public class Configuration {
         setStepConfigTypeName("steps");
         break;
       case "com.bsiag.studio.step.ml":
-        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-studio/step-ml");
@@ -265,8 +281,8 @@ public class Configuration {
         break;
 
       case "com.bsiag.ml.cortex":
-        setSourceModuleDirectory(sourceBase + "/bsiml/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsiml/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsiml/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsiml/", moduleName)));
         setNamespace("studio");
         setJsFolderName("ml");
         setPersistLibraryName("@bsi-ml/cortex");
@@ -277,8 +293,8 @@ public class Configuration {
         break;
 
       case "com.bsiag.portal.ui":
-        setSourceModuleDirectory(sourceBase + "/bsiportal/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsiportal/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsiportal/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsiportal/", moduleName)));
         setNamespace("portal");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-portal/core");
@@ -286,8 +302,8 @@ public class Configuration {
         break;
 
       case "com.bsiag.bsistudio.lab.ui.html":
-        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("crm");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-crm/bsiag-studio-lab");
@@ -295,16 +311,16 @@ public class Configuration {
         break;
 
       case "com.bsiag.briefcase.ui.html":
-        setSourceModuleDirectory(sourceBase + "/bsibriefcase/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsibriefcase/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsibriefcase/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsibriefcase/", moduleName)));
         setNamespace("briefcase");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-briefcase/core");
         setPersistLibraryFileName("900-api_bsi_briefcase_core.json");
         break;
       case "com.bsiag.bsibriefcase.ui.html":
-        setSourceModuleDirectory(sourceBase + "/bsibriefcase/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/bsibriefcase/" + moduleName);
+        setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsibriefcase/", moduleName)));
+        setTargetModuleDirectory(targetBase.resolve(Paths.get("bsibriefcase/", moduleName)));
         setNamespace("bsibriefcase");
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-briefcase/bsiag");
@@ -318,29 +334,45 @@ public class Configuration {
     LOG.info("Namespace: " + getNamespace());
     LOG.info("PersistLibraryName: " + getPersistLibraryName());
     LOG.info("PersistLibraryFileName: " + getPersistLibraryFileName());
-    LOG.info("LibraryApiDirectory: " + getLibraryApiDirectory());
+    LOG.info("LibraryApiDirectory: " + getApiBase());
   }
 
-  protected String getConfiguredSourceBase() {
-    return null;
+  protected Path getConfiguredSourceBase() {
+    return CONFIG.getPropertyValue(SourceBaseProperty.class);
   }
 
-  protected String getConfiguredTargetBase() {
-    return null;
+  protected Path getConfiguredTargetBase() {
+    return CONFIG.getPropertyValue(TargetBaseProperty.class);
   }
 
   protected String getConfiguredModule() {
-    return null;
+    return CONFIG.getPropertyValue(ModuleNameProperty.class);
   }
 
+  protected Path getConfiguredApiBase() {
+    Path apiBase = CONFIG.getPropertyValue(ApiBaseProperty.class);
+    if (apiBase == null) {
+      // default
+      apiBase = Paths.get(getConfiguredSourceBase() + "/ecma6-mig-apis");
+    }
+    return apiBase;
+  }
+
+  protected boolean getConfiguredParseOnlyIncludedFiles() {
+    return CONFIG.getPropertyValue(ParseOnlyIncludeFilesProperty.class);
+  }
+
+  protected List<Path> getConfiguredIncludeFiles() {
+    return CONFIG.getPropertyValue(IncludeFilesProperty.class);
+  }
   /**
    * @return the source directory to be migrated. must exist. Usually something like '.../[com.bsiag.bsicrm.]ui.html'
    */
   public Path getSourceModuleDirectory() {
-    return Paths.get(m_sourceModuleDirectory);
+    return m_sourceModuleDirectory;
   }
 
-  public void setSourceModuleDirectory(String sourceModuleDirectory) {
+  public void setSourceModuleDirectory(Path sourceModuleDirectory) {
     m_sourceModuleDirectory = sourceModuleDirectory;
   }
 
@@ -349,10 +381,10 @@ public class Configuration {
    *         created if it or one of its parents does not exist.
    */
   public Path getTargetModuleDirectory() {
-    return Paths.get(m_targetModuleDirectory);
+    return m_targetModuleDirectory;
   }
 
-  public void setTargetModuleDirectory(String targetModuleDirectory) {
+  public void setTargetModuleDirectory(Path targetModuleDirectory) {
     m_targetModuleDirectory = targetModuleDirectory;
   }
 
@@ -411,15 +443,20 @@ public class Configuration {
   }
 
   public Path getPersistLibraryFile() {
-    return Paths.get(getLibraryApiDirectory().toString(), getPersistLibraryFileName());
+    return getApiBase().resolve(Paths.get(getPersistLibraryFileName()));
   }
+
 
   /**
    * @return The folder where all library api's used for this migration are located. In this folder might be several
    *         *.json * files from previous migrations.
    */
-  public Path getLibraryApiDirectory() {
-    return Paths.get(getConfiguredSourceBase() + "/ecma6-mig-apis");
+  public Path getApiBase() {
+    return m_apiBase;
+  }
+
+  public void setApiBase(Path apiBase) {
+    m_apiBase = apiBase;
   }
 
   /**
@@ -440,9 +477,9 @@ public class Configuration {
     if (getPersistLibraryFileName() != null && StringUtility.isNullOrEmpty(getPersistLibraryName())) {
       throw new VetoException(configurationErrorMessage("In case the persistLibraryFileName is set the persistLibraryName must also be set."));
     }
-    if (getLibraryApiDirectory() != null) {
-      if (!Files.exists(getLibraryApiDirectory()) || !Files.isDirectory(getLibraryApiDirectory())) {
-        throw new VetoException(configurationErrorMessage("In case a libraryApiDirectory is set '" + getLibraryApiDirectory() + "' it must exist and be a directory"));
+    if (getApiBase() != null) {
+      if (!Files.exists(getApiBase()) || !Files.isDirectory(getApiBase())) {
+        throw new VetoException(configurationErrorMessage("In case a libraryApiDirectory is set '" + getApiBase() + "' it must exist and be a directory"));
       }
     }
   }
@@ -473,5 +510,21 @@ public class Configuration {
 
   public void setStepConfigTypeName(String stepConfigTypeName) {
     m_stepConfigTypeName = stepConfigTypeName;
+  }
+
+  public List<Path> getIncludeFiles() {
+    return m_includeFiles;
+  }
+
+  public void setIncludeFiles(List<Path> includeFiles) {
+    m_includeFiles = includeFiles;
+  }
+
+  public boolean isParseOnlyIncludeFiles() {
+    return m_parseOnlyIncludeFiles;
+  }
+
+  public void setParseOnlyIncludeFiles(boolean parseOnlyIncludeFiles) {
+    m_parseOnlyIncludeFiles = parseOnlyIncludeFiles;
   }
 }

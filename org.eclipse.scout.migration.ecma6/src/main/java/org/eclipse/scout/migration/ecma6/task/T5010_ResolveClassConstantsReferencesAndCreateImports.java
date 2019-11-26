@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.migration.ecma6.task;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -61,7 +62,7 @@ public class T5010_ResolveClassConstantsReferencesAndCreateImports extends Abstr
   protected String updateForeignReferences(JsFile jsFile, String source, Context context) {
     Set<String> currentClassesFqn = jsFile.getJsClasses().stream().map(JsClass::getFullyQualifiedName).collect(Collectors.toSet());
 
-    List<INamedElement> constants = context.getApi().getElements(Type.Constant, fun -> !currentClassesFqn.contains(fun.getParent().getFullyQualifiedName()));
+    Collection<INamedElement> constants = context.getApi().getElements(Type.Constant, fun -> !currentClassesFqn.contains(fun.getParent().getFullyQualifiedName()));
     constants.addAll(context.getLibraries().getElements(Type.Constant));
 
     for (INamedElement constant : constants) {

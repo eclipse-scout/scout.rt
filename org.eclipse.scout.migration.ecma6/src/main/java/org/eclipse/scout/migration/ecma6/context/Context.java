@@ -14,10 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
+import org.eclipse.scout.migration.ecma6.configuration.Configuration;
 import org.eclipse.scout.migration.ecma6.model.api.ApiParser;
 import org.eclipse.scout.migration.ecma6.model.api.ApiWriter;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
@@ -31,6 +31,7 @@ import org.eclipse.scout.migration.ecma6.model.old.JsUtility;
 import org.eclipse.scout.migration.ecma6.model.old.JsUtilityFunction;
 import org.eclipse.scout.migration.ecma6.model.old.JsUtilityVariable;
 import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationExcludePathFilter;
+import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationIncludePathFilter;
 import org.eclipse.scout.migration.ecma6.task.T40010_LessModule;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -57,7 +58,7 @@ public class Context {
       readLibraryApis();
     }
     catch (IOException e) {
-      throw new ProcessingException("Could not parse Library APIs in '" + Configuration.get().getLibraryApiDirectory() + "'.", e);
+      throw new ProcessingException("Could not parse Library APIs in '" + Configuration.get().getApiBase() + "'.", e);
     }
     try {
       parseJsFiles();
@@ -75,6 +76,10 @@ public class Context {
     Files.walkFileTree(Configuration.get().getSourceModuleDirectory(), new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+        PathInfo info = new PathInfo(file);
+        if (Configuration.get().isParseOnlyIncludeFiles() && !BEANS.get(IMigrationIncludePathFilter.class).test(info)) {
+          return FileVisitResult.CONTINUE;
+        }
         if (file.getFileName().toString().endsWith(T40010_LessModule.LESS_FILE_SUFFIX)) {
           m_lessFiles.add(file);
         }
@@ -104,7 +109,7 @@ public class Context {
   }
 
   protected void readLibraryApis() throws IOException {
-    Path libraryApiDirectory = Configuration.get().getLibraryApiDirectory();
+    Path libraryApiDirectory = Configuration.get().getApiBase();
     if (libraryApiDirectory != null) {
       ApiParser parser = new ApiParser(libraryApiDirectory);
       m_libraries = parser.parse();
@@ -197,6 +202,9 @@ public class Context {
         }
         PathInfo info = new PathInfo(file);
         if (BEANS.all(IMigrationExcludePathFilter.class).stream().anyMatch(filter -> filter.test(info))) {
+          return FileVisitResult.CONTINUE;
+        }
+        if (Configuration.get().isParseOnlyIncludeFiles() && !BEANS.get(IMigrationIncludePathFilter.class).test(info)) {
           return FileVisitResult.CONTINUE;
         }
         JsFile jsFile = ensureJsFile(ensureWorkingCopy(file));

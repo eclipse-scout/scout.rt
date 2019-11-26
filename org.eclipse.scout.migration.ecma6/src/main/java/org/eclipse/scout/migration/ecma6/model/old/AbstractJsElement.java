@@ -3,7 +3,7 @@ package org.eclipse.scout.migration.ecma6.model.old;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.migration.ecma6.Configuration;
+import org.eclipse.scout.migration.ecma6.configuration.Configuration;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.MultiStatus;
 import org.eclipse.scout.rt.platform.status.Status;

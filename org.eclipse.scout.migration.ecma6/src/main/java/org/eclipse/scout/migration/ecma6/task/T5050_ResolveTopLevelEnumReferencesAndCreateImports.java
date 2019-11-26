@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.migration.ecma6.task;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
@@ -30,7 +30,7 @@ public class T5050_ResolveTopLevelEnumReferencesAndCreateImports extends Abstrac
     String source = workingCopy.getSource();
     JsFile jsFile = context.ensureJsFile(workingCopy);
 
-    List<INamedElement> enums = context.getApi().getElements(Type.TopLevelEnum);
+    Collection<INamedElement> enums = context.getApi().getElements(Type.TopLevelEnum);
     enums.addAll(context.getLibraries().getElements(Type.TopLevelEnum));
 
     for (INamedElement topEnum : enums) {
