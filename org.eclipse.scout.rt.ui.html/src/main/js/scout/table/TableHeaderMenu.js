@@ -587,6 +587,11 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
     .text(this._filterByText());
   scout.HtmlComponent.install(this.$filterTableGroupTitle, this.session);
 
+  var objectType = 'Column';
+  if (this.column.objectType === 'NumberColumn') {
+    objectType = this.column.objectType;
+  }
+
   this.filterTable = scout.create('Table', {
     parent: this,
     headerVisible: false,
@@ -597,11 +602,12 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
     // column-texts are not visible since header is not visible
     columns: [
       {
-        objectType: 'Column',
+        objectType: objectType,
         text: 'filter-value',
         width: 160,
         sortActive: true,
-        sortIndex: 1
+        sortIndex: 1,
+        horizontalAlignment: -1
       },
       {
         objectType: 'NumberColumn',
@@ -622,7 +628,8 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
     tableRow = {
       cells: [
         scout.create('Cell', {
-          value: filterValue.text,
+          text: (this.filter.column.objectType == 'NumberColumn') ? filterValue.text : null,
+          value: (this.filter.column.objectType == 'NumberColumn') ? filterValue.key : filterValue.text,
           iconId: filterValue.iconId
         }),
         filterValue.count,
