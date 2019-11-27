@@ -24,6 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -430,6 +431,22 @@ public class CollectionUtilityTest {
   }
 
   @Test
+  public void testEmptyOrderedHashMap() {
+    HashMap<Integer, String> map = CollectionUtility.emptyOrderedHashMap();
+    assertNotNull(map);
+    // Test that it is a mutable map.
+    assertTrue(map.isEmpty());
+    map.put(1, "test");
+    map.put(3, "test2");
+    map.put(2, "test3");
+    assertEquals(3, map.size());
+
+    // test that it is an ordered map
+    assertArrayEquals(new int[]{1,3,2}, map.entrySet().stream().mapToInt(Entry::getKey).toArray());
+    assertFalse(map.isEmpty());
+  }
+
+  @Test
   public void testHashMap() {
     // test that it is null safe
     assertEquals(1, CollectionUtility.hashMap(null, new ImmutablePair<>(2, "test")).size());
@@ -454,7 +471,12 @@ public class CollectionUtilityTest {
     assertTrue(map.isEmpty());
     // test that it is a mutable map
     map.put(1, "test");
-    assertEquals(1, map.size());
+    map.put(3, "test2");
+    map.put(2, "test3");
+    assertEquals(3, map.size());
+
+    // test that it is an ordered map
+    assertArrayEquals(new int[]{1,3,2}, map.entrySet().stream().mapToInt(Entry::getKey).toArray());
 
     // test that it inserts null keys / values
     assertEquals("test", CollectionUtility.orderedHashMap(new ImmutablePair<Integer, String>(null, "test")).get(null));

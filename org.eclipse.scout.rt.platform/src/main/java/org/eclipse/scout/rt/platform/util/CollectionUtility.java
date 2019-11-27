@@ -614,6 +614,13 @@ public final class CollectionUtility {
     return new HashMap<>(m);
   }
 
+  public static <T, U> LinkedHashMap<T, U> copyOrderedHashMap(LinkedHashMap<T, U> m) {
+    if (m == null || m.isEmpty()) {
+      return emptyOrderedHashMap();
+    }
+    return new LinkedHashMap<>(m);
+  }
+
   public static <T, U, V extends T, W extends U> Map<T, U> putObject(Map<T, U> map, V key, W value) {
     if (map == null) {
       map = new HashMap<>(1);
@@ -734,6 +741,10 @@ public final class CollectionUtility {
     return new HashMap<>(0);
   }
 
+  public static <T, U> LinkedHashMap<T, U> emptyOrderedHashMap() {
+    return new LinkedHashMap<>(0);
+  }
+
   @SafeVarargs
   public static <T, U> HashMap<T, U> hashMap(Pair<T, U>... entries) {
     if (entries == null || entries.length < 1) {
@@ -753,7 +764,7 @@ public final class CollectionUtility {
   @SafeVarargs
   public static <T, U> LinkedHashMap<T, U> orderedHashMap(Pair<T, U>... entries) {
     if (entries == null || entries.length < 1) {
-      return new LinkedHashMap<>(0);
+      return emptyOrderedHashMap();
     }
 
     LinkedHashMap<T, U> hashMap = new LinkedHashMap<>(0);
