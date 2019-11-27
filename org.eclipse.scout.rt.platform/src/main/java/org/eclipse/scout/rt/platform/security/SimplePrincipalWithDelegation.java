@@ -15,10 +15,9 @@ import java.security.Principal;
 import org.ietf.jgss.GSSCredential;
 
 public class SimplePrincipalWithDelegation implements Principal {
-  private static final long serialVersionUID = 1L;
 
   private final String m_name;
-  private final transient GSSCredential m_delegatedCred;
+  private final GSSCredential m_delegatedCred;
 
   public SimplePrincipalWithDelegation(String name, final GSSCredential delegCred) {
     if (name == null) {
