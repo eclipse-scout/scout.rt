@@ -1,7 +1,7 @@
 {
   "name": "@eclipse-scout/core",
   "version": "10.0.0-snapshot",
-  "description": "Eclipse Scout",
+  "description": "Eclipse Scout runtime",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
   "repository": {
@@ -14,6 +14,11 @@
     "npm": ">=6.9.0",
     "pnpm": ">=4"
   },
+  "keywords": [
+    "scout",
+    "eclipse-scout",
+    "scout core runtime"
+  ],
   "main": "./src/index.js",
   "files": [
     "dist",

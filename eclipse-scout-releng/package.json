@@ -14,6 +14,12 @@
     "npm": ">=6.9.0",
     "pnpm": ">=4"
   },
+  "keywords": [
+    "scout",
+    "eclipse-scout",
+    "releng",
+    "release engineering"
+  ],
   "files": [
     "bin",
     "scripts"

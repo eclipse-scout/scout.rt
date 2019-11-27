@@ -14,6 +14,15 @@
     "npm": ">=6.9.0",
     "pnpm": ">=4"
   },
+  "keywords": [
+    "scout",
+    "eclipse-scout",
+    "cli",
+    "command line",
+    "console",
+    "args",
+    "command"
+  ],
   "files": [
     "bin",
     "scripts"
