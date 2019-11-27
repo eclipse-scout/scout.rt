@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -48,7 +48,7 @@ public class ServletContextDelegate implements WebServiceContextDelegate {
   @Override
   public String getEPRAddress(Packet packet, WSEndpoint endpoint) {
     String baseAddress = JaxWsHelper.getBaseAddress(m_request, true);
-    PortAddressResolver resolver = m_servletAdapter.owner.createPortAddressResolver(baseAddress);
+    PortAddressResolver resolver = m_servletAdapter.owner.createPortAddressResolver(baseAddress, endpoint.getClass());
     QName serviceQName = endpoint.getServiceName();
     QName portQName = endpoint.getPortName();
 
