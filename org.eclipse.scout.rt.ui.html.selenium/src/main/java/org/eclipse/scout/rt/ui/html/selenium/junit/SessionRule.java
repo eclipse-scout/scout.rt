@@ -29,11 +29,6 @@ import org.openqa.selenium.WebDriver;
  */
 public class SessionRule extends TestWatcher {
 
-  /**
-   * @see org.eclipse.scout.rt.ui.html.res.ResourceRequestHandler#URL_PARAM_CLEAR_CACHE
-   */
-  private static final String URL_PARAM_CLEAR_CACHE = "clearCache";
-
   private final WebDriver m_driver;
 
   public SessionRule(AbstractSeleniumTest test) {
