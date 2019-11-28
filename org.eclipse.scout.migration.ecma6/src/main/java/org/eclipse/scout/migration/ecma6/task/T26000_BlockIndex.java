@@ -58,7 +58,7 @@ public class T26000_BlockIndex extends AbstractTask {
     WorkingCopy workingCopy = context.getWorkingCopy(pathInfo.getPath());
     if (pathInfo.getPath().toString().replace('\\', '/').contains("/_shared/")) {
       // shared index file. this is no longer required
-      workingCopy.setDeleted(true);
+      // deletion is handled in step 2
       return;
     }
 
@@ -85,7 +85,7 @@ public class T26000_BlockIndex extends AbstractTask {
       return;
     }
 
-    Path srcMainJs = Configuration.get().getSourceModuleDirectory().resolve("src/main/js");
+    Path srcMainJs = Configuration.get().getTargetModuleDirectory().resolve("src/main/js");
     JsFile entryPointClass = context.getJsClass(index.m_run).getJsFile();
     Path entryPointPath = srcMainJs.resolve(entryPointScript.m_localPath);
     WorkingCopy workingCopy = context.ensureWorkingCopy(entryPointPath);
@@ -205,7 +205,7 @@ public class T26000_BlockIndex extends AbstractTask {
         if ("INDEX".equals(rawType)) {
           // Include data from another index file
           for (String file : value.split(">")) {
-            Path refIndex = Configuration.get().getSourceModuleDirectory().resolve("src/main/js").resolve(new P_FileEntry(file).m_localPath);
+            Path refIndex = Configuration.get().getTargetModuleDirectory().resolve("src/main/js").resolve(new P_FileEntry(file).m_localPath);
             String nestedSrc = context.ensureWorkingCopy(refIndex).getSource();
             parse(nestedSrc, result, context);
           }
@@ -292,7 +292,7 @@ public class T26000_BlockIndex extends AbstractTask {
         m_localPath = sharedNamespace + "/" + Configuration.get().getStepConfigTypeName() + "/_shared/" + fileBase + fileExt;
       }
       else {
-        Path basePath = Configuration.get().getSourceModuleDirectory().resolve("src/main/js").relativize(m_current.getPath()).getParent();
+        Path basePath = Configuration.get().getTargetModuleDirectory().resolve("src/main/js").relativize(m_current.getPath()).getParent();
         m_localPath = basePath.toString().replace('\\', '/') + "/" + fileBase + fileExt;
       }
     }

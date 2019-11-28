@@ -49,7 +49,7 @@ public class T5500_JasmineSpecs extends AbstractTask {
 
     String curPath = pathInfo.getPath().toString().replace('\\', '/');
     Path newSpecDestination = Paths.get(curPath.replace("src/test/js/scout", "test")).getParent();
-    Path locationOfIndex = Configuration.get().getSourceModuleDirectory().resolve("src");
+    Path locationOfIndex = Configuration.get().getTargetModuleDirectory().resolve("src");
     String fromSpecToIndex = newSpecDestination.relativize(locationOfIndex).toString().replace('\\', '/');
     String targetModuleName = Configuration.get().getPersistLibraryName().replace("/testing", "/core");
 

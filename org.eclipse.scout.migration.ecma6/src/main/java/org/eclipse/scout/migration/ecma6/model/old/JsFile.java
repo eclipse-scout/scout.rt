@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 public class JsFile extends AbstractJsElement {
   private static final Logger LOG = LoggerFactory.getLogger(JsFile.class);
-  private static final Path INDEX = Configuration.get().getSourceModuleDirectory().resolve("src/main/js/index.js");
+  private static final Path INDEX = Configuration.get().getTargetModuleDirectory().resolve("src/main/js/index.js");
 
   private final Path m_path;
   private final PathInfo m_pathInfo;

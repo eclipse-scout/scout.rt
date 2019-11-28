@@ -1,6 +1,5 @@
 package org.eclipse.scout.migration.ecma6.task;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Predicate;
@@ -13,7 +12,6 @@ import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
-import org.eclipse.scout.migration.ecma6.configuration.Configuration;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.task.json.IConstPlaceholderMapper;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -27,7 +25,6 @@ public class T30000_JsonToJsModule extends AbstractTask {
   private static final Pattern KEY_PAT = Pattern.compile("\"(\\w+)\":");
   private static final Pattern TRAILING_WHITESPACE_CHARS_PAT = Pattern.compile("\\s$");
   private static final String JSON_EXTENSION = "json";
-  private static final String JS_EXTENSION = "js";
   private static final String ESCAPED_REPLACEMENT1 = "@@@_@@@escaped1@@@_@@@";
   private static final String ESCAPED_REPLACEMENT2 = "@@@_@@@escaped2@@@_@@@";
   public static final String JSON_MODEL_NAME_SUFFIX = "Model";
@@ -70,18 +67,7 @@ public class T30000_JsonToJsModule extends AbstractTask {
         "  return " + step5 + ";\n}\n";
 
     String step7 = T25000_ModelsGetModelToImport.replace(PLACEHOLDER_PAT, step6, (m, r) -> migratePlaceholders(m, r, pathInfo.getPath(), context));
-
-    // change file name from Xyz.json to XyzModel.js
-    Path jsonRelPath = Configuration.get().getSourceModuleDirectory().relativize(pathInfo.getPath());
-    String jsonFileName = jsonRelPath.getFileName().toString();
-    String jsFileName = jsonFileName.substring(0, jsonFileName.length() - JSON_EXTENSION.length() - 1) + JSON_MODEL_NAME_SUFFIX + '.' + JS_EXTENSION;
-    Path newRelPath = jsonRelPath.getParent().resolve(jsFileName);
-    Path newFileNameInSourceFolder = pathInfo.getPath().getParent().resolve(jsFileName);
-    Assertions.assertFalse(Files.exists(newFileNameInSourceFolder),
-        "The migration of file '{}' would be stored in '{}' but this file already exists in the source folder!", pathInfo.getPath(), newRelPath);
-
     workingCopy.setSource(step7);
-    workingCopy.setRelativeTargetPath(newRelPath);
 
     BEANS.get(T5020_ResolveClassEnumReferencesAndCreateImports.class).process(pathInfo, context);
     BEANS.get(T5040_ResolveUtilityReferencesAndCreateImports.class).process(pathInfo, context);

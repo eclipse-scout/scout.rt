@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Order(400)
-public class T400_IndexHtmlIncludeHead extends AbstractTask{
+public class T400_IndexHtmlIncludeHead extends AbstractTask {
   private static final Logger LOG = LoggerFactory.getLogger(T400_IndexHtmlIncludeHead.class);
 
   private Predicate<PathInfo> m_pathFilter = PathFilters.oneOf(Paths.get("src/main/resources/WebContent/index.html"));
@@ -37,24 +37,26 @@ public class T400_IndexHtmlIncludeHead extends AbstractTask{
     Document doc = Jsoup.parse(source);
     Elements scoutStylesheetElements = doc.getElementsByTag("scout:include");
     Element headIncludeTag = scoutStylesheetElements.stream()
-      .filter(e -> {
-        String template = e.attr("template");
-        return template != null && template.equalsIgnoreCase("head.html");
-      })
-    .findFirst().orElse(null);
-    if(headIncludeTag != null){
+        .filter(e -> {
+          String template = e.attr("template");
+          return template != null && template.equalsIgnoreCase("head.html");
+        })
+        .findFirst().orElse(null);
+    if (headIncludeTag != null) {
 
-      Pattern pattern = Pattern.compile("(\\s*)"+Pattern.quote(headIncludeTag.outerHtml()));
+      Pattern pattern = Pattern.compile("(\\s*)" + Pattern.quote(headIncludeTag.outerHtml()));
       Matcher matcher = pattern.matcher(source);
-      if(matcher.find()){
-        source = matcher.replaceAll(matcher.group(1)+"<scout:include template=\"includes/head.html\" />");
-      }else{
-        source = MigrationUtility.prependTodo(source, "Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />'.", workingCopy.getLineDelimiter());
-        LOG.warn("Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />' in '"+workingCopy.getPath()+"'");
+      if (matcher.find()) {
+        source = matcher.replaceAll(matcher.group(1) + "<scout:include template=\"includes/head.html\" />");
       }
-    }else{
+      else {
+        source = MigrationUtility.prependTodo(source, "Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />'.", workingCopy.getLineDelimiter());
+        LOG.warn("Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />' in '" + workingCopy.getPath() + "'");
+      }
+    }
+    else {
       source = MigrationUtility.prependTodo(source, "Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />'.", workingCopy.getLineDelimiter());
-      LOG.warn("Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />' in '"+workingCopy.getPath()+"'");
+      LOG.warn("Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />' in '" + workingCopy.getPath() + "'");
     }
     workingCopy.setSource(source);
   }

@@ -14,9 +14,11 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.context.Context;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Order;
 
 @Order(450)
+@IgnoreBean
 public class T450_DeleteLibraries extends AbstractTask {
 
   Pattern JQUERY_PAT = Pattern.compile("webcontent[\\\\/]res[\\\\/]jquery-", Pattern.CASE_INSENSITIVE);
@@ -30,6 +32,6 @@ public class T450_DeleteLibraries extends AbstractTask {
 
   @Override
   public void process(PathInfo pathInfo, Context context) {
-    context.ensureWorkingCopy(pathInfo.getPath()).setDeleted(true);
+//    context.ensureWorkingCopy(pathInfo.getPath()).setDeleted(true);
   }
 }

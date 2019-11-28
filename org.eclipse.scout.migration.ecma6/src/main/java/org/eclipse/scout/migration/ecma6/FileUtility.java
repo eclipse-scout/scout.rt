@@ -1,5 +1,6 @@
 package org.eclipse.scout.migration.ecma6;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -9,16 +10,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class FileUtility {
+  private static final Logger LOG = LoggerFactory.getLogger(FileUtility.class);
 
   private FileUtility() {
   }
@@ -58,10 +64,12 @@ public final class FileUtility {
     if (directory == null || !Files.isDirectory(directory)) {
       return false;
     }
-    Files.walk(directory)
+    try (Stream<Path> resourceStream = Files.walk(directory)) {
+      resourceStream
         .sorted(Comparator.reverseOrder())
         .map(Path::toFile)
         .forEach(File::delete);
+    }
     return true;
   }
 
@@ -86,15 +94,10 @@ public final class FileUtility {
         }
         Path rel = srcDir.relativize(file);
         Path target = targetDir.resolve(rel);
-        Files.move(file, target);
+        Files.move(file, target, StandardCopyOption.ATOMIC_MOVE);
         return FileVisitResult.CONTINUE;
       }
 
-      @Override
-      public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-        Files.delete(dir);
-        return FileVisitResult.CONTINUE;
-      }
     });
 
     return true;
@@ -170,4 +173,20 @@ public final class FileUtility {
       }
     }
   }
+
+  public static boolean findInFile(Path file, String text) throws IOException {
+
+    try (BufferedReader reader = Files.newBufferedReader(file)) {
+      String line = reader.readLine();
+      while (line != null) {
+        if (line.contains(":objectType")) {
+          return true;
+        }
+        line = reader.readLine();
+      }
+    }
+    return false;
+  }
+
 }
+

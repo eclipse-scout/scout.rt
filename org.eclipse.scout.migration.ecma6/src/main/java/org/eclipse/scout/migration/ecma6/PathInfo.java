@@ -12,7 +12,7 @@ public class PathInfo {
 
   public PathInfo(Path path) {
     m_path = path;
-    m_modulePath = Configuration.get().getSourceModuleDirectory();
+    m_modulePath = Configuration.get().getTargetModuleDirectory();
     if(m_modulePath != null) {
       m_moduleRelativePath = m_modulePath.relativize(m_path);
     }else{

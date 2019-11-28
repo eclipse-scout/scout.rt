@@ -33,7 +33,7 @@ public class ExcludeMigignoreFilter implements IMigrationExcludePathFilter {
 
   @PostConstruct
   public void setup() {
-    Path migignoreFile = Configuration.get().getSourceModuleDirectory().resolve(".migignore");
+    Path migignoreFile = Configuration.get().getTargetModuleDirectory().resolve(".migignore");
     if (Files.exists(migignoreFile)) {
       try {
         m_ignoredFiles = readMigignore(migignoreFile);

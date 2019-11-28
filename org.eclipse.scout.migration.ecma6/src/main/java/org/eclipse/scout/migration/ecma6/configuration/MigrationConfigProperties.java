@@ -116,5 +116,10 @@ public class MigrationConfigProperties {
     public String description() {
       return "Only files of the includeFiles property are parsed. Rest of the API is taken from the persisted API.";
     }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return false;
+    }
   }
 }

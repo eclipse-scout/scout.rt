@@ -123,12 +123,6 @@ public class Context {
     return m_workingCopies.get(file);
   }
 
-  public WorkingCopy newFile(Path file) {
-    WorkingCopy wc = createWorkingCopy(file);
-    wc.setSource("");
-    return wc;
-  }
-
   public WorkingCopy ensureWorkingCopy(Path file) {
     return createWorkingCopy(file);
   }

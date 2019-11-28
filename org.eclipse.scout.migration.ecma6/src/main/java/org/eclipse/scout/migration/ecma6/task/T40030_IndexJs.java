@@ -98,7 +98,6 @@ public class T40030_IndexJs extends AbstractTask {
         .append("export default self;").append(nl)
         .append("window.").append(config.getNamespace()).append(" = Object.assign(window.").append(config.getNamespace()).append(" || {}, self);").append(nl);
     workingCopy.setSource(newSource.toString());
-    workingCopy.setRelativeTargetPath(Paths.get("src/main/js/" + baseName));
   }
 
   protected String nameWithoutJsExtension(Path p) {

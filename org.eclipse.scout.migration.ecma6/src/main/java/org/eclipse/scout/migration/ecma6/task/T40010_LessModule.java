@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.migration.ecma6.task;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +27,7 @@ import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.configuration.Configuration;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 @Order(40010)
 public class T40010_LessModule extends AbstractTask {
@@ -47,7 +50,7 @@ public class T40010_LessModule extends AbstractTask {
   public void process(PathInfo pathInfo, Context context) {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
     if (isLegacyModule(pathInfo.getPath())) {
-      workingCopy.setDeleted(true);
+      // deletion is handled in step 2
       return;
     }
 
@@ -62,10 +65,7 @@ public class T40010_LessModule extends AbstractTask {
       newContent = newContent + nl + "@import \"login/LoginBox\";" + nl;
     }
     workingCopy.setSource(newContent);
-
-    Path relPath = Configuration.get().getSourceModuleDirectory().relativize(pathInfo.getPath());
     String newDefaultThemeFileName = "index.less";
-    workingCopy.setRelativeTargetPath(relPath.getParent().resolve(newDefaultThemeFileName));
 
     flushNonDefaultThemes(pathInfo, context, newDefaultThemeFileName, nl);
   }
@@ -76,7 +76,7 @@ public class T40010_LessModule extends AbstractTask {
   }
 
   protected void cache(Context context) {
-    Path sourceDir = Configuration.get().getSourceModuleDirectory();
+    Path sourceDir = Configuration.get().getTargetModuleDirectory();
     for (Path p : context.getAllLessFiles()) {
       String relPath = MigrationUtility.removeFirstSegments(sourceDir.relativize(p), 4);
       if (relPath.endsWith(OLD_FILE_SUFFIX)) {
@@ -96,7 +96,18 @@ public class T40010_LessModule extends AbstractTask {
       String src = buildNonDefaultThemeSource(context, newDefaultThemeFileName, nl, theme);
       String fileName = toThemeFileName(removeLessFileExtension(newDefaultThemeFileName), theme);
       Path targetFile = Configuration.get().getTargetModuleDirectory().resolve(pathInfo.getModuleRelativePath().getParent().resolve(fileName));
-      WorkingCopy workingCopy = context.newFile(targetFile);
+      if (Files.exists(targetFile)) {
+        throw new ProcessingException("File '" + targetFile + "' already exists.");
+      }
+      try {
+        Files.createFile(targetFile);
+      }
+      catch (IOException e) {
+        throw new ProcessingException("Could not create file '" + targetFile + "'.", e);
+      }
+      WorkingCopy workingCopy = context.ensureWorkingCopy(targetFile);
+      // used to ensure initial source is read
+      workingCopy.getSource();
       workingCopy.setSource(src);
     }
   }
