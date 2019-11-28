@@ -28,42 +28,41 @@
     }
   }
 
+  /* Internal mixin used to define a single auto color */
+  .chart-auto-color-fill(@color, @hover-color) {
+    fill: @color;
+
+    &:not(.legend-bubble):hover {
+      fill: @hover-color;
+    }
+  }
+
   /* Mixin to define .color0 - .color5 fill and stroke colors */
   .chart-auto-colors(@color1, @color2, @color3, @color4, @color5, @color6, @active-color:red) {
     fill: @color1;
 
-    /* Hover colors */
-    & .color0:hover,
-    & .color1:hover,
-    & .color2:hover,
-    & .color3:hover,
-    & .color4:hover,
-    & .color5:hover {
-      fill: @active-color;
+    & .color0 {
+      #scout.chart-auto-color-fill(@color1, @active-color);
     }
 
-    & .color0:not(:hover) {
-      fill: @color1;
+    & .color1 {
+      #scout.chart-auto-color-fill(@color2, @active-color);
     }
 
-    & .color1:not(:hover) {
-      fill: @color2;
+    & .color2 {
+      #scout.chart-auto-color-fill(@color3, @active-color);
     }
 
-    & .color2:not(:hover) {
-      fill: @color3;
+    & .color3 {
+      #scout.chart-auto-color-fill(@color4, @active-color);
     }
 
-    & .color3:not(:hover) {
-      fill: @color4;
+    & .color4 {
+      #scout.chart-auto-color-fill(@color5, @active-color);
     }
 
-    & .color4:not(:hover) {
-      fill: @color5;
-    }
-
-    & .color5:not(:hover) {
-      fill: @color6;
+    & .color5 {
+      #scout.chart-auto-color-fill(@color6, @active-color);
     }
 
     & .stroke-color0 {
