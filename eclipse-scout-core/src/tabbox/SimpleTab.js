@@ -375,7 +375,7 @@ export default class SimpleTab extends Widget {
   }
 
   getMenuText() {
-    return strings.join(' ', this.title, strings.box('(', this.subTitle, ')'));
+    return strings.join(' \u2013 ', this.title, this.subTitle);
   }
 
   _installViewListeners() {
