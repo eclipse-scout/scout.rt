@@ -1,5 +1,7 @@
 package org.eclipse.scout.rt.platform.job;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
@@ -9,9 +11,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
+import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.junit.Test;
 
@@ -90,5 +96,24 @@ public class JobFutureTaskTest {
       Jobs.getJobManager().cancel(filter, true);
     }
     Assertions.assertEqual(0, failureCount.get());
+  }
+
+  @Test(expected = FutureCancelledError.class)
+  public void testCancelOfRunMonitorCancelsFuture() throws Exception {
+    RunContext runContext = RunContexts.empty().withRunMonitor(new RunMonitor() {
+
+      @Override
+      protected List<ICancellable> getCancellables() {
+        return Collections.emptyList(); // simulate there are NO cancellables to cancel, especially not the JobFutureTask that indirectly references this RunMonitor
+      }
+    });
+
+    IFuture<String> f = Jobs.schedule(() -> {
+      System.out.println("Run");
+      return "done";
+    }, Jobs.newInput().withRunContext(runContext));
+    runContext.getRunMonitor().cancel(false);
+    String result = f.awaitDoneAndGet();
+    System.out.println("Result: " + result);
   }
 }
