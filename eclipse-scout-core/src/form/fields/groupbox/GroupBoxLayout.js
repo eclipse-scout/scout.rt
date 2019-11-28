@@ -259,8 +259,8 @@ export default class GroupBoxLayout extends AbstractLayout {
    */
   _htmlMenuBar() {
     if (this.groupBox.menuBar && this.groupBox.menuBarVisible) {
-      var htmlMenuBar = HtmlComponent.get(this.groupBox.menuBar.$container);
-      if (htmlMenuBar.isVisible()) {
+      var htmlMenuBar = HtmlComponent.optGet(this.groupBox.menuBar.$container);
+      if (htmlMenuBar && htmlMenuBar.isVisible()) {
         return htmlMenuBar;
       }
     }
