@@ -458,7 +458,7 @@ export default class MenuBar extends Widget {
   }
 
   _allMenusAsFlatList() {
-    return this.orderedMenuItems.all.flatMap(item => {
+    return arrays.flatMap(this.orderedMenuItems.all, item => {
       if (item instanceof ComboMenu) {
         return item.childActions;
       }
