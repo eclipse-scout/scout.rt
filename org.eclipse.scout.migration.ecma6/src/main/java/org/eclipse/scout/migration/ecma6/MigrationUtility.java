@@ -9,6 +9,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
@@ -115,8 +116,10 @@ public final class MigrationUtility {
       return null;
     }
     if (Files.isDirectory(anyFile)) {
-      if (Files.list(anyFile).anyMatch(path -> FileUtility.hasExtension(path, "iml"))) {
-        return anyFile;
+      try (final Stream<Path> fileList = Files.list(anyFile)) {
+        if (fileList.anyMatch(path -> FileUtility.hasExtension(path, "iml", "project"))) {
+          return anyFile;
+        }
       }
     }
     return getModuleDirectory(anyFile.getParent());

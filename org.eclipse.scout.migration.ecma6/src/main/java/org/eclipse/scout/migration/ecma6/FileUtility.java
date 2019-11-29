@@ -13,9 +13,13 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.exception.VetoException;
@@ -53,11 +57,18 @@ public final class FileUtility {
     return path;
   }
 
-  public static boolean hasExtension(Path path, String extension) {
-    if (extension == null) {
+  public static boolean hasExtension(Path path, String... extensions) {
+    if (extensions == null) {
       return false;
     }
-    return extension.equalsIgnoreCase(getFileExtension(path));
+    final Set<String> extensionSet = Arrays.stream(extensions)
+        .filter(Objects::nonNull)
+        .map(String::toLowerCase)
+        .collect(Collectors.toSet());
+    String fileExtension = Optional.ofNullable(getFileExtension(path))
+        .map(String::toLowerCase)
+        .orElse(null);
+    return extensionSet.contains(fileExtension);
   }
 
   public static boolean deleteDirectory(Path directory) throws IOException {
