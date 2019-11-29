@@ -149,6 +149,10 @@
     background-color: @tile-default-inverted-background-color;
     color: @tile-default-inverted-color;
 
+    &.disabled {
+      background-color: @tile-default-border-color;
+    }
+
     & > .form-field {
       & > label {
         color: @tile-default-inverted-label-color;
@@ -200,6 +204,10 @@
     border-color: @tile-alternative-border-color;
     background-color: @tile-alternative-background-color;
     color: @tile-alternative-color;
+
+    &.disabled {
+      background-color: @tile-default-border-color;
+    }
 
     & > .form-field {
       & > label {
