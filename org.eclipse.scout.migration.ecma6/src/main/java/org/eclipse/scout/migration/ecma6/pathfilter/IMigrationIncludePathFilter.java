@@ -1,8 +1,8 @@
 package org.eclipse.scout.migration.ecma6.pathfilter;
 
+import java.nio.file.Path;
 import java.util.function.Predicate;
 
-import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
@@ -10,5 +10,6 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  * no implementation is found all files are migrated.
  */
 @ApplicationScoped
-public interface IMigrationIncludePathFilter extends Predicate<PathInfo> {
+public interface IMigrationIncludePathFilter extends Predicate<Path> {
+
 }

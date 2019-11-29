@@ -77,7 +77,7 @@ public class Context {
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
         PathInfo info = new PathInfo(file);
-        if (Configuration.get().isParseOnlyIncludeFiles() && !BEANS.get(IMigrationIncludePathFilter.class).test(info)) {
+        if (Configuration.get().isParseOnlyIncludeFiles() && !BEANS.get(IMigrationIncludePathFilter.class).test(info.getPath())) {
           return FileVisitResult.CONTINUE;
         }
         if (file.getFileName().toString().endsWith(T40010_LessModule.LESS_FILE_SUFFIX)) {
@@ -198,7 +198,7 @@ public class Context {
         if (BEANS.all(IMigrationExcludePathFilter.class).stream().anyMatch(filter -> filter.test(info))) {
           return FileVisitResult.CONTINUE;
         }
-        if (Configuration.get().isParseOnlyIncludeFiles() && !BEANS.get(IMigrationIncludePathFilter.class).test(info)) {
+        if (Configuration.get().isParseOnlyIncludeFiles() && !BEANS.get(IMigrationIncludePathFilter.class).test(info.getPath())) {
           return FileVisitResult.CONTINUE;
         }
         JsFile jsFile = ensureJsFile(ensureWorkingCopy(file));

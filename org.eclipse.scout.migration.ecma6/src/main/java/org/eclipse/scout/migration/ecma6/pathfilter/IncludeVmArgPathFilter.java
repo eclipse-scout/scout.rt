@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
-import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.configuration.Configuration;
 import org.eclipse.scout.migration.ecma6.configuration.MigrationConfigProperties.IncludeFilesProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -48,8 +47,8 @@ public class IncludeVmArgPathFilter implements IMigrationIncludePathFilter {
   }
 
   @Override
-  public boolean test(PathInfo pathInfo) {
-    return m_includePaths == null || m_includePaths.contains(pathInfo.getPath());
+  public boolean test(Path path) {
+    return m_includePaths == null || m_includePaths.contains(path);
   }
 
 }

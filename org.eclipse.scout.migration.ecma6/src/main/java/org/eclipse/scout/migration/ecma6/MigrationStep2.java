@@ -26,6 +26,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.migration.ecma6.configuration.Configuration;
+import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationIncludePathFilter;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -65,12 +67,13 @@ public class MigrationStep2 implements IRunnable {
   }
 
   protected void removeJsFolder() {
+    final IMigrationIncludePathFilter includeFilter = BEANS.opt(IMigrationIncludePathFilter.class);
     Path sourceFolder = Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src", "main", "js", Configuration.get().getJsFolderName()));
 
     if (Files.exists(sourceFolder)) {
       Path targetFolder = Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src", "main", "js"));
       try {
-        FileUtility.moveDirectory(sourceFolder, targetFolder, p -> true);
+        FileUtility.moveDirectory(sourceFolder, targetFolder, includeFilter);
       }
       catch (IOException e) {
         throw new ProcessingException("Could not move src js from '" + sourceFolder + "' to '" + targetFolder + "'.", e);

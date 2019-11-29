@@ -37,7 +37,7 @@ public class MigrationFileVisitor {
           return FileVisitResult.CONTINUE;
         }
         PathInfo info = new PathInfo(file);
-        if (pathFilter != null && !pathFilter.test(info)) {
+        if (pathFilter != null && !pathFilter.test(info.getPath())) {
           return FileVisitResult.CONTINUE;
         }
         if (excludeFilters.stream().anyMatch(filter -> filter.test(info))) {
