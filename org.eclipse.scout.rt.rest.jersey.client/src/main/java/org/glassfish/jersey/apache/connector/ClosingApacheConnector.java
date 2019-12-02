@@ -38,6 +38,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.client.AuthCache;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -48,10 +49,14 @@ import org.apache.http.protocol.HTTP;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
+import org.eclipse.scout.rt.rest.client.RestClientProperties;
+import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.ClientRequest;
 import org.glassfish.jersey.client.ClientResponse;
+import org.glassfish.jersey.client.RequestEntityProcessing;
 import org.glassfish.jersey.message.internal.HeaderUtils;
 import org.glassfish.jersey.message.internal.ReaderWriter;
 import org.glassfish.jersey.message.internal.Statuses;
@@ -79,6 +84,8 @@ class ClosingApacheConnector extends ApacheConnector {
   @Override
   @SuppressWarnings({"resource", "squid:S1141", "squid:RedundantThrowsDeclarationCheck"})
   public ClientResponse apply(final ClientRequest clientRequest) throws ProcessingException {
+    preprocessClientRequest(clientRequest);
+
     final HttpUriRequest request = getUriHttpRequest(clientRequest);
 
     // Work around for rare abnormal connection terminations (258238)
@@ -149,6 +156,37 @@ class ClosingApacheConnector extends ApacheConnector {
     finally {
       cancellableHandle.dispose();
     }
+  }
+
+  /**
+   * Enables cookies if enabled by {@link RestClientProperties#ENABLE_COOKIES} and disables chunked transfer encoding if
+   * disabled by {@link RestClientProperties#DISABLE_CHUNKED_TRANSFER_ENCODING}.
+   * <p>
+   * If corresponding properties are already set, their values are not overridden.
+   * <p>
+   * Must be called before {@link #getUriHttpRequest(ClientRequest)}.
+   */
+  protected void preprocessClientRequest(ClientRequest clientRequest) {
+    if (!isCookiePropertySet(clientRequest) && !BooleanUtility.nvl(clientRequest.resolveProperty(RestClientProperties.ENABLE_COOKIES, Boolean.class))) {
+      clientRequest.setProperty(ApacheClientProperties.DISABLE_COOKIES, true);
+    }
+
+    if (clientRequest.getProperty(ClientProperties.REQUEST_ENTITY_PROCESSING) == null && BooleanUtility.nvl(clientRequest.resolveProperty(RestClientProperties.DISABLE_CHUNKED_TRANSFER_ENCODING, Boolean.class))) {
+      clientRequest.setProperty(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.BUFFERED);
+    }
+  }
+
+  protected boolean isCookiePropertySet(ClientRequest clientRequest) {
+    if (clientRequest.getProperty(ApacheClientProperties.DISABLE_COOKIES) != null) {
+      return true;
+    }
+
+    RequestConfig requestConfig = (RequestConfig) clientRequest.getConfiguration().getProperty(ApacheClientProperties.REQUEST_CONFIG);
+    if (requestConfig == null) {
+      return false; // absent -> default request configuration
+    }
+
+    return requestConfig.getCookieSpec() != null; // e.g. standard
   }
 
   /**

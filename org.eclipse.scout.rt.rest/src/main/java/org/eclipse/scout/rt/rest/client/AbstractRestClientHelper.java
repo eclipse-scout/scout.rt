@@ -92,6 +92,9 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
     registerContextResolvers(clientBuilder);
     registerRequestFilters(clientBuilder);
 
+    // Set as default to keep current behavior in Scout 8.0
+    clientBuilder.property(RestClientProperties.ENABLE_COOKIES, true); // TODO Scout 10.0 sme remove and change JavaDoc default value in RestclientProperties
+
     configureClientBuilder(clientBuilder);
   }
 
