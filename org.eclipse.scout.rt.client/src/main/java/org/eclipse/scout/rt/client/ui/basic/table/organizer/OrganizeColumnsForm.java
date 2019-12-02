@@ -72,6 +72,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
+import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -86,8 +87,9 @@ import org.slf4j.LoggerFactory;
 public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumnsForm {
 
   private static final Logger LOG = LoggerFactory.getLogger(OrganizeColumnsForm.class);
-
-  private static final String VISIBLE_DIMMENSION_HIERARCHICAL = "dim_hierarchical";
+  private static final String UNICODE_ARROW_UP = "\u2191";
+  private static final String UNICODE_ARROW_DOWN = "\u2193";
+  private static final String VISIBLE_DIMENSION_HIERARCHICAL = "dim_hierarchical";
 
   public enum ConfigType {
     DEFAULT, CUSTOM
@@ -157,8 +159,8 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
   protected void updateGroupingMenuVisibility() {
     boolean hierarchicalTable = getOrganizedTable().isHierarchical();
-    getGroupMenu().setVisible(!hierarchicalTable, VISIBLE_DIMMENSION_HIERARCHICAL);
-    getGroupAdditionalMenu().setVisible(!hierarchicalTable, VISIBLE_DIMMENSION_HIERARCHICAL);
+    getGroupMenu().setVisible(!hierarchicalTable, VISIBLE_DIMENSION_HIERARCHICAL);
+    getGroupAdditionalMenu().setVisible(!hierarchicalTable, VISIBLE_DIMENSION_HIERARCHICAL);
   }
 
   @Order(10)
@@ -864,6 +866,10 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 return true;
               }
 
+              @Override
+              protected boolean getConfiguredHtmlEnabled() {
+                return true;
+              }
             }
 
             @Order(50)
@@ -1714,15 +1720,17 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         columnsTable.getTitleColumn().setValue(row, columnTitle);
 
         // grouping and sorting
-        StringBuilder sb = new StringBuilder();
+        List<CharSequence> cellContents = new ArrayList<>();
         if (col.isSortActive()) {
-          sb.append(col.isSortAscending() ? "\u2191" : "\u2193");
-          sb.append(col.getSortIndex() + 1);
+          cellContents.add(HTML.span(col.isSortAscending() ? UNICODE_ARROW_UP : UNICODE_ARROW_DOWN).cssClass("sort-symbol"));
+          cellContents.add(HTML.span(String.valueOf(col.getSortIndex() + 1)).cssClass("sort-number"));
         }
         if (col.isGroupingActive()) {
-          sb.append(TEXTS.get("GroupingAbbreviation"));
+          cellContents.add(HTML.span(TEXTS.get("GroupingAbbreviation")).cssClass("group-symbol"));
         }
-        columnsTable.getGroupAndSortColumn().setValue(row, sb.toString());
+        if (cellContents.size() > 0) {
+          columnsTable.getGroupAndSortColumn().setValue(row, HTML.fragment(cellContents).toHtml());
+        }
 
         // CustomColumn
         if (col instanceof ICustomColumn<?>) {
