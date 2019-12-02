@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -468,8 +469,17 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
     if (updateChildren) {
       // propagate change to children
       for (IWidget w : getChildren()) {
+
         w.visit(field -> {
-          field.setEnabled(enabled, dimension);
+          if (field instanceof IAction) {
+            if (field.isInheritAccessibility()) {
+              field.setEnabled(enabled, dimension);
+            }
+          }
+          else {
+            field.setEnabled(enabled, dimension);
+          }
+
         });
       }
     }
