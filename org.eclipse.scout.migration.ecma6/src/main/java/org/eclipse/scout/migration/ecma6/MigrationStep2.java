@@ -67,6 +67,9 @@ public class MigrationStep2 implements IRunnable {
   }
 
   protected void removeJsFolder() {
+    if (!Configuration.get().isRemoveJsFolder()) {
+      return;
+    }
     final IMigrationIncludePathFilter includeFilter = BEANS.opt(IMigrationIncludePathFilter.class);
     Path sourceFolder = Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src", "main", "js", Configuration.get().getJsFolderName()));
 
