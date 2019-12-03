@@ -162,7 +162,7 @@ export default class FocusManager {
    */
   evaluateFocusRule($container, focusRuleOrElement) {
     var elementToFocus;
-    if (!focusRuleOrElement || focusRuleOrElement === FocusRule.AUTO) {
+    if (!focusRuleOrElement || scout.isOneOf(focusRuleOrElement, FocusRule.AUTO, FocusRule.PREPARE)) {
       elementToFocus = this.findFirstFocusableElement($container);
     } else if (focusRuleOrElement === FocusRule.NONE) {
       elementToFocus = null;
