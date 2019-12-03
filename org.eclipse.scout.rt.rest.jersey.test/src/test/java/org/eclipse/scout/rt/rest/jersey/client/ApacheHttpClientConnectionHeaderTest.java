@@ -100,7 +100,7 @@ public class ApacheHttpClientConnectionHeaderTest {
     assertHttpConnectionHeader(false, builderConsumer, expectedConnectionHeaderValue);
   }
 
-  protected void assertHttpConnectionHeader(boolean   syncInvocation, UnaryOperator<Builder> builderCustomizer, String expectedConnectionHeaderValue) {
+  protected void assertHttpConnectionHeader(boolean syncInvocation, UnaryOperator<Builder> builderCustomizer, String expectedConnectionHeaderValue) {
     RunContexts.copyCurrent()
         .run(() -> {
           // invoke service
@@ -121,6 +121,9 @@ public class ApacheHttpClientConnectionHeaderTest {
           // check expectations
           assertNotNull(response);
           RestClientTestEchoResponse entity = response.readEntity(RestClientTestEchoResponse.class);
+          response.close();
+          response = null;
+
           assertEquals(Integer.valueOf(Response.Status.OK.getStatusCode()), entity.getEcho().getCode());
           Map<String, String> receivedHeaders = entity.getReceivedHeaders();
           assertNotNull(receivedHeaders);
