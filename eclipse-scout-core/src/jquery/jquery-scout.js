@@ -22,25 +22,6 @@ const __origHeight = $.fn.height;
 const __origOuterHeight = $.fn.outerHeight;
 
 export default class JQueryUtils extends $ {
-  /*
-    static bootstrap() {
-      let functions = JQueryUtils.getFunctionsOf(this)
-        .filter(f => f[0] !== 'getFunctionsOf' && f[0] !== 'bootstrap' && f[0] !== 'linkFunctionsTo');
-      this.linkFunctionsTo(functions, $);
-      this.linkFunctionsTo(functions, $.fn);
-    };
-
-    static linkFunctionsTo(functions, obj) {
-      functions
-        //.filter(f => typeof obj[f[0]] === 'undefined')
-        .map(f => obj[f[0]] = f[1]);
-    };
-
-    static getFunctionsOf(obj) {
-      return Object.getOwnPropertyNames(obj)
-        .filter(name => typeof obj[name] === 'function')
-        .map(name => [name, obj[name]]);
-    };*/
   /**
    * JS Type definition for jQuery Promise (which is actually a Deferred, but does not exist as type).
    * @typedef {object} Promise
