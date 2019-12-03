@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FocusManagerSpecHelper, FormSpecHelper, TableSpecHelper, TreeSpecHelper} from '@eclipse-scout/testing';
-import {Device, focusUtils, scout} from '../../src/index';
+import {Device, FocusRule, focusUtils, scout} from '../../src/index';
 
 /* global FocusManagerSpecHelper */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
@@ -305,6 +305,22 @@ describe('scout.FocusManager', function() {
       expect(document.activeElement).toBe($container1.children('.input1')[0]);
 
       focusManager.uninstallFocusContext($container1);
+    });
+  });
+
+  describe('evaluateFocusRule', function() {
+    it('should find first focusable element', function() {
+      var $container = createDivWithTwoInputs().appendTo(session.$entryPoint);
+      focusManager.installFocusContext($container);
+      var input1 = $container.children('.input1')[0];
+      var input2 = $container.children('.input2')[0];
+
+      expect(focusManager.evaluateFocusRule($container, FocusRule.NONE)).toBe(null);
+      expect(focusManager.evaluateFocusRule($container, FocusRule.AUTO)).toBe(input1);
+      expect(focusManager.evaluateFocusRule($container, FocusRule.PREPARE)).toBe(input1);
+      expect(focusManager.evaluateFocusRule($container, null)).toBe(input1);
+      expect(focusManager.evaluateFocusRule($container, 'invalid-rule')).toBe('invalid-rule');
+      expect(focusManager.evaluateFocusRule($container, input2)).toBe(input2);
     });
   });
 });
