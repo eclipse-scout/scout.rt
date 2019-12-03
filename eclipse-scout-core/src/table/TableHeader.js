@@ -45,7 +45,7 @@ export default class TableHeader extends Widget {
     // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly
     this.$filler = this.$container.appendDiv('table-header-item filler').css('visibility', 'hidden');
 
-    if (!this.enabledComputed) {
+    if (!this.enabled) { // enabledComputed not used on purpose
       this.menuBar.hiddenByUi = true;
     }
     // Required to make "height: 100%" rule work. menuBarContainer and menuBar itself must have the same visibility.
@@ -108,14 +108,14 @@ export default class TableHeader extends Widget {
     }
 
     var $header = this.$filler.beforeDiv('table-header-item')
-      .setEnabled(this.enabledComputed)
+      .setEnabled(this.enabled) // enabledComputed not used on purpose
       .data('column', column)
       .cssMinWidth(columnWidth)
       .cssMaxWidth(columnWidth)
       .cssMarginLeft(marginLeft)
       .cssMarginRight(marginRight);
     $header.appendSpan('table-header-item-text');
-    if (this.enabledComputed) {
+    if (this.enabled) { // enabledComputed not used on purpose
       $header
         .on('click', this._onHeaderItemClick.bind(this))
         .on('mousedown', this._onHeaderItemMouseDown.bind(this));
@@ -137,12 +137,12 @@ export default class TableHeader extends Widget {
     this._decorateHeader(column);
 
     var showSeparator = column.showSeparator;
-    if (isLastColumn && !this.enabledComputed) {
+    if (isLastColumn && !this.enabled) { // enabledComputed not used on purpose
       showSeparator = false;
     }
     if (showSeparator) {
       var $separator = this.$filler.beforeDiv('table-header-resize');
-      if (column.fixedWidth || !this.enabledComputed) {
+      if (column.fixedWidth || !this.enabled) { // enabledComputed not used on purpose
         $separator.setEnabled(false);
       } else {
         $separator
@@ -422,7 +422,7 @@ export default class TableHeader extends Widget {
   }
 
   _renderColumnHeaderMenuEnabled(column) {
-    column.$header.toggleClass('disabled', !this._isHeaderMenuEnabled(column) || !this.enabledComputed);
+    column.$header.toggleClass('disabled', !this._isHeaderMenuEnabled(column) || !this.enabled); // enabledComputed not used on purpose
   }
 
   _renderColumnState(column) {

@@ -112,7 +112,7 @@ export default class Table extends Widget {
     this.maxRowCount = 0;
     this.truncatedCellTooltipEnabled = null;
     this.visibleRowsMap = {}; // visible rows by id
-    this.rowLevelPadding;
+    this.rowLevelPadding = 0;
     this.rowsMap = {}; // rows by id
     this.rowHeight = 0;
     this.rowWidth = 0;
@@ -1194,7 +1194,7 @@ export default class Table extends Widget {
       }
     }
 
-    column.sortAscending = direction === 'asc' ? true : false;
+    column.sortAscending = direction === 'asc';
     column.sortActive = true;
   }
 
@@ -1417,7 +1417,7 @@ export default class Table extends Widget {
         });
       }
 
-      column.sortAscending = direction === 'asc' ? true : false;
+      column.sortAscending = direction === 'asc';
       column.sortActive = true;
     } else if (column.initialAlwaysIncludeSortAtBegin) {
       // do not change order or direction. just set grouped to true.
@@ -3025,7 +3025,7 @@ export default class Table extends Widget {
       field: field,
       row: this.cellEditorPopup.row,
       column: this.cellEditorPopup.column,
-      cell: this.cellEditorPopup.celll
+      cell: this.cellEditorPopup.cell
     });
     this.trigger('completeCellEdit', event);
 
