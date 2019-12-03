@@ -8,31 +8,58 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+@thumb-radius: 8px;
+@thumb-size: 16px;
+@thumb-border-width: 1px;
+@thumb-border-color: @slider-thumb-border-color;
+@thumb-color: @slider-thumb-color;
+@thumb-focus-border-color: @slider-thumb-focus-border-color;
+@thumb-focus-color: @slider-thumb-focus-color;
+
+@track-height: 3px;
+@track-color: @slider-track-color;
+
+.track() {
+  height: @track-height;
+  cursor: pointer;
+  animate: 0.2s;
+}
+
+/**
+ * @param border-width: because firefox renders the border thinner, for some reason
+ */
+.thumb(@border-width) {
+  box-sizing: border-box;
+  border: @border-width solid @thumb-border-color;
+  height: @thumb-size;
+  width: @thumb-size;
+  border-radius: @thumb-size / 2;
+  background-color: @thumb-color;
+  cursor: pointer;
+}
+
+.thumb-focus() {
+  background-color: @thumb-focus-color;
+  border-color: @thumb-focus-border-color;
+}
+
 .slider-input {
   display: inline-block;
   vertical-align: middle;
   border: none;
 
   &:focus {
-    &::-webkit-slider-runnable-track {
-      background: @active-color;
-    }
-
     border: none;
     box-shadow: none;
+    outline: none;
   }
 
-  &::-webkit-slider-runnable-track {
-    height: 3px;
-    cursor: pointer;
-    background: @slider-track-color;
-  }
-
-  &::-webkit-slider-thumb {
-    margin-top: -8px;
+  /* Get rid of Firefox's focus border. See:
+     https://stackoverflow.com/questions/71074/how-to-remove-firefoxs-dotted-outline-on-buttons-as-well-as-links */
+  &::-moz-focus-inner {
+    border: 0;
   }
 }
-
 .slider-value {
   display: inline-block;
   vertical-align: middle;
@@ -45,4 +72,65 @@
 .slider.field {
   /* Slider input/value have the container's height (see SliderLayout), therefore they shouldn't wrap, otherwise the layout breaks. */
   white-space: nowrap;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  padding: 0;
+
+  &:focus {
+    outline: none;
+  }
+
+  /* ---- Webkit, Chrome ---- */
+  &:not(.ms-edge)::-webkit-slider-runnable-track {
+    .track();
+    background: @track-color;
+  }
+
+  &:not(.ms-edge)::-webkit-slider-thumb {
+    .thumb(@thumb-border-width);
+    -webkit-appearance: none;
+    margin-top: ((@track-height) / 2) - (@thumb-size / 2);
+  }
+
+  &:not(.ms-edge):focus::-webkit-slider-thumb {
+    .thumb-focus();
+  }
+
+  /* ---- Firefox ---- */
+  &::-moz-range-track {
+    .track();
+    background: @track-color;
+  }
+
+  &::-moz-range-thumb {
+    .thumb(@thumb-border-width + 0.5px);
+  }
+
+  &:focus::-moz-range-thumb {
+    .thumb-focus();
+  }
+
+  /* ---- Internet Explorer, Edge ---- */
+  &::-ms-track {
+    .track();
+    background: transparent;
+    border-color: transparent;
+    border-size: 0;
+    color: transparent;
+  }
+
+  &::-ms-fill-lower {
+    background: @track-color;
+  }
+  &::-ms-fill-upper {
+    background: @track-color;
+  }
+  &::-ms-thumb {
+    .thumb(@thumb-border-width);
+  }
+  &:focus::-ms-thumb {
+    .thumb-focus();
+  }
 }

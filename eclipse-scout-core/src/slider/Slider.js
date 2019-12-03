@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {HtmlComponent, objects, scout, SliderLayout, Widget} from '../index';
+import Device from '../util/Device';
 
 export default class Slider extends Widget {
 
@@ -38,7 +39,8 @@ export default class Slider extends Widget {
     this.htmlComp.setLayout(new SliderLayout(this));
     this.$sliderInput = this.$container.appendElement('<input>', 'slider-input')
       .attr('type', 'range')
-      .on('change', this._onValueChange.bind(this));
+      .on('change', this._onValueChange.bind(this))
+      .toggleClass('ms-edge', Device.get().isEdge());
 
     this.$sliderValue = this.$container
       .appendSpan('slider-value', this.value);
