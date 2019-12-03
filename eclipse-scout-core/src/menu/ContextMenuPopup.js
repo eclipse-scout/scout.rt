@@ -325,8 +325,9 @@ export default class ContextMenuPopup extends PopupWithHead {
           delegateEventsToOriginal: ['acceptInput', 'action', 'click'],
           delegateAllPropertiesToClone: true,
           delegateAllPropertiesToOriginal: true,
-          excludePropertiesToOriginal: ['selected', 'logicalGrid']
+          excludePropertiesToOriginal: ['selected', 'logicalGrid', 'tabbable']
         });
+        menu.setTabbable(false);
         // attach listener
         this._attachCloneMenuListeners(menu);
       }
