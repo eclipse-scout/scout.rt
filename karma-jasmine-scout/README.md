@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-  <a href="https://ci.eclipse.org/scout/view/Scout%20Nightly%20Jobs/job/scout-integration-10.0-RT-nightly/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins" src="https://img.shields.io/jenkins/build/https/ci.eclipse.org/scout/view/Scout%20Nightly%20Jobs/job/scout-integration-10.0-RT-nightly"></a>
-  <a href="https://ci.eclipse.org/scout/view/Scout%20Nightly%20Jobs/job/scout-integration-10.0-RT-nightly/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins tests" src="https://img.shields.io/jenkins/tests/https/ci.eclipse.org/scout/view/Scout%20Nightly%20Jobs/job/scout-integration-10.0-RT-nightly"></a>
+  <a href="https://ci.eclipse.org/scout/view/Scout%20Nightly%20Jobs/job/scout-integration-10.0-RT-nightly/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins" src="https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fview%2FScout%2520Nightly%2520Jobs%2Fjob%2Fscout-integration-10.0-RT-nightly%2F"></a>
+  <a href="https://ci.eclipse.org/scout/view/Scout%20Nightly%20Jobs/job/scout-integration-10.0-RT-nightly/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins tests" src="https://img.shields.io/jenkins/tests?compact_message&jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fview%2FScout%2520Nightly%2520Jobs%2Fjob%2Fscout-integration-10.0-RT-nightly%2F"></a>
   <a href="https://www.npmjs.com/package/@eclipse-scout/karma-jasmine-scout" target="_blank" rel="noopener noreferrer"><img alt="npm" src="https://img.shields.io/npm/dm/@eclipse-scout/karma-jasmine-scout"></a>
   <a href="https://www.eclipse.org/legal/epl-v10.html" target="_blank" rel="noopener noreferrer"><img alt="NPM" src="https://img.shields.io/npm/l/@eclipse-scout/karma-jasmine-scout"></a>
   <a href="https://www.npmjs.com/package/@eclipse-scout/karma-jasmine-scout" target="_blank" rel="noopener noreferrer"><img alt="npm (scoped)" src="https://img.shields.io/npm/v/@eclipse-scout/karma-jasmine-scout"></a>
