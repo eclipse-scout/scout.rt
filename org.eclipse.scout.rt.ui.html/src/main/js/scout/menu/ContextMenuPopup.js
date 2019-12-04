@@ -321,8 +321,9 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
         delegateEventsToOriginal: ['acceptInput', 'action', 'click'],
         delegateAllPropertiesToClone: true,
         delegateAllPropertiesToOriginal: true,
-        excludePropertiesToOriginal: ['selected', 'logicalGrid']
+        excludePropertiesToOriginal: ['selected', 'logicalGrid', 'tabbable']
       });
+      menu.setTabbable(false);
       // attach listener
       this._attachCloneMenuListeners(menu);
     }
