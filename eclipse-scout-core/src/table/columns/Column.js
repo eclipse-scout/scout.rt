@@ -657,6 +657,20 @@ export default class Column {
   }
 
   /**
+   * Returns a table header menu. Sub-classes can override this method to create a column specific table header menu.
+   */
+  createTableHeaderMenu(tableHeader) {
+    var $header = this.$header;
+    return scout.create('TableHeaderMenu', {
+      parent: tableHeader,
+      column: $header.data('column'),
+      tableHeader: tableHeader,
+      $anchor: $header,
+      focusableContainer: true
+    });
+  }
+
+  /**
    * @returns a field instance used as editor when a cell of this column is in edit mode.
    */
   createEditor(row) {

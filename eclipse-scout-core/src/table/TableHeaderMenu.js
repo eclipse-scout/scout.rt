@@ -710,31 +710,7 @@ export default class TableHeaderMenu extends Popup {
       .text(this._filterByText());
     HtmlComponent.install(this.$filterTableGroupTitle, this.session);
 
-    this.filterTable = scout.create('Table', {
-      parent: this,
-      headerVisible: false,
-      multiSelect: false,
-      autoResizeColumns: true,
-      checkable: true,
-      checkableStyle: Table.CheckableStyle.TABLE_ROW,
-      // column-texts are not visible since header is not visible
-      columns: [{
-        objectType: 'Column',
-        text: 'filter-value',
-        width: 160,
-        sortActive: true,
-        sortIndex: 1
-      }, {
-        objectType: 'NumberColumn',
-        text: 'aggregate-count',
-        width: 40
-      }, {
-        objectType: 'NumberColumn',
-        displayable: false,
-        sortActive: true,
-        sortIndex: 0
-      }]
-    });
+    this.filterTable = this._createFilterTable();
     this.filterTable.on('rowsChecked', this._filterTableRowsCheckedHandler);
     var tableRow, tableRows = [];
     this.filter.availableValues.forEach(function(filterValue) {
@@ -763,6 +739,34 @@ export default class TableHeaderMenu extends Popup {
     setTimeout(this.filterTable.revealChecked.bind(this.filterTable));
 
     return this.$filterTableGroup;
+  }
+
+  _createFilterTable() {
+    return scout.create('Table', {
+      parent: this,
+      headerVisible: false,
+      multiSelect: false,
+      autoResizeColumns: true,
+      checkable: true,
+      checkableStyle: Table.CheckableStyle.TABLE_ROW,
+      // column-texts are not visible since header is not visible
+      columns: [{
+        objectType: 'Column',
+        text: 'filter-value',
+        width: 160,
+        sortActive: true,
+        sortIndex: 1
+      }, {
+        objectType: 'NumberColumn',
+        text: 'aggregate-count',
+        width: 40
+      }, {
+        objectType: 'NumberColumn',
+        displayable: false,
+        sortActive: true,
+        sortIndex: 0
+      }]
+    });
   }
 
   /**
