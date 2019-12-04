@@ -63,6 +63,7 @@ export default class FormField extends Widget {
     this.touched = false;
     this.tooltipText = null;
     this.tooltipAnchor = FormField.TooltipAnchor.DEFAULT;
+    this.onFieldTooltipOptionsCreator = null;
 
     this.$label = null;
     /**
@@ -343,11 +344,8 @@ export default class FormField extends Widget {
 
     if (this.$fieldContainer) {
       if (this.hasOnFieldTooltip()) {
-        tooltips.install(this.$fieldContainer, {
-          parent: this,
-          text: this.tooltipText,
-          arrowPosition: 50
-        });
+        var creatorFunc = this.onFieldTooltipOptionsCreator || this._createOnFieldTooltipOptions;
+        tooltips.install(this.$fieldContainer, creatorFunc.call(this));
       } else {
         tooltips.uninstall(this.$fieldContainer);
       }
@@ -362,6 +360,18 @@ export default class FormField extends Widget {
   hasOnFieldTooltip() {
     return this.tooltipAnchor === FormField.TooltipAnchor.ON_FIELD &&
       strings.hasText(this.tooltipText);
+  }
+
+  setOnFieldTooltipOptionsCreator(onFieldTooltipOptionsCreator) {
+    this.onFieldTooltipOptionsCreator = onFieldTooltipOptionsCreator;
+  }
+
+  _createOnFieldTooltipOptions() {
+    return {
+      parent: this,
+      text: this.tooltipText,
+      arrowPosition: 50
+    };
   }
 
   /**
