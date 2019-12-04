@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {LocaleSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
-import {DecimalFormat, HtmlComponent, scout} from '../../../src/index';
+import {DecimalFormat, scout} from '../../../src/index';
 
 describe('AggregateTableControl', function() {
   var session;
@@ -32,21 +32,6 @@ describe('AggregateTableControl', function() {
     jasmine.clock().uninstall();
     $.fx.off = false;
   });
-
-  function createFormMock() {
-    var form = {
-      render: function() {
-      },
-      remove: function() {
-      },
-      $container: $('<div>'),
-      rootGroupBox: {
-        fields: []
-      }
-    };
-    form.htmlComp = HtmlComponent.install(form.$container, session);
-    return form;
-  }
 
   function createAggregateTC(model) {
     var defaults = {
@@ -73,16 +58,13 @@ describe('AggregateTableControl', function() {
   }
 
   describe('aggregate', function() {
-    var model, table, column0, column1, column2, rows, columns, tableControl;
-    var $colHeaders, $header0, $header1;
+    var model, table, column0, column1, column2, rows, tableControl;
 
     function prepareTable() {
-      columns = [helper.createModelColumn('col1'),
+      var columns = [helper.createModelColumn('col1'),
         helper.createModelColumn('col2', 'NumberColumn'),
         helper.createModelColumn('col3', 'NumberColumn')
       ];
-      columns[0].index = 0;
-      columns[1].index = 1;
       rows = helper.createModelRows(columns, 3);
       model = helper.createModel(columns, rows);
       table = helper.createTable(model);
@@ -269,17 +251,28 @@ describe('AggregateTableControl', function() {
       expect($aggrCells.eq(1).text()).toBe('5');
     });
 
+    it('does not apply background effect', function() {
+      prepareTable();
+      rows[0].cells[1].value = 1;
+      rows[1].cells[1].value = 2;
+      rows[2].cells[1].value = 3;
+      table.setColumnBackgroundEffect(column1, 'colorGradient1');
+      table.render();
+
+      var $aggrRow = $aggregateRow(tableControl);
+      var $aggrCells = $aggrRow.children('.table-cell');
+      expect(table.$cell(column1, table.$rows().eq(0)).attr('style').indexOf('background-color') > -1).toBe(true); // Real cell must have background effect
+      expect($aggrCells.eq(0).attr('style').indexOf('background-color') > -1).toBe(false); // Aggregate cell must not have background effect
+    });
   });
 
   describe('eanbled state', function() {
-    var columns, rows, model, table, tableControl;
+    var rows, model, table, tableControl;
 
     function prepareTable() {
-      columns = [helper.createModelColumn('col1'),
+      var columns = [helper.createModelColumn('col1'),
         helper.createModelColumn('col2')
       ];
-      columns[0].index = 0;
-      columns[1].index = 1;
       rows = helper.createModelRows(2, 3);
       model = helper.createModel(columns, rows);
       table = helper.createTable(model);
@@ -300,12 +293,10 @@ describe('AggregateTableControl', function() {
     });
 
     it('is true if there is at least one number column', function() {
-      columns = [
+      var columns = [
         helper.createModelColumn('col1'),
         helper.createModelColumn('col2', 'NumberColumn')
       ];
-      columns[0].index = 0;
-      columns[1].index = 1;
       rows = helper.createModelRows(columns, 3);
       model = helper.createModel(columns, rows);
       table = helper.createTable(model);
@@ -324,12 +315,10 @@ describe('AggregateTableControl', function() {
     });
 
     it('is false if there is a number column but without an aggregate function', function() {
-      columns = [
+      var columns = [
         helper.createModelColumn('col1'),
         helper.createModelColumn('col2', 'NumberColumn')
       ];
-      columns[0].index = 0;
-      columns[1].index = 1;
       rows = helper.createModelRows(columns, 3);
       model = helper.createModel(columns, rows);
       table = helper.createTable(model);
@@ -356,8 +345,6 @@ describe('AggregateTableControl', function() {
       var columns = [helper.createModelColumn('col1'),
         helper.createModelColumn('col2')
       ];
-      columns[0].index = 0;
-      columns[1].index = 1;
       var rows = helper.createModelRows(2, 3);
       var model = helper.createModel(columns, rows);
       table = helper.createTable(model);

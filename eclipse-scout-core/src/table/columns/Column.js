@@ -635,7 +635,8 @@ export default class Column {
 
   createAggrEmptyCell() {
     return this.initCell(scout.create('Cell', {
-      empty: true
+      empty: true,
+      cssClass: 'table-aggregate-cell'
     }));
   }
 
@@ -690,7 +691,7 @@ export default class Column {
   }
 
   /**
-   * @returns whether or not it is possible to sort this column.
+   * @returns {boolean} whether or not it is possible to sort this column.
    * As a side effect a comparator is installed.
    */
   isSortingPossible() {

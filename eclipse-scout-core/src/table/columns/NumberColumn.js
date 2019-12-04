@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {aggregation, Column, comparators, DecimalFormat, numbers, scout, styles} from '../../index';
+import {aggregation, Column, comparators, DecimalFormat, numbers, scout, strings, styles} from '../../index';
 import * as $ from 'jquery';
 
 export default class NumberColumn extends Column {
@@ -122,18 +122,18 @@ export default class NumberColumn extends Column {
 
   _cellStyle(cell, tableNodeColumn, rowPadding) {
     var style = super._cellStyle(cell, tableNodeColumn, rowPadding);
-
-    if (this.backgroundEffect && cell.value !== undefined) {
-      if (!this.backgroundEffectFunc) {
-        this.backgroundEffectFunc = this._resolveBackgroundEffectFunc();
-      }
-      var backgroundStyle = this.backgroundEffectFunc(this._preprocessValueOrTextForCalculation(cell.value));
-      if (backgroundStyle.backgroundColor) {
-        style += 'background-color: ' + backgroundStyle.backgroundColor + ';';
-      }
-      if (backgroundStyle.backgroundImage) {
-        style += 'background-image: ' + backgroundStyle.backgroundImage + ';';
-      }
+    if (!this.backgroundEffect || cell.value === undefined || strings.contains(cell.cssClass, 'table-aggregate-cell')) {
+      return style;
+    }
+    if (!this.backgroundEffectFunc) {
+      this.backgroundEffectFunc = this._resolveBackgroundEffectFunc();
+    }
+    var backgroundStyle = this.backgroundEffectFunc(this._preprocessValueOrTextForCalculation(cell.value));
+    if (backgroundStyle.backgroundColor) {
+      style += 'background-color: ' + backgroundStyle.backgroundColor + ';';
+    }
+    if (backgroundStyle.backgroundImage) {
+      style += 'background-image: ' + backgroundStyle.backgroundImage + ';';
     }
     return style;
   }
