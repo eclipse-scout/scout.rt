@@ -87,7 +87,9 @@ export default class DialogLayout extends FormLayout {
     // ...then calculate the actual preferred size based on the width. This is necessary because the dialog may contain fields with wrapping content. Without a width hint the height would not be correct.
     dialogSize = this.preferredLayoutSize($container, {
       widthHint: dialogSize.width
-    });
+    }).ceil(); // always round up. If we'd round a height of 380.00005 pixel down
+    // there is not enough space to display the group-box, thus the browser would show scrollbars.
+
     dialogSize = DialogLayout.fitContainerInWindow(windowSize, currentBounds.point(), dialogSize, dialogMargins);
     return dialogSize;
   }
