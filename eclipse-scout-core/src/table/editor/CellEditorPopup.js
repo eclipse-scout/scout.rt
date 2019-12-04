@@ -10,6 +10,7 @@
  */
 import {CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorTabKeyStroke, FormField, graphics, Point, Popup, scout} from '../../index';
 import * as $ from 'jquery';
+import Device from '../../util/Device';
 
 export default class CellEditorPopup extends Popup {
 

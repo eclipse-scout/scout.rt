@@ -1666,18 +1666,15 @@ export default class DateField extends ValueField {
     opts = opts || {};
     super.prepareForCellEdit(opts);
 
-    this.$field.removeClass('cell-editor-field first');
+    this.$field.removeClass('cell-editor-field first last');
     if (this.$dateField) {
-      this.$dateField.addClass('cell-editor-field');
-      if (opts.cssClass) {
-        this.$dateField.addClass(opts.cssClass);
-      }
+      this.addCellEditorFieldCssClasses(this.$dateField, opts);
     }
     if (this.$timeField) {
-      this.$timeField.addClass('cell-editor-field');
-      if (opts.cssClass && !this.$dateField) {
-        this.$timeField.addClass(opts.cssClass);
+      if (!this.$dateField) {
+        opts.cssClass = '';
       }
+      this.addCellEditorFieldCssClasses(this.$timeField, opts);
     }
   }
 

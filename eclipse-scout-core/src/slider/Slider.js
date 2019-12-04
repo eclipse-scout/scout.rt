@@ -40,7 +40,7 @@ export default class Slider extends Widget {
     this.$sliderInput = this.$container.appendElement('<input>', 'slider-input')
       .attr('type', 'range')
       .on('change', this._onValueChange.bind(this))
-      .toggleClass('ms-edge', Device.get().isEdge());
+      .addClass(Device.get().cssClassForEdge());
 
     this.$sliderValue = this.$container
       .appendSpan('slider-value', this.value);

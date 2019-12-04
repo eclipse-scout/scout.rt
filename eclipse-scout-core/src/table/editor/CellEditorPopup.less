@@ -12,20 +12,40 @@
   /* make sure it is behind the scrollbar */
   z-index: 0;
 
-  .first& {
+  &.first {
     /* Hide the left border of the field */
     margin-left: -1px;
   }
 }
 
 .cell-editor-field {
-  /* -1px correction is necessary because the table-cell does not have a border but the fields have */
+
+  /* -1px correction is necessary because the table-cell does not have a border but the fields have
+   * For some reason Microsoft Edge requires 1px less padding than all other browsers, to avoid a
+   * 'jumpy' UI when user clicks into an editable cell */
   padding: @table-row-padding-y @table-cell-padding-right - 1px @table-row-padding-y @table-cell-padding-left - 1px;
   border-radius: 0;
+
+  &.ms-edge {
+    padding-left: @table-cell-padding-left - 2px;
+  }
+
+  &.first {
+    /* Correction for margin-left -1px */
+    padding-left: @table-cell-padding-left;
+
+    &.ms-edge {
+      padding-left: @table-cell-padding-left - 1px;
+    }
+  }
 
   &.halign-right {
     padding-right: @table-cell-padding-left - 1px;
     padding-left: @table-cell-padding-right - 1px;
+
+    &.ms-edge {
+      padding-left: @table-cell-padding-right - 2px;
+    }
   }
 
   &.halign-center {
@@ -36,8 +56,4 @@
     box-shadow: none;
   }
 
-  .first& {
-    /* correction for margin-left -1px */
-    padding-left: @table-cell-padding-left;
-  }
 }

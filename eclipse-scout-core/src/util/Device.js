@@ -166,6 +166,13 @@ export default class Device {
     return Device.Browser.EDGE === this.browser;
   }
 
+  /**
+   * @returns {string} 'ms-edge' if the current browser is Microsoft Edge
+   */
+  cssClassForEdge() {
+    return this.isEdge() ? 'ms-edge' : '';
+  }
+
   isInternetExplorer() {
     return Device.Browser.INTERNET_EXPLORER === this.browser;
   }

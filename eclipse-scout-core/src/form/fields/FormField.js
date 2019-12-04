@@ -1092,6 +1092,15 @@ export default class FormField extends Widget {
     }
   }
 
+  addCellEditorFieldCssClasses($field, opts) {
+    $field
+      .addClass('cell-editor-field')
+      .addClass(Device.get().cssClassForEdge());
+    if (opts.cssClass) {
+      $field.addClass(opts.cssClass);
+    }
+  }
+
   prepareForCellEdit(opts) {
     opts = opts || {};
 
@@ -1107,10 +1116,7 @@ export default class FormField extends Widget {
       this.$container.addClass('cell-editor-form-field');
     }
     if (this.$field) {
-      this.$field.addClass('cell-editor-field');
-      if (opts.cssClass) {
-        this.$field.addClass(opts.cssClass);
-      }
+      this.addCellEditorFieldCssClasses(this.$field, opts);
     }
   }
 
