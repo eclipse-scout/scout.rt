@@ -220,6 +220,28 @@ describe('ContextMenuPopup', function() {
       popup.remove();
     });
 
+    it('makes cloned menus non-tabbable', function() {
+      menu0.tabbable = true; // <-- !
+      var menuItems = [menu0, menu1, menu2];
+      popup = scout.create('ContextMenuPopup', {
+        parent: session.desktop,
+        session: session,
+        menuItems: menuItems
+      });
+      popup.render();
+
+      var menu0Clone = findClone(popup, menu0);
+      var menu1Clone = findClone(popup, menu1);
+      var menu2Clone = findClone(popup, menu2);
+      expect(menu0Clone.tabbable).toBe(false); // <-- !
+      expect(menu1Clone.tabbable).toBe(false);
+      expect(menu2Clone.tabbable).toBe(false);
+      expect(menu0Clone.$container.attr('tabindex')).toBeUndefined(); // <-- !
+      expect(menu1Clone.$container.attr('tabindex')).toBeUndefined();
+      expect(menu2Clone.$container.attr('tabindex')).toBeUndefined();
+      popup.remove();
+    });
+
   });
 
 });
