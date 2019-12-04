@@ -97,8 +97,12 @@ function runKarma(configFileName, headless) {
 
   const Server = require('karma').Server;
   const serverInstance = new Server(karmaConfig, exitCode => {
-    console.log(`There are test failures. Karma has exited with ${exitCode}`);
-    // do not set exitCode of karma to the process here because the build should continue even on failing tests.
+    if (exitCode === 0) {
+      console.log('Karma has exited with 0');
+    } else {
+      console.log(`There are test failures. Karma has exited with ${exitCode}`);
+    }
+    process.exit(0); // do not set exitCode of karma to the process here because the build should continue even on failing tests. therefore always use exitCode zero.
   });
   console.log(`Starting Karma server using config file ${configFilePath}`);
   serverInstance.start();
