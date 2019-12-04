@@ -30,13 +30,13 @@ switch (script) {
     break;
   }
   case 'test-server:stop': {
-    // default port assumed
     const stopper = require('karma').stopper;
+    // default port assumed
     stopper.stop({port: 9876}, exitCode => {
       if (exitCode === 0) {
         console.log('Server stop as initiated');
       }
-      process.exit(exitCode);
+      process.exitCode = exitCode;
     });
     break;
   }
@@ -97,8 +97,8 @@ function runKarma(configFileName, headless) {
 
   const Server = require('karma').Server;
   const serverInstance = new Server(karmaConfig, exitCode => {
-    console.log(`Karma has exited with ${exitCode}`);
-    process.exit(exitCode);
+    console.log(`There are test failures. Karma has exited with ${exitCode}`);
+    // do not set exitCode of karma to the process here because the build should continue even on failing tests.
   });
   console.log(`Starting Karma server using config file ${configFilePath}`);
   serverInstance.start();

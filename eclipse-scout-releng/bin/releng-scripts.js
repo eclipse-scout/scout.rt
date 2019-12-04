@@ -20,7 +20,7 @@ const generateSnapshot = args => {
     .catch(e => {
       console.error('snapshot version failed');
       console.error(e);
-      process.exit(1);
+      process.exitCode = 1;
     });
 };
 
@@ -31,7 +31,7 @@ const setInstallSnapshotDependencies = args => {
     .catch(e => {
       console.error('setPreInstallSnapshotDependencies version failed');
       console.error(e);
-      process.exit(1);
+      process.exitCode = 1;
     });
 };
 
@@ -42,7 +42,7 @@ const setPublishSnapshotDependencies = args => {
     .catch(e => {
       console.error('setPrePublishSnapshotDependencies version failed');
       console.error(e);
-      process.exit(1);
+      process.exitCode = 1;
     });
 };
 
@@ -53,7 +53,7 @@ const setInstallReleaseDependencies = args => {
     .catch(e => {
       console.error('setPreInstallReleaseDependencies version failed');
       console.error(e);
-      process.exit(1);
+      process.exitCode = 1;
     });
 };
 
@@ -67,7 +67,7 @@ const setPublishReleaseDependencies = args => {
     .catch(e => {
       console.error('setPrePublishReleaseDependencies version failed');
       console.error(e);
-      process.exit(1);
+      process.exitCode = 1;
     });
 };
 
@@ -78,7 +78,7 @@ const cleanupArtifactory = args => {
     .catch(e => {
       console.error('Repository cleanup failed');
       console.error(e);
-      process.exit(1);
+      process.exitCode = 1;
     });
 };
 
