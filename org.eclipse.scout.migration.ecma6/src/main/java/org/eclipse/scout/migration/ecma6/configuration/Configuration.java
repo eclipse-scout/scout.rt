@@ -36,6 +36,35 @@ import org.slf4j.LoggerFactory;
 public class Configuration {
   private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
+  public static final String MODULE__ORG_ECLIPSE_SCOUT_RT_UI_HTML = "org.eclipse.scout.rt.ui.html";
+  public static final String MODULE__ORG_ECLIPSE_SCOUT_RT_SVG_UI_HTML = "org.eclipse.scout.rt.svg.ui.html";
+  public static final String MODULE__ORG_ECLIPSE_SCOUT_JSWIDGETS_UI_HTML = "org.eclipse.scout.jswidgets.ui.html";
+  public static final String MODULE__ORG_ECLIPSE_SCOUT_WIDGETS_HEATMAP_UI_HTML = "org.eclipse.scout.widgets.heatmap.ui.html";
+  public static final String MODULE__ORG_ECLIPSE_SCOUT_WIDGETS_UI_HTML = "org.eclipse.scout.widgets.ui.html";
+  public static final String MODULE__ORG_ECLIPSE_SCOUT_CONTACTS_UI_HTML = "org.eclipse.scout.contacts.ui.html";
+  public static final String MODULE__COM_BSIAG_SCOUT_RT_UI_HTML = "com.bsiag.scout.rt.ui.html";
+  public static final String MODULE__COM_BSIAG_SCOUT_RT_PDFVIEWER_UI_HTML = "com.bsiag.scout.rt.pdfviewer.ui.html";
+  public static final String MODULE__COM_BSIAG_SCOUT_RT_OFFICEADDIN_UI_HTML = "com.bsiag.scout.rt.officeaddin.ui.html";
+  public static final String MODULE__COM_BSIAG_SCOUT_RT_HTMLEDITOR_UI_HTML = "com.bsiag.scout.rt.htmleditor.ui.html";
+  public static final String MODULE__COM_BSIAG_WIDGETS_UI_HTML = "com.bsiag.widgets.ui.html";
+  public static final String MODULE__COM_BSIAG_STUDIO_UI_HTML = "com.bsiag.studio.ui.html";
+  public static final String MODULE__COM_BSIAG_STUDIO_UI_HTML_TEST = "com.bsiag.studio.ui.html.test";
+  public static final String MODULE__COM_BSIAG_CRM_UI_HTML_GRAPH = "com.bsiag.crm.ui.html.graph";
+  public static final String MODULE__COM_BSIAG_CRM_UI_HTML_CORE = "com.bsiag.crm.ui.html.core";
+  public static final String MODULE__COM_BSIAG_CRM_STUDIO_UI_HTML = "com.bsiag.crm.studio.ui.html";
+  public static final String MODULE__COM_BSIAG_STUDIO_STEP_BASE = "com.bsiag.studio.step.base";
+  public static final String MODULE__COM_BSIAG_STUDIO_STEP_CRM = "com.bsiag.studio.step.crm";
+  public static final String MODULE__COM_BSIAG_STUDIO_STEP_WEATHER = "com.bsiag.studio.step.weather";
+  public static final String MODULE__COM_BSIAG_STUDIO_STEP_MEDIA = "com.bsiag.studio.step.media";
+  public static final String MODULE__COM_BSIAG_STUDIO_STEP_EXAMPLE = "com.bsiag.studio.step.example";
+  public static final String MODULE__COM_BSIAG_STUDIO_STEP_PROTOTYPING = "com.bsiag.studio.step.prototyping";
+  public static final String MODULE__COM_BSIAG_STUDIO_STEP_ML = "com.bsiag.studio.step.ml";
+  public static final String MODULE__COM_BSIAG_ML_CORTEX = "com.bsiag.ml.cortex";
+  public static final String MODULE__COM_BSIAG_PORTAL_UI = "com.bsiag.portal.ui";
+  public static final String MODULE__COM_BSIAG_BSISTUDIO_LAB_UI_HTML = "com.bsiag.bsistudio.lab.ui.html";
+  public static final String MODULE__COM_BSIAG_BRIEFCASE_UI_HTML = "com.bsiag.briefcase.ui.html";
+  public static final String MODULE__COM_BSIAG_BSIBRIEFCASE_UI_HTML = "com.bsiag.bsibriefcase.ui.html";
+
   public static Configuration get() {
     return BEANS.get(Configuration.class);
   }
@@ -70,7 +99,7 @@ public class Configuration {
     }
 
     switch (moduleName) {
-      case "org.eclipse.scout.rt.ui.html":
+      case MODULE__ORG_ECLIPSE_SCOUT_RT_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("org.eclipse.scout.rt", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("org.eclipse.scout.rt", moduleName)));
         setNamespace("scout");
@@ -78,7 +107,7 @@ public class Configuration {
         setPersistLibraryName("@eclipse-scout/core");
         setPersistLibraryFileName("01-api_eclipse-scout_core.json");
         break;
-      case "org.eclipse.scout.rt.svg.ui.html":
+      case MODULE__ORG_ECLIPSE_SCOUT_RT_SVG_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("org.eclipse.scout.rt", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("org.eclipse.scout.rt", moduleName)));
         setNamespace("scout");
@@ -86,7 +115,7 @@ public class Configuration {
         setPersistLibraryName("@eclipse-scout/svg");
         setPersistLibraryFileName("02-api_eclipse-scout_svg.json");
         break;
-      case "org.eclipse.scout.jswidgets.ui.html":
+      case MODULE__ORG_ECLIPSE_SCOUT_JSWIDGETS_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("org.eclipse.scout.docs/code/widgets/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("org.eclipse.scout.docs/code/widgets/", moduleName)));
         setNamespace("jswidgets");
@@ -95,7 +124,7 @@ public class Configuration {
         setPersistLibraryFileName("10-api_demo-jswidgets.json");
         break;
 
-      case "org.eclipse.scout.widgets.heatmap.ui.html":
+      case MODULE__ORG_ECLIPSE_SCOUT_WIDGETS_HEATMAP_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("org.eclipse.scout.docs/code/widgets/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("org.eclipse.scout.docs/code/widgets/", moduleName)));
         setNamespace("scout");
@@ -103,7 +132,7 @@ public class Configuration {
         setPersistLibraryName("@eclipse-scout/demo-widgets-heatmap");
         setPersistLibraryFileName("40-api_demo-widgets-heatmap.json");
         break;
-      case "org.eclipse.scout.widgets.ui.html":
+      case MODULE__ORG_ECLIPSE_SCOUT_WIDGETS_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("org.eclipse.scout.docs/code/widgets/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("org.eclipse.scout.docs/code/widgets/", moduleName)));
         setNamespace("widgets");
@@ -111,7 +140,7 @@ public class Configuration {
         setPersistLibraryName("@eclipse-scout/demo-widgets");
         setPersistLibraryFileName("41-api_demo-widgets.json");
         break;
-      case "org.eclipse.scout.contacts.ui.html":
+      case MODULE__ORG_ECLIPSE_SCOUT_CONTACTS_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("org.eclipse.scout.docs/code/contacts/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("org.eclipse.scout.docs/code/contacts/", moduleName)));
         setNamespace("contacts");
@@ -120,7 +149,7 @@ public class Configuration {
         setPersistLibraryFileName("43-api_demo-contacts.json");
         break;
 
-      case "com.bsiag.scout.rt.ui.html":
+      case MODULE__COM_BSIAG_SCOUT_RT_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
         setNamespace("scout");
@@ -128,7 +157,7 @@ public class Configuration {
         setPersistLibraryName("@bsi-scout/core");
         setPersistLibraryFileName("50-api_bsi_scout_core.json");
         break;
-      case "com.bsiag.scout.rt.pdfviewer.ui.html":
+      case MODULE__COM_BSIAG_SCOUT_RT_PDFVIEWER_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
         setNamespace("scout");
@@ -136,7 +165,7 @@ public class Configuration {
         setPersistLibraryName("@bsi-scout/pdfviewer");
         setPersistLibraryFileName("52-api_bsi_scout_pdfviewer.json");
         break;
-      case "com.bsiag.scout.rt.officeaddin.ui.html":
+      case MODULE__COM_BSIAG_SCOUT_RT_OFFICEADDIN_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
         setNamespace("scout");
@@ -144,7 +173,7 @@ public class Configuration {
         setPersistLibraryName("@bsi-scout/officeaddin");
         setPersistLibraryFileName("54-api_bsi_scout_officeaddin.json");
         break;
-      case "com.bsiag.scout.rt.htmleditor.ui.html":
+      case MODULE__COM_BSIAG_SCOUT_RT_HTMLEDITOR_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
         setNamespace("scout");
@@ -152,7 +181,7 @@ public class Configuration {
         setPersistLibraryName("@bsi-scout/htmleditor");
         setPersistLibraryFileName("56-api_bsi_scout_htmleditor.json");
         break;
-      case "com.bsiag.widgets.ui.html":
+      case MODULE__COM_BSIAG_WIDGETS_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsi.scout.rt/", moduleName)));
         setNamespace("scout");
@@ -160,7 +189,7 @@ public class Configuration {
         setPersistLibraryName("@bsi-scout/demo-widgets");
         setPersistLibraryFileName("80-api_bsi_demo_widgets.json");
         break;
-      case "com.bsiag.studio.ui.html":
+      case MODULE__COM_BSIAG_STUDIO_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
@@ -168,7 +197,7 @@ public class Configuration {
         setPersistLibraryName("@bsi-studio/core");
         setPersistLibraryFileName("112-api_bsi_studio_core.json");
         break;
-      case "com.bsiag.studio.ui.html.test": {
+      case MODULE__COM_BSIAG_STUDIO_UI_HTML_TEST: {
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
@@ -177,7 +206,7 @@ public class Configuration {
         setPersistLibraryFileName("113-api_bsi_studio_core_test.json");
         break;
       }
-      case "com.bsiag.crm.ui.html.graph":
+      case MODULE__COM_BSIAG_CRM_UI_HTML_GRAPH:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsicrm/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsicrm/", moduleName)));
         setNamespace("scout");
@@ -185,7 +214,7 @@ public class Configuration {
         setPersistLibraryName("@bsi-crm/graph");
         setPersistLibraryFileName("100-api_bsicrm_graph.json");
         break;
-      case "com.bsiag.crm.ui.html.core":
+      case MODULE__COM_BSIAG_CRM_UI_HTML_CORE:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsicrm/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsicrm/", moduleName)));
         setNamespace("crm");
@@ -193,7 +222,7 @@ public class Configuration {
         setPersistLibraryName("@bsi-crm/core");
         setPersistLibraryFileName("110-api_bsicrm_core.json");
         break;
-      case "com.bsiag.crm.studio.ui.html":
+      case MODULE__COM_BSIAG_CRM_STUDIO_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studiocrm");
@@ -202,7 +231,7 @@ public class Configuration {
         setPersistLibraryFileName("120-api_bsicrm_studio.json");
         break;
 
-      case "com.bsiag.studio.step.base":
+      case MODULE__COM_BSIAG_STUDIO_STEP_BASE:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
@@ -213,7 +242,7 @@ public class Configuration {
         setUseIndexJs(false); // there is no index.js for steps
         setStepConfigTypeName("steps");
         break;
-      case "com.bsiag.studio.step.crm":
+      case MODULE__COM_BSIAG_STUDIO_STEP_CRM:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
@@ -224,7 +253,7 @@ public class Configuration {
         setUseIndexJs(false); // there is no index.js for steps
         setStepConfigTypeName("steps");
         break;
-      case "com.bsiag.studio.step.weather":
+      case MODULE__COM_BSIAG_STUDIO_STEP_WEATHER:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
@@ -235,7 +264,7 @@ public class Configuration {
         setUseIndexJs(false); // there is no index.js for steps
         setStepConfigTypeName("steps");
         break;
-      case "com.bsiag.studio.step.media":
+      case MODULE__COM_BSIAG_STUDIO_STEP_MEDIA:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
@@ -246,7 +275,7 @@ public class Configuration {
         setUseIndexJs(false); // there is no index.js for steps
         setStepConfigTypeName("steps");
         break;
-      case "com.bsiag.studio.step.example":
+      case MODULE__COM_BSIAG_STUDIO_STEP_EXAMPLE:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
@@ -257,7 +286,7 @@ public class Configuration {
         setUseIndexJs(false); // there is no index.js for steps
         setStepConfigTypeName("steps");
         break;
-      case "com.bsiag.studio.step.prototyping":
+      case MODULE__COM_BSIAG_STUDIO_STEP_PROTOTYPING:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
@@ -268,7 +297,7 @@ public class Configuration {
         setUseIndexJs(false); // there is no index.js for steps
         setStepConfigTypeName("steps");
         break;
-      case "com.bsiag.studio.step.ml":
+      case MODULE__COM_BSIAG_STUDIO_STEP_ML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("studio");
@@ -280,7 +309,7 @@ public class Configuration {
         setStepConfigTypeName("steps");
         break;
 
-      case "com.bsiag.ml.cortex":
+      case MODULE__COM_BSIAG_ML_CORTEX:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsiml/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsiml/", moduleName)));
         setNamespace("studio");
@@ -292,7 +321,7 @@ public class Configuration {
         setStepConfigTypeName("cortexes");
         break;
 
-      case "com.bsiag.portal.ui":
+      case MODULE__COM_BSIAG_PORTAL_UI:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsiportal/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsiportal/", moduleName)));
         setNamespace("portal");
@@ -301,7 +330,7 @@ public class Configuration {
         setPersistLibraryFileName("700-api_bsi_portal_core.json");
         break;
 
-      case "com.bsiag.bsistudio.lab.ui.html":
+      case MODULE__COM_BSIAG_BSISTUDIO_LAB_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsistudio/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsistudio/", moduleName)));
         setNamespace("crm");
@@ -310,7 +339,7 @@ public class Configuration {
         setPersistLibraryFileName("800-api_bsi_studio_lab.json");
         break;
 
-      case "com.bsiag.briefcase.ui.html":
+      case MODULE__COM_BSIAG_BRIEFCASE_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsibriefcase/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsibriefcase/", moduleName)));
         setNamespace("briefcase");
@@ -318,7 +347,7 @@ public class Configuration {
         setPersistLibraryName("@bsi-briefcase/core");
         setPersistLibraryFileName("900-api_bsi_briefcase_core.json");
         break;
-      case "com.bsiag.bsibriefcase.ui.html":
+      case MODULE__COM_BSIAG_BSIBRIEFCASE_UI_HTML:
         setSourceModuleDirectory(sourceBase.resolve(Paths.get("bsibriefcase/", moduleName)));
         setTargetModuleDirectory(targetBase.resolve(Paths.get("bsibriefcase/", moduleName)));
         setNamespace("bsibriefcase");

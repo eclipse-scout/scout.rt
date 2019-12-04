@@ -32,6 +32,7 @@ import org.eclipse.scout.migration.ecma6.model.old.JsUtilityVariable;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -41,6 +42,7 @@ public class ApiWriter {
     ObjectMapper defaultJacksonObjectMapper = new ObjectMapper()
         .setSerializationInclusion(Include.NON_DEFAULT)
         .enable(SerializationFeature.INDENT_OUTPUT)
+        .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
         .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
     defaultJacksonObjectMapper.writeValue(Files.newBufferedWriter(libraryFile), createLibraryFromCurrentModule(libName, context));
   }
