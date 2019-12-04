@@ -1108,8 +1108,8 @@ export default class FormField extends Widget {
     }
     if (this.$field) {
       this.$field.addClass('cell-editor-field');
-      if (opts.firstCell) {
-        this.$field.addClass('first');
+      if (opts.cssClass) {
+        this.$field.addClass(opts.cssClass);
       }
     }
   }

@@ -1669,14 +1669,14 @@ export default class DateField extends ValueField {
     this.$field.removeClass('cell-editor-field first');
     if (this.$dateField) {
       this.$dateField.addClass('cell-editor-field');
-      if (opts.firstCell) {
-        this.$dateField.addClass('first');
+      if (opts.cssClass) {
+        this.$dateField.addClass(opts.cssClass);
       }
     }
     if (this.$timeField) {
       this.$timeField.addClass('cell-editor-field');
-      if (opts.firstCell && !this.$dateField) {
-        this.$timeField.addClass('first');
+      if (opts.cssClass && !this.$dateField) {
+        this.$timeField.addClass(opts.cssClass);
       }
     }
   }

@@ -38,15 +38,15 @@
   &.has-inner-alignment {
 
     &.halign-left {
-      text-align: left;
+      justify-content: flex-start;
     }
 
     &.halign-center {
-      text-align: center;
+      justify-content: center;
     }
 
     &.halign-right {
-      text-align: right;
+      justify-content: flex-end;
     }
   }
 
@@ -92,6 +92,10 @@
     padding: 0;
     margin: 0 @table-cell-padding-right 0 @table-cell-padding-left;
     vertical-align: top;
+
+    &.last {
+      margin-right: @table-cell-padding-right-last !important;
+    }
   }
 
   &.halign-right > .cell-editor-field.check-box {
@@ -106,7 +110,7 @@
 
 .check-box-field.cell-editor-form-field > .field {
   /* 1px because cell editor popup starts at the table row which has a 1px border and check box field does not have a border */
-  padding-top: @table-row-padding-y - @checkable-cell-padding-adjustment + 1px;
+  padding-top: @table-row-padding-y - @checkable-cell-padding-adjustment + 0.5px;
 }
 
 .check-box-field.disabled > .field {

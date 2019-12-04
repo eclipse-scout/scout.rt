@@ -66,18 +66,25 @@ export default class CellEditorPopup extends Popup {
   _render() {
     super._render();
 
-    var firstCell = this.table.visibleColumns().indexOf(this.column) === 0;
-    this.$container.addClass('cell-editor-popup');
-    this.$container.data('popup', this);
-    if (firstCell) {
-      this.$container.addClass('first');
+    // determine CSS class for first and last column, required for additional margins/padding in cell-editor
+    var cssClass = '',
+      visibleCols = this.table.visibleColumns(),
+      colPos = visibleCols.indexOf(this.column);
+    if (colPos === 0) { // first cell
+      cssClass = 'first';
+    } else if (colPos === visibleCols.length - 1) { // last cell
+      cssClass = 'last';
     }
+
+    this.$container
+      .addClass('cell-editor-popup ' + cssClass)
+      .data('popup', this);
 
     var field = this.cell.field;
     field.mode = FormField.Mode.CELLEDITOR; // hint that this field is used within a cell-editor
     field.render();
     field.prepareForCellEdit({
-      firstCell: firstCell
+      cssClass: cssClass
     });
 
     // Make sure cell content is not visible while the editor is open (especially necessary for transparent editors like checkboxes)
