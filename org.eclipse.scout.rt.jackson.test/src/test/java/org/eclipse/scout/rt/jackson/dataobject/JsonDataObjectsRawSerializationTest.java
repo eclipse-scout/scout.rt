@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -21,10 +22,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestComplexEntityDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestVersionedDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoNode;
@@ -159,6 +163,20 @@ public class JsonDataObjectsRawSerializationTest {
 
     DoEntity rawEntity_noVersion = (DoEntity) s_dataObjectMapper.readValueRaw(readResourceAsString("TestVersionedDoNoVersion.json"));
     assertNull(rawEntity_noVersion.getString(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME));
+  }
+
+  @Test
+  public void testCloneRaw() {
+    TestComplexEntityDo entity = BEANS.get(TestComplexEntityDo.class)
+        .withStringAttribute("str1")
+        .withItemAttribute(BEANS.get(TestItemDo.class).withStringAttribute("str2"));
+    IDoEntity clone = BEANS.get(DataObjectHelper.class).cloneRaw(entity);
+    assertNoTypes(clone);
+    assertEquals("str1", clone.get("stringAttribute"));
+    Object item = clone.get("itemAttribute");
+    assertNotNull(item);
+    assertEquals(DoEntity.class, item.getClass());
+    assertEquals("str2", ((DoEntity) item).get("stringAttribute"));
   }
 
   protected void testRawDataObjectMapper(String jsonFileName) {
