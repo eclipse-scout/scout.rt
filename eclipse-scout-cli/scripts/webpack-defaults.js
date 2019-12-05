@@ -128,6 +128,10 @@ module.exports = (env, args) => {
       splitChunks: {
         chunks: 'all',
         cacheGroups: {
+          // Disable default behaviour so that only the junks defined below and the entry points are built.
+          // This makes it easier if the dependencies are added manually to the html document because it is clear what the output will be (= it is clear which bundles will be created).
+          // It is always possible to disable or change the Scout defaults by deleting or extending the Scout cache groups (e.g. delete config.optimization.splitChunks.cacheGroups.default).
+          default: false,
           scout: {
             // Scout may be loaded as node module or may be part of the workspace
             // Also make sure the regex only matches *.js files to prevent the output from mixing with css
@@ -141,6 +145,25 @@ module.exports = (env, args) => {
             test: /[\\/]node_modules[\\/]jquery[\\/]/,
             name: 'jquery',
             priority: -1,
+            reuseExistingChunk: true,
+            enforce: true
+          },
+          vendors: {
+            test: function(module) {
+              if (!module.nameForCondition) {
+                return false; // raw or external modules do not have the method
+              }
+              const nameForCondition = module.nameForCondition();
+              // Extract all other node_modules into vendors.js
+              if (!nameForCondition.match(/[\\/]node_modules[\\/].*\.js/)) {
+                return false;
+              }
+              // Exclude the webpack module to make sure the vendors.js only contains "real" runtime third party dependencies necessary for the actual application.
+              // So, for a simple Scout app without dependencies, vendors.js won't be generated. This is also important for login.html and logout.html which don't require vendors.js as well.
+              return !nameForCondition.match(/[\\/]node_modules[\\/]webpack[\\/]/);
+            },
+            name: 'vendors',
+            priority: -10,
             reuseExistingChunk: true,
             enforce: true
           }
