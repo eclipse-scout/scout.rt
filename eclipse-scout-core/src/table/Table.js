@@ -4706,6 +4706,7 @@ export default class Table extends Widget {
     if (!this.$container.isEveryParentVisible()) {
       // If the table is invisible, the height of the rows cannot be determined.
       // In that case, the table won't be layouted either -> as soon as it will be layouted, renderViewport will be called again
+      this.invalidateLayoutTree();
       return;
     }
     var viewRange = this._calculateCurrentViewRange();
