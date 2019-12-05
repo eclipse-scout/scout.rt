@@ -129,6 +129,23 @@ public class DataObjectHelper {
   }
 
   /**
+   * Clones the given object using data object serialization and deserialization.
+   * <p>
+   * Result is a generic {@link IDoEntity} object tree ignoring any available type attributes.
+   *
+   * @see IDataObjectMapper#writeValue(Object)
+   * @see IDataObjectMapper#readValueRaw(String, Class)
+   */
+  public IDoEntity cloneRaw(IDoEntity value) {
+    if (value == null) {
+      return null;
+    }
+    IDataObjectMapper mapper = getDataObjectMapper();
+    String clone = mapper.writeValue(value);
+    return (IDoEntity) mapper.readValueRaw(clone);
+  }
+
+  /**
    * @return Serialized, human-readable representation of specified {@code entity}
    */
   public String toString(IDoEntity entity) {
