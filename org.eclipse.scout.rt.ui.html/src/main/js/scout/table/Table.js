@@ -4395,6 +4395,7 @@ scout.Table.prototype._renderViewport = function() {
   if (!this.$container.isEveryParentVisible()) {
     // If the table is invisible, the height of the rows cannot be determined.
     // In that case, the table won't be layouted either -> as soon as it will be layouted, renderViewport will be called again
+    this.invalidateLayoutTree();
     return;
   }
   var viewRange = this._calculateCurrentViewRange();
@@ -4669,7 +4670,7 @@ scout.Table.prototype._destroyCellEditorPopup = function() {
 
     var promise = this.cellEditorPopup.waitForCompleteCellEdit();
     if (promise.state() === 'resolved') {
-      // Do it immediately if promise has already been resolved. 
+      // Do it immediately if promise has already been resolved.
       // This makes sure updateRow does not immediately reopen the editor after closing.
       // At least for Scout JS, for Scout Classic it prevents flickering (endCellEdit comes after updateRows, but updateRows does not know whether the editor is closing so it will reopen it)
       destroyEditor();
