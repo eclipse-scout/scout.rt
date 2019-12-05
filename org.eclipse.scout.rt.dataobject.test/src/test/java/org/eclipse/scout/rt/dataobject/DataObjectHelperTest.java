@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -20,11 +19,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
 
-import org.eclipse.scout.rt.dataobject.DataObjectHelper;
-import org.eclipse.scout.rt.dataobject.DoEntity;
-import org.eclipse.scout.rt.dataobject.DoValue;
-import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
-import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.dataobject.fixture.SimpleFixtureDo;
 import org.eclipse.scout.rt.dataobject.testing.TestingDataObjectHelper;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -50,6 +44,7 @@ public class DataObjectHelperTest {
 
   protected static final String SERIALIZED_DO_ENTITY_VALUE = "Serialized_DoEntity";
   protected static final DoEntity DESERIALIZED_DO_ENTITY_VALUE = BEANS.get(DoEntity.class);
+  protected static final DoEntity DESERIALIZED_DO_ENTITY_VALUE_RAW = BEANS.get(DoEntity.class);
 
   protected IBean<TestingDataObjectHelper> m_testDataObjectHelperRegistrationBackup;
   protected DoEntity m_entity;
@@ -66,6 +61,7 @@ public class DataObjectHelperTest {
     // create a mock for IDataObjectMapper returning fixed values for serialized and deserialized objects
     m_dataObjectMapperMock = Mockito.mock(IDataObjectMapper.class);
     when(m_dataObjectMapperMock.readValue(Mockito.any(String.class), Mockito.any(Class.class))).thenReturn(DESERIALIZED_DO_ENTITY_VALUE);
+    when(m_dataObjectMapperMock.readValueRaw(Mockito.any(String.class))).thenReturn(DESERIALIZED_DO_ENTITY_VALUE_RAW);
     when(m_dataObjectMapperMock.writeValue(Mockito.any(Object.class))).thenReturn(SERIALIZED_DO_ENTITY_VALUE);
     m_dataObjectMapperMockRegistration = Platform.get().getBeanManager().registerBean(new BeanMetaData(IDataObjectMapper.class, m_dataObjectMapperMock).withApplicationScoped(true));
 
@@ -162,7 +158,14 @@ public class DataObjectHelperTest {
   public void testClone() {
     assertNull(m_helper.clone(null));
     DoEntity clone = m_helper.clone(BEANS.get(DoEntity.class));
-    assertEquals(DESERIALIZED_DO_ENTITY_VALUE, clone);
+    assertSame(DESERIALIZED_DO_ENTITY_VALUE, clone);
+  }
+
+  @Test
+  public void testCloneRaw() {
+    assertNull(m_helper.cloneRaw(null));
+    IDoEntity clone = m_helper.cloneRaw(BEANS.get(DoEntity.class));
+    assertSame(DESERIALIZED_DO_ENTITY_VALUE_RAW, clone);
   }
 
   @Test
