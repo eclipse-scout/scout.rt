@@ -231,7 +231,7 @@ export default class Outline extends Tree {
       if (!this.$title) {
         this.$title = this.$container.prependDiv('outline-title')
           .on('mousedown', this._onTitleMouseDown.bind(this))
-          .toggleClass('touch', Device.get().supportsTouch());
+          .toggleClass('touch', Device.get().supportsOnlyTouch());
         this.$titleText = this.$title.prependDiv('outline-title-text');
       }
       this.$titleText.text(this.title);

@@ -27,7 +27,7 @@ scout.selenium = {
   },
 
   setSupportsTouch: function(touch) {
-    scout.Device.get().features['_touch'] = touch;
+    scout.Device.get().features['_onlyTouch'] = touch;
     // Also load FastClick because without it, we would not test the real thing
     // However: once FastClick is loaded, we cannot unload it. This means you
     // should not switch touch mode in the middle of a selenium test.

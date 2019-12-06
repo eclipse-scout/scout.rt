@@ -164,7 +164,7 @@ export default class Tab extends Widget {
   }
 
   _renderTabbable() {
-    this.$container.setTabbable(this.tabbable && !Device.get().supportsTouch());
+    this.$container.setTabbable(this.tabbable && !Device.get().supportsOnlyTouch());
   }
 
   select() {
@@ -177,7 +177,7 @@ export default class Tab extends Widget {
 
   _renderSelected() {
     this.$container.select(this.selected);
-    this.$container.setTabbable(this.selected && !Device.get().supportsTouch());
+    this.$container.setTabbable(this.selected && !Device.get().supportsOnlyTouch());
   }
 
   setMarked(marked) {

@@ -24,7 +24,7 @@ export default class GlassPane extends Widget {
 
     // This is required in touch mode, because FastClick messes up the order
     // of mouse/click events which is especially important for TouchPopups.
-    if (Device.get().supportsTouch()) {
+    if (Device.get().supportsOnlyTouch()) {
       this.$container.addClass('needsclick');
     }
 

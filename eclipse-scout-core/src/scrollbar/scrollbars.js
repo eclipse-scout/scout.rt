@@ -70,7 +70,11 @@ export function install($container, options) {
 
   // Don't use native as variable name because it will break minifying (reserved keyword)
   var nativeScrollbars = scout.nvl(options.nativeScrollbars, Device.get().hasPrettyScrollbars());
-  var hybridScrollbars = scout.nvl(options.hybridScrollbars, Device.get().canHideScrollbars());
+  var hybridScrollbars = scout.nvl(options.hybridScrollbars,
+    Device.get().canHideScrollbars() &&
+    // Don't use native scrolling for ie since it makes the content flicker, unless used on a device supporting touch.
+    !(Device.get().isInternetExplorer() && !Device.get().supportsTouch())
+  );
   if (nativeScrollbars) {
     _installNative($container, options);
   } else if (hybridScrollbars) {

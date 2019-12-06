@@ -25,9 +25,9 @@ export default class FocusManager {
   constructor(options) {
     var defaults = {
       // Auto focusing of elements is bad with on screen keyboards -> deactivate to prevent unwanted popping up of the keyboard
-      active: !Device.get().supportsTouch(),
+      active: !Device.get().supportsOnlyTouch(),
       // Preventing blur is bad on touch devices because every touch on a non input field is supposed to close the keyboard which does not happen if preventDefault is used on mouse down
-      restrictedFocusGain: !Device.get().supportsTouch()
+      restrictedFocusGain: !Device.get().supportsOnlyTouch()
     };
     $.extend(this, defaults, options);
 

@@ -65,7 +65,7 @@ export default class BoxButtons {
       $button.addClass('needsclick');
     }
 
-    if (!Device.get().supportsTouch()) {
+    if (!Device.get().supportsOnlyTouch()) {
       $button.attr('tabindex', opts.tabIndex || '0');
     }
 

@@ -205,7 +205,7 @@ export default class Action extends Widget {
   }
 
   _renderTabbable() {
-    this.$container.setTabbable(this.tabbable && this.enabledComputed && !Device.get().supportsTouch());
+    this.$container.setTabbable(this.tabbable && this.enabledComputed && !Device.get().supportsOnlyTouch());
   }
 
   _renderCompact() {

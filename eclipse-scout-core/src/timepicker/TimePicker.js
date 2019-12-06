@@ -24,7 +24,7 @@ export default class TimePicker extends Widget {
     this.resolution = null;
     this.$scrollable = null;
 
-    this.touch = Device.get().supportsTouch();
+    this.touch = Device.get().supportsOnlyTouch();
   }
 
   _init(options) {

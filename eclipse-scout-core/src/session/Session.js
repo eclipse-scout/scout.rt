@@ -49,7 +49,7 @@ export default class Session {
     this.url = new URL();
     this.userAgent = new UserAgent({
       deviceType: Device.get().type,
-      touch: Device.get().supportsTouch(),
+      touch: Device.get().supportsOnlyTouch(),
       standalone: Device.get().isStandalone()
     });
     this.locale = null;

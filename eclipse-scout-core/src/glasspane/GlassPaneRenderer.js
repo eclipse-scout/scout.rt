@@ -68,7 +68,7 @@ export default class GlassPaneRenderer {
 
     // This is required in touch mode, because FastClick messes up the order
     // of mouse/click events which is especially important for TouchPopups.
-    if (Device.get().supportsTouch()) {
+    if (Device.get().supportsOnlyTouch()) {
       $glassPane.addClass('needsclick');
     }
 

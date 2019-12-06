@@ -98,7 +98,7 @@ export default class RadioButton extends Button {
 
   setTabbable(tabbable) {
     if (this.rendered) {
-      this.$field.setTabbable(tabbable && !Device.get().supportsTouch());
+      this.$field.setTabbable(tabbable && !Device.get().supportsOnlyTouch());
     }
   }
 

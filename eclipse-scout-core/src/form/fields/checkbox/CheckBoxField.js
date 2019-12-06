@@ -111,7 +111,7 @@ export default class CheckBoxField extends ValueField {
   _renderEnabled() {
     super._renderEnabled();
     this.$checkBox
-      .setTabbable(this.enabledComputed && !Device.get().supportsTouch())
+      .setTabbable(this.enabledComputed && !Device.get().supportsOnlyTouch())
       .setEnabled(this.enabledComputed);
   }
 

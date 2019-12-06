@@ -38,7 +38,7 @@ export function appendIcon($field, cssClass) {
 export function initTouch(field, model) {
   field.embedded = scout.nvl(model.embedded, false);
   // when 'touchMode' is not set explicitly, check the device
-  field.touchMode = scout.nvl(model.touchMode, Device.get().supportsTouch());
+  field.touchMode = scout.nvl(model.touchMode, Device.get().supportsOnlyTouch());
 }
 
 /**

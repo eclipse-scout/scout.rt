@@ -30,7 +30,7 @@ export default class DatePicker extends Widget {
     // Only the this.currentMonth is visible, the others are needed for the swipe animation.
     // The month is an object with the properties viewDate, rendered and $container
     this.months = [];
-    this.touch = Device.get().supportsTouch();
+    this.touch = Device.get().supportsOnlyTouch();
   }
 
   _init(options) {

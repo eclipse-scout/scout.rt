@@ -129,7 +129,7 @@ export default class Button extends FormField {
         .addClass('button');
       this.$buttonLabel = $button.appendSpan('button-label');
 
-      if (Device.get().supportsTouch()) {
+      if (Device.get().supportsOnlyTouch()) {
         $button.setTabbable(false);
       }
     }
@@ -261,7 +261,7 @@ export default class Button extends FormField {
     super._renderEnabled();
     if (this.displayStyle === Button.DisplayStyle.LINK) {
       this.$link.setEnabled(this.enabledComputed);
-      this.$field.setTabbable(this.enabledComputed && !Device.get().supportsTouch());
+      this.$field.setTabbable(this.enabledComputed && !Device.get().supportsOnlyTouch());
     }
   }
 

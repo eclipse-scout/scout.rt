@@ -961,7 +961,7 @@ export default class SmartField extends ValueField {
     }
     // Don't focus on desktop devices when click is on field #217192
     // Also required for touch case where field is a DIV and not an INPUT field
-    if (!onField || Device.get().supportsTouch()) {
+    if (!onField || Device.get().supportsOnlyTouch()) {
       this.$field.focus();
     }
     this.togglePopup();
