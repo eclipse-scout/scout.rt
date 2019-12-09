@@ -371,7 +371,12 @@ public class Configuration {
   }
 
   protected Path getConfiguredTargetBase() {
-    return CONFIG.getPropertyValue(TargetBaseProperty.class);
+    Path targetBase = CONFIG.getPropertyValue(TargetBaseProperty.class);
+    // use source base as default
+    if (targetBase == null) {
+      targetBase = getConfiguredSourceBase();
+    }
+    return targetBase;
   }
 
   protected String getConfiguredModule() {
