@@ -22,7 +22,7 @@ export default class PageTileButton extends TileButton {
 
     this.label = this.page.text;
     this.iconId = this.page.overviewIconId;
-    this.htmlEnabled = this.page.htmlEnabled;
+    this.labelHtmlEnabled = this.page.htmlEnabled;
 
     this.on('click', function(event) {
       this.outline.selectNode(this.page);
@@ -32,6 +32,6 @@ export default class PageTileButton extends TileButton {
   notifyPageChanged() {
     this.setLabel(this.page.text);
     this.setIconId(this.page.overviewIconId);
-    this.setHtmlEnabled(this.page.htmlEnabled);
+    this.setLabelHtmlEnabled(this.page.htmlEnabled);
   }
 }
