@@ -23,6 +23,7 @@
       "labelVisible": true,
       "labelPosition": 0,
       "labelWidthInPixel": 0,
+      "labelHtmlEnabled": false,
       "mandatory": false,
       "statusVisible": true,
       "statusPosition": "default",
@@ -85,8 +86,7 @@
       "statusVisible": false,
       "preventDoubleClick": false,
       "stackable": true,
-      "shrinkable": false,
-      "htmlEnabled": false
+      "shrinkable": false
     },
     "RadioButtonGroup": {
       "clearable": "never",
@@ -229,7 +229,6 @@
       "timePickerResolution": 30
     },
     "FileChooserButton": {
-      "htmlEnabled": false
     },
     "Table": {
       "autoResizeColumns": false,

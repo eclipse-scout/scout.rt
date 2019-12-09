@@ -185,7 +185,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    * Subclasses can override this method. Default is {@code null}.
    *
    * @return the ID (name) of the icon
-   * @see IIconGroup
    * @see IIconProviderService
    */
   @ConfigProperty(ConfigProperty.ICON_ID)
@@ -282,7 +281,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     setPreventDoubleClick(getConfiguredPreventDoubleClick());
     setStackable(getConfiguredStackable());
     setShrinkable(getConfiguredShrinkable());
-    setHtmlEnabled(getConfiguredHtmlEnabled());
 
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
@@ -509,20 +507,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   public void setView(boolean visible, boolean enabled) {
     setVisible(visible);
     setEnabled(enabled);
-  }
-
-  protected boolean getConfiguredHtmlEnabled() {
-    return false;
-  }
-
-  @Override
-  public void setHtmlEnabled(boolean enabled) {
-    propertySupport.setProperty(PROP_HTML_ENABLED, enabled);
-  }
-
-  @Override
-  public boolean isHtmlEnabled() {
-    return propertySupport.getPropertyBool(PROP_HTML_ENABLED);
   }
 
   /**

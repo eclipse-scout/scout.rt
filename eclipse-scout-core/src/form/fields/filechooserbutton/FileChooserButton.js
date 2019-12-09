@@ -29,7 +29,7 @@ export default class FileChooserButton extends ValueField {
       parent: this,
       label: this._buttonLabel(),
       iconId: this.iconId,
-      htmlEnabled: this.htmlEnabled
+      labelHtmlEnabled: this.labelHtmlEnabled
     });
     this.button.on('click', this._onButtonClick.bind(this));
 

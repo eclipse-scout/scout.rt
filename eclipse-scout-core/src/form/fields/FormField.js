@@ -51,6 +51,7 @@ export default class FormField extends Widget {
     this.labelVisible = true;
     this.labelPosition = FormField.LabelPosition.DEFAULT;
     this.labelWidthInPixel = 0;
+    this.labelHtmlEnabled = false;
     this.mandatory = false;
     this.statusMenuMappings = [];
     this.menus = [];
@@ -387,9 +388,10 @@ export default class FormField extends Widget {
       }
     } else if (this.$label) {
       this._removePlaceholder();
-      // Make sure an empty label is as height as the other labels, especially important for top labels
-      this.$label.textOrNbsp(label, 'empty');
-      this.$label.toggleClass('top', this.labelPosition === FormField.LabelPosition.TOP);
+      // Make sure an empty label has the same height as the other labels, especially important for top labels
+      this.$label
+        .contentOrNbsp(this.labelHtmlEnabled, label, 'empty')
+        .toggleClass('top', this.labelPosition === FormField.LabelPosition.TOP);
 
       // Invalidate layout if label width depends on its content
       if (this.labelUseUiWidth || this.labelWidthInPixel === FormField.LabelWidth.UI) {
@@ -561,6 +563,15 @@ export default class FormField extends Widget {
       }
       this.invalidateLayoutTree();
     }
+  }
+
+  setLabelHtmlEnabled(labelHtmlEnabled) {
+    this.setProperty('labelHtmlEnabled', labelHtmlEnabled);
+  }
+
+  _renderLabelHtmlEnabled() {
+    // Render the label again when html enabled changes dynamically
+    this._renderLabel();
   }
 
   /**

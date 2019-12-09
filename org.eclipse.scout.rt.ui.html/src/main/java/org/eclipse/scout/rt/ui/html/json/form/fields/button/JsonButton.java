@@ -127,12 +127,6 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
         return getModel().isShrinkable();
       }
     });
-    putJsonProperty(new JsonProperty<IButton>(IButton.PROP_HTML_ENABLED, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isHtmlEnabled();
-      }
-    });
   }
 
   @Override

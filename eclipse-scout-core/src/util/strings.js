@@ -450,7 +450,7 @@ export default {
   nvl,
   padZeroLeft,
   plainText,
-  plainTextElement,
+  plainTextElement, // FIXME [awe] 16.2: check why this variable is exported & usage in strings.js
   quote,
   removePrefix,
   removeSuffix,

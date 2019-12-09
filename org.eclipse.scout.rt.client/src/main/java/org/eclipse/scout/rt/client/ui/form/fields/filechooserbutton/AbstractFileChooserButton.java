@@ -79,7 +79,6 @@ public abstract class AbstractFileChooserButton extends AbstractValueField<Binar
     setFileExtensions(getConfiguredFileExtensions());
     setMaximumUploadSize(getConfiguredMaximumUploadSize());
     setIconId(getConfiguredIconId());
-    setHtmlEnabled(getConfiguredHtmlEnabled());
   }
 
   @Override
@@ -129,20 +128,6 @@ public abstract class AbstractFileChooserButton extends AbstractValueField<Binar
       return value.getContentLength();
     }
     return 0;
-  }
-
-  protected boolean getConfiguredHtmlEnabled() {
-    return false;
-  }
-
-  @Override
-  public void setHtmlEnabled(boolean enabled) {
-    propertySupport.setProperty(PROP_HTML_ENABLED, enabled);
-  }
-
-  @Override
-  public boolean isHtmlEnabled() {
-    return propertySupport.getPropertyBool(PROP_HTML_ENABLED);
   }
 
   protected static class LocalFileChooserButtonExtension<OWNER extends AbstractFileChooserButton> extends LocalValueFieldExtension<BinaryResource, OWNER> implements IFileChooserButtonExtension<OWNER> {

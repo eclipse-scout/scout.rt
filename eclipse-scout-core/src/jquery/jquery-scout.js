@@ -1543,26 +1543,28 @@ export default class JQueryUtils extends $ {
    * If an 'emptyCssClass' is provided, this CSS class is removed in the former and added in the later case.
    */
   static textOrNbsp(text, emptyCssClass) {
-    if (strings.hasText(text)) {
-      this.text(text);
-      if (emptyCssClass) {
-        this.removeClass(emptyCssClass);
-      }
-    } else {
-      this.html('&nbsp;');
-      if (emptyCssClass) {
-        this.addClass(emptyCssClass);
-      }
-    }
-    return this;
+    return JQueryUtils.contentOrNbsp.call(this, false, text, emptyCssClass);
   }
 
   /**
    * Same as "textOrNbsp", but with html (caller is responsible for encoding).
    */
   static htmlOrNbsp(html, emptyCssClass) {
-    if (strings.hasText(html)) {
-      this.html(html);
+    return JQueryUtils.contentOrNbsp.call(this, true, html, emptyCssClass);
+  }
+
+  /**
+   * Renders the given content as plain-text or HTML depending on the given htmlEnabled flag.
+   *
+   * @param {boolean} htmlEnabled
+   * @param {string} content
+   * @param {string} emptyCssClass
+   * @returns {JQueryUtils}
+   */
+  static contentOrNbsp(htmlEnabled, content, emptyCssClass) {
+    var func = htmlEnabled ? this.html : this.text;
+    if (strings.hasText(content)) {
+      func.call(this, content);
       if (emptyCssClass) {
         this.removeClass(emptyCssClass);
       }
@@ -1999,6 +2001,7 @@ $.extend($.fn, {
   outerHeight: JQueryUtils.outerHeight,
   textOrNbsp: JQueryUtils.textOrNbsp,
   htmlOrNbsp: JQueryUtils.htmlOrNbsp,
+  contentOrNbsp: JQueryUtils.contentOrNbsp,
   toggleAttr: JQueryUtils.toggleAttr,
   backupSelection: JQueryUtils.backupSelection,
   restoreSelection: JQueryUtils.restoreSelection,

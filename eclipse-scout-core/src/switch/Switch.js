@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Event, Widget} from '../index';
+import tooltips from '../tooltip/tooltips';
+import strings from '../util/strings';
 
 export default class Switch extends Widget {
 
@@ -21,6 +23,12 @@ export default class Switch extends Widget {
 
     this.$label = null;
     this.$button = null;
+    this.tooltipText = null;
+  }
+
+  _init(model) {
+    super._init(model);
+    this.setTooltipText(model.tooltipText);
   }
 
   _render() {
@@ -34,6 +42,7 @@ export default class Switch extends Widget {
     super._renderProperties();
     this._renderActivated();
     this._renderLabel();
+    this._renderTooltipText();
   }
 
   _onSwitchButtonClick() {
@@ -62,5 +71,20 @@ export default class Switch extends Widget {
 
   _renderActivated() {
     this.$button.toggleClass('activated', this.activated);
+  }
+
+  setTooltipText(tooltipText) {
+    this.setProperty('tooltipText', tooltipText);
+  }
+
+  _renderTooltipText() {
+    if (strings.hasText(this.tooltipText)) {
+      tooltips.install(this.$container, {
+        parent: this,
+        text: this.tooltipText
+      });
+    } else {
+      tooltips.uninstall(this.$container);
+    }
   }
 }

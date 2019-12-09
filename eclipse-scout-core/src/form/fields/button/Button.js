@@ -18,7 +18,6 @@ export default class Button extends FormField {
     this.defaultButton = false;
     this.displayStyle = Button.DisplayStyle.DEFAULT;
     this.gridDataHints.fillHorizontal = false;
-    this.htmlEnabled = false;
     this.iconId = null;
     this.keyStroke = null;
     this.processButton = true;
@@ -276,24 +275,11 @@ export default class Button extends FormField {
     }
   }
 
-  setHtmlEnabled(htmlEnabled) {
-    this.setProperty('htmlEnabled', htmlEnabled);
-  }
-
-  _renderHtmlEnabled() {
-    // Render the label again when html enabled changes dynamically
-    this._renderLabel();
-  }
-
   /**
    * @override
    */
   _renderLabel() {
-    if (this.htmlEnabled) {
-      this.$buttonLabel.html(this.label || '');
-    } else {
-      this.$buttonLabel.textOrNbsp(this.label, 'empty');
-    }
+    this.$buttonLabel.contentOrNbsp(this.labelHtmlEnabled, this.label, 'empty');
     this._updateLabelAndIconStyle();
 
     // Invalidate layout because button may now be longer or shorter

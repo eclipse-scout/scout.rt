@@ -56,12 +56,6 @@ public class JsonFileChooserButton<M extends IFileChooserButton> extends JsonVal
         return getModel().getIconId();
       }
     });
-    putJsonProperty(new JsonProperty<M>(IFileChooserButton.PROP_HTML_ENABLED, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isHtmlEnabled();
-      }
-    });
     putJsonProperty(new JsonProperty<M>(IFileChooserButton.PROP_FILE_EXTENSIONS, model) {
       @Override
       protected List<String> modelValue() {

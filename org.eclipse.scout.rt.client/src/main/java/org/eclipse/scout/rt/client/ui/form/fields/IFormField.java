@@ -85,6 +85,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
   String PROP_LABEL_POSITION = "labelPosition";
   String PROP_LABEL_VISIBLE = "labelVisible";
   String PROP_LABEL_WIDTH_IN_PIXEL = "labelWidthInPixel";
+  String PROP_LABEL_HTML_ENABLED = "labelHtmlEnabled";
   String PROP_KEY_STROKES = "keyStrokes";
   String PROP_STATUS_VISIBLE = "statusVisible";
   String PROP_STATUS_POSITION = "statusPosition";
@@ -337,6 +338,19 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    *          one of the LABEL_POSITION_* constants or a custom constants interpreted by the ui
    */
   void setLabelPosition(byte pos);
+
+  /**
+   * Sets whether the form-field label is HTML enabled (true) or plain-text (false). When label position
+   * is <code>LABEL_POSITION_ON_FIELD</code> this property has no effect, since we can only render plain text.
+   *
+   * @param labelHtmlEnabled
+   */
+  void setLabelHtmlEnabled(boolean labelHtmlEnabled);
+
+  /**
+   * @return whether the form-field label is HTML enabled (true) or plain-text (false)
+   */
+  boolean isLabelHtmlEnabled();
 
   /**
    * @since 19.11.2009
@@ -628,7 +642,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * @param visible
    *          The new visible value.
    */
-  void setVisible(boolean b);
+  void setVisible(boolean visible);
 
   /**
    * Changes the visible property of this {@link IFormField} to the given value.
@@ -678,10 +692,10 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
   /**
    * Changes the visible-granted property of this {@link IFormField} to the given value.
    *
-   * @param visible
+   * @param visibleGranted
    *          The new visible-granted value.
    */
-  void setVisibleGranted(boolean b);
+  void setVisibleGranted(boolean visibleGranted);
 
   /**
    * Changes the visible-granted property of this {@link IFormField} to the given value.

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 import java.util.Collection;
 import java.util.Set;
 
-import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -28,7 +27,7 @@ import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
  * Process buttons are normally placed on dialogs button bar on the lower dialog bar
  * </ol>
  */
-public interface IButton extends IFormField, IHtmlCapable, IContextMenuOwner {
+public interface IButton extends IFormField, IContextMenuOwner {
   /*
    * Properties
    */

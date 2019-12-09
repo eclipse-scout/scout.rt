@@ -249,6 +249,12 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     return true;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(25)
+  protected boolean getConfiguredLabelHtmlEnabled() {
+    return false;
+  }
+
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(32)
   protected String getConfiguredFieldStyle() {
@@ -844,6 +850,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     setLabelWidthInPixel(getConfiguredLabelWidthInPixel());
     setLabelHorizontalAlignment(getConfiguredLabelHorizontalAlignment());
     setLabelVisible(getConfiguredLabelVisible());
+    setLabelHtmlEnabled(getConfiguredLabelHtmlEnabled());
     setStatusVisible(getConfiguredStatusVisible());
     setStatusPosition(getConfiguredStatusPosition());
     setCssClass((getConfiguredCssClass()));
@@ -1384,6 +1391,16 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    */
   protected void calculateLabelVisibleInternal() {
     propertySupport.setPropertyBool(PROP_LABEL_VISIBLE, NamedBitMaskHelper.allBitsSet(m_labelVisible));
+  }
+
+  @Override
+  public void setLabelHtmlEnabled(boolean labelHtmlEnabled) {
+    propertySupport.setProperty(PROP_LABEL_HTML_ENABLED, labelHtmlEnabled);
+  }
+
+  @Override
+  public boolean isLabelHtmlEnabled() {
+    return propertySupport.getPropertyBool(PROP_LABEL_HTML_ENABLED);
   }
 
   private void setEnabledSlave(boolean enabled) {
