@@ -12,12 +12,14 @@ package org.eclipse.scout.rt.client.ui.form.fields.groupbox;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox.IGroupBoxExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
@@ -163,6 +165,21 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Order(232)
   protected boolean getConfiguredExpanded() {
     return true;
+  }
+
+  /**
+   * Configures whether the expanded state of the group box should be cached. <br>
+   * This property only has an effect if the group box is expandable which can be configured by
+   * {@link #getConfiguredExpandable()}.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   *
+   * @return {@code true} if the expanded state of the group box should be cached, {@code false} otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(232)
+  protected boolean getConfiguredCacheExpanded() {
+    return false;
   }
 
   /**
@@ -331,6 +348,11 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   }
 
   @Override
+  public String getPreferenceBaseKey() {
+    return getClass().getName();
+  }
+
+  @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     Class<? extends IGroupBoxBodyGrid> bodyGridClazz = getConfiguredBodyGrid();
@@ -352,6 +374,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     setSubLabel(getConfiguredSubLabel());
     setExpandable(getConfiguredExpandable());
     setExpanded(getConfiguredExpanded());
+    setCacheExpanded(getConfiguredCacheExpanded());
     setBorderVisible(getConfiguredBorderVisible());
     setBorderDecoration(getConfiguredBorderDecoration());
     setGridColumnCount(getConfiguredGridColumnCount());
@@ -365,6 +388,10 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     setMenuBarEllipsisPosition(getConfiguredMenuBarEllipsisPosition());
     setResponsive(getConfiguredResponsive());
     initMenus();
+
+    if (isCacheExpanded()) {
+      Optional.ofNullable(ClientUIPreferences.getInstance().isFieldCollapsed(this)).ifPresent(b -> setExpanded(!b));
+    }
   }
 
   private void initMenus() {
@@ -378,6 +405,14 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     injectMenusInternal(menus);
     new MoveActionNodesHandler<>(menus).moveModelObjects();
     setContextMenu(new FormFieldContextMenu<IGroupBox>(this, menus.getOrderedList()));
+  }
+
+  @Override
+  protected void disposeFieldInternal() {
+    super.disposeFieldInternal();
+    if (isCacheExpanded()) {
+      ClientUIPreferences.getInstance().setFieldCollapsed(this, !isExpanded());
+    }
   }
 
   private void categorizeFields() {
@@ -663,6 +698,16 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public void setExpanded(boolean b) {
     propertySupport.setPropertyBool(PROP_EXPANDED, b);
+  }
+
+  @Override
+  public boolean isCacheExpanded() {
+    return propertySupport.getPropertyBool(PROP_CACHE_EXPANDED);
+  }
+
+  @Override
+  public void setCacheExpanded(boolean b) {
+    propertySupport.setPropertyBool(PROP_CACHE_EXPANDED, b);
   }
 
   @Override

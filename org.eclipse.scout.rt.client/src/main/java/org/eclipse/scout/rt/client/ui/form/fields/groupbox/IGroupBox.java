@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.groupbox;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.IPreferenceField;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
@@ -22,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.notification.INotification;
 import org.eclipse.scout.rt.platform.util.TriState;
 
-public interface IGroupBox extends ICompositeField, IContextMenuOwner {
+public interface IGroupBox extends ICompositeField, IContextMenuOwner, IPreferenceField {
 
   /**
    * {@link String}
@@ -41,6 +42,10 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
    * {@link Boolean}
    */
   String PROP_EXPANDED = "expanded";
+  /**
+   * {@link Boolean}
+   */
+  String PROP_CACHE_EXPANDED = "cacheExpanded";
   /**
    * {@link String}
    */
@@ -261,6 +266,13 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
   boolean isExpanded();
 
   void setExpanded(boolean b);
+
+  /**
+   * @return true if the expanded state of the group box is cached
+   */
+  boolean isCacheExpanded();
+
+  void setCacheExpanded(boolean b);
 
   INotification getNotification();
 
