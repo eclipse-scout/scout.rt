@@ -58,6 +58,10 @@ export default class Popup extends Widget {
     this.horizontalAlignment = Popup.Alignment.LEFTEDGE;
     this.verticalAlignment = Popup.Alignment.BOTTOM;
 
+    // Gives the current alignment after applying horizontal and vertical switch options
+    this.calculatedHorizontalAlignment = this.horizontalAlignment;
+    this.calculatedVerticalAlignment = this.verticalAlignment;
+
     // If switch is enabled, the alignment will be changed if the popup overlaps a window border.
     this.horizontalSwitch = false;
     this.verticalSwitch = true;
@@ -93,6 +97,7 @@ export default class Popup extends Widget {
     this._openLater = false;
 
     this.$arrow = null;
+    this.$arrowOverlay = null;
     this._windowResizeHandler = this._onWindowResize.bind(this);
     this._anchorRenderHandler = this._onAnchorRender.bind(this);
     this._addWidgetProperties(['anchor']);
@@ -322,10 +327,16 @@ export default class Popup extends Widget {
       this.$arrow.remove();
       this.$arrow = null;
     }
+    if (this.$arrowOverlay) {
+      this.$arrowOverlay.remove();
+      this.$arrowOverlay = null;
+    }
     if (this.withArrow) {
+      this.$arrowOverlay = this.$container.prependDiv('popup-arrow-overlay');
       this.$arrow = this.$container.prependDiv('popup-arrow');
       this._updateArrowClass();
     }
+    this.$container.toggleClass('with-arrow', this.withArrow);
     this.invalidateLayoutTree();
   }
 
@@ -749,13 +760,13 @@ export default class Popup extends Widget {
   }
 
   adjustLocation(location, switchIfNecessary) {
-    var verticalAlignment = this.verticalAlignment,
-      horizontalAlignment = this.horizontalAlignment,
-      overlap = this.overlap(location);
+    this.calculatedVerticalAlignment = this.verticalAlignment;
+    this.calculatedHorizontalAlignment = this.horizontalAlignment;
+    var overlap = this.overlap(location);
 
     // Reset arrow style
     if (this.$arrow) {
-      this._updateArrowClass(verticalAlignment, horizontalAlignment);
+      this._updateArrowClass(this.calculatedVerticalAlignment, this.calculatedHorizontalAlignment);
       graphics.setMargins(this.$arrow, new Insets());
     }
 
@@ -764,8 +775,8 @@ export default class Popup extends Widget {
       var verticalSwitch = scout.nvl(switchIfNecessary, this.verticalSwitch);
       if (verticalSwitch) {
         // Switch vertical alignment
-        verticalAlignment = Popup.SwitchRule[verticalAlignment];
-        location = this.prefLocation(verticalAlignment);
+        this.calculatedVerticalAlignment = Popup.SwitchRule[this.calculatedVerticalAlignment];
+        location = this.prefLocation(this.calculatedVerticalAlignment);
       } else {
         // Move popup to the top until it gets fully visible (if switch is disabled)
         location.y -= overlap.y;
@@ -785,8 +796,8 @@ export default class Popup extends Widget {
       var horizontalSwitch = scout.nvl(switchIfNecessary, this.horizontalSwitch);
       if (horizontalSwitch) {
         // Switch horizontal alignment
-        horizontalAlignment = Popup.SwitchRule[horizontalAlignment];
-        location = this.prefLocation(verticalAlignment, horizontalAlignment);
+        this.calculatedHorizontalAlignment = Popup.SwitchRule[this.calculatedHorizontalAlignment];
+        location = this.prefLocation(this.calculatedVerticalAlignment, this.calculatedHorizontalAlignment);
       } else {
         // Move popup to the left until it gets fully visible (if switch is disabled)
         location.x -= overlap.x;

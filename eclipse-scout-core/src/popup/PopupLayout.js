@@ -30,7 +30,7 @@ export default class PopupLayout extends AbstractLayout {
     }
     if (!this.autoSize) {
       // Just layout the popup with the current size
-      this._setSize(this.popup.htmlComp.size());
+      this._setSize(this.popup.htmlComp.size({exact: true}));
       return;
     }
 

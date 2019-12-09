@@ -8,21 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics, Rectangle, scout} from '../index';
+import {graphics, Insets, Rectangle, scout} from '../index';
 import * as $ from 'jquery';
+import arrays from '../util/arrays';
 
 /**
- * Resizable makes a DOM element resizable by adding resize handlers to all edges of the given $container. This is primarily used for (modal) dialogs.
+ * Resizable makes a DOM element resizable by adding resize handlers to all edges of the given model.$container. This is primarily used for (modal) dialogs.
  */
 export default class Resizable {
 
-  constructor($container) {
-    scout.assertParameter('$container', $container);
-    this.$container = $container;
-    this.$window = $container.window();
+  constructor(model) {
+    scout.assertParameter('model', model);
+    scout.assertParameter('$container', model.$container);
+    this.$container = model.$container;
+    this.$window = model.$container.window();
+    this.setModes(model.modes);
+    this.setBoundaries(model.boundaries);
     this.$resizableS = null;
     this.$resizableE = null;
     this.$resizableSE = null;
+    this.$resizableW = null;
+    this.$resizableSW = null;
+    this.$resizableN = null;
+    this.$resizableNW = null;
+    this.$resizableNE = null;
     this._context = null;
 
     this._mouseDownHandler = this._onMouseDown.bind(this);
@@ -31,11 +40,43 @@ export default class Resizable {
     this._resizeHandler = this._resize.bind(this);
   }
 
+  static MODES = {
+    SOUTH: 's',
+    EAST: 'e',
+    WEST: 'w',
+    NORTH: 'n'
+  };
+
   /**
    * 15 fps seems to be a good value for slower browsers like firefox,
    * where it takes longer to render.
    */
   static FPS = 1000 / 15;
+
+  setModes(modes) {
+    var ensuredModes = modes || [Resizable.MODES.SOUTH, Resizable.MODES.EAST, Resizable.MODES.WEST, Resizable.MODES.NORTH];
+    if (arrays.equals(ensuredModes, this.modes)) {
+      return;
+    }
+    this.modes = ensuredModes;
+    this._calculateResizeHandlersVisibility();
+  }
+
+  setBoundaries(boundaries) {
+    this.boundaries = $.extend(new Insets(), boundaries);
+    if (this._boundaryValueSet(this.boundaries.left)) {
+      this.boundaries.left -= this.$container.cssMarginLeft();
+    }
+    if (this._boundaryValueSet(this.boundaries.right)) {
+      this.boundaries.right -= this.$container.cssMarginRight();
+    }
+    if (this._boundaryValueSet(this.boundaries.top)) {
+      this.boundaries.top -= this.$container.cssMarginTop();
+    }
+    if (this._boundaryValueSet(this.boundaries.bottom)) {
+      this.boundaries.bottom -= this.$container.cssMarginBottom();
+    }
+  }
 
   _appendResizeHandles() {
     this.$resizableS = this.$container.appendDiv('resizable-handle resizable-s')
@@ -59,9 +100,41 @@ export default class Resizable {
     this.$resizableNW = this.$container.appendDiv('resizable-handle resizable-nw')
       .data('edge', 'nw')
       .on('mousedown.resizable', this._mouseDownHandler);
-    this.$resizableN = this.$container.appendDiv('resizable-handle resizable-ne')
+    this.$resizableNE = this.$container.appendDiv('resizable-handle resizable-ne')
       .data('edge', 'ne')
       .on('mousedown.resizable', this._mouseDownHandler);
+    this._calculateResizeHandlersVisibility();
+  }
+
+  _calculateResizeHandlersVisibility() {
+    if (this.$resizableS) {
+      this.$resizableS.setVisible(this._hasMode(Resizable.MODES.SOUTH));
+    }
+    if (this.$resizableE) {
+      this.$resizableE.setVisible(this._hasMode(Resizable.MODES.EAST));
+    }
+    if (this.$resizableSE) {
+      this.$resizableSE.setVisible(this._hasMode(Resizable.MODES.SOUTH) && this._hasMode(Resizable.MODES.EAST));
+    }
+    if (this.$resizableW) {
+      this.$resizableW.setVisible(this._hasMode(Resizable.MODES.WEST));
+    }
+    if (this.$resizableSW) {
+      this.$resizableSW.setVisible(this._hasMode(Resizable.MODES.SOUTH) && this._hasMode(Resizable.MODES.WEST));
+    }
+    if (this.$resizableN) {
+      this.$resizableN.setVisible(this._hasMode(Resizable.MODES.NORTH));
+    }
+    if (this.$resizableNW) {
+      this.$resizableNW.setVisible(this._hasMode(Resizable.MODES.NORTH) && this._hasMode(Resizable.MODES.WEST));
+    }
+    if (this.$resizableNE) {
+      this.$resizableNE.setVisible(this._hasMode(Resizable.MODES.NORTH) && this._hasMode(Resizable.MODES.EAST));
+    }
+  }
+
+  _hasMode(mode) {
+    return this.modes.some(m => m === mode);
   }
 
   init() {
@@ -87,6 +160,26 @@ export default class Resizable {
       this.$resizableSE.remove();
       this.$resizableSE = null;
     }
+    if (this.$resizableW) {
+      this.$resizableW.remove();
+      this.$resizableW = null;
+    }
+    if (this.$resizableSW) {
+      this.$resizableSW.remove();
+      this.$resizableSW = null;
+    }
+    if (this.$resizableN) {
+      this.$resizableN.remove();
+      this.$resizableN = null;
+    }
+    if (this.$resizableNW) {
+      this.$resizableNW.remove();
+      this.$resizableNW = null;
+    }
+    if (this.$resizableNE) {
+      this.$resizableNE.remove();
+      this.$resizableNE = null;
+    }
     if (this.$container) {
       this.$container.removeClass('resizable');
     }
@@ -99,9 +192,11 @@ export default class Resizable {
     var $resizable = this.$container,
       $myWindow = $resizable.window(),
       $handle = $(event.target),
-      minWidth = $resizable.cssPxValue('min-width'),
-      minHeight = $resizable.cssPxValue('min-height'),
-      initialBounds = graphics.bounds($resizable);
+      minWidth = $resizable.cssMinWidth(),
+      minHeight = $resizable.cssMinHeight(),
+      maxWidth = $resizable.cssMaxWidth(),
+      maxHeight = $resizable.cssMaxHeight(),
+      initialBounds = graphics.bounds($resizable, {exact: true});
 
     this._context = {
       initialBounds: initialBounds,
@@ -112,10 +207,10 @@ export default class Resizable {
         minHeight
       ),
       maxBounds: new Rectangle(
-        -$resizable.cssMarginLeft(),
-        -$resizable.cssMarginTop(),
-        $myWindow.width() - $resizable[0].offsetLeft,
-        $myWindow.height() - $resizable[0].offsetTop
+        Math.max(-$resizable.cssMarginLeft(), initialBounds.right() - maxWidth),
+        Math.max(-$resizable.cssMarginTop(), initialBounds.bottom() - maxHeight),
+        Math.min($myWindow.width() - $resizable[0].offsetLeft, maxWidth),
+        Math.min($myWindow.height() - $resizable[0].offsetTop, maxHeight)
       ),
       distance: [0, 0],
       edge: $handle.data('edge'),
@@ -167,11 +262,33 @@ export default class Resizable {
   }
 
   _resize(newBounds) {
+    this._cropToBoundaries(newBounds);
     graphics.setBounds(this.$container, newBounds);
     this.$container.trigger('resize', {
       newBounds: newBounds,
       initialBounds: this._context.initialBounds
     });
+  }
+
+  _cropToBoundaries(newBounds) {
+    if (this._boundaryValueSet(this.boundaries.left) && newBounds.x > this.boundaries.left) {
+      newBounds.width -= (this.boundaries.left - newBounds.x);
+      newBounds.x = this.boundaries.left;
+    }
+    if (this._boundaryValueSet(this.boundaries.right) && (newBounds.x + newBounds.width) < this.boundaries.right) {
+      newBounds.width = this.boundaries.right - newBounds.x;
+    }
+    if (this._boundaryValueSet(this.boundaries.top) && newBounds.y > this.boundaries.top) {
+      newBounds.height -= (this.boundaries.top - newBounds.y);
+      newBounds.y = this.boundaries.top;
+    }
+    if (this._boundaryValueSet(this.boundaries.bottom) && (newBounds.y + newBounds.height) < this.boundaries.bottom) {
+      newBounds.height = this.boundaries.bottom - newBounds.y;
+    }
+  }
+
+  _boundaryValueSet(value) {
+    return value > 0;
   }
 
   _calcDistance(eventA, eventB) {

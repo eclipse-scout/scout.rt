@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons, Popup, scout, WidgetPopupLayout} from '../index';
+import {icons, Insets, Popup, Resizable, scout, WidgetPopupLayout} from '../index';
 import * as $ from 'jquery';
+import graphics from '../layout/graphics';
 
 export default class WidgetPopup extends Popup {
 
@@ -22,6 +23,8 @@ export default class WidgetPopup extends Popup {
     this.closeAction = null;
     this.movable = false;
     this.resizable = false;
+    this.resizeModes = null;
+    this.minSize = null;
     this.widget = null;
     this.windowPaddingX = 0;
     this.windowPaddingY = 0;
@@ -119,7 +122,7 @@ export default class WidgetPopup extends Popup {
   _renderResizable() {
     if (this.resizable) {
       this.$container
-        .resizable()
+        .resizable({modes: this._determineResizeModes(), $parent: this.$container, boundaries: this._calculateResizeBoundaries()})
         .on('resize', this._resizeHandler);
     } else {
       this.$container
@@ -129,12 +132,107 @@ export default class WidgetPopup extends Popup {
     }
   }
 
+  _calculateResizeBoundaries() {
+    var resizeBoundaries = new Insets();
+    if (!this.$arrow) {
+      return resizeBoundaries;
+    }
+    var anchorMiddle = this._getAnchorMiddlePoint();
+    if (!anchorMiddle) {
+      return resizeBoundaries;
+    }
+    var arrowSize = graphics.size(this.$arrow);
+    if (this._isVerticallyAligned()) {
+      resizeBoundaries.top = anchorMiddle.y - arrowSize.height;
+      resizeBoundaries.bottom = anchorMiddle.y + arrowSize.height;
+    } else {
+      resizeBoundaries.left = anchorMiddle.x - arrowSize.width;
+      resizeBoundaries.right = anchorMiddle.x + arrowSize.width;
+    }
+    return resizeBoundaries;
+  }
+
+  _determineResizeModes() {
+    if (!this.$arrow || this.resizeModes) {
+      return this.resizeModes;
+    }
+    if (this.calculatedVerticalAlignment === Popup.Alignment.TOP) {
+      return [Resizable.MODES.WEST, Resizable.MODES.EAST, Resizable.MODES.NORTH];
+    }
+    if (this.calculatedVerticalAlignment === Popup.Alignment.BOTTOM) {
+      return [Resizable.MODES.WEST, Resizable.MODES.EAST, Resizable.MODES.SOUTH];
+    }
+    if (this.calculatedHorizontalAlignment === Popup.Alignment.LEFT) {
+      return [Resizable.MODES.NORTH, Resizable.MODES.SOUTH, Resizable.MODES.WEST];
+    }
+    if (this.calculatedHorizontalAlignment === Popup.Alignment.RIGHT) {
+      return [Resizable.MODES.NORTH, Resizable.MODES.SOUTH, Resizable.MODES.EAST];
+    }
+    return this.resizeModes;
+  }
+
   _onResize(event) {
     var autoSizeOrig = this.htmlComp.layout.autoSize;
     this.htmlComp.layout.autoSize = false;
     this.htmlComp.revalidateLayout();
     this.htmlComp.layout.autoSize = autoSizeOrig;
+    this._updateArrowPosition();
     return false;
+  }
+
+  /**
+   * @Override
+   */
+  position(switchIfNecessary) {
+    super.position(switchIfNecessary);
+    if (this.resizable) {
+      var resizable = this.$container.data('resizable');
+      resizable.setBoundaries(this._calculateResizeBoundaries());
+      resizable.setModes(this._determineResizeModes());
+      this._updateArrowPosition();
+    }
+  }
+
+  /**
+   * @Override
+   */
+  _updateArrowClass(verticalAlignment, horizontalAlignment) {
+    super._updateArrowClass(verticalAlignment, horizontalAlignment);
+    if (this.$arrow) {
+      // make sure to remove css positioning which could have been applied in _updateArrowPosition()
+      // otherwise the original positioning functions of popup.js may not work correctly anymore
+      this.$arrow.cssLeft(null);
+      this.$arrow.cssTop(null);
+    }
+  }
+
+  _updateArrowPosition() {
+    if (!this.$arrow) {
+      return;
+    }
+    var anchorMiddlePoint = this._getAnchorMiddlePoint();
+    if (!anchorMiddlePoint) {
+      return;
+    }
+    this.$arrow.removeClass('leftedge rightedge topedge bottomedge');
+    var arrowSize = graphics.size(this.$arrow);
+    var arrowMargins = graphics.margins(this.$arrow);
+    if (this._isVerticallyAligned()) {
+      var verticalMarginShift = arrowMargins.top + arrowMargins.bottom;
+      this.$arrow.cssTop(anchorMiddlePoint.y - (verticalMarginShift + this.$container.position().top + (arrowSize.height / 2)));
+    } else {
+      var horizontalMarginShift = arrowMargins.left + arrowMargins.right;
+      this.$arrow.cssLeft(anchorMiddlePoint.x - (horizontalMarginShift + this.$container.position().left + (arrowSize.width / 2)));
+    }
+  }
+
+  _getAnchorMiddlePoint() {
+    var anchorBounds = this.getAnchorBounds();
+    return anchorBounds ? anchorBounds.center() : null;
+  }
+
+  _isVerticallyAligned() {
+    return scout.isOneOf(this.calculatedHorizontalAlignment, Popup.Alignment.LEFT, Popup.Alignment.RIGHT);
   }
 
   setMovable(movable) {

@@ -1390,14 +1390,14 @@ export default class JQueryUtils extends $ {
    * Makes the current element resizable, which means DIVs for resize-handling are added to the DOM
    * in the E, SE and S of the element. This is primarily useful for (modal) dialogs.
    */
-  static resizable() {
+  static resizable(model) {
     var $this = $(this);
     var resizable = $this.data('resizable');
     if (resizable) {
       // Already resizable
       return this;
     }
-    resizable = scout.create('Resizable', $this);
+    resizable = scout.create('Resizable', $.extend(model, {$container: $this}));
     $this.data('resizable', resizable);
     return this;
   }
