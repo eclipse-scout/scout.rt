@@ -10,11 +10,10 @@
  ******************************************************************************/
 scout.TableControl = function() {
   scout.TableControl.parent.call(this);
-  scout.TableControl.CONTAINER_SIZE = scout.styles.getSize('table-control-container', 'height', 'height', scout.TableControl.CONTAINER_SIZE);
   this.tableFooter;
   this.contentRendered = false;
-  this.height = scout.TableControl.CONTAINER_SIZE;
-  this.animateDuration = scout.TableControl.CONTAINER_ANIMATE_DURATION;
+  this.height = null;
+  this.animateDuration = null;
   this.resizerVisible = true;
   this.toggleAction = true;
   this.showTooltipWhenSelected = false;
@@ -28,6 +27,11 @@ scout.TableControl.prototype._init = function(model) {
   this.parent = model.parent;
   this.table = this.getTable();
   scout.TableControl.parent.prototype._init.call(this, model);
+  // retain the size with 'dense' in case we're in dense mode
+  var denseClass = this.session.desktop.dense ? 'dense' : null;
+  scout.TableControl.CONTAINER_SIZE = scout.styles.getSize('table-control-container', 'height', 'height', scout.TableControl.CONTAINER_SIZE, denseClass);
+  this.height = scout.TableControl.CONTAINER_SIZE;
+  this.animateDuration = scout.TableControl.CONTAINER_ANIMATE_DURATION;
   this._setSelected(this.selected);
 };
 
