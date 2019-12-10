@@ -217,7 +217,9 @@ export default class CheckBoxField extends ValueField {
     }
     this.toggleChecked();
     // Also focus when check box is clicked otherwise firefox would loose the focus (see device.loosesFocusIfPseudoElementIsRemoved)
-    if (scout.isOneOf(event.currentTarget, this.$checkBox[0], this.$checkBoxLabel[0])) {
+    var onCheckBox = this.$checkBox.is(event.currentTarget),
+      onLabel = this.$checkBoxLabel.isOrHas(event.currentTarget); // isOrHas is required for HTML enabled labels with nested elements
+    if (onCheckBox || onLabel) {
       this.focusAndPreventDefault(event);
     }
   }

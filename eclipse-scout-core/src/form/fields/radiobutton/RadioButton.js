@@ -127,12 +127,17 @@ export default class RadioButton extends Button {
   }
 
   _onMouseDown(event) {
-    var $icon = this.get$Icon();
-    if (!this.enabledComputed || !scout.isOneOf(event.target, this.$radioButton[0], this.$buttonLabel[0], $icon[0])) {
+    if (!this.enabledComputed) {
+      return;
+    }
+    var onIcon = this.get$Icon().is(event.target),
+      onButton = this.$radioButton.is(event.target),
+      onLabel = this.$buttonLabel.isOrHas(event.target); // isOrHas is required for HTML enabled labels with nested elements
+    if (!onButton && !onLabel && !onIcon) {
       return;
     }
     this.select();
-    if (this.focusWhenSelected && scout.isOneOf(event.target, this.$buttonLabel[0], $icon[0])) {
+    if (this.focusWhenSelected && (onLabel || onIcon)) {
       this.focusAndPreventDefault(event);
     }
   }
