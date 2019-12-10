@@ -1263,7 +1263,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public void removeRowFilter(ITableRowFilter filter) {
     if (filter != null && m_rowFilters.remove(filter)) {
-      applyRowFilters();
+      // #253699 By removing the row filter additional rows may be accepted by the filters.
+      // The rows currently accepted by the user row filters do not contain these additional rows. So we will remove the user row filters. They will be reapplied by the UI.
+      removeUserRowFilters();
     }
   }
 
