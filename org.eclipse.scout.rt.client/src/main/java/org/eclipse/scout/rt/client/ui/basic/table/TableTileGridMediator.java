@@ -53,7 +53,7 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
   }
 
   protected int getConfiguredGridColumnCount() {
-    return 4;
+    return 6;
   }
 
   protected boolean getConfiguredWithPlaceholders() {

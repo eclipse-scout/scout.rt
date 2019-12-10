@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, arrays, Dimension, graphics, HtmlComponent, MenuBarLayout, scout} from '../index';
+import {AbstractLayout, arrays, Dimension, graphics, HtmlComponent, MenuBarLayout, scout, scrollbars} from '../index';
 
 export default class TableLayout extends AbstractLayout {
 
@@ -80,6 +80,7 @@ export default class TableLayout extends AbstractLayout {
     } else {
       if (tileAccordion && tileAccordion.htmlComp) {
         tileAccordion.htmlComp.setSize(new Dimension(containerSize.width, dataHeight));
+        scrollbars.update(tileAccordion.$container);
         this._dataHeightPositive = dataHeight > 0;
       }
     }

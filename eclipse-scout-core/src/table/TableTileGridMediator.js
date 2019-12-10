@@ -146,6 +146,8 @@ export default class TableTileGridMediator extends Widget {
 
   _setTiles(tiles) {
     this._isUpdatingTiles = true;
+    // remove all new tiles from this.tiles to prevent reused tiles from being destroyed in reset()
+    arrays.removeAll(this.tiles, tiles);
     this.reset();
     this._setTilesInternal(tiles);
     this._isUpdatingTiles = false;
@@ -429,6 +431,11 @@ export default class TableTileGridMediator extends Widget {
     }
     if (event.propertyName === 'selectedTiles') {
       this._syncSelectionFromTileGridToTable(event.source.getSelectedTiles());
+      if (this.tileAccordion.rendered) {
+        // Depending on the tiles content, selecting tiles with shift can lead to a mix of selecting the tiles content
+        // and the tiles itself, which doesn't look nice. Remove the text selection when selection tiles to avoid this.
+        this.tileAccordion.$container.document(true).getSelection().removeAllRanges();
+      }
     }
     if (event.propertyName === 'filteredTiles') {
       this._updateGroupVisibility();

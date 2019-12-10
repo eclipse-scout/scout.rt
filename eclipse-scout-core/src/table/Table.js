@@ -3667,10 +3667,11 @@ export default class Table extends Widget {
   }
 
   hasUserFilter() {
-    return Object.values(this._filterMap)
-      .some(function(filter) {
+    return objects.values(this._filterMap)
+      .filter(function(filter) {
         return filter instanceof TableUserFilter;
-      });
+      })
+      .length > 0;
   }
 
   resizeToFit(column, maxWidth) {
@@ -4268,7 +4269,7 @@ export default class Table extends Widget {
       control.tableFooter = this.footer;
     }, this);
 
-    if (this._isDataRendered()) {
+    if (this.rendered) {
       this._renderFooterVisible();
     }
     if (!visible && this.footer) {
@@ -4384,8 +4385,10 @@ export default class Table extends Widget {
   }
 
   _redraw() {
-    this._rerenderHeaderColumns();
-    this._rerenderViewport();
+    if (this._isDataRendered()) {
+      this._rerenderHeaderColumns();
+      this._rerenderViewport();
+    }
   }
 
   _rerenderHeaderColumns() {
@@ -4396,6 +4399,9 @@ export default class Table extends Widget {
   }
 
   _renderTableHeader() {
+    if (this.tileMode) {
+      return;
+    }
     var changed = false;
     if (this.headerVisible && !this.header) {
       this.header = this._createHeader();
