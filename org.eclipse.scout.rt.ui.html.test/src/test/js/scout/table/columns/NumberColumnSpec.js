@@ -35,7 +35,8 @@ describe('NumberColumn', function() {
     var rgbLevel50 = 'rgb(213, 195, 161)';
     var rgbLevel100 = 'rgb(171, 214, 147)';
     var barChartColor = 'rgb(128, 193, 208)';
-    var imageLevel50 = 'linear-gradient(to left, ' + barChartColor + ' 0%, ' + barChartColor + ' 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0) 100%)';
+    var imageLevel50 = 'linear-gradient(to left, ' + barChartColor + ' 0%, ' + barChartColor + ' 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0) 100%)'; // Chrome returns this value
+    var imageLevel50_2 = 'linear-gradient(to left, ' + barChartColor + ' 0%, ' + barChartColor + ' 50%, transparent 50%, transparent 100%)'; // PhantomJS and other browsers return this value
     var defaultBackgroundColor;
 
     beforeEach(function() {
@@ -201,8 +202,9 @@ describe('NumberColumn', function() {
         table.render();
 
         table.setColumnBackgroundEffect(column0, 'barChart');
+        var bgImage = table.$cell(column0, table.rows[1].$row).css('background-image');
         expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(255, 0, 0)');
-        expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
+        expect(bgImage === imageLevel50 || bgImage === imageLevel50_2).toBe(true);
       });
     });
 
@@ -230,7 +232,8 @@ describe('NumberColumn', function() {
         if (scout.device.supportsCssGradient()) {
           table.setColumnBackgroundEffect(column0, 'barChart');
           expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(defaultBackgroundColor);
-          expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
+          var bgImage = table.$cell(column0, table.rows[1].$row).css('background-image');
+          expect(bgImage === imageLevel50 || bgImage === imageLevel50_2).toBe(true);
         }
 
         // set to null: no effect
