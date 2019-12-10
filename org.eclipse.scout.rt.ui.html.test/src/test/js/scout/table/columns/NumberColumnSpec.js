@@ -35,7 +35,7 @@ describe('NumberColumn', function() {
     var rgbLevel50 = 'rgb(213, 195, 161)';
     var rgbLevel100 = 'rgb(171, 214, 147)';
     var barChartColor = 'rgb(128, 193, 208)';
-    var imageLevel50 = 'linear-gradient(to left, ' + barChartColor + ' 0%, ' + barChartColor + ' 50%, transparent 50%, transparent 100%)';
+    var imageLevel50 = 'linear-gradient(to left, ' + barChartColor + ' 0%, ' + barChartColor + ' 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0) 100%)';
     var defaultBackgroundColor;
 
     beforeEach(function() {
