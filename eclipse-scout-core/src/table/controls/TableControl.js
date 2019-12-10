@@ -14,11 +14,10 @@ export default class TableControl extends Action {
 
   constructor() {
     super();
-    TableControl.CONTAINER_SIZE = styles.getSize('table-control-container', 'height', 'height', TableControl.CONTAINER_SIZE);
     this.tableFooter = null;
     this.contentRendered = false;
-    this.height = TableControl.CONTAINER_SIZE;
-    this.animateDuration = TableControl.CONTAINER_ANIMATE_DURATION;
+    this.height = null;
+    this.animateDuration = null;
     this.resizerVisible = true;
     this.toggleAction = true;
     this.showTooltipWhenSelected = false;
@@ -31,6 +30,11 @@ export default class TableControl extends Action {
     this.parent = model.parent;
     this.table = this.getTable();
     super._init(model);
+    // retain the size with 'dense' in case we're in dense mode
+    var denseClass = this.session.desktop.dense ? 'dense' : null;
+    TableControl.CONTAINER_SIZE = styles.getSize('table-control-container', 'height', 'height', TableControl.CONTAINER_SIZE, denseClass);
+    this.height = TableControl.CONTAINER_SIZE;
+    this.animateDuration = TableControl.CONTAINER_ANIMATE_DURATION;
     this._setSelected(this.selected);
   }
 
