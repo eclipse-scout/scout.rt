@@ -200,12 +200,15 @@
   float: left;
   line-height: 24px;
   height: 24px;
-  #scout.overflow-ellipsis();
   min-height: 20px;
   width: calc(~'100% - ' @calendar-component-margin-left);
   border-bottom: 1px solid @form-background-color;
   text-align: left;
   color: @calendar-component-color;
+
+  & > .content {
+    #scout.overflow-ellipsis();
+  }
 
   & > .calendar-component-leftcolorborder {
     flex-shrink: 0;
