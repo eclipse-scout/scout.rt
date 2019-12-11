@@ -17,9 +17,11 @@ export default class Calendar extends Widget {
     super();
 
     this.monthViewNumberOfWeeks = 6;
-    this.numberOfHourDivisions = 4;
-    this.heightPerDivision = 40;
+    this.numberOfHourDivisions = 2;
+    this.heightPerDivision = 30;
+    this.heightDay = 24 * this.numberOfHourDivisions * this.heightPerDivision;
     this.startHour = 6;
+    this.spaceBeforeScrollTop = 15;
     this.workDayIndices = [1, 2, 3, 4, 5]; // Workdays: Mon-Fri (Week starts at Sun in JS)
     this.components = [];
     this.displayMode;
@@ -29,8 +31,7 @@ export default class Calendar extends Widget {
     this.showDisplayModeSelection = true;
     this.title;
     this.useOverflowCells = true;
-    this.viewRange;
-    this.needsScrollToStartHour = true;
+    this.viewRange = null;
     this.calendarToggleListWidth = 270;
     this.calendarToggleYearWidth = 215;
 
@@ -169,7 +170,7 @@ export default class Calendar extends Widget {
       // only do it on property changes
       return;
     }
-    this._updateModel(true);
+    this._updateModel(false, true);
 
     // only render if components have another layout
     if (oldDisplayMode === Calendar.DisplayMode.MONTH || this.displayMode === Calendar.DisplayMode.MONTH) {
@@ -263,9 +264,12 @@ export default class Calendar extends Widget {
     }
 
     // click event on all day and children elements
-    var mousedownCallback = this._onDayMouseDown.bind(this);
-    this.$grids.find('.calendar-day').on('mousedown', mousedownCallback);
+    var mousedownCallbackWithTime = this._onDayMouseDown.bind(this, true);
+    this.$grid.find('.calendar-day').on('mousedown', mousedownCallbackWithTime);
+    var mousedownCallback = this._onDayMouseDown.bind(this, false);
+    this.$topGrid.find('.calendar-day').on('mousedown', mousedownCallback);
 
+    this.needsScrollToStartHour = true;
     this._updateScreen(false);
   }
 
@@ -298,26 +302,52 @@ export default class Calendar extends Widget {
     this.$progress.setVisible(this.loadInProgress);
   }
 
-  scrollToInitialTime() {
+  updateScrollPosition(animate) {
     if (!this.rendered) {
       // Execute delayed because table may be not layouted yet
-      this.session.layoutValidator.schedulePostValidateFunction(this._scrollToInitialTime.bind(this));
+      this.session.layoutValidator.schedulePostValidateFunction(this._updateScrollPosition.bind(this, true, animate));
     } else {
-      this._scrollToInitialTime();
+      this._updateScrollPosition(true, animate);
     }
   }
 
-  _scrollToInitialTime() {
-    this.needsScrollToStartHour = false;
-    if (!this._isMonth()) {
-      var $scrollables = this.$grid;
-      var scrollTargetTop = this.numberOfHourDivisions * this.heightPerDivision * this.startHour;
-
-      for (var k = 0; k < $scrollables.length; k++) {
-        var $scrollable = $scrollables.eq(k);
-        scrollbars.scrollTop($scrollable, scrollTargetTop);
+  _updateScrollPosition(scrollToInitialTime, animate) {
+    if (this._isMonth()) {
+      this._scrollToSelectedComponent(animate);
+    } else {
+      if (this.selectedComponent) {
+        if (this.selectedComponent.fullDay) {
+          this._scrollToSelectedComponent(animate); // scroll top-grid to selected component
+          if (scrollToInitialTime) {
+            this._scrollToInitialTime(animate); // scroll grid to initial time
+          }
+        } else {
+          var date = dates.parseJsonDate(this.selectedComponent.fromDate, this.selectedComponent);
+          var topPercent = this._dayPosition(date.getHours(), date.getMinutes()) / 100;
+          var topPos = this.heightPerDay * topPercent;
+          scrollbars.scrollTop(this.$grid, topPos - this.spaceBeforeScrollTop, {
+            animate: animate
+          });
+        }
+      } else if (scrollToInitialTime) {
+        this._scrollToInitialTime(animate);
       }
     }
+  }
+
+  _scrollToSelectedComponent(animate) {
+    if (this.selectedComponent && this.selectedComponent._$parts[0] && this.selectedComponent._$parts[0].parent() && this.selectedComponent._$parts[0].isVisible()) {
+      scrollbars.scrollTo(this.selectedComponent._$parts[0].parent(), this.selectedComponent._$parts[0], {
+        animate: animate
+      });
+    }
+  }
+
+  _scrollToInitialTime(animate) {
+    var scrollTargetTop = this.heightPerHour * this.startHour;
+    scrollbars.scrollTop(this.$grid, scrollTargetTop - this.spaceBeforeScrollTop, {
+      animate: animate
+    });
   }
 
   /* -- basics, events -------------------------------------------- */
@@ -345,7 +375,7 @@ export default class Calendar extends Widget {
 
   _navigateDate(direction) {
     this.selectedDate = this._calcSelectedDate(direction);
-    this._updateModel(false);
+    this._updateModel(true, false);
   }
 
   _calcSelectedDate(direction) {
@@ -363,12 +393,12 @@ export default class Calendar extends Widget {
     }
   }
 
-  _updateModel(animate) {
+  _updateModel(updateTopGrid, animate) {
     this._exactRange = this._calcExactRange();
     this._yearPanel.setViewRange(this._exactRange);
     this.viewRange = this._calcViewRange();
     this.trigger('modelChange');
-    this._updateScreen(animate);
+    this._updateScreen(updateTopGrid, animate);
   }
 
   /**
@@ -429,7 +459,7 @@ export default class Calendar extends Widget {
 
   _onTodayClick(event) {
     this.selectedDate = new Date();
-    this._updateModel(false);
+    this._updateModel(true, false);
   }
 
   _onDisplayModeClick(event) {
@@ -439,35 +469,42 @@ export default class Calendar extends Widget {
 
   _onYearClick(event) {
     this._showYearPanel = !this._showYearPanel;
-    this._updateScreen(true);
+    this.needsScrollToStartHour = true;
+    this._updateScreen(true, true);
   }
 
   _onListClick(event) {
     this._showListPanel = !this._showListPanel;
-    this._updateScreen(true);
+    this._updateScreen(false, true);
   }
 
-  _onDayMouseDown(event) {
-    var selectedDate = $(event.delegateTarget).data('date');
-    this._setSelection(selectedDate, null);
+  _onDayMouseDown(withTime, event) {
+    var selectedDate = new Date($(event.delegateTarget).data('date'));
+    if (withTime && (this._isDay() || this._isWeek() || this._isWorkWeek())) {
+      var seconds = Math.floor(event.originalEvent.layerY / this.heightPerDivision) / this.numberOfHourDivisions * 60 * 60;
+      if (seconds < 60 * 60 * 24) {
+        selectedDate.setSeconds(seconds);
+      }
+    }
+    this._setSelection(selectedDate, null, false);
   }
 
   /**
    * @param selectedDate
    * @param selectedComponent may be null when a day is selected
    */
-  _setSelection(selectedDate, selectedComponent) {
+  _setSelection(selectedDate, selectedComponent, updateScrollPosition) {
     var changed = false;
 
     // selected date
-    if (dates.compare(this.selectedDate, selectedDate) !== 0) {
+    if (dates.compareDays(this.selectedDate, selectedDate) !== 0) {
       changed = true;
       $('.calendar-day', this.$container).each(function(index, element) {
         var $day = $(element),
           date = $day.data('date');
-        if (dates.compare(date, this.selectedDate) === 0) {
+        if (!date || dates.compareDays(date, this.selectedDate) === 0) {
           $day.select(false); // de-select old date
-        } else if (dates.compare(date, selectedDate) === 0) {
+        } else if (dates.compareDays(date, selectedDate) === 0) {
           $day.select(true); // select new date
         }
       }.bind(this));
@@ -489,6 +526,9 @@ export default class Calendar extends Widget {
     if (changed) {
       this.trigger('selectionChange');
       this._updateListPanel();
+      if (updateScrollPosition) {
+        this._updateScrollPosition(false, true);
+      }
     }
 
     if (this._showYearPanel) {
@@ -498,7 +538,7 @@ export default class Calendar extends Widget {
 
   /* --  set display mode and range ------------------------------------- */
 
-  _updateScreen(animate) {
+  _updateScreen(updateTopGrid, animate) {
     $.log.isInfoEnabled() && $.log.info('(Calendar#_updateScreen)');
 
     // select mode
@@ -518,6 +558,10 @@ export default class Calendar extends Widget {
     }
 
     this._updateListPanel();
+    this._updateScrollbars(this.$grid, animate);
+    if (updateTopGrid && !this._isMonth()) {
+      this._updateTopGrid();
+    }
   }
 
   layoutSize(animate) {
@@ -567,17 +611,16 @@ export default class Calendar extends Widget {
     // layout week
 
     if (this._isDay() || this._isWeek() || this._isWorkWeek()) {
-      $('.calendar-week', this.$grid).removeClass('calendar-week-noborder');
+      $allWeeks.removeClass('calendar-week-noborder');
       // Parent of selected (Day) is a week
       var selectedWeek = $selected.parent();
       $weeksToHide = $allWeeks.not(selectedWeek); // Hide all (other) weeks delayed, height will animate to zero
       $weeksToHide.data('new-height', 0);
       $weeksToHide.removeClass('invisible');
-      var newHeight = 24 * this.numberOfHourDivisions * this.heightPerDivision;
-      selectedWeek.data('new-height', newHeight);
+      selectedWeek.data('new-height', this.heightDay);
       selectedWeek.addClass('calendar-week-noborder');
       selectedWeek.removeClass('hidden invisible'); // Current week must be shown
-      $('.calendar-day', selectedWeek).data('new-height', newHeight);
+      $('.calendar-day', selectedWeek).data('new-height', this.heightDay);
       // Hide the week-number in the lower grid
       $('.calendar-week-name', this.$grid).addClass('invisible'); // Keep the reserved space
       $('.calendar-week-allday-container', this.$topGrid).removeClass('hidden');
@@ -585,7 +628,7 @@ export default class Calendar extends Widget {
     } else {
       // Month
       var newHeightMonth = gridH / this.monthViewNumberOfWeeks;
-      $allWeeks.removeClass('calendar-week-noborder invisible');
+      $allWeeks.removeClass('calendar-week-noborder invisible hidden');
       $allWeeks.eq(0).addClass('calendar-week-noborder');
       $allWeeks.data('new-height', newHeightMonth);
       $('.calendar-day', this.$grid).data('new-height', newHeightMonth);
@@ -608,14 +651,16 @@ export default class Calendar extends Widget {
     } else if (this._isWorkWeek()) {
       this.$topGrid.find('.calendar-day-name').data('new-width', 0);
       this.$grids.find('.calendar-day').data('new-width', 0);
+      var newWidthWorkWeek = Math.round(contentW / this.workDayIndices.length);
       $('.calendar-day-name:nth-child(-n+6), ' +
         '.calendar-day:nth-child(-n+6)', this.$topGrid)
-        .data('new-width', parseInt(contentW / this.workDayIndices.length, 10));
+        .data('new-width', newWidthWorkWeek);
       $('.calendar-day:nth-child(-n+6)', this.$grid)
-        .data('new-width', parseInt(contentW / this.workDayIndices.length, 10));
+        .data('new-width', newWidthWorkWeek);
     } else if (this._isMonth() || this._isWeek()) {
-      this.$grids.find('.calendar-day').data('new-width', parseInt(contentW / 7, 10));
-      this.$topGrid.find('.calendar-day-name').data('new-width', parseInt(contentW / 7, 10));
+      var newWidthMonthOrWeek = Math.round(contentW / 7);
+      this.$grids.find('.calendar-day').data('new-width', newWidthMonthOrWeek);
+      this.$topGrid.find('.calendar-day-name').data('new-width', newWidthMonthOrWeek);
     }
 
     // layout components
@@ -627,44 +672,21 @@ export default class Calendar extends Widget {
       });
     }
 
-    // set day-name (based on width of shown column)
-    var width = this.$container.width(),
-      weekdays;
-
-    if (this._isDay()) {
-      width /= 1;
-    } else if (this._isWorkWeek()) {
-      width /= this.workDayIndices.length;
-    } else if (this._isWeek()) {
-      width /= 7;
-    } else if (this._isMonth()) {
-      width /= 7;
-    }
-
-    if (width > 100) {
-      weekdays = this.session.locale.dateFormat.symbols.weekdaysOrdered;
-    } else {
-      weekdays = this.session.locale.dateFormat.symbols.weekdaysShortOrdered;
-    }
-
-    $('.calendar-day-name', this.$topGrid).each(function(index) {
-      $(this).attr('data-day-name', weekdays[index]);
-    });
-
-    var updateScrollbarCallback = this._updateScrollbars.bind(this);
+    var afterLayoutCallback = this._afterLayout.bind(this);
 
     // animate old to new sizes
     $('div', this.$container).each(function() {
       var $e = $(this),
         w = $e.data('new-width'),
         h = $e.data('new-height');
+      $e.stop(false, true);
 
       if (w !== undefined && w !== $e.outerWidth()) {
         if (animate) {
-          $e.animateAVCSD('width', w, updateScrollbarCallback.bind($e));
+          $e.animateAVCSD('width', w, afterLayoutCallback.bind(this, $e, animate));
         } else {
           $e.css('width', w);
-          updateScrollbarCallback($e);
+          afterLayoutCallback($e, animate);
         }
       }
       if (h !== undefined && h !== $e.outerHeight()) {
@@ -676,29 +698,57 @@ export default class Calendar extends Widget {
             if (h === 0) {
               $e.addClass('hidden');
             }
-            updateScrollbarCallback($e);
+            afterLayoutCallback($e, animate);
           });
         } else {
           $e.css('height', h);
           if (h === 0) {
             $e.addClass('hidden');
           }
-          updateScrollbarCallback($e);
+          afterLayoutCallback($e, animate);
         }
       }
     });
   }
 
-  _updateScrollbars($parent) {
-    var $scrollables = $('.calendar-scrollable-components', $parent);
+  _afterLayout($parent, animate) {
+    this._updateScrollbars($parent, animate);
+    this._updateWeekdayNames();
+  }
 
-    for (var k = 0; k < $scrollables.length; k++) {
-      var $scrollable = $scrollables.eq(k);
+  _updateWeekdayNames() {
+    // set day-name (based on width of shown column)
+    var weekdayWidth = this.$topGrid.width(),
+      weekdays;
+
+    if (this._isDay()) {
+      weekdayWidth /= 1;
+    } else if (this._isWorkWeek()) {
+      weekdayWidth /= this.workDayIndices.length;
+    } else if (this._isWeek()) {
+      weekdayWidth /= 7;
+    } else if (this._isMonth()) {
+      weekdayWidth /= 7;
+    }
+
+    if (weekdayWidth > 90) {
+      weekdays = this.session.locale.dateFormat.symbols.weekdaysOrdered;
+    } else {
+      weekdays = this.session.locale.dateFormat.symbols.weekdaysShortOrdered;
+    }
+
+    $('.calendar-day-name', this.$topGrid).each(function(index) {
+      $(this).attr('data-day-name', weekdays[index]);
+    });
+  }
+
+  _updateScrollbars($parent, animate) {
+    var $scrollables = $('.calendar-scrollable-components', $parent);
+    $scrollables.each(function() {
+      var $scrollable = $(this);
       scrollbars.update($scrollable, true);
-    }
-    if (this.needsScrollToStartHour) {
-      this.scrollToInitialTime();
-    }
+    });
+    this.updateScrollPosition(animate);
   }
 
   layoutYearPanel() {
@@ -847,7 +897,7 @@ export default class Calendar extends Widget {
 
   _onYearPanelDateSelect(event) {
     this.selectedDate = event.date;
-    this._updateModel(false);
+    this._updateModel(true, false);
   }
 
   _updateListPanel() {
@@ -914,8 +964,8 @@ export default class Calendar extends Widget {
 
   /* -- components, events-------------------------------------------- */
 
-  _selectedComponentChanged(component, partDay) {
-    this._setSelection(partDay, component);
+  _selectedComponentChanged(component, partDay, updateScrollPosition) {
+    this._setSelection(partDay, component, updateScrollPosition);
   }
 
   _onDayContextMenu(event) {

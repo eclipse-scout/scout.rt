@@ -236,10 +236,13 @@ export default class CalendarComponent extends Widget {
     this.setProperty('selected', selected);
   }
 
+  updateSelectedComponent($part, updateScrollPosition) {
+    this.parent._selectedComponentChanged(this, $part.data('partDay'), updateScrollPosition);
+  }
+
   _onMouseDown(event) {
     var $part = $(event.delegateTarget);
-
-    this.parent._selectedComponentChanged(this, $part.data('partDay'));
+    this.updateSelectedComponent($part, false)
 
     if (event.button === 0) {
       var popup = scout.create('WidgetPopup', {

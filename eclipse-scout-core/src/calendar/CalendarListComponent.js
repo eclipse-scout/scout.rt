@@ -39,6 +39,11 @@ export default class CalendarListComponent {
       .html(source._description());
   }
 
+  _onMouseDown(source, event) {
+    var $part = $(event.delegateTarget);
+    source.updateSelectedComponent($part, true)
+  }
+
   remove() {
     this.source.removeListener(this._selectedListener);
     this.source.removeListener(this._removeListener);
