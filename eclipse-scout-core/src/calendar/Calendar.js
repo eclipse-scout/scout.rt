@@ -448,14 +448,8 @@ export default class Calendar extends Widget {
   }
 
   _onDayMouseDown(event) {
-    // we cannot use event.stopPropagation() in CalendarComponent.js because this would
-    // prevent context-menus from being closed. With this awkward if-statement we only
-    // process the event, when it is not bubbling up from somewhere else (= from mousedown
-    // event on component).
-    if (event.eventPhase === Event.AT_TARGET) {
-      var selectedDate = $(event.delegateTarget).data('date');
-      this._setSelection(selectedDate, null);
-    }
+    var selectedDate = $(event.delegateTarget).data('date');
+    this._setSelection(selectedDate, null);
   }
 
   /**

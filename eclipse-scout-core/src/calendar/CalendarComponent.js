@@ -240,32 +240,38 @@ export default class CalendarComponent extends Widget {
     var $part = $(event.delegateTarget);
 
     this.parent._selectedComponentChanged(this, $part.data('partDay'));
-    var popup = scout.create('WidgetPopup', {
-      parent: this.parent,
-      $anchor: $part,
-      closeOnAnchorMouseDown: true,
-      closeOnMouseDownOutside: true,
-      closeOnOtherPopupOpen: true,
-      horizontalAlignment: Popup.Alignment.LEFT,
-      verticalAlignment: Popup.Alignment.CENTER,
-      trimWidth: false,
-      trimHeight: false,
-      horizontalSwitch: true,
-      verticalSwitch: true,
-      withArrow: true,
-      cssClass: 'tooltip',
-      scrollType: 'remove',
-      location: {
-        y: event.originalEvent.y
-      },
-      widget: {
-        objectType: 'Label',
-        htmlEnabled: true,
-        cssClass: 'tooltip-content',
-        value: this._description()
-      }
-    });
-    popup.open();
+
+    if (event.button === 0) {
+      var popup = scout.create('WidgetPopup', {
+        parent: this.parent,
+        $anchor: $part,
+        closeOnAnchorMouseDown: true,
+        closeOnMouseDownOutside: true,
+        closeOnOtherPopupOpen: true,
+        horizontalAlignment: Popup.Alignment.LEFT,
+        verticalAlignment: Popup.Alignment.CENTER,
+        trimWidth: false,
+        trimHeight: false,
+        horizontalSwitch: true,
+        verticalSwitch: true,
+        withArrow: true,
+        cssClass: 'tooltip',
+        scrollType: 'remove',
+        location: {
+          y: event.originalEvent.y
+        },
+        widget: {
+          objectType: 'Label',
+          htmlEnabled: true,
+          cssClass: 'tooltip-content',
+          value: this._description()
+        }
+      });
+      popup.open();
+    }
+
+    // stop propagation to avoid fire mouse-down event on calendar-day (Calendar#_onDayMouseDown)
+    event.stopPropagation();
   }
 
   _onContextMenu(event) {
