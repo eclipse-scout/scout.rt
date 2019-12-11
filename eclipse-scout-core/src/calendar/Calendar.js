@@ -19,7 +19,8 @@ export default class Calendar extends Widget {
     this.monthViewNumberOfWeeks = 6;
     this.numberOfHourDivisions = 2;
     this.heightPerDivision = 30;
-    this.heightDay = 24 * this.numberOfHourDivisions * this.heightPerDivision;
+    this.heightPerHour = this.numberOfHourDivisions * this.heightPerDivision;
+    this.heightPerDay = 24 * this.heightPerHour;
     this.startHour = 6;
     this.spaceBeforeScrollTop = 15;
     this.workDayIndices = [1, 2, 3, 4, 5]; // Workdays: Mon-Fri (Week starts at Sun in JS)
@@ -344,10 +345,22 @@ export default class Calendar extends Widget {
   }
 
   _scrollToInitialTime(animate) {
-    var scrollTargetTop = this.heightPerHour * this.startHour;
-    scrollbars.scrollTop(this.$grid, scrollTargetTop - this.spaceBeforeScrollTop, {
-      animate: animate
-    });
+    this.needsScrollToStartHour = false;
+    if (!this._isMonth()) {
+      if (this.selectedComponent && !this.selectedComponent.fullDay) {
+        var date = dates.parseJsonDate(this.selectedComponent.fromDate);
+        var topPercent = this._dayPosition(date.getHours(), date.getMinutes()) / 100;
+        var topPos = this.heightPerDay * topPercent;
+        scrollbars.scrollTop(this.$grid, topPos - this.spaceBeforeScrollTop, {
+          animate: animate
+        });
+      } else {
+        var scrollTargetTop = this.heightPerHour * this.startHour;
+        scrollbars.scrollTop(this.$grid, scrollTargetTop - this.spaceBeforeScrollTop, {
+          animate: animate
+        });
+      }
+    }
   }
 
   /* -- basics, events -------------------------------------------- */
@@ -617,10 +630,10 @@ export default class Calendar extends Widget {
       $weeksToHide = $allWeeks.not(selectedWeek); // Hide all (other) weeks delayed, height will animate to zero
       $weeksToHide.data('new-height', 0);
       $weeksToHide.removeClass('invisible');
-      selectedWeek.data('new-height', this.heightDay);
+      selectedWeek.data('new-height', this.heightPerDay);
       selectedWeek.addClass('calendar-week-noborder');
       selectedWeek.removeClass('hidden invisible'); // Current week must be shown
-      $('.calendar-day', selectedWeek).data('new-height', this.heightDay);
+      $('.calendar-day', selectedWeek).data('new-height', this.heightPerDay);
       // Hide the week-number in the lower grid
       $('.calendar-week-name', this.$grid).addClass('invisible'); // Keep the reserved space
       $('.calendar-week-allday-container', this.$topGrid).removeClass('hidden');
@@ -882,7 +895,7 @@ export default class Calendar extends Widget {
 
       for (var h = 0; h < 24; h++) { // Render lines for each hour
         var paddedHour = ('00' + h).slice(-2);
-        var topPos = h * this.numberOfHourDivisions * this.heightPerDivision;
+        var topPos = h * this.heightPerHour;
         $parent.appendDiv('calendar-week-axis hour' + (h === 0 ? ' first' : '')).attr('data-axis-name', paddedHour + ':00').css('top', topPos + 'px');
 
         for (var m = 1; m < this.numberOfHourDivisions; m++) { // First one rendered above. Start at the next
