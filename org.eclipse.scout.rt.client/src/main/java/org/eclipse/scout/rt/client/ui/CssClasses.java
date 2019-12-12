@@ -29,4 +29,14 @@ public interface CssClasses {
    * Class that hides the mandatory indicator (useful e.g. inside a {@link AbstractFormFieldMenu})
    */
   String NO_MANDATORY_INDICATOR = "no-mandatory-indicator";
+
+  /**
+   * Class that removes the top padding of group boxes, even if <i>borderVisible</i> is {@code true}.
+   */
+  String TOP_PADDING_INVISIBLE = "top-padding-invisible";
+
+  /**
+   * Class that removes the bottom padding of group boxes, even if <i>borderVisible</i> is {@code true}.
+   */
+  String BOTTOM_PADDING_INVISIBLE = "bottom-padding-invisible";
 }
