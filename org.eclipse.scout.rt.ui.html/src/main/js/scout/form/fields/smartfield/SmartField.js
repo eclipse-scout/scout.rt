@@ -629,7 +629,12 @@ scout.SmartField.prototype.openPopup = function(browse) {
   } else if (this.errorStatus) {
     // In case the search yields a not-unique error, we always want to start a lookup
     // with the current display text in every other case we better do browse again
-    browse = !this._hasNotUniqueError() && !this.searchRequired;
+    if (this._hasNotUniqueError()) {
+      searchAlways = true;
+      browse = false;
+    } else if (!this.searchRequired) {
+      browse = true;
+    }
   }
 
   return this._lookupByTextOrAll(browse, searchText, searchAlways);
@@ -694,6 +699,7 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText, sea
     }
     if (this._searchTextEquals(searchText, lastSearchText)) {
       this._pendingOpenPopup = false;
+      $.log.debug('(SmartField#_lookupByTextOrAll) searchText is equals -> skip lookup');
       return;
     }
   }
