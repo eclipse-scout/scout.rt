@@ -260,11 +260,6 @@ scout.SmartField.prototype._clearPendingLookup = function() {
  * @param [sync] optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
  */
 scout.SmartField.prototype._acceptInput = function(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
-  // Don't show the not-unique error when the search-text becomes empty while typing (see ticket #229775)
-  if (this._notUnique && !searchTextEmpty) {
-    this._setNotUniqueError(searchText);
-  }
-
   // Do nothing when search text is equals to the text of the current lookup row
   if (!selectedLookupRow && this.lookupRow) {
     var lookupRowText = scout.strings.nvl(this.lookupRow.text);
@@ -274,6 +269,11 @@ scout.SmartField.prototype._acceptInput = function(sync, searchText, searchTextE
       this._inputAccepted(false);
       return;
     }
+  }
+
+  // Don't show the not-unique error when the search-text becomes empty while typing (see ticket #229775)
+  if (this._notUnique && !searchTextEmpty) {
+    this._setNotUniqueError(searchText);
   }
 
   // Do nothing when we don't have a current lookup row and search text is empty
@@ -320,7 +320,7 @@ scout.SmartField.prototype._acceptInput = function(sync, searchText, searchTextE
     // popup has been opened (again) with errorStatus NOT_UNIQUE, and search text is still the same
     this.popup.selectFirstLookupRow();
   } else {
-    // even though there's nothing todo, someone could wait for our promise to be resolved
+    // even though there's nothing to do, someone could wait for our promise to be resolved
     this._acceptInputDeferred.resolve();
   }
 
@@ -613,8 +613,11 @@ scout.SmartField.prototype._formatLookupRow = function(lookupRow) {
  * @returns {Promise}
  */
 scout.SmartField.prototype.openPopup = function(browse) {
-  var searchText = this._readDisplayText();
-  $.log.isInfoEnabled() && $.log.info('SmartField#openPopup browse=' + browse + ' searchText=' + searchText + ' popup=' + this.popup + ' pendingOpenPopup=' + this._pendingOpenPopup);
+  // In case searchRequired is set to true, we always start a new search with the text from the field as query
+  var searchText = this._readDisplayText(),
+     searchAlways = this.searchRequired ? true : null;
+  $.log.isInfoEnabled() && $.log.info('SmartField#openPopup browse=' + browse + ' searchText=' + searchText +
+     ' popup=' + this.popup + ' pendingOpenPopup=' + this._pendingOpenPopup);
 
   // Reset scheduled focus next tabbable when user clicks on the smartfield while a lookup is resolved.
   this._tabPrevented = null;
@@ -629,7 +632,7 @@ scout.SmartField.prototype.openPopup = function(browse) {
     browse = !this._hasNotUniqueError() && !this.searchRequired;
   }
 
-  return this._lookupByTextOrAll(browse, searchText);
+  return this._lookupByTextOrAll(browse, searchText, searchAlways);
 };
 
 scout.SmartField.prototype._hasUiError = function(codes) {
@@ -705,7 +708,7 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText, sea
 
   // execute lookup byAll immediately
   if (browse) {
-    $.log.isDebugEnabled() && $.log.debug('(SmartField#_lookupByTextOrAll) lookup byAll (seachText empty)');
+    $.log.isDebugEnabled() && $.log.debug('(SmartField#_lookupByTextOrAll) lookup byAll (searchText empty)');
     this._lastSearchText = null;
     if (this.searchRequired) {
       doneHandler({
