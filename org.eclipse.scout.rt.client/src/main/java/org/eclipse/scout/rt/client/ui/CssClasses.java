@@ -34,4 +34,14 @@ public interface CssClasses {
    * Class that for example removes the right padding of the root-group-box in a form.
    */
   String RIGHT_PADDING_INVISIBLE = "right-padding-invisible";
+
+  /**
+   * Class that removes the top padding of group boxes, even if <i>borderVisible</i> is {@code true}.
+   */
+  String TOP_PADDING_INVISIBLE = "top-padding-invisible";
+
+  /**
+   * Class that removes the bottom padding of group boxes, even if <i>borderVisible</i> is {@code true}.
+   */
+  String BOTTOM_PADDING_INVISIBLE = "bottom-padding-invisible";
 }
