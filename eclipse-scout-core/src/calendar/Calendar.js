@@ -1226,12 +1226,18 @@ export default class Calendar extends Widget {
   _sortFromTo(c1, c2) {
     var from1 = dates.parseJsonDate(c1.fromDate);
     var from2 = dates.parseJsonDate(c2.fromDate);
-    var dFrom = dates.compare(from1, from2);
-    if (dFrom !== 0) {
-      return dFrom;
+    var diffFrom = dates.compare(from1, from2);
+    if (diffFrom !== 0) {
+      return diffFrom;
     }
     var to1 = dates.parseJsonDate(c1.toDate);
     var to2 = dates.parseJsonDate(c2.toDate);
-    return dates.compare(to1, to2);
+    var diffTo = dates.compare(to1, to2);
+    if (diffTo !== 0) {
+      return diffTo;
+    }
+    var s1 = c1.item && c1.item.subject ? c1.item.subject : '';
+    var s2 = c2.item && c2.item.subject ? c2.item.subject : '';
+    return s1.localeCompare(s2);
   }
 }
