@@ -54,6 +54,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -882,6 +883,17 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
       catch (Exception e) { // NOSONAR
         // nop
         setValue(null);
+      }
+      setBrowseHierarchy();
+    }
+
+    protected void setBrowseHierarchy() {
+      if (LocalLookupCall.class.isAssignableFrom(getLookupCall().getClass()) &&
+          ((LocalLookupCall<?>) getLookupCall()).isHierarchicalLookup()) {
+        setBrowseHierarchy(true);
+      }
+      else {
+        setBrowseHierarchy(false);
       }
     }
 
