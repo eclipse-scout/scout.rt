@@ -112,6 +112,12 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
         return getModel().isBrowseLoadIncremental();
       }
     });
+    putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_BROWSE_HIERARCHY, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isBrowseHierarchy();
+      }
+    });
     putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_ACTIVE_FILTER_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
@@ -456,7 +462,6 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     json.put(ISmartField.PROP_DISPLAY_STYLE, getModel().getDisplayStyle());
-    json.put(ISmartField.PROP_BROWSE_HIERARCHY, getModel().isBrowseHierarchy());
     return json;
   }
 
