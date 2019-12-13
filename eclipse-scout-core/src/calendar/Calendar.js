@@ -245,6 +245,7 @@ export default class Calendar extends Widget {
     var dayContextMenuCallback = this._onDayContextMenu.bind(this);
     for (var dayBottom = 0; dayBottom < 7; dayBottom++) {
       $weekTopGridDays.appendDiv('calendar-day')
+        .addClass('calendar-scrollable-components')
         .data('day', dayBottom)
         .on('contextmenu', dayContextMenuCallback);
     }
@@ -270,8 +271,7 @@ export default class Calendar extends Widget {
     var mousedownCallback = this._onDayMouseDown.bind(this, false);
     this.$topGrid.find('.calendar-day').on('mousedown', mousedownCallback);
 
-    this.needsScrollToStartHour = true;
-    this._updateScreen(false);
+    this._updateScreen(false, false);
   }
 
   _renderProperties() {
@@ -284,11 +284,8 @@ export default class Calendar extends Widget {
 
   _renderComponents() {
     this.components.sort(this._sortFromTo);
-    this.components.forEach(function(component) {
-      component.remove();
-      component.render();
-    });
-
+    this.components.forEach(component => component.remove());
+    this.components.forEach(component => component.render());
     this._arrangeComponents();
     this._updateListPanel();
   }
@@ -482,7 +479,6 @@ export default class Calendar extends Widget {
 
   _onYearClick(event) {
     this._showYearPanel = !this._showYearPanel;
-    this.needsScrollToStartHour = true;
     this._updateScreen(true, true);
   }
 
@@ -762,6 +758,17 @@ export default class Calendar extends Widget {
       scrollbars.update($scrollable, true);
     });
     this.updateScrollPosition(animate);
+  }
+
+  _updateTopGrid() {
+    $('.calendar-component', this.$topGrid).each(function($index, part) {
+      $(part).data('component').remove();
+    });
+    var allDayComponents = this.components.filter(component => component.fullDay);
+    // first remove all components and add them from scratch
+    allDayComponents.forEach(component => component.remove());
+    allDayComponents.forEach(component => component.render());
+    this._updateScrollbars(this.$topGrid, false);
   }
 
   layoutYearPanel() {
@@ -1065,17 +1072,27 @@ export default class Calendar extends Widget {
       }
     }
 
-    scrollbars.uninstall(this.$grid, this.session);
     if (this._isMonth()) {
+      this._uninstallScrollbars();
       this.$grid.removeClass('calendar-scrollable-components');
     } else {
-      // If we're in the non-month views, the time can scroll. Add scrollbars
       this.$grid.addClass('calendar-scrollable-components');
-      scrollbars.install(this.$grid, {
+      // If we're in the non-month views, the time can scroll. Add scrollbars
+      this._installScrollbars({
         parent: this,
         session: this.session,
         axis: 'y'
       });
+
+      var $topDays = $('.calendar-scrollable-components', this.$topGrid);
+      for (k = 0; k < $topDays.length; k++) {
+        var $topDay = $topDays.eq(k);
+        scrollbars.install($topDay, {
+          parent: this,
+          session: this.session,
+          axis: 'y'
+        });
+      }
     }
   }
 
@@ -1177,6 +1194,10 @@ export default class Calendar extends Widget {
         .css('width', 100 / stack.w + '%')
         .css('left', stack.x * 100 / stack.w + '%');
     }
+  }
+
+  get$Scrollable() {
+    return this.$grid;
   }
 
   /* -- helper ---------------------------------------------------- */

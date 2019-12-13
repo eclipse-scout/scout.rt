@@ -20,6 +20,8 @@ export default class CalendarComponent extends Widget {
      * Selected is a GUI only property (the model doesn't have it)
      */
     this.selected = false;
+    this.fullDay = false;
+    this.item = null;
     this._$parts = [];
   }
 
@@ -50,6 +52,7 @@ export default class CalendarComponent extends Widget {
     this._$parts.forEach(function($part) {
       $part.remove();
     });
+    this._$parts = [];
     super._remove();
   }
 

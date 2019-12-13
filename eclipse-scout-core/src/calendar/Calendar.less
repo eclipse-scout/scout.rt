@@ -202,9 +202,12 @@
   height: 24px;
   min-height: 20px;
   width: calc(~'100% - ' @calendar-component-margin-left);
-  border-bottom: 1px solid @form-background-color;
   text-align: left;
   color: @calendar-component-color;
+
+  &:not(.component-task):not(.component-month) {
+    border-bottom: 2px solid @form-background-color;
+  }
 
   & > .content {
     #scout.overflow-ellipsis();
@@ -369,10 +372,10 @@
   border-bottom: 1px solid @border-color;
   height: 105px;
   margin-right: @root-group-box-padding-right;
-}
 
-.calendar-top-grid.calendar-top-grid-short {
-  height: 25px;
+  &.calendar-top-grid-short {
+    height: 25px;
+  }
 }
 
 .calendar-week-header,
@@ -382,17 +385,23 @@
   white-space: nowrap;
 }
 
-.calendar-week-allday-container {
+.calendar-week-allday-container,
+.calendar-week-allday-container > .calendar-week-name {
   height: 80px;
 }
 
-.calendar-week-header {
+.calendar-week-allday-container > .calendar-day {
+  padding-top: 30px; // for the day-of-month number
+}
+
+.calendar-week-header,
+.calendar-week-header > .calendar-day-name,
+.calendar-week-header > .calendar-week-name {
   height: @calendar-title-height;
 }
 
 .calendar-week {
   position: relative;
-  height: 1920px; /* FIXME pbn Fixed value: 24*4*20 +40 px offset */
 }
 
 .calendar-week-name {
@@ -405,7 +414,6 @@
   position: relative;
   display: inline-block;
   overflow: hidden;
-  height: 100%;
   z-index: 1; /* draw over grid */
 }
 
