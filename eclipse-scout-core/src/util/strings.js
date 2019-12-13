@@ -8,12 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, scout} from '../index';
+import {
+  objects,
+  scout,
+  PlainTextEncoder,
+  HtmlEncoder} from '../index';
+
+let htmlEncoder = null;
+let plainTextEncoder = null;
 
 /**
  * @param text
  * @param encodeHtml defaults to true
- * @memberOf scout.strings
  */
 export function nl2br(text, encodeHtml) {
   if (!text) {
@@ -133,27 +139,17 @@ export function count(string, separator) {
   return string.split(separator).length - 1;
 }
 
-// Cache used by encode(). Also referenced in stringsSpec.js.
-let _encodeElement = null;
-
 /**
- * Encodes the html of the given string.
+ * Returns the HTML encoded text. Example: 'Foo<br>Bar' returns 'Foo&amp;lt;br&amp;gt;Bar'.
+ * @param {string} text
+ * @return {string} HTML encoded text
  */
-export function encode(string) {
-  if (!string) {
-    return string;
+export function encode(text) {
+  if (!htmlEncoder) { // lazy instantiation to avoid cyclic dependency errors during webpack bootstrap
+    htmlEncoder = new HtmlEncoder();
   }
-  var elem = _encodeElement;
-  if (!elem) {
-    elem = window.document.createElement('div');
-    // cache it to prevent creating an element every time
-    _encodeElement = elem;
-  }
-  elem.textContent = string;
-  return elem.innerHTML;
+  return htmlEncoder.encode(text);
 }
-
-let plainTextElement = null;
 
 /**
  * Returns the plain text of the given html string using simple tag replacement.<p>
@@ -165,46 +161,10 @@ let plainTextElement = null;
  * - trim: Calls string.trim(). White space at the beginning and the end of the text gets removed.
  */
 export function plainText(text, options) {
-  options = options || {};
-  if (!text) {
-    return text;
+  if (!plainTextEncoder) { // lazy instantiation to avoid cyclic dependency errors during webpack bootstrap
+    plainTextEncoder = new HtmlEncoder();
   }
-  text = asString(text);
-
-  // Regexp is used to replace the tags.
-  // It is not possible to use jquery's text() function or to create a html element and use textContent, because the new lines get omitted.
-  // Node.innerText would preserve the new lines but it is not supported by firefox
-
-  // Preserve new lines
-  text = text.replace(/<br>|<br\/>|<\/p>|<p\/>|<\/div>|<\/li>|<\/tr>/gi, '\n');
-
-  // Separate td with ' '
-  text = text.replace(/<\/td>/gi, ' ');
-
-  // Replace remaining tags
-  text = text.replace(/<[^>]+>/gi, '');
-
-  // Remove spaces at the beginning and end of each line
-  text = text.replace(/^[ ]+/gm, '');
-  text = text.replace(/[ ]+$/gm, '');
-
-  if (options.compact) {
-    // Compact consecutive empty lines. One is enough
-    text = text.replace(/\n{3,}/gm, '\n\n');
-  }
-  if (options.trim) {
-    text = text.trim();
-  }
-
-  // Replace character html entities (e.g. &nbsp;, &gt;, ...)
-  var textarea = plainTextElement;
-  if (!textarea) {
-    textarea = document.createElement('textarea');
-    // cache it to prevent creating an element every time
-    plainTextElement = textarea;
-  }
-  textarea.innerHTML = text;
-  return textarea.value;
+  return plainTextEncoder.encode(text, options);
 }
 
 /**
@@ -413,23 +373,6 @@ export function removeSuffix(string, suffix) {
   }
   return s;
 }
-
-export function _setPlainTextElement(el) {
-  plainTextElement = el;
-}
-
-export function _getPlainTextElement() {
-  return plainTextElement;
-}
-
-export function _setEncodeElement(el) {
-  _encodeElement = el;
-}
-
-export function _getEncodeElement() {
-  return _encodeElement;
-}
-
 export default {
   asString,
   box,
@@ -450,7 +393,6 @@ export default {
   nvl,
   padZeroLeft,
   plainText,
-  plainTextElement, // FIXME [awe] 16.2: check why this variable is exported & usage in strings.js
   quote,
   removePrefix,
   removeSuffix,

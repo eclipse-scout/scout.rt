@@ -43,6 +43,11 @@ export {default as PromiseCreator} from './util/PromiseCreator';
 export {default as promises} from './util/promises';
 export {default as Range} from './util/Range';
 export {default as Status} from './util/Status';
+
+export {default as CachedElement} from './encoder/CachedElement';
+export {default as PlainTextEncoder} from './encoder/PlainTextEncoder';
+export {default as HtmlEncoder} from './encoder/HtmlEncoder';
+
 export {default as strings} from './util/strings';
 export {default as styles} from './util/styles';
 export {default as TreeSet} from './util/TreeSet';
