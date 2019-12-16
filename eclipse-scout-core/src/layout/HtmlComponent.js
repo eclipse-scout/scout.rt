@@ -133,15 +133,7 @@ export default class HtmlComponent {
     if (!this.layout) {
       throw new Error('Called layout() but component has no layout');
     }
-    // Don't layout components which don't exist anymore, are invisible or are detached from the DOM
-    if (!this.isAttachedAndVisible()) {
-      return false;
-    }
-    var parent = this.getParent();
-    // Check the visibility of the parents as well.
-    // This check loops to the top of the DOM tree.
-    // To improve performance, the check (isEveryParentVisible) is not executed if the parent already did it, which is the case if parent is being layouted.
-    if ((!parent || !parent.layouting) && !this.$comp.isEveryParentVisible()) {
+    if (!this._checkValidationPossible()) {
       return false;
     }
     if (!this.valid) {
@@ -152,6 +144,45 @@ export default class HtmlComponent {
       // Save size for later use (necessary if pixelBasedSizing is set to false)
       this.sizeCached = this.size();
       this.valid = true;
+    }
+    return true;
+  }
+
+  _checkValidationPossible() {
+    // Don't layout components which don't exist anymore, are invisible or are detached from the DOM
+    if (!this.isAttachedAndVisible()) {
+      return false;
+    }
+    // Check the visibility of the parents as well.
+    // Also check if one of the parents is currently being animated.
+    // To improve performance (the check might loop to the top of the DOM tree), the following code is
+    // not executed if the parent already executed it, which is the case if the parent is being layouted.
+    var parent = this.getParent();
+    if (!parent || !parent.layouting) {
+      var everyParentVisible = true;
+      var $animatedParent = null;
+      var animatingClassPattern = /(^|\s)animate-/; // matches any CSS class that starts with 'animate-'
+      this.$comp.parents().each(function() {
+        var $parent = $(this);
+        if (!$parent.isVisible()) {
+          everyParentVisible = false;
+          return false;
+        }
+        if (animatingClassPattern.test($parent.attr('class'))) {
+          $animatedParent = $parent;
+          return false;
+        }
+        return true; // continue loop
+      });
+      if (!everyParentVisible) {
+        return false;
+      }
+      if ($animatedParent) {
+        // Postpone the layout if there is a CSS animation in progress on one of the parent containers.
+        // Otherwise, wrong sizes might be measured (depending on the CSS animation, e.g. grow/shrink).
+        $animatedParent.oneAnimationEnd(this.validateLayout.bind(this));
+        return false;
+      }
     }
     return true;
   }
