@@ -162,7 +162,7 @@ export function encode(text) {
  */
 export function plainText(text, options) {
   if (!plainTextEncoder) { // lazy instantiation to avoid cyclic dependency errors during webpack bootstrap
-    plainTextEncoder = new HtmlEncoder();
+    plainTextEncoder = new PlainTextEncoder();
   }
   return plainTextEncoder.encode(text, options);
 }
