@@ -15,7 +15,7 @@ scout.Session = function() {
   this.url = new scout.URL();
   this.userAgent = new scout.UserAgent({
     deviceType: scout.device.type,
-    touch: scout.device.supportsTouch(),
+    touch: scout.device.supportsOnlyTouch(),
     standalone: scout.device.isStandalone()
   });
   this.locale;

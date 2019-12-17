@@ -60,7 +60,7 @@ scout.BoxButtons.prototype.addButton = function(opts) {
     $button.addClass('needsclick');
   }
 
-  if (!scout.device.supportsTouch()) {
+  if (!scout.device.supportsOnlyTouch()) {
     $button.attr('tabindex', opts.tabIndex || '0');
   }
 

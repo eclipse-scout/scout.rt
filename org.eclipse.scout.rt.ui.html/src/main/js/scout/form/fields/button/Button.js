@@ -134,7 +134,7 @@ scout.Button.prototype._render = function() {
       .addClass('button');
     this.$buttonLabel = $button.appendSpan('button-label');
 
-    if (scout.device.supportsTouch()) {
+    if (scout.device.supportsOnlyTouch()) {
       $button.setTabbable(false);
     }
   }
@@ -266,7 +266,7 @@ scout.Button.prototype._renderEnabled = function() {
   scout.Button.parent.prototype._renderEnabled.call(this);
   if (this.displayStyle === scout.Button.DisplayStyle.LINK) {
     this.$link.setEnabled(this.enabledComputed);
-    this.$field.setTabbable(this.enabledComputed && !scout.device.supportsTouch());
+    this.$field.setTabbable(this.enabledComputed && !scout.device.supportsOnlyTouch());
   }
 };
 

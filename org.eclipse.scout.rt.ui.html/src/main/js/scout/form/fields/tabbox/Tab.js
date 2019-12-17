@@ -159,7 +159,7 @@ scout.Tab.prototype.setTabbable = function(tabbable) {
 };
 
 scout.Tab.prototype._renderTabbable = function() {
-  this.$container.setTabbable(this.tabbable && !scout.device.supportsTouch());
+  this.$container.setTabbable(this.tabbable && !scout.device.supportsOnlyTouch());
 };
 
 scout.Tab.prototype.select = function() {
@@ -172,7 +172,7 @@ scout.Tab.prototype.setSelected = function(selected) {
 
 scout.Tab.prototype._renderSelected = function() {
   this.$container.select(this.selected);
-  this.$container.setTabbable(this.selected && !scout.device.supportsTouch());
+  this.$container.setTabbable(this.selected && !scout.device.supportsOnlyTouch());
 };
 
 scout.Tab.prototype.setMarked = function(marked) {

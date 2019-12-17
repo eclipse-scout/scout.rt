@@ -361,8 +361,18 @@ scout.Device.prototype.supportsFeature = function(property, checkFunc) {
  * Currently this method returns the same as hasOnScreenKeyboard(). Maybe the implementation here will be
  * different in the future.
  */
+scout.Device.prototype.supportsOnlyTouch = function() {
+  return this.supportsFeature('_onlyTouch', this.hasOnScreenKeyboard.bind(this));
+};
+
+/**
+ * @see http://www.stucox.com/blog/you-cant-detect-a-touchscreen/
+ * @see https://codeburst.io/the-only-way-to-detect-touch-with-javascript-7791a3346685
+ */
 scout.Device.prototype.supportsTouch = function() {
-  return this.supportsFeature('_touch', this.hasOnScreenKeyboard.bind(this));
+  return this.supportsFeature('_touch', function check(property) {
+    return (('ontouchstart' in window) || window.TouchEvent || window.DocumentTouch && document instanceof DocumentTouch);
+  });
 };
 
 scout.Device.prototype.supportsFile = function() {

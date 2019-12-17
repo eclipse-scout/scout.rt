@@ -943,7 +943,7 @@ scout.SmartField.prototype.activate = function(onField) {
   }
   // Don't focus on desktop devices when click is on field #217192
   // Also required for touch case where field is a DIV and not an INPUT field
-  if (!onField || scout.device.supportsTouch()) {
+  if (!onField || scout.device.supportsOnlyTouch()) {
     this.$field.focus();
   }
   this.togglePopup();

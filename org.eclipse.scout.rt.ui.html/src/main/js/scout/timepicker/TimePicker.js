@@ -19,7 +19,7 @@ scout.TimePicker = function() {
   this.resolution;
   this.$scrollable;
 
-  this.touch = scout.device.supportsTouch();
+  this.touch = scout.device.supportsOnlyTouch();
 };
 scout.inherits(scout.TimePicker, scout.Widget);
 

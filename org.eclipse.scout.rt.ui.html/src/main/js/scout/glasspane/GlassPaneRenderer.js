@@ -63,7 +63,7 @@ scout.GlassPaneRenderer.prototype.renderGlassPane = function($glassPaneTarget) {
 
   // This is required in touch mode, because FastClick messes up the order
   // of mouse/click events which is especially important for TouchPopups.
-  if (scout.device.supportsTouch()) {
+  if (scout.device.supportsOnlyTouch()) {
     $glassPane.addClass('needsclick');
   }
 

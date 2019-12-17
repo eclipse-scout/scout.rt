@@ -195,7 +195,7 @@ scout.Outline.prototype._renderTitle = function() {
     if (!this.$title) {
       this.$title = this.$container.prependDiv('outline-title')
         .on('mousedown', this._onTitleMouseDown.bind(this))
-        .toggleClass('touch', scout.device.supportsTouch());
+        .toggleClass('touch', scout.device.supportsOnlyTouch());
       this.$titleText = this.$title.prependDiv('outline-title-text');
     }
     this.$titleText.text(this.title);

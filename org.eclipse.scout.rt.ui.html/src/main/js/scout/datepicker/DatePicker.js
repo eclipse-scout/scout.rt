@@ -25,7 +25,7 @@ scout.DatePicker = function() {
   // Only the this.currentMonth is visible, the others are needed for the swipe animation.
   // The month is an object with the properties viewDate, rendered and $container
   this.months = [];
-  this.touch = scout.device.supportsTouch();
+  this.touch = scout.device.supportsOnlyTouch();
 };
 scout.inherits(scout.DatePicker, scout.Widget);
 

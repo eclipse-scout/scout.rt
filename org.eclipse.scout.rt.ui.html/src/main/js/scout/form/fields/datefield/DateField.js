@@ -1617,7 +1617,7 @@ scout.DateField.prototype.onCellEditorRendered = function(options) {
       this.openDatePopupAndSelect(this.value);
     } else if (!this.hasDate && this.hasTime) {
       this.openTimePopupAndSelect(this.value);
-    } else if (!scout.device.supportsTouch()) {
+    } else if (!scout.device.supportsOnlyTouch()) {
       // If date AND time are active, don't open popup on touch devices because the user has to choose first what he wants to edit
       this.openDatePopupAndSelect(this.value);
     }

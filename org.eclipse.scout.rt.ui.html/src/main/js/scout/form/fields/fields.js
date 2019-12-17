@@ -38,7 +38,7 @@ scout.fields = {
   initTouch: function(field, model) {
     field.embedded = scout.nvl(model.embedded, false);
     // when 'touchMode' is not set explicitly, check the device
-    field.touchMode = scout.nvl(model.touchMode, scout.device.supportsTouch());
+    field.touchMode = scout.nvl(model.touchMode, scout.device.supportsOnlyTouch());
   },
 
   /**

@@ -124,7 +124,7 @@ scout.CheckBoxField.prototype.setValue = function(value) {
 scout.CheckBoxField.prototype._renderEnabled = function() {
   scout.CheckBoxField.parent.prototype._renderEnabled.call(this);
   this.$checkBox
-    .setTabbable(this.enabledComputed && !scout.device.supportsTouch())
+    .setTabbable(this.enabledComputed && !scout.device.supportsOnlyTouch())
     .setEnabled(this.enabledComputed);
 };
 
