@@ -287,16 +287,39 @@ export default class Form extends Widget {
     return this.when('load');
   }
 
+  /**
+   * Lifecycle handle function registered for 'load'.
+   *
+   * @returns {Promise<T | void>|void}
+   */
   _onLifecycleLoad() {
-    return this._load().then(function(data) {
-      if (this.destroyed) {
-        // If form has been closed right after it was opened ignore the load result
-        return;
-      }
-      this.setData(data);
-      this.importData();
-      this.trigger('load');
-    }.bind(this));
+    try {
+      return this._load()
+        .then(data => {
+          if (this.destroyed) {
+            // If form has been closed right after it was opened ignore the load result
+            return;
+          }
+          this.setData(data);
+          this.importData();
+          this.trigger('load');
+        }).catch(error => {
+          return this._handleLoadError(error);
+        });
+    } catch (error) {
+      return this._handleLoadError(error);
+    }
+  }
+
+  /**
+   * This function is called when an error occurs while the <code>_load</code> function is called or when the <code>_load</code> function returns with a rejected promise.
+   * By default the Form is destroyed and the error re-thrown so a caller of <code>Form.load()</code> may catch the error.
+   *
+   * @param error
+   */
+  _handleLoadError(error) {
+    this.destroy();
+    throw error;
   }
 
   /**
@@ -390,7 +413,7 @@ export default class Form extends Widget {
    * This function is called by the lifecycle, when the 'save' function is called.<p>
    * The data given to this function is the result of 'exportData' which was called in advance.
    *
-   * @returns {Promise} promise which may contain a Status specifying if the save operation was successful. The promise may be empty which means the save operation was successful.
+  * @returns {Promise} promise which may contain a Status specifying if the save operation was successful. The promise may be empty which means the save operation was successful.
    */
   _save(data) {
     return $.resolvedPromise();

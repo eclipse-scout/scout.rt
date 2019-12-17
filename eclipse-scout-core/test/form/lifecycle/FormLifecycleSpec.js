@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper} from '@eclipse-scout/testing';
-import {scout, Status} from '../../src/index';
+import {scout, Status} from '../../../src';
+import jasmine from 'jasmine-core';
 
 describe('FormLifecycle', function() {
 
@@ -98,17 +99,7 @@ describe('FormLifecycle', function() {
           message: 'This is a fatal error'
         }));
       };
-      var lifecycleComplete = false;
-      form2.lifecycle.on('close', function() {
-        lifecycleComplete = true;
-      });
-      form2.render();
-      form2.lifecycle.ok();
-      jasmine.clock().tick();
-      expectMessageBox(true);
-      closeMessageBox();
-      jasmine.clock().tick(1000); // <- important, otherwise the promise will not be resolved somehow (?)
-      expect(lifecycleComplete).toBe(false);
+      runTestWithLifecycleOk(form2, false);
     });
 
     it('continues lifecycle if severity is WARNING', function() {
@@ -121,6 +112,10 @@ describe('FormLifecycle', function() {
           message: 'This is only a warning'
         }));
       };
+      runTestWithLifecycleOk(form2, true);
+    });
+
+    function runTestWithLifecycleOk(form2, expected) {
       var lifecycleComplete = false;
       form2.lifecycle.on('close', function() {
         lifecycleComplete = true;
@@ -131,8 +126,8 @@ describe('FormLifecycle', function() {
       expectMessageBox(true);
       closeMessageBox();
       jasmine.clock().tick(1000); // <- important, otherwise the promise will not be resolved somehow (?)
-      expect(lifecycleComplete).toBe(true);
-    });
+      expect(lifecycleComplete).toBe(expected);
+    }
 
     it('should call _validate function on form', function() {
       // validate should always be called, even when there is not a single touched field in the form
@@ -155,6 +150,49 @@ describe('FormLifecycle', function() {
       formField.setMandatory(true);
       form2.ok();
       expect(validateCalled).toBe(false);
+    });
+
+  });
+
+  describe('load', () => {
+
+    beforeEach(() => {
+      jasmine.clock().uninstall(); // we don't need a mock-clock for this test
+    });
+
+    it('should handle errors that occur in promise', done => {
+      var form = helper.createFormWithOneField();
+      form._load = () => {
+        return $.resolvedPromise()
+          .then(() => {
+            throw 'Something went wrong';
+          });
+      };
+      form.render();
+      form.load().catch(error => {
+        expect(form.destroyed).toBe(true);
+      }).always(done);
+    });
+
+    /**
+     * Errors that are thrown directly in the _load function should not be wrapped into a Promise
+     * and must be catched with try/catch or are finally handled by the global error handler.
+     */
+    it('should handle errors that occur in _load function', done => {
+      var form = helper.createFormWithOneField();
+      var error = null;
+      form._load = () => {
+        throw 'Something went wrong';
+      };
+      form.render();
+      try {
+        form.load();
+      } catch (error0) {
+        error = error0;
+      }
+      expect(form.destroyed).toBe(true);
+      expect(error).toBe('Something went wrong');
+      done();
     });
 
   });

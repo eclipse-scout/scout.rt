@@ -25,6 +25,7 @@ import * as $ from 'jquery';
 export default class Lifecycle {
 
   constructor() {
+    this.widget = null;
     this.emptyMandatoryElementsTextKey = null;
     this.emptyMandatoryElementsText = null;
 
@@ -232,7 +233,7 @@ export default class Lifecycle {
         return this._showStatusMessageBox(errorToStatus(error));
       }.bind(this));
 
-    // See ValueField#_createInvalidValueStatus, has similar code to transfor error to status
+    // See ValueField#_createInvalidValueStatus, has similar code to transform error to status
     function errorToStatus(error) {
       if (error instanceof Status) {
         return error;
@@ -277,7 +278,7 @@ export default class Lifecycle {
       .withSeverity(status.severity)
       .withBody(status.message, true)
       .buildAndOpen()
-      .then(function(option) {
+      .then(function() {
         var invalid = (status.severity === Status.Severity.ERROR);
         return $.resolvedPromise(invalid);
       });

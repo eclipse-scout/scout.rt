@@ -42,7 +42,8 @@
   "devDependencies": {
     "@eclipse-scout/cli": "10.0.0-snapshot",
     "@eclipse-scout/releng": "^10.0.0",
-    "@eclipse-scout/testing": "10.0.0-snapshot"
+    "@eclipse-scout/testing": "10.0.0-snapshot",
+    "jasmine-core": "3.5.0"
   },
   "dependencies": {
     "jquery": "3.4.1"
