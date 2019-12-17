@@ -258,18 +258,20 @@ public final class SeleniumExpectedConditions {
   /**
    * @param parentElement
    *          if not null, findElement below the given parent, if null, findElements in document
-   * @param numRows
-   * @return The table-rows found by the expected condition
+   * @param divClass
+   *          css class of child div
+   * @param numDivs
+   * @return Number of child divs found by the expected condition
    */
-  public static ExpectedCondition<List<WebElement>> tableToHaveNumberOfRows(final WebElement parentElement, final int numRows) {
+  public static ExpectedCondition<List<WebElement>> containerToHaveNumberOfChildDivs(final WebElement parentElement, final String divClass, final int numDivs) {
     return new ExpectedCondition<List<WebElement>>() {
       @Override
       public List<WebElement> apply(WebDriver driver) {
         try {
-          By by = By.className("table-row");
-          List<WebElement> tableRows = parentElement != null ? parentElement.findElements(by) : driver.findElements(by);
-          if (numRows == tableRows.size()) {
-            return tableRows;
+          By by = By.className(divClass);
+          List<WebElement> childDivs = parentElement != null ? parentElement.findElements(by) : driver.findElements(by);
+          if (numDivs == childDivs.size()) {
+            return childDivs;
           }
         }
         catch (StaleElementReferenceException e) { // NOSONAR
@@ -280,9 +282,19 @@ public final class SeleniumExpectedConditions {
 
       @Override
       public String toString() {
-        return String.format("table should have %d rows", numRows);
+        return String.format("container should have %d " + divClass, numDivs);
       }
     };
+  }
+
+  /**
+   * @param parentElement
+   *          if not null, findElement below the given parent, if null, findElements in document
+   * @param numRows
+   * @return The table-rows found by the expected condition
+   */
+  public static ExpectedCondition<List<WebElement>> tableToHaveNumberOfRows(final WebElement parentElement, final int numRows) {
+    return containerToHaveNumberOfChildDivs(parentElement, "table-row", numRows);
   }
 
   /**

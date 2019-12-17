@@ -907,7 +907,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
-   * Called when this table requests tile to be displayed, called by {@link #createTiles(List)}.
+   * Called when this table requests tiles to be displayed, called by {@link #createTiles(List)}.
    * <p>
    * Subclasses can override this method. The default returns <code>null</code> (= no tile for this row).
    */
@@ -4505,7 +4505,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     return rows.stream()
         .map(row -> {
           ITile tile = interceptCreateTile(row);
-          if (tile.getParent() == null) {
+          if (tile != null && tile.getParent() == null) {
             tile.setParentInternal(this);
           }
           return BEANS.get(TableRowTileMapping.class)
