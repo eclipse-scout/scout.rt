@@ -8,16 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-/* IMPORTANT: YUI replaces 0% with 0 when compressing the css. This breaks the animations (the first keyframe is ignored).
-   Workaround: Don't use 0%, always use 00%. */
+@desktop-notification-width: 250px;
 
 .desktop-notifications {
   position: fixed;
   right: 10px;
   top: 0;
   height: 100%;
+  width: @desktop-notification-width;
   margin-top: @desktop-notifications-margin-top;
-  width: 0; /* Don't block access to the elements in the background */
+  pointer-events: none; /* Don't block access to the elements in the background */
 }
 
 /*** Animation: slide-in ***/
@@ -37,7 +37,7 @@
  */
 .keyframes-desktop-notification-slide-in() {
   00% {
-    left: 250px;
+    left: @desktop-notification-width;
     margin-bottom: 0;
   }
   /* NOSONAR see comment on top */
@@ -99,11 +99,12 @@
 
 .desktop-notification {
   position: relative;
-  width: 250px;
+  width: @desktop-notification-width;
   float: right;
   border-left: 3px solid @active-color;
   background-color: @desktop-notification-background-color;
   margin-bottom: 20px;
+  pointer-events: auto;
   #scout.drop-shadow();
 
   &.ok {
