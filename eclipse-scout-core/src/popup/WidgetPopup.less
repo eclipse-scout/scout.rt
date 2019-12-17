@@ -28,6 +28,7 @@
   }
 
   & > .popup-arrow {
+
     &.bottom,
     &.right {
       #scout.drop-shadow-large(@y: 4px, @spread: -2px);
@@ -47,6 +48,12 @@
   & > .popup-widget {
     position: relative;
     background-color: inherit;
-    border-radius: @border-radius;
+    // Make sure the solid background color is not drawn over the rounded corners of .widget-popup
+    border-radius: @border-radius + 2px;
+  }
+
+  & > .popup-arrow-overlay {
+    // Make sure the solid background color is not drawn over the rounded corners of .widget-popup
+    border-radius: @border-radius + 2px;
   }
 }
