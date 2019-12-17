@@ -44,6 +44,8 @@ describe('scout.comparators', function() {
     expect(comparator.compareIgnoreCase('A', 'a')).toBe(0);
     expect(comparator.compareIgnoreCase('a', 'a')).toBe(0);
 
+    comparator.install(createSession());
+
     expect(comparator.compare('a', 'B')).toBe(1);
     expect(comparator.compare('B', 'a')).toBe(-1);
   });
