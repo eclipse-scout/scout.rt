@@ -103,7 +103,6 @@ export default class CalendarComponent extends Widget {
         .addClass(this.item.cssClass)
         .data('component', this)
         .data('partDay', partDay)
-        .data('tooltipText', this._description.bind(this))
         .mousedown(this._onMouseDown.bind(this))
         .on('contextmenu', this._onContextMenu.bind(this));
       $part

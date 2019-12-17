@@ -34,8 +34,10 @@ export default class CalendarListComponent {
       .data('partDay', this.partDay)
       .addClass(source.item.cssClass)
       .toggleClass('comp-selected', source._selected)
-      .mousedown(source._onMouseDown.bind(source))
-      .on('contextmenu', source._onContextMenu.bind(source))
+      .mousedown(this._onMouseDown.bind(this, source))
+      .on('contextmenu', source._onContextMenu.bind(source));
+    this.$container.appendDiv('calendar-component-leftcolorborder');
+    this.$container.appendDiv('content')
       .html(source._description());
   }
 

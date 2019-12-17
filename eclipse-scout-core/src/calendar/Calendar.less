@@ -196,6 +196,8 @@
 }
 
 .calendar-component {
+  display: flex;
+  flex-direction: row;
   position: relative;
   float: left;
   line-height: 24px;
@@ -217,7 +219,6 @@
     flex-shrink: 0;
     top: 0;
     left: 0;
-    height: 100%;
     width: 4px;
     margin-right: 4px;
     background-color: @palette-blue-1; /* Default colors used when component has no specific class */
