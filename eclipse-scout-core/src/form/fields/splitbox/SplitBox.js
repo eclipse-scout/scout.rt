@@ -31,15 +31,17 @@ export default class SplitBox extends CompositeField {
     this._addWidgetProperties(['firstField', 'secondField', 'collapsibleField']);
     this._addPreserveOnPropertyChangeProperties(['collapsibleField']);
 
+    this.firstField = null;
+    this.secondField = null;
+    this.collapsibleField = null;
     this.fieldCollapsed = false;
-    this.collapsibleField;
-    this.toggleCollapseKeyStroke;
-    this.firstCollapseKeyStroke;
-    this.secondCollapseKeyStroke;
+    this.toggleCollapseKeyStroke = null;
+    this.firstCollapseKeyStroke = null;
+    this.secondCollapseKeyStroke = null;
     this.splitHorizontal = true; // true = split x-axis, false = split y-axis
     this.splitterEnabled = true;
     this.splitterPosition = 0.5;
-    this.minSplitterPosition;
+    this.minSplitterPosition = 0;
     this.splitterPositionType = SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST;
     this.fieldMinimized = false;
     this.minimizeEnabled = true;
@@ -103,11 +105,9 @@ export default class SplitBox extends CompositeField {
         this._$splitter = this._$splitArea.appendDiv('splitter')
           .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
           .on('mousedown', resizeSplitter.bind(this));
-      } else {
-        // no second field -> no splitter (but special marker class)
-        this.$container.addClass('single-field');
       }
     }
+    this._updateFieldVisibilityClasses();
 
     // --- Helper functions ---
 
@@ -266,6 +266,7 @@ export default class SplitBox extends CompositeField {
 
     function onInnerFieldPropertyChange(event) {
       if (event.propertyName === 'visible') {
+        this._updateFieldVisibilityClasses();
         // Mark layout as invalid
         this.htmlSplitArea.invalidateLayoutTree(false);
       }
@@ -279,6 +280,12 @@ export default class SplitBox extends CompositeField {
     this._renderCollapsibleField(); // renders collapsibleField _and_ fieldCollapsed
     this._renderCollapseHandle(); // renders collapseHandle _and_ toggleCollapseKeyStroke _and_ firstCollapseKeyStroke _and_ secondCollapseKeyStroke
     this._renderFieldMinimized();
+  }
+
+  _remove() {
+    this._$splitArea = null;
+    this._$splitter = null;
+    super._remove();
   }
 
   _setSplitterPosition(splitterPosition) {
@@ -727,5 +734,18 @@ export default class SplitBox extends CompositeField {
       fields.push(this.secondField);
     }
     return fields;
+  }
+
+  _updateFieldVisibilityClasses() {
+    if (!this.rendered && !this.rendering) {
+      return;
+    }
+    var hasFirstField = (this.firstField && this.firstField.isVisible());
+    var hasSecondField = (this.secondField && this.secondField.isVisible());
+    var hasTwoFields = hasFirstField && hasSecondField;
+    var hasOneField = !hasTwoFields && (hasFirstField || hasSecondField);
+
+    // Mark container if only one field is visible (i.e. there is no splitter)
+    this.$container.toggleClass('single-field', hasOneField);
   }
 }

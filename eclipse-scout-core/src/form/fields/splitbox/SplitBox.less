@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-
 @split-box-x-splitter-size: @split-box-splitter-line-size + (2 * @split-box-x-splitter-padding) - @mandatory-indicator-width;
 @split-box-y-splitter-size: @split-box-splitter-line-size + (2 * @split-box-y-splitter-padding);
 
 .split-box {
+
   & > .split-area {
     @temp-splitter-line-size: 1px;
 
@@ -35,8 +35,7 @@
         background-color: @hover-color;
       }
 
-      /* | */
-
+      // "|"
       &.x-axis {
         height: 100%;
         width: @split-box-x-splitter-size;
@@ -45,8 +44,7 @@
         cursor: col-resize;
       }
 
-      /* -- */
-
+      // "--"
       &.y-axis {
         margin-left: @mandatory-indicator-width;
         width: calc(~'100% - ' @mandatory-indicator-width);
@@ -65,14 +63,12 @@
       }
     }
 
-    /* used while dragging */
-
+    // used while dragging
     & > .temp-splitter {
       position: absolute;
       z-index: 2;
 
-      /* | */
-
+      // "|"
       &.x-axis {
         height: 100%;
         width: @temp-splitter-line-size;
@@ -81,8 +77,7 @@
         margin-right: @split-box-x-splitter-padding + floor((@split-box-splitter-line-size - @temp-splitter-line-size) / 2) - @mandatory-indicator-width;
       }
 
-      /* -- */
-
+      // "--"
       &.y-axis {
         margin-left: @mandatory-indicator-width;
         width: calc(~'100% - ' @mandatory-indicator-width);
@@ -115,15 +110,15 @@
   }
 }
 
-.split-box:not(.second-field-collapsed) > .split-area > .first-field {
-  /* | */
+// If splitter is visible (= there are two fields), make room for it by adding a margin to the first field
+.split-box:not(.single-field):not(.second-field-collapsed) > .split-area > .first-field {
 
+  // "|"
   &.x-axis {
     margin-right: @split-box-x-splitter-size;
   }
 
-  /* -- */
-
+  // "--"
   &.y-axis {
     margin-bottom: @split-box-y-splitter-size;
   }
