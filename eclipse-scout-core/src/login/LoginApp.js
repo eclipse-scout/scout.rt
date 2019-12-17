@@ -50,6 +50,6 @@ export default class LoginApp extends App {
     this._prepareDOM();
 
     var loginBox = scout.create('LoginBox', options);
-    loginBox.render($('body'));
+    loginBox.render($('body').addClass('login-body'));
   }
 }
