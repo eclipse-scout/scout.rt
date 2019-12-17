@@ -17,35 +17,35 @@ export default class Calendar extends Widget {
     super();
 
     this.monthViewNumberOfWeeks = 6;
-    this.numberOfHourDivisions = 2;
-    this.heightPerDivision = 30;
+    this.numberOfHourDivisions = this.getConfiguredNumberOfHourDivisions();
+    this.heightPerDivision = this.getConfiguredHeightPerDivision();
+    this.startHour = this.getConfiguredStartHour();
     this.heightPerHour = this.numberOfHourDivisions * this.heightPerDivision;
     this.heightPerDay = 24 * this.heightPerHour;
-    this.startHour = 6;
     this.spaceBeforeScrollTop = 15;
     this.workDayIndices = [1, 2, 3, 4, 5]; // Workdays: Mon-Fri (Week starts at Sun in JS)
     this.components = [];
     this.displayMode;
-    this.displayCondensed;
-    this.loadInProgress;
-    this.selectedDate;
+    this.displayCondensed = false;
+    this.loadInProgress = false;
+    this.selectedDate = null;
     this.showDisplayModeSelection = true;
-    this.title;
+    this.title = null;
     this.useOverflowCells = true;
     this.viewRange = null;
     this.calendarToggleListWidth = 270;
     this.calendarToggleYearWidth = 215;
 
     // main elements
-    this.$container;
-    this.$header;
-    this.$range;
-    this.$commands;
-    this.$grids;
-    this.$grid;
-    this.$topGrid;
-    this.$list;
-    this.$progress;
+    this.$container = null;
+    this.$header = null;
+    this.$range = null;
+    this.$commands = null;
+    this.$grids = null;
+    this.$grid = null;
+    this.$topGrid = null;
+    this.$list = null;
+    this.$progress = null;
 
     // additional modes; should be stored in model
     this._showYearPanel = false;
@@ -57,7 +57,7 @@ export default class Calendar extends Widget {
      * the regular view range contains also dates from the first and
      * next month. The exact range is not sent to the server.
      */
-    this._exactRange;
+    this._exactRange = null;
 
     /**
      * When the list panel is shown, this list contains the scout.CalenderListComponent
@@ -90,6 +90,18 @@ export default class Calendar extends Widget {
     BACKWARD: -1,
     FORWARD: 1
   };
+
+  getConfiguredNumberOfHourDivisions() {
+    return 2;
+  }
+
+  getConfiguredHeightPerDivision() {
+    return 30;
+  }
+
+  getConfiguredStartHour() {
+    return 6;
+  }
 
   _isDay() {
     return this.displayMode === Calendar.DisplayMode.DAY;
