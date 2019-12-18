@@ -4,20 +4,19 @@ BASEDIR=$(dirname $0)
 . $BASEDIR/_functions.sh
 
 GIT_USERNAME=
-RELEASE="TEST_RELEASE"
-TAG=
+VERSION=
 
 function usage {
   cat << EOF
 
-	${PRG} [-h] --git_username <EGerritUser> --release <RELEASE> --tag <TAG>
+	${PRG} [-h] --git_username <GitUser> --version <VERSION> [--tag <TAG>]
 
-	-h                                - Usage info
-	-u | --git_username <EGerritUser> - Eclipse Gerrit Username of Commiter, SSH Key is used for authorisation
-	-r | --release <RELEASE>          - <RELEASE> name (Optional / Default: TEST_RELEASE)
-	-t | --tag <TAG>                  - <TAG> name (Optional / Default: Project Version)
+	-h                                  - Usage info
+	-u | --git_username <GitUser>       - Eclipse Git Username, SSH Key is used for authorisation
+	-v | --version <VERSION>            - <VERSION> name
+	-t | --tag <TAG>                    - <TAG> name (Optional / Default: <VERSION>)
 
-	Example: ${PRG} -u sleicht -r NIGHTLY
+	Example: ${PRG} -u sleicht -v 10.0.42
 
 EOF
 }
@@ -29,10 +28,10 @@ function get_options {
 			-u | --git_username )		shift
 										GIT_USERNAME=$1
 										;;
-			-r | --release )			shift
-										RELEASE=$1
+			-v | --version )			shift
+										VERSION=$1
 										;;
-			-t | --tag )				shift
+			-t | --tag )			shift
 										TAG=$1
 										;;
 			-h | --help )				usage
@@ -46,8 +45,13 @@ function get_options {
 }
 get_options $*
 
-if [[ -z  "$GIT_USERNAME" ]]; then
-	echo "[ERROR]:       <EGerritUser> missing"
+if [[ -z "$GIT_USERNAME" ]]; then
+	echo "[ERROR]:       <GitUser> missing"
+	usage
+	exit 7
+fi
+if [[ -z "$VERSION" ]]; then
+	echo "[ERROR]:       <VERSION> missing"
 	usage
 	exit 7
 fi
@@ -60,11 +64,11 @@ _MAVEN_OPTS="$_MAVEN_OPTS -e -B"
 touch pnpm-workspace.yaml
 
 # Update versions in pom.xml files (java)
-mvn -f org.eclipse.scout.rt -Dmaster_release_milestoneVersion=$RELEASE -N -P release.setversion -T1 -Dmaster_test_forkCount=1 $_MAVEN_OPTS
+mvn -f org.eclipse.scout.rt -Dmaster_release_newVersion=$VERSION -N -P release.setversion -T1 -Dmaster_test_forkCount=1 $_MAVEN_OPTS
 processError
 
 # Update versions in package.json files (javascript)
-mvn -f org.eclipse.scout.rt -Dmaster_release_milestoneVersion=$RELEASE -N -P npm-run-full-build process-sources -Dmaster_npm_release_build=true $_MAVEN_OPTS
+mvn -f org.eclipse.scout.rt -Dmaster_release_newVersion=$VERSION -N -P npm-run-full-build process-sources -Dmaster_npm_release_build=true $_MAVEN_OPTS
 processError
 
 $BASEDIR/build.sh -Dmaster_unitTest_failureIgnore=false -Dmaster_npm_release_build=false $_MAVEN_OPTS
