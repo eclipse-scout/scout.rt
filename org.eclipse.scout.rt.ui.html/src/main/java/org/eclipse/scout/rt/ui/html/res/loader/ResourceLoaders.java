@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.ui.html.UiThemeHelper;
 @ApplicationScoped
 public class ResourceLoaders {
 
-  protected static final Pattern ICON_PATTERN = Pattern.compile("^/icon/.*");
+  protected static final Pattern ICON_PATTERN = Pattern.compile("^/icon/(.*)");
   protected static final Pattern DYNAMIC_RESOURCES_PATTERN = Pattern.compile("^/" + DynamicResourceInfo.PATH_PREFIX + "/.*");
   protected static final Pattern DEFAULT_VALUES_PATTERN = Pattern.compile("^/defaultValues$");
 
