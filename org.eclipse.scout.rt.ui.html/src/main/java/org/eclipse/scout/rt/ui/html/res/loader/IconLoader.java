@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
-import java.io.IOException;
+import java.util.regex.Matcher;
 
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
@@ -25,8 +25,13 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 public class IconLoader extends AbstractResourceLoader {
 
   @Override
-  public BinaryResource loadResource(String pathInfo) throws IOException {
-    final String imageId = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
+  public BinaryResource loadResource(String pathInfo) {
+    Matcher matcher = ResourceLoaders.ICON_PATTERN.matcher(pathInfo);
+    if (!matcher.find()) {
+      return null;
+    }
+
+    String imageId = matcher.group(1);
     IconSpec iconSpec = IconLocator.instance().getIconSpec(imageId);
     if (iconSpec == null) {
       return null;
