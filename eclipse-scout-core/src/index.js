@@ -455,6 +455,7 @@ export {default as ModeSelectorFieldAdapter} from './form/fields/modeselectorfie
 export {default as NumberField} from './form/fields/numberfield/NumberField';
 export {default as NumberFieldAdapter} from './form/fields/numberfield/NumberFieldAdapter';
 export {default as Calculator} from './form/fields/numberfield/Calculator';
+export {default as IntegerField} from './form/fields/integerfield/IntegerField';
 export {default as PlaceholderField} from './form/fields/placeholder/PlaceholderField';
 export {default as PlaceholderFieldAdapter} from './form/fields/placeholder/PlaceholderFieldAdapter';
 export {default as PlannerField} from './form/fields/plannerfield/PlannerField';
