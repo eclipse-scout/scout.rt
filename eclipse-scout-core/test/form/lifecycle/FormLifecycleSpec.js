@@ -10,7 +10,6 @@
  */
 import {FormSpecHelper} from '@eclipse-scout/testing';
 import {scout, Status} from '../../../src';
-import jasmine from 'jasmine-core';
 
 describe('FormLifecycle', function() {
 
