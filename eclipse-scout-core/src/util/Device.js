@@ -363,7 +363,7 @@ export default class Device {
    */
   supportsTouch() {
     return this.supportsFeature('_touch', function check(property) {
-      return (('ontouchstart' in window) || window.TouchEvent || window.DocumentTouch && document instanceof DocumentTouch);
+      return (('ontouchstart' in window) || window.TouchEvent || window.DocumentTouch && document instanceof window.DocumentTouch);
     });
   }
 
