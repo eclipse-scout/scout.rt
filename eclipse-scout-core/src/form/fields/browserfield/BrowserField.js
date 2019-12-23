@@ -23,7 +23,7 @@ export default class BrowserField extends ValueField {
     this.trackLocation = false;
     this.sandboxEnabled = true;
     this.sandboxPermissions = null;
-    this.scrollBarEnabled = false;
+    this.scrollBarEnabled = true;
     this.showInExternalWindow = false;
     this._messageListener = null;
     this._popupWindow = null;
@@ -41,11 +41,11 @@ export default class BrowserField extends ValueField {
 
     this.iframe = scout.create('IFrame', {
       parent: this,
-      location: model.location,
-      sandboxEnabled: model.sandboxEnabled,
-      sandboxPermissions: model.sandboxPermissions,
-      scrollBarEnabled: model.scrollBarEnabled,
-      trackLocation: model.trackLocation
+      location: this.location,
+      sandboxEnabled: this.sandboxEnabled,
+      sandboxPermissions: this.sandboxPermissions,
+      scrollBarEnabled: this.scrollBarEnabled,
+      trackLocation: this.trackLocation
     });
     this.iframe.on('propertyChange', this._onIFramePropertyChange.bind(this));
   }
