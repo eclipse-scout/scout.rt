@@ -275,9 +275,9 @@ export default class BrowserField extends ValueField {
     });
   }
 
-  setTrackLocationChange(trackLocation) {
+  setTrackLocation(trackLocation) {
     this.setProperty('trackLocation', trackLocation);
-    this.iframe.setTrackLocationChange(trackLocation);
+    this.iframe.setTrackLocation(trackLocation);
   }
 
   _onIFramePropertyChange(event) {

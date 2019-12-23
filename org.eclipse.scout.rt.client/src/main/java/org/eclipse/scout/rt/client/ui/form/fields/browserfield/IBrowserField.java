@@ -10,12 +10,12 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
-
-import java.util.EnumSet;
-import java.util.Set;
 
 /**
  * This model represents a separate "website" inside the application.
@@ -251,10 +251,10 @@ public interface IBrowserField extends IFormField {
    * Note: This does only work if the iframe and the iframe's parent document have the same origin (protocol, port and
    * host are the same).
    */
-  boolean isTrackLocationChange();
+  boolean isTrackLocation();
 
   /**
-   * @see #isTrackLocationChange()
+   * @see #isTrackLocation()
    */
-  void setTrackLocationChange(boolean trackLocation);
+  void setTrackLocation(boolean trackLocation);
 }

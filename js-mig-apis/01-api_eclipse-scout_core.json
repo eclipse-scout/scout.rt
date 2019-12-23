@@ -2984,9 +2984,9 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.BrowserField._onMessage"
     }, {
-      "name" : "setTrackLocationChange",
+      "name" : "setTrackLocation",
       "type" : "Function",
-      "fullyQualifiedName" : "scout.BrowserField.setTrackLocationChange"
+      "fullyQualifiedName" : "scout.BrowserField.setTrackLocation"
     }, {
       "name" : "_onIFramePropertyChange",
       "type" : "Function",
@@ -31406,13 +31406,13 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.IFrame._renderLocation"
     }, {
-      "name" : "setTrackLocationChange",
+      "name" : "setTrackLocation",
       "type" : "Function",
-      "fullyQualifiedName" : "scout.IFrame.setTrackLocationChange"
+      "fullyQualifiedName" : "scout.IFrame.setTrackLocation"
     }, {
-      "name" : "_renderTrackLocationChange",
+      "name" : "_renderTrackLocation",
       "type" : "Function",
-      "fullyQualifiedName" : "scout.IFrame._renderTrackLocationChange"
+      "fullyQualifiedName" : "scout.IFrame._renderTrackLocation"
     }, {
       "name" : "_onLoad",
       "type" : "Function",

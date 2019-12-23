@@ -108,7 +108,7 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
     putJsonProperty(new JsonProperty<IBrowserField>(IBrowserField.PROP_TRACK_LOCATION, model) {
       @Override
       protected Boolean modelValue() {
-        return getModel().isTrackLocationChange();
+        return getModel().isTrackLocation();
       }
     });
   }

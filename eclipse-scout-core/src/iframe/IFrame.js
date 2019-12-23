@@ -46,7 +46,7 @@ export default class IFrame extends Widget {
     this._renderScrollBarEnabled(); // Needs to be before _renderLocation, see comment in _renderScrollBarEnabled
     this._renderLocation();
     this._renderSandboxEnabled(); // includes _renderSandboxPermissions()
-    this._renderTrackLocationChange();
+    this._renderTrackLocation();
   }
 
   setLocation(location) {
@@ -60,11 +60,11 @@ export default class IFrame extends Widget {
     this.$iframe.attr('src', location);
   }
 
-  setTrackLocationChange(trackLocation) {
+  setTrackLocation(trackLocation) {
     this.setProperty('trackLocation', trackLocation);
   }
 
-  _renderTrackLocationChange(trackLocation) {
+  _renderTrackLocation(trackLocation) {
     if (this.trackLocation) {
       this.$iframe.on('load', this._loadHandler);
     } else {
