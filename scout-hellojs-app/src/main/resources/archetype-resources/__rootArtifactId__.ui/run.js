@@ -1,5 +1,5 @@
 /*
- * Runs 'npm install' and 'npm run build:dev'.
+ * Exports the function run which can spawn a new process'.
  * A node installation (https://nodejs.org) must be on the PATH for this script to work!
  */
 
@@ -17,7 +17,7 @@ function run(cmd, args) {
       if (code === 0) {
         console.log(`${cmd} ${args} finished successfully!`);
       } else {
-        console.error(`${cmd} ${args} finished with errors, see above (code ${code}).`);
+        console.error(`${cmd} ${args} finished with errors, see above (code ${code})`);
       }
       code === 0 ? resolve(0) : reject(code);
     });
@@ -26,11 +26,4 @@ function run(cmd, args) {
   return promise;
 }
 
-function installAndBuild() {
-  let suffix = process.platform === 'win32' ? '.cmd' : '';
-  run('npm' + suffix, ['install'])
-    .then(() => run('npm' + suffix, ['run', 'build:dev']))
-    .catch(code => {});
-}
-
-installAndBuild();
+module.exports = {run};
