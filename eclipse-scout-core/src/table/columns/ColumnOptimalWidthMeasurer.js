@@ -83,9 +83,10 @@ export default class ColumnOptimalWidthMeasurer {
     this.$measurement
       .addClass('invisible')
       .removeClass('hidden')
-      .children().each(function() {
-      optimalWidth = Math.max(optimalWidth, graphics.size($(this)).width);
-    });
+      .children()
+      .each(function() {
+        optimalWidth = Math.max(optimalWidth, graphics.size($(this)).width);
+      });
     return optimalWidth;
   }
 

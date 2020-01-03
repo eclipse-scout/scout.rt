@@ -29,11 +29,10 @@ export default class MenuNavigationKeyStroke extends KeyStroke {
     if ($newItem.length === 0) {
       // do not change selection
       return;
-    } else {
-      $newItem.select(true).focus();
-      if (this.field.updateNextToSelected) {
-        this.field.updateNextToSelected(this._menuItemClass, $newItem);
-      }
+    }
+    $newItem.select(true).focus();
+    if (this.field.updateNextToSelected) {
+      this.field.updateNextToSelected(this._menuItemClass, $newItem);
     }
     if ($oldItem.length > 0) {
       $oldItem.select(false);

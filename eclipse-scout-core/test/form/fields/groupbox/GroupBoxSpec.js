@@ -233,15 +233,17 @@ describe('GroupBox', function() {
       var groupBox = scout.create('GroupBox', {
         parent: session.desktop,
         gridColumnCount: 2,
-        fields: [{
-          objectType: 'StringField'
-        },
+        fields: [
           {
             objectType: 'StringField'
           },
           {
             objectType: 'StringField'
-          }]
+          },
+          {
+            objectType: 'StringField'
+          }
+        ]
       });
       groupBox.render();
       expect(groupBox.fields[0].gridData.x).toBe(-1);
@@ -265,15 +267,17 @@ describe('GroupBox', function() {
       var groupBox = scout.create('GroupBox', {
         parent: session.desktop,
         gridColumnCount: 2,
-        fields: [{
-          objectType: 'StringField'
-        },
+        fields: [
           {
             objectType: 'StringField'
           },
           {
             objectType: 'StringField'
-          }]
+          },
+          {
+            objectType: 'StringField'
+          }
+        ]
       });
       groupBox.render();
       groupBox.revalidateLayout();

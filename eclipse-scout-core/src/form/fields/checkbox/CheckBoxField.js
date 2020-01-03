@@ -126,7 +126,7 @@ export default class CheckBoxField extends ValueField {
    * @override
    */
   _renderLabel() {
-    this.$checkBoxLabel.contentOrNbsp(this.labelHtmlEnabled, this.label, 'empty')
+    this.$checkBoxLabel.contentOrNbsp(this.labelHtmlEnabled, this.label, 'empty');
     this._renderEmptyLabel();
   }
 

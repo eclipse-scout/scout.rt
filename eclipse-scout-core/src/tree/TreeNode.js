@@ -287,6 +287,7 @@ export default class TreeNode {
         if (tree.visibleNodesMap[childNode.id]) {
           return true;
         }
+        return false;
       });
       if (!hasVisibleNodes && this.parentNode.$node) {
         // Remove 'lazy' from parent

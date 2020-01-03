@@ -51,7 +51,7 @@ export function verifyDataTransferTypesScoutTypes(event, scoutTypeArray, fieldAl
       if (fieldAllowedTypes & scoutType === scoutType) { // NOSONAR
         arrays.pushAll(dragTypeArray, scoutTypeToDragTypeMapping(scoutTypeArray));
       }
-    }.bind(this));
+    });
   } else {
     dragTypeArray = scoutTypeToDragTypeMapping(scoutTypeArray);
   }

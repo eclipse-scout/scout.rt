@@ -43,7 +43,7 @@ export default class CalendarListComponent {
 
   _onMouseDown(source, event) {
     var $part = $(event.delegateTarget);
-    source.updateSelectedComponent($part, true)
+    source.updateSelectedComponent($part, true);
   }
 
   remove() {

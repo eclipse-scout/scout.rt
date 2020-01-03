@@ -244,7 +244,7 @@ export default class CalendarComponent extends Widget {
 
   _onMouseDown(event) {
     var $part = $(event.delegateTarget);
-    this.updateSelectedComponent($part, false)
+    this.updateSelectedComponent($part, false);
 
     if (event.button === 0) {
       var popup = scout.create('WidgetPopup', {
