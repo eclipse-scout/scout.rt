@@ -49,6 +49,9 @@
     "@eclipse-scout/releng": "^10.0.0",
     "eslint": "6.5.1"
   },
+  "dependencies": {
+    "eslint-config-google": "0.14.0"
+  },
   "peerDependencies": {
     "eslint": ">=6.5.1"
   }

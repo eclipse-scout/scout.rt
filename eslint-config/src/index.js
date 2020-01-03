@@ -1,7 +1,17 @@
 'use strict';
 
 module.exports = {
+  env: {
+    es6: true,
+    browser: true,
+    jquery: true,
+    jasmine: true
+  },
   extends: ['eslint:recommended', 'google'],
+  parserOptions: {
+    ecmaVersion: 6,
+    sourceType: 'module'
+  },
   rules: {
     'indent': ['error', 2, {'SwitchCase': 1}],
     'no-extra-parens': ['off'],
