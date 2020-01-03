@@ -1,12 +1,11 @@
-import {Desktop as Desktop_1, models, scout, icons, App} from '@eclipse-scout/core';
+import {Desktop as ScoutDesktop, models, scout, icons, App} from '@eclipse-scout/core';
 import DesktopModel from './DesktopModel';
 
-export default class Desktop extends Desktop_1 {
+export default class Desktop extends ScoutDesktop {
 
   constructor() {
     super();
   }
-
 
   _jsonModel() {
     return models.get(DesktopModel);

@@ -7,7 +7,6 @@ export default class PersonSearchForm extends Form {
     super();
   }
 
-
   _init(model) {
     super._init(model);
     this._initListeners();

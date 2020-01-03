@@ -14,7 +14,6 @@ export default class PersonForm extends Form {
     this.externalField = null;
   }
 
-
   _jsonModel() {
     return models.get(PersonFormModel);
   }
@@ -53,13 +52,8 @@ export default class PersonForm extends Form {
   }
 
   _save(data) {
-    return (data.personId ? ${simpleArtifactName}.persons.store(data)
-  : ${simpleArtifactName}
-  .
-    persons.create(data)
-  )
-  .
-    then(this._onSaveDone.bind(this));
+    return (data.personId ? ${simpleArtifactName}.persons.store(data) : ${simpleArtifactName}.persons.create(data))
+      .then(this._onSaveDone.bind(this));
   }
 
   _onSaveDone(person) {
@@ -68,20 +62,14 @@ export default class PersonForm extends Form {
       data: person
     });
 
-    return ${symbol_dollar}
-  .
-    resolvedPromise();
+    return ${symbol_dollar}.resolvedPromise();
   }
 
   _load() {
     if (this.data.personId) {
       // refresh data from server
-      return ${simpleArtifactName}
-    .
-      persons.load(this.data.personId);
+      return ${simpleArtifactName}.persons.load(this.data.personId);
     }
-    return ${symbol_dollar}
-  .
-    resolvedPromise(this.data);
+    return ${symbol_dollar}.resolvedPromise(this.data);
   }
 }

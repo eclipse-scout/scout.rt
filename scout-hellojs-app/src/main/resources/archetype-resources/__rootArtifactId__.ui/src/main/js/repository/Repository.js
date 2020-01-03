@@ -30,11 +30,9 @@ export default class Repository {
   }
 
   _ensureConverter(opts) {
-    return ${symbol_dollar}
-  .
-    extend({}, {
+    return ${symbol_dollar}.extend({}, {
       converters: {
-        "text json": this._mapJson
+        'text json': this._mapJson
       }
     }, opts);
   }
@@ -52,7 +50,7 @@ export default class Repository {
     return items[0];
   }
 
-// ---- Static Objects ---- //
+  // ---- Static Objects ---- //
 
   static repositories = {};
 

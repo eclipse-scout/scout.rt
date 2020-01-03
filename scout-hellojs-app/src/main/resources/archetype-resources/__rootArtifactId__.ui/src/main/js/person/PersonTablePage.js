@@ -11,15 +11,12 @@ export default class PersonTablePage extends PageWithTable {
     this._dataChangeListener = null;
   }
 
-
   _jsonModel() {
     return models.get(PersonTablePageModel);
   }
 
   _init(model) {
-    var m = ${symbol_dollar}
-  .
-    extend({}, this._jsonModel(), model);
+    var m = ${symbol_dollar}.extend({}, this._jsonModel(), model);
     super._init(m);
     this._initListeners();
   }
@@ -56,9 +53,7 @@ export default class PersonTablePage extends PageWithTable {
     var restriction = scout.create('${simpleArtifactName}.PersonRestriction', searchFilter, {
       ensureUniqueId: false
     });
-    return ${simpleArtifactName}
-  .
-    persons.list(restriction);
+    return ${simpleArtifactName}.persons.list(restriction);
   }
 
   _transformTableDataToTableRows(tableData) {
@@ -103,9 +98,7 @@ export default class PersonTablePage extends PageWithTable {
     MessageBoxes.openYesNo(this.session.desktop, this.session.text('DeleteConfirmationTextNoItemList'))
       .then(function(button) {
         if (button === MessageBox.Buttons.YES) {
-          ${simpleArtifactName}
-        .
-          persons.remove(this._getSelectedPerson().personId)
+          ${simpleArtifactName}.persons.remove(this._getSelectedPerson().personId)
             .then(this._onPersonDeleted.bind(this));
         }
       }.bind(this));

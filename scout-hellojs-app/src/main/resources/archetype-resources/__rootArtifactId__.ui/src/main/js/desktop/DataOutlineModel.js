@@ -8,6 +8,5 @@ export default function() {
         objectType: '${simpleArtifactName}.PersonTablePage'
       }
     ]
-  }
-    ;
+  };
 }

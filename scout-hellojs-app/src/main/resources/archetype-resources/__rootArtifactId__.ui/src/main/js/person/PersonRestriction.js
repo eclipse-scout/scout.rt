@@ -9,9 +9,7 @@ export default class PersonRestriction {
   }
 
   init(model) {
-    ${symbol_dollar}
-  .
-    extend(this, model);
+    ${symbol_dollar}.extend(this, model);
   }
 
   setFirstName(firstName) {

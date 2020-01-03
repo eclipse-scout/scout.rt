@@ -9,7 +9,6 @@ export default class PersonRepository extends Repository {
     this.targetUrl = App.get().apiUrl + 'persons/';
   }
 
-
   /**
    * Loads a single person
    * @param personId The id of the person to fetch. Must not be null.
@@ -59,7 +58,5 @@ export default class PersonRepository extends Repository {
 }
 
 App.addListener('bootstrap', function() {
-  ${simpleArtifactName}
-.
-  persons = Repository.register('${simpleArtifactName}.PersonRepository');
+  ${simpleArtifactName}.persons = Repository.register('${simpleArtifactName}.PersonRepository');
 });

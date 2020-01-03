@@ -14,9 +14,7 @@ export default class Person {
   static EVENT_TYPE = 'person';
 
   init(model) {
-    ${symbol_dollar}
-  .
-    extend(this, model);
+    ${symbol_dollar}.extend(this, model);
   }
 
   setFirstName(firstName) {
@@ -30,7 +28,6 @@ export default class Person {
   setPersonId(id) {
     this.personId = id;
   }
-
 
   setSalary(salary) {
     this.salary = salary;

@@ -7,7 +7,6 @@ export default class DataOutline extends Outline {
     super();
   }
 
-
   _jsonModel() {
     return models.get(DataOutlineModel);
   }
