@@ -27,9 +27,6 @@ public abstract class AbstractIcons implements Serializable {
    */
   public static final String Null = "null";
 
-  /**
-   * marker icon for an empty (transparent white) icon
-   */
   public static final String ApplicationLogo = "application_logo_large";
 
   /* default font icons (sans-serif, arial) */
