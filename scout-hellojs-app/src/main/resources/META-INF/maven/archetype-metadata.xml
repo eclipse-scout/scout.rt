@@ -70,6 +70,7 @@
             <include>**/*.js</include>
             <include>**/*.launch</include>
             <include>**/*.json</include>
+            <include>**/*.less</include>
           </includes>
         </fileSet>
         <fileSet filtered="false" encoding="UTF-8">

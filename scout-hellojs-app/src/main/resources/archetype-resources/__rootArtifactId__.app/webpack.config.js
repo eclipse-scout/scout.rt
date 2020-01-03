@@ -6,8 +6,8 @@ module.exports = (env, args) => {
 
   config.entry = {
     '${simpleArtifactName}': './src/main/js/index.js',
-    '${simpleArtifactName}-theme': require.resolve('@${simpleArtifactName}/ui/src/main/js/theme.less'),
-    '${simpleArtifactName}-theme-dark': require.resolve('@${simpleArtifactName}/ui/src/main/js/theme-dark.less')
+    '${simpleArtifactName}-theme': './src/main/js/theme.less',
+    '${simpleArtifactName}-theme-dark': './src/main/js/theme-dark.less'
   };
 
   return config;
