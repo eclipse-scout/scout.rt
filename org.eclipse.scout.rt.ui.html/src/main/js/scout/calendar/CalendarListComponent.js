@@ -18,7 +18,7 @@
 scout.CalendarListComponent = function(partDay, source) {
   this.partDay = partDay;
   this.source = source;
-  this.$container;
+  this.$container = null;
   this._selectedListener = source.on('selected', function(event) {
     this.$container.toggleClass('comp-selected', event.selected);
   }.bind(this));

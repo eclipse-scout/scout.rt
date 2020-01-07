@@ -218,7 +218,12 @@ scout.CalendarComponent.prototype.setSelected = function(selected) {
   this.setProperty('selected', selected);
 };
 
+/**
+ * Prevent list-component from gaining focus (*1). Since the component is removed/rendered
+ * after the click the focus would be on the body afterwards #222862.
+ */
 scout.CalendarComponent.prototype._onMouseDown = function(event) {
+  event.preventDefault(); // *1
   var $part = $(event.delegateTarget);
   this.parent._selectedComponentChanged(this, $part.data('partDay'));
 };
