@@ -12,6 +12,12 @@ import {comparators} from '../../../src/index';
 
 describe('scout.comparators', function() {
 
+  beforeEach(function() {
+    // ensure before each test that it runs without a collator.
+    // comparators.TEXT is a singleton and therefore other tests might have called install already (which creates a collator).
+    comparators.TEXT.collator = null;
+  });
+
   it('tests \'compare\' method of TEXT comparator', function() {
     var comparator = comparators.TEXT;
 
@@ -21,6 +27,8 @@ describe('scout.comparators', function() {
     expect(comparator.compare('a', 'a')).toBe(0);
     expect(comparator.compare('a', 'b')).toBe(-1);
     expect(comparator.compare('b', 'a')).toBe(1);
+    expect(comparator.compare('a', 'B')).toBe(1);
+    expect(comparator.compare('B', 'a')).toBe(-1);
   });
 
   it('tests \'compareIgnoreCase\' method of TEXT comparator', function() {
@@ -43,11 +51,6 @@ describe('scout.comparators', function() {
 
     expect(comparator.compareIgnoreCase('A', 'a')).toBe(0);
     expect(comparator.compareIgnoreCase('a', 'a')).toBe(0);
-
-    comparator.install(createSession());
-
-    expect(comparator.compare('a', 'B')).toBe(1);
-    expect(comparator.compare('B', 'a')).toBe(-1);
   });
 
   it('tests \'compare\' method of NUMERIC comparator', function() {
