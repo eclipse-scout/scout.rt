@@ -134,7 +134,8 @@ export function isSameMonth(date, date2) {
 }
 
 /**
- * @return the difference of the two dates in number of months.
+ * Returns the difference of the two dates in number of months.
+ * @returns {number}
  */
 export function compareMonths(date1, date2) {
   var d1Month = date1.getMonth(),
@@ -149,7 +150,8 @@ export function compareMonths(date1, date2) {
 }
 
 /**
- * @return the difference of the two dates in number of days.
+ * Returns the difference of the two dates in number of days.
+ * @returns {number}
  */
 export function compareDays(date1, date2) {
   return (trunc(date1) - trunc(date2) - (date1.getTimezoneOffset() - date2.getTimezoneOffset()) * 60000) / (3600000 * 24);

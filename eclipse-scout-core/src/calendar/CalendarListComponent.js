@@ -17,10 +17,11 @@
  * in the calendar, but the CalendarComponent instance is always the same.
  */
 export default class CalendarListComponent {
+
   constructor(partDay, source) {
     this.partDay = partDay;
     this.source = source;
-    this.$container;
+    this.$container = null;
     this._selectedListener = source.on('selected', function(event) {
       this.$container.toggleClass('comp-selected', event.selected);
     }.bind(this));
@@ -41,7 +42,12 @@ export default class CalendarListComponent {
       .html(source._description());
   }
 
+  /**
+   * Prevent list-component from gaining focus (*1). Since the component is removed/rendered
+   * after the click the focus would be on the body afterwards #222862.
+   */
   _onMouseDown(source, event) {
+    event.preventDefault(); // *1
     var $part = $(event.delegateTarget);
     source.updateSelectedComponent($part, true);
   }
