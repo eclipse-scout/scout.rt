@@ -608,6 +608,14 @@ export default class TableFooter extends Widget {
     // Remove existing tooltip (might have the wrong css class)
     if (this._tableStatusTooltip) {
       this._tableStatusTooltip.destroy();
+      this._tableStatusTooltip = null;
+    }
+
+    // Check needed because the table footer might already be removed again when this
+    // callback is executed (e.g. when the user clicks on another page while the opening
+    // animation is still running).
+    if (!this.rendered && !this.rendering) {
+      return;
     }
 
     var tableStatus = this.table.tableStatus;
