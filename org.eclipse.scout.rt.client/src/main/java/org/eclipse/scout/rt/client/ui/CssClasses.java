@@ -44,4 +44,16 @@ public interface CssClasses {
    * Class that removes the bottom padding of group boxes, even if <i>borderVisible</i> is {@code true}.
    */
   String BOTTOM_PADDING_INVISIBLE = "bottom-padding-invisible";
+
+  /**
+   * Class that increases the size of the left margin by the width of the "[X]" part of a check box field. Useful to
+   * align a field with the label of the check box.
+   */
+  String CHECKBOX_INDENTATION = "checkbox-indentation";
+
+  /**
+   * Class that increases the size of the left margin by the width of the "(X)" part of radio button field. Useful to
+   * align a field with the label of the radio button.
+   */
+  String RADIOBUTTON_INDENTATION = "radiobutton-indentation";
 }

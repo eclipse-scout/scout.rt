@@ -128,3 +128,11 @@
     color: @text-color;
   }
 }
+
+.checkbox-indentation {
+  margin-left: @check-box-size + 7px; // 7px = label padding left (see above)
+
+  .radiobutton-group-body > & {
+    margin-left: @check-box-size + 7px - @mandatory-indicator-width;
+  }
+}

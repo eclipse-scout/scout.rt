@@ -88,3 +88,11 @@
     color: @text-disabled-color;
   }
 }
+
+.radiobutton-indentation {
+  margin-left: @radio-button-circle-size + 7px; // 7px = label padding left (see above)
+
+  .radiobutton-group-body > & {
+    margin-left: @radio-button-circle-size + 7px - @mandatory-indicator-width;
+  }
+}
