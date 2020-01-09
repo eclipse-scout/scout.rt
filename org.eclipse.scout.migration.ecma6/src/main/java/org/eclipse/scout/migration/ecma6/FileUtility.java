@@ -190,7 +190,7 @@ public final class FileUtility {
     try (BufferedReader reader = Files.newBufferedReader(file)) {
       String line = reader.readLine();
       while (line != null) {
-        if (line.contains(":objectType")) {
+        if (line.contains(text)) {
           return true;
         }
         line = reader.readLine();

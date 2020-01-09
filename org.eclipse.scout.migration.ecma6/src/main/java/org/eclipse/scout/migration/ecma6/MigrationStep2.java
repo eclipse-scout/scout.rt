@@ -173,7 +173,7 @@ public class MigrationStep2 implements IRunnable {
   protected boolean isModelJsonFile(Path path) {
     if (FileUtility.hasExtension(path, "json")) {
       try {
-        return FileUtility.findInFile(path, ":objectType");
+        return FileUtility.findInFile(path, "objectType:");
       }
       catch (IOException e) {
         throw new ProcessingException("Could not parse file '' to find :objectType to determ if it is a model Json file or not.");
