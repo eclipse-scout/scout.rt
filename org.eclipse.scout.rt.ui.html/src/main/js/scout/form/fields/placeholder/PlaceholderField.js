@@ -15,4 +15,14 @@ scout.inherits(scout.PlaceholderField, scout.FormField);
 
 scout.PlaceholderField.prototype._render = function() {
   this.addContainer(this.$parent, 'placeholder-field');
+  this.addLabel();
+};
+
+/**
+ * @override
+ */
+scout.PlaceholderField.prototype._renderLabel = function() {
+  // Field needs a label to ensure correct layout when labelPosition = TOP.
+  // The label is always rendered empty, because place holder fields should not have any visible parts.
+  this._renderEmptyLabel();
 };
