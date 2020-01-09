@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
+import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -377,7 +378,10 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
   }
 
   protected ILookupRow<VALUE> createLookupRow(VALUE key, String text, JSONObject json) {
-    LookupRow<VALUE> lookupRow = new LookupRow<>(key, text);
+    return applyJson(new LookupRow<>(key, text), json);
+  }
+
+  protected <LOOKUP_ROW extends ILookupRow<VALUE>> LOOKUP_ROW applyJson(LOOKUP_ROW lookupRow, JSONObject json) {
     if (json.has("iconId")) {
       lookupRow.withIconId(json.optString("iconId", null));
     }
@@ -394,7 +398,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
       lookupRow.withForegroundColor(json.optString("foregroundColor", null));
     }
     if (json.has("font")) {
-      lookupRow.withFont(json.optString("font", null));
+      lookupRow.withFont(FontSpec.parse(json.optString("font", null)));
     }
     if (json.has("parentKey")) {
       lookupRow.withParentKey(getLookupRowKeyForId(json.optString("parentKey", null)));
