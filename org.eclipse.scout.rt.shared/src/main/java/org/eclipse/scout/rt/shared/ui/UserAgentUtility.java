@@ -52,7 +52,7 @@ public final class UserAgentUtility {
       return userAgent;
     }
     else {
-      LOG.warn("No UserAgent in calling context found; using default UserAgent");
+      LOG.info("No UserAgent in calling context found; using default UserAgent");
       return UserAgents.createDefault();
     }
   }
