@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,12 +24,12 @@ scout.TileOutlineOverview.prototype._init = function(model) {
 };
 
 scout.TileOutlineOverview.prototype._render = function() {
-  this.$container = this.$parent.appendDiv('tile-outline-overview');
+  this.$container = this.$parent.appendDiv('tile-overview');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.TileOutlineOverviewLayout(this));
-  this.$content = this.$container.appendDiv('tile-outline-overview-content');
+  this.htmlComp.setLayout(new scout.TileOverviewLayout(this));
+  this.$content = this.$container.appendDiv('tile-overview-content');
   this.contentHtmlComp = scout.HtmlComponent.install(this.$content, this.session);
-  this.$title = this.$content.appendDiv('tile-outline-overview-title').text(this.outline.title);
+  this.$title = this.$content.appendDiv('tile-overview-title').text(this.outline.title);
 };
 
 scout.TileOutlineOverview.prototype._renderProperties = function() {

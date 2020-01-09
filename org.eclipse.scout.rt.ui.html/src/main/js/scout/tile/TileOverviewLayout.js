@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,16 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TileOutlineOverviewLayout = function(tileOutlineOverview) {
-  scout.TileOutlineOverviewLayout.parent.call(this);
-  this.tileOutlineOverview = tileOutlineOverview;
+scout.TileOverviewLayout = function(tileOverview) {
+  scout.TileOverviewLayout.parent.call(this);
+  this.tileOverview = tileOverview;
 };
-scout.inherits(scout.TileOutlineOverviewLayout, scout.AbstractLayout);
+scout.inherits(scout.TileOverviewLayout, scout.AbstractLayout);
 
-scout.TileOutlineOverviewLayout.prototype.layout = function($container) {
-  var htmlContainer = this.tileOutlineOverview.htmlComp;
-  var pageTileGrid = this.tileOutlineOverview.pageTileGrid;
-  var $content = this.tileOutlineOverview.$content;
+scout.TileOverviewLayout.prototype.layout = function($container) {
+  var htmlContainer = this.tileOverview.htmlComp;
+  var pageTileGrid = this.tileOverview.pageTileGrid;
+  var $content = this.tileOverview.$content;
   var contentSize = htmlContainer.availableSize()
     .subtract(htmlContainer.insets())
     .subtract(scout.graphics.insets($content, {

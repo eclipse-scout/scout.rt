@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,6 +51,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormMenu;
+import org.eclipse.scout.rt.client.ui.form.ITileOverviewForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IStatusMenuMapping;
 import org.eclipse.scout.rt.client.ui.form.fields.accordionfield.IAccordionField;
 import org.eclipse.scout.rt.client.ui.form.fields.beanfield.IBeanField;
@@ -127,6 +128,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchForm;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
+import org.eclipse.scout.rt.ui.html.json.form.JsonTileOverviewForm;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonDateField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonStatusMenuMapping;
 import org.eclipse.scout.rt.ui.html.json.form.fields.accordionfield.JsonAccordionField;
@@ -344,6 +346,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof ISearchForm) {
       return new JsonSearchForm<>((ISearchForm) model, session, id, parent);
+    }
+    if (model instanceof ITileOverviewForm) {
+      return new JsonTileOverviewForm((ITileOverviewForm) model, session, id, parent);
     }
     if (model instanceof IForm) {
       return new JsonForm<>((IForm) model, session, id, parent);

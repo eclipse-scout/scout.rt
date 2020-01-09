@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,6 +39,8 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
+import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
@@ -57,7 +59,10 @@ import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.MenuWrapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper.IMenuTypeMapper;
+import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.ITileOverviewForm;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
@@ -69,6 +74,7 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
@@ -83,6 +89,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   private static final String TABLE_VISIBLE = "TABLE_VISIBLE";
   private static final String DETAIL_FORM_VISIBLE = "DETAIL_FORM_VISIBLE";
+  private static final String SHOW_TILE_OVERVIEW = "SHOW_TILE_OVERVIEW";
   private static final String PAGE_MENUS_ADDED = "PAGE_MENUS_ADDED";
   private static final String PAGE_ACTIVE = "PAGE_ACTIVE";
   private static final String PAGE_ACTIVATED = "PAGE_ACTIVATED";
@@ -93,7 +100,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(TABLE_VISIBLE, DETAIL_FORM_VISIBLE, PAGE_MENUS_ADDED,
       LIMITED_RESULT, ALWAYS_CREATE_CHILD_PAGE, SEARCH_ACTIVE, SEARCH_REQUIRED, PAGE_ACTIVE);
-  static final NamedBitMaskHelper FLAGS2_BIT_HELPER = new NamedBitMaskHelper(PAGE_ACTIVATED);
+  static final NamedBitMaskHelper FLAGS2_BIT_HELPER = new NamedBitMaskHelper(PAGE_ACTIVATED, SHOW_TILE_OVERVIEW);
   private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = menuType -> {
     if (menuType == TreeMenuType.SingleSelection) {
       return TableMenuType.EmptySpace;
@@ -120,7 +127,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   /**
    * Provides 8 boolean flags.<br>
-   * Currently used: {@link #PAGE_ACTIVATED}
+   * Currently used: {@link #PAGE_ACTIVATED}, {@link #SHOW_TILE_OVERVIEW}
    */
   byte m_flags2;
 
@@ -316,6 +323,19 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   @Order(91)
   protected boolean getConfiguredDetailFormVisible() {
     return true;
+  }
+
+  /**
+   * Configures if the tile overview should be shown by default. If set to {@code true},
+   * {@link #ensureDetailFormCreated()} will create the tile overview as detail form. It will only be visible if
+   * {@link #getConfiguredDetailFormVisible()} is set to {@code true}.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(37)
+  protected boolean getConfiguredShowTileOverview() {
+    return false;
   }
 
   /**
@@ -600,6 +620,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     super.initConfig();
     setTableVisible(getConfiguredTableVisible());
     setDetailFormVisible(getConfiguredDetailFormVisible());
+    setShowTileOverview(getConfiguredShowTileOverview());
     setOverviewIconId(getConfiguredOverviewIconId());
   }
 
@@ -859,6 +880,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
         .call(() -> getConfiguredDetailForm().getConstructor().newInstance());
   }
 
+  protected ITileOverviewForm createTileOverviewForm() {
+    return new P_TileOverviewForm();
+  }
+
   /**
    * Starts the form.
    * <p>
@@ -873,7 +898,13 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     if (getDetailForm() != null) {
       return;
     }
-    IForm form = createDetailForm();
+    IForm form;
+    if (isShowTileOverview()) {
+      form = createTileOverviewForm();
+    }
+    else {
+      form = createDetailForm();
+    }
     if (form != null) {
       setDetailForm(form);
       interceptInitDetailForm();
@@ -1013,6 +1044,21 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       return; // no change
     }
     m_flags = FLAGS_BIT_HELPER.changeBit(DETAIL_FORM_VISIBLE, detailFormVisible, m_flags);
+    firePageChanged();
+  }
+
+  @Override
+  public boolean isShowTileOverview() {
+    return FLAGS2_BIT_HELPER.isBitSet(SHOW_TILE_OVERVIEW, m_flags2);
+  }
+
+  @Override
+  public void setShowTileOverview(boolean showTileOverview) {
+    Assertions.assertNull(getDetailForm(), "Property 'showTileOverview' cannot be changed because DetailForm has already been created");
+    if (isShowTileOverview() == showTileOverview) {
+      return; // no change
+    }
+    m_flags2 = FLAGS2_BIT_HELPER.changeBit(SHOW_TILE_OVERVIEW, showTileOverview, m_flags2);
     firePageChanged();
   }
 
@@ -1250,4 +1296,37 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     return new LocalPageExtension<AbstractPage>(this);
   }
 
+  @ClassId("d9e0f79c-5270-4a6e-8fad-220dc81659ac")
+  protected class P_TileOverviewForm extends AbstractForm implements ITileOverviewForm {
+
+    @Override
+    protected String getConfiguredTitle() {
+      return AbstractPage.this.getConfiguredTitle();
+    }
+
+    @Order(10)
+    @ClassId("e3e6ee1e-df3d-4b13-b5da-23306fbc2686")
+    public class MainBox extends AbstractGroupBox {
+
+      @Override
+      protected boolean execCalculateVisible() {
+        return true;
+      }
+
+      @Order(2000)
+      @ClassId("2eb22815-f33d-41e6-aabc-46b9935f12a2")
+      public class F5KeyStroke extends AbstractKeyStroke {
+
+        @Override
+        protected String getConfiguredKeyStroke() {
+          return IKeyStroke.F5;
+        }
+
+        @Override
+        protected void execAction() {
+          AbstractPage.this.reloadPage();
+        }
+      }
+    }
+  }
 }
