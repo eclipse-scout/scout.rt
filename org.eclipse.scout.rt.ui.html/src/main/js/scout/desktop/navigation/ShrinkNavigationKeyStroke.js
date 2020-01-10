@@ -13,7 +13,7 @@ scout.ShrinkNavigationKeyStroke = function(handle) {
   this.field = handle;
   this.desktop = handle.session.desktop;
   this.ctrl = true;
-  this.which = [scout.keys.ANGULAR_BRACKET];
+  this.which = [scout.keys.forBrowser(scout.keys.ANGULAR_BRACKET)];
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.desktop.$container;
   }.bind(this);
