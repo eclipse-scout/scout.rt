@@ -197,7 +197,7 @@ export default class KeyStroke {
 
   _renderKeyBox($parent, keyCode) {
     var $existingKeyBoxes = $('.key-box', $parent);
-    var text = this.renderingHints.text || keys.codesToKeys[keyCode];
+    var text = this.renderingHints.text || keys.codesToKeys[keys.fromBrowser(keyCode)];
     var align = this.renderingHints.hAlign === HAlign.RIGHT ? 'right' : 'left';
     var offset = this.renderingHints.offset;
     $existingKeyBoxes = $existingKeyBoxes.filter(function() {

@@ -219,30 +219,56 @@ const keys = {
   },
 
   /**
-   * This mapping object defines key-codes which are not the same in various browsers. Use the forBrowser function to access it.
+   * This map defines key-codes which are not the same in various browsers. Use the forBrowser function to access it.
    */
-  browserMapping: {
+  browserMap: {
     [Device.Browser.FIREFOX]: {
       226: 60
     }
   },
 
+  browserMapReverse: {},
+
   /**
-   * If a browser has a non-standard key-code for one of the keys defined in this file this method returns the correct key code for that browser.
+   * If a browser has a non-standard key-code for one of the keys defined in this file this function returns the correct key code for that browser.
    *
    * @param keyCode {number}
    * @returns {number}
    */
   forBrowser: function(keyCode) {
-    let browser = Device.get().browser;
-    let mapping = keys.browserMapping[browser];
-    if (mapping && mapping.hasOwnProperty(keyCode)) {
+    return keys.mapKey(keys.browserMap, keyCode);
+  },
+
+  /**
+   * If a browser has a non-standard key-code for one of the keys defined in this file this function returns the original key for that browser.
+   *
+   * @param keyCode {number}
+   * @returns {number}
+   */
+  fromBrowser: function(keyCode) {
+    return keys.mapKey(keys.browserMapReverse, keyCode);
+  },
+
+  mapKey: function(map, keyCode) {
+    let browserMap = map[Device.get().browser];
+    if (browserMap && browserMap.hasOwnProperty(keyCode)) {
       // A mapping is defined for this browser and key-code
-      return mapping[keyCode];
+      return browserMap[keyCode];
     }
     // No mapping is defined, use standard
     return keyCode;
   }
 };
+
+// Create a map with reverse key mappings for browser specific keys
+for (let browser in keys.browserMap) {
+  let reverseMap = {};
+  let mappedKeysForBrowser = keys.browserMap[browser];
+  for (let origKey in mappedKeysForBrowser) {
+    let browserKey = mappedKeysForBrowser[origKey];
+    reverseMap[browserKey] = parseInt(origKey, 10);
+  }
+  keys.browserMapReverse[browser] = reverseMap;
+}
 
 export default keys;

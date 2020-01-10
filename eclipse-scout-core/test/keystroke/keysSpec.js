@@ -21,4 +21,12 @@ describe('keys', () => {
     expect(keys.forBrowser(keys.ANGULAR_BRACKET)).toEqual(226);
   });
 
+  it('fromBrowser', () => {
+    let device = Device.get();
+    device.browser = Device.Browser.FIREFOX;
+    expect(keys.fromBrowser(60)).toEqual(keys.ANGULAR_BRACKET);
+    device.browser = Device.Browser.CHROME;
+    expect(keys.fromBrowser(226)).toEqual(keys.ANGULAR_BRACKET);
+  });
+
 });
