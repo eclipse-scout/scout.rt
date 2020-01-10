@@ -18,7 +18,7 @@ export default class EnlargeNavigationKeyStroke extends KeyStroke {
     this.desktop = handle.session.desktop;
     this.ctrl = true;
     this.shift = true;
-    this.which = [keys.ANGULAR_BRACKET];
+    this.which = [keys.forBrowser(keys.ANGULAR_BRACKET)];
     this.renderingHints.$drawingArea = function($drawingArea, event) {
       return this.desktop.$container;
     }.bind(this);

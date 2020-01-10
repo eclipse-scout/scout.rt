@@ -8,6 +8,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
+import Device from '../util/Device';
+
 const keys = {
   BACKSPACE: 8,
   TAB: 9,
@@ -214,6 +216,32 @@ const keys = {
     221: '^',
     222: 'ö',
     226: '<'
+  },
+
+  /**
+   * This mapping object defines key-codes which are not the same in various browsers. Use the forBrowser function to access it.
+   */
+  browserMapping: {
+    [Device.Browser.FIREFOX]: {
+      226: 60
+    }
+  },
+
+  /**
+   * If a browser has a non-standard key-code for one of the keys defined in this file this method returns the correct key code for that browser.
+   *
+   * @param keyCode {number}
+   * @returns {number}
+   */
+  forBrowser: function(keyCode) {
+    let browser = Device.get().browser;
+    let mapping = keys.browserMapping[browser];
+    if (mapping && mapping.hasOwnProperty(keyCode)) {
+      // A mapping is defined for this browser and key-code
+      return mapping[keyCode];
+    }
+    // No mapping is defined, use standard
+    return keyCode;
   }
 };
 
