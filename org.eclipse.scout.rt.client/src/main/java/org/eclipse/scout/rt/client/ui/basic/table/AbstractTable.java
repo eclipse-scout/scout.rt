@@ -75,9 +75,12 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.AbstractTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizerProvider;
+import org.eclipse.scout.rt.client.ui.basic.table.customizer.NullTableCustomizerProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizer;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizerProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IColumnAwareUserFilterState;
@@ -2081,23 +2084,14 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
-   * Factory method to return an instance of <code>ITableCustomizer</code> to manage columns.
+   * Factory method to return a table customizer instance.
    * <p>
-   * The default implementation returns null, override this method if you need another type.
+   * The default implementation uses <code>BEANS.get()</code> to retrieve an instance of {@link ITableCustomizerProvider} which
+   * returns {@link NullTableCustomizerProvider} if no other provider is registered. You may register your own provider to create
+   * a custom table customizer which is used by all tables in a Scout application without sub-classing <code>AbstractTable</code>.
    */
   protected ITableCustomizer createTableCustomizer() {
-    return null;
-  }
-
-  /**
-   * Factory method to create an instance of <code>ITableOrganizer</code> which provides the state for the add/remove
-   * and modify buttons in the table-header-menu.
-   * <p>
-   * The default implementation returns an instance of <code>TableOrganizer</code>, override this method if you need
-   * another type.
-   */
-  protected ITableOrganizer createTableOrganizer() {
-    return new TableOrganizer(this);
+    return BEANS.get(ITableCustomizerProvider.class).createTableCustomizer(this);
   }
 
   /*
