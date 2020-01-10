@@ -39,7 +39,7 @@ public class TableOrganizer implements ITableOrganizer {
     return isCustomizable() && hasCreatePermission() || hasInvisibleColumns();
   }
 
-  private boolean hasInvisibleColumns() {
+  protected boolean hasInvisibleColumns() {
     ColumnSet columnSet = m_table.getColumnSet();
     return columnSet.getVisibleColumnCount() < columnSet.getDisplayableColumnCount();
   }
@@ -67,7 +67,7 @@ public class TableOrganizer implements ITableOrganizer {
     }
   }
 
-  private void showInvisibleColumnsForm(IColumn<?> insertAfterColumn) {
+  protected void showInvisibleColumnsForm(IColumn<?> insertAfterColumn) {
     IShowInvisibleColumnsForm form = new ShowInvisibleColumnsForm(m_table).withInsertAfterColumn(insertAfterColumn);
     form.startModify();
     form.waitFor();
@@ -87,7 +87,7 @@ public class TableOrganizer implements ITableOrganizer {
     }
   }
 
-  private void hideColumn(IColumn column) {
+  protected void hideColumn(IColumn column) {
     ColumnSet columnSet = m_table.getColumnSet();
     List<IColumn<?>> visibleColumns = columnSet.getVisibleColumns();
     visibleColumns.remove(column);
@@ -101,28 +101,32 @@ public class TableOrganizer implements ITableOrganizer {
     }
   }
 
-  private boolean isCustom(IColumn column) {
+  protected boolean isCustom(IColumn column) {
     return column instanceof ICustomColumn;
   }
 
-  private boolean isCustomizable() {
+  protected boolean isCustomizable() {
     return m_table.isCustomizable();
   }
 
-  private ITableCustomizer getCustomizer() {
+  protected ITableCustomizer getCustomizer() {
     return m_table.getTableCustomizer();
   }
 
-  private boolean hasCreatePermission() {
+  protected boolean hasCreatePermission() {
     return ACCESS.check(new CreateCustomColumnPermission());
   }
 
-  private boolean hasModifyPermission() {
+  protected boolean hasModifyPermission() {
     return ACCESS.check(new UpdateCustomColumnPermission());
   }
 
-  private boolean hasRemovePermission() {
+  protected boolean hasRemovePermission() {
     return ACCESS.check(new DeleteCustomColumnPermission());
+  }
+
+  protected ITable getTable() {
+    return m_table;
   }
 
 }

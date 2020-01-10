@@ -62,6 +62,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -170,8 +171,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   private final ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>> m_objectExtensions;
 
   /**
-   * Provides 8 boolean flags.<br>
-   * Currently used: {@link #INITIALIZED}, {@link #AUTO_DISCARD_ON_DELETE}, {@link #SORT_VALID},
+   * Provides 4 boolean flags.<br>
+   * Currently used: {@link #AUTO_DISCARD_ON_DELETE}, {@link #SORT_VALID},
    * {@link #INITIAL_MULTI_LINE_TEXT}, {@link #ACTION_RUNNING}
    */
   private byte m_flags;
@@ -195,7 +196,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   private List<ITableControl> m_tableControls;
   private IReloadHandler m_reloadHandler;
   private int m_valueChangeTriggerEnabled = 1;// >=1 is true
-  private ITableOrganizer m_tableOrganizer;
   private boolean m_treeStructureDirty;
 
   public AbstractTable() {
@@ -821,7 +821,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * <p>
    * Subclasses can override this method. The default fires a {@link TableEvent#TYPE_ROW_CLICK} event.
    *
-   * @param Row
+   * @param row
    *          that was clicked (never null).
    * @param mouseButton
    *          the mouse button ({@link MouseButton}) which triggered this method
@@ -922,7 +922,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   /**
    * This method is called during initializing the table and is thought to add header menus to the given collection of
-   * menus. Menus added in this method should be of menu type {@link ITableMenu.TableMenuType#Header}.<br>
+   * menus. Menus added in this method should be of menu type {@link TableMenuType#Header}.<br>
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
    * @param menus
@@ -1032,7 +1032,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     ksList.addAll(contributedKeyStrokes);
     setKeyStrokes(ksList);
 
-    m_tableOrganizer = createTableOrganizer();
+    setTableOrganizer(createTableOrganizer());
 
     // setTileMode() creates the mediator and tileTableHeader lazy if set to true. Do this here to
     // already have a mostly initialized table (AbstractTileTableHeader requires an initialized columnSet).
@@ -2075,9 +2075,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
-   * factory to manage user filters
+   * Factory method to create a user filter manager instance.
    * <p>
-   * default creates a {@link TableUserFilterManager}
+   * The default implementation creates a {@link TableUserFilterManager}.
    */
   protected TableUserFilterManager createUserFilterManager() {
     return new TableUserFilterManager(this);
@@ -2092,6 +2092,17 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    */
   protected ITableCustomizer createTableCustomizer() {
     return BEANS.get(ITableCustomizerProvider.class).createTableCustomizer(this);
+  }
+
+  /**
+   * Factory method to return a table organizer instance.
+   * <p>
+   * The default implementation uses <code>BEANS.get()</code> to retrieve an instance of {@link ITableOrganizerProvider} which
+   * returns {@link TableOrganizer} if no other provider is registered. You may register your own provider to create
+   * a custom table organizer which is used by all tables in a Scout application without sub-classing <code>AbstractTable</code>.
+   */
+  protected ITableOrganizer createTableOrganizer() {
+    return BEANS.get(ITableOrganizerProvider.class).createTableOrganizer(this);
   }
 
   /*
@@ -5198,9 +5209,13 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
   }
 
+  protected void setTableOrganizer(ITableOrganizer tableOrganizer) {
+    propertySupport.setProperty(PROP_TABLE_ORGANIZER, tableOrganizer);
+  }
+
   @Override
   public ITableOrganizer getTableOrganizer() {
-    return m_tableOrganizer;
+    return (ITableOrganizer) propertySupport.getProperty(PROP_TABLE_ORGANIZER);
   }
 
   @Override

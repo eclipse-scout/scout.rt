@@ -152,6 +152,11 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   String PROP_TABLE_CUSTOMIZER = "tableCustomizer";
 
   /**
+   * {@link ITableOrganizer}
+   */
+  String PROP_TABLE_ORGANIZER = "tableOrganizer";
+
+  /**
    * List&lt;ITableControl&gt;
    *
    * @since 5.1.0
