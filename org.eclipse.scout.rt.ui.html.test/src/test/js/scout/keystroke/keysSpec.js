@@ -18,4 +18,12 @@ describe("keys", function() {
     expect(scout.keys.forBrowser(scout.keys.ANGULAR_BRACKET)).toEqual(226);
   });
 
+  it("fromBrowser", function() {
+    var device = scout.device;
+    device.browser = scout.Device.Browser.FIREFOX;
+    expect(scout.keys.fromBrowser(60)).toEqual(scout.keys.ANGULAR_BRACKET);
+    device.browser = scout.Device.Browser.CHROME;
+    expect(scout.keys.fromBrowser(226)).toEqual(scout.keys.ANGULAR_BRACKET);
+  });
+
 });

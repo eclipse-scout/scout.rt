@@ -199,7 +199,7 @@ scout.KeyStroke.prototype.renderKeyBox = function($drawingArea, event) {
 
 scout.KeyStroke.prototype._renderKeyBox = function($parent, keyCode) {
   var $existingKeyBoxes = $('.key-box', $parent);
-  var text = this.renderingHints.text || scout.codesToKeys[keyCode];
+  var text = this.renderingHints.text || scout.codesToKeys[scout.keys.fromBrowser(keyCode)];
   var align = this.renderingHints.hAlign === scout.hAlign.RIGHT ? 'right' : 'left';
   var offset = this.renderingHints.offset;
   $existingKeyBoxes = $existingKeyBoxes.filter(function() {

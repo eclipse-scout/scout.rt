@@ -227,12 +227,25 @@ scout.codesToKeys = {
 };
 
 /**
- * This mapping object defines key-codes which are not the same in various browsers. Use the forBrowser function to access it.
+ * This map defines key-codes which are not the same in various browsers. Use the forBrowser function to access it.
  */
-scout.keys.browserMapping = {};
-scout.keys.browserMapping[scout.Device.Browser.FIREFOX] = {
+scout.keys.browserMap = {};
+scout.keys.browserMap[scout.Device.Browser.FIREFOX] = {
   226: 60 // ANGULAR_BRACKET
 };
+
+scout.keys.browserMapReverse = {};
+
+// Create a map with reverse key mappings for browser specific keys
+for (var browser in scout.keys.browserMap) { // NOSONAR
+  var reverseMap = {};
+  var mappedKeysForBrowser = scout.keys.browserMap[browser];
+  for (var origKey in mappedKeysForBrowser) { // NOSONAR
+    var browserKey = mappedKeysForBrowser[origKey];
+    reverseMap[browserKey] = parseInt(origKey, 10);
+  }
+  scout.keys.browserMapReverse[browser] = reverseMap;
+}
 
 /**
  * If a browser has a non-standard key-code for one of the keys defined in this file this method returns the correct key code for that browser.
@@ -241,11 +254,24 @@ scout.keys.browserMapping[scout.Device.Browser.FIREFOX] = {
  * @returns {number}
  */
 scout.keys.forBrowser = function(keyCode) {
-  var browser = scout.device.browser;
-  var mapping = scout.keys.browserMapping[browser];
-  if (mapping && mapping.hasOwnProperty(keyCode)) {
+  return scout.keys.mapKey(scout.keys.browserMap, keyCode);
+};
+
+/**
+ * If a browser has a non-standard key-code for one of the keys defined in this file this function returns the original key for that browser.
+ *
+ * @param keyCode {number}
+ * @returns {number}
+ */
+scout.keys.fromBrowser = function(keyCode) {
+  return scout.keys.mapKey(scout.keys.browserMapReverse, keyCode);
+};
+
+scout.keys.mapKey = function(map, keyCode) {
+  var browserMap = map[scout.device.browser];
+  if (browserMap && browserMap.hasOwnProperty(keyCode)) {
     // A mapping is defined for this browser and key-code
-    return mapping[keyCode];
+    return browserMap[keyCode];
   }
   // No mapping is defined, use standard
   return keyCode;
