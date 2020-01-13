@@ -86,6 +86,9 @@ scout.Session.JsonResponseError = {
   VERSION_MISMATCH: 40
 };
 
+// Placeholder string for an empty filename
+scout.Session.EMPTY_UPLOAD_FILENAME = '*empty*';
+
 /**
  * $entryPoint is required to create a new session.
  *
@@ -1056,7 +1059,12 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
   $.each(files, function(index, value) {
     if (!allowedTypes || allowedTypes.length === 0 || scout.isOneOf(value.type, allowedTypes)) {
       totalSize += value.size;
-      var filename = scout.nvl(value.scoutName, value.name, ''); // see ClipboardField for comments on "scoutName"
+      /*
+       * - see ClipboardField for comments on "scoutName"
+       * - Some Browsers (e.g. Edge) handle an empty string as filename as if the filename is not set and therefore introduce a default filename like 'blob'.
+       *   To counter this, we introduce a empty filename string. The string consists of characters that can not occur in regular filenames, to prevent collisions.
+       */
+      var filename = scout.nvl(value.scoutName, value.name, scout.Session.EMPTY_UPLOAD_FILENAME);
       formData.append('files', value, filename);
     }
   }.bind(this));
