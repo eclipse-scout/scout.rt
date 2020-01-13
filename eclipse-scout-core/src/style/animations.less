@@ -9,10 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 #scout {
-
-  /* IMPORTANT: YUI replaces 0% with 0 when compressing the css. This breaks the animations (the first keyframe is ignored).
-  Workaround: Don't use 0%, always use 00%. */
-
   /* args = keyframeName, timingFunction, iterationCount */
   .animation(@args) {
     -webkit-animation: @args;
@@ -109,7 +105,7 @@
   /*** Fade with Short Drop ***/
 
   .keyframes-short-drop() {
-    00% { /* see comment on top */
+    0% {
       #scout.transform(translateY(-40px));
     }
     40% {
@@ -257,7 +253,7 @@
        Moves the element into screen from bottom up */
 
   .keyframes-slidein-bottom() {
-    00% { /* see comment on top */
+    0% {
       #scout.transform(translateY(100%));
     }
   }
@@ -339,7 +335,7 @@
   /*** Fade In Zoom Bounce ***/
 
   .keyframes-fadein-zoom-bounce() {
-    00% { /* see comment on top */
+    0% {
       opacity: 0;
       #scout.transform(scale(0.75, 0.75));
     }
@@ -362,7 +358,7 @@
   /*** Rotation ***/
 
   .keyframes-rotation () {
-    00% { /* see comment on top */
+    0% {
       #scout.transform(rotate(0deg));
     }
     100% {
@@ -380,7 +376,7 @@
   /*** Rotation-Reverse ***/
 
   .keyframes-rotation-reverse () {
-    00% { /* see comment on top */
+    0% {
       #scout.transform(rotate(-0deg));
     }
     100% {
@@ -398,7 +394,7 @@
   /*** Pulse Opacity ***/
 
   .keyframes-pulse-opacity () {
-    00% { /* see comment on top */
+    0% {
       opacity: 1.0;
     }
     50% {
@@ -419,7 +415,7 @@
   /*** Pulsate ***/
 
   .keyframes-pulsate () {
-    00% { /* see comment on top */
+    0% {
       #scout.transform(scale(0.25));
       opacity: 0.35;
     }
@@ -446,7 +442,7 @@
   /*** Pulsate Reverse ***/
 
   .keyframes-pulsate-reverse () {
-    00% { /* see comment on top */
+    0% {
       #scout.transform(scale(1.2));
       opacity: 0.0;
     }
@@ -469,7 +465,7 @@
   /*** Pulsate In-Out ***/
 
   .keyframes-pulsate-in-out () {
-    00% { /* see comment on top */
+    0% {
       #scout.transform(scale(1));
       opacity: 1.0;
     }
@@ -493,7 +489,7 @@
   /*** Attention ***/
 
   .keyframes-attention () {
-    00% { /* see comment on top */
+    0% {
       #scout.transform(scale3d(1, 1, 1));
     }
     10% {
@@ -517,7 +513,7 @@
   /*** Rotate-X ***/
 
   .keyframes-rotate-x () {
-    00% { /* see comment on top */
+    0% {
       #scout.transform(perspective(120px) rotateY(0deg));
     }
     50% {
@@ -538,11 +534,10 @@
   /*** Animate Dot ***/
 
   .keyframes-animate-dot () {
-    00% {
+    0% {
       color: @text-color;
       bottom: 0;
     }
-    /* see comment on top */
     25% {
       color: @palette-gray-5;
       bottom: 4px;
@@ -575,10 +570,9 @@
   }
 
   .keyframes-shake() {
-    00% {
+    0% {
       #scout.transform(translate(2px, 1px) rotate(0deg));
     }
-    /* see comment on top */
     10% {
       #scout.transform(translate(-1px, -2px) rotate(-1deg));
     }
@@ -620,29 +614,28 @@
 
   /*** Flash-Gray ***/
 
-  .animation-flash-gray() {
-    #scout.animation-name(flash-gray);
+  .animation-flash-gray(@keyframes-name: flash-gray) {
+    #scout.animation-name(@keyframes-name);
     #scout.animation-duration(0.4s);
     #scout.animation-iteration-count(1);
     #scout.animation-timing-function(linear);
   }
 
   .keyframes-flash-gray() {
-    00% {
-      background-color: @palette-white;
+    0% {
+      background-color: @simple-tab-background-color;
     }
-    /* see comment on top */
     25% {
-      background-color: @palette-gray-5;
+      background-color: @simple-tab-flash-background-color;
     }
     50% {
-      background-color: @palette-white;
+      background-color: @simple-tab-background-color;
     }
     75% {
-      background-color: @palette-gray-5;
+      background-color: @simple-tab-flash-background-color;
     }
     100% {
-      background-color: @palette-white;
+      background-color: @simple-tab-background-color;
     }
   }
 
