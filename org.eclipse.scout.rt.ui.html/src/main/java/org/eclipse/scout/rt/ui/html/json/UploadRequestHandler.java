@@ -57,6 +57,12 @@ import org.slf4j.LoggerFactory;
 public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(UploadRequestHandler.class);
 
+  /**
+   * See Sessions.js. If no filename is set, this filename will be set instead, to ensure no browser sets a default
+   * filename like 'blob'.
+   */
+  private static final String EMPTY_UPLOAD_FILENAME = "*empty*";
+
   private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
 
   private final HttpCacheControl m_httpCacheControl = BEANS.get(HttpCacheControl.class);
@@ -195,7 +201,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       }
       String contentType = item.getContentType();
       BinaryResource res = BinaryResources.create()
-          .withFilename(filename)
+          .withFilename((EMPTY_UPLOAD_FILENAME.equals(filename)) ? "" : filename)
           .withContentType(contentType)
           .withContent(content)
           .build();
