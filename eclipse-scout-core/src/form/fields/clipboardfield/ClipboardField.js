@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, dragAndDrop, InputFieldKeyStrokeContext, keys, mimeTypes, scout, strings, ValueField} from '../../../index';
+import {Device, dragAndDrop, InputFieldKeyStrokeContext, keys, mimeTypes, scout, Session, strings, ValueField} from '../../../index';
 import * as $ from 'jquery';
 
 export default class ClipboardField extends ValueField {
@@ -302,7 +302,7 @@ export default class ClipboardField extends ValueField {
             // attribute to the file object that is then used as a filename in session.uploadFiles().
             var lastModifiedDiff = startPasteTimestamp - file.lastModified;
             if (lastModifiedDiff < 1000) {
-              file.scoutName = '';
+              file.scoutName = Session.EMPTY_UPLOAD_FILENAME;
             }
             filesArgument.push(file);
             contentCount++;
