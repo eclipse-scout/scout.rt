@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxError, App, NullLogger, scout, strings} from './index';
+import {AjaxError, App, arrays, NullLogger, scout, strings} from './index';
 import * as $ from 'jquery';
+import sourcemappedStacktrace from 'sourcemapped-stacktrace';
 
 export default class ErrorHandler {
 
@@ -37,7 +38,10 @@ export default class ErrorHandler {
   _onWindowError(errorMessage, fileName, lineNumber, columnNumber, error) {
     try {
       if (error instanceof Error) {
-        this.handle(error);
+        this.handle(error)
+          .catch(function(error) {
+            console.error('Error in global JavaScript error handler', error);
+          });
       } else {
         var code = 'J00';
         var log = errorMessage + ' at ' + fileName + ':' + lineNumber + '\n(' + 'Code ' + code + ')';
@@ -62,16 +66,15 @@ export default class ErrorHandler {
    *   2. $.get().fail(function(jqXHR, textStatus, errorThrown) { handler.handle(jqXHR, textStatus, errorThrown); }
    *   3. $.get().fail(function(jqXHR, textStatus, errorThrown) { handler.handle(arguments); } // <-- recommended
    *
-   * @return {object} the analyzed errorInfo
+   * @return {Promise} the analyzed errorInfo
    */
   handle() {
     var args = arguments;
     if (args.length === 1 && args[0] && (String(args[0]) === '[object Arguments]' || Array.isArray(args[0]))) {
       args = args[0];
     }
-    var errorInfo = this.analyzeError.apply(this, args);
-    this.handleErrorInfo(errorInfo);
-    return errorInfo;
+    return this.analyzeError.apply(this, args)
+      .then(this.handleErrorInfo.bind(this));
   }
 
   /**
@@ -80,90 +83,145 @@ export default class ErrorHandler {
    * 2. jQuery AJAX errors      (code: 'X' + HTTP status code)
    * 3. Nothing                 (code: 'P3')
    * 4. Everything else         (code: 'P4')
+   * @returns {Promise}
    */
   analyzeError(error) {
     var errorInfo = {
       code: null,
       message: null,
-      location: null,
       stack: null,
+      mappedStack: null,
       debugInfo: null,
-      log: null
+      log: null,
+      error: error
     };
 
+    return this._analyzeError(errorInfo);
+  }
+
+  _analyzeError(errorInfo) {
+    var error = errorInfo.error;
+    // 1. Regular errors
     if (error instanceof Error) {
-      // 1. Errors
-      errorInfo.code = this.getJsErrorCode(error);
-      errorInfo.message = String(error.message || error);
-      if (error.fileName) {
-        errorInfo.location = error.fileName + strings.join('', strings.box(':', error.lineNumber), strings.box(':', error.columnNumber));
-      }
-      if (error.stack) {
-        errorInfo.stack = String(error.stack);
-      }
-      if (error.debugInfo) { // scout extension
-        errorInfo.debugInfo = error.debugInfo;
-      }
-      errorInfo.log = 'Unexpected error: ' + errorInfo.message;
-      if (errorInfo.location) {
-        errorInfo.log += ' at ' + errorInfo.location;
-      }
-      if (errorInfo.stack) {
-        errorInfo.log += '\n' + errorInfo.stack;
-      }
-      if (errorInfo.debugInfo) {
-        // Error throwers may put a "debugInfo" string on the error object that is then added to the log string (this is a scout extension).
-        errorInfo.log += '\n----- Additional debug information: -----\n' + errorInfo.debugInfo;
-      }
-
-    } else if ($.isJqXHR(error) || (Array.isArray(error) && $.isJqXHR(error[0])) || error instanceof AjaxError) {
-      // 2. jQuery $.ajax() error (arguments: jqXHR, textStatus, errorThrown, requestOptions)
-      var jqXHR, errorThrown, requestOptions;
-      if (error instanceof AjaxError) {
-        jqXHR = error.jqXHR;
-        errorThrown = error.errorThrown;
-        requestOptions = error.requestOptions; // scout extension
-      } else {
-        var args = (Array.isArray(error) ? error : arguments);
-        jqXHR = args[0];
-        errorThrown = args[2];
-        requestOptions = args[3]; // scout extension
-      }
-
-      var ajaxRequest = (requestOptions ? strings.join(' ', requestOptions.type, requestOptions.url) : '');
-      var ajaxStatus = (jqXHR.status ? strings.join(' ', jqXHR.status, errorThrown) : 'Connection error');
-
-      errorInfo.code = 'X' + (jqXHR.status || '0');
-      errorInfo.message = 'AJAX call' + strings.box(' "', ajaxRequest, '"') + ' failed' + strings.box(' [', ajaxStatus, ']');
-      errorInfo.log = errorInfo.message;
-      if (jqXHR.responseText) {
-        errorInfo.debugInfo = 'Response text:\n' + jqXHR.responseText;
-        errorInfo.log += '\n' + errorInfo.debugInfo;
-      }
-
-    } else if (!error) {
-      // 3. No reason provided
-      errorInfo.code = 'P3';
-      errorInfo.message = 'Unknown error';
-      errorInfo.log = 'Unexpected error (no reason provided)';
-
-    } else {
-      // 4. Everything else (e.g. when strings are thrown)
-      var s = (typeof error === 'string' || typeof error === 'number') ? String(error) : null;
-      errorInfo.code = 'P4';
-      errorInfo.message = s || 'Unexpected error';
-      if (!s) {
-        try {
-          s = JSON.stringify(error); // may throw "cyclic object value" error
-        } catch (err) {
-          s = String(error);
-        }
-      }
-      errorInfo.log = 'Unexpected error: ' + s;
-
+      // Map stack first before analyzing the error
+      return this.mapStack(error.stack)
+        .catch(function(result) {
+          errorInfo.mappingError = result.message + '\n' + +'\n' + result.error.message + '\n' + result.error.stack;
+          return null;
+        })
+        .then(function(mappedStack) {
+          errorInfo.mappedStack = mappedStack;
+          this._analyzeRegularError(errorInfo);
+          return errorInfo;
+        }.bind(this));
     }
 
-    return errorInfo;
+    // 2. Ajax errors
+    if ($.isJqXHR(error) || (Array.isArray(error) && $.isJqXHR(error[0])) || error instanceof AjaxError) {
+      this._analyzeAjaxError(errorInfo);
+      return $.resolvedPromise(errorInfo);
+    }
+
+    // 3. No reason provided
+    if (!error) {
+      this._analyzeNoError(errorInfo);
+      return $.resolvedPromise(errorInfo);
+    }
+
+    // 4. Everything else (e.g. when strings are thrown)
+    this._analyzeOtherError(errorInfo);
+    return $.resolvedPromise(errorInfo);
+  }
+
+  _analyzeRegularError(errorInfo) {
+    var error = errorInfo.error;
+    errorInfo.code = this.getJsErrorCode(error);
+    errorInfo.message = String(error.message || error);
+    if (error.stack) {
+      errorInfo.stack = String(error.stack);
+    }
+    if (error.debugInfo) { // scout extension
+      errorInfo.debugInfo = error.debugInfo;
+    }
+    var stack = errorInfo.mappedStack || errorInfo.stack;
+    var log = [];
+    if (!stack || stack.indexOf(errorInfo.message === -1)) {
+      // Only log message if not already included in stack
+      log.push(errorInfo.message);
+    }
+    if (stack) {
+      log.push(stack);
+    }
+    if (errorInfo.mappingError) {
+      log.push(errorInfo.mappingError);
+    }
+    if (errorInfo.debugInfo) {
+      // Error throwers may put a "debugInfo" string on the error object that is then added to the log string (this is a scout extension).
+      log.push('----- Additional debug information: -----\n' + errorInfo.debugInfo);
+    }
+    errorInfo.log = arrays.format(log, '\n');
+  }
+
+  _analyzeAjaxError(errorInfo) {
+    var error = errorInfo.error;
+    // jQuery $.ajax() error (arguments: jqXHR, textStatus, errorThrown, requestOptions)
+    var jqXHR, errorThrown, requestOptions;
+    if (error instanceof AjaxError) {
+      jqXHR = error.jqXHR;
+      errorThrown = error.errorThrown;
+      requestOptions = error.requestOptions; // scout extension
+    } else {
+      var args = (Array.isArray(error) ? error : arguments);
+      jqXHR = args[0];
+      errorThrown = args[2];
+      requestOptions = args[3]; // scout extension
+    }
+
+    var ajaxRequest = (requestOptions ? strings.join(' ', requestOptions.type, requestOptions.url) : '');
+    var ajaxStatus = (jqXHR.status ? strings.join(' ', jqXHR.status, errorThrown) : 'Connection error');
+
+    errorInfo.code = 'X' + (jqXHR.status || '0');
+    errorInfo.message = 'AJAX call' + strings.box(' "', ajaxRequest, '"') + ' failed' + strings.box(' [', ajaxStatus, ']');
+    errorInfo.log = errorInfo.message;
+    if (jqXHR.responseText) {
+      errorInfo.debugInfo = 'Response text:\n' + jqXHR.responseText;
+      errorInfo.log += '\n' + errorInfo.debugInfo;
+    }
+  }
+
+  _analyzeOtherError(errorInfo) {
+    var error = errorInfo.error;
+    // Everything else (e.g. when strings are thrown)
+    var s = (typeof error === 'string' || typeof error === 'number') ? String(error) : null;
+    errorInfo.code = 'P4';
+    errorInfo.message = s || 'Unexpected error';
+    if (!s) {
+      try {
+        s = JSON.stringify(error); // may throw "cyclic object value" error
+      } catch (err) {
+        s = String(error);
+      }
+    }
+    errorInfo.log = 'Unexpected error: ' + s;
+  }
+
+  _analyzeNoError(errorInfo) {
+    errorInfo.code = 'P3';
+    errorInfo.message = 'Unknown error';
+    errorInfo.log = 'Unexpected error (no reason provided)';
+  }
+
+  mapStack(stack) {
+    var deferred = $.Deferred();
+    try {
+      sourcemappedStacktrace.mapStackTrace(stack, function(mappedStack) {
+        deferred.resolve(arrays.format(mappedStack, '\n'));
+      });
+    } catch (e) {
+      return $.rejectedPromise({message: 'Exception mapping failed', error: e});
+    }
+
+    return deferred.promise();
   }
 
   /**
@@ -203,6 +261,7 @@ export default class ErrorHandler {
         this._sendErrorMessage(session, errorInfo.log);
       }
     }
+    return errorInfo;
   }
 
   /**

@@ -270,8 +270,10 @@ export default class App {
    */
   _installErrorHandler() {
     window.onerror = this.errorHandler.windowErrorHandler;
-    // FIXME bsh, cgu: use ErrorHandler to handle unhandled promise rejections
-    //                 --> replace jQuery.Deferred.exceptionHook(error, stack)
+    // FIXME bsh, cgu: use ErrorHandler to handle unhandled promise rejections. Just replacing jQuery.Deferred.exceptionHook(error, stack) does not work
+    // because it is called on every exception and not only on unhandled.
+    // https://developer.mozilla.org/en-US/docs/Web/API/Window/unhandledrejection_event would be exactly what we need, but jQuery does not support it.
+    // Bluebird has a polyfill -> can it be ported to jQuery?
   }
 
   _createErrorHandler() {
@@ -380,18 +382,19 @@ export default class App {
   }
 
   _fail(options, error) {
-    $.log.error('App initialization failed', error);
-    var $error = $('body').appendDiv('startup-error');
-    $error.appendDiv('startup-error-title').text('The application could not be started');
+    $.log.error('App initialization failed.');
 
     var args = objects.argumentsToArray(arguments).slice(1);
-    var errorInfo = this.errorHandler.handle(args);
-    if (errorInfo.message) {
-      $error.appendDiv('startup-error-message').text(errorInfo.message);
-    }
-
-    // Reject with original rejection arguments
-    return $.rejectedPromise.apply($, args);
+    return this.errorHandler.handle(args)
+      .then(function(errorInfo) {
+        var $error = $('body').appendDiv('startup-error');
+        $error.appendDiv('startup-error-title').text('The application could not be started');
+        if (errorInfo.message) {
+          $error.appendDiv('startup-error-message').text(errorInfo.message);
+        }
+        // Reject with original rejection arguments
+        return $.rejectedPromise.apply($, args);
+      });
   }
 
   /**

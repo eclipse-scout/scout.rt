@@ -32,16 +32,41 @@ module.exports = (env, args) => {
       });
   }
 
+  /**
+   * Don't reveal absolute file paths in production mode -> only return the file name relative to its module.
+   */
+  function prodDevtoolModuleFilenameTemplate(info) {
+    var path = info.resourcePath || '';
+    // Search for the last /src/ in the path and return the fragment starting from its parent
+    var result = path.match(/.*\/(.*\/src\/.*)/);
+    if (result) {
+      return result[1];
+    }
+    // Match everything after the /last node_modules/ in the path
+    result = path.match(/.*\/node_modules\/(.*)/);
+    if (result) {
+      return result[1];
+    }
+    // Return only the file name (the part after the last /)
+    result = path.match(/([^/\\]*)$/);
+    if (result) {
+      return result[1];
+    }
+  }
+
   const config = {
     target: 'web',
     mode: args.mode,
-    devtool: devMode ? 'inline-cheap-module-source-map' : undefined,
+    // In production mode create external source maps without source code to map stack traces.
+    // Otherwise stack traces would point to the minified source code which makes it quite impossible to analyze productive issues.
+    devtool: devMode ? 'inline-cheap-module-source-map' : 'nosources-source-map',
     output: {
       filename: jsFilename,
       path: outDir,
       libraryTarget: 'umd',
       globalObject: 'this',
-      umdNamedDefine: true
+      umdNamedDefine: true,
+      devtoolModuleFilenameTemplate: devMode ? undefined : prodDevtoolModuleFilenameTemplate
     },
     performance: {
       hints: false
@@ -90,7 +115,6 @@ module.exports = (env, args) => {
             compact: false,
             cacheDirectory: true,
             cacheCompression: false,
-            sourceMaps: devMode ? 'inline' : undefined,
             plugins: [
               require.resolve('@babel/plugin-transform-object-assign'),
               require.resolve('@babel/plugin-proposal-class-properties'),
@@ -135,7 +159,9 @@ module.exports = (env, args) => {
           scout: {
             // Scout may be loaded as node module or may be part of the workspace
             // Also make sure the regex only matches *.js files to prevent the output from mixing with css
-            test: /[\\/]node_modules[\\/]@eclipse-scout[\\/].*\.js|[\\/]eclipse-scout-core[\\/].*\.js|[\\/]org.eclipse.scout.rt.svg.ui.html[\\/].*\.js/,
+            // sourcemapped-stacktrace is included as well because it is not worth it to have a separate bundle for it.
+            // Adding it to vendors.js would force the users to add the vendors.js to login.html as well, which may not be desired if they have custom third party libs not required by the login.html.
+            test: /[\\/]node_modules[\\/]@eclipse-scout[\\/].*\.js|[\\/]eclipse-scout-core[\\/].*\.js|[\\/]org.eclipse.scout.rt.svg.ui.html[\\/].*\.js|[\\/]node_modules[\\/]sourcemapped-stacktrace[\\/].*\.js/,
             name: 'eclipse-scout',
             priority: -5,
             reuseExistingChunk: true,
@@ -192,7 +218,6 @@ module.exports = (env, args) => {
       // minify js
       new TerserPlugin({
         test: /\.js(\?.*)?$/i,
-        sourceMap: devMode,
         cache: true,
         parallel: true
       })
