@@ -673,6 +673,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   protected void handleUiRowsSelected(JsonEvent event) {
     List<ITableRow> tableRows = extractTableRows(event.getData());
+    if (tableRows.isEmpty() && event.getData().getJSONArray(PROP_ROW_IDS).length() > 0) {
+      LOG.info("Ignored inconsistent selection event from UI: {} (current model selection: {})", event.getData(), rowIdsToJson(getModel().getSelectedRows()));
+      return;
+    }
     addTableEventFilterCondition(TableEvent.TYPE_ROWS_SELECTED).setRows(tableRows);
     getModel().getUIFacade().setSelectedRowsFromUI(tableRows);
   }
