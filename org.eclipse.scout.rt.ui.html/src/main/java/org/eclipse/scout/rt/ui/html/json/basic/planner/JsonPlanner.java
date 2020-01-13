@@ -427,6 +427,10 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
   @SuppressWarnings("unchecked")
   protected void handleUiResourcesSelected(JsonEvent event) {
     List<Resource<?>> resources = extractResources(event.getData());
+    if (resources.isEmpty() && event.getData().getJSONArray("resourceIds").length() > 0) {
+      LOG.info("Ignored inconsistent selection event from UI: {} (current model selection: {})", event.getData(), resourceIdsToJson(getModel().getSelectedResources(), new P_ResourceIdProvider()));
+      return;
+    }
     addPlannerEventFilterCondition(PlannerEvent.TYPE_RESOURCES_SELECTED).setResources(resources);
     getModel().getUIFacade().setSelectedResourcesFromUI(resources);
   }

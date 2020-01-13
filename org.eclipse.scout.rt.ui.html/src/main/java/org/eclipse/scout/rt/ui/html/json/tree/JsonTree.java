@@ -990,6 +990,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
 
   protected void handleUiNodesSelected(JsonEvent event) {
     final List<ITreeNode> nodes = extractTreeNodes(event.getData());
+    if (nodes.isEmpty() && event.getData().getJSONArray(PROP_NODE_IDS).length() > 0) {
+      LOG.info("Ignored inconsistent selection event from UI: {} (current model selection: {})", event.getData(), nodeIdsToJson(getModel().getSelectedNodes(), false));
+      return;
+    }
     addTreeEventFilterCondition(TreeEvent.TYPE_NODES_SELECTED).setNodes(nodes);
     getModel().getUIFacade().setNodesSelectedFromUI(nodes);
   }
