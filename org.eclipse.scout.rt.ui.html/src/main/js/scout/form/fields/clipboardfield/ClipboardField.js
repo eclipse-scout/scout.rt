@@ -302,7 +302,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
           // attribute to the file object that is then used as a filename in session.uploadFiles().
           var lastModifiedDiff = startPasteTimestamp - file.lastModified;
           if (lastModifiedDiff < 1000) {
-            file.scoutName = '';
+            file.scoutName = scout.Session.EMPTY_UPLOAD_FILENAME;
           }
           filesArgument.push(file);
           contentCount++;
