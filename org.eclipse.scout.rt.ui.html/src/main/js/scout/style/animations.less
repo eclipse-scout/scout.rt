@@ -484,19 +484,19 @@
 
   /*** Flash-Gray ***/
 
-  .animation-flash-gray() {
-    #scout.animation-name(flash-gray);
+  .animation-flash-gray(@keyframes-name: flash-gray) {
+    #scout.animation-name(@keyframes-name);
     #scout.animation-duration(0.4s);
     #scout.animation-iteration-count(1);
     #scout.animation-timing-function(linear);
   }
 
   .keyframes-flash-gray() {
-    00%  { background-color: @palette-white; } /* see comment on top */
-    25%  { background-color: @palette-gray-5; }
-    50%  { background-color: @palette-white; }
-    75%  { background-color: @palette-gray-5; }
-    100% { background-color: @palette-white; }
+    00%  { background-color: @simple-tab-background-color; } /* see comment on top */
+    25%  { background-color: @simple-tab-flash-background-color; }
+    50%  { background-color: @simple-tab-background-color; }
+    75%  { background-color: @simple-tab-flash-background-color; }
+    100% { background-color: @simple-tab-background-color; }
   }
 
   @-webkit-keyframes flash-gray { .keyframes-flash-gray(); }
