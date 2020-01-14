@@ -64,7 +64,7 @@ public class InteractiveTestSuite extends Runner {
           return true;
         }
         Thread.sleep(100L);
-        if (System.currentTimeMillis() - ts > 30000L) {
+        if (System.currentTimeMillis() - ts > 5000L) {
           System.out.println("Auto-close.");
           throw new InterruptedException();
         }
@@ -83,7 +83,7 @@ public class InteractiveTestSuite extends Runner {
   @Override
   @SuppressWarnings({"squid:S1181", "squid:S1166"})
   public void run(final RunNotifier notifier) {
-    System.out.println("Started interactive test console. (Auto-closing in 30 seconds when no input is entered, assuming it is a ci-test-run)");
+    System.out.println("Started interactive test console. (Auto-closing in 5 seconds when no input is entered, assuming it is a ci-test-run)");
     String lastLine = "";
     int repeat = 0;
     while (true) {
