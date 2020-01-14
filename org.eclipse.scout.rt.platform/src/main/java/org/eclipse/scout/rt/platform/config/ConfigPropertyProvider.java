@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.config;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -70,6 +71,7 @@ public class ConfigPropertyProvider implements IPropertyProvider {
   }
 
   protected List<Entry<String, String>> parse(URL propertiesFileUrl) {
+    String currentDir = extractCurrentDir(propertiesFileUrl);
     List<Entry<String, String>> result = new ArrayList<>();
     IConfigFileLoader loader = getConfigFileLoader();
     Properties props = new Properties() {
@@ -79,6 +81,9 @@ public class ConfigPropertyProvider implements IPropertyProvider {
       public synchronized Object put(Object rawKey, Object rawValue) {
         String key = (String) rawKey;
         String value = (String) rawValue;
+        if (value != null && currentDir != null) {
+          value = value.replace(PropertiesHelper.CURRENT_DIR_VARIABLE, currentDir);
+        }
         Object oldValue = super.put(key, value);
         if (oldValue != null) {
           logDuplicateKey(rawKey, oldValue, rawValue);
@@ -93,6 +98,21 @@ public class ConfigPropertyProvider implements IPropertyProvider {
     LOG.info("Reading properties from {} using {}", propertiesFileUrl, loader.getClass().getName());
     loader.load(propertiesFileUrl, props);
     return result;
+  }
+
+  /**
+   * define value for ${CURRENT_DIR}
+   */
+  protected String extractCurrentDir(URL propertiesFileUrl) {
+    if ("file".equals(propertiesFileUrl.getProtocol())) {
+      try {
+        return new File(propertiesFileUrl.toURI().getSchemeSpecificPart()).getParentFile().getAbsolutePath();
+      }
+      catch (URISyntaxException e) {
+        LOG.warn("Cannot extract path from '{}'", propertiesFileUrl, e);
+      }
+    }
+    return null;
   }
 
   protected IConfigFileLoader getConfigFileLoader() {
@@ -110,7 +130,7 @@ public class ConfigPropertyProvider implements IPropertyProvider {
     return loader;
   }
 
-  private void logDuplicateKey(Object key, Object oldValue, Object newValue) {
+  protected void logDuplicateKey(Object key, Object oldValue, Object newValue) {
     LOG.warn("Duplicate config key: '{}'. Old value '{}' replaced with '{}'.", key, oldValue, newValue);
   }
 

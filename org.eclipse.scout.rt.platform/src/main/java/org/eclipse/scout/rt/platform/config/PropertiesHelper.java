@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +84,13 @@ import org.slf4j.LoggerFactory;
  * <li>my-namespace|myMap[key1]=value1</li>
  * </ul>
  * </code>
+ * <p>
+ * Since 10.0 Scout also supports importing a file defining variables. This feature is helpful
+ * when launching applications in development mode in an IDE using a pre-defined config.properties that contains
+ * variables (also known as tags). The variable file only contains variables and config property values but is itself
+ * not a config.property file. Thus its values are not checked in any {@link IConfigurationValidator}.
+ * <p>
+ * A variable file is passed to the java process with the system property <code>-Dscout.env=file:/path/to/my/launch.properties</code>
  */
 public class PropertiesHelper {
 
@@ -98,14 +106,26 @@ public class PropertiesHelper {
   public static final String IMPORT_KEY = "import";
   private static final Pattern IMPORT_PATTERN = Pattern.compile("^import(\\[[^\\]]*\\])?$");
 
+  /**
+   * The variable ${CURRENT_DIR} can be used in a property file defined with -Dscout.env=file:/path/to/file to access
+   * the folder path of that file, a self-reference.
+   */
+  public static final String CURRENT_DIR_VARIABLE = "${CURRENT_DIR}";
+
   private static final Logger LOG = LoggerFactory.getLogger(PropertiesHelper.class);
 
+  private Map<String, String> m_envProperties = new LinkedHashMap<>();
   private Map<String, String> m_configProperties = new HashMap<>();
   private boolean m_hasProviderProperties = false;
-  private final Set<Object> m_parsedFiles = new HashSet<>();
-  private final Set<Object> m_referencedKeys = new HashSet<>();
-  private final Set<String> m_resolvedKeys = new HashSet<>();
   private boolean m_initializing;
+
+  /*
+   * The following are temporary fields that are cleared after the object is initialized
+   */
+
+  private Set<Object> m_parsedFiles = new HashSet<>();
+  private Set<Object> m_referencedKeys = new HashSet<>();
+  private Set<String> m_importKeys = new HashSet<>();
 
   /**
    * Creates a new instance using the given property provider.<br>
@@ -115,6 +135,20 @@ public class PropertiesHelper {
    * @see ConfigPropertyProvider
    */
   public PropertiesHelper(IPropertyProvider properties) {
+    this(properties, null);
+  }
+
+  /**
+   * Creates a new instance using the given config.properties and optional variable file.<br>
+   *
+   * @param properties
+   *          the property provider.
+   * @param env
+   *          the environment variables. Optional
+   * @see ConfigPropertyProvider
+   */
+  public PropertiesHelper(IPropertyProvider properties, IPropertyProvider env) {
+    parseEnvFile(env);
     try {
       m_initializing = true;
       if (properties != null) {
@@ -138,9 +172,43 @@ public class PropertiesHelper {
     }
     finally {
       m_initializing = false;
+      //free memory
+      m_parsedFiles = null;
+      m_referencedKeys = null;
+      m_importKeys = null;
     }
   }
 
+  /**
+   * Parse env file with variables
+   *
+   * @param propertyProvider
+   * @return true if the file exists
+   */
+  protected boolean parseEnvFile(IPropertyProvider propertyProvider) {
+    if(propertyProvider==null){
+      return false;
+    }
+    List<Entry<String, String>> properties = propertyProvider.readProperties();
+    if (properties == null) {
+      return false;
+    }
+    properties.forEach(prop -> {
+      String key = prop.getKey();
+      String value = resolveImports(key, prop.getValue());
+      if (StringUtility.hasText(key)) {
+        m_envProperties.put(key, value);
+      }
+    });
+    return true;
+  }
+
+  /**
+   * Parse regular config.properties
+   *
+   * @param propertyProvider
+   * @return true if the file exists
+   */
   protected boolean parse(IPropertyProvider propertyProvider) {
     m_parsedFiles.add(propertyProvider.getPropertiesIdentifier());
     List<Entry<String, String>> properties = propertyProvider.readProperties();
@@ -159,7 +227,6 @@ public class PropertiesHelper {
         else {
           LOG.info("Duplicate config key: '{}'. Old value '{}' replaced with '{}'.", key, m_configProperties.get(key), value);
         }
-
       }
       if (StringUtility.hasText(key)) {
         m_configProperties.put(key, value);
@@ -253,6 +320,12 @@ public class PropertiesHelper {
     String envValue = lookupEnvironmentVariableValue(propKey);
     if (StringUtility.hasText(envValue)) {
       return resolve(envValue, PLACEHOLDER_PATTERN);
+    }
+
+    // env file
+    value = m_envProperties.get(propKey);
+    if (StringUtility.hasText(value)) {
+      return value;
     }
 
     // properties file
@@ -887,8 +960,11 @@ public class PropertiesHelper {
   }
 
   protected void resolveAll(Pattern pat) {
+    for (Entry<String, String> entry : m_envProperties.entrySet()) {
+      entry.setValue(resolve(entry.getValue(), pat));
+    }
     for (Entry<String, String> entry : m_configProperties.entrySet()) {
-      if (!m_resolvedKeys.contains(entry.getKey())) {
+      if (!m_importKeys.contains(entry.getKey())) {
         entry.setValue(resolve(entry.getValue(), pat));
       }
     }
@@ -982,7 +1058,7 @@ public class PropertiesHelper {
       else {
         LOG.warn("Import of '{}' skipped because already imported: {}.", value, m_parsedFiles);
       }
-      m_resolvedKeys.add(key);
+      m_importKeys.add(key);
     }
     return value;
   }

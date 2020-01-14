@@ -67,7 +67,33 @@ public final class ConfigUtility {
    */
   public static final String CONFIG_FILE_NAME = "config.properties";
 
-  private static final PropertiesHelper INSTANCE = new PropertiesHelper(new ConfigPropertyProvider(CONFIG_FILE_NAME));
+  /**
+   * Optional file defining variables used in the config.properties. This feature is helpful when launching applications
+   * in development mode in the IDE or as parameterized deployments using a pre-defined config.properties that contains
+   * variables. The variable file only contains variables and values but is itself not a config.property file. Thus its
+   * values are not checked in any {@link IConfigurationValidator}.
+   * <p>
+   * A variable file is passed to the java process using the system property
+   * <code>-Dscout.env=file:/path/to/my/launch.properties</code>
+   * <p>
+   * Example content of such a launch.properties assuming it is placed in the root of the eclipse workspace resp. the
+   * root of the IntelliJ project folder.
+   *
+   * <pre>
+   *   jms.url=jms:/foo/bar
+   *   workspace.dir=${CURRENT_DIR}
+   * </pre>
+   * <p>
+   * Example of a config.properties that contains variables
+   *
+   * <pre>
+   *   scout.services.myjmsprovider.url=${jms.url}
+   *   scout.services.myjmsprovider.foobarDir=${workspace.dir}
+   * </pre>
+   */
+  public static final String SCOUT_ENV_PROPERTY = "scout.env";
+
+  private static final PropertiesHelper INSTANCE = new PropertiesHelper(new ConfigPropertyProvider(CONFIG_FILE_NAME), new ConfigPropertyProvider(SCOUT_ENV_PROPERTY));
 
   private ConfigUtility() {
   }

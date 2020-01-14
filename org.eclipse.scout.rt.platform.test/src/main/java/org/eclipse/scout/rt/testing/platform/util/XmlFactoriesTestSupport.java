@@ -75,7 +75,7 @@ public class XmlFactoriesTestSupport {
       @Override
       public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
         Path fileName = dir.getFileName();
-        if (fileName != null && ".git".equals(fileName.toString())) {
+        if (fileName != null && (".git".equals(fileName.toString())  || "node_modules".equals(fileName.toString())) ) {
           return FileVisitResult.SKIP_SUBTREE;
         }
         return FileVisitResult.CONTINUE;
