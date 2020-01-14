@@ -115,7 +115,6 @@
     width: 100%;
     height: @tab-area-border-width;
     margin-bottom: -@tab-area-border-width;
-    background-color: @tab-item-marked-border-color;
     display: none;
   }
 
@@ -133,6 +132,7 @@
 
   &.marked::after {
     display: block;
+    background-color: @tab-item-marked-border-color;
   }
 
   &:hover {
