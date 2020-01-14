@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,13 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {KeyStrokeContext, PageTileGridSelectKeyStroke, scout, TileGrid} from '../../../index';
+import {arrays, KeyStrokeContext, PageTileGridSelectKeyStroke, scout, TileGrid} from '../../../index';
 
 export default class PageTileGrid extends TileGrid {
 
   constructor() {
     super();
     this.outline = null;
+    this.page = null;
+    this.nodes = null;
     this.withPlaceholders = true;
     this.scrollable = false;
     this.renderAnimationEnabled = true;
@@ -25,11 +27,16 @@ export default class PageTileGrid extends TileGrid {
 
   _init(model) {
     super._init(model);
-    this._setOutline(this.outline);
+    this.nodes = this.nodes || (this.page && this.page.childNodes) || (this.outline && this.outline.nodes);
+    this.setOutline(this.outline);
+    this.setPage(this.page);
+    this.setNodes(this.nodes);
   }
 
   _destroy() {
-    this._setOutline(null);
+    this.setOutline(null);
+    this.setPage(null);
+    this.setNodes(null);
     super._destroy();
   }
 
@@ -51,8 +58,7 @@ export default class PageTileGrid extends TileGrid {
     ]);
   }
 
-  _setOutline(outline) {
-    var tiles = [];
+  setOutline(outline) {
     if (this.outline) {
       this.outline.off('nodeChanged pageChanged', this._outlineNodeChangedHandler);
       this.outline.off('nodesDeleted', this._outlineStructureChangedHandler);
@@ -67,18 +73,22 @@ export default class PageTileGrid extends TileGrid {
       this.outline.on('nodesInserted', this._outlineStructureChangedHandler);
       this.outline.on('allChildNodesDeleted', this._outlineStructureChangedHandler);
       this.outline.on('childNodeOrderChanged', this._outlineStructureChangedHandler);
-      tiles = this._createPageTiles(this.outline.nodes);
     }
-    this.setTiles(tiles);
+  }
+
+  setPage(page) {
+    this._setProperty('page', page);
+  }
+
+  setNodes(nodes) {
+    this._setProperty('nodes', nodes);
+    this._rebuild();
   }
 
   _createPageTiles(pages) {
-    var tiles = [];
-    pages.forEach(function(page) {
-      var tile = this._createPageTile(page);
-      tiles.push(tile);
+    return (pages || []).map(function(page) {
+      return this._createPageTile(page);
     }, this);
-    return tiles;
   }
 
   _createPageTile(page) {
@@ -97,7 +107,7 @@ export default class PageTileGrid extends TileGrid {
   }
 
   _rebuild() {
-    this.setTiles(this._createPageTiles(this.outline.nodes));
+    this.setTiles(this._createPageTiles(this.nodes));
   }
 
   _onOutlineNodeChanged(event) {
@@ -110,12 +120,19 @@ export default class PageTileGrid extends TileGrid {
   }
 
   _onOutlineStructureChanged(event) {
-    var eventContainsTopLevelNode = event.nodes && event.nodes.some(function(node) {
-      return !node.parentNode;
-    }) || event.type === 'allChildNodesDeleted';
-    // only rebuild if top level nodes change
-    if (eventContainsTopLevelNode) {
-      this._rebuild();
+    if (this.page) {
+      if (this.page === event.parentNode) {
+        this.setNodes(this.page.childNodes);
+      }
+    }
+    else {
+      var eventContainsTopLevelNode = event.nodes && event.nodes.some(function(node) {
+        return !node.parentNode;
+      }) || event.type === 'allChildNodesDeleted';
+      // only rebuild if top level nodes change
+      if (eventContainsTopLevelNode) {
+        this.setNodes(this.outline.nodes);
+      }
     }
   }
 }

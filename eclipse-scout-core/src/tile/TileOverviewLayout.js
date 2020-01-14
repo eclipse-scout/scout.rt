@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,19 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, graphics} from '../../../index';
+import {AbstractLayout, graphics} from '../index';
 
-export default class TileOutlineOverviewLayout extends AbstractLayout {
+export default class TileOverviewLayout extends AbstractLayout {
 
-  constructor(tileOutlineOverview) {
+  constructor(tileOverview) {
     super();
-    this.tileOutlineOverview = tileOutlineOverview;
+    this.tileOverview = tileOverview;
   }
 
   layout($container) {
-    var htmlContainer = this.tileOutlineOverview.htmlComp;
-    var pageTileGrid = this.tileOutlineOverview.pageTileGrid;
-    var $content = this.tileOutlineOverview.$content;
+    var htmlContainer = this.tileOverview.htmlComp;
+    var pageTileGrid = this.tileOverview.pageTileGrid;
+    var $content = this.tileOverview.$content;
     var contentSize = htmlContainer.availableSize()
       .subtract(htmlContainer.insets())
       .subtract(graphics.insets($content, {

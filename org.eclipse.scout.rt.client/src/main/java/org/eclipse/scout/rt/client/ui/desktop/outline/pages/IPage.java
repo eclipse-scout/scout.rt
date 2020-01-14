@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 /**
  * A page is a tree node for the outline and a table in the main view<br>
@@ -174,6 +175,16 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, ID
   boolean isDetailFormVisible();
 
   void setDetailFormVisible(boolean visible);
+
+  boolean isShowTileOverview();
+
+  /**
+   * Only possible before detail form is created.
+   *
+   * @throws AssertionException
+   *           if the detail form is already created.
+   */
+  void setShowTileOverview(boolean showTileOverview);
 
   /**
    * Sets the icon ID which is used for icons in the tile outline overview.

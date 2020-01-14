@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2019-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,15 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, OutlineOverview, scout, TileOverviewLayout} from '../../../index';
 
-export default class TileOutlineOverview extends OutlineOverview {
+import {Form, TileOverviewLayout, HtmlComponent} from '../index';
 
+export default class TileOverviewForm extends Form {
   constructor() {
     super();
-    this.pageTileGrid = null;
+
+    this.outline = null;
+    this.nodes = null;
+    this.tileOverviewTitle = null;
     this.scrollable = true;
     this._addWidgetProperties(['pageTileGrid']);
+
+    this.$content = null;
+    this.$title = null;
   }
 
   _init(model) {
@@ -26,17 +32,19 @@ export default class TileOutlineOverview extends OutlineOverview {
     }
   }
 
-  _render() {
-    this.$container = this.$parent.appendDiv('tile-overview');
-    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  _renderForm() {
+    super._renderForm();
     this.htmlComp.setLayout(new TileOverviewLayout(this));
     this.$content = this.$container.appendDiv('tile-overview-content');
     this.contentHtmlComp = HtmlComponent.install(this.$content, this.session);
-    this.$title = this.$content.appendDiv('tile-overview-title').text(this.outline.title);
+    this.$title = this.$content.appendDiv('tile-overview-title').text(this.tileOverviewTitle);
   }
 
   _renderProperties() {
     super._renderProperties();
+    if (this.pageTileGrid.rendered) {
+      this.pageTileGrid = this._createPageTileGrid();
+    }
     this._renderPageTileGrid();
     this._renderScrollable();
   }
@@ -48,7 +56,8 @@ export default class TileOutlineOverview extends OutlineOverview {
   _createPageTileGrid() {
     return scout.create('PageTileGrid', {
       parent: this,
-      outline: this.outline
+      outline: this.outline,
+      nodes: this.nodes
     });
   }
 
@@ -60,5 +69,22 @@ export default class TileOutlineOverview extends OutlineOverview {
     } else {
       this._uninstallScrollbars();
     }
+  }
+
+  setPage(page) {
+    this.outline = page.getOutline();
+    this.nodes = page.childNodes;
+    this.tileOverviewTitle = page.text;
+
+    this.pageTileGrid.setOutline(this.outline);
+    this.pageTileGrid.setPage(page);
+    this.pageTileGrid.setNodes(this.nodes);
+  }
+
+  _remove() {
+    this.$content = null;
+    this.$title = null;
+
+    super._remove();
   }
 }
