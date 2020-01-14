@@ -38,6 +38,7 @@ export default class TabArea extends Widget {
       parent: this,
       cssClass: 'overflow-tab-item unfocusable',
       iconId: null,
+      inheritAccessibility: false,
       text: '0' // Initialize with the normal value to prevent unnecessary layout invalidation by the TabAreaLayout if ellipsis menus is not visible
     });
   }
