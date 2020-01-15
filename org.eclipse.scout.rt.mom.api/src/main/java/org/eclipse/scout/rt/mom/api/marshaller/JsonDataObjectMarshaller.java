@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,54 +10,42 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.mom.api.marshaller;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertType;
+
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
-import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.dataobject.TypeName;
 
 /**
  * This marshaller allows to transport an object's JSON representation as textual data across the network. It uses the
- * Scout {@link IDataObjectMapper} to serialize the content to a string representation.
+ * Scout {@link IDataObjectMapper} to serialize the content to a string representation. <b>The content data must be an
+ * instance of {@link IDataObject} annotated with a {@link TypeName}.</b>
  *
  * @see IMarshaller#MESSAGE_TYPE_TEXT
- * @since 6.1
+ * @see JsonMarshaller for simple type content objects (e.g. String or Boolean)
+ * @since 8.0
  */
 @Bean
-public class JsonMarshaller implements IMarshaller {
-
-  public static final String CTX_PROP_OBJECT_TYPE = "x-scout.mom.json.objecttype";
+public class JsonDataObjectMarshaller implements IMarshaller {
 
   protected final IDataObjectMapper m_dataObjectMapper;
 
-  public JsonMarshaller() {
+  public JsonDataObjectMarshaller() {
     m_dataObjectMapper = createDataObjectMapper();
   }
 
   @Override
   public Object marshall(final Object transferObject, final Map<String, String> context) {
-    if (transferObject == null) {
-      return null;
-    }
-    context.put(CTX_PROP_OBJECT_TYPE, transferObject.getClass().getName());
-    return m_dataObjectMapper.writeValue(transferObject);
+    return m_dataObjectMapper.writeValue(assertType(transferObject, IDataObject.class));
   }
 
   @Override
   public Object unmarshall(final Object data, final Map<String, String> context) {
-    final String jsonText = (String) data;
-    if (jsonText == null) {
-      return null;
-    }
-
-    try {
-      final Class<?> objectType = Class.forName(context.get(CTX_PROP_OBJECT_TYPE));
-      return m_dataObjectMapper.readValue(jsonText, objectType);
-    }
-    catch (final ClassNotFoundException e) {
-      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-    }
+    return m_dataObjectMapper.readValue(assertType(data, String.class), IDataObject.class);
   }
 
   @Override

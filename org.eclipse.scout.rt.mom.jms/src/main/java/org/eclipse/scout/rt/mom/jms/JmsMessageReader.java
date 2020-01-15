@@ -30,10 +30,10 @@ import javax.jms.TextMessage;
 
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
-import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
+import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -52,9 +52,9 @@ public class JmsMessageReader<DTO> {
   private static final Logger LOG = LoggerFactory.getLogger(JmsMessageReader.class);
 
   protected Message m_message;
-
   protected IMarshaller m_marshaller;
   protected Map<String, String> m_marshallerContext;
+  protected IDataObjectMapper m_contextDataObjectMapper;
 
   /**
    * Initializes this reader.
@@ -62,6 +62,7 @@ public class JmsMessageReader<DTO> {
   protected JmsMessageReader init(final Message message, final IMarshaller marshaller) throws JMSException {
     m_message = assertNotNull(message, "Message not specified");
     m_marshaller = assertNotNull(marshaller, "Marshaller not specified");
+    m_contextDataObjectMapper = BEANS.get(IDataObjectMapper.class);
     initContext();
     return this;
   }
@@ -175,10 +176,10 @@ public class JmsMessageReader<DTO> {
    *
    * @see JmsMessageWriter#writeContext(String, Map)
    */
-  @SuppressWarnings("unchecked")
   protected Map<String, String> readContext(final String property) throws JMSException {
     final String json = readProperty(property);
-    final Map<String, String> context = (Map<String, String>) BEANS.get(JsonMarshaller.class).unmarshall(json, Collections.singletonMap(JsonMarshaller.CTX_PROP_OBJECT_TYPE, HashMap.class.getName()));
+    @SuppressWarnings("unchecked")
+    Map<String, String> context = (Map<String, String>) m_contextDataObjectMapper.readValue(json, HashMap.class);
     if (context == null) {
       return Collections.emptyMap();
     }
