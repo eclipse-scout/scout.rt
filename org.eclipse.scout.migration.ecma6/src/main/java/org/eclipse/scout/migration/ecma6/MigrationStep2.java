@@ -194,7 +194,8 @@ public class MigrationStep2 implements IRunnable {
       }
       return;
     }
-    Files.move(path, path.getParent().resolve("index.less"));
+    fileName = fileName.replace("-module.less", "-index.less");
+    Files.move(path, path.getParent().resolve(fileName));
   }
 
   protected void processModuleJsFile(Path path) throws IOException {

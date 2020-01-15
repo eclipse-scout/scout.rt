@@ -13,13 +13,18 @@ package org.eclipse.scout.migration.ecma6.model.api;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.rt.platform.util.StringUtility;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class NamedElement implements INamedElement {
 
@@ -93,6 +98,12 @@ public class NamedElement implements INamedElement {
     m_fullyQualifiedName = fqn;
   }
 
+
+  public NamedElement withCustomAttribute(String key, Object value){
+    m_customAttributes.put(key, value);
+    return this;
+  }
+
   @Override
   public Map<String, Object> getCustomAttributes() {
     return m_customAttributes;
@@ -143,6 +154,7 @@ public class NamedElement implements INamedElement {
   }
 
   @Override
+  @JsonSerialize(converter = ChildrenJsonSerializer.class)
   public List<INamedElement> getChildren() {
     return Collections.unmodifiableList(m_children);
   }
@@ -152,11 +164,15 @@ public class NamedElement implements INamedElement {
   }
 
   void addChildren(List<INamedElement> children) {
-    Set<String> fqns = children.stream().map(c -> c.getFullyQualifiedName()).collect(Collectors.toSet());
-    List<INamedElement> newKids = m_children.stream().filter(c -> !fqns.contains(c.getFullyQualifiedName())).collect(Collectors.toList());
+    List<String> fqns = children.stream().map(c -> c.getFullyQualifiedName()).collect(Collectors.toList());
+    final Iterator<INamedElement> childrenIt = m_children.iterator();
+    while(childrenIt.hasNext()){
+      if(fqns.contains(childrenIt.next().getFullyQualifiedName())){
+        childrenIt.remove();
+      }
+    }
     children.forEach(c -> c.setParent(this));
-    newKids.addAll(children);
-    m_children = newKids;
+    m_children.addAll(children);
   }
 
   @Override

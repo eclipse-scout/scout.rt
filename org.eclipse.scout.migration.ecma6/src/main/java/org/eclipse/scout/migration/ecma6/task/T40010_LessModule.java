@@ -28,17 +28,19 @@ import org.eclipse.scout.migration.ecma6.configuration.Configuration;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Order(40010)
 public class T40010_LessModule extends AbstractTask {
+  private static final Logger LOG = LoggerFactory.getLogger(T40010_LessModule.class);
 
-  public static final String LESS_FILE_SUFFIX = ".less";
-  public static final String OLD_FILE_SUFFIX = "-module" + LESS_FILE_SUFFIX;
+
+  public static final String OLD_FILE_SUFFIX = "-module" + Context.LESS_FILE_SUFFIX;
 
   private final Pattern IMPORT_PAT = Pattern.compile("@import\\s+\"([\\w/.]+)\";");
   private final List<String> m_importsInCurrentFile = new ArrayList<>();
   private final Set<String> m_allLessFilesInCurrentModule = new HashSet<>();
-  private final Set<String> m_nonDefaultThemes = new HashSet<>();
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
@@ -56,7 +58,6 @@ public class T40010_LessModule extends AbstractTask {
 
     m_importsInCurrentFile.clear();
     m_allLessFilesInCurrentModule.clear();
-    m_nonDefaultThemes.clear();
     cache(context);
 
     String nl = workingCopy.getLineDelimiter();
@@ -65,7 +66,8 @@ public class T40010_LessModule extends AbstractTask {
       newContent = newContent + nl + "@import \"login/LoginBox\";" + nl;
     }
     workingCopy.setSource(newContent);
-    String newDefaultThemeFileName = "index.less";
+    String fileName = pathInfo.getPath().getFileName().toString();
+    String newDefaultThemeFileName = fileName.replace(OLD_FILE_SUFFIX, "-index.less");
 
     flushNonDefaultThemes(pathInfo, context, newDefaultThemeFileName, nl);
   }
@@ -76,26 +78,27 @@ public class T40010_LessModule extends AbstractTask {
   }
 
   protected void cache(Context context) {
-    Path sourceDir = Configuration.get().getTargetModuleDirectory();
+    Path sourceDir = Configuration.get().getSourceModuleDirectory();
     for (Path p : context.getAllLessFiles()) {
       String relPath = MigrationUtility.removeFirstSegments(sourceDir.relativize(p), 4);
       if (relPath.endsWith(OLD_FILE_SUFFIX)) {
         // skip modules
         continue;
       }
-      m_allLessFilesInCurrentModule.add(relPath);
-      String theme = parseTheme(p);
-      if (theme != null) {
-        m_nonDefaultThemes.add(theme);
+      if(relPath.endsWith("-macro.less")){
+        // skip macros
+        continue;
       }
+      m_allLessFilesInCurrentModule.add(relPath);
     }
   }
 
   protected void flushNonDefaultThemes(PathInfo pathInfo, Context context, String newDefaultThemeFileName, String nl) {
-    for (String theme : m_nonDefaultThemes) {
+    for (String theme : context.getNonDefaultThemes()) {
       String src = buildNonDefaultThemeSource(context, newDefaultThemeFileName, nl, theme);
       String fileName = toThemeFileName(removeLessFileExtension(newDefaultThemeFileName), theme);
       Path targetFile = Configuration.get().getTargetModuleDirectory().resolve(pathInfo.getModuleRelativePath().getParent().resolve(fileName));
+      LOG.info("Create index.less for theme '"+theme+"': [source:"+pathInfo+", target:"+targetFile+"]");
       if (Files.exists(targetFile)) {
         throw new ProcessingException("File '" + targetFile + "' already exists.");
       }
@@ -113,7 +116,7 @@ public class T40010_LessModule extends AbstractTask {
   }
 
   protected String toThemeFileName(String defaultThemeFileName, String theme) {
-    return defaultThemeFileName + '-' + theme + LESS_FILE_SUFFIX;
+    return defaultThemeFileName + '-' + theme + Context.LESS_FILE_SUFFIX;
   }
 
   protected String buildNonDefaultThemeSource(Context context, String newDefaultThemeFileName, String nl, String theme) {
@@ -144,20 +147,11 @@ public class T40010_LessModule extends AbstractTask {
     result.append("@import \"").append(lessImportPath).append("\";");
   }
 
-  public static String parseTheme(Path lessFile) {
-    String filenameWithExtension = lessFile.getFileName().toString();
-    String fileName = filenameWithExtension.substring(0, filenameWithExtension.length() - LESS_FILE_SUFFIX.length());
-    int firstDelimiterPos = fileName.indexOf('-');
-    if (firstDelimiterPos < 0) {
-      // no theme in file name
-      return null;
-    }
-    return fileName.substring(firstDelimiterPos + 1);
-  }
+
 
   public static String removeLessFileExtension(String path) {
-    if (path.endsWith(LESS_FILE_SUFFIX)) {
-      return path.substring(0, path.length() - LESS_FILE_SUFFIX.length());
+    if (path.endsWith(Context.LESS_FILE_SUFFIX)) {
+      return path.substring(0, path.length() - Context.LESS_FILE_SUFFIX.length());
     }
     return path;
   }

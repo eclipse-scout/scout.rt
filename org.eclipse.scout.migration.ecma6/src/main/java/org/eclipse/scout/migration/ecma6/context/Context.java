@@ -11,10 +11,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.migration.ecma6.FileUtility;
+import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.configuration.Configuration;
@@ -42,11 +45,14 @@ import org.slf4j.LoggerFactory;
 
 public class Context {
   private static final Logger LOG = LoggerFactory.getLogger(Context.class);
+  public static final String LESS_FILE_SUFFIX = ".less";
+
 
   private final Map<Path, WorkingCopy> m_workingCopies = new HashMap<>();
   private final Map<WorkingCopy, JsFile> m_jsFiles = new HashMap<>();
   private final Map<String /*fqn*/, JsClass> m_jsClasses = new HashMap<>();
   private final List<Path> m_lessFiles = new ArrayList<>();
+  private final Set<String> m_nonDefaultThemes = new HashSet<>();
   @FrameworkExtensionMarker
   private final Map<String /*fqn*/, JsUtility> m_jsUtilities = new HashMap<>();
   private final Map<String /*fqn*/, JsTopLevelEnum> m_jsTopLevelEnums = new HashMap<>();
@@ -73,6 +79,7 @@ public class Context {
   }
 
   protected void parseLessFiles() throws IOException {
+    Path sourceDir = Configuration.get().getSourceModuleDirectory();
     Files.walkFileTree(Configuration.get().getSourceModuleDirectory(), new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
@@ -80,8 +87,19 @@ public class Context {
         if (Configuration.get().isParseOnlyIncludeFiles() && !BEANS.get(IMigrationIncludePathFilter.class).test(info.getPath())) {
           return FileVisitResult.CONTINUE;
         }
-        if (file.getFileName().toString().endsWith(T40010_LessModule.LESS_FILE_SUFFIX)) {
+        if (file.getFileName().toString().endsWith(LESS_FILE_SUFFIX)) {
           m_lessFiles.add(file);
+        }
+
+        String relPath = MigrationUtility.removeFirstSegments(sourceDir.relativize(file), 4);
+        // skip modules and marcros for themes
+        if (!relPath.endsWith("-module" + LESS_FILE_SUFFIX)
+        && ! relPath.endsWith("-macro"+LESS_FILE_SUFFIX)) {
+
+        }
+        String theme = MigrationUtility.parseTheme(file);
+        if (theme != null) {
+          m_nonDefaultThemes.add(theme);
         }
         return FileVisitResult.CONTINUE;
       }
@@ -172,6 +190,10 @@ public class Context {
 
   public Libraries getLibraries() {
     return m_libraries;
+  }
+
+  public Set<String> getNonDefaultThemes() {
+    return Collections.unmodifiableSet(m_nonDefaultThemes);
   }
 
   protected void parseJsFiles() throws IOException {

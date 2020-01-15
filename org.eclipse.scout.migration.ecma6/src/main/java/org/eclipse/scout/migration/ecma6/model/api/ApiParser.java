@@ -26,16 +26,18 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class ApiParser {
 
-  private final ObjectMapper m_defaultJacksonObjectMapper;
+  private static final ObjectMapper     m_defaultJacksonObjectMapper = new ObjectMapper()
+    .setSerializationInclusion(Include.NON_DEFAULT)
+    .enable(SerializationFeature.INDENT_OUTPUT)
+    .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+    .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+
+
   private Path m_directory;
 
   public ApiParser(Path directory) {
     m_directory = directory;
-    m_defaultJacksonObjectMapper = new ObjectMapper()
-        .setSerializationInclusion(Include.NON_DEFAULT)
-        .enable(SerializationFeature.INDENT_OUTPUT)
-        .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
-        .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+
   }
 
   public Libraries parse() throws IOException {
@@ -43,7 +45,7 @@ public class ApiParser {
     //noinspection resource
     allLibs.addChildren(Files.list(m_directory)
         .sorted(Path::compareTo)
-        .map(this::parseLibrary)
+        .map(ApiParser::parseLibrary)
         // do not include current migration source as library
         .filter(lib -> Configuration.get().isParseOnlyIncludeFiles() || ObjectUtility.notEquals(Configuration.get().getPersistLibraryName(), lib.getCustomAttributeString(INamedElement.LIBRARY_MODULE_NAME)))
         .collect(Collectors.toList()));
@@ -51,7 +53,7 @@ public class ApiParser {
     return allLibs;
   }
 
-  protected NamedElement parseLibrary(Path lib) {
+  protected static NamedElement parseLibrary(Path lib) {
     try {
       return m_defaultJacksonObjectMapper.readValue(Files.newInputStream(lib), NamedElement.class);
     }
@@ -59,5 +61,4 @@ public class ApiParser {
       throw new ProcessingException("Could parse Api of '" + lib + "'.", e);
     }
   }
-
 }

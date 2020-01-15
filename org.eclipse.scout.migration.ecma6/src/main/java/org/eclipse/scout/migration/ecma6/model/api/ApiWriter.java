@@ -37,14 +37,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class ApiWriter {
+  private static final ObjectMapper jacksonObjectMapper =new ObjectMapper()
+    .setSerializationInclusion(Include.NON_DEFAULT)
+    .enable(SerializationFeature.INDENT_OUTPUT)
+    .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+    .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
 
   public void writeLibrary(Path libraryFile, String libName, Context context) throws IOException {
-    ObjectMapper defaultJacksonObjectMapper = new ObjectMapper()
-        .setSerializationInclusion(Include.NON_DEFAULT)
-        .enable(SerializationFeature.INDENT_OUTPUT)
-        .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
-        .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
-    defaultJacksonObjectMapper.writeValue(Files.newBufferedWriter(libraryFile), createLibraryFromCurrentModule(libName, context));
+    writeLibrary(libraryFile,  createLibraryFromCurrentModule(libName, context));
+  }
+
+  public static void writeLibrary(Path libFile, INamedElement library ) throws IOException {
+    jacksonObjectMapper.writeValue(Files.newBufferedWriter(libFile), library);
   }
 
   public INamedElement createLibraryFromCurrentModule(String libName, Context context) {

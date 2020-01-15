@@ -124,4 +124,15 @@ public final class MigrationUtility {
     }
     return getModuleDirectory(anyFile.getParent());
   }
+
+  public static String parseTheme(Path lessFile) {
+    String filenameWithExtension = lessFile.getFileName().toString();
+    String fileName = filenameWithExtension.substring(0, filenameWithExtension.length() - Context.LESS_FILE_SUFFIX.length());
+    int firstDelimiterPos = fileName.indexOf('-');
+    if (firstDelimiterPos < 0) {
+      // no theme in file name
+      return null;
+    }
+    return fileName.substring(firstDelimiterPos + 1);
+  }
 }

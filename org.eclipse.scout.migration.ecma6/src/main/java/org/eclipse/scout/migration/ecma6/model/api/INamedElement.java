@@ -12,6 +12,7 @@ package org.eclipse.scout.migration.ecma6.model.api;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
