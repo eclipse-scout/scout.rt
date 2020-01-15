@@ -22,6 +22,7 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
+import org.eclipse.scout.rt.platform.security.IPrincipalVerifier;
 import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
@@ -101,6 +102,9 @@ public class TrivialAccessController implements IAccessController {
     // Is already authenticated?
     final Principal principal = BEANS.get(ServletFilterHelper.class).findPrincipal(request, m_config.getPrincipalProducer());
     if (principal != null) {
+      if (m_config.getPrincipalVerifier() != null && !m_config.getPrincipalVerifier().verify(principal)) {
+        return false;
+      }
       BEANS.get(ServletFilterHelper.class).continueChainAsSubject(principal, request, response, chain);
       return true;
     }
@@ -156,6 +160,7 @@ public class TrivialAccessController implements IAccessController {
     private IPrincipalProducer m_principalProducer = BEANS.get(SimplePrincipalProducer.class);
     private PathInfoFilter m_exclusionFilter;
     private boolean m_loginPageInstalled = false;
+    private IPrincipalVerifier m_principalVerifier;
 
     public boolean isEnabled() {
       return m_enabled;
@@ -172,6 +177,15 @@ public class TrivialAccessController implements IAccessController {
 
     public TrivialAuthConfig withPrincipalProducer(final IPrincipalProducer principalProducer) {
       m_principalProducer = principalProducer;
+      return this;
+    }
+
+    public IPrincipalVerifier getPrincipalVerifier() {
+      return m_principalVerifier;
+    }
+
+    public TrivialAuthConfig withPrincipalVerifier(final IPrincipalVerifier principalVerifier) {
+      m_principalVerifier = principalVerifier;
       return this;
     }
 
