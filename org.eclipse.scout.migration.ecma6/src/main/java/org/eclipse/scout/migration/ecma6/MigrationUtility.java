@@ -135,4 +135,8 @@ public final class MigrationUtility {
     }
     return fileName.substring(firstDelimiterPos + 1);
   }
+
+  public static String pathToString(Path path, char delimiter){
+    return path.toString().replace('\\', delimiter).replace('/', delimiter);
+  }
 }

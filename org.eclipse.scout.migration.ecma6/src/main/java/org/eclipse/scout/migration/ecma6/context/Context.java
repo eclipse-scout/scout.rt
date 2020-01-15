@@ -89,18 +89,20 @@ public class Context {
         }
         if (file.getFileName().toString().endsWith(LESS_FILE_SUFFIX)) {
           m_lessFiles.add(file);
+          // check for new theme
+          String relPath = MigrationUtility.removeFirstSegments(sourceDir.relativize(file), 4);
+          // skip modules and marcros for themes
+          if (relPath.endsWith("-module" + LESS_FILE_SUFFIX)
+            ||  relPath.endsWith("-macro"+LESS_FILE_SUFFIX)) {
+            return FileVisitResult.CONTINUE;
+          }
+          String theme = MigrationUtility.parseTheme(file);
+          if (theme != null) {
+            m_nonDefaultThemes.add(theme);
+          }
         }
 
-        String relPath = MigrationUtility.removeFirstSegments(sourceDir.relativize(file), 4);
-        // skip modules and marcros for themes
-        if (!relPath.endsWith("-module" + LESS_FILE_SUFFIX)
-        && ! relPath.endsWith("-macro"+LESS_FILE_SUFFIX)) {
 
-        }
-        String theme = MigrationUtility.parseTheme(file);
-        if (theme != null) {
-          m_nonDefaultThemes.add(theme);
-        }
         return FileVisitResult.CONTINUE;
       }
 
