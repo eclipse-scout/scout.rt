@@ -22,10 +22,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.OtherEntityFixtureDo;
@@ -74,7 +72,7 @@ public class DoEntityTest {
 
     entity.put("foo", "bar");
     assertTrue(entity.has("foo"));
-    assertTrue(((DoValue<String>) entity.getNode("foo")).exists());
+    assertTrue(entity.getNode("foo").exists());
     assertEquals("bar", entity.get("foo", String.class));
     assertEquals("bar", entity.get("foo"));
 
@@ -86,7 +84,7 @@ public class DoEntityTest {
 
     DoValue<String> value = DoValue.of("bar2");
     entity.putNode("foo2", value);
-    assertTrue(((DoValue<String>) entity.getNode("foo2")).exists());
+    assertTrue(entity.getNode("foo2").exists());
     assertEquals("bar2", entity.get("foo2", String.class));
     assertEquals("bar2", entity.get("foo2"));
   }
@@ -95,15 +93,32 @@ public class DoEntityTest {
   @Test
   public void testPutGetHasListAttribute() {
     DoEntity entity = new DoEntity();
-    assertNull(entity.getList("", Object.class));
-    assertNull(entity.getList("foo", Object.class));
+    assertEquals(new ArrayList<>(), entity.getList("", Object.class));
+    assertTrue(entity.has("")); // attribute was created using get()
+    assertEquals(new ArrayList<>(), entity.getList("foo", Object.class));
+    assertTrue(entity.has("foo")); // attribute was created using get()
 
     entity.putList("foo", Arrays.asList("bar"));
     assertTrue(entity.has("foo"));
-    assertTrue(((DoList<String>) entity.getNode("foo")).exists());
+    assertTrue(entity.getNode("foo").exists());
     assertEquals("bar", entity.getList("foo", String.class).get(0));
     assertEquals(Arrays.asList("bar"), entity.get("foo"));
     assertEquals(Arrays.asList("bar"), entity.getList("foo"));
+  }
+
+  @Test
+  public void testOptListAttribute() {
+    DoEntity entity = new DoEntity();
+
+    assertFalse(entity.optList("foo").isPresent());
+    assertFalse(entity.optList("foo", String.class).isPresent());
+    assertFalse(entity.has("foo"));
+
+    entity.putList("foo", Arrays.asList("bar"));
+    assertTrue(entity.optList("foo").isPresent());
+    assertTrue(entity.optList("foo", String.class).isPresent());
+    assertEquals(Arrays.asList("bar"), entity.optList("foo").get());
+    assertEquals(Arrays.asList("bar"), entity.optList("foo", String.class).get());
   }
 
   @Test
@@ -358,13 +373,15 @@ public class DoEntityTest {
     DoEntity entity = BEANS.get(DoEntity.class);
     List<Object> list = newListWithOneNullValue();
     entity.putList("bar", list);
-    assertEquals(null, entity.getList("bar").get(0));
+    assertNull(entity.getList("bar").get(0));
   }
 
   @Test
   public void testGetList_missingNode() {
     DoEntity entity = BEANS.get(DoEntity.class);
-    assertNull(entity.getList("bar"));
+    assertFalse(entity.has("bar"));
+    assertEquals(new ArrayList<>(), entity.getList("bar"));
+    assertTrue(entity.has("bar"));
   }
 
   @Test
@@ -395,7 +412,7 @@ public class DoEntityTest {
     DoEntity entity = BEANS.get(DoEntity.class);
     List<Object> list = newListWithOneNullValue();
     entity.putList("bar", list);
-    assertEquals(null, entity.getStringList("bar").get(0));
+    assertNull(entity.getStringList("bar").get(0));
   }
 
   @Test
@@ -447,7 +464,7 @@ public class DoEntityTest {
     DoEntity entity = BEANS.get(DoEntity.class);
     List<Object> list = newListWithOneNullValue();
     entity.putList("bar", list);
-    assertEquals(null, entity.getBooleanList("bar").get(0));
+    assertNull(entity.getBooleanList("bar").get(0));
   }
 
   @Test
@@ -511,7 +528,7 @@ public class DoEntityTest {
     DoEntity entity = BEANS.get(DoEntity.class);
     List<Object> list = newListWithOneNullValue();
     entity.putList("bar", list);
-    assertEquals(null, entity.getDecimalList("bar").get(0));
+    assertNull(entity.getDecimalList("bar").get(0));
   }
 
   protected List<Object> newListWithOneNullValue() {
@@ -520,13 +537,13 @@ public class DoEntityTest {
     return list;
   }
 
-  protected Function<Object, String> mapper = value -> value.toString();
+  protected Function<Object, String> mapper = Object::toString;
 
   @Test
   public void testGetMapper() {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("foo", "true");
-    assertEquals("true", entity.get("foo", value -> value.toString()));
+    assertEquals("true", entity.get("foo", Object::toString));
     assertEquals("true", entity.get("foo", mapper));
     assertEquals(true, entity.get("foo", value -> Boolean.valueOf((String) value)));
   }
@@ -543,7 +560,7 @@ public class DoEntityTest {
   public void testGetMapperList() {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.putList("foo", Arrays.asList(true, false));
-    assertEquals(Arrays.asList("true", "false"), entity.getList("foo", value -> value.toString()));
+    assertEquals(Arrays.asList("true", "false"), entity.getList("foo", Object::toString));
     assertEquals(Arrays.asList("true", "false"), entity.getList("foo", mapper));
     assertEquals(Arrays.asList(true, false), entity.getList("foo", value -> value));
     assertEquals(Arrays.asList(false, true), entity.getList("foo", value -> !((boolean) value)));
@@ -631,7 +648,7 @@ public class DoEntityTest {
 
     // assert attributes have insertion-order if using all() method
     List<String> expectedKeys1 = Arrays.asList("attr1", "attr2");
-    List<String> actualKeys1 = entity1.all().entrySet().stream().map(Entry::getKey).collect(Collectors.toList());
+    List<String> actualKeys1 = new ArrayList<>(entity1.all().keySet());
     assertEquals(expectedKeys1, actualKeys1);
 
     DoEntity entity2 = BEANS.get(DoEntity.class);
@@ -640,10 +657,10 @@ public class DoEntityTest {
 
     // assert attributes have insertion-order if using all() method
     List<String> expectedKeys2 = Arrays.asList("attr2", "attr1");
-    List<String> actualKeys2 = entity2.all().entrySet().stream().map(Entry::getKey).collect(Collectors.toList());
+    List<String> actualKeys2 = new ArrayList<>(entity2.all().keySet());
     assertEquals(expectedKeys2, actualKeys2);
 
-    // assert entity equality (e.g. map identic) even if attribute order is not identical
+    // assert entity equality (e.g. map identical) even if attribute order is not identical
     assertEquals(entity1, entity2);
   }
 

@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 /**
  * Base interface for all data object entities.
  *
- * @see {@link DoEntity} for a default base class implementation
+ * @see DoEntity for a default base class implementation
  */
 @Bean
 public interface IDoEntity extends IDataObject {
@@ -134,32 +134,62 @@ public interface IDoEntity extends IDataObject {
   }
 
   /**
-   * @return List value of attribute {@code attributeName} or {@code null} if attribute is not available.
+   * @return List value of attribute {@code attributeName}. If the attribute is not available, an empty list is added as
+   *         attribute value into this entity and the list is returned.
    * @see IDoEntity#getNode(String) to get the wrapped attribute node
+   * @see IDoEntity#optList(String, Class) to get a list attribute without adding the attribute into this entity if it
+   *      is not available
    */
   default List<Object> getList(String attributeName) {
     return getList(attributeName, Object.class);
   }
 
   /**
-   * @return List value of attribute {@code attributeName} casted to specified {@code type} or {@code null} if attribute
-   *         is not available.
+   * @return List value of attribute {@code attributeName} casted to specified {@code type}. If the attribute is not
+   *         available, an empty list is added as attribute value into this entity and the list is returned.
    * @see IDoEntity#getNode(String) to get the wrapped attribute node
+   * @see IDoEntity#optList(String, Class) to get a list attribute without adding the attribute into this entity if it
+   *      is not available
    */
   @SuppressWarnings("unchecked")
   default <T> List<T> getList(String attributeName, Class<T> type) {
-    return optNode(attributeName)
-        .map(n -> Assertions.assertType(n, DoList.class).get())
-        .orElse(null);
+    if (!has(attributeName)) {
+      // create the attribute with default value (empty list) if not available
+      putList(attributeName, null);
+    }
+    return Assertions.assertType(getNode(attributeName), DoList.class).get();
   }
 
   /**
    * @return Value of list attribute {@code attributeName}, each element mapped to a custom type using specified
-   *         {@code mapper} or {@code null} if attribute is not available.
+   *         {@code mapper}. If the attribute is not available, an empty list is added as attribute value into this
+   *         entity and the list is returned.
+   * @see IDoEntity#optList(String, Class) to get a list attribute without adding the attribute into this entity if it
+   *      is not available
    */
   default <T> List<T> getList(String attributeName, Function<Object, T> mapper) {
     Assertions.assertNotNull(mapper, "provided mapper function is null");
-    return getList(attributeName).stream().map(mapper::apply).collect(Collectors.toList());
+    return getList(attributeName).stream().map(mapper).collect(Collectors.toList());
+  }
+
+  /**
+   * @return Optional list value of attribute {@code attributeName}. If the attribute is not available, an empty
+   *         optional is returned.
+   * @see IDoEntity#getNode(String) to get the wrapped attribute node
+   */
+  default Optional<List<Object>> optList(String attributeName) {
+    return optList(attributeName, Object.class);
+  }
+
+  /**
+   * @return Optional list value of attribute {@code attributeName} casted to specified {@code type}. If the attribute
+   *         is not available, an empty optional is returned.
+   * @see IDoEntity#getNode(String) to get the wrapped attribute node
+   */
+  @SuppressWarnings("unchecked")
+  default <T> Optional<List<T>> optList(String attributeName, Class<T> type) {
+    return optNode(attributeName)
+        .map(n -> Assertions.assertType(n, DoList.class).get());
   }
 
   /**
@@ -173,8 +203,8 @@ public interface IDoEntity extends IDataObject {
   }
 
   /**
-   * @return Value of list attribute {@code attributeName} converted to a list of {@link BigDecimal} or {@code null} if
-   *         attribute is not available.
+   * @return Value of list attribute {@code attributeName} converted to a list of {@link BigDecimal}. If the attribute
+   *         is not available, an empty list is added as attribute value into this entity and the list is returned.
    * @throws AssertionException
    *           if a list item value is not instance of {@link Number}
    */
@@ -193,8 +223,8 @@ public interface IDoEntity extends IDataObject {
   }
 
   /**
-   * @return Value of list attribute {@code attributeName} casted to {@link List<Boolean>} or {@code null} if attribute
-   *         is not available.
+   * @return Value of list attribute {@code attributeName} casted to {@link List<Boolean>}. If the attribute is not
+   *         available, an empty list is added as attribute value into this entity and the list is returned.
    * @throws AssertionException
    *           if a list item value is not instance of {@link Boolean}
    */
@@ -213,8 +243,8 @@ public interface IDoEntity extends IDataObject {
   }
 
   /**
-   * @return Value of list attribute {@code attributeName} casted to {@link String} or {@code null} if attribute is not
-   *         available.
+   * @return Value of list attribute {@code attributeName} casted to {@link String}. If the attribute is not available,
+   *         an empty list is added as attribute value into this entity and the list is returned.
    * @throws AssertionException
    *           if a list item value is not instance of {@link String}
    */
