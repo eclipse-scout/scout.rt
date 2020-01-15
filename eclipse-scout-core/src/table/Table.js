@@ -2885,22 +2885,7 @@ export default class Table extends Widget {
     this._triggerRowsUpdated(rows);
 
     if (this._isDataRendered()) {
-      // render row and replace div in DOM
-      rows.forEach(function(row) {
-        var oldRow = oldRowsMap[row.id],
-          $updatedRow;
-        if (!oldRow.$row) {
-          return;
-        }
-        $updatedRow = $(this._buildRowDiv(row));
-        $updatedRow.copyCssClasses(oldRow.$row, Table.SELECTION_CLASSES + ' first last');
-        oldRow.$row.replaceWith($updatedRow);
-        Table.linkRowToDiv(row, $updatedRow);
-        this._destroyTooltipsForRow(row);
-        this._removeCellEditorForRow(row);
-        this._installRow(row);
-      }, this);
-
+      this._renderUpdateRows(rows, oldRowsMap);
       if (structureChanged) {
         this._renderRowOrderChanges();
       }
@@ -2916,6 +2901,32 @@ export default class Table extends Widget {
     this._sortAfterUpdate();
     this._updateBackgroundEffect();
     this.invalidateLayoutTree(); // this will also update the scroll-bars
+  }
+
+  _renderUpdateRows(rows, oldRowsMap) {
+    // render row and replace div in DOM
+    rows.forEach(function(row) {
+      var oldRow = oldRowsMap[row.id],
+        $updatedRow;
+      if (!oldRow.$row || oldRow.$row.hasClass('hiding')) {
+        // If row is not rendered or being removed by an animation, don't try to update it.
+        // If it were updated during animated removal, the new row would immediately be inserted again, so the removal would not work.
+        return;
+      }
+      $updatedRow = $(this._buildRowDiv(row));
+      $updatedRow.copyCssClasses(oldRow.$row, Table.SELECTION_CLASSES + ' first last');
+      oldRow.$row.replaceWith($updatedRow);
+      Table.linkRowToDiv(row, $updatedRow);
+      this._destroyTooltipsForRow(row);
+      this._removeCellEditorForRow(row);
+      this._installRow(row);
+      if (oldRow.$row.hasClass('showing') && oldRow.$row.outerHeight() < row.$row.outerHeight() / 3) {
+        // If the row was being shown by an animation, start the animation again for the new row, otherwise row would immediately appear without animation.
+        // Do it only, if the current running time of the animation does not exceed 33% (this won't be correct if the height of the new and old rows differ).
+        // Goal: if the update happens immediately after the animation started, the new row will be animated nicely. If the update happens later, don't start the animation again from the start.
+        this._showRow(row);
+      }
+    }, this);
   }
 
   _sortAfterUpdate() {
