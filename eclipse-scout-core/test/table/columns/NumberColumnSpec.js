@@ -357,4 +357,24 @@ describe('NumberColumn', function() {
       expect(table.rows[0].cells[0].errorStatus).toBe(null);
     });
   });
+
+  it('isContentValid', function() {
+    var table = helper.createTable({
+      columns: [{
+        objectType: 'NumberColumn',
+        mandatory: true
+      }]
+    });
+    table.insertRow({
+      cells: [null]
+    });
+    var column = table.columns[0];
+    var row = table.rows[0];
+    expect(column.isContentValid(row).valid).toBe(false);
+    column.setCellValue(row, 0);
+    expect(column.isContentValid(row).valid).toBe(true);
+    column.setCellValue(row, 1);
+    expect(column.isContentValid(row).valid).toBe(true);
+  });
+
 });

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {aggregation, Column, comparators, DecimalFormat, numbers, scout, strings, styles} from '../../index';
+import {objects, aggregation, Column, comparators, DecimalFormat, numbers, scout, strings, styles} from '../../index';
 import * as $ from 'jquery';
 
 export default class NumberColumn extends Column {
@@ -285,5 +285,9 @@ export default class NumberColumn extends Column {
       minValue: this.minValue,
       decimalFormat: this.decimalFormat
     });
+  }
+
+  _hasCellValue(cell) {
+    return !objects.isNullOrUndefined(cell.value); // Zero (0) is valid too
   }
 }

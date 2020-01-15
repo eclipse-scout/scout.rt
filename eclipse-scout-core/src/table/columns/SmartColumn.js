@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Column, LookupCall, scout, SmartField, strings} from '../../index';
+import objects from '../../util/objects';
 
 export default class SmartColumn extends Column {
 
@@ -112,5 +113,16 @@ export default class SmartColumn extends Column {
     }.bind(this));
 
     return field;
+  }
+
+  /**
+   * Since we don't know the type of the key from the lookup-row we must deal with numeric and string types here.
+   */
+  _hasCellValue(cell) {
+    var value = cell.value;
+    if (objects.isNumber(value)) {
+      return !objects.isNullOrUndefined(value); // Zero (0) is valid too
+    }
+    return !!value;
   }
 }

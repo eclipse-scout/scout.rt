@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, ColumnOptimalWidthMeasurer, comparators, EventSupport, FormField, GridData, icons, objects, scout, strings, styles, Table, TableRow, texts} from '../../index';
+import {Cell, ColumnOptimalWidthMeasurer, comparators, EventSupport, FormField, GridData, icons, objects, scout, Status, strings, styles, Table, TableRow, texts} from '../../index';
 import * as $ from 'jquery';
 
 export default class Column {
@@ -835,7 +835,18 @@ export default class Column {
   }
 
   isContentValid(row) {
-    return this.cell(row).isContentValid();
+    let cell = this.cell(row);
+    var validByErrorStatus = !cell.errorStatus || cell.errorStatus.severity !== Status.Severity.ERROR;
+    var validByMandatory = !cell.mandatory || this._hasCellValue(cell);
+    return {
+      valid: validByErrorStatus && validByMandatory,
+      validByErrorStatus: validByErrorStatus,
+      validByMandatory: validByMandatory
+    };
+  }
+
+  _hasCellValue(cell) {
+    return !!cell.value;
   }
 
   _onTableColumnsChanged(event) {

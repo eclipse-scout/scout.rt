@@ -618,4 +618,22 @@ describe('Column', function() {
       expect(table.visibleColumns().length).toBe(3);
     });
   });
+
+  it('isContentValid', function() {
+    var table = helper.createTable({
+      columns: [{
+        objectType: 'Column',
+        mandatory: true
+      }]
+    });
+    table.insertRow({
+      cells: [null]
+    });
+    var column = table.columns[0];
+    var row = table.rows[0];
+    expect(column.isContentValid(row).valid).toBe(false);
+    column.setCellValue(row, 'foo');
+    expect(column.isContentValid(row).valid).toBe(true);
+  });
+
 });

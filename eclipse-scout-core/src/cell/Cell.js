@@ -87,13 +87,4 @@ export default class Cell {
     this.cssClass = cssClass;
   }
 
-  isContentValid() {
-    var validByErrorStatus = !this.errorStatus || this.errorStatus.severity !== Status.Severity.ERROR;
-    var validByMandatory = !this.mandatory || !!this.value;
-    return {
-      valid: validByErrorStatus && validByMandatory,
-      validByErrorStatus: validByErrorStatus,
-      validByMandatory: validByMandatory
-    };
-  }
 }
