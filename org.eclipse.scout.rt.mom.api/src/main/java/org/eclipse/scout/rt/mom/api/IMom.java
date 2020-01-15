@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.mom.api.IDestination.IDestinationType;
 import org.eclipse.scout.rt.mom.api.IDestination.ResolveMethod;
 import org.eclipse.scout.rt.mom.api.marshaller.BytesMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
+import org.eclipse.scout.rt.mom.api.marshaller.JsonDataObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
@@ -25,7 +26,6 @@ import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractClassConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractIntegerConfigProperty;
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
@@ -58,7 +58,7 @@ public interface IMom {
   /**
    * Indicates the order of the MOM's {@link IPlatformListener} to shutdown itself upon entering platform state
    * {@link State#PlatformStopping}. Any listener depending on MOM facility must be configured with an order less than
-   * {@link #DESTROY_ORDER}.
+   * {@value DESTROY_ORDER}.
    */
   long DESTROY_ORDER = 5_700;
 
@@ -76,9 +76,7 @@ public interface IMom {
    *          specifies how to publish the message.
    * @param <DTO>
    *          the type of the transfer object to be published.
-   * @see #newQueue(String)
-   * @see #newTopic(String)
-   * @see #subscribe(IDestination, IMessageListener, RunContext)
+   * @see IMom#subscribe(IDestination, IMessageListener, SubscribeInput)
    */
   <DTO> void publish(IDestination<DTO> destination, DTO transferObject, PublishInput input);
 
@@ -96,7 +94,7 @@ public interface IMom {
    * @return subscription handle to unsubscribe from the destination.
    * @param <DTO>
    *          the type of the transfer object a subscription is created for.
-   * @see #publish(IDestination, Object)
+   * @see IMom#publish(IDestination, Object, PublishInput)
    */
   <DTO> ISubscription subscribe(IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input);
 
@@ -119,7 +117,7 @@ public interface IMom {
    * @param destination
    *          specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
    *          documentation for more information about the difference between topic and queue based messaging.
-   * @param transferObject
+   * @param requestObject
    *          specifies the transfer object to be sent to the destination.<br>
    *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
    *          that destination. By default, {@link JsonMarshaller} is used.
@@ -139,7 +137,7 @@ public interface IMom {
    *          the type of the request object
    * @param <REPLY>
    *          the type of the reply object
-   * @see #reply(IDestination, IRequestListener, RunContext)
+   * @see IMom#reply(IBiDestination, IRequestListener, SubscribeInput)
    */
   <REQUEST, REPLY> REPLY request(IBiDestination<REQUEST, REPLY> destination, REQUEST requestObject, PublishInput input);
 
@@ -159,7 +157,7 @@ public interface IMom {
    *          the type of the request object
    * @param <REPLY>
    *          the type of the reply object
-   * @see #request(IDestination, Object)
+   * @see IMom#request(IBiDestination, Object, PublishInput)
    */
   <REQUEST, REPLY> ISubscription reply(IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, SubscribeInput input);
 
@@ -208,12 +206,12 @@ public interface IMom {
 
     @Override
     public String description() {
-      return String.format("Specifies the default Marshaller to use if no marshaller is specified for a MOM or a destination. By default the '%s' is used.", JsonMarshaller.class.getSimpleName());
+      return String.format("Specifies the default Marshaller to use if no marshaller is specified for a MOM or a destination. By default the '%s' is used.", JsonDataObjectMarshaller.class.getSimpleName());
     }
 
     @Override
     public Class<? extends IMarshaller> getDefaultValue() {
-      return JsonMarshaller.class;
+      return JsonDataObjectMarshaller.class;
     }
   }
 
@@ -302,8 +300,8 @@ public interface IMom {
   }
 
   /**
-   * If {@link #CONNECTION_RETRY_COUNT} is set then this property sets the interval in milliseconds between connection
-   * attempts. The default retry interval is <code>2</code> seconds.
+   * If {@link IMom.ConnectionRetryCountProperty} is set then this property sets the interval in milliseconds between
+   * connection attempts. The default retry interval is <code>2</code> seconds.
    * <p>
    * If the property is not set, the value of {@link ConnectionRetryIntervalMillisProperty} is used. <b>Value type:</b>
    * {@link Integer} or {@link String}
@@ -329,8 +327,8 @@ public interface IMom {
   }
 
   /**
-   * If {@link #CONNECTION_RETRY_COUNT} is set then every call to a method in {@link IJmsSessionProvider} is tried a
-   * second time after an Exception. This is the interval to wait inbetween these two attempts.
+   * If {@link IMom.ConnectionRetryCountProperty} is set then every call to a method in {@link IJmsSessionProvider} is
+   * tried a second time after an Exception. This is the interval to wait inbetween these two attempts.
    * <p>
    * The default interval is <code>5</code> seconds.
    * <p>

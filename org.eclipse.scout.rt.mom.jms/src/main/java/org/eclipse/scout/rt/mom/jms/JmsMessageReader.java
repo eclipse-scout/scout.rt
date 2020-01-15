@@ -10,12 +10,8 @@
  */
 package org.eclipse.scout.rt.mom.jms;
 
-import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.MESSAGE_TYPE_BYTES;
-import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.MESSAGE_TYPE_NO_PAYLOAD;
-import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.MESSAGE_TYPE_TEXT;
-import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.CTX_PROP_NULL_OBJECT;
-import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.CTX_PROP_REQUEST_REPLY_SUCCESS;
-import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.JMS_PROP_MARSHALLER_CONTEXT;
+import static org.eclipse.scout.rt.mom.api.marshaller.IMarshaller.*;
+import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.*;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import java.util.Collections;
@@ -28,9 +24,9 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
-import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
@@ -52,16 +48,17 @@ public class JmsMessageReader<DTO> {
   private static final Logger LOG = LoggerFactory.getLogger(JmsMessageReader.class);
 
   protected Message m_message;
-
   protected IMarshaller m_marshaller;
   protected Map<String, String> m_marshallerContext;
+  protected IDataObjectMapper m_contextDataObjectMapper;
 
   /**
    * Initializes this reader.
    */
-  protected JmsMessageReader init(final Message message, final IMarshaller marshaller) throws JMSException {
+  protected JmsMessageReader<DTO> init(final Message message, final IMarshaller marshaller) throws JMSException {
     m_message = assertNotNull(message, "Message not specified");
     m_marshaller = assertNotNull(marshaller, "Marshaller not specified");
+    m_contextDataObjectMapper = BEANS.get(IDataObjectMapper.class);
     initContext();
     return this;
   }
@@ -84,7 +81,7 @@ public class JmsMessageReader<DTO> {
    */
   @SuppressWarnings("unchecked")
   public DTO readTransferObject() throws JMSException {
-    if (Boolean.valueOf(m_marshallerContext.get(CTX_PROP_NULL_OBJECT))) {
+    if (Boolean.parseBoolean(m_marshallerContext.get(CTX_PROP_NULL_OBJECT))) {
       return null;
     }
 
@@ -142,10 +139,10 @@ public class JmsMessageReader<DTO> {
   /**
    * Reads whether 'request-reply' communication returned without a failure.
    *
-   * @see JmsMessageWriter#writeReplySuccess(String)
+   * @see JmsMessageWriter#writeRequestReplySuccess(boolean)
    */
   public boolean readRequestReplySuccess() {
-    return Boolean.valueOf(m_marshallerContext.get(CTX_PROP_REQUEST_REPLY_SUCCESS));
+    return Boolean.parseBoolean(m_marshallerContext.get(CTX_PROP_REQUEST_REPLY_SUCCESS));
   }
 
   public IMessage<DTO> readMessage() throws JMSException {
@@ -182,10 +179,10 @@ public class JmsMessageReader<DTO> {
    *
    * @see JmsMessageWriter#writeContext(String, Map)
    */
-  @SuppressWarnings("unchecked")
   protected Map<String, String> readContext(final String property) throws JMSException {
     final String json = readProperty(property);
-    final Map<String, String> context = (Map<String, String>) BEANS.get(JsonMarshaller.class).unmarshall(json, Collections.singletonMap(JsonMarshaller.CTX_PROP_OBJECT_TYPE, HashMap.class.getName()));
+    @SuppressWarnings("unchecked")
+    Map<String, String> context = (Map<String, String>) m_contextDataObjectMapper.readValue(json, HashMap.class);
     if (context == null) {
       return Collections.emptyMap();
     }

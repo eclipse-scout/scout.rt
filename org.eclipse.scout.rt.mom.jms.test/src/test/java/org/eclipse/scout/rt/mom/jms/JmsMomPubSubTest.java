@@ -26,6 +26,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.jms.Message;
 import javax.naming.NamingException;
 
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
+import org.eclipse.scout.rt.dataobject.value.StringValueDo;
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
 import org.eclipse.scout.rt.mom.api.IDestination.ResolveMethod;
@@ -36,6 +39,7 @@ import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.marshaller.BytesMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
+import org.eclipse.scout.rt.mom.api.marshaller.JsonDataObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
@@ -87,14 +91,14 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
   @NonParameterized
   public void testCreateContextOrdinaryMap() throws NamingException {
     installMom();
-    new JmsMomImplementor().createContextEnvironment(Collections.<Object, Object> singletonMap("key", "value"));
+    new JmsMomImplementor().createContextEnvironment(Collections.singletonMap("key", "value"));
   }
 
   @Test
   @NonParameterized
   public void testCreateContextMapWithNullEntries() throws NamingException {
     installMom();
-    new JmsMomImplementor().createContextEnvironment(Collections.<Object, Object> singletonMap("key", null));
+    new JmsMomImplementor().createContextEnvironment(Collections.singletonMap("key", null));
   }
 
   @Test
@@ -165,11 +169,14 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(TextMarshaller.class)));
     assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(ObjectMarshaller.class)));
     assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(JsonMarshaller.class)));
+    DoEntity entity = BEANS.get(DoEntityBuilder.class).put("message", "Hello World").build();
+    assertEquals(entity, testPublishAndConsumeInternal(entity, BEANS.get(JsonDataObjectMarshaller.class)));
     assertArrayEquals("Hello World".getBytes(StandardCharsets.UTF_8), (byte[]) testPublishAndConsumeInternal("Hello World".getBytes(StandardCharsets.UTF_8), BEANS.get(BytesMarshaller.class)));
 
     assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(TextMarshaller.class)));
     assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(ObjectMarshaller.class)));
     assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(JsonMarshaller.class)));
+    assertEquals(entity, testPublishAndConsumeInternal(entity, BEANS.get(JsonDataObjectMarshaller.class)));
     assertArrayEquals("Hello World".getBytes(StandardCharsets.UTF_8), (byte[]) testPublishAndConsumeInternal("Hello World".getBytes(StandardCharsets.UTF_8), BEANS.get(BytesMarshaller.class)));
   }
 
@@ -204,7 +211,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
 
     assertEquals("hello world", capturer.get());
 
-    IFuture<Void> disposeFuture = Jobs.schedule(() -> subscription.dispose(), Jobs.newInput()
+    IFuture<Void> disposeFuture = Jobs.schedule(subscription::dispose, Jobs.newInput()
         .withName("dispose subscription")
         .withExecutionHint(FixtureJobInput.EXPLICIT_HINT)
         .withExceptionHandling(null, false));
@@ -228,11 +235,13 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     assertEquals("", testPublishAndConsumeInternal("", BEANS.get(TextMarshaller.class)));
     assertEquals("", testPublishAndConsumeInternal("", BEANS.get(ObjectMarshaller.class)));
     assertEquals("", testPublishAndConsumeInternal("", BEANS.get(JsonMarshaller.class)));
+    assertEquals(BEANS.get(DoEntity.class), testPublishAndConsumeInternal(BEANS.get(DoEntity.class), BEANS.get(JsonMarshaller.class)));
     assertArrayEquals(new byte[0], (byte[]) testPublishAndConsumeInternal(new byte[0], BEANS.get(BytesMarshaller.class)));
 
     assertEquals("", testPublishAndConsumeInternal("", BEANS.get(TextMarshaller.class)));
     assertEquals("", testPublishAndConsumeInternal("", BEANS.get(ObjectMarshaller.class)));
     assertEquals("", testPublishAndConsumeInternal("", BEANS.get(JsonMarshaller.class)));
+    assertEquals(BEANS.get(DoEntity.class), testPublishAndConsumeInternal(BEANS.get(DoEntity.class), BEANS.get(JsonMarshaller.class)));
     assertArrayEquals(new byte[0], (byte[]) testPublishAndConsumeInternal(new byte[0], BEANS.get(BytesMarshaller.class)));
   }
 
@@ -242,11 +251,13 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     assertNull(testPublishAndConsumeInternal(null, BEANS.get(TextMarshaller.class)));
     assertNull(testPublishAndConsumeInternal(null, BEANS.get(ObjectMarshaller.class)));
     assertNull(testPublishAndConsumeInternal(null, BEANS.get(JsonMarshaller.class)));
+    assertNull(testPublishAndConsumeInternal(null, BEANS.get(JsonDataObjectMarshaller.class)));
     assertNull(testPublishAndConsumeInternal(null, BEANS.get(BytesMarshaller.class)));
 
     assertNull(testPublishAndConsumeInternal(null, BEANS.get(TextMarshaller.class)));
     assertNull(testPublishAndConsumeInternal(null, BEANS.get(ObjectMarshaller.class)));
     assertNull(testPublishAndConsumeInternal(null, BEANS.get(JsonMarshaller.class)));
+    assertNull(testPublishAndConsumeInternal(null, BEANS.get(JsonDataObjectMarshaller.class)));
     assertNull(testPublishAndConsumeInternal(null, BEANS.get(BytesMarshaller.class)));
   }
 
@@ -271,6 +282,27 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     assertEquals("smith", testee.getLastname());
     assertEquals("anna", testee.getFirstname());
     verifyMessageHandlerHandleOutgoingCalled(queue, marshaller, person);
+    verifyMessageHandlerHandleIncomingCalled(queue, marshaller, testee);
+  }
+
+  @Test
+  public void testPublishDataObjectJson() throws InterruptedException {
+    installMom();
+    final Capturer<StringValueDo> capturer = new Capturer<>();
+
+    IDestination<StringValueDo> queue = MOM.newDestination("test/mom/testPublishDataObjectJson", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
+    IMarshaller marshaller = BEANS.get(JsonDataObjectMarshaller.class);
+    m_disposables.add(MOM.registerMarshaller(FixtureMom.class, queue, marshaller));
+
+    StringValueDo value = StringValueDo.of("foo");
+
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, message -> capturer.set(message.getTransferObject())));
+    MOM.publish(FixtureMom.class, queue, value);
+
+    // Verify
+    StringValueDo testee = capturer.get();
+    assertEquals("foo", testee.getValue());
+    verifyMessageHandlerHandleOutgoingCalled(queue, marshaller, value);
     verifyMessageHandlerHandleIncomingCalled(queue, marshaller, testee);
   }
 

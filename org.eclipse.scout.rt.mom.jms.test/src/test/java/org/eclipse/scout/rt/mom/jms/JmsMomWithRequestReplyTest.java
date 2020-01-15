@@ -25,18 +25,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.mom.api.IBiDestination;
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
 import org.eclipse.scout.rt.mom.api.IDestination.ResolveMethod;
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMom;
-import org.eclipse.scout.rt.mom.api.IMom.DefaultMarshallerProperty;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.marshaller.BytesMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
+import org.eclipse.scout.rt.mom.api.marshaller.JsonDataObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
@@ -71,44 +73,51 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
   }
 
   @Test(timeout = 200_000)
-  public void testRequestReply() throws InterruptedException {
+  public void testRequestReply() {
     installMom();
     assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(TextMarshaller.class)));
     assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(ObjectMarshaller.class)));
     assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(JsonMarshaller.class)));
+    DoEntity entity = BEANS.get(DoEntityBuilder.class).put("message", "Hello World").build();
+    assertEquals(entity, testRequestReplyInternal(entity, BEANS.get(JsonDataObjectMarshaller.class)));
     assertArrayEquals("Hello World".getBytes(StandardCharsets.UTF_8), (byte[]) testRequestReplyInternal("Hello World".getBytes(StandardCharsets.UTF_8), BEANS.get(BytesMarshaller.class)));
 
     assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(TextMarshaller.class)));
     assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(ObjectMarshaller.class)));
     assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(JsonMarshaller.class)));
+    assertEquals(entity, testRequestReplyInternal(entity, BEANS.get(JsonDataObjectMarshaller.class)));
     assertArrayEquals("Hello World".getBytes(StandardCharsets.UTF_8), (byte[]) testRequestReplyInternal("Hello World".getBytes(StandardCharsets.UTF_8), BEANS.get(BytesMarshaller.class)));
   }
 
   @Test(timeout = 200_000)
-  public void testRequestReplyEmpty() throws InterruptedException {
+  public void testRequestReplyEmpty() {
     installMom();
     assertEquals("", testRequestReplyInternal("", BEANS.get(TextMarshaller.class)));
     assertEquals("", testRequestReplyInternal("", BEANS.get(ObjectMarshaller.class)));
     assertEquals("", testRequestReplyInternal("", BEANS.get(JsonMarshaller.class)));
+    assertEquals(BEANS.get(DoEntity.class), testRequestReplyInternal(BEANS.get(DoEntity.class), BEANS.get(JsonDataObjectMarshaller.class)));
     assertArrayEquals(new byte[0], (byte[]) testRequestReplyInternal(new byte[0], BEANS.get(BytesMarshaller.class)));
 
     assertEquals("", testRequestReplyInternal("", BEANS.get(TextMarshaller.class)));
     assertEquals("", testRequestReplyInternal("", BEANS.get(ObjectMarshaller.class)));
     assertEquals("", testRequestReplyInternal("", BEANS.get(JsonMarshaller.class)));
+    assertEquals(BEANS.get(DoEntity.class), testRequestReplyInternal(BEANS.get(DoEntity.class), BEANS.get(JsonDataObjectMarshaller.class)));
     assertArrayEquals(new byte[0], (byte[]) testRequestReplyInternal(new byte[0], BEANS.get(BytesMarshaller.class)));
   }
 
   @Test(timeout = 200_000)
-  public void testRequestReplyNull() throws InterruptedException {
+  public void testRequestReplyNull() {
     installMom();
     assertNull(testRequestReplyInternal(null, BEANS.get(TextMarshaller.class)));
     assertNull(testRequestReplyInternal(null, BEANS.get(ObjectMarshaller.class)));
     assertNull(testRequestReplyInternal(null, BEANS.get(JsonMarshaller.class)));
+    assertNull(testRequestReplyInternal(null, BEANS.get(JsonDataObjectMarshaller.class)));
     assertNull(testRequestReplyInternal(null, BEANS.get(BytesMarshaller.class)));
 
     assertNull(testRequestReplyInternal(null, BEANS.get(TextMarshaller.class)));
     assertNull(testRequestReplyInternal(null, BEANS.get(ObjectMarshaller.class)));
     assertNull(testRequestReplyInternal(null, BEANS.get(JsonMarshaller.class)));
+    assertNull(testRequestReplyInternal(null, BEANS.get(JsonDataObjectMarshaller.class)));
     assertNull(testRequestReplyInternal(null, BEANS.get(BytesMarshaller.class)));
   }
 
@@ -148,12 +157,12 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
   }
 
   @Test(expected = AssertionException.class)
-  public void testMomEnvironmentWithoutRequestReply() throws InterruptedException {
+  public void testMomEnvironmentWithoutRequestReply() {
     installMom(FixtureMomWithoutRequestReply.class);
     testRequestReplyInternal("Hello World", null);
   }
 
-  private Object testRequestReplyInternal(Object request, IMarshaller marshaller) throws InterruptedException {
+  private Object testRequestReplyInternal(Object request, IMarshaller marshaller) {
     reset(BEANS.get(IJmsMessageHandler.class));
 
     IBiDestination<Object, Object> queue = MOM.newBiDestination("test/mom/testRequestReplyInternal", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
@@ -164,7 +173,7 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     }
 
     try {
-      disposables.add(MOM.reply(FixtureMom.class, queue, req -> req.getTransferObject(), MOM.newSubscribeInput()
+      disposables.add(MOM.reply(FixtureMom.class, queue, IMessage::getTransferObject, MOM.newSubscribeInput()
           // use single threaded in order to block dispose until subscription is completely released
           .withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_AUTO_SINGLE_THREADED)));
 
@@ -179,7 +188,7 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
   }
 
   @Test(timeout = 200_000)
-  public void testQueueRequestReply() throws InterruptedException {
+  public void testQueueRequestReply() {
     installMom();
     IBiDestination<String, String> queue = MOM.newBiDestination("test/momtestQueueRequestReply", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
 
@@ -193,25 +202,25 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     // Verify
     final String expectedReply = "HELLO WORLD";
     assertEquals(expectedReply, testee);
-    IMarshaller marshaller = BEANS.get(CONFIG.getPropertyValue(DefaultMarshallerProperty.class));
+    IMarshaller marshaller = BEANS.get(JsonMarshaller.class);
     verifyRequestReplyMessageHandler(queue, marshaller, request, expectedReply);
   }
 
   @Test(timeout = 200_000)
-  public void testQueueRequestReplyCorrelationId() throws InterruptedException {
+  public void testQueueRequestReplyCorrelationId() {
     installMom();
     IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testQueueRequestReplyCorrelationId", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
     testRequestReplyCorrelationIdInternal(queue);
   }
 
   @Test(timeout = 200_000)
-  public void testTopicRequestReplyCorrelationId() throws InterruptedException {
+  public void testTopicRequestReplyCorrelationId() {
     installMom();
     IBiDestination<String, String> topic = MOM.newBiDestination("test/mom/testTopicRequestReplyCorrelationId", DestinationType.TOPIC, ResolveMethod.DEFINE, null);
     testRequestReplyCorrelationIdInternal(topic);
   }
 
-  private void testRequestReplyCorrelationIdInternal(final IBiDestination<String, String> destination) throws InterruptedException {
+  private void testRequestReplyCorrelationIdInternal(final IBiDestination<String, String> destination) {
     m_disposables.add(MOM.reply(FixtureMom.class, destination, request -> CorrelationId.CURRENT.get(), MOM.newSubscribeInput()
         .withRunContext(RunContexts.copyCurrent()
             .withCorrelationId("cid:xyz"))));
@@ -225,13 +234,13 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
           // Verify
           final String expectedReply = "cid:abc";
           assertEquals(expectedReply, testee);
-          IMarshaller marshaller = BEANS.get(CONFIG.getPropertyValue(DefaultMarshallerProperty.class));
+          IMarshaller marshaller = BEANS.get(JsonMarshaller.class);
           verifyRequestReplyMessageHandler(destination, marshaller, request, expectedReply);
         });
   }
 
   @Test(timeout = 200_000)
-  public void testTopicRequestReply() throws InterruptedException {
+  public void testTopicRequestReply() {
     installMom();
     IBiDestination<String, String> topic = MOM.newBiDestination("test/mom/testTopicRequestReply", DestinationType.TOPIC, ResolveMethod.DEFINE, null);
 
@@ -330,7 +339,7 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
   }
 
   @Test(timeout = 200_000)
-  public void testRequestReplyWithBlockingCondition() throws InterruptedException {
+  public void testRequestReplyWithBlockingCondition() {
     installMom();
     final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testRequestReplyWithBlockingCondition", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
 
@@ -559,20 +568,20 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
   }
 
   @Test(timeout = 200_000)
-  public void testTopicRequestReplyJsonObjectMarshaller() throws InterruptedException {
+  public void testTopicRequestReplyJsonObjectMarshaller() {
     installMom();
     IBiDestination<Person, Person> queue = MOM.newBiDestination("test/mom/testTopicRequestReplyJsonObjectMarshaller", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
     testRequestReplyJsonObjectMarshallerInternal(queue);
   }
 
   @Test(timeout = 200_000)
-  public void testQueueRequestReplyJsonObjectMarshaller() throws InterruptedException {
+  public void testQueueRequestReplyJsonObjectMarshaller() {
     installMom();
     IBiDestination<Person, Person> topic = MOM.newBiDestination("test/mom/testQueueRequestReplyJsonObjectMarshaller", DestinationType.TOPIC, ResolveMethod.DEFINE, null);
     testRequestReplyJsonObjectMarshallerInternal(topic);
   }
 
-  private void testRequestReplyJsonObjectMarshallerInternal(IBiDestination<Person, Person> destination) throws InterruptedException {
+  private void testRequestReplyJsonObjectMarshallerInternal(IBiDestination<Person, Person> destination) {
     m_disposables.add(MOM.registerMarshaller(FixtureMom.class, destination, BEANS.get(JsonMarshaller.class)));
 
     Person person = new Person();

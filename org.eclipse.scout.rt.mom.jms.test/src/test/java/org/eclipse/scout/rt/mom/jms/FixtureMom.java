@@ -14,6 +14,9 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.mom.api.AbstractMomTransport;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
+import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
+import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 
 /**
@@ -37,5 +40,10 @@ public class FixtureMom extends AbstractMomTransport {
     final Map<String, String> env = m_parameter.getEnvironment();
     env.put(JmsMomImplementor.JMS_MESSAGE_HANDLER, IJmsMessageHandler.class.getName());
     return env;
+  }
+
+  @Override
+  protected IMarshaller getConfiguredDefaultMarshaller() {
+    return BEANS.get(JsonMarshaller.class);
   }
 }
