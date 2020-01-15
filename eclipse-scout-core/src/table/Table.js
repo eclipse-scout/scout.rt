@@ -621,7 +621,14 @@ export default class Table extends Widget {
     var row = this._$mouseDownRow.data('row');
 
     var $target = $(event.target);
-
+    // handle expansion
+    if (this._isRowControl($target)) {
+      if (row.expanded) {
+        this.collapseRow(row);
+      } else {
+        this.expandRow(row);
+      }
+    }
     // For checkableStyle TABLE_ROW & CHECKBOX_TABLE_ROW only: check row if left click OR clicked row was not checked yet
     if (scout.isOneOf(this.checkableStyle, Table.CheckableStyle.TABLE_ROW, Table.CheckableStyle.CHECKBOX_TABLE_ROW) &&
       (!isRightClick || !row.checked) &&
@@ -639,10 +646,13 @@ export default class Table extends Widget {
     }
   }
 
+  _isRowControl($target) {
+    return $target.hasClass('table-row-control') || $target.parent().hasClass('table-row-control')
+  }
+
   _onRowMouseUp(event) {
-    var $row, $mouseUpRow, column, $appLink, row,
-      mouseButton = event.which,
-      $target = $(event.target);
+    var $row, $mouseUpRow, column, $appLink,
+      mouseButton = event.which;
 
     if (this._doubleClickSupport.doubleClicked()) {
       // Don't execute on double click events
@@ -663,16 +673,9 @@ export default class Table extends Widget {
       // Don't execute click / appLinks when the mouse gets pressed and moved outside of a cell
       return;
     }
-
-    row = $row.data('row');
-    // handle expansion
-    if ($target.hasClass('table-row-control') ||
-      $target.parent().hasClass('table-row-control')) {
-      if (row.expanded) {
-        this.collapseRow(row);
-      } else {
-        this.expandRow(row);
-      }
+    var $target = $(event.target);
+    if (this._isRowControl($target)) {
+      // Don't start cell editor or trigger click if row control was clicked (expansion itself is handled by the mouse down handler)
       return;
     }
     if (mouseButton === 1) {
@@ -682,6 +685,7 @@ export default class Table extends Widget {
     if ($appLink) {
       this._triggerAppLinkAction(column, $appLink.data('ref'));
     } else {
+      var row = $row.data('row');
       this._triggerRowClick(row, mouseButton);
     }
   }
@@ -2816,7 +2820,7 @@ export default class Table extends Widget {
       this.updateBuffer.buffer(rows);
       return;
     }
-    var filterChanged, autoOptimizeWidthColumnsDirty;
+    var filterChanged, expansionChanged, autoOptimizeWidthColumnsDirty;
     var autoOptimizeWidthColumns = this.columns.filter(function(column) {
       return column.autoOptimizeWidth && !column.autoOptimizeWidthRequired;
     });
@@ -2841,6 +2845,7 @@ export default class Table extends Widget {
         parentRowId = row.parentRow.id;
       }
       structureChanged = structureChanged || (scout.nvl(oldRow._parentRowId, null) !== scout.nvl(parentRowId, null));
+      expansionChanged = expansionChanged || (oldRow.expanded !== scout.nvl(row.expanded, false));
       row = this._initRow(row);
       // Check if cell values have changed
       if (row.status === TableRow.Status.NON_CHANGED) {
@@ -2903,6 +2908,8 @@ export default class Table extends Widget {
 
     if (filterChanged) {
       this._triggerFilter();
+    }
+    if (filterChanged || expansionChanged) {
       this._renderRowDelta();
     }
 
