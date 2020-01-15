@@ -31,9 +31,9 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
-import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
@@ -46,9 +46,9 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 public class JmsMessageWriter {
 
   protected Message m_message;
-
   protected IMarshaller m_marshaller;
   protected Map<String, String> m_marshallerContext;
+  protected IDataObjectMapper m_contextDataObjectMapper;
 
   /**
    * Initializes this writer.
@@ -58,6 +58,7 @@ public class JmsMessageWriter {
     m_message = createMessage(marshaller.getMessageType(), session);
     m_marshaller = assertNotNull(marshaller, "Marshaller not specified");
     m_marshallerContext = new HashMap<>();
+    m_contextDataObjectMapper = BEANS.get(IDataObjectMapper.class);
     return this;
   }
 
@@ -194,9 +195,7 @@ public class JmsMessageWriter {
     if (context.isEmpty()) {
       return this;
     }
-
-    final String json = (String) BEANS.get(JsonMarshaller.class).marshall(context, new HashMap<>());
-    writeProperty(property, json);
+    writeProperty(property, m_contextDataObjectMapper.writeValue(context));
     return this;
   }
 
