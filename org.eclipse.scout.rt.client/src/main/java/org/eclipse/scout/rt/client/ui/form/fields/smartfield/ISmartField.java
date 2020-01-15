@@ -39,12 +39,11 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
   String PROP_SEARCH_REQUIRED = "searchRequired";
   String PROP_STATUS = "status";
   String PROP_STATUS_VISIBLE = "statusVisible";
+  String PROP_INIT_ACTIVE_FILTER = "initActiveFilter";
 
   /**
    * Hint to mark the {@link IFuture} used to load the field's initial lookup rows. Typically, this future must not be
    * cancelled.
-   * <p>
-   * e.g {@link TreeProposalChooser} requires data to apply tree filter.
    */
   String EXECUTION_HINT_INITIAL_LOOKUP = "initialLookup";
 
@@ -86,7 +85,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
   /**
    * Changes the default-label text for the active-filter radio-button with the given state.
    */
-  void setActiveFilterLabel(TriState state, String label);
+  void setActiveFilterLabel(TriState activeFilter, String label);
 
   /**
    * Returns the label-texts of the active-filter radio-button in this order:
@@ -107,16 +106,20 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
   /**
    * see {@link #getActiveFilter()}
    */
-  void setActiveFilter(TriState state);
+  void setActiveFilter(TriState activeFilter);
+
+  void setInitActiveFilter(TriState initActiveFilter);
+
+  TriState getInitActiveFilter();
 
   int getBrowseMaxRowCount();
 
-  void setBrowseMaxRowCount(int n);
+  void setBrowseMaxRowCount(int browseMaxRowCount);
 
   /**
    * @since 5.1
    */
-  void setMultilineText(boolean b);
+  void setMultilineText(boolean multilineText);
 
   /**
    * @since 5.1
@@ -140,9 +143,8 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
   void setLoadParentNodes(boolean loadParentNodes);
 
   /**
-   * Filter selection of hierarchy browse tree. The level reported here is different than the one used in
-   * {@link AbstractTree#execAcceptSelection(org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode, int)} such as this
-   * level is one smaller. This is because a tree smart field assumes its tree to have multiple roots, but the ITree
+   * Filter selection of hierarchy browse tree. The level reported here is different than the one used in {@link AbstractTree}
+   * such as this level is one smaller. This is because a tree smart field assumes its tree to have multiple roots, but the ITree
    * model is built as single-root tree with invisible root node. level=-1 is the invisible (anonymous) root level=0 are
    * the multiple roots of the smart tree ...
    */
@@ -332,7 +334,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
   /**
    * Sets the value by using the key of the given lookup row. The property <code>lookupRow</code> will be set too.
    *
-   * @param lookupRow
+   * @param lookupRow Lookup row to resolve the value to be set
    */
   void setValueByLookupRow(ILookupRow<VALUE> lookupRow);
 

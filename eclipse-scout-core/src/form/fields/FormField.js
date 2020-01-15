@@ -140,6 +140,7 @@ export default class FormField extends Widget {
 
   /**
    * @override
+   * @returns {KeyStrokeContext}
    */
   _createKeyStrokeContext() {
     return new KeyStrokeContext();

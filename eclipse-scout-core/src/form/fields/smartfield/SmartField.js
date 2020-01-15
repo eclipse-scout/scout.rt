@@ -61,6 +61,7 @@ export default class SmartField extends ValueField {
     this._currentLookupCall = null; // should only be accessed on the original widget since the adapter accesses it
     this.lookupSeqNo = 0; // used to detect if the proposal chooser contains the results of the latest lookup, or an out-dated result.
     // only when the result is up-to-date, we can use the selected lookup row
+    this.initActiveFilter = null;
 
     this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
       'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental', 'searchRequired', 'columnDescriptors',
@@ -114,13 +115,22 @@ export default class SmartField extends ValueField {
     super._initValue(value);
   }
 
+  markAsSaved() {
+    super.markAsSaved();
+    this.setInitActiveFilter(this.activeFilter);
+  }
+
+  resetValue() {
+    super.resetValue();
+    this.setActiveFilter(this.initActiveFilter);
+  }
+
   _createKeyStrokeContext() {
     return new InputFieldKeyStrokeContext();
   }
 
   _initKeyStrokeContext() {
     super._initKeyStrokeContext();
-
     this.keyStrokeContext.registerKeyStroke(new SmartFieldCancelKeyStroke(this));
   }
 
@@ -1278,6 +1288,10 @@ export default class SmartField extends ValueField {
 
   setActiveFilterEnabled(activeFilterEnabled) {
     this.setProperty('activeFilterEnabled', activeFilterEnabled);
+  }
+
+  setInitActiveFilter(initActiveFilter) {
+    this.setProperty('initActiveFilter', initActiveFilter);
   }
 
   setSearchRequired(searchRequired) {
