@@ -610,6 +610,14 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
+  public void testSerialize_EmptyAttributeNameDo() throws Exception {
+    DoEntity testDo = new DoEntity();
+    testDo.put("", "");
+    String json = s_dataObjectMapper.writeValueAsString(testDo);
+    assertJsonEquals("TestEmptyAttributeNameDo.json", json);
+  }
+
+  @Test
   public void testSerialize_EntityWithEmptyObjectDo() throws Exception {
     DoEntity testDo = new DoEntity();
     testDo.put("emptyObject", new TestEmptyObject());
