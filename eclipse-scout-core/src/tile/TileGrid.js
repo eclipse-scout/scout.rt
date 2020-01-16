@@ -293,11 +293,6 @@ export default class TileGrid extends Widget {
     tiles.forEach(function(tile) {
       this._insertTile(tile);
     }, this);
-
-    if (this.rendered && !this.htmlComp.layouting) {
-      // no need to invalidate when tile placeholders are added or removed while layouting
-      this.invalidateLayoutTree();
-    }
   }
 
   _insertTile(tile) {
@@ -348,6 +343,11 @@ export default class TileGrid extends Widget {
         }
       }.bind(this));
     }, this);
+
+    if (!this.htmlComp.layouting) {
+      // no need to invalidate when tile placeholders are added or removed while layouting
+      this.invalidateLayoutTree();
+    }
   }
 
   _removeAllTiles() {
