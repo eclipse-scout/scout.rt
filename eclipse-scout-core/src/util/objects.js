@@ -11,7 +11,7 @@
 import {arrays, scout, strings} from '../index';
 import * as $ from 'jquery';
 
-const CONST_REGEX = /\$\{const\:([^\}]*)\}/;
+const CONST_REGEX = /\${const:([^}]*)}/;
 
 /**
  * Uses Object.create(null) to create an object without a prototype. This is different to use the literal {} which links the object to Object.prototype.
@@ -31,9 +31,8 @@ export function createMap(properties) {
 
 /**
  * Copies all the properties (including the ones from the prototype.) from dest to source
- * @memberOf scout.objects
- * @param filter an array of property names.
- * @returns the destination object (the destination parameter will be modified as well)
+ * @param {[]} [filter] an array of property names.
+ * @returns {object} the destination object (the destination parameter will be modified as well)
  */
 export function copyProperties(source, dest, filter) {
   var propertyName;
@@ -49,9 +48,8 @@ export function copyProperties(source, dest, filter) {
 /**
  * Copies the own properties (excluding the ones from the prototype) from dest to source.
  * If a filter is specified, only the properties matching the ones in the filter are copied.
- * @memberOf scout.objects
- * @param filter an array of property names.
- * @returns the destination object (the destination parameter will be modified as well)
+ * @param {[]} [filter] an array of property names.
+ * @returns {object} the destination object (the destination parameter will be modified as well)
  */
 export function copyOwnProperties(source, dest, filter) {
   var propertyName;
@@ -203,7 +201,7 @@ export function isPlainObject(obj) {
  * <li><code>optProperty(obj, 'foo', 'bar');</code> try to access and return obj.foo.bar</li>
  * </ul>
  *
- * @returns the value of the requested property or undefined if the property does not exist on the object
+ * @returns {*} the value of the requested property or undefined if the property does not exist on the object
  */
 export function optProperty(obj) {
   if (!obj) {
@@ -285,7 +283,7 @@ export function values(obj, all) {
 }
 
 /**
- * @returns the key / name of a property
+ * @returns {string} the key / name of a property
  */
 export function keyByValue(obj, value) {
   return Object.keys(obj)[values(obj).indexOf(value)];
@@ -295,7 +293,7 @@ export function keyByValue(obj, value) {
  * Java-like equals method. Compares the given objects by checking with ===, if that fails, the function
  * checks if both objects have an equals function and use the equals function to compare the two objects
  * by value.
- * @returns True if both objects are equals by reference or by value
+ * @returns {boolean} true if both objects are equals by reference or by value
  */
 export function equals(objA, objB) {
   if (objA === objB) {
@@ -310,7 +308,7 @@ export function equals(objA, objB) {
 
 /**
  * Compare two objects and all its child elements recursively.
- * @returns True if both objects and all child elements are equals by value or implemented equals method
+ * @returns {boolean} true if both objects and all child elements are equals by value or implemented equals method
  */
 export function equalsRecursive(objA, objB) {
   var i;
@@ -359,7 +357,7 @@ export function propertiesEquals(objA, objB, properties) {
 }
 
 /**
- * @returns the function identified by funcName from the given object. The function will return an error
+ * @returns {function} the function identified by funcName from the given object. The function will return an error
  *     if that function does not exist. Use this function if you modify an existing framework function
  *     to find problems after refactorings / renamings as soon as possible.
  */

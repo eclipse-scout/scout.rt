@@ -577,8 +577,8 @@ export default class JQueryUtils extends $ {
   }
 
   /**
-   * @returns the active element of the current document
-   * @param [domElement] (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
+   * @param {boolean} [domElement] (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
+   * @returns {$|HTMLElement} the active element of the current document
    */
   static activeElement(domElement) {
     var myDocument = this.document(true),
@@ -587,8 +587,8 @@ export default class JQueryUtils extends $ {
   }
 
   /**
-   * @returns the BODY element of the HTML document in which the current HTML element is placed.
-   * @param domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
+   * @param {boolean} domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
+   * @returns {$|HTMLElement} the BODY element of the HTML document in which the current HTML element is placed.
    */
   static body(domElement) {
     var $body = $('body', this.document(true));
@@ -596,8 +596,8 @@ export default class JQueryUtils extends $ {
   }
 
   /**
-   * @returns the closest DOM element that has the 'scout' class.
-   * @param domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
+   * @param {boolean} domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
+   * @returns {$|HTMLElement} the closest DOM element that has the 'scout' class.
    */
   static entryPoint(domElement) {
     var $element = this.closest('.scout');
@@ -931,7 +931,7 @@ export default class JQueryUtils extends $ {
   }
 
   /**
-   * @returns the current element if it is scrollable, otherwise the first parent which is scrollable
+   * @returns {$} the current element if it is scrollable, otherwise the first parent which is scrollable
    */
   static scrollParent() {
     var $elem = this;
@@ -1177,7 +1177,7 @@ export default class JQueryUtils extends $ {
   }
 
   /**
-   * @returns the max-width as number. If max-width is not set (resp. defaults to 'none') Number.MAX_VALUE is returned.
+   * @returns {number} the max-width as number. If max-width is not set (resp. defaults to 'none') Number.MAX_VALUE is returned.
    */
   static cssMaxWidth(maxWidth) {
     if (maxWidth === undefined) {
@@ -1206,7 +1206,7 @@ export default class JQueryUtils extends $ {
   }
 
   /**
-   * @returns the max-height as number. If max-height is not set (resp. defaults to 'none') Number.MAX_VALUE is returned.
+   * @returns {number} the max-height as number. If max-height is not set (resp. defaults to 'none') Number.MAX_VALUE is returned.
    */
   static cssMaxHeight(maxHeight) {
     if (maxHeight === undefined) {

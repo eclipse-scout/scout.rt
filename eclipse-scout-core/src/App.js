@@ -365,7 +365,7 @@ export default class App {
   }
 
   /**
-   * @returns the locale to be used when no locale is provided as app option. By default the navigators locale is used.
+   * @returns {Locale} the locale to be used when no locale is provided as app option. By default the navigators locale is used.
    */
   _loadLocale() {
     return locales.getNavigatorLocale();

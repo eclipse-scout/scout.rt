@@ -965,7 +965,7 @@ export default class Planner extends Widget {
   }
 
   /**
-   * @returns true if the range selection may be started, false if not
+   * @returns {boolean} true if the range selection may be started, false if not
    */
   _prepareRangeSelectionByMousemove(mousedownEvent, mousemoveEvent) {
     var moveX = mousedownEvent.pageX - mousemoveEvent.pageX;
@@ -1205,7 +1205,7 @@ export default class Planner extends Widget {
   }
 
   /**
-   * @returns the visible view range (the difference to this.viewRange is that first and last hourOfDay are considered).
+   * @returns {Range} the visible view range (the difference to this.viewRange is that first and last hourOfDay are considered).
    */
   _visibleViewRange() {
     var $items = this.$timelineSmall.children('.scale-item');

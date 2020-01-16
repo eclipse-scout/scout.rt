@@ -1091,15 +1091,12 @@ export default class TileGrid extends Widget {
       if (tile instanceof PlaceholderTile) {
         return false;
       }
-      if (!filter.accept(tile)) {
-        return true;
-      }
-      return false;
+      return !filter.accept(tile);
     });
   }
 
   /**
-   * @returns the tiles which are accepted by the filter and therefore visible.
+   * @returns {Tile[]} the tiles which are accepted by the filter and therefore visible.
    */
   _filterTiles(tiles) {
     tiles = scout.nvl(tiles, this.tiles);
@@ -1239,7 +1236,7 @@ export default class TileGrid extends Widget {
 
   /**
    * Used for virtual scrolling to calculate the view range size.
-   * @returns the configured rowHeight + vgap / 2. Reason: the gaps are only between rows, the first and last row therefore only have 1 gap.
+   * @returns {number} the configured rowHeight + vgap / 2. Reason: the gaps are only between rows, the first and last row therefore only have 1 gap.
    */
   _minRowHeight() {
     return this.htmlComp.layout.rowHeight + this.htmlComp.layout.vgap / 2;
@@ -1330,11 +1327,11 @@ export default class TileGrid extends Widget {
   }
 
   /**
-   * @returns the newly rendered tiles
+   * @returns {Tile[]} the newly rendered tiles
    */
   _renderTileDelta(filterResult) {
     if (!this.virtual) {
-      return;
+      return [];
     }
     var prevTiles = this.renderedTiles();
     var newViewRange = this.virtualScrolling.calculateCurrentViewRange();
@@ -1434,10 +1431,9 @@ export default class TileGrid extends Widget {
   }
 
   _rowsRenderedInfo() {
-    var numRenderedTiles = this.$container.children('.tile').length,
-      renderedRowsRange = '(' + this.viewRangeRendered + ')',
-      text = numRenderedTiles + ' tiles rendered in range ' + renderedRowsRange;
-    return text;
+    var numRenderedTiles = this.$container.children('.tile').length;
+    var renderedRowsRange = '(' + this.viewRangeRendered + ')';
+    return numRenderedTiles + ' tiles rendered in range ' + renderedRowsRange;
   }
 
   _removeTilesInRange(range) {

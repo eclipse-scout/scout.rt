@@ -45,7 +45,7 @@ export default class Status {
   }
 
   /**
-   * @returns true if severity is OK or INFO, false if severity is WARNING or ERROR.
+   * @returns {boolean} true if severity is OK or INFO, false if severity is WARNING or ERROR.
    */
   isValid() {
     return this.severity === Status.Severity.OK ||

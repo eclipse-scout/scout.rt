@@ -48,7 +48,7 @@ export default class SingleLayout extends AbstractLayout {
   }
 
   /**
-   * @returns the first child html component of the given container or null if the container has no child with a html component or no children at all.
+   * @returns {HtmlComponent} the first child html component of the given container or null if the container has no child with a html component or no children at all.
    */
   _getHtmlSingleChild($container) {
     var htmlComp = null;

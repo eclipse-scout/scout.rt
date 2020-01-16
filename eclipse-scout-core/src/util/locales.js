@@ -53,7 +53,7 @@ export function has(languageTag, explicit) {
 }
 
 /**
- * @returns the {@link Locale} for the given languageTag.
+ * @returns {Locale} the locale for the given languageTag.
  * If there is no locale found for the given tag, it tries to load the locale without the country code.
  * If there is still no locale found, null is returned.
  */
@@ -78,7 +78,7 @@ export function getNavigatorLanguage() {
 }
 
 /**
- * @returns the {@link Locale} for the language returned by the navigator.
+ * @returns {Locale} for the language returned by the navigator.
  * If no locale is found, the first locale with the language of the navigator is returned.
  * (e.g. if browser returns 'de' and there is no locale for 'de', check if there is one for 'de-CH', 'de-DE' etc. and take the first.)
  * If still no locale is found, the default locale {@link Locale.DEFAULT} is returned.

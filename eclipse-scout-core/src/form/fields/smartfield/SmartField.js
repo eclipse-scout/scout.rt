@@ -1042,7 +1042,7 @@ export default class SmartField extends ValueField {
   }
 
   /**
-   * @returns true if the field is either 'embedded' or in 'touchMode'.
+   * @returns {boolean} true if the field is either 'embedded' or in 'touchMode'.
    */
   isTouchable() {
     return this.embedded || this.touchMode;
@@ -1458,7 +1458,7 @@ export default class SmartField extends ValueField {
    * For instance the proposal field does'nt use the value but the key from the
    * lookup row for comparison.
    *
-   * @returns the value used to find the selected element in a proposal chooser.
+   * @returns {*} the value used to find the selected element in a proposal chooser.
    */
   getValueForSelection() {
     return this._showSelection() ? this.value : null;

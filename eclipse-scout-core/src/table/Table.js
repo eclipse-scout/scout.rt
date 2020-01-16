@@ -1960,7 +1960,7 @@ export default class Table extends Widget {
   }
 
   /**
-   * @returns the column at position x (e.g. from event.pageX)
+   * @returns {Column} the column at position x (e.g. from event.pageX)
    */
   _columnAtX(x) {
     var columnOffsetRight = 0,
@@ -2073,7 +2073,7 @@ export default class Table extends Widget {
   }
 
   /**
-   * @returns returns a cell for the given column and row. Row Icon column and cell icon column don't not have cells --> generate one.
+   * @returns {Cell} a cell for the given column and row. Row Icon column and cell icon column don't not have cells --> generate one.
    */
   cell(column, row) {
     if (column === this.rowIconColumn) {
@@ -2119,7 +2119,7 @@ export default class Table extends Widget {
 
   /**
    *
-   * @returns the next editable position in the table, starting from the cell at (currentColumn / currentRow).
+   * @returns {object} the next editable position in the table, starting from the cell at (currentColumn / currentRow).
    * A position is an object containing row and column (cell has no reference to a row or column due to memory reasons).
    */
   nextEditableCellPos(currentColumn, currentRow, reverse) {

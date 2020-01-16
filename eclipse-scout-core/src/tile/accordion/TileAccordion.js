@@ -508,7 +508,7 @@ export default class TileAccordion extends Accordion {
   }
 
   /**
-   * @returns the index of the row where the group is located.<p>
+   * @returns {number} the index of the row where the group is located.<p>
    *          Example: There are 3 rows and 2 groups. The first group contains 2 rows, the second 1 row.
    *          The index of the first group is 0, the index of the second group is 2.
    */
@@ -612,7 +612,7 @@ export default class TileAccordion extends Accordion {
   }
 
   /**
-   * @returns the first fully visible tile at the scrollTop.
+   * @returns {Tile} the first fully visible tile at the scrollTop.
    */
   _tileAtScrollTop(scrollTop) {
     return arrays.find(this.getTiles().filter(function(tile) {

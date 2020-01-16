@@ -668,7 +668,7 @@ export default class Widget {
   }
 
   /**
-   * @returns the desktop linked to the current session.
+   * @returns {Desktop} the desktop linked to the current session.
    * If desktop is still initializing it might not be available yet, in that case it searches the parent hierarchy for it.
    */
   findDesktop() {
@@ -797,12 +797,15 @@ export default class Widget {
     }
   }
 
+  /**
+   * @param {boolean} visible true, to make the widget visible, false to hide it
+   */
   setVisible(visible) {
     this.setProperty('visible', visible);
   }
 
   /**
-   * @returns whether the widget is visible or not. May depend on other conditions than the visible property only
+   * @returns {boolean} whether the widget is visible or not. May depend on other conditions than the visible property only
    */
   isVisible() {
     return this.visible;
@@ -1125,8 +1128,8 @@ export default class Widget {
   }
 
   /**
-   * @param $element (optional) element from which the entryPoint will be resolved. If not set this.parent.$container is used.
-   * @returns the entry-point for this Widget. If the widget is part of the main-window it returns this.session.$entryPoint,
+   * @param [$element] (optional) element from which the entryPoint will be resolved. If not set this.parent.$container is used.
+   * @returns {$} the entry-point for this Widget. If the widget is part of the main-window it returns this.session.$entryPoint,
    * for popup-window this function will return the body of the document in the popup window.
    */
   entryPoint($element) {
@@ -1651,7 +1654,7 @@ export default class Widget {
   }
 
   /**
-   * @returns the original widget from which this one was cloned. If it is not a clone, itself is returned.
+   * @returns {Widget} the original widget from which this one was cloned. If it is not a clone, itself is returned.
    */
   original() {
     var original = this;
@@ -1879,12 +1882,12 @@ export default class Widget {
    *   this.widget('StartDate')                 #7
    *   this.nearestWidget('StartDate', true)    #12              (#12 has smaller distance than #7)
    *
-   * @param widgetId
+   * @param {string} widgetId
    *          The ID of the widget to find.
-   * @param deep
+   * @param {boolean} deep
    *          If false, only this widget and the next level are checked. This is the default.
    *          If true, the entire tree is traversed.
-   * @return the first found widget, or null if no widget was found.
+   * @return {Widget} the first found widget, or null if no widget was found.
    */
   nearestWidget(widgetId, deep) {
     if (this.id === widgetId) {
@@ -1909,7 +1912,7 @@ export default class Widget {
   }
 
   /**
-   * @returns the first parent for which the given function returns true.
+   * @returns {Widget} the first parent for which the given function returns true.
    */
   findParent(predicate) {
     var parent = this.parent;
@@ -2210,7 +2213,7 @@ export default class Widget {
    * (in that case the widget would be in the children list of the owner and of the parent).
    * <p>
    * In order to abort visiting, the visitor can return true.
-   * @returns true if the visitor aborted the visiting, false if the visiting completed without aborting
+   * @returns {boolean} true if the visitor aborted the visiting, false if the visiting completed without aborting
    */
   visitChildren(visitor) {
     for (var i = 0; i < this.children.length; i++) {

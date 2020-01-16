@@ -95,7 +95,7 @@ export default class CodeType {
    * In order to abort visiting, the visitor can return true or TreeVisitResult.TERMINATE.
    * To only abort the visiting of a sub tree, the visitor can return SKIP_SUBTREE.
    * </p>
-   * @returns true if the visitor aborted the visiting, false if the visiting completed without aborting
+   * @returns {boolean} true if the visitor aborted the visiting, false if the visiting completed without aborting
    */
   visit(visitor) {
     var codes = this.codes.filter(function(code) {

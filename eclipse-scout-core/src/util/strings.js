@@ -46,7 +46,7 @@ export function insertAt(text, insertText, position) {
 }
 
 /**
- * @returns true if the given string contains any non-space characters
+ * @returns {boolean} true if the given string contains any non-space characters
  */
 export function hasText(text) {
   if (text === undefined || text === null) {
@@ -61,7 +61,7 @@ export function hasText(text) {
 
 /**
  * Inverse operation of hasText(string). Used because empty(s) is more readable than !hasText(s).
- * @returns true if the given string is not set or contains only white-space characters.
+ * @returns {boolean} true if the given string is not set or contains only white-space characters.
  */
 export function empty(text) {
   return !hasText(text);

@@ -188,7 +188,7 @@ export default class ValueField extends FormField {
   }
 
   /**
-   * @returns the parsed value
+   * @returns {*} the parsed value
    * @throws a message, a Status or an error if the parsing fails
    */
   parseValue(displayText) {
@@ -338,7 +338,7 @@ export default class ValueField extends FormField {
   /**
    * Default does nothing because the value field does not know which type the concrete field uses.
    * May be overridden to cast the value to the required type.
-   * @returns the value with the correct type.
+   * @returns {*} the value with the correct type.
    */
   _ensureValue(value) {
     return value;
@@ -432,7 +432,7 @@ export default class ValueField extends FormField {
 
   /**
    * @param the value to be validated
-   * @returns the validated value
+   * @returns {*} the validated value
    * @throws a message, a Status or an error if the validation fails
    */
   validateValue(value) {

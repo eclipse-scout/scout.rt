@@ -152,7 +152,7 @@ export default class Range {
     return new Range(Math.max(this.from, other.from), Math.min(this.to, other.to));
   }
 
-  size(other) {
+  size() {
     return this.to - this.from;
   }
 

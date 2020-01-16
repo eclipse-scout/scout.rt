@@ -596,7 +596,7 @@ export default class GroupBox extends CompositeField {
 
   /**
    *
-   * @returns false if it is the mainbox. Or if the groupbox contains exactly one tablefield which has an invisible label
+   * @returns {boolean} false if it is the mainbox. Or if the groupbox contains exactly one tablefield which has an invisible label
    */
   _computeBorderVisible(borderVisible) {
     if (this.mainBox) {

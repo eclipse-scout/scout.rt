@@ -12,7 +12,6 @@ import {objects, strings} from '../index';
 
 /**
  * Ensures the given parameter is an array
- * @memberOf scout.arrays
  */
 export function ensure(array) {
   if (array === undefined || array === null) {
@@ -40,7 +39,7 @@ export function init(length, initValue) {
  * if it is present (optional operation).  If the array does not contain
  * the element, it is unchanged.
  *
- * @return true if the array contained the specified element
+ * @return {boolean} true if the array contained the specified element
  */
 export function remove(arr, element) {
   if (arr) {
@@ -56,7 +55,7 @@ export function remove(arr, element) {
 /**
  * Removes every given element from the array
  *
- * @return true if the array contained at least one of the specified elements
+ * @return {boolean} true if the array contained at least one of the specified elements
  */
 export function removeAll(arr, elements) {
   var modified = false;
@@ -186,14 +185,14 @@ export function last(arr) {
 }
 
 /**
- * @returns true if the given argument is an array and has a length > 0, false in any other case.
+ * @returns {boolean} true if the given argument is an array and has a length > 0, false in any other case.
  */
 export function hasElements(arr) {
   return !empty(arr);
 }
 
 /**
- * @returns true if the given argument is not an array or the length of the array is 0, false in any other case.
+ * @returns {boolean} true if the given argument is not an array or the length of the array is 0, false in any other case.
  */
 export function empty(arr) {
   if (Array.isArray(arr)) {
@@ -404,7 +403,10 @@ export function pushSet(arr, element) {
 }
 
 /**
- * @param encoded defaults to false
+ * Creates a string containing all elements in the array separated by the given delimiter.
+ * @param {[]} arr
+ * @param {string} [delimiter=null]
+ * @param {boolean} [encodeHtml=false] true to encode the elements, false if not
  */
 export function format(arr, delimiter, encodeHtml) {
   if (!arr || arr.length === 0) {
@@ -450,7 +452,7 @@ export function min(arr) {
 }
 
 /**
- * @returns all elements of the first array which are not in the second array
+ * @returns {[]} all elements of the first array which are not in the second array
  */
 export function diff(arr1, arr2) {
   var diff = arr1.slice();

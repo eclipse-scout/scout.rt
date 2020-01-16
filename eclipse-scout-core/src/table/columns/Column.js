@@ -390,14 +390,14 @@ export default class Column {
   }
 
   /**
-   * @returns the cell object for this column from the given row.
+   * @returns {Cell} the cell object for this column from the given row.
    */
   cell(row) {
     return this.table.cell(this, row);
   }
 
   /**
-   * @returns the cell object for this column from the first selected row in the table.
+   * @returns {Cell} the cell object for this column from the first selected row in the table.
    */
   selectedCell() {
     var selectedRow = this.table.selectedRow();
@@ -412,7 +412,7 @@ export default class Column {
   }
 
   /**
-   * @returns the cell value to be used for grouping and filtering (chart, column filter).
+   * @returns {*} the cell value to be used for grouping and filtering (chart, column filter).
    */
   cellValueOrTextForCalculation(row) {
     var cell = this.cell(row);

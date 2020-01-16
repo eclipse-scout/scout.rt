@@ -176,7 +176,7 @@ export default class TreeProposalChooser extends ProposalChooser {
    * Note: because we only match nodes that have the property leaf set to true, it's not
    * possible to accept a node with accept input that is not a leaf.
    *
-   * @returns the number of leafs in the current tree model.
+   * @returns {TreeNode[]} the leafs in the current tree model.
    */
   findLeafs() {
     var leafs = [];

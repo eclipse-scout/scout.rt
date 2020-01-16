@@ -11,7 +11,7 @@
 import {arrays, Device, objects, strings} from '../index';
 
 /**
- * @returns the x coordinate where the event happened, works for touch events as well.
+ * @returns {number} the x coordinate where the event happened, works for touch events as well.
  */
 export function pageX(event) {
   if (!objects.isNullOrUndefined(event.pageX)) {
@@ -21,7 +21,7 @@ export function pageX(event) {
 }
 
 /**
- * @returns the y coordinate where the event happened, works for touch events as well.
+ * @returns {number} the y coordinate where the event happened, works for touch events as well.
  */
 export function pageY(event) {
   if (!objects.isNullOrUndefined(event.pageY)) {

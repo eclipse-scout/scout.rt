@@ -65,7 +65,7 @@ export default class Splitter extends Widget {
    * not specified, the size is calculated automatically by reading the this.$anchor
    * element's bounds.
    *
-   * @returns the effective position in pixel.
+   * @returns {number} the effective position in pixel.
    */
   setPosition(position) {
     if (!$.isNumeric(position)) {

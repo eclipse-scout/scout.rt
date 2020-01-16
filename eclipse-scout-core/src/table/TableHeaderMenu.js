@@ -777,7 +777,7 @@ export default class TableHeaderMenu extends Popup {
   }
 
   /**
-   * @returns the title-text used for the filter-table
+   * @returns {string} the title-text used for the filter-table
    */
   _filterByText() {
     var text = this.session.text('ui.Filter'),

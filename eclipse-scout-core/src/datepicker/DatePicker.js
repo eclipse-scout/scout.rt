@@ -143,7 +143,7 @@ export default class DatePicker extends Widget {
   }
 
   /**
-   * @returns the x coordinate of the scrollable if the given month should be displayed
+   * @returns {number} the x coordinate of the scrollable if the given month should be displayed
    */
   _scrollableLeftForMonth(month) {
     var scrollableInsets = graphics.insets(this.$scrollable);

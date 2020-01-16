@@ -528,7 +528,7 @@ export default class LogicalGridLayoutInfo {
   }
 
   /**
-   * @returns the width hint for the given gridData
+   * @returns {number|null} the width hint for the given gridData
    */
   widthHintForGridData(gridData) {
     if (this.widthHints.length === 0) {
