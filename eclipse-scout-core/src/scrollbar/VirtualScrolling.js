@@ -78,8 +78,9 @@ export default class VirtualScrolling {
     var maxScrollTop = this.$scrollable[0].scrollHeight - this.$scrollable[0].clientHeight;
     var widgetBounds = this.widget.$container[0].getBoundingClientRect();
     var scrollableBounds = this.$scrollable[0].getBoundingClientRect();
-    if (widgetBounds.bottom < scrollableBounds.top ||
-      widgetBounds.top > scrollableBounds.bottom) {
+    if (widgetBounds.height > 0 && (
+      widgetBounds.bottom < scrollableBounds.top ||
+      widgetBounds.top > scrollableBounds.bottom)) {
       // If widget is not in the view port, no need to draw any row
       return new Range(0, 0);
     }

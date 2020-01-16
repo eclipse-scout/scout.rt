@@ -268,7 +268,7 @@ describe('VirtualTileGrid', function() {
   });
 
   describe('deleteTiles', function() {
-    it('deletes the given tiles no mather if they are in the view port or not', function() {
+    it('deletes the given tiles no matter if they are in the view port or not', function() {
       jasmine.clock().install();
       var tileGrid = createTileGrid(0, {
         viewRangeSize: 1
@@ -697,6 +697,59 @@ describe('VirtualTileGrid', function() {
       tileGrid.removeFilter(filter);
       tileGrid.filter();
       expect(tileGrid.$container).not.toHaveClass('empty');
+    });
+
+    it('updates view port if filter changed while container was invisible and scroll parent not at y=0', function() {
+      jasmine.clock().install();
+      var tileGrid = createTileGrid(3, {
+        viewRangeSize: 1,
+        scrollable: false
+      });
+      var group = scout.create('Group', {
+        parent: session.desktop,
+        body: tileGrid
+      });
+      var accordion = scout.create('TileAccordion', {
+        parent: session.desktop,
+        groups: [group]
+      });
+      accordion.render();
+      accordion.$container.cssTop(20); // Move away from 0 to reproduce the real case, see commit comment
+      tileGrid.validateLayoutTree();
+      expect(tileGrid.filteredTiles.length).toBe(3);
+      expect(tileGrid.renderedTiles().length).toBe(2);
+      expect(tileGrid.viewRangeRendered.size()).toBe(1);
+
+      // Hide group
+      group.setVisible(false);
+      var filter = {
+        // Accept none
+        accept: () => false
+      };
+      tileGrid.addFilter(filter);
+      tileGrid.filter();
+      jasmine.clock().tick(); // Ensure tiles are really removed
+      tileGrid.validateLayoutTree();
+      expect(tileGrid.filteredTiles.length).toBe(0);
+      expect(tileGrid.renderedTiles().length).toBe(0);
+      expect(tileGrid.viewRangeRendered.size()).toBe(0);
+
+      // Make the filter accept all tiles -> ensure tiles will be rendered
+      tileGrid.filters[0].accept = () => true;
+      tileGrid.filter();
+      jasmine.clock().tick();
+      tileGrid.validateLayoutTree();
+      expect(tileGrid.filteredTiles.length).toBe(3);
+      expect(tileGrid.renderedTiles().length).toBe(2);
+      expect(tileGrid.viewRangeRendered.size()).toBe(1);
+
+      // Show group again -> Tiles are already rendered yet
+      group.setVisible(true);
+      tileGrid.validateLayoutTree();
+      expect(tileGrid.filteredTiles.length).toBe(3);
+      expect(tileGrid.renderedTiles().length).toBe(2);
+      expect(tileGrid.viewRangeRendered.size()).toBe(1);
+      jasmine.clock().uninstall();
     });
   });
 });
