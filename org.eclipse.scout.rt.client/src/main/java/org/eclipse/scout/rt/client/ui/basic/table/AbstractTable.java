@@ -1889,6 +1889,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     if (m_editContext == null) {
       return;
     }
+    m_editContext.getFormField().init();
     TableEvent tableEvent = new TableEvent(this, TableEvent.TYPE_START_CELL_EDIT);
     tableEvent.setCellEditor(m_editContext.getFormField());
     tableEvent.setRows(Arrays.asList(m_editContext.getRow()));
@@ -1903,6 +1904,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     TableEvent tableEvent = new TableEvent(this, TableEvent.TYPE_END_CELL_EDIT);
     tableEvent.setCellEditor(m_editContext.getFormField());
     fireTableEventInternal(tableEvent);
+    m_editContext.getFormField().dispose();
     m_editContext = null;
   }
 
