@@ -30,7 +30,6 @@ export default class SalesfunnelChartRenderer extends AbstractChartRenderer {
     this.suppressLegendBox = true;
   }
 
-
   _validate() {
     var chartData = this.chart.chartData;
     if (!chartData ||
@@ -392,11 +391,11 @@ export default class SalesfunnelChartRenderer extends AbstractChartRenderer {
     this.$svg.children(this.segmentSelectorForAnimation).animate({
       tabIndex: 0
     }, this._createAnimationObjectWithTabindexRemoval(shrink))
-      .promise().done(function() {
-      this._remove(afterRemoveFunc);
-      this.animationTriggered = false;
-    }.bind(this));
-
+      .promise()
+      .done(function() {
+        this._remove(afterRemoveFunc);
+        this.animationTriggered = false;
+      }.bind(this));
   }
 
   _calcChartBoxWidth() {

@@ -16,7 +16,6 @@ export default class ChartField extends FormField {
     this._addWidgetProperties(['chart']);
   }
 
-
   _render() {
     this.addContainer(this.$parent, 'chart-field');
     this.addLabel();

@@ -42,7 +42,6 @@ export default class ChartTableControl extends TableControl {
     this._tableUpdatedHandler = this._onTableUpdated.bind(this);
   }
 
-
   static DATE_GROUP_FLAG = 0x100;
   static MAX_AXIS_COUNT = 100;
 
@@ -746,7 +745,7 @@ export default class ChartTableControl extends TableControl {
     this.$chartMain.children().promise().done(function() {
       // adapt size of svg
       try {
-        //Firefox throws error when node is not in dom(already removed by navigating away). all other browser returns a boundingbox with 0
+        // Firefox throws error when node is not in dom(already removed by navigating away). all other browser returns a boundingbox with 0
         var box = this.$chartMain[0].getBBox();
         this.$chartMain.css('width', box.x + box.width);
         this.$chartMain.css('height', box.y + box.height);
@@ -755,7 +754,7 @@ export default class ChartTableControl extends TableControl {
         scrollbars.update(this.$contentContainer);
         this.sizeDirty = false;
       } catch (e) {
-        //nop
+        // nop
       }
     }.bind(this));
 
@@ -1090,13 +1089,13 @@ export default class ChartTableControl extends TableControl {
       yAxisSpecialDateTreating = yAxis.column instanceof DateColumn && yGroup === TableMatrix.DateGroup.YEAR && yAxis.indexOf(null) > -1,
       xAxisSpecialDateTreating = xAxis.column instanceof DateColumn && xGroup === TableMatrix.DateGroup.YEAR && xAxis.indexOf(null) > -1;
 
-    //init drawY axis
+    // init drawY axis
     var deltaY = yAxis.max - yAxis.min,
       labelsY;
 
     if (yAxis.length > 14) {
       if (yAxisSpecialDateTreating) {
-        //if key value with undefined or null
+        // if key value with undefined or null
         var clone2 = yAxis.slice(0, yAxis.length - 1);
         yAxis.min = Math.min.apply(null, clone2);
         deltaY = yAxis.max - yAxis.min;
@@ -1244,14 +1243,12 @@ export default class ChartTableControl extends TableControl {
       var a = object.attr(attribute);
       if (a === undefined) {
         return [null];
-      } else {
-        var n = parseFloat(a);
-        if (isNaN(n)) {
-          return JSON.parse(a);
-        } else {
-          return [n];
-        }
       }
+      var n = parseFloat(a);
+      if (isNaN(n)) {
+        return JSON.parse(a);
+      }
+      return [n];
     };
 
     $('.main-chart.selected', this.$contentContainer).each(function() {

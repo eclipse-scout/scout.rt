@@ -20,7 +20,6 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
     this.segmentSelectorForAnimation = 'path.line-chart-line';
   }
 
-
   _validate() {
     if (!super._validate()) {
       return false;
@@ -210,10 +209,11 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
       .animate({
         tabIndex: 0
       }, this._createAnimationObjectWithTabindexRemoval(moveDownFunc))
-      .promise().done(function() {
-      this._remove(afterRemoveFunc);
-      this.animationTriggered = false;
-    }.bind(this));
+      .promise()
+      .done(function() {
+        this._remove(afterRemoveFunc);
+        this.animationTriggered = false;
+      }.bind(this));
   }
 
   _renderValueBubble(index, value, radius, color, groupIndex) {

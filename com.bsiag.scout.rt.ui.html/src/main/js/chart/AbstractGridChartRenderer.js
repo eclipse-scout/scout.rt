@@ -33,11 +33,9 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
     this.xAxisLabels = [];
   }
 
-
   _validate() {
     return !(this.chart.chartData.axes.length === 0 ||
       this.chart.chartData.chartValueGroups.length === 0);
-
   }
 
   _render() {
@@ -296,21 +294,19 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
         newLabels = this._calcNextLabelsAjustDimensions(bigger, smaller, exp + 1, possibleLines, negValNormalizedBigger);
       if (newLabels.length > 0) {
         return newLabels;
-      } else {
-        var biggerLinesValue = biggerLines.length ? biggerLines[biggerLines.length - 1] : 0,
-          smallerLinesValue = smallerLines.length ? smallerLines[smallerLines.length - 1] : 0,
-          maxValue = Math.ceil(negValNormalizedBigger ? smallerLinesValue : biggerLinesValue),
-          minValue = Math.floor(negValNormalizedBigger ? biggerLinesValue : smallerLinesValue);
-        this.maxMinValue = {
-          maxValue: maxValue,
-          minValue: minValue,
-          range: maxValue - minValue
-        };
-        return labels;
       }
-    } else {
-      return [];
+      var biggerLinesValue = biggerLines.length ? biggerLines[biggerLines.length - 1] : 0,
+        smallerLinesValue = smallerLines.length ? smallerLines[smallerLines.length - 1] : 0,
+        maxValue = Math.ceil(negValNormalizedBigger ? smallerLinesValue : biggerLinesValue),
+        minValue = Math.floor(negValNormalizedBigger ? biggerLinesValue : smallerLinesValue);
+      this.maxMinValue = {
+        maxValue: maxValue,
+        minValue: minValue,
+        range: maxValue - minValue
+      };
+      return labels;
     }
+    return [];
   }
 
   _calcChartBoxWidth() {

@@ -16,7 +16,6 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
     super(chart);
   }
 
-
   _validate() {
     var chartData = this.chart.chartData;
     if (!chartData ||
@@ -74,14 +73,14 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
       this.readyToDraw = true;
       this.setLoading(false);
       if (!this.$svg.isAttached()) {
-        //user navigated away. do not try to render-> error
+        // user navigated away. do not try to render-> error
         return;
       }
       this.readyToDraw = false;
       this._draw(this.animated, true);
     }.bind(this);
 
-    //save callback if user navigated away while calculating and _draw is not executed.
+    // save callback if user navigated away while calculating and _draw is not executed.
     this.readyToDraw = false;
 
     // calc venns and set legend
@@ -127,7 +126,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
     }
   }
 
-// calculation
+  // calculation
 
   _calc1(v1) {
     // set basic data
@@ -140,7 +139,8 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
       v1.r = this.vennCircleHelper.calcR(a, 0);
     }
 
-    v1.x = v1.y = 0;
+    v1.x = 0;
+    v1.y = 0;
 
     // place legend and label
     v1.setLegend(this.data[0].groupName, 1, -1);
@@ -164,13 +164,15 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
       v1.x = 0;
       v2.x = d12;
     } else {
+      // eslint-disable-next-line no-multi-assign
       v1.r = v2.r = this.vennCircleHelper.calcR(-1, 0.7);
       v1.x = -v1.r * 0.6;
       v2.x = v2.r * 0.6;
     }
 
     // calc y ;)
-    v1.y = v2.y = 0;
+    v1.y = 0;
+    v2.y = 0;
 
     // balance circles
     this.vennCircleHelper.findBalance2(v1, v2);
@@ -235,7 +237,9 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
       v2.x = d12;
       v3.x = d13;
 
-      v1.y = v2.y = v3.y = 0;
+      v1.y = 0;
+      v2.y = 0;
+      v3.y = 0;
 
       // c is much more difficult..., only changes v3
       this._cancelAsync3Calculator();
@@ -256,6 +260,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
 
     } else {
       // draw label
+      // eslint-disable-next-line no-multi-assign
       v1.r = v2.r = v3.r = this.vennCircleHelper.calcR(-1, 0.55);
 
       v1.x = -v1.r * 0.73;
@@ -290,7 +295,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
     }
   }
 
-// drawing
+  // drawing
 
   _draw(animated, real) {
     if (!this.rendered && !this.rendering) { // additional check, because this method might be called from a setTimeout()
@@ -307,10 +312,11 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
     this.$svg.children('.venn-legend, .venn-label, .venn-axis-white, .label-line')
       .stop()
       .animateSVG('opacity', 1, 0, null, true)
-      .promise().done(function() {
-      this.remove();
-      that.animationTriggered = false;
-    });
+      .promise()
+      .done(function() {
+        this.remove();
+        that.animationTriggered = false;
+      });
 
     // find venns we will update
     var showVenn = [];
@@ -339,7 +345,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
     }
   }
 
-// handling of circles
+  // handling of circles
   _createCircle(circleIndex, color, cssClass) {
     var $circle = this.$svg.appendSVG('circle', 'venn-circle')
       .attr('cx', this.centerX)
@@ -367,7 +373,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
     return $circle;
   }
 
-// handling of venn, label and legend
+  // handling of venn, label and legend
   _updateVenn(venn, animated) {
     // move circle
     venn.$circle
@@ -409,7 +415,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
     }
   }
 
-// handling of show/hide numbers
+  // handling of show/hide numbers
   _show(event) {
     if (this.numberOfCircles === 1) {
       return; // Nothing to do for only one circle

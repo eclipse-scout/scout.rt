@@ -23,7 +23,6 @@ export default class ChartTableUserFilter extends TableUserFilter {
     this.columnIdY = null;
   }
 
-
   static TYPE = 'CHART';
 
   createLabel() {
@@ -65,10 +64,9 @@ export default class ChartTableUserFilter extends TableUserFilter {
 
     if (!this.yAxis) {
       return (this.filters.indexOf(nX) > -1);
-    } else {
-      key = this.yAxis.column.cellValueOrTextForCalculation(row);
-      var nY = this.yAxis.norm(key);
-      return (this.filters.indexOf(JSON.stringify([nX, nY])) > -1);
     }
+    key = this.yAxis.column.cellValueOrTextForCalculation(row);
+    var nY = this.yAxis.norm(key);
+    return (this.filters.indexOf(JSON.stringify([nX, nY])) > -1);
   }
 }

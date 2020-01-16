@@ -16,7 +16,6 @@ export default class ChartTableControlLayout extends AbstractLayout {
     this.control = control;
   }
 
-
   layout($container) {
     if (!this.control.contentRendered) {
       return;

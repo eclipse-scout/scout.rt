@@ -20,7 +20,6 @@ export default class AbstractCircleChartRenderer extends AbstractChartRenderer {
     this.r;
   }
 
-
   pathSegment(start, end) {
     var s = start * 2 * Math.PI,
       e = end * 2 * Math.PI,
@@ -52,9 +51,10 @@ export default class AbstractCircleChartRenderer extends AbstractChartRenderer {
       .animate({
         tabIndex: 0
       }, this._createAnimationObjectWithTabindexRemoval(tweenOut))
-      .promise().done(function() {
-      this._remove(afterRemoveFunc);
-      this.animationTriggered = false;
-    }.bind(this));
+      .promise()
+      .done(function() {
+        this._remove(afterRemoveFunc);
+        this.animationTriggered = false;
+      }.bind(this));
   }
 }

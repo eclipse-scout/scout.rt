@@ -15,7 +15,6 @@ export default class ChartAdapter extends ModelAdapter {
     super();
   }
 
-
   _onWidgetValueClick(event) {
     this._send('valueClick', event.data);
   }

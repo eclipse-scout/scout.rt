@@ -15,7 +15,6 @@ export default class DonutChartRenderer extends PieChartRenderer {
     super(chart);
   }
 
-
   _render() {
     var outerCircleR = Math.min(this.chartBox.height, this.chartBox.width) / 2;
     this.centerCircleR = outerCircleR * 0.65; // donut thickness = 35% of outer circle

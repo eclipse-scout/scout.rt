@@ -210,7 +210,7 @@ export default class AbstractChartRenderer {
   }
 
   _initRectRenderOptions(renderRectOptions) {
-    //init all values for animation with -1
+    // init all values for animation with -1
 
     // Default options (end value of "null" means "don't set this attribute")
     var options = {
@@ -268,7 +268,7 @@ export default class AbstractChartRenderer {
       } else {
         startY = this.chartBox.mY() - ((labelCount / 2 - 0.75) * this.legendTextHeights.textHeight) - (Math.floor(labelCount / 2) * this.legendTextHeights.textGap);
       }
-      widthPerLabel = 0; //not used in vertical rendering
+      widthPerLabel = 0; // not used in vertical rendering
       startX = this.chart.legendPosition === Chart.LEGEND_POSITION_RIGHT ? this.chartBox.width : 0;
       startX = this.verticalLegendPaddingLeft + bubblePadding + this.legendTextHeights.bubbleR * 2 + startX;
     } else {
@@ -639,7 +639,7 @@ export default class AbstractChartRenderer {
 
     var positions = legendPositions;
 
-    //draw and measure label
+    // draw and measure label
 
     var $legend,
       lengthLegend = 0;
@@ -670,7 +670,7 @@ export default class AbstractChartRenderer {
 
     if (legendPositions.autoPosition) {
       positions = legendPositions.posFunc.call(this, backgroundWidth, backgroundHeight);
-      //adjust legend
+      // adjust legend
       $legend.attr('x', positions.x2 + padding);
       $legend.attr('y', positions.y2 + positions.v * padding);
     }
@@ -739,14 +739,14 @@ export default class AbstractChartRenderer {
     legend.detachFunc = function() {
       $legend.data('wires').forEach(function($wire) {
         $wire.detach();
-      }.bind(this));
+      });
       if ($legend.data('lines')) {
         $legend.data('lines').forEach(function($line) {
           if ($line.data('$background')) {
             $svg.append($line.data('$background'));
           }
           $line.detach();
-        }.bind(this));
+        });
       }
       if ($legend.data('$background')) {
         $legend.data('$background').remove();
@@ -766,21 +766,21 @@ export default class AbstractChartRenderer {
           if ($line.data('$background')) {
             $svg.append($line.data('$background'));
           }
-        }.bind(this));
+        });
       }
     };
 
     legend.removeFunc = function() {
       $legend.data('wires').forEach(function($wire) {
         $wire.remove();
-      }.bind(this));
+      });
       if ($legend.data('lines')) {
         $legend.data('lines').forEach(function($line) {
           if ($line.data('$background')) {
             $line.data('$background').remove();
           }
           $line().remove();
-        }.bind(this));
+        });
       }
       if ($legend.data('$background')) {
         $legend.data('$background').remove();

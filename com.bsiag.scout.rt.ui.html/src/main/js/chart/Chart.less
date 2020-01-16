@@ -12,18 +12,18 @@
   .tile-colors(@attr: fill) {
 
     .tile & {
-      @{attr}: @tile-default-background-color;
+        @{attr}: @tile-default-background-color;
 
       .inverted& {
-        @{attr}: @tile-default-inverted-background-color;
+          @{attr}: @tile-default-inverted-background-color;
       }
 
       .color-alternative& {
-        @{attr}: @tile-alternative-background-color;
+          @{attr}: @tile-alternative-background-color;
       }
 
       .color-alternative.inverted& {
-        @{attr}: @tile-alternative-inverted-background-color;
+          @{attr}: @tile-alternative-inverted-background-color;
       }
     }
   }
@@ -134,6 +134,7 @@
       @chart-data-color-6-inverted,
       @chart-data-active-color-inverted);
   }
+
   .tile.color-alternative & {
     #scout.chart-auto-colors(
       @chart-data-color-1-alternative,
@@ -144,6 +145,7 @@
       @chart-data-color-6-alternative,
       @chart-data-active-color-alternative);
   }
+
   .tile.color-alternative.inverted & {
     #scout.chart-auto-colors(
       @chart-data-color-1-alternative-inverted,
@@ -154,6 +156,7 @@
       @chart-data-color-6-alternative-inverted,
       @chart-data-active-color-alternative-inverted);
   }
+
   .tile.color-rainbow & {
     #scout.chart-auto-colors(
       @chart-data-color-1-rainbow,
@@ -472,6 +475,7 @@ polygon.salesfunnel-chart-bar {
   }
 
   /* Override standard colors set for auto-colors in SVG (see above) */
+
   .tile.inverted &.auto-color:not(:hover),
   .tile.inverted.color-alternative &.auto-color:not(:hover) {
     fill: @palette-white;
@@ -533,7 +537,7 @@ text.salesfunnel-conversionrate-label {
 /* --- Venn --- */
 
 circle.venn-circle {
-   opacity: 0.5;
+  opacity: 0.5;
 
   .clickable & {
     cursor: pointer;

@@ -20,7 +20,6 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
     this.suppressLegendBox = true;
   }
 
-
   _validate() {
     var chartValueGroups = this.chart.chartData.chartValueGroups;
     if (chartValueGroups.length !== 2 ||

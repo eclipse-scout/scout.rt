@@ -21,7 +21,6 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
     this.minHeightForWireLegend = 100;
   }
 
-
   _validate() {
     var chartData = this.chart.chartData;
     if (chartData.axes.length > 0 || chartData.chartValueGroups.length === 0) {

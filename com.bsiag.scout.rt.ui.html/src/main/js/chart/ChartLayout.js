@@ -17,7 +17,6 @@ export default class ChartLayout extends AbstractLayout {
     this.chart = chart;
   }
 
-
   layout($container) {
     var opts = {
       requestAnimation: true,

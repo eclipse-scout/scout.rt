@@ -43,7 +43,6 @@ export default class Chart extends Widget {
     this.visible = true;
   }
 
-
   static PIE = 1;
   static LINE = 2;
   static BAR_VERTICAL = 3;

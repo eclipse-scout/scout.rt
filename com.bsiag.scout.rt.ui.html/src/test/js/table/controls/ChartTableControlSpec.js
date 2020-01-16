@@ -92,8 +92,8 @@ describe('ChartTableControl', function() {
       chartTableControl = createChartTableControl(createModelFromTable(table));
       chartTableControl._renderContent($div);
 
-      expect(chartTableControl.chartGroup1.id).toBe(columns[0].id); //first column selected
-      expect(chartTableControl.chartGroup1.modifier).toBe(256); //with date modifier
+      expect(chartTableControl.chartGroup1.id).toBe(columns[0].id); // first column selected
+      expect(chartTableControl.chartGroup1.modifier).toBe(256); // with date modifier
       expectEmptyChart(false);
     });
 
@@ -115,9 +115,9 @@ describe('ChartTableControl', function() {
 
     it('does not draw a chart, if columns are updated, but rows are not updated yet', function() {
       chartTableControl = createChartTableControl(createModel(2, 1));
-      //remove first column
+      // remove first column
       chartTableControl.table.columns.shift();
-      //rows are not yet updated
+      // rows are not yet updated
       chartTableControl._renderContent($div);
       expectEmptyChart(true);
     });

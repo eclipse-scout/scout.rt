@@ -9,7 +9,6 @@
  */
 import {Device} from '@eclipse-scout/core';
 
-
 // place venn 3 by simulation
 // find angle and distance (to a) and radius where "error" is minimal
 export default class VennAsync3Calculator {
@@ -208,8 +207,7 @@ export default class VennAsync3Calculator {
     // be brutal if basic error
     if ((u === 0 && a !== 0) || (u !== 0 && a === 0)) {
       return 1000;
-    } else {
-      return Math.abs(u / total - a / aTotal) * 100;
     }
+    return Math.abs(u / total - a / aTotal) * 100;
   }
 }

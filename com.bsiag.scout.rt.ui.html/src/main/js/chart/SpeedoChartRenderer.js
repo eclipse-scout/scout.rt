@@ -18,7 +18,6 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
     this.suppressLegendBox = true;
   }
 
-
   static GREEN_AREA_POSITION_LEFT = 1;
   static GREEN_AREA_POSITION_CENTER = 2;
   static GREEN_AREA_POSITION_RIGHT = 3;
@@ -312,7 +311,7 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
     var position = this.chart.chartData.customProperties.greenAreaPosition;
     switch (position) {
       case SpeedoChartRenderer.GREEN_AREA_POSITION_LEFT:
-        //only four parts
+        // only four parts
         if (part === 0) {
           return 'dark-green';
         } else if (part === 1) {
@@ -324,7 +323,7 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
         }
         break;
       case SpeedoChartRenderer.GREEN_AREA_POSITION_RIGHT:
-        //only four parts
+        // only four parts
         if (part === 0) {
           return 'red';
         } else if (part === 1) {
@@ -412,9 +411,10 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
       .animate({
         tabIndex: 0
       }, this._createAnimationObjectWithTabindexRemoval(tweenOut))
-      .promise().done(function() {
-      this._remove(afterRemoveFunc);
-      this.animationTriggered = false;
-    }.bind(this));
+      .promise()
+      .done(function() {
+        this._remove(afterRemoveFunc);
+        this.animationTriggered = false;
+      }.bind(this));
   }
 }

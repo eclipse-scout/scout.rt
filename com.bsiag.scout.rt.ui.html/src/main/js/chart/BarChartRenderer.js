@@ -16,7 +16,6 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
     super(chart);
   }
 
-
   _render() {
     super._render();
 
@@ -121,9 +120,10 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
 
     var
       that = this,
-      legend = this._renderWireLegend(strings.join(
-        ': ', this.chart.chartData.chartValueGroups[chartGroupIndex].groupName, this.session.locale.decimalFormat.format(value)),
-        legendPositions, 'line-chart-wire-label', true),
+      legend = this._renderWireLegend(
+        strings.join(': ', this.chart.chartData.chartValueGroups[chartGroupIndex].groupName, this.session.locale.decimalFormat.format(value)),
+        legendPositions, 'line-chart-wire-label', true
+      ),
       mouseIn = function() {
         legend.attachFunc();
         if (that.toBigLabelHoverFunc) {
@@ -159,9 +159,10 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
     this.$svg.children('.bar-chart-bar')
       .animateSVG('y', yCoord, 200, null, true)
       .animateSVG('height', 0, 200, null, true)
-      .promise().done(function() {
-      this._remove(afterRemoveFunc);
-      this.animationTriggered = false;
-    }.bind(this));
+      .promise()
+      .done(function() {
+        this._remove(afterRemoveFunc);
+        this.animationTriggered = false;
+      }.bind(this));
   }
 }
