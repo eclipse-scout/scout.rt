@@ -17,7 +17,6 @@ import java.util.Locale;
 import java.util.Map;
 
 public class DynamicNls {
-
   private final List<NlsResourceBundleCache> m_resourceBundles;
 
   public DynamicNls() {
@@ -103,5 +102,12 @@ public class DynamicNls {
    */
   protected Locale getDefaultLocale() {
     return NlsLocale.get();
+  }
+
+  /**
+   * Calls destroy on its resource bundles.
+   */
+  public void destroy() {
+    m_resourceBundles.forEach(NlsResourceBundleCache::destroy);
   }
 }

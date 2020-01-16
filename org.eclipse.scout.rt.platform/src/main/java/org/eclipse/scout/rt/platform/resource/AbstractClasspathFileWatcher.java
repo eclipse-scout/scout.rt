@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.ui.html;
+package org.eclipse.scout.rt.platform.resource;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -43,7 +43,17 @@ public abstract class AbstractClasspathFileWatcher {
   private final ReentrantReadWriteLock m_watchKeyReadWriteLock = new ReentrantReadWriteLock();
 
   public AbstractClasspathFileWatcher() throws IOException {
+    this(true);
+  }
+
+  public AbstractClasspathFileWatcher(boolean callInitializer) throws IOException {
     m_watcher = FileSystems.getDefault().newWatchService();
+    if (callInitializer) {
+      callInitializer();
+    }
+  }
+
+  protected void callInitializer() throws IOException {
     init();
     start();
   }
@@ -62,6 +72,20 @@ public abstract class AbstractClasspathFileWatcher {
    * to handle file changes on any files on the classpath. Use this Service only for development reasons.
    */
   protected abstract void execFileChanged(Path path);
+
+  /**
+   * @param path
+   *          Path to the directory to attach a file watcher
+   * @return {@code true} if a watcher should be attached for the given path. Default is {@code true}.
+   */
+  protected boolean execAccept(Path path) {
+    return true;
+  }
+
+  /**
+   * @return The name of the job that watches for file changes.
+   */
+  protected abstract String getConfiguredJobName();
 
   protected void start() {
     Jobs.schedule(() -> {
@@ -101,7 +125,7 @@ public abstract class AbstractClasspathFileWatcher {
         LOG.debug("Watcher stopped");
       }
     }, Jobs.newInput()
-        .withName("Less File change watch"));
+        .withName(getConfiguredJobName()));
   }
 
   protected Set<Path> getRootPaths() {
@@ -128,6 +152,10 @@ public abstract class AbstractClasspathFileWatcher {
   }
 
   protected void registerDirectory(Path directory) throws IOException {
+    if (!execAccept(directory)) {
+      return;
+    }
+
     WatchKey key = directory.register(m_watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
     try {
       m_watchKeyReadWriteLock.writeLock().lock();

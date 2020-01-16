@@ -218,4 +218,31 @@ public final class PlatformConfigProperties {
       return Boolean.FALSE;
     }
   }
+
+  public static class DevelopmentTextsFileWatcherEnabledProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.dev.texts.fileWatcherEnabled";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies if the a file watcher should be installed for every nls resource bundle to invalidate the texts cache if a file changed. This property will only have an effect if platform runs in development mode.";
+    }
+
+    @Override
+    protected Boolean parse(String value) {
+      if (!Platform.get().inDevelopmentMode()) {
+        return false;
+      }
+      // only works in development mode
+      return super.parse(value);
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return true;
+    }
+  }
 }

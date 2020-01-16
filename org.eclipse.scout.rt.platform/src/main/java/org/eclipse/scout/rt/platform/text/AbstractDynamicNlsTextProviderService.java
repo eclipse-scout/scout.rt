@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.eclipse.scout.rt.platform.nls.DynamicNls;
 
@@ -49,5 +50,10 @@ public abstract class AbstractDynamicNlsTextProviderService implements ITextProv
   @Override
   public Map<String, String> getTextMap(Locale locale) {
     return m_instance.getTextMap(locale);
+  }
+
+  @PreDestroy
+  public void destroy() {
+    m_instance.destroy();
   }
 }
