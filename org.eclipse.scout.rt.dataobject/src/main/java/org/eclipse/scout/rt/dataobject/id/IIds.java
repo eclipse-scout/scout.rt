@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.dataobject.id;
 
+import java.util.function.Function;
+
 import org.eclipse.scout.rt.platform.BEANS;
 
 /**
@@ -35,5 +37,13 @@ public final class IIds {
    */
   public static <ID extends IId<WT>, WT extends Comparable<WT>> ID create(Class<ID> idClass, WT value) {
     return BEANS.get(IdFactory.class).createInternal(idClass, value);
+  }
+
+  /**
+   * Returns a function to create new {@link IId} of the provided type. Bean lookup to {@link IdFactory} is cached.
+   */
+  public static <ID extends IId<WT>, WT extends Comparable<WT>> Function<WT, ID> factory(Class<ID> idClass) {
+    IdFactory idFactory = BEANS.get(IdFactory.class);
+    return value -> idFactory.createInternal(idClass, value);
   }
 }
