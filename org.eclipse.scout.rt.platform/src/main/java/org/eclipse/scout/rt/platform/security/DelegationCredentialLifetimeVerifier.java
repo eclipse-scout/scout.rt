@@ -30,7 +30,7 @@ public class DelegationCredentialLifetimeVerifier implements IPrincipalVerifier 
       return true;
     }
     try {
-      return principal.getDelegatedCred().getRemainingLifetime() > 60;
+      return principal.getDelegatedCred().getRemainingLifetime() > 120;
     }
     catch (GSSException e) {
       LOG.error("Error reading delegation credentials lifetime", e);

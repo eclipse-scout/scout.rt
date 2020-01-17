@@ -15,6 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -120,6 +121,14 @@ public interface IUiSession {
    * a sequence number <code>&lt;= sequenceNo</code> are removed from the response history.
    */
   void confirmResponseProcessed(Long sequenceNo);
+
+  /**
+   * Used to verify if the {@link Subject} we're running in should be replaced on the {@link IClientSession}.
+   *
+   * @param request
+   *          the request that is checked if the update of the Subject has been requested
+   */
+  void verifySubject(HttpServletRequest request);
 
   /**
    * @return a JSON object to send back to the client or <code>null</code> if an empty response shall be sent.

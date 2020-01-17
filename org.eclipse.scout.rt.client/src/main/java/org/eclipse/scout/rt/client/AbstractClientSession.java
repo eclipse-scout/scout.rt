@@ -81,7 +81,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private String m_id;
   private IDesktop m_desktop;
   private VirtualDesktop m_virtualDesktop;
-  private Subject m_subject;
+  private volatile Subject m_subject;
 
   private final SharedVariableMap m_sharedVariableMap;
 
@@ -226,7 +226,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * The default implementation looks in the current calling context for the URL. Typically, that URL is set only during
    * session initialization.
    *
-   * @see org.eclipse.scout.rt.ui.html.UiSession#createAndStartClientSession()
+   * @see org.eclipse.scout.rt.ui.html.UiSession#createAndStartClientSession(Locale, UserAgent, Map)
    */
   protected URI resolveBrowserUri() {
     String url = PropertyMap.CURRENT.get().get("url");
@@ -261,6 +261,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * replace the shared variable map with a new version.
    *
    * @param newMap
+   *          map to replace the current one with
    */
   @Override
   public void replaceSharedVariableMapInternal(SharedVariableMap newMap) {
@@ -425,8 +426,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   /**
-   * @deprecated since 6.1 this code moved to
-   *             {@link ClientSessionStopHelper#scheduleJobTerminationTimer(IClientSession)}
+   * @deprecated since 6.1 this code moved to {@link ClientSessionStopHelper#scheduleJobTerminationLoop(IClientSession)}
    */
   @Deprecated
   protected void cancelRunningJobs() {
