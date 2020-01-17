@@ -43,6 +43,7 @@ import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
@@ -58,6 +59,7 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.server.commons.authentication.IAccessController;
 import org.eclipse.scout.rt.server.commons.servlet.CookieUtility;
 import org.eclipse.scout.rt.server.commons.servlet.HttpClientInfo;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
@@ -688,6 +690,25 @@ public class UiSession implements IUiSession {
       return false;
     }
     return m_requestHistory.isRequestProcessed(requestSequenceNo);
+  }
+
+  /**
+   * Verifies if an access controller has created a new {@link Subject} and replaces the current one on the
+   * {@link IClientSession} with the new one. An {@link IAccessController} can request this by setting the
+   * {@link IAccessController#UPDATED_SUBJECT} attribute on the request.
+   */
+  @Override
+  public void verifySubject(HttpServletRequest request) {
+    if (m_clientSession == null) {
+      return;
+    }
+    Subject subject = RunContext.CURRENT.get().getSubject();
+    if (subject == null) {
+      return;
+    }
+    if (request.getAttribute(IAccessController.UPDATED_SUBJECT) != null) {
+      m_clientSession.setSubject(subject);
+    }
   }
 
   @Override

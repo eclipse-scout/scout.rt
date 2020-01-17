@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.security.ICredentialVerifier;
 /**
  * Provides functionality to control access to resources only accessible for authenticated users.
  * <p>
- * An {@link IAuthenticator} consists of the following 3 parts:
+ * An {@link IAccessController} consists of the following 3 parts:
  * <ol>
  * <li>Reads the user's credentials from the request, or challenges the client to provide credentials</li>
  * <li>Verifies the user's credentials, typically by delegating to a {@link ICredentialVerifier}</li>
@@ -39,6 +39,12 @@ import org.eclipse.scout.rt.platform.security.ICredentialVerifier;
  */
 @Bean
 public interface IAccessController {
+
+  /**
+   * Allows to inform the {@link org.eclipse.scout.rt.ui.html.IUiSession} that a new Subject is created by an
+   * {@link IAccessController} that should be updated on the {@link org.eclipse.scout.rt.client.IClientSession}
+   */
+  String UPDATED_SUBJECT = "scout.authentication.updatedSubject";
 
   /**
    * Invoke to authenticate the given {@link HttpServletRequest}.

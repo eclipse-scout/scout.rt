@@ -120,6 +120,8 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
         }
       }
 
+      uiSession.verifySubject(req);
+
       // Associate subsequent processing with the uiSession and jsonRequest.
       RunContexts.copyCurrent()
           .withThreadLocal(IUiSession.CURRENT, uiSession)
