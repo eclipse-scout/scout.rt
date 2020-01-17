@@ -555,6 +555,14 @@ scout.Table.prototype._onRowMouseDown = function(event) {
   var row = this._$mouseDownRow.data('row');
 
   var $target = $(event.target);
+  // handle expansion
+  if (this._isRowControl($target)) {
+    if (row.expanded) {
+      this.collapseRow(row);
+    } else {
+      this.expandRow(row);
+    }
+  }
 
   // For checkableStyle TABLE_ROW & CHECKBOX_TABLE_ROW only: check row if left click OR clicked row was not checked yet
   if (scout.isOneOf(this.checkableStyle, scout.Table.CheckableStyle.TABLE_ROW, scout.Table.CheckableStyle.CHECKBOX_TABLE_ROW) &&
@@ -573,10 +581,13 @@ scout.Table.prototype._onRowMouseDown = function(event) {
   }
 };
 
+scout.Table.prototype._isRowControl = function($target) {
+  return $target.hasClass('table-row-control') || $target.parent().hasClass('table-row-control');
+};
+
 scout.Table.prototype._onRowMouseUp = function(event) {
-  var $row, $mouseUpRow, column, $appLink, row,
-    mouseButton = event.which,
-    $target = $(event.target);
+  var $row, $mouseUpRow, column, $appLink,
+    mouseButton = event.which;
 
   if (this._doubleClickSupport.doubleClicked()) {
     // Don't execute on double click events
@@ -598,15 +609,9 @@ scout.Table.prototype._onRowMouseUp = function(event) {
     return;
   }
 
-  row = $row.data('row');
-  // handle expansion
-  if ($target.hasClass('table-row-control') ||
-    $target.parent().hasClass('table-row-control')) {
-    if (row.expanded) {
-      this.collapseRow(row);
-    } else {
-      this.expandRow(row);
-    }
+  var $target = $(event.target);
+  if (this._isRowControl($target)) {
+    // Don't start cell editor or trigger click if row control was clicked (expansion itself is handled by the mouse down handler)
     return;
   }
   if (mouseButton === 1) {
@@ -616,6 +621,7 @@ scout.Table.prototype._onRowMouseUp = function(event) {
   if ($appLink) {
     this._triggerAppLinkAction(column, $appLink.data('ref'));
   } else {
+    var row = $row.data('row');
     this._triggerRowClick(row, mouseButton);
   }
 };
@@ -2760,7 +2766,7 @@ scout.Table.prototype.updateRows = function(rows) {
     this.updateBuffer.buffer(rows);
     return;
   }
-  var filterChanged, autoOptimizeWidthColumnsDirty;
+  var filterChanged, expansionChanged, autoOptimizeWidthColumnsDirty;
   var autoOptimizeWidthColumns = this.columns.filter(function(column) {
     return column.autoOptimizeWidth && !column.autoOptimizeWidthRequired;
   });
@@ -2785,6 +2791,7 @@ scout.Table.prototype.updateRows = function(rows) {
       parentRowId = row.parentRow.id;
     }
     structureChanged = structureChanged || (scout.nvl(oldRow._parentRowId, null) !== scout.nvl(parentRowId, null));
+    expansionChanged = expansionChanged || (oldRow.expanded !== scout.nvl(row.expanded, false));
     row = this._initRow(row);
     // Check if cell values have changed
     if (row.status === scout.TableRow.Status.NON_CHANGED) {
@@ -2846,6 +2853,8 @@ scout.Table.prototype.updateRows = function(rows) {
 
   if (filterChanged) {
     this._triggerFilter();
+  }
+  if (filterChanged || expansionChanged) {
     this._renderRowDelta();
   }
 

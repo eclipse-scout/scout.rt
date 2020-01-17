@@ -648,7 +648,7 @@ describe("HierarchicalTableSpec", function() {
       table.rows[1].parentRow = table.rows[3];
       table.updateRow(table.rows[1]);
 
-      // expections
+      // expectations
       var expectedRowIds = [0, 3, 1, 2];
       expectRowIds(table.rows, expectedRowIds);
       expectRowIds(getTreeRows(table), expectedRowIds);
@@ -663,7 +663,7 @@ describe("HierarchicalTableSpec", function() {
       table.rows[1].parentRow = null;
       table.updateRow(table.rows[1]);
 
-      // expections
+      // expectations
       var expectedRowIds = [0, 1, 2, 3];
       expectRowIds(table.rows, expectedRowIds);
       expectRowIds(getTreeRows(table), expectedRowIds);
@@ -678,7 +678,7 @@ describe("HierarchicalTableSpec", function() {
       table.rows[3].parentRow = table.rows[2];
       table.updateRow(table.rows[1]);
 
-      // expections
+      // expectations
       var expectedRowIds = [0, 1, 2, 3];
       expectRowIds(table.rows, expectedRowIds);
       expectRowIds(getTreeRows(table), expectedRowIds);
@@ -689,6 +689,25 @@ describe("HierarchicalTableSpec", function() {
       expectRowIds(table.rootRows, [0]);
     });
 
+    it('applies expanded change correctly', function() {
+      var rowIds = [0, 1, 2, 3];
+      expectRowIds(table.rows, rowIds);
+      expectRowIds(table.visibleRows, rowIds);
+      expectRowIds(getExpandedRows(table), [0, 1]);
+      expectRowIds(getUiRows(table), [0, 1, 2, 3]);
+
+      var row0 = {
+        id: table.rows[0].id,
+        expanded: false,
+        cells: ['newRow0Cell0']
+      };
+      table.updateRow(row0);
+
+      expectRowIds(table.rows, rowIds);
+      expectRowIds(table.visibleRows, [0, 3]);
+      expectRowIds(getExpandedRows(table), [1]);
+      expectRowIds(getUiRows(table), [0, 3]);
+    });
   });
 
   describe("filtered visible", function() {
