@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * A notification handler allowing to register {@link INotificationListener}s for specific sessions.
  * <p>
  * Listeners can be called within the context of the given session upon receipt of a notification.
- * {@link INotificationListener.#handleNotification(Serializable)} is not called within a model job (see
+ * {@link INotificationListener#handleNotification(Serializable)} is not called within a model job (see
  * {@link ModelJobs})
  * </p>
  */
