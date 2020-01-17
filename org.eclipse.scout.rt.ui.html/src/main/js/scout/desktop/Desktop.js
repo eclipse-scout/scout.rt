@@ -989,6 +989,16 @@ scout.Desktop.prototype.onLayoutAnimationComplete = function() {
   this.animateLayoutChange = false;
 };
 
+scout.Desktop.prototype.onLayoutAnimationStep = function() {
+  this.repositionTooltips();
+};
+
+scout.Desktop.prototype.repositionTooltips = function() {
+  this.$container.children('.tooltip').each(function() {
+    scout.widget($(this)).position();
+  });
+};
+
 scout.Desktop.prototype.onResize = function(event) {
   this.revalidateLayoutTree();
 };
