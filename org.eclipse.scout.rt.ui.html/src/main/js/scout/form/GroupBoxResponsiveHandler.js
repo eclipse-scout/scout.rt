@@ -192,6 +192,7 @@ scout.GroupBoxResponsiveHandler.prototype._transformLabelPositionOnTop = functio
   if (field.parent instanceof scout.SequenceBox ||
     field instanceof scout.CheckBoxField ||
     field instanceof scout.LabelField ||
+    field instanceof scout.PlaceholderField ||
     field.labelPosition === scout.FormField.LabelPosition.ON_FIELD) {
     return;
   }
