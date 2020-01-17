@@ -1150,6 +1150,10 @@ export default class Desktop extends Widget {
     this.animateLayoutChange = false;
   }
 
+  onLayoutAnimationStep() {
+    this.repositionTooltips();
+  }
+
   onResize(event) {
     this.revalidateLayoutTree();
   }
@@ -1337,5 +1341,11 @@ export default class Desktop extends Widget {
     if (!$targetOverlay.isOrHas($targetOverlay.activeElement())) {
       this.session.focusManager.activateFocusContext($targetOverlay);
     }
+  }
+
+  repositionTooltips() {
+    this.$container.children('.tooltip').each(function() {
+      scout.widget($(this)).position();
+    });
   }
 }

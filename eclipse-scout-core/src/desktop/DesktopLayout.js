@@ -86,6 +86,7 @@ export default class DesktopLayout extends AbstractLayout {
           .subtract(htmlBench.margins());
         if (!animated || fullWidthNavigation) {
           htmlBench.setSize(benchSize);
+          desktop.repositionTooltips();
         }
 
         if (animated) {
@@ -121,16 +122,17 @@ export default class DesktopLayout extends AbstractLayout {
     // If animation is already running, stop the existing and don't use timeout to schedule the new to have a smoother transition
     // Concurrent animation of the same element is bad because jquery messes up the overflow style
     if (htmlComp.$comp.is(':animated')) {
-      htmlComp.$comp.stop().animate(animationProps, {
-        complete: this.desktop.onLayoutAnimationComplete.bind(this.desktop)
-      });
+      animate.call(this);
     } else {
       // schedule animation to have a smoother start
-      setTimeout(function() {
-        htmlComp.$comp.stop().animate(animationProps, {
-          complete: this.desktop.onLayoutAnimationComplete.bind(this.desktop)
-        });
-      }.bind(this));
+      setTimeout(animate.bind(this));
+    }
+
+    function animate() {
+      htmlComp.$comp.stop().animate(animationProps, {
+        complete: this.desktop.onLayoutAnimationComplete.bind(this.desktop),
+        step: this.desktop.onLayoutAnimationStep.bind(this.desktop)
+      });
     }
   }
 
