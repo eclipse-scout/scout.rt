@@ -262,11 +262,6 @@ scout.TileGrid.prototype._insertTiles = function(tiles) {
   tiles.forEach(function(tile) {
     this._insertTile(tile);
   }, this);
-
-  if (this.rendered && !this.htmlComp.layouting) {
-    // no need to invalidate when tile placeholders are added or removed while layouting
-    this.invalidateLayoutTree();
-  }
 };
 
 scout.TileGrid.prototype._insertTile = function(tile) {
@@ -317,6 +312,11 @@ scout.TileGrid.prototype._renderInsertTiles = function(tiles) {
       }
     }.bind(this));
   }, this);
+
+  if (!this.htmlComp.layouting) {
+    // no need to invalidate when tile placeholders are added or removed while layouting
+    this.invalidateLayoutTree();
+  }
 };
 
 scout.TileGrid.prototype._removeAllTiles = function() {
