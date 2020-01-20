@@ -87,7 +87,12 @@
   }
 
   &.first {
-    padding-left: @wizard-progress-content-h-padding;
+    /* 3px = box-shadow width */
+    padding-left: 3px;
+  }
+
+  &.last {
+    padding-right: 3px;
   }
 
   &.last > .wizard-step-content {
@@ -168,31 +173,4 @@
   font-size: 28px;
   color: @wizard-step-disabled-color;
   vertical-align: middle;
-}
-
-/* Special rules for wizard container form */
-.form.wizard-container-form > .root-group-box {
-
-  /* If wizard progress field is in the root-group-box, use negative margins to */
-  /* draw it up to the border of the form (like the main-menubar itself). */
-
-  & > .group-box-body > .wizard-progress-field > .wizard-steps {
-    margin-left: -@root-group-box-padding-left;
-    margin-right: -@root-group-box-padding-right;
-
-    /* Align first and last step content with form fields */
-
-    & > .wizard-steps-body {
-      border-left: 0;
-      border-right: 0;
-
-      & > .wizard-step.first {
-        padding-left: @root-group-box-padding-left + @mandatory-indicator-width;
-      }
-
-      & > .wizard-step.last {
-        padding-right: @root-group-box-padding-right;
-      }
-    }
-  }
 }
