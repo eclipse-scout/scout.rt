@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.security.MalwareScanner;
+import org.eclipse.scout.rt.platform.security.UnsafeResourceException;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
@@ -139,7 +140,8 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     try {
       readUploadData(httpServletRequest, binaryResourceConsumer.getMaximumBinaryResourceUploadSize(), uploadProperties, uploadResources);
     }
-    catch (PlatformException ex) { // NOSONAR
+    catch (UnsafeResourceException e) { // NOSONAR
+      // LOG is done by MalwareScanner which is the only class throwing this exception
       writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createUnsafeUploadResponse());
       return;
     }
