@@ -34,6 +34,12 @@ export default class PopupManager extends Widget {
     this._openPopups(arrays.diff(popups, this.popups));
     this._destroyPopups(arrays.diff(this.popups, popups));
     this._setProperty('popups', popups);
+    // re-parent popups, since PopupManager is not a real widget but only used to sync data
+    this.popups.forEach(function(popup) {
+      if (popup.parent instanceof scout.PopupManager) {
+        popup.setParent(this.session.desktop);
+      }
+    }.bind(this));
   }
 
   _openPopups(popups) {

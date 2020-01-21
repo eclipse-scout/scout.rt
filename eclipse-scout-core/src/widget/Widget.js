@@ -1128,13 +1128,12 @@ export default class Widget {
   }
 
   /**
-   * @param [$element] (optional) element from which the entryPoint will be resolved. If not set this.parent.$container is used.
-   * @returns {$} the entry-point for this Widget. If the widget is part of the main-window it returns this.session.$entryPoint,
+   * @returns {$} the entry-point for this Widget or its parent. If the widget is part of the main-window it returns this.session.$entryPoint,
    * for popup-window this function will return the body of the document in the popup window.
    */
-  entryPoint($element) {
-    $element = scout.nvl($element, this.parent.$container);
-    if (!$element.length) {
+  entryPoint() {
+    var $element = scout.nvl(this.$container, this.parent.$container);
+    if (!$element || !$element.length) {
       throw new Error('Cannot resolve entryPoint, $element.length is 0 or undefined');
     }
     return $element.entryPoint();
