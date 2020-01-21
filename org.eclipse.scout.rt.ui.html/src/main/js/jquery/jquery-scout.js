@@ -37,6 +37,12 @@ function elemVisible(elem) {
   }
   // Must use correct window for element / computedStyle
   var myWindow = (elem instanceof Document ? elem : elem.ownerDocument).defaultView;
+  // In some cases with popup windows the window object may be already set to null
+  // but we still have a valid reference to a DOM element. In that case we assume
+  // the element is not visible anymore.
+  if (!myWindow) {
+    return false;
+  }
   // Check if element itself is hidden by external style-sheet
   if (isHidden(myWindow.getComputedStyle(elem))) {
     return false;
