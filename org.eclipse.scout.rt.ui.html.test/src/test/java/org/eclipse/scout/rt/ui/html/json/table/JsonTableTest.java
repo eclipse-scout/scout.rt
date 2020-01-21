@@ -226,6 +226,80 @@ public class JsonTableTest {
   }
 
   /**
+   * Selection must not be cleared if rowIds cannot be resolved.
+   */
+  @Test
+  public void testIgnorableSelectionEventInconsistentState() throws JSONException {
+    Table table = new Table();
+    table.fill(5);
+    table.init();
+
+    ITableRow row2 = table.getRow(2);
+    ITableRow row4 = table.getRow(4);
+    table.selectRow(row2);
+
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+    jsonTable.toJson();
+
+    assertTrue(row2.isSelected());
+    assertFalse(row4.isSelected());
+
+    // ----------
+
+    // Model selection MUST NOT be cleared when an invalid selection is sent from the UI
+
+    JsonEvent event = createJsonRowsSelectedEvent("not-existing-id");
+    jsonTable.handleUiEvent(event);
+    jsonTable.cleanUpEventFilters();
+
+    assertTrue(row2.isSelected());
+    assertFalse(row4.isSelected());
+
+    // No reply (we assume that the UI state is correct and only the event was wrong, e.g. due to caching)
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_uiSession.currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
+    assertTrue(responseEvents.size() == 0);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ----------
+
+    // Model selection MUST be cleared when an empty selection is sent from the UI
+
+    event = createJsonRowsSelectedEvent(null);
+    jsonTable.handleUiEvent(event);
+    jsonTable.cleanUpEventFilters();
+
+    assertFalse(row2.isSelected());
+    assertFalse(row4.isSelected());
+
+    // No reply (states should be equal)
+    responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_uiSession.currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
+    assertTrue(responseEvents.size() == 0);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ----------
+
+    // Model selection MUST be updated when a partially invalid selection is sent from the UI
+
+    event = createJsonRowsSelectedEvent("not-existing-id");
+    event.getData().getJSONArray(JsonTable.PROP_ROW_IDS).put(jsonTable.getTableRowId(row4));
+    jsonTable.handleUiEvent(event);
+    jsonTable.cleanUpEventFilters();
+
+    assertFalse(row2.isSelected());
+    assertTrue(row4.isSelected());
+
+    // Inform the UI about the change
+    responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_uiSession.currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
+    assertTrue(responseEvents.size() == 1);
+    List<ITableRow> tableRows = jsonTable.extractTableRows(responseEvents.get(0).getData());
+    assertEquals(row4, tableRows.get(0));
+    JsonTestUtility.endRequest(m_uiSession);
+  }
+
+  /**
    * Response must not contain the row_order_changed event if the sort was triggered by the request
    */
   @Test
