@@ -1087,4 +1087,43 @@ describe("Popup", function() {
       });
     });
   });
+
+  describe('open popup delayed/immediately', function() {
+
+    it('open popup not until parent is rendered and layouted', function() {
+      var stringField = scout.create('StringField', {
+        parent: session.desktop
+      });
+      var popup = scout.create('Popup', {
+        parent: stringField
+      });
+      var popupOpen = false;
+      session.desktop.on('popupOpen', function(event) {
+        popupOpen = true;
+      });
+      popup.open();
+      expect(popupOpen).toBe(false);
+      expect(popup.rendered).toBe(false);
+      stringField.render();
+      expect(popupOpen).toBe(false);
+      expect(popup.rendered).toBe(false);
+      stringField.validateLayoutTree();
+      expect(popupOpen).toBe(true);
+      expect(popup.rendered).toBe(true);
+    });
+
+    it('open popup immediately when $parent is provided', function() {
+      var stringField = scout.create('StringField', {
+        parent: session.desktop
+      });
+      var popup = scout.create('Popup', {
+        parent: stringField
+      });
+      stringField.render();
+      popup.open();
+      expect(popup.rendered).toBe(true);
+    });
+
+  });
+
 });

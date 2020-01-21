@@ -151,14 +151,33 @@ scout.Popup.prototype._createLayout = function() {
   return new scout.PopupLayout(this);
 };
 
-scout.Popup.prototype.open = function($parent) {
+scout.Popup.prototype._openWithoutParent = function() {
+  // resolve parent for entry-point (don't change the actual property)
+  var parent = this.parent;
+  if (parent.destroyed) {
+    return;
+  }
+  if (parent.rendered || parent.rendering) {
+    this.open(parent.entryPoint());
+    return;
+  }
+
   // This is important for popups rendered in another (native) browser window. The DOM in the popup window
   // is rendered later, so we must wait until that window is rendered and layouted. See popup-window.html.
-  if (!$parent && !this.parent.rendered) {
-   this.parent.one('render', function() {
-     this.session.layoutValidator.schedulePostValidateFunction(this.open.bind(this));
-   }.bind(this));
-   return;
+  parent.one('render', function() {
+    this.session.layoutValidator.schedulePostValidateFunction(function() {
+      if (this.destroyed || this.rendered) {
+        return;
+      }
+      this.open();
+    }.bind(this));
+  }.bind(this));
+};
+
+scout.Popup.prototype.open = function($parent) {
+  if (!$parent) {
+    this._openWithoutParent();
+    return;
   }
 
   this._triggerPopupOpenEvent();

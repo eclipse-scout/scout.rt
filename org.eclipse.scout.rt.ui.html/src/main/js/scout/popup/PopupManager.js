@@ -31,6 +31,12 @@ scout.PopupManager.prototype._setPopups = function(popups) {
   this._openPopups(scout.arrays.diff(popups, this.popups));
   this._destroyPopups(scout.arrays.diff(this.popups, popups));
   this._setProperty('popups', popups);
+  // re-parent popups, since PopupManager is not a real widget but only used to sync data
+  this.popups.forEach(function(popup) {
+    if (popup.parent instanceof scout.PopupManager) {
+      popup.setParent(this.session.desktop);
+    }
+  }.bind(this));
 };
 
 scout.PopupManager.prototype._openPopups = function(popups) {
