@@ -925,6 +925,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
 
   public List<ITreeNode> extractTreeNodes(JSONObject json) {
     JSONArray nodeIds = json.getJSONArray(PROP_NODE_IDS);
+    return extractTreeNodes(nodeIds);
+  }
+
+  public List<ITreeNode> extractTreeNodes(JSONArray nodeIds) {
     List<ITreeNode> nodes = new ArrayList<>(nodeIds.length());
     for (int i = 0; i < nodeIds.length(); i++) {
       ITreeNode node = optTreeNodeForNodeId(nodeIds.getString(i));
@@ -989,8 +993,15 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   }
 
   protected void handleUiNodesSelected(JsonEvent event) {
-    final List<ITreeNode> nodes = extractTreeNodes(event.getData());
-    addTreeEventFilterCondition(TreeEvent.TYPE_NODES_SELECTED).setNodes(nodes);
+    final JSONArray nodeIds = event.getData().getJSONArray(PROP_NODE_IDS);
+    final List<ITreeNode> nodes = extractTreeNodes(nodeIds);
+    if (nodes.isEmpty() && nodeIds.length() > 0) {
+      // Ignore inconsistent selections from UI (probably an obsolete cached event)
+      return;
+    }
+    if (nodes.size() == nodeIds.length()) {
+      addTreeEventFilterCondition(TreeEvent.TYPE_NODES_SELECTED).setNodes(nodes);
+    }
     getModel().getUIFacade().setNodesSelectedFromUI(nodes);
   }
 

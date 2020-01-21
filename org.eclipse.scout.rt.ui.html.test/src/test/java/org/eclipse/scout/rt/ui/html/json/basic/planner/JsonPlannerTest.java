@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.html.json.basic.planner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,6 +35,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonDateRange;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -120,6 +123,92 @@ public class JsonPlannerTest {
 
     Object value = JsonTestUtility.extractProperty(m_uiSession.currentJsonResponse(), jsonPlanner.getId(), IPlanner.PROP_SELECTION_RANGE);
     assertEquals(adjustedRange, new Range<>(jsonPlanner.toJavaDate((JSONObject) value, "from"), jsonPlanner.toJavaDate((JSONObject) value, "to")));
+  }
+
+  /**
+   * Selection must not be cleared if resourceIds cannot be resolved.
+   */
+  @Test
+  public void testIgnorableSelectionEventInconsistentState() throws JSONException {
+    P_Planner planner = createPlanner();
+    Resource<Integer> resource0 = createResource(0);
+    Resource<Integer> resource1 = createResource(1);
+    Resource<Integer> resource2 = createResource(2);
+    planner.addResource(resource0);
+    planner.addResource(resource1);
+    planner.addResource(resource2);
+    planner.selectResource(resource0);
+
+    JsonPlanner<IPlanner<?, ?>> jsonPlanner = UiSessionTestUtility.newJsonAdapter(m_uiSession, planner, null);
+    jsonPlanner.toJson();
+
+    assertTrue(planner.getSelectedResources().contains(resource0));
+    assertFalse(planner.getSelectedResources().contains(resource1));
+
+    // ----------
+
+    // Model selection MUST NOT be cleared when an invalid selection is sent from the UI
+
+    JsonEvent event = createJsonSelectedEvent("not-existing-id");
+    jsonPlanner.handleUiEvent(event);
+    jsonPlanner.cleanUpEventFilters();
+
+    assertTrue(planner.getSelectedResources().contains(resource0));
+    assertFalse(planner.getSelectedResources().contains(resource1));
+
+    // No reply (we assume that the UI state is correct and only the event was wrong, e.g. due to caching)
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_uiSession.currentJsonResponse(), JsonPlanner.EVENT_RESOURCES_SELECTED);
+    assertTrue(responseEvents.size() == 0);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ----------
+
+    // Model selection MUST be cleared when an empty selection is sent from the UI
+
+    event = createJsonSelectedEvent(null);
+    jsonPlanner.handleUiEvent(event);
+    jsonPlanner.cleanUpEventFilters();
+
+    assertFalse(planner.getSelectedResources().contains(resource0));
+    assertFalse(planner.getSelectedResources().contains(resource1));
+
+    // No reply (states should be equal)
+    responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_uiSession.currentJsonResponse(), JsonPlanner.EVENT_RESOURCES_SELECTED);
+    assertTrue(responseEvents.size() == 0);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ----------
+
+    // Model selection MUST be updated when a partially invalid selection is sent from the UI
+
+    event = createJsonSelectedEvent("not-existing-id");
+    event.getData().getJSONArray(JsonPlanner.PROP_RESOURCE_IDS).put(jsonPlanner.getResourceId(resource1));
+    jsonPlanner.handleUiEvent(event);
+    jsonPlanner.cleanUpEventFilters();
+
+    assertFalse(planner.getSelectedResources().contains(resource0));
+    assertTrue(planner.getSelectedResources().contains(resource1));
+
+    // Inform the UI about the change
+    responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_uiSession.currentJsonResponse(), JsonPlanner.EVENT_RESOURCES_SELECTED);
+    assertTrue(responseEvents.size() == 1);
+    List<Resource<?>> resources = jsonPlanner.extractResources(responseEvents.get(0).getData());
+    assertEquals(resource1, resources.get(0));
+    JsonTestUtility.endRequest(m_uiSession);
+  }
+
+  public static JsonEvent createJsonSelectedEvent(String resourceId) throws JSONException {
+    String tableId = "x"; // never used
+    JSONObject data = new JSONObject();
+    JSONArray resourceIds = new JSONArray();
+    if (resourceId != null) {
+      resourceIds.put(resourceId);
+    }
+    data.put(JsonPlanner.PROP_RESOURCE_IDS, resourceIds);
+    return new JsonEvent(tableId, JsonPlanner.EVENT_RESOURCES_SELECTED, data);
   }
 
   public static JsonEvent createSelectionChangeEvent(String adapterId, Range<Date> range) throws JSONException {

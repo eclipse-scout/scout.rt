@@ -148,7 +148,7 @@ public final class JsonTestUtility {
   /**
    * Empties the response object and flushes the session
    */
-  public static void endRequest(UiSession uiSession) throws Exception {
+  public static void endRequest(UiSession uiSession) {
     UiSessionTestUtility.endRequest(uiSession);
   }
 

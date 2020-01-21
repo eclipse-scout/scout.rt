@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWidget<PLANNER> implements IJsonContextMenuOwner {
   private static final Logger LOG = LoggerFactory.getLogger(JsonPlanner.class);
 
+  public static final String PROP_RESOURCE_IDS = "resourceIds";
   public static final String EVENT_PLANNER_CHANGED = "plannerChanged";
   public static final String EVENT_RESOURCES_INSERTED = "resourcesInserted";
   public static final String EVENT_RESOURCES_UPDATED = "resourcesUpdated";
@@ -348,7 +349,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
 
   protected void handleModelResourcesSelected(List<? extends Resource> resources) {
     JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, "resourceIds", resourceIdsToJson(resources, new P_ResourceIdProvider()));
+    putProperty(jsonEvent, PROP_RESOURCE_IDS, resourceIdsToJson(resources, new P_ResourceIdProvider()));
     addActionEvent(EVENT_RESOURCES_SELECTED, jsonEvent);
   }
 
@@ -384,7 +385,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
     JSONObject jsonEvent = new JSONObject();
     for (Resource resource : resources) {
       String resourceId = getResourceId(resource);
-      jsonEvent.append("resourceIds", resourceId);
+      jsonEvent.append(PROP_RESOURCE_IDS, resourceId);
       disposeResource(resource);
     }
     addActionEvent(EVENT_RESOURCES_DELETED, jsonEvent);
@@ -397,7 +398,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
 
   protected void handleModelResourceOrderChanged(List<? extends Resource> resources) {
     JSONObject jsonEvent = new JSONObject();
-    jsonEvent.put("resourceIds", resourceIdsToJson(resources, new P_ResourceIdProvider()));
+    jsonEvent.put(PROP_RESOURCE_IDS, resourceIdsToJson(resources, new P_ResourceIdProvider()));
     JSONArray jsonResourceIds = new JSONArray();
     for (Resource resource : resources) {
       String resourceId = getResourceId(resource);
@@ -426,8 +427,15 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
 
   @SuppressWarnings("unchecked")
   protected void handleUiResourcesSelected(JsonEvent event) {
-    List<Resource<?>> resources = extractResources(event.getData());
-    addPlannerEventFilterCondition(PlannerEvent.TYPE_RESOURCES_SELECTED).setResources(resources);
+    JSONArray resourceIds = event.getData().getJSONArray(PROP_RESOURCE_IDS);
+    List<Resource<?>> resources = extractResources(resourceIds);
+    if (resources.isEmpty() && resourceIds.length() > 0) {
+      // Ignore inconsistent selections from UI (probably an obsolete cached event)
+      return;
+    }
+    if (resources.size() == resourceIds.length()) {
+      addPlannerEventFilterCondition(PlannerEvent.TYPE_RESOURCES_SELECTED).setResources(resources);
+    }
     getModel().getUIFacade().setSelectedResourcesFromUI(resources);
   }
 
@@ -504,7 +512,11 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
   }
 
   protected List<Resource<?>> extractResources(JSONObject json) {
-    JSONArray resourceIds = json.getJSONArray("resourceIds");
+    JSONArray resourceIds = json.getJSONArray(PROP_RESOURCE_IDS);
+    return extractResources(resourceIds);
+  }
+
+  protected List<Resource<?>> extractResources(JSONArray resourceIds) {
     List<Resource<?>> resources = new ArrayList<>(resourceIds.length());
     for (int i = 0; i < resourceIds.length(); i++) {
       Resource<?> resource = getResource((String) resourceIds.get(i));

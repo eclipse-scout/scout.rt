@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -149,6 +150,84 @@ public class JsonTreeTest {
 //    List<ITreeNode> treeNodes = jsonTree.extractTreeNodes(responseEvents.get(0).getData());
 //    assertEquals(firstNode, treeNodes.get(0));
 //  }
+
+  /**
+   * Selection must not be cleared if nodeIds cannot be resolved.
+   */
+  @Test
+  public void testIgnorableSelectionEventInconsistentState() throws JSONException {
+    TreeNode node0 = new TreeNode();
+    TreeNode node1 = new TreeNode();
+    TreeNode node2 = new TreeNode();
+    TreeNode child0 = new TreeNode();
+    TreeNode child1 = new TreeNode();
+
+    List<ITreeNode> nodes = new ArrayList<>(Arrays.asList(node0, node1, node2));
+    ITree tree = createTree(nodes);
+    tree.addChildNode(node0, child0);
+    tree.addChildNode(node0, child1);
+    tree.selectNode(node0);
+
+    JsonTree<ITree> jsonTree = UiSessionTestUtility.newJsonAdapter(m_uiSession, tree, null);
+    jsonTree.toJson();
+
+    assertTrue(node0.isSelectedNode());
+    assertFalse(node1.isSelectedNode());
+
+    // ----------
+
+    // Model selection MUST NOT be cleared when an invalid selection is sent from the UI
+
+    JsonEvent event = createJsonSelectedEvent("not-existing-id");
+    jsonTree.handleUiEvent(event);
+    jsonTree.cleanUpEventFilters();
+
+    assertTrue(node0.isSelectedNode());
+    assertFalse(node1.isSelectedNode());
+
+    // No reply (we assume that the UI state is correct and only the event was wrong, e.g. due to caching)
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODES_SELECTED);
+    assertTrue(responseEvents.size() == 0);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ----------
+
+    // Model selection MUST be cleared when an empty selection is sent from the UI
+
+    event = createJsonSelectedEvent(null);
+    jsonTree.handleUiEvent(event);
+    jsonTree.cleanUpEventFilters();
+
+    assertFalse(node0.isSelectedNode());
+    assertFalse(node1.isSelectedNode());
+
+    // No reply (states should be equal)
+    responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODES_SELECTED);
+    assertTrue(responseEvents.size() == 0);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ----------
+
+    // Model selection MUST be updated when a partially invalid selection is sent from the UI
+
+    event = createJsonSelectedEvent("not-existing-id");
+    event.getData().getJSONArray(JsonTree.PROP_NODE_IDS).put(jsonTree.getNodeId(node1));
+    jsonTree.handleUiEvent(event);
+    jsonTree.cleanUpEventFilters();
+
+    assertFalse(node0.isSelectedNode());
+    assertTrue(node1.isSelectedNode());
+
+    // Inform the UI about the change
+    responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODES_SELECTED);
+    assertTrue(responseEvents.size() == 1);
+    List<ITreeNode> treeNodes = jsonTree.extractTreeNodes(responseEvents.get(0).getData());
+    assertEquals(node1, treeNodes.get(0));
+    JsonTestUtility.endRequest(m_uiSession);
+  }
 
   /**
    * Response must not contain the expansion event if the expansion was triggered by the request
@@ -848,7 +927,9 @@ public class JsonTreeTest {
     String desktopId = "x"; // never used
     JSONObject data = new JSONObject();
     JSONArray nodeIds = new JSONArray();
-    nodeIds.put(nodeId);
+    if (nodeId != null) {
+      nodeIds.put(nodeId);
+    }
     data.put(JsonTree.PROP_NODE_IDS, nodeIds);
     return new JsonEvent(desktopId, JsonTree.EVENT_NODES_SELECTED, data);
   }
