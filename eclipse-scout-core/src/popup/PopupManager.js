@@ -38,7 +38,7 @@ export default class PopupManager extends Widget {
 
   _openPopups(popups) {
     popups.forEach(function(popup) {
-      popup.open(popup.session.$entryPoint);
+      popup.open(); // Let the popup itself determine the entry point (important for popup windows)
     });
   }
 
