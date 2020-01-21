@@ -28,16 +28,24 @@ export default class PageLayout extends AbstractLayout {
       nodeMenuBar = this.outline.nodeMenuBar,
       nodeMenuBarPrefSize = 0,
       detailMenuBar = this.outline.detailMenuBar,
-      detailMenuBarHeight = 0;
+      detailMenuBarHeight = 0,
+      textWidth = 0;
 
     containerSize = htmlContainer.availableSize()
       .subtract(htmlContainer.insets());
+    textWidth = containerSize.width;
+
+    if ($icon.length > 0) {
+      textWidth -= graphics.prefSize($icon).width;
+    }
 
     if (nodeMenuBar.visible) {
       nodeMenuBarPrefSize = nodeMenuBar.htmlComp.prefSize();
       nodeMenuBar.htmlComp.setSize(nodeMenuBarPrefSize);
-      $text.cssWidth(containerSize.width - nodeMenuBarPrefSize.add(nodeMenuBar.htmlComp.margins()).width);
+      textWidth -= nodeMenuBarPrefSize.add(nodeMenuBar.htmlComp.margins()).width;
     }
+
+    $text.cssWidth(textWidth);
 
     if (detailMenuBar.visible) {
       detailMenuBarHeight = detailMenuBar.htmlComp.prefSize().height;
@@ -66,19 +74,24 @@ export default class PageLayout extends AbstractLayout {
       detailMenuBar = this.outline.detailMenuBar,
       detailMenuBarPrefSize = new Dimension(),
       nodeMenuBar = this.outline.nodeMenuBar,
-      nodeMenuBarWidth = 0;
+      textWidth = 0;
 
     containerSize = htmlContainer.size()
       .subtract(htmlContainer.insets());
+    textWidth = containerSize.width;
+
+    if ($icon.length > 0) {
+      textWidth -= graphics.prefSize($icon).width;
+    }
 
     if (nodeMenuBar.visible && nodeMenuBar.rendered) {
-      nodeMenuBarWidth = nodeMenuBar.htmlComp.prefSize().width;
+      textWidth -= nodeMenuBar.htmlComp.prefSize().width;
     }
 
     // needs a width to be able to calculate the pref height -> container width needs to be correct already
     textHeight = graphics.prefSize($text, {
       includeMargin: true,
-      widthHint: containerSize.width - nodeMenuBarWidth
+      widthHint: textWidth
     }).height;
 
     if ($icon.length > 0) {
