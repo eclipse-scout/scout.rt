@@ -46,7 +46,7 @@ describe('TableHeaderSpec', function() {
 
   });
 
-  fit('hiddenByUi', function() {
+  it('hiddenByUi', function() {
     var table = helper.createTableWithOneColumn();
     table.setMenus([scout.create('Menu', { // fake header menu required to properly calculate visibility
       parent: table,
