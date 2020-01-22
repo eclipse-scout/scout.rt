@@ -510,18 +510,6 @@
         <version>2.1.1</version>
       </dependency>
 
-      <dependency>
-        <groupId>javax.xml.ws</groupId>
-        <artifactId>jaxws-api</artifactId>
-        <version>2.3.1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.activation</groupId>
-            <artifactId>javax.activation-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
       <!-- Jersey (REST) -->
       <dependency>
         <!-- must be compatible with the javax.ws.rs-api version (rs-api 2.0.x is implemented in Jersey 2.25.x, rs-api 2.1.x in Jersey 2.26+) -->
