@@ -27,7 +27,7 @@ scout.MenuBar = function() {
   this.defaultMenu = null;
   this.visible = false;
   this.ellipsisMenuPosition = scout.MenuBar.EllipsisPosition.RIGHT;
-
+  this.hiddenByUi = false;
   this._menuItemPropertyChangeHandler = this._onMenuItemPropertyChange.bind(this);
 
   this._addWidgetProperties('menuItems');
@@ -330,6 +330,16 @@ scout.MenuBar.prototype.updateLastItemMarker = function() {
   if (this._lastVisibleItem && this._lastVisibleItem.rendered) {
     this._lastVisibleItem.$container.addClass('last');
   }
+};
+
+/**
+ * Sets the property hiddenByUi. This does not automatically update the visibility of the menus.
+ * We assume that #updateVisibility() is called later anyway.
+ *
+ * @param {boolean} hiddenByUi
+ */
+scout.MenuBar.prototype.setHiddenByUi = function(hiddenByUi) {
+  this.setProperty('hiddenByUi', hiddenByUi);
 };
 
 scout.MenuBar.prototype.updateVisibility = function() {
