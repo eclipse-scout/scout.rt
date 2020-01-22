@@ -42,9 +42,6 @@ scout.TableHeader.prototype._render = function() {
   // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly
   this.$filler = this.$container.appendDiv('table-header-item filler').css('visibility', 'hidden');
 
-  if (!this.enabled) {
-    this.menuBar.hiddenByUi = true;
-  }
   // Required to make "height: 100%" rule work. menuBarContainer and menuBar itself must have the same visibility.
   // Otherwise they could cover the sorting/filter icons on the table-header of the column.
   this.$menuBarContainer = this.$container
@@ -461,6 +458,7 @@ scout.TableHeader.prototype._adjustColumnMinWidth = function(column) {
 
 scout.TableHeader.prototype.updateMenuBar = function() {
   var menuItems = this.table._filterMenus(this.table.menus, scout.MenuDestinations.HEADER);
+  this.menuBar.setHiddenByUi(!this.enabled); // enabledComputed not used on purpose
   this.menuBar.setMenuItems(menuItems);
 };
 
