@@ -104,6 +104,8 @@
     <sonar.exclusions>**/resources/WebContent/**</sonar.exclusions>
     <sonar.coverage.exclusions>*.test/**,
       **/resources/WebContent/**</sonar.coverage.exclusions>
+
+    <master_plugin_jaxws_version>2.6.1</master_plugin_jaxws_version>
   </properties>
 
   <dependencyManagement>
