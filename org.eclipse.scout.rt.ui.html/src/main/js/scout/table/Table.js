@@ -1430,8 +1430,53 @@ scout.Table.prototype._calculateRowBorderWidth = function() {
 
 scout.Table.prototype._updateRowWidth = function() {
   this.rowWidth = this.visibleColumns().reduce(function(sum, column) {
-    return sum + column.width;
-  }, this.rowBorderWidth);
+    if (this.autoResizeColumns) {
+      return sum + column.width;
+    }
+    // Ensure the row is as long as all cells. Only necessary to use the _realWidth if the device.hasTableCellZoomBug().
+    // If autoResizeColumns is enabled, it is not possible to do a proper calculation with this bug
+    // -> Use regular width and live with the consequence that the last cell of a table with many columns is not fully visible
+    return sum + column._realWidthIfAvailable();
+  }.bind(this), this.rowBorderWidth);
+};
+
+/**
+ * A html element with display: table-cell gets the wrong width in Chrome when zoom is enabled, see
+ * https://bugs.chromium.org/p/chromium/issues/detail?id=740502.
+ * Because the table header items don't use display: table-cell, theirs width is correct.
+ * -> Header items and table cells are not in sync which is normally not a big deal but gets visible very well with a lot of columns.
+ * This method reads the real width and stores it on the column so that the header can use it when setting the header item's size.
+ * It is also necessary to update the row width accordingly otherwise it would be cut at the very right.
+ */
+scout.Table.prototype._updateRealColumnWidths = function($row) {
+  if (!scout.device.hasTableCellZoomBug()) {
+    return false;
+  }
+  var changed = false;
+  this.visibleColumns().forEach(function(column, colIndex) {
+    if (this._updateRealColumnWidth(column, colIndex, $row)) {
+      changed = true;
+    }
+  }, this);
+  return changed;
+};
+
+scout.Table.prototype._updateRealColumnWidth = function(column, colIndex, $row) {
+  if (!scout.device.hasTableCellZoomBug()) {
+    return false;
+  }
+  $row = $row || this.$rows().eq(0);
+  var $cell = this.$cell(scout.nvl(colIndex, column), $row);
+  if ($cell.length === 0 && column._realWidth !== null) {
+    column._realWidth = null;
+    return true;
+  }
+  var realWidth = scout.graphics.size($cell, {exact: true}).width;
+  if (realWidth !== column._realWidth) {
+    column._realWidth = realWidth;
+    return true;
+  }
+  return false;
 };
 
 scout.Table.prototype._updateRowHeight = function() {
@@ -1517,6 +1562,17 @@ scout.Table.prototype._renderRowsInRange = function(range) {
 
   $rows.each(function(index, rowObject) {
     var $row = $(rowObject);
+    // Workaround for Chrome bug, see updateExactColumnWidths
+    // Can be removed when Chrome bug is resolved.
+    // This is only necessary once (when the first row is rendered)
+    if (this.viewRangeRendered.size() === numRowsRendered && this._updateRealColumnWidths($row)) {
+      this._updateRowWidth();
+      if (this.header && this.header.rendered) {
+        this.header.resizeHeaderItems();
+      }
+    }
+    $row.cssWidth(this.rowWidth);
+    // End workaround
     var row = rows[range.from + index];
     scout.Table.linkRowToDiv(row, $row);
     this._installRow(row);
@@ -3312,6 +3368,10 @@ scout.Table.prototype.$cellsForRow = function($row) {
   return $row.children('.table-cell');
 };
 
+/**
+ * @param {scout.Column|number} column or columnIndex
+ * @returns {$}
+ */
 scout.Table.prototype.$cell = function(column, $row) {
   var columnIndex = column;
   if (typeof column !== 'number') {
@@ -3710,6 +3770,7 @@ scout.Table.prototype.resizeColumn = function(column, width) {
       // same calculation in scout.Column.prototype.buildCellForRow;
     }
 
+    this._updateRealColumnWidth(column);
     this._updateRowWidth();
     this.$rows(true)
       .css('width', this.rowWidth);

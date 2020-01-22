@@ -566,6 +566,13 @@ scout.Device.prototype.isTableAdditionalDivRequired = function() {
   }.bind(this));
 };
 
+/**
+ *  https://bugs.chromium.org/p/chromium/issues/detail?id=740502
+ */
+scout.Device.prototype.hasTableCellZoomBug = function() {
+  return this.browser === scout.Device.Browser.CHROME;
+};
+
 scout.Device.prototype.requiresIframeSecurityAttribute = function() {
   return this.supportsFeature('_requiresIframeSecurityAttribute', function(property) {
     var test = document.createElement('iframe');
