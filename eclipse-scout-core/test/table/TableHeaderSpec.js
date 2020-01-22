@@ -45,4 +45,24 @@ describe('TableHeaderSpec', function() {
     });
 
   });
+
+  fit('hiddenByUi', function() {
+    var table = helper.createTableWithOneColumn();
+    table.setMenus([scout.create('Menu', { // fake header menu required to properly calculate visibility
+      parent: table,
+      text: 'Foo',
+      menuTypes: ['Table.Header']
+    })]);
+    table.render();
+
+    expect(table.header.menuBar.hiddenByUi).toBe(false);
+    expect(table.header.menuBar.visible).toBe(true);
+    table.setHeaderEnabled(false);
+    expect(table.header.menuBar.hiddenByUi).toBe(true);
+    expect(table.header.menuBar.visible).toBe(false);
+    table.setHeaderEnabled(true);
+    expect(table.header.menuBar.hiddenByUi).toBe(false);
+    expect(table.header.menuBar.visible).toBe(true);
+  });
+
 });

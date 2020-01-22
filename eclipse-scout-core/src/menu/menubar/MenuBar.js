@@ -47,6 +47,7 @@ export default class MenuBar extends Widget {
     this.ellipsisPosition = MenuBar.EllipsisPosition.RIGHT;
     this._menuItemPropertyChangeHandler = this._onMenuItemPropertyChange.bind(this);
     this._focusHandler = this._onMenuItemFocus.bind(this);
+    this.hiddenByUi = false;
     this._addWidgetProperties('menuItems');
   }
 
@@ -304,10 +305,6 @@ export default class MenuBar extends Widget {
     }
   }
 
-  setEllipsisPositon(ellipsisPositon) {
-    this.setProperty('ellipsisPositon', ellipsisPositon);
-  }
-
   setTabbableMenu(menu) {
     if (!this.tabbable || menu === this.tabbableMenu) {
       return;
@@ -319,6 +316,16 @@ export default class MenuBar extends Widget {
     if (menu) {
       menu.setTabbable(true);
     }
+  }
+
+  /**
+   * Sets the property hiddenByUi. This does not automatically update the visibility of the menus.
+   * We assume that #updateVisibility() is called later anyway.
+   *
+   * @param {boolean} hiddenByUi
+   */
+  setHiddenByUi(hiddenByUi) {
+    this.setProperty('hiddenByUi', hiddenByUi);
   }
 
   updateVisibility() {
