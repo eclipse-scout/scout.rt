@@ -16,6 +16,7 @@ export default class TableFooter extends Widget {
   constructor() {
     super();
 
+    this._compactStyle = false;
     this.animating = false;
     this.open = false;
     this.resizing = false;
@@ -693,12 +694,11 @@ export default class TableFooter extends Widget {
 
   _createOnFilterFieldInputFunction() {
     var debounceFunction = $.debounce(this._applyFilter.bind(this));
-    var fn = function(event) {
+    return function(event) {
       this._updateHasFilterText();
       // debounced filter
       debounceFunction();
     };
-    return fn;
   }
 
   _onDeleteFilterMouseDown(event) {

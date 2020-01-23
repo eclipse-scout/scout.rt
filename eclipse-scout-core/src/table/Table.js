@@ -116,7 +116,7 @@ export default class Table extends Widget {
     this.rowsMap = {}; // rows by id
     this.rowHeight = 0;
     this.rowWidth = 0;
-    this.rowBorderWidth; // read-only, set by _calculateRowBorderWidth(), also used in TableLayout.js
+    this.rowBorderWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableLayout.js
     this.rowBorderLeftWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
     this.rowBorderRightWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
     this.rowIconVisible = false;
@@ -151,6 +151,8 @@ export default class Table extends Widget {
 
     this.$data = null;
     this.$emptyData = null;
+    this.$fillBefore = null;
+    this.$fillAfter = null;
   }
 
   // TODO [7.0] cgu create StringColumn.js incl. defaultValues from defaultValues.json
@@ -647,7 +649,7 @@ export default class Table extends Widget {
   }
 
   _isRowControl($target) {
-    return $target.hasClass('table-row-control') || $target.parent().hasClass('table-row-control')
+    return $target.hasClass('table-row-control') || $target.parent().hasClass('table-row-control');
   }
 
   _onRowMouseUp(event) {
@@ -3114,7 +3116,7 @@ export default class Table extends Widget {
       field: field,
       row: this.cellEditorPopup.row,
       column: this.cellEditorPopup.column,
-      cell: this.cellEditorPopup.celll
+      cell: this.cellEditorPopup.cell
     });
     this.trigger('cancelCellEdit', event);
 

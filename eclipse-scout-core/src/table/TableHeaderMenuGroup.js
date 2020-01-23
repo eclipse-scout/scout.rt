@@ -14,9 +14,8 @@ export default class TableHeaderMenuGroup extends Widget {
 
   constructor() {
     super();
-    this.text;
-    this.textKey;
-    this.cssClass;
+    this.text = null;
+    this.textKey = null;
     this.visible = true;
     this.last = false;
   }

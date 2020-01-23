@@ -14,17 +14,18 @@ import * as $ from 'jquery';
 export default class TableRow {
 
   constructor() {
-    this.$row;
-    this.aggregateRowAfter;
+    this.$row = null;
+    this.aggregateRowAfter = null;
     this.cells = [];
     this.checked = false;
     this.enabled = true;
     this.filterAccepted = true;
-    this.height;
+    this.height = null;
     this.hasError = false;
-    this.id;
+    this.id = null;
     this.initialized = false;
-    this.parentRow;
+    this.parentRow = null;
+    this.parent = null;
     this.childRows = [];
     this.expanded = false;
     this.status = TableRow.Status.NON_CHANGED;

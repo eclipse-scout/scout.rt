@@ -482,6 +482,7 @@ export default class Device {
         var options = Object.defineProperty({}, 'passive', {
           get: function() {
             passiveSupported = true;
+            return false;
           }
         });
         window.addEventListener('test', options, options);

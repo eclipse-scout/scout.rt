@@ -2750,13 +2750,11 @@ export default class Tree extends Widget {
 
   filter(notAnimated) {
     var useAnimation = Boolean(!notAnimated),
-      changedNodes = [],
       newHiddenNodes = [];
     // Filter nodes
     this.visitNodes(function(node) {
       var changed = this._applyFiltersForNode(node);
       if (changed) {
-        changedNodes.push(node);
         if (!node.isFilterAccepted()) {
           arrays.pushAll(newHiddenNodes, this._removeFromFlatList(node, useAnimation));
         } else {

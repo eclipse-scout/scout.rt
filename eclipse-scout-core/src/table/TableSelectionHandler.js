@@ -22,23 +22,23 @@ export default class TableSelectionHandler {
   constructor(table) {
     this.table = table;
     this.mouseMoveSelectionEnabled = true;
-    this._mouseDown;
-    this.lastActionRow;
-    this._allRows;
-    this.mouseOverHandler;
+    this._mouseDown = false;
+    this.lastActionRow = null;
+    this._allRows = null;
+    this.mouseOverHandler = null;
     this.select = true;
     this.counterDebug = 0;
 
-    this.fromIndex;
-    this.toIndex;
+    this.fromIndex = -1;
+    this.toIndex = -1;
     // Index of the row that got a 'mouseover' event previously (needed to determine if the user is going up or down)
-    this._prevSelectedRowIndex;
+    this._prevSelectedRowIndex = -1;
     // The index of the selected row with the greatest distance to fromIndex (needed to efficiently clear the selection)
-    this._maxSelectedRowIndex;
+    this._maxSelectedRowIndex = -1;
   }
 
   clearLastSelectedRowMarker() {
-    this.lastActionRow = undefined;
+    this.lastActionRow = null;
   }
 
   // TODO [7.0] bsh: Table Selection | Try to merge this with TableKeystrokeContext
@@ -86,7 +86,7 @@ export default class TableSelectionHandler {
         this.table.selectedRows = [];
       }
     }
-    if (this.fromIndex === undefined || this.fromIndex < 0) {
+    if (this.fromIndex < 0) {
       this.fromIndex = this._allRows.indexOf(row);
     }
 
@@ -230,7 +230,7 @@ export default class TableSelectionHandler {
     this._allRows = null;
     this.fromIndex = -1;
     this.toIndex = -1;
-    this.selected = true;
+    this.select = true;
     // Update selectedRows and allRows, this might have changed in the meantime (e.g. when row
     // was replaced by update event due to cell editing)
     this.table.notifyRowSelectionFinished();

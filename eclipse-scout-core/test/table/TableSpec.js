@@ -3057,15 +3057,15 @@ describe('Table', function() {
 
       tableField.setTable(table);
       expect(table.rendered).toBe(true);
-      expect(table.rows[0].height).toBeUndefined();
+      expect(table.rows[0].height).toBe(null);
 
       tableField.validateLayout();
       expect(tableField.htmlComp.valid).toBe(false);
       expect(table.htmlComp.valid).toBe(false);
-      expect(table.rows[0].height).toBeUndefined();
+      expect(table.rows[0].height).toBe(null);
 
       tableField.setVisible(true);
-      expect(table.rows[0].height).toBeUndefined();
+      expect(table.rows[0].height).toBe(null);
 
       tableField.validateLayout();
       expect(tableField.htmlComp.valid).toBe(true);

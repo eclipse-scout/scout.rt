@@ -269,7 +269,7 @@ export default class TableTileGridMediator extends Widget {
     return scout.create('Group', {
       parent: this.tileAccordion,
       id: groupId,
-      headerVisible: groupId === 'default' ? false : true,
+      headerVisible: groupId !== 'default',
       title: groupId,
       titleHtmlEnabled: htmlEnabled,
       body: {

@@ -135,7 +135,7 @@ export default class TableHeaderMenuLayout extends PopupLayout {
    * + size of filter-fields
    * + paddings of surrounding containers
    */
-  preferredLayoutSize($container) {
+  preferredLayoutSize($container, options) {
     var prefSize, filterColumnMargins, filterColumnInsets,
       rightColumnHeight = 0,
       leftColumnHeight = 0,
