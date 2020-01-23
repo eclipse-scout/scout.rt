@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -134,6 +134,8 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   String PROP_BENCH_VISIBLE = "benchVisible";
 
   String PROP_BENCH_LAYOUT_DATA = "benchLayoutData";
+
+  String PROP_LOGO_ACTION_ENABLED = "logoActionEnabled";
   /**
    * Default style with header, navigation (tree) and bench (forms).
    * <p>
@@ -687,6 +689,11 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   void openUri(BinaryResource binaryResource, IOpenUriAction openUriAction);
 
   /**
+   * Executes the logo action.
+   */
+  void doLogoAction();
+
+  /**
    * Activates a {@link Bookmark} on this desktop.
    * <p />
    * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and activated, afterwards every page from
@@ -908,4 +915,14 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * @since 6.1
    */
   Future<Coordinates> requestGeolocation();
+
+  /**
+   * @since 8.0
+   */
+  void setLogoActionEnabled(boolean logoActionEnabled);
+
+  /**
+   * @since 8.0
+   */
+  boolean isLogoActionEnabled();
 }

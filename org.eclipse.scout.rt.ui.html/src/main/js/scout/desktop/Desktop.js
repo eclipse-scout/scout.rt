@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,7 @@ scout.Desktop = function() {
   this.logoId = null;
   this.navigationVisible = true;
   this.navigationHandleVisible = true;
+  this.logoActionEnabled = false;
   this.benchVisible = true;
   this.headerVisible = true;
   this.geolocationServiceAvailable = scout.device.supportsGeolocation();
@@ -1104,4 +1105,10 @@ scout.Desktop.prototype.onReconnectingFailed = function() {
 
 scout.Desktop.prototype.dataChange = function(dataType) {
   this.events.trigger('dataChange', dataType);
+};
+
+scout.Desktop.prototype.logoAction = function() {
+  if (this.logoActionEnabled) {
+    this.trigger('logoAction');
+  }
 };

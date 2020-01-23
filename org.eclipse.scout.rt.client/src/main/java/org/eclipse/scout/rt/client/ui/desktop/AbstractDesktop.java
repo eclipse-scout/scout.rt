@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopFor
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopGuiAttachedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopGuiDetachedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopInitChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopLogoActionChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopOpenedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopOutlineChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageDetailFormChangedChain;
@@ -383,6 +384,17 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     return true;
   }
 
+  /**
+   * Configures if the logo action is enabled.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(100)
+  protected boolean getConfiguredLogoActionEnabled() {
+    return false;
+  }
+
   private List<Class<? extends IAction>> getConfiguredActions() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IAction>> fca = ConfigurationUtility.filterClasses(dca, IAction.class);
@@ -560,6 +572,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   protected void execDefaultView() {
   }
 
+  @Order(140)
+  @ConfigOperation
+  protected void execLogoAction() {
+  }
+
   public List<IDesktopExtension> getDesktopExtensions() {
     return CollectionUtility.arrayList(m_desktopExtensions);
   }
@@ -608,6 +625,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     setDisplayStyle(getConfiguredDisplayStyle());
     initDisplayStyle(getDisplayStyle());
     setCacheSplitterPosition(getConfiguredCacheSplitterPosition());
+    setLogoActionEnabled(getConfiguredLogoActionEnabled());
     List<IDesktopExtension> extensions = getDesktopExtensions();
     m_contributionHolder = new ContributionComposite(this);
 
@@ -2132,6 +2150,13 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     }
   }
 
+  @Override
+  public void doLogoAction() {
+    if (isLogoActionEnabled()) {
+      interceptLogoAction();
+    }
+  }
+
   /**
    * Checks whether the given path is a valid deep-link. If that is the case the deep-link is handled. When an error
    * occurs while handling the deep-link a {@link DeepLinkException} is thrown, usually this exception is thrown when
@@ -2321,6 +2346,16 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   @Override
   public boolean isInBackground() {
     return propertySupport.getPropertyBool(PROP_IN_BACKGROUND);
+  }
+
+  @Override
+  public boolean isLogoActionEnabled() {
+    return propertySupport.getPropertyBool(PROP_LOGO_ACTION_ENABLED);
+  }
+
+  @Override
+  public void setLogoActionEnabled(boolean logoActionEnabled) {
+    propertySupport.setPropertyBool(PROP_LOGO_ACTION_ENABLED, logoActionEnabled);
   }
 
   /**
@@ -2551,6 +2586,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     }
 
     @Override
+    public void fireLogoAction() {
+      doLogoAction();
+    }
+
+    @Override
     public void removedNotificationFromUI(IDesktopNotification notification) {
       AbstractDesktop.this.removeNotificationInternal(notification, false);
     }
@@ -2729,6 +2769,10 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       getOwner().execDefaultView();
     }
 
+    @Override
+    public void execLogoAction(DesktopLogoActionChain chain) {
+      getOwner().execLogoAction();
+    }
   }
 
   protected final void interceptOpened() {
@@ -2801,6 +2845,12 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopDefaultViewChain chain = new DesktopDefaultViewChain(extensions);
     chain.execDefaultView();
+  }
+
+  protected final void interceptLogoAction() {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopLogoActionChain chain = new DesktopLogoActionChain(extensions);
+    chain.execLogoAction();
   }
 
   protected class P_LocalPropertyChangeListener implements PropertyChangeListener {
