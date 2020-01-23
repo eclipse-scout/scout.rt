@@ -13,19 +13,18 @@ package org.eclipse.scout.rt.platform.config;
 import java.net.URL;
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -85,17 +84,18 @@ import org.slf4j.LoggerFactory;
  * </ul>
  * </code>
  * <p>
- * Since 10.0 Scout also supports importing a file defining variables. This feature is helpful
- * when launching applications in development mode in an IDE using a pre-defined config.properties that contains
- * variables (also known as tags). The variable file only contains variables and config property values but is itself
- * not a config.property file. Thus its values are not checked in any {@link IConfigurationValidator}.
+ * Since 10.0 Scout also supports importing a file defining variables. This feature is helpful when launching
+ * applications in development mode in an IDE using a pre-defined config.properties that contains variables (also known
+ * as tags). The variable file only contains variables and config property values but is itself not a config.property
+ * file. Thus its values are not checked in any {@link IConfigurationValidator}.
  * <p>
- * A variable file is passed to the java process with the system property <code>-Dscout.env=file:/path/to/my/launch.properties</code>
+ * A variable file is passed to the java process with the system property
+ * <code>-Dscout.env=file:/path/to/my/launch.properties</code>
  */
 public class PropertiesHelper {
 
   private static final char ENVIRONMENT_VARIABLE_DOT_REPLACEMENT = '_';
-  private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{([^\\}]+)\\}");
+  private static final Pattern PLACEHOLDER_PATTERN = PropertiesUtility.DEFAULT_VARIABLE_PATTERN;
   private static final Pattern PATH_PLACEHOLDER_PATTERN = Pattern.compile("^\\$([^\\$]+)\\$");
   public static final String CLASSPATH_PROTOCOL_NAME = "classpath";
   public static final char PROTOCOL_DELIMITER = ':';
@@ -186,7 +186,7 @@ public class PropertiesHelper {
    * @return true if the file exists
    */
   protected boolean parseEnvFile(IPropertyProvider propertyProvider) {
-    if(propertyProvider==null){
+    if (propertyProvider == null) {
       return false;
     }
     List<Entry<String, String>> properties = propertyProvider.readProperties();
@@ -974,57 +974,22 @@ public class PropertiesHelper {
    * Resolves all variables of format <code>${variableName}</code> in the given expression according to the current
    * application context.
    *
-   * @param s
+   * @param value
    *          The expression to resolve.
    * @return A {@link String} where all variables have been replaced with their values.
    * @throws IllegalArgumentException
    *           if a variable could not be resolved in the current context.
    */
   @SuppressWarnings("squid:S1149")
-  protected String resolve(String s, Pattern pat) {
-    Matcher m = pat.matcher(s);
-    boolean found = m.find();
-    if (!found) {
-      return s;
-    }
-    String t = s;
-    Set<String> loopDetection = new LinkedHashSet<>();
-    while (found) {
-      StringBuffer sb = new StringBuffer();
-      List<String> stageKeys = new ArrayList<>();
-      while (found) {
-        String key = m.group(1);
-        String value = getProperty(key);
-        if (m_initializing) {
-          m_referencedKeys.add(key);
-        }
-
-        if (!StringUtility.hasText(value)) {
-          throw new IllegalArgumentException("resolving expression '" + s + "': variable ${" + key + "} is not defined in the context.");
-        }
-        if (value.contains(s)) {
-          throw new IllegalArgumentException("resolving expression '" + s + "': loop detected (the resolved value contains the original expression): " + value);
-        }
-
-        m.appendReplacement(sb, Matcher.quoteReplacement(value));
-
-        stageKeys.add(key);
-        if (loopDetection.contains(key)) {
-          throw new IllegalArgumentException("resolving expression '" + s + "': loop detected: " + loopDetection);
-        }
-        found = m.find();
+  protected String resolve(String value, Pattern variablePattern) {
+    BinaryOperator<String> replacer = (ignoredKey, variableName) -> {
+      String replacement = getProperty(variableName);
+      if (m_initializing) {
+        m_referencedKeys.add(variableName);
       }
-      m.appendTail(sb);
-
-      loopDetection.addAll(stageKeys);
-
-      // next
-      t = sb.toString();
-      m = pat.matcher(t);
-      found = m.find();
-    }
-
-    return t;
+      return replacement;
+    };
+    return PropertiesUtility.resolveValue(null, value, variablePattern, replacer);
   }
 
   protected void importSystemImports(Set<String> importsToIgnore, Pattern pat) {
