@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopFor
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopGuiAttachedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopGuiDetachedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopInitChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopLogoActionChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopOpenedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopOutlineChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageDetailFormChangedChain;
@@ -57,5 +58,7 @@ public interface IDesktopExtension<DESKTOP extends AbstractDesktop> extends IExt
   void execGuiDetached(DesktopGuiDetachedChain chain);
 
   void execDefaultView(DesktopDefaultViewChain chain);
+
+  void execLogoAction(DesktopLogoActionChain chain);
 
 }

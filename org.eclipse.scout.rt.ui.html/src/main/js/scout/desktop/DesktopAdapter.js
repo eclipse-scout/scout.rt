@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,11 +50,17 @@ scout.DesktopAdapter.prototype._sendFormActivate = function(form) {
   });
 };
 
+scout.DesktopAdapter.prototype._logoAction = function(event) {
+  this._send('logoAction');
+};
+
 scout.DesktopAdapter.prototype._onWidgetEvent = function(event) {
   if (event.type === 'formActivate') {
     this._onWidgetFormActivate(event);
   } else if (event.type === 'historyEntryActivate') {
     this._onWidgetHistoryEntryActivate(event);
+  } else if (event.type === 'logoAction') {
+    this._logoAction(event);
   } else if (event.type === 'cancelForms') {
     this._onWidgetCancelAllForms(event);
   } else {
