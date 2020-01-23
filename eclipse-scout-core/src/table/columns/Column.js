@@ -62,6 +62,8 @@ export default class Column {
     this.events = this._createEventSupport();
 
     this._tableColumnsChangedHandler = this._onTableColumnsChanged.bind(this);
+    // Contains the width the cells of the column really have (only set in Chrome due to a Chrome bug, see Table._updateExactColumnWidths)
+    this._realWidth = null;
   }
 
   static DEFAULT_MIN_WIDTH = 60;
@@ -857,6 +859,10 @@ export default class Column {
       this.tableNodeLevel0CellPadding = 23;
       this.expandableIconLevel0CellPadding = 8;
     }
+  }
+
+  _realWidthIfAvailable() {
+    return this._realWidth || this.width;
   }
 
   // --- Event handling methods ---

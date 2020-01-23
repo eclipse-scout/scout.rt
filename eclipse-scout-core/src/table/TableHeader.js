@@ -91,7 +91,7 @@ export default class TableHeader extends Widget {
   }
 
   _renderColumn(column, index) {
-    var columnWidth = column.width,
+    var columnWidth = column._realWidthIfAvailable(),
       marginLeft = '',
       marginRight = '',
       visibleColumns = this._visibleColumns(),
@@ -179,13 +179,14 @@ export default class TableHeader extends Widget {
 
     var remainingHeaderSpace, adjustment,
       $header = column.$header,
-      columnWidth = column.width,
+      columnWidth = column._realWidthIfAvailable(),
       marginLeft = '',
       marginRight = '',
       menuBarWidth = (this.menuBar.visible ? this.$menuBarContainer.outerWidth(true) : 0),
       visibleColumns = this._visibleColumns(),
-      isFirstColumn = visibleColumns.indexOf(column) === 0,
-      isLastColumn = visibleColumns.indexOf(column) === visibleColumns.length - 1;
+      visibleColumnIndex = visibleColumns.indexOf(column),
+      isFirstColumn = visibleColumnIndex === 0,
+      isLastColumn = visibleColumnIndex === visibleColumns.length - 1;
 
     if (isFirstColumn) {
       marginLeft = this.table.rowBorderLeftWidth;
@@ -217,6 +218,13 @@ export default class TableHeader extends Widget {
     if (this.tableHeaderMenu && this.tableHeaderMenu.rendered && this.tableHeaderMenu.column === column) {
       this.tableHeaderMenu.onColumnResized();
     }
+  }
+
+  /**
+   * Resizes all header items to theirs desired widths.
+   */
+  resizeHeaderItems() {
+    this._visibleColumns().forEach(this.resizeHeaderItem.bind(this));
   }
 
   _reconcileScrollPos() {

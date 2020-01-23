@@ -517,6 +517,13 @@ export default class Device {
     return false;
   }
 
+  /**
+   *  https://bugs.chromium.org/p/chromium/issues/detail?id=740502
+   */
+  hasTableCellZoomBug() {
+    return this.browser === Device.Browser.CHROME;
+  }
+
   _detectScrollbarWidth(cssClass) {
     var $measure = $('body')
         .appendDiv(cssClass)
