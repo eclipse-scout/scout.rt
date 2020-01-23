@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -63,6 +63,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
   private static final String EVENT_REMOVE_NOTIFICATION = "removeNotification";
   private static final String EVENT_OPEN_URI = "openUri";
   private static final String EVENT_FORM_ACTIVATE = "formActivate";
+  private static final String EVENT_LOGO_ACTION = "logoAction";
   private static final String EVENT_CANCEL_FORMS = "cancelForms";
 
   public static final String PROP_OUTLINE = "outline";
@@ -119,6 +120,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
     }
     else if (EVENT_GEOLOCATION_DETERMINED.equals(event.getType())) {
       handleUiGeolocationDetermined(event);
+    }
+    else if (EVENT_LOGO_ACTION.equals(event.getType())) {
+      handleUiLogoAction(event);
     }
     else if (EVENT_CANCEL_FORMS.equals(event.getType())) {
       handleCancelAllForms(event);
@@ -205,6 +209,10 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
     }
 
     getModel().getUIFacade().fireGeolocationDetermined(latitude, longitude);
+  }
+
+  protected void handleUiLogoAction(JsonEvent event) {
+    getModel().getUIFacade().fireLogoAction();
   }
 
   protected void handleUiFormActivate(JsonEvent event) {
@@ -352,6 +360,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
       @Override
       protected Boolean modelValue() {
         return getModel().isGeolocationServiceAvailable();
+      }
+    });
+    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_LOGO_ACTION_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isLogoActionEnabled();
       }
     });
     putJsonProperty(new JsonProperty<DESKTOP>(PROP_BENCH_LAYOUT_DATA, model) {

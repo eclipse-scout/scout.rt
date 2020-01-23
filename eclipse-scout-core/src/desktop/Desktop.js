@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,6 +49,7 @@ export default class Desktop extends Widget {
     this.logoId = null;
     this.navigationVisible = true;
     this.navigationHandleVisible = true;
+    this.logoActionEnabled = false;
     this.benchVisible = true;
     this.headerVisible = true;
     this.geolocationServiceAvailable = Device.get().supportsGeolocation();
@@ -1280,6 +1281,12 @@ export default class Desktop extends Widget {
 
   _activeTheme() {
     return cookies.get('scout.ui.theme') || 'default';
+  }
+
+  logoAction() {
+    if (this.logoActionEnabled) {
+      this.trigger('logoAction');
+    }
   }
 
   _initTheme() {
