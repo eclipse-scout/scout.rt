@@ -611,8 +611,15 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleUiRowsSelected(JsonEvent event) {
-    List<ITableRow> tableRows = extractTableRows(event.getData());
-    addTableEventFilterCondition(TableEvent.TYPE_ROWS_SELECTED).setRows(tableRows);
+    JSONArray rowIds = event.getData().getJSONArray(PROP_ROW_IDS);
+    List<ITableRow> tableRows = extractTableRows(rowIds);
+    if (tableRows.isEmpty() && rowIds.length() > 0) {
+      // Ignore inconsistent selections from UI (probably an obsolete cached event)
+      return;
+    }
+    if (tableRows.size() == rowIds.length()) {
+      addTableEventFilterCondition(TableEvent.TYPE_ROWS_SELECTED).setRows(tableRows);
+    }
     getModel().getUIFacade().setSelectedRowsFromUI(tableRows);
   }
 
@@ -950,6 +957,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   protected List<ITableRow> extractTableRows(JSONObject json) {
     JSONArray rowIds = json.getJSONArray(PROP_ROW_IDS);
+    return extractTableRows(rowIds);
+  }
+
+  public List<ITableRow> extractTableRows(JSONArray rowIds) {
     List<ITableRow> rows = new ArrayList<>(rowIds.length());
     for (int i = 0; i < rowIds.length(); i++) {
       ITableRow tableRow = optTableRow((String) rowIds.get(i));
