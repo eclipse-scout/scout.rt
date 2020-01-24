@@ -38,6 +38,8 @@ public class MigrationStep2 implements IRunnable {
   private static final Logger LOG = LoggerFactory.getLogger(MigrationStep2.class);
   private static final String JSON_EXTENSION = "json";
   private static final String JS_EXTENSION = "js";
+  Pattern JQUERY_PAT = Pattern.compile("webcontent[\\\\/]res[\\\\/]jquery-", Pattern.CASE_INSENSITIVE);
+  Pattern JASMINE_PAT = Pattern.compile("webcontent[\\\\/]res[\\\\/]jasmine-", Pattern.CASE_INSENSITIVE);
   private Set<Path> m_deletedFiles = new HashSet<>();
 
   public static void main(String[] args) {
@@ -50,6 +52,7 @@ public class MigrationStep2 implements IRunnable {
     removeJsFolder();
     fileByFileTasks();
     deleteEmptyDirectories();
+    LOG.info("Migration step 2 completed.");
   }
 
   protected void moveIndexJs() {
@@ -138,9 +141,6 @@ public class MigrationStep2 implements IRunnable {
       throw new ProcessingException("exception during visiting file '" + pathInfo.getPath() + "'.", e);
     }
   }
-
-  Pattern JQUERY_PAT = Pattern.compile("webcontent[\\\\/]res[\\\\/]jquery-", Pattern.CASE_INSENSITIVE);
-  Pattern JASMINE_PAT = Pattern.compile("webcontent[\\\\/]res[\\\\/]jasmine-", Pattern.CASE_INSENSITIVE);
 
   protected void removeJQueryJasmineFiles(Path path) throws IOException {
     String fullPath = path.toString();

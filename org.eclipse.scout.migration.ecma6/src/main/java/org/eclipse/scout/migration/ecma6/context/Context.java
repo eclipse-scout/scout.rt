@@ -35,7 +35,6 @@ import org.eclipse.scout.migration.ecma6.model.old.JsUtilityFunction;
 import org.eclipse.scout.migration.ecma6.model.old.JsUtilityVariable;
 import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationExcludePathFilter;
 import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationIncludePathFilter;
-import org.eclipse.scout.migration.ecma6.task.T40010_LessModule;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
@@ -44,10 +43,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Context {
-  private static final Logger LOG = LoggerFactory.getLogger(Context.class);
   public static final String LESS_FILE_SUFFIX = ".less";
-
-
+  public static final String THEME_DEFAULT = "default";
+  private static final Logger LOG = LoggerFactory.getLogger(Context.class);
   private final Map<Path, WorkingCopy> m_workingCopies = new HashMap<>();
   private final Map<WorkingCopy, JsFile> m_jsFiles = new HashMap<>();
   private final Map<String /*fqn*/, JsClass> m_jsClasses = new HashMap<>();
@@ -93,7 +91,7 @@ public class Context {
           String relPath = MigrationUtility.removeFirstSegments(sourceDir.relativize(file), 4);
           // skip modules and marcros for themes
           if (relPath.endsWith("-module" + LESS_FILE_SUFFIX)
-            ||  relPath.endsWith("-macro"+LESS_FILE_SUFFIX)) {
+              || relPath.endsWith("-macro" + LESS_FILE_SUFFIX)) {
             return FileVisitResult.CONTINUE;
           }
           String theme = MigrationUtility.parseTheme(file);
@@ -101,7 +99,6 @@ public class Context {
             m_nonDefaultThemes.add(theme);
           }
         }
-
 
         return FileVisitResult.CONTINUE;
       }
@@ -164,8 +161,20 @@ public class Context {
   }
 
   public Path relativeToModule(Path path) {
+    return relativeToModule(path, null);
+  }
+
+  public Path relativeToModule(Path path, Path subFolder) {
     Assertions.assertNotNull(Configuration.get().getSourceModuleDirectory());
-    return path.relativize(Configuration.get().getSourceModuleDirectory());
+
+    Path p = Configuration.get().getSourceModuleDirectory();
+    if (!path.startsWith(p)) {
+      p = Configuration.get().getTargetModuleDirectory();
+    }
+    if (subFolder != null) {
+      p = p.resolve(subFolder);
+    }
+    return p.relativize(path);
   }
 
   public JsFile getJsFile(WorkingCopy workingCopy) {

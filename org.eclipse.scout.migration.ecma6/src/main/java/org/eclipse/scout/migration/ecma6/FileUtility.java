@@ -77,9 +77,9 @@ public final class FileUtility {
     }
     try (Stream<Path> resourceStream = Files.walk(directory)) {
       resourceStream
-        .sorted(Comparator.reverseOrder())
-        .map(Path::toFile)
-        .forEach(File::delete);
+          .sorted(Comparator.reverseOrder())
+          .map(Path::toFile)
+          .forEach(File::delete);
     }
     return true;
   }
@@ -126,9 +126,7 @@ public final class FileUtility {
     try {
       Assertions.assertTrue(Files.exists(path));
       in = Files.newInputStream(path, StandardOpenOption.READ);
-
-      return lineSeparator(in);
-
+      return Optional.ofNullable(lineSeparator(in)).filter(nl -> nl != null && nl.length() > 0).orElse("\n");
     }
     catch (IOException e) {
       throw new VetoException("Could not read line separator of file '" + path + "'", e);
@@ -200,4 +198,3 @@ public final class FileUtility {
   }
 
 }
-

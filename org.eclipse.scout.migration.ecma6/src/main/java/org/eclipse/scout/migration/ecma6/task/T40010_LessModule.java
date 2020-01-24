@@ -15,8 +15,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,14 +36,19 @@ import org.slf4j.LoggerFactory;
 
 @Order(40010)
 public class T40010_LessModule extends AbstractTask {
-  private static final Logger LOG = LoggerFactory.getLogger(T40010_LessModule.class);
-
-
   public static final String OLD_FILE_SUFFIX = "-module" + Context.LESS_FILE_SUFFIX;
-
+  private static final Logger LOG = LoggerFactory.getLogger(T40010_LessModule.class);
   private final Pattern IMPORT_PAT = Pattern.compile("@import\\s+\"([\\w/.]+)\";");
   private final List<String> m_importsInCurrentFile = new ArrayList<>();
   private final Set<String> m_allLessFilesInCurrentModule = new HashSet<>();
+  private final Map<String /*themename*/, Path/*theme file*/> m_indexLessFiles = new HashMap<>();
+
+  public static String removeLessFileExtension(String path) {
+    if (path.endsWith(Context.LESS_FILE_SUFFIX)) {
+      return path.substring(0, path.length() - Context.LESS_FILE_SUFFIX.length());
+    }
+    return path;
+  }
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
@@ -68,8 +76,13 @@ public class T40010_LessModule extends AbstractTask {
     workingCopy.setSource(newContent);
     String fileName = pathInfo.getPath().getFileName().toString();
     String newDefaultThemeFileName = fileName.replace(OLD_FILE_SUFFIX, "-index.less");
+    m_indexLessFiles.put(Context.THEME_DEFAULT, pathInfo.getPath().getParent().resolve(newDefaultThemeFileName));
 
     flushNonDefaultThemes(pathInfo, context, newDefaultThemeFileName, nl);
+  }
+
+  public Path getIndexLessFile(String theme) {
+    return m_indexLessFiles.get(Optional.ofNullable(theme).orElse(Context.THEME_DEFAULT));
   }
 
   protected boolean isLegacyModule(Path p) {
@@ -85,7 +98,7 @@ public class T40010_LessModule extends AbstractTask {
         // skip modules
         continue;
       }
-      if(relPath.endsWith("-macro.less")){
+      if (relPath.endsWith("-macro.less")) {
         // skip macros
         continue;
       }
@@ -98,12 +111,13 @@ public class T40010_LessModule extends AbstractTask {
       String src = buildNonDefaultThemeSource(context, newDefaultThemeFileName, nl, theme);
       String fileName = toThemeFileName(removeLessFileExtension(newDefaultThemeFileName), theme);
       Path targetFile = Configuration.get().getTargetModuleDirectory().resolve(pathInfo.getModuleRelativePath().getParent().resolve(fileName));
-      LOG.info("Create index.less for theme '"+theme+"': [source:"+pathInfo+", target:"+targetFile+"]");
+      LOG.info("Create index.less for theme '" + theme + "': [source:" + pathInfo + ", target:" + targetFile + "]");
       if (Files.exists(targetFile)) {
         throw new ProcessingException("File '" + targetFile + "' already exists.");
       }
       try {
         Files.createFile(targetFile);
+        m_indexLessFiles.put(theme, targetFile);
       }
       catch (IOException e) {
         throw new ProcessingException("Could not create file '" + targetFile + "'.", e);
@@ -145,14 +159,5 @@ public class T40010_LessModule extends AbstractTask {
     lessImportPath = removeLessFileExtension(lessImportPath);
     m_importsInCurrentFile.add(lessImportPath);
     result.append("@import \"").append(lessImportPath).append("\";");
-  }
-
-
-
-  public static String removeLessFileExtension(String path) {
-    if (path.endsWith(Context.LESS_FILE_SUFFIX)) {
-      return path.substring(0, path.length() - Context.LESS_FILE_SUFFIX.length());
-    }
-    return path;
   }
 }

@@ -58,6 +58,7 @@ public class MigrationStep1 implements Runnable {
     List<IPostMigrationTask> postMigrationTasks = BEANS.all(IPostMigrationTask.class);
     LOG.info("Execute post migration tasks (#: " + postMigrationTasks.size() + ")");
     postMigrationTasks.forEach(task -> task.execute(m_context));
+    LOG.info("Migration step 1 completed.");
   }
 
   public void init() throws IOException {

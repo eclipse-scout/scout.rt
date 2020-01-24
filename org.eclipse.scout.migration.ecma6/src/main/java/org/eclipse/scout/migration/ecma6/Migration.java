@@ -24,12 +24,12 @@ public class Migration implements Runnable {
   private List<ITask> m_tasks;
   private Context m_context;
 
+  protected Migration() {
+  }
+
   public static void main(String[] args) {
     Migration migration = new Migration();
     migration.run();
-  }
-
-  protected Migration() {
   }
 
   @Override
@@ -41,6 +41,7 @@ public class Migration implements Runnable {
       }
     }
     new MigrationStep2().run();
+    LOG.info("Migration completed.");
   }
 
 }

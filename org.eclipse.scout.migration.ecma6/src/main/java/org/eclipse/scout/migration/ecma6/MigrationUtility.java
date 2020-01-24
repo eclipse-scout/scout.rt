@@ -36,8 +36,12 @@ public final class MigrationUtility {
   }
 
   public static String prependTodo(String source, String todoText, String lineSeparator) {
-    source = "// TODO MIG: " + todoText + lineSeparator + source;
+    source = todoText(todoText) + lineSeparator + source;
     return source;
+  }
+
+  public static String todoText(String todoText) {
+    return "// TODO MIG: " + todoText;
   }
 
   public static String parseMemberName(String fullyQualifiedName) {
@@ -136,7 +140,7 @@ public final class MigrationUtility {
     return fileName.substring(firstDelimiterPos + 1);
   }
 
-  public static String pathToString(Path path, char delimiter){
+  public static String pathToString(Path path, char delimiter) {
     return path.toString().replace('\\', delimiter).replace('/', delimiter);
   }
 }
