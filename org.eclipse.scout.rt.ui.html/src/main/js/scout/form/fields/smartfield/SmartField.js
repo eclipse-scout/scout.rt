@@ -1047,6 +1047,10 @@ scout.SmartField.prototype._onFieldKeyUp = function(event) {
   // That's why we must deal with that event here (and not in keyDown)
   // We don't use _displayText() here because we always want the text the
   // user has typed.
+  this._handleInput();
+};
+
+scout.SmartField.prototype._handleInput = function() {
   if (this._pendingOpenPopup || this.isPopupOpen()) {
     if (!this.isDropdown()) {
       this._lookupByTextOrAll();
@@ -1120,6 +1124,16 @@ scout.SmartField.prototype._onFieldKeyDown = function(event) {
 
 scout.SmartField.prototype._onFieldInput = function() {
   this._updateHasText();
+
+  // Handling for undo/redo events which can affect this field, even tough the focus is on another field
+  // we must have the focus, because otherwise acceptInput would be skipped, which could cause the smart-field
+  // to have an invalid displayText which does not reflect the current value. #246765
+  if (!this._userWasTyping) {
+    if (!this.isFocused()) {
+      this.focus();
+    }
+    this._handleInput();
+  }
 };
 
 scout.SmartField.prototype._updateUserWasTyping = function(event) {
