@@ -1090,6 +1090,10 @@ export default class SmartField extends ValueField {
     // That's why we must deal with that event here (and not in keyDown)
     // We don't use _displayText() here because we always want the text the
     // user has typed.
+    this._handleInput();
+  }
+
+  _handleInput() {
     if (this._pendingOpenPopup || this.isPopupOpen()) {
       if (!this.isDropdown()) {
         this._lookupByTextOrAll();
@@ -1163,6 +1167,16 @@ export default class SmartField extends ValueField {
 
   _onFieldInput() {
     this._updateHasText();
+
+    // Handling for undo/redo events which can affect this field, even tough the focus is on another field
+    // we must have the focus, because otherwise acceptInput would be skipped, which could cause the smart-field
+    // to have an invalid displayText which does not reflect the current value. #246765
+    if (!this._userWasTyping) {
+      if (!this.isFocused()) {
+        this.focus();
+      }
+      this._handleInput();
+    }
   }
 
   _updateUserWasTyping(event) {
