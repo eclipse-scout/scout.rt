@@ -19,8 +19,8 @@ export default class PopupWindow {
     this.session = form.session;
     this.events = new EventSupport();
     this.initialized = false;
-    this.$container;
-    this.htmlComp;
+    this.$container = null;
+    this.htmlComp = null;
 
     // link Form instance with this popupWindow instance
     // this is required when form (and popup-window) is closed by the model
