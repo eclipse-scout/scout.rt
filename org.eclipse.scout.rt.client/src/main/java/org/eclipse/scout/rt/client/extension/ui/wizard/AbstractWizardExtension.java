@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardActive
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAnyFieldChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardCancelChain;
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardContainerFormClosedChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardCreateContainerFormChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardDecorateContainerFormChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardFinishChain;
@@ -76,6 +77,11 @@ public abstract class AbstractWizardExtension<OWNER extends AbstractWizard> exte
   @Override
   public void execDecorateContainerForm(WizardDecorateContainerFormChain chain) {
     chain.execDecorateContainerForm();
+  }
+
+  @Override
+  public void execContainerFormClosed(WizardContainerFormClosedChain chain) {
+    chain.execContainerFormClosed();
   }
 
   @Override
