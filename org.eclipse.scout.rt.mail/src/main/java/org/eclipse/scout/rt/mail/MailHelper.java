@@ -1022,7 +1022,7 @@ public class MailHelper {
     if (StringUtility.hasText(subject)) {
       String name = FileUtility.toValidFilename(subject);
       if (StringUtility.hasText(name)) {
-        return name + guessAttachmentFileExtension(part.getContentType());
+        return name + "." + guessAttachmentFileExtension(part.getContentType());
       }
     }
     return null;
