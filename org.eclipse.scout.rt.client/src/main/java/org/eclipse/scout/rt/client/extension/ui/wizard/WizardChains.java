@@ -169,6 +169,23 @@ public final class WizardChains {
     }
   }
 
+  public static class WizardContainerFormClosedChain extends AbstractWizardChain {
+
+    public WizardContainerFormClosedChain(List<? extends IWizardExtension<? extends AbstractWizard>> extensions) {
+      super(extensions);
+    }
+
+    public void execContainerFormClosed() {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
+          next.execContainerFormClosed(WizardContainerFormClosedChain.this);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
+
   public static class WizardAnyFieldChangedChain extends AbstractWizardChain {
 
     public WizardAnyFieldChangedChain(List<? extends IWizardExtension<? extends AbstractWizard>> extensions) {

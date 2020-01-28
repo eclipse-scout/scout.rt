@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardActive
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAnyFieldChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardCancelChain;
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardContainerFormClosedChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardCreateContainerFormChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardDecorateContainerFormChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardFinishChain;
@@ -38,6 +39,8 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardSuspen
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
+import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -87,6 +90,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   private IWizardContainerForm m_containerForm;
   private PropertyChangeListener m_anyFieldChangeListener;
+  private FormListener m_containerFormListener;
 
   public AbstractWizard() {
     this(true);
@@ -146,6 +150,19 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Order(20)
   protected String getConfiguredSubTitle() {
     return null;
+  }
+
+  /**
+   * Defines if the wizard should be closed, whenever the container form is disposed. If set to {@code false} the owner
+   * of the wizard is responsible to always close the wizard. Otherwise listeners could be left registered, causing
+   * memory leaks.
+   * <p>
+   * Default: {@code true}
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(30)
+  protected boolean getConfiguredManagedByContainerForm() {
+    return true;
   }
 
   @SuppressWarnings("unchecked")
@@ -277,6 +294,15 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   /**
+   * This method is called once the container form is closed. The default implementation closes the wizard.
+   */
+  @ConfigOperation
+  @Order(75)
+  protected void execContainerFormClosed() {
+    close();
+  }
+
+  /**
    * This method is used to make then wizard buttons visible/invisible/enabled/disabled based on the current form and
    * wizard state. The default implementation just sets the previous, next and finish buttons correctly based on the
    * {@link #getSteps()}.
@@ -332,6 +358,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   protected void initConfig() {
     setTitle(getConfiguredTitle());
     setSubTitle(getConfiguredSubTitle());
+    setManagedByContainerForm(getConfiguredManagedByContainerForm());
     // initially the wizard is in state "closed"
     setClosedInternal(true);
     setCloseTypeInternal(CloseType.Unknown);
@@ -341,6 +368,11 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     m_containerForm = createContainerForm();
     Assertions.assertNotNull(m_containerForm, "Missing container form");
     interceptDecorateContainerForm();
+
+    if (isManagedByContainerForm()) {
+      m_containerFormListener = this::handleContainerFormEvent;
+      m_containerForm.addFormListener(m_containerFormListener);
+    }
 
     // Run the initialization on behalf of the container form.
     runWithinContainerForm(() -> {
@@ -379,6 +411,14 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         }
       });
     });
+  }
+
+  protected void handleContainerFormEvent(FormEvent e) {
+    if (e.getType() == FormEvent.TYPE_CLOSED) {
+      m_containerForm.removeFormListener(m_containerFormListener);
+      m_containerFormListener = null;
+      interceptContainerFormClosed();
+    }
   }
 
   protected IWizardExtension<? extends AbstractWizard> createLocalExtension() {
@@ -451,8 +491,17 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void setChanging(boolean b) {
-    if (b) {
+  public boolean isManagedByContainerForm() {
+    return propertySupport.getPropertyBool(PROP_MANAGED_BY_CONTAINER_FORM);
+  }
+
+  private void setManagedByContainerForm(boolean managedByContainerForm) {
+    propertySupport.setPropertyBool(PROP_MANAGED_BY_CONTAINER_FORM, managedByContainerForm);
+  }
+
+  @Override
+  public void setChanging(boolean changing) {
+    if (changing) {
       m_changingLock.acquire();
     }
     else {
@@ -840,7 +889,13 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       // close container form
       try {
         if (m_containerForm != null) {
-          m_containerForm.doClose();
+          if (m_containerFormListener != null) {
+            m_containerForm.removeFormListener(m_containerFormListener);
+            m_containerFormListener = null;
+          }
+          if (!m_containerForm.isFormClosed()) {
+            m_containerForm.doClose();
+          }
         }
       }
       catch (RuntimeException e) {
@@ -1071,6 +1126,11 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     }
 
     @Override
+    public void execContainerFormClosed(WizardContainerFormClosedChain chain) {
+      getOwner().execContainerFormClosed();
+    }
+
+    @Override
     public void execReset(WizardResetChain chain) {
       getOwner().execReset();
     }
@@ -1154,6 +1214,12 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardAnyFieldChangedChain chain = new WizardAnyFieldChangedChain(extensions);
     chain.execAnyFieldChanged(source);
+  }
+
+  protected final void interceptContainerFormClosed() {
+    List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
+    WizardContainerFormClosedChain chain = new WizardContainerFormClosedChain(extensions);
+    chain.execContainerFormClosed();
   }
 
   protected final void interceptReset() {
