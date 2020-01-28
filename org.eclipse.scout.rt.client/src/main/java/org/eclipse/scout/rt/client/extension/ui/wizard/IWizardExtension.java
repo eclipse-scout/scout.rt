@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardActive
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAnyFieldChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardCancelChain;
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardContainerFormClosedChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardCreateContainerFormChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardDecorateContainerFormChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardFinishChain;
@@ -49,6 +50,8 @@ public interface IWizardExtension<OWNER extends AbstractWizard> extends IExtensi
   IWizardContainerForm execCreateContainerForm(WizardCreateContainerFormChain chain);
 
   void execDecorateContainerForm(WizardDecorateContainerFormChain chain);
+
+  void execContainerFormClosed(WizardContainerFormClosedChain chain);
 
   void execAnyFieldChanged(WizardAnyFieldChangedChain chain, IFormField source);
 

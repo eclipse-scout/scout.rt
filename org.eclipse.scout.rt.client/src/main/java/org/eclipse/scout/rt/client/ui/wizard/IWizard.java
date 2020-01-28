@@ -67,6 +67,8 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
    */
   String PROP_CLOSE_TYPE = "closeType";
 
+  String PROP_MANAGED_BY_CONTAINER_FORM = "managedByContainerForm";
+
   IFastListenerList<WizardListener> wizardListeners();
 
   default void addWizardListener(WizardListener listener) {
@@ -91,7 +93,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
    *
    * @see IWizard#doNextStep()
    */
-  void setChanging(boolean b);
+  void setChanging(boolean changing);
 
   boolean isChanging();
 
@@ -104,6 +106,8 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
    * @return the type in which the wizard was closed
    */
   CloseType getCloseType();
+
+  boolean isManagedByContainerForm();
 
   /**
    * start the wizard
