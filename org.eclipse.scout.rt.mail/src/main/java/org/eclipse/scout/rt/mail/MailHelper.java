@@ -179,9 +179,10 @@ public class MailHelper {
           else if (part.isMimeType(CONTENT_TYPE_MESSAGE_RFC822) && part.getContent() instanceof MimeMessage) {
             // its a MIME message in rfc822 format as attachment therefore we have to set the filename for the attachment correctly.
             if (attachmentCollector != null) {
-              MimeMessage msg = (MimeMessage) part.getContent();
-              String filteredSubjectText = StringUtility.filterText(msg.getSubject(), "a-zA-Z0-9_-", "");
-              String fileName = (StringUtility.hasText(filteredSubjectText) ? filteredSubjectText : "originalMessage") + ".eml";
+              String fileName = getFilenameFromRefc822Attachment(part);
+              if (StringUtility.isNullOrEmpty(fileName)) {
+                fileName = "originalMessage.eml";
+              }
               RFCWrapperPart wrapperPart = new RFCWrapperPart(part, fileName);
               attachmentCollector.add(wrapperPart);
             }
@@ -1007,6 +1008,20 @@ public class MailHelper {
       LOG.warn("Failed to get attachment filename", e);
       return null;
     }
+  }
+
+  public String getFilenameFromRefc822Attachment(Part part) throws MessagingException, IOException {
+    if (part.getContent() == null) {
+      return null;
+    }
+    String subject = ((MimeMessage) part.getContent()).getSubject();
+    if (StringUtility.hasText(subject)) {
+      String name = FileUtility.toValidFilename(subject);
+      if (StringUtility.hasText(name)) {
+        return name + guessAttachmentFileExtension(part.getContentType());
+      }
+    }
+    return null;
   }
 
   /**
