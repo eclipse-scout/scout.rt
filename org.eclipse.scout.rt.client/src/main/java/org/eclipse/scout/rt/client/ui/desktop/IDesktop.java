@@ -277,7 +277,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   <F extends IForm, H extends IFormHandler> List<F> findAllOpenViews(Class<? extends F> formClass, Class<? extends H> handlerClass, Object exclusiveKey);
 
   /**
-   * see {@link #findAllOpenForms(Class, Class, Object)}
+   * see {@link #findAllOpenViews(Class, Class, Object)}
    *
    * @return null if no match is found, else the first encountered match
    */
@@ -287,7 +287,6 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * Returns all {@link IForm}s with dialog character in the order as registered.
    * <ul>
    * <li>{@link IForm#DISPLAY_HINT_DIALOG}</li>
-   * <li>{@link IForm#DISPLAY_HINT_POPUP_DIALOG}</li>
    * <li>{@link IForm#DISPLAY_HINT_POPUP_WINDOW}</li>
    * </ul>
    */
@@ -300,7 +299,6 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * A dialog has one of the following display hint:
    * <ul>
    * <li>{@link IForm#DISPLAY_HINT_DIALOG}</li>
-   * <li>{@link IForm#DISPLAY_HINT_POPUP_DIALOG}</li>
    * <li>{@link IForm#DISPLAY_HINT_POPUP_WINDOW}</li>
    * </ul>
    * <p>
@@ -441,7 +439,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   /**
    * Add the listener so it is called as <em>last</em> listener.
    * <p>
-   * Use {@link #addDesktopListener(DesktopListener)} in all other cases
+   * Use {@link #addDesktopListener(DesktopListener, Integer...)} in all other cases
    *
    * @param listener
    * @param eventTypes
@@ -478,7 +476,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * These might include pages, forms, fields etc.<br>
    *
    * @param dataTypes
-   *          accepts vararg Objects that act as {@link DataChangeEvent#getEventType())} in implicitly created
+   *          accepts vararg Objects that act as {@link DataChangeEvent#getDataType())} in implicitly created
    *          {@link DataChangeEvent}s.
    * @see {@link AbstractForm#execDataChanged(Object...)} {@link AbstractForm#execDataChanged(Object...)}
    *      {@link AbstractFormField#execDataChanged(Object...)} {@link AbstractFormField#execDataChanged(Object...)}
@@ -539,18 +537,18 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   IForm getPageDetailForm();
 
   /**
-   * see {@link #getPageDetailForm()}, {@link AbstractDesktop#execChangedPageDetailForm(IForm)}
+   * see {@link #getPageDetailForm()}, {@link AbstractDesktop#execPageDetailFormChanged(IForm, IForm)}
    */
   void setPageDetailForm(IForm f);
 
   /**
-   * @return the detail table of the active (selected) page {@link IPage#getDetailTable()} of the active outline
+   * @return the detail table of the active (selected) page {@link IPage#getTable()} of the active outline
    *         {@link IOutline#getDetailTable()}
    */
   ITable getPageDetailTable();
 
   /**
-   * see {@link #getPageDetailTable()}, {@link AbstractDesktop#execChangedPageDetailTable(IForm)}
+   * see {@link #getPageDetailTable()}, {@link AbstractDesktop#execPageDetailTableChanged(ITable, ITable)}
    */
   void setPageDetailTable(ITable t);
 
@@ -561,7 +559,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   IForm getPageSearchForm();
 
   /**
-   * see {@link #getPageSearchForm()}, {@link AbstractDesktop#execChangedPageSearchForm(IForm)}
+   * see {@link #getPageSearchForm()}, {@link AbstractDesktop#execPageSearchFormChanged(IForm, IForm)}
    */
   void setPageSearchForm(IForm f);
 
@@ -942,7 +940,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   /**
    * Cancels all forms contained in the given {@link Set} including all open dialogs, views, message boxes and file
    * choosers related to the forms in the formSet (display parent hierarchy). For forms with unsaved changes the user
-   * will be asked if they should be saved or not with a specific dialog (see {@link UnsavedFormChangesFrom}). If only
+   * will be asked if they should be saved or not with a specific dialog (see {@link UnsavedFormChangesForm}). If only
    * one form with unsaved changes the regular confirmation message box is shown instead of the
    * {@link UnsavedFormChangesForm}.
    *
@@ -957,7 +955,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   /**
    * Cancels all forms contained in the given {@link Set} including all open dialogs, views, message boxes and file
    * choosers related to the forms in the formSet (display parent hierarchy). For forms with unsaved changes the user
-   * will be asked if they should be saved or not with a specific dialog (see {@link UnsavedFormChangesFrom}).
+   * will be asked if they should be saved or not with a specific dialog (see {@link UnsavedFormChangesForm}).
    *
    * @param formSet
    *          {@link Set} of {@link IForm}s that should be canceled. Can be null or empty.

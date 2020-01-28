@@ -42,7 +42,7 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, ID
 
   /**
    * @return The {@link ITable} of this {@link IPage} or {@code null} if it does not have a table. If this page has a
-   *         table but it is not yet created it will be created and initialized. Same as {@link #getTable(true)}.
+   *         table but it is not yet created it will be created and initialized.
    */
   T getTable();
 
@@ -101,14 +101,12 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, ID
   void setDetailForm(IForm form);
 
   /**
-   * @return the child page at the index Note that this is <b>not</b> exactly the same as (IPage)getChildNode(). see
-   *         {@link VirtualPage} for more details.
+   * @return the child page at the index Note that this is <b>not</b> exactly the same as (IPage)getChildNode().
    */
   IPage<?> getChildPage(int index);
 
   /**
-   * @return all child pages Note that this is <b>not</b> exactly the same as (IPage)getChildNodes(). see
-   *         {@link VirtualPage} for more details.
+   * @return all child pages Note that this is <b>not</b> exactly the same as (IPage)getChildNodes().
    *         <p>
    *         Note: Calling this method effectively creates all child page objects and may be expensive on pages with
    *         many child pages.

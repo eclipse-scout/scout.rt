@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.platform.classid.ITypeWithSettableClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
 import org.eclipse.scout.rt.platform.reflect.IPropertyFilter;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
@@ -136,7 +137,7 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
 
   /**
    * Activate the form in terms of UI visibility / focus target<br>
-   * This will send a desktop event {@link DesktopEvent#TYPE_FORM_ENSURE_VISIBLE}
+   * This will send a desktop event {@link DesktopEvent#TYPE_FORM_ACTIVATE}
    */
   void activate();
 
@@ -265,7 +266,7 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   boolean isFormStartable();
 
   /**
-   * true while the {@link IFormHandler#execLoad()} method is running<br>
+   * true while the {@link AbstractFormHandler#execLoad()} method is running<br>
    * this is often used in {@link AbstractValueField#execChangedValue()}
    */
   boolean isFormLoading();
@@ -326,7 +327,7 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    *          a filter that can be used to specify which form properties should be imported
    * @param formFieldFilter
    *          a filter that can be used to specify which form fields should be imported
-   * @see IPropertyFilter#accept(org.eclipse.scout.rt.platform.beans.FastPropertyDescriptor)
+   * @see IPropertyFilter#accept(FastPropertyDescriptor) 
    * @see IFormFieldFilter#accept(IFormField)
    */
   void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter, IFormFieldFilter formFieldFilter);
@@ -466,32 +467,66 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   /**
    * The system button (type) that triggered the save
    *
-   * @see IButton.SYSTEM_TYPE_...
+   * @see "<code>IButton.SYSTEM_TYPE_*</code> constants"
    */
   int getCloseSystemType();
 
   void setCloseSystemType(int saveType);
 
   /**
-   * UI hint that gui should be maximized
+   * This method does nothing since Scout moved to the web with version 5.2.
+   * @deprecated since Scout 10, will be removed with Scout 11
    */
+  @Deprecated
   boolean isMaximized();
 
+  /**
+   * This method does nothing since Scout moved to the web with version 5.2.
+   * @deprecated since Scout 10, will be removed with Scout 11
+   */
+  @Deprecated
   void setMaximized(boolean b);
 
+  /**
+   * This method does nothing since Scout moved to the web with version 5.2.
+   * @deprecated since Scout 10, will be removed with Scout 11
+   */
+  @Deprecated
   boolean isMaximizeEnabled();
 
+  /**
+   * UI hint that GUI should be maximized. This method does nothing since Scout moved to the web with version 5.2.
+   * @deprecated since Scout 10, will be removed with Scout 11
+   */
+  @Deprecated
   void setMaximizeEnabled(boolean b);
 
   /**
-   * UI hint that gui should be minimized
+   * This method does nothing since Scout moved to the web with version 5.2.
+   * @deprecated since Scout 10, will be removed with Scout 11
    */
+  @Deprecated
   boolean isMinimized();
 
+  /**
+   * UI hint that GUI should be minimized. This method does nothing since Scout moved to the web with version 5.2.
+   * @deprecated since Scout 10, will be removed with Scout 11
+   */
+  @Deprecated
   void setMinimized(boolean b);
 
+  /**
+   * This method does nothing since Scout moved to the web with version 5.2.
+   * @deprecated since Scout 10, will be removed with Scout 11
+   */
+  @Deprecated
   boolean isMinimizeEnabled();
 
+  /**
+   * This method does nothing since Scout moved to the web with version 5.2.
+   * @deprecated since Scout 10, will be removed with Scout 11
+   */
+  @Deprecated
   void setMinimizeEnabled(boolean b);
 
   /**
@@ -519,7 +554,6 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   /**
    * @return the display hint to control visualization of this {@link IForm}.
    * @see #DISPLAY_HINT_VIEW
-   * @see #DISPLAY_HINT_POPUP_DIALOG
    * @see #DISPLAY_HINT_POPUP_WINDOW
    */
   int getDisplayHint();
@@ -528,7 +562,6 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * Set the given hint to control visualization of this {@link IForm}.
    * <ul>
    * <li>{@link #DISPLAY_HINT_VIEW}</li>
-   * <li>{@link #DISPLAY_HINT_POPUP_DIALOG}</li>
    * <li>{@link #DISPLAY_HINT_POPUP_WINDOW}</li>
    * </ul>
    */
