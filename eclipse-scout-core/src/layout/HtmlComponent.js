@@ -388,6 +388,8 @@ export default class HtmlComponent {
   /**
    * Sets the size of the component, insets included. Which means: the method subtracts the components insets
    * from the given size before setting the width/height of the component.
+   *
+   * @param {Dimension} size
    */
   setSize(size) {
     if (!this.isAttachedAndVisible()) {
