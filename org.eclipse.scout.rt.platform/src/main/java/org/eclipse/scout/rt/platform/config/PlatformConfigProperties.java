@@ -242,7 +242,7 @@ public final class PlatformConfigProperties {
 
     @Override
     public Boolean getDefaultValue() {
-      return true;
+      return false;
     }
   }
 }
