@@ -19,7 +19,9 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
+import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
 import org.eclipse.scout.rt.client.ui.form.fields.imagefield.IImageField;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -27,6 +29,7 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.basic.filechooser.JsonFileChooserAcceptAttributeBuilder;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
@@ -34,11 +37,13 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormField<IMAGE_FIELD> implements IBinaryResourceProvider, IBinaryResourceConsumer, IJsonContextMenuOwner {
 
   public static final String PROP_IMAGE_URL = "imageUrl";
+  public static final String PROP_ACCEPT_TYPES = "acceptTypes";
 
   private PropertyChangeListener m_contextMenuListener;
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
@@ -83,6 +88,26 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
       @Override
       protected Boolean modelValue() {
         return getModel().isUploadEnabled();
+      }
+    });
+    putJsonProperty(new JsonProperty<IMAGE_FIELD>(IFileChooserField.PROP_FILE_EXTENSIONS, model) {
+      @Override
+      protected List<String> modelValue() {
+        return getModel().getFileExtensions();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        @SuppressWarnings("unchecked")
+        List<String> fileExtensions = (List<String>) value;
+        return new JSONArray(BEANS.get(JsonFileChooserAcceptAttributeBuilder.class)
+            .withTypes(fileExtensions)
+            .build());
+      }
+
+      @Override
+      public String jsonPropertyName() {
+        return PROP_ACCEPT_TYPES;
       }
     });
   }

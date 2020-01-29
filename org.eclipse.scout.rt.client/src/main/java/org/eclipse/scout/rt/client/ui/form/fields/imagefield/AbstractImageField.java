@@ -143,6 +143,12 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     return false;
   }
 
+  @ConfigProperty(ConfigProperty.FILE_EXTENSIONS)
+  @Order(380)
+  protected List<String> getConfiguredFileExtensions() {
+    return CollectionUtility.arrayList("png", "bmp", "jpg", "jpeg", "gif");
+  }
+
   /**
    * Configures the maximum size for a drop request (in bytes).
    * <p>
@@ -222,6 +228,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     setDropMaximumSize(getConfiguredDropMaximumSize());
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
     setUploadEnabled(getConfiguredUploadEnabled());
+    setFileExtensions(getConfiguredFileExtensions());
 
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
@@ -493,6 +500,17 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   @Override
   public void setUploadEnabled(boolean uploadEnabled) {
     propertySupport.setPropertyBool(PROP_UPLOAD_ENABLED, uploadEnabled);
+  }
+
+  @Override
+  public void setFileExtensions(List<String> fileExtensions) {
+    setProperty(PROP_FILE_EXTENSIONS, CollectionUtility.arrayListWithoutNullElements(fileExtensions));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<String> getFileExtensions() {
+    return CollectionUtility.arrayList((List<String>) getProperty(PROP_FILE_EXTENSIONS));
   }
 
   /*

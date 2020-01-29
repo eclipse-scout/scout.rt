@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.imagefield;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -41,6 +43,7 @@ public interface IImageField extends IFormField, IDNDSupport, IContextMenuOwner 
   String PROP_AUTO_FIT = "autoFit";
   String PROP_SCROLL_BAR_ENABLED = "scrollBarEnabled";
   String PROP_UPLOAD_ENABLED = "uploadEnabled";
+  String PROP_FILE_EXTENSIONS = "fileExtensions";
 
   String getImageUrl();
 
@@ -125,5 +128,9 @@ public interface IImageField extends IFormField, IDNDSupport, IContextMenuOwner 
   boolean isUploadEnabled();
 
   void setUploadEnabled(boolean uploadEnabled);
+
+  List<String> getFileExtensions();
+
+  void setFileExtensions(List<String> fileExtensions);
 
 }

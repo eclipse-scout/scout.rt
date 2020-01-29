@@ -99,7 +99,17 @@ public class ImageFieldTest {
     Assert.assertEquals("ImageField should have 1 menu", 1, imageFieldMenus.size());
     Assert.assertEquals("ImageFieldMenu", imageFieldMenus.get(0).getText());
     Assert.assertEquals("control-a", imageFieldMenus.get(0).getKeyStroke());
+  }
 
+  @Test
+  public void testFileExtensions() {
+    List<String> extensions = m_form.getImageField().getFileExtensions();
+    Assert.assertEquals("There should be 5 file extensions registered", 5, extensions.size());
+    Assert.assertTrue(extensions.contains("png"));
+    Assert.assertTrue(extensions.contains("bmp"));
+    Assert.assertTrue(extensions.contains("jpg"));
+    Assert.assertTrue(extensions.contains("jpeg"));
+    Assert.assertTrue(extensions.contains("gif"));
   }
 
   @After
