@@ -83,6 +83,9 @@ public class HierarchicalLookupResultBuilder<VALUE> {
   }
 
   protected boolean contains(VALUE key, List<ILookupRow<VALUE>> path) {
+    if (key == null) {
+      return false;
+    }
     for (ILookupRow<VALUE> row : path) {
       if (key.equals(row.getKey())) {
         return true;
@@ -92,6 +95,9 @@ public class HierarchicalLookupResultBuilder<VALUE> {
   }
 
   protected ILookupRow<VALUE> getLookupRow(VALUE key) {
+    if (key == null) {
+      return null;
+    }
     if (!m_keyCache.containsKey(key)) {
       ILookupRow<VALUE> row = m_lookupRowProvider.getLookupRow(key);
       m_keyCache.put(key, row);
@@ -139,11 +145,12 @@ public class HierarchicalLookupResultBuilder<VALUE> {
    * Creates a map containing every key in the tree and its parent tree node
    */
   protected Map<VALUE, ILookupRow<VALUE>> createParentMap(Collection<? extends ILookupRow<VALUE>> lookupRows) {
+    for (ILookupRow<VALUE> row : lookupRows) {
+      m_keyCache.put(row.getKey(), row);
+    }
     final Map<VALUE, ILookupRow<VALUE>> map = new HashMap<>();
     for (ILookupRow<VALUE> row : lookupRows) {
-      VALUE key = row.getKey();
-      m_keyCache.put(key, row);
-      map.put(key, getLookupRow(row.getParentKey()));
+      map.put(row.getKey(), getLookupRow(row.getParentKey()));
     }
     return map;
   }
