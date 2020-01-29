@@ -140,7 +140,7 @@ export default class Tooltip extends Widget {
     super._onAttach();
     if (this._openLater && !this.rendered) {
       this._openLater = false;
-      this.render(this.$parent);
+      this.render();
     }
   }
 
