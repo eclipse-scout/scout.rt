@@ -1292,10 +1292,11 @@ export default class DateField extends ValueField {
       eventOnDateField = this.$dateField ? (this.$dateField.isOrHas(target) || this.$dateFieldIcon.isOrHas(target) || (this.$dateClearIcon && this.$dateClearIcon.isOrHas(target))) : false,
       eventOnTimeField = this.$timeField ? (this.$timeField.isOrHas(target) || this.$timeFieldIcon.isOrHas(target) || (this.$timeClearIcon && this.$timeClearIcon.isOrHas(target))) : false,
       eventOnPopup = this.popup && this.popup.$container.isOrHas(target),
+      eventOnStatus = this.fieldStatus && this.fieldStatus.$container.isOrHas(target),
       datePicker = this.getDatePicker(),
       timePicker = this.getTimePicker();
 
-    if (!eventOnDateField && !eventOnTimeField && !eventOnPopup) {
+    if (!eventOnDateField && !eventOnTimeField && !eventOnPopup && !eventOnStatus) {
       // event outside this field.
       dateFieldActive = focusUtils.isActiveElement(this.$dateField);
       timeFieldActive = focusUtils.isActiveElement(this.$timeField);
