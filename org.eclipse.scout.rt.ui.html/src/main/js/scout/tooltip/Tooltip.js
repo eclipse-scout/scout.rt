@@ -137,7 +137,7 @@ scout.Tooltip.prototype._onAttach = function() {
   scout.Tooltip.parent.prototype._onAttach.call(this);
   if (this._openLater && !this.rendered) {
     this._openLater = false;
-    this.render(this.$parent);
+    this.render();
   }
 };
 
