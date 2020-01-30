@@ -85,7 +85,7 @@ export default class ErrorHandler {
    * 4. Everything else         (code: 'P4')
    * @returns {Promise}
    */
-  analyzeError(error) {
+  analyzeError(error, ...args) {
     var errorInfo = {
       code: null,
       message: null,
@@ -96,10 +96,10 @@ export default class ErrorHandler {
       error: error
     };
 
-    return this._analyzeError(errorInfo);
+    return this._analyzeError(errorInfo, ...args);
   }
 
-  _analyzeError(errorInfo) {
+  _analyzeError(errorInfo, ...args) {
     var error = errorInfo.error;
     // 1. Regular errors
     if (error instanceof Error) {
@@ -118,7 +118,7 @@ export default class ErrorHandler {
 
     // 2. Ajax errors
     if ($.isJqXHR(error) || (Array.isArray(error) && $.isJqXHR(error[0])) || error instanceof AjaxError) {
-      this._analyzeAjaxError(errorInfo);
+      this._analyzeAjaxError(errorInfo, ...args);
       return $.resolvedPromise(errorInfo);
     }
 
@@ -162,16 +162,18 @@ export default class ErrorHandler {
     errorInfo.log = arrays.format(log, '\n');
   }
 
-  _analyzeAjaxError(errorInfo) {
+  _analyzeAjaxError(errorInfo, ...args) {
     var error = errorInfo.error;
-    // jQuery $.ajax() error (arguments: jqXHR, textStatus, errorThrown, requestOptions)
     var jqXHR, errorThrown, requestOptions;
     if (error instanceof AjaxError) {
+      // Scout Ajax Error
       jqXHR = error.jqXHR;
       errorThrown = error.errorThrown;
       requestOptions = error.requestOptions; // scout extension
     } else {
-      var args = (Array.isArray(error) ? error : arguments);
+      // jQuery $.ajax() error (arguments of the fail handler are: jqXHR, textStatus, errorThrown, requestOptions)
+      // The first argument (jqXHR) is stored in errorInfo.error (may even be an array) -> create args array again and extract the parameters
+      args = arrays.ensure(error).concat(args);
       jqXHR = args[0];
       errorThrown = args[2];
       requestOptions = args[3]; // scout extension
