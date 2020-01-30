@@ -660,11 +660,11 @@ describe("TableAdapter", function() {
 
   });
 
-  describe("_postCreateWidget", function() {
+  describe('_postCreateWidget', function() {
 
-    it("should send a filter event, if a filter exists on table after widget is created.", function () {
+    it('should send a filter event, if a filter exists on table after widget is created.', function () {
       var model = helper.createModelFixture(2, 5);
-      $.extend(model, {filters: [{objectType: "TableTextUserFilter", filterType: "text", text: "2"}]});
+      $.extend(model, {filters: [{objectType: 'TableTextUserFilter', filterType: 'text', text: '2'}]});
       var adapter = helper.createTableAdapter(model);
       var table = adapter.createWidget(model, session.desktop);
 
