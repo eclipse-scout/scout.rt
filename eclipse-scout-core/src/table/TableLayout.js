@@ -86,7 +86,6 @@ export default class TableLayout extends AbstractLayout {
     }
 
     if (!this.table.tileMode) {
-
       this._layoutColumns();
 
       // Size of last column may have to be adjusted due to the header menu items
@@ -128,9 +127,27 @@ export default class TableLayout extends AbstractLayout {
       columnLayoutDirty = htmlContainer.sizeCached.width !== width;
     }
     // Auto resize only if table width or column structure has changed
-    if (this.table.autoResizeColumns && columnLayoutDirty) {
-      this._autoResizeColumns(widthHint);
+    if (columnLayoutDirty) {
+      if (this.table.autoResizeColumns) {
+        this._autoResizeColumns(widthHint);
+      }
+      // This is already done in _renderRowsInRange, but it is necessary here as well if the zoom level changes dynamically (or autoResizeColumns toggles)
+      this._updateRealColumnWidths();
       this.table.columnLayoutDirty = false;
+    }
+  }
+
+  /**
+   * Workaround for Chrome bug, see {@link Table._updateRealColumnWidths}
+   */
+  _updateRealColumnWidths() {
+    if (this.table._updateRealColumnWidths()) {
+      this.table._updateRowWidth();
+      if (this.table.header && this.table.header.rendered) {
+        this.table.header.resizeHeaderItems();
+      }
+      this.table.$rows(true)
+        .css('width', this.table.rowWidth);
     }
   }
 

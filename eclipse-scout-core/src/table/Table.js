@@ -1514,6 +1514,7 @@ export default class Table extends Widget {
       return false;
     }
     var changed = false;
+    $row = $row || this.$rows().eq(0);
     this.visibleColumns().forEach(function(column, colIndex) {
       if (this._updateRealColumnWidth(column, colIndex, $row)) {
         changed = true;
@@ -1621,7 +1622,7 @@ export default class Table extends Widget {
 
     $rows.each(function(index, rowObject) {
       var $row = $(rowObject);
-      // Workaround for Chrome bug, see updateExactColumnWidths
+      // Workaround for Chrome bug, see _updateRealColumnWidths
       // Can be removed when Chrome bug is resolved.
       // This is only necessary once (when the first row is rendered)
       if (this.viewRangeRendered.size() === numRowsRendered && this._updateRealColumnWidths($row)) {
@@ -4597,10 +4598,14 @@ export default class Table extends Widget {
   }
 
   _renderAutoResizeColumns() {
-    if (this.autoResizeColumns) {
-      this.columnLayoutDirty = true;
-      this.invalidateLayoutTree();
+    if (!this.autoResizeColumns && Device.get().hasTableCellZoomBug()) {
+      // Clear real width so that row width is updated correctly by the table layout if autoResizeColumns is disabled on the fly
+      this.visibleColumns().forEach(function(column, colIndex) {
+        column._realWidth = null;
+      });
     }
+    this.columnLayoutDirty = true;
+    this.invalidateLayoutTree();
   }
 
   setMultilineText(multilineText) {

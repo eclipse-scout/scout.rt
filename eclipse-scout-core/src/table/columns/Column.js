@@ -62,7 +62,7 @@ export default class Column {
     this.events = this._createEventSupport();
 
     this._tableColumnsChangedHandler = this._onTableColumnsChanged.bind(this);
-    // Contains the width the cells of the column really have (only set in Chrome due to a Chrome bug, see Table._updateExactColumnWidths)
+    // Contains the width the cells of the column really have (only set in Chrome due to a Chrome bug, see Table._updateRealColumnWidths)
     this._realWidth = null;
   }
 
