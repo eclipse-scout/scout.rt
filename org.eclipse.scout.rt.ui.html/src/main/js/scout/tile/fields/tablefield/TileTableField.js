@@ -82,6 +82,9 @@ scout.TileTableField.prototype._onMenuBarPropertyChange = function(event) {
 };
 
 scout.TileTableField.prototype._toggleHasMenuBar = function() {
+  if (!this.rendered && !this.rendering) {
+    return;
+  }
   // adjust menu bar on TileTableField with the additional class has-menubar.
   this.$container.toggleClass('has-menubar', this.table.menuBar.visible);
 };
