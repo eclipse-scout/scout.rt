@@ -274,7 +274,7 @@ public class CsvHelper {
       // data
       List<String> cellList;
       lineNr = 1;
-      while ((cellList = importRow(reader)) != null && lineNr <= rowCount) {
+      while (lineNr <= rowCount && (cellList = importRow(reader)) != null) {
         // fill up with empty row if allowed
         while (allowVariableColumnCount && (cellList.size() < getColumnNames().size())) {
           cellList.add(cellList.size(), null);
