@@ -663,4 +663,25 @@ describe('TableAdapter', function() {
 
   });
 
+  describe('_postCreateWidget', function() {
+
+    it('should send a filter event, if a filter exists on table after widget is created.', function() {
+      var model = helper.createModelFixture(2, 5);
+      $.extend(model, {filters: [{objectType: 'TableTextUserFilter', filterType: 'text', text: '2'}]});
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.createWidget(model, session.desktop);
+
+      sendQueuedAjaxCalls('', 250);
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      var rows = [table.rows[2]];
+      var event = new scout.RemoteEvent(table.id, 'filter', {
+        rowIds: helper.getRowIds(rows),
+        showBusyIndicator: false
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
+  });
+
 });
