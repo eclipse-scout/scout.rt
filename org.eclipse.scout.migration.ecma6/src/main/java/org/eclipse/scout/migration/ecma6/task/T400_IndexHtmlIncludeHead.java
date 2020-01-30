@@ -1,9 +1,9 @@
 package org.eclipse.scout.migration.ecma6.task;
 
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathFilters;
@@ -36,25 +36,18 @@ public class T400_IndexHtmlIncludeHead extends AbstractTask {
 
     Document doc = Jsoup.parse(source);
     Elements scoutStylesheetElements = doc.getElementsByTag("scout:include");
-    Element headIncludeTag = scoutStylesheetElements.stream()
-        .filter(e -> {
-          String template = e.attr("template");
-          return template != null && template.equalsIgnoreCase("head.html");
-        })
-        .findFirst().orElse(null);
-    if (headIncludeTag != null) {
-
-      Pattern pattern = Pattern.compile("(\\s*)" + Pattern.quote(headIncludeTag.outerHtml()));
-      Matcher matcher = pattern.matcher(source);
-      if (matcher.find()) {
-        source = matcher.replaceAll(matcher.group(1) + "<scout:include template=\"includes/head.html\" />");
+    final List<Element> includeTags = scoutStylesheetElements.stream()
+        .filter(e -> e.attr("template") != null)
+        .collect(Collectors.toList());
+    Element headIncludeTag = null;
+    for (Element e : includeTags) {
+      String template = e.attr("template");
+      if (template.equalsIgnoreCase("head.html")) {
+        headIncludeTag = e;
       }
-      else {
-        source = MigrationUtility.prependTodo(source, "Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />'.", workingCopy.getLineDelimiter());
-        LOG.warn("Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />' in '" + workingCopy.getPath() + "'");
-      }
+      source = source.replace(e.outerHtml(), e.outerHtml().replace(template, "includes/" + template));
     }
-    else {
+    if (headIncludeTag == null) {
       source = MigrationUtility.prependTodo(source, "Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />'.", workingCopy.getLineDelimiter());
       LOG.warn("Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />' in '" + workingCopy.getPath() + "'");
     }
