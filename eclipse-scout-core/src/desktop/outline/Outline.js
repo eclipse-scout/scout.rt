@@ -1079,13 +1079,9 @@ export default class Outline extends Tree {
 
   _onGlassPaneMouseDown(glassPaneOwner, $glassPane) {
     var desktop = this.session.desktop;
-    if (glassPaneOwner instanceof Form && glassPaneOwner.isDialog()) {
-      desktop.activateForm(glassPaneOwner);
-    } else {
-      if (desktop.navigation) {
-        if ($glassPane.parent()[0] === desktop.navigation.$body[0]) {
-          desktop.bringOutlineToFront();
-        }
+    if (desktop.navigation) {
+      if ($glassPane.parent()[0] === desktop.navigation.$body[0]) {
+        desktop.bringOutlineToFront();
       }
     }
   }
