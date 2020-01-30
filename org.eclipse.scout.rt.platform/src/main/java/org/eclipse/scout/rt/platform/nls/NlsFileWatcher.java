@@ -47,6 +47,11 @@ public class NlsFileWatcher extends AbstractClasspathFileWatcher {
   }
 
   @Override
+  protected String getConfiguredExecutionHint() {
+    return NlsFileWatcher.class.getName();
+  }
+
+  @Override
   protected boolean execAccept(Path path) {
     return m_directoryMatcher.matches(path);
   }

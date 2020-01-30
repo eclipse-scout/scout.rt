@@ -87,6 +87,11 @@ public abstract class AbstractClasspathFileWatcher {
    */
   protected abstract String getConfiguredJobName();
 
+  /**
+   * @return A execution hint for the job that watches for file changes.
+   */
+  protected abstract String getConfiguredExecutionHint();
+
   protected void start() {
     Jobs.schedule(() -> {
       try {
@@ -125,7 +130,8 @@ public abstract class AbstractClasspathFileWatcher {
         LOG.debug("Watcher stopped");
       }
     }, Jobs.newInput()
-        .withName(getConfiguredJobName()));
+        .withName(getConfiguredJobName())
+        .withExecutionHint(getConfiguredExecutionHint()));
   }
 
   protected Set<Path> getRootPaths() {
