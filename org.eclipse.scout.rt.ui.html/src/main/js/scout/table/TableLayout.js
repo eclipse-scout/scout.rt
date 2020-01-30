@@ -100,9 +100,28 @@ scout.TableLayout.prototype._layoutColumns = function(widthHint) {
     columnLayoutDirty = htmlContainer.sizeCached.width !== width;
   }
   // Auto resize only if table width or column structure has changed
-  if (this.table.autoResizeColumns && columnLayoutDirty) {
-    this._autoResizeColumns(widthHint);
+  if (columnLayoutDirty) {
+    if (this.table.autoResizeColumns) {
+      this._autoResizeColumns(widthHint);
+    }
+    // This is already done in _renderRowsInRange, but it is necessary here as well if the zoom level changes dynamically (or autoResizeColumns toggles)
+    this._updateRealColumnWidths();
     this.table.columnLayoutDirty = false;
+  }
+};
+
+
+/**
+ * Workaround for Chrome bug, see {@link Table._updateRealColumnWidths}
+ */
+scout.TableLayout.prototype._updateRealColumnWidths = function() {
+  if (this.table._updateRealColumnWidths()) {
+    this.table._updateRowWidth();
+    if (this.table.header && this.table.header.rendered) {
+      this.table.header.resizeHeaderItems();
+    }
+    this.table.$rows(true)
+      .css('width', this.table.rowWidth);
   }
 };
 

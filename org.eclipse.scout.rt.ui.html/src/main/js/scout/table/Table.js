@@ -1453,6 +1453,7 @@ scout.Table.prototype._updateRealColumnWidths = function($row) {
     return false;
   }
   var changed = false;
+  $row = $row || this.$rows().eq(0);
   this.visibleColumns().forEach(function(column, colIndex) {
     if (this._updateRealColumnWidth(column, colIndex, $row)) {
       changed = true;
@@ -1562,7 +1563,7 @@ scout.Table.prototype._renderRowsInRange = function(range) {
 
   $rows.each(function(index, rowObject) {
     var $row = $(rowObject);
-    // Workaround for Chrome bug, see updateExactColumnWidths
+    // Workaround for Chrome bug, see _updateRealColumnWidths
     // Can be removed when Chrome bug is resolved.
     // This is only necessary once (when the first row is rendered)
     if (this.viewRangeRendered.size() === numRowsRendered && this._updateRealColumnWidths($row)) {
@@ -4433,10 +4434,14 @@ scout.Table.prototype.setAutoResizeColumns = function(autoResizeColumns) {
 };
 
 scout.Table.prototype._renderAutoResizeColumns = function() {
-  if (this.autoResizeColumns) {
-    this.columnLayoutDirty = true;
-    this.invalidateLayoutTree();
+  if (!this.autoResizeColumns && scout.device.hasTableCellZoomBug()) {
+    // Clear real width so that row width is updated correctly by the table layout if autoResizeColumns is disabled on the fly
+    this.visibleColumns().forEach(function(column, colIndex) {
+      column._realWidth = null;
+    });
   }
+  this.columnLayoutDirty = true;
+  this.invalidateLayoutTree();
 };
 
 scout.Table.prototype.setMultilineText = function(multilineText) {
