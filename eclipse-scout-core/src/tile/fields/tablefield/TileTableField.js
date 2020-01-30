@@ -86,7 +86,7 @@ export default class TileTableField extends TableField {
   }
 
   _toggleHasMenuBar() {
-    if (!this.rendered) {
+    if (!this.rendered && !this.rendering) {
       return;
     }
     // adjust menu bar on TileTableField with the additional class has-menubar.
