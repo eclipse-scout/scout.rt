@@ -106,7 +106,7 @@ export default class ErrorHandler {
       // Map stack first before analyzing the error
       return this.mapStack(error.stack)
         .catch(function(result) {
-          errorInfo.mappingError = result.message + '\n' + +'\n' + result.error.message + '\n' + result.error.stack;
+          errorInfo.mappingError = result.message + '\n' + result.error.message + '\n' + result.error.stack;
           return null;
         })
         .then(function(mappedStack) {
