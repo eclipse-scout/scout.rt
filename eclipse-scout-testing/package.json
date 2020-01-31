@@ -33,11 +33,9 @@
     "release-postdependency": "releng-scripts release-publish-dependency"
   },
   "devDependencies": {
-    "@eclipse-scout/releng": "^10.0.0",
-    "jquery": "3.4.1",
-    "@eclipse-scout/core": "10.0.0-snapshot"
+    "@eclipse-scout/releng": "^10.0.0"
   },
-  "peerDependencies": {
+  "dependencies": {
     "jquery": "3.4.1",
     "@eclipse-scout/core": "10.0.0-snapshot"
   }

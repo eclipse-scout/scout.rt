@@ -47,8 +47,5 @@
   "dependencies": {
     "jquery": "3.4.1",
     "sourcemapped-stacktrace": "1.1.11"
-  },
-  "peerDependencies": {
-    "jquery": "3.4.1"
   }
 }
