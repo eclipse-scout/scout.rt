@@ -1171,6 +1171,13 @@ export default class SmartField extends ValueField {
     // Handling for undo/redo events which can affect this field, even tough the focus is on another field
     // we must have the focus, because otherwise acceptInput would be skipped, which could cause the smart-field
     // to have an invalid displayText which does not reflect the current value. #246765
+    //
+    // We cannot fix this problem on IE 11, because IE 11 triggers the INPUT event by error when DOM attributes
+    // like 'placeholder' change. Since we have no way to detect these false events, we must skip the undo/redo
+    // handling. See: https://github.com/vuejs/vue/issues/7138
+    if (Device.get().isInternetExplorer()) {
+      return;
+    }
     if (!this._userWasTyping) {
       if (!this.isFocused()) {
         this.focus();
