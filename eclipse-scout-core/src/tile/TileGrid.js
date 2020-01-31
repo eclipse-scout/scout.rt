@@ -39,6 +39,13 @@ import {
 } from '../index';
 import * as $ from 'jquery';
 
+/**
+ * Only select top-level tile elements. Do not select elements with a 'tile' class deeper in the tree.
+ * This prevents errors when a developer accidentally adds an element that has the 'tile' class. #262146
+ * @type {string}
+ */
+const TILE_SELECTOR = '> .tile';
+
 export default class TileGrid extends Widget {
   constructor() {
     super();
@@ -164,9 +171,9 @@ export default class TileGrid extends Widget {
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(this._createLayout());
     this.$container
-      .on('mousedown', '.tile', this._onTileMouseDown.bind(this))
-      .on('click', '.tile', this._onTileClick.bind(this))
-      .on('dblclick', '.tile', this._onTileDoubleClick.bind(this));
+      .on('mousedown', TILE_SELECTOR, this._onTileMouseDown.bind(this))
+      .on('click', TILE_SELECTOR, this._onTileClick.bind(this))
+      .on('dblclick', TILE_SELECTOR, this._onTileDoubleClick.bind(this));
   }
 
   _createLayout() {
