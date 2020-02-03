@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -404,16 +405,36 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   }
 
   /**
-   * Recursively traverses through the given nodes (and its child nodes) and checks which of the model nodes are hidden
-   * by tree filters.
+   * Applies node filters to the UI by converting them to NODES_DELETED and NODES_INSERTED events, respectively:
    * <ul>
    * <li>For every newly hidden node (i.e. a node that is currently visible on the UI) a NODES_DELETED event is created.
    * <li>For every newly visible node (i.e. a node that is currently invisible on the UI) a NODES_INSERTED event is
    * created.
    * </ul>
-   * All new events are added to the event buffer, where they might be coalesced later.
+   * All new events are already grouped by the common parent node and are added to the event buffer, where they might be
+   * further coalesced.
    */
   protected void applyFilterChangedEventToUiRec(List<ITreeNode> nodes) {
+    Map<ITreeNode, List<ITreeNode>> nodesToInsertByParent = new HashMap<>();
+    Map<ITreeNode, List<ITreeNode>> nodesToDeleteByParent = new HashMap<>();
+    processFilterChangedEventForUiRec(Collections.singletonList(getModel().getRootNode()), nodesToInsertByParent, nodesToDeleteByParent);
+    nodesToInsertByParent.entrySet().forEach(e -> m_eventBuffer.add(new TreeEvent(getModel(), TreeEvent.TYPE_NODES_INSERTED, e.getKey(), e.getValue())));
+    nodesToDeleteByParent.entrySet().forEach(e -> m_eventBuffer.add(new TreeEvent(getModel(), TreeEvent.TYPE_NODES_DELETED, e.getKey(), e.getValue())));
+  }
+
+  /**
+   * Recursively traverses through the given nodes (and its child nodes) and checks which of the model nodes are hidden
+   * by tree filters.
+   * <ul>
+   * <li>newly hidden nodes (i.e. a node that is currently visible on the UI) are collected in the
+   * {@code nodesToDeleteByParent} map.
+   * <li>newly visible nodes (i.e. a node that is currently invisible on the UI) are collected in the
+   * {@code nodesToInsertByParent} map.
+   * </ul>
+   * All affected nodes are grouped by parent node and event type. All new events are added to the event buffer, where
+   * they might be coalesced later.
+   */
+  protected void processFilterChangedEventForUiRec(List<ITreeNode> nodes, Map<ITreeNode, List<ITreeNode>> nodesToInsertByParent, Map<ITreeNode, List<ITreeNode>> nodesToDeleteByParent) {
     for (ITreeNode node : nodes) {
       boolean processChildNodes = true;
 
@@ -422,7 +443,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
         if (node.isFilterAccepted()) {
           if (existingNodeId == null) {
             // Node is not filtered but JsonTree does not know it yet --> handle as insertion event
-            m_eventBuffer.add(new TreeEvent(node.getTree(), TreeEvent.TYPE_NODES_INSERTED, node));
+            nodesToInsertByParent.computeIfAbsent(node.getParentNode(), k -> new LinkedList<>()).add(node);
             // Stop recursion, because this node (including its child nodes) is already inserted
             processChildNodes = false;
           }
@@ -430,7 +451,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
         else if (!node.isRejectedByUser()) {
           if (existingNodeId != null) {
             // Node is filtered, but JsonTree has it in its list --> handle as deletion event
-            m_eventBuffer.add(new TreeEvent(node.getTree(), TreeEvent.TYPE_NODES_DELETED, node));
+            nodesToDeleteByParent.computeIfAbsent(node.getParentNode(), k -> new LinkedList<>()).add(node);
           }
           // Stop recursion, because this node (including its child nodes) is already deleted
           processChildNodes = false;
@@ -439,7 +460,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
 
       // Recursion
       if (processChildNodes) {
-        applyFilterChangedEventToUiRec(node.getChildNodes());
+        processFilterChangedEventForUiRec(node.getChildNodes(), nodesToInsertByParent, nodesToDeleteByParent);
       }
     }
   }
