@@ -276,6 +276,18 @@ public class TreeEventBufferTest {
    */
   @Test
   public void testInsertAndRemoveInSameRequest() {
+    doTestInsertAndRemoveInSameRequest(true);
+  }
+
+  /**
+   * Insert a tree of nodes, and then remove them again (from inner to outer node)
+   */
+  @Test
+  public void testInsertAndRemoveInSameRequestUsingDeleteNode() {
+    doTestInsertAndRemoveInSameRequest(false);
+  }
+
+  protected void doTestInsertAndRemoveInSameRequest(boolean useTypeAllChildNodesDeleted) {
     // Note: A similar test but with a real tree can be found here:
     // org.eclipse.scout.rt.ui.html.json.tree.JsonTreeTest.testInsertAndDeleteInSameRequest()
 
@@ -298,9 +310,10 @@ public class TreeEventBufferTest {
     installChildNodes(nodeC, new ITreeNode[0]);
     installChildNodes(nodeB, new ITreeNode[0]);
     installChildNodes(nodeA, new ITreeNode[0]);
-    TreeEvent e2 = mockEvent(nodeC, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, nodeD);
-    TreeEvent e3 = mockEvent(nodeB, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, nodeC);
-    TreeEvent e4 = mockEvent(nodeA, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, nodeB);
+    final int eventType = useTypeAllChildNodesDeleted ? TreeEvent.TYPE_ALL_CHILD_NODES_DELETED : TreeEvent.TYPE_NODES_DELETED;
+    TreeEvent e2 = mockEvent(nodeC, eventType, nodeD);
+    TreeEvent e3 = mockEvent(nodeB, eventType, nodeC);
+    TreeEvent e4 = mockEvent(nodeA, eventType, nodeB);
     m_testBuffer.add(e2);
     m_testBuffer.add(e3);
     m_testBuffer.add(e4);
