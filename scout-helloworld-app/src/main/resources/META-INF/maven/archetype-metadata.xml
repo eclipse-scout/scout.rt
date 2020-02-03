@@ -37,6 +37,10 @@
     <requiredProperty key="userName">
       <defaultValue>Scout Robot</defaultValue>
     </requiredProperty>
+    <!-- debug output for postprocessing groovy script -->
+    <requiredProperty key="debug">
+      <defaultValue>false</defaultValue>
+    </requiredProperty>
   </requiredProperties>
   <modules>
     <module id="parent" dir="__rootArtifactId__" name="parent">
@@ -196,6 +200,8 @@
             <include>**/*.json</include>
             <include>**/*.launch</include>
             <include>**/*.js</include>
+            <include>**/*.sh</include>
+            <include>**/*.cmd</include>
           </includes>
         </fileSet>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">

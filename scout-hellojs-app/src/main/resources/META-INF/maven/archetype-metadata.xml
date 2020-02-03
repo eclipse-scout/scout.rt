@@ -22,6 +22,10 @@
     <requiredProperty key="scoutAuthPublicKeyDev">
       <defaultValue>changeme_database_password</defaultValue>
     </requiredProperty>
+    <!-- debug output for postprocessing groovy script -->
+    <requiredProperty key="debug">
+      <defaultValue>false</defaultValue>
+    </requiredProperty>    
   </requiredProperties>
   <modules>
     <module id="parent" dir="__rootArtifactId__" name="parent">
@@ -71,6 +75,8 @@
             <include>**/*.launch</include>
             <include>**/*.json</include>
             <include>**/*.less</include>
+            <include>**/*.sh</include>
+            <include>**/*.cmd</include>
           </includes>
         </fileSet>
         <fileSet filtered="false" encoding="UTF-8">
@@ -257,6 +263,8 @@
             <include>**/*.gitignore</include>
             <include>**/*.json</include>
             <include>**/*.js</include>
+            <include>**/*.sh</include>
+            <include>**/*.cmd</include>
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
