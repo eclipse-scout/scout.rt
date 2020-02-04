@@ -313,40 +313,42 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
       }
     });
     addPropertyChangeListener(e -> {
-      if (e.getPropertyName().equals(PROP_DISPLAY_MODE)) {
-        try {
-          interceptDisplayModeChanged((int) e.getNewValue());
-        }
-        catch (Exception t) {
-          BEANS.get(ExceptionHandler.class).handle(t);
-        }
-      }
-      else if (e.getPropertyName().equals(PROP_VIEW_RANGE)) {
-        try {
-          interceptViewRangeChanged((Range<Date>) e.getNewValue());
-        }
-        catch (Exception t) {
-          BEANS.get(ExceptionHandler.class).handle(t);
-        }
-      }
-      else if (e.getPropertyName().equals(PROP_SELECTION_RANGE)) {
-        try {
-          interceptSelectionRangeChanged((Range<Date>) e.getNewValue());
-        }
-        catch (Exception t) {
-          BEANS.get(ExceptionHandler.class).handle(t);
-        }
-      }
-      else if (e.getPropertyName().equals(PROP_SELECTED_ACTIVITY)) {
-        Activity<RI, AI> cell = (Activity<RI, AI>) e.getNewValue();
-        if (cell != null) {
+      switch (e.getPropertyName()) {
+        case PROP_DISPLAY_MODE:
           try {
-            interceptActivitySelected(cell);
+            interceptDisplayModeChanged((int) e.getNewValue());
           }
           catch (Exception t) {
             BEANS.get(ExceptionHandler.class).handle(t);
           }
-        }
+          break;
+        case PROP_VIEW_RANGE:
+          try {
+            interceptViewRangeChanged((Range<Date>) e.getNewValue());
+          }
+          catch (Exception t) {
+            BEANS.get(ExceptionHandler.class).handle(t);
+          }
+          break;
+        case PROP_SELECTION_RANGE:
+          try {
+            interceptSelectionRangeChanged((Range<Date>) e.getNewValue());
+          }
+          catch (Exception t) {
+            BEANS.get(ExceptionHandler.class).handle(t);
+          }
+          break;
+        case PROP_SELECTED_ACTIVITY:
+          Activity<RI, AI> cell = (Activity<RI, AI>) e.getNewValue();
+          if (cell != null) {
+            try {
+              interceptActivitySelected(cell);
+            }
+            catch (Exception t) {
+              BEANS.get(ExceptionHandler.class).handle(t);
+            }
+          }
+          break;
       }
     });
   }
@@ -631,8 +633,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
   }
 
   @Override
-  public void isSelectedResource(Resource<RI> resource) {
-    getSelectedResources().contains(resource);
+  public boolean isSelectedResource(Resource<RI> resource) {
+    return getSelectedResources().contains(resource);
   }
 
   @Override

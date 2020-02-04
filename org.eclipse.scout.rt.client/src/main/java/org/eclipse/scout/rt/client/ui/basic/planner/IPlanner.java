@@ -197,7 +197,7 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
 
   List<RESOURCE_ID> getSelectedResourceIds();
 
-  void isSelectedResource(Resource<RESOURCE_ID> resource);
+  boolean isSelectedResource(Resource<RESOURCE_ID> resource);
 
   void selectResource(Resource<RESOURCE_ID> resource);
 
