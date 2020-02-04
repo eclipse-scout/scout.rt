@@ -40,9 +40,10 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
       width = this.getWidth(chartValueGroups);
 
     // Grid
-    var yLabels = this._createYLabelsAndAjustDimensions(this.possibleYLines);
+    var yLabels = this._createYLabelsAndAdjustDimensions(this.possibleYLines);
 
     this.renderYGrid(yLabels);
+    this._renderAxisLabels();
 
     // Lines
     var chartValueGroup,

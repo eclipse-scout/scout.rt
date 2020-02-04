@@ -11,6 +11,8 @@ import {strings} from '@eclipse-scout/core';
 import {AbstractChartRenderer, Chart} from '../index';
 import * as $ from 'jquery';
 
+const LABEL_GAP = 5;
+
 export default class AbstractGridChartRenderer extends AbstractChartRenderer {
 
   constructor(chart) {
@@ -96,7 +98,8 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
 
     // adjust label position for grid charts to have more space for the label text
     if (this.chart.legendPosition === Chart.LEGEND_POSITION_RIGHT) {
-      this.labelBox.x = this.chartBox.width;
+      this.labelBox.x = this.chartBox.width + (this._yAxisLabel() ? this.labelSize.height + LABEL_GAP : 0);
+      this.labelBox.textWidth -= LABEL_GAP;
     } else if (this.chart.legendPosition === Chart.LEGEND_POSITION_LEFT) {
       this.labelBox.x = this.verticalLegendPaddingLeft;
     }
@@ -214,13 +217,13 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
     return this.chartBox.xOffset + this.paddingLeft + this.chartAreaXPadding + xPoint * this.spaceBetweenXValues;
   }
 
-  _createYLabelsAndAjustDimensions(possibleYLines) {
+  _createYLabelsAndAdjustDimensions(possibleYLines) {
     var negNormalized = this.maxMinValue.minValue * (-1);
     var maxLabel = Math.max(negNormalized, this.maxMinValue.maxValue);
     var negValNormalizedBigger = maxLabel !== this.maxMinValue.maxValue;
     var bigger = (negValNormalizedBigger ? negNormalized : this.maxMinValue.maxValue);
     var smaller = (negValNormalizedBigger ? this.maxMinValue.maxValue : negNormalized);
-    return this._calcNextLabelsAjustDimensions(bigger, smaller, 0, possibleYLines, negValNormalizedBigger);
+    return this._calcNextLabelsAdjustDimensions(bigger, smaller, 0, possibleYLines, negValNormalizedBigger);
   }
 
   _calculateLabelFormatOptions(labels) {
@@ -267,13 +270,12 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
     };
   }
 
-  _calcNextLabelsAjustDimensions(bigger, smaller, exp, possibleLines, negValNormalizedBigger) {
+  _calcNextLabelsAdjustDimensions(bigger, smaller, exp, possibleLines, negValNormalizedBigger) {
     var linesBigger = Math.pow(2, exp),
       step = bigger / linesBigger,
       smallerLines = [],
       biggerLines = [];
 
-    // TODO [15.4] cgu: Fix case when all data points are zero
     if (step === 0) {
       // This prevents infinite loops below!
       return [];
@@ -291,7 +293,7 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
     var spacesBetweenLines = smallerLines.length + biggerLines.length;
     if (possibleLines >= spacesBetweenLines) {
       var labels = biggerLines.concat([0], smallerLines),
-        newLabels = this._calcNextLabelsAjustDimensions(bigger, smaller, exp + 1, possibleLines, negValNormalizedBigger);
+        newLabels = this._calcNextLabelsAdjustDimensions(bigger, smaller, exp + 1, possibleLines, negValNormalizedBigger);
       if (newLabels.length > 0) {
         return newLabels;
       }
@@ -310,18 +312,88 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
   }
 
   _calcChartBoxWidth() {
+    var width = this.width;
+
     if (this.chart.legendVisible &&
       (this.chart.legendPosition === Chart.LEGEND_POSITION_RIGHT ||
         this.chart.legendPosition === Chart.LEGEND_POSITION_LEFT)) {
-      return this.width / 6 > this.minLegendWidth ? this.width / 6 * 5 : this.width - this.minLegendWidth;
+      width = this.width / 6 > this.minLegendWidth ? this.width / 6 * 5 : this.width - this.minLegendWidth;
     }
-    return this.width;
+
+    if (this._yAxisLabel()) {
+      width -= (this.labelSize.height + LABEL_GAP);
+    }
+
+    return width;
+  }
+
+  /**
+   * Instead of taking the X-axis label into account every where, we simply make the actual chart-box height
+   * smaller, and paint the X-axis label below the chart-box but before the bottom-padding (which is unused
+   * space, because we reduced the height). See: #_renderAxisLabels.
+   */
+  _calcChartBoxHeight() {
+    var height = super._calcChartBoxHeight();
+
+    if (this._xAxisLabel()) {
+      height -= (this.labelSize.height + LABEL_GAP);
+    }
+
+    return height;
   }
 
   _calcChartBoxXOffset() {
+    var offset = 0;
+
     if (this.chart.legendVisible && this.chart.legendPosition === Chart.LEGEND_POSITION_LEFT) {
-      return this.width / 6 > this.minLegendWidth ? this.width / 6 : this.minLegendWidth;
+      offset = this.width / 6 > this.minLegendWidth ? this.width / 6 : this.minLegendWidth;
     }
-    return 0;
+
+    if (this._yAxisLabel()) {
+      offset += (this.labelSize.height + LABEL_GAP);
+    }
+
+    return offset;
+  }
+
+  _xAxisLabel() {
+    return this.chart.chartData.customProperties.gridXAxisLabel;
+  }
+
+  _yAxisLabel() {
+    return this.chart.chartData.customProperties.gridYAxisLabel;
+  }
+
+  _renderAxisLabels() {
+    var textBounds,
+      xLabel = this._xAxisLabel(),
+      yLabel = this._yAxisLabel(),
+      x = 0,
+      y = 0,
+      cssClass = this.legendLabelClass + ' axis-label';
+    if (xLabel) {
+      textBounds = this._measureText(xLabel, cssClass);
+      x = (this.chartBox.width / 2) - (textBounds.width / 2); // center horizontally
+      y = this.chartBox.height;
+      this.$svg.appendSVG('text', cssClass)
+        .attr('x', x)
+        .attr('y', y)
+        .text(xLabel);
+    }
+    if (yLabel) {
+      // rotation center in SVG is not very intuitive: we need to set the center of the rotation
+      // relative to the parent of the text element, and also perform a translation on the X-axis
+      // which depends on the text width. See: https://www.mediaevent.de/tutorial/svg-transform.html
+      textBounds = this._measureText(yLabel, cssClass);
+      x = 0;
+      y = (this.chartBox.height / 2) - (textBounds.height / 2); // center vertically
+      this.$svg.appendSVG('text', cssClass)
+        .attr('x', x)
+        .attr('y', y)
+        .attr('transform',
+          'rotate(-90, ' + (x + textBounds.width / 2) + ', ' + y + ') ' +
+          'translate(0, -' + (textBounds.width / 2 - textBounds.height / 2) +')')
+        .text(yLabel);
+    }
   }
 }

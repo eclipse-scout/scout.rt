@@ -29,6 +29,13 @@ export default class Chart extends Widget {
 
     this.$container = null;
     this.chartRenderer = null;
+
+    /**
+     * @type {object}
+     * @property {object} [customProperties]
+     * @property {string} [customProperties.gridXAxisLabel]
+     * @property {string} [customProperties.gridYAxisLabel]
+     */
     this.chartData = null;
     this._updateChartTimeoutId = null;
     this._updateChartOpts = null;
@@ -41,6 +48,7 @@ export default class Chart extends Widget {
     this.legendVisible = true;
     this.maxSegments = 5;
     this.visible = true;
+    this.interactiveLegendVisible = true;
   }
 
   static PIE = 1;

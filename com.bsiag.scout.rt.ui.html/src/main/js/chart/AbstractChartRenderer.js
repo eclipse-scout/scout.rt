@@ -13,35 +13,34 @@ import {Chart} from '../index';
 
 export default class AbstractChartRenderer {
 
+  /**
+   * @param {Chart} chart
+   */
   constructor(chart) {
+
+    /**
+     * @property {Chart} chart
+     */
     this.chart = chart;
     this.session = chart.session;
     this.rendering = false; // true while this.render() is executing
     this.rendered = false;
     this.animated = false; // set by render() and remove(), makes it unnecessary to carry an argument through all method calls
-
     this.chartBox = {};
     this.labelBox = {};
-
-    // Viewbox settings
-    this.viewBoxHeight = 1000;
-    this.viewBoxWidth = 1000;
+    this.labelSize = null;
 
     // Clipping and masking
     this.clipId = 'Clip-' + ObjectFactory.get().createUniqueId();
     this.maskId = 'Mask-' + ObjectFactory.get().createUniqueId();
 
     // Padding constants
-    this.viewBoxLegendBubblePadding = 20;
     this.legendBubblePadding = 5;
-    this.viewBoxLegendPadding = 100;
     this.horizontalLegendPaddingLeft = 0;
     this.horizontalLegendEntriesPerLine = 3;
-
     this.verticalLegendPaddingLeft = 20;
 
     this.legendLabelClass = 'legend-label';
-
     this.suppressLegendBox = false;
   }
 
@@ -110,11 +109,9 @@ export default class AbstractChartRenderer {
     if (this.svgWidth < 300) {
       this.horizontalLegendEntriesPerLine = 2;
     }
-    var boxHeight = this.svgHeight,
-      boxWidth = this.svgWidth;
     // This works, because CSS specifies 100% width/height
-    this.height = boxHeight;
-    this.width = boxWidth;
+    this.height = this.svgHeight;
+    this.width = this.svgWidth;
     this._initLegendTextHeights();
     this._initChartBox();
     this._initLabelBox();
@@ -258,8 +255,8 @@ export default class AbstractChartRenderer {
     var labelCount = Math.min(this.chart.chartData.chartValueGroups.length, this.chart.maxSegments),
       startY,
       startX,
-      legendPadding = this.useViewBox ? this.viewBoxLegendPadding : this.horizontalLegendPaddingLeft,
-      bubblePadding = this.useViewBox ? this.viewBoxLegendBubblePadding : this.legendBubblePadding,
+      legendPadding = this.horizontalLegendPaddingLeft,
+      bubblePadding = this.legendBubblePadding,
       widthPerLabel;
 
     if (this.chart.legendPosition === Chart.LEGEND_POSITION_RIGHT || this.chart.legendPosition === Chart.LEGEND_POSITION_LEFT) {
@@ -291,12 +288,13 @@ export default class AbstractChartRenderer {
   }
 
   _initLegendTextHeights() {
-    var textBoundingBox = this._measureText('MeasureHeight', this.legendLabelClass),
-      textHeight = textBoundingBox.height,
+    var textBounds = this._measureText('MeasureHeight', this.legendLabelClass),
+      textHeight = textBounds.height,
       textGap = textHeight / 5,
       paddingTopBottom = textHeight / 2,
       bubbleR = textHeight / 8 * 3;
 
+    this.labelSize = textBounds;
     this.legendTextHeights = {
       textHeight: textHeight,
       textGap: textGap,
@@ -311,10 +309,10 @@ export default class AbstractChartRenderer {
       .attr('y', 0)
       .attr('visibility', 'hidden')
       .text(text);
-    var textBoundingBox;
+    var textBounds;
     try {
       // Firefox throws error when node is not in dom(already removed by navigating away). all other browser returns a boundingbox with 0
-      textBoundingBox = $label[0].getBBox();
+      textBounds = $label[0].getBBox();
     } catch (e) {
       return {
         height: 0,
@@ -323,7 +321,7 @@ export default class AbstractChartRenderer {
     }
     $label.remove();
 
-    return textBoundingBox;
+    return textBounds;
   }
 
   _renderLegendEntry(label, color, colorClass, position) {

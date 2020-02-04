@@ -45,4 +45,7 @@ public interface IChartType {
    * Indicates the value from which the animation should be started. If not set, the animation starts from 0.
    */
   String PROP_FULFILLMENT_START_VALUE = "startValue";
+
+  String GRID_X_AXIS_LABEL = "gridXAxisLabel";
+  String GRID_Y_AXIS_LABEL = "gridYAxisLabel";
 }

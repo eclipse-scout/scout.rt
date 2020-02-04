@@ -22,11 +22,12 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
     var chartGroups = this.chart.chartData.chartValueGroups,
       widthPerX = this.getWidthPerX(),
       width = this.getWidth(chartGroups),
-      yLabels = this._createYLabelsAndAjustDimensions(this.possibleYLines);
+      yLabels = this._createYLabelsAndAdjustDimensions(this.possibleYLines);
     this.spaceBetweenXValues = widthPerX;
 
     // data-axis
     this.renderYGrid(yLabels);
+    this._renderAxisLabels();
 
     // draw data
     for (var cg = 0; cg < chartGroups.length; cg++) {
