@@ -10,14 +10,15 @@
  */
 package org.eclipse.scout.rt.rest.client;
 
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Configuration;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
- * Factory for creating JAX-RS implementor-specific {@link Configuration} objects that are used to build new
- * {@link ClientBuilder} instances.
+ * Factory for creating JAX-RS implementor-specific {@link Configuration} and {@link Client} objects that are used to
+ * build new {@link ClientBuilder} instances.
  *
  * @see ClientBuilder#withConfig(Configuration)
  */
@@ -28,4 +29,11 @@ public interface IRestClientConfigFactory {
    * @return new JAX-RS implementor-specific {@link Configuration}.
    */
   Configuration createClientConfig();
+
+  /**
+   * @return new JAX-RS implementor-specific {@link Client} based on given {@link ClientBuilder}
+   */
+  default Client buildClient(ClientBuilder clientBuilder) {
+    return clientBuilder.build();
+  }
 }
