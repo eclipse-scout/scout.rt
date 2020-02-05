@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {TableSpecHelper} from '@eclipse-scout/testing';
+import Cell from '../../../src/cell/Cell';
 
 describe('SmartColumn', function() {
   var session, helper;
@@ -17,6 +18,11 @@ describe('SmartColumn', function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
+    jasmine.clock().install();
+  });
+
+  afterEach(function() {
+    jasmine.clock().uninstall();
   });
 
   // SmartColumn must deal with values of type number or string
@@ -41,6 +47,37 @@ describe('SmartColumn', function() {
     expect(column.isContentValid(row).valid).toBe(true);
     column.setCellValue(row, 'foo');
     expect(column.isContentValid(row).valid).toBe(true);
+  });
+
+  /**
+   * Makes sure no lookup call is executed (this would throw an error, because no lookup call
+   * is configured for the column / smart-field.
+   */
+  it('must NOT execute a lookup by key when the editor is initialized', function() {
+    var table = helper.createTable({
+      columns: [{
+        objectType: 'SmartColumn',
+        mandatory: true
+      }]
+    });
+    var cell = new Cell();
+    cell.setText('Foo');
+    cell.setValue(7);
+    cell.setEditable(true);
+    table.insertRow({
+      cells: [cell]
+    });
+    var column = table.columns[0];
+    var row = table.rows[0];
+    var field = null;
+    table.on('startCellEdit', function(event) {
+      field = event.field;
+    });
+    table.render();
+    table.focusCell(column, row);
+    jasmine.clock().tick();
+    expect(field.displayText).toEqual('Foo');
+    expect(field.value).toEqual(7);
   });
 
 });

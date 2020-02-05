@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Column, LookupCall, scout, SmartField, strings} from '../../index';
+import {Column, LookupCall, LookupRow, scout, SmartField, strings} from '../../index';
 import objects from '../../util/objects';
 
 export default class SmartColumn extends Column {
@@ -87,6 +87,18 @@ export default class SmartColumn extends Column {
       return strings.nvl(value) + '';
     }
     return this.lookupCall.textByKey(value);
+  }
+
+  /**
+   * Create and set the lookup-row instead of call setValue() as this would execute a lookup by key
+   * which is not necessary, since the cell already contains text and value. This also avoids a problem
+   * with multiple lookups running at once, see ticket 236960.
+   */
+  _initEditorField(field, cell) {
+    var lookupRow = new LookupRow();
+    lookupRow.key = cell.value;
+    lookupRow.text = cell.text;
+    field.setLookupRow(lookupRow);
   }
 
   _createEditor() {

@@ -678,13 +678,21 @@ export default class Column {
   createEditor(row) {
     var field = this._createEditor(row);
     var cell = this.cell(row);
+    this._initEditorField(field, cell);
     field.setLabelVisible(false);
-    field.setValue(cell.value);
     field.setFieldStyle(FormField.FieldStyle.CLASSIC);
     var hints = new GridData(field.gridDataHints);
     hints.horizontalAlignment = cell.horizontalAlignment;
     field.setGridDataHints(hints);
     return field;
+  }
+
+  /**
+   * Depending on the type of column the editor may need to be initialized differently.
+   * The default implementation calls setValue on the field.
+   */
+  _initEditorField(field, cell) {
+    field.setValue(cell.value);
   }
 
   _createEditor() {
