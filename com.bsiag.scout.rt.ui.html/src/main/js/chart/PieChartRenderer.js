@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -32,6 +32,7 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
   _render() {
     var that = this,
       sum = this._sumValues(this.chart.chartData.chartValueGroups),
+      roundingError = 0,
       segments = this._createSegments(),
       startAngle = 0,
       endAngle = 0;
@@ -95,8 +96,15 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
       this._renderLegendEntry(segment.label, (!this.chart.autoColor ? segment.color : null), legendClass, t);
 
       // data inside the arc
+
+      // take into account the rounding error of the previous rounding
+      // this guarantees that all rounded values add up to 100%
+      var result = segment.value / sum * 100 - roundingError;
+      var roundedResult = Math.round(result);
+      roundingError = roundedResult - result;
+
       var midPoint = (startAngle + (endAngle - startAngle) / 2) * 2 * Math.PI,
-        percentage = Math.round(segment.value / sum * 100) + '%';
+        percentage = roundedResult + '%';
       if (endAngle - startAngle >= 0.05) {
         this._renderPieChartPercentage(midPoint, percentage);
       }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -994,6 +994,8 @@ export default class ChartTableControl extends TableControl {
       segments[TRESHOLD - 1][1] = this.session.text('ui.OtherValues');
     }
 
+    var roundingError = 0;
+
     for (var t = 0; t < segments.length; t++) {
       var icon,
         key = segments[t][0],
@@ -1045,11 +1047,21 @@ export default class ChartTableControl extends TableControl {
 
       // data inside the arc
       var midPoint = (startAngle + (endAngle - startAngle) / 2) * 2 * Math.PI;
-      var percentage = dataAxis.total === 0 ? 100 : Math.round(value / dataAxis.total * 100);
+      var roundedResult;
+      if (dataAxis.total === 0) {
+        roundedResult = 100;
+      } else {
+        // take into account the rounding error of the previous rounding
+        // this guarantees that all rounded values add up to 100%
+        var result = value / dataAxis.total * 100 - roundingError;
+        roundedResult = Math.round(result);
+        roundingError = roundedResult - result;
+      }
+      var percentage = roundedResult + '%';
       var $label2 = this.$chartMain.appendSVG('text', 'main-axis')
         .attr('x', 210 + 70 * Math.sin(midPoint))
         .attr('y', 160 - 70 * Math.cos(midPoint))
-        .text(percentage + '%')
+        .text(percentage)
         .attr('opacity', 0)
         .delay(600).animateSVG('opacity', 1, 300);
 
