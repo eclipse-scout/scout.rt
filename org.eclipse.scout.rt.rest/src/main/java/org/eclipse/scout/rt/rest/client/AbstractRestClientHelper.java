@@ -75,7 +75,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
     // IMPORTANT: initClientBuilder must happen _after_ calling clientBuilder.withConfig() because "withConfig()" replaces the entire configuration!
     initClientBuilder(clientBuilder);
-    return clientBuilder.build();
+    return buildClient(clientBuilder);
   }
 
   /**
@@ -85,6 +85,15 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
    */
   protected Configuration createClientConfig() {
     return BEANS.get(IRestClientConfigFactory.class).createClientConfig();
+  }
+
+  /**
+   * Builds the JAX-RS client based on the given {@link ClientBuilder} instance.
+   * <p>
+   * This default implementation delegates to {@link IRestClientConfigFactory#buildClient(ClientBuilder)}
+   */
+  protected Client buildClient(ClientBuilder clientBuilder) {
+    return BEANS.get(IRestClientConfigFactory.class).buildClient(clientBuilder);
   }
 
   protected void initClientBuilder(ClientBuilder clientBuilder) {
