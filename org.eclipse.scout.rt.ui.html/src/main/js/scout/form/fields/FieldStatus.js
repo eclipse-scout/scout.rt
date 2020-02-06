@@ -128,7 +128,7 @@ scout.FieldStatus.prototype.hideTooltip = function() {
 };
 
 scout.FieldStatus.prototype._updatePopup = function(showStatus) {
-  if (!this.status) {
+  if (!this._requiresTooltip()) {
     this.hideTooltip();
   }
   if (scout.arrays.empty(this.menus)) {
@@ -141,11 +141,18 @@ scout.FieldStatus.prototype._updatePopup = function(showStatus) {
   }
 };
 
-scout.FieldStatus.prototype.showTooltip = function() {
+scout.FieldStatus.prototype._requiresTooltip = function() {
   if (!this.status || !this.rendered) {
-    return;
+    return false;
   }
   if (scout.arrays.empty(this.menus) && !scout.strings.hasText(this.status.message)) {
+    return false;
+  }
+  return true;
+};
+
+scout.FieldStatus.prototype.showTooltip = function() {
+  if (!this._requiresTooltip()) {
     return;
   }
   var event = new scout.Event();
