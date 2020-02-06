@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, Status, StringField} from '../../../src/index';
+import {FieldStatus, scout, Status, StringField} from '../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
 describe('FieldStatus', function() {
@@ -81,6 +81,36 @@ describe('FieldStatus', function() {
       expect(formField.fieldStatus._parents.length).toBe(0);
     });
 
+  });
+
+  /**
+   * Test for the case where we had an error-status with a message before and then a status with an empty message is set.
+   * In that case the tooltip must be closed. Set ticket 250554.
+   */
+  fit('must hide tooltip when new status has no message', function() {
+    var model = helper.createFieldModel();
+    var formField = new StringField();
+    formField.init(model);
+    formField.render();
+
+    // same structure as MultiStatus.java received from UI-server
+    var status1 = new Status({
+      message: 'Fehler',
+      severity: Status.Severity.ERROR,
+      children: {
+        message: 'Fehler',
+        severity: Status.Severity.ERROR
+      }
+    });
+    formField.setErrorStatus(status1);
+    expect(session.desktop.$container.find('.tooltip').length).toBe(1);
+
+    // same structure as MultiStatus.java which has no children anymore
+    var status2 = new Status({
+      message: '',
+      severity: Status.Severity.OK});
+    formField.setErrorStatus(status2);
+    expect(session.desktop.$container.find('.tooltip').length).toBe(0);
   });
 
 });

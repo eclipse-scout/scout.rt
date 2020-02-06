@@ -127,7 +127,7 @@ export default class FieldStatus extends Widget {
   }
 
   _updatePopup(showStatus) {
-    if (!this.status) {
+    if (!this._requiresTooltip()) {
       this.hideTooltip();
     }
     if (arrays.empty(this.menus)) {
@@ -140,11 +140,18 @@ export default class FieldStatus extends Widget {
     }
   }
 
-  showTooltip() {
+  _requiresTooltip() {
     if (!this.status) {
-      return;
+      return false;
     }
     if (arrays.empty(this.menus) && !strings.hasText(this.status.message)) {
+      return false;
+    }
+    return true;
+  }
+
+  showTooltip() {
+    if (!this._requiresTooltip()) {
       return;
     }
     var event = new Event();
