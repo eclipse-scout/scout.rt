@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -87,7 +87,7 @@ describe('FieldStatus', function() {
    * Test for the case where we had an error-status with a message before and then a status with an empty message is set.
    * In that case the tooltip must be closed. Set ticket 250554.
    */
-  fit('must hide tooltip when new status has no message', function() {
+  it('must hide tooltip when new status has no message', function() {
     var model = helper.createFieldModel();
     var formField = new StringField();
     formField.init(model);
@@ -95,10 +95,10 @@ describe('FieldStatus', function() {
 
     // same structure as MultiStatus.java received from UI-server
     var status1 = new Status({
-      message: 'Fehler',
+      message: 'Foo',
       severity: Status.Severity.ERROR,
       children: {
-        message: 'Fehler',
+        message: 'Foo',
         severity: Status.Severity.ERROR
       }
     });
