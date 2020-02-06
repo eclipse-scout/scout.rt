@@ -95,6 +95,11 @@ export default class SmartColumn extends Column {
    * with multiple lookups running at once, see ticket 236960.
    */
   _initEditorField(field, cell) {
+    if (objects.isNullOrUndefined(cell.value)) {
+      field.setValue(null);
+      return;
+    }
+
     var lookupRow = new LookupRow();
     lookupRow.key = cell.value;
     lookupRow.text = cell.text;
