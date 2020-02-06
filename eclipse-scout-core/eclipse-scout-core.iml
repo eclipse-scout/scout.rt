@@ -7,6 +7,8 @@
       <excludeFolder url="file://$MODULE_DIR$/dist" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
+    <content url="file://$MODULE_DIR$/node_modules/@eclipse-scout/cli/node_modules/jasmine-core" />
+    <content url="file://$MODULE_DIR$/node_modules/jquery" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
