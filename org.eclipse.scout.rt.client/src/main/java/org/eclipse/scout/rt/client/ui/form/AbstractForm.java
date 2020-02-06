@@ -152,6 +152,7 @@ import org.w3c.dom.Element;
 
 @ClassId("cec05259-9e6f-480c-94fa-f02f56e777f7")
 @FormData(value = AbstractFormData.class, sdkCommand = SdkCommand.USE)
+@SuppressWarnings("deprecation")
 public abstract class AbstractForm extends AbstractWidget implements IForm, IExtensibleObject, IContributionOwner {
 
   private static final String CACHE_BOUNDS = "CACHE_BOUNDS";

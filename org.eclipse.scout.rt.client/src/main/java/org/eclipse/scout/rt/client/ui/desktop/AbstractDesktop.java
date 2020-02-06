@@ -74,7 +74,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
@@ -536,7 +535,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * <p>
    * Subclasses can override this method.<br/>
    * This default implementation keeps track of the current outline table form and updates it accordingly (including
-   * visibility). See also {@link #getOutlineTableForm()}.
+   * visibility). See also {@link #getPageDetailForm()} .
    *
    * @param oldTable
    *          is the table of the old (not selected anymore) table page or {@code null}
@@ -552,7 +551,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * Called after a table page was loaded or reloaded.
    * <p>
    * Subclasses can override this method.<br/>
-   * This default implementation minimizes the page search form when data has been found.
+   * The default implementation does nothing.
    *
    * @param tablePage
    *          the table page that has been (re)loaded
@@ -560,10 +559,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   @Order(120)
   @ConfigOperation
   protected void execTablePageLoaded(IPageWithTable<?> tablePage) {
-    ISearchForm searchForm = tablePage.getSearchFormInternal();
-    if (searchForm != null) {
-      searchForm.setMinimized(tablePage.getTable().getRowCount() > 0);
-    }
   }
 
   /**
@@ -696,8 +691,9 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * The default list contains only the {@link #getLocalDesktopExtension()}
    * </p>
    * <p>
-   * The extension that are held by this desktop must call {@link IDesktopExtension#setCoreDesktop(this)} before using
-   * the extension. That way the extension can use and access this desktop's methods.
+   * The extension that are held by this desktop must call {@link IDesktopExtension#setCoreDesktop(IDesktop)}
+   * passing <code>this</code> as argument, before using the extension. That way the extension can use and access
+   * this desktop's methods.
    * </p>
    *
    * @param desktopExtensions
