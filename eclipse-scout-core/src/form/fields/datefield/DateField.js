@@ -362,6 +362,11 @@ export default class DateField extends ValueField {
     if (this.$timeField) {
       this.$timeField.setEnabled(this.enabledComputed);
     }
+    // Workaround for IE11 issue: other than all other browsers IE11 doesn't trigger a blur event when the field is disabled.
+    // In cases where the field is disabled asynchronously, the popup would stay opened by error #240929.
+    if (Device.get().isInternetExplorer() && !this.enabledComputed) {
+      this.closePopup();
+    }
   }
 
   /**
@@ -767,7 +772,7 @@ export default class DateField extends ValueField {
 
     // Close picker and update model
     if (this.popup instanceof DatePickerPopup) {
-      // in embedded mode we must update the date prediction but not close the popup (don't accidentially close time picker poupp)
+      // in embedded mode we must update the date prediction but not close the popup (don't accidentally close time picker popup)
       this.closePopup();
     }
     this.setDateFocused(false);
