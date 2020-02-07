@@ -339,6 +339,11 @@ scout.DateField.prototype._renderEnabled = function() {
   if (this.$timeField) {
     this.$timeField.setEnabled(this.enabledComputed);
   }
+  // Workaround for IE11 issue: other than all other browsers IE11 doesn't trigger a blur event when the field is disabled.
+  // In cases where the field is disabled asynchronously, the popup would stay opened by error #240929.
+  if (scout.device.isInternetExplorer() && !this.enabledComputed) {
+    this.closePopup();
+  }
 };
 
 /**
@@ -745,7 +750,7 @@ scout.DateField.prototype._onDateFieldBlur = function(event) {
 
   // Close picker and update model
   if (this.popup instanceof scout.DatePickerPopup) {
-    // in embedded mode we must update the date prediction but not close the popup (don't accidentially close time picker poupp)
+    // in embedded mode we must update the date prediction but not close the popup (don't accidentally close time picker popup)
     this.closePopup();
   }
   this.setDateFocused(false);
