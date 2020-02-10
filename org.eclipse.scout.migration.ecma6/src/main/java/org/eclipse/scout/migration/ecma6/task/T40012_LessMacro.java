@@ -165,7 +165,7 @@ public class T40012_LessMacro extends AbstractTask {
   protected void addImport(StringBuilder builder, String NL, String oldImport, String theme) {
     final Map<String, String> themes = LIBS.get(oldImport);
     if (themes == null) {
-      builder.append(MigrationUtility.todoText("Check what imports are needed here (reference not migrated '" + oldImport + "'.")).append(NL);
+      builder.append(MigrationUtility.todoText("Check what imports are needed here (reference not migrated '" + oldImport + "').")).append(NL);
       return;
     }
     final String imp = themes.get(theme);

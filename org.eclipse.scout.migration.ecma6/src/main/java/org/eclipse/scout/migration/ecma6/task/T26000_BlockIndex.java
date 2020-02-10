@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
@@ -38,6 +39,7 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 @Order(26000)
 public class T26000_BlockIndex extends AbstractTask {
@@ -108,7 +110,7 @@ public class T26000_BlockIndex extends AbstractTask {
     }
 
     entryPointSuffix.delete(entryPointSuffix.length() - (1 + nl.length()), entryPointSuffix.length());
-    entryPointSuffix.insert(0, "window.studio = Object.assign(window.studio || {}, {" + nl);
+    entryPointSuffix.insert(0, "window.studio = Object.assign(window.studio || {}, {" + nl);
     entryPointSuffix.append(nl).append("});");
 
     workingCopy.setSource(workingCopy.getSource() + nl + nl + entryPointSuffix);
@@ -206,8 +208,18 @@ public class T26000_BlockIndex extends AbstractTask {
           // Include data from another index file
           for (String file : value.split(">")) {
             Path refIndex = Configuration.get().getTargetModuleDirectory().resolve("src/main/js").resolve(new P_FileEntry(file).m_localPath);
-            String nestedSrc = context.ensureWorkingCopy(refIndex).getSource();
-            parse(nestedSrc, result, context);
+            if(Files.exists(refIndex)) {
+              String nestedSrc = context.ensureWorkingCopy(refIndex).getSource();
+              parse(nestedSrc, result, context);
+            }else{
+              P_IndexType comment = new P_IndexType("COMMENT");
+              StringBuilder commentBuilder = new StringBuilder();
+              commentBuilder.append(line);
+              commentBuilder.append(MigrationUtility.todoText("replace with content of the referenced index file."));
+              comment.m_entry.add(new P_FileEntry(commentBuilder.toString()));
+              result.m_entries.add(comment);
+              break;
+            }
           }
         }
         else {
