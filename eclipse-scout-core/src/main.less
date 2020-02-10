@@ -171,6 +171,11 @@ textarea,
   }
 }
 
+textarea.read-only {
+  // full border around text area not only on the bottom, same as for alternative style
+  border: 1px dashed @border-color;
+}
+
 input[type="text"].alternative,
 input[type="password"].alternative {
   /* Add 1px padding to prevent the text from moving a little when field is focused due to the 2px focus border */
