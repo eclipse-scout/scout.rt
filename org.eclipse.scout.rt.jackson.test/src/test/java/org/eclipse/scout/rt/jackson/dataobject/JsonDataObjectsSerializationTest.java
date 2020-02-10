@@ -2129,6 +2129,95 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("123", marshalled.get(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME));
   }
 
+  /**
+   * Various tests for floating number deserialization
+   * <p>
+   * Note: Jackson allows to deserialize numbers which are specified as JSON numbers or JSON strings within the JSON
+   * string to deserialize.
+   */
+  @Test
+  public void testDeserialize_Numbers() throws Exception {
+    TestComplexEntityDo entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123.456"), TestComplexEntityDo.class);
+    assertEquals(Float.valueOf(123.456f), entity.getFloatAttribute());
+
+    entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"123.456\""), TestComplexEntityDo.class);
+    assertEquals(Float.valueOf(123.456f), entity.getFloatAttribute());
+
+    entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "123.456"), TestComplexEntityDo.class);
+    assertEquals(Double.valueOf(123.456), entity.getDoubleAttribute());
+
+    entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"123.456\""), TestComplexEntityDo.class);
+    assertEquals(Double.valueOf(123.456), entity.getDoubleAttribute());
+
+    entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "123.456"), TestComplexEntityDo.class);
+    assertEquals(new BigDecimal("123.456"), entity.getBigDecimalAttribute());
+
+    entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"123.456\""), TestComplexEntityDo.class);
+    assertEquals(new BigDecimal("123.456"), entity.getBigDecimalAttribute());
+
+    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123-456"), TestComplexEntityDo.class));
+    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123-456-100"), TestComplexEntityDo.class));
+    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"123-456\""), TestComplexEntityDo.class));
+    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"10-03-2019\""), TestComplexEntityDo.class));
+    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"123,456\""), TestComplexEntityDo.class));
+
+    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doublelAttribute", "123-456"), TestComplexEntityDo.class));
+    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "123-456-100"), TestComplexEntityDo.class));
+    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"123-456\""), TestComplexEntityDo.class));
+    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"10-03-2019\""), TestComplexEntityDo.class));
+    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"123,456\""), TestComplexEntityDo.class));
+
+    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "123-456"), TestComplexEntityDo.class));
+    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "123-456-100"), TestComplexEntityDo.class));
+    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"123-456\""), TestComplexEntityDo.class));
+    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"10-03-2019\""), TestComplexEntityDo.class));
+    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"123,456\""), TestComplexEntityDo.class));
+  }
+
+  protected String createTestComplexEntityJson(String attributeName, String value) {
+    return "{\"_type\" : \"TestComplexEntity\", \"" + attributeName + "\" : " + value + "}";
+  }
+
+  @Test
+  public void testSerializeDeserialize_collectionFormat01() throws Exception {
+    TestDateDo testDo = BEANS.get(TestDateDo.class);
+    testDo.withADummySet(CollectionUtility.hashSet("1", "2"))
+        .withDateWithTimestamp(DATE)
+        .withDateOnly(DATE_TRUNCATED);
+
+    String json = s_dataObjectMapper.writeValueAsString(testDo);
+
+    // deserialize and check
+    TestDateDo testDoMarshalled = s_dataObjectMapper.readValue(json, TestDateDo.class);
+    assertEquals(DATE, testDoMarshalled.getDateWithTimestamp());
+    assertEquals(DATE_TRUNCATED, testDoMarshalled.getDateOnly());
+  }
+
+  @Test
+  public void testSerializeDeserialize_collectionFormat02() throws Exception {
+    TestDateDo testDo = BEANS.get(TestDateDo.class);
+    testDo.withZDummySet(CollectionUtility.hashSet("1", "2"))
+        .withDateWithTimestamp(DATE)
+        .withDateOnly(DATE_TRUNCATED);
+
+    String json = s_dataObjectMapper.writeValueAsString(testDo);
+
+    // deserialize and check
+    TestDateDo testDoMarshalled = s_dataObjectMapper.readValue(json, TestDateDo.class);
+    assertEquals(DATE, testDoMarshalled.getDateWithTimestamp());
+    assertEquals(DATE_TRUNCATED, testDoMarshalled.getDateOnly());
+  }
+
+  @Test
+  public void testSerializeLiteral() throws Exception {
+    assertEquals("42", s_dataObjectMapper.writeValueAsString(42));
+    assertEquals("42.12345", s_dataObjectMapper.writeValueAsString(42.12345));
+    assertEquals("true", s_dataObjectMapper.writeValueAsString(true));
+    assertEquals("false", s_dataObjectMapper.writeValueAsString(false));
+    assertEquals("\"foo\"", s_dataObjectMapper.writeValueAsString("foo"));
+    assertEquals("\"foo\\\\n\\\\rbar\"", s_dataObjectMapper.writeValueAsString("foo\\n\\rbar"));
+  }
+
   // ------------------------------------ common test helper methods ------------------------------------
 
   protected TestComplexEntityDo createTestDo() {
@@ -2223,84 +2312,5 @@ public class JsonDataObjectsSerializationTest {
 
   protected URL getResource(String expectedResourceName) {
     return JsonDataObjectsSerializationTest.class.getResource(expectedResourceName);
-  }
-
-  /**
-   * Various tests for floating number deserialization
-   * <p>
-   * Note: Jackson allows to deserialize numbers which are specified as JSON numbers or JSON strings within the JSON
-   * string to deserialize.
-   */
-  @Test
-  public void testDeserialize_Numbers() throws Exception {
-    TestComplexEntityDo entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123.456"), TestComplexEntityDo.class);
-    assertEquals(Float.valueOf(123.456f), entity.getFloatAttribute());
-
-    entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"123.456\""), TestComplexEntityDo.class);
-    assertEquals(Float.valueOf(123.456f), entity.getFloatAttribute());
-
-    entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "123.456"), TestComplexEntityDo.class);
-    assertEquals(Double.valueOf(123.456), entity.getDoubleAttribute());
-
-    entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"123.456\""), TestComplexEntityDo.class);
-    assertEquals(Double.valueOf(123.456), entity.getDoubleAttribute());
-
-    entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "123.456"), TestComplexEntityDo.class);
-    assertEquals(new BigDecimal("123.456"), entity.getBigDecimalAttribute());
-
-    entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"123.456\""), TestComplexEntityDo.class);
-    assertEquals(new BigDecimal("123.456"), entity.getBigDecimalAttribute());
-
-    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123-456"), TestComplexEntityDo.class));
-    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123-456-100"), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"123-456\""), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"10-03-2019\""), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"123,456\""), TestComplexEntityDo.class));
-
-    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doublelAttribute", "123-456"), TestComplexEntityDo.class));
-    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "123-456-100"), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"123-456\""), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"10-03-2019\""), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"123,456\""), TestComplexEntityDo.class));
-
-    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "123-456"), TestComplexEntityDo.class));
-    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "123-456-100"), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"123-456\""), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"10-03-2019\""), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"123,456\""), TestComplexEntityDo.class));
-  }
-
-  protected String createTestComplexEntityJson(String attributeName, String value) {
-    return "{\"_type\" : \"TestComplexEntity\", \"" + attributeName + "\" : " + value + "}";
-  }
-
-  @Test
-  public void testSerializeDeserialize_collectionFormat01() throws Exception {
-    TestDateDo testDo = BEANS.get(TestDateDo.class);
-    testDo.withADummySet(CollectionUtility.hashSet("1", "2"))
-        .withDateWithTimestamp(DATE)
-        .withDateOnly(DATE_TRUNCATED);
-
-    String json = s_dataObjectMapper.writeValueAsString(testDo);
-
-    // deserialize and check
-    TestDateDo testDoMarshalled = s_dataObjectMapper.readValue(json, TestDateDo.class);
-    assertEquals(DATE, testDoMarshalled.getDateWithTimestamp());
-    assertEquals(DATE_TRUNCATED, testDoMarshalled.getDateOnly());
-  }
-
-  @Test
-  public void testSerializeDeserialize_collectionFormat02() throws Exception {
-    TestDateDo testDo = BEANS.get(TestDateDo.class);
-    testDo.withZDummySet(CollectionUtility.hashSet("1", "2"))
-        .withDateWithTimestamp(DATE)
-        .withDateOnly(DATE_TRUNCATED);
-
-    String json = s_dataObjectMapper.writeValueAsString(testDo);
-
-    // deserialize and check
-    TestDateDo testDoMarshalled = s_dataObjectMapper.readValue(json, TestDateDo.class);
-    assertEquals(DATE, testDoMarshalled.getDateWithTimestamp());
-    assertEquals(DATE_TRUNCATED, testDoMarshalled.getDateOnly());
   }
 }
