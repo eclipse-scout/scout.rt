@@ -1106,6 +1106,8 @@ export default class ChartTableControl extends TableControl {
       labelsY;
 
     if (yAxis.length > 14) {
+      deltaY = Math.ceil(deltaY / 4) * 4;
+      yAxis.max = yAxis.min + deltaY;
       if (yAxisSpecialDateTreating) {
         // if key value with undefined or null
         var clone2 = yAxis.slice(0, yAxis.length - 1);
@@ -1143,6 +1145,8 @@ export default class ChartTableControl extends TableControl {
       labelsX;
 
     if (xAxis.length > 14) {
+      deltaX = Math.ceil(deltaX / 4) * 4;
+      xAxis.max = xAxis.min + deltaX;
       if (xAxisSpecialDateTreating) {
         var clone = xAxis.slice(0, xAxis.length - 1);
         xAxis.min = Math.min.apply(null, clone);
