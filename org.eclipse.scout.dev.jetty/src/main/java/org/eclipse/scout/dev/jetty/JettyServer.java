@@ -39,6 +39,7 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
@@ -54,18 +55,18 @@ public class JettyServer {
 
   protected volatile Server m_server = null;
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
     new JettyServer().start();
   }
 
-  protected void start() throws Exception {
+  protected void start() {
     try {
       startInternal();
     }
     catch (Exception e) {
       LOG.error("Fatal: Unable to start application", e);
       shutdown();
-      throw new Exception("Fatal: Unable to start application", e);
+      throw new PlatformException("Fatal: Unable to start application", e);
     }
   }
 
