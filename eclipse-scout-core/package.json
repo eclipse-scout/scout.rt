@@ -42,7 +42,10 @@
   "devDependencies": {
     "@eclipse-scout/cli": "10.0.0-snapshot",
     "@eclipse-scout/releng": "^10.0.0",
-    "@eclipse-scout/testing": "10.0.0-snapshot"
+    "@eclipse-scout/testing": "10.0.0-snapshot",
+    "jasmine-ajax": "3.4.0",
+    "jasmine-jquery": "2.0.6",
+    "karma": "4.3.0"
   },
   "dependencies": {
     "jquery": "3.4.1",
