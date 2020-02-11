@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Event, focusUtils, FormField, menus as menus_1, objects, scout, Status, strings} from '../../index';
+import {arrays, Event, focusUtils, FormField, menus as menus_1, objects, scout, Status, strings, ParsingFailedStatus, ValidationFailedStatus} from '../../index';
 import * as $ from 'jquery';
 
 /**
@@ -135,7 +135,7 @@ export default class ValueField extends FormField {
   }
 
   parseAndSetValue(displayText) {
-    this.clearErrorStatus();
+    this.removeErrorStatus(ParsingFailedStatus);
     try {
       var event = new Event({
         displayText: displayText
@@ -158,13 +158,17 @@ export default class ValueField extends FormField {
     });
     this.trigger('parseError', event);
     if (!event.defaultPrevented) {
-      var status = this._createParsingFailedStatus(displayText, error);
-      this.setErrorStatus(status);
+      this._addParsingFailedErrorStatus(displayText, error);
     }
   }
 
+  _addParsingFailedErrorStatus(displayText, error) {
+    var status = this._createParsingFailedStatus(displayText, error);
+    this.addErrorStatus(status);
+  }
+
   _createParsingFailedStatus(displayText, error) {
-    return this._createInvalidValueStatus(displayText, error);
+    return this._createInvalidValueStatus('ParsingFailedStatus', displayText, error);
   }
 
   /**
@@ -345,8 +349,14 @@ export default class ValueField extends FormField {
   }
 
   _setValue(value) {
+    // When widget is initialized with a given errorStatus and a value -> don't remove the error
+    // status. This is a typical case for Scout Classic: field has a ParsingFailedError and user
+    // hits reload.
+    if (this.initialized) {
+      this.removeErrorStatus(ParsingFailedStatus);
+      this.removeErrorStatus(ValidationFailedStatus);
+    }
     var oldValue = this.value;
-    this._updateErrorStatus(null);
     var typedValue = null;
     try {
       typedValue = this._ensureValue(value);
@@ -460,38 +470,40 @@ export default class ValueField extends FormField {
   _validationFailed(value, error) {
     $.log.isDebugEnabled() && $.log.debug('Validation failed for field with id ' + this.id, error);
     var status = this._createValidationFailedStatus(value, error);
-    this._updateErrorStatus(status);
+    this.addErrorStatus(status);
     this._updateDisplayText(value);
   }
 
   _createValidationFailedStatus(value, error) {
-    return this._createInvalidValueStatus(value, error);
+    return this._createInvalidValueStatus('ValidationFailedStatus', value, error);
   }
 
-  _createInvalidValueStatus(value, error) {
-    if (error instanceof Status) {
+  /**
+   * @param {string} statusType
+   * @returns {Status}
+   */
+  _createInvalidValueStatus(statusType, value, error) {
+    var statusFunc = Status.classForName(statusType);
+    // type of status is correct
+    if (error instanceof statusFunc) {
       return error;
     }
-    if (typeof error === 'string') {
-      return Status.error({
-        message: error
-      });
-    }
-    return Status.error({
-      message: this.session.text(this.invalidValueMessageKey, value)
-    });
-  }
-
-  _updateErrorStatus(status) {
-    if (!this.initialized && this.errorStatus) {
-      // Don't override the error status specified by the init model
-      return;
-    }
-    if (!status) {
-      this.clearErrorStatus();
+    var message, severity = Status.Severity.ERROR;
+    if (error instanceof Status) {
+      // its a Status, but it has the wrong specific type
+      message = error.message;
+      severity = error.severity;
+    } else if (typeof error === 'string') {
+      // convert string to status
+      message = error;
     } else {
-      this.setErrorStatus(status);
+      // create status with default message
+      message = this.session.text(this.invalidValueMessageKey, value);
     }
+    return scout.create(statusType, {
+      message: message,
+      severity: severity
+    });
   }
 
   _updateDisplayText(value) {

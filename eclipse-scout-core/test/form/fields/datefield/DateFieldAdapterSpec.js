@@ -68,40 +68,44 @@ describe('DateFieldAdapter', function() {
     it('sets the server errorStatus if the displayText was reverted to the one provoking the error', function() {
       var field = createWithAdapter({
         hasTime: true,
-        value: dates.create('2017-05-23 12:30:00.000')
-      });
-      field.modelAdapter._syncErrorStatus({
-        message: 'error status from server'
+        value: dates.create('2017-05-23 12:30:00.000'),
+        errorStatus: {
+          children: [{message: 'error status from server'}]
+        }
       });
       field.render();
       field.$dateField.focus();
       expect(field.$dateField.val()).toBe('23.05.2017');
-      expect(field.errorStatus.message).toBe('error status from server');
+      expect(field.errorStatus.children.length).toBe(1);
+      expect(field.errorStatus.children[0].message).toBe('error status from server');
 
       // Enter another date, but don't press enter
       field.$dateField.val('23.05.201');
       field._onDateFieldInput();
       expect(field.value.toISOString()).toBe(dates.create('2017-05-23 12:30:00.000').toISOString());
-      expect(field.errorStatus).toBe(null);
+      expect(field.errorStatus.children.length).toBe(1);
+      expect(field.errorStatus.children[0].message).toBe('error status from server');
 
       // Revert to the old date and press enter -> send the event so that server may validate again
       field.$dateField.val('23.05.2017');
       field._onDateFieldInput();
       field.acceptInput();
-      expect(field.errorStatus.message).toBe('error status from server');
+      expect(field.errorStatus.children.length).toBe(1);
+      expect(field.errorStatus.children[0].message).toBe('error status from server');
     });
 
     it('sets the server errorStatus if the displayText was reverted to the one provoking the error using key down/up', function() {
       var field = createWithAdapter({
-        value: dates.create('2017-05-23')
-      });
-      field.modelAdapter._syncErrorStatus({
-        message: 'error status from server'
+        value: dates.create('2017-05-23'),
+        errorStatus: {
+          children: [{message: 'error status from server'}]
+        }
       });
       field.render();
       field.$dateField.focus();
       expect(field.$dateField.val()).toBe('23.05.2017');
-      expect(field.errorStatus.message).toBe('error status from server');
+      expect(field.errorStatus.children.length).toBe(1);
+      expect(field.errorStatus.children[0].message).toBe('error status from server');
 
       // Enter another date, but don't press enter
       field.$dateField.triggerKeyDown(keys.DOWN);
@@ -111,38 +115,42 @@ describe('DateFieldAdapter', function() {
       field.$dateField.triggerKeyDown(keys.UP);
       expect(field.displayText).toBe('23.05.2017');
       field.acceptInput();
-      expect(field.errorStatus.message).toBe('error status from server');
+      expect(field.errorStatus.children.length).toBe(1);
+      expect(field.errorStatus.children[0].message).toBe('error status from server');
     });
 
     it('sets the server errorStatus if the displayText was reverted to the one provoking the error using picker', function() {
       var field = createWithAdapter({
-        value: dates.create('2017-05-23')
-      });
-      field.modelAdapter._syncErrorStatus({
-        message: 'error status from server'
+        value: dates.create('2017-05-23'),
+        errorStatus: {
+          children: [{message: 'error status from server'}]
+        }
       });
       field.render();
       field.$dateField.focus();
       expect(field.$dateField.val()).toBe('23.05.2017');
-      expect(field.errorStatus.message).toBe('error status from server');
+      expect(field.errorStatus.children.length).toBe(1);
+      expect(field.errorStatus.children[0].message).toBe('error status from server');
 
       // Open picker and select invalid date again -> error status must not vanish
       openDatePicker(field);
       find$Day(field.getDatePicker(), new Date(2017, 4, 23)).triggerClick();
       expect(field.$dateField.val()).toBe('23.05.2017');
-      expect(field.errorStatus.message).toBe('error status from server');
+      expect(field.errorStatus.children.length).toBe(1);
+      expect(field.errorStatus.children[0].message).toBe('error status from server');
     });
 
-    it('does not accidentially remove the model error status on acceptInput', function() {
+    it('does not accidentally remove the model error status on acceptInput', function() {
       var field = createWithAdapter({
-        value: dates.create('2017-05-23')
-      });
-      field.modelAdapter._syncErrorStatus({
-        message: 'error status from server'
+        value: dates.create('2017-05-23'),
+        errorStatus: {
+          children: [{message: 'error status from server'}]
+        }
       });
       field.render();
       field.acceptInput();
-      expect(field.errorStatus.message).toBe('error status from server');
+      expect(field.errorStatus.children.length).toBe(1);
+      expect(field.errorStatus.children[0].message).toBe('error status from server');
     });
 
   });

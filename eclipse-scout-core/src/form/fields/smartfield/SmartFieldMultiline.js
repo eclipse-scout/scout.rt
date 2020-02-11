@@ -93,7 +93,6 @@ export default class SmartFieldMultiline extends SmartField {
 
   _updateErrorStatusClasses(statusClass, hasStatus) {
     super._updateErrorStatusClasses(statusClass, hasStatus);
-    this._$multilineLines.removeClass(FormField.SEVERITY_CSS_CLASSES);
-    this._$multilineLines.addClass(statusClass, hasStatus);
+    this._updateErrorStatusClassesOnElement(this._$multilineLines, statusClass, hasStatus);
   }
 }

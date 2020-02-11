@@ -9,8 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
+  arrays,
   DateFormat,
   DatePickerPopup,
+  DatePredictionFailedStatus,
   dates,
   DateTimeCompositeLayout,
   Device,
@@ -21,6 +23,7 @@ import {
   InputFieldKeyStrokeContext,
   keys,
   objects,
+  ParsingFailedStatus,
   scout,
   Status,
   strings,
@@ -74,6 +77,10 @@ export default class DateField extends ValueField {
 
   static ErrorCode = {
     PARSE_ERROR: -1
+  };
+
+  static PARSE_ERROR_PREDICATE = function(status) {
+    return status.code === DateField.ErrorCode.PARSE_ERROR;
   };
 
   /**
@@ -499,36 +506,27 @@ export default class DateField extends ValueField {
       statusClass = this._errorStatusClass();
 
     if (this.$dateField) {
-      this.$dateField.removeClass(FormField.SEVERITY_CSS_CLASSES);
-      this.$dateField.toggleClass(statusClass, hasStatus);
+      this._updateErrorStatusClassesOnElement(this.$dateField, statusClass, hasStatus);
 
       // Because the error color of field icons depends on the error status of sibling <input> elements.
       // The prediction fields are clones of the input fields, so the 'has-error' class has to be
       // removed from them as well to make the icon "valid".
-      if (this._$predictDateField) {
-        this._$predictDateField.removeClass(FormField.SEVERITY_CSS_CLASSES);
-        this._$predictDateField.toggleClass(statusClass, hasStatus);
-      }
+      this._updateErrorStatusClassesOnElement(this._$predictDateField, statusClass, hasStatus);
     }
 
     // Do the same for the time field
     if (this.$timeField) {
-      this.$timeField.removeClass(FormField.SEVERITY_CSS_CLASSES);
-      this.$timeField.toggleClass(statusClass, hasStatus);
-      if (this._$predictTimeField) {
-        this._$predictTimeField.removeClass(FormField.SEVERITY_CSS_CLASSES);
-        this._$predictTimeField.toggleClass(statusClass, hasStatus);
-      }
+      this._updateErrorStatusClassesOnElement(this.$timeField, statusClass, hasStatus);
+      this._updateErrorStatusClassesOnElement(this._$predictTimeField, statusClass, hasStatus);
     }
 
     if (this.popup) {
-      this.popup.$container.removeClass(FormField.SEVERITY_CSS_CLASSES);
-      this.popup.$container.toggleClass(statusClass, hasStatus);
+      this._updateErrorStatusClassesOnElement(this.popup.$container, statusClass, hasStatus);
     }
   }
 
   _errorStatusClass() {
-    return this.errorStatus ? 'has-' + this.errorStatus.cssClass() : '';
+    return (this.errorStatus && !this._isSuppressStatusField()) ? 'has-' + this.errorStatus.cssClass() : '';
   }
 
   /**
@@ -969,6 +967,7 @@ export default class DateField extends ValueField {
     }
 
     // Predict date
+    this._removePredictErrorStatus();
     var datePrediction = this._predictDate(displayText); // this also updates the errorStatus
     if (datePrediction) {
       fields.valOrText(this._$predictDateField, datePrediction.text);
@@ -1014,7 +1013,7 @@ export default class DateField extends ValueField {
    * Clears the time field if date field is empty before accepting the input
    */
   acceptDate() {
-    if (this.hasTime && !this.errorStatus && strings.empty(this.$dateField.val())) {
+    if (this.hasTime && strings.empty(this.$dateField.val())) {
       this.$timeField.val('');
     }
     this.acceptInput();
@@ -1024,7 +1023,7 @@ export default class DateField extends ValueField {
    * Clears the date field if time field is empty before accepting the input
    */
   acceptTime() {
-    if (this.hasDate && !this.errorStatus && strings.empty(this.$timeField.val())) {
+    if (this.hasDate && strings.empty(this.$timeField.val())) {
       this.$dateField.val('');
     }
     this.acceptInput();
@@ -1219,6 +1218,7 @@ export default class DateField extends ValueField {
   }
 
   _createPredictionField($inputField) {
+    this.setSuppressStatus(FormField.SuppressStatus.ALL);
     var $predictionField = $inputField.clone()
       .addClass('predict')
       .attr('tabIndex', '-1')
@@ -1230,6 +1230,7 @@ export default class DateField extends ValueField {
   }
 
   _removePredictionFields() {
+    this.setSuppressStatus(null);
     if (this._$predictDateField) {
       this._$predictDateField.remove();
       this._$predictDateField = null;
@@ -1448,6 +1449,7 @@ export default class DateField extends ValueField {
     var timePrediction = {};
     var success = true;
 
+    this._removePredictErrorStatus();
     if (this.hasDate) {
       datePrediction = this._predictDate(dateText); // this also updates the errorStatus
       if (!datePrediction) {
@@ -1464,9 +1466,10 @@ export default class DateField extends ValueField {
       this._setTimeDisplayText(timeText);
     }
 
-    // Error status was already set by _predict functions, just throw it so that setValue is not called
+    // Error status was already set by _predict functions, throw this typed Status so DateField knows it must
+    // not set the error status again when the parse error is catched
     if (!success) {
-      throw this.errorStatus;
+      throw new DatePredictionFailedStatus();
     }
 
     // parse success -> return new value
@@ -1474,6 +1477,17 @@ export default class DateField extends ValueField {
       return this._newTimestampAsDate(datePrediction.date, timePrediction.date);
     }
     return null;
+  }
+
+  /**
+   * Don't add error if it is a DatePredictionFailedStatus because the predict function
+   * has already added a parsing error.
+   */
+  _addParsingFailedErrorStatus(displayText, error) {
+    if (error instanceof DatePredictionFailedStatus) {
+      return;
+    }
+    super._addParsingFailedErrorStatus(displayText, error);
   }
 
   /**
@@ -1583,34 +1597,54 @@ export default class DateField extends ValueField {
    * This method updates the parts (date, time) of the error status.
    */
   _setErrorStatusPart(property, valid) {
+
+    // check if date/time error exists
+    var status = null;
+    var storedStatus = null;
+    if (this.errorStatus) {
+      storedStatus = arrays.find(this.errorStatus.asFlatList(), DateField.PARSE_ERROR_PREDICATE);
+    }
+
+    if (storedStatus) {
+      status = storedStatus;
+    } else {
+      status = new ParsingFailedStatus({
+        message: this.session.text('ui.InvalidDate'),
+        severity: Status.Severity.ERROR,
+        code: DateField.ErrorCode.PARSE_ERROR
+      });
+    }
+
     if (valid) {
-      this.setErrorStatus(null);
-      return;
+      delete status[property];
+    } else {
+      status[property] = true;
     }
-    var errorStatus = this.errorStatus;
-    if (!errorStatus) {
-      errorStatus = this._createErrorStatus();
+
+    if (!status.hasOwnProperty('invalidDate') && !status.hasOwnProperty('invalidTime')) {
+      status = null;
     }
-    errorStatus[property] = true;
-    this.setErrorStatus(errorStatus);
+
+    if (status && !storedStatus) {
+      this.addErrorStatus(status);
+    } else if (!status && storedStatus) {
+      this._removePredictErrorStatus();
+    } // else: just update existing error
   }
 
-  _createErrorStatus() {
-    return new Status({
-      message: this.session.text('ui.InvalidDate'),
-      severity: Status.Severity.ERROR,
-      code: DateField.ErrorCode.PARSE_ERROR
-    });
+  _removePredictErrorStatus() {
+    this.removeErrorStatusPredicate(DateField.PARSE_ERROR_PREDICATE);
   }
 
   /**
    * @override
    */
-  _createInvalidValueStatus(value, error) {
-    var errorStatus = super._createInvalidValueStatus(value, error);
+  _createInvalidValueStatus(statusType, value, error) {
+    var errorStatus = super._createInvalidValueStatus(statusType, value, error);
     // Set date and time to invalid, otherwise isDateValid and isTimeValid return false even though there is a validation error
     errorStatus.invalidDate = true;
     errorStatus.invalidTime = true;
+    errorStatus.code = DateField.ErrorCode.PARSE_ERROR;
     return errorStatus;
   }
 
@@ -1623,10 +1657,14 @@ export default class DateField extends ValueField {
   }
 
   _isErrorStatusPartValid(property) {
-    if (this.errorStatus && this.errorStatus[property]) {
-      return false;
+    if (!this.errorStatus) {
+      return true;
     }
-    return true;
+
+    // return false if one of the status has the invalid* property
+    return !this.errorStatus.asFlatList().some(function(status) {
+      return !!status[property];
+    });
   }
 
   _isDateValid() {

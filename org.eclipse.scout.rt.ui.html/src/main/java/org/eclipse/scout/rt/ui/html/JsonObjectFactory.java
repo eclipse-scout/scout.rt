@@ -56,6 +56,8 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormMenu;
 import org.eclipse.scout.rt.client.ui.form.ITileOverviewForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IStatusMenuMapping;
+import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
+import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.accordionfield.IAccordionField;
 import org.eclipse.scout.rt.client.ui.form.fields.beanfield.IBeanField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
@@ -109,6 +111,7 @@ import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
 import org.eclipse.scout.rt.client.ui.tile.IWidgetTile;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
@@ -116,6 +119,9 @@ import org.eclipse.scout.rt.ui.html.json.JsonByteArray;
 import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonDecimalFormat;
+import org.eclipse.scout.rt.ui.html.json.JsonParsingFailedStatus;
+import org.eclipse.scout.rt.ui.html.json.JsonStatus;
+import org.eclipse.scout.rt.ui.html.json.JsonValidationFailedStatus;
 import org.eclipse.scout.rt.ui.html.json.accordion.JsonAccordion;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
 import org.eclipse.scout.rt.ui.html.json.basic.filechooser.JsonFileChooser;
@@ -483,8 +489,17 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     if (object instanceof Date) {
       return new JsonDate((Date) object);
     }
-    else if (object instanceof byte[]) {
+    if (object instanceof byte[]) {
       return new JsonByteArray((byte[]) object);
+    }
+    if (object instanceof ParsingFailedStatus) {
+      return new JsonParsingFailedStatus((ParsingFailedStatus) object);
+    }
+    if (object instanceof ValidationFailedStatus) {
+      return new JsonValidationFailedStatus((ValidationFailedStatus) object);
+    }
+    if (object instanceof IStatus) {
+      return new JsonStatus((IStatus) object);
     }
     if (object instanceof INumberColumn<?>) {
       return new JsonNumberColumn((INumberColumn<?>) object);

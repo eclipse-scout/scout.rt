@@ -10,7 +10,7 @@
  */
 
 import {FormSpecHelper} from '@eclipse-scout/testing';
-import {IntegerField, scout, Status} from '../../../../src/index';
+import {IntegerField, scout, Status, ParsingFailedStatus, ValidationFailedStatus} from '../../../../src/index';
 
 describe('IntegerField', () => {
 
@@ -79,5 +79,50 @@ describe('IntegerField', () => {
       expect(field.errorStatus instanceof Status).toBe(true);
     }
   }
+
+  describe('errorStatus', function() {
+    it('parse, validate and custom-error', function() {
+      var field = scout.create('IntegerField', {
+        parent: session.desktop
+      });
+
+      // invalid number
+      field.parseAndSetValue('foo');
+      expect(field.errorStatus.containsStatus(ParsingFailedStatus)).toBe(true);
+      expect(field.errorStatus.children.length).toEqual(1);
+      field.setErrorStatus(null);
+
+      // add a validator
+      var validator = function() {
+        throw 'Never valid';
+      };
+      field.addValidator(validator);
+      field.parseAndSetValue('123');
+      expect(field.errorStatus.containsStatus(ValidationFailedStatus)).toBe(true);
+      expect(field.errorStatus.children.length).toEqual(1);
+
+      // now set a functional error (typically added by business-logic)
+      // we use "set" here intentionally in place of "add"
+      field.setErrorStatus(Status.error('functional'));
+      expect(field.errorStatus.containsStatus(Status)).toBe(true);
+      expect(field.errorStatus.children).toBe(null);
+      field.removeValidator(validator);
+
+      // now make a parse error
+      // the existing (non-multi) error status should be transformed into a multi-status, so we have two status at the same time
+      field.parseAndSetValue('foo');
+      expect(field.errorStatus.containsStatus(ParsingFailedStatus)).toBe(true);
+      expect(field.errorStatus.children.length).toBe(2);
+      expect(field.errorStatus.children.some(function(status) {
+        return status.message === 'functional';
+      })).toBe(true);
+
+      // when the parse error is resolved, the multi status will remain
+      field.parseAndSetValue('123');
+      expect(field.errorStatus.containsStatus(ParsingFailedStatus)).toBe(false);
+      expect(field.errorStatus.children.length).toBe(1);
+      expect(field.errorStatus.message).toEqual('functional');
+    });
+  });
 
 });

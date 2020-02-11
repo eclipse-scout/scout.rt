@@ -374,6 +374,25 @@ describe('FormField', function() {
 
   });
 
+  it('property suppressStatus', function() {
+    var formField = createFormField(helper.createFieldModel());
+    expect(formField.suppressStatus).toEqual(null); // default value
+    expect(formField._isSuppressStatusField()).toBe(false);
+    expect(formField._isSuppressStatusIcon()).toBe(false);
+
+    formField.setSuppressStatus(FormField.SuppressStatus.ALL);
+    expect(formField._isSuppressStatusField()).toBe(true);
+    expect(formField._isSuppressStatusIcon()).toBe(true);
+
+    formField.setSuppressStatus(FormField.SuppressStatus.ICON);
+    expect(formField._isSuppressStatusField()).toBe(false);
+    expect(formField._isSuppressStatusIcon()).toBe(true);
+
+    formField.setSuppressStatus(FormField.SuppressStatus.FIELD);
+    expect(formField._isSuppressStatusField()).toBe(true);
+    expect(formField._isSuppressStatusIcon()).toBe(false);
+  });
+
   describe('property visible', function() {
     var formField, model;
 

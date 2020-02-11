@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Status} from '../../src/index';
+import {Status, DefaultStatus, ParsingFailedStatus} from '../../src/index';
 
 describe('scout.Status', function() {
 
@@ -74,6 +74,107 @@ describe('scout.Status', function() {
       status = Status.ok('Okay');
       expect(status.severity).toBe(Status.Severity.OK);
       expect(status.message).toBe('Okay');
+    });
+
+  });
+
+  it('addStatus / hasChildren', function() {
+    var status = Status.error('root');
+    expect(status.hasChildren()).toBe(false);
+    status.addStatus(Status.info('foo'));
+    expect(status.hasChildren()).toBe(true);
+    status.removeAllStatus(Status);
+    expect(status.hasChildren()).toBe(false);
+  });
+
+  it('removeAllStatus', function() {
+    var status = Status.error('root');
+    status.addStatus(ParsingFailedStatus.error('foo'));
+    status.addStatus(Status.error('bar'));
+    expect(status.children.length).toEqual(2);
+    status.removeAllStatus(Status);
+    expect(status.hasChildren()).toBe(false); // because Status is the base-class of all status
+
+    // only remove status with type DefaultStatus
+    status.addStatus(ParsingFailedStatus.error('foo'));
+    status.addStatus(DefaultStatus.error('bar'));
+    status.removeAllStatus(DefaultStatus);
+    expect(status.children.length).toEqual(1);
+    expect(status.children[0].message).toEqual('foo');
+  });
+
+  it('containsStatus', function() {
+    var status = Status.error('root');
+
+    expect(status.containsStatus(ParsingFailedStatus)).toBe(false);
+    status.addStatus(ParsingFailedStatus.error('foo'));
+    expect(status.containsStatus(ParsingFailedStatus)).toBe(true);
+
+    expect(status.containsStatus(DefaultStatus)).toBe(false);
+    status.addStatus(DefaultStatus.error('bar'));
+    expect(status.containsStatus(DefaultStatus)).toBe(true);
+  });
+
+  it('updateProperties', function() {
+    var status = Status.ok('root');
+    status.addStatus(ParsingFailedStatus.error('foo'));
+    status.addStatus(DefaultStatus.warning('bar'));
+
+    expect(status.message).toEqual('foo');
+    expect(status.severity).toEqual(Status.Severity.ERROR);
+
+    // use properties from last remaining status (DefaultStatus)
+    status.removeAllStatus(ParsingFailedStatus);
+    expect(status.message).toEqual('bar');
+    expect(status.severity).toEqual(Status.Severity.WARNING);
+
+    // ParsingFailed should have the higher priority than DefaultStatus
+    status = Status.ok('root');
+    status.addStatus(DefaultStatus.error('baz'));
+    status.addStatus(ParsingFailedStatus.error('foo'));
+    expect(status.message).toEqual('foo');
+    expect(status.severity).toEqual(Status.Severity.ERROR);
+
+    // when the last child is removed
+    status.removeAllStatus(Status);
+    expect(status.message).toEqual(null);
+    expect(status.severity).toEqual(Status.Severity.OK);
+  });
+
+  it('equals', function() {
+    var a = Status.ok('root');
+    var b = Status.ok('root');
+    expect(a.equals(b)).toBe(true);
+    expect(b.equals(a)).toBe(true);
+
+    // make sure property 'children' is checked
+    a.addStatus(Status.error('foo'));
+    expect(a.equals(b)).toBe(false);
+    expect(b.equals(a)).toBe(false);
+
+    b.addStatus(Status.error('foo'));
+    expect(a.equals(b)).toBe(true);
+    expect(b.equals(a)).toBe(true);
+  });
+
+  describe('ensureChildren', function() {
+
+    it('status with no children should be transformed in a status with children', function() {
+      var status = Status.ok('foo');
+      expect(status.children).toBe(null);
+      var newStatus = status.ensureChildren();
+      expect(newStatus.children.length).toEqual(1);
+      expect(status).toBe(newStatus.children[0]);
+    });
+
+    it('status with children should return a clone', function() {
+      var status = Status.ensure({
+        children: [{message: 'foo'}]
+      });
+      expect(status.children.length).toEqual(1);
+      var newStatus = status.ensureChildren();
+      expect(newStatus.children.length).toEqual(1);
+      expect(status).not.toBe(newStatus);
     });
 
   });

@@ -46,7 +46,7 @@ describe('FormFieldAdapter', function() {
       // required
       formField._$statusLabel = $('<div></div>');
       adapter.onModelPropertyChange(event);
-      expect(formField.errorStatus).toEqual(new Status({message: 'foo'}));
+      expect(formField.errorStatus.equals(Status.ensure({message: 'foo'}))).toBe(true);
       // never apply id, type, properties on model
       expect(formField.id).toBe(model.id);
       expect(formField.hasOwnProperty('type')).toBe(false);

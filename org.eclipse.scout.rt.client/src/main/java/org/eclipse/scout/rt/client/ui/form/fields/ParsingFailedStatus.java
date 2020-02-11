@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 /**
  * Internal marker status for parsing errors.
  *
- * @see AbstractValueField#parseValue(String)
+ * @see AbstractValueField#parseValueInternal(String)
  */
 @Order(10)
 public final class ParsingFailedStatus extends ScoutFieldStatus {
