@@ -40,6 +40,7 @@ import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
@@ -53,13 +54,25 @@ public class JettyServer {
   public static final String WEB_APP_CONTEXT_PATH = "scout.jetty.webapp.contextpath";
   public static final String SERVER_PORT_KEY = "scout.jetty.port"; // see also org.eclipse.scout.rt.platform.context.NodeIdentifier.compute()
 
+  protected volatile Server m_server = null;
   private boolean m_isInDevMode;
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
     new JettyServer().start();
   }
 
-  protected void start() throws Exception {
+  protected void start() {
+    try {
+      startInternal();
+    }
+    catch (Exception e) {
+      LOG.error("Fatal: Unable to start application", e);
+      shutdown();
+      throw new PlatformException("Fatal: Unable to start application", e);
+    }
+  }
+
+  protected void startInternal() throws Exception {
     // read folder
     File webappFolder = null;
     String webappParam = System.getProperty(WEB_APP_FOLDER_KEY);
@@ -86,11 +99,11 @@ public class JettyServer {
 
     WebAppContext webApp = createWebApp(webappFolder, contextPath);
     Handler serverHandler = createServerHandler(webApp);
-    Server server = new Server(port);
-    server.setHandler(serverHandler);
-    server.start();
+    m_server = new Server(port);
+    m_server.setHandler(serverHandler);
+    m_server.start();
 
-    startConsoleInputHandler(server);
+    startConsoleInputHandler();
 
     if (LOG.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
@@ -109,7 +122,24 @@ public class JettyServer {
     }
   }
 
-  protected void startConsoleInputHandler(final Server server) {
+  public void shutdown() {
+    LOG.info("Shutting down application...");
+    try {
+      shutdownInternal();
+      LOG.info("Shutdown complete");
+    }
+    catch (Exception e) {
+      LOG.error("Error while shutting down application", e);
+    }
+  }
+
+  protected void shutdownInternal() throws Exception {
+    if (m_server != null) {
+      m_server.stop();
+    }
+  }
+
+  protected void startConsoleInputHandler() {
     final Thread t = new Thread("Console input handler") {
       @Override
       public void run() {
@@ -119,9 +149,7 @@ public class JettyServer {
           while ((command = StringUtility.trim(br.readLine())) != null) {
             if ("shutdown".equalsIgnoreCase(command)) {
               try { // NOSONAR
-                LOG.info("Shutting down application...");
-                server.stop();
-                LOG.info("Shutdown complete");
+                shutdown();
                 return;
               }
               catch (Exception e) {
