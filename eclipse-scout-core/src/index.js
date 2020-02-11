@@ -42,7 +42,10 @@ export {default as polyfills} from './util/polyfills';
 export {default as PromiseCreator} from './util/PromiseCreator';
 export {default as promises} from './util/promises';
 export {default as Range} from './util/Range';
-export {default as Status} from './util/Status';
+export {default as Status} from './status/Status';
+export {default as DefaultStatus} from './status/DefaultStatus';
+export {default as ParsingFailedStatus} from './status/ParsingFailedStatus';
+export {default as ValidationFailedStatus} from './status/ValidationFailedStatus';
 
 export {default as CachedElement} from './encoder/CachedElement';
 export {default as PlainTextEncoder} from './encoder/PlainTextEncoder';
@@ -426,6 +429,7 @@ export {default as ClipboardField} from './form/fields/clipboardfield/ClipboardF
 export {default as ClipboardFieldAdapter} from './form/fields/clipboardfield/ClipboardFieldAdapter';
 export {default as ColorField} from './form/fields/colorfield/ColorField';
 export {default as ColorFieldAdapter} from './form/fields/colorfield/ColorFieldAdapter';
+export {default as DatePredictionFailedStatus} from './form/fields/datefield/DatePredictionFailedStatus';
 export {default as DateField} from './form/fields/datefield/DateField';
 export {default as DateFieldAdapter} from './form/fields/datefield/DateFieldAdapter';
 export {default as DateTimeCompositeLayout} from './form/fields/datefield/DateTimeCompositeLayout';

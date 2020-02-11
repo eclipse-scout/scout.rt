@@ -23,6 +23,10 @@ public class JsonStatus implements IJsonObject {
     m_status = status;
   }
 
+  public String getObjectType() {
+    return "Status";
+  }
+
   public IStatus getStatus() {
     return m_status;
   }
@@ -30,13 +34,14 @@ public class JsonStatus implements IJsonObject {
   @Override
   public JSONObject toJson() {
     JSONObject json = new JSONObject();
+    json.put("objectType", getObjectType());
     json.put("message", m_status.getMessage());
     json.put("severity", m_status.getSeverity());
     json.put("iconId", m_status.getIconId());
     json.put("code", m_status.getCode());
     if (m_status.isMultiStatus()) {
       for (IStatus cs : ((IMultiStatus) m_status).getChildren()) {
-        json.append("children", new JsonStatus(cs).toJson());
+        json.append("children", MainJsonObjectFactory.get().createJsonObject(cs).toJson());
       }
     }
     return json;

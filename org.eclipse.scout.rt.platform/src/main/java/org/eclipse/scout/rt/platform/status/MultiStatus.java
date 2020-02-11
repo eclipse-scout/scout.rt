@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 /**
  * Implementation of a {@link IMultiStatus}: A status with child statuses.
  * <p>
- * The severity given by maximum severity of the children or {@link #IStatus#OK}, if no children available.
+ * The severity given by maximum severity of the children or {@link IStatus#OK}, if no children available.
  * </p>
  */
 public class MultiStatus extends Status implements IMultiStatus {

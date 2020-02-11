@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, objects, strings} from '../index';
+import {arrays, objects, strings, DefaultStatus, ParsingFailedStatus, ValidationFailedStatus, ObjectFactory} from '../index';
 import * as $ from 'jquery';
 
 export default class Status {
@@ -17,6 +17,8 @@ export default class Status {
     this.message = null;
     this.severity = Status.Severity.ERROR;
     this.code = 0;
+    this.children = null;
+    this.deletable = true;
     $.extend(this, model);
 
     // severity may be a string (e.g. if set in a model json file) -> convert to real severity
@@ -87,7 +89,112 @@ export default class Status {
     if (!(o instanceof Status)) {
       return false;
     }
+    if (!objects.equalsRecursive(this.children, o.children)) {
+      return false;
+    }
     return objects.propertiesEquals(this, o, ['severity', 'message', 'invalidDate', 'invalidTime']);
+  }
+
+  /**
+   * @param {object} statusType
+   * @return {boolean} whether or not this status contains a child with the give type
+   */
+  containsStatus(statusType) {
+    return this.containsStatusPredicate(function(status) {
+      return status instanceof statusType;
+    });
+  }
+
+  containsStatusPredicate(predicate) {
+    return this.asFlatList().some(predicate);
+  }
+
+  addStatus(status) {
+    if (this.hasChildren()) {
+      this.children.push(status);
+    } else {
+      this.children = [status];
+    }
+    this._updateProperties();
+  }
+
+  /**
+   * Removes all children of the given type from this status. The type is checked by inheritance.
+   *
+   * @param {object} statusType
+   */
+  removeAllStatus(statusType) {
+    this.removeAllStatusPredicate(function(status) {
+      return status instanceof statusType;
+    });
+  }
+
+  removeAllStatusPredicate(predicate) {
+    if (this.hasChildren()) {
+      this.children.forEach(function(status) {
+        status.removeAllStatusPredicate(predicate);
+      });
+      var newChildren = this.children.filter(function(status) {
+        // when status is not deletable we must add it as child again, thus --> true
+        if (!status.deletable) {
+          return true;
+        }
+        return !predicate(status); // negate predicate
+      });
+      this.children = newChildren;
+      this._updateProperties();
+    }
+  }
+
+  _updateProperties() {
+    if (!this.hasChildren()) {
+      this.message = null;
+      this.severity = Status.Severity.OK;
+      this.code = 0;
+      return;
+    }
+
+    var firstStatus = this.asFlatList().sort(function(a, b) {
+      return calcPriority(b) - calcPriority(a);
+
+      function calcPriority(status) {
+        var multiplier = 1;
+        if (status instanceof ParsingFailedStatus) {
+          multiplier = 4;
+        } else if (status instanceof ValidationFailedStatus) {
+          multiplier = 2;
+        }
+        return multiplier * status.severity;
+      }
+    })[0];
+    this.message = firstStatus.message;
+    this.severity = firstStatus.severity;
+    this.code = firstStatus.code;
+  }
+
+  /**
+   * @return {boolean} whether this status has children (= multi status)
+   */
+  hasChildren() {
+    return !!(this.children && this.children.length > 0);
+  }
+
+  /**
+   * In some cases we need to transform an error status without children to a multi-status with children.
+   * If the instance already has children, this function returns a clone of the instance.
+   * If the instance is not yet a multi-status, we return a new instance with the current instance as first child.
+   *
+   * @returns {Status}
+   */
+  ensureChildren() {
+    if (objects.isArray(this.children)) {
+      return this.clone();
+    }
+    var childStatus = this;
+    var newStatus = this.clone();
+    newStatus.children = [childStatus];
+    newStatus._updateProperties();
+    return newStatus;
   }
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */
@@ -145,21 +252,25 @@ export default class Status {
     if (status instanceof Status) {
       return status;
     }
-    return new Status(status);
+    // May return a specialized sub-class of Status
+    if (!status.objectType) {
+      status.objectType = 'Status';
+    }
+    return ObjectFactory.get().create(status);
   }
 
   /**
    * @returns {Status} a Status object with severity OK.
    */
   static ok(model) {
-    return Status._create(model, Status.Severity.OK);
+    return new Status(Status.ensureModel(model, Status.Severity.OK));
   }
 
   /**
    * @returns {Status} a Status object with severity INFO.
    */
   static info(model) {
-    return Status._create(model, Status.Severity.INFO);
+    return new Status(Status.ensureModel(model, Status.Severity.INFO));
   }
 
   /**
@@ -180,17 +291,20 @@ export default class Status {
    * @returns {Status} a Status object with severity WARNING.
    */
   static warning(model) {
-    return Status._create(model, Status.Severity.WARNING);
+    return new Status(Status.ensureModel(model, Status.Severity.WARNING));
   }
 
   /**
    * @returns {Status} a Status object with severity ERROR.
    */
   static error(model) {
-    return Status._create(model, Status.Severity.ERROR);
+    return new Status(Status.ensureModel(model, Status.Severity.ERROR));
   }
 
-  static _create(model, severity) {
+  /**
+   * @returns {object}
+   */
+  static ensureModel(model, severity) {
     if (typeof model === 'string') {
       model = {
         message: model
@@ -198,10 +312,9 @@ export default class Status {
     } else {
       model = model || {};
     }
-    model = $.extend({}, model, {
+    return $.extend({}, model, {
       severity: severity
     });
-    return new Status(model);
   }
 
   /**
@@ -212,12 +325,34 @@ export default class Status {
       return [];
     }
     var list = [];
-    if (status.children) {
+    if (status.hasChildren()) {
       status.children.forEach(function(childStatus) {
         arrays.pushAll(list, Status.asFlatList(childStatus));
       });
+    } else {
+      list.push(status);
     }
-    list.push(status);
     return list;
+  }
+
+  /**
+   * Returns a constructor function for the given class-name.
+   * <p>
+   * The key of this map is a string which is equals to the objectType string, the value is a reference to the constructor function.
+   * This map is required because in JavaScript we don't have the class-name at runtime.
+   * <p>
+   * Note: we cannot initialize this map as static variable, because webpack dependencies are not resolved in the moment the variable
+   * is initialized.
+   *
+   * @param {string} className
+   * @returns {function} Status constructor
+   */
+  static classForName(className) {
+    return {
+      Status: Status,
+      DefaultStatus: DefaultStatus,
+      ParsingFailedStatus: ParsingFailedStatus,
+      ValidationFailedStatus: ValidationFailedStatus
+    }[className];
   }
 }

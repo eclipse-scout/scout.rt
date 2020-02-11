@@ -20,7 +20,6 @@ export default class FormFieldAdapter extends ModelAdapter {
      * By default the field will be disabled.
      */
     this.enabledWhenOffline = false;
-
   }
 
   _goOffline() {
@@ -37,4 +36,5 @@ export default class FormFieldAdapter extends ModelAdapter {
     }
     this.widget.setEnabled(this._enabledBeforeOffline);
   }
+
 }

@@ -22,6 +22,8 @@ export default class SmartFieldAdapter extends LookupFieldAdapter {
    * Property lookup-row must be handled before value, since the smart-field has either a lookup-row
    * or a value but never both (when we only have a value, the smart-field must perform a lookup by key
    * in order to resolve the display name for that value).
+   * <br>
+   * Intentionally don't re-use properties from super-classes.
    */
   static PROPERTIES_ORDER = ['lookupRow', 'value', 'errorStatus', 'displayText'];
 

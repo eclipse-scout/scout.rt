@@ -66,6 +66,7 @@ export default class FormField extends Widget {
     this.tooltipText = null;
     this.tooltipAnchor = FormField.TooltipAnchor.DEFAULT;
     this.onFieldTooltipOptionsCreator = null;
+    this.suppressStatus = null;
 
     this.$label = null;
     /**
@@ -104,6 +105,21 @@ export default class FormField extends Widget {
   static FieldStyle = {
     CLASSIC: 'classic',
     ALTERNATIVE: 'alternative'
+  };
+
+  static SuppressStatus = {
+    /**
+     * Suppress status on icon and field (CSS class).
+     */
+    ALL: 'all',
+    /**
+     * Suppress status on icon, but still show status on field (CSS class).
+     */
+    ICON: 'icon',
+    /**
+     * Suppress status on field (CSS class), but still show status as icon.
+     */
+    FIELD: 'field'
   };
 
   /** Global variable to make it easier to adjust the default field style for all fields */
@@ -301,6 +317,75 @@ export default class FormField extends Widget {
     this._setProperty('errorStatus', errorStatus);
   }
 
+  /**
+   * Adds the given (functional) error status to the list of error status. Prefer this function over #setErrorStatus
+   * when you don't want to mess with the internal error states of the field (parsing, validation).
+   *
+   * @param errorStatus
+   */
+  addErrorStatus(errorStatus) {
+    if (!(errorStatus instanceof Status)) {
+      throw new Error('errorStatus is not a Status');
+    }
+    var status = this._errorStatus();
+    if (status) {
+      status = status.ensureChildren(); // new instance is required for property change
+    } else {
+      status = Status.ok('Root');
+    }
+    status.addStatus(errorStatus);
+    this.setErrorStatus(status);
+  }
+
+  setSuppressStatus(suppressStatus) {
+    this.setProperty('suppressStatus', suppressStatus);
+  }
+
+  _renderSuppressStatus() {
+    this._renderErrorStatus();
+  }
+
+  /**
+   * @returns {boolean} Whether or not error status icon is suppressed
+   */
+  _isSuppressStatusIcon() {
+    return scout.isOneOf(this.suppressStatus, FormField.SuppressStatus.ALL, FormField.SuppressStatus.ICON);
+  }
+
+  /**
+   * @returns {boolean} Whether or not error status CSS class is suppressed on field
+   */
+  _isSuppressStatusField() {
+    return scout.isOneOf(this.suppressStatus, FormField.SuppressStatus.ALL, FormField.SuppressStatus.FIELD);
+  }
+
+  /**
+   * Removes all status (incl. children) with the given type.
+   * @param {object} statusType
+   */
+  removeErrorStatus(statusType) {
+    this.removeErrorStatusPredicate(function(status) {
+      return status instanceof statusType;
+    });
+  }
+
+  removeErrorStatusPredicate(predicate) {
+    var status = this._errorStatus();
+    if (!status) {
+      return;
+    }
+    if (status.containsStatusPredicate(predicate)) {
+      var newStatus = status.clone();
+      newStatus.removeAllStatusPredicate(predicate);
+      // If no other status remains -> clear error status
+      if (newStatus.hasChildren()) {
+        this.setErrorStatus(newStatus);
+      } else {
+        this.clearErrorStatus();
+      }
+    }
+  }
+
   clearErrorStatus() {
     this.setErrorStatus(null);
   }
@@ -308,19 +393,24 @@ export default class FormField extends Widget {
   _renderErrorStatus() {
     var status = this._errorStatus(),
       hasStatus = !!status,
-      statusClass = hasStatus ? 'has-' + status.cssClass() : '';
+      statusClass = (hasStatus && !this._isSuppressStatusField()) ? 'has-' + status.cssClass() : '';
 
     this._updateErrorStatusClasses(statusClass, hasStatus);
     this._updateFieldStatus();
   }
 
   _updateErrorStatusClasses(statusClass, hasStatus) {
-    this.$container.removeClass(FormField.SEVERITY_CSS_CLASSES);
-    this.$container.addClass(statusClass, hasStatus);
-    if (this.$field) {
-      this.$field.removeClass(FormField.SEVERITY_CSS_CLASSES);
-      this.$field.addClass(statusClass, hasStatus);
+    this._updateErrorStatusClassesOnElement(this.$container, statusClass, hasStatus);
+    this._updateErrorStatusClassesOnElement(this.$field, statusClass, hasStatus);
+  }
+
+  _updateErrorStatusClassesOnElement($element, statusClass, hasStatus) {
+    if (!$element) {
+      return;
     }
+    $element
+      .removeClass(FormField.SEVERITY_CSS_CLASSES)
+      .addClass(statusClass, hasStatus);
   }
 
   setTooltipText(tooltipText) {
@@ -548,7 +638,7 @@ export default class FormField extends Widget {
       hasStatus = !!status,
       hasTooltip = this.hasStatusTooltip();
 
-    return !this.suppressStatus && this.visible && (statusVisible || hasStatus || hasTooltip || (this._hasMenus() && this.menusVisible));
+    return !this._isSuppressStatusIcon() && this.visible && (statusVisible || hasStatus || hasTooltip || (this._hasMenus() && this.menusVisible));
   }
 
   _renderChildVisible($child, visible) {

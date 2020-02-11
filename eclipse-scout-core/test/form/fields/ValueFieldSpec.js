@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, Status, StringField, ValueField} from '../../../src/index';
+import {ParsingFailedStatus, arrays, scout, Status, StringField, ValueField} from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper} from '@eclipse-scout/testing';
 
 /* global removePopups */
@@ -131,20 +131,32 @@ describe('ValueField', function() {
         parent: session.desktop,
         value: 'Foo',
         errorStatus: {
-          message: 'initial error status'
+          children: [{
+            message: 'initial error status'
+          }]
         }
       });
-      expect(field.errorStatus.message).toBe('initial error status');
+      expect(field.errorStatus.message).toBe('Validation failed');
+      expect(field.errorStatus.children.length).toEqual(2);
+      expect(findInitialError(field).message).toEqual('initial error status');
 
-      // If setValue is called after initialization, error status will be replaced
+      // Same thing should happen when setValue is called
       field.setValue('ABC');
       expect(field.errorStatus.message).toBe('Validation failed');
+      expect(field.errorStatus.children.length).toEqual(2);
+      expect(findInitialError(field).message).toEqual('initial error status');
 
-      // If calling setErrorStatus error status may be set explicitly independent of the value
+      // calling setErrorStatus error status may be set explicitly independent of the value
       field.setErrorStatus(Status.error({
         message: 'another error'
       }));
       expect(field.errorStatus.message).toBe('another error');
+
+      function findInitialError(field) {
+        return arrays.find(field.errorStatus.children, function(status) {
+          return !(status instanceof ParsingFailedStatus);
+        });
+      }
     });
 
     it('calls validate and format when value is set initially', function() {
@@ -273,10 +285,10 @@ describe('ValueField', function() {
       expect(field.errorStatus.message).toBe('[undefined text: InvalidValueMessageX]');
     });
 
-    it('may throw a Status if value is invalid', function() {
+    it('may throw a ParsingFailedStatus if value is invalid', function() {
       var field = helper.createField('StringField');
       field.setValidator(function(value) {
-        throw Status.error({
+        throw ParsingFailedStatus.error({
           message: 'Custom message'
         });
       });

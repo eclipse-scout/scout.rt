@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CheckBoxField, CompositeField, DateField, dates, HtmlComponent, LogicalGridData, LogicalGridLayoutConfig, scout, SequenceBoxGridConfig, SequenceBoxLayout} from '../../../index';
+import {CheckBoxField, CompositeField, DateField, dates, FormField, HtmlComponent, LogicalGridData, LogicalGridLayoutConfig, scout, SequenceBoxGridConfig, SequenceBoxLayout} from '../../../index';
 
 export default class SequenceBox extends CompositeField {
 
@@ -137,7 +137,7 @@ export default class SequenceBox extends CompositeField {
   _handleStatus(visibilityChanged) {
     if (visibilityChanged && this._lastVisibleField) {
       // if there is a new last visible field, make sure the status is shown on the previously last one
-      this._lastVisibleField.suppressStatus = false;
+      this._lastVisibleField.setSuppressStatus(null);
       if (this._lastVisibleField.rendered) {
         this._lastVisibleField._renderErrorStatus();
         this._lastVisibleField._renderTooltipText();
@@ -181,8 +181,8 @@ export default class SequenceBox extends CompositeField {
     }
     this._isOverwritingStatusFromField = false;
 
-    // Make sure the last field won't display a status
-    this._lastVisibleField.suppressStatus = true;
+    // Make sure the last field won't display a status (but shows status CSS class)
+    this._lastVisibleField.setSuppressStatus(FormField.SuppressStatus.ICON);
     if (visibilityChanged) {
       // If the last field got invisible, make sure the new last field does not display a status anymore (now done by the seq box)
       if (this._lastVisibleField.rendered) {

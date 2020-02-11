@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonGridData;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.JsonStatus;
+import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,7 +172,7 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        return JsonStatus.toJson((IStatus) value);
+        return MainJsonObjectFactory.get().createJsonObject(value).toJson();
       }
     });
     putJsonProperty(new JsonProperty<FORM_FIELD>("gridData", model) {

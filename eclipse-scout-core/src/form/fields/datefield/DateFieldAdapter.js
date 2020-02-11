@@ -8,14 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DateField, dates, Status, ValueFieldAdapter} from '../../../index';
+import {arrays, dates, FormFieldAdapter, ParsingFailedStatus, ValueFieldAdapter} from '../../../index';
 
 export default class DateFieldAdapter extends ValueFieldAdapter {
 
   constructor() {
     super();
-    this._errorStatus = null;
-    this._errorStatusDisplayText = null;
   }
 
   static PROPERTIES_ORDER = ['hasTime', 'hasDate'];
@@ -25,35 +23,27 @@ export default class DateFieldAdapter extends ValueFieldAdapter {
    */
   _initProperties(model) {
     super._initProperties(model);
-    this._updateErrorStatus(model.errorStatus, model.displayText);
-  }
-
-  /**
-   * @override
-   */
-  _attachWidget() {
-    super._attachWidget();
-    this.widget.setValidator(function(value, defaultValidator) {
-      // If the server reported an error for current display text,
-      // make sure it will be shown in the UI if the user enters that display text again or selects the same date using the picker
-      var displayText = this.formatValue(value);
-      if (this.modelAdapter._errorStatus && displayText === this.modelAdapter._errorStatusDisplayText) {
-        throw this.modelAdapter._errorStatus;
-      }
-      return defaultValidator(value);
-    }.bind(this.widget), false);
   }
 
   /**
    * @override
    */
   _onWidgetAcceptInput(event) {
+    var parsingFailedError = null;
+    var errorStatus = this.widget.errorStatus;
+    // Only send Parsing errors to the server
+    if (errorStatus && errorStatus.hasChildren()) {
+      parsingFailedError = arrays.find(errorStatus.asFlatList(), function(childStatus) {
+        return childStatus instanceof ParsingFailedStatus;
+      });
+    }
+
     var data = {
       displayText: this.widget.displayText,
-      errorStatus: this.widget.errorStatus
+      errorStatus: parsingFailedError
     };
     // In case of an error, the value is still the old, valid value -> don't send it
-    if (!this.widget.errorStatus) {
+    if (!parsingFailedError) {
       data.value = dates.toJsonDate(this.widget.value);
     }
     this._send('acceptInput', data, {
@@ -62,17 +52,6 @@ export default class DateFieldAdapter extends ValueFieldAdapter {
         return this.target === previous.target && this.type === previous.type;
       }
     });
-    this._errorStatus = null;
-    this._errorStatusDisplayText = null;
-  }
-
-  /**
-   * @override
-   */
-  _syncDisplayText(displayText) {
-    // No need to call parseAndSetValue, the value will come separately
-    this.widget.setDisplayText(displayText);
-    this._updateErrorStatus(this._errorStatus, displayText);
   }
 
   /**
@@ -85,40 +64,4 @@ export default class DateFieldAdapter extends ValueFieldAdapter {
     return Object.keys(newProperties).sort(this._createPropertySortFunc(DateFieldAdapter.PROPERTIES_ORDER));
   }
 
-  _syncErrorStatus(errorStatus) {
-    if (errorStatus) {
-      if (this.widget.errorStatus) {
-        // Don't loose information which part was invalid
-        errorStatus.invalidDate = this.widget.errorStatus.invalidDate;
-        errorStatus.invalidTime = this.widget.errorStatus.invalidTime;
-      } else {
-        // If the error happened only on server side, we do not know which part was invalid.
-        // Set both to true so that DateField._isDateValid / isTimeValid does not return true
-        errorStatus.invalidDate = true;
-        errorStatus.invalidTime = true;
-      }
-    }
-
-    this._updateErrorStatus(errorStatus, this.widget.displayText);
-    this.widget.setErrorStatus(errorStatus);
-  }
-
-  _updateErrorStatus(errorStatus, displayText) {
-    // Find the first model error status. If server sends a UI error status (=PARSE_ERROR) then don't remember it
-    errorStatus = Status.ensure(errorStatus);
-    var modelErrorStatus = null;
-    if (errorStatus) {
-      modelErrorStatus = arrays.find(errorStatus.asFlatList(), function(status) {
-        return status.code !== DateField.ErrorCode.PARSE_ERROR;
-      });
-    }
-    // Remember errorStatus from model
-    if (modelErrorStatus) {
-      this._errorStatus = modelErrorStatus;
-      this._errorStatusDisplayText = displayText;
-    } else {
-      this._errorStatus = null;
-      this._errorStatusDisplayText = null;
-    }
-  }
 }

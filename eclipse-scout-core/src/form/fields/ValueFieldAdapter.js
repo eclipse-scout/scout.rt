@@ -66,4 +66,5 @@ export default class ValueFieldAdapter extends FormFieldAdapter {
       return comparators.TEXT.compare(a, b); // both are not in list
     };
   }
+
 }

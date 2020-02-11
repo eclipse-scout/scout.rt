@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateFormat, DatePickerTouchPopup, dates, keys, RemoteEvent, scout, Status, TimePickerTouchPopup} from '../../../../src/index';
+import {DateFormat, DatePickerTouchPopup, dates, keys, RemoteEvent, scout, Status, TimePickerTouchPopup, ValidationFailedStatus} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
 describe('DateField', function() {
@@ -269,7 +269,8 @@ describe('DateField', function() {
       // Enter invalid date
       field.setValue(dates.create('2017-05-23 12:30:00.000'));
       expect(field.value).toBe(null);
-      expect(field.errorStatus instanceof Status).toBe(true);
+      expect(field.errorStatus.children.length).toBe(1);
+      expect(field.errorStatus.children[0] instanceof ValidationFailedStatus).toBe(true);
 
       // Enter another date, but don't press enter
       field.$dateField.val('23.05.201');
@@ -282,7 +283,8 @@ describe('DateField', function() {
       field._onDateFieldInput();
       field.acceptInput();
       expect(field.value).toBe(null);
-      expect(field.errorStatus instanceof Status).toBe(true);
+      expect(field.errorStatus.children.length).toBe(1);
+      expect(field.errorStatus.children[0] instanceof ValidationFailedStatus).toBe(true);
     });
 
   });
@@ -313,31 +315,6 @@ describe('DateField', function() {
       expect(dateField.errorStatus instanceof Status).toBe(false);
     });
 
-    it('does not remove time if date was deleted and time has an error', function() {
-      var dateField = scout.create('DateField', {
-        parent: session.desktop,
-        displayText: '01.10.2014\nasdf',
-        hasTime: true
-      });
-      dateField.render();
-      focusDate(dateField);
-      openDatePicker(dateField);
-      dateField.acceptInput();
-      expect(dateField.$dateField.val()).toBe('01.10.2014');
-      expect(dateField.$timeField.val()).toBe('asdf');
-      expect(dateField.errorStatus instanceof Status).toBe(true);
-
-      dateField.$dateField.val('');
-      expect(dateField.$dateField.val()).toBe('');
-      expect(dateField.$timeField.val()).toBe('asdf');
-
-      dateField.acceptDate();
-      expect(dateField.$dateField.val()).toBe('');
-      expect(dateField.$timeField.val()).toBe('asdf');
-      expect(dateField.value).toBe(null);
-      expect(dateField.errorStatus instanceof Status).toBe(true);
-    });
-
   });
 
   describe('acceptTime', function() {
@@ -364,31 +341,6 @@ describe('DateField', function() {
       expect(dateField.$timeField.val()).toBe('');
       expect(dateField.value).toBe(null);
       expect(dateField.errorStatus instanceof Status).toBe(false);
-    });
-
-    it('does not remove date if time was deleted and date has an error', function() {
-      var dateField = scout.create('DateField', {
-        parent: session.desktop,
-        displayText: 'asdf\n05:00',
-        hasTime: true
-      });
-      dateField.render();
-      focusDate(dateField);
-      openDatePicker(dateField);
-      dateField.acceptInput();
-      expect(dateField.$dateField.val()).toBe('asdf');
-      expect(dateField.$timeField.val()).toBe('05:00');
-      expect(dateField.errorStatus instanceof Status).toBe(true);
-
-      dateField.$timeField.val('');
-      expect(dateField.$dateField.val()).toBe('asdf');
-      expect(dateField.$timeField.val()).toBe('');
-
-      dateField.acceptTime();
-      expect(dateField.$dateField.val()).toBe('asdf');
-      expect(dateField.$timeField.val()).toBe('');
-      expect(dateField.value).toBe(null);
-      expect(dateField.errorStatus instanceof Status).toBe(true);
     });
 
   });
