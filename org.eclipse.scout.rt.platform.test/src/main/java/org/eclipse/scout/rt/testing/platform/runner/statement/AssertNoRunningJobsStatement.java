@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
 import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +25,6 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
-import org.eclipse.scout.rt.platform.nls.NlsFileWatcher;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
@@ -69,7 +67,6 @@ public class AssertNoRunningJobsStatement extends Statement {
     final Set<IFuture<?>> scheduledFutures = jobListener.getScheduledFutures();
     if (!scheduledFutures.isEmpty()) {
       assertNoRunningJobs(Jobs.newFutureFilterBuilder()
-          .andMatchNotExecutionHint(NlsFileWatcher.class.getName()) // If the nls file watcher is started in the test, its ok that its job keeps running.
           .andMatchFuture(scheduledFutures)
           .toFilter());
     }

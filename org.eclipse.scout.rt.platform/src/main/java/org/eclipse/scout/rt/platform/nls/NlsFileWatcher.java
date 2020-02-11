@@ -10,57 +10,147 @@
  */
 package org.eclipse.scout.rt.platform.nls;
 
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 
-import org.eclipse.scout.rt.platform.resource.AbstractClasspathFileWatcher;
-import org.eclipse.scout.rt.platform.util.StringUtility;
+import javax.annotation.PreDestroy;
+
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NlsFileWatcher extends AbstractClasspathFileWatcher {
+@ApplicationScoped
+public class NlsFileWatcher {
   private static final Logger LOG = LoggerFactory.getLogger(NlsFileWatcher.class);
-  private static final String TEXT_RESOURCE_EXTENSION = "properties";
+  public static final String TEXT_RESOURCE_EXTENSION = "properties";
 
-  private final PathMatcher m_fileMatcher;
-  private final PathMatcher m_directoryMatcher;
-  private final Runnable m_onFileChanged;
+  private final Map<WatchKey, Path> m_watchKeys = new HashMap<>();
+  private final ReentrantReadWriteLock m_watchReadWriteLock = new ReentrantReadWriteLock();
+  private final Map<Path, List<NlsFileChangeHandler>> m_handlers = new HashMap<>();
 
-  public NlsFileWatcher(String resourceBundleName, Runnable onFileChanged) throws IOException {
-    super(false);
-    int pos = StringUtility.lastIndexOf(resourceBundleName, ".");
-    String filename = StringUtility.substring(resourceBundleName, pos + 1) + "*." + TEXT_RESOURCE_EXTENSION;
-    String directory = StringUtility.replace(StringUtility.substring(resourceBundleName, 0, pos), ".", "/");
+  private WatchService m_watcher;
 
-    m_fileMatcher = FileSystems.getDefault().getPathMatcher("glob:**/" + directory + "/" + filename);
-    m_directoryMatcher = FileSystems.getDefault().getPathMatcher("glob:**/" + directory);
-    m_onFileChanged = onFileChanged;
-
-    callInitializer();
+  @PreDestroy
+  public void destroy() throws IOException {
+    m_watcher.close();
   }
 
-  @Override
-  protected String getConfiguredJobName() {
-    return "Nls file watcher";
+  /**
+   * Registers a handler for a resource bundle. The handler will be called once a file in the folder of the resource
+   * bundle is changed.
+   *
+   * @param resourceBundleName
+   *          name of the resource bundle
+   * @param onFileChangeConsumer
+   *          called once a file has changed.
+   * @param cl
+   *          class loader that can load the resource bundle.
+   * @throws IOException
+   *           if unable to watch the desired directory.
+   */
+  public void watch(String resourceBundleName, Consumer<Path> onFileChangeConsumer, ClassLoader cl) throws IOException {
+    String fileName = resourceBundleName.replace('.', '/') + '.' + TEXT_RESOURCE_EXTENSION;
+    URL resource = cl.getResource(fileName);
+
+    if (resource == null || !resource.getProtocol().equals("file")) {
+      LOG.debug("Resource bundle {} not found or inside a jar. Files will not be watched.", resourceBundleName);
+      return;
+    }
+
+    Path directory = new File(resource.getPath()).toPath().getParent();
+    try {
+      m_watchReadWriteLock.writeLock().lock();
+      ensureStarted();
+      registerDirectory(directory);
+      List<NlsFileChangeHandler> handlers = m_handlers.computeIfAbsent(directory, (key) -> new ArrayList<>());
+      handlers.add(new NlsFileChangeHandler(resourceBundleName, onFileChangeConsumer));
+    }
+    finally {
+      m_watchReadWriteLock.writeLock().unlock();
+    }
   }
 
-  @Override
-  protected String getConfiguredExecutionHint() {
-    return NlsFileWatcher.class.getName();
+  protected synchronized void ensureStarted() throws IOException {
+    if (m_watcher != null) {
+      return;
+    }
+    m_watcher = FileSystems.getDefault().newWatchService();
+
+    Thread watcher = new Thread(() -> {
+      try {
+        WatchKey key;
+        while ((key = m_watcher.take()) != null) {
+          final Path keyPath;
+          try {
+            m_watchReadWriteLock.readLock().lock();
+            keyPath = m_watchKeys.get(key);
+          }
+          finally {
+            m_watchReadWriteLock.readLock().unlock();
+          }
+          if (keyPath == null) {
+            LOG.error("Unregistered watch key '" + key + "'.");
+            break;
+          }
+          for (WatchEvent<?> event : key.pollEvents()) {
+            Path path = keyPath.resolve((Path) event.context());
+            if (event.kind() == ENTRY_MODIFY) {
+              handleFileChanged(path);
+            }
+          }
+          key.reset();
+        }
+      }
+      catch (ClosedWatchServiceException e) { //NOSONAR
+        LOG.debug("Watcher stopped");
+      }
+      catch (InterruptedException e) {
+        BEANS.get(ExceptionHandler.class).handle(e);
+      }
+    }, "NLS File Watcher");
+    watcher.setDaemon(true);
+    watcher.start();
   }
 
-  @Override
-  protected boolean execAccept(Path path) {
-    return m_directoryMatcher.matches(path);
+  protected void registerDirectory(Path directory) throws IOException {
+    WatchKey key = directory.register(m_watcher, ENTRY_MODIFY);
+    try {
+      m_watchReadWriteLock.writeLock().lock();
+      m_watchKeys.put(key, directory);
+    }
+    finally {
+      m_watchReadWriteLock.writeLock().unlock();
+    }
   }
 
-  @Override
-  protected void execFileChanged(Path path) {
-    if (m_fileMatcher.matches(path)) {
-      LOG.info("File {} changed", path);
-      m_onFileChanged.run();
+  protected void handleFileChanged(Path path) {
+    try {
+      m_watchReadWriteLock.readLock().lock();
+      List<NlsFileChangeHandler> handlers = m_handlers.get(path.getParent());
+      if (!CollectionUtility.isEmpty(handlers)) {
+        handlers.forEach(handler -> handler.fileChanged(path));
+      }
+    }
+    finally {
+      m_watchReadWriteLock.readLock().unlock();
     }
   }
 }

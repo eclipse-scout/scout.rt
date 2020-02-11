@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,10 +16,10 @@ import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.DevelopmentTextsFileWatcherEnabledProperty;
-import org.eclipse.scout.rt.platform.resource.AbstractClasspathFileWatcher;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,6 @@ public class NlsResourceBundleCache {
   private final String m_resourceBundleName;
   private final Class<?> m_wrapperClass;
   private final ConcurrentMap<Locale, NlsResourceBundle> m_resourceBundles;
-  private AbstractClasspathFileWatcher m_nlsFileWatcher;
 
   /** constant indicating that no resource bundle exists */
   private static final NlsResourceBundle NONEXISTENT_BUNDLE = new NlsResourceBundle(null, Collections.emptyMap());
@@ -48,13 +47,12 @@ public class NlsResourceBundleCache {
     // Attach a file watcher in development mode to clear the cache if files have been edited.
     if (Platform.get().inDevelopmentMode() && CONFIG.getPropertyValue(DevelopmentTextsFileWatcherEnabledProperty.class)) {
       try {
-        m_nlsFileWatcher = new NlsFileWatcher(m_resourceBundleName, () -> {
-          m_resourceBundles.clear();
-          LOG.info("Cleared bundle cache for nls resource bundle {}", m_resourceBundleName);
-        });
+        BEANS.get(NlsFileWatcher.class).watch(m_resourceBundleName, (path) -> {
+            m_resourceBundles.clear();
+            LOG.info("Cleared bundle cache for nls resource bundle {}", m_resourceBundleName);
+        }, m_wrapperClass.getClassLoader());
       }
       catch (IOException e) {
-        m_nlsFileWatcher = null;
         LOG.warn("Could not create nls file watcher", e);
       }
     }
@@ -106,16 +104,5 @@ public class NlsResourceBundleCache {
     }
     // either this is a locale with only a language or it is the root locale - in any case return root locale as 'parent'
     return Locale.ROOT;
-  }
-
-  public void destroy() {
-    if (m_nlsFileWatcher != null) {
-      try {
-        m_nlsFileWatcher.destroy();
-      }
-      catch (IOException e) {
-        LOG.warn("Unable to destory nls file watcher", e);
-      }
-    }
   }
 }
