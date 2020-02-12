@@ -53,7 +53,7 @@ export default class DesktopNavigation extends Widget {
     this.$body = this.$container.appendDiv('navigation-body')
       .on('mousedown', this._onNavigationBodyMouseDown.bind(this));
     this.htmlCompBody = HtmlComponent.install(this.$body, this.session);
-    this.htmlCompBody.setLayout(new SingleLayout());
+    this.htmlCompBody.setLayout(new SingleLayout(null, {exact: true}));
 
     this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
   }

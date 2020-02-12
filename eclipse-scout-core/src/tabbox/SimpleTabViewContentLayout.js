@@ -24,7 +24,7 @@ export default class SimpleTabViewContentLayout extends AbstractLayout {
     }
 
     var htmlContainer = HtmlComponent.get($container);
-    var size = htmlContainer.availableSize()
+    var size = htmlContainer.availableSize({exact: true})
       .subtract(htmlContainer.insets())
       .subtract(currentView.htmlComp.margins());
 

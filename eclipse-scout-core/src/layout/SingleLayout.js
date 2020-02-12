@@ -17,14 +17,16 @@ import * as $ from 'jquery';
  */
 export default class SingleLayout extends AbstractLayout {
 
-  constructor(htmlChild) {
+  constructor(htmlChild, options) {
     super();
     this._htmlChild = htmlChild;
+    options = options || {};
+    this.exact = scout.nvl(options.exact, false);
   }
 
   layout($container) {
     var htmlContainer = HtmlComponent.get($container);
-    var childSize = htmlContainer.availableSize()
+    var childSize = htmlContainer.availableSize({exact: this.exact})
         .subtract(htmlContainer.insets()),
       htmlChild = this._htmlChild;
 
