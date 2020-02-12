@@ -53,7 +53,7 @@ module.exports = function(config, specEntryPoint) {
       require('karma-jasmine-html-reporter'),
       require('karma-junit-reporter'),
       require('karma-jasmine'),
-      require('karma-jasmine-jquery'),
+      require('@metahub/karma-jasmine-jquery'),
       require('karma-jasmine-ajax'),
       require('@eclipse-scout/karma-jasmine-scout'),
       require('karma-webpack'),
