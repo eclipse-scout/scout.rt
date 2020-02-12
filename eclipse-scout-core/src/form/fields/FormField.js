@@ -942,8 +942,13 @@ export default class FormField extends Widget {
    */
   addFieldContainer($fieldContainer) {
     this.$fieldContainer = $fieldContainer
-      .addClass('field')
-      .appendTo(this.$container);
+      .addClass('field');
+
+    // Only append if not already appended or it is not the last element so that append would move it to the end
+    // This can be important for some widgets, e.g. iframe which would cancel and restart the request on every dom insertion
+    if (this.$container.has($fieldContainer).length === 0 || $fieldContainer.next().length > 0) {
+      $fieldContainer.appendTo(this.$container);
+    }
   }
 
   /**

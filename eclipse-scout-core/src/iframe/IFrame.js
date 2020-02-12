@@ -43,9 +43,9 @@ export default class IFrame extends Widget {
    */
   _renderProperties() {
     super._renderProperties();
-    this._renderScrollBarEnabled(); // Needs to be before _renderLocation, see comment in _renderScrollBarEnabled
-    this._renderLocation();
+    this._renderScrollBarEnabled();
     this._renderSandboxEnabled(); // includes _renderSandboxPermissions()
+    this._renderLocation(); // Needs to be after _renderScrollBarEnabled and _renderSandboxEnabled, see comment in _renderScrollBarEnabled
     this._renderTrackLocation();
   }
 
@@ -123,7 +123,9 @@ export default class IFrame extends Widget {
     }
     // re-render location otherwise the attribute change would have no effect, see
     // https://html.spec.whatwg.org/multipage/embedded-content.html#attr-iframe-sandbox
-    this._renderLocation();
+    if (this.rendered) {
+      this._renderLocation();
+    }
   }
 
   setSandboxPermissions(sandboxPermissions) {
@@ -137,6 +139,8 @@ export default class IFrame extends Widget {
     this.$iframe.attr('sandbox', scout.nvl(this.sandboxPermissions, ''));
     // re-render location otherwise the attribute change would have no effect, see
     // https://html.spec.whatwg.org/multipage/embedded-content.html#attr-iframe-sandbox
-    this._renderLocation();
+    if (this.rendered) {
+      this._renderLocation();
+    }
   }
 }
