@@ -225,9 +225,11 @@ public class JsFileParser {
   private final String m_lineSeparator;
   @FrameworkExtensionMarker
   private JsUtility m_curUtility;
+  private boolean m_logNoContent = true;
 
-  public JsFileParser(WorkingCopy workingCopy) {
+  public JsFileParser(WorkingCopy workingCopy, boolean logNoContent) {
     m_workingCopy = workingCopy;
+    m_logNoContent = logNoContent;
     String source = workingCopy.getInitialSource();
     m_lineSeparator = workingCopy.getLineDelimiter();
     m_sourceReader = new LineReaderWithPositionTracking(new StringReader(source));
@@ -408,12 +410,22 @@ public class JsFileParser {
     // log
     String fileName = m_jsFile.getPath().getFileName().toString();
     if (jsClasses.isEmpty() && jsTopLevelEnums.isEmpty() && jsUtilities.isEmpty() && fileName.endsWith(".js") && !fileName.endsWith("-module.js")) {
-      LOG.error("No content found in file '" + m_jsFile.getPath() + "'.");
+      if (isLogNoContent()) {
+        LOG.error("No content found in file '" + m_jsFile.getPath() + "'.");
+      }
     }
     else if (jsClasses.size() > 1) {
       LOG.warn("More than 1 class found in file '" + m_jsFile.getPath() + "'. Every classfile should be defined in its own file.");
     }
     return m_jsFile;
+  }
+
+  public void setLogNoContent(boolean logNoContent) {
+    m_logNoContent = logNoContent;
+  }
+
+  public boolean isLogNoContent() {
+    return m_logNoContent;
   }
 
   private void readCopyRight() throws IOException {

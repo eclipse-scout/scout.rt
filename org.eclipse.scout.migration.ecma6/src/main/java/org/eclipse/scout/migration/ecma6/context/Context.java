@@ -141,11 +141,33 @@ public class Context {
   }
 
   public WorkingCopy ensureWorkingCopy(Path file) {
-    return createWorkingCopy(file);
+    return ensureWorkingCopy(file, false);
   }
 
-  protected WorkingCopy createWorkingCopy(Path file) {
-    return m_workingCopies.computeIfAbsent(file, WorkingCopy::new);
+  public WorkingCopy ensureWorkingCopy(Path file, boolean createFileIfAbsent) {
+    return createWorkingCopy(file, createFileIfAbsent);
+  }
+
+  protected WorkingCopy createWorkingCopy(Path file, boolean createFileIfAbsent) {
+    if (createFileIfAbsent) {
+      if (!Files.exists(file)) {
+        try {
+          Files.createDirectories(file.getParent());
+          Files.createFile(file);
+        }
+        catch (IOException e) {
+          throw new ProcessingException("Could not create theme file '" + file + "'.", e);
+        }
+
+      }
+    }
+    if (!Files.exists(file)) {
+      throw new IllegalArgumentException("File '" + file + "' to create working copy must exist!");
+    }
+    WorkingCopy workingCopy = m_workingCopies.computeIfAbsent(file, WorkingCopy::new);
+    // used to ensure initial source is read
+    workingCopy.getSource();
+    return workingCopy;
   }
 
   public Collection<WorkingCopy> getWorkingCopies() {
@@ -182,10 +204,14 @@ public class Context {
   }
 
   public JsFile ensureJsFile(WorkingCopy workingCopy) {
+    return ensureJsFile(workingCopy, true);
+  }
+
+  public JsFile ensureJsFile(WorkingCopy workingCopy, boolean logNoContent) {
     JsFile file = m_jsFiles.get(workingCopy);
     if (file == null) {
       try {
-        file = new JsFileParser(workingCopy).parse();
+        file = new JsFileParser(workingCopy, logNoContent).parse();
         m_jsFiles.put(workingCopy, file);
       }
       catch (IOException e) {

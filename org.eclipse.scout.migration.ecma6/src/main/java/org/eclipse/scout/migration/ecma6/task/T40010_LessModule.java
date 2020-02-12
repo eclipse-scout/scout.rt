@@ -75,9 +75,16 @@ public class T40010_LessModule extends AbstractTask {
     }
     workingCopy.setSource(newContent);
     String fileName = pathInfo.getPath().getFileName().toString();
-    String newDefaultThemeFileName = fileName.replace(OLD_FILE_SUFFIX, "-index.less");
+    final String newDefaultThemeFileName;
+    if ((Configuration.get().getJsFolderName() + OLD_FILE_SUFFIX).equals(fileName)) {
+      newDefaultThemeFileName = "index.less";
+    }
+    else {
+      newDefaultThemeFileName = fileName.replace(OLD_FILE_SUFFIX, "-index.less");
+    }
     m_indexLessFiles.put(Context.THEME_DEFAULT, pathInfo.getPath().getParent().resolve(newDefaultThemeFileName));
 
+    // NOTE: rename default theme *-module.less -> index.less is done in of org.eclipse.scout.migration.ecma6.MigrationStep2.processLessModuleFile
     flushNonDefaultThemes(pathInfo, context, newDefaultThemeFileName, nl);
   }
 

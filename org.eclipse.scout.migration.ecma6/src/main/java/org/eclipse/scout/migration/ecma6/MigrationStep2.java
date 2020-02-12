@@ -194,7 +194,12 @@ public class MigrationStep2 implements IRunnable {
       }
       return;
     }
-    fileName = fileName.replace("-module.less", "-index.less");
+    if((Configuration.get().getJsFolderName()+"-module.less").equals(fileName)){
+      fileName = "index.less";
+    }else{
+      fileName = fileName.replace("-module.less", "-index.less");
+    }
+
     Files.move(path, path.getParent().resolve(fileName));
   }
 
@@ -238,7 +243,7 @@ public class MigrationStep2 implements IRunnable {
     if (fileName.endsWith("-module.json")
         || fileName.endsWith("-macro.json")
         || fileName.endsWith("-macro.less")
-        || fileName.endsWith("-macro.js")) {
+    ) {
       if (!m_deletedFiles.contains(path)) {
         Files.delete(path);
         m_deletedFiles.add(path);

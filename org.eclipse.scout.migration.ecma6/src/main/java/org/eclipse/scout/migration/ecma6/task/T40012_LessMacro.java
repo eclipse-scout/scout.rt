@@ -134,6 +134,7 @@ public class T40012_LessMacro extends AbstractTask {
       throw new ProcessingException("Theme file '" + themeFile + "' already exists.");
     }
     try {
+      Files.createDirectories(themeFile.getParent());
       Files.createFile(themeFile);
     }
     catch (IOException e) {

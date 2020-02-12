@@ -11,9 +11,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.migration.ecma6.configuration.Configuration;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.references.JsImport;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,24 @@ public final class MigrationUtility {
   private MigrationUtility() {
   }
 
+
+  public static WorkingCopy getOrCreateWorkingCopy(Path file, Context context) {
+    final Path appJsFile = Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src/main/js", Configuration.get().getNamespace() + ".js"));
+    if (!Files.exists(appJsFile)) {
+      try {
+        Files.createDirectories(appJsFile.getParent());
+        Files.createFile(appJsFile);
+      }
+      catch (IOException e) {
+        throw new ProcessingException("Could not create theme file '" + appJsFile + "'.", e);
+      }
+
+    }
+    WorkingCopy workingCopy = context.ensureWorkingCopy(appJsFile);
+    // used to ensure initial source is read
+    workingCopy.getSource();
+    return workingCopy;
+  }
   public static void prependTodo(WorkingCopy workingCopy, String todoText) {
     String source = workingCopy.getSource();
     source = prependTodo(source, todoText, workingCopy.getLineDelimiter());
