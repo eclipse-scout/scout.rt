@@ -257,6 +257,7 @@ export default class BenchColumn extends Widget {
 
   _onSplitterMove(event) {
     var splitter = event.source;
+    // noinspection UnnecessaryLocalVariableJS
     var diff = event.position - splitter.htmlComp.location().y - splitter.htmlComp.margins().top - splitter.htmlComp.insets().top;
     splitter.getLayoutData().diff = diff;
     this.revalidateLayout();

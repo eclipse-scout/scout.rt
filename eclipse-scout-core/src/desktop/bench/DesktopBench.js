@@ -197,7 +197,6 @@ export default class DesktopBench extends Widget {
       // Request focus on first element in outline content
       this.session.focusManager.validateFocus();
     }
-
   }
 
   _removeOutlineContent() {
@@ -585,6 +584,7 @@ export default class DesktopBench extends Widget {
 
   _onSplitterMove(event) {
     var splitter = event.source;
+    // noinspection UnnecessaryLocalVariableJS
     var diff = event.position - splitter.htmlComp.location().x - splitter.htmlComp.margins().left - splitter.htmlComp.insets().left;
     splitter.getLayoutData().diff = diff;
     this.revalidateLayout();
@@ -784,7 +784,7 @@ export default class DesktopBench extends Widget {
   }
 
   /**
-   * @returns all the currently active views (the selected ones) of all the visible tab boxes
+   * @returns {array} all the currently active views (the selected ones) of all the visible tab boxes
    */
   activeViews() {
     var activeViews = [];

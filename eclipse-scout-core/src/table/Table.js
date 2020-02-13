@@ -462,7 +462,7 @@ export default class Table extends Widget {
   }
 
   _render() {
-    this.$container = this.$parent.appendDiv('table');
+    this.$container = this.$parent.appendDiv('table').addDeviceClass();
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new TableLayout(this));
 

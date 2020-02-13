@@ -61,6 +61,13 @@
     }
   }
 
+  &.ie {
+    // Workaround for bug #227039. Focus calls come too early when table is not correctly layouted yet
+    // -> if table is big ie tries to scroll which leads to ugly flickering and moved desktop whenever a large page with table is clicked
+    height: 0;
+    width: 0;
+  }
+
   & > .table-header {
     padding-left: @detail-table-header-padding-x;
     padding-right: @detail-table-header-padding-x;
