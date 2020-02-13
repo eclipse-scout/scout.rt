@@ -645,6 +645,22 @@ describe('Widget', function() {
       another.destroy();
       expect(parent.events._eventListeners.length).toBe(parentListenerCount - 1);
     });
+
+    it('triggers hierarchyChange event when parent changes', function() {
+      var widget = createWidget({
+        parent: parent
+      });
+      var newParent = createWidget({
+        parent: parent
+      });
+      var event = null;
+      widget.on('hierarchyChange', function(event0) {
+        event = event0;
+      });
+      widget.setParent(newParent);
+      expect(event.oldParent).toBe(parent);
+      expect(event.parent).toBe(newParent);
+    });
   });
 
   describe('remove', function() {

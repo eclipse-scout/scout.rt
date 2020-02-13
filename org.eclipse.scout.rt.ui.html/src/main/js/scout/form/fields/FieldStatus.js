@@ -12,10 +12,14 @@ scout.FieldStatus = function() {
   scout.FieldStatus.parent.call(this);
   this.tooltip = null;
   this.contextMenu = null;
-  this.status;
+  this.status = null;
   this.updating = false;
   this.autoRemove = true;
   this.position = scout.FormField.StatusPosition.DEFAULT;
+
+  this._parents = [];
+  this._parentPropertyChangeListener = this._onParentPropertyChange.bind(this);
+  this._parentHierarchyChangeListener = this._onParentHierarchyChange.bind(this);
 };
 scout.inherits(scout.FieldStatus, scout.Widget);
 
@@ -35,6 +39,7 @@ scout.FieldStatus.prototype._remove = function() {
     this.contextMenu.destroy();
     this.contextMenu = null;
   }
+  this._removeParentListeners();
 };
 
 scout.FieldStatus.prototype._renderProperties = function() {
@@ -123,6 +128,7 @@ scout.FieldStatus.prototype.hideTooltip = function() {
     if (!event.defaultPrevented) {
       this.tooltip.destroy();
       this.tooltip = null;
+      this._removeParentListeners();
     }
   }
 };
@@ -161,6 +167,7 @@ scout.FieldStatus.prototype.showTooltip = function() {
     return;
   }
 
+  this._updateParentListeners();
   this.hideContextMenu();
   if (this.tooltip && this.tooltip.autoRemove !== this.autoRemove) {
     // close
@@ -257,5 +264,62 @@ scout.FieldStatus.prototype._onStatusMouseDown = function(event) {
   this.trigger('statusMouseDown', event);
   if (!event.defaultPrevented) {
     this.togglePopup();
+  }
+};
+
+scout.FieldStatus.prototype._updateTooltipVisibility = function(parent) {
+  if (this.isEveryParentVisible()) {
+    /* We must use a timeout here, because the propertyChange event for the visible property
+     * is triggered before the _renderVisible() function is called. Which means the DOM is still
+     * invisible, thus the tooltip cannot be rendered. Because of the timeout we must double-check
+     * the state of the FieldStatus, because it could have been removed in the meantime.
+     */
+    setTimeout(function() {
+      if (!this.rendered || !this.isEveryParentVisible()) {
+        return;
+      }
+      if (this.tooltip && !this.tooltip.rendered) {
+        this.tooltip.render();
+      }
+    }.bind(this));
+  } else {
+    if (this.tooltip && this.tooltip.rendered) {
+      this.tooltip.remove();
+    }
+  }
+};
+
+scout.FieldStatus.prototype._onParentHierarchyChange = function(event) {
+  // If the parent of a widget we're listening to changes, we must re-check the parent hierarchy
+  // and re-install the property change listener
+  this._updateParentListeners();
+};
+
+scout.FieldStatus.prototype._onParentPropertyChange = function(event) {
+  if ('visible' === event.propertyName) {
+    this._updateTooltipVisibility(event.source);
+  }
+};
+
+scout.FieldStatus.prototype._removeParentListeners = function() {
+  this._parents.forEach(function(parent) {
+    parent.off('hierarchyChange', this._parentHierarchyChangeListener);
+    parent.off('propertyChange', this._parentPropertyChangeListener);
+  }.bind(this));
+  this._parents = [];
+};
+
+/**
+ * Adds a property change listener to every parent of the field status. We keep a list of all parents because
+ * we need to remove the listeners later, also when the parent hierarchy has changed.
+ */
+scout.FieldStatus.prototype._updateParentListeners = function() {
+  this._removeParentListeners();
+  var parent = this.parent;
+  while (parent) {
+    parent.on('hierarchyChange', this._parentHierarchyChangeListener);
+    parent.on('propertyChange', this._parentPropertyChangeListener);
+    this._parents.push(parent);
+    parent = parent.parent;
   }
 };
