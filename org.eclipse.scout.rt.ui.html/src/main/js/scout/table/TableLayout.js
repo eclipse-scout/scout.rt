@@ -16,6 +16,9 @@ scout.TableLayout = function(table) {
 scout.inherits(scout.TableLayout, scout.AbstractLayout);
 
 scout.TableLayout.prototype.layout = function($container) {
+  // Class unlayouted can be used to temporarily set css rules which must not be applied while and after layouting
+  this.table.$container.removeClass('unlayouted');
+
   var menuBarHeight = 0,
     footerHeight = 0,
     headerHeight = 0,

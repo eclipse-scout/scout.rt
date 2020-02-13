@@ -400,7 +400,7 @@ scout.Table.prototype.handleAppLinkAction = function(event) {
 };
 
 scout.Table.prototype._render = function() {
-  this.$container = this.$parent.appendDiv('table');
+  this.$container = this.$parent.appendDiv('table').addDeviceClass().addClass('unlayouted');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.TableLayout(this));
   this.htmlComp.pixelBasedSizing = false;
