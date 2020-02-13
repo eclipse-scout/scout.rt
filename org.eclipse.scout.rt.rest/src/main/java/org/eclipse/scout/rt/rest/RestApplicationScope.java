@@ -10,13 +10,25 @@
  */
 package org.eclipse.scout.rt.rest;
 
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import java.lang.annotation.ElementType;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-@Target(ElementType.TYPE)
+/**
+ * Annotation for {@link IRestResource} that define one or several rest application scopes. A scope assigns a rest
+ * resource to a concrete rest application reachable by a certain path.
+ *
+ * @see {@link RestApplicationScopes}
+ */
+@Documented
 @Retention(RUNTIME)
-public @interface ExternalRestResource {
+@Target({TYPE})
+@Inherited
+public @interface RestApplicationScope {
+
+  String[] value();
 }

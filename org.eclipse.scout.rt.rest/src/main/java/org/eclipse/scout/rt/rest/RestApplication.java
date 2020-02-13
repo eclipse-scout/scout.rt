@@ -44,12 +44,19 @@ public class RestApplication extends Application {
     m_properties = initProperties();
   }
 
+  protected boolean filterClass(Class<?> clazz) {
+    return true;
+  }
+
   protected Set<Class<?>> initClasses() {
-    return BEANS.all(IRestApplicationClassesContributor.class).stream().flatMap(contributor -> {
-      Set<Class<?>> classes = contributor.contribute();
-      LOG.info("Contributed {} classes by {}", classes.size(), contributor.getClass());
-      return classes.stream();
-    }).collect(Collectors.toSet());
+    return BEANS.all(IRestApplicationClassesContributor.class).stream()
+        .flatMap(contributor -> {
+          Set<Class<?>> classes = contributor.contribute();
+          LOG.info("Contributed {} classes by {}", classes.size(), contributor.getClass());
+          return classes.stream();
+        })
+        .filter(this::filterClass)
+        .collect(Collectors.toSet());
   }
 
   protected Set<Object> initSingletons() {
