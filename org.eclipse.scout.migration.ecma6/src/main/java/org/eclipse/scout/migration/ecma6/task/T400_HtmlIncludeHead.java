@@ -1,12 +1,11 @@
 package org.eclipse.scout.migration.ecma6.task;
 
-import java.nio.file.Paths;
+import java.nio.file.FileSystems;
+import java.nio.file.PathMatcher;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
-import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
@@ -19,14 +18,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Order(400)
-public class T400_IndexHtmlIncludeHead extends AbstractTask {
-  private static final Logger LOG = LoggerFactory.getLogger(T400_IndexHtmlIncludeHead.class);
+public class T400_HtmlIncludeHead extends AbstractTask {
+  private static final Logger LOG = LoggerFactory.getLogger(T400_HtmlIncludeHead.class);
 
-  private Predicate<PathInfo> m_pathFilter = PathFilters.oneOf(Paths.get("src/main/resources/WebContent/index.html"));
+  private static PathMatcher FILE_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/{index,login,logout}.html");
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
-    return m_pathFilter.test(pathInfo);
+    return FILE_MATCHER.matches(pathInfo.getModuleRelativePath());
   }
 
   @Override

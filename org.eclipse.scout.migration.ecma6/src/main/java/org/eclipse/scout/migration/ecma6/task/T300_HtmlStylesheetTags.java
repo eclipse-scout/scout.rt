@@ -1,5 +1,7 @@
 package org.eclipse.scout.migration.ecma6.task;
 
+import java.nio.file.FileSystems;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -22,15 +24,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Order(300)
-public class T300_IndexHtmlStylesheetTags extends AbstractTask {
-  private static final Logger LOG = LoggerFactory.getLogger(T300_IndexHtmlStylesheetTags.class);
+public class T300_HtmlStylesheetTags extends AbstractTask {
+  private static final Logger LOG = LoggerFactory.getLogger(T300_HtmlStylesheetTags.class);
 
+  private static PathMatcher FILE_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/{index,login,logout}.html");
   private Predicate<PathInfo> m_fileFilter = PathFilters.oneOf(Paths.get("src/main/resources/WebContent/index.html"));
-  private Set<String> m_stylesheetsToRemove = CollectionUtility.hashSet("res/libs-all-macro.less");
+  private Set<String> m_stylesheetsToRemove = CollectionUtility.hashSet("res/libs-all-macro.less", "res/scout-login-module.less", "res/scout-logout-module.less");
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
-    return m_fileFilter.test(pathInfo);
+    return FILE_MATCHER.matches(pathInfo.getModuleRelativePath());
   }
 
   @Override

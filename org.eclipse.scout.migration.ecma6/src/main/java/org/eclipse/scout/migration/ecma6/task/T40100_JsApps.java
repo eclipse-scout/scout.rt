@@ -15,6 +15,9 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathInfo;
@@ -29,10 +32,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Order(40100)
-public class T40100_JsApp extends AbstractTask {
-  private static final Logger LOG = LoggerFactory.getLogger(T40100_JsApp.class);
+public class T40100_JsApps extends AbstractTask {
+  private static final Logger LOG = LoggerFactory.getLogger(T40100_JsApps.class);
 
-  private static PathMatcher MACRO_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/res/index.js");
+  private static PathMatcher MACRO_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/res/{index,login,logout}.js");
+  private static final Map<String /*fqn*/, String /*simpleName*/> APP_NAMES = new HashMap<>();
+  static {
+    APP_NAMES.put("scout.App", "App");
+    APP_NAMES.put("scout.RemoteApp", "RemoteApp");
+    APP_NAMES.put("scout.LoginApp", "LoginApp");
+    APP_NAMES.put("scout.LogoutApp", "LogoutApp");
+  }
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
@@ -41,7 +51,11 @@ public class T40100_JsApp extends AbstractTask {
 
   @Override
   public void process(PathInfo pathInfo, Context context) {
-    final WorkingCopy appJsWc = context.ensureWorkingCopy(Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src/main/js", Configuration.get().getNamespace() + ".js")), true);
+    String targetFileName = pathInfo.getPath().getFileName().toString().replaceAll("\\.js\\Z", "");
+    if ("index".equalsIgnoreCase(targetFileName)) {
+      targetFileName = Configuration.get().getNamespace();
+    }
+    final WorkingCopy appJsWc = context.ensureWorkingCopy(Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src/main/js", targetFileName + ".js")), true);
     final JsFile appJsFile = context.ensureJsFile(appJsWc, false);
 
     final WorkingCopy indexWc = context.ensureWorkingCopy(pathInfo.getPath());
@@ -52,18 +66,27 @@ public class T40100_JsApp extends AbstractTask {
     // create import for app
     StringBuilder appSourceBuilder = new StringBuilder(appJsWc.getSource());
     appSourceBuilder.append(appJsWc.getLineDelimiter()).append(appJsWc.getLineDelimiter());
-    if (indexSource.contains("scout.RemoteApp")) {
-      indexSource = indexSource.replace("scout.RemoteApp", "RemoteApp");
+
+    Entry<String, String> appMapping = null;
+    for (Entry<String, String> e : APP_NAMES.entrySet()) {
+      if (indexSource.contains(e.getKey())) {
+        appMapping = e;
+        break;
+      }
+    }
+
+    if (appMapping != null) {
+      indexSource = indexSource.replace(appMapping.getKey(), appMapping.getValue());
       JsImport imp = appJsFile.getImport("@eclipse-scout/core");
       if (imp == null) {
         imp = new JsImport("@eclipse-scout/core");
-        imp.addMember(new AliasedMember("RemoteApp"));
+        imp.addMember(new AliasedMember(appMapping.getValue()));
         appJsFile.addImport(imp);
       }
       else {
         appSourceBuilder = new StringBuilder(appSourceBuilder.toString().replace("ref1, ", ""));
         imp.setDefaultMember(null);
-        imp.addMember(new AliasedMember("RemoteApp"));
+        imp.addMember(new AliasedMember(appMapping.getValue()));
       }
     }
     else {

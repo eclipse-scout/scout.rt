@@ -1,14 +1,13 @@
 package org.eclipse.scout.migration.ecma6.task;
 
-import java.nio.file.Paths;
+import java.nio.file.FileSystems;
+import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
-import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.AppNameContextProperty;
@@ -22,27 +21,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Order(200)
-public class T200_IndexHtmlScriptTags extends AbstractTask {
-  private static final Logger LOG = LoggerFactory.getLogger(T200_IndexHtmlScriptTags.class);
+public class T200_HtmlScriptTags extends AbstractTask {
+  private static final Logger LOG = LoggerFactory.getLogger(T200_HtmlScriptTags.class);
+
+  private static PathMatcher FILE_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/{index,login,logout}.html");
 
   private static Pattern END_BODY_REGEX = Pattern.compile("(\\s*)\\<\\/body\\>");
-
-  private Predicate<PathInfo> m_indexJsFilter = PathFilters.oneOf(Paths.get("src/main/resources/WebContent/index.html"));
 
   private String m_newLineAndIndet;
   private List<String> m_scriptsMoveToBody = new ArrayList<>();
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
-    return m_indexJsFilter.test(pathInfo);
+    return FILE_MATCHER.matches(pathInfo.getModuleRelativePath());
   }
 
   @Override
   public void process(PathInfo pathInfo, Context context) {
+    String appJsFileName = pathInfo.getPath().getFileName().toString().replaceAll("\\.html\\Z", "");
+    if ("index".equalsIgnoreCase(appJsFileName)) {
+      appJsFileName = context.getProperty(AppNameContextProperty.class);
+    }
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
     m_newLineAndIndet = workingCopy.getLineDelimiter() + "    ";
     removeScriptElements(workingCopy);
-    addScriptElements(workingCopy, context);
+    addScriptElements(workingCopy, appJsFileName, context);
   }
 
   private void removeScriptElements(WorkingCopy workingCopy) {
@@ -79,7 +82,7 @@ public class T200_IndexHtmlScriptTags extends AbstractTask {
     return source;
   }
 
-  private void addScriptElements(WorkingCopy workingCopy, Context context) {
+  private void addScriptElements(WorkingCopy workingCopy, String appJsFileName, Context context) {
     String source = workingCopy.getSource();
     Matcher matcher = END_BODY_REGEX.matcher(source);
     if (matcher.find()) {
@@ -91,7 +94,7 @@ public class T200_IndexHtmlScriptTags extends AbstractTask {
           .append(m_newLineAndIndet)
           .append("<scout:script src=\"eclipse-scout.js\" />")
           .append(m_newLineAndIndet)
-          .append("<scout:script src=\"").append(context.getProperty(AppNameContextProperty.class)).append(".js\" />");
+          .append("<scout:script src=\"").append(appJsFileName).append(".js\" />");
       for (String scriptElement : m_scriptsMoveToBody) {
         scriptBuilder.append(m_newLineAndIndet)
             .append(scriptElement);
@@ -105,7 +108,7 @@ public class T200_IndexHtmlScriptTags extends AbstractTask {
     else {
       MigrationUtility.prependTodo(workingCopy, "add script imports: <scout:script src=\"jquery.js\" /> " +
           "<scout:script src=\"eclipse-scout.js\" /> " +
-          "<scout:script src=\"jswidgets.js\" />");
+          "<scout:script src=\"" + appJsFileName + ".js\" />");
     }
   }
 }

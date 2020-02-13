@@ -19,7 +19,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import org.eclipse.scout.migration.ecma6.configuration.Configuration;
 import org.eclipse.scout.migration.ecma6.context.Context;
-import org.eclipse.scout.migration.ecma6.task.T200_IndexHtmlScriptTags;
+import org.eclipse.scout.migration.ecma6.task.T200_HtmlScriptTags;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 @Order(100)
 public class T100_CopySourceTargetTask implements IPreMigrationTask {
-  private static final Logger LOG = LoggerFactory.getLogger(T200_IndexHtmlScriptTags.class);
+  private static final Logger LOG = LoggerFactory.getLogger(T200_HtmlScriptTags.class);
 
   @Override
   public void execute(Context context) {
