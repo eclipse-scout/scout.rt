@@ -359,7 +359,7 @@ export function scrollTo($scrollable, $element, options) {
 
 export function _createDefaultScrollToOptions(options) {
   var defaults = {
-    anmiate: false,
+    animate: false,
     stop: true
   };
   return $.extend({}, defaults, options);
