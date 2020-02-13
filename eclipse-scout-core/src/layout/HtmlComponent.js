@@ -180,7 +180,10 @@ export default class HtmlComponent {
       if ($animatedParent) {
         // Postpone the layout if there is a CSS animation in progress on one of the parent containers.
         // Otherwise, wrong sizes might be measured (depending on the CSS animation, e.g. grow/shrink).
-        $animatedParent.oneAnimationEnd(this.validateLayout.bind(this));
+        // Use invalidateLayoutTree to add component to layout validator
+        this.invalidateLayoutTree(false);
+        // Use validateLayoutTree to trigger post validate functions as well
+        $animatedParent.oneAnimationEnd(this.validateLayoutTree.bind(this));
         return false;
       }
     }

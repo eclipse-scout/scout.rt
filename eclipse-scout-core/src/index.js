@@ -142,6 +142,7 @@ export {default as FocusManager} from './focus/FocusManager';
 export {default as FocusContext} from './focus/FocusContext';
 export {default as focusUtils} from './focus/focusUtils';
 export {default as FocusRule} from './focus/FocusRule';
+export {default as VirtualFocus} from './focus/VirtualFocus';
 export {default as GlassPane} from './glasspane/GlassPane';
 export {default as DeferredGlassPaneTarget} from './glasspane/DeferredGlassPaneTarget';
 export {default as GlassPaneRenderer} from './glasspane/GlassPaneRenderer';
@@ -665,13 +666,12 @@ export {default as LogoutApp} from './login/LogoutApp';
 export {default as LogoutBox} from './login/LogoutBox';
 
 import * as self from './index.js';
-
-export default self;
-
 // Add all functions from the scout object to the scout object on the window
 // Note: the scout object on the window still needs its own scout object (window.scout.scout).
 // It is required when the eclipse-core/scout is mapped as external webpack library to window.scout
 import * as scout from './scout';
+
+export default self;
 
 var windowScout = {...self, ...scout};
 

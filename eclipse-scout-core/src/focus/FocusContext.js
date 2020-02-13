@@ -10,6 +10,7 @@
  */
 import {filters, focusUtils, graphics, keys, Point, scrollbars} from '../index';
 import * as $ from 'jquery';
+import VirtualFocus from './VirtualFocus';
 
 /**
  * A focus context is associated with a $container, and controls how to focus elements within that $container.
@@ -246,8 +247,7 @@ export default class FocusContext {
     }
 
     // Focus the requested element
-    elementToFocus.focus();
-
-    $.log.isDebugEnabled() && $.log.debug('Focus set to ' + graphics.debugOutput(elementToFocus));
+    // elementToFocus.focus();
+    VirtualFocus.get().focus(elementToFocus);
   }
 }

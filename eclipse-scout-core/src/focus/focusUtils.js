@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import * as $ from 'jquery';
+import VirtualFocus from './VirtualFocus';
 
 /**
  * Utility methods for focus.
@@ -88,14 +89,10 @@ export function isActiveElement(element) {
   if (!element) {
     return false;
   }
-  var activeElement;
   if (element instanceof $) {
-    activeElement = element.activeElement(true);
     element = element[0];
-  } else {
-    activeElement = (element instanceof Document ? element : element.ownerDocument).activeElement;
   }
-  return activeElement === element;
+  return VirtualFocus.get().activeElement === element;
 }
 
 export default {
