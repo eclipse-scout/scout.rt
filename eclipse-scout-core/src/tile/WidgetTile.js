@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Tile} from '../index';
+import {Tile, Widget} from '../index';
 
 /**
  * A tile containing a widget. The widget will be rendered and its $container used as $container for the tile.
@@ -59,6 +59,8 @@ export default class WidgetTile extends Tile {
       this.setVisible(event.newValue);
     } else if (event.propertyName === 'enabled') {
       this.setEnabled(event.newValue);
+    } else if (event.propertyName === 'disabledStyle') {
+      this.setDisabledStyle(event.newValue);
     }
   }
 
@@ -74,6 +76,9 @@ export default class WidgetTile extends Tile {
       }
       if (!this.tileWidget.enabled) {
         this.setEnabled(false);
+      }
+      if (this.tileWidget.disabledStyle !== Widget.DisabledStyle.DEFAULT) {
+        this.setDisabledStyle(this.tileWidget.disabledStyle);
       }
       this.tileWidget.on('propertyChange', this._widgetPropertyChangeHandler);
     }

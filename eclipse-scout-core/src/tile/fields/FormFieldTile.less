@@ -149,7 +149,7 @@
     background-color: @tile-default-inverted-background-color;
     color: @tile-default-inverted-color;
 
-    &.disabled {
+    &.disabled:not(.read-only) {
       background-color: @tile-default-border-color;
     }
 
@@ -205,7 +205,7 @@
     background-color: @tile-alternative-background-color;
     color: @tile-alternative-color;
 
-    &.disabled {
+    &.disabled:not(.read-only) {
       background-color: @tile-default-border-color;
     }
 
@@ -233,6 +233,10 @@
     border-color: transparent;
     background-color: @tile-alternative-inverted-background-color;
     color: @tile-alternative-inverted-color;
+
+    &.disabled:not(.read-only) {
+      background-color: @tile-default-border-color;
+    }
 
     & > .form-field {
       & > label {
