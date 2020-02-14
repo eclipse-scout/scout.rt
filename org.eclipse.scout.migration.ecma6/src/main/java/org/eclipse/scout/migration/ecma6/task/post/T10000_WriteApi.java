@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.platform.Order;
 public class T10000_WriteApi implements IPostMigrationTask {
   @Override
   public void execute(Context context) {
-
     Path libraryFile = BEANS.get(Configuration.class).getPersistLibraryFile();
     if(libraryFile == null){
       return;
@@ -40,6 +39,5 @@ public class T10000_WriteApi implements IPostMigrationTask {
     catch (IOException e) {
       e.printStackTrace();
     }
-
   }
 }

@@ -399,6 +399,7 @@ public class Configuration {
   protected List<Path> getConfiguredIncludeFiles() {
     return CONFIG.getPropertyValue(IncludeFilesProperty.class);
   }
+
   /**
    * @return the source directory to be migrated. must exist. Usually something like '.../[com.bsiag.bsicrm.]ui.html'
    */
@@ -477,9 +478,11 @@ public class Configuration {
   }
 
   public Path getPersistLibraryFile() {
+    if (getApiBase() == null || StringUtility.isNullOrEmpty(getPersistLibraryFileName())) {
+      return null;
+    }
     return getApiBase().resolve(Paths.get(getPersistLibraryFileName()));
   }
-
 
   /**
    * @return The folder where all library api's used for this migration are located. In this folder might be several
