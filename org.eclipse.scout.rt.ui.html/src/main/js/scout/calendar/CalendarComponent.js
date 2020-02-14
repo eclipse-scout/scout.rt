@@ -69,7 +69,22 @@ scout.CalendarComponent.prototype._render = function() {
   }
 
   var loopDay = this._startLoopDay();
-  var lastComponentDay = scout.dates.shift(this.coveredDaysRange.to, 0, 0, 1);
+
+  var appointmentToDate = scout.dates.parseJsonDate(this.toDate);
+  var appointmentFromDate = scout.dates.parseJsonDate(this.fromDate);
+  var coveredDaysRangeTo = this.coveredDaysRange.to;
+
+  if (!this.fullDay) {
+    var truncToDate = scout.dates.trunc(appointmentToDate);
+    if(!scout.dates.isSameDay(appointmentFromDate, appointmentToDate) && scout.dates.compare(appointmentToDate, truncToDate) === 0){
+      appointmentToDate = scout.dates.shiftTime(appointmentToDate, 0, 0, 0, -1);
+      coveredDaysRangeTo  = scout.dates.shift(coveredDaysRangeTo, 0, 0, -1);
+    }
+  }
+  appointmentToDate = scout.dates.toJsonDate(appointmentToDate);
+
+  var lastComponentDay = scout.dates.shift(coveredDaysRangeTo, 0, 0, 1);
+
   if (scout.dates.compare(loopDay, lastComponentDay) > 0) {
     // start day for the while loop is greater then the exit condition
     return;
@@ -113,13 +128,13 @@ scout.CalendarComponent.prototype._render = function() {
       } else {
         var
           fromDate = scout.dates.parseJsonDate(this.fromDate),
-          toDate = scout.dates.parseJsonDate(this.toDate),
+          toDate = scout.dates.parseJsonDate(appointmentToDate),
           partFrom = this._getHours(this.fromDate),
-          partTo = this._getHours(this.toDate);
+          partTo = this._getHours(appointmentToDate);
 
         // position and height depending on start and end date
         $part.addClass('component-day');
-        if (scout.dates.isSameDay(scout.dates.trunc(this.coveredDaysRange.from), scout.dates.trunc(this.coveredDaysRange.to))) {
+        if (scout.dates.isSameDay(scout.dates.trunc(this.coveredDaysRange.from), scout.dates.trunc(coveredDaysRangeTo))) {
           this._partPosition($part, partFrom, partTo);
         } else if (scout.dates.isSameDay(partDay, fromDate)) {
           this._partPosition($part, partFrom, 24)
