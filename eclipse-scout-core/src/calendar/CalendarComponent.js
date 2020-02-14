@@ -72,7 +72,22 @@ export default class CalendarComponent extends Widget {
     }
 
     var loopDay = this._startLoopDay();
-    var lastComponentDay = dates.shift(this.coveredDaysRange.to, 0, 0, 1);
+
+    var appointmentToDate = dates.parseJsonDate(this.toDate);
+    var appointmentFromDate = dates.parseJsonDate(this.fromDate);
+    var coveredDaysRangeTo = this.coveredDaysRange.to;
+
+    if (!this.fullDay) {
+      var truncToDate = dates.trunc(appointmentToDate);
+      if (!dates.isSameDay(appointmentFromDate, appointmentToDate) && dates.compare(appointmentToDate, truncToDate) === 0) {
+        appointmentToDate = dates.shiftTime(appointmentToDate, 0, 0, 0, -1);
+        coveredDaysRangeTo = dates.shift(coveredDaysRangeTo, 0, 0, -1);
+      }
+    }
+    appointmentToDate = dates.toJsonDate(appointmentToDate);
+
+    var lastComponentDay = dates.shift(coveredDaysRangeTo, 0, 0, 1);
+
     if (dates.compare(loopDay, lastComponentDay) > 0) {
       // start day for the while loop is greater then the exit condition
       return;
@@ -126,13 +141,13 @@ export default class CalendarComponent extends Widget {
         } else {
           var
             fromDate = dates.parseJsonDate(this.fromDate),
-            toDate = dates.parseJsonDate(this.toDate),
+            toDate = dates.parseJsonDate(appointmentToDate),
             partFrom = this._getHours(this.fromDate),
-            partTo = this._getHours(this.toDate);
+            partTo = this._getHours(appointmentToDate);
 
           // position and height depending on start and end date
           $part.addClass('component-day');
-          if (dates.isSameDay(dates.trunc(this.coveredDaysRange.from), dates.trunc(this.coveredDaysRange.to))) {
+          if (dates.isSameDay(dates.trunc(this.coveredDaysRange.from), dates.trunc(coveredDaysRangeTo))) {
             this._partPosition($part, partFrom, partTo);
           } else if (dates.isSameDay(partDay, fromDate)) {
             this._partPosition($part, partFrom, 25) // 25: indicate that it takes longer than that day
