@@ -62,6 +62,7 @@ export default class SmartField extends ValueField {
     this.lookupSeqNo = 0; // used to detect if the proposal chooser contains the results of the latest lookup, or an out-dated result.
     // only when the result is up-to-date, we can use the selected lookup row
     this.initActiveFilter = null;
+    this.disabledCopyOverlay = true;
 
     this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
       'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental', 'searchRequired', 'columnDescriptors',
