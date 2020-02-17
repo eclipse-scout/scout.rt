@@ -81,7 +81,7 @@ import org.eclipse.scout.rt.rest.IRestResource;
  * }
  *
  * &#64;GET
- * &#64;Path("doc")
+ * &#64;Path("doc/csv")
  * &#64;ApiDocIgnore
  * &#64;Produces(MediaType.TEXT_PLAIN)
  * public Response getDocAsText() {
@@ -89,7 +89,7 @@ import org.eclipse.scout.rt.rest.IRestResource;
  * }
  *
  * &#64;GET
- * &#64;Path("doc")
+ * &#64;Path("doc/json")
  * &#64;ApiDocIgnore
  * &#64;Produces(MediaType.APPLICATION_JSON)
  * public Response getDocAsJson() {
