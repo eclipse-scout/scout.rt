@@ -643,4 +643,76 @@ describe('Form', function() {
     });
   });
 
+  describe('disabled form', function() {
+    it('can be closed although it is disabled', function(done) {
+      var form = scout.create('Form', {
+        parent: session.desktop,
+        rootGroupBox: {
+          id: 'mainbox',
+          objectType: 'GroupBox',
+          gridDataHints: {
+            widthInPixel: 1000
+          },
+          menus: [{
+            id: 'okmenu',
+            objectType: 'OkMenu'
+          }, {
+            id: 'cancelmenu',
+            objectType: 'CancelMenu'
+          }, {
+            id: 'closemenu',
+            objectType: 'CloseMenu'
+          }, {
+            id: 'resetmenu',
+            objectType: 'ResetMenu'
+          }, {
+            id: 'savemenu',
+            objectType: 'SaveMenu'
+          }],
+          fields: [{
+            id: 'stringfield1',
+            objectType: 'StringField'
+          }, {
+            id: 'stringfield2',
+            objectType: 'StringField',
+            inheritAccessibility: false
+          }]
+        }
+      });
+      form.setEnabled(false);
+      form.open()
+        .then(function() {
+          expect(session.desktop.activeForm).toBe(form);
+
+          // enabled
+          expect(form.enabled).toBe(false);
+          expect(form.widget('mainbox').enabled).toBe(true);
+          expect(form.widget('stringfield1').enabled).toBe(true);
+          expect(form.widget('stringfield2').enabled).toBe(true);
+          expect(form.widget('okmenu').enabled).toBe(true);
+          expect(form.widget('cancelmenu').enabled).toBe(true);
+          expect(form.widget('closemenu').enabled).toBe(true);
+          expect(form.widget('resetmenu').enabled).toBe(true);
+          expect(form.widget('savemenu').enabled).toBe(true);
+
+          // enabledComputed
+          expect(form.enabledComputed).toBe(false);
+          expect(form.widget('mainbox').enabledComputed).toBe(false);
+          expect(form.widget('stringfield1').enabledComputed).toBe(false);
+          expect(form.widget('stringfield2').enabledComputed).toBe(true);
+          expect(form.widget('okmenu').enabledComputed).toBe(false);
+          expect(form.widget('cancelmenu').enabledComputed).toBe(true);
+          expect(form.widget('closemenu').enabledComputed).toBe(true);
+          expect(form.widget('resetmenu').enabledComputed).toBe(false);
+          expect(form.widget('savemenu').enabledComputed).toBe(false);
+
+          return form.close().then(function() {
+            expect(session.desktop.activeForm).toBe(null);
+            done();
+          });
+        })
+        .catch(fail);
+    });
+  });
+
 });
