@@ -141,7 +141,7 @@ export default class FieldStatus extends Widget {
   }
 
   _requiresTooltip() {
-    if (!this.status) {
+    if (!this.status || !this.rendered) {
       return false;
     }
     if (arrays.empty(this.menus) && !strings.hasText(this.status.message)) {
