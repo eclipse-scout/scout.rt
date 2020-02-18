@@ -99,7 +99,7 @@ scout.CodeType.prototype.visit = function(visitor) {
     return !code.parent;
   });
   for (var i = 0; i < codes.length; i++) {
-    var code = this.codes[i];
+    var code = codes[i];
     var visitResult = visitor(code);
     if (visitResult === true || visitResult === scout.TreeVisitResult.TERMINATE) {
       return scout.TreeVisitResult.TERMINATE;
