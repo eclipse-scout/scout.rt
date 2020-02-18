@@ -2,14 +2,11 @@ package org.eclipse.scout.migration.ecma6.task;
 
 import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
-import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.AppNameContextProperty;
@@ -27,9 +24,8 @@ import org.slf4j.LoggerFactory;
 public class T300_HtmlStylesheetTags extends AbstractTask {
   private static final Logger LOG = LoggerFactory.getLogger(T300_HtmlStylesheetTags.class);
 
-  private static PathMatcher FILE_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/{index,login,logout}.html");
-  private Predicate<PathInfo> m_fileFilter = PathFilters.oneOf(Paths.get("src/main/resources/WebContent/index.html"));
-  private Set<String> m_stylesheetsToRemove = CollectionUtility.hashSet("res/libs-all-macro.less", "res/scout-login-module.less", "res/scout-logout-module.less");
+  private static PathMatcher FILE_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/{index,login,logout,popup-window}.html");
+  private Set<String> m_stylesheetsToRemove = CollectionUtility.hashSet("res/scout-login-module.less", "res/scout-logout-module.less", "res/scout-module.less");
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
@@ -81,12 +77,13 @@ public class T300_HtmlStylesheetTags extends AbstractTask {
       // append first
       Pattern pattern = Pattern.compile("(\\s*)" + Pattern.quote(lastStyleSheet.outerHtml()));
       Matcher matcher = pattern.matcher(source);
+      //noinspection ResultOfMethodCallIgnored
       matcher.find();
       source = matcher.replaceAll(matcher.group(1) + lastStyleSheet.outerHtml() + createSource(matcher.group(1), context));
     }
     else {
       // before </head>
-      Pattern pattern = Pattern.compile("(\\s*)(\\<\\/head\\>)");
+      Pattern pattern = Pattern.compile("(\\s*)(</head>)");
       Matcher matcher = pattern.matcher(source);
       if (matcher.find()) {
         source = matcher.replaceAll(createSource(matcher.group(1) + "  ", context) + matcher.group(1) + matcher.group(2));
@@ -100,10 +97,8 @@ public class T300_HtmlStylesheetTags extends AbstractTask {
   }
 
   private String createSource(String newLineAndIndent, Context context) {
-    StringBuilder scriptBuilder = new StringBuilder();
-    scriptBuilder
-        .append(newLineAndIndent)
-        .append("<scout:stylesheet src=\"" + context.getProperty(AppNameContextProperty.class) + "-theme.css\\\" />");
-    return scriptBuilder.toString();
+    String scriptBuilder = newLineAndIndent +
+        "<scout:stylesheet src=\"" + context.getProperty(AppNameContextProperty.class) + "-theme.css\\\" />";
+    return scriptBuilder;
   }
 }

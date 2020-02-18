@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 public class T400_HtmlIncludeHead extends AbstractTask {
   private static final Logger LOG = LoggerFactory.getLogger(T400_HtmlIncludeHead.class);
 
-  private static PathMatcher FILE_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/{index,login,logout}.html");
+  private static PathMatcher FILE_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/{index,login,logout,popup-window}.html");
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {

@@ -17,8 +17,10 @@ import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -41,6 +43,7 @@ public class T40110_JsMacro extends AbstractTask {
 
   private static PathMatcher MACRO_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/res/*-macro.js");
   private static Map<String, String> OLD_TO_NEW_IMPORTS = new HashMap<>();
+  private static Set<String> IGNORED_OLD_IMPORTS = new HashSet<>();
   private static Pattern OLD_IMPORT_PATTERN = Pattern.compile(Pattern.quote("__include(\"") + "([^\"]+)" + Pattern.quote("\");"));
 
   static {
@@ -52,6 +55,8 @@ public class T40110_JsMacro extends AbstractTask {
     OLD_TO_NEW_IMPORTS.put("crm-module.js", "@bsi-crm/core");
     OLD_TO_NEW_IMPORTS.put("studio-module.js", "@bsi-studio/core");
     OLD_TO_NEW_IMPORTS.put("studio-crm-module.js", "@bsi-crm/studio");
+
+    IGNORED_OLD_IMPORTS.add("jquery-all-macro.js");
   }
 
   @Override
@@ -79,16 +84,15 @@ public class T40110_JsMacro extends AbstractTask {
 
     // Object.assign({}, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9); // workaround so that the imports are not unused
     if (imports.size() > 0) {
-      StringBuilder sourceBuilder = new StringBuilder();
-      sourceBuilder.append(appJsWc.getSource());
-      sourceBuilder.append(appJsWc.getLineDelimiter());
-      sourceBuilder.append("Object.assign({}, ");
-      sourceBuilder.append(
+      String sourceBuilder = appJsWc.getSource() +
+          appJsWc.getLineDelimiter() +
+          "Object.assign({}, " +
           imports.stream()
               .map(imp -> imp.getDefaultMember().getAlias())
-              .collect(Collectors.joining(", ")));
-      sourceBuilder.append("); // workaround so that the imports are not unused");
-      appJsWc.setSource(sourceBuilder.toString());
+              .collect(Collectors.joining(", "))
+          +
+          "); // workaround so that the imports are not unused";
+      appJsWc.setSource(sourceBuilder);
     }
 
     // delete macro file
@@ -103,7 +107,9 @@ public class T40110_JsMacro extends AbstractTask {
   private JsImport ensureImport(WorkingCopy appJsWc, JsFile appJsFile, String oldImport, String oldIncludeLine, int refNr) {
     String newImp = OLD_TO_NEW_IMPORTS.get(oldImport);
     if (newImp == null) {
-      MigrationUtility.prependTodo(appJsWc, "Manual create import for <" + oldIncludeLine + ">");
+      if (!IGNORED_OLD_IMPORTS.contains(oldImport)) {
+        MigrationUtility.prependTodo(appJsWc, "Manual create import for <" + oldIncludeLine + ">");
+      }
       return null;
     }
     JsImport imp = appJsFile.getImport(newImp);
