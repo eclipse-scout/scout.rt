@@ -44,11 +44,26 @@ public class AppNameContextProperty implements IContextProperty<String> {
         potentialAppNames.add(matcherJs.group(1));
       }
 
+      String potentialAppName = null;
+      String jsFolderName = Configuration.get().getJsFolderName();
+      String namespace = Configuration.get().getNamespace();
+      if (jsFolderName != null && !jsFolderName.equals("scout")) {
+        potentialAppName = jsFolderName;
+      }
+      else if (namespace != null && !namespace.equals("scout")) {
+        potentialAppName = namespace;
+      }
+      // Search macro that contains the potentialAppName (typically macro, folder and namespace have the same name, but this can of course vary).
       Matcher matcherLess = APP_NAME_LESS_REGEX.matcher(context.ensureWorkingCopy(indexHtml).getSource());
       while (matcherLess.find()) {
-        if (potentialAppNames.contains(matcherLess.group(1))) {
-          appName = matcherLess.group(1);
-          break;
+        String macroName = matcherLess.group(1);
+        if (potentialAppNames.contains(macroName)) {
+          if (macroName.equals(potentialAppName)) {
+            appName = macroName;
+            break;
+          }
+          // Use the the name of the last macro found as fallback
+          appName = macroName;
         }
       }
       if (appName != null) {
