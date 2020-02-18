@@ -103,7 +103,7 @@ export default class CodeType {
       return !code.parent;
     });
     for (var i = 0; i < codes.length; i++) {
-      var code = this.codes[i];
+      var code = codes[i];
       var visitResult = visitor(code);
       if (visitResult === true || visitResult === TreeVisitResult.TERMINATE) {
         return TreeVisitResult.TERMINATE;
