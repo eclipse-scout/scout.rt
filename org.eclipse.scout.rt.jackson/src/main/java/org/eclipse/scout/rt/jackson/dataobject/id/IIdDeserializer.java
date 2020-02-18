@@ -28,16 +28,17 @@ public class IIdDeserializer extends StdDeserializer<IId<?>> {
   private static final long serialVersionUID = 1L;
 
   protected final Class<? extends IId<?>> m_idType;
+  protected final Class<?> m_wtClass;
   protected final LazyValue<IdFactory> m_idFactory = new LazyValue<>(IdFactory.class);
 
   public IIdDeserializer(Class<? extends IId<?>> idType) {
     super(idType);
     m_idType = idType;
+    m_wtClass = TypeCastUtility.getGenericsParameterClass(m_idType, IId.class);
   }
 
   @Override
   public IId<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-    Class<?> wtClass = TypeCastUtility.getGenericsParameterClass(m_idType, IId.class);
-    return m_idFactory.get().createInternal(m_idType, p.readValueAs(wtClass));
+    return m_idFactory.get().createInternal(m_idType, p.readValueAs(m_wtClass));
   }
 }

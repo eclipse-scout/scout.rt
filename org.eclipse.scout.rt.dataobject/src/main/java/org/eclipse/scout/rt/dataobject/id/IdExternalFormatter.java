@@ -16,12 +16,12 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 public class IdExternalFormatter {
 
   private static final Logger LOG = LoggerFactory.getLogger(IdExternalFormatter.class);
+
+  protected final LazyValue<IdFactory> m_idFactory = new LazyValue<>(IdFactory.class);
 
   protected final Map<String, Class<? extends IId<?>>> m_nameToClassMap = new HashMap<>();
   protected final Map<Class<? extends IId<?>>, String> m_classToNameMap = new HashMap<>();
@@ -84,7 +86,7 @@ public class IdExternalFormatter {
    * @throws ProcessingException
    *           If the referenced class is not found
    */
-  public <ID extends IId<?>> ID fromExternalForm(String externalForm) {
+  public IId<?> fromExternalForm(String externalForm) {
     if (externalForm == null) {
       return null;
     }
@@ -93,14 +95,31 @@ public class IdExternalFormatter {
       throw new IllegalArgumentException("externalForm '" + externalForm + "' is invalid");
     }
     String typeName = tmp[0];
-    String rawId = tmp[1];
     Class<? extends IId<?>> idClass = m_nameToClassMap.get(typeName);
     if (idClass == null) {
       throw new ProcessingException("No class found for type name '{}'", typeName);
     }
-    @SuppressWarnings("unchecked")
-    ID id = (ID) BEANS.get(IdFactory.class).createFromString(idClass, rawId);
-    return id;
+    return m_idFactory.get().createFromString(idClass, tmp[1]);
+  }
+
+  /**
+   * Parses a string in the format <code>"[type-name]:[raw-id]"</code>. If {@code externalForm} has not the expected
+   * format or there is no type {@code null} is returned.
+   */
+  public IId<?> fromExternalFormLenient(String externalForm) {
+    if (externalForm == null) {
+      return null;
+    }
+    String[] tmp = externalForm.split(":", 2);
+    if (tmp.length != 2) {
+      return null;
+    }
+    String typeName = tmp[0];
+    Class<? extends IId<?>> idClass = m_nameToClassMap.get(typeName);
+    if (idClass == null) {
+      return null;
+    }
+    return m_idFactory.get().createFromString(idClass, tmp[1]);
   }
 
   /**

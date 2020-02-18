@@ -1,0 +1,13 @@
+{
+  "_type" : "scout.TestEntityWithIId",
+  "longId" : 37,
+  "longIds" : [ 37, 73 ],
+  "longIdsAsDoList" : [ 73, 23 ],
+  "map" : {
+    "scout.FixtureStringId:marco" : "polo"
+  },
+  "stringId" : "scout.FixtureStringId:foo",
+  "stringIds" : [ "scout.FixtureStringId:foo", "scout.FixtureStringId:foo2" ],
+  "stringIdsAsDoList" : [ "scout.FixtureStringId:foo2", "scout.FixtureStringId:foo2" ],
+  "uuId" : "scout.FixtureUuId:8fa211b0-fd83-42cb-96c9-1942e274ce79"
+}
