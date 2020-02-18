@@ -39,6 +39,7 @@ scout.SmartField = function() {
   this._currentLookupCall = null; // should only be accessed on the original widget since the adapter accesses it
   this.lookupSeqNo = 0; // used to detect if the proposal chooser contains the results of the latest lookup, or an out-dated result.
   // only when the result is up-to-date, we can use the selected lookup row
+  this.disabledCopyOverlay = true;
 
   this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
     'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental', 'searchRequired', 'columnDescriptors',
