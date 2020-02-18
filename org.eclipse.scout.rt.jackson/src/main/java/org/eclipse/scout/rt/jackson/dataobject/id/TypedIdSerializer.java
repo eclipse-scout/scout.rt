@@ -15,7 +15,7 @@ import java.io.IOException;
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IdExternalFormatter;
 import org.eclipse.scout.rt.dataobject.id.TypedId;
-import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -27,12 +27,14 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 public class TypedIdSerializer extends StdSerializer<TypedId<? extends IId>> {
   private static final long serialVersionUID = 1L;
 
+  protected final LazyValue<IdExternalFormatter> m_idExternalFormatter = new LazyValue<>(IdExternalFormatter.class);
+
   public TypedIdSerializer() {
     super(TypedId.class, false);
   }
 
   @Override
   public void serialize(TypedId<? extends IId> value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-    gen.writeString(BEANS.get(IdExternalFormatter.class).toExternalForm(value.getId()));
+    gen.writeString(m_idExternalFormatter.get().toExternalForm(value.getId()));
   }
 }

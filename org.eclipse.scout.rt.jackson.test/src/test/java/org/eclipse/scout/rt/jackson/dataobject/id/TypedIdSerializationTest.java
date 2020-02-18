@@ -46,8 +46,6 @@ public class TypedIdSerializationTest {
     entity.withUuId(TypedId.of(UU_ID));
     String json = m_dataObjectMapper.writeValue(entity);
 
-    System.out.println(json);
-
     String expectedJson = m_testHelper.readResourceAsString(toURL("TestEntityWithTypedIdDo.json"));
     m_testHelper.assertJsonEquals(expectedJson, json);
 

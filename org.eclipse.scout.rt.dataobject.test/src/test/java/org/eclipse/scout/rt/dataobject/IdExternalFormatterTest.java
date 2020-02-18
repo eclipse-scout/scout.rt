@@ -10,12 +10,12 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.UUID;
 
-import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
+import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IIds;
 import org.eclipse.scout.rt.dataobject.id.IdExternalFormatter;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -39,19 +39,36 @@ public class IdExternalFormatterTest {
   @Test
   public void testFromExternalForm() {
     FixtureUuId id1 = IIds.create(FixtureUuId.class, TEST_UUID);
-    FixtureUuId id2 = BEANS.get(IdExternalFormatter.class).fromExternalForm("scout.FixtureUuId:" + TEST_UUID.toString());
+    IId<?> id2 = BEANS.get(IdExternalFormatter.class).fromExternalForm("scout.FixtureUuId:" + TEST_UUID.toString());
     assertEquals(id1, id2);
   }
 
-  @Test(expected = ClassCastException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testFromExternalForm_InvalidType() {
-    FixtureStringId id = BEANS.get(IdExternalFormatter.class).fromExternalForm("scout.FixtureUuId:" + TEST_UUID.toString());
+    IId<?> id = BEANS.get(IdExternalFormatter.class).fromExternalForm("scout.FixtureUuId:Other:" + TEST_UUID.toString());
     assertEquals(id, id);
   }
 
   @Test(expected = ProcessingException.class)
   public void testFromExternalForm_UnknownType() {
-    FixtureUuId id = BEANS.get(IdExternalFormatter.class).fromExternalForm("DoesNotExist:" + TEST_UUID.toString());
+    IId<?> id = BEANS.get(IdExternalFormatter.class).fromExternalForm("DoesNotExist:" + TEST_UUID.toString());
     assertEquals(id, id);
+  }
+
+  @Test
+  public void testFromExternalFormLenient() {
+    FixtureUuId id1 = IIds.create(FixtureUuId.class, TEST_UUID);
+    IId<?> id2 = BEANS.get(IdExternalFormatter.class).fromExternalFormLenient("scout.FixtureUuId:" + TEST_UUID.toString());
+    assertEquals(id1, id2);
+  }
+
+  public void testFromExternalFormLenient_InvalidType() {
+    IId<?> id = BEANS.get(IdExternalFormatter.class).fromExternalFormLenient("scout.FixtureUuId:" + TEST_UUID.toString());
+    assertNull(id);
+  }
+
+  public void testFromExternalFormLenient_UnknownType() {
+    IId<?> id = BEANS.get(IdExternalFormatter.class).fromExternalFormLenient("DoesNotExist:" + TEST_UUID.toString());
+    assertNull(id);
   }
 }
