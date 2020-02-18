@@ -220,7 +220,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
 
   @Override
   public void setSelectedTab(IGroupBox box) {
-    if (box == null || (box.getParentField() == this && box.isVisible())) {
+    if (box == null || box.getParentField() == this) {
       propertySupport.setProperty(PROP_SELECTED_TAB, box);
     }
   }
