@@ -68,9 +68,27 @@ scout.Image.prototype._onImageLoad = function(event) {
   if (!this.rendered) { // check needed, because this is an async callback
     return;
   }
+  this._ensureImageLayout();
   this.$container.removeClass('empty broken');
   this.invalidateLayoutTree();
   this.trigger('load');
+};
+
+/**
+ * This function is used to work around a bug in Chrome. Chrome calculates a wrong aspect ratio
+ * under certain conditions. For details: https://bugs.chromium.org/p/chromium/issues/detail?id=950881
+ * The workaround sets a CSS attribute which forces Chrome to revalidate its internal layout.
+ */
+scout.Image.prototype._ensureImageLayout = function() {
+  if (!scout.device.isChrome()) {
+    return;
+  }
+  this.$container.addClass('chrome-fix');
+  setTimeout(function() {
+    if (this.rendered) {
+      this.$container.removeClass('chrome-fix');
+    }
+  }.bind(this));
 };
 
 scout.Image.prototype._onImageError = function(event) {

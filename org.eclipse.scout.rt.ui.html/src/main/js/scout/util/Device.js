@@ -182,6 +182,10 @@ scout.Device.prototype.isFirefox = function() {
   return scout.Device.Browser.FIREFOX === this.browser;
 };
 
+scout.Device.prototype.isChrome = function() {
+  return scout.Device.Browser.CHROME === this.browser;
+};
+
 /**
  * Compared to isIos() this function uses navigator.platform instead of navigator.userAgent to check whether the app runs on iOS.
  * Most of the time isIos() is the way to go.
