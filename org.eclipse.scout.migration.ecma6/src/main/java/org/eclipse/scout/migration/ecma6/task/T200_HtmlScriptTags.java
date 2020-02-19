@@ -24,9 +24,9 @@ import org.slf4j.LoggerFactory;
 public class T200_HtmlScriptTags extends AbstractTask {
   private static final Logger LOG = LoggerFactory.getLogger(T200_HtmlScriptTags.class);
 
-  private static PathMatcher FILE_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/{index,login,logout}.html");
+  private static final PathMatcher FILE_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/{index,login,logout,spnego_401,office-addin}.html");
 
-  private static Pattern END_BODY_REGEX = Pattern.compile("(\\s*)\\<\\/body\\>");
+  private static final Pattern END_BODY_REGEX = Pattern.compile("(\\s*)</body>");
 
   private String m_newLineAndIndet;
   private List<String> m_scriptsMoveToBody = new ArrayList<>();
@@ -45,7 +45,8 @@ public class T200_HtmlScriptTags extends AbstractTask {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
     m_newLineAndIndet = workingCopy.getLineDelimiter() + "    ";
     removeScriptElements(workingCopy);
-    addScriptElements(workingCopy, appJsFileName, context);
+    addScriptElements(workingCopy, appJsFileName);
+    m_scriptsMoveToBody.clear();
   }
 
   private void removeScriptElements(WorkingCopy workingCopy) {
@@ -82,7 +83,7 @@ public class T200_HtmlScriptTags extends AbstractTask {
     return source;
   }
 
-  private void addScriptElements(WorkingCopy workingCopy, String appJsFileName, Context context) {
+  private void addScriptElements(WorkingCopy workingCopy, String appJsFileName) {
     String source = workingCopy.getSource();
     Matcher matcher = END_BODY_REGEX.matcher(source);
     if (matcher.find()) {

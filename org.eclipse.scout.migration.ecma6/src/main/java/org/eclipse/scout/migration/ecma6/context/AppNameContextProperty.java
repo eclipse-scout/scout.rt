@@ -28,8 +28,8 @@ public class AppNameContextProperty implements IContextProperty<String> {
 
   private static final Logger LOG = LoggerFactory.getLogger(AppNameContextProperty.class);
 
-  private static Pattern APP_NAME_JS_REGEX = Pattern.compile("res\\/([^\\-]*)\\-all\\-macro\\.js");
-  private static Pattern APP_NAME_LESS_REGEX = Pattern.compile("res\\/([^\\-]*)\\-all\\-macro\\.less");
+  private static final Pattern APP_NAME_JS_REGEX = Pattern.compile("res/([^\\-]*)-all-macro\\.js");
+  private static final Pattern APP_NAME_LESS_REGEX = Pattern.compile("res/([^\\-]*)-all-macro\\.less");
 
   private String m_value = "[TODO MIG: appname]";
 
@@ -47,10 +47,10 @@ public class AppNameContextProperty implements IContextProperty<String> {
       String potentialAppName = null;
       String jsFolderName = Configuration.get().getJsFolderName();
       String namespace = Configuration.get().getNamespace();
-      if (jsFolderName != null && !jsFolderName.equals("scout")) {
+      if (jsFolderName != null && !"scout".equals(jsFolderName)) {
         potentialAppName = jsFolderName;
       }
-      else if (namespace != null && !namespace.equals("scout")) {
+      else if (namespace != null && !"scout".equals(namespace)) {
         potentialAppName = namespace;
       }
       // Search macro that contains the potentialAppName (typically macro, folder and namespace have the same name, but this can of course vary).

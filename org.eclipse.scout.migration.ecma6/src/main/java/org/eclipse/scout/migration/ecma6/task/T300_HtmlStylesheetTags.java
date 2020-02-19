@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public class T300_HtmlStylesheetTags extends AbstractTask {
   private static final Logger LOG = LoggerFactory.getLogger(T300_HtmlStylesheetTags.class);
 
-  private static PathMatcher FILE_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/{index,login,logout,popup-window}.html");
+  private static final PathMatcher FILE_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/{index,login,logout,popup-window,spnego_401,office-addin}.html");
   private Set<String> m_stylesheetsToRemove = CollectionUtility.hashSet("res/scout-login-module.less", "res/scout-logout-module.less", "res/scout-module.less");
 
   @Override
@@ -60,8 +60,8 @@ public class T300_HtmlStylesheetTags extends AbstractTask {
       source = removeTagMatcher.replaceAll("");
     }
     else {
-      source = MigrationUtility.prependTodo(source, "remove script tag: '" + element.outerHtml() + "'", workingCopy.getLineDelimiter());
-      LOG.warn("Could not remove script tag '" + element.outerHtml() + "' in '" + workingCopy.getPath() + "'");
+      source = MigrationUtility.prependTodo(source, "remove style tag: '" + element.outerHtml() + "'", workingCopy.getLineDelimiter());
+      LOG.warn("Could not remove style tag '" + element.outerHtml() + "' in '" + workingCopy.getPath() + "'");
     }
     return source;
   }

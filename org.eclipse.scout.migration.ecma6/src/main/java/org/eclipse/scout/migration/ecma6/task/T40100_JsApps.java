@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 public class T40100_JsApps extends AbstractTask {
   private static final Logger LOG = LoggerFactory.getLogger(T40100_JsApps.class);
 
-  private static PathMatcher MACRO_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/res/{index,login,logout}.js");
+  private static final PathMatcher MACRO_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/res/{index,login,logout,spnego_401,office-addin}.js");
   private static final Map<String /*fqn*/, String /*simpleName*/> APP_NAMES = new HashMap<>();
   static {
     APP_NAMES.put("scout.App", "App");
@@ -91,6 +91,9 @@ public class T40100_JsApps extends AbstractTask {
     }
     else {
       appSourceBuilder.append(MigrationUtility.todoText("Manual migration required.")).append(appJsWc.getLineDelimiter());
+    }
+    if ("office-addin".equalsIgnoreCase(targetFileName)) {
+      appSourceBuilder.append(MigrationUtility.todoText("Add imports to all necessary index files (@bsi-scout/officeaddin and more), compare with archetype")).append(appJsWc.getLineDelimiter()).append(appJsWc.getLineDelimiter());
     }
     if (indexSource.contains("modelsUrl:")) {
       appSourceBuilder.append(MigrationUtility.todoText("Remove attribute modelsUrl manually (not needed anymore).")).append(appJsWc.getLineDelimiter());
