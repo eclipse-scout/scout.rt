@@ -31,9 +31,8 @@ public final class MigrationUtility {
   private MigrationUtility() {
   }
 
-
   public static WorkingCopy getOrCreateWorkingCopy(Path file, Context context) {
-    final Path appJsFile = Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src/main/js", Configuration.get().getNamespace() + ".js"));
+    final Path appJsFile = Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src/main/js", Configuration.get().getJsFolderName() + ".js"));
     if (!Files.exists(appJsFile)) {
       try {
         Files.createDirectories(appJsFile.getParent());

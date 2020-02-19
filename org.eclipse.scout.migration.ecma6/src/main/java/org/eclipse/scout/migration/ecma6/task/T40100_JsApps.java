@@ -23,6 +23,7 @@ import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.configuration.Configuration;
+import org.eclipse.scout.migration.ecma6.context.AppNameContextProperty;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.references.AliasedMember;
@@ -53,7 +54,7 @@ public class T40100_JsApps extends AbstractTask {
   public void process(PathInfo pathInfo, Context context) {
     String targetFileName = pathInfo.getPath().getFileName().toString().replaceAll("\\.js\\Z", "");
     if ("index".equalsIgnoreCase(targetFileName)) {
-      targetFileName = Configuration.get().getNamespace();
+      targetFileName = context.getProperty(AppNameContextProperty.class);
     }
     final WorkingCopy appJsWc = context.ensureWorkingCopy(Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src/main/js", targetFileName + ".js")), true);
     final JsFile appJsFile = context.ensureJsFile(appJsWc, false);
@@ -62,10 +63,10 @@ public class T40100_JsApps extends AbstractTask {
     String indexSource = indexWc.getSource();
     // try to find document ready block
     indexSource = indexSource.replaceAll("\\A\\$\\(document\\)\\.ready\\(\\s*function\\(\\s*\\)\\s*\\{\\s*", "");
-    indexSource = indexSource.replaceAll("\\}\\s*\\)\\;\\Z", "");
+    indexSource = indexSource.replaceAll("}\\s*\\);[\\r\\n]*\\Z", "");
+
     // create import for app
     StringBuilder appSourceBuilder = new StringBuilder(appJsWc.getSource());
-    appSourceBuilder.append(appJsWc.getLineDelimiter()).append(appJsWc.getLineDelimiter());
 
     Entry<String, String> appMapping = null;
     for (Entry<String, String> e : APP_NAMES.entrySet()) {
@@ -90,7 +91,7 @@ public class T40100_JsApps extends AbstractTask {
       }
     }
     else {
-      appSourceBuilder.append(MigrationUtility.todoText("Manual migration required.")).append(appJsWc.getLineDelimiter());
+      appSourceBuilder.append(MigrationUtility.todoText("Add import for App if necessary")).append(appJsWc.getLineDelimiter());
     }
     if ("office-addin".equalsIgnoreCase(targetFileName)) {
       appSourceBuilder.append(MigrationUtility.todoText("Add imports to all necessary index files (@bsi-scout/officeaddin and more), compare with archetype")).append(appJsWc.getLineDelimiter()).append(appJsWc.getLineDelimiter());

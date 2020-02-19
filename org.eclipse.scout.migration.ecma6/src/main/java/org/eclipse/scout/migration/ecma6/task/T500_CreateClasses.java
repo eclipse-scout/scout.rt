@@ -30,7 +30,7 @@ public class T500_CreateClasses extends AbstractTask {
 
   private static final Logger LOG = LoggerFactory.getLogger(T500_CreateClasses.class);
 
-  public static String END_CLASS_MARKER = "//MARKER_CLASS_END";
+  public static final String END_CLASS_MARKER = "//MARKER_CLASS_END";
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"), PathFilters.isClass());
 
   @Override
@@ -48,7 +48,6 @@ public class T500_CreateClasses extends AbstractTask {
       MigrationUtility.prependTodo(workingCopy, e.getMessage());
       LOG.error("Could not create class [" + pathInfo.getPath().getFileName() + "]. Appended TODO for manual migration.");
     }
-
   }
 
   protected void createClasses(WorkingCopy workingCopy, Context context) {
@@ -65,6 +64,7 @@ public class T500_CreateClasses extends AbstractTask {
     }
   }
 
+  @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   protected void createClazzBlock(JsClass clazz, boolean onlyOneClazz, JsFile jsFile, WorkingCopy workingCopy, Context context) {
     //    export default class Menu extends Action {
     //      constructor() {
@@ -123,7 +123,6 @@ public class T500_CreateClasses extends AbstractTask {
       else {
         sourceBuilder.insert(0, MigrationUtility.prependTodo("", "Remove 'scout.inhertits(...' manual", workingCopy.getLineDelimiter()));
         LOG.warn("Could not remove 'scout.inhertits(...'  in '" + clazz.getFullyQualifiedName() + "'");
-
       }
     }
     // open class block
@@ -164,10 +163,9 @@ public class T500_CreateClasses extends AbstractTask {
     Pattern pattern = Pattern.compile(patternBuilder.toString());
     Matcher matcher = pattern.matcher(source);
     if (matcher.find()) {
-      StringBuilder replacement = new StringBuilder();
-      replacement.append("constructor");
-      replacement.append(function.getName());
-      source = matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
+      String replacement = "constructor" +
+          function.getName();
+      source = matcher.replaceFirst(Matcher.quoteReplacement(replacement));
     }
 
     // super call variant 1
@@ -182,9 +180,7 @@ public class T500_CreateClasses extends AbstractTask {
       pattern = Pattern.compile(patternBuilder.toString());
       matcher = pattern.matcher(source);
       if (matcher.find()) {
-        StringBuilder replacement = new StringBuilder();
-        replacement.append("super(");
-        source = matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
+        source = matcher.replaceFirst(Matcher.quoteReplacement("super("));
       }
     }
 
@@ -238,9 +234,7 @@ public class T500_CreateClasses extends AbstractTask {
     pattern = Pattern.compile(patternBuilder.toString());
     matcher = pattern.matcher(source);
     if (matcher.find()) {
-      StringBuilder replacement = new StringBuilder();
-      replacement.append("super.").append(matcher.group(1)).append("(");
-      source = matcher.replaceAll(Matcher.quoteReplacement(replacement.toString()));
+      source = matcher.replaceAll(Matcher.quoteReplacement("super." + matcher.group(1) + "("));
     }
 
     // super call variant 2
@@ -253,9 +247,7 @@ public class T500_CreateClasses extends AbstractTask {
     pattern = Pattern.compile(patternBuilder.toString());
     matcher = pattern.matcher(source);
     if (matcher.find()) {
-      StringBuilder replacement = new StringBuilder();
-      replacement.append("super.").append(matcher.group(1)).append("(");
-      source = matcher.replaceAll(Matcher.quoteReplacement(replacement.toString()));
+      source = matcher.replaceAll(Matcher.quoteReplacement("super." + matcher.group(1) + "("));
     }
 
     return source;
@@ -283,20 +275,16 @@ public class T500_CreateClasses extends AbstractTask {
     //    scout.StringField.parent.prototype._clear.call(this);
     //    scout.StringField.parent.prototype._clear.call(this, foo, bar);
     // group 1 function name
-    StringBuilder patternBuilder = new StringBuilder();
-    patternBuilder
-        .append("(?:")
-        .append(Pattern.quote(thisClazz.getFullyQualifiedName()))
-        .append("|")
-        .append(Pattern.quote(inheritedFunction.getJsClass().getFullyQualifiedName()))
-        .append(")")
-        .append("\\.parent\\.prototype\\.(").append(Pattern.quote(inheritedFunction.getName())).append(")\\.call\\s*\\(\\s*this\\s*,?");
-    Pattern pattern = Pattern.compile(patternBuilder.toString());
+    String patternBuilder = "(?:" +
+        Pattern.quote(thisClazz.getFullyQualifiedName()) +
+        "|" +
+        Pattern.quote(inheritedFunction.getJsClass().getFullyQualifiedName()) +
+        ")" +
+        "\\.parent\\.prototype\\.(" + Pattern.quote(inheritedFunction.getName()) + ")\\.call\\s*\\(\\s*this\\s*,?";
+    Pattern pattern = Pattern.compile(patternBuilder);
     Matcher matcher = pattern.matcher(source);
     if (matcher.find()) {
-      StringBuilder replacement = new StringBuilder();
-      replacement.append("super.").append(matcher.group(1)).append("(");
-      source = matcher.replaceAll(Matcher.quoteReplacement(replacement.toString()));
+      source = matcher.replaceAll(Matcher.quoteReplacement("super." + matcher.group(1) + "("));
     }
 
     return source;
@@ -316,16 +304,14 @@ public class T500_CreateClasses extends AbstractTask {
   }
 
   protected String updateVariable(String source, JsClassVariable v, String lineDelimiter) {
-    StringBuilder patternBuilder = new StringBuilder();
-    patternBuilder
-        .append("([\\r\\n]{1})(")
-        .append(v.getJsClass().getNamespace())
-        .append("\\.")
-        .append(v.getJsClass().getName())
-        .append("\\.").append(v.getName())
-        .append(")")
-        .append("((\\s*\\=\\s*[^\\;]*)?\\;)");
-    Pattern pattern = Pattern.compile(patternBuilder.toString(), Pattern.DOTALL);
+    String patternBuilder = "([\\r\\n])(" +
+        v.getJsClass().getNamespace() +
+        "\\." +
+        v.getJsClass().getName() +
+        "\\." + v.getName() +
+        ")" +
+        "((\\s*=\\s*[^;]*)?;)";
+    Pattern pattern = Pattern.compile(patternBuilder, Pattern.DOTALL);
     Matcher matcher = pattern.matcher(source);
     if (matcher.find()) {
       StringBuilder replacement = new StringBuilder();
@@ -366,18 +352,14 @@ public class T500_CreateClasses extends AbstractTask {
   }
 
   protected String updateEnum(String source, JsEnum jsEnum, String lineDelimiter) {
-    StringBuilder patternBuilder = new StringBuilder();
-    patternBuilder.append(jsEnum.getJsClass().getNamespace())
-        .append("\\.")
-        .append(jsEnum.getJsClass().getName());
-
-    patternBuilder.append("\\.").append(jsEnum.getName());
-    patternBuilder.append("(\\ \\=\\s*\\{)");
-
-    Pattern pattern = Pattern.compile(patternBuilder.toString());
+    String patternBuilder = jsEnum.getJsClass().getNamespace() +
+        "\\." +
+        jsEnum.getJsClass().getName() +
+        "\\." + jsEnum.getName() +
+        "( =\\s*\\{)";
+    Pattern pattern = Pattern.compile(patternBuilder);
     Matcher matcher = pattern.matcher(source);
     if (matcher.find()) {
-
       StringBuilder replacement = new StringBuilder();
       if (jsEnum.hasParseErrors()) {
         replacement.append(jsEnum.toTodoText(lineDelimiter)).append(lineDelimiter);

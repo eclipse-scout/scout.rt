@@ -10,19 +10,12 @@
  */
 package org.eclipse.scout.migration.ecma6;
 
-import java.util.List;
-
 import org.eclipse.scout.migration.ecma6.configuration.Configuration;
-import org.eclipse.scout.migration.ecma6.context.Context;
-import org.eclipse.scout.migration.ecma6.task.ITask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Migration implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(Migration.class);
-
-  private List<ITask> m_tasks;
-  private Context m_context;
 
   protected Migration() {
   }
@@ -43,5 +36,4 @@ public class Migration implements Runnable {
     new MigrationStep2().run();
     LOG.info("Migration completed.");
   }
-
 }

@@ -42,7 +42,7 @@ public class T40012_LessMacro extends AbstractTask {
   private static final String THEME_DARK = "dark";
   private static final String THEME_BSI = "bsi";
 
-  private static final Pattern IMPORT_PATTERN = Pattern.compile("\\@import\\s*\"([\\w\\.\\-\\_]+)");
+  private static final Pattern IMPORT_PATTERN = Pattern.compile("@import\\s*\"([\\w.\\-_]+)");
   private static final Map<String, Map<String, String>> LIBS = new HashMap<>();
   static {
     // scout-module.less
@@ -156,7 +156,6 @@ public class T40012_LessMacro extends AbstractTask {
 
     final Path indexLessFile = BEANS.get(T40010_LessModule.class).getIndexLessFile(theme);
     if (indexLessFile != null) {
-      source.append(workingCopy.getLineDelimiter()).append("// local index").append(workingCopy.getLineDelimiter());
       source.append("@import \"").append(context.relativeToModule(indexLessFile, Paths.get("src/main/js"))).append("\";");
     }
 
@@ -169,7 +168,10 @@ public class T40012_LessMacro extends AbstractTask {
       builder.append(MigrationUtility.todoText("Check what imports are needed here (reference not migrated '" + oldImport + "').")).append(NL);
       return;
     }
-    final String imp = themes.get(theme);
+    String imp = themes.get(theme);
+    if (imp == null) {
+      imp = themes.get("default");
+    }
     if (StringUtility.hasText(imp)) {
       builder.append("@import \"").append(imp).append("\";").append(NL);
     }

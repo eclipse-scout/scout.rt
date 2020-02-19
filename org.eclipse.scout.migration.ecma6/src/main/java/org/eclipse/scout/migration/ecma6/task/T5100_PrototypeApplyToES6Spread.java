@@ -37,11 +37,17 @@ public class T5100_PrototypeApplyToES6Spread extends AbstractTask {
 
   @Override
   public void setup(Context context) {
-    m_relativeNamespaceDirectory = Paths.get("src", "main", "js", Configuration.get().getNamespace());
+    if (Configuration.get().getJsFolderName() == null) {
+      return;
+    }
+    m_relativeNamespaceDirectory = Paths.get("src", "main", "js", Configuration.get().getJsFolderName());
   }
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
+    if (m_relativeNamespaceDirectory == null) {
+      return false;
+    }
     return pathInfo.getModuleRelativePath().startsWith(m_relativeNamespaceDirectory);
   }
 

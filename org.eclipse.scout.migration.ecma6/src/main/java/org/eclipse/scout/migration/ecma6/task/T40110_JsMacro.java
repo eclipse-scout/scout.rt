@@ -29,6 +29,7 @@ import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.configuration.Configuration;
+import org.eclipse.scout.migration.ecma6.context.AppNameContextProperty;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.references.AliasedMember;
@@ -41,10 +42,10 @@ import org.slf4j.LoggerFactory;
 public class T40110_JsMacro extends AbstractTask {
   private static final Logger LOG = LoggerFactory.getLogger(T40110_JsMacro.class);
 
-  private static PathMatcher MACRO_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/res/*-macro.js");
-  private static Map<String, String> OLD_TO_NEW_IMPORTS = new HashMap<>();
-  private static Set<String> IGNORED_OLD_IMPORTS = new HashSet<>();
-  private static Pattern OLD_IMPORT_PATTERN = Pattern.compile(Pattern.quote("__include(\"") + "([^\"]+)" + Pattern.quote("\");"));
+  private static final PathMatcher MACRO_MATCHER = FileSystems.getDefault().getPathMatcher("glob:src/main/resources/WebContent/res/*-macro.js");
+  private static final Map<String, String> OLD_TO_NEW_IMPORTS = new HashMap<>();
+  private static final Set<String> IGNORED_OLD_IMPORTS = new HashSet<>();
+  private static final Pattern OLD_IMPORT_PATTERN = Pattern.compile(Pattern.quote("__include(\"") + "([^\"]+)" + Pattern.quote("\");"));
 
   static {
     OLD_TO_NEW_IMPORTS.put("scout-module.js", "@eclipse-scout/core");
@@ -66,7 +67,7 @@ public class T40110_JsMacro extends AbstractTask {
 
   @Override
   public void process(PathInfo pathInfo, Context context) {
-    final WorkingCopy appJsWc = context.ensureWorkingCopy(Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src/main/js", Configuration.get().getNamespace() + ".js")), true);
+    final WorkingCopy appJsWc = context.ensureWorkingCopy(Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src/main/js", context.getProperty(AppNameContextProperty.class) + ".js")), true);
     final JsFile appJsFile = context.ensureJsFile(appJsWc, false);
 
     WorkingCopy macroWc = context.getWorkingCopy(pathInfo.getPath());
@@ -108,7 +109,7 @@ public class T40110_JsMacro extends AbstractTask {
     String newImp = OLD_TO_NEW_IMPORTS.get(oldImport);
     if (newImp == null) {
       if (!IGNORED_OLD_IMPORTS.contains(oldImport)) {
-        MigrationUtility.prependTodo(appJsWc, "Manual create import for <" + oldIncludeLine + ">");
+        MigrationUtility.prependTodo(appJsWc, "Manually create import for <" + oldIncludeLine + ">");
       }
       return null;
     }

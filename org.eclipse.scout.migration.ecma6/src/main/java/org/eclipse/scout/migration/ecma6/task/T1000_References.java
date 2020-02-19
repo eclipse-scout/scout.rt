@@ -23,8 +23,6 @@ public class T1000_References extends AbstractTask {
 
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
 
-//  private Pattern REF_PATTERN = Pattern.compile("[]]")
-
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
     return m_filter.test(pathInfo);

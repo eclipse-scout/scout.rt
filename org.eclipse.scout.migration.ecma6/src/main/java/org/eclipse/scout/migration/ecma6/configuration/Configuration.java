@@ -508,9 +508,6 @@ public class Configuration {
     if (getSourceModuleDirectory() == null || !Files.exists(getSourceModuleDirectory()) || !Files.isDirectory(getSourceModuleDirectory())) {
       throw new VetoException(configurationErrorMessage("'sourceModuleDirectory' with value: '" + getSourceModuleDirectory() + "' is not set, does not exist or is not a directory."));
     }
-    if (StringUtility.isNullOrEmpty(getNamespace())) {
-      throw new VetoException(configurationErrorMessage("'namespace' with value: '" + getNamespace() + "' is not set."));
-    }
     if (getPersistLibraryFileName() != null && StringUtility.isNullOrEmpty(getPersistLibraryName())) {
       throw new VetoException(configurationErrorMessage("In case the persistLibraryFileName is set the persistLibraryName must also be set."));
     }

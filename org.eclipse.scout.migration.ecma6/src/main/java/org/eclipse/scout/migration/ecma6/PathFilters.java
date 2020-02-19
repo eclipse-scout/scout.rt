@@ -10,8 +10,8 @@ import org.eclipse.scout.migration.ecma6.model.old.Exemption;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public final class PathFilters {
-  private static Path SRC_MAIN_JS = Paths.get("src/main/js");
-  private static Path SRC_TEST_JS = Paths.get("src/test/js");
+  private static final Path SRC_MAIN_JS = Paths.get("src/main/js");
+  private static final Path SRC_TEST_JS = Paths.get("src/test/js");
 
   private PathFilters() {
   }

@@ -31,7 +31,8 @@ public class AppNameContextProperty implements IContextProperty<String> {
   private static final Pattern APP_NAME_JS_REGEX = Pattern.compile("res/([^\\-]*)-all-macro\\.js");
   private static final Pattern APP_NAME_LESS_REGEX = Pattern.compile("res/([^\\-]*)-all-macro\\.less");
 
-  private String m_value = "[TODO MIG: appname]";
+  // May be used as file name -> must not contain illegal characters
+  private String m_value = "TODO MIG appname";
 
   @Override
   public void setup(Context context) {

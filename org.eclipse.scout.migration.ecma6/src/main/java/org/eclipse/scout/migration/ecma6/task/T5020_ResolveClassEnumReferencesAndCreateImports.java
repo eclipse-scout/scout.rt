@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.platform.Order;
 @Order(5020)
 public class T5020_ResolveClassEnumReferencesAndCreateImports extends AbstractResolveReferencesAndCreateImportTask {
 
+  @SuppressWarnings("DuplicatedCode")
   @Override
   public void process(PathInfo pathInfo, Context context) {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());

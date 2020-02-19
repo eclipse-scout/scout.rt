@@ -30,6 +30,7 @@ import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationIncludePathFilter;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +39,8 @@ public class MigrationStep2 implements IRunnable {
   private static final Logger LOG = LoggerFactory.getLogger(MigrationStep2.class);
   private static final String JSON_EXTENSION = "json";
   private static final String JS_EXTENSION = "js";
-  Pattern JQUERY_PAT = Pattern.compile("webcontent[\\\\/]res[\\\\/]jquery-", Pattern.CASE_INSENSITIVE);
-  Pattern JASMINE_PAT = Pattern.compile("webcontent[\\\\/]res[\\\\/]jasmine-", Pattern.CASE_INSENSITIVE);
+  private static final Pattern JQUERY_PAT = Pattern.compile("webcontent[\\\\/]res[\\\\/]jquery-", Pattern.CASE_INSENSITIVE);
+  private static final Pattern JASMINE_PAT = Pattern.compile("webcontent[\\\\/]res[\\\\/]jasmine-", Pattern.CASE_INSENSITIVE);
   private Set<Path> m_deletedFiles = new HashSet<>();
 
   public static void main(String[] args) {
@@ -70,7 +71,7 @@ public class MigrationStep2 implements IRunnable {
   }
 
   protected void removeJsFolder() {
-    if (!Configuration.get().isRemoveJsFolder()) {
+    if (!Configuration.get().isRemoveJsFolder() || StringUtility.isNullOrEmpty(Configuration.get().getJsFolderName())) {
       return;
     }
     final IMigrationIncludePathFilter includeFilter = BEANS.opt(IMigrationIncludePathFilter.class);
@@ -259,8 +260,8 @@ public class MigrationStep2 implements IRunnable {
         public FileVisitResult preVisitDirectory(Path d, BasicFileAttributes attrs) throws IOException {
           String name = d.getFileName().toString();
           if (name.startsWith(".")
-              || name.equals("node_modules") ||
-              name.equals("target")) {
+              || "node_modules".equals("name") ||
+              "target".equals(name)) {
             return FileVisitResult.SKIP_SUBTREE;
           }
           return super.preVisitDirectory(d, attrs);

@@ -33,8 +33,8 @@ public class T4900_CreateJQueryImports extends AbstractTask {
 
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
 
-  private static Pattern JQUERY_MEMBER_PAT = Pattern.compile("\\$\\.[^(]*");
-  private static Pattern JQUERY_FUNCTION_PAT = Pattern.compile("\\$\\(");
+  private static final Pattern JQUERY_MEMBER_PAT = Pattern.compile("\\$\\.[^(]*");
+  private static final Pattern JQUERY_FUNCTION_PAT = Pattern.compile("\\$\\(");
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
