@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, ImageLayout, Widget} from '../index';
+import {Device, HtmlComponent, ImageLayout, Widget} from '../index';
 
 export default class Image extends Widget {
 
@@ -71,9 +71,27 @@ export default class Image extends Widget {
     if (!this.rendered) { // check needed, because this is an async callback
       return;
     }
+    this._ensureImageLayout();
     this.$container.removeClass('empty broken');
     this.invalidateLayoutTree();
     this.trigger('load');
+  }
+
+  /**
+   * This function is used to work around a bug in Chrome. Chrome calculates a wrong aspect ratio
+   * under certain conditions. For details: https://bugs.chromium.org/p/chromium/issues/detail?id=950881
+   * The workaround sets a CSS attribute which forces Chrome to revalidate its internal layout.
+   */
+  _ensureImageLayout() {
+    if (!Device.get().isChrome()) {
+      return;
+    }
+    this.$container.addClass('chrome-fix');
+    setTimeout(function() {
+      if (this.rendered) {
+        this.$container.removeClass('chrome-fix');
+      }
+    }.bind(this));
   }
 
   _onImageError(event) {
