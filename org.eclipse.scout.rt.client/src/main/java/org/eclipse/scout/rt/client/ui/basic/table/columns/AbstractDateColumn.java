@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.date.DateFormatProvider;
 
@@ -208,6 +209,15 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
     f.setHasDate(isHasDate());
     f.setHasTime(isHasTime());
     f.setAutoDate(getAutoDate());
+  }
+
+  @Override
+  protected void cellTextToEditField(String cellText, IFormField editorField) {
+    if (!(editorField instanceof IDateField)) {
+      throw new ProcessingException("Expected a date field.");
+    }
+    IDateField field = (IDateField) editorField;
+    field.setDisplayText(cellText);
   }
 
   @Override
