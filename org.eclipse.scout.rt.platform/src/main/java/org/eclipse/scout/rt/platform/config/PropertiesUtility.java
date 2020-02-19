@@ -47,8 +47,10 @@ public class PropertiesUtility {
    * </ol>
    *
    * @param properties
+   * @param failOnProblems
+   *          true to throw {@link IllegalArgumentException} on problems, false to just log as debug
    */
-  public static void resolveVariables(Properties properties) {
+  public static void resolveVariables(Properties properties, boolean failOnProblems) {
     BinaryOperator<String> variableReplacer = (key, variableName) -> {
       String value = defaultReplaceSystemPropertyAndEnv(variableName);
       if (value != null) return value;
@@ -56,7 +58,7 @@ public class PropertiesUtility {
     };
     for (String key : properties.stringPropertyNames()) {
       properties.setProperty(key, resolveKeyOverride(key, variableReplacer));
-      properties.setProperty(key, resolveValue(key, properties.getProperty(key), DEFAULT_VARIABLE_PATTERN, variableReplacer));
+      properties.setProperty(key, resolveValue(key, properties.getProperty(key), DEFAULT_VARIABLE_PATTERN, variableReplacer, failOnProblems));
     }
   }
 
@@ -69,15 +71,17 @@ public class PropertiesUtility {
    * </ol>
    *
    * @param properties
+   * @param failOnProblems
+   *          true to throw {@link IllegalArgumentException} on problems, false to just log as debug
    */
-  public static void resolveVariables(Map<String, String> properties) {
+  public static void resolveVariables(Map<String, String> properties, boolean failOnProblems) {
     BinaryOperator<String> variableReplacer = (key, variableName) -> {
       String value = defaultReplaceSystemPropertyAndEnv(variableName);
       if (value != null) return value;
       return properties.get(variableName);
     };
     properties.replaceAll((key, value) -> resolveKeyOverride(key, variableReplacer));
-    properties.replaceAll((key, value) -> resolveValue(key, value, DEFAULT_VARIABLE_PATTERN, variableReplacer));
+    properties.replaceAll((key, value) -> resolveValue(key, value, DEFAULT_VARIABLE_PATTERN, variableReplacer, failOnProblems));
   }
 
   /**
@@ -107,11 +111,9 @@ public class PropertiesUtility {
    * @param variableReplacer
    *          maps a variable name to its variable value
    * @return A {@link String} where all variables have been replaced with their values.
-   * @throws IllegalArgumentException
-   *           if a variable could not be resolved in the current context.
    */
   @SuppressWarnings("squid:S1149")
-  public static String resolveValue(String propertyKey, String value, Pattern variablePattern, BinaryOperator<String> variableReplacer) {
+  public static String resolveValue(String propertyKey, String value, Pattern variablePattern, BinaryOperator<String> variableReplacer, boolean failOnProblems) {
     Matcher m = variablePattern.matcher(value);
     boolean found = m.find();
     if (!found) {
@@ -126,15 +128,33 @@ public class PropertiesUtility {
         String variableName = m.group(1);
         String replacement = variableReplacer.apply(propertyKey, variableName);
         if (!StringUtility.hasText(replacement)) {
-          throw new IllegalArgumentException("resolving expression '" + value + "': variable ${" + variableName + "} is not defined in the context.");
+          if (failOnProblems) {
+            throw new IllegalArgumentException("resolving expression '" + value + "': variable ${" + variableName + "} is not defined in the context.");
+          }
+          else {
+            LOG.debug("resolving expression '" + value + "': variable ${" + variableName + "} is not defined in the context.");
+            return t;
+          }
         }
         if (replacement.contains(value)) {
-          throw new IllegalArgumentException("resolving expression '" + value + "': loop detected (the resolved value contains the original expression): " + replacement);
+          if (failOnProblems) {
+            throw new IllegalArgumentException("resolving expression '" + value + "': loop detected (the resolved value contains the original expression): " + replacement);
+          }
+          else {
+            LOG.debug("resolving expression '" + value + "': loop detected (the resolved value contains the original expression): " + replacement);
+            return t;
+          }
         }
         m.appendReplacement(sb, Matcher.quoteReplacement(replacement));
         stageKeys.add(variableName);
         if (loopDetection.contains(variableName)) {
-          throw new IllegalArgumentException("resolving expression '" + value + "': loop detected: " + loopDetection);
+          if (failOnProblems) {
+            throw new IllegalArgumentException("resolving expression '" + value + "': loop detected: " + loopDetection);
+          }
+          else {
+            LOG.debug("resolving expression '" + value + "': loop detected: " + loopDetection);
+            return t;
+          }
         }
         found = m.find();
       }
@@ -221,7 +241,13 @@ public class PropertiesUtility {
     }
   }
 
-  public static String getenv(String key) {
+  private static void logVariableNotFound(String key, String value, String variableName) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Property '{}={}' uses undefined variable '{}'.", key, value, variableName);
+    }
+  }
+
+  private static String getenv(String key) {
     return System.getenv(key);
   }
 }

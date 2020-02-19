@@ -989,7 +989,7 @@ public class PropertiesHelper {
       }
       return replacement;
     };
-    return PropertiesUtility.resolveValue(null, value, variablePattern, replacer);
+    return PropertiesUtility.resolveValue(null, value, variablePattern, replacer, true);
   }
 
   protected void importSystemImports(Set<String> importsToIgnore, Pattern pat) {

@@ -42,7 +42,7 @@ public class PropertiesUtilityTest {
   private static Properties load(String path) throws Exception {
     Properties props = new Properties();
     props.load(PropertiesUtility.class.getResourceAsStream("/" + path));
-    PropertiesUtility.resolveVariables(props);
+    PropertiesUtility.resolveVariables(props,true);
     return props;
   }
 
@@ -62,7 +62,7 @@ public class PropertiesUtilityTest {
     Properties props = new Properties();
     props.setProperty("prop1", "a${prop1}b");
     try {
-      PropertiesUtility.resolveVariables(props);
+      PropertiesUtility.resolveVariables(props,true);
       Assert.fail();
     }
     catch (IllegalArgumentException e) {
@@ -77,7 +77,7 @@ public class PropertiesUtilityTest {
     props.setProperty("prop1", "a${prop2}b");
     props.setProperty("prop2", "a${prop33}b");
     try {
-      PropertiesUtility.resolveVariables(props);
+      PropertiesUtility.resolveVariables(props,true);
       Assert.fail();
     }
     catch (IllegalArgumentException e) {
@@ -94,7 +94,7 @@ public class PropertiesUtilityTest {
     props.setProperty("prop4", "a${prop5}b");
     props.setProperty("prop5", "a${prop4}b");
     try {
-      PropertiesUtility.resolveVariables(props);
+      PropertiesUtility.resolveVariables(props,true);
       Assert.fail();
     }
     catch (IllegalArgumentException e) {
@@ -110,7 +110,7 @@ public class PropertiesUtilityTest {
       System.setProperty(attrOtherSystemPropertyKey, "resolved");
 
       Properties props = load(SAMPLE_CONFIG_PROPS);
-      PropertiesUtility.resolveVariables(props);
+      PropertiesUtility.resolveVariables(props,true);
       assertEquals("property resolved", props.getProperty(ATTR_STRING_KEY));
 
       System.setProperty(ATTR_STRING_KEY, "property ${" + ATTR_LONG_KEY + "}");
