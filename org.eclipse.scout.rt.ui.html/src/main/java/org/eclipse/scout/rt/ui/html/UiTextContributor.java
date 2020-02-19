@@ -158,6 +158,8 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.LoadingPopupWindow",
         "ui.Active",
         "ui.Inactive",
-        "ui.All"));
+        "ui.All",
+        "ui.Start",
+        "ui.End"));
   }
 }
