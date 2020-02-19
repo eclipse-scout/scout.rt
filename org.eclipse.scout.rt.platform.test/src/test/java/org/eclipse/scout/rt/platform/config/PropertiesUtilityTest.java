@@ -1,0 +1,124 @@
+/*
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+package org.eclipse.scout.rt.platform.config;
+
+import static org.junit.Assert.*;
+import java.net.MalformedURLException;
+import java.util.Collections;
+import java.util.Properties;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+/**
+ * Tests for class {@link PropertiesUtility}.
+ */
+public class PropertiesUtilityTest {
+  private static final String SAMPLE_CONFIG_PROPS = "org/eclipse/scout/rt/platform/config/sample-config.properties";
+  private static final String DOTPROPERTY_PROPS = "org/eclipse/scout/rt/platform/config/dotproperty-test.properties";
+
+  private static final String USER_HOME_KEY = "user.home";
+  private static final String USER_HOME_VALUE = System.getProperty("user.home");
+  private static final String OTHER_PROP_KEY = "otherProp";
+  private static final String OTHER_PROP_VALUE = "otherVal";
+  private static final String SPECIAL_CHARS_KEY = "specialChars";
+  private static final String SPECIAL_CHARS_VALUE = "-$-\\-";
+  private static final String RESOLVE_TEST_KEY = "a.resolve.test";
+  private static final String RESOLVE_TEST_VALUE = "prefix" + USER_HOME_VALUE + "suffix";
+  private static final String ATTR_USER_HOME_TEST_KEY = "aTestKey";
+  private static final String ATTR_USER_HOME_TEST_VALUE = USER_HOME_VALUE + "/subfolder";
+  private static final String ATTR_STRING_KEY = "stringKey";
+  private static final String ATTR_LONG_KEY = "longKey";
+  private static final String EMPTY_KEY = "emptyKey";
+
+  private static Properties load(String path) throws Exception {
+    Properties props = new Properties();
+    props.load(PropertiesUtility.class.getResourceAsStream("/" + path));
+    PropertiesUtility.resolveVariables(props);
+    return props;
+  }
+
+  @Test
+  public void testPropertiesUtility() throws Exception {
+    Properties props = load(SAMPLE_CONFIG_PROPS);
+    assertEquals(USER_HOME_VALUE, props.getProperty(USER_HOME_KEY));
+    assertEquals(OTHER_PROP_VALUE, props.getProperty(OTHER_PROP_KEY));
+    assertEquals(SPECIAL_CHARS_VALUE, props.getProperty(SPECIAL_CHARS_KEY));
+    assertEquals(RESOLVE_TEST_VALUE, props.getProperty(RESOLVE_TEST_KEY));
+    assertEquals(ATTR_USER_HOME_TEST_VALUE, props.getProperty(ATTR_USER_HOME_TEST_KEY));
+    assertTrue(Collections.list(props.propertyNames()).contains(EMPTY_KEY));
+  }
+
+  @Test
+  public void testLoopOnSelf() throws MalformedURLException {
+    Properties props = new Properties();
+    props.setProperty("prop1", "a${prop1}b");
+    try {
+      PropertiesUtility.resolveVariables(props);
+      Assert.fail();
+    }
+    catch (IllegalArgumentException e) {
+      assertEquals("resolving expression 'a${prop1}b': loop detected (the resolved value contains the original expression): a${prop1}b", e.getMessage());
+    }
+  }
+
+  @Test
+  public void testUndefinedPlaceholder() throws MalformedURLException {
+    Properties props = new Properties();
+    props.setProperty("prop1", "a${prop1}b");
+    props.setProperty("prop1", "a${prop2}b");
+    props.setProperty("prop2", "a${prop33}b");
+    try {
+      PropertiesUtility.resolveVariables(props);
+      Assert.fail();
+    }
+    catch (IllegalArgumentException e) {
+      assertEquals("resolving expression 'a${prop33}b': variable ${prop33} is not defined in the context.", e.getMessage());
+    }
+  }
+
+  @Test
+  public void testLoop() throws MalformedURLException {
+    Properties props = new Properties();
+    props.setProperty("prop1", "a${prop2}b");
+    props.setProperty("prop2", "a${prop3}b");
+    props.setProperty("prop3", "a${prop4}b");
+    props.setProperty("prop4", "a${prop5}b");
+    props.setProperty("prop5", "a${prop4}b");
+    try {
+      PropertiesUtility.resolveVariables(props);
+      Assert.fail();
+    }
+    catch (IllegalArgumentException e) {
+      assertEquals("resolving expression 'a${prop3}b': loop detected: [prop3, prop4, prop5]", e.getMessage());
+    }
+  }
+
+  @Test
+  public void testSystemResolveProperty() throws Exception {
+    final String attrOtherSystemPropertyKey = "attrOtherSystemPropertyKey";
+    try {
+      System.setProperty(ATTR_STRING_KEY, "property ${" + attrOtherSystemPropertyKey + "}");
+      System.setProperty(attrOtherSystemPropertyKey, "resolved");
+
+      Properties props = load(SAMPLE_CONFIG_PROPS);
+      PropertiesUtility.resolveVariables(props);
+      assertEquals("property resolved", props.getProperty(ATTR_STRING_KEY));
+
+      System.setProperty(ATTR_STRING_KEY, "property ${" + ATTR_LONG_KEY + "}");
+      System.setProperty(attrOtherSystemPropertyKey, "property " + 777);
+    }
+    finally {
+      System.clearProperty(ATTR_STRING_KEY);
+      System.clearProperty(attrOtherSystemPropertyKey);
+    }
+  }
+}
