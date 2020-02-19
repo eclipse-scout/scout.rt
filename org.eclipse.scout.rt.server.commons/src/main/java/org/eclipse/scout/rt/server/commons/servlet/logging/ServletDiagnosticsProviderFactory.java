@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDia
 @ApplicationScoped
 public class ServletDiagnosticsProviderFactory {
 
-  public List<? extends IDiagnosticContextValueProvider> getProviders(HttpServletRequest request, HttpServletResponse response) {
+  public List<IDiagnosticContextValueProvider> getProviders(HttpServletRequest request, HttpServletResponse response) {
     List<IDiagnosticContextValueProvider> providers = new ArrayList<>();
     providers.add(new HttpRequestMethodContextValueProvider(request.getMethod()));
     providers.add(new HttpRequestQueryStringContextValueProvider(request.getQueryString()));
