@@ -62,11 +62,7 @@ public class IdExternalFormatterTest {
     assertEquals(id1, id2);
   }
 
-  public void testFromExternalFormLenient_InvalidType() {
-    IId<?> id = BEANS.get(IdExternalFormatter.class).fromExternalFormLenient("scout.FixtureUuId:" + TEST_UUID.toString());
-    assertNull(id);
-  }
-
+  @Test
   public void testFromExternalFormLenient_UnknownType() {
     IId<?> id = BEANS.get(IdExternalFormatter.class).fromExternalFormLenient("DoesNotExist:" + TEST_UUID.toString());
     assertNull(id);
