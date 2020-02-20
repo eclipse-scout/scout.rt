@@ -47,6 +47,10 @@ public class DataObjectSerializers extends Serializers.Base {
     return this;
   }
 
+  public ScoutDataObjectModuleContext getModuleContext() {
+    return m_moduleContext;
+  }
+
   @Override
   public JsonSerializer<?> findReferenceSerializer(SerializationConfig config, ReferenceType refType, BeanDescription beanDesc, TypeSerializer contentTypeSerializer, JsonSerializer<Object> contentValueSerializer) {
     if (DoValue.class.isAssignableFrom(refType.getRawClass())) {
@@ -56,7 +60,7 @@ public class DataObjectSerializers extends Serializers.Base {
     return super.findReferenceSerializer(config, refType, beanDesc, contentTypeSerializer, contentValueSerializer);
   }
 
-  // TODO [9.1] pbz: Pass m_moduleContext to all Do* serializer 
+  // TODO [9.1] pbz: Pass m_moduleContext to all Do* serializer
   @Override
   public JsonSerializer<?> findSerializer(SerializationConfig config, JavaType type, BeanDescription beanDesc) {
     Class<?> rawClass = type.getRawClass();

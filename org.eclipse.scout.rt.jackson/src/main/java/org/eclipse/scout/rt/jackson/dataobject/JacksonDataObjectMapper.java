@@ -139,8 +139,17 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
    */
   protected ObjectMapper createObjectMapperInstance(boolean ignoreTypeAttribute) {
     ObjectMapper om = new ObjectMapper();
-    om.registerModule(BEANS.get(ScoutDataObjectModule.class).withIgnoreTypeAttribute(ignoreTypeAttribute));
+    ScoutDataObjectModule scoutDataObjectModule = BEANS.get(ScoutDataObjectModule.class).withIgnoreTypeAttribute(ignoreTypeAttribute);
+    prepareScoutDataModuleContext(scoutDataObjectModule.getModuleContext());
+    om.registerModule(scoutDataObjectModule);
     om.setDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN)); // FIXME [9.0] pbz: [JSON] check if it can be moved to ScoutDataObjectModule class
     return om;
+  }
+
+  /**
+   * Override this method to add custom properties to {@code moduleContext}.
+   */
+  protected void prepareScoutDataModuleContext(ScoutDataObjectModuleContext moduleContext) {
+    moduleContext.withDataObjectMapperClass(getClass());
   }
 }
