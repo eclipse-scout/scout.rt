@@ -47,6 +47,10 @@ public class DataObjectSerializers extends Serializers.Base {
     return this;
   }
 
+  public ScoutDataObjectModuleContext getModuleContext() {
+    return m_moduleContext;
+  }
+
   @Override
   public JsonSerializer<?> findReferenceSerializer(SerializationConfig config, ReferenceType refType, BeanDescription beanDesc, TypeSerializer contentTypeSerializer, JsonSerializer<Object> contentValueSerializer) {
     if (DoValue.class.isAssignableFrom(refType.getRawClass())) {

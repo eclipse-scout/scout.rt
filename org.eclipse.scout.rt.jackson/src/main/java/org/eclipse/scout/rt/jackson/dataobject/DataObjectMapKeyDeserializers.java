@@ -40,6 +40,10 @@ public class DataObjectMapKeyDeserializers implements KeyDeserializers {
     return this;
   }
 
+  public ScoutDataObjectModuleContext getModuleContext() {
+    return m_moduleContext;
+  }
+
   @Override
   public KeyDeserializer findKeyDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
     Class<?> rawClass = type.getRawClass();

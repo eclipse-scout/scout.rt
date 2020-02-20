@@ -47,6 +47,10 @@ public class DataObjectDeserializers extends Deserializers.Base {
     return this;
   }
 
+  public ScoutDataObjectModuleContext getModuleContext() {
+    return m_moduleContext;
+  }
+
   @Override
   public JsonDeserializer<?> findReferenceDeserializer(ReferenceType refType, DeserializationConfig config, BeanDescription beanDesc, TypeDeserializer contentTypeDeserializer, JsonDeserializer<?> contentDeserializer)
       throws JsonMappingException {

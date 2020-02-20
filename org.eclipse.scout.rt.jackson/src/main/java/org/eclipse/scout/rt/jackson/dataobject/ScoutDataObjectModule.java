@@ -44,13 +44,17 @@ public class ScoutDataObjectModule extends Module {
    */
   protected static final String DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME = "_typeVersion";
 
-  protected ScoutDataObjectModuleContext m_moduleContext;
+  private ScoutDataObjectModuleContext m_moduleContext;
 
   @PostConstruct
   protected void init() {
     m_moduleContext = BEANS.get(ScoutDataObjectModuleContext.class)
         .withTypeAttributeName(DEFAULT_TYPE_ATTRIBUTE_NAME)
         .withTypeVersionAttributeName(DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME);
+  }
+
+  public ScoutDataObjectModuleContext getModuleContext() {
+    return m_moduleContext;
   }
 
   /**
@@ -104,7 +108,12 @@ public class ScoutDataObjectModule extends Module {
 
   /**
    * Override this method to add custom properties to {@code moduleContext}.
+   * <p>
+   * TODO [11.0] pbz remove this method > consider move {@link #init()} to {@link JacksonDataObjectMapper}
+   *
+   * @deprecated use JacksonDataObjectMapper#prepareScoutDataModuleContext(ScoutDataObjectModuleContext) instead
    */
+  @Deprecated
   protected void prepareScoutDataModuleContext(ScoutDataObjectModuleContext moduleContext) {
     // NOP
   }

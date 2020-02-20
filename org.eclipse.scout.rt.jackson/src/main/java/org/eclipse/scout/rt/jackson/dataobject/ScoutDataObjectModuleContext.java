@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 
@@ -23,6 +24,8 @@ import org.eclipse.scout.rt.platform.util.BooleanUtility;
  */
 @Bean
 public class ScoutDataObjectModuleContext {
+
+  protected static final String DATA_OBJECT_MAPPER_CLASS_KEY = "dataObjectMapperClassKey";
 
   protected static final String TYPE_ATTRIBUTE_NAME_KEY = "typeAttributeNameKey";
 
@@ -47,6 +50,21 @@ public class ScoutDataObjectModuleContext {
   /* **************************************************************************
    * NAMED PROPERTIES
    * *************************************************************************/
+
+  public boolean belongsTo(Class<? extends IDataObjectMapper> dataObjectMapperClass) {
+    Class<? extends IDataObjectMapper> actualDataObjectMapperClass = getDataObjectMapperClass();
+    return actualDataObjectMapperClass == null ? false : dataObjectMapperClass.isAssignableFrom(actualDataObjectMapperClass);
+  }
+
+  @SuppressWarnings("unchecked")
+  public Class<? extends IDataObjectMapper> getDataObjectMapperClass() {
+    return (Class<? extends IDataObjectMapper>) get(DATA_OBJECT_MAPPER_CLASS_KEY, Class.class);
+  }
+
+  public ScoutDataObjectModuleContext withDataObjectMapperClass(Class<? extends IDataObjectMapper> dataObjectMapperClass) {
+    put(DATA_OBJECT_MAPPER_CLASS_KEY, dataObjectMapperClass);
+    return this;
+  }
 
   public String getTypeAttributeName() {
     return get(TYPE_ATTRIBUTE_NAME_KEY, String.class);

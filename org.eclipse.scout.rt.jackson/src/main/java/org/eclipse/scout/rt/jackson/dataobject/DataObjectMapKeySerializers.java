@@ -43,6 +43,10 @@ public class DataObjectMapKeySerializers extends Serializers.Base {
     return this;
   }
 
+  public ScoutDataObjectModuleContext getModuleContext() {
+    return m_moduleContext;
+  }
+
   @Override
   public JsonSerializer<?> findSerializer(SerializationConfig config, JavaType type, BeanDescription beanDesc) {
     Class<?> rawClass = type.getRawClass();
