@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 
@@ -53,7 +53,7 @@ public class ScoutDataObjectModuleContext {
 
   public boolean belongsTo(Class<? extends IDataObjectMapper> dataObjectMapperClass) {
     Class<? extends IDataObjectMapper> actualDataObjectMapperClass = getDataObjectMapperClass();
-    return actualDataObjectMapperClass == null ? false : dataObjectMapperClass.isAssignableFrom(actualDataObjectMapperClass);
+    return actualDataObjectMapperClass != null && dataObjectMapperClass.isAssignableFrom(actualDataObjectMapperClass);
   }
 
   @SuppressWarnings("unchecked")
