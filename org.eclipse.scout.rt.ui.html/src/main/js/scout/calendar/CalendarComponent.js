@@ -249,7 +249,6 @@ scout.CalendarComponent.prototype._format = function(date, pattern) {
 
 scout.CalendarComponent.prototype._description = function() {
   var descParts = [],
-    rows = [],
     range = null,
     text = '',
     fromDate = scout.dates.parseJsonDate(this.fromDate),
@@ -266,33 +265,24 @@ scout.CalendarComponent.prototype._description = function() {
   // time-range
   if (this.fullDay) {
     // NOP
+  } else if (scout.dates.isSameDay(fromDate, toDate)) {
+    range = this.session.text('ui.FromXToY', this._format(fromDate, 'HH:mm'), this._format(toDate, 'HH:mm'));
   } else {
+    range = this.session.text('ui.FromXToY', this._format(fromDate, 'EEEE HH:mm '), this._format(toDate, 'EEEE HH:mm'));
+  }
 
-    var table = "<table class='calendar-component-table'>";
-
-    rows.push({
-      text: this.session.text('ui.Start'),
-      day: this._format(fromDate, 'dd.MM.yyyy'),
-      time: this._format(fromDate, 'HH:mm')
+  if (scout.strings.hasText(range)) {
+    descParts.push({
+      text: range,
+      cssClass: 'calendar-component-intro'
     });
-    rows.push({
-      text: this.session.text('ui.End'),
-      day: this._format(toDate, 'dd.MM.yyyy'),
-      time: this._format(toDate, 'HH:mm')
+  }
+
+  // description
+  if (scout.strings.hasText(this.item.description)) {
+    descParts.push({
+      text: scout.strings.nl2br(this.item.description)
     });
-
-    rows.forEach(function(part) {
-      table += "<tr ><td class='calendar-component-bold'>" + part.text + ":</td><td>" + part.day + "</td><td>" + part.time + "</td></tr>";
-    });
-
-    table += "</table>";
-
-    if (scout.strings.hasText(table)) {
-      descParts.push({
-        text: table,
-        cssClass: 'calendar-component-intro'
-      });
-    }
   }
 
   // build text
