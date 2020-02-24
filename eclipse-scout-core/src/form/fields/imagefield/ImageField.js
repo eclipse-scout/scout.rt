@@ -140,22 +140,35 @@ export default class ImageField extends FormField {
     this.setProperty('uploadEnabled', uploadEnabled);
   }
 
+  _renderEnabled() {
+    super._renderEnabled();
+    this._updateUploadEnabled();
+  }
+
   _renderUploadEnabled() {
-    var enabled = this.uploadEnabled;
+    this._updateUploadEnabled();
+  }
+
+  _updateUploadEnabled() {
+    var enabled = this.enabledComputed && this.uploadEnabled;
     this.$fieldContainer.toggleClass('clickable', enabled);
     if (enabled) {
-      this._clickHandler = this._onClickUpload.bind(this);
-      this.$fieldContainer.on('click', this._clickHandler);
-      this.fileInput = scout.create('FileInput', {
-        parent: this,
-        acceptTypes: this.acceptTypes,
-        text: this.displayText,
-        enabled: this.enabledComputed,
-        maximumUploadSize: this.maximumUploadSize,
-        visible: !Device.get().supportsFile()
-      });
-      this.fileInput.render(this.$fieldContainer);
-      this.fileInput.on('change', this._onFileChange.bind(this));
+      if (!this._clickHandler) {
+        this._clickHandler = this._onClickUpload.bind(this);
+        this.$fieldContainer.on('click', this._clickHandler);
+      }
+      if (!this.fileInput) {
+        this.fileInput = scout.create('FileInput', {
+          parent: this,
+          acceptTypes: this.acceptTypes,
+          text: this.displayText,
+          enabled: this.enabledComputed,
+          maximumUploadSize: this.maximumUploadSize,
+          visible: !Device.get().supportsFile()
+        });
+        this.fileInput.render(this.$fieldContainer);
+        this.fileInput.on('change', this._onFileChange.bind(this));
+      }
     } else {
       this.$fieldContainer.off('click', this._clickHandler);
       this._clickHandler = null;
