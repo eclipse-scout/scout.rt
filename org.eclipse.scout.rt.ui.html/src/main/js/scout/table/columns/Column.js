@@ -671,6 +671,7 @@ scout.Column.prototype.createTableHeaderMenu = function(tableHeader) {
 scout.Column.prototype.createEditor = function(row) {
   var field = this._createEditor(row);
   var cell = this.cell(row);
+  this._initEditorField(field, cell);
   field.setLabelVisible(false);
   field.setValue(cell.value);
   field.setFieldStyle(scout.FormField.FieldStyle.CLASSIC);
@@ -678,6 +679,14 @@ scout.Column.prototype.createEditor = function(row) {
   hints.horizontalAlignment = cell.horizontalAlignment;
   field.setGridDataHints(hints);
   return field;
+};
+
+/**
+ * Depending on the type of column the editor may need to be initialized differently.
+ * The default implementation calls setValue on the field.
+ */
+scout.Column.prototype._initEditorField = function(field, cell) {
+  field.setValue(cell.value);
 };
 
 scout.Column.prototype._createEditor = function() {

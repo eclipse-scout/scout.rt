@@ -85,6 +85,18 @@ scout.SmartColumn.prototype._formatValue = function(value) {
   return this.lookupCall.textByKey(value);
 };
 
+/**
+ * Create and set the lookup-row instead of call setValue() as this would execute a lookup by key
+ * which is not necessary, since the cell already contains text and value. This also avoids a problem
+ * with multiple lookups running at once, see ticket 236960.
+ */
+scout.SmartColumn.prototype._initEditorField = function(field, cell) {
+  var lookupRow = new scout.LookupRow();
+  lookupRow.key = cell.value;
+  lookupRow.text = cell.text;
+  field.setLookupRow(lookupRow);
+};
+
 scout.SmartColumn.prototype._createEditor = function() {
   var field = scout.create('SmartField', {
     parent: this.table,
