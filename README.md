@@ -10,26 +10,26 @@ This Repository **Eclipse Scout RT** contains the source for the runtime compone
 Downloads
 ---------
 
-The content of this repository is build on the Eclipse infrastructure and the different versions are available on several [P2 Update Sites] [2].
+The content of this repository is built on the Eclipse infrastructure and published to various repositories (e.g. [Maven Central] [2] for the Java code and [npmjs] [3] for the JavaScript code). 
 
-The easiest way to start with Eclipse Scout is to download _Eclipse for Scout Developers Eclipse for Scout Developers_ on the [Eclipse downloads page] [3].
+The easiest way to start with Eclipse Scout is to download _Eclipse for Scout Developers_ on the [Eclipse downloads page] [4].
 
 
 Documentation & Links
 ---------------------
 
-* [Eclipse Scout Documentation] [4]
-* [Eclipse Scout Forum] [5]
-* [Eclipse Bugzilla] [6] (Product=Scout; Component=Scout)
+* [Eclipse Scout Documentation] [5]
+* [Eclipse Scout Forum] [6]
+* [Eclipse Bugzilla] [7] (Product=Scout; Component=Scout)
 
 
 Contribution Guidelines
 -----------------------
 
 We welcome any kind of contributions (Bug report, documentation, code contribution...).
-Please read the [Eclipse Scout Contribution page] [7] to know more about it.
+Please read the [Eclipse Scout Contribution page] [8] to learn more about it.
 
-The contribution process of Eclipse Scout is hosted on tools deployed by the Eclipse Foundation (involing [Bugzilla] [6], Gerrit, Hudson, MediaWiki...).
+The contribution process of Eclipse Scout is hosted on tools deployed by the Eclipse Foundation (involing [Bugzilla] [7], Gerrit, Hudson, MediaWiki...).
 
 External tools like the GitHub tracker and pull requests are not supported.
 
@@ -37,21 +37,22 @@ External tools like the GitHub tracker and pull requests are not supported.
 Get in Touch
 ------------
 
-To get in touch with the Eclipse Scout community, please open a thread in the [Eclipse Scout Forum] [5] or send a mail to [our mailing list] [8]: scout-dev@eclipse.org
+To get in touch with the Eclipse Scout community, please open a thread in the [Eclipse Scout Forum] [6] or send a mail to [our mailing list] [9]: scout-dev@eclipse.org
 
 
 License
 -------
 
-[Eclipse Public License (EPL) v1.0] [9]
+[Eclipse Public License (EPL) v1.0] [10]
 
 
 [1]: https://www.eclipse.org/scout/
-[2]: https://wiki.eclipse.org/Scout/Updatesites
-[3]: https://www.eclipse.org/downloads/packages/
-[4]: https://eclipsescout.github.io/
-[5]: https://www.eclipse.org/forums/index.php?t=thread&frm_id=174
-[6]: https://bugs.eclipse.org/bugs/
-[7]: https://wiki.eclipse.org/Scout/Contribution
-[8]: https://accounts.eclipse.org/mailing-list/scout-dev
-[9]: https://wiki.eclipse.org/Eclipse_Public_License
+[2]: https://search.maven.org/search?q=g:org.eclipse.scout.rt
+[3]: https://www.npmjs.com/search?q=%40eclipse-scout
+[4]: https://www.eclipse.org/downloads/packages/
+[5]: https://eclipsescout.github.io/
+[6]: https://www.eclipse.org/forums/index.php?t=thread&frm_id=174
+[7]: https://bugs.eclipse.org/bugs/
+[8]: https://wiki.eclipse.org/Scout/Contribution
+[9]: https://accounts.eclipse.org/mailing-list/scout-dev
+[10]: https://wiki.eclipse.org/Eclipse_Public_License
