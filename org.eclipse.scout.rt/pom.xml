@@ -686,7 +686,7 @@
       </snapshots>
       <id>bintray-bsi-business-systems-integration-ag-scout-eclipse-org</id>
       <name>bintray</name>
-      <url>http://dl.bintray.com/bsi-business-systems-integration-ag/scout-eclipse-org</url>
+      <url>https://dl.bintray.com/bsi-business-systems-integration-ag/scout-eclipse-org</url>
     </repository>
   </repositories>
 
@@ -712,7 +712,7 @@
       </snapshots>
       <id>bintray-bsi-business-systems-integration-ag-scout-eclipse-org</id>
       <name>bintray-plugins</name>
-      <url>http://dl.bintray.com/bsi-business-systems-integration-ag/scout-eclipse-org</url>
+      <url>https://dl.bintray.com/bsi-business-systems-integration-ag/scout-eclipse-org</url>
     </pluginRepository>
   </pluginRepositories>
 
