@@ -134,6 +134,7 @@ scout.Form.prototype._remove = function() {
   this.fileChooserController.remove();
   if (this._glassPaneRenderer) {
     this._glassPaneRenderer.removeGlassPanes();
+    this._glassPaneRenderer = null;
   }
 
   this._uninstallFocusContext();
