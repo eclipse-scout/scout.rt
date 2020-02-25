@@ -48,12 +48,12 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
   String PROP_HEADER_VISIBLE = "headerVisible";
 
   /**
-   * {@link #DAY}, {@link #WEEK}, {@link #MONTH}, {@link #WORK_WEEK}
+   * Values from {@link IPlannerDisplayMode}.
    */
   String PROP_DISPLAY_MODE = "displayMode";
 
   /**
-   * type {@link IDisplayModeOption}
+   * {@link DisplayModeOptions}
    */
   String PROP_DISPLAY_MODE_OPTIONS = "displayModeOptions";
 
@@ -120,12 +120,12 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
   void setViewRange(Range<Date> dateRange);
 
   /**
-   * {@link #DAY}, {@link #WEEK}, {@link #MONTH}, {@link #WORK_WEEK}
+   * @return value from {@link IPlannerDisplayMode}
    */
   int getDisplayMode();
 
   /**
-   * {@link #DAY}, {@link #WEEK}, {@link #MONTH}, {@link #WORK_WEEK}
+   * @param mode value from {@link IPlannerDisplayMode}
    */
   void setDisplayMode(int mode);
 
@@ -215,14 +215,8 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
   @Deprecated
   Object getContainer();
 
-  /**
-   * @param menus
-   */
   void setMenus(List<? extends IMenu> menus);
 
-  /**
-   * @param menu
-   */
   void addMenu(IMenu menu);
 
   @Override

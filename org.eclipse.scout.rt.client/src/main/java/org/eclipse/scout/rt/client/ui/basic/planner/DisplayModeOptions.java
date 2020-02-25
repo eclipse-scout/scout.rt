@@ -25,8 +25,8 @@ public class DisplayModeOptions {
 
   /**
    * @return the interval of the small time line. <br>
-   *         For {@link DAY}, {@link WEEK}, {@link WORK_WEEK} the value is expected to be minutes. <br>
-   *         For {@link MONTH}, {@link YEAR} and {@link CALENDAR_WEEK} the parameter has no effect.
+   *         For {@link IPlannerDisplayMode#DAY}, {@link IPlannerDisplayMode#WEEK}, {@link IPlannerDisplayMode#WORK_WEEK} the value is expected to be minutes.<br>
+   *         For {@link IPlannerDisplayMode#MONTH}, {@link IPlannerDisplayMode#YEAR} and {@link IPlannerDisplayMode#CALENDAR_WEEK} the parameter has no effect.
    */
   public long getInterval() {
     return m_interval;
@@ -60,7 +60,8 @@ public class DisplayModeOptions {
 
   /**
    * @return the minimum number of small time line intervals the selection range may have<br>
-   *         For display mode {@link MONTH}, {@link YEAR} and {@link CALENDAR_WEEK} the parameter has no effect.
+   *         For display mode {@link IPlannerDisplayMode#MONTH}, {@link IPlannerDisplayMode#YEAR} and
+   *         {@link IPlannerDisplayMode#CALENDAR_WEEK} the parameter has no effect.
    */
   public int getMinSelectionIntervalCount() {
     return m_minSelectionIntervalCount;

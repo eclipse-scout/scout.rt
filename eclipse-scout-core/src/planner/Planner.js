@@ -41,28 +41,29 @@ export default class Planner extends Widget {
     this.activityMap = [];
     this.activitySelectable = false;
     this.availableDisplayModes = [];
-    this.displayMode;
+    this.displayMode = null;
     this.displayModeOptions = {};
     this.headerVisible = true;
-    this.label;
+    this.label = null;
     this.resources = [];
     this.resourceMap = [];
     this.selectionMode = Planner.SelectionMode.MULTI_RANGE;
     this.selectionRange = new DateRange();
     this.selectedResources = [];
     this.viewRange = {};
+    this.selectedActivity = null;
 
     // visual
     this._resourceTitleWidth = 20;
     this._rangeSelectionStarted = false;
-    this.startRow;
-    this.lastRow;
+    this.startRow = null;
+    this.lastRow = null;
 
     // main elements
-    this.$container;
-    this.$range;
-    this.$modes;
-    this.$grid;
+    this.$container = null;
+    this.$range = null;
+    this.$modes = null;
+    this.$grid = null;
 
     // scale calculator
     this.transformLeft = function(t) {
@@ -536,7 +537,6 @@ export default class Planner extends Widget {
     var newLargeGroup, $divLarge, $divSmall,
       first = true;
     var loop = new Date(this.viewRange.from.valueOf());
-
     var options = this.displayModeOptions[this.displayMode];
     var interval = options.interval;
     var labelPeriod = options.labelPeriod;
@@ -715,7 +715,6 @@ export default class Planner extends Widget {
     var newLargeGroup, $divLarge, $divSmall,
       first = true;
     var loop = new Date(this.viewRange.from.valueOf());
-
     var options = this.displayModeOptions[this.displayMode];
     var labelPeriod = options.labelPeriod;
 
@@ -742,9 +741,11 @@ export default class Planner extends Widget {
     }
   }
 
+  /**
+   * @param {Date} newDate
+   */
   _incrementTimelineScaleItems($largeComp, $smallComp, newDate, newLargeGroup) {
     $largeComp.data('count', $largeComp.data('count') + 1);
-
     $smallComp.data('date-to', new Date(newDate.valueOf()))
       .data('first', newLargeGroup);
   }
@@ -808,7 +809,7 @@ export default class Planner extends Widget {
   _rerenderActivities(resources) {
     resources = resources || this.resources;
     resources.forEach(function(resource) {
-      this._removeActivititesForResource(resource);
+      this._removeActivitiesForResource(resource);
       this._renderActivititesForResource(resource);
     }, this);
   }
@@ -847,7 +848,7 @@ export default class Planner extends Widget {
     return activitiesHtml;
   }
 
-  _removeActivititesForResource(resource) {
+  _removeActivitiesForResource(resource) {
     resource.activities.forEach(function(activity) {
       if (activity.$activity) {
         activity.$activity.remove();
@@ -977,11 +978,8 @@ export default class Planner extends Widget {
     }
     var mousedownRow = this._findRow(mousedownEvent.pageY);
     var mousemoveRow = this._findRow(mousemoveEvent.pageY);
-    if (Math.abs(moveY) >= moveThreshold && this.selectionMode === Planner.SelectionMode.MULTI_RANGE && mousedownRow !== mousemoveRow) {
-      // Accept if y movement is big enough AND the row changed. No need to switch into range selection mode if cursor is still on the same row
-      return true;
-    }
-    return false;
+    // Accept if y movement is big enough AND the row changed. No need to switch into range selection mode if cursor is still on the same row
+    return Math.abs(moveY) >= moveThreshold && this.selectionMode === Planner.SelectionMode.MULTI_RANGE && mousedownRow !== mousemoveRow;
   }
 
   _onCellMousemove(mousedownEvent, event) {
@@ -1214,6 +1212,9 @@ export default class Planner extends Widget {
 
   /* -- helper ---------------------------------------------------- */
 
+  /**
+   * @param {Date} date
+   */
   _dateFormat(date, pattern) {
     var d = new Date(date.valueOf()),
       dateFormat = new DateFormat(this.session.locale, pattern);
@@ -1338,6 +1339,7 @@ export default class Planner extends Widget {
   _renderDisplayModeOptions() {
     this._renderRange();
     this._renderScale();
+    this._rerenderActivities(); // required in case first/lastHourOfDay changes
     this._select(); // adjust selection if minSelectionIntervalCount has changed
     this.invalidateLayoutTree();
   }
