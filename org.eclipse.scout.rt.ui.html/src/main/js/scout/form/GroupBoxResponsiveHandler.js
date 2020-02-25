@@ -253,8 +253,6 @@ scout.GroupBoxResponsiveHandler.prototype._transformStatusPosition = function(fi
  * Status visibility
  */
 scout.GroupBoxResponsiveHandler.prototype._transformStatusVisibility = function(field, apply) {
-  var ResponsiveState = scout.ResponsiveManager.ResponsiveState;
-
   if (apply) {
     this._storeFieldProperty(field, 'statusVisible', field.statusVisible);
     field.setStatusVisible(false);
@@ -269,8 +267,11 @@ scout.GroupBoxResponsiveHandler.prototype._transformStatusVisibility = function(
  * Vertical alignment
  */
 scout.GroupBoxResponsiveHandler.prototype._transformVerticalAlignment = function(field, apply) {
-  if (!(field instanceof scout.Button && field.displayStyle === scout.Button.DisplayStyle.DEFAULT ||
-      field instanceof scout.CheckBoxField) ||
+  var isDefaultButton = field instanceof scout.Button && field.displayStyle === scout.Button.DisplayStyle.DEFAULT;
+  var isCheckbox = field instanceof scout.CheckBoxField;
+  var isSingleHeightOnFieldLabelField = field.labelPosition === scout.FormField.LabelPosition.ON_FIELD && field.gridData && field.gridData.h === 1;
+
+  if (!(isDefaultButton || isCheckbox || isSingleHeightOnFieldLabelField) ||
     !field.gridData) {
     return;
   }
