@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -2339,7 +2339,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       IGroupBox selbox = tabBox.getSelectedTab();
       if (selbox == null || !selbox.isSaveNeeded()) {
         for (IGroupBox g : tabBox.getGroupBoxes()) {
-          if (g.isSaveNeeded()) {
+          if (g.isSaveNeeded() && g.isVisible()) {
             tabBox.setSelectedTab(g);
             break;
           }
