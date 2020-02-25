@@ -1307,6 +1307,7 @@ scout.Planner.prototype._adjustHours = function(optionsMap) {
 scout.Planner.prototype._renderDisplayModeOptions = function() {
   this._renderRange();
   this._renderScale();
+  this._rerenderActivities(); // required in case first/lastHourOfDay changes
   this._select(); // adjust selection if minSelectionIntervalCount has changed
   this.invalidateLayoutTree();
 };
