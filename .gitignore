@@ -35,5 +35,5 @@ target/
 .flattened-pom.xml
 
 # node
-/node
 node_modules
+pnpm-lock.yaml

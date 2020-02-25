@@ -1,0 +1,9 @@
+packages:
+  - 'eclipse-scout-cli'
+  - 'eclipse-scout-releng'
+  - 'eclipse-scout-core'
+  - 'eclipse-scout-testing'
+  - 'eslint-config'
+  - 'karma-jasmine-scout'
+  - 'org.eclipse.scout.rt.svg.ui.html'
+  
