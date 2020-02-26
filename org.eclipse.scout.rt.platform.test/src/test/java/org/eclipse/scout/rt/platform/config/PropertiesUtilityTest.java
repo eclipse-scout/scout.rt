@@ -81,7 +81,7 @@ public class PropertiesUtilityTest {
       Assert.fail();
     }
     catch (IllegalArgumentException e) {
-      assertTrue(StringUtility.containsString(e.getMessage(), "loop detected"));
+      assertEquals("resolving expression 'a${prop33}b': variable ${prop33} is not defined in the context.", e.getMessage());
     }
   }
 
@@ -98,7 +98,7 @@ public class PropertiesUtilityTest {
       Assert.fail();
     }
     catch (IllegalArgumentException e) {
-      assertEquals("resolving expression 'a${prop3}b': loop detected: [prop3, prop4, prop5]", e.getMessage());
+      assertTrue(StringUtility.containsString(e.getMessage(), "loop detected"));
     }
   }
 
