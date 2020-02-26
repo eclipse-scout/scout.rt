@@ -159,6 +159,18 @@ public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends Abstract
         return getModel().isVirtual();
       }
     });
+    putJsonProperty(new JsonProperty<T>(ITileGrid.PROP_ANIMATE_TILE_REMOVAL, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isAnimateTileRemoval();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(ITileGrid.PROP_ANIMATE_TILE_INSERTION, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isAnimateTileInsertion();
+      }
+    });
   }
 
   @Override

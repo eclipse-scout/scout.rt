@@ -102,6 +102,8 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     setScrollable(getConfiguredScrollable());
     setWithPlaceholders(getConfiguredWithPlaceholders());
     setVirtual(getConfiguredVirtual());
+    setAnimateTileRemoval(getConfiguredAnimateTileRemoval());
+    setAnimateTileInsertion(getConfiguredAnimateTileInsertion());
 
     OrderedCollection<T> tiles = new OrderedCollection<>();
     injectTilesInternal(tiles);
@@ -270,6 +272,28 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   @Order(37)
   protected boolean getConfiguredVirtual() {
     return false;
+  }
+
+  /**
+   * Enable animation for tiles removed from the tile grid.
+   * <p>
+   * Default: {@code true}
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(80)
+  protected boolean getConfiguredAnimateTileRemoval() {
+    return true;
+  }
+
+  /**
+   * Enable animation for tiles inserted into the tile grid.
+   * <p>
+   * Default: {@code true}
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(90)
+  protected boolean getConfiguredAnimateTileInsertion() {
+    return true;
   }
 
   @Override
@@ -498,6 +522,26 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   @Override
   public void setVirtual(boolean virtual) {
     propertySupport.setPropertyBool(PROP_VIRTUAL, virtual);
+  }
+
+  @Override
+  public boolean isAnimateTileRemoval() {
+    return propertySupport.getPropertyBool(PROP_ANIMATE_TILE_REMOVAL);
+  }
+
+  @Override
+  public void setAnimateTileRemoval(boolean animateTileRemoval) {
+    propertySupport.setPropertyBool(PROP_ANIMATE_TILE_REMOVAL, animateTileRemoval);
+  }
+
+  @Override
+  public boolean isAnimateTileInsertion() {
+    return propertySupport.getPropertyBool(PROP_ANIMATE_TILE_INSERTION);
+  }
+
+  @Override
+  public void setAnimateTileInsertion(boolean animateTileInsertion) {
+    propertySupport.setPropertyBool(PROP_ANIMATE_TILE_INSERTION, animateTileInsertion);
   }
 
   /**
