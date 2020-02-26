@@ -11,10 +11,11 @@
 package org.eclipse.scout.rt.platform.config;
 
 import static org.junit.Assert.*;
-import java.net.MalformedURLException;
+
 import java.util.Collections;
 import java.util.Properties;
 
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,7 +24,6 @@ import org.junit.Test;
  */
 public class PropertiesUtilityTest {
   private static final String SAMPLE_CONFIG_PROPS = "org/eclipse/scout/rt/platform/config/sample-config.properties";
-  private static final String DOTPROPERTY_PROPS = "org/eclipse/scout/rt/platform/config/dotproperty-test.properties";
 
   private static final String USER_HOME_KEY = "user.home";
   private static final String USER_HOME_VALUE = System.getProperty("user.home");
@@ -58,7 +58,7 @@ public class PropertiesUtilityTest {
   }
 
   @Test
-  public void testLoopOnSelf() throws MalformedURLException {
+  public void testLoopOnSelf() {
     Properties props = new Properties();
     props.setProperty("prop1", "a${prop1}b");
     try {
@@ -71,7 +71,7 @@ public class PropertiesUtilityTest {
   }
 
   @Test
-  public void testUndefinedPlaceholder() throws MalformedURLException {
+  public void testUndefinedPlaceholder() {
     Properties props = new Properties();
     props.setProperty("prop1", "a${prop1}b");
     props.setProperty("prop1", "a${prop2}b");
@@ -81,12 +81,12 @@ public class PropertiesUtilityTest {
       Assert.fail();
     }
     catch (IllegalArgumentException e) {
-      assertEquals("resolving expression 'a${prop33}b': variable ${prop33} is not defined in the context.", e.getMessage());
+      assertTrue(StringUtility.containsString(e.getMessage(), "loop detected"));
     }
   }
 
   @Test
-  public void testLoop() throws MalformedURLException {
+  public void testLoop() {
     Properties props = new Properties();
     props.setProperty("prop1", "a${prop2}b");
     props.setProperty("prop2", "a${prop3}b");
