@@ -22,17 +22,14 @@ export default class DesktopLogo extends Widget {
 
   _init(model) {
     super._init(model);
-    if (this.desktop) {
-      this.clickable = this.desktop.logoActionEnabled;
-    }
+    this.desktop = this.session.desktop;
+    this.clickable = this.desktop.logoActionEnabled;
     this.url = model.url;
   }
 
   _render() {
     this.$container = this.$parent.appendDiv('desktop-logo');
-    if (this.desktop) {
-      this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
-    }
+    this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
   }
 
   _renderProperties() {
@@ -43,7 +40,7 @@ export default class DesktopLogo extends Widget {
 
   _remove() {
     this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
-    scout.DesktopLogo.parent.prototype._remove.call(this);
+    super._remove();
   }
 
   _renderUrl() {
@@ -51,14 +48,11 @@ export default class DesktopLogo extends Widget {
   }
 
   _renderClickable() {
-    if (this.desktop) {
-      this.$container.toggleClass('clickable', this.clickable);
-      if (this.clickable) {
-        this.$container.on('click', this._clickHandler);
-      }
-      else {
-        this.$container.off('click', this._clickHandler);
-      }
+    this.$container.toggleClass('clickable', this.clickable);
+    if (this.clickable) {
+      this.$container.on('click', this._clickHandler);
+    } else {
+      this.$container.off('click', this._clickHandler);
     }
   }
 
@@ -77,8 +71,6 @@ export default class DesktopLogo extends Widget {
   }
 
   _onClick(event) {
-    if (this.desktop) {
-      this.desktop.logoAction();
-    }
+    this.desktop.logoAction();
   }
 }

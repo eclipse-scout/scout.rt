@@ -104,8 +104,7 @@ export default class DesktopHeader extends Widget {
     if (!this.logo) {
       this.logo = scout.create('DesktopLogo', {
         parent: this,
-        url: this.logoUrl,
-        desktop: this.desktop
+        url: this.logoUrl
       });
       this.logo.render();
     } else {
