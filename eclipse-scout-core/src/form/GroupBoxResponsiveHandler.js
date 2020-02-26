@@ -270,8 +270,6 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
    * Status visibility
    */
   _transformStatusVisibility(field, apply) {
-    var ResponsiveState = ResponsiveManager.ResponsiveState;
-
     if (apply) {
       this._storeFieldProperty(field, 'statusVisible', field.statusVisible);
       field.setStatusVisible(false);
@@ -286,8 +284,11 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
    * Vertical alignment
    */
   _transformVerticalAlignment(field, apply) {
-    if (!(field instanceof Button && field.displayStyle === Button.DisplayStyle.DEFAULT ||
-      field instanceof CheckBoxField) ||
+    var isDefaultButton = field instanceof Button && field.displayStyle === Button.DisplayStyle.DEFAULT;
+    var isCheckbox = field instanceof CheckBoxField;
+    var isSingleHeightOnFieldLabelField = field.labelPosition === FormField.LabelPosition.ON_FIELD && field.gridData && field.gridData.h === 1;
+
+    if (!(isDefaultButton || isCheckbox || isSingleHeightOnFieldLabelField) ||
       !field.gridData) {
       return;
     }
