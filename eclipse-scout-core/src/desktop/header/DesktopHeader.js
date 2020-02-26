@@ -101,6 +101,10 @@ export default class DesktopHeader extends Widget {
   }
 
   _renderLogo() {
+    if (this.desktop.displayStyle === Desktop.DisplayStyle.COMPACT) {
+      // Do not render logo in compact mode (wastes space)
+      return;
+    }
     if (!this.logo) {
       this.logo = scout.create('DesktopLogo', {
         parent: this,
