@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.form.fields.DisplayableFormFieldFilter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
@@ -45,7 +46,12 @@ public class JsonTabBox<TAB_BOX extends ITabBox> extends JsonCompositeField<TAB_
 
       @Override
       protected JsonAdapterPropertyConfig createConfig() {
-        return new JsonAdapterPropertyConfigBuilder().disposeOnChange(false).build();
+        return new JsonAdapterPropertyConfigBuilder()
+            .disposeOnChange(false)
+            // ensure adapter is not accidentally created on a property change,
+            // it would never be sent to ui but could receive events by the model which eventually would result in exceptions because the ui cannot find the adapter
+            .filter(new DisplayableFormFieldFilter<>())
+            .build();
       }
     });
   }
