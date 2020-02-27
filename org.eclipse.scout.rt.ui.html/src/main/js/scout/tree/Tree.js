@@ -98,11 +98,17 @@ scout.Tree.CheckableStyle = {
    * Node check is only possible by checking the checkbox.
    */
   CHECKBOX: 'checkbox',
+
   /**
    * Node check is possible by clicking anywhere on the node.
    */
   CHECKBOX_TREE_NODE: 'checkbox_tree_node'
 };
+
+/**
+ * Used to calculate the view range size. See: #calculateViewRangeSize
+ */
+scout.Tree.VIEW_RANGE_DIVISOR = 4;
 
 scout.Tree.prototype._init = function(model) {
   scout.Tree.parent.prototype._init.call(this, model);
@@ -797,7 +803,7 @@ scout.Tree.prototype._widthForNode = function(node) {
  */
 scout.Tree.prototype._calculateViewRangeForNode = function(node) {
   var viewRange = new scout.Range(),
-    quarterRange = Math.floor(this.viewRangeSize / 4),
+    quarterRange = Math.floor(this.viewRangeSize / scout.Tree.VIEW_RANGE_DIVISOR),
     diff;
 
   var nodeIndex = this.visibleNodesFlat.indexOf(node);
@@ -819,6 +825,10 @@ scout.Tree.prototype._calculateViewRangeForNode = function(node) {
  * Calculates the optimal view range size (number of nodes to be rendered).
  * It uses the default node height to estimate how many nodes fit in the view port.
  * The view range size is this value * 2.
+ * <p>
+ * Note: the value calculated by this function is important for calculating the
+ * 'insertBatch'. When the value becomes smaller than 4 (VIEW_RANGE_DIVISOR) this
+ * will cause errors on inserting nodes at the right position. See #262890.
  */
 scout.Tree.prototype.calculateViewRangeSize = function() {
   // Make sure row height is up to date (row height may be different after zooming)
@@ -827,7 +837,10 @@ scout.Tree.prototype.calculateViewRangeSize = function() {
   if (this.nodeHeight === 0) {
     throw new Error('Cannot calculate view range with nodeHeight = 0');
   }
-  return Math.ceil(this.$data.outerHeight() / this.nodeHeight) * 2;
+
+  var viewRangeMultiplier = scout.Tree.VIEW_RANGE_DIVISOR / 2; // See: #_calculateViewRangeForNode()
+  var viewRange = Math.ceil(this.$data.outerHeight() / this.nodeHeight) * viewRangeMultiplier;
+  return Math.max(scout.Tree.VIEW_RANGE_DIVISOR, viewRange);
 };
 
 scout.Tree.prototype.setViewRangeSize = function(viewRangeSize) {
