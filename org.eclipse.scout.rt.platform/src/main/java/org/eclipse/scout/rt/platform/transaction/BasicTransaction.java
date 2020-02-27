@@ -182,7 +182,7 @@ public class BasicTransaction implements ITransaction {
     }
     for (ITransactionMember mem : a) {
       try {
-        LOG.debug("release of transaction member '{}'. " + mem);
+        LOG.debug("release of transaction member '{}'. ", mem);
         mem.release();
       }
       catch (Throwable t) {
