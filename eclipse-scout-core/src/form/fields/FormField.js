@@ -594,6 +594,7 @@ export default class FormField extends Widget {
       this.$field.setEnabled(this.enabledComputed);
     }
     this._updateDisabledCopyOverlay();
+    this._updateDropType();
   }
 
   /**
@@ -1148,7 +1149,11 @@ export default class FormField extends Widget {
   }
 
   _renderDropType() {
-    if (this.dropType) {
+    this._updateDropType();
+  }
+
+  _updateDropType() {
+    if (this.dropType && this.enabledComputed) {
       this._installDragAndDropHandler();
     } else {
       this._uninstallDragAndDropHandler();
