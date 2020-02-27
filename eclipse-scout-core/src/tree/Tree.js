@@ -138,6 +138,11 @@ export default class Tree extends Widget {
     CHECKBOX_TREE_NODE: 'checkbox_tree_node'
   };
 
+  /**
+   * Used to calculate the view range size. See {@link calculateViewRangeSize}.
+   */
+  static VIEW_RANGE_DIVISOR = 4;
+
   _init(model) {
     super._init(model);
     this.addFilter(new LazyNodeFilter(this), true);
@@ -828,7 +833,7 @@ export default class Tree extends Widget {
    */
   _calculateViewRangeForNode(node) {
     var viewRange = new Range(),
-      quarterRange = Math.floor(this.viewRangeSize / 4),
+      quarterRange = Math.floor(this.viewRangeSize / Tree.VIEW_RANGE_DIVISOR),
       diff;
 
     var nodeIndex = this.visibleNodesFlat.indexOf(node);
@@ -850,15 +855,20 @@ export default class Tree extends Widget {
    * Calculates the optimal view range size (number of nodes to be rendered).
    * It uses the default node height to estimate how many nodes fit in the view port.
    * The view range size is this value * 2.
+   * <p>
+   * Note: the value calculated by this function is important for calculating the
+   * 'insertBatch'. When the value becomes smaller than 4 ({@link Tree.VIEW_RANGE_DIVISOR}) this
+   * will cause errors on inserting nodes at the right position. See #262890.
    */
   calculateViewRangeSize() {
     // Make sure row height is up to date (row height may be different after zooming)
     this._updateNodeDimensions();
-
     if (this.nodeHeight === 0) {
       throw new Error('Cannot calculate view range with nodeHeight = 0');
     }
-    return Math.ceil(this.$data.outerHeight() / this.nodeHeight) * 2;
+    var viewRangeMultiplier = Tree.VIEW_RANGE_DIVISOR / 2; // See  _calculateViewRangeForNode
+    var viewRange = Math.ceil(this.$data.outerHeight() / this.nodeHeight) * viewRangeMultiplier;
+    return Math.max(Tree.VIEW_RANGE_DIVISOR, viewRange);
   }
 
   setViewRangeSize(viewRangeSize) {

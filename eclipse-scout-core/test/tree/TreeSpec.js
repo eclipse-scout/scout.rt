@@ -677,6 +677,17 @@ describe('Tree', function() {
         expect(tree.$fillAfter.height()).toBe(0);
       });
 
+      /**
+       * With only a single node, $data.outerHeight() / tree.nodeHeight would result in 1 (because both have equal height)
+       * Without the correction from ticket #262890 the function would return 2 (1 * 2), but it must return min. 4.
+       */
+      it('calculateViewRangeSize should not return values < 4', function() {
+        model = helper.createModelFixture(1, 0, false);
+        tree = helper.createTree(model);
+        tree.render();
+        expect(tree.calculateViewRangeSize()).toBe(4);
+      });
+
     });
 
     describe('deleting a root node', function() {
