@@ -21,7 +21,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +41,7 @@ public class ConfigPropertyProvider implements IPropertyProvider {
    * <li>A {@link String} that contains a valid {@link URL} in external form containing at least one colon (:) to define
    * a schema/protocol.</li>
    * <li>A {@link String} without any protocol or schema that holds an absolute path on the java classpath. Such a
-   * string can also have a <code>classpath:</code> prefix (which is the default if no schema is present).</li>
+   * string can also have a <code>classpath:</code> prefix.</li>
    * <li>The name of a system property ({@link System#getProperty(String)}) holding a value that corresponds to one of
    * the two previous options.</li>
    * </ul>
@@ -62,12 +61,14 @@ public class ConfigPropertyProvider implements IPropertyProvider {
 
   @Override
   public List<Entry<String, String>> readProperties() {
-    Assertions.assertNotNull(getFileUrl(), "The config file URL can not be null!");
-    URL url = getPropertiesFileUrl(getFileUrl());
-    if (url != null) {
-      return parse(url);
+    if (getFileUrl() == null) {
+      return null;
     }
-    return null;
+    URL url = getPropertiesFileUrl(getFileUrl());
+    if (url == null) {
+      return null;
+    }
+    return parse(url);
   }
 
   protected List<Entry<String, String>> parse(URL propertiesFileUrl) {
@@ -152,12 +153,19 @@ public class ConfigPropertyProvider implements IPropertyProvider {
    * the classpath. Besides classpath resources also all installed URL schemes and absolute local file paths are
    * supported.
    * <p>
-   * <b>Example:</b>
+   * <b>Examples for classpath:</b>
    * <ul>
-   * <li>classpath:myfolder/myFile.txt</li>
-   * <li>file:/C:/path/to/my/file.ext</li>
+   * <li>classpath:external-config.properties</li>
+   * <li>classpath:myfolder/config.properties</li>
    * </ul>
-   *
+   * <p>
+   * <b>Examples for absolute path:</b>
+   * <ul>
+   * <li>file:/var/etc/...</li>
+   * <li>file:/C:/path/to/my/file.ext</li>
+   * <li>/var/etc/...</li>
+   * <li>C:\foo\bar\...</li>
+   * </ul>
    * @param filePath
    *          The absolute file path. May be {@code null}.
    * @return An {@link URL} pointing to the file if it can be found. {@code null} otherwise.
@@ -167,19 +175,16 @@ public class ConfigPropertyProvider implements IPropertyProvider {
       return null;
     }
 
-    boolean isClasspathUrl = filePath.indexOf(PROTOCOL_DELIMITER) < 0; // if no protocol specified: Default is class-path
-    if (!isClasspathUrl && filePath.startsWith(CLASSPATH_PREFIX)) {
+    if (filePath.startsWith(CLASSPATH_PREFIX)) {
       filePath = filePath.substring(CLASSPATH_PREFIX.length());
       if (!StringUtility.hasText(filePath)) {
         return null;
       }
-      isClasspathUrl = true;
-    }
-
-    if (isClasspathUrl) {
       return PropertiesHelper.class.getClassLoader().getResource(filePath);
     }
-    return toPropertiesFileUrl(filePath);
+    else{
+      return toPropertiesFileUrl(filePath);
+    }
   }
 
   protected static URL toPropertiesFileUrl(String filePath) {

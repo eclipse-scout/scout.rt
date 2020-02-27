@@ -29,14 +29,14 @@ import org.mockito.Mockito;
  */
 public class PropertiesHelperTest {
 
-  private static final String SAMPLE_CONFIG_PROPS = "org/eclipse/scout/rt/platform/config/sample-config.properties";
-  private static final String HELPER_CONFIG_PROPS = "org/eclipse/scout/rt/platform/config/helper-test.properties";
-  private static final String TEST_CONFIG_PROPS = "org/eclipse/scout/rt/platform/config/test-config.properties";
-  private static final String MAP_CONFIG_PROPS = "org/eclipse/scout/rt/platform/config/map-test.properties";
-  private static final String LOOP_IMPORT_PROPS = "org/eclipse/scout/rt/platform/config/imp1.properties";
-  private static final String PLACEHOLDER_IMPORT_PROPS = "org/eclipse/scout/rt/platform/config/placeholder-imp.properties";
-  private static final String LIST_PROPS = "org/eclipse/scout/rt/platform/config/list-test.properties";
-  private static final String DOTPROPERTY_PROPS = "org/eclipse/scout/rt/platform/config/dotproperty-test.properties";
+  private static final String SAMPLE_CONFIG_PROPS = "classpath:org/eclipse/scout/rt/platform/config/sample-config.properties";
+  private static final String HELPER_CONFIG_PROPS = "classpath:org/eclipse/scout/rt/platform/config/helper-test.properties";
+  private static final String TEST_CONFIG_PROPS = "classpath:org/eclipse/scout/rt/platform/config/test-config.properties";
+  private static final String MAP_CONFIG_PROPS = "classpath:org/eclipse/scout/rt/platform/config/map-test.properties";
+  private static final String LOOP_IMPORT_PROPS = "classpath:org/eclipse/scout/rt/platform/config/imp1.properties";
+  private static final String PLACEHOLDER_IMPORT_PROPS = "classpath:org/eclipse/scout/rt/platform/config/placeholder-imp.properties";
+  private static final String LIST_PROPS = "classpath:org/eclipse/scout/rt/platform/config/list-test.properties";
+  private static final String DOTPROPERTY_PROPS = "classpath:org/eclipse/scout/rt/platform/config/dotproperty-test.properties";
 
   private static final String USER_HOME_KEY = "user.home";
   private static final String USER_HOME_VALUE = System.getProperty("user.home");
@@ -100,13 +100,13 @@ public class PropertiesHelperTest {
       assertNotNull(e);
     }
 
-    PropertiesHelper file4 = new PropertiesHelper(new ConfigPropertyProvider("classpath:" + TEST_CONFIG_PROPS));
+    PropertiesHelper file4 = new PropertiesHelper(new ConfigPropertyProvider(TEST_CONFIG_PROPS));
     assertTrue(file4.hasProviderProperties());
     assertEquals(2, file4.getAllPropertyNames().size());
 
     String key = "myconfig.properties";
     try {
-      System.setProperty(key, "classpath:" + TEST_CONFIG_PROPS);
+      System.setProperty(key, TEST_CONFIG_PROPS);
       PropertiesHelper file5 = new PropertiesHelper(new ConfigPropertyProvider(key));
       assertTrue(file5.hasProviderProperties());
       assertEquals(2, file5.getAllPropertyNames().size());

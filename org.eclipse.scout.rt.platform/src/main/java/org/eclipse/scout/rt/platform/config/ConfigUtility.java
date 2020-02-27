@@ -65,7 +65,7 @@ public final class ConfigUtility {
    * Property to specify the configuration file. If not specified then {@link ClassLoader#getResource(String)} with
    * "/config.properties" is used.
    */
-  public static final String CONFIG_FILE_NAME = "config.properties";
+  public static final String CONFIG_FILE_NAME = "classpath:config.properties";
 
   /**
    * Optional file defining variables used in the config.properties. This feature is helpful when launching applications
@@ -93,7 +93,7 @@ public final class ConfigUtility {
    */
   public static final String SCOUT_ENV_PROPERTY = "scout.env";
 
-  private static final PropertiesHelper INSTANCE = new PropertiesHelper(new ConfigPropertyProvider(CONFIG_FILE_NAME), new ConfigPropertyProvider(SCOUT_ENV_PROPERTY));
+  private static final PropertiesHelper INSTANCE = new PropertiesHelper(new ConfigPropertyProvider(CONFIG_FILE_NAME), new ConfigPropertyProvider(System.getProperty(SCOUT_ENV_PROPERTY)));
 
   private ConfigUtility() {
   }
