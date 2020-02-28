@@ -111,6 +111,7 @@ public class UiSession implements IUiSession {
   // the following beans must be set lazily. See the corresponding static getters.
   private static final LazyValue<HttpSessionHelper> HTTP_SESSION_HELPER = new LazyValue<>(HttpSessionHelper.class);
   private static final LazyValue<JsonRequestHelper> JSON_REQUEST_HELPER = new LazyValue<>(JsonRequestHelper.class);
+  private static final String URL_PARAM_THEME = "theme";
 
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final JsonEventProcessor m_jsonEventProcessor;
@@ -234,7 +235,7 @@ public class UiSession implements IUiSession {
       storeHttpSessionIdInCookie(resp, httpSession, m_clientSession.getUserAgent());
 
       // Apply theme from model to HTTP session and cookie
-      boolean reloadPage = initUiTheme(req, resp, httpSession);
+      boolean reloadPage = initUiTheme(req, resp, jsonStartupReq.getSessionStartupParams());
 
       // When theme changes, stop initialization (UI session will not be used anyway) and instruct the client to reload the page
       if (reloadPage) {
@@ -399,10 +400,10 @@ public class UiSession implements IUiSession {
    * @return Whether or not the page must be reloaded by the browser (required when theme changes after client-session
    *         has been initialized)
    */
-  protected boolean initUiTheme(HttpServletRequest req, HttpServletResponse resp, HttpSession httpSession) {
-    UiThemeHelper uiThemeUtility = UiThemeHelper.get();
+  protected boolean initUiTheme(HttpServletRequest req, HttpServletResponse resp, Map<String, String> sessionStartupParams) {
+    UiThemeHelper helper = UiThemeHelper.get();
     String modelTheme = m_clientSession.getDesktop().getTheme();
-    String currentTheme = uiThemeUtility.getTheme(req);
+    String currentTheme = helper.getTheme(req);
 
     // Ensure the model theme is valid, otherwise it could result in a endless reload loop
     String validTheme = UiThemeHelper.get().validateTheme(modelTheme);
@@ -411,12 +412,19 @@ public class UiSession implements IUiSession {
       modelTheme = validTheme;
     }
 
+    // If a theme is requested via URL this has priority before the theme from the session or the model
+    String requestedTheme = sessionStartupParams.get(URL_PARAM_THEME);
+    if (requestedTheme != null) {
+      modelTheme = helper.validateTheme(requestedTheme);
+    }
+
     if (modelTheme == null) {
-      modelTheme = ObjectUtility.nvl(currentTheme, uiThemeUtility.getConfiguredTheme());
+      modelTheme = ObjectUtility.nvl(currentTheme, helper.getConfiguredTheme());
       m_clientSession.getDesktop().setTheme(currentTheme);
     }
+
     boolean reloadPage = !modelTheme.equals(currentTheme);
-    uiThemeUtility.storeTheme(resp, httpSession, modelTheme);
+    helper.storeTheme(resp, req.getSession(), modelTheme);
     LOG.debug("UI theme model={} current={} reloadPage={}", modelTheme, currentTheme, reloadPage);
     return reloadPage;
   }

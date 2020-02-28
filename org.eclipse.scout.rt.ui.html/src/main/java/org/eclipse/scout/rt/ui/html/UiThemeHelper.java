@@ -29,7 +29,6 @@ public class UiThemeHelper {
 
   private static final Logger LOG = LoggerFactory.getLogger(UiThemeHelper.class);
   private static final String THEME_SESSION_ATTRIBUTE = UiThemeHelper.class.getName() + "#theme";
-  private static final String URL_PARAM_THEME = "theme";
 
   /**
    * Cookie name used to store the preferred theme of a user (even after user has logged out).
@@ -69,21 +68,17 @@ public class UiThemeHelper {
    * default theme).
    */
   public String getTheme(HttpServletRequest req) {
+    String theme = null;
 
-    // 1st - check if theme is requested by URL
-    String theme = req.getParameter(URL_PARAM_THEME);
-
-    // 2nd - try to find the theme hint in the session attributes
+    // 1st - try to find the theme hint in the session attributes
     String themeFromSession = null;
     HttpSession session = req.getSession(false);
     if (session != null) {
       themeFromSession = (String) session.getAttribute(THEME_SESSION_ATTRIBUTE);
-      if (theme == null) {
-        theme = themeFromSession;
-      }
+      theme = themeFromSession;
     }
 
-    // 3rd - check if theme is requested by cookie
+    // 2nd - check if theme is requested by cookie
     if (theme == null) {
       Cookie cookie = CookieUtility.getCookieByName(req, THEME_COOKIE_NAME);
       if (cookie != null) {
@@ -91,7 +86,7 @@ public class UiThemeHelper {
       }
     }
 
-    // 4th - use theme configured in config.properties or 'default'
+    // 3rd - use theme configured in config.properties or 'default'
     if (theme == null) {
       theme = getConfiguredTheme();
     }
