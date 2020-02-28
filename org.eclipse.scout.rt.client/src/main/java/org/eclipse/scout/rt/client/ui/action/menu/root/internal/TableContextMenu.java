@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
+import java.beans.PropertyChangeEvent;
 import java.util.List;
 import java.util.Set;
 
@@ -68,7 +69,15 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
 
   @Override
   protected boolean isOwnerPropertyChangedListenerRequired() {
-    return false;
+    return true;
+  }
+
+  @Override
+  protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
+    super.handleOwnerPropertyChanged(evt);
+    if (ITable.PROP_ENABLED.equals(evt.getPropertyName())) {
+      calculateEnableState();
+    }
   }
 
   protected void handleOwnerValueChanged() {
