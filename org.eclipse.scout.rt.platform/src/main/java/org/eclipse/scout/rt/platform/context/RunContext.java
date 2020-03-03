@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
 import javax.security.auth.Subject;
@@ -80,6 +81,7 @@ public class RunContext implements IAdaptable {
 
   protected TransactionScope m_transactionScope = TransactionScope.REQUIRED;
   protected ITransaction m_transaction;
+  protected Supplier<ITransaction> m_newTransactionSupplier;
   protected List<ITransactionMember> m_transactionMembers = new ArrayList<>();
 
   protected List<IRunContextChainInterceptor<?>> m_interceptors = new ArrayList<>();
@@ -178,6 +180,7 @@ public class RunContext implements IAdaptable {
     final TransactionProcessor<RESULT> transactionProcessor = BEANS.get(TransactionProcessor.class)
         .withCallerTransaction(m_transaction)
         .withTransactionScope(m_transactionScope)
+        .withNewTransactionSupplier(m_newTransactionSupplier)
         .withTransactionMembers(m_transactionMembers);
 
     return new CallableChain<RESULT>()
@@ -337,10 +340,30 @@ public class RunContext implements IAdaptable {
   /**
    * Sets the transaction to be used for this context. Has only an effect, if the transaction scope is set to
    * {@link TransactionScope#REQUIRED} or {@link TransactionScope#MANDATORY}. In most cases, this property should not be
-   * set.
+   * set. <br>
+   * <b>Caution:</b> in case the given transaction is used, it <b>it will not be completed (commit/rollback/release) by
+   * this context</b>. If your intention is to use a particular {@link ITransaction}, use
+   * {@link #withNewTransactionSupplier(Supplier)} and {@link TransactionScope#REQUIRES_NEW} instead.
    */
   public RunContext withTransaction(final ITransaction transaction) {
     m_transaction = transaction;
+    return this;
+  }
+
+  /**
+   * @see #withNewTransactionSupplier(Supplier)
+   */
+  public Supplier<ITransaction> getNewTransactionSupplier() {
+    return m_newTransactionSupplier;
+  }
+
+  /**
+   * Sets the supplier for a new {@link ITransaction}, which must not return {@code null}. Has only effect, if the
+   * transaction scope is set to {@link TransactionScope#REQUIRES_NEW} or {@link TransactionScope#REQUIRED} and
+   * {@link ITransaction#CURRENT} is not set. If {@code null}, {@code BEANS.get(ITransaction.class)} is used.
+   */
+  public RunContext withNewTransactionSupplier(final Supplier<ITransaction> newTransactionSupplier) {
+    m_newTransactionSupplier = newTransactionSupplier;
     return this;
   }
 
@@ -484,6 +507,7 @@ public class RunContext implements IAdaptable {
         .attr("cid", getCorrelationId())
         .attr("transactionScope", getTransactionScope())
         .ref("transaction", getTransaction())
+        .ref("newTransactionSupplier", getNewTransactionSupplier())
         .ref("runMonitor", getRunMonitor())
         .ref("transactionMembers", m_transactionMembers)
         .ref("threadLocalProcessors", m_threadLocalProcessors);
@@ -501,6 +525,7 @@ public class RunContext implements IAdaptable {
     m_propertyMap = new PropertyMap(origin.m_propertyMap);
     m_transactionScope = origin.m_transactionScope;
     m_transaction = origin.m_transaction;
+    m_newTransactionSupplier = origin.m_newTransactionSupplier;
     m_transactionMembers = new ArrayList<>(origin.m_transactionMembers);
     m_threadLocalProcessors = new HashMap<>(origin.m_threadLocalProcessors);
     m_diagnosticProcessors = new HashMap<>(origin.m_diagnosticProcessors);
@@ -521,6 +546,7 @@ public class RunContext implements IAdaptable {
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
     m_transactionScope = currentRunContext.m_transactionScope;
     m_transaction = ITransaction.CURRENT.get();
+    m_newTransactionSupplier = currentRunContext.m_newTransactionSupplier;
     m_transactionMembers = new ArrayList<>(currentRunContext.m_transactionMembers);
     m_diagnosticProcessors = new HashMap<>(currentRunContext.m_diagnosticProcessors);
 

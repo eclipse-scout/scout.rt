@@ -139,6 +139,7 @@ public final class RunContexts {
       newRunContext
           .withRunMonitor(BEANS.get(RunMonitor.class))
           .withTransactionScope(TransactionScope.REQUIRED)
+          .withNewTransactionSupplier(null)
           .withoutTransactionMembers();
 
       // Register the run monitor for propagated cancellation.

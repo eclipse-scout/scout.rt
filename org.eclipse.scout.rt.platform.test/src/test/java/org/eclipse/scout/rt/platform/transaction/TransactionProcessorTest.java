@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.transaction;
 
+import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -28,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -40,6 +43,7 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -100,6 +104,35 @@ public class TransactionProcessorTest {
   }
 
   @Test
+  public void testMandatoryWithoutExistingTransactionAndNewTransactionSupplier() throws Exception {
+    final AtomicBoolean supplierWasInvoked = new AtomicBoolean();
+
+    CallableChain<Object> chain = new CallableChain<>();
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(null)
+        .withTransactionScope(TransactionScope.MANDATORY)
+        .withNewTransactionSupplier(() -> {
+          supplierWasInvoked.set(true);
+          return BEANS.get(ITransaction.class);
+        }));
+
+    try {
+      chain.call(new Callable<Object>() {
+
+        @Override
+        public Object call() throws Exception {
+          return "result";
+        }
+      });
+      fail();
+    }
+    catch (TransactionRequiredException e) {
+      assertTrue(true);
+    }
+    assertFalse(supplierWasInvoked.get());
+  }
+
+  @Test
   public void testMandatoryWithExistingTransactionAndSuccess() throws Exception {
     ITransaction callingTransaction = mock(ITransaction.class);
     final Holder<ITransaction> actualTransaction = new Holder<>();
@@ -119,6 +152,37 @@ public class TransactionProcessorTest {
 
     assertEquals("result", result);
     assertSame(callingTransaction, actualTransaction.getValue());
+    verifyZeroInteractions(m_transaction);
+    verifyZeroInteractions(callingTransaction);
+  }
+
+  @Test
+  public void testMandatoryWithExistingTransactionAndSuccessAndNewTransactionSupplier() throws Exception {
+    ITransaction callingTransaction = mock(ITransaction.class);
+    final Holder<ITransaction> actualTransaction = new Holder<>();
+    final AtomicBoolean supplierWasInvoked = new AtomicBoolean();
+
+    CallableChain<Object> chain = new CallableChain<>();
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(callingTransaction)
+        .withTransactionScope(TransactionScope.MANDATORY)
+        .withNewTransactionSupplier(() -> {
+          supplierWasInvoked.set(true);
+          return BEANS.get(ITransaction.class);
+        }));
+    Object result = chain.call(new Callable<Object>() {
+
+      @Override
+      public Object call() throws Exception {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        return "result";
+      }
+    });
+
+    assertEquals("result", result);
+    assertSame(callingTransaction, actualTransaction.getValue());
+    assertFalse(supplierWasInvoked.get());
+
     verifyZeroInteractions(m_transaction);
     verifyZeroInteractions(callingTransaction);
   }
@@ -178,6 +242,42 @@ public class TransactionProcessorTest {
     // verify
     assertSame(m_transaction, actualTransaction.getValue());
     assertEquals("result", result);
+
+    verify(m_transaction, times(1)).release();
+
+    InOrder inOrder = Mockito.inOrder(m_transaction);
+    inOrder.verify(m_transaction, times(1)).commitPhase1();
+    inOrder.verify(m_transaction, times(1)).commitPhase2();
+    inOrder.verify(m_transaction, never()).rollback();
+    inOrder.verify(m_transaction, times(1)).release();
+  }
+
+  @Test
+  public void testRequiresNewWithoutExistingTransactionAndSuccessAndNewTransactionSupplier() throws Exception {
+    final Holder<ITransaction> actualTransaction = new Holder<>();
+    final AtomicBoolean supplierWasInvoked = new AtomicBoolean();
+
+    CallableChain<Object> chain = new CallableChain<>();
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(null)
+        .withTransactionScope(TransactionScope.REQUIRES_NEW)
+        .withNewTransactionSupplier(() -> {
+          supplierWasInvoked.set(true);
+          return BEANS.get(ITransaction.class);
+        }));
+    Object result = chain.call(new Callable<Object>() {
+
+      @Override
+      public Object call() throws Exception {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        return "result";
+      }
+    });
+
+    // verify
+    assertSame(m_transaction, actualTransaction.getValue());
+    assertEquals("result", result);
+    assertTrue(supplierWasInvoked.get());
 
     verify(m_transaction, times(1)).release();
 
@@ -293,6 +393,68 @@ public class TransactionProcessorTest {
   }
 
   @Test
+  public void testRequiresNewWithNewTransactionSupplierReturningNull() throws Exception {
+    ITransaction callingTransaction = mock(ITransaction.class);
+    final AtomicBoolean supplierWasInvoked = new AtomicBoolean();
+
+    CallableChain<Object> chain = new CallableChain<>();
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(callingTransaction)
+        .withTransactionScope(TransactionScope.REQUIRES_NEW)
+        .withNewTransactionSupplier(() -> {
+          supplierWasInvoked.set(true);
+          return null;
+        }));
+    assertThrows(AssertionException.class, () -> chain.call(() -> {
+      Assert.fail("callable is not expected to be invoked");
+      return null;
+    }));
+
+    // verify
+    assertTrue(supplierWasInvoked.get());
+    verifyZeroInteractions(callingTransaction);
+    verifyZeroInteractions(m_transaction);
+  }
+
+  @Test
+  public void testRequiresNewWithExistingTransactionAndSuccessAndNewTransactionSupplier() throws Exception {
+    ITransaction callingTransaction = mock(ITransaction.class);
+    final Holder<ITransaction> actualTransaction = new Holder<>();
+    final AtomicBoolean supplierWasInvoked = new AtomicBoolean();
+
+    CallableChain<Object> chain = new CallableChain<>();
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(callingTransaction)
+        .withTransactionScope(TransactionScope.REQUIRES_NEW)
+        .withNewTransactionSupplier(() -> {
+          supplierWasInvoked.set(true);
+          return BEANS.get(ITransaction.class);
+        }));
+    Object result = chain.call(new Callable<Object>() {
+
+      @Override
+      public Object call() throws Exception {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        return "result";
+      }
+    });
+
+    // verify
+    assertSame(m_transaction, actualTransaction.getValue());
+    assertEquals("result", result);
+    assertTrue(supplierWasInvoked.get());
+
+    verifyZeroInteractions(callingTransaction);
+    verify(m_transaction, times(1)).release();
+
+    InOrder inOrder = Mockito.inOrder(m_transaction);
+    inOrder.verify(m_transaction, times(1)).commitPhase1();
+    inOrder.verify(m_transaction, times(1)).commitPhase2();
+    inOrder.verify(m_transaction, never()).rollback();
+    inOrder.verify(m_transaction, times(1)).release();
+  }
+
+  @Test
   public void testRequiresNewWithExistingTransactionAndError() throws Exception {
     ITransaction callingTransaction = mock(ITransaction.class);
     final RuntimeException exception = new RuntimeException("Expected JUnit exception");
@@ -351,6 +513,42 @@ public class TransactionProcessorTest {
     // verify
     assertEquals("result", result);
     assertSame(m_transaction, actualTransaction.getValue());
+
+    verify(m_transaction, times(1)).release();
+
+    InOrder inOrder = Mockito.inOrder(m_transaction);
+    inOrder.verify(m_transaction, times(1)).commitPhase1();
+    inOrder.verify(m_transaction, times(1)).commitPhase2();
+    inOrder.verify(m_transaction, never()).rollback();
+    inOrder.verify(m_transaction, times(1)).release();
+  }
+
+  @Test
+  public void testRequiredWithoutExistingTransactionAndSuccessAndNewTransactionSupplier() throws Exception {
+    final Holder<ITransaction> actualTransaction = new Holder<>();
+    final AtomicBoolean supplierWasInvoked = new AtomicBoolean();
+
+    CallableChain<Object> chain = new CallableChain<>();
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(null)
+        .withTransactionScope(TransactionScope.REQUIRED)
+        .withNewTransactionSupplier(() -> {
+          supplierWasInvoked.set(true);
+          return BEANS.get(ITransaction.class);
+        }));
+    Object result = chain.call(new Callable<Object>() {
+
+      @Override
+      public Object call() throws Exception {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        return "result";
+      }
+    });
+
+    // verify
+    assertEquals("result", result);
+    assertSame(m_transaction, actualTransaction.getValue());
+    assertTrue(supplierWasInvoked.get());
 
     verify(m_transaction, times(1)).release();
 
@@ -460,6 +658,38 @@ public class TransactionProcessorTest {
     // verify
     assertEquals("result", result);
     assertSame(callingTransaction, actualTransaction.getValue());
+
+    verifyZeroInteractions(m_transaction);
+    verifyZeroInteractions(callingTransaction);
+  }
+
+  @Test
+  public void testRequiredWithExistingTransactionAndSuccessAndNewTransactionSupplier() throws Exception {
+    ITransaction callingTransaction = mock(ITransaction.class);
+    final Holder<ITransaction> actualTransaction = new Holder<>();
+    final AtomicBoolean supplierWasInvoked = new AtomicBoolean();
+
+    CallableChain<Object> chain = new CallableChain<>();
+    chain.add(new TransactionProcessor<Object>()
+        .withCallerTransaction(callingTransaction)
+        .withTransactionScope(TransactionScope.REQUIRED)
+        .withNewTransactionSupplier(() -> {
+          supplierWasInvoked.set(true);
+          return BEANS.get(ITransaction.class);
+        }));
+    Object result = chain.call(new Callable<Object>() {
+
+      @Override
+      public Object call() throws Exception {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        return "result";
+      }
+    });
+
+    // verify
+    assertEquals("result", result);
+    assertSame(callingTransaction, actualTransaction.getValue());
+    assertFalse(supplierWasInvoked.get());
 
     verifyZeroInteractions(m_transaction);
     verifyZeroInteractions(callingTransaction);
