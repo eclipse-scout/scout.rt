@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.transaction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
@@ -43,6 +44,7 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
 
   protected TransactionScope m_transactionScope = TransactionScope.REQUIRES_NEW;
   protected ITransaction m_callerTransaction;
+  protected Supplier<ITransaction> m_newTransactionSupplier;
   protected List<ITransactionMember> m_transactionMembers = new ArrayList<>();
 
   public TransactionProcessor<RESULT> withTransactionScope(final TransactionScope transactionScope) {
@@ -52,6 +54,11 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
 
   public TransactionProcessor<RESULT> withCallerTransaction(final ITransaction callerTransaction) {
     m_callerTransaction = callerTransaction;
+    return this;
+  }
+
+  public TransactionProcessor<RESULT> withNewTransactionSupplier(final Supplier<ITransaction> newTransactionSupplier) {
+    m_newTransactionSupplier = newTransactionSupplier;
     return this;
   }
 
@@ -86,7 +93,13 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
    */
   protected RESULT runTxRequiresNew(final Chain<RESULT> chain) throws Exception {
     // Create and register the new transaction.
-    final ITransaction newTransaction = BEANS.get(ITransaction.class);
+    final ITransaction newTransaction;
+    if (m_newTransactionSupplier != null) {
+      newTransaction = Assertions.assertNotNull(m_newTransactionSupplier.get(), "newTransactionSupplier is required to return a non-null value");
+    }
+    else {
+      newTransaction = BEANS.get(ITransaction.class);
+    }
 
     // Register the transaction members.
     for (final ITransactionMember transactionMember : m_transactionMembers) {

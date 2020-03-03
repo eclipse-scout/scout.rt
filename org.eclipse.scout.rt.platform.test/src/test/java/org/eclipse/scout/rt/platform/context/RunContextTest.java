@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 import javax.security.auth.Subject;
 
@@ -328,6 +329,37 @@ public class RunContextTest {
         assertSame(tx, ITransaction.CURRENT.get());
         assertSame(tx, RunContexts.copyCurrent().getTransaction());
         assertSame(tx, RunContext.CURRENT.get().getTransaction());
+      });
+    });
+  }
+
+  @Test
+  public void testCopyCurrent_newTransactionSupplier() {
+    final ITransaction tx = mock(ITransaction.class);
+    final Supplier<ITransaction> txSupplier = () -> tx;
+
+    RunContexts.empty().withNewTransactionSupplier(txSupplier).run(() -> {
+      assertEquals(txSupplier, RunContext.CURRENT.get().getNewTransactionSupplier());
+      assertNull(RunContexts.copyCurrent().getNewTransactionSupplier());
+    });
+
+    RunContexts.empty().withNewTransactionSupplier(null).run(() -> {
+      assertNotNull(ITransaction.CURRENT.get());
+      assertNotNull(RunContexts.copyCurrent().getTransaction());
+      assertNull(RunContext.CURRENT.get().getNewTransactionSupplier());
+
+      RunContexts.copyCurrent().run(() -> assertNotNull(ITransaction.CURRENT.get()));
+    });
+
+    RunContexts.empty().withNewTransactionSupplier(txSupplier).run(() -> {
+      assertSame(tx, ITransaction.CURRENT.get());
+      assertSame(tx, RunContexts.copyCurrent().getTransaction());
+      assertSame(txSupplier, RunContext.CURRENT.get().getNewTransactionSupplier());
+
+      RunContexts.copyCurrent().run(() -> {
+        assertSame(tx, ITransaction.CURRENT.get());
+        assertSame(tx, RunContexts.copyCurrent().getTransaction());
+        assertNull(RunContext.CURRENT.get().getNewTransactionSupplier());
       });
     });
   }
