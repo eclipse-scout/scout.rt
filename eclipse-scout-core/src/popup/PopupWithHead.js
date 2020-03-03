@@ -214,6 +214,7 @@ export default class PopupWithHead extends Popup {
     // Make sure the elements inside the header have the same style as to blueprint (menu)
     // This makes it possible to position the content in the header (icon, text) exactly on top of the content of the blueprint
     this.$head.copyCssIfGreater(this.$headBlueprint, 'padding');
+    this.$head.copyCss(this.$headBlueprint, 'line-height');
     this.$head.height(this.$headBlueprint.height());
     this.$head.width(this.$headBlueprint.width());
 
