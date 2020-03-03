@@ -418,8 +418,8 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     Map<ITreeNode, List<ITreeNode>> nodesToInsertByParent = new HashMap<>();
     Map<ITreeNode, List<ITreeNode>> nodesToDeleteByParent = new HashMap<>();
     processFilterChangedEventForUiRec(Collections.singletonList(getModel().getRootNode()), nodesToInsertByParent, nodesToDeleteByParent);
-    nodesToInsertByParent.entrySet().forEach(e -> m_eventBuffer.add(new TreeEvent(getModel(), TreeEvent.TYPE_NODES_INSERTED, e.getKey(), e.getValue())));
-    nodesToDeleteByParent.entrySet().forEach(e -> m_eventBuffer.add(new TreeEvent(getModel(), TreeEvent.TYPE_NODES_DELETED, e.getKey(), e.getValue())));
+    nodesToDeleteByParent.forEach((key, value) -> m_eventBuffer.add(new TreeEvent(getModel(), TreeEvent.TYPE_NODES_DELETED, key, value)));
+    nodesToInsertByParent.forEach((key, value) -> m_eventBuffer.add(new TreeEvent(getModel(), TreeEvent.TYPE_NODES_INSERTED, key, value)));
   }
 
   /**
@@ -534,7 +534,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     }
     // TODO [7.0] bsh: Tree | Events not yet implemented:
     // - TYPE_NODE_REQUEST_FOCUS
-    // - TYPE_NODE_ENSURE_VISIBLE what is the difference to scroll_to_selection? delete in treeevent
+    // - TYPE_NODE_ENSURE_VISIBLE what is the difference to scroll_to_selection? delete in TreeEvent
     // - TYPE_NODES_DRAG_REQUEST
     // - TYPE_DRAG_FINISHED
     // - TYPE_NODE_DROP_ACTION, partly implemented with consumeBinaryResource(...)
@@ -809,7 +809,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   }
 
   /**
-   * @return the nodeIdfor the given node. Returns <code>null</code> if the node is the invisible root node or
+   * @return the nodeId for the given node. Returns <code>null</code> if the node is the invisible root node or
    *         <code>null</code> itself. Use {@link #optNodeId(ITreeNode)} to prevent an exception when no nodeId could be
    *         found.
    * @throws UiException
