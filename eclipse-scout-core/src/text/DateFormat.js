@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateFormatPatternDefinition, DateFormatPatternType, dates, numbers, scout, strings} from '../index';
-import objects from '../util/objects';
+import {DateFormatPatternDefinition, DateFormatPatternType, dates, numbers, scout, strings, objects} from '../index';
 
 /**
  * Custom JavaScript Date Format
@@ -1041,7 +1040,7 @@ export default class DateFormat {
     // ----- Helper functions -----
 
     function isValid(value, expectedValue) {
-      return (expectedValue === undefined || expectedValue === value);
+      return objects.isNullOrUndefined(expectedValue) || expectedValue === value;
     }
   }
 
