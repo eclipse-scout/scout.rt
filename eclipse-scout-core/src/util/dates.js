@@ -63,6 +63,24 @@ export function shiftToNextDayOfType(date, day) {
   return shift(date, 0, 0, diff);
 }
 
+/**
+ * Finds the next date (based on the given date) that matches the given day in week and date.
+ *
+ * @param {Date} date Start date
+ * @param {number} dayInWeek 0-6
+ * @param {number} dayInMonth 1-31
+ * @returns {Date}
+ */
+export function shiftToNextDayAndDate(date, dayInWeek, dayInMonth) {
+  var tmpDate = new Date(date.getTime());
+  tmpDate.setDate(dayInMonth);
+  while (tmpDate.getDay() !== dayInWeek || tmpDate.getDate() !== dayInMonth) {
+    tmpDate = shift(tmpDate, 0, 1, 0);
+    tmpDate.setDate(dayInMonth);
+  }
+  return tmpDate;
+}
+
 export function shiftToPreviousDayOfType(date, day) {
   var diff = day - date.getDay();
 
@@ -611,6 +629,7 @@ export default {
   shift,
   shiftTime,
   shiftToNextDayOfType,
+  shiftToNextDayAndDate,
   shiftToNextOrPrevDayOfType,
   shiftToNextOrPrevMonday,
   shiftToPreviousDayOfType,

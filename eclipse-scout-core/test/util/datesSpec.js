@@ -143,6 +143,16 @@ describe('scout.dates', function() {
     });
   });
 
+  describe('shiftToNextDayAndDate', function() {
+
+    it('shifts to next date with requested week-day and date', function() {
+      var date = dates.create('2020-03-03'); // Tue
+      expect(dates.shiftToNextDayAndDate(date, 1, 22).toISOString()).toBe(dates.create('2020-06-22 00:00:00.000').toISOString()); // 1=Mo
+
+      expect(dates.shiftToNextDayAndDate(date, 2, 24).toISOString()).toBe(dates.create('2020-03-24 00:00:00.000').toISOString()); // 2=Tue
+    });
+  });
+
   describe('shiftToPreviousDayOfType', function() {
 
     it('shifts to previous day of type', function() {

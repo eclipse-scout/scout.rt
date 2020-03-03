@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {DateFormatPatternDefinition, DateFormatPatternType, dates, numbers, scout, strings} from '../index';
+import objects from '../util/objects';
 
 /**
  * Custom JavaScript Date Format
@@ -755,10 +756,7 @@ export default class DateFormat {
         return true;
       }
       // In analyze mode, constant terms are optional (this supports "020318" --> "02.03.2018")
-      if (parseContext.analyze) {
-        return true;
-      }
-      return false;
+      return parseContext.analyze;
     };
   }
 
@@ -876,10 +874,19 @@ export default class DateFormat {
 
     // Try to generate a valid predicted date with the information retrieved so far
     startDate = this._prepareStartDate(startDate);
-    if (parseContext.hints.weekday !== undefined) {
-      startDate = dates.shiftToNextDayOfType(startDate, parseContext.hints.weekday);
+
+    // When weekday is included in pattern, try to find a suitable start date #235975
+    var dayInWeek = parseContext.hints.weekday;
+    var dayInMonth = parseContext.dateInfo.day;
+    if (dayInWeek !== undefined) {
+      if (dayInMonth !== undefined && dayInMonth <= 31) {
+        startDate = dates.shiftToNextDayAndDate(startDate, dayInWeek, dayInMonth);
+      } else {
+        startDate = dates.shiftToNextDayOfType(startDate, dayInWeek);
+      }
     }
-    var predictedDate = this._dateInfoToDate(parseContext.dateInfo, startDate);
+
+    var predictedDate = this._dateInfoToDate(parseContext.dateInfo, startDate, parseContext.hints);
 
     // Update analyzeInfo
     analyzeInfo.dateInfo = parseContext.dateInfo;
@@ -932,13 +939,19 @@ export default class DateFormat {
         return null; // Date and weekday don't match -> parsing failed
       }
     }
-    // TODO [7.0] bsh: Handle week of year
 
     // Return valid date
     return date;
   }
 
-  _dateInfoToDate(dateInfo, startDate) {
+  /**
+   * @param {Object} dateInfo
+   * @param {Date} [startDate]
+   * @param {Object} [hints]
+   * @returns {null|Date}
+   * @private
+   */
+  _dateInfoToDate(dateInfo, startDate, hints) {
     if (!dateInfo) {
       return null;
     }
@@ -1012,6 +1025,9 @@ export default class DateFormat {
       return null;
     }
     if (!isValid(result.getMilliseconds(), dateInfo.milliseconds)) {
+      return null;
+    }
+    if (!isValid(result.getDay(), objects.optProperty(hints, 'weekday'))) {
       return null;
     }
 
