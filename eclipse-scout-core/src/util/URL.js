@@ -29,6 +29,16 @@ export default class URL {
     this.parameterMap = URL._parse(this.queryPartRaw);
   }
 
+  /**
+   * Checks if the given parameter exists, even if value is null or an empty string.
+   *
+   * @param param
+   * @return {boolean}
+   */
+  hasParameter(param) {
+    return this.parameterMap.hasOwnProperty(param);
+  }
+
   getParameter(param) {
     if (typeof param !== 'string') {
       throw new Error('Illegal argument type: ' + param);

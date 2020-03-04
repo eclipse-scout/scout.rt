@@ -27,10 +27,12 @@ import {
   MessageBoxController,
   Outline,
   scout,
+  strings,
   styles,
   Tree,
   webstorage,
-  Widget
+  Widget,
+  URL
 } from '../index';
 import * as $ from 'jquery';
 
@@ -83,6 +85,7 @@ export default class Desktop extends Widget {
     this.theme = null;
     this.dense = false;
     this._glassPaneTargetFilters = [];
+    this.url = null;
 
     this._addWidgetProperties(['viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes', 'activeForm']);
 
@@ -104,6 +107,8 @@ export default class Desktop extends Widget {
     SAME_WINDOW: 'sameWindow'
   };
 
+  static DEFAULT_THEME = 'default';
+
   _init(model) {
     // Note: session and desktop are tightly coupled. Because a lot of widgets want to register
     // a listener on the desktop in their init phase, they access the desktop by calling 'this.session.desktop'
@@ -117,7 +122,7 @@ export default class Desktop extends Widget {
     session.desktop = this;
 
     super._init(model);
-
+    this.url = new URL();
     this._initTheme();
     this.formController = scout.create('DesktopFormController', {
       displayParent: this,
@@ -1280,7 +1285,7 @@ export default class Desktop extends Widget {
   }
 
   _activeTheme() {
-    return cookies.get('scout.ui.theme') || 'default';
+    return cookies.get('scout.ui.theme') || Desktop.DEFAULT_THEME;
   }
 
   logoAction() {
@@ -1291,7 +1296,9 @@ export default class Desktop extends Widget {
 
   _initTheme() {
     var theme = this.theme;
-    if (theme === null) {
+    if (this.url.hasParameter('theme')) {
+      theme = strings.nullIfEmpty(this.url.getParameter('theme')) || Desktop.DEFAULT_THEME;
+    } else if (theme === null) {
       theme = this._activeTheme();
     }
     this.setTheme(theme);
@@ -1319,9 +1326,15 @@ export default class Desktop extends Widget {
     // Reload page in order to download the CSS files for the new theme
     // Don't remove body but make it invisible, otherwise JS exceptions might be thrown if body is removed while an action executed
     $('body').setVisible(false);
-    scout.reloadPage({
+    var reloadOptions = {
       clearBody: false
-    });
+    };
+    // If parameter 'theme' exists in the URL, remove it now - otherwise the parameter would overrule the cookie settings
+    if (this.url.hasParameter('theme')) {
+      this.url.removeParameter('theme');
+      reloadOptions.redirectUrl = this.url.toString();
+    }
+    scout.reloadPage(reloadOptions);
   }
 
   /**
