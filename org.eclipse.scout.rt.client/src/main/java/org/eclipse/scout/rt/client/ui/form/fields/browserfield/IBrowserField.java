@@ -32,7 +32,8 @@ public interface IBrowserField extends IFormField {
     AllowPopupsToEscapeSandbox("allow-popups-to-escape-sandbox"),
     AllowSameOrigin("allow-same-origin"),
     AllowScripts("allow-scripts"),
-    AllowTopNavigation("allow-top-navigation");
+    AllowTopNavigation("allow-top-navigation"),
+    AllowPresentation("allow-presentation");
 
     private final String m_attribute;
 

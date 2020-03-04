@@ -20,16 +20,33 @@ export default class BrowserFieldLayout extends FormFieldLayout {
 
   preferredLayoutSize($container, options) {
     var prefSize = super.preferredLayoutSize($container, options);
-    var sandboxPermissions = this.browserField.sandboxPermissions;
-    if (!this.browserField.sandboxEnabled || (sandboxPermissions && sandboxPermissions.indexOf('allow-same-origin') > -1)) {
-      if (this.browserField.$field.contents().attr('readyState') !== 'loading') {
-        prefSize.height = this.browserField.$field.contents().height() + // get height of content
-          this.browserField.iframe.htmlComp.insets().vertical() + // add insets of iframe
-          this.browserField.htmlComp.insets().vertical(); // add insets of browser field
-      }
-    } else {
-      $.log.isInfoEnabled() && $.log.info('Could not read height of sandboxed iframe content if permission \'allow-same-origin\' is not set.');
+    if (this._isIFrameReadable()) {
+      prefSize.height = this.browserField.$field.contents().height() + // get height of content
+        this.browserField.iframe.htmlComp.insets().vertical() + // add insets of iframe
+        this.browserField.htmlComp.insets().vertical(); // add insets of browser field
     }
     return prefSize;
   }
+
+  _isIFrameReadable() {
+    var field = this.browserField;
+    var perms = field.sandboxPermissions;
+    if (field.sandboxEnabled && (perms && perms.indexOf('allow-same-origin') === -1)) {
+      $.log.isWarnEnabled() && $.log.warn('Access to IFrame denied, cannot read height.' +
+        ' Reason: sandbox is enabled or "allow-same-origin" is not set');
+      return false;
+    }
+    try {
+      var doc = field.$field[0].contentWindow.document;
+    } catch (e) {
+      $.log.isWarnEnabled() && $.log.warn('Access to IFrame denied, cannot read height. Reason: denied by browser');
+      return false;
+    }
+    if (field.$field.contents().attr('readyState') === 'loading') {
+      $.log.isWarnEnabled() && $.log.warn('Access to IFrame denied, cannot read height. Reason: readyState == "loading"');
+      return false;
+    }
+    return true;
+  }
+
 }
