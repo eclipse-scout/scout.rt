@@ -7,7 +7,7 @@
     <groupId>${groupId}</groupId>
     <artifactId>${rootArtifactId}</artifactId>
     <version>${version}</version>
-    <relativePath>../${rootArtifactId}/pom.xml</relativePath>
+    <relativePath>../${rootArtifactId}</relativePath>
   </parent>
 
   <artifactId>${rootArtifactId}.${artifactId}</artifactId>
