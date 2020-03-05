@@ -474,7 +474,7 @@ scout.Point.prototype.equals = function(o) {
   return (this.x === o.x && this.y === o.y);
 };
 
-scout.Point.prototype.clone = function(o) {
+scout.Point.prototype.clone = function() {
   return new scout.Point(this.x, this.y);
 };
 
@@ -576,7 +576,7 @@ scout.Rectangle.prototype.equals = function(o) {
   return (this.x === o.x && this.y === o.y && this.width === o.width && this.height === o.height);
 };
 
-scout.Rectangle.prototype.clone = function(o) {
+scout.Rectangle.prototype.clone = function() {
   return new scout.Rectangle(this.x, this.y, this.width, this.height);
 };
 
