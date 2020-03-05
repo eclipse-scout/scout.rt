@@ -298,7 +298,7 @@ export default class HtmlComponent {
       if (includeMargin) {
         prefSizeCached = prefSizeCached.add(this.margins());
       }
-      return prefSizeCached;
+      return prefSizeCached.clone();
     }
 
     var minSize = graphics.cssMinSize(this.$comp);
@@ -315,7 +315,7 @@ export default class HtmlComponent {
     if (includeMargin) {
       prefSize = prefSize.add(this.margins());
     }
-    return prefSize;
+    return prefSize.clone();
   }
 
   computePrefSizeKey(options) {
