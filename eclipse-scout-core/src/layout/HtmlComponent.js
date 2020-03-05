@@ -379,7 +379,7 @@ export default class HtmlComponent {
 
   /**
    * Returns the size of the component, insets included.
-   * @param options, see {@link scout.graphics#size} for details.
+   * @param options, see {@link graphics#size} for details.
    */
   size(options) {
     return graphics.size(this.$comp, options);

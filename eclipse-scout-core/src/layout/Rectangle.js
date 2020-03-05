@@ -40,7 +40,7 @@ export default class Rectangle {
     return (this.x === o.x && this.y === o.y && this.width === o.width && this.height === o.height);
   }
 
-  clone(o) {
+  clone() {
     return new Rectangle(this.x, this.y, this.width, this.height);
   }
 

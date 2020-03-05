@@ -35,7 +35,7 @@ export default class Point {
     return (this.x === o.x && this.y === o.y);
   }
 
-  clone(o) {
+  clone() {
     return new Point(this.x, this.y);
   }
 
