@@ -55,6 +55,12 @@ public interface IWrappedFormField<T extends IForm> extends IFormField {
   void setInnerForm(T form, boolean manageFormLifeCycle);
 
   /**
+   * @return {@code true} if the lifecycle of the {@link IForm} is managed by the {@link IWrappedFormField},
+   *         {@code false} otherwise.
+   */
+  boolean isManageInnerFormLifeCycle();
+
+  /**
    * @return {@code true} if the inner form should request the initial focus once loaded, {@code false} otherwise.
    */
   boolean isInitialFocusEnabled();
