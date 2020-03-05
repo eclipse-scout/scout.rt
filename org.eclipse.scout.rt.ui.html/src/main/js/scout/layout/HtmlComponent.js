@@ -261,7 +261,7 @@ scout.HtmlComponent.prototype.prefSize = function(options) {
     if (includeMargin) {
       prefSizeCached = prefSizeCached.add(this.margins());
     }
-    return prefSizeCached;
+    return prefSizeCached.clone();
   }
 
   if (options.widthHint || options.heightHint) {
@@ -276,7 +276,7 @@ scout.HtmlComponent.prototype.prefSize = function(options) {
   if (includeMargin) {
     prefSize = prefSize.add(this.margins());
   }
-  return prefSize;
+  return prefSize.clone();
 };
 
 scout.HtmlComponent.prototype.computePrefSizeKey = function(options) {
