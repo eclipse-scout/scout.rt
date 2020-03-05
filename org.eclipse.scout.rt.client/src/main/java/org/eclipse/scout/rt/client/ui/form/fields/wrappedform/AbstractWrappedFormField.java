@@ -207,6 +207,11 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
   }
 
   @Override
+  public boolean isManageInnerFormLifeCycle() {
+    return m_manageInnerFormLifeCycle;
+  }
+
+  @Override
   public boolean isInitialFocusEnabled() {
     return propertySupport.getPropertyBool(PROP_INITIAL_FOCUS_ENABLED);
   }
