@@ -363,4 +363,9 @@ scout.FormController.prototype._layoutDialog = function(dialog) {
   // If not validated anew, focus on single-button forms is not gained.
   // Maybe, this is the same problem as in BusyIndicator.js
   this.session.focusManager.validateFocus();
+
+  // Animate _after_ the layout is valid (otherwise, the position would be wrong, because
+  // HtmlComponent defers the layout when a component is currently being animated)
+  dialog.$container.addClassForAnimation('animate-open');
+  dialog.$container.addDeviceClass(); // no animation in IE
 };
