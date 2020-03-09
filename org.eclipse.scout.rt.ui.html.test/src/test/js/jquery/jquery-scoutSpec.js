@@ -103,6 +103,24 @@ describe('jquery-scout', function() {
 
   });
 
+  describe('hasAnimationClass', function() {
+
+    it('checks for animation classes', function() {
+      expect($e.hasAnimationClass()).toBe(false);
+      $e.addClass('animate');
+      expect($e.hasAnimationClass()).toBe(false);
+      $e.addClass('animate-open');
+      expect($e.hasAnimationClass()).toBe(true);
+      $e.removeClass('animate-open');
+      expect($e.hasAnimationClass()).toBe(false);
+      $e.addClassForAnimation('my-class');
+      expect($e.hasAnimationClass()).toBe(false);
+      $e.addClassForAnimation('animate-my-class');
+      expect($e.hasAnimationClass()).toBe(true);
+    });
+
+  });
+
   describe('icon', function() {
 
     it('sets and removes icons', function() {
