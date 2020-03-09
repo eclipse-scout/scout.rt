@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.text.Collator;
 import java.util.Collection;
 import java.util.Comparator;
@@ -2021,5 +2022,40 @@ public final class StringUtility {
    */
   public static int lastIndexOf(String s, String str, int fromIndex) {
     return (s == null || str == null ? -1 : s.lastIndexOf(str, fromIndex));
+  }
+
+  /**
+   * Returns a random alphanumeric string of length 8, consisting of the characters <code>[a-zA-Z0-9]</code> (never
+   * <code>null</code>). This can be useful when generating test data.
+   * <p>
+   * IMPORTANT: Do <b>not</b> use this method to generate primary keys or security tokens! The used randomness is not
+   * {@linkplain SecureRandom secure}. There is also no guarantee that the result is unique or that the method is
+   * particularly fast.
+   */
+  public static String randomId() {
+    return randomId(8);
+  }
+
+  /**
+   * Returns a random alphanumeric string of the given length, consisting of the characters <code>[a-zA-Z0-9]</code>
+   * (never <code>null</code>). This can be useful when generating test data.
+   * <p>
+   * IMPORTANT: Do <b>not</b> use this method to generate primary keys or security tokens! The used randomness is not
+   * {@linkplain SecureRandom secure}. There is also no guarantee that the result is unique or that the method is
+   * particularly fast.
+   *
+   * @param length
+   *          should be &gt; 0 (lower values will return an empty string)
+   */
+  public static String randomId(int length) {
+    if (length < 1) {
+      return "";
+    }
+    final String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < length; i++) {
+      sb.append(alphabet.charAt((int) Math.floor(Math.random() * alphabet.length())));
+    }
+    return sb.toString();
   }
 }
