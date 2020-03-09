@@ -726,4 +726,14 @@ public class StringUtilityTest {
     assertEquals("Foo", StringUtility.uppercaseFirst("foo"));
   }
 
+  @Test
+  public void testRandomId() {
+    assertNotNull(StringUtility.randomId());
+    assertEquals(8, StringUtility.randomId().length());
+
+    assertEquals(22, StringUtility.randomId(22).length());
+    assertEquals(1, StringUtility.randomId(1).length());
+    assertEquals(0, StringUtility.randomId(0).length());
+    assertEquals(0, StringUtility.randomId(-123).length());
+  }
 }
