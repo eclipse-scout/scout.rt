@@ -166,11 +166,6 @@ scout.Form.prototype._renderForm = function() {
 
   this.htmlComp.setLayout(layout);
   this.rootGroupBox.render();
-
-  if (this.isDialog()) {
-    this.$container.addClassForAnimation('animate-open');
-    this.$container.addDeviceClass();
-  }
 };
 
 scout.Form.prototype.setModal = function(modal) {
