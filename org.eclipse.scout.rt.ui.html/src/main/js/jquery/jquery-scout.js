@@ -1032,6 +1032,11 @@ $.fn.oneAnimationEnd = function(selector, data, handler) {
   return this.one('animationend webkitAnimationEnd', selector, data, handler);
 };
 
+$.fn.hasAnimationClass = function() {
+  // matches any CSS class that starts with 'animate-'
+  return /(^|\s)animate-/.test(this.attr('class'));
+};
+
 /**
  * Animates from old to new width
  */
