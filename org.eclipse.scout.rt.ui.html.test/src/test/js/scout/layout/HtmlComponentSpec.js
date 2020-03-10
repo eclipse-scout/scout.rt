@@ -194,43 +194,12 @@ describe("HtmlComponent", function() {
       expect(htmlChild.layout.layout).not.toHaveBeenCalled();
     });
 
-    it('does not call parents() too many times', function() {
-      spyOn(htmlComp.$comp, 'parents').and.callThrough();
-      spyOn(htmlChild.$comp, 'parents').and.callThrough();
+    it("does not call isParentVisible too many times", function() {
+      spyOn(htmlComp.$comp, 'isEveryParentVisible').and.callThrough();
+      spyOn(htmlChild.$comp, 'isEveryParentVisible').and.callThrough();
       htmlComp.validateLayout();
-      expect(htmlComp.$comp.parents).toHaveBeenCalled();
-      expect(htmlChild.$comp.parents).not.toHaveBeenCalled();
-    });
-
-    it('does not layout components with an animating parent', function() {
-      $comp.addClass('animate-test');
-      spyOn(htmlChild.layout, 'layout').and.callThrough();
-      htmlChild.validateLayout();
-      expect(htmlChild.layout.layout).not.toHaveBeenCalled();
-
-      // Simulate end of animation
-      $comp.removeClass('animate-test');
-      $comp.trigger('animationend');
-      expect(htmlChild.layout.layout).toHaveBeenCalled();
-    });
-
-    it('does not layout animated components', function() {
-      var calledPostValidateFunction = false;
-      session.layoutValidator.schedulePostValidateFunction(function() {
-        calledPostValidateFunction = true;
-      });
-
-      $comp.addClass('animate-test');
-      spyOn(htmlComp.layout, 'layout').and.callThrough();
-      htmlComp.validateLayout();
-      expect(htmlComp.layout.layout).not.toHaveBeenCalled();
-      expect(calledPostValidateFunction).toBe(false);
-
-      // Simulate end of animation
-      $comp.removeClass('animate-test');
-      $comp.trigger('animationend');
-      expect(htmlComp.layout.layout).toHaveBeenCalled();
-      expect(calledPostValidateFunction).toBe(true);
+      expect(htmlComp.$comp.isEveryParentVisible).toHaveBeenCalled();
+      expect(htmlChild.$comp.isEveryParentVisible).not.toHaveBeenCalled();
     });
 
   });

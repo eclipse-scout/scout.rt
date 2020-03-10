@@ -130,7 +130,15 @@ scout.HtmlComponent.prototype.validateLayout = function() {
   if (!this.layout) {
     throw new Error('Called layout() but component has no layout');
   }
-  if (!this._checkValidationPossible()) {
+  // Don't layout components which don't exist anymore, are invisible or are detached from the DOM
+  if (!this.isAttachedAndVisible()) {
+    return false;
+  }
+  var parent = this.getParent();
+  // Check the visibility of the parents as well.
+  // This check loops to the top of the DOM tree.
+  // To improve performance, the check (isEveryParentVisible) is not executed if the parent already did it, which is the case if parent is being layouted.
+  if ((!parent || !parent.layouting) && !this.$comp.isEveryParentVisible()) {
     return false;
   }
   if (!this.valid) {
@@ -143,59 +151,6 @@ scout.HtmlComponent.prototype.validateLayout = function() {
     this.valid = true;
   }
   return true;
-};
-
-scout.HtmlComponent.prototype._checkValidationPossible = function() {
-  // Don't layout components which don't exist anymore, are invisible or are detached from the DOM
-  if (!this.isAttachedAndVisible()) {
-    return false;
-  }
-
-  // Don't layout if component is currently animated
-  var animatingClassPattern = /(^|\s)animate-/; // matches any CSS class that starts with 'animate-'
-  if (animatingClassPattern.test(this.$comp.attr('class'))) {
-    this._validateLayoutAfterAnimation(this.$comp);
-    return false;
-  }
-
-  // Check the visibility of the parents as well.
-  // Also check if one of the parents is currently being animated.
-  // To improve performance (the check might loop to the top of the DOM tree), the following code is
-  // not executed if the parent already executed it, which is the case if the parent is being layouted.
-  var parent = this.getParent();
-  if (!parent || !parent.layouting) {
-    var everyParentVisible = true;
-    var $animatedParent = null;
-    this.$comp.parents().each(function() {
-      var $parent = $(this);
-      if (!$parent.isVisible()) {
-        everyParentVisible = false;
-        return false;
-      }
-      if (animatingClassPattern.test($parent.attr('class'))) {
-        $animatedParent = $parent;
-        return false;
-      }
-      return true; // continue loop
-    });
-    if (!everyParentVisible) {
-      return false;
-    }
-    if ($animatedParent) {
-      // Postpone the layout if there is a CSS animation in progress on one of the parent containers.
-      // Otherwise, wrong sizes might be measured (depending on the CSS animation, e.g. grow/shrink).
-      this._validateLayoutAfterAnimation($animatedParent);
-      return false;
-    }
-  }
-  return true;
-};
-
-scout.HtmlComponent.prototype._validateLayoutAfterAnimation = function($animatedElement) {
-  // Use invalidateLayoutTree to add component to layout validator
-  this.invalidateLayoutTree(false);
-  // Use validateLayoutTree to trigger post validate functions as well
-  $animatedElement.oneAnimationEnd(this.validateLayoutTree.bind(this));
 };
 
 /**
