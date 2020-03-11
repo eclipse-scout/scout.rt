@@ -3,10 +3,8 @@ package org.eclipse.scout.rt.platform.job;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
@@ -34,7 +32,7 @@ public class JobFutureTaskTest {
    * However, to have a more reliable test result, set {@link #ROUNDS} to 100000000.
    */
   @Test
-  public void testRaceConditionOnCancel() throws InterruptedException, ExecutionException, TimeoutException {
+  public void testRaceConditionOnCancel() throws InterruptedException {
     Semaphore scheduleLock = new Semaphore(100, true);
     AtomicInteger failureCount = new AtomicInteger();
     AtomicBoolean active = new AtomicBoolean(true);
@@ -62,6 +60,7 @@ public class JobFutureTaskTest {
         }, Jobs.newInput().withExecutionHint(TEST_HINT));
 
         Jobs.schedule(() -> {
+          //noinspection ResultOfMethodCallIgnored
           Thread.interrupted();//clear state
           try {
             Thread.sleep(0L, rnd.nextInt(100000));
@@ -99,7 +98,7 @@ public class JobFutureTaskTest {
   }
 
   @Test(expected = FutureCancelledError.class)
-  public void testCancelOfRunMonitorCancelsFuture() throws Exception {
+  public void testCancelOfRunMonitorCancelsFuture() {
     RunContext runContext = RunContexts.empty().withRunMonitor(new RunMonitor() {
 
       @Override
@@ -107,12 +106,12 @@ public class JobFutureTaskTest {
         return Collections.emptyList(); // simulate there are NO cancellables to cancel, especially not the JobFutureTask that indirectly references this RunMonitor
       }
     });
+    runContext.getRunMonitor().cancel(false);
 
     IFuture<String> f = Jobs.schedule(() -> {
       System.out.println("Run");
       return "done";
     }, Jobs.newInput().withRunContext(runContext));
-    runContext.getRunMonitor().cancel(false);
     String result = f.awaitDoneAndGet();
     System.out.println("Result: " + result);
   }
