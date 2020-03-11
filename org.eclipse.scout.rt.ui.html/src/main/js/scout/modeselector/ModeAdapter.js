@@ -12,9 +12,3 @@ scout.ModeAdapter = function() {
   scout.ModeAdapter.parent.call(this);
 };
 scout.inherits(scout.ModeAdapter, scout.ActionAdapter);
-
-scout.ModeAdapter.prototype._initModel = function(model, parent) {
-  model = scout.ModeAdapter.parent.prototype._initModel.call(this, model, parent);
-  model.inheritAccessibility = true;
-  return model;
-};
