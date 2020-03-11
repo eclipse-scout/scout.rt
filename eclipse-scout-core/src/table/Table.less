@@ -34,6 +34,11 @@
     & > .table-data > .table-row {
       cursor: pointer;
     }
+
+    &.disabled > .table-data > .table-row,
+    & > .table-data > .table-row.disabled {
+      cursor: default;
+    }
   }
 
   /* Used for scout.Table.CheckableStyle.TABLE_ROW */
@@ -282,7 +287,7 @@
 
   &.table-node {
 
-    > .table-row-control {
+    & > .table-row-control {
       display: block;
       position: absolute;
       top: 0;
@@ -310,7 +315,6 @@
         color: @highlight-color;
       }
     }
-
   }
 
   &.checkable {
