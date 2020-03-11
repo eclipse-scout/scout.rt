@@ -314,7 +314,8 @@
   white-space: nowrap;
 }
 
-.calendar-week-header {
+.calendar-week-header,
+.calendar-day-name {
   height: @calendar-title-height;
 }
 
@@ -333,7 +334,6 @@
   position: relative;
   display: inline-block;
   overflow: hidden;
-  height: 100%;
   z-index: 1; /* draw over grid */
 
   &.ui-selected {

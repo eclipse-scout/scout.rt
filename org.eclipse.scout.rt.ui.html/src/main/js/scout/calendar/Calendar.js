@@ -516,12 +516,20 @@ scout.Calendar.prototype.layoutSize = function(animate) {
   // basic grid width
   this.$grid.data('new-width', gridW);
 
+  var $allWeeks = $('.calendar-week', this.$grid);
+  var $selectedWeek = $selected.parent();
+  var $calendarWeekNames = $('.calendar-week > .calendar-week-name', this.$grid);
+  var newHeightMonth = parseInt((gridH - headerH) / 6, 10);
+
   // layout week
   if (this._isDay() || this._isWeek() || this._isWorkWeek()) {
-    $('.calendar-week', this.$grid).data('new-height', 0);
-    $selected.parent().data('new-height', gridH - headerH);
-  } else {
-    $('.calendar-week', this.$grid).data('new-height', parseInt((gridH - headerH) / 6, 10));
+    $allWeeks.not($selectedWeek).data('new-height', 0);
+    $selectedWeek.data('new-height', gridH - headerH);
+    $calendarWeekNames.addClass('invisible');
+  } else { // month
+    $allWeeks.data('new-height', newHeightMonth);
+    $calendarWeekNames.removeClass('invisible');
+    $calendarWeekNames.data('new-height', newHeightMonth);
   }
 
   // layout days
@@ -538,6 +546,11 @@ scout.Calendar.prototype.layoutSize = function(animate) {
   } else if (this._isMonth() || this._isWeek()) {
     $('.calendar-day-name, .calendar-day', this.$grid)
       .data('new-width', parseInt((gridW - headerH) / 7, 10));
+  }
+  if (this._isDay() || this._isWeek() || this._isWorkWeek()) {
+    $('.calendar-day', $selectedWeek).data('new-height', gridH - headerH); // selected day
+  } else { // month
+    $('.calendar-day', this.$grid).data('new-height', newHeightMonth); // all days
   }
 
   // layout components
@@ -581,6 +594,8 @@ scout.Calendar.prototype.layoutSize = function(animate) {
       w = $e.data('new-width'),
       h = $e.data('new-height');
 
+    $e.stop(false, true);
+
     if (w !== undefined && w !== $e.outerWidth()) {
       if (animate) {
         $e.animateAVCSD('width', w, updateScrollbarCallback.bind($e));
@@ -590,10 +605,17 @@ scout.Calendar.prototype.layoutSize = function(animate) {
       }
     }
     if (h !== undefined && h !== $e.outerHeight()) {
+      if (h > 0) {
+        $e.removeClass('hidden');
+      }
       if (animate) {
-        $e.animateAVCSD('height', h, updateScrollbarCallback.bind($e));
+        $e.animateAVCSD('height', h, function() {
+          $e.toggleClass('hidden', h === 0);
+          updateScrollbarCallback($e);
+        });
       } else {
         $e.css('height', h);
+        $e.toggleClass('hidden', h === 0);
         updateScrollbarCallback($e);
       }
     }
