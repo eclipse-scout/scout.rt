@@ -40,8 +40,8 @@ public final class StringUtility {
 
   public static final Pattern PATTERN_TRIM_NEWLINES = Pattern.compile("^[\r\n]*(.*?)[\r\n]*$", Pattern.DOTALL);
   /**
-   * Special constant used by {@link #htmlEncode(String)} to preserve a tab character (<code>\t</code>) in the resulting
-   * HTML. {@link #htmlDecode(String)} can convert it back to <code>\t</code>, but only if the tag was not altered.
+   * Special constant used while converting text to HTML to preserve a tab character (<code>\t</code>) in the resulting
+   * HTML. It can be converted back to <code>\t</code>, but only if the tag was not altered.
    */
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public static final String HTML_ENCODED_TAB = "<span style=\"white-space:pre\">&#9;</span>";
@@ -1643,21 +1643,21 @@ public final class StringUtility {
   }
 
   /**
-   * Delegate to {@link ListUtility.parse(String text)}
+   * Delegates to {@link CollectionUtility#parse(String)}
    */
   public static Collection<Object> stringToCollection(String text) {
     return CollectionUtility.parse(text);
   }
 
   /**
-   * Delegate to {@link ListUtility.format(Collection c)}
+   * Delegates to {@link #collectionToString(Collection, boolean)} with argument "false".
    */
   public static String collectionToString(Collection<Object> c) {
     return collectionToString(c, false);
   }
 
   /**
-   * Delegate to {@link ListUtility.format(Collection c, boolean quoteStrings)}
+   * Delegates to {@link CollectionUtility#format(Collection, boolean)}
    */
   public static String collectionToString(Collection<Object> c, boolean quoteStrings) {
     return CollectionUtility.format(c, quoteStrings);
@@ -2047,6 +2047,7 @@ public final class StringUtility {
    * @param length
    *          should be &gt; 0 (lower values will return an empty string)
    */
+  @SuppressWarnings("squid:S2245") // Math.random is ok here
   public static String randomId(int length) {
     if (length < 1) {
       return "";
