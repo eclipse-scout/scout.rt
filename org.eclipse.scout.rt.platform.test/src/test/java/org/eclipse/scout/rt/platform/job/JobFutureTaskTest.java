@@ -107,13 +107,13 @@ public class JobFutureTaskTest {
         return Collections.emptyList(); // simulate there are NO cancellables to cancel, especially not the JobFutureTask that indirectly references this RunMonitor
       }
     });
+    runContext.getRunMonitor().cancel(false);
 
     IFuture<String> f = Jobs.schedule(() -> {
       System.out.println("Run");
       return "done";
     }, Jobs.newInput().withRunContext(runContext));
-    runContext.getRunMonitor().cancel(false);
     String result = f.awaitDoneAndGet();
-    System.out.println("Result: " + result);
+    System.out.println("This code should never be reached: " + result);
   }
 }
