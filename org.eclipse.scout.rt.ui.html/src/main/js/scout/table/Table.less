@@ -64,6 +64,11 @@
       }
     }
 
+    &.disabled > .table-data > .table-row,
+    & > .table-data > .table-row.disabled {
+      cursor: default;
+    }
+
     &:focus,
     &.focused {
       & > .table-data > .table-row {
