@@ -168,7 +168,7 @@ const findWorkspaceFileDir = async (dir, verbose) => {
  */
 const getExcludedFolders = excludeFolderOverride => {
   if (!excludeFolderOverride) {
-    return ['node_modules', '.git', '.settings', '.idea', 'target', 'src'];
+    return ['node_modules', '.pnpm-store', '.git', '.settings', '.idea', 'target', 'src'];
   }
   return excludeFolderOverride;
 };
