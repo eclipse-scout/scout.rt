@@ -251,7 +251,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
         return value.toUpperCase();
       }
     }
-    return value;
+    return StringUtility.emptyIfNull(value);
   }
 
   @Override
