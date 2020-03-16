@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.ui.html;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,7 +31,6 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.commons.BufferedServletOutputStream;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
-import org.eclipse.scout.rt.testing.platform.job.JobTestUtil.ICondition;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
@@ -44,12 +44,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWithNewPlatform()
 @RunWith(PlatformTestRunner.class)
 public class UiSessionInitAndDisposeTest {
-  private List<IBean<?>> m_beans;
 
+  private static final Logger LOG = LoggerFactory.getLogger(UiSessionInitAndDisposeTest.class);
+
+  private List<IBean<?>> m_beans;
   private List<String> m_protocol = Collections.synchronizedList(new ArrayList<>());
 
   @Before
@@ -89,7 +93,7 @@ public class UiSessionInitAndDisposeTest {
   }
 
   private void writeToProtocol(String line) {
-    System.out.println("protocol: " + line);
+    LOG.info("New protocol entry: '{}' ", line);
     m_protocol.add(line);
   }
 
@@ -105,7 +109,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", "{\"startup\":true}");
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -159,7 +163,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -217,7 +221,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -245,14 +249,13 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       unloadHandler.handlePost(req, resp);
     }
-
-    // UiSession.dispose() calls detachGui() asynchronously (in a ModelJob). This is not relevant in the real world,
-    // but we force a certain order here to make the test more deterministic/reliable.
-    JobTestUtil.waitForCondition(new ICondition() {
-      @Override
-      public boolean isFulfilled() {
-        return m_protocol.contains("Desktop.execGuiDetached");
-      }
+    JobTestUtil.waitForCondition(() -> {
+      int n = Jobs.getJobManager()
+          .getFutures(Jobs.newFutureFilterBuilder()
+              .andMatchExecutionSemaphore(clientSession.getModelJobSemaphore())
+              .toFilter())
+          .size();
+      return n == 0;
     });
 
     //json startup with same client session
@@ -262,7 +265,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -288,7 +291,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       unloadHandler.handlePost(req, resp);
     }
-    JobTestUtil.waitForCondition(() -> clientSession.isStopped());
+    JobTestUtil.waitForCondition(clientSession::isStopped);
 
     assertEquals(
         Arrays.asList(
@@ -317,7 +320,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionIdA = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionIdA = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -347,7 +350,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionIdB = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionIdB = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -379,7 +382,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       unloadHandler.handlePost(req, resp);
     }
-    JobTestUtil.waitForCondition(() -> clientSession.isStopped());
+    JobTestUtil.waitForCondition(clientSession::isStopped);
 
     //two calls UiSession.dispose; remove them from the protocol since they can occor any time in the list
     for (int i = 1; i <= 2; i++) {
@@ -420,7 +423,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionIdA = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionIdA = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -452,7 +455,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionIdB = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionIdB = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -502,7 +505,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       unloadHandler.handlePost(req, resp);
     }
-    JobTestUtil.waitForCondition(() -> clientSession.isStopped());
+    JobTestUtil.waitForCondition(clientSession::isStopped);
 
     assertEquals(
         Arrays.asList(
