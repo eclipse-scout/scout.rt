@@ -14,6 +14,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
@@ -75,7 +76,20 @@ public class NlsFileWatcher {
       return;
     }
 
-    Path directory = new File(resource.getPath()).toPath().getParent();
+    Path directory = null;
+    try {
+      directory = new File(resource.toURI()).toPath().getParent();
+    }
+    catch (URISyntaxException e) {
+      LOG.debug("Resource bundle path {} is invalid. Files will not be watched.", resource.getPath(), e);
+      return;
+    }
+
+    if (directory == null || !directory.toFile().exists()) {
+      LOG.debug("Resource bundle directory {} does not exist. Files will not be watched.", directory);
+      return;
+    }
+
     try {
       m_watchReadWriteLock.writeLock().lock();
       ensureStarted();
