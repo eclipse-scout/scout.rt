@@ -506,6 +506,27 @@ describe('Desktop', function() {
       expect(desktop.header.rendered).toBe(true);
     });
 
+    it('correctly restores view tabs', function() {
+      var form = formHelper.createViewWithOneField();
+      form.title = 'title';
+      desktop.showForm(form);
+      var tab = desktop.header.tabArea.tabs[0];
+      expect(tab.view).toBe(form);
+      expect(tab.rendered).toBe(true);
+      expect(tab.selected).toBe(true);
+
+      desktop.setHeaderVisible(false);
+      expect(tab.view).toBe(form);
+      expect(tab.rendered).toBe(false);
+      expect(tab.selected).toBe(true);
+
+      desktop.setHeaderVisible(true);
+      tab = desktop.header.tabArea.tabs[0];
+      expect(tab.view).toBe(form);
+      expect(tab.rendered).toBe(true);
+      expect(tab.selected).toBe(true);
+    });
+
   });
 
   describe('geolocation', function() {

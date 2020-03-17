@@ -35,9 +35,9 @@ export default class SimpleTabBoxController {
   }
 
   install(tabBox, tabArea) {
+    this.uninstall();
     this.tabBox = scout.assertParameter('tabBox', tabBox);
     this.tabArea = scout.assertParameter('tabArea', tabArea || this.tabBox.tabArea);
-
     this._installListeners();
   }
 
@@ -50,17 +50,19 @@ export default class SimpleTabBoxController {
     this.tabBox.on('viewRemove', this._viewRemoveHandler);
     this.tabBox.on('viewActivate', this._viewActivateHandler);
     this.tabBox.on('viewDeactivate', this._viewDeactivateHandler);
-
     this.tabArea.on('tabSelect', this._viewTabSelectHandler);
   }
 
   _uninstallListeners() {
-    this.tabBox.off('viewAdd', this._viewAddHandler);
-    this.tabBox.off('viewRemove', this._viewRemoveHandler);
-    this.tabBox.off('viewActivate', this._viewActivateHandler);
-    this.tabBox.off('viewDeactivate', this._viewDeactivateHandler);
-
-    this.tabArea.off('tabSelect', this._viewTabSelectHandler);
+    if (this.tabBox) {
+      this.tabBox.off('viewAdd', this._viewAddHandler);
+      this.tabBox.off('viewRemove', this._viewRemoveHandler);
+      this.tabBox.off('viewActivate', this._viewActivateHandler);
+      this.tabBox.off('viewDeactivate', this._viewDeactivateHandler);
+    }
+    if (this.tabArea) {
+      this.tabArea.off('tabSelect', this._viewTabSelectHandler);
+    }
   }
 
   _onViewAdd(event) {

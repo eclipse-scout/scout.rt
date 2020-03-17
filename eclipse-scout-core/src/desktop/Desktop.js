@@ -30,9 +30,9 @@ import {
   strings,
   styles,
   Tree,
+  URL,
   webstorage,
-  Widget,
-  URL
+  Widget
 } from '../index';
 import * as $ from 'jquery';
 
@@ -426,7 +426,7 @@ export default class Desktop extends Widget {
     if (this.navigation && this.navigation.rendered) {
       this.header.$container.insertAfter(this.navigation.$container);
     } else {
-      this.header.$container.insertBefore(this.$overlaySeparator);
+      this.header.$container.prependTo(this.$container);
     }
     // register header tab area
     if (this.bench) {

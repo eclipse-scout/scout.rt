@@ -19,6 +19,7 @@ export default class SimpleTabBox extends Widget {
     this.tabArea = null;
     this.viewStack = [];
     this.currentView = null;
+    this.controller = null;
     this._removeViewInProgress = 0;
   }
 

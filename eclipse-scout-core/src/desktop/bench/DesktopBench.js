@@ -80,13 +80,21 @@ export default class DesktopBench extends Widget {
     if (this.headerTabAreaController) {
       this.headerTabAreaController.install(this, this.headerTabArea);
       // for all views
-      this.getTabBox('C').viewStack.slice().reverse().forEach(function(view) {
+      var tabBox = this.getTabBox('C');
+      tabBox.viewStack.slice().reverse().forEach(function(view) {
         this.headerTabAreaController._onViewAdd({
           view: view
         });
+        if (tabBox.currentView === view) {
+          this.headerTabAreaController._onViewActivate({
+            view: view
+          });
+        }
       }, this);
       // ensure the correct view tab area is visible (header or center part)
       this.headerTabAreaController._onViewsChanged();
+      // prevent flickering
+      this.validateLayoutTree();
     }
   }
 
