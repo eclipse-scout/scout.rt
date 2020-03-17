@@ -17,44 +17,51 @@ import java.util.concurrent.CountDownLatch;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.exception.BeanCreationException;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests bean creation with constructor and / or {@link PostConstruct} methods throwing exceptions.
  *
  * @since 6.1
  */
+@RunWith(PlatformTestRunner.class)
+@RunWithNewPlatform
 public class BeanCreationWithExceptionsTest {
-
-  private IBean<TestBean> m_testBean;
 
   @Before
   public void before() {
-    m_testBean = Platform.get().getBeanManager().registerClass(TestBean.class);
+    Platform.get().getBeanManager().registerClass(TestBeanState.class);
+    Platform.get().getBeanManager().registerClass(TestBean.class);
   }
 
   @After
   public void after() {
-    Platform.get().getBeanManager().unregisterBean(m_testBean);
-    m_testBean = null;
+    Platform.get().getBeanManager().unregisterClass(TestBeanState.class);
+    Platform.get().getBeanManager().unregisterClass(TestBean.class);
   }
 
   @Test
   public void testSuccessfulConstruction() {
-    TestBean.reset(false, false);
+    TestBeanState state = BEANS.get(TestBeanState.class);
+    state.reset(false, false);
     BEANS.get(TestBean.class);
-    TestBean.assertInvocations(1, 1);
+    state.assertInvocations(1, 1);
   }
 
   @Test
   public void testExceptionInConstructor() {
-    TestBean.reset(true, false);
+    TestBeanState state = BEANS.get(TestBeanState.class);
+    state.reset(true, false);
     try {
       BEANS.get(TestBean.class);
       fail("expecting exception");
@@ -62,12 +69,13 @@ public class BeanCreationWithExceptionsTest {
     catch (BeanCreationException e) {
       assertTestBeanException(true, e);
     }
-    TestBean.assertInvocations(0, 0);
+    state.assertInvocations(0, 0);
   }
 
   @Test
   public void testExceptionInPostConstruct() {
-    TestBean.reset(false, true);
+    TestBeanState state = BEANS.get(TestBeanState.class);
+    state.reset(false, true);
     try {
       BEANS.get(TestBean.class);
       fail("expecting exception");
@@ -75,12 +83,13 @@ public class BeanCreationWithExceptionsTest {
     catch (BeanCreationException e) {
       assertTestBeanException(false, e);
     }
-    TestBean.assertInvocations(1, 0);
+    state.assertInvocations(1, 0);
   }
 
   @Test
   public void testExceptionInConstructorThenOk() {
-    TestBean.reset(true, false);
+    TestBeanState state = BEANS.get(TestBeanState.class);
+    state.reset(true, false);
     try {
       BEANS.get(TestBean.class);
       fail("expecting exception");
@@ -88,17 +97,18 @@ public class BeanCreationWithExceptionsTest {
     catch (BeanCreationException e) {
       assertTestBeanException(true, e);
     }
-    TestBean.assertInvocations(0, 0);
+    state.assertInvocations(0, 0);
 
     // disable exceptions, try again
-    TestBean.s_throwExceptionInConstructor = false;
+    state.throwExceptionInConstructor = false;
     BEANS.get(TestBean.class);
-    TestBean.assertInvocations(1, 1);
+    state.assertInvocations(1, 1);
   }
 
   @Test
   public void testExceptionInPostConstructThenOk() {
-    TestBean.reset(false, true);
+    TestBeanState state = BEANS.get(TestBeanState.class);
+    state.reset(false, true);
     try {
       BEANS.get(TestBean.class);
       fail("expecting exception");
@@ -106,17 +116,18 @@ public class BeanCreationWithExceptionsTest {
     catch (BeanCreationException e) {
       assertTestBeanException(false, e);
     }
-    TestBean.assertInvocations(1, 0);
+    state.assertInvocations(1, 0);
 
     // disable exceptions, try again
-    TestBean.s_throwExceptionInPostConstruct = false;
+    state.throwExceptionInPostConstruct = false;
     BEANS.get(TestBean.class);
-    TestBean.assertInvocations(2, 1);
+    state.assertInvocations(2, 1);
   }
 
   @Test
   public void testExceptionInConstructorThenInPostConstructThenOk() {
-    TestBean.reset(true, false);
+    TestBeanState state = BEANS.get(TestBeanState.class);
+    state.reset(true, false);
     try {
       BEANS.get(TestBean.class);
       fail("expecting exception");
@@ -124,11 +135,11 @@ public class BeanCreationWithExceptionsTest {
     catch (BeanCreationException e) {
       assertTestBeanException(true, e);
     }
-    TestBean.assertInvocations(0, 0);
+    state.assertInvocations(0, 0);
 
     // disable constructor exception, enable postConstruct exception
-    TestBean.s_throwExceptionInConstructor = false;
-    TestBean.s_throwExceptionInPostConstruct = true;
+    state.throwExceptionInConstructor = false;
+    state.throwExceptionInPostConstruct = true;
     try {
       BEANS.get(TestBean.class);
       fail("expecting exception");
@@ -136,33 +147,35 @@ public class BeanCreationWithExceptionsTest {
     catch (BeanCreationException e) {
       assertTestBeanException(false, e);
     }
-    TestBean.assertInvocations(1, 0);
+    state.assertInvocations(1, 0);
 
     // disable exceptions, try again
-    TestBean.s_throwExceptionInPostConstruct = false;
+    state.throwExceptionInPostConstruct = false;
     BEANS.get(TestBean.class);
-    TestBean.assertInvocations(2, 1);
+    state.assertInvocations(2, 1);
   }
 
   @Test
   public void testConcurrentSuccessfulConstruction() {
-    TestBean.reset(false, false);
-    TestBean.armLatch(true);
+    TestBeanState state = BEANS.get(TestBeanState.class);
+    state.reset(false, false);
+    state.armLatch(true);
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
-    TestBean.s_constructorLatch.countDown();
+    state.constructorLatch.countDown();
     f1.awaitDoneAndGet();
     f2.awaitDoneAndGet();
-    TestBean.assertInvocations(1, 1);
+    state.assertInvocations(1, 1);
   }
 
   @Test
   public void testConcurrentExceptionInConstructor() {
-    TestBean.reset(true, false);
-    TestBean.armLatch(true);
+    TestBeanState state = BEANS.get(TestBeanState.class);
+    state.reset(true, false);
+    state.armLatch(true);
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
-    TestBean.s_constructorLatch.countDown();
+    state.constructorLatch.countDown();
     try {
       f1.awaitDoneAndGet();
       fail("expecting exception");
@@ -177,16 +190,17 @@ public class BeanCreationWithExceptionsTest {
     catch (BeanCreationException e) {
       // expected
     }
-    TestBean.assertInvocations(0, 0);
+    state.assertInvocations(0, 0);
   }
 
   @Test
   public void testConcurrentExceptionInPostConstruct() {
-    TestBean.reset(false, true);
-    TestBean.armLatch(true);
+    TestBeanState state = BEANS.get(TestBeanState.class);
+    state.reset(false, true);
+    state.armLatch(true);
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
-    TestBean.s_constructorLatch.countDown();
+    state.constructorLatch.countDown();
     try {
       f1.awaitDoneAndGet();
       fail("expecting exception");
@@ -201,16 +215,17 @@ public class BeanCreationWithExceptionsTest {
     catch (BeanCreationException e) {
       // expected
     }
-    TestBean.assertInvocations(1, 0);
+    state.assertInvocations(1, 0);
   }
 
   @Test
   public void testConcurrentExceptionInConstructorThenOk() {
-    TestBean.reset(true, false);
-    TestBean.armLatch(true);
+    TestBeanState state = BEANS.get(TestBeanState.class);
+    state.reset(true, false);
+    state.armLatch(true);
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
-    TestBean.s_constructorLatch.countDown();
+    state.constructorLatch.countDown();
     try {
       f1.awaitDoneAndGet();
       fail("expecting exception");
@@ -225,21 +240,22 @@ public class BeanCreationWithExceptionsTest {
     catch (BeanCreationException e) {
       // expected
     }
-    TestBean.assertInvocations(0, 0);
+    state.assertInvocations(0, 0);
 
     // disable exceptions, try again
-    TestBean.s_throwExceptionInConstructor = false;
+    state.throwExceptionInConstructor = false;
     BEANS.get(TestBean.class);
-    TestBean.assertInvocations(1, 1);
+    state.assertInvocations(1, 1);
   }
 
   @Test
   public void testConcurrentExceptionInPostConstructThenOk() {
-    TestBean.reset(false, true);
-    TestBean.armLatch(true);
+    TestBeanState state = BEANS.get(TestBeanState.class);
+    state.reset(false, true);
+    state.armLatch(true);
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
-    TestBean.s_constructorLatch.countDown();
+    state.constructorLatch.countDown();
     try {
       f1.awaitDoneAndGet();
       fail("expecting exception");
@@ -254,21 +270,22 @@ public class BeanCreationWithExceptionsTest {
     catch (BeanCreationException e) {
       // expected
     }
-    TestBean.assertInvocations(1, 0);
+    state.assertInvocations(1, 0);
 
     // disable exceptions, try again
-    TestBean.s_throwExceptionInPostConstruct = false;
+    state.throwExceptionInPostConstruct = false;
     BEANS.get(TestBean.class);
-    TestBean.assertInvocations(2, 1);
+    state.assertInvocations(2, 1);
   }
 
   @Test
   public void testConcurrentExceptionInConstructorThenInPostConstructThenOk() {
-    TestBean.reset(true, false);
-    TestBean.armLatch(true);
+    TestBeanState state = BEANS.get(TestBeanState.class);
+    state.reset(true, false);
+    state.armLatch(true);
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
-    TestBean.s_constructorLatch.countDown();
+    state.constructorLatch.countDown();
     try {
       f1.awaitDoneAndGet();
       fail("expecting exception");
@@ -283,15 +300,15 @@ public class BeanCreationWithExceptionsTest {
     catch (BeanCreationException e) {
       // expected
     }
-    TestBean.assertInvocations(0, 0);
+    state.assertInvocations(0, 0);
 
     // disable constructor exception, enable postConstruct exception
-    TestBean.s_throwExceptionInConstructor = false;
-    TestBean.s_throwExceptionInPostConstruct = true;
-    TestBean.armLatch(true);
+    state.throwExceptionInConstructor = false;
+    state.throwExceptionInPostConstruct = true;
+    state.armLatch(true);
     f1 = scheduleGetBean();
     f2 = scheduleGetBean();
-    TestBean.s_constructorLatch.countDown();
+    state.constructorLatch.countDown();
     try {
       f1.awaitDoneAndGet();
       fail("expecting exception");
@@ -306,12 +323,12 @@ public class BeanCreationWithExceptionsTest {
     catch (BeanCreationException e) {
       // expected
     }
-    TestBean.assertInvocations(1, 0);
+    state.assertInvocations(1, 0);
 
     // disable exceptions, try again
-    TestBean.s_throwExceptionInPostConstruct = false;
+    state.throwExceptionInPostConstruct = false;
     BEANS.get(TestBean.class);
-    TestBean.assertInvocations(2, 1);
+    state.assertInvocations(2, 1);
   }
 
   private static IFuture<TestBean> scheduleGetBean() {
@@ -319,7 +336,7 @@ public class BeanCreationWithExceptionsTest {
     IFuture<TestBean> future = Jobs.schedule(() -> {
       runningLatch.countDown();
       return BEANS.get(TestBean.class);
-    }, Jobs.newInput());
+    }, Jobs.newInput().withExceptionHandling(new ExceptionHandler(), false));
     await(runningLatch);
     return future;
   }
@@ -347,46 +364,56 @@ public class BeanCreationWithExceptionsTest {
 
   @IgnoreBean
   @ApplicationScoped
-  public static class TestBean {
-    static CountDownLatch s_constructorLatch;
-    static boolean s_throwExceptionInConstructor;
-    static boolean s_throwExceptionInPostConstruct;
-    static int s_numConstructorInvocations;
-    static int s_numPostConstructInvocations;
+  public static class TestBeanState {
+    CountDownLatch constructorLatch;
+    boolean throwExceptionInConstructor;
+    boolean throwExceptionInPostConstruct;
+    int numConstructorInvocations;
+    int numPostConstructInvocations;
 
-    static void reset(boolean throwInConstructor, boolean throwInPostConstruct) {
-      s_constructorLatch = new CountDownLatch(0);
-      s_throwExceptionInConstructor = throwInConstructor;
-      s_throwExceptionInPostConstruct = throwInPostConstruct;
-      s_numConstructorInvocations = 0;
-      s_numPostConstructInvocations = 0;
+    public TestBeanState() {
     }
 
-    static void armLatch(boolean constructorLatch) {
+    void reset(boolean throwInConstructor, boolean throwInPostConstruct) {
+      constructorLatch = new CountDownLatch(0);
+      throwExceptionInConstructor = throwInConstructor;
+      throwExceptionInPostConstruct = throwInPostConstruct;
+      numConstructorInvocations = 0;
+      numPostConstructInvocations = 0;
+    }
+
+    void armLatch(boolean constructorLatch) {
       if (constructorLatch) {
-        s_constructorLatch = new CountDownLatch(1);
+        this.constructorLatch = new CountDownLatch(1);
       }
     }
 
-    static void assertInvocations(int expectedConstructorInvocations, int expectedPostConstructInvocations) {
-      assertEquals(expectedConstructorInvocations, s_numConstructorInvocations);
-      assertEquals(expectedPostConstructInvocations, s_numPostConstructInvocations);
+    void assertInvocations(int expectedConstructorInvocations, int expectedPostConstructInvocations) {
+      assertEquals(expectedConstructorInvocations, numConstructorInvocations);
+      assertEquals(expectedPostConstructInvocations, numPostConstructInvocations);
     }
+  }
+
+  @IgnoreBean
+  @ApplicationScoped
+  public static class TestBean {
 
     public TestBean() {
-      await(s_constructorLatch);
-      if (s_throwExceptionInConstructor) {
+      TestBeanState state = BEANS.get(TestBeanState.class);
+      await(state.constructorLatch);
+      if (state.throwExceptionInConstructor) {
         throw new TestBeanException(true);
       }
-      s_numConstructorInvocations++;
+      state.numConstructorInvocations++;
     }
 
     @PostConstruct
     private void postConstruct() {
-      if (s_throwExceptionInPostConstruct) {
+      TestBeanState state = BEANS.get(TestBeanState.class);
+      if (state.throwExceptionInPostConstruct) {
         throw new TestBeanException(false);
       }
-      s_numPostConstructInvocations++;
+      state.numPostConstructInvocations++;
     }
   }
 
@@ -396,7 +423,7 @@ public class BeanCreationWithExceptionsTest {
     private final boolean m_fromConstructor;
 
     public TestBeanException(boolean fromConstructor) {
-      super("expected exception from {}", fromConstructor ? "constructor" : "@PostConstruct");
+      super("fixture exception from {}", fromConstructor ? "constructor" : "@PostConstruct");
       m_fromConstructor = fromConstructor;
     }
 
