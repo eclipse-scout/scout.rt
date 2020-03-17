@@ -203,6 +203,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public void openUri(BinaryResource binaryResource) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public void openUri(BinaryResource binaryResource, IOpenUriAction openUriAction) {
     throw createUnsupportedOperationException();
   }

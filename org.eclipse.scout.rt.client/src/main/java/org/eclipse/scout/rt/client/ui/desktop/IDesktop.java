@@ -656,7 +656,16 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   void openUri(String uri, IOpenUriAction openUriAction);
 
   /**
-   * Downloads the given binary resource. Download handler is valid for 1 minute.
+   * Decides based on the given {@link BinaryResource} which {@link IOpenUriAction} should be used.<br>
+   * Downloads the given {@link BinaryResource}. Download handler is valid for 1 minute.
+   *
+   * @param binaryResource
+   *          The binary resource that should be opened on the UI using a temporary URI. Must not be <code>null</code>.
+   */
+  void openUri(BinaryResource binaryResource);
+
+  /**
+   * Downloads the given {@link BinaryResource}. Download handler is valid for 1 minute.
    *
    * @param binaryResource
    *          The binary resource that should be opened on the UI using a temporary URI. Must not be <code>null</code>.
