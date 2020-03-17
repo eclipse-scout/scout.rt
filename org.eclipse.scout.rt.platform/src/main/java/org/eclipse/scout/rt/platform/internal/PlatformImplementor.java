@@ -181,7 +181,7 @@ public class PlatformImplementor implements IPlatform {
 
   protected void validateConfiguration() {
     if (!ConfigUtility.hasProviderProperties()) {
-      LOG.info("No {} found. Running with empty configuration.", ConfigUtility.CONFIG_FILE_NAME);
+      LOG.info("No {} found. Running with empty configuration.", ConfigUtility.DEFAULT_PATH_TO_CONFIG_FILE);
       return;
     }
     final List<IConfigurationValidator> validators = BEANS.all(IConfigurationValidator.class);

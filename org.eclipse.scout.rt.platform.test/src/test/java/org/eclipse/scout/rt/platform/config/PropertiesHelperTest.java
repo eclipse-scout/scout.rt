@@ -107,7 +107,7 @@ public class PropertiesHelperTest {
     String key = "myconfig.properties";
     try {
       System.setProperty(key, TEST_CONFIG_PROPS);
-      PropertiesHelper file5 = new PropertiesHelper(new ConfigPropertyProvider(key));
+      PropertiesHelper file5 = new PropertiesHelper(new ConfigPropertyProvider(key, null));
       assertTrue(file5.hasProviderProperties());
       assertEquals(2, file5.getAllPropertyNames().size());
     }
@@ -272,8 +272,7 @@ public class PropertiesHelperTest {
     try {
       new PropertiesHelper(new SimpleConfigPropertyProvider("ID")
           .withProperty("prop1", "a${prop2}b")
-          .withProperty("prop2", "a${prop33}b")
-      );
+          .withProperty("prop2", "a${prop33}b"));
       Assert.fail();
     }
     catch (IllegalArgumentException e) {

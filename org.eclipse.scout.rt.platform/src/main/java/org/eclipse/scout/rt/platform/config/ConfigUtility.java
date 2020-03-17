@@ -62,12 +62,6 @@ import java.util.Set;
 public final class ConfigUtility {
 
   /**
-   * Property to specify the configuration file. If not specified then {@link ClassLoader#getResource(String)} with
-   * "/config.properties" is used.
-   */
-  public static final String CONFIG_FILE_NAME = "classpath:config.properties";
-
-  /**
    * Optional file defining variables used in the config.properties. This feature is helpful when launching applications
    * in development mode in the IDE or as parameterized deployments using a pre-defined config.properties that contains
    * variables. The variable file only contains variables and values but is itself not a config.property file. Thus its
@@ -93,7 +87,19 @@ public final class ConfigUtility {
    */
   public static final String SCOUT_ENV_PROPERTY = "scout.env";
 
-  private static final PropertiesHelper INSTANCE = new PropertiesHelper(new ConfigPropertyProvider(CONFIG_FILE_NAME), new ConfigPropertyProvider(System.getProperty(SCOUT_ENV_PROPERTY)));
+  /**
+   * Property to specify the configuration file. If not specified then {@link #DEFAULT_PATH_TO_CONFIG_FILE} is used.
+   */
+  public static final String CONFIG_FILE_PROPERTY = "config.properties";
+
+  /**
+   * Default path to config.properties file.
+   */
+  public static final String DEFAULT_PATH_TO_CONFIG_FILE = "classpath:config.properties";
+
+  private static final PropertiesHelper INSTANCE = new PropertiesHelper(
+      new ConfigPropertyProvider(CONFIG_FILE_PROPERTY, DEFAULT_PATH_TO_CONFIG_FILE),
+      new ConfigPropertyProvider(SCOUT_ENV_PROPERTY, null));
 
   private ConfigUtility() {
   }
