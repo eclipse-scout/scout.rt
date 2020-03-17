@@ -1650,6 +1650,12 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
+  public void openUri(BinaryResource res) {
+    Assertions.assertNotNull(res);
+    openUri(res, BEANS.get(OpenUriHelper.class).getOpenUriActionForResource(res));
+  }
+
+  @Override
   public void openUri(BinaryResource res, IOpenUriAction openUriAction) {
     Assertions.assertNotNull(res);
     Assertions.assertNotNull(openUriAction);
