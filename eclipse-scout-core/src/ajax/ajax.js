@@ -142,17 +142,14 @@ export function removeJson(url, options) {
 
 /**
  * Performs an Ajax request using JSON as format for the request and the response.
+ * The default HTTP method is POST.
  * @param [options] additional settings for the request.
  *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
  * @returns {Promise} a promise which is resolved when the request succeeds.
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
 export function callJson(options) {
-  var opts = $.extend({}, {
-    dataType: 'json',
-    contentType: 'application/json; charset=UTF-8'
-  }, options);
-  return call(opts);
+  return createCallJson(options).call();
 }
 
 /**
@@ -163,6 +160,32 @@ export function callJson(options) {
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
 export function call(options) {
+  return createCall(options).call();
+}
+
+/**
+ * Prepares an Ajax call with JSON as format for the request and the response,
+ * but does not execute it yet. The default HTTP method is POST.
+ * @param [options] additional settings for the request.
+ *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+ * @returns {AjaxCall} the prepared Ajax call object. Execute it with the call() function.
+ */
+export function createCallJson(options) {
+  var opts = $.extend({}, {
+    type: 'POST',
+    dataType: 'json',
+    contentType: 'application/json; charset=UTF-8'
+  }, options);
+  return createCall(opts);
+}
+
+/**
+ * Prepares an Ajax call, but does not execute it yet.
+ * @param [options] additional settings for the request.
+ *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
+ * @returns {AjaxCall} the prepared Ajax call object. Execute it with the call() function.
+ */
+export function createCall(options) {
   var opts = $.extend({}, {
     cache: false
   }, options);
@@ -175,6 +198,8 @@ export function call(options) {
 }
 
 export default {
+  createCall,
+  createCallJson,
   call,
   callJson,
   get,
