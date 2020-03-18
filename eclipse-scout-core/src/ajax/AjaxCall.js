@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Call, URL} from '../index';
+import {AjaxError, Call, URL} from '../index';
 import * as $ from 'jquery';
 
 export default class AjaxCall extends Call {
@@ -16,6 +16,7 @@ export default class AjaxCall extends Call {
   constructor() {
     super();
     this.type = 'ajax';
+    this.ajaxOptions = null;
   }
 
   init(model) {
@@ -32,6 +33,19 @@ export default class AjaxCall extends Call {
   }
 
   // ==================================================================================
+
+  _promise() {
+    return super._promise()
+      .catch(function(jqXHR, textStatus, errorThrown) {
+        // Wrap arguments in an object to make rethrowing the error easier.
+        return $.rejectedPromise(new AjaxError({
+          jqXHR: jqXHR,
+          textStatus: textStatus,
+          errorThrown: errorThrown,
+          requestOptions: this.ajaxOptions
+        }));
+      }.bind(this));
+  }
 
   _callImpl() {
     // Mark retries by adding an URL parameter
@@ -67,6 +81,7 @@ export default class AjaxCall extends Call {
   /* --- STATIC HELPERS ------------------------------------------------------------- */
 
   static isOfflineError(jqXHR, textStatus, errorThrown, request) {
+    // noinspection UnnecessaryLocalVariableJS
     var offline = (
       // Status code = 0 -> no connection
       !jqXHR.status ||

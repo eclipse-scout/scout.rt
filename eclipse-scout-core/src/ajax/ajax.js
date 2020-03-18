@@ -167,21 +167,11 @@ export function call(options) {
     cache: false
   }, options);
 
-  var ajaxCall = scout.create('AjaxCall', {
+  return scout.create('AjaxCall', {
     ajaxOptions: opts
   }, {
     ensureUniqueId: false
   });
-  return ajaxCall.call()
-    .catch(function(jqXHR, textStatus, errorThrown) {
-      // Wrap arguments in an object to make rethrowing the error easier.
-      return $.rejectedPromise(new AjaxError({
-        jqXHR: jqXHR,
-        textStatus: textStatus,
-        errorThrown: errorThrown,
-        requestOptions: opts
-      }));
-    });
 }
 
 export default {

@@ -729,12 +729,12 @@ export default class Session {
       }
     }
 
-    function onAjaxFail(jqXHR, textStatus, errorThrown) {
+    function onAjaxFail(ajaxError) {
       try {
         if (busyHandling) {
           this.setBusy(false);
         }
-        this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
+        this._processErrorResponse(ajaxError.jqXHR, ajaxError.textStatus, ajaxError.errorThrown, request);
       } catch (err) {
         jsError = jsError || err;
       }
@@ -884,9 +884,9 @@ export default class Session {
       }
     }
 
-    function onAjaxFail(jqXHR, textStatus, errorThrown) {
+    function onAjaxFail(ajaxError) {
       this.backgroundJobPollingSupport.setFailed();
-      this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
+      this._processErrorResponse(ajaxError.jqXHR, ajaxError.textStatus, ajaxError.errorThrown, request);
     }
   }
 

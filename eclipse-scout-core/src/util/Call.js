@@ -79,6 +79,10 @@ export default class Call {
     this.deferred.reject.apply(this.deferred, this.result);
   }
 
+  _promise() {
+    return this.deferred.promise();
+  }
+
   // ==================================================================================
 
   /**
@@ -114,7 +118,7 @@ export default class Call {
   call() {
     this._checkInitialized();
     this._call();
-    return this.deferred.promise();
+    return this._promise();
   }
 
   /**
@@ -158,7 +162,7 @@ export default class Call {
    * >>> This method MUST be implemented by a subclass. <<<
    */
   _callImpl() {
-    throw new Error('Missing implemention: _callImpl()');
+    throw new Error('Missing implementation: _callImpl()');
   }
 
   _onCallDone() {
