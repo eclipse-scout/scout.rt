@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, dragAndDrop, InputFieldKeyStrokeContext, keys, mimeTypes, scout, Session, strings, ValueField} from '../../../index';
+import {arrays, Device, dragAndDrop, InputFieldKeyStrokeContext, keys, mimeTypes, scout, Session, strings, ValueField} from '../../../index';
 import * as $ from 'jquery';
 
 export default class ClipboardField extends ValueField {
@@ -309,6 +309,7 @@ export default class ClipboardField extends ValueField {
           }
         }
       });
+      this._cleanupFiles(filesArgument);
     }
 
     var waitForFileReaderEvents = 0;
@@ -423,6 +424,28 @@ export default class ClipboardField extends ValueField {
 
     // trigger other actions to catch content
     return true;
+  }
 
+  /**
+   * Safari creates two files when pasting an image from clipboard, one PNG and one JPEG.
+   * If that happens, remove the JPEG and only keep the PNG.
+   */
+  _cleanupFiles(files) {
+    if (files.length !== 2) {
+      return;
+    }
+    var pngImage;
+    var jpgImage;
+    files.forEach(function(file) {
+      // Check for the scoutName because it will only be set if it is likely a paste from clipboard event
+      if (file.name === 'image.png' && file.scoutName) {
+        pngImage = file;
+      } else if (file.name === 'image.jpeg' && file.scoutName) {
+        jpgImage = file;
+      }
+    });
+    if (pngImage && jpgImage) {
+      arrays.remove(files, jpgImage);
+    }
   }
 }
