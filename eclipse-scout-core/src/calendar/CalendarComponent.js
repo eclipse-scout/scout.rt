@@ -44,9 +44,6 @@ export default class CalendarComponent extends Widget {
     }
   }
 
-  /**
-   * @override ModelAdapter.js
-   */
   _remove() {
     // remove $parts because they're not children of this.$container
     this._$parts.forEach(function($part) {
@@ -120,16 +117,15 @@ export default class CalendarComponent extends Widget {
         .data('partDay', partDay)
         .mousedown(this._onMouseDown.bind(this))
         .on('contextmenu', this._onContextMenu.bind(this));
-      $part
-        .appendDiv('calendar-component-leftcolorborder');
-      $part
-        .appendDiv('content', this.item.subject);
+      $part.appendDiv('calendar-component-leftcolorborder');
+      $part.appendDiv('content', this.item.subject);
 
       this._$parts.push($part);
 
       if (this.parent._isMonth()) {
+        var width = $day.data('new-width') || $day.width(); // prefer width from layoutSize
         $part.addClass('component-month')
-          .toggleClass('compact', $day.width() < CalendarComponent.MONTH_COMPACT_THRESHOLD);
+          .toggleClass('compact', width < CalendarComponent.MONTH_COMPACT_THRESHOLD);
       } else {
         if (this.fullDay) {
           // Full day tasks are rendered in the topGrid
