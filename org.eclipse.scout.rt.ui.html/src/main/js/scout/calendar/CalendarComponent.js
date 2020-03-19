@@ -38,9 +38,6 @@ scout.CalendarComponent.prototype._syncCoveredDaysRange = function(coveredDaysRa
   }
 };
 
-/**
- * @override ModelAdapter.js
- */
 scout.CalendarComponent.prototype._remove = function() {
   // remove $parts because they're not children of this.$container
   var tooltipSupport = this.parent._tooltipSupport;
@@ -117,8 +114,9 @@ scout.CalendarComponent.prototype._render = function() {
 
 
     if (this.parent._isMonth()) {
+      var width = $day.data('new-width') || $day.width(); // prefer width from layoutSize
       $part.addClass('component-month')
-        .toggleClass('compact', $day.width() < scout.CalendarComponent.MONTH_COMPACT_THRESHOLD);
+        .toggleClass('compact', width < scout.CalendarComponent.MONTH_COMPACT_THRESHOLD);
     } else {
       if (this.fullDay) {
         var count = $('.component-task', $day).length;
