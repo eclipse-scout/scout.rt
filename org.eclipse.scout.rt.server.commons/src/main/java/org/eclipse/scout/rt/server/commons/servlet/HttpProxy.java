@@ -117,6 +117,23 @@ public class HttpProxy {
   }
 
   /**
+   * @return Whether the {@linkplain HttpServletRequest#getParameterMap() request parameters} should be written as
+   *         payload instead of the {@linkplain HttpServletRequest#getInputStream() original payload}.
+   *         <p>
+   *         This is mostly relevant for form submissions (content type <code>application/x-www-form-urlencoded</code>).
+   *         Because the servlet container parses the parameters from the payload, they cannot be read again from the
+   *         request body. Instead, they have to be read from the parameter map and be converted back to a valid body.
+   * @see #writeRequestParameters(HttpServletRequest, HttpRequest)
+   */
+  protected boolean shouldWriteParametersAsPayload(HttpServletRequest req) {
+    if (req.getParameterMap().isEmpty()) {
+      return false;
+    }
+    // https://www.w3.org/TR/html401/interact/forms.html#h-17.13.4.1
+    return "application/x-www-form-urlencoded".equals(req.getContentType());
+  }
+
+  /**
    * Forwards the given request to the remote URL using the given method.
    * <ul>
    * <li>Adds every request header beside the blacklisted to the forwarded request.<br>
@@ -148,7 +165,7 @@ public class HttpProxy {
     if (shouldIncludeRequestPayload(req)) {
       // Payload is empty if parameters are used (usually with content type = application/x-www-form-urlencoded)
       // -> write parameters if there are any, otherwise write the raw payload
-      if (!req.getParameterMap().isEmpty()) {
+      if (shouldWriteParametersAsPayload(req)) {
         writeRequestParameters(req, httpReq);
       }
       else {

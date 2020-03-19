@@ -10,18 +10,11 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonMap;
+import static java.util.Collections.*;
 import static org.eclipse.scout.rt.platform.util.CollectionUtility.hashMap;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -75,6 +68,34 @@ public class HttpProxyTest {
 
     String url = proxy.rewriteUrl(req, options);
     assertEquals("http://internal.example.com:1234/api/templates/a20a1264-2c56-4c71-a1fd-a1edb675a8ee/preview", url);
+  }
+
+  @Test
+  public void testShouldWriteParametersAsPayload() {
+    Map<String, String[]> oneParameter = CollectionUtility.hashMap(ImmutablePair.of("maxRows", new String[]{"2"}));
+    Map<String, String[]> multiParameters = CollectionUtility.hashMap(ImmutablePair.of("name", new String[]{"alice"}), ImmutablePair.of("pets", new String[]{"dog", "cat"}));
+
+    assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/json", null)));
+    assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/json", oneParameter)));
+    assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/json", multiParameters)));
+
+    assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/x-www-form-urlencoded", null)));
+    assertTrue(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/x-www-form-urlencoded", oneParameter)));
+    assertTrue(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/x-www-form-urlencoded", multiParameters)));
+  }
+
+  private HttpServletRequest mockRequest(String method, String contentType, Map<String, String[]> parameterMap) {
+    HttpServletRequest req = mock(HttpServletRequest.class);
+    if (method != null) {
+      when(req.getMethod()).thenReturn(method);
+    }
+    if (contentType != null) {
+      when(req.getContentType()).thenReturn(contentType);
+    }
+    if (parameterMap != null) {
+      when(req.getParameterMap()).thenReturn(parameterMap);
+    }
+    return req;
   }
 
   @Test
