@@ -36,26 +36,12 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>com.mchange</groupId>
-          <artifactId>c3p0</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.mchange</groupId>
-          <artifactId>mchange-commons-java</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.zaxxer</groupId>
-          <artifactId>HikariCP-java7</artifactId>
-        </exclusion>
-      </exclusions>
    </dependency>
     <!-- optional logger dependencies -->
 
