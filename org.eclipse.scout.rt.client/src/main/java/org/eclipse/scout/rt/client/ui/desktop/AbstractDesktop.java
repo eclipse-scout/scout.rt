@@ -169,7 +169,8 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
   private final List<ClientCallback<Coordinates>> m_pendingPositionResponses = Collections.synchronizedList(new ArrayList<>());
-  private int m_attachedGuis = 0;
+  private int m_attachedCount = 0;
+  private int m_attachedGuiCount = 0;
   private final IDataChangeManager m_dataChangeListeners;
   private final IDataChangeManager m_dataChangeDesktopInForegroundListeners;
 
@@ -1968,7 +1969,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   @Override
   public void closeInternal() {
     setOpenedInternal(false);
-    while (getAttachedGuiCount() > 0) {
+    while (m_attachedGuiCount > 0) {
       detachGui();
     }
 
@@ -2089,20 +2090,28 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     return true;
   }
 
-  private int getAttachedGuiCount() {
-    return m_attachedGuis;
+  /**
+   * How many times the attachGui() method has been called. Some behavior like URL or deep-link handling
+   * may be different the first time a desktop is attached. If the attached count is 1 it means the desktop
+   * has been created. If attached count is > 1 it means an existing desktop is re-used (probably by a
+   * reload with Ctrl + R in the browser).
+   *
+   * @return
+   */
+  protected int getAttachedCount() {
+    return m_attachedCount;
   }
 
-  private void setAttachedGuiCount(int n) {
-    m_attachedGuis = n;
-    propertySupport.setPropertyBool(PROP_GUI_AVAILABLE, m_attachedGuis > 0);
+  private void setAttachedGuiCount(int attachedGuiCount) {
+    m_attachedGuiCount = attachedGuiCount;
+    propertySupport.setPropertyBool(PROP_GUI_AVAILABLE, m_attachedGuiCount > 0);
   }
 
   private void attachGui() {
-    setAttachedGuiCount(getAttachedGuiCount() + 1);
-
-    if (getAttachedGuiCount() == 1) {
-      //this is the first call to attachGui, call extensions
+    m_attachedCount++;
+    setAttachedGuiCount(m_attachedGuiCount + 1);
+    if (m_attachedGuiCount == 1) {
+      // this is the first call to attachGui, call extensions
       for (IDesktopExtension ext : getDesktopExtensions()) {
         try {
           ContributionCommand cc = ext.guiAttachedDelegate();
@@ -2117,13 +2126,13 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     }
 
     PropertyMap params = getStartupRequestParams();
-    final String geolocationServiceAvailableStr = params.get(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE);
-    final boolean geolocationServiceAvailable = TypeCastUtility.castValue(geolocationServiceAvailableStr, boolean.class);
+    String geolocationServiceAvailableStr = params.get(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE);
+    boolean geolocationServiceAvailable = TypeCastUtility.castValue(geolocationServiceAvailableStr, boolean.class);
     setGeolocationServiceAvailable(geolocationServiceAvailable);
 
     boolean handleDeepLink = params.getOrDefault(DeepLinkUrlParameter.HANDLE_DEEP_LINK, true);
     if (handleDeepLink) {
-      final String deepLinkPath = params.get(DeepLinkUrlParameter.DEEP_LINK);
+      String deepLinkPath = params.get(DeepLinkUrlParameter.DEEP_LINK);
       activateDefaultView(deepLinkPath);
     }
   }
@@ -2138,16 +2147,25 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    *          parameter may be null. See: {@link IDeepLinks}.
    */
   protected void activateDefaultView(String deepLinkPath) {
+    if (safeHandleDeepLink(deepLinkPath)) {
+      return;
+    }
+    if (m_attachedCount <= 1) { // is startup?
+      interceptDefaultView();
+    }
+  }
+
+  protected boolean safeHandleDeepLink(String deepLinkPath) {
     try {
-      if (!handleDeepLink(deepLinkPath)) {
-        interceptDefaultView();
+      if (handleDeepLink(deepLinkPath)) {
+        return true;
       }
     }
     catch (DeepLinkException e) {
       LOG.warn("Failed to execute deep-link '{}', reason: {}", deepLinkPath, e.getMessage());
-      interceptDefaultView();
       showDeepLinkError(e);
     }
+    return false;
   }
 
   @Override
@@ -2174,6 +2192,12 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     }
 
     if (StringUtility.isNullOrEmpty(deepLinkPath)) {
+      return false;
+    }
+
+    // Check if the same deep-link is activated
+    BrowserHistoryEntry entry = getBrowserHistoryEntry();
+    if (entry != null && deepLinkPath.equals(entry.getDeepLinkPath())) {
       return false;
     }
 
@@ -2220,8 +2244,8 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   private void detachGui() {
-    setAttachedGuiCount(getAttachedGuiCount() - 1);
-    if (getAttachedGuiCount() == 0) {
+    setAttachedGuiCount(m_attachedGuiCount - 1);
+    if (m_attachedGuiCount == 0) {
       //this is the last call to detachGui, call extensions
       for (IDesktopExtension ext : getDesktopExtensions()) {
         try {

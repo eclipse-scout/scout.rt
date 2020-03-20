@@ -26,6 +26,7 @@ import {
   KeyStrokeContext,
   MessageBoxController,
   Outline,
+  objects,
   scout,
   strings,
   styles,
@@ -506,11 +507,29 @@ export default class Desktop extends Widget {
     var myWindow = this.$container.window(true),
       history = this.browserHistoryEntry;
     if (history) {
+      var historyPath = this._createHistoryPath(history.path);
       var setStateFunc = (this.rendered ? myWindow.history.pushState : myWindow.history.replaceState).bind(myWindow.history);
       setStateFunc({
         deepLinkPath: history.deepLinkPath
-      }, history.title, history.path);
+      }, history.title, historyPath);
     }
+  }
+
+  /**
+   * Takes the history.path provided by the browserHistoryEvent and appends additional URL parameters.
+   */
+  _createHistoryPath(historyPath) {
+    var cloneUrl = this.url.clone();
+    cloneUrl.removeParameter('dl');
+    cloneUrl.removeParameter('i');
+    if (objects.countOwnProperties(cloneUrl.parameterMap) > 0) {
+      var pathUrl = new URL(historyPath);
+      for (var paramName in cloneUrl.parameterMap) {
+        pathUrl.addParameter(paramName, cloneUrl.getParameter(paramName));
+      }
+      historyPath = pathUrl.toString({alwaysFirst: ['dl', 'i']});
+    }
+    return historyPath;
   }
 
   _setupDragAndDrop() {

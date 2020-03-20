@@ -152,6 +152,10 @@ export default class URL {
     return result;
   }
 
+  clone() {
+    return new URL(this.toString());
+  }
+
   /* --- STATIC HELPERS ------------------------------------------------------------- */
 
   /**
