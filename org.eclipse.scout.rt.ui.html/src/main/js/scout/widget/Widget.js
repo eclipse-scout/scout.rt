@@ -1092,7 +1092,12 @@ scout.Widget.prototype.glassPaneTargets = function(element) {
 };
 
 scout.Widget.prototype._glassPaneTargets = function(element) {
-  return [this.$container];
+  // since popups are rendered outside the DOM of the widget parent-child hierarchy, get glassPaneTargets of popups belonging to this widget separately.
+  return [this.$container].concat(
+    this.session.desktop.getPopupsFor(this)
+    .reduce(function(acc, popup) {
+      return acc.concat(popup.glassPaneTargets());
+    }, []));
 };
 
 scout.Widget.prototype.toString = function() {

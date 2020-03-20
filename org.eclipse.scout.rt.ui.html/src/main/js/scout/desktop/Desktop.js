@@ -641,7 +641,7 @@ scout.Desktop.prototype._renderNotification = function(notification) {
   notification.fadeIn(this.$notifications);
   if (notification.duration > 0) {
     notification.removeTimeout = setTimeout(notification.hide.bind(notification), notification.duration);
-    notification.one('remove', function(){
+    notification.one('remove', function() {
       this.removeNotification(notification);
     }.bind(this));
   }
@@ -680,17 +680,25 @@ scout.Desktop.prototype.removeNotification = function(notification) {
   }
 };
 
-/**
- * Destroys every popup which is a descendant of the given widget.
- */
-scout.Desktop.prototype.destroyPopupsFor = function(widget) {
+scout.Desktop.prototype.getPopupsFor = function(widget) {
+  var popups = [];
   this.$container.children('.popup').each(function(i, elem) {
     var $popup = $(elem),
       popup = scout.Widget.getWidgetFor($popup);
 
     if (widget.has(popup)) {
-      popup.destroy();
+      popups.push(popup);
     }
+  });
+  return popups;
+};
+
+/**
+ * Destroys every popup which is a descendant of the given widget.
+ */
+scout.Desktop.prototype.destroyPopupsFor = function(widget) {
+  this.getPopupsFor(widget).forEach(function(popup) {
+    popup.destroy();
   });
 };
 

@@ -20,6 +20,7 @@ scout.GlassPaneRenderer = function(widget, enabled) {
   this._deferredGlassPanes = [];
   this._resolvedDisplayParent = null;
   this._registeredDisplayParent = null;
+  this._glassPaneRendererRegistered = false;
 };
 
 scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
@@ -31,6 +32,10 @@ scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
       this.renderGlassPane(glassPaneTarget);
     }
   }, this);
+  if (!this._glassPaneRendererRegistered) {
+    this.session.focusManager.registerGlassPaneRenderer(this);
+    this._glassPaneRendererRegistered = true;
+  }
 };
 
 /**
@@ -93,6 +98,8 @@ scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
 
   this._$glassPanes = [];
   this._$glassPaneTargets = [];
+  this.session.focusManager.unregisterGlassPaneRenderer(this);
+  this._glassPaneRendererRegistered = false;
 };
 
 scout.GlassPaneRenderer.prototype.eachGlassPane = function(func) {

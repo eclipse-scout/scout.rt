@@ -147,6 +147,7 @@ scout.Popup.prototype._postRender = function() {
 
   this.size();
   this._attachCloseHandler();
+  this._handleGlassPanes();
 };
 
 scout.Popup.prototype._remove = function() {
@@ -295,8 +296,7 @@ scout.Popup.prototype._onPopupOpen = function(event) {
   // Use case: Opening of a context menu or cell editor in a form popup
   // Also, popups covered by a glass pane (a modal dialog is open) must never be closed
   // Use case: popup opens a modal dialog. User clicks on a smartfield on this dialog -> underlying popup must not get closed
-  var closable =
-    !this.isOrHas(event.popup) &&
+  var closable = !this.isOrHas(event.popup) &&
     !event.popup.isOrHas(this);
   if (this.rendered) {
     closable = closable && !this.session.focusManager.isElementCovertByGlassPane(this.$container[0]);
@@ -469,5 +469,13 @@ scout.Popup.prototype.isOpen = function() {
 scout.Popup.prototype.ensureOpen = function() {
   if (!this.isOpen()) {
     this.open();
+  }
+};
+
+scout.Popup.prototype._handleGlassPanes = function() {
+  var parentCoveredByGlassPane = this.session.focusManager.isElementCovertByGlassPane(this.parent.$container);
+  // if a popup is covered by a glass pane the glass pane's need to be rerendered to ensure a glass pane is also painted over the popup
+  if (parentCoveredByGlassPane) {
+    this.session.focusManager.rerenderGlassPanes();
   }
 };

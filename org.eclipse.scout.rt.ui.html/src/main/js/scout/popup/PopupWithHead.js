@@ -281,3 +281,7 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
   scout.graphics.setSize(this.$head, headSize);
   scout.graphics.setSize(this.$body, bodySize);
 };
+
+scout.PopupWithHead.prototype._glassPaneTargets = function() {
+  return [this.$container, this.$head];
+};
