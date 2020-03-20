@@ -10,13 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
-import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.*;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -380,6 +375,13 @@ public class JsonDataObjectsSerializationTest {
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     assertJsonEquals("TestBinaryResourceDoNullContent.json", json);
+  }
+
+  @Test
+  public void testDeserialize_BinaryResource_WithoutCharset() throws Exception {
+    String inputJson = readResourceAsString("TestBinaryResourceDoWithoutCharset.json");
+    TestBinaryResourceDo testDo = s_dataObjectMapper.readValue(inputJson, TestBinaryResourceDo.class);
+    assertEquals(BINARY_RESOURCE, testDo.getBrDefault());
   }
 
   @Test
