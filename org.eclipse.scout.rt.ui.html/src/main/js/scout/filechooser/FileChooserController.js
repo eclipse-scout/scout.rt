@@ -55,6 +55,10 @@ scout.FileChooserController.prototype.render = function() {
 };
 
 scout.FileChooserController.prototype._render = function(fileChooser) {
+  // missing displayParent (when render is called by reload), use displayParent of FileChooserController
+  if (!fileChooser.displayParent) {
+    fileChooser._setProperty('displayParent', this.displayParent);
+  }
   // Use parent's function or (if not implemented) our own.
   if (this.displayParent.acceptView) {
     if (!this.displayParent.acceptView(fileChooser)) {

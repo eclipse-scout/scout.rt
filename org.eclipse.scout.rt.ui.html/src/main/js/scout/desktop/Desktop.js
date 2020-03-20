@@ -717,17 +717,25 @@ scout.Desktop.prototype.removeNotification = function(notification) {
   }
 };
 
-/**
- * Destroys every popup which is a descendant of the given widget.
- */
-scout.Desktop.prototype.destroyPopupsFor = function(widget) {
+scout.Desktop.prototype.getPopupsFor = function(widget) {
+  var popups = [];
   this.$container.children('.popup').each(function(i, elem) {
     var $popup = $(elem),
       popup = scout.widget($popup);
 
     if (widget.has(popup)) {
-      popup.destroy();
+      popups.push(popup);
     }
+  });
+  return popups;
+};
+
+/**
+ * Destroys every popup which is a descendant of the given widget.
+ */
+scout.Desktop.prototype.destroyPopupsFor = function(widget) {
+  this.getPopupsFor(widget).forEach(function(popup) {
+    popup.destroy();
   });
 };
 
