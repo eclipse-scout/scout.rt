@@ -38,6 +38,7 @@ export default class FocusManager {
     this._focusContexts = [];
     this._glassPaneTargets = [];
     this._glassPaneDisplayParents = [];
+    this._glassPaneRenderers = [];
 
     // Make $entryPoint focusable and install focus context.
     var $mainEntryPoint = this.session.$entryPoint;
@@ -256,6 +257,10 @@ export default class FocusManager {
     this._glassPaneDisplayParents.push(displayParent);
   }
 
+  registerGlassPaneRenderer(glassPaneRenderer) {
+    this._glassPaneRenderers.push(glassPaneRenderer);
+  }
+
   /**
    * Unregisters the given glasspane target, so that the focus can be gained again for the target or one of its child controls.
    */
@@ -266,6 +271,20 @@ export default class FocusManager {
 
   unregisterGlassPaneDisplayParent(displayParent) {
     arrays.remove(this._glassPaneDisplayParents, displayParent);
+  }
+
+  unregisterGlassPaneRenderer(glassPaneRenderer) {
+    arrays.remove(this._glassPaneRenderers, glassPaneRenderer);
+  }
+
+  rerenderGlassPanes() {
+    // create a copy of the current glassPaneRenderers
+    var currGlassPaneRenderers = this._glassPaneRenderers.slice();
+    // remove and rerender every glassPaneRenderer to keep them (and their members) valid.
+    currGlassPaneRenderers.forEach(function(glassPaneRenderer) {
+      glassPaneRenderer.removeGlassPanes();
+      glassPaneRenderer.renderGlassPanes();
+    });
   }
 
   /**

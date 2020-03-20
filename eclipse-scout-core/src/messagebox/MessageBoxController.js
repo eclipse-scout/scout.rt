@@ -59,6 +59,10 @@ export default class MessageBoxController {
   }
 
   _render(messageBox) {
+    // missing displayParent (when render is called by reload), use displayParent of MessageBoxController
+    if (!messageBox.displayParent) {
+      messageBox._setProperty('displayParent', this.displayParent);
+    }
     // Use parent's function or (if not implemented) our own.
     if (this.displayParent.acceptView) {
       if (!this.displayParent.acceptView(messageBox)) {

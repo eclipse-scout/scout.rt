@@ -271,6 +271,7 @@ export default class Popup extends Widget {
     this.size();
     this._attachCloseHandlers();
     this._attachAnchorHandlers();
+    this._handleGlassPanes();
   }
 
   _onAttach() {
@@ -992,6 +993,14 @@ export default class Popup extends Widget {
       this.position();
     } else if (this.windowResizeType === 'remove') {
       this.close();
+    }
+  }
+
+  _handleGlassPanes() {
+    var parentCoveredByGlassPane = this.session.focusManager.isElementCovertByGlassPane(this.parent.$container);
+    // if a popup is covered by a glass pane the glass pane's need to be rerendered to ensure a glass pane is also painted over the popup
+    if (parentCoveredByGlassPane) {
+      this.session.focusManager.rerenderGlassPanes();
     }
   }
 }

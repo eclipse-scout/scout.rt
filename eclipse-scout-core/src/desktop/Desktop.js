@@ -25,15 +25,16 @@ import {
   HtmlEnvironment,
   KeyStrokeContext,
   MessageBoxController,
-  Outline,
   objects,
+  Outline,
   scout,
   strings,
   styles,
   Tree,
   URL,
   webstorage,
-  Widget
+  Widget,
+  widgets
 } from '../index';
 import * as $ from 'jquery';
 
@@ -800,17 +801,25 @@ export default class Desktop extends Widget {
     }
   }
 
+  getPopupsFor(widget) {
+    var popups = [];
+    this.$container.children('.popup').each(function(i, elem) {
+      var $popup = $(elem),
+        popup = widgets.get($popup);
+
+      if (widget.has(popup)) {
+        popups.push(popup);
+      }
+    });
+    return popups;
+  }
+
   /**
    * Destroys every popup which is a descendant of the given widget.
    */
   destroyPopupsFor(widget) {
-    this.$container.children('.popup').each(function(i, elem) {
-      var $popup = $(elem),
-        popup = scout.widget($popup);
-
-      if (widget.has(popup)) {
-        popup.destroy();
-      }
+    this.getPopupsFor(widget).forEach(function(popup) {
+      popup.destroy();
     });
   }
 

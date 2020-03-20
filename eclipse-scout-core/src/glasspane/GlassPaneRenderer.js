@@ -26,6 +26,7 @@ export default class GlassPaneRenderer {
     this._registeredDisplayParent = null;
     this._displayParentRenderHandler = this._onDisplayParentRender.bind(this);
     this._glassPaneRemoveHandler = this._onGlassPaneRemove.bind(this);
+    this._glassPaneRendererRegistered = false;
   }
 
   renderGlassPanes() {
@@ -37,6 +38,10 @@ export default class GlassPaneRenderer {
         this.renderGlassPane(glassPaneTarget);
       }
     }, this);
+    if (!this._glassPaneRendererRegistered) {
+      this.session.focusManager.registerGlassPaneRenderer(this);
+      this._glassPaneRendererRegistered = true;
+    }
   }
 
   /**
@@ -101,6 +106,8 @@ export default class GlassPaneRenderer {
     this._deferredGlassPanes = [];
 
     this._unregisterDisplayParent();
+    this.session.focusManager.unregisterGlassPaneRenderer(this);
+    this._glassPaneRendererRegistered = false;
   }
 
   _removeGlassPane($glassPane) {

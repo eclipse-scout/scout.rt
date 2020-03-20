@@ -1491,7 +1491,12 @@ export default class Widget {
   }
 
   _glassPaneTargets(element) {
-    return [this.$container];
+    // since popups are rendered outside the DOM of the widget parent-child hierarchy, get glassPaneTargets of popups belonging to this widget separately.
+    return [this.$container].concat(
+      this.session.desktop.getPopupsFor(this)
+        .reduce(function(acc, popup) {
+          return acc.concat(popup.glassPaneTargets());
+        }, []));
   }
 
   addGlassPaneContribution(contribution) {

@@ -276,4 +276,8 @@ export default class PopupWithHead extends Popup {
     graphics.setSize(this.$head, headSize);
     graphics.setSize(this.$body, bodySize);
   }
+
+  _glassPaneTargets() {
+    return [this.$container, this.$head];
+  }
 }
