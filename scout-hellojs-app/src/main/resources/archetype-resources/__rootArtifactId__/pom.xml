@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_rt_plugin_config-master</artifactId>
-    <version>3.9.0</version>
+    <version>3.11.0</version>
     <relativePath />
   </parent>
 
