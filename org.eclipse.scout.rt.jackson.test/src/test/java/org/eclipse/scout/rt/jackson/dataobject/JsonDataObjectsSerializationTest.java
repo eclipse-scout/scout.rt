@@ -385,6 +385,16 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
+  public void testDeserialize_BinaryResource_NullValues() throws Exception {
+    String inputJson = readResourceAsString("TestBinaryResourceDoNullValues.json");
+    TestBinaryResourceDo testDo = s_dataObjectMapper.readValue(inputJson, TestBinaryResourceDo.class);
+    assertEquals(BinaryResources.create()
+        .withContentType("image/jpeg")
+        .withFilename("unicorn.jpg")
+        .build(), testDo.getBrDefault());
+  }
+
+  @Test
   public void testDeserializeTestDateDo_UnorderedAttributes() throws Exception {
     runTestDeserializeTestDateDo("TestDateDoUnorderedAttributes.json");
   }

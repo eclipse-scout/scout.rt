@@ -42,26 +42,34 @@ public class DoBinaryResourceDeserializer extends StdDeserializer<BinaryResource
   @Override
   public BinaryResource deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
     JsonNode node = jp.getCodec().readTree(jp);
-    byte[] content = node.get("content").binaryValue();
-    long lastModified = node.get("lastModified").asLong();
-    String contentType = getNullableText(node, "contentType");
-    String filename = getNullableText(node, "filename");
-    String charset = getNullableText(node, "charset");
-    boolean cachingAllowed = node.get("cachingAllowed").asBoolean();
-    int cacheMaxAge = node.get("cacheMaxAge").asInt();
 
     // Note: the properties contentLength and fingerprint, are calculated based on the content
     // So we don't need to set it here. However they are added to the JSON, because they might
     // provide some information about the data.
-    return BinaryResources.create()
-        .withContent(content)
-        .withLastModified(lastModified)
-        .withContentType(contentType)
-        .withFilename(filename)
-        .withCharset(charset)
-        .withCachingAllowed(cachingAllowed)
-        .withCacheMaxAge(cacheMaxAge)
-        .build();
+    BinaryResources builder = BinaryResources.create();
+
+    JsonNode fieldNode = node.get("content");
+    if (fieldNode != null) {
+      builder.withContent(fieldNode.binaryValue());
+    }
+    fieldNode = node.get("lastModified");
+    if (fieldNode != null) {
+      builder.withLastModified(fieldNode.asLong());
+    }
+    builder
+        .withContentType(getNullableText(node, "contentType"))
+        .withFilename(getNullableText(node, "filename"))
+        .withCharset(getNullableText(node, "charset"));
+    fieldNode = node.get("cachingAllowed");
+    if (fieldNode != null) {
+      builder.withCachingAllowed(fieldNode.asBoolean());
+    }
+    fieldNode = node.get("cacheMaxAge");
+    if (fieldNode != null) {
+      builder.withCacheMaxAge(fieldNode.asInt());
+    }
+
+    return builder.build();
   }
 
 }
