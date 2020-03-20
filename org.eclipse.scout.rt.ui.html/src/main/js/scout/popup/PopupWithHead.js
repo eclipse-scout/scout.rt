@@ -272,3 +272,7 @@ scout.PopupWithHead.prototype._positionImpl = function(horizontalAlignment, vert
   scout.graphics.setSize(this.$head, headSize);
   scout.graphics.setSize(this.$body, bodySize);
 };
+
+scout.PopupWithHead.prototype._glassPaneTargets = function() {
+  return [this.$container, this.$head];
+};

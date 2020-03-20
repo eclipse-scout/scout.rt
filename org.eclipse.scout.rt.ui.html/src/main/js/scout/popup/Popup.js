@@ -240,6 +240,7 @@ scout.Popup.prototype._postRender = function() {
   this.size();
   this._attachCloseHandlers();
   this._attachAnchorHandlers();
+  this._attachCloseHandler();
 };
 
 scout.Popup.prototype._onAttach = function() {
@@ -918,5 +919,13 @@ scout.Popup.prototype._onWindowResize = function() {
     this.position();
   } else if (this.windowResizeType === 'remove') {
     this.close();
+  }
+};
+
+scout.Popup.prototype._handleGlassPanes = function() {
+  var parentCoveredByGlassPane = this.session.focusManager.isElementCovertByGlassPane(this.parent.$container);
+  // if a popup is covered by a glass pane the glass pane's need to be rerendered to ensure a glass pane is also painted over the popup
+  if (parentCoveredByGlassPane) {
+    this.session.focusManager.rerenderGlassPanes();
   }
 };
