@@ -33,6 +33,9 @@ public class DoBinaryResourceDeserializer extends StdDeserializer<BinaryResource
    */
   protected String getNullableText(JsonNode node, String fieldName) {
     JsonNode field = node.get(fieldName);
+    if (field == null) {
+      return null;
+    }
     return field.isNull() ? null : field.asText();
   }
 

@@ -378,6 +378,13 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
+  public void testDeserialize_BinaryResource_WithoutCharset() throws Exception {
+    String inputJson = readResourceAsString("TestBinaryResourceDoWithoutCharset.json");
+    TestBinaryResourceDo testDo = s_dataObjectMapper.readValue(inputJson, TestBinaryResourceDo.class);
+    assertEquals(BINARY_RESOURCE, testDo.getBrDefault());
+  }
+
+  @Test
   public void testDeserializeTestDateDo_UnorderedAttributes() throws Exception {
     runTestDeserializeTestDateDo("TestDateDoUnorderedAttributes.json");
   }
