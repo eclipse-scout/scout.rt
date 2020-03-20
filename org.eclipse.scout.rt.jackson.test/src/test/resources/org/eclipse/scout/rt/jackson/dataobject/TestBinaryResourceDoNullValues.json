@@ -1,0 +1,7 @@
+{
+  "_type" : "TestBinaryResource",
+  "brDefault" : {
+    "contentType" : "image/jpeg",
+    "filename" : "unicorn.jpg"
+  }
+}
