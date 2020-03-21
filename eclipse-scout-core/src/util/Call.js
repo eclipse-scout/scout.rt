@@ -36,6 +36,12 @@ export default class Call {
     this.name = null; // Identifier for the call, used to build the uniqueName
     this.uniqueName = null; // Unique identifier of this call instance for logging and debugging purposes
     this.logPrefix = ''; // All log messages are prefixed with this string. It contains the uniqueName and the current state (e.g. callCounter)
+
+    // Temporary store for the arguments to the done/fail callbacks of the _callImpl() function.
+    // They will be used be _resolve() and _reject(). We could pass them through the _onCallX functions,
+    // but when a call is aborted while it is only scheduled (setTimeout), we would not have any values
+    // to pass to _reject().
+    this.result = null;
   }
 
   static GLOBAL_SEQ = 0;
@@ -71,16 +77,16 @@ export default class Call {
 
   _resolve() {
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + '[RESOLVE]');
-    this.deferred.resolve.apply(this.deferred, this.result);
+    this.deferred.resolve.apply(this.deferred, arrays.ensure(this.result));
   }
 
   _reject() {
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + '[REJECT]');
-    this.deferred.reject.apply(this.deferred, this.result);
+    this.deferred.reject.apply(this.deferred, arrays.ensure(this.result));
   }
 
-  _promise() {
-    return this.deferred.promise();
+  _setResult() {
+    this.result = objects.argumentsToArray(arguments);
   }
 
   // ==================================================================================
@@ -118,7 +124,7 @@ export default class Call {
   call() {
     this._checkInitialized();
     this._call();
-    return this._promise();
+    return this.deferred.promise();
   }
 
   /**
@@ -147,12 +153,10 @@ export default class Call {
     this.pendingCall = this._callImpl()
       .always(function() {
         this.pendingCall = null;
-        // Store the last callback's arguments. They will be used be _resolve() and _reject().
-        // We could pass them through the _onCallX functions, but when a call is aborted while
-        // it is only scheduled (setTimeout), we would not have any values to pass to _reject().
-        this.result = objects.argumentsToArray(arguments);
       }.bind(this))
+      .done(this._setResultDone.bind(this))
       .done(this._onCallDone.bind(this))
+      .fail(this._setResultFail.bind(this))
       .fail(this._onCallFail.bind(this));
   }
 
@@ -163,6 +167,14 @@ export default class Call {
    */
   _callImpl() {
     throw new Error('Missing implementation: _callImpl()');
+  }
+
+  _setResultDone() {
+    this._setResult.apply(this, arguments);
+  }
+
+  _setResultFail() {
+    this._setResult.apply(this, arguments);
   }
 
   _onCallDone() {

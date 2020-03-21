@@ -34,19 +34,6 @@ export default class AjaxCall extends Call {
 
   // ==================================================================================
 
-  _promise() {
-    return super._promise()
-      .catch(function(jqXHR, textStatus, errorThrown) {
-        // Wrap arguments in an object to make rethrowing the error easier.
-        return $.rejectedPromise(new AjaxError({
-          jqXHR: jqXHR,
-          textStatus: textStatus,
-          errorThrown: errorThrown,
-          requestOptions: this.ajaxOptions
-        }));
-      }.bind(this));
-  }
-
   _callImpl() {
     // Mark retries by adding an URL parameter
     if (this.callCounter !== 1) {
@@ -57,6 +44,16 @@ export default class AjaxCall extends Call {
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + (this.callCounter === 1 ? '--- ' : '') + this.ajaxOptions.type + ' "' + this.ajaxOptions.url + '"' + (this.callCounter === 1 ? ' ---' : ''));
 
     return $.ajax(this.ajaxOptions);
+  }
+
+  _setResultFail(jqXHR, textStatus, errorThrown) {
+    // Store result as single object to make rethrowing the error easier for callers of AjaxCall
+    this._setResult(new AjaxError({
+      jqXHR: jqXHR,
+      textStatus: textStatus,
+      errorThrown: errorThrown,
+      requestOptions: this.ajaxOptions
+    }));
   }
 
   _onCallDone(data, textStatus, jqXHR) {
