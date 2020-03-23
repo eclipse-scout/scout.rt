@@ -84,7 +84,7 @@ export default class SequenceBox extends CompositeField {
   }
 
   /**
-   * @override Widgets.js
+   * @override
    */
   invalidateLogicalGrid(invalidateLayout) {
     super.invalidateLogicalGrid(false);
@@ -94,7 +94,7 @@ export default class SequenceBox extends CompositeField {
   }
 
   /**
-   * @override Widgets.js
+   * @override
    */
   _setLogicalGrid(logicalGrid) {
     super._setLogicalGrid(logicalGrid);
@@ -168,10 +168,13 @@ export default class SequenceBox extends CompositeField {
     }
 
     if (this._lastVisibleField.menus && this._lastVisibleField.menus.length > 0) {
+      // Change owner to make sure menu won't be destroyed when setMenus is called
+      this._updateBoxMenuOwner(this.fieldStatus);
       this.setMenus(this._lastVisibleField.menus);
       this.setMenusVisible(this._lastVisibleField.menusVisible);
       this._isMenusOverwritten = true;
     } else {
+      this._updateBoxMenuOwner(this);
       this.setMenus(this.boxMenus);
       this.setMenusVisible(this.boxMenusVisible);
       this._isMenusOverwritten = false;
@@ -219,6 +222,9 @@ export default class SequenceBox extends CompositeField {
   }
 
   setMenus(menus) {
+    // ensure menus are real and not just model objects
+    menus = this._createChildren(menus);
+
     if (this._isOverwritingStatusFromField && !this._isMenusOverwritten) {
       // was not overwritten, will be overwritten now -> backup old value
       this.boxMenus = this.menus;
@@ -230,6 +236,12 @@ export default class SequenceBox extends CompositeField {
       // prevent setting value if directly changed on seq box and is already overwritten
       super.setMenus(menus);
     }
+  }
+
+  _updateBoxMenuOwner(newOwner) {
+    this.boxMenus.forEach(function(menu) {
+      menu.setOwner(newOwner);
+    });
   }
 
   setMenusVisible(menusVisible) {
@@ -281,10 +293,9 @@ export default class SequenceBox extends CompositeField {
   }
 
   _getDateFields() {
-    var dateFields = this.fields.filter(function(field) {
+    return this.fields.filter(function(field) {
       return field instanceof DateField;
     });
-    return dateFields;
   }
 
   _getAutoDateProposal(field) {

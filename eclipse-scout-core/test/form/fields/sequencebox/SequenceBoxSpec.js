@@ -760,4 +760,29 @@ describe('SequenceBox', function() {
       expect(box.fields[1].autoDate.toISOString()).toBe(date.toISOString());
     });
   });
+
+  describe('menus', function() {
+    it('are replaced by the menus of the last field', function() {
+      var field = createField({
+        menus: [{
+          objectType: 'Menu',
+          text: 'seq menu'
+        }]
+      });
+      field.render();
+      expect(field.fieldStatus.menus).toEqual(field.menus);
+
+      field.fields[1].insertMenu({objectType: 'Menu', text: 'field menu'});
+      expect(field.fieldStatus.menus).toEqual(field.fields[1].menus);
+      field.fieldStatus.showContextMenu();
+      expect(field.fieldStatus.contextMenu.$visibleMenuItems().eq(0).text()).toBe('field menu');
+      field.fieldStatus.hideContextMenu();
+
+      field.fields[1].deleteMenu(field.fields[1].menus[0]);
+      expect(field.fieldStatus.menus).toEqual(field.menus);
+      field.fieldStatus.showContextMenu();
+      expect(field.fieldStatus.contextMenu.$visibleMenuItems().eq(0).text()).toBe('seq menu');
+      field.fieldStatus.hideContextMenu();
+    });
+  });
 });
