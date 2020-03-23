@@ -96,16 +96,19 @@ export default class Status {
   }
 
   /**
+   * Note: we cannot 'overload' this function, because predicates and status-types are both functions,
+   * thus we cannot distinct them by type or instanceof.
+   *
    * @param {object} statusType
    * @return {boolean} whether or not this status contains a child with the give type
    */
   containsStatus(statusType) {
-    return this.containsStatusPredicate(function(status) {
+    return this.containsStatusByPredicate(function(status) {
       return status instanceof statusType;
     });
   }
 
-  containsStatusPredicate(predicate) {
+  containsStatusByPredicate(predicate) {
     return this.asFlatList().some(predicate);
   }
 
@@ -124,15 +127,15 @@ export default class Status {
    * @param {object} statusType
    */
   removeAllStatus(statusType) {
-    this.removeAllStatusPredicate(function(status) {
+    this.removeAllStatusByPredicate(function(status) {
       return status instanceof statusType;
     });
   }
 
-  removeAllStatusPredicate(predicate) {
+  removeAllStatusByPredicate(predicate) {
     if (this.hasChildren()) {
       this.children.forEach(function(status) {
-        status.removeAllStatusPredicate(predicate);
+        status.removeAllStatusByPredicate(predicate);
       });
       var newChildren = this.children.filter(function(status) {
         // when status is not deletable we must add it as child again, thus --> true

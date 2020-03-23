@@ -42,6 +42,9 @@ export default class FormField extends Widget {
     this.dropType = 0;
     this.dropMaximumSize = dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
     this.empty = true;
+    /**
+     * @type {Status}
+     */
     this.errorStatus = null;
     this.fieldStyle = FormField.DEFAULT_FIELD_STYLE;
     this.gridData = null;
@@ -337,6 +340,18 @@ export default class FormField extends Widget {
     this.setErrorStatus(status);
   }
 
+  /**
+   * Whether or not the error status is or has the given status type.
+   * @param statusType
+   * @returns {boolean}
+   */
+  containsStatus(statusType) {
+    if (!this.errorStatus) {
+      return false;
+    }
+    return this.errorStatus.containsStatus(statusType);
+  }
+
   setSuppressStatus(suppressStatus) {
     this.setProperty('suppressStatus', suppressStatus);
   }
@@ -364,19 +379,19 @@ export default class FormField extends Widget {
    * @param {object} statusType
    */
   removeErrorStatus(statusType) {
-    this.removeErrorStatusPredicate(function(status) {
+    this.removeErrorStatusByPredicate(function(status) {
       return status instanceof statusType;
     });
   }
 
-  removeErrorStatusPredicate(predicate) {
+  removeErrorStatusByPredicate(predicate) {
     var status = this._errorStatus();
     if (!status) {
       return;
     }
-    if (status.containsStatusPredicate(predicate)) {
+    if (status.containsStatusByPredicate(predicate)) {
       var newStatus = status.clone();
-      newStatus.removeAllStatusPredicate(predicate);
+      newStatus.removeAllStatusByPredicate(predicate);
       // If no other status remains -> clear error status
       if (newStatus.hasChildren()) {
         this.setErrorStatus(newStatus);

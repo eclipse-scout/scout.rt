@@ -79,6 +79,9 @@ export default class DateField extends ValueField {
     PARSE_ERROR: -1
   };
 
+  /**
+   * Predicate function to find a PARSE_ERROR.
+   */
   static PARSE_ERROR_PREDICATE = function(status) {
     return status.code === DateField.ErrorCode.PARSE_ERROR;
   };
@@ -1010,20 +1013,24 @@ export default class DateField extends ValueField {
   }
 
   /**
-   * Clears the time field if date field is empty before accepting the input
+   * Clears the time field if date field is empty before accepting the input.<br/>
+   * Don't delete invalid input from the time field.
    */
   acceptDate() {
-    if (this.hasTime && strings.empty(this.$dateField.val())) {
+    var invalid = this.containsStatus(ParsingFailedStatus);
+    if (this.hasTime && !invalid && strings.empty(this.$dateField.val())) {
       this.$timeField.val('');
     }
     this.acceptInput();
   }
 
   /**
-   * Clears the date field if time field is empty before accepting the input
+   * Clears the date field if time field is empty before accepting the input.<br/>
+   * Don't delete invalid input from the time field.
    */
   acceptTime() {
-    if (this.hasDate && strings.empty(this.$timeField.val())) {
+    var invalid = this.containsStatus(ParsingFailedStatus);
+    if (this.hasDate && !invalid && strings.empty(this.$timeField.val())) {
       this.$dateField.val('');
     }
     this.acceptInput();
@@ -1633,7 +1640,7 @@ export default class DateField extends ValueField {
   }
 
   _removePredictErrorStatus() {
-    this.removeErrorStatusPredicate(DateField.PARSE_ERROR_PREDICATE);
+    this.removeErrorStatusByPredicate(DateField.PARSE_ERROR_PREDICATE);
   }
 
   /**
