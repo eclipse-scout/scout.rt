@@ -668,6 +668,39 @@ public class DateUtilityTest {
   }
 
   @Test
+  public void testHoursBetween() {
+    Calendar cal = Calendar.getInstance();
+    Date d1, d2;
+
+    assertEquals(-1, DateUtility.getHoursBetween(null, null));
+    assertEquals(-1, DateUtility.getHoursBetween(cal.getTime(), null));
+    assertEquals(-1, DateUtility.getHoursBetween(null, cal.getTime()));
+
+    cal.set(2000, Calendar.JANUARY, 1, 0, 0);
+    d1 = cal.getTime();
+    cal.set(2000, Calendar.JANUARY, 2, 0, 0);
+    d2 = cal.getTime();
+    assertEquals(24, DateUtility.getHoursBetween(d1, d2));
+    assertEquals(24, DateUtility.getHoursBetween(d2, d1));
+
+    cal.set(2014, Calendar.FEBRUARY, 23, 12, 0);
+    d1 = cal.getTime();
+    cal.set(2014, Calendar.MARCH, 31, 0, 0);
+    d2 = cal.getTime();
+    assertEquals(852, DateUtility.getHoursBetween(d1, d2));
+    assertEquals(852, DateUtility.getHoursBetween(d2, d1));
+
+    cal.set(2000, Calendar.JANUARY, 1, 23, 59);
+    d1 = cal.getTime();
+    cal.set(2000, Calendar.JANUARY, 2, 0, 0);
+    d2 = cal.getTime();
+    assertEquals(1, DateUtility.getHoursBetween(d1, d2));
+    assertEquals(1, DateUtility.getHoursBetween(d2, d1));
+
+    assertEquals(0, DateUtility.getHoursBetween(d1, d1));
+  }
+
+  @Test
   public void testIsWeekend() {
     Calendar todayCalendar = Calendar.getInstance();
 

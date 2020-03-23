@@ -32,7 +32,8 @@ public final class DateUtility {
   private DateUtility() {
   }
 
-  public static final long DAY_MILLIS = 24L * 3600L * 1000L;
+  public static final long HOUR_MILLIS = 3600L * 1000L;
+  public static final long DAY_MILLIS = 24L * HOUR_MILLIS;
 
   private static final Logger LOG = LoggerFactory.getLogger(DateUtility.class);
 
@@ -785,7 +786,12 @@ public final class DateUtility {
    * <li>start = 1.1.2000, end = 2.1.2000 --> getDaysBetween(start, end) = 1
    * <li>start = 2.1.2000, end = 1.1.2000 --> getDaysBetween(start, end) = 1
    * </ul>
-   * returns <code>-1</code> in case of an error (e.g. parameter is null)
+   *
+   * @param start
+   *          the start date, inclusive
+   * @param end
+   *          the end date, exclusive
+   * @return <code>-1</code> in case of an error (e.g. parameter is null)
    */
   public static int getDaysBetween(Date start, Date end) {
     if (start == null || end == null) {
@@ -801,5 +807,31 @@ public final class DateUtility {
     long startL = startDate.getTimeInMillis() + startDate.getTimeZone().getOffset(startDate.getTimeInMillis());
     int numDays = (int) ((endL - startL) / DAY_MILLIS);
     return Math.abs(numDays);
+  }
+
+  /**
+   * Returns the absolute value of hours between <code>start</code> and <code>end</code>. Any hour fractions will be
+   * ignored. Ex.: start = 01.01.2020 15:02:03, end = 02.01.2020 13:01:05 => will result in 22 hours start = 02.01.2020
+   * 13:01:05, end = 01.01.2020 15:02:03 => will result in 22 hours
+   *
+   * @param start
+   *          the start date, inclusive
+   * @param end
+   *          the end date, exclusive
+   * @return <code>-1</code> in case of an error (e.g. parameter is null)
+   */
+  public static int getHoursBetween(Date start, Date end) {
+    if (start == null || end == null) {
+      return -1;
+    }
+    Calendar startDate = DateUtility.convertDate(start);
+    DateUtility.truncCalendarToHour(startDate);
+    Calendar endDate = DateUtility.convertDate(end);
+    DateUtility.truncCalendarToHour(endDate);
+
+    long endL = endDate.getTimeInMillis() + endDate.getTimeZone().getOffset(endDate.getTimeInMillis());
+    long startL = startDate.getTimeInMillis() + startDate.getTimeZone().getOffset(startDate.getTimeInMillis());
+    int numHours = (int) ((endL - startL) / HOUR_MILLIS);
+    return Math.abs(numHours);
   }
 }
