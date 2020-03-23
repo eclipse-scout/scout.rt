@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
+  arrays,
   clipboard,
   Device,
   dragAndDrop,
@@ -60,6 +61,7 @@ export default class FormField extends Widget {
     this.requiresSave = false;
     this.statusPosition = FormField.StatusPosition.DEFAULT;
     this.statusVisible = true;
+    this.suppressStatus = false;
     this.touched = false;
     this.tooltipText = null;
     this.tooltipAnchor = FormField.TooltipAnchor.DEFAULT;
@@ -95,6 +97,8 @@ export default class FormField extends Widget {
     this._addCloneProperties(['dropType', 'dropMaximumSize', 'errorStatus', 'fieldStyle', 'gridDataHints', 'gridData', 'label', 'labelVisible', 'labelPosition',
       'labelWidthInPixel', 'mandatory', 'mode', 'preventInitialFocus', 'requiresSave', 'touched', 'statusVisible', 'statusPosition', 'statusMenuMappings',
       'tooltipText', 'tooltipAnchor']);
+
+    this._menuPropertyChangeHandler = this._onMenuPropertyChange.bind(this);
   }
 
   static FieldStyle = {
@@ -691,8 +695,49 @@ export default class FormField extends Widget {
   }
 
   _setMenus(menus) {
+    menus = arrays.ensure(menus);
+    this.menus.forEach(function(menu) {
+      menu.off('propertyChange', this._menuPropertyChangeHandler);
+    }, this);
+
     this.updateKeyStrokes(menus, this.menus);
     this._setProperty('menus', menus);
+
+    this.menus.forEach(function(menu) {
+      menu.on('propertyChange', this._menuPropertyChangeHandler);
+    }, this);
+  }
+
+  insertMenu(menuToInsert) {
+    this.insertMenus([menuToInsert]);
+  }
+
+  insertMenus(menusToInsert) {
+    menusToInsert = arrays.ensure(menusToInsert);
+    if (menusToInsert.length === 0) {
+      return;
+    }
+    this.setMenus(this.menus.concat(menusToInsert));
+  }
+
+  deleteMenu(menuToDelete) {
+    this.deleteMenus([menuToDelete])
+  }
+
+  deleteMenus(menusToDelete) {
+    menusToDelete = arrays.ensure(menusToDelete);
+    if (menusToDelete.length === 0) {
+      return;
+    }
+    var menus = this.menus.slice();
+    arrays.removeAll(menus, menusToDelete);
+    this.setMenus(menus);
+  }
+
+  _onMenuPropertyChange(event) {
+    if (event.propertyName === 'visible' && this.rendered) {
+      this._updateMenus();
+    }
   }
 
   _getCurrentMenus() {
@@ -1055,7 +1100,7 @@ export default class FormField extends Widget {
   }
 
   /**
-   * @return the default layout FormFieldLayout. Override this function if your field needs another layout.
+   * @return {FormFieldLayout} the default layout FormFieldLayout. Override this function if your field needs another layout.
    */
   _createLayout() {
     return new FormFieldLayout(this);

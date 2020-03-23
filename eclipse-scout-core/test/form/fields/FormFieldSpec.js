@@ -223,6 +223,19 @@ describe('FormField', function() {
       formField = createFormField(model);
     });
 
+    it('ensures this.menus is not null', function() {
+      var menu = scout.create('Menu', {
+        parent: formField
+      });
+      formField.setMenus([menu]);
+      expect(formField.menus).toBeDefined();
+      expect(formField.menus.length).toBe(1);
+
+      formField.setMenus(null);
+      expect(formField.menus).toBeDefined();
+      expect(formField.menus.length).toBe(0);
+    });
+
     it('adds class has-menus if there are menus', function() {
       var menu = scout.create('Menu', {
         parent: formField
@@ -253,6 +266,65 @@ describe('FormField', function() {
       expect(formField.$container).not.toHaveClass('has-tooltip');
     });
 
+    it('toggles has-menus class when visibility changes', function() {
+      var menu = scout.create('Menu', {
+        parent: formField
+      });
+      formField.setMenus([menu]);
+      formField.render();
+      expect(formField.$container).toHaveClass('has-menus');
+
+      menu.setVisible(false);
+      expect(formField.$container).not.toHaveClass('has-menus');
+
+      menu.setVisible(true);
+      expect(formField.$container).toHaveClass('has-menus');
+
+      formField.setMenusVisible(false);
+      expect(formField.$container).not.toHaveClass('has-menus');
+
+      menu.setVisible(false);
+      formField.setMenusVisible(true);
+      expect(formField.$container).not.toHaveClass('has-menus');
+
+      var menu2 = scout.create('Menu', {
+        parent: formField
+      });
+      formField.setMenus([menu, menu2]);
+      expect(formField.$container).toHaveClass('has-menus');
+
+      menu.setVisible(true);
+      formField.setMenus([menu]);
+      expect(formField.$container).toHaveClass('has-menus');
+      menu2.setVisible(false); // check that listener is detached
+      expect(formField.$container).toHaveClass('has-menus');
+    });
+
+    it('updates menus on status when visibility changes', function() {
+      var menu = scout.create('Menu', {
+        parent: formField
+      });
+      var menu2 = scout.create('Menu', {
+        parent: formField,
+        visible: false
+      });
+      formField.setMenus([menu, menu2]);
+      formField.render();
+      expect(formField.menus).toEqual([menu, menu2]);
+      expect(formField.fieldStatus.menus).toEqual([menu]);
+
+      formField.fieldStatus.showContextMenu();
+      expect(formField.fieldStatus.contextMenu.$visibleMenuItems().length).toBe(1);
+      formField.fieldStatus.hideContextMenu();
+
+      menu2.setVisible(true);
+      expect(formField.menus).toEqual([menu, menu2]);
+      expect(formField.fieldStatus.menus).toEqual([menu, menu2]);
+
+      formField.fieldStatus.showContextMenu();
+      expect(formField.fieldStatus.contextMenu.$visibleMenuItems().length).toBe(2);
+      formField.fieldStatus.hideContextMenu();
+    });
   });
 
   describe('property status visible', function() {
