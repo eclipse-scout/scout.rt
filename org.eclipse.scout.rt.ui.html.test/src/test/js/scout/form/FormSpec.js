@@ -595,6 +595,47 @@ describe('Form', function() {
       expect(form.widget('tabItem1').parent).toBe(form.widget('tabBox'));
       expect(form.widget('tabItem2').parent).toBe(form.widget('tabBox'));
     });
+
+    it('works correctly even for wrapped forms', function(done) {
+      var form = scout.create({
+        parent: session.desktop,
+        objectType: 'Form',
+        displayHint: scout.Form.DisplayHint.VIEW,
+        rootGroupBox: {
+          objectType: 'GroupBox',
+          fields: [{
+            objectType: 'WrappedFormField',
+            initialFocusEnabled: true,
+            innerForm: {
+              objectType: 'Form',
+              initialFocus: 'Field2',
+              rootGroupBox: {
+                objectType: 'GroupBox',
+                fields: [
+                  {
+                    id: 'Field1',
+                    objectType: 'StringField',
+                    value: 'Field1'
+                  },
+                  {
+                    id: 'Field2',
+                    objectType: 'StringField',
+                    value: 'Field2'
+                  }
+                ]
+              }
+            }
+          }]
+        }
+      });
+      form.open()
+        .then(function() {
+          expect(form.widget('Field2').$field).toBeFocused();
+          form.close();
+        })
+        .catch(fail)
+        .always(done);
+    });
   });
 
 });
