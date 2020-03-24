@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.platform.util.date;
 import static org.junit.Assert.*;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
@@ -109,11 +108,9 @@ public class DateUtilityTest {
 
   /**
    * Test for {@link DateUtility#addDays(Date, double)}
-   *
-   * @throws ParseException
    */
   @Test
-  public void testAddDaysFull() throws ParseException {
+  public void testAddDaysFull() {
     String date1 = "2013-09-30 10:10:10.111";
     String date2 = "2013-10-01 10:10:10.111";
     assertDateEquals(date2, DateUtility.addDays(dateOf(date1), 1));
@@ -122,21 +119,17 @@ public class DateUtilityTest {
 
   /**
    * Test for {@link DateUtility#addDays(Date, double)} for a larger day period
-   *
-   * @throws ParseException
    */
   @Test
-  public void testAddDaysLarge() throws ParseException {
+  public void testAddDaysLarge() {
     assertDateEquals("2030-12-31 00:00:00.000", DateUtility.addDays(dateOf("1990-01-01 00:00:00.000"), 14974));
   }
 
   /**
    * Test for {@link DateUtility#addDays(Date, double)}
-   *
-   * @throws ParseException
    */
   @Test
-  public void testAddDatetoNullFull() throws ParseException {
+  public void testAddDatetoNullFull() {
     assertNull(DateUtility.addDays(null, -1));
   }
 
@@ -216,7 +209,7 @@ public class DateUtilityTest {
   public void assertCorrectDuration(Calendar start, Calendar end) {
     Date startDate = start.getTime();
     Date endDate = end.getTime();
-    Double duration = (DateUtility.convertDateToDoubleTime(endDate) - DateUtility.convertDateToDoubleTime(startDate));
+    double duration = (DateUtility.convertDateToDoubleTime(endDate) - DateUtility.convertDateToDoubleTime(startDate));
     assertEquals(endDate, DateUtility.addDays(startDate, duration));
   }
 
@@ -300,21 +293,17 @@ public class DateUtilityTest {
 
   /**
    * Test for {@link DateUtility#addMonths(Date d, int count)}
-   *
-   * @throws ParseException
    */
   @Test
-  public void testAddMonthstoNullFull() throws ParseException {
+  public void testAddMonthstoNullFull() {
     assertNull(DateUtility.addMonths(null, -1));
   }
 
   /**
    * Test for {@link DateUtility#addMonths(Date d, int count)}
-   *
-   * @throws ParseException
    */
   @Test
-  public void testAddMonthsFull() throws ParseException {
+  public void testAddMonthsFull() {
     String date1 = "2013-12-10 10:10:10.111";
     String date2 = "2014-01-10 10:10:10.111";
     assertDateEquals(date2, DateUtility.addMonths(dateOf(date1), 1));
@@ -698,6 +687,24 @@ public class DateUtilityTest {
     assertEquals(1, DateUtility.getHoursBetween(d2, d1));
 
     assertEquals(0, DateUtility.getHoursBetween(d1, d1));
+
+    // Assert examples from JavaDoc
+    final String PATTERN = "yyyy-MM-dd HH:mm:ss";
+    assertEquals(22, DateUtility.getHoursBetween(
+        DateUtility.parse("2020-01-01 15:02:03", PATTERN),
+        DateUtility.parse("2020-01-02 13:01:05", PATTERN)));
+    assertEquals(22, DateUtility.getHoursBetween(
+        DateUtility.parse("2020-01-02 13:01:05", PATTERN),
+        DateUtility.parse("2020-01-01 15:02:03", PATTERN)));
+    assertEquals(0, DateUtility.getHoursBetween(
+        DateUtility.parse("2020-01-01 15:02:03", PATTERN),
+        DateUtility.parse("2020-01-01 15:02:03", PATTERN)));
+    assertEquals(0, DateUtility.getHoursBetween(
+        DateUtility.parse("2020-01-01 15:02:03", PATTERN),
+        DateUtility.parse("2020-01-01 15:59:59", PATTERN)));
+    assertEquals(1, DateUtility.getHoursBetween(
+        DateUtility.parse("2020-01-01 15:02:03", PATTERN),
+        DateUtility.parse("2020-01-01 16:00:00", PATTERN)));
   }
 
   @Test

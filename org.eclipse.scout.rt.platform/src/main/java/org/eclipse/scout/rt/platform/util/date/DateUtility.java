@@ -38,11 +38,11 @@ public final class DateUtility {
   private static final Logger LOG = LoggerFactory.getLogger(DateUtility.class);
 
   //2 letter code countries for different weekends worldwide
-  private static final List<String> SUN_WEEKEND_DAYS_COUNTRIES = Arrays.asList(new String[]{"GQ", "IN", "TH", "UG"});
-  private static final List<String> FRY_WEEKEND_DAYS_COUNTRIES = Arrays.asList(new String[]{"DJ", "IR"});
-  private static final List<String> FRY_SUN_WEEKEND_DAYS_COUNTRIES = Arrays.asList(new String[]{"BN"});
-  private static final List<String> THU_FRY_WEEKEND_DAYS_COUNTRIES = Arrays.asList(new String[]{"AF"});
-  private static final List<String> FRY_SAT_WEEKEND_DAYS_COUNTRIES = Arrays.asList(new String[]{"AE", "DZ", "BH", "BD", "EG", "IQ", "IL", "JO", "KW", "LY", "MV", "MR", "OM", "PS", "QA", "SA", "SD", "SY", "YE"});
+  private static final List<String> SUN_WEEKEND_DAYS_COUNTRIES = Arrays.asList("GQ", "IN", "TH", "UG");
+  private static final List<String> FRY_WEEKEND_DAYS_COUNTRIES = Arrays.asList("DJ", "IR");
+  private static final List<String> FRY_SUN_WEEKEND_DAYS_COUNTRIES = Arrays.asList("BN");
+  private static final List<String> THU_FRY_WEEKEND_DAYS_COUNTRIES = Arrays.asList("AF");
+  private static final List<String> FRY_SAT_WEEKEND_DAYS_COUNTRIES = Arrays.asList("AE", "DZ", "BH", "BD", "EG", "IQ", "IL", "JO", "KW", "LY", "MV", "MR", "OM", "PS", "QA", "SA", "SD", "SY", "YE");
 
   /**
    * format date with {@value DateFormat#DEFAULT} pattern
@@ -116,7 +116,7 @@ public final class DateUtility {
    *          date
    * @param pattern
    *          date format
-   * @returns <code>true</code> if, and only if the given String is a valid date according to the given date format.
+   * @return <code>true</code> if, and only if the given String is a valid date according to the given date format.
    */
   public static boolean isValidDate(String s, String pattern) {
     try {
@@ -206,7 +206,6 @@ public final class DateUtility {
   /**
    * determines the day of the week
    *
-   * @param d
    * @return int with the the day of the week (sunday=1)
    */
   public static int getWeekday(Date d) {
@@ -770,10 +769,10 @@ public final class DateUtility {
     double t = ((c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(Calendar.MINUTE)) * 60 + c.get(Calendar.SECOND)) * 1000 + c.get(Calendar.MILLISECOND);
     double d = t / DAY_MILLIS;
     // range check
-    if ((double) d < 0) {
+    if (d < 0) {
       d = 0d;
     }
-    if ((double) d > 1) {
+    if (d > 1) {
       d = 1d;
     }
     return d;
@@ -810,9 +809,16 @@ public final class DateUtility {
   }
 
   /**
-   * Returns the absolute value of hours between <code>start</code> and <code>end</code>. Any hour fractions will be
-   * ignored. Ex.: start = 01.01.2020 15:02:03, end = 02.01.2020 13:01:05 => will result in 22 hours start = 02.01.2020
-   * 13:01:05, end = 01.01.2020 15:02:03 => will result in 22 hours
+   * Returns the absolute value of hours between <code>start</code> and <code>end</code>. Both input values are first
+   * truncated to hours, i.e. any hour fractions (minutes, seconds) will be ignored.
+   * <p>
+   * <b>Examples:</b>
+   * <li>start = 2020-01-01 15:02:03, end = 2020-01-02 13:01:05, result = 22
+   * <li>start = 2020-01-02 13:01:05, end = 2020-01-01 15:02:03, result = 22
+   * <li>start = 2020-01-01 15:02:03, end = 2020-01-01 15:02:03, result = 0
+   * <li>start = 2020-01-01 15:02:03, end = 2020-01-01 15:59:59, result = 0
+   * <li>start = 2020-01-01 15:02:03, end = 2020-01-01 16:00:00, result = 1
+   * </ul>
    *
    * @param start
    *          the start date, inclusive
