@@ -522,6 +522,10 @@ export default class TileGrid extends Widget {
     this.session.onRequestsDone(this._showContextMenu.bind(this, options));
   }
 
+  /**
+   * @param options may contain pageX, pageY, menuItems and menuFilter.
+   * If these properties are not provided they are determined automatically.
+   */
   _showContextMenu(options) {
     options = options || {};
     if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
@@ -530,7 +534,7 @@ export default class TileGrid extends Widget {
     if (this.selectedTiles.length === 0) {
       return;
     }
-    var menuItems = this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true, false);
+    var menuItems = options.menuItems || this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true, false);
     if (menuItems.length === 0) {
       return;
     }
@@ -555,7 +559,7 @@ export default class TileGrid extends Widget {
         y: pageY
       },
       $anchor: this.$container,
-      menuFilter: this._filterMenusHandler
+      menuFilter: options.menuFilter || this._filterMenusHandler
     });
     this.contextMenu.open();
   }

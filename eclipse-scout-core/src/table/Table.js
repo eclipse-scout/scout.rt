@@ -29,7 +29,7 @@ import {
   MenuBar,
   MenuDestinations,
   MenuItemsOrder,
-  menus as menus_1,
+  menus,
   NumberColumn,
   objects,
   Range,
@@ -705,13 +705,13 @@ export default class Table extends Widget {
 
   _showContextMenu(options) {
     options = options || {};
-    if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
+    if (!this._isDataRendered() || !this.attached) { // check needed because function is called asynchronously
       return;
     }
     if (this.selectedRows.length === 0) {
       return;
     }
-    var menuItems = this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
+    var menuItems = this._filterMenusForContextMenu();
     if (menuItems.length === 0) {
       return;
     }
@@ -2064,7 +2064,11 @@ export default class Table extends Widget {
   }
 
   _filterMenus(menuItems, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
-    return menus_1.filterAccordingToSelection('Table', this.selectedRows.length, menuItems, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
+    return menus.filterAccordingToSelection('Table', this.selectedRows.length, menuItems, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
+  }
+
+  _filterMenusForContextMenu() {
+    return this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
   }
 
   setStaticMenus(staticMenus) {

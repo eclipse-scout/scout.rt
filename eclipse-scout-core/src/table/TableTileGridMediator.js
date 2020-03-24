@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AggregateTableControl, arrays, scout, Widget} from '../index';
+import {AggregateTableControl, arrays, objects, scout, Widget} from '../index';
 import * as $ from 'jquery';
 
 /**
@@ -244,9 +244,15 @@ export default class TableTileGridMediator extends Widget {
   }
 
   _adaptTileGrid(tileGrid) {
-    // we want to use the table's context menu, redirect request to show the context menu. The selection is already synchronized.
-    tileGrid.showContextMenu = function(options) {
-      this.session.onRequestsDone(this.table._showContextMenu.bind(this.table, options));
+    // The table contains the menu items -> pass them to the showContextMenu function of the tileGrid.
+    objects.mandatoryFunction(tileGrid, '_showContextMenu');
+    var origShowContextMenu = tileGrid._showContextMenu;
+    tileGrid._showContextMenu = function(options) {
+      objects.mandatoryFunction(this.table, '_filterMenusForContextMenu')
+      options.menuItems = this.table._filterMenusForContextMenu();
+      scout.assertProperty(this.table, '_filterMenusHandler');
+      options.menuFilter = this.table._filterMenusHandler;
+      origShowContextMenu.call(tileGrid, options);
     }.bind(this);
     // use the table's keyStrokeContext bindTarget for each tileGrid as well to ensure that the tileGrid's keyStrokes are active when the table is active
     tileGrid.keyStrokeContext.$bindTarget = this.table.keyStrokeContext.$bindTarget;
