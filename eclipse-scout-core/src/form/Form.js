@@ -919,8 +919,12 @@ export default class Form extends Widget {
       focused = this.initialFocus.focus();
     } else {
       // If no explicit focus is requested, try to focus the first focusable element.
-      // Do it only if the context belonging to that element is ready. Not ready means, some other widget (probably an outer container) is still preparing the context and will do the initial focus later
-      focused = this.session.focusManager.requestFocusIfReady(this.session.focusManager.findFirstFocusableElement(this.$container));
+      // Do it only if the focus is not already on an element in the form (e.g. focus could have been requested explicitly by a child element)
+      // And only if the context belonging to that element is ready. Not ready means, some other widget (probably an outer container) is still preparing the context and will do the initial focus later
+      if (!this.$container.isOrHas(this.$container.activeElement())) {
+        var focusManager = this.session.focusManager;
+        focused = focusManager.requestFocusIfReady(focusManager.findFirstFocusableElement(this.$container));
+      }
     }
     if (focused) {
       // If the focus widget is outside of the view area the browser tries to scroll the widget into view.
