@@ -73,6 +73,10 @@ export default class TabItem extends GroupBox {
       this.parent.setSelectedTab(this);
     }
     // ensure the focus is on the tab
-    this.parent.focusTab(this);
+    this.parent.focusTabItem(this);
+  }
+
+  isFocused() {
+    return this.parent.isTabItemFocused(this);
   }
 }

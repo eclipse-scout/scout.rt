@@ -626,8 +626,7 @@ describe('Form', function() {
       });
       form.render();
       form.validateLayoutTree();
-      // TODO aho fix this test
-      //      expect(form.widget('tabItem1').isFocused()).toBe(true);
+      expect(form.widget('tabItem1').isFocused()).toBe(true);
 
       // InitialFocus property must not modify parent of tab items
       expect(form.widget('tabItem1').parent).toBe(form.widget('tabBox'));

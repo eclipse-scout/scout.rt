@@ -119,6 +119,10 @@ export default class TabArea extends Widget {
     }
   }
 
+  isTabItemFocused(tabItem) {
+    return this.getTabForItem(tabItem).isFocused();
+  }
+
   focusTabItem(tabItem) {
     this.focusTab(this.getTabForItem(tabItem));
   }

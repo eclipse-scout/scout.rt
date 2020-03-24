@@ -249,11 +249,22 @@ export default class TabBox extends CompositeField {
     return null;
   }
 
-  focusTab(tab) {
-    if (this.selectedTab !== tab) {
-      this.selectTab(tab);
+  isTabItemFocused(tabItem) {
+    return this.header.isTabItemFocused(tabItem);
+  }
+
+  focusTabItem(tabItem) {
+    if (this.selectedTab !== tabItem) {
+      this.selectTab(tabItem);
     }
-    this.header.focusTabItem(tab);
+    this.header.focusTabItem(tabItem);
+  }
+
+  /**
+   * @deprecated use focusTabItem instead
+   */
+  focusTab(tab) {
+    this.focusTabItem(tab);
   }
 
   _onTabBoxHeaderPropertyChange(event) {

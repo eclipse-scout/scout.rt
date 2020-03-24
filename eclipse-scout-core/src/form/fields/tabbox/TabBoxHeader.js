@@ -82,6 +82,10 @@ export default class TabBoxHeader extends Widget {
     this.tabArea.setSelectedTabItem(tabItem);
   }
 
+  isTabItemFocused(tabItem) {
+    return this.tabArea.isTabItemFocused(tabItem);
+  }
+
   focusTabItem(tabItem) {
     this.tabArea.focusTabItem(tabItem);
   }
