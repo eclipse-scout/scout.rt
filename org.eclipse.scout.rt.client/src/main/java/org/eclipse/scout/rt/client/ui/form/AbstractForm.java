@@ -64,6 +64,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.IFormExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.MoveFormFieldsHandler;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -2772,8 +2773,9 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       return;
     }
 
-    if (!getDesktop().isShowing(this)) {
-      m_displayParent.set(displayParent, true); // If not showing yet, the 'displayParent' can be changed without detach/attach.
+    if (!getDesktop().isShowing(this) || ClientSessionProvider.currentSession().isStopping()) {
+      // If not showing yet or session is stopping, the 'displayParent' can be changed without detach/attach.
+      m_displayParent.set(displayParent, true);
     }
     else {
       // This Form is already showing and must be attached to the new 'displayParent'.
