@@ -871,7 +871,12 @@ scout.Form.prototype.renderInitialFocus = function() {
   if (this.initialFocus) {
     this.initialFocus.focus();
   } else {
-    this.session.focusManager.requestFocus(this.session.focusManager.findFirstFocusableElement(this.$container));
+    // If no explicit focus is requested, try to focus the first focusable element.
+    // Do it only if the focus is not already on an element in the form (e.g. focus could have been requested explicitly by a child element)
+    if (!this.$container.isOrHas(this.$container.activeElement())) {
+      var focusManager = this.session.focusManager;
+      focusManager.requestFocus(focusManager.findFirstFocusableElement(this.$container));
+    }
   }
 };
 
