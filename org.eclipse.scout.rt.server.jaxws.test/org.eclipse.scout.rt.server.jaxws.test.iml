@@ -21,20 +21,26 @@
     <orderEntry type="library" name="Maven: org.jboss:jandex:2.0.5.Final" level="project" />
     <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:2.3.2" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.security" />
-    <orderEntry type="library" name="Maven: com.google.http-client:google-http-client:1.27.0" level="project" />
+    <orderEntry type="library" name="Maven: com.google.http-client:google-http-client:1.34.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.13" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:3.0.2" level="project" />
-    <orderEntry type="library" name="Maven: com.google.guava:guava:20.0" level="project" />
-    <orderEntry type="library" name="Maven: com.google.j2objc:j2objc-annotations:1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.6" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.10" level="project" />
+    <orderEntry type="library" name="Maven: com.google.guava:guava:28.2-android" level="project" />
+    <orderEntry type="library" name="Maven: com.google.guava:failureaccess:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava" level="project" />
+    <orderEntry type="library" name="Maven: org.checkerframework:checker-compat-qual:2.5.5" level="project" />
+    <orderEntry type="library" name="Maven: com.google.errorprone:error_prone_annotations:2.3.4" level="project" />
+    <orderEntry type="library" name="Maven: com.google.j2objc:j2objc-annotations:1.3" level="project" />
+    <orderEntry type="library" name="Maven: io.opencensus:opencensus-api:0.24.0" level="project" />
+    <orderEntry type="library" name="Maven: io.grpc:grpc-context:1.22.1" level="project" />
+    <orderEntry type="library" name="Maven: io.opencensus:opencensus-contrib-http-util:0.24.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.12" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.11" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:jcl-over-slf4j:1.7.25" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.server.commons" />
-    <orderEntry type="library" name="Maven: javax.servlet:javax.servlet-api:3.1.0" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.mom.api" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.dataobject" />
-    <orderEntry type="library" name="Maven: javax.xml.ws:jaxws-api:2.3.1" level="project" />
-    <orderEntry type="library" name="Maven: javax.jws:javax.jws-api:1.1" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.xml.ws:jakarta.xml.ws-api:2.3.3" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.jws:jakarta.jws-api:1.1.1" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.server.test" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.shared.test" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.platform.test" />
@@ -44,23 +50,29 @@
     <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy:1.9.3" level="project" />
     <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy-agent:1.9.3" level="project" />
     <orderEntry type="library" name="Maven: org.objenesis:objenesis:2.6" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.sun.xml.ws:jaxws-rt:2.3.1" level="project" />
-    <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.3.1" level="project" />
-    <orderEntry type="library" name="Maven: javax.xml.soap:javax.xml.soap-api:1.4.0" level="project" />
-    <orderEntry type="library" name="Maven: javax.annotation:javax.annotation-api:1.3.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.jaxb:jaxb-runtime:2.3.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.jaxb:txw2:2.3.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.sun.istack:istack-commons-runtime:3.0.7" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.sun.xml.ws:policy:2.7.5" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.sun.activation:javax.activation:1.2.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.gmbal:gmbal-api-only:3.1.0-b001" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.external:management-api:3.0.0-b012" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.jvnet.staxex:stax-ex:1.8" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.sun.xml.stream.buffer:streambuffer:1.5.6" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.servlet:jakarta.servlet-api:4.0.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.sun.xml.ws:jaxws-rt:2.3.2" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.xml.bind:jakarta.xml.bind-api:2.3.3" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.xml.soap:jakarta.xml.soap-api:1.4.2" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.annotation:jakarta.annotation-api:1.3.5" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.jaxb:jaxb-runtime:2.3.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.jaxb:txw2:2.3.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.sun.istack:istack-commons-runtime:3.0.8" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.sun.xml.ws:policy:2.7.6" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.gmbal:gmbal:4.0.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.external:management-api:3.2.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.pfl:pfl-basic:4.0.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.pfl:pfl-tf:4.0.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.pfl:pfl-asm:4.0.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.pfl:pfl-dynamic:4.0.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.pfl:pfl-basic-tools:4.0.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.pfl:pfl-tf-tools:4.0.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.jvnet.staxex:stax-ex:1.8.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.sun.xml.stream.buffer:streambuffer:1.5.7" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jvnet.mimepull:mimepull:1.9.10" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.sun.xml.fastinfoset:FastInfoset:1.2.15" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.ha:ha-api:3.1.9" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.sun.xml.messaging.saaj:saaj-impl:1.5.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.sun.xml.fastinfoset:FastInfoset:1.2.16" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.ha:ha-api:3.1.12" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.sun.xml.messaging.saaj:saaj-impl:1.5.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.woodstox:woodstox-core:5.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.codehaus.woodstox:stax2-api:4.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: ch.qos.logback:logback-classic:1.2.3" level="project" />
