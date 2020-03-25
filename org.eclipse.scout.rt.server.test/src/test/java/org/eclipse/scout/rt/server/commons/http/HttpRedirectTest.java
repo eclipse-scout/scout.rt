@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.rt.server.commons.http;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -224,13 +224,10 @@ public class HttpRedirectTest {
     try (InputStream in = resp.getContent()) {
       bytes = IOUtility.readBytes(in);
     }
-    assertEquals(200, resp.getStatusCode());
-    String text = new String(bytes, StandardCharsets.UTF_8).trim();
-    assertEquals("HTTP-POST:bar", text);
-    assertEquals(StandardCharsets.UTF_8, resp.getContentCharset());
-    assertEquals(new String(bytes), 15, bytes.length);//text + CR + LF
-    //two calls due to redirect
-    assertEquals(Arrays.asList("05", "05"), m_servletPostLog);
+    assertEquals(302, resp.getStatusCode());
+    assertArrayEquals(new byte[0], bytes);
+    // one calls due to non-repeatable
+    assertEquals(Arrays.asList("05"), m_servletPostLog);
   }
 
   /**
