@@ -50,6 +50,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
+import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.rest.client.RestClientProperties;
@@ -72,10 +73,11 @@ import org.glassfish.jersey.message.internal.Statuses;
  *      ConnectionClosedException when using httpclient: 4.5.1+ with chunked transfer encoding</a>
  * @see <a href="https://github.com/eclipse-ee4j/jersey/pull/3861">GitHub pull request 3861</a>
  */
-// TODO [9.0] abr: remove this class as soon as jersey-apache-connector has been updated to 2.29+
+// TODO [9.0] abr: Refactor this class so it does not extend ApacheConnector anymore (contains too much customizations)
 class ClosingApacheConnector extends ApacheConnector {
 
   private static final Logger LOGGER = Logger.getLogger(ClosingApacheConnector.class.getName());
+  private static final FinalValue<Boolean> WRITE_OUT_BOUND_HEADERS_WITH_CLIENT_REQUEST = new FinalValue<>();
 
   public ClosingApacheConnector(Client client, Configuration config) {
     super(client, config);
@@ -90,7 +92,7 @@ class ClosingApacheConnector extends ApacheConnector {
 
     // Work around for rare abnormal connection terminations (258238)
     ensureHttpHeaderCloseConnection(clientRequest.getHeaders(), request);
-    final Map<String, String> clientHeadersSnapshot = writeOutBoundHeaders(clientRequest.getHeaders(), request);
+    final Map<String, String> clientHeadersSnapshot = writeOutBoundHeaders(clientRequest, request);
 
     final IRegistrationHandle cancellableHandle = registerCancellable(request);
 
@@ -273,13 +275,37 @@ class ClosingApacheConnector extends ApacheConnector {
   }
 
   @SuppressWarnings("unchecked")
-  private static Map<String, String> writeOutBoundHeaders(final MultivaluedMap<String, Object> headers, final HttpUriRequest request) {
-    return invokePrivateMethod(
-        "writeOutBoundHeaders",
-        new Class[]{MultivaluedMap.class, HttpUriRequest.class},
-        Map.class,
-        null,
-        new Object[]{headers, request});
+  private static Map<String, String> writeOutBoundHeaders(final ClientRequest clientRequest, final HttpUriRequest request) {
+    // Apache connector 2.30.1 uses a different API for this private method
+    if (WRITE_OUT_BOUND_HEADERS_WITH_CLIENT_REQUEST.setIfAbsentAndGet(ClosingApacheConnector::createWriteOutboundHeadersFunction)) {
+      return invokePrivateMethod(
+          "writeOutBoundHeaders",
+          new Class[]{ClientRequest.class, HttpUriRequest.class},
+          Map.class,
+          null,
+          new Object[]{clientRequest, request});
+    }
+    else {
+      return invokePrivateMethod(
+          "writeOutBoundHeaders",
+          new Class[]{MultivaluedMap.class, HttpUriRequest.class},
+          Map.class,
+          null,
+          new Object[]{clientRequest.getHeaders(), request});
+    }
+  }
+
+  private static boolean createWriteOutboundHeadersFunction() {
+    boolean useApiWithClientRequest = false;
+    try {
+      ApacheConnector.class.getDeclaredMethod("writeOutBoundHeaders", ClientRequest.class, HttpUriRequest.class);
+      useApiWithClientRequest = true;
+    }
+    catch (Exception e) {
+      LOGGER.log(Level.FINER, "writeOutBoundHeaders(ClientRequest,class, HttpUriRequest.class) does not exist", e);
+    }
+    LOGGER.info("using writeOutBoundHeaers with clientRequest: " + useApiWithClientRequest);
+    return useApiWithClientRequest;
   }
 
   private HttpHost getHost(final HttpUriRequest request) {
