@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.imap;
 
+import java.util.concurrent.Callable;
+
 import javax.mail.Message;
 import javax.mail.Store;
 
@@ -74,4 +76,11 @@ public interface IImapAdapter {
 
   void setSSLProtocols(String[] sslProtocols);
 
+  boolean isUseOAuth();
+
+  void setUseOAuth(boolean useOAuth);
+
+  Callable<String> getOAuthTokenResolver();
+
+  void setOAuthTokenResolver(Callable<String> resolver);
 }

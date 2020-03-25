@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.mail.AuthenticationFailedException;
 import javax.mail.Flags;
@@ -51,6 +52,9 @@ public class ImapAdapter implements IImapAdapter {
   private String m_defaultFolderName;
   private Store m_store;
   private Map<String, Folder> m_cachedFolders;
+
+  private boolean m_useOAuth;
+  private Callable<String> m_oauthTokenResolver;
 
   public ImapAdapter() {
     m_cachedFolders = new HashMap<String, Folder>();
@@ -239,6 +243,20 @@ public class ImapAdapter implements IImapAdapter {
       getCachedFolders().clear();
       Properties props = new Properties();
       props.put("mail.transport.protocol", "imap");
+
+      if (isUseOAuth() && getOAuthTokenResolver() != null) {
+        props.put("mail.imap.sasl.enable", "true");
+        props.put("mail.imap.sasl.mechanisms", "XOAUTH2");
+        props.put("mail.imap.auth.login.disable", "true");
+        props.put("mail.imap.auth.plain.disable", "true");
+        try {
+          setPassword(getOAuthTokenResolver().call());
+        }
+        catch (Exception e) {
+          throw new ProcessingException("Error retrieving OAuth access token", e);
+        }
+      }
+
       if (getHost() != null) {
         props.put("mail.imap.host", getHost());
       }
@@ -453,5 +471,25 @@ public class ImapAdapter implements IImapAdapter {
 
   protected Map<String, Folder> getCachedFolders() {
     return m_cachedFolders;
+  }
+
+  @Override
+  public boolean isUseOAuth() {
+    return m_useOAuth;
+  }
+
+  @Override
+  public void setUseOAuth(boolean useOAuth) {
+    m_useOAuth = useOAuth;
+  }
+
+  @Override
+  public Callable<String> getOAuthTokenResolver() {
+    return m_oauthTokenResolver;
+  }
+
+  @Override
+  public void setOAuthTokenResolver(Callable<String> oauthTokenResolver) {
+    m_oauthTokenResolver = oauthTokenResolver;
   }
 }
