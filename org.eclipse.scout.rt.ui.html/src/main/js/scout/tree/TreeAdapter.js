@@ -140,6 +140,8 @@ scout.TreeAdapter.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
       throw new Error('Parent node could not be found. Id: ' + parentNodeId);
     }
   }
+  this.addFilterForWidgetEventType('nodesSelected');
+  this.addFilterForWidgetEventType('nodesChecked');
   var nodes = this.widget._nodesByIds(nodeIds);
   this.widget.deleteNodes(nodes, parentNode);
 };
@@ -152,6 +154,8 @@ scout.TreeAdapter.prototype._onAllChildNodesDeleted = function(parentNodeId) {
       throw new Error('Parent node could not be found. Id: ' + parentNodeId);
     }
   }
+  this.addFilterForWidgetEventType('nodesSelected');
+  this.addFilterForWidgetEventType('nodesChecked');
   this.widget.deleteAllChildNodes(parentNode);
 };
 

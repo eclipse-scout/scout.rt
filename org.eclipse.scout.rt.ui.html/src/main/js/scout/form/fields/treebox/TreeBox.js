@@ -11,6 +11,7 @@
 scout.TreeBox = function() {
   scout.TreeBox.parent.call(this);
   this.tree = null;
+  this._populating = false;
   this._addWidgetProperties(['tree', 'filterBox']);
 };
 scout.inherits(scout.TreeBox, scout.LookupBox);
@@ -52,6 +53,9 @@ scout.TreeBox.prototype._renderStructure = function($fieldContainer) {
 };
 
 scout.TreeBox.prototype._onTreeNodesChecked = function(event) {
+  if (this._populating) {
+    return;
+  }
   this._syncTreeToValue();
 };
 
@@ -126,20 +130,22 @@ scout.TreeBox.prototype._lookupByAllDone = function(result) {
 scout.TreeBox.prototype._populateTree = function(result) {
   var topLevelNodes = [];
 
-  this._poulateTreeRecursive(null, topLevelNodes, result.lookupRows);
+  this._populating = true;
+  this._populateTreeRecursive(null, topLevelNodes, result.lookupRows);
 
   this.tree.deleteAllNodes();
   this.tree.insertNodes(topLevelNodes);
+  this._populating = false;
 
   this._syncValueToTree(this.value);
 };
 
-scout.TreeBox.prototype._poulateTreeRecursive = function(parentKey, nodesArray, lookupRows) {
+scout.TreeBox.prototype._populateTreeRecursive = function(parentKey, nodesArray, lookupRows) {
   var node;
   lookupRows.forEach(function(lookupRow) {
     if (lookupRow.parentKey === parentKey) {
       node = this._createNode(lookupRow);
-      this._poulateTreeRecursive(node.id, node.childNodes, lookupRows);
+      this._populateTreeRecursive(node.id, node.childNodes, lookupRows);
       node.leaf = !node.childNodes.length;
       nodesArray.push(node);
     }

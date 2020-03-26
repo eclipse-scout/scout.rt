@@ -106,6 +106,19 @@ scout.TreeNode.prototype.reset = function() {
 };
 
 /**
+ * @returns {boolean} true, if the node is an ancestor of the given node
+ */
+scout.TreeNode.prototype.isAncestorOf = function(node) {
+  while (node) {
+    if (node.parentNode === this) {
+      return true;
+    }
+    node = node.parentNode;
+  }
+  return false;
+};
+
+/**
  * Check if node is in hierarchy of a parent. is used on removal from flat list.
  */
 scout.TreeNode.prototype.isChildOf = function(parentNode) {
