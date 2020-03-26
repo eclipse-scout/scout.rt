@@ -16,19 +16,23 @@ import * as $ from 'jquery';
  */
 export default class TreeNode {
 
-  constructor(tree) {
+  constructor() {
     this.$node = null;
     this.$text = null;
     this.attached = false;
     this.checked = false;
     this.childNodes = [];
     this.childrenLoaded = false;
+    this.childrenChecked = false;
+    this.cssClass = null;
     this.destroyed = false;
     this.enabled = true;
     this.expanded = false;
     this.expandedLazy = false;
     this.filterAccepted = true;
     this.filterDirty = false;
+    this.htmlEnabled = false;
+    this.iconId = null;
     this.id = null;
     this.initialized = false;
     this.initialExpanded = false;
@@ -98,10 +102,6 @@ export default class TreeNode {
   _jsonModel() {
   }
 
-  hasChildNodes() {
-    return this.childNodes.length > 0;
-  }
-
   reset() {
     if (this.$node) {
       this.$node.remove();
@@ -111,16 +111,42 @@ export default class TreeNode {
     this.attached = false;
   }
 
+  hasChildNodes() {
+    return this.childNodes.length > 0;
+  }
+
   /**
-   * Check if node is in hierarchy of a parent. is used on removal from flat list.
+   * @returns {boolean} true, if the node is an ancestor of the given node
    */
-  isChildOf(parentNode) {
-    if (parentNode === this.parentNode) {
+  isAncestorOf(node) {
+    while (node) {
+      if (node.parentNode === this) {
+        return true;
+      }
+      node = node.parentNode;
+    }
+    return false;
+  }
+
+  /**
+   * @returns {boolean} true, if the node is a descendant of the given node
+   */
+  isDescendantOf(node) {
+    if (node === this.parentNode) {
       return true;
-    } else if (!this.parentNode) {
+    }
+    if (!this.parentNode) {
       return false;
     }
-    return this.parentNode.isChildOf(parentNode);
+    // noinspection JSDeprecatedSymbols
+    return this.parentNode.isDescendantOf(node);
+  }
+
+  /**
+   * @deprecated use isDescendantOf instead
+   */
+  isChildOf(node) {
+    return this.isDescendantOf(node);
   }
 
   isFilterAccepted(forceFilter) {
@@ -284,10 +310,7 @@ export default class TreeNode {
     // If parent node is marked as 'lazy', check if any visible child nodes remain.
     if (this.parentNode && this.parentNode.expandedLazy) {
       var hasVisibleNodes = this.parentNode.childNodes.some(function(childNode) {
-        if (tree.visibleNodesMap[childNode.id]) {
-          return true;
-        }
-        return false;
+        return !!tree.visibleNodesMap[childNode.id];
       });
       if (!hasVisibleNodes && this.parentNode.$node) {
         // Remove 'lazy' from parent
@@ -297,7 +320,7 @@ export default class TreeNode {
   }
 
   /**
-   * @return The object that has the properties used for styles (colors, fonts, etc.)
+   * @return {object} The object that has the properties used for styles (colors, fonts, etc.)
    *     The default impl. returns "this". Override this function to return another object.
    */
   _getStyles() {

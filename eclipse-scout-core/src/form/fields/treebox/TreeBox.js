@@ -15,6 +15,7 @@ export default class TreeBox extends LookupBox {
   constructor() {
     super();
     this.tree = null;
+    this._populating = false;
     this._addWidgetProperties(['tree', 'filterBox']);
   }
 
@@ -52,6 +53,9 @@ export default class TreeBox extends LookupBox {
   }
 
   _onTreeNodesChecked(event) {
+    if (this._populating) {
+      return;
+    }
     this._syncTreeToValue();
   }
 
@@ -125,21 +129,22 @@ export default class TreeBox extends LookupBox {
 
   _populateTree(result) {
     var topLevelNodes = [];
-
-    this._poulateTreeRecursive(null, topLevelNodes, result.lookupRows);
+    this._populating = true;
+    this._populateTreeRecursive(null, topLevelNodes, result.lookupRows);
 
     this.tree.deleteAllNodes();
     this.tree.insertNodes(topLevelNodes);
+    this._populating = false;
 
     this._syncValueToTree(this.value);
   }
 
-  _poulateTreeRecursive(parentKey, nodesArray, lookupRows) {
+  _populateTreeRecursive(parentKey, nodesArray, lookupRows) {
     var node;
     lookupRows.forEach(function(lookupRow) {
       if (lookupRow.parentKey === parentKey) {
         node = this._createNode(lookupRow);
-        this._poulateTreeRecursive(node.id, node.childNodes, lookupRows);
+        this._populateTreeRecursive(node.id, node.childNodes, lookupRows);
         node.leaf = !node.childNodes.length;
         nodesArray.push(node);
       }

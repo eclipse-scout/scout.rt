@@ -459,6 +459,37 @@ describe('Outline', function() {
       expect(outline.outlineOverview.rendered).toBe(false);
     });
 
+    it('is displayed selected page is deleted', function() {
+      var outline = helper.createOutline(helper.createModelFixture(3, 2));
+      session.desktop.setOutline(outline);
+      expect(outline.outlineOverview.rendered).toBe(true);
+
+      outline.selectNodes(outline.nodes[0]);
+      expect(outline.outlineOverview.rendered).toBe(false);
+
+      outline.deleteNode(outline.nodes[0]);
+      expect(outline.outlineOverview.rendered).toBe(true);
+
+      outline.selectNodes(outline.nodes[0].childNodes[0]);
+      expect(outline.outlineOverview.rendered).toBe(false);
+
+      // Delete parent of selected node
+      outline.deleteNode(outline.nodes[0]);
+      expect(outline.outlineOverview.rendered).toBe(true);
+    });
+
+    it('is displayed if all pages are deleted', function() {
+      var outline = helper.createOutline(helper.createModelFixture(3, 2));
+      session.desktop.setOutline(outline);
+      expect(outline.outlineOverview.rendered).toBe(true);
+
+      outline.selectNodes(outline.nodes[0]);
+      expect(outline.outlineOverview.rendered).toBe(false);
+
+      outline.deleteAllNodes();
+      expect(outline.outlineOverview.rendered).toBe(true);
+    });
+
     it('is not displayed if outlineOverviewVisible is false', function() {
       var outline = helper.createOutline(helper.createModelFixture(3, 2));
       session.desktop.setOutline(outline);
@@ -503,7 +534,5 @@ describe('Outline', function() {
       expect(outline.outlineOverview).toBe(null);
       expect(outline.defaultDetailForm.rendered).toBe(true);
     });
-
   });
-
 });

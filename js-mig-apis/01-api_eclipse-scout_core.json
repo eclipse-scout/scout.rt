@@ -18696,9 +18696,9 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.TreeBox._populateTree"
     }, {
-      "name" : "_poulateTreeRecursive",
+      "name": "_populateTreeRecursive",
       "type" : "Function",
-      "fullyQualifiedName" : "scout.TreeBox._poulateTreeRecursive"
+      "fullyQualifiedName": "scout.TreeBox._populateTreeRecursive"
     }, {
       "name" : "getCheckedLookupRows",
       "type" : "Function",

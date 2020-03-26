@@ -687,7 +687,6 @@ describe('Tree', function() {
         tree.render();
         expect(tree.calculateViewRangeSize()).toBe(4);
       });
-
     });
 
     describe('deleting a root node', function() {
@@ -773,7 +772,47 @@ describe('Tree', function() {
         expect(tree.nodes[1].childNodes[0]).toBe(node2Child2);
         expect(Object.keys(tree.nodesMap).length).toBe(14); // 39 - (1 + 3 + 9) - 3*(1 + 3) = 39 - 13 - 12
       });
+    });
 
+    it('deselects the deleted nodes', function() {
+      tree.render();
+      var childNode1_1 = tree.nodes[1].childNodes[1];
+      var childNode2_1 = tree.nodes[2].childNodes[1];
+      tree.selectNode(node0);
+      expect(tree.selectedNodes.length).toBe(1);
+      tree.deleteNode(node0);
+      expect(tree.selectedNodes.length).toBe(0);
+
+      tree.selectNode(childNode1_1);
+      expect(tree.selectedNodes.length).toBe(1);
+      tree.deleteNode(node1);
+      expect(tree.selectedNodes.length).toBe(0);
+
+      tree.selectNode(childNode2_1.childNodes[0]);
+      expect(tree.selectedNodes.length).toBe(1);
+      tree.deleteAllChildNodes(node2);
+      expect(tree.selectedNodes.length).toBe(0);
+    });
+
+    it('unchecks the deleted nodes', function() {
+      tree.setCheckable(true);
+      tree.render();
+      var childNode1_1 = tree.nodes[1].childNodes[1];
+      var childNode2_1 = tree.nodes[2].childNodes[1];
+      tree.checkNode(node0);
+      expect(tree.checkedNodes.length).toBe(1);
+      tree.deleteNode(node0);
+      expect(tree.checkedNodes.length).toBe(0);
+
+      tree.checkNode(childNode1_1);
+      expect(tree.checkedNodes.length).toBe(1);
+      tree.deleteNode(node1);
+      expect(tree.checkedNodes.length).toBe(0);
+
+      tree.checkNode(childNode2_1.childNodes[0]);
+      expect(tree.checkedNodes.length).toBe(1);
+      tree.deleteAllChildNodes(node2);
+      expect(tree.checkedNodes.length).toBe(0);
     });
 
   });

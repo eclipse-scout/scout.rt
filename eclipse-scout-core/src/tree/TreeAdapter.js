@@ -143,6 +143,8 @@ export default class TreeAdapter extends ModelAdapter {
         throw new Error('Parent node could not be found. Id: ' + parentNodeId);
       }
     }
+    this.addFilterForWidgetEventType('nodesSelected');
+    this.addFilterForWidgetEventType('nodesChecked');
     var nodes = this.widget._nodesByIds(nodeIds);
     this.widget.deleteNodes(nodes, parentNode);
   }
@@ -155,6 +157,8 @@ export default class TreeAdapter extends ModelAdapter {
         throw new Error('Parent node could not be found. Id: ' + parentNodeId);
       }
     }
+    this.addFilterForWidgetEventType('nodesSelected');
+    this.addFilterForWidgetEventType('nodesChecked');
     this.widget.deleteAllChildNodes(parentNode);
   }
 
@@ -167,6 +171,11 @@ export default class TreeAdapter extends ModelAdapter {
     this.widget.selectNodes(nodes);
   }
 
+  /**
+   * @parem event.expanded true, to expand the node
+   * @param event.expandedLazy true, to expand the nodes lazily
+   * @param event.recursive true, to expand the descendant nodes as well
+   */
   _onNodeExpanded(nodeId, event) {
     var node = this.widget.nodesMap[nodeId],
       options = {
@@ -193,6 +202,7 @@ export default class TreeAdapter extends ModelAdapter {
     }
   }
 
+  // noinspection DuplicatedCode
   _onNodeChanged(nodeId, cell) {
     var node = this.widget.nodesMap[nodeId];
 

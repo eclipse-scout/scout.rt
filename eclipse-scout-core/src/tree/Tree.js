@@ -335,8 +335,6 @@ export default class Tree extends Widget {
 
   _destroyTreeNode(node) {
     delete this.nodesMap[node.id];
-    arrays.remove(this.selectedNodes, node); // ensure deleted node is not in selection list anymore (in case the model does not update the selection)
-    arrays.remove(this.checkedNodes, node); // ensure deleted node is not in checked list anymore
     this._removeFromFlatList(node, false); // ensure node is not longer in visible nodes list.
     node.destroy();
 
@@ -1582,7 +1580,7 @@ export default class Tree extends Widget {
               this._$animationWrapper = $('<div class="animation-wrapper">').insertBefore(node.$node);
               this._$animationWrapper.data('parentNode', parentNode);
             }
-            if (node.isChildOf(this._$animationWrapper.data('parentNode'))) {
+            if (node.isDescendantOf(this._$animationWrapper.data('parentNode'))) {
               this._$animationWrapper.append(node.$node);
             }
             node.attached = false;
@@ -2134,8 +2132,16 @@ export default class Tree extends Widget {
     this.deselectNodes(node);
   }
 
-  deselectNodes(nodes) {
+  /**
+   * @param nodes the nodes to deselect
+   * @param options.collectChildren true to add the selected children to the list of nodes to deselect
+   */
+  deselectNodes(nodes, options) {
     nodes = arrays.ensure(nodes);
+    options = options || {};
+    if (options.collectChildren) {
+      nodes = nodes.concat(this._collectNodesIfDescendants(nodes, this.selectedNodes));
+    }
     var selectedNodes = this.selectedNodes.slice(); // copy
     if (arrays.removeAll(selectedNodes, nodes)) {
       this.selectNodes(selectedNodes);
@@ -2374,8 +2380,8 @@ export default class Tree extends Widget {
     var deletedNodes = [];
     var parentNodesToReindex = [];
     var topLevelNodesToReindex = [];
-
     nodes = arrays.ensure(nodes).slice(); // copy
+
     nodes.forEach(function(node) {
       var p = parentNode || node.parentNode;
       if (p) {
@@ -2398,13 +2404,14 @@ export default class Tree extends Widget {
       Tree.visitNodes(this._destroyTreeNode.bind(this), node.childNodes);
     }, this);
 
-    this.deselectNodes(deletedNodes);
-
     // update child node indices
     parentNodesToReindex.forEach(function(p) {
       this._updateChildNodeIndex(p.childNodes);
     }, this);
     this._updateChildNodeIndex(topLevelNodesToReindex);
+
+    this.deselectNodes(deletedNodes, {collectChildren: true});
+    this.uncheckNodes(deletedNodes, {collectChildren: true});
 
     // remove node from html document
     if (this.rendered) {
@@ -2417,6 +2424,18 @@ export default class Tree extends Widget {
     });
   }
 
+  _collectNodesIfDescendants(nodes, nodesToCheck) {
+    var result = [];
+    nodesToCheck.forEach(function(nodeToCheck) {
+      if (nodes.some(function(node) {
+        return node.isAncestorOf(nodeToCheck);
+      })) {
+        result.push(nodeToCheck);
+      }
+    });
+    return result;
+  }
+
   deleteAllChildNodes(parentNode) {
     var nodes;
     if (parentNode) {
@@ -2427,6 +2446,9 @@ export default class Tree extends Widget {
       this.nodes = [];
     }
     Tree.visitNodes(updateNodeMap.bind(this), nodes);
+
+    this.deselectNodes(nodes, {collectChildren: true});
+    this.uncheckNodes(nodes, {collectChildren: true});
 
     // remove node from html document
     if (this.rendered) {
@@ -2551,11 +2573,18 @@ export default class Tree extends Widget {
     this.uncheckNodes([node], opts);
   }
 
+  /**
+   * @param nodes the nodes to uncheck
+   * @param options.collectChildren true to add the checked children to the list of nodes to uncheck
+   */
   uncheckNodes(nodes, options) {
     var opts = {
       checked: false
     };
     $.extend(opts, options);
+    if (opts.collectChildren) {
+      nodes = nodes.concat(this._collectNodesIfDescendants(nodes, this.checkedNodes));
+    }
     this.checkNodes(nodes, opts);
   }
 

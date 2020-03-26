@@ -425,10 +425,6 @@ export default class Outline extends Tree {
       node.detailTable.destroy();
       node.detailTable = null;
     }
-    // If last node is removed, navigate back to top
-    if (this.nodes.length === 0) {
-      this.navigateToTop();
-    }
   }
 
   /**
@@ -777,7 +773,7 @@ export default class Outline extends Tree {
 
     // Scroll to the parent node to hide ancestor nodes and give as much room as possible for the content
     if (this.selectedNodes[0] && this.selectedNodes[0].parentNode) {
-      if (this.prevSelectedNode && this.prevSelectedNode.isChildOf(this.selectedNodes[0])) {
+      if (this.prevSelectedNode && this.prevSelectedNode.isDescendantOf(this.selectedNodes[0])) {
         // But don't do it on upwards navigation, in that case the tree will scroll to the optimal position by itself, see _updateScrollTopAfterSelection
         return;
       }

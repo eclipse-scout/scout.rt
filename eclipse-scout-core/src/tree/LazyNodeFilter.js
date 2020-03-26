@@ -23,7 +23,7 @@ export default class LazyNodeFilter {
         if (typeof selectedNode === 'string') {
           break;
         }
-        if (selectedNode === node || selectedNode.isChildOf(node)) {
+        if (selectedNode === node || selectedNode.isDescendantOf(node)) {
           return true;
         }
       }
