@@ -52,7 +52,8 @@ public class ApacheHttpResponse extends LowLevelHttpResponse {
 
   @Override
   public long getContentLength() throws IOException {
-    return m_response.getEntity().getContentLength();
+    HttpEntity entity = m_response.getEntity();
+    return entity != null ? entity.getContentLength() : 0;
   }
 
   @Override
