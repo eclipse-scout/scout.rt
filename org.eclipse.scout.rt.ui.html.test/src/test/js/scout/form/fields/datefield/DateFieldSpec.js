@@ -839,6 +839,7 @@ describe('DateField', function() {
       expect(!!dateField._predictDate(undefined)).toBe(true);
       expect(!!dateField._predictDate('0')).toBe(true);
       expect(!!dateField._predictDate('1')).toBe(true);
+      expect(!!dateField._predictDate('+4')).toBe(true);
       expect(!!dateField._predictDate('-7')).toBe(true);
       expect(!!dateField._predictDate('01')).toBe(true);
       expect(!!dateField._predictDate('17')).toBe(true);
@@ -859,6 +860,8 @@ describe('DateField', function() {
       expect(!!dateField._predictDate('1...2')).toBe(false);
       expect(!!dateField._predictDate('11x')).toBe(false);
       expect(!!dateField._predictDate('31.02.2015')).toBe(false);
+      expect(!!dateField._predictDate('+999999999999999')).toBe(false); // NaN
+      expect(!!dateField._predictDate('-999999999999999')).toBe(false); // NaN
     });
 
     it('can predict dates', function() {

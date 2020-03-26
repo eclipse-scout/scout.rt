@@ -1468,6 +1468,10 @@ scout.DateField.prototype._predictDate = function(inputText) {
     var now = scout.dates.newDate();
     var daysToAdd = Number(m[1] + (m[2] || '0'));
     now.setDate(now.getDate() + daysToAdd);
+    if (isNaN(now.valueOf()) || now.getDate() < 0) { // Some older browsers don't set NaN but return invalid values
+      this._setDateValid(false);
+      return null;
+    }
     this._setDateValid(true);
     return {
       date: now,
