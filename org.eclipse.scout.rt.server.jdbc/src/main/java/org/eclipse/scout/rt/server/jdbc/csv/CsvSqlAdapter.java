@@ -10,10 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jdbc.csv;
 
-/**
- * Title: BSI Scout V3
- */
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
