@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
+import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.IOUtility;
@@ -83,6 +84,13 @@ public final class SeleniumJavaScript {
     String modelClassSelector = SeleniumUtil.getModelClassCssSelector(tableClass);
     String jQuerySelector = "$('div[" + modelClassSelector + "] > .table-data')";
     executeScript(test, "scout.selenium.scrollToRight(" + jQuerySelector + ")");
+  }
+
+  public static void scrollTreeToBottom(AbstractSeleniumTest test, Class<? extends AbstractTree> treeClass) {
+    test.waitUntilElementClickable(treeClass);
+    String modelClassSelector = SeleniumUtil.getModelClassCssSelector(treeClass);
+    String jQuerySelector = "$('div[" + modelClassSelector + "] > .tree-data')";
+    executeScript(test, "scout.selenium.scrollToBottom(" + jQuerySelector + ")");
   }
 
   /**
