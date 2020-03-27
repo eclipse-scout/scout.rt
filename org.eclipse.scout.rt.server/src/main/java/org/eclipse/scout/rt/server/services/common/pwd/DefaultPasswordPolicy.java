@@ -15,12 +15,6 @@ import java.util.Arrays;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 
-/**
- * Title: BSI Scout V3 Copyright: Copyright (c) 2001,2009 BSI AG
- *
- * @version 3.x
- */
-
 public class DefaultPasswordPolicy implements IPasswordPolicy {
 
   private static final int MIN_PASSWORD_LENGTH = 8;
