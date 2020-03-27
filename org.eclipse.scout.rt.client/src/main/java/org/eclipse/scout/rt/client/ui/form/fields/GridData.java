@@ -11,12 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields;
 
 /**
- * Title: BSI Scout V3
- *  Copyright (c) 2001,2009 BSI AG
- * @version 3.x
- */
-
-/**
  * Grid Cell as container helper for dynamic layouting in scout
  */
 @SuppressWarnings({"squid:S00116", "squid:ClassVariableVisibilityCheck"})
