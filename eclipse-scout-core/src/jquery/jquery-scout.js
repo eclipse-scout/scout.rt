@@ -1031,6 +1031,11 @@ export default class JQueryUtils extends $ {
     return this.one('animationend webkitAnimationEnd', selector, data, handler);
   }
 
+  static hasAnimationClass() {
+    // matches any CSS class that starts with 'animate-'
+    return /(^|\s)animate-/.test(this.attr('class'));
+  }
+
   /**
    * Animates from old to new width
    */
@@ -1949,6 +1954,7 @@ $.extend($.fn, {
   animateSVG: JQueryUtils.animateSVG,
   addClassForAnimation: JQueryUtils.addClassForAnimation,
   oneAnimationEnd: JQueryUtils.oneAnimationEnd,
+  hasAnimationClass: JQueryUtils.hasAnimationClass,
   cssWidthAnimated: JQueryUtils.cssWidthAnimated,
   cssHeightAnimated: JQueryUtils.cssHeightAnimated,
   cssLeftAnimated: JQueryUtils.cssLeftAnimated,

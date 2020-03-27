@@ -202,11 +202,6 @@ export default class Form extends Widget {
 
     this.htmlComp.setLayout(layout);
     this.rootGroupBox.render();
-
-    if (this.isDialog()) {
-      this.$container.addClassForAnimation('animate-open');
-      this.$container.addDeviceClass();
-    }
   }
 
   _renderFocusedElement() {

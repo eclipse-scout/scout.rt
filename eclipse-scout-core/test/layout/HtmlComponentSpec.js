@@ -75,7 +75,7 @@ describe('HtmlComponent', function() {
 
     it('does NOT set data \'htmlComponent\' when constructor is called', function() {
       spyOn(jqueryMock, 'data');
-      var htmlComp = new HtmlComponent(jqueryMock, session);
+      new HtmlComponent(jqueryMock, session);
       expect(jqueryMock.data).not.toHaveBeenCalled();
     });
 
@@ -217,6 +217,18 @@ describe('HtmlComponent', function() {
       $comp.removeClass('animate-test');
       $comp.trigger('animationend');
       expect(htmlChild.layout.layout).toHaveBeenCalled();
+    });
+
+    it('does not layout animated components', function() {
+      $comp.addClass('animate-test');
+      spyOn(htmlComp.layout, 'layout').and.callThrough();
+      htmlComp.validateLayout();
+      expect(htmlComp.layout.layout).not.toHaveBeenCalled();
+
+      // Simulate end of animation
+      $comp.removeClass('animate-test');
+      $comp.trigger('animationend');
+      expect(htmlComp.layout.layout).toHaveBeenCalled();
     });
 
   });

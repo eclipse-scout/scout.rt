@@ -133,10 +133,10 @@ export default class HtmlComponent {
     if (!this.layout) {
       throw new Error('Called layout() but component has no layout');
     }
-    if (!this._checkValidationPossible()) {
-      return false;
-    }
     if (!this.valid) {
+      if (!this._checkValidationPossible()) {
+        return false;
+      }
       this.layouting = true;
       this.layout.layout(this.$comp);
       this.layouting = false;
@@ -153,6 +153,13 @@ export default class HtmlComponent {
     if (!this.isAttachedAndVisible()) {
       return false;
     }
+
+    // Don't layout if component is currently animated
+    if (this.$comp.hasAnimationClass()) {
+      this._validateLayoutAfterAnimation(this.$comp);
+      return false;
+    }
+
     // Check the visibility of the parents as well.
     // Also check if one of the parents is currently being animated.
     // To improve performance (the check might loop to the top of the DOM tree), the following code is
@@ -161,14 +168,13 @@ export default class HtmlComponent {
     if (!parent || !parent.layouting) {
       var everyParentVisible = true;
       var $animatedParent = null;
-      var animatingClassPattern = /(^|\s)animate-/; // matches any CSS class that starts with 'animate-'
       this.$comp.parents().each(function() {
         var $parent = $(this);
         if (!$parent.isVisible()) {
           everyParentVisible = false;
           return false;
         }
-        if (animatingClassPattern.test($parent.attr('class'))) {
+        if ($parent.hasAnimationClass()) {
           $animatedParent = $parent;
           return false;
         }
@@ -180,11 +186,15 @@ export default class HtmlComponent {
       if ($animatedParent) {
         // Postpone the layout if there is a CSS animation in progress on one of the parent containers.
         // Otherwise, wrong sizes might be measured (depending on the CSS animation, e.g. grow/shrink).
-        $animatedParent.oneAnimationEnd(this.validateLayout.bind(this));
+        this._validateLayoutAfterAnimation($animatedParent);
         return false;
       }
     }
     return true;
+  }
+
+  _validateLayoutAfterAnimation($animatedElement) {
+    $animatedElement.oneAnimationEnd(this.validateLayout.bind(this));
   }
 
   /**
