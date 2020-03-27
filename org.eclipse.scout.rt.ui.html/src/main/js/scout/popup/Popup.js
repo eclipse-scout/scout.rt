@@ -240,7 +240,7 @@ scout.Popup.prototype._postRender = function() {
   this.size();
   this._attachCloseHandlers();
   this._attachAnchorHandlers();
-  this._attachCloseHandler();
+  this._handleGlassPanes();
 };
 
 scout.Popup.prototype._onAttach = function() {
