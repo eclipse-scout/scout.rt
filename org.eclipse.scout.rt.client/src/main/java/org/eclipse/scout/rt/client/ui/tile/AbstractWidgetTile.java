@@ -72,6 +72,13 @@ public abstract class AbstractWidgetTile<T extends IWidget> extends AbstractTile
   }
 
   public void setTileWidget(T widget) {
+    if (getTileWidget() != null) {
+      getTileWidget().dispose();
+    }
+    if (widget != null) {
+      widget.setParentInternal(this);
+      widget.init();
+    }
     propertySupport.setProperty(PROP_TILE_WIDGET, widget);
   }
 

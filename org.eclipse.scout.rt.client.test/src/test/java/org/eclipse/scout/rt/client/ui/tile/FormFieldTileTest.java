@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.tile;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -23,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.imagefield.AbstractImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.tilefield.AbstractTileField;
+import org.eclipse.scout.rt.client.ui.tile.FormFieldTileTest.TestForm.TestMainBox.TestTileField;
 import org.eclipse.scout.rt.client.ui.tile.FormFieldTileTest.TestForm.TestMainBox.TestTileField.TestTileGrid;
 import org.eclipse.scout.rt.client.ui.tile.FormFieldTileTest.TestForm.TestMainBox.TestTileField.TestTileGrid.TestImageTile;
 import org.eclipse.scout.rt.client.ui.tile.FormFieldTileTest.TestForm.TestMainBox.TestTileField.TestTileGrid.TestImageTile.TestImageField;
@@ -101,7 +98,9 @@ public class FormFieldTileTest {
   @Test
   public void testParentField() {
     TestImageField field = m_fixture.getImageFieldInTile();
-    assertNull(field.getParentField()); // the form field in the menu has no direct parent form field.
+    // The form field in the menu has no direct parent form field. The parent is the tile.
+    assertEquals(m_fixture.getImageTile(), field.getParent());
+    assertEquals(m_fixture.getRootGroupBox(), field.getParentField()); // getParentField visits all parents
   }
 
   @Before
@@ -120,6 +119,10 @@ public class FormFieldTileTest {
 
     public TestImageField getImageFieldInTile() {
       return getFieldByClass(TestImageField.class);
+    }
+
+    public TestImageTile getImageTile() {
+      return getFieldByClass(TestTileField.class).getTileGrid().getTileByClass(TestImageTile.class);
     }
 
     public class TestMainBox extends AbstractGroupBox {
