@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,9 +38,6 @@ import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingMaxWaitShutdownProperty;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitAllShutdownProperty;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitWriteLockProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.UnloadRequestHandler;
@@ -50,27 +48,26 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWithNewPlatform()
 @RunWith(PlatformTestRunner.class)
 public class UiSessionInitAndDisposeTest {
-  private List<IBean<?>> m_beans;
 
+  private static final Logger LOG = LoggerFactory.getLogger(UiSessionInitAndDisposeTest.class);
+
+  private List<IBean<?>> m_beans;
   private List<String> m_protocol = Collections.synchronizedList(new ArrayList<String>());
 
   @Before
   public void before() {
     m_protocol.clear();
     m_beans = TestingUtility.registerBeans(
-        new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withProducer(new IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>() {
+        new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withInitialInstance(new JobCompletionDelayOnSessionShutdown() {
           @Override
-          public JobCompletionDelayOnSessionShutdown produce(IBean<JobCompletionDelayOnSessionShutdown> bean) {
-            return new JobCompletionDelayOnSessionShutdown() {
-              @Override
-              public Long getDefaultValue() {
-                return 10L;
-              }
-            };
+          protected Long getDefaultValue() {
+            return 1L;
           }
         }),
 
@@ -78,27 +75,6 @@ public class UiSessionInitAndDisposeTest {
           @Override
           public Integer getDefaultValue() {
             return 2;
-          }
-        }),
-
-        new BeanMetaData(SessionStoreHousekeepingMaxWaitShutdownProperty.class).withInitialInstance(new SessionStoreHousekeepingMaxWaitShutdownProperty() {
-          @Override
-          public Integer getDefaultValue() {
-            return 10;
-          }
-        }),
-
-        new BeanMetaData(SessionStoreMaxWaitWriteLockProperty.class).withInitialInstance(new SessionStoreMaxWaitWriteLockProperty() {
-          @Override
-          public Integer getDefaultValue() {
-            return 1;
-          }
-        }),
-
-        new BeanMetaData(SessionStoreMaxWaitAllShutdownProperty.class).withInitialInstance(new SessionStoreMaxWaitAllShutdownProperty() {
-          @Override
-          public Integer getDefaultValue() {
-            return 1;
           }
         }),
 
@@ -136,7 +112,7 @@ public class UiSessionInitAndDisposeTest {
   }
 
   private void writeToProtocol(String line) {
-    System.out.println("protocol: " + line);
+    LOG.info("New protocol entry: '{}' ", line);
     m_protocol.add(line);
   }
 
@@ -152,7 +128,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", "{\"startup\":true}");
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -216,7 +192,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -225,6 +201,8 @@ public class UiSessionInitAndDisposeTest {
     assertNotNull(store.getClientSessionMap().get(clientSessionId));
     assertEquals(1, store.getUiSessionMap().size());
     assertNotNull(store.getUiSessionMap().get(uiSessionId));
+
+    final FixtureClientSession clientSession = (FixtureClientSession) store.getClientSessionMap().values().iterator().next();
 
     assertEquals(
         Arrays.asList(
@@ -246,7 +224,7 @@ public class UiSessionInitAndDisposeTest {
     JobTestUtil.waitForCondition(new ICondition() {
       @Override
       public boolean isFulfilled() {
-        return store.isEmpty() && !store.isHttpSessionValid();
+        return store.isEmpty() && !store.isHttpSessionValid() && clientSession.isStopped();
       }
     });
 
@@ -277,7 +255,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -286,6 +264,8 @@ public class UiSessionInitAndDisposeTest {
     assertNotNull(store.getClientSessionMap().get(clientSessionId));
     assertEquals(1, store.getUiSessionMap().size());
     assertNotNull(store.getUiSessionMap().get(uiSessionId));
+
+    final FixtureClientSession clientSession = (FixtureClientSession) store.getClientSessionMap().values().iterator().next();
 
     assertEquals(
         Arrays.asList(
@@ -303,6 +283,17 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       unloadHandler.handlePost(req, resp);
     }
+    JobTestUtil.waitForCondition(new ICondition() {
+      @Override
+      public boolean isFulfilled() {
+        int n = Jobs.getJobManager()
+            .getFutures(Jobs.newFutureFilterBuilder()
+                .andMatchExecutionSemaphore(clientSession.getModelJobSemaphore())
+                .toFilter())
+            .size();
+        return n == 0;
+      }
+    });
 
     //json startup with same client session
     try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
@@ -311,7 +302,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -337,7 +328,7 @@ public class UiSessionInitAndDisposeTest {
     JobTestUtil.waitForCondition(new ICondition() {
       @Override
       public boolean isFulfilled() {
-        return store.isEmpty() && !store.isHttpSessionValid();
+        return clientSession.isStopped();
       }
     });
 
@@ -368,7 +359,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionIdA = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionIdA = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -398,7 +389,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionIdB = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionIdB = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -416,6 +407,8 @@ public class UiSessionInitAndDisposeTest {
     assertNotEquals(uiSessionIdA, uiSessionIdB);
     assertEquals(2, store.countUiSessions());
 
+    final FixtureClientSession clientSession = (FixtureClientSession) store.getClientSessionMap().values().iterator().next();
+
     //brower tab A closed -> json unload
     try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/unload/" + uiSessionIdA, null);
@@ -431,7 +424,7 @@ public class UiSessionInitAndDisposeTest {
     JobTestUtil.waitForCondition(new ICondition() {
       @Override
       public boolean isFulfilled() {
-        return store.isEmpty() && !store.isHttpSessionValid();
+        return clientSession.isStopped();
       }
     });
 
@@ -474,7 +467,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionIdA = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionIdA = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -483,6 +476,8 @@ public class UiSessionInitAndDisposeTest {
     assertNotNull(store.getClientSessionMap().get(clientSessionIdA));
     assertEquals(1, store.getUiSessionMap().size());
     assertNotNull(store.getUiSessionMap().get(uiSessionIdA));
+
+    final FixtureClientSession clientSession = (FixtureClientSession) store.getClientSessionMap().values().iterator().next();
 
     assertEquals(
         Arrays.asList(
@@ -504,7 +499,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       messageHandler.handlePost(req, resp);
-      String respContent = new String(out.getContent(), "UTF-8");
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
       uiSessionIdB = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
       clientSessionIdB = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
     }
@@ -560,7 +555,7 @@ public class UiSessionInitAndDisposeTest {
     JobTestUtil.waitForCondition(new ICondition() {
       @Override
       public boolean isFulfilled() {
-        return store.isEmpty() && !store.isHttpSessionValid();
+        return clientSession.isStopped();
       }
     });
 
@@ -615,6 +610,7 @@ public class UiSessionInitAndDisposeTest {
 
   @IgnoreBean
   private class FixtureClientSession extends AbstractClientSession {
+    private boolean m_stopped;
 
     public FixtureClientSession() {
       super(true);
@@ -642,6 +638,11 @@ public class UiSessionInitAndDisposeTest {
       writeToProtocol("ClientSession.stopping");
       super.stop(exitCode);
       writeToProtocol("ClientSession.stopped");
+      m_stopped = true;
+    }
+
+    public boolean isStopped() {
+      return m_stopped;
     }
   }
 
