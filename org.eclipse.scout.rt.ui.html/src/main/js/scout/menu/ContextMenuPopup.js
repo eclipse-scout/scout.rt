@@ -65,7 +65,7 @@ scout.ContextMenuPopup.prototype._installScrollbars = function() {
 };
 
 scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, animated) {
-  if (!this.rendered) {
+  if (!this.rendered && !this.rendering) {
     return;
   }
   if (this.bodyAnimating) {
@@ -160,7 +160,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
     };
     return;
   }
-  if (!this.rendered) {
+  if (!this.rendered && !this.rendering) {
     return;
   }
   if (this.bodyAnimating) {
