@@ -198,11 +198,7 @@ module.exports = (env, args) => {
     }
   };
 
-  if (devMode) {
-    // Shows progress information in the console in dev mode
-    const webpack = require('webpack');
-    config.plugins.push(new webpack.ProgressPlugin());
-  } else {
+  if (!devMode) {
     const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
     const TerserPlugin = require('terser-webpack-plugin');
     config.optimization.minimizer = [
@@ -225,7 +221,12 @@ module.exports = (env, args) => {
   }
 
   const isWatchMode = args && args.watch;
-  if (!isWatchMode) {
+  if (isWatchMode) {
+    // Shows progress information in the console in watch mode
+    const webpack = require('webpack');
+    config.plugins.push(new webpack.ProgressPlugin());
+  }
+  if (!isWatchMode || !devMode) { // TODO !devMode added to clear before file-list is created but is does not seem to work correctly
     // see: https://webpack.js.org/guides/output-management/#cleaning-up-the-dist-folder
     config.plugins.push(new CleanWebpackPlugin());
   }

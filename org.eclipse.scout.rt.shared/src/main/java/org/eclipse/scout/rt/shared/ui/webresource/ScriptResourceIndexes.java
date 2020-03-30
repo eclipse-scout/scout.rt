@@ -10,10 +10,8 @@
  */
 package org.eclipse.scout.rt.shared.ui.webresource;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Enumeration;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -42,12 +40,12 @@ public class ScriptResourceIndexes {
   }
 
   protected Map<String, String> createNewIndex() {
-    try {
-      Enumeration<URL> fileListEnum = getClass().getClassLoader().getResources(AbstractWebResourceResolver.MIN_FOLDER_NAME + '/' + INDEX_FILE_NAME);
-      return BEANS.get(ScriptResourceIndexBuilder.class).build(fileListEnum);
+    // TODO This is not sufficient. Index-File is cached -> It should be reloaded when bundles change -> Should consider cache=false resp. clearCache request parameters
+    // TODO But even if index file would be reloaded it won't work because it would contain duplicate values, even though dist folder would be cleared before build... I don't know why
+    Optional<WebResourceDescriptor> desc = WebResources.resolveIndexFile(INDEX_FILE_NAME);
+    if (!desc.isPresent()) {
+      throw new ProcessingException("Error loading {}", INDEX_FILE_NAME);
     }
-    catch (IOException e) {
-      throw new ProcessingException("Error loading {}", INDEX_FILE_NAME, e);
-    }
+    return BEANS.get(ScriptResourceIndexBuilder.class).build(desc.get().getUrl());
   }
 }

@@ -44,4 +44,6 @@ public interface IWebResourceResolver {
    *         could not be found.
    */
   Optional<WebResourceDescriptor> resolveWebResource(String path, boolean minified);
+
+  Optional<WebResourceDescriptor> resolveIndexFile(String path);
 }

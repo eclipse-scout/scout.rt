@@ -10,15 +10,13 @@
  */
 package org.eclipse.scout.rt.shared.ui.webresource;
 
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -39,7 +37,7 @@ public class ScriptResourceIndexBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(ScriptResourceIndexBuilder.class);
 
-  public Map<String, String> build(Enumeration<URL> url) {
+  public Map<String, String> build(URL url) {
     return readAllLines(url)
         .map(this::parse)
         .filter(Optional::isPresent)
@@ -72,17 +70,14 @@ public class ScriptResourceIndexBuilder {
         .map(devName -> new ImmutablePair<>(devName, fileEntry));
   }
 
-  protected Stream<String> readAllLines(Enumeration<URL> urls) {
+  protected Stream<String> readAllLines(URL url) {
     List<String> linesCombined = new ArrayList<>();
-    while (urls.hasMoreElements()) {
-      URL url = urls.nextElement();
       try {
         linesCombined.addAll(IOUtility.readAllLinesFromUrl(url, StandardCharsets.UTF_8));
       }
       catch (IOException e) {
         throw new PlatformException("Unable to read from URL '{}'.", url, e);
       }
-    }
     return linesCombined.stream();
   }
 }

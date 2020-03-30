@@ -49,6 +49,15 @@ public abstract class AbstractWebResourceResolver implements IWebResourceResolve
   }
 
   @Override
+  public Optional<WebResourceDescriptor> resolveIndexFile(String path) {
+    if (path == null) {
+      return Optional.empty();
+    }
+    String subFolder = getScriptResourceFolder(true);
+    return lookupResource(path, path, subFolder, false);
+  }
+
+  @Override
   public Optional<WebResourceDescriptor> resolveWebResource(String path, boolean minified) {
     if (path == null) {
       return Optional.empty();

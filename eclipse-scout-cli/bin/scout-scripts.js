@@ -56,6 +56,10 @@ switch (script) {
     runWebpackWatch({mode: 'development'});
     break;
   }
+  case 'build:prod:watch': {
+    runWebpackWatch({mode: 'production'});
+    break;
+  }
   default:
     console.log(`Unknown script "${script}"`);
     break;

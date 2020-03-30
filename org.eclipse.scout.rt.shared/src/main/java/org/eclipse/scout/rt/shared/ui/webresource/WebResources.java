@@ -41,15 +41,23 @@ public class WebResources {
     return WEB_RESOURCES.get().resolveWebResourceInternal(path, minified);
   }
 
+  public static Optional<WebResourceDescriptor> resolveIndexFile(String path) {
+    return WEB_RESOURCES.get().resolveIndexFileInternal(path);
+  }
+
   protected Optional<WebResourceDescriptor> resolveScriptResourceInternal(String path, boolean minified, String theme) {
-    return resolveResource(resolver -> resolver.resolveScriptResource(cleanPath(path), minified, theme));
+    return resolveResourceInternal(resolver -> resolver.resolveScriptResource(cleanPath(path), minified, theme));
   }
 
   protected Optional<WebResourceDescriptor> resolveWebResourceInternal(String path, boolean minified) {
-    return resolveResource(resolver -> resolver.resolveWebResource(cleanPath(path), minified));
+    return resolveResourceInternal(resolver -> resolver.resolveWebResource(cleanPath(path), minified));
   }
 
-  protected Optional<WebResourceDescriptor> resolveResource(Function<IWebResourceResolver, Optional<WebResourceDescriptor>> callFunc) {
+  protected Optional<WebResourceDescriptor> resolveIndexFileInternal(String path) {
+    return resolveResourceInternal(resolver -> resolver.resolveIndexFile(cleanPath(path)));
+  }
+
+  protected Optional<WebResourceDescriptor> resolveResourceInternal(Function<IWebResourceResolver, Optional<WebResourceDescriptor>> callFunc) {
     if (CONFIG.getPropertyValue(LoadWebResourcesFromFilesystemConfigProperty.class)) {
       Optional<WebResourceDescriptor> resFromFilesystem = callFunc.apply(FS_RESOLVER.get());
       if (resFromFilesystem.isPresent()) {
