@@ -2472,6 +2472,14 @@ export default class Table extends Widget {
     }
   }
 
+  removeAllColumnGroupings() {
+    this.columns
+      .filter(function(column) {
+        return column.grouped;
+      })
+      .forEach(this.removeColumnGrouping.bind(this));
+  }
+
   /**
    * @returns {boolean} true if at least one column has grouped=true
    */
@@ -3000,6 +3008,20 @@ export default class Table extends Widget {
     return this.hierarchical;
   }
 
+  _setHierarchical(hierarchical) {
+    if (this.hierarchical === hierarchical) {
+      return;
+    }
+
+    // Has to be called before the property is set! Otherwise the grouping will not completely removed,
+    // since isGroupingPossible() will return false.
+    if (hierarchical) {
+      this.removeAllColumnGroupings();
+    }
+
+    this._setProperty('hierarchical', hierarchical);
+  }
+
   /**
    * The given rows must be rows of this table in desired order.
    * @param {TableRow[]} rows
@@ -3509,11 +3531,11 @@ export default class Table extends Widget {
     }, this);
     if (!hierarchical) {
       this.rootRows = this.rows;
-      this.hierarchical = hierarchical;
+      this._setHierarchical(hierarchical);
       return;
     }
 
-    this.hierarchical = hierarchical;
+    this._setHierarchical(hierarchical);
     this.rootRows = [];
     this.rows.forEach(function(row) {
       var parentRow;
