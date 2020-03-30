@@ -2412,6 +2412,14 @@ scout.Table.prototype.removeColumnGrouping = function(column) {
   }
 };
 
+scout.Table.prototype.removeAllColumnGroupings = function() {
+  this.columns
+    .filter(function(column) {
+      return column.grouped;
+    })
+    .forEach(this.removeColumnGrouping.bind(this));
+};
+
 /**
  * @returns {boolean} true if at least one column has grouped=true
  */
@@ -2939,6 +2947,20 @@ scout.Table.prototype.isHierarchical = function() {
   return this.hierarchical;
 };
 
+scout.Table.prototype._setHierarchical = function(hierarchical) {
+  if (this.hierarchical === hierarchical) {
+    return;
+  }
+
+  // Has to be called before the property is set! Otherwise the grouping will not completely removed,
+  // since isGroupingPossible() will return false.
+  if (hierarchical) {
+    this.removeAllColumnGroupings();
+  }
+
+  this._setProperty('hierarchical', hierarchical);
+};
+
 /**
  * The given rows must be rows of this table in desired order.
  * @param {scout.TableRow[]} rows
@@ -3430,11 +3452,11 @@ scout.Table.prototype._rebuildTreeStructure = function() {
   }, this);
   if (!hierarchical) {
     this.rootRows = this.rows;
-    this.hierarchical = hierarchical;
+    this._setHierarchical(hierarchical);
     return;
   }
 
-  this.hierarchical = hierarchical;
+  this._setHierarchical(hierarchical);
   this.rootRows = [];
   this.rows.forEach(function(row) {
     var parentRow;
