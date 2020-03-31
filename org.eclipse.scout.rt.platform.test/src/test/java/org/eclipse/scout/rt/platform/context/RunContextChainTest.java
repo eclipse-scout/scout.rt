@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.context;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import java.util.Iterator;
 
@@ -34,7 +32,7 @@ public class RunContextChainTest {
    * Tests the correct order of interceptors in {@link RunContext}.
    */
   @Test
-  public void testCallableChain() throws Exception {
+  public void testCallableChain() {
     CallableChain<Object> chain = new RunContext().createCallableChain();
 
     Iterator<IChainable> chainIterator = chain.values().iterator();
@@ -60,7 +58,7 @@ public class RunContextChainTest {
     assertSame(RunMonitor.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
     // 5. SubjectProcessor
-    c = (IChainable) chainIterator.next();
+    c = chainIterator.next();
     assertEquals(SubjectProcessor.class, c.getClass());
 
     // 6. DiagnosticContextValueProcessor
