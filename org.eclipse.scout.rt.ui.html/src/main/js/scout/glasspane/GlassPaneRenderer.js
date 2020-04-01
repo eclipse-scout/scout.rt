@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -193,10 +193,16 @@ scout.GlassPaneRenderer.prototype._onMouseDown = function(event) {
   }
 
   if ($animationTarget) {
-    $animationTarget.addClassForAnimation('animate-modality-highlight', {
-      // remove animate-open as well, user may click the glasspane before the widget itself was able to remove the animate-open class
-      classesToRemove: 'animate-modality-highlight animate-open'
-    });
+    // If the animation target itself is covered by a glasspane, the event is passed on
+    var $glassPane = this._widget.$container.children('.glasspane');
+    if ($glassPane.length) {
+      $glassPane.trigger('mousedown');
+    } else {
+      $animationTarget.addClassForAnimation('animate-modality-highlight', {
+        // remove animate-open as well, user may click the glasspane before the widget itself was able to remove the animate-open class
+        classesToRemove: 'animate-modality-highlight animate-open'
+      });
+    }
   }
 
   $.suppressEvent(event);
