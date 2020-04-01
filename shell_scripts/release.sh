@@ -68,7 +68,7 @@ mvn -f org.eclipse.scout.rt -Dmaster_release_newVersion=$VERSION -N -P release.s
 processError
 
 # Update versions in package.json files (javascript)
-mvn -f org.eclipse.scout.rt -Dmaster_release_newVersion=$VERSION -N -P npm-run-full-build process-sources -Dmaster_npm_release_build=true $_MAVEN_OPTS
+mvn -f org.eclipse.scout.rt -Dmaster_release_newVersion=$VERSION -N -P npm-install-node,npm-install-workspace,npm-deploy process-sources -Dmaster_npm_release_build=true $_MAVEN_OPTS
 processError
 
 $BASEDIR/build.sh -Dmaster_unitTest_failureIgnore=false -Dmaster_npm_release_build=false $_MAVEN_OPTS
