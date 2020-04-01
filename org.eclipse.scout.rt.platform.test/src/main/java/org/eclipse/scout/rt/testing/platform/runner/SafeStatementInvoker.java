@@ -34,7 +34,7 @@ public class SafeStatementInvoker implements IRunnable {
   }
 
   @Override
-  public void run() throws Exception {
+  public void run() {
     try {
       m_next.evaluate();
     }

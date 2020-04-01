@@ -71,7 +71,7 @@ public class OutlineTreeContextMenuTest {
     assertRowMenusExistOnTablePageNode(outline);
   }
 
-  private static void assertEmptySpaceMenusExistOnTablePageParent(IOutline outline) throws Exception {
+  private static void assertEmptySpaceMenusExistOnTablePageParent(IOutline outline) {
     outline.selectFirstNode();
 
     ITreeNode selectedNode = outline.getSelectedNode();
@@ -83,7 +83,7 @@ public class OutlineTreeContextMenuTest {
     assertEquals(OutlineTreeContextMenuNestedPageWithTablesTest.sizeMenuListWithoutSeparators(menus), requiredMenus.size());
   }
 
-  private static void assertRowMenusExistOnTablePageNode(IOutline outline) throws Exception {
+  private static void assertRowMenusExistOnTablePageNode(IOutline outline) {
     outline.selectFirstNode();
 
     List<IMenu> requiredMenus = resolveMenusOfActiveTablePage(outline, PageWithTableRowMenu.class);
@@ -98,7 +98,7 @@ public class OutlineTreeContextMenuTest {
   }
 
   @SafeVarargs
-  private static List<IMenu> resolveMenusOfActiveTablePage(IOutline outline, Class<? extends IMenu>... menuClasses) throws Exception {
+  private static List<IMenu> resolveMenusOfActiveTablePage(IOutline outline, Class<? extends IMenu>... menuClasses) {
     List<IMenu> resolvedMenus = new LinkedList<>();
     IPageWithTable<?> activePage = (IPageWithTable<?>) outline.getActivePage();
 

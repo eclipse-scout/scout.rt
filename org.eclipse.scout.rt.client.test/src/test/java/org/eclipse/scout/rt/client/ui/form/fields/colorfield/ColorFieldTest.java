@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.colorfield;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -109,7 +107,7 @@ public class ColorFieldTest {
   }
 
   @After
-  public void tearDown() throws Throwable {
+  public void tearDown() {
     m_form.doClose();
   }
 

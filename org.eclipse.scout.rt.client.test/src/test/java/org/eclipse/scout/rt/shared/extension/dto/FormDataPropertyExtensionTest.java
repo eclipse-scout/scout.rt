@@ -37,28 +37,28 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class FormDataPropertyExtensionTest extends AbstractLocalExtensionTestCase {
   @Test
-  public void testPropertyExtensionFormFieldExplicit() throws Exception {
+  public void testPropertyExtensionFormFieldExplicit() {
     BEANS.get(IExtensionRegistry.class).register(MainBoxPropertyExtension.class, MainBox.class);
     BEANS.get(IExtensionRegistry.class).register(PropertyExtensionData.class, OrigFormData.class);
     doFormFieldTest();
   }
 
   @Test
-  public void testPropertyExtensionFormFieldAnnotation() throws Exception {
+  public void testPropertyExtensionFormFieldAnnotation() {
     BEANS.get(IExtensionRegistry.class).register(MainBoxPropertyExtension.class);
     BEANS.get(IExtensionRegistry.class).register(PropertyExtensionData.class);
     doFormFieldTest();
   }
 
   @Test
-  public void testPropertyExtensionFormExplicit() throws Exception {
+  public void testPropertyExtensionFormExplicit() {
     BEANS.get(IExtensionRegistry.class).register(FormPropertyExtension.class, OrigForm.class);
     BEANS.get(IExtensionRegistry.class).register(PropertyExtensionData.class, OrigFormData.class);
     doFormTest();
   }
 
   @Test
-  public void testPropertyExtensionToFormFieldContribution() throws Exception {
+  public void testPropertyExtensionToFormFieldContribution() {
     // contribute a new field to the second template use in the form
     BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateField.class, org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox.SecondUseOfTemplateBox.class);
     BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateFieldData.class, SecondUseOfTemplateBox.class);
@@ -70,7 +70,7 @@ public class FormDataPropertyExtensionTest extends AbstractLocalExtensionTestCas
     doExtensionOfContributionTest();
   }
 
-  private void doExtensionOfContributionTest() throws Exception {
+  private void doExtensionOfContributionTest() {
     Long exportTestVal = Long.valueOf(501);
     Long importTestVal = Long.valueOf(601);
 
@@ -90,7 +90,7 @@ public class FormDataPropertyExtensionTest extends AbstractLocalExtensionTestCas
     Assert.assertEquals(importTestVal, propertyExtensionClient.getLongValue());
   }
 
-  private void doFormTest() throws Exception {
+  private void doFormTest() {
     Long exportTestVal = Long.valueOf(201);
     Long importTestVal = Long.valueOf(301);
     OrigForm f = new OrigForm();
@@ -109,7 +109,7 @@ public class FormDataPropertyExtensionTest extends AbstractLocalExtensionTestCas
     Assert.assertEquals(importTestVal, f.getExtension(FormPropertyExtension.class).getLongValue());
   }
 
-  private void doFormFieldTest() throws Exception {
+  private void doFormFieldTest() {
     Long exportTestVal = Long.valueOf(101);
     Long importTestVal = Long.valueOf(401);
     OrigForm f = new OrigForm();

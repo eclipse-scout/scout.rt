@@ -40,14 +40,14 @@ import org.mockito.Mockito;
 public class AbstractPageWithNodesTest {
 
   @Test
-  public void testInitNodePage() throws Exception {
+  public void testInitNodePage() {
     ParentItemNodePage pItem = new ParentItemNodePage();
     pItem.initPage();
     assertEquals("Parent page", pItem.getCell().getText());
   }
 
   @Test
-  public void testPageNodeText() throws Exception {
+  public void testPageNodeText() {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     desktop.setAvailableOutlines(CollectionUtility.arrayList(new PageWithNodeOutline()));
     desktop.setOutline(PageWithNodeOutline.class);
@@ -57,7 +57,7 @@ public class AbstractPageWithNodesTest {
   }
 
   @Test
-  public void testSetupOutlinePage() throws Exception {
+  public void testSetupOutlinePage() {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     assertNotNull(desktop);
 
@@ -74,7 +74,7 @@ public class AbstractPageWithNodesTest {
   }
 
   @Test
-  public void testRenameChildPages() throws Exception {
+  public void testRenameChildPages() {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     desktop.setAvailableOutlines(CollectionUtility.arrayList(new PageWithNodeOutline()));
     desktop.setOutline(PageWithNodeOutline.class);

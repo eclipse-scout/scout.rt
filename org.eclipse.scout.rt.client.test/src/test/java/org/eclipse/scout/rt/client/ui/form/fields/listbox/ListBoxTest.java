@@ -55,7 +55,7 @@ public class ListBoxTest extends AbstractListBox<Long> {
   private static List<IBean<?>> m_beans;
 
   @BeforeClass
-  public static void beforeClass() throws Exception {
+  public static void beforeClass() {
     m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(ListBoxLookupCall.class));
   }
 
@@ -84,7 +84,7 @@ public class ListBoxTest extends AbstractListBox<Long> {
   }
 
   @Test
-  public void testNoNullKeys() throws Exception {
+  public void testNoNullKeys() {
     List<? extends ILookupRow<Long>> rows = execLoadTableData();
     assertEquals(3, rows.size());
   }

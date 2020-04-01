@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -84,7 +83,7 @@ public class HttpRedirectTest {
     m_server.stop();
   }
 
-  private void fixtureServletGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  private void fixtureServletGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     m_servletGetLog.add(req.getHeader(CORRELATION_ID));
     String redirectUrl = m_redirectUrls.poll();
     if (redirectUrl != null) {
@@ -96,7 +95,7 @@ public class HttpRedirectTest {
 
   }
 
-  private void fixtureServletPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  private void fixtureServletPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     m_servletPostLog.add(req.getHeader(CORRELATION_ID));
     String redirectUrl = m_redirectUrls.poll();
     if (redirectUrl != null) {
@@ -168,7 +167,7 @@ public class HttpRedirectTest {
       }
 
       @Override
-      public long getLength() throws IOException {
+      public long getLength() {
         return 3;
       }
     });
@@ -214,7 +213,7 @@ public class HttpRedirectTest {
       }
 
       @Override
-      public long getLength() throws IOException {
+      public long getLength() {
         return 3;
       }
     });
@@ -260,7 +259,7 @@ public class HttpRedirectTest {
       }
 
       @Override
-      public long getLength() throws IOException {
+      public long getLength() {
         return 3;
       }
     });

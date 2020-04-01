@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -81,7 +77,7 @@ public class TypeCastUtilityTest {
   }
 
   @Test
-  public void testCastBigDecimalToBoolean() throws Exception {
+  public void testCastBigDecimalToBoolean() {
     //Bug 406875
     assertFalse(TypeCastUtility.castValue(BigDecimal.ZERO, boolean.class));
     assertTrue(TypeCastUtility.castValue(BigDecimal.ONE, boolean.class));
@@ -91,7 +87,7 @@ public class TypeCastUtilityTest {
   }
 
   @Test
-  public void testCastStringToBoolean() throws Exception {
+  public void testCastStringToBoolean() {
     assertTrue(TypeCastUtility.castValue("1", boolean.class));
     assertTrue(TypeCastUtility.castValue("true", boolean.class));
     assertTrue(TypeCastUtility.castValue("on", boolean.class));
@@ -110,7 +106,7 @@ public class TypeCastUtilityTest {
   }
 
   @Test
-  public void testGetNonPrimitiveType() throws Exception {
+  public void testGetNonPrimitiveType() {
     assertSame(TypeCastUtility.getNonPrimitiveType(char.class), Character.class);
     assertSame(TypeCastUtility.getNonPrimitiveType(byte.class), Byte.class);
     assertSame(TypeCastUtility.getNonPrimitiveType(boolean.class), Boolean.class);
@@ -127,7 +123,7 @@ public class TypeCastUtilityTest {
   }
 
   @Test(expected = NullPointerException.class)
-  public void testGetNonPrimitiveTypeNull() throws Exception {
+  public void testGetNonPrimitiveTypeNull() {
     TypeCastUtility.getNonPrimitiveType(null);
   }
 

@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.extension.services.common.code;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -37,7 +36,7 @@ import org.junit.Test;
 public class MoveCodesTest extends AbstractLocalExtensionTestCase {
 
   @Test
-  public void testSetup() throws Exception {
+  public void testSetup() {
     MoveCodesCodeType codeType = new MoveCodesCodeType();
     List<? extends AbstractCode<String>> rootCodes = codeType.getCodes();
     assertCodes(rootCodes, Top1Code.class, Top2Code.class);

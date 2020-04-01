@@ -34,7 +34,7 @@ public class ConnectionMock extends VerboseMock implements InvocationHandler {
   }
 
   @Override
-  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+  public Object invoke(Object proxy, Method method, Object[] args) {
     String mname = method.getName();
     if ("prepareStatement".equals(mname)) {
       log(Connection.class, mname, args);

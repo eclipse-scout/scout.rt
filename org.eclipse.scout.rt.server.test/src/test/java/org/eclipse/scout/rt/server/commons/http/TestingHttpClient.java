@@ -51,7 +51,7 @@ public class TestingHttpClient extends DefaultHttpTransportManager {
 
   @FunctionalInterface
   public interface IResponseInterceptor {
-    HttpResponse intercept(HttpRequest request, HttpClientConnection conn, HttpContext context, IResponseProvider superCall) throws HttpException, IOException;
+    HttpResponse intercept(HttpRequest request, HttpClientConnection conn, HttpContext context, IResponseProvider superCall);
   }
 
   /**

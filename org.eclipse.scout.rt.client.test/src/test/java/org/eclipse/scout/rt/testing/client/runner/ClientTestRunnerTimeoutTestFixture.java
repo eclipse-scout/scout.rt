@@ -26,11 +26,11 @@ import org.junit.runner.RunWith;
 public class ClientTestRunnerTimeoutTestFixture {
 
   @Test(timeout = 500)
-  public void testTimeoutNotExeeded() throws Exception {
+  public void testTimeoutNotExeeded() {
   }
 
   @Test(timeout = 500, expected = IllegalStateException.class)
-  public void testTimeoutNotExceededButExceptionExpected() throws Exception {
+  public void testTimeoutNotExceededButExceptionExpected() {
     throw new IllegalStateException();
   }
 

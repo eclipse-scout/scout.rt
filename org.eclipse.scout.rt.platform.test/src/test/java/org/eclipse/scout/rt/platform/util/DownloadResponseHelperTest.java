@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.platform.util;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -130,7 +129,7 @@ public class DownloadResponseHelperTest {
   }
 
   @Test
-  public void testContentDispositionResponseHeaderControlCharacters() throws UnsupportedEncodingException {
+  public void testContentDispositionResponseHeaderControlCharacters() {
     String s = "test";
     for (int i = 0x00; i <= 0x1F; i++) {
       s = s + new String(new byte[]{(byte) i}, StandardCharsets.ISO_8859_1);

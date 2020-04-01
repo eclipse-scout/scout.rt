@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.treebox;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,7 +52,7 @@ public class TreeBoxTest {
   private HashSet<Long> testValue;
 
   @BeforeClass
-  public static void beforeClass() throws Exception {
+  public static void beforeClass() {
     m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(TreeBoxLookupCall.class));
   }
 
@@ -76,7 +73,7 @@ public class TreeBoxTest {
    * Check child nodes when parent node is checked
    */
   @Test
-  public void testDefaultBehavior() throws Exception {
+  public void testDefaultBehavior() {
     SimpleTreeBox treeBox = createSimpleTreeBox();
     ITree tree = treeBox.getTree();
 
@@ -98,7 +95,7 @@ public class TreeBoxTest {
    * after removal.
    */
   @Test
-  public void testCheckedNodesRemovedOn() throws Exception {
+  public void testCheckedNodesRemovedOn() {
     HashSet<Long> initialValues = CollectionUtility.hashSet(1L, 4L, 5L);
     SimpleTreeBox treeBox = createSimpleTreeBoxWithInitialSelection(initialValues);
     ITree tree = treeBox.getTree();
@@ -119,7 +116,7 @@ public class TreeBoxTest {
    * {@link AutoSelectTreeBox}. Bug 368107 - Check child nodes when parent node is checked
    */
   @Test
-  public void testAutoSelectBehavior() throws Exception {
+  public void testAutoSelectBehavior() {
     AutoSelectTreeBox treeBox = new AutoSelectTreeBox();
     treeBox.init();
     ITree tree = treeBox.getTree();
@@ -146,7 +143,7 @@ public class TreeBoxTest {
    * {@link AutoSelectTreeBox}. Bug 368107 - Check child nodes when parent node is checked
    */
   @Test
-  public void testAutoSelectBehaviorExtended() throws Exception {
+  public void testAutoSelectBehaviorExtended() {
     AutoSelectTreeBox treeBox = new AutoSelectTreeBox();
     treeBox.init();
     ITree tree = treeBox.getTree();
@@ -194,7 +191,7 @@ public class TreeBoxTest {
   }
 
   @Test
-  public void testCheckKeysByModel() throws Exception {
+  public void testCheckKeysByModel() {
     SimpleTreeBox treeBox = new SimpleTreeBox();
     treeBox.init();
     ITree tree = treeBox.getTree();
@@ -222,7 +219,7 @@ public class TreeBoxTest {
   }
 
   @Test
-  public void testAutoCheckKeysByModel() throws Exception {
+  public void testAutoCheckKeysByModel() {
     AutoSelectTreeBox treeBox = new AutoSelectTreeBox();
     treeBox.init();
     ITree tree = treeBox.getTree();
@@ -251,7 +248,7 @@ public class TreeBoxTest {
   }
 
   @Test
-  public void testNullKeys() throws Exception {
+  public void testNullKeys() {
     AutoSelectTreeBox treeBox = new AutoSelectTreeBox();
     treeBox.init();
     treeBox.checkAllKeys();

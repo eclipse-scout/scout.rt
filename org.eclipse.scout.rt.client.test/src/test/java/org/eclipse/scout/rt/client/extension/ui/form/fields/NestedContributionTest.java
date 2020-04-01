@@ -45,7 +45,7 @@ import org.junit.runner.RunWith;
 public class NestedContributionTest extends AbstractLocalExtensionTestCase {
 
   @Test
-  public void testNestedContribution() throws Exception {
+  public void testNestedContribution() {
     // find the contribution that will be at the second position in a HashMap
     final Map<Class, Boolean> findOrder = new HashMap<>(2);
     findOrder.put(FirstGroupBox.class, Boolean.TRUE);

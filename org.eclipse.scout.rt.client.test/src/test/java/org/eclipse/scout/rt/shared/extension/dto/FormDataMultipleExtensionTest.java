@@ -40,20 +40,20 @@ import org.junit.runner.RunWith;
 public class FormDataMultipleExtensionTest extends AbstractLocalExtensionTestCase {
 
   @Test
-  public void testFormDataMultipleExtensionsExplicit() throws Exception {
+  public void testFormDataMultipleExtensionsExplicit() {
     BEANS.get(IExtensionRegistry.class).register(MultipleExtGroupBoxExtension.class, MainBox.class);
     BEANS.get(IExtensionRegistry.class).register(MultipleExtGroupBoxExtensionData.class, OrigFormData.class);
     doTest();
   }
 
   @Test
-  public void testFormDataMultipleExtensionsFromAnnotation() throws Exception {
+  public void testFormDataMultipleExtensionsFromAnnotation() {
     BEANS.get(IExtensionRegistry.class).register(MultipleExtGroupBoxExtension.class);
     BEANS.get(IExtensionRegistry.class).register(MultipleExtGroupBoxExtensionData.class);
     doTest();
   }
 
-  private void doTest() throws Exception {
+  private void doTest() {
     // create and test form
     OrigForm origForm = new OrigForm();
     origForm.init();

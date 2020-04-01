@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.mail;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 import javax.mail.MessagingException;
 
@@ -48,7 +47,7 @@ public class CharsetSafeMimeMessageTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testInvalidCustomMessageId() throws MessagingException {
+  public void testInvalidCustomMessageId() {
     CharsetSafeMimeMessage mimeMessage1 = new CharsetSafeMimeMessage();
     mimeMessage1.setCustomMessageId("mymessageid@localhost"); // <> is missing
   }

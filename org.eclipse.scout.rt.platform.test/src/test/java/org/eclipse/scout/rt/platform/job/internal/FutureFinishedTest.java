@@ -80,7 +80,7 @@ public class FutureFinishedTest {
   }
 
   @Test
-  public void testCancelledBeforeRunning() throws InterruptedException {
+  public void testCancelledBeforeRunning() {
     final AtomicBoolean run = new AtomicBoolean(false);
 
     IFuture<Void> future = Jobs.schedule(() -> run.set(true), Jobs.newInput()

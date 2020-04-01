@@ -378,7 +378,7 @@ public class PermissionsTest {
   }
 
   @Test
-  public void testSealing() throws Exception {
+  public void testSealing() {
     IPermissionCollection permissions = createDefaultPermissionCollection();
     assertThrows(AssertionException.class, () -> permissions.add(new UJFixturePermission()));
 

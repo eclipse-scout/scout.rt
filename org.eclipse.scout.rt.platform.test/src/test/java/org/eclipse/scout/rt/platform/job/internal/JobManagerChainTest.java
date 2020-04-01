@@ -32,7 +32,7 @@ import org.junit.runner.RunWith;
 public class JobManagerChainTest {
 
   @Test
-  public void testCallableChain() throws Exception {
+  public void testCallableChain() {
     CallableChain<Object> chain = new CallableChain<>();
 
     new JobManager().interceptCallableChain(chain, mock(JobFutureTask.class), mock(RunMonitor.class), mock(JobInput.class));

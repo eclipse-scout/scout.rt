@@ -25,7 +25,7 @@ import org.junit.Test;
 public class HtmlContentBuilderTest {
 
   @Test
-  public void testManyBinds() throws Exception {
+  public void testManyBinds() {
     IHtmlElement h2 = HTML.h2("h2");
     IHtmlTable table = createTable("0");
 

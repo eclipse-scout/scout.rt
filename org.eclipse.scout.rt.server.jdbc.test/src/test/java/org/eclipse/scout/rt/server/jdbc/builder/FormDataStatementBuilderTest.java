@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.server.jdbc.builder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -179,13 +177,13 @@ public class FormDataStatementBuilderTest {
   }
 
   @Test
-  public void createSelectStatementStatementNull() throws Exception {
+  public void createSelectStatementStatementNull() {
     m_builder.build(m_formData);
     assertNull(m_builder.createSelectStatement(null));
   }
 
   @Test
-  public void createSelectStatementContributionNull() throws Exception {
+  public void createSelectStatementContributionNull() {
     m_builder.build(m_formData);
     String actual = m_builder.createSelectStatement(STATEMENT_TEMPLATE);
     assertEquals("SELECT P.PERSON_NR FROM ORS_PERSON P WHERE 1=1", StringUtility.cleanup(actual));
@@ -198,14 +196,14 @@ public class FormDataStatementBuilderTest {
   }
 
   @Test
-  public void createSelectStatementContributionNullContributions() throws Exception {
+  public void createSelectStatementContributionNullContributions() {
     m_builder.build(m_formData);
     String actual = m_builder.createSelectStatement(STATEMENT_TEMPLATE, null, null);
     assertEquals("SELECT P.PERSON_NR FROM ORS_PERSON P WHERE 1=1", StringUtility.cleanup(actual));
   }
 
   @Test
-  public void createSelectStatementWhereConstraintsOnly() throws Exception {
+  public void createSelectStatementWhereConstraintsOnly() {
     m_builder.build(m_formData);
     m_builder.addWhere(" AND 0=0 ");
     String actual = m_builder.createSelectStatement(STATEMENT_TEMPLATE);
@@ -213,7 +211,7 @@ public class FormDataStatementBuilderTest {
   }
 
   @Test
-  public void createSelectStatementWithContribution() throws Exception {
+  public void createSelectStatementWithContribution() {
     m_builder.build(m_formData);
     EntityContribution contrib = new EntityContribution();
     contrib.addSelectExpression("MA.NAME", false);

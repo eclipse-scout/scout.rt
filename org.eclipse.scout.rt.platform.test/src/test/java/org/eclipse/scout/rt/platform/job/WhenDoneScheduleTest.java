@@ -387,7 +387,7 @@ public class WhenDoneScheduleTest {
 
   @Test
   @Times(20)
-  public void testSemaphore() throws InterruptedException {
+  public void testSemaphore() {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1).seal();
@@ -471,7 +471,7 @@ public class WhenDoneScheduleTest {
   }
 
   @Test
-  public void testExceptionInFunction() throws Exception {
+  public void testExceptionInFunction() {
     final RuntimeException testException = new RuntimeException("JUnit test exception");
 
     final AtomicReference<Throwable> actualException = new AtomicReference<>();

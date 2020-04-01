@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.deeplink;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -63,7 +61,7 @@ public class DeepLinksTest {
    * The outline deep link handler should be registered by the Scout framework by default.
    */
   @Test
-  public void testOutlineDeepLinkHandler() throws Exception {
+  public void testOutlineDeepLinkHandler() {
     assertTrue(m_deepLinks.canHandleDeepLink("outline-123"));
   }
 

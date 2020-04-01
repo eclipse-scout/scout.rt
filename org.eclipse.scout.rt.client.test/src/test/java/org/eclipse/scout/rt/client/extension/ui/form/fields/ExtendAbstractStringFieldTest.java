@@ -42,7 +42,7 @@ public class ExtendAbstractStringFieldTest extends AbstractLocalExtensionTestCas
   private static AtomicInteger allStringFieldExecInitFieldCounter = new AtomicInteger(0);
 
   @Test
-  public void testOwnerFromGeneric() throws Exception {
+  public void testOwnerFromGeneric() {
     BEANS.get(IExtensionRegistry.class).register(AllStringFieldExtension.class);
     // testcode
     MyForm form = new MyForm();

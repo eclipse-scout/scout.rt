@@ -69,7 +69,7 @@ public class CallableChainTest {
   }
 
   @Test
-  public void testDecoratorChainWithException() throws Exception {
+  public void testDecoratorChainWithException() {
     final List<String> protocol = new ArrayList<>();
 
     final Exception exception = new Exception("expected JUnit test exception");
@@ -195,7 +195,7 @@ public class CallableChainTest {
   }
 
   @Test
-  public void testInterceptorChainWithException() throws Exception {
+  public void testInterceptorChainWithException() {
     final List<String> protocol = new ArrayList<>();
     final Exception exception = new Exception("expected JUnit test exception");
 
@@ -289,7 +289,7 @@ public class CallableChainTest {
         }).add(new ICallableInterceptor<String>() {
 
           @Override
-          public String intercept(Chain<String> chain) throws Exception {
+          public String intercept(Chain<String> chain) {
             protocol.add("interceptor2:before");
             return "interceptor2-result";
           }
@@ -353,7 +353,7 @@ public class CallableChainTest {
         }).add(new ICallableInterceptor<String>() {
 
           @Override
-          public String intercept(Chain<String> chain) throws Exception {
+          public String intercept(Chain<String> chain) {
             protocol.add("interceptor2:before");
             try {
               return "interceptor2-result"; // do not continue chain
@@ -478,7 +478,7 @@ public class CallableChainTest {
   }
 
   @Test
-  public void testMixedWithException() throws Exception {
+  public void testMixedWithException() {
     final Exception exception = new Exception("expected JUnit test exception");
     final List<String> protocol = new ArrayList<>();
 

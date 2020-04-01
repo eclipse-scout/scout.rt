@@ -50,7 +50,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testDefaultSave() throws Exception {
+  public void testDefaultSave() {
     m_form.startModify();
     m_form.touch();
     assertEquals("isSaveNeeded [before]", true, m_form.isSaveNeeded());
@@ -59,7 +59,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testDefaultOk() throws Exception {
+  public void testDefaultOk() {
     m_form.startModify();
     m_form.touch();
     assertEquals("isSaveNeeded [before]", true, m_form.isSaveNeeded());
@@ -68,7 +68,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testDefaultCancel() throws Exception {
+  public void testDefaultCancel() {
     m_form.startModify();
     assertEquals("isSaveNeeded [before]", false, m_form.isSaveNeeded());
     m_form.clickCancel();
@@ -78,7 +78,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testMarkStoredHandlerSave() throws Exception {
+  public void testMarkStoredHandlerSave() {
     m_form.setExecStoreHandlerImplementation(MethodImplementation.MARK_STORED);
     m_form.startModify();
     m_form.touch();
@@ -88,7 +88,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testMarkStoredHandlerOk() throws Exception {
+  public void testMarkStoredHandlerOk() {
     m_form.setExecStoreHandlerImplementation(MethodImplementation.MARK_STORED);
     m_form.startModify();
     m_form.touch();
@@ -98,7 +98,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testMarkStoredFormSave() throws Exception {
+  public void testMarkStoredFormSave() {
     m_form.setExecStoredImplementation(MethodImplementation.MARK_STORED);
     m_form.startModify();
     m_form.touch();
@@ -108,7 +108,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testMarkStoredFormOk() throws Exception {
+  public void testMarkStoredFormOk() {
     m_form.setExecStoredImplementation(MethodImplementation.MARK_STORED);
     m_form.startModify();
     m_form.touch();
@@ -118,7 +118,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testMarkStoredCombinationSave() throws Exception {
+  public void testMarkStoredCombinationSave() {
     m_form.setExecStoreHandlerImplementation(MethodImplementation.MARK_NOT_STORED); //no effect because of execStored in the form
     m_form.setExecStoredImplementation(MethodImplementation.MARK_STORED);
     m_form.startModify();
@@ -129,7 +129,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testMarkStoredCombinationOk() throws Exception {
+  public void testMarkStoredCombinationOk() {
     m_form.setExecStoreHandlerImplementation(MethodImplementation.MARK_NOT_STORED); //no effect because of execStored in the form
     m_form.setExecStoredImplementation(MethodImplementation.MARK_STORED);
     m_form.startModify();
@@ -140,7 +140,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testMarkNotStoredHandlerSave() throws Exception {
+  public void testMarkNotStoredHandlerSave() {
     m_form.setExecStoreHandlerImplementation(MethodImplementation.MARK_NOT_STORED);
     m_form.startModify();
     m_form.touch();
@@ -150,7 +150,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testMarkNotStoredHandlerOk() throws Exception {
+  public void testMarkNotStoredHandlerOk() {
     m_form.setExecStoreHandlerImplementation(MethodImplementation.MARK_NOT_STORED);
     m_form.startModify();
     m_form.touch();
@@ -160,7 +160,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testMarkNotStoredFormSave() throws Exception {
+  public void testMarkNotStoredFormSave() {
     m_form.setExecStoredImplementation(MethodImplementation.MARK_NOT_STORED);
     m_form.startModify();
     m_form.touch();
@@ -170,7 +170,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testMarkNotStoredFormOk() throws Exception {
+  public void testMarkNotStoredFormOk() {
     m_form.setExecStoredImplementation(MethodImplementation.MARK_NOT_STORED);
     m_form.startModify();
     m_form.touch();
@@ -180,7 +180,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testMarkNotStoredCombinationSave() throws Exception {
+  public void testMarkNotStoredCombinationSave() {
     m_form.setExecStoreHandlerImplementation(MethodImplementation.MARK_STORED); //no effect because of execStored in the form
     m_form.setExecStoredImplementation(MethodImplementation.MARK_NOT_STORED);
     m_form.startModify();
@@ -191,7 +191,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testMarkNotStoredCombinationOk() throws Exception {
+  public void testMarkNotStoredCombinationOk() {
     m_form.setExecStoreHandlerImplementation(MethodImplementation.MARK_STORED); //no effect because of execStored in the form
     m_form.setExecStoredImplementation(MethodImplementation.MARK_NOT_STORED);
     m_form.startModify();
@@ -202,7 +202,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testConsumedVetoHandlerSave() throws Exception {
+  public void testConsumedVetoHandlerSave() {
     m_form.setExecStoreHandlerImplementation(MethodImplementation.CONSUMED_VETO_EXCEPTION);
     m_form.startModify();
     m_form.touch();
@@ -212,7 +212,7 @@ public class FormStoredTest {
   }
 
   @Test
-  public void testConsumedVetoHandlerOk() throws Exception {
+  public void testConsumedVetoHandlerOk() {
     m_form.setExecStoreHandlerImplementation(MethodImplementation.CONSUMED_VETO_EXCEPTION);
     m_form.startModify();
     m_form.touch();

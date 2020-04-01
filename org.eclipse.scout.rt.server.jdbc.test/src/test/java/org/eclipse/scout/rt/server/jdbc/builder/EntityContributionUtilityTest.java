@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.server.jdbc.builder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.server.jdbc.builder.FormDataStatementBuilder.EntityStrategy;
 import org.junit.Test;
@@ -62,7 +59,7 @@ public class EntityContributionUtilityTest {
   }
 
   @Test
-  public void testMergeStaticallyConfiguredGroupByAndHavingParts() throws Exception {
+  public void testMergeStaticallyConfiguredGroupByAndHavingParts() {
     String baseSqlWithTags = "SELECT <selectParts>SUM(T.B)</selectParts> FROM <fromParts>SCOUT_TABLE T</fromParts> WHERE <whereParts>T.W = 14</whereParts>";
     //
     String s = EntityContributionUtility.mergeContributions(EntityStrategy.BuildQuery, baseSqlWithTags, new EntityContribution(), true).getSelectParts().get(0);

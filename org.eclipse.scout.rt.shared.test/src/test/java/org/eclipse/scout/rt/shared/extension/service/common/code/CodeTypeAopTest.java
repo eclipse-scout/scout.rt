@@ -34,7 +34,7 @@ import org.junit.Test;
 public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
 
   @Test
-  public void testExecValidate() throws Exception {
+  public void testExecValidate() {
 
     BEANS.get(IExtensionRegistry.class).register(CodeTypeExtension.class);
 

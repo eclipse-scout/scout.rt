@@ -162,7 +162,7 @@ public class SmartFieldLookupTest {
   }
 
   @Test
-  public void testSubtreeLookupNoLookupCall_InBackground() throws InterruptedException {
+  public void testSubtreeLookupNoLookupCall_InBackground() {
     IFuture<List<ILookupRow<Long>>> futureRows = m_field.callSubTreeLookupInBackground(1L, TriState.TRUE, false);
     List<? extends ILookupRow<Long>> rows = awaitDoneAndGet(futureRows);
     assertEquals(0, rows.size());
@@ -185,7 +185,7 @@ public class SmartFieldLookupTest {
 
   @SuppressWarnings("unchecked")
   @Test
-  public void testSubtreeLookupExceptions_InBackground() throws InterruptedException {
+  public void testSubtreeLookupExceptions_InBackground() {
     final IBlockingCondition bc = Jobs.newBlockingCondition(true);
     m_field.setLookupCall(new TestLookupCall());
     when(m_mock_service.getDataByRec(any(ILookupCall.class))).thenThrow(new PlatformException("lookup error"));
@@ -202,7 +202,7 @@ public class SmartFieldLookupTest {
 
   @SuppressWarnings("unchecked")
   @Test
-  public void testTextLookupExceptions_InBackground() throws InterruptedException {
+  public void testTextLookupExceptions_InBackground() {
     m_field.setLookupCall(new TestLookupCall());
     final String errorText = "lookup error";
     when(m_mock_service.getDataByText(any(ILookupCall.class))).thenThrow(new PlatformException(errorText));

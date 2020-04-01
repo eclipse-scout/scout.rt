@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.extension;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -41,7 +38,7 @@ import org.junit.runner.RunWith;
 public class ExtensionRegistryInstantiationTest extends AbstractLocalExtensionTestCase {
 
   @Test
-  public void testBasicFormExtension() throws Exception {
+  public void testBasicFormExtension() {
     BEANS.get(IExtensionRegistry.class).register(BasicFormExtension.class);
 
     BasicForm basicForm = new BasicForm();
@@ -49,7 +46,7 @@ public class ExtensionRegistryInstantiationTest extends AbstractLocalExtensionTe
   }
 
   @Test
-  public void testNameFieldExtension() throws Exception {
+  public void testNameFieldExtension() {
     BEANS.get(IExtensionRegistry.class).register(NameFieldExtension.class);
 
     BasicForm basicForm = new BasicForm();
@@ -63,7 +60,7 @@ public class ExtensionRegistryInstantiationTest extends AbstractLocalExtensionTe
   }
 
   @Test
-  public void testNestedBasicFormExtension() throws Exception {
+  public void testNestedBasicFormExtension() {
     BEANS.get(IExtensionRegistry.class).register(NestedBasicFormExtension.class);
 
     BasicForm basicForm = new BasicForm();
@@ -77,7 +74,7 @@ public class ExtensionRegistryInstantiationTest extends AbstractLocalExtensionTe
   }
 
   @Test
-  public void testStaticPojoContainerExtension() throws Exception {
+  public void testStaticPojoContainerExtension() {
     BEANS.get(IExtensionRegistry.class).register(StaticPojoContainerExtension.NameFieldExtension.class);
     BEANS.get(IExtensionRegistry.class).register(StaticPojoContainerExtension.FirstNameFieldExtension.class);
 
@@ -92,7 +89,7 @@ public class ExtensionRegistryInstantiationTest extends AbstractLocalExtensionTe
   }
 
   @Test
-  public void testExtensionOrder() throws Exception {
+  public void testExtensionOrder() {
     IExtensionRegistry registry = BEANS.get(IExtensionRegistry.class);
     registry.register(NameFieldExtension.class);
     registry.register(NameFieldExtension02.class);
@@ -104,7 +101,7 @@ public class ExtensionRegistryInstantiationTest extends AbstractLocalExtensionTe
   }
 
   @Test
-  public void testExtensionForGroupBoxWithSecondInnerField() throws Exception {
+  public void testExtensionForGroupBoxWithSecondInnerField() {
     IExtensionRegistry registry = BEANS.get(IExtensionRegistry.class);
     registry.register(TopBoxExtension.class);
 
@@ -120,7 +117,7 @@ public class ExtensionRegistryInstantiationTest extends AbstractLocalExtensionTe
   }
 
   @Test
-  public void testBasicFormExtensionWithSubclassedFormHandler() throws Exception {
+  public void testBasicFormExtensionWithSubclassedFormHandler() {
     IExtensionRegistry registry = BEANS.get(IExtensionRegistry.class);
     registry.register(BasicFormExtension02.class);
 

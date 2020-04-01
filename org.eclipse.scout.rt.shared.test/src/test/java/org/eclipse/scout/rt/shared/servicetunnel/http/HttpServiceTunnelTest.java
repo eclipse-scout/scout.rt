@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
@@ -68,7 +64,7 @@ public class HttpServiceTunnelTest {
   }
 
   @Test
-  public void testTunnelException() throws IOException {
+  public void testTunnelException() {
     when(mockUrl.getValue()).thenReturn("http://localhost");
     MockLowLevelHttpResponse expectedResponse = new MockLowLevelHttpResponse().setStatusCode(401);
     HttpServiceTunnel tunnel = createHttpServiceTunnel(expectedResponse);
@@ -165,11 +161,11 @@ public class HttpServiceTunnelTest {
     return new IServiceTunnelContentHandler() {
 
       @Override
-      public void writeResponse(OutputStream out, ServiceTunnelResponse msg) throws IOException {
+      public void writeResponse(OutputStream out, ServiceTunnelResponse msg) {
       }
 
       @Override
-      public void writeRequest(OutputStream out, ServiceTunnelRequest msg) throws IOException {
+      public void writeRequest(OutputStream out, ServiceTunnelRequest msg) {
       }
 
       @Override
@@ -181,7 +177,7 @@ public class HttpServiceTunnelTest {
       }
 
       @Override
-      public ServiceTunnelRequest readRequest(InputStream in) throws IOException, ClassNotFoundException {
+      public ServiceTunnelRequest readRequest(InputStream in) {
         return null;
       }
 

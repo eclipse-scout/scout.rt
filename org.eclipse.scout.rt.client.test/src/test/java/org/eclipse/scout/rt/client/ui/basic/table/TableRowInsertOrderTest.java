@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +39,7 @@ import org.junit.runner.RunWith;
 public class TableRowInsertOrderTest {
 
   @Test
-  public void testEventRowOrderAfterInsert() throws Exception {
+  public void testEventRowOrderAfterInsert() {
     P_Table table = new P_Table();
     table.init();
 
@@ -65,7 +62,7 @@ public class TableRowInsertOrderTest {
   }
 
   @Test
-  public void testEventRowOrderAfterInsertWithSort() throws Exception {
+  public void testEventRowOrderAfterInsertWithSort() {
     P_Table table = new P_Table();
     table.getFirstColumn().setInitialSortIndex(0);
     table.getFirstColumn().setInitialSortIndex(1);

@@ -4,7 +4,6 @@
  */
 package org.eclipse.scout.rt.rest.jersey;
 
-import java.io.IOException;
 import java.util.Locale;
 
 import javax.ws.rs.client.ClientRequestContext;
@@ -24,7 +23,7 @@ import org.eclipse.scout.rt.platform.nls.NlsLocale;
 public class LanguageAndCorrelationIdRestRequestFilter implements ClientRequestFilter {
 
   @Override
-  public void filter(ClientRequestContext requestContext) throws IOException {
+  public void filter(ClientRequestContext requestContext) {
     putLocale(requestContext);
     putCorrelationId(requestContext);
   }

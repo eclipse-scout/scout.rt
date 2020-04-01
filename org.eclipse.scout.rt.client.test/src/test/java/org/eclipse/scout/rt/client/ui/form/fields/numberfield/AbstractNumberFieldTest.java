@@ -414,14 +414,14 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
   }
 
   @Test
-  public void testDisplayTextInitialState() throws Exception {
+  public void testDisplayTextInitialState() {
     assertEquals("", getDisplayText());
     assertEquals(0, m_displayTextChangedCounter.get());
     assertArrayEquals(new String[]{}, m_displayTextChangedHistory.toArray());
   }
 
   @Test
-  public void testDisplayTextSameTextTwiceUnformatted() throws Exception {
+  public void testDisplayTextSameTextTwiceUnformatted() {
     // read grouping char because it is different in java8 vs. java11
     DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(NlsLocale.get());
     char groupChar = df.getDecimalFormatSymbols().getGroupingSeparator();
@@ -436,7 +436,7 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
   }
 
   @Test
-  public void testDisplayTextSameTextTwiceFormatted() throws Exception {
+  public void testDisplayTextSameTextTwiceFormatted() {
     getUIFacade().parseAndSetValueFromUI("12'345");
     assertEquals("12'345", getDisplayText());
     getUIFacade().parseAndSetValueFromUI("12'345"); // input matches display text
@@ -447,7 +447,7 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
   }
 
   @Test
-  public void testDisplayTextNoValueChangeOnEmptyText() throws Exception {
+  public void testDisplayTextNoValueChangeOnEmptyText() {
     getUIFacade().parseAndSetValueFromUI("123");
     assertEquals("123", getDisplayText());
     getUIFacade().parseAndSetValueFromUI("");

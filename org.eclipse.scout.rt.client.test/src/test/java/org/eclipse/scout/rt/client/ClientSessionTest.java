@@ -78,7 +78,7 @@ public class ClientSessionTest {
   }
 
   @Test
-  public void testStop() throws Exception {
+  public void testStop() {
     BeanTestingHelper.get().registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
     session = BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().withUserAgent(UserAgents.createDefault()));
 
@@ -95,7 +95,7 @@ public class ClientSessionTest {
   }
 
   @Test
-  public void testStopWithClosedMessageBox() throws Exception {
+  public void testStopWithClosedMessageBox() {
     BeanTestingHelper.get().registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
     session = BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().withUserAgent(UserAgents.createDefault()));
 
@@ -128,7 +128,7 @@ public class ClientSessionTest {
   }
 
   @Test
-  public void testStopWithBlockingMessageBox() throws Exception {
+  public void testStopWithBlockingMessageBox() {
     BeanTestingHelper.get().registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
     BeanTestingHelper.get().registerBean(
         new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withProducer((IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>) bean -> new JobCompletionDelayOnSessionShutdown() {
@@ -169,7 +169,7 @@ public class ClientSessionTest {
   }
 
   @Test
-  public void testStopWithBlockingClientCallback() throws Exception {
+  public void testStopWithBlockingClientCallback() {
     BeanTestingHelper.get().registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
     BeanTestingHelper.get().registerBean(
         new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withProducer((IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>) bean -> new JobCompletionDelayOnSessionShutdown() {

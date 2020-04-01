@@ -55,7 +55,7 @@ public class ClientJobCancelTest {
   private List<IBean<?>> m_serviceReg;
 
   @Before
-  public void before() throws Exception {
+  public void before() {
 
     m_serviceReg = BeanTestingHelper.get().registerBeans(
         new BeanMetaData(MockServerProcessingCancelService.class)

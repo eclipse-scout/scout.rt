@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,7 +31,6 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -82,22 +79,22 @@ public class XmlUtilityTest {
     final StringBuilder buf = new StringBuilder();
     XmlUtility.newSAXParser().parse(new ByteArrayInputStream(SIMPLE_XML.getBytes(StandardCharsets.UTF_8)), new DefaultHandler() {
       @Override
-      public void startDocument() throws SAXException {
+      public void startDocument() {
         buf.append("startDocument\n");
       }
 
       @Override
-      public void endDocument() throws SAXException {
+      public void endDocument() {
         buf.append("endDocument\n");
       }
 
       @Override
-      public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      public void startElement(String uri, String localName, String qName, Attributes attributes) {
         buf.append("startElement " + qName + "\n");
       }
 
       @Override
-      public void endElement(String uri, String localName, String qName) throws SAXException {
+      public void endElement(String uri, String localName, String qName) {
         buf.append("endElement " + qName + "\n");
       }
     });

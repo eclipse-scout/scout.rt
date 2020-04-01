@@ -24,7 +24,7 @@ import org.junit.Test;
 public class MultipeChainCallsTest extends AbstractLocalExtensionTestCase {
 
   @Test
-  public void testMultipeChainCalls() throws Exception {
+  public void testMultipeChainCalls() {
     BEANS.get(IExtensionRegistry.class).register(NameFieldExt.class);
 
     NameField field = new NameField();

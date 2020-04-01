@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.server.jdbc.style;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.sql.Blob;
@@ -44,7 +42,7 @@ public class AbstractSqlStyleTest {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void testConnection(Connection conn) throws SQLException {
+    public void testConnection(Connection conn) {
     }
 
     @Override
@@ -269,7 +267,7 @@ public class AbstractSqlStyleTest {
     }
 
     @Override
-    public void testConnection(Connection conn) throws SQLException {
+    public void testConnection(Connection conn) {
     }
 
     @Override
@@ -305,7 +303,7 @@ public class AbstractSqlStyleTest {
     }
 
     @Override
-    public void testConnection(Connection conn) throws SQLException {
+    public void testConnection(Connection conn) {
     }
 
     @Override

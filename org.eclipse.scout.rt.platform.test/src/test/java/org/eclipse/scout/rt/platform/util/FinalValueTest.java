@@ -55,7 +55,7 @@ public class FinalValueTest {
   }
 
   @Test
-  public void testLazySet() throws Exception {
+  public void testLazySet() {
     FinalValue<String> s = new FinalValue<>();
     String value = s.setIfAbsentAndGet(TEST_VALUE);
     assertTestValue(s);
@@ -63,7 +63,7 @@ public class FinalValueTest {
   }
 
   @Test
-  public void testLazySetWithException() throws Exception {
+  public void testLazySetWithException() {
     FinalValue<String> s = new FinalValue<>();
     try {
       s.setIfAbsent(() -> {
@@ -89,7 +89,7 @@ public class FinalValueTest {
   }
 
   @Test
-  public void testLazyDuplicateSet() throws Exception {
+  public void testLazyDuplicateSet() {
     FinalValue<String> s = new FinalValue<>();
     s.setIfAbsentAndGet(TEST_VALUE);
     String value2 = s.setIfAbsentAndGet("other");
@@ -98,7 +98,7 @@ public class FinalValueTest {
   }
 
   @Test
-  public void testNoDoubleInitializationTry() throws Exception {
+  public void testNoDoubleInitializationTry() {
     FinalValue<String> s = new FinalValue<>();
     s.setIfAbsentAndGet((String) null);
     Assert.assertNull(s.setIfAbsentAndGet("should not matter"));

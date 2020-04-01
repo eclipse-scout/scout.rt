@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -51,20 +49,20 @@ public class FindFieldByFormDataIdVisitorTest {
   private MainForm m_mainForm;
 
   @Before
-  public void before() throws Exception {
+  public void before() {
     m_mainForm = new MainForm();
     m_mainForm.start();
   }
 
   @After
-  public void after() throws Exception {
+  public void after() {
     m_mainForm.doReset();
     m_mainForm.doCancel();
     m_mainForm = null;
   }
 
   @Test
-  public void testFixture() throws Exception {
+  public void testFixture() {
     assertNotNull(m_mainForm);
     assertEquals(FIRST_FIELD_ID, m_mainForm.getFirstField().getFieldId());
     InnerForm innerForm = m_mainForm.getWrappedFormField().getInnerForm();
@@ -83,7 +81,7 @@ public class FindFieldByFormDataIdVisitorTest {
    * --------------------------------------------------------------------------
    */
   @Test
-  public void testGetFirstFieldWithoutForm() throws Exception {
+  public void testGetFirstFieldWithoutForm() {
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(FIRST_FIELD_DATA_ID);
     m_mainForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
@@ -92,7 +90,7 @@ public class FindFieldByFormDataIdVisitorTest {
   }
 
   @Test
-  public void testGetFirstFieldOnMainForm() throws Exception {
+  public void testGetFirstFieldOnMainForm() {
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(FIRST_FIELD_DATA_ID, m_mainForm);
     m_mainForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
@@ -101,7 +99,7 @@ public class FindFieldByFormDataIdVisitorTest {
   }
 
   @Test
-  public void testGetFirstFieldOnInnerForm() throws Exception {
+  public void testGetFirstFieldOnInnerForm() {
     InnerForm innerForm = m_mainForm.getWrappedFormField().getInnerForm();
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(FIRST_FIELD_DATA_ID, innerForm);
     innerForm.visit(visitor, IFormField.class);
@@ -111,7 +109,7 @@ public class FindFieldByFormDataIdVisitorTest {
   }
 
   @Test
-  public void testGetFirstFieldOnInnerInnerForm() throws Exception {
+  public void testGetFirstFieldOnInnerInnerForm() {
     InnerInnerForm innerInnerForm = m_mainForm.getWrappedFormField().getInnerForm().getWrappedFormField().getInnerForm();
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(FIRST_FIELD_DATA_ID, innerInnerForm);
     innerInnerForm.visit(visitor, IFormField.class);
@@ -125,7 +123,7 @@ public class FindFieldByFormDataIdVisitorTest {
    * --------------------------------------------------------------------------
    */
   @Test
-  public void testGetSecondFieldWithoutForm() throws Exception {
+  public void testGetSecondFieldWithoutForm() {
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(SECOND_FIELD_DATA_ID);
     m_mainForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
@@ -134,7 +132,7 @@ public class FindFieldByFormDataIdVisitorTest {
   }
 
   @Test
-  public void testGetSecondFieldOnMainForm() throws Exception {
+  public void testGetSecondFieldOnMainForm() {
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(SECOND_FIELD_DATA_ID, m_mainForm);
     m_mainForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
@@ -143,7 +141,7 @@ public class FindFieldByFormDataIdVisitorTest {
   }
 
   @Test
-  public void testGetSecondFieldOnInnerForm() throws Exception {
+  public void testGetSecondFieldOnInnerForm() {
     InnerForm innerForm = m_mainForm.getWrappedFormField().getInnerForm();
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(SECOND_FIELD_DATA_ID, innerForm);
     innerForm.visit(visitor, IFormField.class);
@@ -153,7 +151,7 @@ public class FindFieldByFormDataIdVisitorTest {
   }
 
   @Test
-  public void testGetSecondFieldOnInnerInnerForm() throws Exception {
+  public void testGetSecondFieldOnInnerInnerForm() {
     InnerInnerForm innerInnerForm = m_mainForm.getWrappedFormField().getInnerForm().getWrappedFormField().getInnerForm();
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(SECOND_FIELD_DATA_ID, innerInnerForm);
     innerInnerForm.visit(visitor, IFormField.class);
@@ -167,7 +165,7 @@ public class FindFieldByFormDataIdVisitorTest {
    * --------------------------------------------------------------------------
    */
   @Test
-  public void testGetThirdFieldWithoutForm() throws Exception {
+  public void testGetThirdFieldWithoutForm() {
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(THIRD_FIELD_DATA_ID);
     m_mainForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
@@ -176,7 +174,7 @@ public class FindFieldByFormDataIdVisitorTest {
   }
 
   @Test
-  public void testGetThirdFieldOnMainForm() throws Exception {
+  public void testGetThirdFieldOnMainForm() {
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(THIRD_FIELD_DATA_ID, m_mainForm);
     m_mainForm.visit(visitor, IFormField.class);
     IFormField field = visitor.getField();
@@ -185,7 +183,7 @@ public class FindFieldByFormDataIdVisitorTest {
   }
 
   @Test
-  public void testGetThirdFieldOnInnerForm() throws Exception {
+  public void testGetThirdFieldOnInnerForm() {
     InnerForm innerForm = m_mainForm.getWrappedFormField().getInnerForm();
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(THIRD_FIELD_DATA_ID, innerForm);
     innerForm.visit(visitor, IFormField.class);
@@ -195,7 +193,7 @@ public class FindFieldByFormDataIdVisitorTest {
   }
 
   @Test
-  public void testGetThirdFieldOnInnerInnerForm() throws Exception {
+  public void testGetThirdFieldOnInnerInnerForm() {
     InnerInnerForm innerInnerForm = m_mainForm.getWrappedFormField().getInnerForm().getWrappedFormField().getInnerForm();
     FindFieldByFormDataIdVisitor visitor = new FindFieldByFormDataIdVisitor(THIRD_FIELD_DATA_ID, innerInnerForm);
     innerInnerForm.visit(visitor, IFormField.class);

@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.platform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.junit.AfterClass;
@@ -53,7 +51,7 @@ public class PlatformStartTest {
   }
 
   @Test
-  public void testStartStop() throws Exception {
+  public void testStartStop() {
     Platform.set(new FixturePlatformWithMinimalBeanManager());
     IPlatform p = Platform.get();
     p.start();

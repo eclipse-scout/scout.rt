@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.htmlfield;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.net.MalformedURLException;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -27,7 +24,7 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class AbstractHtmlFieldTest {
   @Test
-  public void testExecHyperlinkAction() throws MalformedURLException {
+  public void testExecHyperlinkAction() {
     P_HtmlField htmlField = new P_HtmlField();
     String ref = "data";
     htmlField.getUIFacade().fireAppLinkActionFromUI(ref);

@@ -47,7 +47,7 @@ public class PageWithTable2Test {
   private static final String S3 = "Dolor";
 
   @Test
-  public void testImportFormData1() throws Exception {
+  public void testImportFormData1() {
     Object[][] data = new Object[][]{new Object[]{5, S1}};
     SimpleTablePage page = new SimpleTablePage(false, data);
 
@@ -62,7 +62,7 @@ public class PageWithTable2Test {
    * Test with LimitedResult == true
    */
   @Test
-  public void testImportFormData2() throws Exception {
+  public void testImportFormData2() {
     Object[][] data = new Object[][]{new Object[]{I1, S1}, new Object[]{I2, S2}, new Object[]{I3, S3}};
     SimpleTablePage page = new SimpleTablePage(true, data);
 

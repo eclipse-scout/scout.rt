@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.server.context;
 
+import static org.junit.Assert.*;
+
 import java.util.Iterator;
 
 import org.eclipse.scout.rt.platform.chain.IChainable;
@@ -32,10 +34,6 @@ import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-
 @RunWith(PlatformTestRunner.class)
 public class ServerRunContextChainTest {
 
@@ -43,7 +41,7 @@ public class ServerRunContextChainTest {
    * Tests the correct order of interceptors in {@link ServerRunContext}.
    */
   @Test
-  public void testCallableChain() throws Exception {
+  public void testCallableChain() {
     CallableChain<Object> chain = new ServerRunContext() {
       @Override
       protected <RESULT> CallableChain<RESULT> createCallableChain() { // overwrite to be accessible in test

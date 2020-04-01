@@ -65,7 +65,7 @@ public class ModelJobTest {
   }
 
   @Test
-  public void testThreadName() throws InterruptedException {
+  public void testThreadName() {
     ClientRunContext clientRunContext = ClientRunContexts.empty().withSession(m_clientSession1, true);
     assertEquals("scout-model-thread", ModelJobs.newInput(clientRunContext).getThreadName());
   }

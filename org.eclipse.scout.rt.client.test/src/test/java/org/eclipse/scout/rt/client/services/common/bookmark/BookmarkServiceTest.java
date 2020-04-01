@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.services.common.bookmark;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -52,7 +50,7 @@ public class BookmarkServiceTest {
   }
 
   @Test
-  public void testSetStartBookmark() throws Exception {
+  public void testSetStartBookmark() {
     Bookmark bookmark = new Bookmark();
     bookmark.setText("My Bookmark Text");
     Mockito.when(m_mockDesktop.createBookmark()).thenReturn(bookmark);
@@ -67,7 +65,7 @@ public class BookmarkServiceTest {
   }
 
   @Test
-  public void testDeleteBookmark() throws Exception {
+  public void testDeleteBookmark() {
     Bookmark bookmark = new Bookmark();
     bookmark.setText("My Bookmark Text");
     Mockito.when(m_mockDesktop.createBookmark()).thenReturn(bookmark);

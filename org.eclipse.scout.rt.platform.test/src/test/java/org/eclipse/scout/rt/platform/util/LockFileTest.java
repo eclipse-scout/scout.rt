@@ -27,7 +27,7 @@ import org.junit.Test;
 public class LockFileTest {
 
   @Test
-  public void testLock() throws IOException, InterruptedException {
+  public void testLock() throws IOException {
     File f = File.createTempFile(getClass().getName() + "-testWithLockCall", ".lock");
 
     LockFile a = new LockFile(f);

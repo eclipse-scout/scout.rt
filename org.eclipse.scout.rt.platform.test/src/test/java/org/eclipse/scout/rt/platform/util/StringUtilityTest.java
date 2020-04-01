@@ -10,12 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -197,7 +192,7 @@ public class StringUtilityTest {
   static final String CHARACTERS = "aouäöüàé";
 
   @Test
-  public void testDecompress_umlauts() throws Exception {
+  public void testDecompress_umlauts() {
 
     StringBuilder builder = new StringBuilder();
     for (int i = 0; i < 100000; i++) {
@@ -211,7 +206,7 @@ public class StringUtilityTest {
   }
 
   @Test
-  public void testTags() throws Exception {
+  public void testTags() {
     String s;
     s = "foo <a>text</a> bar";
     assertEquals("foo  bar", StringUtility.removeTag(s, "a"));
@@ -226,7 +221,7 @@ public class StringUtilityTest {
   }
 
   @Test
-  public void testRegExPattern() throws Exception {
+  public void testRegExPattern() {
     String s;
     s = "test*";
     assertEquals("test.*", StringUtility.toRegExPattern(s));
@@ -242,7 +237,7 @@ public class StringUtilityTest {
    * Tests for {@link StringUtility#getTag(String, String)}.
    */
   @Test
-  public void testGetTag() throws Exception {
+  public void testGetTag() {
     String input;
 
     input = null;
@@ -306,7 +301,7 @@ public class StringUtilityTest {
    * Test for {@link StringUtility#replaceTags(String, String, String)}
    */
   @Test
-  public void testReplaceTags() throws Exception {
+  public void testReplaceTags() {
     String input;
 
     //HTML attributes:
@@ -718,7 +713,7 @@ public class StringUtilityTest {
   }
 
   @Test
-  public void testUppercaseFirst() throws Exception {
+  public void testUppercaseFirst() {
     assertEquals(null, StringUtility.uppercaseFirst(null));
     assertEquals("", StringUtility.uppercaseFirst(""));
     assertEquals("A", StringUtility.uppercaseFirst("A"));

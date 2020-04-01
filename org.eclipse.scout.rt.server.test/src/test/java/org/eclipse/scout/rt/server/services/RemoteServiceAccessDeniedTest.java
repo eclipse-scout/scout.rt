@@ -88,7 +88,7 @@ public class RemoteServiceAccessDeniedTest {
       m_permissionCollection.add(new RemoteServiceAccessPermission("*.INonTunnelProcessService", "*"));
     }
 
-    public void test(Class<?> interfaceClass, Method interfaceMethod, Class<?> implClass) throws Exception {
+    public void test(Class<?> interfaceClass, Method interfaceMethod, Class<?> implClass) {
       checkRemoteServiceAccessByInterface(interfaceClass, interfaceMethod, new Object[0]);
       checkRemoteServiceAccessByAnnotations(interfaceClass, implClass, interfaceMethod, new Object[0]);
       checkRemoteServiceAccessByPermission(interfaceClass, implClass, interfaceMethod, new Object[0]);

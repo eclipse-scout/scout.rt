@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +43,7 @@ import org.junit.runner.RunWith;
 public class PageWithTable1Test {
 
   @Test
-  public void testReloadPage_multipleSummaryColumns() throws Exception {
+  public void testReloadPage_multipleSummaryColumns() {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     assertNotNull(desktop);
 

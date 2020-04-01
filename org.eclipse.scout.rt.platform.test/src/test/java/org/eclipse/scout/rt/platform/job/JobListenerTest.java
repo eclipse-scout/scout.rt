@@ -52,7 +52,7 @@ public class JobListenerTest {
   }
 
   @Test
-  public void testEvents() throws Exception {
+  public void testEvents() {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
@@ -85,7 +85,7 @@ public class JobListenerTest {
   }
 
   @Test
-  public void testCancel() throws Exception {
+  public void testCancel() {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 

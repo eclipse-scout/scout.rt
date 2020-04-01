@@ -117,12 +117,12 @@ public class BeanInstanceUtilTest {
   }
 
   @Test(expected = BeanCreationException.class)
-  public void testCollectPostConstructMethodsWithParameters() throws Exception {
+  public void testCollectPostConstructMethodsWithParameters() {
     BeanInstanceUtil.collectPostConstructMethods(PostConstructWithParameters.class);
   }
 
   @Test
-  public void testInitializeInstanceBase() throws Exception {
+  public void testInitializeInstanceBase() {
     PostConstructBase base = new PostConstructBase();
     BeanInstanceUtil.initializeBeanInstance(base);
 
@@ -137,7 +137,7 @@ public class BeanInstanceUtilTest {
   }
 
   @Test
-  public void testInitializeInstanceBaseEx1() throws Exception {
+  public void testInitializeInstanceBaseEx1() {
     PostConstructEx1 baseEx1 = new PostConstructEx1();
     BeanInstanceUtil.initializeBeanInstance(baseEx1);
 
@@ -153,7 +153,7 @@ public class BeanInstanceUtilTest {
   }
 
   @Test
-  public void testInitializeInstanceBaseEx2() throws Exception {
+  public void testInitializeInstanceBaseEx2() {
     PostConstructEx2 baseEx2 = new PostConstructEx2();
     BeanInstanceUtil.initializeBeanInstance(baseEx2);
 
@@ -169,12 +169,12 @@ public class BeanInstanceUtilTest {
   }
 
   @Test(expected = BeanCreationException.class)
-  public void testInitializeInstanceThrowingRuntimeException() throws Exception {
+  public void testInitializeInstanceThrowingRuntimeException() {
     BeanInstanceUtil.initializeBeanInstance(new PostConstructThrowingRuntimeException());
   }
 
   @Test(expected = BeanCreationException.class)
-  public void testInitializeInstanceThrowingException() throws Exception {
+  public void testInitializeInstanceThrowingException() {
     BeanInstanceUtil.initializeBeanInstance(new PostConstructThrowingException());
   }
 

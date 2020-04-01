@@ -57,7 +57,7 @@ public class ClientNotificationClusterNotificationTest {
   private ClusterNotificationProperties m_testProps = new ClusterNotificationProperties(TEST_NODE, TEST_USER);
 
   @Before
-  public void before() throws Exception {
+  public void before() {
     m_nullMomImplementorSpy = spy(NullMomImplementor.class);
     m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(TestClusterMom.class)));
     m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(NullMomImplementor.class).withProducer((IBeanInstanceProducer<IMomImplementor>) bean -> m_nullMomImplementorSpy)));

@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.data.form;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
@@ -28,7 +26,7 @@ import org.junit.runner.RunWith;
 public class FormDataInjectionTest {
 
   @Test
-  public void testBaseForm() throws Exception {
+  public void testBaseForm() {
     BaseFormData formData = new BaseFormData();
 
     assertEquals(2, formData.getFields().length);
@@ -37,7 +35,7 @@ public class FormDataInjectionTest {
   }
 
   @Test
-  public void testExtendedForm() throws Exception {
+  public void testExtendedForm() {
     ExtendedFormData formData = new ExtendedFormData();
 
     assertEquals(4, formData.getFields().length);
@@ -48,7 +46,7 @@ public class FormDataInjectionTest {
   }
 
   @Test
-  public void testExtendedInjectedField() throws Exception {
+  public void testExtendedInjectedField() {
     ExtendedInjectedFieldFormData formData = new ExtendedInjectedFieldFormData();
 
     assertEquals(5, formData.getFields().length);
@@ -60,7 +58,7 @@ public class FormDataInjectionTest {
   }
 
   @Test
-  public void testReplaceField() throws Exception {
+  public void testReplaceField() {
     ReplaceFieldFormData formData = new ReplaceFieldFormData();
 
     assertEquals(2, formData.getFields().length);
@@ -76,7 +74,7 @@ public class FormDataInjectionTest {
   }
 
   @Test
-  public void testReplace2Field() throws Exception {
+  public void testReplace2Field() {
     Replace2FieldFormData formData = new Replace2FieldFormData();
 
     assertEquals(3, formData.getFields().length);
@@ -96,7 +94,7 @@ public class FormDataInjectionTest {
   }
 
   @Test
-  public void testReplace3Field() throws Exception {
+  public void testReplace3Field() {
     Replace3FieldFormData formData = new Replace3FieldFormData();
 
     assertEquals(3, formData.getFields().length);
@@ -117,7 +115,7 @@ public class FormDataInjectionTest {
   }
 
   @Test
-  public void testGroupBoxEx() throws Exception {
+  public void testGroupBoxEx() {
     TemplateExFormData formData = new TemplateExFormData();
 
     assertEquals(1, formData.getFields().length);

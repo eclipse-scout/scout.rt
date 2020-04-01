@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.services.common.code;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -44,7 +42,7 @@ public class CodeServiceClientProxyTest {
   private CodeService m_service;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     m_service = createServiceUnderTest();
   }
 
@@ -53,7 +51,7 @@ public class CodeServiceClientProxyTest {
    * {@link org.eclipse.scout.rt.client.services.common.code.CodeServiceClientProxy#getCodeType(java.lang.Class)}.
    */
   @Test
-  public void testGetCodeType() throws Exception {
+  public void testGetCodeType() {
     CompanyRatingCodeType ct1 = m_service.getCodeType(CompanyRatingCodeType.class);
     assertNotNull(ct1);
 
@@ -70,7 +68,7 @@ public class CodeServiceClientProxyTest {
    * {@link org.eclipse.scout.rt.client.services.common.code.CodeServiceClientProxy#getAllCodeTypes(java.lang.String)}.
    */
   @Test
-  public void testGetAllCodeTypes() throws Exception {
+  public void testGetAllCodeTypes() {
     List<ICodeType<?, ?>> codeTypes = m_service.getAllCodeTypes();
     assertEquals("size", 2, codeTypes.size());
     ICodeType<?, ?> codeType = codeTypes.get(0);
@@ -96,7 +94,7 @@ public class CodeServiceClientProxyTest {
    * {@link org.eclipse.scout.rt.client.services.common.code.CodeServiceClientProxy#findCodeTypeById(java.lang.Object)}.
    */
   @Test
-  public void testFindCodeTypeById() throws Exception {
+  public void testFindCodeTypeById() {
     //Preload the code, as a client application would do in ClientSession#execLoadSession():
     List<ICodeType<?, ?>> codeTypes = m_service.getAllCodeTypes();
     assertEquals("size", 2, codeTypes.size());

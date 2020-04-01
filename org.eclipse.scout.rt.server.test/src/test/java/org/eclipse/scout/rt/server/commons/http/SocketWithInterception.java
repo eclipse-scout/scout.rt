@@ -33,12 +33,12 @@ public class SocketWithInterception extends Socket {
   private ISocketReadInterceptor m_readInterceptor = null;
   private ISocketWriteInterceptor m_writeInterceptor = null;
 
-  public SocketWithInterception withInterceptRead(ISocketReadInterceptor i) throws IOException {
+  public SocketWithInterception withInterceptRead(ISocketReadInterceptor i) {
     m_readInterceptor = i;
     return this;
   }
 
-  public SocketWithInterception withInterceptWrite(ISocketWriteInterceptor i) throws IOException {
+  public SocketWithInterception withInterceptWrite(ISocketWriteInterceptor i) {
     m_writeInterceptor = i;
     return this;
   }

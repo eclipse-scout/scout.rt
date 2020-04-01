@@ -79,7 +79,7 @@ public class LookupRowTest {
   }
 
   @Test
-  public void testActive() throws Exception {
+  public void testActive() {
     ILookupRow<String> row = new LookupRow<>("key", "text");
     row.withActive(true);
     row.withActive(false);

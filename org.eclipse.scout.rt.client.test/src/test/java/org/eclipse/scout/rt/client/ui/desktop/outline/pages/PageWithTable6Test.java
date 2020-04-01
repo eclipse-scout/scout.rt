@@ -48,7 +48,7 @@ import org.junit.runner.RunWith;
 public class PageWithTable6Test {
 
   @Test
-  public void testMenus() throws Exception {
+  public void testMenus() {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     Outline outline = new Outline();
     desktop.setAvailableOutlines(Collections.singletonList(outline));

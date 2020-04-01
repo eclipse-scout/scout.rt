@@ -44,7 +44,7 @@ public class BatchLookupTest {
   private static long m_localInvocations;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     Answer answer = (Answer<List<ILookupRow<Object>>>) invocation -> {
       Object[] args = invocation.getArguments();
       ILookupCall<?> call = (ILookupCall<?>) args[0];

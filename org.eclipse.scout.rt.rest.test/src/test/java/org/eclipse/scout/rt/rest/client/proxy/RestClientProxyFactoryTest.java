@@ -11,11 +11,7 @@
 package org.eclipse.scout.rt.rest.client.proxy;
 
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import javax.ws.rs.client.AsyncInvoker;
 import javax.ws.rs.client.Client;
@@ -89,7 +85,7 @@ public class RestClientProxyFactoryTest {
   }
 
   @Test
-  public void testCreateAndConfigureProxiedClient() throws Exception {
+  public void testCreateAndConfigureProxiedClient() {
     assertThrows(AssertionException.class, () -> getFactory().createClientProxy(null, null));
 
     Client client = mockClient();

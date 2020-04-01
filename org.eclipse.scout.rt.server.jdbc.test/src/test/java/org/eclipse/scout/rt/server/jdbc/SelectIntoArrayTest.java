@@ -59,7 +59,7 @@ public class SelectIntoArrayTest {
   };
 
   @Test
-  public void testSelect() throws Exception {
+  public void testSelect() {
     SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     Object[][] data = sql.select("SELECT A,B,C FROM T WHERE D=0");
@@ -72,7 +72,7 @@ public class SelectIntoArrayTest {
   }
 
   @Test
-  public void testSelectIntoBeanArray() throws Exception {
+  public void testSelectIntoBeanArray() {
     SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     BeanArrayHolder<MyBean> h = new BeanArrayHolder<>(MyBean.class);
@@ -86,7 +86,7 @@ public class SelectIntoArrayTest {
   }
 
   @Test
-  public void testSelectFromFormDataArray() throws Exception {
+  public void testSelectFromFormDataArray() {
     SqlServiceMock sql = new SqlServiceMock();
     Object[][] expectedData = new Object[][]{
         new Object[]{true, 1, "abc"},
@@ -111,7 +111,7 @@ public class SelectIntoArrayTest {
   }
 
   @Test
-  public void testSelectIntoFormDataArray() throws Exception {
+  public void testSelectIntoFormDataArray() {
     SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     Object[][] expectedData = DATA;
@@ -129,7 +129,7 @@ public class SelectIntoArrayTest {
    * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna). Direct select.
    */
   @Test
-  public void testSelectIntoTableFieldBeanData() throws Exception {
+  public void testSelectIntoTableFieldBeanData() {
     SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     TableFieldBeanData tableData = new TableFieldBeanData();
@@ -142,7 +142,7 @@ public class SelectIntoArrayTest {
    * bind.
    */
   @Test
-  public void testSelectIntoTableFieldBeanDataInNVPair() throws Exception {
+  public void testSelectIntoTableFieldBeanDataInNVPair() {
     SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     TableFieldBeanData tableData = new TableFieldBeanData();
@@ -154,7 +154,7 @@ public class SelectIntoArrayTest {
    * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna). TableData is in Map bind.
    */
   @Test
-  public void testSelectIntoTableFieldBeanDataInMap() throws Exception {
+  public void testSelectIntoTableFieldBeanDataInMap() {
     SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     TableFieldBeanData tableData = new TableFieldBeanData();
@@ -168,7 +168,7 @@ public class SelectIntoArrayTest {
    * (ContainerBean).
    */
   @Test
-  public void testSelectIntoTableFieldBeanDataInBean() throws Exception {
+  public void testSelectIntoTableFieldBeanDataInBean() {
     SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     ContainerBean bean = new ContainerBean();
@@ -190,7 +190,7 @@ public class SelectIntoArrayTest {
   }
 
   @Test
-  public void testSelectIntoFormDataWithArray() throws Exception {
+  public void testSelectIntoFormDataWithArray() {
     SqlServiceMock sql = createSqlServiceMock(ROLES_DATA);
     //
 
@@ -207,7 +207,7 @@ public class SelectIntoArrayTest {
   }
 
   @Test
-  public void testSelectIntoFormDataWithSet() throws Exception {
+  public void testSelectIntoFormDataWithSet() {
     SqlServiceMock sql = createSqlServiceMock(ROLES_DATA);
     //
 
@@ -224,7 +224,7 @@ public class SelectIntoArrayTest {
   }
 
   @Test
-  public void testSelectIntoListInHolder() throws Exception {
+  public void testSelectIntoListInHolder() {
     SqlServiceMock sql = createSqlServiceMock(ROLES_DATA);
     //
 
@@ -240,7 +240,7 @@ public class SelectIntoArrayTest {
   }
 
   @Test
-  public void testEmptySelectIntoFormDataWithSet() throws Exception {
+  public void testEmptySelectIntoFormDataWithSet() {
     SqlServiceMock sql = createSqlServiceMock(new Object[][]{});
     //
 

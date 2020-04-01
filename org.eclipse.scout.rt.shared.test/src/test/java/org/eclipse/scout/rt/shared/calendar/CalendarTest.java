@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.calendar;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -34,14 +33,14 @@ public class CalendarTest {
   private IObjectSerializer m_objectSerializer;
 
   @Before
-  public void setUp() throws Throwable {
+  public void setUp() {
     m_oldLocale = Locale.getDefault();
     m_oldTimeZone = TimeZone.getDefault();
     m_objectSerializer = SerializationUtility.createObjectSerializer(new ServiceTunnelObjectReplacer());
   }
 
   @After
-  public void tearDown() throws Throwable {
+  public void tearDown() {
     Locale.setDefault(m_oldLocale);
     TimeZone.setDefault(m_oldTimeZone);
   }

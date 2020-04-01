@@ -28,7 +28,7 @@ import org.junit.Test;
 public class TableRowDataPropertyFilterTest {
 
   @Test
-  public void testTableRowDataPropertyFilter() throws Exception {
+  public void testTableRowDataPropertyFilter() {
     TableRowDataPropertyFilter propertyFilter = new TableRowDataPropertyFilter();
     FastPropertyDescriptor[] props = BeanUtility.getFastPropertyDescriptors(P_TableRowData.class, AbstractTableRowData.class, propertyFilter);
     Map<String, FastPropertyDescriptor> propertyDescriptorsByName = new HashMap<>();

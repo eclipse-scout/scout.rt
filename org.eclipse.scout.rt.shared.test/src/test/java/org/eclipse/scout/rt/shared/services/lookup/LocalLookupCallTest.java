@@ -45,7 +45,7 @@ public class LocalLookupCallTest {
   private static final String ROW50_TEXT = "all regex meta-chars: ^[.${*(\\+)|?<>";
 
   @Test
-  public void testGetDataByAll() throws Exception {
+  public void testGetDataByAll() {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     assertEquals("default value for 'active' property", TriState.UNDEFINED, lc.getActive());
     List<? extends ILookupRow<Integer>> rows = lc.getDataByAll();
@@ -53,7 +53,7 @@ public class LocalLookupCallTest {
   }
 
   @Test
-  public void testGetDataByAll_FilterActive() throws Exception {
+  public void testGetDataByAll_FilterActive() {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     lc.setActive(TriState.TRUE);
     List<? extends ILookupRow<Integer>> rows = lc.getDataByAll();
@@ -64,7 +64,7 @@ public class LocalLookupCallTest {
    * Key lookup must return row even when it is inactive (no filtering).
    */
   @Test
-  public void testGetDataByKey_InactiveRow() throws Exception {
+  public void testGetDataByKey_InactiveRow() {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     lc.setActive(TriState.TRUE);
     lc.setKey(ROW40_KEY);
@@ -73,7 +73,7 @@ public class LocalLookupCallTest {
   }
 
   @Test
-  public void testGetDataByAll_FilterInactive() throws Exception {
+  public void testGetDataByAll_FilterInactive() {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     lc.setActive(TriState.FALSE);
     List<? extends ILookupRow<Integer>> rows = lc.getDataByAll();
@@ -81,14 +81,14 @@ public class LocalLookupCallTest {
   }
 
   @Test
-  public void testGetDataByText() throws Exception {
+  public void testGetDataByText() {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     List<? extends ILookupRow<Integer>> rows = lc.getDataByText();
     assertEquals("rows length", 8, rows.size());
   }
 
   @Test
-  public void testGetDataByTextFiltered() throws Exception {
+  public void testGetDataByTextFiltered() {
     runGetDataByTextFiltered(8, null, null);
     runGetDataByTextFiltered(4, "*or*", null);
     runGetDataByTextFiltered(4, "*or*", "*");
@@ -104,7 +104,7 @@ public class LocalLookupCallTest {
   }
 
   @Test
-  public void testGetDataByTextFilteredCustomWildcard() throws Exception {
+  public void testGetDataByTextFilteredCustomWildcard() {
     runGetDataByTextFiltered(8, null, "°");
     runGetDataByTextFiltered(4, "°or°", "°");
     runGetDataByTextFiltered(3, "°or", "°");
@@ -132,7 +132,7 @@ public class LocalLookupCallTest {
   }
 
   @Test
-  public void testGetDataByKey() throws Exception {
+  public void testGetDataByKey() {
     runGetDataByKey(0, null);
     runGetDataByKey(1, ROW10_KEY);
     runGetDataByKey(1, ROW31_KEY);
@@ -149,7 +149,7 @@ public class LocalLookupCallTest {
   }
 
   @Test
-  public void testGetDataByRec() throws Exception {
+  public void testGetDataByRec() {
     runGetDataByRec(5, null);
     runGetDataByRec(2, ROW10_KEY);
     runGetDataByRec(0, ROW20_KEY);
@@ -160,7 +160,7 @@ public class LocalLookupCallTest {
   }
 
   @Test
-  public void testGetDataByTextHierachic() throws Exception {
+  public void testGetDataByTextHierachic() {
     P_LocalLookupCallHierarchic lc = new P_LocalLookupCallHierarchic();
     lc.setText("F");
     lc.setHierarchicalLookup(true);
@@ -185,7 +185,7 @@ public class LocalLookupCallTest {
   }
 
   @Test
-  public void testRepeatingWildcards() throws Exception {
+  public void testRepeatingWildcards() {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     Pattern p = lc.createSearchPattern("***hello*world**test*");
     assertFalse("no repeating wildcard should be contained in the search pattern.", p.toString().contains(".*.*"));

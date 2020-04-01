@@ -610,10 +610,9 @@ public class TreeEventBufferTest {
    * second delete event - this has been corrected in the removeNodesFromPreviousEvents() method.
    * </p>
    *
-   * @throws Exception
    */
   @Test
-  public void testDeleteInsertCoalesce() throws Exception {
+  public void testDeleteInsertCoalesce() {
     ITreeNode root = mockNode("Root");
     ITreeNode nodeA = mockNode("A");
     installChildNodes(root, nodeA);
@@ -633,7 +632,7 @@ public class TreeEventBufferTest {
   }
 
   @Test
-  public void testDeleteInsertCoalesce_MultipleNodes() throws Exception {
+  public void testDeleteInsertCoalesce_MultipleNodes() {
     ITreeNode root = mockNode("Root");
     ITreeNode nodeA = mockNode("A");
     ITreeNode nodeB = mockNode("B");
@@ -695,37 +694,37 @@ public class TreeEventBufferTest {
   }
 
   @Test
-  public void testIgnoreExpandAfterInsert() throws Exception {
+  public void testIgnoreExpandAfterInsert() {
     testIgnoreAfterInsert(TreeEvent.TYPE_NODE_EXPANDED);
   }
 
   @Test
-  public void testIgnoreExpandRecursiveAfterInsert() throws Exception {
+  public void testIgnoreExpandRecursiveAfterInsert() {
     testIgnoreAfterInsert(TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE);
   }
 
   @Test
-  public void testIgnoreCollapsedAfterInsert() throws Exception {
+  public void testIgnoreCollapsedAfterInsert() {
     testIgnoreAfterInsert(TreeEvent.TYPE_NODE_COLLAPSED);
   }
 
   @Test
-  public void testIgnoreCollapsedRecursiveAfterInsert() throws Exception {
+  public void testIgnoreCollapsedRecursiveAfterInsert() {
     testIgnoreAfterInsert(TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE);
   }
 
   @Test
-  public void testIgnoreChangedAfterInsert() throws Exception {
+  public void testIgnoreChangedAfterInsert() {
     testIgnoreAfterInsert(TreeEvent.TYPE_NODE_CHANGED);
   }
 
   @Test
-  public void testIgnoreUpdatedAfterInsert() throws Exception {
+  public void testIgnoreUpdatedAfterInsert() {
     testIgnoreAfterInsert(TreeEvent.TYPE_NODES_UPDATED);
   }
 
   @Test
-  public void testIgnoreInsertedAfterInsert() throws Exception {
+  public void testIgnoreInsertedAfterInsert() {
     testIgnoreAfterInsert(TreeEvent.TYPE_NODES_INSERTED);
   }
 
@@ -742,7 +741,7 @@ public class TreeEventBufferTest {
    * TYPE_NODES_CHECKED must not be ignored after insert, because it might be necessary to say "no node is checked"
    */
   @Test
-  public void testNotIgnoreCheckedAfterInsert() throws Exception {
+  public void testNotIgnoreCheckedAfterInsert() {
     LinkedList<TreeEvent> treeEvents = new LinkedList<>();
     ITreeNode parentA = mockNode("parent");
     treeEvents.add(mockEvent(TreeEvent.TYPE_NODES_INSERTED, mockNode("child", parentA)));
@@ -752,7 +751,7 @@ public class TreeEventBufferTest {
   }
 
   @Test(timeout = TIMEOUT_VALUE)
-  public void testCoalesceSameTypeWithManyInsertEvents() throws Exception {
+  public void testCoalesceSameTypeWithManyInsertEvents() {
     final int eventCount = 10000;
     ITreeNode parentA = mockNode("parentA");
     LinkedList<TreeEvent> treeEvents = new LinkedList<>();
@@ -767,7 +766,7 @@ public class TreeEventBufferTest {
   }
 
   @Test(timeout = TIMEOUT_VALUE)
-  public void testCoalesceSameTypeWithManyInsertHavingDifferentParentsEvents() throws Exception {
+  public void testCoalesceSameTypeWithManyInsertHavingDifferentParentsEvents() {
     final int eventCount = 10000;
     LinkedList<TreeEvent> treeEvents = new LinkedList<>();
     ITreeNode parentA = mockNode("parentA");
@@ -791,7 +790,7 @@ public class TreeEventBufferTest {
   }
 
   @Test(timeout = TIMEOUT_VALUE)
-  public void testCoalesceSameTypeWithManyInsertUpdateEvents() throws Exception {
+  public void testCoalesceSameTypeWithManyInsertUpdateEvents() {
     final int eventCount = 10000;
     LinkedList<TreeEvent> treeEvents = new LinkedList<>();
     ITreeNode parentA = mockNode("parentA");
@@ -807,7 +806,7 @@ public class TreeEventBufferTest {
   }
 
   @Test(timeout = TIMEOUT_VALUE)
-  public void testCoalesceSameTypeWithManyInsertInsertUpdateUpdateEvents() throws Exception {
+  public void testCoalesceSameTypeWithManyInsertInsertUpdateUpdateEvents() {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
     ITreeNode parentA = mockNode("parentA");
@@ -826,7 +825,7 @@ public class TreeEventBufferTest {
   }
 
   @Test(timeout = TIMEOUT_VALUE)
-  public void testRemoveNodesContainedInPreviousEventsWithManyInsertAndUpdateEvents() throws Exception {
+  public void testRemoveNodesContainedInPreviousEventsWithManyInsertAndUpdateEvents() {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
     ITreeNode parentA = mockNode("parentA");
@@ -850,7 +849,7 @@ public class TreeEventBufferTest {
   }
 
   @Test(timeout = TIMEOUT_VALUE)
-  public void testRemoveIdenticalEventsWithManyInsertEvents() throws Exception {
+  public void testRemoveIdenticalEventsWithManyInsertEvents() {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
     for (int i = 0; i < eventCount; i++) {
@@ -865,7 +864,7 @@ public class TreeEventBufferTest {
   }
 
   @Test(timeout = TIMEOUT_VALUE)
-  public void testRemoveIdenticalEventsWithManyInsertAndDeleteEvents() throws Exception {
+  public void testRemoveIdenticalEventsWithManyInsertAndDeleteEvents() {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
     for (int i = 0; i < eventCount; i++) {
@@ -878,7 +877,7 @@ public class TreeEventBufferTest {
   }
 
   @Test(timeout = TIMEOUT_VALUE)
-  public void testRemoveObsoleteWithManyNodesInsertAndDelete() throws Exception {
+  public void testRemoveObsoleteWithManyNodesInsertAndDelete() {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
     String[] nodeIds = new String[eventCount];
@@ -898,7 +897,7 @@ public class TreeEventBufferTest {
   }
 
   @Test(timeout = TIMEOUT_VALUE)
-  public void testRemoveObsoleteWithManyNodesPairwiseInsertAndDelete() throws Exception {
+  public void testRemoveObsoleteWithManyNodesPairwiseInsertAndDelete() {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
     for (int i = 0; i < eventCount; i++) {
@@ -916,7 +915,7 @@ public class TreeEventBufferTest {
   }
 
   @Test(timeout = TIMEOUT_VALUE)
-  public void testRemoveObsoleteWithManyUpdateAndOneDeleteAllNodesEvent() throws Exception {
+  public void testRemoveObsoleteWithManyUpdateAndOneDeleteAllNodesEvent() {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
     String[] nodeIds = new String[eventCount];
@@ -943,7 +942,7 @@ public class TreeEventBufferTest {
   }
 
   @Test(timeout = TIMEOUT_VALUE)
-  public void testRemoveObsoleteWithManyNodesUpdateAndDelete() throws Exception {
+  public void testRemoveObsoleteWithManyNodesUpdateAndDelete() {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
     String[] nodeIds = new String[eventCount];

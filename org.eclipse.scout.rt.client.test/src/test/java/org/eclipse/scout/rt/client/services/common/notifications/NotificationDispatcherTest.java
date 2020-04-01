@@ -52,7 +52,7 @@ public class NotificationDispatcherTest {
   private volatile GroupNotificationHandler m_groupNotificationHanlder;
 
   @Before
-  public void before() throws Exception {
+  public void before() {
     m_globalNotificationHanlder = mock(GlobalNotificationHandler.class);
     m_groupNotificationHanlder = mock(GroupNotificationHandler.class);
     m_serviceReg = BeanTestingHelper.get().registerBeans(

@@ -45,7 +45,7 @@ public class AccessControlServiceTest {
   private List<IBean<?>> m_registerServices;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     m_accessControlService = BeanInstanceUtil.createBean(P_SharedAccessControlService.class);
     BeanInstanceUtil.initializeBeanInstance(m_accessControlService);
 
@@ -57,7 +57,7 @@ public class AccessControlServiceTest {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     BeanTestingHelper.get().unregisterBeans(m_registerServices);
   }
 

@@ -36,7 +36,7 @@ import org.junit.runner.RunWith;
 public class FieldExtensionTest extends AbstractLocalExtensionTestCase {
 
   @Test
-  public void testFieldExtension() throws Exception {
+  public void testFieldExtension() {
     BEANS.get(IExtensionRegistry.class).register(PrenameField.class, MyForm.MainBox.class);
     BEANS.get(IExtensionRegistry.class).register(FirstField.class, MyForm.MainBox.class);
 

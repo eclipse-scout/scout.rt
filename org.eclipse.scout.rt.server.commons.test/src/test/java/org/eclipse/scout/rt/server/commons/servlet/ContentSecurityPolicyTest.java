@@ -153,7 +153,7 @@ public class ContentSecurityPolicyTest {
   }
 
   @Test
-  public void testPutOrRemove() throws Exception {
+  public void testPutOrRemove() {
     m_csp.withChildSrc("foo");
     assertEquals("expect only 'foo' as directive source", StringUtility.join(ContentSecurityPolicy.SOURCE_SEPARATOR, ContentSecurityPolicy.DIRECTIVE_CHILD_SRC, "foo"), m_csp.toToken());
 

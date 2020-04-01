@@ -57,7 +57,7 @@ public class JobListenerBlockedFutureTest {
   }
 
   @Test
-  public void testEvents() throws Exception {
+  public void testEvents() {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 

@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.testing.platform.util.concurrent;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
 import org.junit.Test;
@@ -22,7 +21,7 @@ import org.junit.Test;
 public class OptimisticLockTest {
 
   @Test
-  public void testInitiallyNotAcqiured() throws Exception {
+  public void testInitiallyNotAcqiured() {
     OptimisticLock l = new OptimisticLock();
     assertFalse(l.isAcquired());
     assertTrue(l.isReleased());

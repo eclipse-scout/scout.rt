@@ -37,7 +37,7 @@ public class ServiceWithSessionInterceptorTest {
   }
 
   @Test
-  public void testService() throws Exception {
+  public void testService() {
     BEANS.get(ITestService.class).doit();
   }
 

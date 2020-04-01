@@ -61,7 +61,7 @@ public class JobAsyncExceptionTest {
   }
 
   @Test(expected = PlatformException.class)
-  public void testExceptionInCallable() throws Exception {
+  public void testExceptionInCallable() {
     P_JobManager jobManager = new P_JobManager();
 
     IFuture<Void> future = jobManager.schedule((IRunnable) () -> {
@@ -76,7 +76,7 @@ public class JobAsyncExceptionTest {
 
   }
 
-  private void registerTestBeans(Object... beans) throws Exception {
+  private void registerTestBeans(Object... beans) {
     for (Object bean : beans) {
       m_registeredBeans.add(BEANS.getBeanManager().registerBean(
           new BeanMetaData(bean.getClass())
@@ -99,7 +99,7 @@ public class JobAsyncExceptionTest {
     public <RESULT> IRunContextChainInterceptor<RESULT> create() {
       return new AbstractRunContextChainInterceptor<RESULT>() {
         @Override
-        public RESULT intercept(Chain<RESULT> chain) throws Exception {
+        public RESULT intercept(Chain<RESULT> chain) {
           throw new PlatformException("Expected test exception");
         }
 

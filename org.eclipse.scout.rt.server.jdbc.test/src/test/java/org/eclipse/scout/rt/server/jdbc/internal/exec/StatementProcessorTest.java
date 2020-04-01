@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.server.jdbc.internal.exec;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,7 +47,7 @@ import org.junit.runner.RunWith;
 public class StatementProcessorTest {
 
   @Test
-  public void testLookupCall() throws Exception {
+  public void testLookupCall() {
     LookupCall call = new LookupCall() {
       private static final long serialVersionUID = 1L;
     };
@@ -160,7 +157,7 @@ public class StatementProcessorTest {
   }
 
   @Test
-  public void testSelectLike() throws Exception {
+  public void testSelectLike() {
     AbstractSqlService sqlService = new AbstractSqlService() {
     };
     BeanInstanceUtil.initializeBeanInstance(sqlService);
@@ -175,7 +172,7 @@ public class StatementProcessorTest {
   }
 
   @Test
-  public void testFormData() throws Exception {
+  public void testFormData() {
     IntegerHolder countConcurrent = new IntegerHolder();
     PersonFormData formData = new PersonFormData();
     formData.getAddressTable().addRow();

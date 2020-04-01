@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +39,7 @@ public class HierarchicalTableTest {
   }
 
   @Test
-  public void testCorrectRowOrderAfterAddRows() throws Exception {
+  public void testCorrectRowOrderAfterAddRows() {
     P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
     table.init();
     List<ITableRow> rows = new ArrayList<>();
@@ -55,7 +54,7 @@ public class HierarchicalTableTest {
    * Table expect always to have all parent rows
    */
   @Test(expected = IllegalArgumentException.class)
-  public void testAddRowsWithInvalidRowList() throws Exception {
+  public void testAddRowsWithInvalidRowList() {
     P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
     table.init();
     List<ITableRow> rows = new ArrayList<>();
@@ -69,7 +68,7 @@ public class HierarchicalTableTest {
    * Table expect always to have all parent rows
    */
   @Test(expected = IllegalArgumentException.class)
-  public void testAddRowWithUnresolvedParentRow() throws Exception {
+  public void testAddRowWithUnresolvedParentRow() {
     P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
     table.init();
     List<ITableRow> rows = new ArrayList<>();
@@ -84,7 +83,7 @@ public class HierarchicalTableTest {
    * Table does a minimal sort to ensure parent child order.
    */
   @Test
-  public void testAddRow() throws Exception {
+  public void testAddRow() {
     P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
     table.init();
     List<ITableRow> rows = new ArrayList<>();
@@ -100,7 +99,7 @@ public class HierarchicalTableTest {
    * Table removes cascading removes all child rows
    */
   @Test
-  public void testRemoveParentRow() throws Exception {
+  public void testRemoveParentRow() {
     P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
     table.init();
     List<ITableRow> rows = new ArrayList<>();
@@ -167,7 +166,7 @@ public class HierarchicalTableTest {
    * </pre>
    */
   @Test
-  public void testExpandCollapseRow() throws Exception {
+  public void testExpandCollapseRow() {
     P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
     table.init();
     List<ITableRow> rows = new ArrayList<>();

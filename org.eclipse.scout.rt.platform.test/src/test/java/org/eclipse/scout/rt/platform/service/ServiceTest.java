@@ -21,7 +21,7 @@ import org.junit.runner.RunWith;
 public class ServiceTest {
 
   @Test
-  public void testFragmentRegisteredService() throws Exception {
+  public void testFragmentRegisteredService() {
     ITestService service = BEANS.get(ITestService.class);
     Assert.assertNotNull(service);
   }

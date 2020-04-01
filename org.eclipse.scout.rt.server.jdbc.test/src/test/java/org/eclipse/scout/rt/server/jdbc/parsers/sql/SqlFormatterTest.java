@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.server.jdbc.parsers.sql;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.InputStream;
 
@@ -55,7 +54,7 @@ public class SqlFormatterTest {
   }
 
   @Test
-  public void testBlankString() throws Exception {
+  public void testBlankString() {
     assertEquals("", SqlFormatter.wellform(""));
     assertEquals("", SqlFormatter.wellform(" "));
     assertEquals("", SqlFormatter.wellform("     "));

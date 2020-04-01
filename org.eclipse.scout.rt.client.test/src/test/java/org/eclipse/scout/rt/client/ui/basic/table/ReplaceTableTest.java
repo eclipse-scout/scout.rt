@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -55,7 +54,7 @@ public class ReplaceTableTest {
   }
 
   @Test
-  public void testBaseTable() throws Exception {
+  public void testBaseTable() {
     BaseTable table = new BaseTable();
 
     assertEquals(2, table.getColumnCount());
@@ -64,7 +63,7 @@ public class ReplaceTableTest {
   }
 
   @Test
-  public void testExtendedTable() throws Exception {
+  public void testExtendedTable() {
     ExtendedTable table = new ExtendedTable();
 
     assertEquals(3, table.getColumnCount());
@@ -79,7 +78,7 @@ public class ReplaceTableTest {
   }
 
   @Test
-  public void testExtendedExtendedTable() throws Exception {
+  public void testExtendedExtendedTable() {
     ExtendedExtendedTable table = new ExtendedExtendedTable();
 
     assertEquals(3, table.getColumnCount());
@@ -96,7 +95,7 @@ public class ReplaceTableTest {
   }
 
   @Test
-  public void testBaseForm() throws Exception {
+  public void testBaseForm() {
     BaseForm form = new BaseForm();
 
     assertEquals(1, form.getMainBox().getFieldCount());
@@ -113,7 +112,7 @@ public class ReplaceTableTest {
   }
 
   @Test
-  public void testExtendedForm() throws Exception {
+  public void testExtendedForm() {
     ExtendedForm form = new ExtendedForm();
 
     assertEquals(1, form.getMainBox().getFieldCount());
@@ -142,7 +141,7 @@ public class ReplaceTableTest {
   }
 
   @Test
-  public void testExtendedFormUsingTemplates() throws Exception {
+  public void testExtendedFormUsingTemplates() {
     ExtendedFormUsingTemplates form = new ExtendedFormUsingTemplates();
     assertEquals(1, form.getMainBox().getFieldCount());
     assertEquals(2, form.getTabBox().getFieldCount());
@@ -172,7 +171,7 @@ public class ReplaceTableTest {
   }
 
   @Test
-  public void testTablePage() throws Exception {
+  public void testTablePage() {
     BaseTablePage tablePage = new BaseTablePage();
     assertEquals(4, tablePage.getTable().getColumnCount());
     assertSame(tablePage.getTable().getFirstColumn(), tablePage.getTable().getColumnSet().getColumn(0));

@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.server.jdbc.builder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
@@ -74,7 +71,7 @@ public class FormDataStatementBuilderWithComposerTest {
   }
 
   @Test
-  public void testBuildComposerEntityNodeStrategyBuildConstraintsAggregationNone() throws Exception {
+  public void testBuildComposerEntityNodeStrategyBuildConstraintsAggregationNone() {
     ComposerAttributeNodeData subAttributeNode = prepareComposer(DataModelConstants.AGGREGATION_NONE);
     ComposerEntityNodeData subEntityNode = (ComposerEntityNodeData) subAttributeNode.getParentNode();
     m_builder.getAliasMapper().setNodeAlias(subEntityNode.getParentNode(), "Table", "T");
@@ -93,7 +90,7 @@ public class FormDataStatementBuilderWithComposerTest {
   }
 
   @Test
-  public void testBuildComposerEntityNodeStrategyBuildConstraintsAggregationSum() throws Exception {
+  public void testBuildComposerEntityNodeStrategyBuildConstraintsAggregationSum() {
     ComposerAttributeNodeData subAttributeNode = prepareComposer(DataModelConstants.AGGREGATION_SUM);
     ComposerEntityNodeData subEntityNode = (ComposerEntityNodeData) subAttributeNode.getParentNode();
     m_builder.getAliasMapper().setNodeAlias(subEntityNode.getParentNode(), "Table", "T");
@@ -112,7 +109,7 @@ public class FormDataStatementBuilderWithComposerTest {
   }
 
   @Test
-  public void testBuildComposerAttributeNodeStrategyBuildConstraintOfAttributeAggregationNone() throws Exception {
+  public void testBuildComposerAttributeNodeStrategyBuildConstraintOfAttributeAggregationNone() {
     ComposerAttributeNodeData subAttributeNode = prepareComposer(DataModelConstants.AGGREGATION_NONE);
     m_builder.getAliasMapper().setNodeAlias(subAttributeNode.getParentNode(), "Table", "T");
 
@@ -129,7 +126,7 @@ public class FormDataStatementBuilderWithComposerTest {
   }
 
   @Test
-  public void testBuildComposerAttributeNodeStrategyBuildConstraintOfAttributeAggregationSum() throws Exception {
+  public void testBuildComposerAttributeNodeStrategyBuildConstraintOfAttributeAggregationSum() {
     ComposerAttributeNodeData subAttributeNode = prepareComposer(DataModelConstants.AGGREGATION_SUM);
     m_builder.getAliasMapper().setNodeAlias(subAttributeNode.getParentNode(), "Table", "T");
 
@@ -146,7 +143,7 @@ public class FormDataStatementBuilderWithComposerTest {
   }
 
   @Test
-  public void testBuildComposerAttributeNodeStrategyBuildConstraintOfAttributeWithContextAggregationNone() throws Exception {
+  public void testBuildComposerAttributeNodeStrategyBuildConstraintOfAttributeWithContextAggregationNone() {
     ComposerAttributeNodeData subAttributeNode = prepareComposer(DataModelConstants.AGGREGATION_NONE);
     m_builder.getAliasMapper().setNodeAlias(subAttributeNode.getParentNode(), "Table", "T");
 
@@ -163,7 +160,7 @@ public class FormDataStatementBuilderWithComposerTest {
   }
 
   @Test
-  public void testBuildComposerAttributeNodeStrategyBuildConstraintOfAttributeWithContextAggregationSum() throws Exception {
+  public void testBuildComposerAttributeNodeStrategyBuildConstraintOfAttributeWithContextAggregationSum() {
     ComposerAttributeNodeData subAttributeNode = prepareComposer(DataModelConstants.AGGREGATION_SUM);
     m_builder.getAliasMapper().setNodeAlias(subAttributeNode.getParentNode(), "Table", "T");
 

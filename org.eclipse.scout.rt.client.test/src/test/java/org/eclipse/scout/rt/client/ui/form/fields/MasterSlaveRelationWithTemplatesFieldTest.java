@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -34,7 +32,7 @@ import org.junit.runner.RunWith;
 public class MasterSlaveRelationWithTemplatesFieldTest {
 
   @Test
-  public void testTemplateFields() throws Exception {
+  public void testTemplateFields() {
     MyForm f = new MyForm();
     try {
       f.start();
@@ -51,7 +49,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
   }
 
   @Test
-  public void testNonExistingMasterField() throws Exception {
+  public void testNonExistingMasterField() {
     NonExistingMasterFieldTestForm f = new NonExistingMasterFieldTestForm();
     try {
       f.start();

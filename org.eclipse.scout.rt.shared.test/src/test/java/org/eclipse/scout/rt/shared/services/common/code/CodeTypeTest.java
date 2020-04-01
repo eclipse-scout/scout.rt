@@ -28,7 +28,7 @@ import org.junit.runner.RunWith;
 public class CodeTypeTest {
 
   @Test
-  public void testOverwriteCode_overwriteValues() throws Exception {
+  public void testOverwriteCode_overwriteValues() {
     TestCodeType ct = new TestCodeType();
     ICode c = ct.getCode(TestCodeType.Test1Code.ID);
     assertEquals(TestCodeType.DYNAMIC_TEXT, c.getText());
@@ -47,7 +47,7 @@ public class CodeTypeTest {
   }
 
   @Test
-  public void testOverwriteCode_keepValues() throws Exception {
+  public void testOverwriteCode_keepValues() {
     TestCodeType ct = new TestCodeType();
     ICode c = ct.getCode(TestCodeType.Test2Code.ID);
     assertEquals(TestCodeType.DYNAMIC_TEXT, c.getText());

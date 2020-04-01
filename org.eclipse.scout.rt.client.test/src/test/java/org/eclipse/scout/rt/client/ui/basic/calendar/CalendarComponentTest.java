@@ -36,7 +36,7 @@ public class CalendarComponentTest {
   private static final Date DATE_2 = DateUtility.parse("02.07.2012", "dd.MM.yyyy");
 
   @Test
-  public void testOrder1() throws Exception {
+  public void testOrder1() {
     CalendarComponent comp1 = createComponent(createItem("A"));
     CalendarComponent comp2 = createComponent(createItem("B"));
     Set<CalendarComponent> set = createSet(comp1, comp2);
@@ -50,7 +50,7 @@ public class CalendarComponentTest {
   }
 
   @Test
-  public void testOrder2() throws Exception {
+  public void testOrder2() {
     CalendarComponent comp1 = createComponent(createItem("B"));
     CalendarComponent comp2 = createComponent(createItem("A"));
     Set<CalendarComponent> set = createSet(comp1, comp2);
@@ -60,7 +60,7 @@ public class CalendarComponentTest {
   }
 
   @Test
-  public void testOrder3() throws Exception {
+  public void testOrder3() {
     CalendarComponent comp1 = createComponent(createItem("C"));
     CalendarComponent comp2 = createComponent(createItem("C"));
     Set<CalendarComponent> set = createSet(comp1, comp2);
@@ -69,7 +69,7 @@ public class CalendarComponentTest {
   }
 
   @Test
-  public void testDateOrder1() throws Exception {
+  public void testDateOrder1() {
     CalendarComponent comp1 = createComponent(createItem(DATE_1, "B"));
     CalendarComponent comp2 = createComponent(createItem("A"));
     Set<CalendarComponent> set = createSet(comp1, comp2);
@@ -79,7 +79,7 @@ public class CalendarComponentTest {
   }
 
   @Test
-  public void testDateOrder2() throws Exception {
+  public void testDateOrder2() {
     CalendarComponent comp1 = createComponent(createItem(DATE_2, "B"));
     CalendarComponent comp2 = createComponent(createItem(DATE_1, "A"));
     Set<CalendarComponent> set = createSet(comp1, comp2);
@@ -89,7 +89,7 @@ public class CalendarComponentTest {
   }
 
   @Test
-  public void testDateOrder3() throws Exception {
+  public void testDateOrder3() {
     CalendarComponent comp1 = createComponent(createItem(DATE_2, null));
     CalendarComponent comp2 = createComponent(createItem(DATE_2, null));
     Set<CalendarComponent> set = createSet(comp1, comp2);
@@ -98,7 +98,7 @@ public class CalendarComponentTest {
   }
 
   @Test
-  public void testCoveredDayRange1() throws Exception {
+  public void testCoveredDayRange1() {
     ICalendarAppointment appointment = new CalendarAppointment(UUID.randomUUID(), null, DATE_1, DATE_2, false, "Subject", "Body", null);
     CalendarComponent component = createComponent(appointment);
     Range<Date> coveredDayRange = component.getCoveredDaysRange();
@@ -108,7 +108,7 @@ public class CalendarComponentTest {
   }
 
   @Test
-  public void testCoveredDayRange2() throws Exception {
+  public void testCoveredDayRange2() {
     ICalendarAppointment appointment = new CalendarAppointment(UUID.randomUUID(), null, DATE_1, null, false, "Subject", "Body", null);
     CalendarComponent component = createComponent(appointment);
     Range<Date> coveredDayRange = component.getCoveredDaysRange();
@@ -118,7 +118,7 @@ public class CalendarComponentTest {
   }
 
   @Test
-  public void testCoveredDayRange3() throws Exception {
+  public void testCoveredDayRange3() {
     ICalendarAppointment appointment = new CalendarAppointment(UUID.randomUUID(), null, null, DATE_2, false, "Subject", "Body", null);
     CalendarComponent component = createComponent(appointment);
     Range<Date> coveredDayRange = component.getCoveredDaysRange();

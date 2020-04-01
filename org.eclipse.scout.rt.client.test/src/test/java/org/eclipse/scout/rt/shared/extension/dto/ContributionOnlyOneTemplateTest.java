@@ -24,7 +24,7 @@ import org.junit.Test;
 
 public class ContributionOnlyOneTemplateTest extends AbstractLocalExtensionTestCase {
   @Test
-  public void testContributeToDtoInOnlyOneTemplate() throws Exception {
+  public void testContributeToDtoInOnlyOneTemplate() {
     IExtensionRegistry extensionRegistry = BEANS.get(IExtensionRegistry.class);
     extensionRegistry.register(PropertyExtensionData.class, new ClassIdentifier(SecondUseOfTemplateBox.class, SecondStringInTemplate.class));
     doTest();

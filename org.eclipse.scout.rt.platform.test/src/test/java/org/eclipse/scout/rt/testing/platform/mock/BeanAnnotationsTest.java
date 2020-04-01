@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.testing.platform.mock;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
@@ -51,7 +50,7 @@ public class BeanAnnotationsTest {
   }
 
   @Test
-  public void testClearEmptyBA() throws Exception {
+  public void testClearEmptyBA() {
     BeanAnnotations ba = new BeanAnnotations();
     ba.clear();
   }

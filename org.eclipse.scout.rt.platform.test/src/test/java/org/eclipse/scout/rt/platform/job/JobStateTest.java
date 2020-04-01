@@ -293,7 +293,7 @@ public class JobStateTest {
 
   @Test
   @Times(100) // regression
-  public void testBlockedAndInterrupted() throws ThreadInterruptedError, java.lang.InterruptedException {
+  public void testBlockedAndInterrupted() throws ThreadInterruptedError {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
@@ -375,7 +375,7 @@ public class JobStateTest {
 
   @Test
   @Times(100) // regression
-  public void testBlockedAndTimeout() throws ThreadInterruptedError, java.lang.InterruptedException {
+  public void testBlockedAndTimeout() throws ThreadInterruptedError {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
@@ -451,7 +451,7 @@ public class JobStateTest {
   }
 
   @Test
-  public void testScheduleAtFixedRate() throws ThreadInterruptedError, java.lang.InterruptedException {
+  public void testScheduleAtFixedRate() throws ThreadInterruptedError {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
@@ -510,7 +510,7 @@ public class JobStateTest {
   }
 
   @Test
-  public void testScheduleAtFixedRateAndMutex() throws ThreadInterruptedError, java.lang.InterruptedException {
+  public void testScheduleAtFixedRateAndMutex() throws ThreadInterruptedError {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
@@ -582,7 +582,7 @@ public class JobStateTest {
   }
 
   @Test
-  public void testScheduleWithFixedDelay() throws ThreadInterruptedError, java.lang.InterruptedException {
+  public void testScheduleWithFixedDelay() throws ThreadInterruptedError {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
@@ -636,7 +636,7 @@ public class JobStateTest {
   }
 
   @Test
-  public void testScheduleWithFixedDelayAndMutex() throws ThreadInterruptedError, java.lang.InterruptedException {
+  public void testScheduleWithFixedDelayAndMutex() throws ThreadInterruptedError {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 

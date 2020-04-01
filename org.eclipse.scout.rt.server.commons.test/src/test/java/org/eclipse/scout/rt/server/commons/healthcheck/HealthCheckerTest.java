@@ -192,7 +192,7 @@ public class HealthCheckerTest {
       int counter = 0;
 
       @Override
-      public void run() throws Exception {
+      public void run() {
         counter++;
         if (throwException.get()) {
           throw new ArrayIndexOutOfBoundsException(counter);

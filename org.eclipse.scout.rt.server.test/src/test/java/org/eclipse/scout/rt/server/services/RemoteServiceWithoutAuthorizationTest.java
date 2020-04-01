@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.server.services;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Method;
 
@@ -76,7 +75,7 @@ public class RemoteServiceWithoutAuthorizationTest {
       super();
     }
 
-    public boolean test(Class<?> interfaceClass, Method interfaceMethod, Class<?> implClass) throws Exception {
+    public boolean test(Class<?> interfaceClass, Method interfaceMethod, Class<?> implClass) {
       return mustAuthorize(interfaceClass, implClass, interfaceMethod, new Object[0]);
     }
   }

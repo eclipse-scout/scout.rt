@@ -41,16 +41,16 @@ public class FormWaitForTest {
   private static final Logger LOG = LoggerFactory.getLogger(FormWaitForTest.class);
 
   @Test
-  public void testStartAndWait_Dialog() throws Exception {
+  public void testStartAndWait_Dialog() {
     testStartAndWaitImpl(true, IForm.DISPLAY_HINT_DIALOG, null);
   }
 
   @Test
-  public void testStartAndWait_View() throws Exception {
+  public void testStartAndWait_View() {
     testStartAndWaitImpl(true, IForm.DISPLAY_HINT_DIALOG, null);
   }
 
-  protected void testStartAndWaitImpl(final boolean modal, final int displayHint, final String viewId) throws Exception {
+  protected void testStartAndWaitImpl(final boolean modal, final int displayHint, final String viewId) {
     final ArrayList<Integer> testSequence = new ArrayList<>();
     DynamicGroupBox mainBox = new DynamicGroupBox(
         new DynamicStringField("f1", "First Name"),

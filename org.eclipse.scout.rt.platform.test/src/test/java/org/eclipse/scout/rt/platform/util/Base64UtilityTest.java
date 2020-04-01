@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.nio.charset.StandardCharsets;
 
@@ -23,7 +22,7 @@ public class Base64UtilityTest {
    * This tests just a small set of byte lengths.
    */
   @Test
-  public void testEncodeDecodeMultipleByteLength() throws Exception {
+  public void testEncodeDecodeMultipleByteLength() {
     for (int i = 0; i < 1000; i++) {
       byte[] byteArray = new byte[i];
       for (int j = 0; j < i; j++) {
@@ -41,49 +40,49 @@ public class Base64UtilityTest {
   }
 
   @Test
-  public void encodeDecodeTestShort() throws Exception {
+  public void encodeDecodeTestShort() {
     String encode = Base64Utility.encode(TEST_STRING_SHORT.getBytes());
     byte[] decode = Base64Utility.decode(encode);
     assertArrayEquals(TEST_STRING_SHORT.getBytes(), decode);
   }
 
   @Test
-  public void encodeDecodeUrlSafeTestShort() throws Exception {
+  public void encodeDecodeUrlSafeTestShort() {
     String encode = Base64Utility.encodeUrlSafe(TEST_STRING_SHORT.getBytes());
     byte[] decode = Base64Utility.decodeUrlSafe(encode);
     assertArrayEquals(TEST_STRING_SHORT.getBytes(), decode);
   }
 
   @Test
-  public void encodeDecodeTestMiddle() throws Exception {
+  public void encodeDecodeTestMiddle() {
     String encode = Base64Utility.encode(TEST_STRING_MIDDLE.getBytes());
     byte[] decode = Base64Utility.decode(encode);
     assertArrayEquals(TEST_STRING_MIDDLE.getBytes(), decode);
   }
 
   @Test
-  public void encodeDecodeUrlSafeTestMiddle() throws Exception {
+  public void encodeDecodeUrlSafeTestMiddle() {
     String encode = Base64Utility.encodeUrlSafe(TEST_STRING_MIDDLE.getBytes());
     byte[] decode = Base64Utility.decodeUrlSafe(encode);
     assertArrayEquals(TEST_STRING_MIDDLE.getBytes(), decode);
   }
 
   @Test
-  public void encodeDecodeTestLong() throws Exception {
+  public void encodeDecodeTestLong() {
     String encode = Base64Utility.encode(TEST_STRING_LONG.getBytes());
     byte[] decode = Base64Utility.decode(encode);
     assertArrayEquals(TEST_STRING_LONG.getBytes(), decode);
   }
 
   @Test
-  public void encodeDecodeUrlSafeTestLong() throws Exception {
+  public void encodeDecodeUrlSafeTestLong() {
     String encode = Base64Utility.encodeUrlSafe(TEST_STRING_LONG.getBytes());
     byte[] decode = Base64Utility.decodeUrlSafe(encode);
     assertArrayEquals(TEST_STRING_LONG.getBytes(), decode);
   }
 
   @Test
-  public void encodeDecodeTestUrlSafe() throws Exception {
+  public void encodeDecodeTestUrlSafe() {
     String encode = Base64Utility.encodeUrlSafe(TEST_STRING_URL.getBytes(StandardCharsets.UTF_8));
     assertEquals(TEST_BASE64_DATA_OF_STRING_URL_SAFE, encode);
 
@@ -92,7 +91,7 @@ public class Base64UtilityTest {
   }
 
   @Test
-  public void encodeDecodeTestUrl() throws Exception {
+  public void encodeDecodeTestUrl() {
     String encode = Base64Utility.encode(TEST_STRING_URL.getBytes(StandardCharsets.UTF_8));
     assertEquals(TEST_BASE64_DATA_OF_STRING_URL_UNSAFE, encode);
 
@@ -101,7 +100,7 @@ public class Base64UtilityTest {
   }
 
   @Test
-  public void encodeDecodeTestLongAndStringChangedToBlocks() throws Exception {
+  public void encodeDecodeTestLongAndStringChangedToBlocks() {
     String encode = Base64Utility.encode(TEST_STRING_LONG.getBytes());
     encode = StringUtility.wrapText(encode, 80);
     byte[] decode = Base64Utility.decode(encode);
@@ -109,68 +108,68 @@ public class Base64UtilityTest {
   }
 
   @Test
-  public void encodeTestShortAndCheckAgainstBase64String() throws Exception {
+  public void encodeTestShortAndCheckAgainstBase64String() {
     String encode = Base64Utility.encode(TEST_STRING_SHORT.getBytes());
     assertEquals(TEST_BASE64_DATA_OF_STRING_SHORT, encode);
   }
 
   @Test
-  public void encodeTestMiddleAndCheckAgainstBase64String() throws Exception {
+  public void encodeTestMiddleAndCheckAgainstBase64String() {
     String encode = Base64Utility.encode(TEST_STRING_MIDDLE.getBytes());
     assertEquals(TEST_BASE64_DATA_OF_STRING_MIDDLE, encode);
   }
 
   @Test
-  public void encodeTestUrlUnsafeAndCheckAgainstBase64String() throws Exception {
+  public void encodeTestUrlUnsafeAndCheckAgainstBase64String() {
     String encode = Base64Utility.encode(TEST_STRING_URL.getBytes());
     assertEquals(TEST_BASE64_DATA_OF_STRING_URL_UNSAFE, encode);
   }
 
   @Test
-  public void encodeTestUrlSafeAndCheckAgainstBase64String() throws Exception {
+  public void encodeTestUrlSafeAndCheckAgainstBase64String() {
     String encode = Base64Utility.encodeUrlSafe(TEST_STRING_URL.getBytes());
     assertEquals(TEST_BASE64_DATA_OF_STRING_URL_SAFE, encode);
   }
 
   @Test
-  public void encodeTestLongAndCheckAgainstBase64String() throws Exception {
+  public void encodeTestLongAndCheckAgainstBase64String() {
     String encode = Base64Utility.encode(TEST_STRING_LONG.getBytes());
     assertEquals(TEST_BASE64_DATA_STRING_OF_STRING_LONG, encode);
   }
 
   @Test
-  public void encodeTestLongAndStringChangedToBlocks() throws Exception {
+  public void encodeTestLongAndStringChangedToBlocks() {
     String encode = Base64Utility.encode(TEST_STRING_LONG.getBytes());
     encode = StringUtility.wrapText(encode, 76);
     assertEquals(TEST_BASE64_DATA_BLOCK_OF_STRING_LONG, encode);
   }
 
   @Test
-  public void decodeTestShortBase64String() throws Exception {
+  public void decodeTestShortBase64String() {
     byte[] decode = Base64Utility.decode(TEST_BASE64_DATA_OF_STRING_SHORT);
     assertArrayEquals(TEST_STRING_SHORT.getBytes(), decode);
   }
 
   @Test
-  public void decodeTestMiddleBase64String() throws Exception {
+  public void decodeTestMiddleBase64String() {
     byte[] decode = Base64Utility.decode(TEST_BASE64_DATA_OF_STRING_MIDDLE);
     assertArrayEquals(TEST_STRING_MIDDLE.getBytes(), decode);
   }
 
   @Test
-  public void decodeTestLongBase64String() throws Exception {
+  public void decodeTestLongBase64String() {
     byte[] decode = Base64Utility.decode(TEST_BASE64_DATA_STRING_OF_STRING_LONG);
     assertArrayEquals(TEST_STRING_LONG.getBytes(), decode);
   }
 
   @Test
-  public void decodeTestLongBlockBase64String() throws Exception {
+  public void decodeTestLongBlockBase64String() {
     byte[] decode = Base64Utility.decode(TEST_BASE64_DATA_BLOCK_OF_STRING_LONG);
     assertArrayEquals(TEST_STRING_LONG.getBytes(), decode);
   }
 
   @Test
-  public void decodeTestUrlSafe() throws Exception {
+  public void decodeTestUrlSafe() {
     byte[] decoded = Base64Utility.decodeUrlSafe(TEST_BASE64_DATA_OF_STRING_URL_SAFE);
     assertEquals(TEST_STRING_URL, new String(decoded, StandardCharsets.UTF_8));
   }

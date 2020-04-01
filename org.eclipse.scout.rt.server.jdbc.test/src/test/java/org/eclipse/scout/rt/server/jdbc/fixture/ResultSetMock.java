@@ -15,7 +15,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.SQLWarning;
 
 /**
@@ -57,7 +56,7 @@ public class ResultSetMock extends VerboseMock implements InvocationHandler /*, 
     return m.invoke(this, args);
   }
 
-  public boolean next() throws SQLException {
+  public boolean next() {
     m_row++;
     m_wasNull = false;
     if (m_resultData != null && m_row < m_resultData.length) {
@@ -66,7 +65,7 @@ public class ResultSetMock extends VerboseMock implements InvocationHandler /*, 
     return false;
   }
 
-  private Object getObjectInternal(int columnIndex, Class<?> type) throws SQLException {
+  private Object getObjectInternal(int columnIndex, Class<?> type) {
     Object o = m_resultData[m_row][columnIndex - 1];
     m_wasNull = (o == null);
     if (o == null && type.isPrimitive()) {
@@ -95,31 +94,31 @@ public class ResultSetMock extends VerboseMock implements InvocationHandler /*, 
     return o;
   }
 
-  public ResultSetMetaData getMetaData() throws SQLException {
+  public ResultSetMetaData getMetaData() {
     return m_rsMeta;
   }
 
-  public boolean wasNull() throws SQLException {
+  public boolean wasNull() {
     return m_wasNull;
   }
 
-  public void close() throws SQLException {
+  public void close() {
   }
 
-  public SQLWarning getWarnings() throws SQLException {
+  public SQLWarning getWarnings() {
     return null;
   }
 
-  public void clearWarnings() throws SQLException {
+  public void clearWarnings() {
   }
 
-  public int getFetchSize() throws SQLException {
+  public int getFetchSize() {
     if (m_resultData != null) {
       return m_resultData.length;
     }
     return 0;
   }
 
-  public void setFetchSize(int rows) throws SQLException {
+  public void setFetchSize(int rows) {
   }
 }

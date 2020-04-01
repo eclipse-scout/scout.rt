@@ -35,7 +35,7 @@ public class SelectIntoTest {
   private List<IBean<?>> m_beans;
 
   @Before
-  public void before() throws Exception {
+  public void before() {
     SqlServiceMock sqlService = new SqlServiceMock();
     m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(ISqlService.class).withInitialInstance(sqlService).withApplicationScoped(true));
   }
@@ -46,7 +46,7 @@ public class SelectIntoTest {
   }
 
   @Test(expected = ProcessingException.class)
-  public void testMissingOutputBind() throws Exception {
+  public void testMissingOutputBind() {
     BEANS.get(ISqlService.class).selectInto("SELECT A FROM T WHERE A = :a INTO :b", new NVPair("a", 1));
   }
 }

@@ -43,7 +43,7 @@ public class BatchNormalizerTest {
   private IFruitLookupService m_lookupService;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     Answer answer = (Answer<List<ILookupRow<Object>>>) invocation -> {
       Object[] args = invocation.getArguments();
       ILookupCall<?> call = (ILookupCall<?>) args[0];
@@ -142,7 +142,7 @@ public class BatchNormalizerTest {
     testInternal(batchCall, 10 + 500, 10 + 500, 0, 1000);
   }
 
-  private void testInternal(BatchLookupCall batchCall, int expectedNormalizedSize, int expectedServerInvocations, int expectedNullArrayCount, int expectedTotalResultRowCount) throws Exception {
+  private void testInternal(BatchLookupCall batchCall, int expectedNormalizedSize, int expectedServerInvocations, int expectedNullArrayCount, int expectedTotalResultRowCount) {
     //
     BatchLookupNormalizer normalizer = new BatchLookupNormalizer();
     List<ILookupCall<?>> callArray = batchCall.getCallBatch();

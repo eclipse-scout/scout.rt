@@ -65,7 +65,7 @@ public class ClusterSynchronizationServiceTest {
   private List<IBean<?>> m_beans = new ArrayList<>();
 
   @Before
-  public void before() throws Exception {
+  public void before() {
     m_nullMomImplementorSpy = spy(NullMomImplementor.class);
     m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(TestClusterMom.class)));
     m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(NullMomImplementor.class).withProducer((IBeanInstanceProducer<IMomImplementor>) bean -> m_nullMomImplementorSpy)));
@@ -113,7 +113,7 @@ public class ClusterSynchronizationServiceTest {
    * Tests that no message is sent, if the transaction is not committed.
    */
   @Test
-  public void testSendTransactional_NotCommitted() throws Exception {
+  public void testSendTransactional_NotCommitted() {
     m_svc.publishTransactional("Testnotification");
     assertNoMessageSent();
   }
@@ -122,7 +122,7 @@ public class ClusterSynchronizationServiceTest {
    * Tests that no message is sent, if the transaction is not committed.
    */
   @Test
-  public void testSendTransactional_Committed() throws Exception {
+  public void testSendTransactional_Committed() {
     m_svc.publishTransactional("Testnotification");
     ITransaction.CURRENT.get().commitPhase1();
     ITransaction.CURRENT.get().commitPhase2();
@@ -130,7 +130,7 @@ public class ClusterSynchronizationServiceTest {
   }
 
   @Test
-  public void testSendTransactional_Rollback() throws Exception {
+  public void testSendTransactional_Rollback() {
     m_svc.publishTransactional("Testnotification");
     ITransaction.CURRENT.get().rollback();
     ITransaction.CURRENT.get().commitPhase1();
@@ -139,7 +139,7 @@ public class ClusterSynchronizationServiceTest {
   }
 
   @Test
-  public void testTransactionalSendMultipleMessages() throws Exception {
+  public void testTransactionalSendMultipleMessages() {
     ArgumentCaptor<ClusterNotificationMessage> msgCaptor = ArgumentCaptor.forClass(ClusterNotificationMessage.class);
     doNothing().when(m_nullMomImplementorSpy).publish(eq(IClusterMomDestinations.CLUSTER_NOTIFICATION_TOPIC), msgCaptor.capture(), any(PublishInput.class));
 
@@ -158,7 +158,7 @@ public class ClusterSynchronizationServiceTest {
   }
 
   @Test
-  public void testDisabledSendTransactional() throws Exception {
+  public void testDisabledSendTransactional() {
     m_svc.disable();
     m_svc.publishTransactional("Testnotification");
     ITransaction.CURRENT.get().commitPhase1();
@@ -167,14 +167,14 @@ public class ClusterSynchronizationServiceTest {
   }
 
   @Test
-  public void testDisabledSend_NoTransaction() throws Exception {
+  public void testDisabledSend_NoTransaction() {
     m_svc.disable();
     m_svc.publish("Testnotification");
     assertNoMessageSent();
   }
 
   @Test
-  public void testTransactionalWithCoalesce() throws Exception {
+  public void testTransactionalWithCoalesce() {
     ArgumentCaptor<ClusterNotificationMessage> msgCaptor = ArgumentCaptor.forClass(ClusterNotificationMessage.class);
     doNothing().when(m_nullMomImplementorSpy).publish(eq(IClusterMomDestinations.CLUSTER_NOTIFICATION_TOPIC), msgCaptor.capture(), any(PublishInput.class));
 

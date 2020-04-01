@@ -72,7 +72,7 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
     assertRowMenusExistOnTablePageNode(outline);
   }
 
-  private static void assertRowMenusExistOnTablePageNode(IOutline outline) throws Exception {
+  private static void assertRowMenusExistOnTablePageNode(IOutline outline) {
     outline.selectFirstNode();
 
     IPageWithTable<?> activePage = (IPageWithTable<?>) outline.getActivePage();
@@ -113,7 +113,7 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
   }
 
   @SafeVarargs
-  private static List<IMenu> resolveMenusOfPageWithTable(IPageWithTable<?> page, Class<? extends IMenu>... menuClasses) throws Exception {
+  private static List<IMenu> resolveMenusOfPageWithTable(IPageWithTable<?> page, Class<? extends IMenu>... menuClasses) {
     List<IMenu> resolvedMenus = new LinkedList<>();
 
     for (Class<? extends IMenu> menuClass : menuClasses) {

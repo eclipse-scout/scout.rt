@@ -39,7 +39,7 @@ public class ServiceWithSessionInterceptorTest {
   }
 
   @Test
-  public void testService() throws Exception {
+  public void testService() {
     ServerRunContexts.empty().withSession(m_serverSession).run(() -> runInServerRunContext());
   }
 

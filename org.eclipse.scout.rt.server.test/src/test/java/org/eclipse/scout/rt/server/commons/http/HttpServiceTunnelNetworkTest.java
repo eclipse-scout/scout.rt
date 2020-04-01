@@ -100,7 +100,7 @@ public class HttpServiceTunnelNetworkTest {
   }
 
   @Test
-  public void testPostWithChunkedResponseAndSuccess() throws IOException, NoSuchMethodException, SecurityException {
+  public void testPostWithChunkedResponseAndSuccess() throws SecurityException {
     m_client.withSocketReadInterceptor(() -> new ISocketReadInterceptor() {
       @Override
       public int read(InputStream in, byte[] buf, int off, int len) throws IOException {
@@ -175,14 +175,14 @@ public class HttpServiceTunnelNetworkTest {
    * tunnel - calling {@link IRunMonitorCancelService#cancel(long)}.
    */
   @Test
-  public void testPostWithChunkedResponseThatIsCancelled() throws IOException, NoSuchMethodException, SecurityException, InterruptedException {
+  public void testPostWithChunkedResponseThatIsCancelled() throws SecurityException {
     m_client.withSocketReadInterceptor(() -> new ISocketReadInterceptor() {
       int m_contentStart;
       int m_truncatedContentLength;
       int m_waitAfterContentBytes;
       final StringBuffer m_buf = new StringBuffer();
 
-      private int intercept(int b) throws IOException {
+      private int intercept(int b) {
         m_clientRead.append((char) b);
         m_buf.append((char) b);
 

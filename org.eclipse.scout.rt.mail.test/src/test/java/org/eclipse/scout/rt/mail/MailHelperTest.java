@@ -68,7 +68,7 @@ public class MailHelperTest {
    *           ,MessagingException
    */
   @Test
-  public void testMimeMessageWithoutSender() throws MessagingException {
+  public void testMimeMessageWithoutSender() {
     MailMessage definition = new MailMessage().withBodyPlainText("Body");
     MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(definition);
     assertNotNull(message);
@@ -281,7 +281,7 @@ public class MailHelperTest {
   }
 
   @Test
-  public void testMimeMessageDefinitionAttachments() throws Exception {
+  public void testMimeMessageDefinitionAttachments() {
     final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
 
     MailMessage definition = new MailMessage();
@@ -302,7 +302,7 @@ public class MailHelperTest {
   }
 
   @Test
-  public void testMimeMessageDefinitionInlineAttachments() throws Exception {
+  public void testMimeMessageDefinitionInlineAttachments() {
     final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
 
     MailMessage definition = new MailMessage();
@@ -362,7 +362,7 @@ public class MailHelperTest {
   }
 
   @Test(expected = ProcessingException.class)
-  public void testInternetAddress3() throws Exception {
+  public void testInternetAddress3() {
     // test an invalid address, expect a ProcessingException
     MailParticipant participant = new MailParticipant()
         .withEmail("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com")
@@ -390,14 +390,14 @@ public class MailHelperTest {
   }
 
   @Test
-  public void testInternetAddressEmpty() throws Exception {
+  public void testInternetAddressEmpty() {
     assertNull(BEANS.get(MailHelper.class).createInternetAddress((String) null));
     assertNull(BEANS.get(MailHelper.class).createInternetAddress((MailParticipant) null));
     assertNull(BEANS.get(MailHelper.class).createInternetAddress(""));
   }
 
   @Test(expected = ProcessingException.class)
-  public void testInternetAddressInvalid() throws Exception {
+  public void testInternetAddressInvalid() {
     assertNull(BEANS.get(MailHelper.class).createInternetAddress("foo@bar@foo.de"));
   }
 
@@ -623,7 +623,7 @@ public class MailHelperTest {
   }
 
   @Test
-  public void testGetPlainText() throws MessagingException {
+  public void testGetPlainText() {
     MailHelper mailHelper = BEANS.get(MailHelper.class);
 
     MimeMessage mimeMessage = mailHelper.createMimeMessage(BEANS.get(MailMessage.class).withBodyPlainText("plain text body\näpfel\nŻółw").withBodyHtml("<html><body>html body<br>äpfel<br>Żółw<body></html>"));
@@ -631,7 +631,7 @@ public class MailHelperTest {
   }
 
   @Test
-  public void testGetHtmlBody() throws MessagingException {
+  public void testGetHtmlBody() {
     MailHelper mailHelper = BEANS.get(MailHelper.class);
 
     MimeMessage mimeMessage = mailHelper.createMimeMessage(BEANS.get(MailMessage.class).withBodyPlainText("plain text body\näpfel\nŻółw").withBodyHtml("<html><body>html body<br>äpfel<br>Żółw<body></html>"));
@@ -639,7 +639,7 @@ public class MailHelperTest {
   }
 
   @Test
-  public void testReadContentAsString() throws MessagingException {
+  public void testReadContentAsString() {
     MailHelper mailHelper = BEANS.get(MailHelper.class);
 
     MimeMessage mimeMessage = mailHelper.createMimeMessage(BEANS.get(MailMessage.class).withBodyPlainText("plain text body\näpfel\nŻółw").withBodyHtml("<html><body>html body<br>äpfel<br>Żółw<body></html>"));
@@ -649,12 +649,12 @@ public class MailHelperTest {
   }
 
   @Test(expected = AssertionException.class)
-  public void testGetAttachmentFilenameNoPart() throws MessagingException, UnsupportedEncodingException {
+  public void testGetAttachmentFilenameNoPart() {
     BEANS.get(MailHelper.class).getAttachmentFilename(null, s -> s);
   }
 
   @Test(expected = AssertionException.class)
-  public void testGetAttachmentFilenameNoDefaultFilenameFunction() throws MessagingException, UnsupportedEncodingException {
+  public void testGetAttachmentFilenameNoDefaultFilenameFunction() {
     MimeBodyPart part = new MimeBodyPart();
     BEANS.get(MailHelper.class).getAttachmentFilename(part, null);
   }
@@ -678,7 +678,7 @@ public class MailHelperTest {
   }
 
   @Test
-  public void testDecodeAttachmentFilename() throws MessagingException {
+  public void testDecodeAttachmentFilename() {
     MailHelper mailHelper = BEANS.get(MailHelper.class);
 
     assertNull(mailHelper.decodeAttachmentFilename(null));
@@ -692,7 +692,7 @@ public class MailHelperTest {
   }
 
   @Test
-  public void testGuessAttachmentFileExtension() throws MessagingException {
+  public void testGuessAttachmentFileExtension() {
     MailHelper mailHelper = BEANS.get(MailHelper.class);
 
     assertNull(mailHelper.guessAttachmentFileExtension(null));
@@ -708,7 +708,7 @@ public class MailHelperTest {
   }
 
   @Test
-  public void testEmptyContentDisposition() throws MessagingException {
+  public void testEmptyContentDisposition() {
     String eml = ""
         + "To: lorem@exampleorg\n"
         + "From: ipsum@example.org\n"

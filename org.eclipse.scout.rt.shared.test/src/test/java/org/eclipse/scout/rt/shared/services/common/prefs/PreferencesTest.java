@@ -28,7 +28,7 @@ import org.junit.runner.RunWith;
 public class PreferencesTest {
 
   @Test
-  public void test() throws Exception {
+  public void test() {
     Preferences prefs = new Preferences("X", null);
 
     prefs.put("any", "Any");
@@ -83,7 +83,7 @@ public class PreferencesTest {
   }
 
   @Test
-  public void testPutByteArray() throws Exception {
+  public void testPutByteArray() {
     Preferences prefs = new Preferences("X", null);
     assertNull(prefs.getByteArray("byte", null));
     prefs.putByteArray("byte", new byte[]{(byte) 1, (byte) 2, (byte) 3});
@@ -95,13 +95,13 @@ public class PreferencesTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testPutNullKey() throws Exception {
+  public void testPutNullKey() {
     Preferences prefs = new Preferences("X", null);
     prefs.put(null, "Any");
   }
 
   @Test
-  public void testPutEmptyKey() throws Exception {
+  public void testPutEmptyKey() {
     Preferences prefs = new Preferences("X", null);
     prefs.put("", "Any");
     assertEquals("Any", prefs.get("", null));

@@ -248,7 +248,7 @@ public class AbstractFormTest {
   }
 
   @Test
-  public void testGetSetTitle() throws Exception {
+  public void testGetSetTitle() {
     final boolean[] called = {false};
     IForm form = new TestFormWithClassId();
     PropertyChangeListener l = evt -> {
@@ -263,7 +263,7 @@ public class AbstractFormTest {
   }
 
   @Test
-  public void testGetSetSubTitle() throws Exception {
+  public void testGetSetSubTitle() {
     final boolean[] called = {false};
     IForm form = new TestFormWithClassId();
     PropertyChangeListener l = evt -> {
@@ -278,7 +278,7 @@ public class AbstractFormTest {
   }
 
   @Test
-  public void testCloseInInitForm() throws Exception {
+  public void testCloseInInitForm() {
     // call doClose in execInitForm
     AbstractForm form = new TestForm(true);
     assertTrue(form.isFormStartable());
@@ -297,7 +297,7 @@ public class AbstractFormTest {
   }
 
   @Test
-  public void testStartedStateDuringInitialisation() throws Exception {
+  public void testStartedStateDuringInitialisation() {
     final Boolean[] resultStartable = {null};
     final Boolean[] resultStarted = {null};
     final Boolean[] resultBlocking = {null};
@@ -316,7 +316,7 @@ public class AbstractFormTest {
   }
 
   @Test
-  public void testFormEventResetComplete() throws Exception {
+  public void testFormEventResetComplete() {
     final Boolean[] called = {false};
     final AbstractForm form = new TestForm(false);
     form.addFormListener(e -> {

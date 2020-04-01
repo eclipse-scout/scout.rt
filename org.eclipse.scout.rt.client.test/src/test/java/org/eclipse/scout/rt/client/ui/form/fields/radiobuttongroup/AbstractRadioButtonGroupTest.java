@@ -58,7 +58,7 @@ public class AbstractRadioButtonGroupTest {
   private P_StandardRadioButtonGroup m_group;
 
   @BeforeClass
-  public static void beforeClass() throws Exception {
+  public static void beforeClass() {
     m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(P_CompanyLookupCall.class));
   }
 

@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.server.commons.http;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,7 +80,7 @@ public class HttpRetryTest {
     m_server.stop();
   }
 
-  private void fixtureServletGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  private void fixtureServletGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     servletGetLog.add(req.getHeader(CORRELATION_ID));
     resp.setContentType("text/plain;charset=UTF-8");
     resp.getOutputStream().println("Hello " + req.getParameter("foo"));
@@ -180,7 +177,7 @@ public class HttpRetryTest {
       }
 
       @Override
-      public long getLength() throws IOException {
+      public long getLength() {
         return 3;
       }
     });
@@ -228,7 +225,7 @@ public class HttpRetryTest {
       }
 
       @Override
-      public long getLength() throws IOException {
+      public long getLength() {
         return 3;
       }
     });
@@ -285,7 +282,7 @@ public class HttpRetryTest {
       }
 
       @Override
-      public long getLength() throws IOException {
+      public long getLength() {
         return 3;
       }
     });
@@ -334,7 +331,7 @@ public class HttpRetryTest {
       }
 
       @Override
-      public long getLength() throws IOException {
+      public long getLength() {
         return 3;
       }
     });
@@ -376,7 +373,7 @@ public class HttpRetryTest {
       }
 
       @Override
-      public long getLength() throws IOException {
+      public long getLength() {
         return 3;
       }
     });
@@ -415,7 +412,7 @@ public class HttpRetryTest {
       }
 
       @Override
-      public long getLength() throws IOException {
+      public long getLength() {
         return 3;
       }
     });

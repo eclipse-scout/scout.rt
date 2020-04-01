@@ -51,7 +51,7 @@ public class PageWithTableGroupingTest {
   }
 
   @Test
-  public void testGroupingBasic() throws Exception {
+  public void testGroupingBasic() {
 
     //reset columns
     table.resetColumns();
@@ -75,7 +75,7 @@ public class PageWithTableGroupingTest {
   }
 
   @Test
-  public void testGroupingVisibility() throws Exception {
+  public void testGroupingVisibility() {
 
     //reset columns
     table.resetColumns();
@@ -94,7 +94,7 @@ public class PageWithTableGroupingTest {
   }
 
   @Test
-  public void testGroupingPreferences() throws Exception {
+  public void testGroupingPreferences() {
 
     //reset columns
     table.resetColumns();

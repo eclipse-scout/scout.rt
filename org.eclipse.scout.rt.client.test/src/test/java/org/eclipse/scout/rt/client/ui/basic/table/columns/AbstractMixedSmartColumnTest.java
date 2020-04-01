@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -127,7 +123,7 @@ public class AbstractMixedSmartColumnTest {
   }
 
   @Test
-  public void testCompleteEdit_ParsingError() throws Exception {
+  public void testCompleteEdit_ParsingError() {
     assertCompleteEditWithErrors(false, ParsingFailedStatus.class);
   }
 
@@ -136,11 +132,11 @@ public class AbstractMixedSmartColumnTest {
    * was not displayed in the editable cell. Its basically the same test
    */
   @Test
-  public void testCompleteEdit_ValidationError() throws Exception {
+  public void testCompleteEdit_ValidationError() {
     assertCompleteEditWithErrors(true, ValidationFailedStatus.class);
   }
 
-  private void assertCompleteEditWithErrors(boolean useUiFacade, Class<? extends ScoutFieldStatus> statusClass) throws Exception {
+  private void assertCompleteEditWithErrors(boolean useUiFacade, Class<? extends ScoutFieldStatus> statusClass) {
     P_Table table = new P_Table();
     table.addRowsByArray(new Long[]{3L});
     ISmartField<?> field = (ISmartField<?>) table.getEditableSmartColumn().prepareEdit(table.getRow(0));

@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.text.SimpleDateFormat;
@@ -74,7 +72,7 @@ public class AbstractDateColumnTest {
   }
 
   @Test
-  public void testConfiguredDateFormat() throws Exception {
+  public void testConfiguredDateFormat() {
     Date testDate = new Date();
     SimpleDateFormat df = new SimpleDateFormat(TEST_FORMAT1, NlsLocale.get());
     TestTable table = new TestTable();

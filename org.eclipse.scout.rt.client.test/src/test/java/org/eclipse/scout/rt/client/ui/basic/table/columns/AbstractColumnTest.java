@@ -10,12 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -181,7 +176,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   }
 
   @Test
-  public void testValidColumn_EditField() throws Exception {
+  public void testValidColumn_EditField() {
     TestVetoTable table = new TestVetoTable();
     table.addRowsByArray(new String[]{VALID, "a"});
     TestVetoTable.ValidateTestColumn testColumn = table.getValidateTestColumn();
@@ -191,7 +186,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   }
 
   @Test
-  public void testValidColumn_EditField1() throws Exception {
+  public void testValidColumn_EditField1() {
     TestVetoTable table = new TestVetoTable();
     TestVetoTable.ValidateTestColumn testColumn = table.getValidateTestColumn();
     testColumn.setMandatory(true);
@@ -206,7 +201,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
    * {@link VetoException}
    */
   @Test
-  public void testValidateVetoColumn_EditField() throws Exception {
+  public void testValidateVetoColumn_EditField() {
     TestVetoTable table = new TestVetoTable();
     table.addRowsByArray(new String[]{VALID, "a"});
     ColumnTestUtility.editCellValue(table.getRow(0), table.getValidateTestColumn(), INVALID);
@@ -230,7 +225,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   }
 
   @Test
-  public void testNoInitialDecoration() throws Exception {
+  public void testNoInitialDecoration() {
     TestVetoTable table = new TestVetoTable();
     table.addRowsByArray(new String[]{"a"});
     ICell c0 = table.getCell(0, 0);
@@ -258,7 +253,7 @@ public class AbstractColumnTest extends AbstractColumn<Object> {
   }
 
   @Test
-  public void testDecorationsAfterAllInserts() throws Exception {
+  public void testDecorationsAfterAllInserts() {
     TestDecorationTable table = new TestDecorationTable();
     table.addRowsByArray(new String[]{"a", "b"});
   }

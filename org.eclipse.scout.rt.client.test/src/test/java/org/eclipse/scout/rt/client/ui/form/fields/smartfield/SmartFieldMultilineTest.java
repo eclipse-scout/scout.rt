@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class SmartFieldMultilineTest {
   private static List<IBean<?>> m_beans;
 
   @BeforeClass
-  public static void beforeClass() throws Exception {
+  public static void beforeClass() {
     m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(P_SingleLookupCall.class), new BeanMetaData(P_MultiLookupCall.class));
   }
 

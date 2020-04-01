@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -47,7 +43,7 @@ public class TableFieldTest {
    */
 
   @Test
-  public void testCreateTableField() throws Exception {
+  public void testCreateTableField() {
     P_TableField tableField1 = createTableField(false);
     assertEquals("prerequisite: tableField1.isPrimaryKey()", false, tableField1.getTable().getKeyColumn().isPrimaryKey());
     assertEquals("prerequisite: tableField1.isDisplayable()", true, tableField1.getTable().getKeyColumn().isDisplayable());
@@ -122,7 +118,7 @@ public class TableFieldTest {
   }
 
   @Test
-  public void testImportFormFieldData() throws Exception {
+  public void testImportFormFieldData() {
     P_TableField tableField1 = createTableField(false);
     runImportFormFieldData(tableField1);
 
@@ -173,7 +169,7 @@ public class TableFieldTest {
   }
 
   @Test
-  public void testImportFormFieldDataWithTableValueSet() throws Exception {
+  public void testImportFormFieldDataWithTableValueSet() {
     P_TableField tableField1 = createTableField(false);
     runImportFormFieldDataWithTableValueSet(tableField1);
 
@@ -198,7 +194,7 @@ public class TableFieldTest {
   }
 
   @Test
-  public void testImportFormFieldDataWithNewRow() throws Exception {
+  public void testImportFormFieldDataWithNewRow() {
     P_TableField tableField1 = createTableField(false);
     runImportFormFieldDataWithNewRow(tableField1);
 
@@ -239,7 +235,7 @@ public class TableFieldTest {
   }
 
   @Test
-  public void testImportFormFieldDataWithDeletedRow() throws Exception {
+  public void testImportFormFieldDataWithDeletedRow() {
     P_TableField tableField1 = createTableField(false);
     runImportFormFieldDataWithDeletedRow(tableField1);
 
@@ -406,7 +402,7 @@ public class TableFieldTest {
   }
 
   @Test
-  public void testImportFormFieldDataWithUpdatedRow() throws Exception {
+  public void testImportFormFieldDataWithUpdatedRow() {
     P_TableField tableField1 = createTableField(false);
     runImportFormFieldDataWithUpdatedRow(tableField1);
 
@@ -467,7 +463,7 @@ public class TableFieldTest {
   }
 
   @Test
-  public void testImportFormFieldDataWithAllRowStates() throws Exception {
+  public void testImportFormFieldDataWithAllRowStates() {
     P_TableField tableField1 = createTableField(false);
     runImportFormFieldDataWithAllRowStates(tableField1);
 

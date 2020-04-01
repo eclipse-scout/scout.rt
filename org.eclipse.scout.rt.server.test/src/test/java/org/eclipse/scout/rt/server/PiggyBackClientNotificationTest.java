@@ -14,10 +14,6 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
@@ -59,7 +55,7 @@ public class PiggyBackClientNotificationTest {
   }
 
   @Test
-  public void testPiggyBack() throws ServletException, IOException {
+  public void testPiggyBack() {
     ServiceTunnelServlet s = new ServiceTunnelServlet();
     Class[] parameterTypes = new Class[]{String.class};
     Object[] args = new Object[]{"test"};

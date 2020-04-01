@@ -100,7 +100,7 @@ public class JmsMomManualTest {
 
   @Ignore
   @Test
-  public void test() throws InterruptedException {
+  public void test() {
     final IDestination<String> queue = MOM.newDestination("test/mom/testSubscribeFailover", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
     m_disposables.add(MOM.registerMarshaller(FixtureMomWithManualEnvironment.class, queue, BEANS.get(ObjectMarshaller.class)));
 

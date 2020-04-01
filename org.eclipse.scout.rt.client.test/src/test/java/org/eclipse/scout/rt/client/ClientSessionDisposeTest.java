@@ -52,7 +52,7 @@ public class ClientSessionDisposeTest {
    * Test might fail when manually debugged.
    */
   @Test
-  public void testDispose() throws Exception {
+  public void testDispose() {
     Platform.set(new DefaultPlatform());
     Platform.get().start();
     Platform.get().awaitPlatformStarted();

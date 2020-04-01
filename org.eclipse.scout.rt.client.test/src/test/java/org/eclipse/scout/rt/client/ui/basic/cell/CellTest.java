@@ -10,15 +10,8 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.cell;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -56,7 +49,7 @@ public class CellTest {
    * , all values should be copied and that there are no calls to an observer
    */
   @Test
-  public void testConstructor_copy() throws Exception {
+  public void testConstructor_copy() {
     Object value = new Object();
     String text = "text";
     String iconId = "iconId";
@@ -122,7 +115,7 @@ public class CellTest {
   }
 
   @Test
-  public void testSetValue_newValue() throws Exception {
+  public void testSetValue_newValue() {
     Cell c = new Cell();
     Object value = new Object();
 
@@ -138,7 +131,7 @@ public class CellTest {
   }
 
   @Test
-  public void testSetValue_sameValue() throws Exception {
+  public void testSetValue_sameValue() {
     Cell c = new Cell();
     Object value = new Object();
 
@@ -159,7 +152,7 @@ public class CellTest {
   }
 
   @Test
-  public void testSetValue_validateValidValue() throws Exception {
+  public void testSetValue_validateValidValue() {
     ICellObserver observer = Mockito.mock(ICellObserver.class);
     Cell c = new Cell(observer);
     Object value = new Object();
@@ -175,7 +168,7 @@ public class CellTest {
   }
 
   @Test
-  public void testSetValue_validateInalidValue() throws Exception {
+  public void testSetValue_validateInalidValue() {
     ICellObserver observer = Mockito.mock(ICellObserver.class);
     Cell c = new Cell(observer);
     Object value = new Object();

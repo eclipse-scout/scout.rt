@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.rest;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -78,7 +77,7 @@ public class RestApplicationTest {
   @IgnoreBean
   public static class FixtureRestContainerRequestFilter implements IRestContainerRequestFilter {
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
     }
   }
 

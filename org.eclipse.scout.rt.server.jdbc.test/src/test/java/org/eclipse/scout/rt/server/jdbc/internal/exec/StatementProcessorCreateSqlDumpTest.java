@@ -39,7 +39,7 @@ public class StatementProcessorCreateSqlDumpTest {
   private static final String FROM_DUAL_LINE = "FROM      DUAL";
 
   @Test
-  public void testSimpleSelectPlainText() throws Exception {
+  public void testSimpleSelectPlainText() {
     runSimpleSelectPlainText(Collections.singletonList("1"), "Select 1 from dual");
     runSimpleSelectPlainText(Collections.singletonList("23"), "Select :myKey from dual");
     runSimpleSelectPlainText(Collections.singletonList("'lorem'"), "Select :myText from dual");
@@ -59,7 +59,7 @@ public class StatementProcessorCreateSqlDumpTest {
    * This test illustrate the bug 371963. The first selected value '?' is not a place holder for :myText
    */
   @Test
-  public void testSelectPlainText() throws Exception {
+  public void testSelectPlainText() {
     ArrayList<String> vals = new ArrayList<>();
     vals.add("'?'");
     vals.add("'lorem'");
@@ -72,7 +72,7 @@ public class StatementProcessorCreateSqlDumpTest {
   }
 
   @Test
-  public void testSimpleSelectWithBinds() throws Exception {
+  public void testSimpleSelectWithBinds() {
     runSimpleSelectWithBinds(Collections.singletonList("1"), Collections.<String> emptyList(), "Select 1 from dual");
     runSimpleSelectWithBinds(Collections.singletonList(":myKey"), Collections.singletonList(":myKey => ? [INTEGER 23]"), "Select :myKey from dual");
     runSimpleSelectWithBinds(Collections.singletonList(":myText"), Collections.singletonList(":myText => ? [CHAR lorem]"), "Select :myText from dual");

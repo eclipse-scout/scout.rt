@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +43,7 @@ import org.junit.runner.RunWith;
 public class ColumnAutoResizeTest {
 
   @Test
-  public void testReloadPage_multipleSummaryColumns() throws Exception {
+  public void testReloadPage_multipleSummaryColumns() {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);

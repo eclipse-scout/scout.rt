@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.status;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -139,7 +136,7 @@ public class MultiStatusTest {
   }
 
   @Test
-  public void testMultistatusTextNotEquals() throws Exception {
+  public void testMultistatusTextNotEquals() {
     MultiStatus multiStatus = new MultiStatus();
     multiStatus.add(m_warningStatus);
     multiStatus.add(m_infoStatus);
@@ -188,7 +185,7 @@ public class MultiStatusTest {
   }
 
   @Test
-  public void testMessage() throws Exception {
+  public void testMessage() {
     MultiStatus multiStatus = new MultiStatus();
     multiStatus.add(new TestStatus());
     multiStatus.add(new TestStatus2());
@@ -196,7 +193,7 @@ public class MultiStatusTest {
   }
 
   @Test
-  public void testCode() throws Exception {
+  public void testCode() {
     MultiStatus multiStatus = new MultiStatus();
     multiStatus.add(new TestStatus());
     multiStatus.add(new TestStatus2());

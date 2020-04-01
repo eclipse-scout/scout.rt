@@ -129,7 +129,7 @@ public class JobCancelTest {
   }
 
   @Test
-  public void testCancelBeforeRunning() throws Exception {
+  public void testCancelBeforeRunning() {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
 
     IFuture<Void> future = Jobs.getJobManager().schedule(() -> {

@@ -56,14 +56,14 @@ public class ServiceLoaderClassLoaderMock extends ClassLoader {
       try {
         URL url = new URL(null, "mock:///" + name, new URLStreamHandler() {
           @Override
-          protected URLConnection openConnection(URL u) throws IOException {
+          protected URLConnection openConnection(URL u) {
             return new URLConnection(u) {
               @Override
-              public void connect() throws IOException {
+              public void connect() {
               }
 
               @Override
-              public InputStream getInputStream() throws IOException {
+              public InputStream getInputStream() {
                 return new ByteArrayInputStream(m_responseData);
               }
             };

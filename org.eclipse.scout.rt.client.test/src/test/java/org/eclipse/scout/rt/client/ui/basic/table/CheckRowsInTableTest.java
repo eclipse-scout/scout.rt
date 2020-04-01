@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
@@ -33,7 +31,7 @@ import org.junit.runner.RunWith;
 public class CheckRowsInTableTest {
 
   @Test
-  public void testSetCheckedByRow() throws Exception {
+  public void testSetCheckedByRow() {
     P_Table table = createTable(true);
     ITableRow row = table.getRow(0);
     table.checkRow(row, true);
@@ -41,7 +39,7 @@ public class CheckRowsInTableTest {
   }
 
   @Test
-  public void testSetUncheckedByRow() throws Exception {
+  public void testSetUncheckedByRow() {
     P_Table table = createTable(true);
     ITableRow row = table.getRow(0);
     table.checkRow(row, false);
@@ -49,7 +47,7 @@ public class CheckRowsInTableTest {
   }
 
   @Test
-  public void testCheckAllWithDisabledRowSingleSelect() throws Exception {
+  public void testCheckAllWithDisabledRowSingleSelect() {
     P_Table table = createTable(false);
     ITableRow disabledRow = table.getRow(0);
     disabledRow.setEnabled(false);
@@ -58,7 +56,7 @@ public class CheckRowsInTableTest {
   }
 
   @Test
-  public void testSetCheckedByIndex() throws Exception {
+  public void testSetCheckedByIndex() {
     P_Table table = createTable(true);
     ITableRow row = table.getRow(0);
     table.checkRow(row.getRowIndex(), true);
@@ -66,7 +64,7 @@ public class CheckRowsInTableTest {
   }
 
   @Test
-  public void testSetUncheckedById() throws Exception {
+  public void testSetUncheckedById() {
     P_Table table = createTable(true);
     ITableRow row = table.getRow(0);
     table.checkRow(row.getRowIndex(), false);
@@ -74,7 +72,7 @@ public class CheckRowsInTableTest {
   }
 
   @Test
-  public void testCheckAll() throws Exception {
+  public void testCheckAll() {
     P_Table table = createTable(true);
     table.checkAllRows();
     for (ITableRow row : table.getRows()) {
@@ -83,14 +81,14 @@ public class CheckRowsInTableTest {
   }
 
   @Test
-  public void testCheckAllOnSingleCheckable() throws Exception {
+  public void testCheckAllOnSingleCheckable() {
     P_Table table = createTable(false);
     table.checkAllRows();
     assertEquals(table.getCheckedRows().size(), 1);
   }
 
   @Test
-  public void testUncheckAll() throws Exception {
+  public void testUncheckAll() {
     P_Table table = createTable(true);
     for (ITableRow row : table.getRows()) {
       row.setChecked(true);
@@ -102,7 +100,7 @@ public class CheckRowsInTableTest {
   }
 
   @Test
-  public void testSetAllRowsCheckedOverUIFacade() throws Exception {
+  public void testSetAllRowsCheckedOverUIFacade() {
     P_Table table = createTable(true);
 
     ITableUIFacade facade = table.getUIFacade();
@@ -116,7 +114,7 @@ public class CheckRowsInTableTest {
   }
 
   @Test
-  public void testSetAllRowsUncheckedOverUIFacade() throws Exception {
+  public void testSetAllRowsUncheckedOverUIFacade() {
     P_Table table = createTable(true);
     ITableUIFacade facade = table.getUIFacade();
     for (ITableRow row : table.getRows()) {
@@ -129,7 +127,7 @@ public class CheckRowsInTableTest {
   }
 
   @Test
-  public void testSetAllRowsCheckedOverUIFacadeOnSingleCheckable() throws Exception {
+  public void testSetAllRowsCheckedOverUIFacadeOnSingleCheckable() {
     P_Table table = createTable(false);
     table.getUIFacade().setCheckedRowsFromUI(table.getRows(), true);
     assertEquals(table.getCheckedRows().size(), 1);
@@ -139,7 +137,7 @@ public class CheckRowsInTableTest {
    * Tests whether the row gets removed from checked rows as well if the row gets deleted
    */
   @Test
-  public void testDeleteRow() throws Exception {
+  public void testDeleteRow() {
     P_Table table = createTable(true);
     ITableRow row = table.getRow(0);
     table.checkRow(row, true);
@@ -152,7 +150,7 @@ public class CheckRowsInTableTest {
   }
 
   @Test
-  public void testDeleteRow_Multiple() throws Exception {
+  public void testDeleteRow_Multiple() {
     P_Table table = createTable(true);
     ITableRow row0 = table.getRow(0);
     ITableRow row1 = table.getRow(1);
@@ -172,7 +170,7 @@ public class CheckRowsInTableTest {
    * {@link ITable#getCheckedRows()} should be ordered according the sort spec
    */
   @Test
-  public void testGetCheckedRows_NoSorting() throws Exception {
+  public void testGetCheckedRows_NoSorting() {
     P_Table table = createTable(true);
     table.getColumnSet().clearSortColumns();
     table.sort();
@@ -184,7 +182,7 @@ public class CheckRowsInTableTest {
   }
 
   @Test
-  public void testGetCheckedRows_WithSorting() throws Exception {
+  public void testGetCheckedRows_WithSorting() {
     P_Table table = createTable(true);
     table.getColumnSet().clearSortColumns();
     table.getColumnSet().addSortColumn(table.getSecondColumn(), false);
@@ -204,7 +202,7 @@ public class CheckRowsInTableTest {
   }
 
   @Test
-  public void testGetCheckedRows_WithSorting2() throws Exception {
+  public void testGetCheckedRows_WithSorting2() {
     P_Table table = createTable(true);
     table.getColumnSet().clearSortColumns();
     table.getColumnSet().addSortColumn(table.getSecondColumn(), false);
@@ -225,7 +223,7 @@ public class CheckRowsInTableTest {
    * Tests sorting behavior for selected rows, should behave the same as for checked rows
    */
   @Test
-  public void testGetSelectedRows_WithSorting2() throws Exception {
+  public void testGetSelectedRows_WithSorting2() {
     P_Table table = createTable(true);
     table.setMultiSelect(true);
     table.getColumnSet().clearSortColumns();
@@ -244,7 +242,7 @@ public class CheckRowsInTableTest {
   }
 
   @Test
-  public void testGetCheckedRows_moveRow() throws Exception {
+  public void testGetCheckedRows_moveRow() {
     P_Table table = createTable(true);
     table.getColumnSet().clearSortColumns();
     table.sort();

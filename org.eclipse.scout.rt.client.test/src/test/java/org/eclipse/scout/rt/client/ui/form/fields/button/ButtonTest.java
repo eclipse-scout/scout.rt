@@ -106,7 +106,7 @@ public class ButtonTest {
   private TestForm m_form;
 
   @Before
-  public void setUp() throws Throwable {
+  public void setUp() {
     m_form = new TestForm();
     m_form.startForm();
   }
@@ -164,7 +164,7 @@ public class ButtonTest {
   }
 
   @After
-  public void tearDown() throws Throwable {
+  public void tearDown() {
     m_form.doClose();
   }
 }

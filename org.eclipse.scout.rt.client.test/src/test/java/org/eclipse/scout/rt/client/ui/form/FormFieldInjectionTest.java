@@ -53,7 +53,7 @@ import org.junit.runner.RunWith;
 public class FormFieldInjectionTest {
 
   @Test
-  public void testContainerFields() throws Exception {
+  public void testContainerFields() {
     TestingFormFieldInjection injection = new TestingFormFieldInjection();
     FormFieldInjectionTestForm form = new FormFieldInjectionTestForm(injection);
 

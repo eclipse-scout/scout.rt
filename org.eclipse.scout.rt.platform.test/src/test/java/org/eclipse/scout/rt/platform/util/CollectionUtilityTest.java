@@ -266,22 +266,22 @@ public class CollectionUtilityTest {
   }
 
   @Test(expected = IndexOutOfBoundsException.class)
-  public void testSliceExceptionTo1() throws Exception {
+  public void testSliceExceptionTo1() {
     CollectionUtility.slice(Arrays.asList("foo", "bar", "test"), -4, 2);
   }
 
   @Test(expected = IndexOutOfBoundsException.class)
-  public void testSliceExceptionTo2() throws Exception {
+  public void testSliceExceptionTo2() {
     CollectionUtility.slice(Arrays.asList("foo", "bar", "test"), 3, 2);
   }
 
   @Test(expected = IndexOutOfBoundsException.class)
-  public void testSliceExceptionFrom1() throws Exception {
+  public void testSliceExceptionFrom1() {
     CollectionUtility.slice(Arrays.asList("foo", "bar", "test"), 0, -4);
   }
 
   @Test(expected = IndexOutOfBoundsException.class)
-  public void testSliceExceptionFrom2() throws Exception {
+  public void testSliceExceptionFrom2() {
     CollectionUtility.slice(Arrays.asList("foo", "bar", "test"), 0, 3);
   }
 

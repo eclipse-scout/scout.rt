@@ -46,7 +46,7 @@ public class ProposalFieldTest {
   private static List<IBean<?>> m_beans;
 
   @BeforeClass
-  public static void beforeClass() throws Exception {
+  public static void beforeClass() {
     m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(P_LookupCall.class));
   }
 
@@ -104,14 +104,14 @@ public class ProposalFieldTest {
   }
 
   @Test
-  public void testLookupRowWithNullText() throws Exception {
+  public void testLookupRowWithNullText() {
     LookupRow<Long> nullLookupRow = new LookupRow<>(1L, null);
     m_proposalField.setLookupRow(nullLookupRow);
     assertEquals("", m_proposalField.getDisplayText());
   }
 
   @Test
-  public void testTrimText_Spaces() throws Exception {
+  public void testTrimText_Spaces() {
     m_proposalField.setTrimText(false);
     m_proposalField.setValueAsString(" a ");
     assertEquals(" a ", m_proposalField.getValue());
@@ -122,7 +122,7 @@ public class ProposalFieldTest {
   }
 
   @Test
-  public void testMaxLength_TextTooLong() throws Exception {
+  public void testMaxLength_TextTooLong() {
     m_proposalField.setMaxLength(32);
     m_proposalField.setValueAsString("1234567890");
     assertEquals("1234567890", m_proposalField.getValue());

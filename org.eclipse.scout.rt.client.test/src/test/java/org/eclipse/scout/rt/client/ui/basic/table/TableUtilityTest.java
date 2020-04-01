@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -49,7 +48,7 @@ public class TableUtilityTest {
   private static P_Table m_table;
 
   @BeforeClass
-  public static void setupTable() throws Exception {
+  public static void setupTable() {
     m_table = createTable(ITableRow.STATUS_NON_CHANGED);
 
     assertEquals(2, m_table.getRowCount());
@@ -57,7 +56,7 @@ public class TableUtilityTest {
   }
 
   @Test
-  public void testExportRowsAsCSVwithColumnNamesTypesFormats() throws Exception {
+  public void testExportRowsAsCSVwithColumnNamesTypesFormats() {
     Object[][] result = TableUtility.exportRowsAsCSV(m_table.getRows(), m_table.getColumns(), true, true, true);
 
     assertEquals(5, result.length);
@@ -69,7 +68,7 @@ public class TableUtilityTest {
   }
 
   @Test
-  public void testExportRowsAsCSVwithColumnNamesTypes() throws Exception {
+  public void testExportRowsAsCSVwithColumnNamesTypes() {
     Object[][] result = TableUtility.exportRowsAsCSV(m_table.getRows(), m_table.getColumns(), true, true, false);
 
     assertEquals(4, result.length);
@@ -80,7 +79,7 @@ public class TableUtilityTest {
   }
 
   @Test
-  public void testExportRowsAsCSVwithColumnNamesFormats() throws Exception {
+  public void testExportRowsAsCSVwithColumnNamesFormats() {
     Object[][] result = TableUtility.exportRowsAsCSV(m_table.getRows(), m_table.getColumns(), true, false, true);
 
     assertEquals(4, result.length);
@@ -91,7 +90,7 @@ public class TableUtilityTest {
   }
 
   @Test
-  public void testExportRowsAsCSVwithColumnTypesFormats() throws Exception {
+  public void testExportRowsAsCSVwithColumnTypesFormats() {
     Object[][] result = TableUtility.exportRowsAsCSV(m_table.getRows(), m_table.getColumns(), false, true, true);
 
     assertEquals(4, result.length);
@@ -102,7 +101,7 @@ public class TableUtilityTest {
   }
 
   @Test
-  public void testExportRowsAsCSVwithColumnNames() throws Exception {
+  public void testExportRowsAsCSVwithColumnNames() {
     Object[][] result = TableUtility.exportRowsAsCSV(m_table.getRows(), m_table.getColumns(), true, false, false);
 
     assertEquals(3, result.length);
@@ -112,7 +111,7 @@ public class TableUtilityTest {
   }
 
   @Test
-  public void testExportRowsAsCSVwithColumnTypes() throws Exception {
+  public void testExportRowsAsCSVwithColumnTypes() {
     Object[][] result = TableUtility.exportRowsAsCSV(m_table.getRows(), m_table.getColumns(), false, true, false);
 
     assertEquals(3, result.length);
@@ -122,7 +121,7 @@ public class TableUtilityTest {
   }
 
   @Test
-  public void testExportRowsAsCSVwithColumnFormats() throws Exception {
+  public void testExportRowsAsCSVwithColumnFormats() {
     Object[][] result = TableUtility.exportRowsAsCSV(m_table.getRows(), m_table.getColumns(), false, false, true);
 
     assertEquals(3, result.length);
@@ -132,7 +131,7 @@ public class TableUtilityTest {
   }
 
   @Test
-  public void testExportRowsAsCSVwithoutColumnNamesTypesFormats() throws Exception {
+  public void testExportRowsAsCSVwithoutColumnNamesTypesFormats() {
     Object[][] result = TableUtility.exportRowsAsCSV(m_table.getRows(), m_table.getColumns(), false, false, false);
 
     assertEquals(2, result.length);

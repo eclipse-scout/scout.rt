@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Set;
 
@@ -32,7 +29,7 @@ public class InternalTableRowTest {
   private static final String TEST_ICON_ID = "iconId";
 
   @Test
-  public void testCreateInternalTableRow() throws Exception {
+  public void testCreateInternalTableRow() {
     TestTable table = new TestTable();
     ITableRow row = table.createRow();
     row.getCellForUpdate(0).setValue("Test");
@@ -46,7 +43,7 @@ public class InternalTableRowTest {
   }
 
   @Test
-  public void testSetStatus() throws Exception {
+  public void testSetStatus() {
     TestTable table = new TestTable();
     InternalTableRow ir = new InternalTableRow(table);
     ir.setStatusDeleted();
@@ -54,7 +51,7 @@ public class InternalTableRowTest {
   }
 
   @Test
-  public void testSetCssClass() throws Exception {
+  public void testSetCssClass() {
     TestTable table = new TestTable();
     ITableRow row = table.createRow();
     row.getCellForUpdate(0).setValue("Test");

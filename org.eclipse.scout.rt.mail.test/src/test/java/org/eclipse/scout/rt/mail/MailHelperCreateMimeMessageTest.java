@@ -10,13 +10,8 @@
  */
 package org.eclipse.scout.rt.mail;
 
-import static org.eclipse.scout.rt.mail.MailHelperTest.createMailParticipant;
-import static org.eclipse.scout.rt.mail.MailHelperTest.createMailParticipants;
-import static org.eclipse.scout.rt.mail.MailHelperTest.verifyMimeMessage;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.eclipse.scout.rt.mail.MailHelperTest.*;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -60,7 +55,7 @@ public class MailHelperCreateMimeMessageTest {
       "logo");
 
   @Test(expected = IllegalArgumentException.class)
-  public void testCreateMimeMessageWithNull() throws Exception {
+  public void testCreateMimeMessageWithNull() {
     BEANS.get(MailHelper.class).createMimeMessage(null);
   }
 

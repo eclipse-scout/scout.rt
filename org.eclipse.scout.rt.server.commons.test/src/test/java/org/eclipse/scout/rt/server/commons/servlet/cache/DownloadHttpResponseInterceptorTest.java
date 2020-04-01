@@ -10,10 +10,8 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet.cache;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletResponse;
@@ -115,7 +113,7 @@ public class DownloadHttpResponseInterceptorTest {
   }
 
   @Test
-  public void testContentDispositionResponseHeaderControlCharacters() throws UnsupportedEncodingException {
+  public void testContentDispositionResponseHeaderControlCharacters() {
     String s = "test";
     for (int i = 0x00; i <= 0x1F; i++) {
       s = s + new String(new byte[]{(byte) i}, StandardCharsets.ISO_8859_1);

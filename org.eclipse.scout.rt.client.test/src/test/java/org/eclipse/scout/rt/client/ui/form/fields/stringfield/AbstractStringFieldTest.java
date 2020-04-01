@@ -49,14 +49,14 @@ public class AbstractStringFieldTest extends AbstractStringField {
   }
 
   @Test
-  public void testDisplayTextInitialState() throws Exception {
+  public void testDisplayTextInitialState() {
     assertEquals("", getDisplayText());
     assertEquals(0, m_displayTextChangedCounter.get());
     assertArrayEquals(new String[]{}, m_displayTextChangedHistory.toArray());
   }
 
   @Test
-  public void testDisplayTextSameTextTwice() throws Exception {
+  public void testDisplayTextSameTextTwice() {
     getUIFacade().parseAndSetValueFromUI("Test");
     assertEquals("Test", getDisplayText());
     getUIFacade().parseAndSetValueFromUI("Test");
@@ -67,7 +67,7 @@ public class AbstractStringFieldTest extends AbstractStringField {
   }
 
   @Test
-  public void testDisplayTextNoValueChangeOnEmptyText() throws Exception {
+  public void testDisplayTextNoValueChangeOnEmptyText() {
     getUIFacade().parseAndSetValueFromUI("Test");
     assertEquals("Test", getDisplayText());
     getUIFacade().parseAndSetValueFromUI("");

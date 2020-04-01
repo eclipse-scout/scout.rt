@@ -57,7 +57,7 @@ public class SubjectProcessorTest {
   }
 
   @Test
-  public void testException() throws Exception {
+  public void testException() {
     final Holder<Subject> actualSubject = new Holder<>();
 
     final Exception exception = new Exception("expected JUnit test exception");
@@ -79,7 +79,7 @@ public class SubjectProcessorTest {
   }
 
   @Test
-  public void testRuntimeException() throws Exception {
+  public void testRuntimeException() {
     final Holder<Subject> actualSubject = new Holder<>();
 
     final RuntimeException runtimeException = new RuntimeException("expected JUnit test exception");

@@ -189,7 +189,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testUrlEncode() throws Exception {
+  public void testUrlEncode() {
     assertEquals("www.google.com", IOUtility.urlEncode("www.google.com"));
     assertNull(IOUtility.urlEncode(null));
     assertEquals("", IOUtility.urlEncode(""));
@@ -201,7 +201,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testUrlDecode() throws Exception {
+  public void testUrlDecode() {
     assertEquals("www.google.com", IOUtility.urlDecode("www.google.com"));
     assertNull(IOUtility.urlDecode(null));
     assertEquals("", IOUtility.urlDecode(""));
@@ -254,7 +254,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testReadLinesEmptyFile() throws FileNotFoundException {
+  public void testReadLinesEmptyFile() {
     File tempFile = null;
     try {
       tempFile = IOUtility.createTempFile(FILENAME, EXTENSION, null);
@@ -386,7 +386,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testRemoveByteOrderMark() throws Exception {
+  public void testRemoveByteOrderMark() {
     final byte[] UTF8_BOM = new byte[]{(byte) 0xef, (byte) 0xbb, (byte) 0xbf};
     final byte[] UTF16BE_BOM = new byte[]{(byte) 0xfe, (byte) 0xff};
     final byte[] UTF16LE_BOM = new byte[]{(byte) 0xff, (byte) 0xfe};
@@ -553,7 +553,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testResourceTryError1() throws Exception {
+  public void testResourceTryError1() {
     try (InputStream res = new FileInputStream("foo/bar/test")) {
       if (res != null) {
         System.out.println("null resource: " + res);
@@ -567,7 +567,7 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testResourceTryError2() throws Exception {
+  public void testResourceTryError2() {
     try (InputStream res = null) {
       @SuppressWarnings({"resource", "unused"})
       InputStream tmp = new FileInputStream("foo/bar/test");

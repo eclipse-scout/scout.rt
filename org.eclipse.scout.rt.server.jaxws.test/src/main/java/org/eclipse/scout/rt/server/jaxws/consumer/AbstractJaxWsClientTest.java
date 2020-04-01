@@ -10,14 +10,7 @@
  */
 package org.eclipse.scout.rt.server.jaxws.consumer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Proxy;
 import java.net.SocketTimeoutException;
@@ -520,7 +513,7 @@ public abstract class AbstractJaxWsClientTest {
    * Test acquire port in different transactions
    * ************************************************************/
   @Test
-  public void testAcquirePortInDifferentTransactions() throws InterruptedException {
+  public void testAcquirePortInDifferentTransactions() {
     final Holder<JaxWsConsumerTestServicePortType> txn1PortHolder = new Holder<>(JaxWsConsumerTestServicePortType.class);
     final Holder<JaxWsConsumerTestServicePortType> txn2PortHolder = new Holder<>(JaxWsConsumerTestServicePortType.class);
 

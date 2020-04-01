@@ -67,7 +67,7 @@ public class DefaultAuthTokenTest {
   }
 
   @Test
-  public void testEnabled() throws Exception {
+  public void testEnabled() {
     assertTrue(BEANS.get(DefaultAuthTokenSigner.class).isEnabled());
     assertTrue(BEANS.get(DefaultAuthTokenVerifier.class).isEnabled());
   }

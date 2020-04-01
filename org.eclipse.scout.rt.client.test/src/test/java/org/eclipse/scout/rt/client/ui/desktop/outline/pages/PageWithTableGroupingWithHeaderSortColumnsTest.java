@@ -49,7 +49,7 @@ public class PageWithTableGroupingWithHeaderSortColumnsTest {
   }
 
   @Test
-  public void testGroupingWithHeaderSortColumn() throws Exception {
+  public void testGroupingWithHeaderSortColumn() {
 
     //reset columns
     table.resetColumns();
@@ -73,7 +73,7 @@ public class PageWithTableGroupingWithHeaderSortColumnsTest {
   }
 
   @Test
-  public void testGroupingInvisibleHeaderSortColumn() throws Exception {
+  public void testGroupingInvisibleHeaderSortColumn() {
 
     //reset columns
     table.resetColumns();
@@ -93,7 +93,7 @@ public class PageWithTableGroupingWithHeaderSortColumnsTest {
   }
 
   @Test
-  public void testGroupingInvisibleFirstHeaderSortColumn() throws Exception {
+  public void testGroupingInvisibleFirstHeaderSortColumn() {
 
     //reset columns
     table.resetColumns();

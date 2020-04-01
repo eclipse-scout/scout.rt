@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
@@ -39,7 +38,7 @@ public class ColumnVisibilityTest {
   private Test2Column m_prefCol2;
 
   @Before
-  public void before() throws Exception {
+  public void before() {
     // reset UI preferences
     final TestTable prefTable = new TestTable();
     m_prefCol1 = prefTable.getTest1Column();
@@ -54,7 +53,7 @@ public class ColumnVisibilityTest {
    * execInitTable of {@link AbstractTable}.
    */
   @Test
-  public void test_displayable_configuredTrue_initFalseTrue() throws Exception {
+  public void test_displayable_configuredTrue_initFalseTrue() {
     TestTable table = new TestTable();
     table.init();
     Test1Column col1 = table.getTest1Column();
@@ -68,7 +67,7 @@ public class ColumnVisibilityTest {
    * {@link AbstractTable}.
    */
   @Test
-  public void test_displayable_configuredFalse_initTrue() throws Exception {
+  public void test_displayable_configuredFalse_initTrue() {
     TestTable table = new TestTable();
     table.init();
     Test2Column col2 = table.getTest2Column();
@@ -82,7 +81,7 @@ public class ColumnVisibilityTest {
    * execInitTable of {@link AbstractTable}. In addition the column's preferences are set to invisible.
    */
   @Test
-  public void test_displayable_configuredTrue_initFalseTrue_uiPrefsVisibleFalse() throws Exception {
+  public void test_displayable_configuredTrue_initFalseTrue_uiPrefsVisibleFalse() {
     // set ui preferences
     m_prefCol1.setVisible(false);
     m_uiPrefs.setTableColumnPreferences(m_prefCol1);
@@ -101,7 +100,7 @@ public class ColumnVisibilityTest {
    * {@link AbstractTable}. In addition the column's preferences are set to invisible.
    */
   @Test
-  public void test_displayable_configuredFalse_initTrue_uiPrefsVisibleFalse() throws Exception {
+  public void test_displayable_configuredFalse_initTrue_uiPrefsVisibleFalse() {
     // set ui preferences
     m_prefCol2.setVisible(false);
     m_uiPrefs.setTableColumnPreferences(m_prefCol2);
@@ -121,7 +120,7 @@ public class ColumnVisibilityTest {
    * is set to false.
    */
   @Test
-  public void test_displayable_configuredTrue_initFalseTrue_uiPrefsVisibleTrueVisibleGrantedFalse() throws Exception {
+  public void test_displayable_configuredTrue_initFalseTrue_uiPrefsVisibleTrueVisibleGrantedFalse() {
     // set ui preferences
     m_prefCol1.setVisible(true);
     m_prefCol1.setVisibleGranted(false);
@@ -141,7 +140,7 @@ public class ColumnVisibilityTest {
    * {@link AbstractTable}. In addition the column's preferences are set to visible but visible granted is set to false.
    */
   @Test
-  public void test_displayable_configuredFalse_initTrue_uiPrefsVisibleTrueVisibleGrantedFalse() throws Exception {
+  public void test_displayable_configuredFalse_initTrue_uiPrefsVisibleTrueVisibleGrantedFalse() {
     // set ui preferences
     m_prefCol2.setVisible(true);
     m_prefCol2.setVisibleGranted(false);

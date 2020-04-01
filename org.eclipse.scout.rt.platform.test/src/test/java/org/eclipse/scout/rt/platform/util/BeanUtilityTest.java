@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
+import static org.junit.Assert.*;
+
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.Iterator;
@@ -18,13 +20,6 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * JUnit tests for {@link BeanUtility}
@@ -46,7 +41,7 @@ public class BeanUtilityTest {
   }
 
   @Test
-  public void testGetConstructorInvisibleClass() throws Exception {
+  public void testGetConstructorInvisibleClass() {
     assertNull(BeanUtility.findConstructor(InvisibleClass.class));
   }
 
@@ -116,7 +111,7 @@ public class BeanUtilityTest {
   }
 
   @Test
-  public void testCreateInstanceNullAndEmpty() throws Exception {
+  public void testCreateInstanceNullAndEmpty() {
     assertNull(BeanUtility.createInstance(null));
     assertNull(BeanUtility.createInstance(null, null, null));
     //
@@ -126,17 +121,17 @@ public class BeanUtilityTest {
   }
 
   @Test
-  public void testCreateInstanceInvisibleClass() throws Exception {
+  public void testCreateInstanceInvisibleClass() {
     assertNull(BeanUtility.createInstance(InvisibleClass.class));
   }
 
   @Test
-  public void testCreateInstanceNonStaticClass() throws Exception {
+  public void testCreateInstanceNonStaticClass() {
     assertNull(BeanUtility.createInstance(NonStaticInnerClass.class));
   }
 
   @Test
-  public void testCreateInstanceNonStaticClassWithThisArgument() throws Exception {
+  public void testCreateInstanceNonStaticClassWithThisArgument() {
     assertNotNull(BeanUtility.createInstance(NonStaticInnerClass.class, this));
   }
 
@@ -147,7 +142,7 @@ public class BeanUtilityTest {
   static final String EXPECTED_CONSTR_LONG = "Expected constructor with complex type java.lang.Long";
 
   @Test
-  public void testCreateInstancePrimitiveType() throws Exception {
+  public void testCreateInstancePrimitiveType() {
     {
       PrimitiveTypeConstructor obj = BeanUtility.createInstance(PrimitiveTypeConstructor.class, new Class<?>[]{long.class}, new Object[]{TEST_LONG_42});
       assertNotNull(obj);
@@ -170,7 +165,7 @@ public class BeanUtilityTest {
   }
 
   @Test
-  public void testCreateInstanceComplexType() throws Exception {
+  public void testCreateInstanceComplexType() {
     {
       ComplexTypeConstructor obj = BeanUtility.createInstance(ComplexTypeConstructor.class, new Class<?>[]{Long.class}, new Object[]{TEST_LONG_42});
       assertNotNull(obj);
@@ -194,7 +189,7 @@ public class BeanUtilityTest {
   }
 
   @Test
-  public void testCreateInstancePrimitiveAndComplexType() throws Exception {
+  public void testCreateInstancePrimitiveAndComplexType() {
     {
       PrimitiveAndComplexTypeConstructor obj = BeanUtility.createInstance(PrimitiveAndComplexTypeConstructor.class, new Class<?>[]{long.class}, new Object[]{TEST_LONG_42});
       assertNotNull(obj);
@@ -221,7 +216,7 @@ public class BeanUtilityTest {
   static final String WORLD = "world";
 
   @Test
-  public void testCreateInstanceArray() throws Exception {
+  public void testCreateInstanceArray() {
     {
       ArrayConstructor obj = BeanUtility.createInstance(ArrayConstructor.class, new Class<?>[]{String[].class}, new Object[]{new String[]{HELLO, WORLD}});
       assertNotNull(obj);
@@ -235,7 +230,7 @@ public class BeanUtilityTest {
   }
 
   @Test
-  public void testCreateInstanceVararg() throws Exception {
+  public void testCreateInstanceVararg() {
     {
       VarargConstructor obj = BeanUtility.createInstance(VarargConstructor.class, new Class<?>[]{String[].class}, new Object[]{new String[]{HELLO, WORLD}});
       assertNotNull(obj);

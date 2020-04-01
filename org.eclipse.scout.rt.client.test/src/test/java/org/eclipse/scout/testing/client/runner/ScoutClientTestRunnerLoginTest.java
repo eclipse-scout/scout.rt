@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.testing.client.runner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 
@@ -42,52 +40,52 @@ public class ScoutClientTestRunnerLoginTest {
   private static IClientSession s_beforeClassClientSession;
 
   @BeforeClass
-  public static void beforeClass1() throws Exception {
+  public static void beforeClass1() {
     checkBeforeClass();
   }
 
   @BeforeClass
-  public static void beforeClass2() throws Exception {
+  public static void beforeClass2() {
     checkBeforeClass();
   }
 
   @AfterClass
-  public static void afterClass1() throws Exception {
+  public static void afterClass1() {
     checkAfterClass();
   }
 
   @AfterClass
-  public static void afterClass2() throws Exception {
+  public static void afterClass2() {
     checkAfterClass();
   }
 
   @Before
-  public void before1() throws Exception {
+  public void before1() {
     checkBeforeAfterAndTest();
   }
 
   @Before
-  public void before2() throws Exception {
+  public void before2() {
     checkBeforeAfterAndTest();
   }
 
   @After
-  public void after1() throws Exception {
+  public void after1() {
     checkBeforeAfterAndTest();
   }
 
   @After
-  public void after2() throws Exception {
+  public void after2() {
     checkBeforeAfterAndTest();
   }
 
   @Test
-  public void testWithAdditionalLogin1() throws Exception {
+  public void testWithAdditionalLogin1() {
     checkBeforeAfterAndTest();
   }
 
   @Test
-  public void testWithAdditionalLogin2() throws Exception {
+  public void testWithAdditionalLogin2() {
     checkBeforeAfterAndTest();
   }
 

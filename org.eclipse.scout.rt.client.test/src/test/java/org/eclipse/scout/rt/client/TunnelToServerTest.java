@@ -63,7 +63,7 @@ public class TunnelToServerTest {
     }
 
     @Override
-    public Object invoke(T instance, Method method, Object[] args) throws Throwable {
+    public Object invoke(T instance, Method method, Object[] args) {
       return "return " + getInterfaceClass().getSimpleName() + "#" + method.getName();
     }
   }

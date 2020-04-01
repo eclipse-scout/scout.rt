@@ -19,7 +19,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -58,13 +57,13 @@ public class HttpHighLoadTest {
     m_server.stop();
   }
 
-  private void fixtureServletGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  private void fixtureServletGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     String arg = req.getParameter("arg");
     resp.setContentType("text/plain;charset=UTF-8");
     resp.getOutputStream().println("Get " + arg);
   }
 
-  private void fixtureServletPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  private void fixtureServletPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     assertEquals("text/plain;charset=UTF-8", req.getContentType());
     assertEquals("UTF-8", req.getCharacterEncoding());
     String arg = IOUtility.readString(req.getInputStream(), req.getCharacterEncoding(), req.getContentLength());
@@ -73,7 +72,7 @@ public class HttpHighLoadTest {
   }
 
   @Test
-  public void testPost() throws IOException {
+  public void testPost() {
     HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
     int n = 10000;
     AtomicInteger successCount = new AtomicInteger();
@@ -98,7 +97,7 @@ public class HttpHighLoadTest {
           }
 
           @Override
-          public long getLength() throws IOException {
+          public long getLength() {
             return reqBytes.length;
           }
         });

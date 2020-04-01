@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.rt.client.fixture;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -52,7 +51,7 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
    * @return the service response You may call callTargetService() to simply call a service for test purpose (without a
    *         transaction!)
    */
-  protected ServiceTunnelResponse mockServiceCall(ServiceTunnelRequest req) throws Exception {
+  protected ServiceTunnelResponse mockServiceCall(ServiceTunnelRequest req) {
     try {
       ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
 
@@ -75,7 +74,7 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
   }
 
   @Override
-  protected HttpResponse executeRequest(ServiceTunnelRequest call, byte[] callData) throws IOException {
+  protected HttpResponse executeRequest(ServiceTunnelRequest call, byte[] callData) {
     return null;
   }
 }

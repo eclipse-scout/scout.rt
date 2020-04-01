@@ -41,7 +41,7 @@ public class NotificationCoalescerTest {
   private List<IBean<?>> m_registerServices;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     // register new test coalescer
     P_TestNotificationCoalescer testCoalescer = BeanInstanceUtil.createBean(P_TestNotificationCoalescer.class);
     BeanInstanceUtil.initializeBeanInstance(testCoalescer);
@@ -53,7 +53,7 @@ public class NotificationCoalescerTest {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     BeanTestingHelper.get().unregisterBeans(m_registerServices);
   }
 
@@ -64,7 +64,7 @@ public class NotificationCoalescerTest {
   }
 
   @Test
-  public void testCoalesce_single() throws Exception {
+  public void testCoalesce_single() {
     List<P_TestNotification> testNotifications = CollectionUtility.arrayList(new P_TestNotification());
     List<? extends Serializable> res = BEANS.get(NotificationCoalescer.class).coalesce(testNotifications);
 

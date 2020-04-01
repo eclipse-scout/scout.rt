@@ -74,7 +74,7 @@ public class JmsMomWithCustomMarshallerTest extends AbstractJmsMomTest {
   }
 
   @Test(expected = PlatformException.class)
-  public void testMomEnvironmentWithInvalidMarshaller() throws InterruptedException {
+  public void testMomEnvironmentWithInvalidMarshaller() {
     installMom(FixtureMomWithInvalidMarshaller.class);
     IDestination<String> queueString = MOM.newDestination("test/mom/testPublishStringData", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
     MOM.publish(FixtureMom.class, queueString, "Hello MOM!");

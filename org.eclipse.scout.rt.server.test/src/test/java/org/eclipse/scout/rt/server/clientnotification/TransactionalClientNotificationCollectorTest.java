@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.server.clientnotification;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -60,7 +58,7 @@ public class TransactionalClientNotificationCollectorTest {
   }
 
   @Test
-  public void testMessagesAddedIfActive() throws Exception {
+  public void testMessagesAddedIfActive() {
     ClientNotificationMessage mockMessage = Mockito.mock(ClientNotificationMessage.class);
     boolean added = m_collector.addAll(CollectionUtility.arrayList(mockMessage));
     assertTrue(added);

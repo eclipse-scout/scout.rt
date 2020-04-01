@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -21,7 +20,7 @@ public class HexUtilityTest {
    * This tests just a small set of byte lengths.
    */
   @Test
-  public void testEncodeDecodeMultipleByteLength() throws Exception {
+  public void testEncodeDecodeMultipleByteLength() {
     for (int i = 0; i < 1000; i++) {
       byte[] byteArray = new byte[i];
       for (int j = 0; j < i; j++) {
@@ -39,28 +38,28 @@ public class HexUtilityTest {
   }
 
   @Test
-  public void encodeDecodeTestShort() throws Exception {
+  public void encodeDecodeTestShort() {
     String encode = HexUtility.encode(TEST_STRING_SHORT.getBytes());
     byte[] decode = HexUtility.decode(encode);
     assertArrayEquals(TEST_STRING_SHORT.getBytes(), decode);
   }
 
   @Test
-  public void encodeDecodeTestMiddle() throws Exception {
+  public void encodeDecodeTestMiddle() {
     String encode = HexUtility.encode(TEST_STRING_MIDDLE.getBytes());
     byte[] decode = HexUtility.decode(encode);
     assertArrayEquals(TEST_STRING_MIDDLE.getBytes(), decode);
   }
 
   @Test
-  public void encodeDecodeTestLong() throws Exception {
+  public void encodeDecodeTestLong() {
     String encode = HexUtility.encode(TEST_STRING_LONG.getBytes());
     byte[] decode = HexUtility.decode(encode);
     assertArrayEquals(TEST_STRING_LONG.getBytes(), decode);
   }
 
   @Test
-  public void encodeDecodeTestLongAndStringChangedToBlocks() throws Exception {
+  public void encodeDecodeTestLongAndStringChangedToBlocks() {
     String encode = HexUtility.encode(TEST_STRING_LONG.getBytes());
     encode = StringUtility.wrapText(encode, 80);
     byte[] decode = HexUtility.decode(encode);
@@ -68,51 +67,51 @@ public class HexUtilityTest {
   }
 
   @Test
-  public void encodeTestShortAndCheckAgainstHexString() throws Exception {
+  public void encodeTestShortAndCheckAgainstHexString() {
     String encode = HexUtility.encode(TEST_STRING_SHORT.getBytes());
     assertEquals(TEST_BASE64_DATA_OF_STRING_SHORT, encode);
   }
 
   @Test
-  public void encodeTestMiddleAndCheckAgainstHexString() throws Exception {
+  public void encodeTestMiddleAndCheckAgainstHexString() {
     String encode = HexUtility.encode(TEST_STRING_MIDDLE.getBytes());
     StringUtility.equalsIgnoreCase(TEST_BASE64_DATA_OF_STRING_MIDDLE, encode);
     assertEquals(TEST_BASE64_DATA_OF_STRING_MIDDLE, encode);
   }
 
   @Test
-  public void encodeTestLongAndCheckAgainstHexString() throws Exception {
+  public void encodeTestLongAndCheckAgainstHexString() {
     String encode = HexUtility.encode(TEST_STRING_LONG.getBytes());
     assertEquals(TEST_BASE64_DATA_STRING_OF_STRING_LONG, encode);
   }
 
   @Test
-  public void encodeTestLongAndStringChangedToBlocks() throws Exception {
+  public void encodeTestLongAndStringChangedToBlocks() {
     String encode = HexUtility.encode(TEST_STRING_LONG.getBytes());
     encode = StringUtility.wrapText(encode, 76);
     assertEquals(TEST_BASE64_DATA_BLOCK_OF_STRING_LONG, encode);
   }
 
   @Test
-  public void decodeTestShortHexString() throws Exception {
+  public void decodeTestShortHexString() {
     byte[] decode = HexUtility.decode(TEST_BASE64_DATA_OF_STRING_SHORT);
     assertArrayEquals(TEST_STRING_SHORT.getBytes(), decode);
   }
 
   @Test
-  public void decodeTestMiddleHexString() throws Exception {
+  public void decodeTestMiddleHexString() {
     byte[] decode = HexUtility.decode(TEST_BASE64_DATA_OF_STRING_MIDDLE);
     assertArrayEquals(TEST_STRING_MIDDLE.getBytes(), decode);
   }
 
   @Test
-  public void decodeTestLongHexString() throws Exception {
+  public void decodeTestLongHexString() {
     byte[] decode = HexUtility.decode(TEST_BASE64_DATA_STRING_OF_STRING_LONG);
     assertArrayEquals(TEST_STRING_LONG.getBytes(), decode);
   }
 
   @Test
-  public void decodeTestLongBlockHexString() throws Exception {
+  public void decodeTestLongBlockHexString() {
     byte[] decode = HexUtility.decode(TEST_BASE64_DATA_BLOCK_OF_STRING_LONG);
     assertArrayEquals(TEST_STRING_LONG.getBytes(), decode);
   }

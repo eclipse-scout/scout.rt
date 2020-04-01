@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -40,7 +38,7 @@ import org.junit.runner.RunWith;
 public class ReplaceFieldTest {
 
   @Test
-  public void testGetFieldId() throws Exception {
+  public void testGetFieldId() {
     assertEquals("BaseField", new BaseField().getFieldId());
     assertEquals("BaseField", new ExtendedField().getFieldId());
     assertEquals("ExtendedFieldWithoutReplace", new ExtendedFieldWithoutReplace().getFieldId());
@@ -50,7 +48,7 @@ public class ReplaceFieldTest {
   }
 
   @Test
-  public void testBaseForm() throws Exception {
+  public void testBaseForm() {
     BaseForm form = new BaseForm();
     MainBox mainBox = form.getMainBox();
     assertNotNull(mainBox);
@@ -61,7 +59,7 @@ public class ReplaceFieldTest {
   }
 
   @Test
-  public void testExtendedForm() throws Exception {
+  public void testExtendedForm() {
     ExtendedForm form = new ExtendedForm();
     MainBox mainBox = form.getMainBox();
     assertNotNull(mainBox);
@@ -75,7 +73,7 @@ public class ReplaceFieldTest {
   }
 
   @Test
-  public void testExtendedMainBoxAndFieldTopLevelForm() throws Exception {
+  public void testExtendedMainBoxAndFieldTopLevelForm() {
     ExtendedMainBoxAndFieldTopLevelForm form = new ExtendedMainBoxAndFieldTopLevelForm();
     MainBox mainBox = form.getMainBox();
     assertNotNull(mainBox);
@@ -92,7 +90,7 @@ public class ReplaceFieldTest {
   }
 
   @Test
-  public void testExtendedMainBoxAndFieldNestedForm() throws Exception {
+  public void testExtendedMainBoxAndFieldNestedForm() {
     ExtendedMainBoxAndFieldNestedForm form = new ExtendedMainBoxAndFieldNestedForm();
     MainBox mainBox = form.getMainBox();
     assertNotNull(mainBox);
@@ -132,7 +130,7 @@ public class ReplaceFieldTest {
   }
 
   @Test
-  public void testNestedReplace() throws Exception {
+  public void testNestedReplace() {
     ExampleExForm form = new ExampleExForm();
     assertNotNull(form.getTextField());
     assertSame(ExampleExForm.DetailExBox.TextExField.class, form.getTextField().getClass());

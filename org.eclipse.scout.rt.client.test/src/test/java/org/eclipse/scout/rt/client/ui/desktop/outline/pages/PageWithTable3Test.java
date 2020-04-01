@@ -41,7 +41,7 @@ import org.junit.runner.RunWith;
 public class PageWithTable3Test {
 
   @Test
-  public void testSorting() throws Exception {
+  public void testSorting() {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     PageWithTableOutline outline = new PageWithTableOutline();
     desktop.setAvailableOutlines(Collections.singletonList(outline));

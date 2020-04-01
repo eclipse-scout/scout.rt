@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.data.form;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -42,7 +40,7 @@ public class FormDataImportWithPropertiesTest {
   private static final String EXPECTED_TEXT = "a test text";
 
   @Test
-  public void testImportFormData_untouchedProperties() throws Exception {
+  public void testImportFormData_untouchedProperties() {
     DynamicGroupBox mainBox = new DynamicGroupBox(new DynamicCancelButton());
     final DynamicFormWithProperties f = new DynamicFormWithProperties("Form1", mainBox);
     try {
@@ -67,7 +65,7 @@ public class FormDataImportWithPropertiesTest {
   }
 
   @Test
-  public void testImportFormData_modifiedProperties() throws Exception {
+  public void testImportFormData_modifiedProperties() {
     DynamicGroupBox mainBox = new DynamicGroupBox(new DynamicCancelButton());
     final DynamicFormWithProperties f = new DynamicFormWithProperties("Form1", mainBox);
     try {

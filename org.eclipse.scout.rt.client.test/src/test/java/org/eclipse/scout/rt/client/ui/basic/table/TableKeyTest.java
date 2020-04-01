@@ -43,7 +43,7 @@ import org.junit.runner.RunWith;
 public class TableKeyTest {
 
   @Test
-  public void testKeyAndParentKey() throws Exception {
+  public void testKeyAndParentKey() {
     P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
     table.init();
     List<ITableRow> rows = new ArrayList<>();
@@ -62,7 +62,7 @@ public class TableKeyTest {
   }
 
   @Test
-  public void testKeyAndParentKeyWithMultipleKeyColumn() throws Exception {
+  public void testKeyAndParentKeyWithMultipleKeyColumn() {
     P_MultiplePrimaryKeyColumnTable table = new P_MultiplePrimaryKeyColumnTable();
     table.init();
     List<ITableRow> rows = new ArrayList<>();
@@ -83,7 +83,7 @@ public class TableKeyTest {
   }
 
   @Test
-  public void testModifyParentsPrimaryKey() throws Exception {
+  public void testModifyParentsPrimaryKey() {
     P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
     table.init();
     List<ITableRow> rows = new ArrayList<>();
@@ -99,7 +99,7 @@ public class TableKeyTest {
   }
 
   @Test
-  public void testModifyParentsPrimaryKeyWithMultipleKeyColumn() throws Exception {
+  public void testModifyParentsPrimaryKeyWithMultipleKeyColumn() {
     P_MultiplePrimaryKeyColumnTable table = new P_MultiplePrimaryKeyColumnTable();
     table.init();
     List<ITableRow> rows = new ArrayList<>();
@@ -117,7 +117,7 @@ public class TableKeyTest {
   }
 
   @Test
-  public void testReParenting() throws Exception {
+  public void testReParenting() {
     P_SinglePrimaryKeyColumnTable table = new P_SinglePrimaryKeyColumnTable();
     table.init();
     List<ITableRow> rows = new ArrayList<>();
@@ -133,7 +133,7 @@ public class TableKeyTest {
   }
 
   @Test
-  public void testReParentingWithMultipleKey() throws Exception {
+  public void testReParentingWithMultipleKey() {
     P_MultiplePrimaryKeyColumnTable table = new P_MultiplePrimaryKeyColumnTable();
     table.init();
     List<ITableRow> rows = new ArrayList<>();

@@ -51,7 +51,7 @@ import org.junit.runner.RunWith;
 public class GroupBoxLayout0100Test extends AbstractGroupBoxLayoutTest {
 
   @Test
-  public void testVerticalLayout() throws Exception {
+  public void testVerticalLayout() {
     MainBox groupBox = new MainBox();
     IGroupBoxBodyGrid grid = new VerticalSmartGroupBoxBodyGrid();
     grid.validate(groupBox);
@@ -72,7 +72,7 @@ public class GroupBoxLayout0100Test extends AbstractGroupBoxLayoutTest {
   }
 
   @Test
-  public void testHorizontalLayout() throws Exception {
+  public void testHorizontalLayout() {
     MainBox groupBox = new MainBox();
     IGroupBoxBodyGrid grid = new HorizontalGroupBoxBodyGrid();
     grid.validate(groupBox);

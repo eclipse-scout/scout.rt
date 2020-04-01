@@ -38,7 +38,7 @@ public class NotificationHandlerRegistryTest {
   private GroupNotificationHandler m_groupNotificationHanlder;
 
   @Before
-  public void before() throws Exception {
+  public void before() {
     // ensure bean hander cache of notification dispatcher gets refreshed
     ensureHandlerRegistryRefreshed();
   }

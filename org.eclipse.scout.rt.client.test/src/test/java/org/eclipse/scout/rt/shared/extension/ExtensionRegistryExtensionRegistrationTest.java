@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.extension;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 import java.util.Map;
@@ -42,18 +40,18 @@ public class ExtensionRegistryExtensionRegistrationTest {
   private ExtensionRegistryTest m_clientExtensionManager;
 
   @Before
-  public void before() throws Exception {
+  public void before() {
     m_clientExtensionManager = new ExtensionRegistryTest();
   }
 
   @Test
-  public void testBasicFormExtension() throws Exception {
+  public void testBasicFormExtension() {
     m_clientExtensionManager.register(BasicFormExtension.class, BasicForm.class);
     assertBasicFormExtension();
   }
 
   @Test
-  public void testBasicFormExtensionAutoDetection() throws Exception {
+  public void testBasicFormExtensionAutoDetection() {
     m_clientExtensionManager.register(BasicFormExtension.class);
     assertBasicFormExtension();
   }
@@ -66,13 +64,13 @@ public class ExtensionRegistryExtensionRegistrationTest {
   }
 
   @Test
-  public void testNameFieldExtension() throws Exception {
+  public void testNameFieldExtension() {
     m_clientExtensionManager.register(NameFieldExtension.class, NameField.class);
     assertNameFieldExtension();
   }
 
   @Test
-  public void testNameFieldExtensionAutoDetection() throws Exception {
+  public void testNameFieldExtensionAutoDetection() {
     m_clientExtensionManager.register(NameFieldExtension.class);
     assertNameFieldExtension();
   }
@@ -85,7 +83,7 @@ public class ExtensionRegistryExtensionRegistrationTest {
   }
 
   @Test
-  public void testRemoveNestedBasicFormExtension() throws Exception {
+  public void testRemoveNestedBasicFormExtension() {
     m_clientExtensionManager.register(NestedBasicFormExtension.class, BasicForm.class);
     assertNestedBasicFormExtension();
     boolean changed = m_clientExtensionManager.deregister(NestedBasicFormExtension.class);
@@ -107,13 +105,13 @@ public class ExtensionRegistryExtensionRegistrationTest {
   }
 
   @Test
-  public void testNestedBasicFormExtension() throws Exception {
+  public void testNestedBasicFormExtension() {
     m_clientExtensionManager.register(NestedBasicFormExtension.class, BasicForm.class);
     assertNestedBasicFormExtension();
   }
 
   @Test
-  public void testNestedBasicFormExtensionAutoDetection() throws Exception {
+  public void testNestedBasicFormExtensionAutoDetection() {
     m_clientExtensionManager.register(NestedBasicFormExtension.class);
     assertNestedBasicFormExtension();
   }
@@ -141,7 +139,7 @@ public class ExtensionRegistryExtensionRegistrationTest {
   }
 
   @Test
-  public void testStaticPojoContainerExtension() throws Exception {
+  public void testStaticPojoContainerExtension() {
     // add first name before name because eclipse compiler sorts nested classes by name
     m_clientExtensionManager.register(StaticPojoContainerExtension.FirstNameFieldExtension.class);
     m_clientExtensionManager.register(StaticPojoContainerExtension.NameFieldExtension.class);
@@ -149,7 +147,7 @@ public class ExtensionRegistryExtensionRegistrationTest {
   }
 
   @Test(expected = IllegalExtensionException.class)
-  public void testStaticPojoContainerExtensionAutoRegister() throws Exception {
+  public void testStaticPojoContainerExtensionAutoRegister() {
     m_clientExtensionManager.register(StaticPojoContainerExtension.class);
   }
 
@@ -166,27 +164,27 @@ public class ExtensionRegistryExtensionRegistrationTest {
   }
 
   @Test(expected = IllegalExtensionException.class)
-  public void testContributionToWrongOwner() throws Exception {
+  public void testContributionToWrongOwner() {
     m_clientExtensionManager.register(SpecialStringField.class, NameField.class);
   }
 
   @Test(expected = IllegalExtensionException.class)
-  public void testExtensionToWrongOwner() throws Exception {
+  public void testExtensionToWrongOwner() {
     m_clientExtensionManager.register(MultipleExtGroupBoxExtension.class, NameField.class);
   }
 
   @Test(expected = IllegalExtensionException.class)
-  public void testPojoContainerExtension() throws Exception {
+  public void testPojoContainerExtension() {
     m_clientExtensionManager.register(PojoContainerExtension.NameFieldExtension.class, NameField.class);
   }
 
   @Test(expected = IllegalExtensionException.class)
-  public void testPojoContainerExtensionAutoRegister() throws Exception {
+  public void testPojoContainerExtensionAutoRegister() {
     m_clientExtensionManager.register(PojoContainerExtension.class);
   }
 
   @Test(expected = IllegalExtensionException.class)
-  public void testInvalidExtension() throws Exception {
+  public void testInvalidExtension() {
     m_clientExtensionManager.register(InvalidExtension.class);
   }
 

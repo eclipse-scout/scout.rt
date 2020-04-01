@@ -211,7 +211,7 @@ public class StoreAndLoadXml2FormTest {
   }
 
   @Test
-  public void test() throws Throwable {
+  public void test() {
     TestForm f = new TestForm();
     try {
       f.startModify();

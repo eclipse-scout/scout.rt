@@ -64,7 +64,7 @@ public class EnumSerializationTest {
   }
 
   @Test(expected = PlatformException.class)
-  public void testSerializeDeserialize_EntityWithEnumMapKeyNull() throws Exception {
+  public void testSerializeDeserialize_EntityWithEnumMapKeyNull() {
     TestEntityWithEnumMapKeyDo entity = new TestEntityWithEnumMapKeyDo();
     entity.withMap(Collections.singletonMap(null, "test"));
     m_dataObjectMapper.writeValue(entity);

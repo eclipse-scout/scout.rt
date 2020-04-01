@@ -87,7 +87,7 @@ public class CodeRowTest {
   }
 
   @Test
-  public void testCreateWithArray() throws Exception {
+  public void testCreateWithArray() {
     ICodeRow<String> row = new CodeRow<>(OBJECT_ARRAY, String.class);
     assertCodeRowCreatedWithObjectArray(row);
 
@@ -109,7 +109,7 @@ public class CodeRowTest {
   }
 
   @Test
-  public void testCreateWithSubType() throws Exception {
+  public void testCreateWithSubType() {
     ICodeRow<String> row = new StringCodeRow(OBJECT_ARRAY);
     assertCodeRowCreatedWithObjectArray(row);
   }

@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.server.clientnotification;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -129,7 +127,7 @@ public class ClientNotificationRegistryTest {
    * Tests that multiple notifications for a user are consumed in the correct order.
    */
   @Test
-  public void testMultipleNotifications() throws Exception {
+  public void testMultipleNotifications() {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
     reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
     reg.putForUser(TEST_USER, TEST_NOTIFICATION);
@@ -270,7 +268,7 @@ public class ClientNotificationRegistryTest {
    * ServerRunContext.
    */
   @Test
-  public void testTransactionalWithPiggyBack() throws Exception {
+  public void testTransactionalWithPiggyBack() {
     try {
       final String currentNode = TEST_NODE;
       final String otherNode = "Node2";
@@ -307,7 +305,7 @@ public class ClientNotificationRegistryTest {
    * If the notifications are already consumed, piggy back is not possible
    */
   @Test
-  public void testTransactionalNoPiggyBack() throws Exception {
+  public void testTransactionalNoPiggyBack() {
     final String currentNode = TEST_NODE;
     final String otherNode = "Node2";
 

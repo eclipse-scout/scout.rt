@@ -35,7 +35,7 @@ import org.junit.runner.RunWith;
 public class StringFieldSetMultilineTextTest {
 
   @Test
-  public void test() throws Exception {
+  public void test() {
     MyForm f = new MyForm();
     try {
       f.startForm();

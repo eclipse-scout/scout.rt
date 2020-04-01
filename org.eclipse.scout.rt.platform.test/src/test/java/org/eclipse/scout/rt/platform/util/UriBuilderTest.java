@@ -10,13 +10,8 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -104,7 +99,7 @@ public class UriBuilderTest {
    * encoded characters which is probably not exactly what you expect.
    */
   @Test
-  public void testEncodedInputString() throws URISyntaxException {
+  public void testEncodedInputString() {
     String path = "leer%20zeichen.png";
 
     // When you know your path is already URL encoded, decode it first
@@ -140,7 +135,7 @@ public class UriBuilderTest {
   }
 
   @Test
-  public void testEncodedQuery() throws MalformedURLException {
+  public void testEncodedQuery() {
     String query = "?a=%3D";
     UriBuilder builder = new UriBuilder(TEST_URI_PATH + query);
     final String url = builder.createURL().toString();
@@ -148,7 +143,7 @@ public class UriBuilderTest {
   }
 
   @Test
-  public void testScheme() throws Exception {
+  public void testScheme() {
     UriBuilder builder = new UriBuilder();
     assertNull(builder.getScheme());
     //
@@ -162,7 +157,7 @@ public class UriBuilderTest {
   }
 
   @Test
-  public void testHost() throws Exception {
+  public void testHost() {
     UriBuilder builder = new UriBuilder();
     assertNull(builder.getHost());
     //
@@ -177,7 +172,7 @@ public class UriBuilderTest {
   }
 
   @Test
-  public void testPort() throws Exception {
+  public void testPort() {
     UriBuilder builder = new UriBuilder();
     assertEquals(-1, builder.getPort());
     //
@@ -203,7 +198,7 @@ public class UriBuilderTest {
   }
 
   @Test
-  public void testPath() throws Exception {
+  public void testPath() {
     UriBuilder builder = new UriBuilder();
     assertNull(builder.getPath());
     //
@@ -218,7 +213,7 @@ public class UriBuilderTest {
   }
 
   @Test
-  public void testAddPath() throws Exception {
+  public void testAddPath() {
     UriBuilder builder = new UriBuilder();
     assertNull(builder.getPath());
     //
@@ -241,7 +236,7 @@ public class UriBuilderTest {
   }
 
   @Test
-  public void testFragment() throws Exception {
+  public void testFragment() {
     UriBuilder builder = new UriBuilder();
     assertNull(builder.getFragment());
     //
@@ -256,7 +251,7 @@ public class UriBuilderTest {
   }
 
   @Test
-  public void testParameter() throws Exception {
+  public void testParameter() {
     UriBuilder builder = new UriBuilder();
     assertNotNull(builder.getParameters());
     assertTrue(builder.getParameters().isEmpty());
@@ -279,7 +274,7 @@ public class UriBuilderTest {
   }
 
   @Test
-  public void testParameters() throws Exception {
+  public void testParameters() {
     UriBuilder builder = new UriBuilder();
     assertNotNull(builder.getParameters());
     assertTrue(builder.getParameters().isEmpty());
@@ -352,7 +347,7 @@ public class UriBuilderTest {
   }
 
   @Test
-  public void testParameter_WithSpecialCharacters() throws Exception {
+  public void testParameter_WithSpecialCharacters() {
     UriBuilder builder = new UriBuilder(TEST_URI_PATH);
     builder.parameter("key", "value"); // simple key/value
     builder.parameter("k&y", "=alue"); // contains an equals sign (invalid value for url parameter)
@@ -378,7 +373,7 @@ public class UriBuilderTest {
   }
 
   @Test
-  public void testQueryString() throws Exception {
+  public void testQueryString() {
     UriBuilder builder = new UriBuilder(TEST_URI_PATH);
     builder.queryString("foo=1&bar=baz");
     assertEquals(2, builder.getParameters().size());

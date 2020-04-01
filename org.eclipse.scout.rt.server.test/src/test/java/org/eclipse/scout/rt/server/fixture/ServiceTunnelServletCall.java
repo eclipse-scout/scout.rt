@@ -70,7 +70,7 @@ public class ServiceTunnelServletCall extends Thread {
         }
 
         @Override
-        public long getLength() throws IOException {
+        public long getLength() {
           return 0;
         }
       });

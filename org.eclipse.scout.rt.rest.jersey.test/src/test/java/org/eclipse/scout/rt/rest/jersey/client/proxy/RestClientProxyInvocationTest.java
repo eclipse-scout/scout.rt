@@ -85,7 +85,7 @@ public class RestClientProxyInvocationTest {
   // --- GET -> Response -------------------------------------------------------
 
   @Test
-  public void testSyncGetOk() throws Exception {
+  public void testSyncGetOk() {
     Locale locale = Locale.GERMANY;
     String correlationId = UUID.randomUUID().toString();
     RunContexts.copyCurrent()
@@ -128,7 +128,7 @@ public class RestClientProxyInvocationTest {
   }
 
   @Test
-  public void testAsyncGetOk() throws Exception {
+  public void testAsyncGetOk() {
     Locale defaultLocale = NlsLocale.get();
     Locale locale = Locale.GERMANY;
     String correlationId = UUID.randomUUID().toString();
@@ -148,25 +148,25 @@ public class RestClientProxyInvocationTest {
   }
 
   @Test
-  public void testAsyncGetForbidden() throws Exception {
+  public void testAsyncGetForbidden() {
     VetoException ve = assertThrows(VetoException.class, () -> webTargetGet(Response.Status.FORBIDDEN, Content.DEFAULT, Execution.ASYNC));
     assertEquals("REST Client Test: Forbidden", ve.getDisplayMessage());
   }
 
   @Test
-  public void testAsyncGetForbiddenEmptyBody() throws Exception {
+  public void testAsyncGetForbiddenEmptyBody() {
     VetoException ve = assertThrows(VetoException.class, () -> webTargetGet(Response.Status.FORBIDDEN, Content.EMPTY_BODY, Execution.ASYNC));
     assertEquals("Forbidden", ve.getDisplayMessage());
   }
 
   @Test
-  public void testAsyncGetNotFound() throws Exception {
+  public void testAsyncGetNotFound() {
     ResourceNotFoundException pe = assertThrows(ResourceNotFoundException.class, () -> webTargetGet(Response.Status.NOT_FOUND, Content.DEFAULT, Execution.ASYNC));
     assertEquals("REST Client Test: Not Found", pe.getDisplayMessage());
   }
 
   @Test
-  public void testAsyncGetNotFoundEmptyBody() throws Exception {
+  public void testAsyncGetNotFoundEmptyBody() {
     ResourceNotFoundException pe = assertThrows(ResourceNotFoundException.class, () -> webTargetGet(Response.Status.NOT_FOUND, Content.EMPTY_BODY, Execution.ASYNC));
     assertEquals("Not Found", pe.getDisplayMessage());
   }
@@ -371,7 +371,7 @@ public class RestClientProxyInvocationTest {
   }
 
   @Test
-  public void testAsyncGetEntityForbidden() throws Exception {
+  public void testAsyncGetEntityForbidden() {
     ExecutionException ee = assertThrows(ExecutionException.class, () -> m_target
         .queryParam(STATUS, Response.Status.FORBIDDEN.getStatusCode())
         .request()
@@ -398,7 +398,7 @@ public class RestClientProxyInvocationTest {
   }
 
   @Test
-  public void testAsyncGetEntityNotFound() throws Exception {
+  public void testAsyncGetEntityNotFound() {
     ExecutionException ee = assertThrows(ExecutionException.class, () -> m_target
         .queryParam(STATUS, Response.Status.NOT_FOUND.getStatusCode())
         .request()
@@ -527,7 +527,7 @@ public class RestClientProxyInvocationTest {
   }
 
   @Test
-  public void testClientInvocationAsyncGetEntityForbiddenEmptyBody() throws Exception {
+  public void testClientInvocationAsyncGetEntityForbiddenEmptyBody() {
     ExecutionException ee = assertThrows(ExecutionException.class, () -> clientInvocationGetEntity(Response.Status.FORBIDDEN, Content.EMPTY_BODY, Execution.ASYNC));
     assertEquals(AccessForbiddenException.class, ee.getCause().getClass());
     assertEquals("Forbidden", ((AccessForbiddenException) ee.getCause()).getDisplayMessage());
@@ -541,7 +541,7 @@ public class RestClientProxyInvocationTest {
   }
 
   @Test
-  public void testClientInvocationAsyncGetEntityNotFoundEmptyBody() throws Exception {
+  public void testClientInvocationAsyncGetEntityNotFoundEmptyBody() {
     ExecutionException ee = assertThrows(ExecutionException.class, () -> clientInvocationGetEntity(Response.Status.NOT_FOUND, Content.EMPTY_BODY, Execution.ASYNC));
     assertEquals(ResourceNotFoundException.class, ee.getCause().getClass());
     assertEquals("Not Found", ((ResourceNotFoundException) ee.getCause()).getDisplayMessage());
@@ -635,7 +635,7 @@ public class RestClientProxyInvocationTest {
   }
 
   @Test
-  public void testInvocationAsyncGetEntityForbiddenEmptyBody() throws Exception {
+  public void testInvocationAsyncGetEntityForbiddenEmptyBody() {
     Invocation invocation = m_target
         .queryParam(STATUS, Response.Status.FORBIDDEN.getStatusCode())
         .queryParam(EMPTY_BODY, "true")

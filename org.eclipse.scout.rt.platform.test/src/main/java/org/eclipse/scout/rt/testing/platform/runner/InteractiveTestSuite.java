@@ -196,12 +196,12 @@ public class InteractiveTestSuite extends Runner {
     private final Set<String> m_successList = new LinkedHashSet<>();
 
     @Override
-    public void testStarted(Description description) throws Exception {
+    public void testStarted(Description description) {
       m_failure = null;
     }
 
     @Override
-    public void testFailure(Failure failure) throws Exception {
+    public void testFailure(Failure failure) {
       m_failure = failure;
       Description description = failure.getDescription();
       String msg = String.format("FAILED %s#%s - %s", description.getClassName(), description.getMethodName(), m_failure.getMessage());
@@ -213,7 +213,7 @@ public class InteractiveTestSuite extends Runner {
     }
 
     @Override
-    public void testFinished(Description description) throws Exception {
+    public void testFinished(Description description) {
       if (m_failure == null) {
         String msg = String.format("SUCCESS %s#%s", description.getClassName(), description.getMethodName());
         m_successList.add(msg);

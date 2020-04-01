@@ -30,7 +30,7 @@ import org.junit.runner.RunWith;
 public class CodeTypeWithAddRemoveCodeTest {
 
   @Test
-  public void testAddRemoveRootCode() throws Exception {
+  public void testAddRemoveRootCode() {
     TestCodeType ct = new TestCodeType();
     assertEquals("{id:10,text:Root10,children:[{id:11,text:Test11},{id:12,text:Test12}]}", dumpCodeType(ct));
 
@@ -65,7 +65,7 @@ public class CodeTypeWithAddRemoveCodeTest {
   }
 
   @Test
-  public void testAddRemoveChildCode() throws Exception {
+  public void testAddRemoveChildCode() {
     TestCodeType ct = new TestCodeType();
     assertEquals("{id:10,text:Root10,children:[{id:11,text:Test11},{id:12,text:Test12}]}", dumpCodeType(ct));
 

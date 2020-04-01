@@ -62,7 +62,7 @@ public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest 
   }
 
   @Test
-  public void testWithUnchangedTableCustomizer() throws Exception {
+  public void testWithUnchangedTableCustomizer() {
     tableCustomizerSerialDataIsRandom = false;
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     desktop.activateFirstPage();
@@ -80,7 +80,7 @@ public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest 
   }
 
   @Test
-  public void testWithChangedTableCustomizer() throws Exception {
+  public void testWithChangedTableCustomizer() {
     tableCustomizerSerialDataIsRandom = true;
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     desktop.activateFirstPage();

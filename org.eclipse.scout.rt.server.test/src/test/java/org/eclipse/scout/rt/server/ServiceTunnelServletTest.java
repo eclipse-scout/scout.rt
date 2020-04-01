@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.io.IOException;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +23,6 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -77,7 +75,7 @@ public class ServiceTunnelServletTest {
   private ServerSessionProvider m_serverSessionProviderSpy;
 
   @Before
-  public void before() throws ServletException, InstantiationException, IllegalAccessException {
+  public void before() {
     m_serverSessionProviderSpy = spy(BEANS.get(ServerSessionProvider.class));
 
     m_beans = BeanTestingHelper.get().registerBeans(
@@ -98,7 +96,7 @@ public class ServiceTunnelServletTest {
   }
 
   @Test
-  public void testNewSessionCreatedOnLookupHttpSession() throws ServletException {
+  public void testNewSessionCreatedOnLookupHttpSession() {
     createServletRunContext(m_requestMock, m_responseMock).run(() -> {
       final ServerRunContext runcontext = ServerRunContexts.copyCurrent().withClientNodeId("testNodeId");
       IServerSession session = BEANS.get(HttpServerRunContextProducer.class).getOrCreateScoutSession(m_requestMock, runcontext, "testid");
@@ -110,7 +108,7 @@ public class ServiceTunnelServletTest {
    * If a {@link IServerSession} already exists, no new session should be created.
    */
   @Test
-  public void testNoNewServerSessionOnLookup() throws ServletException {
+  public void testNoNewServerSessionOnLookup() {
     RunContexts
         .empty()
         .run(() -> {
@@ -127,7 +125,7 @@ public class ServiceTunnelServletTest {
    * threads and that {@link ServerSessionProvider#provide(ServerRunContext)}} is called only once.
    */
   @Test
-  public void testLookupScoutServerSessionOnHttpSessionMultipleThreads() throws ServletException {
+  public void testLookupScoutServerSessionOnHttpSessionMultipleThreads() {
     final Map<String, IServerSession> cache = new HashMap<>();
 
     final TestServerSession testServerSession = new TestServerSession();
@@ -161,7 +159,7 @@ public class ServiceTunnelServletTest {
   }
 
   @Test
-  public void testPostSuccessful() throws ServletException, IOException {
+  public void testPostSuccessful() {
     ServiceTunnelServlet s = new ServiceTunnelServlet();
     Class[] parameterTypes = new Class[]{String.class};
     Object[] args = new Object[]{"test"};
@@ -223,7 +221,7 @@ public class ServiceTunnelServletTest {
     }
 
     @Override
-    public IServerSession call() throws Exception {
+    public IServerSession call() {
       return createServletRunContext(m_request, m_response).call(() -> BEANS.get(HttpServerRunContextProducer.class)
           .getOrCreateScoutSession(m_request, ServerRunContexts.empty().withClientNodeId("testNodeId"), "testSessionId"));
     }

@@ -49,20 +49,20 @@ public class PageDataExtensionTest extends AbstractLocalExtensionTestCase {
   }
 
   @Test
-  public void testPageDataSingleExtensionExplicit() throws Exception {
+  public void testPageDataSingleExtensionExplicit() {
     BEANS.get(IExtensionRegistry.class).register(ThirdIntegerColumn.class, OrigPageWithTable.Table.class);
     BEANS.get(IExtensionRegistry.class).register(ThirdIntegerColumnData.class, OrigPageWithTableRowData.class);
     doTestSingle();
   }
 
   @Test
-  public void testPageDataMultipleExtensionAnnotation() throws Exception {
+  public void testPageDataMultipleExtensionAnnotation() {
     BEANS.get(IExtensionRegistry.class).register(MultiColumnExtension.class);
     BEANS.get(IExtensionRegistry.class).register(MultiColumnExtensionData.class);
     doTestMulti();
   }
 
-  private void doTestMulti() throws Exception {
+  private void doTestMulti() {
     Long EXT_TEST_VAL1_EXPORT = Long.valueOf(6);
     BigDecimal EXT_TEST_VAL2_EXPORT = BigDecimal.valueOf(7);
     Long EXT_TEST_VAL1_IMPORT = Long.valueOf(8);
@@ -92,7 +92,7 @@ public class PageDataExtensionTest extends AbstractLocalExtensionTestCase {
     Assert.assertTrue(EXT_TEST_VAL2_IMPORT.compareTo((BigDecimal) pwt.getTable().getRow(0).getCell(3).getValue()) == 0);
   }
 
-  private void doTestSingle() throws Exception {
+  private void doTestSingle() {
     Long ORIG_TEST_VAL_EXPORT = Long.valueOf(66);
     Integer EXT_TEST_VAL_EXPORT = Integer.valueOf(77);
     BigDecimal ORIG_TEST_VAL_IMPORT = new BigDecimal("88");

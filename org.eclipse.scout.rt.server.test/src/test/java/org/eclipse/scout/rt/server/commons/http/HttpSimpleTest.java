@@ -147,7 +147,7 @@ public class HttpSimpleTest {
       }
 
       @Override
-      public long getLength() throws IOException {
+      public long getLength() {
         return 3;
       }
     });

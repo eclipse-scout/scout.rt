@@ -85,7 +85,7 @@ public class SmartFieldTest {
   private StyleField m_styleField;
 
   @BeforeClass
-  public static void beforeClass() throws Exception {
+  public static void beforeClass() {
     m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(StyleLookupCall.class));
   }
 
@@ -270,7 +270,7 @@ public class SmartFieldTest {
   }
 
   @Before
-  public void setUp() throws Throwable {
+  public void setUp() {
     m_reg = BeanTestingHelper.get().registerBeans(
         new BeanMetaData(StyleLookupService.class)
             .withApplicationScoped(true));
@@ -280,7 +280,7 @@ public class SmartFieldTest {
   }
 
   @Test
-  public void testStyle_SetValue() throws Throwable {
+  public void testStyle_SetValue() {
     StyleField f = m_styleField;
     f.setValue(ID_RED);
     assertRedLookupRow(f);
@@ -370,7 +370,7 @@ public class SmartFieldTest {
   }
 
   @Test
-  public void testStyle_AcceptProposal() throws Throwable {
+  public void testStyle_AcceptProposal() {
     StyleField f = m_styleField;
     f.getUIFacade().setLookupRowFromUI(createRedLookupRow());
     assertRedLookupRow(f);
@@ -405,7 +405,7 @@ public class SmartFieldTest {
    * should be performed.
    */
   @Test
-  public void testLookupOnlyWhenNecessary() throws Exception {
+  public void testLookupOnlyWhenNecessary() {
     StyleField f = m_styleField;
     StyleLookupCall lookupCall = (StyleLookupCall) f.getLookupCall();
     // expect lookup is performed
@@ -427,7 +427,7 @@ public class SmartFieldTest {
   }
 
   @After
-  public void tearDown() throws Throwable {
+  public void tearDown() {
     BeanTestingHelper.get().unregisterBeans(m_reg);
     m_form.doClose();
   }
@@ -447,7 +447,7 @@ public class SmartFieldTest {
    * Test for ticket #168652.
    */
   @Test
-  public void testDeleteProposal() throws Exception {
+  public void testDeleteProposal() {
     m_styleField.setValue(ID_RED);
     m_styleField.lookupByAll();
     waitUntilLookupRowsLoaded();

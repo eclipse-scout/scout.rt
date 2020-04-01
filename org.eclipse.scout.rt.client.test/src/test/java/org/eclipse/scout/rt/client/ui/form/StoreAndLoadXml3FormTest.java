@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
 public class StoreAndLoadXml3FormTest {
 
   @Test
-  public void testXmlFieldIds() throws Exception {
+  public void testXmlFieldIds() {
     TestForm f = new TestForm();
     assertEquals("MainBox", f.getMainBox().getFieldId());
     assertEquals("customId", f.getText4Field().getFieldId());
@@ -45,7 +45,7 @@ public class StoreAndLoadXml3FormTest {
   }
 
   @Test
-  public void testFieldIds() throws Exception {
+  public void testFieldIds() {
     TestForm f = new TestForm();
     checkFieldXml(f.getMainBox(), "MainBox");
     checkFieldXml(f.getText4Field(), "customId");
@@ -75,7 +75,7 @@ public class StoreAndLoadXml3FormTest {
   }
 
   @Test
-  public void testFormId() throws Exception {
+  public void testFormId() {
     TestForm f = new TestForm();
     Document xml = f.storeToXml();
     assertEquals("TestForm", xml.getDocumentElement().getAttribute("formId"));

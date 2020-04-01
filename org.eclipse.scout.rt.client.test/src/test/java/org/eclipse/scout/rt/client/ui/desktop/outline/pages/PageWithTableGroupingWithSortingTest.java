@@ -50,7 +50,7 @@ public class PageWithTableGroupingWithSortingTest {
   }
 
   @Test
-  public void testGroupingWithSorting() throws Exception {
+  public void testGroupingWithSorting() {
     //reset columns
     table.resetColumns();
 
@@ -79,7 +79,7 @@ public class PageWithTableGroupingWithSortingTest {
   }
 
   @Test
-  public void testGrouping() throws Exception {
+  public void testGrouping() {
 
     //reset columns
     table.resetColumns();

@@ -76,7 +76,7 @@ public class ParameterizedTestRunnerExtensionTest {
   }
 
   @Test
-  public void testValidateOneParametersMethod() throws NoSuchMethodException, SecurityException {
+  public void testValidateOneParametersMethod() throws SecurityException {
     List<Throwable> errors;
 
     errors = new LinkedList<>();

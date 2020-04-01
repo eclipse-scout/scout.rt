@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore;
@@ -54,7 +51,7 @@ public class FormStoredWithVetoTest {
   }
 
   @Test
-  public void testVetoHandlerSave() throws Exception {
+  public void testVetoHandlerSave() {
     m_form.setExecStoreHandlerImplementation(MethodImplementation.VETO_EXCEPTION);
     m_form.startModify();
     m_form.touch();
@@ -68,7 +65,7 @@ public class FormStoredWithVetoTest {
   }
 
   @Test
-  public void testVetoHandlerOk() throws Exception {
+  public void testVetoHandlerOk() {
     m_form.setExecStoreHandlerImplementation(MethodImplementation.VETO_EXCEPTION);
     m_form.startModify();
     m_form.touch();
@@ -82,7 +79,7 @@ public class FormStoredWithVetoTest {
   }
 
   @Test
-  public void testVetoFormSave() throws Exception {
+  public void testVetoFormSave() {
     m_form.setExecStoredImplementation(MethodImplementation.VETO_EXCEPTION);
     m_form.startModify();
     m_form.touch();
@@ -96,7 +93,7 @@ public class FormStoredWithVetoTest {
   }
 
   @Test
-  public void testVetoFormOk() throws Exception {
+  public void testVetoFormOk() {
     m_form.setExecStoredImplementation(MethodImplementation.VETO_EXCEPTION);
     m_form.startModify();
     m_form.touch();
@@ -110,7 +107,7 @@ public class FormStoredWithVetoTest {
   }
 
   @Test
-  public void testVetoCombinationSave() throws Exception {
+  public void testVetoCombinationSave() {
     m_form.setExecStoreHandlerImplementation(MethodImplementation.MARK_STORED); //no effect because of execStored in the form
     m_form.setExecStoredImplementation(MethodImplementation.VETO_EXCEPTION);
     m_form.startModify();
@@ -125,7 +122,7 @@ public class FormStoredWithVetoTest {
   }
 
   @Test
-  public void testVetoCombinationOk() throws Exception {
+  public void testVetoCombinationOk() {
     m_form.setExecStoreHandlerImplementation(MethodImplementation.MARK_STORED); //no effect because of execStored in the form
     m_form.setExecStoredImplementation(MethodImplementation.VETO_EXCEPTION);
     m_form.startModify();

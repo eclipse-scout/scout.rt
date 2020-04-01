@@ -10,11 +10,8 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.eclipse.scout.rt.platform.util.CollectionUtility.emptyHashSet;
-import static org.eclipse.scout.rt.platform.util.CollectionUtility.hashSet;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.eclipse.scout.rt.platform.util.CollectionUtility.*;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.concurrent.Callable;
@@ -63,7 +60,7 @@ public class ReflectionUtilityTest {
     }
 
     @Override
-    public Object call() throws Exception {
+    public Object call() {
       return null;
     }
   }

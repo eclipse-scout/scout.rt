@@ -35,7 +35,7 @@ import org.junit.runner.RunWith;
 public class NestedMenusTest {
 
   @Test
-  public void testFindNestedMenuInDesktop() throws Exception {
+  public void testFindNestedMenuInDesktop() {
     IDesktop desktop = new P_Desktop();
     AboutMenu menu = desktop.getMenuByClass(P_Desktop.HelpMenu.AboutMenu.class);
     assertNotNull(menu);

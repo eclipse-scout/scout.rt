@@ -50,7 +50,7 @@ public class SelectInputBindTest {
    * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna). Direct batch update.
    */
   @Test
-  public void testBatchUpdateFromTableFieldBeanData() throws Exception {
+  public void testBatchUpdateFromTableFieldBeanData() {
     SqlServiceMock sql = createSqlServiceMock();
     TableFieldBeanData tableData = createTableFieldBeanData(false);
     sql.update("UDPATE my_table SET a=:{active}, s=:{state} where n=:{name} ", tableData);
@@ -62,7 +62,7 @@ public class SelectInputBindTest {
    * is in NVPair bind.
    */
   @Test
-  public void testBatchUpdateFromTableFieldBeanDataInNVPair() throws Exception {
+  public void testBatchUpdateFromTableFieldBeanDataInNVPair() {
     SqlServiceMock sql = createSqlServiceMock();
     TableFieldBeanData tableData = createTableFieldBeanData(false);
     sql.update("UDPATE my_table SET a=:{table.active}, s=:{table.state} where n=:{table.name} ", new NVPair("table", tableData));
@@ -74,7 +74,7 @@ public class SelectInputBindTest {
    * is in Map bind.
    */
   @Test
-  public void testBatchUpdateFromTableFieldBeanDataInMap() throws Exception {
+  public void testBatchUpdateFromTableFieldBeanDataInMap() {
     SqlServiceMock sql = createSqlServiceMock();
     TableFieldBeanData tableData = createTableFieldBeanData(false);
     Map<String, ?> map = Collections.singletonMap("table", tableData);
@@ -87,7 +87,7 @@ public class SelectInputBindTest {
    * is in a bean (ContainerBean).
    */
   @Test
-  public void testBatchUpdateFromTableFieldBeanDataInBean() throws Exception {
+  public void testBatchUpdateFromTableFieldBeanDataInBean() {
     SqlServiceMock sql = createSqlServiceMock();
     TableFieldBeanData tableData = createTableFieldBeanData(false);
     ContainerBean bean = new ContainerBean();
@@ -101,7 +101,7 @@ public class SelectInputBindTest {
    * update.
    */
   @Test
-  public void testBatchUpdateFromTableBeanHolderFilter() throws Exception {
+  public void testBatchUpdateFromTableBeanHolderFilter() {
     SqlServiceMock sql = createSqlServiceMock();
     TableFieldBeanData tableData = createTableFieldBeanData(true);
     TableBeanHolderFilter filter = new TableBeanHolderFilter(tableData, ITableBeanRowHolder.STATUS_UPDATED);
@@ -114,7 +114,7 @@ public class SelectInputBindTest {
    * batch update is in NVPair bind.
    */
   @Test
-  public void testBatchUpdateFromTableBeanHolderFilterInNVPair() throws Exception {
+  public void testBatchUpdateFromTableBeanHolderFilterInNVPair() {
     SqlServiceMock sql = createSqlServiceMock();
     TableFieldBeanData tableData = createTableFieldBeanData(true);
     TableBeanHolderFilter filter = new TableBeanHolderFilter(tableData, ITableBeanRowHolder.STATUS_UPDATED);
@@ -127,7 +127,7 @@ public class SelectInputBindTest {
    * batch update is in Map bind.
    */
   @Test
-  public void testBatchUpdateFromTableBeanHolderFilterInMap() throws Exception {
+  public void testBatchUpdateFromTableBeanHolderFilterInMap() {
     SqlServiceMock sql = createSqlServiceMock();
     TableFieldBeanData tableData = createTableFieldBeanData(true);
     TableBeanHolderFilter filter = new TableBeanHolderFilter(tableData, ITableBeanRowHolder.STATUS_UPDATED);
@@ -141,7 +141,7 @@ public class SelectInputBindTest {
    * batch update is in a bean (ContainerBean).
    */
   @Test
-  public void testBatchUpdateFromTableBeanHolderFilterInBean() throws Exception {
+  public void testBatchUpdateFromTableBeanHolderFilterInBean() {
     SqlServiceMock sql = createSqlServiceMock();
     TableFieldBeanData tableData = createTableFieldBeanData(true);
     TableBeanHolderFilter filter = new TableBeanHolderFilter(tableData, ITableBeanRowHolder.STATUS_UPDATED);
@@ -197,7 +197,7 @@ public class SelectInputBindTest {
    * Batch update from an array.
    */
   @Test
-  public void testBatchUpdateFromArray() throws Exception {
+  public void testBatchUpdateFromArray() {
     SqlServiceMock sql = createSqlServiceMock();
 
     Long person = 9L;
@@ -212,7 +212,7 @@ public class SelectInputBindTest {
    * (because in a set you can not ensure the order of the entries in the set)
    */
   @Test
-  public void testBatchUpdateFromArray2() throws Exception {
+  public void testBatchUpdateFromArray2() {
     SqlServiceMock sql = createSqlServiceMock();
 
     Long person = 9L;
@@ -225,7 +225,7 @@ public class SelectInputBindTest {
    * Batch update from a list.
    */
   @Test
-  public void testBatchUpdateFromList() throws Exception {
+  public void testBatchUpdateFromList() {
     SqlServiceMock sql = createSqlServiceMock();
 
     Long person = 9L;
@@ -238,7 +238,7 @@ public class SelectInputBindTest {
    * Direct batch update from a set.
    */
   @Test
-  public void testBatchUpdateFromSet() throws Exception {
+  public void testBatchUpdateFromSet() {
     SqlServiceMock sql = createSqlServiceMock();
 
     Long person = 9L;
@@ -253,7 +253,7 @@ public class SelectInputBindTest {
    * Batch update from a list in an holder.
    */
   @Test
-  public void testBatchUpdateFromListInHolder() throws Exception {
+  public void testBatchUpdateFromListInHolder() {
     SqlServiceMock sql = createSqlServiceMock();
 
     Long person = 9L;
@@ -267,7 +267,7 @@ public class SelectInputBindTest {
    * Direct batch update from a array in {@link AbstractValueFieldData}.
    */
   @Test
-  public void testBatchUpdateFromArrayInValueField() throws Exception {
+  public void testBatchUpdateFromArrayInValueField() {
     SqlServiceMock sql = createSqlServiceMock();
 
     FormDataWithArray formData = new FormDataWithArray();
@@ -282,7 +282,7 @@ public class SelectInputBindTest {
    * Direct batch update from a array in {@link AbstractValueFieldData}.
    */
   @Test
-  public void testBatchUpdateFromSetInValueField() throws Exception {
+  public void testBatchUpdateFromSetInValueField() {
     SqlServiceMock sql = createSqlServiceMock();
 
     Set<Long> roles = new HashSet<>();
@@ -301,7 +301,7 @@ public class SelectInputBindTest {
    * Direct batch update from a array in {@link AbstractValueFieldData}.
    */
   @Test
-  public void testEmptyBatchUpdateFromSetInValueField() throws Exception {
+  public void testEmptyBatchUpdateFromSetInValueField() {
     SqlServiceMock sql = createSqlServiceMock();
 
     FormDataWithSet formData = new FormDataWithSet();

@@ -10,12 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.action;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -117,7 +112,7 @@ public class ActionTest {
    * test for {@link AbstractAction#combineKeyStrokes(String...)}
    */
   @Test
-  public void testCombineKeyStrokes() throws Exception {
+  public void testCombineKeyStrokes() {
     assertEquals(IKeyStroke.CONTROL + '-' + IKeyStroke.F1, AbstractAction.combineKeyStrokes(IKeyStroke.CONTROL, IKeyStroke.F1));
   }
 

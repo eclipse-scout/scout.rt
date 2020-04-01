@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -161,7 +157,7 @@ public class TableTest {
    * AutoDiscardOnDelete = false) delete a row and discard it.
    */
   @Test
-  public void testDeleteAndDiscard() throws Exception {
+  public void testDeleteAndDiscard() {
     //Bug 361985
     P_Table table = createTestTable(ITableRow.STATUS_NON_CHANGED);
     final CapturingTableAdapter ta = new CapturingTableAdapter();
@@ -187,7 +183,7 @@ public class TableTest {
    * AutoDiscardOnDelete = false) discard these deletedRows with discardAllDeletedRows.
    */
   @Test
-  public void testDeleteAllAndDiscardAll() throws Exception {
+  public void testDeleteAllAndDiscardAll() {
     //Bug 361985
     P_Table table = createTestTable(ITableRow.STATUS_NON_CHANGED);
 
@@ -210,7 +206,7 @@ public class TableTest {
    * (STATUS_INSERTED, or .STATUS_NON_CHANGED)
    */
   @Test
-  public void testDeleteAllAutoDiscard() throws Exception {
+  public void testDeleteAllAutoDiscard() {
     //Bug 361985
     //test with STATUS_INSERTED and AutoDiscardOnDelete:
     P_Table table = createTestTable(ITableRow.STATUS_INSERTED);
@@ -232,7 +228,7 @@ public class TableTest {
    * discard all rows => no deleted row.
    */
   @Test
-  public void testDiscardAll_StatusInserted() throws Exception {
+  public void testDiscardAll_StatusInserted() {
     //Bug 361985
     //test with STATUS_INSERTED and AutoDiscardOnDelete:
     P_Table table = createTestTable(ITableRow.STATUS_INSERTED);
@@ -247,7 +243,7 @@ public class TableTest {
    * discard all rows => no deleted row.
    */
   @Test
-  public void testDiscardAll_StatusNonChanged() throws Exception {
+  public void testDiscardAll_StatusNonChanged() {
     P_Table table2 = createTestTable(ITableRow.STATUS_NON_CHANGED);
 
     table2.discardAllRows();
@@ -259,7 +255,7 @@ public class TableTest {
    * rows will stay in the order they were added to the table.
    */
   @Test
-  public void testSortNotEnabled() throws Exception {
+  public void testSortNotEnabled() {
     P_Table table = new P_Table();
     table.init();
 
@@ -296,7 +292,7 @@ public class TableTest {
    * </ol>
    */
   @Test
-  public void testSortFirstColumn() throws Exception {
+  public void testSortFirstColumn() {
     P_Table table = new P_Table();
     table.init();
 
@@ -334,7 +330,7 @@ public class TableTest {
    * column) - 2. SecondColumn descending - 3. FirstColumn ascending.
    */
   @Test
-  public void testSortTwoColumns() throws Exception {
+  public void testSortTwoColumns() {
     P_Table table = new P_Table();
     table.init();
 
@@ -387,7 +383,7 @@ public class TableTest {
    * column).
    */
   @Test
-  public void testSortDefault() throws Exception {
+  public void testSortDefault() {
     P_Table table = new P_Table();
     table.init();
 
@@ -448,7 +444,7 @@ public class TableTest {
   }
 
   @Test
-  public void testInitConfig_DefaultValues() throws Exception {
+  public void testInitConfig_DefaultValues() {
     P_Table table = new P_Table();
     table.initConfig();
     assertTrue(table.isEnabled());

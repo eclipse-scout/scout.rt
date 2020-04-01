@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.sequencebox;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -69,7 +66,7 @@ public class SequenceBoxTest {
    * client.ui.form.fields.IValueField<T>[], int)}.
    */
   @Test
-  public void testExecCheckFromTo() throws Exception {
+  public void testExecCheckFromTo() {
     //check standard case
     SequenceTestForm f = new SequenceTestForm();
     f.setModal(false);
@@ -143,7 +140,7 @@ public class SequenceBoxTest {
   }
 
   @Test
-  public void testRightNeighbor() throws Exception {
+  public void testRightNeighbor() {
     ThreeElementSequence sb = new ThreeElementSequence();
     sb.clearErrorStatus();
     sb.getFirstField().setValue(3);
@@ -155,7 +152,7 @@ public class SequenceBoxTest {
   }
 
   @Test
-  public void testRightNeighborNull() throws Exception {
+  public void testRightNeighborNull() {
     ThreeElementSequence sb = new ThreeElementSequence();
     sb.clearErrorStatus();
     sb.getFirstField().setValue(3);
@@ -167,7 +164,7 @@ public class SequenceBoxTest {
   }
 
   @Test
-  public void testLeftNeighbor() throws Exception {
+  public void testLeftNeighbor() {
     ThreeElementSequence sb = new ThreeElementSequence();
     sb.clearErrorStatus();
     sb.getFirstField().setValue(3);
@@ -179,7 +176,7 @@ public class SequenceBoxTest {
   }
 
   @Test
-  public void testLeftNeighborNull() throws Exception {
+  public void testLeftNeighborNull() {
     ThreeElementSequence sb = new ThreeElementSequence();
     sb.clearErrorStatus();
     sb.getFirstField().setValue(null);
@@ -191,7 +188,7 @@ public class SequenceBoxTest {
   }
 
   @Test
-  public void testAllEmpty() throws Exception {
+  public void testAllEmpty() {
     ThreeElementSequence sb = new ThreeElementSequence();
     sb.addErrorStatus(new InvalidSequenceStatus(""));
     sb.getFirstField().setValue(null);
@@ -224,7 +221,7 @@ public class SequenceBoxTest {
   }
 
   @Test
-  public void testStatusVisible() throws Exception {
+  public void testStatusVisible() {
     ThreeElementSequence sb = new ThreeElementSequence();
     assertFalse(sb.getFirstField().isStatusVisible());
     assertFalse(sb.getSecondField().isStatusVisible());

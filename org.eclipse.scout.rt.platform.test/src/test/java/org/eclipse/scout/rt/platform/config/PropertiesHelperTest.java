@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.platform.config;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,7 +62,7 @@ public class PropertiesHelperTest {
   private static final String EMPTY_KEY = "emptyKey";
 
   @Test
-  public void testPropertiesHelper() throws Exception {
+  public void testPropertiesHelper() {
     PropertiesHelper instance = new PropertiesHelper(new ConfigPropertyProvider(SAMPLE_CONFIG_PROPS));
     assertEquals(USER_HOME_VALUE, instance.getProperty(USER_HOME_KEY));
     assertEquals(OTHER_PROP_VALUE, instance.getProperty(OTHER_PROP_KEY));
@@ -85,7 +83,7 @@ public class PropertiesHelperTest {
   }
 
   @Test
-  public void testGetPropertiesFileUrl() throws IOException {
+  public void testGetPropertiesFileUrl() {
     PropertiesHelper h = new PropertiesHelper(null);
     assertFalse(h.hasProviderProperties());
 
@@ -256,7 +254,7 @@ public class PropertiesHelperTest {
   }
 
   @Test
-  public void testLoopOnSelf() throws MalformedURLException {
+  public void testLoopOnSelf() {
     try {
       new PropertiesHelper(new SimpleConfigPropertyProvider("ID")
           .withProperty("prop1", "a${prop1}b"));
@@ -268,7 +266,7 @@ public class PropertiesHelperTest {
   }
 
   @Test
-  public void testUndefinedPlaceholder() throws MalformedURLException {
+  public void testUndefinedPlaceholder() {
     try {
       new PropertiesHelper(new SimpleConfigPropertyProvider("ID")
           .withProperty("prop1", "a${prop2}b")
@@ -281,7 +279,7 @@ public class PropertiesHelperTest {
   }
 
   @Test
-  public void testLoop() throws MalformedURLException {
+  public void testLoop() {
     try {
       new PropertiesHelper(new SimpleConfigPropertyProvider("ID")
           .withProperty("prop1", "a${prop2}b")

@@ -45,7 +45,7 @@ public class BindValueTest {
   }
 
   @Test
-  public void testNullBindWithLong() throws Exception {
+  public void testNullBindWithLong() {
     m_sqlService.clearProtocol();
 
     //actual behaviour
@@ -67,7 +67,7 @@ public class BindValueTest {
   }
 
   @Test
-  public void testNullBindWithLongAndNullType() throws Exception {
+  public void testNullBindWithLongAndNullType() {
     m_sqlService.clearProtocol();
 
     //actual behaviour
@@ -89,7 +89,7 @@ public class BindValueTest {
   }
 
   @Test
-  public void testNullBindWithLongHolder() throws Exception {
+  public void testNullBindWithLongHolder() {
     m_sqlService.clearProtocol();
 
     //actual behaviour

@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.id;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.net.URL;
 import java.util.Collections;
@@ -91,7 +89,7 @@ public class StringIdSerializationTest {
   }
 
   @Test(expected = PlatformException.class)
-  public void testSerializeDeserialize_EntityWithIdMapKeyNull() throws Exception {
+  public void testSerializeDeserialize_EntityWithIdMapKeyNull() {
     TestEntityWithStringIdMapKeyDo entity = new TestEntityWithStringIdMapKeyDo();
     entity.withMap(Collections.singletonMap(null, "test"));
     m_dataObjectMapper.writeValue(entity);

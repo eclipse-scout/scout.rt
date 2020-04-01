@@ -150,7 +150,7 @@ public class AbstractTreeTest {
   }
 
   @Test
-  public void testInitConfig_DefaultValues() throws Exception {
+  public void testInitConfig_DefaultValues() {
     m_tree.initConfig();
     assertTrue(m_tree.isEnabled());
   }

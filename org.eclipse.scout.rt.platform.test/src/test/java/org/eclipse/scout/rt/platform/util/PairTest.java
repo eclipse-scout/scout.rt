@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -22,21 +20,21 @@ import org.junit.Test;
 public class PairTest {
 
   @Test
-  public void testImmutable() throws Exception {
+  public void testImmutable() {
     Pair<String, Integer> pair = new ImmutablePair<>("Foo", 123);
     assertPair(pair);
     assertPair(ImmutablePair.of("Foo", 123));
   }
 
   @Test
-  public void testMutable() throws Exception {
+  public void testMutable() {
     Pair<String, Integer> pair = new MutablePair<>("Foo", 123);
     assertPair(pair);
     assertPair(MutablePair.of("Foo", 123));
   }
 
   @Test
-  public void testMutatePair() throws Exception {
+  public void testMutatePair() {
     MutablePair<String, Integer> pair = new MutablePair<>("Foo", 123);
     assertPair(pair);
 
@@ -53,7 +51,7 @@ public class PairTest {
   }
 
   @Test
-  public void testEqualsImmutable() throws Exception {
+  public void testEqualsImmutable() {
     Pair<String, Integer> pairA = new ImmutablePair<>("Foo", 123);
     Pair<String, Integer> pairB = new ImmutablePair<>("Foo", 123);
     Pair<String, String> pairC = new ImmutablePair<>("Foo", "Bar");
@@ -63,7 +61,7 @@ public class PairTest {
   }
 
   @Test
-  public void testEqualsMutable() throws Exception {
+  public void testEqualsMutable() {
     Pair<String, Integer> pairA = new MutablePair<>("Foo", 123);
     Pair<String, Integer> pairB = new MutablePair<>("Foo", 123);
     Pair<String, String> pairC = new MutablePair<>("Foo", "Bar");

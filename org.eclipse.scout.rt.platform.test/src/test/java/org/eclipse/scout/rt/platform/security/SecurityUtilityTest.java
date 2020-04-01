@@ -30,7 +30,7 @@ public class SecurityUtilityTest {
   private static final char[] PASSWORD = "insecure".toCharArray();
 
   @Test
-  public void testEncryption() throws Exception {
+  public void testEncryption() {
     final String origData = "origData";
     final byte[] salt = SecurityUtility.createRandomBytes();
     final byte[] inputBytes = origData.getBytes(ENCODING);
@@ -47,65 +47,65 @@ public class SecurityUtilityTest {
   }
 
   @Test(expected = AssertionException.class)
-  public void testEncryptNoData() throws Exception {
+  public void testEncryptNoData() {
     final byte[] salt = SecurityUtility.createRandomBytes();
     SecurityUtility.encrypt(null, "pass".toCharArray(), salt, KEY_LEN);
   }
 
   @Test(expected = AssertionException.class)
-  public void testEncryptNoSalt() throws Exception {
+  public void testEncryptNoSalt() {
     SecurityUtility.encrypt("test".getBytes(ENCODING), "pass".toCharArray(), null, KEY_LEN);
   }
 
   @Test(expected = AssertionException.class)
-  public void testEncryptNoKey() throws Exception {
+  public void testEncryptNoKey() {
     final byte[] salt = SecurityUtility.createRandomBytes();
     SecurityUtility.encrypt("test".getBytes(ENCODING), null, salt, KEY_LEN);
   }
 
   @Test(expected = AssertionException.class)
-  public void testEncryptWrongKeyLen() throws Exception {
+  public void testEncryptWrongKeyLen() {
     final byte[] salt = SecurityUtility.createRandomBytes();
     SecurityUtility.encrypt("test".getBytes(ENCODING), "pass".toCharArray(), salt, 4);
   }
 
   @Test(expected = AssertionException.class)
-  public void testCreateSignatureWrongArg1() throws Exception {
+  public void testCreateSignatureWrongArg1() {
     SecurityUtility.createSignature(null, new byte[]{});
   }
 
   @Test(expected = AssertionException.class)
-  public void testCreateSignatureWrongArg2() throws Exception {
+  public void testCreateSignatureWrongArg2() {
     SecurityUtility.createSignature(new byte[]{}, (byte[]) null);
   }
 
   @Test(expected = AssertionException.class)
-  public void testCreateSignatureWrongArg3() throws Exception {
+  public void testCreateSignatureWrongArg3() {
     SecurityUtility.createSignature(new byte[]{}, (InputStream) null);
   }
 
   @Test(expected = AssertionException.class)
-  public void testVerifySignatureWrongArg1() throws Exception {
+  public void testVerifySignatureWrongArg1() {
     SecurityUtility.verifySignature(new byte[]{}, (byte[]) null, new byte[]{});
   }
 
   @Test(expected = AssertionException.class)
-  public void testVerifySignatureWrongArg2() throws Exception {
+  public void testVerifySignatureWrongArg2() {
     SecurityUtility.verifySignature(null, new byte[]{}, new byte[]{});
   }
 
   @Test(expected = AssertionException.class)
-  public void testVerifySignatureWrongArg3() throws Exception {
+  public void testVerifySignatureWrongArg3() {
     SecurityUtility.verifySignature(new byte[]{}, new byte[]{}, null);
   }
 
   @Test(expected = AssertionException.class)
-  public void testVerifySignatureWrongArg4() throws Exception {
+  public void testVerifySignatureWrongArg4() {
     SecurityUtility.verifySignature(new byte[]{}, (InputStream) null, new byte[]{});
   }
 
   @Test
-  public void testRandomBytes() throws Exception {
+  public void testRandomBytes() {
     byte[] createRandomBytes = SecurityUtility.createRandomBytes();
     byte[] createRandomBytes2 = SecurityUtility.createRandomBytes();
     SecurityUtility.createRandomBytes(4);
@@ -123,7 +123,7 @@ public class SecurityUtilityTest {
   }
 
   @Test
-  public void testHash() throws Exception {
+  public void testHash() {
     final byte[] data = "testdata".getBytes(ENCODING);
     final byte[] salt = SecurityUtility.createRandomBytes();
     final byte[] salt2 = SecurityUtility.createRandomBytes();
@@ -267,22 +267,22 @@ public class SecurityUtilityTest {
   }
 
   @Test(expected = AssertionException.class)
-  public void testCreateMacWrongArg1() throws Exception {
+  public void testCreateMacWrongArg1() {
     SecurityUtility.createMac(null, new byte[]{});
   }
 
   @Test(expected = AssertionException.class)
-  public void testCreateMacWrongArg2() throws Exception {
+  public void testCreateMacWrongArg2() {
     SecurityUtility.createMac(new byte[]{}, (byte[]) null);
   }
 
   @Test(expected = AssertionException.class)
-  public void testCreateMacWrongArg3() throws Exception {
+  public void testCreateMacWrongArg3() {
     SecurityUtility.createMac(new byte[]{}, (InputStream) null);
   }
 
   @Test
-  public void testGenerateKeyPair() throws Exception {
+  public void testGenerateKeyPair() {
     KeyPairBytes generateKeyPair1 = SecurityUtility.generateKeyPair();
     KeyPairBytes generateKeyPair2 = SecurityUtility.generateKeyPair();
 
@@ -298,7 +298,7 @@ public class SecurityUtilityTest {
   }
 
   @Test
-  public void testSignature() throws Exception {
+  public void testSignature() {
     KeyPairBytes keyPair = SecurityUtility.generateKeyPair();
     final byte[] data = "original test data".getBytes(ENCODING);
 
@@ -309,7 +309,7 @@ public class SecurityUtilityTest {
   }
 
   @Test
-  public void testSignatureApiStability() throws Exception {
+  public void testSignatureApiStability() {
     final byte[] data = "myTestData".getBytes(ENCODING);
     final byte[] sig = Base64Utility.decode("MEUCIE+t3/ngQ65qql7bTFCPPGVbj2z0BIiwNzjaC6wMV93VAiEAxBTA6FWTCBVDSAMvk7FXZcUeF/i4lNc/fW4a2G63O64=");
     final byte[] pubKey = Base64Utility.decode("MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEJX6uq87Qz1Xyk85+8NG5dnYDV1ZBSt/W3/H4nvY7h4o7JNM0AYxgX5/4Dizb5iD9iVX2uuv1BO7J9H/hze7Cag==");
@@ -317,7 +317,7 @@ public class SecurityUtilityTest {
   }
 
   @Test
-  public void testDecryptionApiStability() throws Exception {
+  public void testDecryptionApiStability() {
     final byte[] encrypted = Base64Utility.decode("43aysPcKhTvyzZIWa6d1wwntGobQOXT38VU=");
     final byte[] salt = Base64Utility.decode("iPENJpMTU8MxarL8ZMHxXw==");
     Assert.assertEquals("myTestData", new String(SecurityUtility.decrypt(encrypted, PASSWORD, salt, 128), ENCODING));

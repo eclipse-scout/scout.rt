@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.fixture;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -33,7 +32,7 @@ public abstract class MockHttpURLConnection extends HttpURLConnection {
   }
 
   @Override
-  public void connect() throws IOException {
+  public void connect() {
   }
 
   @Override
@@ -46,7 +45,7 @@ public abstract class MockHttpURLConnection extends HttpURLConnection {
   }
 
   @Override
-  public OutputStream getOutputStream() throws IOException {
+  public OutputStream getOutputStream() {
     return m_out;
   }
 
@@ -59,7 +58,7 @@ public abstract class MockHttpURLConnection extends HttpURLConnection {
   }
 
   @Override
-  public InputStream getInputStream() throws IOException {
+  public InputStream getInputStream() {
     if (m_in == null) {
       final AtomicInteger scRef = new AtomicInteger(500);
       final ByteArrayOutputStream servletOut = new ByteArrayOutputStream();
@@ -88,6 +87,6 @@ public abstract class MockHttpURLConnection extends HttpURLConnection {
     return m_in;
   }
 
-  protected abstract void mockHttpServlet(InputStream servletIn, OutputStream servletOut) throws Exception;
+  protected abstract void mockHttpServlet(InputStream servletIn, OutputStream servletOut);
 
 }

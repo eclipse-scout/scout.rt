@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.net.HttpCookie;
@@ -61,7 +57,7 @@ public class MultiSessionCookieStoreTest {
   }
 
   @Test
-  public void testAddBasic() throws Exception {
+  public void testAddBasic() {
 
     final IClientSession session1 = mock(IClientSession.class);
 
@@ -106,7 +102,7 @@ public class MultiSessionCookieStoreTest {
    * cookies.
    */
   @Test
-  public void testAddMultipleClients() throws Exception {
+  public void testAddMultipleClients() {
     // Simulate concurrency by changing the client session
     MultiSessionCookieStore cookieStore = new MultiSessionCookieStore();
     ISession.CURRENT.set(SESSION1);
@@ -129,7 +125,7 @@ public class MultiSessionCookieStoreTest {
   }
 
   @Test
-  public void testGetCookies() throws Exception {
+  public void testGetCookies() {
     MultiSessionCookieStore cookieStore = new MultiSessionCookieStore();
     ISession.CURRENT.set(SESSION1);
     createCookies(cookieStore);
@@ -141,7 +137,7 @@ public class MultiSessionCookieStoreTest {
   }
 
   @Test
-  public void testGetURIs() throws Exception {
+  public void testGetURIs() {
     MultiSessionCookieStore cookieStore = new MultiSessionCookieStore();
     ISession.CURRENT.set(SESSION1);
     createCookies(cookieStore);
@@ -151,7 +147,7 @@ public class MultiSessionCookieStoreTest {
   }
 
   @Test
-  public void testRemoveAll() throws Exception {
+  public void testRemoveAll() {
     MultiSessionCookieStore cookieStore = new MultiSessionCookieStore();
     ISession.CURRENT.set(SESSION1);
     createCookies(cookieStore);
@@ -166,7 +162,7 @@ public class MultiSessionCookieStoreTest {
   }
 
   @Test
-  public void testRemoveByUri() throws Exception {
+  public void testRemoveByUri() {
     MultiSessionCookieStore cookieStore = new MultiSessionCookieStore();
     ISession.CURRENT.set(SESSION1);
     createCookies(cookieStore);
@@ -181,7 +177,7 @@ public class MultiSessionCookieStoreTest {
   }
 
   @Test
-  public void testSessionStopped() throws Exception {
+  public void testSessionStopped() {
     MultiSessionCookieStore cookieStore = new MultiSessionCookieStore();
     ISession.CURRENT.set(SESSION1);
     createCookies(cookieStore);

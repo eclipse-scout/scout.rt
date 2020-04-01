@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,7 +45,7 @@ public class PageWithTableAndPageBeanTest {
   private static final String SECOND_COL_CONTENT = "second col";
 
   @Test
-  public void testExecLoadData() throws Exception {
+  public void testExecLoadData() {
     PageWithTable p = prepareTest();
     assertEquals(1, p.getTable().getRowCount());
     assertEquals(FIRST_COL_CONTENT, p.getTable().getFirstColumn().getValue(0));

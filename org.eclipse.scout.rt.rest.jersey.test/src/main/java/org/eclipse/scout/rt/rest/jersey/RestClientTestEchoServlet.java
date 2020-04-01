@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,7 +42,7 @@ public class RestClientTestEchoServlet extends HttpServlet {
   private static final Logger LOG = LoggerFactory.getLogger(RestClientTestEchoServlet.class);
 
   @Override
-  protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     final String requestId = req.getParameter(REQUEST_ID);
     if (requestId != null) {
       BEANS.get(RequestSynchronizer.class).notifyRequestArrived(requestId);

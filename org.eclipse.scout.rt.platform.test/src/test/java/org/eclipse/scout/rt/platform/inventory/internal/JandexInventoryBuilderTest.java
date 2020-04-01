@@ -37,7 +37,7 @@ import org.junit.Test;
 public class JandexInventoryBuilderTest {
 
   @Test
-  public void testScanJar() throws URISyntaxException, MalformedURLException {
+  public void testScanJar() throws MalformedURLException {
     URL jarUrl = getClass().getResource("test repository/test.jar_");
     URL scoutXml = new URL("jar:" + jarUrl.toExternalForm() + "!/" + JandexInventoryBuilder.SCOUT_XML_PATH);
     JandexInventoryBuilder builder = new JandexInventoryBuilder(RebuildStrategy.ALWAYS);
@@ -57,7 +57,7 @@ public class JandexInventoryBuilderTest {
   }
 
   @Test
-  public void testScanModuleWithSpaceInPath() throws IOException, URISyntaxException {
+  public void testScanModuleWithSpaceInPath() throws IOException {
     JandexInventoryBuilder builder = new JandexInventoryBuilder(RebuildStrategy.ALWAYS);
     Index index1 = builder.scanModule(builder.findIndexUri(getClass().getResource("test repository/META-INF/scout.xml")));
     Index index2 = builder.scanModule(builder.findIndexUri(new URL("jar:" + getClass().getResource("test repository/test.jar_").toExternalForm() + "!/META-INF/scout.xml")));

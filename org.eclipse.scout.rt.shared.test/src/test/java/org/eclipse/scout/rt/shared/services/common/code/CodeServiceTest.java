@@ -135,10 +135,9 @@ public class CodeServiceTest {
   /**
    * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#reloadCodeType(Class)}.
    *
-   * @throws Exception
    */
   @Test
-  public void testReloadCodeType() throws Exception {
+  public void testReloadCodeType() {
     ICodeService service = newCodeServiceInstance();
     service.getAllCodeTypes();
 
@@ -158,10 +157,9 @@ public class CodeServiceTest {
   /**
    * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#reloadCodeTypes(List)}.
    *
-   * @throws Exception
    */
   @Test
-  public void testReloadCodeTypes() throws Exception {
+  public void testReloadCodeTypes() {
     ICodeService service = newCodeServiceInstance();
     service.getAllCodeTypes();
 
@@ -188,10 +186,9 @@ public class CodeServiceTest {
   /**
    * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#findCodeTypeById(Object)} .
    *
-   * @throws Exception
    */
   @Test
-  public void testFindCodeTypeById() throws Exception {
+  public void testFindCodeTypeById() {
     ICodeService service = newCodeServiceInstance();
 
     ICodeType<Long, ?> abcCodeType1 = service.findCodeTypeById(ABC_ID);

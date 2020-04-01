@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -39,13 +36,13 @@ import org.junit.runner.RunWith;
 public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test(expected = AssertionException.class)
-  public void testRemoveFieldNull() throws Exception {
+  public void testRemoveFieldNull() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().removeField(null);
   }
 
   @Test
-  public void testRemoveFieldExisting() throws Exception {
+  public void testRemoveFieldExisting() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     TopBoxField field = form.getTopBoxField();
     form.getTopBox().removeField(field);
@@ -56,20 +53,20 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test(expected = AssertionException.class)
-  public void testRemoveFieldForeignBox() throws Exception {
+  public void testRemoveFieldForeignBox() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().removeField(form.getBottomBoxField());
   }
 
   @Test(expected = AssertionException.class)
-  public void testRemoveFieldForeignForm() throws Exception {
+  public void testRemoveFieldForeignForm() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     AddRemoveFieldsForm otherForm = new AddRemoveFieldsForm();
     form.getTopBox().removeField(otherForm.getTopBoxField());
   }
 
   @Test(expected = AssertionException.class)
-  public void testRemoveFieldTwice() throws Exception {
+  public void testRemoveFieldTwice() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     TopBoxField field = form.getTopBoxField();
     try {
@@ -82,7 +79,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test
-  public void testRemoveFieldAfterFormStarted() throws Exception {
+  public void testRemoveFieldAfterFormStarted() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.start();
 
@@ -95,7 +92,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test
-  public void testRemoveFieldAfterFormStartedAndStopped() throws Exception {
+  public void testRemoveFieldAfterFormStartedAndStopped() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.start();
     form.doClose();
@@ -109,32 +106,32 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test(expected = AssertionException.class)
-  public void testAddFieldNull() throws Exception {
+  public void testAddFieldNull() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().addField(null);
   }
 
   @Test(expected = AssertionException.class)
-  public void testAddFieldExistingInBox() throws Exception {
+  public void testAddFieldExistingInBox() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().addField(form.getTopBoxField());
   }
 
   @Test(expected = AssertionException.class)
-  public void testAddFieldExistingInOtherBox() throws Exception {
+  public void testAddFieldExistingInOtherBox() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().addField(form.getBottomBoxField());
   }
 
   @Test(expected = AssertionException.class)
-  public void testAddFieldExistingInOtherForm() throws Exception {
+  public void testAddFieldExistingInOtherForm() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     AddRemoveFieldsForm otherForm = new AddRemoveFieldsForm();
     form.getTopBox().addField(otherForm.getTopBoxField());
   }
 
   @Test
-  public void testAddFieldRemovedFromOtherBox() throws Exception {
+  public void testAddFieldRemovedFromOtherBox() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     BottomBoxField field = form.getBottomBoxField();
     form.getBottomBox().removeField(field);
@@ -148,7 +145,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test(expected = AssertionException.class)
-  public void testAddFieldRemovedFromOtherForm() throws Exception {
+  public void testAddFieldRemovedFromOtherForm() {
     AddRemoveFieldsForm otherForm = new AddRemoveFieldsForm();
     TopBoxField field = otherForm.getTopBoxField();
     otherForm.getTopBox().removeField(field);
@@ -158,7 +155,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test
-  public void testAddFieldDynamic() throws Exception {
+  public void testAddFieldDynamic() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     AddRemoveStringField field = new AddRemoveStringField();
     form.getTopBox().addField(field);
@@ -168,7 +165,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test(expected = AssertionException.class)
-  public void testAddFieldDynamicTwice() throws Exception {
+  public void testAddFieldDynamicTwice() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     AddRemoveStringField field = new AddRemoveStringField();
     form.getTopBox().addField(field);
@@ -176,7 +173,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test
-  public void testAddFieldDynamicTwiceNewInstances() throws Exception {
+  public void testAddFieldDynamicTwiceNewInstances() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     AddRemoveStringField field = new AddRemoveStringField();
     form.getTopBox().addField(field);
@@ -192,7 +189,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test
-  public void testAddFieldAfterFormStarted() throws Exception {
+  public void testAddFieldAfterFormStarted() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.start();
 
@@ -205,7 +202,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test
-  public void testAddFieldAfterFormStartedAndStopped() throws Exception {
+  public void testAddFieldAfterFormStartedAndStopped() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.start();
     form.doClose();
@@ -218,19 +215,19 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test(expected = AssertionException.class)
-  public void testMoveFieldNullField() throws Exception {
+  public void testMoveFieldNullField() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().moveFieldTo(null, form.getBottomBox());
   }
 
   @Test(expected = AssertionException.class)
-  public void testMoveFieldNullNewContainer() throws Exception {
+  public void testMoveFieldNullNewContainer() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().moveFieldTo(form.getTopBoxField(), null);
   }
 
   @Test
-  public void testMoveFieldExisting() throws Exception {
+  public void testMoveFieldExisting() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     TopBoxField field = form.getTopBoxField();
     assertFieldPropertyChangeListener(field);
@@ -244,7 +241,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test
-  public void testMoveFieldToChildComposite() throws Exception {
+  public void testMoveFieldToChildComposite() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     BottomBoxField field = form.getBottomBoxField();
     assertFieldPropertyChangeListener(field);
@@ -260,7 +257,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test
-  public void testMoveFieldToSameComposite() throws Exception {
+  public void testMoveFieldToSameComposite() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     TopBoxField field = form.getTopBoxField();
     assertFieldPropertyChangeListener(field);
@@ -302,20 +299,20 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test(expected = AssertionException.class)
-  public void testMoveFieldForeignBox() throws Exception {
+  public void testMoveFieldForeignBox() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.getTopBox().moveFieldTo(form.getBottomBoxField(), form.getBottomBox());
   }
 
   @Test(expected = AssertionException.class)
-  public void testMoveFieldForeignForm() throws Exception {
+  public void testMoveFieldForeignForm() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     AddRemoveFieldsForm otherForm = new AddRemoveFieldsForm();
     form.getTopBox().moveFieldTo(otherForm.getTopBoxField(), form.getBottomBox());
   }
 
   @Test
-  public void testMoveFieldTwice() throws Exception {
+  public void testMoveFieldTwice() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     TopBoxField field = form.getTopBoxField();
     form.getTopBox().moveFieldTo(field, form.getBottomBox());
@@ -329,7 +326,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test
-  public void testMoveFieldAfterFormStarted() throws Exception {
+  public void testMoveFieldAfterFormStarted() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.start();
     TopBoxField field = form.getTopBoxField();
@@ -343,7 +340,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test
-  public void testRemoveAndAddFieldAfterFormStarted() throws Exception {
+  public void testRemoveAndAddFieldAfterFormStarted() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.start();
     TopBoxField field = form.getTopBoxField();
@@ -369,7 +366,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
   }
 
   @Test
-  public void testMoveFieldAfterFormStartedAndStopped() throws Exception {
+  public void testMoveFieldAfterFormStartedAndStopped() {
     AddRemoveFieldsForm form = new AddRemoveFieldsForm();
     form.start();
     form.doClose();

@@ -246,7 +246,7 @@ public class FormFieldTest {
   }
 
   @Test
-  public void testStatusVisible_Default() throws Exception {
+  public void testStatusVisible_Default() {
     SimpleTestFormField testField = new SimpleTestFormField();
     assertTrue(testField.isStatusVisible());
   }
@@ -256,7 +256,7 @@ public class FormFieldTest {
    * changed as expected.
    */
   @Test
-  public void testStatusVisible_setStatusVisible() throws Exception {
+  public void testStatusVisible_setStatusVisible() {
     final boolean[] called = {false};
     SimpleTestFormField testField = new SimpleTestFormField();
     testField.addPropertyChangeListener(evt -> {
@@ -270,7 +270,7 @@ public class FormFieldTest {
   }
 
   @Test
-  public void testGetErrorStatus() throws Exception {
+  public void testGetErrorStatus() {
     SimpleTestFormField testField = new SimpleTestFormField();
     final MultiStatus ms = new MultiStatus();
     ms.add(new Status("error"));
@@ -282,7 +282,7 @@ public class FormFieldTest {
   }
 
   @Test
-  public void testSetSameErrorStatus() throws Exception {
+  public void testSetSameErrorStatus() {
     SimpleTestFormField testField = new SimpleTestFormField();
     P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
     testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
@@ -303,7 +303,7 @@ public class FormFieldTest {
   }
 
   @Test
-  public void testSetDifferentErrorStatus() throws Exception {
+  public void testSetDifferentErrorStatus() {
     SimpleTestFormField testField = new SimpleTestFormField();
     P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
     testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
@@ -324,7 +324,7 @@ public class FormFieldTest {
   }
 
   @Test
-  public void testAddSameErrorStatus() throws Exception {
+  public void testAddSameErrorStatus() {
     SimpleTestFormField testField = new SimpleTestFormField();
     P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
     testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
@@ -346,7 +346,7 @@ public class FormFieldTest {
   }
 
   @Test
-  public void testAddDifferentErrorStatus() throws Exception {
+  public void testAddDifferentErrorStatus() {
     SimpleTestFormField testField = new SimpleTestFormField();
     P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
     testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
@@ -368,7 +368,7 @@ public class FormFieldTest {
   }
 
   @Test
-  public void testAddRemoveAddErrorStatus() throws Exception {
+  public void testAddRemoveAddErrorStatus() {
     SimpleTestFormField testField = new SimpleTestFormField();
     P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
     testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
@@ -396,7 +396,7 @@ public class FormFieldTest {
   }
 
   @Test
-  public void testAddMultipleRemoveOneAddErrorStatus() throws Exception {
+  public void testAddMultipleRemoveOneAddErrorStatus() {
     SimpleTestFormField testField = new SimpleTestFormField();
     P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
     testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
@@ -434,7 +434,7 @@ public class FormFieldTest {
   }
 
   @Test
-  public void testRemoveErrorStatus() throws Exception {
+  public void testRemoveErrorStatus() {
     SimpleTestFormField testField = new SimpleTestFormField();
     P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
     testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
@@ -456,7 +456,7 @@ public class FormFieldTest {
   }
 
   @Test
-  public void testRemoveWithRemainingErrorStatus() throws Exception {
+  public void testRemoveWithRemainingErrorStatus() {
     SimpleTestFormField testField = new SimpleTestFormField();
     P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
     testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
@@ -488,7 +488,7 @@ public class FormFieldTest {
   }
 
   @Test
-  public void testRemoveNonExistingErrorStatus() throws Exception {
+  public void testRemoveNonExistingErrorStatus() {
     SimpleTestFormField testField = new SimpleTestFormField();
     P_PropertyChangeEventCounter counter = new P_PropertyChangeEventCounter();
     testField.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, counter);
@@ -534,14 +534,14 @@ public class FormFieldTest {
   }
 
   @Test
-  public void testAddErrorStatusString() throws Exception {
+  public void testAddErrorStatusString() {
     SimpleTestFormField testField = new SimpleTestFormField();
     testField.addErrorStatus("error");
     assertTrue(testField.getErrorStatus().containsStatus(DefaultFieldStatus.class));
   }
 
   @Test
-  public void testClearErrorStatus() throws Exception {
+  public void testClearErrorStatus() {
     SimpleTestFormField testField = new SimpleTestFormField();
     testField.addErrorStatus(new Status("error"));
     testField.clearErrorStatus();

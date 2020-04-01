@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -102,7 +100,7 @@ public class PageTest {
   }
 
   @Test
-  public void testIsSetDetailFormVisible() throws Exception {
+  public void testIsSetDetailFormVisible() {
     AbstractPage<?> p = new P_Page();
     assertTrue(p.isDetailFormVisible());
     P_Outline outline = P_Outline.createMock();
@@ -113,7 +111,7 @@ public class PageTest {
   }
 
   @Test
-  public void testIsSetTableVisible() throws Exception {
+  public void testIsSetTableVisible() {
     AbstractPage<?> p = new P_Page();
     assertTrue(p.isTableVisible());
     P_Outline outline = P_Outline.createMock();

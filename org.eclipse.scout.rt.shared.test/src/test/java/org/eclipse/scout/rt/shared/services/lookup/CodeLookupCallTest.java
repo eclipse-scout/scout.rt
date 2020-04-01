@@ -46,7 +46,7 @@ public class CodeLookupCallTest {
   private static final String ROW31_TEXT = "mor";
 
   @Test
-  public void testGetDataByAll() throws Exception {
+  public void testGetDataByAll() {
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
     List<ILookupRow<Integer>> oldRows = oldLc.getDataByAll();
 
@@ -57,7 +57,7 @@ public class CodeLookupCallTest {
   }
 
   @Test
-  public void testGetDataByText() throws Exception {
+  public void testGetDataByText() {
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
     List<ILookupRow<Integer>> oldRows = oldLc.getDataByText();
 
@@ -68,7 +68,7 @@ public class CodeLookupCallTest {
   }
 
   @Test
-  public void testGetDataByTextFiltered() throws Exception {
+  public void testGetDataByTextFiltered() {
     runGetDataByTextFiltered(null);
     runGetDataByTextFiltered("*or*");
     runGetDataByTextFiltered("*or");
@@ -93,7 +93,7 @@ public class CodeLookupCallTest {
   }
 
   @Test
-  public void testGetDataByKey() throws Exception {
+  public void testGetDataByKey() {
     runGetDataByKey(0, null);
     runGetDataByKey(1, ROW10_KEY);
     runGetDataByKey(1, ROW31_KEY);
@@ -114,7 +114,7 @@ public class CodeLookupCallTest {
   }
 
   @Test
-  public void testGetDataByRec() throws Exception {
+  public void testGetDataByRec() {
     runGetDataByRec(3, null);
     runGetDataByRec(2, ROW10_KEY);
     runGetDataByRec(0, ROW20_KEY);
@@ -148,7 +148,7 @@ public class CodeLookupCallTest {
   }
 
   @Test
-  public void testGetFilteredData() throws Exception {
+  public void testGetFilteredData() {
 
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
     oldLc.setFilter((call, code, treeLevel) -> true);

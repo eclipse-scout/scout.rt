@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.notification;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +27,7 @@ import org.junit.Test;
 public class TypeParameterBeanRegistryTest {
 
   @Test
-  public void testEmptyRegistry() throws Exception {
+  public void testEmptyRegistry() {
     final TypeParameterBeanRegistry<ITestHandler> reg = new TypeParameterBeanRegistry<>(ITestHandler.class);
     assertTrue(reg.getBeans(String.class).isEmpty());
   }

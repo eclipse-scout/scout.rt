@@ -11,8 +11,7 @@
 package org.eclipse.scout.rt.client.extension.ui.form;
 
 import static org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.EXEC_VALIDATE_VALUE_OPERATION_NAME;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +48,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    * check behavior of an original field.
    */
   @Test
-  public void testOrigForm() throws Exception {
+  public void testOrigForm() {
     OrigForm form = new OrigForm();
     form.getSalutationField().setValue("test");
     form.getOperations();
@@ -61,7 +60,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    * extend an original field (registration on original field).
    */
   @Test
-  public void testOrigFormWithExtensionOnOrigForm() throws Exception {
+  public void testOrigFormWithExtensionOnOrigForm() {
     BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, SalutationField.class);
 
     OrigForm form = new OrigForm();
@@ -76,7 +75,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    * check behavior of an original field (registration on extended field).
    */
   @Test
-  public void testOrigFormWithExtensionOnExtendedForm() throws Exception {
+  public void testOrigFormWithExtensionOnExtendedForm() {
     BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, SalutationFieldEx.class);
 
     OrigForm form = new OrigForm();
@@ -90,7 +89,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    * contribute to an original field.
    */
   @Test
-  public void testOrigFormWithContributionOnOrigForm() throws Exception {
+  public void testOrigFormWithContributionOnOrigForm() {
     BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldContribution.class, TopBox.class);
 
     OrigForm form = new OrigForm();
@@ -104,7 +103,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    * check behavior of a replaced field.
    */
   @Test
-  public void testExtededFormReplace() throws Exception {
+  public void testExtededFormReplace() {
     ExtendedForm form = new ExtendedForm();
     form.getSalutationField().setValue("test");
     form.getOperations();
@@ -117,7 +116,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    * extend behavior of a replaced field (registration on original field).
    */
   @Test
-  public void testExtendedFormReplaceWithExtensionOnOrigForm() throws Exception {
+  public void testExtendedFormReplaceWithExtensionOnOrigForm() {
     BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, SalutationField.class);
 
     ExtendedForm form = new ExtendedForm();
@@ -133,7 +132,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    * extend behavior of a replaced field (registration on replaced field).
    */
   @Test
-  public void testExtendedFormReplaceWithExtensionOnExtendedForm() throws Exception {
+  public void testExtendedFormReplaceWithExtensionOnExtendedForm() {
     BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, SalutationFieldEx.class);
 
     ExtendedForm form = new ExtendedForm();
@@ -149,7 +148,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    * check behavior of an injected field.
    */
   @Test
-  public void testExtededFormInject() throws Exception {
+  public void testExtededFormInject() {
     ExtendedForm form = new ExtendedForm();
     form.getCountryField().setValue("test");
     form.getOperations();
@@ -161,7 +160,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    * extend behavior of an injected field.
    */
   @Test
-  public void testExtededFormInjectWithExtension() throws Exception {
+  public void testExtededFormInjectWithExtension() {
     BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, CountryField.class);
 
     ExtendedForm form = new ExtendedForm();
@@ -176,7 +175,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    * check behavior of a field of an injected container.
    */
   @Test
-  public void testExtededFormInjectContainer() throws Exception {
+  public void testExtededFormInjectContainer() {
     ExtendedForm form = new ExtendedForm();
     form.getBottomDetailBoxField().setValue("test");
     form.getOperations();
@@ -188,7 +187,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    * extend behavior of a field of an injected container.
    */
   @Test
-  public void testExtededFormInjectContainerWithExtension() throws Exception {
+  public void testExtededFormInjectContainerWithExtension() {
     BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, BottomDetailBoxField.class);
 
     ExtendedForm form = new ExtendedForm();
@@ -203,7 +202,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    * contribute new field to an injected container.
    */
   @Test
-  public void testExtededFormInjectContainerWithContribution() throws Exception {
+  public void testExtededFormInjectContainerWithContribution() {
     BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldContribution.class, BottomDetailBox.class);
 
     ExtendedForm form = new ExtendedForm();
@@ -217,7 +216,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    * extend an original group in a form extension (registration on original form).
    */
   @Test
-  public void testExtendedFormExtendedGroupWithField() throws Exception {
+  public void testExtendedFormExtendedGroupWithField() {
     BEANS.get(IExtensionRegistry.class).register(ExtendedFormExtendedGroupWithField.class);
 
     OrigForm form = new OrigForm();

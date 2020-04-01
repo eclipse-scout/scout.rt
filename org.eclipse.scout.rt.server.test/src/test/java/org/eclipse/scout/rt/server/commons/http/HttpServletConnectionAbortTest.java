@@ -56,7 +56,7 @@ public class HttpServletConnectionAbortTest {
    * This test must not fail, see "MARKER:"
    */
   @Test
-  public void testPostWithServerReadingInput() throws IOException, ClassNotFoundException {
+  public void testPostWithServerReadingInput() throws IOException {
     m_client.withSocketWriteInterceptor(() -> new ISocketWriteInterceptor() {
       @Override
       public void write(OutputStream out, int b) throws IOException {
@@ -107,7 +107,7 @@ public class HttpServletConnectionAbortTest {
    */
   @Ignore
   @Test
-  public void testPostWithoutServerReadingInput() throws IOException, ClassNotFoundException {
+  public void testPostWithoutServerReadingInput() throws IOException {
     m_client.withSocketWriteInterceptor(() -> new ISocketWriteInterceptor() {
       @Override
       public void write(OutputStream out, int b) throws IOException {

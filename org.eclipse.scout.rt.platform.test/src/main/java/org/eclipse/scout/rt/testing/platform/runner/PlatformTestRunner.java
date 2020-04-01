@@ -306,7 +306,7 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
     }
 
     @Override
-    public void evaluate() throws Throwable {
+    public void evaluate() {
       for (FrameworkMethod each : m_afters) {
         try {
           each.invokeExplosively(m_target);

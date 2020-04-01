@@ -48,7 +48,7 @@ public class TransactionProcessorTest {
   private ITransaction m_transaction;
 
   @Before
-  public void before() throws Exception {
+  public void before() {
     MockitoAnnotations.initMocks(this);
 
     m_transaction = Mockito.spy(BEANS.get(ITransaction.class));

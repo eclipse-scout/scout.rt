@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
@@ -112,12 +108,12 @@ public class TriStateTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testParseAnyObject() throws Exception {
+  public void testParseAnyObject() {
     TriState.parse(new Object());
   }
 
   @Test
-  public void testOrder() throws Exception {
+  public void testOrder() {
     assertTrue(TriState.TRUE.compareTo(TriState.FALSE) > 0);
     assertTrue(TriState.UNDEFINED.compareTo(TriState.FALSE) > 0);
     assertTrue(TriState.UNDEFINED.compareTo(TriState.TRUE) > 0);

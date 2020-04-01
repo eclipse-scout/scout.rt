@@ -64,7 +64,7 @@ public class FormDataCloneTest {
     }
 
     @Override
-    protected Object replaceObject(Object obj) throws IOException {
+    protected Object replaceObject(Object obj) {
       if (obj instanceof AbstractFormData) {
         m_outCount++;
       }
@@ -79,7 +79,7 @@ public class FormDataCloneTest {
     }
 
     @Override
-    protected Object resolveObject(Object obj) throws IOException {
+    protected Object resolveObject(Object obj) {
       if (obj instanceof AbstractFormData) {
         m_inCount++;
       }

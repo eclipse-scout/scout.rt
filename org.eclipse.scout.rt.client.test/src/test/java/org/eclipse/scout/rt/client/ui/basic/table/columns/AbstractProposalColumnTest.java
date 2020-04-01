@@ -61,7 +61,7 @@ public class AbstractProposalColumnTest {
   }
 
   @Test
-  public void testLookupRowWithNullText() throws Exception {
+  public void testLookupRowWithNullText() {
     AbstractProposalColumn<Long> column = new AbstractProposalColumn<Long>() {
     };
     column.setCodeTypeClass(TestCodeType.class);
@@ -76,7 +76,7 @@ public class AbstractProposalColumnTest {
   }
 
   @Test
-  public void testLookupRowWithUntrimmedText1() throws Exception {
+  public void testLookupRowWithUntrimmedText1() {
     final AbstractProposalColumn<Long> column = new AbstractProposalColumn<Long>() {
       @Override
       protected boolean getConfiguredEditable() {
@@ -105,7 +105,7 @@ public class AbstractProposalColumnTest {
   }
 
   @Test
-  public void testLookupRowWithUntrimmedText2() throws Exception {
+  public void testLookupRowWithUntrimmedText2() {
     final AbstractProposalColumn<Long> column = new AbstractProposalColumn<Long>() {
       @Override
       protected boolean getConfiguredEditable() {
@@ -134,7 +134,7 @@ public class AbstractProposalColumnTest {
   }
 
   @Test
-  public void testLookupRowWithTooLongText1() throws Exception {
+  public void testLookupRowWithTooLongText1() {
     final AbstractProposalColumn<Long> column = new AbstractProposalColumn<Long>() {
       @Override
       protected boolean getConfiguredEditable() {
@@ -163,7 +163,7 @@ public class AbstractProposalColumnTest {
   }
 
   @Test
-  public void testLookupRowWithTooLongText2() throws Exception {
+  public void testLookupRowWithTooLongText2() {
     final AbstractProposalColumn<Long> column = new AbstractProposalColumn<Long>() {
       @Override
       protected boolean getConfiguredEditable() {

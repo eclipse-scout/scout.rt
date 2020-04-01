@@ -31,7 +31,7 @@ import org.junit.runner.RunWith;
 public class TableEventOrderTest {
 
   @Test
-  public void testRowsInsertedAfterColumnStructureChanged() throws Exception {
+  public void testRowsInsertedAfterColumnStructureChanged() {
     P_Table table = new P_Table();
     table.init();
 

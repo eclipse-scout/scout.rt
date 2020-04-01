@@ -21,7 +21,7 @@ public class AttachmentSupportTest {
   private AttachmentSupport m_support = new AttachmentSupport();
 
   @Test
-  public void testStatus() throws Exception {
+  public void testStatus() {
     BinaryResource br1 = newBinaryResource("foo");
 
     // initial status
@@ -37,7 +37,7 @@ public class AttachmentSupportTest {
   }
 
   @Test
-  public void testGetAttachments() throws Exception {
+  public void testGetAttachments() {
     BinaryResource br1 = newBinaryResource("foo");
     BinaryResource br2 = newBinaryResource("bar");
 
@@ -56,7 +56,7 @@ public class AttachmentSupportTest {
   }
 
   @Test
-  public void testCleanup() throws Exception {
+  public void testCleanup() {
     BinaryResource br1 = newBinaryResource("foo");
 
     // nothing to clean up

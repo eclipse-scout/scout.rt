@@ -53,7 +53,7 @@ public class SVGUtilityTest {
     Assert.assertEquals(parent.getHref().getBaseVal(), url);
   }
 
-  private Document asXML(SVGDocument d) throws SAXException, IOException, ParserConfigurationException {
+  private Document asXML(SVGDocument d) throws IOException {
     try (OutputStream os = new ByteArrayOutputStream();) {
       SVGUtility.writeSVGDocument(d, os, "utf8");
       return XmlUtility.getXmlDocument(os.toString());

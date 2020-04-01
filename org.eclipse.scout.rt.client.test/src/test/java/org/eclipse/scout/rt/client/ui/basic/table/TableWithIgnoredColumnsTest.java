@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.dto.ColumnData;
 import org.eclipse.scout.rt.client.dto.ColumnData.SdkColumnCommand;
@@ -31,12 +30,12 @@ public class TableWithIgnoredColumnsTest {
   private static final int ROW_COUNT = 3;
 
   @Test
-  public void testTableExportTableBeanData() throws Exception {
+  public void testTableExportTableBeanData() {
     doTestExportTableBeanDataOriginalDefaultIgnore(new P_Table(), new P_TableBean());
   }
 
   @Test
-  public void testTableImportTableBeanData() throws Exception {
+  public void testTableImportTableBeanData() {
     doTestImportTableBeanDataOriginalDefaultIgnore(new P_Table(), new P_TableBean());
   }
 
@@ -44,12 +43,12 @@ public class TableWithIgnoredColumnsTest {
    * Replace with DEFAULT
    */
   @Test
-  public void testTableDefaultExportTableBeanData() throws Exception {
+  public void testTableDefaultExportTableBeanData() {
     doTestExportTableBeanDataOriginalDefaultIgnore(new P_TableDefault(), new P_TableDefaultBean());
   }
 
   @Test
-  public void testTableDefaultImportTableBeanData() throws Exception {
+  public void testTableDefaultImportTableBeanData() {
     doTestImportTableBeanDataOriginalDefaultIgnore(new P_TableDefault(), new P_TableDefaultBean());
   }
 
@@ -57,12 +56,12 @@ public class TableWithIgnoredColumnsTest {
    * Replace with IGNORE
    */
   @Test
-  public void testTableIgnoreExportTableBeanData() throws Exception {
+  public void testTableIgnoreExportTableBeanData() {
     doTestExportTableBeanDataOriginalDefaultIgnore(new P_TableIgnore(), new P_TableIgnoreBean());
   }
 
   @Test
-  public void testTableIgnoreImportTableBeanData() throws Exception {
+  public void testTableIgnoreImportTableBeanData() {
     doTestImportTableBeanDataOriginalDefaultIgnore(new P_TableIgnore(), new P_TableIgnoreBean());
   }
 
@@ -70,7 +69,7 @@ public class TableWithIgnoredColumnsTest {
    * Replace with CREATE
    */
   @Test
-  public void testTableCreateExportTableBeanData() throws Exception {
+  public void testTableCreateExportTableBeanData() {
     P_TableCreate table = new P_TableCreate();
     for (int i = 1; i <= ROW_COUNT; i++) {
       table.addRow(table.createRow(new Object[]{"Default " + i, "Create " + i, "Ignore " + i}));
@@ -87,7 +86,7 @@ public class TableWithIgnoredColumnsTest {
   }
 
   @Test
-  public void testTableCreateImportTableBeanData() throws Exception {
+  public void testTableCreateImportTableBeanData() {
     P_TableCreateBean tableBean = new P_TableCreateBean();
     for (int i = 1; i <= ROW_COUNT; i++) {
       P_TableCreateBean.TableCreateBeanRowData row = tableBean.addRow();
@@ -106,7 +105,7 @@ public class TableWithIgnoredColumnsTest {
     }
   }
 
-  private void doTestExportTableBeanDataOriginalDefaultIgnore(P_Table table, P_TableBean tableBean) throws Exception {
+  private void doTestExportTableBeanDataOriginalDefaultIgnore(P_Table table, P_TableBean tableBean) {
     for (int i = 1; i <= ROW_COUNT; i++) {
       table.addRow(table.createRow(new Object[]{"Default " + i, "Create " + i, "Ignore " + i}));
     }
@@ -120,7 +119,7 @@ public class TableWithIgnoredColumnsTest {
     }
   }
 
-  private void doTestImportTableBeanDataOriginalDefaultIgnore(P_Table table, P_TableBean tableBean) throws Exception {
+  private void doTestImportTableBeanDataOriginalDefaultIgnore(P_Table table, P_TableBean tableBean) {
     for (int i = 1; i <= ROW_COUNT; i++) {
       P_TableBean.TableBeanRowData row = tableBean.addRow();
       row.setDefault("Default " + i);

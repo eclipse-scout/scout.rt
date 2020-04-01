@@ -15,7 +15,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.SQLWarning;
 
 public class PreparedStatementMock extends VerboseMock implements InvocationHandler/*, java.sql.PreparedStatement*/ {
@@ -51,36 +50,36 @@ public class PreparedStatementMock extends VerboseMock implements InvocationHand
     return this.getClass().getMethod(mname, method.getParameterTypes()).invoke(this, args);
   }
 
-  private void setObjectInternal(int columnIndex, Object obj) throws SQLException {
+  private void setObjectInternal(int columnIndex, Object obj) {
     //ok
   }
 
-  public void setObject(int columnIndex, Object obj, int targetSqlType) throws SQLException {
+  public void setObject(int columnIndex, Object obj, int targetSqlType) {
     //ok
   }
 
-  public void close() throws SQLException {
+  public void close() {
   }
 
-  public void cancel() throws SQLException {
+  public void cancel() {
   }
 
-  public SQLWarning getWarnings() throws SQLException {
+  public SQLWarning getWarnings() {
     return null;
   }
 
-  public void clearWarnings() throws SQLException {
+  public void clearWarnings() {
   }
 
-  public boolean isClosed() throws SQLException {
+  public boolean isClosed() {
     return false;
   }
 
-  public ResultSet executeQuery() throws SQLException {
+  public ResultSet executeQuery() {
     return new ResultSetMock(getProtocol(), m_resultData).getResultSet();
   }
 
-  public int executeUpdate() throws SQLException {
+  public int executeUpdate() {
     return 0;
   }
 }

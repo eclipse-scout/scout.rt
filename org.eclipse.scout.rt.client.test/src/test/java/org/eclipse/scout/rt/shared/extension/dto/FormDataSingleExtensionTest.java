@@ -37,27 +37,27 @@ import org.junit.runner.RunWith;
 public class FormDataSingleExtensionTest extends AbstractLocalExtensionTestCase {
 
   @Test(expected = IllegalExtensionException.class)
-  public void testFormDataSingleExtensionExplicitInnerType() throws Exception {
+  public void testFormDataSingleExtensionExplicitInnerType() {
     BEANS.get(IExtensionRegistry.class).register(SecondBigDecimalField.class, MainBox.class);
     BEANS.get(IExtensionRegistry.class).register(SingleFormExtensionData.class, OrigFormData.class);
     doTest();
   }
 
   @Test
-  public void testFormDataSingleExtensionExplicit() throws Exception {
+  public void testFormDataSingleExtensionExplicit() {
     BEANS.get(IExtensionRegistry.class).register(SingleFormExtension.class, OrigForm.class);
     BEANS.get(IExtensionRegistry.class).register(SingleFormExtensionData.class, OrigFormData.class);
     doTest();
   }
 
   @Test
-  public void testFormDataSingleExtensionAnnotation() throws Exception {
+  public void testFormDataSingleExtensionAnnotation() {
     BEANS.get(IExtensionRegistry.class).register(SingleFormExtension.class);
     BEANS.get(IExtensionRegistry.class).register(SingleFormExtensionData.class);
     doTest();
   }
 
-  private void doTest() throws Exception {
+  private void doTest() {
     // create and test form
     OrigForm origForm = new OrigForm();
     origForm.init();

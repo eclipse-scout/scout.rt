@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -45,7 +41,7 @@ public class SmartFieldParseValueTest {
   private AbstractSmartField<Long> m_smartField;
 
   @BeforeClass
-  public static void beforeClass() throws Exception {
+  public static void beforeClass() {
     m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(P_LookupCall.class));
   }
 
@@ -65,7 +61,7 @@ public class SmartFieldParseValueTest {
   }
 
   @Test
-  public void testSetValue() throws Exception {
+  public void testSetValue() {
     m_smartField.setValue(1L);
     assertTrue(isCurrentLookupRowSet(m_smartField));
     assertEquals(1L, m_smartField.getValue().longValue());
@@ -73,7 +69,7 @@ public class SmartFieldParseValueTest {
   }
 
   @Test
-  public void testSetValue_MustChangeDisplayText() throws Exception {
+  public void testSetValue_MustChangeDisplayText() {
     m_smartField.setLookupRow(LookupRows.ROW_1);
     m_smartField.setValue(1L);
     assertEquals("aName", m_smartField.getDisplayText());
@@ -82,7 +78,7 @@ public class SmartFieldParseValueTest {
   }
 
   @Test
-  public void testParseAndSetValue() throws Exception {
+  public void testParseAndSetValue() {
     m_smartField.parseAndSetValue("aName");
     assertTrue(isCurrentLookupRowSet(m_smartField));
     assertEquals(1L, m_smartField.getValue().longValue());
@@ -90,7 +86,7 @@ public class SmartFieldParseValueTest {
   }
 
   @Test
-  public void testParseAndSetValue_InvalidValue() throws Exception {
+  public void testParseAndSetValue_InvalidValue() {
     m_smartField.parseAndSetValue("FooBar");
     assertFalse(isCurrentLookupRowSet(m_smartField));
     assertNotNull(m_smartField.getErrorStatus());

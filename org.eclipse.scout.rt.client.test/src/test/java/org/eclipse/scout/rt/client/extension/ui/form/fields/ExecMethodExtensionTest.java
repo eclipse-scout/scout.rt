@@ -37,7 +37,7 @@ import org.junit.runner.RunWith;
 public class ExecMethodExtensionTest extends AbstractLocalExtensionTestCase {
 
   @Test
-  public void testExecValidate() throws Exception {
+  public void testExecValidate() {
     BEANS.get(IExtensionRegistry.class).register(NameFieldExtension.class, NameField.class);
 
     MyForm myForm = new MyForm();

@@ -11,10 +11,7 @@
 package org.eclipse.scout.rt.rest.jersey.client;
 
 import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.STATUS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Map;
 import java.util.function.UnaryOperator;
@@ -66,13 +63,13 @@ public class ApacheHttpClientConnectionHeaderTest {
   }
 
   @Test
-  public void testDefaultRequest() throws Exception {
+  public void testDefaultRequest() {
     assertTrue(CONFIG.getPropertyValue(RestEnsureHttpHeaderConnectionCloseProperty.class).booleanValue());
     assertSyncAsyncHttpConnectionHeader(b -> b, CON_CLOSE);
   }
 
   @Test
-  public void testDefaultWithDisabledConfigPropertyRequest() throws Exception {
+  public void testDefaultWithDisabledConfigPropertyRequest() {
     RestEnsureHttpHeaderConnectionCloseProperty property = BEANS.get(RestEnsureHttpHeaderConnectionCloseProperty.class);
     property.setValue(Boolean.FALSE);
     try {
@@ -86,12 +83,12 @@ public class ApacheHttpClientConnectionHeaderTest {
   }
 
   @Test
-  public void testExplicitCloseRequest() throws Exception {
+  public void testExplicitCloseRequest() {
     assertSyncAsyncHttpConnectionHeader(b -> b.header(CON_DIRECTIVE, CON_CLOSE), CON_CLOSE);
   }
 
   @Test
-  public void testKeepAliveRequest() throws Exception {
+  public void testKeepAliveRequest() {
     assertSyncAsyncHttpConnectionHeader(b -> b.header(CON_DIRECTIVE, CON_KEEP_ALIVE), CON_KEEP_ALIVE);
   }
 

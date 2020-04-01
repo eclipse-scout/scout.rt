@@ -33,7 +33,7 @@ public class PermissionLevelTest {
   }
 
   @Test
-  public void testBasic() throws Exception {
+  public void testBasic() {
     assertEquals("DENIED", TestPermissionLevels.DENIED.getText());
     assertEquals("DENIED", TestPermissionLevels.DENIED.getStringValue());
     assertTrue(TestPermissionLevels.DENIED.isActive());
@@ -55,7 +55,7 @@ public class PermissionLevelTest {
   }
 
   @Test
-  public void testAllLevelsStream() throws Exception {
+  public void testAllLevelsStream() {
     Set<PermissionLevel> levels = PermissionLevel.all();
     assertTrue(levels.containsAll(Arrays.asList(PermissionLevel.ALL, PermissionLevel.NONE, PermissionLevel.UNDEFINED, TestPermissionLevels.GRANTED, TestPermissionLevels.DENIED)));
   }

@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -95,7 +93,7 @@ public class ValueFieldTest {
   }
 
   @Test
-  public void testResetParse() throws Exception {
+  public void testResetParse() {
     IValueField<String> v = new ParseErrorField();
     v.parseAndSetValue(UNPARSABLE_VALUE);
     v.parseAndSetValue("valid");

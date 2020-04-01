@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,19 +44,19 @@ public class ComposerFieldTest {
   private ComposerFieldData m_fieldData;
 
   @Before
-  public void before() throws Exception {
+  public void before() {
     m_composerField = new ComposerField();
     m_fieldData = new ComposerFieldData();
   }
 
   @Test
-  public void testFixture() throws Exception {
+  public void testFixture() {
     m_composerField.exportFormFieldData(m_fieldData);
     assertEquals(0, m_fieldData.getRootCount());
   }
 
   @Test
-  public void testExportEitherOrNode() throws Exception {
+  public void testExportEitherOrNode() {
     // setup field
     ITreeNode parentNode = m_composerField.getTree().getRootNode();
     EitherOrNode eitherNode = m_composerField.addEitherNode(parentNode, false);
@@ -82,7 +80,7 @@ public class ComposerFieldTest {
   }
 
   @Test
-  public void testImportEitherOrNode() throws Exception {
+  public void testImportEitherOrNode() {
     // setup field data
     ComposerEitherOrNodeData eitherNodeData = new ComposerEitherOrNodeData();
     eitherNodeData.setBeginOfEitherOr(true);
@@ -109,7 +107,7 @@ public class ComposerFieldTest {
   }
 
   @Test
-  public void testImportEitherOrOrNode() throws Exception {
+  public void testImportEitherOrOrNode() {
     // setup field data
     ComposerEitherOrNodeData eitherNodeData = new ComposerEitherOrNodeData();
     eitherNodeData.setBeginOfEitherOr(true);
@@ -153,7 +151,7 @@ public class ComposerFieldTest {
    * called as well.
    */
   @Test
-  public void testInitMenusLater() throws Exception {
+  public void testInitMenusLater() {
     ComposerWithDataModelField composerField = new ComposerWithDataModelField();
     ITreeNode rootNode = composerField.getTree().getRootNode();
     assertFalse(rootNode.getMenuByClass(AddEntityMenu.class).isInitDone());

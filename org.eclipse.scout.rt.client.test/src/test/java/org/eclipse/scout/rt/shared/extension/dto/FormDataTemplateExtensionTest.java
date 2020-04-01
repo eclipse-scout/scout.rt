@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.extension.dto;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.Set;
 
@@ -43,34 +41,34 @@ import org.junit.runner.RunWith;
 public class FormDataTemplateExtensionTest extends AbstractLocalExtensionTestCase {
 
   @Test
-  public void testFormDataTemplateExtensionFromAnnotation() throws Exception {
+  public void testFormDataTemplateExtensionFromAnnotation() {
     BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateField.class);
     BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateFieldData.class);
     doTestAllTemplateUses();
   }
 
   @Test
-  public void testFormDataTemplateExtensionExplicit() throws Exception {
+  public void testFormDataTemplateExtensionExplicit() {
     BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateField.class, GroupBoxInTemplateField.class);
     BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateFieldData.class, AbstractTemplateBoxData.class);
     doTestAllTemplateUses();
   }
 
   @Test
-  public void testFormDataTemplateExtensionExplicitOnlyOneTemplateUse() throws Exception {
+  public void testFormDataTemplateExtensionExplicitOnlyOneTemplateUse() {
     BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateField.class, org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox.SecondUseOfTemplateBox.class);
     BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateFieldData.class, SecondUseOfTemplateBox.class);
     doTestOnlyInOneTemplateUse();
   }
 
   @Test
-  public void testFormDataValueFieldTemplate() throws Exception {
+  public void testFormDataValueFieldTemplate() {
     BEANS.get(IExtensionRegistry.class).register(SpecialStringField.class);
     BEANS.get(IExtensionRegistry.class).register(SpecialStringFieldData.class);
     doValueFieldTemplateTest();
   }
 
-  private void doValueFieldTemplateTest() throws Exception {
+  private void doValueFieldTemplateTest() {
     String changedValue = "other value";
     OrigForm origForm = new OrigForm();
     origForm.init();
@@ -89,7 +87,7 @@ public class FormDataTemplateExtensionTest extends AbstractLocalExtensionTestCas
     assertEquals(changedValue, origForm.getFieldByClass(SpecialStringField.class).getValue());
   }
 
-  private void doTestOnlyInOneTemplateUse() throws Exception {
+  private void doTestOnlyInOneTemplateUse() {
     // create and test form
     Set<Integer> valueOfSecondTree = CollectionUtility.hashSet(8, 9, 10);
     OrigForm origForm = new OrigForm();
@@ -127,7 +125,7 @@ public class FormDataTemplateExtensionTest extends AbstractLocalExtensionTestCas
     assertEquals(changedValueOfContributedTree, origForm.getSecondUseOfTemplateBox().getFieldByClass(TreeBoxToTemplateField.class).getValue());
   }
 
-  private void doTestAllTemplateUses() throws Exception {
+  private void doTestAllTemplateUses() {
     // create and test form
     Set<Integer> valueOfSecondTree = CollectionUtility.hashSet(5, 6, 7);
     OrigForm origForm = new OrigForm();

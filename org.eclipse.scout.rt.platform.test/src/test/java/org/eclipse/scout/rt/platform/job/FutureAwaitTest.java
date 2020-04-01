@@ -27,7 +27,7 @@ import org.junit.runner.RunWith;
 public class FutureAwaitTest {
 
   @Test(timeout = 5000)
-  public void testAwaitDone_Interrupted() throws java.lang.InterruptedException {
+  public void testAwaitDone_Interrupted() {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
@@ -81,7 +81,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDone_ComputationFailed() throws java.lang.InterruptedException {
+  public void testAwaitDone_ComputationFailed() {
     final RuntimeException computationException = new RuntimeException("expected JUnit test exception");
 
     // Init
@@ -109,7 +109,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneWithTimeout_Interrupted() throws java.lang.InterruptedException {
+  public void testAwaitDoneWithTimeout_Interrupted() {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
@@ -181,7 +181,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneWithTimeout_ComputationFailed() throws java.lang.InterruptedException {
+  public void testAwaitDoneWithTimeout_ComputationFailed() {
     final RuntimeException computationException = new RuntimeException("expected JUnit test exception");
 
     // Init
@@ -204,7 +204,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneAndGet_Interrupted() throws java.lang.InterruptedException {
+  public void testAwaitDoneAndGet_Interrupted() {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
@@ -257,7 +257,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneAndGet_ComputationFailed() throws java.lang.InterruptedException {
+  public void testAwaitDoneAndGet_ComputationFailed() {
     final RuntimeException computationException = new RuntimeException("expected JUnit test exception");
 
     // Init
@@ -277,7 +277,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneAndGetWithTimeout_Interrupted() throws java.lang.InterruptedException {
+  public void testAwaitDoneAndGetWithTimeout_Interrupted() {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
@@ -331,7 +331,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testAwaitDoneAndGetWithTimeout_ComputationFailed() throws java.lang.InterruptedException {
+  public void testAwaitDoneAndGetWithTimeout_ComputationFailed() {
     final RuntimeException computationException = new RuntimeException("expected JUnit test exception");
 
     // Init
@@ -384,7 +384,7 @@ public class FutureAwaitTest {
   }
 
   @Test //(timeout = 5000)
-  public void testJobManagerAwaitDone_Interrupted() throws java.lang.InterruptedException {
+  public void testJobManagerAwaitDone_Interrupted() {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
@@ -468,7 +468,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testJobManagerAwaitDone_ComputationFailed() throws java.lang.InterruptedException {
+  public void testJobManagerAwaitDone_ComputationFailed() {
     final RuntimeException computationException = new RuntimeException("expected JUnit test exception");
 
     // Init
@@ -484,7 +484,7 @@ public class FutureAwaitTest {
   }
 
   @Test(timeout = 5000)
-  public void testBlockingConditionWaitFor_Interrupted() throws java.lang.InterruptedException {
+  public void testBlockingConditionWaitFor_Interrupted() {
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
 
     // Run the test in a separate thread
