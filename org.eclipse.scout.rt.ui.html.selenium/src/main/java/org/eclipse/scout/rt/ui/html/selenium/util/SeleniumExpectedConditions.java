@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.ui.html.selenium.util.TextComparator.Contains;
 import org.eclipse.scout.rt.ui.html.selenium.util.TextComparator.Equals;
 import org.eclipse.scout.rt.ui.html.selenium.util.TextComparator.EqualsIgnoreCase;
+import org.eclipse.scout.rt.ui.html.selenium.util.TextComparator.StartsWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -124,7 +125,7 @@ public final class SeleniumExpectedConditions {
 
   /**
    * Waits until the given element has the requested attribute name and contains the given value. Example: the attribute
-   * "class" of an element should contain the string "error-status".
+   * "class" must contain the string "status".
    */
   public static ExpectedCondition<Boolean> attributeToContainValue(final WebElement element, final String attributeName, final String value) {
     return attributeToCompareValue(new Contains(), element, attributeName, value);
@@ -136,6 +137,14 @@ public final class SeleniumExpectedConditions {
    */
   public static ExpectedCondition<Boolean> attributeToEqualsValue(final WebElement element, final String attributeName, final String value) {
     return attributeToCompareValue(new Equals(), element, attributeName, value);
+  }
+
+  /**
+   * Waits until the given element has the requested attribute name and starts with the given value. Example: the attribute
+   * "class" must start with "error-".
+   */
+  public static ExpectedCondition<Boolean> attributeToStartsWithValue(final WebElement element, final String attributeName, final String value) {
+    return attributeToCompareValue(new StartsWith(), element, attributeName, value);
   }
 
   /**

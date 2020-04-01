@@ -41,4 +41,12 @@ abstract class TextComparator {
       return actual.contains(expected);
     }
   }
+
+  static class StartsWith extends TextComparator {
+
+    @Override
+    boolean compare(String expected, String actual) {
+      return actual.startsWith(expected);
+    }
+  }
 }
