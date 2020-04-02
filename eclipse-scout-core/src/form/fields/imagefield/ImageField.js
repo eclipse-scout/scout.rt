@@ -64,6 +64,10 @@ export default class ImageField extends FormField {
   _remove() {
     super._remove();
     this._clickHandler = null;
+    if (this.fileInput) {
+      this.fileInput.destroy();
+      this.fileInput = null;
+    }
   }
 
   _installDragAndDropHandler(event) {
