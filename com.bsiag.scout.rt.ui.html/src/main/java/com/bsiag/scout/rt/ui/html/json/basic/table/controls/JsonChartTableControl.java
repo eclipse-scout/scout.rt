@@ -10,7 +10,7 @@
 package com.bsiag.scout.rt.ui.html.json.basic.table.controls;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
@@ -77,7 +77,7 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
     });
   }
 
-  private JSONObject createJsonObject(IChartColumnParam columnParam) {
+  protected JSONObject createJsonObject(IChartColumnParam columnParam) {
     JSONObject json = new JSONObject();
     if (columnParam != null) {
       IColumn<?> column = columnParam.getColumn();
@@ -90,17 +90,8 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
     return null;
   }
 
-  @SuppressWarnings("rawtypes")
-  private JsonTable<?> getTableAdapter() {
-    JsonTable<?> jsonTable = null;
-    if (getParent() instanceof JsonTable && ObjectUtility.equals(getModel().getTable(), getParent().getModel())) {
-      jsonTable = (JsonTable<?>) getParent();
-    }
-    if (jsonTable == null) {
-      // Fallback that is probably not necessary because JsonTable is always the parent of the JsonTableControl.
-      jsonTable = (JsonTable) getGlobalAdapter(getModel().getTable());
-    }
-    return jsonTable;
+  protected JsonTable<?> getTableAdapter() {
+    return Assertions.assertInstance(getParent(), JsonTable.class, "Unexpected parent adapter: {}", getParent());
   }
 
   @Override
@@ -146,15 +137,13 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
     getModel().setGroup2(createColumnParam(chartGroup2));
   }
 
-  private ChartColumnParam createColumnParam(JSONObject jsonValue) {
+  protected ChartColumnParam createColumnParam(JSONObject jsonValue) {
     if (jsonValue == null) {
       return null;
     }
-
     String id = jsonValue.optString("id");
     int modifier = jsonValue.optInt("modifier");
     IColumn<?> column = getTableAdapter().optColumn(id);
     return new ChartColumnParam(column, modifier);
   }
-
 }
