@@ -76,7 +76,7 @@ export default class ContextMenuPopup extends PopupWithHead {
   }
 
   removeSubMenuItems(parentMenu, animated) {
-    if (!this.rendered) {
+    if (!this.rendered && !this.rendering) {
       return;
     }
     if (this.bodyAnimating) {
@@ -171,7 +171,7 @@ export default class ContextMenuPopup extends PopupWithHead {
       };
       return;
     }
-    if (!this.rendered) {
+    if (!this.rendered && !this.rendering) {
       return;
     }
     if (this.bodyAnimating) {
