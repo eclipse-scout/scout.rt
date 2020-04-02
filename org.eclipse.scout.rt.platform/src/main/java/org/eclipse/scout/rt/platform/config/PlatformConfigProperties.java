@@ -57,6 +57,26 @@ public final class PlatformConfigProperties {
     }
   }
 
+  public static class PlatformVersionProperty extends AbstractStringConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.platform.version";
+    }
+
+    @Override
+    public String getDefaultValue() {
+      // implementation for Java 9 and above should maybe use ModuleDescriptor
+      String version = Platform.class.getPackage().getImplementationVersion();
+      return version != null ? version : "development";
+    }
+
+    @Override
+    public String description() {
+      return "Version of the scout platform. Used e.g. in the info form and the diagnostic views. The default value is bound to the implementation version in the manifest file.";
+    }
+  }
+
   public static class ApplicationVersionProperty extends AbstractStringConfigProperty {
 
     @Override

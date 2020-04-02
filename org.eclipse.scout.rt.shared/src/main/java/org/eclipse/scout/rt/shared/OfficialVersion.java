@@ -12,15 +12,27 @@ package org.eclipse.scout.rt.shared;
 
 import java.util.Calendar;
 
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties;
+
+// TODO [11.0] rst cleanup deprecations
 public final class OfficialVersion {
 
   private OfficialVersion() {
   }
 
+  /**
+   * @deprecated use instead {@link PlatformConfigProperties.PlatformVersionProperty}
+   */
+  @Deprecated
   public static final String VERSION = "10.0.0";
 
-  public static final String COPYRIGHT = "Scout " + VERSION + ", &copy; BSI Business Systems Integration AG " + 2001 + "," + Calendar.getInstance().get(Calendar.YEAR) + " EPL";
+  public static final String COPYRIGHT_VERSION = "10";
+  public static final String COPYRIGHT = "Scout " + COPYRIGHT_VERSION + ", &copy; BSI Business Systems Integration AG " + 2001 + "," + Calendar.getInstance().get(Calendar.YEAR) + " EPL";
 
+  /**
+   * @deprecated unused global variable will be remove in a future release
+   */
   @SuppressWarnings({"squid:ClassVariableVisibilityCheck", "squid:S1444"})
   public static String customCopyrightText;
+
 }

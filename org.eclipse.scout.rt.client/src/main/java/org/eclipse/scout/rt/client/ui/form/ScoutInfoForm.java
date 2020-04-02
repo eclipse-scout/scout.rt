@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformVersionProperty;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
 import org.eclipse.scout.rt.platform.html.IHtmlElement;
@@ -46,7 +47,6 @@ import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
-import org.eclipse.scout.rt.shared.OfficialVersion;
 
 @ClassId("dee01442-979d-4231-a3f9-bd2a163e752a")
 public class ScoutInfoForm extends AbstractForm {
@@ -131,7 +131,7 @@ public class ScoutInfoForm extends AbstractForm {
     Locale locale = NlsLocale.get();
     props.put(TEXTS.get("Language"), locale.getDisplayLanguage(locale));
     props.put(TEXTS.get("FormattingLocale"), locale);
-    props.put(TEXTS.get("ScoutVersion"), OfficialVersion.VERSION);
+    props.put(TEXTS.get("ScoutVersion"), CONFIG.getPropertyValue(PlatformVersionProperty.class));
     return props;
   }
 
