@@ -89,15 +89,13 @@ public class ServerSessionCache {
    * available.
    *
    * @param scoutSessionId
-   * @param httpSession
-   *          May not be {@code null}.
+   *          is the groupId referencing multiple http sessions
+   * @param httpSessionId
+   *          must not be {@code null}.
    */
   public void removeHttpSession(String scoutSessionId, String httpSessionId) {
     final ServerSessionEntry removedEntry = m_lockBySessionId.remove(scoutSessionId, entry -> removeEntry(entry, httpSessionId));
-    if (removedEntry == null) {
-      LOG.warn("Unknown sessionContext [scoutSessionId={}, httpSessionId={}]", scoutSessionId, httpSessionId);
-    }
-    else {
+    if (removedEntry != null) {
       LOG.debug("Removed Scout server session from cache [scoutSessionId={}, httpSessionId={}].", scoutSessionId, httpSessionId);
       // destroy entry that was removed from the cache.
       // execute it outside the lock so that new sessions may be created again while the old one is still stopping.
