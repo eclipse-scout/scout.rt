@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.job.internal;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.concurrent.AbstractInterruptionError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,14 @@ public class CallableChainExceptionHandler<RESULT> implements ICallableIntercept
     catch (Exception | Error e) { // NOSONAR
       if (Thread.currentThread().isInterrupted()) {
         LOG.debug("Exception in callable chain due to interruption.", e);
+      }
+      else if (e instanceof VetoException) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("{} in callable chain.", e.getClass().getSimpleName(), e);
+        }
+        else {
+          LOG.info("{} in callable chain: {}", e.getClass().getSimpleName(), e.getMessage());
+        }
       }
       else {
         LOG.warn("Exception in callable chain.", e);
