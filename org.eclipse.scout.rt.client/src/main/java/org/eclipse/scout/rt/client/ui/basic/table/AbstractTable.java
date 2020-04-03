@@ -1319,6 +1319,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     if (getUserFilterManager() == null) {
       setUserFilterManager(createUserFilterManager());
     }
+    setTileMode(ClientUIPreferences.getInstance().getTableTileMode(this, isTileMode()));
   }
 
   @Override
