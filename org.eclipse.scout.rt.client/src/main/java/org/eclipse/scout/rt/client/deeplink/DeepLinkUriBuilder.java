@@ -25,10 +25,9 @@ import org.eclipse.scout.rt.shared.deeplink.DeepLinkUtility;
 public final class DeepLinkUriBuilder {
 
   private final UriBuilder m_builder;
-
   private String m_info;
-
   private String m_path;
+  private boolean m_pathVisible = true;
 
   private DeepLinkUriBuilder(UriBuilder builder) {
     m_builder = builder;
@@ -71,6 +70,11 @@ public final class DeepLinkUriBuilder {
     return this;
   }
 
+  public DeepLinkUriBuilder pathVisible(boolean pathVisible) {
+    m_pathVisible = pathVisible;
+    return this;
+  }
+
   public BrowserHistoryEntry createBrowserHistoryEntry() {
     if (m_path == null) {
       throw new IllegalStateException("Cannot create BrowserHistoryEntry without deep-link path");
@@ -80,7 +84,7 @@ public final class DeepLinkUriBuilder {
     if (StringUtility.hasText(m_info)) {
       title.append(" - ").append(m_info);
     }
-    return new BrowserHistoryEntry(m_builder.createURI(), title.toString(), m_path);
+    return new BrowserHistoryEntry(m_builder.createURI(), title.toString(), m_path, m_pathVisible);
   }
 
   public URL createURL() {

@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.client.deeplink;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
@@ -55,12 +56,13 @@ public class OutlineDeepLinkHandlerTest {
   public void testCreateBrowserHistory() {
     OutlineDeepLinkHandler handler = new OutlineDeepLinkHandler();
     IOutline outline = new P_OutlineFoo();
-    BrowserHistoryEntry entry = handler.createBrowserHistoryEntry(outline);
+    BrowserHistoryEntry entry = handler.createBrowserHistoryEntry(outline, false);
     assertEquals("outline-04446", entry.getDeepLinkPath());
     // title of outline is added to title of desktop (this string is used for the title in the browser-window)
     assertEquals("Test Environment Application - Foo", entry.getTitle());
     // title of outline is used to create the (i)nfo URL parameter
     assertEquals("./?dl=outline-04446&i=foo", entry.getPath());
+    assertTrue(entry.isPathVisible());
   }
 
   /**

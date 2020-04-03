@@ -56,10 +56,17 @@ public class OutlineDeepLinkHandler extends AbstractDeepLinkHandler {
     desktop.activateOutline(selectedOutline);
   }
 
-  public BrowserHistoryEntry createBrowserHistoryEntry(IOutline outline) {
+  /**
+   * @param outline
+   * @param startup Set to true on startup while the default view is activated. Hides the
+   *                path in the URL when set to true.
+   * @return
+   */
+  public BrowserHistoryEntry createBrowserHistoryEntry(IOutline outline, boolean startup) {
     return DeepLinkUriBuilder.createRelative()
         .parameterPath(toDeepLinkPath(outlineId(outline)))
         .parameterInfo(outline.getTitle())
+        .pathVisible(!startup)
         .createBrowserHistoryEntry();
   }
 

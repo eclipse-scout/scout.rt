@@ -169,8 +169,9 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
   private final List<ClientCallback<Coordinates>> m_pendingPositionResponses = Collections.synchronizedList(new ArrayList<>());
-  private int m_attachedCount = 0;
-  private int m_attachedGuiCount = 0;
+  private int m_attachedCount;
+  private int m_attachedGuiCount;
+  private boolean m_activatingDefaultView;
   private final IDataChangeManager m_dataChangeListeners;
   private final IDataChangeManager m_dataChangeDesktopInForegroundListeners;
 
@@ -1091,7 +1092,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       if (m_outline != null) {
         m_activeOutlineListener = new P_ActiveOutlineListener();
         m_outline.addPropertyChangeListener(m_activeOutlineListener);
-        setBrowserHistoryEntry(BEANS.get(OutlineDeepLinkHandler.class).createBrowserHistoryEntry(m_outline));
+        setBrowserHistoryEntry(BEANS.get(OutlineDeepLinkHandler.class).createBrowserHistoryEntry(m_outline, m_activatingDefaultView));
       }
       // <bsh 2010-10-15>
       // Those three "setXyz(null)" statements used to be called unconditionally. Now, they
@@ -2151,7 +2152,12 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       return;
     }
     if (m_attachedCount <= 1) { // is startup?
-      interceptDefaultView();
+      try {
+        m_activatingDefaultView = true;
+        interceptDefaultView();
+      } finally {
+        m_activatingDefaultView = false;
+      }
     }
   }
 

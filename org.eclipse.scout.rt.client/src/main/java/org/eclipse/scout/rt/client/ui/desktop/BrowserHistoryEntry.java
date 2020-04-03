@@ -11,20 +11,20 @@
 package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.net.URI;
+import java.util.Objects;
 
 /**
  * This class is used to populate the browser history with history entries.
  *
- * @see https://developer.mozilla.org/en-US/docs/Web/API/History
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/History">API/History</a>
  * @since 6.0
  */
 public class BrowserHistoryEntry {
 
   private final String m_title;
-
   private final URI m_path;
-
   private final String m_deepLinkPath;
+  private final boolean m_pathVisible;
 
   /**
    * @param path
@@ -35,11 +35,15 @@ public class BrowserHistoryEntry {
    * @param deepLinkPath
    *          stored in the History.state object of the browser. This path is sent back to the UI server when the user
    *          clicks on the navigate buttons in the browser. Example <code>outline-12345</code>
+   * @param pathVisible
+   *          flag to show or hide the path in the URL. In some cases we want to suppress deep-link parameters
+   *          on startup, but we still need the deep-link-path.
    */
-  public BrowserHistoryEntry(URI path, String title, String deepLinkPath) {
+  public BrowserHistoryEntry(URI path, String title, String deepLinkPath, boolean pathVisible) {
     m_path = path;
     m_title = title;
     m_deepLinkPath = deepLinkPath;
+    m_pathVisible = pathVisible;
   }
 
   public String getTitle() {
@@ -57,53 +61,28 @@ public class BrowserHistoryEntry {
     return m_deepLinkPath;
   }
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((m_deepLinkPath == null) ? 0 : m_deepLinkPath.hashCode());
-    result = prime * result + ((m_path == null) ? 0 : m_path.hashCode());
-    result = prime * result + ((m_title == null) ? 0 : m_title.hashCode());
-    return result;
+  public boolean isPathVisible() {
+    return m_pathVisible;
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
+  public boolean equals(Object o) {
+    if (this == o) {
       return true;
     }
-    if (obj == null) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    BrowserHistoryEntry other = (BrowserHistoryEntry) obj;
-    if (m_deepLinkPath == null) {
-      if (other.m_deepLinkPath != null) {
-        return false;
-      }
-    }
-    else if (!m_deepLinkPath.equals(other.m_deepLinkPath)) {
-      return false;
-    }
-    if (m_path == null) {
-      if (other.m_path != null) {
-        return false;
-      }
-    }
-    else if (!m_path.equals(other.m_path)) {
-      return false;
-    }
-    if (m_title == null) {
-      if (other.m_title != null) {
-        return false;
-      }
-    }
-    else if (!m_title.equals(other.m_title)) {
-      return false;
-    }
-    return true;
+    BrowserHistoryEntry that = (BrowserHistoryEntry) o;
+    return m_pathVisible == that.m_pathVisible &&
+      m_title.equals(that.m_title) &&
+      m_path.equals(that.m_path) &&
+      m_deepLinkPath.equals(that.m_deepLinkPath);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_title, m_path, m_deepLinkPath, m_pathVisible);
   }
 
 }

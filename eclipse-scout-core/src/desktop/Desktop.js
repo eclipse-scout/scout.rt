@@ -508,7 +508,7 @@ export default class Desktop extends Widget {
     var myWindow = this.$container.window(true),
       history = this.browserHistoryEntry;
     if (history) {
-      var historyPath = this._createHistoryPath(history.path);
+      var historyPath = this._createHistoryPath(history);
       var setStateFunc = (this.rendered ? myWindow.history.pushState : myWindow.history.replaceState).bind(myWindow.history);
       setStateFunc({
         deepLinkPath: history.deepLinkPath
@@ -519,7 +519,11 @@ export default class Desktop extends Widget {
   /**
    * Takes the history.path provided by the browserHistoryEvent and appends additional URL parameters.
    */
-  _createHistoryPath(historyPath) {
+  _createHistoryPath(history) {
+    if (!history.pathVisible) {
+      return '';
+    }
+    var historyPath = history.path;
     var cloneUrl = this.url.clone();
     cloneUrl.removeParameter('dl');
     cloneUrl.removeParameter('i');

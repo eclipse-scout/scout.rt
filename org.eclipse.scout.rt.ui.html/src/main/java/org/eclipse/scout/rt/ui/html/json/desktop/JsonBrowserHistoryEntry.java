@@ -28,6 +28,7 @@ public class JsonBrowserHistoryEntry implements IJsonObject {
     json.put("path", m_browserHistoryEntry.getPath());
     json.put("title", m_browserHistoryEntry.getTitle());
     json.put("deepLinkPath", m_browserHistoryEntry.getDeepLinkPath());
+    json.put("pathVisible", m_browserHistoryEntry.isPathVisible());
     return json;
   }
 
