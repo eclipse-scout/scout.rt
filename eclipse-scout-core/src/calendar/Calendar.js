@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CalendarComponent, CalendarLayout, CalendarListComponent, DateRange, dates, HtmlComponent, KeyStrokeContext, menus as menus_1, objects, scout, scrollbars, strings, Widget} from '../index';
+import {CalendarComponent, CalendarLayout, CalendarListComponent, DateRange, dates, GroupBox, HtmlComponent, KeyStrokeContext, menus, objects, scout, scrollbars, strings, Widget} from '../index';
 import * as $ from 'jquery';
 
 export default class Calendar extends Widget {
@@ -64,6 +64,7 @@ export default class Calendar extends Widget {
      * items visible on the list.
      */
     this._listComponents = [];
+    this.menuInjectionTarget = null;
 
     this._addWidgetProperties(['components', 'menus', 'selectedComponent']);
   }
@@ -139,6 +140,7 @@ export default class Calendar extends Widget {
     });
     this._setSelectedDate(model.selectedDate);
     this._setDisplayMode(model.displayMode);
+    this._setMenuInjectionTarget(model.menuInjectionTarget);
     this._exactRange = this._calcExactRange();
     this._yearPanel.setViewRange(this._exactRange);
     this.viewRange = this._calcViewRange();
@@ -198,7 +200,34 @@ export default class Calendar extends Widget {
   }
 
   _setMenus(menus) {
+    if (this._checkMenuInjectionTarget(this.menuInjectionTarget)) {
+      var originalMenus = this._removeInjectedMenus(this.menuInjectionTarget, this.menus);
+      this.menuInjectionTarget.setMenus(menus.concat(originalMenus));
+    }
     this._setProperty('menus', menus);
+  }
+
+  _setMenuInjectionTarget(menuInjectionTarget) {
+    if (objects.isString(menuInjectionTarget)) {
+      menuInjectionTarget = scout.widget(menuInjectionTarget);
+    }
+    // Remove all injected menus from old injection target
+    if (this._checkMenuInjectionTarget(this.menuInjectionTarget)) {
+      var originalMenus = this._removeInjectedMenus(this.menuInjectionTarget, this.menus);
+      this.menuInjectionTarget.setMenus(originalMenus);
+    }
+    if (this._checkMenuInjectionTarget(menuInjectionTarget)) {
+      menuInjectionTarget.setMenus(this.menus.concat(menuInjectionTarget.menus));
+    }
+    this._setProperty('menuInjectionTarget', menuInjectionTarget);
+  }
+
+  _checkMenuInjectionTarget(menuInjectionTarget) {
+    return menuInjectionTarget instanceof GroupBox;
+  }
+
+  _removeInjectedMenus(menuInjectionTarget, injectedMenus) {
+    return menuInjectionTarget.menus.filter(element => !injectedMenus.includes(element));
   }
 
   _render() {
@@ -1012,7 +1041,7 @@ export default class Calendar extends Widget {
       if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
         return;
       }
-      var filteredMenus = menus_1.filter(this.menus, [allowedType], true),
+      var filteredMenus = menus.filter(this.menus, [allowedType], true),
         $part = $(event.currentTarget);
       if (filteredMenus.length === 0) {
         return;

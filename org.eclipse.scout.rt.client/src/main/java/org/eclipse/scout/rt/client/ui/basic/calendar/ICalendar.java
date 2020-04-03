@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.ICalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
@@ -74,6 +75,8 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    * @since 4.0.0 {@link IContextMenu}
    */
   String PROP_CONTEXT_MENU = "contextMenus";
+
+  String PROP_MENU_INJECTION_TARGET = "menuInjectionTarget";
 
   String getTitle();
 
@@ -161,7 +164,7 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    * <p>
    * Default {@code 6}.
    *
-   * @see getUseOverflowCells
+   * @see #getUseOverflowCells
    */
   int getStartHour();
 
@@ -176,7 +179,7 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    * <p>
    * Default {@code true}.
    *
-   * @see getStartHour
+   * @see #getStartHour
    */
   boolean getUseOverflowCells();
 
@@ -210,4 +213,14 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
 
   @Override
   ICalendarContextMenu getContextMenu();
+
+  IGroupBox getMenuInjectionTarget();
+
+  /**
+   * Specifies a target {@link IGroupBox} where the calendar will inject all menus contained in
+   * {@link #getContextMenu()}. The menus will be injected within the ui layer and will be removed as soon as the
+   * injection target changes. As soon as the menus within the contextmenu change, the injected menus will be removed
+   * and the new menu structure will be injected.
+   */
+  void setMenuInjectionTarget(IGroupBox target);
 }

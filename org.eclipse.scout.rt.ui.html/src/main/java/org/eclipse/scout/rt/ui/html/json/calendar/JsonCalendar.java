@@ -191,6 +191,15 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
         return getModel().getShowDisplayModeSelection();
       }
     });
+    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_MENU_INJECTION_TARGET, model) {
+      @Override
+      protected String modelValue() {
+        return getUiSession().getJsonAdapters(getModel().getMenuInjectionTarget()).stream()
+            .findAny()
+            .map(IJsonAdapter::getId)
+            .orElse(null);
+      }
+    });
   }
 
   @SuppressWarnings("unchecked")

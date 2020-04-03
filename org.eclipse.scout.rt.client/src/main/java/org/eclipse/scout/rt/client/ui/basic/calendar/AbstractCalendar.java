@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ICalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.CalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
@@ -68,7 +69,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link ICalendarItemProducer} are defined as inner classes<br>
+ * {@link ICalendarItemProvider} are defined as inner classes<br>
  */
 @ClassId("51532170-6aba-414e-a18f-413d4400e70e")
 public abstract class AbstractCalendar extends AbstractWidget implements ICalendar, IContributionOwner, IExtensibleObject {
@@ -186,7 +187,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   /**
    * Filter and resolve item conflicts after some {@link ICalendarItemProvider} changed their items
    *
-   * @param changedProviders
+   * @param changedProviderTypes
    *          is the list of provider types that changed their provided items
    * @param componentsByProvider
    *          is the life map of all provider types with their provided items.
@@ -454,6 +455,16 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   }
 
   @Override
+  public IGroupBox getMenuInjectionTarget() {
+    return (IGroupBox) propertySupport.getProperty(PROP_MENU_INJECTION_TARGET);
+  }
+
+  @Override
+  public void setMenuInjectionTarget(IGroupBox target) {
+    propertySupport.setProperty(PROP_MENU_INJECTION_TARGET, target);
+  }
+
+  @Override
   public List<IMenu> getMenus() {
     return getContextMenu().getChildActions();
   }
@@ -546,9 +557,6 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     propertySupport.setProperty(PROP_SELECTED_COMPONENT, comp);
   }
 
-  /**
-   * @param provider
-   */
   protected void updateContentProviderMenus(ICalendarItemProvider provider) {
     // remove old
     if (m_inheritedMenusOfSelectedProvider != null) {
@@ -576,7 +584,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
 
   @Override
   public Set<CalendarComponent> getComponents() {
-    return CollectionUtility.hashSet(propertySupport.<CalendarComponent> getPropertySet(PROP_COMPONENTS));
+    return CollectionUtility.hashSet(propertySupport.getPropertySet(PROP_COMPONENTS));
   }
 
   private void updateComponentsInternal(List<ICalendarItemProvider> changedProviders) {
