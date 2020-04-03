@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Outline, PageWithTable, scout} from '../../../../src/index';
+import {arrays, Outline, PageWithTable, scout, StaticLookupCall} from '../../../../src/index';
 import {OutlineSpecHelper} from '@eclipse-scout/testing';
 
 describe('PageWithTable', function() {
@@ -70,6 +70,97 @@ describe('PageWithTable', function() {
     // expect error to be set as tableStatus
     var keys = Object.keys(page.detailTable.tableStatus);
     expect(arrays.containsAll(keys, ['message', 'code', 'severity'])).toBe(true);
+  });
+
+  it('does not fail when cells with null values are inserted into a smart column ', function(done) {
+    class DummyLookupCall extends StaticLookupCall {
+      constructor() {
+        super();
+      }
+
+      _data() {
+        return [
+          ['key0', 'Key 0'],
+          ['key1', 'Key 1']
+        ];
+      }
+    }
+
+    class SamplePageWithTable extends PageWithTable {
+      createChildPage(row) {
+        return scout.create('Page', {
+          parent: this.getOutline()
+        });
+      }
+
+      _loadTableData(searchFilter) {
+        var data = [{
+          string: 'string 1',
+          smartValue: null
+        }, {
+          string: 'string 2',
+          smartValue: null
+        }, {
+          string: 'string 3',
+          smartValue: 'key0'
+        }, {
+          string: 'string 4',
+          smartValue: 'key1'
+        }, {
+          string: 'string 5',
+          smartValue: 'key0'
+        }];
+        return $.resolvedPromise(data);
+      }
+
+      _transformTableDataToTableRows(tableData) {
+        return tableData
+          .map(function(row) {
+            return {
+              data: row,
+              cells: [
+                row.string,
+                row.smartValue
+              ]
+            };
+          });
+      }
+    }
+
+    jasmine.clock().uninstall();
+    var lookupCall = new DummyLookupCall();
+    lookupCall.init({session: session});
+    page = new SamplePageWithTable();
+    page.init({
+      parent: outline,
+      detailTable: {
+        objectType: 'Table',
+        columns: [
+          {
+            id: 'StringColumn',
+            objectType: 'Column',
+            sortActive: true,
+            sortIndex: 0
+          },
+          {
+            id: 'SmartColumn',
+            objectType: 'SmartColumn',
+            lookupCall: lookupCall
+          }
+        ]
+      }
+    });
+    outline.insertNode(page);
+    outline.selectNode(page);
+    page.detailTable.when('propertyChange:loading').then(function(event) {
+      // Loading is set to true when update buffer finishes
+      expect(page.detailTable.rows[0].cells[0].text).toEqual('string 1');
+      expect(page.detailTable.rows[0].cells[1].text).toEqual('');
+      expect(page.detailTable.rows[2].cells[0].text).toEqual('string 3');
+      expect(page.detailTable.rows[2].cells[1].text).toEqual('Key 0');
+      done();
+    })
+      .catch(fail);
   });
 
 });

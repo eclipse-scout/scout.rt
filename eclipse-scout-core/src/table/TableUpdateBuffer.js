@@ -29,14 +29,16 @@ export default class TableUpdateBuffer {
     this.table._renderViewportBlocked = true;
     this.table.setLoading(true);
 
-    promise.always(function() {
+    var handler = function() {
       arrays.remove(this.promises, promise);
 
       // process immediately when all promises have resolved
       if (this.promises.length === 0) {
         this.process();
       }
-    }.bind(this));
+    }.bind(this);
+    // Use then instead of always to ensure it is always executed asynchronous, even for null values
+    promise.then(handler, handler);
   }
 
   isBuffering() {
