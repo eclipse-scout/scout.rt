@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -79,6 +80,7 @@ public class ClientUIPreferences {
   protected static final String TABLE_COLUMN_BACKGROUND_EFFECT = "table.column.background.effect.";
   protected static final String TABLE_COLUMN_SORT_ASC = "table.column.sortAsc.";
   protected static final String TABLE_COLUMN_SORT_EXPLICIT = "table.column.sortExplicit.";
+  protected static final String TABLE_TILE_MODE = "table.tile.mode";
   protected static final String CALENDAR_DISPLAY_MODE = "calendar.display.mode";
   protected static final String CALENDAR_DISPLAY_CONDENSED = "calendar.display.condensed";
   protected static final String DESKTOP_COLUMN_SPLITS = "desktop.columnSplits";
@@ -841,6 +843,20 @@ public class ClientUIPreferences {
     return defaultValue;
   }
 
+  public boolean getTableTileMode(ITable table, boolean defaultValue) {
+    if (m_prefs == null) {
+      return defaultValue;
+    }
+
+    String key = getTableKey(table) + "#" + TABLE_TILE_MODE;
+    return BooleanUtility.nvl(getPropertyBoolean(key));
+  }
+
+  public void setTableTileMode(ITable table, boolean value) {
+    String key = getTableKey(table) + "#" + TABLE_TILE_MODE;
+    setPropertyBoolean(key, value);
+  }
+
   public int getPropertyInteger(String propName, int defaultValue, boolean setDefaultAsProperty) {
     if (m_prefs == null) {
       return defaultValue;
@@ -961,6 +977,23 @@ public class ClientUIPreferences {
     }
 
     m_prefs.put(propName, Boolean.toString(value));
+    flush();
+  }
+
+  public String getPropertyString(String propName) {
+    if (m_prefs == null) {
+      return null;
+    }
+
+    return m_prefs.get(propName, null);
+  }
+
+  public void setPropertyString(String propName, String value) {
+    if (m_prefs == null) {
+      return;
+    }
+
+    m_prefs.put(propName, value);
     flush();
   }
 

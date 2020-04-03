@@ -16,8 +16,10 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.tile.TileGridLayoutConfig;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class TableTileGridMediator extends AbstractPropertyObserver implements ITableTileGridMediator, TableListener {
 
@@ -67,7 +69,7 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
   @Override
   public void tableChanged(TableEvent e) {
     if (m_table.isTileMode()) {
-      List<ITableRowTileMapping> tileMappings = new ArrayList<>(getTileMappings());
+      List<ITableRowTileMapping> tileMappings = CollectionUtility.arrayList(getTileMappings());
       switch (e.getType()) {
         case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
           // when the column structure changes rows are not reloaded but retransmitted to the ui. Force a property change event for the tileMappings to ensure that the mapping is recreated on the clientside.
@@ -96,6 +98,8 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
     if (m_table.isTileMode()) {
       loadTiles(m_table.getRows());
     }
+    // Store user preferences here (instead of when setting the property on the table). This ensures that the tileMode was at least used once.
+    ClientUIPreferences.getInstance().setTableTileMode(m_table, m_table.isTileMode());
   }
 
   protected void loadTiles(List<ITableRow> rows) {
