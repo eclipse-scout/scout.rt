@@ -930,7 +930,7 @@ export default class JQueryUtils extends $ {
   }
 
   /**
-   * @return true if the element is attached (= is in the dom tree), false if not
+   * @return {boolean} true if the element is attached (= is in the dom tree), false if not
    */
   static isAttached() {
     return $.contains(this.document(true).documentElement, this[0]);

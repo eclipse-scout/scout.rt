@@ -181,6 +181,7 @@ export function uninstall($container, session) {
   removeScrollable(session, $container);
   $container.removeData('scrollable');
   $container.css('overflow', '');
+  $container.removeClass('hybrid-scrollable');
   $container.removeData('scrollbars');
 
   var htmlContainer = HtmlComponent.optGet($container);
@@ -476,9 +477,8 @@ export function scrollToBottom($scrollable) {
 }
 
 /**
- * Returns true if the location is visible in the current viewport of the $scrollable, or if $scrollable is null
  * @param location object with x and y properties
- *
+ * @eturns {boolean} true if the location is visible in the current viewport of the $scrollable, or if $scrollable is null
  */
 export function isLocationInView(location, $scrollable) {
   if (!$scrollable || $scrollable.length === 0) {

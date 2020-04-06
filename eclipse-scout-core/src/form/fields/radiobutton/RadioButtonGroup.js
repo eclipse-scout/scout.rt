@@ -420,7 +420,7 @@ export default class RadioButtonGroup extends ValueField {
   }
 
   /**
-   * @return true if a lookup call execution has been scheduled now. false otherwise.
+   * @return {boolean} true if a lookup call execution has been scheduled now. false otherwise.
    */
   _ensureLookupCallExecuted() {
     if (!this.lookupCall) {

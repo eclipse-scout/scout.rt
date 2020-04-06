@@ -65,7 +65,7 @@ export default class Rectangle {
    * This means the two rectangles share at least one internal point.
    *
    * @param r the rectangle to test against
-   * @return true if the specified rectangle intersects this one
+   * @return {boolean} true if the specified rectangle intersects this one
    */
   intersects(r) {
     if (!r) {

@@ -12,6 +12,7 @@ import {
   arrays,
   ContextMenuKeyStroke,
   DoubleClickSupport,
+  graphics,
   HtmlComponent,
   KeyStrokeContext,
   LoadingSupport,
@@ -541,10 +542,24 @@ export default class TileGrid extends Widget {
     var pageX = scout.nvl(options.pageX, null);
     var pageY = scout.nvl(options.pageY, null);
     if (pageX === null || pageY === null) {
-      var $selectedTile = arrays.last(this.selectedTiles).$container;
-      var offset = $selectedTile.offset();
+      var offset;
+      var $scrollable = this.$container.scrollParent();
+      if ($scrollable.length === 0) {
+        $scrollable = this.$container;
+      }
+      var scrollableBounds = graphics.offsetBounds($scrollable);
+      if (this.isTileInView(this.focusedTile)) {
+        // Place the context menu on the focused tile if possible
+        offset = this.focusedTile.$container.offset();
+      } else {
+        // If focused tile is not in view place the popup in the top left corner of the tile grid
+        offset = this.$container.offset();
+      }
       pageX = offset.left + 10;
       pageY = offset.top + 10;
+      // Ensure popup is always in view
+      pageX = Math.min(Math.max(pageX, scrollableBounds.x), scrollableBounds.right());
+      pageY = Math.min(Math.max(pageY, scrollableBounds.y), scrollableBounds.bottom());
     }
     // Prevent firing of 'onClose'-handler during contextMenu.open()
     // (Can lead to null-access when adding a new handler to this.contextMenu)
@@ -879,6 +894,20 @@ export default class TileGrid extends Widget {
 
   addTileToSelection(tile) {
     this.addTilesToSelection([tile]);
+  }
+
+  /**
+   * @returns {boolean} true if the tile is completely or partially visible in the first scrollable parent.
+   */
+  isTileInView(tile) {
+    var $scrollable = this.$container.scrollParent();
+    if ($scrollable.length === 0) {
+      $scrollable = this.$container;
+    }
+    if (!tile || !tile.$container || !$scrollable) {
+      return false;
+    }
+    return graphics.offsetBounds(tile.$container).intersects(graphics.offsetBounds($scrollable));
   }
 
   _onTileMouseDown(event) {
