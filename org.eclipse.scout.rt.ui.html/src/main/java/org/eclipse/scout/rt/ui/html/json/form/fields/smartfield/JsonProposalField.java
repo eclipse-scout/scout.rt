@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -54,7 +55,10 @@ public class JsonProposalField<VALUE, MODEL extends IProposalField<VALUE>> exten
 
   @Override
   protected Object valueToJson(VALUE value) {
-    assert value instanceof String;
+    if (value == null) {
+      return null;
+    }
+    Assertions.assertInstance(value, String.class);
     return value;
   }
 
