@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -71,6 +71,8 @@ export default class GlassPaneRenderer {
       .appendDiv('glasspane')
       .on('mousedown', this._onMouseDown.bind(this));
 
+    this._adjustGlassPaneSize($glassPane, $glassPaneTarget);
+
     // This is required in touch mode, because FastClick messes up the order
     // of mouse/click events which is especially important for TouchPopups.
     if (Device.get().supportsOnlyTouch()) {
@@ -91,6 +93,27 @@ export default class GlassPaneRenderer {
     $glassPane.one('remove', this._glassPaneRemoveHandler);
 
     this._registerDisplayParent();
+  }
+
+  _adjustGlassPaneSize($glassPane, $glassPaneTarget) {
+    // The glasspane must cover the border and overlapping children
+    var top = -$glassPaneTarget.cssBorderTopWidth(),
+      bottom = -$glassPaneTarget.cssBorderBottomWidth(),
+      left = -$glassPaneTarget.cssBorderLeftWidth(),
+      right = -$glassPaneTarget.cssBorderRightWidth();
+
+    $glassPaneTarget.children().each(function(idx, elem) {
+      var element = $(elem);
+      top = Math.min(top, (element.cssTop() || 0) + (element.cssMarginTop() || 0));
+      bottom = Math.min(bottom, (element.cssBottom() || 0) + (element.cssMarginBottom() || 0));
+      left = Math.min(left, (element.cssLeft() || 0) + (element.cssMarginLeft() || 0));
+      right = Math.min(right, (element.cssRight() || 0) + (element.cssMarginRight() || 0));
+    });
+
+    $glassPane.cssTop(top)
+      .cssBottom(bottom)
+      .cssLeft(left)
+      .cssRight(right);
   }
 
   removeGlassPanes() {
@@ -198,10 +221,16 @@ export default class GlassPaneRenderer {
     }
 
     if ($animationTarget) {
-      $animationTarget.addClassForAnimation('animate-modality-highlight', {
-        // remove animate-open as well, user may click the glasspane before the widget itself was able to remove the animate-open class
-        classesToRemove: 'animate-modality-highlight animate-open'
-      });
+      // If the animation target itself is covered by a glasspane, the event is passed on
+      var $glassPane = this._widget.$container.children('.glasspane');
+      if ($glassPane.length) {
+        $glassPane.trigger('mousedown');
+      } else {
+        $animationTarget.addClassForAnimation('animate-modality-highlight', {
+          // remove animate-open as well, user may click the glasspane before the widget itself was able to remove the animate-open class
+          classesToRemove: 'animate-modality-highlight animate-open'
+        });
+      }
     }
 
     $.suppressEvent(event);
