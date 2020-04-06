@@ -108,7 +108,8 @@ describe('FieldStatus', function() {
     // same structure as MultiStatus.java which has no children anymore
     var status2 = new Status({
       message: '',
-      severity: Status.Severity.OK});
+      severity: Status.Severity.OK
+    });
     formField.setErrorStatus(status2);
     expect(session.desktop.$container.find('.tooltip').length).toBe(0);
   });
