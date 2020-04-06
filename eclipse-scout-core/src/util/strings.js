@@ -8,11 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  objects,
-  scout,
-  PlainTextEncoder,
-  HtmlEncoder} from '../index';
+import {HtmlEncoder, objects, PlainTextEncoder, scout} from '../index';
 
 let htmlEncoder = null;
 let plainTextEncoder = null;
@@ -373,6 +369,7 @@ export function removeSuffix(string, suffix) {
   }
   return s;
 }
+
 export default {
   asString,
   box,

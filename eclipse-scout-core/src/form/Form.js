@@ -409,7 +409,7 @@ export default class Form extends Widget {
    * This function is called by the lifecycle, when the 'save' function is called.<p>
    * The data given to this function is the result of 'exportData' which was called in advance.
    *
-  * @returns {Promise} promise which may contain a Status specifying if the save operation was successful. The promise may be empty which means the save operation was successful.
+   * @returns {Promise} promise which may contain a Status specifying if the save operation was successful. The promise may be empty which means the save operation was successful.
    */
   _save(data) {
     return $.resolvedPromise();

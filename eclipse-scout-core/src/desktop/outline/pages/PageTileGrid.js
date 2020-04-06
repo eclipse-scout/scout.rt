@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, KeyStrokeContext, PageTileGridSelectKeyStroke, scout, TileGrid} from '../../../index';
+import {KeyStrokeContext, PageTileGridSelectKeyStroke, scout, TileGrid} from '../../../index';
 
 export default class PageTileGrid extends TileGrid {
 
@@ -124,8 +124,7 @@ export default class PageTileGrid extends TileGrid {
       if (this.page === event.parentNode) {
         this.setNodes(this.page.childNodes);
       }
-    }
-    else {
+    } else {
       var eventContainsTopLevelNode = event.nodes && event.nodes.some(function(node) {
         return !node.parentNode;
       }) || event.type === 'allChildNodesDeleted';
