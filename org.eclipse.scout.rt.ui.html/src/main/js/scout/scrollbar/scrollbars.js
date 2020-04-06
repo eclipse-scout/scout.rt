@@ -165,6 +165,7 @@ scout.scrollbars = {
     this.removeScrollable(session, $container);
     $container.removeData('scrollable');
     $container.css('overflow', '');
+    $container.removeClass('hybrid-scrollable');
     $container.removeData('scrollbars');
 
     var htmlContainer = scout.HtmlComponent.optGet($container);

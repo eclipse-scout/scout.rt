@@ -499,10 +499,25 @@ scout.TileGrid.prototype._showContextMenu = function(options) {
   var pageX = scout.nvl(options.pageX, null);
   var pageY = scout.nvl(options.pageY, null);
   if (pageX === null || pageY === null) {
-    var $selectedTile = scout.arrays.last(this.selectedTiles).$container;
-    var offset = $selectedTile.offset();
+    var offset;
+    var $scrollable = this.$container.scrollParent();
+    if ($scrollable.length === 0) {
+      $scrollable = this.$container;
+    }
+    var scrollableBounds = scout.graphics.offsetBounds($scrollable);
+    var focusedTile = this.focusedTile || scout.arrays.last(this.selectedTiles);
+    if (this.isTileInView(focusedTile)) {
+      // Place the context menu on the focused tile if possible
+      offset = focusedTile.$container.offset();
+    } else {
+      // If focused tile is not in view place the popup in the top left corner of the tile grid
+      offset = this.$container.offset();
+    }
     pageX = offset.left + 10;
     pageY = offset.top + 10;
+    // Ensure popup is always in view. Add +-1 to make sure it won't be made invisible by Popup._isInView even if bounds are fractional
+    pageX = Math.min(Math.max(pageX, scrollableBounds.x + 1), scrollableBounds.right() - 1);
+    pageY = Math.min(Math.max(pageY, scrollableBounds.y + 1), scrollableBounds.bottom() - 1);
   }
   // Prevent firing of 'onClose'-handler during contextMenu.open()
   // (Can lead to null-access when adding a new handler to this.contextMenu)
@@ -833,6 +848,20 @@ scout.TileGrid.prototype.addTilesToSelection = function(tiles) {
 
 scout.TileGrid.prototype.addTileToSelection = function(tile) {
   this.addTilesToSelection([tile]);
+};
+
+/**
+ * @returns {boolean} true if the tile is completely or partially visible in the first scrollable parent.
+ */
+scout.TileGrid.prototype.isTileInView = function(tile) {
+  var $scrollable = this.$container.scrollParent();
+  if ($scrollable.length === 0) {
+    $scrollable = this.$container;
+  }
+  if (!tile || !tile.$container || !$scrollable) {
+    return false;
+  }
+  return scout.graphics.offsetBounds(tile.$container).intersects(scout.graphics.offsetBounds($scrollable));
 };
 
 scout.TileGrid.prototype._onTileMouseDown = function(event) {
