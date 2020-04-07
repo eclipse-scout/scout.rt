@@ -280,9 +280,6 @@ export default class BenchColumn extends Widget {
       this.updateFirstLastMarker();
       this.htmlComp.layout.reset();
       this.htmlComp.invalidateLayoutTree();
-      // Layout immediate to prevent 'laggy' form visualization,
-      // but not initially while desktop gets rendered because it will be done at the end anyway
-      this.htmlComp.validateLayoutTree();
     }
   }
 
@@ -320,9 +317,6 @@ export default class BenchColumn extends Widget {
         this.updateFirstLastMarker();
         this.htmlComp.layout.reset();
         this.htmlComp.invalidateLayoutTree();
-        // Layout immediate to prevent 'laggy' form visualization,
-        // but not initially while desktop gets rendered because it will be done at the end anyway
-        this.htmlComp.validateLayoutTree();
       }
     }
   }

@@ -142,7 +142,7 @@ export default class HtmlComponent {
       this.layouting = false;
       this.layouted = true;
       // Save size for later use (necessary if pixelBasedSizing is set to false)
-      this.sizeCached = this.size();
+      this.sizeCached = this.size({exact: true});
       this.valid = true;
     }
     return true;
