@@ -277,9 +277,6 @@ scout.BenchColumn.prototype.addView = function(view, bringToFront) {
     this.updateFirstLastMarker();
     this.htmlComp.layout.reset();
     this.htmlComp.invalidateLayoutTree();
-    // Layout immediate to prevent 'laggy' form visualization,
-    // but not initially while desktop gets rendered because it will be done at the end anyway
-    this.htmlComp.validateLayoutTree();
   }
 };
 
@@ -317,9 +314,6 @@ scout.BenchColumn.prototype.removeView = function(view, showSiblingView) {
       this.updateFirstLastMarker();
       this.htmlComp.layout.reset();
       this.htmlComp.invalidateLayoutTree();
-      // Layout immediate to prevent 'laggy' form visualization,
-      // but not initially while desktop gets rendered because it will be done at the end anyway
-      this.htmlComp.validateLayoutTree();
     }
   }
 };
