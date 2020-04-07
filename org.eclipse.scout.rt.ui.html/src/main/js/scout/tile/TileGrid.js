@@ -515,9 +515,9 @@ scout.TileGrid.prototype._showContextMenu = function(options) {
     }
     pageX = offset.left + 10;
     pageY = offset.top + 10;
-    // Ensure popup is always in view
-    pageX = Math.min(Math.max(pageX, scrollableBounds.x), scrollableBounds.right());
-    pageY = Math.min(Math.max(pageY, scrollableBounds.y), scrollableBounds.bottom());
+    // Ensure popup is always in view. Add +-1 to make sure it won't be made invisible by Popup._isInView even if bounds are fractional
+    pageX = Math.min(Math.max(pageX, scrollableBounds.x + 1), scrollableBounds.right() - 1);
+    pageY = Math.min(Math.max(pageY, scrollableBounds.y + 1), scrollableBounds.bottom() - 1);
   }
   // Prevent firing of 'onClose'-handler during contextMenu.open()
   // (Can lead to null-access when adding a new handler to this.contextMenu)
