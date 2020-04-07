@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ scout.ContextMenuPopup = function() {
   this.menuItems = [];
   this.cloneMenuItems = true;
   this._toggleSubMenuQueue = [];
+  this.repositionEnabled = true;
 };
 scout.inherits(scout.ContextMenuPopup, scout.PopupWithHead);
 
@@ -102,13 +103,16 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
       width: 'auto',
       height: 'auto'
     });
-    var targetSize = this.htmlComp.size();
+    var targetBounds = this.htmlComp.offsetBounds();
     parentMenu.$subMenuBody.css('box-shadow', 'none');
     this.htmlComp.setBounds(actualBounds);
     if (this.verticalAlignment !== scout.Popup.Alignment.TOP) {
       // set container to element
       parentMenu.$subMenuBody.cssTop();
     }
+
+    this._animateTopAndLeft(this.htmlComp.$comp, actualBounds, targetBounds, duration);
+
     // move new body to top of popup
     parentMenu.$subMenuBody.cssHeightAnimated(actualBounds.height, parentMenu.$container.cssHeight(), {
       duration: duration,
@@ -143,15 +147,15 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
       }.bind(this)
     });
 
-    this.$body.cssWidthAnimated(actualBounds.width, targetSize.width, {
+    this.$body.cssWidthAnimated(actualBounds.width, targetBounds.width, {
       duration: duration,
-      start: this.revalidateLayout.bind(this),
-      progress: this.revalidateLayout.bind(this),
+      start: this.revalidateLayout.bind(this, true),
+      progress: this.revalidateLayout.bind(this, false),
       queue: false
     });
 
-    if (targetSize.height !== actualBounds.height) {
-      this.$body.cssHeightAnimated(actualBounds.height, targetSize.height, {
+    if (targetBounds.height !== actualBounds.height) {
+      this.$body.cssHeightAnimated(actualBounds.height, targetBounds.height, {
         duration: duration,
         queue: false
       });
@@ -219,12 +223,15 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
       height: 'auto'
     });
     var targetBounds = this.htmlComp.offsetBounds();
+
+    this._animateTopAndLeft(this.htmlComp.$comp, actualBounds, targetBounds, duration);
+
     this.$body.css('box-shadow', 'none');
     // set container to element
     this.$body.cssWidthAnimated(actualBounds.width, targetBounds.width, {
       duration: duration,
-      start: this.revalidateLayout.bind(this),
-      progress: this.revalidateLayout.bind(this),
+      start: this.revalidateLayout.bind(this, true),
+      progress: this.revalidateLayout.bind(this, false),
       queue: false
     });
 
@@ -293,6 +300,22 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
     this._installScrollbars();
     this._updateFirstLastClass();
   }
+};
+
+scout.ContextMenuPopup.prototype._animateTopAndLeft = function($comp, actualBounds, targetBounds, duration) {
+  var options = {
+      duration: duration,
+      queue: false
+  };
+  $comp
+    .cssTopAnimated(actualBounds.y, targetBounds.y, options)
+    .cssLeftAnimated(actualBounds.x, targetBounds.x, options);
+};
+
+scout.ContextMenuPopup.prototype.revalidateLayout = function(repositionEnabled) {
+  this.repositionEnabled = scout.nvl(repositionEnabled, true);
+  scout.ContextMenuPopup.parent.prototype.revalidateLayout.call(this);
+  this.repositionEnabled = true;
 };
 
 scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMenuRendering) {
