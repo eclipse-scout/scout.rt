@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -129,8 +129,10 @@ export default class PopupLayout extends AbstractLayout {
    * @returns {Dimension}
    */
   _calcMaxSize() {
-    // Position the popup at the desired location before doing any calculations to consider the preferred bounds
-    this._position(false);
+    if (this.popup.repositionEnabled) {
+      // Position the popup at the desired location before doing any calculations to consider the preferred bounds
+      this._position(false);
+    }
 
     var maxWidth, maxHeight,
       htmlComp = this.popup.htmlComp,
@@ -220,8 +222,10 @@ export default class PopupLayout extends AbstractLayout {
    * @returns {Insets}
    */
   _calcMaxSizeAroundAnchor() {
-    // Position the popup at the desired location before doing any calculations because positioning adds CSS classes which might change margins
-    this._position(false);
+    if (this.popup.repositionEnabled) {
+      // Position the popup at the desired location before doing any calculations because positioning adds CSS classes which might change margins
+      this._position(false);
+    }
 
     var maxWidthLeft, maxWidthRight, maxHeightDown, maxHeightUp,
       htmlComp = this.popup.htmlComp,
