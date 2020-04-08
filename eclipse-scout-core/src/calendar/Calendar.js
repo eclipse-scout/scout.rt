@@ -65,6 +65,7 @@ export default class Calendar extends Widget {
      */
     this._listComponents = [];
     this.menuInjectionTarget = null;
+    this._menuInjectionTargetMenusChangedHandler = null;
 
     this._addWidgetProperties(['components', 'menus', 'selectedComponent']);
   }
@@ -211,13 +212,26 @@ export default class Calendar extends Widget {
     if (objects.isString(menuInjectionTarget)) {
       menuInjectionTarget = scout.widget(menuInjectionTarget);
     }
-    // Remove all injected menus from old injection target
+    // Remove injected menus and installed listener from old injection target
     if (this._checkMenuInjectionTarget(this.menuInjectionTarget)) {
+      menuInjectionTarget.off('propertyChange:menus', this._menuInjectionTargetMenusChangedHandler);
       var originalMenus = this._removeInjectedMenus(this.menuInjectionTarget, this.menus);
       this.menuInjectionTarget.setMenus(originalMenus);
     }
     if (this._checkMenuInjectionTarget(menuInjectionTarget)) {
       menuInjectionTarget.setMenus(this.menus.concat(menuInjectionTarget.menus));
+      // Listen for menu changes on the injection target. Re inject menus into target if the menus have been altered.
+      this._menuInjectionTargetMenusChangedHandler = menuInjectionTarget.on('propertyChange:menus',
+        function(evt) {
+          if (this.menuInjectionTarget.menus.some(function(element) {
+            return this.menus.includes(element);
+          }.bind(this))) {
+            // Menus have already been injected => Do nothing
+            return;
+          }
+          this.menuInjectionTarget.setMenus(this.menus.concat(this.menuInjectionTarget.menus));
+        }.bind(this)
+      );
     }
     this._setProperty('menuInjectionTarget', menuInjectionTarget);
   }
@@ -227,7 +241,9 @@ export default class Calendar extends Widget {
   }
 
   _removeInjectedMenus(menuInjectionTarget, injectedMenus) {
-    return menuInjectionTarget.menus.filter(element => !injectedMenus.includes(element));
+    return menuInjectionTarget.menus.filter(function(element) {
+      return !injectedMenus.includes(element);
+    });
   }
 
   _render() {
