@@ -1056,10 +1056,10 @@ export default class Widget {
    * @param {boolean} [invalidateLayout] true, to invalidate the layout of the parent of this.htmlComp, false if not. Default is true.
    */
   invalidateParentLogicalGrid(invalidateLayout) {
+    this.parent.invalidateLogicalGrid(false);
     if (!this.rendered || !this.htmlComp) {
       return;
     }
-    this.parent.invalidateLogicalGrid(false);
     if (scout.nvl(invalidateLayout, true)) {
       var htmlCompParent = this.htmlComp.getParent();
       if (htmlCompParent) {
