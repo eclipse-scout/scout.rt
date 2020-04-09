@@ -16,6 +16,13 @@ const AfterEmitWebpackPlugin = require('./AfterEmitWebpackPlugin');
 const path = require('path');
 const scoutBuildConstants = require('./constants');
 
+/**
+ * @param args.mode {string} development or production
+ * @param args.clean {boolean} true, to clean the dist folder before each build. Default is true.
+ * @param args.progress {boolean} true, to show build progress in percentage. Default is true.
+ * @param args.profile {boolean} true, to show timing information for each build step. Default is false.
+ * @param args.resDirArray {[]} an array containing directories which should be copied to dist/res
+ */
 module.exports = (env, args) => {
   const {devMode, outSubDir, cssFilename, jsFilename} = scoutBuildConstants.getConstantsForMode(args.mode);
   const outDir = path.resolve(scoutBuildConstants.outDir, outSubDir);
@@ -34,6 +41,7 @@ module.exports = (env, args) => {
 
   /**
    * Don't reveal absolute file paths in production mode -> only return the file name relative to its module.
+   * @param info.resourcePath
    */
   function prodDevtoolModuleFilenameTemplate(info) {
     var path = info.resourcePath || '';
@@ -54,6 +62,13 @@ module.exports = (env, args) => {
     }
   }
 
+  function nvl(arg, defaultValue) {
+    if (arg === undefined || arg === null) {
+      return defaultValue;
+    }
+    return arg;
+  }
+
   const config = {
     target: 'web',
     mode: args.mode,
@@ -71,7 +86,7 @@ module.exports = (env, args) => {
     performance: {
       hints: false
     },
-    stats: 'normal',
+    profile: args.profile,
     module: {
       // LESS
       rules: [{
@@ -175,6 +190,9 @@ module.exports = (env, args) => {
             enforce: true
           },
           vendors: {
+            /**
+             * @param module.nameForCondition
+             */
             test: function(module) {
               if (!module.nameForCondition) {
                 return false; // raw or external modules do not have the method
@@ -198,11 +216,15 @@ module.exports = (env, args) => {
     }
   };
 
-  if (devMode) {
+  if (nvl(args.progress, true)) {
     // Shows progress information in the console in dev mode
     const webpack = require('webpack');
-    config.plugins.push(new webpack.ProgressPlugin());
-  } else {
+    config.plugins.push(new webpack.ProgressPlugin({
+      profile: args.profile
+    }));
+  }
+
+  if (!devMode) {
     const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
     const TerserPlugin = require('terser-webpack-plugin');
     config.optimization.minimizer = [
@@ -224,8 +246,7 @@ module.exports = (env, args) => {
     ];
   }
 
-  const isWatchMode = args && args.watch;
-  if (!isWatchMode) {
+  if (nvl(args.clean, true)) {
     // see: https://webpack.js.org/guides/output-management/#cleaning-up-the-dist-folder
     config.plugins.push(new CleanWebpackPlugin());
   }
