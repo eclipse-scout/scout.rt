@@ -20,13 +20,22 @@ process.on('unhandledRejection', err => {
 // argv[0] path to node
 // argv[1] path to js file
 // argv[2] name of called script
+// argv[3..n] arguments for the script
 const script = process.argv[2];
+const argv = process.argv.slice(3);
+const parser = require('yargs-parser');
 const fs = require('fs');
 const path = require('path');
 const webpackConfigFileName = './webpack.config.js';
+const webpackYargsOptions = {
+  boolean: ['progress', 'profile', 'clean'],
+  array: ['resDirArray']
+};
+let webpackStats;
+
 switch (script) {
   case 'test-server:start': {
-    runKarma();
+    runKarma(null, false, parser(argv));
     break;
   }
   case 'test-server:stop': {
@@ -41,19 +50,25 @@ switch (script) {
     break;
   }
   case 'test:ci': {
-    runKarma(null, true);
+    runKarma(null, true, parser(argv));
     break;
   }
   case 'build:dev': {
-    runWebpack({mode: 'development'});
+    const args = parser(argv, webpackYargsOptions);
+    args.mode = 'development';
+    runWebpack(args);
     break;
   }
   case 'build:prod': {
-    runWebpack({mode: 'production'});
+    const args = parser(argv, webpackYargsOptions);
+    args.mode = 'production';
+    runWebpack(args);
     break;
   }
   case 'build:dev:watch': {
-    runWebpackWatch({mode: 'development'});
+    const args = parser(argv, webpackYargsOptions);
+    args.mode = 'development';
+    runWebpackWatch(args);
     break;
   }
   default:
@@ -61,7 +76,7 @@ switch (script) {
     break;
 }
 
-function runKarma(configFileName, headless) {
+function runKarma(configFileName, headless, args) {
   const cfg = require('karma').config;
   const cfgFile = configFileName || './karma.conf.js';
 
@@ -85,7 +100,7 @@ function runKarma(configFileName, headless) {
   }
 
   // load config
-  const karmaConfig = cfg.parseConfig(configFilePath);
+  const karmaConfig = cfg.parseConfig(configFilePath, args);
   if (autoSetupHeadlessConfig) {
     // only executed if headless and no specific CI config file is found: use headless defaults
     karmaConfig.set({
@@ -108,32 +123,35 @@ function runKarma(configFileName, headless) {
   serverInstance.start();
 }
 
-function runWebpack(webPackArgs) {
+function runWebpack(args) {
   const configFilePath = path.resolve(webpackConfigFileName);
   if (!fs.existsSync(configFilePath)) {
     // No config file found -> abort
     console.log(`Skipping webpack build (config file ${webpackConfigFileName} not found)`);
     return;
   }
-  const compiler = createWebpackCompiler(configFilePath, webPackArgs);
-  compiler.run(logWebpack);
+  const {compiler, statsConfig} = createWebpackCompiler(configFilePath, args);
+  compiler.run((err, stats) => logWebpack(err, stats, statsConfig));
 }
 
-function runWebpackWatch(webPackArgs) {
+function runWebpackWatch(args) {
   const configFilePath = path.resolve(webpackConfigFileName);
-  webPackArgs = Object.assign(webPackArgs || {}, {watch: true});
-  const compiler = createWebpackCompiler(configFilePath, webPackArgs);
-  compiler.watch({}, logWebpack);
+  // Don't clean the dist folder in watch mode, may be overridden by command line argument
+  args = Object.assign({clean: false}, args);
+  const {compiler, statsConfig} = createWebpackCompiler(configFilePath, args);
+  compiler.watch({}, (err, stats) => logWebpack(err, stats, statsConfig));
 }
 
-function createWebpackCompiler(configFilePath, webPackArgs) {
+function createWebpackCompiler(configFilePath, args) {
   const webpack = require('webpack');
   const conf = require(configFilePath);
-  const webpackConfig = conf(process.env, webPackArgs);
-  return webpack(webpackConfig);
+  const webpackConfig = conf(args.env, args);
+  const statsConfig = args.stats || webpackConfig.stats;
+  const compiler = webpack(webpackConfig);
+  return {compiler, statsConfig};
 }
 
-function logWebpack(err, stats) {
+function logWebpack(err, stats, statsConfig) {
   if (err) {
     console.error(err);
     return;
@@ -146,7 +164,11 @@ function logWebpack(err, stats) {
   if (stats.hasWarnings()) {
     console.warn(info.warnings);
   }
-  console.log(stats.toString({
-    colors: true
-  }) + '\n\n');
+  statsConfig = statsConfig || {};
+  if (typeof statsConfig === 'string') {
+    const webpack = require('webpack');
+    statsConfig = webpack.Stats.presetToOptions(statsConfig);
+  }
+  statsConfig.colors = true;
+  console.log(stats.toString(statsConfig) + '\n\n');
 }
