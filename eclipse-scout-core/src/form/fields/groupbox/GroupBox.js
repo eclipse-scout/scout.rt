@@ -96,7 +96,8 @@ export default class GroupBox extends CompositeField {
     this._setBodyLayoutConfig(this.bodyLayoutConfig);
     this.menuBar = scout.create('MenuBar', {
       parent: this,
-      menuOrder: new GroupBoxMenuItemsOrder()
+      menuOrder: new GroupBoxMenuItemsOrder(),
+      ellipsisPosition: this.menuBarEllipsisPosition
     });
     this._setFields(this.fields);
     this._setMainBox(this.mainBox);
