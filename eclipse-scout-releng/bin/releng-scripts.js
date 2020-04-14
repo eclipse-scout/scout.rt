@@ -26,7 +26,7 @@ const generateSnapshot = args => {
 
 const setInstallSnapshotDependencies = args => {
   const script = require('../scripts/updateVersion');
-  script.setPreInstallSnapshotDependencies({verbose: args.verbose, dryrun: args.dryrun, excludeFolderOverride: args.excludeFolderOverride})
+  script.setPreInstallSnapshotDependencies({verbose: args.verbose, dryrun: args.dryrun})
     .then(() => console.log('setPreInstallSnapshotDependencies version done'))
     .catch(e => {
       console.error('setPreInstallSnapshotDependencies version failed');
@@ -37,7 +37,7 @@ const setInstallSnapshotDependencies = args => {
 
 const setPublishSnapshotDependencies = args => {
   const script = require('../scripts/updateVersion');
-  script.setPrePublishSnapshotDependencies({verbose: args.verbose, dryrun: args.dryrun, excludeFolderOverride: args.excludeFolderOverride})
+  script.setPrePublishSnapshotDependencies({verbose: args.verbose, dryrun: args.dryrun})
     .then(() => console.log('setPrePublishSnapshotDependencies version done'))
     .catch(e => {
       console.error('setPrePublishSnapshotDependencies version failed');
@@ -48,7 +48,7 @@ const setPublishSnapshotDependencies = args => {
 
 const setInstallReleaseDependencies = args => {
   const script = require('../scripts/updateVersion');
-  script.setPreInstallReleaseDependencies({mapping: args.mapping, verbose: args.verbose, dryrun: args.dryrun, excludeFolderOverride: args.excludeFolderOverride})
+  script.setPreInstallReleaseDependencies({mapping: args.mapping, verbose: args.verbose, dryrun: args.dryrun})
     .then(() => console.log('setPreInstallReleaseDependencies version done'))
     .catch(e => {
       console.error('setPreInstallReleaseDependencies version failed');
@@ -62,7 +62,7 @@ const setPublishReleaseDependencies = args => {
     throw new Error('Please provide arguments for --newVersion or --mapping');
   }
   const script = require('../scripts/updateVersion');
-  script.setPrePublishReleaseDependencies({mapping: args.mapping, newVersion: args.newVersion, useRegexMap: args.useRegexMap, verbose: args.verbose, dryrun: args.dryrun, excludeFolderOverride: args.excludeFolderOverride})
+  script.setPrePublishReleaseDependencies({mapping: args.mapping, newVersion: args.newVersion, useRegexMap: args.useRegexMap, verbose: args.verbose, dryrun: args.dryrun})
     .then(() => console.log('setPrePublishReleaseDependencies version done'))
     .catch(e => {
       console.error('setPrePublishReleaseDependencies version failed');
@@ -87,61 +87,44 @@ yargs
   }, argv => {
     console.log(`Unknown script ${argv._[0]}`);
   })
-  .command('snapshot-version', 'generate a new snapshot version for the module',
-    () => {
-    },
+  .command('snapshot-version', 'Generates a new snapshot version for the module',
+    () => {},
     generateSnapshot
   )
-  .command('snapshot-install-dependency', 'updates dependencies for ci',
-    yargs => {
-      return yargs
-        .option('excludeFolderOverride', {
-          description: 'override the default exclusion',
-          type: 'array'
-        });
-    },
+  .command('snapshot-install-dependency', 'Updates dependencies that are not part of the workspace so they will be downloaded from the registry.',
+    () => {},
     setInstallSnapshotDependencies
   )
-  .command('snapshot-publish-dependency', 'updates dependencies for ci',
-    yargs => {
-      return yargs
-        .option('excludeFolderOverride', {
-          description: 'override the default exclusion',
-          type: 'array'
-        });
-    },
+  .command('snapshot-publish-dependency', 'Adds the timestamp to the current version and updates the workspace dependencies in the same way as done for non workspace dependencies by the snapshot-install-dependency command.',
+    () => {},
     setPublishSnapshotDependencies
   )
-  .command('release-install-dependency', 'updates dependencies for ci',
+  .command('release-install-dependency', 'Uses the given mapping to update dependencies that are not part of the workspace so they will be downloaded from the registry.',
     yargs => {
       return yargs
-        .option('excludeFolderOverride', {
-          description: 'override the default exclusion',
-          type: 'array'
+        .option('mapping', {
+          description: '1 or more mappings with a regex and a version to specify which dependencies should be updated by what version. E.g.: --mapping.0.regex @your-dep --mapping.0.version 1.2.3',
+          type: 'string'
         });
     },
     setInstallReleaseDependencies
   )
-  .command('release-publish-dependency', 'updates dependencies for ci',
+  .command('release-publish-dependency', 'Updates the versions of the workspace modules with the new version provided. Also updates the dependencies to these workspace modules with the new version.',
     yargs => {
       return yargs
         .option('newVersion', {
-          description: 'new version of the npm module',
+          description: 'New version of the npm module',
           type: 'string'
         })
         .option('useRegexMap', {
           description: 'true if the modules in the workspace have different versions. the regex-version mapping is used to set the version',
           type: 'boolean',
           default: false
-        })
-        .option('excludeFolderOverride', {
-          description: 'override the default exclusion',
-          type: 'array'
         });
     },
     setPublishReleaseDependencies
   )
-  .command('snapshot-cleanup', 'cleanup old modules on the artifactory',
+  .command('snapshot-cleanup', 'Cleans up old modules on the artifactory.',
     yargs => {
       return yargs
         .option('apikey', {
@@ -153,15 +136,15 @@ yargs
           type: 'string'
         })
         .option('user', {
-          description: 'username',
+          description: 'Username',
           type: 'string'
         })
         .option('pwd', {
-          description: 'password',
+          description: 'Password',
           type: 'string'
         })
         .option('reponame', {
-          description: 'name of the repository',
+          description: 'Name of the repository',
           type: 'string'
         })
         .option('keep', {
