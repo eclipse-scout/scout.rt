@@ -54,10 +54,13 @@ import org.eclipse.scout.rt.platform.util.IDisposable;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.NonParameterized;
+import org.eclipse.scout.rt.testing.platform.testcategory.SlowTest;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Assume;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(SlowTest.class)
 public class JmsMomPubSubTest extends AbstractJmsMomTest {
 
   public JmsMomPubSubTest(AbstractJmsMomTestParameter parameter) {

@@ -20,9 +20,12 @@ import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.testcategory.ResourceIntensiveTest;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
+@Category(ResourceIntensiveTest.class) // uses up to 25k native threads
 @RunWith(PlatformTestRunner.class)
 public class JobManagerLoadTest {
 

@@ -21,12 +21,15 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.testcategory.SlowTest;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.SimpleTrigger;
 
+@Category(SlowTest.class)
 @RunWith(PlatformTestRunner.class)
 public class SerialFutureExecutionTest {
 
