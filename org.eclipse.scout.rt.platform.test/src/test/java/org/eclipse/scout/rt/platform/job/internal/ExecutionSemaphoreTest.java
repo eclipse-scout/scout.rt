@@ -37,10 +37,13 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
+import org.eclipse.scout.rt.testing.platform.testcategory.SlowTest;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
+@Category(SlowTest.class)
 @RunWith(PlatformTestRunner.class)
 public class ExecutionSemaphoreTest {
 
