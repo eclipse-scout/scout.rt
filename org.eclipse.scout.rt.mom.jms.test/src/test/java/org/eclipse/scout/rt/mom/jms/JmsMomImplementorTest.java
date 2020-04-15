@@ -101,6 +101,7 @@ import org.eclipse.scout.rt.testing.platform.runner.parameterized.AbstractScoutT
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.NonParameterized;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.testcategory.SlowTest;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.After;
 import org.junit.Assume;
@@ -108,12 +109,14 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Category(SlowTest.class)
 @RunWith(ParameterizedPlatformTestRunner.class)
 public class JmsMomImplementorTest {
 
