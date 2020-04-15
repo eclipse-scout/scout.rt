@@ -229,10 +229,18 @@ scout.Desktop.prototype._renderDisplayChildrenOfOutline = function() {
   this.outline.messageBoxController.render();
   this.outline.fileChooserController.render();
 
+  // this restores the selected view after a page refresh. selectedViewTabs is only set by the model.
   if (this.outline.selectedViewTabs) {
     this.outline.selectedViewTabs.forEach(function(selectedView) {
       this.formController._activateView(selectedView);
     }.bind(this));
+  } else {
+    // views on the outline are not activated by default. Check for modal views on this outline
+    var modalViews = this.outline.views.filter(function(view) {
+      return view.modal;
+    });
+    // activate each modal view in the order it was originally activated
+    modalViews.forEach(this.formController._activateView.bind(this.formController));
   }
 };
 
@@ -754,6 +762,11 @@ scout.Desktop.prototype.bringOutlineToFront = function() {
   }
 
   if (!this.inBackground || this.displayStyle === scout.Desktop.DisplayStyle.BENCH) {
+    return;
+  }
+
+  // Check if the activeForm blocks the current outline
+  if (this.activeForm && this.activeForm.modal && scout.isOneOf(this.activeForm.displayParent, this, this.outline)) {
     return;
   }
 
