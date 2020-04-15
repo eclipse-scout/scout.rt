@@ -17,8 +17,11 @@ import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.testing.platform.testcategory.SlowTest;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(SlowTest.class)
 public class JobFutureTaskTest {
   private static final int ROUNDS = 100000;
   private static final String TEST_HINT = "JobFutureTaskTest_testRaceConditionOnCancelWithJobManager";
