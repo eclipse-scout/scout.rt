@@ -120,6 +120,42 @@ describe('Desktop', function() {
       expect(outline.$container.parent()[0]).toBe(desktop.navigation.$body[0]);
     });
 
+    it('activates modal views when being rendered', function() {
+      var outline1 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+      var outline2 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+
+      desktop.setOutline(outline1);
+      desktop.bringOutlineToFront(outline1);
+      expect(desktop.outline).toBe(outline1);
+      expect(outline1.rendered).toBe(true);
+
+      // create a new modal view and activate it
+      var form = formHelper.createFormWithOneField();
+      form.displayHint = scout.Form.DisplayHint.VIEW;
+      form.modal = true;
+      form.displayParent = outline1;
+      desktop.showForm(form);
+      expect(form.rendered).toBe(true);
+
+      // switch the outline
+      desktop.setOutline(outline2);
+      desktop.bringOutlineToFront(outline2);
+      expect(desktop.outline).toBe(outline2);
+      expect(outline1.rendered).toBe(false);
+      expect(outline2.rendered).toBe(true);
+      expect(form.rendered).toBe(false);
+
+      // switch back to the outline with the modal form
+      desktop.setOutline(outline1);
+      desktop.bringOutlineToFront(outline1);
+      expect(desktop.outline).toBe(outline1);
+      expect(outline1.rendered).toBe(true);
+      expect(outline2.rendered).toBe(false);
+
+      // and check that the form is propertly rendered
+      expect(form.rendered).toBe(true);
+    });
+
   });
 
   describe('benchVisible', function() {
