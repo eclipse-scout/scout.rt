@@ -11,15 +11,7 @@
 package org.eclipse.scout.rt.mom.jms;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.reset;
 
 import java.io.Serializable;
@@ -59,10 +51,13 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.NonParameterized;
+import org.eclipse.scout.rt.testing.platform.testcategory.SlowTest;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Assume;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(SlowTest.class)
 public class JmsMomPubSubTest extends AbstractJmsMomTest {
 
   public JmsMomPubSubTest(AbstractJmsMomTestParameter parameter) {

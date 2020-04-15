@@ -26,9 +26,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.testing.platform.testcategory.ResourceIntensiveTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpContent;
@@ -39,6 +41,7 @@ import com.google.api.client.http.HttpResponse;
 /**
  * Test how the Google HTTP Client API together with the Apache HTTP Client handle a high frequency of requests.
  */
+@Category(ResourceIntensiveTest.class) // uses up to 10k native threads
 public class HttpHighLoadTest {
   private TestingHttpClient m_client;
   private TestingHttpServer m_server;
