@@ -15,7 +15,6 @@ const jquery = require.resolve('jquery');
 const fs = require('fs');
 
 module.exports = function(config, specEntryPoint) {
-
   const webpackConfigFilePath = path.resolve('webpack.config.js');
   if (!fs.existsSync(webpackConfigFilePath)) {
     const message = 'Karma requires a webpack config file at location "' + webpackConfigFilePath + '" but it could not be found.';
@@ -24,7 +23,8 @@ module.exports = function(config, specEntryPoint) {
   }
   var webpackConfigProvider = require(webpackConfigFilePath);
 
-  const webpackConfig = webpackConfigProvider(null, {mode: scoutBuild.mode.development});
+  const webpackArgs = Object.assign({mode: scoutBuild.mode.development}, config.webpackArgs);
+  const webpackConfig = webpackConfigProvider(null, webpackArgs);
   delete webpackConfig.entry;
 
   const specIndex = specEntryPoint ? path.resolve(specEntryPoint) : path.resolve('test', 'test-index.js');
