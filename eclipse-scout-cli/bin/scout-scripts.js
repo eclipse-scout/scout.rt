@@ -31,11 +31,11 @@ const webpackYargsOptions = {
   boolean: ['progress', 'profile', 'clean'],
   array: ['resDirArray']
 };
-let webpackStats;
+const karmaYargsOptions = prepareWebpackYargsOptionsForKarma();
 
 switch (script) {
   case 'test-server:start': {
-    runKarma(null, false, parser(argv));
+    runKarma(null, false, parser(argv, karmaYargsOptions));
     break;
   }
   case 'test-server:stop': {
@@ -50,7 +50,12 @@ switch (script) {
     break;
   }
   case 'test:ci': {
-    runKarma(null, true, parser(argv));
+    let args = parser(argv, karmaYargsOptions);
+    args.webpackArgs = args.webpackArgs || {};
+    if (args.webpackArgs.progress === undefined) {
+      args.webpackArgs.progress = false;
+    }
+    runKarma(null, true, args);
     break;
   }
   case 'build:dev': {
@@ -171,4 +176,18 @@ function logWebpack(err, stats, statsConfig) {
   }
   statsConfig.colors = true;
   console.log(stats.toString(statsConfig) + '\n\n');
+}
+
+/**
+ * Prepends the values of the arrays in the options with webpackArgs.
+ */
+function prepareWebpackYargsOptionsForKarma() {
+  var result = {};
+  for (let [key, value] of Object.entries(webpackYargsOptions)) {
+    if (Array.isArray(value)) {
+      value = value.map(elem => 'webpackArgs.' + elem);
+    }
+    result[key] = value;
+  }
+  return result;
 }
