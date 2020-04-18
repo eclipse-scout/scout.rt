@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.reflect;
 
+import java.beans.Introspector;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
@@ -36,14 +37,14 @@ public final class FastBeanUtility {
     return Character.toUpperCase(s.charAt(0)) + s.substring(1);
   }
 
+  /**
+   * @deprecated use {@link Introspector#decapitalize(String)}
+   * @param s
+   * @return Introspector#decapitalize(String)
+   */
+  @Deprecated
   public static String decapitalize(String s) {
-    if (s == null || s.isEmpty()) {
-      return "";
-    }
-    if (s.length() >= 2 && Character.isUpperCase(s.charAt(0)) && Character.isUpperCase(s.charAt(1))) {
-      return s;
-    }
-    return Character.toLowerCase(s.charAt(0)) + s.substring(1);
+    return Introspector.decapitalize(s);
   }
 
   public static boolean compareMethods(Method a, Method b) {
@@ -88,7 +89,7 @@ public final class FastBeanUtility {
         Matcher matcher = BEAN_METHOD_PAT.matcher(m.getName());
         if (matcher.matches()) {
           String kind = matcher.group(1);
-          String name = decapitalize(matcher.group(2));
+          String name = Introspector.decapitalize(matcher.group(2));
           Class<?>[] paramTypes = m.getParameterTypes();
           Class<?> retType = m.getReturnType();
           //
