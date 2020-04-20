@@ -136,6 +136,7 @@ export default class StringField extends BasicField {
 
   _onMouseWheel(event) {
     event = event.originalEvent || this.$container.window(true).event.originalEvent;
+    // noinspection JSUnresolvedVariable
     var delta = event.wheelDelta ? -event.wheelDelta : event.detail;
     var scrollTop = this.$field[0].scrollTop;
     if (delta < 0 && scrollTop === 0) {
@@ -420,7 +421,7 @@ export default class StringField extends BasicField {
   _renderGridData() {
     super._renderGridData();
     this.updateInnerAlignment({
-      useHorizontalAlignment: this.multilineText ? false : true
+      useHorizontalAlignment: !this.multilineText
     });
   }
 

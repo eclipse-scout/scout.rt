@@ -78,9 +78,9 @@ public class T40030_IndexJs extends AbstractTask {
     if ("@eclipse-scout/core".equals(config.getPersistLibraryName())) {
       newSource
           .append(nl)
-          .append("export { default as JQueryUtils } from './jquery/jquery-scout';")
+          .append("export * from './jquery/jquery-scout';")
           .append(nl)
-          .append("export { default as JQuerySelectors } from './jquery/jquery-scout-selectors';")
+          .append("export * from './jquery/jquery-scout-selectors';")
           .append(nl)
           .append(nl)
           .append("export { default as LoginApp } from './login/LoginApp';")

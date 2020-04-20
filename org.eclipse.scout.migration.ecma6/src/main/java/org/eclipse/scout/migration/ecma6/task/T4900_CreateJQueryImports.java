@@ -63,7 +63,7 @@ public class T4900_CreateJQueryImports extends AbstractTask {
       JsImport jqueryImport = jsFile.getImport(JQUERY_MODULE_NAME);
       if (jqueryImport == null) {
         jqueryImport = new JsImport(JQUERY_MODULE_NAME);
-        jqueryImport.setDefaultMember(new AliasedMember("*", "$"));
+        jqueryImport.setDefaultMember(new AliasedMember("$"));
         jsFile.addImport(jqueryImport);
       }
     }
