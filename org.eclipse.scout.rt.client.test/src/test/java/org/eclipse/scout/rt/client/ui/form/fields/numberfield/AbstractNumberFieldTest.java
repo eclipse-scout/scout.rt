@@ -38,7 +38,7 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
 
-  private static Locale ORIGINAL_LOCALE;
+  private static Locale s_originalLocale;
   private static final BigDecimal DEFAULT_MIN_VALUE = new BigDecimal("-999999999999999999999999999999999999999999999999999999999999");
   private static final BigDecimal DEFAULT_MAX_VALUE = new BigDecimal("999999999999999999999999999999999999999999999999999999999999");
 
@@ -59,13 +59,13 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
 
   @BeforeClass
   public static void setupBeforeClass() {
-    ORIGINAL_LOCALE = NlsLocale.getOrElse(null);
+    s_originalLocale = NlsLocale.getOrElse(null);
     NlsLocale.set(new Locale("de", "CH"));
   }
 
   @AfterClass
   public static void tearDownAfterClass() {
-    NlsLocale.set(ORIGINAL_LOCALE);
+    NlsLocale.set(s_originalLocale);
   }
 
   @Override
@@ -187,6 +187,32 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
     format = getFormat();
     assertTrue("expected groupingUsed-property set to true after using convenience setter", format.isGroupingUsed());
     assertTrue("expected groupingUsed-property set to true after using convenience setter", isGroupingUsed());
+  }
+
+  @Test
+  public void testLenientGrouping() {
+    for (Locale locale : Locale.getAvailableLocales()) {
+      DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance(locale);
+      setFormat(format);
+
+      // grouping
+      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123,123,123"));
+      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123’123’123"));
+      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123'123'123"));
+      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123´123´123"));
+      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123.123.123"));
+      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123 123 123"));
+      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123\u00A0123\u00A0123"));
+      assertParseToBigDecimalInternalThrowsRuntimeException("Parsing with unsupported grouping separator is expected to fail", this, "123~123~123");
+
+      // decimal
+      setRoundingMode(RoundingMode.UP);
+      // if the parsing doesn't throw an exception it's successful
+      assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123'123.123"));
+      assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123,123.123"));
+      assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123.123,123"));
+      assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123'123,123"));
+    }
   }
 
   @Test
@@ -425,25 +451,32 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
     // read grouping char because it is different in java8 vs. java11
     DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(NlsLocale.get());
     char groupChar = df.getDecimalFormatSymbols().getGroupingSeparator();
+    String numberUnformatted = "12345";
+    String numberFormatted = "12" + groupChar + "345";
 
-    getUIFacade().parseAndSetValueFromUI("12345");
-    assertEquals("12" + groupChar + "345", getDisplayText());
-    getUIFacade().parseAndSetValueFromUI("12345"); // input does not match display text
-    assertEquals("12" + groupChar + "345", getDisplayText());
+    getUIFacade().parseAndSetValueFromUI(numberUnformatted);
+    assertEquals(numberFormatted, getDisplayText());
+    getUIFacade().parseAndSetValueFromUI(numberUnformatted); // input does not match display text
+    assertEquals(numberFormatted, getDisplayText());
 
     assertEquals(2, m_displayTextChangedCounter.get());
-    assertArrayEquals(new String[]{"12" + groupChar + "345", "12" + groupChar + "345"}, m_displayTextChangedHistory.toArray());
+    assertArrayEquals(new String[]{numberFormatted, numberFormatted}, m_displayTextChangedHistory.toArray());
   }
 
   @Test
   public void testDisplayTextSameTextTwiceFormatted() {
-    getUIFacade().parseAndSetValueFromUI("12'345");
-    assertEquals("12'345", getDisplayText());
-    getUIFacade().parseAndSetValueFromUI("12'345"); // input matches display text
-    assertEquals("12'345", getDisplayText());
+    // read grouping char because it is different in java8 vs. java11
+    DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(NlsLocale.get());
+    char groupChar = df.getDecimalFormatSymbols().getGroupingSeparator();
+    String numberFormatted = "12" + groupChar + "345";
+
+    getUIFacade().parseAndSetValueFromUI(numberFormatted);
+    assertEquals(numberFormatted, getDisplayText());
+    getUIFacade().parseAndSetValueFromUI(numberFormatted); // input matches display text
+    assertEquals(numberFormatted, getDisplayText());
 
     assertEquals(1, m_displayTextChangedCounter.get());
-    assertArrayEquals(new String[]{"12'345"}, m_displayTextChangedHistory.toArray());
+    assertArrayEquals(new String[]{numberFormatted}, m_displayTextChangedHistory.toArray());
   }
 
   @Test

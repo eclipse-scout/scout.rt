@@ -29,6 +29,13 @@ export default class DecimalFormat {
     this.negativePrefix = locale.decimalFormatSymbols.minusSign;
     this.negativeSuffix = '';
     this.groupingChar = locale.decimalFormatSymbols.groupingSeparator;
+    // we want to be lenient when it comes to grouping separators, try the locale default plus a few others
+    this.lenientGroupingChars = '\'´`’' + // apostrophe and variations
+      '\u00B7' + // middle dot
+      '\u0020' + // space
+      '\u00A0' + // no-break space
+      '\u2009' + // thin space
+      '\u202F'; // narrow no-break space
     this.groupLength = 0;
     this.decimalSeparatorChar = locale.decimalFormatSymbols.decimalSeparator;
     this.zeroBefore = 1;
@@ -228,7 +235,7 @@ export default class DecimalFormat {
       return numberString;
     }
     return numberString
-      .replace(new RegExp('[' + this.groupingChar + ']', 'g'), '')
+      .replace(new RegExp('[' + this.groupingChar + this.lenientGroupingChars + ']', 'g'), '')
       .replace(new RegExp('[' + this.decimalSeparatorChar + ']', 'g'), '.')
       .replace(/\s/g, '');
   }
