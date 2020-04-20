@@ -14,7 +14,9 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.ParsePosition;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -33,6 +35,7 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -95,7 +98,6 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
    * Corresponds to {@link DecimalFormat#setMaximumIntegerDigits(int)}
    * <p>
    *
-   * @return
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(280)
@@ -108,6 +110,25 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
     return 1;
   }
 
+  /**
+   * Additional possible grouping separators for lenient parsing. Return an empty list to just use the locale's default.
+   */
+  protected Set<Character> getConfiguredLenientDecimalSeparators() {
+    return CollectionUtility.hashSet(',', '.');
+  }
+
+  protected Set<Character> getConfiguredLenientGroupingSeparators() {
+    return CollectionUtility.hashSet(
+        '\'', '´', '`', '’', // apostrophe and variations
+        ',', '.',
+        "\u00B7".charAt(0), // middle dot
+        "\u0020".charAt(0), // space
+        "\u00A0".charAt(0), // no-break space
+        "\u2009".charAt(0), // thin space
+        "\u202F".charAt(0) // narrow no-break space
+    );
+  }
+
   @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
@@ -117,6 +138,8 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
     setGroupingUsed(getConfiguredGroupingUsed());
     setMinValue(getConfiguredMinValue());
     setMaxValue(getConfiguredMaxValue());
+    setLenientDecimalSeparators(getConfiguredLenientDecimalSeparators());
+    setLenientGroupingSeparators(getConfiguredLenientGroupingSeparators());
   }
 
   protected void initFormat() {
@@ -271,6 +294,28 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
     return (NUMBER) propertySupport.getProperty(PROP_MAX_VALUE);
   }
 
+  @Override
+  public void setLenientDecimalSeparators(Set<Character> lenientDecimalSeparators) {
+    propertySupport.setProperty(PROP_LENIENT_DECIMAL_SEPARATORS, lenientDecimalSeparators);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Set<Character> getLenientDecimalSeparators() {
+    return (Set<Character>) propertySupport.getProperty(PROP_LENIENT_DECIMAL_SEPARATORS);
+  }
+
+  @Override
+  public void setLenientGroupingSeparators(Set<Character> lenientGroupingSeparators) {
+    propertySupport.setProperty(PROP_LENIENT_GROUPING_SEPARATORS, lenientGroupingSeparators);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Set<Character> getLenientGroupingSeparators() {
+    return (Set<Character>) propertySupport.getProperty(PROP_LENIENT_GROUPING_SEPARATORS);
+  }
+
   private int compareInternal(NUMBER a, NUMBER b) {
     return ObjectUtility.compareTo(NumberUtility.numberToBigDecimal(a), NumberUtility.numberToBigDecimal(b));
   }
@@ -326,14 +371,11 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
    * <p>
    * Callers can expect the resulting BigDecimal to lie in the range {@link #getMinValue()} --> {@link #getMaxValue()}
    * and for subclasses of {@link AbstractDecimalField} to respect
-   * {@link AbstractDecimalField#getParsingFractionDigits()}. (The maximum fraction digits used for parsing is adapted
-   * to {@link AbstractDecimalField#getMultiplier()} if needed.)
+   * {@link AbstractDecimalField#getConfiguredFractionDigits()} ()}. (The maximum fraction digits used for parsing is
+   * adapted to {@link AbstractDecimalField#getMultiplier()} if needed.)
    * <p>
    * If the parsing cannot be done complying these rules and considering {@link #getRoundingMode()} an exception is
    * thrown.
-   *
-   * @param text
-   * @return
    */
   protected BigDecimal parseToBigDecimalInternal(String text) {
     BigDecimal retVal = null;
@@ -346,9 +388,20 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
     if (!text.isEmpty()) {
       text = ensureSuffix(text);
       ParsePosition p = new ParsePosition(0);
-      BigDecimal valBeforeRounding = (BigDecimal) getFormatInternal().parse(text, p);
-      // check for bad syntax
-      if (p.getErrorIndex() >= 0 || p.getIndex() != text.length()) {
+      BigDecimal valBeforeRounding = null;
+
+      BigDecimal parsedVal = (BigDecimal) getFormatInternal().parse(text, p);
+      // check for successful parsing
+      if (p.getErrorIndex() == -1 && p.getIndex() == text.length()) {
+        valBeforeRounding = parsedVal;
+      }
+
+      if (valBeforeRounding == null) {
+        // try lenient
+        valBeforeRounding = parseLenient(text);
+      }
+
+      if (valBeforeRounding == null) {
         throw new ProcessingException(TEXTS.get("InvalidNumberMessageX", text));
       }
       try {
@@ -366,6 +419,82 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
       }
     }
     return retVal;
+  }
+
+  /**
+   * Parses a text input to a BigDecimal while being lenient with the used decimal and grouping separators.
+   *
+   * @return A {@link BigDecimal} representing the parsed String or {@code null} in case parsing was not successful.
+   */
+  protected BigDecimal parseLenient(String text) {
+    DecimalFormat f = getFormat();
+    DecimalFormatSymbols dfs = f.getDecimalFormatSymbols();
+    Set<Character> decimalSeparators = getLenientDecimalSeparators();
+    Set<Character> groupingSeparators = getLenientGroupingSeparators();
+
+    // first check for multiple occurrences of potential decimal separators (with respect to possible grouping) and try simplify it.
+    // the idea here is to simplify inputs like "1.500.5" to "1500.5". To the eye it looks more like a mix of grouping/decimal separators.
+    // inputs like "123.123.123" or "123,123,123", where it looks more like grouping are untouched.
+    for (char d : decimalSeparators) {
+      int first = text.indexOf(d);
+      int last = text.lastIndexOf(d);
+      if (first > -1 && first != last) {
+        // check if it might be grouping by distance of 3
+        boolean isGrouping = true;
+        int currPos = first + 1;
+        while (currPos < text.length()) {
+          int newPos = text.indexOf(d, currPos);
+          if (newPos == -1) {
+            // no more occurrences, check if distance to end is valid
+            newPos = text.length();
+          }
+          if ((newPos - currPos) != 3) {
+            isGrouping = false;
+            break;
+          }
+          currPos = newPos + 1;
+        }
+        if (isGrouping) {
+          // if it's a clear case of grouping ("123.123.123") ignore it
+          break;
+        }
+
+        // Only the right-most decimal separator should remain, the others are removed.
+        String simplifiedText = text.substring(0, first)
+            + text.substring(first, last).replace(d + "", "")
+            + text.substring(last, text.length());
+
+        ParsePosition p = new ParsePosition(0);
+        dfs.setDecimalSeparator(d);
+        f.setDecimalFormatSymbols(dfs);
+        // try parsing this simplified string
+        BigDecimal parsedVal = (BigDecimal) f.parse(simplifiedText, p);
+        if (p.getErrorIndex() == -1 && p.getIndex() == simplifiedText.length()) {
+          return parsedVal;
+        }
+      }
+    }
+
+    // otherwise try parsing with all combinations of decimal/grouping separators
+    for (char d : decimalSeparators) {
+      Set<Character> innerGroupingSeparators = CollectionUtility.hashSet(groupingSeparators);
+      // the current decimal separator can't be a grouping separator
+      innerGroupingSeparators.remove(d);
+      dfs.setDecimalSeparator(d);
+      for (char g : innerGroupingSeparators) {
+        dfs.setGroupingSeparator(g);
+        ParsePosition p = new ParsePosition(0);
+        // use current grouping separator
+        f.setDecimalFormatSymbols(dfs);
+        // try parsing with the current DecimalFormat
+        BigDecimal parsedVal = (BigDecimal) f.parse(text, p);
+        // check for successful parsing
+        if (p.getErrorIndex() == -1 && p.getIndex() == text.length()) {
+          return parsedVal;
+        }
+      }
+    }
+    return null;
   }
 
   private void throwNumberTooLarge() {
