@@ -9,7 +9,7 @@
  */
 import {strings} from '@eclipse-scout/core';
 import {AbstractGridChartRenderer} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class LineChartRenderer extends AbstractGridChartRenderer {
 

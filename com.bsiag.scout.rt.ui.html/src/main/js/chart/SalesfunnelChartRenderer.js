@@ -9,7 +9,7 @@
  */
 import {strings} from '@eclipse-scout/core';
 import {AbstractChartRenderer} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class SalesfunnelChartRenderer extends AbstractChartRenderer {
 

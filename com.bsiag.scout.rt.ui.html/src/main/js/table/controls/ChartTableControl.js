@@ -9,7 +9,7 @@
  */
 import {DateColumn, icons, NumberColumn, objects, scout, scrollbars, strings, TableControl, TableMatrix, tooltips} from '@eclipse-scout/core';
 import {Chart, ChartTableControlLayout, ChartTableUserFilter} from '../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class ChartTableControl extends TableControl {
 

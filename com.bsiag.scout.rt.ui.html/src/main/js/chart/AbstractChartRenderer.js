@@ -8,7 +8,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {ObjectFactory, scout, strings, tooltips} from '@eclipse-scout/core';
-import * as $ from 'jquery';
+import $ from 'jquery';
 import {Chart} from '../index';
 
 export default class AbstractChartRenderer {

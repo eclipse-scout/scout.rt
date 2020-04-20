@@ -9,7 +9,7 @@
  */
 import {objects, scout} from '@eclipse-scout/core';
 import {AbstractCircleChartRenderer} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class FulfillmentChartRenderer extends AbstractCircleChartRenderer {
 

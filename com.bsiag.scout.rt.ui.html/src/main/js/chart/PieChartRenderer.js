@@ -9,7 +9,7 @@
  */
 import {scout, strings} from '@eclipse-scout/core';
 import {AbstractCircleChartRenderer, Chart} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class PieChartRenderer extends AbstractCircleChartRenderer {
 

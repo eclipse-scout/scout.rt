@@ -9,7 +9,7 @@
  */
 import {strings} from '@eclipse-scout/core';
 import {AbstractChartRenderer, Chart} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 const LABEL_GAP = 5;
 
