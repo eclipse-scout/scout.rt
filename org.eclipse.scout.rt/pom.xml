@@ -585,7 +585,6 @@
         <groupId>jakarta.ws.rs</groupId>
         <artifactId>jakarta.ws.rs-api</artifactId>
         <version>2.1.6</version>
-        <!-- <type>bundle</type> FIXME imo needed? -->
         <exclusions>
           <exclusion>
             <groupId>jakarta.activation</groupId>
