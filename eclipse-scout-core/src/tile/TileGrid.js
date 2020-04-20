@@ -38,7 +38,7 @@ import {
   VirtualScrolling,
   Widget
 } from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * Only select top-level tile elements. Do not select elements with a 'tile' class deeper in the tree.

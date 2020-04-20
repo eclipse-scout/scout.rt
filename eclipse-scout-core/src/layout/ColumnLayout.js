@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractLayout, Dimension, HtmlComponent, scout} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class ColumnLayout extends AbstractLayout {
 

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, CodeType, objects, scout, texts} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * This default language is used whenever a code registers its texts in scout.texts.

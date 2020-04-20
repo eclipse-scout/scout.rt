@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {App, arrays, defaultValues, EventSupport, objects, PropertyChangeEventFilter, RemoteEvent, scout, strings, Widget, WidgetEventTypeFilter} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * A model adapter is the connector with the server, it takes the events sent from the server and calls the corresponding methods on the widget.

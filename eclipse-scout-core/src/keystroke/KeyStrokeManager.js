@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Action, arrays, EventSupport, filters as filters_1, keys, KeyStroke, ValueField, VirtualKeyStrokeEvent} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class KeyStrokeManager {
 

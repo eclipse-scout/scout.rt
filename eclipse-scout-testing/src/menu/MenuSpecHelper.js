@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import * as $ from 'jquery';
+import $ from 'jquery';
 import {scout} from '@eclipse-scout/core';
 
 export default class MenuSpecHelper {

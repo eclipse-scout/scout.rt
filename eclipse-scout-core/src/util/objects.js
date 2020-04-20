@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, scout, strings} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 const CONST_REGEX = /\${const:([^}]*)}/;
 

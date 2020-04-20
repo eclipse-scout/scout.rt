@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AppLinkKeyStroke, ValueField} from '@eclipse-scout/core';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class SvgField extends ValueField {
 

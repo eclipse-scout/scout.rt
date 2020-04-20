@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {keys, KeyStroke, TagBar} from '../../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * @param fieldAdapter acts as an interface so we can use the same key-stroke for TagField and TagFieldPopup.

@@ -41,7 +41,7 @@ import {
   TreeSpaceKeyStroke,
   Widget
 } from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * @class

@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, aggregation, Column, comparators, DecimalFormat, numbers, scout, strings, styles} from '../../index';
-import * as $ from 'jquery';
+import {aggregation, Column, comparators, DecimalFormat, numbers, objects, scout, strings, styles} from '../../index';
+import $ from 'jquery';
 
 export default class NumberColumn extends Column {
 

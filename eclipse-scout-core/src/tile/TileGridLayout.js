@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Dimension, graphics, HtmlComponent, LogicalGridLayout, PlaceholderTile, Point, Rectangle, scrollbars, styles} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class TileGridLayout extends LogicalGridLayout {
 

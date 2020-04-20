@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {graphics, HtmlComponent, NullLayout, Point, Popup, PopupWithHeadLayout, scout, scrollbars} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class PopupWithHead extends Popup {
 

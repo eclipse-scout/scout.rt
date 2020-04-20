@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {PromiseCreator} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * Use a promise creator to create a promise and wait until each promise has been done before the next

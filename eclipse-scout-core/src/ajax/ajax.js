@@ -1,5 +1,5 @@
 import {AjaxCall, AjaxError, scout} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * Utility to perform Ajax requests in an easy way.<br>

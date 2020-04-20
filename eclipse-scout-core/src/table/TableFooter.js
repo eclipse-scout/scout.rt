@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {fields, graphics, HtmlComponent, InputFieldKeyStrokeContext, MenuBarLayout, scout, Status, strings, Table, TableFooterLayout, TableTextUserFilter, Widget} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class TableFooter extends Widget {
 

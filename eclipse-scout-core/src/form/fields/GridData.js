@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormField} from '../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class GridData {
 

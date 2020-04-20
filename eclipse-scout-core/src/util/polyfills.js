@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Device, numbers} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * Polyfill for IE9 providing a simple implementation of FormData (as used by FileChooser.js)

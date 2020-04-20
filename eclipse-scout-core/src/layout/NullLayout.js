@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractLayout, HtmlComponent} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * Null Layout.

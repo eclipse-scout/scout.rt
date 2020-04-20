@@ -10,7 +10,7 @@
  */
 import {objects, scout, TypeDescriptor} from './index';
 
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * @singleton

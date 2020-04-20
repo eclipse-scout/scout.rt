@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Cell, ColumnOptimalWidthMeasurer, comparators, EventSupport, FormField, GridData, icons, objects, scout, Status, strings, styles, Table, TableRow, texts} from '../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class Column {
 

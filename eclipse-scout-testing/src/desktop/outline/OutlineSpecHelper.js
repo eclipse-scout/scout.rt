@@ -10,7 +10,7 @@
  */
 import {Outline, OutlineAdapter} from '@eclipse-scout/core';
 import {FormSpecHelper, TableSpecHelper} from '../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class OutlineSpecHelper {
   constructor(session) {

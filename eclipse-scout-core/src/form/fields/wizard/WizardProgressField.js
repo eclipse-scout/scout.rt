@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Form, FormField, GroupBox, icons, inspector, scout, scrollbars, strings, tooltips, WizardProgressFieldLayout} from '../../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class WizardProgressField extends FormField {
 

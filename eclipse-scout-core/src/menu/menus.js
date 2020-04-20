@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, icons, MenuDestinations, scout} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export function filterAccordingToSelection(prefix, selectionLength, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
   var allowedTypes = [];

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {defaultValues, icons, objects, scout, styles, texts, Tree} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * @class

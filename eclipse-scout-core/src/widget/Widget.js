@@ -33,7 +33,7 @@ import {
   TreeVisitResult,
   widgets
 } from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class Widget {
   constructor() {

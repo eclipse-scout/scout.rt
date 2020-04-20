@@ -31,7 +31,7 @@ import {
   Status,
   Widget
 } from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class FileChooser extends Widget {
 

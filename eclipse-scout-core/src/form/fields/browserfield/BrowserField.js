@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {BrowserFieldLayout, numbers, PopupBlockerHandler, Rectangle, scout, strings, ValueField} from '../../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class BrowserField extends ValueField {
 
