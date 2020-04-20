@@ -96,6 +96,19 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(100005121000.1234)).toBe('100.005.121.000,12');
     });
 
+    it('is lenient with grouping separators', function() {
+      var decimalFormat = new scout.DecimalFormat(locale, {
+        pattern: '#,##0.00'
+      });
+
+      expect(decimalFormat.parse('123’123’123')).toBe(123123123);
+      expect(decimalFormat.parse('123\'123\'123')).toBe(123123123);
+      expect(decimalFormat.parse('123´123´123')).toBe(123123123);
+      expect(decimalFormat.parse('123\u202F123\u202F123')).toBe(123123123);
+      var func = decimalFormat.parse.bind(decimalFormat, '123~123~123');
+      expect(func).toThrowError();
+    });
+
     it("can swap the position of the minus sign", function() {
       var decimalFormat = new scout.DecimalFormat(locale, {
         pattern: '0.0-' // Group separator after decimal separator, 0 after #
