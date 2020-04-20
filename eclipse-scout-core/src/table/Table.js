@@ -3471,7 +3471,7 @@ export default class Table extends Widget {
   }
 
   /**
-   * @param {scout.Column|number} column or columnIndex
+   * @param {Column|number} column or columnIndex
    * @returns {$}
    */
   $cell(column, $row) {
@@ -5193,9 +5193,6 @@ export default class Table extends Widget {
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */
 
-  /**
-   * @memberOf Table
-   */
   static parseHorizontalAlignment(alignment) {
     if (alignment > 0) {
       return 'right';

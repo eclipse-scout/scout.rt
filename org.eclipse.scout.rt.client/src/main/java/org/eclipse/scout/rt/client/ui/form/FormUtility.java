@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.client.ui.form;
 
+import java.util.function.Consumer;
+
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -46,8 +48,7 @@ public final class FormUtility {
 
   /**
    * Complete the configurations of the complete field tree of the form. This method is normally called by the form's
-   * constructor after the form initConfig and postInitConfig. This method is normally called before
-   * {@link #initFormFields(IForm)}.
+   * constructor after the form initConfig and postInitConfig.
    */
   public static void rebuildFieldGrid(IForm form, boolean initMainBoxGridData) {
     IGroupBox rootGroupBox = form.getRootGroupBox();
@@ -83,7 +84,7 @@ public final class FormUtility {
    * @since 3.8.2
    */
   public static void setTabBoxMarkStrategy(IForm form, int strategy) {
-    form.<ITabBox> visit(box -> box.setMarkStrategy(strategy), ITabBox.class);
+    form.visit((Consumer<ITabBox>) box -> box.setMarkStrategy(strategy), ITabBox.class);
   }
 
   /**

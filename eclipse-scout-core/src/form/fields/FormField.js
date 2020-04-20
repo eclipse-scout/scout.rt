@@ -721,7 +721,7 @@ export default class FormField extends Widget {
   }
 
   deleteMenu(menuToDelete) {
-    this.deleteMenus([menuToDelete])
+    this.deleteMenus([menuToDelete]);
   }
 
   deleteMenus(menusToDelete) {

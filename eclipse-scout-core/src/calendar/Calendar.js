@@ -1025,11 +1025,8 @@ export default class Calendar extends Widget {
 
     function belongsToSelectedDate(component) {
       var selectedDate = dates.trunc(this.selectedDate);
-      if (dates.compare(selectedDate, component.coveredDaysRange.from) >= 0 &&
-        dates.compare(selectedDate, component.coveredDaysRange.to) <= 0) {
-        return true;
-      }
-      return false;
+      return dates.compare(selectedDate, component.coveredDaysRange.from) >= 0 &&
+        dates.compare(selectedDate, component.coveredDaysRange.to) <= 0;
     }
 
     components.forEach(function(component) {

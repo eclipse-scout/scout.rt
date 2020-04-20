@@ -36,9 +36,6 @@ export default class TimePickerTouchPopup extends TouchPopup {
     this._field.$container.addClass('time');
   }
 
-  /**
-   * @implements DatePickerPopup
-   */
   getTimePicker() {
     return this._widget;
   }

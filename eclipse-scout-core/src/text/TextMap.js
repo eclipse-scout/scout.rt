@@ -16,7 +16,7 @@ export default class TextMap {
     this.map = textMap || {};
   }
 
-  static TEXT_KEY_REGEX = /\$\{textKey\:([a-zA-Z0-9\.]*)\}/;
+  static TEXT_KEY_REGEX = /\${textKey:([a-zA-Z0-9.]*)}/;
 
   /**
    * Returns the text for the given key.

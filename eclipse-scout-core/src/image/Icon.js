@@ -25,7 +25,7 @@ export default class Icon extends Widget {
 
     /**
      * Is set if the icon is rendered and an image, it is not set if it is a font icon
-     * @type {scout.Inage}
+     * @type Image
      */
     this.image = null;
     this.prepend = false;

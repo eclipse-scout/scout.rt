@@ -40,9 +40,6 @@ export default class TimePickerPopup extends Popup {
     this.picker.render();
   }
 
-  /**
-   * @implements DatePickerPopup
-   */
   getTimePicker() {
     return this.picker;
   }

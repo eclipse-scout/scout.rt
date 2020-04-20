@@ -14,6 +14,7 @@ export default class AccordionField extends FormField {
 
   constructor() {
     super();
+    this.accordion = null;
     this.eventDelegator = null;
     this._addWidgetProperties(['accordion']);
   }

@@ -117,7 +117,7 @@ const LONG_ARROW_LEFT_BOLD = 'font:\uF177';
 const LONG_ARROW_RIGHT_BOLD = 'font:\uF178';
 
 // Other constants
-const ICON_ID_REGEX = /\$\{iconId\:([a-zA-Z0-9_\.]*)\}/;
+const ICON_ID_REGEX = /\${iconId:([a-zA-Z0-9_.]*)}/;
 
 /**
  * Returns an {@link IconDesc} object with structured info contained in the iconId string.

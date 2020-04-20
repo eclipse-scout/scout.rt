@@ -90,14 +90,14 @@ export default class DateColumnUserFilter extends ColumnUserFilter {
   }
 
   /**
-   * @implements ColumnUserFilter.js
+   * @override
    */
   filterFieldsTitle() {
     return this.session.text('ui.DateRange');
   }
 
   /**
-   * @override ColumnUserFilter.js
+   * @override
    */
   addFilterFields(groupBox) {
     this.dateFromField = groupBox.addFilterField('DateField', 'ui.from');

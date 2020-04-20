@@ -45,7 +45,6 @@ import $ from 'jquery';
  *                                          If one class is currently set on the $elem, a clone of the $elem without the class
  *                                          is created and measured instead. See also {@link #prefSizeWithoutAnimation}.
  *
- * @memberOf scout.graphics
  * @param $elem
  *          the jQuery element to measure
  * @param options

@@ -87,7 +87,7 @@ export default class SmartField extends ValueField {
   static DEFAULT_BROWSE_MAX_COUNT = 100;
 
   /**
-   * @see IContentAssistField#getActiveFilterLabels() - should have the same order.
+   * @see "IContentAssistField#getActiveFilterLabels()" - should have the same order.
    */
   static ACTIVE_FILTER_VALUES = ['UNDEFINED', 'FALSE', 'TRUE'];
 

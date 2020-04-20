@@ -269,7 +269,7 @@ export default class KeyStroke {
    *
    * @returns a plain object with properties ctrl, shift, alt and which - may be used as input
    *     for Key.js and KeyStroke.js
-   * @see org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer
+   * @see "org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer"
    */
   static parseKeyStroke(keyStrokeName) {
     if (!keyStrokeName) {

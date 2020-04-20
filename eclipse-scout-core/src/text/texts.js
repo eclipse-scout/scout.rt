@@ -11,7 +11,7 @@
 import {TextMap} from '../index';
 import $ from 'jquery';
 
-const TEXT_KEY_REGEX = /\$\{textKey\:([^\}]*)\}/;
+const TEXT_KEY_REGEX = /\${textKey:([^}]*)}/;
 
 let textsByLocale = {};
 
@@ -135,6 +135,7 @@ export function readFromDOM() {
   $('scout-text').each(function() {
     // No need to unescape strings (the browser did this already)
     var key = $(this).data('key');
+    // noinspection UnnecessaryLocalVariableJS
     var value = $(this).data('value');
     textMap[key] = value;
   });
@@ -151,7 +152,7 @@ export function buildKey(key) {
 
 /**
  * @param value text which contains a text key like '${textKey:AKey}'.
- * @return the resolved key or the unchanged value if the text key could not be extracted.
+ * @return {string} the resolved key or the unchanged value if the text key could not be extracted.
  */
 export function resolveKey(value) {
   var result = TEXT_KEY_REGEX.exec(value);

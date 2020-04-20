@@ -37,7 +37,7 @@ export default class BrowserFieldLayout extends FormFieldLayout {
       return false;
     }
     try {
-      var doc = field.$field[0].contentWindow.document;
+      field.$field[0].contentWindow.document;
     } catch (e) {
       $.log.isWarnEnabled() && $.log.warn('Access to IFrame denied, cannot read height. Reason: denied by browser');
       return false;
