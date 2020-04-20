@@ -5,7 +5,6 @@ export {default as RemoteApp} from './RemoteApp';
 export {default as Extension} from './Extension';
 export {default as TypeDescriptor} from './TypeDescriptor';
 export {default as ObjectFactory} from './ObjectFactory';
-export * from './objectFactories';
 export {default as LoadingSupport} from './widget/LoadingSupport';
 export {default as SimpleLoadingSupport} from './widget/SimpleLoadingSupport';
 export {default as ModelAdapter} from './session/ModelAdapter';
@@ -43,11 +42,9 @@ export {default as PromiseCreator} from './util/PromiseCreator';
 export {default as promises} from './util/promises';
 export {default as Range} from './util/Range';
 export {default as Status} from './util/Status';
-
 export {default as CachedElement} from './encoder/CachedElement';
 export {default as PlainTextEncoder} from './encoder/PlainTextEncoder';
 export {default as HtmlEncoder} from './encoder/HtmlEncoder';
-
 export {default as strings} from './util/strings';
 export {default as styles} from './util/styles';
 export {default as TreeSet} from './util/TreeSet';
@@ -655,15 +652,20 @@ export {default as Resizable} from './resizable/Resizable';
 export {default as UnsavedFormChangesForm} from './desktop/unsavedchanges/UnsavedFormChangesForm';
 export {default as UnsavedFormsLookupCall} from './desktop/unsavedchanges/UnsavedFormsLookupCall';
 export {default as TileTableHeaderBox} from './table/TileTableHeaderBox';
-
-export {default as JQueryUtils} from './jquery/jquery-scout';
-export {default as JQuerySelectors} from './jquery/jquery-scout-selectors';
-
 export {default as LoginApp} from './login/LoginApp';
 export {default as LoginBox} from './login/LoginBox';
 export {default as LogoutApp} from './login/LogoutApp';
 export {default as LogoutBox} from './login/LogoutBox';
 
+// The following files don't export anything but they need to be imported so they participate on the webpack build
+// noinspection ES6UnusedImports
+import * as objectFactories from './objectFactories';
+// noinspection ES6UnusedImports
+import * as jqs from './jquery/jquery-scout';
+// noinspection ES6UnusedImports
+import * as jqss from './jquery/jquery-scout-selectors';
+
+import * as scout from './scout';
 import * as self from './index.js';
 
 export default self;
@@ -671,8 +673,6 @@ export default self;
 // Add all functions from the scout object to the scout object on the window
 // Note: the scout object on the window still needs its own scout object (window.scout.scout).
 // It is required when the eclipse-core/scout is mapped as external webpack library to window.scout
-import * as scout from './scout';
-
 var windowScout = {...self, ...scout};
 
 // Add the scout object to the window

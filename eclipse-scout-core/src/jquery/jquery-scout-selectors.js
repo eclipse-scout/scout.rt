@@ -15,35 +15,33 @@ import * as $ from 'jquery';
  * This file extends jQuery with custom selectors required in Scout.
  * Part of this file is copied with some modifications from jQuery UI.
  */
-export default class JQuerySelectors/* extends $*/ {
-  static focusable(element, isTabIndexNotNaN) {
-    var nodeName = element.nodeName.toLowerCase();
-    return (/input|select|textarea|button|object/.test(nodeName) ?
-      !element.disabled :
-      'a' === nodeName ?
-        element.href || isTabIndexNotNaN :
-        isTabIndexNotNaN) &&
-      // the element and all of its ancestors must be visible
-      JQuerySelectors.visible(element);
-  }
+function focusable(element, isTabIndexNotNaN) {
+  var nodeName = element.nodeName.toLowerCase();
+  return (/input|select|textarea|button|object/.test(nodeName) ?
+    !element.disabled :
+    'a' === nodeName ?
+      element.href || isTabIndexNotNaN :
+      isTabIndexNotNaN) &&
+    // the element and all of its ancestors must be visible
+    visible(element);
+}
 
-  static visible(element) {
-    return $.expr.filters.visible(element) &&
-      !$(element).parents().addBack().filter(function() {
-        return $.css(this, 'visibility') === 'hidden';
-      }).length;
-  }
+function visible(element) {
+  return $.expr.filters.visible(element) &&
+    !$(element).parents().addBack().filter(function() {
+      return $.css(this, 'visibility') === 'hidden';
+    }).length;
 }
 
 $.extend($.expr[':'], {
 
   focusable: function(element) {
-    return JQuerySelectors.focusable(element, !isNaN($.attr(element, 'tabindex')));
+    return focusable(element, !isNaN($.attr(element, 'tabindex')));
   },
 
   tabbable: function(element) {
     var tabIndex = $.attr(element, 'tabindex'),
       isTabIndexNaN = isNaN(tabIndex);
-    return (isTabIndexNaN || tabIndex >= 0) && JQuerySelectors.focusable(element, !isTabIndexNaN);
+    return (isTabIndexNaN || tabIndex >= 0) && focusable(element, !isTabIndexNaN);
   }
 });

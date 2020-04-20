@@ -74,7 +74,7 @@ export function fixTouchEvent(event) {
 /**
  * @returns an object containing passive: true if the browser supports passive event listeners, otherwise returns false.
  */
-export function passiveOptions(event) {
+export function passiveOptions() {
   var options = false;
   if (Device.get().supportsPassiveEventListener()) {
     options = {
