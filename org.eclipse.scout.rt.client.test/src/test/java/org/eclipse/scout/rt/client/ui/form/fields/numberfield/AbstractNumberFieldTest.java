@@ -197,6 +197,32 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
   }
 
   @Test
+  public void testLenientGrouping() {
+    for (Locale locale : Locale.getAvailableLocales()) {
+      DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance(locale);
+      setFormat(format);
+
+      // grouping
+      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123,123,123"));
+      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123’123’123"));
+      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123'123'123"));
+      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123´123´123"));
+      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123.123.123"));
+      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123 123 123"));
+      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123\u00A0123\u00A0123"));
+      assertParseToBigDecimalInternalThrowsRuntimeException("Parsing with unsupported grouping separator is expected to fail", this, "123~123~123");
+
+      // decimal
+      setRoundingMode(RoundingMode.UP);
+      // if the parsing doesn't throw an exception it's successful
+      assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123'123.123"));
+      assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123,123.123"));
+      assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123.123,123"));
+      assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123'123,123"));
+    }
+  }
+
+  @Test
   public void testPropertySupportForFormat() {
     setGroupingUsed(true);
     P_PropertyTracker formatTracker = new P_PropertyTracker();
