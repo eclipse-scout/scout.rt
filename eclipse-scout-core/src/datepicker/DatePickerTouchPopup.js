@@ -41,9 +41,6 @@ export default class DatePickerTouchPopup extends TouchPopup {
     this._acceptInput();
   }
 
-  /**
-   * @implements DatePickerPopup
-   */
   getDatePicker() {
     return this._widget;
   }

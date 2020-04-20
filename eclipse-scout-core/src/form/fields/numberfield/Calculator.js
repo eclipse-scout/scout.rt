@@ -24,12 +24,12 @@ export default class Calculator {
   }
 
   isFormula(input) {
-    return input.match(/^[\d\(\)\+\-\*\/\.]+$/);
+    return input.match(/^[\d()+\-*/.]+$/);
   }
 
   evalFormula(input) {
     this._tokens = input
-      .split(/([\d.]+|\(|\)|[\+\-\*\/])/)
+      .split(/([\d.]+|\(|\)|[+\-*/])/)
       .filter(function(e) {
         return e.length !== 0;
       });

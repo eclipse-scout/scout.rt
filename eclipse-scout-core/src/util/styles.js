@@ -11,9 +11,6 @@
 import {arrays, numbers, scout, strings} from '../index';
 import $ from 'jquery';
 
-/**
- * @memberOf scout.styles
- */
 let styleMap = {};
 
 let element = null;

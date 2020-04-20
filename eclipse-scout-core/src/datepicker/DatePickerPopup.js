@@ -41,9 +41,6 @@ export default class DatePickerPopup extends Popup {
     this.picker.render();
   }
 
-  /**
-   * @implements DatePickerPopup
-   */
   getDatePicker() {
     return this.picker;
   }

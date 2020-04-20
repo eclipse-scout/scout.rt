@@ -17,8 +17,6 @@ import $ from 'jquery';
  * Otherwise we install JS-based scrollbars. In that case the install function
  * creates a new scrollbar.js. For native scrollbars we
  * must set some additional CSS styles.
- *
- * @memberOf scout.scrollbars
  */
 
 let _$scrollables = {};
@@ -64,6 +62,12 @@ export function removeScrollable(session, $container) {
   }
 }
 
+/**
+ * @param [options]
+ * @param [options.axis] x, y or both. Default is both.
+ * @param {boolean} [options.nativeScrollbars]
+ * @param {boolean} [options.hybridScrollbars]
+ */
 export function install($container, options) {
   options = _createDefaultScrollToOptions(options);
   options.axis = options.axis || 'both';

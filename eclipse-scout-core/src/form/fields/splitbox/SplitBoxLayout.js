@@ -102,13 +102,11 @@ export default class SplitBoxLayout extends AbstractLayout {
   preferredLayoutSize($container, options) {
     // Extract components
     var htmlContainer = HtmlComponent.get($container), // = split-area
-      $splitter = $container.children('.splitter'),
       $fields = $container.children('.form-field'),
       htmlFirstField = HtmlComponent.optGet($fields.eq(0)),
       htmlSecondField = HtmlComponent.optGet($fields.eq(1));
 
     var splitXAxis = this.splitBox.splitHorizontal;
-    var splitterSize = graphics.size($splitter, true);
     var splitterPosition = this.splitBox.getEffectiveSplitterPosition();
 
     // compute width hints

@@ -15,8 +15,7 @@ import $ from 'jquery';
  */
 
 /**
- * @return whether the given element is focusable by mouse.
- * @memberOf scout.focusUtils
+ * @return {boolean} whether the given element is focusable by mouse.
  */
 export function isFocusableByMouse(element) {
   var $element = $(element);

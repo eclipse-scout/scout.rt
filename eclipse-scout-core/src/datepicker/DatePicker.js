@@ -19,13 +19,13 @@ export default class DatePicker extends Widget {
     // Preselected date can only be set if selectedDate is null. The preselected date is rendered differently, but
     // has no function otherwise. (It is used to indicate the day that will be selected when the user presses
     // the UP or DOWN key while no date is selected.)
-    this.preselectedDate;
-    this.selectedDate;
-    this.dateFormat;
-    this.viewDate;
-    this.allowedDates;
-    this.currentMonth;
-    this.$scrollable;
+    this.preselectedDate = null;
+    this.selectedDate = null;
+    this.dateFormat = null;
+    this.viewDate = null;
+    this.allowedDates = null;
+    this.currentMonth = null;
+    this.$scrollable = null;
     // Contains the months to be rendered.
     // Only the this.currentMonth is visible, the others are needed for the swipe animation.
     // The month is an object with the properties viewDate, rendered and $container

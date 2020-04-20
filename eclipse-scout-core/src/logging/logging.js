@@ -21,6 +21,7 @@ let showStackTraces = true;
 
 /***
  * Loads log4javascript.min.js if logging is enabled.
+ * @param [options] options
  * @param {boolean} options.enabled
  * @param {boolean} options.showPopup
  * @param options.resourceUrl

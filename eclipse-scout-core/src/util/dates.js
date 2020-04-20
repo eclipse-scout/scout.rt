@@ -10,9 +10,6 @@
  */
 import {DateFormat, scout, strings} from '../index';
 
-/**
- * @memberOf scout.dates
- */
 export function shift(date, years, months, days) {
   var newDate = new Date(date.getTime());
   if (years) {

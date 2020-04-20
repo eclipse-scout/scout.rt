@@ -248,7 +248,7 @@ export default class TableTileGridMediator extends Widget {
     objects.mandatoryFunction(tileGrid, '_showContextMenu');
     var origShowContextMenu = tileGrid._showContextMenu;
     tileGrid._showContextMenu = function(options) {
-      objects.mandatoryFunction(this.table, '_filterMenusForContextMenu')
+      objects.mandatoryFunction(this.table, '_filterMenusForContextMenu');
       options.menuItems = this.table._filterMenusForContextMenu();
       scout.assertProperty(this.table, '_filterMenusHandler');
       options.menuFilter = this.table._filterMenusHandler;
