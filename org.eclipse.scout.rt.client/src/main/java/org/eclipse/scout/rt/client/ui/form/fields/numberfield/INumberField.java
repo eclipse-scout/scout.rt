@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.numberfield;
 
+import java.util.Set;
+
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 
@@ -19,5 +21,25 @@ import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
  * @param <NUMBER>
  */
 public interface INumberField<NUMBER extends Number> extends IBasicField<NUMBER>, INumberValueContainer<NUMBER> {
+
+  String PROP_LENIENT_DECIMAL_SEPARATORS = "lenientDecimalSeparators";
+
+  String PROP_LENIENT_GROUPING_SEPARATORS = "lenientGroupingSeparators";
+
+  /**
+   * Sets the possible decimal separators which should be considered for lenient parsing. Value <code>null</code> or an
+   * empty list means lenient parsing is disabled.
+   */
+  void setLenientDecimalSeparators(Set<Character> lenientDecimalSeparators);
+
+  Set<Character> getLenientDecimalSeparators();
+
+  /**
+   * Sets the possible grouping separators which should be considered for lenient parsing. Value <code>null</code> or an
+   * empty list means lenient parsing is disabled.
+   */
+  void setLenientGroupingSeparators(Set<Character> lenientGroupingSeparators);
+
+  Set<Character> getLenientGroupingSeparators();
 
 }
