@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {objects, QueryBy, scout} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * Base class for lookup calls. A concrete implementation of LookupCall.js which uses resources over a network

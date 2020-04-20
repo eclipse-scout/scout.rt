@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {events, graphics, Insets, scout, scrollbars, Widget} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class Scrollbar extends Widget {
 

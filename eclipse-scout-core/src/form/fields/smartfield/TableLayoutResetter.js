@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * This class is used to reset and restore styles in the DOM, so we can measure the preferred size of the table.

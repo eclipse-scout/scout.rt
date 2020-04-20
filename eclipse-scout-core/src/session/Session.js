@@ -39,7 +39,7 @@ import {
   UserAgent,
   webstorage
 } from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class Session {
   constructor() {

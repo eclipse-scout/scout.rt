@@ -27,7 +27,7 @@ import {
   strings,
   Widget
 } from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class Popup extends Widget {
 

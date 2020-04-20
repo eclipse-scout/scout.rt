@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Column, ColumnUserFilter, Device, graphics, GroupBoxMenuItemsOrder, inspector, MenuBar, MenuDestinations, scout, scrollbars, strings, styles, Table, tooltips, Widget} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class TableHeader extends Widget {
 

@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Status, strings} from '../index';
-import * as $ from 'jquery';
+import {strings} from '../index';
+import $ from 'jquery';
 
 /**
  * @class

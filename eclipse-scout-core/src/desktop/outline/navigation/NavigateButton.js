@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Action, Menu} from '../../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * The outline navigation works mostly browser-side. The navigation logic is implemented in JavaScript.

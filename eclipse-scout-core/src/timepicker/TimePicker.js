@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {dates, Device, HtmlComponent, scrollbars, Widget} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class TimePicker extends Widget {
 

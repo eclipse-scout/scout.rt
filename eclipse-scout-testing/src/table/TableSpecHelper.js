@@ -10,7 +10,7 @@
  */
 import {arrays, comparators, DecimalFormat, ObjectFactory, objects, RemoteEvent, scout, Table, TableAdapter, TextColumnUserFilter} from '@eclipse-scout/core';
 import {MenuSpecHelper} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class TableSpecHelper {
   constructor(session) {

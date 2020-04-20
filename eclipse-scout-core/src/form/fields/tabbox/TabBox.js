@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, CompositeField, FormField, HtmlComponent, scout, SingleLayout, TabArea, TabBoxLayout} from '../../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * Tab-area = where the 1-n tabs are placed (may have multiple runs = lines).

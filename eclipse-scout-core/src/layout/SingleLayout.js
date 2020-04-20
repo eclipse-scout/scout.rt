@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractLayout, Dimension, graphics, HtmlComponent} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * Resizes the child so it has the same size as the container.<br>

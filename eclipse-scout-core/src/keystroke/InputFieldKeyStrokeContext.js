@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {keys, KeyStrokeContext, keyStrokeModifier} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * Keystroke context used for input fields.

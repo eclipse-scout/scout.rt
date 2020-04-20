@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractLayout, Dimension, FormField, graphics, GroupBox, HtmlComponent, HtmlEnvironment, MenuBarLayout, ResponsiveManager, scrollbars} from '../../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class GroupBoxLayout extends AbstractLayout {
 

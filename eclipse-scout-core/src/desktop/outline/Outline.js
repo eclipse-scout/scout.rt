@@ -41,7 +41,7 @@ import {
   TreeNavigationEndKeyStroke,
   TreeNavigationUpKeyStroke
 } from '../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * @extends {Tree}

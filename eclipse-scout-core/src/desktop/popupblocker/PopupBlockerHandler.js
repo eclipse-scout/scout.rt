@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {MessageBoxes, scout, Status} from '../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * @param {optional boolean} preserveOpener A boolean indicating if the popup-window should have a back reference to the origin window. By default this parameter is false because of security reasons. Only trusted sites may be allowed to access the opener window and potentially modify the origin web application! See https://mathiasbynens.github.io/rel-noopener/ for more details.

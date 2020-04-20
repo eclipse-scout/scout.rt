@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, DeferredGlassPaneTarget, Device, Form, scout} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * Renders glassPanes over the 'glassPaneTargets' of a widget.

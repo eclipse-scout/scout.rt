@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 describe('jquery-scout', function() {
 

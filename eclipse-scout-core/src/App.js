@@ -10,7 +10,7 @@
  */
 
 import {codes, Device, EventSupport, fonts, locales, logging, numbers, ObjectFactory, objects, polyfills, scout, Session, texts, webstorage} from './index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 let instance = null;
 let listeners = [];

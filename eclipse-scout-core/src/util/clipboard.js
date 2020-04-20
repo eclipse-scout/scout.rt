@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FocusRule, scout, Status} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * Copies the given text to the clipboard. To make this work, the method must be called inside

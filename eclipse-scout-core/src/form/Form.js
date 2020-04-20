@@ -28,7 +28,7 @@ import {
   Widget,
   WrappedFormField
 } from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class Form extends Widget {
   constructor() {

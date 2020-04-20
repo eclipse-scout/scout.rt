@@ -10,7 +10,7 @@
  */
 
 import {App, Device, ObjectFactory, objects, strings, ValueField, widgets} from './index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 let $activeElements = null;
 let objectFactories = {};

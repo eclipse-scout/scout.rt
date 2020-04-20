@@ -26,7 +26,7 @@ import {
   strings,
   ValueField
 } from '../../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class SmartField extends ValueField {
 

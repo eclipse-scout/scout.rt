@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {LookupCall, objects, scout} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class HierarchicalLookupResultBuilder {
   constructor(lookupCall) {

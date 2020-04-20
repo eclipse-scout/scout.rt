@@ -1,5 +1,5 @@
 import {AppLinkKeyStroke, HtmlComponent, KeyStrokeContext, strings, Widget} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class Label extends Widget {
 

@@ -80,7 +80,7 @@ public class ManualFixes {
         // Import the chart.js module and use it in the instance creation
         String importName = "ChartJs";
         String newSource = wc.getSource().replace("this.chart = new Chart(this.$container[0]", "this.chart = new " + importName + "(this.$container[0]");
-        int importInsertPos = newSource.indexOf("import * as $ from 'jquery';");
+        int importInsertPos = newSource.indexOf("import $ from 'jquery';");
         newSource = newSource.substring(0, importInsertPos) + "import {Chart as " + importName + "} from 'chart.js';" + wc.getLineDelimiter() + newSource.substring(importInsertPos);
         wc.setSource(newSource);
       }

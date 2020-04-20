@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {icons, MenuBar, Outline, TableRow, TreeNode} from '../../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * This class is used differently in online and JS-only case. In the online case we only have instances

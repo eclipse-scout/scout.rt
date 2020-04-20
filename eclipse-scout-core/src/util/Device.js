@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {App, objects, scout} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 let instance;
 /* global FastClick */

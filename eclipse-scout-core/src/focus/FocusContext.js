@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {filters, focusUtils, graphics, keys, Point, scrollbars} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * A focus context is associated with a $container, and controls how to focus elements within that $container.

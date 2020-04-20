@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, LookupCall, LookupRow, objects, QueryBy, RemoteLookupRequest, scout} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class RemoteLookupCall extends LookupCall {
 

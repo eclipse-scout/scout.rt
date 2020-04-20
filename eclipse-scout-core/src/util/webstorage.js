@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * Utility functions for "sessionStorage" and "localStorage" that ignore any errors.

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Key, keys, KeyStroke, scout} from '../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * Keystroke to move the cursor into field field to table footer.

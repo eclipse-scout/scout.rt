@@ -28,7 +28,7 @@ import {
   TimePickerPopup,
   ValueField
 } from '../../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class DateField extends ValueField {
 

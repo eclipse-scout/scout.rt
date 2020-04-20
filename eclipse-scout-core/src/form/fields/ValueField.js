@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Event, focusUtils, FormField, menus as menus_1, objects, scout, Status, strings} from '../../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 /**
  * @abstract

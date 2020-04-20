@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Calendar, dates, Planner, scout, scrollbars, Widget} from '../index';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 export default class YearPanel extends Widget {
 
