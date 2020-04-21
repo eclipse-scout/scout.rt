@@ -159,6 +159,10 @@ public class ProcessingExceptionTest {
         // ignore omitted line counter
         continue;
       }
+      if (trimmedLine.startsWith("at org.junit.")) {
+        // junit runner chain
+        continue;
+      }
       if (!processedLines.add(trimmedLine) && !duplicateLines.contains(trimmedLine)) {
         duplicateLines.add(trimmedLine);
       }
