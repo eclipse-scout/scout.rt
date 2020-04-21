@@ -51,6 +51,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -398,13 +399,27 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   @Override
+  protected void execMarkSaved() {
+    super.execMarkSaved();
+    TriState activeFilter = getActiveFilter();
+    setInitActiveFilter(activeFilter);
+  }
+
+  @Override
+  public void resetValue() {
+    super.resetValue();
+    TriState activeFilter = getInitActiveFilter();
+    setActiveFilter(activeFilter);
+  }
+
+  @Override
   public boolean isActiveFilterEnabled() {
     return propertySupport.getPropertyBool(PROP_ACTIVE_FILTER_ENABLED);
   }
 
   @Override
-  public void setActiveFilterEnabled(boolean b) {
-    propertySupport.setPropertyBool(PROP_ACTIVE_FILTER_ENABLED, b);
+  public void setActiveFilterEnabled(boolean activeFilterEnabled) {
+    propertySupport.setPropertyBool(PROP_ACTIVE_FILTER_ENABLED, activeFilterEnabled);
   }
 
   @Override
@@ -418,6 +433,16 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
       activeFilter = TriState.TRUE;
     }
     propertySupport.setProperty(PROP_ACTIVE_FILTER, activeFilter);
+  }
+
+  @Override
+  public void setInitActiveFilter(TriState initActiveFilter) {
+    propertySupport.setProperty(PROP_INIT_ACTIVE_FILTER, initActiveFilter);
+  }
+
+  @Override
+  public TriState getInitActiveFilter() {
+    return (TriState)  propertySupport.getProperty(PROP_INIT_ACTIVE_FILTER);
   }
 
   @Override
@@ -452,9 +477,9 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   @Override
-  public void setMultilineText(boolean b) {
-    boolean changed = propertySupport.setPropertyBool(PROP_MULTILINE_TEXT, b);
-    if (!b & changed && isInitConfigDone()) {
+  public void setMultilineText(boolean multilineText) {
+    boolean changed = propertySupport.setPropertyBool(PROP_MULTILINE_TEXT, multilineText);
+    if (!multilineText & changed && isInitConfigDone()) {
       setValue(getValue());
     }
   }
@@ -566,7 +591,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   /**
-   * @param wildcard
+   * @param wildcard Wildcard character used in lookup calls
    */
   @Override
   public void setWildcard(String wildcard) {
@@ -603,13 +628,12 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     if (getLookupRow() == null) {
       return true;
     }
-
     return validKey == getLookupRow().getKey() || (validKey != null && validKey.equals(getLookupRow().getKey()));
   }
 
   @Override
-  public void setLookupRow(ILookupRow<VALUE> row) {
-    propertySupport.setProperty(PROP_LOOKUP_ROW, row);
+  public void setLookupRow(ILookupRow<VALUE> lookupRow) {
+    propertySupport.setProperty(PROP_LOOKUP_ROW, lookupRow);
   }
 
   @Override
@@ -619,17 +643,17 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   @Override
-  public void setValueByLookupRow(ILookupRow<VALUE> row) {
+  public void setValueByLookupRow(ILookupRow<VALUE> lookupRow) {
     m_validationError = null;
     ILookupRow<VALUE> oldRow = getLookupRow();
     try {
-      if (row == null) {
+      if (lookupRow == null) {
         setLookupRow(null);
         setValue(null);
       }
-      else if (row.isEnabled()) {
-        setLookupRow(row);
-        setValue(getValueFromLookupRow(row));
+      else if (lookupRow.isEnabled()) {
+        setLookupRow(lookupRow);
+        setValue(getValueFromLookupRow(lookupRow));
       }
       // don't do anything if row is disabled
     }
@@ -651,11 +675,11 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   /**
-   * @param row
+   * @param lookupRow Lookup row used to resolve the value
    * @return a property from the lookup row which is used as value (usually this is the key of the lookup row)
    */
-  protected VALUE getValueFromLookupRow(ILookupRow<VALUE> row) {
-    return row.getKey();
+  protected VALUE getValueFromLookupRow(ILookupRow<VALUE> lookupRow) {
+    return lookupRow.getKey();
   }
 
   @Override
@@ -1141,10 +1165,6 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     return "";
   }
 
-  /**
-   * @param currentLookupRow
-   * @return
-   */
   private String lookupRowAsText(ILookupRow<VALUE> currentLookupRow) {
     String text = currentLookupRow.getText();
     if (text != null && (!isMultilineText() && (getLookupCall() == null || !getLookupCall().isMultilineText()))) {
@@ -1175,7 +1195,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
    * Creates a {@link ILookupRowProvider} to fetch a row by key.
    *
    * @see LookupCall#getDataByKey()
-   * @see LookupCall#getDataByAllInBackground(ILookupRowFetchedCallback)
+   * @see LookupCall#getDataByAllInBackground(RunContext, ILookupRowFetchedCallback)
    */
   protected ILookupRowProvider<VALUE> newByKeyLookupRowProvider(final VALUE key) {
     return new ILookupRowProvider<VALUE>() {
@@ -1222,7 +1242,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
    * Creates a {@link ILookupRowProvider} to fetch all rows.
    *
    * @see LookupCall#getDataByAll()
-   * @see LookupCall#getDataByAllInBackground(ILookupRowFetchedCallback)
+   * @see LookupCall#getDataByAllInBackground(RunContext, ILookupRowFetchedCallback)
    */
   protected ILookupRowProvider<VALUE> newByAllLookupRowProvider(final TriState activeState) {
     return new ILookupRowProvider<VALUE>() {
@@ -1270,7 +1290,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
    * Creates a {@link ILookupRowProvider} to fetch rows matching the given text.
    *
    * @see LookupCall#getDataByText()
-   * @see LookupCall#getDataByTextInBackground(ILookupRowFetchedCallback)
+   * @see LookupCall#getDataByAllInBackground(RunContext, ILookupRowFetchedCallback)
    */
   protected ILookupRowProvider<VALUE> newByTextLookupRowProvider(final String text) {
     return new ILookupRowProvider<VALUE>() {
@@ -1427,7 +1447,6 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
             at org.eclipse.scout.rt.shared.services.lookup.LookupCall.loadData(LookupCall.java:437)
             at org.eclipse.scout.rt.shared.services.lookup.LookupCall$5.run(LookupCall.java:417)
             */
-            return;
           }
         }
       }

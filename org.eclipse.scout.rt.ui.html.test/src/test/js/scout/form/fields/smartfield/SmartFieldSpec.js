@@ -115,6 +115,17 @@ describe('SmartField', function() {
       expect(findTableProposals()).toEqual(['Bar', 'Baz']);
     });
 
+    it('reset active filter', function() {
+      field = createFieldWithLookupCall();
+      field.setActiveFilterEnabled(true);
+      field.setActiveFilter('FALSE');
+      field.markAsSaved();
+      field.setActiveFilter('UNDEFINED');
+      expect(field.activeFilter).toEqual('UNDEFINED');
+      field.resetValue();
+      expect(field.activeFilter).toEqual('FALSE');
+    });
+
   });
 
   describe('clear', function() {

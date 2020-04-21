@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -521,5 +522,21 @@ public class SmartFieldTest {
     assertEquals("", field.getDisplayText());
     field.refreshDisplayText();
     assertEquals("", field.getDisplayText());
+  }
+
+  @Test
+  public void testInitActiveFilter() {
+    ISmartField<Long> field = new AbstractSmartField<Long>() {
+      @Override
+      protected boolean getConfiguredActiveFilterEnabled() {
+        return true;
+      }
+    };
+    field.setActiveFilter(TriState.FALSE);
+    field.markSaved();
+    field.setActiveFilter(TriState.UNDEFINED);
+    assertEquals(TriState.UNDEFINED, field.getActiveFilter());
+    field.resetValue();
+    assertEquals(TriState.FALSE, field.getActiveFilter());
   }
 }

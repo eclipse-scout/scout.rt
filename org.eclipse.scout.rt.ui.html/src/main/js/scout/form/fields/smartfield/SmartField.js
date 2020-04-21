@@ -39,6 +39,7 @@ scout.SmartField = function() {
   this._currentLookupCall = null; // should only be accessed on the original widget since the adapter accesses it
   this.lookupSeqNo = 0; // used to detect if the proposal chooser contains the results of the latest lookup, or an out-dated result.
   // only when the result is up-to-date, we can use the selected lookup row
+  this.initActiveFilter = null;
   this.disabledCopyOverlay = true;
 
   this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
@@ -92,6 +93,16 @@ scout.SmartField.prototype._initValue = function(value) {
   this._setCodeType(this.codeType);
   this._setLookupRow(this.lookupRow);
   scout.SmartField.parent.prototype._initValue.call(this, value);
+};
+
+scout.SmartField.prototype.markAsSaved = function() {
+  scout.SmartField.parent.prototype.markAsSaved.call(this);
+  this.setInitActiveFilter(this.activeFilter);
+};
+
+scout.SmartField.prototype.resetValue = function() {
+  scout.SmartField.parent.prototype.resetValue.call(this);
+  this.setActiveFilter(this.initActiveFilter);
 };
 
 scout.SmartField.prototype._createKeyStrokeContext = function() {
@@ -1282,6 +1293,10 @@ scout.SmartField.prototype.setActiveFilter = function(activeFilter) {
 
 scout.SmartField.prototype.setActiveFilterEnabled = function(activeFilterEnabled) {
   this.setProperty('activeFilterEnabled', activeFilterEnabled);
+};
+
+scout.SmartField.prototype.setInitActiveFilter = function(initActiveFilter) {
+  this.setProperty('initActiveFilter', initActiveFilter);
 };
 
 scout.SmartField.prototype.setSearchRequired = function(searchRequired) {
