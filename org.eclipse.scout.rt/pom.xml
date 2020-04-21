@@ -104,6 +104,8 @@
     <sonar.exclusions>**/resources/WebContent/**</sonar.exclusions>
     <sonar.coverage.exclusions>*.test/**,
       **/resources/WebContent/**</sonar.coverage.exclusions>
+
+    <scout.excludeTestCategories/> <!-- may be set as a system property to disable test with test category (defined in platform.test) -->
   </properties>
 
   <dependencyManagement>
