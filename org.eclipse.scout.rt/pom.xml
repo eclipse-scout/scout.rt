@@ -112,6 +112,8 @@
       **/resources/WebContent/**,
       **/node_modules/**
     </sonar.coverage.exclusions>
+
+    <scout.excludeTestCategories/> <!-- may be set as a system property to disable test with test category (defined in platform.test) -->
   </properties>
 
   <dependencyManagement>
