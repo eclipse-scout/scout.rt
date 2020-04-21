@@ -25,6 +25,10 @@
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
+  <properties>
+    <surefire.excludedGroups>${scout.excludeTestCategories}</surefire.excludedGroups>
+  </properties>
+
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>
@@ -53,5 +57,19 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <excludedGroups>${scout.excludeTestCategories}</excludedGroups>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
 </project>
