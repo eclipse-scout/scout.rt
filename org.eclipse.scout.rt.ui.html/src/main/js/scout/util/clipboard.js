@@ -100,7 +100,7 @@ scout.clipboard = {
     promise
       .catch(function() {
         status = this._failedStatus(options.parent.session);
-      })
+      }.bind(this))
       // Show notification
       .then(this.showNotification.bind(this, options.parent, status));
   },
