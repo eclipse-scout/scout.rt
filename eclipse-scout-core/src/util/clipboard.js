@@ -102,8 +102,9 @@ export function _showNotification(options, promise) {
     .catch(function() {
       status = _failedStatus(options.parent.session);
     })
-    // Show notification
-    .then(showNotification.bind(this, options.parent, status));
+    .then(function() {
+      showNotification(options.parent, status);
+    });
 }
 
 export function _successStatus(session) {
