@@ -75,13 +75,29 @@ public class HttpProxyTest {
     Map<String, String[]> oneParameter = CollectionUtility.hashMap(ImmutablePair.of("maxRows", new String[]{"2"}));
     Map<String, String[]> multiParameters = CollectionUtility.hashMap(ImmutablePair.of("name", new String[]{"alice"}), ImmutablePair.of("pets", new String[]{"dog", "cat"}));
 
+    assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", null, null)));
+    assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", null, oneParameter)));
+    assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", null, multiParameters)));
+
     assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/json", null)));
     assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/json", oneParameter)));
     assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/json", multiParameters)));
 
+    assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/json; \"this is not application/x-www-form-urlencoded\"", null)));
+    assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/json; \"this is not application/x-www-form-urlencoded\"", oneParameter)));
+    assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/json; \"this is not application/x-www-form-urlencoded\"", multiParameters)));
+
     assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/x-www-form-urlencoded", null)));
     assertTrue(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/x-www-form-urlencoded", oneParameter)));
     assertTrue(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/x-www-form-urlencoded", multiParameters)));
+
+    assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/x-www-form-urlencoded; charset=utf-8", null)));
+    assertTrue(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/x-www-form-urlencoded; charset=utf-8", oneParameter)));
+    assertTrue(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "application/x-www-form-urlencoded; charset=utf-8", multiParameters)));
+
+    assertFalse(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "APplicATIon/X-www-fOrM-urlencoded; charset=\"UTF-8\"", null)));
+    assertTrue(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "APplicATIon/X-www-fOrM-urlencoded; charset=\"UTF-8\"", oneParameter)));
+    assertTrue(m_proxy.shouldWriteParametersAsPayload(mockRequest("POST", "APplicATIon/X-www-fOrM-urlencoded; charset=\"UTF-8\"", multiParameters)));
   }
 
   private HttpServletRequest mockRequest(String method, String contentType, Map<String, String[]> parameterMap) {

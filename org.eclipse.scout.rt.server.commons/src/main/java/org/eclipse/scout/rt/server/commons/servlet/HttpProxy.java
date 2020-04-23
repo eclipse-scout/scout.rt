@@ -126,7 +126,16 @@ public class HttpProxy {
       return false;
     }
     // https://www.w3.org/TR/html401/interact/forms.html#h-17.13.4.1
-    return "application/x-www-form-urlencoded".equals(req.getContentType());
+    // https://tools.ietf.org/html/rfc2045#section-5.1
+    String contentType = req.getContentType();
+    if (contentType == null) {
+      return false;
+    }
+    int i = contentType.indexOf(";");
+    if (i != -1) {
+      contentType = contentType.substring(0, i); // ignore parameters
+    }
+    return "application/x-www-form-urlencoded".equalsIgnoreCase(contentType);
   }
 
   /**
