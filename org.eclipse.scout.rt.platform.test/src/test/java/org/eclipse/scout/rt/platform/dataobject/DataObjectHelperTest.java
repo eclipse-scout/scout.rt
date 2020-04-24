@@ -68,8 +68,8 @@ public class DataObjectHelperTest {
     m_dataObjectMapperMockRegistration = Platform.get().getBeanManager().registerBean(new BeanMetaData(IDataObjectMapper.class, m_dataObjectMapperMock).withApplicationScoped(true));
 
     m_helper = BEANS.get(DataObjectHelper.class);
-    m_entity = new DoEntity();
-    m_subEntity = new DoEntity();
+    m_entity = BEANS.get(DoEntity.class);
+    m_subEntity = BEANS.get(DoEntity.class);
     m_subEntity.put("name", "subEntity");
 
     m_entity.put("integer", 42);

@@ -71,7 +71,9 @@ public class DoEntityBuilder {
   }
 
   /**
-   * @return builded {@link DoEntity} instance
+   * // TODO [11.0] pbz change return value to IDoEntity
+   * 
+   * @return built {@link DoEntity} instance
    */
   public DoEntity build() {
     return m_entity;

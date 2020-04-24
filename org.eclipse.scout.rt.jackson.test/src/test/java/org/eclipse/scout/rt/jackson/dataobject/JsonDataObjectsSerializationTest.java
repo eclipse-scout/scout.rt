@@ -10,8 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.*;
-import static org.junit.Assert.*;
+import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
+import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -553,12 +558,12 @@ public class JsonDataObjectsSerializationTest {
 
   @Test
   public void testSerialize_SimpleDoRaw() throws Exception {
-    DoEntity testDo = new DoEntity();
+    DoEntity testDo = BEANS.get(DoEntity.class);
     testDo.put("bigIntegerAttribute", DoValue.of(new BigInteger("123456")));
     testDo.put("bigDecimalAttribute", new BigDecimal("789.0"));
     testDo.put("dateAttribute", DoValue.of(DateUtility.parse("2017-09-22 14:23:12.123", IValueFormatConstants.DEFAULT_DATE_PATTERN)));
 
-    DoEntity testDo2 = new DoEntity();
+    DoEntity testDo2 = BEANS.get(DoEntity.class);
     testDo2.put("bigIntegerAttribute2", DoValue.of(new BigInteger("789")));
 
     testDo.put("itemAttributeNode", testDo2);
@@ -573,7 +578,7 @@ public class JsonDataObjectsSerializationTest {
 
   @Test
   public void testSerialize_SimpleDoWithPojoRaw() throws Exception {
-    DoEntity testDo = new DoEntity();
+    DoEntity testDo = BEANS.get(DoEntity.class);
     testDo.put("bigIntegerAttribute", DoValue.of(new BigInteger("123456")));
     testDo.put("bigDecimalAttribute", new BigDecimal("789.0"));
     testDo.put("dateAttribute", DoValue.of(DateUtility.parse("2017-09-22 14:23:12.123", IValueFormatConstants.DEFAULT_DATE_PATTERN)));
@@ -582,7 +587,7 @@ public class JsonDataObjectsSerializationTest {
     sub.setBar("bar");
     testDo.put("sub", sub);
 
-    DoEntity testDo2 = new DoEntity();
+    DoEntity testDo2 = BEANS.get(DoEntity.class);
     testDo2.put("bigIntegerAttribute2", DoValue.of(new BigInteger("789")));
     testDo.put("itemAttributeNode", testDo2);
     testDo.put("itemAttributeRef", testDo2);
@@ -616,14 +621,14 @@ public class JsonDataObjectsSerializationTest {
 
   @Test
   public void testSerialize_EmptyRawDo() throws Exception {
-    DoEntity testDo = new DoEntity();
+    DoEntity testDo = BEANS.get(DoEntity.class);
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     assertJsonEquals("TestEmptyDoEntity.json", json);
   }
 
   @Test
   public void testSerialize_EmptyAttributeNameDo() throws Exception {
-    DoEntity testDo = new DoEntity();
+    DoEntity testDo = BEANS.get(DoEntity.class);
     testDo.put("", "");
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     assertJsonEquals("TestEmptyAttributeNameDo.json", json);
@@ -631,10 +636,10 @@ public class JsonDataObjectsSerializationTest {
 
   @Test
   public void testSerialize_EntityWithEmptyObjectDo() throws Exception {
-    DoEntity testDo = new DoEntity();
+    DoEntity testDo = BEANS.get(DoEntity.class);
     testDo.put("emptyObject", new TestEmptyObject());
     testDo.put("emptyList", Arrays.asList());
-    testDo.put("emptyEntity", new DoEntity());
+    testDo.put("emptyEntity", BEANS.get(DoEntity.class));
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     assertJsonEquals("TestEntityWithEmptyObjectDo.json", json);
   }
@@ -1130,7 +1135,7 @@ public class JsonDataObjectsSerializationTest {
 
   @Test
   public void testSerializeDeserialize_EntityWithCollectionRaw() throws Exception {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("attribute1", Arrays.asList("list-item-1", "list-item-2"));
     entity.put("attribute2", Arrays.asList(123, 45.69));
     entity.put("attribute3", Arrays.asList(UUID_1, UUID_2));
@@ -1224,7 +1229,7 @@ public class JsonDataObjectsSerializationTest {
 
   @Test
   public void testSerialize_illegalKeyTypeMap() throws Exception {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     Map<TestItemDo, String> illegalKeyTypeMap = new HashMap<>();
     illegalKeyTypeMap.put(createTestItemDo("key", "value"), "foo");
     entity.put("mapAttribute", illegalKeyTypeMap);
@@ -1238,14 +1243,14 @@ public class JsonDataObjectsSerializationTest {
 
   @Test(expected = JsonMappingException.class)
   public void testSerialize_nullKeyMap() throws Exception {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("mapAttribute", Collections.singletonMap(null, "foo"));
     s_dataObjectMapper.writeValueAsString(entity);
   }
 
   @Test
   public void testSerializeDeserialize_EntityWithMapRaw() throws Exception {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("mapAttribute1", Collections.singletonMap("key", "value"));
     entity.put("mapAttribute2", Collections.singletonMap(123, 45.69));
     entity.put("mapAttribute3", Collections.singletonMap(UUID_1, DATE));
@@ -1328,7 +1333,7 @@ public class JsonDataObjectsSerializationTest {
 
   @Test
   public void testSerializeDeserialize_EntityWithSetRaw() throws Exception {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     Set<String> stringSet = new LinkedHashSet<>();
     stringSet.add("foo");
     stringSet.add("bar");
@@ -1709,7 +1714,7 @@ public class JsonDataObjectsSerializationTest {
 
   @Test
   public void testGeneratedLargeJsonObject() throws Exception {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     // generate some complex, random JSON structure
     for (int i = 0; i < 1000; i++) {
       switch (i % 5) {

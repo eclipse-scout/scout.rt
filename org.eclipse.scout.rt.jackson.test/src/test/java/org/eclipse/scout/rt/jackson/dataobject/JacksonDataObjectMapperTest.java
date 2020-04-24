@@ -77,7 +77,7 @@ public class JacksonDataObjectMapperTest {
     assertNull(m_mapper.readValue((String) null, null));
     assertNull(m_mapper.readValue((String) null, Object.class));
 
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("foo", "bar");
     entity.put("baz", 42);
     String json = m_mapper.writeValue(entity);
@@ -107,7 +107,7 @@ public class JacksonDataObjectMapperTest {
     m_mapper.writeValue(bos, null);
     assertEquals(0, bos.toByteArray().length);
 
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("foo", "bar");
     entity.put("baz", 42);
     ByteArrayOutputStream expected = new ByteArrayOutputStream();
@@ -149,7 +149,7 @@ public class JacksonDataObjectMapperTest {
   @Test
   public void testCloneDoEntity() throws Exception {
     DoEntityHolder<DoEntity> holder = new DoEntityHolder<>();
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("foo", "bar");
     entity.put("42", 1234.56);
     holder.setValue(entity);

@@ -224,8 +224,8 @@ public class TestDateDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestDateDo withZDummySet(Set<String> aDummySet) {
-    zDummySet().set(aDummySet);
+  public TestDateDo withZDummySet(Set<String> zDummySet) {
+    zDummySet().set(zDummySet);
     return this;
   }
 
