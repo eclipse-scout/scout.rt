@@ -17,7 +17,7 @@
       <defaultValue>My JS Application</defaultValue>
     </requiredProperty>
     <requiredProperty key="simpleArtifactName">
-      <defaultValue>Artifact Simple Name</defaultValue>
+      <defaultValue>name</defaultValue>
     </requiredProperty>
     <requiredProperty key="scoutAuthPublicKeyDev">
       <defaultValue>changeme_database_password</defaultValue>
@@ -25,7 +25,7 @@
     <!-- debug output for postprocessing groovy script -->
     <requiredProperty key="debug">
       <defaultValue>false</defaultValue>
-    </requiredProperty>    
+    </requiredProperty>
   </requiredProperties>
   <modules>
     <module id="parent" dir="__rootArtifactId__" name="parent">
