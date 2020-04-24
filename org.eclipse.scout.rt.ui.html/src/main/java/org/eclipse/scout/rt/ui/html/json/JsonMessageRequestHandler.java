@@ -240,7 +240,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     String message = jsonRequest.getMessage();
     JSONObject event = jsonRequest.getEvent();
 
-    String header = "JavaScript exception occured";
+    String header = "JavaScript exception occurred";
     if (event != null) {
       String target = event.getString("target");
       String type = event.getString("type");
