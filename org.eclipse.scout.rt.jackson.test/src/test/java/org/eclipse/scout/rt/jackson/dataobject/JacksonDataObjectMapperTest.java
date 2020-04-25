@@ -11,14 +11,11 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -77,7 +74,7 @@ public class JacksonDataObjectMapperTest {
     assertNull(m_mapper.readValue((String) null, null));
     assertNull(m_mapper.readValue((String) null, Object.class));
 
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("foo", "bar");
     entity.put("baz", 42);
     String json = m_mapper.writeValue(entity);
@@ -98,7 +95,7 @@ public class JacksonDataObjectMapperTest {
 
   @Test(expected = AssertionException.class)
   public void testWriteValueWithNullOutputStream() {
-    m_mapper.writeValue((OutputStream) null, null);
+    m_mapper.writeValue(null, null);
   }
 
   @Test
@@ -107,7 +104,7 @@ public class JacksonDataObjectMapperTest {
     m_mapper.writeValue(bos, null);
     assertEquals(0, bos.toByteArray().length);
 
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("foo", "bar");
     entity.put("baz", 42);
     ByteArrayOutputStream expected = new ByteArrayOutputStream();
@@ -149,7 +146,7 @@ public class JacksonDataObjectMapperTest {
   @Test
   public void testCloneDoEntity() throws Exception {
     DoEntityHolder<DoEntity> holder = new DoEntityHolder<>();
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("foo", "bar");
     entity.put("42", 1234.56);
     holder.setValue(entity);
@@ -164,13 +161,13 @@ public class JacksonDataObjectMapperTest {
     testDo.id().set("4d2abc01-afc0-49f2-9eee-a99878d49728");
     testDo.stringAttribute().set("foo");
     testDo.integerAttribute().set(42);
-    testDo.longAttribute().set(123l);
+    testDo.longAttribute().set(123L);
     testDo.floatAttribute().set(12.34f);
     testDo.doubleAttribute().set(56.78);
     testDo.bigDecimalAttribute().set(new BigDecimal("1.23456789"));
     testDo.bigIntegerAttribute().set(new BigInteger("123456789"));
     testDo.dateAttribute().set(new Date(123456789));
-    testDo.objectAttribute().set(new String("fooObject"));
+    testDo.objectAttribute().set("fooObject");
     testDo.withUuidAttribute(UUID.fromString("298d64f9-821d-49fe-91fb-6fb9860d4950"));
     testDo.withLocaleAttribute(Locale.forLanguageTag("de-CH"));
 
