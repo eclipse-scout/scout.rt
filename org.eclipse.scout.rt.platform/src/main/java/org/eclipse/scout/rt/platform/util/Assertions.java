@@ -535,14 +535,10 @@ public final class Assertions {
    *          object to be tested.
    * @param clazz
    *          class to be tested against.
-   * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
-   * @param msgArgs
-   *          arguments to be used in the message.
    * @return <code>value</code>, if it is an instance of <code>clazz</code>
    * @throws AssertionException
    *           if <code>value</code> is not an instance of <code>clazz</code>
-   * @see {@link #assertType(Object, Class)} for a null-tolerant assertion
+   * @see #assertType(Object, Class)
    */
   public static <T> T assertInstance(final Object value, final Class<T> clazz) {
     return assertInstance(value, clazz, "expected 'value' to be an instance of 'class' [value={}, class={}]", value, clazz);
@@ -563,7 +559,7 @@ public final class Assertions {
    * @return <code>value</code>, if it is an instance of <code>clazz</code>
    * @throws AssertionException
    *           if <code>value</code> is not an instance of <code>clazz</code>
-   * @see {@link #assertType(Object, Class, String, Object...)} for a null-tolerant assertion
+   * @see #assertType(Object, Class, String, Object...)}
    */
   public static <T> T assertInstance(final Object value, final Class<T> clazz, final String msg, final Object... msgArgs) {
     if (!clazz.isInstance(value)) {
@@ -580,14 +576,10 @@ public final class Assertions {
    *          object to be tested.
    * @param clazz
    *          class to be tested against.
-   * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
-   * @param msgArgs
-   *          arguments to be used in the message.
    * @return <code>value</code>, if it is of type <code>clazz</code>
    * @throws AssertionException
    *           if <code>value</code> is not of type <code>clazz</code>
-   * @see {@link #assertInstance(Object, Class)} for a strict assertion rejecting null values
+   * @see #assertInstance(Object, Class)
    */
   public static <T> T assertType(final Object value, final Class<T> clazz) {
     return assertType(value, clazz, "expected 'value' to be of type 'class' [value={}, class={}]", value, clazz);
@@ -608,7 +600,7 @@ public final class Assertions {
    * @return <code>value</code>, if it is of type <code>clazz</code>
    * @throws AssertionException
    *           if <code>value</code> is not of type <code>clazz</code>
-   * @see {@link #assertInstance(Object, Class, String, Object...)} for a strict assertion rejecting null values
+   * @see #assertInstance(Object, Class, String, Object...)}
    */
   public static <T> T assertType(final Object value, final Class<T> clazz, final String msg, final Object... msgArgs) {
     if (value == null) {
