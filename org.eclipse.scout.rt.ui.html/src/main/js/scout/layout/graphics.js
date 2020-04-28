@@ -139,19 +139,21 @@ scout.graphics = {
    * If prefSize is called during the animation, the current size is returned instead of the one after the animation.
    */
   prefSizeWithoutAnimation: function($elem, options) {
-    var animateClass = scout.arrays.find(options.animateClasses, function(cssClass) {
+    var animateClasses = scout.arrays.ensure(options.animateClasses);
+    animateClasses = animateClasses.filter(function(cssClass) {
       return $elem.hasClass(cssClass);
     });
     options = $.extend({}, options);
     options.animateClasses = null;
 
-    if (!animateClass) {
+    if (animateClasses.length === 0) {
       return this.prefSize($elem, options);
     }
 
+    animateClasses = scout.arrays.format(animateClasses, ' ');
     var $clone = $elem
       .clone()
-      .removeClass(animateClass)
+      .removeClass(animateClasses)
       .appendTo($elem.parent());
     var prefSize = scout.graphics.prefSize($clone, options);
     $clone.remove();
