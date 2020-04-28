@@ -304,7 +304,7 @@ class ClosingApacheConnector extends ApacheConnector {
     catch (Exception e) {
       LOGGER.log(Level.FINER, "writeOutBoundHeaders(ClientRequest,class, HttpUriRequest.class) does not exist", e);
     }
-    LOGGER.info("using writeOutBoundHeaers with clientRequest: " + useApiWithClientRequest);
+    LOGGER.info("using writeOutBoundHeaders with clientRequest: " + useApiWithClientRequest);
     return useApiWithClientRequest;
   }
 
