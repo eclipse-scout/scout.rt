@@ -11,11 +11,11 @@
 import {BooleanColumn} from '../../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-describe('BooleanColumn', function() {
-  var session;
-  var helper;
+describe('BooleanColumn', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
@@ -23,55 +23,55 @@ describe('BooleanColumn', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
-  describe('table checkable column', function() {
+  describe('table checkable column', () => {
 
-    it('a checkbox column gets inserted if table.checkable=true', function() {
-      var model = helper.createModelFixture(2);
+    it('a checkbox column gets inserted if table.checkable=true', () => {
+      let model = helper.createModelFixture(2);
       model.checkable = true;
       expect(model.columns.length).toBe(2);
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       expect(table.columns.length).toBe(3);
 
       table.render();
       expect(table.columns[0] instanceof BooleanColumn).toBeTruthy();
     });
 
-    it('no checkbox column gets inserted if table.checkable=false', function() {
-      var model = helper.createModelFixture(2);
+    it('no checkbox column gets inserted if table.checkable=false', () => {
+      let model = helper.createModelFixture(2);
       model.checkable = false;
       expect(model.columns.length).toBe(2);
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       expect(table.columns.length).toBe(2);
 
       table.render();
       expect(table.columns[0] instanceof BooleanColumn).toBeFalsy();
     });
 
-    it('this.checkableColumn is set to the new column', function() {
-      var model = helper.createModelFixture(2);
+    it('this.checkableColumn is set to the new column', () => {
+      let model = helper.createModelFixture(2);
       model.checkable = true;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render();
 
       expect(table.checkableColumn).not.toBeUndefined();
       expect(table.checkableColumn).toBe(table.columns[0]);
     });
 
-    it('displays the row.checked state as checkbox', function() {
-      var model = helper.createModelFixture(2, 2);
+    it('displays the row.checked state as checkbox', () => {
+      let model = helper.createModelFixture(2, 2);
       model.checkable = true;
       model.rows[0].checked = true;
       model.rows[1].checked = false;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render();
-      var $rows = table.$rows();
-      var $checkbox = table.columns[0].$checkBox($rows.eq(0));
+      let $rows = table.$rows();
+      let $checkbox = table.columns[0].$checkBox($rows.eq(0));
       expect($checkbox).toHaveClass('checked');
       $checkbox = table.columns[0].$checkBox($rows.eq(1));
       expect($checkbox).not.toHaveClass('checked');
@@ -79,17 +79,17 @@ describe('BooleanColumn', function() {
 
   });
 
-  describe('boolean column', function() {
+  describe('boolean column', () => {
 
-    it('displays the cell value as checkbox', function() {
-      var model = helper.createModelFixture(2, 2);
+    it('displays the cell value as checkbox', () => {
+      let model = helper.createModelFixture(2, 2);
       model.columns[0].objectType = 'BooleanColumn';
       model.rows[0].cells[0].value = true;
       model.rows[1].cells[0].value = false;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render();
-      var $rows = table.$rows();
-      var $checkbox = table.columns[0].$checkBox($rows.eq(0));
+      let $rows = table.$rows();
+      let $checkbox = table.columns[0].$checkBox($rows.eq(0));
       expect($checkbox).toHaveClass('checked');
       $checkbox = table.columns[0].$checkBox($rows.eq(1));
       expect($checkbox).not.toHaveClass('checked');

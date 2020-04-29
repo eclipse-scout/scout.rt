@@ -71,7 +71,7 @@ export default class Accordion extends Widget {
 
   deleteGroups(groupsToDelete) {
     groupsToDelete = arrays.ensure(groupsToDelete);
-    var groups = this.groups.slice();
+    let groups = this.groups.slice();
     arrays.removeAll(groups, groupsToDelete);
     this.setGroups(groups);
   }
@@ -97,8 +97,8 @@ export default class Accordion extends Widget {
 
     // Only delete those which are not in the new array
     // Only insert those which are not already there
-    var groupsToDelete = arrays.diff(this.groups, groups);
-    var groupsToInsert = arrays.diff(groups, this.groups);
+    let groupsToDelete = arrays.diff(this.groups, groups);
+    let groupsToInsert = arrays.diff(groups, this.groups);
     this._deleteGroups(groupsToDelete);
     this._insertGroups(groupsToInsert);
     this._sort(groups);
@@ -174,7 +174,7 @@ export default class Accordion extends Widget {
   }
 
   sort() {
-    var groups = this.groups.slice();
+    let groups = this.groups.slice();
     this._sort(groups);
     this._updateGroupOrder(groups);
     this._setProperty('groups', groups);
@@ -193,7 +193,7 @@ export default class Accordion extends Widget {
     }
     // Loop through the the groups and move every html element to the end of the container
     // Only move if the order is different to the old order
-    var different = false;
+    let different = false;
     groups.forEach(function(group, i) {
       if (this.groups[i] !== group || different) {
         // Start ordering as soon as the order of the array starts to differ
@@ -227,7 +227,7 @@ export default class Accordion extends Widget {
    * @override
    */
   getFocusableElement() {
-    var group = widgets.findFirstFocusableWidget(this.groups, this);
+    let group = widgets.findFirstFocusableWidget(this.groups, this);
     if (group) {
       return group.getFocusableElement();
     }
@@ -247,14 +247,14 @@ export default class Accordion extends Widget {
     if (!this.exclusiveExpand) {
       return;
     }
-    var expandedGroup = arrays.find(this.groups, function(group) {
+    let expandedGroup = arrays.find(this.groups, group => {
       return group.visible && !group.collapsed;
     });
     this._collapseOthers(expandedGroup);
   }
 
   setCollapseStyle(collapseStyle) {
-    this.groups.forEach(function(group) {
+    this.groups.forEach(group => {
       group.setCollapseStyle(collapseStyle);
     });
     this.setProperty('collapseStyle', collapseStyle);
@@ -264,7 +264,7 @@ export default class Accordion extends Widget {
     if (!expandedGroup || !expandedGroup.collapsible) {
       return;
     }
-    this.groups.forEach(function(group) {
+    this.groups.forEach(group => {
       if (group !== expandedGroup && group.collapsible) {
         group.setCollapsed(true);
       }

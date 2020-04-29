@@ -20,11 +20,11 @@ import {scout, WizardProgressField} from '../../../../src/index';
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-describe('WizardProgressField', function() {
+describe('WizardProgressField', () => {
 
-  var session, field;
+  let session, field;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     field = new WizardProgressField();
@@ -32,9 +32,9 @@ describe('WizardProgressField', function() {
   });
 
   // #241222
-  describe('rendering', function() {
+  describe('rendering', () => {
 
-    it('must evaluate activeStepIndex for action-enabled class', function() {
+    it('must evaluate activeStepIndex for action-enabled class', () => {
       field = scout.create('WizardProgressField', {
         parent: session.desktop
       });
@@ -52,7 +52,7 @@ describe('WizardProgressField', function() {
         'actionEnabled': true
       }]);
 
-      var $steps = field.$container.find('.wizard-step');
+      let $steps = field.$container.find('.wizard-step');
       expect($steps.length).toBe(2);
       expect($steps.eq(0).hasClass('action-enabled')).toBe(true);
       expect($steps.eq(1).hasClass('action-enabled')).toBe(false);

@@ -24,7 +24,7 @@ export default class LookupFieldAdapter extends ValueFieldAdapter {
    * @param {object} [queryData] optional data (text, key, rec)
    */
   sendLookup(queryBy, queryData) {
-    var propertyName = queryBy.toLowerCase(),
+    let propertyName = queryBy.toLowerCase(),
       requestType = 'lookupBy' + strings.toUpperCaseFirstLetter(propertyName),
       requestData = {
         showBusyIndicator: false

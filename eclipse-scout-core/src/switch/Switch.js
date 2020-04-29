@@ -46,7 +46,7 @@ export default class Switch extends Widget {
   }
 
   _onSwitchButtonClick() {
-    var event = new Event();
+    let event = new Event();
     this.trigger('switch', event);
     if (!event.defaultPrevented) {
       this.setActivated(!this.activated);

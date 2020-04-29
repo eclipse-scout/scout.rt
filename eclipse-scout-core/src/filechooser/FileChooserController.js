@@ -52,10 +52,10 @@ export default class FileChooserController {
    * Renders all file choosers registered with this controller.
    */
   render() {
-    this.displayParent.fileChoosers.forEach(function(chooser) {
+    this.displayParent.fileChoosers.forEach(chooser => {
       chooser.setDisplayParent(this.displayParent);
       this._render(chooser);
-    }.bind(this));
+    });
   }
 
   _render(fileChooser) {
@@ -78,7 +78,7 @@ export default class FileChooserController {
     // Open all file choosers in the center of the desktop, except the ones that belong to a popup-window
     // Since the file chooser doesn't have a DOM element as parent when render is called, we must find the
     // entryPoint by using the model.
-    var $parent;
+    let $parent;
     if (this.displayParent instanceof Form && this.displayParent.isPopupWindow()) {
       $parent = this.displayParent.popupWindow.$container;
     } else {
@@ -105,7 +105,7 @@ export default class FileChooserController {
    * This method has no effect if already attached.
    */
   attach() {
-    this.displayParent.fileChoosers.forEach(function(fileChooser) {
+    this.displayParent.fileChoosers.forEach(fileChooser => {
       fileChooser.attach();
     }, this);
   }
@@ -117,7 +117,7 @@ export default class FileChooserController {
    * This method has no effect if already detached.
    */
   detach() {
-    this.displayParent.fileChoosers.forEach(function(fileChooser) {
+    this.displayParent.fileChoosers.forEach(fileChooser => {
       fileChooser.detach();
     }, this);
   }

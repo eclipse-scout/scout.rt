@@ -52,7 +52,7 @@ export default class ColumnOptimalWidthMeasurer {
 
     if (this.completeImageCount >= this.imageCount) {
       // Measure now
-      var optimalWidth = this._measure();
+      let optimalWidth = this._measure();
       $.log.isDebugEnabled() && $.log.debug('Optimal width measuring done (sync) for column ' + this.column.id + ': ' + optimalWidth);
       this.remove();
       return optimalWidth;
@@ -77,7 +77,7 @@ export default class ColumnOptimalWidthMeasurer {
   }
 
   _measure() {
-    var optimalWidth = this.column.minWidth;
+    let optimalWidth = this.column.minWidth;
     // Since the measurement may be async due to image loading, the $measurement is hidden (=display: none) until the real measurement starts.
     // Otherwise it would influence the scroll width of the real table data
     this.$measurement
@@ -116,7 +116,7 @@ export default class ColumnOptimalWidthMeasurer {
   }
 
   _appendRow(row) {
-    var columnContent = this.column.buildCellForRow(row);
+    let columnContent = this.column.buildCellForRow(row);
     if (this._columnCellContents[columnContent]) {
       return;
     }
@@ -135,16 +135,16 @@ export default class ColumnOptimalWidthMeasurer {
 
   _appendToMeasurement($calc) {
     // Count images
-    var $calcImgs = $calc.find('img');
-    $calcImgs.each(function(index, elem) {
-      var $img = $(elem);
+    let $calcImgs = $calc.find('img');
+    $calcImgs.each((index, elem) => {
+      let $img = $(elem);
       $img.data('measure', 'in-progress');
       if (elem.complete) {
         $img.data('complete', elem.complete);
         this.completeImageCount++;
       }
       this.imageCount++;
-    }.bind(this));
+    });
 
     // Append to measurement element
     $calc.css({
@@ -154,7 +154,7 @@ export default class ColumnOptimalWidthMeasurer {
   }
 
   _onImageLoadOrError(event) {
-    var $img = $(event.target);
+    let $img = $(event.target);
     if ($img.data('complete')) {
       // Ignore images which were already complete and therefore already incremented the _imageCompleteCount
       return;
@@ -163,7 +163,7 @@ export default class ColumnOptimalWidthMeasurer {
     this.completeImageCount++;
     $.log.isTraceEnabled() && $.log.trace('Images complete (async) ' + this.completeImageCount + '/' + this.imageCount, event.target.src);
     if (this.completeImageCount >= this.imageCount) {
-      var optimalWidth = this._measure();
+      let optimalWidth = this._measure();
       $.log.isDebugEnabled() && $.log.debug('Optimal width measuring done (async) for column ' + this.column.id + ': ' + optimalWidth);
       this._resolve(optimalWidth);
     }

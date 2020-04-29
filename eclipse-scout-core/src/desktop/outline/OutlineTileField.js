@@ -34,7 +34,7 @@ export default class OutlineTileField extends FormField {
     if (this.tileOutlineOverview) {
       return;
     }
-    var outline = this.outline ? this.session.getWidget(this.outline) : null;
+    let outline = this.outline ? this.session.getWidget(this.outline) : null;
     this.tileOutlineOverview = scout.create('TileOutlineOverview', {
       parent: this,
       outline: outline

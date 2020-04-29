@@ -44,7 +44,7 @@ export default class PopupWindow {
 
   _onReady() {
     // set container (used as document-root from callers)
-    var myDocument = this.myWindow.document,
+    let myDocument = this.myWindow.document,
       $myWindow = $(this.myWindow),
       $myDocument = $(myDocument);
 
@@ -60,7 +60,7 @@ export default class PopupWindow {
 
     // resize browser-window before layout?
     if (this.resizeToPrefSize) {
-      var prefSize = this.htmlComp.prefSize(),
+      let prefSize = this.htmlComp.prefSize(),
         // we cannot simply set the pref. size of the component as window size,
         // since the window "chrome" (window-border, -title and location bar)
         // occupies some space. That's why we measure the difference between
@@ -100,7 +100,7 @@ export default class PopupWindow {
   // if we need to do that in a later release we should take a look on the SO-post below:
   // http://stackoverflow.com/questions/4319487/detecting-if-the-browser-window-is-moved-with-javascript
   _onResize() {
-    var $myWindow = $(this.myWindow),
+    let $myWindow = $(this.myWindow),
       width = $myWindow.width(),
       height = $myWindow.height(),
       left = this.myWindow.screenX,
@@ -108,7 +108,7 @@ export default class PopupWindow {
     $.log.isDebugEnabled() && $.log.debug('popup-window resize: width=' + width + ' height=' + height + ' top=' + top + ' left=' + left);
 
     this.form.storeCacheBounds(new Rectangle(left, top, width, height));
-    var windowSize = new Dimension($myWindow.width(), $myWindow.height());
+    let windowSize = new Dimension($myWindow.width(), $myWindow.height());
     this.htmlComp.setSize(windowSize);
   }
 

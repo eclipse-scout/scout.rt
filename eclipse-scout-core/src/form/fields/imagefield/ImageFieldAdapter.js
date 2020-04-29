@@ -25,7 +25,7 @@ export default class ImageFieldAdapter extends FormFieldAdapter {
   }
 
   _onFileUpload(event) {
-    var success = this.widget.fileInput.upload();
+    let success = this.widget.fileInput.upload();
     if (!success) {
       this.widget.fileInput.clear();
     }

@@ -17,7 +17,7 @@ export default class HorizontalGrid extends AbstractGrid {
   }
 
   layoutAllDynamic(widgets) {
-    var matrix = new HorizontalGridMatrix(this.getGridColumnCount());
+    let matrix = new HorizontalGridMatrix(this.getGridColumnCount());
     matrix.computeGridData(widgets);
     this.gridRows = matrix.getRowCount();
   }

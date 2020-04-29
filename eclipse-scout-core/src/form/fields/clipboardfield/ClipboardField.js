@@ -16,8 +16,10 @@ export default class ClipboardField extends ValueField {
   constructor() {
     super();
 
+    this.allowedMimeTypes = null;
     this.dropType = 0;
     this.dropMaximumSize = dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
+    this.maximumSize = null;
     this._fileUploadWaitRetryCountTimeout = 99;
     this._fullSelectionLength = 0;
   }
@@ -106,9 +108,9 @@ export default class ClipboardField extends ValueField {
   }
 
   _renderDisplayText() {
-    var displayText = this.displayText;
-    var img;
-    this.$field.children().each(function(idx, elem) {
+    let displayText = this.displayText;
+    let img;
+    this.$field.children().each((idx, elem) => {
       if (!img && elem.nodeName === 'IMG') {
         img = elem;
       }
@@ -118,12 +120,12 @@ export default class ClipboardField extends ValueField {
       this.$field.html(strings.nl2br(displayText, true));
       this._installScrollbars();
 
-      setTimeout(function() {
+      setTimeout(() => {
         this.$field.selectAllText();
         // store length of full selection, in order to determine if the whole text is selected in "onCopy"
-        var selection = this._getSelection();
+        let selection = this._getSelection();
         this._fullSelectionLength = (selection) ? selection.toString().length : 0;
-      }.bind(this));
+      });
     } else {
       this.$field.empty();
     }
@@ -145,7 +147,7 @@ export default class ClipboardField extends ValueField {
   }
 
   _getSelection() {
-    var selection, myWindow = this.$container.window(true);
+    let selection, myWindow = this.$container.window(true);
     if (myWindow.getSelection) {
       selection = myWindow.getSelection();
     } else if (document.getSelection) {
@@ -179,7 +181,7 @@ export default class ClipboardField extends ValueField {
       return;
     }
 
-    var selection, text, dataTransfer, myWindow = this.$container.window(true);
+    let selection, text, dataTransfer, myWindow = this.$container.window(true);
     try {
       if (event.originalEvent.clipboardData) {
         dataTransfer = event.originalEvent.clipboardData;
@@ -232,14 +234,14 @@ export default class ClipboardField extends ValueField {
     // Setting custom clipboard data is not possible with iOS due to a WebKit bug.
     // The default behavior copies rich text. Since it is not expected to copy the style of the clipboard field, temporarily set color and background-color
     // https://bugs.webkit.org/show_bug.cgi?id=176980
-    var oldStyle = this.$field.attr('style');
+    let oldStyle = this.$field.attr('style');
     this.$field.css({
       'color': '#000',
       'background-color': 'transparent'
     });
-    setTimeout(function() {
+    setTimeout(() => {
       this.$field.attrOrRemove('style', oldStyle);
-    }.bind(this));
+    });
     return false;
   }
 
@@ -249,8 +251,8 @@ export default class ClipboardField extends ValueField {
       return false;
     }
 
-    var startPasteTimestamp = Date.now();
-    var dataTransfer, myWindow = this.$container.window(true);
+    let startPasteTimestamp = Date.now();
+    let dataTransfer, myWindow = this.$container.window(true);
     this.$field.selectAllText();
     if (event.originalEvent.clipboardData) {
       dataTransfer = event.originalEvent.clipboardData;
@@ -261,13 +263,13 @@ export default class ClipboardField extends ValueField {
       throw new Error('Unable to access clipboard data.');
     }
 
-    var filesArgument = [], // options to be uploaded, arguments for this.session.uploadFiles
+    let filesArgument = [], // options to be uploaded, arguments for this.session.uploadFiles
       additionalOptions = {},
       additionalOptionsCompatibilityIndex = 0, // counter for additional options
       contentCount = 0;
 
     // some browsers (e.g. IE) specify text content simply as data of type 'Text', it is not listed in list of types
-    var textContent = dataTransfer.getData('Text');
+    let textContent = dataTransfer.getData('Text');
     if (textContent) {
       if (window.Blob) {
         filesArgument.push(new Blob([textContent], {
@@ -282,16 +284,16 @@ export default class ClipboardField extends ValueField {
     }
 
     if (contentCount === 0 && dataTransfer.items) {
-      Array.prototype.forEach.call(dataTransfer.items, function(item) {
+      Array.prototype.forEach.call(dataTransfer.items, item => {
         if (item.type === mimeTypes.TEXT_PLAIN) {
-          item.getAsString(function(str) {
+          item.getAsString(str => {
             filesArgument.push(new Blob([str], {
               type: mimeTypes.TEXT_PLAIN
             }));
             contentCount++;
           });
         } else if (scout.isOneOf(item.type, [mimeTypes.IMAGE_PNG, mimeTypes.IMAGE_JPG, mimeTypes.IMAGE_JPEG, mimeTypes.IMAGE_GIF])) {
-          var file = item.getAsFile();
+          let file = item.getAsFile();
           if (file) {
             // When pasting an image from the clipboard, Chrome and Firefox create a File object with
             // a generic name such as "image.png" or "grafik.png" (hardcoded in Chrome, locale-dependent
@@ -300,7 +302,7 @@ export default class ClipboardField extends ValueField {
             // event and the file's last modified timestamp. If it is "very small", the file is likely
             // a bitmap from the clipboard and not a real file. In that case, add a special "scoutName"
             // attribute to the file object that is then used as a filename in session.uploadFiles().
-            var lastModifiedDiff = startPasteTimestamp - file.lastModified;
+            let lastModifiedDiff = startPasteTimestamp - file.lastModified;
             if (lastModifiedDiff < 1000) {
               file.scoutName = Session.EMPTY_UPLOAD_FILENAME;
             }
@@ -312,20 +314,20 @@ export default class ClipboardField extends ValueField {
       this._cleanupFiles(filesArgument);
     }
 
-    var waitForFileReaderEvents = 0;
+    let waitForFileReaderEvents = 0;
     if (contentCount === 0 && dataTransfer.files) {
-      Array.prototype.forEach.call(dataTransfer.files, function(item) {
-        var reader = new FileReader();
+      Array.prototype.forEach.call(dataTransfer.files, item => {
+        let reader = new FileReader();
         // register functions for file reader
-        reader.onload = function(event) {
-          var f = new Blob([event.target.result], {
+        reader.onload = event => {
+          let f = new Blob([event.target.result], {
             type: item.type
           });
           f.name = item.name;
           filesArgument.push(f);
           waitForFileReaderEvents--;
         };
-        reader.onerror = function(event) {
+        reader.onerror = event => {
           waitForFileReaderEvents--;
           $.log.error('Error while reading file ' + item.name + ' / ' + event.target.error.code);
         };
@@ -337,15 +339,15 @@ export default class ClipboardField extends ValueField {
     }
 
     // upload function needs to be called asynchronously to support real files
-    var uploadFunctionTimeoutCount = 0;
-    var uploadFunction = function() {
+    let uploadFunctionTimeoutCount = 0;
+    let uploadFunction = () => {
       if (waitForFileReaderEvents !== 0 && uploadFunctionTimeoutCount++ !== this._fileUploadWaitRetryCountTimeout) {
         setTimeout(uploadFunction, 150);
         return;
       }
 
       if (uploadFunctionTimeoutCount >= this._fileUploadWaitRetryCountTimeout) {
-        var boxOptions = {
+        let boxOptions = {
           entryPoint: this.$container.entryPoint(),
           header: this.session.text('ui.ClipboardTimeoutTitle'),
           body: this.session.text('ui.ClipboardTimeout'),
@@ -360,34 +362,34 @@ export default class ClipboardField extends ValueField {
       if (filesArgument.length > 0 || Object.keys(additionalOptions).length > 0) {
         this.session.uploadFiles(this, filesArgument, additionalOptions, this.maximumSize, this.allowedMimeTypes);
       }
-    }.bind(this);
+    };
 
     // upload content function, if content can not be read from event
     // (e.g. "Allow programmatic clipboard access" is disabled in IE)
-    var uploadContentFunction = function() {
+    let uploadContentFunction = () => {
       // store old inner html (will be replaced)
       this._uninstallScrollbars();
-      var oldHtmlContent = this.$field.html();
+      let oldHtmlContent = this.$field.html();
       this.$field.html('');
-      var restoreOldHtmlContent = function() {
+      let restoreOldHtmlContent = () => {
         this.$field.html(oldHtmlContent);
         this._installScrollbars();
-      }.bind(this);
-      setTimeout(function() {
-        var imgElementsFound = false;
-        this.$field.children().each(function(idx, elem) {
+      };
+      setTimeout(() => {
+        let imgElementsFound = false;
+        this.$field.children().each((idx, elem) => {
           if (elem.nodeName === 'IMG') {
-            var srcAttr = $(elem).attr('src');
-            var srcDataMatch = /^data:(.*);base64,(.*)/.exec(srcAttr);
-            var mimeType = srcDataMatch && srcDataMatch[1];
+            let srcAttr = $(elem).attr('src');
+            let srcDataMatch = /^data:(.*);base64,(.*)/.exec(srcAttr);
+            let mimeType = srcDataMatch && srcDataMatch[1];
             if (scout.isOneOf(mimeType, mimeTypes.IMAGE_PNG, mimeTypes.IMAGE_JPG, mimeTypes.IMAGE_JPEG, mimeTypes.IMAGE_GIF)) {
-              var encData = window.atob(srcDataMatch[2]); // base64 decode
-              var byteNumbers = [];
-              for (var i = 0; i < encData.length; i++) {
+              let encData = window.atob(srcDataMatch[2]); // base64 decode
+              let byteNumbers = [];
+              for (let i = 0; i < encData.length; i++) {
                 byteNumbers[i] = encData.charCodeAt(i);
               }
-              var byteArray = new Uint8Array(byteNumbers);
-              var f = new Blob([byteArray], {
+              let byteArray = new Uint8Array(byteNumbers);
+              let f = new Blob([byteArray], {
                 type: mimeType
               });
               f.name = '';
@@ -400,7 +402,7 @@ export default class ClipboardField extends ValueField {
           restoreOldHtmlContent();
         } else {
           // try to read nativly pasted text from field
-          var nativePasteContent = this.$field.text();
+          let nativePasteContent = this.$field.text();
           if (strings.hasText(nativePasteContent)) {
             this.setDisplayText(nativePasteContent);
             filesArgument.push(new Blob([nativePasteContent], {
@@ -411,8 +413,8 @@ export default class ClipboardField extends ValueField {
           }
         }
         uploadFunction();
-      }.bind(this), 0);
-    }.bind(this);
+      }, 0);
+    };
 
     if (contentCount > 0) {
       uploadFunction();
@@ -434,9 +436,9 @@ export default class ClipboardField extends ValueField {
     if (files.length !== 2) {
       return;
     }
-    var pngImage;
-    var jpgImage;
-    files.forEach(function(file) {
+    let pngImage;
+    let jpgImage;
+    files.forEach(file => {
       // Check for the scoutName because it will only be set if it is likely a paste from clipboard event
       if (file.name === 'image.png' && file.scoutName) {
         pngImage = file;

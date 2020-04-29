@@ -104,7 +104,7 @@ export default class Widget {
     this._parentRemovingWhileAnimatingHandler = this._onParentRemovingWhileAnimating.bind(this);
     this._scrollHandler = this._onScroll.bind(this);
     this.events = this._createEventSupport();
-    this.events.registerSubTypePredicate('propertyChange', function(event, propertyName) {
+    this.events.registerSubTypePredicate('propertyChange', (event, propertyName) => {
       return event.propertyName === propertyName;
     });
     this.loadingSupport = this._createLoadingSupport();
@@ -129,7 +129,7 @@ export default class Widget {
   };
 
   init(model) {
-    var staticModel = this._jsonModel();
+    let staticModel = this._jsonModel();
     if (staticModel) {
       model = $.extend({}, staticModel, model);
     }
@@ -168,7 +168,7 @@ export default class Widget {
       throw new Error('Session expected: ' + this);
     }
 
-    this._eachProperty(model, function(propertyName, value, isWidgetProperty) {
+    this._eachProperty(model, (propertyName, value, isWidgetProperty) => {
       if (value === undefined) {
         // Don't set the value if it is undefined, compared to null which is allowed explicitly ($.extend works in the same way)
         return;
@@ -177,7 +177,7 @@ export default class Widget {
         value = this._prepareWidgetProperty(propertyName, value);
       }
       this._initProperty(propertyName, value);
-    }.bind(this));
+    });
 
     this._setCssClass(this.cssClass);
     this._setLogicalGrid(this.logicalGrid);
@@ -212,7 +212,7 @@ export default class Widget {
       return this._createChild(models);
     }
 
-    var widgets = [];
+    let widgets = [];
     models.forEach(function(model, i) {
       widgets[i] = this._createChild(model);
     }, this);
@@ -231,7 +231,7 @@ export default class Widget {
     }
     if (typeof model === 'string') {
       // Special case: If only an ID is supplied, try to (locally) resolve the corresponding widget
-      var existingWidget = this.widget(model);
+      let existingWidget = this.widget(model);
       if (!existingWidget) {
         throw new Error('Referenced widget not found: ' + model);
       }
@@ -262,9 +262,9 @@ export default class Widget {
     if (this.rendered && (this.animateRemoval || this._isRemovalPrevented())) {
       // Do not destroy yet if the removal happens animated
       // Also don't destroy if the removal is pending to keep the parent / child link until removal finishes
-      this.one('remove', function() {
+      this.one('remove', () => {
         this.destroy();
-      }.bind(this));
+      });
       this.remove();
       return;
     }
@@ -376,9 +376,9 @@ export default class Widget {
    * By default executes every action of this._postRenderActions
    */
   _postRender() {
-    var actions = this._postRenderActions;
+    let actions = this._postRenderActions;
     this._postRenderActions = [];
-    actions.forEach(function(action) {
+    actions.forEach(action => {
       action();
     });
   }
@@ -410,7 +410,7 @@ export default class Widget {
     if (this.removalPending) {
       return true;
     }
-    var parent = this.parent;
+    let parent = this.parent;
     if (!parent || parent.removing || parent.rendering) {
       // If parent is being removed or rendered, no need to check the ancestors because removing / rendering is already in progress
       return false;
@@ -480,7 +480,7 @@ export default class Widget {
 
     this.removalPending = true;
     // Don't execute immediately to make sure nothing interferes with the animation (e.g. layouting) which could make it laggy
-    setTimeout(function() {
+    setTimeout(() => {
       // check if the container has been removed in the meantime
       if (!this.rendered) {
         return;
@@ -494,10 +494,10 @@ export default class Widget {
         return;
       }
       this.$container.addClass(this.animateRemovalClass);
-      this.$container.oneAnimationEnd(function() {
+      this.$container.oneAnimationEnd(() => {
         this._removeInternal();
-      }.bind(this));
-    }.bind(this));
+      });
+    });
 
     // If the parent is being removed while the animation is running, the animationEnd event will never fire
     // -> Make sure remove is called nevertheless. Important: remove it before the parent is removed to maintain the regular remove order
@@ -578,9 +578,9 @@ export default class Widget {
       // If they are already linked to a new parent, removing the children is not possible anymore.
       // This may lead to an "Already rendered" exception if the new parent wants to render its children.
       if (this.parent._isRemovalPending()) {
-        this.parent.one('remove', function() {
+        this.parent.one('remove', () => {
           this.setParent(parent);
-        }.bind(this));
+        });
         return;
       }
 
@@ -593,7 +593,7 @@ export default class Widget {
         this.parent._removeChild(this);
       }
     }
-    var oldParent = this.parent;
+    let oldParent = this.parent;
     this.parent = parent;
     this.parent._addChild(this);
     this.trigger('hierarchyChange', {
@@ -620,8 +620,8 @@ export default class Widget {
    * @returns {Widget[]} a list of all ancestors
    */
   ancestors() {
-    var ancestors = [];
-    var parent = this.parent;
+    let ancestors = [];
+    let parent = this.parent;
     while (parent) {
       ancestors.push(parent);
       parent = parent.parent;
@@ -675,7 +675,7 @@ export default class Widget {
     if (this.session.desktop) {
       return this.session.desktop;
     }
-    return this.findParent(function(parent) {
+    return this.findParent(parent => {
       return parent instanceof Desktop;
     });
   }
@@ -700,7 +700,7 @@ export default class Widget {
     }
 
     if (updateChildren) {
-      this.visitChildren(function(field) {
+      this.visitChildren(field => {
         field.setEnabled(enabled);
       });
     }
@@ -721,7 +721,7 @@ export default class Widget {
       }
     }
 
-    var enabledComputed = this._computeEnabled(this.inheritAccessibility, parentEnabled);
+    let enabledComputed = this._computeEnabled(this.inheritAccessibility, parentEnabled);
     this._updateEnabledComputed(enabledComputed);
   }
 
@@ -739,8 +739,8 @@ export default class Widget {
       this._renderEnabled();
     }
 
-    var computedStateForChildren = scout.nvl(enabledComputedForChildren, enabledComputed);
-    this.children.forEach(function(child) {
+    let computedStateForChildren = scout.nvl(enabledComputedForChildren, enabledComputed);
+    this.children.forEach(child => {
       if (child.inheritAccessibility) {
         child.recomputeEnabled(computedStateForChildren);
       }
@@ -773,7 +773,7 @@ export default class Widget {
   setDisabledStyle(disabledStyle) {
     this.setProperty('disabledStyle', disabledStyle);
 
-    this.children.forEach(function(child) {
+    this.children.forEach(child => {
       child.setDisabledStyle(disabledStyle);
     });
   }
@@ -823,7 +823,7 @@ export default class Widget {
    * @returns {boolean} true if every parent within the hierarchy is visible.
    */
   isEveryParentVisible() {
-    var parent = this.parent;
+    let parent = this.parent;
     while (parent) {
       if (!parent.isVisible()) {
         return false;
@@ -876,9 +876,9 @@ export default class Widget {
   }
 
   addCssClass(cssClass) {
-    var cssClasses = this.cssClassAsArray();
-    var cssClassesToAdd = Widget.cssClassAsArray(cssClass);
-    cssClassesToAdd.forEach(function(newCssClass) {
+    let cssClasses = this.cssClassAsArray();
+    let cssClassesToAdd = Widget.cssClassAsArray(cssClass);
+    cssClassesToAdd.forEach(newCssClass => {
       if (cssClasses.indexOf(newCssClass) >= 0) {
         return;
       }
@@ -888,8 +888,8 @@ export default class Widget {
   }
 
   removeCssClass(cssClass) {
-    var cssClasses = this.cssClassAsArray();
-    var cssClassesToRemove = Widget.cssClassAsArray(cssClass);
+    let cssClasses = this.cssClassAsArray();
+    let cssClassesToRemove = Widget.cssClassAsArray(cssClass);
     if (arrays.removeAll(cssClasses, cssClassesToRemove)) {
       this.setProperty('cssClass', arrays.format(cssClasses, ' '));
     }
@@ -1061,7 +1061,7 @@ export default class Widget {
       return;
     }
     if (scout.nvl(invalidateLayout, true)) {
-      var htmlCompParent = this.htmlComp.getParent();
+      let htmlCompParent = this.htmlComp.getParent();
       if (htmlCompParent) {
         htmlCompParent.invalidateLayoutTree();
       }
@@ -1132,7 +1132,7 @@ export default class Widget {
    * for popup-window this function will return the body of the document in the popup window.
    */
   entryPoint() {
-    var $element = scout.nvl(this.$container, this.parent.$container);
+    let $element = scout.nvl(this.$container, this.parent.$container);
     if (!$element || !$element.length) {
       throw new Error('Cannot resolve entryPoint, $element.length is 0 or undefined');
     }
@@ -1140,12 +1140,12 @@ export default class Widget {
   }
 
   window(domElement) {
-    var $el = this.$container || this.$parent;
+    let $el = this.$container || this.$parent;
     return $el ? $el.window(domElement) : domElement ? null : $(null);
   }
 
   document(domElement) {
-    var $el = this.$container || this.$parent;
+    let $el = this.$container || this.$parent;
     return $el ? $el.document(domElement) : domElement ? null : $(null);
   }
 
@@ -1187,7 +1187,7 @@ export default class Widget {
   }
 
   _triggerChildrenOnAttach(parent) {
-    this.children.forEach(function(child) {
+    this.children.forEach(child => {
       child._onAttach();
       child._triggerChildrenOnAttach(parent);
     });
@@ -1242,9 +1242,9 @@ export default class Widget {
       return;
     }
 
-    var activeElement = this.$container.document(true).activeElement;
-    var isFocused = this.$container.isOrHas(activeElement);
-    var focusManager = this.session.focusManager;
+    let activeElement = this.$container.document(true).activeElement;
+    let isFocused = this.$container.isOrHas(activeElement);
+    let focusManager = this.session.focusManager;
 
     if (focusManager.isFocusContextInstalled(this.$container)) {
       this._uninstallFocusContext();
@@ -1255,7 +1255,7 @@ export default class Widget {
   }
 
   _triggerChildrenOnDetach() {
-    this.children.forEach(function(child) {
+    this.children.forEach(child => {
       child._onDetach();
       child._triggerChildrenOnDetach(parent);
     });
@@ -1318,7 +1318,7 @@ export default class Widget {
    */
   triggerPropertyChange(propertyName, oldValue, newValue) {
     scout.assertParameter('propertyName', propertyName);
-    var event = new Event({
+    let event = new Event({
       propertyName: propertyName,
       oldValue: oldValue,
       newValue: newValue
@@ -1332,12 +1332,12 @@ export default class Widget {
    */
   _setProperty(propertyName, newValue) {
     scout.assertParameter('propertyName', propertyName);
-    var oldValue = this[propertyName];
+    let oldValue = this[propertyName];
     if (objects.equals(oldValue, newValue)) {
       return;
     }
     this[propertyName] = newValue;
-    var event = this.triggerPropertyChange(propertyName, oldValue, newValue);
+    let event = this.triggerPropertyChange(propertyName, oldValue, newValue);
     if (event.defaultPrevented) {
       // Revert to old value if property change should be prevented
       this[propertyName] = oldValue;
@@ -1380,7 +1380,7 @@ export default class Widget {
     // Create new child widget(s)
     widgets = this._createChildren(widgets);
 
-    var oldWidgets = this[propertyName];
+    let oldWidgets = this[propertyName];
     if (oldWidgets && Array.isArray(widgets)) {
       // If new value is an array, old value has to be one as well
       // Only destroy those which are not in the new array
@@ -1409,11 +1409,11 @@ export default class Widget {
     if (this.isPreserveOnPropertyChangeProperty(propertyName)) {
       return;
     }
-    var widgets = this[propertyName];
+    let widgets = this[propertyName];
     if (!widgets) {
       return;
     }
-    var removeFuncName = '_remove' + strings.toUpperCaseFirstLetter(propertyName);
+    let removeFuncName = '_remove' + strings.toUpperCaseFirstLetter(propertyName);
     if (this[removeFuncName]) {
       this[removeFuncName]();
     } else {
@@ -1426,13 +1426,13 @@ export default class Widget {
    */
   _internalRemoveWidgets(widgets) {
     widgets = arrays.ensure(widgets);
-    widgets.forEach(function(widget) {
+    widgets.forEach(widget => {
       widget.remove();
     });
   }
 
   _callSetProperty(propertyName, value) {
-    var setFuncName = '_set' + strings.toUpperCaseFirstLetter(propertyName);
+    let setFuncName = '_set' + strings.toUpperCaseFirstLetter(propertyName);
     if (this[setFuncName]) {
       this[setFuncName](value);
     } else {
@@ -1441,7 +1441,7 @@ export default class Widget {
   }
 
   _callRenderProperty(propertyName) {
-    var renderFuncName = '_render' + strings.toUpperCaseFirstLetter(propertyName);
+    let renderFuncName = '_render' + strings.toUpperCaseFirstLetter(propertyName);
     if (!this[renderFuncName]) {
       return;
     }
@@ -1472,10 +1472,10 @@ export default class Widget {
    * In both cases the method _glassPaneTargets is called which may be overridden by the actual widget.
    */
   glassPaneTargets(element) {
-    var resolveGlassPanes = function(element) {
+    let resolveGlassPanes = function(element) {
       // contributions
-      var targets = arrays.flatMap(this._glassPaneContributions, function(cont) {
-        var $elements = cont(element);
+      let targets = arrays.flatMap(this._glassPaneContributions, cont => {
+        let $elements = cont(element);
         if ($elements) {
           return arrays.ensure($elements);
         }
@@ -1494,7 +1494,7 @@ export default class Widget {
     // since popups are rendered outside the DOM of the widget parent-child hierarchy, get glassPaneTargets of popups belonging to this widget separately.
     return [this.$container].concat(
       this.session.desktop.getPopupsFor(this)
-        .reduce(function(acc, popup) {
+        .reduce((acc, popup) => {
           return acc.concat(popup.glassPaneTargets());
         }, []));
   }
@@ -1517,7 +1517,7 @@ export default class Widget {
   }
 
   toString() {
-    var attrs = '';
+    let attrs = '';
     attrs += 'id=' + this.id;
     attrs += ' objectType=' + this.objectType;
     attrs += ' rendered=' + this.rendered;
@@ -1532,11 +1532,11 @@ export default class Widget {
    * @param [count] the number of ancestors to be processed. Default is -1 which means all.
    */
   ancestorsToString(count) {
-    var str = '',
+    let str = '',
       ancestors = this.ancestors();
 
     count = scout.nvl(count, -1);
-    ancestors.some(function(ancestor, i) {
+    ancestors.some((ancestor, i) => {
       if (count > -1 && i >= count) {
         return true;
       }
@@ -1617,7 +1617,7 @@ export default class Widget {
   }
 
   _eachProperty(model, func) {
-    var propertyName, value, i;
+    let propertyName, value, i;
 
     // Loop through primitive properties
     for (propertyName in model) {
@@ -1661,7 +1661,7 @@ export default class Widget {
    * @returns {Widget} the original widget from which this one was cloned. If it is not a clone, itself is returned.
    */
   original() {
-    var original = this;
+    let original = this;
     while (original.cloneOf) {
       original = original.cloneOf;
     }
@@ -1698,7 +1698,7 @@ export default class Widget {
    *
    */
   clone(model, options) {
-    var clone, cloneModel;
+    let clone, cloneModel;
     model = model || {};
     options = options || {};
 
@@ -1724,15 +1724,15 @@ export default class Widget {
       return clone;
     }
     properties = arrays.ensure(properties);
-    properties.forEach(function(property) {
-      var propertyValue = this[property],
+    properties.forEach(property => {
+      let propertyValue = this[property],
         clonedProperty = null;
       if (propertyValue === undefined) {
         throw new Error('Property \'' + property + '\' is undefined. Deep copy not possible.');
       }
       if (this._widgetProperties.indexOf(property) > -1) {
         if (Array.isArray(propertyValue)) {
-          clonedProperty = propertyValue.map(function(val) {
+          clonedProperty = propertyValue.map(val => {
             return val.clone({
               parent: clone
             }, options);
@@ -1743,14 +1743,14 @@ export default class Widget {
           }, options);
         }
       } else if (Array.isArray(propertyValue)) {
-        clonedProperty = propertyValue.map(function(val) {
+        clonedProperty = propertyValue.map(val => {
           return val;
         });
       } else {
         clonedProperty = propertyValue;
       }
       clone[property] = clonedProperty;
-    }.bind(this));
+    });
   }
 
   /**
@@ -1766,7 +1766,7 @@ export default class Widget {
   }
 
   _mirror(clone, options) {
-    var eventDelegator = arrays.find(this.eventDelegators, function(eventDelegator) {
+    let eventDelegator = arrays.find(this.eventDelegators, eventDelegator => {
       return eventDelegator.clone === clone;
     });
     if (eventDelegator) {
@@ -1787,9 +1787,9 @@ export default class Widget {
       })
     };
     this.eventDelegators.push(eventDelegator);
-    clone.one('destroy', function() {
+    clone.one('destroy', () => {
       this._unmirror(clone);
-    }.bind(this));
+    });
   }
 
   unmirror(target) {
@@ -1801,7 +1801,7 @@ export default class Widget {
   }
 
   _unmirror(target) {
-    var eventDelegatorIndex = arrays.findIndex(this.eventDelegators, function(eventDelegator) {
+    let eventDelegatorIndex = arrays.findIndex(this.eventDelegators, eventDelegator => {
         return eventDelegator.clone === target;
       }),
       eventDelegator = eventDelegatorIndex > -1 ? this.eventDelegators.splice(eventDelegatorIndex, 1)[0] : null;
@@ -1826,7 +1826,7 @@ export default class Widget {
   }
 
   callSetter(propertyName, value) {
-    var setterFuncName = 'set' + strings.toUpperCaseFirstLetter(propertyName);
+    let setterFuncName = 'set' + strings.toUpperCaseFirstLetter(propertyName);
     if (this[setterFuncName]) {
       this[setterFuncName](value);
     } else {
@@ -1897,15 +1897,15 @@ export default class Widget {
     if (this.id === widgetId) {
       return this;
     }
-    var widgets = this.children.slice(); // list of widgets to check
+    let widgets = this.children.slice(); // list of widgets to check
     while (widgets.length) {
-      var widget = widgets.shift();
+      let widget = widgets.shift();
       if (widget.id === widgetId) {
         return widget; // found
       }
       if (deep) {
-        for (var i = 0; i < widget.children.length; i++) {
-          var child = widget.children[i];
+        for (let i = 0; i < widget.children.length; i++) {
+          let child = widget.children[i];
           if (child.parent === widget) { // same check as in visitChildren()
             widgets.push(child);
           }
@@ -1919,7 +1919,7 @@ export default class Widget {
    * @returns {Widget} the first parent for which the given function returns true.
    */
   findParent(predicate) {
-    var parent = this.parent;
+    let parent = this.parent;
     while (parent) {
       if (predicate(parent)) {
         return parent;
@@ -1933,8 +1933,8 @@ export default class Widget {
    * @returns {Widget} the first child for which the given function returns true.
    */
   findChild(predicate) {
-    var foundChild = null;
-    this.visitChildren(function(child) {
+    let foundChild = null;
+    this.visitChildren(child => {
       if (predicate(child)) {
         foundChild = child;
         return true;
@@ -1975,7 +1975,7 @@ export default class Widget {
     if (this.rendering) {
       return;
     }
-    var $target = $(event.target);
+    let $target = $(event.target);
     if (this.$container.has($target)) {
       this._$lastFocusedElement = $target;
     }
@@ -2023,7 +2023,7 @@ export default class Widget {
     if (!this.rendered || !this.visible) {
       return false;
     }
-    var elem = this.getFocusableElement();
+    let elem = this.getFocusableElement();
     if (elem) {
       return $.ensure(elem).is(':focusable');
     }
@@ -2042,7 +2042,7 @@ export default class Widget {
   }
 
   _installScrollbars(options) {
-    var $scrollable = this.get$Scrollable();
+    let $scrollable = this.get$Scrollable();
     if (!$scrollable) {
       throw new Error('Scrollable is not defined, cannot install scrollbars');
     }
@@ -2051,7 +2051,7 @@ export default class Widget {
       return;
     }
     options = options || {};
-    var defaults = {
+    let defaults = {
       parent: this
     };
     options = $.extend({}, defaults, options);
@@ -2060,7 +2060,7 @@ export default class Widget {
   }
 
   _uninstallScrollbars() {
-    var $scrollable = this.get$Scrollable();
+    let $scrollable = this.get$Scrollable();
     if (!$scrollable || !$scrollable.data('scrollable')) {
       return;
     }
@@ -2079,7 +2079,7 @@ export default class Widget {
   }
 
   _onScroll() {
-    var $scrollable = this.get$Scrollable();
+    let $scrollable = this.get$Scrollable();
     this.scrollTop = $scrollable[0].scrollTop;
     this.scrollLeft = $scrollable[0].scrollLeft;
   }
@@ -2099,7 +2099,7 @@ export default class Widget {
   }
 
   _renderScrollTop() {
-    var $scrollable = this.get$Scrollable();
+    let $scrollable = this.get$Scrollable();
     if (!$scrollable || this.scrollTop === null) {
       // Don't do anything for non scrollable elements. Also, reading $scrollable[0].scrollTop must not be done while rendering because it would provoke a reflow
       return;
@@ -2128,7 +2128,7 @@ export default class Widget {
   }
 
   _renderScrollLeft() {
-    var $scrollable = this.get$Scrollable();
+    let $scrollable = this.get$Scrollable();
     if (!$scrollable || this.scrollLeft === null) {
       // Don't do anything for non scrollable elements. Also, reading $scrollable[0].scrollLeft must not be done while rendering because it would provoke a reflow
       return;
@@ -2166,7 +2166,7 @@ export default class Widget {
       this.getDelegateScrollable().scrollToTop();
       return;
     }
-    var $scrollable = this.get$Scrollable();
+    let $scrollable = this.get$Scrollable();
     if (!$scrollable) {
       return;
     }
@@ -2182,7 +2182,7 @@ export default class Widget {
       this.getDelegateScrollable().scrollToBottom();
       return;
     }
-    var $scrollable = this.get$Scrollable();
+    let $scrollable = this.get$Scrollable();
     if (!$scrollable) {
       return;
     }
@@ -2200,7 +2200,7 @@ export default class Widget {
     if (!this.rendered) {
       return;
     }
-    var $scrollParent = this.$container.scrollParent();
+    let $scrollParent = this.$container.scrollParent();
     if ($scrollParent.length === 0) {
       // No scrollable parent found -> scrolling is not possible
       return;
@@ -2220,10 +2220,10 @@ export default class Widget {
    * @returns {boolean} true if the visitor aborted the visiting, false if the visiting completed without aborting
    */
   visitChildren(visitor) {
-    for (var i = 0; i < this.children.length; i++) {
-      var child = this.children[i];
+    for (let i = 0; i < this.children.length; i++) {
+      let child = this.children[i];
       if (child.parent === this) {
-        var treeVisitResult = visitor(child);
+        let treeVisitResult = visitor(child);
         if (treeVisitResult === true || treeVisitResult === TreeVisitResult.TERMINATE) {
           // Visitor wants to abort the visiting
           return TreeVisitResult.TERMINATE;
@@ -2254,7 +2254,7 @@ export default class Widget {
   }
 
   static cssClassAsArray(cssClass) {
-    var cssClasses = [],
+    let cssClasses = [],
       cssClassesStr = cssClass || '';
 
     cssClassesStr = cssClassesStr.trim();

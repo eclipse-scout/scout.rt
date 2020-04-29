@@ -11,25 +11,25 @@
 
 import {TreeNode} from '../../src/index';
 
-describe('TreeNode', function() {
-  var session;
+describe('TreeNode', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  describe('isAncestorOf', function() {
-    it('returns true if the node is an ancestor of the given node ', function() {
-      var tree = scout.create('Tree', {parent: session.desktop});
-      var rootNode = scout.create('TreeNode', {
+  describe('isAncestorOf', () => {
+    it('returns true if the node is an ancestor of the given node ', () => {
+      let tree = scout.create('Tree', {parent: session.desktop});
+      let rootNode = scout.create('TreeNode', {
         parent: tree
       });
-      var parentNode = scout.create('TreeNode', {
+      let parentNode = scout.create('TreeNode', {
         parent: tree,
         parentNode: rootNode
       });
-      var node = scout.create('TreeNode', {
+      let node = scout.create('TreeNode', {
         parent: tree,
         parentNode: parentNode
       });
@@ -43,17 +43,17 @@ describe('TreeNode', function() {
     });
   });
 
-  describe('isDescendantOf', function() {
-    it('returns true if the node is a descendant of the given node ', function() {
-      var tree = scout.create('Tree', {parent: session.desktop});
-      var rootNode = scout.create('TreeNode', {
+  describe('isDescendantOf', () => {
+    it('returns true if the node is a descendant of the given node ', () => {
+      let tree = scout.create('Tree', {parent: session.desktop});
+      let rootNode = scout.create('TreeNode', {
         parent: tree
       });
-      var parentNode = scout.create('TreeNode', {
+      let parentNode = scout.create('TreeNode', {
         parent: tree,
         parentNode: rootNode
       });
-      var node = scout.create('TreeNode', {
+      let node = scout.create('TreeNode', {
         parent: tree,
         parentNode: parentNode
       });

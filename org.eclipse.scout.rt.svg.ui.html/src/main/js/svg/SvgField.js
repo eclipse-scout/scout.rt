@@ -51,8 +51,8 @@ export default class SvgField extends ValueField {
   }
 
   _onAppLinkAction(event) {
-    var $target = $(event.delegateTarget);
-    var ref = $target.data('ref');
+    let $target = $(event.delegateTarget);
+    let ref = $target.data('ref');
     this._triggerAppLinkAction(ref);
     event.preventDefault();
   }

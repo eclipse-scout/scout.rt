@@ -74,10 +74,10 @@ export default class ObjectFactory {
     }
     options = options || {};
 
-    var createFunc = this._registry[objectType];
+    let createFunc = this._registry[objectType];
     if (createFunc) {
       // 1. - Use factory function registered for the given objectType
-      var scoutObject = createFunc(options.model);
+      let scoutObject = createFunc(options.model);
       if (!scoutObject) {
         throw new Error('Failed to create object for objectType "' + objectType + '": Factory function did not return a valid object');
       }
@@ -134,7 +134,7 @@ export default class ObjectFactory {
     options.model = model;
 
     // Create object
-    var scoutObject = this._createObjectByType(objectType, options);
+    let scoutObject = this._createObjectByType(objectType, options);
     if (objects.isFunction(scoutObject.init)) {
       if (model) {
         if (model.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
@@ -184,7 +184,7 @@ export default class ObjectFactory {
    * That's why we call this method in the scout._init method.
    */
   init() {
-    for (var objectType in scout.objectFactories) {
+    for (let objectType in scout.objectFactories) {
       if (scout.objectFactories.hasOwnProperty(objectType)) {
         this.register(objectType, scout.objectFactories[objectType]);
       }

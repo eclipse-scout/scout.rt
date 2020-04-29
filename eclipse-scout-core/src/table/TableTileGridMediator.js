@@ -136,7 +136,7 @@ export default class TableTileGridMediator extends Widget {
     if (!tableRowTileMappings) {
       return;
     }
-    var tiles = tableRowTileMappings.map(this.resolveMapping, this);
+    let tiles = tableRowTileMappings.map(this.resolveMapping, this);
     this._setTiles(tiles);
   }
 
@@ -155,7 +155,7 @@ export default class TableTileGridMediator extends Widget {
 
   _setTilesInternal(tiles) {
     // check if all tiles are already available in the table
-    var tableRowMissing = tiles.some(function(tile) {
+    let tableRowMissing = tiles.some(function(tile) {
       return this.table.rowsMap[tile.rowId] === undefined;
     }, this);
 
@@ -186,17 +186,17 @@ export default class TableTileGridMediator extends Widget {
   // only used in ScoutJS, see TableAdapter.modifyTablePrototype()
   loadTiles() {
     // hierarchy is not supported in tile mode. There is no way to visualize a parent-child hierarchy in the tileGrid. Therefore only top level rows are displayed.
-    var rows = this.table.rows.filter(function(row) {
+    let rows = this.table.rows.filter(row => {
       return !row.parentRow;
     });
-    var tiles = this.table.createTiles(rows);
+    let tiles = this.table.createTiles(rows);
     if (tiles) {
       this.setTiles(tiles);
     }
   }
 
   resolveMapping(tableRowTileMapping) {
-    var tile = tableRowTileMapping.tile;
+    let tile = tableRowTileMapping.tile;
     tile.rowId = tableRowTileMapping.tableRow;
     tile.setParent(this);
     tile.setOwner(this);
@@ -217,23 +217,23 @@ export default class TableTileGridMediator extends Widget {
   getTilesForRows(rows) {
     return rows.map(function(row) {
       return this.tilesMap[row.id];
-    }, this).filter(function(t) {
+    }, this).filter(t => {
       return !!t;
     });
   }
 
   _initGroups(tiles) {
-    var primaryGroupingColumn = arrays.find(this.table.columns, function(column) {
+    let primaryGroupingColumn = arrays.find(this.table.columns, column => {
       return column.grouped && column.sortIndex === 0;
     });
 
     tiles.forEach(function(tile) {
-      var row = this.table.rowsMap[tile.rowId];
-      var groupId = primaryGroupingColumn ? primaryGroupingColumn.cellTextForGrouping(row) : 'default';
-      var htmlEnabled = primaryGroupingColumn ? primaryGroupingColumn.htmlEnabled : false;
+      let row = this.table.rowsMap[tile.rowId];
+      let groupId = primaryGroupingColumn ? primaryGroupingColumn.cellTextForGrouping(row) : 'default';
+      let htmlEnabled = primaryGroupingColumn ? primaryGroupingColumn.htmlEnabled : false;
       this.groupForTileMap[row.id] = groupId;
       // check if group already exists, otherwise create it
-      var group = this.tileAccordion.getGroupById(groupId);
+      let group = this.tileAccordion.getGroupById(groupId);
       if (!group) {
         group = this._createTileGroup(groupId, htmlEnabled);
         this._adaptTileGrid(group.body);
@@ -246,7 +246,7 @@ export default class TableTileGridMediator extends Widget {
   _adaptTileGrid(tileGrid) {
     // The table contains the menu items -> pass them to the showContextMenu function of the tileGrid.
     objects.mandatoryFunction(tileGrid, '_showContextMenu');
-    var origShowContextMenu = tileGrid._showContextMenu;
+    let origShowContextMenu = tileGrid._showContextMenu;
     tileGrid._showContextMenu = function(options) {
       objects.mandatoryFunction(this.table, '_filterMenusForContextMenu');
       options.menuItems = this.table._filterMenusForContextMenu();
@@ -310,7 +310,7 @@ export default class TableTileGridMediator extends Widget {
     }.bind(this);
 
     // check if there exists a hierarchy within the tableRows
-    var hasHierarchy = arrays.find(this.table.rows, function(row) {
+    let hasHierarchy = arrays.find(this.table.rows, row => {
       return row.parentRow;
     }) !== null;
 
@@ -330,7 +330,7 @@ export default class TableTileGridMediator extends Widget {
 
   deactivate() {
     // show aggregation table control
-    this.table.tableControls.forEach(function(control) {
+    this.table.tableControls.forEach(control => {
       if (control instanceof AggregateTableControl) {
         control.setVisible(true);
       }
@@ -363,7 +363,7 @@ export default class TableTileGridMediator extends Widget {
     this.tileAccordion.deleteAllGroups();
 
     // destroy tiles manually since owner is the mediator thus the tileGrid can't destroy them
-    this.tiles.forEach(function(tile) {
+    this.tiles.forEach(tile => {
       tile.destroy();
     });
   }
@@ -395,7 +395,7 @@ export default class TableTileGridMediator extends Widget {
 
   destroy() {
     // destroy tiles manually since owner is the mediator thus the tileGrid can't destroy them
-    this.tiles.forEach(function(tile) {
+    this.tiles.forEach(tile => {
       tile.destroy();
     });
 
@@ -419,7 +419,7 @@ export default class TableTileGridMediator extends Widget {
     tiles.forEach(function(tile) {
       delete this.tilesMap[tile.rowId];
       delete this.groupForTileMap[tile.rowId];
-      var group = this.tileAccordion.getGroupByTile(tile);
+      let group = this.tileAccordion.getGroupByTile(tile);
       if (group) {
         // if there's only one left remove the group (tile is removed later)
         if (group.body.tiles.length === 1) {
@@ -527,17 +527,17 @@ export default class TableTileGridMediator extends Widget {
   }
 
   _addFilter(tableFilter) {
-    var tileFilter = {
+    let tileFilter = {
       table: this.table,
       accept: function(tile) {
-        var rowForTile = this.table.rowsMap[tile.rowId];
+        let rowForTile = this.table.rowsMap[tile.rowId];
         if (rowForTile) {
           return tableFilter.accept(rowForTile);
         }
         return false;
       }
     };
-    var key = tableFilter.createKey();
+    let key = tableFilter.createKey();
     if (this.tileFilterMap[key]) {
       this.tileAccordion.removeTileFilter(this.tileFilterMap[key]);
     }
@@ -560,9 +560,9 @@ export default class TableTileGridMediator extends Widget {
 
   _syncSelectionFromTileGridToTable(selectedTiles) {
     if (!this._isUpdatingTiles) {
-      var selectedRows = selectedTiles.map(function(tile) {
+      let selectedRows = selectedTiles.map(function(tile) {
         return this.table.rowsMap[tile.rowId];
-      }, this).filter(function(t) {
+      }, this).filter(t => {
         return Boolean(t);
       });
       this.table.selectRows(selectedRows);
@@ -570,20 +570,20 @@ export default class TableTileGridMediator extends Widget {
   }
 
   _updateGroupVisibility() {
-    this.tileAccordion.groups.forEach(function(group) {
+    this.tileAccordion.groups.forEach(group => {
       // Make groups invisible if a tile filter is active and no tiles match (= no tiles are visible)
-      var groupEmpty = group.body.filters.length > 0 && group.body.filteredTiles.length === 0;
+      let groupEmpty = group.body.filters.length > 0 && group.body.filteredTiles.length === 0;
       group.setVisible(!groupEmpty);
       group.setTitleSuffix('(' + group.body.filteredTiles.length + ')');
     });
   }
 
   _syncScrollTopFromTableToTile() {
-    var rowIndex = this.table._rowIndexAtScrollTop(this.table.scrollTop);
+    let rowIndex = this.table._rowIndexAtScrollTop(this.table.scrollTop);
     if (rowIndex <= 0) {
       return;
     }
-    var tile = this.tilesMap[this.table.rows[rowIndex].id];
+    let tile = this.tilesMap[this.table.rows[rowIndex].id];
     if (!tile) {
       return;
     }
@@ -591,7 +591,7 @@ export default class TableTileGridMediator extends Widget {
     // reset scrollTop on tileAccordion, otherwise it would overwrite the synced scrollTop
     this.tileAccordion.scrollTop = null;
 
-    var options = {
+    let options = {
       align: 'top'
     };
 
@@ -604,9 +604,9 @@ export default class TableTileGridMediator extends Widget {
   }
 
   _syncScrollTopFromTileGridToTable() {
-    var tile = this.tileAccordion._tileAtScrollTop(this.tileAccordion.scrollTop);
+    let tile = this.tileAccordion._tileAtScrollTop(this.tileAccordion.scrollTop);
     if (tile) {
-      var options = {
+      let options = {
         align: 'top'
       };
       if (!this.table._isDataRendered()) {

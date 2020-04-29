@@ -10,16 +10,16 @@
  */
 import {graphics} from '../../src/index';
 
-describe('graphics', function() {
+describe('graphics', () => {
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
   });
 
-  describe('bounds', function() {
-    var $div;
+  describe('bounds', () => {
+    let $div;
 
-    beforeEach(function() {
+    beforeEach(() => {
       $div = $('<div>')
         .css('position', 'absolute')
         .css('left', '6px')
@@ -30,27 +30,27 @@ describe('graphics', function() {
         .appendTo($('#sandbox'));
     });
 
-    it('returns rectangle with position from JQuery.position()', function() {
-      var rect = graphics.bounds($div);
+    it('returns rectangle with position from JQuery.position()', () => {
+      let rect = graphics.bounds($div);
       expect(rect.x).toBe(6);
       expect(rect.y).toBe(7);
     });
 
-    it('returns rectangle with size from JQuery.outerWidth/Height', function() {
-      var rect = graphics.bounds($div);
+    it('returns rectangle with size from JQuery.outerWidth/Height', () => {
+      let rect = graphics.bounds($div);
       expect(rect.width).toBe(8);
       expect(rect.height).toBe(9);
     });
 
-    it('returns rectangle with size from  JQuery.outerWidth/Height() including margin if includeMargin is true', function() {
-      var rect = graphics.bounds($div, {
+    it('returns rectangle with size from  JQuery.outerWidth/Height() including margin if includeMargin is true', () => {
+      let rect = graphics.bounds($div, {
         includeMargin: true
       });
       expect(rect.width).toBe(8 + 2 * 10);
       expect(rect.height).toBe(9 + 2 * 10);
 
       // check convenience short-hand version
-      var rect2 = graphics.bounds($div, true);
+      let rect2 = graphics.bounds($div, true);
       expect(rect2.width).toBe(rect.width);
       expect(rect2.height).toBe(rect.height);
     });

@@ -10,27 +10,27 @@
  */
 import {arrays, PromiseCreator, promises} from '../../src/index';
 
-describe('scout.promises', function() {
+describe('scout.promises', () => {
 
   function createDeferredArray(len) {
     return arrays.init(len, null);
   }
 
   function createPromiseCreatorForDeferredArray(deferredArray) {
-    return new PromiseCreator(deferredArray.map(function(v, i) {
-      return function() {
+    return new PromiseCreator(deferredArray.map((v, i) => {
+      return () => {
         deferredArray[i] = new $.Deferred();
         return deferredArray[i];
       };
     }));
   }
 
-  it('oneByOne stops executing after failure', function(done) {
-    var deferredArray = createDeferredArray(3);
-    var promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
-    promises.oneByOne(promiseCreator).then(function() {
+  it('oneByOne stops executing after failure', done => {
+    let deferredArray = createDeferredArray(3);
+    let promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
+    promises.oneByOne(promiseCreator).then(() => {
       fail('Unexpected code branch');
-    }, function(msg) {
+    }, msg => {
       expect(msg).toBe('Foo');
       expect(deferredArray[1]).toBeNull();
       expect(deferredArray[2]).toBeNull();
@@ -39,12 +39,12 @@ describe('scout.promises', function() {
     setTimeout(deferredArray[0].reject.bind(deferredArray[0], 'Foo'));
   });
 
-  it('groupwise stops executing after failed group', function(done) {
-    var deferredArray = createDeferredArray(3);
-    var promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
-    promises.groupwise(2, promiseCreator).then(function() {
+  it('groupwise stops executing after failed group', done => {
+    let deferredArray = createDeferredArray(3);
+    let promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
+    promises.groupwise(2, promiseCreator).then(() => {
       fail('Unexpected code branch');
-    }, function(msg) {
+    }, msg => {
       expect(msg).toBe('Bar');
       expect(deferredArray[1]).not.toBeNull();
       expect(deferredArray[2]).toBeNull();
@@ -53,12 +53,12 @@ describe('scout.promises', function() {
     setTimeout(deferredArray[0].reject.bind(deferredArray[0], 'Bar'));
   });
 
-  it('parallel stops executing after failed promise', function(done) {
-    var deferredArray = createDeferredArray(9);
-    var promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
-    promises.parallel(3, promiseCreator).then(function() {
+  it('parallel stops executing after failed promise', done => {
+    let deferredArray = createDeferredArray(9);
+    let promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
+    promises.parallel(3, promiseCreator).then(() => {
       fail('Unexpected code branch');
-    }, function(msg) {
+    }, msg => {
       expect(msg).toBe(4);
       expect(deferredArray[0].state()).toBe('resolved');
       expect(deferredArray[1].state()).toBe('resolved');
@@ -93,50 +93,48 @@ describe('scout.promises', function() {
     deferredArray[1].resolve(1);
   });
 
-  it('does not cut off error arguments', function(done) {
-    var deferredArray = createDeferredArray(1);
-    var promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
-    promises.oneByOne(promiseCreator).then(function() {
+  it('does not cut off error arguments', done => {
+    let deferredArray = createDeferredArray(1);
+    let promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
+    promises.oneByOne(promiseCreator).then(() => {
       fail('Unexpected code branch');
-    }, function() {
-      expect(arguments).toBeTruthy();
-      expect(arguments.length).toBe(2);
-      expect(arguments[0]).toBe('Foo');
-      expect(arguments[1]).toBe('Bar');
+    }, (...args) => {
+      expect(args).toBeTruthy();
+      expect(args.length).toBe(2);
+      expect(args[0]).toBe('Foo');
+      expect(args[1]).toBe('Bar');
       done();
     });
     setTimeout(deferredArray[0].reject.bind(deferredArray[0], 'Foo', 'Bar'));
   });
 
-  it('adds all result arguments, one for each deferred', function(done) {
-    var deferredArray = arrays.init(3, null).map(function() {
+  it('adds all result arguments, one for each deferred', done => {
+    let deferredArray = arrays.init(3, null).map(() => {
       return new $.Deferred();
     });
-    var promiseCreator = new PromiseCreator(deferredArray.map(function(v, i) {
-      return function() {
-        return deferredArray[i].promise();
-      };
+    let promiseCreator = new PromiseCreator(deferredArray.map((v, i) => {
+      return () => deferredArray[i].promise();
     }));
-    promises.groupwise(4, promiseCreator).then(function() {
-      expect(arguments).toBeTruthy();
-      expect(arguments.length).toBe(3);
+    promises.groupwise(4, promiseCreator).then((...args) => {
+      expect(args).toBeTruthy();
+      expect(args.length).toBe(3);
       // same behavior as if multiple Deferred or Promise or Thenable objects have been used with $.when or $.promiseAll method
       // empty argument resolve call adds an undefined to result
-      expect(arguments[0]).toBeUndefined();
+      expect(args[0]).toBeUndefined();
       // one argument resolve call just adds the argument to result
-      expect(arguments[1]).toBe('Foo');
+      expect(args[1]).toBe('Foo');
       // multiple argument resolve call adds all arguments as an array to result
-      expect(arguments[2]).toEqual(['Bar', true]);
+      expect(args[2]).toEqual(['Bar', true]);
       done();
-    }, function(msg) {
+    }, msg => {
       fail('Unexpected code branch');
       done();
     });
     // resolve order 2, 1, 0
-    deferredArray[1].then(function() {
+    deferredArray[1].then(() => {
       setTimeout(deferredArray[0].resolve.bind(deferredArray[0]));
     });
-    deferredArray[2].then(function() {
+    deferredArray[2].then(() => {
       setTimeout(deferredArray[1].resolve.bind(deferredArray[1], 'Foo'));
     });
     deferredArray[2].resolve('Bar', true);

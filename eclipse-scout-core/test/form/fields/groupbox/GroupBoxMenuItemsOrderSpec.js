@@ -10,9 +10,9 @@
  */
 import {Action, GroupBoxMenuItemsOrder, NullWidget, scout} from '../../../../src/index';
 
-describe('GroupBoxMenuItemsOrder', function() {
+describe('GroupBoxMenuItemsOrder', () => {
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
   });
 
@@ -26,13 +26,13 @@ describe('GroupBoxMenuItemsOrder', function() {
     });
   }
 
-  it('order', function() {
-    var b1 = createMenu('left-button', -1, true);
-    var b2 = createMenu('right-button', 1, true);
-    var m1 = createMenu('left-menu', -1, false);
-    var m2 = createMenu('right-menu', 1, false);
+  it('order', () => {
+    let b1 = createMenu('left-button', -1, true);
+    let b2 = createMenu('right-button', 1, true);
+    let m1 = createMenu('left-menu', -1, false);
+    let m2 = createMenu('right-menu', 1, false);
 
-    var sorted = new GroupBoxMenuItemsOrder().order([b1, b2, m1, m2]);
+    let sorted = new GroupBoxMenuItemsOrder().order([b1, b2, m1, m2]);
     expect(sorted.left[0]).toBe(b1);
     expect(sorted.left[1]).toBe(m1);
 

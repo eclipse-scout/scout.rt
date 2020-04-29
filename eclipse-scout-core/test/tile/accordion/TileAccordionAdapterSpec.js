@@ -10,38 +10,38 @@
  */
 import {scout} from '../../../src/index';
 
-describe('TileAccordionAdapter', function() {
-  var session;
+describe('TileAccordionAdapter', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
   function createTileAccordion(model) {
-    var defaults = {
+    let defaults = {
       parent: session.desktop,
       session: session,
       objectType: 'TileAccordion'
     };
     model = $.extend({}, defaults, model);
-    var tileAccordionAdapter = session.createModelAdapter(model);
+    let tileAccordionAdapter = session.createModelAdapter(model);
     return tileAccordionAdapter.createWidget(model, model.parent);
   }
 
-  describe('initProperties', function() {
+  describe('initProperties', () => {
 
-    it('does not take filters from tile grid in remote case', function() {
-      var filter = scout.create('RemoteTileFilter');
-      var accordion = createTileAccordion({
+    it('does not take filters from tile grid in remote case', () => {
+      let filter = scout.create('RemoteTileFilter');
+      let accordion = createTileAccordion({
         groups: [{
           objectType: 'Group',
           body: {

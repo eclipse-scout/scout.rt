@@ -11,7 +11,7 @@
 import {DateFormat, scout, strings} from '../index';
 
 export function shift(date, years, months, days) {
-  var newDate = new Date(date.getTime());
+  let newDate = new Date(date.getTime());
   if (years) {
     newDate.setFullYear(date.getFullYear() + years);
     if (compareMonths(newDate, date) !== years * 12) {
@@ -35,7 +35,7 @@ export function shift(date, years, months, days) {
 }
 
 export function shiftTime(date, hours, minutes, seconds, milliseconds) {
-  var newDate = new Date(date.getTime());
+  let newDate = new Date(date.getTime());
   if (hours) {
     newDate.setHours(date.getHours() + hours);
   }
@@ -52,7 +52,7 @@ export function shiftTime(date, hours, minutes, seconds, milliseconds) {
 }
 
 export function shiftToNextDayOfType(date, day) {
-  var diff = day - date.getDay();
+  let diff = day - date.getDay();
 
   if (diff <= 0) {
     diff += 7;
@@ -69,7 +69,7 @@ export function shiftToNextDayOfType(date, day) {
  * @returns {Date}
  */
 export function shiftToNextDayAndDate(date, dayInWeek, dayInMonth) {
-  var tmpDate = new Date(date.getTime());
+  let tmpDate = new Date(date.getTime());
   tmpDate.setDate(dayInMonth);
   while (tmpDate.getDay() !== dayInWeek || tmpDate.getDate() !== dayInMonth) {
     tmpDate = shift(tmpDate, 0, 1, 0);
@@ -79,7 +79,7 @@ export function shiftToNextDayAndDate(date, dayInWeek, dayInMonth) {
 }
 
 export function shiftToPreviousDayOfType(date, day) {
-  var diff = day - date.getDay();
+  let diff = day - date.getDay();
 
   if (diff >= 0) {
     diff -= 7;
@@ -153,7 +153,7 @@ export function isSameMonth(date, date2) {
  * @returns {number}
  */
 export function compareMonths(date1, date2) {
-  var d1Month = date1.getMonth(),
+  let d1Month = date1.getMonth(),
     d2Month = date2.getMonth(),
     d1Year = date1.getFullYear(),
     d2Year = date2.getFullYear(),
@@ -181,7 +181,7 @@ export function compareDays(date1, date2) {
  */
 export function timestamp(date, utc) {
   // (note: month is 0-indexed)
-  var d = date || new Date();
+  let d = date || new Date();
   if (utc) {
     return strings.padZeroLeft(d.getUTCFullYear(), 4) +
       strings.padZeroLeft(d.getUTCMonth() + 1, 2) +
@@ -201,8 +201,8 @@ export function timestamp(date, utc) {
 }
 
 export function orderWeekdays(weekdays, firstDayOfWeekArg) {
-  var weekdaysOrdered = [];
-  for (var i = 0; i < 7; i++) {
+  let weekdaysOrdered = [];
+  for (let i = 0; i < 7; i++) {
     weekdaysOrdered[i] = weekdays[(i + firstDayOfWeekArg) % 7];
   }
   return weekdaysOrdered;
@@ -223,7 +223,7 @@ export function weekInYear(date, option) {
   if (!date) {
     return undefined;
   }
-  var firstDayOfWeekArg = 1;
+  let firstDayOfWeekArg = 1;
   if (typeof option === 'object') {
     // DateFormat
     if (option.symbols !== undefined && option.symbols.firstDayOfWeek !== undefined) {
@@ -237,21 +237,21 @@ export function weekInYear(date, option) {
   }
 
   // Thursday of current week decides the year
-  var thursday = _thursdayOfWeek(date, firstDayOfWeekArg);
+  let thursday = _thursdayOfWeek(date, firstDayOfWeekArg);
 
   // In ISO format, the week with January 4th is the first week
-  var jan4 = new Date(thursday.getFullYear(), 0, 4);
+  let jan4 = new Date(thursday.getFullYear(), 0, 4);
 
   // If the date is before the beginning of the year, it belongs to the year before
-  var startJan4 = firstDayOfWeek(jan4, firstDayOfWeekArg);
+  let startJan4 = firstDayOfWeek(jan4, firstDayOfWeekArg);
   if (date.getTime() < startJan4.getTime()) {
     jan4 = new Date(thursday.getFullYear() - 1, 0, 4);
   }
 
   // Get the Thursday of the first week, to be able to compare it to 'thursday'
-  var thursdayFirstWeek = _thursdayOfWeek(jan4, firstDayOfWeekArg);
+  let thursdayFirstWeek = _thursdayOfWeek(jan4, firstDayOfWeekArg);
 
-  var diffInDays = (thursday.getTime() - thursdayFirstWeek.getTime()) / 86400000;
+  let diffInDays = (thursday.getTime() - thursdayFirstWeek.getTime()) / 86400000;
 
   return 1 + Math.round(diffInDays / 7);
 }
@@ -262,7 +262,7 @@ export function _thursdayOfWeek(date, firstDayOfWeekArg) {
     return undefined;
   }
 
-  var thursday = new Date(date.valueOf());
+  let thursday = new Date(date.valueOf());
   if (thursday.getDay() !== 4) { // 0 = Sun, 1 = Mon, 2 = Thu, 3 = Wed, 4 = Thu, 5 = Fri, 6 = Sat
     if (thursday.getDay() < firstDayOfWeekArg) {
       // go 1 week backward
@@ -277,7 +277,7 @@ export function firstDayOfWeek(date, firstDayOfWeekArg) {
   if (!date || typeof firstDayOfWeekArg !== 'number') {
     return undefined;
   }
-  var firstDay = new Date(date.valueOf());
+  let firstDay = new Date(date.valueOf());
   if (firstDay.getDay() !== firstDayOfWeekArg) {
     firstDay.setDate(firstDay.getDate() - (firstDay.getDay() + 7 - firstDayOfWeekArg) % 7);
   }
@@ -295,7 +295,7 @@ export function parseJsonDate(jsonDate) {
     return null;
   }
 
-  var year = '1970',
+  let year = '1970',
     month = '01',
     day = '01',
     hours = '00',
@@ -305,7 +305,7 @@ export function parseJsonDate(jsonDate) {
     utc = false;
 
   // Date + Time
-  var matches = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d{3})(Z?)$/.exec(jsonDate);
+  let matches = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d{3})(Z?)$/.exec(jsonDate);
   if (matches !== null) {
     year = matches[1];
     month = matches[2];
@@ -338,7 +338,7 @@ export function parseJsonDate(jsonDate) {
     }
   }
 
-  var result;
+  let result;
   if (utc) {
     // UTC date
     result = new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds, milliseconds));
@@ -373,7 +373,7 @@ export function toJsonDate(date, utc, includeDate, includeTime) {
   if (includeTime === undefined) {
     includeTime = true;
   }
-  var datePart, timePart, utcPart;
+  let datePart, timePart, utcPart;
   if (utc) {
     // (note: month is 0-indexed)
     datePart = strings.padZeroLeft(date.getUTCFullYear(), 4) + '-' +
@@ -395,7 +395,7 @@ export function toJsonDate(date, utc, includeDate, includeTime) {
       strings.padZeroLeft(date.getMilliseconds(), 3);
     utcPart = '';
   }
-  var result = '';
+  let result = '';
   if (includeDate) {
     result += datePart;
     if (includeTime) {
@@ -430,11 +430,11 @@ export function toJsonDateRange(range) {
  */
 export function create(dateString) {
   if (dateString) {
-    var matches = /^(\d{4})(?:-(\d{2})(?:-(\d{2})(?: (\d{2})(?::(\d{2})(?::(\d{2})(?:\.(\d{3}))?(Z?))?)?)?)?)?/.exec(dateString);
+    let matches = /^(\d{4})(?:-(\d{2})(?:-(\d{2})(?: (\d{2})(?::(\d{2})(?::(\d{2})(?:\.(\d{3}))?(Z?))?)?)?)?)?/.exec(dateString);
     if (matches === null) {
       throw new Error('Unparsable date: ' + dateString);
     }
-    var date;
+    let date;
     if (matches[8] === 'Z') {
       date = new Date(Date.UTC(
         matches[1], // fullYear
@@ -474,7 +474,7 @@ export function newDate() {
 }
 
 export function format(date, locale, pattern) {
-  var dateFormat = new DateFormat(locale, pattern);
+  let dateFormat = new DateFormat(locale, pattern);
   return dateFormat.format(date);
 }
 
@@ -482,7 +482,7 @@ export function format(date, locale, pattern) {
  * Uses the default date and time format patterns from the locale to format the given date.
  */
 export function formatDateTime(date, locale) {
-  var dateFormat = new DateFormat(locale, locale.dateFormatPatternDefault + ' ' + locale.timeFormatPatternDefault);
+  let dateFormat = new DateFormat(locale, locale.dateFormatPatternDefault + ' ' + locale.timeFormatPatternDefault);
   return dateFormat.format(date);
 }
 
@@ -496,7 +496,7 @@ export function compare(a, b) {
   if (!b) {
     return 1;
   }
-  var diff = a.getTime() - b.getTime();
+  let diff = a.getTime() - b.getTime();
   if (diff < -1) {
     return -1;
   }
@@ -517,7 +517,7 @@ export function equals(a, b) {
  * If date is omitted, 1970-01-01 is used as date part independent of the time zone, means it is 1970-01-01 in every time zone.
  */
 export function combineDateTime(date, time) {
-  var newDate = new Date();
+  let newDate = new Date();
   newDate.setHours(0, 0, 0, 0); // set time part to zero in local time!
   newDate.setFullYear(1970, 0, 1); // make sure local time has no effect on date (if date is omitted it has to be 1970-01-01)
   if (date) {
@@ -539,7 +539,7 @@ export function isLeapYear(year) {
   if (year === undefined || year === null) {
     return false;
   }
-  var date = new Date(year, 1, 29);
+  let date = new Date(year, 1, 29);
   return date.getDate() === 29;
 }
 
@@ -578,7 +578,7 @@ export function trunc(date, createCopy) {
  *          The default value for this flag is "true".
  */
 export function ceil(date, minutesResolution, createCopy) {
-  var h,
+  let h,
     m,
     mResulution = scout.nvl(minutesResolution, 30);
   if (date) {

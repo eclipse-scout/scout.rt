@@ -38,7 +38,7 @@ export default class OutlineOverview extends Widget {
    */
   _attach() {
     this.$parent.append(this.$container);
-    var htmlParent = this.htmlComp.getParent();
+    let htmlParent = this.htmlComp.getParent();
     this.htmlComp.setSize(htmlParent.size());
     super._attach();
   }

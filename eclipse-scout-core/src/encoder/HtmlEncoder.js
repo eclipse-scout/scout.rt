@@ -20,7 +20,7 @@ export default class HtmlEncoder {
     if (!text) {
       return text;
     }
-    var div = this.cache.get();
+    let div = this.cache.get();
     div.textContent = text;
     return div.innerHTML;
   }

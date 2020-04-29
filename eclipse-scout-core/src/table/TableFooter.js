@@ -44,7 +44,7 @@ export default class TableFooter extends Widget {
   }
 
   _render() {
-    var filter, $filter;
+    let filter, $filter;
 
     this.$container = this.$parent.appendDiv('table-footer');
     this._$window = this.$parent.window();
@@ -167,7 +167,7 @@ export default class TableFooter extends Widget {
 
     function resize(event) {
       // Remember current height and start position
-      var startHeight = this.$controlContainer.height(),
+      let startHeight = this.$controlContainer.height(),
         startX = Math.floor(event.pageY);
       this._$window
         .on('mousemove.tablefooter', resizeMove.bind(this))
@@ -181,14 +181,14 @@ export default class TableFooter extends Widget {
           return;
         }
         // Calculate position delta
-        var x = Math.floor(event.pageY);
-        var dx = x - startX;
+        let x = Math.floor(event.pageY);
+        let dx = x - startX;
         // Ensure control container does not get bigger than the table
-        var maxHeight = this.table.$container.height() - this.table.footer.$container.height();
+        let maxHeight = this.table.$container.height() - this.table.footer.$container.height();
         // Calculate new height of table control container
-        var newHeight = Math.min(startHeight - dx, maxHeight);
+        let newHeight = Math.min(startHeight - dx, maxHeight);
         this.$controlContainer.height(newHeight);
-        var controlContainerInsets = graphics.insets(this.$controlContainer);
+        let controlContainerInsets = graphics.insets(this.$controlContainer);
         this.$controlContent.outerHeight(newHeight - controlContainerInsets.vertical());
         this._revalidateTableLayout();
       }
@@ -208,12 +208,12 @@ export default class TableFooter extends Widget {
   }
 
   _renderControls() {
-    var controls = this.table.tableControls;
+    let controls = this.table.tableControls;
     if (controls) {
-      controls.forEach(function(control) {
+      controls.forEach(control => {
         control.setParent(this);
         control.render(this._$controls);
-      }.bind(this));
+      });
     } else {
       this._$controls.empty();
     }
@@ -227,7 +227,7 @@ export default class TableFooter extends Widget {
   }
 
   _renderInfoLoad() {
-    var $info = this._$infoLoad,
+    let $info = this._$infoLoad,
       numRows = this.table.rows.length,
       estRows = this.table.estimatedRowCount,
       maxRows = this.table.maxRowCount;
@@ -270,9 +270,9 @@ export default class TableFooter extends Widget {
   }
 
   _renderInfoFilter() {
-    var $info = this._$infoFilter;
-    var numRowsFiltered = this.table.filteredRows().length;
-    var filteredBy = this.table.filteredBy().join(', '); // filteredBy() returns an array
+    let $info = this._$infoFilter;
+    let numRowsFiltered = this.table.filteredRows().length;
+    let filteredBy = this.table.filteredBy().join(', '); // filteredBy() returns an array
 
     $info.empty();
     if (!this._compactStyle) {
@@ -309,7 +309,7 @@ export default class TableFooter extends Widget {
   }
 
   _renderInfoSelection() {
-    var $info = this._$infoSelection,
+    let $info = this._$infoSelection,
       numRows = this.table.filteredRows().length,
       numRowsSelected = this.table.selectedRows.length,
       all = numRows > 0 && numRows === numRowsSelected;
@@ -339,8 +339,8 @@ export default class TableFooter extends Widget {
   }
 
   _renderInfoTableStatus() {
-    var $info = this._$infoTableStatus;
-    var tableStatus = this.table.tableStatus;
+    let $info = this._$infoTableStatus;
+    let tableStatus = this.table.tableStatus;
     $info.removeClass(Status.SEVERITY_CSS_CLASSES);
     if (tableStatus) {
       $info.addClass(tableStatus.cssClass());
@@ -358,23 +358,23 @@ export default class TableFooter extends Widget {
   }
 
   _updateInfoFilterVisibility() {
-    var visible = this.table.filteredBy().length > 0;
+    let visible = this.table.filteredBy().length > 0;
     this._setInfoVisible(this._$infoFilter, visible);
   }
 
   _updateInfoSelectionVisibility() {
-    var visible = this.table.multiSelect;
+    let visible = this.table.multiSelect;
     this._setInfoVisible(this._$infoSelection, visible);
   }
 
   _updateInfoTableStatusVisibility() {
-    var visible = this.table.tableStatus;
+    let visible = this.table.tableStatus;
     if (visible) {
       // If the uiState of the tableStatus was not set to hidden (either manually by the
       // user or automatically by a timeout or other event), show the tooltip when the
       // "info visible" animation has finished. Otherwise, we don't show the tooltip to
       // not disturb the user.
-      var complete = null;
+      let complete = null;
       if (!scout.isOneOf(this.table.tableStatus.uiState, 'user-hidden', 'auto-hidden')) {
         this._$infoTableStatus.addClass('tooltip-active'); // color icon before animation starts
         complete = function() {
@@ -398,15 +398,15 @@ export default class TableFooter extends Widget {
       }
       return;
     }
-    var animate = this.rendered; // Animate only on a user interaction, no while the table gets rendered
+    let animate = this.rendered; // Animate only on a user interaction, no while the table gets rendered
     if (!animate) {
       $info.setVisible(visible);
       return;
     }
     if (visible) {
-      var animationOpts = {
+      let animationOpts = {
         progress: this.revalidateLayout.bind(this),
-        complete: function() {
+        complete: () => {
           if (complete) {
             complete();
           }
@@ -426,7 +426,7 @@ export default class TableFooter extends Widget {
         width: 0
       }, {
         progress: this.revalidateLayout.bind(this),
-        complete: function() {
+        complete: () => {
           $info.removeData('hiding');
           $info.setVisible(false);
         }
@@ -446,9 +446,9 @@ export default class TableFooter extends Widget {
         arrowPositionUnit: '%',
         $anchor: $info
       });
-      this._tableInfoTooltip.one('destroy', function() {
+      this._tableInfoTooltip.one('destroy', () => {
         this._tableInfoTooltip = null;
-      }.bind(this));
+      });
       this._tableInfoTooltip.render();
     }
   }
@@ -487,7 +487,7 @@ export default class TableFooter extends Widget {
     if (this.open) {
       // Calling open again may resize the container -> don't return
     }
-    var currentControl = this.$controlContent.data('control');
+    let currentControl = this.$controlContent.data('control');
     if (this.animating && currentControl !== control) {
       // Make sure the existing content is removed if the close animation was aborted and another control selected while the container is still closing
       // (The done callback won't be executed when calling stop(true))
@@ -496,9 +496,9 @@ export default class TableFooter extends Widget {
     this.animating = true;
     this.open = true;
 
-    var allowedControlHeight = this.computeControlContainerHeight(this.table, control);
+    let allowedControlHeight = this.computeControlContainerHeight(this.table, control);
 
-    var insets = graphics.insets(this.$controlContainer);
+    let insets = graphics.insets(this.$controlContainer);
     this.$controlContent.outerHeight(allowedControlHeight - insets.vertical());
 
     // If container is opened the first time, set the height to 0 to make animation work
@@ -534,7 +534,7 @@ export default class TableFooter extends Widget {
     this.animating = true;
     this.table.invalidateLayoutTree();
 
-    var completeFunc = function() {
+    let completeFunc = function() {
       this.animating = false;
       this.$controlContainer.hide();
       control.onControlContainerClosed();
@@ -553,7 +553,7 @@ export default class TableFooter extends Widget {
   }
 
   computeControlContainerHeight(table, control, growControl) {
-    var menuBarHeight = 0,
+    let menuBarHeight = 0,
       footerHeight = 0,
       containerHeight = graphics.size(table.$container).height,
       maxControlHeight,
@@ -571,7 +571,7 @@ export default class TableFooter extends Widget {
     }
 
     if (table.menuBarVisible && menuBar.visible) {
-      var htmlMenuBar = HtmlComponent.get(menuBar.$container);
+      let htmlMenuBar = HtmlComponent.get(menuBar.$container);
       menuBarHeight = MenuBarLayout.size(htmlMenuBar, containerSize).height;
     }
     // Layout table footer and add size of footer (including the control content) to 'height'
@@ -619,14 +619,14 @@ export default class TableFooter extends Widget {
       return;
     }
 
-    var tableStatus = this.table.tableStatus;
-    var text = (tableStatus ? tableStatus.message : null);
+    let tableStatus = this.table.tableStatus;
+    let text = (tableStatus ? tableStatus.message : null);
     if (strings.empty(text)) {
       return; // Refuse to show empty tooltip
     }
 
     // Create new tooltip
-    var opts = {
+    let opts = {
       parent: this,
       text: text,
       severity: tableStatus.severity,
@@ -634,14 +634,14 @@ export default class TableFooter extends Widget {
       $anchor: this._$infoTableStatusIcon
     };
     this._tableStatusTooltip = scout.create('Tooltip', opts);
-    this._tableStatusTooltip.one('destroy', function() {
+    this._tableStatusTooltip.one('destroy', () => {
       this._tableStatusTooltip = null;
-    }.bind(this));
+    });
     this._tableStatusTooltip.render();
 
     // Adjust icon style
     this._$infoTableStatus.addClass('tooltip-active');
-    this._tableStatusTooltip.on('remove', function() {
+    this._tableStatusTooltip.on('remove', () => {
       this._$infoTableStatus.removeClass('tooltip-active');
       // When the tooltip is removed (e.g. because of the auto-remove timeout, or
       // The user clicked somewhere) set the uiStatus accordingly. Otherwise, it
@@ -650,16 +650,16 @@ export default class TableFooter extends Widget {
       if (this.table.tableStatus && !this.table.tableStatus.isError()) {
         this.table.tableStatus.uiState = 'auto-hidden';
       }
-    }.bind(this));
+    });
 
     // Auto-hide unimportant messages
     clearTimeout(this._autoHideTableStatusTooltipTimeoutId);
     if (!tableStatus.isError() && !tableStatus.isWarning() && !tableStatus.uiState) {
       // Already set status to 'auto-hidden', in case the user changes outline before timeout elapses
       this.table.tableStatus.uiState = 'auto-hidden';
-      this._autoHideTableStatusTooltipTimeoutId = setTimeout(function() {
+      this._autoHideTableStatusTooltipTimeoutId = setTimeout(() => {
         this._hideTableStatusTooltip();
-      }.bind(this), 5000);
+      }, 5000);
     }
   }
 
@@ -668,7 +668,7 @@ export default class TableFooter extends Widget {
   }
 
   onControlSelected(control) {
-    var previousControl = this.selectedControl;
+    let previousControl = this.selectedControl;
     this.selectedControl = control;
 
     if (control) {
@@ -693,7 +693,7 @@ export default class TableFooter extends Widget {
   }
 
   _createOnFilterFieldInputFunction() {
-    var debounceFunction = $.debounce(this._applyFilter.bind(this));
+    let debounceFunction = $.debounce(this._applyFilter.bind(this));
     return function(event) {
       this._updateHasFilterText();
       // debounced filter
@@ -709,7 +709,7 @@ export default class TableFooter extends Widget {
   }
 
   _applyFilter(event) {
-    var filter,
+    let filter,
       filterText = this._$textFilter.val();
     if (this.filterText !== filterText) {
       this.filterText = filterText;
@@ -737,9 +737,9 @@ export default class TableFooter extends Widget {
     if (this._compactStyle) {
       this._toggleTableInfoTooltip(this._$infoLoad, 'TableInfoLoadTooltip');
     } else {
-      var numRows = this.table.rows.length;
-      var estRows = this.table.estimatedRowCount;
-      var maxRows = this.table.maxRowCount;
+      let numRows = this.table.rows.length;
+      let estRows = this.table.estimatedRowCount;
+      let maxRows = this.table.maxRowCount;
       if (estRows && maxRows && numRows < estRows && numRows < maxRows) {
         this.table.reload(Table.ReloadReason.OVERRIDE_ROW_LIMIT);
       } else {
@@ -779,7 +779,7 @@ export default class TableFooter extends Widget {
     if (event.filter.filterType === TableTextUserFilter.TYPE) {
       // Do not update the content when the value does not change. This is the case when typing text in
       // the UI. If we would call val() unconditionally, the current cursor position will get lost.
-      var currentText = this._$textFilter.val();
+      let currentText = this._$textFilter.val();
       if (currentText !== event.filter.text) {
         this._$textFilter.val(event.filter.text);
         this._updateHasFilterText();

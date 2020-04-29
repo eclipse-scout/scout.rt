@@ -19,17 +19,17 @@ export default class WidgetPopupLayout extends PopupLayout {
   _setSize(prefSize) {
     super._setSize(prefSize);
 
-    var htmlPopup = this.popup.htmlComp;
-    var htmlWidget = this.popup.widget.htmlComp;
-    var widgetSize = prefSize.subtract(htmlPopup.insets());
+    let htmlPopup = this.popup.htmlComp;
+    let htmlWidget = this.popup.widget.htmlComp;
+    let widgetSize = prefSize.subtract(htmlPopup.insets());
     htmlWidget.setSize(widgetSize.subtract(htmlWidget.margins()));
   }
 
   preferredLayoutSize($container, options) {
-    var htmlComp = this.popup.htmlComp;
-    var htmlWidget = this.popup.widget.htmlComp;
+    let htmlComp = this.popup.htmlComp;
+    let htmlWidget = this.popup.widget.htmlComp;
 
-    var prefSize = htmlWidget.prefSize(options)
+    let prefSize = htmlWidget.prefSize(options)
       .add(htmlComp.insets())
       .add(htmlWidget.margins());
 

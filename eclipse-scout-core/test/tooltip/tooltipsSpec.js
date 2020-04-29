@@ -11,11 +11,11 @@
 import {FormSpecHelper} from '@eclipse-scout/testing';
 import {tooltips, ValueField} from '../../src/index';
 
-describe('scout.tooltips', function() {
+describe('scout.tooltips', () => {
 
-  var session, helper, formField, model;
+  let session, helper, formField, model;
 
-  beforeEach(function() {
+  beforeEach(() => {
     jasmine.clock().install();
 
     setFixtures(sandbox());
@@ -36,11 +36,11 @@ describe('scout.tooltips', function() {
     formField.render();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
-  it('can be installed and uninstalled for a form field', function() {
+  it('can be installed and uninstalled for a form field', () => {
     tooltips.install(formField.$container, {
       parent: session.desktop,
       session: session,
@@ -51,7 +51,7 @@ describe('scout.tooltips', function() {
     expect(formField.$container.data('tooltipSupport')).toBeUndefined();
   });
 
-  it('creates a tooltip on mouseenter and removes it on mouseleave', function() {
+  it('creates a tooltip on mouseenter and removes it on mouseleave', () => {
     tooltips.install(formField.$container, {
       parent: session.desktop,
       session: session,
@@ -63,8 +63,8 @@ describe('scout.tooltips', function() {
     formField.$container.triggerMouseEnter();
     jasmine.clock().tick(100);
 
-    var tooltip = $('body').find('.tooltip');
-    var tooltipContent = tooltip.children('.tooltip-content');
+    let tooltip = $('body').find('.tooltip');
+    let tooltipContent = tooltip.children('.tooltip-content');
     expect(tooltip).not.toBeUndefined();
     expect(tooltip.length).toBe(1);
     expect(tooltipContent.text()).toBe('Test2');
@@ -78,9 +78,9 @@ describe('scout.tooltips', function() {
     tooltips.uninstall(formField.$container);
   });
 
-  describe('if text', function() {
+  describe('if text', () => {
 
-    it('is empty no tooltip will be shown', function() {
+    it('is empty no tooltip will be shown', () => {
       tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
@@ -92,20 +92,18 @@ describe('scout.tooltips', function() {
       formField.$container.triggerMouseEnter();
       jasmine.clock().tick(100);
 
-      var tooltip = $('body').find('.tooltip');
+      let tooltip = $('body').find('.tooltip');
       expect(tooltip).not.toBeUndefined();
       expect(tooltip.length).toBe(0);
 
       tooltips.uninstall(formField.$container);
     });
 
-    it('is a function, it will be called for tooltip text', function() {
+    it('is a function, it will be called for tooltip text', () => {
       tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
-        text: function() {
-          return 'Test3';
-        },
+        text: () => 'Test3',
         delay: 0
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
@@ -113,8 +111,8 @@ describe('scout.tooltips', function() {
       formField.$container.triggerMouseEnter();
       jasmine.clock().tick(100);
 
-      var tooltip = $('body').find('.tooltip');
-      var tooltipContent = tooltip.children('.tooltip-content');
+      let tooltip = $('body').find('.tooltip');
+      let tooltipContent = tooltip.children('.tooltip-content');
       expect(tooltip).not.toBeUndefined();
       expect(tooltip.length).toBe(1);
       expect(tooltipContent.text()).toBe('Test3');
@@ -122,13 +120,11 @@ describe('scout.tooltips', function() {
       tooltips.uninstall(formField.$container);
     });
 
-    it('is undefined no tooltip will be shown', function() {
+    it('is undefined no tooltip will be shown', () => {
       tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
-        text: function() {
-          return undefined;
-        },
+        text: () => undefined,
         delay: 0
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
@@ -136,14 +132,14 @@ describe('scout.tooltips', function() {
       formField.$container.triggerMouseEnter();
       jasmine.clock().tick(100);
 
-      var tooltip = $('body').find('.tooltip');
+      let tooltip = $('body').find('.tooltip');
       expect(tooltip).not.toBeUndefined();
       expect(tooltip.length).toBe(0);
 
       tooltips.uninstall(formField.$container);
     });
 
-    it('is provided by component, it will be used as tooltip text', function() {
+    it('is provided by component, it will be used as tooltip text', () => {
       tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
@@ -155,8 +151,8 @@ describe('scout.tooltips', function() {
       formField.$container.triggerMouseEnter();
       jasmine.clock().tick(100);
 
-      var tooltip = $('body').find('.tooltip');
-      var tooltipContent = tooltip.children('.tooltip-content');
+      let tooltip = $('body').find('.tooltip');
+      let tooltipContent = tooltip.children('.tooltip-content');
       expect(tooltip).not.toBeUndefined();
       expect(tooltip.length).toBe(1);
       expect(tooltipContent.text()).toBe('Test4');
@@ -164,7 +160,7 @@ describe('scout.tooltips', function() {
       tooltips.uninstall(formField.$container);
     });
 
-    it('is provided as function by component, it will be called and used as tooltip text', function() {
+    it('is provided as function by component, it will be called and used as tooltip text', () => {
       tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
@@ -172,14 +168,14 @@ describe('scout.tooltips', function() {
       });
       expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
 
-      formField.$container.data('tooltipText', function() {
+      formField.$container.data('tooltipText', () => {
         return 'Test5';
       });
       formField.$container.triggerMouseEnter();
       jasmine.clock().tick(100);
 
-      var tooltip = $('body').find('.tooltip');
-      var tooltipContent = tooltip.children('.tooltip-content');
+      let tooltip = $('body').find('.tooltip');
+      let tooltipContent = tooltip.children('.tooltip-content');
       expect(tooltip).not.toBeUndefined();
       expect(tooltip.length).toBe(1);
       expect(tooltipContent.text()).toBe('Test5');
@@ -187,7 +183,7 @@ describe('scout.tooltips', function() {
       tooltips.uninstall(formField.$container);
     });
 
-    it('is provided using options and by component, text provided using options will be used', function() {
+    it('is provided using options and by component, text provided using options will be used', () => {
       tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
@@ -200,8 +196,8 @@ describe('scout.tooltips', function() {
       formField.$container.triggerMouseEnter();
       jasmine.clock().tick(100);
 
-      var tooltip = $('body').find('.tooltip');
-      var tooltipContent = tooltip.children('.tooltip-content');
+      let tooltip = $('body').find('.tooltip');
+      let tooltipContent = tooltip.children('.tooltip-content');
       expect(tooltip).not.toBeUndefined();
       expect(tooltip.length).toBe(1);
       expect(tooltipContent.text()).toBe('Test6');
@@ -209,12 +205,12 @@ describe('scout.tooltips', function() {
       tooltips.uninstall(formField.$container);
     });
 
-    it('is a function, component is passed as first and only argument', function() {
+    it('is a function, component is passed as first and only argument', () => {
       tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
-        text: function() {
-          return (formField.$container.is(arguments[0]) && arguments.length === 1) ? 'Test8' : 'InvalidArguments';
+        text: function(container) {
+          return (formField.$container.is(container) && arguments.length === 1) ? 'Test8' : 'InvalidArguments';
         },
         delay: 0
       });
@@ -223,8 +219,8 @@ describe('scout.tooltips', function() {
       formField.$container.triggerMouseEnter();
       jasmine.clock().tick(100);
 
-      var tooltip = $('body').find('.tooltip');
-      var tooltipContent = tooltip.children('.tooltip-content');
+      let tooltip = $('body').find('.tooltip');
+      let tooltipContent = tooltip.children('.tooltip-content');
       expect(tooltip).not.toBeUndefined();
       expect(tooltip.length).toBe(1);
       expect(tooltipContent.text()).toBe('Test8');
@@ -234,9 +230,9 @@ describe('scout.tooltips', function() {
 
   });
 
-  it('can update the text of an already visible tooltip', function() {
+  it('can update the text of an already visible tooltip', () => {
     // 1. Test with 'tooltipText' data attribute in DOM
-    var $testElement = session.$entryPoint.appendDiv('tooltip-test')
+    let $testElement = session.$entryPoint.appendDiv('tooltip-test')
       .data('tooltipText', 'initial text');
 
     tooltips.install($testElement, {
@@ -245,7 +241,7 @@ describe('scout.tooltips', function() {
       delay: 123
     });
 
-    var tooltip = $('body').find('.tooltip');
+    let tooltip = $('body').find('.tooltip');
     expect(tooltip.length).toBe(0);
 
     $testElement.triggerMouseEnter();
@@ -266,13 +262,13 @@ describe('scout.tooltips', function() {
     expect(tooltip.length).toBe(1);
     expect(tooltip.text()).toBe('initial text');
 
-    var support = $testElement.data('tooltipSupport');
+    let support = $testElement.data('tooltipSupport');
     tooltips.update($testElement);
 
     tooltip = $('body').find('.tooltip');
     expect(tooltip.length).toBe(1);
     expect(tooltip.text()).toBe('updated text');
-    var support2 = $testElement.data('tooltipSupport');
+    let support2 = $testElement.data('tooltipSupport');
     expect(support2).toBe(support);
 
     tooltips.uninstall($testElement);

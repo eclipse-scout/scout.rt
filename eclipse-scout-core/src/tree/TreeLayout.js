@@ -24,7 +24,7 @@ export default class TreeLayout extends AbstractLayout {
   }
 
   _layout($container) {
-    var menuBarSize, containerSize, heightOffset,
+    let menuBarSize, containerSize, heightOffset,
       menuBar = this.tree.menuBar,
       htmlMenuBar = menuBar.htmlComp,
       htmlContainer = this.tree.htmlComp;
@@ -80,7 +80,7 @@ export default class TreeLayout extends AbstractLayout {
   }
 
   _setDataHeight(heightOffset) {
-    var $data = this.tree.$data;
+    let $data = this.tree.$data;
 
     heightOffset += $data.cssMarginTop() + $data.cssMarginBottom();
 

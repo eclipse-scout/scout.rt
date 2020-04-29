@@ -20,7 +20,7 @@ export default class MobilePopupLayout extends PopupLayout {
   layout($container) {
     super.layout($container);
 
-    var htmlPopup = this.popup.htmlComp,
+    let htmlPopup = this.popup.htmlComp,
       popupSize = htmlPopup.size(),
       htmlWidget = this.popup.widget.htmlComp,
       widgetSize = 0,
@@ -41,7 +41,7 @@ export default class MobilePopupLayout extends PopupLayout {
    * @override AbstractLayout.js
    */
   preferredLayoutSize($container) {
-    var $window = this.popup.$container.window(),
+    let $window = this.popup.$container.window(),
       windowSize = new Dimension($window.width(), $window.height());
 
     return windowSize;

@@ -48,7 +48,7 @@ export default class Tooltip extends Widget {
 
   render($parent) {
     // Use entry point by default
-    var $tooltipParent = $parent || this.entryPoint();
+    let $tooltipParent = $parent || this.entryPoint();
     // when the parent is detached it is not possible to render the popup -> do it later
     if (!$tooltipParent || !$tooltipParent.length || !$tooltipParent.isAttached()) {
       this._openLater = true;
@@ -91,7 +91,7 @@ export default class Tooltip extends Widget {
 
     // If the tooltip is rendered inside a (popup) dialog, get a reference to the dialog.
     this.dialog = null;
-    var parent = this.parent;
+    let parent = this.parent;
     while (parent) {
       if (parent instanceof Form && parent.isDialog()) {
         this.dialog = parent;
@@ -164,7 +164,7 @@ export default class Tooltip extends Widget {
   }
 
   _renderText() {
-    var text = this.text || '';
+    let text = this.text || '';
     if (this.htmlEnabled) {
       this.$content.html(text);
     } else {
@@ -189,7 +189,7 @@ export default class Tooltip extends Widget {
   }
 
   _renderMenus() {
-    var maxIconWidth = 0,
+    let maxIconWidth = 0,
       menus = this.menus;
 
     if (menus.length > 0 && !this.$menus) {
@@ -201,7 +201,7 @@ export default class Tooltip extends Widget {
 
     // Render menus
     menus.forEach(function(menu) {
-      var iconWidth = 0;
+      let iconWidth = 0;
       menu.render(this.$menus);
       if (menu.iconId) {
         iconWidth = menu.get$Icon().outerWidth(true);
@@ -211,7 +211,7 @@ export default class Tooltip extends Widget {
 
     // Align menus if there is one with an icon
     if (maxIconWidth > 0) {
-      menus.forEach(function(menu) {
+      menus.forEach(menu => {
         if (!menu.iconId) {
           menu.$text.cssPaddingLeft(maxIconWidth);
         } else {
@@ -226,7 +226,7 @@ export default class Tooltip extends Widget {
   }
 
   position() {
-    var top, left, arrowSize, overlapX, overlapY, x, y, origin,
+    let top, left, arrowSize, overlapX, overlapY, x, y, origin,
       tooltipWidth, tooltipHeight, arrowDivWidth, arrowPosition, inView;
 
     if (this.origin) {
@@ -246,7 +246,7 @@ export default class Tooltip extends Widget {
 
     // this.$parent might not be at (0,0) of the document
     if (!this.originRelativeToParent) {
-      var parentOffset = this.$parent.offset();
+      let parentOffset = this.$parent.offset();
       x -= parentOffset.left;
       y -= parentOffset.top;
     }
@@ -293,7 +293,7 @@ export default class Tooltip extends Widget {
       .cssTop(top);
 
     // If there are menu popups make sure they are positioned correctly
-    this.menus.forEach(function(menu) {
+    this.menus.forEach(menu => {
       if (menu.popup) {
         menu.popup.position();
       }
@@ -322,7 +322,7 @@ export default class Tooltip extends Widget {
   }
 
   _isMouseDownOutside(event) {
-    var $target = $(event.target),
+    let $target = $(event.target),
       targetWidget = scout.widget($target);
 
     // Only remove the tooltip if the click is outside of the container or the $anchor (= status icon)

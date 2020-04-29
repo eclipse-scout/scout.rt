@@ -81,7 +81,7 @@ export default class TableHeader extends Widget {
   }
 
   _renderColumns() {
-    var visibleColumns = this._visibleColumns();
+    let visibleColumns = this._visibleColumns();
     visibleColumns.forEach(this._renderColumn, this);
     if (visibleColumns.length === 0) {
       // If there are no columns, make the filler visible and make sure the header is as large as normally using nbsp
@@ -91,7 +91,7 @@ export default class TableHeader extends Widget {
   }
 
   _renderColumn(column, index) {
-    var columnWidth = column._realWidthIfAvailable(),
+    let columnWidth = column._realWidthIfAvailable(),
       marginLeft = '',
       marginRight = '',
       visibleColumns = this._visibleColumns(),
@@ -104,7 +104,7 @@ export default class TableHeader extends Widget {
       marginRight = this.table.rowBorderRightWidth;
     }
 
-    var $header = this.$filler.beforeDiv('table-header-item')
+    let $header = this.$filler.beforeDiv('table-header-item')
       .setEnabled(this.enabled) // enabledComputed not used on purpose
       .data('column', column)
       .cssMinWidth(columnWidth)
@@ -133,12 +133,12 @@ export default class TableHeader extends Widget {
     this._installHeaderItemTooltip(column);
     this._decorateHeader(column);
 
-    var showSeparator = column.showSeparator;
+    let showSeparator = column.showSeparator;
     if (isLastColumn && !this.enabled) { // enabledComputed not used on purpose
       showSeparator = false;
     }
     if (showSeparator) {
-      var $separator = this.$filler.beforeDiv('table-header-resize');
+      let $separator = this.$filler.beforeDiv('table-header-resize');
       if (column.fixedWidth || !this.enabled) { // enabledComputed not used on purpose
         $separator.setEnabled(false);
       } else {
@@ -177,7 +177,7 @@ export default class TableHeader extends Widget {
       return;
     }
 
-    var remainingHeaderSpace, adjustment,
+    let remainingHeaderSpace, adjustment,
       $header = column.$header,
       columnWidth = column._realWidthIfAvailable(),
       marginLeft = '',
@@ -203,7 +203,7 @@ export default class TableHeader extends Widget {
           adjustment -= remainingHeaderSpace;
         }
 
-        var origColumnWidth = columnWidth;
+        let origColumnWidth = columnWidth;
         columnWidth = Math.max(columnWidth - adjustment, column.minWidth);
         this.$filler.cssWidth(origColumnWidth - columnWidth);
       }
@@ -229,7 +229,7 @@ export default class TableHeader extends Widget {
 
   _reconcileScrollPos() {
     // When scrolling horizontally scroll header as well
-    var
+    let
       scrollLeft = this.table.get$Scrollable().scrollLeft(),
       lastColumn = this._lastVisibleColumn();
 
@@ -239,7 +239,7 @@ export default class TableHeader extends Widget {
   }
 
   _arrangeHeaderItems($headers) {
-    var that = this;
+    let that = this;
     $headers.each(function() {
       // move to old position and then animate
       $(this).css('left', $(this).data('old-pos') - $(this).offset().left)
@@ -247,7 +247,7 @@ export default class TableHeader extends Widget {
           left: 0
         }, {
           progress: function(animation, progress, remainingMs) {
-            var $headerItem = $(this);
+            let $headerItem = $(this);
             if (!$headerItem.isSelected()) {
               return;
             }
@@ -287,13 +287,13 @@ export default class TableHeader extends Widget {
   }
 
   _headerItemTooltipText($col) {
-    var column = $col.data('column');
+    let column = $col.data('column');
     if (column && strings.hasText(column.headerTooltipText)) {
       return column.headerTooltipText;
     } else if ($col.isContentTruncated() || ($col.width() + $col.position().left) > $col.parent().width()) {
       $col = $col.clone();
       $col.children('.table-header-item-state').remove();
-      var text = strings.plainText($col.html(), {
+      let text = strings.plainText($col.html(), {
         trim: true
       });
       if (strings.hasText(text)) {
@@ -304,7 +304,7 @@ export default class TableHeader extends Widget {
   }
 
   _headerItemTooltipHtmlEnabled($col) {
-    var column = $col.data('column');
+    let column = $col.data('column');
     return column.headerTooltipHtmlEnabled;
   }
 
@@ -331,11 +331,11 @@ export default class TableHeader extends Widget {
     column.trigger('headerMenuOpen', {
       menu: this.tableHeaderMenu
     });
-    this.tableHeaderMenu.one('destroy', function() {
+    this.tableHeaderMenu.one('destroy', () => {
       column.trigger('headerMenuClose', {
         menu: this.tableHeaderMenu
       });
-    }.bind(this));
+    });
   }
 
   closeHeaderMenu() {
@@ -372,7 +372,7 @@ export default class TableHeader extends Widget {
   }
 
   _renderColumnCssClass(column, oldColumnState) {
-    var $header = column.$header;
+    let $header = column.$header;
     if (oldColumnState) {
       $header.removeClass(oldColumnState.headerCssClass);
     }
@@ -380,7 +380,7 @@ export default class TableHeader extends Widget {
   }
 
   _renderColumnText(column) {
-    var text = column.text,
+    let text = column.text,
       $header = column.$header,
       $headerText = $header.children('.table-header-item-text');
 
@@ -403,7 +403,7 @@ export default class TableHeader extends Widget {
   }
 
   _updateColumnIconAndTextStyle(column) {
-    var $icon = column.$header.data('$icon'),
+    let $icon = column.$header.data('$icon'),
       $text = column.$header.children('.table-header-item-text');
 
     if ($icon) {
@@ -424,7 +424,7 @@ export default class TableHeader extends Widget {
   }
 
   _renderColumnState(column) {
-    var sortDirection, $state,
+    let sortDirection, $state,
       $header = column.$header,
       filtered = this.table.getFilter(column.id);
 
@@ -445,7 +445,7 @@ export default class TableHeader extends Widget {
 
     if (column.grouped || filtered) {
       // contains group and filter symbols
-      var $left = $state.appendDiv('left');
+      let $left = $state.appendDiv('left');
       if (column.grouped) {
         $header.addClass('grouped');
         $state.addClass('grouped');
@@ -467,7 +467,7 @@ export default class TableHeader extends Widget {
    * Makes sure state is fully visible by adjusting width (happens if column.minWidth is < DEFAULT_MIN_WIDTH)
    */
   _adjustColumnMinWidth(column) {
-    var filtered = this.table.getFilter(column.id);
+    let filtered = this.table.getFilter(column.id);
     if (column.sortActive || column.grouped || filtered) {
       if (column.minWidth < Column.DEFAULT_MIN_WIDTH) {
         column.prefMinWidth = column.minWidth;
@@ -490,13 +490,13 @@ export default class TableHeader extends Widget {
   }
 
   updateMenuBar() {
-    var menuItems = this.table._filterMenus(this.table.menus, MenuDestinations.HEADER);
+    let menuItems = this.table._filterMenus(this.table.menus, MenuDestinations.HEADER);
     this.menuBar.setHiddenByUi(!this.enabled); // enabledComputed not used on purpose
     this.menuBar.setMenuItems(menuItems);
   }
 
   _onTableColumnResized(event) {
-    var column = event.column,
+    let column = event.column,
       lastColumn = this._lastVisibleColumn();
     this.resizeHeaderItem(column);
     if (lastColumn !== column) {
@@ -509,7 +509,7 @@ export default class TableHeader extends Widget {
   }
 
   _onTableColumnMoved(event) {
-    var
+    let
       column = event.column,
       oldPos = event.oldPos,
       newPos = event.newPos,
@@ -547,9 +547,9 @@ export default class TableHeader extends Widget {
 
     // Update header size due to header menu items if moved from or to last position
     if (oldPos === lastColumnPos || newPos === lastColumnPos) {
-      visibleColumns.forEach(function(column) {
+      visibleColumns.forEach(column => {
         this.resizeHeaderItem(column);
-      }.bind(this));
+      });
     }
 
     // move to old position and then animate
@@ -570,8 +570,8 @@ export default class TableHeader extends Widget {
   }
 
   onOrderChanged(oldColumnOrder) {
-    var $header, $headerResize;
-    var $headers = this.findHeaderItems();
+    let $header, $headerResize;
+    let $headers = this.findHeaderItems();
 
     // store old position of headers
     $headers.each(function() {
@@ -601,7 +601,7 @@ export default class TableHeader extends Widget {
   }
 
   _onHeaderItemClick(event) {
-    var $headerItem = $(event.currentTarget),
+    let $headerItem = $(event.currentTarget),
       column = $headerItem.data('column');
 
     if (this.dragging || this.columnMoved) {
@@ -624,7 +624,7 @@ export default class TableHeader extends Widget {
       return; // ignore buttons other than the main (left) mouse button
     }
 
-    var diff = 0,
+    let diff = 0,
       that = this,
       startX = Math.floor(event.pageX),
       $header = $(event.currentTarget),
@@ -665,10 +665,10 @@ export default class TableHeader extends Widget {
       $header.css('left', diff);
 
       // find other affected headers
-      var middle = realMiddle($header);
+      let middle = realMiddle($header);
 
       $otherHeaders.each(function(i) {
-        var m = realMiddle($(this));
+        let m = realMiddle($(this));
 
         if (middle < m && i < oldPos) {
           $(this).css('left', move);
@@ -689,7 +689,7 @@ export default class TableHeader extends Widget {
     }
 
     function realWidth($div) {
-      var html = $div.html(),
+      let html = $div.html(),
         width = $div.html('<span>' + html + '</span>').find('span:first').width();
 
       $div.html(html);
@@ -712,7 +712,7 @@ export default class TableHeader extends Widget {
       }
 
       // find new position of dragged header
-      var h = (diff < 0) ? $otherHeaders : $($otherHeaders.get().reverse());
+      let h = (diff < 0) ? $otherHeaders : $($otherHeaders.get().reverse());
       h.each(function(i) {
         if ($(this).css('left') !== '0px') {
           newPos = that._visibleColumns().indexOf(($(this).data('column')));
@@ -726,7 +726,7 @@ export default class TableHeader extends Widget {
         that.dragging = false;
         that.columnMoved = true;
       } else {
-        $header.animateAVCSD('left', '', function() {
+        $header.animateAVCSD('left', '', () => {
           that.dragging = false;
         });
       }
@@ -756,7 +756,7 @@ export default class TableHeader extends Widget {
       }, this);
     } else {
       // Optimize the column left of the separator
-      var $header = $(event.target).prev(),
+      let $header = $(event.target).prev(),
         column = $header.data('column');
       this.table.resizeToFit(column);
     }
@@ -767,7 +767,7 @@ export default class TableHeader extends Widget {
       return; // ignore buttons other than the main (left) mouse button
     }
 
-    var startX = Math.floor(event.pageX),
+    let startX = Math.floor(event.pageX),
       $header = $(event.target).prev(),
       column = $header.data('column'),
       that = this,
@@ -776,10 +776,10 @@ export default class TableHeader extends Widget {
     // Install resize helpers. Those helpers make sure the header and the data element keep their
     // current width until the resizing has finished. Otherwise, make a column smaller while the
     // table has been horizontally scrolled to the right would behave very strange.
-    var $headerColumnResizedHelper = this.$container
+    let $headerColumnResizedHelper = this.$container
       .appendDiv('table-column-resize-helper')
       .css('width', this.table.rowWidth + this.table.rowBorderWidth);
-    var $dataColumnResizedHelper = this.table.$data
+    let $dataColumnResizedHelper = this.table.$data
       .appendDiv('table-column-resize-helper')
       .css('width', this.table.rowWidth);
 
@@ -792,7 +792,7 @@ export default class TableHeader extends Widget {
     event.preventDefault();
 
     function resizeMove(event) {
-      var diff = Math.floor(event.pageX) - startX,
+      let diff = Math.floor(event.pageX) - startX,
         wHeader = headerWidth + diff;
 
       wHeader = Math.max(wHeader, column.minWidth);
@@ -828,7 +828,7 @@ export default class TableHeader extends Widget {
   }
 
   _onTableAddFilterRemoved(event) {
-    var column = event.filter.column;
+    let column = event.filter.column;
     // Check for column.$header because column may have been removed in the mean time due to a structure changed event -> don't try to render state
     if (event.filter.filterType === ColumnUserFilter.TYPE && column.$header) {
       this._renderColumnState(column);

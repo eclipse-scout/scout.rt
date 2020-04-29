@@ -12,16 +12,16 @@
 import {arrays, Outline, PageWithTable, scout, StaticLookupCall} from '../../../../src/index';
 import {OutlineSpecHelper} from '@eclipse-scout/testing';
 
-describe('PageWithTable', function() {
+describe('PageWithTable', () => {
 
-  var session, helper;
+  let session, helper;
 
   /** @type {Outline} */
-  var outline;
+  let outline;
   /** @type {PageWithTable} */
-  var page;
+  let page;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new OutlineSpecHelper(session);
@@ -40,13 +40,13 @@ describe('PageWithTable', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
-  it('updates the page on table reload', function() {
-    var counter = 0;
-    page._loadTableData = function(searchFilter) {
+  it('updates the page on table reload', () => {
+    let counter = 0;
+    page._loadTableData = searchFilter => {
       counter++;
       return $.resolvedDeferred();
     };
@@ -56,24 +56,22 @@ describe('PageWithTable', function() {
     expect(counter).toBe(1);
   });
 
-  it('should handle errors in _onLoadTableDataDone', function() {
-    page._loadTableData = function(searchFilter) {
-      return $.resolvedDeferred([{
-        rowId: 1,
-        parentRow: 666, // does not exist -> causes an error in Table.js#insertRows
-        cells: []
-      }]);
-    };
+  it('should handle errors in _onLoadTableDataDone', () => {
+    page._loadTableData = searchFilter => $.resolvedDeferred([{
+      rowId: 1,
+      parentRow: 666, // does not exist -> causes an error in Table.js#insertRows
+      cells: []
+    }]);
     expect(page.detailTable.tableStatus).toBe(undefined);
     page.detailTable.reload();
     jasmine.clock().tick(3);
 
     // expect error to be set as tableStatus
-    var keys = Object.keys(page.detailTable.tableStatus);
+    let keys = Object.keys(page.detailTable.tableStatus);
     expect(arrays.containsAll(keys, ['message', 'code', 'severity'])).toBe(true);
   });
 
-  it('does not fail when cells with null values are inserted into a smart column ', function(done) {
+  it('does not fail when cells with null values are inserted into a smart column ', done => {
     class DummyLookupCall extends StaticLookupCall {
       constructor() {
         super();
@@ -95,7 +93,7 @@ describe('PageWithTable', function() {
       }
 
       _loadTableData(searchFilter) {
-        var data = [{
+        let data = [{
           string: 'string 1',
           smartValue: null
         }, {
@@ -116,7 +114,7 @@ describe('PageWithTable', function() {
 
       _transformTableDataToTableRows(tableData) {
         return tableData
-          .map(function(row) {
+          .map(row => {
             return {
               data: row,
               cells: [
@@ -129,7 +127,7 @@ describe('PageWithTable', function() {
     }
 
     jasmine.clock().uninstall();
-    var lookupCall = new DummyLookupCall();
+    let lookupCall = new DummyLookupCall();
     lookupCall.init({session: session});
     page = new SamplePageWithTable();
     page.init({
@@ -153,7 +151,7 @@ describe('PageWithTable', function() {
     });
     outline.insertNode(page);
     outline.selectNode(page);
-    page.detailTable.when('propertyChange:loading').then(function(event) {
+    page.detailTable.when('propertyChange:loading').then(event => {
       // Loading is set to true when update buffer finishes
       expect(page.detailTable.rows[0].cells[0].text).toEqual('string 1');
       expect(page.detailTable.rows[0].cells[1].text).toEqual('');

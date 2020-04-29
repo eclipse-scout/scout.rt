@@ -11,23 +11,23 @@
 import {Device, Outline, scout} from '../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
 
-describe('OutlineMediator', function() {
+describe('OutlineMediator', () => {
 
-  var session, tableModel, detailTable, page, firstColumn;
+  let session, tableModel, detailTable, page, firstColumn;
 
   /** @type {Outline} */
-  var outline;
+  let outline;
   /** @type {OutlineSpecHelper} */
-  var helper;
+  let helper;
   /** @type {TableSpecHelper} */
-  var tableHelper;
+  let tableHelper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new OutlineSpecHelper(session);
     tableHelper = new TableSpecHelper(session);
-    var model = helper.createModelFixture(1, 1, false);
+    let model = helper.createModelFixture(1, 1, false);
     outline = helper.createOutline(model);
 
     tableModel = tableHelper.createModelFixture(1, 0);
@@ -42,37 +42,37 @@ describe('OutlineMediator', function() {
     outline.insertNodes([page], null);
   });
 
-  it('tableRowsInserted', function() {
+  it('tableRowsInserted', () => {
     detailTable.insertRow(tableHelper.createModelRow(0, ['Foo']));
     expect(page.childNodes.length).toBe(1);
     expect(page.childNodes[0].text).toBe('Foo');
   });
 
-  it('tableRowsDeleted', function() {
+  it('tableRowsDeleted', () => {
     detailTable.insertRow(tableHelper.createModelRow(0, ['Foo']));
     expect(page.childNodes.length).toBe(1);
     expect(page.childNodes[0].text).toBe('Foo');
 
-    var firstRow = detailTable.rows[0];
+    let firstRow = detailTable.rows[0];
     detailTable.deleteRow(firstRow);
     expect(page.childNodes.length).toBe(0);
   });
 
-  it('tableRowsUpdated', function() {
+  it('tableRowsUpdated', () => {
     detailTable.insertRow(tableHelper.createModelRow(0, ['Foo']));
     expect(page.childNodes.length).toBe(1);
     expect(page.childNodes[0].text).toBe('Foo');
 
-    var firstRow = detailTable.rows[0];
+    let firstRow = detailTable.rows[0];
     detailTable.setCellValue(firstColumn, firstRow, 'Bar');
     expect(page.childNodes.length).toBe(1);
     expect(page.childNodes[0].text).toBe('Bar');
   });
 
-  it('tableRowAction', function() {
+  it('tableRowAction', () => {
     detailTable.insertRow(tableHelper.createModelRow(0, ['Foo']));
-    var firstRow = detailTable.rows[0];
-    var pageForRow = firstRow.page;
+    let firstRow = detailTable.rows[0];
+    let pageForRow = firstRow.page;
 
     expect(page.expanded).toBe(false);
     expect(outline.selectedNode()).toBe(null);
@@ -84,11 +84,11 @@ describe('OutlineMediator', function() {
     expect(outline.selectedNode()).toBe(pageForRow);
   });
 
-  it('tableRowOrderChanged', function() {
+  it('tableRowOrderChanged', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
-    var modelRows = [
+    let modelRows = [
       tableHelper.createModelRow(0, ['Foo']),
       tableHelper.createModelRow(1, ['Bar'])
     ];
@@ -101,8 +101,8 @@ describe('OutlineMediator', function() {
     expect(page.childNodes[1].text).toBe('Foo');
   });
 
-  it('tableRowsFiltered', function() {
-    var modelRows = [
+  it('tableRowsFiltered', () => {
+    let modelRows = [
       tableHelper.createModelRow(0, ['Foo']),
       tableHelper.createModelRow(1, ['Bar'])
     ];
@@ -110,7 +110,7 @@ describe('OutlineMediator', function() {
     outline.expandNode(page);
 
     expect(page.childNodes.length).toBe(2);
-    var filter = scout.create('TableTextUserFilter', {
+    let filter = scout.create('TableTextUserFilter', {
       session: session,
       table: detailTable,
       text: 'bar'

@@ -99,7 +99,7 @@ export default class BasicField extends ValueField {
    * @override ValueField.js
    */
   _checkDisplayTextChanged(displayText, whileTyping) {
-    var displayTextChanged = super._checkDisplayTextChanged(displayText, whileTyping);
+    let displayTextChanged = super._checkDisplayTextChanged(displayText, whileTyping);
 
     if (whileTyping) {
       if (this.updateDisplayTextOnModify && displayTextChanged) {

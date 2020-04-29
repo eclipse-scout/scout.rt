@@ -23,7 +23,7 @@ export default class FormTableControlLayout extends AbstractLayout {
       return;
     }
 
-    var form = this.control.form,
+    let form = this.control.form,
       htmlForm = form.htmlComp,
       controlContentSize = graphics.size(this.control.tableFooter.$controlContent),
       formSize = controlContentSize.subtract(htmlForm.margins());
@@ -33,8 +33,8 @@ export default class FormTableControlLayout extends AbstractLayout {
     // special case: when the control is opened/resized and there is not enough space, ensure that the active element is
     // visible by scrolling to it
     if (form.rootGroupBox.controls[0] instanceof TabBox) {
-      var tabBox = form.rootGroupBox.controls[0];
-      var tab = tabBox.selectedTab;
+      let tabBox = form.rootGroupBox.controls[0];
+      let tab = tabBox.selectedTab;
       if (tab && tab.scrollable && document.activeElement && tab.$body.has(document.activeElement)) {
         scrollbars.scrollTo(tab.$body, $(document.activeElement));
       }

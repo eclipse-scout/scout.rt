@@ -70,8 +70,8 @@ export function repeat(pattern, count) {
   if (typeof count !== 'number' || count < 1) {
     return '';
   }
-  var result = '';
-  for (var i = 0; i < count; i++) {
+  let result = '';
+  for (let i = 0; i < count; i++) {
     result += pattern;
   }
   return result;
@@ -82,7 +82,7 @@ export function padZeroLeft(string, padding) {
   if (string === undefined || string === null || typeof padding !== 'number' || padding < 1 || (string + '').length >= padding) {
     return string;
   }
-  var z = repeat('0', padding) + string;
+  let z = repeat('0', padding) + string;
   return z.slice(-padding);
 }
 
@@ -170,19 +170,17 @@ export function plainText(text, options) {
  * not defined or have zero length are ignored. The default return value is the empty string.
  *
  * @param {string} separator String to use as separator
- * @param {arguments|array} varargs List of strings to join
+ * @param args list of strings to join. Can be an array or individual arguments
  */
-export function join(separator, vararg) {
-  var stringsToJoin;
-  if (vararg && objects.isArray(vararg)) {
-    stringsToJoin = vararg;
-  } else {
-    stringsToJoin = objects.argumentsToArray(arguments).slice(1);
+export function join(separator, ...args) {
+  let stringsToJoin = args;
+  if (args[0] && objects.isArray(args[0])) {
+    stringsToJoin = args[0];
   }
   separator = asString(separator);
-  var s = '';
-  for (var i = 0; i < stringsToJoin.length; i++) {
-    var arg = asString(stringsToJoin[i]);
+  let s = '';
+  for (let i = 0; i < stringsToJoin.length; i++) {
+    let arg = asString(stringsToJoin[i]);
     if (arg) {
       if (s && separator) {
         s += separator;
@@ -201,7 +199,7 @@ export function box(prefix, string, suffix) {
   prefix = asString(prefix);
   string = asString(string);
   suffix = asString(suffix);
-  var s = '';
+  let s = '';
   if (hasText(string)) {
     if (prefix) {
       s += prefix;
@@ -235,8 +233,9 @@ export function _changeFirstLetter(string, funcName) {
     return string;
   }
   string = asString(string);
-  var s = '';
+  let s = '';
   if (hasText(string)) {
+    // noinspection JSValidateTypes
     s = string.charAt(0)[funcName]() + string.slice(1);
   }
   return s;
@@ -317,13 +316,13 @@ export function splitMax(string, separator, limit) {
   separator = asString(separator);
   limit = Number(limit);
 
-  var array = string.split(separator);
+  let array = string.split(separator);
   if (isNaN(limit) || limit <= 0 || limit >= array.length) {
     return array;
   }
 
-  var arrayShort = array.slice(0, limit - 1);
-  var last = array.slice(limit - 1).join(separator); // combine the rest
+  let arrayShort = array.slice(0, limit - 1);
+  let last = array.slice(limit - 1).join(separator); // combine the rest
   arrayShort.push(last);
   return arrayShort;
 }
@@ -357,7 +356,7 @@ export function equalsIgnoreCase(a, b) {
 }
 
 export function removePrefix(string, prefix) {
-  var s = string;
+  let s = string;
   if (startsWith(string, prefix)) {
     s = string.substring(prefix.length);
   }
@@ -365,7 +364,7 @@ export function removePrefix(string, prefix) {
 }
 
 export function removeSuffix(string, suffix) {
-  var s = string;
+  let s = string;
   if (endsWith(string, suffix)) {
     s = string.substring(0, string.length - suffix.length);
   }

@@ -11,11 +11,11 @@
 import {RemoteEvent} from '../../src/index';
 import {TreeSpecHelper} from '@eclipse-scout/testing';
 
-describe('TreeAdapter', function() {
-  var session;
-  var helper;
+describe('TreeAdapter', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TreeSpecHelper(session);
@@ -24,63 +24,63 @@ describe('TreeAdapter', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
     $.fx.off = false;
   });
 
-  describe('node click', function() {
-    it('sends selection and click events in one call in this order', function() {
-      var model = helper.createModelFixture(1);
-      var adapter = helper.createTreeAdapter(model);
-      var tree = adapter.createWidget(model, session.desktop);
+  describe('node click', () => {
+    it('sends selection and click events in one call in this order', () => {
+      let model = helper.createModelFixture(1);
+      let adapter = helper.createTreeAdapter(model);
+      let tree = adapter.createWidget(model, session.desktop);
       tree.render();
 
-      var $node = tree.$container.find('.tree-node:first');
+      let $node = tree.$container.find('.tree-node:first');
       $node.triggerClick();
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var requestData = mostRecentJsonRequest();
+      let requestData = mostRecentJsonRequest();
       expect(requestData).toContainEventTypesExactly(['nodesSelected', 'nodeClick']);
     });
 
-    it('sends selection, check and click events if tree is checkable and checkbox has been clicked', function() {
-      var model = helper.createModelFixture(1);
-      var adapter = helper.createTreeAdapter(model);
-      var tree = adapter.createWidget(model, session.desktop);
+    it('sends selection, check and click events if tree is checkable and checkbox has been clicked', () => {
+      let model = helper.createModelFixture(1);
+      let adapter = helper.createTreeAdapter(model);
+      let tree = adapter.createWidget(model, session.desktop);
       tree.checkable = true;
       tree.render();
 
-      var $checkbox = tree.$container.find('.tree-node:first').children('.tree-node-checkbox')
+      let $checkbox = tree.$container.find('.tree-node:first').children('.tree-node-checkbox')
         .children('div');
       $checkbox.triggerClick();
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var requestData = mostRecentJsonRequest();
+      let requestData = mostRecentJsonRequest();
       expect(requestData).toContainEventTypesExactly(['nodesSelected', 'nodesChecked', 'nodeClick']);
     });
 
-    it('does not send click if mouse down happens on another node than mouseup', function() {
-      var model = helper.createModelFixture(2);
-      var adapter = helper.createTreeAdapter(model);
-      var tree = adapter.createWidget(model, session.desktop);
+    it('does not send click if mouse down happens on another node than mouseup', () => {
+      let model = helper.createModelFixture(2);
+      let adapter = helper.createTreeAdapter(model);
+      let tree = adapter.createWidget(model, session.desktop);
       tree.render();
 
-      var $node0 = tree.nodes[0].$node;
-      var $node1 = tree.nodes[1].$node;
+      let $node0 = tree.nodes[0].$node;
+      let $node1 = tree.nodes[1].$node;
       $node0.triggerMouseDown();
       $node1.triggerMouseUp();
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var requestData = mostRecentJsonRequest();
+      let requestData = mostRecentJsonRequest();
       // Must contain only selection event (of first node), no clicked
       expect(requestData).toContainEventsExactly([{
         nodeIds: [tree.nodes[0].id],
@@ -89,14 +89,14 @@ describe('TreeAdapter', function() {
       }]);
     });
 
-    it('does not send click if mouse down does not happen on a node', function() {
-      var model = helper.createModelFixture(1);
-      var adapter = helper.createTreeAdapter(model);
-      var tree = adapter.createWidget(model, session.desktop);
-      var $div = session.$entryPoint.makeDiv().cssHeight(10).cssWidth(10);
+    it('does not send click if mouse down does not happen on a node', () => {
+      let model = helper.createModelFixture(1);
+      let adapter = helper.createTreeAdapter(model);
+      let tree = adapter.createWidget(model, session.desktop);
+      let $div = session.$entryPoint.makeDiv().cssHeight(10).cssWidth(10);
       tree.render();
 
-      var $node0 = tree.nodes[0].$node;
+      let $node0 = tree.nodes[0].$node;
       $node0.triggerMouseDown();
       $(window).triggerMouseUp({
         position: {
@@ -108,7 +108,7 @@ describe('TreeAdapter', function() {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var requestData = mostRecentJsonRequest();
+      let requestData = mostRecentJsonRequest();
       // Must contain only selection event (of first node), no clicked
       expect(requestData).toContainEventsExactly([{
         nodeIds: [tree.nodes[0].id],
@@ -132,14 +132,14 @@ describe('TreeAdapter', function() {
     });
   });
 
-  describe('node double click', function() {
-    it('sends clicked, selection, action and expansion events', function() {
-      var model = helper.createModelFixture(1, 1, false);
-      var adapter = helper.createTreeAdapter(model);
-      var tree = adapter.createWidget(model, session.desktop);
+  describe('node double click', () => {
+    it('sends clicked, selection, action and expansion events', () => {
+      let model = helper.createModelFixture(1, 1, false);
+      let adapter = helper.createTreeAdapter(model);
+      let tree = adapter.createWidget(model, session.desktop);
       tree.render();
 
-      var $node = tree.$container.find('.tree-node:first');
+      let $node = tree.$container.find('.tree-node:first');
       $node.triggerDoubleClick();
 
       sendQueuedAjaxCalls();
@@ -148,14 +148,14 @@ describe('TreeAdapter', function() {
     });
   });
 
-  describe('node control double click', function() {
-    it('sends clicked, selection, action and expansion events', function() {
-      var model = helper.createModelFixture(1, 1, false);
-      var adapter = helper.createTreeAdapter(model);
-      var tree = adapter.createWidget(model, session.desktop);
+  describe('node control double click', () => {
+    it('sends clicked, selection, action and expansion events', () => {
+      let model = helper.createModelFixture(1, 1, false);
+      let adapter = helper.createTreeAdapter(model);
+      let tree = adapter.createWidget(model, session.desktop);
       tree.render();
 
-      var $node = tree.$container.find('.tree-node:first');
+      let $node = tree.$container.find('.tree-node:first');
       $node.triggerDoubleClick();
 
       sendQueuedAjaxCalls();
@@ -165,14 +165,14 @@ describe('TreeAdapter', function() {
     });
   });
 
-  describe('selectNodes', function() {
-    it('sends nodeExpanded for the parents if a hidden node should be selected whose parents are collapsed (revealing the selection)', function() {
-      var model = helper.createModelFixture(3, 3, false);
-      var adapter = helper.createTreeAdapter(model);
-      var tree = adapter.createWidget(model, session.desktop);
-      var node0 = tree.nodes[0];
-      var child0 = node0.childNodes[0];
-      var grandchild0 = child0.childNodes[0];
+  describe('selectNodes', () => {
+    it('sends nodeExpanded for the parents if a hidden node should be selected whose parents are collapsed (revealing the selection)', () => {
+      let model = helper.createModelFixture(3, 3, false);
+      let adapter = helper.createTreeAdapter(model);
+      let tree = adapter.createWidget(model, session.desktop);
+      let node0 = tree.nodes[0];
+      let child0 = node0.childNodes[0];
+      let grandchild0 = child0.childNodes[0];
       tree.render();
 
       expect(node0.expanded).toBe(false);
@@ -187,12 +187,12 @@ describe('TreeAdapter', function() {
 
       sendQueuedAjaxCalls();
 
-      var event0 = new RemoteEvent(tree.id, 'nodeExpanded', {
+      let event0 = new RemoteEvent(tree.id, 'nodeExpanded', {
         nodeId: node0.id,
         expanded: true,
         expandedLazy: false
       });
-      var event1 = new RemoteEvent(tree.id, 'nodeExpanded', {
+      let event1 = new RemoteEvent(tree.id, 'nodeExpanded', {
         nodeId: child0.id,
         expanded: true,
         expandedLazy: false
@@ -200,10 +200,10 @@ describe('TreeAdapter', function() {
       expect(mostRecentJsonRequest()).toContainEvents([event0, event1]);
     });
 
-    it('does not send selection event if triggered by server', function() {
-      var model = helper.createModelFixture(2, 2);
-      var adapter = helper.createTreeAdapter(model);
-      var tree = adapter.createWidget(model, session.desktop);
+    it('does not send selection event if triggered by server', () => {
+      let model = helper.createModelFixture(2, 2);
+      let adapter = helper.createTreeAdapter(model);
+      let tree = adapter.createWidget(model, session.desktop);
 
       adapter._onNodesSelected([tree.nodes[1].id]);
       sendQueuedAjaxCalls();
@@ -213,12 +213,12 @@ describe('TreeAdapter', function() {
 
   });
 
-  describe('checkNodes', function() {
+  describe('checkNodes', () => {
 
-    it('does not send checked event if triggered by server', function() {
-      var model = helper.createModelFixture(2, 2);
-      var adapter = helper.createTreeAdapter(model);
-      var tree = adapter.createWidget(model, session.desktop);
+    it('does not send checked event if triggered by server', () => {
+      let model = helper.createModelFixture(2, 2);
+      let adapter = helper.createTreeAdapter(model);
+      let tree = adapter.createWidget(model, session.desktop);
       tree.checkable = true;
       expect(tree.nodes[1].checked).toBe(false);
 
@@ -233,13 +233,13 @@ describe('TreeAdapter', function() {
 
   });
 
-  describe('setNodesExpanded', function() {
+  describe('setNodesExpanded', () => {
 
-    it('does not send expand event if triggered by server', function() {
-      var model = helper.createModelFixture(2, 2);
-      var adapter = helper.createTreeAdapter(model);
-      var tree = adapter.createWidget(model, session.desktop);
-      var node = tree.nodes[1];
+    it('does not send expand event if triggered by server', () => {
+      let model = helper.createModelFixture(2, 2);
+      let adapter = helper.createTreeAdapter(model);
+      let tree = adapter.createWidget(model, session.desktop);
+      let node = tree.nodes[1];
       expect(node.expanded).toBe(false);
 
       adapter._onNodeExpanded(node.id, {
@@ -254,16 +254,16 @@ describe('TreeAdapter', function() {
 
   });
 
-  describe('collapseAll', function() {
-    it('sends nodeExpanded for every collapsed node', function() {
-      var i;
-      var model = helper.createModelFixture(3, 2, true);
-      var adapter = helper.createTreeAdapter(model);
-      var tree = adapter.createWidget(model, session.desktop);
+  describe('collapseAll', () => {
+    it('sends nodeExpanded for every collapsed node', () => {
+      let i;
+      let model = helper.createModelFixture(3, 2, true);
+      let adapter = helper.createTreeAdapter(model);
+      let tree = adapter.createWidget(model, session.desktop);
       tree.render();
 
-      var allNodes = [];
-      tree.visitNodes(function(node) {
+      let allNodes = [];
+      tree.visitNodes(node => {
         allNodes.push(node);
       });
 
@@ -274,17 +274,17 @@ describe('TreeAdapter', function() {
     });
   });
 
-  describe('onModelAction', function() {
+  describe('onModelAction', () => {
 
-    describe('nodesInserted event', function() {
-      var model;
-      var tree;
-      var adapter;
-      var node0;
-      var node1;
-      var node2;
+    describe('nodesInserted event', () => {
+      let model;
+      let tree;
+      let adapter;
+      let node0;
+      let node1;
+      let node2;
 
-      beforeEach(function() {
+      beforeEach(() => {
         model = helper.createModelFixture(3, 1, true);
         adapter = helper.createTreeAdapter(model);
         tree = adapter.createWidget(model, session.desktop);
@@ -293,26 +293,26 @@ describe('TreeAdapter', function() {
         node2 = tree.nodes[2];
       });
 
-      it('calls insertNodes', function() {
+      it('calls insertNodes', () => {
         spyOn(tree, 'insertNodes');
 
-        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
-        var event = helper.createNodesInsertedEvent(model, [newNode0Child3], node0.id);
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        let event = helper.createNodesInsertedEvent(model, [newNode0Child3], node0.id);
         adapter.onModelAction(event);
         expect(tree.insertNodes).toHaveBeenCalledWith([newNode0Child3], tree.nodes[0]);
       });
 
     });
 
-    describe('nodesDeleted event', function() {
-      var model;
-      var tree;
-      var adapter;
-      var node0;
-      var node1;
-      var node2;
+    describe('nodesDeleted event', () => {
+      let model;
+      let tree;
+      let adapter;
+      let node0;
+      let node1;
+      let node2;
 
-      beforeEach(function() {
+      beforeEach(() => {
         // A large tree is used to properly test recursion
         model = helper.createModelFixture(3, 2, true);
         tree = helper.createTree(model);
@@ -323,30 +323,30 @@ describe('TreeAdapter', function() {
         node2 = tree.nodes[2];
       });
 
-      it('calls deleteNodes', function() {
+      it('calls deleteNodes', () => {
         spyOn(tree, 'deleteNodes');
 
-        var node2Child0 = node2.childNodes[0];
-        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
-        var event = helper.createNodesDeletedEvent(model, [node2Child0.id], node2.id);
+        let node2Child0 = node2.childNodes[0];
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        let event = helper.createNodesDeletedEvent(model, [node2Child0.id], node2.id);
         adapter.onModelAction(event);
         expect(tree.deleteNodes).toHaveBeenCalledWith([node2Child0], node2);
       });
 
     });
 
-    describe('allChildNodesDeleted event', function() {
-      var model;
-      var tree;
-      var adapter;
-      var node0;
-      var node1;
-      var node2;
-      var node1Child0;
-      var node1Child1;
-      var node1Child2;
+    describe('allChildNodesDeleted event', () => {
+      let model;
+      let tree;
+      let adapter;
+      let node0;
+      let node1;
+      let node2;
+      let node1Child0;
+      let node1Child1;
+      let node1Child2;
 
-      beforeEach(function() {
+      beforeEach(() => {
         model = helper.createModelFixture(3, 1, true);
         adapter = helper.createTreeAdapter(model);
         tree = adapter.createWidget(model, session.desktop);
@@ -358,25 +358,25 @@ describe('TreeAdapter', function() {
         node1Child2 = node1.childNodes[1];
       });
 
-      it('calls deleteAllChildNodes', function() {
+      it('calls deleteAllChildNodes', () => {
         spyOn(tree, 'deleteAllChildNodes');
 
-        var event = helper.createAllChildNodesDeletedEvent(model);
+        let event = helper.createAllChildNodesDeletedEvent(model);
         adapter.onModelAction(event);
         expect(tree.deleteAllChildNodes).toHaveBeenCalled();
       });
 
     });
 
-    describe('nodesSelected event', function() {
-      var model;
-      var tree;
-      var adapter;
-      var node0;
-      var child0;
-      var grandchild0;
+    describe('nodesSelected event', () => {
+      let model;
+      let tree;
+      let adapter;
+      let node0;
+      let child0;
+      let grandchild0;
 
-      beforeEach(function() {
+      beforeEach(() => {
         model = helper.createModelFixture(3, 3, false);
         adapter = helper.createTreeAdapter(model);
         tree = adapter.createWidget(model, session.desktop);
@@ -385,20 +385,20 @@ describe('TreeAdapter', function() {
         grandchild0 = child0.childNodes[0];
       });
 
-      it('calls selectNodes', function() {
+      it('calls selectNodes', () => {
         spyOn(tree, 'selectNodes');
 
-        var event = helper.createNodesSelectedEvent(model, [node0.id]);
+        let event = helper.createNodesSelectedEvent(model, [node0.id]);
         adapter.onModelAction(event);
         expect(tree.selectNodes).toHaveBeenCalledWith([node0]);
       });
 
     });
 
-    describe('nodeChanged event', function() {
-      var model, tree, adapter, nodes, node0, node1, child0, child1_1;
+    describe('nodeChanged event', () => {
+      let model, tree, adapter, nodes, node0, node1, child0, child1_1;
 
-      beforeEach(function() {
+      beforeEach(() => {
         model = helper.createModelFixture(3, 3, false);
         adapter = helper.createTreeAdapter(model);
         tree = adapter.createWidget(model, session.desktop);
@@ -409,19 +409,19 @@ describe('TreeAdapter', function() {
         child1_1 = node1.childNodes[1];
       });
 
-      it('calls changeNode', function() {
+      it('calls changeNode', () => {
         spyOn(tree, 'changeNode');
 
-        var event = helper.createNodeChangedEvent(model, node0.id);
+        let event = helper.createNodeChangedEvent(model, node0.id);
         adapter.onModelAction(event);
         expect(tree.changeNode).toHaveBeenCalledWith(node0);
       });
 
-      it('updates the text of the node', function() {
+      it('updates the text of the node', () => {
         tree.render();
-        var event = helper.createNodeChangedEvent(model, node0.id);
+        let event = helper.createNodeChangedEvent(model, node0.id);
         event.text = 'new Text';
-        var message = {
+        let message = {
           events: [event]
         };
         session._processSuccessResponse(message);
@@ -431,14 +431,14 @@ describe('TreeAdapter', function() {
 
     });
 
-    describe('nodesUpdated event', function() {
-      var model;
-      var tree;
-      var adapter;
-      var node0;
-      var child0;
+    describe('nodesUpdated event', () => {
+      let model;
+      let tree;
+      let adapter;
+      let node0;
+      let child0;
 
-      beforeEach(function() {
+      beforeEach(() => {
         model = helper.createModelFixture(3, 3, false);
         tree = helper.createTree(model);
         adapter = helper.createTreeAdapter(model);
@@ -447,27 +447,27 @@ describe('TreeAdapter', function() {
         child0 = node0.childNodes[0];
       });
 
-      it('calls updateNodes', function() {
+      it('calls updateNodes', () => {
         spyOn(tree, 'updateNodes');
 
-        var child0Update = {
+        let child0Update = {
           id: child0.id,
           enabled: false
         };
-        var event = helper.createNodesUpdatedEvent(model, [child0Update]);
+        let event = helper.createNodesUpdatedEvent(model, [child0Update]);
         adapter.onModelAction(event);
         expect(tree.updateNodes).toHaveBeenCalledWith([child0Update]);
       });
     });
 
-    describe('childNodeOrderChanged event', function() {
-      var model;
-      var tree;
-      var adapter;
-      var node0;
-      var child0;
+    describe('childNodeOrderChanged event', () => {
+      let model;
+      let tree;
+      let adapter;
+      let node0;
+      let child0;
 
-      beforeEach(function() {
+      beforeEach(() => {
         model = helper.createModelFixture(3, 3, false);
         adapter = helper.createTreeAdapter(model);
         tree = adapter.createWidget(model, session.desktop);
@@ -475,29 +475,29 @@ describe('TreeAdapter', function() {
         child0 = node0.childNodes[0];
       });
 
-      it('calls updateNodeOrder', function() {
+      it('calls updateNodeOrder', () => {
         spyOn(tree, 'updateNodeOrder');
-        var parentNode = tree.nodes[1];
-        var childNode0 = parentNode.childNodes[0];
-        var childNode1 = parentNode.childNodes[1];
-        var childNode2 = parentNode.childNodes[2];
+        let parentNode = tree.nodes[1];
+        let childNode0 = parentNode.childNodes[0];
+        let childNode1 = parentNode.childNodes[1];
+        let childNode2 = parentNode.childNodes[2];
 
-        var event = helper.createChildNodeOrderChangedEvent(model, [childNode2.id, childNode1.id, childNode0.id], parentNode.id);
+        let event = helper.createChildNodeOrderChangedEvent(model, [childNode2.id, childNode1.id, childNode0.id], parentNode.id);
         adapter.onModelAction(event);
         expect(tree.updateNodeOrder).toHaveBeenCalledWith([childNode2, childNode1, childNode0], parentNode);
       });
 
     });
 
-    describe('multiple events', function() {
-      var model;
-      var tree;
-      var adapter;
-      var node0;
-      var node1;
-      var node2;
+    describe('multiple events', () => {
+      let model;
+      let tree;
+      let adapter;
+      let node0;
+      let node1;
+      let node2;
 
-      beforeEach(function() {
+      beforeEach(() => {
         model = helper.createModelFixture(3, 1, true);
         adapter = helper.createTreeAdapter(model);
         tree = adapter.createWidget(model, session.desktop);
@@ -506,11 +506,11 @@ describe('TreeAdapter', function() {
         node2 = tree.nodes[2];
       });
 
-      it('handles delete, collapse, insert, expand events correctly', function() {
+      it('handles delete, collapse, insert, expand events correctly', () => {
         tree.render();
 
         // Delete child nodes from node0
-        var message = {
+        let message = {
           events: [helper.createAllChildNodesDeletedEvent(model, node0.id)]
         };
         session._processSuccessResponse(message);
@@ -518,7 +518,7 @@ describe('TreeAdapter', function() {
         expect(helper.findAllNodes(tree).length).toBe(9);
 
         // Collapse node0
-        var $node0 = node0.$node;
+        let $node0 = node0.$node;
         message = {
           events: [helper.createNodeExpandedEvent(model, node0.id, false)]
         };
@@ -527,7 +527,7 @@ describe('TreeAdapter', function() {
         expect($node0).not.toHaveClass('expanded');
 
         // Insert new child node at node0
-        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
         message = {
           events: [helper.createNodesInsertedEvent(model, [newNode0Child3], node0.id)]
         };

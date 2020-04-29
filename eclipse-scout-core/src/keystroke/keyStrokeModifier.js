@@ -42,7 +42,7 @@ export function _eval(testee, modifier, modifierUndefined) {
 }
 
 export function toModifierBitMask(event) {
-  var modifierBitMask = 0;
+  let modifierBitMask = 0;
   modifierBitMask |= event.ctrlKey ? CTRL : 0; // NOSONAR
   modifierBitMask |= event.altKey ? ALT : 0; // NOSONAR
   modifierBitMask |= event.shiftKey ? SHIFT : 0; // NOSONAR

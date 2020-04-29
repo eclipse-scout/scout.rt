@@ -18,7 +18,7 @@ describe('PlainTextEncoder', () => {
   it('converts HTML to plain text', () => {
     expect(encoder.encode('')).toBe('');
 
-    var htmlText = '<b>hello</b>';
+    let htmlText = '<b>hello</b>';
     expect(encoder.encode(htmlText)).toBe('hello');
 
     htmlText = '<b>hello</b> world! <span class="xyz">Some more html...</span>';
@@ -26,7 +26,7 @@ describe('PlainTextEncoder', () => {
   });
 
   it('considers upper and lower case tags', () => {
-    var htmlText = '<B>hello</B>';
+    let htmlText = '<B>hello</B>';
     expect(encoder.encode(htmlText)).toBe('hello');
 
     htmlText = '<b>hello</b> world! <SPAN class="xyz">Some more html...</SPAN>';
@@ -34,7 +34,7 @@ describe('PlainTextEncoder', () => {
   });
 
   it('converts br, p, div into new lines', () => {
-    var htmlText = '<b>1. line</b><br><i>2. line</i>';
+    let htmlText = '<b>1. line</b><br><i>2. line</i>';
     expect(encoder.encode(htmlText)).toBe('1. line\n2. line');
 
     htmlText = '<b>1. line</b><br/><i>2. line</i>';
@@ -48,7 +48,7 @@ describe('PlainTextEncoder', () => {
   });
 
   it('converts li, tr into new lines', () => {
-    var htmlText = '<ul><li><b>1. line</b></li><li><i>2. line</i></li></ul>';
+    let htmlText = '<ul><li><b>1. line</b></li><li><i>2. line</i></li></ul>';
     expect(encoder.encode(htmlText)).toBe('1. line\n2. line\n');
 
     htmlText = '<table><tr><td><b>1. line</b></td></tr><tr><td><i>2. line</i></td></tr></table>';
@@ -56,7 +56,7 @@ describe('PlainTextEncoder', () => {
   });
 
   it('converts td into whitespaces', () => {
-    var htmlText = '<table><tr><td>1. cell</td><td>2. cell</td></tr></table>';
+    let htmlText = '<table><tr><td>1. cell</td><td>2. cell</td></tr></table>';
     expect(encoder.encode(htmlText)).toBe('1. cell 2. cell\n');
 
     htmlText =
@@ -68,7 +68,7 @@ describe('PlainTextEncoder', () => {
   });
 
   it('converts &nbsp;, &amp;, &gt;, &lt;', () => {
-    var htmlText = '<b>first&nbsp;word</b>&nbsp;next word';
+    let htmlText = '<b>first&nbsp;word</b>&nbsp;next word';
     expect(encoder.encode(htmlText)).toBe('first word next word');
 
     htmlText = '<b>first&amp;word</b>&amp;next word';
@@ -82,17 +82,17 @@ describe('PlainTextEncoder', () => {
   });
 
   it('preserves tabs', () => {
-    var htmlText = '\t\t';
+    let htmlText = '\t\t';
     expect(encoder.encode(htmlText)).toBe('\t\t');
   });
 
   it('removes leading and trailing newlines if configured', () => {
-    var htmlText = '\n\nHello!\n\n';
+    let htmlText = '\n\nHello!\n\n';
     expect(encoder.encode(htmlText, {trim: true})).toBe('Hello!');
   });
 
   it('leaves multiple newlines alone unless configured', () => {
-    var htmlText = 'Hello!\n\n\nI like coding!';
+    let htmlText = 'Hello!\n\n\nI like coding!';
     expect(encoder.encode(htmlText)).toBe('Hello!\n\n\nI like coding!');
     expect(encoder.encode(htmlText, {compact: false})).toBe('Hello!\n\n\nI like coding!');
     expect(encoder.encode(htmlText, {compact: true})).toBe('Hello!\n\nI like coding!');

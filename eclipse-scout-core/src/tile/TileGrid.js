@@ -240,7 +240,7 @@ export default class TileGrid extends Widget {
     if (tilesToDelete.length === 0) {
       return;
     }
-    var tiles = this.tiles.slice();
+    let tiles = this.tiles.slice();
     arrays.removeAll(tiles, tilesToDelete);
     this.setTiles(tiles, appendPlaceholders);
   }
@@ -264,12 +264,12 @@ export default class TileGrid extends Widget {
     }
 
     // Only insert those which are not already there
-    var tilesToInsert = arrays.diff(tiles, this.tiles);
+    let tilesToInsert = arrays.diff(tiles, this.tiles);
     this._insertTiles(tilesToInsert);
 
     // Append the existing placeholders, otherwise they would be unnecessarily deleted if a tile is deleted
     if (this.withPlaceholders && scout.nvl(appendPlaceholders, true)) {
-      var placeholders = this.placeholders();
+      let placeholders = this.placeholders();
       // But only add as much placeholders as needed: If a new tile is added, it should replace the placeholder underneath.
       // If this were not done the placeholders would move animated when a new tile is inserted rather than just staying where they are
       placeholders = placeholders.slice(Math.min(this._filterTiles(tilesToInsert).length, placeholders.length), placeholders.length);
@@ -277,12 +277,12 @@ export default class TileGrid extends Widget {
     }
 
     // Only delete those which are not in the new array
-    var tilesToDelete = arrays.diff(this.tiles, tiles);
+    let tilesToDelete = arrays.diff(this.tiles, tiles);
     this._deleteTiles(tilesToDelete);
 
     this._sort(tiles);
     this.filteredTilesDirty = this.filteredTilesDirty || tilesToDelete.length > 0 || tilesToInsert.length > 0 || !arrays.equals(this.tiles, tiles); // last check necessary if sorting changed
-    var currentTiles = this.tiles;
+    let currentTiles = this.tiles;
     this._setProperty('tiles', tiles);
     this._updateFilteredTiles();
 
@@ -315,7 +315,7 @@ export default class TileGrid extends Widget {
     if (tile.removalPending) {
       // If tile is being removed by the filter and the filter cleared so that the tile should be rendered again while the animation is still running,
       // we need to wait for the remove animation, otherwise an already rendered exception occurs
-      tile.one('remove', function() {
+      tile.one('remove', () => {
         if (tile.rendered) {
           // Might be already rendered again by renderTileDelta because filter was changed again
           return;
@@ -325,7 +325,7 @@ export default class TileGrid extends Widget {
         if (this.tileRemovalPendingCount === 0) {
           this.invalidateLayoutTree();
         }
-      }.bind(this));
+      });
       return;
     }
     tile.render();
@@ -342,14 +342,14 @@ export default class TileGrid extends Widget {
       // Wait until the layout animation is done before animating the insert operation.
       // Also make them invisible to not cover existing tiles while they are moving or changing size.
       // Also do it for tiles which don't have an insert animation (e.g. placeholders), due to the same reason.
-      this.one('layoutAnimationDone', function() {
+      this.one('layoutAnimationDone', () => {
         if (tile.rendered) {
           tile.$container.removeClass('invisible');
           if (this._animateTileInsertion(tile)) {
             tile.$container.addClassForAnimation('animate-insert');
           }
         }
-      }.bind(this));
+      });
     }, this);
 
     if (!this.htmlComp.layouting) {
@@ -359,7 +359,7 @@ export default class TileGrid extends Widget {
   }
 
   _removeAllTiles() {
-    this.tiles.forEach(function(tile) {
+    this.tiles.forEach(tile => {
       tile.remove();
     });
     this.viewRangeRendered = new Range(0, 0);
@@ -418,12 +418,12 @@ export default class TileGrid extends Widget {
       return;
     }
     this.tileRemovalPendingCount++;
-    tile.one('remove', function() {
+    tile.one('remove', () => {
       this.tileRemovalPendingCount--;
       if (this.rendered && this.tileRemovalPendingCount === 0 && !this.htmlComp.layouting) {
         this.invalidateLayoutTree();
       }
-    }.bind(this));
+    });
   }
 
   setComparator(comparator) {
@@ -434,13 +434,13 @@ export default class TileGrid extends Widget {
   }
 
   sort() {
-    var tiles = this.tiles.slice();
+    let tiles = this.tiles.slice();
     this._sort(tiles);
     if (arrays.equals(this.tiles, tiles)) {
       // Check is needed anyway to determine whether filteredTilesDirty needs to be set, so we can use it here as well to early return if nothing changed
       return;
     }
-    var currentTiles = this.tiles;
+    let currentTiles = this.tiles;
     this._setProperty('tiles', tiles);
 
     // Sort list of filtered tiles as well
@@ -459,7 +459,7 @@ export default class TileGrid extends Widget {
       return;
     }
 
-    var placeholders = [];
+    let placeholders = [];
     if (this.withPlaceholders) {
       // Don't reorder placeholders -> remove them first, then sort and add them afterwards again
       placeholders = this._deletePlaceholders(tiles);
@@ -498,7 +498,7 @@ export default class TileGrid extends Widget {
   }
 
   _renderLayoutConfig() {
-    var oldMinWidth = this.htmlComp.layout.minWidth;
+    let oldMinWidth = this.htmlComp.layout.minWidth;
     this.layoutConfig.applyToLayout(this.htmlComp.layout);
     if (this.virtualScrolling) {
       this.virtualScrolling.setMinRowHeight(this._minRowHeight());
@@ -535,20 +535,20 @@ export default class TileGrid extends Widget {
     if (this.selectedTiles.length === 0) {
       return;
     }
-    var menuItems = options.menuItems || this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true, false);
+    let menuItems = options.menuItems || this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true, false);
     if (menuItems.length === 0) {
       return;
     }
-    var pageX = scout.nvl(options.pageX, null);
-    var pageY = scout.nvl(options.pageY, null);
+    let pageX = scout.nvl(options.pageX, null);
+    let pageY = scout.nvl(options.pageY, null);
     if (pageX === null || pageY === null) {
-      var offset;
-      var $scrollable = this.$container.scrollParent();
+      let offset;
+      let $scrollable = this.$container.scrollParent();
       if ($scrollable.length === 0) {
         $scrollable = this.$container;
       }
-      var scrollableBounds = graphics.offsetBounds($scrollable);
-      var focusedTile = this.focusedTile || arrays.last(this.selectedTiles);
+      let scrollableBounds = graphics.offsetBounds($scrollable);
+      let focusedTile = this.focusedTile || arrays.last(this.selectedTiles);
       if (this.isTileInView(focusedTile)) {
         // Place the context menu on the focused tile if possible
         offset = focusedTile.$container.offset();
@@ -606,8 +606,8 @@ export default class TileGrid extends Widget {
    * @override
    */
   _onScroll() {
-    var scrollTop = this.$container[0].scrollTop;
-    var scrollLeft = this.$container[0].scrollLeft;
+    let scrollTop = this.$container[0].scrollTop;
+    let scrollLeft = this.$container[0].scrollLeft;
     if (this.scrollTop !== scrollTop && this.virtual) {
       this.scrolling = true;
       this.revalidateLayout();
@@ -644,13 +644,13 @@ export default class TileGrid extends Widget {
     if (!this.withPlaceholders) {
       return this.tiles;
     }
-    return this.tiles.filter(function(tile) {
+    return this.tiles.filter(tile => {
       return !(tile instanceof PlaceholderTile);
     });
   }
 
   _createPlaceholders() {
-    var numPlaceholders, lastX,
+    let numPlaceholders, lastX,
       columnCount = this.gridColumnCount,
       tiles = this.filteredTiles,
       placeholders = [];
@@ -669,7 +669,7 @@ export default class TileGrid extends Widget {
 
     // Otherwise create placeholders for every missing tile in the last row
     numPlaceholders = columnCount - 1 - lastX;
-    for (var i = 0; i < numPlaceholders; i++) {
+    for (let i = 0; i < numPlaceholders; i++) {
       placeholders.push(this._createPlaceholder());
     }
     return placeholders;
@@ -682,10 +682,10 @@ export default class TileGrid extends Widget {
   }
 
   _deleteObsoletePlaceholders() {
-    var obsoletePlaceholders = [],
+    let obsoletePlaceholders = [],
       obsolete = false;
 
-    var placeholders = this.placeholders();
+    let placeholders = this.placeholders();
     placeholders.forEach(function(placeholder) {
       // Remove all placeholder in the row if there is one at x=0 (don't do it if there are only placeholders)
       if (placeholder.gridData.x === 0 && this.filteredTiles[0] !== placeholder) {
@@ -704,7 +704,7 @@ export default class TileGrid extends Widget {
   }
 
   placeholders() {
-    var i, placeholders = [];
+    let i, placeholders = [];
     for (i = this.tiles.length - 1; i >= 0; i--) {
       if (!(this.tiles[i] instanceof PlaceholderTile)) {
         // Placeholders are always at the end -> we may stop as soon as no more placeholders are found
@@ -716,13 +716,13 @@ export default class TileGrid extends Widget {
   }
 
   _insertMissingPlaceholders() {
-    var placeholders = this._createPlaceholders();
+    let placeholders = this._createPlaceholders();
     this.insertTiles(placeholders, false);
   }
 
   _deletePlaceholders(tiles) {
-    var i;
-    var deletedPlaceholders = [];
+    let i;
+    let deletedPlaceholders = [];
     for (i = tiles.length - 1; i >= 0; i--) {
       if (tiles[i] instanceof PlaceholderTile) {
         deletedPlaceholders.push(tiles[i]);
@@ -734,13 +734,13 @@ export default class TileGrid extends Widget {
 
   _replacePlaceholders(tiles, tilesToInsert) {
     // Find index of the first tile which is not a placeholder (placeholders are always added at the end, so it is faster if search is done backwards)
-    var index = arrays.findIndexFromReverse(tiles, tiles.length - 1, function(tile) {
+    let index = arrays.findIndexFromReverse(tiles, tiles.length - 1, tile => {
       return !(tile instanceof PlaceholderTile);
     });
 
-    var numPlaceholders = tiles.length - 1 - index;
-    for (var i = 1; i <= numPlaceholders; i++) {
-      var tile = tiles[index + i];
+    let numPlaceholders = tiles.length - 1 - index;
+    for (let i = 1; i <= numPlaceholders; i++) {
+      let tile = tiles[index + i];
       if (tilesToInsert[i - 1] && !(tilesToInsert[i - 1] instanceof PlaceholderTile)) {
         arrays.remove(tiles, tile);
       }
@@ -775,17 +775,17 @@ export default class TileGrid extends Widget {
     if (!this.rendered || !tile || this.isFocused()) {
       return;
     }
-    var $scrollables = this.$container.scrollParents();
+    let $scrollables = this.$container.scrollParents();
     if ($scrollables.length === 0) {
       return;
     }
-    var oldScrollTopArr = $scrollables.map(function(i, $elem) {
+    let oldScrollTopArr = $scrollables.map((i, $elem) => {
       return $elem.scrollTop();
     }).toArray();
     // Make sure the tile grid has the focus when focusing a tile
     if (this.focus()) {
       // Restore old scroll to prevent scrolling by the browser due to the focus() call
-      oldScrollTopArr.forEach(function(val, idx) {
+      oldScrollTopArr.forEach((val, idx) => {
         $scrollables[idx].scrollTop(val);
       }, this);
     }
@@ -796,7 +796,7 @@ export default class TileGrid extends Widget {
     if (!selectable) {
       this.deselectAllTiles();
     }
-    this.tiles.forEach(function(tile) {
+    this.tiles.forEach(tile => {
       tile.setSelectable(selectable);
     });
   }
@@ -836,7 +836,7 @@ export default class TileGrid extends Widget {
     }
 
     // Deselect the tiles which are not part of the new selection
-    var tilesToUnselect = this.selectedTiles;
+    let tilesToUnselect = this.selectedTiles;
     arrays.removeAll(tilesToUnselect, tiles);
     tilesToUnselect.forEach(function(tile) {
       tile.setSelected(false);
@@ -846,7 +846,7 @@ export default class TileGrid extends Widget {
     }, this);
 
     // Select the tiles
-    tiles.forEach(function(tile) {
+    tiles.forEach(tile => {
       tile.setSelected(true);
     }, this);
 
@@ -866,7 +866,7 @@ export default class TileGrid extends Widget {
 
   deselectTiles(tiles) {
     tiles = arrays.ensure(tiles);
-    var selectedTiles = this.selectedTiles.slice();
+    let selectedTiles = this.selectedTiles.slice();
     if (arrays.removeAll(selectedTiles, tiles)) {
       this.selectTiles(selectedTiles);
     }
@@ -901,7 +901,7 @@ export default class TileGrid extends Widget {
    * @returns {boolean} true if the tile is completely or partially visible in the first scrollable parent.
    */
   isTileInView(tile) {
-    var $scrollable = this.$container.scrollParent();
+    let $scrollable = this.$container.scrollParent();
     if ($scrollable.length === 0) {
       $scrollable = this.$container;
     }
@@ -925,8 +925,8 @@ export default class TileGrid extends Widget {
   }
 
   _onTileClick(event) {
-    var $tile = $(event.currentTarget);
-    var tile = $tile.data('widget');
+    let $tile = $(event.currentTarget);
+    let tile = $tile.data('widget');
     if (tile instanceof PlaceholderTile) {
       return;
     }
@@ -936,12 +936,12 @@ export default class TileGrid extends Widget {
       return;
     }
 
-    var mouseButton = event.which;
+    let mouseButton = event.which;
     this._triggerTileClick(tile, mouseButton);
   }
 
   _triggerTileClick(tile, mouseButton) {
-    var event = {
+    let event = {
       tile: tile,
       mouseButton: mouseButton
     };
@@ -949,8 +949,8 @@ export default class TileGrid extends Widget {
   }
 
   _onTileDoubleClick(event) {
-    var $tile = $(event.currentTarget);
-    var tile = $tile.data('widget');
+    let $tile = $(event.currentTarget);
+    let tile = $tile.data('widget');
     if (tile instanceof PlaceholderTile) {
       return;
     }
@@ -1008,8 +1008,8 @@ export default class TileGrid extends Widget {
 
   addFilters(filtersToAdd) {
     filtersToAdd = arrays.ensure(filtersToAdd);
-    var filters = this.filters.slice();
-    filtersToAdd.forEach(function(filter) {
+    let filters = this.filters.slice();
+    filtersToAdd.forEach(filter => {
       if (filters.indexOf(filter) >= 0) {
         return;
       }
@@ -1027,7 +1027,7 @@ export default class TileGrid extends Widget {
 
   removeFilters(filtersToRemove) {
     filtersToRemove = arrays.ensure(filtersToRemove);
-    var filters = this.filters.slice();
+    let filters = this.filters.slice();
     if (!arrays.removeAll(filters, filtersToRemove)) {
       return;
     }
@@ -1039,9 +1039,9 @@ export default class TileGrid extends Widget {
   }
 
   filter() {
-    var currentTiles = this.tiles;
+    let currentTiles = this.tiles;
     // Full reset is set to true to loop through every tile and make sure tile.filterAccepted is correctly set
-    var filterResult = this._applyFilters(this.tiles, true);
+    let filterResult = this._applyFilters(this.tiles, true);
     this._updateFilteredTiles();
     if (this.rendered) {
       // Not all tiles may be rendered yet (e.g. if filter is active before grid is rendered and removed after grid is rendered)
@@ -1055,9 +1055,9 @@ export default class TileGrid extends Widget {
     if (this.filters.length === 0 && !scout.nvl(fullReset, false)) {
       return;
     }
-    var newlyShownTiles = [];
-    var newlyHiddenTiles = [];
-    var changed = false;
+    let newlyShownTiles = [];
+    let newlyHiddenTiles = [];
+    let changed = false;
     tiles.forEach(function(tile) {
       if (this._applyFiltersForTile(tile)) {
         changed = true;
@@ -1085,7 +1085,7 @@ export default class TileGrid extends Widget {
   }
 
   _updateFilteredTiles() {
-    var tiles = this.tiles;
+    let tiles = this.tiles;
     if (this.filters.length > 0) {
       tiles = this._filterTiles();
     }
@@ -1127,7 +1127,7 @@ export default class TileGrid extends Widget {
   }
 
   _tileAcceptedByFilters(tile) {
-    return !this.filters.some(function(filter) {
+    return !this.filters.some(filter => {
       // return true if an element was found which is not accepted by the filter to break the some() loop
       if (tile instanceof PlaceholderTile) {
         return false;
@@ -1144,14 +1144,14 @@ export default class TileGrid extends Widget {
     if (this.filters.length === 0) {
       return tiles.slice();
     }
-    return tiles.filter(function(tile) {
+    return tiles.filter(tile => {
       return tile.filterAccepted;
     });
   }
 
   findTileIndexAt(x, y, startIndex, reverse) {
     startIndex = scout.nvl(startIndex, 0);
-    return arrays.findIndexFrom(this.filteredTiles, startIndex, function(tile, i) {
+    return arrays.findIndexFrom(this.filteredTiles, startIndex, (tile, i) => {
       return tile.gridData.x === x && tile.gridData.y === y;
     }, reverse);
   }
@@ -1165,9 +1165,9 @@ export default class TileGrid extends Widget {
       return this.filteredTiles;
     }
 
-    var tiles = [];
-    for (var row = viewRange.from; row < viewRange.to; row++) {
-      this.eachTileInRow(row, function(tile) { // jshint ignore:line
+    let tiles = [];
+    for (let row = viewRange.from; row < viewRange.to; row++) {
+      this.eachTileInRow(row, tile => { // jshint ignore:line
         if (!filter || filter(tile)) {
           tiles.push(tile);
         }
@@ -1177,8 +1177,8 @@ export default class TileGrid extends Widget {
   }
 
   findTilesInRow(row) {
-    var tiles = [];
-    this.eachTileInRow(row, function(tile) {
+    let tiles = [];
+    this.eachTileInRow(row, tile => {
       tiles.push(tile);
     });
     return tiles;
@@ -1188,9 +1188,9 @@ export default class TileGrid extends Widget {
    * Executes the given function for each tile in a row.
    */
   eachTileInRow(row, func) {
-    var startIndex = row * this.gridColumnCount;
-    var tiles = [];
-    for (var i = startIndex; i < startIndex + this.gridColumnCount; i++) {
+    let startIndex = row * this.gridColumnCount;
+    let tiles = [];
+    for (let i = startIndex; i < startIndex + this.gridColumnCount; i++) {
       if (this.filteredTiles[i]) {
         func(this.filteredTiles[i], i);
       }
@@ -1232,7 +1232,7 @@ export default class TileGrid extends Widget {
   }
 
   _updateVirtualScrollable() {
-    var $scrollable = this.virtualScrolling.$scrollable;
+    let $scrollable = this.virtualScrolling.$scrollable;
     if ($scrollable) {
       $scrollable.off('scroll', this._scrollParentScrollHandler);
     }
@@ -1261,7 +1261,7 @@ export default class TileGrid extends Widget {
   }
 
   _heightForRow(row) {
-    var height = 0;
+    let height = 0;
 
     height = this.htmlComp.layout.rowHeight;
     if (row !== this.rowCount() - 1) {
@@ -1315,40 +1315,40 @@ export default class TileGrid extends Widget {
       // Range already rendered -> do nothing
       return;
     }
-    var rangesToRemove = this.viewRangeRendered.subtract(viewRange).filter(function(range) {
+    let rangesToRemove = this.viewRangeRendered.subtract(viewRange).filter(range => {
       return range.size() > 0;
     });
-    rangesToRemove.forEach(function(range) {
+    rangesToRemove.forEach(range => {
       this._removeTilesInRange(range);
-    }.bind(this));
+    });
 
-    var rangesToRender = viewRange.subtract(this.viewRangeRendered).filter(function(range) {
+    let rangesToRender = viewRange.subtract(this.viewRangeRendered).filter(range => {
       return range.size() > 0;
     });
-    rangesToRender.forEach(function(range) {
+    rangesToRender.forEach(range => {
       this._renderTilesInRange(range);
-    }.bind(this));
+    });
 
     this._renderFiller();
   }
 
   _renderTilesInRange(range) {
-    var numRowsRendered = 0;
-    var tilesRendered = 0;
-    var tiles = this.filteredTiles;
+    let numRowsRendered = 0;
+    let tilesRendered = 0;
+    let tiles = this.filteredTiles;
     if (tiles.length === 0) {
       return;
     }
 
-    var maxRange = this.virtualScrolling.maxViewRange();
+    let maxRange = this.virtualScrolling.maxViewRange();
     range = maxRange.intersect(range);
-    var newRange = this.viewRangeRendered.union(range);
+    let newRange = this.viewRangeRendered.union(range);
     if (newRange.length === 2) {
       throw new Error('Can only prepend or append rows to the existing range. Existing: ' + this.viewRangeRendered + '. New: ' + newRange);
     }
     this.viewRangeRendered = newRange[0];
 
-    for (var row = range.from; row < range.to; row++) {
+    for (let row = range.from; row < range.to; row++) {
       this.eachTileInRow(row, renderTile.bind(this));
       numRowsRendered++;
     }
@@ -1374,12 +1374,12 @@ export default class TileGrid extends Widget {
     if (!this.virtual) {
       return [];
     }
-    var prevTiles = this.renderedTiles();
-    var newViewRange = this.virtualScrolling.calculateCurrentViewRange();
-    var newTiles = this.findTilesInRange(newViewRange);
+    let prevTiles = this.renderedTiles();
+    let newViewRange = this.virtualScrolling.calculateCurrentViewRange();
+    let newTiles = this.findTilesInRange(newViewRange);
 
-    var tilesToRemove = arrays.diff(prevTiles, newTiles);
-    var tilesToRender = arrays.diff(newTiles, prevTiles);
+    let tilesToRemove = arrays.diff(prevTiles, newTiles);
+    let tilesToRender = arrays.diff(newTiles, prevTiles);
     if (filterResult) {
       filterResult.newlyHiddenTiles.forEach(function(tile) {
         if (tile.rendered) {
@@ -1389,7 +1389,7 @@ export default class TileGrid extends Widget {
     }
 
     // tilesToRemove contains newlyHiddenTiles as well but remove() does nothing if it is already removing
-    tilesToRemove.forEach(function(tile) {
+    tilesToRemove.forEach(tile => {
       tile.remove();
     });
     tilesToRender.forEach(function(tile) {
@@ -1430,7 +1430,7 @@ export default class TileGrid extends Widget {
     this._onAnimatedTileRemove(tile);
     tile.animateRemoval = false;
     // Remove animation is started by a set timeout -> use set timeout as well to come after
-    setTimeout(function() {
+    setTimeout(() => {
       // Reset to default
       tile.animateRemovalClass = 'animate-remove';
     });
@@ -1452,7 +1452,7 @@ export default class TileGrid extends Widget {
     // Loop through the tiles and move every html element to the end of the container
     // Only move if the order is different to the old order
     // This is actually only necessary to make debugging easier, since the tiles are positioned absolutely it would work without it
-    var different = false;
+    let different = false;
     this.tiles.forEach(function(tile, i) {
       if (prevTiles[i] !== tile || different) {
         // Start ordering as soon as the order of the arrays starts to differ
@@ -1472,20 +1472,20 @@ export default class TileGrid extends Widget {
   }
 
   _rowsRenderedInfo() {
-    var numRenderedTiles = this.$container.children('.tile').length;
-    var renderedRowsRange = '(' + this.viewRangeRendered + ')';
+    let numRenderedTiles = this.$container.children('.tile').length;
+    let renderedRowsRange = '(' + this.viewRangeRendered + ')';
     return numRenderedTiles + ' tiles rendered in range ' + renderedRowsRange;
   }
 
   _removeTilesInRange(range) {
-    var numRowsRemoved = 0;
-    var newRange = this.viewRangeRendered.subtract(range);
+    let numRowsRemoved = 0;
+    let newRange = this.viewRangeRendered.subtract(range);
     if (newRange.length === 2) {
       throw new Error('Can only remove rows at the beginning or end of the existing range. ' + this.viewRangeRendered + '. New: ' + newRange);
     }
     this.viewRangeRendered = newRange[0];
 
-    for (var i = range.from; i < range.to; i++) {
+    for (let i = range.from; i < range.to; i++) {
       this._removeTilesInRow(i);
       numRowsRemoved++;
     }
@@ -1497,22 +1497,22 @@ export default class TileGrid extends Widget {
   }
 
   _removeTilesInRow(row) {
-    var tiles = this.findTilesInRow(row);
-    tiles.forEach(function(tile) {
+    let tiles = this.findTilesInRow(row);
+    tiles.forEach(tile => {
       tile.remove();
     });
   }
 
   rowHasRenderedTiles(row) {
-    var tilesInRow = this.findTilesInRow(row);
-    return tilesInRow.some(function(tile) {
+    let tilesInRow = this.findTilesInRow(row);
+    return tilesInRow.some(tile => {
       return tile.rendered && !tile.removing;
     });
   }
 
   ensureTileRendered(tile) {
     if (!tile.rendered) {
-      var rowIndex = tile.gridData.y;
+      let rowIndex = tile.gridData.y;
       this.virtualScrolling._renderViewRangeForRowIndex(rowIndex);
       this.invalidateLayoutTree();
     }
@@ -1523,7 +1523,7 @@ export default class TileGrid extends Widget {
       this.$fillBefore = this.$container.prependDiv('filler');
     }
 
-    var fillBeforeHeight = this._calculateFillerHeight(new Range(0, this.viewRangeRendered.from));
+    let fillBeforeHeight = this._calculateFillerHeight(new Range(0, this.viewRangeRendered.from));
     this.$fillBefore.cssHeight(fillBeforeHeight);
     this.$fillBefore.css('width', '100%');
     $.log.isTraceEnabled() && $.log.trace('FillBefore height: ' + fillBeforeHeight);
@@ -1534,10 +1534,10 @@ export default class TileGrid extends Widget {
     // Make sure filler is always at the end
     this.$fillAfter.appendTo(this.$container);
 
-    var renderedTilesHeight = this._calculateFillerHeight(new Range(this.viewRangeRendered.from, this.viewRangeRendered.to));
+    let renderedTilesHeight = this._calculateFillerHeight(new Range(this.viewRangeRendered.from, this.viewRangeRendered.to));
     this.$fillAfter.cssTop(fillBeforeHeight + renderedTilesHeight);
 
-    var fillAfterHeight = this._calculateFillerHeight(new Range(this.viewRangeRendered.to, this.rowCount()));
+    let fillAfterHeight = this._calculateFillerHeight(new Range(this.viewRangeRendered.to, this.rowCount()));
     this.$fillAfter.cssHeight(fillAfterHeight);
     this.$fillAfter.css('width', '100%');
 
@@ -1545,8 +1545,8 @@ export default class TileGrid extends Widget {
   }
 
   _calculateFillerHeight(range) {
-    var totalHeight = 0;
-    for (var i = range.from; i < range.to; i++) {
+    let totalHeight = 0;
+    for (let i = range.from; i < range.to; i++) {
       totalHeight += this._heightForRow(i);
     }
     return totalHeight;
@@ -1562,9 +1562,9 @@ export default class TileGrid extends Widget {
     if (!this.virtual) {
       return this.filteredTiles;
     }
-    var tiles = [];
-    this.$container.children('.tile').each(function(i, elem) {
-      var tile = scout.widget(elem);
+    let tiles = [];
+    this.$container.children('.tile').each((i, elem) => {
+      let tile = scout.widget(elem);
       if (!tile.removalPending) {
         // Don't return the tiles which are being removed
         // Otherwise delta could be wrong if called while removing. Example: filter is added and removed right after while the tiles are still being removed -> RenderTileDelta has to render the tiles being removed

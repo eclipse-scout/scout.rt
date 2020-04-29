@@ -18,7 +18,7 @@ export default class OutlineLayout extends TreeLayout {
   }
 
   _layout($container) {
-    var containerSize,
+    let containerSize,
       htmlContainer = this.outline.htmlComp;
 
     super._layout($container);
@@ -27,15 +27,15 @@ export default class OutlineLayout extends TreeLayout {
       .subtract(htmlContainer.insets());
 
     if (this.outline.embedDetailContent) {
-      var selectedNode = this.outline.selectedNodes[0];
+      let selectedNode = this.outline.selectedNodes[0];
       if (selectedNode && selectedNode.rendered) {
-        var pageHtmlComp = selectedNode.htmlComp;
+        let pageHtmlComp = selectedNode.htmlComp;
         // pageHtmlComp is null if there is no detail form and no detail menubar
         if (pageHtmlComp) {
           // Fix width so that prefSize returns the appropriate height (necessary for elements with text wrap)
           pageHtmlComp.$comp.cssWidth(containerSize.width);
 
-          var prefSize = pageHtmlComp.prefSize();
+          let prefSize = pageHtmlComp.prefSize();
           pageHtmlComp.setSize(new Dimension(containerSize.width, prefSize.height));
           selectedNode.height = prefSize.height + pageHtmlComp.margins().vertical();
         }
@@ -43,8 +43,8 @@ export default class OutlineLayout extends TreeLayout {
 
       // Remove width and height from non selected nodes (at this point we don't know the previously selected node anymore, so we need to process all visible nodes)
       // It is not enough to only process rendered nodes, we need to update the detached nodes as well
-      this.outline.visibleNodesFlat.forEach(function(node) {
-        var $node = node.$node;
+      this.outline.visibleNodesFlat.forEach(node => {
+        let $node = node.$node;
         if (!$node) {
           // Do nothing if node has never been rendered
           return;
@@ -67,7 +67,7 @@ export default class OutlineLayout extends TreeLayout {
   }
 
   _setDataHeight(heightOffset) {
-    var titleSize = null;
+    let titleSize = null;
     if (this.outline.titleVisible) {
       titleSize = graphics.size(this.outline.$title, true);
     }

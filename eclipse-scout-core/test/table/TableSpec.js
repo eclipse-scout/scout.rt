@@ -13,8 +13,8 @@ import {LocaleSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
 
 /* global removePopups */
 
-describe('Table', function() {
-  var session, helper;
+describe('Table', () => {
+  let session, helper;
 
   /**
    * TestBeanColumn that validates that the table is available in _init
@@ -29,7 +29,7 @@ describe('Table', function() {
 
   window.scout.TestBeanColumn = TestBeanColumn;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
@@ -39,7 +39,7 @@ describe('Table', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
@@ -47,12 +47,12 @@ describe('Table', function() {
     $.fx.off = false;
   });
 
-  describe('render', function() {
+  describe('render', () => {
 
-    it('renders CSS class', function() {
+    it('renders CSS class', () => {
       // regular table
-      var model = helper.createModelFixture(2, 1);
-      var table = helper.createTable(model);
+      let model = helper.createModelFixture(2, 1);
+      let table = helper.createTable(model);
       table.render();
       expect('table', table.$container.attr('class'));
 
@@ -68,37 +68,37 @@ describe('Table', function() {
       expect(table.$container.find('.table-row').first().hasClass('checked')).toBe(true);
     });
 
-    it('renders a table header', function() {
-      var model = helper.createModelFixture(2);
-      var table = helper.createTable(model);
+    it('renders a table header', () => {
+      let model = helper.createModelFixture(2);
+      let table = helper.createTable(model);
       table.render();
 
       expect(table.header).not.toBeUndefined();
     });
 
-    describe('renders table rows', function() {
+    describe('renders table rows', () => {
 
-      it('accepts rows with cells', function() {
-        var model = helper.createModelFixture(3, 1);
+      it('accepts rows with cells', () => {
+        let model = helper.createModelFixture(3, 1);
         model.rows[0] = helper.createModelRowByTexts(1, ['cell1', '', '0']);
-        var table = helper.createTable(model);
+        let table = helper.createTable(model);
         table.render();
 
-        var $row0 = table.$rows().eq(0);
-        var $cells = $row0.find('.table-cell');
+        let $row0 = table.$rows().eq(0);
+        let $cells = $row0.find('.table-cell');
         expect($cells.eq(0).text()).toBe('cell1');
         expect($cells.eq(1).html()).toBe('&nbsp;');
         expect($cells.eq(2).text()).toBe('0');
       });
 
-      it('accepts rows with text only', function() {
-        var model = helper.createModelFixture(3, 1);
+      it('accepts rows with text only', () => {
+        let model = helper.createModelFixture(3, 1);
         model.rows[0] = helper.createModelRowByTexts(1, ['cell1', '', '0'], true);
-        var table = helper.createTable(model);
+        let table = helper.createTable(model);
         table.render();
 
-        var $row0 = table.$rows().eq(0);
-        var $cells = $row0.find('.table-cell');
+        let $row0 = table.$rows().eq(0);
+        let $cells = $row0.find('.table-cell');
         expect($cells.eq(0).text()).toBe('cell1');
         expect($cells.eq(1).html()).toBe('&nbsp;');
         expect($cells.eq(2).text()).toBe('0');
@@ -108,10 +108,10 @@ describe('Table', function() {
 
   });
 
-  describe('_calculateViewRangeForRowIndex', function() {
-    it('returns a range based on viewRangeSize', function() {
-      var model = helper.createModelFixture(2, 10);
-      var table = helper.createTable(model);
+  describe('_calculateViewRangeForRowIndex', () => {
+    it('returns a range based on viewRangeSize', () => {
+      let model = helper.createModelFixture(2, 10);
+      let table = helper.createTable(model);
 
       table.viewRangeSize = 4;
       expect(table._calculateViewRangeForRowIndex(0)).toEqual(new Range(0, 4));
@@ -146,11 +146,11 @@ describe('Table', function() {
     });
   });
 
-  describe('rowIcons and checkable rows', function() {
+  describe('rowIcons and checkable rows', () => {
 
-    var model, table, row;
+    let model, table, row;
 
-    it('creates an artificial cell when a rowIcon is set on a row', function() {
+    it('creates an artificial cell when a rowIcon is set on a row', () => {
       model = helper.createModelFixture(1);
       model.rowIconVisible = true;
       table = helper.createTable(model);
@@ -158,27 +158,27 @@ describe('Table', function() {
       row.rowIcon = icons.WORLD;
       table.insertRow(row);
 
-      var columns = table.columns;
+      let columns = table.columns;
       expect(columns.length).toBe(2);
       expect(columns[0] instanceof IconColumn).toBe(true);
-      var cell = table.cell(table.columns[0], table.rows[0]);
+      let cell = table.cell(table.columns[0], table.rows[0]);
       expect(cell.cssClass).toBe('row-icon-cell');
     });
 
   });
 
-  describe('insertRows', function() {
-    var model, table;
+  describe('insertRows', () => {
+    let model, table;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(2);
       table = helper.createTable(model);
     });
 
-    it('inserts rows at the end of the table', function() {
+    it('inserts rows at the end of the table', () => {
       expect(table.rows.length).toBe(0);
 
-      var rows = helper.createModelRows(2, 5);
+      let rows = helper.createModelRows(2, 5);
       table.insertRows(rows);
 
       expect(table.rows.length).toBe(5);
@@ -191,7 +191,7 @@ describe('Table', function() {
       expect(Object.keys(table.rowsMap).length).toBe(5 + 3);
     });
 
-    it('renders rows only if view range is not full yet', function() {
+    it('renders rows only if view range is not full yet', () => {
       table.viewRangeSize = 2;
       table.render();
       expect(table.rows.length).toBe(0);
@@ -211,8 +211,8 @@ describe('Table', function() {
       expect(table.viewRangeRendered).toEqual(new Range(0, 2));
     });
 
-    it('rowsInserted event must be triggered before rowOrderChanged event', function() {
-      var events = '',
+    it('rowsInserted event must be triggered before rowOrderChanged event', () => {
+      let events = '',
         rowsOnInsert;
       if (!Device.get().supportsInternationalization()) {
         return;
@@ -221,11 +221,11 @@ describe('Table', function() {
       model = helper.createModelFixture(1, 0);
       table = helper.createTable(model);
       table.sort(table.columns[0], 'desc');
-      table.on('rowsInserted', function(event) {
+      table.on('rowsInserted', event => {
         events += 'rowsInserted ';
         rowsOnInsert = event.rows;
       });
-      table.on('rowOrderChanged', function() {
+      table.on('rowOrderChanged', () => {
         events += 'rowOrderChanged';
       });
       table.insertRows([helper.createModelRow(1, ['A']), helper.createModelRow(1, ['Z'])]);
@@ -245,21 +245,21 @@ describe('Table', function() {
 
   });
 
-  describe('updateRows', function() {
-    var model, table;
+  describe('updateRows', () => {
+    let model, table;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(2, 2);
       model.rows[0].cells[0].text = 'cellText0';
       model.rows[0].cells[1].text = 'cellText1';
       table = helper.createTable(model);
     });
 
-    it('updates the model cell texts', function() {
+    it('updates the model cell texts', () => {
       expect(table.rows[0].cells[0].text).toBe('cellText0');
       expect(table.rows[0].cells[1].text).toBe('cellText1');
 
-      var row = {
+      let row = {
         id: table.rows[0].id,
         cells: ['newCellText0', 'newCellText1']
       };
@@ -269,16 +269,16 @@ describe('Table', function() {
       expect(table.rows[0].cells[1].text).toBe('newCellText1');
     });
 
-    it('updates the html cell texts', function() {
+    it('updates the html cell texts', () => {
       table.render();
       table.validateLayout(); // make sure layout is valid
 
-      var $rows = table.$rows();
-      var $cells0 = table.$cellsForRow($rows.eq(0));
+      let $rows = table.$rows();
+      let $cells0 = table.$cellsForRow($rows.eq(0));
       expect($cells0.eq(0).text()).toBe('cellText0');
       expect($cells0.eq(1).text()).toBe('cellText1');
 
-      var row = {
+      let row = {
         id: table.rows[0].id,
         cells: ['newCellText0', 'newCellText1']
       };
@@ -294,10 +294,10 @@ describe('Table', function() {
       expect($cells0.eq(1).text()).toBe('newCellText1');
     });
 
-    it('does not fail if the row to update is the same instance as the existing one', function() {
+    it('does not fail if the row to update is the same instance as the existing one', () => {
       table.render();
-      var $rows = table.$rows();
-      var $cells0 = table.$cellsForRow($rows.eq(0));
+      let $rows = table.$rows();
+      let $cells0 = table.$cellsForRow($rows.eq(0));
       expect($cells0.eq(0).text()).toBe('cellText0');
       expect($cells0.eq(1).text()).toBe('cellText1');
 
@@ -311,7 +311,7 @@ describe('Table', function() {
       expect($cells0.eq(1).text()).toBe('newCellText1');
     });
 
-    it('does not destroy selection', function() {
+    it('does not destroy selection', () => {
       model = helper.createModelFixture(2, 3);
       model.rows[0].cells[0].text = 'cellText0';
       model.rows[0].cells[1].text = 'cellText1';
@@ -323,7 +323,7 @@ describe('Table', function() {
       expect(table.$selectedRows().eq(0)).toHaveClass('select-top');
       expect(table.$selectedRows().eq(1)).toHaveClass('select-middle');
       expect(table.$selectedRows().eq(2)).toHaveClass('select-bottom');
-      var row = {
+      let row = {
         id: table.rows[0].id,
         cells: ['newCellText0', 'newCellText1']
       };
@@ -335,21 +335,21 @@ describe('Table', function() {
       expect(table.$selectedRows().eq(2)).toHaveClass('select-bottom');
     });
 
-    it('silently updates rows which are not in view range', function() {
+    it('silently updates rows which are not in view range', () => {
       table.viewRangeSize = 1;
       table.render();
       expect(table.viewRangeRendered).toEqual(new Range(0, 1));
       expect(table.$rows().length).toBe(1);
       expect(table.rows.length).toBe(2);
-      var $rows = table.$rows();
-      var $cells0 = table.$cellsForRow($rows.eq(0));
+      let $rows = table.$rows();
+      let $cells0 = table.$cellsForRow($rows.eq(0));
       expect($cells0.eq(0).text()).toBe('cellText0');
 
-      var row0 = {
+      let row0 = {
         id: table.rows[0].id,
         cells: ['newRow0Cell0', 'newRow0Cell1']
       };
-      var row1 = {
+      let row1 = {
         id: table.rows[1].id,
         cells: ['newRow1Cell0', 'newRow1Cell1']
       };
@@ -368,10 +368,10 @@ describe('Table', function() {
     });
   });
 
-  describe('deleteRows', function() {
-    var model, table, rows, row0, row1, row2;
+  describe('deleteRows', () => {
+    let model, table, rows, row0, row1, row2;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(2, 3);
       table = helper.createTable(model);
       rows = table.rows;
@@ -380,7 +380,7 @@ describe('Table', function() {
       row2 = model.rows[2];
     });
 
-    it('deletes single rows from model', function() {
+    it('deletes single rows from model', () => {
       expect(table.rows.length).toBe(3);
       expect(table.rows[0]).toBe(row0);
 
@@ -392,7 +392,7 @@ describe('Table', function() {
       expect(table.rows.length).toBe(0);
     });
 
-    it('deletes single rows from html document', function() {
+    it('deletes single rows from html document', () => {
       table.render();
       expect(table.$rows().length).toBe(3);
 
@@ -405,10 +405,10 @@ describe('Table', function() {
       expect(table.$rows().length).toBe(0);
     });
 
-    it('considers view range (distinguishes between rendered and non rendered rows, adjusts viewRangeRendered)', function() {
+    it('considers view range (distinguishes between rendered and non rendered rows, adjusts viewRangeRendered)', () => {
       model = helper.createModelFixture(2, 6);
       table = helper.createTable(model);
-      var spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new Range(1, 4));
+      let spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new Range(1, 4));
       table.render();
       expect(table.viewRangeRendered).toEqual(new Range(1, 4));
       expect(table.$rows().length).toBe(3);
@@ -446,22 +446,22 @@ describe('Table', function() {
     });
   });
 
-  describe('deleteAllRows', function() {
-    var model, table;
+  describe('deleteAllRows', () => {
+    let model, table;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(2, 3);
       table = helper.createTable(model);
     });
 
-    it('deletes all rows from model', function() {
+    it('deletes all rows from model', () => {
       expect(table.rows.length).toBe(3);
 
       table.deleteAllRows();
       expect(table.rows.length).toBe(0);
     });
 
-    it('deletes all rows from html document', function() {
+    it('deletes all rows from html document', () => {
       table.render();
       expect(table.$rows().length).toBe(3);
 
@@ -469,7 +469,7 @@ describe('Table', function() {
       expect(table.$rows().length).toBe(0);
     });
 
-    it('silently removes not rendered rows', function() {
+    it('silently removes not rendered rows', () => {
       table.viewRangeSize = 2;
       table.render();
       expect(table.viewRangeRendered).toEqual(new Range(0, 2));
@@ -487,10 +487,10 @@ describe('Table', function() {
     });
   });
 
-  describe('updateRowOrder', function() {
-    var model, table, row0, row1, row2;
+  describe('updateRowOrder', () => {
+    let model, table, row0, row1, row2;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(2, 3);
       table = helper.createTable(model);
       row0 = table.rows[0];
@@ -498,7 +498,7 @@ describe('Table', function() {
       row2 = table.rows[2];
     });
 
-    it('reorders the model rows', function() {
+    it('reorders the model rows', () => {
       table.updateRowOrder([row2, row1, row0]);
       expect(table.rows.length).toBe(3);
       expect(table.rows[0]).toBe(row2);
@@ -506,21 +506,21 @@ describe('Table', function() {
       expect(table.rows[2]).toBe(row0);
     });
 
-    it('reorders the html nodes', function() {
+    it('reorders the html nodes', () => {
       table.render();
       table.updateRowOrder([row2, row1, row0]);
-      var $rows = table.$rows();
+      let $rows = table.$rows();
       expect(true).toBe(true);
       expect($rows.eq(0).data('row').id).toBe(row2.id);
       expect($rows.eq(1).data('row').id).toBe(row1.id);
       expect($rows.eq(2).data('row').id).toBe(row0.id);
     });
 
-    it('considers view range', function() {
+    it('considers view range', () => {
       table.viewRangeSize = 2;
       table.render();
 
-      var $rows = table.$rows();
+      let $rows = table.$rows();
       expect(table.viewRangeRendered).toEqual(new Range(0, 2));
       expect($rows.eq(0).data('row').id).toBe(model.rows[0].id);
       expect($rows.eq(1).data('row').id).toBe(model.rows[1].id);
@@ -536,11 +536,11 @@ describe('Table', function() {
     });
   });
 
-  describe('checkRow', function() {
+  describe('checkRow', () => {
 
     function findCheckedRows(rows) {
-      var checkedRows = [];
-      for (var i = 0; i < rows.length; i++) {
+      let checkedRows = [];
+      for (let i = 0; i < rows.length; i++) {
         if (rows[i].checked) {
           checkedRows.push(rows[i]);
         }
@@ -548,15 +548,15 @@ describe('Table', function() {
       return checkedRows;
     }
 
-    it('checks the row, does not uncheck others if multiCheck is set to true', function() {
-      var model = helper.createModelFixture(2, 5);
+    it('checks the row, does not uncheck others if multiCheck is set to true', () => {
+      let model = helper.createModelFixture(2, 5);
       model.checkable = true;
       model.multiCheck = true;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render();
 
-      var rows = table.rows;
-      var checkedRows = findCheckedRows(rows);
+      let rows = table.rows;
+      let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
       table.checkRow(rows[0], true, true);
@@ -568,7 +568,7 @@ describe('Table', function() {
       table.checkRow(rows[4], false, true);
 
       checkedRows = [];
-      for (var z = 0; z < rows.length; z++) {
+      for (let z = 0; z < rows.length; z++) {
         if (rows[z].checked) {
           checkedRows.push(rows[z]);
         }
@@ -576,15 +576,15 @@ describe('Table', function() {
       expect(checkedRows.length).toBe(1);
     });
 
-    it('unchecks other rows if multiCheck is set to false', function() {
-      var model = helper.createModelFixture(2, 5);
+    it('unchecks other rows if multiCheck is set to false', () => {
+      let model = helper.createModelFixture(2, 5);
       model.checkable = true;
       model.multiCheck = false;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render();
 
-      var rows = table.rows;
-      var checkedRows = findCheckedRows(rows);
+      let rows = table.rows;
+      let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
       table.checkRow(rows[0], true, true);
@@ -599,15 +599,15 @@ describe('Table', function() {
       expect(checkedRows.length).toBe(0);
     });
 
-    it('does not check the row if checkable is set to false', function() {
-      var model = helper.createModelFixture(2, 5);
+    it('does not check the row if checkable is set to false', () => {
+      let model = helper.createModelFixture(2, 5);
       model.checkable = false;
       model.multiCheck = false;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render();
 
-      var rows = table.rows;
-      var checkedRows = findCheckedRows(rows);
+      let rows = table.rows;
+      let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
       table.checkRow(rows[0], true, true);
@@ -615,15 +615,15 @@ describe('Table', function() {
       expect(checkedRows.length).toBe(0);
     });
 
-    it('does not check the row if the row is disabled', function() {
-      var model = helper.createModelFixture(2, 5);
+    it('does not check the row if the row is disabled', () => {
+      let model = helper.createModelFixture(2, 5);
       model.multiCheck = false;
       model.checkable = false;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render();
 
-      var rows = table.rows;
-      var checkedRows = findCheckedRows(rows);
+      let rows = table.rows;
+      let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
       rows[0].enabled = false;
       table.checkRow(rows[0], true, true);
@@ -631,16 +631,16 @@ describe('Table', function() {
       expect(checkedRows.length).toBe(0);
     });
 
-    it('does not check the row if the table is disabled', function() {
-      var model = helper.createModelFixture(2, 5);
+    it('does not check the row if the table is disabled', () => {
+      let model = helper.createModelFixture(2, 5);
       model.checkable = true;
       model.multiCheck = true;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.setEnabled(false);
       table.render();
 
-      var rows = table.rows;
-      var checkedRows = findCheckedRows(rows);
+      let rows = table.rows;
+      let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
       table.checkRow(rows[0], true, true);
@@ -648,16 +648,16 @@ describe('Table', function() {
       expect(checkedRows.length).toBe(0);
     });
 
-    it('considers view range', function() {
-      var model = helper.createModelFixture(2, 5);
+    it('considers view range', () => {
+      let model = helper.createModelFixture(2, 5);
       model.checkable = true;
       model.multiCheck = true;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.viewRangeSize = 2;
       table.render();
 
-      var rows = table.rows;
-      var checkedRows = findCheckedRows(rows);
+      let rows = table.rows;
+      let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
       table.checkRow(rows[0], true);
@@ -670,52 +670,52 @@ describe('Table', function() {
       expect(table.$rows().eq(1).data('row').checked).toBe(false);
     });
 
-    it('keeps added checkable column visible even when reloading factory settings', function() {
-      var model = helper.createModelFixture(2, 5);
+    it('keeps added checkable column visible even when reloading factory settings', () => {
+      let model = helper.createModelFixture(2, 5);
       model.checkable = true;
       model.multiCheck = true;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var rows = table.rows;
-      var checkedRows = findCheckedRows(rows);
+      let rows = table.rows;
+      let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
       table.checkRow(rows[0], true, true);
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(1);
 
-      var colsDeepCopy = $.extend(true, [], table.columns);
+      let colsDeepCopy = $.extend(true, [], table.columns);
       expect(table.columns.length).toBe(3);
       colsDeepCopy.shift();
       table.updateColumnStructure(colsDeepCopy);
       expect(table.columns.length).toBe(3);
     });
 
-    it('does not add an additional checkable column if one is already configured', function() {
-      var model = helper.createModelSingleConfiguredCheckableColumn(5);
+    it('does not add an additional checkable column if one is already configured', () => {
+      let model = helper.createModelSingleConfiguredCheckableColumn(5);
       model.checkable = true;
       model.multiCheck = true;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var rows = table.rows;
-      var checkedRows = findCheckedRows(rows);
+      let rows = table.rows;
+      let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
       expect(table.columns.length).toBe(1);
     });
 
-    it('checkablestyle.checbox_table_row checks row with click event', function() {
-      var model = helper.createModelFixture(2, 5);
+    it('checkablestyle.checbox_table_row checks row with click event', () => {
+      let model = helper.createModelFixture(2, 5);
       model.checkableStyle = Table.CheckableStyle.CHECKBOX_TABLE_ROW;
       model.checkable = true;
       model.multiCheck = true;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render();
 
-      var rows = table.rows;
-      var checkedRows = findCheckedRows(rows);
+      let rows = table.rows;
+      let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
       table.$cell(0, table.rows[4].$row).triggerClick();
@@ -733,35 +733,35 @@ describe('Table', function() {
 
   });
 
-  describe('selectRows', function() {
+  describe('selectRows', () => {
 
-    it('updates model', function() {
-      var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+    it('updates model', () => {
+      let model = helper.createModelFixture(2, 5);
+      let table = helper.createTable(model);
       table.render();
 
-      var rows = [table.rows[0], model.rows[4]];
+      let rows = [table.rows[0], model.rows[4]];
       table.selectRows(rows);
 
       expect(table.selectedRows).toEqual(rows);
     });
 
-    it('selects rendered rows and unselects others', function() {
-      var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+    it('selects rendered rows and unselects others', () => {
+      let model = helper.createModelFixture(2, 5);
+      let table = helper.createTable(model);
       table.render();
 
-      var $selectedRows = table.$selectedRows();
+      let $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(0);
 
       helper.selectRowsAndAssert(table, [model.rows[0], model.rows[4]]);
       helper.selectRowsAndAssert(table, [model.rows[2]]);
     });
 
-    it('considers view range', function() {
-      var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
-      var rows = table.rows;
+    it('considers view range', () => {
+      let model = helper.createModelFixture(2, 5);
+      let table = helper.createTable(model);
+      let rows = table.rows;
       table.viewRangeSize = 2;
       table.render();
       table.selectRows(rows[2]);
@@ -773,24 +773,24 @@ describe('Table', function() {
       expect(table.$selectedRows().length).toBe(1);
     });
 
-    it('triggers rowsSelected', function() {
-      var model = helper.createModelFixture(2, 5);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+    it('triggers rowsSelected', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       table.render();
 
-      var rows = [table.rows[0], table.rows[4]];
-      var eventTriggered = false;
-      table.on('rowsSelected', function() {
+      let rows = [table.rows[0], table.rows[4]];
+      let eventTriggered = false;
+      table.on('rowsSelected', () => {
         eventTriggered = true;
       });
       table.selectRows(rows);
       expect(eventTriggered).toBe(true);
     });
 
-    it('selectedRow() returns first selected row or null when table has no selection', function() {
-      var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+    it('selectedRow() returns first selected row or null when table has no selection', () => {
+      let model = helper.createModelFixture(2, 5);
+      let table = helper.createTable(model);
       table.selectRows([table.rows[1], table.rows[2]]);
       expect(table.selectedRow()).toBe(table.rows[1]);
 
@@ -800,14 +800,14 @@ describe('Table', function() {
 
   });
 
-  describe('toggle selection', function() {
-    it('selects all if not all are selected', function() {
-      var model = helper.createModelFixture(2, 5);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+  describe('toggle selection', () => {
+    it('selects all if not all are selected', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       table.render();
 
-      var $selectedRows = table.$selectedRows();
+      let $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(0);
 
       table.toggleSelection();
@@ -816,13 +816,13 @@ describe('Table', function() {
       helper.assertSelectionEvent(model.id, helper.getRowIds(model.rows));
     });
 
-    it('selects none if all are selected', function() {
-      var model = helper.createModelFixture(2, 5);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+    it('selects none if all are selected', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       table.render();
 
-      var $selectedRows = table.$selectedRows();
+      let $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(0);
 
       helper.selectRowsAndAssert(table, table.rows);
@@ -839,10 +839,10 @@ describe('Table', function() {
     });
   });
 
-  describe('selectAll', function() {
-    it('selects all rows', function() {
-      var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+  describe('selectAll', () => {
+    it('selects all rows', () => {
+      let model = helper.createModelFixture(2, 5);
+      let table = helper.createTable(model);
       table.render();
 
       expect(table.selectedRows.length).toBe(0);
@@ -853,9 +853,9 @@ describe('Table', function() {
       expect(table.$selectedRows().length).toBe(5);
     });
 
-    it('considers view range -> renders selection only for rendered rows', function() {
-      var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+    it('considers view range -> renders selection only for rendered rows', () => {
+      let model = helper.createModelFixture(2, 5);
+      let table = helper.createTable(model);
       table.viewRangeSize = 2;
       table.render();
 
@@ -868,14 +868,14 @@ describe('Table', function() {
     });
   });
 
-  describe('doRowAction', function() {
+  describe('doRowAction', () => {
 
-    it('sends rowAction event with row and column', function() {
-      var model = helper.createModelFixture(2, 5);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
-      var row0 = table.rows[0];
-      var column0 = table.columns[0];
+    it('sends rowAction event with row and column', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
+      let row0 = table.rows[0];
+      let column0 = table.columns[0];
 
       table.selectedRows = [row0];
       table.render();
@@ -886,19 +886,19 @@ describe('Table', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
-      var event = new RemoteEvent(table.id, 'rowAction', {
+      let event = new RemoteEvent(table.id, 'rowAction', {
         columnId: column0.id,
         rowId: row0.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('does not send rowAction event if the row is not selected', function() {
-      var model = helper.createModelFixture(2, 5);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
-      var row0 = table.rows[0];
-      var column0 = table.columns[0];
+    it('does not send rowAction event if the row is not selected', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
+      let row0 = table.rows[0];
+      let column0 = table.columns[0];
 
       // no selection at all
       table.selectedRows = [];
@@ -926,19 +926,19 @@ describe('Table', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
-      var event = new RemoteEvent(table.id, 'rowAction', {
+      let event = new RemoteEvent(table.id, 'rowAction', {
         columnId: column0.id,
         rowId: row0.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('does not send rowAction event if it is not the only one selected row', function() {
-      var model = helper.createModelFixture(2, 5);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
-      var row0 = table.rows[0];
-      var column0 = table.columns[0];
+    it('does not send rowAction event if it is not the only one selected row', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
+      let row0 = table.rows[0];
+      let column0 = table.columns[0];
 
       // no selection at all
       table.selectedRows = [row0, table.rows[1]];
@@ -952,12 +952,12 @@ describe('Table', function() {
 
   });
 
-  describe('resizeColumn', function() {
+  describe('resizeColumn', () => {
 
-    it('updates column model and sends resize event ', function() {
-      var model = helper.createModelFixture(2, 5);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+    it('updates column model and sends resize event ', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       table.render();
 
       expect(table.columns[0].width).not.toBe(100);
@@ -965,7 +965,7 @@ describe('Table', function() {
       expect(table.columns[0].width).toBe(100);
 
       sendQueuedAjaxCalls('', 1000);
-      var event = new RemoteEvent(table.id, 'columnResized', {
+      let event = new RemoteEvent(table.id, 'columnResized', {
         columnId: table.columns[0].id,
         width: 100,
         showBusyIndicator: false
@@ -973,10 +973,10 @@ describe('Table', function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('does not send resize event when resizing is in progress', function() {
-      var model = helper.createModelFixture(2, 5);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+    it('does not send resize event when resizing is in progress', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       table.render();
 
       table.resizeColumn(table.columns[0], 50);
@@ -987,10 +987,10 @@ describe('Table', function() {
       expect(jasmine.Ajax.requests.count()).toBe(0);
     });
 
-    it('sends resize event when resizing is finished', function() {
-      var model = helper.createModelFixture(2, 5);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+    it('sends resize event when resizing is finished', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       table.render();
 
       table.resizeColumn(table.columns[0], 50);
@@ -1002,7 +1002,7 @@ describe('Table', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
-      var event = new RemoteEvent(table.id, 'columnResized', {
+      let event = new RemoteEvent(table.id, 'columnResized', {
         columnId: table.columns[0].id,
         width: 150,
         showBusyIndicator: false
@@ -1010,8 +1010,8 @@ describe('Table', function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('always updates model width, but only resizes cells of visible columns ', function() {
-      var model = helper.createModelFixture(5, 1);
+    it('always updates model width, but only resizes cells of visible columns ', () => {
+      let model = helper.createModelFixture(5, 1);
       model.columns[0].width = 100;
       model.columns[1].width = 101;
       model.columns[1].visible = false;
@@ -1019,16 +1019,16 @@ describe('Table', function() {
       model.columns[2].displayable = false;
       model.columns[3].width = 103;
       model.columns[4].width = 104;
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       table.render();
       // Manually set a "large" table width, because otherwise it will depend on the window size.
       // When running with PhantomJS, the window size would be too small, causing the test to fail.
       table.$container.width(9999);
       table.revalidateLayout();
 
-      var $headerItems = table.header.$container.children('.table-header-item:not(.filler)');
-      var $rowCells = table.rows[0].$row.children('.table-cell');
+      let $headerItems = table.header.$container.children('.table-header-item:not(.filler)');
+      let $rowCells = table.rows[0].$row.children('.table-cell');
       expect($headerItems.length).toBe(3);
       expect($rowCells.length).toBe(3);
       expect($headerItems.eq(0).cssMinWidth()).toBe(100);
@@ -1081,13 +1081,13 @@ describe('Table', function() {
 
   });
 
-  describe('autoResizeColumns', function() {
+  describe('autoResizeColumns', () => {
 
-    it('distributes the table columns using initialWidth as weight', function() {
-      var model = helper.createModelFixture(2);
+    it('distributes the table columns using initialWidth as weight', () => {
+      let model = helper.createModelFixture(2);
       model.columns[0].initialWidth = 100;
       model.columns[1].initialWidth = 200;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render();
       table.$data.width(450);
 
@@ -1100,14 +1100,14 @@ describe('Table', function() {
       expect(table.columns[1].width).toBe(300);
     });
 
-    it('excludes columns with fixed width', function() {
-      var model = helper.createModelFixture(2);
+    it('excludes columns with fixed width', () => {
+      let model = helper.createModelFixture(2);
       model.columns[0].initialWidth = 100;
       model.columns[0].width = model.columns[0].initialWidth;
       model.columns[0].fixedWidth = true;
       model.columns[1].initialWidth = 200;
       model.columns[1].width = model.columns[1].initialWidth;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render();
       table.$data.width(450);
 
@@ -1120,11 +1120,11 @@ describe('Table', function() {
       expect(table.columns[1].width).toBe(350);
     });
 
-    it('does not make the column smaller than the initial size', function() {
-      var model = helper.createModelFixture(2);
+    it('does not make the column smaller than the initial size', () => {
+      let model = helper.createModelFixture(2);
       model.columns[0].initialWidth = 100;
       model.columns[1].initialWidth = 200;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render();
       table.$data.width(240);
 
@@ -1139,11 +1139,11 @@ describe('Table', function() {
       // get smaller than initialSize
     });
 
-    it('does not make the column smaller than a minimum size', function() {
-      var model = helper.createModelFixture(2);
+    it('does not make the column smaller than a minimum size', () => {
+      let model = helper.createModelFixture(2);
       model.columns[0].initialWidth = 1000;
       model.columns[1].initialWidth = Column.DEFAULT_MIN_WIDTH - 10;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render();
       table.$data.width(450);
 
@@ -1158,9 +1158,9 @@ describe('Table', function() {
 
   });
 
-  describe('sort', function() {
-    var model, table, adapter, column0, column1, column2;
-    var $colHeaders, $header0, $header1, $header2;
+  describe('sort', () => {
+    let model, table, adapter, column0, column1, column2;
+    let $colHeaders, $header0, $header1, $header2;
 
     function prepareTable() {
       model = helper.createModelFixture(3, 3);
@@ -1187,7 +1187,7 @@ describe('Table', function() {
       $header2 = $colHeaders.eq(2);
     }
 
-    it('updates column model', function() {
+    it('updates column model', () => {
       prepareTable();
       render(table);
       table.sort(column0, 'desc');
@@ -1197,8 +1197,8 @@ describe('Table', function() {
       expect(table.columns[0].sortIndex).toBe(0);
     });
 
-    describe('model update', function() {
-      it('sets sortAscending according to direction param', function() {
+    describe('model update', () => {
+      it('sets sortAscending according to direction param', () => {
         prepareTable();
         render(table);
 
@@ -1209,7 +1209,7 @@ describe('Table', function() {
         expect(table.columns[0].sortAscending).toBe(true);
       });
 
-      it('resets properties on other columns', function() {
+      it('resets properties on other columns', () => {
         prepareTable();
         render(table);
 
@@ -1233,7 +1233,7 @@ describe('Table', function() {
         expect(table.columns[1].sortIndex).toBe(0);
       });
 
-      it('sets sortIndex', function() {
+      it('sets sortIndex', () => {
         prepareTable();
         render(table);
 
@@ -1255,7 +1255,7 @@ describe('Table', function() {
         expect(table.columns[1].sortIndex).toBe(0);
       });
 
-      it('does not remove sortIndex for columns always included at begin', function() {
+      it('does not remove sortIndex for columns always included at begin', () => {
         prepareTable();
         column1.initialAlwaysIncludeSortAtBegin = true;
         column1.sortActive = true;
@@ -1289,7 +1289,7 @@ describe('Table', function() {
         expect(table.columns[2].sortIndex).toBe(0);
       });
 
-      it('does not remove sortIndex for columns always included at end', function() {
+      it('does not remove sortIndex for columns always included at end', () => {
         prepareTable();
         column1.initialAlwaysIncludeSortAtEnd = true;
         column1.sortActive = true;
@@ -1323,7 +1323,7 @@ describe('Table', function() {
         expect(table.columns[2].sortIndex).toBe(0);
       });
 
-      it('does not remove sortIndex for columns always included at begin and end (combination)', function() {
+      it('does not remove sortIndex for columns always included at begin and end (combination)', () => {
         prepareTable();
         column1.initialAlwaysIncludeSortAtEnd = true;
         column1.sortActive = true;
@@ -1357,7 +1357,7 @@ describe('Table', function() {
         expect(table.columns[2].sortIndex).toBe(0);
       });
 
-      it('removes column from sort columns', function() {
+      it('removes column from sort columns', () => {
         prepareTable();
         render(table);
 
@@ -1387,7 +1387,7 @@ describe('Table', function() {
       });
     });
 
-    it('sends sort without sortingRequested event when client side sorting is possible', function() {
+    it('sends sort without sortingRequested event when client side sorting is possible', () => {
       prepareTableWithAdapter();
       render(table);
       // Make sure sorting is not executed because it does not work with
@@ -1398,14 +1398,14 @@ describe('Table', function() {
       table.sort(column0, 'desc');
       sendQueuedAjaxCalls();
 
-      var event = new RemoteEvent(table.id, 'sort', {
+      let event = new RemoteEvent(table.id, 'sort', {
         columnId: table.columns[0].id,
         sortAscending: false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('sends sort event with sortingRequested if client side sorting is not possible', function() {
+    it('sends sort event with sortingRequested if client side sorting is not possible', () => {
       prepareTableWithAdapter();
       render(table);
       spyOn(Device.get(), 'supportsInternationalization').and.returnValue(false);
@@ -1413,7 +1413,7 @@ describe('Table', function() {
       table.sort(column0, 'desc');
       sendQueuedAjaxCalls();
 
-      var event = new RemoteEvent(table.id, 'sort', {
+      let event = new RemoteEvent(table.id, 'sort', {
         columnId: table.columns[0].id,
         sortAscending: false,
         sortingRequested: true
@@ -1421,7 +1421,7 @@ describe('Table', function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('sorts the data', function() {
+    it('sorts the data', () => {
       prepareTable();
       render(table);
       spyOn(table, '_sort');
@@ -1431,7 +1431,7 @@ describe('Table', function() {
       expect(table._sort).toHaveBeenCalled();
     });
 
-    it('regroups the data if group by column is active', function() {
+    it('regroups the data if group by column is active', () => {
       if (!Device.get().supportsInternationalization()) {
         return;
       }
@@ -1451,19 +1451,19 @@ describe('Table', function() {
       expect(table._group).toHaveBeenCalled();
     });
 
-    it('restores selection after sorting', function() {
-      var model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'NumberColumn'),
+    it('restores selection after sorting', () => {
+      let model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'NumberColumn'),
         table = helper.createTable(model),
         column0 = table.columns[0],
         rows = table.rows;
       table.render();
 
-      var $rows = table.$rows();
-      var $row0 = $rows.eq(0);
-      var $row1 = $rows.eq(1);
-      var $row2 = $rows.eq(2);
-      var $row3 = $rows.eq(3);
-      var $row4 = $rows.eq(4);
+      let $rows = table.$rows();
+      let $row0 = $rows.eq(0);
+      let $row1 = $rows.eq(1);
+      let $row2 = $rows.eq(2);
+      let $row3 = $rows.eq(3);
+      let $row4 = $rows.eq(4);
 
       expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('selected');
 
@@ -1497,15 +1497,15 @@ describe('Table', function() {
       expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
     });
 
-    describe('sorting', function() {
+    describe('sorting', () => {
 
-      it('sorts text columns considering locale (if browser supports it)', function() {
+      it('sorts text columns considering locale (if browser supports it)', () => {
         if (!Device.get().supportsInternationalization()) {
           return;
         }
 
-        var model = helper.createModelSingleColumnByTexts(['Österreich', 'Italien', 'Zypern']);
-        var table = helper.createTable(model);
+        let model = helper.createModelSingleColumnByTexts(['Österreich', 'Italien', 'Zypern']);
+        let table = helper.createTable(model);
         column0 = table.columns[0];
         table.render();
 
@@ -1528,9 +1528,9 @@ describe('Table', function() {
         helper.assertTextsInCells(table.rows, 0, ['Italien', 'Zypern', 'Österreich']);
       });
 
-      it('sorts number columns', function() {
-        var model = helper.createModelSingleColumnByValues([100, 90, 300], 'NumberColumn');
-        var table = helper.createTable(model);
+      it('sorts number columns', () => {
+        let model = helper.createModelSingleColumnByValues([100, 90, 300], 'NumberColumn');
+        let table = helper.createTable(model);
         column0 = table.columns[0];
         table.render();
 
@@ -1541,9 +1541,9 @@ describe('Table', function() {
         helper.assertValuesInCells(table.rows, 0, [90, 100, 300]);
       });
 
-      it('sorts date columns', function() {
-        var model = helper.createModelSingleColumnByValues([new Date('2012-08-10'), new Date('2014-03-01'), new Date('1999-01-10')], 'DateColumn');
-        var table = helper.createTable(model);
+      it('sorts date columns', () => {
+        let model = helper.createModelSingleColumnByValues([new Date('2012-08-10'), new Date('2014-03-01'), new Date('1999-01-10')], 'DateColumn');
+        let table = helper.createTable(model);
         column0 = table.columns[0];
         table.render();
 
@@ -1554,13 +1554,13 @@ describe('Table', function() {
         helper.assertDatesInCells(table.rows, 0, [new Date('1999-01-10'), new Date('2012-08-10'), new Date('2014-03-01')]);
       });
 
-      it('uses non sort columns as fallback', function() {
+      it('uses non sort columns as fallback', () => {
         if (!Device.get().supportsInternationalization()) {
           return;
         }
 
-        var model = helper.createModelFixture(2, 4);
-        var table = helper.createTable(model);
+        let model = helper.createModelFixture(2, 4);
+        let table = helper.createTable(model);
 
         column0 = table.columns[0];
         column1 = table.columns[1];
@@ -1597,30 +1597,30 @@ describe('Table', function() {
 
   });
 
-  describe('row click', function() {
+  describe('row click', () => {
 
     function clickRowAndAssertSelection(table, $row) {
       $row.triggerClick();
 
-      var $selectedRows = table.$selectedRows();
+      let $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(1);
 
-      var $selectedRow = $selectedRows.first();
+      let $selectedRow = $selectedRows.first();
       expect($selectedRow.innerText).toEqual($row.innerText);
 
       expect($selectedRow.hasClass('selected')).toBeTruthy();
       expect($selectedRow.hasClass('select-single')).toBeTruthy();
     }
 
-    it('selects row and unselects others', function() {
-      var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+    it('selects row and unselects others', () => {
+      let model = helper.createModelFixture(2, 5);
+      let table = helper.createTable(model);
       table.render();
 
-      var $selectedRows = table.$selectedRows();
+      let $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(0);
 
-      var $rows = table.$rows();
+      let $rows = table.$rows();
       clickRowAndAssertSelection(table, $rows.eq(1));
       clickRowAndAssertSelection(table, $rows.eq(2));
 
@@ -1628,13 +1628,13 @@ describe('Table', function() {
       clickRowAndAssertSelection(table, $rows.eq(4));
     });
 
-    it('sends selection and click events', function() {
-      var model = helper.createModelFixture(2, 5);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+    it('sends selection and click events', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       table.render();
 
-      var $row = table.$rows().first();
+      let $row = table.$rows().first();
       $row.triggerClick();
 
       sendQueuedAjaxCalls();
@@ -1644,13 +1644,13 @@ describe('Table', function() {
       expect(mostRecentJsonRequest()).toContainEventTypesExactly(['property', 'rowsSelected', 'rowClick']);
     });
 
-    it('sends only click if row already is selected', function() {
-      var model = helper.createModelFixture(2, 5);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+    it('sends only click if row already is selected', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       table.render();
 
-      var $row = table.$rows().first();
+      let $row = table.$rows().first();
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
 
@@ -1667,14 +1667,14 @@ describe('Table', function() {
       expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowClick']);
     });
 
-    it('sends selection, checked and click events if table is checkable and checkbox has been clicked', function() {
-      var model = helper.createModelFixture(2, 5);
+    it('sends selection, checked and click events if table is checkable and checkbox has been clicked', () => {
+      let model = helper.createModelFixture(2, 5);
       model.checkable = true;
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       table.render();
 
-      var $checkbox = table.$rows().first().find('.check-box').first();
+      let $checkbox = table.$rows().first().find('.check-box').first();
       $checkbox.triggerClick();
 
       sendQueuedAjaxCalls();
@@ -1684,85 +1684,85 @@ describe('Table', function() {
 
   });
 
-  describe('right click on row', function() {
+  describe('right click on row', () => {
 
-    afterEach(function() {
+    afterEach(() => {
       // Close context menus
       removePopups(session);
     });
 
-    it('opens context menu', function() {
-      var model = helper.createModelFixture(2, 2);
-      var table = helper.createTable(model);
+    it('opens context menu', () => {
+      let model = helper.createModelFixture(2, 2);
+      let table = helper.createTable(model);
       table.selectedRows = [table.rows[0]];
       table.render();
 
-      var menuModel = helper.createMenuModel('menu'),
+      let menuModel = helper.createMenuModel('menu'),
         menu = helper.menuHelper.createMenu(menuModel);
       table.menus = [menu];
-      var $row0 = table.$data.children('.table-row').eq(0);
+      let $row0 = table.$data.children('.table-row').eq(0);
       $row0.triggerContextMenu();
 
       sendQueuedAjaxCalls();
 
-      var $menu = helper.getDisplayingContextMenu(table);
+      let $menu = helper.getDisplayingContextMenu(table);
       expect($menu.length).toBeTruthy();
     });
 
-    it('context menu only shows items without header type also if there is a type singleSelection', function() {
-      var model = helper.createModelFixture(2, 2);
-      var table = helper.createTable(model);
+    it('context menu only shows items without header type also if there is a type singleSelection', () => {
+      let model = helper.createModelFixture(2, 2);
+      let table = helper.createTable(model);
       table.selectedRows = [table.rows[0]];
       table.render();
 
-      var menuModel1 = helper.createMenuModel('menu'),
+      let menuModel1 = helper.createMenuModel('menu'),
         menu1 = helper.menuHelper.createMenu(menuModel1),
         menuModel2 = helper.createMenuModelWithSingleAndHeader('menu'),
         menu2 = helper.menuHelper.createMenu(menuModel2);
 
       table.menus = [menu1, menu2];
-      var $row0 = table.$data.children('.table-row').eq(0);
+      let $row0 = table.$data.children('.table-row').eq(0);
       $row0.triggerContextMenu();
 
       sendQueuedAjaxCalls();
 
-      var $menu = helper.getDisplayingContextMenu(table);
+      let $menu = helper.getDisplayingContextMenu(table);
       expect($menu.find('.menu-item').length).toBe(1);
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
       expect(menu2.$container).not.toBeDefined();
       expect(menu1.$container).toBeDefined();
     });
 
-    it('context menu only shows visible menus', function() {
-      var model = helper.createModelFixture(2, 2);
-      var table = helper.createTable(model);
+    it('context menu only shows visible menus', () => {
+      let model = helper.createModelFixture(2, 2);
+      let table = helper.createTable(model);
       table.selectedRows = [table.rows[0]];
       table.render();
 
-      var menuModel1 = helper.createMenuModel('menu'),
+      let menuModel1 = helper.createMenuModel('menu'),
         menu1 = helper.menuHelper.createMenu(menuModel1),
         menuModel2 = helper.createMenuModel('menu'),
         menu2 = helper.menuHelper.createMenu(menuModel2);
       menu2.visible = false;
 
       table.menus = [menu1, menu2];
-      var $row0 = table.$data.children('.table-row').eq(0);
+      let $row0 = table.$data.children('.table-row').eq(0);
       $row0.triggerContextMenu();
 
       sendQueuedAjaxCalls();
 
-      var $menu = helper.getDisplayingContextMenu(table);
+      let $menu = helper.getDisplayingContextMenu(table);
       expect($menu.find('.menu-item').length).toBe(1);
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
     });
 
   });
 
-  describe('_filterMenus', function() {
-    var singleSelMenu, multiSelMenu, bothSelMenu, emptySpaceMenu, headerMenu, table;
+  describe('_filterMenus', () => {
+    let singleSelMenu, multiSelMenu, bothSelMenu, emptySpaceMenu, headerMenu, table;
 
-    beforeEach(function() {
-      var model = helper.createModelFixture(2, 2);
+    beforeEach(() => {
+      let model = helper.createModelFixture(2, 2);
       singleSelMenu = helper.menuHelper.createMenu({
         menuTypes: ['Table.SingleSelection']
       });
@@ -1780,31 +1780,31 @@ describe('Table', function() {
     });
 
     // context menu
-    it('returns no menus for contextMenu if no row is selected', function() {
+    it('returns no menus for contextMenu if no row is selected', () => {
       table.selectRows([]);
-      var menus = table._filterMenus(table.menus, MenuDestinations.CONTEXT_MENU);
+      let menus = table._filterMenus(table.menus, MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([]);
     });
 
-    it('returns only single selection menus for contextMenu if one row is selected', function() {
+    it('returns only single selection menus for contextMenu if one row is selected', () => {
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenus(table.menus, MenuDestinations.CONTEXT_MENU);
+      let menus = table._filterMenus(table.menus, MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([singleSelMenu]);
     });
 
-    it('returns only multi selection menus for contextMenu if multiple rows are selected', function() {
+    it('returns only multi selection menus for contextMenu if multiple rows are selected', () => {
       table.selectRows([table.rows[0], table.rows[1]]);
-      var menus = table._filterMenus(table.menus, MenuDestinations.CONTEXT_MENU);
+      let menus = table._filterMenus(table.menus, MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([multiSelMenu]);
     });
 
-    it('returns menus with single- and multi selection set for contextMenu if one or more rows are selected', function() {
+    it('returns menus with single- and multi selection set for contextMenu if one or more rows are selected', () => {
       bothSelMenu = helper.menuHelper.createMenu({
         menuTypes: ['Table.SingleSelection', 'Table.MultiSelection']
       });
       table.menus = [singleSelMenu, multiSelMenu, bothSelMenu];
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenus(table.menus, MenuDestinations.CONTEXT_MENU);
+      let menus = table._filterMenus(table.menus, MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([singleSelMenu, bothSelMenu]);
 
       table.selectRows([table.rows[0], table.rows[1]]);
@@ -1817,31 +1817,31 @@ describe('Table', function() {
     });
 
     // menuBar
-    it('returns only empty space menus if no row is selected', function() {
+    it('returns only empty space menus if no row is selected', () => {
       table.selectRows([]);
-      var menus = table._filterMenus(table.menus, MenuDestinations.MENU_BAR);
+      let menus = table._filterMenus(table.menus, MenuDestinations.MENU_BAR);
       expect(menus).toEqual([emptySpaceMenu]);
     });
 
-    it('returns empty space and single selection menus if one row is selected', function() {
+    it('returns empty space and single selection menus if one row is selected', () => {
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenus(table.menus, MenuDestinations.MENU_BAR);
+      let menus = table._filterMenus(table.menus, MenuDestinations.MENU_BAR);
       expect(menus).toEqual([singleSelMenu, emptySpaceMenu]);
     });
 
-    it('returns empty space and multi selection menus if multiple rows are selected', function() {
+    it('returns empty space and multi selection menus if multiple rows are selected', () => {
       table.selectRows([table.rows[0], table.rows[1]]);
-      var menus = table._filterMenus(table.menus, MenuDestinations.MENU_BAR);
+      let menus = table._filterMenus(table.menus, MenuDestinations.MENU_BAR);
       expect(menus).toEqual([multiSelMenu, emptySpaceMenu]);
     });
 
-    it('returns menus with empty space, single- and multi selection set if one or more rows are selected', function() {
+    it('returns menus with empty space, single- and multi selection set if one or more rows are selected', () => {
       bothSelMenu = helper.menuHelper.createMenu({
         menuTypes: ['Table.SingleSelection', 'Table.MultiSelection']
       });
       table.menus = [singleSelMenu, multiSelMenu, emptySpaceMenu, bothSelMenu];
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenus(table.menus, MenuDestinations.MENU_BAR);
+      let menus = table._filterMenus(table.menus, MenuDestinations.MENU_BAR);
       expect(menus).toEqual([singleSelMenu, emptySpaceMenu, bothSelMenu]);
 
       table.selectRows([table.rows[0], table.rows[1]]);
@@ -1854,11 +1854,11 @@ describe('Table', function() {
     });
   });
 
-  describe('menu bar popup ', function() {
-    var menuBarMenu, singleSelMenu, singleMultiSelMenu, multiSelMenu, bothSelMenu, emptySpaceMenu, headerMenu, table;
+  describe('menu bar popup ', () => {
+    let menuBarMenu, singleSelMenu, singleMultiSelMenu, multiSelMenu, bothSelMenu, emptySpaceMenu, headerMenu, table;
 
-    beforeEach(function() {
-      var model = helper.createModelFixture(2, 2);
+    beforeEach(() => {
+      let model = helper.createModelFixture(2, 2);
       table = helper.createTable(model);
 
       menuBarMenu = scout.create('Menu', {
@@ -1886,20 +1886,20 @@ describe('Table', function() {
       table.setMenus([menuBarMenu]);
     });
 
-    it('shows no menus if no row is selected', function() {
+    it('shows no menus if no row is selected', () => {
       table.render();
       table.selectRows([]);
-      var menuBarMenu = table.menuBar.orderedMenuItems.all[0];
+      let menuBarMenu = table.menuBar.orderedMenuItems.all[0];
       menuBarMenu.doAction();
 
       expect(scout.widget(menuBarMenu.popup.$menuItems()[0]).original()).toBe(emptySpaceMenu);
       expect(menuBarMenu.popup.$menuItems()[1]).toBe(undefined);
     });
 
-    it('shows single selection and empty space menus if single row is selected', function() {
+    it('shows single selection and empty space menus if single row is selected', () => {
       table.render();
       table.selectRows([table.rows[0]]);
-      var menuBarMenu = table.menuBar.orderedMenuItems.all[0];
+      let menuBarMenu = table.menuBar.orderedMenuItems.all[0];
       menuBarMenu.doAction();
 
       expect(scout.widget(menuBarMenu.popup.$menuItems()[0]).original()).toBe(singleSelMenu);
@@ -1908,10 +1908,10 @@ describe('Table', function() {
       expect(menuBarMenu.popup.$menuItems()[3]).toBe(undefined);
     });
 
-    it('shows multi selection and empty space menus if multiple rows are selected', function() {
+    it('shows multi selection and empty space menus if multiple rows are selected', () => {
       table.render();
       table.selectRows([table.rows[0], table.rows[1]]);
-      var menuBarMenu = table.menuBar.orderedMenuItems.all[0];
+      let menuBarMenu = table.menuBar.orderedMenuItems.all[0];
       menuBarMenu.doAction();
 
       expect(scout.widget(menuBarMenu.popup.$menuItems()[0]).original()).toBe(singleMultiSelMenu);
@@ -1922,11 +1922,11 @@ describe('Table', function() {
 
   });
 
-  describe('setMenus', function() {
+  describe('setMenus', () => {
 
-    it('updates the menubar with the relevant menus', function() {
-      var table = helper.createTable(helper.createModelFixture(2, 2));
-      var menus = [
+    it('updates the menubar with the relevant menus', () => {
+      let table = helper.createTable(helper.createModelFixture(2, 2));
+      let menus = [
         scout.create('Menu', {
           parent: table,
           menuTypes: ['Table.EmptySpace']
@@ -1964,19 +1964,19 @@ describe('Table', function() {
     });
   });
 
-  describe('row mouse down / move / up', function() {
+  describe('row mouse down / move / up', () => {
 
-    it('selects multiple rows', function() {
-      var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+    it('selects multiple rows', () => {
+      let model = helper.createModelFixture(2, 5);
+      let table = helper.createTable(model);
       table.render();
 
-      var $rows = table.$data.children('.table-row');
-      var $row0 = $rows.eq(0);
-      var $row1 = $rows.eq(1);
-      var $row2 = $rows.eq(2);
-      var $row3 = $rows.eq(3);
-      var $row4 = $rows.eq(4);
+      let $rows = table.$data.children('.table-row');
+      let $row0 = $rows.eq(0);
+      let $row1 = $rows.eq(1);
+      let $row2 = $rows.eq(2);
+      let $row3 = $rows.eq(3);
+      let $row4 = $rows.eq(4);
 
       expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('selected');
 
@@ -1997,16 +1997,16 @@ describe('Table', function() {
       expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
     });
 
-    it('only sends selection event, no click', function() {
-      var model = helper.createModelFixture(2, 5);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+    it('only sends selection event, no click', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       table.render();
 
-      var $rows = table.$data.children('.table-row');
-      var $row0 = $rows.eq(0);
-      var $row1 = $rows.eq(1);
-      var $row2 = $rows.eq(2);
+      let $rows = table.$data.children('.table-row');
+      let $row0 = $rows.eq(0);
+      let $row1 = $rows.eq(1);
+      let $row2 = $rows.eq(2);
 
       expect($rows).not.toHaveClass('selected');
 
@@ -2017,25 +2017,25 @@ describe('Table', function() {
 
       sendQueuedAjaxCalls();
 
-      var requestData = mostRecentJsonRequest();
+      let requestData = mostRecentJsonRequest();
       // first selection event for first row, second selection event for
       // remaining rows (including first row)
       expect(requestData).toContainEventTypesExactly(['property', 'rowsSelected']);
 
-      var event = [new RemoteEvent(table.id, 'rowsSelected', {
+      let event = [new RemoteEvent(table.id, 'rowsSelected', {
         rowIds: [model.rows[0].id, model.rows[1].id, model.rows[2].id]
       })];
       expect(requestData).toContainEvents(event);
     });
 
-    it('only send one event for mousedown and immediate mouseup on the same row', function() {
-      var model = helper.createModelFixture(2, 5);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+    it('only send one event for mousedown and immediate mouseup on the same row', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       table.render();
 
-      var $rows = table.$data.children('.table-row');
-      var $row0 = $rows.eq(0);
+      let $rows = table.$data.children('.table-row');
+      let $row0 = $rows.eq(0);
 
       expect($rows).not.toHaveClass('selected');
 
@@ -2044,20 +2044,20 @@ describe('Table', function() {
 
       sendQueuedAjaxCalls();
 
-      var requestData = mostRecentJsonRequest();
+      let requestData = mostRecentJsonRequest();
       // exactly only one selection event for first row
       expect(requestData).toContainEventTypesExactly(['property', 'rowsSelected', 'rowClick']);
 
-      var event = [new RemoteEvent(table.id, 'rowsSelected', {
+      let event = [new RemoteEvent(table.id, 'rowsSelected', {
         rowIds: [model.rows[0].id]
       })];
       expect(requestData).toContainEvents(event);
     });
 
-    it('only selects first row if mouse move selection or multi selection is disabled', function() {
-      var model = helper.createModelFixture(2, 4);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+    it('only selects first row if mouse move selection or multi selection is disabled', () => {
+      let model = helper.createModelFixture(2, 4);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       table.selectionHandler.mouseMoveSelectionEnabled = false;
       verifyMouseMoveSelectionIsDisabled(model, table, false);
 
@@ -2071,10 +2071,10 @@ describe('Table', function() {
     function verifyMouseMoveSelectionIsDisabled(model, table, selectionMovable) {
       table.render();
 
-      var $rows = table.$data.children('.table-row');
-      var $row0 = $rows.eq(0);
-      var $row1 = $rows.eq(1);
-      var $row2 = $rows.eq(2);
+      let $rows = table.$data.children('.table-row');
+      let $row0 = $rows.eq(0);
+      let $row1 = $rows.eq(1);
+      let $row2 = $rows.eq(2);
 
       expect($rows).not.toHaveClass('selected');
 
@@ -2083,8 +2083,8 @@ describe('Table', function() {
       $row2.trigger('mouseover');
       $row2.triggerMouseUp();
 
-      var expectedSelectedRowIndex = (selectionMovable ? 2 : 0);
-      for (var i = 0; i < $rows.length; i++) {
+      let expectedSelectedRowIndex = (selectionMovable ? 2 : 0);
+      for (let i = 0; i < $rows.length; i++) {
         if (i === expectedSelectedRowIndex) {
           expect($rows.eq(i)).toHaveClass('selected');
         } else {
@@ -2094,8 +2094,8 @@ describe('Table', function() {
 
       sendQueuedAjaxCalls();
 
-      var requestData = mostRecentJsonRequest();
-      var event = new RemoteEvent(table.id, 'rowsSelected', {
+      let requestData = mostRecentJsonRequest();
+      let event = new RemoteEvent(table.id, 'rowsSelected', {
         rowIds: [model.rows[expectedSelectedRowIndex].id]
       });
       expect(requestData).toContainEvents(event);
@@ -2103,21 +2103,21 @@ describe('Table', function() {
 
   });
 
-  describe('moveColumn', function() {
-    var model, table;
+  describe('moveColumn', () => {
+    let model, table;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(3, 2);
       table = helper.createTable(model);
     });
 
-    it('moves column from oldPos to newPos', function() {
+    it('moves column from oldPos to newPos', () => {
       table.render();
 
-      var $colHeaders = table.header.$container.find('.table-header-item');
-      var $header0 = $colHeaders.eq(0);
-      var $header1 = $colHeaders.eq(1);
-      var $header2 = $colHeaders.eq(2);
+      let $colHeaders = table.header.$container.find('.table-header-item');
+      let $header0 = $colHeaders.eq(0);
+      let $header1 = $colHeaders.eq(1);
+      let $header2 = $colHeaders.eq(2);
 
       expect(table.columns.indexOf($header0.data('column'))).toBe(0);
       expect(table.columns.indexOf($header1.data('column'))).toBe(1);
@@ -2136,15 +2136,15 @@ describe('Table', function() {
       expect(table.columns.indexOf($header0.data('column'))).toBe(2);
     });
 
-    it('considers view range (does not fail if not all rows are rendered)', function() {
+    it('considers view range (does not fail if not all rows are rendered)', () => {
       table.viewRangeSize = 1;
       table.render();
 
-      var $rows = table.$rows();
+      let $rows = table.$rows();
       expect(table.viewRangeRendered).toEqual(new Range(0, 1));
       expect(table.$rows().length).toBe(1);
       expect(table.rows.length).toBe(2);
-      var $cells0 = table.$cellsForRow($rows.eq(0));
+      let $cells0 = table.$cellsForRow($rows.eq(0));
       expect($cells0.eq(0).text()).toBe('0_0');
       expect($cells0.eq(1).text()).toBe('0_1');
       expect($cells0.eq(2).text()).toBe('0_2');
@@ -2162,10 +2162,10 @@ describe('Table', function() {
 
   });
 
-  describe('updateRowOrder', function() {
-    var model, table, row0, row1, row2;
+  describe('updateRowOrder', () => {
+    let model, table, row0, row1, row2;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(2, 3);
       table = helper.createTable(model);
       row0 = model.rows[0];
@@ -2173,14 +2173,14 @@ describe('Table', function() {
       row2 = model.rows[2];
     });
 
-    it('correct DOM order for newly inserted rows', function() {
+    it('correct DOM order for newly inserted rows', () => {
       table.render();
       expect(table.rows.length).toBe(3);
-      var newRows = [helper.createModelRow(null, helper.createModelCells(2)), helper.createModelRow(null, helper.createModelCells(2))];
+      let newRows = [helper.createModelRow(null, helper.createModelCells(2)), helper.createModelRow(null, helper.createModelCells(2))];
 
       // Insert new rows and switch rows 0 and 1
       table.insertRows(newRows);
-      var orderedRows = [table.rows[1], table.rows[0], table.rows[3], table.rows[4], table.rows[2]];
+      let orderedRows = [table.rows[1], table.rows[0], table.rows[3], table.rows[4], table.rows[2]];
       table.updateRowOrder(orderedRows);
 
       // Check if rows were inserted
@@ -2191,7 +2191,7 @@ describe('Table', function() {
       // but we must disable jQuery animations completely during test execution, otherwise test will fail, since
       // the complete/done function is scheduled and executed to a time where the test that started the animation
       // is already finished. So this will lead to unpredictable failures.
-      var uiOrderedRows = [],
+      let uiOrderedRows = [],
         $row;
       table.$rows().each(function() {
         $row = $(this);
@@ -2202,10 +2202,10 @@ describe('Table', function() {
 
   });
 
-  describe('initColumns', function() {
+  describe('initColumns', () => {
 
-    it('table is available in _init', function() {
-      var table = scout.create('Table', {
+    it('table is available in _init', () => {
+      let table = scout.create('Table', {
         parent: session.desktop,
         columns: [{
           objectType: 'TestBeanColumn'
@@ -2214,8 +2214,8 @@ describe('Table', function() {
       // assertions are done in the TestBeanColumn
     });
 
-    it('sets the column indices if not already set', function() {
-      var table = scout.create('Table', {
+    it('sets the column indices if not already set', () => {
+      let table = scout.create('Table', {
         parent: session.desktop,
         columns: [{
           objectType: 'Column'
@@ -2230,8 +2230,8 @@ describe('Table', function() {
       expect(table.columns[2].index).toBe(2);
     });
 
-    it('does not set the column indices if already set', function() {
-      var table = scout.create('Table', {
+    it('does not set the column indices if already set', () => {
+      let table = scout.create('Table', {
         parent: session.desktop,
         columns: [{
           objectType: 'Column',
@@ -2250,10 +2250,10 @@ describe('Table', function() {
     });
   });
 
-  describe('updateColumnStructure', function() {
-    var model, table, column0, column1, column2;
+  describe('updateColumnStructure', () => {
+    let model, table, column0, column1, column2;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(3, 2);
       table = helper.createTable(model);
       column0 = table.columns[0];
@@ -2261,7 +2261,7 @@ describe('Table', function() {
       column2 = table.columns[2];
     });
 
-    it('resets the model columns', function() {
+    it('resets the model columns', () => {
       table.updateColumnStructure([column2, column1]);
 
       expect(table.columns.length).toBe(2);
@@ -2269,10 +2269,10 @@ describe('Table', function() {
       expect(table.columns[1].id).toBe(column1.id);
     });
 
-    it('redraws the header to reflect header cell changes (text)', function() {
+    it('redraws the header to reflect header cell changes (text)', () => {
       table.render();
 
-      var $colHeaders = table.header.findHeaderItems();
+      let $colHeaders = table.header.findHeaderItems();
       expect($colHeaders.eq(0).text()).toBe(column0.text);
       expect($colHeaders.eq(1).text()).toBe(column1.text);
       expect($colHeaders.eq(2).text()).toBe(column2.text);
@@ -2288,10 +2288,10 @@ describe('Table', function() {
       expect($colHeaders.eq(2).text()).toBe(column2.text);
     });
 
-    it('updates width of empty data', function() {
+    it('updates width of empty data', () => {
       table.deleteAllRows();
       table.render();
-      var rowWidth = table.rowWidth;
+      let rowWidth = table.rowWidth;
       expect(table.$emptyData.width()).toBe(rowWidth);
 
       table.updateColumnStructure([column0, column1]);
@@ -2300,10 +2300,10 @@ describe('Table', function() {
     });
   });
 
-  describe('updateColumnOrder', function() {
-    var model, table, column0, column1, column2;
+  describe('updateColumnOrder', () => {
+    let model, table, column0, column1, column2;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(3, 2);
       table = helper.createTable(model);
       column0 = table.columns[0];
@@ -2311,7 +2311,7 @@ describe('Table', function() {
       column2 = table.columns[2];
     });
 
-    it('reorders the model columns', function() {
+    it('reorders the model columns', () => {
       table.updateColumnOrder([column2, column0, column1]);
       expect(table.columns.length).toBe(3);
       expect(table.columns[0]).toBe(column2);
@@ -2319,18 +2319,18 @@ describe('Table', function() {
       expect(table.columns[2]).toBe(column1);
     });
 
-    it('reorders the html nodes', function() {
+    it('reorders the html nodes', () => {
       table.render();
 
-      var $colHeaders = table.header.findHeaderItems();
+      let $colHeaders = table.header.findHeaderItems();
       expect($colHeaders.length).toBe(3);
       expect($colHeaders.eq(0).data('column')).toBe(column0);
       expect($colHeaders.eq(1).data('column')).toBe(column1);
       expect($colHeaders.eq(2).data('column')).toBe(column2);
 
-      var $rows = table.$rows();
-      var $cells0 = $rows.eq(0).find('.table-cell');
-      var $cells1 = $rows.eq(1).find('.table-cell');
+      let $rows = table.$rows();
+      let $cells0 = $rows.eq(0).find('.table-cell');
+      let $cells1 = $rows.eq(1).find('.table-cell');
 
       expect($cells0.eq(0).text()).toBe('0_0');
       expect($cells0.eq(1).text()).toBe('0_1');
@@ -2360,14 +2360,14 @@ describe('Table', function() {
       expect($cells1.eq(2).text()).toBe('1_1');
     });
 
-    it('silently moves cells which are not rendered in view range', function() {
+    it('silently moves cells which are not rendered in view range', () => {
       table.viewRangeSize = 1;
       table.render();
       expect(table.viewRangeRendered).toEqual(new Range(0, 1));
 
-      var $colHeaders = table.header.findHeaderItems();
-      var $rows = table.$rows();
-      var $cells0 = $rows.eq(0).find('.table-cell');
+      let $colHeaders = table.header.findHeaderItems();
+      let $rows = table.$rows();
+      let $cells0 = $rows.eq(0).find('.table-cell');
 
       expect($rows.length).toBe(1);
       expect(table.rows.length).toBe(2);
@@ -2396,21 +2396,21 @@ describe('Table', function() {
 
   });
 
-  describe('updateColumnHeaders', function() {
-    var model, table, column0, column1, column2;
+  describe('updateColumnHeaders', () => {
+    let model, table, column0, column1, column2;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(3, 2);
 
     });
 
-    it('updates the text and sorting state of model columns', function() {
+    it('updates the text and sorting state of model columns', () => {
       table = helper.createTable(model);
       column0 = table.columns[0];
       column1 = table.columns[1];
       column2 = table.columns[2];
 
-      var text0 = table.columns[0].text;
+      let text0 = table.columns[0].text;
 
       column1 = $.extend({}, table.columns[1]);
       column1.text = 'newText1';
@@ -2430,7 +2430,7 @@ describe('Table', function() {
       expect(table.columns[2].sortActive).toBe(column2.sortActive);
     });
 
-    it('updates sort indices of the sort columns if a sort column got removed', function() {
+    it('updates sort indices of the sort columns if a sort column got removed', () => {
       model.columns[1].sortActive = true;
       model.columns[1].sortAscending = true;
       model.columns[1].sortIndex = 1;
@@ -2461,14 +2461,14 @@ describe('Table', function() {
       expect(table.columns[2].sortIndex).toBe(-1);
     });
 
-    it('updates the text and sorting state of html table header nodes', function() {
+    it('updates the text and sorting state of html table header nodes', () => {
       table = helper.createTable(model);
       column0 = table.columns[0];
       column1 = table.columns[1];
       column2 = table.columns[2];
       table.render();
 
-      var $colHeaders = table.header.findHeaderItems();
+      let $colHeaders = table.header.findHeaderItems();
       expect($colHeaders.eq(0).text()).toBe(column0.text);
       expect($colHeaders.eq(1).text()).toBe(column1.text);
       expect($colHeaders.eq(1)).not.toHaveClass('sort-asc');
@@ -2489,14 +2489,14 @@ describe('Table', function() {
       expect($colHeaders.eq(2).text()).toBe(column2.text);
     });
 
-    it('updates the custom css class of table header nodes', function() {
+    it('updates the custom css class of table header nodes', () => {
       table = helper.createTable(model);
       column0 = table.columns[0];
       column1 = table.columns[1];
       column2 = table.columns[2];
       table.render();
 
-      var $colHeaders = table.header.findHeaderItems();
+      let $colHeaders = table.header.findHeaderItems();
       expect($colHeaders.eq(1)).not.toHaveClass('custom-header');
 
       column1 = $.extend({}, table.columns[1]);
@@ -2514,13 +2514,13 @@ describe('Table', function() {
       expect($colHeaders.eq(1)).not.toHaveClass('custom-header');
     });
 
-    it('considers html enabled property of table header cells', function() {
+    it('considers html enabled property of table header cells', () => {
       model = helper.createModelFixture(4, 2);
       table = helper.createTable(model);
       column0 = table.columns[0];
       column1 = table.columns[1];
       column2 = table.columns[2];
-      var column3 = table.columns[3];
+      let column3 = table.columns[3];
 
       column0 = helper.createModelColumn('test');
       column0.id = model.columns[0].id;
@@ -2536,7 +2536,7 @@ describe('Table', function() {
 
       table.render();
 
-      var $colHeaders = table.header.findHeaderItems();
+      let $colHeaders = table.header.findHeaderItems();
       expect($colHeaders.eq(0).text()).toBe('test');
       expect($colHeaders.eq(1).text()).toBe('test');
       expect($colHeaders.eq(2).text()).toBe('<b>test</b>');
@@ -2544,11 +2544,11 @@ describe('Table', function() {
     });
   });
 
-  describe('headerVisible', function() {
+  describe('headerVisible', () => {
 
-    it('hides/shows the table header', function() {
-      var model = helper.createModelFixture(2);
-      var table = helper.createTable(model);
+    it('hides/shows the table header', () => {
+      let model = helper.createModelFixture(2);
+      let table = helper.createTable(model);
       table.render();
 
       expect(table.header).toBeTruthy();
@@ -2556,9 +2556,9 @@ describe('Table', function() {
       expect(table.header).toBeFalsy();
     });
 
-    it('adds empty div when set to true if there are no rows', function() {
-      var model = helper.createModelFixture(0);
-      var table = helper.createTable(model);
+    it('adds empty div when set to true if there are no rows', () => {
+      let model = helper.createModelFixture(0);
+      let table = helper.createTable(model);
       table.setHeaderVisible(false);
       table.render();
       expect(table.$emptyData).toBe(null);
@@ -2569,16 +2569,16 @@ describe('Table', function() {
       table.setHeaderVisible(false);
       expect(table.$emptyData).toBe(null);
 
-      var row = helper.createModelRow();
+      let row = helper.createModelRow();
       table.insertRow(row);
       table.setHeaderVisible(true);
       // Still null because there are rows
       expect(table.$emptyData).toBe(null);
     });
 
-    it('removes empty div when set to false even if there are no rows', function() {
-      var model = helper.createModelFixture(0);
-      var table = helper.createTable(model);
+    it('removes empty div when set to false even if there are no rows', () => {
+      let model = helper.createModelFixture(0);
+      let table = helper.createTable(model);
       table.render();
       expect(table.$emptyData).not.toBe(null);
 
@@ -2588,7 +2588,7 @@ describe('Table', function() {
       table.setHeaderVisible(true);
       expect(table.$emptyData).not.toBe(null);
 
-      var row = helper.createModelRow();
+      let row = helper.createModelRow();
       table.insertRow(row);
       table.setHeaderVisible(false);
       expect(table.$emptyData).toBe(null);
@@ -2600,11 +2600,11 @@ describe('Table', function() {
 
   });
 
-  describe('Column visibility', function() {
+  describe('Column visibility', () => {
 
-    it('update headers and rows when visibility of a column changes', function() {
-      var model = helper.createModelFixture(2, 1);
-      var table = helper.createTable(model);
+    it('update headers and rows when visibility of a column changes', () => {
+      let model = helper.createModelFixture(2, 1);
+      let table = helper.createTable(model);
       table.render();
 
       expect(table.columns[0].isVisible()).toBe(true);
@@ -2622,9 +2622,9 @@ describe('Table', function() {
       expect(table.$container.find('.table-cell').length).toBe(1);
     });
 
-    it('visibleColumns() only return visible columns', function() {
-      var model = helper.createModelFixture(2, 1);
-      var table = helper.createTable(model);
+    it('visibleColumns() only return visible columns', () => {
+      let model = helper.createModelFixture(2, 1);
+      let table = helper.createTable(model);
 
       expect(table.columns.length).toBe(2);
       expect(table.visibleColumns().length).toBe(2);
@@ -2635,12 +2635,12 @@ describe('Table', function() {
       expect(table.visibleColumns().length).toBe(1);
     });
 
-    it('moveColumn() must deal with different indices for visible and all columns', function() {
-      var model = helper.createModelFixture(3, 1);
-      var table = helper.createTable(model);
-      var colA = table.columns[0];
-      var colB = table.columns[1];
-      var colC = table.columns[2];
+    it('moveColumn() must deal with different indices for visible and all columns', () => {
+      let model = helper.createModelFixture(3, 1);
+      let table = helper.createTable(model);
+      let colA = table.columns[0];
+      let colB = table.columns[1];
+      let colC = table.columns[2];
 
       colB.setVisible(false); // column in the middle is invisible
       expect(table.visibleColumns().length).toBe(2);
@@ -2656,11 +2656,11 @@ describe('Table', function() {
 
   });
 
-  describe('moveRowUp', function() {
+  describe('moveRowUp', () => {
 
-    it('moves row one up', function() {
-      var model = helper.createModelFixture(1, 0);
-      var table = helper.createTable(model);
+    it('moves row one up', () => {
+      let model = helper.createModelFixture(1, 0);
+      let table = helper.createTable(model);
       table.insertRows([
         helper.createModelRow(1, ['A']),
         helper.createModelRow(1, ['B']),
@@ -2668,7 +2668,7 @@ describe('Table', function() {
       ]);
 
       // Move row B one up
-      var rowB = table.rows[1];
+      let rowB = table.rows[1];
       table.moveRowUp(rowB);
       expect(table.rows[0].cells[0].text).toBe('B');
       expect(table.rows[1].cells[0].text).toBe('A');
@@ -2681,7 +2681,7 @@ describe('Table', function() {
       expect(table.rows[2].cells[0].text).toBe('C');
 
       // Move row D one up
-      var rowD = table.rows[2];
+      let rowD = table.rows[2];
       table.moveRowUp(rowD);
       expect(table.rows[0].cells[0].text).toBe('B');
       expect(table.rows[1].cells[0].text).toBe('C');
@@ -2695,11 +2695,11 @@ describe('Table', function() {
     });
   });
 
-  describe('moveRowDown', function() {
+  describe('moveRowDown', () => {
 
-    it('moves row one down', function() {
-      var model = helper.createModelFixture(1, 0);
-      var table = helper.createTable(model);
+    it('moves row one down', () => {
+      let model = helper.createModelFixture(1, 0);
+      let table = helper.createTable(model);
       table.insertRows([
         helper.createModelRow(1, ['A']),
         helper.createModelRow(1, ['B']),
@@ -2707,7 +2707,7 @@ describe('Table', function() {
       ]);
 
       // Move row B one down
-      var rowB = table.rows[1];
+      let rowB = table.rows[1];
       table.moveRowDown(rowB);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('C');
@@ -2720,7 +2720,7 @@ describe('Table', function() {
       expect(table.rows[2].cells[0].text).toBe('B');
 
       // Move row A one down
-      var rowA = table.rows[0];
+      let rowA = table.rows[0];
       table.moveRowDown(rowA);
       expect(table.rows[0].cells[0].text).toBe('C');
       expect(table.rows[1].cells[0].text).toBe('A');
@@ -2734,11 +2734,11 @@ describe('Table', function() {
     });
   });
 
-  describe('moveRowToTop', function() {
+  describe('moveRowToTop', () => {
 
-    it('moves row to the top', function() {
-      var model = helper.createModelFixture(1, 0);
-      var table = helper.createTable(model);
+    it('moves row to the top', () => {
+      let model = helper.createModelFixture(1, 0);
+      let table = helper.createTable(model);
       table.insertRows([
         helper.createModelRow(1, ['A']),
         helper.createModelRow(1, ['B']),
@@ -2746,7 +2746,7 @@ describe('Table', function() {
       ]);
 
       // Move row B to top
-      var rowB = table.rows[1];
+      let rowB = table.rows[1];
       table.moveRowToTop(rowB);
       expect(table.rows[0].cells[0].text).toBe('B');
       expect(table.rows[1].cells[0].text).toBe('A');
@@ -2759,7 +2759,7 @@ describe('Table', function() {
       expect(table.rows[2].cells[0].text).toBe('C');
 
       // Move row C to top
-      var rowC = table.rows[2];
+      let rowC = table.rows[2];
       table.moveRowToTop(rowC);
       expect(table.rows[0].cells[0].text).toBe('C');
       expect(table.rows[1].cells[0].text).toBe('B');
@@ -2767,11 +2767,11 @@ describe('Table', function() {
     });
   });
 
-  describe('moveRowToBottom', function() {
+  describe('moveRowToBottom', () => {
 
-    it('moves row to the bottom', function() {
-      var model = helper.createModelFixture(1, 0);
-      var table = helper.createTable(model);
+    it('moves row to the bottom', () => {
+      let model = helper.createModelFixture(1, 0);
+      let table = helper.createTable(model);
       table.insertRows([
         helper.createModelRow(1, ['A']),
         helper.createModelRow(1, ['B']),
@@ -2779,7 +2779,7 @@ describe('Table', function() {
       ]);
 
       // Move row B to bottom
-      var rowB = table.rows[1];
+      let rowB = table.rows[1];
       table.moveRowToBottom(rowB);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('C');
@@ -2792,7 +2792,7 @@ describe('Table', function() {
       expect(table.rows[2].cells[0].text).toBe('B');
 
       // Move row A to bottom
-      var rowA = table.rows[0];
+      let rowA = table.rows[0];
       table.moveRowToBottom(rowA);
       expect(table.rows[0].cells[0].text).toBe('C');
       expect(table.rows[1].cells[0].text).toBe('B');
@@ -2800,11 +2800,11 @@ describe('Table', function() {
     });
   });
 
-  describe('moveVisibleRowUp', function() {
+  describe('moveVisibleRowUp', () => {
 
-    it('moves row one up regarding filtered rows', function() {
-      var model = helper.createModelFixture(1, 0);
-      var table = helper.createTable(model);
+    it('moves row one up regarding filtered rows', () => {
+      let model = helper.createModelFixture(1, 0);
+      let table = helper.createTable(model);
       table.insertRows([
         helper.createModelRow(1, ['A']),
         helper.createModelRow(1, ['B-filtered']),
@@ -2816,7 +2816,7 @@ describe('Table', function() {
       ]);
 
       // Filter active
-      var filter = helper.createAndRegisterColumnFilter({
+      let filter = helper.createAndRegisterColumnFilter({
         table: table,
         session: session,
         column: table.columns[0],
@@ -2826,7 +2826,7 @@ describe('Table', function() {
       table.filter();
 
       // Move row D one up
-      var rowD = table.rows[3];
+      let rowD = table.rows[3];
       table.moveVisibleRowUp(rowD);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('D-filtered');
@@ -2847,7 +2847,7 @@ describe('Table', function() {
       expect(table.rows[6].cells[0].text).toBe('G');
 
       // Move row F one up
-      var rowF = table.rows[5];
+      let rowF = table.rows[5];
       table.moveVisibleRowUp(rowF);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('D-filtered');
@@ -2869,11 +2869,11 @@ describe('Table', function() {
     });
   });
 
-  describe('moveVisibleRowDown', function() {
+  describe('moveVisibleRowDown', () => {
 
-    it('moves row one up regarding filtered rows', function() {
-      var model = helper.createModelFixture(1, 0);
-      var table = helper.createTable(model);
+    it('moves row one up regarding filtered rows', () => {
+      let model = helper.createModelFixture(1, 0);
+      let table = helper.createTable(model);
       table.insertRows([
         helper.createModelRow(1, ['A']),
         helper.createModelRow(1, ['B-filtered']),
@@ -2885,7 +2885,7 @@ describe('Table', function() {
       ]);
 
       // Filter active
-      var filter = helper.createAndRegisterColumnFilter({
+      let filter = helper.createAndRegisterColumnFilter({
         table: table,
         session: session,
         column: table.columns[0],
@@ -2895,7 +2895,7 @@ describe('Table', function() {
       table.filter();
 
       // Move row D one down
-      var rowD = table.rows[3];
+      let rowD = table.rows[3];
       table.moveVisibleRowDown(rowD);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('B-filtered');
@@ -2916,7 +2916,7 @@ describe('Table', function() {
       expect(table.rows[6].cells[0].text).toBe('G');
 
       // Move row B one down
-      var rowB = table.rows[1];
+      let rowB = table.rows[1];
       table.moveVisibleRowDown(rowB);
       expect(table.rows[0].cells[0].text).toBe('A');
       expect(table.rows[1].cells[0].text).toBe('C');
@@ -2939,11 +2939,11 @@ describe('Table', function() {
 
   });
 
-  describe('rowStatus', function() {
+  describe('rowStatus', () => {
 
-    it('changes when updating the value', function() {
-      var model = helper.createModelFixture(2, 4);
-      var table = helper.createTable(model);
+    it('changes when updating the value', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
 
       // Check initial status
       expect(table.rows[0].status).toBe(TableRow.Status.NON_CHANGED);
@@ -2951,7 +2951,7 @@ describe('Table', function() {
       expect(table.rows[2].status).toBe(TableRow.Status.NON_CHANGED);
       expect(table.rows[3].status).toBe(TableRow.Status.NON_CHANGED);
 
-      var column0 = table.columns[0];
+      let column0 = table.columns[0];
 
       // Update value --> should change status
       column0.setCellValue(table.rows[0], 77);
@@ -2981,10 +2981,10 @@ describe('Table', function() {
     });
   });
 
-  describe('ensureExpansionVisible', function() {
-    var model, table, rows, $scrollable, nodeHeight;
+  describe('ensureExpansionVisible', () => {
+    let model, table, rows, $scrollable, nodeHeight;
 
-    beforeEach(function() {
+    beforeEach(() => {
       $('<style>' +
         '.table-row {height: 28px;}' +
         '.table {height: 170px; overflow: hidden;}' +
@@ -3016,7 +3016,7 @@ describe('Table', function() {
       $scrollable = table.get$Scrollable();
     });
 
-    it('scrolls current row to the top when expanding a large child set', function() {
+    it('scrolls current row to the top when expanding a large child set', () => {
       expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(1).$row), $scrollable)).toBe(true);
       expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(7).$row), $scrollable)).toBe(false);
       expect(table._rowById(4).expanded).toBe(false);
@@ -3030,7 +3030,7 @@ describe('Table', function() {
       expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(5).$row), $scrollable)).toBe(false);
     });
 
-    it('scrolls current row up so that the full expansion is visible plus half a row at the bottom', function() {
+    it('scrolls current row up so that the full expansion is visible plus half a row at the bottom', () => {
       expect(table._rowById(5).expanded).toBe(false);
       table.expandRow(table._rowById(5), true);
       expect(table._rowById(5).expanded).toBe(true);
@@ -3045,14 +3045,14 @@ describe('Table', function() {
 
   });
 
-  describe('invisible', function() {
-    it('does not try to read row height when invisible', function() {
-      var tableField = scout.create('TableField', {
+  describe('invisible', () => {
+    it('does not try to read row height when invisible', () => {
+      let tableField = scout.create('TableField', {
         parent: session.desktop,
         visible: false
       });
-      var model = helper.createModelFixture(2, 1);
-      var table = helper.createTable(model);
+      let model = helper.createModelFixture(2, 1);
+      let table = helper.createTable(model);
       tableField.render();
 
       tableField.setTable(table);

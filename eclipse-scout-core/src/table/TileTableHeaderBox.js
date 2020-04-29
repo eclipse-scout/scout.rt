@@ -93,9 +93,9 @@ export default class TileTableHeaderBox extends GroupBox {
   }
 
   _findSortByLookupRowForKey(key) {
-    return this.sortByField.lookupCall.data.map(function(lookupRow) {
+    return this.sortByField.lookupCall.data.map(lookupRow => {
       return lookupRow[0];
-    }).find(function(rowKey) {
+    }).find(rowKey => {
       return rowKey.column === key.column && rowKey.asc === key.asc;
     }, this);
   }
@@ -120,10 +120,10 @@ export default class TileTableHeaderBox extends GroupBox {
     }
     if (event.propertyName === 'value') {
       this.isGrouping = true;
-      var column;
+      let column;
       if (event.newValue !== null) {
         column = event.newValue;
-        var direction = (column.sortIndex >= 0 && !column.sortAscending) ? 'desc' : 'asc';
+        let direction = (column.sortIndex >= 0 && !column.sortAscending) ? 'desc' : 'asc';
         this.table.groupColumn(column, false, direction, false);
       } else {
         column = event.oldValue;
@@ -139,7 +139,7 @@ export default class TileTableHeaderBox extends GroupBox {
     }
     if (event.propertyName === 'value') {
       this.isSorting = true;
-      var column, sortInfo;
+      let column, sortInfo;
       if (event.newValue !== null) {
         sortInfo = event.newValue.column;
         column = event.newValue.column;
@@ -152,7 +152,7 @@ export default class TileTableHeaderBox extends GroupBox {
   }
 
   _syncSortingGroupingFields() {
-    var primaryGroupingColumn = arrays.find(this.table.visibleColumns(), function(column) {
+    let primaryGroupingColumn = arrays.find(this.table.visibleColumns(), column => {
       return column.grouped && column.sortIndex === 0;
     });
     if (primaryGroupingColumn) {
@@ -161,7 +161,7 @@ export default class TileTableHeaderBox extends GroupBox {
       this.groupByField.setValue(null);
     }
 
-    var primarySortingColumn = arrays.find(this.table.visibleColumns(), function(column) {
+    let primarySortingColumn = arrays.find(this.table.visibleColumns(), column => {
       return column.sortActive && column.sortIndex === 0;
     });
 

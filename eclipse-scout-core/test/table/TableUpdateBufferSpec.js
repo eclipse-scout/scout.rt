@@ -11,24 +11,24 @@
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
 /* global removePopups */
-describe('TableUpdateBuffer', function() {
-  var session, helper;
+describe('TableUpdateBuffer', () => {
+  let session, helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
   });
 
-  it('buffers updateRow calls and processes them when all promises resolve', function(done) {
-    var table = helper.createTable(helper.createModelFixture(2, 2));
+  it('buffers updateRow calls and processes them when all promises resolve', done => {
+    let table = helper.createTable(helper.createModelFixture(2, 2));
     table.render();
 
-    var deferred = $.Deferred();
-    var promise = deferred.promise();
+    let deferred = $.Deferred();
+    let promise = deferred.promise();
     table.updateBuffer.pushPromise(promise);
 
-    var row = {
+    let row = {
       id: table.rows[0].id,
       cells: ['newCellText0', 'newCellText1']
     };
@@ -37,7 +37,7 @@ describe('TableUpdateBuffer', function() {
     expect(table.rows[0].cells[0].text).toBe('0_0');
     expect(table.loading).toBe(true);
 
-    promise.then(function() {
+    promise.then(() => {
       expect(table.updateBuffer.isBuffering()).toBe(false);
       expect(table.rows[0].cells[0].text).toBe('newCellText0');
       expect(table.loading).toBe(false);
@@ -46,30 +46,30 @@ describe('TableUpdateBuffer', function() {
     deferred.resolve();
   });
 
-  it('prevents rendering viewport while buffering', function(done) {
-    var table = helper.createTable(helper.createModelFixture(2, 0));
+  it('prevents rendering viewport while buffering', done => {
+    let table = helper.createTable(helper.createModelFixture(2, 0));
     table.render();
 
-    var deferred = $.Deferred();
-    var promise = deferred.promise();
+    let deferred = $.Deferred();
+    let promise = deferred.promise();
     table.updateBuffer.pushPromise(promise);
 
-    var rows = [{
+    let rows = [{
       cells: ['a', 'b']
     }];
     table.insertRows(rows);
     expect(table.$rows().length).toBe(0);
 
-    var row = {
+    let row = {
       id: table.rows[0].id,
       cells: ['newCellText0', 'newCellText1']
     };
     table.updateRow(row);
     expect(table.$rows().length).toBe(0);
 
-    promise.then(function() {
+    promise.then(() => {
       expect(table.$rows().length).toBe(1);
-      var $cells0 = table.$cellsForRow(table.$rows().eq(0));
+      let $cells0 = table.$cellsForRow(table.$rows().eq(0));
       expect($cells0.eq(0).text()).toBe('newCellText0');
       done();
     });

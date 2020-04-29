@@ -52,10 +52,10 @@ export default class MessageBoxController {
    * Renders all message boxes registered with this controller.
    */
   render() {
-    this.displayParent.messageBoxes.forEach(function(msgBox) {
+    this.displayParent.messageBoxes.forEach(msgBox => {
       msgBox.setDisplayParent(this.displayParent);
       this._render(msgBox);
-    }.bind(this));
+    });
   }
 
   _render(messageBox) {
@@ -79,7 +79,7 @@ export default class MessageBoxController {
     // Open all message boxes in the center of the desktop, except message-boxes that belong to a popup-window
     // Since the message box doesn't have a DOM element as parent when render is called, we must find the
     // entryPoint by using the model.
-    var $mbParent;
+    let $mbParent;
     if (this.displayParent instanceof Form && this.displayParent.isPopupWindow()) {
       $mbParent = this.displayParent.popupWindow.$container;
     } else {
@@ -106,7 +106,7 @@ export default class MessageBoxController {
    * This method has no effect if already attached.
    */
   attach() {
-    this.displayParent.messageBoxes.forEach(function(messageBox) {
+    this.displayParent.messageBoxes.forEach(messageBox => {
       messageBox.attach();
     }, this);
   }
@@ -118,7 +118,7 @@ export default class MessageBoxController {
    * This method has no effect if already detached.
    */
   detach() {
-    this.displayParent.messageBoxes.forEach(function(messageBox) {
+    this.displayParent.messageBoxes.forEach(messageBox => {
       messageBox.detach();
     }, this);
   }

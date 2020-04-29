@@ -58,7 +58,7 @@ export default class ModeSelector extends Widget {
   }
 
   _renderModes() {
-    this.modes.forEach(function(mode) {
+    this.modes.forEach(mode => {
       mode.render();
     });
     this._updateMarkers();
@@ -88,9 +88,9 @@ export default class ModeSelector extends Widget {
   }
 
   _updateMarkers() {
-    var visibleModes = [];
-    var selectedModeIndex = -1;
-    this.modes.forEach(function(mode) {
+    let visibleModes = [];
+    let selectedModeIndex = -1;
+    this.modes.forEach(mode => {
       if (mode.rendered) {
         mode.$container.removeClass('first last after-selected');
         if (mode.isVisible()) {
@@ -111,13 +111,13 @@ export default class ModeSelector extends Widget {
   }
 
   findModeById(id) {
-    return arrays.find(this.modes, function(mode) {
+    return arrays.find(this.modes, mode => {
       return mode.id === id;
     });
   }
 
   findModeByRef(ref) {
-    return arrays.find(this.modes, function(mode) {
+    return arrays.find(this.modes, mode => {
       return mode.ref === ref;
     });
   }

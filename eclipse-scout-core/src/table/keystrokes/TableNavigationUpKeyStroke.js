@@ -17,7 +17,7 @@ export default class TableNavigationUpKeyStroke extends AbstractTableNavigationK
     this.which = [keys.UP];
     this.renderingHints.text = '↑';
     this.renderingHints.$drawingArea = function($drawingArea, event) {
-      var row = this.firstRowBeforeSelection();
+      let row = this.firstRowBeforeSelection();
       if (row) {
         return row.$row;
       }
@@ -25,7 +25,7 @@ export default class TableNavigationUpKeyStroke extends AbstractTableNavigationK
   }
 
   handle(event) {
-    var table = this.field,
+    let table = this.field,
       rows = table.visibleRows,
       selectedRows = table.selectedRows,
       lastActionRow = table.selectionHandler.lastActionRow,
@@ -62,7 +62,7 @@ export default class TableNavigationUpKeyStroke extends AbstractTableNavigationK
           newSelectedRows = [];
           arrays.pushAll(newSelectedRows, selectedRows);
           // only unselect when first or last row (but not in the middle of the selection, see #172929)
-          var selectionIndizes = table.selectionHandler.getMinMaxSelectionIndizes();
+          let selectionIndizes = table.selectionHandler.getMinMaxSelectionIndizes();
           if (scout.isOneOf(lastActionRowIndex, selectionIndizes[0], selectionIndizes[1])) {
             arrays.remove(newSelectedRows, lastActionRow);
           }

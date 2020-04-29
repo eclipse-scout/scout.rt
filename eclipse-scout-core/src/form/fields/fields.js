@@ -28,7 +28,7 @@ export function appendIcon($field, cssClass) {
    * a new focus target, so we cannot simply change the focus target, because at the end the wrong target would be
    * focused and the popup would be closed immediately. With 'unfocusable' the focus manager will prevent the default focus (and does not execute _handleIEEvent either)
    */
-  var $icon = $field.appendSpan('icon unfocusable');
+  let $icon = $field.appendSpan('icon unfocusable');
   if (cssClass) {
     $icon.addClass(cssClass);
   }
@@ -48,7 +48,7 @@ export function initTouch(field, model) {
  * @return when called with 1 argument: $field.text() or $field.val()
  */
 export function valOrText($field, text) {
-  var isDiv = $field.is('div');
+  let isDiv = $field.is('div');
   if (arguments.length === 2) {
     if (isDiv) {
       $field.text(text);
@@ -98,7 +98,7 @@ export function handleOnClick(field) {
  * @param {FormField[]} fields
  */
 export function activateFirstField(widget, fields) {
-  var firstField = widgets.findFirstFocusableWidget(fields, widget);
+  let firstField = widgets.findFirstFocusableWidget(fields, widget);
   if (firstField) {
     firstField.activate();
   }
@@ -109,13 +109,13 @@ export function activateFirstField(widget, fields) {
  * This allows screen readers to build a catalog of the elements on the screen and their relationships, for example, to read the label when the input is focused.
  */
 export function linkElementWithLabel($elem, $label) {
-  var labelId = $label.attr('id');
+  let labelId = $label.attr('id');
   if (!labelId) {
     // Create an id if the element does not have one yet
     labelId = widgets.createUniqueId('lbl');
     $label.attr('id', labelId);
   }
-  var labelledBy = $elem.attr('aria-labelledby') || '';
+  let labelledBy = $elem.attr('aria-labelledby') || '';
   if (labelledBy) {
     // Add to the existing value if there is one
     labelId += ' ' + labelledBy;

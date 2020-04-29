@@ -32,7 +32,7 @@ export default class TableHeaderMenuLayout extends PopupLayout {
       return;
     }
 
-    var
+    let
       actionColumnSize, filterColumnSize,
       $filterColumn = this.popup.$columnFilters,
       filterColumnInsets = graphics.insets($filterColumn),
@@ -57,7 +57,7 @@ export default class TableHeaderMenuLayout extends PopupLayout {
     // Same for pref size. To implement max height of table, the RowLayout could read css max-height
     // Filter fields
     if (this.popup.hasFilterFields) {
-      var
+      let
         $filterFieldsGroup = this.popup.$filterFieldsGroup,
         filterFieldHtmlComp = HtmlComponent.get($filterFieldsGroup.find('.form-field'));
 
@@ -68,7 +68,7 @@ export default class TableHeaderMenuLayout extends PopupLayout {
 
     // Filter table
     if (this.popup.hasFilterTable) {
-      var
+      let
         filterTableContainerHeight,
         $filterTableGroup = this.popup.$filterTableGroup,
         filterTableContainerInsets = graphics.insets($filterTableGroup),
@@ -102,7 +102,7 @@ export default class TableHeaderMenuLayout extends PopupLayout {
   }
 
   _adjustSizeWithAnchor(prefSize) {
-    var maxWidth,
+    let maxWidth,
       htmlComp = this.popup.htmlComp,
       windowPaddingX = this.popup.windowPaddingX,
       popupMargins = htmlComp.margins(),
@@ -111,7 +111,7 @@ export default class TableHeaderMenuLayout extends PopupLayout {
       windowWidth = $window.width();
 
     maxWidth = (windowWidth - popupMargins.horizontal() - popupBounds.x - windowPaddingX);
-    var compact = popupBounds.width > maxWidth;
+    let compact = popupBounds.width > maxWidth;
     if (compact) {
       this.popup.$body.addClass('compact', compact);
       prefSize = this.preferredLayoutSize(this.popup.$container);
@@ -136,7 +136,7 @@ export default class TableHeaderMenuLayout extends PopupLayout {
    * + paddings of surrounding containers
    */
   preferredLayoutSize($container, options) {
-    var prefSize, filterColumnMargins, filterColumnInsets,
+    let prefSize, filterColumnMargins, filterColumnInsets,
       rightColumnHeight = 0,
       leftColumnHeight = 0,
       containerInsets = graphics.insets($container),
@@ -147,7 +147,7 @@ export default class TableHeaderMenuLayout extends PopupLayout {
 
     // Filter table
     if (this.popup.hasFilterTable) {
-      var
+      let
         $filterTableGroup = this.popup.$filterTableGroup,
         filterTableHeight = this.popup.filterTable.htmlComp.size(true).height,
         filterTableContainerInsets = graphics.insets($filterTableGroup),
@@ -167,7 +167,7 @@ export default class TableHeaderMenuLayout extends PopupLayout {
 
     // Filter fields
     if (this.popup.hasFilterFields) {
-      var
+      let
         $filterFieldsGroup = this.popup.$filterFieldsGroup,
         filterFieldContainerInsets = graphics.insets($filterFieldsGroup),
         filterFieldContainerHeight;

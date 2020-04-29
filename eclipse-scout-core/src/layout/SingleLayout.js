@@ -25,8 +25,8 @@ export default class SingleLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var htmlContainer = HtmlComponent.get($container);
-    var childSize = htmlContainer.availableSize({exact: this.exact})
+    let htmlContainer = HtmlComponent.get($container);
+    let childSize = htmlContainer.availableSize({exact: this.exact})
         .subtract(htmlContainer.insets()),
       htmlChild = this._htmlChild;
 
@@ -39,7 +39,7 @@ export default class SingleLayout extends AbstractLayout {
   }
 
   preferredLayoutSize($container, options) {
-    var htmlChild = this._htmlChild;
+    let htmlChild = this._htmlChild;
     if (!htmlChild) {
       htmlChild = this._getHtmlSingleChild($container);
     }
@@ -53,9 +53,9 @@ export default class SingleLayout extends AbstractLayout {
    * @returns {HtmlComponent} the first child html component of the given container or null if the container has no child with a html component or no children at all.
    */
   _getHtmlSingleChild($container) {
-    var htmlComp = null;
-    $container.children().each(function(i, child) {
-      var htmlChild = HtmlComponent.optGet($(child));
+    let htmlComp = null;
+    $container.children().each((i, child) => {
+      let htmlChild = HtmlComponent.optGet($(child));
       if (htmlChild) {
         htmlComp = htmlChild;
         return false;

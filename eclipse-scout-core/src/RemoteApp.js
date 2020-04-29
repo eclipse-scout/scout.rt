@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, defaultValues, objects, scout} from './index';
+import {App, defaultValues, scout} from './index';
 import $ from 'jquery';
 
 export default class RemoteApp extends App {
@@ -43,16 +43,15 @@ export default class RemoteApp extends App {
   _loadSession($entryPoint, options) {
     options = options || {};
     options.$entryPoint = $entryPoint;
-    var session = this._createSession(options);
+    let session = this._createSession(options);
     App.get().sessions.push(session);
     return session.start();
   }
 
-  _fail(options, error) {
+  _fail(options, error, ...args) {
     $.log.error('App initialization failed', error);
     // Session.js already handled the error -> don't show a message here
     // Reject with original rejection arguments
-    var args = objects.argumentsToArray(arguments).slice(1);
-    return $.rejectedPromise.apply($, args);
+    return $.rejectedPromise(error, ...args);
   }
 }

@@ -38,7 +38,7 @@ export default class SmartFieldTouchPopup extends TouchPopup {
   }
 
   _createProposalChooser() {
-    var objectType = this.parent.browseHierarchy ? 'TreeProposalChooser' : 'TableProposalChooser';
+    let objectType = this.parent.browseHierarchy ? 'TreeProposalChooser' : 'TableProposalChooser';
     return scout.create(objectType, {
       parent: this,
       touch: true,
@@ -47,7 +47,7 @@ export default class SmartFieldTouchPopup extends TouchPopup {
   }
 
   _fieldOverrides() {
-    var obj = super._fieldOverrides();
+    let obj = super._fieldOverrides();
     // Make sure proposal chooser does not get cloned, because it would not work (e.g. because selectedRows may not be cloned)
     // It would also generate a loop because field would try to render the chooser and the popup
     // -> The original smart field has to control the chooser

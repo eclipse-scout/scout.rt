@@ -19,8 +19,8 @@ export default class UnsavedFormsLookupCall extends StaticLookupCall {
   }
 
   _data() {
-    return this.unsavedForms.map(function(form) {
-      var text = UnsavedFormChangesForm.getFormDisplayName(form);
+    return this.unsavedForms.map(form => {
+      let text = UnsavedFormChangesForm.getFormDisplayName(form);
       return [form, text];
     });
   }

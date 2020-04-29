@@ -28,7 +28,7 @@ export default class TypeDescriptor {
   }
 
   createInstance(options) {
-    var i, namespaces, className,
+    let i, namespaces, className,
       namespace = window.scout; // default namespace
 
     if (this.modelVariant) {
@@ -51,7 +51,7 @@ export default class TypeDescriptor {
 
     if (!namespace[className]) { // Try without variant if variantLenient is true
       if (options.variantLenient && this.modelVariant) {
-        var infoWithoutVariant = new TypeDescriptor(this.typeDescriptor, this.objectType, null);
+        let infoWithoutVariant = new TypeDescriptor(this.typeDescriptor, this.objectType, null);
         return infoWithoutVariant.createInstance(options);
       }
       throw this.error('Could not find "' + className + '" in namespace "' + namespaces.join('.') + '"');
@@ -65,7 +65,7 @@ export default class TypeDescriptor {
   }
 
   static newInstance(typeDescriptor, options) {
-    var info = TypeDescriptor.parse(typeDescriptor);
+    let info = TypeDescriptor.parse(typeDescriptor);
     return info.createInstance(options);
   }
 
@@ -75,11 +75,11 @@ export default class TypeDescriptor {
    * @static
    */
   static parse(typeDescriptor) {
-    var typePart = null,
+    let typePart = null,
       variantPart = null;
 
     if (strings.contains(typeDescriptor, ObjectFactory.MODEL_VARIANT_SEPARATOR)) {
-      var tmp = typeDescriptor.split(ObjectFactory.MODEL_VARIANT_SEPARATOR);
+      let tmp = typeDescriptor.split(ObjectFactory.MODEL_VARIANT_SEPARATOR);
       typePart = parseDescriptorPart(tmp[0]);
       variantPart = parseDescriptorPart(tmp[1]);
 
@@ -97,8 +97,8 @@ export default class TypeDescriptor {
       return {
         name: name,
         namespaces: scout.nvl(namespaces, []),
-        toString: function() {
-          var parts = namespaces.slice();
+        toString: () => {
+          let parts = namespaces.slice();
           parts.push(name);
           return strings.join(ObjectFactory.NAMESPACE_SEPARATOR, parts);
         }
@@ -106,10 +106,10 @@ export default class TypeDescriptor {
     }
 
     function parseDescriptorPart(descriptorPart) {
-      var namespaces = [];
+      let namespaces = [];
 
       if (strings.contains(descriptorPart, ObjectFactory.NAMESPACE_SEPARATOR)) {
-        var namespaceParts = descriptorPart.split(ObjectFactory.NAMESPACE_SEPARATOR);
+        let namespaceParts = descriptorPart.split(ObjectFactory.NAMESPACE_SEPARATOR);
         namespaces = namespaceParts.slice(0, namespaceParts.length - 1);
         descriptorPart = arrays.last(namespaceParts);
       }

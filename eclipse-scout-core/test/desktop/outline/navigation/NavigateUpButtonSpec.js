@@ -10,30 +10,30 @@
  */
 import {NavigateUpButton} from '../../../../src/index';
 
-describe('NavigateUpButton', function() {
+describe('NavigateUpButton', () => {
 
-  var session, outline, menu, node = {};
+  let session, outline, menu, node = {};
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     outline = {
       session: session,
-      navigateToTop: function() {
+      navigateToTop: () => {
       }
     };
-    var model = createSimpleModel('NavigateUpButton', session);
+    let model = createSimpleModel('NavigateUpButton', session);
     model.outline = outline;
     model.node = node;
     menu = new NavigateUpButton();
     menu.init(model);
   });
 
-  it('_toggleDetail is always true', function() {
+  it('_toggleDetail is always true', () => {
     expect(menu._toggleDetail()).toBe(true);
   });
 
-  it('_isDetail returns true or false depending on the state of the detail-form and detail-table', function() {
+  it('_isDetail returns true or false depending on the state of the detail-form and detail-table', () => {
     // false when both detailForm and detailTable are visible
     node.detailForm = {};
     node.detailFormVisible = true;
@@ -65,21 +65,21 @@ describe('NavigateUpButton', function() {
     expect(menu._isDetail()).toBe(false);
   });
 
-  describe('_buttonEnabled', function() {
+  describe('_buttonEnabled', () => {
 
-    it('is true when current node has a parent or...', function() {
+    it('is true when current node has a parent or...', () => {
       node.parentNode = {};
       outline.defaultDetailForm = undefined;
       expect(menu._buttonEnabled()).toBe(true);
     });
 
-    it('is true when current node is a top-level node and outline a default detail-form or...', function() {
+    it('is true when current node is a top-level node and outline a default detail-form or...', () => {
       node.parentNode = undefined;
       outline.defaultDetailForm = {};
       expect(menu._buttonEnabled()).toBe(true);
     });
 
-    it('is false otherwise', function() {
+    it('is false otherwise', () => {
       node.parentNode = undefined;
       outline.defaultDetailForm = undefined;
       expect(menu._buttonEnabled()).toBe(false);
@@ -87,18 +87,18 @@ describe('NavigateUpButton', function() {
 
   });
 
-  describe('_drill', function() {
+  describe('_drill', () => {
 
-    beforeEach(function() {
-      outline.selectNodes = function(node) {
+    beforeEach(() => {
+      outline.selectNodes = node => {
       };
-      outline.collapseNode = function(node) {
+      outline.collapseNode = node => {
       };
-      outline.collapseAll = function(node) {
+      outline.collapseAll = node => {
       };
     });
 
-    it('drills up to parent node, sets the selection on the tree', function() {
+    it('drills up to parent node, sets the selection on the tree', () => {
       node.parentNode = {};
       spyOn(outline, 'selectNodes');
       spyOn(outline, 'collapseNode');
@@ -108,7 +108,7 @@ describe('NavigateUpButton', function() {
       expect(outline.collapseNode).toHaveBeenCalledWith(node.parentNode, {collapseChildNodes: true});
     });
 
-    it('shows default detail-form or outline overview', function() {
+    it('shows default detail-form or outline overview', () => {
       node.parentNode = undefined;
       menu.drill;
       spyOn(outline, 'navigateToTop');

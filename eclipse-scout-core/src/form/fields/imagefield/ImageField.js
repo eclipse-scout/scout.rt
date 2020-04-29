@@ -44,7 +44,7 @@ export default class ImageField extends FormField {
     this.addFieldContainer(this.$parent.makeDiv());
 
     // Complete the layout hierarchy between the image field and the image
-    var htmlComp = HtmlComponent.install(this.$fieldContainer, this.session);
+    let htmlComp = HtmlComponent.install(this.$fieldContainer, this.session);
     htmlComp.setLayout(new SingleLayout());
     this.icon.render(this.$fieldContainer);
 
@@ -89,7 +89,7 @@ export default class ImageField extends FormField {
   }
 
   _renderImageUrl() {
-    var hasImageUrl = !!this.imageUrl;
+    let hasImageUrl = !!this.imageUrl;
     this.$fieldContainer.toggleClass('has-image', hasImageUrl);
     this.$container.toggleClass('has-image', hasImageUrl);
     scrollbars.update(this.$fieldContainer);
@@ -159,7 +159,7 @@ export default class ImageField extends FormField {
   }
 
   _updateUploadEnabled() {
-    var enabled = this.enabledComputed && this.uploadEnabled;
+    let enabled = this.enabledComputed && this.uploadEnabled;
     this.$fieldContainer.toggleClass('clickable', enabled);
     if (enabled) {
       if (!this._clickHandler) {

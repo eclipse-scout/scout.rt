@@ -10,20 +10,20 @@
  */
 
 import {FormSpecHelper} from '@eclipse-scout/testing';
-import {IntegerField, scout, Status, ParsingFailedStatus, ValidationFailedStatus} from '../../../../src/index';
+import {IntegerField, ParsingFailedStatus, scout, Status, ValidationFailedStatus} from '../../../../src/index';
 
 describe('IntegerField', () => {
 
-  var session, helper;
+  let session, helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
   });
 
   it('_parseValue', () => {
-    var field = scout.create('IntegerField', {
+    let field = scout.create('IntegerField', {
       parent: session.desktop
     });
 
@@ -47,7 +47,7 @@ describe('IntegerField', () => {
   });
 
   it('Test user input', () => {
-    var field = scout.create('IntegerField', {
+    let field = scout.create('IntegerField', {
       parent: session.desktop
     });
     field.render();
@@ -57,7 +57,7 @@ describe('IntegerField', () => {
   });
 
   it('Test min/max values', () => {
-    var field = scout.create('IntegerField', {
+    let field = scout.create('IntegerField', {
       parent: session.desktop,
       minValue: 0,
       maxValue: 99
@@ -80,9 +80,9 @@ describe('IntegerField', () => {
     }
   }
 
-  describe('errorStatus', function() {
-    it('parse, validate and custom-error', function() {
-      var field = scout.create('IntegerField', {
+  describe('errorStatus', () => {
+    it('parse, validate and custom-error', () => {
+      let field = scout.create('IntegerField', {
         parent: session.desktop
       });
 
@@ -93,7 +93,7 @@ describe('IntegerField', () => {
       field.setErrorStatus(null);
 
       // add a validator
-      var validator = function() {
+      let validator = () => {
         throw 'Never valid';
       };
       field.addValidator(validator);
@@ -113,7 +113,7 @@ describe('IntegerField', () => {
       field.parseAndSetValue('foo');
       expect(field.errorStatus.containsStatus(ParsingFailedStatus)).toBe(true);
       expect(field.errorStatus.children.length).toBe(2);
-      expect(field.errorStatus.children.some(function(status) {
+      expect(field.errorStatus.children.some(status => {
         return status.message === 'functional';
       })).toBe(true);
 

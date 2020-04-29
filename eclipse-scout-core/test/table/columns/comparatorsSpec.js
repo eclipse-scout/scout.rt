@@ -10,16 +10,16 @@
  */
 import {comparators} from '../../../src/index';
 
-describe('scout.comparators', function() {
+describe('scout.comparators', () => {
 
-  beforeEach(function() {
+  beforeEach(() => {
     // ensure before each test that it runs without a collator.
     // comparators.TEXT is a singleton and therefore other tests might have called install already (which creates a collator).
     comparators.TEXT.collator = null;
   });
 
-  it('tests \'compare\' method of TEXT comparator', function() {
-    var comparator = comparators.TEXT;
+  it('tests \'compare\' method of TEXT comparator', () => {
+    let comparator = comparators.TEXT;
 
     expect(comparator.compare(null, null)).toBe(0);
     expect(comparator.compare(null, 'a')).toBe(-1);
@@ -31,8 +31,8 @@ describe('scout.comparators', function() {
     expect(comparator.compare('B', 'a')).toBe(-1);
   });
 
-  it('tests \'compareIgnoreCase\' method of TEXT comparator', function() {
-    var comparator = comparators.TEXT;
+  it('tests \'compareIgnoreCase\' method of TEXT comparator', () => {
+    let comparator = comparators.TEXT;
 
     expect(comparator.compareIgnoreCase(null, null)).toBe(0);
     expect(comparator.compareIgnoreCase(undefined, undefined)).toBe(0);
@@ -53,8 +53,8 @@ describe('scout.comparators', function() {
     expect(comparator.compareIgnoreCase('a', 'a')).toBe(0);
   });
 
-  it('tests \'compare\' method of NUMERIC comparator', function() {
-    var comparator = comparators.NUMERIC;
+  it('tests \'compare\' method of NUMERIC comparator', () => {
+    let comparator = comparators.NUMERIC;
 
     expect(comparator.compare(undefined, undefined)).toBe(0);
     expect(comparator.compare(undefined, '1')).toBe(-1);
@@ -85,8 +85,8 @@ describe('scout.comparators', function() {
     expect(comparator.compare('1.9999', '1.9998')).toBe(1);
   });
 
-  it('tests \'compare\' method of ALPHANUMERIC comparator', function() {
-    var comparator = comparators.ALPHANUMERIC;
+  it('tests \'compare\' method of ALPHANUMERIC comparator', () => {
+    let comparator = comparators.ALPHANUMERIC;
 
     expect(comparator.compare(undefined, undefined)).toBe(0);
     expect(comparator.compare(null, null)).toBe(0);
@@ -102,8 +102,8 @@ describe('scout.comparators', function() {
     expect(comparator.compare('doc 9 .txt 10', 'doc 9')).toBe(1);
   });
 
-  it('tests \'compareIgnoreCase\' method of ALPHANUMERIC comparator', function() {
-    var comparator = comparators.ALPHANUMERIC;
+  it('tests \'compareIgnoreCase\' method of ALPHANUMERIC comparator', () => {
+    let comparator = comparators.ALPHANUMERIC;
 
     expect(comparator.compareIgnoreCase(undefined, undefined)).toBe(0);
     expect(comparator.compareIgnoreCase(null, null)).toBe(0);
@@ -136,8 +136,8 @@ describe('scout.comparators', function() {
     expect(comparator.compareIgnoreCase('doc\n9', 'DOC\n\n9')).toBe(-1);
   });
 
-  it('tests \'compareIgnoreCase\' method of ALPHANUMERIC comparator with session', function() {
-    var comparator = comparators.ALPHANUMERIC;
+  it('tests \'compareIgnoreCase\' method of ALPHANUMERIC comparator with session', () => {
+    let comparator = comparators.ALPHANUMERIC;
     comparator.install(createSession());
     expect(comparator.compareIgnoreCase('doc8', 'doc8')).toBe(0);
     expect(comparator.compareIgnoreCase('DoC8', 'dOc8')).toBe(0);
@@ -153,11 +153,11 @@ describe('scout.comparators', function() {
 
   function createSession(userAgent) {
     setFixtures(sandbox());
-    var session = sandboxSession({
+    let session = sandboxSession({
       'userAgent': userAgent
     });
     // test request only, don't test response (would require valid session, desktop etc.)
-    session._processStartupResponse = function() {
+    session._processStartupResponse = () => {
     };
     return session;
   }

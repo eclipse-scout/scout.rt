@@ -11,10 +11,10 @@
 import {dates, scout, SequenceBoxGridConfig, Status} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper, MenuSpecHelper} from '@eclipse-scout/testing';
 
-describe('SequenceBox', function() {
-  var session, helper, menuHelper;
+describe('SequenceBox', () => {
+  let session, helper, menuHelper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
@@ -22,8 +22,8 @@ describe('SequenceBox', function() {
   });
 
   function createField(modelProperties) {
-    var seqBox = helper.createField('SequenceBox', session.desktop, modelProperties);
-    var fields = [
+    let seqBox = helper.createField('SequenceBox', session.desktop, modelProperties);
+    let fields = [
       helper.createField('StringField', seqBox, {
         statusVisible: false
       }),
@@ -35,11 +35,11 @@ describe('SequenceBox', function() {
     return seqBox;
   }
 
-  describe('mandatory indicator', function() {
+  describe('mandatory indicator', () => {
 
     // Must not contain an indicator to prevent a double indicator if the first field is mandatory too
-    it('does not exist', function() {
-      var field = createField({
+    it('does not exist', () => {
+      let field = createField({
         mandatory: true
       });
       field.render();
@@ -49,10 +49,10 @@ describe('SequenceBox', function() {
 
   });
 
-  describe('label width', function() {
+  describe('label width', () => {
 
-    it('is 0 if it is empty', function() {
-      var field = createField();
+    it('is 0 if it is empty', () => {
+      let field = createField();
       field.render();
       // css is not applied, therefore we need to adjust display style here
       field.fields[0].$label.css('display', 'inline-block');
@@ -63,10 +63,10 @@ describe('SequenceBox', function() {
 
   });
 
-  describe('status handling', function() {
+  describe('status handling', () => {
 
-    it('moves the error status of the last field to the seq box', function() {
-      var field = createField({
+    it('moves the error status of the last field to the seq box', () => {
+      let field = createField({
         statusVisible: false
       });
       field.render();
@@ -86,8 +86,8 @@ describe('SequenceBox', function() {
       expect(field.fields[1].errorStatus.message).toBe('foo');
     });
 
-    it('moves the tooltip of the last field to the seq box', function() {
-      var field = createField({
+    it('moves the tooltip of the last field to the seq box', () => {
+      let field = createField({
         statusVisible: false
       });
       field.render();
@@ -105,11 +105,11 @@ describe('SequenceBox', function() {
       expect(field.fields[1].tooltipText).toBe('foo');
     });
 
-    it('moves the menus of the last field to the seq box', function() {
-      var field = createField({
+    it('moves the menus of the last field to the seq box', () => {
+      let field = createField({
         statusVisible: false
       });
-      var menu0 = menuHelper.createMenu(menuHelper.createModel());
+      let menu0 = menuHelper.createMenu(menuHelper.createModel());
       field.fields[1].menus = [menu0];
       field.fields[1].menusVisible = false;
       field.render();
@@ -127,8 +127,8 @@ describe('SequenceBox', function() {
       expect(field.fields[1].$status.isVisible()).toBe(false);
     });
 
-    it('does not display the error message of the last field, only the one of the seq box', function() {
-      var field = createField({
+    it('does not display the error message of the last field, only the one of the seq box', () => {
+      let field = createField({
         statusVisible: false
       });
       field.render();
@@ -144,8 +144,8 @@ describe('SequenceBox', function() {
       expect(field._tooltip().rendered).toBe(true);
     });
 
-    it('removes the tooltip from the seq box if last field gets invisible', function() {
-      var field = createField({
+    it('removes the tooltip from the seq box if last field gets invisible', () => {
+      let field = createField({
         statusVisible: false
       });
       field.fields[1].tooltipText = 'foo';
@@ -164,8 +164,8 @@ describe('SequenceBox', function() {
       expect(field.fields[1].tooltipText).toBe('foo');
     });
 
-    it('moves the tooltip from the first field to the seq box if it gets the last field after a visibility change', function() {
-      var field = createField({
+    it('moves the tooltip from the first field to the seq box if it gets the last field after a visibility change', () => {
+      let field = createField({
         statusVisible: false
       });
       field.fields[0].tooltipText = 'foo';
@@ -184,8 +184,8 @@ describe('SequenceBox', function() {
       expect(field.fields[0].tooltipText).toBe('foo');
     });
 
-    it('moves the error from the first field to the seq box if it gets the last field after a visibility change', function() {
-      var field = createField({
+    it('moves the error from the first field to the seq box if it gets the last field after a visibility change', () => {
+      let field = createField({
         statusVisible: false
       });
       field.fields[0].errorStatus = new Status({
@@ -209,8 +209,8 @@ describe('SequenceBox', function() {
       expect(field.fields[0].errorStatus.message).toBe('foo');
     });
 
-    it('makes sure the status may be displayed on the field again if the field was the last visible field once', function() {
-      var field = createField({
+    it('makes sure the status may be displayed on the field again if the field was the last visible field once', () => {
+      let field = createField({
         statusVisible: false
       });
       field.fields[0].errorStatus = new Status({
@@ -243,8 +243,8 @@ describe('SequenceBox', function() {
       expect(field.fields[0].errorStatus.message).toBe('foo');
     });
 
-    it('shows the error status of the seq box', function() {
-      var field = createField({
+    it('shows the error status of the seq box', () => {
+      let field = createField({
         errorStatus: {
           statusVisible: false,
           message: 'foo'
@@ -256,8 +256,8 @@ describe('SequenceBox', function() {
       expect(field.errorStatus.message).toBe('foo');
     });
 
-    it('shows the tooltip of the seq box', function() {
-      var field = createField({
+    it('shows the tooltip of the seq box', () => {
+      let field = createField({
         statusVisible: false,
         tooltipText: 'foo'
       });
@@ -267,9 +267,9 @@ describe('SequenceBox', function() {
       expect(field.tooltipText).toBe('foo');
     });
 
-    it('renders invisible menus of the seq box', function() {
-      var menu0 = menuHelper.createMenu(menuHelper.createModel());
-      var field = createField({
+    it('renders invisible menus of the seq box', () => {
+      let menu0 = menuHelper.createMenu(menuHelper.createModel());
+      let field = createField({
         statusVisible: false,
         menus: [menu0],
         menusVisible: false
@@ -281,9 +281,9 @@ describe('SequenceBox', function() {
       expect(field.$container).not.toHaveClass('has-menus');
     });
 
-    it('renders visible menus of the seq box', function() {
-      var menu0 = menuHelper.createMenu(menuHelper.createModel());
-      var field = createField({
+    it('renders visible menus of the seq box', () => {
+      let menu0 = menuHelper.createMenu(menuHelper.createModel());
+      let field = createField({
         statusVisible: false,
         menus: [menu0],
         menusVisible: true
@@ -295,8 +295,8 @@ describe('SequenceBox', function() {
       expect(field.$container).toHaveClass('has-menus');
     });
 
-    it('prefers the error status of the last visible field', function() {
-      var field = createField({
+    it('prefers the error status of the last visible field', () => {
+      let field = createField({
         statusVisible: false
       });
       field.render();
@@ -327,8 +327,8 @@ describe('SequenceBox', function() {
       expect(field.fields[1].errorStatus).toBeFalsy();
     });
 
-    it('also remembers the new error status of the seq box if the status is currently overwritten by the field', function() {
-      var field = createField({
+    it('also remembers the new error status of the seq box if the status is currently overwritten by the field', () => {
+      let field = createField({
         statusVisible: false
       });
       field.render();
@@ -368,8 +368,8 @@ describe('SequenceBox', function() {
       expect(field.fields[1].errorStatus).toBeFalsy();
     });
 
-    it('also remembers the error status of the seq box if the status is overwritten by the field multiple times', function() {
-      var field = createField({
+    it('also remembers the error status of the seq box if the status is overwritten by the field multiple times', () => {
+      let field = createField({
         statusVisible: false
       });
       field.render();
@@ -409,8 +409,8 @@ describe('SequenceBox', function() {
       expect(field.fields[1].errorStatus).toBeFalsy();
     });
 
-    it('does not change the seq box status if the last visible field is not changed', function() {
-      var field = createField({
+    it('does not change the seq box status if the last visible field is not changed', () => {
+      let field = createField({
         statusVisible: false
       });
       field.render();
@@ -441,8 +441,8 @@ describe('SequenceBox', function() {
       expect(field.fields[0].errorStatus).toBeFalsy();
     });
 
-    it('removes the error status from the sequenceBox after all fields are valid', function() {
-      var field = createField({
+    it('removes the error status from the sequenceBox after all fields are valid', () => {
+      let field = createField({
         statusVisible: false
       });
       field.render();
@@ -483,10 +483,10 @@ describe('SequenceBox', function() {
     });
   });
 
-  describe('label', function() {
+  describe('label', () => {
 
-    it('is linked with the fields (also considers fields own label)', function() {
-      var field = createField();
+    it('is linked with the fields (also considers fields own label)', () => {
+      let field = createField();
       field.setLabel('box label');
       field.fields[0].setLabel('first label');
       field.fields[1].setLabel('second label');
@@ -500,8 +500,8 @@ describe('SequenceBox', function() {
       expect(field.fields[1].$timeField.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + field.fields[1].$label.attr('id'));
     });
 
-    it('focuses the first visible field when clicked', function() {
-      var field = createField();
+    it('focuses the first visible field when clicked', () => {
+      let field = createField();
       field.render();
       field.setLabel('box label');
       field.$label.triggerClick();
@@ -514,10 +514,10 @@ describe('SequenceBox', function() {
 
   });
 
-  describe('clone', function() {
-    it('considers the clone properties and deep clones fields', function() {
-      var cloneHelper = new CloneSpecHelper();
-      var seqBox = scout.create('SequenceBox', {
+  describe('clone', () => {
+    it('considers the clone properties and deep clones fields', () => {
+      let cloneHelper = new CloneSpecHelper();
+      let seqBox = scout.create('SequenceBox', {
         parent: session.desktop,
         id: 'seq01',
         label: 'abc',
@@ -532,7 +532,7 @@ describe('SequenceBox', function() {
           objectType: 'Menu'
         }]
       });
-      var clone = seqBox.clone({
+      let clone = seqBox.clone({
         parent: seqBox.parent
       });
 
@@ -551,9 +551,9 @@ describe('SequenceBox', function() {
     });
   });
 
-  describe('focus', function() {
-    it('focuses the first field', function() {
-      var box = scout.create('SequenceBox', {
+  describe('focus', () => {
+    it('focuses the first field', () => {
+      let box = scout.create('SequenceBox', {
         parent: session.desktop,
         fields: [{
           objectType: 'StringField'
@@ -568,8 +568,8 @@ describe('SequenceBox', function() {
       expect(box.fields[0].$field).toBeFocused();
     });
 
-    it('focuses the second field if the first is disabled', function() {
-      var box = scout.create('SequenceBox', {
+    it('focuses the second field if the first is disabled', () => {
+      let box = scout.create('SequenceBox', {
         parent: session.desktop,
         fields: [{
           objectType: 'StringField',
@@ -586,8 +586,8 @@ describe('SequenceBox', function() {
       expect(box.fields[1].$field).toBeFocused();
     });
 
-    it('focuses the second field if the first is not focusable', function() {
-      var box = scout.create('SequenceBox', {
+    it('focuses the second field if the first is not focusable', () => {
+      let box = scout.create('SequenceBox', {
         parent: session.desktop,
         fields: [{
           objectType: 'LabelField'
@@ -603,9 +603,9 @@ describe('SequenceBox', function() {
     });
   });
 
-  describe('autoDate on datefields', function() {
-    it('is set on following date fields if the date changes in a date field', function() {
-      var box = scout.create('SequenceBox', {
+  describe('autoDate on datefields', () => {
+    it('is set on following date fields if the date changes in a date field', () => {
+      let box = scout.create('SequenceBox', {
         parent: session.desktop,
         fields: [{
           objectType: 'DateField'
@@ -617,7 +617,7 @@ describe('SequenceBox', function() {
       expect(box.fields[0].autoDate).toBe(null);
       expect(box.fields[1].autoDate).toBe(null);
 
-      var date = dates.create('2017-05-23 12:30:00.000');
+      let date = dates.create('2017-05-23 12:30:00.000');
 
       box.fields[0].setValue(date);
 
@@ -626,8 +626,8 @@ describe('SequenceBox', function() {
       expect(box.fields[1].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
     });
 
-    it('is set only on following fields in the sequence box', function() {
-      var box = scout.create('SequenceBox', {
+    it('is set only on following fields in the sequence box', () => {
+      let box = scout.create('SequenceBox', {
         parent: session.desktop,
         fields: [{
           objectType: 'DateField'
@@ -645,7 +645,7 @@ describe('SequenceBox', function() {
       expect(box.fields[2].autoDate).toBe(null);
       expect(box.fields[3].autoDate).toBe(null);
 
-      var date = dates.create('2017-05-23 12:30:00.000');
+      let date = dates.create('2017-05-23 12:30:00.000');
 
       box.fields[1].setValue(date);
 
@@ -655,15 +655,15 @@ describe('SequenceBox', function() {
       expect(box.fields[2].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
       expect(box.fields[3].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
 
-      var date2 = dates.create('2017-05-26 12:30:00.000');
+      let date2 = dates.create('2017-05-26 12:30:00.000');
       box.fields[2].setValue(date2);
 
       expect(box.fields[2].value.toISOString()).toBe(date2.toISOString());
       expect(box.fields[3].autoDate.toISOString()).toBe(dates.shift(date2, 0, 0, 1).toISOString());
     });
 
-    it('is correctly removed again after a date field value is removed', function() {
-      var box = scout.create('SequenceBox', {
+    it('is correctly removed again after a date field value is removed', () => {
+      let box = scout.create('SequenceBox', {
         parent: session.desktop,
         fields: [{
           objectType: 'DateField'
@@ -681,8 +681,8 @@ describe('SequenceBox', function() {
       expect(box.fields[2].autoDate).toBe(null);
       expect(box.fields[3].autoDate).toBe(null);
 
-      var date = dates.create('2017-05-23 12:30:00.000');
-      var date2 = dates.create('2017-05-26 12:30:00.000');
+      let date = dates.create('2017-05-23 12:30:00.000');
+      let date2 = dates.create('2017-05-26 12:30:00.000');
 
       box.fields[0].setValue(date);
       box.fields[2].setValue(date2);
@@ -700,8 +700,8 @@ describe('SequenceBox', function() {
       expect(box.fields[3].autoDate.toISOString()).toBe(dates.shift(date2, 0, 0, 1).toISOString());
     });
 
-    it('is correctly set within sequence boxes containing other fields as well', function() {
-      var box = scout.create('SequenceBox', {
+    it('is correctly set within sequence boxes containing other fields as well', () => {
+      let box = scout.create('SequenceBox', {
         parent: session.desktop,
         fields: [{
           objectType: 'DateField'
@@ -717,7 +717,7 @@ describe('SequenceBox', function() {
       expect(box.fields[0].autoDate).toBe(null);
       expect(box.fields[2].autoDate).toBe(null);
 
-      var date = dates.create('2017-05-23 12:30:00.000');
+      let date = dates.create('2017-05-23 12:30:00.000');
 
       box.fields[0].setValue(date);
 
@@ -725,9 +725,9 @@ describe('SequenceBox', function() {
       expect(box.fields[2].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
     });
 
-    it('works correctly with values already set on the datefield model', function() {
-      var date = dates.create('2017-05-23 12:30:00.000');
-      var box = scout.create('SequenceBox', {
+    it('works correctly with values already set on the datefield model', () => {
+      let date = dates.create('2017-05-23 12:30:00.000');
+      let box = scout.create('SequenceBox', {
         parent: session.desktop,
         fields: [{
           objectType: 'DateField',
@@ -741,10 +741,10 @@ describe('SequenceBox', function() {
       expect(box.fields[1].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
     });
 
-    it('dont conflict with already set/programmed autoDates', function() {
-      var date = dates.create('2017-05-23 12:30:00.000');
-      var date2 = dates.create('2017-05-27 12:30:00.000');
-      var box = scout.create('SequenceBox', {
+    it('dont conflict with already set/programmed autoDates', () => {
+      let date = dates.create('2017-05-23 12:30:00.000');
+      let date2 = dates.create('2017-05-27 12:30:00.000');
+      let box = scout.create('SequenceBox', {
         parent: session.desktop,
         fields: [{
           objectType: 'DateField',
@@ -761,9 +761,9 @@ describe('SequenceBox', function() {
     });
   });
 
-  describe('menus', function() {
-    it('are replaced by the menus of the last field', function() {
-      var field = createField({
+  describe('menus', () => {
+    it('are replaced by the menus of the last field', () => {
+      let field = createField({
         menus: [{
           objectType: 'Menu',
           text: 'seq menu'

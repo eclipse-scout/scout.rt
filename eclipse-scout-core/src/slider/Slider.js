@@ -61,7 +61,7 @@ export default class Slider extends Widget {
   }
 
   _renderValue() {
-    var value = scout.nvl(this.value, 0);
+    let value = scout.nvl(this.value, 0);
     this.$sliderInput.val(value);
     this.$sliderValue.text(value);
   }
@@ -91,7 +91,7 @@ export default class Slider extends Widget {
   }
 
   _onValueChange(event) {
-    var n = Number(this.$sliderInput.val());
+    let n = Number(this.$sliderInput.val());
     // Ensure valid number
     if (!objects.isNumber(n)) {
       n = scout.nvl(this.maxValue, this.minValue, 0);

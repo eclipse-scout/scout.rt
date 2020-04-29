@@ -72,7 +72,7 @@ export default class ResponsiveHandler {
    * Before a transformation can be enabled, it has to be registered first.
    */
   _enableTransformation(state, transformationId) {
-    var transformationIds = this.enabledTransformations[state];
+    let transformationIds = this.enabledTransformations[state];
     if (!transformationIds) {
       transformationIds = [];
       this.enabledTransformations[state] = transformationIds;
@@ -114,8 +114,8 @@ export default class ResponsiveHandler {
     this.oldState = this.state;
     this.state = newState;
 
-    var oldTransformations;
-    var newTransformations;
+    let oldTransformations;
+    let newTransformations;
     if (this.oldState !== this.state) {
       oldTransformations = this.enabledTransformations[this.oldState] || [];
       newTransformations = this.enabledTransformations[this.state] || [];
@@ -152,13 +152,13 @@ export default class ResponsiveHandler {
   }
 
   _transformWidget(widget) {
-    this._transformationsToApply.forEach(function(transformationType) {
+    this._transformationsToApply.forEach(transformationType => {
       this.transformations[transformationType](widget, true);
-    }.bind(this));
+    });
 
-    this._transformationsToReset.forEach(function(transformationType) {
+    this._transformationsToReset.forEach(transformationType => {
       this.transformations[transformationType](widget, false);
-    }.bind(this));
+    });
   }
 
   /* --- HANDLERS ------------------------------------------------------------- */

@@ -63,13 +63,13 @@ export default class DatePicker extends Widget {
   }
 
   prependMonth(month) {
-    var months = this.months.slice();
+    let months = this.months.slice();
     arrays.insert(months, month, 0);
     this.setMonths(months);
   }
 
   appendMonth(month) {
-    var months = this.months.slice();
+    let months = this.months.slice();
     months.push(month);
     this.setMonths(months);
   }
@@ -79,20 +79,20 @@ export default class DatePicker extends Widget {
    */
   resetMonths(viewDate) {
     viewDate = viewDate || this.viewDate;
-    var prevDate = dates.shift(viewDate, 0, -1, 0);
-    var nextDate = dates.shift(viewDate, 0, 1, 0);
+    let prevDate = dates.shift(viewDate, 0, -1, 0);
+    let nextDate = dates.shift(viewDate, 0, 1, 0);
     this.setMonths([prevDate, viewDate, nextDate]);
   }
 
   setMonths(months) {
     months = arrays.ensure(months);
     months = months.map(function(month) {
-      var viewDate = month;
+      let viewDate = month;
       if (!(month instanceof Date)) {
         viewDate = month.viewDate;
       }
       // Use existing month object (so that $container won't be removed, see below)
-      var existingMonth = this._findMonthByViewDate(viewDate);
+      let existingMonth = this._findMonthByViewDate(viewDate);
       if (existingMonth) {
         return existingMonth;
       }
@@ -105,7 +105,7 @@ export default class DatePicker extends Widget {
 
     // Remove the obsolete months
     if (this.rendered) {
-      this.months.forEach(function(month) {
+      this.months.forEach(month => {
         if (months.indexOf(month) < 0 && month.rendered) {
           month.$container.remove();
         }
@@ -129,7 +129,7 @@ export default class DatePicker extends Widget {
     }, this);
 
     // Adjust size and position of the scrollable
-    var scrollableWidth = this.months.length * this._boxWidth;
+    let scrollableWidth = this.months.length * this._boxWidth;
     this.$scrollable.width(scrollableWidth);
     if (this.currentMonth) {
       this.$scrollable.cssLeft(this._scrollableLeftForMonth(this.currentMonth));
@@ -137,7 +137,7 @@ export default class DatePicker extends Widget {
   }
 
   _findMonthByViewDate(viewDate) {
-    return arrays.find(this.months, function(month) {
+    return arrays.find(this.months, month => {
       return dates.compareMonths(month.viewDate, viewDate) === 0;
     });
   }
@@ -146,8 +146,8 @@ export default class DatePicker extends Widget {
    * @returns {number} the x coordinate of the scrollable if the given month should be displayed
    */
   _scrollableLeftForMonth(month) {
-    var scrollableInsets = graphics.insets(this.$scrollable);
-    var monthMargins = graphics.margins(month.$container);
+    let scrollableInsets = graphics.insets(this.$scrollable);
+    let monthMargins = graphics.margins(month.$container);
     return -1 * (month.$container.position().left - monthMargins.left - scrollableInsets.left);
   }
 
@@ -156,7 +156,7 @@ export default class DatePicker extends Widget {
       return;
     }
 
-    var $box = this.$parent.makeDiv('date-picker-month-box');
+    let $box = this.$parent.makeDiv('date-picker-month-box');
     this._build$DateBox(month.viewDate).appendTo($box);
     $box.on('DOMMouseScroll mousewheel', this._onMouseWheel.bind(this))
       .appendTo(this.$scrollable);
@@ -185,8 +185,8 @@ export default class DatePicker extends Widget {
   }
 
   _renderViewDate(animated) {
-    var month = this._findMonthByViewDate(this.viewDate);
-    var newLeft = this._scrollableLeftForMonth(month);
+    let month = this._findMonthByViewDate(this.viewDate);
+    let newLeft = this._scrollableLeftForMonth(month);
     if (!this.currentMonth) {
       // The first time a month is rendered, revalidate the layout.
       // Reason: When the popup opens, the datepicker is not rendered yet, thus the preferred size cannot be determined
@@ -206,9 +206,9 @@ export default class DatePicker extends Widget {
         .stop(true)
         .animate({
           left: newLeft
-        }, 300, function() {
+        }, 300, () => {
           this.resetMonths();
-        }.bind(this));
+        });
     }
   }
 
@@ -232,14 +232,14 @@ export default class DatePicker extends Widget {
     if (!this.currentMonth) {
       return;
     }
-    var $box = this.currentMonth.$container;
-    $box.find('.date-picker-day').each(function(i, elem) {
-      var $day = $(elem);
+    let $box = this.currentMonth.$container;
+    $box.find('.date-picker-day').each((i, elem) => {
+      let $day = $(elem);
       $day.removeClass('preselected');
       if (dates.isSameDay(this.preselectedDate, $day.data('date'))) {
         $day.addClass('preselected');
       }
-    }.bind(this));
+    });
   }
 
   selectDate(date, animated) {
@@ -262,14 +262,14 @@ export default class DatePicker extends Widget {
     if (!this.currentMonth) {
       return;
     }
-    var $box = this.currentMonth.$container;
-    $box.find('.date-picker-day').each(function(i, elem) {
-      var $day = $(elem);
+    let $box = this.currentMonth.$container;
+    $box.find('.date-picker-day').each((i, elem) => {
+      let $day = $(elem);
       $day.removeClass('selected');
       if (dates.isSameDay(this.selectedDate, $day.data('date'))) {
         $day.addClass('selected');
       }
-    }.bind(this));
+    });
   }
 
   /**
@@ -278,7 +278,7 @@ export default class DatePicker extends Widget {
    * @param {boolean} [animated] - Default is true
    */
   showDate(viewDate, animated) {
-    var viewDateDiff = 0;
+    let viewDateDiff = 0;
     if (this.viewDate) {
       viewDateDiff = dates.compareMonths(viewDate, this.viewDate);
     }
@@ -302,13 +302,13 @@ export default class DatePicker extends Widget {
   }
 
   shiftViewDate(years, months, days) {
-    var date = this.viewDate;
+    let date = this.viewDate;
     date = dates.shift(date, years, months, days);
     this.showDate(date);
   }
 
   shiftSelectedDate(years, months, days) {
-    var date = this.preselectedDate;
+    let date = this.preselectedDate;
 
     if (this.selectedDate) {
       if (this.allowedDates) {
@@ -326,7 +326,7 @@ export default class DatePicker extends Widget {
   }
 
   _findNextAllowedDate(years, months, days) {
-    var i, date,
+    let i, date,
       sum = years + months + days,
       dir = sum > 0 ? 1 : -1,
       now = this.selectedDate || dates.trunc(new Date());
@@ -364,35 +364,35 @@ export default class DatePicker extends Widget {
       return true;
     }
     // when allowedDates is set, only dates contained in this array are allowed
-    var allowedDateAsTimestamp,
+    let allowedDateAsTimestamp,
       dateAsTimestamp = date.getTime();
-    return this.allowedDates.some(function(allowedDate) {
+    return this.allowedDates.some(allowedDate => {
       allowedDateAsTimestamp = allowedDate.getTime();
       return allowedDateAsTimestamp === dateAsTimestamp;
     });
   }
 
   _build$DateBox(viewDate) {
-    var cl, i, day, dayEnabled, dayInMonth, $day,
+    let cl, i, day, dayEnabled, dayInMonth, $day,
       now = new Date(),
       start = new Date(viewDate),
       weekdays = this.dateFormat.symbols.weekdaysShortOrdered;
 
-    var $box = this.$container
+    let $box = this.$container
       .makeDiv('date-picker-month')
       .data('viewDate', viewDate);
 
     // Create weekday header
-    var $weekdays = $box.appendDiv('date-picker-weekdays');
-    weekdays.forEach(function(weekday) {
+    let $weekdays = $box.appendDiv('date-picker-weekdays');
+    weekdays.forEach(weekday => {
       $weekdays.appendDiv('date-picker-weekday', weekday);
     });
 
     // Find start date (-1)
-    var $week;
-    for (var offset = 0; offset < 42; offset++) {
+    let $week;
+    for (let offset = 0; offset < 42; offset++) {
       start.setDate(start.getDate() - 1);
-      var diff = new Date(start.getYear(), viewDate.getMonth(), 0).getDate() - start.getDate();
+      let diff = new Date(start.getYear(), viewDate.getMonth(), 0).getDate() - start.getDate();
       if ((start.getDay() === 0) && (start.getMonth() !== viewDate.getMonth()) && (diff > 1)) {
         break;
       }
@@ -451,7 +451,7 @@ export default class DatePicker extends Widget {
   }
 
   _append$Header() {
-    var headerHtml =
+    let headerHtml =
       '<div class="date-picker-header">' +
       '  <div class="date-picker-left-y" data-shift="-12"></div>' +
       '  <div class="date-picker-left-m" data-shift="-1"></div>' +
@@ -469,44 +469,44 @@ export default class DatePicker extends Widget {
   }
 
   _createHeaderText(viewDate) {
-    var months = this.dateFormat.symbols.months;
+    let months = this.dateFormat.symbols.months;
     return months[viewDate.getMonth()] + ' ' + viewDate.getFullYear();
   }
 
   _registerSwipeHandlers() {
-    var $window = this.$scrollable.window();
+    let $window = this.$scrollable.window();
 
-    this.$scrollable.on('touchmove', function(event) {
+    this.$scrollable.on('touchmove', event => {
       // prevent scrolling the background when swiping the date picker (iOS)
       event.preventDefault();
     });
 
-    this.$scrollable.on('remove', function(event) {
+    this.$scrollable.on('remove', event => {
       $window.off('.datepickerDrag');
     });
 
-    this.$scrollable.on(events.touchdown(this.touch), function(event) {
-      var origPageX = events.pageX(event);
-      var moveX = 0;
+    this.$scrollable.on(events.touchdown(this.touch), event => {
+      let origPageX = events.pageX(event);
+      let moveX = 0;
 
       // stop pending animations, otherwise the months may be removed by the animation stop handler before touchend is executed
       this.$scrollable.stop(true);
 
       // Prepare months. On the first swipe the 3 boxes are already rendered, so nothing happens when setMonths is called.
       // But on a subsequent swipe (while the pane is still moving) the next month needs to be rendered.
-      var prevDate = dates.shift(this.viewDate, 0, -1, 0);
-      var nextDate = dates.shift(this.viewDate, 0, 1, 0);
+      let prevDate = dates.shift(this.viewDate, 0, -1, 0);
+      let nextDate = dates.shift(this.viewDate, 0, 1, 0);
       this.setMonths([prevDate, this.viewDate, nextDate]);
-      var scrollableLeft = this.$scrollable.position().left;
+      let scrollableLeft = this.$scrollable.position().left;
 
       this.swiped = false;
-      var started = true;
+      let started = true;
 
-      $window.on(events.touchmove(this.touch, 'datepickerDrag'), function(event) {
-        var pageX = events.pageX(event);
+      $window.on(events.touchmove(this.touch, 'datepickerDrag'), event => {
+        let pageX = events.pageX(event);
         moveX = pageX - origPageX;
-        var newScrollableLeft = scrollableLeft + moveX;
-        var minX = this.$container.width() - this.$scrollable.outerWidth();
+        let newScrollableLeft = scrollableLeft + moveX;
+        let minX = this.$container.width() - this.$scrollable.outerWidth();
 
         // limit the drag range
         newScrollableLeft = Math.max(Math.min(newScrollableLeft, 0), minX);
@@ -515,9 +515,9 @@ export default class DatePicker extends Widget {
         if (newScrollableLeft !== scrollableLeft) {
           this.$scrollable.cssLeft(newScrollableLeft);
         }
-      }.bind(this));
+      });
 
-      $window.on(events.touchendcancel(this.touch, 'datepickerDrag'), function(event) {
+      $window.on(events.touchendcancel(this.touch, 'datepickerDrag'), event => {
         $window.off('.datepickerDrag');
         if (!started) {
           // On iOS touchcancel and touchend are fired right after each other when swiping twice very fast -> Ignore the second event
@@ -526,8 +526,8 @@ export default class DatePicker extends Widget {
         started = false;
 
         // If the movement is less than this value (in px), the swipe won't happen. Instead, the value is selected.
-        var minMove = 5;
-        var viewDate = this.viewDate;
+        let minMove = 5;
+        let viewDate = this.viewDate;
 
         // Detect in which direction the swipe happened
         if (moveX < -minMove) {
@@ -542,13 +542,13 @@ export default class DatePicker extends Widget {
           this.swiped = true;
           this.setViewDate(viewDate);
         }
-      }.bind(this));
-    }.bind(this));
+      });
+    });
   }
 
   _onNavigationMouseDown(event) {
-    var $target = $(event.currentTarget);
-    var diff = $target.data('shift');
+    let $target = $(event.currentTarget);
+    let diff = $target.data('shift');
     this.shiftViewDate(0, diff, 0);
   }
 
@@ -557,8 +557,8 @@ export default class DatePicker extends Widget {
       // Don't handle on a swipe action
       return;
     }
-    var $target = $(event.currentTarget);
-    var date = $target.data('date');
+    let $target = $(event.currentTarget);
+    let date = $target.data('date');
     this.selectDate(date);
     this.trigger('dateSelect', {
       date: date
@@ -567,8 +567,8 @@ export default class DatePicker extends Widget {
 
   _onMouseWheel(event) {
     event = event.originalEvent || this.$container.window(true).event.originalEvent;
-    var wheelData = event.wheelDelta ? event.wheelDelta / 10 : -event.detail * 3;
-    var diff = (wheelData >= 0 ? -1 : 1);
+    let wheelData = event.wheelDelta ? event.wheelDelta / 10 : -event.detail * 3;
+    let diff = (wheelData >= 0 ? -1 : 1);
     this.shiftViewDate(0, diff, 0);
     event.preventDefault();
   }

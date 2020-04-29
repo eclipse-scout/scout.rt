@@ -11,10 +11,10 @@
 import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
 import {arrays, Desktop, Device, Form, RemoteEvent, scout, Status, strings, Widget} from '../../src/index';
 
-describe('Desktop', function() {
-  var session, desktop, outlineHelper, formHelper;
+describe('Desktop', () => {
+  let session, desktop, outlineHelper, formHelper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession({
       desktop: {
@@ -30,11 +30,11 @@ describe('Desktop', function() {
     desktop.viewButtons = [];
   });
 
-  describe('notification', function() {
-    var ntfc,
+  describe('notification', () => {
+    let ntfc,
       parent = new Widget();
 
-    beforeEach(function() {
+    beforeEach(() => {
       parent.session = session;
       ntfc = scout.create('DesktopNotification', {
         id: 'theID',
@@ -43,7 +43,7 @@ describe('Desktop', function() {
       });
     });
 
-    it('is rendered when desktop is rendered', function() {
+    it('is rendered when desktop is rendered', () => {
       desktop.notifications.push(ntfc);
       expect(desktop.notifications.indexOf(ntfc)).toBe(0);
       expect(ntfc.rendered).toBe(false);
@@ -52,7 +52,7 @@ describe('Desktop', function() {
       expect(ntfc.rendered).toBe(true);
     });
 
-    it('may be added with addNotification', function() {
+    it('may be added with addNotification', () => {
       session._renderDesktop();
       spyOn(ntfc, 'fadeIn').and.callThrough();
       desktop.addNotification(ntfc);
@@ -62,7 +62,7 @@ describe('Desktop', function() {
       expect(desktop.$notification).not.toBe(null);
     });
 
-    it('schedules addNotification when desktop is not rendered', function() {
+    it('schedules addNotification when desktop is not rendered', () => {
       scout.create('DesktopNotification', {
         parent: desktop,
         status: {
@@ -80,7 +80,7 @@ describe('Desktop', function() {
       expect(desktop.$container.find('.desktop-notifications').length).toBe(1);
     });
 
-    it('removeNotification with object', function() {
+    it('removeNotification with object', () => {
       session._renderDesktop();
       spyOn(ntfc, 'fadeOut').and.callThrough();
       desktop.addNotification(ntfc); // first add -> create $notifications DIV
@@ -88,7 +88,7 @@ describe('Desktop', function() {
       expect(ntfc.fadeOut).toHaveBeenCalled();
     });
 
-    it('removeNotification with (string) ID', function() {
+    it('removeNotification with (string) ID', () => {
       session._renderDesktop();
       spyOn(ntfc, 'fadeOut').and.callThrough();
       desktop.addNotification(ntfc); // first add -> create $notifications DIV
@@ -96,7 +96,7 @@ describe('Desktop', function() {
       expect(ntfc.fadeOut).toHaveBeenCalled();
     });
 
-    it('_onNotificationRemove - last notifications removes $notifications DIV', function() {
+    it('_onNotificationRemove - last notifications removes $notifications DIV', () => {
       session._renderDesktop();
       desktop.addNotification(ntfc); // first add -> create $notifications DIV
       desktop.removeNotification(ntfc);
@@ -107,12 +107,12 @@ describe('Desktop', function() {
     });
   });
 
-  describe('outline', function() {
+  describe('outline', () => {
 
-    it('is displayed in desktop navigation', function() {
+    it('is displayed in desktop navigation', () => {
       session._renderDesktop();
-      var model = outlineHelper.createModelFixture(3, 2);
-      var outline = outlineHelper.createOutline(model);
+      let model = outlineHelper.createModelFixture(3, 2);
+      let outline = outlineHelper.createOutline(model);
 
       expect(desktop.outline).toBeFalsy();
       expect(outline.rendered).toBe(false);
@@ -125,13 +125,13 @@ describe('Desktop', function() {
 
   });
 
-  describe('benchVisible', function() {
+  describe('benchVisible', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       session._renderDesktop();
     });
 
-    it('controls visibility of the bench', function() {
+    it('controls visibility of the bench', () => {
       expect(desktop.benchVisible).toBe(true);
       expect(desktop.bench.rendered).toBe(true);
 
@@ -145,10 +145,10 @@ describe('Desktop', function() {
       expect(desktop.bench.rendered).toBe(true);
     });
 
-    it('removes the content after the animation', function() {
+    it('removes the content after the animation', () => {
       jasmine.clock().install();
-      var form = formHelper.createFormWithOneField();
-      var tabBox = desktop.bench.getTabBox('C');
+      let form = formHelper.createFormWithOneField();
+      let tabBox = desktop.bench.getTabBox('C');
       form.displayHint = Form.DisplayHint.VIEW;
       desktop.showForm(form);
 
@@ -178,9 +178,9 @@ describe('Desktop', function() {
 
   });
 
-  describe('navigationVisible', function() {
+  describe('navigationVisible', () => {
 
-    it('controls visibility of the navigation', function() {
+    it('controls visibility of the navigation', () => {
       session._renderDesktop();
       expect(desktop.navigationVisible).toBe(true);
       expect(desktop.navigation.rendered).toBe(true);
@@ -196,10 +196,10 @@ describe('Desktop', function() {
       expect(desktop.navigation.rendered).toBe(true);
     });
 
-    it('only affects content in navigation, not in bench or header', function() {
+    it('only affects content in navigation, not in bench or header', () => {
       session._renderDesktop();
-      var outline = outlineHelper.createOutlineWithOneDetailForm();
-      var detailForm = outline.nodes[0].detailForm;
+      let outline = outlineHelper.createOutlineWithOneDetailForm();
+      let detailForm = outline.nodes[0].detailForm;
       // because outline is the owner, it is parent as well if created by server -> simulate this
       detailForm.setParent(outline);
 
@@ -224,34 +224,34 @@ describe('Desktop', function() {
       expect(detailForm.$container.parent()[0]).toBe(desktop.bench.getTabBox('C').$viewContent[0]);
     });
 
-    it('does not remove dialogs, message boxes and file choosers with display parent outline', function(done) {
+    it('does not remove dialogs, message boxes and file choosers with display parent outline', done => {
       session._renderDesktop();
-      var outline = outlineHelper.createOutline();
+      let outline = outlineHelper.createOutline();
       desktop.setOutline(outline);
-      var msgBox = scout.create('MessageBox', {
+      let msgBox = scout.create('MessageBox', {
         parent: outline,
         displayParent: outline
       });
       msgBox.open();
-      var fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create('FileChooser', {
         parent: outline,
         displayParent: outline
       });
       fileChooser.open();
-      var dialog = formHelper.createFormWithOneField({
+      let dialog = formHelper.createFormWithOneField({
         parent: outline,
         displayParent: outline
       });
-      var promises = [];
+      let promises = [];
       promises.push(dialog.open());
-      var view = formHelper.createFormWithOneField({
+      let view = formHelper.createFormWithOneField({
         parent: outline,
         displayHint: Form.DisplayHint.VIEW,
         displayParent: outline,
         modal: true
       });
       promises.push(view.open());
-      $.promiseAll(promises).then(function() {
+      $.promiseAll(promises).then(() => {
         expect(desktop.navigationVisible).toBe(true);
         expect(desktop.navigation.rendered).toBe(true);
         expect(desktop.navigation.$body.children('.glasspane').length).toBe(4); // Every glass pane renderer added one
@@ -292,12 +292,12 @@ describe('Desktop', function() {
         .always(done);
     });
 
-    it('does not remove message boxes with display parent outline', function() {
+    it('does not remove message boxes with display parent outline', () => {
       session._renderDesktop();
-      var outline = outlineHelper.createOutline();
+      let outline = outlineHelper.createOutline();
       desktop.setOutline(outline);
 
-      var msgBox = scout.create('MessageBox', {
+      let msgBox = scout.create('MessageBox', {
         parent: outline,
         displayParent: outline
       });
@@ -330,11 +330,11 @@ describe('Desktop', function() {
       expect(session.focusManager._glassPaneTargets.length).toBe(0);
     });
 
-    it('does not remove file choosers with display parent outline', function() {
+    it('does not remove file choosers with display parent outline', () => {
       session._renderDesktop();
-      var outline = outlineHelper.createOutline();
+      let outline = outlineHelper.createOutline();
       desktop.setOutline(outline);
-      var fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create('FileChooser', {
         parent: outline,
         displayParent: outline
       });
@@ -367,7 +367,7 @@ describe('Desktop', function() {
       expect(session.focusManager._glassPaneTargets.length).toBe(0);
     });
 
-    it('does not remove dialogs with display parent outline even when rendered along with the outline', function() {
+    it('does not remove dialogs with display parent outline even when rendered along with the outline', () => {
       // Simulate startup / reload case
       session = sandboxSession({
         desktop: {
@@ -391,8 +391,8 @@ describe('Desktop', function() {
         }
       });
       desktop = session.desktop;
-      var outline = desktop.outline;
-      var dialog = outline.dialogs[0];
+      let outline = desktop.outline;
+      let dialog = outline.dialogs[0];
       expect(desktop.navigationVisible).toBe(true);
       expect(desktop.navigation.rendered).toBe(true);
       expect(dialog.rendered).toBe(true);
@@ -409,7 +409,7 @@ describe('Desktop', function() {
       dialog.close();
     });
 
-    it('does not remove message boxes with display parent outline even when rendered along with the outline', function() {
+    it('does not remove message boxes with display parent outline even when rendered along with the outline', () => {
       // Simulate startup / reload case
       session = sandboxSession({
         desktop: {
@@ -428,8 +428,8 @@ describe('Desktop', function() {
         }
       });
       desktop = session.desktop;
-      var outline = desktop.outline;
-      var msgBox = outline.messageBoxes[0];
+      let outline = desktop.outline;
+      let msgBox = outline.messageBoxes[0];
       expect(desktop.navigationVisible).toBe(true);
       expect(desktop.navigation.rendered).toBe(true);
       expect(msgBox.rendered).toBe(true);
@@ -446,7 +446,7 @@ describe('Desktop', function() {
       msgBox.close();
     });
 
-    it('does not remove file choosers with display parent outline even when rendered along with the outline', function() {
+    it('does not remove file choosers with display parent outline even when rendered along with the outline', () => {
       // Simulate startup / reload case
       session = sandboxSession({
         desktop: {
@@ -465,8 +465,8 @@ describe('Desktop', function() {
         }
       });
       desktop = session.desktop;
-      var outline = desktop.outline;
-      var fileChooser = outline.fileChoosers[0];
+      let outline = desktop.outline;
+      let fileChooser = outline.fileChoosers[0];
       expect(desktop.navigationVisible).toBe(true);
       expect(desktop.navigation.rendered).toBe(true);
       expect(fileChooser.rendered).toBe(true);
@@ -485,13 +485,13 @@ describe('Desktop', function() {
 
   });
 
-  describe('headerVisible', function() {
+  describe('headerVisible', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       session._renderDesktop();
     });
 
-    it('controls visibility of the header', function() {
+    it('controls visibility of the header', () => {
       expect(desktop.headerVisible).toBe(true);
       expect(desktop.header.rendered).toBe(true);
 
@@ -506,11 +506,11 @@ describe('Desktop', function() {
       expect(desktop.header.rendered).toBe(true);
     });
 
-    it('correctly restores view tabs', function() {
-      var form = formHelper.createViewWithOneField();
+    it('correctly restores view tabs', () => {
+      let form = formHelper.createViewWithOneField();
       form.title = 'title';
       desktop.showForm(form);
-      var tab = desktop.header.tabArea.tabs[0];
+      let tab = desktop.header.tabArea.tabs[0];
       expect(tab.view).toBe(form);
       expect(tab.rendered).toBe(true);
       expect(tab.selected).toBe(true);
@@ -529,19 +529,19 @@ describe('Desktop', function() {
 
   });
 
-  describe('geolocation', function() {
+  describe('geolocation', () => {
 
-    var browserImpl;
+    let browserImpl;
     if (!navigator.geolocation) {
       navigator.geolocation = {
-        getCurrentPosition: function() {
+        getCurrentPosition: () => {
         }
       };
     }
     browserImpl = navigator.geolocation.getCurrentPosition;
 
-    beforeEach(function() {
-      navigator.geolocation.getCurrentPosition = function(success, error) {
+    beforeEach(() => {
+      navigator.geolocation.getCurrentPosition = (success, error) => {
         success({
           coords: {
             latitude: 1,
@@ -553,9 +553,9 @@ describe('Desktop', function() {
       jasmine.clock().install();
     });
 
-    it('asks the browser for its geographic location', function() {
+    it('asks the browser for its geographic location', () => {
       expect(Device.get().supportsGeolocation()).toBe(true);
-      var message = {
+      let message = {
         events: [{
           target: session.desktop.id,
           type: 'requestGeolocation'
@@ -565,15 +565,15 @@ describe('Desktop', function() {
       session._processSuccessResponse(message);
       sendQueuedAjaxCalls();
 
-      var requestData = mostRecentJsonRequest();
-      var expectedEvent = new RemoteEvent(session.desktop.id, 'geolocationDetermined', {
+      let requestData = mostRecentJsonRequest();
+      let expectedEvent = new RemoteEvent(session.desktop.id, 'geolocationDetermined', {
         latitude: 1,
         longitude: 1
       });
       expect(requestData).toContainEvents(expectedEvent);
     });
 
-    afterEach(function() {
+    afterEach(() => {
       navigator.geolocation.getCurrentPosition = browserImpl;
       jasmine.Ajax.uninstall();
       jasmine.clock().uninstall();
@@ -581,29 +581,29 @@ describe('Desktop', function() {
 
   });
 
-  describe('showForm', function() {
+  describe('showForm', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       session._renderDesktop();
     });
 
-    it('shows and activates the form', function() {
+    it('shows and activates the form', () => {
       expect(desktop.activeForm).toBe(null);
 
-      var form = formHelper.createFormWithOneField();
+      let form = formHelper.createFormWithOneField();
       desktop.showForm(form);
       expect(form.rendered).toBe(true);
       expect(desktop.activeForm).toBe(form);
 
-      var anotherForm = formHelper.createFormWithOneField();
+      let anotherForm = formHelper.createFormWithOneField();
       desktop.showForm(anotherForm);
       expect(form.rendered).toBe(true);
       expect(desktop.activeForm).toBe(anotherForm);
     });
 
-    it('adds a view to the bench if displayHint is View', function() {
-      var form = formHelper.createFormWithOneField();
-      var tabBox = desktop.bench.getTabBox('C');
+    it('adds a view to the bench if displayHint is View', () => {
+      let form = formHelper.createFormWithOneField();
+      let tabBox = desktop.bench.getTabBox('C');
       form.displayHint = Form.DisplayHint.VIEW;
       desktop.showForm(form);
 
@@ -613,42 +613,38 @@ describe('Desktop', function() {
     });
   });
 
-  describe('activateForm', function() {
+  describe('activateForm', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       session._renderDesktop();
     });
 
-    var desktopOverlayHtmlElements = function() {
-      return desktop.$container.children('.overlay-separator').nextAll().toArray();
-    };
+    let desktopOverlayHtmlElements = () => desktop.$container.children('.overlay-separator').nextAll().toArray();
 
-    var formElt = function(form) {
-      return form.$container[0];
-    };
+    let formElt = form => form.$container[0];
 
-    var widgetHtmlElements = function(forms) {
-      var formElts = [];
-      forms.forEach(function(form) {
+    let widgetHtmlElements = forms => {
+      let formElts = [];
+      forms.forEach(form => {
         formElts.push(form.$container[0]);
       });
       return formElts;
     };
 
-    it('brings non-modal dialog in front upon activation', function() {
+    it('brings non-modal dialog in front upon activation', () => {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField({
+      let dialog0 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField({
+      let dialog1 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField({
+      let dialog2 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog2);
@@ -663,16 +659,16 @@ describe('Desktop', function() {
       expect(desktop.activeForm).toBe(dialog0);
     });
 
-    it('keeps the order of other non-modal dialogs even when one of them is the display-parent of the dialog to activate', function() {
+    it('keeps the order of other non-modal dialogs even when one of them is the display-parent of the dialog to activate', () => {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField({
+      let dialog0 = formHelper.createFormWithOneField({
         modal: false,
         cssClass: 'DIALOG0'
       });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField({
+      let dialog1 = formHelper.createFormWithOneField({
         modal: false,
         cssClass: 'DIALOG1',
         parent: dialog0,
@@ -680,7 +676,7 @@ describe('Desktop', function() {
       });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField({
+      let dialog2 = formHelper.createFormWithOneField({
         modal: false,
         cssClass: 'DIALOG2'
       });
@@ -692,12 +688,12 @@ describe('Desktop', function() {
       expect(desktop.activeForm).toBe(dialog1);
     });
 
-    it('activates outline when activating dialog of other outline', function() {
-      var outline1 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+    it('activates outline when activating dialog of other outline', () => {
+      let outline1 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
       desktop.setOutline(outline1);
-      var outline2 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+      let outline2 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
 
-      var dialog1 = formHelper.createFormWithOneField({
+      let dialog1 = formHelper.createFormWithOneField({
         modal: false
       });
       dialog1.setCssClass('DIALOG1');
@@ -705,7 +701,7 @@ describe('Desktop', function() {
       dialog1.displayParent = outline1;
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField({
+      let dialog2 = formHelper.createFormWithOneField({
         modal: false
       });
       dialog2.setCssClass('DIALOG2');
@@ -729,12 +725,12 @@ describe('Desktop', function() {
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog2, dialog1]));
     });
 
-    it('activates outline when activating child dialog of other\'s outline dialog', function() {
-      var outline1 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+    it('activates outline when activating child dialog of other\'s outline dialog', () => {
+      let outline1 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
       desktop.setOutline(outline1);
-      var outline2 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+      let outline2 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
 
-      var dialog1 = formHelper.createFormWithOneField({
+      let dialog1 = formHelper.createFormWithOneField({
         modal: false
       });
       dialog1.setCssClass('DIALOG1');
@@ -742,7 +738,7 @@ describe('Desktop', function() {
       dialog1.displayParent = outline1;
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField({
+      let dialog2 = formHelper.createFormWithOneField({
         modal: false
       });
       dialog2.setCssClass('DIALOG2');
@@ -766,20 +762,20 @@ describe('Desktop', function() {
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog2]));
     });
 
-    it('does not bring non-modal dialog in front of desktop-modal dialog', function() {
+    it('does not bring non-modal dialog in front of desktop-modal dialog', () => {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField({
+      let dialog0 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField({
+      let dialog1 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog1);
 
-      var desktopModalDialog = formHelper.createFormWithOneField({
+      let desktopModalDialog = formHelper.createFormWithOneField({
         modal: true
       });
       desktop.showForm(desktopModalDialog);
@@ -792,20 +788,20 @@ describe('Desktop', function() {
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog1, dialog0, desktopModalDialog]));
     });
 
-    it('brings non-modal dialog in front of other non-modal dialog and it\'s modal child-dialog', function() {
+    it('brings non-modal dialog in front of other non-modal dialog and it\'s modal child-dialog', () => {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField({
+      let dialog0 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField({
+      let dialog1 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField({
+      let dialog2 = formHelper.createFormWithOneField({
         modal: true,
         parent: dialog1,
         displayParent: dialog1
@@ -822,25 +818,25 @@ describe('Desktop', function() {
       expect(desktop.activeForm).toBe(dialog0);
     });
 
-    it('brings complete hierarchy of a non-modal dialog with 2-levels of modal child dialogs in front', function() {
+    it('brings complete hierarchy of a non-modal dialog with 2-levels of modal child dialogs in front', () => {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField({
+      let dialog0 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField({
+      let dialog1 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog1);
 
-      var parentDialog = formHelper.createFormWithOneField({
+      let parentDialog = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(parentDialog);
 
-      var modalChildDialogLevel1 = formHelper.createFormWithOneField({
+      let modalChildDialogLevel1 = formHelper.createFormWithOneField({
         modal: true,
         parent: parentDialog,
         displayParent: parentDialog
@@ -848,7 +844,7 @@ describe('Desktop', function() {
 
       desktop.showForm(modalChildDialogLevel1);
 
-      var modalChildDialogLevel2 = formHelper.createFormWithOneField({
+      let modalChildDialogLevel2 = formHelper.createFormWithOneField({
         modal: true,
         parent: modalChildDialogLevel1,
         displayParent: modalChildDialogLevel1
@@ -895,25 +891,25 @@ describe('Desktop', function() {
       expect(desktop.activeForm).toBe(modalChildDialogLevel2);
     });
 
-    it('keeps position of dialog\'s messagebox relative to it\'s parent dialog while reordering dialogs', function() {
+    it('keeps position of dialog\'s messagebox relative to it\'s parent dialog while reordering dialogs', () => {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField({
+      let dialog0 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField({
+      let dialog1 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField({
+      let dialog2 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog2);
 
-      var messagebox = scout.create('MessageBox', {
+      let messagebox = scout.create('MessageBox', {
         parent: dialog2,
         displayParent: dialog2,
         header: 'Title',
@@ -943,15 +939,15 @@ describe('Desktop', function() {
       expect(desktop.activeForm).toBe(dialog2);
     });
 
-    it('brings dialog with messagebox on top upon mousedown on messagebox', function() {
+    it('brings dialog with messagebox on top upon mousedown on messagebox', () => {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField({
+      let dialog0 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog0);
 
-      var messagebox = scout.create('MessageBox', {
+      let messagebox = scout.create('MessageBox', {
         parent: dialog0,
         displayParent: dialog0,
         header: 'Title',
@@ -961,12 +957,12 @@ describe('Desktop', function() {
       });
       messagebox.open();
 
-      var dialog1 = formHelper.createFormWithOneField({
+      let dialog1 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField({
+      let dialog2 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog2);
@@ -981,25 +977,25 @@ describe('Desktop', function() {
       expect(desktop.activeForm).toBe(dialog0);
     });
 
-    it('keeps desktop\'s messagebox on top while reordering dialogs', function() {
+    it('keeps desktop\'s messagebox on top while reordering dialogs', () => {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField({
+      let dialog0 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField({
+      let dialog1 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField({
+      let dialog2 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog2);
 
-      var messagebox = scout.create('MessageBox', {
+      let messagebox = scout.create('MessageBox', {
         parent: desktop,
         displayParent: desktop,
         header: 'Title',
@@ -1029,25 +1025,25 @@ describe('Desktop', function() {
       expect(desktop.activeForm).toBe(dialog2);
     });
 
-    it('keeps position of dialog\'s fileChooser relative to it\'s parent dialog while reordering dialogs', function() {
+    it('keeps position of dialog\'s fileChooser relative to it\'s parent dialog while reordering dialogs', () => {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField({
+      let dialog0 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField({
+      let dialog1 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField({
+      let dialog2 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog2);
 
-      var fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create('FileChooser', {
         parent: dialog2,
         displayParent: dialog2
       });
@@ -1073,26 +1069,26 @@ describe('Desktop', function() {
       expect(desktop.activeForm).toBe(dialog2);
     });
 
-    it('brings dialog with filechooser on top upon mousedown on filechooser', function() {
+    it('brings dialog with filechooser on top upon mousedown on filechooser', () => {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField({
+      let dialog0 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog0);
 
-      var fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create('FileChooser', {
         parent: dialog0,
         displayParent: dialog0
       });
       fileChooser.open();
 
-      var dialog1 = formHelper.createFormWithOneField({
+      let dialog1 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField({
+      let dialog2 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog2);
@@ -1107,25 +1103,25 @@ describe('Desktop', function() {
       expect(desktop.activeForm).toBe(dialog0);
     });
 
-    it('does not change position of desktop\'s fileChooser while reordering dialogs', function() {
+    it('does not change position of desktop\'s fileChooser while reordering dialogs', () => {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField({
+      let dialog0 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField({
+      let dialog1 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField({
+      let dialog2 = formHelper.createFormWithOneField({
         modal: false
       });
       desktop.showForm(dialog2);
 
-      var fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create('FileChooser', {
         parent: desktop,
         displayParent: desktop
       });
@@ -1151,16 +1147,16 @@ describe('Desktop', function() {
       expect(desktop.activeForm).toBe(dialog2);
     });
 
-    it('activates parent view upon activation of child dialog', function() {
+    it('activates parent view upon activation of child dialog', () => {
       expect(desktop.activeForm).toBe(null);
 
-      var tabBox = desktop.bench.getTabBox('C');
+      let tabBox = desktop.bench.getTabBox('C');
 
-      var viewForm0 = formHelper.createFormWithOneField();
+      let viewForm0 = formHelper.createFormWithOneField();
       viewForm0.displayHint = Form.DisplayHint.VIEW;
       desktop.showForm(viewForm0);
 
-      var dialog0 = formHelper.createFormWithOneField({
+      let dialog0 = formHelper.createFormWithOneField({
         modal: false
       });
       dialog0.parent = viewForm0;
@@ -1171,7 +1167,7 @@ describe('Desktop', function() {
       expect(tabBox.currentView).toEqual(viewForm0);
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0]));
 
-      var viewForm1 = formHelper.createFormWithOneField();
+      let viewForm1 = formHelper.createFormWithOneField();
       viewForm1.displayHint = Form.DisplayHint.VIEW;
       desktop.showForm(viewForm1);
 
@@ -1186,26 +1182,26 @@ describe('Desktop', function() {
     });
   });
 
-  describe('activeForm', function() {
+  describe('activeForm', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       session._renderDesktop();
     });
 
-    it('will be set to the display parent form if dialog closes', function(done) {
-      var dialogParent = formHelper.createFormWithOneField({
+    it('will be set to the display parent form if dialog closes', done => {
+      let dialogParent = formHelper.createFormWithOneField({
         displayHint: 'dialog'
       });
-      var dialog = formHelper.createFormWithOneField({
+      let dialog = formHelper.createFormWithOneField({
         displayHint: 'dialog',
         displayParent: dialogParent
       });
       dialogParent.open()
-        .then(function() {
+        .then(() => {
           expect(desktop.activeForm).toBe(dialogParent);
         })
         .then(dialog.open.bind(dialog))
-        .then(function() {
+        .then(() => {
           expect(desktop.activeForm).toBe(dialog);
 
           dialog.close();
@@ -1215,11 +1211,11 @@ describe('Desktop', function() {
         .always(done);
     });
 
-    it('will send the outline to back', function() {
-      var outline = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+    it('will send the outline to back', () => {
+      let outline = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
       desktop.setOutline(outline);
 
-      var view = formHelper.createFormWithOneField({
+      let view = formHelper.createFormWithOneField({
         displayHint: Form.DisplayHint.VIEW
       });
 
@@ -1234,19 +1230,19 @@ describe('Desktop', function() {
       expect(view.attached).toBe(true);
     });
 
-    it('will be set to currentView if dialog closes and there is no display parent form', function(done) {
-      var view = formHelper.createFormWithOneField({
+    it('will be set to currentView if dialog closes and there is no display parent form', done => {
+      let view = formHelper.createFormWithOneField({
         displayHint: 'view'
       });
-      var dialog = formHelper.createFormWithOneField({
+      let dialog = formHelper.createFormWithOneField({
         displayHint: 'dialog'
       });
       view.open()
-        .then(function() {
+        .then(() => {
           expect(desktop.activeForm).toBe(view);
         })
         .then(dialog.open.bind(dialog))
-        .then(function() {
+        .then(() => {
           expect(desktop.activeForm).toBe(dialog);
 
           dialog.close();
@@ -1256,12 +1252,12 @@ describe('Desktop', function() {
         .always(done);
     });
 
-    it('will be set to undefined if dialog closes and there is no currentView and no display parent', function(done) {
-      var dialog = formHelper.createFormWithOneField({
+    it('will be set to undefined if dialog closes and there is no currentView and no display parent', done => {
+      let dialog = formHelper.createFormWithOneField({
         displayHint: 'dialog'
       });
       dialog.open()
-        .then(function() {
+        .then(() => {
           expect(desktop.activeForm).toBe(dialog);
 
           dialog.close();
@@ -1271,16 +1267,16 @@ describe('Desktop', function() {
         .always(done);
     });
 
-    it('must not be the detail form', function(done) {
-      var outline = outlineHelper.createOutlineWithOneDetailForm();
+    it('must not be the detail form', done => {
+      let outline = outlineHelper.createOutlineWithOneDetailForm();
       desktop.setOutline(outline);
       outline.selectNodes(outline.nodes[0]);
-      var detailForm = outline.nodes[0].detailForm;
-      var dialog = formHelper.createFormWithOneField({
+      let detailForm = outline.nodes[0].detailForm;
+      let dialog = formHelper.createFormWithOneField({
         displayHint: 'dialog'
       });
       dialog.open()
-        .then(function() {
+        .then(() => {
           expect(desktop.activeForm).toBe(dialog);
 
           dialog.close();
@@ -1290,17 +1286,17 @@ describe('Desktop', function() {
         .always(done);
     });
 
-    it('must not be the detail form even if it is the display parent', function(done) {
-      var outline = outlineHelper.createOutlineWithOneDetailForm();
+    it('must not be the detail form even if it is the display parent', done => {
+      let outline = outlineHelper.createOutlineWithOneDetailForm();
       desktop.setOutline(outline);
       outline.selectNodes(outline.nodes[0]);
-      var detailForm = outline.nodes[0].detailForm;
-      var dialog = formHelper.createFormWithOneField({
+      let detailForm = outline.nodes[0].detailForm;
+      let dialog = formHelper.createFormWithOneField({
         displayHint: 'dialog',
         displayParent: detailForm
       });
       dialog.open()
-        .then(function() {
+        .then(() => {
           expect(desktop.activeForm).toBe(dialog);
 
           dialog.close();
@@ -1310,15 +1306,15 @@ describe('Desktop', function() {
         .always(done);
     });
 
-    it('must be a form', function(done) {
-      var outline = outlineHelper.createOutlineWithOneDetailTable();
+    it('must be a form', done => {
+      let outline = outlineHelper.createOutlineWithOneDetailTable();
       desktop.setOutline(outline);
       outline.selectNodes(outline.nodes[0]);
-      var dialog = formHelper.createFormWithOneField({
+      let dialog = formHelper.createFormWithOneField({
         displayHint: 'dialog'
       });
       dialog.open()
-        .then(function() {
+        .then(() => {
           expect(desktop.activeForm).toBe(dialog);
 
           dialog.close();
@@ -1330,11 +1326,11 @@ describe('Desktop', function() {
 
   });
 
-  describe('displayStyle', function() {
+  describe('displayStyle', () => {
 
-    describe('COMPACT', function() {
+    describe('COMPACT', () => {
 
-      beforeEach(function() {
+      beforeEach(() => {
         desktop.displayStyle = Desktop.DisplayStyle.COMPACT;
         // Flags currently only set by server, therefore we need to set them here as well
         desktop.navigationVisible = true;
@@ -1343,8 +1339,8 @@ describe('Desktop', function() {
         session._renderDesktop();
       });
 
-      it('shows bench and hides navigation if a view is open', function() {
-        var form = formHelper.createViewWithOneField();
+      it('shows bench and hides navigation if a view is open', () => {
+        let form = formHelper.createViewWithOneField();
         expect(form.rendered).toBe(false);
         expect(desktop.navigationVisible).toBe(true);
         expect(desktop.benchVisible).toBe(false);
@@ -1357,10 +1353,10 @@ describe('Desktop', function() {
         expect(desktop.headerVisible).toBe(true);
       });
 
-      it('opens the bench again if a view is shown right after the last view was closed', function() {
+      it('opens the bench again if a view is shown right after the last view was closed', () => {
         jasmine.clock().install();
-        var form = formHelper.createViewWithOneField();
-        var form2 = formHelper.createViewWithOneField();
+        let form = formHelper.createViewWithOneField();
+        let form2 = formHelper.createViewWithOneField();
         expect(form.rendered).toBe(false);
         expect(form2.rendered).toBe(false);
         expect(desktop.navigationVisible).toBe(true);
@@ -1384,9 +1380,9 @@ describe('Desktop', function() {
         jasmine.clock().uninstall();
       });
 
-      it('hides bench and shows navigation if the last view gets closed', function() {
-        var form1 = formHelper.createViewWithOneField();
-        var form2 = formHelper.createViewWithOneField();
+      it('hides bench and shows navigation if the last view gets closed', () => {
+        let form1 = formHelper.createViewWithOneField();
+        let form2 = formHelper.createViewWithOneField();
         expect(form1.rendered).toBe(false);
         expect(form2.rendered).toBe(false);
         expect(desktop.navigationVisible).toBe(true);
@@ -1432,13 +1428,13 @@ describe('Desktop', function() {
         expect(desktop.headerVisible).toBe(false);
       });
 
-      it('shows outline dialog again when switching from bench to navigation', function() {
-        var outline = outlineHelper.createOutline();
+      it('shows outline dialog again when switching from bench to navigation', () => {
+        let outline = outlineHelper.createOutline();
         desktop.setOutline(outline);
-        var dialog = formHelper.createFormWithOneField({
+        let dialog = formHelper.createFormWithOneField({
           displayParent: desktop.outline
         });
-        var view = formHelper.createViewWithOneField();
+        let view = formHelper.createViewWithOneField();
         expect(dialog.rendered).toBe(false);
         expect(desktop.navigationVisible).toBe(true);
         expect(desktop.benchVisible).toBe(false);
@@ -1472,8 +1468,8 @@ describe('Desktop', function() {
         expect(desktop.benchVisible).toBe(false);
       });
 
-      it('does not bring activateForm to fail for fake views', function() {
-        var form = formHelper.createFormWithOneField();
+      it('does not bring activateForm to fail for fake views', () => {
+        let form = formHelper.createFormWithOneField();
         form.displayHint = Form.DisplayHint.VIEW;
         scout.create('FormMenu', {
           parent: desktop,
@@ -1488,11 +1484,11 @@ describe('Desktop', function() {
     });
   });
 
-  describe('cancelViewsMenu', function() {
+  describe('cancelViewsMenu', () => {
 
-    var view1, view2, view3, promises;
+    let view1, view2, view3, promises;
 
-    beforeEach(function() {
+    beforeEach(() => {
       session._renderDesktop();
 
       promises = [];
@@ -1520,24 +1516,24 @@ describe('Desktop', function() {
       spyOn(view3, 'ok').and.callThrough();
     });
 
-    afterEach(function() {
+    afterEach(() => {
       view1.close();
       view2.close();
       view3.close();
     });
 
-    it('check open tabs', function() {
+    it('check open tabs', () => {
       expect(desktop.bench.getViews()).toEqual([view1, view2, view3]);
     });
 
-    it('close all open tabs on desktop', function(done) {
+    it('close all open tabs on desktop', done => {
       promises.push(view1.whenClose());
       promises.push(view2.whenClose());
       promises.push(view3.whenClose());
 
       desktop.cancelViews([view1, view2, view3]);
 
-      $.promiseAll(promises).then(function() {
+      $.promiseAll(promises).then(() => {
         expect(view1.close).toHaveBeenCalled();
         expect(view2.close).toHaveBeenCalled();
         expect(view3.close).toHaveBeenCalled();
@@ -1547,13 +1543,13 @@ describe('Desktop', function() {
         .always(done);
     });
 
-    it('close some open tabs on desktop', function(done) {
+    it('close some open tabs on desktop', done => {
       promises.push(view1.whenClose());
       promises.push(view2.whenClose());
 
       desktop.cancelViews([view1, view2]);
 
-      $.promiseAll(promises).then(function() {
+      $.promiseAll(promises).then(() => {
         expect(view1.close).toHaveBeenCalled();
         expect(view2.close).toHaveBeenCalled();
         expect(view3.close).not.toHaveBeenCalled();
@@ -1563,10 +1559,10 @@ describe('Desktop', function() {
         .always(done);
     });
 
-    it('close others and expect to not cancel the display parent of a modal form', function(done) {
+    it('close others and expect to not cancel the display parent of a modal form', done => {
       desktop.activateForm(view1);
       expect(view1.rendered).toBe(true);
-      var modalView = formHelper.createViewWithOneField({
+      let modalView = formHelper.createViewWithOneField({
         title: 'viewModal',
         displayParent: view1,
         modal: true
@@ -1578,7 +1574,7 @@ describe('Desktop', function() {
 
       desktop.bench.getViewTab(modalView)._onCloseOther();
 
-      $.promiseAll(promises).then(function() {
+      $.promiseAll(promises).then(() => {
         expect(view1.close).not.toHaveBeenCalled();
         expect(view2.close).toHaveBeenCalled();
         expect(view3.close).toHaveBeenCalled();
@@ -1588,7 +1584,7 @@ describe('Desktop', function() {
         .always(done);
     });
 
-    it('close tabs and save unsaved changes', function(done) {
+    it('close tabs and save unsaved changes', done => {
       view2.rootGroupBox.fields[0].setValue('Foo');
 
       promises.push(view1.whenClose());
@@ -1598,18 +1594,18 @@ describe('Desktop', function() {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      var unsavedFormChangesForm = arrays.last(desktop.children);
+      let unsavedFormChangesForm = arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
-      var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
-      openFormsField.when('lookupCallDone').then(function() {
+      openFormsField.when('lookupCallDone').then(() => {
         // default is all selected, view2 should be saved
         expect(openFormsField.value.length).toBe(1);
         expect(openFormsField.value[0]).toEqual(view2);
         unsavedFormChangesForm.ok();
       });
 
-      $.promiseAll(promises).then(function() {
+      $.promiseAll(promises).then(() => {
         expect(view1.close).toHaveBeenCalled();
         expect(view2.ok).toHaveBeenCalled();
         expect(desktop.bench.getViews()).toEqual([view3]);
@@ -1618,25 +1614,25 @@ describe('Desktop', function() {
         .always(done);
     });
 
-    it('close tabs and cancel UnsavedFormChangesForm', function(done) {
+    it('close tabs and cancel UnsavedFormChangesForm', done => {
       view2.rootGroupBox.fields[0].setValue('Foo');
 
       desktop.cancelViews([view1, view2]);
       // UnsavedFormChangesForm should be the last child
-      var unsavedFormChangesForm = arrays.last(desktop.children);
+      let unsavedFormChangesForm = arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
-      unsavedFormChangesForm.whenPostLoad().then(function() {
+      unsavedFormChangesForm.whenPostLoad().then(() => {
         unsavedFormChangesForm.close();
       });
 
-      unsavedFormChangesForm.whenClose().then(function() {
+      unsavedFormChangesForm.whenClose().then(() => {
         expect(desktop.bench.getViews()).toEqual([view1, view2, view3]);
       })
         .catch(fail)
         .always(done);
     });
 
-    it('close tabs and dont save unsaved changes', function(done) {
+    it('close tabs and dont save unsaved changes', done => {
       view2.rootGroupBox.fields[0].setValue('Foo');
 
       promises.push(view1.whenClose());
@@ -1645,11 +1641,11 @@ describe('Desktop', function() {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      var unsavedFormChangesForm = arrays.last(desktop.children);
+      let unsavedFormChangesForm = arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
-      var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
-      openFormsField.when('lookupCallDone').then(function() {
+      openFormsField.when('lookupCallDone').then(() => {
         expect(openFormsField.value.length).toBe(1);
         openFormsField.setValue(null);
         unsavedFormChangesForm.ok();
@@ -1657,7 +1653,7 @@ describe('Desktop', function() {
 
       promises.push(unsavedFormChangesForm.whenClose());
 
-      $.promiseAll(promises).then(function() {
+      $.promiseAll(promises).then(() => {
         expect(view1.close).toHaveBeenCalled();
         expect(view2.ok).not.toHaveBeenCalled();
         expect(view2.close).toHaveBeenCalled();
@@ -1667,8 +1663,8 @@ describe('Desktop', function() {
         .always(done);
     });
 
-    it('close tabs when one tab has an open message box', function() {
-      var msgBox = scout.create('MessageBox', {
+    it('close tabs when one tab has an open message box', () => {
+      let msgBox = scout.create('MessageBox', {
         parent: view3,
         displayParent: view3
       });
@@ -1689,11 +1685,11 @@ describe('Desktop', function() {
       jasmine.clock().uninstall();
     });
 
-    it('close tabs with open file chooser and save unsaved changes', function(done) {
+    it('close tabs with open file chooser and save unsaved changes', done => {
       desktop.showForm(view2);
       view2.rootGroupBox.fields[0].setValue('Foo');
 
-      var fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create('FileChooser', {
         parent: view2,
         displayParent: view2
       });
@@ -1708,18 +1704,18 @@ describe('Desktop', function() {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      var unsavedFormChangesForm = arrays.last(desktop.children);
+      let unsavedFormChangesForm = arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
-      var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
-      openFormsField.when('lookupCallDone').then(function() {
+      openFormsField.when('lookupCallDone').then(() => {
         // default is all selected, view2 should be saved
         expect(openFormsField.value.length).toBe(1);
         expect(openFormsField.value[0]).toEqual(view2);
         unsavedFormChangesForm.ok();
       });
 
-      $.promiseAll(promises).then(function() {
+      $.promiseAll(promises).then(() => {
         expect(view1.close).toHaveBeenCalled();
         expect(view2.ok).toHaveBeenCalled();
         expect(fileChooser.close).toHaveBeenCalled();
@@ -1729,8 +1725,8 @@ describe('Desktop', function() {
         .always(done);
     });
 
-    it('close tabs when one tab has an open modal dialog with unsaved changes', function(done) {
-      var modalDialog = formHelper.createFormWithOneField({
+    it('close tabs when one tab has an open modal dialog with unsaved changes', done => {
+      let modalDialog = formHelper.createFormWithOneField({
         parent: view2,
         displayParent: view2
       });
@@ -1751,18 +1747,18 @@ describe('Desktop', function() {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      var unsavedFormChangesForm = arrays.last(desktop.children);
+      let unsavedFormChangesForm = arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
-      var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
-      openFormsField.when('lookupCallDone').then(function() {
+      openFormsField.when('lookupCallDone').then(() => {
         expect(openFormsField.value.length).toBe(1);
         // the sub-form has unsaved changes (modalDialg), in the unsavedFormChangesForm the parent-view should be displayed
         expect(openFormsField.value[0]).toEqual(view2);
         unsavedFormChangesForm.ok();
       });
 
-      $.promiseAll(promises).then(function() {
+      $.promiseAll(promises).then(() => {
         expect(view1.close).toHaveBeenCalled();
         expect(view2.ok).toHaveBeenCalled();
         expect(modalDialog.ok).toHaveBeenCalled();
@@ -1772,8 +1768,8 @@ describe('Desktop', function() {
         .always(done);
     });
 
-    it('close tabs when one tab has an open modal dialog without unsaved changes', function(done) {
-      var modalDialog = formHelper.createFormWithOneField({
+    it('close tabs when one tab has an open modal dialog without unsaved changes', done => {
+      let modalDialog = formHelper.createFormWithOneField({
         parent: view2,
         displayParent: view2,
         modal: true
@@ -1792,7 +1788,7 @@ describe('Desktop', function() {
 
       desktop.cancelViews([view1, view2]);
 
-      $.promiseAll(promises).then(function() {
+      $.promiseAll(promises).then(() => {
         expect(view1.close).toHaveBeenCalled();
         expect(view2.close).toHaveBeenCalled();
         expect(view2.ok).not.toHaveBeenCalled();
@@ -1804,8 +1800,8 @@ describe('Desktop', function() {
         .always(done);
     });
 
-    it('close tabs when one tab has invalid unsaved changes', function() {
-      view2.rootGroupBox.fields[0].setValidator(function(value) {
+    it('close tabs when one tab has invalid unsaved changes', () => {
+      view2.rootGroupBox.fields[0].setValidator(value => {
         if (strings.equalsIgnoreCase(value, 'Foo')) {
           throw new Error('Validation failed');
         }
@@ -1818,11 +1814,11 @@ describe('Desktop', function() {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      var unsavedFormChangesForm = arrays.last(desktop.children);
+      let unsavedFormChangesForm = arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
-      var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
-      openFormsField.when('lookupCallDone').then(function() {
+      openFormsField.when('lookupCallDone').then(() => {
         expect(openFormsField.value.length).toBe(1);
         expect(openFormsField.value[0]).toEqual(view2);
         unsavedFormChangesForm.ok();
@@ -1846,8 +1842,8 @@ describe('Desktop', function() {
       jasmine.clock().uninstall();
     });
 
-    it('close tabs when one tab has a child with invalid unsaved changes', function() {
-      var modalDialog = formHelper.createFormWithOneField({
+    it('close tabs when one tab has a child with invalid unsaved changes', () => {
+      let modalDialog = formHelper.createFormWithOneField({
         parent: view2,
         displayParent: view2,
         modal: true
@@ -1860,7 +1856,7 @@ describe('Desktop', function() {
       spyOn(modalDialog, 'close').and.callThrough();
       spyOn(modalDialog, 'ok').and.callThrough();
 
-      modalDialog.rootGroupBox.fields[0].setValidator(function(value) {
+      modalDialog.rootGroupBox.fields[0].setValidator(value => {
         if (strings.equalsIgnoreCase(value, 'Foo')) {
           throw new Error('Validation failed');
         }
@@ -1872,11 +1868,11 @@ describe('Desktop', function() {
       jasmine.clock().install();
       desktop.cancelViews([view1, view2]);
       // UnsavedFormChangesForm should be the last child
-      var unsavedFormChangesForm = arrays.last(desktop.children);
+      let unsavedFormChangesForm = arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
-      var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
-      openFormsField.when('lookupCallDone').then(function() {
+      openFormsField.when('lookupCallDone').then(() => {
         expect(openFormsField.value.length).toBe(1);
         expect(openFormsField.value[0]).toEqual(view2);
         unsavedFormChangesForm.ok();
@@ -1904,11 +1900,11 @@ describe('Desktop', function() {
 
   });
 
-  describe('modal form', function() {
+  describe('modal form', () => {
 
-    var view1, view2, view3;
+    let view1, view2, view3;
 
-    beforeEach(function() {
+    beforeEach(() => {
       session._renderDesktop();
 
       view1 = formHelper.createViewWithOneField({
@@ -1923,13 +1919,13 @@ describe('Desktop', function() {
       spyOn(view1, 'ok').and.callThrough();
     });
 
-    afterEach(function() {
+    afterEach(() => {
       view1.close();
     });
 
-    it('of a simple form.', function() {
+    it('of a simple form.', () => {
 
-      var viewModal = formHelper.createViewWithOneField({
+      let viewModal = formHelper.createViewWithOneField({
         title: 'viewModal',
         parent: view1,
         displayParent: view1,
@@ -1950,8 +1946,8 @@ describe('Desktop', function() {
 
     });
 
-    it('of a wrapped form', function() {
-      var form = scout.create('Form', {
+    it('of a wrapped form', () => {
+      let form = scout.create('Form', {
         parent: session.desktop,
         id: 'outerForm',
         displayHint: Form.DisplayHint.VIEW,
@@ -1977,9 +1973,9 @@ describe('Desktop', function() {
         }
       });
       desktop.showForm(form);
-      var innerForm = form.widget('wrappedFormField').innerForm;
+      let innerForm = form.widget('wrappedFormField').innerForm;
 
-      var viewModal = formHelper.createViewWithOneField({
+      let viewModal = formHelper.createViewWithOneField({
         title: 'viewModal',
         parent: innerForm,
         displayParent: innerForm,

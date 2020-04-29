@@ -25,7 +25,7 @@ export default class ResponseQueue {
   static FORCE_TIMEOUT = 10 * 1000; // in ms
 
   add(response) {
-    var sequenceNo = response && response['#'];
+    let sequenceNo = response && response['#'];
 
     // Ignore responses that were already processed (duplicate detection)
     if (sequenceNo && sequenceNo <= this.lastProcessedSequenceNo) {
@@ -42,10 +42,10 @@ export default class ResponseQueue {
       this.queue.push(response);
     } else {
       // Insert at correct position (ascending order)
-      var newQueue = [];
-      var responseToInsert = response;
-      for (var i = 0; i < this.queue.length; i++) {
-        var el = this.queue[i];
+      let newQueue = [];
+      let responseToInsert = response;
+      for (let i = 0; i < this.queue.length; i++) {
+        let el = this.queue[i];
         if (el['#']) {
           if (responseToInsert && el['#'] > sequenceNo) {
             // insert at position
@@ -73,12 +73,12 @@ export default class ResponseQueue {
     }
 
     // Process the queue in ascending order
-    var responseSuccess = true;
-    var missingResponse = false;
-    var nonProcessedResponses = [];
-    for (var i = 0; i < this.queue.length; i++) {
-      var el = this.queue[i];
-      var sequenceNo = el['#'];
+    let responseSuccess = true;
+    let missingResponse = false;
+    let nonProcessedResponses = [];
+    for (let i = 0; i < this.queue.length; i++) {
+      let el = this.queue[i];
+      let sequenceNo = el['#'];
 
       // For elements with a sequence number, check if they are in the expected order
       if (sequenceNo) {
@@ -93,7 +93,7 @@ export default class ResponseQueue {
       }
 
       // Handle the element
-      var success = this.session.processJsonResponseInternal(el);
+      let success = this.session.processJsonResponseInternal(el);
       // Only return success value of the response that was passed to the process() call
       if (response && el === response) {
         responseSuccess = success;
@@ -125,10 +125,10 @@ export default class ResponseQueue {
       clearTimeout(this.forceTimeoutId);
       this.forceTimeoutId = null;
     } else if (!this.forceTimeoutId) {
-      this.forceTimeoutId = setTimeout(function() {
+      this.forceTimeoutId = setTimeout(() => {
         try {
-          var s = '[';
-          for (var i = 0; i < this.queue.length; i++) {
+          let s = '[';
+          for (let i = 0; i < this.queue.length; i++) {
             if (i > 0) {
               s += ', ';
             }
@@ -147,7 +147,7 @@ export default class ResponseQueue {
           this.force = false;
           this.forceTimeoutId = null;
         }
-      }.bind(this), ResponseQueue.FORCE_TIMEOUT);
+      }, ResponseQueue.FORCE_TIMEOUT);
     }
   }
 

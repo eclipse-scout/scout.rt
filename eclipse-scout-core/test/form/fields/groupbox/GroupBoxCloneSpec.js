@@ -11,12 +11,12 @@
 import {GroupBox, GroupBoxGridConfig, HorizontalGrid, scout} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('GroupBox', function() {
-  var session;
-  var helper;
-  var cloneHelper;
+describe('GroupBox', () => {
+  let session;
+  let helper;
+  let cloneHelper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
@@ -24,7 +24,7 @@ describe('GroupBox', function() {
   });
 
   function createField(model, parent) {
-    var field = new GroupBox();
+    let field = new GroupBox();
     model.session = session;
     model.parent = parent || session.desktop;
     field.init(model);
@@ -43,10 +43,10 @@ describe('GroupBox', function() {
     }
   }
 
-  describe('clone', function() {
+  describe('clone', () => {
 
-    it('considers the clone properties and deep clones fields and menus', function() {
-      var groupBox = scout.create('GroupBox', {
+    it('considers the clone properties and deep clones fields and menus', () => {
+      let groupBox = scout.create('GroupBox', {
         parent: session.desktop,
         id: 'gb01',
         subLabel: 'abc',
@@ -64,7 +64,7 @@ describe('GroupBox', function() {
           objectType: 'Menu'
         }]
       });
-      var clone = groupBox.clone({
+      let clone = groupBox.clone({
         parent: groupBox.parent
       });
 
@@ -84,8 +84,8 @@ describe('GroupBox', function() {
       expect(clone.logicalGrid.gridConfig instanceof GroupBoxGridConfig).toBe(true);
     });
 
-    it('does not render the cloned box', function() {
-      var clone,
+    it('does not render the cloned box', () => {
+      let clone,
         groupBox = scout.create('GroupBox', {
           parent: session.desktop,
           id: 'gb01',

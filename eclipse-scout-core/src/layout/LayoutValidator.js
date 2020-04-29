@@ -19,7 +19,7 @@ export default class LayoutValidator {
   }
 
   invalidateTree(htmlComp) {
-    var validateRoot,
+    let validateRoot,
       htmlParent = htmlComp,
       htmlSource = htmlComp;
 
@@ -42,7 +42,7 @@ export default class LayoutValidator {
   }
 
   invalidate(htmlComp) {
-    var position = 0;
+    let position = 0;
     // Don't insert if already inserted...
     // Info: when component is already in list but no one triggers validation,
     // validation is never scheduled that's why we call scheduleValidation here.
@@ -53,7 +53,7 @@ export default class LayoutValidator {
 
     // Make sure it will be inserted before any descendant
     // This prevents multiple layouting of the descendant
-    this._invalidComponents.forEach(function(invalidComponent, i) {
+    this._invalidComponents.forEach((invalidComponent, i) => {
       if (invalidComponent.isDescendantOf(htmlComp)) {
         return;
       }
@@ -68,9 +68,9 @@ export default class LayoutValidator {
 
   _scheduleValidation() {
     if (this._validateTimeoutId === null) {
-      this._validateTimeoutId = setTimeout(function() {
+      this._validateTimeoutId = setTimeout(() => {
         this.validate();
-      }.bind(this));
+      });
     }
   }
 

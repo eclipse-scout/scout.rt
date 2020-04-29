@@ -10,7 +10,7 @@
  */
 import {Device} from '../../src/index';
 
-describe('Device', function() {
+describe('Device', () => {
 
   function test(userAgent, expectedDevice) {
     return verify(bootstrapDevice(userAgent), expectedDevice);
@@ -35,25 +35,25 @@ describe('Device', function() {
   }
 
   function bootstrapDevice(userAgent) {
-    var device = new Device({
+    let device = new Device({
       userAgent: userAgent
     });
     device.bootstrap();
     return device;
   }
 
-  describe('scout.device', function() {
+  describe('scout.device', () => {
 
-    it('is initialized automatically', function() {
+    it('is initialized automatically', () => {
       expect(Device.get()).toBeDefined();
       expect(Device.get().browser).toBeDefined();
     });
 
   });
 
-  describe('isWindowsTabletMode', function() {
+  describe('isWindowsTabletMode', () => {
 
-    it('returns true if system is windows and scrollbarWidth is 0', function() {
+    it('returns true if system is windows and scrollbarWidth is 0', () => {
       Device.get().scrollbarWidth = 0;
       Device.get().system = Device.System.WINDOWS;
       Device.get().systemVersion = 10.0;
@@ -62,9 +62,9 @@ describe('Device', function() {
 
   });
 
-  describe('user agent parsing', function() {
+  describe('user agent parsing', () => {
 
-    it('recognizes iOS devices', function() {
+    it('recognizes iOS devices', () => {
       // iPhone 4S
       test('Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A403 Safari/8536.25', {
         system: Device.System.IOS,
@@ -93,7 +93,7 @@ describe('Device', function() {
 
     });
 
-    it('recognizes Android devices', function() {
+    it('recognizes Android devices', () => {
       // Samsung Galaxy S4
       test('Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KVT49L) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.170 Mobile Safari/537.36', {
         system: Device.System.ANDROID,
@@ -111,7 +111,7 @@ describe('Device', function() {
       });
     });
 
-    it('recognizes Windows devices', function() {
+    it('recognizes Windows devices', () => {
       // Windows with Firefox browser
       test('Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36', {
         system: Device.System.WINDOWS,
@@ -129,8 +129,8 @@ describe('Device', function() {
     // Note: cannot detect Surface tablet reliable with Jasmine test, since scrollbar width
     // measurement depends on the browser that runs the spec.
 
-    it('recognizes supported browsers', function() {
-      var userAgent, device;
+    it('recognizes supported browsers', () => {
+      let userAgent, device;
 
       // Microsoft Edge 12
       _test('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240',
@@ -160,7 +160,7 @@ describe('Device', function() {
         Device.Browser.CHROME, 23.0);
 
       function _test(userAgent, expectedBrowser, expectedVersion) {
-        var device = new Device({
+        let device = new Device({
           userAgent: userAgent
         });
         expect(device.browser).toBe(expectedBrowser);

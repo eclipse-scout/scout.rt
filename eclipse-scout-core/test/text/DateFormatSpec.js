@@ -11,25 +11,25 @@
 import {DateFormat, dates, strings} from '../../src/index';
 import {LocaleSpecHelper} from '@eclipse-scout/testing';
 
-describe('DateFormat', function() {
-  var locale;
-  var helper;
+describe('DateFormat', () => {
+  let locale;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     helper = new LocaleSpecHelper();
     locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     locale = null;
   });
 
-  describe('format', function() {
+  describe('format', () => {
 
-    it('considers d M y', function() {
-      var pattern = 'dd.MM.yy';
-      var dateFormat = new DateFormat(locale, pattern);
+    it('considers d M y', () => {
+      let pattern = 'dd.MM.yy';
+      let dateFormat = new DateFormat(locale, pattern);
 
       expect(dateFormat.format(dates.create('2014-03-21'))).toBe('21.03.14');
 
@@ -47,9 +47,9 @@ describe('DateFormat', function() {
       expect(dateFormat.format(dates.create('2017-01-16'))).toBe('16.01.17 00:00');
     });
 
-    it('considers h H m a', function() {
-      var pattern = 'HH:mm';
-      var dateFormat = new DateFormat(locale, pattern);
+    it('considers h H m a', () => {
+      let pattern = 'HH:mm';
+      let dateFormat = new DateFormat(locale, pattern);
 
       expect(dateFormat.format(dates.create('2017-01-01 13:01'))).toBe('13:01');
       expect(dateFormat.format(dates.create('2017-01-01 05:01'))).toBe('05:01');
@@ -82,9 +82,9 @@ describe('DateFormat', function() {
       expect(dateFormat.format(dates.create('2017-01-01 01:01'))).toBe('01:01 AM');
     });
 
-    it('considers E', function() {
-      var pattern = 'E, dd.MM.yy';
-      var dateFormat = new DateFormat(locale, pattern);
+    it('considers E', () => {
+      let pattern = 'E, dd.MM.yy';
+      let dateFormat = new DateFormat(locale, pattern);
 
       expect(dateFormat.format(dates.create('2014-03-21'))).toBe('Fr, 21.03.14');
 
@@ -101,14 +101,14 @@ describe('DateFormat', function() {
       expect(dateFormat.format(dates.create('2014-03-21'))).toBe('Freitag, 21.03.14');
     });
 
-    it('considers ss SSS Z', function() {
-      var date = dates.create('2014-03-21 13:01'),
+    it('considers ss SSS Z', () => {
+      let date = dates.create('2014-03-21 13:01'),
         offset = Math.abs(date.getTimezoneOffset()),
         isNegative = offset !== date.getTimezoneOffset(),
         timeZone = (isNegative ? '-' : '+') + strings.padZeroLeft(Math.floor(offset / 60), 2) + strings.padZeroLeft(offset % 60, 2);
 
-      var pattern = 'yyyy-MM-dd HH:mm:ss';
-      var dateFormat = new DateFormat(locale, pattern);
+      let pattern = 'yyyy-MM-dd HH:mm:ss';
+      let dateFormat = new DateFormat(locale, pattern);
       expect(dateFormat.format(date)).toBe('2014-03-21 13:01:00');
 
       pattern = 'yyyy-MM-dd HH:mm:ss.SSS';
@@ -123,11 +123,11 @@ describe('DateFormat', function() {
 
   });
 
-  describe('parse', function() {
+  describe('parse', () => {
 
-    it('considers d M y', function() {
-      var pattern = 'dd.MM.yy';
-      var dateFormat = new DateFormat(locale, pattern);
+    it('considers d M y', () => {
+      let pattern = 'dd.MM.yy';
+      let dateFormat = new DateFormat(locale, pattern);
 
       expect(dateFormat.parse('21.03.14').getTime()).toBe(dates.create('2014-03-21').getTime());
 
@@ -141,9 +141,9 @@ describe('DateFormat', function() {
       expect(dateFormat.parse('1.3.04').getTime()).toBe(dates.create('2004-03-01').getTime());
     });
 
-    it('considers h H m a', function() {
-      var pattern = 'yyyy-MM-dd HH:mm';
-      var dateFormat = new DateFormat(locale, pattern);
+    it('considers h H m a', () => {
+      let pattern = 'yyyy-MM-dd HH:mm';
+      let dateFormat = new DateFormat(locale, pattern);
 
       expect(dateFormat.parse('2017-01-01 12:00').getTime()).toBe(dates.create('2017-01-01 12:00').getTime());
       expect(dateFormat.parse('2017-01-01 13:00').getTime()).toBe(dates.create('2017-01-01 13:00').getTime());
@@ -175,9 +175,9 @@ describe('DateFormat', function() {
       expect(dateFormat.parse('2017-01-01 12:00 AM').getTime()).toBe(dates.create('2017-01-01 00:00').getTime());
     });
 
-    it('considers ss SSS Z', function() {
-      var pattern = 'yyyy-MM-dd HH:mm:ss';
-      var dateFormat = new DateFormat(locale, pattern);
+    it('considers ss SSS Z', () => {
+      let pattern = 'yyyy-MM-dd HH:mm:ss';
+      let dateFormat = new DateFormat(locale, pattern);
 
       expect(dateFormat.parse('2017-01-01 12:00:05').getTime()).toBe(dates.create('2017-01-01 12:00:05').getTime());
       expect(dateFormat.parse('2017-01-01 13:00:05').getTime()).toBe(dates.create('2017-01-01 13:00:05').getTime());
@@ -191,20 +191,20 @@ describe('DateFormat', function() {
 
       pattern = 'yyyy-MM-ddTHH:mm:ss.SSSZ';
       dateFormat = new DateFormat(locale, pattern);
-      var refDate = dates.create('2017-01-01 12:00:05.123');
+      let refDate = dates.create('2017-01-01 12:00:05.123');
       refDate.setMinutes(refDate.getMinutes() - refDate.getTimezoneOffset() - 6 * 60);
       expect(dateFormat.parse('2017-01-01T12:00:05.123-0600').getTime()).toBe(refDate.getTime());
 
     });
   });
 
-  describe('analyze', function() {
-    describe('analyzes the text and returns an object with months, years and days', function() {
-      it('considers pattern dd.MM.yyyy', function() {
-        var pattern = 'dd.MM.yyyy';
-        var dateFormat = new DateFormat(locale, pattern);
+  describe('analyze', () => {
+    describe('analyzes the text and returns an object with months, years and days', () => {
+      it('considers pattern dd.MM.yyyy', () => {
+        let pattern = 'dd.MM.yyyy';
+        let dateFormat = new DateFormat(locale, pattern);
 
-        var result = dateFormat.analyze('21.12.2014');
+        let result = dateFormat.analyze('21.12.2014');
         expect(result.matchInfo.day).toBe('21');
         expect(result.matchInfo.month).toBe('12');
         expect(result.matchInfo.year).toBe('2014');
@@ -217,31 +217,31 @@ describe('DateFormat', function() {
         expect(result.parsedPattern).toBe('dd.M.yyyy');
       });
 
-      it('considers pattern yyyy-MM-dd', function() {
-        var pattern = 'yyyy-MM-dd';
-        var dateFormat = new DateFormat(locale, pattern);
+      it('considers pattern yyyy-MM-dd', () => {
+        let pattern = 'yyyy-MM-dd';
+        let dateFormat = new DateFormat(locale, pattern);
 
-        var result = dateFormat.analyze('2000-08-12');
+        let result = dateFormat.analyze('2000-08-12');
         expect(result.matchInfo.day).toBe('12');
         expect(result.matchInfo.month).toBe('08');
         expect(result.matchInfo.year).toBe('2000');
       });
 
-      it('considers pattern MM/dd/yyy', function() {
-        var pattern = 'MM/dd/yyyy';
-        var dateFormat = new DateFormat(locale, pattern);
+      it('considers pattern MM/dd/yyy', () => {
+        let pattern = 'MM/dd/yyyy';
+        let dateFormat = new DateFormat(locale, pattern);
 
-        var result = dateFormat.analyze('08/16/1999');
+        let result = dateFormat.analyze('08/16/1999');
         expect(result.matchInfo.day).toBe('16');
         expect(result.matchInfo.month).toBe('08');
         expect(result.matchInfo.year).toBe('1999');
       });
 
-      it('checks correct handling of am/pm', function() {
-        var pattern = 'yyyy-MM-dd h:mm a';
-        var dateFormat = new DateFormat(locale, pattern);
+      it('checks correct handling of am/pm', () => {
+        let pattern = 'yyyy-MM-dd h:mm a';
+        let dateFormat = new DateFormat(locale, pattern);
 
-        var result = dateFormat.analyze('2017-01-01 12:00 AM');
+        let result = dateFormat.analyze('2017-01-01 12:00 AM');
         expect(result.dateInfo.hours).toBe(0);
         expect(result.dateInfo.minutes).toBe(0);
 
@@ -254,11 +254,11 @@ describe('DateFormat', function() {
         expect(result.dateInfo.minutes).toBe(1);
       });
 
-      it('proposes valid dates for pattern dd.MM.yyyy', function() {
-        var pattern = 'dd.MM.yyyy';
-        var dateFormat = new DateFormat(locale, pattern);
+      it('proposes valid dates for pattern dd.MM.yyyy', () => {
+        let pattern = 'dd.MM.yyyy';
+        let dateFormat = new DateFormat(locale, pattern);
 
-        var result = dateFormat.analyze('2', dates.create('2016-02-01'));
+        let result = dateFormat.analyze('2', dates.create('2016-02-01'));
         expect(dateFormat.format(result.predictedDate)).toBe('02.02.2016');
 
         result = dateFormat.analyze('21', dates.create('2016-02-01'));
@@ -286,11 +286,11 @@ describe('DateFormat', function() {
         expect(result.predictedDate).toBe(null);
       });
 
-      it('proposes valid dates for pattern MM.yyyy', function() {
-        var pattern = 'MM.yyyy';
-        var dateFormat = new DateFormat(locale, pattern);
+      it('proposes valid dates for pattern MM.yyyy', () => {
+        let pattern = 'MM.yyyy';
+        let dateFormat = new DateFormat(locale, pattern);
 
-        var result = dateFormat.analyze('02.2017', dates.create('2017-03-31'));
+        let result = dateFormat.analyze('02.2017', dates.create('2017-03-31'));
         expect(dateFormat.format(result.predictedDate)).toBe('02.2017');
 
         result = dateFormat.analyze('04.2017', dates.create('2017-03-31'));
@@ -303,19 +303,19 @@ describe('DateFormat', function() {
         expect(dateFormat.format(result.predictedDate)).toBe('05.2017');
       });
 
-      it('proposes valid dates for pattern yyyy', function() {
-        var pattern = 'yyyy';
-        var dateFormat = new DateFormat(locale, pattern);
+      it('proposes valid dates for pattern yyyy', () => {
+        let pattern = 'yyyy';
+        let dateFormat = new DateFormat(locale, pattern);
 
-        var result = dateFormat.analyze('2017', dates.create('2016-02-29'));
+        let result = dateFormat.analyze('2017', dates.create('2016-02-29'));
         expect(dateFormat.format(result.predictedDate)).toBe('2017');
       });
 
-      it('proposes valid times', function() {
-        var pattern = 'HH:mm';
-        var dateFormat = new DateFormat(locale, pattern);
+      it('proposes valid times', () => {
+        let pattern = 'HH:mm';
+        let dateFormat = new DateFormat(locale, pattern);
 
-        var result = dateFormat.analyze('2', dates.create('2016-02-01'));
+        let result = dateFormat.analyze('2', dates.create('2016-02-01'));
         expect(dateFormat.format(result.predictedDate)).toBe('02:00');
 
         result = dateFormat.analyze('20', dates.create('2016-02-01'));

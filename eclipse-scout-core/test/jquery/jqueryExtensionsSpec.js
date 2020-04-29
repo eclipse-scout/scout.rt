@@ -11,27 +11,27 @@
 
 import $ from 'jquery';
 
-describe('jquery-scout', function() {
+describe('jquery-scout', () => {
 
-  var $e;
+  let $e;
 
   /**
    * We must append $e to the DOM, because otherwise test would fail in some browsers (Chrome, PhantomJS).
    */
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     $e = $('<div>');
     $e.appendTo($('#sandbox'));
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
-  describe('isEnabled', function() {
+  describe('isEnabled', () => {
 
-    it('is only false when class disabled is set', function() {
+    it('is only false when class disabled is set', () => {
       expect($e.isEnabled()).toBe(true);
       $e.addClass('disabled');
       expect($e.isEnabled()).toBe(false);
@@ -41,9 +41,9 @@ describe('jquery-scout', function() {
 
   });
 
-  describe('isVisible', function() {
+  describe('isVisible', () => {
 
-    it('returns false if class hidden is set', function() {
+    it('returns false if class hidden is set', () => {
       expect($e.isVisible()).toBe(true);
       $e.addClass('hidden');
       expect($e.isVisible()).toBe(false);
@@ -51,7 +51,7 @@ describe('jquery-scout', function() {
       expect($e.isVisible()).toBe(true);
     });
 
-    it('returns true if display != none', function() {
+    it('returns true if display != none', () => {
       expect($e.isVisible()).toBe(true);
       $e.css('display', 'none');
       expect($e.isVisible()).toBe(false);
@@ -65,9 +65,9 @@ describe('jquery-scout', function() {
 
   });
 
-  describe('setEnabled', function() {
+  describe('setEnabled', () => {
 
-    it('DIV does not have disabled attribute', function() {
+    it('DIV does not have disabled attribute', () => {
       $e.setEnabled(false);
       expect($e.hasClass('disabled')).toBe(true);
       expect($e.attr('disabled')).toBeUndefined();
@@ -76,7 +76,7 @@ describe('jquery-scout', function() {
       expect($e.attr('disabled')).toBeUndefined();
     });
 
-    it('INPUT must have disabled attribute', function() {
+    it('INPUT must have disabled attribute', () => {
       $e = $('<input>');
       $e.setEnabled(false);
       expect($e.hasClass('disabled')).toBe(true);
@@ -88,9 +88,9 @@ describe('jquery-scout', function() {
 
   });
 
-  describe('toggleAttr', function() {
+  describe('toggleAttr', () => {
 
-    it('toggles attribute', function() {
+    it('toggles attribute', () => {
       expect($e.attr('test')).toBeUndefined();
       $e.toggleAttr('test');
       expect($e.attr('test')).toBe('test');
@@ -114,9 +114,9 @@ describe('jquery-scout', function() {
 
   });
 
-  describe('hasAnimationClass', function() {
+  describe('hasAnimationClass', () => {
 
-    it('checks for animation classes', function() {
+    it('checks for animation classes', () => {
       expect($e.hasAnimationClass()).toBe(false);
       $e.addClass('animate');
       expect($e.hasAnimationClass()).toBe(false);
@@ -132,9 +132,9 @@ describe('jquery-scout', function() {
 
   });
 
-  describe('icon', function() {
+  describe('icon', () => {
 
-    it('sets and removes icons', function() {
+    it('sets and removes icons', () => {
       // Set and remove font icon
       $e.icon();
       expect($e.children().length).toBe(0);
@@ -188,9 +188,9 @@ describe('jquery-scout', function() {
 
   });
 
-  describe('textOrNbsp', function() {
+  describe('textOrNbsp', () => {
 
-    it('sets text or nbsp', function() {
+    it('sets text or nbsp', () => {
       $e.textOrNbsp();
       expect($e.html()).toBe('&nbsp;');
       $e.empty();
@@ -228,9 +228,9 @@ describe('jquery-scout', function() {
 
   });
 
-  describe('htmlOrNbsp', function() {
+  describe('htmlOrNbsp', () => {
 
-    it('sets html or nbsp', function() {
+    it('sets html or nbsp', () => {
       $e.htmlOrNbsp();
       expect($e.html()).toBe('&nbsp;');
       $e.empty();
@@ -270,12 +270,12 @@ describe('jquery-scout', function() {
 
   });
 
-  describe('nvl', function() {
+  describe('nvl', () => {
 
-    it('can return alternative element', function() {
-      var $f = $('<div>');
+    it('can return alternative element', () => {
+      let $f = $('<div>');
       $f.appendTo($('#sandbox'));
-      var $g = $('<div>'); // not in DOM
+      let $g = $('<div>'); // not in DOM
 
       expect($e.nvl()).toBe($e);
       expect($e.nvl($f)).toBe($e);
@@ -285,7 +285,7 @@ describe('jquery-scout', function() {
       expect($('.does-not-exist').nvl($e)).toBe($e);
       expect($('.does-not-exist').nvl($g)).toBe($g);
 
-      var $result = $('.does').nvl($('.not')).nvl(null).nvl($('.exist')).nvl();
+      let $result = $('.does').nvl($('.not')).nvl(null).nvl($('.exist')).nvl();
       expect($result instanceof $).toBe(true);
       expect($result.length).toBe(0);
       $result = $result.nvl($result).nvl($f).nvl(null);
@@ -296,17 +296,17 @@ describe('jquery-scout', function() {
 
   });
 
-  describe('elementFromPoint', function() {
+  describe('elementFromPoint', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       $('<style>.invisible {visibility: hidden !important;}</style>').appendTo($('#sandbox'));
     });
 
-    it('returns the element from point but only if it is a child', function() {
-      var $container = $('<div>')
+    it('returns the element from point but only if it is a child', () => {
+      let $container = $('<div>')
         .attr('style', 'position: absolute; left: 10px; top: 10px; width: 100px; height: 100px')
         .appendTo($('#sandbox'));
-      var $elem = $('<div>')
+      let $elem = $('<div>')
         .attr('style', 'position: absolute; left: 10px; top: 10px; width: 50px; height: 50px')
         .appendTo($container);
       expect($container.elementFromPoint(20, 20)[0]).toBe($elem[0]);
@@ -319,12 +319,12 @@ describe('jquery-scout', function() {
       expect($container.elementFromPoint(9, 9).length).toBe(0);
     });
 
-    it('considers the selector', function() {
-      var $container = $('<div>')
+    it('considers the selector', () => {
+      let $container = $('<div>')
         .addClass('outer')
         .attr('style', 'position: absolute; left: 10px; top: 10px; width: 100px; height: 100px')
         .appendTo($('#sandbox'));
-      var $elem = $('<div>')
+      let $elem = $('<div>')
         .addClass('inner')
         .attr('style', 'position: absolute; left: 10px; top: 10px; width: 50px; height: 50px')
         .appendTo($container);
@@ -333,11 +333,11 @@ describe('jquery-scout', function() {
       expect($container.elementFromPoint(20, 20, '.asdf').length).toBe(0);
     });
 
-    it('returns the document element if no element matches and document is used as container', function() {
-      var $container = $('<div>')
+    it('returns the document element if no element matches and document is used as container', () => {
+      let $container = $('<div>')
         .attr('style', 'position: absolute; left: 10px; top: 10px; width: 100px; height: 100px')
         .appendTo($('#sandbox'));
-      var $elem = $('<div>')
+      let $elem = $('<div>')
         .attr('style', 'position: absolute; left: 10px; top: 10px; width: 50px; height: 50px')
         .appendTo($container);
       expect($(document).elementFromPoint(20, 20)[0]).toBe($elem[0]);
@@ -348,16 +348,16 @@ describe('jquery-scout', function() {
       $('body').removeClass('invisible');
     });
 
-    it('returns an empty collection if called on empty collection', function() {
+    it('returns an empty collection if called on empty collection', () => {
       expect($('.does-not-exist').elementFromPoint(20, 20).length).toBe(0);
     });
 
   });
 
-  describe('cssPxValue', function() {
+  describe('cssPxValue', () => {
 
-    it('is behaves differently with different types of arguments', function() {
-      var $test = $('#sandbox').appendDiv('test');
+    it('is behaves differently with different types of arguments', () => {
+      let $test = $('#sandbox').appendDiv('test');
 
       expect($test.cssPxValue('width') > 0).toBe(true);
       $test.css('width', 'auto');
@@ -379,10 +379,10 @@ describe('jquery-scout', function() {
 
   });
 
-  describe('cssMinWidth/cssMinHeight', function() {
+  describe('cssMinWidth/cssMinHeight', () => {
 
-    it('returns 0 if computed value is not a number', function() {
-      var $test = $('#sandbox').appendDiv('test');
+    it('returns 0 if computed value is not a number', () => {
+      let $test = $('#sandbox').appendDiv('test');
 
       expect($test.cssMinWidth()).toBe(0);
       $test.attr('style', 'min-width: auto');
@@ -407,10 +407,10 @@ describe('jquery-scout', function() {
 
   });
 
-  describe('cssMaxWidth/cssMaxHeight', function() {
+  describe('cssMaxWidth/cssMaxHeight', () => {
 
-    it('returns Number.MAX_VALUE if computed value is not a number', function() {
-      var $test = $('#sandbox').appendDiv('test');
+    it('returns Number.MAX_VALUE if computed value is not a number', () => {
+      let $test = $('#sandbox').appendDiv('test');
 
       // Note: Check for "> 99999" instead of "= Number.MAX_VALUE" to prevent
       // potential rounding errors
@@ -438,17 +438,17 @@ describe('jquery-scout', function() {
 
   });
 
-  describe('debounce', function() {
+  describe('debounce', () => {
 
-    it('is debounces function calls', function() {
-      var counter = 0;
+    it('is debounces function calls', () => {
+      let counter = 0;
 
       function incImpl() {
         counter++;
       }
 
-      var inc = $.debounce(incImpl);
-      var incFast = $.debounce(incImpl, 40);
+      let inc = $.debounce(incImpl);
+      let incFast = $.debounce(incImpl, 40);
 
       inc();
       expect(counter).toBe(0); // still zero
@@ -475,7 +475,7 @@ describe('jquery-scout', function() {
       inc();
       jasmine.clock().tick(100);
       expect(counter).toBe(3);
-      var cancelled = inc.cancel();
+      let cancelled = inc.cancel();
       expect(cancelled).toBe(true);
       jasmine.clock().tick(200);
       expect(counter).toBe(3); // not changed, function was cancelled
@@ -483,14 +483,14 @@ describe('jquery-scout', function() {
       expect(cancelled).toBe(false);
     });
 
-    it('it debounces only the first function call when reschedule=false', function() {
-      var counter = 0;
+    it('it debounces only the first function call when reschedule=false', () => {
+      let counter = 0;
 
       function incImpl() {
         counter++;
       }
 
-      var inc = $.debounce(incImpl, {
+      let inc = $.debounce(incImpl, {
         delay: 100,
         reschedule: false
       });

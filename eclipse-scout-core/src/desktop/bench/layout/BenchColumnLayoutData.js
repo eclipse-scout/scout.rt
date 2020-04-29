@@ -22,7 +22,7 @@ export default class BenchColumnLayoutData {
   }
 
   _ensureColumns() {
-    this.columns = this.columns.map(function(col, i) {
+    this.columns = this.columns.map((col, i) => {
       return new BenchRowLayoutData(col).withOrder(i * 2);
     });
   }

@@ -23,20 +23,20 @@ export default class DesktopTab extends SimpleTab {
   }
 
   _onContextMenu(event) {
-    var menuCloseAllTabs = scout.create('Menu', {
+    let menuCloseAllTabs = scout.create('Menu', {
       parent: this,
       text: this.session.text('ui.CloseAllTabs')
     });
     menuCloseAllTabs.on('action', this._onCloseAll.bind(this));
 
-    var menuCloseOtherTabs = scout.create('Menu', {
+    let menuCloseOtherTabs = scout.create('Menu', {
       parent: this,
       text: this.session.text('ui.CloseOtherTabs'),
       enabled: this.parent.tabs.length > 1
     });
     menuCloseOtherTabs.on('action', this._onCloseOther.bind(this));
 
-    var popup = scout.create('ContextMenuPopup', {
+    let popup = scout.create('ContextMenuPopup', {
       parent: this,
       menuItems: [menuCloseAllTabs, menuCloseOtherTabs],
       cloneMenuItems: false,
@@ -49,14 +49,14 @@ export default class DesktopTab extends SimpleTab {
   }
 
   _onCloseAll() {
-    var openViews = this.parent.tabs.map(function(desktopTab) {
+    let openViews = this.parent.tabs.map(desktopTab => {
       return desktopTab.view;
     });
     this.session.desktop.cancelViews(openViews);
   }
 
   _onCloseOther() {
-    var openViews = this.parent.tabs.map(function(desktopTab) {
+    let openViews = this.parent.tabs.map(desktopTab => {
       return desktopTab.view;
     });
     arrays.remove(openViews, this.view);

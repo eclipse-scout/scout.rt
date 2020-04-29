@@ -12,16 +12,16 @@
 import {Extension, scout, StringField} from '../src/index';
 import {LocaleSpecHelper} from '@eclipse-scout/testing';
 
-describe('Extension', function() {
-  var session;
+describe('Extension', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
   });
 
-  describe('extend functions of StringField', function() {
+  describe('extend functions of StringField', () => {
 
     // create a dummy class and extensions to that class
     class MyStringField extends StringField {
@@ -32,7 +32,7 @@ describe('Extension', function() {
     // ---- extension #1 ----
     class MyExtension1 extends Extension {
       init() {
-        var proto = MyStringField.prototype;
+        let proto = MyStringField.prototype;
         this.extend(proto, '_init');
         this.extend(proto, '_renderProperties');
         this.extend(proto, '_renderInputMasked');
@@ -62,7 +62,7 @@ describe('Extension', function() {
     // ---- extension #2 ----
     class MyExtension2 extends Extension {
       init() {
-        var proto = MyStringField.prototype;
+        let proto = MyStringField.prototype;
         this.extend(proto, '_init');
         this.extend(proto, '_renderProperties');
       }
@@ -86,34 +86,34 @@ describe('Extension', function() {
 
     // ---- Spec starts here ----
 
-    var myStringField;
+    let myStringField;
     Extension.install([
       'scout.MyExtension1',
       'scout.MyExtension2'
     ]);
 
-    beforeEach(function() {
-      var model = createSimpleModel('StringField', session);
+    beforeEach(() => {
+      let model = createSimpleModel('StringField', session);
       myStringField = scout.create('scout.MyStringField', model);
     });
 
-    it('should extend _init method', function() {
+    it('should extend _init method', () => {
       expect(myStringField.foo).toBe('bar');
       expect(myStringField.bar).toBe('foo');
     });
 
-    it('should extend _renderProperties method', function() {
+    it('should extend _renderProperties method', () => {
       myStringField.render();
-      var $bar = $('.bar');
-      var $foo = $('.foo');
+      let $bar = $('.bar');
+      let $foo = $('.foo');
       expect($bar.length).toBe(1);
       expect($foo.length).toBe(1);
     });
 
-    it('should extend _renderInputMasked method', function() {
+    it('should extend _renderInputMasked method', () => {
       myStringField.setProperty('inputMasked', true);
       myStringField.render();
-      var typeAttr = $('input').attr('type');
+      let typeAttr = $('input').attr('type');
       expect(typeAttr).toBe('ext-password');
     });
 

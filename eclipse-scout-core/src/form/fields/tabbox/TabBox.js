@@ -66,7 +66,7 @@ export default class TabBox extends CompositeField {
     this.addStatus();
 
     this._$tabContent = this.$container.appendDiv('tab-content');
-    var htmlCompContent = HtmlComponent.install(this._$tabContent, this.session);
+    let htmlCompContent = HtmlComponent.install(this._$tabContent, this.session);
     htmlCompContent.setLayout(new SingleLayout());
   }
 
@@ -96,8 +96,8 @@ export default class TabBox extends CompositeField {
   }
 
   deleteTabItem(tabItem) {
-    var index = this.tabItems.indexOf(tabItem);
-    var newTabItems = this.tabItems.slice();
+    let index = this.tabItems.indexOf(tabItem);
+    let newTabItems = this.tabItems.slice();
     if (index >= 0) {
       newTabItems.splice(index, 1);
       this.setTabItems(newTabItems);
@@ -109,7 +109,7 @@ export default class TabBox extends CompositeField {
       return;
     }
     index = scout.nvl(index, this.tabItems.length);
-    var newTabItems = this.tabItems.slice();
+    let newTabItems = this.tabItems.slice();
     newTabItems.splice(index, 0, tabItem);
     this.setTabItems(newTabItems);
   }
@@ -120,10 +120,10 @@ export default class TabBox extends CompositeField {
 
   _setTabItems(tabItems) {
     tabItems = tabItems || [];
-    var tabsToRemove = this.tabItems || [];
-    tabsToRemove.filter(function(tabItem) {
+    let tabsToRemove = this.tabItems || [];
+    tabsToRemove.filter(tabItem => {
       return tabItems.indexOf(tabItem) < 0;
-    }, this).forEach(function(tabItem) {
+    }, this).forEach(tabItem => {
       tabItem.remove();
     });
 
@@ -144,13 +144,13 @@ export default class TabBox extends CompositeField {
   }
 
   _removeTabContent() {
-    this.tabItems.forEach(function(tabItem) {
+    this.tabItems.forEach(tabItem => {
       tabItem.remove();
     }, this);
   }
 
   selectTabById(tabId) {
-    var tab = this.getTabItem(tabId);
+    let tab = this.getTabItem(tabId);
     if (!tab) {
       throw new Error('Tab with ID \'' + tabId + '\' does not exist');
     }
@@ -221,7 +221,7 @@ export default class TabBox extends CompositeField {
   }
 
   getTabItem(tabId) {
-    return arrays.find(this.tabItems, function(tabItem) {
+    return arrays.find(this.tabItems, tabItem => {
       return tabItem.id === tabId;
     });
   }

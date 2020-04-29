@@ -123,7 +123,7 @@ const ICON_ID_REGEX = /\${iconId:([a-zA-Z0-9_.]*)}/;
  * Returns an {@link IconDesc} object with structured info contained in the iconId string.
  */
 export function parseIconId(iconId) {
-  var icon = new IconDesc();
+  let icon = new IconDesc();
 
   if (strings.startsWith(iconId, 'font:')) {
     icon.iconType = IconDesc.IconType.FONT_ICON;
@@ -133,7 +133,7 @@ export function parseIconId(iconId) {
       icon.font = IconDesc.DEFAULT_FONT;
       icon.iconCharacter = iconId;
     } else {
-      var tmp = iconId.split(' ');
+      let tmp = iconId.split(' ');
       icon.font = tmp[0];
       icon.iconCharacter = tmp[1];
     }
@@ -156,7 +156,7 @@ export function parseIconId(iconId) {
  * @returns {string}
  */
 export function resolveIconId(value) {
-  var iconId, tmp,
+  let iconId, tmp,
     result = ICON_ID_REGEX.exec(value);
   if (result && result.length === 2) {
     iconId = result[1];
@@ -187,8 +187,8 @@ export function resolveIconId(value) {
  */
 export function resolveIconProperty(object, iconProperty) {
   iconProperty = iconProperty || 'iconId';
-  var value = object[iconProperty];
-  var newValue = resolveIconId(value);
+  let value = object[iconProperty];
+  let newValue = resolveIconId(value);
   if (newValue !== value) {
     object[iconProperty] = newValue;
   }

@@ -10,18 +10,18 @@
  */
 import {Mode} from '../../src/index';
 
-describe('Mode', function() {
-  var session;
+describe('Mode', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  describe('defaults', function() {
+  describe('defaults', () => {
 
-    it('should be as expected', function() {
-      var mode = new Mode();
+    it('should be as expected', () => {
+      let mode = new Mode();
       mode.init(createSimpleModel('Mode', session));
       expect(mode.selected).toBe(false);
     });

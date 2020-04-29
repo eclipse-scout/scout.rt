@@ -39,14 +39,13 @@ import {scout} from './index';
 export default class Extension {
 
   extend(extended, funcName) {
-    var origFunc = extended[funcName];
-    var extension = this;
-    var wrapper = function() {
+    let origFunc = extended[funcName];
+    let extension = this;
+    extended[funcName] = function(...args) {
       extension.extended = this;
       extension.next = origFunc.bind(this);
-      return extension[funcName].apply(extension, arguments);
+      return extension[funcName](...args);
     };
-    extended[funcName] = wrapper;
   }
 
   /**
@@ -56,7 +55,7 @@ export default class Extension {
    * @static
    */
   static install(extensions) {
-    extensions.forEach(function(ext) {
+    extensions.forEach(ext => {
       scout.create(ext);
     });
   }

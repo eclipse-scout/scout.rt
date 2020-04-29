@@ -42,9 +42,9 @@ export default class PageWithTable extends Page {
     if (this.leaf) { // when page is a leaf we do nothing at all
       return;
     }
-    var rows = arrays.ensure(event.rows),
-      childPages = rows.map(function(row) {
-        var childPage = row.page;
+    let rows = arrays.ensure(event.rows),
+      childPages = rows.map(row => {
+        let childPage = row.page;
         childPage.unlinkWithRow(row);
         return childPage;
       }, this);
@@ -61,7 +61,7 @@ export default class PageWithTable extends Page {
       return;
     }
 
-    var rows = arrays.ensure(event.rows),
+    let rows = arrays.ensure(event.rows),
       childPages = rows.map(function(row) {
         return this._createChildPageInternal(row);
       }, this);
@@ -85,7 +85,7 @@ export default class PageWithTable extends Page {
   }
 
   _createChildPageInternal(row) {
-    var childPage = this.createChildPage(row);
+    let childPage = this.createChildPage(row);
     if (childPage === null && this.alwaysCreateChildPage) {
       childPage = this.createDefaultChildPage(row);
     }
@@ -121,7 +121,7 @@ export default class PageWithTable extends Page {
   }
 
   _createSearchFilter() {
-    var firstFormTableControl = arrays.find(this.detailTable.tableControls, function(tableControl) {
+    let firstFormTableControl = arrays.find(this.detailTable.tableControls, tableControl => {
       return tableControl.form;
     });
     if (firstFormTableControl) {
@@ -159,7 +159,7 @@ export default class PageWithTable extends Page {
    *
    * @param searchFilter The search filter as exported by the search form or null.
    *
-   * @return {$.Deferred}
+   * @return {Promise}
    */
   _loadTableData(searchFilter) {
     return $.resolvedDeferred();
@@ -172,7 +172,7 @@ export default class PageWithTable extends Page {
    * @param tableData data loaded by <code>_loadTableData</code>
    */
   _onLoadTableDataDone(tableData) {
-    var rows = this._transformTableDataToTableRows(tableData);
+    let rows = this._transformTableDataToTableRows(tableData);
     if (rows && rows.length > 0) {
       this.detailTable.insertRows(rows);
     }

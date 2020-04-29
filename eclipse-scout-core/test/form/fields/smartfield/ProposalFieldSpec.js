@@ -10,11 +10,11 @@
  */
 import {scout, Status} from '../../../../src/index';
 
-describe('ProposalField', function() {
+describe('ProposalField', () => {
 
-  var session, field, lookupRow;
+  let session, field, lookupRow;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     field = scout.create('ProposalField', {
@@ -28,15 +28,15 @@ describe('ProposalField', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
     removePopups(session);
     removePopups(session, '.touch-popup');
   });
 
-  describe('proposal field', function() {
+  describe('proposal field', () => {
 
-    it('defaults', function() {
+    it('defaults', () => {
       expect(field.maxLength).toBe(4000);
       expect(field.trimText).toBe(true);
     });
@@ -46,7 +46,7 @@ describe('ProposalField', function() {
      * No matter if the typed text exists as record in the lookup call, we
      * simply set value/display text to it.
      */
-    it('setValue', function() {
+    it('setValue', () => {
       field.setValue('Foo');
       expect(field.value).toBe('Foo');
       expect(field.displayText).toBe('Foo');
@@ -57,7 +57,7 @@ describe('ProposalField', function() {
       expect(field.errorStatus).toBe(null);
     });
 
-    it('is empty when text is empty', function() {
+    it('is empty when text is empty', () => {
       expect(field.value).toBe(null);
       expect(field.displayText).toBe('');
       expect(field.empty).toBe(true);
@@ -83,8 +83,8 @@ describe('ProposalField', function() {
       expect(field.empty).toBe(true);
     });
 
-    it('setLookupRow should set value too', function() {
-      var lookupRow = {
+    it('setLookupRow should set value too', () => {
+      let lookupRow = {
         key: 123,
         text: 'Foo'
       };
@@ -97,7 +97,7 @@ describe('ProposalField', function() {
       expect(field.lookupRow).toBe(null);
     });
 
-    it('should set error status when result has an exception', function() {
+    it('should set error status when result has an exception', () => {
       field._lookupByTextOrAllDone({
         lookupRows: [],
         exception: 'proposal lookup failed'
@@ -113,13 +113,13 @@ describe('ProposalField', function() {
    * will trigger the acceptInput event which is also sent to the Scout server.
    * # 221199
    */
-  it('lookupOnAcceptByText', function() {
+  it('lookupOnAcceptByText', () => {
     field.render();
     field.lookupOnAcceptByText = true;
     field.setValue('Foo');
 
-    var acceptInputCalled = false;
-    field.on('acceptInput', function() {
+    let acceptInputCalled = false;
+    field.on('acceptInput', () => {
       acceptInputCalled = true;
     });
     field.clear();
@@ -133,7 +133,7 @@ describe('ProposalField', function() {
    * this.lookupOnAcceptByText.
    * # 2345061
    */
-  it('when lookupOnAcceptByText=true the value is not deleted when aboutToBlurByMouseDown is called', function() {
+  it('when lookupOnAcceptByText=true the value is not deleted when aboutToBlurByMouseDown is called', () => {
     field.render();
     field.lookupOnAcceptByText = true;
 
@@ -146,7 +146,7 @@ describe('ProposalField', function() {
     expect(field.$field.val()).toBe('Foo');
   });
 
-  it('should return value for last search-text', function() {
+  it('should return value for last search-text', () => {
     field.setValue('Bar');
     expect(field._getLastSearchText()).toBe('Bar');
   });

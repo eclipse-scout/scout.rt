@@ -67,7 +67,7 @@ export default class FocusContext {
    */
   _onKeyDown(event) {
     if (event.which === keys.TAB) {
-      var activeElement = this.$container.activeElement(true),
+      let activeElement = this.$container.activeElement(true),
         $focusableElements = this.$container.find(':tabbable:visible'),
         firstFocusableElement = $focusableElements.first()[0],
         lastFocusableElement = $focusableElements.last()[0],
@@ -101,7 +101,7 @@ export default class FocusContext {
       }
 
       // Check if new focused element is currently visible, otherwise scroll the container
-      var $focusableElement = $(focusedElement),
+      let $focusableElement = $(focusedElement),
         containerBounds = graphics.offsetBounds($focusableElement),
         $scrollable = $focusableElement.scrollParent();
       if (!scrollbars.isLocationInView(new Point(containerBounds.x, containerBounds.y), $scrollable)) {
@@ -114,7 +114,7 @@ export default class FocusContext {
    * Method invoked once a 'focusin' event is fired by this context's $container or one of its child controls.
    */
   _onFocusIn(event) {
-    var $target = $(event.target);
+    let $target = $(event.target);
     $target.on('remove', this._removeListener);
     this.focusedElement = event.target;
 
@@ -174,7 +174,7 @@ export default class FocusContext {
       element = null;
     }
 
-    var elementToFocus = null;
+    let elementToFocus = null;
     if (!element) {
       elementToFocus = this.focusManager.findFirstFocusableElement(this.$container, filter);
     } else if (!filter || filter.call(element)) {
@@ -220,7 +220,7 @@ export default class FocusContext {
 
     // Check whether the element is covert by a glasspane
     if (this.focusManager.isElementCovertByGlassPane(elementToFocus)) {
-      var activeElement = this.$container.activeElement(true);
+      let activeElement = this.$container.activeElement(true);
       if (elementToFocus && (!activeElement || !this.focusManager.isElementCovertByGlassPane(activeElement))) {
         // If focus should be removed (blur), don't break here and try to focus the root element
         // Otherwise, if desired element cannot be focused then break and leave the focus where it is, unless the currently focused element is covered by a glass pane

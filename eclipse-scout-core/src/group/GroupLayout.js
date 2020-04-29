@@ -18,21 +18,21 @@ export default class GroupLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var htmlComp = this.group.htmlComp;
-    var containerSize = htmlComp.availableSize()
+    let htmlComp = this.group.htmlComp;
+    let containerSize = htmlComp.availableSize()
       .subtract(htmlComp.insets());
 
-    var htmlHeader = this.group.htmlHeader;
-    var headerSize = htmlHeader.prefSize({
+    let htmlHeader = this.group.htmlHeader;
+    let headerSize = htmlHeader.prefSize({
       widthHint: containerSize.width
     });
     headerSize.width = containerSize.width;
     headerSize = headerSize.subtract(htmlHeader.margins());
     htmlHeader.setSize(headerSize);
 
-    var htmlFooter = this.group.htmlFooter;
+    let htmlFooter = this.group.htmlFooter;
     if (htmlFooter.isVisible()) {
-      var footerSize = htmlFooter.prefSize({
+      let footerSize = htmlFooter.prefSize({
         includeMargin: false,
         useCssSize: true
       });
@@ -49,8 +49,8 @@ export default class GroupLayout extends AbstractLayout {
       return;
     }
 
-    var htmlBody = this.group.body.htmlComp;
-    var bodySize = containerSize.subtract(htmlBody.margins());
+    let htmlBody = this.group.body.htmlComp;
+    let bodySize = containerSize.subtract(htmlBody.margins());
     bodySize.height -= headerSize.height;
     if (htmlFooter.isVisible()) {
       bodySize.height -= htmlFooter.prefSize(true).height;
@@ -59,7 +59,7 @@ export default class GroupLayout extends AbstractLayout {
   }
 
   invalidate(htmlSource) {
-    var htmlBody = this.group.body.htmlComp;
+    let htmlBody = this.group.body.htmlComp;
     // If a child triggers a layout invalidation, the animation should be stopped and restarted because the body will likely have another height.
     // This will happen for sure if a child is an image which will be loaded during the animation.
     if (htmlBody && this.group.bodyAnimating && htmlSource && htmlSource.isDescendantOf(this.group.htmlComp)) {
@@ -73,11 +73,11 @@ export default class GroupLayout extends AbstractLayout {
 
   preferredLayoutSize($container, options) {
     options = options || {};
-    var prefSize;
-    var htmlComp = this.group.htmlComp;
-    var htmlHeader = this.group.htmlHeader;
-    var htmlBody = this.group.body.htmlComp;
-    var htmlFooter = this.group.htmlFooter;
+    let prefSize;
+    let htmlComp = this.group.htmlComp;
+    let htmlHeader = this.group.htmlHeader;
+    let htmlBody = this.group.body.htmlComp;
+    let htmlFooter = this.group.htmlFooter;
 
     // HeightHint not supported
     options.heightHint = null;

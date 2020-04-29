@@ -22,7 +22,7 @@ export default class MenuBarRightKeyStroke extends KeyStroke {
   }
 
   handle(event) {
-    var menuItems = this.field._allMenusAsFlatList(),
+    let menuItems = this.field._allMenusAsFlatList(),
       $menuItemFocused = this.field.$container.find(':focus'),
       i, menuItem, focusNext = false;
 

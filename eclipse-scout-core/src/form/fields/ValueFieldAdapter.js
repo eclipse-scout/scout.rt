@@ -51,9 +51,9 @@ export default class ValueFieldAdapter extends FormFieldAdapter {
   }
 
   _createPropertySortFunc(order) {
-    return function(a, b) {
-      var ia = order.indexOf(a);
-      var ib = order.indexOf(b);
+    return (a, b) => {
+      let ia = order.indexOf(a);
+      let ib = order.indexOf(b);
       if (ia > -1 && ib > -1) { // both are in the list
         return ia - ib;
       }

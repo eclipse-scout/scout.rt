@@ -70,7 +70,7 @@ export default class Notification extends Widget {
   }
 
   _renderMessage() {
-    var message = scout.nvl(strings.nl2br(this.status.message), '');
+    let message = scout.nvl(strings.nl2br(this.status.message), '');
     this.$container.html(message);
     this.invalidateLayoutTree();
   }

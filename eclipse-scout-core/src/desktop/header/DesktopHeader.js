@@ -210,7 +210,7 @@ export default class DesktopHeader extends Widget {
     if (!this.outlineContent) {
       return;
     }
-    var menuBar = this._outlineContentMenuBar(this.outlineContent);
+    let menuBar = this._outlineContentMenuBar(this.outlineContent);
     if (menuBar) {
       menuBar.on('propertyChange', this._outlineContentMenuBarPropertyChangeHandler);
     }
@@ -220,7 +220,7 @@ export default class DesktopHeader extends Widget {
     if (!this.outlineContent) {
       return;
     }
-    var menuBar = this._outlineContentMenuBar(this.outlineContent);
+    let menuBar = this._outlineContentMenuBar(this.outlineContent);
     if (menuBar) {
       menuBar.off('propertyChange', this._outlineContentMenuBarPropertyChangeHandler);
     }
@@ -237,14 +237,14 @@ export default class DesktopHeader extends Widget {
     if (!this.viewButtonBoxVisible || !this.desktop.bench || !this.desktop.bench.outlineContentVisible) {
       return;
     }
-    var outlineContent = this.desktop.bench.outlineContent;
+    let outlineContent = this.desktop.bench.outlineContent;
     if (!outlineContent) {
       // Outline content not available yet (-> needs to be loaded first)
       return;
     }
-    var hasMenuBar = false;
+    let hasMenuBar = false;
     if (outlineContent instanceof Form && outlineContent.detailForm) {
-      var rootGroupBox = outlineContent.rootGroupBox;
+      let rootGroupBox = outlineContent.rootGroupBox;
       hasMenuBar = rootGroupBox.menuBar && rootGroupBox.menuBarVisible && rootGroupBox.menuBar.visible;
     } else {
       hasMenuBar = outlineContent.menuBar && outlineContent.menuBar.visible;

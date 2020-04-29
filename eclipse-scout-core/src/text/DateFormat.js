@@ -90,11 +90,9 @@ export default class DateFormat {
         type: DateFormatPatternType.YEAR,
         terms: ['yyyy'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          return strings.padZeroLeft(formatContext.inputDate.getFullYear(), 4).slice(-4);
-        },
+        formatFunction: (formatContext, acceptedTerm) => strings.padZeroLeft(formatContext.inputDate.getFullYear(), 4).slice(-4),
         parseRegExp: /^(\d{4})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.matchInfo.year = match;
           parseContext.dateInfo.year = Number(match);
         }
@@ -103,9 +101,9 @@ export default class DateFormat {
         type: DateFormatPatternType.YEAR,
         terms: ['yyy', 'yy', 'y'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          var year = String(formatContext.inputDate.getFullYear());
-          var length = (formatContext.exactLength ? acceptedTerm.length : 2);
+        formatFunction: (formatContext, acceptedTerm) => {
+          let year = String(formatContext.inputDate.getFullYear());
+          let length = (formatContext.exactLength ? acceptedTerm.length : 2);
           if (length === 1) {
             // Return max. 2 digits, no leading zero
             return year.slice(-length);
@@ -114,19 +112,19 @@ export default class DateFormat {
           return strings.padZeroLeft(year, length).slice(-length);
         },
         parseRegExp: /^(\d{1,3})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           if (match.length === 3) {
             parseContext.dateInfo.year = Number(match);
             parseContext.matchInfo.year = match;
             return;
           }
-          var startYear = (parseContext.startDate || new Date()).getFullYear();
+          let startYear = (parseContext.startDate || new Date()).getFullYear();
           // Construct a new year using the startYear's century and the entered 'short year'
-          var year = Number(
+          let year = Number(
             strings.padZeroLeft(startYear, 4).substr(0, 2) +
             strings.padZeroLeft(match, 2));
           // Ensure max. 50 years distance between 'startYear' and 'year'
-          var distance = year - startYear;
+          let distance = year - startYear;
           if (distance <= -50) {
             year += 100;
           } else if (distance > 50) {
@@ -145,7 +143,7 @@ export default class DateFormat {
           return this.dateFormat.symbols.months[formatContext.inputDate.getMonth()];
         },
         parseFunction: function(parseContext, acceptedTerm) {
-          var i, symbol, re, m;
+          let i, symbol, re, m;
           for (i = 0; i < this.dateFormat.symbols.months.length; i++) {
             symbol = this.dateFormat.symbols.months[i];
             if (!symbol) {
@@ -185,7 +183,7 @@ export default class DateFormat {
           return this.dateFormat.symbols.monthsShort[formatContext.inputDate.getMonth()];
         },
         parseFunction: function(parseContext, acceptedTerm) {
-          var i, symbol, re, m;
+          let i, symbol, re, m;
           for (i = 0; i < this.dateFormat.symbols.monthsShort.length; i++) {
             symbol = this.dateFormat.symbols.monthsShort[i];
             if (!symbol) {
@@ -221,12 +219,10 @@ export default class DateFormat {
         type: DateFormatPatternType.MONTH,
         terms: ['MM'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          return strings.padZeroLeft(formatContext.inputDate.getMonth() + 1, 2);
-        },
+        formatFunction: (formatContext, acceptedTerm) => strings.padZeroLeft(formatContext.inputDate.getMonth() + 1, 2),
         parseRegExp: /^(\d{2})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
-          var month = Number(match);
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
+          let month = Number(match);
           parseContext.dateInfo.month = month - 1;
           parseContext.matchInfo.month = match;
         },
@@ -236,11 +232,11 @@ export default class DateFormat {
           if (parseContext.analyze) {
             if (parseContext.inputString === '0') {
               // Use current dateInfo to create a date
-              var date = this.dateFormat._dateInfoToDate(parseContext.dateInfo);
+              let date = this.dateFormat._dateInfoToDate(parseContext.dateInfo);
               if (!date) {
                 return null; // parsing failed (dateInfo does not seem to contain a valid string)
               }
-              var month = date.getMonth();
+              let month = date.getMonth();
               if (month >= 9) {
                 month = 0;
                 if (parseContext.dateInfo.year === undefined) {
@@ -262,12 +258,10 @@ export default class DateFormat {
         type: DateFormatPatternType.MONTH,
         terms: ['M'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          return String(formatContext.inputDate.getMonth() + 1);
-        },
+        formatFunction: (formatContext, acceptedTerm) => String(formatContext.inputDate.getMonth() + 1),
         parseRegExp: /^(\d{1,2})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
-          var month = Number(match);
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
+          let month = Number(match);
           parseContext.dateInfo.month = month - 1;
           parseContext.matchInfo.month = match;
         }
@@ -277,11 +271,9 @@ export default class DateFormat {
         type: DateFormatPatternType.WEEK_IN_YEAR,
         terms: ['ww'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          return strings.padZeroLeft(dates.weekInYear(formatContext.inputDate), 2);
-        },
+        formatFunction: (formatContext, acceptedTerm) => strings.padZeroLeft(dates.weekInYear(formatContext.inputDate), 2),
         parseRegExp: /^(\d{2})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.matchInfo.week = match;
           parseContext.hints.weekInYear = Number(match);
         }
@@ -290,11 +282,9 @@ export default class DateFormat {
         type: DateFormatPatternType.WEEK_IN_YEAR,
         terms: ['w'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          return String(dates.weekInYear(formatContext.inputDate));
-        },
+        formatFunction: (formatContext, acceptedTerm) => String(dates.weekInYear(formatContext.inputDate)),
         parseRegExp: /^(\d{1,2})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.matchInfo.week = match;
           parseContext.hints.weekInYear = Number(match);
         }
@@ -304,15 +294,13 @@ export default class DateFormat {
         type: DateFormatPatternType.DAY_IN_MONTH,
         terms: ['dd'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          return strings.padZeroLeft(formatContext.inputDate.getDate(), 2);
-        },
+        formatFunction: (formatContext, acceptedTerm) => strings.padZeroLeft(formatContext.inputDate.getDate(), 2),
         parseRegExp: /^(\d{2})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.dateInfo.day = Number(match);
           parseContext.matchInfo.day = match;
         },
-        parseFunction: function(parseContext, acceptedTerm) {
+        parseFunction: (parseContext, acceptedTerm) => {
           // Special case! When regexp did not match, check if input is '0'. In this case (and only
           // if we are in analyze mode), predict '01' as input.
           if (parseContext.analyze) {
@@ -330,11 +318,9 @@ export default class DateFormat {
         type: DateFormatPatternType.DAY_IN_MONTH,
         terms: ['d'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          return String(formatContext.inputDate.getDate());
-        },
+        formatFunction: (formatContext, acceptedTerm) => String(formatContext.inputDate.getDate()),
         parseRegExp: /^(\d{1,2})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.dateInfo.day = Number(match);
           parseContext.matchInfo.day = match;
         }
@@ -348,7 +334,7 @@ export default class DateFormat {
           return this.dateFormat.symbols.weekdays[formatContext.inputDate.getDay()];
         },
         parseFunction: function(parseContext, acceptedTerm) {
-          var i, symbol, re, m;
+          let i, symbol, re, m;
           for (i = 0; i < this.dateFormat.symbols.weekdays.length; i++) {
             symbol = this.dateFormat.symbols.weekdays[i];
             if (!symbol) {
@@ -388,7 +374,7 @@ export default class DateFormat {
           return this.dateFormat.symbols.weekdaysShort[formatContext.inputDate.getDay()];
         },
         parseFunction: function(parseContext, acceptedTerm) {
-          var i, symbol, re, m;
+          let i, symbol, re, m;
           for (i = 0; i < this.dateFormat.symbols.weekdaysShort.length; i++) {
             symbol = this.dateFormat.symbols.weekdaysShort[i];
             if (!symbol) {
@@ -425,11 +411,9 @@ export default class DateFormat {
         type: DateFormatPatternType.HOUR_24,
         terms: ['HH'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          return strings.padZeroLeft(formatContext.inputDate.getHours(), 2);
-        },
+        formatFunction: (formatContext, acceptedTerm) => strings.padZeroLeft(formatContext.inputDate.getHours(), 2),
         parseRegExp: /^(\d{2})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.dateInfo.hours = Number(match);
           parseContext.matchInfo.hours = match;
         }
@@ -438,11 +422,9 @@ export default class DateFormat {
         type: DateFormatPatternType.HOUR_24,
         terms: ['H'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          return String(formatContext.inputDate.getHours());
-        },
+        formatFunction: (formatContext, acceptedTerm) => String(formatContext.inputDate.getHours()),
         parseRegExp: /^(\d{1,2})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.dateInfo.hours = Number(match);
           parseContext.matchInfo.hours = match;
         }
@@ -452,18 +434,18 @@ export default class DateFormat {
         type: DateFormatPatternType.HOUR_12,
         terms: ['hh'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
+        formatFunction: (formatContext, acceptedTerm) => {
           if (formatContext.inputDate.getHours() % 12 === 0) {
             return '12'; // there is no hour '0' in 12-hour format
           }
           return strings.padZeroLeft(formatContext.inputDate.getHours() % 12, 2);
         },
         parseRegExp: /^(10|11|12|0[1-9])(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.dateInfo.hours = Number(match) + (parseContext.hints.pm ? 12 : 0);
           parseContext.matchInfo.hours = match;
         },
-        parseFunction: function(parseContext, acceptedTerm) {
+        parseFunction: (parseContext, acceptedTerm) => {
           // Special case! When regexp did not match and input is a single '0', predict '01'
           if (parseContext.analyze) {
             if (parseContext.inputString === '0') {
@@ -480,14 +462,14 @@ export default class DateFormat {
         type: DateFormatPatternType.HOUR_12,
         terms: ['h'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
+        formatFunction: (formatContext, acceptedTerm) => {
           if (formatContext.inputDate.getHours() % 12 === 0) {
             return '12'; // there is no hour '0' in 12-hour format
           }
           return String(formatContext.inputDate.getHours() % 12);
         },
         parseRegExp: /^(10|11|12|0?[1-9])(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.dateInfo.hours = Number(match) + (parseContext.hints.pm ? 12 : 0);
           parseContext.matchInfo.hours = match;
         }
@@ -504,8 +486,8 @@ export default class DateFormat {
           return this.dateFormat.symbols.pm;
         },
         parseFunction: function(parseContext, acceptedTerm) {
-          var re = new RegExp('^(' + strings.quote(this.dateFormat.symbols.am) + ')(.*)$', 'i');
-          var m = re.exec(parseContext.inputString);
+          let re = new RegExp('^(' + strings.quote(this.dateFormat.symbols.am) + ')(.*)$', 'i');
+          let m = re.exec(parseContext.inputString);
           parseContext.matchInfo.ampm = null;
           if (m) { // match found
             parseContext.matchInfo.ampm = m[1];
@@ -552,20 +534,18 @@ export default class DateFormat {
         type: DateFormatPatternType.MINUTE,
         terms: ['mm'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          return strings.padZeroLeft(formatContext.inputDate.getMinutes(), 2);
-        },
+        formatFunction: (formatContext, acceptedTerm) => strings.padZeroLeft(formatContext.inputDate.getMinutes(), 2),
         parseRegExp: /^(\d{2})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.dateInfo.minutes = Number(match);
           parseContext.matchInfo.minutes = match;
         },
-        parseFunction: function(parseContext, acceptedTerm) {
+        parseFunction: (parseContext, acceptedTerm) => {
           // Special case! When regexp did not match, check if input + '0' would make a
           // valid minutes value. If yes, predict this value.
           if (parseContext.analyze) {
             if (scout.isOneOf(parseContext.inputString, '0', '1', '2', '3', '4', '5')) {
-              var tenMinutes = parseContext.inputString + '0';
+              let tenMinutes = parseContext.inputString + '0';
               parseContext.dateInfo.minutes = Number(tenMinutes);
               parseContext.matchInfo.minutes = tenMinutes;
               parseContext.inputString = '';
@@ -579,11 +559,9 @@ export default class DateFormat {
         type: DateFormatPatternType.MINUTE,
         terms: ['m'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          return String(formatContext.inputDate.getMinutes());
-        },
+        formatFunction: (formatContext, acceptedTerm) => String(formatContext.inputDate.getMinutes()),
         parseRegExp: /^(\d{1,2})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.dateInfo.minutes = Number(match);
           parseContext.matchInfo.minutes = match;
         }
@@ -593,11 +571,9 @@ export default class DateFormat {
         type: DateFormatPatternType.SECOND,
         terms: ['ss'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          return strings.padZeroLeft(formatContext.inputDate.getSeconds(), 2);
-        },
+        formatFunction: (formatContext, acceptedTerm) => strings.padZeroLeft(formatContext.inputDate.getSeconds(), 2),
         parseRegExp: /^(\d{2})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.dateInfo.seconds = Number(match);
           parseContext.matchInfo.seconds = match;
         }
@@ -606,11 +582,9 @@ export default class DateFormat {
         type: DateFormatPatternType.SECOND,
         terms: ['s'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          return String(formatContext.inputDate.getSeconds());
-        },
+        formatFunction: (formatContext, acceptedTerm) => String(formatContext.inputDate.getSeconds()),
         parseRegExp: /^(\d{1,2})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.dateInfo.seconds = Number(match);
           parseContext.matchInfo.seconds = match;
         }
@@ -620,11 +594,9 @@ export default class DateFormat {
         type: DateFormatPatternType.MILLISECOND,
         terms: ['SSS'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          return strings.padZeroLeft(formatContext.inputDate.getMilliseconds(), 3);
-        },
+        formatFunction: (formatContext, acceptedTerm) => strings.padZeroLeft(formatContext.inputDate.getMilliseconds(), 3),
         parseRegExp: /^(\d{3})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.dateInfo.milliseconds = Number(match);
           parseContext.matchInfo.milliseconds = match;
         }
@@ -633,11 +605,9 @@ export default class DateFormat {
         type: DateFormatPatternType.MILLISECOND,
         terms: ['S'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          return String(formatContext.inputDate.getMilliseconds());
-        },
+        formatFunction: (formatContext, acceptedTerm) => String(formatContext.inputDate.getMilliseconds()),
         parseRegExp: /^(\d{1,3})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.dateInfo.milliseconds = Number(match);
           parseContext.matchInfo.milliseconds = match;
         }
@@ -648,14 +618,14 @@ export default class DateFormat {
         type: DateFormatPatternType.TIMEZONE,
         terms: ['Z'],
         dateFormat: this,
-        formatFunction: function(formatContext, acceptedTerm) {
-          var offset = Math.abs(formatContext.inputDate.getTimezoneOffset()),
+        formatFunction: (formatContext, acceptedTerm) => {
+          let offset = Math.abs(formatContext.inputDate.getTimezoneOffset()),
             isNegative = offset !== formatContext.inputDate.getTimezoneOffset();
           return (isNegative ? '-' : '+') + strings.padZeroLeft(Math.floor(offset / 60), 2) + strings.padZeroLeft(offset % 60, 2);
         },
         parseRegExp: /^([+|-]\d{4})(.*)$/,
-        applyMatchFunction: function(parseContext, match, acceptedTerm) {
-          var offset = Number(match.substr(1, 2)) * 60 + Number(match.substr(3, 2));
+        applyMatchFunction: (parseContext, match, acceptedTerm) => {
+          let offset = Number(match.substr(1, 2)) * 60 + Number(match.substr(3, 2));
           if (match.charAt(0) === '-') {
             offset *= -1;
           }
@@ -667,9 +637,9 @@ export default class DateFormat {
 
     // Build a map of pattern definitions by pattern type
     this._patternLibrary = {};
-    for (var i = 0; i < this._patternDefinitions.length; i++) {
-      var patternDefinition = this._patternDefinitions[i];
-      var type = patternDefinition.type;
+    for (let i = 0; i < this._patternDefinitions.length; i++) {
+      let patternDefinition = this._patternDefinitions[i];
+      let type = patternDefinition.type;
       if (type) {
         if (!this._patternLibrary[type]) {
           this._patternLibrary[type] = [];
@@ -682,7 +652,7 @@ export default class DateFormat {
   }
 
   _compile() {
-    var i, j, patternDefinitions, patternDefinition, re, m, term, termAccepted, analyseFunctions;
+    let i, j, patternDefinitions, patternDefinition, re, m, term, termAccepted, analyseFunctions;
 
     // Build format, parse and analyze functions for all terms in the DateFormat's pattern.
     // A term is a continuous sequence of the same character.
@@ -694,7 +664,7 @@ export default class DateFormat {
       termAccepted = false;
       for (i = 0; i < this._patternDefinitions.length; i++) {
         patternDefinition = this._patternDefinitions[i];
-        var acceptedTerm = patternDefinition.accept(term);
+        let acceptedTerm = patternDefinition.accept(term);
         if (acceptedTerm) {
           // 1. Create and install format function
           this._formatFunctions.push(patternDefinition.createFormatFunction(acceptedTerm));
@@ -726,7 +696,7 @@ export default class DateFormat {
         // 1. Create and install constant format function
         this._formatFunctions.push(this._createConstantStringFormatFunction(term));
         // 2./3. Create and install parse and analyse functions
-        var constantStringParseFunction = this._createConstantStringParseFunction(term);
+        let constantStringParseFunction = this._createConstantStringParseFunction(term);
         this._parseFunctions.push(constantStringParseFunction);
         this._analyzeFunctions.push([constantStringParseFunction]);
       }
@@ -738,7 +708,7 @@ export default class DateFormat {
    * have a DateFormatPatternDefinition).
    */
   _createConstantStringFormatFunction(term) {
-    return function(formatContext) {
+    return formatContext => {
       formatContext.formattedString += term;
     };
   }
@@ -748,7 +718,7 @@ export default class DateFormat {
    * have a DateFormatPatternDefinition).
    */
   _createConstantStringParseFunction(term) {
-    return function(parseContext) {
+    return parseContext => {
       if (strings.startsWith(parseContext.inputString, term)) {
         parseContext.inputString = parseContext.inputString.substr(term.length);
         parseContext.parsedPattern += term;
@@ -774,12 +744,12 @@ export default class DateFormat {
       return '';
     }
 
-    var formatContext = this._createFormatContext(date);
+    let formatContext = this._createFormatContext(date);
     formatContext.exactLength = scout.nvl(exactLength, false);
     // Apply all formatter functions for this DateFormat to the pattern to replace the
     // different terms with the corresponding value from the given date.
-    for (var i = 0; i < this._formatFunctions.length; i++) {
-      var formatFunction = this._formatFunctions[i];
+    for (let i = 0; i < this._formatFunctions.length; i++) {
+      let formatFunction = this._formatFunctions[i];
       formatFunction(formatContext);
     }
     return formatContext.formattedString;
@@ -833,21 +803,21 @@ export default class DateFormat {
    *   and a date could be predicted).
    */
   analyze(text, startDate) {
-    var analyzeInfo = this._createAnalyzeInfo(text);
+    let analyzeInfo = this._createAnalyzeInfo(text);
     if (!text) {
       return analyzeInfo;
     }
 
-    var parseContext = this._createParseContext(text);
+    let parseContext = this._createParseContext(text);
     parseContext.analyze = true; // Mark context as "analyze mode"
     parseContext.startDate = startDate;
-    var matchedPattern = '';
-    for (var i = 0; i < this._terms.length; i++) {
+    let matchedPattern = '';
+    for (let i = 0; i < this._terms.length; i++) {
       if (parseContext.inputString.length > 0) {
-        var parseFunctions = this._analyzeFunctions[i];
-        var parsed = false;
-        for (var j = 0; j < parseFunctions.length; j++) {
-          var parseFunction = parseFunctions[j];
+        let parseFunctions = this._analyzeFunctions[i];
+        let parsed = false;
+        for (let j = 0; j < parseFunctions.length; j++) {
+          let parseFunction = parseFunctions[j];
           if (parseFunction(parseContext)) {
             parsed = true;
             break;
@@ -875,8 +845,8 @@ export default class DateFormat {
     startDate = this._prepareStartDate(startDate);
 
     // When weekday is included in pattern, try to find a suitable start date #235975
-    var dayInWeek = parseContext.hints.weekday;
-    var dayInMonth = parseContext.dateInfo.day;
+    let dayInWeek = parseContext.hints.weekday;
+    let dayInMonth = parseContext.dateInfo.day;
     if (dayInWeek !== undefined) {
       if (dayInMonth !== undefined && dayInMonth <= 31) {
         startDate = dates.shiftToNextDayAndDate(startDate, dayInWeek, dayInMonth);
@@ -885,7 +855,7 @@ export default class DateFormat {
       }
     }
 
-    var predictedDate = this._dateInfoToDate(parseContext.dateInfo, startDate, parseContext.hints);
+    let predictedDate = this._dateInfoToDate(parseContext.dateInfo, startDate, parseContext.hints);
 
     // Update analyzeInfo
     analyzeInfo.dateInfo = parseContext.dateInfo;
@@ -910,10 +880,10 @@ export default class DateFormat {
       return null;
     }
 
-    var parseContext = this._createParseContext(text);
+    let parseContext = this._createParseContext(text);
     parseContext.startDate = startDate;
-    for (var i = 0; i < this._parseFunctions.length; i++) {
-      var parseFunction = this._parseFunctions[i];
+    for (let i = 0; i < this._parseFunctions.length; i++) {
+      let parseFunction = this._parseFunctions[i];
       if (!parseFunction(parseContext)) {
         return null; // Parsing failed
       }
@@ -927,7 +897,7 @@ export default class DateFormat {
     }
 
     // Build date from dateInfo
-    var date = this._dateInfoToDate(parseContext.dateInfo, startDate);
+    let date = this._dateInfoToDate(parseContext.dateInfo, startDate);
     if (!date) {
       return null; // dateInfo could not be converted to a valid date -> parsing failed
     }
@@ -962,16 +932,16 @@ export default class DateFormat {
     // due to JavaScript's automatic date correction, e.g. dateInfo = { day: 11, month: 1 }
     // and startDate = 2015-07-29 would result in invalid date 2015-03-11, because February
     // 2015 does not have 29 days and is "corrected" to March.)
-    var result = new Date(1970, 0, 1);
+    let result = new Date(1970, 0, 1);
 
-    var validDay = scout.nvl(dateInfo.day, startDate.getDate());
-    var validMonth = scout.nvl(dateInfo.month, startDate.getMonth());
-    var validYear = scout.nvl(dateInfo.year, startDate.getFullYear());
+    let validDay = scout.nvl(dateInfo.day, startDate.getDate());
+    let validMonth = scout.nvl(dateInfo.month, startDate.getMonth());
+    let validYear = scout.nvl(dateInfo.year, startDate.getFullYear());
     // When user entered the day but not (yet) the month, adjust month if possible to propose a valid date
     if (dateInfo.day && !dateInfo.month) {
       // If day "31" does not exist in the proposed month, use the next month
       if (dateInfo.day === 31) {
-        var monthsWithThirthyOneDays = [0, 2, 4, 6, 7, 9, 11];
+        let monthsWithThirthyOneDays = [0, 2, 4, 6, 7, 9, 11];
         if (!scout.isOneOf(validMonth, monthsWithThirthyOneDays)) {
           validMonth = validMonth + 1;
         }
@@ -985,7 +955,7 @@ export default class DateFormat {
 
     // ensure valid day for selected month for dateInfo without day
     if (!dateInfo.day && dateInfo.month) {
-      var lastOfMonth = dates.shift(new Date(validYear, dateInfo.month + 1, 1), 0, 0, -1);
+      let lastOfMonth = dates.shift(new Date(validYear, dateInfo.month + 1, 1), 0, 0, -1);
       validDay = Math.min(lastOfMonth.getDate(), startDate.getDate());
     }
 

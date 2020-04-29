@@ -11,14 +11,14 @@
 import * as numbers from '../../src/util/numbers';
 import RoundingMode from '../../src/util/RoundingMode';
 
-describe('scout.numbers', function() {
+describe('scout.numbers', () => {
 
   /**
-   * Test cases copied & extended from {@link java.math.RoundingMode}
+   * Test cases copied & extended from java.math.RoundingMode
    */
-  describe('round', function() {
+  describe('round', () => {
 
-    it('tests special cases', function() {
+    it('tests special cases', () => {
       expect(numbers.round(undefined, 0)).toBe(undefined);
       expect(numbers.round(undefined)).toBe(undefined);
       expect(numbers.round(undefined, 0, 0)).toBe(undefined);
@@ -33,8 +33,8 @@ describe('scout.numbers', function() {
       expect(numbers.round(-0)).toBe(0);
     });
 
-    it('tests rounding mode \'UP\'', function() {
-      var roundingMode = RoundingMode.UP;
+    it('tests rounding mode \'UP\'', () => {
+      let roundingMode = RoundingMode.UP;
       expect(numbers.round(5.51, roundingMode)).toBe(6);
       expect(numbers.round(5.5, roundingMode)).toBe(6);
       expect(numbers.round(2.5, roundingMode)).toBe(3);
@@ -57,8 +57,8 @@ describe('scout.numbers', function() {
       expect(numbers.round(12.34500000000000, roundingMode, 2)).toBe(12.35);
     });
 
-    it('tests rounding mode \'DOWN\'', function() {
-      var roundingMode = RoundingMode.DOWN;
+    it('tests rounding mode \'DOWN\'', () => {
+      let roundingMode = RoundingMode.DOWN;
       expect(numbers.round(5.51, roundingMode)).toBe(5);
       expect(numbers.round(5.5, roundingMode)).toBe(5);
       expect(numbers.round(2.5, roundingMode)).toBe(2);
@@ -80,8 +80,8 @@ describe('scout.numbers', function() {
       expect(numbers.round(12.34500000000000, roundingMode, 2)).toBe(12.34);
     });
 
-    it('tests rounding mode \'CEILING\'', function() {
-      var roundingMode = RoundingMode.CEILING;
+    it('tests rounding mode \'CEILING\'', () => {
+      let roundingMode = RoundingMode.CEILING;
       expect(numbers.round(5.51, roundingMode)).toBe(6);
       expect(numbers.round(5.5, roundingMode)).toBe(6);
       expect(numbers.round(2.5, roundingMode)).toBe(3);
@@ -103,8 +103,8 @@ describe('scout.numbers', function() {
       expect(numbers.round(12.34500000000000, roundingMode, 2)).toBe(12.35);
     });
 
-    it('tests rounding mode \'FLOOR\'', function() {
-      var roundingMode = RoundingMode.FLOOR;
+    it('tests rounding mode \'FLOOR\'', () => {
+      let roundingMode = RoundingMode.FLOOR;
       expect(numbers.round(5.51, roundingMode)).toBe(5);
       expect(numbers.round(5.5, roundingMode)).toBe(5);
       expect(numbers.round(2.5, roundingMode)).toBe(2);
@@ -126,8 +126,8 @@ describe('scout.numbers', function() {
       expect(numbers.round(12.34500000000000, roundingMode, 2)).toBe(12.34);
     });
 
-    it('tests rounding mode \'HALF_UP\'', function() {
-      var roundingMode = RoundingMode.HALF_UP;
+    it('tests rounding mode \'HALF_UP\'', () => {
+      let roundingMode = RoundingMode.HALF_UP;
       expect(numbers.round(5.51, roundingMode)).toBe(6);
       expect(numbers.round(5.5, roundingMode)).toBe(6);
       expect(numbers.round(2.5, roundingMode)).toBe(3);
@@ -149,8 +149,8 @@ describe('scout.numbers', function() {
       expect(numbers.round(12.34500000000000, roundingMode, 2)).toBe(12.35);
     });
 
-    it('tests rounding mode \'HALF_DOWN\'', function() {
-      var roundingMode = RoundingMode.HALF_DOWN;
+    it('tests rounding mode \'HALF_DOWN\'', () => {
+      let roundingMode = RoundingMode.HALF_DOWN;
 
       expect(numbers.round(5.51, roundingMode)).toBe(6);
       expect(numbers.round(5.5, roundingMode)).toBe(5);
@@ -175,9 +175,9 @@ describe('scout.numbers', function() {
 
   });
 
-  describe('shiftDecimalPoint', function() {
+  describe('shiftDecimalPoint', () => {
 
-    it('can shift decimal point to left and right', function() {
+    it('can shift decimal point to left and right', () => {
       expect(numbers.shiftDecimalPoint()).toBe(undefined);
       expect(numbers.shiftDecimalPoint(null)).toBe(null);
       expect(numbers.shiftDecimalPoint('')).toBe('');
@@ -229,9 +229,9 @@ describe('scout.numbers', function() {
 
   });
 
-  describe('randomId', function() {
+  describe('randomId', () => {
 
-    it('can generate random IDs', function() {
+    it('can generate random IDs', () => {
       expect(typeof numbers.randomId()).toBe('string');
       expect(numbers.randomId().length).toBe(8);
       expect(numbers.randomId(0).length).toBe(8);
@@ -242,9 +242,9 @@ describe('scout.numbers', function() {
 
   });
 
-  describe('correlationId', function() {
+  describe('correlationId', () => {
 
-    it('can generate random correlation IDs', function() {
+    it('can generate random correlation IDs', () => {
       numbers._setCorrelationCounter(4865);
       expect(typeof numbers.correlationId()).toBe('string');
       expect(numbers.correlationId().length).toBe(11 + 5);
@@ -256,17 +256,17 @@ describe('scout.numbers', function() {
 
   });
 
-  describe('isNumber', function() {
+  describe('isNumber', () => {
 
-    it('returns true if the value is a number', function() {
+    it('returns true if the value is a number', () => {
       expect(numbers.isNumber(3)).toBe(true);
     });
 
-    it('returns false if the value is not a number', function() {
+    it('returns false if the value is not a number', () => {
       expect(numbers.isNumber('3')).toBe(false);
     });
 
-    it('returns false if the value is NaN', function() {
+    it('returns false if the value is NaN', () => {
       expect(numbers.isNumber(NaN)).toBe(false);
     });
 

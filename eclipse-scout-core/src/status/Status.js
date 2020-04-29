@@ -27,7 +27,7 @@ export default class Status {
     }
     // children
     if (model && model.children && Array.isArray(model.children)) {
-      this.children = model.children.map(function(child) {
+      this.children = model.children.map(child => {
         return Status.ensure(child);
       });
     }
@@ -81,7 +81,7 @@ export default class Status {
    * @return {Status} a clone of this Status instance.
    */
   clone() {
-    var modelClone = $.extend({}, this);
+    let modelClone = $.extend({}, this);
     return new Status(modelClone);
   }
 
@@ -103,7 +103,7 @@ export default class Status {
    * @return {boolean} whether or not this status contains a child with the give type
    */
   containsStatus(statusType) {
-    return this.containsStatusByPredicate(function(status) {
+    return this.containsStatusByPredicate(status => {
       return status instanceof statusType;
     });
   }
@@ -127,17 +127,17 @@ export default class Status {
    * @param {object} statusType
    */
   removeAllStatus(statusType) {
-    this.removeAllStatusByPredicate(function(status) {
+    this.removeAllStatusByPredicate(status => {
       return status instanceof statusType;
     });
   }
 
   removeAllStatusByPredicate(predicate) {
     if (this.hasChildren()) {
-      this.children.forEach(function(status) {
+      this.children.forEach(status => {
         status.removeAllStatusByPredicate(predicate);
       });
-      var newChildren = this.children.filter(function(status) {
+      let newChildren = this.children.filter(status => {
         // when status is not deletable we must add it as child again, thus --> true
         if (!status.deletable) {
           return true;
@@ -157,11 +157,11 @@ export default class Status {
       return;
     }
 
-    var firstStatus = this.asFlatList().sort(function(a, b) {
+    let firstStatus = this.asFlatList().sort((a, b) => {
       return calcPriority(b) - calcPriority(a);
 
       function calcPriority(status) {
-        var multiplier = 1;
+        let multiplier = 1;
         if (status instanceof ParsingFailedStatus) {
           multiplier = 4;
         } else if (status instanceof ValidationFailedStatus) {
@@ -193,8 +193,8 @@ export default class Status {
     if (objects.isArray(this.children)) {
       return this.clone();
     }
-    var childStatus = this;
-    var newStatus = this.clone();
+    let childStatus = this;
+    let newStatus = this.clone();
     newStatus.children = [childStatus];
     newStatus._updateProperties();
     return newStatus;
@@ -215,7 +215,7 @@ export default class Status {
    * @static
    */
   static cssClassForSeverity(severity) {
-    var cssSeverity,
+    let cssSeverity,
       Severity = Status.Severity;
 
     switch (severity) {
@@ -237,8 +237,8 @@ export default class Status {
 
   static animateStatusMessage($status, message) {
     if (strings.endsWith(message, '...')) {
-      var $ellipsis = $status.makeSpan('ellipsis');
-      for (var i = 0; i < 3; i++) {
+      let $ellipsis = $status.makeSpan('ellipsis');
+      for (let i = 0; i < 3; i++) {
         $ellipsis.append($status.makeSpan('animate-dot delay-' + i, '.'));
       }
       message = message.substring(0, message.length - 3);
@@ -327,9 +327,9 @@ export default class Status {
     if (!status) {
       return [];
     }
-    var list = [];
+    let list = [];
     if (status.hasChildren()) {
-      status.children.forEach(function(childStatus) {
+      status.children.forEach(childStatus => {
         arrays.pushAll(list, Status.asFlatList(childStatus));
       });
     } else {

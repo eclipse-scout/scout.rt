@@ -20,13 +20,13 @@ export default class WizardProgressFieldLayout extends FormFieldLayout {
     super.layout($container);
 
     // Remember old scroll position, because setting the body width might change it
-    var oldScrollLeft = this.formField.$field.scrollLeft();
+    let oldScrollLeft = this.formField.$field.scrollLeft();
 
     // Explicitly set width of body to scrollWidth because container is scrollable. Otherwise,
     // the body would have the wrong size because it has "overflow: hidden" set.
-    var $body = this.formField.$wizardStepsBody;
+    let $body = this.formField.$wizardStepsBody;
     $body.width('auto'); // reset previously set width to ensure 'scrollWidth' returns the preferred size
-    var bodyWidth = $body[0].scrollWidth;
+    let bodyWidth = $body[0].scrollWidth;
     $body.width(bodyWidth);
 
     // Ensure scrolling position did not change because of the width change (prevents flickering effect)

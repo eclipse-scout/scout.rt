@@ -27,7 +27,7 @@ const DEFAULT_DROP_MAXIMUM_SIZE = 50 * 1024 * 1024; // 50 MB
  */
 export function scoutTypeToDragTypeMapping(scoutTypesArray) {
   scoutTypesArray = arrays.ensure(scoutTypesArray);
-  var ret = [];
+  let ret = [];
   if (scoutTypesArray.indexOf(SCOUT_TYPES.FILE_TRANSFER) >= 0) {
     ret.push('Files');
   }
@@ -43,11 +43,11 @@ export function scoutTypeToDragTypeMapping(scoutTypesArray) {
  */
 export function verifyDataTransferTypesScoutTypes(event, scoutTypeArray, fieldAllowedTypes) {
   scoutTypeArray = arrays.ensure(scoutTypeArray);
-  var dragTypeArray = [];
+  let dragTypeArray = [];
 
   // check if any scout type is allowed for field allowed types (or no field allowed types defined)
   if (fieldAllowedTypes !== undefined) {
-    scoutTypeArray.forEach(function fieldAllowedTypesContainsElement(scoutType) {
+    scoutTypeArray.forEach(scoutType => {
       if ((fieldAllowedTypes & scoutType) === scoutType) { // NOSONAR
         arrays.pushAll(dragTypeArray, scoutTypeToDragTypeMapping(scoutTypeArray));
       }
@@ -68,7 +68,7 @@ export function verifyDataTransferTypesScoutTypes(event, scoutTypeArray, fieldAl
  * @param needleArray e.g. 'Files'
  */
 export function verifyDataTransferTypes(event, needleArray) {
-  var dataTransfer = event.originalEvent.dataTransfer;
+  let dataTransfer = event.originalEvent.dataTransfer;
 
   if (dataTransferTypesContains(dataTransfer, needleArray)) {
     event.stopPropagation();
@@ -88,7 +88,7 @@ export function verifyDataTransferTypes(event, needleArray) {
  */
 export function dataTransferTypesContainsScoutTypes(dataTransfer, scoutTypesArray) {
   scoutTypesArray = arrays.ensure(scoutTypesArray);
-  var dragTypesArray = scoutTypeToDragTypeMapping(scoutTypesArray);
+  let dragTypesArray = scoutTypeToDragTypeMapping(scoutTypesArray);
   return dataTransferTypesContains(dataTransfer, dragTypesArray);
 }
 
@@ -108,7 +108,7 @@ export function dataTransferTypesContains(dataTransfer, needleArray) {
       return true;
     } else if (dataTransfer.types.contains) {
       // DOMStringList: contains function
-      return needleArray.some(function containsElement(element) {
+      return needleArray.some(element => {
         return dataTransfer.types.contains(element);
       });
     }

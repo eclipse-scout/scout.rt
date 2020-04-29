@@ -9,15 +9,15 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-window.mostRecentJsonRequest = function() {
-  var req = jasmine.Ajax.requests.mostRecent();
+window.mostRecentJsonRequest = () => {
+  let req = jasmine.Ajax.requests.mostRecent();
   if (req) {
     return $.parseJSON(req.params);
   }
 };
 
-window.sandboxDesktop = function() {
-  var $sandbox = window.sandbox();
+window.sandboxDesktop = () => {
+  let $sandbox = window.sandbox();
   $sandbox.addClass('scout desktop');
   return $sandbox;
 };
@@ -26,14 +26,14 @@ window.sandboxDesktop = function() {
  * Sends the queued requests and simulates a response as well.
  * @param response if not set an empty success response will be generated
  */
-window.sendQueuedAjaxCalls = function(response, time) {
+window.sendQueuedAjaxCalls = (response, time) => {
   time = time || 0;
   jasmine.clock().tick(time);
 
   receiveResponseForAjaxCall('', response);
 };
 
-window.receiveResponseForAjaxCall = function(request, response) {
+window.receiveResponseForAjaxCall = (request, response) => {
   if (!response) {
     response = {
       status: 200,
@@ -51,19 +51,17 @@ window.receiveResponseForAjaxCall = function(request, response) {
 /**
  * Uninstalls 'beforeunload' and 'unload' events from window that were previously installed by session.start()
  */
-window.uninstallUnloadHandlers = function(session) {
+window.uninstallUnloadHandlers = session => {
   $(window)
     .off('beforeunload.' + session.uiSessionId)
     .off('unload.' + session.uiSessionId);
 };
 
-window.createPropertyChangeEvent = function(model, properties) {
-  return {
-    target: model.id,
-    properties: properties,
-    type: 'property'
-  };
-};
+window.createPropertyChangeEvent = (model, properties) => ({
+  target: model.id,
+  properties: properties,
+  type: 'property'
+});
 
 /**
  * Returns a new object instance having two properties id, objectType from the given widgetModel.
@@ -72,24 +70,22 @@ window.createPropertyChangeEvent = function(model, properties) {
  *
  * @param widgetModel
  */
-window.createAdapterModel = function(widgetModel) {
-  return {
-    id: widgetModel.id,
-    objectType: widgetModel.objectType,
-    session: widgetModel.session
-  };
-};
+window.createAdapterModel = widgetModel => ({
+  id: widgetModel.id,
+  objectType: widgetModel.objectType,
+  session: widgetModel.session
+});
 
-window.stripCommentsFromJson = function(input) {
+window.stripCommentsFromJson = input => {
   if (!input || typeof input !== 'string') {
     return input;
   }
-  var result = '';
-  var whitespaceBuffer = '';
-  for (var i = 0; i < input.length; i++) {
-    var previousCharacter = input.charAt(i - 1);
-    var currentCharacter = input.charAt(i);
-    var nextCharacter = input.charAt(i + 1);
+  let result = '';
+  let whitespaceBuffer = '';
+  for (let i = 0; i < input.length; i++) {
+    let previousCharacter = input.charAt(i - 1);
+    let currentCharacter = input.charAt(i);
+    let nextCharacter = input.charAt(i + 1);
 
     // Add whitespace to a buffer (because me might want to ignore it at the end of a line)
     if (currentCharacter === ' ' || currentCharacter === '\t') {

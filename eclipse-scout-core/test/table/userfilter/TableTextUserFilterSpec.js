@@ -11,11 +11,11 @@
 import {BeanColumn, NullWidget, ObjectFactory, scout} from '../../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-describe('TableTextUserFilter', function() {
-  var session;
-  var helper;
+describe('TableTextUserFilter', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
@@ -23,7 +23,7 @@ describe('TableTextUserFilter', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
@@ -42,24 +42,24 @@ describe('TableTextUserFilter', function() {
     }
   }
 
-  describe('filter', function() {
+  describe('filter', () => {
 
-    beforeEach(function() {
-      ObjectFactory.get().register('ASpecBeanColumn', function() {
+    beforeEach(() => {
+      ObjectFactory.get().register('ASpecBeanColumn', () => {
         return new ASpecBeanColumn();
       });
     });
 
-    afterEach(function() {
+    afterEach(() => {
       ObjectFactory.get().unregister('ASpecBeanColumn');
     });
 
-    it('filters rows based on cell text', function() {
-      var model = helper.createModelFixture(2, 0),
+    it('filters rows based on cell text', () => {
+      let model = helper.createModelFixture(2, 0),
         table = helper.createTable(model),
         filter = createFilter(table);
 
-      var rows = [{
+      let rows = [{
         cells: ['cell00', 'cell01']
       }, {
         cells: ['cell10', 'cell11']
@@ -96,12 +96,12 @@ describe('TableTextUserFilter', function() {
       expect(table.filteredRows().length).toBe(2);
     });
 
-    it('separates cell values with whitepace', function() {
-      var model = helper.createModelFixture(2, 0),
+    it('separates cell values with whitepace', () => {
+      let model = helper.createModelFixture(2, 0),
         table = helper.createTable(model),
         filter = createFilter(table);
 
-      var rows = [{
+      let rows = [{
         cells: ['cell00', 'cell01']
       }, {
         cells: ['cell10', 'cell11']
@@ -124,8 +124,8 @@ describe('TableTextUserFilter', function() {
       expect(table.filteredRows()[0]).toBe(table.rows[1]);
     });
 
-    it('works with bean columns', function() {
-      var table = scout.create('Table', {
+    it('works with bean columns', () => {
+      let table = scout.create('Table', {
         parent: new NullWidget(),
         session: session,
         columns: [
@@ -135,14 +135,14 @@ describe('TableTextUserFilter', function() {
           })
         ]
       });
-      var filter = createFilter(table);
-      var bean0 = {
+      let filter = createFilter(table);
+      let bean0 = {
         a: 'bean0 text'
       };
-      var bean1 = {
+      let bean1 = {
         a: 'bean1 text'
       };
-      var rows = [{
+      let rows = [{
         cells: [bean0]
       }, {
         cells: [bean1]

@@ -21,7 +21,7 @@ export default class CalendarModesMenu extends Menu {
   _init(model) {
     super._init(model);
     this.calendar = this.parent;
-    var menusToAdd = [];
+    let menusToAdd = [];
     menusToAdd.push(scout.create('CalendarModeMenu', {
       parent: this,
       displayMode: Calendar.DisplayMode.DAY,
@@ -57,27 +57,27 @@ export default class CalendarModesMenu extends Menu {
 
   _setDisplayMode(displayMode) {
     this._setProperty('displayMode', displayMode);
-    var menu = this.getMenuForMode(this.displayMode);
+    let menu = this.getMenuForMode(this.displayMode);
     menu.setSelected(true);
     this.setText(menu.text);
   }
 
   getMenuForMode(displayMode) {
-    return arrays.find(this.childActions, function(menu) {
+    return arrays.find(this.childActions, menu => {
       return menu.displayMode === displayMode;
     });
   }
 
   _onMenuPropertyChange(event) {
     if (event.propertyName === 'selected') {
-      var selected = event.newValue;
+      let selected = event.newValue;
       if (selected) {
-        var displayMode = event.source.displayMode;
+        let displayMode = event.source.displayMode;
         this.setDisplayMode(displayMode);
         this.calendar.setDisplayMode(displayMode);
 
         // unselect other menu items
-        this.childActions.forEach(function(menu) {
+        this.childActions.forEach(menu => {
           if (menu !== event.source) {
             menu.setSelected(false);
           }

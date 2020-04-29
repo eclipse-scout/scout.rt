@@ -28,13 +28,13 @@ let showStackTraces = true;
  * @returns {Promise}
  */
 export function bootstrap(options) {
-  var location = new URL(),
+  let location = new URL(),
     logging = location.getParameter('logging'),
     logLevel = location.getParameter('logLevel');
 
   options = scout.nvl(options, {});
 
-  var enabled = !!(options.enabled || logging),
+  let enabled = !!(options.enabled || logging),
     showPopup = !!(options.showPopup || logging),
     resourceUrl = strings.nvl(options.resourceUrl);
 
@@ -55,7 +55,7 @@ export function bootstrap(options) {
 export function initLog4Javascript(logLevel, showPopup) {
   logLevel = scout.nvl(logLevel, DEFAULT_LEVEL);
   log4javascript.setShowStackTraces(showStackTraces);
-  var defaultLogger = log4javascript.getDefaultLogger();
+  let defaultLogger = log4javascript.getDefaultLogger();
   defaultLogger.setLevel(parseLevel(logLevel));
   $.log = defaultLogger;
 
@@ -64,7 +64,7 @@ export function initLog4Javascript(logLevel, showPopup) {
   if (showPopup) {
     // To avoid problems with our CSP rule which prohibits inline scripts we set the useDocumentWrite
     // flag to false, so the console[_uncompressed].html/js is loaded instead.
-    defaultLogger.getEffectiveAppenders().forEach(function(appender) {
+    defaultLogger.getEffectiveAppenders().forEach(appender => {
       appender.setUseDocumentWrite(false);
     });
   } else {
@@ -73,7 +73,7 @@ export function initLog4Javascript(logLevel, showPopup) {
   }
 
   // Add appenders later
-  _appendersToAdd.forEach(function(obj) {
+  _appendersToAdd.forEach(obj => {
     addAppender(obj.factoryName, obj.options);
   }, this);
   _appendersToAdd = [];
@@ -109,7 +109,7 @@ export function addAppender(factoryName, options) {
     return;
   }
 
-  var factory = scout.create(factoryName, options);
+  let factory = scout.create(factoryName, options);
   $.log.addAppender(factory.create());
 }
 

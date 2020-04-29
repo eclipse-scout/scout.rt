@@ -11,12 +11,12 @@
 import {arrays, Device, Range, Table} from '../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-describe('Table Grouping', function() {
+describe('Table Grouping', () => {
 
-  var session, helper, model, table, column0, column1, column2, column3, column4, rows, columns, adapter;
-  var $colHeaders, $header0, $header1;
+  let session, helper, model, table, column0, column1, column2, column3, column4, rows, columns, adapter;
+  let $colHeaders, $header0, $header1;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
@@ -26,7 +26,7 @@ describe('Table Grouping', function() {
 
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
@@ -75,12 +75,12 @@ describe('Table Grouping', function() {
    * b     |  d     |  f     |  8     |  24
    */
   function prepareContent() {
-    var column0Values = ['a', 'b'],
+    let column0Values = ['a', 'b'],
       column1Values = ['c', 'd'],
       column2Values = ['e', 'f'],
       value, text, j;
 
-    for (var i = 0; i < rows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
       value = column0Values[Math.floor(i / 4)];
       text = value.toString();
       rows[i].cells[0] = column0.initCell(helper.createModelCell(text, value));
@@ -117,10 +117,10 @@ describe('Table Grouping', function() {
     table.groupColumn(column, '', 'asc', true);
   }
 
-  function assertGroupingProperty(table) {
-    var i, expectGrouped = arrays.init(5, false);
-    for (i = 1; i < arguments.length; i++) {
-      expectGrouped[arguments[i]] = true;
+  function assertGroupingProperty(table, ...args) {
+    let i, expectGrouped = arrays.init(5, false);
+    for (i = 0; i < args.length; i++) {
+      expectGrouped[args[i]] = true;
     }
 
     for (i = 0; i < 5; i++) {
@@ -137,7 +137,7 @@ describe('Table Grouping', function() {
   }
 
   function assertGroupingValues(table, column, values) {
-    var i, c, $sumCell;
+    let i, c, $sumCell;
     c = table.columns.indexOf(column);
     expect(find$aggregateRows(table).length).toBe(values.length);
 
@@ -157,7 +157,7 @@ describe('Table Grouping', function() {
     }, session);
   }
 
-  it('renders an aggregate row for each group', function() {
+  it('renders an aggregate row for each group', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -172,7 +172,7 @@ describe('Table Grouping', function() {
     expect(table._aggregateRows.length).toBe(2);
   });
 
-  it('considers groupingStyle -> aggregate rows must be rendered previous to the grouped rows', function() {
+  it('considers groupingStyle -> aggregate rows must be rendered previous to the grouped rows', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -182,7 +182,7 @@ describe('Table Grouping', function() {
     render(table);
     addGrouping(table, column0, false);
 
-    var // check in the DOM if the aggregate row comes previous to the first
+    let // check in the DOM if the aggregate row comes previous to the first
       // row of the group
       $mixedRows = table.$data.children('.table-row,.table-aggregate-row'),
       $aggregateRows = table.$data.find('.table-aggregate-row'),
@@ -195,7 +195,7 @@ describe('Table Grouping', function() {
     expect(aggrRow2Pos < rowLastPos).toBe(true);
   });
 
-  it('considers view range -> only renders an aggregate row for rendered rows', function() {
+  it('considers view range -> only renders an aggregate row for rendered rows', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -217,7 +217,7 @@ describe('Table Grouping', function() {
     expect(table._aggregateRows[1].$row).toBeFalsy();
   });
 
-  it('considers view range -> doesn\'t render an aggregate row if the last row of the group is not rendered', function() {
+  it('considers view range -> doesn\'t render an aggregate row if the last row of the group is not rendered', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -251,7 +251,7 @@ describe('Table Grouping', function() {
     expect(table._aggregateRows[1].$row).toBeFalsy();
   });
 
-  it('regroups if rows get inserted', function() {
+  it('regroups if rows get inserted', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -267,7 +267,7 @@ describe('Table Grouping', function() {
     assertGroupingValues(table, column4, ['30', '78']);
 
     // add new row for group 1
-    var rows = [{
+    let rows = [{
       cells: ['a', 'xyz', 'xyz', 10, 20]
     }];
     table.insertRows(rows);
@@ -278,7 +278,7 @@ describe('Table Grouping', function() {
     assertGroupingValues(table, column4, ['50', '78']);
   });
 
-  it('regroups if rows get inserted, event is from server and table was empty', function() {
+  it('regroups if rows get inserted, event is from server and table was empty', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -291,7 +291,7 @@ describe('Table Grouping', function() {
     expect(find$aggregateRows(table).length).toBe(0);
 
     // add new row for group 1
-    var rows = [{
+    let rows = [{
       cells: ['a', 'xyz', 'xyz', 10, 20]
     }];
     table.insertRows(rows);
@@ -302,7 +302,7 @@ describe('Table Grouping', function() {
     assertGroupingValues(table, column4, ['20']);
   });
 
-  it('does not regroup if rows get inserted, event is from server and table was not empty', function() {
+  it('does not regroup if rows get inserted, event is from server and table was not empty', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -318,7 +318,7 @@ describe('Table Grouping', function() {
     assertGroupingValues(table, column4, ['30', '78']);
 
     // add new row for group 1
-    var rows = [{
+    let rows = [{
       cells: ['a', 'xyz', 'xyz', 10, 20]
     }];
     table.insertRows(rows);
@@ -330,7 +330,7 @@ describe('Table Grouping', function() {
     assertGroupingValues(table, column4, ['30', '78']);
   });
 
-  it('regroups when a filter is applied', function() {
+  it('regroups when a filter is applied', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -342,7 +342,7 @@ describe('Table Grouping', function() {
     addGrouping(table, column0, false);
     expect(find$aggregateRows(table).length).toBe(2);
 
-    var filter = createAndRegisterColumnFilter(table, column1, ['c']);
+    createAndRegisterColumnFilter(table, column1, ['c']);
     table.filter();
 
     assertGroupingValues(table, column3, ['3', '11']);
@@ -350,7 +350,7 @@ describe('Table Grouping', function() {
 
   });
 
-  it('regroups if rows get deleted', function() {
+  it('regroups if rows get deleted', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -380,7 +380,7 @@ describe('Table Grouping', function() {
     assertGroupingValues(table, column4, ['78']);
   });
 
-  it('removes aggregate rows if all rows get deleted', function() {
+  it('removes aggregate rows if all rows get deleted', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -402,7 +402,7 @@ describe('Table Grouping', function() {
     assertGroupingProperty(table, 0);
   });
 
-  it('regroups if rows get updated', function() {
+  it('regroups if rows get updated', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -417,7 +417,7 @@ describe('Table Grouping', function() {
     assertGroupingValues(table, column3, ['10', '26']);
     assertGroupingValues(table, column4, ['30', '78']);
 
-    var row = {
+    let row = {
       id: table.rows[1].id,
       cells: ['a', 'xyz', 'xyz', 10, 20]
     };
@@ -429,7 +429,7 @@ describe('Table Grouping', function() {
     assertGroupingValues(table, column4, ['44', '78']);
   });
 
-  it('may group column 0 only', function() {
+  it('may group column 0 only', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -448,7 +448,7 @@ describe('Table Grouping', function() {
     assertGroupingProperty(table);
   });
 
-  it('may group column 1 only', function() {
+  it('may group column 1 only', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -467,7 +467,7 @@ describe('Table Grouping', function() {
     assertGroupingProperty(table);
   });
 
-  it('may group columns 0 (avg) and 1 (sum)', function() {
+  it('may group columns 0 (avg) and 1 (sum)', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -489,7 +489,7 @@ describe('Table Grouping', function() {
 
   });
 
-  it('may group columns 0, 1 and 2', function() {
+  it('may group columns 0, 1 and 2', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -514,7 +514,7 @@ describe('Table Grouping', function() {
   });
 
   // vary order
-  it('may group columns 2 and 1', function() {
+  it('may group columns 2 and 1', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -536,7 +536,7 @@ describe('Table Grouping', function() {
 
   });
 
-  it('may group column 1 only after grouping column 0 first', function() {
+  it('may group column 1 only after grouping column 0 first', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }
@@ -557,7 +557,7 @@ describe('Table Grouping', function() {
     assertGroupingProperty(table);
   });
 
-  it('may group column 1 and 2 after grouping column 0 first', function() {
+  it('may group column 1 and 2 after grouping column 0 first', () => {
     if (!Device.get().supportsInternationalization()) {
       return;
     }

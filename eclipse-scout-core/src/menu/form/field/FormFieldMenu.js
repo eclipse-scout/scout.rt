@@ -55,7 +55,7 @@ export default class FormFieldMenu extends Menu {
       this.field.gridData = GridData.createFromHints(this.field, 1);
 
       this.field.render(this.$container);
-      var layoutData = new LogicalGridData(this.field);
+      let layoutData = new LogicalGridData(this.field);
       layoutData.validate();
       this.field.setLayoutData(layoutData);
       this.field.$container.addClass('content');
@@ -69,7 +69,7 @@ export default class FormFieldMenu extends Menu {
   }
 
   clone(model, options) {
-    var clone = super.clone(model, options);
+    let clone = super.clone(model, options);
     this._deepCloneProperties(clone, ['field'], options);
     return clone;
   }

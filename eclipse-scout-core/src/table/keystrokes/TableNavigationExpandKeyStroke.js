@@ -18,7 +18,7 @@ export default class TableNavigationExpandKeyStroke extends AbstractTableNavigat
     this.which = [keys.ADD, keys.RIGHT];
     this.renderingHints.text = '+';
     this.renderingHints.$drawingArea = function($drawingArea, event) {
-      var row = this.field.selectedRows[0];
+      let row = this.field.selectedRows[0];
       if (row) {
         return row.$row;
       }
@@ -26,7 +26,7 @@ export default class TableNavigationExpandKeyStroke extends AbstractTableNavigat
   }
 
   _accept(event) {
-    var accepted = super._accept(event),
+    let accepted = super._accept(event),
       selectedRow = this.field.selectedRows[0];
     if (!accepted) {
       return false;
@@ -38,7 +38,7 @@ export default class TableNavigationExpandKeyStroke extends AbstractTableNavigat
   }
 
   handle(event) {
-    var table = this.field,
+    let table = this.field,
       selectedRow = this.field.selectedRows[0],
       visibleChildRows;
     if (!selectedRow) {

@@ -116,7 +116,7 @@ export default class BrowserField extends ValueField {
   _renderLocation() {
     // Convert empty locations to 'about:blank', because in Firefox (maybe others, too?),
     // empty locations simply remove the src attribute but don't remove the old content.
-    var location = this.location || 'about:blank';
+    let location = this.location || 'about:blank';
     if (this.showInExternalWindow) {
       // fallback: separate window
       if (this._popupWindow && !this._popupWindow.closed) {
@@ -163,38 +163,38 @@ export default class BrowserField extends ValueField {
    * popups from having an invalid position.
    */
   _calcPopupBounds() {
-    var myWindow = this.$container.window(true);
+    let myWindow = this.$container.window(true);
 
-    var POPUP_WINDOW_TOP_HEIGHT = 30;
-    var POPUP_WINDOW_BOTTOM_HEIGHT = 8;
-    var POPUP_WINDOW_CHROME_HEIGHT = POPUP_WINDOW_TOP_HEIGHT + POPUP_WINDOW_BOTTOM_HEIGHT;
+    let POPUP_WINDOW_TOP_HEIGHT = 30;
+    let POPUP_WINDOW_BOTTOM_HEIGHT = 8;
+    let POPUP_WINDOW_CHROME_HEIGHT = POPUP_WINDOW_TOP_HEIGHT + POPUP_WINDOW_BOTTOM_HEIGHT;
 
-    var BROWSER_WINDOW_TOP_HEIGHT = 55;
+    let BROWSER_WINDOW_TOP_HEIGHT = 55;
 
     // Don't limit screenX/Y in any way. Coordinates can be negative (if we have a secondary monitor on the left side
     // of the primary monitor) or larger then the availSize of the screen (if we have a secondary monitor on the right
     // side of the primary monitor). Note that IE cannot properly place the popup on a monitor on the left. It seems
     // to ignore negative X coordinates somehow (but not entirely).
-    var browserBounds = new Rectangle(
+    let browserBounds = new Rectangle(
       myWindow.screenX,
       myWindow.screenY,
       $(myWindow).width(),
       $(myWindow).height() + BROWSER_WINDOW_TOP_HEIGHT);
 
-    var fieldBounds = new Rectangle(
+    let fieldBounds = new Rectangle(
       this.$field.offset().left,
       this.$field.offset().top,
       this.$field.width(),
       this.$field.height());
 
-    var popupX = browserBounds.x + fieldBounds.x;
-    var popupY = browserBounds.y + fieldBounds.y + BROWSER_WINDOW_TOP_HEIGHT;
-    var popupWidth = fieldBounds.width;
-    var popupHeight = fieldBounds.height + POPUP_WINDOW_CHROME_HEIGHT;
+    let popupX = browserBounds.x + fieldBounds.x;
+    let popupY = browserBounds.y + fieldBounds.y + BROWSER_WINDOW_TOP_HEIGHT;
+    let popupWidth = fieldBounds.width;
+    let popupHeight = fieldBounds.height + POPUP_WINDOW_CHROME_HEIGHT;
 
     // ensure that the lower Y of the new popup is not below the lower Y of the browser window
-    var popupLowerY = popupY + popupHeight;
-    var browserLowerY = browserBounds.y + browserBounds.height;
+    let popupLowerY = popupY + popupHeight;
+    let browserLowerY = browserBounds.y + browserBounds.height;
     if (popupLowerY > browserLowerY) {
       popupHeight -= (popupLowerY - browserLowerY) + POPUP_WINDOW_CHROME_HEIGHT;
     }
@@ -214,10 +214,10 @@ export default class BrowserField extends ValueField {
     }
 
     if (!this._popupWindow || (reopenIfClosed && this._popupWindow.closed)) {
-      var popupBlockerHandler = new PopupBlockerHandler(this.session);
-      var popupBounds = this._calcPopupBounds();
+      let popupBlockerHandler = new PopupBlockerHandler(this.session);
+      let popupBounds = this._calcPopupBounds();
       // (b) window specifications
-      var windowSpecs = strings.join(',',
+      let windowSpecs = strings.join(',',
         'directories=no',
         'location=no',
         'menubar=no',
@@ -231,7 +231,7 @@ export default class BrowserField extends ValueField {
         'width=' + popupBounds.width,
         'height=' + popupBounds.height
       );
-      var location = this.location || 'about:blank';
+      let location = this.location || 'about:blank';
       popupBlockerHandler.openWindow(location, undefined, windowSpecs, this._popupWindowOpen.bind(this));
     } else if (reopenIfClosed) {
       this._popupWindow.focus();
@@ -244,8 +244,8 @@ export default class BrowserField extends ValueField {
       this.trigger('externalWindowStateChange', {
         windowState: BrowserField.WindowStates.WINDOW_OPEN
       });
-      var popupInterval = window.setInterval(function() {
-        var popupWindowClosed = false;
+      let popupInterval = window.setInterval(() => {
+        let popupWindowClosed = false;
         try {
           popupWindowClosed = this._popupWindow === null || this._popupWindow.closed;
         } catch (e) {
@@ -259,7 +259,7 @@ export default class BrowserField extends ValueField {
             windowState: BrowserField.WindowStates.WINDOW_CLOSED
           });
         }
-      }.bind(this), 500);
+      }, 500);
     }
   }
 

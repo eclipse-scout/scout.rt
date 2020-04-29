@@ -12,8 +12,8 @@ import {GridData, GroupBoxGridConfig, HorizontalGrid, scout, VerticalSmartGrid} 
 import {GroupBoxSpecHelper} from '@eclipse-scout/testing';
 
 // see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout01Test
-describe('AbstractGrid01', function() {
-  var session;
+describe('AbstractGrid01', () => {
+  let session;
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -51,9 +51,9 @@ describe('AbstractGrid01', function() {
     this.groupBox.render();
   });
 
-  describe('group box layout 01', function() {
+  describe('group box layout 01', () => {
     it('test horizontal layout', function() {
-      var grid = new HorizontalGrid();
+      let grid = new HorizontalGrid();
       grid.setGridConfig(new GroupBoxGridConfig());
       grid.validate(this.groupBox);
 
@@ -75,7 +75,7 @@ describe('AbstractGrid01', function() {
     });
 
     it('test vertical smart layout', function() {
-      var grid = new VerticalSmartGrid();
+      let grid = new VerticalSmartGrid();
       grid.setGridConfig(new GroupBoxGridConfig());
       grid.validate(this.groupBox);
 

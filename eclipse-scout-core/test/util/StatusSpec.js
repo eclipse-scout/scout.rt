@@ -8,14 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Status, DefaultStatus, ParsingFailedStatus} from '../../src/index';
+import {DefaultStatus, ParsingFailedStatus, Status} from '../../src/index';
 
-describe('scout.Status', function() {
+describe('scout.Status', () => {
 
-  describe('convenience functions', function() {
+  describe('convenience functions', () => {
 
-    it('create valid status objects', function() {
-      var status;
+    it('create valid status objects', () => {
+      let status;
 
       // 1. Options argument (default)
       status = Status.error({
@@ -78,8 +78,8 @@ describe('scout.Status', function() {
 
   });
 
-  it('addStatus / hasChildren', function() {
-    var status = Status.error('root');
+  it('addStatus / hasChildren', () => {
+    let status = Status.error('root');
     expect(status.hasChildren()).toBe(false);
     status.addStatus(Status.info('foo'));
     expect(status.hasChildren()).toBe(true);
@@ -87,8 +87,8 @@ describe('scout.Status', function() {
     expect(status.hasChildren()).toBe(false);
   });
 
-  it('removeAllStatus', function() {
-    var status = Status.error('root');
+  it('removeAllStatus', () => {
+    let status = Status.error('root');
     status.addStatus(ParsingFailedStatus.error('foo'));
     status.addStatus(Status.error('bar'));
     expect(status.children.length).toEqual(2);
@@ -103,8 +103,8 @@ describe('scout.Status', function() {
     expect(status.children[0].message).toEqual('foo');
   });
 
-  it('containsStatus', function() {
-    var status = Status.error('root');
+  it('containsStatus', () => {
+    let status = Status.error('root');
 
     expect(status.containsStatus(ParsingFailedStatus)).toBe(false);
     status.addStatus(ParsingFailedStatus.error('foo'));
@@ -115,8 +115,8 @@ describe('scout.Status', function() {
     expect(status.containsStatus(DefaultStatus)).toBe(true);
   });
 
-  it('updateProperties', function() {
-    var status = Status.ok('root');
+  it('updateProperties', () => {
+    let status = Status.ok('root');
     status.addStatus(ParsingFailedStatus.error('foo'));
     status.addStatus(DefaultStatus.warning('bar'));
 
@@ -141,9 +141,9 @@ describe('scout.Status', function() {
     expect(status.severity).toEqual(Status.Severity.OK);
   });
 
-  it('equals', function() {
-    var a = Status.ok('root');
-    var b = Status.ok('root');
+  it('equals', () => {
+    let a = Status.ok('root');
+    let b = Status.ok('root');
     expect(a.equals(b)).toBe(true);
     expect(b.equals(a)).toBe(true);
 
@@ -157,22 +157,22 @@ describe('scout.Status', function() {
     expect(b.equals(a)).toBe(true);
   });
 
-  describe('ensureChildren', function() {
+  describe('ensureChildren', () => {
 
-    it('status with no children should be transformed in a status with children', function() {
-      var status = Status.ok('foo');
+    it('status with no children should be transformed in a status with children', () => {
+      let status = Status.ok('foo');
       expect(status.children).toBe(null);
-      var newStatus = status.ensureChildren();
+      let newStatus = status.ensureChildren();
       expect(newStatus.children.length).toEqual(1);
       expect(status).toBe(newStatus.children[0]);
     });
 
-    it('status with children should return a clone', function() {
-      var status = Status.ensure({
+    it('status with children should return a clone', () => {
+      let status = Status.ensure({
         children: [{message: 'foo'}]
       });
       expect(status.children.length).toEqual(1);
-      var newStatus = status.ensureChildren();
+      let newStatus = status.ensureChildren();
       expect(newStatus.children.length).toEqual(1);
       expect(status).not.toBe(newStatus);
     });

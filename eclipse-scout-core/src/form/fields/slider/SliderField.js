@@ -20,7 +20,7 @@ export default class SliderField extends ValueField {
 
   _init(model) {
     super._init(model);
-    var sliderOptions = $.extend({
+    let sliderOptions = $.extend({
       parent: this
     }, model);
     this.slider = scout.create('Slider', sliderOptions);

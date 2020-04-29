@@ -21,10 +21,10 @@ export default class RadioButtonGroupRightKeyStroke extends KeyStroke {
   }
 
   handle(event) {
-    var fieldBefore,
+    let fieldBefore,
       focusedButton = $(event.target).data('radiobutton');
 
-    this.field.radioButtons.some(function(radioButton) {
+    this.field.radioButtons.some(radioButton => {
       if (fieldBefore && radioButton.enabledComputed && radioButton.visible) {
         radioButton.select();
         radioButton.focus();

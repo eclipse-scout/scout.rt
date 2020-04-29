@@ -19,7 +19,7 @@ export default class FormLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var htmlContainer = HtmlComponent.get($container),
+    let htmlContainer = HtmlComponent.get($container),
       htmlRootGb = this._htmlRootGroupBox(),
       rootGbSize;
 
@@ -39,13 +39,13 @@ export default class FormLayout extends AbstractLayout {
 
   preferredLayoutSize($container, options) {
     options = options || {};
-    var htmlContainer = HtmlComponent.get($container),
+    let htmlContainer = HtmlComponent.get($container),
       htmlRootGb = this._htmlRootGroupBox(),
       prefSize;
 
     this.form.validateLogicalGrid();
 
-    var titleHeight = this._titleHeight();
+    let titleHeight = this._titleHeight();
     if (options.heightHint) {
       options.heightHint -= titleHeight;
     }
@@ -58,7 +58,7 @@ export default class FormLayout extends AbstractLayout {
   }
 
   _htmlRootGroupBox() {
-    var $rootGroupBox = this.form.$container.children('.root-group-box');
+    let $rootGroupBox = this.form.$container.children('.root-group-box');
     return HtmlComponent.get($rootGroupBox);
   }
 

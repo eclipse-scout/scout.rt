@@ -29,16 +29,12 @@ export default class KeyStrokeManager {
   }
 
   installTopLevelKeyStrokeHandlers($container) {
-    var
+    let
       myWindow = $container.window(true),
       // Swallow F1 (online help) key stroke
-      helpHandler = function(event) {
-        return event.which !== keys.F1;
-      },
+      helpHandler = event => event.which !== keys.F1,
       // Swallow Backspace (browser navigation) key stroke
-      backspaceHandler = function(event) {
-        return event.which !== keys.BACKSPACE;
-      };
+      backspaceHandler = event => event.which !== keys.BACKSPACE;
 
     if (this.swallowF1) {
       $container
@@ -97,20 +93,20 @@ export default class KeyStrokeManager {
    * Visualizes the keys supported by the given keyStrokeContext.
    */
   _renderKeys(keyStrokeContext, event) {
-    var descendantContexts = event.originalEvent.keyStrokeContexts || [];
-    var immediatePropagationStoppedKeys = [];
+    let descendantContexts = event.originalEvent.keyStrokeContexts || [];
+    let immediatePropagationStoppedKeys = [];
 
     keyStrokeContext.keyStrokes
-      .filter(function(keyStroke) {
-        var render = keyStroke.renderingHints.render;
+      .filter(keyStroke => {
+        let render = keyStroke.renderingHints.render;
         return (typeof render === 'function' ? render.call(keyStroke) : render);
       })
       .forEach(function(keyStroke) {
         keyStroke.enabledByFilter = this._filter(keyStroke);
-        var $drawingArea = (keyStroke.field ? keyStroke.field.$container : null) || keyStrokeContext.$getScopeTarget(); // Precedence: keystroke's field container, or the scope target otherwise.
-        var keys = keyStroke.keys(); // Get all keys which are handled by the keystroke. Typically, this is a single key.
+        let $drawingArea = (keyStroke.field ? keyStroke.field.$container : null) || keyStrokeContext.$getScopeTarget(); // Precedence: keystroke's field container, or the scope target otherwise.
+        let keys = keyStroke.keys(); // Get all keys which are handled by the keystroke. Typically, this is a single key.
         keys.forEach(function(key) {
-          var virtualKeyStrokeEvent = new VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, key.keyStrokeMode, event.target);
+          let virtualKeyStrokeEvent = new VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, key.keyStrokeMode, event.target);
 
           if (immediatePropagationStoppedKeys.indexOf(key.toKeyStrokeString()) < 0 && keyStrokeContext.accept(virtualKeyStrokeEvent) &&
             keyStroke.accept(virtualKeyStrokeEvent) && !this._isPreventedByDescendantContext(key, event.target, descendantContexts)) {
@@ -130,7 +126,7 @@ export default class KeyStrokeManager {
   }
 
   _isPreventedByDescendantContext(key, target, descendantContexts) {
-    var virtualKeyStrokeEvent = new VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, key.keyStrokeMode, target);
+    let virtualKeyStrokeEvent = new VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, key.keyStrokeMode, target);
 
     // Check whether any descendant keyStrokeContext prevents this keystroke from execution.
     return descendantContexts.some(function(descendantContext) {
@@ -141,7 +137,7 @@ export default class KeyStrokeManager {
       }
 
       // Ask keystrokes of descendant keyStrokeContext whether this event is swallowed.
-      return descendantContext.keyStrokes.some(function(descendantKeyStroke) {
+      return descendantContext.keyStrokes.some(descendantKeyStroke => {
         descendantKeyStroke.accept(virtualKeyStrokeEvent);
         return virtualKeyStrokeEvent.isAnyPropagationStopped();
       }, this);
@@ -169,7 +165,7 @@ export default class KeyStrokeManager {
     // of a keystroke, all its keystrokes on the context are deleted. Which means no key stroke is processed
     // anymore. However: creating a copy can be dangerous too, because the handle function must deal with
     // the situation that the widget to which the keystroke belongs, is suddenly destroyed.
-    var keyStrokesCopy = keyStrokeContext.keyStrokes.slice();
+    let keyStrokesCopy = keyStrokeContext.keyStrokes.slice();
     keyStrokesCopy.some(function(keyStroke) {
       if (!keyStroke.accept(event)) {
         return false;
@@ -198,7 +194,7 @@ export default class KeyStrokeManager {
   }
 
   _filter(keyStroke) {
-    for (var i = 0; i < this.filters.length; i++) {
+    for (let i = 0; i < this.filters.length; i++) {
       if (!this.filters[i].filter(keyStroke)) {
         return false;
       }
@@ -215,7 +211,7 @@ export default class KeyStrokeManager {
   }
 
   _installHelpDisposeListener(event) {
-    var helpDisposeHandler,
+    let helpDisposeHandler,
       $currentTarget = $(event.currentTarget),
       $myWindow = $currentTarget.window(),
       $topLevelContainer = $currentTarget.entryPoint();
@@ -224,7 +220,7 @@ export default class KeyStrokeManager {
       $topLevelContainer.off('keyup', helpDisposeHandler);
       $myWindow.off('blur', helpDisposeHandler);
       this._helpRendered = false;
-      this._renderedKeys.forEach(function(key) {
+      this._renderedKeys.forEach(key => {
         key.remove();
       });
       this._renderedKeys = [];
@@ -240,7 +236,7 @@ export default class KeyStrokeManager {
     // check if scopeTarget is covered by glass pane
     if (this.session.focusManager.isElementCovertByGlassPane(keyStrokeContext.$getScopeTarget())) {
       // check if any action with 'keyStrokeFirePolicy=IAction.KeyStrokeFirePolicy.ALWAYS' is in keyStrokeContext
-      var keyStrokeFirePolicyAlways = $.grep(keyStrokeContext.keyStrokes, function(k) { // (will at least return an empty array)
+      let keyStrokeFirePolicyAlways = $.grep(keyStrokeContext.keyStrokes, k => { // (will at least return an empty array)
         return k.keyStrokeFirePolicy === Action.KeyStrokeFirePolicy.ALWAYS;
       });
       if (keyStrokeFirePolicyAlways.length === 0) {

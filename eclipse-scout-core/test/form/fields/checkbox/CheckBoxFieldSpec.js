@@ -10,30 +10,30 @@
  */
 import {CheckBoxField, keys, scout, ValueField} from '../../../../src/index';
 
-describe('CheckBoxField', function() {
-  var session;
+describe('CheckBoxField', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  describe('inheritance', function() {
-    var checkBox;
-    var model;
+  describe('inheritance', () => {
+    let checkBox;
+    let model;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = createSimpleModel('CheckBoxField', session);
       checkBox = new CheckBoxField();
       checkBox.init(model);
     });
 
-    it('inherits from ValueField', function() {
+    it('inherits from ValueField', () => {
       expect(ValueField.prototype.isPrototypeOf(checkBox)).toBe(true);
     });
 
-    it('_renderValue sets checked property', function() {
-      var $div = $('<div>');
+    it('_renderValue sets checked property', () => {
+      let $div = $('<div>');
       checkBox.render($div);
 
       checkBox.setValue(true);
@@ -42,8 +42,8 @@ describe('CheckBoxField', function() {
       expect(checkBox.$checkBox.hasClass('checked')).toBe(false);
     });
 
-    it('_renderValue sets disabled property', function() {
-      var $div = $('<div>');
+    it('_renderValue sets disabled property', () => {
+      let $div = $('<div>');
       checkBox.render($div);
 
       checkBox.setEnabled(false);
@@ -56,10 +56,10 @@ describe('CheckBoxField', function() {
 
   });
 
-  describe('label', function() {
+  describe('label', () => {
 
-    it('is linked with the field', function() {
-      var field = scout.create('CheckBoxField', {
+    it('is linked with the field', () => {
+      let field = scout.create('CheckBoxField', {
         parent: session.desktop,
         label: 'label'
       });
@@ -72,10 +72,10 @@ describe('CheckBoxField', function() {
 
   });
 
-  describe('keyStroke', function() {
+  describe('keyStroke', () => {
 
-    it('toggles the value', function() {
-      var field = scout.create('CheckBoxField', {
+    it('toggles the value', () => {
+      let field = scout.create('CheckBoxField', {
         parent: session.desktop,
         keyStroke: 'ctrl-b'
       });

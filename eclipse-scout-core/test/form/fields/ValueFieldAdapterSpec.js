@@ -11,27 +11,27 @@
 import {Device, ValueFieldAdapter} from '../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('ValueFieldAdapter', function() {
-  var session, helper;
+describe('ValueFieldAdapter', () => {
+  let session, helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
   });
 
-  describe('_createPropertySortFunc', function() {
+  describe('_createPropertySortFunc', () => {
 
-    it('should order properties', function() {
+    it('should order properties', () => {
       if (!Device.get().supportsInternationalization()) {
         return;
       }
-      var order = ['foo', 'baz', 'bar'];
-      var properties = ['x', 'bar', 'foo', 'a', 'y', 'baz'];
-      var adapter = new ValueFieldAdapter();
-      var sortFunc = adapter._createPropertySortFunc(order);
+      let order = ['foo', 'baz', 'bar'];
+      let properties = ['x', 'bar', 'foo', 'a', 'y', 'baz'];
+      let adapter = new ValueFieldAdapter();
+      let sortFunc = adapter._createPropertySortFunc(order);
       properties.sort(sortFunc);
-      var expected = ['foo', 'baz', 'bar', 'a', 'x', 'y'];
+      let expected = ['foo', 'baz', 'bar', 'a', 'x', 'y'];
       expect(properties).toEqual(expected);
     });
   });

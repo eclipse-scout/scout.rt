@@ -75,9 +75,9 @@ export default class FileChooser extends Widget {
       new ClickActiveElementKeyStroke(this, [
         keys.SPACE, keys.ENTER
       ]),
-      new CloseKeyStroke(this, function() {
+      new CloseKeyStroke(this, (() => {
         return this.$cancelButton;
-      }.bind(this))
+      }))
     ]);
   }
 
@@ -86,13 +86,13 @@ export default class FileChooser extends Widget {
     this._glassPaneRenderer.renderGlassPanes();
     this.$container = this.$parent.appendDiv('file-chooser')
       .on('mousedown', this._onMouseDown.bind(this));
-    var $handle = this.$container.appendDiv('drag-handle');
+    let $handle = this.$container.appendDiv('drag-handle');
     this.$container.draggable($handle);
 
     this.$container.appendDiv('closable')
-      .on('click', function() {
+      .on('click', () => {
         this.cancel();
-      }.bind(this));
+      });
 
     this.$content = this.$container.appendDiv('file-chooser-content');
     this.$title = this.$content.appendDiv('file-chooser-title')
@@ -119,7 +119,7 @@ export default class FileChooser extends Widget {
 
     // Buttons
     this.$buttons = this.$container.appendDiv('file-chooser-buttons');
-    var boxButtons = new BoxButtons(this.$buttons);
+    let boxButtons = new BoxButtons(this.$buttons);
     if (!this.fileInput.legacy) {
       this.$addFileButton = boxButtons.addButton({
         text: this.session.text('ui.Browse'),
@@ -143,9 +143,9 @@ export default class FileChooser extends Widget {
     this.$container.addClassForAnimation('animate-open');
     // Prevent resizing when file chooser is dragged off the viewport
     this.$container.addClass('calc-helper');
-    var windowSize = this.$container.windowSize();
+    let windowSize = this.$container.windowSize();
     // Use css width, but ensure that it is not larger than the window (mobile)
-    var w = Math.min(this.$container.width(), windowSize.width - 20);
+    let w = Math.min(this.$container.width(), windowSize.width - 20);
     this.$container.css('min-width', w);
     this.$container.css('max-width', w);
     this.$container.removeClass('calc-helper');
@@ -231,7 +231,7 @@ export default class FileChooser extends Widget {
   }
 
   cancel() {
-    var event = new Event();
+    let event = new Event();
     this.trigger('cancel', event);
     if (!event.defaultPrevented) {
       this._close();
@@ -283,7 +283,7 @@ export default class FileChooser extends Widget {
   }
 
   removeFile(file) {
-    var files = this.files.slice();
+    let files = this.files.slice();
     arrays.remove(files, file);
     this.setFiles(files);
     // Clear the input, otherwise user could not choose the file which he has removed previously
@@ -311,18 +311,18 @@ export default class FileChooser extends Widget {
   }
 
   _renderFiles() {
-    var files = this.files;
+    let files = this.files;
 
     if (!this.fileInput.legacy) {
       this.$files.empty();
       files.forEach(function(file) {
-        var $file = this.$files.appendElement('<li>', 'file', file.name);
+        let $file = this.$files.appendElement('<li>', 'file', file.name);
         // Append a space to allow the browser to break the line here when it gets too long
         $file.append(' ');
-        var $remove = $file
+        let $remove = $file
           .appendSpan('remove menu-item')
           .on('click', this.removeFile.bind(this, file));
-        var $removeLink = $file.makeElement('<a>', 'remove-link', this.session.text('Remove'));
+        let $removeLink = $file.makeElement('<a>', 'remove-link', this.session.text('Remove'));
         $remove.appendTextNode('(');
         $remove.append($removeLink);
         $remove.appendTextNode(')');
@@ -361,7 +361,7 @@ export default class FileChooser extends Widget {
 
   _onMouseDown(event, option) {
     // If there is a dialog in the parent-hierarchy activate it in order to bring it on top of other dialogs.
-    var parent = this.findParent(function(p) {
+    let parent = this.findParent(p => {
       return p instanceof Form && p.isDialog();
     });
     if (parent) {

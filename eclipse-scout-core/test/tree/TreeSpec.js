@@ -11,12 +11,12 @@
 import {graphics, objects, Page, Range, scout, scrollbars, strings, Tree} from '../../src/index';
 import {TreeSpecHelper} from '@eclipse-scout/testing';
 
-describe('Tree', function() {
-  var session;
+describe('Tree', () => {
+  let session;
 
-  var helper; /* TreeSpecHelper*/
+  let helper; /* TreeSpecHelper*/
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TreeSpecHelper(session);
@@ -27,37 +27,37 @@ describe('Tree', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
     $.fx.off = false;
   });
 
-  describe('creation', function() {
-    it('adds nodes', function() {
+  describe('creation', () => {
+    it('adds nodes', () => {
 
-      var model = helper.createModelFixture(1);
-      var tree = helper.createTree(model);
+      let model = helper.createModelFixture(1);
+      let tree = helper.createTree(model);
       tree.render();
 
       expect(helper.findAllNodes(tree).length).toBe(1);
     });
 
-    it('does not add notes if no nodes are provided', function() {
+    it('does not add notes if no nodes are provided', () => {
 
-      var model = helper.createModelFixture();
-      var tree = helper.createTree(model);
+      let model = helper.createModelFixture();
+      let tree = helper.createTree(model);
       tree.render();
 
       expect(helper.findAllNodes(tree).length).toBe(0);
     });
   });
 
-  describe('insertNodes', function() {
-    var model, tree, node0, node1, node2;
+  describe('insertNodes', () => {
+    let model, tree, node0, node1, node2;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(3, 1, true);
       tree = helper.createTree(model);
       node0 = tree.nodes[0];
@@ -65,39 +65,39 @@ describe('Tree', function() {
       node2 = tree.nodes[2];
     });
 
-    describe('inserting a child', function() {
+    describe('inserting a child', () => {
 
-      it('inserts in a reasonable order if childNodeIndex is not set', function() {
+      it('inserts in a reasonable order if childNodeIndex is not set', () => {
         // we want to start with an empty tree for this test
-        var rootNodeModel = helper.createModelNode('0', 'root');
+        let rootNodeModel = helper.createModelNode('0', 'root');
         rootNodeModel.expanded = true;
         model = helper.createModel([rootNodeModel]);
         tree = helper.createTree(model);
         tree.render();
 
         // child nodes
-        var nodeModels = [
+        let nodeModels = [
           helper.createModelNode('0_0', 'node0'),
           helper.createModelNode('0_1', 'node1'),
           helper.createModelNode('0_2', 'node2')
         ];
         // make sure nodes _DON'T_ have a childNodeIndex (since that's usually the case when a programmer calls insertNodes in JS only)
-        nodeModels.forEach(function(node) {
+        nodeModels.forEach(node => {
           delete node.childNodeIndex;
         });
-        var rootNode = tree.nodes[0];
+        let rootNode = tree.nodes[0];
         tree.insertNodes(nodeModels, rootNode);
 
         // assert order in DOM is 0_0, 0_1, 0_2 (= same order as in array)
-        var orderedNodeIdString = '';
+        let orderedNodeIdString = '';
         tree.$container.find('[data-level=\'1\']').each(function() {
           orderedNodeIdString += $(this).attr('data-nodeid') + ',';
         });
         expect(orderedNodeIdString).toBe('0_0,0_1,0_2,');
       });
 
-      it('updates model', function() {
-        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+      it('updates model', () => {
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         expect(tree.nodes.length).toBe(3);
         expect(Object.keys(tree.nodesMap).length).toBe(12);
 
@@ -107,12 +107,12 @@ describe('Tree', function() {
         expect(Object.keys(tree.nodesMap).length).toBe(13);
       });
 
-      it('updates model with a complex node containing another node', function() {
-        var node1_1_0 = helper.createModelNode('1_1_0', 'node1_1_0', 0);
+      it('updates model with a complex node containing another node', () => {
+        let node1_1_0 = helper.createModelNode('1_1_0', 'node1_1_0', 0);
         tree.insertNodes([node1_1_0], node1.childNodes[1]);
 
-        var node2_1_0 = helper.createModelNode('2_1_0', 'node2_1_0', 1);
-        var node2_1_0_0 = helper.createModelNode('2_1_0_0', 'node2_1_0_0', 0);
+        let node2_1_0 = helper.createModelNode('2_1_0', 'node2_1_0', 1);
+        let node2_1_0_0 = helper.createModelNode('2_1_0_0', 'node2_1_0_0', 0);
         node2_1_0.childNodes = [node2_1_0_0];
         node2_1_0.expanded = true;
         tree.insertNodes([node2_1_0], node2.childNodes[1]);
@@ -127,10 +127,10 @@ describe('Tree', function() {
         expect(Object.keys(tree.nodesMap).length).toBe(15);
       });
 
-      it('updates html document if parent is expanded', function() {
+      it('updates html document if parent is expanded', () => {
         tree.render();
         tree.revalidateLayoutTree();
-        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         expect(helper.findAllNodes(tree).length).toBe(12);
 
         tree.insertNodes([newNode0Child3], node0);
@@ -138,11 +138,11 @@ describe('Tree', function() {
         expect(node0.childNodes[3].$node.text()).toBe(newNode0Child3.text);
       });
 
-      it('updates html document at a specific position', function() {
+      it('updates html document at a specific position', () => {
         tree.render();
 
-        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 2);
-        var newNode0Child4 = helper.createModelNode('0_4', 'newNode0Child4', 3);
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 2);
+        let newNode0Child4 = helper.createModelNode('0_4', 'newNode0Child4', 3);
         expect(helper.findAllNodes(tree).length).toBe(12);
 
         tree.insertNodes([newNode0Child3, newNode0Child4], node0);
@@ -153,8 +153,8 @@ describe('Tree', function() {
         expect(node0.childNodes[3].$node.next().attr('data-level')).toBe('1');
         expect(node0.childNodes[3].$node.next().text()).toBe('node 0_2');
 
-        var newNode1Child3 = helper.createModelNode('1_3', 'newNode1Child3', 1);
-        var newNode1Child4 = helper.createModelNode('1_4', 'newNode1Child4', 2);
+        let newNode1Child3 = helper.createModelNode('1_3', 'newNode1Child3', 1);
+        let newNode1Child4 = helper.createModelNode('1_4', 'newNode1Child4', 2);
 
         tree.insertNodes([newNode1Child3, newNode1Child4]);
         expect(helper.findAllNodes(tree).length).toBe(16);
@@ -169,11 +169,11 @@ describe('Tree', function() {
       });
     });
 
-    it('only updates the model if parent is collapsed', function() {
+    it('only updates the model if parent is collapsed', () => {
       tree.setNodeExpanded(node0, false);
       tree.render();
 
-      var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+      let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
       expect(helper.findAllNodes(tree).length).toBe(9);
 
       tree.insertNodes([newNode0Child3], node0);
@@ -187,7 +187,7 @@ describe('Tree', function() {
       expect(node0.childNodes[3].$node).toBe(null);
     });
 
-    it('expands the parent if parent.expanded = true and the new inserted nodes are the first child nodes', function() {
+    it('expands the parent if parent.expanded = true and the new inserted nodes are the first child nodes', () => {
       model = helper.createModelFixture(3, 0, true);
       tree = helper.createTree(model);
       node0 = tree.nodes[0];
@@ -195,8 +195,8 @@ describe('Tree', function() {
       node2 = tree.nodes[2];
       tree.render();
 
-      var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
-      var $node0 = node0.$node;
+      let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
+      let $node0 = node0.$node;
       // Even tough the nodes were created with expanded=true, the $node should not have
       // been rendered as expanded (because it has no children)
       expect($node0).not.toHaveClass('expanded');
@@ -208,16 +208,16 @@ describe('Tree', function() {
       expect($node0).toHaveClass('expanded');
     });
 
-    describe('with breadcrumb style', function() {
+    describe('with breadcrumb style', () => {
 
-      beforeEach(function() {
+      beforeEach(() => {
         tree.setDisplayStyle(Tree.DisplayStyle.BREADCRUMB);
       });
 
-      it('inserts a html node if the parent node is selected', function() {
+      it('inserts a html node if the parent node is selected', () => {
         tree.render();
         tree.revalidateLayoutTree();
-        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         expect(helper.findAllNodes(tree).length).toBe(3); // top level nodes are visible
 
         tree.selectNode(node0);
@@ -228,10 +228,10 @@ describe('Tree', function() {
         expect(node0.childNodes[3].$node.text()).toBe(newNode0Child3.text);
       });
 
-      it('only updates model if the parent node is not selected', function() {
+      it('only updates model if the parent node is not selected', () => {
         tree.render();
         tree.revalidateLayoutTree();
-        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         expect(helper.findAllNodes(tree).length).toBe(3); // top level nodes are visible
 
         tree.insertNodes([newNode0Child3], node0);
@@ -241,11 +241,11 @@ describe('Tree', function() {
         expect(node0.childNodes[3].attached).toBe(false);
       });
 
-      it('inserts html nodes at a specific position', function() {
+      it('inserts html nodes at a specific position', () => {
         tree.render();
 
-        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 2);
-        var newNode0Child4 = helper.createModelNode('0_4', 'newNode0Child4', 3);
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 2);
+        let newNode0Child4 = helper.createModelNode('0_4', 'newNode0Child4', 3);
         tree.selectNode(node0);
         expect(helper.findAllNodes(tree).length).toBe(4);
 
@@ -259,7 +259,7 @@ describe('Tree', function() {
       });
     });
 
-    it('expands the parent if parent.expanded = true and the new inserted nodes are the first child nodes', function() {
+    it('expands the parent if parent.expanded = true and the new inserted nodes are the first child nodes', () => {
       model = helper.createModelFixture(3, 0, true);
       tree = helper.createTree(model);
       node0 = tree.nodes[0];
@@ -267,8 +267,8 @@ describe('Tree', function() {
       node2 = tree.nodes[2];
       tree.render();
 
-      var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
-      var $node0 = node0.$node;
+      let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
+      let $node0 = node0.$node;
       // Even tough the nodes were created with expanded=true, the $node should not have
       // been rendered as expanded (because it has no children)
       expect($node0).not.toHaveClass('expanded');
@@ -282,13 +282,13 @@ describe('Tree', function() {
 
   });
 
-  describe('updateNodes', function() {
-    var model;
-    var tree;
-    var node0;
-    var child0;
+  describe('updateNodes', () => {
+    let model;
+    let tree;
+    let node0;
+    let child0;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(3, 3, false);
       tree = helper.createTree(model);
       node0 = tree.nodes[0];
@@ -297,20 +297,20 @@ describe('Tree', function() {
 
     // this test does not create a new node instance/model for an update, but re-uses
     // an already existing node and simply changes a property of that instance
-    it('update same node instance', function() {
+    it('update same node instance', () => {
       expect(node0.leaf).toBe(false);
       tree.render();
       node0.leaf = true;
       tree.updateNode(node0);
       // we expect that _decorateNode has been called and updates the DOM of the tree
-      var $treeNode = tree.$container.find('[data-nodeid="' + node0.id + '"]').first();
+      let $treeNode = tree.$container.find('[data-nodeid="' + node0.id + '"]').first();
       expect($treeNode.attr('class')).toContain('leaf');
     });
 
-    describe('enabled update', function() {
-      var child0Update;
+    describe('enabled update', () => {
+      let child0Update;
 
-      beforeEach(function() {
+      beforeEach(() => {
         child0Update = {
           id: child0.id,
           enabled: false
@@ -318,14 +318,14 @@ describe('Tree', function() {
         tree.checkable = true;
       });
 
-      it('updates the enabled state of the model node', function() {
+      it('updates the enabled state of the model node', () => {
         expect(child0.enabled).toBe(true);
 
         tree.updateNodes([child0Update]);
         expect(child0.enabled).toBe(false);
       });
 
-      it('updates the enabled state of the html node, if visible', function() {
+      it('updates the enabled state of the html node, if visible', () => {
         // Render tree and make sure child0 is visible
         tree.render();
         tree.setNodeExpanded(node0, true);
@@ -339,7 +339,7 @@ describe('Tree', function() {
         expect(child0.$node.isEnabled()).toBe(false);
       });
 
-      it('updates the enabled state of the html node after expansion, if not visible', function() {
+      it('updates the enabled state of the html node after expansion, if not visible', () => {
         // Render tree and make sure child0 is visible
         tree.render();
         tree.setNodeExpanded(node0, true);
@@ -361,15 +361,15 @@ describe('Tree', function() {
       });
     });
 
-    describe('enabled update on checkable tree', function() {
-      var child0Update;
+    describe('enabled update on checkable tree', () => {
+      let child0Update;
 
       function $checkbox(node) {
         return node.$node.children('.tree-node-checkbox')
           .children('.check-box');
       }
 
-      beforeEach(function() {
+      beforeEach(() => {
         child0Update = {
           id: child0.id,
           enabled: false
@@ -377,14 +377,14 @@ describe('Tree', function() {
         tree.checkable = true;
       });
 
-      it('updates the enabled state of the model node', function() {
+      it('updates the enabled state of the model node', () => {
         expect(child0.enabled).toBe(true);
 
         tree.updateNodes([child0Update]);
         expect(child0.enabled).toBe(false);
       });
 
-      it('updates the enabled state of the html node, if visible', function() {
+      it('updates the enabled state of the html node, if visible', () => {
         // Render tree and make sure child0 is visible
         tree.render();
         tree.setNodeExpanded(node0, true);
@@ -397,7 +397,7 @@ describe('Tree', function() {
         expect($checkbox(child0).isEnabled()).toBe(false);
       });
 
-      it('updates the enabled state of the html node after expansion, if not visible', function() {
+      it('updates the enabled state of the html node after expansion, if not visible', () => {
         // Render tree and make sure child0 is visible
         tree.render();
         tree.setNodeExpanded(node0, true);
@@ -421,10 +421,10 @@ describe('Tree', function() {
     });
   });
 
-  describe('changeNode', function() {
-    var model, tree, nodes, node0, node1, child0, child1_1;
+  describe('changeNode', () => {
+    let model, tree, nodes, node0, node1, child0, child1_1;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(3, 3, false);
       tree = helper.createTree(model);
       nodes = tree.nodes;
@@ -434,25 +434,25 @@ describe('Tree', function() {
       child1_1 = node1.childNodes[1];
     });
 
-    it('updates the text of the model node', function() {
+    it('updates the text of the model node', () => {
       node0.text = 'new Text';
       tree.changeNode(node0);
       expect(tree.nodes[0].text).toBe('new Text');
     });
 
-    it('updates the text of the html node', function() {
+    it('updates the text of the html node', () => {
       tree.render();
 
       node0.text = 'new Text';
       tree.changeNode(node0);
-      var $node0 = node0.$node;
+      let $node0 = node0.$node;
       expect($node0.text()).toBe('new Text');
 
       // Check whether tree-control is still there
       expect($node0.children('.tree-node-control').length).toBe(1);
     });
 
-    it('updates custom cssClass of model and html node', function() {
+    it('updates custom cssClass of model and html node', () => {
       tree.selectedNodes = [node0];
       tree.render();
 
@@ -463,7 +463,7 @@ describe('Tree', function() {
       expect(node0.cssClass).toBe('new-css-class');
 
       // Check gui
-      var $node0 = node0.$node;
+      let $node0 = node0.$node;
       expect($node0).toHaveClass('new-css-class');
 
       // check if other classes are still there
@@ -485,11 +485,11 @@ describe('Tree', function() {
       expect($node0).toHaveClass('selected');
     });
 
-    it('preserves child-of-selected when root nodes get changed', function() {
+    it('preserves child-of-selected when root nodes get changed', () => {
       tree.selectedNodes = [];
       tree.render();
 
-      var $children = tree.$data.find('.tree-node.child-of-selected');
+      let $children = tree.$data.find('.tree-node.child-of-selected');
       expect($children.length).toBe(3);
       expect($children.eq(0)[0]).toBe(nodes[0].$node[0]);
       expect($children.eq(1)[0]).toBe(nodes[1].$node[0]);
@@ -506,12 +506,12 @@ describe('Tree', function() {
       expect($children.eq(2)[0]).toBe(nodes[2].$node[0]);
     });
 
-    it('preserves child-of-selected when child nodes get changed', function() {
+    it('preserves child-of-selected when child nodes get changed', () => {
       tree.selectedNodes = [node1];
       tree.setNodeExpanded(node1, true);
       tree.render();
 
-      var $children = tree.$data.find('.tree-node.child-of-selected');
+      let $children = tree.$data.find('.tree-node.child-of-selected');
       expect($children.length).toBe(3);
       expect($children.eq(0)[0]).toBe(node1.childNodes[0].$node[0]);
       expect($children.eq(1)[0]).toBe(node1.childNodes[1].$node[0]);
@@ -528,15 +528,13 @@ describe('Tree', function() {
       expect($children.eq(2)[0]).toBe(node1.childNodes[2].$node[0]);
     });
 
-    it('preserves group css class when nodes get updated', function() {
+    it('preserves group css class when nodes get updated', () => {
       tree.selectNode(node1);
       tree.render();
 
-      tree._isGroupingEnd = function(node) {
-        return node.nodeType === Page.NodeType.TABLE;
-      };
+      tree._isGroupingEnd = node => node.nodeType === Page.NodeType.TABLE;
 
-      var $groupNodes = tree.$data.find('.tree-node.group');
+      let $groupNodes = tree.$data.find('.tree-node.group');
       expect($groupNodes.length).toBe(1);
       expect($groupNodes.eq(0)[0]).toBe(node1.$node[0]);
 
@@ -550,14 +548,14 @@ describe('Tree', function() {
     });
   });
 
-  describe('deleteNodes', function() {
-    var model;
-    var tree;
-    var node0;
-    var node1;
-    var node2;
+  describe('deleteNodes', () => {
+    let model;
+    let tree;
+    let node0;
+    let node1;
+    let node2;
 
-    beforeEach(function() {
+    beforeEach(() => {
       // A large tree is used to properly test recursion
       model = helper.createModelFixture(3, 2, true);
       tree = helper.createTree(model);
@@ -566,11 +564,11 @@ describe('Tree', function() {
       node2 = tree.nodes[2];
     });
 
-    describe('deleting a child', function() {
+    describe('deleting a child', () => {
 
-      it('updates model', function() {
-        var node2Child0 = node2.childNodes[0];
-        var node2Child1 = node2.childNodes[1];
+      it('updates model', () => {
+        let node2Child0 = node2.childNodes[0];
+        let node2Child1 = node2.childNodes[1];
         expect(tree.nodes.length).toBe(3);
         expect(tree.nodes[0]).toBe(node0);
         expect(Object.keys(tree.nodesMap).length).toBe(39);
@@ -581,11 +579,11 @@ describe('Tree', function() {
         expect(Object.keys(tree.nodesMap).length).toBe(35);
       });
 
-      it('updates html document', function() {
+      it('updates html document', () => {
         tree.setViewRangeSize(40);
         tree.render();
 
-        var node2Child0 = node2.childNodes[0];
+        let node2Child0 = node2.childNodes[0];
 
         expect(helper.findAllNodes(tree).length).toBe(39);
         expect(node2Child0.$node).toBeDefined();
@@ -600,9 +598,9 @@ describe('Tree', function() {
         expect(node0.childNodes[2].$node).toBeDefined();
       });
 
-      it('updates child node indices', function() {
-        var node2Child0 = node2.childNodes[0];
-        var node2Child1 = node2.childNodes[1];
+      it('updates child node indices', () => {
+        let node2Child0 = node2.childNodes[0];
+        let node2Child1 = node2.childNodes[1];
         expect(tree.nodes.length).toBe(3);
         expect(node2.childNodes.length).toBe(3);
         expect(node2.childNodes[0].childNodeIndex).toBe(0);
@@ -620,15 +618,15 @@ describe('Tree', function() {
         expect(tree.nodes[1].childNodeIndex).toBe(1);
       });
 
-      it('considers view range (distinguishes between rendered and non rendered rows, adjusts viewRangeRendered)', function() {
+      it('considers view range (distinguishes between rendered and non rendered rows, adjusts viewRangeRendered)', () => {
         // initial view range
         model = helper.createModelFixture(6, 0, false);
         tree = helper.createTree(model);
         node0 = tree.nodes[0];
         node1 = tree.nodes[1];
-        var lastNode = tree.nodes[5];
+        let lastNode = tree.nodes[5];
 
-        var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(1, 4));
+        let spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(1, 4));
         tree.render();
         expect(tree.viewRangeRendered).toEqual(new Range(1, 4));
         expect(tree.$nodes().length).toBe(3);
@@ -681,7 +679,7 @@ describe('Tree', function() {
        * With only a single node, $data.outerHeight() / tree.nodeHeight would result in 1 (because both have equal height)
        * Without the correction from ticket #262890 the function would return 2 (1 * 2), but it must return min. 4.
        */
-      it('calculateViewRangeSize should not return values < 4', function() {
+      it('calculateViewRangeSize should not return values < 4', () => {
         model = helper.createModelFixture(1, 0, false);
         tree = helper.createTree(model);
         tree.render();
@@ -689,15 +687,15 @@ describe('Tree', function() {
       });
     });
 
-    describe('deleting a root node', function() {
-      it('updates model', function() {
+    describe('deleting a root node', () => {
+      it('updates model', () => {
         tree.deleteNodes([node0]);
         expect(tree.nodes.length).toBe(2);
         expect(tree.nodes[0]).toBe(node1);
         expect(Object.keys(tree.nodesMap).length).toBe(26);
       });
 
-      it('updates html document', function() {
+      it('updates html document', () => {
         tree.setViewRangeSize(30);
         tree.render();
 
@@ -710,8 +708,8 @@ describe('Tree', function() {
         expect(node0.childNodes[2].$node).toBe(null);
       });
 
-      describe('deleting a collapsed root node', function() {
-        it('updates model', function() {
+      describe('deleting a collapsed root node', () => {
+        it('updates model', () => {
           tree.setNodeExpanded(node0, false);
           node0.expanded = false;
 
@@ -721,7 +719,7 @@ describe('Tree', function() {
           expect(Object.keys(tree.nodesMap).length).toBe(26);
         });
 
-        it('updates html document', function() {
+        it('updates html document', () => {
           tree.setViewRangeSize(30);
           tree.setNodeExpanded(node0, false);
           tree.render();
@@ -737,14 +735,14 @@ describe('Tree', function() {
       });
     });
 
-    describe('deleting all nodes', function() {
-      it('updates model', function() {
+    describe('deleting all nodes', () => {
+      it('updates model', () => {
         tree.deleteNodes([node0, node1, node2]);
         expect(tree.nodes.length).toBe(0);
         expect(Object.keys(tree.nodesMap).length).toBe(0);
       });
 
-      it('updates html document', function() {
+      it('updates html document', () => {
         tree.render();
 
         tree.deleteNodes([node0, node1, node2]);
@@ -752,13 +750,13 @@ describe('Tree', function() {
       });
     });
 
-    describe('deleting child nodes without commentParentNode', function() {
+    describe('deleting child nodes without commentParentNode', () => {
 
-      it('updates model', function() {
-        var node1Child2 = node1.childNodes[2];
-        var node2Child0 = node2.childNodes[0];
-        var node2Child1 = node2.childNodes[1];
-        var node2Child2 = node2.childNodes[2];
+      it('updates model', () => {
+        let node1Child2 = node1.childNodes[2];
+        let node2Child0 = node2.childNodes[0];
+        let node2Child1 = node2.childNodes[1];
+        let node2Child2 = node2.childNodes[2];
         expect(tree.nodes.length).toBe(3);
         expect(tree.nodes[0]).toBe(node0);
         expect(Object.keys(tree.nodesMap).length).toBe(39); // 3 + 9 + 27
@@ -774,10 +772,10 @@ describe('Tree', function() {
       });
     });
 
-    it('deselects the deleted nodes', function() {
+    it('deselects the deleted nodes', () => {
       tree.render();
-      var childNode1_1 = tree.nodes[1].childNodes[1];
-      var childNode2_1 = tree.nodes[2].childNodes[1];
+      let childNode1_1 = tree.nodes[1].childNodes[1];
+      let childNode2_1 = tree.nodes[2].childNodes[1];
       tree.selectNode(node0);
       expect(tree.selectedNodes.length).toBe(1);
       tree.deleteNode(node0);
@@ -794,11 +792,11 @@ describe('Tree', function() {
       expect(tree.selectedNodes.length).toBe(0);
     });
 
-    it('unchecks the deleted nodes', function() {
+    it('unchecks the deleted nodes', () => {
       tree.setCheckable(true);
       tree.render();
-      var childNode1_1 = tree.nodes[1].childNodes[1];
-      var childNode2_1 = tree.nodes[2].childNodes[1];
+      let childNode1_1 = tree.nodes[1].childNodes[1];
+      let childNode2_1 = tree.nodes[2].childNodes[1];
       tree.checkNode(node0);
       expect(tree.checkedNodes.length).toBe(1);
       tree.deleteNode(node0);
@@ -817,17 +815,17 @@ describe('Tree', function() {
 
   });
 
-  describe('deleteAllChildNodes', function() {
-    var model;
-    var tree;
-    var node0;
-    var node1;
-    var node2;
-    var node1Child0;
-    var node1Child1;
-    var node1Child2;
+  describe('deleteAllChildNodes', () => {
+    let model;
+    let tree;
+    let node0;
+    let node1;
+    let node2;
+    let node1Child0;
+    let node1Child1;
+    let node1Child2;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(3, 1, true);
       tree = helper.createTree(model);
       node0 = tree.nodes[0];
@@ -838,7 +836,7 @@ describe('Tree', function() {
       node1Child2 = node1.childNodes[1];
     });
 
-    it('deletes all nodes from model', function() {
+    it('deletes all nodes from model', () => {
       expect(tree.nodes.length).toBe(3);
       expect(Object.keys(tree.nodesMap).length).toBe(12);
 
@@ -847,7 +845,7 @@ describe('Tree', function() {
       expect(Object.keys(tree.nodesMap).length).toBe(0);
     });
 
-    it('deletes all nodes from html document', function() {
+    it('deletes all nodes from html document', () => {
       tree.render();
 
       expect(helper.findAllNodes(tree).length).toBe(12);
@@ -856,7 +854,7 @@ describe('Tree', function() {
       expect(helper.findAllNodes(tree).length).toBe(0);
     });
 
-    it('deletes all nodes from model for a given parent', function() {
+    it('deletes all nodes from model for a given parent', () => {
       expect(tree.nodes.length).toBe(3);
       expect(Object.keys(tree.nodesMap).length).toBe(12);
 
@@ -865,7 +863,7 @@ describe('Tree', function() {
       expect(Object.keys(tree.nodesMap).length).toBe(9);
     });
 
-    it('deletes all nodes from html document for a given parent', function() {
+    it('deletes all nodes from html document for a given parent', () => {
       tree.render();
 
       expect(helper.findAllNodes(tree).length).toBe(12);
@@ -882,11 +880,11 @@ describe('Tree', function() {
 
   });
 
-  describe('checkNodes', function() {
+  describe('checkNodes', () => {
 
     function findCheckedNodes(nodes) {
-      var checkedNodes = [];
-      for (var j = 0; j < nodes.length; j++) {
+      let checkedNodes = [];
+      for (let j = 0; j < nodes.length; j++) {
         if (nodes[j].checked) {
           checkedNodes.push(nodes[j]);
         }
@@ -894,15 +892,15 @@ describe('Tree', function() {
       return checkedNodes;
     }
 
-    it('checks a subnode -> mark upper nodes ', function() {
-      var model = helper.createModelFixture(4, 4);
-      var tree = helper.createTree(model);
+    it('checks a subnode -> mark upper nodes ', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
       tree.render();
       tree.checkable = true;
 
-      var node;
+      let node;
       // find node with more then one child level
-      for (var i = 0; i < tree.nodes.length; i++) {
+      for (let i = 0; i < tree.nodes.length; i++) {
         if (tree.nodes[i].childNodes && tree.nodes[i].childNodes.length > 0 && tree.nodes[i].childNodes[0].childNodes && tree.nodes[i].childNodes[0].childNodes.length > 0) {
           node = tree.nodes[i].childNodes[0].childNodes[0];
           break;
@@ -919,14 +917,14 @@ describe('Tree', function() {
       }
     });
 
-    it('checks a node -> mark upper nodes -> uncheck node and test if node keeps marked because children are checked', function() {
-      var model = helper.createModelFixture(4, 4);
-      var tree = helper.createTree(model);
+    it('checks a node -> mark upper nodes -> uncheck node and test if node keeps marked because children are checked', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
       tree.render();
       tree.checkable = true;
-      var node, nodeToCheck;
+      let node, nodeToCheck;
       // find node with more then one child level
-      for (var i = 0; i < tree.nodes.length; i++) {
+      for (let i = 0; i < tree.nodes.length; i++) {
         if (tree.nodes[i].childNodes && tree.nodes[i].childNodes.length > 0 && tree.nodes[i].childNodes[0].childNodes && tree.nodes[i].childNodes[0].childNodes.length > 0) {
           node = tree.nodes[i].childNodes[0].childNodes[0];
           nodeToCheck = tree.nodes[i].childNodes[0];
@@ -938,7 +936,7 @@ describe('Tree', function() {
         tree.checkNode(node, true);
       }
       tree.checkNode(nodeToCheck, true);
-      var tmpNode = nodeToCheck;
+      let tmpNode = nodeToCheck;
       // upper nodes should be marked
       while (tmpNode.parentNode) {
         tmpNode = tmpNode.parentNode;
@@ -958,14 +956,14 @@ describe('Tree', function() {
       }
     });
 
-    it('checks a subnode and its sibling -> mark upper nodes -> uncheck one of the siblings', function() {
-      var model = helper.createModelFixture(4, 4);
-      var tree = helper.createTree(model);
+    it('checks a subnode and its sibling -> mark upper nodes -> uncheck one of the siblings', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
       tree.render();
       tree.checkable = true;
-      var nodeOne, nodeTwo;
+      let nodeOne, nodeTwo;
       // find node with more then one child level
-      for (var i = 0; i < tree.nodes.length; i++) {
+      for (let i = 0; i < tree.nodes.length; i++) {
         if (tree.nodes[i].childNodes && tree.nodes[i].childNodes.length > 0 && tree.nodes[i].childNodes[0].childNodes && tree.nodes[i].childNodes[0].childNodes.length > 1) {
           nodeOne = tree.nodes[i].childNodes[0].childNodes[0];
           nodeTwo = tree.nodes[i].childNodes[0].childNodes[1];
@@ -977,7 +975,7 @@ describe('Tree', function() {
         tree.checkNode(nodeTwo, true);
       }
       // check if all upper nodes are marked
-      var tmpNode = nodeOne;
+      let tmpNode = nodeOne;
       while (tmpNode.parentNode) {
         tmpNode = tmpNode.parentNode;
         expect(tmpNode.childrenChecked).toEqual(true);
@@ -1002,37 +1000,37 @@ describe('Tree', function() {
       }
     });
 
-    it('does not check a disabled node', function() {
-      var model = helper.createModelFixture(4, 4);
-      var tree = helper.createTree(model);
+    it('does not check a disabled node', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
       tree.render();
       tree.checkable = true;
 
-      var node = tree.nodes[0];
+      let node = tree.nodes[0];
       node.enabled = false;
       tree.checkNode(node, true);
       expect(node.checked).toEqual(false);
     });
 
-    it('does not check a node in a disabled tree', function() {
-      var model = helper.createModelFixture(4, 4);
-      var tree = helper.createTree(model);
+    it('does not check a node in a disabled tree', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
       tree.enabled = false;
       tree.render();
 
-      var node = tree.nodes[0];
+      let node = tree.nodes[0];
       tree.checkNode(node, true);
       expect(node.checked).toEqual(false);
     });
 
-    it('never checks two nodes if multiCheck is set to false', function() {
-      var model = helper.createModelFixture(4, 4);
-      var tree = helper.createTree(model);
+    it('never checks two nodes if multiCheck is set to false', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
       tree.multiCheck = false;
       tree.checkable = true;
       tree.render();
 
-      var node = tree.nodes[0],
+      let node = tree.nodes[0],
         nodeTwo = tree.nodes[1];
 
       if (node && nodeTwo) {
@@ -1040,56 +1038,56 @@ describe('Tree', function() {
         tree.checkNode(nodeTwo, true);
       }
 
-      var checkedNodes = findCheckedNodes(tree.nodes);
+      let checkedNodes = findCheckedNodes(tree.nodes);
       expect(checkedNodes.length).toBe(1);
     });
 
-    it('checks children if autoCheckChildren is set to true', function() {
-      var model = helper.createModelFixture(2, 2);
-      var tree = helper.createTree(model);
+    it('checks children if autoCheckChildren is set to true', () => {
+      let model = helper.createModelFixture(2, 2);
+      let tree = helper.createTree(model);
       tree.multiCheck = true;
       tree.checkable = true;
       tree.autoCheckChildren = true;
       tree.render();
 
-      var node = tree.nodes[0];
+      let node = tree.nodes[0];
       tree.checkNode(node, true);
       expect(node.checked).toEqual(true);
       // every descendant needs to be checked
-      Tree.visitNodes(function(node) {
+      Tree.visitNodes(node => {
         expect(node.checked).toEqual(true);
       }, node.childNodes);
     });
 
-    it('does not check the children if autoCheckChildren is set to false', function() {
-      var model = helper.createModelFixture(4, 4);
-      var tree = helper.createTree(model);
+    it('does not check the children if autoCheckChildren is set to false', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
       tree.multiCheck = true;
       tree.checkable = true;
       tree.autoCheckChildren = false;
       tree.render();
 
-      var node = tree.nodes[0];
+      let node = tree.nodes[0];
       tree.checkNode(node, true);
       expect(node.checked).toEqual(true);
       // no descendant must be checked
-      Tree.visitNodes(function(node) {
+      Tree.visitNodes(node => {
         expect(node.checked).toEqual(false);
       }, node.childNodes);
     });
 
-    it('does not check nodes if checkable is set to false', function() {
-      var model = helper.createModelFixture(4, 4);
-      var tree = helper.createTree(model);
+    it('does not check nodes if checkable is set to false', () => {
+      let model = helper.createModelFixture(4, 4);
+      let tree = helper.createTree(model);
       tree.multiCheck = false;
       tree.checkable = false;
       tree.render();
 
-      var node = tree.nodes[0];
+      let node = tree.nodes[0];
       tree.checkNode(node, true);
 
-      var checkedNodes = [];
-      for (var j = 0; j < tree.nodes.length; j++) {
+      let checkedNodes = [];
+      for (let j = 0; j < tree.nodes.length; j++) {
         if (tree.nodes[j].checked) {
           checkedNodes.push(tree.nodes[j]);
         }
@@ -1097,19 +1095,19 @@ describe('Tree', function() {
       expect(checkedNodes.length).toBe(0);
     });
 
-    it('checkablestyle.checkbox_tree_node checks row with click event', function() {
-      var model = helper.createModelFixture(5, 0);
+    it('checkablestyle.checkbox_tree_node checks row with click event', () => {
+      let model = helper.createModelFixture(5, 0);
       model.checkableStyle = Tree.CheckableStyle.CHECKBOX_TREE_NODE;
       model.checkable = true;
-      var tree = helper.createTree(model);
+      let tree = helper.createTree(model);
       tree.render();
 
-      var nodes = tree.nodes;
+      let nodes = tree.nodes;
 
-      var checkedNodes = findCheckedNodes(nodes);
+      let checkedNodes = findCheckedNodes(nodes);
       expect(checkedNodes.length).toBe(0);
 
-      var node = tree.$nodes;
+      let node = tree.$nodes;
 
       tree.$nodes().eq(2).triggerClick();
       tree.$nodes().eq(1).triggerClick();
@@ -1126,28 +1124,28 @@ describe('Tree', function() {
 
   });
 
-  describe('node click', function() {
+  describe('node click', () => {
 
-    it('calls tree._onNodeMouseDown', function() {
-      var model = helper.createModelFixture(1);
-      var tree = helper.createTree(model);
+    it('calls tree._onNodeMouseDown', () => {
+      let model = helper.createModelFixture(1);
+      let tree = helper.createTree(model);
       spyOn(tree, '_onNodeMouseDown');
       tree.render();
 
-      var $node = tree.$container.find('.tree-node:first');
+      let $node = tree.$container.find('.tree-node:first');
       $node.triggerMouseDown();
 
       expect(tree._onNodeMouseDown).toHaveBeenCalled();
     });
 
-    it('updates model (selection)', function() {
-      var model = helper.createModelFixture(1);
-      var tree = helper.createTree(model);
+    it('updates model (selection)', () => {
+      let model = helper.createModelFixture(1);
+      let tree = helper.createTree(model);
       tree.render();
 
       expect(tree.selectedNodes.length).toBe(0);
 
-      var $node = tree.$container.find('.tree-node:first');
+      let $node = tree.$container.find('.tree-node:first');
       $node.triggerClick();
 
       expect(tree.selectedNodes.length).toBe(1);
@@ -1156,13 +1154,13 @@ describe('Tree', function() {
 
   });
 
-  describe('node double click', function() {
-    it('expands/collapses the node', function() {
-      var model = helper.createModelFixture(1, 1, false);
-      var tree = helper.createTree(model);
+  describe('node double click', () => {
+    it('expands/collapses the node', () => {
+      let model = helper.createModelFixture(1, 1, false);
+      let tree = helper.createTree(model);
       tree.render();
 
-      var $node = tree.$container.find('.tree-node:first');
+      let $node = tree.$container.find('.tree-node:first');
       expect($node).not.toHaveClass('expanded');
 
       $node.triggerDoubleClick();
@@ -1173,14 +1171,14 @@ describe('Tree', function() {
     });
   });
 
-  describe('node control double click', function() {
-    it('does the same as control single click (does NOT expand and immediately collapse again)', function() {
-      var model = helper.createModelFixture(1, 1, false);
-      var tree = helper.createTree(model);
+  describe('node control double click', () => {
+    it('does the same as control single click (does NOT expand and immediately collapse again)', () => {
+      let model = helper.createModelFixture(1, 1, false);
+      let tree = helper.createTree(model);
       tree.render();
 
-      var $nodeControl = tree.$container.find('.tree-node-control:first');
-      var $node = $nodeControl.parent();
+      let $nodeControl = tree.$container.find('.tree-node-control:first');
+      let $node = $nodeControl.parent();
       expect($node).not.toHaveClass('expanded');
 
       $nodeControl.triggerDoubleClick();
@@ -1194,28 +1192,28 @@ describe('Tree', function() {
     });
   });
 
-  describe('checkable node double click', function() {
-    it('doesn\'t expands/collapses the node with checkable style checkbox_tree_node (default)', function() {
-      var model = helper.createModelFixture(1, 1, false);
+  describe('checkable node double click', () => {
+    it('doesn\'t expands/collapses the node with checkable style checkbox_tree_node (default)', () => {
+      let model = helper.createModelFixture(1, 1, false);
       model.checkable = true;
-      var tree = helper.createTree(model);
+      let tree = helper.createTree(model);
       tree.render();
 
-      var $node = tree.$container.find('.tree-node:first');
+      let $node = tree.$container.find('.tree-node:first');
       expect($node).not.toHaveClass('expanded');
 
       $node.triggerDoubleClick();
       expect($node).not.toHaveClass('expanded');
     });
 
-    it('expands/collapses the node with checkable style checkbox', function() {
-      var model = helper.createModelFixture(1, 1, false);
+    it('expands/collapses the node with checkable style checkbox', () => {
+      let model = helper.createModelFixture(1, 1, false);
       model.checkableStyle = Tree.CheckableStyle.CHECKBOX;
       model.checkable = true;
-      var tree = helper.createTree(model);
+      let tree = helper.createTree(model);
       tree.render();
 
-      var $node = tree.$container.find('.tree-node:first');
+      let $node = tree.$container.find('.tree-node:first');
       expect($node).not.toHaveClass('expanded');
 
       $node.triggerDoubleClick();
@@ -1226,14 +1224,14 @@ describe('Tree', function() {
     });
   });
 
-  describe('deselectAll', function() {
+  describe('deselectAll', () => {
 
-    it('clears the selection', function() {
-      var model = helper.createModelFixture(1, 1);
-      var node0 = model.nodes[0];
+    it('clears the selection', () => {
+      let model = helper.createModelFixture(1, 1);
+      let node0 = model.nodes[0];
       model.selectedNodes = [node0.id];
 
-      var tree = helper.createTree(model);
+      let tree = helper.createTree(model);
       tree.render();
       expect(tree.$selectedNodes().length).toBe(1);
 
@@ -1247,12 +1245,12 @@ describe('Tree', function() {
     });
   });
 
-  describe('selectNodes', function() {
+  describe('selectNodes', () => {
 
-    it('selects a node', function() {
-      var model = helper.createModelFixture(3, 3, false);
-      var tree = helper.createTree(model);
-      var node0 = tree.nodes[0];
+    it('selects a node', () => {
+      let model = helper.createModelFixture(3, 3, false);
+      let tree = helper.createTree(model);
+      let node0 = tree.nodes[0];
 
       tree.render();
       expect(tree.$selectedNodes().length).toBe(0);
@@ -1268,11 +1266,11 @@ describe('Tree', function() {
       expect(node0.$node.isSelected()).toBe(true);
     });
 
-    it('selectedNode()', function() {
-      var model = helper.createModelFixture(2, 2);
-      var tree = helper.createTree(model);
-      var node0 = tree.nodes[0];
-      var node1 = tree.nodes[1];
+    it('selectedNode()', () => {
+      let model = helper.createModelFixture(2, 2);
+      let tree = helper.createTree(model);
+      let node0 = tree.nodes[0];
+      let node1 = tree.nodes[1];
 
       // single selection
       tree.selectNode(node0);
@@ -1288,12 +1286,12 @@ describe('Tree', function() {
       expect(tree.selectedNode()).toBe(null);
     });
 
-    it('expands the parents if a hidden node should be selected whose parents are collapsed (revealing the selection)', function() {
-      var model = helper.createModelFixture(3, 3, false);
-      var tree = helper.createTree(model);
-      var node0 = tree.nodes[0];
-      var child0 = node0.childNodes[0];
-      var grandchild0 = child0.childNodes[0];
+    it('expands the parents if a hidden node should be selected whose parents are collapsed (revealing the selection)', () => {
+      let model = helper.createModelFixture(3, 3, false);
+      let tree = helper.createTree(model);
+      let node0 = tree.nodes[0];
+      let child0 = node0.childNodes[0];
+      let grandchild0 = child0.childNodes[0];
       tree.render();
 
       expect(node0.expanded).toBe(false);
@@ -1307,10 +1305,10 @@ describe('Tree', function() {
       expect(grandchild0.$node.isSelected()).toBe(true);
     });
 
-    it('also expands the node if bread crumb mode is enabled', function() {
-      var model = helper.createModelFixture(1, 1);
-      var tree = helper.createTree(model);
-      var node0 = tree.nodes[0];
+    it('also expands the node if bread crumb mode is enabled', () => {
+      let model = helper.createModelFixture(1, 1);
+      let tree = helper.createTree(model);
+      let node0 = tree.nodes[0];
 
       tree.displayStyle = Tree.DisplayStyle.BREADCRUMB;
       tree.render();
@@ -1321,11 +1319,11 @@ describe('Tree', function() {
       expect(node0.expanded).toBe(true);
     });
 
-    it('also expands the parents in breadcrumb mode if a hidden node should be selected after being expanded and collapsed while in its hidden state', function() {
-      var model = helper.createModelFixture(3, 3, false);
-      var tree = helper.createTree(model);
-      var node0 = tree.nodes[0];
-      var node1 = tree.nodes[1];
+    it('also expands the parents in breadcrumb mode if a hidden node should be selected after being expanded and collapsed while in its hidden state', () => {
+      let model = helper.createModelFixture(3, 3, false);
+      let tree = helper.createTree(model);
+      let node0 = tree.nodes[0];
+      let node1 = tree.nodes[1];
 
       tree.setDisplayStyle(Tree.DisplayStyle.BREADCRUMB);
       tree.render(session.$entryPoint);
@@ -1347,17 +1345,17 @@ describe('Tree', function() {
       expect(tree.$selectedNodes().length).toBe(1);
     });
 
-    it('sets css class ancestor-of-selected on every ancestor of the selected element', function() {
-      var model = helper.createModelFixture(3, 3);
-      var tree = helper.createTree(model);
-      var nodes = tree.nodes;
-      var node1 = nodes[1];
-      var child1 = node1.childNodes[1];
-      var grandchild1 = child1.childNodes[1];
+    it('sets css class ancestor-of-selected on every ancestor of the selected element', () => {
+      let model = helper.createModelFixture(3, 3);
+      let tree = helper.createTree(model);
+      let nodes = tree.nodes;
+      let node1 = nodes[1];
+      let child1 = node1.childNodes[1];
+      let grandchild1 = child1.childNodes[1];
 
       tree.render();
 
-      var $parents = tree.$data.find('.tree-node.ancestor-of-selected');
+      let $parents = tree.$data.find('.tree-node.ancestor-of-selected');
       expect($parents.length).toBe(0);
 
       tree.selectNodes(node1);
@@ -1383,16 +1381,16 @@ describe('Tree', function() {
       expect($parents.length).toBe(0);
     });
 
-    it('sets css class child-of-selected on direct children of the selected element', function() {
-      var model = helper.createModelFixture(3, 1, true);
-      var tree = helper.createTree(model);
-      var nodes = tree.nodes;
-      var node1 = nodes[1];
-      var child1 = node1.childNodes[1];
+    it('sets css class child-of-selected on direct children of the selected element', () => {
+      let model = helper.createModelFixture(3, 1, true);
+      let tree = helper.createTree(model);
+      let nodes = tree.nodes;
+      let node1 = nodes[1];
+      let child1 = node1.childNodes[1];
 
       tree.render();
 
-      var $children = tree.$data.find('.tree-node.child-of-selected');
+      let $children = tree.$data.find('.tree-node.child-of-selected');
       expect($children.length).toBe(3);
       expect($children.eq(0)[0]).toBe(nodes[0].$node[0]);
       expect($children.eq(1)[0]).toBe(nodes[1].$node[0]);
@@ -1414,12 +1412,12 @@ describe('Tree', function() {
       expect($children.eq(2)[0]).toBe(nodes[2].$node[0]);
     });
 
-    it('may select a node which is not rendered', function() {
-      var model = helper.createModelFixture(3, 3);
-      var tree = helper.createTree(model);
-      var nodes = tree.nodes;
-      var child0 = nodes[1].childNodes[0];
-      var child1 = nodes[1].childNodes[1];
+    it('may select a node which is not rendered', () => {
+      let model = helper.createModelFixture(3, 3);
+      let tree = helper.createTree(model);
+      let nodes = tree.nodes;
+      let child0 = nodes[1].childNodes[0];
+      let child1 = nodes[1].childNodes[1];
       tree.viewRangeSize = 1;
       tree.render();
 
@@ -1445,12 +1443,12 @@ describe('Tree', function() {
       expect(child1.$node).not.toHaveClass('selected');
     });
 
-    it('sets parent and ancestor css classes even if nodes are not rendered', function() {
-      var model = helper.createModelFixture(3, 3);
-      var tree = helper.createTree(model);
-      var nodes = tree.nodes;
-      var child1 = nodes[1].childNodes[1];
-      var grandChild1 = child1.childNodes[1];
+    it('sets parent and ancestor css classes even if nodes are not rendered', () => {
+      let model = helper.createModelFixture(3, 3);
+      let tree = helper.createTree(model);
+      let nodes = tree.nodes;
+      let child1 = nodes[1].childNodes[1];
+      let grandChild1 = child1.childNodes[1];
       tree.viewRangeSize = 1;
       tree.render();
 
@@ -1473,12 +1471,12 @@ describe('Tree', function() {
       expect(nodes[1].$node).toHaveClass('ancestor-of-selected');
     });
 
-    it('sets child-of-selected css class even if nodes are not rendered', function() {
-      var model = helper.createModelFixture(3, 3);
-      var tree = helper.createTree(model);
-      var nodes = tree.nodes;
-      var child1 = nodes[1].childNodes[1];
-      var grandChild1 = child1.childNodes[1];
+    it('sets child-of-selected css class even if nodes are not rendered', () => {
+      let model = helper.createModelFixture(3, 3);
+      let tree = helper.createTree(model);
+      let nodes = tree.nodes;
+      let child1 = nodes[1].childNodes[1];
+      let grandChild1 = child1.childNodes[1];
       tree.viewRangeSize = 1;
       tree.render();
 
@@ -1499,21 +1497,21 @@ describe('Tree', function() {
     });
   });
 
-  describe('expandNode', function() {
-    var model, tree, nodes, node1;
+  describe('expandNode', () => {
+    let model, tree, nodes, node1;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(3, 3);
       tree = helper.createTree(model);
       nodes = tree.nodes;
       node1 = nodes[1];
     });
 
-    it('sets css class child-of-selected on direct children if the expanded node is selected', function() {
+    it('sets css class child-of-selected on direct children if the expanded node is selected', () => {
       tree.render();
 
       tree.selectNodes(node1);
-      var $children = tree.$data.find('.tree-node.child-of-selected');
+      let $children = tree.$data.find('.tree-node.child-of-selected');
       expect($children.length).toBe(0);
 
       tree.expandNode(node1);
@@ -1528,10 +1526,10 @@ describe('Tree', function() {
       expect($children.length).toBe(0);
     });
 
-    it('renders the child nodes if parent is expanded', function() {
+    it('renders the child nodes if parent is expanded', () => {
       tree.render();
 
-      var $nodes = helper.findAllNodes(tree);
+      let $nodes = helper.findAllNodes(tree);
       expect($nodes.length).toBe(3);
 
       tree.expandNode(node1);
@@ -1543,16 +1541,16 @@ describe('Tree', function() {
       expect(node1.childNodes[2].$node[0]).toBe($nodes[4]);
     });
 
-    describe('with breadcrumb style', function() {
+    describe('with breadcrumb style', () => {
 
-      beforeEach(function() {
+      beforeEach(() => {
         tree.setDisplayStyle(Tree.DisplayStyle.BREADCRUMB);
       });
 
-      it('renders the child nodes if parent is expanded', function() {
+      it('renders the child nodes if parent is expanded', () => {
         tree.render();
 
-        var $nodes = helper.findAllNodes(tree);
+        let $nodes = helper.findAllNodes(tree);
         expect($nodes.length).toBe(3);
 
         tree.selectNode(node1); // select node calls expand node
@@ -1564,11 +1562,11 @@ describe('Tree', function() {
         expect(node1.childNodes[2].$node[0]).toBe($nodes[3]);
       });
 
-      it('ensures top level nodes are rendered', function() {
+      it('ensures top level nodes are rendered', () => {
         tree.render(session.$entryPoint);
 
-        var node0 = tree.nodes[0];
-        var node1 = tree.nodes[1];
+        let node0 = tree.nodes[0];
+        let node1 = tree.nodes[1];
         tree.selectNode(node1);
         tree.deleteNodes([node1]);
         tree.expandNode(node0);
@@ -1581,12 +1579,12 @@ describe('Tree', function() {
     });
   });
 
-  describe('expandAllParentNodes', function() {
+  describe('expandAllParentNodes', () => {
 
-    it('expands all parent nodes of the given node (model)', function() {
-      var model = helper.createModelFixture(3, 3);
-      var tree = helper.createTree(model);
-      var nodes = tree.nodes;
+    it('expands all parent nodes of the given node (model)', () => {
+      let model = helper.createModelFixture(3, 3);
+      let tree = helper.createTree(model);
+      let nodes = tree.nodes;
 
       expect(nodes[0].expanded).toBe(false);
       expect(nodes[0].childNodes[0].expanded).toBe(false);
@@ -1598,10 +1596,10 @@ describe('Tree', function() {
       expect(nodes[0].childNodes[0].childNodes[0].expanded).toBe(false);
     });
 
-    it('expands all parent nodes of the given node (html)', function() {
-      var model = helper.createModelFixture(3, 3);
-      var tree = helper.createTree(model);
-      var nodes = tree.nodes;
+    it('expands all parent nodes of the given node (html)', () => {
+      let model = helper.createModelFixture(3, 3);
+      let tree = helper.createTree(model);
+      let nodes = tree.nodes;
       tree.render();
 
       expect(nodes[0].$node).not.toHaveClass('expanded');
@@ -1616,12 +1614,12 @@ describe('Tree', function() {
 
   });
 
-  describe('lazyExpandCollapse', function() {
+  describe('lazyExpandCollapse', () => {
 
-    it('manual expand -> manual collapse node', function() {
-      var model = helper.createModelFixture(3, 2);
-      var tree = helper.createTree(model);
-      var node0 = tree.nodes[0];
+    it('manual expand -> manual collapse node', () => {
+      let model = helper.createModelFixture(3, 2);
+      let tree = helper.createTree(model);
+      let node0 = tree.nodes[0];
       tree.render();
 
       expect(node0.expanded).toBe(false);
@@ -1631,10 +1629,10 @@ describe('Tree', function() {
       expect(node0.expanded).toBe(false);
     });
 
-    it('manual expand -> lazy collapse node', function() {
-      var model = helper.createModelFixture(3, 2);
-      var tree = helper.createTree(model);
-      var node0 = tree.nodes[0];
+    it('manual expand -> lazy collapse node', () => {
+      let model = helper.createModelFixture(3, 2);
+      let tree = helper.createTree(model);
+      let node0 = tree.nodes[0];
       tree.render();
 
       expect(node0.expanded).toBe(false);
@@ -1644,10 +1642,10 @@ describe('Tree', function() {
       expect(node0.expanded).toBe(false);
     });
 
-    it('lazy expand -> manual collapse node', function() {
-      var model = helper.createModelFixture(3, 2);
-      var tree = helper.createTree(model);
-      var node0 = tree.nodes[0];
+    it('lazy expand -> manual collapse node', () => {
+      let model = helper.createModelFixture(3, 2);
+      let tree = helper.createTree(model);
+      let node0 = tree.nodes[0];
       tree.render();
 
       expect(node0.expanded).toBe(false);
@@ -1657,10 +1655,10 @@ describe('Tree', function() {
       expect(node0.expanded).toBe(false);
     });
 
-    it('lazy expand -> lazy collapse node', function() {
-      var model = helper.createModelFixture(3, 2);
-      var tree = helper.createTree(model);
-      var node0 = tree.nodes[0];
+    it('lazy expand -> lazy collapse node', () => {
+      let model = helper.createModelFixture(3, 2);
+      let tree = helper.createTree(model);
+      let node0 = tree.nodes[0];
       tree.render();
 
       expect(node0.expanded).toBe(false);
@@ -1671,12 +1669,12 @@ describe('Tree', function() {
     });
   });
 
-  describe('collapseNode', function() {
+  describe('collapseNode', () => {
 
-    it('prevents collapsing in bread crumb mode if node is selected', function() {
-      var model = helper.createModelFixture(1, 1);
-      var tree = helper.createTree(model);
-      var node0 = tree.nodes[0];
+    it('prevents collapsing in bread crumb mode if node is selected', () => {
+      let model = helper.createModelFixture(1, 1);
+      let tree = helper.createTree(model);
+      let node0 = tree.nodes[0];
 
       tree.displayStyle = Tree.DisplayStyle.BREADCRUMB;
       tree.render();
@@ -1693,16 +1691,16 @@ describe('Tree', function() {
     });
   });
 
-  describe('collapseAll', function() {
+  describe('collapseAll', () => {
 
-    it('collapses all nodes', function() {
-      var i;
-      var model = helper.createModelFixture(3, 2, true);
-      var tree = helper.createTree(model);
+    it('collapses all nodes', () => {
+      let i;
+      let model = helper.createModelFixture(3, 2, true);
+      let tree = helper.createTree(model);
       tree.render();
 
-      var allNodes = [];
-      tree.visitNodes(function(node) {
+      let allNodes = [];
+      tree.visitNodes(node => {
         allNodes.push(node);
       });
 
@@ -1717,10 +1715,10 @@ describe('Tree', function() {
     });
   });
 
-  describe('updateItemPath', function() {
-    var model, tree, node1, child1, grandchild1, nodes;
+  describe('updateItemPath', () => {
+    let model, tree, node1, child1, grandchild1, nodes;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(3, 3);
       tree = helper.createTree(model);
       nodes = tree.nodes;
@@ -1729,15 +1727,13 @@ describe('Tree', function() {
       grandchild1 = child1.childNodes[1];
     });
 
-    it('Sets css class group on every element within the same group', function() {
+    it('Sets css class group on every element within the same group', () => {
       tree.render();
-      tree._isGroupingEnd = function(node) {
-        return node.nodeType === Page.NodeType.TABLE;
-      };
+      tree._isGroupingEnd = node => node.nodeType === Page.NodeType.TABLE;
 
       tree.selectNodes([]);
       tree._renderViewport();
-      var $groupNodes = tree.$data.find('.tree-node.group');
+      let $groupNodes = tree.$data.find('.tree-node.group');
       expect($groupNodes.length).toBe(0);
 
       tree.selectNodes(node1);
@@ -1765,20 +1761,20 @@ describe('Tree', function() {
     });
   });
 
-  describe('updateNodeOrder', function() {
-    var model, tree, nodes;
+  describe('updateNodeOrder', () => {
+    let model, tree, nodes;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(3, 3);
       tree = helper.createTree(model);
       nodes = tree.nodes;
     });
 
-    it('reorders the child nodes if parent is given (model)', function() {
-      var parentNode = nodes[1];
-      var childNode0 = parentNode.childNodes[0];
-      var childNode1 = parentNode.childNodes[1];
-      var childNode2 = parentNode.childNodes[2];
+    it('reorders the child nodes if parent is given (model)', () => {
+      let parentNode = nodes[1];
+      let childNode0 = parentNode.childNodes[0];
+      let childNode1 = parentNode.childNodes[1];
+      let childNode2 = parentNode.childNodes[2];
 
       tree.updateNodeOrder([childNode2, childNode1, childNode0], parentNode);
       expect(tree.nodes[1].childNodes.length).toBe(3);
@@ -1798,11 +1794,11 @@ describe('Tree', function() {
       expect(tree.visibleNodesFlat[2]).toBe(nodes[2]);
     });
 
-    it('reorders the child nodes if parent is given and expanded (model)', function() {
-      var parentNode = nodes[1];
-      var childNode0 = parentNode.childNodes[0];
-      var childNode1 = parentNode.childNodes[1];
-      var childNode2 = parentNode.childNodes[2];
+    it('reorders the child nodes if parent is given and expanded (model)', () => {
+      let parentNode = nodes[1];
+      let childNode0 = parentNode.childNodes[0];
+      let childNode1 = parentNode.childNodes[1];
+      let childNode2 = parentNode.childNodes[2];
 
       tree.expandNode(parentNode);
       tree.updateNodeOrder([childNode2, childNode1, childNode0], parentNode);
@@ -1826,26 +1822,26 @@ describe('Tree', function() {
       expect(tree.visibleNodesFlat[5]).toBe(nodes[2]);
     });
 
-    it('reorders the child nodes if parent is given (html)', function() {
-      var parentNode = nodes[1];
-      var childNode0 = parentNode.childNodes[0];
-      var childNode1 = parentNode.childNodes[1];
-      var childNode2 = parentNode.childNodes[2];
+    it('reorders the child nodes if parent is given (html)', () => {
+      let parentNode = nodes[1];
+      let childNode0 = parentNode.childNodes[0];
+      let childNode1 = parentNode.childNodes[1];
+      let childNode2 = parentNode.childNodes[2];
       tree.render();
       tree.expandNode(parentNode);
 
       tree.updateNodeOrder([childNode2, childNode1, childNode0], parentNode);
-      var $childNodes = parentNode.$node.nextUntil(nodes[2].$node);
+      let $childNodes = parentNode.$node.nextUntil(nodes[2].$node);
       expect($childNodes.eq(0).data('node').id).toBe(childNode2.id);
       expect($childNodes.eq(1).data('node').id).toBe(childNode1.id);
       expect($childNodes.eq(2).data('node').id).toBe(childNode0.id);
     });
 
-    it('considers view range when updating child node order', function() {
-      var parentNode = nodes[0];
-      var childNode0 = parentNode.childNodes[0];
-      var childNode1 = parentNode.childNodes[1];
-      var childNode2 = parentNode.childNodes[2];
+    it('considers view range when updating child node order', () => {
+      let parentNode = nodes[0];
+      let childNode0 = parentNode.childNodes[0];
+      let childNode1 = parentNode.childNodes[1];
+      let childNode2 = parentNode.childNodes[2];
       tree.viewRangeSize = 3;
       tree.render();
       tree.expandNode(parentNode);
@@ -1857,7 +1853,7 @@ describe('Tree', function() {
       tree._renderViewport();
 
       expect(tree.viewRangeRendered).toEqual(new Range(0, 3));
-      var $nodes = tree.$nodes();
+      let $nodes = tree.$nodes();
       expect($nodes.length).toBe(3);
       expect(tree.nodes.length).toBe(3);
       expect(parentNode.childNodes.length).toBe(3);
@@ -1866,11 +1862,11 @@ describe('Tree', function() {
       expect($nodes.eq(2).data('node').id).toBe(childNode1.id);
     });
 
-    it('reorders expanded child nodes if parent is given (model)', function() {
-      var parentNode = nodes[1];
-      var childNode0 = parentNode.childNodes[0];
-      var childNode1 = parentNode.childNodes[1];
-      var childNode2 = parentNode.childNodes[2];
+    it('reorders expanded child nodes if parent is given (model)', () => {
+      let parentNode = nodes[1];
+      let childNode0 = parentNode.childNodes[0];
+      let childNode1 = parentNode.childNodes[1];
+      let childNode2 = parentNode.childNodes[2];
 
       tree.expandNode(parentNode);
       tree.expandNode(childNode1);
@@ -1898,10 +1894,10 @@ describe('Tree', function() {
       expect(tree.visibleNodesFlat[8]).toBe(nodes[2]);
     });
 
-    it('reorders the root nodes if no parent is given (model)', function() {
-      var node0 = nodes[0];
-      var node1 = nodes[1];
-      var node2 = nodes[2];
+    it('reorders the root nodes if no parent is given (model)', () => {
+      let node0 = nodes[0];
+      let node1 = nodes[1];
+      let node2 = nodes[2];
 
       tree.updateNodeOrder([node2, node1, node0]);
       expect(tree.nodes.length).toBe(3);
@@ -1921,23 +1917,23 @@ describe('Tree', function() {
       expect(tree.visibleNodesFlat[2]).toBe(node0);
     });
 
-    it('reorders the root nodes if no parent is given (html)', function() {
-      var node0 = nodes[0];
-      var node1 = nodes[1];
-      var node2 = nodes[2];
+    it('reorders the root nodes if no parent is given (html)', () => {
+      let node0 = nodes[0];
+      let node1 = nodes[1];
+      let node2 = nodes[2];
 
       tree.render();
       tree.updateNodeOrder([node2, node1, node0]);
-      var $nodes = tree.$nodes();
+      let $nodes = tree.$nodes();
       expect($nodes.eq(0).data('node').id).toBe(node2.id);
       expect($nodes.eq(1).data('node').id).toBe(node1.id);
       expect($nodes.eq(2).data('node').id).toBe(node0.id);
     });
 
-    it('reorders expanded root nodes if no parent is given (model)', function() {
-      var node0 = nodes[0];
-      var node1 = nodes[1];
-      var node2 = nodes[2];
+    it('reorders expanded root nodes if no parent is given (model)', () => {
+      let node0 = nodes[0];
+      let node1 = nodes[1];
+      let node2 = nodes[2];
 
       tree.expandNode(node1);
       tree.updateNodeOrder([node2, node0, node1]);
@@ -1961,15 +1957,15 @@ describe('Tree', function() {
       expect(tree.visibleNodesFlat[5]).toBe(node1.childNodes[2]);
     });
 
-    it('reorders expanded root nodes if no parent is given (html)', function() {
-      var node0 = nodes[0];
-      var node1 = nodes[1];
-      var node2 = nodes[2];
+    it('reorders expanded root nodes if no parent is given (html)', () => {
+      let node0 = nodes[0];
+      let node1 = nodes[1];
+      let node2 = nodes[2];
 
       tree.render();
       tree.expandNode(node1);
       tree.updateNodeOrder([node2, node0, node1]);
-      var $nodes = tree.$nodes();
+      let $nodes = tree.$nodes();
       expect($nodes.eq(0).data('node').id).toBe(node2.id);
       expect($nodes.eq(1).data('node').id).toBe(node0.id);
       expect($nodes.eq(2).data('node').id).toBe(node1.id);
@@ -1979,17 +1975,15 @@ describe('Tree', function() {
     });
   });
 
-  describe('tree filter', function() {
+  describe('tree filter', () => {
 
-    it('filters nodes when filter() is called', function() {
-      var model = helper.createModelFixture(1, 1, true);
-      var tree = helper.createTree(model);
+    it('filters nodes when filter() is called', () => {
+      let model = helper.createModelFixture(1, 1, true);
+      let tree = helper.createTree(model);
       tree.render();
 
-      var filter = {
-        accept: function(node) {
-          return node === tree.nodes[0];
-        }
+      let filter = {
+        accept: node => node === tree.nodes[0]
       };
       tree.addFilter(filter);
       tree.filter();
@@ -2002,13 +1996,11 @@ describe('Tree', function() {
       expect(tree.nodes[0].childNodes[0].filterAccepted).toBe(true);
     });
 
-    it('filters nodes when filter is added and removed', function() {
-      var model = helper.createModelFixture(1, 1, true);
-      var tree = helper.createTree(model);
-      var filter = {
-        accept: function(node) {
-          return node === tree.nodes[0];
-        }
+    it('filters nodes when filter is added and removed', () => {
+      let model = helper.createModelFixture(1, 1, true);
+      let tree = helper.createTree(model);
+      let filter = {
+        accept: node => node === tree.nodes[0]
       };
       tree.addFilter(filter);
       expect(tree.nodes[0].filterAccepted).toBe(true);
@@ -2019,13 +2011,11 @@ describe('Tree', function() {
       expect(tree.nodes[0].childNodes[0].filterAccepted).toBe(true);
     });
 
-    it('makes sure only filtered nodes are displayed when node gets expanded', function() {
-      var model = helper.createModelFixture(2, 1);
-      var tree = helper.createTree(model);
-      var filter = {
-        accept: function(node) {
-          return node === tree.nodes[0] || node === tree.nodes[0].childNodes[0];
-        }
+    it('makes sure only filtered nodes are displayed when node gets expanded', () => {
+      let model = helper.createModelFixture(2, 1);
+      let tree = helper.createTree(model);
+      let filter = {
+        accept: node => node === tree.nodes[0] || node === tree.nodes[0].childNodes[0]
       };
       tree.addFilter(filter);
       tree.render();
@@ -2042,13 +2032,11 @@ describe('Tree', function() {
       expect(tree.nodes[0].childNodes[1].rendered).toBe(false);
     });
 
-    it('applies filter if a node gets changed', function() {
-      var model = helper.createModelFixture(2, 1);
-      var tree = helper.createTree(model);
-      var filter = {
-        accept: function(node) {
-          return node.text === 'node 0';
-        }
+    it('applies filter if a node gets changed', () => {
+      let model = helper.createModelFixture(2, 1);
+      let tree = helper.createTree(model);
+      let filter = {
+        accept: node => node.text === 'node 0'
       };
       tree.addFilter(filter);
       tree.render();
@@ -2065,13 +2053,11 @@ describe('Tree', function() {
       expect(tree.nodes[1].attached).toBe(false);
     });
 
-    it('applies filter if a node gets inserted', function() {
-      var model = helper.createModelFixture(2, 1, true);
-      var tree = helper.createTree(model);
-      var filter = {
-        accept: function(node) {
-          return node.text === 'node 0';
-        }
+    it('applies filter if a node gets inserted', () => {
+      let model = helper.createModelFixture(2, 1, true);
+      let tree = helper.createTree(model);
+      let filter = {
+        accept: node => node.text === 'node 0'
       };
       tree.addFilter(filter);
       tree.render();
@@ -2080,7 +2066,7 @@ describe('Tree', function() {
       expect(tree.nodes[0].rendered).toBe(true);
       expect(tree.nodes[1].rendered).toBe(false);
 
-      var newNode = helper.createModelNode('', 'newNode0Child1');
+      let newNode = helper.createModelNode('', 'newNode0Child1');
       tree.insertNodes([newNode], tree.nodes[0], 2);
 
       expect(tree.nodes[0].childNodes.length).toBe(3);
@@ -2115,8 +2101,8 @@ describe('Tree', function() {
      * failed and caused the error. To fix the error, we now make sure the node is attached
      * by calling showNode in Tree#filter.
      */
-    it('make sure nodes unchanged by filters are attached. See ticket #168957', function() {
-      var i,
+    it('make sure nodes unchanged by filters are attached. See ticket #168957', () => {
+      let i,
         topLevelNode3,
         topLevelNodes = [],
         childNodes = [],
@@ -2139,10 +2125,10 @@ describe('Tree', function() {
       topLevelNodes.push(helper.createModelNode('', 'TopLevel 5', 4));
 
       // filters
-      var model = helper.createModel(topLevelNodes);
-      var tree = helper.createTree(model);
-      var filterA = {
-        accept: function(node) {
+      let model = helper.createModel(topLevelNodes);
+      let tree = helper.createTree(model);
+      let filterA = {
+        accept: node => {
           if (node.level === 0) {
             return true;
           }
@@ -2150,8 +2136,8 @@ describe('Tree', function() {
 
         }
       };
-      var filterB = {
-        accept: function(node) {
+      let filterB = {
+        accept: node => {
           if (node.level === 0) {
             return true;
           }
@@ -2181,15 +2167,13 @@ describe('Tree', function() {
       expect(tree.visibleNodesFlat[4].text).toBe('B1');
     });
 
-    it('shows nodes correctly if nodes are made hidden right before', function(done) {
-      var model = helper.createModelFixture(2, 1, true);
-      var tree = helper.createTree(model);
-      var node0 = tree.nodes[0];
-      var node1 = tree.nodes[1];
-      var filter = {
-        accept: function(node) {
-          return node.text === 'node 0';
-        }
+    it('shows nodes correctly if nodes are made hidden right before', done => {
+      let model = helper.createModelFixture(2, 1, true);
+      let tree = helper.createTree(model);
+      let node0 = tree.nodes[0];
+      let node1 = tree.nodes[1];
+      let filter = {
+        accept: node => node.text === 'node 0'
       };
       tree.render();
 
@@ -2199,7 +2183,7 @@ describe('Tree', function() {
       tree.addFilter(filter);
       tree.removeFilter(filter);
 
-      node1.$node.promise().then(function() {
+      node1.$node.promise().then(() => {
         expect(node1.rendered).toBe(true);
         expect(node1.attached).toBe(true);
         expect(node1.$node).not.toHaveClass('hiding showing');
@@ -2209,15 +2193,15 @@ describe('Tree', function() {
     });
   });
 
-  describe('tree enabled/disabled', function() {
+  describe('tree enabled/disabled', () => {
 
-    var model;
-    var tree;
-    var node0;
-    var node1;
-    var node2;
+    let model;
+    let tree;
+    let node0;
+    let node1;
+    let node2;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(3, 1, true);
       model.checkable = true;
       model.nodes[2].enabled = false;
@@ -2228,7 +2212,7 @@ describe('Tree', function() {
       node2 = tree.nodes[2];
     });
 
-    it('disables checkboxes when tree is disabled', function() {
+    it('disables checkboxes when tree is disabled', () => {
       tree.render();
 
       expect(node0.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).not.toHaveClass('disabled');
@@ -2245,38 +2229,38 @@ describe('Tree', function() {
     });
   });
 
-  describe('test visible list and map', function() {
+  describe('test visible list and map', () => {
 
-    describe('with initial all expanded nodes', function() {
-      var model, tree;
-      beforeEach(function() {
+    describe('with initial all expanded nodes', () => {
+      let model, tree;
+      beforeEach(() => {
         model = helper.createModelFixture(3, 2, true);
         tree = helper.createTree(model);
       });
 
-      it('init with all expanded in correct order', function() {
-        var index = 0;
-        tree.visitNodes(function(node) {
+      it('init with all expanded in correct order', () => {
+        let index = 0;
+        tree.visitNodes(node => {
           expect(tree.visibleNodesFlat.indexOf(node) === index).toBeTruthy();
           expect(tree.visibleNodesMap[node.id]).toBeTruthy();
           index++;
         });
       });
 
-      it('collapse a node -> all children have to be removed', function() {
-        var collapseNode = tree.nodes[0];
+      it('collapse a node -> all children have to be removed', () => {
+        let collapseNode = tree.nodes[0];
         tree.collapseNode(collapseNode);
 
-        tree.nodes.forEach(function(node) {
+        tree.nodes.forEach(node => {
           expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
           expect(tree.visibleNodesMap[node.id]).toBeTruthy();
           if (node === collapseNode) {
-            Tree.visitNodes(function(childNode) {
+            Tree.visitNodes(childNode => {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeFalsy();
               expect(tree.visibleNodesMap[childNode.id]).toBeFalsy();
             }, node.childNodes);
           } else {
-            Tree.visitNodes(function(childNode) {
+            Tree.visitNodes(childNode => {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
               expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
             }, node.childNodes);
@@ -2284,27 +2268,25 @@ describe('Tree', function() {
         });
       });
 
-      it('filter node -> filtered node and children has to be removed from visible', function() {
-        var filterNode = tree.nodes[0];
-        var filter = {
-          accept: function(node) {
-            return node !== filterNode;
-          }
+      it('filter node -> filtered node and children has to be removed from visible', () => {
+        let filterNode = tree.nodes[0];
+        let filter = {
+          accept: node => node !== filterNode
         };
         tree.addFilter(filter);
 
-        tree.nodes.forEach(function(node) {
+        tree.nodes.forEach(node => {
           if (node === filterNode) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeFalsy();
             expect(tree.visibleNodesMap[node.id]).toBeFalsy();
-            Tree.visitNodes(function(childNode) {
+            Tree.visitNodes(childNode => {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeFalsy();
               expect(tree.visibleNodesMap[childNode.id]).toBeFalsy();
             }, node.childNodes);
           } else {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
             expect(tree.visibleNodesMap[node.id]).toBeTruthy();
-            Tree.visitNodes(function(childNode) {
+            Tree.visitNodes(childNode => {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
               expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
             }, node.childNodes);
@@ -2312,22 +2294,20 @@ describe('Tree', function() {
         });
       });
 
-      it('update node -> node is filtered', function() {
+      it('update node -> node is filtered', () => {
 
-        var filter = {
-          accept: function(node) {
-            return node.enabled;
-          }
+        let filter = {
+          accept: node => node.enabled
         };
         tree.addFilter(filter);
 
-        tree.visitNodes(function(childNode) {
+        tree.visitNodes(childNode => {
           expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
           expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
         });
-        var nodeToChange = tree.nodes[0];
+        let nodeToChange = tree.nodes[0];
 
-        var clone = {
+        let clone = {
           checked: nodeToChange.checked,
           childNodeIndex: nodeToChange.childNodeIndex,
           childNodes: nodeToChange.childNodes,
@@ -2342,18 +2322,18 @@ describe('Tree', function() {
 
         tree.updateNodes([clone]);
 
-        tree.nodes.forEach(function(node) {
+        tree.nodes.forEach(node => {
           if (node === nodeToChange) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeFalsy();
             expect(tree.visibleNodesMap[node.id]).toBeFalsy();
-            Tree.visitNodes(function(childNode) {
+            Tree.visitNodes(childNode => {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeFalsy();
               expect(tree.visibleNodesMap[childNode.id]).toBeFalsy();
             }, node.childNodes);
           } else {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
             expect(tree.visibleNodesMap[node.id]).toBeTruthy();
-            Tree.visitNodes(function(childNode) {
+            Tree.visitNodes(childNode => {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
               expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
             }, node.childNodes);
@@ -2361,15 +2341,15 @@ describe('Tree', function() {
         });
       });
 
-      it('insert expanded node to expanded parent', function() {
-        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+      it('insert expanded node to expanded parent', () => {
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         newNode0Child3.expanded = true;
         tree.insertNodes([newNode0Child3], tree.nodes[0]);
 
-        var newNode0Child3Child0 = helper.createModelNode('0_3_1', 'newNode0Child3Child0', 0);
-        var treeNodeC3 = tree._nodeById(newNode0Child3.id);
+        let newNode0Child3Child0 = helper.createModelNode('0_3_1', 'newNode0Child3Child0', 0);
+        let treeNodeC3 = tree._nodeById(newNode0Child3.id);
         tree.insertNodes([newNode0Child3Child0], treeNodeC3);
-        var treeNodeC3C0 = tree._nodeById(newNode0Child3Child0.id);
+        let treeNodeC3C0 = tree._nodeById(newNode0Child3Child0.id);
 
         expect(tree.visibleNodesFlat.indexOf(treeNodeC3) > -1).toBeTruthy();
         expect(tree.visibleNodesMap[treeNodeC3.id]).toBeTruthy();
@@ -2377,46 +2357,44 @@ describe('Tree', function() {
         expect(tree.visibleNodesMap[treeNodeC3C0.id]).toBeTruthy();
       });
 
-      it('insert child node in filtered parent', function() {
-        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+      it('insert child node in filtered parent', () => {
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         newNode0Child3.expanded = true;
-        var filter = {
-          accept: function(node) {
-            return tree.nodes[0].id !== node.id;
-          }
+        let filter = {
+          accept: node => tree.nodes[0].id !== node.id
         };
         tree.addFilter(filter);
 
-        tree.nodes.forEach(function(node) {
+        tree.nodes.forEach(node => {
           if (node === tree.nodes[0]) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeFalsy();
             expect(tree.visibleNodesMap[node.id]).toBeFalsy();
-            Tree.visitNodes(function(childNode) {
+            Tree.visitNodes(childNode => {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeFalsy();
               expect(tree.visibleNodesMap[childNode.id]).toBeFalsy();
             }, node.childNodes);
           } else {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
             expect(tree.visibleNodesMap[node.id]).toBeTruthy();
-            Tree.visitNodes(function(childNode) {
+            Tree.visitNodes(childNode => {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
               expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
             }, node.childNodes);
           }
         });
         tree.insertNodes([newNode0Child3], tree.nodes[0]);
-        tree.nodes.forEach(function(node) {
+        tree.nodes.forEach(node => {
           if (node === tree.nodes[0]) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeFalsy();
             expect(tree.visibleNodesMap[node.id]).toBeFalsy();
-            Tree.visitNodes(function(childNode) {
+            Tree.visitNodes(childNode => {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeFalsy();
               expect(tree.visibleNodesMap[childNode.id]).toBeFalsy();
             }, node.childNodes);
           } else {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
             expect(tree.visibleNodesMap[node.id]).toBeTruthy();
-            Tree.visitNodes(function(childNode) {
+            Tree.visitNodes(childNode => {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
               expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
             }, node.childNodes);
@@ -2425,23 +2403,21 @@ describe('Tree', function() {
 
       });
 
-      it('insert child node which should be filtered', function() {
-        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+      it('insert child node which should be filtered', () => {
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         newNode0Child3.expanded = true;
-        var filter = {
-          accept: function(node) {
-            return newNode0Child3.id !== node.id;
-          }
+        let filter = {
+          accept: node => newNode0Child3.id !== node.id
         };
         tree.addFilter(filter);
-        tree.visitNodes(function(childNode) {
+        tree.visitNodes(childNode => {
           expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
           expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
         });
         tree.insertNodes([newNode0Child3], tree.nodes[0]);
 
-        var treeNode0C3 = tree._nodeById(newNode0Child3.id);
-        tree.visitNodes(function(node) {
+        let treeNode0C3 = tree._nodeById(newNode0Child3.id);
+        tree.visitNodes(node => {
           if (node === treeNode0C3) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeFalsy();
             expect(tree.visibleNodesMap[node.id]).toBeFalsy();
@@ -2453,15 +2429,15 @@ describe('Tree', function() {
       });
     });
 
-    describe('with initial all closed nodes', function() {
-      var model, tree;
-      beforeEach(function() {
+    describe('with initial all closed nodes', () => {
+      let model, tree;
+      beforeEach(() => {
         model = helper.createModelFixture(3, 2, false);
         tree = helper.createTree(model);
       });
 
-      it('init with all collapsed', function() {
-        tree.visitNodes(function(node) {
+      it('init with all collapsed', () => {
+        tree.visitNodes(node => {
           if (tree.nodes.indexOf(node) > -1) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
             expect(tree.visibleNodesMap[node.id]).toBeTruthy();
@@ -2472,11 +2448,11 @@ describe('Tree', function() {
         });
       });
 
-      it('insert child node collapsed parent', function() {
-        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+      it('insert child node collapsed parent', () => {
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         newNode0Child3.expanded = true;
         tree.insertNodes([newNode0Child3], tree.nodes[0]);
-        var newNode0Child3Child0 = helper.createModelNode('0_3_1', 'newNode0Child3Child0', 0);
+        let newNode0Child3Child0 = helper.createModelNode('0_3_1', 'newNode0Child3Child0', 0);
         tree.insertNodes([newNode0Child3Child0], tree._nodeById(newNode0Child3.id));
         expect(tree.visibleNodesFlat.indexOf(newNode0Child3) > -1).toBeFalsy();
         expect(tree.visibleNodesMap[newNode0Child3.id]).toBeFalsy();
@@ -2484,10 +2460,10 @@ describe('Tree', function() {
         expect(tree.visibleNodesMap[newNode0Child3Child0.id]).toBeFalsy();
       });
 
-      it('expand node', function() {
-        var node0 = tree.nodes[0];
+      it('expand node', () => {
+        let node0 = tree.nodes[0];
         tree.expandNode(node0);
-        tree.visitNodes(function(node) {
+        tree.visitNodes(node => {
           if (node.parentNode === node0) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
             expect(tree.visibleNodesMap[node.id]).toBeTruthy();
@@ -2500,8 +2476,8 @@ describe('Tree', function() {
           }
         });
         // check order
-        for (var i = 0; i < tree.visibleNodesFlat.length; i++) {
-          var nodeInList = tree.visibleNodesFlat[i];
+        for (let i = 0; i < tree.visibleNodesFlat.length; i++) {
+          let nodeInList = tree.visibleNodesFlat[i];
           if (i === 0) {
             expect(nodeInList.id === '0').toBeTruthy();
           } else if (i < 4) {
@@ -2513,12 +2489,12 @@ describe('Tree', function() {
 
       });
 
-      it('expand child node', function() {
-        var node0 = tree.nodes[0],
+      it('expand child node', () => {
+        let node0 = tree.nodes[0],
           node0_0 = node0.childNodes[0];
         tree.expandNode(node0);
         tree.expandNode(node0_0);
-        tree.visitNodes(function(node) {
+        tree.visitNodes(node => {
           if (node.parentNode === node0) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
             expect(tree.visibleNodesMap[node.id]).toBeTruthy();
@@ -2533,8 +2509,8 @@ describe('Tree', function() {
             expect(tree.visibleNodesMap[node.id]).toBeFalsy();
           }
         });
-        for (var i = 0; i < tree.visibleNodesFlat.length; i++) {
-          var nodeInList = tree.visibleNodesFlat[i];
+        for (let i = 0; i < tree.visibleNodesFlat.length; i++) {
+          let nodeInList = tree.visibleNodesFlat[i];
           if (i === 0) {
             expect(nodeInList.id === '0').toBeTruthy();
           } else if (i < 7) {
@@ -2553,22 +2529,22 @@ describe('Tree', function() {
     });
   });
 
-  describe('destroy tree nodes', function() {
+  describe('destroy tree nodes', () => {
 
-    var tree;
+    let tree;
 
-    beforeEach(function() {
-      var model = helper.createModelFixture(2, 1, false);
+    beforeEach(() => {
+      let model = helper.createModelFixture(2, 1, false);
       tree = helper.createTree(model);
     });
 
-    it('should destroy all tree nodes and set destroyed flag', function() {
-      var nodesMapCopy = $.extend({}, tree.nodesMap);
-      objects.values(nodesMapCopy).forEach(function(node) {
+    it('should destroy all tree nodes and set destroyed flag', () => {
+      let nodesMapCopy = $.extend({}, tree.nodesMap);
+      objects.values(nodesMapCopy).forEach(node => {
         expect(node.destroyed).toBe(false);
       });
       tree.destroy();
-      objects.values(nodesMapCopy).forEach(function(node) {
+      objects.values(nodesMapCopy).forEach(node => {
         expect(node.destroyed).toBe(true);
       });
       expect(objects.countOwnProperties(tree.nodesMap)).toBe(0);
@@ -2577,10 +2553,10 @@ describe('Tree', function() {
 
   });
 
-  describe('ensureExpansionVisible', function() {
-    var model, tree, nodes, $scrollable, nodeHeight;
+  describe('ensureExpansionVisible', () => {
+    let model, tree, nodes, $scrollable, nodeHeight;
 
-    beforeEach(function() {
+    beforeEach(() => {
       $('<style>' +
         '.tree-node {height: 28px; }' +
         '.tree {height: 230px; overflow: hidden;}' +
@@ -2597,7 +2573,7 @@ describe('Tree', function() {
       nodeHeight = tree.nodeHeight;
     });
 
-    it('scrolls current node to the top when expanding a large child set', function() {
+    it('scrolls current node to the top when expanding a large child set', () => {
       expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[1].$node), $scrollable)).toBe(true);
       expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[9].$node), $scrollable)).toBe(false);
       expect(nodes[7].expanded).toBe(false);
@@ -2611,7 +2587,7 @@ describe('Tree', function() {
       expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[8].$node), $scrollable)).toBe(false);
     });
 
-    it('scrolls current node up so that the full expansion is visible plus half a node at the bottom', function() {
+    it('scrolls current node up so that the full expansion is visible plus half a node at the bottom', () => {
       nodes[7].childNodes = [nodes[7].childNodes[0], nodes[7].childNodes[1]];
       tree.selectNode(nodes[7]);
       tree.setNodeExpanded(nodes[7], true);
@@ -2627,15 +2603,15 @@ describe('Tree', function() {
     });
   });
 
-  describe('invisible', function() {
+  describe('invisible', () => {
 
-    it('does not try to read node width when invisible', function() {
-      var treeField = scout.create('TreeField', {
+    it('does not try to read node width when invisible', () => {
+      let treeField = scout.create('TreeField', {
         parent: session.desktop,
         visible: false
       });
-      var model = helper.createModelFixture(3, 0, true);
-      var tree = helper.createTree(model);
+      let model = helper.createModelFixture(3, 0, true);
+      let tree = helper.createTree(model);
       treeField.render();
 
       treeField.setTree(tree);

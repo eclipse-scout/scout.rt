@@ -20,12 +20,12 @@ export default class RadioButtonLayout extends ButtonLayout {
   layout($container) {
     super.layout($container);
 
-    var $icon = this.radioButton.get$Icon(),
+    let $icon = this.radioButton.get$Icon(),
       $circle = this.radioButton.$radioButton,
       $label = this.radioButton.$buttonLabel,
       $fieldContainer = this.radioButton.$fieldContainer;
 
-    var labelMaxWidth = $fieldContainer.width() - ($circle.outerWidth(true) + ($icon.length ? $icon.outerWidth(true) : 0));
+    let labelMaxWidth = $fieldContainer.width() - ($circle.outerWidth(true) + ($icon.length ? $icon.outerWidth(true) : 0));
     $label.css('max-width', labelMaxWidth);
   }
 }

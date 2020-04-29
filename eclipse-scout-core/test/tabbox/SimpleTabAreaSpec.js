@@ -10,27 +10,27 @@
  */
 import {scout} from '../../src/index';
 
-describe('SimpleTabArea', function() {
-  var session;
+describe('SimpleTabArea', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  it('renders the tabs in the correct order', function() {
-    var tabBox = scout.create('SimpleTabBox', {
+  it('renders the tabs in the correct order', () => {
+    let tabBox = scout.create('SimpleTabBox', {
       parent: session.desktop
     });
-    var view1 = scout.create('GroupBox', {
+    let view1 = scout.create('GroupBox', {
       parent: tabBox,
       title: 'One'
     });
-    var view2 = scout.create('GroupBox', {
+    let view2 = scout.create('GroupBox', {
       parent: tabBox,
       title: 'Two'
     });
-    var view3 = scout.create('GroupBox', {
+    let view3 = scout.create('GroupBox', {
       parent: tabBox,
       title: 'Three'
     });

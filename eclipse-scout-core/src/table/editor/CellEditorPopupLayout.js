@@ -20,7 +20,7 @@ export default class CellEditorPopupLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var size,
+    let size,
       htmlField = this._field.htmlComp;
 
     size = this._htmlContainer.availableSize({
@@ -32,7 +32,7 @@ export default class CellEditorPopupLayout extends AbstractLayout {
   }
 
   preferredLayoutSize($container) {
-    var cellBounds, rowBounds, margin,
+    let cellBounds, rowBounds, margin,
       $row = this.cellEditorPopup.row.$row,
       $cell = this.cellEditorPopup.$anchor;
 

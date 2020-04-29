@@ -48,9 +48,7 @@ export default class Popup extends Widget {
     this.windowPaddingY = 5;
     this.withGlassPane = false;
     this.withFocusContext = true;
-    this.initialFocus = function() {
-      return FocusRule.AUTO;
-    };
+    this.initialFocus = () => FocusRule.AUTO;
     this.focusableContainer = false;
 
     // The alignment defines how the popup is positioned around the anchor.
@@ -166,7 +164,7 @@ export default class Popup extends Widget {
 
   _openWithoutParent() {
     // resolve parent for entry-point (don't change the actual property)
-    var parent = this.parent;
+    let parent = this.parent;
     if (parent.destroyed) {
       return;
     }
@@ -177,14 +175,14 @@ export default class Popup extends Widget {
 
     // This is important for popups rendered in another (native) browser window. The DOM in the popup window
     // is rendered later, so we must wait until that window is rendered and layouted. See popup-window.html.
-    parent.one('render', function() {
-      this.session.layoutValidator.schedulePostValidateFunction(function() {
+    parent.one('render', () => {
+      this.session.layoutValidator.schedulePostValidateFunction(() => {
         if (this.destroyed || this.rendered) {
           return;
         }
         this.open();
-      }.bind(this));
-    }.bind(this));
+      });
+    });
   }
 
   open($parent) {
@@ -214,7 +212,7 @@ export default class Popup extends Widget {
     if (!this.withFocusContext) {
       return;
     }
-    var context = this.session.focusManager.getFocusContext(this.$container);
+    let context = this.session.focusManager.getFocusContext(this.$container);
     context.ready();
     if (!context.lastValidFocusedElement) {
       // No widget requested focus -> try to determine the initial focus
@@ -223,7 +221,7 @@ export default class Popup extends Widget {
   }
 
   _requestInitialFocus() {
-    var initialFocusElement = this.session.focusManager.evaluateFocusRule(this.$container, this.initialFocus());
+    let initialFocusElement = this.session.focusManager.evaluateFocusRule(this.$container, this.initialFocus());
     if (!initialFocusElement) {
       return;
     }
@@ -240,7 +238,7 @@ export default class Popup extends Widget {
   }
 
   render($parent) {
-    var $popupParent = $parent || this.entryPoint();
+    let $popupParent = $parent || this.entryPoint();
     // when the parent is detached it is not possible to render the popup -> do it later
     if (!$popupParent || !$popupParent.length || !$popupParent.isAttached()) {
       this._openLater = true;
@@ -289,7 +287,7 @@ export default class Popup extends Widget {
   }
 
   remove() {
-    var currentAnimateRemoval = this.animateRemoval;
+    let currentAnimateRemoval = this.animateRemoval;
     if (!this._isInView()) {
       this.animateRemoval = false;
     }
@@ -377,8 +375,8 @@ export default class Popup extends Widget {
   }
 
   _computeArrowPositionClass(verticalAlignment, horizontalAlignment) {
-    var Alignment = Popup.Alignment;
-    var cssClass = '';
+    let Alignment = Popup.Alignment;
+    let cssClass = '';
     horizontalAlignment = horizontalAlignment || this.horizontalAlignment;
     verticalAlignment = verticalAlignment || this.verticalAlignment;
     switch (horizontalAlignment) {
@@ -413,7 +411,7 @@ export default class Popup extends Widget {
   }
 
   close() {
-    var event = new Event();
+    let event = new Event();
     this.trigger('close', event);
     if (!event.defaultPrevented) {
       this.destroy();
@@ -448,7 +446,7 @@ export default class Popup extends Widget {
     scrollbars.onScroll(this.$anchor, this._anchorScrollHandler);
 
     // Attach a location change handler as well (will only work if the anchor is a widget which triggers a locationChange event, e.g. another Popup)
-    var anchor = scout.widget(this.$anchor);
+    let anchor = scout.widget(this.$anchor);
     if (anchor) {
       this._anchorLocationChangeHandler = this._onAnchorLocationChange.bind(this);
       anchor.on('locationChange', this._anchorLocationChangeHandler);
@@ -461,7 +459,7 @@ export default class Popup extends Widget {
       this._anchorScrollHandler = null;
     }
     if (this._anchorLocationChangeHandler) {
-      var anchor = scout.widget(this.$anchor);
+      let anchor = scout.widget(this.$anchor);
       if (anchor) {
         anchor.off('locationChange', this._anchorLocationChangeHandler);
         this._anchorLocationChangeHandler = null;
@@ -498,7 +496,7 @@ export default class Popup extends Widget {
   }
 
   _isMouseDownOutside(event) {
-    var $target = $(event.target),
+    let $target = $(event.target),
       targetWidget;
 
     if (!this.closeOnAnchorMouseDown && this._isMouseDownOnAnchor(event)) {
@@ -571,7 +569,7 @@ export default class Popup extends Widget {
     // Use case: Opening of a context menu or cell editor in a form popup
     // Also, popups covered by a glass pane (a modal dialog is open) must never be closed
     // Use case: popup opens a modal dialog. User clicks on a smartfield on this dialog -> underlying popup must not get closed
-    var closable = !this.isOrHas(event.popup) &&
+    let closable = !this.isOrHas(event.popup) &&
       !event.popup.isOrHas(this);
     if (this.rendered) {
       closable = closable && !this.session.focusManager.isElementCovertByGlassPane(this.$container[0]);
@@ -643,15 +641,15 @@ export default class Popup extends Widget {
   }
 
   _prefLocationWithAnchor(verticalAlignment, horizontalAlignment) {
-    var $container = this.$container;
+    let $container = this.$container;
     horizontalAlignment = horizontalAlignment || this.horizontalAlignment;
     verticalAlignment = verticalAlignment || this.verticalAlignment;
-    var anchorBounds = this.getAnchorBounds();
-    var size = graphics.size($container);
-    var margins = graphics.margins($container);
-    var Alignment = Popup.Alignment;
+    let anchorBounds = this.getAnchorBounds();
+    let size = graphics.size($container);
+    let margins = graphics.margins($container);
+    let Alignment = Popup.Alignment;
 
-    var arrowBounds = null;
+    let arrowBounds = null;
     if (this.$arrow) {
       // Ensure the arrow has the correct class
       this._updateArrowClass(verticalAlignment, horizontalAlignment);
@@ -663,9 +661,9 @@ export default class Popup extends Widget {
     $container.removeClass(this._alignClasses());
     $container.addClass(verticalAlignment + ' ' + horizontalAlignment);
 
-    var widthWithMargin = size.width + margins.horizontal();
-    var width = size.width;
-    var x = anchorBounds.x;
+    let widthWithMargin = size.width + margins.horizontal();
+    let width = size.width;
+    let x = anchorBounds.x;
     if (horizontalAlignment === Alignment.LEFT) {
       x -= widthWithMargin;
     } else if (horizontalAlignment === Alignment.LEFTEDGE) {
@@ -686,9 +684,9 @@ export default class Popup extends Widget {
       }
     }
 
-    var heightWithMargin = size.height + margins.vertical();
-    var height = size.height;
-    var y = anchorBounds.y;
+    let heightWithMargin = size.height + margins.vertical();
+    let height = size.height;
+    let y = anchorBounds.y;
     if (verticalAlignment === Alignment.TOP) {
       y -= heightWithMargin;
     } else if (verticalAlignment === Alignment.TOPEDGE) {
@@ -710,7 +708,7 @@ export default class Popup extends Widget {
     }
 
     // this.$parent might not be at (0,0) of the document
-    var parentOffset = this.$parent.offset();
+    let parentOffset = this.$parent.offset();
     x -= parentOffset.left;
     y -= parentOffset.top;
 
@@ -718,18 +716,18 @@ export default class Popup extends Widget {
   }
 
   _alignClasses() {
-    var Alignment = Popup.Alignment;
+    let Alignment = Popup.Alignment;
     return strings.join(' ', Alignment.LEFT, Alignment.LEFTEDGE, Alignment.CENTER, Alignment.RIGHT, Alignment.RIGHTEDGE,
       Alignment.TOP, Alignment.TOPEDGE, Alignment.CENTER, Alignment.BOTTOM, Alignment.BOTTOMEDGE);
   }
 
   getAnchorBounds() {
-    var anchorBounds = this.anchorBounds;
+    let anchorBounds = this.anchorBounds;
     if (!this.$anchor) {
       // Use manually set anchor bounds
       return anchorBounds;
     }
-    var realAnchorBounds = graphics.offsetBounds(this.$anchor, {
+    let realAnchorBounds = graphics.offsetBounds(this.$anchor, {
       exact: true
     });
     if (!anchorBounds) {
@@ -757,7 +755,7 @@ export default class Popup extends Widget {
   }
 
   getWindowSize() {
-    var $window = this.$parent.window();
+    let $window = this.$parent.window();
     return new Dimension($window.width(), $window.height());
   }
 
@@ -767,21 +765,21 @@ export default class Popup extends Widget {
    * Prefers the right and bottom over the left and top border, meaning if a positive value is returned it does not mean that the left border is overlapping as well.
    */
   overlap(location, includeMargin) {
-    var $container = this.$container;
+    let $container = this.$container;
     if (!$container || !location) {
       return null;
     }
     includeMargin = scout.nvl(includeMargin, true);
-    var height = $container.outerHeight(includeMargin);
-    var width = $container.outerWidth(includeMargin);
-    var popupBounds = new Rectangle(location.x, location.y, width, height);
-    var bounds = graphics.offsetBounds($container.entryPoint(), true);
+    let height = $container.outerHeight(includeMargin);
+    let width = $container.outerWidth(includeMargin);
+    let popupBounds = new Rectangle(location.x, location.y, width, height);
+    let bounds = graphics.offsetBounds($container.entryPoint(), true);
 
-    var overlapX = popupBounds.right() + this.windowPaddingX - bounds.width;
+    let overlapX = popupBounds.right() + this.windowPaddingX - bounds.width;
     if (overlapX < 0) {
       overlapX = Math.min(popupBounds.x - this.windowPaddingX - bounds.x, 0);
     }
-    var overlapY = popupBounds.bottom() + this.windowPaddingY - bounds.height;
+    let overlapY = popupBounds.bottom() + this.windowPaddingY - bounds.height;
     if (overlapY < 0) {
       overlapY = Math.min(popupBounds.y - this.windowPaddingY - bounds.y, 0);
     }
@@ -791,7 +789,7 @@ export default class Popup extends Widget {
   adjustLocation(location, switchIfNecessary) {
     this.calculatedVerticalAlignment = this.verticalAlignment;
     this.calculatedHorizontalAlignment = this.horizontalAlignment;
-    var overlap = this.overlap(location);
+    let overlap = this.overlap(location);
 
     // Reset arrow style
     if (this.$arrow) {
@@ -801,7 +799,7 @@ export default class Popup extends Widget {
 
     location = location.clone();
     if (overlap.y !== 0) {
-      var verticalSwitch = scout.nvl(switchIfNecessary, this.verticalSwitch);
+      let verticalSwitch = scout.nvl(switchIfNecessary, this.verticalSwitch);
       if (verticalSwitch) {
         // Switch vertical alignment
         this.calculatedVerticalAlignment = Popup.SwitchRule[this.calculatedVerticalAlignment];
@@ -822,7 +820,7 @@ export default class Popup extends Widget {
       }
     }
     if (overlap.x !== 0) {
-      var horizontalSwitch = scout.nvl(switchIfNecessary, this.horizontalSwitch);
+      let horizontalSwitch = scout.nvl(switchIfNecessary, this.horizontalSwitch);
       if (horizontalSwitch) {
         // Switch horizontal alignment
         this.calculatedHorizontalAlignment = Popup.SwitchRule[this.calculatedHorizontalAlignment];
@@ -845,7 +843,7 @@ export default class Popup extends Widget {
   }
 
   size() {
-    var size = this.prefSize(this.$container);
+    let size = this.prefSize(this.$container);
     if (!size) {
       return;
     }
@@ -862,7 +860,7 @@ export default class Popup extends Widget {
   }
 
   _position(switchIfNecessary) {
-    var location = this.prefLocation();
+    let location = this.prefLocation();
     if (!location) {
       return;
     }
@@ -884,11 +882,11 @@ export default class Popup extends Widget {
     if (!this.boundToAnchor || !this.$anchor) {
       return;
     }
-    var inView = this._isInView();
-    var needsLayouting = this.$container.hasClass('invisible') === inView && inView;
+    let inView = this._isInView();
+    let needsLayouting = this.$container.hasClass('invisible') === inView && inView;
     this.$container.toggleClass('invisible', !inView); // Use visibility: hidden to not break layouting / size measurement
     if (needsLayouting) {
-      var currentAnimateResize = this.animateResize;
+      let currentAnimateResize = this.animateResize;
       this.animateResize = false;
       this.revalidateLayout();
       this.animateResize = currentAnimateResize;
@@ -902,7 +900,7 @@ export default class Popup extends Widget {
     if (!this.boundToAnchor || !this.$anchor) {
       return;
     }
-    var anchorBounds = this.getAnchorBounds();
+    let anchorBounds = this.getAnchorBounds();
     return scrollbars.isLocationInView(anchorBounds.center(), this.$anchor.scrollParent());
   }
 
@@ -959,7 +957,7 @@ export default class Popup extends Widget {
   }
 
   _onAnchorRender() {
-    this.session.layoutValidator.schedulePostValidateFunction(function() {
+    this.session.layoutValidator.schedulePostValidateFunction(() => {
       if (this.rendered || this.destroyed) {
         return;
       }
@@ -968,11 +966,11 @@ export default class Popup extends Widget {
         this.anchor.one('render', this._anchorRenderHandler);
         return;
       }
-      var currentAnimateOpening = this.animateOpening;
+      let currentAnimateOpening = this.animateOpening;
       this.animateOpening = false;
       this.open();
       this.animateOpening = currentAnimateOpening;
-    }.bind(this));
+    });
   }
 
   _renderAnchor() {
@@ -997,7 +995,7 @@ export default class Popup extends Widget {
   }
 
   _handleGlassPanes() {
-    var parentCoveredByGlassPane = this.session.focusManager.isElementCovertByGlassPane(this.parent.$container);
+    let parentCoveredByGlassPane = this.session.focusManager.isElementCovertByGlassPane(this.parent.$container);
     // if a popup is covered by a glass pane the glass pane's need to be rerendered to ensure a glass pane is also painted over the popup
     if (parentCoveredByGlassPane) {
       this.session.focusManager.rerenderGlassPanes();
@@ -1005,10 +1003,10 @@ export default class Popup extends Widget {
   }
 }
 
-(function() {
+((() => {
   // Initialize switch rules (wrapped in IIFE to have local function scope for the variables)
-  var SwitchRule = Popup.SwitchRule;
-  var Alignment = Popup.Alignment;
+  let SwitchRule = Popup.SwitchRule;
+  let Alignment = Popup.Alignment;
   SwitchRule[Alignment.LEFT] = Alignment.RIGHT;
   SwitchRule[Alignment.LEFTEDGE] = Alignment.RIGHTEDGE;
   SwitchRule[Alignment.TOP] = Alignment.BOTTOM;
@@ -1018,4 +1016,4 @@ export default class Popup extends Widget {
   SwitchRule[Alignment.RIGHTEDGE] = Alignment.LEFTEDGE;
   SwitchRule[Alignment.BOTTOM] = Alignment.TOP;
   SwitchRule[Alignment.BOTTOMEDGE] = Alignment.TOPEDGE;
-}());
+})());

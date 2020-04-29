@@ -29,14 +29,14 @@ export default class SmartFieldPopupLayout extends PopupLayout {
   }
 
   layout($container) {
-    var size, popupSize,
+    let size, popupSize,
       htmlProposalChooser = this._htmlProposalChooser();
 
     // skip layout while CSS animation is running (prefSize would not work while animation is running)
     if (this.animating) {
-      this.popup.htmlComp.$comp.oneAnimationEnd(function() {
+      this.popup.htmlComp.$comp.oneAnimationEnd(() => {
         this.popup.revalidateLayout();
-      }.bind(this));
+      });
       return;
     }
 
@@ -66,14 +66,14 @@ export default class SmartFieldPopupLayout extends PopupLayout {
       this.animating = true;
       this.popup.htmlComp.$comp.css('visibility', 'hidden');
 
-      this.popup.session.layoutValidator.schedulePostValidateFunction(function() {
+      this.popup.session.layoutValidator.schedulePostValidateFunction(() => {
         this.popup.htmlComp.$comp.css('visibility', '');
         this.popup.htmlComp.$comp.addClassForAnimation('animate-open');
-        this.popup.htmlComp.$comp.oneAnimationEnd(function() {
+        this.popup.htmlComp.$comp.oneAnimationEnd(() => {
           this.animating = false;
           this.popup._onAnimationEnd();
-        }.bind(this));
-      }.bind(this));
+        });
+      });
     }
   }
 
@@ -81,7 +81,7 @@ export default class SmartFieldPopupLayout extends PopupLayout {
    * @override AbstractLayout.js
    */
   preferredLayoutSize($container, options) {
-    var prefSize,
+    let prefSize,
       htmlProposalChooser = this._htmlProposalChooser(),
       fieldBounds = graphics.offsetBounds(this.popup.smartField.$field);
 
@@ -105,7 +105,7 @@ export default class SmartFieldPopupLayout extends PopupLayout {
   }
 
   _htmlProposalChooser() {
-    var proposalChooser = this.popup.proposalChooser;
+    let proposalChooser = this.popup.proposalChooser;
     if (!proposalChooser) {
       return null;
     }

@@ -19,21 +19,21 @@ export default class TagBarLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var htmlContainer = HtmlComponent.get($container);
-    var hasTags = this.tagBar.tags && this.tagBar.tags.length > 0;
+    let htmlContainer = HtmlComponent.get($container);
+    let hasTags = this.tagBar.tags && this.tagBar.tags.length > 0;
 
     if (hasTags) {
-      var availableSize = htmlContainer.availableSize()
+      let availableSize = htmlContainer.availableSize()
         .subtract(htmlContainer.insets());
-      var maxTagsWidth = availableSize.width;
-      var prefTagsWidth = 0;
-      var overflow = false;
+      let maxTagsWidth = availableSize.width;
+      let prefTagsWidth = 0;
+      let overflow = false;
 
       // 1. check if overflow occurs
-      var $te, i;
-      var $tagElements = $container.find('.tag-element');
-      var numTagElements = $tagElements.length;
-      var teSizes = [];
+      let $te, i;
+      let $tagElements = $container.find('.tag-element');
+      let numTagElements = $tagElements.length;
+      let teSizes = [];
       $tagElements.removeClass('hidden');
 
       // use a for loop, because don't want to loop all elements when we already know the rest is in overflow
@@ -60,7 +60,7 @@ export default class TagBarLayout extends AbstractLayout {
           $te = $($tagElements[i]);
 
           // all elements with a greater index are hidden for sure
-          var teSize = teSizes[i];
+          let teSize = teSizes[i];
           if (!teSize) {
             $te.addClass('hidden');
             continue;
@@ -79,16 +79,16 @@ export default class TagBarLayout extends AbstractLayout {
   }
 
   preferredLayoutSize($container, options) {
-    var htmlContainer = HtmlComponent.get($container);
-    var hasTags = this.tagBar.tags && this.tagBar.tags.length > 0;
-    var availableSize = htmlContainer.availableSize();
-    var prefTagsWidth = 0;
+    let htmlContainer = HtmlComponent.get($container);
+    let hasTags = this.tagBar.tags && this.tagBar.tags.length > 0;
+    let availableSize = htmlContainer.availableSize();
+    let prefTagsWidth = 0;
 
     if (!hasTags) {
       return new Dimension(0, availableSize.height);
     }
 
-    var $tagElements = $container.find('.tag-element');
+    let $tagElements = $container.find('.tag-element');
     $tagElements.removeClass('hidden');
     $tagElements.each(function() {
       prefTagsWidth += graphics.size($(this), {

@@ -14,7 +14,7 @@ import $ from 'jquery';
 export default class TooltipSupport {
 
   constructor(options) {
-    var defaultOptions = {
+    let defaultOptions = {
       selector: null,
       delay: tooltips.DEFAULT_TOOLTIP_DELAY,
       text: undefined,
@@ -62,10 +62,10 @@ export default class TooltipSupport {
   }
 
   _onMouseEnter(event) {
-    var $comp = $(event.currentTarget);
+    let $comp = $(event.currentTarget);
 
     if (this._options.nativeTooltip) {
-      var text = this._text($comp);
+      let text = this._text($comp);
       $comp.attr('title', text);
     } else {
       clearTimeout(this._tooltipTimeoutId);
@@ -86,7 +86,7 @@ export default class TooltipSupport {
   }
 
   _text($comp) {
-    var text = this._options.text || $comp.data('tooltipText');
+    let text = this._options.text || $comp.data('tooltipText');
     if ($.isFunction(text)) {
       text = text($comp);
     }
@@ -94,7 +94,7 @@ export default class TooltipSupport {
   }
 
   _htmlEnabled($comp) {
-    var htmlEnabled = this._options.htmlEnabled || $comp.data('htmlEnabled');
+    let htmlEnabled = this._options.htmlEnabled || $comp.data('htmlEnabled');
     if ($.isFunction(htmlEnabled)) {
       htmlEnabled = htmlEnabled($comp);
     }
@@ -105,12 +105,12 @@ export default class TooltipSupport {
     if (!$comp || !$comp.isAttached()) {
       return; // removed in the meantime (this method is called using setTimeout)
     }
-    var text = this._text($comp);
+    let text = this._text($comp);
     if (!text) {
       return; // treat undefined and no text as no tooltip
     }
 
-    var htmlEnabled = this._htmlEnabled($comp);
+    let htmlEnabled = this._htmlEnabled($comp);
 
     if (this._tooltip && this._tooltip.rendered) {
       // update existing tooltip
@@ -119,7 +119,7 @@ export default class TooltipSupport {
       this._tooltip.setMenus(this._options.menus);
     } else {
       // create new tooltip
-      var options = $.extend({}, this._options, {
+      let options = $.extend({}, this._options, {
         $anchor: this._options.$anchor || $comp,
         text: text,
         htmlEnabled: htmlEnabled

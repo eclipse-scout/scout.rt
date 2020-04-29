@@ -16,7 +16,7 @@ export default class Locale {
     model = scout.nvl(model, Locale.DEFAULT);
 
     this.languageTag = model.languageTag;
-    var tags = locales.splitLanguageTag(this.languageTag);
+    let tags = locales.splitLanguageTag(this.languageTag);
     this.language = tags[0];
     this.country = tags[1];
     this.displayLanguage = model.displayLanguage;

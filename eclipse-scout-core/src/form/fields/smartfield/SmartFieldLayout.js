@@ -30,7 +30,7 @@ export default class SmartFieldLayout extends FormFieldLayout {
       return;
     }
 
-    var popup = this._smartField.popup;
+    let popup = this._smartField.popup;
     if (popup && popup.rendered) {
       // Make sure the popup is correctly layouted and positioned
       popup.position();

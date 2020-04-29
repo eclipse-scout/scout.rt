@@ -20,9 +20,9 @@ export default class TabBoxLayout extends AbstractLayout {
 
     this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
     HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
-    this._tabBox.one('remove', function() {
+    this._tabBox.one('remove', () => {
       HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
-    }.bind(this));
+    });
   }
 
   _initDefaults() {
@@ -35,7 +35,7 @@ export default class TabBoxLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var containerSize, tabContentSize, tabAreaMargins, innerTabAreaSize,
+    let containerSize, tabContentSize, tabAreaMargins, innerTabAreaSize,
       htmlContainer = HtmlComponent.get($container),
       htmlTabContent = HtmlComponent.get(this._tabBox._$tabContent),
       htmlTabArea = HtmlComponent.get(this._tabBox.header.$container),
@@ -81,7 +81,7 @@ export default class TabBoxLayout extends AbstractLayout {
   }
 
   _layoutStatus(height) {
-    var htmlContainer = this._tabBox.htmlComp,
+    let htmlContainer = this._tabBox.htmlComp,
       containerPadding = htmlContainer.insets({
         includeBorder: false
       }),
@@ -112,7 +112,7 @@ export default class TabBoxLayout extends AbstractLayout {
    */
   preferredLayoutSize($container, options) {
     options = options || {};
-    var htmlContainer = HtmlComponent.get($container),
+    let htmlContainer = HtmlComponent.get($container),
       htmlTabContent = HtmlComponent.get(this._tabBox._$tabContent),
       htmlTabArea = HtmlComponent.get(this._tabBox.header.$container),
       tabAreaSize = new Dimension(),

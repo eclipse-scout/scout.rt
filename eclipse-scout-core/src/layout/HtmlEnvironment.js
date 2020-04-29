@@ -42,7 +42,7 @@ export default class HtmlEnvironment {
     this.fieldMandatoryIndicatorWidth = styles.getSize('html-env-field-mandatory-indicator', 'width', 'width', this.fieldMandatoryIndicatorWidth, additionalClass);
     this.fieldStatusWidth = styles.getSize('html-env-field-status', 'width', 'width', this.fieldStatusWidth, additionalClass);
 
-    var event = {
+    let event = {
       source: this
     };
     this.events.trigger('propertyChange', event);
@@ -61,7 +61,7 @@ export default class HtmlEnvironment {
   }
 }
 
-App.addListener('prepare', function() {
+App.addListener('prepare', () => {
   if (instance) {
     // if the environment was created before the app itself, use it instead of creating a new one
     return;

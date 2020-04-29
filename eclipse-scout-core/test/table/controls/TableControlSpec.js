@@ -11,11 +11,11 @@
 import {RemoteEvent, scout, TableControlAdapter} from '../../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-describe('TableControl', function() {
-  var session;
-  var tableHelper;
+describe('TableControl', () => {
+  let session;
+  let tableHelper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     tableHelper = new TableSpecHelper(session);
@@ -25,7 +25,7 @@ describe('TableControl', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
@@ -41,28 +41,28 @@ describe('TableControl', function() {
   }
 
   function createTableControlAdapter(model) {
-    var action = new TableControlAdapter();
+    let action = new TableControlAdapter();
     action.init(model);
     return action;
   }
 
   function createTable() {
-    var tableModel = tableHelper.createModelFixture(2);
+    let tableModel = tableHelper.createModelFixture(2);
     return tableHelper.createTable(tableModel);
   }
 
-  describe('selected', function() {
-    var table;
+  describe('selected', () => {
+    let table;
 
-    beforeEach(function() {
+    beforeEach(() => {
       table = createTable();
     });
 
-    it('opens and closes the control container', function() {
-      var action = createAction(createModel());
+    it('opens and closes the control container', () => {
+      let action = createAction(createModel());
       table._setTableControls([action]);
       table.render();
-      var $controlContainer = table.footer.$controlContainer;
+      let $controlContainer = table.footer.$controlContainer;
       expect($controlContainer).toBeHidden();
 
       action.setSelected(true);
@@ -72,14 +72,14 @@ describe('TableControl', function() {
       expect($controlContainer).toBeHidden();
     });
 
-    it('removes the content of the previous selected control without closing the container', function() {
-      var action = createAction(createModel());
-      var action2 = createAction(createModel());
+    it('removes the content of the previous selected control without closing the container', () => {
+      let action = createAction(createModel());
+      let action2 = createAction(createModel());
       table._setTableControls([action, action2]);
 
       action.selected = true;
       table.render();
-      var $controlContainer = table.footer.$controlContainer;
+      let $controlContainer = table.footer.$controlContainer;
 
       expect($controlContainer).toBeVisible();
       expect(action.contentRendered).toBe(true);
@@ -98,13 +98,13 @@ describe('TableControl', function() {
       expect(action.selected).toBe(false);
     });
 
-    it('sends selected events (for current and previous selection)', function() {
-      var model = createModel();
-      var adapter = createTableControlAdapter(model);
-      var action = adapter.createWidget(model, session.desktop);
-      var model2 = createModel();
-      var adapter2 = createTableControlAdapter(model2);
-      var action2 = adapter2.createWidget(model2, session.desktop);
+    it('sends selected events (for current and previous selection)', () => {
+      let model = createModel();
+      let adapter = createTableControlAdapter(model);
+      let action = adapter.createWidget(model, session.desktop);
+      let model2 = createModel();
+      let adapter2 = createTableControlAdapter(model2);
+      let action2 = adapter2.createWidget(model2, session.desktop);
       table._setTableControls([action, action2]);
 
       action.selected = true;
@@ -112,7 +112,7 @@ describe('TableControl', function() {
 
       action2.setSelected(true);
       sendQueuedAjaxCalls();
-      var events = [
+      let events = [
         new RemoteEvent(action.id, 'property', {
           selected: false
         }),

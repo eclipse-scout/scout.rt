@@ -13,7 +13,7 @@
 // JQuery extensions for testing purpose
 
 $.fn.triggerBlur = function() {
-  var event = jQuery.Event('blur', {
+  let event = jQuery.Event('blur', {
     originalEvent: jQuery.Event('dummy') // create dummy object
   });
   this.trigger(event);
@@ -26,7 +26,7 @@ $.fn.triggerRightClick = function() {
 };
 
 $.fn.triggerKeyUp = function(key, modifier) {
-  var event = jQuery.Event('keyup', {
+  let event = jQuery.Event('keyup', {
     originalEvent: jQuery.Event('dummy'), // create dummy object
     which: key
   });
@@ -35,7 +35,7 @@ $.fn.triggerKeyUp = function(key, modifier) {
 };
 
 $.fn.triggerKeyDown = function(key, modifier) {
-  var event = jQuery.Event('keydown', {
+  let event = jQuery.Event('keydown', {
     originalEvent: jQuery.Event('dummy'), // create dummy object
     which: key
   });
@@ -66,7 +66,7 @@ $.fn.triggerMouseDown = function(opts) {
  * Does not use jQuery to create the event to make sure capture phase listeners are notified as well.
  */
 $.fn.triggerMouseDownCapture = function(opts) {
-  var event;
+  let event;
   try {
     event = new MouseEvent('mousedown', {
       'view': window,
@@ -103,7 +103,7 @@ $.fn.triggerKeyCapture = function(eventType, which, modifier) {
   // Due to a Chrome bug, "new KeyboardEvent" cannot be used,
   // as it doesn't set "which". We have to use this less specific
   // constructor.
-  var eventObj;
+  let eventObj;
 
   try {
     eventObj = new Event(eventType, {
@@ -135,7 +135,7 @@ $.fn.triggerMouseMove = function(position) {
 };
 
 $.fn.triggerMouseAction = function(eventType, opts) {
-  var event;
+  let event;
   opts = opts || {};
 
   if (!opts.position) {
@@ -177,7 +177,7 @@ $.fn.triggerWithPosition = function(event, position) {
 };
 
 $.fn.triggerContextMenu = function() {
-  var opts = {
+  let opts = {
     position: this.offset(),
     which: 3
   };
@@ -222,7 +222,7 @@ $.fn.triggerDoubleClick = function() {
 };
 
 $.fn.triggerImageLoadCapture = function(opts) {
-  var event;
+  let event;
   try {
     event = new Event('load', {
       'view': window,

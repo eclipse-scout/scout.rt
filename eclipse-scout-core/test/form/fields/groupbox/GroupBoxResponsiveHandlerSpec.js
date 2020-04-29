@@ -11,18 +11,18 @@
 import {FormField, GroupBox, HtmlEnvironment, ResponsiveManager, scout} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('GroupBoxResponsiveHandler', function() {
-  var session;
-  var helper;
+describe('GroupBoxResponsiveHandler', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
   });
 
   function createField(model, parent) {
-    var field = new GroupBox();
+    let field = new GroupBox();
     model.session = session;
     model.parent = parent || session.desktop;
     field.init(model);
@@ -42,7 +42,7 @@ describe('GroupBoxResponsiveHandler', function() {
         objectType: 'StringField'
       }]
     }];
-    var groupBox = scout.create('GroupBox', {
+    let groupBox = scout.create('GroupBox', {
       parent: session.desktop,
       fields: fields,
       responsive: true
@@ -50,9 +50,9 @@ describe('GroupBoxResponsiveHandler', function() {
     return groupBox;
   }
 
-  var normalWidth = HtmlEnvironment.get().formColumnWidth * 2 + 10;
-  var condensedWidth = HtmlEnvironment.get().formColumnWidth + 10;
-  var compactWidth = HtmlEnvironment.get().formColumnWidth - 10;
+  let normalWidth = HtmlEnvironment.get().formColumnWidth * 2 + 10;
+  let condensedWidth = HtmlEnvironment.get().formColumnWidth + 10;
+  let compactWidth = HtmlEnvironment.get().formColumnWidth - 10;
 
   function expectNormal(groupBox) {
     expect(groupBox.fields[0].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
@@ -61,7 +61,7 @@ describe('GroupBoxResponsiveHandler', function() {
     expect(groupBox.fields[2].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
     expect(groupBox.gridColumnCount).toBe(2);
 
-    var innerGroupBox = groupBox.fields[3];
+    let innerGroupBox = groupBox.fields[3];
     if (innerGroupBox.responsive === null || innerGroupBox.responsive === false) {
       expect(innerGroupBox.fields[0].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
       expect(innerGroupBox.gridColumnCount).toBe(2);
@@ -75,7 +75,7 @@ describe('GroupBoxResponsiveHandler', function() {
     expect(groupBox.fields[2].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
     expect(groupBox.gridColumnCount).toBe(2);
 
-    var innerGroupBox = groupBox.fields[3];
+    let innerGroupBox = groupBox.fields[3];
     if (innerGroupBox.responsive === null || innerGroupBox.responsive === true) {
       expect(innerGroupBox.fields[0].labelPosition).toBe(FormField.LabelPosition.TOP);
       expect(innerGroupBox.gridColumnCount).toBe(2);
@@ -94,21 +94,21 @@ describe('GroupBoxResponsiveHandler', function() {
     expect(groupBox.fields[2].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
     expect(groupBox.gridColumnCount).toBe(1);
 
-    var innerGroupBox = groupBox.fields[3];
+    let innerGroupBox = groupBox.fields[3];
     if (innerGroupBox.responsive === null || innerGroupBox.responsive === true) {
       expect(innerGroupBox.fields[0].labelPosition).toBe(FormField.LabelPosition.TOP);
       expect(innerGroupBox.gridColumnCount).toBe(1);
     }
   }
 
-  describe('handleResponsive', function() {
-    var groupBox;
+  describe('handleResponsive', () => {
+    let groupBox;
 
-    beforeEach(function() {
+    beforeEach(() => {
       groupBox = createGroupBox();
     });
 
-    it('switches to condensed mode if width under threshold', function() {
+    it('switches to condensed mode if width under threshold', () => {
       // normal state
       groupBox.render($('#sandbox'));
       groupBox.$container.cssWidth(normalWidth);
@@ -131,7 +131,7 @@ describe('GroupBoxResponsiveHandler', function() {
 
     });
 
-    it('switches to compact mode if width under threshold', function() {
+    it('switches to compact mode if width under threshold', () => {
       // normal state
       groupBox.render($('#sandbox'));
       groupBox.$container.cssWidth(normalWidth);
@@ -158,7 +158,7 @@ describe('GroupBoxResponsiveHandler', function() {
       expectNormal(groupBox);
     });
 
-    it('does not switch inner group box to condensed mode if inner group box is not responsive', function() {
+    it('does not switch inner group box to condensed mode if inner group box is not responsive', () => {
       groupBox.fields[3].setResponsive(false);
 
       // normal state
@@ -181,7 +181,7 @@ describe('GroupBoxResponsiveHandler', function() {
       expectNormal(groupBox);
     });
 
-    it('reacts to dynamically inserted field', function() {
+    it('reacts to dynamically inserted field', () => {
       groupBox.fields[3].setResponsive(false);
 
       // normal state
@@ -197,7 +197,7 @@ describe('GroupBoxResponsiveHandler', function() {
       groupBox.validateLayout();
       expectCondensed(groupBox);
 
-      var dynamicField = scout.create('StringField', {
+      let dynamicField = scout.create('StringField', {
         parent: session.desktop,
         labelPosition: FormField.LabelPosition.DEFAULT
       });
@@ -214,14 +214,14 @@ describe('GroupBoxResponsiveHandler', function() {
     });
   });
 
-  describe('setResponsive', function() {
-    var groupBox;
+  describe('setResponsive', () => {
+    let groupBox;
 
-    beforeEach(function() {
+    beforeEach(() => {
       groupBox = createGroupBox();
     });
 
-    it('switches the responsive state for the inner group box', function() {
+    it('switches the responsive state for the inner group box', () => {
       // normal state
       groupBox.render($('#sandbox'));
       groupBox.$container.cssWidth(normalWidth);

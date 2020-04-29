@@ -22,33 +22,33 @@ export default class CarouselLayout extends AbstractLayout {
     // recalculate style transformation after layout
     this.carousel.recalcTransformation();
 
-    var filmstripSize = this.carousel.htmlComp.availableSize()
+    let filmstripSize = this.carousel.htmlComp.availableSize()
       .subtract(this.carousel.htmlComp.insets())
       .subtract(this.carousel.htmlCompFilmstrip.margins());
-    var itemSize = this.carousel.htmlComp.availableSize()
+    let itemSize = this.carousel.htmlComp.availableSize()
       .subtract(this.carousel.htmlComp.insets())
       .subtract(this.carousel.htmlCompFilmstrip.margins());
 
     if (this.carousel.statusEnabled && this.carousel.htmlCompStatus) {
-      var carouselStatusSize = this.carousel.htmlCompStatus.size().add(this.carousel.htmlCompStatus.margins());
+      let carouselStatusSize = this.carousel.htmlCompStatus.size().add(this.carousel.htmlCompStatus.margins());
 
       filmstripSize.height -= carouselStatusSize.height;
       itemSize.height -= carouselStatusSize.height;
     }
 
-    var $carouselItems = this.carousel.$carouselItems;
+    let $carouselItems = this.carousel.$carouselItems;
     filmstripSize.width = $carouselItems.length * filmstripSize.width;
     this.carousel.htmlCompFilmstrip.setSize(filmstripSize);
 
-    $carouselItems.forEach(function(e) {
-      var htmlCarouselItem = HtmlComponent.get(e);
+    $carouselItems.forEach(e => {
+      let htmlCarouselItem = HtmlComponent.get(e);
       htmlCarouselItem.setSize(itemSize);
     });
   }
 
   preferredLayoutSize($container) {
-    var currentIndex = this.carousel.currentItem;
-    var dim = new Dimension(1, 1);
+    let currentIndex = this.carousel.currentItem;
+    let dim = new Dimension(1, 1);
     if (currentIndex < this.carousel.$carouselItems.length && currentIndex >= 0) {
       dim = HtmlComponent.get(this.carousel.$carouselItems[currentIndex]).prefSize();
     }

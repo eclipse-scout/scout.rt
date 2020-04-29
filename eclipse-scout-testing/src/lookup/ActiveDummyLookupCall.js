@@ -25,7 +25,7 @@ export default class ActiveDummyLookupCall extends StaticLookupCall {
   }
 
   _dataToLookupRow(data) {
-    var lookupRow = super._dataToLookupRow(data);
+    let lookupRow = super._dataToLookupRow(data);
     lookupRow.active = data[2];
     return lookupRow;
   }

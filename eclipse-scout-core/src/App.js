@@ -18,7 +18,7 @@ let listeners = [];
 export default class App {
 
   static addListener(type, func) {
-    var listener = {
+    let listener = {
       type: type,
       func: func
     };
@@ -77,10 +77,10 @@ export default class App {
    */
   _prepare(options) {
     return this._prepareLogging(options)
-      .done(function() {
+      .done(() => {
         this._prepareEssentials(options);
         this._prepareDone(options);
-      }.bind(this));
+      });
   }
 
   _prepareEssentials(options) {
@@ -108,8 +108,8 @@ export default class App {
   _bootstrap(options) {
     options = options || {};
 
-    var promises = [];
-    this._doBootstrap(options).forEach(function(value) {
+    let promises = [];
+    this._doBootstrap(options).forEach(value => {
       if (Array.isArray(value)) {
         promises.concat(value);
       } else if (value) {
@@ -154,7 +154,7 @@ export default class App {
       // If a resource returns 401 (unauthorized) it is likely a session timeout.
       // This may happen if no Scout backend is used or a reverse proxy returned the response, otherwise status 200 with an error object would be returned, see below
       if (this._isSessionTimeoutStatus(vararg.status)) {
-        var url = requestOptions ? requestOptions.url : '';
+        let url = requestOptions ? requestOptions.url : '';
         this._handleBootstrapTimeoutError(vararg, url);
         return;
       }
@@ -168,8 +168,9 @@ export default class App {
     }
 
     // Make sure promise will be rejected with all original arguments so that it can be eventually handled by this._fail
-    var args = objects.argumentsToArray(arguments).slice(1);
-    return $.rejectedPromise.apply($, args);
+    // eslint-disable-next-line prefer-rest-params
+    let args = objects.argumentsToArray(arguments).slice(1);
+    return $.rejectedPromise(...args);
   }
 
   _isSessionTimeoutStatus(httpStatus) {
@@ -219,8 +220,8 @@ export default class App {
   }
 
   _checkBrowserCompability(options) {
-    var device = Device.get();
-    var app = this;
+    let device = Device.get();
+    let app = this;
     $.log.isInfoEnabled() && $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);
     if (!scout.nvl(options.checkBrowserCompatibility, true) || device.isSupportedBrowser()) {
       // No check requested or browser is supported
@@ -228,13 +229,13 @@ export default class App {
     }
 
     $('.scout').each(function() {
-      var $entryPoint = $(this),
+      let $entryPoint = $(this),
         $box = $entryPoint.appendDiv(),
         newOptions = objects.valueCopy(options);
 
       newOptions.checkBrowserCompatibility = false;
-      $box.load('unsupported-browser.html', function() {
-        $box.find('button').on('click', function() {
+      $box.load('unsupported-browser.html', () => {
+        $box.find('button').on('click', () => {
           $box.remove();
           app._init(newOptions);
         });
@@ -289,7 +290,7 @@ export default class App {
    * Uses the object returned by {@link #_ajaxDefaults} to setup ajax. The values in that object are used as default values for every ajax call.
    */
   _ajaxSetup() {
-    var ajaxDefaults = this._ajaxDefaults();
+    let ajaxDefaults = this._ajaxDefaults();
     if (ajaxDefaults) {
       $.ajaxSetup(ajaxDefaults);
     }
@@ -319,13 +320,13 @@ export default class App {
 
   _loadSessions(options) {
     options = options || {};
-    var promises = [];
-    $('.scout').each(function(i, elem) {
-      var $entryPoint = $(elem);
+    let promises = [];
+    $('.scout').each((i, elem) => {
+      let $entryPoint = $(elem);
       options.portletPartId = options.portletPartId || $entryPoint.data('partid') || '0';
-      var promise = this._loadSession($entryPoint, options);
+      let promise = this._loadSession($entryPoint, options);
       promises.push(promise);
-    }.bind(this));
+    });
     return $.promiseAll(promises);
   }
 
@@ -335,15 +336,15 @@ export default class App {
   _loadSession($entryPoint, options) {
     options.locale = options.locale || this._loadLocale();
     options.$entryPoint = $entryPoint;
-    var session = this._createSession(options);
+    let session = this._createSession(options);
     this.sessions.push(session);
 
     // TODO [7.0] cgu improve this, start must not be executed because it currently does a server request
-    var desktop = this._createDesktop(session.root);
+    let desktop = this._createDesktop(session.root);
     this.trigger('desktopReady', {
       desktop: desktop
     });
-    session.render(function() {
+    session.render(() => {
       session._renderDesktop();
 
       // Ensure layout is valid (explicitly layout immediately and don't wait for setTimeout to run to make layouting invisible to the user)
@@ -355,7 +356,7 @@ export default class App {
         session: session
       });
       $.log.isInfoEnabled() && $.log.info('Session initialized. Detected ' + Device.get());
-    }.bind(this));
+    });
     return $.resolvedPromise();
   }
 
@@ -386,19 +387,18 @@ export default class App {
     $.log.isInfoEnabled() && $.log.info('App initialized');
   }
 
-  _fail(options, error) {
+  _fail(options, error, ...args) {
     $.log.error('App initialization failed.');
 
-    var args = objects.argumentsToArray(arguments).slice(1);
-    return this.errorHandler.handle(args)
-      .then(function(errorInfo) {
-        var $error = $('body').appendDiv('startup-error');
+    return this.errorHandler.handle(error, ...args)
+      .then(errorInfo => {
+        let $error = $('body').appendDiv('startup-error');
         $error.appendDiv('startup-error-title').text('The application could not be started');
         if (errorInfo.message) {
           $error.appendDiv('startup-error-message').text(errorInfo.message);
         }
         // Reject with original rejection arguments
-        return $.rejectedPromise.apply($, args);
+        return $.rejectedPromise(error, ...args);
       });
   }
 

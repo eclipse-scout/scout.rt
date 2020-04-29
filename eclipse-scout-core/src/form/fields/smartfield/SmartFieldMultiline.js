@@ -19,7 +19,7 @@ export default class SmartFieldMultiline extends SmartField {
   }
 
   _render() {
-    var $input, htmlComp;
+    let $input, htmlComp;
 
     this.addContainer(this.$parent, 'smart-field has-icon', new SmartFieldLayout(this));
     this.addLabel();
@@ -62,7 +62,7 @@ export default class SmartFieldMultiline extends SmartField {
    */
   _onMultilineLinesClick(event) {
     if (this.enabledComputed) {
-      var selection = this.$field.window(true).getSelection();
+      let selection = this.$field.window(true).getSelection();
       if (!selection.toString()) {
         this.$field.focus();
       }
@@ -71,7 +71,7 @@ export default class SmartFieldMultiline extends SmartField {
 
   _renderDisplayText() {
     super._renderDisplayText();
-    var additionalLines = this.additionalLines();
+    let additionalLines = this.additionalLines();
     if (additionalLines) {
       this._$multilineLines.html(arrays.formatEncoded(additionalLines, '<br/>'));
     } else {
@@ -80,7 +80,7 @@ export default class SmartFieldMultiline extends SmartField {
   }
 
   _getInputBounds() {
-    var fieldBounds = graphics.offsetBounds(this.$fieldContainer),
+    let fieldBounds = graphics.offsetBounds(this.$fieldContainer),
       textFieldBounds = graphics.offsetBounds(this.$field);
     fieldBounds.height = textFieldBounds.height;
     return fieldBounds;

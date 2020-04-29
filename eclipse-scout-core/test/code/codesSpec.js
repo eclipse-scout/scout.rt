@@ -10,13 +10,13 @@
  */
 import {Code, codes, CodeType} from '../../src/index';
 
-describe('scout.codes', function() {
+describe('scout.codes', () => {
 
-  var CODE_TYPE = 12345;
-  var CODE = 12346;
+  let CODE_TYPE = 12345;
+  let CODE = 12346;
 
   // Some dummy data used to make the tests below work
-  beforeEach(function() {
+  beforeEach(() => {
     codes.init({
       12345: {
         id: 12345,
@@ -35,56 +35,56 @@ describe('scout.codes', function() {
     });
   });
 
-  it('can init without data', function() {
-    var emptyRegistry = {};
+  it('can init without data', () => {
+    let emptyRegistry = {};
     codes.registry = emptyRegistry;
     codes.init();
     expect(codes.registry).toBe(emptyRegistry);
   });
 
-  it('finds a code type by ID', function() {
-    var codeType = codes.codeType(CODE_TYPE);
+  it('finds a code type by ID', () => {
+    let codeType = codes.codeType(CODE_TYPE);
     expect(codeType instanceof CodeType).toBe(true);
     expect(codeType.id).toEqual(CODE_TYPE);
   });
 
-  it('finds a code by ID (single and two parameter call)', function() {
-    var code = codes.get(CODE_TYPE, CODE);
+  it('finds a code by ID (single and two parameter call)', () => {
+    let code = codes.get(CODE_TYPE, CODE);
     expect(code instanceof Code).toBe(true);
-    var codeRef = CODE_TYPE + ' ' + CODE;
+    let codeRef = CODE_TYPE + ' ' + CODE;
     code = codes.get(codeRef);
     expect(code instanceof Code).toBe(true);
     expect(code.id).toEqual(CODE);
   });
 
-  it('throws an error when code type is not found', function() {
-    var func = codes.codeType.bind(scout.codes, 'DoesNotExist');
+  it('throws an error when code type is not found', () => {
+    let func = codes.codeType.bind(scout.codes, 'DoesNotExist');
     expect(func).toThrowError();
   });
 
-  it('throws an error when code is not found', function() {
-    var codeType = codes.codeType(CODE_TYPE);
-    var func = codeType.get.bind(codeType, 'DoesNotExist');
+  it('throws an error when code is not found', () => {
+    let codeType = codes.codeType(CODE_TYPE);
+    let func = codeType.get.bind(codeType, 'DoesNotExist');
     expect(func).toThrowError();
   });
 
-  describe('optGet', function() {
+  describe('optGet', () => {
 
-    it('should work as get if code exists', function() {
-      var code = codes.optGet(CODE_TYPE, CODE);
+    it('should work as get if code exists', () => {
+      let code = codes.optGet(CODE_TYPE, CODE);
       expect(code instanceof Code).toBe(true);
     });
 
-    it('should return null if code does not exist', function() {
-      var code = codes.optGet(CODE_TYPE, 'DoesNotExist');
+    it('should return null if code does not exist', () => {
+      let code = codes.optGet(CODE_TYPE, 'DoesNotExist');
       expect(code).toBe(undefined);
     });
 
   });
 
-  describe('add', function() {
-    it('adds a code type or an array of code types', function() {
-      var codeType = {
+  describe('add', () => {
+    it('adds a code type or an array of code types', () => {
+      let codeType = {
         id: 'codeType.123',
         objectType: 'CodeType',
         codes: [{

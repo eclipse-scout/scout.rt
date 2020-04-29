@@ -17,18 +17,16 @@ export default class SubCloseKeyStroke extends MenuNavigationExecKeyStroke {
     this._menuItemClass = menuItemClass;
     this.which = [keys.BACKSPACE];
     this.renderingHints.render = true;
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
-      return event.$menuItem;
-    };
+    this.renderingHints.$drawingArea = ($drawingArea, event) => event.$menuItem;
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     if (!accepted) {
       return false;
     }
 
-    var menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass + '.expanded');
+    let menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass + '.expanded');
     if (menuItems.$all.length > 0) {
       event.$menuItem = menuItems.$all;
       return true;

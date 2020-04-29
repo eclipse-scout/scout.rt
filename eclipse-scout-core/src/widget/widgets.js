@@ -20,7 +20,7 @@ let uniqueIdSeqNo = 0;
 export function get($elem) {
   $elem = $.ensure($elem);
   while ($elem && $elem.length > 0) {
-    var widget = $elem.data('widget');
+    let widget = $elem.data('widget');
     if (widget) {
       return widget;
     }
@@ -46,9 +46,9 @@ export function createUniqueId(prefix) {
  * Iterates through the given widgets and toggles the 'first' and 'last' classes on the corresponding widgets if the widgets are visible and rendered.
  */
 export function updateFirstLastMarker(widgets) {
-  widgets.filter(function(widget, i, widgets) {
+  widgets.filter((widget, i, widgets) => {
     return widget.rendered && widget.isVisible();
-  }).forEach(function(widget, i, widgets) {
+  }).forEach((widget, i, widgets) => {
     widget.$container.toggleClass('first', i === 0);
     widget.$container.toggleClass('last', i === widgets.length - 1);
   });
@@ -63,7 +63,7 @@ export function findFirstFocusableWidget(widgets, container) {
   if (container && (!container.rendered || !container.visible)) {
     return false;
   }
-  return arrays.find(widgets, function(widget) {
+  return arrays.find(widgets, widget => {
     return widget.isFocusable();
   });
 }

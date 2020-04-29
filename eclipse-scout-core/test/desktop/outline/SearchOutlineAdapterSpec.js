@@ -11,10 +11,10 @@
 import {scout} from '../../../src/index';
 import {OutlineSpecHelper} from '@eclipse-scout/testing';
 
-describe('SearchOutlineAdapter', function() {
-  var helper, session;
+describe('SearchOutlineAdapter', () => {
+  let helper, session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new OutlineSpecHelper(session);
@@ -22,23 +22,23 @@ describe('SearchOutlineAdapter', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
-  describe('onModelPropertyChange', function() {
+  describe('onModelPropertyChange', () => {
 
-    describe('requestFocusQueryField', function() {
+    describe('requestFocusQueryField', () => {
 
-      it('may be called multiple times', function() {
-        var outline = scout.create(createSimpleModel('SearchOutline', session));
+      it('may be called multiple times', () => {
+        let outline = scout.create(createSimpleModel('SearchOutline', session));
         linkWidgetAndAdapter(outline, 'SearchOutlineAdapter');
         outline.render();
 
         session.$entryPoint.focus();
         expect(document.activeElement).toBe(session.$entryPoint[0]);
-        var event = createPropertyChangeEvent(outline, {
+        let event = createPropertyChangeEvent(outline, {
           requestFocusQueryField: null
         });
         outline.modelAdapter.onModelPropertyChange(event);

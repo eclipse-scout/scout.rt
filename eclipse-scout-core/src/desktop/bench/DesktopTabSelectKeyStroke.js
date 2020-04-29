@@ -25,15 +25,15 @@ export default class DesktopTabSelectKeyStroke extends RangeKeyStroke {
     // range [1..9]
     this.registerRange(
       keys['1'], // range from
-      function() {
+      () => {
         return keys[Math.min(this._viewTabs().length, 9)]; // range to
-      }.bind(this)
+      }
     );
 
     // rendering hints
     this.renderingHints.hAlign = HAlign.RIGHT;
     this.renderingHints.$drawingArea = function($drawingArea, event) {
-      var viewIndex = event.which - keys['1'];
+      let viewIndex = event.which - keys['1'];
       return this._viewTabs()[viewIndex].$container;
     }.bind(this);
   }
@@ -42,7 +42,7 @@ export default class DesktopTabSelectKeyStroke extends RangeKeyStroke {
    * @override KeyStroke.js
    */
   _isEnabled() {
-    var enabled = super._isEnabled();
+    let enabled = super._isEnabled();
     return enabled && this.field.selectViewTabsKeyStrokesEnabled && this._viewTabs().length > 0;
   }
 
@@ -50,10 +50,10 @@ export default class DesktopTabSelectKeyStroke extends RangeKeyStroke {
    * @override KeyStroke.js
    */
   handle(event) {
-    var viewIndex = event.which - keys['1'];
+    let viewIndex = event.which - keys['1'];
 
     if (this._viewTabs().length && viewIndex < this._viewTabs().length) {
-      var viewTab = this._viewTabs()[viewIndex];
+      let viewTab = this._viewTabs()[viewIndex];
       if (this.field.bench) {
         this.field.bench.activateView(viewTab.view);
       }

@@ -57,7 +57,7 @@ export default class Reconnector {
   _ping() {
     this.session.onReconnecting();
 
-    var pingAjaxOptions = this.session.defaultAjaxOptions({
+    let pingAjaxOptions = this.session.defaultAjaxOptions({
       ping: true
     });
 
@@ -75,13 +75,13 @@ export default class Reconnector {
   }
 
   _onPingFail(jqXHR, textStatus, errorThrown) {
-    var handleFailedPing = function handleFailedPing() {
+    let handleFailedPing = function handleFailedPing() {
       $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping failed');
       this.session.onReconnectingFailed();
       this._schedulePing(this.interval);
     }.bind(this);
 
-    var pingDuration = Date.now() - this.pingStartTimestamp;
+    let pingDuration = Date.now() - this.pingStartTimestamp;
     if (pingDuration < this.minPingDuration) {
       // Wait at least a certain time before informing about connection failure (to prevent flickering of the reconnecting notification)
       setTimeout(handleFailedPing, this.minPingDuration - pingDuration);

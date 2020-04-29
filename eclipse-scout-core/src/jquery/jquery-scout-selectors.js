@@ -16,7 +16,7 @@ import $ from 'jquery';
  * Part of this file is copied with some modifications from jQuery UI.
  */
 function focusable(element, isTabIndexNotNaN) {
-  var nodeName = element.nodeName.toLowerCase();
+  let nodeName = element.nodeName.toLowerCase();
   return (/input|select|textarea|button|object/.test(nodeName) ?
     !element.disabled :
     'a' === nodeName ?
@@ -35,12 +35,10 @@ function visible(element) {
 
 $.extend($.expr[':'], {
 
-  focusable: function(element) {
-    return focusable(element, !isNaN($.attr(element, 'tabindex')));
-  },
+  focusable: element => focusable(element, !isNaN($.attr(element, 'tabindex'))),
 
-  tabbable: function(element) {
-    var tabIndex = $.attr(element, 'tabindex'),
+  tabbable: element => {
+    let tabIndex = $.attr(element, 'tabindex'),
       isTabIndexNaN = isNaN(tabIndex);
     return (isTabIndexNaN || tabIndex >= 0) && focusable(element, !isTabIndexNaN);
   }

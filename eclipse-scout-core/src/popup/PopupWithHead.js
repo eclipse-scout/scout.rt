@@ -55,7 +55,7 @@ export default class PopupWithHead extends Popup {
   _$createBody() {
     this.$body = this.$container.appendDiv('popup-body');
     // Complete the layout hierarchy between the popup and the menu items
-    var htmlBody = HtmlComponent.install(this.$body, this.session);
+    let htmlBody = HtmlComponent.install(this.$body, this.session);
     htmlBody.setLayout(this._createBodyLayout());
 
     this._modifyBody();
@@ -110,10 +110,10 @@ export default class PopupWithHead extends Popup {
   }
 
   _copyStyleToHeadChildren() {
-    var $blueprintChildren = this.$headBlueprint.children();
+    let $blueprintChildren = this.$headBlueprint.children();
     this.$head.children().each(function(i) {
-      var $headChild = $(this);
-      var $blueprintChild = $blueprintChildren.eq(i);
+      let $headChild = $(this);
+      let $blueprintChild = $blueprintChildren.eq(i);
       $headChild.copyCss($blueprintChild, 'margin padding line-height border vertical-align font-size display width height');
     });
   }
@@ -148,12 +148,12 @@ export default class PopupWithHead extends Popup {
    * @override Popup.js
    */
   _position(switchIfNecessary) {
-    var $container = this.$container;
+    let $container = this.$container;
     if (!$container) {
       // When layouting the menu bar, menus are removed at first and then added anew.
       return;
     }
-    var horizontalAlignment, verticalAlignment, overlap, pos;
+    let horizontalAlignment, verticalAlignment, overlap, pos;
     if (!this._headVisible) {
       // If head is not visible, use default implementation and adjust $body to $container
       super._position(switchIfNecessary);
@@ -171,8 +171,8 @@ export default class PopupWithHead extends Popup {
     }
     this._positionImpl();
 
-    var horizontalSwitch = scout.nvl(switchIfNecessary, this.horizontalSwitch);
-    var verticalSwitch = scout.nvl(switchIfNecessary, this.verticalSwitch);
+    let horizontalSwitch = scout.nvl(switchIfNecessary, this.horizontalSwitch);
+    let verticalSwitch = scout.nvl(switchIfNecessary, this.verticalSwitch);
     if (horizontalSwitch || verticalSwitch) {
       pos = $container.offset();
       overlap = this.overlap({
@@ -180,7 +180,7 @@ export default class PopupWithHead extends Popup {
         y: pos.top
       }, false);
       // this.$parent might not be at (0,0) of the document
-      var parentOffset = this.$parent.offset();
+      let parentOffset = this.$parent.offset();
       overlap.x -= parentOffset.left;
       overlap.y -= parentOffset.top;
       if (overlap.y > 0 && verticalSwitch) {
@@ -199,7 +199,7 @@ export default class PopupWithHead extends Popup {
   }
 
   _positionImpl(horizontalAlignment, verticalAlignment) {
-    var pos, headSize, bodySize, bodyWidth, widthDiff, left, top, headInsets, menuInsets,
+    let pos, headSize, bodySize, bodyWidth, widthDiff, left, top, headInsets, menuInsets,
       bodyTop = 0,
       headTop = 0,
       decoTop = 0;
@@ -227,7 +227,7 @@ export default class PopupWithHead extends Popup {
 
     pos = this.$headBlueprint.offset();
     // this.$parent might not be at (0,0) of the document
-    var parentOffset = this.$parent.offset();
+    let parentOffset = this.$parent.offset();
     pos.left -= parentOffset.left;
     pos.top -= parentOffset.top;
 

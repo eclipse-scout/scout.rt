@@ -65,7 +65,7 @@ export default class YearPanel extends Widget {
   }
 
   _drawYear() {
-    var first, month, $month, d, day, $day,
+    let first, month, $month, d, day, $day,
       year = this.selectedDate.getFullYear();
 
     // append 3 years
@@ -127,7 +127,7 @@ export default class YearPanel extends Widget {
     $('.year-day.year-range, .year-day.year-range-day', this.$yearList).removeClass('year-range year-range-day');
 
     // loop all days and colorize based on range and selected
-    var that = this,
+    let that = this,
       $day, date;
 
     $('.year-day', this.$yearList).each(function() {
@@ -147,7 +147,7 @@ export default class YearPanel extends Widget {
   }
 
   _scrollYear() {
-    var top, halfMonth, halfYear,
+    let top, halfMonth, halfYear,
       $day = $('.year-range-day', this.$yearList),
       $month = $day.parent(),
       $year = $day.parent().parent();
@@ -201,7 +201,7 @@ export default class YearPanel extends Widget {
   /* -- events ---------------------------------------- */
 
   _onYearClick(event) {
-    var
+    let
       // we must use Planner.DisplayMode (extends Calendar.DisplayMode) here
       // because YearPanel must work for calendar and planner.
       displayMode = Planner.DisplayMode,
@@ -245,7 +245,7 @@ export default class YearPanel extends Widget {
   }
 
   _onYearHoverIn(event) {
-    var $day = $(event.target),
+    let $day = $(event.target),
       date1 = $day.data('date'),
       year = date1.getFullYear(),
       month = date1.getMonth(),

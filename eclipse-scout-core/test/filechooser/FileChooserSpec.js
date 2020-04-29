@@ -10,17 +10,17 @@
  */
 import {Device, scout} from '../../src/index';
 
-describe('FileChooser', function() {
-  var session;
+describe('FileChooser', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  describe('open', function() {
-    it('opens the chooser', function() {
-      var fileChooser = scout.create('FileChooser', {
+  describe('open', () => {
+    it('opens the chooser', () => {
+      let fileChooser = scout.create('FileChooser', {
         parent: session.desktop
       });
       fileChooser.open();
@@ -30,9 +30,9 @@ describe('FileChooser', function() {
     });
   });
 
-  describe('close', function() {
-    it('closes the chooser', function() {
-      var fileChooser = scout.create('FileChooser', {
+  describe('close', () => {
+    it('closes the chooser', () => {
+      let fileChooser = scout.create('FileChooser', {
         parent: session.desktop
       });
       fileChooser.open();
@@ -42,19 +42,19 @@ describe('FileChooser', function() {
     });
   });
 
-  describe('addFiles', function() {
-    it('adds the files if multiSelect is true', function() {
+  describe('addFiles', () => {
+    it('adds the files if multiSelect is true', () => {
       if (!Device.get().supportsFileConstructor()) {
         return;
       }
-      var fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create('FileChooser', {
         parent: session.desktop,
         multiSelect: true
       });
       fileChooser.open();
-      var file1 = new File([''], 'file 1');
-      var file2 = new File([''], 'file 2');
-      var file3 = new File([''], 'file 3');
+      let file1 = new File([''], 'file 1');
+      let file2 = new File([''], 'file 2');
+      let file3 = new File([''], 'file 3');
       fileChooser.addFiles([file1, file2]);
       fileChooser.addFiles(file3);
       expect(fileChooser.files).toEqual([file1, file2, file3]);
@@ -64,18 +64,18 @@ describe('FileChooser', function() {
       fileChooser.close();
     });
 
-    it('does only add one file if multiSelect is false', function() {
+    it('does only add one file if multiSelect is false', () => {
       if (!Device.get().supportsFileConstructor()) {
         return;
       }
-      var fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create('FileChooser', {
         parent: session.desktop,
         multiSelect: false
       });
       fileChooser.open();
-      var file1 = new File([''], 'file 1');
-      var file2 = new File([''], 'file 2');
-      var file3 = new File([''], 'file 3');
+      let file1 = new File([''], 'file 1');
+      let file2 = new File([''], 'file 2');
+      let file3 = new File([''], 'file 3');
       fileChooser.addFiles([file1, file2]);
       expect(fileChooser.files).toEqual([file1]);
       expect(fileChooser.$files.children().length).toBe(1);
@@ -89,15 +89,15 @@ describe('FileChooser', function() {
     });
   });
 
-  describe('removeFile', function() {
-    it('removes the file', function() {
+  describe('removeFile', () => {
+    it('removes the file', () => {
       if (!Device.get().supportsFileConstructor()) {
         return;
       }
-      var file1 = new File([''], 'file 1');
-      var file2 = new File([''], 'file 2');
-      var file3 = new File([''], 'file 3');
-      var fileChooser = scout.create('FileChooser', {
+      let file1 = new File([''], 'file 1');
+      let file2 = new File([''], 'file 2');
+      let file3 = new File([''], 'file 3');
+      let fileChooser = scout.create('FileChooser', {
         parent: session.desktop,
         multiSelect: true,
         files: [file1, file2, file3]

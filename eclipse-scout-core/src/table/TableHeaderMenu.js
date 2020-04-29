@@ -138,7 +138,7 @@ export default class TableHeaderMenu extends Popup {
     // only add right column if filter has a filter-table or filter-fields
     if (this.hasFilterTable || this.hasFilterFields) {
       this.$columnFilters = this.$body.appendDiv('table-header-menu-filters');
-      var htmlColumnFilters = HtmlComponent.install(this.$columnFilters, this.session);
+      let htmlColumnFilters = HtmlComponent.install(this.$columnFilters, this.session);
       htmlColumnFilters.setLayout(new RowLayout());
     }
 
@@ -151,7 +151,7 @@ export default class TableHeaderMenu extends Popup {
 
     // -- Left column -- //
     // Moving
-    var movableColumns = this.table.visibleColumns().filter(function(column) {
+    let movableColumns = this.table.visibleColumns().filter(column => {
       return !column.fixedPosition;
     });
     if (movableColumns.length > 1 && !this.column.fixedPosition) {
@@ -209,13 +209,13 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _updateFirstLast() {
-    addFirstLastClass(this.leftGroups.filter(function(group) {
+    addFirstLastClass(this.leftGroups.filter(group => {
       return group.isVisible();
     }));
     addFirstLastClass(this.$rightGroups);
 
     function addFirstLastClass(groups) {
-      groups.forEach(function(group, index, arr) {
+      groups.forEach((group, index, arr) => {
         toggleCssClass(group, 'first', index === 0);
         toggleCssClass(group, 'last', index === arr.length - 1);
       }, this);
@@ -225,7 +225,7 @@ export default class TableHeaderMenu extends Popup {
     // work with a model-class (like the button menu groups). Currently this would cause
     // to much work.
     function toggleCssClass(group, cssClass, condition) {
-      var $container = group instanceof TableHeaderMenuGroup ? group.$container : group;
+      let $container = group instanceof TableHeaderMenuGroup ? group.$container : group;
       $container.toggleClass(cssClass, condition);
     }
   }
@@ -248,7 +248,7 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _renderMovingGroup() {
-    var table = this.table,
+    let table = this.table,
       column = this.column,
       pos = table.visibleColumns().indexOf(column);
 
@@ -262,7 +262,7 @@ export default class TableHeaderMenu extends Popup {
       text: '${textKey:ui.toBegin}',
       cssClass: 'move move-top'
     });
-    this.toBeginButton.on('action', function() {
+    this.toBeginButton.on('action', () => {
       table.moveColumn(column, pos, 0);
       pos = table.visibleColumns().indexOf(column);
     });
@@ -272,7 +272,7 @@ export default class TableHeaderMenu extends Popup {
       text: '${textKey:ui.forward}',
       cssClass: 'move move-up'
     });
-    this.forwardButton.on('action', function() {
+    this.forwardButton.on('action', () => {
       table.moveColumn(column, pos, Math.max(pos - 1, 0));
       pos = table.visibleColumns().indexOf(column);
     });
@@ -282,7 +282,7 @@ export default class TableHeaderMenu extends Popup {
       text: '${textKey:ui.backward}',
       cssClass: 'move move-down'
     });
-    this.backwardButton.on('action', function() {
+    this.backwardButton.on('action', () => {
       table.moveColumn(column, pos, Math.min(pos + 1, table.header.findHeaderItems().length - 1));
       pos = table.visibleColumns().indexOf(column);
     });
@@ -292,7 +292,7 @@ export default class TableHeaderMenu extends Popup {
       text: '${textKey:ui.toEnd}',
       cssClass: 'move move-bottom'
     });
-    this.toEndButton.on('action', function() {
+    this.toEndButton.on('action', () => {
       table.moveColumn(column, pos, table.header.findHeaderItems().length - 1);
       pos = table.visibleColumns().indexOf(column);
     });
@@ -302,14 +302,14 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _onColumnMoved() {
-    var table = this.table,
+    let table = this.table,
       column = this.column;
 
     if (this.moveGroup) {
-      var visibleColumns = table.visibleColumns();
-      var columnIndex = table.visibleColumns().indexOf(column);
-      var forwardEnabled = visibleColumns[columnIndex - 1] && !visibleColumns[columnIndex - 1].fixedPosition;
-      var backwardEnabled = visibleColumns[columnIndex + 1] && !visibleColumns[columnIndex + 1].fixedPosition;
+      let visibleColumns = table.visibleColumns();
+      let columnIndex = table.visibleColumns().indexOf(column);
+      let forwardEnabled = visibleColumns[columnIndex - 1] && !visibleColumns[columnIndex - 1].fixedPosition;
+      let backwardEnabled = visibleColumns[columnIndex + 1] && !visibleColumns[columnIndex + 1].fixedPosition;
 
       this.toBeginButton.setEnabled(forwardEnabled);
       this.forwardButton.setEnabled(forwardEnabled);
@@ -326,7 +326,7 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _renderColumnActionsGroup() {
-    var column = this.column,
+    let column = this.column,
       menuPopup = this;
 
     this.columnActionsGroup = scout.create('TableHeaderMenuGroup', {
@@ -374,14 +374,14 @@ export default class TableHeaderMenu extends Popup {
     this.addColumnButton.setVisible(event.addVisible);
     this.removeColumnButton.setVisible(event.removeVisible);
     this.modifyColumnButton.setVisible(event.modifyVisible);
-    var groupVisible = this.columnActionsGroup.children.some(function(button) {
+    let groupVisible = this.columnActionsGroup.children.some(button => {
       return button.visible;
     });
     this.columnActionsGroup.setVisible(groupVisible);
   }
 
   _renderSortingGroup() {
-    var table = this.table,
+    let table = this.table,
       column = this.column,
       menuPopup = this;
 
@@ -453,11 +453,11 @@ export default class TableHeaderMenu extends Popup {
       return;
     }
 
-    var addIcon,
+    let addIcon,
       showAddCommands = false,
       sortCount = this._sortColumnCount();
 
-    this.sortingGroup.children.forEach(function(button) {
+    this.sortingGroup.children.forEach(button => {
       button.setSelected(false);
     });
 
@@ -490,12 +490,12 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _renderGroupingGroup() {
-    var menuPopup = this,
+    let menuPopup = this,
       table = this.table,
       column = this.column,
       groupCount = this._groupColumnCount();
 
-    var group = scout.create('TableHeaderMenuGroup', {
+    let group = scout.create('TableHeaderMenuGroup', {
       parent: this,
       textKey: 'ui.Grouping'
     });
@@ -546,14 +546,14 @@ export default class TableHeaderMenu extends Popup {
     return group;
 
     function groupColumn() {
-      var direction = (column.sortIndex >= 0 && !column.sortAscending) ? 'desc' : 'asc';
+      let direction = (column.sortIndex >= 0 && !column.sortAscending) ? 'desc' : 'asc';
       menuPopup.close();
       table.groupColumn(column, this.additional, direction, !this.selected);
     }
   }
 
   _renderHierarchyGruop() {
-    var table = this.table,
+    let table = this.table,
       menuPopup = this;
     this.hierarchyGroup = scout.create('TableHeaderMenuGroup', {
       parent: this,
@@ -561,28 +561,28 @@ export default class TableHeaderMenu extends Popup {
       visible: this.table.isTableNodeColumn(this.column)
     });
 
-    var collapseAllButton = scout.create('TableHeaderMenuButton', {
+    let collapseAllButton = scout.create('TableHeaderMenuButton', {
       parent: this.hierarchyGroup,
       text: '${textKey:ui.CollapseAll}',
       cssClass: 'hierarchy-collapse-all',
-      enabled: !!arrays.find(table.rows, function(row) {
+      enabled: !!arrays.find(table.rows, row => {
         return row.expanded && !arrays.empty(row.childRows);
       })
     });
-    collapseAllButton.on('action', function() {
+    collapseAllButton.on('action', () => {
       menuPopup.close();
       table.collapseAll();
     });
 
-    var expandAllButton = scout.create('TableHeaderMenuButton', {
+    let expandAllButton = scout.create('TableHeaderMenuButton', {
       parent: this.hierarchyGroup,
       text: '${textKey:ui.ExpandAll}',
       cssClass: 'hierarchy-expand-all',
-      enabled: !!arrays.find(table.rows, function(row) {
+      enabled: !!arrays.find(table.rows, row => {
         return !row.expanded && !arrays.empty(row.childRows);
       })
     });
-    expandAllButton.on('action', function() {
+    expandAllButton.on('action', () => {
       menuPopup.close();
       table.expandAll();
     });
@@ -592,7 +592,7 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _renderAggregationGroup() {
-    var table = this.table,
+    let table = this.table,
       column = this.column,
       aggregation = column.aggregationFunction,
       menuPopup = this,
@@ -608,7 +608,7 @@ export default class TableHeaderMenu extends Popup {
     createHeaderMenuButtonForAggregationFunction('${textKey:ui.Minimum}', 'min');
     createHeaderMenuButtonForAggregationFunction('${textKey:ui.Maximum}', 'max');
 
-    group.children.forEach(function(button) {
+    group.children.forEach(button => {
       button.setSelected(button.aggregation === aggregation);
     });
     group.render(this.$columnActions);
@@ -616,7 +616,7 @@ export default class TableHeaderMenu extends Popup {
 
     function createHeaderMenuButtonForAggregationFunction(text, aggregation) {
       if (allowedAggregationFunctions.indexOf(aggregation) !== -1) {
-        var aggrButton = scout.create('TableHeaderMenuButton', {
+        let aggrButton = scout.create('TableHeaderMenuButton', {
           parent: group,
           text: text,
           cssClass: 'aggregation-function ' + aggregation,
@@ -634,7 +634,7 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _renderColoringGroup() {
-    var table = this.table,
+    let table = this.table,
       column = this.column,
       menuPopup = this,
       backgroundEffect = column.backgroundEffect,
@@ -672,7 +672,7 @@ export default class TableHeaderMenu extends Popup {
       this.barChartButton.on('action', onClick.bind(this.barChartButton));
     }
 
-    group.children.forEach(function(button) {
+    group.children.forEach(button => {
       button.setSelected(button.backgroundEffect === backgroundEffect);
     });
     group.render(this.$columnActions);
@@ -685,11 +685,11 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _renderFilterTable() {
-    var $filterActions;
+    let $filterActions;
 
     this.$filterTableGroup = this.$columnFilters
       .appendDiv('table-header-menu-group first');
-    var htmlComp = HtmlComponent.install(this.$filterTableGroup, this.session);
+    let htmlComp = HtmlComponent.install(this.$filterTableGroup, this.session);
     htmlComp.setLayout(new RowLayout());
 
     $filterActions = this.$filterTableGroup
@@ -712,7 +712,7 @@ export default class TableHeaderMenu extends Popup {
 
     this.filterTable = this._createFilterTable();
     this.filterTable.on('rowsChecked', this._filterTableRowsCheckedHandler);
-    var tableRow, tableRows = [];
+    let tableRow, tableRows = [];
     this.filter.availableValues.forEach(function(filterValue) {
       tableRow = {
         cells: [
@@ -743,7 +743,7 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _createFilterTable() {
-    var objectType = 'Column';
+    let objectType = 'Column';
     if (this.column.objectType === 'NumberColumn') {
       objectType = this.column.objectType;
     }
@@ -780,7 +780,7 @@ export default class TableHeaderMenu extends Popup {
    * @returns {string} the title-text used for the filter-table
    */
   _filterByText() {
-    var text = this.session.text('ui.Filter'),
+    let text = this.session.text('ui.Filter'),
       numSelected = this.filter.selectedValues.length,
       numFilters = this.filter.availableValues.length;
 
@@ -793,8 +793,8 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _onFilterCheckedModeClick() {
-    var checkedMode = TableHeaderMenu.CheckedMode;
-    var checkAll = this.filterCheckedMode.checkAll;
+    let checkedMode = TableHeaderMenu.CheckedMode;
+    let checkAll = this.filterCheckedMode.checkAll;
     this.filter.selectedValues = [];
     if (this.filterCheckedMode === checkedMode.ALL) {
       this.filterCheckedMode = checkedMode.NONE;
@@ -809,7 +809,7 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _onSortModeClick() {
-    var sortMode = TableHeaderMenu.SortMode;
+    let sortMode = TableHeaderMenu.SortMode;
     if (this.filterSortMode === sortMode.ALPHABETICALLY) {
       // sort by amount
       this.filterTable.sort(this.filterTable.columns[1], 'desc');
@@ -837,8 +837,8 @@ export default class TableHeaderMenu extends Popup {
     // checked mode
     this.$filterToggleChecked.text(this.session.text(this.filterCheckedMode.text));
     // sort mode
-    var sortMode = TableHeaderMenu.SortMode;
-    var sortAlphabetically = this.filterSortMode === TableHeaderMenu.SortMode.ALPHABETICALLY;
+    let sortMode = TableHeaderMenu.SortMode;
+    let sortAlphabetically = this.filterSortMode === TableHeaderMenu.SortMode.ALPHABETICALLY;
     this.$filterSortOrder.toggleClass(sortMode.ALPHABETICALLY.cssClass, sortAlphabetically);
     this.$filterSortOrder.toggleClass(sortMode.AMOUNT.cssClass, !sortAlphabetically);
   }
@@ -850,9 +850,9 @@ export default class TableHeaderMenu extends Popup {
       filter: this.filter
     });
     this.$filterFieldsGroup = this.$columnFilters.appendDiv('table-header-menu-group');
-    var htmlComp = HtmlComponent.install(this.$filterFieldsGroup, this.session);
+    let htmlComp = HtmlComponent.install(this.$filterFieldsGroup, this.session);
     htmlComp.setLayout(new RowLayout());
-    var $filterFieldsText = this.$filterFieldsGroup
+    let $filterFieldsText = this.$filterFieldsGroup
       .appendDiv('table-header-menu-group-text')
       .text(this.filter.filterFieldsTitle());
     htmlComp = HtmlComponent.install($filterFieldsText, this.session);
@@ -865,7 +865,7 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _countColumns(propertyName) {
-    return this.table.visibleColumns().reduce(function(sum, column) {
+    return this.table.visibleColumns().reduce((sum, column) => {
       return sum + (column[propertyName] ? 1 : 0);
     }, 0);
   }
@@ -879,16 +879,16 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _computeWhitherWidth() {
-    var $tableHeaderContainer = this.tableHeader.$container,
+    let $tableHeaderContainer = this.tableHeader.$container,
       headerItemWidth = this.$headerItem.outerWidth() - this.$headerItem.cssBorderWidthX(),
       containerWidth = this.$container.outerWidth() - this.$container.cssBorderWidthX(),
       tableHeaderWidth = $tableHeaderContainer.outerWidth() - this.tableHeader.menuBar.$container.outerWidth();
 
     // if container is wider than header item -> use header item width, otherwise use container width
-    var whitherWidth = Math.min(headerItemWidth, containerWidth);
+    let whitherWidth = Math.min(headerItemWidth, containerWidth);
     // if container is positioned at the right side, header item may not be fully visible (under the menubar or partly invisible due to scrolling)
     whitherWidth = Math.min(whitherWidth, tableHeaderWidth - this.$headerItem.position().left);
-    var clipLeft = $tableHeaderContainer.offset().left - this.$headerItem.offset().left - this.tableHeader.table.$container.cssBorderLeftWidth();
+    let clipLeft = $tableHeaderContainer.offset().left - this.$headerItem.offset().left - this.tableHeader.table.$container.cssBorderLeftWidth();
     if (clipLeft > 0) {
       whitherWidth -= clipLeft;
     }
@@ -905,7 +905,7 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _onLocationChange(event) {
-    var inView, containerBounds,
+    let inView, containerBounds,
       isLocationInView = scrollbars.isLocationInView,
       headerItemBounds = graphics.offsetBounds(this.$headerItem),
       $tableHeaderContainer = this.tableHeader.$container;

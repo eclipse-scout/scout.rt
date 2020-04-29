@@ -313,22 +313,22 @@ export default class SimpleTab extends Widget {
   _renderStatus() {
     this._statusContainerUsageCounter -= (this._statusIconDivs.length === 0 ? 0 : 1);
 
-    this._statusIconDivs.forEach(function($statusIcon) {
+    this._statusIconDivs.forEach($statusIcon => {
       $statusIcon.remove();
     });
     this._statusIconDivs = [];
 
     if (this.status) {
-      this.status.asFlatList().forEach(function(status) {
+      this.status.asFlatList().forEach(status => {
         if (!status || !status.iconId) {
           return;
         }
-        var $statusIcon = this._getOrCreate$StatusContainer().appendIcon(status.iconId, 'status');
+        let $statusIcon = this._getOrCreate$StatusContainer().appendIcon(status.iconId, 'status');
         if (status.cssClass()) {
           $statusIcon.addClass(status.cssClass());
         }
         this._statusIconDivs.push($statusIcon);
-      }.bind(this));
+      });
     }
 
     this._statusContainerUsageCounter += (this._statusIconDivs.length === 0 ? 0 : 1);

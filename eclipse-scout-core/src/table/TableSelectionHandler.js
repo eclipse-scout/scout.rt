@@ -43,7 +43,7 @@ export default class TableSelectionHandler {
 
   // TODO [7.0] bsh: Table Selection | Try to merge this with TableKeystrokeContext
   onMouseDown(event) {
-    var $row = $(event.currentTarget),
+    let $row = $(event.currentTarget),
       row = $row.data('row'),
       oldSelectedState = $row.isSelected();
     this._mouseDown = true;
@@ -64,9 +64,9 @@ export default class TableSelectionHandler {
         // The last action row may have been cleared, e.g. when rows have been replaced. In that case, simply assume
         // the first or the last of the currently selected rows as being the last action row to make shift-click
         // behave as expected (depending on which row is nearer from the clicked row).
-        var thisRowIndex = this._allRows.indexOf(row);
-        var firstSelectedRow = this.table.selectedRows[0];
-        var lastSelectedRow = this.table.selectedRows[this.table.selectedRows.length - 1];
+        let thisRowIndex = this._allRows.indexOf(row);
+        let firstSelectedRow = this.table.selectedRows[0];
+        let lastSelectedRow = this.table.selectedRows[this.table.selectedRows.length - 1];
         if (thisRowIndex <= (this._allRows.indexOf(firstSelectedRow) + this._allRows.indexOf(lastSelectedRow)) / 2) {
           this.lastActionRow = firstSelectedRow;
         } else {
@@ -109,7 +109,7 @@ export default class TableSelectionHandler {
   }
 
   onMouseOver(event) {
-    var $row = $(event.currentTarget),
+    let $row = $(event.currentTarget),
       row = $row.data('row');
     this.toIndex = this._allRows.indexOf(row);
     this.handleSelection(event);
@@ -117,14 +117,14 @@ export default class TableSelectionHandler {
   }
 
   handleSelection(event) {
-    var rowsToUnselect;
+    let rowsToUnselect;
     if (this.table.multiSelect) {
       // Multi-selection -> expand/shrink selection
-      var thisIndex = this.toIndex;
-      var goingUp = (thisIndex < this._prevSelectedRowIndex);
-      var goingDown = (thisIndex > this._prevSelectedRowIndex);
-      var beforeFromSelection = (this._prevSelectedRowIndex < this.fromIndex);
-      var afterFromSelection = (this._prevSelectedRowIndex > this.fromIndex);
+      let thisIndex = this.toIndex;
+      let goingUp = (thisIndex < this._prevSelectedRowIndex);
+      let goingDown = (thisIndex > this._prevSelectedRowIndex);
+      let beforeFromSelection = (this._prevSelectedRowIndex < this.fromIndex);
+      let afterFromSelection = (this._prevSelectedRowIndex > this.fromIndex);
 
       // In 'ctrlKey' mode, the unselection is done via 'select=false'
       // Also prevent unselect in shiftKey mode, because otherwise we'd could
@@ -141,14 +141,14 @@ export default class TableSelectionHandler {
 
         // when shift is pressed: only unselect when first or last row (but not in the middle of the selection, see #172929)
         if (rowsToUnselect && event.shiftKey) {
-          var selectionIndizes = this.getMinMaxSelectionIndizes();
-          rowsToUnselect = rowsToUnselect.reduce(function(aggr, row) {
-            var rowIndex = this._allRows.indexOf(row);
+          let selectionIndizes = this.getMinMaxSelectionIndizes();
+          rowsToUnselect = rowsToUnselect.reduce((aggr, row) => {
+            let rowIndex = this._allRows.indexOf(row);
             if (scout.isOneOf(rowIndex, selectionIndizes[0], selectionIndizes[1])) {
               aggr.push(row);
             }
             return aggr;
-          }.bind(this), []);
+          }, []);
         }
 
         if (rowsToUnselect) {
@@ -176,7 +176,7 @@ export default class TableSelectionHandler {
   }
 
   _selectRange(fromIndex, toIndex, select) {
-    var startIndex = Math.min(fromIndex, toIndex),
+    let startIndex = Math.min(fromIndex, toIndex),
       endIndex = Math.max(fromIndex, toIndex) + 1,
       actionRows = this._allRows.slice(startIndex, endIndex);
     // set/remove selection
@@ -192,7 +192,7 @@ export default class TableSelectionHandler {
   }
 
   getMinMaxSelectionIndizes() {
-    var
+    let
       selectedRows = this.table.selectedRows,
       allRows = this.table.visibleRows;
 
@@ -200,10 +200,10 @@ export default class TableSelectionHandler {
       return [-1, -1];
     }
 
-    var min = -1,
+    let min = -1,
       max = -1;
-    selectedRows.forEach(function(row) {
-      var index = allRows.indexOf(row);
+    selectedRows.forEach(row => {
+      let index = allRows.indexOf(row);
       if (min === -1 || index < min) {
         min = index;
       }

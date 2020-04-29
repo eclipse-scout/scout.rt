@@ -32,7 +32,7 @@ export default class GroupBoxLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var gbBodySize,
+    let gbBodySize,
       menuBarSize,
       menuBarHeight = 0,
       statusWidth = 0,
@@ -65,10 +65,10 @@ export default class GroupBoxLayout extends AbstractLayout {
         menuBarSize = htmlMenuBar.prefSize({
           exact: true
         });
-        var titleSize = graphics.prefSize(this.groupBox.$title);
-        var titleLabelWidth = Math.ceil(graphics.prefSize(this.groupBox.$label, true).width) + 1;
-        var menuBarWidth = menuBarSize.width;
-        var titleWidth = titleSize.width - statusWidth;
+        let titleSize = graphics.prefSize(this.groupBox.$title);
+        let titleLabelWidth = Math.ceil(graphics.prefSize(this.groupBox.$label, true).width) + 1;
+        let menuBarWidth = menuBarSize.width;
+        let titleWidth = titleSize.width - statusWidth;
 
         if ((titleLabelWidth + menuBarWidth) < titleWidth) {
           // label and menu-bar both fit into the title
@@ -80,9 +80,9 @@ export default class GroupBoxLayout extends AbstractLayout {
         } else {
           // label and menu-bar don't fit into the title
           // scale down until both fit into the title, try to keep the same width-ratio (r)
-          var scaleFactor = (titleLabelWidth + menuBarWidth) / titleWidth;
-          var rLabel = (titleLabelWidth / titleWidth) / scaleFactor;
-          var rMenuBar = (menuBarWidth / titleWidth) / scaleFactor;
+          let scaleFactor = (titleLabelWidth + menuBarWidth) / titleWidth;
+          let rLabel = (titleLabelWidth / titleWidth) / scaleFactor;
+          let rMenuBar = (menuBarWidth / titleWidth) / scaleFactor;
 
           if (rLabel < rMenuBar) {
             rLabel = Math.max(0.33, rLabel);
@@ -138,7 +138,7 @@ export default class GroupBoxLayout extends AbstractLayout {
     // Make $element wider, so status is on the left
     function setWidthForStatus($element, statusWidth) {
       if (statusWidth) {
-        var marginX = $element.cssMarginX() + statusWidth;
+        let marginX = $element.cssMarginX() + statusWidth;
         $element.cssWidth('calc(100% - ' + marginX + 'px)');
       } else {
         $element.cssWidth('');
@@ -147,7 +147,7 @@ export default class GroupBoxLayout extends AbstractLayout {
   }
 
   _layoutStatus() {
-    var htmlContainer = this.groupBox.htmlComp,
+    let htmlContainer = this.groupBox.htmlComp,
       containerPadding = htmlContainer.insets({
         includeBorder: false
       }),
@@ -171,7 +171,7 @@ export default class GroupBoxLayout extends AbstractLayout {
 
   preferredLayoutSize($container, options) {
     options = options || {};
-    var htmlContainer = this.groupBox.htmlComp,
+    let htmlContainer = this.groupBox.htmlComp,
       htmlGbBody = this._htmlGbBody(),
       htmlMenuBar,
       prefSize,
@@ -246,7 +246,7 @@ export default class GroupBoxLayout extends AbstractLayout {
   }
 
   _menuBarSize(htmlMenuBar, containerSize, statusWidth) {
-    var menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
+    let menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
     if (!this.groupBox.mainBox) {
       // adjust size of menubar as well if it is in a regular group box
       menuBarSize.width -= statusWidth;
@@ -259,7 +259,7 @@ export default class GroupBoxLayout extends AbstractLayout {
    */
   _htmlMenuBar() {
     if (this.groupBox.menuBar && this.groupBox.menuBarVisible) {
-      var htmlMenuBar = HtmlComponent.optGet(this.groupBox.menuBar.$container);
+      let htmlMenuBar = HtmlComponent.optGet(this.groupBox.menuBar.$container);
       if (htmlMenuBar && htmlMenuBar.isVisible()) {
         return htmlMenuBar;
       }

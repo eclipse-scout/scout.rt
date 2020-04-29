@@ -20,7 +20,7 @@ export default class MenuNavigationDownKeyStroke extends MenuNavigationKeyStroke
   }
 
   handle(event) {
-    var menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
+    let menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
     if (menuItems.$selected.length > 0) {
       this._changeSelection(menuItems.$selected, menuItems.$selected.nextAll(':visible').first());
     } else {

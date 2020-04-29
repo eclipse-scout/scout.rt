@@ -65,8 +65,8 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
   init(model) {
     super.init(model);
 
-    var transformationType = GroupBoxResponsiveHandler.TransformationType;
-    var responsiveState = ResponsiveManager.ResponsiveState;
+    let transformationType = GroupBoxResponsiveHandler.TransformationType;
+    let responsiveState = ResponsiveManager.ResponsiveState;
 
     this._registerTransformation(transformationType.LABEL_POSITION_ON_FIELD, this._transformLabelPositionOnField);
     this._registerTransformation(transformationType.LABEL_POSITION_ON_TOP, this._transformLabelPositionOnTop);
@@ -93,16 +93,16 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
 
     this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
     HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
-    this.widget.one('remove', function() {
+    this.widget.one('remove', () => {
       HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
-    }.bind(this));
+    });
 
-    this.widget.visitFields(function(field) {
+    this.widget.visitFields(field => {
       if (field instanceof CompositeField) {
         field.on('propertyChange', this._formFieldAddedHandler);
         this._compositeFields.push(field);
       }
-    }.bind(this));
+    });
 
     HtmlEnvironment.get().on('propertyChange', this._htmlPropertyChangeHandler);
   }
@@ -113,9 +113,9 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
   destroy() {
     super.destroy();
 
-    this._compositeFields.forEach(function(compositeField) {
+    this._compositeFields.forEach(compositeField => {
       compositeField.off('propertyChange', this._formFieldAddedHandler);
-    }.bind(this));
+    });
 
     HtmlEnvironment.get().off('propertyChange', this._htmlPropertyChangeHandler);
   }
@@ -162,7 +162,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     }
 
     // suppress a revalidate of the layout tree, since setLabelPosition would trigger it.
-    var htmlParent;
+    let htmlParent;
     if (widget.htmlComp) {
       widget.htmlComp.suppressInvalidate = true;
       htmlParent = widget.htmlComp.getParent();
@@ -284,16 +284,16 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
    * Vertical alignment
    */
   _transformVerticalAlignment(field, apply) {
-    var isDefaultButton = field instanceof Button && field.displayStyle === Button.DisplayStyle.DEFAULT;
-    var isCheckbox = field instanceof CheckBoxField;
-    var isSingleHeightOnFieldLabelField = field.labelPosition === FormField.LabelPosition.ON_FIELD && field.gridData && field.gridData.h === 1;
+    let isDefaultButton = field instanceof Button && field.displayStyle === Button.DisplayStyle.DEFAULT;
+    let isCheckbox = field instanceof CheckBoxField;
+    let isSingleHeightOnFieldLabelField = field.labelPosition === FormField.LabelPosition.ON_FIELD && field.gridData && field.gridData.h === 1;
 
     if (!(isDefaultButton || isCheckbox || isSingleHeightOnFieldLabelField) ||
       !field.gridData) {
       return;
     }
 
-    var gridData = this.getGridData(field);
+    let gridData = this.getGridData(field);
     if (apply) {
       this._storeFieldProperty(field, 'fillVertical', gridData.fillVertical);
       this._storeFieldProperty(field, 'verticalAlignment', gridData.verticalAlignment);
@@ -361,7 +361,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
       return;
     }
 
-    var gridData = this.getGridData(field);
+    let gridData = this.getGridData(field);
     if (apply && gridData.weightX === 0) {
       this._storeFieldProperty(field, 'weightX', gridData.weightX);
       gridData.weightX = 1;
@@ -378,10 +378,10 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
 
   _onFormFieldAdded(event) {
     if (this.state !== ResponsiveManager.ResponsiveState.NORMAL && (event.propertyName === 'fields' || event.propertyName === 'tabItems')) {
-      var newFields = arrays.diff(event.newValue, event.oldValue);
-      newFields.forEach(function(field) {
+      let newFields = arrays.diff(event.newValue, event.oldValue);
+      newFields.forEach(field => {
         field.visitFields(this._transformWidget.bind(this));
-      }.bind(this));
+      });
     }
   }
 }

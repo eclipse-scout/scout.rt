@@ -1,10 +1,10 @@
-describe('ResponseQueue', function() {
+describe('ResponseQueue', () => {
 
-  beforeEach(function() {
+  beforeEach(() => {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
@@ -13,11 +13,11 @@ describe('ResponseQueue', function() {
     return sandboxSession();
   }
 
-  describe('add', function() {
+  describe('add', () => {
 
-    it('adds elements to the queue in the correct order', function() {
-      var session = createSession();
-      var rq = session.responseQueue;
+    it('adds elements to the queue in the correct order', () => {
+      let session = createSession();
+      let rq = session.responseQueue;
 
       expect(rq.nextExpectedSequenceNo).toBe(1);
 
@@ -45,9 +45,9 @@ describe('ResponseQueue', function() {
       expect(rq.nextExpectedSequenceNo).toBe(1);
     });
 
-    it('removes elements that are superseded by combined response', function() {
-      var session = createSession();
-      var rq = session.responseQueue;
+    it('removes elements that are superseded by combined response', () => {
+      let session = createSession();
+      let rq = session.responseQueue;
 
       expect(rq.nextExpectedSequenceNo).toBe(1);
 
@@ -70,12 +70,12 @@ describe('ResponseQueue', function() {
 
   });
 
-  describe('process', function() {
+  describe('process', () => {
 
-    it('processes elements in the correct order', function() {
-      var session = createSession();
-      var rq = session.responseQueue;
-      spyOn(session, 'processJsonResponseInternal').and.callFake(function(data) {
+    it('processes elements in the correct order', () => {
+      let session = createSession();
+      let rq = session.responseQueue;
+      spyOn(session, 'processJsonResponseInternal').and.callFake(data => {
         if (data && data.id === 9) {
           return true;
         }
@@ -93,7 +93,7 @@ describe('ResponseQueue', function() {
       rq.add({'#': 2, 'id': 6});
       rq.add({id: 8});
 
-      var success = rq.process({'#': 4, 'id': 9});
+      let success = rq.process({'#': 4, 'id': 9});
 
       expect(rq.queue.length).toBe(0);
       expect(rq.nextExpectedSequenceNo).toBe(5);
@@ -101,10 +101,10 @@ describe('ResponseQueue', function() {
       expect(success).toBe(true);
     });
 
-    it('does not process elements in the wrong order', function() {
-      var session = createSession();
-      var rq = session.responseQueue;
-      spyOn(session, 'processJsonResponseInternal').and.callFake(function(data) {
+    it('does not process elements in the wrong order', () => {
+      let session = createSession();
+      let rq = session.responseQueue;
+      spyOn(session, 'processJsonResponseInternal').and.callFake(data => {
         if (data && data.id === 9) {
           return true;
         }
@@ -114,7 +114,7 @@ describe('ResponseQueue', function() {
       expect(rq.nextExpectedSequenceNo).toBe(1);
 
       rq.add({'#': 2, 'id': 1});
-      var success = rq.process({'#': 3, 'id': 2});
+      let success = rq.process({'#': 3, 'id': 2});
       expect(success).toBe(true);
       expect(rq.queue.length).toBe(2); // not processed!
 
@@ -136,10 +136,10 @@ describe('ResponseQueue', function() {
       expect(rq.nextExpectedSequenceNo).toBe(5);
     });
 
-    it('does not process same response twice', function() {
-      var session = createSession();
-      var rq = session.responseQueue;
-      spyOn(session, 'processJsonResponseInternal').and.callFake(function(data) {
+    it('does not process same response twice', () => {
+      let session = createSession();
+      let rq = session.responseQueue;
+      spyOn(session, 'processJsonResponseInternal').and.callFake(data => {
         if (data && data.id === 9) {
           return true;
         }
@@ -151,7 +151,7 @@ describe('ResponseQueue', function() {
       rq.add({'#': 1, 'id': 4});
       rq.add({'#': 3, 'id': 5});
       rq.add({'#': 2, 'id': 6});
-      var success = rq.process({'#': 4, 'id': 9});
+      let success = rq.process({'#': 4, 'id': 9});
 
       expect(rq.queue.length).toBe(0);
       expect(rq.lastProcessedSequenceNo).toBe(4);

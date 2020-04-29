@@ -24,7 +24,7 @@ export default class StatusMenuMapping extends Widget {
     if (typeof model === 'string') {
       // If the model is a string it is probably the id of the menu.
       // Menus are defined by the parent (form field) -> search the parent's children for the menu
-      var existingWidget = this.parent.widget(model);
+      let existingWidget = this.parent.widget(model);
       if (!existingWidget) {
         throw new Error('Referenced widget not found: ' + model);
       }

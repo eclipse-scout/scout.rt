@@ -31,7 +31,7 @@ export default class TableControl extends Action {
     this.table = this.getTable();
     super._init(model);
     // retain the size with 'dense' in case we're in dense mode
-    var denseClass = this.session.desktop.dense ? 'dense' : null;
+    let denseClass = this.session.desktop.dense ? 'dense' : null;
     TableControl.CONTAINER_SIZE = styles.getSize('table-control-container', 'height', 'height', TableControl.CONTAINER_SIZE, denseClass);
     this.height = TableControl.CONTAINER_SIZE;
     this.animateDuration = TableControl.CONTAINER_ANIMATE_DURATION;
@@ -48,7 +48,7 @@ export default class TableControl extends Action {
   }
 
   _createKeyStrokeContextForTableControl() {
-    var keyStrokeContext = new KeyStrokeContext();
+    let keyStrokeContext = new KeyStrokeContext();
     keyStrokeContext.$scopeTarget = function() {
       return this.tableFooter.$controlContent;
     }.bind(this);
@@ -64,7 +64,7 @@ export default class TableControl extends Action {
   }
 
   _render() {
-    var classes = 'table-control ';
+    let classes = 'table-control ';
     if (this.cssClass) {
       classes += this.cssClass + '-table-control';
     }
@@ -210,7 +210,7 @@ export default class TableControl extends Action {
   }
 
   _configureTooltip() {
-    var options = super._configureTooltip();
+    let options = super._configureTooltip();
     options.cssClass = 'table-control-tooltip';
     return options;
   }
@@ -235,7 +235,7 @@ export default class TableControl extends Action {
   }
 
   getTable() {
-    var parent = this.parent;
+    let parent = this.parent;
     while (parent) {
       if (parent instanceof Table) {
         return parent;

@@ -11,10 +11,10 @@
 // eslint-disable-next-line max-classes-per-file
 import {Dimension, HtmlComponent, Popup, scout, Widget} from '../../src/index';
 
-describe('Popup', function() {
-  var session, $desktop;
+describe('Popup', () => {
+  let session, $desktop;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession({
       desktop: {
@@ -44,7 +44,7 @@ describe('Popup', function() {
     _render() {
       this.$container = this.$parent.appendDiv();
       this.htmlComp = HtmlComponent.install(this.$container, this.session);
-      for (var i = 0; i < this.numBlocks; i++) {
+      for (let i = 0; i < this.numBlocks; i++) {
         this.$container.appendDiv('wrapping-block');
       }
     }
@@ -62,7 +62,7 @@ describe('Popup', function() {
     _render() {
       this.$container = this.$parent.appendDiv();
       this.htmlComp = HtmlComponent.install(this.$container, this.session);
-      for (var i = 0; i < this.numBlocks; i++) {
+      for (let i = 0; i < this.numBlocks; i++) {
         this.$container.appendDiv('large-block');
       }
     }
@@ -70,17 +70,15 @@ describe('Popup', function() {
 
   window.scouttests.LargeContent = LargeContent;
 
-  var entryPointSizeFunc = function() {
-    return new Dimension($desktop.width(), $desktop.height());
-  };
+  let entryPointSizeFunc = () => new Dimension($desktop.width(), $desktop.height());
 
-  afterEach(function() {
+  afterEach(() => {
     removePopups(session);
   });
 
-  describe('withGlassPane', function() {
-    it('shows a glass pane if set to true', function() {
-      var popup = scout.create('Popup', {
+  describe('withGlassPane', () => {
+    it('shows a glass pane if set to true', () => {
+      let popup = scout.create('Popup', {
         parent: session.desktop,
         withGlassPane: true
       });
@@ -89,8 +87,8 @@ describe('Popup', function() {
       expect(popup.$container.children('.glasspane').length).toBe(0);
     });
 
-    it('does not show a glass pane if set to false', function() {
-      var popup = scout.create('Popup', {
+    it('does not show a glass pane if set to false', () => {
+      let popup = scout.create('Popup', {
         parent: session.desktop
       });
       popup.render();
@@ -99,11 +97,11 @@ describe('Popup', function() {
     });
   });
 
-  describe('horizontalAlignment', function() {
-    describe('RIGHT', function() {
-      it('opens on the right of the anchor', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+  describe('horizontalAlignment', () => {
+    describe('RIGHT', () => {
+      it('opens on the right of the anchor', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.RIGHT,
           $anchor: $anchor,
@@ -115,9 +113,9 @@ describe('Popup', function() {
         expect(popup.$container.cssWidth()).toBe(50);
       });
 
-      it('opens on the right of the anchor considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('opens on the right of the anchor considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
           horizontalAlignment: Popup.Alignment.RIGHT,
@@ -131,9 +129,9 @@ describe('Popup', function() {
         expect(popup.$container.cssMarginX()).toBe(20);
       });
 
-      it('moves to left when overlapping right window border', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('moves to left when overlapping right window border', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.RIGHT,
           $anchor: $anchor,
@@ -146,9 +144,9 @@ describe('Popup', function() {
         expect(popup.$container.cssWidth()).toBe(50);
       });
 
-      it('moves to left when overlapping right window border considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('moves to left when overlapping right window border considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.RIGHT,
           $anchor: $anchor,
@@ -164,10 +162,10 @@ describe('Popup', function() {
       });
     });
 
-    describe('LEFT', function() {
-      it('opens on the left of the anchor', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+    describe('LEFT', () => {
+      it('opens on the left of the anchor', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.LEFT,
           $anchor: $anchor,
@@ -179,9 +177,9 @@ describe('Popup', function() {
         expect(popup.$container.cssWidth()).toBe(50);
       });
 
-      it('opens on the left of the anchor considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('opens on the left of the anchor considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
           horizontalAlignment: Popup.Alignment.LEFT,
@@ -195,10 +193,10 @@ describe('Popup', function() {
         expect(popup.$container.cssMarginX()).toBe(20);
       });
 
-      it('moves to right when overlapping left window border', function() {
-        var $anchor = $desktop.appendDiv('anchor');
+      it('moves to right when overlapping left window border', () => {
+        let $anchor = $desktop.appendDiv('anchor');
         $anchor.cssLeft(70 - 25);
-        var popup = scout.create('Popup', {
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.LEFT,
           $anchor: $anchor,
@@ -211,10 +209,10 @@ describe('Popup', function() {
         expect(popup.$container.cssWidth()).toBe(50);
       });
 
-      it('moves to right when overlapping left window border considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
+      it('moves to right when overlapping left window border considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
         $anchor.cssLeft(70 - 25);
-        var popup = scout.create('Popup', {
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.LEFT,
           $anchor: $anchor,
@@ -229,10 +227,10 @@ describe('Popup', function() {
       });
     });
 
-    describe('LEFTEDGE', function() {
-      it('opens on the left edge of the anchor', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+    describe('LEFTEDGE', () => {
+      it('opens on the left edge of the anchor', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.LEFTEDGE,
           $anchor: $anchor,
@@ -244,9 +242,9 @@ describe('Popup', function() {
         expect(popup.$container.cssWidth()).toBe(50);
       });
 
-      it('opens on the left edge of the anchor considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('opens on the left edge of the anchor considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
           horizontalAlignment: Popup.Alignment.LEFTEDGE,
@@ -261,10 +259,10 @@ describe('Popup', function() {
       });
     });
 
-    describe('RIGHTEDGE', function() {
-      it('opens on the right edge of the anchor', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+    describe('RIGHTEDGE', () => {
+      it('opens on the right edge of the anchor', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.RIGHTEDGE,
           $anchor: $anchor,
@@ -276,9 +274,9 @@ describe('Popup', function() {
         expect(popup.$container.cssWidth()).toBe(50);
       });
 
-      it('opens on the left edge of the anchor considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('opens on the left edge of the anchor considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
           horizontalAlignment: Popup.Alignment.RIGHTEDGE,
@@ -293,10 +291,10 @@ describe('Popup', function() {
       });
     });
 
-    describe('CENTER', function() {
-      it('opens on the center of the anchor', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+    describe('CENTER', () => {
+      it('opens on the center of the anchor', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.CENTER,
           $anchor: $anchor
@@ -307,9 +305,9 @@ describe('Popup', function() {
         expect(popup.$container.cssWidth()).toBe(50);
       });
 
-      it('opens on the center of the anchor considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('opens on the center of the anchor considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
           horizontalAlignment: Popup.Alignment.CENTER,
@@ -325,11 +323,11 @@ describe('Popup', function() {
     });
   });
 
-  describe('verticalAlignment', function() {
-    describe('BOTTOM', function() {
-      it('opens on the bottom of the anchor', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+  describe('verticalAlignment', () => {
+    describe('BOTTOM', () => {
+      it('opens on the bottom of the anchor', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           verticalAlignment: Popup.Alignment.BOTTOM,
           $anchor: $anchor,
@@ -341,9 +339,9 @@ describe('Popup', function() {
         expect(popup.$container.cssHeight()).toBe(50);
       });
 
-      it('opens on the bottom of the anchor considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('opens on the bottom of the anchor considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
           verticalAlignment: Popup.Alignment.BOTTOM,
@@ -357,9 +355,9 @@ describe('Popup', function() {
         expect(popup.$container.cssMarginY()).toBe(20);
       });
 
-      it('moves to top when overlapping bottom window border', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('moves to top when overlapping bottom window border', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.RIGHT,
           verticalAlignment: Popup.Alignment.BOTTOM,
@@ -374,9 +372,9 @@ describe('Popup', function() {
         expect(popup.$container.cssHeight()).toBe(50);
       });
 
-      it('moves to top when overlapping bottom window border considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('moves to top when overlapping bottom window border considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.RIGHT,
           verticalAlignment: Popup.Alignment.BOTTOM,
@@ -394,10 +392,10 @@ describe('Popup', function() {
       });
     });
 
-    describe('TOP', function() {
-      it('opens on the top of the anchor', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+    describe('TOP', () => {
+      it('opens on the top of the anchor', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           verticalAlignment: Popup.Alignment.TOP,
           $anchor: $anchor,
@@ -409,9 +407,9 @@ describe('Popup', function() {
         expect(popup.$container.cssHeight()).toBe(50);
       });
 
-      it('opens on the top of the anchor considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('opens on the top of the anchor considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
           verticalAlignment: Popup.Alignment.TOP,
@@ -425,10 +423,10 @@ describe('Popup', function() {
         expect(popup.$container.cssMarginY()).toBe(20);
       });
 
-      it('moves to bottom when overlapping top window border', function() {
-        var $anchor = $desktop.appendDiv('anchor');
+      it('moves to bottom when overlapping top window border', () => {
+        let $anchor = $desktop.appendDiv('anchor');
         $anchor.cssTop(70 - 25);
-        var popup = scout.create('Popup', {
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.RIGHT,
           verticalAlignment: Popup.Alignment.TOP,
@@ -442,10 +440,10 @@ describe('Popup', function() {
         expect(popup.$container.cssHeight()).toBe(50);
       });
 
-      it('moves to bottom when overlapping top window border considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
+      it('moves to bottom when overlapping top window border considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
         $anchor.cssTop(70 - 25);
-        var popup = scout.create('Popup', {
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.RIGHT,
           verticalAlignment: Popup.Alignment.TOP,
@@ -462,10 +460,10 @@ describe('Popup', function() {
       });
     });
 
-    describe('TOPEDGE', function() {
-      it('opens on the top edge of the anchor', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+    describe('TOPEDGE', () => {
+      it('opens on the top edge of the anchor', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           verticalAlignment: Popup.Alignment.TOPEDGE,
           $anchor: $anchor
@@ -476,9 +474,9 @@ describe('Popup', function() {
         expect(popup.$container.cssHeight()).toBe(50);
       });
 
-      it('opens on the left edge of the anchor considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('opens on the left edge of the anchor considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
           verticalAlignment: Popup.Alignment.TOPEDGE,
@@ -492,10 +490,10 @@ describe('Popup', function() {
       });
     });
 
-    describe('BOTTOMEDGE', function() {
-      it('opens on the bottom edge of the anchor', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+    describe('BOTTOMEDGE', () => {
+      it('opens on the bottom edge of the anchor', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           verticalAlignment: Popup.Alignment.BOTTOMEDGE,
           $anchor: $anchor
@@ -506,9 +504,9 @@ describe('Popup', function() {
         expect(popup.$container.cssHeight()).toBe(50);
       });
 
-      it('opens on the bottom edge of the anchor considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('opens on the bottom edge of the anchor considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
           verticalAlignment: Popup.Alignment.BOTTOMEDGE,
@@ -522,10 +520,10 @@ describe('Popup', function() {
       });
     });
 
-    describe('CENTER', function() {
-      it('opens on the center of the anchor', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+    describe('CENTER', () => {
+      it('opens on the center of the anchor', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           verticalAlignment: Popup.Alignment.CENTER,
           $anchor: $anchor
@@ -536,9 +534,9 @@ describe('Popup', function() {
         expect(popup.$container.cssHeight()).toBe(50);
       });
 
-      it('opens on the center of the anchor considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('opens on the center of the anchor considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
           verticalAlignment: Popup.Alignment.CENTER,
@@ -554,11 +552,11 @@ describe('Popup', function() {
     });
   });
 
-  describe('trimWidth', function() {
-    describe('reduces width if there is not enough space', function() {
-      it('on the left', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('WidgetPopup', {
+  describe('trimWidth', () => {
+    describe('reduces width if there is not enough space', () => {
+      it('on the left', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
           horizontalAlignment: Popup.Alignment.LEFT,
@@ -578,9 +576,9 @@ describe('Popup', function() {
         expect(popup.$container.cssHeight()).toBe(100);
       });
 
-      it('on the right', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('WidgetPopup', {
+      it('on the right', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
           horizontalAlignment: Popup.Alignment.RIGHT,
@@ -601,10 +599,10 @@ describe('Popup', function() {
       });
     });
 
-    describe('with hAlign = LEFTEDGE', function() {
-      it('does not unnecessarily trim if the popup could be displayed completely', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('WidgetPopup', {
+    describe('with hAlign = LEFTEDGE', () => {
+      it('does not unnecessarily trim if the popup could be displayed completely', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable',
           horizontalAlignment: Popup.Alignment.LEFTEDGE,
@@ -627,11 +625,11 @@ describe('Popup', function() {
     });
   });
 
-  describe('trimHeight', function() {
-    describe('reduces height if there is not enough space', function() {
-      it('on the bottom', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('WidgetPopup', {
+  describe('trimHeight', () => {
+    describe('reduces height if there is not enough space', () => {
+      it('on the bottom', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
           horizontalAlignment: Popup.Alignment.CENTER,
@@ -650,9 +648,9 @@ describe('Popup', function() {
         expect(popup.$container.cssHeight()).toBe(50);
       });
 
-      it('on the top', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('WidgetPopup', {
+      it('on the top', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
           horizontalAlignment: Popup.Alignment.CENTER,
@@ -671,9 +669,9 @@ describe('Popup', function() {
         expect(popup.$container.cssHeight()).toBe(50);
       });
 
-      it('on the center', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('WidgetPopup', {
+      it('on the center', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
           horizontalAlignment: Popup.Alignment.CENTER,
@@ -693,9 +691,9 @@ describe('Popup', function() {
         expect(popup.$container.cssMarginY()).toBe(20);
       });
 
-      it('on the edge', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('WidgetPopup', {
+      it('on the edge', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
           horizontalAlignment: Popup.Alignment.LEFT,
@@ -717,10 +715,10 @@ describe('Popup', function() {
       });
     });
 
-    describe('with vAlign = TOPEDGE', function() {
-      it('does not unnecessarily trim if the popup could be displayed completely', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('WidgetPopup', {
+    describe('with vAlign = TOPEDGE', () => {
+      it('does not unnecessarily trim if the popup could be displayed completely', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable',
           horizontalAlignment: Popup.Alignment.RIGHT,
@@ -743,11 +741,11 @@ describe('Popup', function() {
     });
   });
 
-  describe('verticalSwitch', function() {
-    describe('with verticalAlign = bottom', function() {
-      it('switches to top when overlapping bottom window border', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+  describe('verticalSwitch', () => {
+    describe('with verticalAlign = bottom', () => {
+      it('switches to top when overlapping bottom window border', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           verticalAlignment: Popup.Alignment.BOTTOM,
           $anchor: $anchor,
@@ -760,9 +758,9 @@ describe('Popup', function() {
         expect(popup.$container.cssHeight()).toBe(50);
       });
 
-      it('switches to top when overlapping bottom window border considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('switches to top when overlapping bottom window border considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           verticalAlignment: Popup.Alignment.BOTTOM,
           $anchor: $anchor,
@@ -777,10 +775,10 @@ describe('Popup', function() {
         expect(popup.$container.cssMarginY()).toBe(20);
       });
 
-      it('switches to top when overlapping bottom window border with dynamic margins', function() {
+      it('switches to top when overlapping bottom window border with dynamic margins', () => {
         // Don't switch
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           verticalAlignment: Popup.Alignment.BOTTOM,
           $anchor: $anchor,
@@ -813,11 +811,11 @@ describe('Popup', function() {
       });
     });
 
-    describe('with verticalAlign = top', function() {
-      it('switches to bottom when overlapping top window border', function() {
-        var $anchor = $desktop.appendDiv('anchor');
+    describe('with verticalAlign = top', () => {
+      it('switches to bottom when overlapping top window border', () => {
+        let $anchor = $desktop.appendDiv('anchor');
         $anchor.cssTop(70 - 25);
-        var popup = scout.create('Popup', {
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           verticalAlignment: Popup.Alignment.TOP,
           $anchor: $anchor,
@@ -829,10 +827,10 @@ describe('Popup', function() {
         expect(popup.$container.cssHeight()).toBe(50);
       });
 
-      it('switches to top when overlapping bottom window border considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
+      it('switches to top when overlapping bottom window border considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
         $anchor.cssTop(70 - 25);
-        var popup = scout.create('Popup', {
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           verticalAlignment: Popup.Alignment.TOP,
           $anchor: $anchor,
@@ -847,10 +845,10 @@ describe('Popup', function() {
       });
     });
 
-    describe('with verticalAlign = topedge', function() {
-      it('switches to bottomedge when overlapping bottom window border', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('WidgetPopup', {
+    describe('with verticalAlign = topedge', () => {
+      it('switches to bottomedge when overlapping bottom window border', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable',
           verticalAlignment: Popup.Alignment.TOPEDGE,
@@ -869,9 +867,9 @@ describe('Popup', function() {
         expect(popup.$container.cssHeight()).toBe(125);
       });
 
-      it('switches to bottomedge when overlapping bottom window border considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('WidgetPopup', {
+      it('switches to bottomedge when overlapping bottom window border considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
           verticalAlignment: Popup.Alignment.TOPEDGE,
@@ -893,11 +891,11 @@ describe('Popup', function() {
     });
   });
 
-  describe('horizontalSwitch', function() {
-    describe('with horizontalAlign = right', function() {
-      it('switches to left when overlapping right window border', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+  describe('horizontalSwitch', () => {
+    describe('with horizontalAlign = right', () => {
+      it('switches to left when overlapping right window border', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.RIGHT,
           horizontalSwitch: true,
@@ -911,9 +909,9 @@ describe('Popup', function() {
         expect(popup.$container.cssWidth()).toBe(50);
       });
 
-      it('switches to left when overlapping right window border considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+      it('switches to left when overlapping right window border considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
           horizontalAlignment: Popup.Alignment.RIGHT,
@@ -930,11 +928,11 @@ describe('Popup', function() {
       });
     });
 
-    describe('with horizontalAlign = left', function() {
-      it('switches to right when overlapping left window border', function() {
-        var $anchor = $desktop.appendDiv('anchor');
+    describe('with horizontalAlign = left', () => {
+      it('switches to right when overlapping left window border', () => {
+        let $anchor = $desktop.appendDiv('anchor');
         $anchor.cssLeft(70 - 25);
-        var popup = scout.create('Popup', {
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.LEFT,
           horizontalSwitch: true,
@@ -947,10 +945,10 @@ describe('Popup', function() {
         expect(popup.$container.cssWidth()).toBe(50);
       });
 
-      it('switches to right when overlapping left window border considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
+      it('switches to right when overlapping left window border considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
         $anchor.cssLeft(70 - 25);
-        var popup = scout.create('Popup', {
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
           horizontalAlignment: Popup.Alignment.LEFT,
@@ -966,10 +964,10 @@ describe('Popup', function() {
       });
     });
 
-    describe('with horizontalAlign = rightedge', function() {
-      it('switches to rightedge when overlapping right window border', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('WidgetPopup', {
+    describe('with horizontalAlign = rightedge', () => {
+      it('switches to rightedge when overlapping right window border', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable',
           horizontalAlignment: Popup.Alignment.LEFTEDGE,
@@ -988,9 +986,9 @@ describe('Popup', function() {
         expect(popup.$container.cssWidth()).toBe(125);
       });
 
-      it('switches to rightedge when overlapping right window border considering margin', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('WidgetPopup', {
+      it('switches to rightedge when overlapping right window border considering margin', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
           horizontalAlignment: Popup.Alignment.LEFTEDGE,
@@ -1012,11 +1010,11 @@ describe('Popup', function() {
     });
   });
 
-  describe('withArrow', function() {
-    describe('and hAlign LEFT, vAlign CENTER', function() {
-      it('opens popup to the left, arrow points to the right into the center of the anchor', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+  describe('withArrow', () => {
+    describe('and hAlign LEFT, vAlign CENTER', () => {
+      it('opens popup to the left, arrow points to the right into the center of the anchor', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.LEFT,
           verticalAlignment: Popup.Alignment.CENTER,
@@ -1033,10 +1031,10 @@ describe('Popup', function() {
       });
     });
 
-    describe('and hAlign RIGHT, vAlign CENTER', function() {
-      it('opens popup to the right, arrow points to the left into the center of the anchor', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+    describe('and hAlign RIGHT, vAlign CENTER', () => {
+      it('opens popup to the right, arrow points to the left into the center of the anchor', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.RIGHT,
           verticalAlignment: Popup.Alignment.CENTER,
@@ -1053,10 +1051,10 @@ describe('Popup', function() {
       });
     });
 
-    describe('and hAlign CENTER, vAlign TOP', function() {
-      it('opens popup to the top, arrow points to the bottom into the center of the anchor', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+    describe('and hAlign CENTER, vAlign TOP', () => {
+      it('opens popup to the top, arrow points to the bottom into the center of the anchor', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.CENTER,
           verticalAlignment: Popup.Alignment.TOP,
@@ -1073,10 +1071,10 @@ describe('Popup', function() {
       });
     });
 
-    describe('and hAlign CENTER, vAlign BOTTOM', function() {
-      it('opens popup to the bottom, arrow points to the top into the center of the anchor', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var popup = scout.create('Popup', {
+    describe('and hAlign CENTER, vAlign BOTTOM', () => {
+      it('opens popup to the bottom, arrow points to the top into the center of the anchor', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let popup = scout.create('Popup', {
           parent: session.desktop,
           horizontalAlignment: Popup.Alignment.CENTER,
           verticalAlignment: Popup.Alignment.BOTTOM,
@@ -1094,17 +1092,17 @@ describe('Popup', function() {
     });
   });
 
-  describe('open popup delayed/immediately', function() {
+  describe('open popup delayed/immediately', () => {
 
-    it('open popup not until parent is rendered and layouted', function() {
-      var stringField = scout.create('StringField', {
+    it('open popup not until parent is rendered and layouted', () => {
+      let stringField = scout.create('StringField', {
         parent: session.desktop
       });
-      var popup = scout.create('Popup', {
+      let popup = scout.create('Popup', {
         parent: stringField
       });
-      var popupOpen = false;
-      session.desktop.on('popupOpen', function(event) {
+      let popupOpen = false;
+      session.desktop.on('popupOpen', event => {
         popupOpen = true;
       });
       popup.open();
@@ -1118,11 +1116,11 @@ describe('Popup', function() {
       expect(popup.rendered).toBe(true);
     });
 
-    it('open popup immediately when $parent is provided', function() {
-      var stringField = scout.create('StringField', {
+    it('open popup immediately when $parent is provided', () => {
+      let stringField = scout.create('StringField', {
         parent: session.desktop
       });
-      var popup = scout.create('Popup', {
+      let popup = scout.create('Popup', {
         parent: stringField
       });
       stringField.render();

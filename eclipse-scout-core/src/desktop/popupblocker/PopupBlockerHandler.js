@@ -34,7 +34,7 @@ export default class PopupBlockerHandler {
   openWindow(uri, windowName, windowSpecs, onWindowOpened) {
     windowName = windowName || 'scout_' + new Date().getTime();
 
-    var popup = window.open('', windowName, windowSpecs);
+    let popup = window.open('', windowName, windowSpecs);
     if (popup) {
       if (!this.preserveOpener) {
         popup.opener = null;
@@ -50,15 +50,15 @@ export default class PopupBlockerHandler {
       }
     } else {
       $.log.warn('Popup-blocker detected! Show link to open window manually');
-      this.showNotification(function() {
+      this.showNotification(() => {
         this.openWindow(uri, windowName, windowSpecs, onWindowOpened);
-      }.bind(this));
+      });
     }
   }
 
   // Shows a notification when popup-blocker has been detected
   showNotification(vararg) {
-    var notification, linkUrl,
+    let notification, linkUrl,
       desktop = this.session.desktop;
 
     if (typeof vararg === 'string') {

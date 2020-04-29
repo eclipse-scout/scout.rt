@@ -49,7 +49,7 @@ export default class DateColumnUserFilter extends ColumnUserFilter {
    * @override ColumnUserFilter.js
    */
   createFilterAddedEventData() {
-    var data = super.createFilterAddedEventData();
+    let data = super.createFilterAddedEventData();
     data.dateFrom = dates.toJsonDate(this.dateFrom);
     data.dateTo = dates.toJsonDate(this.dateTo);
     return data;
@@ -71,7 +71,7 @@ export default class DateColumnUserFilter extends ColumnUserFilter {
       return false;
     }
 
-    var
+    let
       keyValue = key.valueOf(),
       fromValue = this.dateFrom ? this.dateFrom.valueOf() : null,
       // Shift the toValue to 1ms before midnight/next day. Thus any time of the selected day is accepted.

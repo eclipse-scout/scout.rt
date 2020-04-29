@@ -43,7 +43,7 @@ export default class LogicalGridMatrix {
     if (!this._cursor.increment()) {
       return false;
     }
-    var currentIndex = this._cursor.currentIndex();
+    let currentIndex = this._cursor.currentIndex();
     if (!this._isAllCellFree(currentIndex.x, currentIndex.y, w, h)) {
       if (!this._getAssignedCell(currentIndex)) {
         this._setAssignedCell(currentIndex, new LogicalGridMatrixCell());
@@ -57,18 +57,18 @@ export default class LogicalGridMatrix {
     if (x + w > this._cursor.startX + this._cursor.columnCount || y + h > this._cursor.startY + this._cursor.rowCount) {
       return false;
     }
-    return this._assignedCells.slice(x, x + w).every(function(valX) {
-      return (valX || []).slice(y, y + h).every(function(valY) {
+    return this._assignedCells.slice(x, x + w).every(valX => {
+      return (valX || []).slice(y, y + h).every(valY => {
         return !valY;
       });
     });
   }
 
   toString() {
-    var ret = '----Group Box Grid Matrix [orientation=' + this._cursor.orientation + ', columnCount=' + this.getColumnCount() + ', rowCount=' + this.getRowCount() + ']--------------\n';
-    var tempCursor = new LogicalGridMatrixCursor(0, 0, this.getColumnCount(), this.getRowCount(), this._cursor.orientation);
+    let ret = '----Group Box Grid Matrix [orientation=' + this._cursor.orientation + ', columnCount=' + this.getColumnCount() + ', rowCount=' + this.getRowCount() + ']--------------\n';
+    let tempCursor = new LogicalGridMatrixCursor(0, 0, this.getColumnCount(), this.getRowCount(), this._cursor.orientation);
     while (tempCursor.increment()) {
-      var cell = this._getAssignedCell(tempCursor.currentIndex());
+      let cell = this._getAssignedCell(tempCursor.currentIndex());
       ret += 'cell[' + tempCursor.currentIndex().x + ', ' + tempCursor.currentIndex().y + '] ';
       if (!cell) {
         ret += 'NULL';

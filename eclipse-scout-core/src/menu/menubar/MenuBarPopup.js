@@ -76,7 +76,7 @@ export default class MenuBarPopup extends ContextMenuPopup {
   }
 
   _onParentMenuPropertyChange(event) {
-    this.session.layoutValidator.schedulePostValidateFunction(function() {
+    this.session.layoutValidator.schedulePostValidateFunction(() => {
       // Because this post layout validation function is executed asynchronously,
       // we have to check again if the popup is still rendered.
       if (!this.rendered) {
@@ -84,6 +84,6 @@ export default class MenuBarPopup extends ContextMenuPopup {
       }
       this.rerenderHead();
       this.position();
-    }.bind(this));
+    });
   }
 }

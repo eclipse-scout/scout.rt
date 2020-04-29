@@ -22,7 +22,7 @@ export default class TableFooterLayout extends AbstractLayout {
    * @override
    */
   layout($container) {
-    var contentFits, controlsWidth, infoWidth,
+    let contentFits, controlsWidth, infoWidth,
       $controls = this._tableFooter._$controls,
       $info = this._tableFooter._$info,
       $infoItems = $info.find('.table-info-item'),
@@ -33,7 +33,7 @@ export default class TableFooterLayout extends AbstractLayout {
 
     // Remove width to make sure elements are as width as they want to be
     $infoItems.each(function() {
-      var $item = $(this);
+      let $item = $(this);
       // Do not touch items which are being hidden to make sure they can properly animate width to 0
       if ($item.isVisible() && !$item.data('hiding')) {
         $item.data('oldWidth', $item.outerWidth());
@@ -70,7 +70,7 @@ export default class TableFooterLayout extends AbstractLayout {
     }
 
     // don't animate on the first layouting -> only animate on user interactions
-    var animated = this._tableFooter.htmlComp.layouted;
+    let animated = this._tableFooter.htmlComp.layouted;
     this._setInfoItemsSize($infoItems, animated);
 
     if (this._tableFooter._tableStatusTooltip && this._tableFooter._tableStatusTooltip.rendered) {
@@ -81,17 +81,17 @@ export default class TableFooterLayout extends AbstractLayout {
     }
 
     // Let table controls update their content according to the new footer size
-    this._tableFooter.table.tableControls.forEach(function(control) {
+    this._tableFooter.table.tableControls.forEach(control => {
       control.revalidateLayout();
     });
   }
 
   _setInfoItemsSize($infoItems, animated) {
     $infoItems.each(function() {
-      var $item = $(this);
+      let $item = $(this);
       if ($item.isVisible() && !$item.data('hiding')) {
         // Make sure complete function of already scheduled animation will be executed
-        var existingComplete = $item.data('animationComplete');
+        let existingComplete = $item.data('animationComplete');
         if (animated) {
           $item.stop().cssWidthAnimated($item.data('oldWidth'), $item.outerWidth(), {
             complete: existingComplete

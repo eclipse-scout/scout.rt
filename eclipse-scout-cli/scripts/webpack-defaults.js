@@ -15,6 +15,7 @@ const AfterEmitWebpackPlugin = require('./AfterEmitWebpackPlugin');
 
 const path = require('path');
 const scoutBuildConstants = require('./constants');
+const webpack = require('webpack');
 
 /**
  * @param args.mode {string} development or production
@@ -44,9 +45,9 @@ module.exports = (env, args) => {
    * @param info.resourcePath
    */
   function prodDevtoolModuleFilenameTemplate(info) {
-    var path = info.resourcePath || '';
+    let path = info.resourcePath || '';
     // Search for the last /src/ in the path and return the fragment starting from its parent
-    var result = path.match(/.*\/(.*\/src\/.*)/);
+    let result = path.match(/.*\/(.*\/src\/.*)/);
     if (result) {
       return result[1];
     }
@@ -72,9 +73,12 @@ module.exports = (env, args) => {
   const config = {
     target: 'web',
     mode: args.mode,
+    // In dev mode 'inline-source-map' is used (devtool is false because we use SourceMapDevToolPlugin)
+    // Other source map types may increase build performance but decrease debugging experience
+    // (e.g. wrong this in arrow functions with inline-cheap-module-source-map or not having original source code at all (code after babel transpilation instead of before) with eval types).
     // In production mode create external source maps without source code to map stack traces.
     // Otherwise stack traces would point to the minified source code which makes it quite impossible to analyze productive issues.
-    devtool: devMode ? 'inline-cheap-module-source-map' : 'nosources-source-map',
+    devtool: devMode ? false : 'nosources-source-map',
     output: {
       filename: jsFilename,
       path: outDir,
@@ -132,8 +136,7 @@ module.exports = (env, args) => {
             cacheCompression: false,
             plugins: [
               require.resolve('@babel/plugin-transform-object-assign'),
-              require.resolve('@babel/plugin-proposal-class-properties'),
-              require.resolve('@babel/plugin-proposal-object-rest-spread')],
+              require.resolve('@babel/plugin-proposal-class-properties')],
             presets: [
               [require.resolve('@babel/preset-env'), {
                 debug: false,
@@ -193,7 +196,7 @@ module.exports = (env, args) => {
             /**
              * @param module.nameForCondition
              */
-            test: function(module) {
+            test: module => {
               if (!module.nameForCondition) {
                 return false; // raw or external modules do not have the method
               }
@@ -249,6 +252,13 @@ module.exports = (env, args) => {
   if (nvl(args.clean, true)) {
     // see: https://webpack.js.org/guides/output-management/#cleaning-up-the-dist-folder
     config.plugins.push(new CleanWebpackPlugin());
+  }
+
+  if (devMode) {
+    // Generating source maps for vendors.js may take some time and is not necessary
+    config.plugins.push(new webpack.SourceMapDevToolPlugin({
+      exclude: ['vendors.js', 'jquery.js']
+    }));
   }
 
   return config;

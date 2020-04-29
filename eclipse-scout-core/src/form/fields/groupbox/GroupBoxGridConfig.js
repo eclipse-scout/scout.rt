@@ -21,7 +21,7 @@ export default class GroupBoxGridConfig extends LogicalGridConfig {
   }
 
   getGridColumnCount() {
-    var gridColumns = -1,
+    let gridColumns = -1,
       widget = this.widget;
 
     do {

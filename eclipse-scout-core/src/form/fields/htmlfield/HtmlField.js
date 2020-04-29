@@ -104,9 +104,9 @@ export default class HtmlField extends ValueField {
       this.session.layoutValidator.schedulePostValidateFunction(this._renderScrollToAnchor.bind(this));
       return;
     }
-    var anchor = this.scrollToAnchor;
+    let anchor = this.scrollToAnchor;
     if (this.scrollBarEnabled && anchor && this.$field.find(anchor)) {
-      var anchorElem = this.$field.find('#'.concat(anchor));
+      let anchorElem = this.$field.find('#'.concat(anchor));
       if (anchorElem && anchorElem.length > 0) {
         scrollbars.scrollTo(this.$field, anchorElem);
       }
@@ -114,8 +114,8 @@ export default class HtmlField extends ValueField {
   }
 
   _onAppLinkAction(event) {
-    var $target = $(event.delegateTarget);
-    var ref = $target.data('ref');
+    let $target = $(event.delegateTarget);
+    let ref = $target.data('ref');
     this.triggerAppLinkAction(ref);
   }
 

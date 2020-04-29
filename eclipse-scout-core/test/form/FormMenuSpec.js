@@ -12,10 +12,10 @@ import {FormSpecHelper} from '@eclipse-scout/testing';
 import {FormMenu, menus, scout} from '../../src/index';
 
 /* global linkWidgetAndAdapter */
-describe('FormMenu', function() {
-  var session, desktop, helper;
+describe('FormMenu', () => {
+  let session, desktop, helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
@@ -23,7 +23,7 @@ describe('FormMenu', function() {
   });
 
   function createMenu(modelProperties) {
-    var menu = helper.createField('FormMenu', desktop, modelProperties);
+    let menu = helper.createField('FormMenu', desktop, modelProperties);
     menu.form = helper.createFormWithOneField();
     menu.desktop = desktop;
     return menu;
@@ -33,10 +33,10 @@ describe('FormMenu', function() {
     return $('.popup');
   }
 
-  describe('setSelected', function() {
+  describe('setSelected', () => {
 
-    it('opens and closes the form popup', function() {
-      var menu = createMenu();
+    it('opens and closes the form popup', () => {
+      let menu = createMenu();
       menu.render();
       expect(findPopup()).not.toExist();
 
@@ -47,13 +47,13 @@ describe('FormMenu', function() {
       expect(findPopup()).not.toExist();
     });
 
-    it('opens the popup and the ellipsis if the menu is overflown', function() {
-      var ellipsisMenu = menus.createEllipsisMenu({
+    it('opens the popup and the ellipsis if the menu is overflown', () => {
+      let ellipsisMenu = menus.createEllipsisMenu({
         parent: session.desktop
       });
       ellipsisMenu.render();
 
-      var menu = createMenu();
+      let menu = createMenu();
       menu.render();
 
       menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
@@ -70,13 +70,13 @@ describe('FormMenu', function() {
       ellipsisMenu.setSelected(false);
     });
 
-    it('opens the popup but not the ellipsis if the menu is overflown and mobile popup style is used', function() {
-      var ellipsisMenu = menus.createEllipsisMenu({
+    it('opens the popup but not the ellipsis if the menu is overflown and mobile popup style is used', () => {
+      let ellipsisMenu = menus.createEllipsisMenu({
         parent: session.desktop
       });
       ellipsisMenu.render();
 
-      var menu = createMenu({popupStyle: FormMenu.PopupStyle.MOBILE});
+      let menu = createMenu({popupStyle: FormMenu.PopupStyle.MOBILE});
       menu.render();
 
       menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
@@ -94,10 +94,10 @@ describe('FormMenu', function() {
 
   });
 
-  describe('detach', function() {
-    it('does not fail if a parent is detached', function() {
-      var menuBar = scout.create('MenuBar', {parent: session.desktop});
-      var menu = createMenu();
+  describe('detach', () => {
+    it('does not fail if a parent is detached', () => {
+      let menuBar = scout.create('MenuBar', {parent: session.desktop});
+      let menu = createMenu();
       // Link menu with the menu bar
       menuBar.setMenuItems([menu]);
       menuBar.render();
@@ -111,19 +111,19 @@ describe('FormMenu', function() {
     });
   });
 
-  describe('onModelPropertyChange', function() {
+  describe('onModelPropertyChange', () => {
 
-    describe('selected', function() {
+    describe('selected', () => {
 
-      it('calls setSelected', function() {
-        var menu = createMenu();
+      it('calls setSelected', () => {
+        let menu = createMenu();
         linkWidgetAndAdapter(menu, 'MenuAdapter');
         menu.render();
         expect(findPopup()).not.toExist();
 
         spyOn(menu, 'setSelected');
 
-        var event = createPropertyChangeEvent(menu, {
+        let event = createPropertyChangeEvent(menu, {
           'selected': true
         });
         menu.modelAdapter.onModelPropertyChange(event);

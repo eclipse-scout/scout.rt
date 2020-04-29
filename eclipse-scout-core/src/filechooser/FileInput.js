@@ -28,7 +28,7 @@ export default class FileInput extends Widget {
   _init(model) {
     super._init(model);
     this.uploadController = model.uploadController || model.parent;
-    var url = new URL(model.legacyFileUploadUrl || 'upload/' + this.session.uiSessionId + '/' + this.uploadController.id);
+    let url = new URL(model.legacyFileUploadUrl || 'upload/' + this.session.uiSessionId + '/' + this.uploadController.id);
     url.setParameter('legacy', true);
     this.legacyFileUploadUrl = url.toString();
     this.legacy = !Device.get().supportsFile();
@@ -76,21 +76,21 @@ export default class FileInput extends Widget {
   _renderLegacyMode() {
     this.$legacyFormTarget = this.$fileInput.appendElement('<iframe>')
       .attr('name', 'legacyFileUpload' + this.uploadController.id)
-      .on('load', function() {
+      .on('load', () => {
         // Manually handle JSON response from iframe
         try {
           // "onAjaxDone"
-          var text = this.$legacyFormTarget.contents().text();
+          let text = this.$legacyFormTarget.contents().text();
           if (strings.hasText(text)) {
             // Manually handle JSON response
-            var json = $.parseJSON(text);
+            let json = $.parseJSON(text);
             this.session.responseQueue.process(json);
           }
         } finally {
           // "onAjaxAlways"
           this.session.setBusy(false);
         }
-      }.bind(this));
+      });
     this.$fileInput
       .attr('name', 'file')
       .addClass('legacy-upload-file-input');
@@ -128,7 +128,7 @@ export default class FileInput extends Widget {
     if (this.legacy) {
       return;
     }
-    var text = this.text || '';
+    let text = this.text || '';
     this.$text.text(text);
   }
 
@@ -137,7 +137,7 @@ export default class FileInput extends Widget {
   }
 
   _renderAcceptTypes() {
-    var acceptTypes = this.acceptTypes || '';
+    let acceptTypes = this.acceptTypes || '';
     this.$fileInput.attr('accept', acceptTypes);
   }
 
@@ -171,7 +171,7 @@ export default class FileInput extends Widget {
     if (arrays.equals(this.files, files)) {
       return;
     }
-    var name = '';
+    let name = '';
     if (files.length > 0) {
       if (this.legacy) {
         name = files[0];
@@ -204,7 +204,7 @@ export default class FileInput extends Widget {
   }
 
   _onFileChange(event) {
-    var files = [];
+    let files = [];
 
     if (!this.legacy) {
       files = this.$fileInput[0].files;
@@ -234,7 +234,7 @@ export default class FileInput extends Widget {
       event.stopPropagation();
       event.preventDefault();
 
-      var files = event.originalEvent.dataTransfer.files;
+      let files = event.originalEvent.dataTransfer.files;
       if (files.length >= 1) {
         this._setFiles(files);
       }
@@ -242,7 +242,7 @@ export default class FileInput extends Widget {
   }
 
   static fileListToArray(fileList) {
-    var files = [],
+    let files = [],
       i;
     for (i = 0; i < fileList.length; i++) {
       files.push(fileList[i]);
@@ -256,7 +256,7 @@ export default class FileInput extends Widget {
       return;
     }
 
-    var totalSize = files.reduce(function(total, file) {
+    let totalSize = files.reduce((total, file) => {
       return total + file.size;
     }, 0);
 

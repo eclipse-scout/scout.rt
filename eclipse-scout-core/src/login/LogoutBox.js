@@ -18,12 +18,12 @@ export default class LogoutBox extends Box {
   }
 
   init(opts) {
-    var defaultOpts = {
+    let defaultOpts = {
       loginUrl: webstorage.getItem(sessionStorage, 'scout:loginUrl') || './',
       logoUrl: 'logo.png'
     };
     this.options = $.extend({}, defaultOpts, opts);
-    var defaultTexts = {
+    let defaultTexts = {
       'ui.LogoutSuccessful': 'Good bye!',
       'ui.LoginAgain': 'Login again'
     };

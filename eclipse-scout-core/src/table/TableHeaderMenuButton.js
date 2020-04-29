@@ -43,7 +43,7 @@ export default class TableHeaderMenuButton extends Action {
 
   // Show 'remove' text when button is already selected
   _onMouseOver() {
-    var text = this.selected ?
+    let text = this.selected ?
       this.session.text('ui.remove') : this.text;
     this.parent.appendText(text);
   }

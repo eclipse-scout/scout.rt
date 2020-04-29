@@ -26,6 +26,7 @@ import $ from 'jquery';
 
 export default class SplitBox extends CompositeField {
 
+  // noinspection DuplicatedCode
   constructor() {
     super();
     this._addWidgetProperties(['firstField', 'secondField', 'collapsibleField']);
@@ -34,6 +35,7 @@ export default class SplitBox extends CompositeField {
     this.firstField = null;
     this.secondField = null;
     this.collapsibleField = null;
+    this.collapseKeyStroke = null;
     this.fieldCollapsed = false;
     this.toggleCollapseKeyStroke = null;
     this.firstCollapseKeyStroke = null;
@@ -68,7 +70,7 @@ export default class SplitBox extends CompositeField {
    * Set the group boxes of the split box to responsive if not set otherwise.
    */
   _initResponsive() {
-    this.getFields().forEach(function(field) {
+    this.getFields().forEach(field => {
       if (field instanceof GroupBox && field.responsive === null) {
         field.setResponsive(true);
       }
@@ -115,9 +117,10 @@ export default class SplitBox extends CompositeField {
       if (event.which !== 1) {
         return; // only handle left mouse button
       }
+      let mousePosition, splitAreaPosition, splitAreaSize, splitterSize, splitterPosition, $tempSplitter;
       if (this.splitterEnabled) {
         // Update mouse position (see resizeMove() for details)
-        var mousePosition = {
+        mousePosition = {
           x: event.pageX,
           y: event.pageY
         };
@@ -131,13 +134,13 @@ export default class SplitBox extends CompositeField {
         $('iframe').addClass('dragging-in-progress');
 
         // Get initial area and splitter bounds
-        var splitAreaPosition = this._$splitArea.offset();
-        var splitAreaSize = graphics.size(this._$splitArea, true);
-        var splitterPosition = this._$splitter.offset();
-        var splitterSize = graphics.size(this._$splitter, true);
+        splitAreaPosition = this._$splitArea.offset();
+        splitAreaSize = graphics.size(this._$splitArea, true);
+        splitterPosition = this._$splitter.offset();
+        splitterSize = graphics.size(this._$splitter, true);
 
         // Create temporary splitter
-        var $tempSplitter = this._$splitArea.appendDiv('temp-splitter')
+        $tempSplitter = this._$splitArea.appendDiv('temp-splitter')
           .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis');
         if (this.splitHorizontal) { // "|"
           $tempSplitter.cssLeft(splitterPosition.left - splitAreaPosition.left);
@@ -147,8 +150,8 @@ export default class SplitBox extends CompositeField {
         this._$splitter.addClass('dragging');
       }
 
-      var newSplitterPosition = this.splitterPosition;
-      var SNAP_SIZE = 10;
+      let newSplitterPosition = this.splitterPosition;
+      let SNAP_SIZE = 10;
 
       function resizeMove(event) {
         if (event.pageX === mousePosition.x && event.pageY === mousePosition.y) {
@@ -163,14 +166,14 @@ export default class SplitBox extends CompositeField {
 
         if (this.splitHorizontal) { // "|"
           // Calculate target splitter position (in area)
-          var targetSplitterPositionLeft = event.pageX - splitAreaPosition.left;
+          let targetSplitterPositionLeft = event.pageX - splitAreaPosition.left;
 
           // De-normalize minimum splitter position to allowed splitter range in pixel [minSplitterPositionLeft, maxSplitterPositionLeft]
-          var minSplitterPositionLeft;
-          var maxSplitterPositionLeft;
+          let minSplitterPositionLeft;
+          let maxSplitterPositionLeft;
 
           // Splitter width plus margin on right side, if temporary splitter position is x, the splitter div position is x-splitterOffset
-          var splitterOffset = Math.floor((splitterSize.width + HtmlEnvironment.get().fieldMandatoryIndicatorWidth) / 2);
+          let splitterOffset = Math.floor((splitterSize.width + HtmlEnvironment.get().fieldMandatoryIndicatorWidth) / 2);
 
           if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST) {
             minSplitterPositionLeft = scout.nvl(this.minSplitterPosition, 0);
@@ -191,7 +194,7 @@ export default class SplitBox extends CompositeField {
           }
 
           // Snap to begin and end
-          var tempSplitterOffsetX = splitterOffset;
+          let tempSplitterOffsetX = splitterOffset;
 
           if (targetSplitterPositionLeft < (minSplitterPositionLeft + splitterOffset + SNAP_SIZE)) { // snap left if minimum position is reached (+ snap range)
             targetSplitterPositionLeft = minSplitterPositionLeft; // set splitter directly to left minimal bound
@@ -214,10 +217,10 @@ export default class SplitBox extends CompositeField {
           }
         } else { // "--"
           // Calculate target splitter position (in area)
-          var targetSplitterPositionTop = event.pageY - splitAreaPosition.top;
+          let targetSplitterPositionTop = event.pageY - splitAreaPosition.top;
 
           // Snap to begin and end
-          var tempSplitterOffsetY = Math.floor(splitterSize.height / 2);
+          let tempSplitterOffsetY = Math.floor(splitterSize.height / 2);
           if (targetSplitterPositionTop < SNAP_SIZE) {
             targetSplitterPositionTop = 0;
             tempSplitterOffsetY = 0;
@@ -311,7 +314,7 @@ export default class SplitBox extends CompositeField {
     if (this._oldSplitterPositionType) {
       // splitterPositionType changed while the split box was rendered --> convert splitterPosition
       // to the target type such that the current position in screen does not change.
-      var splitAreaSize = this.htmlSplitArea.size(),
+      let splitAreaSize = this.htmlSplitArea.size(),
         splitterPosition = this.splitterPosition,
         splitterSize = graphics.size(this._$splitter, true),
         minSplitterPosition = this.minSplitterPosition,
@@ -323,10 +326,10 @@ export default class SplitBox extends CompositeField {
       }
 
       // Convert value depending on the old and new type system
-      var oldIsRelative = this._isSplitterPositionTypeRelative(this._oldSplitterPositionType);
-      var newIsRelative = this._isSplitterPositionTypeRelative(this.splitterPositionType);
-      var oldIsAbsolute = !oldIsRelative;
-      var newIsAbsolute = !newIsRelative;
+      let oldIsRelative = this._isSplitterPositionTypeRelative(this._oldSplitterPositionType);
+      let newIsRelative = this._isSplitterPositionTypeRelative(this.splitterPositionType);
+      let oldIsAbsolute = !oldIsRelative;
+      let newIsAbsolute = !newIsRelative;
       if (oldIsRelative && newIsAbsolute) {
         // From relative to absolute
         if ((this._oldSplitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST && this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) ||
@@ -405,7 +408,7 @@ export default class SplitBox extends CompositeField {
     }
 
     if (this.collapsibleField) {
-      var horizontalAlignment = CollapseHandle.HorizontalAlignment.LEFT;
+      let horizontalAlignment = CollapseHandle.HorizontalAlignment.LEFT;
       if (this.collapsibleField !== this.firstField) {
         horizontalAlignment = CollapseHandle.HorizontalAlignment.RIGHT;
       }
@@ -447,7 +450,7 @@ export default class SplitBox extends CompositeField {
     if (!this._collapseHandle) {
       return;
     }
-    var leftVisible, rightVisible,
+    let leftVisible, rightVisible,
       collapsed = this.fieldCollapsed,
       minimized = this.fieldMinimized,
       minimizable = this._isMinimizable(),
@@ -632,7 +635,7 @@ export default class SplitBox extends CompositeField {
     }
 
     // Set new value (send to server if changed
-    var positionChanged = (this.splitterPosition !== newSplitterPosition);
+    let positionChanged = (this.splitterPosition !== newSplitterPosition);
     this.splitterPosition = newSplitterPosition;
 
     if (positionChanged) {
@@ -671,7 +674,7 @@ export default class SplitBox extends CompositeField {
   }
 
   collapseHandleButtonPressed(event) {
-    var collapsed = this.fieldCollapsed,
+    let collapsed = this.fieldCollapsed,
       minimized = this.fieldMinimized,
       minimizable = this._isMinimizable(),
       positionTypeFirstField = ((this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)),
@@ -726,7 +729,7 @@ export default class SplitBox extends CompositeField {
    * @override CompositeField.js
    */
   getFields() {
-    var fields = [];
+    let fields = [];
     if (this.firstField) {
       fields.push(this.firstField);
     }
@@ -740,10 +743,10 @@ export default class SplitBox extends CompositeField {
     if (!this.rendered && !this.rendering) {
       return;
     }
-    var hasFirstField = (this.firstField && this.firstField.isVisible());
-    var hasSecondField = (this.secondField && this.secondField.isVisible());
-    var hasTwoFields = hasFirstField && hasSecondField;
-    var hasOneField = !hasTwoFields && (hasFirstField || hasSecondField);
+    let hasFirstField = (this.firstField && this.firstField.isVisible());
+    let hasSecondField = (this.secondField && this.secondField.isVisible());
+    let hasTwoFields = hasFirstField && hasSecondField;
+    let hasOneField = !hasTwoFields && (hasFirstField || hasSecondField);
 
     // Mark container if only one field is visible (i.e. there is no splitter)
     this.$container.toggleClass('single-field', hasOneField);

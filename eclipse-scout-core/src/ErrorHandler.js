@@ -39,12 +39,12 @@ export default class ErrorHandler {
     try {
       if (error instanceof Error) {
         this.handle(error)
-          .catch(function(error) {
+          .catch(error => {
             console.error('Error in global JavaScript error handler', error);
           });
       } else {
-        var code = 'J00';
-        var log = errorMessage + ' at ' + fileName + ':' + lineNumber + '\n(' + 'Code ' + code + ')';
+        let code = 'J00';
+        let log = errorMessage + ' at ' + fileName + ':' + lineNumber + '\n(' + 'Code ' + code + ')';
         this.handleErrorInfo({
           code: code,
           message: errorMessage,
@@ -66,14 +66,21 @@ export default class ErrorHandler {
    *   2. $.get().fail(function(jqXHR, textStatus, errorThrown) { handler.handle(jqXHR, textStatus, errorThrown); }
    *   3. $.get().fail(function(jqXHR, textStatus, errorThrown) { handler.handle(arguments); } // <-- recommended
    *
+   * @param {object|arguments|[]} error or array or array-like object containing the error and other arguments
    * @return {Promise} the analyzed errorInfo
    */
-  handle() {
-    var args = arguments;
-    if (args.length === 1 && args[0] && (String(args[0]) === '[object Arguments]' || Array.isArray(args[0]))) {
-      args = args[0];
+  handle(errorOrArgs, ...args) {
+    let error = errorOrArgs;
+    if (errorOrArgs && args.length === 0) {
+      if ((String(errorOrArgs) === '[object Arguments]')) {
+        error = errorOrArgs[0];
+        args = [...errorOrArgs].slice(1);
+      } else if (Array.isArray(errorOrArgs)) {
+        error = errorOrArgs[0];
+        args = errorOrArgs.slice(1);
+      }
     }
-    return this.analyzeError.apply(this, args)
+    return this.analyzeError(error, ...args)
       .then(this.handleErrorInfo.bind(this));
   }
 
@@ -86,7 +93,7 @@ export default class ErrorHandler {
    * @returns {Promise}
    */
   analyzeError(error, ...args) {
-    var errorInfo = {
+    let errorInfo = {
       code: null,
       message: null,
       stack: null,
@@ -100,20 +107,20 @@ export default class ErrorHandler {
   }
 
   _analyzeError(errorInfo, ...args) {
-    var error = errorInfo.error;
+    let error = errorInfo.error;
     // 1. Regular errors
     if (error instanceof Error) {
       // Map stack first before analyzing the error
       return this.mapStack(error.stack)
-        .catch(function(result) {
+        .catch(result => {
           errorInfo.mappingError = result.message + '\n' + result.error.message + '\n' + result.error.stack;
           return null;
         })
-        .then(function(mappedStack) {
+        .then(mappedStack => {
           errorInfo.mappedStack = mappedStack;
           this._analyzeRegularError(errorInfo);
           return errorInfo;
-        }.bind(this));
+        });
     }
 
     // 2. Ajax errors
@@ -134,7 +141,7 @@ export default class ErrorHandler {
   }
 
   _analyzeRegularError(errorInfo) {
-    var error = errorInfo.error;
+    let error = errorInfo.error;
     errorInfo.code = this.getJsErrorCode(error);
     errorInfo.message = String(error.message || error);
     if (error.stack) {
@@ -143,8 +150,8 @@ export default class ErrorHandler {
     if (error.debugInfo) { // scout extension
       errorInfo.debugInfo = error.debugInfo;
     }
-    var stack = errorInfo.mappedStack || errorInfo.stack;
-    var log = [];
+    let stack = errorInfo.mappedStack || errorInfo.stack;
+    let log = [];
     if (!stack || stack.indexOf(errorInfo.message === -1)) {
       // Only log message if not already included in stack
       log.push(errorInfo.message);
@@ -163,8 +170,8 @@ export default class ErrorHandler {
   }
 
   _analyzeAjaxError(errorInfo, ...args) {
-    var error = errorInfo.error;
-    var jqXHR, errorThrown, requestOptions;
+    let error = errorInfo.error;
+    let jqXHR, errorThrown, requestOptions;
     if (error instanceof AjaxError) {
       // Scout Ajax Error
       jqXHR = error.jqXHR;
@@ -179,8 +186,8 @@ export default class ErrorHandler {
       requestOptions = args[3]; // scout extension
     }
 
-    var ajaxRequest = (requestOptions ? strings.join(' ', requestOptions.type, requestOptions.url) : '');
-    var ajaxStatus = (jqXHR.status ? strings.join(' ', jqXHR.status, errorThrown) : 'Connection error');
+    let ajaxRequest = (requestOptions ? strings.join(' ', requestOptions.type, requestOptions.url) : '');
+    let ajaxStatus = (jqXHR.status ? strings.join(' ', jqXHR.status, errorThrown) : 'Connection error');
 
     errorInfo.code = 'X' + (jqXHR.status || '0');
     errorInfo.message = 'AJAX call' + strings.box(' "', ajaxRequest, '"') + ' failed' + strings.box(' [', ajaxStatus, ']');
@@ -192,9 +199,9 @@ export default class ErrorHandler {
   }
 
   _analyzeOtherError(errorInfo) {
-    var error = errorInfo.error;
+    let error = errorInfo.error;
     // Everything else (e.g. when strings are thrown)
-    var s = (typeof error === 'string' || typeof error === 'number') ? String(error) : null;
+    let s = (typeof error === 'string' || typeof error === 'number') ? String(error) : null;
     errorInfo.code = 'P4';
     errorInfo.message = s || 'Unexpected error';
     if (!s) {
@@ -214,9 +221,9 @@ export default class ErrorHandler {
   }
 
   mapStack(stack) {
-    var deferred = $.Deferred();
+    let deferred = $.Deferred();
     try {
-      sourcemappedStacktrace.mapStackTrace(stack, function(mappedStack) {
+      sourcemappedStacktrace.mapStackTrace(stack, mappedStack => {
         deferred.resolve(arrays.format(mappedStack, '\n'));
       });
     } catch (e) {
@@ -238,7 +245,7 @@ export default class ErrorHandler {
 
       // Note: when the null-logger is active it has already written the error to the console
       // when the $.log.error function has been called above, so we don't have to log again here.
-      var writeToConsole = ErrorHandler.CONSOLE_OUTPUT;
+      let writeToConsole = ErrorHandler.CONSOLE_OUTPUT;
       if ($.log instanceof NullLogger) {
         writeToConsole = false;
       }
@@ -255,7 +262,7 @@ export default class ErrorHandler {
     // We simply use the first scout session to display the message box and log the error. This is not ideal in the
     // multi-session-case (portlet), but currently there is no other way. Besides, this feature is not in use yet.
     if (App.get().sessions.length > 0) {
-      var session = App.get().sessions[0];
+      let session = App.get().sessions[0];
       if (this.displayError) {
         this._showMessageBox(session, errorInfo.message, errorInfo.code, errorInfo.log);
       }
@@ -300,7 +307,7 @@ export default class ErrorHandler {
   }
 
   _showMessageBox(session, errorMessage, errorCode, logMessage) {
-    var options = {
+    let options = {
       header: session.optText('ui.UnexpectedProblem', 'Internal UI Error'),
       body: strings.join('\n\n',
         session.optText('ui.InternalUiErrorMsg', errorMessage, ' (' + session.optText('ui.ErrorCodeX', 'Code ' + errorCode, errorCode) + ')'),

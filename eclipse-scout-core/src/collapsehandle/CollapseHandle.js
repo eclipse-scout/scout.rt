@@ -71,7 +71,7 @@ export default class CollapseHandle extends Widget {
   }
 
   _updateVisibilityClasses() {
-    var bothVisible = this.leftVisible && this.rightVisible;
+    let bothVisible = this.leftVisible && this.rightVisible;
     this.$container.toggleClass('both-visible', bothVisible);
     this.$left.toggleClass('both-visible', bothVisible);
     this.$right.toggleClass('both-visible', bothVisible);
@@ -91,7 +91,7 @@ export default class CollapseHandle extends Widget {
   }
 
   _onMouseDown(event) {
-    var target = event.target;
+    let target = event.target;
     if (this.$left.isOrHas(target)) {
       this.trigger('action', {
         left: true

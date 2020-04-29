@@ -11,10 +11,10 @@
 import {Action, Button, ButtonAdapterMenu, Dimension, GroupBoxMenuItemsOrder, HtmlComponent, MenuBar, MenuItemsOrder, menus, scout} from '../../src/index';
 import {MenuSpecHelper} from '@eclipse-scout/testing';
 
-describe('MenuBar', function() {
-  var helper, session;
+describe('MenuBar', () => {
+  let helper, session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new MenuSpecHelper(session);
@@ -39,10 +39,10 @@ describe('MenuBar', function() {
     });
   }
 
-  describe('setMenuItems', function() {
+  describe('setMenuItems', () => {
 
-    it('prefers EmptySpace for the left position if menu has multiple menuTypes', function() {
-      var menu1 = helper.createMenu(helper.createModel('multi')),
+    it('prefers EmptySpace for the left position if menu has multiple menuTypes', () => {
+      let menu1 = helper.createMenu(helper.createModel('multi')),
         menu2 = helper.createMenu(helper.createModel('selection')),
         menuBar = createMenuBar(),
         menus = [menu2, menu1];
@@ -55,16 +55,16 @@ describe('MenuBar', function() {
 
       expect(menuBar.orderedMenuItems.all.length).toBe(4); // 2 + separator + ellipsis
       expect(menuBar.orderedMenuItems.all[0]).toBe(menu1);
-      expect(menuBar.orderedMenuItems.all.map(function(mi) {
+      expect(menuBar.orderedMenuItems.all.map(mi => {
         return mi.separator;
       })).toEqual([false, true, false, false]);
-      expect(menuBar.orderedMenuItems.all.map(function(mi) {
+      expect(menuBar.orderedMenuItems.all.map(mi => {
         return mi.ellipsis;
       })).toEqual([undefined, undefined, undefined, true]);
     });
 
-    it('must add/destroy dynamically created separators', function() {
-      var separator,
+    it('must add/destroy dynamically created separators', () => {
+      let separator,
         menu1 = helper.createMenu(createModel('empty')),
         menu2 = helper.createMenu(createModel('selection-1', null, ['Table.SingleSelection'])),
         menu3 = helper.createMenu(createModel('selection-2', null, ['Table.SingleSelection'])),
@@ -88,12 +88,12 @@ describe('MenuBar', function() {
       expect(separator.id).not.toBe(menuBar.orderedMenuItems.all[1].id);
     });
 
-    it('renders menu bar invisible if no visible menu items are available', function() {
-      var modelMenu1 = createModel('foo');
-      var modelMenu2 = createModel('bar');
+    it('renders menu bar invisible if no visible menu items are available', () => {
+      let modelMenu1 = createModel('foo');
+      let modelMenu2 = createModel('bar');
       modelMenu2.keyStroke = 'enter';
 
-      var menu1 = helper.createMenu(modelMenu1),
+      let menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
         menuBar = createMenuBar(),
         menus = [menu1, menu2];
@@ -110,12 +110,12 @@ describe('MenuBar', function() {
       expect(menuBar.$container.isVisible()).toBe(false);
     });
 
-    it('renders menu bar visible if at least one visible menu item is available', function() {
-      var modelMenu1 = createModel('foo');
-      var modelMenu2 = createModel('bar');
+    it('renders menu bar visible if at least one visible menu item is available', () => {
+      let modelMenu1 = createModel('foo');
+      let modelMenu2 = createModel('bar');
       modelMenu2.keyStroke = 'enter';
 
-      var menu1 = helper.createMenu(modelMenu1),
+      let menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
         menuBar = createMenuBar(),
         menus = [menu1, menu2];
@@ -132,29 +132,29 @@ describe('MenuBar', function() {
       expect(menuBar.$container.isVisible()).toBe(true);
     });
 
-    it('hides unnecessary explicit separator menus', function() {
-      var menuModel = helper.createModel();
+    it('hides unnecessary explicit separator menus', () => {
+      let menuModel = helper.createModel();
       menuModel.menuTypes = ['Table.EmptySpace'];
 
-      var sep1a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep1a', separator: true}));
-      var sep1b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep1b', separator: true}));
-      var menu1 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu1', text: 'Menu 1 (L)'}));
-      var sep12a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep12a', separator: true}));
-      var sep12b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep12b', separator: true, menuTypes: ['Table.SingleSelection']})); // <-- will generate an additional artificial separator menu
-      var menu2 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu2', text: 'Menu 2 (L)', menuTypes: ['Table.SingleSelection']}));
-      var sep2a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep2a', separator: true, menuTypes: ['Table.SingleSelection']}));
-      var sep2b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep2b', separator: true, menuTypes: ['Table.SingleSelection']}));
+      let sep1a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep1a', separator: true}));
+      let sep1b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep1b', separator: true}));
+      let menu1 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu1', text: 'Menu 1 (L)'}));
+      let sep12a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep12a', separator: true}));
+      let sep12b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep12b', separator: true, menuTypes: ['Table.SingleSelection']})); // <-- will generate an additional artificial separator menu
+      let menu2 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu2', text: 'Menu 2 (L)', menuTypes: ['Table.SingleSelection']}));
+      let sep2a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep2a', separator: true, menuTypes: ['Table.SingleSelection']}));
+      let sep2b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep2b', separator: true, menuTypes: ['Table.SingleSelection']}));
 
-      var sep3a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep3a', horizontalAlignment: 1, separator: true}));
-      var sep3b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep3b', horizontalAlignment: 1, separator: true}));
-      var menu3 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu3', horizontalAlignment: 1, text: 'Menu 3 (R)'}));
-      var sep34a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep34a', horizontalAlignment: 1, separator: true}));
-      var sep34b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep34b', horizontalAlignment: 1, separator: true}));
-      var menu4 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu4', horizontalAlignment: 1, text: 'Menu 4 (R)'}));
-      var sep4a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep4a', horizontalAlignment: 1, separator: true}));
-      var sep4b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep4b', horizontalAlignment: 1, separator: true}));
+      let sep3a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep3a', horizontalAlignment: 1, separator: true}));
+      let sep3b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep3b', horizontalAlignment: 1, separator: true}));
+      let menu3 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu3', horizontalAlignment: 1, text: 'Menu 3 (R)'}));
+      let sep34a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep34a', horizontalAlignment: 1, separator: true}));
+      let sep34b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep34b', horizontalAlignment: 1, separator: true}));
+      let menu4 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu4', horizontalAlignment: 1, text: 'Menu 4 (R)'}));
+      let sep4a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep4a', horizontalAlignment: 1, separator: true}));
+      let sep4b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep4b', horizontalAlignment: 1, separator: true}));
 
-      var menuBar = createMenuBar();
+      let menuBar = createMenuBar();
       menuBar.render();
       menuBar.setMenuItems([
         sep1a, sep1b, menu1, sep12a, sep12b, menu2, sep2a, sep2b,
@@ -167,10 +167,10 @@ describe('MenuBar', function() {
 
       function listVisibleMenuIds(menus) {
         return menus
-          .filter(function(menu) {
+          .filter(menu => {
             return menu.visible && !menu.ellipsis;
           })
-          .map(function(menu) {
+          .map(menu => {
             return menu.id;
           })
           .join(', ');
@@ -183,16 +183,16 @@ describe('MenuBar', function() {
 
   });
 
-  describe('focus', function() {
-    it('MenuBar must update tabbable when a menu item is focused', function() {
+  describe('focus', () => {
+    it('MenuBar must update tabbable when a menu item is focused', () => {
       // otherwise the menu item can not have the focus, because the DOM element is not focusable without a tabindex.
-      var menuModel = helper.createModel();
+      let menuModel = helper.createModel();
       menuModel.menuTypes = ['Table.EmptySpace'];
 
-      var menu1 = helper.createMenu($.extend({}, menuModel, {id: 'menu1', text: 'Menu 1'}));
-      var menu2 = helper.createMenu($.extend({}, menuModel, {id: 'menu2', text: 'Menu 2'}));
+      let menu1 = helper.createMenu($.extend({}, menuModel, {id: 'menu1', text: 'Menu 1'}));
+      let menu2 = helper.createMenu($.extend({}, menuModel, {id: 'menu2', text: 'Menu 2'}));
 
-      var menuBar = createMenuBar();
+      let menuBar = createMenuBar();
       menuBar.render();
       menuBar.setMenuItems([menu1, menu2]);
 
@@ -206,15 +206,15 @@ describe('MenuBar', function() {
     });
   });
 
-  describe('propertyChange', function() {
-    var menu, menuBar;
+  describe('propertyChange', () => {
+    let menu, menuBar;
 
-    beforeEach(function() {
+    beforeEach(() => {
       menu = helper.createMenu(createModel('foo'));
       menuBar = createMenuBar();
     });
 
-    it('must listen on property changes of its menu items (even when menu bar is not rendered)', function() {
+    it('must listen on property changes of its menu items (even when menu bar is not rendered)', () => {
       menu.visible = false;
       menuBar.setMenuItems([menu]);
       expect(menuBar.visible).toBe(false);
@@ -227,7 +227,7 @@ describe('MenuBar', function() {
     });
 
     // Note: the menu alone has already an event listener
-    it('must remove property-change and focus listeners on destroy', function() {
+    it('must remove property-change and focus listeners on destroy', () => {
       expect(menu.events.count()).toBe(1);
 
       menuBar.setMenuItems([menu]);
@@ -237,13 +237,13 @@ describe('MenuBar', function() {
       expect(menu.events.count()).toBe(1);
     });
 
-    it('automatically hides unused separators', function() {
-      var menu1 = helper.createMenu(createModel('Menu 1'));
-      var menu2 = helper.createMenu(createModel('Menu 2'));
-      var menu3 = helper.createMenu(createModel('Menu 3'));
-      var separator = helper.createMenu($.extend({}, createModel(), {separator: true}));
+    it('automatically hides unused separators', () => {
+      let menu1 = helper.createMenu(createModel('Menu 1'));
+      let menu2 = helper.createMenu(createModel('Menu 2'));
+      let menu3 = helper.createMenu(createModel('Menu 3'));
+      let separator = helper.createMenu($.extend({}, createModel(), {separator: true}));
 
-      var menuBar = createMenuBar();
+      let menuBar = createMenuBar();
       menuBar.render();
       menuBar.setMenuItems([menu1, separator, menu2, menu3]);
 
@@ -280,21 +280,21 @@ describe('MenuBar', function() {
     });
   });
 
-  describe('setVisible', function() {
-    it('does not throw an error if called on menus moved to the ellipsis menu', function() {
-      var menu1 = helper.createMenu(createModel('foo')),
+  describe('setVisible', () => {
+    it('does not throw an error if called on menus moved to the ellipsis menu', () => {
+      let menu1 = helper.createMenu(createModel('foo')),
         menu2 = helper.createMenu(createModel('bar')),
         menuBar = createMenuBar();
 
-      var menu3model = createModel('boo');
+      let menu3model = createModel('boo');
       menu3model.visible = false;
-      var menu3 = helper.createMenu(menu3model);
+      let menu3 = helper.createMenu(menu3model);
 
-      var menu4model = createModel('far');
+      let menu4model = createModel('far');
       menu4model.horizontalAlignment = 1;
-      var menu4 = helper.createMenu(menu4model);
+      let menu4 = helper.createMenu(menu4model);
 
-      var menus = [menu1, menu2, menu3, menu4];
+      let menus = [menu1, menu2, menu3, menu4];
 
       menuBar.setMenuItems(menus);
       menuBar.render();
@@ -308,9 +308,9 @@ describe('MenuBar', function() {
     });
   });
 
-  describe('layout', function() {
-    it('gets invalidated if a menu changes its visibility', function() {
-      var menu1 = helper.createMenu(createModel('foo')),
+  describe('layout', () => {
+    it('gets invalidated if a menu changes its visibility', () => {
+      let menu1 = helper.createMenu(createModel('foo')),
         menu2 = helper.createMenu(createModel('bar')),
         menuBar = createMenuBar(),
         menus = [menu1, menu2];
@@ -331,13 +331,13 @@ describe('MenuBar', function() {
     });
   });
 
-  describe('updateDefaultMenu', function() {
-    it('marks first visible and enabled menu that reacts to ENTER keystroke as default menu', function() {
-      var modelMenu1 = createModel('foo');
-      var modelMenu2 = createModel('bar');
+  describe('updateDefaultMenu', () => {
+    it('marks first visible and enabled menu that reacts to ENTER keystroke as default menu', () => {
+      let modelMenu1 = createModel('foo');
+      let modelMenu2 = createModel('bar');
       modelMenu2.keyStroke = 'enter';
 
-      var menu1 = helper.createMenu(modelMenu1),
+      let menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
         menuBar = createMenuBar(),
         menus = [menu1, menu2];
@@ -353,13 +353,13 @@ describe('MenuBar', function() {
       expect(menu2.$container).toHaveClass('default-menu');
     });
 
-    it('marks ButtonAdapterMenu that reacts to ENTER keystroke as default menu', function() {
-      var button = new Button();
+    it('marks ButtonAdapterMenu that reacts to ENTER keystroke as default menu', () => {
+      let button = new Button();
       button.init({
         id: '123',
         parent: session.desktop
       });
-      var adapterMenu = new ButtonAdapterMenu();
+      let adapterMenu = new ButtonAdapterMenu();
       adapterMenu.init({
         id: '234',
         button: button,
@@ -369,7 +369,7 @@ describe('MenuBar', function() {
       button.setProperty('defaultButton', false);
       button.setProperty('keyStroke', 'enter');
 
-      var menuBar = createMenuBar(new GroupBoxMenuItemsOrder()),
+      let menuBar = createMenuBar(new GroupBoxMenuItemsOrder()),
         menus = [adapterMenu];
 
       menuBar.setMenuItems(menus);
@@ -381,13 +381,13 @@ describe('MenuBar', function() {
       expect(adapterMenu.$container).toHaveClass('default-menu');
     });
 
-    it('marks first visible and enabled menu that has the "defaultMenu" flag set as default menu', function() {
-      var modelMenu1 = createModel('foo');
-      var modelMenu2 = createModel('bar');
-      var modelMenu3 = createModel('bla');
-      var modelMenu4 = createModel('xyz');
-      var modelMenu5 = createModel('qux');
-      var modelMenu6 = createModel('fum');
+    it('marks first visible and enabled menu that has the "defaultMenu" flag set as default menu', () => {
+      let modelMenu1 = createModel('foo');
+      let modelMenu2 = createModel('bar');
+      let modelMenu3 = createModel('bla');
+      let modelMenu4 = createModel('xyz');
+      let modelMenu5 = createModel('qux');
+      let modelMenu6 = createModel('fum');
       // menu2 should not have the default menu class since the default menu is set to false
       modelMenu2.keyStroke = 'enter';
       modelMenu2.defaultMenu = false;
@@ -401,7 +401,7 @@ describe('MenuBar', function() {
       // menu6 should have the default menu class but is not the default menu in the menu bar.
       modelMenu6.keyStroke = 'enter';
 
-      var menuBar = createMenuBar(),
+      let menuBar = createMenuBar(),
         menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
         menu3 = helper.createMenu(modelMenu3),
@@ -430,17 +430,17 @@ describe('MenuBar', function() {
       expect(menu4).toBe(menuBar.defaultMenu);
     });
 
-    it('updates state if menu gets enabled or disabled', function() {
-      var modelMenu1 = createModel('foo');
-      var modelMenu2 = createModel('bar');
+    it('updates state if menu gets enabled or disabled', () => {
+      let modelMenu1 = createModel('foo');
+      let modelMenu2 = createModel('bar');
       modelMenu2.keyStroke = 'enter';
 
-      var menu1 = helper.createMenu(modelMenu1),
+      let menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
         menuBar = createMenuBar(),
         menusItems = [menu1, menu2];
 
-      var ellipsisMenu = menus.createEllipsisMenu({
+      let ellipsisMenu = menus.createEllipsisMenu({
         parent: session.desktop
       });
       ellipsisMenu.render();
@@ -462,17 +462,17 @@ describe('MenuBar', function() {
       expect(menu2.$container).toHaveClass('default-menu');
     });
 
-    it('updates state if keyStroke or defaultMenu property of menu changes', function() {
-      var modelMenu1 = createModel('foo');
-      var modelMenu2 = createModel('bar');
+    it('updates state if keyStroke or defaultMenu property of menu changes', () => {
+      let modelMenu1 = createModel('foo');
+      let modelMenu2 = createModel('bar');
       modelMenu2.keyStroke = 'enter';
 
-      var menu1 = helper.createMenu(modelMenu1),
+      let menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
         menuBar = createMenuBar(),
         menuItems = [menu1, menu2];
 
-      var ellipsisMenu = menus.createEllipsisMenu({
+      let ellipsisMenu = menus.createEllipsisMenu({
         parent: session.desktop
       });
       ellipsisMenu.render();
@@ -513,17 +513,17 @@ describe('MenuBar', function() {
       expect(menu2.$container).not.toHaveClass('default-menu');
     });
 
-    it('considers rendered state of default menu', function() {
-      var modelMenu1 = createModel('foo');
-      var modelMenu2 = createModel('bar');
+    it('considers rendered state of default menu', () => {
+      let modelMenu1 = createModel('foo');
+      let modelMenu2 = createModel('bar');
       modelMenu2.keyStroke = 'enter';
 
-      var menu1 = helper.createMenu(modelMenu1),
+      let menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
         menuBar = createMenuBar(),
         menuItems = [menu1, menu2];
 
-      var ellipsisMenu = menus.createEllipsisMenu({
+      let ellipsisMenu = menus.createEllipsisMenu({
         parent: session.desktop
       });
       ellipsisMenu.render();
@@ -554,9 +554,9 @@ describe('MenuBar', function() {
     });
   });
 
-  describe('ellipsis position', function() {
-    it('is calculated correctly for ellipsisPosition RIGHT', function() {
-      var rightMenu1 = helper.createMenu(createModel('foo')),
+  describe('ellipsis position', () => {
+    it('is calculated correctly for ellipsisPosition RIGHT', () => {
+      let rightMenu1 = helper.createMenu(createModel('foo')),
         rightMenu2 = helper.createMenu(createModel('bar')),
         leftMenu1 = helper.createMenu(createModel('foo')),
         leftMenu2 = helper.createMenu(createModel('bar')),
@@ -596,8 +596,8 @@ describe('MenuBar', function() {
       expect(menuBar.orderedMenuItems.left[2]).toBe(menuBar._ellipsis);
     });
 
-    it('is calculated correctly for ellipsisPosition LEFT', function() {
-      var rightMenu1 = helper.createMenu(createModel('foo')),
+    it('is calculated correctly for ellipsisPosition LEFT', () => {
+      let rightMenu1 = helper.createMenu(createModel('foo')),
         rightMenu2 = helper.createMenu(createModel('bar')),
         leftMenu1 = helper.createMenu(createModel('foo')),
         leftMenu2 = helper.createMenu(createModel('bar')),
@@ -638,9 +638,9 @@ describe('MenuBar', function() {
     });
   });
 
-  describe('reorderMenus', function() {
-    it('updates left-of-button correctly', function() {
-      var button1 = scout.create('Menu', {
+  describe('reorderMenus', () => {
+    it('updates left-of-button correctly', () => {
+      let button1 = scout.create('Menu', {
           parent: session.desktop,
           actionStyle: Action.ActionStyle.BUTTON
         }),
@@ -661,8 +661,8 @@ describe('MenuBar', function() {
       expect(button2.$container).not.toHaveClass('left-of-button');
     });
 
-    it('updates last correctly', function() {
-      var button1 = scout.create('Menu', {
+    it('updates last correctly', () => {
+      let button1 = scout.create('Menu', {
           parent: session.desktop,
           actionStyle: Action.ActionStyle.BUTTON
         }),

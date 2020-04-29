@@ -87,7 +87,7 @@ export default class LoginBox extends Box {
   }
 
   data() {
-    var data = {};
+    let data = {};
     data[this.userDataKey] = this.$user.val();
     data[this.passwordDataKey] = this.$password.val();
     $.extend(data, this.additionalData);
@@ -98,8 +98,8 @@ export default class LoginBox extends Box {
     // Prevent default submit action
     event.preventDefault();
 
-    var url = this.$form.attr('action');
-    var data = this.data();
+    let url = this.$form.attr('action');
+    let data = this.data();
 
     this.$button
       .removeClass('login-error')
@@ -112,7 +112,7 @@ export default class LoginBox extends Box {
         .append($('<div>').addClass('login-button-loading'));
     }
 
-    var options = $.extend({}, this.ajaxOptions, {
+    let options = $.extend({}, this.ajaxOptions, {
       url: url,
       data: data
     });
@@ -123,7 +123,7 @@ export default class LoginBox extends Box {
 
   redirect(data) {
     // Calculate target URL
-    var url = this.redirectUrl;
+    let url = this.redirectUrl;
     if (!url) {
       url = (window.location.href || '').trim();
       // Remove login and everything after it from the URL
@@ -161,19 +161,19 @@ export default class LoginBox extends Box {
       .val('');
 
     // async bind reset function because focus method on username field (see above) already triggers an input event on IE.
-    setTimeout(function() {
+    setTimeout(() => {
       this.$user
         .one('input.resetLoginError', this._resetButtonText.bind(this));
       this.$password
         .one('input.resetLoginError', this._resetButtonText.bind(this));
-    }.bind(this));
+    });
   }
 
   // ----- Helper functions -----
 
   static prepareRedirectUrl(url) {
-    var urlParts = /^([^?#]*)(\?[^#]*)?(#.*)?$/.exec(url || ''); // $1 = baseUrl, $2 = queryPart, $3 = hashPart
-    var filteredBaseUrl = urlParts[1]
+    let urlParts = /^([^?#]*)(\?[^#]*)?(#.*)?$/.exec(url || ''); // $1 = baseUrl, $2 = queryPart, $3 = hashPart
+    let filteredBaseUrl = urlParts[1]
       .replace(/login.html$/, '')
       .replace(/login$/, '')
       .replace(/logout$/, '');

@@ -11,10 +11,10 @@
 import {SliderField} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('SliderField', function() {
-  var session, helper, field;
+describe('SliderField', () => {
+  let session, helper, field;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
@@ -23,13 +23,13 @@ describe('SliderField', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
     jasmine.Ajax.uninstall();
   });
 
   function createField(model) {
-    var field = new SliderField();
+    let field = new SliderField();
     field.init(model);
     return field;
   }
@@ -38,9 +38,9 @@ describe('SliderField', function() {
     return helper.createFieldModel();
   }
 
-  describe('slider', function() {
+  describe('slider', () => {
 
-    it('accepts the value', function() {
+    it('accepts the value', () => {
       field.render();
       field.setValue(25);
 

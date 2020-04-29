@@ -34,7 +34,7 @@ export default class MobilePopup extends Popup {
    * @override Popup.js
    */
   prefLocation(verticalAlignment, horizontalAlignment) {
-    var popupSize = this.htmlComp.prefSize(),
+    let popupSize = this.htmlComp.prefSize(),
       windowHeight = this.$container.window().height(),
       y = Math.max(windowHeight - popupSize.height, 0);
     return new Point(0, y);

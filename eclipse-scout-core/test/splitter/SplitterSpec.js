@@ -10,17 +10,17 @@
  */
 import {scout} from '../../src/index';
 
-describe('Splitter', function() {
-  var session;
+describe('Splitter', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     $('<style>.splitter {position: absolute;}</style>').appendTo($('#sandbox'));
   });
 
-  it('renders the splitter at the given position', function() {
-    var splitter = scout.create('Splitter', {
+  it('renders the splitter at the given position', () => {
+    let splitter = scout.create('Splitter', {
       parent: session.desktop,
       position: 100
     });

@@ -24,22 +24,22 @@ export default class OutlineAdapter extends TreeAdapter {
    * is created completely.
    */
   _postCreateWidget() {
-    var outline = this.widget;
+    let outline = this.widget;
     outline.visitNodes(this._onWidgetPageInit.bind(this));
   }
 
   _onPageChanged(event) {
-    var page = this.widget._nodeById(event.nodeId);
+    let page = this.widget._nodeById(event.nodeId);
     page.overviewIconId = event.overviewIconId;
 
     page.detailFormVisible = event.detailFormVisible;
-    var detailForm = this.session.getOrCreateWidget(event.detailForm, this.widget);
+    let detailForm = this.session.getOrCreateWidget(event.detailForm, this.widget);
     if (detailForm !== page.detailForm) {
       page.setDetailForm(detailForm);
     }
 
     page.detailTableVisible = event.detailTableVisible;
-    var detailTable = this.session.getOrCreateWidget(event.detailTable, this.widget);
+    let detailTable = this.session.getOrCreateWidget(event.detailTable, this.widget);
     if (page.detailTable !== detailTable) {
       if (page.detailTable) {
         this._destroyDetailTable(page);
@@ -91,7 +91,7 @@ export default class OutlineAdapter extends TreeAdapter {
 
   _linkNodeWithRow(row) {
     scout.assertParameter('row', row);
-    var node,
+    let node,
       nodeId = row.nodeId;
 
     if (nodeId === undefined) {
@@ -110,14 +110,14 @@ export default class OutlineAdapter extends TreeAdapter {
   }
 
   _unlinkNodeWithRow(row) {
-    var node = this.widget.nodesMap[row.nodeId];
+    let node = this.widget.nodesMap[row.nodeId];
     if (node) {
       node.unlinkWithRow(row);
     }
   }
 
   _onDetailTableRowInit(event) {
-    var node,
+    let node,
       outline = this.widget,
       nodeId = event.row.nodeId;
     this._linkNodeWithRow(event.row);
@@ -147,7 +147,7 @@ export default class OutlineAdapter extends TreeAdapter {
     if (!this._nodeIdToRowMap.hasOwnProperty(page.id)) {
       return;
     }
-    var row = this._nodeIdToRowMap[page.id];
+    let row = this._nodeIdToRowMap[page.id];
     page.linkWithRow(row);
     delete this._nodeIdToRowMap[page.id];
   }
@@ -172,7 +172,7 @@ export default class OutlineAdapter extends TreeAdapter {
       return this._computeDetailContentOrig();
     }
 
-    var selectedPage = this.selectedNode();
+    let selectedPage = this.selectedNode();
     if (!selectedPage) {
       // Detail content is shown for the selected node only
       return null;

@@ -26,7 +26,7 @@ export function init(data) {
  * @returns {Object}
  */
 export function get(modelFunc, parent) {
-  var model = modelFunc();
+  let model = modelFunc();
   if (parent) {
     model.parent = parent;
   }
@@ -55,7 +55,7 @@ export function getExtension(extensionId) {
  */
 
 export function _get(id, type) {
-  var model = modelMap[id];
+  let model = modelMap[id];
   if (!model) {
     throw new Error('No model map entry found for id \'' + id + '\'');
   }
@@ -147,11 +147,11 @@ export function extend(extension, parentModel) {
   }
 
   scout.assertParameter('extensions', extension.extensions);
-  extension.extensions.forEach(function(extensionConfig) {
-    var operation = scout.assertParameter('operation', extensionConfig.operation);
-    var target = scout.assertParameter('target', extensionConfig.target);
+  extension.extensions.forEach(extensionConfig => {
+    let operation = scout.assertParameter('operation', extensionConfig.operation);
+    let target = scout.assertParameter('target', extensionConfig.target);
 
-    var targetObject;
+    let targetObject;
     if (target.root) {
       targetObject = parentModel;
     } else {
@@ -165,10 +165,10 @@ export function extend(extension, parentModel) {
       $.extend(targetObject, extensionConfig.extension);
     } else if (operation === 'insert') {
       targetObject[target.property] = targetObject[target.property] || [];
-      var targetArray = targetObject[target.property];
-      var extensionArray = arrays.ensure(extensionConfig.extension);
+      let targetArray = targetObject[target.property];
+      let extensionArray = arrays.ensure(extensionConfig.extension);
       _bindExtensionsToBeforeOrAfter(target, extensionArray);
-      var insertAt = _findExtensionIndex(target, targetArray);
+      let insertAt = _findExtensionIndex(target, targetArray);
       arrays.insertAll(targetArray, extensionArray, insertAt);
     }
   });
@@ -187,16 +187,16 @@ export function extend(extension, parentModel) {
  */
 
 export function _findExtensionIndex(target, targetArray) {
-  var insertAt = targetArray.length;
+  let insertAt = targetArray.length;
   if (target.before) {
-    insertAt = arrays.findIndex(targetArray, function(element) {
+    insertAt = arrays.findIndex(targetArray, element => {
       return element.id === target.before || element.groupedWith === target.before;
     });
     if (insertAt === -1) {
       insertAt = targetArray.length;
     }
   } else if (target.after) {
-    insertAt = arrays.findIndex(targetArray, function(element) {
+    insertAt = arrays.findIndex(targetArray, element => {
       return element.id === target.after || element.groupedWith === target.after;
     });
     if (insertAt === -1) {
@@ -221,9 +221,9 @@ export function _findExtensionIndex(target, targetArray) {
  */
 
 export function _bindExtensionsToBeforeOrAfter(target, extensionsArray) {
-  var beforeOrAfter = target.before || target.after;
+  let beforeOrAfter = target.before || target.after;
   if (beforeOrAfter && target.groupWithTarget) {
-    extensionsArray.forEach(function(element) {
+    extensionsArray.forEach(element => {
       element.groupedWith = beforeOrAfter;
     });
   }

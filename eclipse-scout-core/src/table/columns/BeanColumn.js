@@ -18,11 +18,11 @@ export default class BeanColumn extends Column {
   }
 
   buildCellForRow(row) {
-    var cell = this.cell(row);
-    var cssClass = this._cellCssClass(cell);
-    var style = this._cellStyle(cell);
-    var $cell = $(super._buildCell('', style, cssClass));
-    var value = this.table.cellValue(this, row);
+    let cell = this.cell(row);
+    let cssClass = this._cellCssClass(cell);
+    let style = this._cellStyle(cell);
+    let $cell = $(super._buildCell('', style, cssClass));
+    let value = this.table.cellValue(this, row);
 
     if (cell.errorStatus) {
       row.hasError = true;
@@ -41,10 +41,10 @@ export default class BeanColumn extends Column {
   }
 
   _plainTextForRow(row) {
-    var cell = this.table.cell(this, row);
+    let cell = this.table.cell(this, row);
     if (!cell.plainText) {
       // Convert to plain text and cache it because rendering is expensive
-      var html = this.buildCellForRow(row);
+      let html = this.buildCellForRow(row);
       cell.plainText = strings.plainText(html);
     }
     return cell.plainText;
@@ -55,23 +55,23 @@ export default class BeanColumn extends Column {
    * If this approach does not work for a specific bean column, just override this method.
    */
   cellValueOrTextForCalculation(row) {
-    var plainText = this._plainTextForRow(row);
+    let plainText = this._plainTextForRow(row);
     return this._preprocessTextForCalculation(plainText);
   }
 
   cellTextForGrouping(row) {
-    var plainText = this._plainTextForRow(row);
+    let plainText = this._plainTextForRow(row);
     return this._preprocessTextForGrouping(plainText);
   }
 
   cellTextForTextFilter(row) {
-    var plainText = this._plainTextForRow(row);
+    let plainText = this._plainTextForRow(row);
     return this._preprocessTextForTextFilter(plainText);
   }
 
   compare(row1, row2) {
-    var plainText1 = this._plainTextForRow(row1);
-    var plainText2 = this._plainTextForRow(row2);
+    let plainText1 = this._plainTextForRow(row1);
+    let plainText2 = this._plainTextForRow(row2);
     return this.comparator.compareIgnoreCase(plainText1, plainText2);
   }
 }

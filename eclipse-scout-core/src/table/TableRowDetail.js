@@ -46,12 +46,12 @@ export default class TableRowDetail extends Widget {
   }
 
   _renderCell(column) {
-    var cell = this.table.cell(column, this.row);
+    let cell = this.table.cell(column, this.row);
     if (strings.empty(cell.text) && !cell.iconId) {
       return;
     }
 
-    var headerText;
+    let headerText;
     if (column.headerHtmlEnabled) {
       headerText = strings.plainText(column.text);
     } else {
@@ -66,17 +66,17 @@ export default class TableRowDetail extends Widget {
       }
     }
 
-    var cellText = column.cellTextForRowDetail(this.row);
+    let cellText = column.cellTextForRowDetail(this.row);
 
-    var $field = this.$container.appendDiv('table-row-detail-field');
+    let $field = this.$container.appendDiv('table-row-detail-field');
     if (!strings.empty(headerText)) {
       $field.appendSpan('table-row-detail-name').text(headerText + ': ');
     }
 
-    var iconId = cell.iconId;
-    var hasCellText = !strings.empty(cellText);
+    let iconId = cell.iconId;
+    let hasCellText = !strings.empty(cellText);
     if (iconId) {
-      var $icon = $field.appendIcon(iconId, 'table-row-detail-icon');
+      let $icon = $field.appendIcon(iconId, 'table-row-detail-icon');
       $icon.toggleClass('with-text', hasCellText);
     }
     if (hasCellText) {
@@ -94,9 +94,9 @@ export default class TableRowDetail extends Widget {
       return;
     }
 
-    var row = arrays.find(event.rows, function(row) {
+    let row = arrays.find(event.rows, row => {
       return row.id === this.row.id;
-    }.bind(this));
+    });
 
     if (!row) {
       return;

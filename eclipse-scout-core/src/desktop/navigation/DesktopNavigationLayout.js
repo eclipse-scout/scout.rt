@@ -18,7 +18,7 @@ export default class DesktopNavigationLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var bodySize, viewButtonBoxSize, viewButtonBoxPrefSize,
+    let bodySize, viewButtonBoxSize, viewButtonBoxPrefSize,
       htmlContainer = this.navigation.htmlComp,
       containerSize = htmlContainer.size({
         exact: true
@@ -61,21 +61,21 @@ export default class DesktopNavigationLayout extends AbstractLayout {
   }
 
   preferredLayoutSize($container) {
-    var htmlContainer = this.navigation.htmlComp,
+    let htmlContainer = this.navigation.htmlComp,
       htmlBody = this.navigation.htmlCompBody,
       toolBox = this.navigation.toolBox,
       viewButtonBox = this.navigation.viewButtonBox;
 
-    var prefSize = htmlBody.prefSize();
+    let prefSize = htmlBody.prefSize();
 
-    var prefSizeBoxes = new Dimension(0, 0);
+    let prefSizeBoxes = new Dimension(0, 0);
     if (viewButtonBox) {
-      var prefSizeViewButtonBox = viewButtonBox.htmlComp.prefSize();
+      let prefSizeViewButtonBox = viewButtonBox.htmlComp.prefSize();
       prefSizeBoxes.width += prefSizeViewButtonBox.width;
       prefSizeBoxes.height = Math.max(prefSizeBoxes.height, prefSizeViewButtonBox.height);
     }
     if (toolBox) {
-      var prefSizeToolBox = toolBox.htmlComp.prefSize();
+      let prefSizeToolBox = toolBox.htmlComp.prefSize();
       prefSizeBoxes.width += prefSizeToolBox.width;
       prefSizeBoxes.height = Math.max(prefSizeBoxes.height, prefSizeToolBox.height);
     }

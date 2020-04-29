@@ -25,7 +25,7 @@ export default class TagFieldCancelKeyStroke extends KeyStroke {
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     if (!accepted) {
       return false;
     }

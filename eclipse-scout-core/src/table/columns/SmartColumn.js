@@ -100,14 +100,14 @@ export default class SmartColumn extends Column {
       return;
     }
 
-    var lookupRow = new LookupRow();
+    let lookupRow = new LookupRow();
     lookupRow.key = cell.value;
     lookupRow.text = cell.text;
     field.setLookupRow(lookupRow);
   }
 
   _createEditor() {
-    var field = scout.create('SmartField', {
+    let field = scout.create('SmartField', {
       parent: this.table,
       codeType: this.codeType,
       lookupCall: this.lookupCall,
@@ -118,16 +118,16 @@ export default class SmartColumn extends Column {
       activeFilterEnabled: this.activeFilterEnabled
     });
 
-    field.on('prepareLookupCall', function(event) {
+    field.on('prepareLookupCall', event => {
       this.trigger('prepareLookupCall', {
         lookupCall: event.lookupCall
       });
-    }.bind(this));
-    field.on('lookupCallDone', function(event) {
+    });
+    field.on('lookupCallDone', event => {
       this.trigger('lookupCallDone', {
         result: event.result
       });
-    }.bind(this));
+    });
 
     return field;
   }
@@ -136,7 +136,7 @@ export default class SmartColumn extends Column {
    * Since we don't know the type of the key from the lookup-row we must deal with numeric and string types here.
    */
   _hasCellValue(cell) {
-    var value = cell.value;
+    let value = cell.value;
     if (objects.isNumber(value)) {
       return !objects.isNullOrUndefined(value); // Zero (0) is valid too
     }

@@ -11,11 +11,11 @@
 import {Device, scout, Status} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('FileChooserField', function() {
-  var session;
-  var helper;
+describe('FileChooserField', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
@@ -23,30 +23,30 @@ describe('FileChooserField', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
     jasmine.Ajax.uninstall();
   });
 
-  describe('setValue', function() {
-    var field;
+  describe('setValue', () => {
+    let field;
 
-    beforeEach(function() {
+    beforeEach(() => {
       field = helper.createField('FileChooserField');
     });
 
-    it('sets the file as value', function() {
+    it('sets the file as value', () => {
       if (!Device.get().supportsFileConstructor()) {
         return;
       }
-      var file = new File(['lorem'], 'ipsum.txt');
+      let file = new File(['lorem'], 'ipsum.txt');
       field.render();
       field.setValue(file);
       expect(field.value).toBe(file);
       expect(field.displayText).toBe('ipsum.txt');
     });
 
-    it('sets no file as value', function() {
+    it('sets no file as value', () => {
       field.render();
       field.setValue(null);
       expect(field.value).toBe(null);
@@ -54,17 +54,17 @@ describe('FileChooserField', function() {
     });
   });
 
-  describe('maximumUploadSize', function() {
+  describe('maximumUploadSize', () => {
 
-    it('is validated when setting new value', function() {
+    it('is validated when setting new value', () => {
       if (!Device.get().supportsFileConstructor()) {
         return;
       }
-      var smallFile = new File(['a'], 'small file.txt');
-      var largeFile = new File(['abcdefghijklmnopqrstuvwxyz'], 'large file.txt');
-      var largerFile = new File(['abcdefghijklmnopqrstuvwxyz0123456789'], 'larger file.txt');
+      let smallFile = new File(['a'], 'small file.txt');
+      let largeFile = new File(['abcdefghijklmnopqrstuvwxyz'], 'large file.txt');
+      let largerFile = new File(['abcdefghijklmnopqrstuvwxyz0123456789'], 'larger file.txt');
 
-      var field = helper.createField('FileChooserField');
+      let field = helper.createField('FileChooserField');
       field.setMaximumUploadSize(5); // 5 bytes
 
       field.setValue(largeFile);
@@ -80,13 +80,13 @@ describe('FileChooserField', function() {
       expect(field.value).toBe(smallFile);
     });
 
-    it('is not validated when changing maximumUploadSize', function() {
+    it('is not validated when changing maximumUploadSize', () => {
       if (!Device.get().supportsFileConstructor()) {
         return;
       }
-      var largeFile = new File(['abcdefghijklmnopqrstuvwxyz'], 'large file.txt');
+      let largeFile = new File(['abcdefghijklmnopqrstuvwxyz'], 'large file.txt');
 
-      var field = helper.createField('FileChooserField');
+      let field = helper.createField('FileChooserField');
       field.setValue(largeFile);
       expect(field.errorStatus).toBe(null);
       expect(field.value).toBe(largeFile);
@@ -97,10 +97,10 @@ describe('FileChooserField', function() {
     });
   });
 
-  describe('label', function() {
+  describe('label', () => {
 
-    it('is linked with the field', function() {
-      var field = scout.create('FileChooserField', {
+    it('is linked with the field', () => {
+      let field = scout.create('FileChooserField', {
         parent: session.desktop,
         label: 'label'
       });
@@ -109,8 +109,8 @@ describe('FileChooserField', function() {
       expect(field.$field.attr('aria-labelledby')).toBe(field.$label.attr('id'));
     });
 
-    it('focuses the field when clicked', function() {
-      var field = scout.create('FileChooserField', {
+    it('focuses the field when clicked', () => {
+      let field = scout.create('FileChooserField', {
         parent: session.desktop,
         label: 'label'
       });

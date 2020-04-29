@@ -11,11 +11,11 @@
 import {focusUtils} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('WrappedForm', function() {
-  var session;
-  var helper;
+describe('WrappedForm', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
@@ -25,11 +25,11 @@ describe('WrappedForm', function() {
     return helper.createField('WrappedFormField', session.desktop, modelProperties);
   }
 
-  describe('mandatory indicator', function() {
+  describe('mandatory indicator', () => {
 
     // Must not contain an indicator to prevent a double indicator if the first field is mandatory too
-    it('does not exist', function() {
-      var field = createField({mandatory: true});
+    it('does not exist', () => {
+      let field = createField({mandatory: true});
       field.render();
 
       expect(field.$mandatory).toBeUndefined();
@@ -37,36 +37,36 @@ describe('WrappedForm', function() {
 
   });
 
-  describe('initial focus disabled', function() {
-    it('string field in inner form hasn\'t focus', function() {
-      var innerForm = helper.createFormWithOneField();
-      var field = createField({innerForm: innerForm});
+  describe('initial focus disabled', () => {
+    it('string field in inner form hasn\'t focus', () => {
+      let innerForm = helper.createFormWithOneField();
+      let field = createField({innerForm: innerForm});
       expect(field.initialFocusEnabled).toBe(false);
 
       field.render();
 
-      var $stringField = innerForm.rootGroupBox.fields[0].$field;
+      let $stringField = innerForm.rootGroupBox.fields[0].$field;
       expect(focusUtils.isActiveElement($stringField)).toBe(false);
     });
   });
 
-  describe('initial focus enabled', function() {
-    it('string field in inner form has focus', function() {
-      var innerForm = helper.createFormWithOneField();
-      var field = createField({initialFocusEnabled: true, innerForm: innerForm});
+  describe('initial focus enabled', () => {
+    it('string field in inner form has focus', () => {
+      let innerForm = helper.createFormWithOneField();
+      let field = createField({initialFocusEnabled: true, innerForm: innerForm});
       expect(field.initialFocusEnabled).toBe(true);
 
       field.render();
 
-      var $stringField = innerForm.rootGroupBox.fields[0].$field;
+      let $stringField = innerForm.rootGroupBox.fields[0].$field;
       expect(focusUtils.isActiveElement($stringField)).toBe(true);
     });
   });
 
-  describe('innerForm', function() {
-    it('is set to null when being destroyed', function() {
-      var innerForm = helper.createFormWithOneField();
-      var field = createField({innerForm: innerForm});
+  describe('innerForm', () => {
+    it('is set to null when being destroyed', () => {
+      let innerForm = helper.createFormWithOneField();
+      let field = createField({innerForm: innerForm});
       field.render();
       expect(field.innerForm).toBe(innerForm);
       expect(innerForm.rendered).toBe(true);
@@ -77,9 +77,9 @@ describe('WrappedForm', function() {
       expect(innerForm.destroyed).toBe(true);
     });
 
-    it('will be removed if set to null', function() {
-      var innerForm = helper.createFormWithOneField();
-      var field = createField({innerForm: innerForm});
+    it('will be removed if set to null', () => {
+      let innerForm = helper.createFormWithOneField();
+      let field = createField({innerForm: innerForm});
       field.render();
       expect(field.innerForm).toBe(innerForm);
       expect(innerForm.rendered).toBe(true);

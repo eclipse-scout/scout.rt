@@ -37,9 +37,9 @@ export default class BusyIndicator extends Widget {
       new ClickActiveElementKeyStroke(this, [
         keys.SPACE, keys.ENTER
       ]),
-      new CloseKeyStroke(this, function() {
+      new CloseKeyStroke(this, (() => {
         return this.$cancelButton;
-      }.bind(this))
+      }))
     ]);
   }
 
@@ -58,7 +58,7 @@ export default class BusyIndicator extends Widget {
     // 1. Render modality glasspanes (must precede adding the busy indicator to the DOM)
     this._glassPaneRenderer = new GlassPaneRenderer(this);
     this._glassPaneRenderer.renderGlassPanes();
-    this._glassPaneRenderer.eachGlassPane(function($glassPane) {
+    this._glassPaneRenderer.eachGlassPane($glassPane => {
       $glassPane.addClass('busy');
     });
 
@@ -66,7 +66,7 @@ export default class BusyIndicator extends Widget {
     // But don't use .hidden, otherwise the box' size cannot be calculated correctly!)
     this.$container = this.$parent.appendDiv('busyindicator invisible');
 
-    var $handle = this.$container.appendDiv('drag-handle');
+    let $handle = this.$container.appendDiv('drag-handle');
     this.$container.draggable($handle);
 
     this.$content = this.$container.appendDiv('busyindicator-content');
@@ -75,7 +75,7 @@ export default class BusyIndicator extends Widget {
 
     if (this.cancellable) {
       this.$buttons = this.$container.appendDiv('busyindicator-buttons');
-      var boxButtons = new BoxButtons(this.$buttons);
+      let boxButtons = new BoxButtons(this.$buttons);
       this.$cancelButton = boxButtons.addButton({
         text: this.session.text('Cancel'),
         onClick: this._onCancelClick.bind(this)
@@ -97,12 +97,12 @@ export default class BusyIndicator extends Widget {
     this._position();
 
     // Show busy box with a delay of 2.5 seconds (configurable by this.showTimeout).
-    this._busyIndicatorTimeoutId = setTimeout(function() {
+    this._busyIndicatorTimeoutId = setTimeout(() => {
       this.$container.removeClass('invisible').addClassForAnimation('animate-open');
       // Validate first focusable element
       // Maybe, this is not required if problem with single-button form is solved (see FormController.js)
       this.session.focusManager.validateFocus();
-    }.bind(this), this.showTimeout);
+    }, this.showTimeout);
   }
 
   _postRender() {
@@ -115,7 +115,7 @@ export default class BusyIndicator extends Widget {
     clearTimeout(this._busyIndicatorTimeoutId);
 
     // Remove glasspane
-    this._glassPaneRenderer.eachGlassPane(function($glassPane) {
+    this._glassPaneRenderer.eachGlassPane($glassPane => {
       $glassPane.removeClass('busy');
     });
     this._glassPaneRenderer.removeGlassPanes();

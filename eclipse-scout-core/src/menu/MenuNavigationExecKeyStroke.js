@@ -21,7 +21,7 @@ export default class MenuNavigationExecKeyStroke extends MenuNavigationKeyStroke
   }
 
   handle(event) {
-    var $menuItem = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass).$selected;
+    let $menuItem = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass).$selected;
     if ($menuItem.length > 0) {
       $menuItem.data('widget').doAction();
     }

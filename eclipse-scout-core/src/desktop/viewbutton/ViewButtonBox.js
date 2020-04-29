@@ -93,16 +93,16 @@ export default class ViewButtonBox extends Widget {
   }
 
   _updateViewButtons() {
-    var viewButtons = this.viewButtons.filter(function(b) {
+    let viewButtons = this.viewButtons.filter(b => {
         return b.visible;
       }),
-      menuButtons = viewButtons.filter(function(b) {
+      menuButtons = viewButtons.filter(b => {
         return b.displayStyle === 'MENU';
       }),
       tabButtons = null;
     // render as tab if length is < 1
     if (menuButtons.length > 1) {
-      tabButtons = viewButtons.filter(function(b) {
+      tabButtons = viewButtons.filter(b => {
         return b.displayStyle === 'TAB';
       });
     } else {
@@ -144,8 +144,8 @@ export default class ViewButtonBox extends Widget {
    * This method must also work in offline mode.
    */
   _onDesktopOutlineChange(event) {
-    var outline = this.desktop.outline;
-    this.viewButtons.forEach(function(viewTab) {
+    let outline = this.desktop.outline;
+    this.viewButtons.forEach(viewTab => {
       if (viewTab instanceof OutlineViewButton) {
         viewTab.onOutlineChange(outline);
       }
@@ -154,7 +154,7 @@ export default class ViewButtonBox extends Widget {
 
   _onViewButtonSelected(event) {
     // Deselect other togglable view buttons
-    this.viewButtons.forEach(function(viewButton) {
+    this.viewButtons.forEach(viewButton => {
       if (viewButton !== event.source && viewButton.isToggleAction()) {
         viewButton.setSelected(false);
       }

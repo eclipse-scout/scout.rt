@@ -50,7 +50,7 @@ export default class OutlineViewButton extends ViewButton {
   }
 
   onOutlineChange(outline) {
-    var selected = !!outline && this.outline === outline;
+    let selected = !!outline && this.outline === outline;
     this.setSelected(selected);
   }
 }

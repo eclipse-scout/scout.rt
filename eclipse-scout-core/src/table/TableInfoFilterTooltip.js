@@ -23,7 +23,7 @@ export default class TableInfoFilterTooltip extends Tooltip {
   }
 
   _renderText() {
-    var table = this.tableFooter.table,
+    let table = this.tableFooter.table,
       numRowsFiltered = table.filteredRows().length,
       filteredBy = table.filteredBy().join(', '); // filteredBy() returns an array
 

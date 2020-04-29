@@ -55,7 +55,7 @@ export default class FlexboxLayoutData {
   }
 
   _grow(delta, apply) {
-    var maxDelta = 0,
+    let maxDelta = 0,
       consumedDelta = 0;
     if (this.grow > 0) {
       maxDelta = delta;
@@ -70,7 +70,7 @@ export default class FlexboxLayoutData {
   }
 
   _shrink(delta, apply) {
-    var maxDelta = 0,
+    let maxDelta = 0,
       consumedDelta = 0;
     if (this.shrink > 0) {
       maxDelta = -this.sizePx + 20;
@@ -87,7 +87,7 @@ export default class FlexboxLayoutData {
 
   /* Static functions */
   static fixed(size) {
-    var layoutData = new FlexboxLayoutData();
+    let layoutData = new FlexboxLayoutData();
     layoutData.relative = false;
     layoutData.initial = size || -1;
     layoutData.grow = 0;

@@ -57,8 +57,8 @@ export default class ListBox extends LookupBox {
       return;
     }
     this._valueSyncing = true;
-    var valueArray = [];
-    this.table.rows.forEach(function(row) {
+    let valueArray = [];
+    this.table.rows.forEach(row => {
       if (row.checked) {
         valueArray.push(row.lookupRow.key);
       }
@@ -79,7 +79,7 @@ export default class ListBox extends LookupBox {
     }
 
     this._valueSyncing = true;
-    var opts = {
+    let opts = {
       checkOnlyEnabled: false
     };
     try {
@@ -87,15 +87,15 @@ export default class ListBox extends LookupBox {
         this.table.uncheckRows(this.table.rows, opts);
       } else {
         // if lookup was not executed yet: do it now.
-        var lookupScheduled = this._ensureLookupCallExecuted();
+        let lookupScheduled = this._ensureLookupCallExecuted();
         if (lookupScheduled) {
           return; // was the first lookup: table has no rows yet. cancel sync. Will be executed again after lookup execution.
         }
 
-        var rowsToCheck = [];
+        let rowsToCheck = [];
 
         this.table.uncheckRows(this.table.rows, opts);
-        this.table.rows.forEach(function(row) {
+        this.table.rows.forEach(row => {
           if (arrays.containsAny(newValue, row.lookupRow.key)) {
             rowsToCheck.push(row);
           }
@@ -116,7 +116,7 @@ export default class ListBox extends LookupBox {
   }
 
   _populateTable(result) {
-    var
+    let
       tableRows = [],
       lookupRows = result.lookupRows;
 
@@ -138,15 +138,15 @@ export default class ListBox extends LookupBox {
       return [];
     }
 
-    return this.table.rows.filter(function(row) {
+    return this.table.rows.filter(row => {
       return row.checked;
-    }).map(function(row) {
+    }).map(row => {
       return row.lookupRow;
     });
   }
 
   _createTableRow(lookupRow) {
-    var
+    let
       cell = scout.create('Cell', {
         text: lookupRow.text
       }),

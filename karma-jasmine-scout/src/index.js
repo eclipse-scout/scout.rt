@@ -8,16 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-var createPattern = function(path) {
-  return {pattern: path, included: true, served: true, watched: false};
-};
+let createPattern = path => ({pattern: path, included: true, served: true, watched: false});
 
-var findJqueryPosition = function(files) {
+let findJqueryPosition = files => {
   if (files.length <= 1) {
     return 0;
   }
-  for (var index = 0; index < files.length; index++) {
-    var entry = files[index];
+  for (let index = 0; index < files.length; index++) {
+    let entry = files[index];
     if (entry.pattern && entry.pattern.endsWith('/jquery.js')) {
       return index + 1; // right after the jquery
     }
@@ -25,9 +23,9 @@ var findJqueryPosition = function(files) {
   return files.length - 1; // default: second last
 };
 
-var initJasmine_scout = function(files) {
+let initJasmine_scout = files => {
   // jqueryExtensions must be loaded after the jquery file
-  var insertPos = findJqueryPosition(files);
+  let insertPos = findJqueryPosition(files);
   files.splice(insertPos, 0,
     createPattern(__dirname + '/scoutMatchers.js'),
     createPattern(__dirname + '/cloneMatchers.js'),

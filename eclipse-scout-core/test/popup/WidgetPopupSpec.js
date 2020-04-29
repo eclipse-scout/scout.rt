@@ -11,10 +11,10 @@
 
 import {Form, scout} from '../../src/index';
 
-describe('WidgetPopup', function() {
-  var session;
+describe('WidgetPopup', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
@@ -41,31 +41,31 @@ describe('WidgetPopup', function() {
     });
   }
 
-  describe('withFocusContext', function() {
-    it('focuses the first focusable element when opened', function() {
-      var popup = createPopupWithFormAnd2Fields();
+  describe('withFocusContext', () => {
+    it('focuses the first focusable element when opened', () => {
+      let popup = createPopupWithFormAnd2Fields();
       popup.open();
       expect(popup.widget.widget('First Field').isFocused()).toBe(true);
     });
 
-    it('focuses the element specified by an inner element', function() {
-      var popup = createPopupWithFormAnd2Fields('Second Field');
+    it('focuses the element specified by an inner element', () => {
+      let popup = createPopupWithFormAnd2Fields('Second Field');
       popup.open();
       expect(popup.widget.widget('Second Field').isFocused()).toBe(true);
     });
 
-    it('reverts focus correctly when popup is closed', function() {
-      var field1 = scout.create('StringField', {
+    it('reverts focus correctly when popup is closed', () => {
+      let field1 = scout.create('StringField', {
         parent: session.desktop
       });
       field1.render();
-      var field2 = scout.create('StringField', {
+      let field2 = scout.create('StringField', {
         parent: session.desktop
       });
       field2.render();
       field2.focus();
 
-      var popup = createPopupWithFormAnd2Fields('Second Field');
+      let popup = createPopupWithFormAnd2Fields('Second Field');
       popup.open();
       expect(popup.widget.widget('Second Field').isFocused()).toBe(true);
 

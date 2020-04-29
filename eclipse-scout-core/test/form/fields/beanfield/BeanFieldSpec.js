@@ -10,10 +10,10 @@
  */
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('BeanField', function() {
-  var session, helper, field;
+describe('BeanField', () => {
+  let session, helper, field;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
@@ -22,7 +22,7 @@ describe('BeanField', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
     jasmine.Ajax.uninstall();
   });
@@ -36,14 +36,14 @@ describe('BeanField', function() {
     });
   }
 
-  it('renders the bean', function() {
+  it('renders the bean', () => {
     field.render();
     expect(field.$container).toHaveClass('test-bean-field');
     expect(field.$field.children('.msg-from').text()).toBe('Message from Jasmine Test Runner');
     expect(field.$field.children('.msg-text').text()).toBe('It works!');
   });
 
-  it('updates properties correctly', function() {
+  it('updates properties correctly', () => {
     field.render();
     expect(field.value.sender).toBe('Jasmine Test Runner');
     expect(field.displayText).toBe(null);

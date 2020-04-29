@@ -23,7 +23,7 @@ export default class FocusAdjacentElementKeyStroke extends KeyStroke {
   }
 
   handle(event) {
-    var activeElement = this.field.$container.activeElement(true),
+    let activeElement = this.field.$container.activeElement(true),
       $focusableElements = this.field.$container.find(':focusable');
 
     switch (event.which) { // NOSONAR

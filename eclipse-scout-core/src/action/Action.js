@@ -107,7 +107,7 @@ export default class Action extends Widget {
   }
 
   _renderText() {
-    var text = this.text || '';
+    let text = this.text || '';
     if (text && this.textVisible) {
       if (!this.$text) {
         // Create a separate text element to so that setting the text does not remove the icon
@@ -132,7 +132,7 @@ export default class Action extends Widget {
   }
 
   _renderIconId() {
-    var iconId = this.iconId || '';
+    let iconId = this.iconId || '';
     // If the icon is an image (and not a font icon), the Icon class will invalidate the layout when the image has loaded
     if (!iconId) {
       this._removeIconId();
@@ -147,9 +147,9 @@ export default class Action extends Widget {
       iconDesc: iconId,
       prepend: true
     });
-    this.icon.one('destroy', function() {
+    this.icon.one('destroy', () => {
       this.icon = null;
-    }.bind(this));
+    });
     this.icon.render();
   }
 
@@ -197,7 +197,7 @@ export default class Action extends Widget {
   }
 
   _shouldInstallTooltip() {
-    var show = this.tooltipText && this.enabledComputed;
+    let show = this.tooltipText && this.enabledComputed;
     if (!this.showTooltipWhenSelected && this.selected) {
       show = false;
     }
@@ -295,7 +295,7 @@ export default class Action extends Widget {
   }
 
   _renderKeyStroke() {
-    var keyStroke = this.keyStroke;
+    let keyStroke = this.keyStroke;
     if (keyStroke === undefined) {
       this.$container.removeAttr('data-shortcut');
     } else {

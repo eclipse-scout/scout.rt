@@ -39,7 +39,7 @@ export default class DesktopAdapter extends ModelAdapter {
   }
 
   _sendFormActivate(form) {
-    var eventData = {
+    let eventData = {
       formId: form ? form.modelAdapter.id : null
     };
 
@@ -72,18 +72,18 @@ export default class DesktopAdapter extends ModelAdapter {
   }
 
   _onFormShow(event) {
-    var form,
+    let form,
       displayParent = this.session.getModelAdapter(event.displayParent);
 
     if (displayParent) {
       form = this.session.getOrCreateWidget(event.form, displayParent.widget);
       form.setDisplayParent(displayParent.widget);
 
-      var hasPendingFormActivateEvent = this.session.asyncEvents.some(function(event) {
+      let hasPendingFormActivateEvent = this.session.asyncEvents.some(function(event) {
         return event.type === 'formActivate' && event.target === this.id;
       }, this);
       if (!hasPendingFormActivateEvent) {
-        this.addFilterForWidgetEvent(function(widgetEvent) {
+        this.addFilterForWidgetEvent(widgetEvent => {
           return (widgetEvent.type === 'formActivate' && widgetEvent.form === form);
         });
       }
@@ -93,7 +93,7 @@ export default class DesktopAdapter extends ModelAdapter {
   }
 
   _onFormHide(event) {
-    var form,
+    let form,
       displayParent = this.session.getModelAdapter(event.displayParent);
 
     if (displayParent) {
@@ -103,15 +103,15 @@ export default class DesktopAdapter extends ModelAdapter {
   }
 
   _onFormActivate(event) {
-    var form = this.session.getWidget(event.form);
+    let form = this.session.getWidget(event.form);
     this.widget.activateForm(form);
   }
 
   _onWidgetCancelAllForms(event) {
     event.preventDefault();
-    var formIds = [];
+    let formIds = [];
     if (event.forms) {
-      formIds = event.forms.map(function(form) {
+      formIds = event.forms.map(form => {
         return form.modelAdapter.id;
       });
     }
@@ -121,7 +121,7 @@ export default class DesktopAdapter extends ModelAdapter {
   }
 
   _onMessageBoxShow(event) {
-    var messageBox,
+    let messageBox,
       displayParent = this.session.getModelAdapter(event.displayParent);
 
     if (displayParent) {
@@ -132,7 +132,7 @@ export default class DesktopAdapter extends ModelAdapter {
   }
 
   _onMessageBoxHide(event) {
-    var messageBox,
+    let messageBox,
       displayParent = this.session.getModelAdapter(event.displayParent);
 
     if (displayParent) {
@@ -142,7 +142,7 @@ export default class DesktopAdapter extends ModelAdapter {
   }
 
   _onFileChooserShow(event) {
-    var fileChooser,
+    let fileChooser,
       displayParent = this.session.getModelAdapter(event.displayParent);
 
     if (displayParent) {
@@ -153,7 +153,7 @@ export default class DesktopAdapter extends ModelAdapter {
   }
 
   _onFileChooserHide(event) {
-    var fileChooser,
+    let fileChooser,
       displayParent = this.session.getModelAdapter(event.displayParent);
 
     if (displayParent) {
@@ -167,12 +167,12 @@ export default class DesktopAdapter extends ModelAdapter {
   }
 
   _onOutlineChanged(event) {
-    var outline = this.session.getOrCreateWidget(event.outline, this.widget);
+    let outline = this.session.getOrCreateWidget(event.outline, this.widget);
     this.widget.setOutline(outline);
   }
 
   _onAddNotification(event) {
-    var notification = this.session.getOrCreateWidget(event.notification, this.widget);
+    let notification = this.session.getOrCreateWidget(event.notification, this.widget);
     this.widget.addNotification(notification);
   }
 
@@ -186,13 +186,13 @@ export default class DesktopAdapter extends ModelAdapter {
 
   _onRequestGeolocation(event) {
     if (navigator.geolocation) {
-      var success = function(position) {
+      let success = function(position) {
         this._send('geolocationDetermined', {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
         });
       }.bind(this);
-      var error = function(error) {
+      let error = function(error) {
         this._send('geolocationDetermined', {
           errorCode: error.code,
           errorMessage: error.message

@@ -11,8 +11,8 @@
 import {arrays, ObjectFactory, scout} from '@eclipse-scout/core';
 import {LocaleSpecHelper, TestingApp} from './index';
 
-window.sandboxSession = function(options) {
-  var $sandbox = $('#sandbox')
+window.sandboxSession = options => {
+  let $sandbox = $('#sandbox')
     .addClass('scout');
 
   options = options || {};
@@ -23,7 +23,7 @@ window.sandboxSession = function(options) {
   options.remote = true; // required so adapters will be registered in the adapter registry
   options.$entryPoint = $sandbox;
 
-  var session = scout.create('Session', options, {
+  let session = scout.create('Session', options, {
     ensureUniqueId: false
   });
 
@@ -31,16 +31,14 @@ window.sandboxSession = function(options) {
   // the value of the "showBusyIndicator" using toContainEvents(). Usually, this
   // flag is filtered from the request before sending the AJAX call, however in
   // the tests we want to keep it.
-  session._requestToJson = function(request) {
-    return JSON.stringify(request);
-  };
+  session._requestToJson = request => JSON.stringify(request);
 
   // Simulate successful session initialization
   session.uiSessionId = '1.1';
   session.modelAdapterRegistry[session.uiSessionId] = session;
   session.locale = new LocaleSpecHelper().createLocale('de-CH');
 
-  var desktop = options.desktop || {};
+  let desktop = options.desktop || {};
   desktop.navigationVisible = scout.nvl(desktop.navigationVisible, false);
   desktop.headerVisible = scout.nvl(desktop.headerVisible, false);
   desktop.benchVisible = scout.nvl(desktop.benchVisible, false);
@@ -56,11 +54,11 @@ window.sandboxSession = function(options) {
   return session;
 };
 
-window.createSimpleModel = function(objectType, session, id) {
+window.createSimpleModel = (objectType, session, id) => {
   if (id === undefined) {
     id = ObjectFactory.get().createUniqueId();
   }
-  var parent = session.desktop;
+  let parent = session.desktop;
   return {
     id: id,
     objectType: objectType,
@@ -73,9 +71,9 @@ window.createSimpleModel = function(objectType, session, id) {
  * This function links and existing widget with a new adapter instance. This is useful for tests
  * where you have an existing widget and later create a new adapter instance to that widget.
  */
-window.linkWidgetAndAdapter = function(widget, adapterClass) {
-  var session = widget.session;
-  var adapter = scout.create(adapterClass, {
+window.linkWidgetAndAdapter = (widget, adapterClass) => {
+  let session = widget.session;
+  let adapter = scout.create(adapterClass, {
     id: widget.id,
     session: session
   });
@@ -89,10 +87,10 @@ window.linkWidgetAndAdapter = function(widget, adapterClass) {
  * Converts the given adapaterDataArray into a map of adapterData where the key
  * is the adapterData.id and the value is the adapterData itself.
  */
-window.mapAdapterData = function(adapterDataArray) {
-  var adapterDataMap = {};
+window.mapAdapterData = adapterDataArray => {
+  let adapterDataMap = {};
   adapterDataArray = arrays.ensure(adapterDataArray);
-  adapterDataArray.forEach(function(adapterData) {
+  adapterDataArray.forEach(adapterData => {
     adapterDataMap[adapterData.id] = adapterData;
   });
   return adapterDataMap;
@@ -105,8 +103,8 @@ window.mapAdapterData = function(adapterDataArray) {
  *
  * @param adapterDataArray
  */
-window.registerAdapterData = function(adapterDataArray, session) {
-  var adapterDataMap = mapAdapterData(adapterDataArray);
+window.registerAdapterData = (adapterDataArray, session) => {
+  let adapterDataMap = mapAdapterData(adapterDataArray);
   session._copyAdapterData(adapterDataMap);
 };
 
@@ -114,20 +112,20 @@ window.registerAdapterData = function(adapterDataArray, session) {
  * Removes all open popups for the given session.
  * May be used to make sure handlers get properly detached
  */
-window.removePopups = function(session, cssClass) {
+window.removePopups = (session, cssClass) => {
   cssClass = cssClass || '.popup';
   session.$entryPoint.children(cssClass).each(function() {
-    var popup = scout.widget($(this));
+    let popup = scout.widget($(this));
     popup.animateRemoval = false;
     popup.remove();
   });
 };
 
-window.createSimpleModel = function(objectType, session, id) {
+window.createSimpleModel = (objectType, session, id) => {
   if (id === undefined) {
     id = ObjectFactory.get().createUniqueId();
   }
-  var parent = session.desktop;
+  let parent = session.desktop;
   return {
     id: id,
     objectType: objectType,
@@ -148,7 +146,7 @@ export function startApp(App) {
 }
 
 export default {
-  runTestSuite: function(context) {
+  runTestSuite: context => {
     startApp(TestingApp);
     context.keys().forEach(context);
   },

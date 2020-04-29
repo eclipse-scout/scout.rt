@@ -75,7 +75,7 @@ export default class AggregateTableControl extends TableControl {
 
   _renderAggregate() {
     this.table.visibleColumns().forEach(function(column, c) {
-      var aggregateValue, cell, $cell;
+      let aggregateValue, cell, $cell;
 
       aggregateValue = this.aggregateRow[c];
       // Aggregation functions are not available if column is grouped -> do not show aggregated value
@@ -105,7 +105,7 @@ export default class AggregateTableControl extends TableControl {
   }
 
   _aggregate() {
-    var rows,
+    let rows,
       aggregateRow = [],
       selectedRows = this.table.selectedRows;
 
@@ -130,7 +130,7 @@ export default class AggregateTableControl extends TableControl {
 
   _reconcileScrollPos() {
     // When scrolling horizontally scroll aggregate content as well
-    var scrollLeft = this.table.$data.scrollLeft();
+    let scrollLeft = this.table.$data.scrollLeft();
     this.$contentContainer.scrollLeft(scrollLeft);
   }
 
@@ -139,7 +139,7 @@ export default class AggregateTableControl extends TableControl {
       // During init the columns are not resolved yet -> containsAggregatedNumberColumn won't return a correct value
       return;
     }
-    var enabled = this.table.containsAggregatedNumberColumn();
+    let enabled = this.table.containsAggregatedNumberColumn();
 
     // Select control if enabled, aggregation function changed and table is not grouped
     if (enabled) {

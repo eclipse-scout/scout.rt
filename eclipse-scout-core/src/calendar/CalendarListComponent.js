@@ -22,14 +22,14 @@ export default class CalendarListComponent {
     this.partDay = partDay;
     this.source = source;
     this.$container = null;
-    this._selectedListener = source.on('selected', function(event) {
+    this._selectedListener = source.on('selected', event => {
       this.$container.toggleClass('comp-selected', event.selected);
-    }.bind(this));
+    });
     this._removeListener = source.on('remove', this.remove.bind(this));
   }
 
   render($parent) {
-    var source = this.source;
+    let source = this.source;
     this.$container = $parent
       .appendDiv('calendar-component')
       .data('partDay', this.partDay)
@@ -48,7 +48,7 @@ export default class CalendarListComponent {
    */
   _onMouseDown(source, event) {
     event.preventDefault(); // *1
-    var $part = $(event.delegateTarget);
+    let $part = $(event.delegateTarget);
     source.updateSelectedComponent($part, true);
   }
 

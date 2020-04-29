@@ -11,41 +11,41 @@
 import {keys, scout} from '../../../../src/index';
 import {TabBoxSpecHelper} from '@eclipse-scout/testing';
 
-describe('TabBox', function() {
-  var session;
-  var helper;
+describe('TabBox', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TabBoxSpecHelper(session);
   });
 
-  describe('render', function() {
-    var tabBox;
+  describe('render', () => {
+    let tabBox;
 
-    beforeEach(function() {
-      var tabItem = helper.createTabItem();
+    beforeEach(() => {
+      let tabItem = helper.createTabItem();
       tabBox = helper.createTabBoxWith([tabItem]);
     });
 
-    it('does NOT call layout for the selected tab on initialization', function() {
+    it('does NOT call layout for the selected tab on initialization', () => {
       spyOn(session.layoutValidator, 'invalidateTree').and.callThrough();
       tabBox.render();
       expect(session.layoutValidator.invalidateTree).not.toHaveBeenCalled();
     });
 
-    it('must not create LogicalGridData for tab items', function() {
+    it('must not create LogicalGridData for tab items', () => {
       tabBox.render();
       expect(tabBox.tabItems[0].htmlComp.layoutData).toBe(null);
     });
 
   });
 
-  describe('remove', function() {
+  describe('remove', () => {
 
-    it('does not fail if there was no selected tab', function() {
-      var tabBox = scout.create('TabBox', {parent: session.desktop});
+    it('does not fail if there was no selected tab', () => {
+      let tabBox = scout.create('TabBox', {parent: session.desktop});
       tabBox.render();
       tabBox.remove();
       expect().nothing();
@@ -53,16 +53,16 @@ describe('TabBox', function() {
 
   });
 
-  describe('selection', function() {
+  describe('selection', () => {
 
-    it('should select tabs by ID', function() {
-      var tabItemA = helper.createTabItem({
+    it('should select tabs by ID', () => {
+      let tabItemA = helper.createTabItem({
         id: 'Foo'
       });
-      var tabItemB = helper.createTabItem({
+      let tabItemB = helper.createTabItem({
         id: 'Bar'
       });
-      var tabBox = helper.createTabBoxWith([tabItemA, tabItemB]);
+      let tabBox = helper.createTabBoxWith([tabItemA, tabItemB]);
       tabBox.selectTabById('Foo');
       expect(tabBox.selectedTab).toBe(tabItemA);
       tabBox.selectTabById('Bar');
@@ -71,16 +71,16 @@ describe('TabBox', function() {
 
   });
 
-  describe('key handling', function() {
+  describe('key handling', () => {
 
-    it('supports left/right keys to select a tab-item', function() {
-      var tabItemA = helper.createTabItem({
+    it('supports left/right keys to select a tab-item', () => {
+      let tabItemA = helper.createTabItem({
         label: 'tab 01'
       });
-      var tabItemB = helper.createTabItem({
+      let tabItemB = helper.createTabItem({
         label: 'tab 02'
       });
-      var tabBox = helper.createTabBoxWith([tabItemA, tabItemB]);
+      let tabBox = helper.createTabBoxWith([tabItemA, tabItemB]);
       tabBox.render();
 
       tabItemA.focus();
@@ -103,10 +103,10 @@ describe('TabBox', function() {
 
   });
 
-  describe('first class', function() {
-    var tabBox;
+  describe('first class', () => {
+    let tabBox;
 
-    beforeEach(function() {
+    beforeEach(() => {
       tabBox = scout.create('TabBox', {
         parent: session.desktop,
         tabItems: [{
@@ -123,14 +123,14 @@ describe('TabBox', function() {
         '</style>').appendTo($('#sandbox'));
     });
 
-    it('is added to the first tab item', function() {
+    it('is added to the first tab item', () => {
       tabBox.render();
       tabBox.validateLayout();
       expect(tabBox.header.tabArea.tabs[0].$container).toHaveClass('first');
       expect(tabBox.header.tabArea.tabs[1].$container).not.toHaveClass('first');
     });
 
-    it('is added to the first visible tab item', function() {
+    it('is added to the first visible tab item', () => {
       tabBox = scout.create('TabBox', {
         parent: session.desktop,
         tabItems: [{
@@ -152,7 +152,7 @@ describe('TabBox', function() {
       expect(tabBox.header.tabArea.tabs[2].$container).not.toHaveClass('first');
     });
 
-    it('is correctly updated when visibility changes', function() {
+    it('is correctly updated when visibility changes', () => {
       tabBox.render();
       tabBox.validateLayout();
       tabBox.tabItems[0].setVisible(false);

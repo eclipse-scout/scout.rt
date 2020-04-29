@@ -18,7 +18,7 @@ export default class TreeSpecHelper {
   }
 
   createModel(nodes) {
-    var model = createSimpleModel('Tree', this.session);
+    let model = createSimpleModel('Tree', this.session);
 
     if (nodes) {
       model.nodes = nodes;
@@ -50,12 +50,12 @@ export default class TreeSpecHelper {
       return;
     }
 
-    var nodes = [],
+    let nodes = [],
       nodeId;
     if (!depth) {
       depth = 0;
     }
-    for (var i = 0; i < nodeCount; i++) {
+    for (let i = 0; i < nodeCount; i++) {
       nodeId = i;
       if (parentNode) {
         nodeId = parentNode.id + '_' + nodeId;
@@ -70,30 +70,30 @@ export default class TreeSpecHelper {
   }
 
   createTree(model) {
-    var defaults = {
+    let defaults = {
       parent: this.session.desktop
     };
     model = $.extend({}, defaults, model);
-    var tree = new Tree();
+    let tree = new Tree();
     tree.init(model);
     return tree;
   }
 
   createTreeAdapter(model) {
-    var adapter = new TreeAdapter();
+    let adapter = new TreeAdapter();
     adapter.init(model);
     return adapter;
   }
 
   createCompactTree(model) {
-    var tree = new CompactTree();
+    let tree = new CompactTree();
     tree.init(model);
     return tree;
   }
 
   createCompactTreeAdapter(model) {
     model.objectType = 'Tree:Compact';
-    var tree = new TreeAdapter();
+    let tree = new TreeAdapter();
     tree.init(model);
     return tree;
   }
@@ -117,10 +117,10 @@ export default class TreeSpecHelper {
   }
 
   assertSelection(tree, nodes) {
-    var $selectedNodes = tree.$selectedNodes();
+    let $selectedNodes = tree.$selectedNodes();
     expect($selectedNodes.length).toBe(nodes.length);
 
-    var selectedNodes = [];
+    let selectedNodes = [];
     $selectedNodes.each(function() {
       selectedNodes.push($(this).data('node'));
     });

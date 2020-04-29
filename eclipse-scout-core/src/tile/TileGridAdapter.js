@@ -60,7 +60,7 @@ export default class TileGridAdapter extends ModelAdapter {
   }
 
   _onWidgetTileClick(event) {
-    var data = {
+    let data = {
       tile: event.tile.id,
       mouseButton: event.mouseButton
     };
@@ -68,7 +68,7 @@ export default class TileGridAdapter extends ModelAdapter {
   }
 
   _onWidgetTileAction(event) {
-    var data = {
+    let data = {
       tile: event.tile.id
     };
     this._send('tileAction', data);

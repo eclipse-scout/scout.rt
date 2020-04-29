@@ -23,9 +23,9 @@ export default class SmartFieldMultilineLayout extends AbstractLayout {
 
     this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
     HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
-    this.smartField.one('remove', function() {
+    this.smartField.one('remove', () => {
       HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
-    }.bind(this));
+    });
   }
 
   _initDefaults() {
@@ -38,7 +38,7 @@ export default class SmartFieldMultilineLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var htmlContainer = HtmlComponent.get($container),
+    let htmlContainer = HtmlComponent.get($container),
       $input = $container.children('.multiline-input'),
       $lines = $container.children('.multiline-lines'),
       innerSize = htmlContainer.availableSize()

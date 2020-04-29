@@ -11,13 +11,13 @@
 import {FormSpecHelper} from '@eclipse-scout/testing';
 import {ModelAdapter, ObjectFactory, RemoteEvent, scout} from '../../src/index';
 
-describe('ModelAdapter', function() {
+describe('ModelAdapter', () => {
 
-  var session, $sandbox, myObjectFactory, helper,
+  let session, $sandbox, myObjectFactory, helper,
     model = {},
     originalObjectFactory = ObjectFactory.get();
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -28,23 +28,23 @@ describe('ModelAdapter', function() {
 
     // Create a private object factory used for these tests
     myObjectFactory = new ObjectFactory();
-    myObjectFactory.register('Generic', function() {
+    myObjectFactory.register('Generic', () => {
       return new ModelAdapter();
     });
-    myObjectFactory.register('HasChildAdapter', function() {
-      var adapter = new ModelAdapter();
+    myObjectFactory.register('HasChildAdapter', () => {
+      let adapter = new ModelAdapter();
       adapter._addWidgetProperties('childAdapter');
       return adapter;
     });
-    myObjectFactory.register('HasChildAdapters', function() {
-      var adapter = new ModelAdapter();
+    myObjectFactory.register('HasChildAdapters', () => {
+      let adapter = new ModelAdapter();
       adapter._addWidgetProperties('childAdapters');
       return adapter;
     });
     ObjectFactory._set(myObjectFactory);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
@@ -72,11 +72,11 @@ describe('ModelAdapter', function() {
     return session.getOrCreateWidget(model.id, session.desktop);
   }
 
-  it('can handle properties in any order', function() {
-    var widget = createWidget({id: '2'});
+  it('can handle properties in any order', () => {
+    let widget = createWidget({id: '2'});
 
     // Send a dummy event to this object which contains both a new object and a id-only ref to that new object
-    var event = new RemoteEvent('2', 'property', {
+    let event = new RemoteEvent('2', 'property', {
       properties: {
         x1: 'val1',
         x2: 'val2',
@@ -124,15 +124,15 @@ describe('ModelAdapter', function() {
     expect(widget.o2.id).toBe('4');
   });
 
-  it('_syncPropertiesOnPropertyChange calls set* methods or setProperty method', function() {
-    var widget = createWidget({
+  it('_syncPropertiesOnPropertyChange calls set* methods or setProperty method', () => {
+    let widget = createWidget({
       foo: 1,
       bar: 2
     });
     widget.setFoo = function(value) {
       this.foo = value;
     };
-    var newValues = {
+    let newValues = {
       foo: 6,
       bar: 7
     };
@@ -146,20 +146,20 @@ describe('ModelAdapter', function() {
     expect(widget.setProperty).toHaveBeenCalled(); // for property 'bar'
   });
 
-  describe('init', function() {
+  describe('init', () => {
 
-    it('copies properties to widget', function() {
-      var widget = createWidget({foo: 6});
+    it('copies properties to widget', () => {
+      let widget = createWidget({foo: 6});
       expect(widget.foo).toBe(6);
     });
 
-    it('sets default values', function() {
+    it('sets default values', () => {
       // model does not contain a property visible
-      var model = createModel({objectType: 'Button'});
+      let model = createModel({objectType: 'Button'});
       expect(model.visible).toBe(undefined);
 
       // because visible is a default property, the property is set on the widget/adapter
-      var widget = createWidget(model);
+      let widget = createWidget(model);
       expect(widget.visible).toBe(true);
 
       // verify that the original model is not modified
@@ -168,18 +168,18 @@ describe('ModelAdapter', function() {
 
   });
 
-  describe('destroy', function() {
+  describe('destroy', () => {
 
-    var widget, adapter, childModel;
+    let widget, adapter, childModel;
 
-    beforeEach(function() {
+    beforeEach(() => {
       widget = createWidget();
       adapter = widget.modelAdapter;
       childModel = createModel();
     });
 
-    it('destroys the adapter and its children', function() {
-      var message = {
+    it('destroys the adapter and its children', () => {
+      let message = {
         adapterData: mapAdapterData(childModel),
         events: [createPropertyChangeEvent(adapter, {
           childWidget: childModel.id
@@ -197,10 +197,10 @@ describe('ModelAdapter', function() {
       expect(session.getModelAdapter(childModel.id)).toBeFalsy();
     });
 
-    it('does not destroy children, which are globally used', function() {
+    it('does not destroy children, which are globally used', () => {
       childModel.global = true;
 
-      var message = {
+      let message = {
         adapterData: mapAdapterData(childModel),
         events: [createPropertyChangeEvent(adapter, {
           childWidget: childModel.id
@@ -221,21 +221,21 @@ describe('ModelAdapter', function() {
 
   });
 
-  describe('onModelPropertyChange', function() {
+  describe('onModelPropertyChange', () => {
 
-    var widget, adapter, childModel, childModel2;
+    let widget, adapter, childModel, childModel2;
 
-    beforeEach(function() {
+    beforeEach(() => {
       widget = createWidget();
       adapter = widget.modelAdapter;
       childModel = createModel();
       childModel2 = createModel();
     });
 
-    describe('adapter', function() {
+    describe('adapter', () => {
 
-      it('creates and registers the new adapter', function() {
-        var message = {
+      it('creates and registers the new adapter', () => {
+        let message = {
           adapterData: mapAdapterData(childModel),
           events: [createPropertyChangeEvent(adapter, {
             childWidget: childModel.id
@@ -247,8 +247,8 @@ describe('ModelAdapter', function() {
         expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget.modelAdapter);
       });
 
-      it('destroys the old adapter', function() {
-        var message = {
+      it('destroys the old adapter', () => {
+        let message = {
           adapterData: mapAdapterData(childModel),
           events: [createPropertyChangeEvent(adapter, {
             childWidget: childModel.id
@@ -273,33 +273,33 @@ describe('ModelAdapter', function() {
 
     });
 
-    describe('filters', function() {
+    describe('filters', () => {
 
-      var widget, adapter;
+      let widget, adapter;
 
-      beforeEach(function() {
+      beforeEach(() => {
         jasmine.Ajax.requests.reset();
         widget = createWidget();
         adapter = widget.modelAdapter;
         adapter._addRemoteProperties(['foo']);
       });
 
-      describe('propertyChange events', function() {
+      describe('propertyChange events', () => {
 
-        it('should send event when property change is triggered by widget', function() {
+        it('should send event when property change is triggered by widget', () => {
           widget.setProperty('foo', 'bar');
           sendQueuedAjaxCalls();
           expect(jasmine.Ajax.requests.count()).toBe(1);
 
-          var event = new RemoteEvent(widget.id, 'property', {
+          let event = new RemoteEvent(widget.id, 'property', {
             foo: 'bar'
           });
           expect(mostRecentJsonRequest()).toContainEvents(event);
           expect(widget.foo).toBe('bar');
         });
 
-        it('should not send event when property is triggered by server', function() {
-          var propertyChangeEvent = new RemoteEvent('123', 'propertyChange', {
+        it('should not send event when property is triggered by server', () => {
+          let propertyChangeEvent = new RemoteEvent('123', 'propertyChange', {
             properties: {foo: 'bar'}
           });
           adapter.onModelPropertyChange(propertyChangeEvent);
@@ -310,15 +310,15 @@ describe('ModelAdapter', function() {
 
       });
 
-      describe('widget events', function() {
+      describe('widget events', () => {
 
-        it('should handle widget event when it is not filtered', function() {
+        it('should handle widget event when it is not filtered', () => {
           spyOn(adapter, '_onWidgetEvent');
           widget.trigger('fooHappened');
           expect(adapter._onWidgetEvent).toHaveBeenCalled();
         });
 
-        it('should not handle widget event when it is filtered', function() {
+        it('should not handle widget event when it is filtered', () => {
           adapter.addFilterForWidgetEventType('fooHappened');
           spyOn(adapter, '_onWidgetEvent');
           widget.trigger('fooHappened');
@@ -334,13 +334,13 @@ describe('ModelAdapter', function() {
 
     });
 
-    describe('export adapter', function() {
+    describe('export adapter', () => {
 
-      it('exportAdapterData should export last part of model-class as ID', function() {
-        var adapter = new ModelAdapter();
+      it('exportAdapterData should export last part of model-class as ID', () => {
+        let adapter = new ModelAdapter();
 
         // regular top-level classes (.)
-        var model = {modelClass: 'com.bsiag.sandbox.FooField'};
+        let model = {modelClass: 'com.bsiag.sandbox.FooField'};
         adapter.exportAdapterData(model);
         expect(model.id).toBe('FooField');
 
@@ -352,10 +352,10 @@ describe('ModelAdapter', function() {
 
     });
 
-    describe('adapters', function() {
+    describe('adapters', () => {
 
-      it('creates and registers adapters', function() {
-        var message = {
+      it('creates and registers adapters', () => {
+        let message = {
           adapterData: mapAdapterData([childModel, childModel2]),
           events: [createPropertyChangeEvent(adapter, {
             childWidget: [childModel.id, childModel2.id]
@@ -369,8 +369,8 @@ describe('ModelAdapter', function() {
         expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[1].modelAdapter);
       });
 
-      it('destroys the old adapters', function() {
-        var message = {
+      it('destroys the old adapters', () => {
+        let message = {
           adapterData: mapAdapterData([childModel, childModel2]),
           events: [createPropertyChangeEvent(adapter, {
             childWidget: [childModel.id, childModel2.id]
@@ -382,8 +382,8 @@ describe('ModelAdapter', function() {
         expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget[0].modelAdapter);
         expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[1].modelAdapter);
 
-        var childWidget = widget.childWidget[0];
-        var childWidget2 = widget.childWidget[1];
+        let childWidget = widget.childWidget[0];
+        let childWidget2 = widget.childWidget[1];
         message = {
           events: [createPropertyChangeEvent(adapter, {
             childWidget: [childModel2.id]
@@ -398,9 +398,9 @@ describe('ModelAdapter', function() {
         expect(childWidget2.destroyed).toBe(false);
       });
 
-      it('destroys the old and creates the new adapters if the array contains both', function() {
-        var childModel3 = createModel();
-        var message = {
+      it('destroys the old and creates the new adapters if the array contains both', () => {
+        let childModel3 = createModel();
+        let message = {
           adapterData: mapAdapterData([childModel, childModel2]),
           events: [createPropertyChangeEvent(adapter, {
             childWidget: [childModel.id, childModel2.id]

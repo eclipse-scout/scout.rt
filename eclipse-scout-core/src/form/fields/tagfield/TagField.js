@@ -74,11 +74,11 @@ export default class TagField extends ValueField {
     this.addContainer(this.$parent, 'tag-field', new TagFieldLayout(this));
     this.addLabel();
     this.addMandatoryIndicator();
-    var $fieldContainer = this.$container.appendDiv();
+    let $fieldContainer = this.$container.appendDiv();
     this.fieldHtmlComp = HtmlComponent.install($fieldContainer, this.session);
     this.fieldHtmlComp.setLayout(new TagFieldContainerLayout(this));
     this.tagBar.render($fieldContainer);
-    var $field = $fieldContainer.appendElement('<input>', 'field')
+    let $field = $fieldContainer.appendElement('<input>', 'field')
       .on('keydown', this._onInputKeydown.bind(this))
       .on('keyup', this._onInputKeyup.bind(this))
       .on('input', this._onFieldInput.bind(this));
@@ -116,9 +116,9 @@ export default class TagField extends ValueField {
    * @override ValueField.js
    */
   _validateValue(value) {
-    var tags = arrays.ensure(value);
-    var result = [];
-    tags.forEach(function(tag) {
+    let tags = arrays.ensure(value);
+    let result = [];
+    tags.forEach(tag => {
       if (!strings.empty(tag)) {
         tag = tag.toLowerCase();
         if (result.indexOf(tag) < 0) {
@@ -130,7 +130,7 @@ export default class TagField extends ValueField {
   }
 
   _parseValue(displayText) {
-    var tags = arrays.ensure(this.value);
+    let tags = arrays.ensure(this.value);
     tags = tags.slice();
     tags.push(displayText);
     return tags;
@@ -155,7 +155,7 @@ export default class TagField extends ValueField {
   }
 
   _updateInputVisible() {
-    var visible, oldVisible = !this.$field.isVisible();
+    let visible, oldVisible = !this.$field.isVisible();
     if (this.enabledComputed) {
       visible = true;
     } else {
@@ -225,7 +225,7 @@ export default class TagField extends ValueField {
   }
 
   addTag(text) {
-    var value = this._parseValue(text);
+    let value = this._parseValue(text);
     this.setValue(value);
     this._triggerAcceptInput();
   }
@@ -235,7 +235,7 @@ export default class TagField extends ValueField {
       return;
     }
     tag = tag.toLowerCase();
-    var tags = arrays.ensure(this.value);
+    let tags = arrays.ensure(this.value);
     if (tags.indexOf(tag) === -1) {
       return;
     }
@@ -288,9 +288,9 @@ export default class TagField extends ValueField {
     });
     return this._currentLookupCall
       .execute()
-      .always(function() {
+      .always(() => {
         this._currentLookupCall = null;
-      }.bind(this))
+      })
       .done(this._onLookupDone.bind(this));
   }
 
@@ -343,7 +343,7 @@ export default class TagField extends ValueField {
   }
 
   isInputFocused() {
-    var ae = this.$fieldContainer.activeElement();
+    let ae = this.$fieldContainer.activeElement();
     return this.$field.is(ae);
   }
 
@@ -355,7 +355,7 @@ export default class TagField extends ValueField {
 
   _renderPlaceholder($field) {
     // only render placeholder when tag field is empty (has no tags)
-    var hasTags = !!arrays.ensure(this.value).length;
+    let hasTags = !!arrays.ensure(this.value).length;
     $field = scout.nvl($field, this.$field);
     if ($field) {
       $field.placeholder(hasTags ? '' : this.label);
@@ -368,27 +368,23 @@ export default class TagField extends ValueField {
 
   static createFieldAdapter(field) {
     return {
-      $container: function() {
-        return field.$fieldContainer;
-      },
+      $container: () => field.$fieldContainer,
 
-      enabled: function() {
-        return strings.empty(field._readDisplayText());
-      },
+      enabled: () => strings.empty(field._readDisplayText()),
 
-      focus: function() {
+      focus: () => {
         field.$field.focus();
       },
 
-      one: function(p1, p2) {
+      one: (p1, p2) => {
         field.one(p1, p2);
       },
 
-      off: function(p1, p2) {
+      off: (p1, p2) => {
         field.off(p1, p2);
       },
 
-      removeTag: function(tag) {
+      removeTag: tag => {
         field.removeTag(tag);
       }
     };

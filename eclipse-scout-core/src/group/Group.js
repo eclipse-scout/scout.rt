@@ -130,7 +130,7 @@ export default class Group extends Widget {
    * Adds an image or font-based icon to the group header by adding either an IMG or SPAN element.
    */
   _renderIconId() {
-    var iconId = this.iconId || '';
+    let iconId = this.iconId || '';
     // If the icon is an image (and not a font icon), the Icon class will invalidate the layout when the image has loaded
     if (!iconId) {
       this._removeIconId();
@@ -147,15 +147,15 @@ export default class Group extends Widget {
       iconDesc: iconId,
       prepend: true
     });
-    this.icon.one('destroy', function() {
+    this.icon.one('destroy', () => {
       this.icon = null;
-    }.bind(this));
+    });
     this.icon.render(this.$header);
     this._updateIconStyle();
   }
 
   _updateIconStyle() {
-    var hasTitle = !!this.title;
+    let hasTitle = !!this.title;
     this.get$Icon().toggleClass('with-title', hasTitle);
     this.get$Icon().addClass('group-icon');
     this._renderCollapseStyle();
@@ -351,7 +351,7 @@ export default class Group extends Widget {
     } else if (this.collapseStyle === Group.CollapseStyle.LEFT && !this.header) {
       this.$collapseIcon.prependTo(this.$header);
     } else if (this.collapseStyle === Group.CollapseStyle.BOTTOM) {
-      var sibling = this.body.$container ? this.body.$container : this.$header;
+      let sibling = this.body.$container ? this.body.$container : this.$header;
       this.$footer.insertAfter(sibling);
       this.$collapseIcon.insertAfter(this.$collapseBorderLeft);
     }
@@ -376,7 +376,7 @@ export default class Group extends Widget {
    * Resizes the body to its preferred size by animating the height.
    */
   resizeBody() {
-    this.animateToggleCollapse().done(function() {
+    this.animateToggleCollapse().done(() => {
       if (this.bodyAnimating) {
         // Another animation has been started in the mean time -> ignore done event
         return;
@@ -385,7 +385,7 @@ export default class Group extends Widget {
         this.body.remove();
       }
       this.invalidateLayoutTree();
-    }.bind(this));
+    });
   }
 
   /**
@@ -393,10 +393,10 @@ export default class Group extends Widget {
    * @returns {Promise}
    */
   animateToggleCollapse(options) {
-    var currentSize = graphics.cssSize(this.body.$container);
-    var currentMargins = graphics.margins(this.body.$container);
-    var currentPaddings = graphics.paddings(this.body.$container);
-    var targetHeight, targetMargins, targetPaddings;
+    let currentSize = graphics.cssSize(this.body.$container);
+    let currentMargins = graphics.margins(this.body.$container);
+    let currentPaddings = graphics.paddings(this.body.$container);
+    let targetHeight, targetMargins, targetPaddings;
 
     if (this.collapsed) {
       // Collapsing

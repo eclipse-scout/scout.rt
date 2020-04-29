@@ -22,7 +22,7 @@ export default class NullLayout extends AbstractLayout {
 
   layout($container) {
     $container.children().each(function() {
-      var htmlComp = HtmlComponent.optGet($(this));
+      let htmlComp = HtmlComponent.optGet($(this));
       if (htmlComp) {
         htmlComp.revalidateLayout();
       }

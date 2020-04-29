@@ -95,7 +95,7 @@ export default class Page extends TreeNode {
   }
 
   _internalInitTable() {
-    var table = this.detailTable;
+    let table = this.detailTable;
     if (table) {
       // this case is used for Scout classic
       table = this.getOutline()._createChild(table);
@@ -107,7 +107,7 @@ export default class Page extends TreeNode {
   }
 
   _internalInitDetailForm() {
-    var detailForm = this.detailForm;
+    let detailForm = this.detailForm;
     if (detailForm) {
       detailForm = this.getOutline()._createChild(detailForm);
     }
@@ -139,7 +139,7 @@ export default class Page extends TreeNode {
     if (this.detailForm) {
       return;
     }
-    var form = this.createDetailForm();
+    let form = this.createDetailForm();
     if (form && !form.displayParent) {
       form.setDisplayParent(this.getOutline());
     }
@@ -202,8 +202,8 @@ export default class Page extends TreeNode {
    * @returns {Array.<Page>} pages linked with the given rows.
    */
   updatePagesFromTableRows(rows) {
-    return rows.map(function(row) {
-      var page = row.page;
+    return rows.map(row => {
+      let page = row.page;
       page.updatePageFromTableRow(row);
       return page;
     });
@@ -215,7 +215,7 @@ export default class Page extends TreeNode {
    * @returns {Page} page linked with the given row.
    */
   updatePageFromTableRow(row) {
-    var page = row.page;
+    let page = row.page;
     page.enabled = row.enabled;
     page.text = page.computeTextForRow(row);
     if (row.cells.length >= 1) {
@@ -233,7 +233,7 @@ export default class Page extends TreeNode {
    * @param {TableRow} row
    */
   computeTextForRow(row) {
-    var text = '';
+    let text = '';
     if (row.cells.length >= 1) {
       text = row.cells[0].text;
     }
@@ -246,7 +246,7 @@ export default class Page extends TreeNode {
    *     object (entity-key or arbitrary data) to a child page.
    */
   _pageParam(paramProperties) {
-    var param = {
+    let param = {
       parent: this.getOutline()
     };
     $.extend(param, paramProperties);
@@ -254,7 +254,7 @@ export default class Page extends TreeNode {
   }
 
   reloadPage() {
-    var outline = this.getOutline();
+    let outline = this.getOutline();
     if (outline) {
       this.loadChildren();
     }
@@ -282,8 +282,8 @@ export default class Page extends TreeNode {
     if (!this.drillDownOnRowClick) {
       return;
     }
-    var row = event.row;
-    var drillNode = this.pageForTableRow(row);
+    let row = event.row;
+    let drillNode = this.pageForTableRow(row);
     this.getOutline().selectNode(drillNode);
     this.detailTable.deselectRow(row);
   }

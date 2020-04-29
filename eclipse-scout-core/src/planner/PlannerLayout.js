@@ -19,7 +19,7 @@ export default class PlannerLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var menuBarSize,
+    let menuBarSize,
       $header = this.planner._header.$container,
       $scale = this.planner.$scale,
       $grid = this.planner.$grid,
@@ -73,7 +73,7 @@ export default class PlannerLayout extends AbstractLayout {
    * Min width is necessary for horizontal scrollbar
    */
   _updateMinWidth() {
-    var minWidth = this._minWidth(),
+    let minWidth = this._minWidth(),
       $scaleTitle = this.planner.$scaleTitle,
       $timeline = this.planner.$timeline;
 
@@ -84,7 +84,7 @@ export default class PlannerLayout extends AbstractLayout {
 
     $timeline.css('min-width', minWidth);
     minWidth += $scaleTitle.outerWidth(true);
-    this.planner.resources.forEach(function(resource) {
+    this.planner.resources.forEach(resource => {
       resource.$resource.css('min-width', minWidth);
     });
   }
@@ -93,7 +93,7 @@ export default class PlannerLayout extends AbstractLayout {
    * Positions the scale lines and set to correct height
    */
   _layoutScaleLines() {
-    var height, $smallScaleItems, $largeScaleItems, scrollLeft,
+    let height, $smallScaleItems, $largeScaleItems, scrollLeft,
       $timelineSmall = this.planner.$timelineSmall,
       $timelineLarge = this.planner.$timelineLarge;
 
@@ -107,11 +107,11 @@ export default class PlannerLayout extends AbstractLayout {
 
     // First loop through every item and set height to 0 in order to get the correct scrollHeight
     $largeScaleItems.each(function() {
-      var $scaleItemLine = $(this).data('scale-item-line');
+      let $scaleItemLine = $(this).data('scale-item-line');
       $scaleItemLine.cssHeight(0);
     });
     $smallScaleItems.each(function() {
-      var $scaleItemLine = $(this).data('scale-item-line');
+      let $scaleItemLine = $(this).data('scale-item-line');
       if ($scaleItemLine) {
         $scaleItemLine.cssHeight(0);
       }
@@ -123,13 +123,13 @@ export default class PlannerLayout extends AbstractLayout {
     height = this.planner.$grid[0].scrollHeight;
     scrollLeft = this.planner.$scale[0].scrollLeft;
     $largeScaleItems.each(function() {
-      var $scaleItem = $(this),
+      let $scaleItem = $(this),
         $scaleItemLine = $scaleItem.data('scale-item-line');
       $scaleItemLine.cssLeft(scrollLeft + $scaleItem.position().left)
         .cssHeight(height);
     });
     $smallScaleItems.each(function() {
-      var $scaleItem = $(this),
+      let $scaleItem = $(this),
         $scaleItemLine = $scaleItem.data('scale-item-line');
       if ($scaleItemLine) {
         $scaleItemLine.cssLeft(scrollLeft + $scaleItem.position().left)
@@ -139,7 +139,7 @@ export default class PlannerLayout extends AbstractLayout {
   }
 
   _minWidth() {
-    var $scaleItemsLarge = this.planner.$timelineLarge.children('.scale-item'),
+    let $scaleItemsLarge = this.planner.$timelineLarge.children('.scale-item'),
       $scaleItemsSmall = this.planner.$timelineSmall.children('.scale-item'),
       numScaleItemsLarge = $scaleItemsLarge.length,
       numScaleItemsSmall = $scaleItemsSmall.length,

@@ -17,7 +17,7 @@ export default class TableProposalChooser extends ProposalChooser {
   }
 
   _createModel() {
-    var headerVisible = false,
+    let headerVisible = false,
       columns = [],
       descriptors = this.smartField.columnDescriptors;
 
@@ -30,7 +30,7 @@ export default class TableProposalChooser extends ProposalChooser {
       columns.push(this._createColumn());
     }
 
-    var table = this._createTable(columns, headerVisible);
+    let table = this._createTable(columns, headerVisible);
     table.on('rowClick', this._onRowClick.bind(this));
 
     return table;
@@ -45,11 +45,11 @@ export default class TableProposalChooser extends ProposalChooser {
   }
 
   _createColumnForDescriptor(descriptor) {
-    var width = Column.NARROW_MIN_WIDTH;
+    let width = Column.NARROW_MIN_WIDTH;
     if (descriptor.width && descriptor.width > 0) { // 0 = default
       width = descriptor.width;
     }
-    var column = scout.create('Column', {
+    let column = scout.create('Column', {
       session: this.session,
       text: descriptor.text,
       cssClass: scout.nvl(descriptor.cssClass, null),
@@ -78,7 +78,7 @@ export default class TableProposalChooser extends ProposalChooser {
   }
 
   _onRowClick(event) {
-    var row = event.row;
+    let row = event.row;
     if (!row || !row.enabled) {
       return;
     }
@@ -91,7 +91,7 @@ export default class TableProposalChooser extends ProposalChooser {
   }
 
   setLookupResult(result) {
-    var
+    let
       tableRows = [],
       lookupRows = result.lookupRows,
       multipleColumns = !!this.smartField.columnDescriptors;
@@ -106,11 +106,11 @@ export default class TableProposalChooser extends ProposalChooser {
   }
 
   trySelectCurrentValue() {
-    var currentValue = this.smartField.getValueForSelection();
+    let currentValue = this.smartField.getValueForSelection();
     if (objects.isNullOrUndefined(currentValue)) {
       return;
     }
-    var tableRow = arrays.find(this.model.rows, function(row) {
+    let tableRow = arrays.find(this.model.rows, row => {
       return row.lookupRow.key === currentValue;
     });
     if (tableRow) {
@@ -138,7 +138,7 @@ export default class TableProposalChooser extends ProposalChooser {
    * @returns {object} table-row model
    */
   _createTableRow(lookupRow, multipleColumns) {
-    var row = lookupField.createTableRow(lookupRow, multipleColumns);
+    let row = lookupField.createTableRow(lookupRow, multipleColumns);
     if (multipleColumns) {
       arrays.pushAll(row.cells, this._transformTableRowData(lookupRow, lookupRow.additionalTableRowData));
     }
@@ -155,7 +155,7 @@ export default class TableProposalChooser extends ProposalChooser {
   }
 
   getSelectedLookupRow() {
-    var selectedRow = this.model.selectedRow();
+    let selectedRow = this.model.selectedRow();
     if (!selectedRow) {
       return null;
     }
@@ -167,9 +167,9 @@ export default class TableProposalChooser extends ProposalChooser {
    * array of additional values in the correct order, as defined by the descriptors.
    */
   _transformTableRowData(lookupRow, tableRowData) {
-    var descriptors = this.smartField.columnDescriptors;
-    var cells = [];
-    descriptors.forEach(function(desc) {
+    let descriptors = this.smartField.columnDescriptors;
+    let cells = [];
+    descriptors.forEach(desc => {
       cells.push(lookupField.createTableCell(lookupRow, desc, tableRowData));
     });
     return cells;

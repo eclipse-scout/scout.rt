@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, objects, scout, strings} from '../index';
+import {arrays, scout, strings} from '../index';
 import $ from 'jquery';
 
 /**
@@ -77,16 +77,16 @@ export default class Call {
 
   _resolve() {
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + '[RESOLVE]');
-    this.deferred.resolve.apply(this.deferred, arrays.ensure(this.result));
+    this.deferred.resolve(...arrays.ensure(this.result));
   }
 
   _reject() {
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + '[REJECT]');
-    this.deferred.reject.apply(this.deferred, arrays.ensure(this.result));
+    this.deferred.reject(...arrays.ensure(this.result));
   }
 
-  _setResult() {
-    this.result = objects.argumentsToArray(arguments);
+  _setResult(...args) {
+    this.result = args;
   }
 
   // ==================================================================================
@@ -151,9 +151,9 @@ export default class Call {
     this._updateLogPrefix();
 
     this.pendingCall = this._callImpl()
-      .always(function() {
+      .always(() => {
         this.pendingCall = null;
-      }.bind(this))
+      })
       .done(this._setResultDone.bind(this))
       .done(this._onCallDone.bind(this))
       .fail(this._setResultFail.bind(this))
@@ -169,12 +169,12 @@ export default class Call {
     throw new Error('Missing implementation: _callImpl()');
   }
 
-  _setResultDone() {
-    this._setResult.apply(this, arguments);
+  _setResultDone(...args) {
+    this._setResult(...args);
   }
 
-  _setResultFail() {
-    this._setResult.apply(this, arguments);
+  _setResultFail(...args) {
+    this._setResult(...args);
   }
 
   _onCallDone() {
@@ -182,7 +182,7 @@ export default class Call {
     this._resolve();
   }
 
-  _onCallFail() {
+  _onCallFail(...args) {
     // Aborted? -> REJECT
     if (this.aborted) {
       $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Call aborted');
@@ -191,7 +191,7 @@ export default class Call {
     }
 
     // Retry impossible? -> REJECT
-    var nextInterval = this._nextRetryImpl.apply(this, arguments);
+    let nextInterval = this._nextRetryImpl(...args);
     if (typeof nextInterval !== 'number') {
       $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'No retries remaining');
       this._reject();
@@ -199,9 +199,9 @@ export default class Call {
     }
 
     // Retry
-    var callDuration = Date.now() - this.callStartTimestamp;
-    var additionalDelay = Math.max(this.minCallDuration - callDuration, 0);
-    var retryInterval = nextInterval + additionalDelay;
+    let callDuration = Date.now() - this.callStartTimestamp;
+    let additionalDelay = Math.max(this.minCallDuration - callDuration, 0);
+    let retryInterval = nextInterval + additionalDelay;
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Try again in ' + retryInterval + ' ms...');
     this.callTimeoutId = setTimeout(this._call.bind(this), retryInterval);
   }

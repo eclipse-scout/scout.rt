@@ -39,7 +39,7 @@ export default class TableMatrix {
    * add data axis
    */
   addData(data, dataGroup) {
-    var dataAxis = [],
+    let dataAxis = [],
       locale = this.locale;
 
     // collect all axis
@@ -49,42 +49,34 @@ export default class TableMatrix {
     dataAxis.column = data;
 
     // data always is number
-    dataAxis.format = function(n) {
-      return locale.decimalFormat.format(n);
-    };
+    dataAxis.format = n => locale.decimalFormat.format(n);
 
     // count, sum, avg
     if (dataGroup === TableMatrix.NumberGroup.COUNT) {
-      dataAxis.norm = function(f) {
-        return 1;
-      };
-      dataAxis.group = function(array) {
-        return array.length;
-      };
+      dataAxis.norm = f => 1;
+      dataAxis.group = array => array.length;
     } else if (dataGroup === TableMatrix.NumberGroup.SUM) {
-      dataAxis.norm = function(f) {
+      dataAxis.norm = f => {
         if (isNaN(f) || f === null || f === '') {
           return null;
         }
         return parseFloat(f);
       };
-      dataAxis.group = function(array) {
-        return array.reduce(function(a, b) {
-          return a + b;
-        });
-      };
+      dataAxis.group = array => array.reduce((a, b) => {
+        return a + b;
+      });
     } else if (dataGroup === TableMatrix.NumberGroup.AVG) {
-      dataAxis.norm = function(f) {
+      dataAxis.norm = f => {
         if (isNaN(f) || f === null || f === '') {
           return null;
         }
         return parseFloat(f);
       };
-      dataAxis.group = function(array) {
-        var sum = array.reduce(function(a, b) {
+      dataAxis.group = array => {
+        let sum = array.reduce((a, b) => {
             return a + b;
           }),
-          count = array.reduce(function(a, b) {
+          count = array.reduce((a, b) => {
             return (b === null ? a : a + 1);
           }, 0);
 
@@ -100,7 +92,7 @@ export default class TableMatrix {
 
   // add x or y Axis
   addAxis(axis, axisGroup) {
-    var keyAxis = [],
+    let keyAxis = [],
       locale = this.locale,
       session = this.session,
       getText = this.session.text.bind(this.session),
@@ -114,15 +106,15 @@ export default class TableMatrix {
     keyAxis.normTable = [];
 
     // add a key to the axis
-    keyAxis.add = function(k) {
+    keyAxis.add = k => {
       if (keyAxis.indexOf(k) === -1) {
         keyAxis.push(k);
       }
     };
 
     // default functions
-    keyAxis.reorder = function() {
-      keyAxis.sort(function(a, b) {
+    keyAxis.reorder = () => {
+      keyAxis.sort((a, b) => {
         // make sure -empty- is at the bottom
         if (a === null) {
           return 1;
@@ -134,17 +126,17 @@ export default class TableMatrix {
         return (a - b);
       });
     };
-    keyAxis.norm = function(f) {
+    keyAxis.norm = f => {
       if (f === null || f === '') {
         return null;
       }
-      var index = keyAxis.normTable.indexOf(f);
+      let index = keyAxis.normTable.indexOf(f);
       if (index === -1) {
         return keyAxis.normTable.push(f) - 1;
       }
       return index;
     };
-    keyAxis.format = function(n) {
+    keyAxis.format = n => {
       if (n === null) {
         return emptyCell;
       }
@@ -154,18 +146,18 @@ export default class TableMatrix {
     // norm and format depends of datatype and group functionality
     if (axis instanceof DateColumn) {
       if (axisGroup === TableMatrix.DateGroup.NONE) {
-        keyAxis.norm = function(f) {
+        keyAxis.norm = f => {
           if (f === null || f === '') {
             return null;
           }
           return f.getTime();
 
         };
-        keyAxis.format = function(n) {
+        keyAxis.format = n => {
           if (n === null) {
             return null;
           }
-          var format = axis.format;
+          let format = axis.format;
           if (format) {
             format = DateFormat.ensure(locale, format);
           } else {
@@ -174,14 +166,14 @@ export default class TableMatrix {
           return format.format(new Date(n));
         };
       } else if (axisGroup === TableMatrix.DateGroup.YEAR) {
-        keyAxis.norm = function(f) {
+        keyAxis.norm = f => {
           if (f === null || f === '') {
             return null;
           }
           return f.getFullYear();
 
         };
-        keyAxis.format = function(n) {
+        keyAxis.format = n => {
           if (n === null) {
             return emptyCell;
           }
@@ -189,14 +181,14 @@ export default class TableMatrix {
 
         };
       } else if (axisGroup === TableMatrix.DateGroup.MONTH) {
-        keyAxis.norm = function(f) {
+        keyAxis.norm = f => {
           if (f === null || f === '') {
             return null;
           }
           return f.getMonth();
 
         };
-        keyAxis.format = function(n) {
+        keyAxis.format = n => {
           if (n === null) {
             return emptyCell;
           }
@@ -204,27 +196,27 @@ export default class TableMatrix {
 
         };
       } else if (axisGroup === TableMatrix.DateGroup.WEEKDAY) {
-        keyAxis.norm = function(f) {
+        keyAxis.norm = f => {
           if (f === null || f === '') {
             return null;
           }
-          var b = (f.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
+          let b = (f.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
           return b;
         };
-        keyAxis.format = function(n) {
+        keyAxis.format = n => {
           if (n === null) {
             return emptyCell;
           }
           return locale.dateFormatSymbols.weekdaysOrdered[n];
         };
       } else if (axisGroup === TableMatrix.DateGroup.DATE) {
-        keyAxis.norm = function(f) {
+        keyAxis.norm = f => {
           if (f === null || f === '') {
             return null;
           }
           return dates.trunc(f).getTime();
         };
-        keyAxis.format = function(n) {
+        keyAxis.format = n => {
           if (n === null) {
             return emptyCell;
           }
@@ -232,26 +224,26 @@ export default class TableMatrix {
         };
       }
     } else if (axis instanceof NumberColumn) {
-      keyAxis.norm = function(f) {
+      keyAxis.norm = f => {
         if (isNaN(f) || f === null || f === '') {
           return null;
         }
         return parseFloat(f);
       };
-      keyAxis.format = function(n) {
+      keyAxis.format = n => {
         if (isNaN(n) || n === null) {
           return emptyCell;
         }
         return axis.decimalFormat.format(n);
       };
     } else if (axis instanceof BooleanColumn) {
-      keyAxis.norm = function(f) {
+      keyAxis.norm = f => {
         if (!f) {
           return 0;
         }
         return 1;
       };
-      keyAxis.format = function(n) {
+      keyAxis.format = n => {
         if (n === 0) {
           return getText('ui.BooleanColumnGroupingFalse');
         }
@@ -260,11 +252,11 @@ export default class TableMatrix {
     } else if (axis instanceof IconColumn) {
       keyAxis.textIsIcon = true;
     } else {
-      keyAxis.reorder = function() {
-        var comparator = comparators.TEXT;
+      keyAxis.reorder = () => {
+        let comparator = comparators.TEXT;
         comparator.install(session);
 
-        keyAxis.sort(function(a, b) {
+        keyAxis.sort((a, b) => {
           // make sure -empty- is at the bottom
           if (a === null) {
             return 1;
@@ -284,16 +276,16 @@ export default class TableMatrix {
    * @returns a cube containing the results
    */
   calculate() {
-    var cube = {},
+    let cube = {},
       r, v, k, data, key, normData, normKey;
 
     // collect data from table
     for (r = 0; r < this._rows.length; r++) {
-      var row = this._rows[r];
+      let row = this._rows[r];
       // collect keys of x, y axis from row
-      var keys = [];
+      let keys = [];
       for (k = 0; k < this._allAxis.length; k++) {
-        var column = this._allAxis[k].column;
+        let column = this._allAxis[k].column;
         key = column.cellValueOrTextForCalculation(row);
         normKey = this._allAxis[k].norm(key);
 
@@ -305,7 +297,7 @@ export default class TableMatrix {
       keys = JSON.stringify(keys);
 
       // collect values of data axis from row
-      var values = [];
+      let values = [];
       for (v = 0; v < this._allData.length; v++) {
         data = this._table.cellValue(this._allData[v].column, row);
         normData = this._allData[v].norm(data);
@@ -332,14 +324,14 @@ export default class TableMatrix {
 
       for (k in cube) {
         if (cube.hasOwnProperty(k)) {
-          var allCell = cube[k],
+          let allCell = cube[k],
             subCell = [];
 
-          for (var i = 0; i < allCell.length; i++) {
+          for (let i = 0; i < allCell.length; i++) {
             subCell.push(allCell[i][v]);
           }
 
-          var newValue = this._allData[v].group(subCell);
+          let newValue = this._allData[v].group(subCell);
           cube[k][v] = newValue;
           data.total += newValue;
 
@@ -361,7 +353,7 @@ export default class TableMatrix {
         data.max = 0.1;
       }
 
-      var f = Math.ceil(Math.log(data.max) / Math.LN10) - 1;
+      let f = Math.ceil(Math.log(data.max) / Math.LN10) - 1;
 
       data.max = Math.ceil(data.max / Math.pow(10, f)) * Math.pow(10, f);
       data.max = Math.ceil(data.max / 4) * 4;
@@ -383,7 +375,7 @@ export default class TableMatrix {
     }
 
     // access function used by chart
-    cube.getValue = function(keys) {
+    cube.getValue = keys => {
       keys = JSON.stringify(keys);
 
       if (cube.hasOwnProperty(keys)) {
@@ -397,7 +389,7 @@ export default class TableMatrix {
   }
 
   columnCount(filterNumberColumns) {
-    var c, column, r, row, cellValue,
+    let c, column, r, row, cellValue,
       columns = this.columns(filterNumberColumns),
       colCount = [],
       count = 0;
@@ -430,7 +422,7 @@ export default class TableMatrix {
    */
   columns(filterNumberColumns) {
     filterNumberColumns = scout.nvl(filterNumberColumns, true);
-    return this._table.visibleColumns().filter(function(column) {
+    return this._table.visibleColumns().filter(column => {
       if (column.guiOnly) {
         return false;
       }

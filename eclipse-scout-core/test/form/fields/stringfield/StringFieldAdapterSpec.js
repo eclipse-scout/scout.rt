@@ -11,10 +11,10 @@
 import {StringField} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('StringFieldAdapter', function() {
-  var session, helper;
+describe('StringFieldAdapter', () => {
+  let session, helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
@@ -22,13 +22,13 @@ describe('StringFieldAdapter', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
     jasmine.Ajax.uninstall();
   });
 
   function createField(model) {
-    var field = new StringField();
+    let field = new StringField();
     field.init(model);
     return field;
   }
@@ -37,17 +37,17 @@ describe('StringFieldAdapter', function() {
     return helper.createFieldModel();
   }
 
-  describe('onModelPropertyChange', function() {
+  describe('onModelPropertyChange', () => {
 
-    describe('insertText', function() {
+    describe('insertText', () => {
 
-      it('may be called multiple times with the same text', function() {
-        var field = createField(createModel());
+      it('may be called multiple times with the same text', () => {
+        let field = createField(createModel());
         linkWidgetAndAdapter(field, 'StringFieldAdapter');
         field.render();
         expect(field.$field[0].value).toBe('');
 
-        var event = createPropertyChangeEvent(field, {
+        let event = createPropertyChangeEvent(field, {
           insertText: 'hello'
         });
         field.modelAdapter.onModelPropertyChange(event);

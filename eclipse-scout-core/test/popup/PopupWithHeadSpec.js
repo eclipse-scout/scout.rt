@@ -10,10 +10,10 @@
  */
 import {Dimension, Popup, scout} from '../../src/index';
 
-describe('PopupWithHead', function() {
-  var helper, session, $desktop;
+describe('PopupWithHead', () => {
+  let helper, session, $desktop;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession({
       desktop: {
@@ -31,18 +31,16 @@ describe('PopupWithHead', function() {
       '</style>').appendTo($('#sandbox'));
   });
 
-  var entryPointSizeFunc = function() {
-    return new Dimension($desktop.width(), $desktop.height());
-  };
+  let entryPointSizeFunc = () => new Dimension($desktop.width(), $desktop.height());
 
-  afterEach(function() {
+  afterEach(() => {
     removePopups(session);
   });
 
   function createMenu(numActions) {
     numActions = scout.nvl(numActions, 2);
-    var actions = [];
-    for (var i = 0; i < numActions; i++) {
+    let actions = [];
+    for (let i = 0; i < numActions; i++) {
       actions.push({
         objectType: 'Menu',
         label: 'Menu' + i
@@ -55,12 +53,12 @@ describe('PopupWithHead', function() {
     });
   }
 
-  describe('verticalAlignment', function() {
-    describe('BOTTOM', function() {
-      it('opens on the bottom of the anchor', function() {
-        var menu = createMenu();
+  describe('verticalAlignment', () => {
+    describe('BOTTOM', () => {
+      it('opens on the bottom of the anchor', () => {
+        let menu = createMenu();
         menu.render();
-        var popup = scout.create('MenuBarPopup', {
+        let popup = scout.create('MenuBarPopup', {
           parent: session.desktop,
           menu: menu,
           verticalAlignment: Popup.Alignment.BOTTOM,
@@ -74,12 +72,12 @@ describe('PopupWithHead', function() {
     });
   });
 
-  describe('horizontalAlignment', function() {
-    describe('LEFTEDGE', function() {
-      it('opens on the left edge of the anchor', function() {
-        var menu = createMenu();
+  describe('horizontalAlignment', () => {
+    describe('LEFTEDGE', () => {
+      it('opens on the left edge of the anchor', () => {
+        let menu = createMenu();
         menu.render();
-        var popup = scout.create('MenuBarPopup', {
+        let popup = scout.create('MenuBarPopup', {
           parent: session.desktop,
           menu: menu,
           horizontalAlignment: Popup.Alignment.LEFTEDGE,
@@ -92,11 +90,11 @@ describe('PopupWithHead', function() {
       });
     });
 
-    describe('RIGHTEDGE', function() {
-      it('opens on the right edge of the anchor', function() {
-        var menu = createMenu();
+    describe('RIGHTEDGE', () => {
+      it('opens on the right edge of the anchor', () => {
+        let menu = createMenu();
         menu.render();
-        var popup = scout.create('MenuBarPopup', {
+        let popup = scout.create('MenuBarPopup', {
           parent: session.desktop,
           menu: menu,
           horizontalAlignment: Popup.Alignment.RIGHTEDGE,
@@ -110,12 +108,12 @@ describe('PopupWithHead', function() {
     });
   });
 
-  describe('verticalSwitch', function() {
-    describe('with verticalAlign = bottom', function() {
-      it('switches to top when overlapping bottom window border', function() {
-        var menu = createMenu();
+  describe('verticalSwitch', () => {
+    describe('with verticalAlign = bottom', () => {
+      it('switches to top when overlapping bottom window border', () => {
+        let menu = createMenu();
         menu.render();
-        var popup = scout.create('MenuBarPopup', {
+        let popup = scout.create('MenuBarPopup', {
           parent: session.desktop,
           menu: menu,
           verticalAlignment: Popup.Alignment.BOTTOM,
@@ -128,10 +126,10 @@ describe('PopupWithHead', function() {
         expect(popup.$container.cssHeight()).toBe(60);
       });
 
-      it('does not switch but trim if top side is smaller', function() {
-        var menu = createMenu();
+      it('does not switch but trim if top side is smaller', () => {
+        let menu = createMenu();
         menu.render();
-        var popup = scout.create('MenuBarPopup', {
+        let popup = scout.create('MenuBarPopup', {
           parent: session.desktop,
           menu: menu,
           verticalAlignment: Popup.Alignment.BOTTOM,
@@ -147,12 +145,12 @@ describe('PopupWithHead', function() {
     });
   });
 
-  describe('horizontalSwitch', function() {
-    describe('with horizontalAlign = leftedge', function() {
-      it('switches to rightedge when overlapping left window border', function() {
-        var menu = createMenu();
+  describe('horizontalSwitch', () => {
+    describe('with horizontalAlign = leftedge', () => {
+      it('switches to rightedge when overlapping left window border', () => {
+        let menu = createMenu();
         menu.render();
-        var popup = scout.create('MenuBarPopup', {
+        let popup = scout.create('MenuBarPopup', {
           parent: session.desktop,
           menu: menu,
           horizontalAlignment: Popup.Alignment.LEFTEDGE,
@@ -166,10 +164,10 @@ describe('PopupWithHead', function() {
       });
     });
 
-    it('does not switch but trim if left side is smaller', function() {
-      var menu = createMenu();
+    it('does not switch but trim if left side is smaller', () => {
+      let menu = createMenu();
       menu.render();
-      var popup = scout.create('MenuBarPopup', {
+      let popup = scout.create('MenuBarPopup', {
         parent: session.desktop,
         menu: menu,
         horizontalAlignment: Popup.Alignment.LEFTEDGE,

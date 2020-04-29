@@ -12,11 +12,11 @@ import {DesktopFormController} from '../../src/index';
 
 describe('DesktopFormController', function() {
 
-  var ctrl, session, $sandbox, popupWindow,
+  let ctrl, session, $sandbox, popupWindow,
     myWindow, myForm,
     displayParent = this;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     $sandbox = $('#sandbox');
@@ -26,16 +26,16 @@ describe('DesktopFormController', function() {
     myForm = {
       id: 'foo',
       rendered: true,
-      remove: function() {
+      remove: () => {
       }
     };
 
     // mock popupWindow
     popupWindow = {
       form: myForm,
-      _onReady: function() {
+      _onReady: () => {
       },
-      close: function() {
+      close: () => {
       }
     };
 
@@ -55,11 +55,11 @@ describe('DesktopFormController', function() {
 
   });
 
-  afterEach(function() {
+  afterEach(() => {
     ctrl.dispose();
   });
 
-  it('Listens to popupWindowReady event and calls _onReady - having a popupWindow instance', function() {
+  it('Listens to popupWindowReady event and calls _onReady - having a popupWindow instance', () => {
     spyOn(popupWindow, '_onReady');
     $(document).trigger('popupWindowReady', {
       popupWindow: popupWindow
@@ -67,7 +67,7 @@ describe('DesktopFormController', function() {
     expect(popupWindow._onReady).toHaveBeenCalled();
   });
 
-  it('Listens to popupWindowReady event and calls _onReady - having only a form ID (reload case)', function() {
+  it('Listens to popupWindowReady event and calls _onReady - having only a form ID (reload case)', () => {
     ctrl._popupWindows.push(popupWindow);
     spyOn(popupWindow, '_onReady');
     $(document).trigger('popupWindowReady', {
@@ -76,13 +76,13 @@ describe('DesktopFormController', function() {
     expect(popupWindow._onReady).toHaveBeenCalled();
   });
 
-  it('_addPopupWindow registers listeners and adds to array with popup-windows', function() {
+  it('_addPopupWindow registers listeners and adds to array with popup-windows', () => {
     expect(ctrl._popupWindows.length).toBe(0);
     ctrl._addPopupWindow(myWindow, myForm, false);
     expect(ctrl._popupWindows.length).toBe(1);
   });
 
-  it('_removePopupWindow cleans up and removes from array with popup-windows', function() {
+  it('_removePopupWindow cleans up and removes from array with popup-windows', () => {
     spyOn(popupWindow, 'close');
     spyOn(myForm, 'remove');
     ctrl._popupWindows.push(popupWindow);

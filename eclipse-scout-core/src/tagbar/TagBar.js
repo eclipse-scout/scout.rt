@@ -64,15 +64,15 @@ export default class TagBar extends Widget {
    * This function is also used by sub- and friend-classes like the TagOverflowPopup.
    */
   _renderTags() {
-    var tags = arrays.ensure(this.tags);
-    var clickHandler = this.clickable ? this._onTagClick.bind(this) : null;
-    var removeHandler = this._onTagRemoveClick.bind(this);
+    let tags = arrays.ensure(this.tags);
+    let clickHandler = this.clickable ? this._onTagClick.bind(this) : null;
+    let removeHandler = this._onTagRemoveClick.bind(this);
     TagBar.renderTags(this.$container, tags, this.enabledComputed, clickHandler, removeHandler);
     this.invalidateLayoutTree();
   }
 
   _onTagClick(event) {
-    var tag = TagBar.getTagData($(event.currentTarget));
+    let tag = TagBar.getTagData($(event.currentTarget));
     this._triggerTagClick(tag);
     return false;
   }
@@ -91,7 +91,7 @@ export default class TagBar extends Widget {
   }
 
   removeTagByElement($tag) {
-    var tag = TagBar.getTagData($tag);
+    let tag = TagBar.getTagData($tag);
     if (tag) {
       this._triggerTagRemove(tag, $tag);
     }
@@ -113,7 +113,7 @@ export default class TagBar extends Widget {
     if (!this.$overflowIcon) {
       return false;
     }
-    var ae = this.$container.activeElement();
+    let ae = this.$container.activeElement();
     return this.$overflowIcon.is(ae);
   }
 
@@ -183,7 +183,7 @@ export default class TagBar extends Widget {
 
     // when overflow popup opens it sets focus to the first tag element, this means:
     // the input field loses focus. In that case we must prevent that the overflow popup is closed.
-    var popupRequestsFocus = this.overflow && this.overflow.$container.has(event.relatedTarget);
+    let popupRequestsFocus = this.overflow && this.overflow.$container.has(event.relatedTarget);
     if (popupRequestsFocus) {
       return;
     }
@@ -222,7 +222,7 @@ export default class TagBar extends Widget {
     if (!this.rendered) {
       return [];
     }
-    var tags = [];
+    let tags = [];
     this.$container
       .find('.tag-element:not(.hidden)')
       .each(function() {
@@ -263,7 +263,7 @@ export default class TagBar extends Widget {
   }
 
   static getTagData($tag) {
-    var tagData = $tag.data('tag');
+    let tagData = $tag.data('tag');
     if (tagData) {
       return tagData;
     }
@@ -272,16 +272,16 @@ export default class TagBar extends Widget {
 
   static renderTags($parent, tags, enabled, clickHandler, removeHandler) {
     $parent.find('.tag-element').remove();
-    tags.forEach(function(tagText) {
+    tags.forEach(tagText => {
       TagBar.renderTag($parent, tagText, enabled, clickHandler, removeHandler);
     }, this);
   }
 
   static renderTag($parent, tagText, enabled, clickHandler, removeHandler) {
-    var $element = $parent
+    let $element = $parent
       .appendDiv('tag-element')
       .data('tag', tagText);
-    var $tagText = $element.appendSpan('tag-text', tagText);
+    let $tagText = $element.appendSpan('tag-text', tagText);
     if (clickHandler) {
       $tagText
         .addClass('clickable')

@@ -12,10 +12,10 @@ import {RemoteEvent} from '../../src/index';
 import {LocaleSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
 
 /* global removePopups */
-describe('TableAdapter', function() {
-  var session, helper;
+describe('TableAdapter', () => {
+  let session, helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
@@ -25,7 +25,7 @@ describe('TableAdapter', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
@@ -33,31 +33,31 @@ describe('TableAdapter', function() {
     $.fx.off = false;
   });
 
-  describe('selectRows', function() {
+  describe('selectRows', () => {
 
-    it('sends rowsSelected event containing rowIds', function() {
-      var model = helper.createModelFixture(2, 5);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+    it('sends rowsSelected event containing rowIds', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
 
-      var rows = [table.rows[0], table.rows[4]];
+      let rows = [table.rows[0], table.rows[4]];
       table.selectRows(rows);
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new RemoteEvent(table.id, 'rowsSelected', {
+      let event = new RemoteEvent(table.id, 'rowsSelected', {
         rowIds: helper.getRowIds(rows)
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('does not send selection event if triggered by server', function() {
-      var model = helper.createModelFixture(2, 5);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+    it('does not send selection event if triggered by server', () => {
+      let model = helper.createModelFixture(2, 5);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
 
-      var rows = [table.rows[0], table.rows[4]];
+      let rows = [table.rows[0], table.rows[4]];
       adapter._onRowsSelected([rows[0].id, rows[1].id]);
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(0);
@@ -65,21 +65,21 @@ describe('TableAdapter', function() {
 
   });
 
-  describe('checkRows', function() {
+  describe('checkRows', () => {
 
-    it('sends rowsChecked event containing rowIds', function() {
-      var model = helper.createModelFixture(2, 5);
+    it('sends rowsChecked event containing rowIds', () => {
+      let model = helper.createModelFixture(2, 5);
       model.checkable = true;
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
 
-      var rows = [table.rows[0]];
+      let rows = [table.rows[0]];
       table.checkRows(rows);
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new RemoteEvent(table.id, 'rowsChecked', {
+      let event = new RemoteEvent(table.id, 'rowsChecked', {
         rows: [{
           rowId: rows[0].id,
           checked: true
@@ -88,13 +88,13 @@ describe('TableAdapter', function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('does not send rowsChecked event if triggered by server', function() {
-      var model = helper.createModelFixture(2, 5);
+    it('does not send rowsChecked event if triggered by server', () => {
+      let model = helper.createModelFixture(2, 5);
       model.checkable = true;
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
 
-      var rows = [table.rows[0]];
+      let rows = [table.rows[0]];
       adapter._onRowsChecked([{
         id: rows[0].id,
         checked: true
@@ -105,18 +105,18 @@ describe('TableAdapter', function() {
 
   });
 
-  describe('expandRows', function() {
+  describe('expandRows', () => {
 
-    it('sends rowsExpanded event containing rowIds', function() {
-      var rowIds = [0, 1, 2],
-        rows = rowIds.map(function(id) {
-          var rowData = helper.createModelRow(id, ['row' + id]);
+    it('sends rowsExpanded event containing rowIds', () => {
+      let rowIds = [0, 1, 2],
+        rows = rowIds.map(id => {
+          let rowData = helper.createModelRow(id, ['row' + id]);
           rowData.expanded = true;
           return rowData;
         });
-      var model = helper.createModel(helper.createModelColumns(1), rows);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+      let model = helper.createModel(helper.createModelColumns(1), rows);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       rows = table.rows;
       rows[1].parentId = rows[0].id;
       table.updateRows(rows);
@@ -127,7 +127,7 @@ describe('TableAdapter', function() {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new RemoteEvent(table.id, 'rowsExpanded', {
+      let event = new RemoteEvent(table.id, 'rowsExpanded', {
         rows: [{
           rowId: rows[0].id,
           expanded: false
@@ -136,16 +136,16 @@ describe('TableAdapter', function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('does not send rowsChecked event if triggered by server', function() {
-      var rowIds = [0, 1, 2],
-        rows = rowIds.map(function(id) {
-          var rowData = helper.createModelRow(id, ['row' + id]);
+    it('does not send rowsChecked event if triggered by server', () => {
+      let rowIds = [0, 1, 2],
+        rows = rowIds.map(id => {
+          let rowData = helper.createModelRow(id, ['row' + id]);
           rowData.expanded = true;
           return rowData;
         });
-      var model = helper.createModel(helper.createModelColumns(1), rows);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+      let model = helper.createModel(helper.createModelColumns(1), rows);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       rows[1].parentId = rows[0].id;
       table.updateRows(rows);
       table.render();
@@ -163,7 +163,7 @@ describe('TableAdapter', function() {
 
   });
 
-  describe('onModelAction', function() {
+  describe('onModelAction', () => {
 
     function createRowsInsertedEvent(model, rows) {
       return {
@@ -173,7 +173,7 @@ describe('TableAdapter', function() {
       };
     }
 
-    describe('rowsSelected event', function() {
+    describe('rowsSelected event', () => {
 
       function createRowsSelectedEvent(model, rowIds) {
         return {
@@ -183,23 +183,23 @@ describe('TableAdapter', function() {
         };
       }
 
-      it('calls selectRows', function() {
-        var model = helper.createModelFixture(2, 5);
-        var adapter = helper.createTableAdapter(model);
-        var table = adapter.createWidget(model, session.desktop);
+      it('calls selectRows', () => {
+        let model = helper.createModelFixture(2, 5);
+        let adapter = helper.createTableAdapter(model);
+        let table = adapter.createWidget(model, session.desktop);
         table.render();
 
         spyOn(table, 'selectRows');
 
-        var rowIds = [table.rows[0].id, table.rows[4].id];
-        var event = createRowsSelectedEvent(model, rowIds);
+        let rowIds = [table.rows[0].id, table.rows[4].id];
+        let event = createRowsSelectedEvent(model, rowIds);
         adapter.onModelAction(event);
         expect(table.selectRows).toHaveBeenCalledWith([table.rows[0], table.rows[4]]);
       });
     });
 
-    describe('rowsDeleted event', function() {
-      var model, table, adapter, rows, row0, row1, row2;
+    describe('rowsDeleted event', () => {
+      let model, table, adapter, rows, row0, row1, row2;
 
       function createRowsDeletedEvent(model, rowIds) {
         return {
@@ -209,7 +209,7 @@ describe('TableAdapter', function() {
         };
       }
 
-      beforeEach(function() {
+      beforeEach(() => {
         model = helper.createModelFixture(2, 3);
         adapter = helper.createTableAdapter(model);
         table = adapter.createWidget(model, session.desktop);
@@ -219,17 +219,17 @@ describe('TableAdapter', function() {
         row2 = model.rows[2];
       });
 
-      it('calls deleteRows', function() {
+      it('calls deleteRows', () => {
         spyOn(table, 'deleteRows');
 
-        var rowIds = [rows[0].id, rows[2].id];
-        var event = createRowsDeletedEvent(model, rowIds);
+        let rowIds = [rows[0].id, rows[2].id];
+        let event = createRowsDeletedEvent(model, rowIds);
         adapter.onModelAction(event);
         expect(table.deleteRows).toHaveBeenCalledWith([rows[0], rows[2]]);
       });
 
-      it('does not send rowsSelected event for the deleted rows', function() {
-        var row = table.rows[0];
+      it('does not send rowsSelected event for the deleted rows', () => {
+        let row = table.rows[0];
         table.selectedRows = [row];
 
         adapter._onRowsDeleted([row.id]);
@@ -239,8 +239,8 @@ describe('TableAdapter', function() {
 
     });
 
-    describe('allRowsDeleted event', function() {
-      var model, table, adapter, row0, row1, row2;
+    describe('allRowsDeleted event', () => {
+      let model, table, adapter, row0, row1, row2;
 
       function createAllRowsDeletedEvent(model, rowIds) {
         return {
@@ -249,22 +249,22 @@ describe('TableAdapter', function() {
         };
       }
 
-      beforeEach(function() {
+      beforeEach(() => {
         model = helper.createModelFixture(2, 3);
         adapter = helper.createTableAdapter(model);
         table = adapter.createWidget(model, session.desktop);
       });
 
-      it('calls deleteAllRows', function() {
+      it('calls deleteAllRows', () => {
         spyOn(table, 'deleteAllRows');
 
-        var event = createAllRowsDeletedEvent(model);
+        let event = createAllRowsDeletedEvent(model);
         adapter.onModelAction(event);
         expect(table.deleteAllRows).toHaveBeenCalled();
       });
 
-      it('does not send rowsSelected event', function() {
-        var row = table.rows[0];
+      it('does not send rowsSelected event', () => {
+        let row = table.rows[0];
         table.selectedRows = [row];
 
         adapter._onAllRowsDeleted();
@@ -273,26 +273,26 @@ describe('TableAdapter', function() {
       });
     });
 
-    describe('rowsInserted event', function() {
-      var model, table, adapter;
+    describe('rowsInserted event', () => {
+      let model, table, adapter;
 
-      beforeEach(function() {
+      beforeEach(() => {
         model = helper.createModelFixture(2);
         adapter = helper.createTableAdapter(model);
         table = adapter.createWidget(model, session.desktop);
       });
 
-      it('calls insertRows', function() {
+      it('calls insertRows', () => {
         spyOn(table, 'insertRows');
 
-        var rows = helper.createModelRows(2, 5);
-        var event = createRowsInsertedEvent(model, rows);
+        let rows = helper.createModelRows(2, 5);
+        let event = createRowsInsertedEvent(model, rows);
         adapter.onModelAction(event);
         expect(table.insertRows).toHaveBeenCalledWith(rows);
       });
 
-      it('may contain cells as objects', function() {
-        var row = {
+      it('may contain cells as objects', () => {
+        let row = {
           cells: [{
             value: 'a value 0',
             text: 'a text 0'
@@ -301,7 +301,7 @@ describe('TableAdapter', function() {
             text: 'a text 1'
           }]
         };
-        var event = createRowsInsertedEvent(model, [row]);
+        let event = createRowsInsertedEvent(model, [row]);
         adapter.onModelAction(event);
         expect(table.rows[0].cells[0].value).toBe('a value 0');
         expect(table.rows[0].cells[0].text).toBe('a text 0');
@@ -309,11 +309,11 @@ describe('TableAdapter', function() {
         expect(table.rows[0].cells[1].text).toBe('a text 1');
       });
 
-      it('may contain cells as scalars', function() {
-        var row = {
+      it('may contain cells as scalars', () => {
+        let row = {
           cells: ['a text 0', 'a text 1']
         };
-        var event = createRowsInsertedEvent(model, [row]);
+        let event = createRowsInsertedEvent(model, [row]);
         adapter.onModelAction(event);
         expect(table.rows[0].cells[0].value).toBe('a text 0');
         expect(table.rows[0].cells[0].text).toBe('a text 0');
@@ -321,8 +321,8 @@ describe('TableAdapter', function() {
         expect(table.rows[0].cells[1].text).toBe('a text 1');
       });
 
-      it('respects null values', function() {
-        var row = {
+      it('respects null values', () => {
+        let row = {
           cells: [{
             value: null,
             text: 'empty 0'
@@ -331,7 +331,7 @@ describe('TableAdapter', function() {
             text: 'empty 1'
           }]
         };
-        var event = createRowsInsertedEvent(model, [row]);
+        let event = createRowsInsertedEvent(model, [row]);
         adapter.onModelAction(event);
         expect(table.rows[0].cells[0].value).toBe(null);
         expect(table.rows[0].cells[0].text).toBe('empty 0');
@@ -339,10 +339,10 @@ describe('TableAdapter', function() {
         expect(table.rows[0].cells[1].text).toBe('empty 1');
       });
 
-      it('uses text as value if value is not provided', function() {
+      it('uses text as value if value is not provided', () => {
         // This case is relevant for custom columns, where no JS representation exists.
         // They have values on server but they are not sent to client. Since we expect every cell to have a value use the text as value.
-        var row = {
+        let row = {
           cells: [{
             cssClass: 'abc',
             text: 'text 0'
@@ -351,7 +351,7 @@ describe('TableAdapter', function() {
             text: 'text 1'
           }]
         };
-        var event = createRowsInsertedEvent(model, [row]);
+        let event = createRowsInsertedEvent(model, [row]);
         adapter.onModelAction(event);
         expect(table.rows[0].cells[0].value).toBe('text 0');
         expect(table.rows[0].cells[0].text).toBe('text 0');
@@ -360,10 +360,10 @@ describe('TableAdapter', function() {
       });
     });
 
-    describe('rowOrderChanged event', function() {
-      var model, table, adapter, row0, row1, row2;
+    describe('rowOrderChanged event', () => {
+      let model, table, adapter, row0, row1, row2;
 
-      beforeEach(function() {
+      beforeEach(() => {
         model = helper.createModelFixture(2, 3);
         adapter = helper.createTableAdapter(model);
         table = adapter.createWidget(model, session.desktop);
@@ -380,26 +380,26 @@ describe('TableAdapter', function() {
         };
       }
 
-      it('calls updateRowOrder', function() {
+      it('calls updateRowOrder', () => {
         spyOn(table, 'updateRowOrder');
 
-        var event = createRowOrderChangedEvent(model, [row2.id, row1.id, row0.id]);
+        let event = createRowOrderChangedEvent(model, [row2.id, row1.id, row0.id]);
         adapter.onModelAction(event);
         expect(table.updateRowOrder).toHaveBeenCalledWith([row2, row1, row0]);
       });
 
-      it('correct DOM order for newly inserted rows', function() {
+      it('correct DOM order for newly inserted rows', () => {
         table.render();
         expect(table.rows.length).toBe(3);
 
-        var newRows = [
+        let newRows = [
           helper.createModelRow(null, helper.createModelCells(2)),
           helper.createModelRow(null, helper.createModelCells(2))
         ];
 
         // Insert new rows and switch rows 0 and 1
-        var orderedRowIds = [row1.id, row0.id, newRows[0].id, newRows[1].id, row2.id];
-        var message = {
+        let orderedRowIds = [row1.id, row0.id, newRows[0].id, newRows[1].id, row2.id];
+        let message = {
           events: [
             createRowsInsertedEvent(model, newRows),
             createRowOrderChangedEvent(model, orderedRowIds)
@@ -411,7 +411,7 @@ describe('TableAdapter', function() {
         expect(table.rows.length).toBe(5);
 
         // Check if order in the DOM is correct
-        var $row, rowId, expectedRowId,
+        let $row, rowId, expectedRowId,
           i = 0,
           $rows = table.$rows();
         $rows.each(function() {
@@ -424,8 +424,8 @@ describe('TableAdapter', function() {
 
     });
 
-    describe('rowsUpdated event', function() {
-      var model, table, adapter, row0;
+    describe('rowsUpdated event', () => {
+      let model, table, adapter, row0;
 
       function createRowsUpdatedEvent(model, rows) {
         return {
@@ -435,7 +435,7 @@ describe('TableAdapter', function() {
         };
       }
 
-      beforeEach(function() {
+      beforeEach(() => {
         model = helper.createModelFixture(2, 2);
         model.rows[0].cells[0].text = 'cellText0';
         model.rows[0].cells[1].text = 'cellText1';
@@ -443,24 +443,24 @@ describe('TableAdapter', function() {
         table = adapter.createWidget(model, session.desktop);
       });
 
-      it('calls updateRows', function() {
+      it('calls updateRows', () => {
         spyOn(table, 'updateRows');
 
-        var row = {
+        let row = {
           id: table.rows[0].id,
           cells: ['newCellText0', 'newCellText1']
         };
-        var event = createRowsUpdatedEvent(model, [row]);
+        let event = createRowsUpdatedEvent(model, [row]);
         adapter.onModelAction(event);
         expect(table.updateRows).toHaveBeenCalledWith([row]);
       });
 
     });
 
-    describe('columnStructureChanged event', function() {
-      var model, table, adapter, column0, column1, column2;
+    describe('columnStructureChanged event', () => {
+      let model, table, adapter, column0, column1, column2;
 
-      beforeEach(function() {
+      beforeEach(() => {
         model = helper.createModelFixture(3, 2);
         adapter = helper.createTableAdapter(model);
         table = adapter.createWidget(model, session.desktop);
@@ -477,9 +477,9 @@ describe('TableAdapter', function() {
         };
       }
 
-      it('calls updateColumnStructure', function() {
+      it('calls updateColumnStructure', () => {
         spyOn(table, 'updateColumnStructure');
-        var message = {
+        let message = {
           events: [createColumnStructureChangedEvent(model, [column2, column1])]
         };
         session._processSuccessResponse(message);
@@ -487,10 +487,10 @@ describe('TableAdapter', function() {
       });
     });
 
-    describe('columnOrderChanged event', function() {
-      var model, table, adapter, column0, column1, column2;
+    describe('columnOrderChanged event', () => {
+      let model, table, adapter, column0, column1, column2;
 
-      beforeEach(function() {
+      beforeEach(() => {
         model = helper.createModelFixture(3, 2);
         adapter = helper.createTableAdapter(model);
         table = adapter.createWidget(model, session.desktop);
@@ -507,9 +507,9 @@ describe('TableAdapter', function() {
         };
       }
 
-      it('calls updateColumnOrder', function() {
+      it('calls updateColumnOrder', () => {
         spyOn(table, 'updateColumnOrder');
-        var message = {
+        let message = {
           events: [createColumnOrderChangedEvent(model, [column2.id, column0.id, column1.id])]
         };
         session._processSuccessResponse(message);
@@ -518,10 +518,10 @@ describe('TableAdapter', function() {
 
     });
 
-    describe('columnHeadersUpdated event', function() {
-      var model, table, adapter, column0, column1, column2;
+    describe('columnHeadersUpdated event', () => {
+      let model, table, adapter, column0, column1, column2;
 
-      beforeEach(function() {
+      beforeEach(() => {
         model = helper.createModelFixture(3, 2);
         column0 = model.columns[0];
         column1 = model.columns[1];
@@ -536,7 +536,7 @@ describe('TableAdapter', function() {
         };
       }
 
-      it('calls updateColumnHeaders', function() {
+      it('calls updateColumnHeaders', () => {
         adapter = helper.createTableAdapter(model);
         table = adapter.createWidget(model, session.desktop);
         spyOn(table, 'updateColumnHeaders');
@@ -548,7 +548,7 @@ describe('TableAdapter', function() {
         column2 = helper.createModelColumn('newText2');
         column2.id = model.columns[2].id;
 
-        var message = {
+        let message = {
           events: [createColumnHeadersUpdatedEvent(model, [column1, column2])]
         };
         session._processSuccessResponse(message);
@@ -557,18 +557,18 @@ describe('TableAdapter', function() {
     });
   });
 
-  describe('onModelPropertyChange', function() {
+  describe('onModelPropertyChange', () => {
 
-    describe('menus', function() {
+    describe('menus', () => {
 
-      it('creates and registers menu adapters', function() {
-        var model = helper.createModelFixture(2);
-        var adapter = helper.createTableAdapter(model);
-        var table = adapter.createWidget(model, session.desktop);
-        var menu1 = helper.createMenuModel();
-        var menu2 = helper.createMenuModel();
+      it('creates and registers menu adapters', () => {
+        let model = helper.createModelFixture(2);
+        let adapter = helper.createTableAdapter(model);
+        let table = adapter.createWidget(model, session.desktop);
+        let menu1 = helper.createMenuModel();
+        let menu2 = helper.createMenuModel();
 
-        var message = {
+        let message = {
           adapterData: mapAdapterData([menu1, menu2]),
           events: [createPropertyChangeEvent(table, {
             menus: [menu1.id, menu2.id]
@@ -579,14 +579,14 @@ describe('TableAdapter', function() {
         expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1].modelAdapter);
       });
 
-      it('destroys the old menus', function() {
-        var model = helper.createModelFixture(2);
-        var adapter = helper.createTableAdapter(model);
-        var table = adapter.createWidget(model, session.desktop);
-        var menu1 = helper.createMenuModel();
-        var menu2 = helper.createMenuModel();
+      it('destroys the old menus', () => {
+        let model = helper.createModelFixture(2);
+        let adapter = helper.createTableAdapter(model);
+        let table = adapter.createWidget(model, session.desktop);
+        let menu1 = helper.createMenuModel();
+        let menu2 = helper.createMenuModel();
 
-        var message = {
+        let message = {
           adapterData: mapAdapterData([menu1, menu2]),
           events: [createPropertyChangeEvent(table, {
             menus: [menu1.id, menu2.id]
@@ -596,7 +596,7 @@ describe('TableAdapter', function() {
         expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0].modelAdapter);
         expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1].modelAdapter);
 
-        var menu1Widget = session.getModelAdapter(menu1.id).widget;
+        let menu1Widget = session.getModelAdapter(menu1.id).widget;
         message = {
           events: [createPropertyChangeEvent(table, {
             menus: [menu2.id]
@@ -609,15 +609,15 @@ describe('TableAdapter', function() {
         expect(menu1Widget.destroyed).toBe(true);
       });
 
-      it('destroys the old and creates the new menus if the list contains both', function() {
-        var model = helper.createModelFixture(2);
-        var adapter = helper.createTableAdapter(model);
-        var table = adapter.createWidget(model, session.desktop);
-        var menu1 = helper.createMenuModel();
-        var menu2 = helper.createMenuModel();
-        var menu3 = helper.createMenuModel();
+      it('destroys the old and creates the new menus if the list contains both', () => {
+        let model = helper.createModelFixture(2);
+        let adapter = helper.createTableAdapter(model);
+        let table = adapter.createWidget(model, session.desktop);
+        let menu1 = helper.createMenuModel();
+        let menu2 = helper.createMenuModel();
+        let menu3 = helper.createMenuModel();
 
-        var message = {
+        let message = {
           adapterData: mapAdapterData([menu1, menu2]),
           events: [createPropertyChangeEvent(table, {
             menus: [menu1.id, menu2.id]
@@ -627,7 +627,7 @@ describe('TableAdapter', function() {
         expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0].modelAdapter);
         expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1].modelAdapter);
 
-        var menu1Widget = session.getModelAdapter(menu1.id).widget;
+        let menu1Widget = session.getModelAdapter(menu1.id).widget;
         message = {
           adapterData: mapAdapterData(menu3),
           events: [createPropertyChangeEvent(table, {
@@ -646,13 +646,13 @@ describe('TableAdapter', function() {
 
   });
 
-  describe('_sendFilter', function() {
+  describe('_sendFilter', () => {
 
     // Test case for ticket #175700
-    it('should not coalesce remove and \'add\' events', function() {
-      var model = helper.createModelFixture(1, 2);
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+    it('should not coalesce remove and \'add\' events', () => {
+      let model = helper.createModelFixture(1, 2);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
       adapter._sendFilter(['1', '2']); // should create a remove event, because number of rows is equals to the length of rowIds
       adapter._sendFilter(['1']); // should create an 'add' event
       adapter._sendFilter(['2']); // should be coalesced with previous add event
@@ -663,19 +663,19 @@ describe('TableAdapter', function() {
 
   });
 
-  describe('_postCreateWidget', function() {
+  describe('_postCreateWidget', () => {
 
-    it('should send a filter event, if a filter exists on table after widget is created.', function() {
-      var model = helper.createModelFixture(2, 5);
+    it('should send a filter event, if a filter exists on table after widget is created.', () => {
+      let model = helper.createModelFixture(2, 5);
       $.extend(model, {filters: [{objectType: 'TableTextUserFilter', filterType: 'text', text: '2'}]});
-      var adapter = helper.createTableAdapter(model);
-      var table = adapter.createWidget(model, session.desktop);
+      let adapter = helper.createTableAdapter(model);
+      let table = adapter.createWidget(model, session.desktop);
 
       sendQueuedAjaxCalls('', 250);
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var rows = [table.rows[2]];
-      var event = new scout.RemoteEvent(table.id, 'filter', {
+      let rows = [table.rows[2]];
+      let event = new scout.RemoteEvent(table.id, 'filter', {
         rowIds: helper.getRowIds(rows),
         showBusyIndicator: false
       });

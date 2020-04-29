@@ -98,7 +98,7 @@ export default class Tile extends Widget {
   }
 
   _setColorScheme(colorScheme) {
-    var defaultScheme = {
+    let defaultScheme = {
       scheme: Tile.ColorSchemeId.DEFAULT,
       inverted: false
     };
@@ -114,7 +114,7 @@ export default class Tile extends Widget {
     if (typeof colorScheme === 'object') {
       return colorScheme;
     }
-    var colorSchemeObj = {};
+    let colorSchemeObj = {};
     if (typeof colorScheme === 'string') {
       // Split up colorScheme in two individual parts ("scheme" and "inverted").
       // This information is then used when rendering the color scheme.
@@ -186,21 +186,21 @@ export default class Tile extends Widget {
       // which means that animate-invisible is still on the element and will trigger the (wrong) animation when container is made visible again
       this.$container.removeClass('invisible animate-visible');
       this.$container.addClassForAnimation('animate-invisible');
-      this.$container.oneAnimationEnd(function() {
+      this.$container.oneAnimationEnd(() => {
         // Make the element invisible after the animation (but only if visibility has not changed again in the meantime)
         this.$container.setVisible(this.isVisible());
-      }.bind(this));
+      });
     } else {
       this.$container.addClass('invisible'); // Don't show it until it has the correct size and position to prevent flickering (Scout JS, non virtual)
       this.$container.setVisible(true);
       // Wait until the tile is layouted before trying to animate it to make sure the layout does not read the size while the animation runs (because it will be the wrong one)
-      this.session.layoutValidator.schedulePostValidateFunction(function() {
+      this.session.layoutValidator.schedulePostValidateFunction(() => {
         if (!this.rendered || !this.isVisible()) {
           return;
         }
         this.$container.removeClass('invisible animate-invisible');
         this.$container.addClassForAnimation('animate-visible');
-      }.bind(this));
+      });
     }
     this.invalidateParentLogicalGrid();
   }

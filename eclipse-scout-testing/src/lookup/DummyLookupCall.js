@@ -27,7 +27,7 @@ export default class DummyLookupCall extends StaticLookupCall {
   }
 
   _dataToLookupRow(data) {
-    var lookupRow = super._dataToLookupRow(data);
+    let lookupRow = super._dataToLookupRow(data);
     lookupRow.cssClass = lookupRow.text.toLowerCase();
     if (!this.showText) {
       lookupRow.text = null;

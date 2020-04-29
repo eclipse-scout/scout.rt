@@ -72,7 +72,7 @@ export default class MessageBoxes {
   }
 
   build() {
-    var options = {
+    let options = {
       parent: this.parent,
       header: this.headerText,
       body: this.bodyText,
@@ -100,14 +100,14 @@ export default class MessageBoxes {
    * @see MessageBox.Buttons
    */
   buildAndOpen() {
-    var def = $.Deferred();
-    var messageBox = this.build();
-    messageBox.on('action', function(event) {
+    let def = $.Deferred();
+    let messageBox = this.build();
+    messageBox.on('action', event => {
       if (this.closeOnClick) {
         messageBox.close();
       }
       def.resolve(event.option);
-    }.bind(this));
+    });
     messageBox.open();
     return def.promise();
   }

@@ -26,13 +26,13 @@ export default class CalendarSpecHelper {
   }
 
   createCalendar(model) {
-    var calendar = new Calendar();
+    let calendar = new Calendar();
     calendar.init(model);
     return calendar;
   }
 
   createSimpleModel() {
-    var c = createSimpleModel('Calendar', this.session);
+    let c = createSimpleModel('Calendar', this.session);
     c.selectedDate = '2016-07-20 14:09:28.556';
     c.startHour = 6;
     c.displayMode = Calendar.DisplayMode.DAY;
@@ -40,16 +40,16 @@ export default class CalendarSpecHelper {
   }
 
   createComponent(options, cal) {
-    var component = new CalendarComponent();
-    var model = this.createComponentModel(options);
+    let component = new CalendarComponent();
+    let model = this.createComponentModel(options);
     component.init(model);
     component.parent = cal;
     return component;
   }
 
   createComponentModel(options) {
-    var c = createSimpleModel('CalendarComponent', this.session);
-    for (var prop in options) {
+    let c = createSimpleModel('CalendarComponent', this.session);
+    for (let prop in options) {
       c[prop] = options[prop];
     }
     return c;

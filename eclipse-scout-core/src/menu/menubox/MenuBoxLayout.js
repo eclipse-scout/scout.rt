@@ -24,14 +24,14 @@ export default class MenuBoxLayout extends AbstractLayout {
    * @override AbstractLayout.js
    */
   layout($container) {
-    var htmlContainer = this.menuBox.htmlComp,
+    let htmlContainer = this.menuBox.htmlComp,
       containerSize = htmlContainer.size(),
       menus = this.visibleMenus(),
       menusWidth = 0;
 
     // Make sure open popups are at the correct position after layouting
-    this.menuBox.session.layoutValidator.schedulePostValidateFunction(function() {
-      menus.forEach(function(menu) {
+    this.menuBox.session.layoutValidator.schedulePostValidateFunction(() => {
+      menus.forEach(menu => {
         if (menu.popup) {
           menu.popup.position();
         }
@@ -71,7 +71,7 @@ export default class MenuBoxLayout extends AbstractLayout {
   }
 
   preferredLayoutSize($container) {
-    var menus = this.visibleMenus();
+    let menus = this.visibleMenus();
 
     this.updateFirstAndLastMenuMarker(menus);
     this.undoCollapse(menus);
@@ -108,7 +108,7 @@ export default class MenuBoxLayout extends AbstractLayout {
    */
   compactMenus(argMenus) {
     argMenus = argMenus || this.visibleMenus();
-    argMenus.forEach(function(menu) {
+    argMenus.forEach(menu => {
       if (menu.compactOrig !== undefined) {
         // already done
         return;
@@ -129,7 +129,7 @@ export default class MenuBoxLayout extends AbstractLayout {
    */
   undoCompactMenus(argMenus) {
     argMenus = argMenus || this.visibleMenus();
-    argMenus.forEach(function(menu) {
+    argMenus.forEach(menu => {
       if (menu.compactOrig === undefined) {
         return;
       }
@@ -154,7 +154,7 @@ export default class MenuBoxLayout extends AbstractLayout {
    */
   shrinkMenus(argMenus) {
     argMenus = argMenus || this.visibleMenus();
-    argMenus.forEach(function(menu) {
+    argMenus.forEach(menu => {
       if (menu.textVisibleOrig !== undefined) {
         // already done
         return;
@@ -174,7 +174,7 @@ export default class MenuBoxLayout extends AbstractLayout {
 
   undoShrinkMenus(argMenus) {
     argMenus = argMenus || this.visibleMenus();
-    argMenus.forEach(function(menu) {
+    argMenus.forEach(menu => {
       if (menu.textVisibleOrig === undefined) {
         return;
       }
@@ -188,7 +188,7 @@ export default class MenuBoxLayout extends AbstractLayout {
 
   collapse(argMenus, containerSize, menusWidth) {
     this._createAndRenderEllipsis(this.menuBox.$container);
-    var collapsedMenus = this._moveOverflowMenusIntoEllipsis(containerSize, menusWidth);
+    let collapsedMenus = this._moveOverflowMenusIntoEllipsis(containerSize, menusWidth);
     this.updateFirstAndLastMenuMarker(collapsedMenus);
   }
 
@@ -202,7 +202,7 @@ export default class MenuBoxLayout extends AbstractLayout {
   }
 
   _createAndRenderEllipsis($container) {
-    var ellipsis = menus.createEllipsisMenu({
+    let ellipsis = menus.createEllipsisMenu({
       parent: this.menuBox,
       horizontalAlignment: 1,
       compact: this.menuBox.compact
@@ -224,11 +224,11 @@ export default class MenuBoxLayout extends AbstractLayout {
    * Returns the list of "surviving" menus (with the ellipsis menu being the last element).
    */
   _moveOverflowMenusIntoEllipsis(containerSize, menusWidth) {
-    var collapsedMenus = [this._ellipsis];
-    var ellipsisSize = graphics.size(this._ellipsis.$container, true);
+    let collapsedMenus = [this._ellipsis];
+    let ellipsisSize = graphics.size(this._ellipsis.$container, true);
     menusWidth += ellipsisSize.width;
     this.visibleMenus().slice().reverse().forEach(function(menu) {
-      var menuSize;
+      let menuSize;
       if (menusWidth > containerSize.width) {
         // Menu does not fit -> move to ellipsis menu
         menuSize = graphics.size(menu.$container, true);
@@ -249,7 +249,7 @@ export default class MenuBoxLayout extends AbstractLayout {
   }
 
   actualPrefSize(argMenus) {
-    var menusWidth, prefSize;
+    let menusWidth, prefSize;
 
     argMenus = argMenus || this.visibleMenus();
     menusWidth = this._menusWidth(argMenus);
@@ -266,9 +266,9 @@ export default class MenuBoxLayout extends AbstractLayout {
    * @return the current width of all menus incl. the ellipsis
    */
   _menusWidth(argMenus) {
-    var menusWidth = 0;
+    let menusWidth = 0;
     argMenus = argMenus || this.visibleMenus();
-    argMenus.forEach(function(menu) {
+    argMenus.forEach(menu => {
       if (menu.rendered) {
         menusWidth += menu.$container.outerWidth(true);
       }
@@ -302,16 +302,16 @@ export default class MenuBoxLayout extends AbstractLayout {
   }
 
   visibleMenus() {
-    return this.menuBox.menus.filter(function(menu) {
+    return this.menuBox.menus.filter(menu => {
       return menu.visible;
     }, this);
   }
 
   updateFirstAndLastMenuMarker(argMenus) {
     // Find first and last rendered menu
-    var firstMenu = null;
-    var lastMenu = null;
-    (argMenus || []).forEach(function(menu) {
+    let firstMenu = null;
+    let lastMenu = null;
+    (argMenus || []).forEach(menu => {
       if (menu.rendered) {
         if (!firstMenu) {
           firstMenu = menu;

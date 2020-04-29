@@ -11,32 +11,32 @@
 import {FormFieldAdapter, Status} from '../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('FormFieldAdapter', function() {
-  var session;
-  var helper;
+describe('FormFieldAdapter', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
   });
 
-  describe('onModelPropertyChange', function() {
-    var formField, adapter, model;
+  describe('onModelPropertyChange', () => {
+    let formField, adapter, model;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createFieldModel();
       adapter = new FormFieldAdapter();
       adapter.init(model);
       formField = adapter.createWidget(model, session.desktop);
     });
 
-    it('event should update model', function() {
+    it('event should update model', () => {
       // Note: normally an event for ID 123 would never be applied
       // to an adapter with ID 2! We only do this here in order to
       // check whether or not the onModelPropertyChange method applies
       // the ID of the event by error (should not happen).
-      var event = {
+      let event = {
         id: '123',
         type: 'property',
         properties: {

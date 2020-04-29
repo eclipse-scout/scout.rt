@@ -108,7 +108,7 @@ export default class RadioButton extends Button {
 
   _renderIconId() {
     super._renderIconId();
-    var $icon = this.get$Icon();
+    let $icon = this.get$Icon();
     if ($icon.length > 0) {
       $icon.insertAfter(this.$radioButton);
     }
@@ -130,7 +130,7 @@ export default class RadioButton extends Button {
     if (!this.enabledComputed) {
       return;
     }
-    var onIcon = this.get$Icon().is(event.target),
+    let onIcon = this.get$Icon().is(event.target),
       onButton = this.$radioButton.is(event.target),
       onLabel = this.$buttonLabel.isOrHas(event.target); // isOrHas is required for HTML enabled labels with nested elements
     if (!onButton && !onLabel && !onIcon) {

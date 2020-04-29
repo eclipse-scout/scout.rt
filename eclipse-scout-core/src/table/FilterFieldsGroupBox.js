@@ -32,7 +32,7 @@ export default class FilterFieldsGroupBox extends GroupBox {
   }
 
   addFilterField(objectType, text) {
-    var field = scout.create(objectType, {
+    let field = scout.create(objectType, {
       parent: this,
       label: this.session.text(text),
       statusVisible: false,

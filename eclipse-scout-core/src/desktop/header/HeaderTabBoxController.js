@@ -31,7 +31,7 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
   install(bench, tabArea) {
     this.bench = scout.assertParameter('bench', bench);
 
-    var tabBoxCenter = this.bench.getTabBox('C');
+    let tabBoxCenter = this.bench.getTabBox('C');
     this.tabAreaCenter = tabBoxCenter.tabArea;
 
     super.install(tabBoxCenter, tabArea);
@@ -44,7 +44,7 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
   }
 
   _onViewsChanged() {
-    if (this.bench.getViews().some(function(view) {
+    if (this.bench.getViews().some(view => {
       return 'C' !== view.displayViewId;
     })) {
       // has views in other view stacks

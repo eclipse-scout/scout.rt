@@ -19,13 +19,13 @@ export default class WidgetEventTypeFilter {
   }
 
   addFilterForEventType(eventType) {
-    this.filters.push(function(event) {
+    this.filters.push(event => {
       return event.type === eventType;
     });
   }
 
   filter(event) {
-    return this.filters.some(function(filterFunc) {
+    return this.filters.some(filterFunc => {
       return filterFunc(event);
     });
   }

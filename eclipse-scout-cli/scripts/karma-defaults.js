@@ -14,14 +14,14 @@ const scoutBuild = require('./constants');
 const jquery = require.resolve('jquery');
 const fs = require('fs');
 
-module.exports = function(config, specEntryPoint) {
+module.exports = (config, specEntryPoint) => {
   const webpackConfigFilePath = path.resolve('webpack.config.js');
   if (!fs.existsSync(webpackConfigFilePath)) {
     const message = 'Karma requires a webpack config file at location "' + webpackConfigFilePath + '" but it could not be found.';
     console.error(message);
     throw new Error(message);
   }
-  var webpackConfigProvider = require(webpackConfigFilePath);
+  let webpackConfigProvider = require(webpackConfigFilePath);
 
   const webpackArgs = Object.assign({mode: scoutBuild.mode.development}, config.webpackArgs);
   const webpackConfig = webpackConfigProvider(null, webpackArgs);

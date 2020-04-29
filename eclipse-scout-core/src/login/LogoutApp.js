@@ -43,7 +43,7 @@ export default class LogoutApp extends App {
     options.texts = $.extend({}, texts.readFromDOM(), options.texts);
     this._prepareDOM();
 
-    var logoutBox = scout.create('LogoutBox', options);
+    let logoutBox = scout.create('LogoutBox', options);
     logoutBox.render($('body').addClass('logout-body'));
   }
 }

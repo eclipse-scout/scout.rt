@@ -17,7 +17,7 @@ export default class TableNavigationPageDownKeyStroke extends AbstractTableNavig
     this.which = [keys.PAGE_DOWN];
     this.renderingHints.text = 'PgDn';
     this.renderingHints.$drawingArea = function($drawingArea, event) {
-      var viewport = this._viewportInfo();
+      let viewport = this._viewportInfo();
       if (viewport.lastRow) {
         return viewport.lastRow.$row;
       }
@@ -25,7 +25,7 @@ export default class TableNavigationPageDownKeyStroke extends AbstractTableNavig
   }
 
   handle(event) {
-    var table = this.field,
+    let table = this.field,
       viewport = this._viewportInfo(),
       rows = table.visibleRows,
       selectedRows = table.selectedRows,

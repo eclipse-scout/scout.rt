@@ -38,10 +38,10 @@ export default class SequenceBox extends CompositeField {
    * Initialize all DateFields in this SequenceBox with a meaningful autoDate, except fields which already have an autoDate provided by the model.
    */
   _initDateFields() {
-    var dateFields = this._getDateFields();
-    var newAutoDate = null;
-    for (var i = 0; i < dateFields.length; i++) {
-      var currField = dateFields[i];
+    let dateFields = this._getDateFields();
+    let newAutoDate = null;
+    for (let i = 0; i < dateFields.length; i++) {
+      let currField = dateFields[i];
       if (currField.autoDate) {
         // is the autoDate already set by the field's model remember to not change this value.
         currField.hasModelAutoDateSet = true;
@@ -54,7 +54,7 @@ export default class SequenceBox extends CompositeField {
   }
 
   _render() {
-    var field, i;
+    let field, i;
     this.addContainer(this.$parent, 'sequence-box');
     this.addLabel();
     this.addField(this.$parent.makeDiv());
@@ -122,7 +122,7 @@ export default class SequenceBox extends CompositeField {
   }
 
   _onFieldPropertyChange(event) {
-    var visibiltyChanged = (event.propertyName === 'visible');
+    let visibiltyChanged = (event.propertyName === 'visible');
     if (scout.isOneOf(event.propertyName, ['errorStatus', 'tooltipText', 'visible', 'menus', 'menusVisible'])) {
       this._handleStatus(visibiltyChanged);
     }
@@ -239,7 +239,7 @@ export default class SequenceBox extends CompositeField {
   }
 
   _updateBoxMenuOwner(newOwner) {
-    this.boxMenus.forEach(function(menu) {
+    this.boxMenus.forEach(menu => {
       menu.setOwner(newOwner);
     });
   }
@@ -259,7 +259,7 @@ export default class SequenceBox extends CompositeField {
   }
 
   _getLastVisibleField() {
-    var visibleFields = this.fields.filter(function(field) {
+    let visibleFields = this.fields.filter(field => {
       return field.visible;
     });
     if (visibleFields.length === 0) {
@@ -277,11 +277,11 @@ export default class SequenceBox extends CompositeField {
 
   _onDateFieldValueChange(event) {
     // For a better user experience preselect a meaningful date on all following DateFields in the sequence box.
-    var field = event.source;
-    var dateFields = this._getDateFields();
-    var newAutoDate = this._getAutoDateProposal(field);
-    for (var i = dateFields.indexOf(field) + 1; i < dateFields.length; i++) {
-      var currField = dateFields[i];
+    let field = event.source;
+    let dateFields = this._getDateFields();
+    let newAutoDate = this._getAutoDateProposal(field);
+    for (let i = dateFields.indexOf(field) + 1; i < dateFields.length; i++) {
+      let currField = dateFields[i];
       if (!currField.hasModelAutoDateSet) {
         currField.setAutoDate(newAutoDate);
       }
@@ -293,13 +293,13 @@ export default class SequenceBox extends CompositeField {
   }
 
   _getDateFields() {
-    return this.fields.filter(function(field) {
+    return this.fields.filter(field => {
       return field instanceof DateField;
     });
   }
 
   _getAutoDateProposal(field) {
-    var newAutoDate = null;
+    let newAutoDate = null;
     // if it's only a time field, add one hour, otherwise add one day
     if (field && field.value) {
       if (!field.hasDate && field.hasTime) {
@@ -346,7 +346,7 @@ export default class SequenceBox extends CompositeField {
   }
 
   clone(model, options) {
-    var clone = super.clone(model, options);
+    let clone = super.clone(model, options);
     this._deepCloneProperties(clone, 'fields', options);
     return clone;
   }

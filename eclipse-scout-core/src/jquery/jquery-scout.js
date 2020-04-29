@@ -39,7 +39,7 @@ function elemVisible(elem) {
     return false;
   }
   // Must use correct window for element / computedStyle
-  var myWindow = (elem instanceof Document ? elem : elem.ownerDocument).defaultView;
+  let myWindow = (elem instanceof Document ? elem : elem.ownerDocument).defaultView;
   // In some cases with popup windows the window object may be already set to null
   // but we still have a valid reference to a DOM element. In that case we assume
   // the element is not visible anymore.
@@ -61,8 +61,8 @@ function elemVisible(elem) {
 }
 
 function explodeShorthandProperties(properties) {
-  var newProperties = [];
-  properties.forEach(function(prop) {
+  let newProperties = [];
+  properties.forEach(prop => {
     // shorthand css properties may not be copied directly (at least not in firefox) -> copy the actual properties
     if (prop === 'margin' || prop === 'padding') {
       newProperties.push(prop + '-top');
@@ -117,8 +117,8 @@ const __origCleanData = $.cleanData;
  * This function is copied from jQuery UI. It is used to fire a 'remove' event
  * when we call the .remove() function on a jQuery object.
  */
-$.cleanData = function(elems) {
-  var events, elem, i;
+$.cleanData = elems => {
+  let events, elem, i;
   for (i = 0; (elem = elems[i]); i++) { // NOSONAR
     try {
       // Only trigger remove when necessary to save time
@@ -149,7 +149,7 @@ $.removeThis = function() {
  * Note: "return false" is equal to preventDefault() and stopPropagation(), but
  * not stopImmediatePropagation().
  */
-$.suppressEvent = function(event) {
+$.suppressEvent = event => {
   if (event) {
     event.preventDefault();
     event.stopPropagation();
@@ -161,7 +161,7 @@ $.suppressEvent = function(event) {
  * If the event target is disabled (according to $.fn.isEnabled()), the event is suppressed
  * and the method returns true. Otherwise, false is returned.
  */
-$.suppressEventIfDisabled = function(event, $target) {
+$.suppressEventIfDisabled = (event, $target) => {
   $target = $target || $(event.target);
   if (!$target.isEnabled()) {
     $.suppressEvent(event);
@@ -191,11 +191,11 @@ $.suppressEventIfDisabled = function(event, $target) {
  *
  * @param fx
  *          the function to wrap
- * @param options
+ * @param [options]
  *          an optional options object (see table above). Short-hand version: If a number is passed instead
  *          of an object, the value is automatically converted to the option 'delay'.
  */
-$.debounce = function(fx, options) {
+$.debounce = (fx, options) => {
   if (typeof options === 'number') {
     options = {
       delay: options
@@ -206,10 +206,9 @@ $.debounce = function(fx, options) {
     reschedule: true
   }, options);
 
-  var timeoutId = null;
-  var fn = function() {
-    var that = this,
-      args = arguments;
+  let timeoutId = null;
+  let fn = function(...args) {
+    let that = this;
 
     if (timeoutId && !options.reschedule) {
       // Function is already schedule but 'reschedule' option is set to false --> discard this request
@@ -219,12 +218,12 @@ $.debounce = function(fx, options) {
       // Function is already scheduled --> cancel current scheduled call and re-schedule the call
       clearTimeout(timeoutId);
     }
-    timeoutId = setTimeout(function() {
+    timeoutId = setTimeout(() => {
       timeoutId = null;
       fx.apply(that, args);
     }, options.delay);
   };
-  fn.cancel = function() {
+  fn.cancel = () => {
     if (timeoutId) {
       clearTimeout(timeoutId);
       timeoutId = null;
@@ -240,21 +239,20 @@ $.debounce = function(fx, options) {
  * (default 250ms). This is similar to $.debounce() but ensures that function is called at least
  * every 'delay' milliseconds. Can be useful to prevent too many function calls, e.g. from UI events.
  */
-$.throttle = function(fx, delay) {
+$.throttle = (fx, delay) => {
   delay = (delay !== undefined) ? delay : 250;
-  var timeoutId = null;
-  var lastExecution;
-  return function() {
-    var that = this,
-      args = arguments,
-      now = new Date().getTime(),
-      callFx = function() {
-        lastExecution = now;
-        fx.apply(that, args);
-      };
+  let timeoutId = null;
+  let lastExecution;
+  return function(...args) {
+    let that = this;
+    let now = new Date().getTime();
+    let callFx = () => {
+      lastExecution = now;
+      fx.apply(that, args);
+    };
     if (lastExecution && lastExecution + delay > now) {
       clearTimeout(timeoutId);
-      timeoutId = setTimeout(function() {
+      timeoutId = setTimeout(() => {
         callFx();
       }, delay);
     } else {
@@ -266,16 +264,14 @@ $.throttle = function(fx, delay) {
 /**
  * Returns a function which negates the return value of the given function when called.
  */
-$.negate = function(fx) {
-  return function() {
-    return !fx.apply(this, arguments);
-  };
+$.negate = fx => function(...args) {
+  return !fx.apply(this, args);
 };
 
 /**
  * color calculation
  */
-$.colorOpacity = function(hex, opacity) {
+$.colorOpacity = (hex, opacity) => {
   // validate hex string
   hex = String(hex).replace(/[^0-9a-f]/gi, '');
   if (hex.length < 6) {
@@ -284,9 +280,9 @@ $.colorOpacity = function(hex, opacity) {
   opacity = opacity || 0;
 
   // convert to decimal and change luminosity
-  var rgb = '#';
-  for (var i = 0; i < 3; i++) {
-    var c = parseInt(hex.substr(i * 2, 2), 16);
+  let rgb = '#';
+  for (let i = 0; i < 3; i++) {
+    let c = parseInt(hex.substr(i * 2, 2), 16);
     c = Math.round(Math.min(Math.max(0, 255 - (255 - c) * opacity), 255)).toString(16);
     rgb += ('00' + c).substr(c.length);
   }
@@ -314,16 +310,16 @@ $.colorOpacity = function(hex, opacity) {
  * removeTag         false               Whether to remove the script tag again from the DOM
  *                                       after the script has been loaded.
  */
-$.injectScript = function(url, options) {
+$.injectScript = (url, options) => {
   options = options || {};
-  var deferred = $.Deferred();
+  let deferred = $.Deferred();
 
-  var myDocument = options.document || window.document;
-  var linkTag = myDocument.createElement('script');
+  let myDocument = options.document || window.document;
+  let linkTag = myDocument.createElement('script');
   $(linkTag)
     .attr('src', url)
     .attr('async', true)
-    .on('load error', function(event) {
+    .on('load error', event => {
       if (options.removeTag) {
         myDocument.head.removeChild(linkTag);
       }
@@ -358,17 +354,17 @@ $.injectScript = function(url, options) {
  * --------------------------------------------------------------------------------------------
  * document          window.document     Which document to inject the style sheet to.
  */
-$.injectStyleSheet = function(url, options) {
+$.injectStyleSheet = (url, options) => {
   options = options || {};
-  var deferred = $.Deferred();
+  let deferred = $.Deferred();
 
-  var myDocument = options.document || window.document;
-  var linkTag = myDocument.createElement('link');
+  let myDocument = options.document || window.document;
+  let linkTag = myDocument.createElement('link');
   $(linkTag)
     .attr('rel', 'stylesheet')
     .attr('type', 'text/css')
     .attr('href', url)
-    .on('load error', function(event) {
+    .on('load error', event => {
       if (event.type === 'error') {
         deferred.reject($(linkTag));
       } else {
@@ -397,12 +393,12 @@ $.injectStyleSheet = function(url, options) {
  * --------------------------------------------------------------------------------------------
  * document          window.document     Which document to inject the style to.
  */
-$.injectStyle = function(data, options) {
+$.injectStyle = (data, options) => {
   options = options || {};
 
-  var myDocument = options.document || window.document;
-  var styleTag = myDocument.createElement('style');
-  var $styleTag = $(styleTag);
+  let myDocument = options.document || window.document;
+  let styleTag = myDocument.createElement('style');
+  let $styleTag = $(styleTag);
   $styleTag
     .attr('type', 'text/css')
     .html(data);
@@ -411,7 +407,7 @@ $.injectStyle = function(data, options) {
   return $styleTag;
 };
 
-$.pxToNumber = function(pixel) {
+$.pxToNumber = pixel => {
   if (!pixel) {
     // parseFloat would return NaN if pixel is '' or undefined
     return 0;
@@ -424,12 +420,12 @@ $.pxToNumber = function(pixel) {
  * Use this function as shorthand of this:
  * <code>$.Deferred().resolve([arguments]);</code>
  *
- * @param {object[]} [arguments] of this function are passed to the resolve function of the deferred
+ * @param {object[]} [args] of this function are passed to the resolve function of the deferred
  * @returns {$.Deferred} a deferred for an already resolved jQuery.Deferred object.
  */
-$.resolvedDeferred = function() {
-  var deferred = $.Deferred();
-  deferred.resolve.apply(deferred, arguments);
+$.resolvedDeferred = (...args) => {
+  let deferred = $.Deferred();
+  deferred.resolve(...args);
   return deferred;
 };
 
@@ -437,12 +433,12 @@ $.resolvedDeferred = function() {
  * Use this function as shorthand of this:
  * <code>$.Deferred().resolve([arguments]).promise();</code>
  *
- * @param {object[]} [arguments] of this function are passed to the resolve function of the deferred
+ * @param {object[]} [args] of this function are passed to the resolve function of the deferred
  * @returns {Promise} a promise for an already resolved jQuery.Deferred object.
  */
-$.resolvedPromise = function() {
-  var deferred = $.Deferred();
-  deferred.resolve.apply(deferred, arguments);
+$.resolvedPromise = (...args) => {
+  let deferred = $.Deferred();
+  deferred.resolve(...args);
   return deferred.promise();
 };
 
@@ -453,30 +449,30 @@ $.resolvedPromise = function() {
  * @param {object[]} [arguments] of this function are passed to the reject function of the deferred
  * @returns {Promise} a promise for an already rejected jQuery.Deferred object.
  */
-$.rejectedPromise = function() {
-  var deferred = $.Deferred();
-  deferred.reject.apply(deferred, arguments);
+$.rejectedPromise = (...args) => {
+  let deferred = $.Deferred();
+  deferred.reject(...args);
   return deferred.promise();
 };
 
 /**
  * Creates a new promise which resolves when all promises resolve and fails when the first promise fails.
  *
- * @param asArray (optional) when set to true, the resolve function will transform the
+ * @param {boolean} [asArray] (optional) when set to true, the resolve function will transform the
  *    flat arguments list containing the results into an array. The arguments of the reject function won't be touched. Default is false.
  */
-$.promiseAll = function(promises, asArray) {
+$.promiseAll = (promises, asArray) => {
   asArray = scout.nvl(asArray, false);
   promises = arrays.ensure(promises);
-  var deferred = $.Deferred();
-  $.when.apply($, promises).done(function() {
+  let deferred = $.Deferred();
+  $.when(...promises).done((...args) => {
     if (asArray) {
-      deferred.resolve(objects.argumentsToArray(arguments));
+      deferred.resolve(args);
     } else {
-      deferred.resolve.apply(this, arguments);
+      deferred.resolve(...args);
     }
-  }).fail(function() {
-    deferred.reject.apply(this, arguments);
+  }).fail((...args) => {
+    deferred.reject(...args);
   });
   return deferred.promise();
 };
@@ -488,19 +484,16 @@ $.promiseAll = function(promises, asArray) {
  *
  * @returns a promise from JQuery function $.ajax
  */
-$.ajaxJson = function(url) {
-  return $.ajax({
-    url: url,
-    dataType: 'json',
-    contentType: 'application/json; charset=UTF-8'
-  }).catch(function() {
-    // Reject the promise with usual arguments (jqXHR, textStatus, errorThrown), but add the request
-    // options as additional argument (e.g. to make the URL available to the error handler)
-    var args = objects.argumentsToArray(arguments);
-    args.push(this);
-    return $.rejectedPromise.apply($, args);
-  });
-};
+$.ajaxJson = url => $.ajax({
+  url: url,
+  dataType: 'json',
+  contentType: 'application/json; charset=UTF-8'
+}).catch(function(...args) {
+  // Reject the promise with usual arguments (jqXHR, textStatus, errorThrown), but add the request
+  // options as additional argument (e.g. to make the URL available to the error handler)
+  args.push(this);
+  return $.rejectedPromise(...args);
+});
 
 /**
  * Ensures the given parameter is a jQuery object.<p>
@@ -509,7 +502,7 @@ $.ajaxJson = function(url) {
  * <p>
  * Just using $() on an existing jQuery object would clone it which would work but is unnecessary.
  */
-$.ensure = function($elem) {
+$.ensure = $elem => {
   if ($elem instanceof $) {
     return $elem;
   }
@@ -519,9 +512,7 @@ $.ensure = function($elem) {
 /**
  * Helper function to determine if an object is of type "jqXHR" (http://api.jquery.com/jQuery.ajax/#jqXHR)
  */
-$.isJqXHR = function(obj) {
-  return (typeof obj === 'object' && obj.hasOwnProperty('readyState') && obj.hasOwnProperty('status') && obj.hasOwnProperty('statusText'));
-};
+$.isJqXHR = obj => (typeof obj === 'object' && obj.hasOwnProperty('readyState') && obj.hasOwnProperty('status') && obj.hasOwnProperty('statusText'));
 
 // === $.prototype extensions ===
 
@@ -538,11 +529,11 @@ $.fn.nvl = function($element) {
  * @param text (optional) adds a child text-node with given text (no HTML content)
  */
 $.fn.makeElement = function(element, cssClass, text) {
-  var myDocument = this.document(true);
+  let myDocument = this.document(true);
   if (myDocument === undefined || element === undefined) {
     return new Error('missing arguments: document, element');
   }
-  var $element = $(element, myDocument);
+  let $element = $(element, myDocument);
   if (cssClass) {
     $element.addClass(cssClass);
   }
@@ -571,7 +562,7 @@ $.fn.makeSpan = function(cssClass, text) {
  * @returns HTML document reference (ownerDocument) of the HTML element.
  */
 $.fn.document = function(domElement) {
-  var myDocument = this.length ? (this[0] instanceof Document ? this[0] : this[0].ownerDocument) : null;
+  let myDocument = this.length ? (this[0] instanceof Document ? this[0] : this[0].ownerDocument) : null;
   return domElement ? myDocument : $(myDocument);
 };
 
@@ -580,7 +571,7 @@ $.fn.document = function(domElement) {
  * @returns HTML window reference (defaultView) of the HTML element
  */
 $.fn.window = function(domElement) {
-  var myDocument = this.document(true),
+  let myDocument = this.document(true),
     myWindow = myDocument ? myDocument.defaultView : null;
   return domElement ? myWindow : $(myWindow);
 };
@@ -590,7 +581,7 @@ $.fn.window = function(domElement) {
  * @returns {$|HTMLElement} the active element of the current document
  */
 $.fn.activeElement = function(domElement) {
-  var myDocument = this.document(true),
+  let myDocument = this.document(true),
     activeElement = myDocument ? myDocument.activeElement : null;
   return domElement ? activeElement : $(activeElement);
 };
@@ -600,7 +591,7 @@ $.fn.activeElement = function(domElement) {
  * @returns {$|HTMLElement} the BODY element of the HTML document in which the current HTML element is placed.
  */
 $.fn.body = function(domElement) {
-  var $body = $('body', this.document(true));
+  let $body = $('body', this.document(true));
   return domElement ? $body[0] : $body;
 };
 
@@ -609,7 +600,7 @@ $.fn.body = function(domElement) {
  * @returns {$|HTMLElement} the closest DOM element that has the 'scout' class.
  */
 $.fn.entryPoint = function(domElement) {
-  var $element = this.closest('.scout');
+  let $element = this.closest('.scout');
   return domElement ? $element[0] : $element;
 };
 
@@ -617,7 +608,7 @@ $.fn.entryPoint = function(domElement) {
  * @returns {Dimension} size of the window (width and height)
  */
 $.fn.windowSize = function() {
-  var $window = this.window();
+  let $window = this.window();
   return new Dimension($window.width(), $window.height());
 };
 
@@ -625,7 +616,7 @@ $.fn.windowSize = function() {
  * Returns the element at the given point considering only child elements and elements matching the selector, if specified.
  */
 $.fn.elementFromPoint = function(x, y, selector) {
-  var $container = $(this),
+  let $container = $(this),
     doc = $container.document(true),
     elements = [],
     i = 0,
@@ -665,7 +656,7 @@ $.fn.elementFromPoint = function(x, y, selector) {
     $element = $();
   }
 
-  elements.forEach(function($element) {
+  elements.forEach($element => {
     // show element again
     $element.removeClass('invisible');
   });
@@ -720,7 +711,7 @@ $.fn.appendIcon = function(iconId, cssClass) {
     return this.appendSpan(cssClass)
       .addClass('icon');
   }
-  var icon;
+  let icon;
   if (iconId instanceof IconDesc) {
     icon = iconId;
   } else {
@@ -737,7 +728,7 @@ $.fn.appendIcon = function(iconId, cssClass) {
 };
 
 $.fn.appendImg = function(imageSrc, cssClass) {
-  var $icon = this.appendElement('<img>', cssClass);
+  let $icon = this.appendElement('<img>', cssClass);
   if (imageSrc) {
     $icon.attr('src', imageSrc);
   }
@@ -745,11 +736,11 @@ $.fn.appendImg = function(imageSrc, cssClass) {
 };
 
 $.fn.makeSVG = function(type, cssClass, text, id) {
-  var myDocument = this.document(true);
+  let myDocument = this.document(true);
   if (myDocument === undefined || type === undefined) {
     return new Error('missing arguments: document, type');
   }
-  var $svg = $(myDocument.createElementNS('http://www.w3.org/2000/svg', type));
+  let $svg = $(myDocument.createElementNS('http://www.w3.org/2000/svg', type));
   if (cssClass) {
     $svg.attr('class', cssClass);
   }
@@ -785,7 +776,7 @@ $.fn.attrXLINK = function(attributeName, value) {
  * The current implementation adds a class 'ie' if Internet Explorer is used.
  */
 $.fn.addDeviceClass = function() {
-  var device = Device.get();
+  let device = Device.get();
   if (device.isInternetExplorer()) {
     this.addClass('ie');
     if (device.browserVersion === 9) {
@@ -829,7 +820,7 @@ $.fn.isEnabled = function() {
 };
 
 $.fn.setVisible = function(visible) {
-  var isVisible = !this.hasClass('hidden');
+  let isVisible = !this.hasClass('hidden');
   if (isVisible === visible) {
     return this;
   }
@@ -863,7 +854,7 @@ $.fn.isTabbable = function() {
  * @see Icon as an alternative
  */
 $.fn.icon = function(iconId, addToDomFunc) {
-  var icon, $icon = this.data('$icon');
+  let icon, $icon = this.data('$icon');
   if (iconId) {
     icon = icons.parseIconId(iconId);
     if (icon.isFontIcon()) {
@@ -922,7 +913,7 @@ $.fn.isVisible = function() {
 };
 
 $.fn.isEveryParentVisible = function() {
-  var everyParentVisible = true;
+  let everyParentVisible = true;
   this.parents().each(function() {
     if (!$(this).isVisible()) {
       everyParentVisible = false;
@@ -943,7 +934,7 @@ $.fn.isAttached = function() {
  * @returns {$} the current element if it is scrollable, otherwise the first parent which is scrollable
  */
 $.fn.scrollParent = function() {
-  var $elem = this;
+  let $elem = this;
   while ($elem.length > 0) {
     if ($elem.data('scrollable')) {
       return $elem;
@@ -957,7 +948,7 @@ $.fn.scrollParent = function() {
  * Returns every parent which is scrollable
  */
 $.fn.scrollParents = function() {
-  var $scrollParents = $(),
+  let $scrollParents = $(),
     $elem = this;
 
   while ($elem.length > 0) {
@@ -971,8 +962,8 @@ $.fn.scrollParents = function() {
 
 // most used animate
 $.fn.animateAVCSD = function(attr, value, complete, step, duration) {
-  var properties = {};
-  var options = {};
+  let properties = {};
+  let options = {};
 
   properties[attr] = value;
   if (complete) {
@@ -993,9 +984,9 @@ $.fn.animateAVCSD = function(attr, value, complete, step, duration) {
 // SVG animate, array contains attr, endValue + startValue
 $.fn.animateSVG = function(attr, endValue, duration, complete, withoutTabIndex) {
   return this.each(function() {
-    var startValue = parseFloat($(this).attr(attr));
+    let startValue = parseFloat($(this).attr(attr));
     if (withoutTabIndex) {
-      var oldComplete = complete;
+      let oldComplete = complete;
       complete = function() {
         if (oldComplete) {
           oldComplete.call(this);
@@ -1017,16 +1008,16 @@ $.fn.animateSVG = function(attr, endValue, duration, complete, withoutTabIndex) 
 };
 
 $.fn.addClassForAnimation = function(className, options) {
-  var defaultOptions = {
+  let defaultOptions = {
     classesToRemove: className
   };
   options = $.extend({}, defaultOptions, options);
   this.addClass(className);
-  this.oneAnimationEnd(function() {
+  this.oneAnimationEnd(() => {
     // remove class, otherwise animation will be executed each time the element changes it's visibility (attach/rerender),
     // and even each time when the css classes change
     this.removeClass(options.classesToRemove);
-  }.bind(this));
+  });
   return this;
 };
 
@@ -1116,7 +1107,7 @@ $.fn.cssAnimated = function(fromVals, toVals, opts) {
 
 // over engineered animate
 $.fn.widthToContent = function(opts) {
-  var oldW = this.outerWidth(),
+  let oldW = this.outerWidth(),
     newW = this.css('width', 'auto').outerWidth();
 
   this.cssWidthAnimated(oldW, newW, opts);
@@ -1128,7 +1119,7 @@ $.fn.widthToContent = function(opts) {
  * Not the same as position() which returns the position relative to the offset parent.
  */
 $.fn.offsetTo = function($to) {
-  var toOffset = $to.offset(),
+  let toOffset = $to.offset(),
     offset = this.offset();
 
   return {
@@ -1181,7 +1172,7 @@ $.fn.cssWidth = function(width) {
 
 $.fn.cssMinWidth = function(minWidth) {
   if (minWidth === undefined) {
-    var value = this.css('min-width');
+    let value = this.css('min-width');
     if (value === 'auto' || value.indexOf('%') !== -1) {
       return 0;
     }
@@ -1195,7 +1186,7 @@ $.fn.cssMinWidth = function(minWidth) {
  */
 $.fn.cssMaxWidth = function(maxWidth) {
   if (maxWidth === undefined) {
-    var value = this.css('max-width');
+    let value = this.css('max-width');
     if (value === 'none' || value.indexOf('%') !== -1) {
       return Number.MAX_VALUE;
     }
@@ -1210,7 +1201,7 @@ $.fn.cssHeight = function(height) {
 
 $.fn.cssMinHeight = function(minHeight) {
   if (minHeight === undefined) {
-    var value = this.css('min-height');
+    let value = this.css('min-height');
     if (value === 'auto' || value.indexOf('%') !== -1) {
       return 0;
     }
@@ -1224,7 +1215,7 @@ $.fn.cssMinHeight = function(minHeight) {
  */
 $.fn.cssMaxHeight = function(maxHeight) {
   if (maxHeight === undefined) {
-    var value = this.css('max-height');
+    let value = this.css('max-height');
     if (value === 'none' || value.indexOf('%') !== -1) {
       return Number.MAX_VALUE;
     }
@@ -1352,22 +1343,22 @@ $.fn.innerRight = function() {
 };
 
 $.fn.copyCss = function($origin, props) {
-  var properties = props.split(' ');
-  var $this = this;
+  let properties = props.split(' ');
+  let $this = this;
   properties = explodeShorthandProperties(properties);
-  properties.forEach(function(prop) {
+  properties.forEach(prop => {
     $this.css(prop, $origin.css(prop));
   });
   return $this;
 };
 
 $.fn.copyCssIfGreater = function($origin, props) {
-  var properties = props.split(' ');
-  var $this = this;
+  let properties = props.split(' ');
+  let $this = this;
   properties = explodeShorthandProperties(properties);
-  properties.forEach(function(prop) {
-    var originValue = $.pxToNumber($origin.css(prop));
-    var thisValue = $.pxToNumber($this.css(prop));
+  properties.forEach(prop => {
+    let originValue = $.pxToNumber($origin.css(prop));
+    let thisValue = $.pxToNumber($this.css(prop));
     if (originValue > thisValue) {
       $this.css(prop, originValue + 'px');
     }
@@ -1376,9 +1367,9 @@ $.fn.copyCssIfGreater = function($origin, props) {
 };
 
 $.fn.copyCssClasses = function($other, classString) {
-  var classes = classString.split(' ');
-  var $this = this;
-  classes.forEach(function(cssClass) {
+  let classes = classString.split(' ');
+  let $this = this;
+  classes.forEach(cssClass => {
     if ($other.hasClass(cssClass)) {
       $this.addClass(cssClass);
     }
@@ -1405,8 +1396,8 @@ $.fn.isOrHas = function(elem) {
  * in the E, SE and S of the element. This is primarily useful for (modal) dialogs.
  */
 $.fn.resizable = function(model) {
-  var $this = $(this);
-  var resizable = $this.data('resizable');
+  let $this = $(this);
+  let resizable = $this.data('resizable');
   if (resizable) {
     // Already resizable
     return this;
@@ -1420,8 +1411,8 @@ $.fn.resizable = function(model) {
  * Removes the resize handles and event handlers in order to make the element un resizable again.
  */
 $.fn.unresizable = function() {
-  var $this = $(this);
-  var resizable = $this.data('resizable');
+  let $this = $(this);
+  let resizable = $this.data('resizable');
   if (resizable) {
     resizable.destroy();
     $this.removeData('resizable');
@@ -1438,32 +1429,32 @@ $.fn.unresizable = function() {
  * { top: (top pixels), left: (left pixels) }
  */
 $.fn.draggable = function($handle, callback) {
-  var $draggable = this;
+  let $draggable = this;
   $handle = $handle || $draggable;
-  return $handle.on('mousedown.draggable', function(event) {
+  return $handle.on('mousedown.draggable', event => {
     $('iframe').addClass('dragging-in-progress');
-    var orig_offset = $draggable.offset();
-    var orig_event = event;
-    var handleWidth = $handle.width();
-    var windowWidth = $handle.window().width();
-    var windowHeight = $handle.window().height();
+    let orig_offset = $draggable.offset();
+    let orig_event = event;
+    let handleWidth = $handle.width();
+    let windowWidth = $handle.window().width();
+    let windowHeight = $handle.window().height();
     $handle.parents()
-      .on('mousemove.dragging', function(event) {
-        var top = orig_offset.top + (event.pageY - orig_event.pageY);
-        var left = orig_offset.left + (event.pageX - orig_event.pageX);
+      .on('mousemove.dragging', event => {
+        let top = orig_offset.top + (event.pageY - orig_event.pageY);
+        let left = orig_offset.left + (event.pageX - orig_event.pageX);
         // do not drop outside of viewport (and leave a margin of 100 pixels)
         left = Math.max(100 - handleWidth, left);
         left = Math.min(windowWidth - 100, left);
         top = Math.max(0, top); // must not be dragged outside of top, otherwise dragging back is impossible
         top = Math.min(windowHeight - 100, top);
-        var newOffset = {
+        let newOffset = {
           top: top,
           left: left
         };
         $draggable.offset(newOffset);
         callback && callback(newOffset);
       })
-      .on('mouseup.dragging', function(e) {
+      .on('mouseup.dragging', e => {
         $handle.parents().off('.dragging');
         $('iframe').removeClass('dragging-in-progress');
       });
@@ -1476,7 +1467,7 @@ $.fn.draggable = function($handle, callback) {
  * Removes the mouse down handler which was added by draggable() in order to make it un draggable again.
  */
 $.fn.undraggable = function($handle) {
-  var $draggable = this;
+  let $draggable = this;
   $handle = $handle || $draggable;
   return $handle.off('mousedown.draggable');
 };
@@ -1522,29 +1513,29 @@ $.fn.removeAnimated = function(cssClass, callback) {
 };
 
 const __origHide = $.fn.hide;
-$.fn.hide = function() {
+$.fn.hide = function(...args) {
   this.trigger('hide');
-  return __origHide.apply(this, arguments);
+  return __origHide.apply(this, args);
 };
 
 const __origWidth = $.fn.width;
-$.fn.width = function() {
-  return _ceilNumber(__origWidth.apply(this, arguments));
+$.fn.width = function(...args) {
+  return _ceilNumber(__origWidth.apply(this, args));
 };
 
 const __origOuterWidth = $.fn.outerWidth;
-$.fn.outerWidth = function() {
-  return _ceilNumber(__origOuterWidth.apply(this, arguments));
+$.fn.outerWidth = function(...args) {
+  return _ceilNumber(__origOuterWidth.apply(this, args));
 };
 
 const __origHeight = $.fn.height;
-$.fn.height = function() {
-  return _ceilNumber(__origHeight.apply(this, arguments));
+$.fn.height = function(...args) {
+  return _ceilNumber(__origHeight.apply(this, args));
 };
 
-var __origOuterHeight = $.fn.outerHeight;
-$.fn.outerHeight = function() {
-  return _ceilNumber(__origOuterHeight.apply(this, arguments));
+let __origOuterHeight = $.fn.outerHeight;
+$.fn.outerHeight = function(...args) {
+  return _ceilNumber(__origOuterHeight.apply(this, args));
 };
 
 /**
@@ -1572,7 +1563,7 @@ $.fn.htmlOrNbsp = function(html, emptyCssClass) {
  * @returns {$}
  */
 $.fn.contentOrNbsp = function(htmlEnabled, content, emptyCssClass) {
-  var func = htmlEnabled ? this.html : this.text;
+  let func = htmlEnabled ? this.html : this.text;
   if (strings.hasText(content)) {
     func.call(this, content);
     if (emptyCssClass) {
@@ -1608,7 +1599,7 @@ $.fn.toggleAttr = function(attr, state, value) {
     value = attr;
   }
   return this.each(function() {
-    var $element = $(this);
+    let $element = $(this);
     if (state === undefined) {
       // set state according to the current value
       state = ($element.attr(attr) === undefined);
@@ -1624,7 +1615,7 @@ $.fn.toggleAttr = function(attr, state, value) {
 };
 
 $.fn.backupSelection = function() {
-  var field = this[0];
+  let field = this[0];
   if (field && field === this.activeElement(true)) {
     return {
       selectionStart: field.selectionStart,
@@ -1636,7 +1627,7 @@ $.fn.backupSelection = function() {
 };
 
 $.fn.restoreSelection = function(selection) {
-  var field = this[0];
+  let field = this[0];
   if (field && field === this.activeElement(true) && selection) {
     field.setSelectionRange(selection.selectionStart, selection.selectionEnd, selection.selectionDirection);
   }
@@ -1678,7 +1669,7 @@ $.fn.appendAppLink = function(appLinkBean, func) {
 $.fn.appLink = function(appLinkBean, func) {
   if (!func) {
     func = function(event) {
-      var widget = scout.widget(this);
+      let widget = scout.widget(this);
       if (widget && widget._onAppLinkAction) {
         widget._onAppLinkAction(event);
       }
@@ -1714,7 +1705,7 @@ $.fn.unfocusable = function() {
  * Select all text within an element, e.g. within a content editable div element.
  */
 $.fn.selectAllText = function() {
-  var range,
+  let range,
     myDocument = this.document(true),
     myWindow = this.window(true),
     element = this[0];
@@ -1743,8 +1734,8 @@ $.fn.selectAllText = function() {
 };
 
 $.fn._getClientAndScrollWidthRounded = function() {
-  var element = this[0];
-  var device = Device.get();
+  let element = this[0];
+  let device = Device.get();
   if (device.isInternetExplorer() || device.isEdge()) {
     // IE and Edge seem to round up the scrollWidth. Therefore the clientWidth must be rounded up as well to have a valid comparison.
     return {
@@ -1760,7 +1751,7 @@ $.fn._getClientAndScrollWidthRounded = function() {
 };
 
 $.fn._getClientAndScrollWidthReliable = function() {
-  var widths = this._getClientAndScrollWidthRounded();
+  let widths = this._getClientAndScrollWidthRounded();
   if (!Device.get().isScrollWidthIncludingPadding()) {
     // browser supports accurate client- and scroll widths.
     return widths;
@@ -1770,7 +1761,7 @@ $.fn._getClientAndScrollWidthReliable = function() {
     return widths;
   }
 
-  var paddingRight = this.cssPaddingRight(),
+  let paddingRight = this.cssPaddingRight(),
     oldStyle = this.attr('style');
   if (paddingRight > 0) {
     // Some browsers render text within the right-padding (even with overflow=hidden). This has an effect on the value of scrollWidth which may be wrong in these cases (scrollWidth == clientWidth but ellipsis is shown).
@@ -1791,10 +1782,10 @@ $.fn._getClientAndScrollWidthReliable = function() {
   // to sub-pixel rendering. The text is "slightly" (0.2 pixels) larger than the clientWidth,
   // but scrollWidth returns the same value.
   // As a workaround, we do a second measurement of the uncut width before returning false.
-  var clientWidth = this[0].getBoundingClientRect().width;
+  let clientWidth = this[0].getBoundingClientRect().width;
   this.css('width', 'auto');
   this.css('max-width', 'none');
-  var scrollWidth = this[0].getBoundingClientRect().width;
+  let scrollWidth = this[0].getBoundingClientRect().width;
   this.attrOrRemove('style', oldStyle);
   return {
     clientWidth: clientWidth,
@@ -1806,7 +1797,7 @@ $.fn._getClientAndScrollWidthReliable = function() {
  * Checks if content is truncated.
  */
 $.fn.isContentTruncated = function() {
-  var widths = this._getClientAndScrollWidthReliable();
+  let widths = this._getClientAndScrollWidthReliable();
   if (widths.scrollWidth > widths.clientWidth) {
     return true;
   }
@@ -1820,13 +1811,13 @@ $.fn.isContentTruncated = function() {
  */
 $.fn.onSingleOrDoubleClick = function(singleClickFunc, doubleClickFunc, timeout) {
   return this.each(function() {
-    var that = this,
-      numClicks = 0,
-      timeout = scout.nvl(timeout, 300);
-    $(this).on('click', function(event) {
+    let that = this;
+    let numClicks = 0;
+    let timeout = scout.nvl(timeout, 300);
+    $(this).on('click', event => {
       numClicks++;
       if (numClicks === 1) {
-        setTimeout(function() {
+        setTimeout(() => {
           if (numClicks === 1) {
             singleClickFunc.call(that, event);
           } else {
@@ -1840,13 +1831,13 @@ $.fn.onSingleOrDoubleClick = function(singleClickFunc, doubleClickFunc, timeout)
 };
 
 $.fn.onPassive = function(eventType, handler) {
-  var options = events.passiveOptions();
+  let options = events.passiveOptions();
   this[0].addEventListener(eventType, handler, options);
   return this;
 };
 
 $.fn.offPassive = function(eventType, handler) {
-  var options = events.passiveOptions();
+  let options = events.passiveOptions();
   this[0].removeEventListener(eventType, handler, options);
   return this;
 };
@@ -1888,9 +1879,7 @@ $.fn.appendLi = function(cssClass, text) {
 // === $.easing extensions ===
 
 $.extend($.easing, {
-  easeOutQuart: function(x) {
-    return 1 - Math.pow(1 - x, 4);
-  }
+  easeOutQuart: x => 1 - Math.pow(1 - x, 4)
 });
 
 /**
@@ -1923,16 +1912,16 @@ $.extend($.easing, {
  */
 
 // use this transport for "binary" data type
-$.ajaxTransport('+binary', function(options, originalOptions, jqXHR) {
+$.ajaxTransport('+binary', (options, originalOptions, jqXHR) => {
   // check for conditions and support for blob / arraybuffer response type
   if (window.FormData && ((options.dataType && (options.dataType === 'binary')) ||
     (options.data && ((window.ArrayBuffer && options.data instanceof ArrayBuffer) ||
       (window.Blob && options.data instanceof Blob))))) {
     return {
       // create new XMLHttpRequest
-      send: function(headers, callback) {
+      send: (headers, callback) => {
         // setup all variables
-        var xhr = new XMLHttpRequest(),
+        let xhr = new XMLHttpRequest(),
           url = options.url,
           type = options.type,
           async = options.async || true,
@@ -1942,8 +1931,8 @@ $.ajaxTransport('+binary', function(options, originalOptions, jqXHR) {
           username = options.username || null,
           password = options.password || null;
 
-        xhr.addEventListener('load', function() {
-          var data = {};
+        xhr.addEventListener('load', () => {
+          let data = {};
           data[options.dataType] = xhr.response;
           // make callback and send data
           callback(xhr.status, xhr.statusText, data, xhr.getAllResponseHeaders());
@@ -1952,14 +1941,14 @@ $.ajaxTransport('+binary', function(options, originalOptions, jqXHR) {
         xhr.open(type, url, async, username, password);
 
         // setup custom headers
-        for (var i in headers) { // NOSONAR
+        for (let i in headers) { // NOSONAR
           xhr.setRequestHeader(i, headers[i]);
         }
 
         // apply custom fields (if provided)
         // noinspection JSUnresolvedVariable
         if (options.xhrFields) {
-          for (var j in options.xhrFields) {
+          for (let j in options.xhrFields) {
             xhr[j] = options.xhrFields[j];
           }
         }
@@ -1967,7 +1956,7 @@ $.ajaxTransport('+binary', function(options, originalOptions, jqXHR) {
         xhr.responseType = dataType;
         xhr.send(data);
       },
-      abort: function() {
+      abort: () => {
       }
     };
   }

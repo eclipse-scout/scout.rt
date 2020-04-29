@@ -11,9 +11,9 @@
 import {Action, ObjectFactory, scout, StringField} from '../src/index';
 import {LocaleSpecHelper} from '@eclipse-scout/testing';
 
-describe('ObjectFactory', function() {
-  var session;
-  beforeEach(function() {
+describe('ObjectFactory', () => {
+  let session;
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
@@ -23,7 +23,7 @@ describe('ObjectFactory', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
@@ -35,9 +35,9 @@ describe('ObjectFactory', function() {
    * adapterDataCache of the Session.
    */
   function createModel(session, id, objectType) {
-    var model = createSimpleModel(objectType, session, id);
+    let model = createSimpleModel(objectType, session, id);
     if ('Menu.NavigateUp' === objectType || 'Menu.NavigateDown' === objectType) {
-      var outlineId = 'outline' + id;
+      let outlineId = 'outline' + id;
       model.outline = outlineId;
       session._adapterDataCache[outlineId] = {
         id: outlineId,
@@ -51,47 +51,43 @@ describe('ObjectFactory', function() {
     } else if ('TextColumnUserFilter' === objectType) {
       model.table = {};
       model.column = {};
-      model.calculate = function() {
+      model.calculate = () => {
       };
     } else if ('AggregateTableControl' === objectType) {
       model.table = {
         columns: [],
-        on: function() {
+        on: () => {
         }
       };
     } else if ('TabBox' === objectType) {
-      var tabItemId = 'tabItem' + id;
+      let tabItemId = 'tabItem' + id;
       model.selectedTab = 0;
 
       model.tabItems = [tabItemId];
       session._adapterDataCache[tabItemId] = {
         id: tabItemId,
         objectType: 'TabItem',
-        getForm: function() {
-          return createSimpleModel('Form', session);
-        }
+        getForm: () => createSimpleModel('Form', session)
       };
     } else if ('ButtonAdapterMenu' === objectType) {
       model.button = {
-        on: function() {
+        on: () => {
         }
       };
     } else if ('GroupBox' === objectType || 'TabItem' === objectType) {
-      model.getForm = function() {
-        return createSimpleModel('Form', session);
-      };
+      model.getForm = () => createSimpleModel('Form', session);
     }
 
     return model;
   }
 
-  it('creates objects which are registered in scout.objectFactories', function() {
+  it('creates objects which are registered in scout.objectFactories', () => {
     session.init({
       $entryPoint: $('#sandbox')
     });
     // When this test fails with a message like 'TypeError: scout.[ObjectType] is not a constructor...'
     // you should check if the required .js File is registered in SpecRunnerMaven.html.
-    var i, model, object, modelAdapter, objectType;
+    let i, model, object, modelAdapter, objectType;
     for (objectType in scout.objectFactories) {
       model = createModel(session, i, objectType);
       object = scout.objectFactories[objectType]();
@@ -102,167 +98,167 @@ describe('ObjectFactory', function() {
     }
   });
 
-  it('scout.create works with KeyStroke', function() {
+  it('scout.create works with KeyStroke', () => {
     // when creating a KeyStroke via factory, Action should be initialized.
-    var keyStroke = scout.create('KeyStroke', {
+    let keyStroke = scout.create('KeyStroke', {
       parent: session.desktop
     });
     expect(Action.prototype.isPrototypeOf(keyStroke)).toBe(true);
   });
 
-  it('puts the object type to the resulting object', function() {
-    var model = {
+  it('puts the object type to the resulting object', () => {
+    let model = {
       parent: session.desktop
       // objectType will be set
     };
-    var object = ObjectFactory.get().create('StringField', model);
+    let object = ObjectFactory.get().create('StringField', model);
     expect(model.objectType).toBe('StringField');
     expect(object.objectType).toBe('StringField');
   });
 
-  it('puts the object type to the resulting object', function() {
-    var model = {
+  it('puts the object type to the resulting object', () => {
+    let model = {
       parent: session.desktop,
       objectType: 'NumberField' // this objectType will be ignored
     };
-    var object = ObjectFactory.get().create('StringField', model);
+    let object = ObjectFactory.get().create('StringField', model);
     expect(object instanceof StringField).toBe(true);
     expect(model.objectType).toBe('StringField');
     expect(object.objectType).toBe('StringField');
   });
 
-  it('throws an error if no explicit type is specified', function() {
-    expect(function() {
+  it('throws an error if no explicit type is specified', () => {
+    expect(() => {
       ObjectFactory.get().create(null, {
         objectType: 'NumberField'
       });
     }).toThrow();
   });
 
-  it('throws an error if argument list is wrong', function() {
-    expect(function() {
+  it('throws an error if argument list is wrong', () => {
+    expect(() => {
       ObjectFactory.get().create();
     }).toThrow();
-    expect(function() {
+    expect(() => {
       ObjectFactory.get().create('StringField');
     }).toThrow();
-    expect(function() {
+    expect(() => {
       ObjectFactory.get().create({
         someProperty: 'someValue'
       });
     }).toThrow();
-    expect(function() {
+    expect(() => {
       ObjectFactory.get().create('', {});
     }).toThrow();
-    expect(function() {
+    expect(() => {
       ObjectFactory.get().create('', {}, {
         objectType: 'StringField'
       });
     }).toThrow();
   });
 
-  describe('finds the correct constructor function if no factory is defined', function() {
+  describe('finds the correct constructor function if no factory is defined', () => {
 
-    it('uses scout namespace by default', function() {
-      var object = ObjectFactory.get()._createObjectByType('StringField');
+    it('uses scout namespace by default', () => {
+      let object = ObjectFactory.get()._createObjectByType('StringField');
       expect(object instanceof StringField).toBe(true);
     });
 
-    it('uses namespace of given object type if provided', function() {
+    it('uses namespace of given object type if provided', () => {
       window.my = {};
-      var my = window.my;
-      my.StringField = function() {
+      let my = window.my;
+      my.StringField = () => {
       };
-      var object = ObjectFactory.get()._createObjectByType('my.StringField');
+      let object = ObjectFactory.get()._createObjectByType('my.StringField');
       expect(object instanceof my.StringField).toBe(true);
     });
 
-    it('considers variants', function() {
+    it('considers variants', () => {
       window.test = {};
-      window.test.VariantStringField = function() {
+      window.test.VariantStringField = () => {
       };
-      var object = ObjectFactory.get()._createObjectByType('test.StringField:Variant');
+      let object = ObjectFactory.get()._createObjectByType('test.StringField:Variant');
       expect(object).not.toBe(null);
       delete window.scout.VariantStringField;
     });
 
     // in this case namespace from objectType is also used as namespace for variant
-    it('considers variants also within a custom namespace for object type', function() {
+    it('considers variants also within a custom namespace for object type', () => {
       window.my = {};
-      var my = window.my;
-      my.VariantStringField = function() {
+      let my = window.my;
+      my.VariantStringField = () => {
       };
-      var object = ObjectFactory.get()._createObjectByType('my.StringField:Variant');
+      let object = ObjectFactory.get()._createObjectByType('my.StringField:Variant');
       expect(object instanceof my.VariantStringField).toBe(true); // objectType is 'my.StringField'
     });
 
-    it('considers variants also within a custom namespace for variant', function() {
+    it('considers variants also within a custom namespace for variant', () => {
       window.my = {};
-      var my = window.my;
-      my.VariantStringField = function() {
+      let my = window.my;
+      my.VariantStringField = () => {
       };
-      var object = ObjectFactory.get()._createObjectByType('StringField:my.Variant');
+      let object = ObjectFactory.get()._createObjectByType('StringField:my.Variant');
       expect(object instanceof my.VariantStringField).toBe(true); // objectType is '[scout.]StringField'
     });
 
-    it('considers variants also within a custom namespace for variant and a different variant for objectType', function() {
+    it('considers variants also within a custom namespace for variant and a different variant for objectType', () => {
       window.your = {};
-      var your = window.your;
-      your.VariantStringField = function() {
+      let your = window.your;
+      your.VariantStringField = () => {
       };
-      var object = ObjectFactory.get()._createObjectByType('my.StringField:your.Variant');
+      let object = ObjectFactory.get()._createObjectByType('my.StringField:your.Variant');
       expect(object instanceof your.VariantStringField).toBe(true); // objectType is 'my.StringField'
     });
 
-    it('can handle too many variants in objectType', function() {
+    it('can handle too many variants in objectType', () => {
       window.my = {};
-      var my = window.my;
-      my.VariantStringField = function() {
+      let my = window.my;
+      my.VariantStringField = () => {
       };
-      var object = ObjectFactory.get()._createObjectByType('my.StringField:Variant:Foo');
+      let object = ObjectFactory.get()._createObjectByType('my.StringField:Variant:Foo');
       expect(object instanceof my.VariantStringField).toBe(true);
     });
 
-    it('can handle nested namespaces', function() {
+    it('can handle nested namespaces', () => {
       window.my = {
         inner: {
           space: {}
         }
       };
-      var my = window.my;
-      my.inner.space.StringField = function() {
+      let my = window.my;
+      my.inner.space.StringField = () => {
       };
-      var object = ObjectFactory.get()._createObjectByType('my.inner.space.StringField');
+      let object = ObjectFactory.get()._createObjectByType('my.inner.space.StringField');
       expect(object instanceof my.inner.space.StringField).toBe(true);
     });
 
-    it('throws errors', function() {
-      var my = window.my;
-      my.VariantStringField = function() {
+    it('throws errors', () => {
+      let my = window.my;
+      my.VariantStringField = () => {
       };
-      expect(function() {
+      expect(() => {
         ObjectFactory.get()._createObjectByType('my.StringField:NotExistingVariant');
       }).toThrow();
     });
 
-    describe('variantLenient', function() {
-      it('tries to create an object without variant if with variant fails', function() {
-        var model = {
+    describe('variantLenient', () => {
+      it('tries to create an object without variant if with variant fails', () => {
+        let model = {
           variantLenient: true
         };
-        var object = ObjectFactory.get()._createObjectByType('StringField:Variant', model);
+        let object = ObjectFactory.get()._createObjectByType('StringField:Variant', model);
         expect(object instanceof StringField).toBe(true);
       });
 
-      it('tries to create an object without variant if with variant fails also with custom namespace', function() {
+      it('tries to create an object without variant if with variant fails also with custom namespace', () => {
         window.my = {};
-        var my = window.my;
-        my.StringField = function() {
+        let my = window.my;
+        my.StringField = () => {
         };
-        var model = {
+        let model = {
           variantLenient: true
         };
-        var object = ObjectFactory.get()._createObjectByType('my.StringField:Variant', model);
+        let object = ObjectFactory.get()._createObjectByType('my.StringField:Variant', model);
         expect(object instanceof my.StringField).toBe(true);
       });
     });

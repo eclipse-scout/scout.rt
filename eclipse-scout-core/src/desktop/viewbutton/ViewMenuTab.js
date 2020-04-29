@@ -80,7 +80,7 @@ export default class ViewMenuTab extends Widget {
   _setViewButtons(viewButtons) {
     this._setProperty('viewButtons', viewButtons);
     this.setVisible(this.viewButtons.length > 0);
-    var selectedButton = this._findSelectedViewButton();
+    let selectedButton = this._findSelectedViewButton();
     if (selectedButton) {
       this.setSelectedButton(selectedButton);
     } else {
@@ -147,8 +147,8 @@ export default class ViewMenuTab extends Widget {
   }
 
   _findSelectedViewButton() {
-    var viewMenu;
-    for (var i = 0; i < this.viewButtons.length; i++) {
+    let viewMenu;
+    for (let i = 0; i < this.viewButtons.length; i++) {
       viewMenu = this.viewButtons[i];
       if (viewMenu.selected) {
         return viewMenu;
@@ -173,7 +173,7 @@ export default class ViewMenuTab extends Widget {
       // already open
       return;
     }
-    var naviBounds = graphics.bounds(this.$container.parent(), true);
+    let naviBounds = graphics.bounds(this.$container.parent(), true);
     this.popup = scout.create('ViewMenuPopup', {
       parent: this,
       $tab: this.dropdown.$container,
@@ -184,10 +184,10 @@ export default class ViewMenuTab extends Widget {
     this.$container.addClass('popup-open');
     this.popup.headText = this.text;
     this.popup.open();
-    this.popup.on('remove', function(event) {
+    this.popup.on('remove', event => {
       this.$container.removeClass('popup-open');
       this.popup = null;
-    }.bind(this));
+    });
   }
 
   _closePopup() {
@@ -209,7 +209,7 @@ export default class ViewMenuTab extends Widget {
   }
 
   onViewButtonSelected() {
-    var viewButton = this._findSelectedViewButton();
+    let viewButton = this._findSelectedViewButton();
     if (viewButton) {
       this.setSelectedButton(this._findSelectedViewButton());
     }

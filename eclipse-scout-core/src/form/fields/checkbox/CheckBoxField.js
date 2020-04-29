@@ -43,7 +43,7 @@ export default class CheckBoxField extends ValueField {
     this.formKeyStrokeContext.registerKeyStroke(this.checkBoxKeyStroke);
     this.formKeyStrokeContext.$bindTarget = function() {
       // use form if available
-      var form = this.getForm();
+      let form = this.getForm();
       if (form) {
         return form.$container;
       }
@@ -217,7 +217,7 @@ export default class CheckBoxField extends ValueField {
     }
     this.toggleChecked();
     // Also focus when check box is clicked otherwise firefox would loose the focus (see device.loosesFocusIfPseudoElementIsRemoved)
-    var onCheckBox = this.$checkBox.is(event.currentTarget),
+    let onCheckBox = this.$checkBox.is(event.currentTarget),
       onLabel = this.$checkBoxLabel.isOrHas(event.currentTarget); // isOrHas is required for HTML enabled labels with nested elements
     if (onCheckBox || onLabel) {
       this.focusAndPreventDefault(event);

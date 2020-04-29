@@ -89,7 +89,7 @@ export default class LogicalGridMatrixCursor {
   }
 
   toString() {
-    var builder = [];
+    let builder = [];
     builder.push('MatrixCursor [');
     builder.push('orientation=' + this.orientation);
     builder.push(', startX=' + this.startX);

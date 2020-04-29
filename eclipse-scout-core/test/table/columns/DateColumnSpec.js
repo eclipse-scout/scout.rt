@@ -13,12 +13,12 @@ import {TableSpecHelper} from '@eclipse-scout/testing';
 
 /* global LocaleSpecHelper */
 /* global linkWidgetAndAdapter */
-describe('DateColumn', function() {
-  var session;
-  var helper;
-  var locale;
+describe('DateColumn', () => {
+  let session;
+  let helper;
+  let locale;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
@@ -26,18 +26,18 @@ describe('DateColumn', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
-  describe('format', function() {
-    it('updates the value and the display text if the format changes', function() {
-      var testDate = dates.create('2017-01-01 13:01');
-      var model = helper.createModelSingleColumnByValues([testDate], 'DateColumn');
-      var table = helper.createTable(model);
-      var column0 = table.columns[0];
+  describe('format', () => {
+    it('updates the value and the display text if the format changes', () => {
+      let testDate = dates.create('2017-01-01 13:01');
+      let model = helper.createModelSingleColumnByValues([testDate], 'DateColumn');
+      let table = helper.createTable(model);
+      let column0 = table.columns[0];
       column0.setFormat();
       table.render();
 

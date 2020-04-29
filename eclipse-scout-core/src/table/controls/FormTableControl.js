@@ -33,7 +33,7 @@ export default class FormTableControl extends TableControl {
     this.form.render($parent);
 
     // Tab box gets a special style if it is the first field in the root group box
-    var rootGroupBox = this.form.rootGroupBox;
+    let rootGroupBox = this.form.rootGroupBox;
     if (rootGroupBox.controls[0] instanceof TabBox) {
       rootGroupBox.controls[0].$container.addClass('in-table-control');
     }

@@ -18,7 +18,7 @@ export default class CodeLookupCall extends StaticLookupCall {
   }
 
   _lookupRowByKey(key) {
-    var codeType = codes.codeType(this.codeType, true);
+    let codeType = codes.codeType(this.codeType, true);
     if (!codeType) {
       return null;
     }
@@ -30,30 +30,30 @@ export default class CodeLookupCall extends StaticLookupCall {
   }
 
   _lookupRowsByText(text) {
-    return this._collectLookupRows(function(lookupRow) {
-      var lookupRowText = lookupRow.text || '';
+    return this._collectLookupRows(lookupRow => {
+      let lookupRowText = lookupRow.text || '';
       return strings.startsWith(lookupRowText.toLowerCase(), text.toLowerCase());
     });
   }
 
   _lookupRowsByRec(rec) {
-    return this._collectLookupRows(function(lookupRow) {
+    return this._collectLookupRows(lookupRow => {
       return lookupRow.parentKey === rec;
     });
   }
 
   _collectLookupRows(predicate) {
-    var codeType = codes.codeType(this.codeType, true);
+    let codeType = codes.codeType(this.codeType, true);
     if (!codeType) {
       return [];
     }
-    var lookupRows = [];
-    codeType.visit(function(code) {
-      var lookupRow = this._createLookupRow(code);
+    let lookupRows = [];
+    codeType.visit(code => {
+      let lookupRow = this._createLookupRow(code);
       if (!predicate || predicate(lookupRow)) {
         lookupRows.push(lookupRow);
       }
-    }.bind(this));
+    });
     return lookupRows;
   }
 
@@ -61,7 +61,7 @@ export default class CodeLookupCall extends StaticLookupCall {
     if (!code) {
       return null;
     }
-    var lookupRow = scout.create('LookupRow', {
+    let lookupRow = scout.create('LookupRow', {
       key: code.id,
       text: code.text(this.session.locale),
       parentKey: code.parent && code.parent.id

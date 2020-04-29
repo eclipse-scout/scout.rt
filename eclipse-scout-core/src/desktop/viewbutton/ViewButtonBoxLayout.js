@@ -18,7 +18,7 @@ export default class ViewButtonBoxLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var tabs = this.viewButtonBox.tabButtons.filter(function(tab) {
+    let tabs = this.viewButtonBox.tabButtons.filter(tab => {
         return tab.visible;
       }),
       viewMenuTab = this.viewButtonBox.viewMenuTab,
@@ -39,7 +39,7 @@ export default class ViewButtonBoxLayout extends AbstractLayout {
       }).width;
     }
 
-    tabs.forEach(function(tab, index) {
+    tabs.forEach((tab, index) => {
       if (tabs.length - 1 === index) {
         // to avoid pixel fault due to rounding issues calculate the rest for the last tab.
         // Round up to the second digit otherwise at least Chrome may still show the background of the view button box (at least in compact mode)

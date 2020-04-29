@@ -18,27 +18,27 @@ export default class TileOverviewLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var htmlContainer = this.tileOverview.htmlComp;
-    var pageTileGrid = this.tileOverview.pageTileGrid;
-    var $content = this.tileOverview.$content;
+    let htmlContainer = this.tileOverview.htmlComp;
+    let pageTileGrid = this.tileOverview.pageTileGrid;
+    let $content = this.tileOverview.$content;
 
-    var containerSize = htmlContainer.availableSize()
+    let containerSize = htmlContainer.availableSize()
       .subtract(htmlContainer.insets());
-    var contentSize = containerSize.subtract(graphics.insets($content, {
+    let contentSize = containerSize.subtract(graphics.insets($content, {
       includeMargin: true
     }));
 
     // layout group-box and menu-bar (optional)
-    var htmlRootGb = this._htmlRootGroupBox();
+    let htmlRootGb = this._htmlRootGroupBox();
     if (htmlRootGb) {
-      var rootGbSize = containerSize.subtract(htmlRootGb.margins());
-      var rootGbPrefSize = htmlRootGb.prefSize();
+      let rootGbSize = containerSize.subtract(htmlRootGb.margins());
+      let rootGbPrefSize = htmlRootGb.prefSize();
       htmlRootGb.setSize(new Dimension(rootGbSize.width, rootGbPrefSize.height));
     }
 
     // layout tile-grid
-    var htmlTileGrid = pageTileGrid.htmlComp;
-    var tilesPrefSize = pageTileGrid.htmlComp.prefSize({
+    let htmlTileGrid = pageTileGrid.htmlComp;
+    let tilesPrefSize = pageTileGrid.htmlComp.prefSize({
       widthHint: contentSize.width
     });
     htmlTileGrid.setSize(tilesPrefSize);
@@ -50,7 +50,7 @@ export default class TileOverviewLayout extends AbstractLayout {
    * @returns {*}
    */
   _htmlRootGroupBox() {
-    var $rootGroupBox = this.tileOverview.$container.children('.root-group-box');
+    let $rootGroupBox = this.tileOverview.$container.children('.root-group-box');
     if ($rootGroupBox.length) {
       return HtmlComponent.get($rootGroupBox);
     }

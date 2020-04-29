@@ -29,16 +29,16 @@ export default class DateFieldAdapter extends ValueFieldAdapter {
    * @override
    */
   _onWidgetAcceptInput(event) {
-    var parsingFailedError = null;
-    var errorStatus = this.widget.errorStatus;
+    let parsingFailedError = null;
+    let errorStatus = this.widget.errorStatus;
     // Only send Parsing errors to the server
     if (errorStatus && errorStatus.hasChildren()) {
-      parsingFailedError = arrays.find(errorStatus.asFlatList(), function(childStatus) {
+      parsingFailedError = arrays.find(errorStatus.asFlatList(), childStatus => {
         return childStatus instanceof ParsingFailedStatus;
       });
     }
 
-    var data = {
+    let data = {
       displayText: this.widget.displayText,
       errorStatus: parsingFailedError
     };

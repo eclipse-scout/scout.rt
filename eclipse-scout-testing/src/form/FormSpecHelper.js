@@ -17,18 +17,18 @@ export default class FormSpecHelper {
   }
 
   createViewWithOneField(model) {
-    var form = this.createFormWithOneField(model);
+    let form = this.createFormWithOneField(model);
     form.displayHint = Form.DisplayHint.VIEW;
     return form;
   }
 
   createFormWithOneField(model) {
-    var defaults = {
+    let defaults = {
       parent: this.session.desktop
     };
     model = $.extend({}, defaults, model);
-    var form = scout.create('Form', model);
-    var rootGroupBox = this.createGroupBoxWithFields(form, 1);
+    let form = scout.create('Form', model);
+    let rootGroupBox = this.createGroupBoxWithFields(form, 1);
     form._setRootGroupBox(rootGroupBox);
     return form;
   }
@@ -40,12 +40,12 @@ export default class FormSpecHelper {
   createGroupBoxWithFields(parent, numFields) {
     parent = scout.nvl(parent, this.session.desktop);
     numFields = scout.nvl(numFields, 1);
-    var
+    let
       fields = [],
       groupBox = scout.create('GroupBox', {
         parent: parent
       });
-    for (var i = 0; i < numFields; i++) {
+    for (let i = 0; i < numFields; i++) {
       fields.push(scout.create('StringField', {
         parent: groupBox
       }));
@@ -57,8 +57,8 @@ export default class FormSpecHelper {
   createRadioButtonGroup(parent, numRadioButtons) {
     parent = scout.nvl(parent, this.session.desktop);
     numRadioButtons = scout.nvl(numRadioButtons, 2);
-    var fields = [];
-    for (var i = 0; i < numRadioButtons; i++) {
+    let fields = [];
+    for (let i = 0; i < numRadioButtons; i++) {
       fields.push({
         objectType: 'RadioButton'
       });
@@ -71,18 +71,18 @@ export default class FormSpecHelper {
 
   createFormWithFields(parent, isModal, numFields) {
     parent = scout.nvl(parent, this.session.desktop);
-    var form = scout.create('Form', {
+    let form = scout.create('Form', {
       parent: parent,
       displayHint: isModal ? 'dialog' : 'view'
     });
-    var rootGroupBox = this.createGroupBoxWithFields(form, numFields);
+    let rootGroupBox = this.createGroupBoxWithFields(form, numFields);
     form._setRootGroupBox(rootGroupBox);
     return form;
   }
 
   createFieldModel(objectType, parent, modelProperties) {
     parent = scout.nvl(parent, this.session.desktop);
-    var model = createSimpleModel(objectType || 'StringField', this.session);
+    let model = createSimpleModel(objectType || 'StringField', this.session);
     model.parent = parent;
     if (modelProperties) {
       $.extend(model, modelProperties);
@@ -98,8 +98,8 @@ export default class FormSpecHelper {
   createModeSelector(parent, numModes) {
     parent = scout.nvl(parent, this.session.desktop);
     numModes = scout.nvl(numModes, 2);
-    var modes = [];
-    for (var i = 0; i < numModes; i++) {
+    let modes = [];
+    for (let i = 0; i < numModes; i++) {
       modes.push({
         objectType: 'Mode'
       });

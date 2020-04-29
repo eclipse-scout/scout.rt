@@ -21,7 +21,7 @@ export default class TableAdapter extends ModelAdapter {
   _postCreateWidget() {
     // if a newly created table has already a userfilter defined, we need to fire the filter event after creation
     // because the original event had been fired before the eventhandler was registered.
-    if (objects.values(this.widget._filterMap).some(function(filter) {
+    if (objects.values(this.widget._filterMap).some(filter => {
       return filter instanceof TableUserFilter;
     })) {
       this._onWidgetFilter();
@@ -29,7 +29,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendRowsSelected(rowIds, debounceSend) {
-    var eventData = {
+    let eventData = {
       rowIds: rowIds
     };
 
@@ -44,7 +44,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendRowClick(rowId, mouseButton, columnId) {
-    var data = {
+    let data = {
       rowId: rowId,
       columnId: columnId,
       mouseButton: mouseButton
@@ -53,12 +53,12 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onWidgetRowsSelected(event) {
-    var rowIds = this.widget._rowsToIds(this.widget.selectedRows);
+    let rowIds = this.widget._rowsToIds(this.widget.selectedRows);
     this._sendRowsSelected(rowIds, event.debounce);
   }
 
   _onWidgetRowClick(event) {
-    var columnId;
+    let columnId;
     if (event.column !== undefined) {
       columnId = event.column.id;
     }
@@ -67,14 +67,14 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onWidgetFilterAdded(event) {
-    var filter = event.filter;
+    let filter = event.filter;
     if (filter instanceof TableUserFilter) {
       this._send('filterAdded', filter.createFilterAddedEventData());
     }
   }
 
   _onWidgetFilterRemoved(event) {
-    var filter = event.filter;
+    let filter = event.filter;
     if (filter instanceof TableUserFilter) {
       this._send('filterRemoved', filter.createFilterRemovedEventData());
     }
@@ -89,7 +89,7 @@ export default class TableAdapter extends ModelAdapter {
       return;
     }
 
-    var eventData = {
+    let eventData = {
       columnId: column.id,
       width: column.width
     };
@@ -110,7 +110,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendAggregationFunctionChanged(column) {
-    var data = {
+    let data = {
       columnId: column.id,
       aggregationFunction: column.aggregationFunction
     };
@@ -122,7 +122,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendColumnBackgroundEffectChanged(column) {
-    var data = {
+    let data = {
       columnId: column.id,
       backgroundEffect: column.backgroundEffect
     };
@@ -137,8 +137,8 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onWidgetColumnMoved(event) {
-    var index = event.newPos;
-    this.widget.columns.forEach(function(iteratingColumn, i) {
+    let index = event.newPos;
+    this.widget.columns.forEach((iteratingColumn, i) => {
       // Adjust index if column is only known on the gui
       if (iteratingColumn.guiOnly) {
         index--;
@@ -148,7 +148,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendColumnMoved(column, index) {
-    var data = {
+    let data = {
       columnId: column.id,
       index: index
     };
@@ -161,7 +161,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendPrepareCellEdit(row, column) {
-    var data = {
+    let data = {
       rowId: row.id,
       columnId: column.id
     };
@@ -174,7 +174,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendCompleteCellEdit(field) {
-    var data = {
+    let data = {
       fieldId: field.id
     };
     this._send('completeCellEdit', data);
@@ -186,7 +186,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendCancelCellEdit(field) {
-    var data = {
+    let data = {
       fieldId: field.id
     };
     this._send('cancelCellEdit', data);
@@ -197,11 +197,11 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendRowsChecked(rows) {
-    var data = {
+    let data = {
       rows: []
     };
 
-    for (var i = 0; i < rows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
       data.rows.push({
         rowId: rows[i].id,
         checked: rows[i].checked
@@ -216,8 +216,8 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendRowsExpanded(rows) {
-    var data = {
-      rows: rows.map(function(row) {
+    let data = {
+      rows: rows.map(row => {
         return {
           rowId: row.id,
           expanded: row.expanded
@@ -228,12 +228,12 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onWidgetFilter(event) {
-    var rowIds = this.widget._rowsToIds(this.widget.filteredRows());
+    let rowIds = this.widget._rowsToIds(this.widget.filteredRows());
     this._sendFilter(rowIds);
   }
 
   _sendFilter(rowIds) {
-    var eventData = {};
+    let eventData = {};
     if (rowIds.length === this.widget.rows.length) {
       eventData.remove = true;
     } else {
@@ -298,7 +298,7 @@ export default class TableAdapter extends ModelAdapter {
       contextColumn = null;
       this.widget.contextColumn = null;
     }
-    var columnId = null;
+    let columnId = null;
     if (contextColumn) {
       columnId = contextColumn.id;
     }
@@ -308,7 +308,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onWidgetReload(event) {
-    var data = {
+    let data = {
       reloadReason: event.reloadReason
     };
     this._send('reload', data);
@@ -373,7 +373,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onRowsDeleted(rowIds) {
-    var rows = this.widget._rowsByIds(rowIds);
+    let rows = this.widget._rowsByIds(rowIds);
     this.addFilterForWidgetEventType('rowsSelected');
     this.widget.deleteRows(rows);
   }
@@ -388,7 +388,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onRowsSelected(rowIds) {
-    var rows = this.widget._rowsByIds(rowIds);
+    let rows = this.widget._rowsByIds(rowIds);
     this.addFilterForWidgetEventType('rowsSelected');
     this.widget.selectRows(rows);
     // TODO [7.0] cgu what is this for? seems wrong here
@@ -396,11 +396,11 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onRowsChecked(rows) {
-    var checkedRows = [],
+    let checkedRows = [],
       uncheckedRows = [];
 
     rows.forEach(function(rowData) {
-      var row = this.widget._rowById(rowData.id);
+      let row = this.widget._rowById(rowData.id);
       if (rowData.checked) {
         checkedRows.push(row);
       } else {
@@ -419,10 +419,10 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onRowsExpanded(rows) {
-    var expandedRows = [],
+    let expandedRows = [],
       collapsedRows = [];
     rows.forEach(function(rowData) {
-      var row = this.widget._rowById(rowData.id);
+      let row = this.widget._rowById(rowData.id);
       if (rowData.expanded) {
         expandedRows.push(row);
       } else {
@@ -436,7 +436,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onRowOrderChanged(rowIds) {
-    var rows = this.widget._rowsByIds(rowIds);
+    let rows = this.widget._rowsByIds(rowIds);
     this.widget.updateRowOrder(rows);
   }
 
@@ -446,12 +446,12 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onColumnOrderChanged(columnIds) {
-    var columns = this.widget.columnsByIds(columnIds);
+    let columns = this.widget.columnsByIds(columnIds);
     this.widget.updateColumnOrder(columns);
   }
 
   _onColumnHeadersUpdated(columns) {
-    columns.forEach(function(column) {
+    columns.forEach(column => {
       defaultValues.applyTo(column);
     });
     this.widget.updateColumnHeaders(columns);
@@ -465,7 +465,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onStartCellEdit(columnId, rowId, fieldId) {
-    var column = this.widget.columnById(columnId),
+    let column = this.widget.columnById(columnId),
       row = this.widget._rowById(rowId),
       field = this.session.getOrCreateWidget(fieldId, this.widget);
 
@@ -473,7 +473,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onEndCellEdit(fieldId) {
-    var field = this.session.getModelAdapter(fieldId);
+    let field = this.session.getModelAdapter(fieldId);
     this.widget.endCellEdit(field.widget);
   }
 
@@ -487,10 +487,10 @@ export default class TableAdapter extends ModelAdapter {
 
   _onColumnBackgroundEffectChanged(event) {
     event.eventParts.forEach(function(eventPart) {
-      var column = this.widget.columnById(eventPart.columnId),
+      let column = this.widget.columnById(eventPart.columnId),
         backgroundEffect = eventPart.backgroundEffect;
 
-      this.addFilterForWidgetEvent(function(widgetEvent) {
+      this.addFilterForWidgetEvent(widgetEvent => {
         return (widgetEvent.type === 'columnBackgroundEffectChanged' &&
           widgetEvent.column.id === column.id &&
           widgetEvent.column.backgroundEffect === backgroundEffect);
@@ -501,21 +501,21 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onRequestFocusInCell(event) {
-    var row = this.widget._rowById(event.rowId),
+    let row = this.widget._rowById(event.rowId),
       column = this.widget.columnById(event.columnId);
 
     this.widget.focusCell(column, row);
   }
 
   _onAggregationFunctionChanged(event) {
-    var columns = [],
+    let columns = [],
       functions = [];
 
     event.eventParts.forEach(function(eventPart) {
-      var func = eventPart.aggregationFunction,
+      let func = eventPart.aggregationFunction,
         column = this.widget.columnById(eventPart.columnId);
 
-      this.addFilterForWidgetEvent(function(widgetEvent) {
+      this.addFilterForWidgetEvent(widgetEvent => {
         return (widgetEvent.type === 'aggregationFunctionChanged' &&
           widgetEvent.column.id === column.id &&
           widgetEvent.column.aggregationFunction === func);
@@ -590,7 +590,7 @@ export default class TableAdapter extends ModelAdapter {
     adapterData = super.exportAdapterData(adapterData);
     delete adapterData.selectedRows;
     adapterData.rows = [];
-    adapterData.columns.forEach(function(column) {
+    adapterData.columns.forEach(column => {
       delete column.classId;
       delete column.modelClass;
     });
@@ -633,7 +633,7 @@ export default class TableAdapter extends ModelAdapter {
         // In a JS only app the flag 'uiSortPossible' is never set and thus defaults to true. Additionally we check if each column can install
         // its comparator used to sort. If installation failed for some reason, sorting is not possible. In a remote app the server sets the
         // 'uiSortPossible' flag, which decides if the column must be sorted by the server or can be sorted by the client.
-        var uiSortPossible = scout.nvl(this.uiSortPossible, true);
+        let uiSortPossible = scout.nvl(this.uiSortPossible, true);
         return uiSortPossible && this._isSortingPossibleOrig(sortColumns);
       }
       return this._isSortingPossibleOrig(sortColumns);
@@ -691,7 +691,7 @@ export default class TableAdapter extends ModelAdapter {
         // defaultValues in JS only case, because it would destroy the 'undefined' state of the
         // cell properties, which is required because the Column checks, whether it should apply
         // defaults from the Column instance to a cell, or use the values from the cell.
-        var model;
+        let model;
         if (objects.isPlainObject(vararg)) {
           model = vararg;
           model.value = this._parseValue(model.value);
@@ -725,7 +725,7 @@ export default class TableAdapter extends ModelAdapter {
         // The comparator returns false if it could not be installed which means sorting should be delegated to server (e.g. collator is not available).
         // In a remote app the server sets the 'uiSortPossible' flag, which decides if the column must be sorted by the
         // server or can be sorted by the client.
-        var uiSortPossible = scout.nvl(this.uiSortPossible, true);
+        let uiSortPossible = scout.nvl(this.uiSortPossible, true);
         return uiSortPossible && this.installComparator();
       }
       return this.isSortingPossibleOrig();

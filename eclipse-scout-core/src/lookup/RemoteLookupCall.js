@@ -55,7 +55,7 @@ export default class RemoteLookupCall extends LookupCall {
       return;
     }
 
-    var lookupRows = arrays.ensure(lookupResult.lookupRows).map(function(lookupRowObject) {
+    let lookupRows = arrays.ensure(lookupResult.lookupRows).map(lookupRowObject => {
       return scout.create('LookupRow', lookupRowObject);
     });
     lookupResult.lookupRows = lookupRows;
@@ -71,7 +71,7 @@ export default class RemoteLookupCall extends LookupCall {
       return false;
     }
 
-    var propertyName = lookupResult.queryBy.toLowerCase(),
+    let propertyName = lookupResult.queryBy.toLowerCase(),
       requestData = lookupResult[propertyName],
       resultParameter = new RemoteLookupRequest(lookupResult.queryBy, requestData);
     return this.deferred.requestParameter.equals(resultParameter);

@@ -17,21 +17,21 @@ export default class VerticalSmartGrid extends AbstractGrid {
   }
 
   layoutAllDynamic(widgets) {
-    var cellCount = 0;
-    widgets.forEach(function(f) {
-      var hints = AbstractGrid.getGridDataFromHints(f, this.getGridColumnCount());
+    let cellCount = 0;
+    widgets.forEach(f => {
+      let hints = AbstractGrid.getGridDataFromHints(f, this.getGridColumnCount());
       cellCount += hints.w * hints.h;
-    }.bind(this));
+    });
 
     // do the calc
-    var rowCount = Math.floor((cellCount + this.getGridColumnCount() - 1) / this.getGridColumnCount());
-    var matrix = new VerticalGridMatrix(this.getGridColumnCount(), rowCount);
+    let rowCount = Math.floor((cellCount + this.getGridColumnCount() - 1) / this.getGridColumnCount());
+    let matrix = new VerticalGridMatrix(this.getGridColumnCount(), rowCount);
     while (!matrix.computeGridData(widgets)) {
       matrix.resetAll(this.getGridColumnCount(), ++rowCount);
     }
 
     // set gridData
-    widgets.forEach(function(f) {
+    widgets.forEach(f => {
       f.gridData = matrix.getGridData(f);
     });
     this.gridRows = matrix.getRowCount();

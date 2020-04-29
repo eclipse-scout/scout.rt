@@ -10,22 +10,22 @@
  */
 import {scout, TileGridLayoutConfig} from '../../../src/index';
 
-describe('TileAccordion', function() {
-  var session;
+describe('TileAccordion', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     // Stop all running animations to not influence other specs
     $(':animated').finish();
   });
 
   function createAccordion(numGroups, model) {
-    var groups = [];
-    for (var i = 0; i < numGroups; i++) {
+    let groups = [];
+    for (let i = 0; i < numGroups; i++) {
       groups.push({
         objectType: 'Group',
         label: 'Group ' + i,
@@ -35,7 +35,7 @@ describe('TileAccordion', function() {
         }
       });
     }
-    var defaults = {
+    let defaults = {
       parent: session.desktop,
       groups: groups
     };
@@ -44,7 +44,7 @@ describe('TileAccordion', function() {
   }
 
   function createGroup(model) {
-    var defaults = {
+    let defaults = {
       parent: session.desktop,
       body: {
         objectType: 'TileGrid',
@@ -56,24 +56,20 @@ describe('TileAccordion', function() {
   }
 
   function createTile(model) {
-    var defaults = {
+    let defaults = {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
     return scout.create('Tile', model);
   }
 
-  describe('init', function() {
-    it('copies properties to tile grids', function() {
-      var comparator = function() {
-        return true;
+  describe('init', () => {
+    it('copies properties to tile grids', () => {
+      let comparator = () => true;
+      let filter = {
+        accept: () => true
       };
-      var filter = {
-        accept: function() {
-          return true;
-        }
-      };
-      var accordion = createAccordion(0, {
+      let accordion = createAccordion(0, {
         selectable: true,
         multiSelect: false,
         tileGridLayoutConfig: {
@@ -103,16 +99,12 @@ describe('TileAccordion', function() {
       expect(accordion.groups[0].body.withPlaceholders).toBe(true);
     });
 
-    it('does not override properties which are specified by the tile grid itself', function() {
-      var comparator = function() {
-        return true;
+    it('does not override properties which are specified by the tile grid itself', () => {
+      let comparator = () => true;
+      let filter = {
+        accept: () => true
       };
-      var filter = {
-        accept: function() {
-          return true;
-        }
-      };
-      var accordion = createAccordion(0);
+      let accordion = createAccordion(0);
       accordion.insertGroup({
         objectType: 'Group',
         body: {
@@ -139,9 +131,9 @@ describe('TileAccordion', function() {
     });
   });
 
-  describe('setters', function() {
-    it('copy properties to tile grids', function() {
-      var accordion = createAccordion(2);
+  describe('setters', () => {
+    it('copy properties to tile grids', () => {
+      let accordion = createAccordion(2);
 
       expect(accordion.selectable).toBe(false);
       accordion.setSelectable(true);
@@ -157,24 +149,20 @@ describe('TileAccordion', function() {
     });
   });
 
-  describe('addTileFilter', function() {
-    it('adds the filter to every existing tile grid', function() {
-      var accordion = createAccordion(2);
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
-      var tile3 = createTile();
+  describe('addTileFilter', () => {
+    it('adds the filter to every existing tile grid', () => {
+      let accordion = createAccordion(2);
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
+      let tile3 = createTile();
       accordion.groups[0].body.insertTiles([tile0, tile1]);
       accordion.groups[1].body.insertTiles([tile2, tile3]);
-      var filter = {
-        accept: function(tile) {
-          return tile === tile1 || tile === tile3;
-        }
+      let filter = {
+        accept: tile => tile === tile1 || tile === tile3
       };
-      var filter2 = {
-        accept: function(tile) {
-          return false;
-        }
+      let filter2 = {
+        accept: tile => false
       };
       expect(accordion.tileFilters).toEqual([]);
       accordion.addTileFilter(filter);
@@ -194,22 +182,18 @@ describe('TileAccordion', function() {
       expect(accordion.groups[1].body.filteredTiles).toEqual([]);
     });
 
-    it('adds the filter to future tile grids', function() {
-      var accordion = createAccordion(1);
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
-      var tile3 = createTile();
+    it('adds the filter to future tile grids', () => {
+      let accordion = createAccordion(1);
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
+      let tile3 = createTile();
       accordion.groups[0].body.insertTiles([tile0, tile1]);
-      var filter = {
-        accept: function(tile) {
-          return tile === tile1 || tile === tile3;
-        }
+      let filter = {
+        accept: tile => tile === tile1 || tile === tile3
       };
-      var filter2 = {
-        accept: function(tile) {
-          return true;
-        }
+      let filter2 = {
+        accept: tile => true
       };
       expect(accordion.tileFilters).toEqual([]);
       accordion.addTileFilter(filter);
@@ -232,24 +216,20 @@ describe('TileAccordion', function() {
     });
   });
 
-  describe('removeTileFilter', function() {
-    it('removes the filter to every existing tile grid', function() {
-      var accordion = createAccordion(2);
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
-      var tile3 = createTile();
+  describe('removeTileFilter', () => {
+    it('removes the filter to every existing tile grid', () => {
+      let accordion = createAccordion(2);
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
+      let tile3 = createTile();
       accordion.groups[0].body.insertTiles([tile0, tile1]);
       accordion.groups[1].body.insertTiles([tile2, tile3]);
-      var filter = {
-        accept: function(tile) {
-          return tile === tile1 || tile === tile3;
-        }
+      let filter = {
+        accept: tile => tile === tile1 || tile === tile3
       };
-      var filter2 = {
-        accept: function(tile) {
-          return false;
-        }
+      let filter2 = {
+        accept: tile => false
       };
       accordion.setTileFilters([filter, filter2]);
       accordion.filterTiles();
@@ -272,22 +252,18 @@ describe('TileAccordion', function() {
       expect(accordion.groups[1].body.filteredTiles).toEqual([tile2, tile3]);
     });
 
-    it('makes sure the filter is not added to future tile grids', function() {
-      var accordion = createAccordion(1);
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
-      var tile3 = createTile();
+    it('makes sure the filter is not added to future tile grids', () => {
+      let accordion = createAccordion(1);
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
+      let tile3 = createTile();
       accordion.groups[0].body.insertTiles([tile0, tile1]);
-      var filter = {
-        accept: function(tile) {
-          return tile === tile1 || tile === tile3;
-        }
+      let filter = {
+        accept: tile => tile === tile1 || tile === tile3
       };
-      var filter2 = {
-        accept: function(tile) {
-          return false;
-        }
+      let filter2 = {
+        accept: tile => false
       };
       accordion.setTileFilters([filter, filter2]);
       accordion.filterTiles();
@@ -312,19 +288,19 @@ describe('TileAccordion', function() {
     });
   });
 
-  describe('click', function() {
-    it('triggers tileClick', function() {
-      var accordion = createAccordion(3, {
+  describe('click', () => {
+    it('triggers tileClick', () => {
+      let accordion = createAccordion(3, {
         selectable: false,
         multiSelect: false
       });
-      var tile0 = createTile();
-      var tile1 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
       accordion.groups[0].body.insertTile(tile0);
       accordion.groups[1].body.insertTile(tile1);
       accordion.render();
-      var clickEventCount = 0;
-      accordion.on('tileClick', function(event) {
+      let clickEventCount = 0;
+      accordion.on('tileClick', event => {
         if (event.tile === tile0 && event.mouseButton === 1) {
           clickEventCount++;
         }
@@ -337,26 +313,26 @@ describe('TileAccordion', function() {
       expect(clickEventCount).toBe(1);
     });
 
-    it('triggers tileSelected and tileClick if selectable', function() {
-      var accordion = createAccordion(3, {
+    it('triggers tileSelected and tileClick if selectable', () => {
+      let accordion = createAccordion(3, {
         selectable: true,
         multiSelect: false
       });
-      var tile0 = createTile();
-      var tile1 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
       accordion.groups[0].body.insertTile(tile0);
       accordion.groups[1].body.insertTile(tile1);
       accordion.render();
-      var clickEventCount = 0;
-      var selectEventCount = 0;
-      var events = [];
-      accordion.on('propertyChange', function(event) {
+      let clickEventCount = 0;
+      let selectEventCount = 0;
+      let events = [];
+      accordion.on('propertyChange', event => {
         if (event.propertyName === 'selectedTiles') {
           selectEventCount++;
         }
         events.push('select');
       });
-      accordion.on('tileClick', function(event) {
+      accordion.on('tileClick', event => {
         if (event.tile === tile0 && event.mouseButton === 1) {
           clickEventCount++;
         }
@@ -375,33 +351,33 @@ describe('TileAccordion', function() {
       expect(events[1]).toBe('click');
     });
 
-    it('triggers tileAction when clicked twice', function() {
-      var accordion = createAccordion(3, {
+    it('triggers tileAction when clicked twice', () => {
+      let accordion = createAccordion(3, {
         selectable: true,
         multiSelect: false
       });
-      var tile0 = createTile();
-      var tile1 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
       accordion.groups[0].body.insertTile(tile0);
       accordion.groups[1].body.insertTile(tile1);
       accordion.render();
-      var selectEventCount = 0;
-      var clickEventCount = 0;
-      var actionEventCount = 0;
-      var events = [];
-      accordion.on('propertyChange', function(event) {
+      let selectEventCount = 0;
+      let clickEventCount = 0;
+      let actionEventCount = 0;
+      let events = [];
+      accordion.on('propertyChange', event => {
         if (event.propertyName === 'selectedTiles') {
           selectEventCount++;
         }
         events.push('select');
       });
-      accordion.on('tileClick', function(event) {
+      accordion.on('tileClick', event => {
         if (event.tile === tile0) {
           clickEventCount++;
         }
         events.push('click');
       });
-      accordion.on('tileAction', function(event) {
+      accordion.on('tileAction', event => {
         if (event.tile === tile0) {
           actionEventCount++;
         }
@@ -423,19 +399,19 @@ describe('TileAccordion', function() {
       expect(events[2]).toBe('action');
     });
 
-    it('is not delegated anymore if group is deleted without being destroyed', function() {
+    it('is not delegated anymore if group is deleted without being destroyed', () => {
       // This is a theoretical proof of concept without any known practical use cases
-      var accordion = createAccordion(3, {
+      let accordion = createAccordion(3, {
         selectable: false,
         multiSelect: false
       });
-      var tile0 = createTile();
-      var tile1 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
       accordion.groups[0].body.insertTile(tile0);
       accordion.groups[1].body.insertTile(tile1);
       accordion.render();
-      var clickEventCount = 0;
-      accordion.on('tileClick', function(event) {
+      let clickEventCount = 0;
+      accordion.on('tileClick', event => {
         if (event.tile === tile0 && event.mouseButton === 1) {
           clickEventCount++;
         }
@@ -443,18 +419,18 @@ describe('TileAccordion', function() {
       expect(clickEventCount).toBe(0);
 
       // Use desktop as owner to prevent destruction
-      var group0 = accordion.groups[0];
+      let group0 = accordion.groups[0];
       group0.setOwner(session.desktop);
       accordion.deleteGroup(group0);
       expect(group0.destroyed).toBe(false);
       expect(group0.rendered).toBe(false);
 
       // Move to another accordion
-      var accordion2 = createAccordion(0);
+      let accordion2 = createAccordion(0);
       accordion2.insertGroup(group0);
       accordion2.render();
-      var clickEventCount2 = 0;
-      accordion2.on('tileClick', function(event) {
+      let clickEventCount2 = 0;
+      accordion2.on('tileClick', event => {
         if (event.tile === tile0 && event.mouseButton === 1) {
           clickEventCount2++;
         }
@@ -468,14 +444,14 @@ describe('TileAccordion', function() {
     });
   });
 
-  describe('selectTiles', function() {
-    it('selects one of the given tiles and unselects the previously selected ones', function() {
-      var accordion = createAccordion(3, {
+  describe('selectTiles', () => {
+    it('selects one of the given tiles and unselects the previously selected ones', () => {
+      let accordion = createAccordion(3, {
         selectable: true,
         multiSelect: false
       });
-      var tile0 = createTile();
-      var tile1 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
       accordion.groups[0].body.insertTile(tile0);
       accordion.groups[1].body.insertTile(tile1);
       expect(accordion.getSelectedTileCount()).toBe(0);
@@ -493,13 +469,13 @@ describe('TileAccordion', function() {
       expect(accordion.getSelectedTile()).toBe(tile1);
     });
 
-    it('selects all the given tiles and unselects the previously selected ones if multiSelect is true', function() {
-      var accordion = createAccordion(3, {
+    it('selects all the given tiles and unselects the previously selected ones if multiSelect is true', () => {
+      let accordion = createAccordion(3, {
         selectable: true,
         multiSelect: true
       });
-      var tile0 = createTile();
-      var tile1 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
       accordion.groups[0].body.insertTile(tile0);
       accordion.groups[1].body.insertTile(tile1);
       expect(accordion.getSelectedTileCount()).toBe(0);
@@ -518,19 +494,19 @@ describe('TileAccordion', function() {
       expect(accordion.getSelectedTiles()[1]).toBe(tile1);
     });
 
-    it('triggers a property change event', function() {
-      var accordion = createAccordion(3, {
+    it('triggers a property change event', () => {
+      let accordion = createAccordion(3, {
         selectable: true,
         multiSelect: false
       });
-      var tile0 = createTile();
-      var tile1 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
       accordion.groups[0].body.insertTile(tile0);
       accordion.groups[1].body.insertTile(tile1);
       expect(accordion.getSelectedTileCount()).toBe(0);
-      var eventTriggered = false;
-      var selectedTiles = [];
-      accordion.on('propertyChange', function(event) {
+      let eventTriggered = false;
+      let selectedTiles = [];
+      accordion.on('propertyChange', event => {
         if (event.propertyName === 'selectedTiles') {
           eventTriggered = true;
           selectedTiles = accordion.getSelectedTiles();
@@ -542,19 +518,19 @@ describe('TileAccordion', function() {
       expect(selectedTiles[0]).toBe(tile1);
     });
 
-    it('triggers a property change event also if multiSelect is true', function() {
-      var accordion = createAccordion(3, {
+    it('triggers a property change event also if multiSelect is true', () => {
+      let accordion = createAccordion(3, {
         selectable: true,
         multiSelect: true
       });
-      var tile0 = createTile();
-      var tile1 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
       accordion.groups[0].body.insertTile(tile0);
       accordion.groups[1].body.insertTile(tile1);
       expect(accordion.getSelectedTileCount()).toBe(0);
-      var eventTriggered = false;
-      var selectedTiles = [];
-      accordion.on('propertyChange', function(event) {
+      let eventTriggered = false;
+      let selectedTiles = [];
+      accordion.on('propertyChange', event => {
         if (event.propertyName === 'selectedTiles') {
           eventTriggered = true;
           selectedTiles = accordion.getSelectedTiles();
@@ -567,13 +543,13 @@ describe('TileAccordion', function() {
       expect(selectedTiles[1]).toBe(tile1);
     });
 
-    it('does not select tiles in a collapsed group', function() {
-      var accordion = createAccordion(2, {
+    it('does not select tiles in a collapsed group', () => {
+      let accordion = createAccordion(2, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tile0 = createTile();
-      var tile1 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
       accordion.groups[0].body.insertTile(tile0);
       accordion.groups[0].setCollapsed(true);
       accordion.groups[1].body.insertTile(tile1);
@@ -592,17 +568,17 @@ describe('TileAccordion', function() {
     });
   });
 
-  describe('insertGroups', function() {
-    it('triggers property change events for tiles inserted by the new group', function() {
-      var accordion = createAccordion(0);
-      var tile0 = createTile();
-      var group0 = createGroup();
+  describe('insertGroups', () => {
+    it('triggers property change events for tiles inserted by the new group', () => {
+      let accordion = createAccordion(0);
+      let tile0 = createTile();
+      let group0 = createGroup();
       group0.body.insertTile(tile0);
-      var tileEventTriggered = false;
-      var filteredTileEventTriggered = false;
-      var tileCount = 0;
-      var filteredTileCount = 0;
-      accordion.on('propertyChange', function(event) {
+      let tileEventTriggered = false;
+      let filteredTileEventTriggered = false;
+      let tileCount = 0;
+      let filteredTileCount = 0;
+      accordion.on('propertyChange', event => {
         if (event.propertyName === 'tiles') {
           tileEventTriggered = true;
           tileCount = accordion.getTileCount();
@@ -623,17 +599,17 @@ describe('TileAccordion', function() {
       expect(accordion.getFilteredTileCount()).toBe(1);
     });
 
-    it('adjusts selection if new grid contains selected tiles', function() {
-      var accordion = createAccordion(1, {
+    it('adjusts selection if new grid contains selected tiles', () => {
+      let accordion = createAccordion(1, {
         selectable: true,
         multiSelect: false
       });
-      var tile0 = createTile();
-      var tile1 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
       accordion.groups[0].body.insertTile(tile0);
       accordion.selectTile(tile0);
 
-      var group1 = createGroup();
+      let group1 = createGroup();
       group1.body.setSelectable(true);
       group1.body.insertTile(tile1);
       group1.body.selectTile(tile1);
@@ -647,25 +623,25 @@ describe('TileAccordion', function() {
       expect(accordion.getSelectedTiles()[0]).toBe(tile1);
     });
 
-    it('triggers a property change event for the new selection if new grid contains selected tiles', function() {
-      var accordion = createAccordion(0, {
+    it('triggers a property change event for the new selection if new grid contains selected tiles', () => {
+      let accordion = createAccordion(0, {
         selectable: true,
         multiSelect: false
       });
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var group0 = createGroup();
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let group0 = createGroup();
       group0.body.setSelectable(true);
       group0.body.insertTile(tile0);
 
-      var group1 = createGroup();
+      let group1 = createGroup();
       group1.body.setSelectable(true);
       group1.body.insertTile(tile1);
       group1.body.selectTile(tile1);
 
-      var eventTriggered = false;
-      var selectedTileCount = 0;
-      accordion.on('propertyChange', function(event) {
+      let eventTriggered = false;
+      let selectedTileCount = 0;
+      accordion.on('propertyChange', event => {
         if (event.propertyName === 'selectedTiles') {
           eventTriggered = true;
           selectedTileCount = accordion.getSelectedTileCount();
@@ -687,17 +663,17 @@ describe('TileAccordion', function() {
     });
   });
 
-  describe('deleteGroups', function() {
-    it('triggers a property change event for tiles of the deleted group', function() {
-      var accordion = createAccordion(1);
-      var tile0 = createTile();
-      var tile1 = createTile();
+  describe('deleteGroups', () => {
+    it('triggers a property change event for tiles of the deleted group', () => {
+      let accordion = createAccordion(1);
+      let tile0 = createTile();
+      let tile1 = createTile();
       accordion.groups[0].body.insertTile(tile0);
-      var tileEventTriggered = false;
-      var filteredTileEventTriggered = false;
-      var tileCount = 0;
-      var filteredTileCount = 0;
-      accordion.on('propertyChange', function(event) {
+      let tileEventTriggered = false;
+      let filteredTileEventTriggered = false;
+      let tileCount = 0;
+      let filteredTileCount = 0;
+      accordion.on('propertyChange', event => {
         if (event.propertyName === 'tiles') {
           tileEventTriggered = true;
           tileCount = accordion.getTileCount();

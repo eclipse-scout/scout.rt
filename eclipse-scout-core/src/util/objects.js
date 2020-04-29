@@ -22,7 +22,7 @@ const CONST_REGEX = /\${const:([^}]*)}/;
  * @param [object] properties optional initial properties to be set on the new created object
  */
 export function createMap(properties) {
-  var map = Object.create(null);
+  let map = Object.create(null);
   if (properties) {
     $.extend(map, properties);
   }
@@ -35,7 +35,7 @@ export function createMap(properties) {
  * @returns {object} the destination object (the destination parameter will be modified as well)
  */
 export function copyProperties(source, dest, filter) {
-  var propertyName;
+  let propertyName;
   filter = arrays.ensure(filter);
   for (propertyName in source) {
     if (filter.length === 0 || filter.indexOf(propertyName) !== -1) {
@@ -52,7 +52,7 @@ export function copyProperties(source, dest, filter) {
  * @returns {object} the destination object (the destination parameter will be modified as well)
  */
 export function copyOwnProperties(source, dest, filter) {
-  var propertyName;
+  let propertyName;
   filter = arrays.ensure(filter);
   for (propertyName in source) {
     if (Object.prototype.hasOwnProperty.call(source, propertyName) && (filter.length === 0 || filter.indexOf(propertyName) !== -1)) {
@@ -73,8 +73,8 @@ export function countOwnProperties(obj) {
 
   // regular objects may inherit a property through their prototype
   // we're only interested in own properties
-  var count = 0;
-  for (var prop in obj) {
+  let count = 0;
+  for (let prop in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, prop)) {
       count++;
     }
@@ -87,7 +87,7 @@ export function countOwnProperties(obj) {
  * Properties that already exist on dest are NOT overwritten.
  */
 export function extractProperties(source, dest, properties) {
-  properties.forEach(function(propertyName) {
+  properties.forEach(propertyName => {
     if (dest[propertyName] === undefined) {
       dest[propertyName] = source[propertyName];
     }
@@ -105,8 +105,8 @@ export function extractProperties(source, dest, properties) {
  * @returns {Boolean}
  */
 export function someOwnProperties(obj, properties) {
-  var propArr = arrays.ensure(properties);
-  return propArr.some(function(prop) {
+  let propArr = arrays.ensure(properties);
+  return propArr.some(prop => {
     return Object.prototype.hasOwnProperty.call(obj, prop);
   });
 }
@@ -121,8 +121,8 @@ export function someOwnProperties(obj, properties) {
  * @returns {Boolean}
  */
 export function someProperties(obj, properties) {
-  var propArr = arrays.ensure(properties);
-  return propArr.some(function(prop) {
+  let propArr = arrays.ensure(properties);
+  return propArr.some(prop => {
     return prop in obj;
   });
 }
@@ -132,18 +132,18 @@ export function valueCopy(obj) {
   if (obj === undefined || obj === null || typeof obj !== 'object') {
     return obj;
   }
-  var copy;
+  let copy;
   // Arrays
   if (Array.isArray(obj)) {
     copy = [];
-    for (var i = 0; i < obj.length; i++) {
+    for (let i = 0; i < obj.length; i++) {
       copy[i] = valueCopy(obj[i]);
     }
     return copy;
   }
   // All other objects
   copy = {};
-  for (var prop in obj) {
+  for (let prop in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, prop)) {
       copy[prop] = valueCopy(obj[prop]);
     }
@@ -165,16 +165,16 @@ export function findChildObjectByKey(parentObj, property, propertyValue) {
   if (parentObj[property] === propertyValue) {
     return parentObj;
   }
-  var child;
+  let child;
   if (Array.isArray(parentObj)) {
-    for (var i = 0; i < parentObj.length; i++) {
+    for (let i = 0; i < parentObj.length; i++) {
       child = findChildObjectByKey(parentObj[i], property, propertyValue);
       if (child) {
         return child;
       }
     }
   }
-  for (var prop in parentObj) {
+  for (let prop in parentObj) {
     if (Object.prototype.hasOwnProperty.call(parentObj, prop)) {
       child = findChildObjectByKey(parentObj[prop], property, propertyValue);
       if (child) {
@@ -203,26 +203,26 @@ export function isPlainObject(obj) {
  *
  * @returns {*} the value of the requested property or undefined if the property does not exist on the object
  */
-export function optProperty(obj) {
+export function optProperty(obj, ...properties) {
   if (!obj) {
     return null;
   }
 
-  var numArgs = arguments.length;
-  if (numArgs < 2) {
+  let numArgs = properties.length;
+  if (numArgs === 0) {
     return obj;
   }
-  if (numArgs === 2) {
-    return obj[arguments[1]];
+  if (numArgs === 1) {
+    return obj[properties[0]];
   }
 
-  for (var i = 1; i < numArgs - 1; i++) {
-    obj = obj[arguments[i]];
+  for (let i = 0; i < numArgs - 1; i++) {
+    obj = obj[properties[i]];
     if (!obj) {
       return null;
     }
   }
-  return obj[arguments[numArgs - 1]];
+  return obj[properties[numArgs - 1]];
 }
 
 /**
@@ -268,12 +268,12 @@ export function isArray(obj) {
  * @param {boolean} [all] can be set to true to return all properties instead of own properties
  */
 export function values(obj, all) {
-  var values = [];
+  let values = [];
   if (obj) {
     if (typeof obj.hasOwnProperty !== 'function') {
       all = true;
     }
-    for (var key in obj) {
+    for (let key in obj) {
       if (all || obj.hasOwnProperty(key)) {
         values.push(obj[key]);
       }
@@ -311,13 +311,13 @@ export function equals(objA, objB) {
  * @returns {boolean} true if both objects and all child elements are equals by value or implemented equals method
  */
 export function equalsRecursive(objA, objB) {
-  var i;
+  let i;
   if (isPlainObject(objA) && isPlainObject(objB)) {
     if (isFunction(objA.equals) && isFunction(objB.equals)) {
       return objA.equals(objB);
     }
-    var keysA = Object.keys(objA);
-    var keysB = Object.keys(objB);
+    let keysA = Object.keys(objA);
+    let keysB = Object.keys(objB);
     if (!arrays.equalsIgnoreOrder(keysA, keysB)) {
       return false;
     }
@@ -346,7 +346,7 @@ export function equalsRecursive(objA, objB) {
  * Compares a list of properties of two objects by using the equals method for each property.
  */
 export function propertiesEquals(objA, objB, properties) {
-  var i, property;
+  let i, property;
   for (i = 0; i < properties.length; i++) {
     property = properties[i];
     if (!equals(objA[property], objB[property])) {
@@ -362,9 +362,9 @@ export function propertiesEquals(objA, objB, properties) {
  *     to find problems after refactorings / renamings as soon as possible.
  */
 export function mandatoryFunction(obj, funcName) {
-  var func = obj[funcName];
+  let func = obj[funcName];
   if (!func || typeof func !== 'function') {
-    throw new Error('Function \'' + funcName + '\' does not exist on object. Check if it has been renamed or moved.', obj);
+    throw new Error('Function \'' + funcName + '\' does not exist on object. Check if it has been renamed or moved. Object: ' + obj);
   }
   return func;
 }
@@ -374,7 +374,7 @@ export function mandatoryFunction(obj, funcName) {
  * by calling <code>mandatoryFunction</code>.
  */
 export function replacePrototypeFunction(obj, funcName, func, rememberOrig) {
-  var proto = obj.prototype;
+  let proto = obj.prototype;
   mandatoryFunction(proto, funcName);
   if (rememberOrig) {
     proto[funcName + 'Orig'] = proto[funcName];
@@ -405,12 +405,12 @@ export function forEachArgument(args, func) {
  *   3. Type: checkFunctionOverrides().join('\n')
  */
 export function checkFunctionOverrides() {
-  var whitelist = [
+  let whitelist = [
     'ModelAdapter.init',
     'ModelAdapter._init',
     'Calendar.init'
   ];
-  var result1 = [
+  let result1 = [
     'Legend:',
     '[!] Function includes super call, and parent function uses arguments',
     ' ~  Function includes super call, but parent function does not use arguments',
@@ -418,48 +418,48 @@ export function checkFunctionOverrides() {
     '',
     'Wrong number of arguments:'
   ];
-  var result2 = ['Different argument names:'];
+  let result2 = ['Different argument names:'];
 
-  for (var prop in scout) {
+  for (let prop in scout) {
     if (!scout.hasOwnProperty(prop)) {
       continue;
     }
-    var o = scout[prop];
+    let o = scout[prop];
     // Only check functions that have a "parent"
     if (typeof o === 'function' && o.parent) {
-      for (var name in o.prototype) {
+      for (let name in o.prototype) {
         if (!o.prototype.hasOwnProperty(name)) {
           continue;
         }
-        var fn = o.prototype[name];
+        let fn = o.prototype[name];
         // Ignore constructor, inherited properties and non-functions
         if (name === 'constructor' || !o.prototype.hasOwnProperty(name) || typeof fn !== 'function') {
           continue;
         }
-        var args = getFunctionArguments(fn);
+        let args = getFunctionArguments(fn);
         // Check all parents
-        var parent = o.parent;
+        let parent = o.parent;
         while (parent) {
-          var parentFn = parent.prototype[name];
+          let parentFn = parent.prototype[name];
           if (parent.prototype.hasOwnProperty(name) && typeof parentFn === 'function') {
-            var parentArgs = getFunctionArguments(parentFn);
+            let parentArgs = getFunctionArguments(parentFn);
             // Check arguments (at least all of the parent args must be present)
-            var mismatch = false;
-            for (var i = 0; i < parentArgs.length; i++) {
+            let mismatch = false;
+            for (let i = 0; i < parentArgs.length; i++) {
               if (args.length < i || args[i] !== parentArgs[i]) {
                 mismatch = true;
                 break;
               }
             }
-            var fname = prop + '.' + name;
+            let fname = prop + '.' + name;
             if (mismatch && whitelist.indexOf(fname) === -1) { // && args.length !== parentArgs.length) {
               // Collect found mismatch
-              var result = fname + '(' + args.join(', ') + ') does not correctly override ' + getPrototypeOwner(parentFn) + '.' + name + '(' + parentArgs.join(', ') + ')';
-              var includesSuperCall = fn.toString().match(new RegExp('scout.' + strings.quote(prop) + '.parent.prototype.' + strings.quote(name) + '.call\\(')) !== null;
-              var parentFunctionUsesArguments = false;
+              let result = fname + '(' + args.join(', ') + ') does not correctly override ' + getPrototypeOwner(parentFn) + '.' + name + '(' + parentArgs.join(', ') + ')';
+              let includesSuperCall = fn.toString().match(new RegExp('scout.' + strings.quote(prop) + '.parent.prototype.' + strings.quote(name) + '.call\\(')) !== null;
+              let parentFunctionUsesArguments = false;
               if (includesSuperCall) {
-                for (var j = 0; j < parentArgs.length; j++) {
-                  var m = parentFn.toString().match(new RegExp('[^.\\w]' + strings.quote(parentArgs[j]) + '[^\\w]', 'g'));
+                for (let j = 0; j < parentArgs.length; j++) {
+                  let m = parentFn.toString().match(new RegExp('[^.\\w]' + strings.quote(parentArgs[j]) + '[^\\w]', 'g'));
                   if (m !== null && m.length > 1) {
                     parentFunctionUsesArguments = true;
                     break;
@@ -486,18 +486,18 @@ export function checkFunctionOverrides() {
   // ----- Helper functions -----
 
   function getFunctionArguments(fn) {
-    var FN_COMMENTS = /\/\*.*?\*\/|\/\/.*$/mg; // removes comments in function declaration
-    var FN_ARGS = /^function[^(]*\((.*?)\)/m; // fetches all arguments in m[1]
+    let FN_COMMENTS = /\/\*.*?\*\/|\/\/.*$/mg; // removes comments in function declaration
+    let FN_ARGS = /^function[^(]*\((.*?)\)/m; // fetches all arguments in m[1]
 
     if (typeof fn !== 'function') {
       throw new Error('Argument is not a function: ' + fn);
     }
 
-    var m = fn.toString().replace(FN_COMMENTS, '')
+    let m = fn.toString().replace(FN_COMMENTS, '')
       .match(FN_ARGS);
-    var args = [];
+    let args = [];
     if (m !== null) {
-      m[1].split(',').forEach(function(arg, i) {
+      m[1].split(',').forEach((arg, i) => {
         arg = arg.trim();
         if (arg.length > 0) {
           args.push(arg);
@@ -508,17 +508,17 @@ export function checkFunctionOverrides() {
   }
 
   function getPrototypeOwner(fx) {
-    for (var prop in scout) {
+    for (let prop in scout) {
       if (!scout.hasOwnProperty(prop)) {
         continue;
       }
-      var o = scout[prop];
+      let o = scout[prop];
       if (typeof o === 'function') {
-        for (var name in o.prototype) {
+        for (let name in o.prototype) {
           if (!o.prototype.hasOwnProperty(name)) {
             continue;
           }
-          var fn = o.prototype[name];
+          let fn = o.prototype[name];
           // Ignore constructor, inherited properties and non-functions
           if (name === 'constructor' || !o.prototype.hasOwnProperty(name) || typeof fn !== 'function') {
             continue;
@@ -542,12 +542,12 @@ export function resolveConst(value, constType) {
     return value;
   }
 
-  var result = CONST_REGEX.exec(value);
+  let result = CONST_REGEX.exec(value);
   if (result && result.length === 2) {
     // go down the object hierarchy starting on the given constType-object or on 'window'
-    var objectHierarchy = result[1].split('.');
-    var obj = constType || window;
-    for (var i = 0; i < objectHierarchy.length; i++) {
+    let objectHierarchy = result[1].split('.');
+    let obj = constType || window;
+    for (let i = 0; i < objectHierarchy.length; i++) {
       obj = obj[objectHierarchy[i]];
       if (obj === undefined) {
         window.console.log('Failed to resolve constant \'' + result[1] + '\', object is undefined');
@@ -565,8 +565,8 @@ export function resolveConst(value, constType) {
 export function resolveConstProperty(object, config) {
   scout.assertProperty(config, 'property');
   scout.assertProperty(config, 'constType');
-  var value = object[config.property];
-  var resolvedValue = resolveConst(value, config.constType);
+  let value = object[config.property];
+  let resolvedValue = resolveConst(value, config.constType);
   if (value !== resolvedValue) {
     object[config.property] = resolvedValue;
   }

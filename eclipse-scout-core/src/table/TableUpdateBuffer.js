@@ -29,7 +29,7 @@ export default class TableUpdateBuffer {
     this.table._renderViewportBlocked = true;
     this.table.setLoading(true);
 
-    var handler = function() {
+    let handler = function() {
       arrays.remove(this.promises, promise);
 
       // process immediately when all promises have resolved
@@ -62,7 +62,7 @@ export default class TableUpdateBuffer {
       return;
     }
 
-    var rows = objects.values(this._rowMap);
+    let rows = objects.values(this._rowMap);
     this.table.updateRows(rows);
     this._rowMap = {};
 

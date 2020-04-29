@@ -10,10 +10,10 @@
  */
 import {DateRange, dates} from '../../src/index';
 
-describe('DateRange', function() {
+describe('DateRange', () => {
 
-  it('equals', function() {
-    var range1 = new DateRange(dates.create('2015-24-11'), dates.create('2015-25-11')),
+  it('equals', () => {
+    let range1 = new DateRange(dates.create('2015-24-11'), dates.create('2015-25-11')),
       range2 = new DateRange(dates.create('2015-24-11'), dates.create('2015-25-11')),
       range3 = new DateRange(dates.create('2014-24-11'), dates.create('2014-25-11'));
 

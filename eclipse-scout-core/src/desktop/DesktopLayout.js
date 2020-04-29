@@ -18,7 +18,7 @@ export default class DesktopLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var navigationSize, headerSize, htmlHeader, htmlBench, benchSize, htmlNavigation, animationProps,
+    let navigationSize, headerSize, htmlHeader, htmlBench, benchSize, htmlNavigation, animationProps,
       navigationWidth = 0,
       headerHeight = 0,
       desktop = this.desktop,
@@ -137,7 +137,7 @@ export default class DesktopLayout extends AbstractLayout {
   }
 
   containerSize() {
-    var htmlContainer = this.desktop.htmlComp,
+    let htmlContainer = this.desktop.htmlComp,
       containerSize = htmlContainer.availableSize({
         exact: true
       });
@@ -149,15 +149,15 @@ export default class DesktopLayout extends AbstractLayout {
     if (!this.desktop.navigationVisible) {
       return 0;
     }
-    var navigationLayoutData = this.desktop.navigation.htmlComp.layoutData;
+    let navigationLayoutData = this.desktop.navigation.htmlComp.layoutData;
     if (navigationLayoutData.fullWidth) {
       return containerSize.width;
     }
-    var splitterPosition = 0;
+    let splitterPosition = 0;
     if (this.desktop.splitter) {
       splitterPosition = this.desktop.splitter.position;
     }
-    var outline = this.desktop.outline;
+    let outline = this.desktop.outline;
     if (!this.desktop.resizing && outline && outline.toggleBreadcrumbStyleEnabled) {
       // If toggleBreadcrumbStyleEnabled is true, BREADCRUMB_STYLE_WIDTH triggers the toggling between the two modes.
       // This code ensures this rule is never violated (necessary if mode is toggled programmatically rather than by the user)

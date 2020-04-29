@@ -70,14 +70,14 @@ export default class VirtualScrolling {
     if (this.viewRangeSize === 0) {
       return new Range(0, 0);
     }
-    var rowIndex;
+    let rowIndex;
     if (this.$scrollable.length === 0) {
       return this.maxViewRange();
     }
-    var scrollTop = this.$scrollable[0].scrollTop;
-    var maxScrollTop = this.$scrollable[0].scrollHeight - this.$scrollable[0].clientHeight;
-    var widgetBounds = this.widget.$container[0].getBoundingClientRect();
-    var scrollableBounds = this.$scrollable[0].getBoundingClientRect();
+    let scrollTop = this.$scrollable[0].scrollTop;
+    let maxScrollTop = this.$scrollable[0].scrollHeight - this.$scrollable[0].clientHeight;
+    let widgetBounds = this.widget.$container[0].getBoundingClientRect();
+    let scrollableBounds = this.$scrollable[0].getBoundingClientRect();
     if (widgetBounds.height > 0 && (
       widgetBounds.bottom < scrollableBounds.top ||
       widgetBounds.top > scrollableBounds.bottom)) {
@@ -109,7 +109,7 @@ export default class VirtualScrolling {
       return this.maxViewRange();
     }
 
-    var viewRange = new Range(),
+    let viewRange = new Range(),
       quarterRange = Math.floor(this.viewRangeSize / 4),
       diff;
 
@@ -128,7 +128,7 @@ export default class VirtualScrolling {
    * Returns the index of the row which is at position scrollTop.
    */
   _rowIndexAtScrollTop(scrollTop) {
-    var height = 0,
+    let height = 0,
       rowCount = this.rowCount(),
       index = rowCount - 1;
 
@@ -137,7 +137,7 @@ export default class VirtualScrolling {
       height = scrollTop + (this.widget.$container.offset().top - this.$scrollable.offset().top);
     }
 
-    for (var row = 0; row < rowCount; row++) {
+    for (let row = 0; row < rowCount; row++) {
       height += this.rowHeight(row);
       if (scrollTop < height) {
         index = row;
@@ -162,12 +162,12 @@ export default class VirtualScrolling {
    * Calculates and renders the rows which should be visible in the current viewport based on scroll top.
    */
   _renderViewPort() {
-    var viewRange = this.calculateCurrentViewRange();
+    let viewRange = this.calculateCurrentViewRange();
     this._renderViewRange(viewRange);
   }
 
   _renderViewRangeForRowIndex(rowIndex) {
-    var viewRange = this.calculateViewRangeForRowIndex(rowIndex);
+    let viewRange = this.calculateViewRangeForRowIndex(rowIndex);
     this._renderViewRange(viewRange);
   }
 

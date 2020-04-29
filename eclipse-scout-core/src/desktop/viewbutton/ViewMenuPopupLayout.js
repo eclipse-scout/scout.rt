@@ -17,7 +17,7 @@ export default class ViewMenuPopupLayout extends PopupWithHeadLayout {
   }
 
   preferredLayoutSize($container) {
-    var prefSize = super.preferredLayoutSize($container);
+    let prefSize = super.preferredLayoutSize($container);
 
     // Always use pref size if it is larger than view button box so that the menu items are fully readable
     if (prefSize.width >= this.popup.viewButtonBoxBounds.width) {

@@ -10,18 +10,18 @@
  */
 import {dates, keys, RemoteEvent, scout} from '../../../../src/index';
 
-describe('DateFieldAdapter', function() {
-  var session;
-  var helper;
+describe('DateFieldAdapter', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
     $('.tooltip').remove();
@@ -35,7 +35,7 @@ describe('DateFieldAdapter', function() {
     model = $.extend({
       parent: session.desktop
     }, model);
-    var field = scout.create('DateField', model);
+    let field = scout.create('DateField', model);
     linkWidgetAndAdapter(field, 'DateFieldAdapter');
     return field;
   }
@@ -56,17 +56,17 @@ describe('DateFieldAdapter', function() {
   }
 
   function find$Day(picker, date) {
-    var $box = picker.currentMonth.$container;
-    return $box.find('.date-picker-day').filter(function(i, elem) {
-      var $day = $(elem);
+    let $box = picker.currentMonth.$container;
+    return $box.find('.date-picker-day').filter((i, elem) => {
+      let $day = $(elem);
       return (dates.isSameDay(date, $day.data('date')));
     });
   }
 
-  describe('parseValue', function() {
+  describe('parseValue', () => {
 
-    it('sets the server errorStatus if the displayText was reverted to the one provoking the error', function() {
-      var field = createWithAdapter({
+    it('sets the server errorStatus if the displayText was reverted to the one provoking the error', () => {
+      let field = createWithAdapter({
         hasTime: true,
         value: dates.create('2017-05-23 12:30:00.000'),
         errorStatus: {
@@ -94,8 +94,8 @@ describe('DateFieldAdapter', function() {
       expect(field.errorStatus.children[0].message).toBe('error status from server');
     });
 
-    it('sets the server errorStatus if the displayText was reverted to the one provoking the error using key down/up', function() {
-      var field = createWithAdapter({
+    it('sets the server errorStatus if the displayText was reverted to the one provoking the error using key down/up', () => {
+      let field = createWithAdapter({
         value: dates.create('2017-05-23'),
         errorStatus: {
           children: [{message: 'error status from server'}]
@@ -119,8 +119,8 @@ describe('DateFieldAdapter', function() {
       expect(field.errorStatus.children[0].message).toBe('error status from server');
     });
 
-    it('sets the server errorStatus if the displayText was reverted to the one provoking the error using picker', function() {
-      var field = createWithAdapter({
+    it('sets the server errorStatus if the displayText was reverted to the one provoking the error using picker', () => {
+      let field = createWithAdapter({
         value: dates.create('2017-05-23'),
         errorStatus: {
           children: [{message: 'error status from server'}]
@@ -140,8 +140,8 @@ describe('DateFieldAdapter', function() {
       expect(field.errorStatus.children[0].message).toBe('error status from server');
     });
 
-    it('does not accidentally remove the model error status on acceptInput', function() {
-      var field = createWithAdapter({
+    it('does not accidentally remove the model error status on acceptInput', () => {
+      let field = createWithAdapter({
         value: dates.create('2017-05-23'),
         errorStatus: {
           children: [{message: 'error status from server'}]
@@ -155,10 +155,10 @@ describe('DateFieldAdapter', function() {
 
   });
 
-  describe('picker', function() {
+  describe('picker', () => {
 
-    it('sends displayText and value if date was selected', function() {
-      var field = createWithAdapter({
+    it('sends displayText and value if date was selected', () => {
+      let field = createWithAdapter({
         autoDate: '2016-02-05'
       });
       field.render();
@@ -170,7 +170,7 @@ describe('DateFieldAdapter', function() {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var events = [
+      let events = [
         new RemoteEvent(field.id, 'acceptInput', {
           displayText: '01.02.2016',
           value: '2016-02-01 00:00:00.000',

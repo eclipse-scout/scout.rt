@@ -80,11 +80,11 @@ const TEXT = {
  * Numeric comparator, used to compare numeric values. Used for numbers, dates, etc.
  */
 const NUMERIC = {
-  install: function(session) {
+  install: session => {
     // NOP
     return true;
   },
-  compare: function(valueA, valueB) {
+  compare: (valueA, valueB) => {
     if (objects.isNullOrUndefined(valueA) && objects.isNullOrUndefined(valueB)) {
       return 0;
     }
@@ -121,7 +121,7 @@ const ALPHANUMERIC = {
   compareIgnoreCase: function(valueA, valueB) {
     return this._compare(valueA, valueB, true);
   },
-  _compare: function(valueA, valueB, ignoreCase) {
+  _compare: (valueA, valueB, ignoreCase) => {
     if (!valueA && !valueB) {
       return 0;
     }
@@ -132,21 +132,21 @@ const ALPHANUMERIC = {
       return 1;
     }
 
-    var pattern = '(([0-9]+)|([^0-9]+))';
-    var regexp1 = new RegExp(pattern, 'g');
-    var regexp2 = new RegExp(pattern, 'g');
-    var found1 = regexp1.exec(valueA);
-    var found2 = regexp2.exec(valueB);
+    let pattern = '(([0-9]+)|([^0-9]+))';
+    let regexp1 = new RegExp(pattern, 'g');
+    let regexp2 = new RegExp(pattern, 'g');
+    let found1 = regexp1.exec(valueA);
+    let found2 = regexp2.exec(valueB);
     while (found1 && found2) {
-      var n1 = parseInt(found1[1], 0);
-      var n2 = parseInt(found2[1], 0);
+      let n1 = parseInt(found1[1], 0);
+      let n2 = parseInt(found2[1], 0);
       if (!isNaN(n1) && !isNaN(n2)) {
-        var numericResult = NUMERIC.compare(n1, n2);
+        let numericResult = NUMERIC.compare(n1, n2);
         if (numericResult !== 0) {
           return numericResult;
         }
       } else {
-        var textResult = ignoreCase ? TEXT.compareIgnoreCase(found1[1], found2[1]) : TEXT.compare(found1[1], found2[1]);
+        let textResult = ignoreCase ? TEXT.compareIgnoreCase(found1[1], found2[1]) : TEXT.compare(found1[1], found2[1]);
         if (textResult !== 0) {
           return textResult;
         }

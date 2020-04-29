@@ -10,10 +10,10 @@
  */
 import {URL} from '../../src/index';
 
-describe('scout.URL', function() {
+describe('scout.URL', () => {
 
-  it('can parse super-simple URL', function() {
-    var u = new URL(encodeURI('http://www.simple.example/dir/file.html'));
+  it('can parse super-simple URL', () => {
+    let u = new URL(encodeURI('http://www.simple.example/dir/file.html'));
     expect(u).toBeDefined();
     expect(u.baseUrlRaw).toBe('http://www.simple.example/dir/file.html');
     expect(u.queryPartRaw).toBeUndefined();
@@ -21,13 +21,13 @@ describe('scout.URL', function() {
     expect(u.getParameter('sort')).toBeUndefined();
   });
 
-  it('can parse empty hash', function() {
-    var u = new URL(encodeURI('http://www.simple.example/dir/file.html#'));
+  it('can parse empty hash', () => {
+    let u = new URL(encodeURI('http://www.simple.example/dir/file.html#'));
     expect(u.hashPartRaw).toBe('');
   });
 
-  it('can parse a moderately simple URL', function() {
-    var u = new URL(encodeURI('http://www.simple.example/dir/file.html?query=search&action=&sort#bottom'));
+  it('can parse a moderately simple URL', () => {
+    let u = new URL(encodeURI('http://www.simple.example/dir/file.html?query=search&action=&sort#bottom'));
     expect(u).toBeDefined();
     expect(u.baseUrlRaw).toBe('http://www.simple.example/dir/file.html');
     expect(u.queryPartRaw).toBe('query=search&action=&sort');
@@ -39,22 +39,22 @@ describe('scout.URL', function() {
     expect(u.getParameter('bottom')).toBeUndefined();
   });
 
-  it('can convert the URL to string (only changed in order of arguments)', function() {
-    var u = new URL(encodeURI('http://www.simple.example/dir/file.html?query=search&action=&sort#bottom'));
+  it('can convert the URL to string (only changed in order of arguments)', () => {
+    let u = new URL(encodeURI('http://www.simple.example/dir/file.html?query=search&action=&sort#bottom'));
     expect(u).toBeDefined();
     expect(u.toString()).toBe('http://www.simple.example/dir/file.html?action=&query=search&sort#bottom');
   });
 
-  it('can handle multi-valued parameters', function() {
-    var u = new URL(encodeURI('http://www.simple.example/dir/file.html?query=search&action=&query&sort&query=go#bottom'));
+  it('can handle multi-valued parameters', () => {
+    let u = new URL(encodeURI('http://www.simple.example/dir/file.html?query=search&action=&query&sort&query=go#bottom'));
     expect(u).toBeDefined();
     expect(u.queryPartRaw).toBe('query=search&action=&query&sort&query=go');
     expect(u.getParameter('query')).toEqual([null, 'go', 'search']);
     expect(u.toString()).toBe('http://www.simple.example/dir/file.html?action=&query&query=go&query=search&sort#bottom');
   });
 
-  it('can add parameters', function() {
-    var u = new URL(encodeURI('http://www.simple.example/dir/file.html?user=hugo&submit=yes&debug#66627'));
+  it('can add parameters', () => {
+    let u = new URL(encodeURI('http://www.simple.example/dir/file.html?user=hugo&submit=yes&debug#66627'));
     u.addParameter('check', 'no');
     try {
       u.addParameter();
@@ -72,8 +72,8 @@ describe('scout.URL', function() {
     expect(u.toString()).toBe('http://www.simple.example/dir/file.html?check=no&debug&print&slow&submit=yes&user=admin&user=hugo&x=#66627');
   });
 
-  it('can remove parameters', function() {
-    var u = new URL(encodeURI('http://www.simple.example/dir/file.html?user=hugo&submit=yes&debug&user=peter#66627'));
+  it('can remove parameters', () => {
+    let u = new URL(encodeURI('http://www.simple.example/dir/file.html?user=hugo&submit=yes&debug&user=peter#66627'));
     u.removeParameter('user');
     u.removeParameter(''); // should do nothing
     u.removeParameter('submit');
@@ -82,8 +82,8 @@ describe('scout.URL', function() {
     expect(u.toString()).toBe('http://www.simple.example/dir/file.html#66627');
   });
 
-  it('can create or replace parameters', function() {
-    var u = new URL(encodeURI('http://www.simple.example/dir/file.html?user=hugo&submit=yes&debug&user=peter#66627'));
+  it('can create or replace parameters', () => {
+    let u = new URL(encodeURI('http://www.simple.example/dir/file.html?user=hugo&submit=yes&debug&user=peter#66627'));
     u.addParameter('user', 'test');
     u.setParameter('user', 'hans');
     u.setParameter(''); // should do nothing
@@ -96,8 +96,8 @@ describe('scout.URL', function() {
     expect(u.toString()).toBe('http://www.simple.example/dir/file.html?check&debug&submit=&user=hans#66627');
   });
 
-  it('can handle non-ascii characters', function() {
-    var u = new URL(encodeURI('http://www.menükarte.example/dir/à la carte.php?query=search&wine=château lafite#\u1F603'));
+  it('can handle non-ascii characters', () => {
+    let u = new URL(encodeURI('http://www.menükarte.example/dir/à la carte.php?query=search&wine=château lafite#\u1F603'));
     expect(u).toBeDefined();
     expect(decodeURIComponent(u.baseUrlRaw)).toBe('http://www.menükarte.example/dir/à la carte.php');
     expect(decodeURIComponent(u.queryPartRaw)).toBe('query=search&wine=château lafite');
@@ -107,17 +107,15 @@ describe('scout.URL', function() {
     expect(u.getParameter('wine')).toBe('château lafite');
   });
 
-  it('can sort parameters', function() {
-    var u = new URL(encodeURI('http://www.simple.example/dir/file.html?user=hugo&submit=yes&debug#66627'));
+  it('can sort parameters', () => {
+    let u = new URL(encodeURI('http://www.simple.example/dir/file.html?user=hugo&submit=yes&debug#66627'));
     u.addParameter('check', 'no');
     u.addParameter('print');
     u.addParameter('slow', null);
     u.addParameter('x', '');
     u.addParameter('user', 'admin');
     expect(u.toString()).toBe('http://www.simple.example/dir/file.html?check=no&debug&print&slow&submit=yes&user=admin&user=hugo&x=#66627');
-    var reverseAlphabetSorter = function(a, b) {
-      return -1 * URL._sorter(a, b);
-    };
+    let reverseAlphabetSorter = (a, b) => -1 * URL._sorter(a, b);
     expect(u.toString({
       sorter: reverseAlphabetSorter
     })).toBe('http://www.simple.example/dir/file.html?x=&user=admin&user=hugo&submit=yes&slow&print&debug&check=no#66627');

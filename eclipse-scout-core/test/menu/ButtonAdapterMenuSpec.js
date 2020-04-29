@@ -10,11 +10,11 @@
  */
 import {Button, ButtonAdapterMenu} from '../../src/index';
 
-describe('ButtonAdapterMenu', function() {
+describe('ButtonAdapterMenu', () => {
 
-  var helper, session, $sandbox, button, adapterMenu;
+  let helper, session, $sandbox, button, adapterMenu;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     $sandbox = $('#sandbox');
@@ -24,46 +24,46 @@ describe('ButtonAdapterMenu', function() {
     adapterMenu.init({id: '234', button: button, parent: session.desktop});
   });
 
-  describe('maps defaultButton setting', function() {
+  describe('maps defaultButton setting', () => {
 
-    describe('from not set to null', function() {
+    describe('from not set to null', () => {
 
-      it('to defaultMenu = true', function() {
+      it('to defaultMenu = true', () => {
         expect(adapterMenu.defaultMenu).toBe(null);
       });
 
     });
 
-    describe('from true', function() {
-      beforeEach(function() {
+    describe('from true', () => {
+      beforeEach(() => {
         button.setProperty('defaultButton', false); // set other value first to trigger actual property change with following line
         button.setProperty('defaultButton', true);
       });
 
-      it('to defaultMenu = true', function() {
+      it('to defaultMenu = true', () => {
         expect(adapterMenu.defaultMenu).toBe(true);
       });
 
     });
 
-    describe('from false (w/o other previous values) to null', function() {
-      beforeEach(function() {
+    describe('from false (w/o other previous values) to null', () => {
+      beforeEach(() => {
         button.setProperty('defaultButton', false);
       });
 
-      it('to defaultMenu = null', function() {
+      it('to defaultMenu = null', () => {
         expect(adapterMenu.defaultMenu).toBe(null);
       });
 
     });
 
-    describe('from false (with other previous values) to false', function() {
-      beforeEach(function() {
+    describe('from false (with other previous values) to false', () => {
+      beforeEach(() => {
         button.setProperty('defaultButton', true); // set other value first to trigger actual property change with following line
         button.setProperty('defaultButton', false);
       });
 
-      it('to defaultMenu = false', function() {
+      it('to defaultMenu = false', () => {
         expect(adapterMenu.defaultMenu).toBe(false);
       });
 
@@ -71,9 +71,9 @@ describe('ButtonAdapterMenu', function() {
 
   });
 
-  describe('initialization / destroy', function() {
+  describe('initialization / destroy', () => {
 
-    it('should set/delete adaptedBy property on original button instance', function() {
+    it('should set/delete adaptedBy property on original button instance', () => {
       // init
       expect(button.adaptedBy).toBe(adapterMenu);
       // destroy
@@ -83,13 +83,13 @@ describe('ButtonAdapterMenu', function() {
 
   });
 
-  describe('focusable element', function() {
+  describe('focusable element', () => {
 
-    it('button should delegate to adapter menu', function() {
+    it('button should delegate to adapter menu', () => {
       expect(button.getFocusableElement()).toBe(null);
       expect(adapterMenu.getFocusableElement()).toBe(null);
       adapterMenu.render($sandbox);
-      var adapterMenuContainer = adapterMenu.$container[0];
+      let adapterMenuContainer = adapterMenu.$container[0];
       expect(button.getFocusableElement()).toBe(adapterMenuContainer);
       expect(adapterMenu.getFocusableElement()).toBe(adapterMenuContainer);
     });

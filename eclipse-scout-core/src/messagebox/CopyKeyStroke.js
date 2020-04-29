@@ -19,9 +19,7 @@ export default class CopyKeyStroke extends KeyStroke {
     this.ctrl = true;
     this.preventDefault = false;
     this.renderingHints.render = true;
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
-      return field.$container;
-    };
+    this.renderingHints.$drawingArea = ($drawingArea, event) => field.$container;
   }
 
   handle(event) {

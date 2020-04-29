@@ -20,7 +20,7 @@ export default class TouchPopupLayout extends PopupLayout {
   layout($container) {
     super.layout($container);
 
-    var popupSize = this.popup.htmlComp.size().subtract(this.popup.htmlComp.insets()),
+    let popupSize = this.popup.htmlComp.size().subtract(this.popup.htmlComp.insets()),
       headerHeight = graphics.size(this.popup._$header, true).height,
       field = this.popup._field,
       fieldHeight = field.htmlComp.prefSize().height,
@@ -37,7 +37,7 @@ export default class TouchPopupLayout extends PopupLayout {
    * @override AbstractLayout.js
    */
   preferredLayoutSize($container) {
-    var popupWidth = HtmlEnvironment.get().formColumnWidth,
+    let popupWidth = HtmlEnvironment.get().formColumnWidth,
       popupHeight = HtmlEnvironment.get().formRowHeight * 15;
 
     return new Dimension(popupWidth, popupHeight);

@@ -58,7 +58,7 @@ export default class ViewMenuPopup extends PopupWithHead {
     }, this);
 
     // Add last marker to last visible item
-    var lastVisibleMenu = arrays.findFromReverse(this.viewMenus, this.viewMenus.length - 1, function(viewMenu) {
+    let lastVisibleMenu = arrays.findFromReverse(this.viewMenus, this.viewMenus.length - 1, viewMenu => {
       return viewMenu.visible;
     }, this);
     lastVisibleMenu.$container.addClass('last');
@@ -104,7 +104,7 @@ export default class ViewMenuPopup extends PopupWithHead {
   }
 
   position() {
-    var pos = this.$tab.offset(),
+    let pos = this.$tab.offset(),
       headSize = graphics.size(this.$tab, true),
       bodyTop = headSize.height;
 

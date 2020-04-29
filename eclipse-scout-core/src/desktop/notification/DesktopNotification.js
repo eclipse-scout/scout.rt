@@ -53,7 +53,7 @@ export default class DesktopNotification extends Notification {
   }
 
   _renderMessage() {
-    var message = this.status.message || '';
+    let message = this.status.message || '';
     if (this.htmlEnabled) {
       this.$messageText.html(message);
       // Add action to app-links
@@ -141,9 +141,9 @@ export default class DesktopNotification extends Notification {
     }
     this._removing = true;
     this.$container.addClass('desktop-notification-fade-out');
-    this.$container.oneAnimationEnd(function() {
+    this.$container.oneAnimationEnd(() => {
       this.destroy();
-    }.bind(this));
+    });
   }
 
   /**
@@ -154,8 +154,8 @@ export default class DesktopNotification extends Notification {
   }
 
   _onAppLinkAction(event) {
-    var $target = $(event.delegateTarget);
-    var ref = $target.data('ref');
+    let $target = $(event.delegateTarget);
+    let ref = $target.data('ref');
     this.triggerAppLinkAction(ref);
   }
 

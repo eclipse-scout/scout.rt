@@ -12,11 +12,11 @@
 import {keys} from '../../src/index';
 import {TreeSpecHelper} from '@eclipse-scout/testing';
 
-describe('TreeKeyStrokes', function() {
-  var session;
-  var helper;
+describe('TreeKeyStrokes', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TreeSpecHelper(session);
@@ -24,19 +24,19 @@ describe('TreeKeyStrokes', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
-  describe('key up', function() {
+  describe('key up', () => {
 
-    it('selects the above node in collapsed tree', function() {
-      var model = helper.model = helper.createModelFixture(3, 3, false);
-      var tree = helper.createTree(model);
+    it('selects the above node in collapsed tree', () => {
+      let model = helper.model = helper.createModelFixture(3, 3, false);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0],
+      let node0 = tree.nodes[0],
         node1 = tree.nodes[1],
         node2 = tree.nodes[2];
 
@@ -51,11 +51,11 @@ describe('TreeKeyStrokes', function() {
       helper.assertSelection(tree, [node0]);
     });
 
-    it('selects the above node node in expanded tree', function() {
-      var model = helper.model = helper.createModelFixture(3, 1, true);
-      var tree = helper.createTree(model);
+    it('selects the above node node in expanded tree', () => {
+      let model = helper.model = helper.createModelFixture(3, 1, true);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0],
+      let node0 = tree.nodes[0],
         node1 = tree.nodes[1],
         node0Child2 = node0.childNodes[2],
         node1Child0 = node1.childNodes[0],
@@ -72,22 +72,22 @@ describe('TreeKeyStrokes', function() {
       helper.assertSelection(tree, [node0Child2]);
     });
 
-    it('selects the last node if no node is selected yet', function() {
-      var model = helper.model = helper.createModelFixture(3, 3, false);
-      var tree = helper.createTree(model);
+    it('selects the last node if no node is selected yet', () => {
+      let model = helper.model = helper.createModelFixture(3, 3, false);
+      let tree = helper.createTree(model);
 
-      var node2 = tree.nodes[2];
+      let node2 = tree.nodes[2];
 
       tree.render();
       tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node2]);
     });
 
-    it('selects the only node if there is only one', function() {
-      var model = helper.model = helper.createModelFixture(1, 0, false);
-      var tree = helper.createTree(model);
+    it('selects the only node if there is only one', () => {
+      let model = helper.model = helper.createModelFixture(1, 0, false);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0];
+      let node0 = tree.nodes[0];
       tree.render();
       tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node0]);
@@ -102,24 +102,24 @@ describe('TreeKeyStrokes', function() {
       tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node0]);
     });
-    it('does nothing if first node already is selected', function() {
-      var model = helper.model = helper.createModelFixture(3, 3, false);
-      var tree = helper.createTree(model);
+    it('does nothing if first node already is selected', () => {
+      let model = helper.model = helper.createModelFixture(3, 3, false);
+      let tree = helper.createTree(model);
 
       tree.render();
-      var node0 = tree.nodes[0];
+      let node0 = tree.nodes[0];
       helper.selectNodesAndAssert(tree, [node0]);
       tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node0]);
     });
   });
 
-  describe('key down', function() {
-    it('selects the node below in collapsed tree', function() {
-      var model = helper.model = helper.createModelFixture(3, 3, false);
-      var tree = helper.createTree(model);
+  describe('key down', () => {
+    it('selects the node below in collapsed tree', () => {
+      let model = helper.model = helper.createModelFixture(3, 3, false);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0],
+      let node0 = tree.nodes[0],
         node1 = tree.nodes[1],
         node2 = tree.nodes[2];
 
@@ -134,11 +134,11 @@ describe('TreeKeyStrokes', function() {
       helper.assertSelection(tree, [node2]);
     });
 
-    it('selects the first node if no row is selected yet', function() {
-      var model = helper.model = helper.createModelFixture(3, 3, false);
-      var tree = helper.createTree(model);
+    it('selects the first node if no row is selected yet', () => {
+      let model = helper.model = helper.createModelFixture(3, 3, false);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0];
+      let node0 = tree.nodes[0];
 
       tree.render();
 
@@ -146,11 +146,11 @@ describe('TreeKeyStrokes', function() {
       helper.assertSelection(tree, [node0]);
     });
 
-    it('selects the above node node in expanded tree', function() {
-      var model = helper.model = helper.createModelFixture(3, 1, true);
-      var tree = helper.createTree(model);
+    it('selects the above node node in expanded tree', () => {
+      let model = helper.model = helper.createModelFixture(3, 1, true);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0],
+      let node0 = tree.nodes[0],
         node1 = tree.nodes[1],
         node0Child2 = node0.childNodes[2],
         node1Child0 = node1.childNodes[0],
@@ -167,11 +167,11 @@ describe('TreeKeyStrokes', function() {
       helper.assertSelection(tree, [node1Child1]);
     });
 
-    it('selects the only node if there is only one', function() {
-      var model = helper.model = helper.createModelFixture(1, 0, false);
-      var tree = helper.createTree(model);
+    it('selects the only node if there is only one', () => {
+      let model = helper.model = helper.createModelFixture(1, 0, false);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0];
+      let node0 = tree.nodes[0];
       tree.render();
       tree.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(tree, [node0]);
@@ -187,11 +187,11 @@ describe('TreeKeyStrokes', function() {
       helper.assertSelection(tree, [node0]);
     });
 
-    it('does nothing if last node already is selected', function() {
-      var model = helper.model = helper.createModelFixture(3, 1, false);
-      var tree = helper.createTree(model);
+    it('does nothing if last node already is selected', () => {
+      let model = helper.model = helper.createModelFixture(3, 1, false);
+      let tree = helper.createTree(model);
 
-      var node2 = tree.nodes[2];
+      let node2 = tree.nodes[2];
 
       tree.render();
       helper.selectNodesAndAssert(tree, [node2]);
@@ -201,12 +201,12 @@ describe('TreeKeyStrokes', function() {
     });
   });
 
-  describe('Home', function() {
-    it('selects first node in collapsed tree', function() {
-      var model = helper.model = helper.createModelFixture(3, 1, false);
-      var tree = helper.createTree(model);
+  describe('Home', () => {
+    it('selects first node in collapsed tree', () => {
+      let model = helper.model = helper.createModelFixture(3, 1, false);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0],
+      let node0 = tree.nodes[0],
         node2 = tree.nodes[2];
 
       tree.render();
@@ -215,11 +215,11 @@ describe('TreeKeyStrokes', function() {
       tree.$data.triggerKeyDown(keys.HOME);
       helper.assertSelection(tree, [node0]);
     });
-    it('selects first node in expanded tree', function() {
-      var model = helper.model = helper.createModelFixture(3, 1, true);
-      var tree = helper.createTree(model);
+    it('selects first node in expanded tree', () => {
+      let model = helper.model = helper.createModelFixture(3, 1, true);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0],
+      let node0 = tree.nodes[0],
         node0Child2 = node0.childNodes[2];
 
       tree.render();
@@ -227,19 +227,19 @@ describe('TreeKeyStrokes', function() {
 
       tree.$data.triggerKeyDown(keys.HOME);
       helper.assertSelection(tree, [node0]);
-      tree.visitNodes(function(node) {
+      tree.visitNodes(node => {
         expect(node.expanded).toBeFalsy();
       });
     });
   });
 
-  describe('Subtract', function() {
+  describe('Subtract', () => {
 
-    it(' collapses a node', function() {
-      var model = helper.model = helper.createModelFixture(3, 1, true);
-      var tree = helper.createTree(model);
+    it(' collapses a node', () => {
+      let model = helper.model = helper.createModelFixture(3, 1, true);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0];
+      let node0 = tree.nodes[0];
 
       tree.render();
       helper.selectNodesAndAssert(tree, [node0]);
@@ -249,11 +249,11 @@ describe('TreeKeyStrokes', function() {
       expect(node0.expanded).toBeFalsy();
     });
 
-    it(' collapses a node and drill up', function() {
-      var model = helper.model = helper.createModelFixture(3, 1, true);
-      var tree = helper.createTree(model);
+    it(' collapses a node and drill up', () => {
+      let model = helper.model = helper.createModelFixture(3, 1, true);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0],
+      let node0 = tree.nodes[0],
         node0Child0 = node0.childNodes[0];
 
       tree.render();
@@ -271,12 +271,12 @@ describe('TreeKeyStrokes', function() {
 
   });
 
-  describe('Add', function() {
-    it(' expands a node', function() {
-      var model = helper.model = helper.createModelFixture(3, 1, false);
-      var tree = helper.createTree(model);
+  describe('Add', () => {
+    it(' expands a node', () => {
+      let model = helper.model = helper.createModelFixture(3, 1, false);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0];
+      let node0 = tree.nodes[0];
 
       tree.render();
       helper.selectNodesAndAssert(tree, [node0]);
@@ -286,11 +286,11 @@ describe('TreeKeyStrokes', function() {
       expect(node0.expanded).toBeTruthy();
     });
 
-    it(' expands a node and drill down', function() {
-      var model = helper.model = helper.createModelFixture(3, 1, false);
-      var tree = helper.createTree(model);
+    it(' expands a node and drill down', () => {
+      let model = helper.model = helper.createModelFixture(3, 1, false);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0];
+      let node0 = tree.nodes[0];
 
       tree.render();
       helper.selectNodesAndAssert(tree, [node0]);
@@ -303,13 +303,13 @@ describe('TreeKeyStrokes', function() {
     });
   });
 
-  describe('End', function() {
-    it(' jumps to last node', function() {
-      var model = helper.model = helper.createModelFixture(3, 1, false);
-      var tree = helper.createTree(model);
+  describe('End', () => {
+    it(' jumps to last node', () => {
+      let model = helper.model = helper.createModelFixture(3, 1, false);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0];
-      var node2 = tree.nodes[2];
+      let node0 = tree.nodes[0];
+      let node2 = tree.nodes[2];
 
       tree.render();
       helper.selectNodesAndAssert(tree, [node0]);
@@ -321,20 +321,20 @@ describe('TreeKeyStrokes', function() {
 
   });
 
-  describe('space', function() {
+  describe('space', () => {
 
-    it('does nothing if no nodes are selected', function() {
-      var model = helper.model = helper.createModelFixture(3, 1, false);
+    it('does nothing if no nodes are selected', () => {
+      let model = helper.model = helper.createModelFixture(3, 1, false);
       model.checkable = true;
-      var tree = helper.createTree(model);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0];
+      let node0 = tree.nodes[0];
       tree.checkNode(node0, true);
       expect(node0.checked).toBeTruthy();
       tree.render();
       tree.$data.triggerKeyDown(keys.SPACE);
 
-      tree.visitNodes(function(node) {
+      tree.visitNodes(node => {
         if (node === node0) {
           expect(node.checked).toBeTruthy();
         } else {
@@ -343,19 +343,19 @@ describe('TreeKeyStrokes', function() {
       });
     });
 
-    it('checks the selected node ', function() {
-      var model = helper.model = helper.createModelFixture(3, 1, false);
+    it('checks the selected node ', () => {
+      let model = helper.model = helper.createModelFixture(3, 1, false);
       model.checkable = true;
-      var tree = helper.createTree(model);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0];
+      let node0 = tree.nodes[0];
       tree.render();
       expect(node0.checked).toBeFalsy();
       helper.selectNodesAndAssert(tree, [node0]);
 
       tree.$data.triggerKeyDown(keys.SPACE);
 
-      tree.visitNodes(function(node) {
+      tree.visitNodes(node => {
         if (node === node0) {
           expect(node.checked).toBeTruthy();
         } else {
@@ -364,12 +364,12 @@ describe('TreeKeyStrokes', function() {
       });
     });
 
-    it('unchecks the selected node ', function() {
-      var model = helper.model = helper.createModelFixture(3, 1, false);
+    it('unchecks the selected node ', () => {
+      let model = helper.model = helper.createModelFixture(3, 1, false);
       model.checkable = true;
-      var tree = helper.createTree(model);
+      let tree = helper.createTree(model);
 
-      var node0 = tree.nodes[0];
+      let node0 = tree.nodes[0];
       tree.render();
       tree.checkNode(node0, true);
       expect(node0.checked).toBeTruthy();
@@ -377,7 +377,7 @@ describe('TreeKeyStrokes', function() {
 
       tree.$data.triggerKeyDown(keys.SPACE);
 
-      tree.visitNodes(function(node) {
+      tree.visitNodes(node => {
         expect(node.checked).toBeFalsy();
       });
     });

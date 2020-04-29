@@ -85,7 +85,7 @@ export default class TileAccordionSelectionHandler extends TileGridSelectionHand
    * @override
    */
   scrollTo(tile) {
-    var group = this.tileAccordion.getGroupByTile(tile);
+    let group = this.tileAccordion.getGroupByTile(tile);
     group.body.scrollTo(tile);
   }
 
@@ -93,7 +93,7 @@ export default class TileAccordionSelectionHandler extends TileGridSelectionHand
    * @override
    */
   getTileGridByRow(rowIndex) {
-    var group = this.tileAccordion.getGroupByVisibleRow(rowIndex);
+    let group = this.tileAccordion.getGroupByVisibleRow(rowIndex);
     if (group) {
       return group.body;
     }

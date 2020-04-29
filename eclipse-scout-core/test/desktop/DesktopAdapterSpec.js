@@ -11,10 +11,10 @@
 import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
 import {RemoteEvent, Widget} from '../../src/index';
 
-describe('DesktopAdapter', function() {
-  var session, desktop, outlineHelper, formHelper, desktopAdapter;
+describe('DesktopAdapter', () => {
+  let session, desktop, outlineHelper, formHelper, desktopAdapter;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -31,29 +31,29 @@ describe('DesktopAdapter', function() {
     desktopAdapter = desktop.modelAdapter;
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
   function createAndRegisterFormModel() {
-    var groupBoxModel = createSimpleModel('GroupBox', session);
+    let groupBoxModel = createSimpleModel('GroupBox', session);
     groupBoxModel.mainBox = true;
-    var formModel = createSimpleModel('Form', session);
+    let formModel = createSimpleModel('Form', session);
     formModel.rootGroupBox = groupBoxModel.id;
     registerAdapterData([formModel, groupBoxModel], session);
     return formModel;
   }
 
-  describe('activateForm', function() {
-    var ntfc,
+  describe('activateForm', () => {
+    let ntfc,
       parent = new Widget();
 
-    it('sends formActivateEvent', function() {
-      var formModel = createAndRegisterFormModel();
-      var formModel2 = createAndRegisterFormModel();
-      var form = session.getOrCreateWidget(formModel.id, desktop);
-      var form2 = session.getOrCreateWidget(formModel2.id, desktop);
+    it('sends formActivateEvent', () => {
+      let formModel = createAndRegisterFormModel();
+      let formModel2 = createAndRegisterFormModel();
+      let form = session.getOrCreateWidget(formModel.id, desktop);
+      let form2 = session.getOrCreateWidget(formModel2.id, desktop);
       desktop.dialogs = [form, form2];
       session._renderDesktop();
 
@@ -61,7 +61,7 @@ describe('DesktopAdapter', function() {
       expect(desktop.activeForm).toBe(form);
 
       sendQueuedAjaxCalls();
-      var event = new RemoteEvent(desktopAdapter.id, 'formActivate', {
+      let event = new RemoteEvent(desktopAdapter.id, 'formActivate', {
         formId: form.modelAdapter.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -76,9 +76,9 @@ describe('DesktopAdapter', function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('can close and open new form in the same response', function() {
-      var formModel = createAndRegisterFormModel();
-      var form = session.getOrCreateWidget(formModel.id, desktop);
+    it('can close and open new form in the same response', () => {
+      let formModel = createAndRegisterFormModel();
+      let form = session.getOrCreateWidget(formModel.id, desktop);
       desktop.dialogs = [form];
       session._renderDesktop();
 
@@ -94,7 +94,7 @@ describe('DesktopAdapter', function() {
 
       // Close form and open new form --> new form must be activated
 
-      var response = {
+      let response = {
         adapterData: {
           '400': {
             displayHint: 'view',
@@ -129,7 +129,7 @@ describe('DesktopAdapter', function() {
       session._processSuccessResponse(response);
       sendQueuedAjaxCalls();
 
-      var expectedEvents = [
+      let expectedEvents = [
         new RemoteEvent(desktopAdapter.id, 'formActivate', {
           formId: null
         }),
@@ -160,20 +160,20 @@ describe('DesktopAdapter', function() {
     });
   });
 
-  describe('onFormShow', function() {
-    var ntfc,
+  describe('onFormShow', () => {
+    let ntfc,
       parent = new Widget();
 
-    it('activates form but does not send an activate form event', function() {
+    it('activates form but does not send an activate form event', () => {
       session._renderDesktop();
-      var formModel = createAndRegisterFormModel();
+      let formModel = createAndRegisterFormModel();
 
-      var formShowEvent = new RemoteEvent(desktopAdapter.id, 'formShow', {
+      let formShowEvent = new RemoteEvent(desktopAdapter.id, 'formShow', {
         form: formModel.id,
         displayParent: desktopAdapter.id
       });
       desktopAdapter.onModelAction(formShowEvent);
-      var form = session.getModelAdapter(formModel.id).widget;
+      let form = session.getModelAdapter(formModel.id).widget;
       expect(form.rendered).toBe(true);
       expect(desktop.activeForm).toBe(form);
 

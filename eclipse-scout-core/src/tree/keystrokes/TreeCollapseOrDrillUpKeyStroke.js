@@ -16,8 +16,8 @@ export default class TreeCollapseOrDrillUpKeyStroke extends AbstractTreeNavigati
     super(tree, modifierBitMask);
     this.which = [keys.SUBTRACT];
     this.renderingHints.text = '-';
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
-      var currentNode = event._treeCurrentNode;
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
+      let currentNode = event._treeCurrentNode;
       if (currentNode.expanded) {
         return currentNode.$node;
       } else if (currentNode.parentNode) {
@@ -27,13 +27,13 @@ export default class TreeCollapseOrDrillUpKeyStroke extends AbstractTreeNavigati
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
-    var currentNode = event._treeCurrentNode;
+    let accepted = super._accept(event);
+    let currentNode = event._treeCurrentNode;
     return accepted && currentNode && (currentNode.expanded || currentNode.parentNode);
   }
 
   handle(event) {
-    var currentNode = event._treeCurrentNode;
+    let currentNode = event._treeCurrentNode;
     if (currentNode.expanded) {
       this.field.collapseNode(currentNode);
     } else if (currentNode.parentNode) {

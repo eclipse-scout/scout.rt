@@ -25,9 +25,7 @@ export default class TableFocusFilterFieldKeyStroke extends KeyStroke {
     super();
     this.field = table;
 
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
-      return event._$filterInput;
-    };
+    this.renderingHints.$drawingArea = ($drawingArea, event) => event._$filterInput;
 
     this.virtualKeyStrokeWhich = 'a-Z;a-z;0-9';
     this.preventDefault = false; // false so that the key is inserted into the search field.
@@ -42,12 +40,12 @@ export default class TableFocusFilterFieldKeyStroke extends KeyStroke {
       return false;
     }
 
-    var $filterInput = $('.table-text-filter', this.field.$container);
+    let $filterInput = $('.table-text-filter', this.field.$container);
     if (!$filterInput.length) {
       return false;
     }
 
-    var activeElement = this.field.$container.activeElement(true),
+    let activeElement = this.field.$container.activeElement(true),
       activeElementType = activeElement.tagName.toLowerCase(),
       focusOnInputField = (activeElementType === 'textarea' || activeElementType === 'input');
     if (activeElement.className !== 'table-text-filter' || !focusOnInputField) {
@@ -62,13 +60,13 @@ export default class TableFocusFilterFieldKeyStroke extends KeyStroke {
    * @override KeyStroke.js
    */
   handle(event) {
-    var $filterInput = event._$filterInput;
+    let $filterInput = event._$filterInput;
 
     // Focus the field and move cursor to the end.
     if (this.field.session.focusManager.requestFocus($filterInput)) {
       $filterInput.focus();
 
-      var length = scout.nvl($filterInput.val(), '').length;
+      let length = scout.nvl($filterInput.val(), '').length;
       $filterInput[0].setSelectionRange(length, length);
     }
   }
@@ -84,9 +82,9 @@ export default class TableFocusFilterFieldKeyStroke extends KeyStroke {
    * @override KeyStroke.js
    */
   renderKeyBox($drawingArea, event) {
-    var $filterInput = event._$filterInput;
-    var filterInputPosition = $filterInput.position();
-    var left = filterInputPosition.left + $filterInput.cssMarginLeft() + 4;
+    let $filterInput = event._$filterInput;
+    let filterInputPosition = $filterInput.position();
+    let left = filterInputPosition.left + $filterInput.cssMarginLeft() + 4;
     $filterInput.beforeDiv('key-box char', 'a - z')
       .toggleClass('disabled', !this.enabledByFilter)
       .cssLeft(left);

@@ -10,19 +10,19 @@
  */
 import {DesktopNotification, scout, Status, Widget} from '../../../src/index';
 
-describe('DesktopNotification', function() {
-  var session, helper, $sandbox,
+describe('DesktopNotification', () => {
+  let session, helper, $sandbox,
     parent = new Widget();
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     $sandbox = session.$entryPoint;
     parent.session = session;
   });
 
-  it('will fade in, be added to the desktop and be renderd upon show() ', function() {
-    var notification = scout.create('DesktopNotification', {
+  it('will fade in, be added to the desktop and be renderd upon show() ', () => {
+    let notification = scout.create('DesktopNotification', {
       parent: parent,
       id: 'foo',
       duration: -1
@@ -34,8 +34,8 @@ describe('DesktopNotification', function() {
     expect(session.desktop.notifications[0]).toBe(notification);
   });
 
-  it('will fade out and be removed from the dektop upon hide()', function() {
-    var notification = scout.create('DesktopNotification', {
+  it('will fade out and be removed from the dektop upon hide()', () => {
+    let notification = scout.create('DesktopNotification', {
       parent: parent,
       id: 'foo',
       duration: -1
@@ -47,8 +47,8 @@ describe('DesktopNotification', function() {
     expect(session.desktop.notifications[0]).toBe(undefined);
   });
 
-  it('_init copies properties from event (model)', function() {
-    var notification = new DesktopNotification();
+  it('_init copies properties from event (model)', () => {
+    let notification = new DesktopNotification();
     notification.init({
       parent: parent,
       id: 'foo',
@@ -66,8 +66,8 @@ describe('DesktopNotification', function() {
     expect(notification.status.severity).toBe(Status.Severity.OK);
   });
 
-  it('has close-icon when notification is closable', function() {
-    var notification = scout.create('DesktopNotification', {
+  it('has close-icon when notification is closable', () => {
+    let notification = scout.create('DesktopNotification', {
       parent: parent,
       id: 'foo',
       duration: 123,

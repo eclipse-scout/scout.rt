@@ -10,23 +10,23 @@
  */
 import {Range, scout} from '../../src/index';
 
-describe('VirtualTileGrid', function() {
-  var session;
+describe('VirtualTileGrid', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
   function createTileGrid(numTiles, model) {
-    var tiles = [];
-    for (var i = 0; i < numTiles; i++) {
+    let tiles = [];
+    for (let i = 0; i < numTiles; i++) {
       tiles.push({
         objectType: 'Tile',
         label: 'Tile ' + i
       });
     }
-    var defaults = {
+    let defaults = {
       parent: session.desktop,
       tiles: tiles,
       virtual: true,
@@ -37,20 +37,20 @@ describe('VirtualTileGrid', function() {
   }
 
   function createTile(model) {
-    var defaults = {
+    let defaults = {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
     return scout.create('Tile', model);
   }
 
-  describe('virtual', function() {
-    it('only renders the tiles in the view range, if true', function() {
-      var tileGrid = createTileGrid(7, {
+  describe('virtual', () => {
+    it('only renders the tiles in the view range, if true', () => {
+      let tileGrid = createTileGrid(7, {
         viewRangeSize: 2
       });
       tileGrid.render();
-      var $tiles = tileGrid.$container.children('.tile');
+      let $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(4);
       expect($tiles.eq(0).data('widget')).toBe(tileGrid.tiles[0]);
       expect($tiles.eq(1).data('widget')).toBe(tileGrid.tiles[1]);
@@ -73,16 +73,16 @@ describe('VirtualTileGrid', function() {
       expect($tiles.eq(2).data('widget')).toBe(tileGrid.tiles[6]);
     });
 
-    it('can be toggled dynamically', function() {
-      var tileGrid = createTileGrid(7, {
+    it('can be toggled dynamically', () => {
+      let tileGrid = createTileGrid(7, {
         viewRangeSize: 2,
         virtual: false
       });
       tileGrid.render();
-      var $tiles = tileGrid.$container.children('.tile');
+      let $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(7); // All tiles rendered
 
-      tileGrid.virtualScrolling.calculateViewRangeSize = function() {
+      tileGrid.virtualScrolling.calculateViewRangeSize = () => {
         // Is called when toggling virtual, cannot determined correctly in the specs -> always return 2
         return 2;
       };
@@ -100,16 +100,16 @@ describe('VirtualTileGrid', function() {
       expect($tiles.length).toBe(7); // All rows rendered again
     });
 
-    it('does nothing if all tiles are in the view port', function() {
-      var tileGrid = createTileGrid(4, {
+    it('does nothing if all tiles are in the view port', () => {
+      let tileGrid = createTileGrid(4, {
         viewRangeSize: 2,
         virtual: false
       });
       tileGrid.render();
-      var $tiles = tileGrid.$container.children('.tile');
+      let $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(4);
 
-      tileGrid.virtualScrolling.calculateViewRangeSize = function() {
+      tileGrid.virtualScrolling.calculateViewRangeSize = () => {
         // Is called when toggling virtual, cannot determined correctly in the specs -> always return 2
         return 2;
       };
@@ -125,13 +125,13 @@ describe('VirtualTileGrid', function() {
       tileGrid.validateLayout();
     });
 
-    it('can be enabled even if tiles have been inserted', function() {
-      var tileGrid = createTileGrid(2, {
+    it('can be enabled even if tiles have been inserted', () => {
+      let tileGrid = createTileGrid(2, {
         viewRangeSize: 2,
         virtual: false
       });
       tileGrid.render();
-      var $tiles = tileGrid.$container.children('.tile');
+      let $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(2); // All tiles rendered
 
       // Insert new tiles, will be rendered because virtual is false
@@ -139,7 +139,7 @@ describe('VirtualTileGrid', function() {
       $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(6);
 
-      tileGrid.virtualScrolling.calculateViewRangeSize = function() {
+      tileGrid.virtualScrolling.calculateViewRangeSize = () => {
         // Is called when toggling virtual, cannot determined correctly in the specs -> always return 2
         return 2;
       };
@@ -153,13 +153,13 @@ describe('VirtualTileGrid', function() {
       expect($tiles.eq(3).data('widget')).toBe(tileGrid.tiles[3]);
     });
 
-    it('removes tiles correctly when enabled even if a filter is active', function() {
-      var tileGrid = createTileGrid(4, {
+    it('removes tiles correctly when enabled even if a filter is active', () => {
+      let tileGrid = createTileGrid(4, {
         viewRangeSize: 1,
         virtual: false
       });
-      var filter = {
-        accept: function(tile) {
+      let filter = {
+        accept: tile => {
           // Accept 0 and 1
           return tile.label.indexOf('0') >= 0 || tile.label.indexOf('1') >= 0;
         }
@@ -167,11 +167,11 @@ describe('VirtualTileGrid', function() {
       tileGrid.addFilter(filter);
       tileGrid.filter();
       tileGrid.render();
-      var $tiles = tileGrid.$container.children('.tile');
+      let $tiles = tileGrid.$container.children('.tile');
       expect(tileGrid.filteredTiles.length).toBe(2);
       expect($tiles.length).toBe(4); // All tiles rendered
 
-      tileGrid.virtualScrolling.calculateViewRangeSize = function() {
+      tileGrid.virtualScrolling.calculateViewRangeSize = () => {
         // Is called when toggling virtual, cannot determined correctly in the specs -> always return 2
         return 2;
       };
@@ -184,9 +184,9 @@ describe('VirtualTileGrid', function() {
     });
   });
 
-  describe('selectTiles', function() {
-    it('selects the given tiles but renders the selection only for the tiles in the view range', function() {
-      var tileGrid = createTileGrid(3, {
+  describe('selectTiles', () => {
+    it('selects the given tiles but renders the selection only for the tiles in the view range', () => {
+      let tileGrid = createTileGrid(3, {
         selectable: true,
         viewRangeSize: 1
       });
@@ -216,9 +216,9 @@ describe('VirtualTileGrid', function() {
     });
   });
 
-  describe('deselectTiles', function() {
-    it('deselects the given tiles, no matter if they are in the view port or not', function() {
-      var tileGrid = createTileGrid(3, {
+  describe('deselectTiles', () => {
+    it('deselects the given tiles, no matter if they are in the view port or not', () => {
+      let tileGrid = createTileGrid(3, {
         selectable: true,
         viewRangeSize: 1
       });
@@ -238,15 +238,15 @@ describe('VirtualTileGrid', function() {
     });
   });
 
-  describe('insertTiles', function() {
-    it('inserts the given tiles and renders them if they are in the viewport', function() {
-      var tileGrid = createTileGrid(0, {
+  describe('insertTiles', () => {
+    it('inserts the given tiles and renders them if they are in the viewport', () => {
+      let tileGrid = createTileGrid(0, {
         viewRangeSize: 1
       });
       tileGrid.render();
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
       expect(tileGrid.tiles.length).toBe(0);
       expect(tileGrid.$container.children('.tile').length).toBe(0);
 
@@ -267,16 +267,16 @@ describe('VirtualTileGrid', function() {
     });
   });
 
-  describe('deleteTiles', function() {
-    it('deletes the given tiles no matter if they are in the view port or not', function() {
+  describe('deleteTiles', () => {
+    it('deletes the given tiles no matter if they are in the view port or not', () => {
       jasmine.clock().install();
-      var tileGrid = createTileGrid(0, {
+      let tileGrid = createTileGrid(0, {
         viewRangeSize: 1
       });
       tileGrid.render();
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
       tileGrid.insertTiles([tile0, tile1, tile2]);
       expect(tileGrid.tiles.length).toBe(3);
       expect(tileGrid.$container.children('.tile').length).toBe(2);
@@ -310,18 +310,18 @@ describe('VirtualTileGrid', function() {
       jasmine.clock().uninstall();
     });
 
-    it('destroys the deleted tiles', function() {
-      var tileGrid = createTileGrid(0, {
+    it('destroys the deleted tiles', () => {
+      let tileGrid = createTileGrid(0, {
         animateTileRemoval: false,
         viewRangeSize: 1
       });
-      var tile0 = createTile({
+      let tile0 = createTile({
         parent: tileGrid
       });
-      var tile1 = createTile({
+      let tile1 = createTile({
         parent: tileGrid
       });
-      var tile2 = createTile({
+      let tile2 = createTile({
         parent: tileGrid
       });
       tileGrid.render();
@@ -345,14 +345,14 @@ describe('VirtualTileGrid', function() {
     });
   });
 
-  describe('deleteAllTiles', function() {
-    it('adds empty marker also if virtual is true', function() {
-      var tileGrid = createTileGrid(0, {
+  describe('deleteAllTiles', () => {
+    it('adds empty marker also if virtual is true', () => {
+      let tileGrid = createTileGrid(0, {
         viewRangeSize: 1
       });
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
       tileGrid.render();
       expect(tileGrid.$container).toHaveClass('empty');
 
@@ -364,18 +364,18 @@ describe('VirtualTileGrid', function() {
     });
   });
 
-  describe('setTiles', function() {
+  describe('setTiles', () => {
 
-    it('applies the order of the new tiles to the rendered elements in the view range', function() {
-      var tileGrid = createTileGrid(0, {
+    it('applies the order of the new tiles to the rendered elements in the view range', () => {
+      let tileGrid = createTileGrid(0, {
         viewRangeSize: 1
       });
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
       tileGrid.insertTiles([tile0, tile1, tile2]);
       tileGrid.render();
-      var $tiles = tileGrid.$container.children('.tile');
+      let $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(2);
       expect($tiles.eq(0).data('widget')).toBe(tile0);
       expect($tiles.eq(1).data('widget')).toBe(tile1);
@@ -393,24 +393,22 @@ describe('VirtualTileGrid', function() {
       expect(tileGrid.filteredTiles[2]).toBe(tile0);
     });
 
-    it('applies the order of the new tiles to the filteredTiles if a filter is active', function() {
-      var tileGrid = createTileGrid(3, {
+    it('applies the order of the new tiles to the filteredTiles if a filter is active', () => {
+      let tileGrid = createTileGrid(3, {
         viewRangeSize: 1
       });
-      var tile0 = tileGrid.tiles[0];
-      var tile1 = tileGrid.tiles[1];
-      var tile2 = tileGrid.tiles[2];
+      let tile0 = tileGrid.tiles[0];
+      let tile1 = tileGrid.tiles[1];
+      let tile2 = tileGrid.tiles[2];
 
-      var filter = {
-        accept: function(tile) {
-          return tile.label.indexOf('1') < 0;
-        }
+      let filter = {
+        accept: tile => tile.label.indexOf('1') < 0
       };
       tileGrid.addFilter(filter);
       tileGrid.filter();
 
       tileGrid.render();
-      var $tiles = tileGrid.$container.children('.tile');
+      let $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(2);
       expect($tiles.eq(0).data('widget')).toBe(tile0);
       expect($tiles.eq(1).data('widget')).toBe(tile2);
@@ -436,24 +434,24 @@ describe('VirtualTileGrid', function() {
 
   });
 
-  describe('sort', function() {
+  describe('sort', () => {
 
-    it('reorders the DOM elements in the view range according to the new order', function() {
-      var tileGrid = createTileGrid(0, {
+    it('reorders the DOM elements in the view range according to the new order', () => {
+      let tileGrid = createTileGrid(0, {
         viewRangeSize: 1
       });
-      var tile0 = createTile({
+      let tile0 = createTile({
         label: 'a'
       });
-      var tile1 = createTile({
+      let tile1 = createTile({
         label: 'b'
       });
-      var tile2 = createTile({
+      let tile2 = createTile({
         label: 'c'
       });
       tileGrid.insertTiles([tile0, tile1]);
 
-      tileGrid.setComparator(function(t0, t1) {
+      tileGrid.setComparator((t0, t1) => {
         // desc
         return (t0.label < t1.label ? 1 : ((t0.label > t1.label) ? -1 : 0));
       });
@@ -463,7 +461,7 @@ describe('VirtualTileGrid', function() {
       expect(tileGrid.tiles[1]).toBe(tile0);
       expect(tileGrid.filteredTiles[0]).toBe(tile1);
       expect(tileGrid.filteredTiles[1]).toBe(tile0);
-      var $tiles = tileGrid.$container.children('.tile');
+      let $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(2);
       expect($tiles.eq(0).data('widget')).toBe(tile1);
       expect($tiles.eq(1).data('widget')).toBe(tile0);
@@ -483,21 +481,21 @@ describe('VirtualTileGrid', function() {
 
   });
 
-  describe('mouseDown', function() {
+  describe('mouseDown', () => {
 
-    describe('with multiSelect = true', function() {
+    describe('with multiSelect = true', () => {
 
-      describe('with CTRL pressed', function() {
+      describe('with CTRL pressed', () => {
 
-        it('on a deselected tile adds the tile to the selection, even if the selection is not in the view range', function() {
-          var tileGrid = createTileGrid(3, {
+        it('on a deselected tile adds the tile to the selection, even if the selection is not in the view range', () => {
+          let tileGrid = createTileGrid(3, {
             selectable: true,
             multiSelect: true,
             viewRange: 1
           });
           tileGrid.render();
-          var tile0 = tileGrid.tiles[0];
-          var tile2 = tileGrid.tiles[2];
+          let tile0 = tileGrid.tiles[0];
+          let tile2 = tileGrid.tiles[2];
           tileGrid.selectTile(tile0);
           expect(tile0.selected).toBe(true);
           expect(tile2.selected).toBe(false);
@@ -515,27 +513,25 @@ describe('VirtualTileGrid', function() {
     });
   });
 
-  describe('filter', function() {
+  describe('filter', () => {
 
-    it('removes not accepted elements', function() {
+    it('removes not accepted elements', () => {
       jasmine.clock().install();
-      var tileGrid = createTileGrid(3, {
+      let tileGrid = createTileGrid(3, {
         viewRangeSize: 1
       });
-      var tile0 = tileGrid.tiles[0];
-      var tile1 = tileGrid.tiles[1];
-      var tile2 = tileGrid.tiles[2];
+      let tile0 = tileGrid.tiles[0];
+      let tile1 = tileGrid.tiles[1];
+      let tile2 = tileGrid.tiles[2];
       tileGrid.render();
       expect(tileGrid.filteredTiles.length).toBe(3);
-      var $tiles = tileGrid.$container.children('.tile');
+      let $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(2);
       expect($tiles.eq(0).data('widget')).toBe(tile0);
       expect($tiles.eq(1).data('widget')).toBe(tile1);
 
-      var filter1 = {
-        accept: function(tile) {
-          return tile.label.indexOf('1') < 0;
-        }
+      let filter1 = {
+        accept: tile => tile.label.indexOf('1') < 0
       };
       tileGrid.addFilter(filter1);
       tileGrid.filter();
@@ -551,10 +547,8 @@ describe('VirtualTileGrid', function() {
       expect($tiles.eq(0).data('widget')).toBe(tile0);
       expect($tiles.eq(1).data('widget')).toBe(tile2);
 
-      var filter2 = {
-        accept: function(tile) {
-          return tile.label.indexOf('2') < 0;
-        }
+      let filter2 = {
+        accept: tile => tile.label.indexOf('2') < 0
       };
       tileGrid.addFilter(filter2);
       tileGrid.filter();
@@ -599,20 +593,20 @@ describe('VirtualTileGrid', function() {
       jasmine.clock().uninstall();
     });
 
-    it('considers newly inserted tiles', function() {
-      var tileGrid = createTileGrid(3, {
+    it('considers newly inserted tiles', () => {
+      let tileGrid = createTileGrid(3, {
         viewRangeSize: 1
       });
-      var tile3 = createTile({
+      let tile3 = createTile({
         label: 'Tile 3'
       });
-      var tile4 = createTile({
+      let tile4 = createTile({
         label: 'Tile 4'
       });
       expect(tileGrid.tiles.length).toBe(3);
 
-      var filter = {
-        accept: function(tile) {
+      let filter = {
+        accept: tile => {
           // Accept tile 1 and 4 only
           return tile.label.indexOf('1') >= 0 || tile.label.indexOf('4') >= 0;
         }
@@ -636,17 +630,17 @@ describe('VirtualTileGrid', function() {
       expect(tileGrid.filteredTiles.length).toBe(2);
       expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[1]);
       expect(tileGrid.filteredTiles[1]).toBe(tileGrid.tiles[4]);
-      var $tiles = tileGrid.$container.children('.tile');
+      let $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(2);
       expect($tiles.eq(0).data('widget')).toBe(tileGrid.tiles[1]);
       expect($tiles.eq(1).data('widget')).toBe(tileGrid.tiles[4]);
     });
 
-    it('applies the filters initially, if there is one', function() {
-      var tileGrid = createTileGrid(3, {
+    it('applies the filters initially, if there is one', () => {
+      let tileGrid = createTileGrid(3, {
         viewRangeSize: 1,
         filters: [{
-          accept: function(tile) {
+          accept: tile => {
             // Accept tile 1 only
             return tile.label.indexOf('1') >= 0;
           }
@@ -656,15 +650,15 @@ describe('VirtualTileGrid', function() {
       expect(tileGrid.tiles.length).toBe(3);
       expect(tileGrid.filteredTiles.length).toBe(1);
       expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[1]);
-      var $tiles = tileGrid.$container.children('.tile');
+      let $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(1);
       expect($tiles.eq(0).data('widget')).toBe(tileGrid.tiles[1]);
     });
 
-    it('applies the filters initially even if every tile is accepted', function() {
-      var tileGrid = createTileGrid(3, {
+    it('applies the filters initially even if every tile is accepted', () => {
+      let tileGrid = createTileGrid(3, {
         filters: [{
-          accept: function(tile) {
+          accept: tile => {
             // Accept all
             return true;
           }
@@ -677,15 +671,15 @@ describe('VirtualTileGrid', function() {
       expect(tileGrid.filteredTiles[2]).toBe(tileGrid.tiles[2]);
     });
 
-    it('updates empty marker', function() {
-      var tileGrid = createTileGrid(3, {
+    it('updates empty marker', () => {
+      let tileGrid = createTileGrid(3, {
         viewRangeSize: 1
       });
       tileGrid.render();
       expect(tileGrid.$container).not.toHaveClass('empty');
 
-      var filter = {
-        accept: function(tile) {
+      let filter = {
+        accept: tile => {
           // Accept none
           return false;
         }
@@ -699,17 +693,17 @@ describe('VirtualTileGrid', function() {
       expect(tileGrid.$container).not.toHaveClass('empty');
     });
 
-    it('updates view port if filter changed while container was invisible and scroll parent not at y=0', function() {
+    it('updates view port if filter changed while container was invisible and scroll parent not at y=0', () => {
       jasmine.clock().install();
-      var tileGrid = createTileGrid(3, {
+      let tileGrid = createTileGrid(3, {
         viewRangeSize: 1,
         scrollable: false
       });
-      var group = scout.create('Group', {
+      let group = scout.create('Group', {
         parent: session.desktop,
         body: tileGrid
       });
-      var accordion = scout.create('TileAccordion', {
+      let accordion = scout.create('TileAccordion', {
         parent: session.desktop,
         groups: [group]
       });
@@ -722,7 +716,7 @@ describe('VirtualTileGrid', function() {
 
       // Hide group
       group.setVisible(false);
-      var filter = {
+      let filter = {
         // Accept none
         accept: () => false
       };

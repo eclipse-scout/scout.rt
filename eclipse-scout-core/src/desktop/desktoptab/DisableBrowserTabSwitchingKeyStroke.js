@@ -41,7 +41,7 @@ export default class DisableBrowserTabSwitchingKeyStroke extends RangeKeyStroke 
    * @override KeyStroke.js
    */
   _isEnabled() {
-    var enabled = super._isEnabled();
+    let enabled = super._isEnabled();
     return enabled && this.field.selectViewTabsKeyStrokesEnabled;
   }
 

@@ -69,8 +69,8 @@ export default class LookupCall {
     return this
       .cloneForKey(key)
       .execute()
-      .then(function(result) {
-        var lookupRow = LookupCall.firstLookupRow(result);
+      .then(result => {
+        let lookupRow = LookupCall.firstLookupRow(result);
         return lookupRow ? lookupRow.text : '';
       });
   }

@@ -28,7 +28,7 @@ export default class NumberColumnUserFilter extends ColumnUserFilter {
    * @override ColumnUserFilter
    */
   createFilterAddedEventData() {
-    var data = super.createFilterAddedEventData();
+    let data = super.createFilterAddedEventData();
     data.numberFrom = this.numberFrom;
     data.numberTo = this.numberTo;
     return data;
@@ -45,7 +45,7 @@ export default class NumberColumnUserFilter extends ColumnUserFilter {
    * @override ColumnUserFilter
    */
   acceptByFields(key, normKey, row) {
-    var
+    let
       hasFrom = objects.isNumber(this.numberFrom),
       hasTo = objects.isNumber(this.numberTo);
     if (hasFrom && hasTo) {

@@ -19,7 +19,7 @@ export default class TableSpecHelper {
   }
 
   createModel(columns, rows) {
-    var model = createSimpleModel('Table', this.session);
+    let model = createSimpleModel('Table', this.session);
 
     // Server will never send undefined -> don't create model with undefined properties.
     if (rows) {
@@ -49,8 +49,8 @@ export default class TableSpecHelper {
   createModelRowByTexts(id, texts, withoutCells) {
     texts = arrays.ensure(texts);
 
-    var cells = [];
-    for (var i = 0; i < texts.length; i++) {
+    let cells = [];
+    for (let i = 0; i < texts.length; i++) {
       if (!withoutCells) {
         cells[i] = this.createModelCell(texts[i]);
       } else {
@@ -66,8 +66,8 @@ export default class TableSpecHelper {
    */
   createModelRowByValues(id, values) {
     values = arrays.ensure(values);
-    var cells = [];
-    for (var i = 0; i < values.length; i++) {
+    let cells = [];
+    for (let i = 0; i < values.length; i++) {
       cells[i] = this.createModelCell(values[i] + '', values[i]);
     }
     return this.createModelRow(id, cells);
@@ -84,7 +84,7 @@ export default class TableSpecHelper {
   }
 
   createModelCell(text, value) {
-    var cell = {};
+    let cell = {};
     if (text !== undefined) {
       cell.text = text;
     }
@@ -111,7 +111,7 @@ export default class TableSpecHelper {
       columnType = 'Column';
     }
 
-    var columns = [],
+    let columns = [],
       columnTypes = [];
     if (objects.isArray(columnType)) {
       if (columnType.length !== count) {
@@ -119,11 +119,11 @@ export default class TableSpecHelper {
       }
       columnTypes = columnType;
     } else {
-      for (var i = 0; i < count; i++) {
+      for (let i = 0; i < count; i++) {
         columnTypes.push(columnType);
       }
     }
-    for (var j = 0; j < count; j++) {
+    for (let j = 0; j < count; j++) {
       columns[j] = this.createModelColumn('col' + j, columnTypes[j]);
     }
     return columns;
@@ -136,18 +136,18 @@ export default class TableSpecHelper {
    * Otherwise the value is similar to 'cell0_0' if rowId is given, or 'cell0' if no rowId is given.
    */
   createModelCells(columns, rowId) {
-    var cells = [];
+    let cells = [];
     if (rowId === undefined) {
       rowId = '';
     }
 
     if (typeof columns === 'number') {
-      for (var i = 0; i < columns; i++) {
+      for (let i = 0; i < columns; i++) {
         cells[i] = this.createModelCell(rowId + '_' + i, 'cell' + rowId + '_' + i);
       }
     } else {
-      for (var j = 0; j < columns.length; j++) {
-        var value = 'cell' + rowId + j;
+      for (let j = 0; j < columns.length; j++) {
+        let value = 'cell' + rowId + j;
         if (columns[j].objectType === 'NumberColumn') {
           value = rowId + j;
         }
@@ -166,24 +166,24 @@ export default class TableSpecHelper {
       return;
     }
 
-    var rows = [];
-    for (var i = 0; i < rowCount; i++) {
+    let rows = [];
+    for (let i = 0; i < rowCount; i++) {
       rows[i] = this.createModelRow(null, this.createModelCells(columns, i), parentRow);
     }
     return rows;
   }
 
   createModelSingleColumnByTexts(texts) {
-    var rows = [];
-    for (var i = 0; i < texts.length; i++) {
+    let rows = [];
+    for (let i = 0; i < texts.length; i++) {
       rows.push(this.createModelRowByTexts(null, texts[i]));
     }
     return this.createModel(this.createModelColumns(1), rows);
   }
 
   createModelSingleColumnByValues(values, columnType) {
-    var rows = [];
-    for (var i = 0; i < values.length; i++) {
+    let rows = [];
+    for (let i = 0; i < values.length; i++) {
       rows.push(this.createModelRowByValues(null, values[i]));
     }
     return this.createModel(this.createModelColumns(1, columnType), rows);
@@ -194,40 +194,40 @@ export default class TableSpecHelper {
   }
 
   createTableWithOneColumn() {
-    var model = this.createModelFixture(1, 1);
+    let model = this.createModelFixture(1, 1);
     return this.createTable(model);
   }
 
   createModelSingleConfiguredCheckableColumn(rowCount) {
-    var cols = this.createModelColumns(1);
+    let cols = this.createModelColumns(1);
     cols[0].checkable = true;
     return this.createModel(cols, this.createModelRows(1, rowCount));
   }
 
   createTable(model) {
-    var defaults = {
+    let defaults = {
       parent: this.session.desktop
     };
     model = $.extend({}, defaults, model);
-    var table = new Table();
+    let table = new Table();
     table.init(model);
     return table;
   }
 
   createTableAdapter(model) {
-    var tableAdapter = new TableAdapter();
+    let tableAdapter = new TableAdapter();
     tableAdapter.init(model);
     return tableAdapter;
   }
 
   createColumnFilter(model) {
-    var filter = new TextColumnUserFilter();
+    let filter = new TextColumnUserFilter();
     filter.init(model);
     return filter;
   }
 
   createAndRegisterColumnFilter(model) {
-    var filter = this.createColumnFilter(model);
+    let filter = this.createColumnFilter(model);
     model.table.addFilter(filter);
     return filter;
   }
@@ -239,18 +239,18 @@ export default class TableSpecHelper {
   applyDisplayStyle(table) {
     table.$data.css('position', 'relative');
     table.$rows().each(function() {
-      var $row = $(this);
+      let $row = $(this);
       $row.css('display', 'table-row');
       $row.children('.table-cell').each(function() {
-        var $cell = $(this);
+        let $cell = $(this);
         $cell.css('display', 'table-cell');
       });
     });
   }
 
   getRowIds(rows) {
-    var rowIds = [];
-    for (var i = 0; i < rows.length; i++) {
+    let rowIds = [];
+    for (let i = 0; i < rows.length; i++) {
       rowIds.push(rows[i].id);
     }
     return rowIds;
@@ -262,10 +262,10 @@ export default class TableSpecHelper {
   }
 
   assertSelection(table, rows) {
-    var $selectedRows = table.$selectedRows();
+    let $selectedRows = table.$selectedRows();
     expect($selectedRows.length).toBe(rows.length);
 
-    var selectedRows = [];
+    let selectedRows = [];
     $selectedRows.each(function() {
       selectedRows.push($(this).data('row'));
 
@@ -284,27 +284,27 @@ export default class TableSpecHelper {
    */
   assertTextsInCells(rows, colIndex, texts) {
     expect(rows.length).toBe(texts.length);
-    for (var i = 0; i < rows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
       expect(rows[i].cells[colIndex].text).toBe(texts[i]);
     }
   }
 
   assertValuesInCells(rows, colIndex, values) {
     expect(rows.length).toBe(values.length);
-    for (var i = 0; i < rows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
       expect(rows[i].cells[colIndex].value).toBe(values[i]);
     }
   }
 
   assertDatesInCells(rows, colIndex, dates) {
     expect(rows.length).toBe(dates.length);
-    for (var i = 0; i < rows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
       expect(rows[i].cells[colIndex].value.getTime()).toBe(dates[i].getTime());
     }
   }
 
   assertSelectionEvent(id, rowIds) {
-    var event = new RemoteEvent(id, 'rowsSelected', {
+    let event = new RemoteEvent(id, 'rowsSelected', {
       rowIds: rowIds
     });
     expect(mostRecentJsonRequest()).toContainEvents(event);

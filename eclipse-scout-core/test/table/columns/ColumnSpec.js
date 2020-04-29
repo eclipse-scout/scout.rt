@@ -11,12 +11,12 @@
 import {scout} from '../../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-describe('Column', function() {
-  var session;
-  var helper;
-  var locale;
+describe('Column', () => {
+  let session;
+  let helper;
+  let locale;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
@@ -24,7 +24,7 @@ describe('Column', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
@@ -33,8 +33,8 @@ describe('Column', function() {
   /**
    * Test assumes that default values for horiz. alignment are set on cell object.
    */
-  it('considers horizontal alignment', function() {
-    var model = helper.createModelFixture(3, 2);
+  it('considers horizontal alignment', () => {
+    let model = helper.createModelFixture(3, 2);
     model.columns[1].horizontalAlignment = 0;
     model.columns[2].horizontalAlignment = 1;
 
@@ -44,16 +44,16 @@ describe('Column', function() {
     model.rows[1].cells[1].horizontalAlignment = 0;
     model.rows[1].cells[2].horizontalAlignment = 1;
 
-    var table = helper.createTable(model);
+    let table = helper.createTable(model);
     table.render();
 
-    var $headerItems = table.header.$container.find('.table-header-item');
-    var $headerItem0 = $headerItems.eq(0);
-    var $headerItem1 = $headerItems.eq(1);
-    var $headerItem2 = $headerItems.eq(2);
-    var $rows = table.$rows();
-    var $cells0 = $rows.eq(0).find('.table-cell');
-    var $cells1 = $rows.eq(1).find('.table-cell');
+    let $headerItems = table.header.$container.find('.table-header-item');
+    let $headerItem0 = $headerItems.eq(0);
+    let $headerItem1 = $headerItems.eq(1);
+    let $headerItem2 = $headerItems.eq(2);
+    let $rows = table.$rows();
+    let $cells0 = $rows.eq(0).find('.table-cell');
+    let $cells1 = $rows.eq(1).find('.table-cell');
 
     // Left
     expect($headerItem0).toHaveClass('halign-left');
@@ -89,33 +89,33 @@ describe('Column', function() {
     expect($cells1.eq(2)).toHaveClass('halign-right');
   });
 
-  it('converts linebreak into <br> in header cells', function() {
-    var model = helper.createModelFixture(3, 2);
+  it('converts linebreak into <br> in header cells', () => {
+    let model = helper.createModelFixture(3, 2);
     model.columns[0].text = 'header text';
     model.columns[1].text = 'header text\nNew line';
-    var table = helper.createTable(model);
+    let table = helper.createTable(model);
     table.render();
 
-    var $headerItems = table.header.$container.find('.table-header-item');
-    var $headerItem0Text = $headerItems.eq(0).children('.table-header-item-text');
-    var $headerItem1Text = $headerItems.eq(1).children('.table-header-item-text');
+    let $headerItems = table.header.$container.find('.table-header-item');
+    let $headerItem0Text = $headerItems.eq(0).children('.table-header-item-text');
+    let $headerItem1Text = $headerItems.eq(1).children('.table-header-item-text');
 
     expect($headerItem0Text.html()).toBe('header text');
     expect($headerItem1Text.html()).toBe('header text<br>New line');
   });
 
-  it('considers custom css class of a column', function() {
-    var model = helper.createModelFixture(3, 2);
+  it('considers custom css class of a column', () => {
+    let model = helper.createModelFixture(3, 2);
     model.columns[0].cssClass = 'abc';
 
-    var table = helper.createTable(model);
+    let table = helper.createTable(model);
     table.render();
 
-    var $headerItems = table.header.$container.find('.table-header-item');
-    var $headerItem0 = $headerItems.eq(0);
-    var $rows = table.$rows();
-    var $cells0 = $rows.eq(0).find('.table-cell');
-    var $cells1 = $rows.eq(1).find('.table-cell');
+    let $headerItems = table.header.$container.find('.table-header-item');
+    let $headerItem0 = $headerItems.eq(0);
+    let $rows = table.$rows();
+    let $cells0 = $rows.eq(0).find('.table-cell');
+    let $cells1 = $rows.eq(1).find('.table-cell');
 
     expect($headerItem0).not.toHaveClass('abc');
     expect($cells0.eq(0)).toHaveClass('abc');
@@ -124,19 +124,19 @@ describe('Column', function() {
     expect($cells1.eq(1)).not.toHaveClass('abc');
   });
 
-  it('considers custom css class of a column, as well for checkbox columns', function() {
-    var model = helper.createModelFixture(3, 2);
+  it('considers custom css class of a column, as well for checkbox columns', () => {
+    let model = helper.createModelFixture(3, 2);
     model.columns[0].cssClass = 'abc';
     model.columns[0].objectType = 'BooleanColumn';
 
-    var table = helper.createTable(model);
+    let table = helper.createTable(model);
     table.render();
 
-    var $headerItems = table.header.$container.find('.table-header-item');
-    var $headerItem0 = $headerItems.eq(0);
-    var $rows = table.$rows();
-    var $cells0 = $rows.eq(0).find('.table-cell');
-    var $cells1 = $rows.eq(1).find('.table-cell');
+    let $headerItems = table.header.$container.find('.table-header-item');
+    let $headerItem0 = $headerItems.eq(0);
+    let $rows = table.$rows();
+    let $cells0 = $rows.eq(0).find('.table-cell');
+    let $cells1 = $rows.eq(1).find('.table-cell');
 
     expect($headerItem0).not.toHaveClass('abc');
     expect($cells0.eq(0)).toHaveClass('abc');
@@ -145,19 +145,19 @@ describe('Column', function() {
     expect($cells1.eq(1)).not.toHaveClass('abc');
   });
 
-  it('considers custom css class of a cell, if both are set only the cell class is used', function() {
-    var model = helper.createModelFixture(3, 2);
+  it('considers custom css class of a cell, if both are set only the cell class is used', () => {
+    let model = helper.createModelFixture(3, 2);
     model.columns[0].cssClass = 'abc';
     model.rows[0].cells[0].cssClass = 'custom-cell-0';
 
-    var table = helper.createTable(model);
+    let table = helper.createTable(model);
     table.render();
 
-    var $headerItems = table.header.$container.find('.table-header-item');
-    var $headerItem0 = $headerItems.eq(0);
-    var $rows = table.$rows();
-    var $cells0 = $rows.eq(0).find('.table-cell');
-    var $cells1 = $rows.eq(1).find('.table-cell');
+    let $headerItems = table.header.$container.find('.table-header-item');
+    let $headerItem0 = $headerItems.eq(0);
+    let $rows = table.$rows();
+    let $cells0 = $rows.eq(0).find('.table-cell');
+    let $cells1 = $rows.eq(1).find('.table-cell');
 
     expect($headerItem0).not.toHaveClass('abc');
     expect($cells0.eq(0)).not.toHaveClass('abc');
@@ -168,29 +168,29 @@ describe('Column', function() {
     expect($cells1.eq(1)).not.toHaveClass('abc');
   });
 
-  it('considers htmlEnabled of a cell', function() {
-    var model = helper.createModelFixture(3, 2);
+  it('considers htmlEnabled of a cell', () => {
+    let model = helper.createModelFixture(3, 2);
     model.rows[0].cells[0].text = '<b>hi</b>';
     model.rows[0].cells[0].htmlEnabled = false;
     model.rows[0].cells[1].text = '<b>hi</b>';
     model.rows[0].cells[1].htmlEnabled = true;
 
-    var table = helper.createTable(model);
+    let table = helper.createTable(model);
     table.render();
 
-    var $rows = table.$rows();
-    var $cells0 = $rows.eq(0).find('.table-cell');
+    let $rows = table.$rows();
+    let $cells0 = $rows.eq(0).find('.table-cell');
 
     expect($cells0.eq(0).text()).toBe('<b>hi</b>');
     expect($cells0.eq(1).text()).toBe('hi');
   });
 
-  it('caches encoded text of a cell to improve performance', function() {
-    var model = helper.createModelFixture(3, 1);
+  it('caches encoded text of a cell to improve performance', () => {
+    let model = helper.createModelFixture(3, 1);
     model.rows[0].cells[0].text = '<b>hi</b>';
     model.rows[0].cells[0].htmlEnabled = false;
 
-    var table = helper.createTable(model);
+    let table = helper.createTable(model);
     expect(table.rows[0].cells[0].text).toBe('<b>hi</b>');
     expect(table.rows[0].cells[0]._cachedEncodedText).toBeFalsy();
 
@@ -199,7 +199,7 @@ describe('Column', function() {
     expect(table.rows[0].cells[0].text).toBe('<b>hi</b>');
     expect(table.rows[0].cells[0].encodedText()).toBe('&lt;b&gt;hi&lt;/b&gt;');
     expect(table.rows[0].$row.find('.table-cell').eq(0).text()).toBe('<b>hi</b>');
-    var firstElement = table.rows[0].cells[0]._cachedEncodedText;
+    let firstElement = table.rows[0].cells[0]._cachedEncodedText;
     expect(firstElement).not.toBeFalsy();
 
     // re render -> encode must not be called again
@@ -208,20 +208,20 @@ describe('Column', function() {
     expect(firstElement).toBe(table.rows[0].cells[0]._cachedEncodedText);
   });
 
-  describe('multilineText', function() {
-    it('replaces\n with br, but only if htmlEnabled is false', function() {
-      var model = helper.createModelFixture(3, 2);
+  describe('multilineText', () => {
+    it('replaces\n with br, but only if htmlEnabled is false', () => {
+      let model = helper.createModelFixture(3, 2);
       model.multilineText = true;
       model.rows[0].cells[0].text = '<br>hello\nyou';
       model.rows[0].cells[0].htmlEnabled = false;
       model.rows[0].cells[1].text = '<br>hello\nyou';
       model.rows[0].cells[1].htmlEnabled = true;
 
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render();
 
-      var $rows = table.$rows();
-      var $cells0 = $rows.eq(0).find('.table-cell');
+      let $rows = table.$rows();
+      let $cells0 = $rows.eq(0).find('.table-cell');
 
       expect($cells0.eq(0).html()).toBe('&lt;br&gt;hello<br>you');
       // No replacement, provided html should be left untouched
@@ -229,15 +229,15 @@ describe('Column', function() {
     });
   });
 
-  describe('textWrap', function() {
-    var table, model, $rows, $cells0, $cell0_0, $cell0_1;
+  describe('textWrap', () => {
+    let table, model, $rows, $cells0, $cell0_0, $cell0_1;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(2, 2);
       table = helper.createTable(model);
     });
 
-    it('wraps text if column.textWrap and table.multilineText are true', function() {
+    it('wraps text if column.textWrap and table.multilineText are true', () => {
       table.multilineText = true;
       table.columns[0].textWrap = true;
       table.render();
@@ -247,7 +247,7 @@ describe('Column', function() {
       expect($cell0_0).not.toHaveClass('white-space-nowrap');
     });
 
-    it('does not wrap text if column.textWrap is false and table.multilineText is true', function() {
+    it('does not wrap text if column.textWrap is false and table.multilineText is true', () => {
       table.multilineText = true;
       table.columns[0].textWrap = false;
       table.render();
@@ -257,7 +257,7 @@ describe('Column', function() {
       expect($cell0_0).toHaveClass('white-space-nowrap');
     });
 
-    it('does not wrap text if column.textWrap is true and table.multilineText is false', function() {
+    it('does not wrap text if column.textWrap is true and table.multilineText is false', () => {
       table.multilineText = false;
       table.columns[0].textWrap = true;
       table.render();
@@ -267,7 +267,7 @@ describe('Column', function() {
       expect($cell0_0).toHaveClass('white-space-nowrap');
     });
 
-    it('can be toggled on the fly', function() {
+    it('can be toggled on the fly', () => {
       table.multilineText = true;
       table.columns[0].textWrap = false;
       table.render();
@@ -287,93 +287,85 @@ describe('Column', function() {
     });
   });
 
-  describe('initCell', function() {
-    var table, model;
+  describe('initCell', () => {
+    let table, model;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(1, 0);
       table = helper.createTable(model);
     });
 
-    it('sets the value and the text', function() {
+    it('sets the value and the text', () => {
       table.insertRows([{
         cells: ['cell 1']
       }]);
-      var row = table.rows[0];
+      let row = table.rows[0];
       expect(row.cells[0].value).toEqual('cell 1');
       expect(row.cells[0].text).toEqual('cell 1');
     });
 
-    it('calls formatValue to format the text', function() {
-      table.columns[0]._formatValue = function(value) {
-        return value.toUpperCase();
-      };
+    it('calls formatValue to format the text', () => {
+      table.columns[0]._formatValue = value => value.toUpperCase();
       table.insertRows([{
         cells: ['cell 1']
       }]);
-      var row = table.rows[0];
+      let row = table.rows[0];
       expect(row.cells[0].value).toEqual('cell 1');
       expect(row.cells[0].text).toEqual('CELL 1');
     });
 
-    it('calls formatValue to format the text, also for cell objects', function() {
-      table.columns[0]._formatValue = function(value) {
-        return value.toUpperCase();
-      };
+    it('calls formatValue to format the text, also for cell objects', () => {
+      table.columns[0]._formatValue = value => value.toUpperCase();
       table.insertRows([{
         cells: [scout.create('Cell', {
           value: 'cell 1'
         })]
       }]);
-      var row = table.rows[0];
+      let row = table.rows[0];
       expect(row.cells[0].value).toEqual('cell 1');
       expect(row.cells[0].text).toEqual('CELL 1');
     });
 
-    it('does not format the value if a text is provided', function() {
-      table.columns[0]._formatValue = function(value) {
-        return value.toUpperCase();
-      };
+    it('does not format the value if a text is provided', () => {
+      table.columns[0]._formatValue = value => value.toUpperCase();
       table.insertRows([{
         cells: [scout.create('Cell', {
           value: 'cell 1',
           text: 'cell text 1'
         })]
       }]);
-      var row = table.rows[0];
+      let row = table.rows[0];
       expect(row.cells[0].value).toEqual('cell 1');
       expect(row.cells[0].text).toEqual('cell text 1');
     });
 
-    it('sets the value to null if only text is provided', function() {
-      table.columns[0]._formatValue = function(value) {
-        return value.toUpperCase();
-      };
+    it('sets the value to null if only text is provided', () => {
+      table.columns[0]._formatValue = value => value.toUpperCase();
       table.insertRows([{
         cells: [scout.create('Cell', {
           text: 'cell text 1'
         })]
       }]);
-      var row = table.rows[0];
+      let row = table.rows[0];
       expect(row.cells[0].value).toEqual(null);
       expect(row.cells[0].text).toEqual('cell text 1');
     });
 
   });
 
-  describe('setCellValue', function() {
-    var table, model;
+  describe('setCellValue', () => {
+    let table, model;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(2, 0);
       table = helper.createTable(model);
     });
 
-    it('sets the value and the text', function() {
+    it('sets the value and the text', () => {
       table.insertRows([{
         cells: ['cell 1', 'cell 2']
       }]);
-      var row = table.rows[0];
+      let row = table.rows[0];
       expect(row.cells[0].value).toEqual('cell 1');
       expect(row.cells[0].text).toEqual('cell 1');
 
@@ -382,14 +374,12 @@ describe('Column', function() {
       expect(row.cells[0].text).toEqual('new cell value');
     });
 
-    it('calls formatValue to format the text', function() {
-      table.columns[0]._formatValue = function(value) {
-        return value.toUpperCase();
-      };
+    it('calls formatValue to format the text', () => {
+      table.columns[0]._formatValue = value => value.toUpperCase();
       table.insertRows([{
         cells: ['cell 1', 'cell 2']
       }]);
-      var row = table.rows[0];
+      let row = table.rows[0];
       expect(row.cells[0].value).toEqual('cell 1');
       expect(row.cells[0].text).toEqual('CELL 1');
 
@@ -400,35 +390,35 @@ describe('Column', function() {
 
   });
 
-  describe('cell getters', function() {
+  describe('cell getters', () => {
 
-    it('cell() should return cell of given row', function() {
-      var model = helper.createModelFixture(3, 2);
-      var table = helper.createTable(model);
-      var row1 = table.rows[1];
-      var column1 = table.columns[1];
-      var cell1 = row1.cells[1];
+    it('cell() should return cell of given row', () => {
+      let model = helper.createModelFixture(3, 2);
+      let table = helper.createTable(model);
+      let row1 = table.rows[1];
+      let column1 = table.columns[1];
+      let cell1 = row1.cells[1];
       expect(column1.cell(row1)).toBe(cell1);
     });
 
-    it('selectedCell() should return cell from selected row', function() {
-      var model = helper.createModelFixture(3, 2);
-      var table = helper.createTable(model);
-      var row1 = table.rows[1];
-      var column1 = table.columns[1];
-      var cell1 = row1.cells[1];
+    it('selectedCell() should return cell from selected row', () => {
+      let model = helper.createModelFixture(3, 2);
+      let table = helper.createTable(model);
+      let row1 = table.rows[1];
+      let column1 = table.columns[1];
+      let cell1 = row1.cells[1];
       table.selectRows([row1]);
       expect(column1.selectedCell()).toBe(cell1);
     });
 
   });
 
-  describe('autoOptimizeWidth', function() {
+  describe('autoOptimizeWidth', () => {
 
-    it('will resize the column to fit its content after layouting', function() {
-      var model = helper.createModelFixture(3, 2);
+    it('will resize the column to fit its content after layouting', () => {
+      let model = helper.createModelFixture(3, 2);
       model.columns[1].autoOptimizeWidth = true;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       spyOn(table, 'resizeToFit').and.callThrough();
       table.render();
       expect(table.columns[0].autoOptimizeWidth).toBe(false);
@@ -442,11 +432,11 @@ describe('Column', function() {
       expect(table.resizeToFit.calls.count()).toBe(1);
     });
 
-    it('also works if there is no header', function() {
-      var model = helper.createModelFixture(3, 2);
+    it('also works if there is no header', () => {
+      let model = helper.createModelFixture(3, 2);
       model.columns[1].autoOptimizeWidth = true;
       model.headerVisible = false;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       spyOn(table, 'resizeToFit').and.callThrough();
       table.render();
       expect(table.resizeToFit).not.toHaveBeenCalled();
@@ -456,11 +446,11 @@ describe('Column', function() {
       expect(table.resizeToFit.calls.count()).toBe(1);
     });
 
-    it('considers images', function() {
-      var model = helper.createModelFixture(3, 2);
+    it('considers images', () => {
+      let model = helper.createModelFixture(3, 2);
       model.columns[1].autoOptimizeWidth = true;
       model.rows[0].cells[1].iconId = 'fancyIcon.png';
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       spyOn(table, 'resizeToFit').and.callThrough();
       spyOn(table, '_resizeToFit').and.callThrough();
       table.render();
@@ -479,12 +469,12 @@ describe('Column', function() {
       expect(table._resizeToFit.calls.count()).toBe(1);
     });
 
-    describe('autoOptimizeWidthRequired', function() {
-      it('will be set to true if a row is updated and the content changed', function() {
-        var model = helper.createModelFixture(3, 2);
+    describe('autoOptimizeWidthRequired', () => {
+      it('will be set to true if a row is updated and the content changed', () => {
+        let model = helper.createModelFixture(3, 2);
         model.columns[0].autoOptimizeWidth = true;
         model.columns[1].autoOptimizeWidth = true;
-        var table = helper.createTable(model);
+        let table = helper.createTable(model);
         table.render();
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(true);
         expect(table.columns[1].autoOptimizeWidthRequired).toBe(true);
@@ -514,11 +504,11 @@ describe('Column', function() {
         expect(table.resizeToFit.calls.count()).toBe(1);
       });
 
-      it('will be set to true if a row is inserted', function() {
-        var model = helper.createModelFixture(3, 2);
+      it('will be set to true if a row is inserted', () => {
+        let model = helper.createModelFixture(3, 2);
         model.columns[0].autoOptimizeWidth = true;
         model.columns[1].autoOptimizeWidth = true;
-        var table = helper.createTable(model);
+        let table = helper.createTable(model);
         table.render();
         table.validateLayout();
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
@@ -532,11 +522,11 @@ describe('Column', function() {
         expect(table.resizeToFit.calls.count()).toBe(2);
       });
 
-      it('will be set to true if a row is deleted', function() {
-        var model = helper.createModelFixture(3, 2);
+      it('will be set to true if a row is deleted', () => {
+        let model = helper.createModelFixture(3, 2);
         model.columns[0].autoOptimizeWidth = true;
         model.columns[1].autoOptimizeWidth = true;
-        var table = helper.createTable(model);
+        let table = helper.createTable(model);
         table.render();
         table.validateLayout();
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
@@ -550,11 +540,11 @@ describe('Column', function() {
         expect(table.resizeToFit.calls.count()).toBe(2);
       });
 
-      it('will be set to true if all rows are deleted', function() {
-        var model = helper.createModelFixture(3, 2);
+      it('will be set to true if all rows are deleted', () => {
+        let model = helper.createModelFixture(3, 2);
         model.columns[0].autoOptimizeWidth = true;
         model.columns[1].autoOptimizeWidth = true;
-        var table = helper.createTable(model);
+        let table = helper.createTable(model);
         table.render();
         table.validateLayout();
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
@@ -568,9 +558,9 @@ describe('Column', function() {
         expect(table.resizeToFit.calls.count()).toBe(2);
       });
 
-      it('will be set to true if autoOptimizeWidth is set dynamically', function() {
-        var model = helper.createModelFixture(3, 2);
-        var table = helper.createTable(model);
+      it('will be set to true if autoOptimizeWidth is set dynamically', () => {
+        let model = helper.createModelFixture(3, 2);
+        let table = helper.createTable(model);
         table.render();
         table.validateLayout();
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
@@ -595,11 +585,11 @@ describe('Column', function() {
 
   });
 
-  describe('displayable', function() {
+  describe('displayable', () => {
 
-    it('if set to false, column may not be made visible', function() {
-      var model = helper.createModelFixture(3, 2);
-      var table = helper.createTable(model);
+    it('if set to false, column may not be made visible', () => {
+      let model = helper.createModelFixture(3, 2);
+      let table = helper.createTable(model);
       expect(table.columns[0].visible).toBe(true);
       expect(table.columns[0].displayable).toBe(true);
       expect(table.columns[0].isVisible()).toBe(true);
@@ -619,8 +609,8 @@ describe('Column', function() {
     });
   });
 
-  it('isContentValid', function() {
-    var table = helper.createTable({
+  it('isContentValid', () => {
+    let table = helper.createTable({
       columns: [{
         objectType: 'Column',
         mandatory: true
@@ -629,8 +619,8 @@ describe('Column', function() {
     table.insertRow({
       cells: [null]
     });
-    var column = table.columns[0];
-    var row = table.rows[0];
+    let column = table.columns[0];
+    let row = table.rows[0];
     expect(column.isContentValid(row).valid).toBe(false);
     column.setCellValue(row, 'foo');
     expect(column.isContentValid(row).valid).toBe(true);

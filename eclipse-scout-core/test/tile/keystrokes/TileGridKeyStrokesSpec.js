@@ -10,10 +10,10 @@
  */
 import {arrays, keys, scout} from '../../../src/index';
 
-describe('TileGridKeyStrokes', function() {
-  var session;
+describe('TileGridKeyStrokes', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     // Set a fixed width to prevent tiles from wrapping on small screens (e.g. PhantomJS)
@@ -26,14 +26,14 @@ describe('TileGridKeyStrokes', function() {
   });
 
   function createTileGrid(numTiles, model) {
-    var tiles = [];
-    for (var i = 0; i < numTiles; i++) {
+    let tiles = [];
+    for (let i = 0; i < numTiles; i++) {
       tiles.push({
         objectType: 'Tile',
         label: 'Tile ' + i
       });
     }
-    var defaults = {
+    let defaults = {
       parent: session.desktop,
       tiles: tiles
     };
@@ -42,19 +42,19 @@ describe('TileGridKeyStrokes', function() {
   }
 
   function createTile(model) {
-    var defaults = {
+    let defaults = {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
     return scout.create('Tile', model);
   }
 
-  describe('ctrl + a', function() {
-    it('selects all tiles', function() {
-      var tileGrid = createTileGrid(3, {
+  describe('ctrl + a', () => {
+    it('selects all tiles', () => {
+      let tileGrid = createTileGrid(3, {
         selectable: true
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
 
@@ -70,8 +70,8 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.A, 'ctrl');
     });
 
-    it('deselects all tiles if tiles are already selected', function() {
-      var tileGrid = createTileGrid(3, {
+    it('deselects all tiles if tiles are already selected', () => {
+      let tileGrid = createTileGrid(3, {
         selectable: true
       });
       tileGrid.render();
@@ -93,12 +93,12 @@ describe('TileGridKeyStrokes', function() {
 
   });
 
-  describe('key right', function() {
-    it('selects the next tile', function() {
-      var tileGrid = createTileGrid(4, {
+  describe('key right', () => {
+    it('selects the next tile', () => {
+      let tileGrid = createTileGrid(4, {
         selectable: true
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[1]);
@@ -112,11 +112,11 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.RIGHT);
     });
 
-    it('selects the first tile if no tile is selected yet', function() {
-      var tileGrid = createTileGrid(4, {
+    it('selects the first tile if no tile is selected yet', () => {
+      let tileGrid = createTileGrid(4, {
         selectable: true
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
 
@@ -125,11 +125,11 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.RIGHT);
     });
 
-    it('does nothing if the last tile is already selected', function() {
-      var tileGrid = createTileGrid(4, {
+    it('does nothing if the last tile is already selected', () => {
+      let tileGrid = createTileGrid(4, {
         selectable: true
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(arrays.last(tiles));
@@ -139,11 +139,11 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.RIGHT);
     });
 
-    it('selects the only tile if there is only one', function() {
-      var tileGrid = createTileGrid(1, {
+    it('selects the only tile if there is only one', () => {
+      let tileGrid = createTileGrid(1, {
         selectable: true
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
 
@@ -162,12 +162,12 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.RIGHT);
     });
 
-    describe('with shift', function() {
-      it('adds the next tile to the selection', function() {
-        var tileGrid = createTileGrid(4, {
+    describe('with shift', () => {
+      it('adds the next tile to the selection', () => {
+        let tileGrid = createTileGrid(4, {
           selectable: true
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTile(tiles[1]);
@@ -181,11 +181,11 @@ describe('TileGridKeyStrokes', function() {
         tileGrid.$container.triggerKeyUpCapture(keys.RIGHT, 'shift');
       });
 
-      it('removes the next tile from the selection if the focused tile is the first tile of the selection', function() {
-        var tileGrid = createTileGrid(4, {
+      it('removes the next tile from the selection if the focused tile is the first tile of the selection', () => {
+        let tileGrid = createTileGrid(4, {
           selectable: true
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[0], tiles[1], tiles[2]]);
@@ -201,11 +201,11 @@ describe('TileGridKeyStrokes', function() {
         expect(tileGrid.selectedTiles).toEqual([tiles[2], tiles[3]]);
       });
 
-      it('does nothing if the last tile is already selected', function() {
-        var tileGrid = createTileGrid(4, {
+      it('does nothing if the last tile is already selected', () => {
+        let tileGrid = createTileGrid(4, {
           selectable: true
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTile(tiles[2]);
@@ -219,18 +219,18 @@ describe('TileGridKeyStrokes', function() {
         tileGrid.$container.triggerKeyUpCapture(keys.RIGHT, 'shift');
       });
 
-      it('adds the correct tile to the selection if the focused tile gets invisible', function() {
-        var tileGrid = createTileGrid(4, {
+      it('adds the correct tile to the selection if the focused tile gets invisible', () => {
+        let tileGrid = createTileGrid(4, {
           selectable: true
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[0], tiles[1]]);
         tileGrid.focusedTile = tiles[0];
 
-        var filter = {
-          accept: function(tile) {
+        let filter = {
+          accept: tile => {
             return tile !== tiles[0]; // Make tile 0 invisible
           }
         };
@@ -243,11 +243,11 @@ describe('TileGridKeyStrokes', function() {
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2]]);
       });
 
-      it('connects two selections blocks and sets the focused tile to the beginning of the new block', function() {
-        var tileGrid = createTileGrid(6, {
+      it('connects two selections blocks and sets the focused tile to the beginning of the new block', () => {
+        let tileGrid = createTileGrid(6, {
           selectable: true
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[4]]);
@@ -268,12 +268,12 @@ describe('TileGridKeyStrokes', function() {
     });
   });
 
-  describe('key left', function() {
-    it('selects the previous tile', function() {
-      var tileGrid = createTileGrid(4, {
+  describe('key left', () => {
+    it('selects the previous tile', () => {
+      let tileGrid = createTileGrid(4, {
         selectable: true
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[2]);
@@ -287,11 +287,11 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.LEFT);
     });
 
-    it('selects the last tile if no tile is selected yet', function() {
-      var tileGrid = createTileGrid(4, {
+    it('selects the last tile if no tile is selected yet', () => {
+      let tileGrid = createTileGrid(4, {
         selectable: true
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
 
@@ -300,11 +300,11 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.LEFT);
     });
 
-    it('does nothing if the first tile is already selected', function() {
-      var tileGrid = createTileGrid(4, {
+    it('does nothing if the first tile is already selected', () => {
+      let tileGrid = createTileGrid(4, {
         selectable: true
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[0]);
@@ -314,11 +314,11 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.LEFT);
     });
 
-    it('selects the only tile if there is only one', function() {
-      var tileGrid = createTileGrid(1, {
+    it('selects the only tile if there is only one', () => {
+      let tileGrid = createTileGrid(1, {
         selectable: true
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
 
@@ -337,12 +337,12 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.LEFT);
     });
 
-    describe('with shift', function() {
-      it('adds the previous tile to the selection', function() {
-        var tileGrid = createTileGrid(4, {
+    describe('with shift', () => {
+      it('adds the previous tile to the selection', () => {
+        let tileGrid = createTileGrid(4, {
           selectable: true
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTile(tiles[3]);
@@ -356,11 +356,11 @@ describe('TileGridKeyStrokes', function() {
         tileGrid.$container.triggerKeyUpCapture(keys.LEFT, 'shift');
       });
 
-      it('does nothing if the first tile is already selected', function() {
-        var tileGrid = createTileGrid(4, {
+      it('does nothing if the first tile is already selected', () => {
+        let tileGrid = createTileGrid(4, {
           selectable: true
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTile(tiles[1]);
@@ -374,11 +374,11 @@ describe('TileGridKeyStrokes', function() {
         tileGrid.$container.triggerKeyUpCapture(keys.LEFT, 'shift');
       });
 
-      it('removes the previous tile from the selection if the next tile is already selected', function() {
-        var tileGrid = createTileGrid(4, {
+      it('removes the previous tile from the selection if the next tile is already selected', () => {
+        let tileGrid = createTileGrid(4, {
           selectable: true
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[2], tiles[3]]);
@@ -394,18 +394,18 @@ describe('TileGridKeyStrokes', function() {
         expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1]]);
       });
 
-      it('adds the correct tile to the selection if the focused tile gets invisible', function() {
-        var tileGrid = createTileGrid(4, {
+      it('adds the correct tile to the selection if the focused tile gets invisible', () => {
+        let tileGrid = createTileGrid(4, {
           selectable: true
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[2]]);
         tileGrid.focusedTile = tiles[2];
 
-        var filter = {
-          accept: function(tile) {
+        let filter = {
+          accept: tile => {
             return tile !== tiles[2]; // Make tile 2 invisible
           }
         };
@@ -418,11 +418,11 @@ describe('TileGridKeyStrokes', function() {
         expect(tileGrid.selectedTiles).toEqual([tiles[0], tiles[1]]);
       });
 
-      it('connects two selections blocks and sets the focused tile to the beginning of the new block', function() {
-        var tileGrid = createTileGrid(5, {
+      it('connects two selections blocks and sets the focused tile to the beginning of the new block', () => {
+        let tileGrid = createTileGrid(5, {
           selectable: true
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[4]]);
@@ -445,13 +445,13 @@ describe('TileGridKeyStrokes', function() {
 
   });
 
-  describe('key down', function() {
-    it('selects the tile below', function() {
-      var tileGrid = createTileGrid(8, {
+  describe('key down', () => {
+    it('selects the tile below', () => {
+      let tileGrid = createTileGrid(8, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[0]);
@@ -465,12 +465,12 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.DOWN);
     });
 
-    it('selects the first tile if no tile is selected yet', function() {
-      var tileGrid = createTileGrid(8, {
+    it('selects the first tile if no tile is selected yet', () => {
+      let tileGrid = createTileGrid(8, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
 
@@ -479,12 +479,12 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.DOWN);
     });
 
-    it('does nothing if a tile in the last row is already selected', function() {
-      var tileGrid = createTileGrid(8, {
+    it('does nothing if a tile in the last row is already selected', () => {
+      let tileGrid = createTileGrid(8, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[6]);
@@ -501,12 +501,12 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.DOWN);
     });
 
-    it('selects the only tile if there is only one', function() {
-      var tileGrid = createTileGrid(1, {
+    it('selects the only tile if there is only one', () => {
+      let tileGrid = createTileGrid(1, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
 
@@ -525,12 +525,12 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.DOWN);
     });
 
-    it('selects the last tile if below the focused tile is no tile', function() {
-      var tileGrid = createTileGrid(5, {
+    it('selects the last tile if below the focused tile is no tile', () => {
+      let tileGrid = createTileGrid(5, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.selectTile(tiles[2]);
       tileGrid.render();
       tileGrid.validateLayout();
@@ -540,13 +540,13 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.DOWN);
     });
 
-    describe('with shift', function() {
-      it('adds the tiles between the focused and the newly focused tile to the selection', function() {
-        var tileGrid = createTileGrid(9, {
+    describe('with shift', () => {
+      it('adds the tiles between the focused and the newly focused tile to the selection', () => {
+        let tileGrid = createTileGrid(9, {
           selectable: true,
           gridColumnCount: 3
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTile(tiles[1]);
@@ -558,12 +558,12 @@ describe('TileGridKeyStrokes', function() {
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
       });
 
-      it('removes the tiles between the focused and the newly focused tiles from the selection if the focused tile is the first tile of the selection', function() {
-        var tileGrid = createTileGrid(9, {
+      it('removes the tiles between the focused and the newly focused tiles from the selection if the focused tile is the first tile of the selection', () => {
+        let tileGrid = createTileGrid(9, {
           selectable: true,
           gridColumnCount: 3
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
@@ -576,12 +576,12 @@ describe('TileGridKeyStrokes', function() {
         expect(tileGrid.selectedTiles).toEqual([tiles[7]]);
       });
 
-      it('does nothing if a tile in the last row is already selected', function() {
-        var tileGrid = createTileGrid(5, {
+      it('does nothing if a tile in the last row is already selected', () => {
+        let tileGrid = createTileGrid(5, {
           selectable: true,
           gridColumnCount: 3
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[2], tiles[3]]);
@@ -590,19 +590,19 @@ describe('TileGridKeyStrokes', function() {
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3]]);
       });
 
-      it('adds the correct tile to the selection if the focused tile gets invisible', function() {
-        var tileGrid = createTileGrid(9, {
+      it('adds the correct tile to the selection if the focused tile gets invisible', () => {
+        let tileGrid = createTileGrid(9, {
           selectable: true,
           gridColumnCount: 3
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[2], tiles[3], tiles[4]]);
         tileGrid.focusedTile = tiles[2];
 
-        var filter = {
-          accept: function(tile) {
+        let filter = {
+          accept: tile => {
             return tile !== tiles[2]; // Make tile 2 invisible
           }
         };
@@ -615,12 +615,12 @@ describe('TileGridKeyStrokes', function() {
         expect(tileGrid.selectedTiles).toEqual([tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
       });
 
-      it('connects two selections blocks and sets the focused tile to the beginning of the new block', function() {
-        var tileGrid = createTileGrid(9, {
+      it('connects two selections blocks and sets the focused tile to the beginning of the new block', () => {
+        let tileGrid = createTileGrid(9, {
           selectable: true,
           gridColumnCount: 3
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[0], tiles[1], tiles[5]]);
@@ -639,13 +639,13 @@ describe('TileGridKeyStrokes', function() {
 
   });
 
-  describe('key up', function() {
-    it('selects the tile above', function() {
-      var tileGrid = createTileGrid(8, {
+  describe('key up', () => {
+    it('selects the tile above', () => {
+      let tileGrid = createTileGrid(8, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(arrays.last(tiles));
@@ -659,12 +659,12 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.UP);
     });
 
-    it('selects the last tile if no tile is selected yet', function() {
-      var tileGrid = createTileGrid(8, {
+    it('selects the last tile if no tile is selected yet', () => {
+      let tileGrid = createTileGrid(8, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
 
@@ -673,12 +673,12 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.UP);
     });
 
-    it('does nothing if a tile in the first row is already selected', function() {
-      var tileGrid = createTileGrid(8, {
+    it('does nothing if a tile in the first row is already selected', () => {
+      let tileGrid = createTileGrid(8, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[2]);
@@ -695,12 +695,12 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.UP);
     });
 
-    it('selects the only tile if there is only one', function() {
-      var tileGrid = createTileGrid(1, {
+    it('selects the only tile if there is only one', () => {
+      let tileGrid = createTileGrid(1, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
 
@@ -719,13 +719,13 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.UP);
     });
 
-    describe('with shift', function() {
-      it('adds the tiles between the focused and the newly focused tile to the selection', function() {
-        var tileGrid = createTileGrid(9, {
+    describe('with shift', () => {
+      it('adds the tiles between the focused and the newly focused tile to the selection', () => {
+        let tileGrid = createTileGrid(9, {
           selectable: true,
           gridColumnCount: 3
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTile(tiles[7]);
@@ -737,12 +737,12 @@ describe('TileGridKeyStrokes', function() {
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
       });
 
-      it('removes the tiles between the focused and the newly focused tiles from the selection if the focused tile is the first tile of the selection', function() {
-        var tileGrid = createTileGrid(9, {
+      it('removes the tiles between the focused and the newly focused tiles from the selection if the focused tile is the first tile of the selection', () => {
+        let tileGrid = createTileGrid(9, {
           selectable: true,
           gridColumnCount: 3
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
@@ -755,12 +755,12 @@ describe('TileGridKeyStrokes', function() {
         expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
       });
 
-      it('does nothing if a tile in the first row is already selected', function() {
-        var tileGrid = createTileGrid(5, {
+      it('does nothing if a tile in the first row is already selected', () => {
+        let tileGrid = createTileGrid(5, {
           selectable: true,
           gridColumnCount: 3
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[1], tiles[2], tiles[3]]);
@@ -770,19 +770,19 @@ describe('TileGridKeyStrokes', function() {
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3]]);
       });
 
-      it('adds the correct tile to the selection if the focused tile gets invisible', function() {
-        var tileGrid = createTileGrid(9, {
+      it('adds the correct tile to the selection if the focused tile gets invisible', () => {
+        let tileGrid = createTileGrid(9, {
           selectable: true,
           gridColumnCount: 3
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[4], tiles[5], tiles[6]]);
         tileGrid.focusedTile = tiles[6];
 
-        var filter = {
-          accept: function(tile) {
+        let filter = {
+          accept: tile => {
             return tile !== tiles[6]; // Make tile 6 invisible
           }
         };
@@ -795,12 +795,12 @@ describe('TileGridKeyStrokes', function() {
         expect(tileGrid.selectedTiles).toEqual([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5]]);
       });
 
-      it('connects two selections blocks and sets the focused tile to the beginning of the new block', function() {
-        var tileGrid = createTileGrid(9, {
+      it('connects two selections blocks and sets the focused tile to the beginning of the new block', () => {
+        let tileGrid = createTileGrid(9, {
           selectable: true,
           gridColumnCount: 3
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[3], tiles[7], tiles[8]]);
@@ -818,13 +818,13 @@ describe('TileGridKeyStrokes', function() {
     });
   });
 
-  describe('home', function() {
-    it('selects the first tile', function() {
-      var tileGrid = createTileGrid(8, {
+  describe('home', () => {
+    it('selects the first tile', () => {
+      let tileGrid = createTileGrid(8, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[1]);
@@ -834,11 +834,11 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.HOME);
     });
 
-    it('does nothing if the first tile is already selected', function() {
-      var tileGrid = createTileGrid(4, {
+    it('does nothing if the first tile is already selected', () => {
+      let tileGrid = createTileGrid(4, {
         selectable: true
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(tiles[0]);
@@ -848,12 +848,12 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.HOME);
     });
 
-    it('selects only the first tile if first and other tiles are selected', function() {
-      var tileGrid = createTileGrid(8, {
+    it('selects only the first tile if first and other tiles are selected', () => {
+      let tileGrid = createTileGrid(8, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTiles([tiles[0], tiles[1]]);
@@ -864,12 +864,12 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.HOME);
     });
 
-    it('selects the only tile if there is only one', function() {
-      var tileGrid = createTileGrid(1, {
+    it('selects the only tile if there is only one', () => {
+      let tileGrid = createTileGrid(1, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
 
@@ -888,13 +888,13 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.HOME);
     });
 
-    describe('with shift', function() {
-      it('adds the tiles between the focused and the newly focused tile to the selection', function() {
-        var tileGrid = createTileGrid(9, {
+    describe('with shift', () => {
+      it('adds the tiles between the focused and the newly focused tile to the selection', () => {
+        let tileGrid = createTileGrid(9, {
           selectable: true,
           gridColumnCount: 3
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[6], tiles[7]]);
@@ -906,13 +906,13 @@ describe('TileGridKeyStrokes', function() {
 
   });
 
-  describe('end', function() {
-    it('selects the last tile', function() {
-      var tileGrid = createTileGrid(8, {
+  describe('end', () => {
+    it('selects the last tile', () => {
+      let tileGrid = createTileGrid(8, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
 
@@ -921,11 +921,11 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.END);
     });
 
-    it('does nothing if the first tile is already selected', function() {
-      var tileGrid = createTileGrid(4, {
+    it('does nothing if the first tile is already selected', () => {
+      let tileGrid = createTileGrid(4, {
         selectable: true
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTile(arrays.last(tiles));
@@ -935,12 +935,12 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.END);
     });
 
-    it('selects only the last tile if last and other tiles are selected', function() {
-      var tileGrid = createTileGrid(4, {
+    it('selects only the last tile if last and other tiles are selected', () => {
+      let tileGrid = createTileGrid(4, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
       tileGrid.selectTiles([tiles[2], tiles[3]]);
@@ -951,12 +951,12 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.END);
     });
 
-    it('selects the only tile if there is only one', function() {
-      var tileGrid = createTileGrid(1, {
+    it('selects the only tile if there is only one', () => {
+      let tileGrid = createTileGrid(1, {
         selectable: true,
         gridColumnCount: 3
       });
-      var tiles = tileGrid.tiles;
+      let tiles = tileGrid.tiles;
       tileGrid.render();
       tileGrid.validateLayout();
 
@@ -975,13 +975,13 @@ describe('TileGridKeyStrokes', function() {
       tileGrid.$container.triggerKeyUpCapture(keys.END);
     });
 
-    describe('with shift', function() {
-      it('adds the tiles between the focused and the newly focused tile to the selection', function() {
-        var tileGrid = createTileGrid(9, {
+    describe('with shift', () => {
+      it('adds the tiles between the focused and the newly focused tile to the selection', () => {
+        let tileGrid = createTileGrid(9, {
           selectable: true,
           gridColumnCount: 3
         });
-        var tiles = tileGrid.tiles;
+        let tiles = tileGrid.tiles;
         tileGrid.render();
         tileGrid.validateLayout();
         tileGrid.selectTiles([tiles[4], tiles[5]]);

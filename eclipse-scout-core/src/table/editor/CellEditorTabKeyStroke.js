@@ -20,19 +20,19 @@ export default class CellEditorTabKeyStroke extends KeyStroke {
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     return accepted && !this.field.isCompleteCellEditRequested(); // Make sure events (complete, prepare) don't get sent twice since it will lead to exceptions. This may happen if user presses and holds the tab key.
   }
 
   handle(event) {
-    var pos,
+    let pos,
       backwards = event.shiftKey,
       table = this.field.table,
       column = this.field.column,
       row = this.field.row;
 
     this.field.completeEdit()
-      .then(function() {
+      .then(() => {
         pos = table.nextEditableCellPos(column, row, backwards);
         if (pos) {
           table.prepareCellEdit(pos.column, pos.row);

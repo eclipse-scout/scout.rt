@@ -17,7 +17,7 @@ import {scout} from '../../../index';
  */
 export function createTableRow(lookupRow, multipleColumns) {
   multipleColumns = scout.nvl(multipleColumns, false);
-  var cells = [],
+  let cells = [],
     row = {
       cells: cells,
       lookupRow: lookupRow
@@ -43,7 +43,7 @@ export function createTableRow(lookupRow, multipleColumns) {
  * Creates a table cell for a descriptor. If no descriptor is provided, the default lookupRow cell is created.
  */
 export function createTableCell(lookupRow, desc, tableRowData) {
-  var cell = scout.create('Cell');
+  let cell = scout.create('Cell');
 
   // default column descriptor (first column) has propertyName null
   if (!(desc && desc.propertyName)) {

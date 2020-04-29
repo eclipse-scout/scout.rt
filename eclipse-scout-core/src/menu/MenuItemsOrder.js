@@ -20,12 +20,12 @@ export default class MenuItemsOrder {
   }
 
   order(items) {
-    var buttons = [],
+    let buttons = [],
       emptySpaceItems = [],
       selectionItems = [],
       rightItems = [];
 
-    var isEmptyspaceMenuVisible = false,
+    let isEmptyspaceMenuVisible = false,
       isSelectionMenuVisible = false;
     items.forEach(function(item) {
       // skip separators added dynamically by this class
@@ -62,7 +62,7 @@ export default class MenuItemsOrder {
   }
 
   _menuTypes(types) {
-    var i, menuTypes = [];
+    let i, menuTypes = [];
     types = types || [];
     for (i = 0; i < types.length; i++) {
       menuTypes.push(this.objectType + '.' + types[i]);

@@ -11,27 +11,27 @@
 import {HtmlComponent} from '../../../../src/index';
 import {TabBoxSpecHelper} from '@eclipse-scout/testing';
 
-describe('TabItem', function() {
-  var session;
-  var helper;
+describe('TabItem', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TabBoxSpecHelper(session);
   });
 
-  describe('_renderStatusVisible', function() {
-    var tabBox;
+  describe('_renderStatusVisible', () => {
+    let tabBox;
 
-    beforeEach(function() {
-      var tabItem = helper.createTabItem({
+    beforeEach(() => {
+      let tabItem = helper.createTabItem({
         label: 'Foo'
       });
       tabBox = helper.createTabBoxWith([tabItem]);
     });
 
-    it('invalidates tabarea if status visibility changes', function() {
+    it('invalidates tabarea if status visibility changes', () => {
       tabBox.render();
       tabBox.validateLayout();
       expect(HtmlComponent.get(tabBox.header.tabArea.$container).valid).toBe(true);
@@ -45,10 +45,10 @@ describe('TabItem', function() {
 
   });
 
-  describe('_renderCssClass', function() {
-    var tabItem, tabBox, tab;
+  describe('_renderCssClass', () => {
+    let tabItem, tabBox, tab;
 
-    beforeEach(function() {
+    beforeEach(() => {
       tabItem = helper.createTabItem({
         cssClass: 'foo1'
       });
@@ -57,7 +57,7 @@ describe('TabItem', function() {
       tab = tabBox.header.tabArea.tabs[0];
     });
 
-    it('adds CSS class to both, TabItem and GroupBox', function() {
+    it('adds CSS class to both, TabItem and GroupBox', () => {
       // Test initial CSS class
       expect(tab.$container.hasClass('foo1')).toBe(true);
       expect(tabItem.$container.hasClass('foo1')).toBe(true);

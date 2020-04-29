@@ -10,12 +10,12 @@
  */
 import {arrays} from '../../src/index';
 
-describe('scout.arrays', function() {
+describe('scout.arrays', () => {
 
-  describe('init', function() {
+  describe('init', () => {
 
-    it('checks whether array has correct length and initial values', function() {
-      var i, arr = arrays.init(5, 'foo');
+    it('checks whether array has correct length and initial values', () => {
+      let i, arr = arrays.init(5, 'foo');
       expect(arr.length).toBe(5);
       for (i = 0; i < arr.length; i++) {
         expect(arr[i]).toBe('foo');
@@ -24,9 +24,9 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('ensure', function() {
+  describe('ensure', () => {
 
-    it('creates an array if the param is not an array', function() {
+    it('creates an array if the param is not an array', () => {
       expect(arrays.ensure()).toEqual([]);
       expect(arrays.ensure(undefined)).toEqual([]);
       expect(arrays.ensure(null)).toEqual([]);
@@ -35,23 +35,23 @@ describe('scout.arrays', function() {
       expect(arrays.ensure(false)).toEqual([false]);
     });
 
-    it('returns the param if the param already is an array', function() {
-      var arr = [];
+    it('returns the param if the param already is an array', () => {
+      let arr = [];
       expect(arrays.ensure(arr)).toBe(arr);
       arr = [0, 1];
       expect(arrays.ensure(arr)).toBe(arr);
     });
   });
 
-  describe('remove', function() {
+  describe('remove', () => {
 
-    it('removes elements', function() {
+    it('removes elements', () => {
       // Ensure empty arguments are supported
       expect(arrays.remove()).toBe(false);
       expect(arrays.remove([])).toBe(false);
       expect(arrays.remove([], 'x')).toBe(false);
 
-      var arr = ['a', 'b', 'c', 'a', 'd']; // 'a' is two times in the list
+      let arr = ['a', 'b', 'c', 'a', 'd']; // 'a' is two times in the list
 
       expect(arrays.remove(arr, 'y')).toBe(false);
       expect(arr).toEqual(['a', 'b', 'c', 'a', 'd']);
@@ -73,10 +73,10 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('removeAll', function() {
+  describe('removeAll', () => {
 
-    it('removes all given elements', function() {
-      var arr = ['a', 'b', 'c', 'a', 'd']; // 'a' is two times in the list
+    it('removes all given elements', () => {
+      let arr = ['a', 'b', 'c', 'a', 'd']; // 'a' is two times in the list
 
       expect(arrays.removeAll(arr, ['y'])).toBe(false);
       expect(arr).toEqual(['a', 'b', 'c', 'a', 'd']);
@@ -94,7 +94,8 @@ describe('scout.arrays', function() {
       expect(arr).toEqual([]);
     });
 
-    it('considers emtpy args', function() {
+    it('considers emtpy args', () => {
+      // noinspection JSCheckFunctionSignatures
       expect(arrays.removeAll()).toBe(false);
       expect(arrays.removeAll([])).toBe(false);
       expect(arrays.removeAll([], [])).toBe(false);
@@ -103,10 +104,10 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('replace', function() {
+  describe('replace', () => {
 
-    it('replaces elements', function() {
-      var arr = ['a', 'b', 'c', 'd'];
+    it('replaces elements', () => {
+      let arr = ['a', 'b', 'c', 'd'];
 
       arrays.replace(arr, 'c', 'x');
       expect(arr).toEqual(['a', 'b', 'x', 'd']);
@@ -116,10 +117,10 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('insert', function() {
+  describe('insert', () => {
 
-    it('insert element at index', function() {
-      var arr = ['a', 'b', 'c', 'd'];
+    it('insert element at index', () => {
+      let arr = ['a', 'b', 'c', 'd'];
       arrays.insert(arr, 'e', 0);
       expect(arr).toEqual(['e', 'a', 'b', 'c', 'd']);
 
@@ -134,10 +135,10 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('insertAll', function() {
+  describe('insertAll', () => {
 
-    it('insert element array at index', function() {
-      var arr = ['a', 'b', 'c', 'd'];
+    it('insert element array at index', () => {
+      let arr = ['a', 'b', 'c', 'd'];
       arrays.insertAll(arr, ['e', 'f', 'g'], 0);
       expect(arr).toEqual(['e', 'f', 'g', 'a', 'b', 'c', 'd']);
 
@@ -152,20 +153,16 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('insertSorted', function() {
+  describe('insertSorted', () => {
 
-    it('inserts element at correct position', function() {
-      var compareOrdered = function(a, b) {
-        return a.order < b.order ? -1 : (a.order > b.order ? 1 : 0);
-      };
-      var flat = function(arr) {
-        return arr.map(function(el) {
-          return el.text;
-        }).join(', ');
-      };
+    it('inserts element at correct position', () => {
+      let compareOrdered = (a, b) => a.order < b.order ? -1 : (a.order > b.order ? 1 : 0);
+      let flat = arr => arr.map(el => {
+        return el.text;
+      }).join(', ');
 
       // Without duplicates
-      var arr = [];
+      let arr = [];
       arrays.insertSorted(arr, {order: 10, text: 'A'}, compareOrdered);
       arrays.insertSorted(arr, {order: 20, text: 'B'}, compareOrdered);
       arrays.insertSorted(arr, {order: 5, text: 'C'}, compareOrdered);
@@ -195,52 +192,44 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('max', function() {
-    it('returns 0 iff input contains 0', function() {
+  describe('max', () => {
+    it('returns 0 iff input contains 0', () => {
       expect(arrays.max([null, 5])).toBe(5);
       expect(arrays.max([null, 0])).toBe(0);
       expect(arrays.max([null, -13])).toBe(-13);
     });
 
-    it('behaves like Math.max on null and undefined', function() {
-      var doTest = function(arr) {
-        expect(arrays.max(arr)).toBe(Math.max.apply(Math, arr));
-      };
-
-      doTest(null);
-      doTest(undefined);
+    it('behaves like Math.max on null and undefined', () => {
+      expect(arrays.max(null)).toEqual(Math.max(null));
+      expect(arrays.max(undefined)).toEqual(Math.max(undefined));
     });
 
-    it('ignores non-number elements', function() {
+    it('ignores non-number elements', () => {
       expect(arrays.max([null, 5, 6.7, false, undefined, NaN, {}, 'batman'])).toBe(6.7);
     });
   });
 
-  describe('min', function() {
-    it('returns 0 iff input contains 0', function() {
+  describe('min', () => {
+    it('returns 0 iff input contains 0', () => {
       expect(arrays.min([null, 5])).toBe(5);
       expect(arrays.min([null, 0])).toBe(0);
       expect(arrays.min([null, -13])).toBe(-13);
     });
 
-    it('behaves like Math.min on null and undefined', function() {
-      var doTest = function(arr) {
-        expect(arrays.min(arr)).toBe(Math.min.apply(Math, arr));
-      };
-
-      doTest(null);
-      doTest(undefined);
+    it('behaves like Math.min on null and undefined', () => {
+      expect(arrays.min(null)).toEqual(Math.min(null));
+      expect(arrays.min(undefined)).toEqual(Math.min(undefined));
     });
 
-    it('ignores non-number elements', function() {
+    it('ignores non-number elements', () => {
       expect(arrays.min([null, 5, 6.7, false, undefined, NaN, {}, 'batman'])).toBe(5);
     });
   });
 
-  describe('move', function() {
+  describe('move', () => {
 
-    it('replaces elements', function() {
-      var arr = ['a', 'b', 'c', 'd'];
+    it('replaces elements', () => {
+      let arr = ['a', 'b', 'c', 'd'];
       arrays.move(arr, 0, 1);
       expect(arr).toEqual(['b', 'a', 'c', 'd']);
 
@@ -259,57 +248,57 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('union', function() {
+  describe('union', () => {
 
-    it('merges two arrays', function() {
-      var arr1 = ['a', 'b', 'c'];
-      var arr2 = ['d', 'e', 'f'];
+    it('merges two arrays', () => {
+      let arr1 = ['a', 'b', 'c'];
+      let arr2 = ['d', 'e', 'f'];
 
       expect(arrays.union(arr1, arr2)).toEqual(['a', 'b', 'c', 'd', 'e', 'f']);
     });
 
-    it('merges two arrays and removes duplicates', function() {
-      var arr1 = ['a', 'b', 'c'];
-      var arr2 = ['d', 'a', 'e'];
+    it('merges two arrays and removes duplicates', () => {
+      let arr1 = ['a', 'b', 'c'];
+      let arr2 = ['d', 'a', 'e'];
 
       expect(arrays.union(arr1, arr2)).toEqual(['a', 'b', 'c', 'd', 'e']);
     });
 
-    it('also works with floats', function() {
-      var arr1 = [1.5, 2];
-      var arr2 = [1.5, 30];
+    it('also works with floats', () => {
+      let arr1 = [1.5, 2];
+      let arr2 = [1.5, 30];
 
       expect(arrays.union(arr1, arr2)).toEqual([1.5, 2, 30]);
     });
 
-    it('if the arrays contain objects instead of primitives, it uses their id to check for equality', function() {
-      var obj1 = {
+    it('if the arrays contain objects instead of primitives, it uses their id to check for equality', () => {
+      let obj1 = {
         id: '1'
       };
-      var obj2 = {
+      let obj2 = {
         id: '2'
       };
-      var obj3 = {
+      let obj3 = {
         id: '3'
       };
-      var arr1 = [obj1, obj2];
-      var arr2 = [obj2, obj3, obj1];
+      let arr1 = [obj1, obj2];
+      let arr2 = [obj2, obj3, obj1];
 
       expect(arrays.union(arr1, arr2)).toEqual([obj1, obj2, obj3]);
     });
 
-    it('does not fail if arr1 or arr2 are not defined', function() {
+    it('does not fail if arr1 or arr2 are not defined', () => {
       expect(arrays.union(null, ['d', 'e', 'f'])).toEqual(['d', 'e', 'f']);
       expect(arrays.union(['d', 'e', 'f'], null)).toEqual(['d', 'e', 'f']);
       expect(arrays.union(null, null)).toEqual([]);
     });
   });
 
-  describe('equals', function() {
+  describe('equals', () => {
 
-    it('checks whether two arrays contain the same elements in the same order', function() {
-      var arr1 = ['a', 'b', 'c'];
-      var arr2 = ['a', 'b', 'c'];
+    it('checks whether two arrays contain the same elements in the same order', () => {
+      let arr1 = ['a', 'b', 'c'];
+      let arr2 = ['a', 'b', 'c'];
       expect(arrays.equals(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a', 'b', 'c'];
@@ -333,9 +322,9 @@ describe('scout.arrays', function() {
       expect(arrays.equals(arr1, arr2)).toBeFalsy();
     });
 
-    it('considers emtpy and same arrays', function() {
-      var arr1 = [];
-      var arr2 = ['b', 'a', 'b'];
+    it('considers emtpy and same arrays', () => {
+      let arr1 = [];
+      let arr2 = ['b', 'a', 'b'];
       expect(arrays.equals(arr1, arr2)).toBeFalsy();
 
       arr1 = ['a'];
@@ -351,9 +340,9 @@ describe('scout.arrays', function() {
       expect(arrays.equals(arr1, arr2)).toBeTruthy();
     });
 
-    it('returns true if one array is undefined/null and the other empty', function() {
-      var arr1 = [];
-      var arr2;
+    it('returns true if one array is undefined/null and the other empty', () => {
+      let arr1 = [];
+      let arr2;
       expect(arrays.equals(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a'];
@@ -371,11 +360,11 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('equalsIgnoreOrder', function() {
+  describe('equalsIgnoreOrder', () => {
 
-    it('checks whether two arrays contain the same elements without considering the order', function() {
-      var arr1 = ['a', 'b', 'c'];
-      var arr2 = ['b', 'a', 'b'];
+    it('checks whether two arrays contain the same elements without considering the order', () => {
+      let arr1 = ['a', 'b', 'c'];
+      let arr2 = ['b', 'a', 'b'];
       expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a', 'b', 'c'];
@@ -395,9 +384,9 @@ describe('scout.arrays', function() {
       expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
     });
 
-    it('considers emtpy and same arrays', function() {
-      var arr1 = [];
-      var arr2 = ['b', 'a', 'b'];
+    it('considers emtpy and same arrays', () => {
+      let arr1 = [];
+      let arr2 = ['b', 'a', 'b'];
       expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
 
       arr1 = ['a'];
@@ -413,9 +402,9 @@ describe('scout.arrays', function() {
       expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
     });
 
-    it('returns true if one array is undefined/null and the other empty', function() {
-      var arr1 = [];
-      var arr2;
+    it('returns true if one array is undefined/null and the other empty', () => {
+      let arr1 = [];
+      let arr2;
       expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a'];
@@ -433,20 +422,20 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('findIndex', function() {
+  describe('findIndex', () => {
 
-    it('returns the index of the element for which the given predicate returns true', function() {
-      var arr = ['a', 'b', 'c', 'd'];
+    it('returns the index of the element for which the given predicate returns true', () => {
+      let arr = ['a', 'b', 'c', 'd'];
 
       expect(arrays.findIndex()).toBe(-1);
       expect(arrays.findIndex()).toBe(-1);
 
-      var index = arrays.findIndex(arr, function(element) {
+      let index = arrays.findIndex(arr, element => {
         return element === 'c';
       });
       expect(index).toBe(2);
 
-      index = arrays.findIndex(arr, function(element) {
+      index = arrays.findIndex(arr, element => {
         return element === 'z';
       });
       expect(index).toBe(-1);
@@ -454,20 +443,20 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('find', function() {
+  describe('find', () => {
 
-    it('returns the element for which the given predicate returns true', function() {
-      var arr = ['a', 'b', 'c', 'd'];
+    it('returns the element for which the given predicate returns true', () => {
+      let arr = ['a', 'b', 'c', 'd'];
 
       expect(arrays.find()).toBe(null);
       expect(arrays.find(arr)).toBe(null);
 
-      var element = arrays.find(arr, function(element) {
+      let element = arrays.find(arr, element => {
         return element === 'c';
       });
       expect(element).toBe('c');
 
-      element = arrays.find(arr, function(element) {
+      element = arrays.find(arr, element => {
         return element === 'z';
       });
       expect(element).toBeFalsy();
@@ -475,68 +464,68 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('findFrom', function() {
+  describe('findFrom', () => {
 
-    it('returns the element for which the given predicate returns true, starting from a given index', function() {
-      var arr = ['a', 'b', 'c', 'd'];
+    it('returns the element for which the given predicate returns true, starting from a given index', () => {
+      let arr = ['a', 'b', 'c', 'd'];
 
       expect(arrays.find()).toBe(null);
       expect(arrays.find(arr)).toBe(null);
 
-      var element = arrays.findFrom(arr, 1, function(element) {
+      let element = arrays.findFrom(arr, 1, element => {
         return element === 'c';
       });
       expect(element).toBe('c');
 
-      element = arrays.findFrom(arr, 1, function(element) {
+      element = arrays.findFrom(arr, 1, element => {
         return element === 'z';
       });
       expect(element).toBeFalsy();
     });
 
-    it('does not return the element for which the given predicate returns true, if it is on the left side of the start index', function() {
-      var arr = ['a', 'b', 'c', 'd'];
+    it('does not return the element for which the given predicate returns true, if it is on the left side of the start index', () => {
+      let arr = ['a', 'b', 'c', 'd'];
 
-      var element = arrays.findFrom(arr, 1, function(element) {
+      let element = arrays.findFrom(arr, 1, element => {
         return element === 'a';
       });
       expect(element).toBeFalsy();
     });
 
-    it('also checks the element at start index ', function() {
-      var arr = ['a', 'b', 'c', 'd'];
+    it('also checks the element at start index ', () => {
+      let arr = ['a', 'b', 'c', 'd'];
 
-      var element = arrays.findFrom(arr, 1, function(element) {
+      let element = arrays.findFrom(arr, 1, element => {
         return element === 'b';
       });
       expect(element).toBeTruthy();
 
       // edge cases
-      element = arrays.findFrom(arr, 0, function(element) {
+      element = arrays.findFrom(arr, 0, element => {
         return element === 'a';
       });
       expect(element).toBeTruthy();
 
-      element = arrays.findFrom(arr, 3, function(element) {
+      element = arrays.findFrom(arr, 3, element => {
         return element === 'd';
       });
       expect(element).toBeTruthy();
 
-      element = arrays.findFrom(arr, 3, function(element) {
+      element = arrays.findFrom(arr, 3, element => {
         return element === 'z';
       });
       expect(element).toBeFalsy();
     });
 
-    it('searches from right to left if backwards is true', function() {
-      var arr = ['a', 'b', 'c', 'd'];
+    it('searches from right to left if backwards is true', () => {
+      let arr = ['a', 'b', 'c', 'd'];
 
-      var element = arrays.findFrom(arr, 2, function(element) {
+      let element = arrays.findFrom(arr, 2, element => {
         return element === 'a';
       }, true);
       expect(element).toBeTruthy();
 
-      element = arrays.findFrom(arr, 2, function(element) {
+      element = arrays.findFrom(arr, 2, element => {
         return element === 'd';
       }, true);
       expect(element).toBeFalsy();
@@ -544,10 +533,10 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('format', function() {
+  describe('format', () => {
 
-    it('formats an array by concatenating each entry', function() {
-      var arr = ['a', 'b', 'c', 'd'];
+    it('formats an array by concatenating each entry', () => {
+      let arr = ['a', 'b', 'c', 'd'];
       expect(arrays.format(arr)).toBe('abcd');
       expect(arrays.format(arr, '_')).toBe('a_b_c_d');
 
@@ -560,20 +549,23 @@ describe('scout.arrays', function() {
       expect(arrays.format(arr, '_')).toBe('abc');
     });
 
-    it('returns \'\' for empty array or if no array was provided', function() {
-      var arr = [];
+    it('returns \'\' for empty array or if no array was provided', () => {
+      let arr = [];
       expect(arrays.format(arr)).toBe('');
+      // noinspection JSCheckFunctionSignatures
       expect(arrays.format()).toBe('');
     });
 
   });
 
-  describe('formatEncoded', function() {
+  describe('formatEncoded', () => {
 
-    it('encodes the html of each array element', function() {
-      var arr = ['<span>a</span>', 'b', 'c<p>', '<script>d</script>'];
+    it('encodes the html of each array element', () => {
+      // noinspection BadExpressionStatementJS
+      let arr = ['<span>a</span>', 'b', 'c<p>', '<script>d</script>'];
       expect(arrays.formatEncoded(arr, '<br>')).toBe('&lt;span&gt;a&lt;/span&gt;<br>b<br>c&lt;p&gt;<br>&lt;script&gt;d&lt;/script&gt;');
 
+      // noinspection JSUnresolvedVariable
       arr = ['abc', '<script>def'];
       expect(arrays.formatEncoded(arr)).toBe('abc&lt;script&gt;def');
       expect(arrays.formatEncoded(arr, '<br>')).toBe('abc<br>&lt;script&gt;def');
@@ -585,9 +577,9 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('first', function() {
+  describe('first', () => {
 
-    it('finds first array element', function() {
+    it('finds first array element', () => {
       expect(arrays.first()).toBe(undefined);
       expect(arrays.first('test')).toBe('test');
       expect(arrays.first({
@@ -604,9 +596,9 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('last', function() {
+  describe('last', () => {
 
-    it('finds last array element', function() {
+    it('finds last array element', () => {
       expect(arrays.last()).toBe(undefined);
       expect(arrays.last('test')).toBe('test');
       expect(arrays.last({
@@ -623,10 +615,10 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('pushIfDefined', function() {
+  describe('pushIfDefined', () => {
 
-    it('pushes element only if it is defined', function() {
-      var arr = null;
+    it('pushes element only if it is defined', () => {
+      let arr = null;
 
       // expect no errors:
       arrays.pushIfDefined();
@@ -661,10 +653,10 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('pushSet', function() {
+  describe('pushSet', () => {
 
-    it('only pushes the element if it is truthy and does not already exist in the array', function() {
-      var arr = [1, 2, 3];
+    it('only pushes the element if it is truthy and does not already exist in the array', () => {
+      let arr = [1, 2, 3];
       arrays.pushSet(arr, 1);
       expect(arr).toEqual([1, 2, 3]);
 
@@ -679,11 +671,11 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('diff', function() {
+  describe('diff', () => {
 
-    it('returns all elements of the first array which are not in the second array', function() {
-      var arr1 = ['a', 'b', 'b1', 'c'];
-      var arr2 = ['b', 'c', 'c1', 'd'];
+    it('returns all elements of the first array which are not in the second array', () => {
+      let arr1 = ['a', 'b', 'b1', 'c'];
+      let arr2 = ['b', 'c', 'c1', 'd'];
 
       expect(arrays.diff(arr1, arr2)).toEqual(['a', 'b1']);
       expect(arrays.diff(arr2, arr1)).toEqual(['c1', 'd']);
@@ -691,15 +683,15 @@ describe('scout.arrays', function() {
 
   });
 
-  describe('flatMap', function() {
+  describe('flatMap', () => {
 
-    it('returns flat list of all merged array elements', function() {
-      var arr = [
+    it('returns flat list of all merged array elements', () => {
+      let arr = [
         'a b c',
         '1 2',
         'x'
       ];
-      var result = arrays.flatMap(arr, function(text) {
+      let result = arrays.flatMap(arr, text => {
         return text.split(' ');
       });
       expect(['a', 'b', 'c', '1', '2', 'x']).toEqual(result);

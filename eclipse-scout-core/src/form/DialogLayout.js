@@ -23,7 +23,7 @@ export default class DialogLayout extends FormLayout {
       return;
     }
 
-    var currentBounds,
+    let currentBounds,
       htmlComp = this.form.htmlComp,
       cacheBounds = this.form.readCacheBounds(),
       dialogMargins = htmlComp.margins(),
@@ -34,7 +34,7 @@ export default class DialogLayout extends FormLayout {
     } else {
       currentBounds = htmlComp.bounds();
     }
-    var dialogSize = this._calcSize($container, currentBounds, cacheBounds);
+    let dialogSize = this._calcSize($container, currentBounds, cacheBounds);
 
     // Add markers to be able to style the dialog in a different way when it uses the full width or height
     $container
@@ -63,7 +63,7 @@ export default class DialogLayout extends FormLayout {
    *          adjusted size excluding margins (suitable to pass to graphics.setSize())
    */
   _calcSize($container, currentBounds, cacheBounds) {
-    var dialogSize,
+    let dialogSize,
       htmlComp = this.form.htmlComp,
       dialogMargins = htmlComp.margins(),
       windowSize = $container.windowSize();
@@ -108,11 +108,11 @@ export default class DialogLayout extends FormLayout {
     // class .dialog may specify a margin
     // currentBounds.y and x are 0 initially, but if size changes while dialog is open they are greater than 0
     // This guarantees the dialog size may not exceed the document size
-    var maxWidth = (windowSize.width - containerMargins.horizontal() - containerPosition.x);
-    var maxHeight = (windowSize.height - containerMargins.vertical() - containerPosition.y);
+    let maxWidth = (windowSize.width - containerMargins.horizontal() - containerPosition.x);
+    let maxHeight = (windowSize.height - containerMargins.vertical() - containerPosition.y);
 
     // Calculate new dialog size, ensuring that the dialog is not larger than container
-    var size = new Dimension();
+    let size = new Dimension();
     size.width = Math.min(maxWidth, containerSize.width);
     size.height = Math.min(maxHeight, containerSize.height);
 
@@ -127,14 +127,14 @@ export default class DialogLayout extends FormLayout {
    * @static
    */
   static positionContainerInWindow($container) {
-    var
+    let
       windowSize = $container.windowSize(),
       containerSize = HtmlComponent.get($container).size(true),
       left = (windowSize.width - containerSize.width) / 2,
       top = (windowSize.height - containerSize.height) / 2;
 
     // optical middle (move up 20% of distance between window and dialog)
-    var opticalMiddleOffset = (top / 5);
+    let opticalMiddleOffset = (top / 5);
     top -= opticalMiddleOffset;
 
     // Ensure integer numbers

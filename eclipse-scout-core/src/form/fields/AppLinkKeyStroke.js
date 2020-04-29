@@ -26,7 +26,7 @@ export default class AppLinkKeyStroke extends KeyStroke {
    * @override KeyStroke.js
    */
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     return accepted && $(event.target).hasClass('app-link');
   }
 

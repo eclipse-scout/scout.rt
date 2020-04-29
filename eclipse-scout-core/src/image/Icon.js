@@ -95,13 +95,13 @@ export default class Icon extends Widget {
       prepend: this.prepend
     });
     this.image.render(this.$parent);
-    this.image.one('destroy', function() {
+    this.image.one('destroy', () => {
       this.image = null;
-    }.bind(this));
-    this.image.on('load error', function(event) {
+    });
+    this.image.on('load error', event => {
       // propagate event
       this.trigger(event.type, event);
-    }.bind(this));
+    });
     this.$container = this.image.$container;
     this.htmlComp = this.image.htmlComp;
   }

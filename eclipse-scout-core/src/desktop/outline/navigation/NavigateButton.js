@@ -62,7 +62,7 @@ export default class NavigateButton extends Menu {
   }
 
   _setDetailVisible() {
-    var detailVisible = this._toggleDetail();
+    let detailVisible = this._toggleDetail();
     $.log.isDebugEnabled() && $.log.debug('show detail-' + (detailVisible ? 'form' : 'table'));
     this.outline.setDetailFormVisibleByUi(this.node, detailVisible);
   }

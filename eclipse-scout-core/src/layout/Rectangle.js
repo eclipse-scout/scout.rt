@@ -113,8 +113,8 @@ export default class Rectangle {
   }
 
   union(r) {
-    var tx2 = this.width;
-    var ty2 = this.height;
+    let tx2 = this.width;
+    let ty2 = this.height;
     if (tx2 < 0 || ty2 < 0) {
       // This rectangle has negative dimensions...
       // If r has non-negative dimensions then it is the answer.
@@ -124,17 +124,17 @@ export default class Rectangle {
       // Either way, r is our answer.
       return new Rectangle(r.x, r.y, r.width, r.height);
     }
-    var rx2 = r.width;
-    var ry2 = r.height;
+    let rx2 = r.width;
+    let ry2 = r.height;
     if (rx2 < 0 || ry2 < 0) {
       return new Rectangle(this.x, this.y, this.width, this.height);
     }
-    var tx1 = this.x;
-    var ty1 = this.y;
+    let tx1 = this.x;
+    let ty1 = this.y;
     tx2 += tx1;
     ty2 += ty1;
-    var rx1 = r.x;
-    var ry1 = r.y;
+    let rx1 = r.x;
+    let ry1 = r.y;
     rx2 += rx1;
     ry2 += ry1;
     if (tx1 > rx1) {

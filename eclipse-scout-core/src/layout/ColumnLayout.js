@@ -26,18 +26,18 @@ export default class ColumnLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var htmlComp = HtmlComponent.get($container);
-    var containerSize = htmlComp.availableSize()
+    let htmlComp = HtmlComponent.get($container);
+    let containerSize = htmlComp.availableSize()
       .subtract(htmlComp.insets());
 
-    $container.children().each(function(i, elem) {
-      var $elem = $(elem);
-      var htmlChild = HtmlComponent.optGet($elem);
+    $container.children().each((i, elem) => {
+      let $elem = $(elem);
+      let htmlChild = HtmlComponent.optGet($elem);
       if (!htmlChild || !$elem.isVisible()) {
         return;
       }
 
-      var childPrefSize = htmlChild.prefSize({
+      let childPrefSize = htmlChild.prefSize({
         useCssSize: true
       });
 
@@ -56,24 +56,24 @@ export default class ColumnLayout extends AbstractLayout {
       } else {
         htmlChild.setSize(childPrefSize);
       }
-    }.bind(this));
+    });
   }
 
   preferredLayoutSize($container, options) {
-    var prefSize = new Dimension(),
+    let prefSize = new Dimension(),
       htmlContainer = HtmlComponent.get($container),
       childOptions = {
         useCssSize: true
       };
 
-    $container.children().each(function(i, elem) {
-      var $elem = $(elem);
-      var htmlChild = HtmlComponent.optGet($elem);
+    $container.children().each((i, elem) => {
+      let $elem = $(elem);
+      let htmlChild = HtmlComponent.optGet($elem);
       if (!htmlChild || !$elem.isVisible()) {
         return;
       }
 
-      var childPrefSize = htmlChild.prefSize(childOptions);
+      let childPrefSize = htmlChild.prefSize(childOptions);
       // Use layout data width if set
       if (htmlChild.layoutData && htmlChild.layoutData.widthHint) {
         childPrefSize.width = htmlChild.layoutData.widthHint;

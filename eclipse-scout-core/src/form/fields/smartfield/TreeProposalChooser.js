@@ -17,7 +17,7 @@ export default class TreeProposalChooser extends ProposalChooser {
   }
 
   _createModel() {
-    var tree = scout.create('Tree', {
+    let tree = scout.create('Tree', {
       parent: this,
       requestFocusOnNodeControlMouseDown: false,
       scrollToSelection: true
@@ -39,7 +39,7 @@ export default class TreeProposalChooser extends ProposalChooser {
   }
 
   getSelectedLookupRow() {
-    var selectedNode = this.model.selectedNode();
+    let selectedNode = this.model.selectedNode();
     if (!selectedNode) {
       return null;
     }
@@ -61,7 +61,7 @@ export default class TreeProposalChooser extends ProposalChooser {
    * @param {boolean} appendResult whether or not we must delete the tree
    */
   setLookupResult(result) {
-    var treeNodes, treeNodesFlat,
+    let treeNodes, treeNodesFlat,
       lookupRows = result.lookupRows,
       appendResult = scout.nvl(result.appendResult, false);
 
@@ -69,17 +69,17 @@ export default class TreeProposalChooser extends ProposalChooser {
       treeNodesFlat = lookupRows.map(this._createTreeNode.bind(this));
       treeNodes = this._flatListToSubTree(treeNodesFlat);
       if (treeNodes.length) {
-        var parentNode = null;
-        treeNodes.forEach(function(treeNode) {
+        let parentNode = null;
+        treeNodes.forEach(treeNode => {
           parentNode = this.model.nodesMap[treeNode.parentId];
           this._appendChildNode(parentNode, treeNode);
-        }.bind(this));
+        });
         if (parentNode) {
           this.model.insertNodes(treeNodes, parentNode);
         }
       } else {
         // remove control icon, when no child nodes are available
-        var node = this.model.nodesMap[result.rec];
+        let node = this.model.nodesMap[result.rec];
         node.leaf = true;
         node.childrenLoaded = true;
         this.model.updateNode(node);
@@ -99,7 +99,7 @@ export default class TreeProposalChooser extends ProposalChooser {
 
   _expandAllParentNodes(treeNodesFlat) {
     // when tree node is a leaf or children are not loaded yet
-    var leafs = treeNodesFlat.reduce(function(aggr, treeNode) {
+    let leafs = treeNodesFlat.reduce((aggr, treeNode) => {
       if (treeNode.leaf || !treeNode.childNodesLoaded && treeNode.childNodes.length === 0) {
         aggr.push(treeNode);
       }
@@ -120,12 +120,12 @@ export default class TreeProposalChooser extends ProposalChooser {
   }
 
   trySelectCurrentValue() {
-    var currentValue = this.smartField.getValueForSelection();
+    let currentValue = this.smartField.getValueForSelection();
     if (objects.isNullOrUndefined(currentValue)) {
       return;
     }
-    var allTreeNodes = objects.values(this.model.nodesMap);
-    var treeNode = arrays.find(allTreeNodes, function(node) {
+    let allTreeNodes = objects.values(this.model.nodesMap);
+    let treeNode = arrays.find(allTreeNodes, node => {
       return node.lookupRow.key === currentValue;
     });
     if (treeNode) {
@@ -134,7 +134,7 @@ export default class TreeProposalChooser extends ProposalChooser {
   }
 
   _createTreeNode(lookupRow) {
-    var
+    let
       initialLeaf = true,
       expandAll = this.smartField.browseAutoExpandAll,
       loadIncremental = this.isBrowseLoadIncremental();
@@ -179,8 +179,8 @@ export default class TreeProposalChooser extends ProposalChooser {
    * @returns {TreeNode[]} the leafs in the current tree model.
    */
   findLeafs() {
-    var leafs = [];
-    Tree.visitNodes(function(node, parentNode) {
+    let leafs = [];
+    Tree.visitNodes((node, parentNode) => {
       if (node.leaf || !node.childNodes.length) {
         leafs.push(node);
       }
@@ -195,16 +195,16 @@ export default class TreeProposalChooser extends ProposalChooser {
    */
   _flatListToSubTree(treeNodesFlat) {
     // 1. put all nodes with the same parent in a map (key=parentId, value=[nodes])
-    var nodesMap = {};
-    treeNodesFlat.forEach(function(treeNode) {
+    let nodesMap = {};
+    treeNodesFlat.forEach(treeNode => {
       nodesMap[treeNode.id] = treeNode;
     });
 
-    var rootNodes = [];
+    let rootNodes = [];
 
     // 2. based on this map, set the childNodes references on the treeNodes
-    treeNodesFlat.forEach(function(treeNode) {
-      var parentNode = nodesMap[treeNode.parentId];
+    treeNodesFlat.forEach(treeNode => {
+      let parentNode = nodesMap[treeNode.parentId];
       if (parentNode) {
         this._appendChildNode(parentNode, treeNode);
       } else {
@@ -212,7 +212,7 @@ export default class TreeProposalChooser extends ProposalChooser {
         treeNode.parentNode = null;
         rootNodes.push(treeNode);
       }
-    }.bind(this));
+    });
 
     return rootNodes;
   }

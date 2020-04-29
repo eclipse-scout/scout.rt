@@ -18,7 +18,7 @@ export default class MessageBoxLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var htmlComp = HtmlComponent.get($container),
+    let htmlComp = HtmlComponent.get($container),
       windowSize = $container.windowSize(),
       currentBounds = htmlComp.offsetBounds(true),
       messageBoxSize = htmlComp.size(),
@@ -33,7 +33,7 @@ export default class MessageBoxLayout extends AbstractLayout {
 
     graphics.setSize($container, messageBoxSize);
 
-    var buttonsSize = graphics.size(this.messageBox.$buttons, {
+    let buttonsSize = graphics.size(this.messageBox.$buttons, {
       exact: true
     });
     this.messageBox.$content.css('height', 'calc(100% - ' + buttonsSize.height + 'px)');

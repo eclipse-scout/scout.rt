@@ -16,7 +16,7 @@ export default class TreeNavigationEndKeyStroke extends AbstractTreeNavigationKe
     super(tree, modifierBitMask);
     this.which = [keys.END];
     this.renderingHints.$drawingArea = function($drawingArea, event) {
-      var newSelectedNode = this._computeNewSelection(event._treeCurrentNode);
+      let newSelectedNode = this._computeNewSelection(event._treeCurrentNode);
       if (newSelectedNode) {
         return newSelectedNode.$node;
       }
@@ -24,14 +24,14 @@ export default class TreeNavigationEndKeyStroke extends AbstractTreeNavigationKe
   }
 
   handle(event) {
-    var newSelection = this._computeNewSelection(event._treeCurrentNode);
+    let newSelection = this._computeNewSelection(event._treeCurrentNode);
     if (newSelection) {
       this.selectNodesAndReveal(newSelection);
     }
   }
 
   _computeNewSelection(currentNode) {
-    var nodes = this.field.visibleNodesFlat;
+    let nodes = this.field.visibleNodesFlat;
     if (nodes.length === 0) {
       return;
     }

@@ -102,7 +102,7 @@ export default class DesktopNavigation extends Widget {
   }
 
   _setOutline(newOutline) {
-    var oldOutline = this.outline;
+    let oldOutline = this.outline;
     if (this.outline) {
       this.outline.off('propertyChange', this._outlinePropertyChangeHandler);
     }
@@ -132,7 +132,7 @@ export default class DesktopNavigation extends Widget {
       return;
     }
 
-    var menuCount = this.viewButtonBox.menuButtons.length,
+    let menuCount = this.viewButtonBox.menuButtons.length,
       tabCount = this.viewButtonBox.tabButtons.length;
     if ((menuCount + tabCount) > 1) {
       if (menuCount > 0) {

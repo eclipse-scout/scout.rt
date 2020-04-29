@@ -25,9 +25,9 @@ export default class FormFieldLayout extends AbstractLayout {
 
     this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
     HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
-    this.formField.one('remove', function() {
+    this.formField.one('remove', () => {
       HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
-    }.bind(this));
+    });
   }
 
   // Minimum field with to normal state, for smaller widths the "compact" style is applied.
@@ -45,7 +45,7 @@ export default class FormFieldLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var containerPadding, fieldOffset, fieldSize, fieldBounds, htmlField, labelHasFieldWidth, top, bottom, left, right,
+    let containerPadding, fieldOffset, fieldSize, fieldBounds, htmlField, labelHasFieldWidth, top, bottom, left, right,
       htmlContainer = HtmlComponent.get($container),
       formField = this.formField,
       tooltip = formField._tooltip(),
@@ -74,7 +74,7 @@ export default class FormFieldLayout extends AbstractLayout {
         graphics.setBounds(formField.$label, left, top, labelWidth, this.rowHeight);
         left += labelWidth + formField.$label.cssMarginX();
       } else if (formField.labelPosition === FormField.LabelPosition.TOP) {
-        var labelHeight = graphics.prefSize(formField.$label).height;
+        let labelHeight = graphics.prefSize(formField.$label).height;
         // prefSize rounds the value -> ensure label height is set to that value to prevent gaps between container and label.
         // In addition, this also ensures that the correct height is set when changing the label position from left to top
         formField.$label.cssHeight(labelHeight);
@@ -94,18 +94,18 @@ export default class FormFieldLayout extends AbstractLayout {
         .cssWidth(statusWidth);
       // If both status and label position is "top", pull status up (without margin on the right side)
       if (formField.statusPosition === FormField.StatusPosition.TOP && labelHasFieldWidth) {
-        var statusHeight = graphics.prefSize(formField.$status, {
+        let statusHeight = graphics.prefSize(formField.$status, {
           useCssSize: true
         }).height;
         // Vertically center status with label
-        var statusTop = containerPadding.top + formField.$label.cssPaddingTop() + (formField.$label.height() / 2) - (statusHeight / 2);
+        let statusTop = containerPadding.top + formField.$label.cssPaddingTop() + (formField.$label.height() / 2) - (statusHeight / 2);
         formField.$status
           .cssTop(statusTop)
           .cssRight(right + formField.$label.cssMarginRight())
           .cssHeight(statusHeight)
           .cssLineHeight(null);
         // Add padding to label to prevent overlay of text and status icon
-        var w = graphics.size(formField.$status, true).width;
+        let w = graphics.size(formField.$status, true).width;
         formField.$label.cssPaddingRight(w);
       } else {
         // Default status position
@@ -126,7 +126,7 @@ export default class FormFieldLayout extends AbstractLayout {
         bottom - containerPadding.bottom,
         left - containerPadding.left);
       // Calculate field size: "available size" - "insets (border and padding)" - "additional offset" - "field's margin"
-      var fieldMargins = graphics.margins(formField.$fieldContainer);
+      let fieldMargins = graphics.margins(formField.$fieldContainer);
       fieldSize = htmlContainer.availableSize({
         exact: true
       })
@@ -148,7 +148,7 @@ export default class FormFieldLayout extends AbstractLayout {
       formField.$container.toggleClass('compact', fieldBounds.width <= FormFieldLayout.MIN_FIELD_WIDTH);
 
       if (labelHasFieldWidth) {
-        var fieldWidth = fieldSize.add(fieldMargins).width - formField.$label.cssMarginX();
+        let fieldWidth = fieldSize.add(fieldMargins).width - formField.$label.cssMarginX();
         if (formField.$mandatory && formField.$mandatory.isVisible()) {
           fieldWidth += formField.$mandatory.outerWidth(true);
         }
@@ -158,9 +158,9 @@ export default class FormFieldLayout extends AbstractLayout {
 
     if (formField.$fieldContainer) {
       // Icons are placed inside the field (as overlay)
-      var $iconInput = this._$elementForIconLayout();
-      var fieldBorder = graphics.borders($iconInput);
-      var inputBounds = graphics.offsetBounds($iconInput);
+      let $iconInput = this._$elementForIconLayout();
+      let fieldBorder = graphics.borders($iconInput);
+      let inputBounds = graphics.offsetBounds($iconInput);
       top += fieldBorder.top;
       right += fieldBorder.right;
       fieldBounds.x += fieldBorder.left;
@@ -193,23 +193,23 @@ export default class FormFieldLayout extends AbstractLayout {
 
   _layoutDisabledCopyOverlay() {
     if (this.formField.$field && this.formField.$disabledCopyOverlay) {
-      var $overlay = this.formField.$disabledCopyOverlay;
-      var $field = this.formField.$field;
+      let $overlay = this.formField.$disabledCopyOverlay;
+      let $field = this.formField.$field;
 
-      var pos = $field.position();
-      var padding = graphics.insets($field, {
+      let pos = $field.position();
+      let padding = graphics.insets($field, {
         includePadding: true
       });
 
       // subtract scrollbars sizes from width and height so overlay does not block scrollbars
       // we read the size from the scrollbar from our device, because we already determined
       // it on startup. Only do this when element is scrollable.
-      var elem = $field[0];
-      var overflowX = $field.css('overflow-x');
-      var overflowY = $field.css('overflow-y');
-      var scrollHorizontal = overflowX === 'scroll' || overflowX === 'auto' && (elem.scrollWidth - elem.clientWidth) > 0;
-      var scrollVertical = overflowY === 'scroll' || overflowY === 'auto' && (elem.scrollHeight - elem.clientHeight) > 0;
-      var scrollbarSize = Device.get().scrollbarWidth;
+      let elem = $field[0];
+      let overflowX = $field.css('overflow-x');
+      let overflowY = $field.css('overflow-y');
+      let scrollHorizontal = overflowX === 'scroll' || overflowX === 'auto' && (elem.scrollWidth - elem.clientWidth) > 0;
+      let scrollVertical = overflowY === 'scroll' || overflowY === 'auto' && (elem.scrollHeight - elem.clientHeight) > 0;
+      let scrollbarSize = Device.get().scrollbarWidth;
 
       $overlay
         .css('top', pos.top)
@@ -229,16 +229,16 @@ export default class FormFieldLayout extends AbstractLayout {
   }
 
   preferredLayoutSize($container, options) {
-    var htmlContainer = HtmlComponent.get(this.formField.$container);
-    var formField = this.formField;
-    var prefSizeLabel = new Dimension();
-    var prefSizeMandatory = new Dimension();
-    var prefSizeStatus = new Dimension();
-    var prefSizeField = new Dimension();
-    var widthHint = scout.nvl(options.widthHint, 0);
-    var heightHint = scout.nvl(options.heightHint, 0);
+    let htmlContainer = HtmlComponent.get(this.formField.$container);
+    let formField = this.formField;
+    let prefSizeLabel = new Dimension();
+    let prefSizeMandatory = new Dimension();
+    let prefSizeStatus = new Dimension();
+    let prefSizeField = new Dimension();
+    let widthHint = scout.nvl(options.widthHint, 0);
+    let heightHint = scout.nvl(options.heightHint, 0);
     // Status is only pulled up if status AND label are on top
-    var statusOnTop = formField.statusPosition === FormField.StatusPosition.TOP && this._isLabelVisible() && formField.labelPosition === FormField.LabelPosition.TOP;
+    let statusOnTop = formField.statusPosition === FormField.StatusPosition.TOP && this._isLabelVisible() && formField.labelPosition === FormField.LabelPosition.TOP;
 
     // Calculate the preferred sizes of the individual parts
     // Mandatory indicator
@@ -281,8 +281,8 @@ export default class FormFieldLayout extends AbstractLayout {
 
     // Field
     if (formField.$fieldContainer) {
-      var fieldMargins = graphics.margins(formField.$fieldContainer);
-      var htmlField = HtmlComponent.optGet(formField.$fieldContainer);
+      let fieldMargins = graphics.margins(formField.$fieldContainer);
+      let htmlField = HtmlComponent.optGet(formField.$fieldContainer);
       if (!htmlField) {
         widthHint -= fieldMargins.horizontal();
         heightHint -= fieldMargins.vertical();
@@ -303,7 +303,7 @@ export default class FormFieldLayout extends AbstractLayout {
     }
 
     // Now sum up to calculate the preferred size of the container
-    var prefSize = new Dimension();
+    let prefSize = new Dimension();
 
     // Field is the base, and it should be at least as height as a form row height.
     prefSize.width = prefSizeField.width;
@@ -342,7 +342,7 @@ export default class FormFieldLayout extends AbstractLayout {
   }
 
   _layoutIcon(formField, fieldBounds, right, top) {
-    var height = this.rowHeight;
+    let height = this.rowHeight;
     if (fieldBounds) {
       // If field is bigger than rowHeight (e.g. if used in desktop cell editor), make sure icon is as height as field
       height = fieldBounds.height;
@@ -355,7 +355,7 @@ export default class FormFieldLayout extends AbstractLayout {
   }
 
   _layoutClearIcon(formField, fieldBounds, right, top) {
-    var height = this.rowHeight;
+    let height = this.rowHeight;
     if (fieldBounds) {
       // If field is bigger than rowHeight (e.g. if used in desktop cell editor), make sure icon is as height as field
       height = fieldBounds.height;

@@ -51,7 +51,7 @@ export default class StaticLookupCall extends LookupCall {
   }
 
   _getAll() {
-    var deferred = $.Deferred();
+    let deferred = $.Deferred();
     setTimeout(this._queryByAll.bind(this, deferred), this.delay);
     return deferred.promise();
   }
@@ -64,7 +64,7 @@ export default class StaticLookupCall extends LookupCall {
   }
 
   _lookupRowsByAll() {
-    var datas = this.data.slice(0, StaticLookupCall.MAX_ROW_COUNT + 1);
+    let datas = this.data.slice(0, StaticLookupCall.MAX_ROW_COUNT + 1);
     return datas
       .map(this._dataToLookupRow, this)
       .filter(this._filterActiveLookupRow, this);
@@ -78,13 +78,13 @@ export default class StaticLookupCall extends LookupCall {
   }
 
   _getByText(text) {
-    var deferred = $.Deferred();
+    let deferred = $.Deferred();
     setTimeout(this._queryByText.bind(this, deferred, text), this.delay);
     return deferred.promise();
   }
 
   _queryByText(deferred, text) {
-    var lookupRows = this._lookupRowsByText(text);
+    let lookupRows = this._lookupRowsByText(text);
 
     // resolve non-hierarchical results immediately
     if (!this.hierarchical) {
@@ -96,7 +96,7 @@ export default class StaticLookupCall extends LookupCall {
     }
 
     // if loadIncremental=false we must also load children
-    var promise, builder = new HierarchicalLookupResultBuilder(this);
+    let promise, builder = new HierarchicalLookupResultBuilder(this);
     if (this.loadIncremental) {
       promise = $.resolvedPromise(lookupRows);
     } else {
@@ -106,23 +106,23 @@ export default class StaticLookupCall extends LookupCall {
     // hierarchical lookups must first load their parent nodes
     // before we can resolve the results
     promise
-      .then(function(lookupRows) {
+      .then(lookupRows => {
         return builder.addParentLookupRows(lookupRows);
       })
-      .done(function(lookupRows) {
+      .done(lookupRows => {
         deferred.resolve({
           queryBy: QueryBy.TEXT,
           text: text,
           lookupRows: lookupRows
         });
       })
-      .fail(function(error) {
+      .fail(error => {
         throw error;
       });
   }
 
   _lookupRowsByText(text) {
-    var datas = this.data.filter(function(data) {
+    let datas = this.data.filter(data => {
       return strings.startsWith(data[1].toLowerCase(), text.toLowerCase());
     });
     return datas
@@ -131,13 +131,13 @@ export default class StaticLookupCall extends LookupCall {
   }
 
   _getByKey(key) {
-    var deferred = $.Deferred();
+    let deferred = $.Deferred();
     setTimeout(this._queryByKey.bind(this, deferred, key), this.delay);
     return deferred.promise();
   }
 
   _queryByKey(deferred, key) {
-    var lookupRow = this._lookupRowByKey(key);
+    let lookupRow = this._lookupRowByKey(key);
     if (lookupRow) {
       deferred.resolve({
         queryBy: QueryBy.KEY,
@@ -149,7 +149,7 @@ export default class StaticLookupCall extends LookupCall {
   }
 
   _lookupRowByKey(key) {
-    var data = arrays.find(this.data, function(data) {
+    let data = arrays.find(this.data, data => {
       return data[0] === key;
     });
     if (!data) {
@@ -159,7 +159,7 @@ export default class StaticLookupCall extends LookupCall {
   }
 
   _getByRec(rec) {
-    var deferred = $.Deferred();
+    let deferred = $.Deferred();
     setTimeout(this._queryByRec.bind(this, deferred, rec), this.delay);
     return deferred.promise();
   }
@@ -173,12 +173,12 @@ export default class StaticLookupCall extends LookupCall {
   }
 
   _lookupRowsByRec(rec) {
-    return this.data.reduce(function(aggr, data) {
+    return this.data.reduce((aggr, data) => {
       if (data[2] === rec) {
         aggr.push(this._dataToLookupRow(data));
       }
       return aggr;
-    }.bind(this), [])
+    }, [])
       .filter(this._filterActiveLookupRow, this);
   }
 
@@ -190,7 +190,7 @@ export default class StaticLookupCall extends LookupCall {
    * Implement this function to convert a single data array into an instance of LookupRow.
    */
   _dataToLookupRow(data) {
-    var lookupRow = scout.create('LookupRow', {
+    let lookupRow = scout.create('LookupRow', {
       key: data[0],
       text: data[1],
       parentKey: data[2]

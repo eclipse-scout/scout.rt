@@ -11,31 +11,31 @@
 import {NavigateDownButton, NavigateUpButton} from '../../../../src/index';
 import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
 
-describe('NavigateButton', function() {
+describe('NavigateButton', () => {
 
-  var session, helper, formHelper;
+  let session, helper, formHelper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new OutlineSpecHelper(session);
     formHelper = new FormSpecHelper(session);
   });
 
-  it('is only created once for each node', function() {
-    var model = helper.createModelFixture(3, 2, true);
+  it('is only created once for each node', () => {
+    let model = helper.createModelFixture(3, 2, true);
     model.nodes[0].detailForm = formHelper.createFormWithOneField();
     model.nodes[0].detailFormVisible = true;
     model.nodes[1].detailForm = formHelper.createFormWithOneField();
     model.nodes[1].detailFormVisible = true;
-    var outline = helper.createOutline(model);
-    var staticMenus = outline.nodes[0].detailForm.rootGroupBox.staticMenus;
+    let outline = helper.createOutline(model);
+    let staticMenus = outline.nodes[0].detailForm.rootGroupBox.staticMenus;
     expect(staticMenus[0] instanceof NavigateUpButton).toBe(true);
     expect(staticMenus[1] instanceof NavigateDownButton).toBe(true);
 
     outline.selectNode(outline.nodes[1]);
     outline.selectNode(outline.nodes[0]);
-    var newStaticMenus = outline.nodes[0].detailForm.rootGroupBox.staticMenus;
+    let newStaticMenus = outline.nodes[0].detailForm.rootGroupBox.staticMenus;
     expect(newStaticMenus[0] instanceof NavigateUpButton).toBe(true);
     expect(newStaticMenus[1] instanceof NavigateDownButton).toBe(true);
     // static menus should still be the same
@@ -43,19 +43,19 @@ describe('NavigateButton', function() {
     expect(newStaticMenus[1]).toBe(staticMenus[1]);
   });
 
-  it('will be destroyed when navigateButtonsVisible is set to false', function() {
-    var model = helper.createModelFixture(3, 2, true);
+  it('will be destroyed when navigateButtonsVisible is set to false', () => {
+    let model = helper.createModelFixture(3, 2, true);
     model.nodes[0].detailForm = formHelper.createFormWithOneField();
     model.nodes[0].detailFormVisible = true;
     model.nodes[1].detailForm = formHelper.createFormWithOneField();
     model.nodes[1].detailFormVisible = true;
-    var outline = helper.createOutline(model);
-    var staticMenus = outline.nodes[0].detailForm.rootGroupBox.staticMenus;
+    let outline = helper.createOutline(model);
+    let staticMenus = outline.nodes[0].detailForm.rootGroupBox.staticMenus;
     expect(staticMenus[0] instanceof NavigateUpButton).toBe(true);
     expect(staticMenus[1] instanceof NavigateDownButton).toBe(true);
 
     outline.setNavigateButtonsVisible(false);
-    var newStaticMenus = outline.nodes[0].detailForm.rootGroupBox.staticMenus;
+    let newStaticMenus = outline.nodes[0].detailForm.rootGroupBox.staticMenus;
     expect(newStaticMenus.length).toBe(0);
     expect(staticMenus[0].destroyed).toBe(true);
     expect(staticMenus[1].destroyed).toBe(true);

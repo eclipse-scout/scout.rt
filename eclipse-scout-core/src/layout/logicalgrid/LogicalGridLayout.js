@@ -33,14 +33,14 @@ export default class LogicalGridLayout extends AbstractLayout {
 
     this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
     HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
-    this.widget.one('remove', function() {
+    this.widget.one('remove', () => {
       HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
-    }.bind(this));
+    });
 
   }
 
   _initDefaults() {
-    var env = HtmlEnvironment.get();
+    let env = HtmlEnvironment.get();
     this.hgap = env.formColumnGap;
     this.vgap = env.formRowGap;
     this.columnWidth = env.formColumnWidth;
@@ -56,7 +56,7 @@ export default class LogicalGridLayout extends AbstractLayout {
   }
 
   validateLayout($container, options) {
-    var visibleComps = [],
+    let visibleComps = [],
       visibleCons = [];
 
     // If there is a logical grid, validate it (= recalculate if it is dirty) and use the grid config to get the grid relevant widgets (Scout JS).
@@ -77,15 +77,15 @@ export default class LogicalGridLayout extends AbstractLayout {
         validateGridData.call(this, widget.htmlComp);
       }, this);
     } else {
-      $container.children().each(function(idx, elem) {
-        var $comp = $(elem);
-        var htmlComp = HtmlComponent.optGet($comp);
+      $container.children().each((idx, elem) => {
+        let $comp = $(elem);
+        let htmlComp = HtmlComponent.optGet($comp);
         if (!htmlComp) {
           // Only consider elements with a html component
           return;
         }
         validateGridData.call(this, htmlComp);
-      }.bind(this));
+      });
     }
 
     function validateGridData(htmlComp) {
@@ -110,11 +110,11 @@ export default class LogicalGridLayout extends AbstractLayout {
   }
 
   _validateGridData(htmlComp) {
-    var $comp = htmlComp.$comp;
-    var widget = $comp.data('widget');
+    let $comp = htmlComp.$comp;
+    let widget = $comp.data('widget');
     // Prefer the visibility state of the widget, if there is one.
     // This allows for transitions, because the $component may still be in the process of being made invisible
-    var visible = widget ? widget.isVisible() : $comp.isVisible();
+    let visible = widget ? widget.isVisible() : $comp.isVisible();
     if (visible) {
       htmlComp.layoutData.validate();
       return true;
@@ -126,7 +126,7 @@ export default class LogicalGridLayout extends AbstractLayout {
   }
 
   _layout($container) {
-    var htmlContainer = HtmlComponent.get($container),
+    let htmlContainer = HtmlComponent.get($container),
       containerSize = htmlContainer.availableSize(),
       containerInsets = htmlContainer.insets();
     this.validateLayout($container, {
@@ -137,10 +137,10 @@ export default class LogicalGridLayout extends AbstractLayout {
       containerSize.width = this.minWidth;
     }
     $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayout#layout) container ' + htmlContainer.debug() + ' size=' + containerSize + ' insets=' + containerInsets);
-    var cellBounds = this._layoutCellBounds(containerSize, containerInsets);
+    let cellBounds = this._layoutCellBounds(containerSize, containerInsets);
 
     // Set bounds of components
-    var r1, r2, r, d, $comp, i, htmlComp, data, delta, margins;
+    let r1, r2, r, d, $comp, i, htmlComp, data, delta, margins;
     for (i = 0; i < this.info.$components.length; i++) {
       $comp = this.info.$components[i];
       htmlComp = HtmlComponent.get($comp);
@@ -201,10 +201,11 @@ export default class LogicalGridLayout extends AbstractLayout {
     // widthHint and heightHint are already adjusted by HtmlComponent, no need to remove insets here
     this.validateLayout($container, options);
 
-    var sizeflag = LayoutConstants.PREF;
-    var dim = new Dimension();
+    let sizeflag = LayoutConstants.PREF;
+    let dim = new Dimension();
     // w
-    var i, w, h, useCount = 0;
+    let i, w, h, useCount = 0;
+    // noinspection DuplicatedCode
     for (i = 0; i < this.info.cols; i++) {
       w = this.info.width[i][sizeflag];
       if (useCount > 0) {
@@ -215,6 +216,7 @@ export default class LogicalGridLayout extends AbstractLayout {
     }
     // h
     useCount = 0;
+    // noinspection DuplicatedCode
     for (i = 0; i < this.info.rows; i++) {
       h = this.info.height[i][sizeflag];
       if (useCount > 0) {
@@ -224,7 +226,7 @@ export default class LogicalGridLayout extends AbstractLayout {
       useCount++;
     }
     // insets
-    var insets = HtmlComponent.get($container).insets();
+    let insets = HtmlComponent.get($container).insets();
     dim.width += insets.horizontal();
     dim.height += insets.vertical();
     return dim;

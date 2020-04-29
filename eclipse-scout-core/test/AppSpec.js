@@ -10,27 +10,27 @@
  */
 import {App} from '../src/index';
 
-describe('App', function() {
+describe('App', () => {
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox().addClass('scout'));
   });
 
-  afterEach(function() {
+  afterEach(() => {
     $('.startup-error').remove();
   });
 
-  describe('initDone', function() {
-    it('is executed after desktop is rendered', function(done) {
-      var app = new App();
+  describe('initDone', () => {
+    it('is executed after desktop is rendered', done => {
+      let app = new App();
       app.init();
 
-      var desktop;
-      app.when('desktopReady').then(function(event) {
+      let desktop;
+      app.when('desktopReady').then(event => {
         desktop = event.desktop;
       });
       app.when('init')
-        .then(function() {
+        .then(() => {
           expect(desktop.rendered).toBe(true);
           expect(app.initialized).toBe(true);
         })
@@ -38,21 +38,21 @@ describe('App', function() {
         .catch(fail);
     });
 
-    it('waits for load to complete', function(done) {
-      var app = new App();
+    it('waits for load to complete', done => {
+      let app = new App();
       app.init();
 
-      var loaded = false;
-      app._load = function() {
-        var def = $.Deferred();
-        setTimeout(function() {
+      let loaded = false;
+      app._load = () => {
+        let def = $.Deferred();
+        setTimeout(() => {
           loaded = true;
           def.resolve();
         });
         return def.promise();
       };
       app.when('init')
-        .then(function() {
+        .then(() => {
           expect(loaded).toBe(true);
           expect(app.initialized).toBe(true);
         })
@@ -60,18 +60,18 @@ describe('App', function() {
         .catch(fail);
     });
 
-    it('is not executed when loading fails', function(done) {
-      var app = new App();
+    it('is not executed when loading fails', done => {
+      let app = new App();
       app.init()
-        .catch(function() {
+        .catch(() => {
           expect(app.initialized).toBe(false);
           done();
         });
 
-      var loaded = false;
-      app._load = function() {
-        var def = $.Deferred();
-        setTimeout(function() {
+      let loaded = false;
+      app._load = () => {
+        let def = $.Deferred();
+        setTimeout(() => {
           loaded = true;
           def.reject();
         });

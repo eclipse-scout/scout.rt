@@ -11,11 +11,11 @@
 import {FormSpecHelper} from '@eclipse-scout/testing';
 import {scout, StringField} from '../../src/index';
 
-describe('scout.WidgetTooltipSpec', function() {
+describe('scout.WidgetTooltipSpec', () => {
 
-  var session, helper;
+  let session, helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     jasmine.clock().install();
 
     setFixtures(sandbox());
@@ -26,12 +26,12 @@ describe('scout.WidgetTooltipSpec', function() {
     session.$entryPoint.addClass('desktop');
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
-  it('can create and hold a widget', function() {
-    var tooltip = scout.create('WidgetTooltip', {
+  it('can create and hold a widget', () => {
+    let tooltip = scout.create('WidgetTooltip', {
       parent: session.desktop,
       $anchor: session.desktop.$container,
       widget: {

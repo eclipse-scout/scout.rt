@@ -20,7 +20,7 @@ export default class URL {
     if (url === undefined) {
       url = window.location.href;
     }
-    var urlParts = /^([^?#]*)(?:\?([^#]*))?(?:#(.*))?$/.exec(url || '');
+    let urlParts = /^([^?#]*)(?:\?([^#]*))?(?:#(.*))?$/.exec(url || '');
     // encoded
     this.baseUrlRaw = urlParts[1];
     this.queryPartRaw = urlParts[2];
@@ -43,7 +43,7 @@ export default class URL {
     if (typeof param !== 'string') {
       throw new Error('Illegal argument type: ' + param);
     }
-    var value = this.parameterMap[param];
+    let value = this.parameterMap[param];
     if (Array.isArray(value)) {
       return value.sort(URL._sorter);
     }
@@ -97,20 +97,20 @@ export default class URL {
    *     the resulting string.
    */
   toString(options) {
-    var result = this.baseUrlRaw;
+    let result = this.baseUrlRaw;
 
     if (Object.keys(this.parameterMap).length) {
       options = options || {};
-      var sorter = options.sorter || URL._sorter;
+      let sorter = options.sorter || URL._sorter;
       if (options.alwaysFirst || options.alwaysLast) {
         options.alwaysFirst = arrays.ensure(options.alwaysFirst);
         options.alwaysLast = arrays.ensure(options.alwaysLast);
-        var origSorter = sorter;
-        sorter = function(a, b) {
-          var firstA = options.alwaysFirst.indexOf(a);
-          var firstB = options.alwaysFirst.indexOf(b);
-          var lastA = options.alwaysLast.indexOf(a);
-          var lastB = options.alwaysLast.indexOf(b);
+        let origSorter = sorter;
+        sorter = (a, b) => {
+          let firstA = options.alwaysFirst.indexOf(a);
+          let firstB = options.alwaysFirst.indexOf(b);
+          let lastA = options.alwaysLast.indexOf(a);
+          let lastB = options.alwaysLast.indexOf(b);
           // If A is marked as "alwaysFirst", sort them A-B. If B is also marked as "alwaysFirst", sort them
           // by their position in the array. If only B is marked as "alwaysFirst", sort them B-A.
           if (firstA !== -1) {
@@ -130,18 +130,18 @@ export default class URL {
         };
       }
       // Built a sorted string of all formatted parameterMap entries
-      var reconstructedQueryPart = Object.keys(this.parameterMap).sort(sorter).map(function(key) {
-        var value = this.getParameter(key);
+      let reconstructedQueryPart = Object.keys(this.parameterMap).sort(sorter).map(key => {
+        let value = this.getParameter(key);
         // For multiple values, generate a parameter string for each value
         if (Array.isArray(value)) {
           return value.map(
-            function(innerKey, innerIndex) {
+            (innerKey, innerIndex) => {
               return URL._formatQueryParam(key, value[innerIndex]);
             }
           ).join('&');
         }
         return URL._formatQueryParam(key, value);
-      }.bind(this)).join('&');
+      }).join('&');
       result += '?' + reconstructedQueryPart;
     }
 
@@ -174,7 +174,7 @@ export default class URL {
    */
   //
   static _formatQueryParam(key, value) {
-    var s = encodeURIComponent(key);
+    let s = encodeURIComponent(key);
     if (value !== undefined && value !== null) {
       s += '=' + encodeURIComponent(value);
     }
@@ -195,7 +195,7 @@ export default class URL {
       throw new Error('Argument \'key\' must not be null');
     }
     if (key in map) {
-      var oldValue = map[key];
+      let oldValue = map[key];
       if (Array.isArray(oldValue)) {
         oldValue.push(value);
       } else {
@@ -213,7 +213,7 @@ export default class URL {
    * @memberOf URL
    */
   static _parse(queryPart) {
-    var queryString = (queryPart || '').replace(/\+/g, ' '),
+    let queryString = (queryPart || '').replace(/\+/g, ' '),
       pattern = /([^&=]+)(=?)([^&]*)/g,
       map = {},
       m, key, value;

@@ -58,10 +58,10 @@ export default class ButtonAdapterMenu extends Menu {
 
   _onButtonPropertyChange(event) {
     // Whenever a button property changes, apply the changes to the menu
-    var changedProperties = {};
+    let changedProperties = {};
     changedProperties[event.propertyName] = event.newValue;
     changedProperties = ButtonAdapterMenu.adaptButtonProperties(changedProperties);
-    for (var prop in changedProperties) { // NOSONAR
+    for (let prop in changedProperties) { // NOSONAR
       // Set the property (don't use callSetter because this may delegate to the button)
       this.setProperty(prop, changedProperties[prop]);
     }
@@ -82,7 +82,7 @@ export default class ButtonAdapterMenu extends Menu {
     }
 
     // Everything else is delegated to the button
-    var actionExecuted = this.button.doAction();
+    let actionExecuted = this.button.doAction();
     if (actionExecuted) {
       if (this.isToggleAction()) {
         this.setSelected(!this.selected);
@@ -113,7 +113,7 @@ export default class ButtonAdapterMenu extends Menu {
     menuProperties = menuProperties || {};
 
     // Plain properties: simply copy, no translation required
-    ['visible', 'selected', 'tooltipText', 'keyStroke', 'keyStrokes', 'cssClass', 'modelClass', 'classId', 'iconId', 'preventDoubleClick', 'enabled', 'inheritAccessibility', 'stackable', 'shrinkable'].forEach(function(prop) {
+    ['visible', 'selected', 'tooltipText', 'keyStroke', 'keyStrokes', 'cssClass', 'modelClass', 'classId', 'iconId', 'preventDoubleClick', 'enabled', 'inheritAccessibility', 'stackable', 'shrinkable'].forEach(prop => {
       menuProperties[prop] = buttonProperties[prop];
     });
 
@@ -132,7 +132,7 @@ export default class ButtonAdapterMenu extends Menu {
 
     // Cleanup: Remove all properties that have value 'undefined' from the result object,
     // otherwise, they would be applied to the model adapter.
-    for (var prop in menuProperties) {
+    for (let prop in menuProperties) {
       if (menuProperties[prop] === undefined) {
         delete menuProperties[prop];
       }

@@ -10,11 +10,11 @@
  */
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-describe('TableHeaderSpec', function() {
-  var session;
-  var helper;
+describe('TableHeaderSpec', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
@@ -22,20 +22,20 @@ describe('TableHeaderSpec', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
-  describe('render', function() {
+  describe('render', () => {
 
-    it('attaches listener to the table but only once', function() {
-      var model = helper.createModelFixture(2);
-      var table = helper.createTable(model);
+    it('attaches listener to the table but only once', () => {
+      let model = helper.createModelFixture(2);
+      let table = helper.createTable(model);
       table.render();
       expect(table.header).not.toBeUndefined();
-      var listenerCount = table.events._eventListeners.length;
+      let listenerCount = table.events._eventListeners.length;
 
       table.setHeaderVisible(false);
       table.setHeaderVisible(true);
@@ -46,8 +46,8 @@ describe('TableHeaderSpec', function() {
 
   });
 
-  it('hiddenByUi', function() {
-    var table = helper.createTableWithOneColumn();
+  it('hiddenByUi', () => {
+    let table = helper.createTableWithOneColumn();
     table.setMenus([scout.create('Menu', { // fake header menu required to properly calculate visibility
       parent: table,
       text: 'Foo',

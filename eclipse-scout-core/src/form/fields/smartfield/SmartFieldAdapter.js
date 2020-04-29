@@ -33,7 +33,7 @@ export default class SmartFieldAdapter extends LookupFieldAdapter {
   }
 
   _syncResult(result) {
-    var executedLookupCall = this.widget._currentLookupCall;
+    let executedLookupCall = this.widget._currentLookupCall;
     if (!executedLookupCall && this.widget.touchMode && this.widget.popup && this.widget.popup._field) {
       // in case lookupCall is executed from within the popup (touch):
       executedLookupCall = this.widget.popup._field._currentLookupCall;
@@ -65,7 +65,7 @@ export default class SmartFieldAdapter extends LookupFieldAdapter {
   }
 
   _onWidgetAcceptInput(event) {
-    var eventData = {
+    let eventData = {
       displayText: event.displayText,
       errorStatus: event.errorStatus
     };

@@ -36,7 +36,7 @@ export default class PlannerHeader extends Widget {
   }
 
   _renderAvailableDisplayModes() {
-    var displayMode = Planner.DisplayMode;
+    let displayMode = Planner.DisplayMode;
     this.$commands.empty();
 
     if (this.availableDisplayModes.length > 1) {
@@ -72,7 +72,7 @@ export default class PlannerHeader extends Widget {
       }
     }
 
-    var $modes = this.$commands.children('.planner-mode');
+    let $modes = this.$commands.children('.planner-mode');
     $modes.first().addClass('first');
     $modes.last().addClass('last');
     if ($modes.length === 1) {
@@ -108,7 +108,7 @@ export default class PlannerHeader extends Widget {
   }
 
   _onDisplayModeClick(event) {
-    var displayMode = $(event.target).data('mode');
+    let displayMode = $(event.target).data('mode');
     this.setDisplayMode(displayMode);
     this.trigger('displayModeClick', {
       displayMode: this.displayMode

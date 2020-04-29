@@ -10,11 +10,11 @@
  */
 import * as models from '../../src/util/models';
 
-describe('scout.models', function() {
+describe('scout.models', () => {
 
-  describe('get', function() {
+  describe('get', () => {
 
-    var model = {
+    let model = {
       model: {
         type: 'model',
         value: 'modelValue'
@@ -28,26 +28,26 @@ describe('scout.models', function() {
       }
     };
 
-    beforeEach(function() {
+    beforeEach(() => {
       models.init(model);
     });
 
-    it('load object without type possible', function() {
+    it('load object without type possible', () => {
       expect(models._get('object', 'model').value).toBe('objectValue');
     });
 
-    it('ensure the object is a copy', function() {
+    it('ensure the object is a copy', () => {
       models._get('model', 'model').value = 'changed';
       expect(models._get('model', 'model').value).toBe('modelValue');
     });
 
   });
 
-  describe('extend', function() {
+  describe('extend', () => {
 
-    var parentObj;
+    let parentObj;
 
-    var originalparent = {
+    let originalparent = {
       id: 'parent',
       color: 'red',
       text: 'test',
@@ -75,7 +75,7 @@ describe('scout.models', function() {
       }
     };
 
-    var newPropertyInRoot = {
+    let newPropertyInRoot = {
       extensions: [{
         operation: 'appendTo',
         target: {
@@ -87,7 +87,7 @@ describe('scout.models', function() {
       }]
     };
 
-    var overridePropertyInRoot = {
+    let overridePropertyInRoot = {
       extensions: [{
         operation: 'appendTo',
         target: {
@@ -99,7 +99,7 @@ describe('scout.models', function() {
       }]
     };
 
-    var overridePropertyInTree = {
+    let overridePropertyInTree = {
       extensions: [{
         operation: 'appendTo',
         target: {
@@ -111,7 +111,7 @@ describe('scout.models', function() {
       }]
     };
 
-    var newObjectNoArrayInRoot = {
+    let newObjectNoArrayInRoot = {
       extensions: [{
         operation: 'insert',
         target: {
@@ -125,7 +125,7 @@ describe('scout.models', function() {
       }]
     };
 
-    var newObjectInTree = {
+    let newObjectInTree = {
       extensions: [{
         operation: 'insert',
         target: {
@@ -139,7 +139,7 @@ describe('scout.models', function() {
       }]
     };
 
-    var newObjectTreeInTree = {
+    let newObjectTreeInTree = {
       extensions: [{
         operation: 'insert',
         target: {
@@ -157,7 +157,7 @@ describe('scout.models', function() {
       }]
     };
 
-    var newObjectInTreeIndexed = {
+    let newObjectInTreeIndexed = {
       extensions: [{
         operation: 'insert',
         target: {
@@ -172,7 +172,7 @@ describe('scout.models', function() {
       }]
     };
 
-    var newObjectInTreeRelativeindex = {
+    let newObjectInTreeRelativeindex = {
       type: 'extension',
       extensions: [{
         operation: 'insert',
@@ -188,7 +188,7 @@ describe('scout.models', function() {
       }]
     };
 
-    var newObjectInTreeRelativeindexWithArray = {
+    let newObjectInTreeRelativeindexWithArray = {
       type: 'extension',
       extensions: [{
         operation: 'insert',
@@ -207,7 +207,7 @@ describe('scout.models', function() {
       }]
     };
 
-    var newObjectgroupWithTarget = {
+    let newObjectgroupWithTarget = {
       type: 'extension',
       extensions: [{
         operation: 'insert',
@@ -223,7 +223,7 @@ describe('scout.models', function() {
       }]
     };
 
-    var newObjectArraygroupWithTarget = {
+    let newObjectArraygroupWithTarget = {
       type: 'extension',
       extensions: [{
         operation: 'insert',
@@ -241,55 +241,55 @@ describe('scout.models', function() {
       }]
     };
 
-    beforeEach(function() {
+    beforeEach(() => {
       parentObj = $.extend(true, {}, originalparent);
     });
 
-    it('insert new property into root object', function() {
+    it('insert new property into root object', () => {
       models.extend(newPropertyInRoot, parentObj);
       expect(parentObj.newColor).toBe('green');
     });
-    it('override property in root object', function() {
+    it('override property in root object', () => {
       models.extend(overridePropertyInRoot, parentObj);
       expect(parentObj.color).toBe('yellow');
     });
-    it('insert new property into a non existing array on root object', function() {
+    it('insert new property into a non existing array on root object', () => {
       models.extend(newObjectNoArrayInRoot, parentObj);
       expect(parentObj.array[0].value).toBe('inserted into non existing Array');
     });
-    it('override property in tree object', function() {
+    it('override property in tree object', () => {
       models.extend(overridePropertyInTree, parentObj);
       expect(parentObj.rootContainer.childs[1].value).toBe('property in tree overriden');
     });
-    it('insert new object into tree object', function() {
+    it('insert new object into tree object', () => {
       models.extend(newObjectInTree, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[1].value).toBe('new object in tree');
     });
-    it('insert new object tree into tree object', function() {
+    it('insert new object tree into tree object', () => {
       models.extend(newObjectTreeInTree, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[1].childs[0].value).toBe('new object tree in tree');
     });
-    it('insert new object into tree object with fixed index', function() {
+    it('insert new object into tree object with fixed index', () => {
       models.extend(newObjectInTreeIndexed, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].value).toBe('fixed index insert');
     });
-    it('insert new object into tree object with relative index', function() {
+    it('insert new object into tree object with relative index', () => {
       models.extend(newObjectInTreeRelativeindex, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].value).toBe('relative index insert');
     });
-    it('insert new object into tree object with relative index and two extension elements', function() {
+    it('insert new object into tree object with relative index and two extension elements', () => {
       models.extend(newObjectInTreeRelativeindexWithArray, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].value).toBe('relative index insert');
       expect(parentObj.rootContainer.childs[1].childs[1].value).toBe('relative index insert2');
     });
-    it('insert object referenced by String', function() {
-      var model = {};
+    it('insert object referenced by String', () => {
+      let model = {};
       model.newObjectInTreeRelativeindex = newObjectInTreeRelativeindex;
       models.init(model);
       models.extend('newObjectInTreeRelativeindex', parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].value).toBe('relative index insert');
     });
-    it('insert object bound to field', function() {
+    it('insert object bound to field', () => {
       models.extend(newObjectgroupWithTarget, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].groupedWith).toBe('child3');
 
@@ -302,7 +302,7 @@ describe('scout.models', function() {
 
     });
 
-    it('insert objects array bound to field', function() {
+    it('insert objects array bound to field', () => {
       models.extend(newObjectArraygroupWithTarget, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].groupedWith).toBe('child3');
       expect(parentObj.rootContainer.childs[1].childs[1].groupedWith).toBe('child3');

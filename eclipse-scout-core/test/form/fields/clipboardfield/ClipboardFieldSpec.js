@@ -11,10 +11,10 @@
 import {Device} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('ClipboardField', function() {
-  var session, helper, $sandbox, origDevice;
+describe('ClipboardField', () => {
+  let session, helper, $sandbox, origDevice;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     $sandbox = $('#sandbox');
@@ -24,7 +24,7 @@ describe('ClipboardField', function() {
     origDevice = Device.get();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
     jasmine.Ajax.uninstall();
   });
@@ -33,8 +33,8 @@ describe('ClipboardField', function() {
     return helper.createField('ClipboardField');
   }
 
-  it('Rendered container has the right class', function() {
-    var field = createField();
+  it('Rendered container has the right class', () => {
+    let field = createField();
     field.render($sandbox);
     expect(field.$container.hasClass('clipboard-field')).toBe(true);
   });

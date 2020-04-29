@@ -49,7 +49,7 @@ export default class LogicalGridData {
       return;
     }
 
-    var data = this.widget.gridData;
+    let data = this.widget.gridData;
     // setup constraints
     this.gridx = data.x;
     this.gridy = data.y;
@@ -83,9 +83,9 @@ export default class LogicalGridData {
   }
 
   _inheritWeightY() {
-    var d = this._inheritWeightYRec(this.widget);
+    let d = this._inheritWeightYRec(this.widget);
     if (d === null) {
-      var data = this.widget.gridData;
+      let data = this.widget.gridData;
       if (data.weightY >= 0) {
         d = data.weightY;
       } else {
@@ -96,18 +96,18 @@ export default class LogicalGridData {
   }
 
   _inheritWeightYRec(widget) {
-    var found = false,
+    let found = false,
       sumWy = 0;
 
     // The children may have a dirty grid -> make sure the grid is valid before reading any grid data properties
     widget.validateLogicalGrid();
 
     if (widget instanceof CompositeField) {
-      var i, inheritWeightY, child, children = widget.getFields();
+      let i, inheritWeightY, child, children = widget.getFields();
       for (i = 0; i < children.length; i++) {
         child = children[i];
         if (child.isVisible()) {
-          var data = child.gridData;
+          let data = child.gridData;
           if (data.weightY < 0) {
             inheritWeightY = this._inheritWeightYRec(child);
             if (inheritWeightY !== null) {

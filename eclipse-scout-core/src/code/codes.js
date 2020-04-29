@@ -19,7 +19,7 @@ let defaultLanguage = 'en';
 let registry = {};
 
 export function bootstrap(url) {
-  var promise = url ? $.ajaxJson(url) : $.resolvedPromise({});
+  let promise = url ? $.ajaxJson(url) : $.resolvedPromise({});
   return promise.then(_preInit.bind(this, url));
 }
 
@@ -36,7 +36,7 @@ export function _preInit(url, data) {
 
 export function init(data) {
   data = data || {};
-  Object.keys(data).forEach(function(codeTypeId) {
+  Object.keys(data).forEach(codeTypeId => {
     add(data[codeTypeId]);
   }, this);
 }
@@ -46,7 +46,7 @@ export function init(data) {
  */
 export function add(codeTypes) {
   codeTypes = arrays.ensure(codeTypes);
-  codeTypes.forEach(function(codeType) {
+  codeTypes.forEach(codeType => {
     codeType = CodeType.ensure(codeType);
     registry[codeType.id] = codeType;
   }, this);
@@ -57,8 +57,8 @@ export function add(codeTypes) {
  */
 export function remove(codeTypes) {
   codeTypes = arrays.ensure(codeTypes);
-  codeTypes.forEach(function(codeType) {
-    var id;
+  codeTypes.forEach(codeType => {
+    let id;
     if (typeof codeType === 'string') {
       id = codeType;
     } else {
@@ -92,6 +92,7 @@ export function remove(codeTypes) {
  * @throw {Error} if code does not exist
  */
 export function get(vararg, codeId) {
+  // eslint-disable-next-line prefer-rest-params
   return _get('get', objects.argumentsToArray(arguments));
 }
 
@@ -104,16 +105,17 @@ export function get(vararg, codeId) {
  * @returns {Code} code for the given codeId or undefined if code does not exist
  */
 export function optGet(vararg, codeId) {
+  // eslint-disable-next-line prefer-rest-params
   return _get('optGet', objects.argumentsToArray(arguments));
 }
 
 export function _get(funcName, funcArgs) {
-  var codeTypeId, codeId;
+  let codeTypeId, codeId;
   if (funcArgs.length === 2) {
     codeTypeId = funcArgs[0];
     codeId = funcArgs[1];
   } else {
-    var tmp = funcArgs[0].split(' ');
+    let tmp = funcArgs[0].split(' ');
     if (tmp.length !== 2) {
       throw new Error('Invalid string. Must have format "[CodeType.id] [Code.id]"');
     }
@@ -126,7 +128,7 @@ export function _get(funcName, funcArgs) {
 }
 
 export function codeType(codeTypeId, optional) {
-  var codeType = registry[codeTypeId];
+  let codeType = registry[codeTypeId];
   if (!optional && !codeType) {
     throw new Error('No CodeType found for id=' + codeTypeId);
   }
@@ -147,13 +149,13 @@ export function generateTextKey(code) {
  * @return the generated text key
  */
 export function registerTexts(code, textsArg) {
-  var key = generateTextKey(code);
+  let key = generateTextKey(code);
 
   // In case of changed defaultLanguage clear the 'default' entry
   texts.get('default').remove(key);
 
-  for (var languageTag in textsArg) { // NOSONAR
-    var text = textsArg[languageTag];
+  for (let languageTag in textsArg) { // NOSONAR
+    let text = textsArg[languageTag];
     // Use defaultLanguage as default, if specified (may be changed or set to null by the app).
     if (languageTag && languageTag === defaultLanguage) {
       languageTag = 'default';

@@ -25,7 +25,7 @@ export default class TagFieldDeleteKeyStroke extends KeyStroke {
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     if (!accepted) {
       return false;
     }
@@ -33,8 +33,8 @@ export default class TagFieldDeleteKeyStroke extends KeyStroke {
   }
 
   handle(event) {
-    var $tag = this._$focusedTag();
-    var tag = TagBar.getTagData($tag);
+    let $tag = this._$focusedTag();
+    let tag = TagBar.getTagData($tag);
     this.fieldAdapter.removeTag(tag);
   }
 

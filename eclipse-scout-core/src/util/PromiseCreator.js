@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects} from '../index';
 
 /**
  * The PromiseCreator is used to work with code that creates a lot of promises.
@@ -39,12 +38,13 @@ export default class PromiseCreator {
   }
 
   next() {
-    var thisItem = this.currentItem;
+    let thisItem = this.currentItem;
     return this.createPromise()
-      .done(function() {
-        this._addResults.apply(this, [thisItem, objects.argumentsToArray(arguments)]);
-      }.bind(this))
+      .done((...args) => {
+        this._addResults.apply(this, [thisItem, args]);
+      })
       .fail(function() {
+        // eslint-disable-next-line prefer-rest-params
         this.error = arguments.length > 0 ? arguments : new Error('Promise execution failed');
       }.bind(this));
   }
@@ -54,7 +54,7 @@ export default class PromiseCreator {
       throw new Error('items out of bounds');
     }
 
-    var promise = this._createPromise();
+    let promise = this._createPromise();
     this.currentItem++;
     return promise;
   }

@@ -11,10 +11,10 @@
 import {ObjectFactory, objects, OutlineOverview, scout, Status, TileOutlineOverview, Tree} from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper, OutlineSpecHelper, TreeSpecHelper} from '@eclipse-scout/testing';
 
-describe('Outline', function() {
-  var helper, menuHelper, formHelper, session;
+describe('Outline', () => {
+  let helper, menuHelper, formHelper, session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new OutlineSpecHelper(session);
@@ -24,7 +24,7 @@ describe('Outline', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
@@ -46,18 +46,18 @@ describe('Outline', function() {
     };
   }
 
-  describe('collapsing', function() {
+  describe('collapsing', () => {
     // Regression test for erroneous behavior of MessageBoxController
-    it('still allows a messagebox to be shown', function() {
-      var outline = helper.createOutlineWithOneDetailTable();
+    it('still allows a messagebox to be shown', () => {
+      let outline = helper.createOutlineWithOneDetailTable();
       session.desktop.outline = outline;
 
-      var model = {
+      let model = {
         session: session,
         parent: session.desktop,
         severity: Status.Severity.ERROR
       };
-      var messageBox = scout.create('MessageBox', model);
+      let messageBox = scout.create('MessageBox', model);
 
       // This collapses the registered outline
       session.desktop.setNavigationVisible(false);
@@ -69,23 +69,23 @@ describe('Outline', function() {
     });
   });
 
-  describe('dispose', function() {
-    var model, tree, node0;
+  describe('dispose', () => {
+    let model, tree, node0;
 
-    beforeEach(function() {
+    beforeEach(() => {
       // A large tree is used to properly test recursion
       model = helper.createModelFixture(3, 2, true);
       tree = helper.createOutline(model);
       node0 = tree.nodes[0];
     });
 
-    it('calls onNodeDeleted for every node to be able to cleanup', function() {
+    it('calls onNodeDeleted for every node to be able to cleanup', () => {
       spyOn(tree, '_onNodeDeleted');
       tree.destroy();
       expect(tree._onNodeDeleted.calls.count()).toBe(39);
     });
 
-    it('calls onNodeDeleted for every node (which was not already deleted before) to be able to cleanup', function() {
+    it('calls onNodeDeleted for every node (which was not already deleted before) to be able to cleanup', () => {
       spyOn(tree, '_onNodeDeleted');
 
       tree.deleteNodes([node0]);
@@ -98,17 +98,17 @@ describe('Outline', function() {
 
   });
 
-  describe('deleteNodes', function() {
-    var model, tree, node0;
+  describe('deleteNodes', () => {
+    let model, tree, node0;
 
-    beforeEach(function() {
+    beforeEach(() => {
       // A large tree is used to properly test recursion
       model = helper.createModelFixture(3, 2, true);
       tree = helper.createOutline(model);
       node0 = tree.nodes[0];
     });
 
-    it('calls onNodeDeleted for every node to be able to cleanup', function() {
+    it('calls onNodeDeleted for every node to be able to cleanup', () => {
       spyOn(tree, '_onNodeDeleted');
 
       tree.deleteNodes([node0]);
@@ -117,16 +117,16 @@ describe('Outline', function() {
 
   });
 
-  describe('deleteAllChildNodes', function() {
-    var model, tree;
+  describe('deleteAllChildNodes', () => {
+    let model, tree;
 
-    beforeEach(function() {
+    beforeEach(() => {
       // A large tree is used to properly test recursion
       model = helper.createModelFixture(3, 2, true);
       tree = helper.createOutline(model);
     });
 
-    it('calls onNodeDeleted for every node to be able to cleanup', function() {
+    it('calls onNodeDeleted for every node to be able to cleanup', () => {
       spyOn(tree, '_onNodeDeleted');
 
       tree.deleteAllChildNodes();
@@ -136,12 +136,12 @@ describe('Outline', function() {
 
   });
 
-  describe('navigateToTop', function() {
+  describe('navigateToTop', () => {
 
-    it('collapses all nodes in bread crumb mode', function() {
-      var model = helper.createModelFixture(1, 1);
-      var tree = helper.createOutline(model);
-      var node0 = tree.nodes[0];
+    it('collapses all nodes in bread crumb mode', () => {
+      let model = helper.createModelFixture(1, 1);
+      let tree = helper.createOutline(model);
+      let node0 = tree.nodes[0];
 
       tree.displayStyle = Tree.DisplayStyle.BREADCRUMB;
       tree.render();
@@ -158,16 +158,16 @@ describe('Outline', function() {
     });
   });
 
-  describe('selectNodes', function() {
-    var model, outline, node;
+  describe('selectNodes', () => {
+    let model, outline, node;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(3, 2, true);
       outline = helper.createOutline(model);
       node = outline.nodes[0];
     });
 
-    it('handle navigateUp only once', function() {
+    it('handle navigateUp only once', () => {
       outline.selectNodes(node);
       outline.navigateUpInProgress = true;
       outline.selectNodes([]);
@@ -176,12 +176,12 @@ describe('Outline', function() {
 
     // we must override the _render* methods for this test-case, since we had to
     // implement a lot more of set-up code to make these methods work.
-    it('otherwise handle single selection (or do nothing when selection is != 1 node)', function() {
+    it('otherwise handle single selection (or do nothing when selection is != 1 node)', () => {
       node.detailFormVisibleByUi = false;
       outline.navigateUpInProgress = false;
-      outline._renderSelection = function() {
+      outline._renderSelection = () => {
       };
-      outline._renderMenus = function() {
+      outline._renderMenus = () => {
       };
 
       // don't change the visibleByUi flag when selection is != 1
@@ -195,13 +195,13 @@ describe('Outline', function() {
 
   });
 
-  describe('updateDetailMenus', function() {
+  describe('updateDetailMenus', () => {
 
-    it('adds the empty space menus of the detail table to the detail menu bar', function() {
-      var outline = helper.createOutlineWithOneDetailTable();
+    it('adds the empty space menus of the detail table to the detail menu bar', () => {
+      let outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
-      var node0 = outline.nodes[0];
+      let node0 = outline.nodes[0];
       node0.detailTable.menus = [
         menuHelper.createMenu({
           menuTypes: ['Table.SingleSelection']
@@ -218,11 +218,11 @@ describe('Outline', function() {
       expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[1]);
     });
 
-    it('adds the single selection menus of the parent detail table to the detail menu bar', function() {
-      var outline = helper.createOutlineWithOneDetailTable();
+    it('adds the single selection menus of the parent detail table to the detail menu bar', () => {
+      let outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
-      var node0 = outline.nodes[0];
+      let node0 = outline.nodes[0];
       node0.detailTable.menus = [
         menuHelper.createMenu({
           menuTypes: ['Table.SingleSelection']
@@ -239,11 +239,11 @@ describe('Outline', function() {
       expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
     });
 
-    it('attaches a listener to the detail table to get dynamic menu changes', function() {
-      var outline = helper.createOutlineWithOneDetailTable();
+    it('attaches a listener to the detail table to get dynamic menu changes', () => {
+      let outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
-      var node0 = outline.nodes[0];
+      let node0 = outline.nodes[0];
       expect(outline.detailMenuBarVisible).toBe(false);
       expect(outline.detailMenuBar.menuItems.length).toBe(0);
 
@@ -252,23 +252,23 @@ describe('Outline', function() {
       expect(outline.detailMenuBar.menuItems.length).toBe(0);
 
       // Menus change on table -> detail menu bar needs to be updated as well
-      var menu = menuHelper.createModel('menu', '', ['Table.EmptySpace']);
+      let menu = menuHelper.createModel('menu', '', ['Table.EmptySpace']);
       node0.detailTable.setMenus([menu]);
       expect(outline.detailMenuBarVisible).toBe(true);
       expect(outline.detailMenuBar.menuItems.length).toBe(1);
       expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
     });
 
-    it('removes the listener from the detail tables on selection changes and destroy', function() {
-      var outline = helper.createOutlineWithOneDetailTable();
+    it('removes the listener from the detail tables on selection changes and destroy', () => {
+      let outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
-      var node0 = outline.nodes[0];
-      var node1 = outline.nodes[1];
-      var initialListenerCount = node0.detailTable.events._eventListeners.length;
+      let node0 = outline.nodes[0];
+      let node1 = outline.nodes[1];
+      let initialListenerCount = node0.detailTable.events._eventListeners.length;
 
       outline.selectNodes(node0);
-      var selectionListenerCount = node0.detailTable.events._eventListeners.length;
+      let selectionListenerCount = node0.detailTable.events._eventListeners.length;
       expect(selectionListenerCount).toBe(initialListenerCount + 3); // destroy and propertyChange listener
 
       outline.selectNodes(node1);
@@ -283,16 +283,16 @@ describe('Outline', function() {
       expect(node0.detailTable.events._eventListeners.length).toBe(0); // every listener should be removed now
     });
 
-    it('makes sure table does not update the menu parent for empty space menus', function() {
-      var outline = helper.createOutlineWithOneDetailTable();
+    it('makes sure table does not update the menu parent for empty space menus', () => {
+      let outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
       outline.render();
-      var node0 = outline.nodes[0];
-      var emptySpaceMenu = menuHelper.createMenu({
+      let node0 = outline.nodes[0];
+      let emptySpaceMenu = menuHelper.createMenu({
         menuTypes: ['Table.EmptySpace']
       });
-      var emptySpaceMenu2 = menuHelper.createMenu({
+      let emptySpaceMenu2 = menuHelper.createMenu({
         menuTypes: ['Table.EmptySpace']
       });
       node0.detailTable.menus = [emptySpaceMenu];
@@ -314,12 +314,12 @@ describe('Outline', function() {
       outline.validateLayout();
     });
 
-    it('makes sure table does not update the menu parent for single selection menus', function() {
-      var outline = helper.createOutlineWithOneDetailTable();
+    it('makes sure table does not update the menu parent for single selection menus', () => {
+      let outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
       outline.render();
-      var node0 = outline.nodes[0];
+      let node0 = outline.nodes[0];
       // Select child node -> single selection menus are active
       // A row is necessary to make sure single selection menus are not filtered out
       node0.detailTable.insertRow({
@@ -329,10 +329,10 @@ describe('Outline', function() {
       outline.selectNodes(node0.childNodes[0]);
       expect(outline.detailMenuBar.menuItems.length).toBe(0);
 
-      var singleSelectionMenu = menuHelper.createMenu({
+      let singleSelectionMenu = menuHelper.createMenu({
         menuTypes: ['Table.SingleSelection']
       });
-      var singleSelectionMenu2 = menuHelper.createMenu({
+      let singleSelectionMenu2 = menuHelper.createMenu({
         menuTypes: ['Table.SingleSelection']
       });
       node0.detailTable.setMenus([singleSelectionMenu, singleSelectionMenu2]);
@@ -346,16 +346,16 @@ describe('Outline', function() {
       outline.validateLayout();
     });
 
-    it('does not fail if same menus are set again', function() {
-      var outline = helper.createOutlineWithOneDetailTable();
+    it('does not fail if same menus are set again', () => {
+      let outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
       outline.render();
-      var node0 = outline.nodes[0];
-      var emptySpaceMenu = menuHelper.createMenu({
+      let node0 = outline.nodes[0];
+      let emptySpaceMenu = menuHelper.createMenu({
         menuTypes: ['Table.EmptySpace']
       });
-      var emptySpaceMenu2 = menuHelper.createMenu({
+      let emptySpaceMenu2 = menuHelper.createMenu({
         menuTypes: ['Table.EmptySpace']
       });
       node0.detailTable.menus = [emptySpaceMenu, emptySpaceMenu2];
@@ -383,14 +383,14 @@ describe('Outline', function() {
 
   });
 
-  describe('detailContent', function() {
+  describe('detailContent', () => {
 
-    it('is shown when a node is selected', function() {
-      var outline = helper.createOutlineWithOneDetailTable();
+    it('is shown when a node is selected', () => {
+      let outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
       outline.render();
-      var node0 = outline.nodes[0];
+      let node0 = outline.nodes[0];
       node0.childNodes[0].detailForm = new FormSpecHelper(session).createFormWithOneField({
         modal: false
       });
@@ -408,21 +408,21 @@ describe('Outline', function() {
       expect(outline.detailContent.rendered).toBe(true);
     });
 
-    describe('click on a node inside the detail content', function() {
+    describe('click on a node inside the detail content', () => {
 
-      it('does not modify the outline', function() {
-        var outline = helper.createOutline(helper.createModelFixture(3, 2));
+      it('does not modify the outline', () => {
+        let outline = helper.createOutline(helper.createModelFixture(3, 2));
         outline.setCompact(true);
         outline.setEmbedDetailContent(true);
-        var node0 = outline.nodes[0];
+        let node0 = outline.nodes[0];
         outline.render();
         outline.selectNodes(outline.nodes[1]);
 
         // The outline node contains a tree as detail node (real life case would be a form with a tree field, but this is easier to test)
-        var treeHelper = new TreeSpecHelper(session);
-        var treeModel = treeHelper.createModelFixture(3, 3);
+        let treeHelper = new TreeSpecHelper(session);
+        let treeModel = treeHelper.createModelFixture(3, 3);
         treeModel.nodes[0].id = ObjectFactory.get().createUniqueId(); // tree helper doesn't use unique ids -> do it here
-        var tree = treeHelper.createTree(treeModel);
+        let tree = treeHelper.createTree(treeModel);
         outline.setDetailContent(tree);
 
         spyOn(outline, 'selectNodes');
@@ -438,9 +438,9 @@ describe('Outline', function() {
     });
   });
 
-  describe('outlineOverview', function() {
+  describe('outlineOverview', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       session = sandboxSession({
         desktop: {
           navigationVisible: true,
@@ -450,8 +450,8 @@ describe('Outline', function() {
       });
     });
 
-    it('is displayed when no node is selected', function() {
-      var outline = helper.createOutline(helper.createModelFixture(3, 2));
+    it('is displayed when no node is selected', () => {
+      let outline = helper.createOutline(helper.createModelFixture(3, 2));
       session.desktop.setOutline(outline);
       expect(outline.outlineOverview.rendered).toBe(true);
 
@@ -459,8 +459,8 @@ describe('Outline', function() {
       expect(outline.outlineOverview.rendered).toBe(false);
     });
 
-    it('is displayed selected page is deleted', function() {
-      var outline = helper.createOutline(helper.createModelFixture(3, 2));
+    it('is displayed selected page is deleted', () => {
+      let outline = helper.createOutline(helper.createModelFixture(3, 2));
       session.desktop.setOutline(outline);
       expect(outline.outlineOverview.rendered).toBe(true);
 
@@ -478,8 +478,8 @@ describe('Outline', function() {
       expect(outline.outlineOverview.rendered).toBe(true);
     });
 
-    it('is displayed if all pages are deleted', function() {
-      var outline = helper.createOutline(helper.createModelFixture(3, 2));
+    it('is displayed if all pages are deleted', () => {
+      let outline = helper.createOutline(helper.createModelFixture(3, 2));
       session.desktop.setOutline(outline);
       expect(outline.outlineOverview.rendered).toBe(true);
 
@@ -490,8 +490,8 @@ describe('Outline', function() {
       expect(outline.outlineOverview.rendered).toBe(true);
     });
 
-    it('is not displayed if outlineOverviewVisible is false', function() {
-      var outline = helper.createOutline(helper.createModelFixture(3, 2));
+    it('is not displayed if outlineOverviewVisible is false', () => {
+      let outline = helper.createOutline(helper.createModelFixture(3, 2));
       session.desktop.setOutline(outline);
       expect(outline.outlineOverview.rendered).toBe(true);
 
@@ -502,34 +502,34 @@ describe('Outline', function() {
       expect(outline.outlineOverview.rendered).toBe(true);
     });
 
-    it('uses the TileOutlineOverview by default', function() {
-      var outline = helper.createOutline(helper.createModelFixture(3, 2));
+    it('uses the TileOutlineOverview by default', () => {
+      let outline = helper.createOutline(helper.createModelFixture(3, 2));
       session.desktop.setOutline(outline);
       expect(outline.outlineOverview instanceof TileOutlineOverview).toBe(true);
     });
 
-    it('may be replaced by another OutlineOverview', function() {
-      var model = helper.createModelFixture(3, 2);
+    it('may be replaced by another OutlineOverview', () => {
+      let model = helper.createModelFixture(3, 2);
       model.outlineOverview = {
         objectType: 'OutlineOverview'
       };
-      var outline = helper.createOutline(model);
+      let outline = helper.createOutline(model);
       session.desktop.setOutline(outline);
       expect(outline.outlineOverview instanceof OutlineOverview).toBe(true);
       expect(outline.outlineOverview instanceof TileOutlineOverview).toBe(false);
 
-      var outlineOverview = scout.create('TileOutlineOverview', {parent: outline});
+      let outlineOverview = scout.create('TileOutlineOverview', {parent: outline});
       outline.setOutlineOverview(outlineOverview);
       expect(outline.outlineOverview instanceof TileOutlineOverview).toBe(true);
       expect(outline.outlineOverview).toBe(outlineOverview);
     });
 
-    it('is replaced by the default detail form if there is one', function() {
-      var outline = helper.createOutline(helper.createModelFixture(3, 2));
+    it('is replaced by the default detail form if there is one', () => {
+      let outline = helper.createOutline(helper.createModelFixture(3, 2));
       session.desktop.setOutline(outline);
       expect(outline.outlineOverview.rendered).toBe(true);
 
-      var form = formHelper.createFormWithOneField();
+      let form = formHelper.createFormWithOneField();
       outline.setDefaultDetailForm(form);
       expect(outline.outlineOverview).toBe(null);
       expect(outline.defaultDetailForm.rendered).toBe(true);

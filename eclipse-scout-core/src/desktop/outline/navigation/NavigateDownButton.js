@@ -65,7 +65,7 @@ export default class NavigateDownButton extends NavigateButton {
     }
 
     // when it's not a leaf and not a detail - the button is only enabled when a single row is selected and that row is linked to a page
-    var table = this.node.detailTable;
+    let table = this.node.detailTable;
     if (table) {
       return table.selectedRows.length === 1 && !!table.selectedRows[0].page;
     }
@@ -73,10 +73,10 @@ export default class NavigateDownButton extends NavigateButton {
   }
 
   _drill() {
-    var drillNode;
+    let drillNode;
 
     if (this.node.detailTable) {
-      var row = this.node.detailTable.selectedRow();
+      let row = this.node.detailTable.selectedRow();
       drillNode = this.node.pageForTableRow(row);
     } else {
       drillNode = this.node.childNodes[0];
@@ -85,15 +85,15 @@ export default class NavigateDownButton extends NavigateButton {
     if (drillNode) {
       $.log.isDebugEnabled() && $.log.debug('drill down to node ' + drillNode);
       // Collapse other expanded child nodes
-      var parentNode = drillNode.parentNode;
+      let parentNode = drillNode.parentNode;
       if (parentNode) {
-        parentNode.childNodes.forEach(function(childNode) {
+        parentNode.childNodes.forEach(childNode => {
           if (childNode.expanded && childNode !== drillNode) {
             this.outline.collapseNode(childNode, {
               animateExpansion: false
             });
           }
-        }.bind(this));
+        });
       }
 
       // Select the target node
@@ -112,7 +112,7 @@ export default class NavigateDownButton extends NavigateButton {
   }
 
   _onOutlinePageRowLink(event) {
-    var table = this.node.detailTable;
+    let table = this.node.detailTable;
     if (table && table.selectedRows.length === 1 && table.selectedRows[0].page === event.page) {
       this.updateEnabled();
     }

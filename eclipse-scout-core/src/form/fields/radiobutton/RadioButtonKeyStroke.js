@@ -23,7 +23,7 @@ export default class RadioButtonKeyStroke extends ButtonKeyStroke {
    * To not prevent a parent key stroke context from execution of the event, the key stroke event is only accepted if the radio button is not selected.
    */
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     return accepted && !this.field.selected;
   }
 }

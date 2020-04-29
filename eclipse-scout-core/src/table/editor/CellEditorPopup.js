@@ -67,7 +67,7 @@ export default class CellEditorPopup extends Popup {
     super._render();
 
     // determine CSS class for first and last column, required for additional margins/padding in cell-editor
-    var cssClass = '',
+    let cssClass = '',
       visibleCols = this.table.visibleColumns(),
       colPos = visibleCols.indexOf(this.column);
     if (colPos === 0) { // first cell
@@ -80,7 +80,7 @@ export default class CellEditorPopup extends Popup {
       .addClass('cell-editor-popup ' + cssClass)
       .data('popup', this);
 
-    var field = this.cell.field;
+    let field = this.cell.field;
     field.mode = FormField.Mode.CELLEDITOR; // hint that this field is used within a cell-editor
     field.render();
     field.prepareForCellEdit({
@@ -113,7 +113,7 @@ export default class CellEditorPopup extends Popup {
     super._postRender(); // installs the focus context for this popup
 
     // If applicable, invoke the field's function 'onCellEditorRendered' to signal the cell-editor to be rendered.
-    var field = this.cell.field;
+    let field = this.cell.field;
     if (field.onCellEditorRendered) {
       field.onCellEditorRendered({
         openFieldPopup: this.table.openFieldPopupOnCellEdit,
@@ -135,7 +135,7 @@ export default class CellEditorPopup extends Popup {
   }
 
   position() {
-    var cellBounds, rowBounds,
+    let cellBounds, rowBounds,
       $tableData = this.table.$data,
       $row = this.row.$row,
       $cell = this.$anchor,
@@ -160,20 +160,20 @@ export default class CellEditorPopup extends Popup {
     // There is no blur event when the popup gets closed -> trigger blur so that the field may react (accept display text, close popups etc.)
     // When acceptInput returns a promise, we must wait until input is accepted
     // Otherwise call completeEdit immediately, also call it immediately if waitForAcceptInput is false (see _onKeyStroke)
-    var field = this.cell.field;
-    var acceptInputPromise = field.acceptInput();
+    let field = this.cell.field;
+    let acceptInputPromise = field.acceptInput();
     if (!acceptInputPromise || !scout.nvl(waitForAcceptInput, true)) {
       this._pendingCompleteCellEdit = $.resolvedPromise();
       this.table.completeCellEdit();
     } else {
-      this._pendingCompleteCellEdit = acceptInputPromise.then(function() {
+      this._pendingCompleteCellEdit = acceptInputPromise.then(() => {
         this.table.completeCellEdit();
-      }.bind(this));
+      });
     }
 
-    this._pendingCompleteCellEdit.then(function() {
+    this._pendingCompleteCellEdit.then(() => {
       this._pendingCompleteCellEdit = null;
-    }.bind(this));
+    });
 
     return this._pendingCompleteCellEdit;
   }

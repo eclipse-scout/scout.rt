@@ -11,10 +11,10 @@
 import {scout, Tree} from '../../../src/index';
 import {OutlineSpecHelper} from '@eclipse-scout/testing';
 
-describe('DesktopNavigation', function() {
-  var session, desktop, outlineHelper;
+describe('DesktopNavigation', () => {
+  let session, desktop, outlineHelper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession({
       renderDesktop: false,
@@ -26,9 +26,9 @@ describe('DesktopNavigation', function() {
     outlineHelper = new OutlineSpecHelper(session);
   });
 
-  describe('viewButtonBox', function() {
+  describe('viewButtonBox', () => {
 
-    it('is visible when there are more than one ViewButtons', function() {
+    it('is visible when there are more than one ViewButtons', () => {
       desktop.viewButtons = [
         scout.create('ViewButton', {
           parent: desktop,
@@ -45,13 +45,13 @@ describe('DesktopNavigation', function() {
       expect(desktop.navigation.viewButtonBox.visible).toBe(true);
     });
 
-    it('is not visible if there are no view buttons', function() {
+    it('is not visible if there are no view buttons', () => {
       desktop.viewButtons = [];
       desktop.render(session.$entryPoint);
       expect(desktop.navigation.viewButtonBox.visible).toBeFalsy();
     });
 
-    it('is not visible when there is only one ViewButton', function() {
+    it('is not visible when there is only one ViewButton', () => {
       desktop.viewButtons = [scout.create('ViewButton', {
         parent: desktop,
         displayStyle: 'MENU'
@@ -60,7 +60,7 @@ describe('DesktopNavigation', function() {
       expect(desktop.navigation.viewButtonBox.visible).toBe(false);
     });
 
-    it('has only one ViewButtonMenu if all buttons are displayType menu', function() {
+    it('has only one ViewButtonMenu if all buttons are displayType menu', () => {
       desktop.viewButtons = [
         scout.create('ViewButton', {
           parent: desktop,
@@ -79,10 +79,10 @@ describe('DesktopNavigation', function() {
     });
   });
 
-  describe('outline', function() {
+  describe('outline', () => {
 
-    it('collapses and expands in two steps when breadcrumb toggling enabled', function() {
-      var outline = _setupOutline(outlineHelper, desktop, true);
+    it('collapses and expands in two steps when breadcrumb toggling enabled', () => {
+      let outline = _setupOutline(outlineHelper, desktop, true);
 
       expect(desktop.navigationVisible).toBe(true);
       expect(desktop.outline.displayStyle).toBe(Tree.DisplayStyle.DEFAULT);
@@ -115,8 +115,8 @@ describe('DesktopNavigation', function() {
       expect(desktop.navigation.handle.rightVisible).toBe(false);
     });
 
-    it('collapses and expands in one step when breadcrumb toggling disabled', function() {
-      var outline = _setupOutline(outlineHelper, desktop, false);
+    it('collapses and expands in one step when breadcrumb toggling disabled', () => {
+      let outline = _setupOutline(outlineHelper, desktop, false);
 
       expect(desktop.navigation.handle.leftVisible).toBe(true);
       expect(desktop.navigation.handle.rightVisible).toBe(false);
@@ -139,8 +139,8 @@ describe('DesktopNavigation', function() {
 });
 
 function _setupOutline(outlineHelper, desktop, toggleBreadcrumbStyleEnabled) {
-  var model = outlineHelper.createModelFixture(3, 2);
-  var outline = outlineHelper.createOutline(model);
+  let model = outlineHelper.createModelFixture(3, 2);
+  let outline = outlineHelper.createOutline(model);
   outline.toggleBreadcrumbStyleEnabled = toggleBreadcrumbStyleEnabled;
   outline.displayStyle = Tree.DisplayStyle.DEFAULT;
   desktop.setOutline(outline);

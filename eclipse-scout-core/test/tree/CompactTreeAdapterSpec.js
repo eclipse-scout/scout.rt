@@ -11,11 +11,11 @@
 import {RemoteEvent} from '../../src/index';
 import {TreeSpecHelper} from '@eclipse-scout/testing';
 
-describe('CompactTreeAdapter', function() {
-  var session;
-  var helper;
+describe('CompactTreeAdapter', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TreeSpecHelper(session);
@@ -24,28 +24,28 @@ describe('CompactTreeAdapter', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
     $.fx.off = false;
   });
 
-  describe('selectNodes', function() {
+  describe('selectNodes', () => {
 
-    it('selects child node and notifies server if server selects the first title node', function() {
-      var model = helper.createModelFixture(2, 1, true);
-      var adapter = helper.createCompactTreeAdapter(model);
-      var tree = adapter.createWidget(model, session.desktop);
+    it('selects child node and notifies server if server selects the first title node', () => {
+      let model = helper.createModelFixture(2, 1, true);
+      let adapter = helper.createCompactTreeAdapter(model);
+      let tree = adapter.createWidget(model, session.desktop);
       tree.render();
 
-      var nodes = [tree.nodes[0]];
+      let nodes = [tree.nodes[0]];
       adapter._onNodesSelected([nodes[0].id]);
       sendQueuedAjaxCalls();
       expect(tree.selectedNodes[0]).toBe(tree.nodes[0].childNodes[0]);
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new RemoteEvent(tree.id, 'nodesSelected', {
+      let event = new RemoteEvent(tree.id, 'nodesSelected', {
         nodeIds: [tree.nodes[0].childNodes[0].id]
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);

@@ -11,10 +11,10 @@
 import {scout} from '../../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
 
-describe('TableFieldAdapter', function() {
-  var session, helper, tableHelper;
+describe('TableFieldAdapter', () => {
+  let session, helper, tableHelper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     tableHelper = new TableSpecHelper(session);
@@ -24,7 +24,7 @@ describe('TableFieldAdapter', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
@@ -32,7 +32,7 @@ describe('TableFieldAdapter', function() {
   });
 
   function createTableFieldWithTableModel() {
-    var table = tableHelper.createModelFixture(2, 2);
+    let table = tableHelper.createModelFixture(2, 2);
     registerAdapterData(table, session);
     return createTableFieldModel({table: table.id});
   }
@@ -45,16 +45,16 @@ describe('TableFieldAdapter', function() {
     return helper.createFieldModel('TableField', session.desktop, tableModel);
   }
 
-  describe('property table', function() {
+  describe('property table', () => {
 
-    it('destroys the table and model adapter if value is changed to \'\'', function() {
-      var model = createTableFieldWithTableModel();
-      var adapter = createTableFieldAdapter(model);
-      var tableField = adapter.createWidget(model, session.desktop);
-      var table = tableField.table;
+    it('destroys the table and model adapter if value is changed to \'\'', () => {
+      let model = createTableFieldWithTableModel();
+      let adapter = createTableFieldAdapter(model);
+      let tableField = adapter.createWidget(model, session.desktop);
+      let table = tableField.table;
       expect(session.getModelAdapter(table.id).widget).toBe(table);
 
-      var message = {
+      let message = {
         events: [createPropertyChangeEvent(tableField, {table: ''})]
       };
       session._processSuccessResponse(message);

@@ -34,7 +34,7 @@ export default class GridData {
   }
 
   static createFromHints(field, gridColumnCount) {
-    var data = new GridData(field.gridDataHints);
+    let data = new GridData(field.gridDataHints);
     if (data.w === FormField.FULL_WIDTH) {
       data.w = gridColumnCount;
     }

@@ -21,9 +21,9 @@ export default class PopupManager extends Widget {
 
   _init(model) {
     super._init(model);
-    this.session.layoutValidator.schedulePostValidateFunction(function() {
+    this.session.layoutValidator.schedulePostValidateFunction(() => {
       this._openPopups(this.popups);
-    }.bind(this));
+    });
   }
 
   setPopups(popups) {
@@ -35,21 +35,21 @@ export default class PopupManager extends Widget {
     this._destroyPopups(arrays.diff(this.popups, popups));
     this._setProperty('popups', popups);
     // re-parent popups, since PopupManager is not a real widget but only used to sync data
-    this.popups.forEach(function(popup) {
+    this.popups.forEach(popup => {
       if (popup.parent instanceof scout.PopupManager) {
         popup.setParent(this.session.desktop);
       }
-    }.bind(this));
+    });
   }
 
   _openPopups(popups) {
-    popups.forEach(function(popup) {
+    popups.forEach(popup => {
       popup.open(); // Let the popup itself determine the entry point (important for popup windows)
     });
   }
 
   _destroyPopups(popups) {
-    popups.forEach(function(popup) {
+    popups.forEach(popup => {
       popup.destroy();
     });
   }

@@ -22,14 +22,14 @@ export default class GroupBoxMenuItemsOrder {
    * The buttons are always on the outer side of the group-box, the menus are on the inner side.
    */
   order(items) {
-    var leftButtons = [],
+    let leftButtons = [],
       leftMenus = [],
       rightButtons = [],
       rightMenus = [];
 
-    items.forEach(function(item) {
+    items.forEach(item => {
       if (item.isButton()) {
-        var horizontalAlignment = item.horizontalAlignment;
+        let horizontalAlignment = item.horizontalAlignment;
         if (horizontalAlignment === undefined) {
           // Real buttons have no property 'horizontalAlignment' but a corresponding field on the gridData
           horizontalAlignment = (item.gridData && item.gridData.horizontalAlignment);

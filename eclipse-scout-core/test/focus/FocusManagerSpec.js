@@ -13,10 +13,10 @@ import {Device, FocusRule, focusUtils, scout} from '../../src/index';
 
 /* global FocusManagerSpecHelper */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
-describe('scout.FocusManager', function() {
-  var session, formHelper, focusHelper, focusManager;
+describe('scout.FocusManager', () => {
+  let session, formHelper, focusHelper, focusManager;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     jasmine.Ajax.install();
     session = sandboxSession();
@@ -27,23 +27,23 @@ describe('scout.FocusManager', function() {
     uninstallUnloadHandlers(session);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
   function createDivWithTwoInputs() {
-    var $container = session.$entryPoint.makeDiv();
+    let $container = session.$entryPoint.makeDiv();
     $container.appendElement('<input type="text" val="input1" class="input1">');
     $container.appendElement('<input type="text" val="input2" class="input2">');
     return $container;
   }
 
-  describe('isSelectableText', function() {
+  describe('isSelectableText', () => {
 
-    it('must return true for disabled text-fields', function() {
-      var $textField = $('<input>')
+    it('must return true for disabled text-fields', () => {
+      let $textField = $('<input>')
         .attr('type', 'text')
         .attr('disabled', 'disabled');
       expect(focusUtils.isSelectableText($textField)).toBe(true);
@@ -51,23 +51,23 @@ describe('scout.FocusManager', function() {
 
   });
 
-  describe('Focus fixes for Internet Explorer (IE)', function() {
+  describe('Focus fixes for Internet Explorer (IE)', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       // simulate we are an IE
       Device.get().browser = Device.Browser.INTERNET_EXPLORER;
     });
 
-    it('Click on table-cell, must focus table', function() {
-      var tableHelper = new TableSpecHelper(session);
-      var tableModel = tableHelper.createModelFixture(2, 1);
-      var table = tableHelper.createTable(tableModel);
+    it('Click on table-cell, must focus table', () => {
+      let tableHelper = new TableSpecHelper(session);
+      let tableModel = tableHelper.createModelFixture(2, 1);
+      let table = tableHelper.createTable(tableModel);
       table.render();
 
       // we don't really click - just simulate that the method has been called by the FocusManager
-      var event = {
+      let event = {
         target: $('.table-cell')[0],
-        preventDefault: function() {
+        preventDefault: () => {
         }
       };
       spyOn(event, 'preventDefault');
@@ -76,16 +76,16 @@ describe('scout.FocusManager', function() {
       expect(event.preventDefault).toHaveBeenCalled();
     });
 
-    it('Click on tree-node, must focus tree', function() {
-      var treeHelper = new TreeSpecHelper(session);
-      var treeModel = treeHelper.createModelFixture(1);
-      var tree = treeHelper.createTree(treeModel);
+    it('Click on tree-node, must focus tree', () => {
+      let treeHelper = new TreeSpecHelper(session);
+      let treeModel = treeHelper.createModelFixture(1);
+      let tree = treeHelper.createTree(treeModel);
       tree.render();
 
       // we don't really click - just simulate that the method has been called by the FocusManager
-      var event = {
+      let event = {
         target: $('.tree-node')[0],
-        preventDefault: function() {
+        preventDefault: () => {
         }
       };
       spyOn(event, 'preventDefault');
@@ -96,23 +96,23 @@ describe('scout.FocusManager', function() {
 
   });
 
-  describe('validateFocus', function() {
+  describe('validateFocus', () => {
 
-    it('When nothing else is focusable, focus must be on the Desktop (=sandbox)', function() {
+    it('When nothing else is focusable, focus must be on the Desktop (=sandbox)', () => {
       focusManager.validateFocus();
-      var sandbox = $('#sandbox')[0];
+      let sandbox = $('#sandbox')[0];
       expect(document.activeElement).toBe(sandbox);
     });
 
-    describe('with forms:', function() {
+    describe('with forms:', () => {
 
-      var form;
-      beforeEach(function() {
+      let form;
+      beforeEach(() => {
         form = formHelper.createFormWithFields(session.desktop, false, 4);
         form.render();
       });
 
-      afterEach(function() {
+      afterEach(() => {
         form.destroy();
         form = null;
       });
@@ -121,36 +121,36 @@ describe('scout.FocusManager', function() {
        * Because form is not a dialog, it does not install its own focus-context
        * but uses the focus-context of the Desktop (=sandbox) instead.
        */
-      it('Focus-context must install listeners on its $container', function() {
+      it('Focus-context must install listeners on its $container', () => {
         expect(focusHelper.handlersRegistered(session.$entryPoint)).toBe(true);
       });
 
-      it('Focus must be on the 1st form-field when form is rendered', function() {
-        var $firstField = form.rootGroupBox.fields[0].$field;
+      it('Focus must be on the 1st form-field when form is rendered', () => {
+        let $firstField = form.rootGroupBox.fields[0].$field;
         expect($firstField).toBeFocused();
       });
 
-      it('FocusContext must remember the last focused element', function() {
-        var $secondField = form.rootGroupBox.fields[1].$field;
+      it('FocusContext must remember the last focused element', () => {
+        let $secondField = form.rootGroupBox.fields[1].$field;
         $secondField.focus();
         expect($secondField).toBeFocused();
 
         expect(focusManager._findActiveContext().lastValidFocusedElement).toBe($secondField[0]);
       });
 
-      it('A new FocusContext must be created when a form is opened as dialog', function() {
-        var $secondField = form.rootGroupBox.fields[1].$field;
+      it('A new FocusContext must be created when a form is opened as dialog', () => {
+        let $secondField = form.rootGroupBox.fields[1].$field;
         $secondField.focus(); // must be remembered by focus-context
 
-        var sandboxContext = focusManager._findActiveContext();
+        let sandboxContext = focusManager._findActiveContext();
         expect(sandboxContext.$container).toBe(session.$entryPoint);
 
-        var dialog = formHelper.createFormWithFields(session.desktop, true, 2);
+        let dialog = formHelper.createFormWithFields(session.desktop, true, 2);
         dialog.render();
 
         expect(focusManager._focusContexts.length).toBe(2);
 
-        var dialogContext = focusManager._findActiveContext();
+        let dialogContext = focusManager._findActiveContext();
         expect(dialogContext.$container).toBe(dialog.$container);
 
         // focus-context must install handlers on form $container
@@ -160,8 +160,8 @@ describe('scout.FocusManager', function() {
         expect(sandboxContext.lastValidFocusedElement).toBe($secondField[0]);
       });
 
-      it('Must focus another valid field if the focused field is removed', function() {
-        var $firstField = form.rootGroupBox.fields[0].$field,
+      it('Must focus another valid field if the focused field is removed', () => {
+        let $firstField = form.rootGroupBox.fields[0].$field,
           $secondField = form.rootGroupBox.fields[1].$field;
 
         expect($firstField).toBeFocused();
@@ -169,8 +169,8 @@ describe('scout.FocusManager', function() {
         expect($secondField).toBeFocused();
       });
 
-      it('Must focus another valid field if the focused field is hidden', function() {
-        var $firstField = form.rootGroupBox.fields[0].$field,
+      it('Must focus another valid field if the focused field is hidden', () => {
+        let $firstField = form.rootGroupBox.fields[0].$field,
           $secondField = form.rootGroupBox.fields[1].$field;
 
         expect($firstField).toBeFocused();
@@ -182,11 +182,11 @@ describe('scout.FocusManager', function() {
 
   });
 
-  describe('activateFocusContext', function() {
+  describe('activateFocusContext', () => {
 
-    it('activates the context of the given $container and restores its focus', function() {
-      var $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
-      var $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+    it('activates the context of the given $container and restores its focus', () => {
+      let $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+      let $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);
       focusManager.installFocusContext($container1);
       expect(document.activeElement).toBe($container1.children('.input1')[0]);
 
@@ -206,9 +206,9 @@ describe('scout.FocusManager', function() {
 
   });
 
-  describe('requestFocus', function() {
-    it('focuses the given element', function() {
-      var $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+  describe('requestFocus', () => {
+    it('focuses the given element', () => {
+      let $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
       focusManager.installFocusContext($container1);
 
       focusManager.requestFocus($container1.children('.input1'));
@@ -217,9 +217,9 @@ describe('scout.FocusManager', function() {
       focusManager.uninstallFocusContext($container1);
     });
 
-    it('activates the context of the element if the element to focus is not in the active context', function() {
-      var $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
-      var $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+    it('activates the context of the element if the element to focus is not in the active context', () => {
+      let $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+      let $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);
       focusManager.installFocusContext($container1);
       focusManager.installFocusContext($container2);
 
@@ -235,9 +235,9 @@ describe('scout.FocusManager', function() {
       focusManager.uninstallFocusContext($container2);
     });
 
-    it('does nothing if the element cannot be focused', function() {
-      var $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
-      var $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+    it('does nothing if the element cannot be focused', () => {
+      let $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+      let $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);
       focusManager.installFocusContext($container1);
       focusManager.installFocusContext($container2);
 
@@ -246,7 +246,7 @@ describe('scout.FocusManager', function() {
       expect(focusManager._findActiveContext().$container[0]).toBe($container1[0]);
 
       // Container2 is covered by a glass pane -> requesting focus on a covered element should do nothing
-      var glassPane = scout.create('GlassPane', {
+      let glassPane = scout.create('GlassPane', {
         parent: session.desktop
       });
       glassPane.render($container2);
@@ -258,10 +258,10 @@ describe('scout.FocusManager', function() {
       focusManager.uninstallFocusContext($container2);
     });
 
-    it('activates the correct context', function() {
-      var $input0 = session.$entryPoint.appendElement('<input type="text" class="input0">');
-      var $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
-      var $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+    it('activates the correct context', () => {
+      let $input0 = session.$entryPoint.appendElement('<input type="text" class="input0">');
+      let $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+      let $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);
       focusManager.installFocusContext(session.$entryPoint);
       focusManager.installFocusContext($container1);
       focusManager.installFocusContext($container2);
@@ -284,9 +284,9 @@ describe('scout.FocusManager', function() {
     });
   });
 
-  describe('registerGlassPaneTarget', function() {
-    it('removes the focus if the active element will be covered by the glass pane', function() {
-      var $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+  describe('registerGlassPaneTarget', () => {
+    it('removes the focus if the active element will be covered by the glass pane', () => {
+      let $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
       focusManager.installFocusContext($container1);
 
       focusManager.requestFocus($container1.children('.input1'));
@@ -294,7 +294,7 @@ describe('scout.FocusManager', function() {
       expect(focusManager._findActiveContext().$container[0]).toBe($container1[0]);
 
       // GlassPane will cover the active element -> blur it and focus desktop
-      var glassPane = scout.create('GlassPane', {
+      let glassPane = scout.create('GlassPane', {
         parent: session.desktop
       });
       glassPane.render($container1);
@@ -308,12 +308,12 @@ describe('scout.FocusManager', function() {
     });
   });
 
-  describe('evaluateFocusRule', function() {
-    it('should find first focusable element', function() {
-      var $container = createDivWithTwoInputs().appendTo(session.$entryPoint);
+  describe('evaluateFocusRule', () => {
+    it('should find first focusable element', () => {
+      let $container = createDivWithTwoInputs().appendTo(session.$entryPoint);
       focusManager.installFocusContext($container);
-      var input1 = $container.children('.input1')[0];
-      var input2 = $container.children('.input2')[0];
+      let input1 = $container.children('.input1')[0];
+      let input2 = $container.children('.input2')[0];
 
       expect(focusManager.evaluateFocusRule($container, FocusRule.NONE)).toBe(null);
       expect(focusManager.evaluateFocusRule($container, FocusRule.AUTO)).toBe(input1);

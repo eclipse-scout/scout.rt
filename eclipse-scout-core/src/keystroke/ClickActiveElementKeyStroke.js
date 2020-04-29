@@ -18,13 +18,11 @@ export default class ClickActiveElementKeyStroke extends KeyStroke {
     this.which = which;
     this.stopPropagation = true;
     this.renderingHints.render = true;
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
-      return event._$activeElement;
-    };
+    this.renderingHints.$drawingArea = ($drawingArea, event) => event._$activeElement;
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     if (!accepted) {
       return false;
     }

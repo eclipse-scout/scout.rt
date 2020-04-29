@@ -77,7 +77,7 @@ export default class Scrollbar extends Widget {
     this._scrollDir = this.axis === 'x' ? 'scrollLeft' : 'scrollTop';
 
     // Install listeners
-    var scrollbars = this.$parent.data('scrollbars');
+    let scrollbars = this.$parent.data('scrollbars');
     if (!scrollbars) {
       throw new Error('Data "scrollbars" missing in ' + graphics.debugOutput(this.$parent) + '\nAncestors: ' + this.ancestorsToString(1));
     }
@@ -85,10 +85,10 @@ export default class Scrollbar extends Widget {
       .on('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
       .on('scroll', this._onScrollHandler)
       .onPassive('touchstart', this._onTouchStartHandler);
-    scrollbars.forEach(function(scrollbar) {
+    scrollbars.forEach(scrollbar => {
       scrollbar.on('scrollStart', this._fixScrollbarHandler);
       scrollbar.on('scrollEnd', this._unfixScrollbarHandler);
-    }.bind(this));
+    });
     this.$container.on('mousedown', this._onScrollbarMouseDownHandler);
     this._$thumb.on('mousedown', this._onThumbMouseDownHandler);
     // Scrollbar might be clipped to prevent overlapping an ancestor. In order to reset this clipping the scrollbar needs
@@ -99,15 +99,15 @@ export default class Scrollbar extends Widget {
 
   _remove() {
     // Uninstall listeners
-    var scrollbars = this.$parent.data('scrollbars');
+    let scrollbars = this.$parent.data('scrollbars');
     this.$parent
       .off('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
       .off('scroll', this._onScrollHandler)
       .offPassive('touchstart', this._onTouchStartHandler);
-    scrollbars.forEach(function(scrollbar) {
+    scrollbars.forEach(scrollbar => {
       scrollbar.off('scrollStart', this._fixScrollbarHandler);
       scrollbar.off('scrollEnd', this._unfixScrollbarHandler);
-    }.bind(this));
+    });
     this.$container.off('mousedown', this._onScrollbarMouseDownHandler);
     this._$thumb.off('mousedown', '', this._onThumbMouseDownHandler);
     this._$ancestors.off('scroll resize', this._onAncestorScrollOrResizeHandler);
@@ -125,7 +125,7 @@ export default class Scrollbar extends Widget {
     // Container with JS scrollbars must have either relative or absolute position
     // otherwise we cannot determine the correct dimension of the scrollbars
     if (this.$parent && this.$parent.isAttached()) {
-      var cssPosition = this.$parent.css('position');
+      let cssPosition = this.$parent.css('position');
       if (!scout.isOneOf(cssPosition, 'relative', 'absolute')) {
         this.$parent.css('position', 'relative');
       }
@@ -136,7 +136,7 @@ export default class Scrollbar extends Widget {
    * scroll by "diff" in px (positive and negative)
    */
   scroll(diff) {
-    var posOld = Math.max(0, this.$parent[this._scrollDir]());
+    let posOld = Math.max(0, this.$parent[this._scrollDir]());
     this._scrollToAbsolutePoint(posOld + diff);
   }
 
@@ -144,7 +144,7 @@ export default class Scrollbar extends Widget {
    * scroll to absolute point (expressed as absolute point in px)
    */
   _scrollToAbsolutePoint(absolutePoint) {
-    var scrollPos = Math.min(
+    let scrollPos = Math.min(
       (this._scrollSize - this._offsetSize + 1), // scrollPos can't be larger than the start of last page. Add +1 because at least chrome has issues to scroll to the very bottom if scrollTop is fractional
       Math.max(0, Math.round(absolutePoint))); // scrollPos can't be negative
 
@@ -158,10 +158,10 @@ export default class Scrollbar extends Widget {
     if (!this.rendered) {
       return;
     }
-    var margin = this.$container['cssMargin' + this.axis.toUpperCase()]();
-    var scrollPos = this.$parent[this._scrollDir]();
-    var scrollLeft = this.$parent.scrollLeft();
-    var scrollTop = this.$parent.scrollTop();
+    let margin = this.$container['cssMargin' + this.axis.toUpperCase()]();
+    let scrollPos = this.$parent[this._scrollDir]();
+    let scrollLeft = this.$parent.scrollLeft();
+    let scrollTop = this.$parent.scrollTop();
 
     this.reset();
 
@@ -169,20 +169,20 @@ export default class Scrollbar extends Widget {
     this._scrollSize = this.$parent[0]['scroll' + this._dim];
 
     // calc size and range of thumb
-    var thumbSize = Math.max(this._offsetSize * this._offsetSize / this._scrollSize - margin, 25);
-    var thumbRange = this._offsetSize - thumbSize - margin;
+    let thumbSize = Math.max(this._offsetSize * this._offsetSize / this._scrollSize - margin, 25);
+    let thumbRange = this._offsetSize - thumbSize - margin;
 
     // set size of thumb
     this._$thumb.css(this._dim.toLowerCase(), thumbSize);
 
     // set location of thumb
-    var posNew = scrollPos / (this._scrollSize - this._offsetSize) * thumbRange;
+    let posNew = scrollPos / (this._scrollSize - this._offsetSize) * thumbRange;
     this._$thumb.css(this._dir, posNew);
 
     // Add 1px to make sure scroll bar is not shown if width is a floating point value.
     // Even if we were using getBoundingClientRect().width to get an exact width,
     // it would not help because scroll size is always an integer
-    var offsetFix = 1;
+    let offsetFix = 1;
 
     // show scrollbar
     if (this._offsetSize + offsetFix >= this._scrollSize) {
@@ -231,26 +231,26 @@ export default class Scrollbar extends Widget {
     // Clipping is only needed when scrollbar has a fixed position.
     // Otherwise the over-size is handled by 'overflow: hidden;'.
     if (this.$container.css('position') === 'fixed') {
-      var thumbBounds = graphics.offsetBounds(this._$thumb);
-      var thumbWidth = thumbBounds.width;
-      var thumbHeight = thumbBounds.height;
-      var thumbEndX = thumbBounds.x + thumbBounds.width;
-      var thumbEndY = thumbBounds.y + thumbBounds.height;
-      var biggestAncestorBeginX = 0;
-      var biggestAncestorBeginY = 0;
-      var smallestAncestorEndX = thumbEndX;
-      var smallestAncestorEndY = thumbEndY;
+      let thumbBounds = graphics.offsetBounds(this._$thumb);
+      let thumbWidth = thumbBounds.width;
+      let thumbHeight = thumbBounds.height;
+      let thumbEndX = thumbBounds.x + thumbBounds.width;
+      let thumbEndY = thumbBounds.y + thumbBounds.height;
+      let biggestAncestorBeginX = 0;
+      let biggestAncestorBeginY = 0;
+      let smallestAncestorEndX = thumbEndX;
+      let smallestAncestorEndY = thumbEndY;
 
       // Find nearest clip boundaries: It is not necessarily the boundary of the closest ancestor-div in the DOM,
       // because ancestor-divs themselves may be scrolled.
       this.$container.parents('div').each(function() {
-        var $ancestor = $(this);
-        var ancestorBounds = graphics.offsetBounds($ancestor);
+        let $ancestor = $(this);
+        let ancestorBounds = graphics.offsetBounds($ancestor);
         if ($ancestor.css('overflow-x') !== 'visible') {
           if (ancestorBounds.x > biggestAncestorBeginX) {
             biggestAncestorBeginX = ancestorBounds.x;
           }
-          var ancestorEndX = ancestorBounds.x + ancestorBounds.width;
+          let ancestorEndX = ancestorBounds.x + ancestorBounds.width;
           if (ancestorEndX < smallestAncestorEndX) {
             smallestAncestorEndX = ancestorEndX;
           }
@@ -259,17 +259,17 @@ export default class Scrollbar extends Widget {
           if (ancestorBounds.y > biggestAncestorBeginY) {
             biggestAncestorBeginY = ancestorBounds.y;
           }
-          var ancestorEndY = ancestorBounds.y + ancestorBounds.height;
+          let ancestorEndY = ancestorBounds.y + ancestorBounds.height;
           if (ancestorEndY < smallestAncestorEndY) {
             smallestAncestorEndY = ancestorEndY;
           }
         }
       });
 
-      var clipLeft = 0;
-      var clipRight = 0;
-      var clipTop = 0;
-      var clipBottom = 0;
+      let clipLeft = 0;
+      let clipRight = 0;
+      let clipTop = 0;
+      let clipBottom = 0;
 
       // clip left
       if (biggestAncestorBeginX > thumbBounds.x) {
@@ -333,17 +333,17 @@ export default class Scrollbar extends Widget {
     // On a mobile device scroll events are fired delayed so the update will be delayed as well.
     // This will lead to flickering and could be prevented by calling fixScrollbar. But unfortunately calling fix will stop the scroll pane from scrolling immediately, at least in Edge.
     // In order to reduce the flickering the current approach is to hide the scrollbars while scrolling (only in this specific hybrid touch scrolling)
-    events.onScrollStartEndDuringTouch(this.$parent, function() {
+    events.onScrollStartEndDuringTouch(this.$parent, () => {
       if (!this.rendered) {
         return;
       }
       this.$container.css('opacity', 0);
-    }.bind(this), function() {
+    }, () => {
       if (!this.rendered) {
         return;
       }
       this.$container.css('opacity', '');
-    }.bind(this));
+    });
   }
 
   _onScrollWheel(event) {
@@ -357,7 +357,7 @@ export default class Scrollbar extends Widget {
       return true; // only scroll if shift modifier matches
     }
     event = event.originalEvent || this.$container.window(true).event.originalEvent;
-    var w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 20;
+    let w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 20;
 
     this.notifyBeforeScroll();
     this.scroll(w);
@@ -369,22 +369,22 @@ export default class Scrollbar extends Widget {
   _onScrollbarMouseDown(event) {
     this.notifyBeforeScroll();
 
-    var clickableAreaSize = this.$container[this._dim.toLowerCase()]();
+    let clickableAreaSize = this.$container[this._dim.toLowerCase()]();
 
-    var offset = this.$container.offset()[this._dir];
-    var clicked = (this.axis === 'x' ? event.pageX : event.pageY) - offset;
+    let offset = this.$container.offset()[this._dir];
+    let clicked = (this.axis === 'x' ? event.pageX : event.pageY) - offset;
 
-    var percentage;
+    let percentage;
 
     if (this._isContainerTooSmallForThumb()) {
       percentage = Math.min(1, Math.max(0, (clicked / clickableAreaSize))); // percentage can't be larger than 1, nor negative
       this._scrollToAbsolutePoint((percentage * this._scrollSize) - Math.round(this._offsetSize / 2));
     } else { // move the thumb center to clicked point
-      var thumbSize = this._$thumb['outer' + this._dim](true);
-      var minPossible = Math.round(thumbSize / 2);
-      var maxPossible = clickableAreaSize - Math.round(thumbSize / 2);
+      let thumbSize = this._$thumb['outer' + this._dim](true);
+      let minPossible = Math.round(thumbSize / 2);
+      let maxPossible = clickableAreaSize - Math.round(thumbSize / 2);
 
-      var rawPercentage = ((clicked - minPossible) * (1 / (maxPossible - minPossible)));
+      let rawPercentage = ((clicked - minPossible) * (1 / (maxPossible - minPossible)));
       percentage = Math.min(1, Math.max(0, rawPercentage)); // percentage can't be larger than 1, nor negative
 
       this._scrollToAbsolutePoint(percentage * (this._scrollSize - this._offsetSize));
@@ -400,11 +400,11 @@ export default class Scrollbar extends Widget {
     }
     this.notifyBeforeScroll();
     // calculate thumbCenterOffset in px (offset from clicked point to thumb center)
-    var clipped = (this.axis === 'x' ? this._thumbClipping.horizontal() : this._thumbClipping.vertical());
-    var thumbSize = clipped + this._$thumb['outer' + this._dim](true); // including border, margin and padding
-    var thumbClippingOffset = (this.axis === 'x' ? this._thumbClipping.left : this._thumbClipping.top);
-    var thumbCenter = this._$thumb.offset()[this._dir] + Math.floor(thumbSize / 2) - thumbClippingOffset;
-    var thumbCenterOffset = Math.round((this.axis === 'x' ? event.pageX : event.pageY) - thumbCenter);
+    let clipped = (this.axis === 'x' ? this._thumbClipping.horizontal() : this._thumbClipping.vertical());
+    let thumbSize = clipped + this._$thumb['outer' + this._dim](true); // including border, margin and padding
+    let thumbClippingOffset = (this.axis === 'x' ? this._thumbClipping.left : this._thumbClipping.top);
+    let thumbCenter = this._$thumb.offset()[this._dir] + Math.floor(thumbSize / 2) - thumbClippingOffset;
+    let thumbCenterOffset = Math.round((this.axis === 'x' ? event.pageX : event.pageY) - thumbCenter);
 
     this._$thumb.addClass('scrollbar-thumb-move');
     this._$thumb
@@ -424,27 +424,27 @@ export default class Scrollbar extends Widget {
     }
 
     // represents offset in px of clicked point in thumb to the center of the thumb (positive and negative)
-    var thumbCenterOffset = event.data.thumbCenterOffset;
+    let thumbCenterOffset = event.data.thumbCenterOffset;
 
-    var clipped = (this.axis === 'x' ? this._thumbClipping.horizontal() : this._thumbClipping.vertical());
-    var thumbSize = clipped + this._$thumb['outer' + this._dim](true); // including border, margin and padding
-    var size = this.$container[this._dim.toLowerCase()]() - thumbSize; // size of div excluding margin/padding/border
-    var offset = this.$container.offset()[this._dir] + (thumbSize / 2);
+    let clipped = (this.axis === 'x' ? this._thumbClipping.horizontal() : this._thumbClipping.vertical());
+    let thumbSize = clipped + this._$thumb['outer' + this._dim](true); // including border, margin and padding
+    let size = this.$container[this._dim.toLowerCase()]() - thumbSize; // size of div excluding margin/padding/border
+    let offset = this.$container.offset()[this._dir] + (thumbSize / 2);
 
-    var movedTo = Math.min(
+    let movedTo = Math.min(
       size,
       Math.max(0, (this.axis === 'x' ? event.pageX : event.pageY) - offset - thumbCenterOffset));
 
-    var percentage = Math.min(
+    let percentage = Math.min(
       1, // percentage can't be larger than 1
       Math.max(0, (movedTo / size))); // percentage can't be negative
 
-    var posNew = (percentage * (this._scrollSize - this._offsetSize));
+    let posNew = (percentage * (this._scrollSize - this._offsetSize));
     this._scrollToAbsolutePoint(posNew);
   }
 
   _onDocumentMouseUp(event) {
-    var $document = $(event.currentTarget);
+    let $document = $(event.currentTarget);
     $document.off('mousemove', this._onDocumentMousemoveHandler);
     if (this.rendered) {
       this._$thumb.removeClass('scrollbar-thumb-move');
@@ -493,8 +493,8 @@ export default class Scrollbar extends Widget {
    * If the thumb gets bigger than its container this method will return true, otherwise false
    */
   _isContainerTooSmallForThumb() {
-    var thumbSize = this._$thumb['outer' + this._dim](true);
-    var thumbMovableAreaSize = this.$container[this._dim.toLowerCase()]();
+    let thumbSize = this._$thumb['outer' + this._dim](true);
+    let thumbMovableAreaSize = this.$container[this._dim.toLowerCase()]();
     return thumbSize >= thumbMovableAreaSize;
   }
 }

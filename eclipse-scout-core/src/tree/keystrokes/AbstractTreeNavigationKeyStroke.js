@@ -27,7 +27,7 @@ export default class AbstractTreeNavigationKeyStroke extends KeyStroke {
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     if (!accepted) {
       return false;
     }
@@ -40,7 +40,7 @@ export default class AbstractTreeNavigationKeyStroke extends KeyStroke {
   }
 
   handle(event) {
-    var newSelection = this._computeNewSelection(event._treeCurrentNode);
+    let newSelection = this._computeNewSelection(event._treeCurrentNode);
     if (newSelection) {
       this.selectNodesAndReveal(newSelection, true);
     }

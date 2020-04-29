@@ -23,7 +23,7 @@ export default class TableInfoSelectionTooltip extends Tooltip {
   }
 
   _renderText() {
-    var table = this.tableFooter.table,
+    let table = this.tableFooter.table,
       numRowsSelected = table.selectedRows.length;
 
     this.$content.appendSpan().text(this.session.text('ui.NumRowsSelected', this.tableFooter.computeCountInfo(numRowsSelected)));

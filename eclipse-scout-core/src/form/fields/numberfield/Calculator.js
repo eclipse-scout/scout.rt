@@ -30,7 +30,7 @@ export default class Calculator {
   evalFormula(input) {
     this._tokens = input
       .split(/([\d.]+|\(|\)|[+\-*/])/)
-      .filter(function(e) {
+      .filter(e => {
         return e.length !== 0;
       });
     return this._expr();
@@ -44,7 +44,7 @@ export default class Calculator {
   }
 
   _consumeNext() {
-    var cur = this._tokens[0];
+    let cur = this._tokens[0];
     this._tokens = this._tokens.slice(1, this._tokens.length);
     return cur;
   }
@@ -55,7 +55,7 @@ export default class Calculator {
 
   // a+b+...
   _sum() {
-    var v = this._prod();
+    let v = this._prod();
     while (this._next() === '+' || this._next() === '-') {
       switch (this._consumeNext()) { // NOSONAR
         case '+':
@@ -71,7 +71,7 @@ export default class Calculator {
 
   // a*b*...
   _prod() {
-    var v = this._unary();
+    let v = this._unary();
     while (this._next() === '*' || this._next() === '/') {
       switch (this._consumeNext()) { // NOSONAR
         case '*':
@@ -87,14 +87,14 @@ export default class Calculator {
 
   // [+-]123, [+-](a)
   _unary() {
-    var qualifier = 1;
+    let qualifier = 1;
     if (this._next() === '+') {
       this._consumeNext();
     } else if (this._next() === '-') {
       this._consumeNext();
       qualifier = -1;
     }
-    var v;
+    let v;
     if ((v = this._group()) !== undefined) {
       return qualifier * v;
     }
@@ -107,7 +107,7 @@ export default class Calculator {
   _group() {
     if (this._next() === '(') {
       this._consumeNext();
-      var v = this._expr();
+      let v = this._expr();
       if (this._next() !== ')') {
         throw 'missing closing bracket';
       }

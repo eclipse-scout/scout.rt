@@ -43,16 +43,16 @@ export default class DecimalFormat {
     this.multiplier = options.multiplier || 1;
     this.roundingMode = options.roundingMode || RoundingMode.HALF_UP;
 
-    var SYMBOLS = DecimalFormat.PATTERN_SYMBOLS;
+    let SYMBOLS = DecimalFormat.PATTERN_SYMBOLS;
     // Check if there are separate subpatterns for positive and negative numbers ("PositivePattern;NegativePattern")
-    var split = this.pattern.split(SYMBOLS.patternSeparator);
+    let split = this.pattern.split(SYMBOLS.patternSeparator);
     // Use the first subpattern as positive prefix/suffix
-    var positivePrefixAndSuffix = findPrefixAndSuffix(split[0]);
+    let positivePrefixAndSuffix = findPrefixAndSuffix(split[0]);
     this.positivePrefix = positivePrefixAndSuffix.prefix;
     this.positiveSuffix = positivePrefixAndSuffix.suffix;
     if (split.length > 1) {
       // Yes, there is a negative subpattern
-      var negativePrefixAndSuffix = findPrefixAndSuffix(split[1]);
+      let negativePrefixAndSuffix = findPrefixAndSuffix(split[1]);
       this.negativePrefix = negativePrefixAndSuffix.prefix;
       this.negativeSuffix = negativePrefixAndSuffix.suffix;
       // from now on, only look at the positive subpattern
@@ -74,11 +74,11 @@ export default class DecimalFormat {
     }
 
     // find group length
-    var posDecimalSeparator = this.pattern.indexOf(SYMBOLS.decimalSeparator);
+    let posDecimalSeparator = this.pattern.indexOf(SYMBOLS.decimalSeparator);
     if (posDecimalSeparator === -1) {
       posDecimalSeparator = this.pattern.length; // assume decimal separator at end
     }
-    var posGroupingSeparator = this.pattern.lastIndexOf(SYMBOLS.groupingSeparator, posDecimalSeparator); // only search before decimal separator
+    let posGroupingSeparator = this.pattern.lastIndexOf(SYMBOLS.groupingSeparator, posDecimalSeparator); // only search before decimal separator
     if (posGroupingSeparator > 0) {
       this.groupLength = posDecimalSeparator - posGroupingSeparator - 1;
     }
@@ -97,14 +97,14 @@ export default class DecimalFormat {
     // Returns an object with the properties 'prefix' and 'suffix', which contain all characters
     // before or after any 'digit-like' character in the given pattern string.
     function findPrefixAndSuffix(pattern) {
-      var result = {
+      let result = {
         prefix: '',
         suffix: ''
       };
       // Find prefix (anything before the first 'digit-like' character)
-      var digitLikeCharacters = SYMBOLS.digit + SYMBOLS.zeroDigit + SYMBOLS.decimalSeparator + SYMBOLS.groupingSeparator;
-      var r = new RegExp('^(.*?)[' + digitLikeCharacters + '].*$');
-      var matches = r.exec(pattern);
+      let digitLikeCharacters = SYMBOLS.digit + SYMBOLS.zeroDigit + SYMBOLS.decimalSeparator + SYMBOLS.groupingSeparator;
+      let r = new RegExp('^(.*?)[' + digitLikeCharacters + '].*$');
+      let matches = r.exec(pattern);
       if (matches !== null) {
         // Ignore single quotes (for special, quoted characters - e.g. Java quotes percentage sign like '%')
         result.prefix = matches[1].replace(new RegExp('\'([^\']+)\'', 'g'), '$1');
@@ -130,9 +130,9 @@ export default class DecimalFormat {
     if (strings.empty(numberString)) {
       return null;
     }
-    var normalizedNumberString = this.normalize(numberString);
+    let normalizedNumberString = this.normalize(numberString);
     evaluateNumberFunction = evaluateNumberFunction || Number;
-    var number = evaluateNumberFunction(normalizedNumberString);
+    let number = evaluateNumberFunction(normalizedNumberString);
 
     if (isNaN(number)) {
       throw new Error(numberString + ' is not a number (NaN)');
@@ -149,8 +149,8 @@ export default class DecimalFormat {
       return null;
     }
 
-    var prefix = this.positivePrefix;
-    var suffix = this.positiveSuffix;
+    let prefix = this.positivePrefix;
+    let suffix = this.positiveSuffix;
 
     // apply multiplier
     if (applyMultiplier && this.multiplier !== 1) {
@@ -161,10 +161,10 @@ export default class DecimalFormat {
     number = this.round(number);
 
     // after decimal point
-    var after = '';
+    let after = '';
     if (this.allAfter) {
       after = number.toFixed(this.allAfter).split('.')[1];
-      for (var j = after.length - 1; j > this.zeroAfter - 1; j--) {
+      for (let j = after.length - 1; j > this.zeroAfter - 1; j--) {
         if (after[j] !== '0') {
           break;
         }
@@ -183,13 +183,13 @@ export default class DecimalFormat {
     }
 
     // before decimal point
-    var before = Math.floor(number);
+    let before = Math.floor(number);
     before = (before === 0) ? '' : String(before);
     before = strings.padZeroLeft(before, this.zeroBefore);
 
     // group digits
     if (this.groupLength) {
-      for (var i = before.length - this.groupLength; i > 0; i -= this.groupLength) {
+      for (let i = before.length - this.groupLength; i > 0; i -= this.groupLength) {
         before = before.substr(0, i) + this.groupingChar + before.substr(i);
       }
     }

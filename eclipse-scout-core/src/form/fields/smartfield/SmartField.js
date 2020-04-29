@@ -139,8 +139,8 @@ export default class SmartField extends ValueField {
     this.addContainer(this.$parent, 'has-icon ' + this.cssClassName(), new SmartFieldLayout(this));
     this.addLabel();
 
-    var fieldFunc = this.isDropdown() ? fields.makeInputDiv : fields.makeInputOrDiv;
-    var $field = fieldFunc.call(scout.fields, this)
+    let fieldFunc = this.isDropdown() ? fields.makeInputDiv : fields.makeInputOrDiv;
+    let $field = fieldFunc.call(scout.fields, this)
       .on('mousedown', this._onFieldMouseDown.bind(this));
 
     if (!this.touchMode) {
@@ -174,7 +174,7 @@ export default class SmartField extends ValueField {
   }
 
   cssClassName() {
-    var prefix = this.displayStyle;
+    let prefix = this.displayStyle;
     if (this.displayStyle === SmartField.DisplayStyle.DEFAULT) {
       prefix = 'smart';
     }
@@ -182,7 +182,7 @@ export default class SmartField extends ValueField {
   }
 
   _readSearchText() {
-    var fieldText = this._readDisplayText(),
+    let fieldText = this._readDisplayText(),
       displayText = scout.nvl(this.displayText, ''),
       textLines = displayText.split('\n');
 
@@ -199,7 +199,7 @@ export default class SmartField extends ValueField {
   }
 
   _renderDisplayText() {
-    var displayText = scout.nvl(this.displayText, ''),
+    let displayText = scout.nvl(this.displayText, ''),
       textLines = displayText.split('\n');
     if (textLines.length) {
       displayText = textLines[0];
@@ -222,11 +222,11 @@ export default class SmartField extends ValueField {
 
     // Use a timeout to prevent multiple execution within the same user action
     this._acceptInputEnabled = false;
-    setTimeout(function() {
+    setTimeout(() => {
       this._acceptInputEnabled = true;
-    }.bind(this));
+    });
 
-    var
+    let
       searchText = this._readSearchText(),
       searchTextEmpty = strings.empty(searchText),
       searchTextChanged = this._checkSearchTextChanged(searchText),
@@ -274,8 +274,8 @@ export default class SmartField extends ValueField {
   }
 
   _searchTextEquals(searchText, lastSearchText) {
-    var a = strings.nullIfEmpty(this._firstTextLine(searchText));
-    var b = strings.nullIfEmpty(lastSearchText);
+    let a = strings.nullIfEmpty(this._firstTextLine(searchText));
+    let b = strings.nullIfEmpty(lastSearchText);
     return strings.equalsIgnoreCase(a, b);
   }
 
@@ -295,7 +295,7 @@ export default class SmartField extends ValueField {
 
     // Do nothing when search text is equals to the text of the current lookup row
     if (!selectedLookupRow && this.lookupRow) {
-      var lookupRowText = strings.nvl(this.lookupRow.text);
+      let lookupRowText = strings.nvl(this.lookupRow.text);
       if (lookupRowText === searchText) {
         $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptInput) unchanged: text is equals. Close popup');
         this._clearLookupStatus();
@@ -426,7 +426,7 @@ export default class SmartField extends ValueField {
 
   _focusNextTabbable() {
     if (this._tabPrevented) {
-      var $tabElements = this.entryPoint().find(':tabbable'),
+      let $tabElements = this.entryPoint().find(':tabbable'),
         direction = this._tabPrevented.shiftKey ? -1 : 1,
         fieldIndex = $tabElements.index(this.$field),
         nextIndex = fieldIndex + direction;
@@ -437,7 +437,7 @@ export default class SmartField extends ValueField {
         nextIndex = 0;
       }
       $.log.isDebugEnabled() && $.log.debug('(SmartField#_inputAccepted) tab-index=' + fieldIndex + ' next tab-index=' + nextIndex);
-      var $nextElement = $tabElements.eq(nextIndex).focus();
+      let $nextElement = $tabElements.eq(nextIndex).focus();
       if (objects.isFunction($nextElement[0].select)) {
         $nextElement[0].select();
       }
@@ -452,7 +452,7 @@ export default class SmartField extends ValueField {
 
     // when there's exactly one result, we accept that lookup row
     if (result.uniqueMatch) {
-      var lookupRow = result.uniqueMatch;
+      let lookupRow = result.uniqueMatch;
       if (this._isLookupRowActive(lookupRow)) {
         this.setLookupRow(lookupRow);
         this._inputAccepted();
@@ -476,17 +476,17 @@ export default class SmartField extends ValueField {
     result.uniqueMatch = null;
 
     // Set query type on result, e.g. 'byAll'
-    var propertyName = 'by' + strings.toUpperCaseFirstLetter(result.queryBy.toLowerCase());
+    let propertyName = 'by' + strings.toUpperCaseFirstLetter(result.queryBy.toLowerCase());
     result[propertyName] = true;
 
     if (this.browseHierarchy) {
       // tree (hierarchical)
-      var proposalChooser = scout.create('TreeProposalChooser', {
+      let proposalChooser = scout.create('TreeProposalChooser', {
         parent: this,
         smartField: this
       });
       proposalChooser.setLookupResult(result);
-      var leafs = proposalChooser.findLeafs();
+      let leafs = proposalChooser.findLeafs();
       result.numLookupRows = leafs.length;
       if (result.numLookupRows === 1) {
         result.uniqueMatch = leafs[0].lookupRow;
@@ -503,7 +503,7 @@ export default class SmartField extends ValueField {
   }
 
   _acceptInputFail(result) {
-    var searchText = result.text;
+    let searchText = result.text;
 
     // in any other case something went wrong
     if (result.empty) {
@@ -541,7 +541,7 @@ export default class SmartField extends ValueField {
     $.log.isDebugEnabled() && $.log.debug('(SmartField#lookupByRec) rec=', rec);
     this._lastSearchText = null;
     return this._executeLookup(this.lookupCall.cloneForRec(rec))
-      .then(function(result) {
+      .then(result => {
 
         // Since this function is only used for hierarchical trees we
         // can simply set the appendResult flag always to true here
@@ -551,7 +551,7 @@ export default class SmartField extends ValueField {
         if (this.isPopupOpen()) {
           this.popup.setLookupResult(result);
         }
-      }.bind(this))
+      })
       .then(this._triggerLookupCallDone.bind(this));
   }
 
@@ -594,7 +594,7 @@ export default class SmartField extends ValueField {
     if (!codeType) {
       return;
     }
-    var lookupCall = scout.create('CodeLookupCall', {
+    let lookupCall = scout.create('CodeLookupCall', {
       session: this.session,
       codeType: codeType
     });
@@ -622,7 +622,7 @@ export default class SmartField extends ValueField {
 
   _lookupByKeyDone(result) {
     this._notUnique = false;
-    var lookupRow = LookupCall.firstLookupRow(result);
+    let lookupRow = LookupCall.firstLookupRow(result);
     this.setLookupRow(lookupRow);
     return this._formatLookupRow(lookupRow);
   }
@@ -643,7 +643,7 @@ export default class SmartField extends ValueField {
    */
   openPopup(browse) {
     // In case searchRequired is set to true, we always start a new search with the text from the field as query
-    var searchText = this._readDisplayText(),
+    let searchText = this._readDisplayText(),
       searchAlways = this.searchRequired ? true : null;
     $.log.isInfoEnabled() && $.log.info('SmartField#openPopup browse=' + browse + ' searchText=' + searchText +
       ' popup=' + this.popup + ' pendingOpenPopup=' + this._pendingOpenPopup);
@@ -670,7 +670,7 @@ export default class SmartField extends ValueField {
   }
 
   _hasUiError(codes) {
-    var status = this._errorStatus();
+    let status = this._errorStatus();
 
     if (!status) {
       return false;
@@ -683,8 +683,8 @@ export default class SmartField extends ValueField {
     }
 
     // collect codes from the status hierarchy
-    var statusList = Status.asFlatList(status);
-    var foundCodes = statusList.reduce(function(list, status) {
+    let statusList = Status.asFlatList(status);
+    let foundCodes = statusList.reduce((list, status) => {
       if (status.code && list.indexOf(status.code) === -1) {
         list.push(status.code);
       }
@@ -692,7 +692,7 @@ export default class SmartField extends ValueField {
     }, []);
 
     // if one of the requested codes exist in the list of found codes
-    return codes.some(function(code) {
+    return codes.some(code => {
       return foundCodes.indexOf(code) > -1;
     });
   }
@@ -720,7 +720,7 @@ export default class SmartField extends ValueField {
     // this avoids unnecessary lookup-calls when a keyboard event has triggered
     // the lookupByTextOrAll function but the search-text has not changed #226643.
     if (!browse && !searchAlways) {
-      var lastSearchText = null;
+      let lastSearchText = null;
       if (this._lastSearchText) {
         lastSearchText = this._lastSearchText;
       } else {
@@ -735,8 +735,8 @@ export default class SmartField extends ValueField {
 
     this._clearPendingLookup();
 
-    var deferred = $.Deferred();
-    var doneHandler = function(result) {
+    let deferred = $.Deferred();
+    let doneHandler = function(result) {
       this._lookupByTextOrAllDone(result);
       deferred.resolve(result);
     }.bind(this);
@@ -761,13 +761,13 @@ export default class SmartField extends ValueField {
       }
     } else {
       // execute lookup byText with a debounce/delay
-      this._pendingLookup = setTimeout(function() {
+      this._pendingLookup = setTimeout(() => {
         $.log.isDebugEnabled() && $.log.debug('(SmartField#_lookupByTextOrAll) lookup byText searchText=' + searchText);
         this._lastSearchText = searchText;
         this._executeLookup(this.lookupCall.cloneForText(searchText), true)
           .done(doneHandler)
           .done(this._triggerLookupCallDone.bind(this));
-      }.bind(this), SmartField.DEBOUNCE_DELAY);
+      }, SmartField.DEBOUNCE_DELAY);
     }
 
     return deferred.promise();
@@ -826,7 +826,7 @@ export default class SmartField extends ValueField {
       return;
     }
 
-    var popupStatus = null;
+    let popupStatus = null;
     if (result.numLookupRows > this.browseMaxRowCount) {
       // Info: we limit the lookup rows here, but this is more a last line of defense
       // limit should be always performed on the server, so we don't have to transfer
@@ -871,7 +871,7 @@ export default class SmartField extends ValueField {
       // a filter can lead to an empty result (for instance when there are no
       // inactive proposals), and it's hard to switch to another filter value
       // when the popup does not show up at all.
-      var emptyResult = {
+      let emptyResult = {
         lookupRows: []
       };
       this._ensurePopup(emptyResult);
@@ -888,8 +888,8 @@ export default class SmartField extends ValueField {
     this.$field.addClass('focused');
     this.$container.addClass('popup-open');
 
-    var useTouch = this.touchMode && !this.isDropdown();
-    var popupType = useTouch ? 'SmartFieldTouchPopup' : 'SmartFieldPopup';
+    let useTouch = this.touchMode && !this.isDropdown();
+    let popupType = useTouch ? 'SmartFieldTouchPopup' : 'SmartFieldPopup';
     this._pendingOpenPopup = false;
     this.popup = scout.create(popupType, {
       parent: this,
@@ -914,17 +914,17 @@ export default class SmartField extends ValueField {
      *      is stateful. The java field always passes the activeFilter property to the
      *      lookup call.
      */
-    var fieldForPopup = useTouch ? this.popup._field : this;
+    let fieldForPopup = useTouch ? this.popup._field : this;
     this.popup.on('lookupRowSelected', fieldForPopup._onLookupRowSelected.bind(fieldForPopup));
     this.popup.on('activeFilterSelected', this._onActiveFilterSelected.bind(this)); // intentionally use this instead of fieldForPopup *1
-    this.popup.one('remove', function() {
+    this.popup.one('remove', () => {
       this.popup = null;
       if (this.rendered) {
         this.$container.removeClass('popup-open');
         this.$field.removeClass('focused');
         this._renderErrorStatus();
       }
-    }.bind(this));
+    });
   }
 
   closePopup() {
@@ -942,9 +942,9 @@ export default class SmartField extends ValueField {
     if (this.touchMode) {
       return false;
     }
-    var eventOnField = this.$field.isOrHas(target) || this.$icon.isOrHas(target) || (this.$clearIcon && this.$clearIcon.isOrHas(target));
-    var eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
-    var eventOnTooltip = this._tooltip() && this._tooltip().rendered && this._tooltip().$container.isOrHas(target);
+    let eventOnField = this.$field.isOrHas(target) || this.$icon.isOrHas(target) || (this.$clearIcon && this.$clearIcon.isOrHas(target));
+    let eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
+    let eventOnTooltip = this._tooltip() && this._tooltip().rendered && this._tooltip().$container.isOrHas(target);
     if (!eventOnField && !eventOnPopup && !eventOnTooltip) {
       this.acceptInput(true); // event outside this value field
     }
@@ -962,11 +962,11 @@ export default class SmartField extends ValueField {
     if (!this.isDropdown() && !fields.handleOnClick(this)) {
       if (this.popup && this.popup.removalPending) {
         // If smart field is activated while it is closing (during remove animation), wait for the animation to finish and activate it afterwards
-        this.popup.one('remove', function() {
+        this.popup.one('remove', () => {
           if (this.rendered) {
             this.activate(onField);
           }
-        }.bind(this));
+        });
       }
       return;
     }
@@ -1056,9 +1056,9 @@ export default class SmartField extends ValueField {
     }
 
     // Pop-ups shouldn't open when one of the following keys is pressed
-    var w = event.which;
-    var isPaste = ((event.ctrlKey || event.metaKey) && w === keys.V) || (event.shiftKey && w === keys.INSERT);
-    var isCut = ((event.ctrlKey || event.metaKey) && w === keys.X) || (event.shiftKey && w === keys.DELETE);
+    let w = event.which;
+    let isPaste = ((event.ctrlKey || event.metaKey) && w === keys.V) || (event.shiftKey && w === keys.INSERT);
+    let isCut = ((event.ctrlKey || event.metaKey) && w === keys.X) || (event.shiftKey && w === keys.DELETE);
 
     if (!isPaste && !isCut && (
       event.ctrlKey ||
@@ -1132,7 +1132,7 @@ export default class SmartField extends ValueField {
 
     // For dropdowns, not only navigation keys trigger the popup (see code below).
     // However, there are still some exceptions that should be ignored:
-    var w = event.which;
+    let w = event.which;
     if (this.isDropdown() && (
       event.ctrlKey ||
       event.altKey ||
@@ -1188,9 +1188,9 @@ export default class SmartField extends ValueField {
   }
 
   _updateUserWasTyping(event) {
-    var w = event.which;
-    var isPaste = ((event.ctrlKey || event.metaKey) && w === keys.V) || (event.shiftKey && w === keys.INSERT);
-    var isCut = ((event.ctrlKey || event.metaKey) && w === keys.X) || (event.shiftKey && w === keys.DELETE);
+    let w = event.which;
+    let isPaste = ((event.ctrlKey || event.metaKey) && w === keys.V) || (event.shiftKey && w === keys.INSERT);
+    let isCut = ((event.ctrlKey || event.metaKey) && w === keys.X) || (event.shiftKey && w === keys.DELETE);
 
     if (!isPaste && !isCut && (
       event.ctrlKey ||
@@ -1223,7 +1223,7 @@ export default class SmartField extends ValueField {
   }
 
   _isNavigationKey(event) {
-    var navigationKeys = [
+    let navigationKeys = [
       keys.PAGE_UP,
       keys.PAGE_DOWN,
       keys.UP,
@@ -1256,7 +1256,7 @@ export default class SmartField extends ValueField {
     // enter key in order to select a result (see ticket #229775).
     this._clearPendingLookup();
 
-    var currentLookupCall = this.original()._currentLookupCall;
+    let currentLookupCall = this.original()._currentLookupCall;
 
     if (currentLookupCall) {
       currentLookupCall.abort();
@@ -1276,8 +1276,8 @@ export default class SmartField extends ValueField {
    */
   _onActiveFilterSelected(event) {
     this.setActiveFilter(event.activeFilter);
-    var browse = !this.searchRequired;
-    var searchText = this._readSearchText();
+    let browse = !this.searchRequired;
+    let searchText = this._readSearchText();
     if (this.lookupRow) {
       if (this.lookupRow.text !== searchText) {
         browse = false;
@@ -1327,7 +1327,7 @@ export default class SmartField extends ValueField {
     this.lookupSeqNo++;
     this.setLoading(true);
 
-    var currentLookupCall = this.original()._currentLookupCall;
+    let currentLookupCall = this.original()._currentLookupCall;
 
     if (abortExisting && currentLookupCall) {
       currentLookupCall.abort();
@@ -1339,12 +1339,12 @@ export default class SmartField extends ValueField {
 
     return lookupCall
       .execute()
-      .always(function() {
+      .always(() => {
         this.original()._currentLookupCall = null;
         this.setLoading(false);
         this._clearLookupStatus();
         this._clearNoResultsErrorStatus();
-      }.bind(this));
+      });
   }
 
   /**
@@ -1419,14 +1419,14 @@ export default class SmartField extends ValueField {
   }
 
   resetDisplayText() {
-    var returned = this.formatValue(this.value);
+    let returned = this.formatValue(this.value);
     if (returned && $.isFunction(returned.promise)) {
       // Promise is returned -> set display text later
       returned
         .done(this._setAndRenderDisplayText.bind(this))
-        .fail(function() {
+        .fail(() => {
           $.log.isInfoEnabled() && $.log.info('Could not resolve display text for value: ' + this.value);
-        }.bind(this));
+        });
     } else {
       this._setAndRenderDisplayText(returned);
     }
@@ -1492,11 +1492,11 @@ export default class SmartField extends ValueField {
       return false;
     }
 
-    var text;
+    let text;
     if (this.rendered) {
       // check if text matches (deal with multi-line)
       text = this._readDisplayText();
-      var additionalLines = this.additionalLines();
+      let additionalLines = this.additionalLines();
       if (additionalLines) {
         text = [text].concat(additionalLines).join('\n');
       }
@@ -1554,7 +1554,7 @@ export default class SmartField extends ValueField {
   }
 
   additionalLines() {
-    var text = scout.nvl(this.displayText, ''),
+    let text = scout.nvl(this.displayText, ''),
       textLines = text.split('\n');
     if (textLines.length > 1) {
       textLines.shift();
@@ -1652,7 +1652,7 @@ export default class SmartField extends ValueField {
 
     if (this.lookupStatus.code === SmartField.ErrorCode.NO_RESULTS ||
       this.lookupStatus.code === SmartField.ErrorCode.NOT_UNIQUE) {
-      var errorStatus = this.lookupStatus.clone();
+      let errorStatus = this.lookupStatus.clone();
       errorStatus.severity = Status.Severity.ERROR;
       this.setErrorStatus(errorStatus);
     }

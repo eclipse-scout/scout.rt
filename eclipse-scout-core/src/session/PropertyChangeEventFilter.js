@@ -27,7 +27,7 @@ export default class PropertyChangeEventFilter {
   }
 
   filter(propertyName, value) {
-    return this.filters.some(function(filterFunc) {
+    return this.filters.some(filterFunc => {
       return filterFunc(propertyName, value);
     });
   }
@@ -36,7 +36,7 @@ export default class PropertyChangeEventFilter {
    * Will accept the property if the name matches, it won't check the value.
    */
   addFilterForPropertyName(filteredPropertyName) {
-    this.filters.push(function(propertyName, value) {
+    this.filters.push((propertyName, value) => {
       return propertyName === filteredPropertyName;
     });
   }
@@ -45,7 +45,7 @@ export default class PropertyChangeEventFilter {
     if (!this._filterProperties.hasOwnProperty(propertyName)) {
       return false;
     }
-    var filterPropertyValue = this._filterProperties[propertyName];
+    let filterPropertyValue = this._filterProperties[propertyName];
     return objects.equals(filterPropertyValue, value);
   }
 

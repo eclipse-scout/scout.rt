@@ -22,7 +22,7 @@ export default class ProposalTreeNode extends TreeNode {
   }
 
   _renderText() {
-    var text = this.text;
+    let text = this.text;
     if (this.lookupRow.active === false) {
       text += ' (' + this.session.text('InactiveState') + ')';
     }
@@ -53,7 +53,7 @@ export default class ProposalTreeNode extends TreeNode {
 
   loadChildren() {
     if (this.isBrowseLoadIncremental()) {
-      var parentKey = this.lookupRow.key;
+      let parentKey = this.lookupRow.key;
       return this.proposalChooser.smartField.lookupByRec(parentKey);
     }
     // child nodes are already loaded -> same as parent.loadChildren

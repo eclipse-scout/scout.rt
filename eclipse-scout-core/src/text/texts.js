@@ -16,7 +16,7 @@ const TEXT_KEY_REGEX = /\${textKey:([^}]*)}/;
 let textsByLocale = {};
 
 export function bootstrap(url) {
-  var promise = url ? $.ajaxJson(url) : $.resolvedPromise({});
+  let promise = url ? $.ajaxJson(url) : $.resolvedPromise({});
   return promise.then(_preInit.bind(this, url));
 }
 
@@ -38,8 +38,8 @@ export function _preInit(url, data) {
 }
 
 export function init(model) {
-  var languageTags = Object.keys(model);
-  languageTags.forEach(function(languageTag) {
+  let languageTags = Object.keys(model);
+  languageTags.forEach(languageTag => {
     get(languageTag).addAll(model[languageTag]);
   }, this);
 }
@@ -48,10 +48,10 @@ export function init(model) {
  * Links the texts of the given languageTag to make parent lookup possible (e.g. look first in de-CH, then in de, then in default)
  */
 export function link(languageTag) {
-  var tags = createOrderedLanguageTags(languageTag);
-  var child;
-  tags.forEach(function(tag) {
-    var texts = _get(tag);
+  let tags = createOrderedLanguageTags(languageTag);
+  let child;
+  tags.forEach(tag => {
+    let texts = _get(tag);
     if (!texts) {
       // If there are no texts for the given tag, create an empty Texts object for linking purpose
       texts = new TextMap();
@@ -73,7 +73,7 @@ export function link(languageTag) {
  * - 'default' generates the array: ['default']
  */
 export function createOrderedLanguageTags(languageTag) {
-  var tags = [],
+  let tags = [],
     i = languageTag.lastIndexOf('-');
 
   tags.push(languageTag);
@@ -94,7 +94,7 @@ export function createOrderedLanguageTags(languageTag) {
  * Returns the (modifiable) TextMap for the given language tag.
  */
 export function get(languageTag) {
-  var texts = _get(languageTag);
+  let texts = _get(languageTag);
   if (texts) {
     return texts;
   }
@@ -131,12 +131,12 @@ export function put(languageTag, textMap) {
  * is called, as that method removes all <scout-text> tags.
  */
 export function readFromDOM() {
-  var textMap = {};
+  let textMap = {};
   $('scout-text').each(function() {
     // No need to unescape strings (the browser did this already)
-    var key = $(this).data('key');
+    let key = $(this).data('key');
     // noinspection UnnecessaryLocalVariableJS
-    var value = $(this).data('value');
+    let value = $(this).data('value');
     textMap[key] = value;
   });
   return textMap;
@@ -155,7 +155,7 @@ export function buildKey(key) {
  * @return {string} the resolved key or the unchanged value if the text key could not be extracted.
  */
 export function resolveKey(value) {
-  var result = TEXT_KEY_REGEX.exec(value);
+  let result = TEXT_KEY_REGEX.exec(value);
   if (result && result.length === 2) {
     return result[1];
   }
@@ -168,7 +168,7 @@ export function resolveKey(value) {
  * @return the resolved text in the language of the given session or the unchanged text if the text key could not be extracted.
  */
 export function resolveText(value, languageTag) {
-  var key = resolveKey(value);
+  let key = resolveKey(value);
   if (key !== value) {
     return get(languageTag).get(key);
   }
@@ -185,8 +185,8 @@ export function resolveText(value, languageTag) {
 export function resolveTextProperty(object, textProperty, session) {
   textProperty = textProperty || 'text';
   session = object.session || session;
-  var value = object[textProperty];
-  var text = resolveText(value, session.locale.languageTag);
+  let value = object[textProperty];
+  let text = resolveText(value, session.locale.languageTag);
   if (text !== value) {
     object[textProperty] = text;
   }

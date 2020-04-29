@@ -20,7 +20,7 @@ export default class StringFieldCtrlEnterKeyStroke extends KeyStroke {
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     return accepted && this.field.hasAction;
   }
 

@@ -28,8 +28,8 @@ export function getScrollables(session) {
   }
 
   // return all scrollables, no matter to which session they belong
-  var $scrollables = [];
-  objects.values(_$scrollables).forEach(function($scrollablesPerSession) {
+  let $scrollables = [];
+  objects.values(_$scrollables).forEach($scrollablesPerSession => {
     arrays.pushAll($scrollables, $scrollablesPerSession);
   });
   return $scrollables;
@@ -49,7 +49,7 @@ export function pushScrollable(session, $container) {
 }
 
 export function removeScrollable(session, $container) {
-  var initLength = 0;
+  let initLength = 0;
   if (_$scrollables[session]) {
     initLength = _$scrollables[session].length;
     arrays.$remove(_$scrollables[session], $container);
@@ -73,8 +73,8 @@ export function install($container, options) {
   options.axis = options.axis || 'both';
 
   // Don't use native as variable name because it will break minifying (reserved keyword)
-  var nativeScrollbars = scout.nvl(options.nativeScrollbars, Device.get().hasPrettyScrollbars());
-  var hybridScrollbars = scout.nvl(options.hybridScrollbars,
+  let nativeScrollbars = scout.nvl(options.nativeScrollbars, Device.get().hasPrettyScrollbars());
+  let hybridScrollbars = scout.nvl(options.hybridScrollbars,
     Device.get().canHideScrollbars() &&
     // Don't use native scrolling for ie since it makes the content flicker, unless used on a device supporting touch.
     !(Device.get().isInternetExplorer() && !Device.get().supportsTouch())
@@ -89,12 +89,12 @@ export function install($container, options) {
     $container.css('overflow', 'hidden');
     _installJs($container, options);
   }
-  var htmlContainer = HtmlComponent.optGet($container);
+  let htmlContainer = HtmlComponent.optGet($container);
   if (htmlContainer) {
     htmlContainer.scrollable = true;
   }
   $container.data('scrollable', true);
-  var session = options.session || options.parent.session;
+  let session = options.session || options.parent.session;
   pushScrollable(session, $container);
   return $container;
 }
@@ -139,14 +139,14 @@ export function isJsScrolling($scrollable) {
 
 export function _installJs($container, options) {
   $.log.isTraceEnabled() && $.log.trace('installing JS-scrollbars for container ' + graphics.debugOutput($container));
-  var scrollbars = arrays.ensure($container.data('scrollbars'));
-  scrollbars.forEach(function(scrollbar) {
+  let scrollbars = arrays.ensure($container.data('scrollbars'));
+  scrollbars.forEach(scrollbar => {
     scrollbar.destroy();
   });
   scrollbars = [];
-  var scrollbar;
+  let scrollbar;
   if (options.axis === 'both') {
-    var scrollOptions = $.extend({}, options);
+    let scrollOptions = $.extend({}, options);
     scrollOptions.axis = 'y';
     scrollbar = scout.create('Scrollbar', $.extend({}, scrollOptions));
     scrollbars.push(scrollbar);
@@ -161,7 +161,7 @@ export function _installJs($container, options) {
   }
   $container.data('scrollbars', scrollbars);
 
-  scrollbars.forEach(function(scrollbar) {
+  scrollbars.forEach(scrollbar => {
     scrollbar.render($container);
     scrollbar.update();
   });
@@ -176,9 +176,9 @@ export function uninstall($container, session) {
     return;
   }
 
-  var scrollbars = $container.data('scrollbars');
+  let scrollbars = $container.data('scrollbars');
   if (scrollbars) {
-    scrollbars.forEach(function(scrollbar) {
+    scrollbars.forEach(scrollbar => {
       scrollbar.destroy();
     });
   }
@@ -188,7 +188,7 @@ export function uninstall($container, session) {
   $container.removeClass('hybrid-scrollable');
   $container.removeData('scrollbars');
 
-  var htmlContainer = HtmlComponent.optGet($container);
+  let htmlContainer = HtmlComponent.optGet($container);
   if (htmlContainer) {
     htmlContainer.scrollable = false;
   }
@@ -204,7 +204,7 @@ export function update($scrollable, immediate) {
   if (!$scrollable || !$scrollable.data('scrollable')) {
     return;
   }
-  var scrollbars = $scrollable.data('scrollbars');
+  let scrollbars = $scrollable.data('scrollbars');
   if (!scrollbars) {
     if (Device.get().isIos()) {
       _handleIosPaintBug($scrollable);
@@ -219,7 +219,7 @@ export function update($scrollable, immediate) {
     return;
   }
   // Executes the update later to prevent unnecessary updates
-  setTimeout(function() {
+  setTimeout(() => {
     _update(scrollbars);
     $scrollable.removeData('scrollbarUpdatePending');
   }, 0);
@@ -228,12 +228,12 @@ export function update($scrollable, immediate) {
 
 export function _update(scrollbars) {
   // Reset the scrollbars first to make sure they don't extend the scrollSize
-  scrollbars.forEach(function(scrollbar) {
+  scrollbars.forEach(scrollbar => {
     if (scrollbar.rendered) {
       scrollbar.reset();
     }
   });
-  scrollbars.forEach(function(scrollbar) {
+  scrollbars.forEach(scrollbar => {
     if (scrollbar.rendered) {
       scrollbar.update();
     }
@@ -254,14 +254,14 @@ export function _handleIosPaintBug($scrollable) {
   if ($scrollable.data('scrollbarUpdatePending')) {
     return;
   }
-  setTimeout(function() {
+  setTimeout(() => {
     workaround();
     $scrollable.removeData('scrollbarUpdatePending');
   });
   $scrollable.data('scrollbarUpdatePending', true);
 
   function workaround() {
-    var size = graphics.size($scrollable).subtract(graphics.insets($scrollable, {
+    let size = graphics.size($scrollable).subtract(graphics.insets($scrollable, {
       includePadding: false,
       includeBorder: true
     }));
@@ -274,11 +274,11 @@ export function _handleIosPaintBug($scrollable) {
 }
 
 export function reset($scrollable) {
-  var scrollbars = $scrollable.data('scrollbars');
+  let scrollbars = $scrollable.data('scrollbars');
   if (!scrollbars) {
     return;
   }
-  scrollbars.forEach(function(scrollbar) {
+  scrollbars.forEach(scrollbar => {
     scrollbar.reset();
   });
 }
@@ -306,7 +306,7 @@ export function reset($scrollable) {
  *          of an object, the value is automatically converted to the option "align".
  */
 export function scrollTo($scrollable, $element, options) {
-  var scrollTo,
+  let scrollTo,
     scrollOffsetUp = 4,
     scrollOffsetDown = 8,
     scrollableH = $scrollable.height(),
@@ -325,7 +325,7 @@ export function scrollTo($scrollable, $element, options) {
     options = _createDefaultScrollToOptions(options);
   }
 
-  var align = options.align;
+  let align = options.align;
   if (!align) {
     // If the element is above the visible area it will be aligned to top.
     // If the element is below the visible area it will be aligned to bottom.
@@ -363,7 +363,7 @@ export function scrollTo($scrollable, $element, options) {
 }
 
 export function _createDefaultScrollToOptions(options) {
-  var defaults = {
+  let defaults = {
     animate: false,
     stop: true
   };
@@ -374,7 +374,7 @@ export function _createDefaultScrollToOptions(options) {
  * Horizontally scrolls the $scrollable to the given $element (must be a child of $scrollable)
  */
 export function scrollHorizontalTo($scrollable, $element, options) {
-  var scrollTo,
+  let scrollTo,
     scrollableW = $scrollable.width(),
     elementBounds = graphics.bounds($element, true),
     elementLeft = elementBounds.x,
@@ -391,7 +391,7 @@ export function scrollHorizontalTo($scrollable, $element, options) {
 
 export function scrollTop($scrollable, scrollTop, options) {
   options = _createDefaultScrollToOptions(options);
-  var scrollbarElement = scrollbar($scrollable, 'y');
+  let scrollbarElement = scrollbar($scrollable, 'y');
   if (scrollbarElement) {
     scrollbarElement.notifyBeforeScroll();
   }
@@ -410,7 +410,7 @@ export function scrollTop($scrollable, scrollTop, options) {
 
   // Animated
   animateScrollTop($scrollable, scrollTop, options);
-  $scrollable.promise('scroll').always(function() {
+  $scrollable.promise('scroll').always(() => {
     if (scrollbarElement) {
       scrollbarElement.notifyAfterScroll();
     }
@@ -419,7 +419,7 @@ export function scrollTop($scrollable, scrollTop, options) {
 
 export function scrollLeft($scrollable, scrollLeft, options) {
   options = _createDefaultScrollToOptions(options);
-  var scrollbarElement = scrollbar($scrollable, 'x');
+  let scrollbarElement = scrollbar($scrollable, 'x');
   if (scrollbarElement) {
     scrollbarElement.notifyBeforeScroll();
   }
@@ -438,7 +438,7 @@ export function scrollLeft($scrollable, scrollLeft, options) {
 
   // Animated
   animateScrollLeft($scrollable, scrollLeft, options);
-  $scrollable.promise('scroll').always(function() {
+  $scrollable.promise('scroll').always(() => {
     if (scrollbarElement) {
       scrollbarElement.notifyAfterScroll();
     }
@@ -470,8 +470,8 @@ export function animateScrollLeft($scrollable, scrollLeft, options) {
 }
 
 export function scrollbar($scrollable, axis) {
-  var scrollbars = $scrollable.data('scrollbars') || [];
-  return arrays.find(scrollbars, function(scrollbar) {
+  let scrollbars = $scrollable.data('scrollbars') || [];
+  return arrays.find(scrollbars, scrollbar => {
     return scrollbar.axis === axis;
   });
 }
@@ -488,7 +488,7 @@ export function isLocationInView(location, $scrollable) {
   if (!$scrollable || $scrollable.length === 0) {
     return true;
   }
-  var scrollableOffsetBounds = graphics.offsetBounds($scrollable);
+  let scrollableOffsetBounds = graphics.offsetBounds($scrollable);
   return scrollableOffsetBounds.contains(location.x, location.y);
 }
 
@@ -499,19 +499,19 @@ export function isLocationInView(location, $scrollable) {
 export function onScroll($anchor, handler) {
   handler.$scrollParents = [];
   $anchor.scrollParents().each(function() {
-    var $scrollParent = $(this);
+    let $scrollParent = $(this);
     $scrollParent.on('scroll', handler);
     handler.$scrollParents.push($scrollParent);
   });
 }
 
 export function offScroll(handler) {
-  var $scrollParents = handler.$scrollParents;
+  let $scrollParents = handler.$scrollParents;
   if (!$scrollParents) {
     throw new Error('$scrollParents are not defined');
   }
-  for (var i = 0; i < $scrollParents.length; i++) {
-    var $elem = $scrollParents[i];
+  for (let i = 0; i < $scrollParents.length; i++) {
+    let $elem = $scrollParents[i];
     $elem.off('scroll', handler);
   }
 }
@@ -528,7 +528,7 @@ export function fix($elem) {
   // getBoundingClientRect used by purpose instead of graphics.offsetBounds to get exact values
   // Also important: offset() of jquery returns getBoundingClientRect().top + window.pageYOffset.
   // In case of IE and zoom = 125%, the pageYOffset is 1 because the height of the navigation is bigger than the height of the desktop which may be fractional.
-  var bounds = $elem[0].getBoundingClientRect();
+  let bounds = $elem[0].getBoundingClientRect();
   $elem
     .css('position', 'fixed')
     .cssLeft(bounds.left - $elem.cssMarginLeft())
@@ -546,7 +546,7 @@ export function unfix($elem, timeoutId, immediate) {
     _unfix($elem);
     return;
   }
-  return setTimeout(function() {
+  return setTimeout(() => {
     _unfix($elem);
   }, 50);
 }
@@ -566,13 +566,13 @@ export function _unfix($elem) {
  * @param session (optional) when no session is given, scrollables from all sessions are stored
  */
 export function storeScrollPositions($container, session) {
-  var $scrollables = getScrollables(session);
+  let $scrollables = getScrollables(session);
   if (!$scrollables) {
     return;
   }
 
-  var scrollTop, scrollLeft;
-  $scrollables.forEach(function($scrollable) {
+  let scrollTop, scrollLeft;
+  $scrollables.forEach($scrollable => {
     if ($container.isOrHas($scrollable[0])) {
       scrollTop = $scrollable.scrollTop();
       $scrollable.data('scrollTop', scrollTop);
@@ -588,13 +588,13 @@ export function storeScrollPositions($container, session) {
  * @param session (optional) when no session is given, scrollables from all sessions are restored
  */
 export function restoreScrollPositions($container, session) {
-  var $scrollables = getScrollables(session);
+  let $scrollables = getScrollables(session);
   if (!$scrollables) {
     return;
   }
 
-  var scrollTop, scrollLeft;
-  $scrollables.forEach(function($scrollable) {
+  let scrollTop, scrollLeft;
+  $scrollables.forEach($scrollable => {
     if ($container.isOrHas($scrollable[0])) {
       scrollTop = $scrollable.data('scrollTop');
       if (scrollTop) {
@@ -620,11 +620,11 @@ export function setVisible($scrollable, visible) {
   if (!$scrollable || !$scrollable.data('scrollable')) {
     return;
   }
-  var scrollbars = $scrollable.data('scrollbars');
+  let scrollbars = $scrollable.data('scrollbars');
   if (!scrollbars) {
     return;
   }
-  scrollbars.forEach(function(scrollbar) {
+  scrollbars.forEach(scrollbar => {
     if (scrollbar.rendered) {
       scrollbar.$container.setVisible(visible);
     }
@@ -635,11 +635,11 @@ export function opacity($scrollable, opacity) {
   if (!$scrollable || !$scrollable.data('scrollable')) {
     return;
   }
-  var scrollbars = $scrollable.data('scrollbars');
+  let scrollbars = $scrollable.data('scrollbars');
   if (!scrollbars) {
     return;
   }
-  scrollbars.forEach(function(scrollbar) {
+  scrollbars.forEach(scrollbar => {
     if (scrollbar.rendered) {
       scrollbar.$container.css('opacity', opacity);
     }
@@ -647,8 +647,8 @@ export function opacity($scrollable, opacity) {
 }
 
 export function _getCompleteChildRowsHeightRecursive(children, getChildren, isExpanded, defaultChildHeight) {
-  var height = 0;
-  children.forEach(function(child) {
+  let height = 0;
+  children.forEach(child => {
     if (child.height) {
       height += child.height;
     } else {
@@ -663,33 +663,33 @@ export function _getCompleteChildRowsHeightRecursive(children, getChildren, isEx
 }
 
 export function ensureExpansionVisible(parent) {
-  var isParentExpanded = parent.isExpanded(parent.element);
-  var children = parent.getChildren(parent.element);
-  var parentPositionTop = parent.$element.position().top;
-  var parentHeight = parent.element.height;
-  var scrollTopPos = parent.$scrollable.scrollTop();
+  let isParentExpanded = parent.isExpanded(parent.element);
+  let children = parent.getChildren(parent.element);
+  let parentPositionTop = parent.$element.position().top;
+  let parentHeight = parent.element.height;
+  let scrollTopPos = parent.$scrollable.scrollTop();
 
   // vertical scrolling
   if (!isParentExpanded) {
     // parent is not expanded, make sure that at least one node above the parent is visible
     if (parentPositionTop < parentHeight) {
-      var minScrollTop = Math.max(scrollTopPos - (parentHeight - parentPositionTop), 0);
+      let minScrollTop = Math.max(scrollTopPos - (parentHeight - parentPositionTop), 0);
       scrollTop(parent.$scrollable, minScrollTop, {
         animate: true
       });
     }
   } else if (isParentExpanded && children.length > 0) {
     // parent is expanded and has children, best effort approach to show the expansion
-    var fullDataHeight = parent.$scrollable.height();
+    let fullDataHeight = parent.$scrollable.height();
 
     // get childRowCount considering already expanded rows
-    var childRowsHeight = _getCompleteChildRowsHeightRecursive(children, parent.getChildren, parent.isExpanded, parent.defaultChildHeight);
+    let childRowsHeight = _getCompleteChildRowsHeightRecursive(children, parent.getChildren, parent.isExpanded, parent.defaultChildHeight);
 
     // + 1.5 since its the parent's top position and we want to scroll half a row further to show that there's something after the expansion
-    var additionalHeight = childRowsHeight + (1.5 * parentHeight);
-    var scrollTo = parentPositionTop + additionalHeight;
+    let additionalHeight = childRowsHeight + (1.5 * parentHeight);
+    let scrollTo = parentPositionTop + additionalHeight;
     // scroll as much as needed to show the expansion but make sure that the parent row (plus one more) is still visible
-    var newScrollTop = scrollTopPos + Math.min(scrollTo - fullDataHeight, parentPositionTop - parentHeight);
+    let newScrollTop = scrollTopPos + Math.min(scrollTo - fullDataHeight, parentPositionTop - parentHeight);
     // only scroll down
     if (newScrollTop > scrollTopPos) {
       scrollTop(parent.$scrollable, newScrollTop, {
@@ -701,7 +701,7 @@ export function ensureExpansionVisible(parent) {
 
   if (children.length > 0) {
     // horizontal scrolling: at least 3 levels of hierarchy should be visible (only relevant for small fields)
-    var minLevelLeft = Math.max(parent.element.level - 3, 0) * parent.nodePaddingLevel;
+    let minLevelLeft = Math.max(parent.element.level - 3, 0) * parent.nodePaddingLevel;
     scrollLeft(parent.$scrollable, minLevelLeft, {
       animate: true,
       stop: false

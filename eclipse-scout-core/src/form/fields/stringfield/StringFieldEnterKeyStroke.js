@@ -23,7 +23,7 @@ export default class StringFieldEnterKeyStroke extends KeyStroke {
   _applyPropagationFlags(event) {
     super._applyPropagationFlags(event);
 
-    var activeElement = this.field.$container.activeElement(true);
+    let activeElement = this.field.$container.activeElement(true);
     this.preventInvokeAcceptInputOnActiveValueField = !event.isPropagationStopped() && activeElement.tagName.toLowerCase() === 'textarea';
     if (this.preventInvokeAcceptInputOnActiveValueField) {
       event.stopPropagation();

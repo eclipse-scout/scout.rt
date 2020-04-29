@@ -10,35 +10,33 @@
  */
 import {TestingApp} from '@eclipse-scout/testing';
 
-describe('RemoteApp', function() {
-  var session;
+describe('RemoteApp', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox().addClass('scout'));
     session = sandboxSession({
       renderDesktop: false
     });
   });
 
-  describe('initDone', function() {
+  describe('initDone', () => {
 
-    it('waits for session startup to complete', function(done) {
-      var app = new TestingApp();
+    it('waits for session startup to complete', done => {
+      let app = new TestingApp();
       app.init();
-      app._createSession = function(options) {
-        return session;
-      };
-      var loaded = false;
-      session.start = function() {
-        var def = $.Deferred();
-        setTimeout(function() {
+      app._createSession = options => session;
+      let loaded = false;
+      session.start = () => {
+        let def = $.Deferred();
+        setTimeout(() => {
           loaded = true;
           def.resolve();
         });
         return def.promise();
       };
       app.when('init')
-        .then(function() {
+        .then(() => {
           expect(loaded).toBe(true);
           expect(app.initialized).toBe(true);
         })
@@ -46,20 +44,18 @@ describe('RemoteApp', function() {
         .catch(fail);
     });
 
-    it('is not executed when session startup fails', function(done) {
-      var app = new TestingApp();
+    it('is not executed when session startup fails', done => {
+      let app = new TestingApp();
       app.init()
-        .catch(function() {
+        .catch(() => {
           expect(app.initialized).toBe(false);
           done();
         });
-      app._createSession = function(options) {
-        return session;
-      };
-      var loaded = false;
-      session.start = function() {
-        var def = $.Deferred();
-        setTimeout(function() {
+      app._createSession = options => session;
+      let loaded = false;
+      session.start = () => {
+        let def = $.Deferred();
+        setTimeout(() => {
           loaded = true;
           def.reject();
         });

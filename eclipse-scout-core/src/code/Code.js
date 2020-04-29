@@ -34,7 +34,7 @@ export default class Code {
       if (this._text) {
         throw new Error('Either set texts or text property, not both.');
       }
-      var key = codes.registerTexts(this, model.texts);
+      let key = codes.registerTexts(this, model.texts);
       // Convert to ${textKey:key} so that text() may resolve it
       this._text = texts.buildKey(key);
     }
@@ -44,7 +44,7 @@ export default class Code {
    * @param vararg the language tag or the locale (object with a property languageTag) to load the text for.
    */
   text(vararg) {
-    var languageTag = vararg;
+    let languageTag = vararg;
     if (typeof vararg === 'object') {
       languageTag = vararg.languageTag;
     }
@@ -52,9 +52,9 @@ export default class Code {
   }
 
   visitChildren(visitor) {
-    for (var i = 0; i < this.children.length; i++) {
-      var child = this.children[i];
-      var visitResult = visitor(child);
+    for (let i = 0; i < this.children.length; i++) {
+      let child = this.children[i];
+      let visitResult = visitor(child);
       if (visitResult === true || visitResult === TreeVisitResult.TERMINATE) {
         return TreeVisitResult.TERMINATE;
       }

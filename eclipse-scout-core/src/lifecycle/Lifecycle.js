@@ -60,10 +60,10 @@ export default class Lifecycle {
   }
 
   load() {
-    return this._load().then(function() {
+    return this._load().then(() => {
       this.markAsSaved();
       this.events.trigger('postLoad');
-    }.bind(this));
+    });
   }
 
   /**
@@ -71,9 +71,9 @@ export default class Lifecycle {
    */
   _load() {
     return this.handlers.load()
-      .then(function(status) {
+      .then(status => {
         this.events.trigger('load');
-      }.bind(this));
+      });
   }
 
   /**
@@ -89,7 +89,7 @@ export default class Lifecycle {
   ok() {
     // 1.) validate form
     return this._whenInvalid(this._validate)
-      .then(function(invalid) {
+      .then(invalid => {
         if (invalid) {
           return;
         }
@@ -101,22 +101,22 @@ export default class Lifecycle {
 
         // 3.) perform save operation
         return this._whenInvalid(this._save)
-          .then(function(invalid) {
+          .then(invalid => {
             if (invalid) {
               return;
             }
 
             this.markAsSaved();
             return this.close();
-          }.bind(this));
-      }.bind(this));
+          });
+      });
   }
 
   /**
    * @returns {Promise}
    */
   cancel() {
-    var showMessageBox = this.requiresSave() && this.askIfNeedSave;
+    let showMessageBox = this.requiresSave() && this.askIfNeedSave;
     if (showMessageBox) {
       return this._showYesNoCancelMessageBox(
         this.askIfNeedSaveText,
@@ -133,9 +133,9 @@ export default class Lifecycle {
     this._reset();
 
     // reload the state
-    return this.load().then(function() {
+    return this.load().then(() => {
       this.events.trigger('reset');
-    }.bind(this));
+    });
   }
 
   /**
@@ -159,7 +159,7 @@ export default class Lifecycle {
   save() {
     // 1.) validate form
     return this._whenInvalid(this._validate)
-      .then(function(invalid) {
+      .then(invalid => {
 
         // 2.) invalid or form has not been changed
         if (invalid || !this.requiresSave()) {
@@ -168,14 +168,14 @@ export default class Lifecycle {
 
         // 3.) perform save operation
         return this._whenInvalid(this._save)
-          .then(function(invalid) {
+          .then(invalid => {
             if (invalid) {
               return;
             }
 
             this.markAsSaved();
-          }.bind(this));
-      }.bind(this));
+          });
+      });
   }
 
   /**
@@ -183,10 +183,10 @@ export default class Lifecycle {
    */
   _save() {
     return this.handlers.save()
-      .then(function(status) {
+      .then(status => {
         this.events.trigger('save');
         return status;
-      }.bind(this));
+      });
   }
 
   /**
@@ -223,15 +223,15 @@ export default class Lifecycle {
    */
   _whenInvalid(func) {
     return func.call(this)
-      .then(function(status) {
+      .then(status => {
         if (!status || status.severity === Status.Severity.OK) {
           return $.resolvedPromise(false); // invalid=false
         }
         return this._showStatusMessageBox(status);
-      }.bind(this))
-      .catch(function(error) {
+      })
+      .catch(error => {
         return this._showStatusMessageBox(errorToStatus(error));
-      }.bind(this));
+      });
 
     // See ValueField#_createInvalidValueStatus, has similar code to transform error to status
     function errorToStatus(error) {
@@ -257,7 +257,7 @@ export default class Lifecycle {
       .withNo()
       .withCancel()
       .buildAndOpen()
-      .then(function(option) {
+      .then(option => {
         if (option === MessageBox.Buttons.YES) {
           return yesAction();
         } else if (option === MessageBox.Buttons.NO) {
@@ -278,8 +278,8 @@ export default class Lifecycle {
       .withSeverity(status.severity)
       .withBody(status.message, true)
       .buildAndOpen()
-      .then(function() {
-        var invalid = (status.severity === Status.Severity.ERROR);
+      .then(() => {
+        let invalid = (status.severity === Status.Severity.ERROR);
         return $.resolvedPromise(invalid);
       });
   }
@@ -288,7 +288,7 @@ export default class Lifecycle {
    * @returns {Promise}
    */
   _validate() {
-    var status = this._validateElements();
+    let status = this._validateElements();
     if (status.isValid()) {
       status = this._validateWidget();
     }
@@ -301,8 +301,8 @@ export default class Lifecycle {
    * @return Status
    */
   _validateElements() {
-    var elements = this._invalidElements();
-    var status = new Status();
+    let elements = this._invalidElements();
+    let status = new Status();
     if (elements.missingElements.length === 0 && elements.invalidElements.length === 0) {
       status.severity = Status.Severity.OK;
     } else {
@@ -344,7 +344,7 @@ export default class Lifecycle {
    * Creates a HTML message used to display missing and invalid fields in a message box.
    */
   _createInvalidElementsMessageHtml(missing, invalid) {
-    var $div = $('<div>'),
+    let $div = $('<div>'),
       hasMissing = missing.length > 0,
       hasInvalid = invalid.length > 0;
     if (hasMissing) {
@@ -362,7 +362,7 @@ export default class Lifecycle {
 
     function appendTitleAndList($div, title, elements, elementTextFunc) {
       $div.appendElement('<strong>').text(title);
-      var $ul = $div.appendElement('<ul>');
+      let $ul = $div.appendElement('<ul>');
       elements.forEach(function(element) {
         $ul.appendElement('<li>').text(elementTextFunc.call(this, element));
       }, this);
@@ -398,7 +398,7 @@ export default class Lifecycle {
    *   Only one handler can be registered for each type.
    */
   handle(type, func) {
-    var supportedTypes = ['load', 'save'];
+    let supportedTypes = ['load', 'save'];
     if (supportedTypes.indexOf(type) === -1) {
       throw new Error('Cannot register handler for unsupported type \'' + type + '\'');
     }

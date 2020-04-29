@@ -20,15 +20,15 @@ import {Rectangle} from '../../src/index';
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-describe('Rectangle', function() {
+describe('Rectangle', () => {
 
-  it('equals', function() {
-    var r1 = new Rectangle(0, 0, 10, 5);
-    var r2 = new Rectangle(0, 0, 20, -1);
-    var r3 = new Rectangle(0, 0, 20, -1);
-    var r4 = new Rectangle(0.5, 0.1, 10.2, 5.9);
-    var r5 = new Rectangle(14, 15, 10, 5);
-    var r6 = new Rectangle(14, 15, 20, -1);
+  it('equals', () => {
+    let r1 = new Rectangle(0, 0, 10, 5);
+    let r2 = new Rectangle(0, 0, 20, -1);
+    let r3 = new Rectangle(0, 0, 20, -1);
+    let r4 = new Rectangle(0.5, 0.1, 10.2, 5.9);
+    let r5 = new Rectangle(14, 15, 10, 5);
+    let r6 = new Rectangle(14, 15, 20, -1);
 
     expect(r1.equals(r2)).toBe(false);
     expect(r2.equals(r3)).toBe(true);
@@ -40,17 +40,17 @@ describe('Rectangle', function() {
     expect(r5.equals(r6)).toBe(false);
   });
 
-  it('intersects', function() {
-    var r1 = new Rectangle(0, 0, 10, 5);
-    var r2 = new Rectangle(0, 0, 20, -1);
-    var r3 = new Rectangle(9, 0, 10, 5);
-    var r4 = new Rectangle(10, 0, 10, 5);
-    var r5 = new Rectangle(0, 4, 10, 5);
-    var r6 = new Rectangle(0, 5, 10, 5);
-    var r7 = new Rectangle(4, 7, 10, 5);
-    var r8 = new Rectangle(7, 4, 10, 5);
-    var r9 = new Rectangle(10, 5, 10, 5);
-    var r10 = new Rectangle(12, 8, 10, 5);
+  it('intersects', () => {
+    let r1 = new Rectangle(0, 0, 10, 5);
+    let r2 = new Rectangle(0, 0, 20, -1);
+    let r3 = new Rectangle(9, 0, 10, 5);
+    let r4 = new Rectangle(10, 0, 10, 5);
+    let r5 = new Rectangle(0, 4, 10, 5);
+    let r6 = new Rectangle(0, 5, 10, 5);
+    let r7 = new Rectangle(4, 7, 10, 5);
+    let r8 = new Rectangle(7, 4, 10, 5);
+    let r9 = new Rectangle(10, 5, 10, 5);
+    let r10 = new Rectangle(12, 8, 10, 5);
 
     expect(r1.intersects(r1)).toBe(true);
     expect(r1.intersects(r2)).toBe(false);

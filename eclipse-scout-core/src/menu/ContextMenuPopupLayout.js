@@ -18,7 +18,7 @@ export default class ContextMenuPopupLayout extends PopupWithHeadLayout {
   }
 
   layout($container) {
-    var $menuItems = this.popup.$visibleMenuItems();
+    let $menuItems = this.popup.$visibleMenuItems();
     this._adjustTextAlignment($menuItems);
     this._resetMaxWidthFor($menuItems);
     super.layout($container);
@@ -27,11 +27,11 @@ export default class ContextMenuPopupLayout extends PopupWithHeadLayout {
 
   _adjustTextAlignment($menuItems) {
     // Calculate the text offset (= max icon width)
-    var textOffset = 0;
-    $menuItems.each(function(index, menuItem) {
-      var $menuItem = $(menuItem);
-      var $icon = $menuItem.children('.icon');
-      var iconWidth = 0;
+    let textOffset = 0;
+    $menuItems.each((index, menuItem) => {
+      let $menuItem = $(menuItem);
+      let $icon = $menuItem.children('.icon');
+      let iconWidth = 0;
 
       if ($icon.length > 0) {
         iconWidth = $icon.outerWidth(true);
@@ -41,17 +41,17 @@ export default class ContextMenuPopupLayout extends PopupWithHeadLayout {
 
     // Update the padding of each text such that the sum of icon width and the padding
     // are the same for all items. This ensures that the texts are all aligned.
-    $menuItems.each(function(index, menuItem) {
-      var $menuItem = $(menuItem);
-      var $icon = $menuItem.children('.icon');
-      var $text = $menuItem.children('.text');
-      var iconWidth = 0;
+    $menuItems.each((index, menuItem) => {
+      let $menuItem = $(menuItem);
+      let $icon = $menuItem.children('.icon');
+      let $text = $menuItem.children('.text');
+      let iconWidth = 0;
 
       if ($icon.length > 0) {
         iconWidth = $icon.outerWidth(true);
       }
       $text.css('padding-left', textOffset - iconWidth);
-      var htmlComp = HtmlComponent.optGet($menuItem);
+      let htmlComp = HtmlComponent.optGet($menuItem);
       if (htmlComp) {
         htmlComp.invalidateLayout();
       }
@@ -59,8 +59,8 @@ export default class ContextMenuPopupLayout extends PopupWithHeadLayout {
   }
 
   _resetMaxWidthFor($menuItems) {
-    $menuItems.each(function(pos, item) {
-      var $menu = $(item),
+    $menuItems.each((pos, item) => {
+      let $menu = $(item),
         menu = $menu.data('widget');
 
       if (!menu) {
@@ -75,8 +75,8 @@ export default class ContextMenuPopupLayout extends PopupWithHeadLayout {
   }
 
   _setMaxWidthFor($menuItems) {
-    $menuItems.each(function(pos, item) {
-      var $menu = $(item),
+    $menuItems.each((pos, item) => {
+      let $menu = $(item),
         menu = $menu.data('widget');
 
       if (!menu) {
@@ -88,14 +88,14 @@ export default class ContextMenuPopupLayout extends PopupWithHeadLayout {
         // Submenu icon is on the right side of the text.
         // If there is not enough space to show the whole menu item (icon, text and submenu icon), the text is truncated.
         // Icon and submenu icon are always shown.
-        var textMaxWidth = this._calcTextMaxWidth(menu);
+        let textMaxWidth = this._calcTextMaxWidth(menu);
         menu.$text.cssPxValue('max-width', textMaxWidth);
       }
-    }.bind(this));
+    });
   }
 
   _calcTextMaxWidth(menu) {
-    var containerWidth = menu.$container.width(),
+    let containerWidth = menu.$container.width(),
       $icon = menu.get$Icon(),
       $text = menu.$text,
       $submenuIcon = menu.$submenuIcon,

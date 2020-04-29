@@ -83,7 +83,7 @@ export default class Mode extends Action {
   }
 
   _updateLabelAndIconStyle() {
-    var hasText = !!this.text;
+    let hasText = !!this.text;
     this.get$Icon().toggleClass('with-label', hasText);
   }
 }

@@ -23,13 +23,13 @@ export default class LocaleSpecHelper {
   }
 
   createModel(languageTag) {
-    var model = {};
+    let model = {};
     model.languageTag = languageTag;
     return model;
   }
 
   createLocale(languageTag) {
-    var model = this.createModel(languageTag);
+    let model = this.createModel(languageTag);
     model.decimalFormatSymbols = this.decimalFormatSymbolsByLocale[languageTag];
     model.decimalFormatPatternDefault = '#,##0.###';
     model.dateFormatSymbols = this.dateFormatSymbolsByLocale[languageTag];
@@ -56,14 +56,14 @@ export default class LocaleSpecHelper {
   }
 
   createDecimalFormatSymbolsForDeDE() {
-    var symbols = this.createDecimalFormatSymbolsForDeCH();
+    let symbols = this.createDecimalFormatSymbolsForDeCH();
     symbols.decimalSeparator = ',';
     symbols.groupingSeparator = '.';
     return symbols;
   }
 
   _initDateFormatSymbols() {
-    var symbols = this.createDateFormatSymbolsForDe();
+    let symbols = this.createDateFormatSymbolsForDe();
     this.dateFormatSymbolsByLocale = {};
     this.dateFormatSymbolsByLocale[LocaleSpecHelper.DEFAULT_LOCALE] = symbols;
     this.dateFormatSymbolsByLocale[LocaleSpecHelper.GERMAN_LOCALE] = symbols;

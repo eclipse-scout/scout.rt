@@ -22,7 +22,7 @@ export default class WidgetTooltip extends Tooltip {
     // Default interceptor that stops the propagation for all key strokes except ESCAPE and ENTER.
     // Otherwise, the tooltip would be destroyed for all key strokes that bubble up to the
     // root (see global document listener in Tooltip.js).
-    this.keyStrokeStopPropagationInterceptor = function(event) {
+    this.keyStrokeStopPropagationInterceptor = event => {
       if (scout.isOneOf(event.which, keys.ESC, keys.ENTER)) {
         return;
       }
@@ -30,9 +30,7 @@ export default class WidgetTooltip extends Tooltip {
     };
 
     this.withFocusContext = true;
-    this.initialFocus = function() {
-      return FocusRule.AUTO;
-    };
+    this.initialFocus = () => FocusRule.AUTO;
     this.focusableContainer = false;
   }
 

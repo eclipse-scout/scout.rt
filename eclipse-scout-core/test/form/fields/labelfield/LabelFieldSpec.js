@@ -10,42 +10,42 @@
  */
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('LabelField', function() {
-  var session;
-  var helper;
-  var field;
+describe('LabelField', () => {
+  let session;
+  let helper;
+  let field;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
     field = helper.createField('LabelField');
   });
 
-  describe('HtmlEnabled', function() {
+  describe('HtmlEnabled', () => {
 
-    it('if false, encodes html in display text', function() {
+    it('if false, encodes html in display text', () => {
       field.htmlEnabled = false;
       field.displayText = '<b>Hello</b>';
       field.render();
       expect(field.$field.html()).toBe('&lt;b&gt;Hello&lt;/b&gt;');
     });
 
-    it('if true, does not encode html in display text', function() {
+    it('if true, does not encode html in display text', () => {
       field.htmlEnabled = true;
       field.displayText = '<b>Hello</b>';
       field.render();
       expect(field.$field.html()).toBe('<b>Hello</b>');
     });
 
-    it('if false, replaces \n with br tag and encodes other text', function() {
+    it('if false, replaces \n with br tag and encodes other text', () => {
       field.htmlEnabled = false;
       field.displayText = '<b>Hello</b>\nGoodbye';
       field.render();
       expect(field.$field.html()).toBe('&lt;b&gt;Hello&lt;/b&gt;<br>Goodbye');
     });
 
-    it('if true, does not replace \n with br tag and does not encode other text', function() {
+    it('if true, does not replace \n with br tag and does not encode other text', () => {
       field.htmlEnabled = true;
       field.displayText = '<b>Hello</b>\nGoodbye';
       field.render();
@@ -53,12 +53,12 @@ describe('LabelField', function() {
     });
   });
 
-  describe('acceptInput', function() {
+  describe('acceptInput', () => {
 
     /**
      * If acceptInput wasn't overridden this test would call parseValue and set the touched property.
      */
-    it('must be a NOP operation', function() {
+    it('must be a NOP operation', () => {
       field.setValue('foo');
       field.markAsSaved();
       expect(field.touched).toBe(false);

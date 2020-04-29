@@ -39,9 +39,9 @@ export default class SimpleTabArea extends Widget {
     // reverse since tab.renderAfter() called without sibling=true argument (see _renderTab)
     // will _prepend_ themselves into the container.
     this.tabs.slice().reverse()
-      .forEach(function(tab) {
+      .forEach(tab => {
         this._renderTab(tab);
-      }.bind(this));
+      });
   }
 
   _renderTab(tab) {
@@ -114,7 +114,7 @@ export default class SimpleTabArea extends Widget {
   }
 
   addTab(tab, sibling) {
-    var insertPosition = -1;
+    let insertPosition = -1;
     if (sibling) {
       insertPosition = this.tabs.indexOf(sibling);
     }
@@ -128,7 +128,7 @@ export default class SimpleTabArea extends Widget {
   }
 
   destroyTab(tab) {
-    var index = this.tabs.indexOf(tab);
+    let index = this.tabs.indexOf(tab);
     if (index > -1) {
       this.tabs.splice(index, 1);
       tab.destroy();

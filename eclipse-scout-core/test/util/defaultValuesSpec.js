@@ -10,17 +10,17 @@
  */
 import {defaultValues} from '../../src/index';
 
-describe('scout.defaultValues', function() {
+describe('scout.defaultValues', () => {
 
-  afterEach(function() {
+  afterEach(() => {
     // Reload default values to not influence other tests
     defaultValues.bootstrap();
   });
 
-  describe('init', function() {
+  describe('init', () => {
 
-    it('can load invalid configurations', function() {
-      expect(function() {
+    it('can load invalid configurations', () => {
+      expect(() => {
         defaultValues.init();
       }).toThrow();
       defaultValues.init({});
@@ -30,7 +30,7 @@ describe('scout.defaultValues', function() {
       defaultValues.init({
         'objectTypeHierarchy': {}
       });
-      expect(function() {
+      expect(() => {
         defaultValues.init({
           'objectTypeHierarchy': {
             'FormField': {
@@ -46,10 +46,10 @@ describe('scout.defaultValues', function() {
 
   });
 
-  describe('applyTo', function() {
+  describe('applyTo', () => {
 
-    it('can apply default values to JSON', function() {
-      var config = {
+    it('can apply default values to JSON', () => {
+      let config = {
         'defaults': {
           'FormField': {
             'width': 10,
@@ -86,7 +86,7 @@ describe('scout.defaultValues', function() {
       };
       defaultValues.init(config);
 
-      var testObjects = [{ // [0]
+      let testObjects = [{ // [0]
         'id': '2',
         'objectType': 'SmartField'
       }, { // [1]
@@ -176,8 +176,8 @@ describe('scout.defaultValues', function() {
       expect(testObjects[11].axisData.length).toBe(0);
     });
 
-    it('can apply default values to JSON considering the model variant', function() {
-      var config = {
+    it('can apply default values to JSON considering the model variant', () => {
+      let config = {
         'defaults': {
           'FormField': {
             'enabled': true
@@ -195,7 +195,7 @@ describe('scout.defaultValues', function() {
       };
       defaultValues.init(config);
 
-      var testObjects = [{ // [0]
+      let testObjects = [{ // [0]
         'id': '1',
         'objectType': 'FormField',
         'visible': true,
@@ -232,8 +232,8 @@ describe('scout.defaultValues', function() {
       expect(testObjects[3].borderDecoration).toBe('auto');
     });
 
-    it('copies default values \'by value\'', function() {
-      var config = {
+    it('copies default values \'by value\'', () => {
+      let config = {
         'defaults': {
           'Table': {
             rows: []
@@ -242,7 +242,7 @@ describe('scout.defaultValues', function() {
       };
       defaultValues.init(config);
 
-      var testObjects = [{
+      let testObjects = [{
         'id': '1',
         'objectType': 'Table'
       }, {
@@ -259,7 +259,7 @@ describe('scout.defaultValues', function() {
       expect(testObjects[1].rows).toEqual([]);
       expect(testObjects[2].rows).toEqual(['three']);
 
-      var testRows = testObjects[0].rows;
+      let testRows = testObjects[0].rows;
       testRows.push('one');
 
       expect(testObjects[0].rows).toEqual(['one']);

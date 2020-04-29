@@ -87,11 +87,11 @@ export default class Image extends Widget {
       return;
     }
     this.$container.addClass('chrome-fix');
-    setTimeout(function() {
+    setTimeout(() => {
       if (this.rendered) {
         this.$container.removeClass('chrome-fix');
       }
-    }.bind(this));
+    });
   }
 
   _onImageError(event) {

@@ -25,12 +25,12 @@ export default class FileChooserField extends ValueField {
     super._init(model);
 
     this.fileInput.on('change', this._onFileChange.bind(this));
-    this.on('propertyChange', function(event) {
+    this.on('propertyChange', event => {
       if (event.propertyName === 'enabledComputed') {
         // Propagate "enabledComputed" to inner widget
         this.fileInput.setEnabled(event.newValue);
       }
-    }.bind(this));
+    });
   }
 
   /**
@@ -97,14 +97,14 @@ export default class FileChooserField extends ValueField {
   }
 
   _renderPlaceholder() {
-    var $field = this.fileInput.$text;
+    let $field = this.fileInput.$text;
     if ($field) {
       $field.placeholder(this.label);
     }
   }
 
   _removePlaceholder() {
-    var $field = this.fileInput.$text;
+    let $field = this.fileInput.$text;
     if ($field) {
       $field.placeholder('');
     }
@@ -125,7 +125,7 @@ export default class FileChooserField extends ValueField {
   }
 
   _onFileChange(event) {
-    var file = arrays.first(event.files);
+    let file = arrays.first(event.files);
     if (objects.isNullOrUndefined(file)) {
       this.acceptInput(false);
     }

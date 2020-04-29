@@ -39,7 +39,7 @@ export function bootstrap(fonts) {
   loadingComplete = false;
   preload({
     fonts: fonts,
-    onComplete: function(success, badFonts) {
+    onComplete: (success, badFonts) => {
       if (!success && badFonts && badFonts.length) {
         $.log.warn('Timeout ocurred while pre-loading the following fonts:\n\n- ' + badFonts.join('\n- ') + '\n\n' +
           'Rendering will now continue, but font measurements may be inaccurate. ' +
@@ -129,7 +129,7 @@ const TEST_TIMEOUT = 12 * 1000; // 12 sec
  */
 export function preload(options) {
   options = options || {};
-  var fonts = options.fonts || [];
+  let fonts = options.fonts || [];
   if (!Array.isArray(fonts)) {
     fonts = [fonts];
   }
@@ -139,11 +139,11 @@ export function preload(options) {
   }
 
   // Create a DIV for each font
-  var divs = [];
-  fonts.forEach(function(font) {
+  let divs = [];
+  fonts.forEach(font => {
     // Convert to object
     if (typeof font === 'string') {
-      var fontParts = strings.splitMax(font, '|', 3).map(function(s) {
+      let fontParts = strings.splitMax(font, '|', 3).map(s => {
         return s.trim();
       });
       font = {
@@ -157,11 +157,11 @@ export function preload(options) {
     font.testString = font.testString || options.testString || TEST_STRING;
 
     // these fonts are compared to the custom fonts, strings separated by comma
-    var testFonts = font.testFonts || options.testFonts || TEST_FONTS;
+    let testFonts = font.testFonts || options.testFonts || TEST_FONTS;
 
     // Create DIV with default fonts
     // (Because preloader functionality should not depend on a CSS style sheet we set the required properties programmatically.)
-    var $div = $('body').appendDiv('font-preloader')
+    let $div = $('body').appendDiv('font-preloader')
       .text(font.testString)
       .css('display', 'block')
       .css('visibility', 'hidden')
@@ -179,13 +179,13 @@ export function preload(options) {
       .css('font-family', testFonts);
 
     // Remember size, set new font, and then measure again
-    var originalSize = measureSize($div);
+    let originalSize = measureSize($div);
     $div.data('original-size', originalSize);
     $div.data('font-family', font.family);
     $div.css('font-family', '\'' + font.family + '\',' + testFonts);
     if (font.style) {
-      var style = ($div.attr('style') || '').trim();
-      var sep = (style.substr(-1) === ';' ? '' : ';') + (style ? ' ' : '');
+      let style = ($div.attr('style') || '').trim();
+      let sep = (style.substr(-1) === ';' ? '' : ';') + (style ? ' ' : '');
       $div.attr('style', style + sep + font.style);
     }
 
@@ -203,16 +203,16 @@ export function preload(options) {
     return;
   }
 
-  var onFinished = complete;
-  var timeout = scout.nvl(options.timeout, TEST_TIMEOUT);
-  var watchTimerId, timeoutTimerId;
+  let onFinished = complete;
+  let timeout = scout.nvl(options.timeout, TEST_TIMEOUT);
+  let watchTimerId, timeoutTimerId;
   if (timeout && timeout >= 0) {
     // Add timeout
-    timeoutTimerId = setTimeout(function() {
+    timeoutTimerId = setTimeout(() => {
       clearTimeout(watchTimerId);
       complete(false);
     }, timeout);
-    onFinished = function() {
+    onFinished = () => {
       clearTimeout(timeoutTimerId);
       complete(true);
     };
@@ -225,9 +225,9 @@ export function preload(options) {
 
   function watchWidthChange(delay, onFinished) {
     // Check each DIV
-    var i = divs.length;
+    let i = divs.length;
     while (i--) {
-      var $div = divs[i];
+      let $div = divs[i];
       if (measureSize($div) !== $div.data('original-size')) {
         divs.splice(i, 1);
         $div.remove();
@@ -240,7 +240,7 @@ export function preload(options) {
     }
 
     // Watch again after a small delay
-    watchTimerId = setTimeout(function() {
+    watchTimerId = setTimeout(() => {
       // Slowly increase delay up to 1 second
       if (delay < 1000) {
         delay = delay * 1.2;
@@ -250,14 +250,14 @@ export function preload(options) {
   }
 
   function complete(success) {
-    options.onComplete(success, divs.map(function($div) {
+    options.onComplete(success, divs.map($div => {
       return $div.data('font-family');
     }));
   }
 }
 
 export function measureSize($div) {
-  var size = graphics.size($div, {
+  let size = graphics.size($div, {
     exact: true
   });
   return size.width + 'x' + size.height;
@@ -268,12 +268,12 @@ export function measureSize($div) {
  * font definition objects, suitable for passing to the preload() function (see above).
  */
 export function autoDetectFonts() {
-  var fonts = [];
+  let fonts = [];
   // Implementation note: "styleSheets" and "cssRules" are not arrays (they only look like arrays)
-  var styleSheets = document.styleSheets;
-  for (var i = 0; i < styleSheets.length; i++) {
-    var styleSheet = styleSheets[i];
-    var cssRules;
+  let styleSheets = document.styleSheets;
+  for (let i = 0; i < styleSheets.length; i++) {
+    let styleSheet = styleSheets[i];
+    let cssRules;
     try {
       cssRules = styleSheet.cssRules;
     } catch (error) {
@@ -283,18 +283,18 @@ export function autoDetectFonts() {
         ' (access blocked by browser). Use the bootstrap argument "fonts" to manually list fonts to pre-load.');
       continue;
     }
-    for (var j = 0; j < styleSheet.cssRules.length; j++) {
-      var cssRule = styleSheet.cssRules[j];
+    for (let j = 0; j < styleSheet.cssRules.length; j++) {
+      let cssRule = styleSheet.cssRules[j];
       if (cssRule.type === window.CSSRule.FONT_FACE_RULE) {
-        var style = cssRule.style;
-        var ff = style.getPropertyValue('font-family');
-        var fw = style.getPropertyValue('font-weight');
-        var fs = style.getPropertyValue('font-style');
-        var fv = style.getPropertyValue('font-variant');
-        var ft = style.getPropertyValue('font-stretch');
+        let style = cssRule.style;
+        let ff = style.getPropertyValue('font-family');
+        let fw = style.getPropertyValue('font-weight');
+        let fs = style.getPropertyValue('font-style');
+        let fv = style.getPropertyValue('font-variant');
+        let ft = style.getPropertyValue('font-stretch');
         if (ff) {
           ff = ff.replace(/^["']|["']$/g, ''); // Unquote strings, they will be quoted again automatically
-          var s = [];
+          let s = [];
           if (fw && fw !== 'normal') {
             s.push('font-weight:' + fw);
           }
@@ -307,7 +307,7 @@ export function autoDetectFonts() {
           if (ft && ft !== 'normal') {
             s.push('font-stretch:' + ft);
           }
-          var font = {
+          let font = {
             family: ff
           };
           if (s.length) {

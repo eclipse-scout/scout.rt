@@ -42,12 +42,12 @@ export default class NavigateUpButton extends NavigateButton {
    * top-level node without a parent and the outline has a default detail-form.
    */
   _buttonEnabled() {
-    var parentNode = this.node.parentNode;
+    let parentNode = this.node.parentNode;
     return !!parentNode || !!this.outline.defaultDetailForm || !!this.outline.outlineOverview;
   }
 
   _drill() {
-    var parentNode = this.node.parentNode;
+    let parentNode = this.node.parentNode;
     if (parentNode) {
       $.log.isDebugEnabled() && $.log.debug('drill up to node ' + parentNode);
       this.outline.navigateUpInProgress = true;

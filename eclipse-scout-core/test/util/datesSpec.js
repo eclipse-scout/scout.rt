@@ -11,15 +11,15 @@
 import {dates} from '../../src/index';
 import {LocaleSpecHelper} from '@eclipse-scout/testing';
 
-describe('scout.dates', function() {
+describe('scout.dates', () => {
 
-  describe('shift', function() {
+  describe('shift', () => {
 
     // Note: Test dates need explicit time zone setting, otherwise the result of toISOString (which always
     // returns UTC dates) would depend on the browser's time zone. For convenience, we use UTC as well ("+00:00").
 
-    it('shifts year or month or day', function() {
-      var date = dates.create('2014-11-21');
+    it('shifts year or month or day', () => {
+      let date = dates.create('2014-11-21');
       expect(dates.shift(date, 1).toISOString()).toBe(dates.create('2015-11-21 00:00:00.000').toISOString());
 
       date = dates.create('2014-11-21');
@@ -29,37 +29,37 @@ describe('scout.dates', function() {
       expect(dates.shift(date, 0, 0, 1).toISOString()).toBe(dates.create('2014-11-22 00:00:00.000').toISOString());
     });
 
-    it('shifts year and month if both provided', function() {
-      var date = dates.create('2014-01-01');
+    it('shifts year and month if both provided', () => {
+      let date = dates.create('2014-01-01');
       expect(dates.shift(date, 1, 1).toISOString()).toBe(dates.create('2015-02-01 00:00:00.000').toISOString());
     });
 
-    it('shifts year and month and day if all provided', function() {
-      var date = dates.create('2014-01-01');
+    it('shifts year and month and day if all provided', () => {
+      let date = dates.create('2014-01-01');
       expect(dates.shift(date, 1, 1, 1).toISOString()).toBe(dates.create('2015-02-02 00:00:00.000').toISOString());
     });
 
-    describe('shift year', function() {
+    describe('shift year', () => {
 
-      it('adds or removes years', function() {
-        var date = dates.create('2014-11-21');
+      it('adds or removes years', () => {
+        let date = dates.create('2014-11-21');
         expect(dates.shift(date, 1).toISOString()).toBe(dates.create('2015-11-21 00:00:00.000').toISOString());
 
         date = dates.create('2014-11-01');
         expect(dates.shift(date, -1).toISOString()).toBe(dates.create('2013-11-01 00:00:00.000').toISOString());
       });
 
-      it('handles edge case leap year', function() {
-        var date = dates.create('2016-02-29T00:00:00.000');
+      it('handles edge case leap year', () => {
+        let date = dates.create('2016-02-29T00:00:00.000');
         expect(dates.shift(date, 1).toISOString()).toBe(dates.create('2017-02-28 00:00:00.000').toISOString());
       });
 
     });
 
-    describe('shift month', function() {
+    describe('shift month', () => {
 
-      it('adds or removes months', function() {
-        var date = dates.create('2014-11-21');
+      it('adds or removes months', () => {
+        let date = dates.create('2014-11-21');
         expect(dates.shift(date, 0, 1).toISOString()).toBe(dates.create('2014-12-21 00:00:00.000').toISOString());
 
         date = dates.create('2014-12-21');
@@ -84,8 +84,8 @@ describe('scout.dates', function() {
         expect(dates.shift(date, 0, -12).toISOString()).toBe(dates.create('2013-11-21 00:00:00.000').toISOString());
       });
 
-      it('handles edge case start month', function() {
-        var date = dates.create('2014-11-01');
+      it('handles edge case start month', () => {
+        let date = dates.create('2014-11-01');
         expect(dates.shift(date, 0, 1).toISOString()).toBe(dates.create('2014-12-01 00:00:00.000').toISOString());
 
         date = dates.create('2014-11-01');
@@ -104,8 +104,8 @@ describe('scout.dates', function() {
         expect(dates.shift(date, 0, -13).toISOString()).toBe(dates.create('2013-10-01 00:00:00.000').toISOString());
       });
 
-      it('handles edge case end month', function() {
-        var date = dates.create('2014-10-31');
+      it('handles edge case end month', () => {
+        let date = dates.create('2014-10-31');
         expect(dates.shift(date, 0, 1).toISOString()).toBe(dates.create('2014-11-30 00:00:00.000').toISOString());
 
         date = dates.create('2014-10-31');
@@ -124,18 +124,18 @@ describe('scout.dates', function() {
         expect(dates.shift(date, 0, -25).toISOString()).toBe(dates.create('2012-09-30 00:00:00.000').toISOString());
       });
 
-      it('handles edge case leap year', function() {
-        var date = dates.create('2016-02-29');
+      it('handles edge case leap year', () => {
+        let date = dates.create('2016-02-29');
         expect(dates.shift(date, 0, 12).toISOString()).toBe(dates.create('2017-02-28 00:00:00.000').toISOString());
       });
     });
 
   });
 
-  describe('shiftToNextDayOfType', function() {
+  describe('shiftToNextDayOfType', () => {
 
-    it('shifts to next day of type', function() {
-      var date = dates.create('2015-07-09');
+    it('shifts to next day of type', () => {
+      let date = dates.create('2015-07-09');
       expect(dates.shiftToNextDayOfType(date, 1).toISOString()).toBe(dates.create('2015-07-13 00:00:00.000').toISOString());
 
       date = dates.create('2015-07-09');
@@ -143,20 +143,20 @@ describe('scout.dates', function() {
     });
   });
 
-  describe('shiftToNextDayAndDate', function() {
+  describe('shiftToNextDayAndDate', () => {
 
-    it('shifts to next date with requested week-day and date', function() {
-      var date = dates.create('2020-03-03'); // Tue
+    it('shifts to next date with requested week-day and date', () => {
+      let date = dates.create('2020-03-03'); // Tue
       expect(dates.shiftToNextDayAndDate(date, 1, 22).toISOString()).toBe(dates.create('2020-06-22 00:00:00.000').toISOString()); // 1=Mo
 
       expect(dates.shiftToNextDayAndDate(date, 2, 24).toISOString()).toBe(dates.create('2020-03-24 00:00:00.000').toISOString()); // 2=Tue
     });
   });
 
-  describe('shiftToPreviousDayOfType', function() {
+  describe('shiftToPreviousDayOfType', () => {
 
-    it('shifts to previous day of type', function() {
-      var date = dates.create('2015-07-09');
+    it('shifts to previous day of type', () => {
+      let date = dates.create('2015-07-09');
       expect(dates.shiftToPreviousDayOfType(date, 1).toISOString()).toBe(dates.create('2015-07-06 00:00:00.000').toISOString());
 
       date = dates.create('2015-07-09');
@@ -164,10 +164,10 @@ describe('scout.dates', function() {
     });
   });
 
-  describe('ensureMonday', function() {
+  describe('ensureMonday', () => {
 
-    it('shifts to next monday in direction if it is not a monday yet', function() {
-      var date = dates.create('2016-02-09');
+    it('shifts to next monday in direction if it is not a monday yet', () => {
+      let date = dates.create('2016-02-09');
       expect(dates.ensureMonday(date, 1).toISOString()).toBe(dates.create('2016-02-15 00:00:00.000').toISOString());
 
       date = dates.create('2016-02-21');
@@ -181,10 +181,10 @@ describe('scout.dates', function() {
     });
   });
 
-  describe('isSameDay', function() {
-    it('returns true if day, month and year matches', function() {
-      var date = dates.create('2014-11-21');
-      var date2 = dates.create('2014-11-21 11:13');
+  describe('isSameDay', () => {
+    it('returns true if day, month and year matches', () => {
+      let date = dates.create('2014-11-21');
+      let date2 = dates.create('2014-11-21 11:13');
       expect(dates.isSameDay(date, date2)).toBe(true);
 
       date = dates.create('2014-11-21');
@@ -210,10 +210,10 @@ describe('scout.dates', function() {
 
   });
 
-  describe('compareMonths', function() {
-    it('returns the differences in number of months', function() {
-      var date = dates.create('2014-11-21');
-      var date2 = dates.create('2014-11-21');
+  describe('compareMonths', () => {
+    it('returns the differences in number of months', () => {
+      let date = dates.create('2014-11-21');
+      let date2 = dates.create('2014-11-21');
       expect(dates.compareMonths(date, date2)).toBe(0);
 
       date = dates.create('2014-11-21');
@@ -225,9 +225,9 @@ describe('scout.dates', function() {
       expect(dates.compareMonths(date, date2)).toBe(1);
     });
 
-    it('ignores time', function() {
-      var date = dates.create('2014-11-21T23:00');
-      var date2 = dates.create('2014-11-21');
+    it('ignores time', () => {
+      let date = dates.create('2014-11-21T23:00');
+      let date2 = dates.create('2014-11-21');
       expect(dates.compareMonths(date, date2)).toBe(0);
 
       date = dates.create('2014-11-21');
@@ -239,9 +239,9 @@ describe('scout.dates', function() {
       expect(dates.compareMonths(date, date2)).toBe(1);
     });
 
-    it('works with different years', function() {
-      var date = dates.create('2014-11-21');
-      var date2 = dates.create('2013-11-21');
+    it('works with different years', () => {
+      let date = dates.create('2014-11-21');
+      let date2 = dates.create('2013-11-21');
       expect(dates.compareMonths(date, date2)).toBe(12);
 
       date = dates.create('2014-11-21');
@@ -259,10 +259,10 @@ describe('scout.dates', function() {
 
   });
 
-  describe('compareDays', function() {
-    it('returns the differences in number of days', function() {
-      var date = dates.create('2014-11-21');
-      var date2 = dates.create('2014-11-21');
+  describe('compareDays', () => {
+    it('returns the differences in number of days', () => {
+      let date = dates.create('2014-11-21');
+      let date2 = dates.create('2014-11-21');
       expect(dates.compareDays(date, date2)).toBe(0);
 
       date = dates.create('2014-11-21');
@@ -274,9 +274,9 @@ describe('scout.dates', function() {
       expect(dates.compareDays(date, date2)).toBe(6);
     });
 
-    it('ignores time', function() {
-      var date = dates.create('2014-11-21T23:00');
-      var date2 = dates.create('2014-11-21');
+    it('ignores time', () => {
+      let date = dates.create('2014-11-21T23:00');
+      let date2 = dates.create('2014-11-21');
       expect(dates.compareDays(date, date2)).toBe(0);
 
       date = dates.create('2014-11-21');
@@ -288,9 +288,9 @@ describe('scout.dates', function() {
       expect(dates.compareDays(date, date2)).toBe(1);
     });
 
-    it('works with different month', function() {
-      var date = dates.create('2014-11-21');
-      var date2 = dates.create('2014-10-21');
+    it('works with different month', () => {
+      let date = dates.create('2014-11-21');
+      let date2 = dates.create('2014-10-21');
       expect(dates.compareDays(date, date2)).toBe(31);
 
       date = dates.create('2014-11-21');
@@ -298,9 +298,9 @@ describe('scout.dates', function() {
       expect(dates.compareDays(date, date2)).toBe(-30);
     });
 
-    it('works with different years', function() {
-      var date = dates.create('2014-11-21');
-      var date2 = dates.create('2013-11-21');
+    it('works with different years', () => {
+      let date = dates.create('2014-11-21');
+      let date2 = dates.create('2013-11-21');
       expect(dates.compareDays(date, date2)).toBe(365);
 
       date = dates.create('2014-11-21');
@@ -318,28 +318,28 @@ describe('scout.dates', function() {
 
   });
 
-  describe('timestamp', function() {
+  describe('timestamp', () => {
 
-    it('returns a string of the expected length withonly digits', function() {
-      var ts = dates.timestamp();
+    it('returns a string of the expected length withonly digits', () => {
+      let ts = dates.timestamp();
       expect(typeof ts).toBe('string');
       expect(ts.length).toBe(17);
       expect(/^\d+$/.test(ts)).toBe(true);
 
-      var date = dates.create('2014-11-21 00:33:00.000Z');
+      let date = dates.create('2014-11-21 00:33:00.000Z');
       expect(dates.timestamp(date, true)).toBe('20141121003300000');
     });
 
   });
 
-  describe('orderWeekdays', function() {
+  describe('orderWeekdays', () => {
 
-    it('orders weekdays', function() {
-      var weekdays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-      var check0 = dates.orderWeekdays(weekdays, 0);
-      var check1 = dates.orderWeekdays(weekdays, 1);
-      var check2 = dates.orderWeekdays(weekdays, 2);
-      var check3 = dates.orderWeekdays(weekdays, 3);
+    it('orders weekdays', () => {
+      let weekdays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+      let check0 = dates.orderWeekdays(weekdays, 0);
+      let check1 = dates.orderWeekdays(weekdays, 1);
+      let check2 = dates.orderWeekdays(weekdays, 2);
+      let check3 = dates.orderWeekdays(weekdays, 3);
       expect(check0.join('-')).toBe('So-Mo-Di-Mi-Do-Fr-Sa');
       expect(check1.join('-')).toBe('Mo-Di-Mi-Do-Fr-Sa-So');
       expect(check2.join('-')).toBe('Di-Mi-Do-Fr-Sa-So-Mo');
@@ -348,18 +348,18 @@ describe('scout.dates', function() {
 
   });
 
-  describe('toJsonDate / parseJsonDate', function() {
+  describe('toJsonDate / parseJsonDate', () => {
 
-    it('can handle missing or invalid inputs', function() {
+    it('can handle missing or invalid inputs', () => {
       expect(dates.toJsonDate()).toBe(null);
       expect(dates.parseJsonDate()).toBe(null);
-      expect(function() {
+      expect(() => {
         dates.parseJsonDate('invalid date string');
       }).toThrow();
     });
 
-    it('can convert JSON and JS dates', function() {
-      var date, jsonDate;
+    it('can convert JSON and JS dates', () => {
+      let date, jsonDate;
 
       // Test 1 - UTC
       date = dates.parseJsonDate('2014-11-21 00:00:00.000Z');
@@ -374,7 +374,7 @@ describe('scout.dates', function() {
       // Time only
       date = dates.parseJsonDate('15:23:00.123Z');
       expect(date.toISOString()).toBe('1970-01-01T15:23:00.123Z');
-      expect(function() {
+      expect(() => {
         dates.parseJsonDate('15:23:00');
       }).toThrow(); // missing millis
 
@@ -403,12 +403,12 @@ describe('scout.dates', function() {
 
   });
 
-  describe('create', function() {
+  describe('create', () => {
 
-    it('can create dates', function() {
+    it('can create dates', () => {
       expect(dates.create()).toBe(undefined);
       expect(dates.create('')).toBe(undefined);
-      expect(function() {
+      expect(() => {
         dates.create('invalid date string');
       }).toThrow();
 
@@ -424,9 +424,9 @@ describe('scout.dates', function() {
 
   });
 
-  describe('weekInYear', function() {
+  describe('weekInYear', () => {
 
-    it('can calculate week in year', function() {
+    it('can calculate week in year', () => {
       expect(dates.weekInYear()).toBe(undefined);
       expect(dates.weekInYear(undefined)).toBe(undefined);
       expect(dates.weekInYear(null)).toBe(undefined);
@@ -474,42 +474,42 @@ describe('scout.dates', function() {
 
   });
 
-  describe('format', function() {
+  describe('format', () => {
 
-    it('can handle invalid values', function() {
-      expect(function() {
+    it('can handle invalid values', () => {
+      expect(() => {
         dates.format();
       }).toThrow();
-      expect(function() {
+      expect(() => {
         dates.format(new Date());
       }).toThrow();
-      expect(function() {
+      expect(() => {
         dates.format('gugus');
       }).toThrow();
 
-      var helper = new LocaleSpecHelper();
-      var locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+      let helper = new LocaleSpecHelper();
+      let locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
 
       expect(dates.format(null, locale)).toBe('');
       expect(dates.format(dates.create('2014-11-21'), locale)).toBe('21.11.2014');
     });
 
-    it('can format valid dates', function() {
-      var helper = new LocaleSpecHelper();
-      var locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+    it('can format valid dates', () => {
+      let helper = new LocaleSpecHelper();
+      let locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
 
       expect(dates.format(dates.create('2014-11-21'), locale, 'yy')).toBe('14');
     });
 
   });
 
-  describe('compare', function() {
+  describe('compare', () => {
 
-    it('can handle invalid dates', function() {
+    it('can handle invalid dates', () => {
       expect(dates.compare()).toBe(0);
 
-      var date = null;
-      var date2 = null;
+      let date = null;
+      let date2 = null;
       expect(dates.compare(date, date2)).toBe(0);
 
       date = dates.create('2014-11-21');
@@ -519,7 +519,7 @@ describe('scout.dates', function() {
       date2 = dates.create('2014-11-21');
       expect(dates.compare(date, date2)).toBe(-1);
 
-      expect(function() {
+      expect(() => {
         dates.compare('invalid value', date2);
       }).toThrow();
 
@@ -528,9 +528,9 @@ describe('scout.dates', function() {
       expect(dates.compare(date, date2)).toBe(-1);
     });
 
-    it('can compare valid dates', function() {
-      var date = dates.create('2014-11-21');
-      var date2 = dates.create('2014-11-21');
+    it('can compare valid dates', () => {
+      let date = dates.create('2014-11-21');
+      let date2 = dates.create('2014-11-21');
       expect(dates.compare(date, date2)).toBe(0);
 
       date = dates.create('2013-11-21');
@@ -556,10 +556,10 @@ describe('scout.dates', function() {
 
   });
 
-  describe('equals', function() {
+  describe('equals', () => {
 
-    it('returns true if the dates are equal, false if not', function() {
-      var date1 = dates.create('2015-25-11'),
+    it('returns true if the dates are equal, false if not', () => {
+      let date1 = dates.create('2015-25-11'),
         date2 = dates.create('2015-25-11'),
         date3 = dates.create('2014-25-11');
 
@@ -571,9 +571,9 @@ describe('scout.dates', function() {
     });
   });
 
-  describe('isLeapYear', function() {
+  describe('isLeapYear', () => {
 
-    it('correctly identifies leap years', function() {
+    it('correctly identifies leap years', () => {
       expect(dates.isLeapYear()).toBe(false);
       expect(dates.isLeapYear(undefined)).toBe(false);
       expect(dates.isLeapYear(null)).toBe(false);
@@ -597,20 +597,20 @@ describe('scout.dates', function() {
 
   });
 
-  describe('combineDateTime', function() {
+  describe('combineDateTime', () => {
 
-    it('creates a new date by using date part of param date and time part of param time.', function() {
-      var date = dates.combineDateTime(dates.create('2014-11-21 12:23:11.123'), dates.create('2017-12-10 05:15:50.999'));
+    it('creates a new date by using date part of param date and time part of param time.', () => {
+      let date = dates.combineDateTime(dates.create('2014-11-21 12:23:11.123'), dates.create('2017-12-10 05:15:50.999'));
       expect(date.toISOString()).toBe(dates.create('2014-11-21 05:15:50.999').toISOString());
     });
 
-    it('uses 01-01-1970 as date part if date is ommitted', function() {
-      var date = dates.combineDateTime(null, dates.create('2017-12-10 05:15:50.999'));
+    it('uses 01-01-1970 as date part if date is ommitted', () => {
+      let date = dates.combineDateTime(null, dates.create('2017-12-10 05:15:50.999'));
       expect(date.toISOString()).toBe(dates.create('1970-01-01 05:15:50.999').toISOString());
     });
 
-    it('uses 00:00 as time part if time is ommitted', function() {
-      var date = dates.combineDateTime(dates.create('2017-12-10 05:15:50.999'));
+    it('uses 00:00 as time part if time is ommitted', () => {
+      let date = dates.combineDateTime(dates.create('2017-12-10 05:15:50.999'));
       expect(date.toISOString()).toBe(dates.create('2017-12-10 00:00:00.000').toISOString());
     });
 

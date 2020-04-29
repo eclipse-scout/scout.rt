@@ -56,7 +56,7 @@ export default class IFrame extends Widget {
   _renderLocation() {
     // Convert empty locations to 'about:blank', because in Firefox (maybe others, too?),
     // empty locations simply remove the src attribute but don't remove the old content.
-    var location = this.location || 'about:blank';
+    let location = this.location || 'about:blank';
     this.$iframe.attr('src', location);
   }
 
@@ -78,12 +78,12 @@ export default class IFrame extends Widget {
     }
 
     if (this.trackLocation) {
-      var doc = this.$iframe[0].contentDocument;
+      let doc = this.$iframe[0].contentDocument;
       if (!doc) {
         // Doc can be null if website cannot be loaded or if website is not from same origin
         return;
       }
-      var location = doc.location.href;
+      let location = doc.location.href;
       if (location === 'about:blank') {
         location = null;
       }

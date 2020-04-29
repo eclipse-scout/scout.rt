@@ -23,12 +23,12 @@ export default class ProposalChooserLayout extends AbstractLayout {
    * If one must support other types, a LayoutResetter class must be implemented for that type.
    */
   _createTypeHandler(proposalChooser) {
-    var handlerObjectType = proposalChooser.model.objectType + 'LayoutResetter';
+    let handlerObjectType = proposalChooser.model.objectType + 'LayoutResetter';
     return scout.create(handlerObjectType, proposalChooser.model);
   }
 
   layout($container) {
-    var filterPrefSize,
+    let filterPrefSize,
       htmlContainer = HtmlComponent.get($container),
       htmlComp = HtmlComponent.get($container.children(this._typeHandler.cssSelector)),
       size = htmlContainer.size().subtract(htmlContainer.insets()),
@@ -56,7 +56,7 @@ export default class ProposalChooserLayout extends AbstractLayout {
    * size of the table/tree. After that the original width and height is restored.
    */
   preferredLayoutSize($container, options) {
-    var oldDisplay, prefSize, modelSize, statusSize, filterPrefSize,
+    let oldDisplay, prefSize, modelSize, statusSize, filterPrefSize,
       pcWidth, pcHeight,
       htmlComp = this._proposalChooser.htmlComp,
       $status = this._proposalChooser.$status,

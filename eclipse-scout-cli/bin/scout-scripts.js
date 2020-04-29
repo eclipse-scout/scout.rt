@@ -182,7 +182,7 @@ function logWebpack(err, stats, statsConfig) {
  * Prepends the values of the arrays in the options with webpackArgs.
  */
 function prepareWebpackYargsOptionsForKarma() {
-  var result = {};
+  let result = {};
   for (let [key, value] of Object.entries(webpackYargsOptions)) {
     if (Array.isArray(value)) {
       value = value.map(elem => 'webpackArgs.' + elem);

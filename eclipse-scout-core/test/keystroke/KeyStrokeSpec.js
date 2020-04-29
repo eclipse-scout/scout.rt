@@ -10,10 +10,10 @@
  */
 import {keys, KeyStroke} from '../../src/index';
 
-describe('KeyStroke', function() {
-  var session;
+describe('KeyStroke', () => {
+  let session;
 
-  var spyable = function() {
+  let spyable = () => {
   };
 
   class TestingKeyStroke extends KeyStroke {
@@ -28,19 +28,19 @@ describe('KeyStroke', function() {
     }
   }
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
   });
 
-  describe('unrepeatability', function() {
+  describe('unrepeatability', () => {
 
-    var testImpl = function(keyDownCount) {
-      var keyStroke = new TestingKeyStroke();
+    let testImpl = keyDownCount => {
+      let keyStroke = new TestingKeyStroke();
 
       session.desktop.keyStrokeContext.registerKeyStroke(keyStroke);
 
@@ -57,11 +57,11 @@ describe('KeyStroke', function() {
         .toBe(false, 'because an unrepeatable keystroke should be reset after the closing keyup event');
     };
 
-    it('means that an unrepeatable KeyStroke is triggered exactly once per keyup event, even given three keydown events', function() {
+    it('means that an unrepeatable KeyStroke is triggered exactly once per keyup event, even given three keydown events', () => {
       testImpl(3);
     });
 
-    it('means that an unrepeatable KeyStroke is triggered exactly once given the sequence (keydown, keyup)', function() {
+    it('means that an unrepeatable KeyStroke is triggered exactly once given the sequence (keydown, keyup)', () => {
       testImpl(1);
     });
   });

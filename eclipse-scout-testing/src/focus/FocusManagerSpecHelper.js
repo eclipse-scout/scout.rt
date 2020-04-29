@@ -13,7 +13,7 @@ import $ from 'jquery';
 
 export default class FocusManagerSpecHelper {
   handlersRegistered($comp) {
-    var i,
+    let i,
       expectedHandlers = ['keydown', 'focusin', 'focusout', 'hide'],
       handlerCount = 0,
       events = $._data($comp[0], 'events'),

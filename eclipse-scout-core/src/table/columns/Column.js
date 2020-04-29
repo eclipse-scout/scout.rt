@@ -129,7 +129,7 @@ export default class Column {
    * @param {Cell|string|number|object} vararg either a Cell instance or a scalar value
    */
   initCell(vararg, row) {
-    var cell = this._ensureCell(vararg);
+    let cell = this._ensureCell(vararg);
     this._initCell(cell);
 
     // If a text is provided, use that text instead of using formatValue to generate a text based on the value
@@ -148,7 +148,7 @@ export default class Column {
    * @private
    */
   _ensureCell(vararg) {
-    var cell;
+    let cell;
 
     if (vararg instanceof Cell) {
       cell = vararg;
@@ -173,13 +173,13 @@ export default class Column {
   }
 
   _updateCellText(row, cell) {
-    var value = cell.value;
+    let value = cell.value;
     if (!row) {
       // row is omitted when creating aggregate cells
       return;
     }
 
-    var returned = this._formatValue(value);
+    let returned = this._formatValue(value);
     if (returned && $.isFunction(returned.promise)) {
       // Promise is returned -> set display text later
       this.setCellTextDeferred(returned, row, cell);
@@ -208,17 +208,17 @@ export default class Column {
   }
 
   buildCellForRow(row) {
-    var cell = this.cell(row);
+    let cell = this.cell(row);
     return this.buildCell(cell, row);
   }
 
   buildCellForAggregateRow(aggregateRow) {
-    var cell;
+    let cell;
     if (this.grouped) {
-      var refRow = (this.table.groupingStyle === Table.GroupingStyle.TOP ? aggregateRow.nextRow : aggregateRow.prevRow);
+      let refRow = (this.table.groupingStyle === Table.GroupingStyle.TOP ? aggregateRow.nextRow : aggregateRow.prevRow);
       cell = this.createAggrGroupCell(refRow);
     } else {
-      var aggregateValue = aggregateRow.contents[this.table.columns.indexOf(this)];
+      let aggregateValue = aggregateRow.contents[this.table.columns.indexOf(this)];
       cell = this.createAggrValueCell(aggregateValue);
     }
     return this.buildCell(cell, {});
@@ -227,24 +227,24 @@ export default class Column {
   buildCell(cell, row) {
     scout.assertParameter('cell', cell, Cell);
 
-    var tableNodeColumn = this.table.isTableNodeColumn(this),
+    let tableNodeColumn = this.table.isTableNodeColumn(this),
       rowPadding = 0;
 
     if (tableNodeColumn) {
       rowPadding = this.table._calcRowLevelPadding(row);
     }
 
-    var text = this._text(cell);
-    var iconId = cell.iconId;
-    var icon = this._icon(iconId, !!text) || '';
-    var cssClass = this._cellCssClass(cell, tableNodeColumn);
-    var style = this._cellStyle(cell, tableNodeColumn, rowPadding);
+    let text = this._text(cell);
+    let iconId = cell.iconId;
+    let icon = this._icon(iconId, !!text) || '';
+    let cssClass = this._cellCssClass(cell, tableNodeColumn);
+    let style = this._cellStyle(cell, tableNodeColumn, rowPadding);
 
     if (cell.errorStatus) {
       row.hasError = true;
     }
 
-    var content;
+    let content;
     if (!text && !icon) {
       // If every cell of a row is empty the row would collapse, using nbsp makes sure the row is as height as the others even if it is empty
       content = '&nbsp;';
@@ -269,8 +269,8 @@ export default class Column {
   }
 
   _expandIcon(expanded, rowPadding) {
-    var style = 'padding-left: ' + (rowPadding + this.expandableIconLevel0CellPadding) + 'px';
-    var cssClasses = 'table-row-control';
+    let style = 'padding-left: ' + (rowPadding + this.expandableIconLevel0CellPadding) + 'px';
+    let cssClasses = 'table-row-control';
     if (expanded) {
       cssClasses += ' expanded';
     }
@@ -278,7 +278,7 @@ export default class Column {
   }
 
   _icon(iconId, hasText) {
-    var cssClass, icon;
+    let cssClass, icon;
     if (!iconId) {
       return;
     }
@@ -296,7 +296,7 @@ export default class Column {
   }
 
   _text(cell) {
-    var text = cell.text || '';
+    let text = cell.text || '';
 
     if (!cell.htmlEnabled) {
       text = cell.encodedText() || '';
@@ -309,7 +309,7 @@ export default class Column {
   }
 
   _cellCssClass(cell, tableNode) {
-    var cssClass = 'table-cell';
+    let cssClass = 'table-cell';
     if (cell.mandatory) {
       cssClass += ' mandatory';
     }
@@ -323,8 +323,8 @@ export default class Column {
       cssClass += ' has-error';
     }
     cssClass += ' halign-' + Table.parseHorizontalAlignment(cell.horizontalAlignment);
-    var visibleColumns = this.table.visibleColumns();
-    var overAllColumnPosition = visibleColumns.indexOf(this);
+    let visibleColumns = this.table.visibleColumns();
+    let overAllColumnPosition = visibleColumns.indexOf(this);
     if (overAllColumnPosition === 0) {
       cssClass += ' first';
     }
@@ -342,7 +342,7 @@ export default class Column {
   }
 
   _cellStyle(cell, tableNodeColumn, rowPadding) {
-    var style,
+    let style,
       width = this.width;
 
     if (width === 0) {
@@ -358,7 +358,7 @@ export default class Column {
   }
 
   onMouseUp(event, $row) {
-    var row = $row.data('row'),
+    let row = $row.data('row'),
       cell = this.cell(row);
 
     if (this.isCellEditable(row, cell, event)) {
@@ -371,7 +371,7 @@ export default class Column {
   }
 
   startCellEdit(row, field) {
-    var popup,
+    let popup,
       $row = row.$row,
       cell = this.cell(row),
       $cell = this.table.$cell(this, $row);
@@ -402,7 +402,7 @@ export default class Column {
    * @returns {Cell} the cell object for this column from the first selected row in the table.
    */
   selectedCell() {
-    var selectedRow = this.table.selectedRow();
+    let selectedRow = this.table.selectedRow();
     return this.table.cell(this, selectedRow);
   }
 
@@ -417,8 +417,8 @@ export default class Column {
    * @returns {*} the cell value to be used for grouping and filtering (chart, column filter).
    */
   cellValueOrTextForCalculation(row) {
-    var cell = this.cell(row);
-    var value = this.cellValueOrText(row);
+    let cell = this.cell(row);
+    let value = this.cellValueOrText(row);
     if (objects.isNullOrUndefined(value)) {
       return null;
     }
@@ -445,7 +445,7 @@ export default class Column {
    * @returns {string} the cell text to be used for table grouping
    */
   cellTextForGrouping(row) {
-    var cell = this.cell(row);
+    let cell = this.cell(row);
     return this._preprocessTextForGrouping(cell.text, cell.htmlEnabled);
   }
 
@@ -460,7 +460,7 @@ export default class Column {
    * @returns {string} the cell text to be used for the text filter
    */
   cellTextForTextFilter(row) {
-    var cell = this.cell(row);
+    let cell = this.cell(row);
     return this._preprocessTextForTextFilter(cell.text, cell.htmlEnabled);
   }
 
@@ -474,7 +474,7 @@ export default class Column {
    * @returns {string} the cell text to be used for the table row detail.
    */
   cellTextForRowDetail(row) {
-    var cell = this.cell(row);
+    let cell = this.cell(row);
 
     return this._preprocessText(this._text(cell), {
       removeHtmlTags: cell.htmlEnabled
@@ -502,7 +502,7 @@ export default class Column {
   }
 
   setCellValue(row, value) {
-    var cell = this.cell(row);
+    let cell = this.cell(row);
 
     // value may have the wrong type (e.g. text instead of date) -> ensure type
     value = this._parseValue(value);
@@ -521,13 +521,13 @@ export default class Column {
 
   setCellTextDeferred(promise, row, cell) {
     promise
-      .done(function(text) {
+      .done(text => {
         this.setCellText(row, text, cell);
-      }.bind(this))
-      .fail(function(error) {
+      })
+      .fail(error => {
         this.setCellText(row, '', cell);
         $.log.error('Could not resolve cell text for value ' + cell.value, error);
-      }.bind(this));
+      });
 
     // (then) promises always resolve asynchronously which means the text will always be set later after row is initialized and will generate an update row event.
     // To make sure not every cell update will render the viewport (which is an expensive operation), the update is buffered and done as soon as all promises resolve.
@@ -561,9 +561,9 @@ export default class Column {
     }
     this.horizontalAlignment = hAlign;
 
-    this.table.rows.forEach(function(row) {
+    this.table.rows.forEach(row => {
       this.cell(row).setHorizontalAlignment(hAlign);
-    }.bind(this));
+    });
 
     this.table.updateRows(this.table.rows);
 
@@ -578,9 +578,9 @@ export default class Column {
     }
     this.editable = editable;
 
-    this.table.rows.forEach(function(row) {
+    this.table.rows.forEach(row => {
       this.cell(row).setEditable(editable);
-    }.bind(this));
+    });
 
     this.table.updateRows(this.table.rows);
   }
@@ -591,9 +591,9 @@ export default class Column {
     }
     this.mandatory = mandatory;
 
-    this.table.rows.forEach(function(row) {
+    this.table.rows.forEach(row => {
       this.cell(row).setMandatory(mandatory);
-    }.bind(this));
+    });
 
     this.table.updateRows(this.table.rows);
   }
@@ -620,7 +620,7 @@ export default class Column {
   }
 
   createAggrGroupCell(row) {
-    var cell = this.cell(row);
+    let cell = this.cell(row);
     return this.initCell(scout.create('Cell', {
       // value necessary for value based columns (e.g. checkbox column)
       value: cell.value,
@@ -662,7 +662,7 @@ export default class Column {
    * Returns a table header menu. Sub-classes can override this method to create a column specific table header menu.
    */
   createTableHeaderMenu(tableHeader) {
-    var $header = this.$header;
+    let $header = this.$header;
     return scout.create('TableHeaderMenu', {
       parent: tableHeader,
       column: $header.data('column'),
@@ -676,12 +676,12 @@ export default class Column {
    * @returns a field instance used as editor when a cell of this column is in edit mode.
    */
   createEditor(row) {
-    var field = this._createEditor(row);
-    var cell = this.cell(row);
+    let field = this._createEditor(row);
+    let cell = this.cell(row);
     this._initEditorField(field, cell);
     field.setLabelVisible(false);
     field.setFieldStyle(FormField.FieldStyle.CLASSIC);
-    var hints = new GridData(field.gridDataHints);
+    let hints = new GridData(field.gridDataHints);
     hints.horizontalAlignment = cell.horizontalAlignment;
     field.setGridDataHints(hints);
     return field;
@@ -725,8 +725,8 @@ export default class Column {
   }
 
   compare(row1, row2) {
-    var valueA = this.cellValueOrText(row1);
-    var valueB = this.cellValueOrText(row2);
+    let valueA = this.cellValueOrText(row1);
+    let valueB = this.cellValueOrText(row2);
     return this.comparator.compare(valueA, valueB);
   }
 
@@ -806,7 +806,7 @@ export default class Column {
     if (this.headerCssClass === headerCssClass) {
       return;
     }
-    var oldState = $.extend({}, this);
+    let oldState = $.extend({}, this);
     this.headerCssClass = headerCssClass;
     if (this.table.header) {
       this.table.header.updateHeader(this, oldState);
@@ -846,8 +846,8 @@ export default class Column {
 
   isContentValid(row) {
     let cell = this.cell(row);
-    var validByErrorStatus = !cell.errorStatus || cell.errorStatus.severity !== Status.Severity.ERROR;
-    var validByMandatory = !cell.mandatory || this._hasCellValue(cell);
+    let validByErrorStatus = !cell.errorStatus || cell.errorStatus.severity !== Status.Severity.ERROR;
+    let validByMandatory = !cell.mandatory || this._hasCellValue(cell);
     return {
       valid: validByErrorStatus && validByMandatory,
       validByErrorStatus: validByErrorStatus,

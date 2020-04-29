@@ -10,17 +10,17 @@
  */
 import {Menu, NullWidget, ObjectFactory, objects, scout, Status, Tooltip} from '../src/index';
 
-describe('main', function() {
-  var session;
+describe('main', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  describe('nvl', function() {
+  describe('nvl', () => {
 
-    it('can return alternative value', function() {
+    it('can return alternative value', () => {
       expect(scout.nvl()).toBe(undefined);
       expect(scout.nvl('X')).toBe('X');
       expect(scout.nvl('X', 'Y')).toBe('X');
@@ -47,11 +47,11 @@ describe('main', function() {
 
   });
 
-  describe('assertParameter', function() {
+  describe('assertParameter', () => {
 
-    it('throws Error when value is not set', function() {
-      var foo = null;
-      var func = scout.assertParameter.bind(scout, 'foo', foo);
+    it('throws Error when value is not set', () => {
+      let foo = null;
+      let func = scout.assertParameter.bind(scout, 'foo', foo);
       expect(func).toThrowError();
       foo = 'bar';
       func = scout.assertParameter.bind(scout, 'foo', foo);
@@ -67,9 +67,9 @@ describe('main', function() {
       expect(func).not.toThrowError();
     });
 
-    it('throws Error when value has wrong type', function() {
-      var foo = {};
-      var func = scout.assertParameter.bind(scout, 'foo', foo, Status);
+    it('throws Error when value has wrong type', () => {
+      let foo = {};
+      let func = scout.assertParameter.bind(scout, 'foo', foo, Status);
       expect(func).toThrowError();
       foo = new Status();
       func = scout.assertParameter.bind(scout, 'foo', foo, Status);
@@ -78,9 +78,9 @@ describe('main', function() {
 
   });
 
-  describe('isOneOf', function() {
+  describe('isOneOf', () => {
 
-    it('can check if value is one of multiple values', function() {
+    it('can check if value is one of multiple values', () => {
       expect(scout.isOneOf()).toBe(false);
       expect(scout.isOneOf('test')).toBe(false);
       expect(scout.isOneOf('test', 'bla')).toBe(false);
@@ -96,25 +96,25 @@ describe('main', function() {
 
   });
 
-  describe('create', function() {
+  describe('create', () => {
 
-    it('accepts string or object as first argument', function() {
+    it('accepts string or object as first argument', () => {
       // must fail
-      expect(function() {
+      expect(() => {
         scout.create(1);
       }).toThrow();
-      expect(function() {
+      expect(() => {
         scout.create();
       }).toThrow();
-      expect(function() {
+      expect(() => {
         scout.create(true);
       }).toThrow();
-      expect(function() {
-        scout.create(function() {
+      expect(() => {
+        scout.create(() => {
         });
       }).toThrow();
 
-      var menu = scout.create('Menu', {
+      let menu = scout.create('Menu', {
         parent: new NullWidget(),
         session: session
       });
@@ -128,9 +128,9 @@ describe('main', function() {
       expect(menu instanceof Menu).toBe(true);
     });
 
-    it('creates a new initialized widget with parent and session set', function() {
-      var parent = new NullWidget();
-      var widget = scout.create('Tooltip', {
+    it('creates a new initialized widget with parent and session set', () => {
+      let parent = new NullWidget();
+      let widget = scout.create('Tooltip', {
         parent: parent,
         session: session
       });
@@ -140,10 +140,10 @@ describe('main', function() {
       expect(widget.session).toBe(session);
     });
 
-    describe('creates local object if first parameter is the objectType', function() {
+    describe('creates local object if first parameter is the objectType', () => {
 
-      it('sets property \'id\' correctly when no ID is provided', function() {
-        var expectedSeqNo = ObjectFactory.get().uniqueIdSeqNo + 1,
+      it('sets property \'id\' correctly when no ID is provided', () => {
+        let expectedSeqNo = ObjectFactory.get().uniqueIdSeqNo + 1,
           menu = scout.create('Menu', {
             parent: new NullWidget(),
             session: session
@@ -152,8 +152,8 @@ describe('main', function() {
         expect(ObjectFactory.get().uniqueIdSeqNo).toBe(expectedSeqNo);
       });
 
-      it('session must be set, but adapter should not be registered', function() {
-        var oldNumProperties = objects.countOwnProperties(session.modelAdapterRegistry),
+      it('session must be set, but adapter should not be registered', () => {
+        let oldNumProperties = objects.countOwnProperties(session.modelAdapterRegistry),
           menu = scout.create('Menu', {
             parent: new NullWidget(),
             session: session
@@ -164,8 +164,8 @@ describe('main', function() {
 
     });
 
-    it('creates local object if first parameter of type object and contains objectType property', function() {
-      var expectedSeqNo = ObjectFactory.get().uniqueIdSeqNo + 1,
+    it('creates local object if first parameter of type object and contains objectType property', () => {
+      let expectedSeqNo = ObjectFactory.get().uniqueIdSeqNo + 1,
         menu = scout.create({
           parent: new NullWidget(),
           session: session,

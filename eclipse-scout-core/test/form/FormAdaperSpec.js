@@ -11,10 +11,10 @@
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
 /* global linkWidgetAndAdapter */
-describe('FormAdapter', function() {
-  var session, helper;
+describe('FormAdapter', () => {
+  let session, helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -23,16 +23,16 @@ describe('FormAdapter', function() {
     uninstallUnloadHandlers(session);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
-  describe('form destroy', function() {
+  describe('form destroy', () => {
 
-    it('destroys the adapters of the children', function() {
-      var form = helper.createFormWithOneField();
+    it('destroys the adapters of the children', () => {
+      let form = helper.createFormWithOneField();
       linkWidgetAndAdapter(form, 'FormAdapter');
       linkWidgetAndAdapter(form.rootGroupBox, 'GroupBoxAdapter');
       linkWidgetAndAdapter(form.rootGroupBox.fields[0], 'StringFieldAdapter');
@@ -49,9 +49,9 @@ describe('FormAdapter', function() {
 
   });
 
-  describe('onModelAction', function() {
+  describe('onModelAction', () => {
 
-    describe('disposeAdapter', function() {
+    describe('disposeAdapter', () => {
 
       function createDisposeAdapterEvent(model) {
         return {
@@ -61,12 +61,12 @@ describe('FormAdapter', function() {
         };
       }
 
-      it('destroys the form', function() {
-        var form = helper.createFormWithOneField();
+      it('destroys the form', () => {
+        let form = helper.createFormWithOneField();
         linkWidgetAndAdapter(form, 'FormAdapter');
         spyOn(form, 'destroy');
 
-        var message = {
+        let message = {
           events: [createDisposeAdapterEvent(form)]
         };
         session._processSuccessResponse(message);

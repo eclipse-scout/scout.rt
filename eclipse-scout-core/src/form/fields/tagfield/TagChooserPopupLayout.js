@@ -21,8 +21,8 @@ export default class TagChooserPopupLayout extends PopupLayout {
     super.layout($container);
 
     // layout table
-    var htmlComp = this.popup.htmlComp;
-    var size = htmlComp.size().subtract(htmlComp.insets());
+    let htmlComp = this.popup.htmlComp;
+    let size = htmlComp.size().subtract(htmlComp.insets());
     this.popup.table.htmlComp.setSize(size);
 
     this.popup.position();
@@ -32,9 +32,9 @@ export default class TagChooserPopupLayout extends PopupLayout {
    * @override AbstractLayout.js
    */
   preferredLayoutSize($container) {
-    var tableHandler = scout.create('TableLayoutResetter', this.popup.table);
+    let tableHandler = scout.create('TableLayoutResetter', this.popup.table);
     tableHandler.modifyDom();
-    var prefSize = super.preferredLayoutSize($container);
+    let prefSize = super.preferredLayoutSize($container);
     tableHandler.restoreDom();
     return prefSize;
   }

@@ -39,7 +39,7 @@ export default class CompactTree extends Tree {
   _render() {
     this.$container = this.$parent.appendDiv('compact-tree');
 
-    var layout = new TreeLayout(this);
+    let layout = new TreeLayout(this);
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(layout);
 
@@ -78,8 +78,8 @@ export default class CompactTree extends Tree {
    * @override
    */
   _insertNodeInDOMAtPlace(node, index) {
-    var visibleNodeBefore = this.visibleNodesFlat[index - 1];
-    var n;
+    let visibleNodeBefore = this.visibleNodesFlat[index - 1];
+    let n;
     if (!visibleNodeBefore) {
       node.$node.prependTo(this.$nodesContainer);
     } else if (visibleNodeBefore.level < node.level) {
@@ -87,7 +87,7 @@ export default class CompactTree extends Tree {
       node.$node.insertAfter(visibleNodeBefore.$node.children()[0]);
     } else {
       n = visibleNodeBefore.$node;
-      for (var i = 0; i < visibleNodeBefore.level - node.level; i++) {
+      for (let i = 0; i < visibleNodeBefore.level - node.level; i++) {
         n = n.parent();
       }
       node.$node.insertAfter(n);
@@ -98,9 +98,9 @@ export default class CompactTree extends Tree {
    * @override
    */
   selectNodes(nodes, debounceSend) {
-    var selectedSectionNodes = [];
+    let selectedSectionNodes = [];
     nodes = arrays.ensure(nodes);
-    nodes.forEach(function(node) {
+    nodes.forEach(node => {
       // If a section is selected, automatically change selection to first section-node
       if (node.isSection()) {
         if (node.childNodes.length > 0) {

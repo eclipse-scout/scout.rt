@@ -10,50 +10,50 @@
  */
 import {scout} from '../../src/index';
 
-describe('TileGridAdapter', function() {
-  var session;
+describe('TileGridAdapter', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
   function createTileGrid(model) {
-    var defaults = {
+    let defaults = {
       parent: session.desktop,
       session: session,
       objectType: 'TileGrid'
     };
     model = $.extend({}, defaults, model);
-    var tileGridAdapter = session.createModelAdapter(model);
+    let tileGridAdapter = session.createModelAdapter(model);
     return tileGridAdapter.createWidget(model, model.parent);
   }
 
   function createTile(model) {
-    var defaults = {
+    let defaults = {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    var tile = scout.create('Tile', model);
+    let tile = scout.create('Tile', model);
     linkWidgetAndAdapter(tile, 'TileAdapter');
     return tile;
   }
 
-  describe('initProperties', function() {
+  describe('initProperties', () => {
 
-    it('creates a tile filter if tiles are filtered by the server', function() {
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
-      var tileGrid = createTileGrid({
+    it('creates a tile filter if tiles are filtered by the server', () => {
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
+      let tileGrid = createTileGrid({
         tiles: [tile0.id, tile1.id, tile2.id],
         filteredTiles: [tile1.id, tile2.id]
       });
@@ -64,7 +64,7 @@ describe('TileGridAdapter', function() {
       expect(tileGrid.filters.length).toBe(1);
 
       // Assert that filter will be removed as soon as server side filter is removed
-      var event = createPropertyChangeEvent(tileGrid, {
+      let event = createPropertyChangeEvent(tileGrid, {
         filteredTiles: null
       });
       tileGrid.modelAdapter.onModelPropertyChange(event);
@@ -78,13 +78,13 @@ describe('TileGridAdapter', function() {
 
   });
 
-  describe('_syncFilteredTiles', function() {
+  describe('_syncFilteredTiles', () => {
 
-    it('creates a tile filter if tiles are filtered by the server', function() {
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
-      var tileGrid = createTileGrid({
+    it('creates a tile filter if tiles are filtered by the server', () => {
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
+      let tileGrid = createTileGrid({
         tiles: [tile0.id, tile1.id, tile2.id]
       });
       expect(tileGrid.tiles.length).toBe(3);
@@ -92,7 +92,7 @@ describe('TileGridAdapter', function() {
       expect(tileGrid.filters.length).toBe(0);
 
       // Tiles are filtered on server side
-      var event = createPropertyChangeEvent(tileGrid, {
+      let event = createPropertyChangeEvent(tileGrid, {
         filteredTiles: [tile1.id, tile2.id]
       });
       tileGrid.modelAdapter.onModelPropertyChange(event);

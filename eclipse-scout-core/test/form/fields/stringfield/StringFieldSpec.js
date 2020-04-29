@@ -11,10 +11,10 @@
 import {RemoteEvent, scout, StringField} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('StringField', function() {
-  var session, helper, field;
+describe('StringField', () => {
+  let session, helper, field;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
@@ -24,13 +24,13 @@ describe('StringField', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
     jasmine.Ajax.uninstall();
   });
 
   function createField(model) {
-    var field = new StringField();
+    let field = new StringField();
     field.init(model);
     return field;
   }
@@ -39,14 +39,14 @@ describe('StringField', function() {
     return helper.createFieldModel();
   }
 
-  describe('inputMasked', function() {
-    it('sets the field into password mode, if true', function() {
+  describe('inputMasked', () => {
+    it('sets the field into password mode, if true', () => {
       field.inputMasked = true;
       field.render();
       expect(field.$field.attr('type')).toBe('password');
     });
 
-    it('unsets the password mode, if false', function() {
+    it('unsets the password mode, if false', () => {
       field.inputMasked = false;
       field.render();
       expect(field.$field.attr('type')).toBe('text');
@@ -54,26 +54,26 @@ describe('StringField', function() {
 
   });
 
-  describe('insertText', function() {
-    it('expects empty field at the beginning', function() {
+  describe('insertText', () => {
+    it('expects empty field at the beginning', () => {
       field.render();
       expect(field.$field[0].value).toBe('');
     });
 
-    it('inserts text into an empty field', function() {
+    it('inserts text into an empty field', () => {
       field.render();
       field.insertText('Test1');
       expect(field.$field[0].value).toBe('Test1');
     });
 
-    it('appends text to the previous value (if no text is selected)', function() {
+    it('appends text to the previous value (if no text is selected)', () => {
       field.render();
       field.insertText('Test1');
       field.insertText('ABC2');
       expect(field.$field[0].value).toBe('Test1ABC2');
     });
 
-    it('replaces selection #1 (if part of the text is selected, selection does not start at the beginning)', function() {
+    it('replaces selection #1 (if part of the text is selected, selection does not start at the beginning)', () => {
       field.render();
       field.insertText('Test1');
       field.$field[0].selectionStart = 2;
@@ -82,7 +82,7 @@ describe('StringField', function() {
       expect(field.$field[0].value).toBe('Testen21');
     });
 
-    it('replaces selection #2 (if part of the text is selected, start at the beginning)', function() {
+    it('replaces selection #2 (if part of the text is selected, start at the beginning)', () => {
       field.render();
       field.insertText('Test1');
       field.$field[0].selectionStart = 0;
@@ -91,7 +91,7 @@ describe('StringField', function() {
       expect(field.$field[0].value).toBe('ABC21');
     });
 
-    it('replaces selection #3 (if whole content is selected)', function() {
+    it('replaces selection #3 (if whole content is selected)', () => {
       field.render();
       field.insertText('Test1');
       field.$field[0].select();
@@ -99,12 +99,12 @@ describe('StringField', function() {
       expect(field.$field[0].value).toBe('ABC2');
     });
 
-    it('sends display text changed to server using accept text', function() {
+    it('sends display text changed to server using accept text', () => {
       field.render();
       field.insertText('Test1');
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
-      var event = new RemoteEvent(field.id, 'acceptInput', {
+      let event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1',
         whileTyping: false,
         showBusyIndicator: true
@@ -123,10 +123,10 @@ describe('StringField', function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('sends display text changed to server using accept text, twice, if updateDisplayTextOnModify=true', function() {
+    it('sends display text changed to server using accept text, twice, if updateDisplayTextOnModify=true', () => {
       field.updateDisplayTextOnModify = true;
       field.render();
-      var message = {
+      let message = {
         events: [createPropertyChangeEvent(field, {
           insertText: 'Test1'
         })]
@@ -134,7 +134,7 @@ describe('StringField', function() {
       session._processSuccessResponse(message);
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
-      var events = [];
+      let events = [];
       // acceptInput needs to be sent twice, with whileTyping = true and = false
       events[0] = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1',
@@ -173,13 +173,13 @@ describe('StringField', function() {
 
   });
 
-  describe('trim', function() {
-    it('should restore selection', function() {
+  describe('trim', () => {
+    it('should restore selection', () => {
       field.trimText = true;
       field.render();
       field.$field.val(' foo ');
       field.$field[0].select();
-      var selection = field._getSelection();
+      let selection = field._getSelection();
       expect(selection.start).toBe(0);
       expect(selection.end).toBe(5);
       field.setDisplayText('foo');
@@ -189,12 +189,12 @@ describe('StringField', function() {
       expect(selection.end).toBe(3);
     });
 
-    it('should not break when displayText is very long (regex is too big)', function() {
+    it('should not break when displayText is very long (regex is too big)', () => {
       // this test doesn't expect anything - the test succeeds when no exception is thrown
       // with a large displayText. In ticket #169354 the issue occured with a displayText
       // that hat 55'577 bytes, so this is about the size which causes Chrome too crash.
-      var longText = '';
-      for (var i = 0; i < 3500; i++) {
+      let longText = '';
+      for (let i = 0; i < 3500; i++) {
         longText += 'too big to fail '; // 16 bytes x 3'500 = 56'000 bytes
       }
       field.trimText = true;
@@ -205,42 +205,42 @@ describe('StringField', function() {
     });
   });
 
-  describe('setValue', function() {
-    var field;
+  describe('setValue', () => {
+    let field;
 
-    beforeEach(function() {
+    beforeEach(() => {
       field = helper.createField('StringField');
     });
 
-    it('sets the value and display text if the value is valid', function() {
+    it('sets the value and display text if the value is valid', () => {
       field.render();
       field.setValue('hello');
       expect(field.value).toBe('hello');
       expect(field.displayText).toBe('hello');
     });
 
-    it('tries to convert the value into a string', function() {
+    it('tries to convert the value into a string', () => {
       field.render();
       field.setValue(10);
       expect(field.value).toBe('10');
       expect(field.displayText).toBe('10');
     });
 
-    it('sets the value to null if given value is empty', function() {
+    it('sets the value to null if given value is empty', () => {
       field.render();
       field.setValue('');
       expect(field.value).toBe(null);
       expect(field.displayText).toBe('');
     });
 
-    it('sets value to null if given value only consists of whitespaces and trim is true', function() {
+    it('sets value to null if given value only consists of whitespaces and trim is true', () => {
       field.render();
       field.setValue('  ');
       expect(field.value).toBe(null);
       expect(field.displayText).toBe('');
     });
 
-    it('does not set value to null if given value only consists of whitespaces and trim is false', function() {
+    it('does not set value to null if given value only consists of whitespaces and trim is false', () => {
       field.setTrimText(false);
       field.render();
       field.setValue('  ');
@@ -249,10 +249,10 @@ describe('StringField', function() {
     });
   });
 
-  describe('label', function() {
+  describe('label', () => {
 
-    it('is linked with the field', function() {
-      var field = scout.create('StringField', {
+    it('is linked with the field', () => {
+      let field = scout.create('StringField', {
         parent: session.desktop,
         label: 'label'
       });
@@ -261,8 +261,8 @@ describe('StringField', function() {
       expect(field.$field.attr('aria-labelledby')).toBe(field.$label.attr('id'));
     });
 
-    it('focuses the field when clicked', function() {
-      var field = scout.create('StringField', {
+    it('focuses the field when clicked', () => {
+      let field = scout.create('StringField', {
         parent: session.desktop,
         label: 'label'
       });

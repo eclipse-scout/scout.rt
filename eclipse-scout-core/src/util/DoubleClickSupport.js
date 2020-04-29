@@ -43,14 +43,14 @@ export default class DoubleClickSupport {
 
   mousedown(event) {
     if (event && event.type === 'mousedown') {
-      var posX = scout.nvl(event.pageX, 0);
-      var posY = scout.nvl(event.pageY, 0);
-      var timestamp = Date.now();
-      var isDoubleClick = false;
+      let posX = scout.nvl(event.pageX, 0);
+      let posY = scout.nvl(event.pageY, 0);
+      let timestamp = Date.now();
+      let isDoubleClick = false;
       if (this._lastTimestamp !== undefined) {
-        var interval = timestamp - this._lastTimestamp;
+        let interval = timestamp - this._lastTimestamp;
         if (interval <= this._maxDoubleClickInterval) {
-          var distance = Math.max(Math.abs(posX - this._lastPosX), Math.abs(posY - this._lastPosY));
+          let distance = Math.max(Math.abs(posX - this._lastPosX), Math.abs(posY - this._lastPosY));
           if (distance <= this._maxDoubleClickDistance) {
             // Double click detected
             isDoubleClick = true;

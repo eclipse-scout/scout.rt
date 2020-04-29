@@ -24,7 +24,7 @@ export default class ComboMenu extends Menu {
     this.$container.unfocusable();
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
 
-    this.childActions.forEach(function(childAction) {
+    this.childActions.forEach(childAction => {
       childAction.addCssClass('combo-menu-child');
       childAction.render();
     });

@@ -10,17 +10,17 @@
  */
 import {scout} from '../../src/index';
 
-describe('BusyIndicator', function() {
-  var helper, session;
+describe('BusyIndicator', () => {
+  let helper, session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  describe('render', function() {
-    it('uses entry point as parent if no $parent is provided', function() {
-      var busyIndicator = scout.create('BusyIndicator', {
+  describe('render', () => {
+    it('uses entry point as parent if no $parent is provided', () => {
+      let busyIndicator = scout.create('BusyIndicator', {
         parent: session.desktop,
         showTimeout: 0
       });
@@ -29,9 +29,9 @@ describe('BusyIndicator', function() {
       busyIndicator.destroy();
     });
 
-    it('uses $parent as parent if provided', function() {
-      var $parent = session.$entryPoint.appendDiv();
-      var busyIndicator = scout.create('BusyIndicator', {
+    it('uses $parent as parent if provided', () => {
+      let $parent = session.$entryPoint.appendDiv();
+      let busyIndicator = scout.create('BusyIndicator', {
         parent: session.desktop,
         showTimeout: 0
       });

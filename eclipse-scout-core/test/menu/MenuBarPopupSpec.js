@@ -10,23 +10,23 @@
  */
 import {MenuSpecHelper} from '@eclipse-scout/testing';
 
-describe('MenuBarPopup', function() {
+describe('MenuBarPopup', () => {
 
-  var helper, session, $sandbox, modelMenu1, modelMenu2, menu1, menu2;
+  let helper, session, $sandbox, modelMenu1, modelMenu2, menu1, menu2;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new MenuSpecHelper(session);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     removePopups(session);
   });
 
-  it('is opened on doAction if the menu has child actions', function() {
-    var childMenu = helper.createMenu({text: 'child menu'});
-    var menu = helper.createMenu({
+  it('is opened on doAction if the menu has child actions', () => {
+    let childMenu = helper.createMenu({text: 'child menu'});
+    let menu = helper.createMenu({
       text: 'the menu',
       childActions: [childMenu]
     });
@@ -36,9 +36,9 @@ describe('MenuBarPopup', function() {
     expect(menu.popup.rendered).toBe(true);
   });
 
-  it('rerenders the head on a menu property change', function() {
-    var childMenu = helper.createMenu({text: 'child menu'});
-    var menu = helper.createMenu({
+  it('rerenders the head on a menu property change', () => {
+    let childMenu = helper.createMenu({text: 'child menu'});
+    let menu = helper.createMenu({
       text: 'the menu',
       childActions: [childMenu]
     });

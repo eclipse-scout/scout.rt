@@ -11,13 +11,13 @@
 // eslint-disable-next-line max-classes-per-file
 import {Call} from '../../src/index';
 
-describe('scout.Call', function() {
+describe('scout.Call', () => {
 
-  beforeEach(function() {
+  beforeEach(() => {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
@@ -25,7 +25,7 @@ describe('scout.Call', function() {
 
   class SuccessCall extends Call {
     _callImpl() {
-      var deferred = $.Deferred();
+      let deferred = $.Deferred();
       deferred.resolve();
       return deferred.promise();
     }
@@ -38,7 +38,7 @@ describe('scout.Call', function() {
     }
 
     _callImpl() {
-      var deferred = $.Deferred();
+      let deferred = $.Deferred();
       deferred.reject();
       return deferred.promise();
     }
@@ -51,7 +51,7 @@ describe('scout.Call', function() {
     }
 
     _callImpl() {
-      var deferred = $.Deferred();
+      let deferred = $.Deferred();
       if (this.callCounter > 1) {
         deferred.resolve();
       } else {
@@ -63,12 +63,12 @@ describe('scout.Call', function() {
 
   // ----- Tests -----
 
-  it('calls done on success', function() {
-    var call = new SuccessCall();
+  it('calls done on success', () => {
+    let call = new SuccessCall();
     call.init();
-    var done = false;
+    let done = false;
     call.call()
-      .done(function() {
+      .done(() => {
         done = true;
       });
 
@@ -76,12 +76,12 @@ describe('scout.Call', function() {
     expect(call.callCounter).toBe(1);
   });
 
-  it('calls fail on failure', function() {
-    var call = new FailCall();
+  it('calls fail on failure', () => {
+    let call = new FailCall();
     call.init();
-    var failed = false;
+    let failed = false;
     call.call()
-      .fail(function() {
+      .fail(() => {
         failed = true;
       });
 
@@ -89,16 +89,16 @@ describe('scout.Call', function() {
     expect(call.callCounter).toBe(1);
   });
 
-  it('retries on failure', function() {
-    var call = new FailOnFirstTryCall();
+  it('retries on failure', () => {
+    let call = new FailOnFirstTryCall();
     call.init();
-    var done = false;
-    var failed = false;
+    let done = false;
+    let failed = false;
     call.call()
-      .done(function() {
+      .done(() => {
         done = true;
       })
-      .fail(function() {
+      .fail(() => {
         failed = true;
       });
 

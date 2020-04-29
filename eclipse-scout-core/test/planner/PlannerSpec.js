@@ -10,27 +10,27 @@
  */
 import {DateRange, dates, ObjectFactory, Planner} from '../../src/index';
 
-describe('Planner', function() {
-  var session;
-  var helper;
+describe('Planner', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
   function createPlannerModel(numResources) {
-    var model = createSimpleModel('Planner', session);
+    let model = createSimpleModel('Planner', session);
     model.resources = [];
-    for (var i = 0; i < numResources; i++) {
+    for (let i = 0; i < numResources; i++) {
       model.resources[i] = createResource('resource' + i);
     }
     return model;
@@ -55,7 +55,7 @@ describe('Planner', function() {
   }
 
   function createPlanner(model) {
-    var planner = new Planner();
+    let planner = new Planner();
     planner.init(model);
     return planner;
   }
@@ -68,10 +68,10 @@ describe('Planner', function() {
     return resource.$cells.children('.planner-activity');
   }
 
-  describe('deleteResources', function() {
-    var model, planner, resource0, resource1, resource2;
+  describe('deleteResources', () => {
+    let model, planner, resource0, resource1, resource2;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = createPlannerModel(3);
       planner = createPlanner(model);
       resource0 = model.resources[0];
@@ -79,7 +79,7 @@ describe('Planner', function() {
       resource2 = model.resources[2];
     });
 
-    it('deletes resources from model', function() {
+    it('deletes resources from model', () => {
       expect(planner.resources.length).toBe(3);
       expect(planner.resources[0]).toBe(resource0);
       expect(Object.keys(planner.resourceMap).length).toBe(3);
@@ -102,7 +102,7 @@ describe('Planner', function() {
       expect(planner.activityMap.length).toBe(0);
     });
 
-    it('deletes resources from html document', function() {
+    it('deletes resources from html document', () => {
       planner.render();
       expect(find$Resources(planner).length).toBe(3);
 
@@ -114,7 +114,7 @@ describe('Planner', function() {
       expect(find$Resources(planner).length).toBe(0);
     });
 
-    it('also adjusts selectedResources and selectionRange if deleted resource was selected', function() {
+    it('also adjusts selectedResources and selectionRange if deleted resource was selected', () => {
       planner.selectedResources = [resource0];
       expect(planner.selectedResources.length).toBe(1);
       planner.deleteResources([resource0]);
@@ -125,10 +125,10 @@ describe('Planner', function() {
 
   });
 
-  describe('updateResources', function() {
-    var model, planner, resource0, resource1, resource2, $resource1;
+  describe('updateResources', () => {
+    let model, planner, resource0, resource1, resource2, $resource1;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = createPlannerModel(3);
       planner = createPlanner(model);
       resource0 = model.resources[0];
@@ -136,12 +136,12 @@ describe('Planner', function() {
       resource2 = model.resources[2];
     });
 
-    it('updates resources in model', function() {
+    it('updates resources in model', () => {
       expect(planner.resources[1]).toBe(resource1);
       expect(planner.resources[1].resourceCell.text).toBe('resource1');
       expect(planner.resourceMap[resource1.id]).toBe(planner.resources[1]);
 
-      var updatedResource = createResource('new resource1');
+      let updatedResource = createResource('new resource1');
       updatedResource.id = resource1.id;
       planner.updateResources([updatedResource]);
       expect(planner.resources[1]).not.toBe(resource1);
@@ -149,13 +149,13 @@ describe('Planner', function() {
       expect(planner.resourceMap[resource1.id]).toBe(planner.resources[1]);
     });
 
-    it('updates resources in html document', function() {
+    it('updates resources in html document', () => {
       planner.render();
       $resource1 = find$Resources(planner).eq(1);
       expect($resource1.children('.resource-title').text()).toBe('resource1');
       expect($resource1[0]).toBe(resource1.$resource[0]);
 
-      var updatedResource = createResource('new resource1');
+      let updatedResource = createResource('new resource1');
       updatedResource.id = resource1.id;
       planner.updateResources([updatedResource]);
       $resource1 = find$Resources(planner).eq(1);
@@ -164,20 +164,20 @@ describe('Planner', function() {
       expect($resource1.data('resource')).toBe(updatedResource);
     });
 
-    it('updates activities', function() {
+    it('updates activities', () => {
       planner.render();
       $resource1 = find$Resources(planner).eq(1);
-      var $activity0 = find$ActivitiesForResource(resource1);
+      let $activity0 = find$ActivitiesForResource(resource1);
       expect($activity0.text()).toBe('');
       expect($activity0[0]).toBe(resource1.activities[0].$activity[0]);
 
-      var updatedResource = createResource('new resource1');
+      let updatedResource = createResource('new resource1');
       updatedResource.id = resource1.id;
       updatedResource.activities[0].text = 'updated activity';
       planner.updateResources([updatedResource]);
       $resource1 = find$Resources(planner).eq(1);
       $activity0 = find$ActivitiesForResource(updatedResource);
-      var updatedActivity = updatedResource.activities[0];
+      let updatedActivity = updatedResource.activities[0];
       expect($activity0.text()).toBe('updated activity');
       expect($activity0[0]).toBe(updatedActivity.$activity[0]);
       expect($activity0.data('activity')).toBe(updatedActivity);
@@ -185,30 +185,30 @@ describe('Planner', function() {
     });
   });
 
-  describe('renderScale', function() {
-    var model, planner;
+  describe('renderScale', () => {
+    let model, planner;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = createPlannerModel(0);
       planner = createPlanner(model);
       planner.render();
       planner.displayModeOptions = {};
     });
 
-    describe('displayMode: DAY', function() {
+    describe('displayMode: DAY', () => {
 
-      beforeEach(function() {
+      beforeEach(() => {
         planner.displayMode = Planner.DisplayMode.DAY;
         planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-21'));
       });
 
-      afterEach(function() {
+      afterEach(() => {
         planner._renderDisplayModeOptions();
         validateRendering();
       });
 
       function validateRendering() {
-        var options, interval, labelPeriod, firstHourOfDay, lastHourOfDay, hours, hourParts, smallCount;
+        let options, interval, labelPeriod, firstHourOfDay, lastHourOfDay, hours, hourParts, smallCount;
         options = planner.displayModeOptions[planner.displayMode];
         interval = options.interval;
         labelPeriod = options.labelPeriod;
@@ -224,15 +224,15 @@ describe('Planner', function() {
         expect(planner.$timelineSmall.children().length).toBe(smallCount);
 
         // labels
-        for (var i = 0; i < smallCount; i++) {
-          var visible = i % labelPeriod === 0;
+        for (let i = 0; i < smallCount; i++) {
+          let visible = i % labelPeriod === 0;
           expect(planner.$timelineSmall.children()[i].classList.contains('label-invisible')).toBe(!visible);
-          var labalValue = planner._dateFormat(new Date().setMinutes((i % hourParts) * interval), ':mm');
+          let labalValue = planner._dateFormat(new Date().setMinutes((i % hourParts) * interval), ':mm');
           expect(planner.$timelineSmall.children()[i].textContent).toBe(labalValue);
         }
       }
 
-      it('draws scale for whole day', function() {
+      it('draws scale for whole day', () => {
         planner.displayModeOptions[planner.displayMode] = {
           interval: 30,
           labelPeriod: 1,
@@ -241,7 +241,7 @@ describe('Planner', function() {
         };
       });
 
-      it('draws scale for one hour', function() {
+      it('draws scale for one hour', () => {
         planner.displayModeOptions[planner.displayMode] = {
           interval: 30,
           labelPeriod: 1,
@@ -250,7 +250,7 @@ describe('Planner', function() {
         };
       });
 
-      it('draws scale for two hour interval', function() {
+      it('draws scale for two hour interval', () => {
         planner.displayModeOptions[planner.displayMode] = {
           interval: 120,
           labelPeriod: 1,
@@ -259,7 +259,7 @@ describe('Planner', function() {
         };
       });
 
-      it('draws scale with only showing every second label', function() {
+      it('draws scale with only showing every second label', () => {
         planner.displayModeOptions[planner.displayMode] = {
           interval: 30,
           labelPeriod: 2,
@@ -270,20 +270,20 @@ describe('Planner', function() {
 
     });
 
-    describe('displayMode: WEEK / WORK_WEEK', function() {
+    describe('displayMode: WEEK / WORK_WEEK', () => {
 
-      beforeEach(function() {
+      beforeEach(() => {
         planner.displayMode = Planner.DisplayMode.WEEK;
         planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
       });
 
-      afterEach(function() {
+      afterEach(() => {
         planner._renderDisplayModeOptions();
         validateRendering();
       });
 
       function validateRendering() {
-        var options, interval, labelPeriod, firstHourOfDay, lastHourOfDay, hours, days, dayParts, smallCount;
+        let options, interval, labelPeriod, firstHourOfDay, lastHourOfDay, hours, days, dayParts, smallCount;
         options = planner.displayModeOptions[planner.displayMode];
         interval = options.interval;
         labelPeriod = options.labelPeriod;
@@ -304,15 +304,15 @@ describe('Planner', function() {
         expect(planner.$timelineSmall.children().length).toBe(smallCount);
 
         // labels
-        for (var i = 0; i < smallCount; i++) {
-          var visible = i % labelPeriod === 0;
+        for (let i = 0; i < smallCount; i++) {
+          let visible = i % labelPeriod === 0;
           expect(planner.$timelineSmall.children()[i].classList.contains('label-invisible')).toBe(!visible);
-          var labalValue = planner._dateFormat(dates.shiftTime(new Date(planner.viewRange.from.valueOf()), 0, interval * (i % dayParts), 0, 0), 'HH:mm');
+          let labalValue = planner._dateFormat(dates.shiftTime(new Date(planner.viewRange.from.valueOf()), 0, interval * (i % dayParts), 0, 0), 'HH:mm');
           expect(planner.$timelineSmall.children()[i].textContent).toBe(labalValue);
         }
       }
 
-      it('draws scale for WEEK for whole day with 6h interval', function() {
+      it('draws scale for WEEK for whole day with 6h interval', () => {
         planner.displayModeOptions[planner.displayMode] = {
           interval: 360,
           labelPeriod: 1,
@@ -321,7 +321,7 @@ describe('Planner', function() {
         };
       });
 
-      it('draws scale for WEEK with only showing every second label', function() {
+      it('draws scale for WEEK with only showing every second label', () => {
         planner.displayModeOptions[planner.displayMode] = {
           interval: 360,
           labelPeriod: 2,
@@ -330,7 +330,7 @@ describe('Planner', function() {
         };
       });
 
-      it('draws scale for WEEK with changing month', function() {
+      it('draws scale for WEEK with changing month', () => {
         planner.viewRange = new DateRange(dates.create('2016-06-27'), dates.create('2016-07-04'));
         planner.displayModeOptions[planner.displayMode] = {
           interval: 360,
@@ -340,7 +340,7 @@ describe('Planner', function() {
         };
       });
 
-      it('draws scale for WORK_WEEK for whole day with 6h interval', function() {
+      it('draws scale for WORK_WEEK for whole day with 6h interval', () => {
         planner.displayMode = Planner.DisplayMode.WORK_WEEK;
         planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-25'));
         planner.displayModeOptions[planner.displayMode] = {
@@ -351,7 +351,7 @@ describe('Planner', function() {
         };
       });
 
-      it('draws scale for WORK_WEEK with only showing every second label', function() {
+      it('draws scale for WORK_WEEK with only showing every second label', () => {
         planner.displayMode = Planner.DisplayMode.WORK_WEEK;
         planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-25'));
         planner.displayModeOptions[planner.displayMode] = {
@@ -363,20 +363,20 @@ describe('Planner', function() {
       });
     });
 
-    describe('displayMode: MONTH', function() {
+    describe('displayMode: MONTH', () => {
 
-      beforeEach(function() {
+      beforeEach(() => {
         planner.displayMode = Planner.DisplayMode.MONTH;
         planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-08-20'));
       });
 
-      afterEach(function() {
+      afterEach(() => {
         planner._renderDisplayModeOptions();
         validateRendering();
       });
 
       function validateRendering() {
-        var options, interval, labelPeriod, months, days;
+        let options, interval, labelPeriod, months, days;
         options = planner.displayModeOptions[planner.displayMode];
         labelPeriod = options.labelPeriod;
 
@@ -391,21 +391,21 @@ describe('Planner', function() {
         expect(planner.$timelineSmall.children().length).toBe(days);
 
         // labels
-        for (var i = 0; i < days; i++) {
-          var visible = dates.shift(planner.viewRange.from, 0, 0, i).getDate() % labelPeriod === 0;
+        for (let i = 0; i < days; i++) {
+          let visible = dates.shift(planner.viewRange.from, 0, 0, i).getDate() % labelPeriod === 0;
           expect(planner.$timelineSmall.children()[i].classList.contains('label-invisible')).toBe(!visible);
-          var labalValue = planner._dateFormat(dates.shift(new Date(planner.viewRange.from.valueOf()), 0, 0, i), 'dd');
+          let labalValue = planner._dateFormat(dates.shift(new Date(planner.viewRange.from.valueOf()), 0, 0, i), 'dd');
           expect(planner.$timelineSmall.children()[i].textContent).toBe(labalValue);
         }
       }
 
-      it('draws scale', function() {
+      it('draws scale', () => {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 1
         };
       });
 
-      it('draws scale with only showing every second label', function() {
+      it('draws scale with only showing every second label', () => {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 2
         };
@@ -413,20 +413,20 @@ describe('Planner', function() {
 
     });
 
-    describe('displayMode: CALENDAR_WEEK', function() {
+    describe('displayMode: CALENDAR_WEEK', () => {
 
-      beforeEach(function() {
+      beforeEach(() => {
         planner.displayMode = Planner.DisplayMode.CALENDAR_WEEK;
         planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2017-03-20'));
       });
 
-      afterEach(function() {
+      afterEach(() => {
         planner._renderDisplayModeOptions();
         validateRendering();
       });
 
       function validateRendering() {
-        var options, interval, labelPeriod, months, weeks;
+        let options, interval, labelPeriod, months, weeks;
         options = planner.displayModeOptions[planner.displayMode];
         labelPeriod = options.labelPeriod;
 
@@ -444,28 +444,28 @@ describe('Planner', function() {
         expect(planner.$timelineSmall.children().length).toBe(weeks);
 
         // labels
-        for (var i = 0; i < weeks; i++) {
-          var weekInYear = dates.weekInYear(dates.shift(new Date(planner.viewRange.from.valueOf()), 0, 0, 7 * i));
-          var visible = weekInYear % labelPeriod === 0;
+        for (let i = 0; i < weeks; i++) {
+          let weekInYear = dates.weekInYear(dates.shift(new Date(planner.viewRange.from.valueOf()), 0, 0, 7 * i));
+          let visible = weekInYear % labelPeriod === 0;
           expect(planner.$timelineSmall.children()[i].classList.contains('label-invisible')).toBe(!visible);
-          var labalValue = weekInYear + '';
+          let labalValue = weekInYear + '';
           expect(planner.$timelineSmall.children()[i].textContent).toBe(labalValue);
         }
       }
 
-      it('draws scale for CALENDAR_WEEK displayMode', function() {
+      it('draws scale for CALENDAR_WEEK displayMode', () => {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 1
         };
       });
 
-      it('draws scale with only showing every second label', function() {
+      it('draws scale with only showing every second label', () => {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 2
         };
       });
 
-      it('draws scale with only showing every third label', function() {
+      it('draws scale with only showing every third label', () => {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 3
         };
@@ -473,20 +473,20 @@ describe('Planner', function() {
 
     });
 
-    describe('displayMode: YEAR', function() {
+    describe('displayMode: YEAR', () => {
 
-      beforeEach(function() {
+      beforeEach(() => {
         planner.displayMode = Planner.DisplayMode.YEAR;
         planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2018-06-20'));
       });
 
-      afterEach(function() {
+      afterEach(() => {
         planner._renderDisplayModeOptions();
         validateRendering();
       });
 
       function validateRendering() {
-        var options, interval, labelPeriod, years, months;
+        let options, interval, labelPeriod, years, months;
         options = planner.displayModeOptions[planner.displayMode];
         labelPeriod = options.labelPeriod;
 
@@ -498,27 +498,27 @@ describe('Planner', function() {
         expect(planner.$timelineSmall.children().length).toBe(months);
 
         // labels
-        for (var i = 0; i < months; i++) {
-          var visible = (dates.shift(planner.viewRange.from, 0, i, 0).getMonth()) % labelPeriod === 0;
+        for (let i = 0; i < months; i++) {
+          let visible = (dates.shift(planner.viewRange.from, 0, i, 0).getMonth()) % labelPeriod === 0;
           expect(planner.$timelineSmall.children()[i].classList.contains('label-invisible')).toBe(!visible);
-          var labalValue = planner._dateFormat(dates.shift(new Date(planner.viewRange.from.valueOf()), 0, i, 0), 'MMMM');
+          let labalValue = planner._dateFormat(dates.shift(new Date(planner.viewRange.from.valueOf()), 0, i, 0), 'MMMM');
           expect(planner.$timelineSmall.children()[i].textContent).toBe(labalValue);
         }
       }
 
-      it('draws scale for YEAR displayMode', function() {
+      it('draws scale for YEAR displayMode', () => {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 1
         };
       });
 
-      it('draws scale with only showing every second label', function() {
+      it('draws scale with only showing every second label', () => {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 2
         };
       });
 
-      it('draws scale with only showing every third label', function() {
+      it('draws scale with only showing every third label', () => {
         planner.displayModeOptions[planner.displayMode] = {
           labelPeriod: 3
         };
@@ -527,17 +527,17 @@ describe('Planner', function() {
 
   });
 
-  describe('transformLeft/transformWidth', function() {
-    var model, planner;
+  describe('transformLeft/transformWidth', () => {
+    let model, planner;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = createPlannerModel(0);
       planner = createPlanner(model);
       planner.render();
       planner.displayModeOptions = {};
     });
 
-    it('calculates left and width in WEEK mode for whole days', function() {
+    it('calculates left and width in WEEK mode for whole days', () => {
       planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
       planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {
@@ -547,8 +547,8 @@ describe('Planner', function() {
       };
       planner._renderDisplayModeOptions();
 
-      var options = planner.displayModeOptions[planner.displayMode];
-      var cellWidthPercent = 100 / (((options.lastHourOfDay - options.firstHourOfDay + 1) * 7 * 60) / options.interval);
+      let options = planner.displayModeOptions[planner.displayMode];
+      let cellWidthPercent = 100 / (((options.lastHourOfDay - options.firstHourOfDay + 1) * 7 * 60) / options.interval);
 
       expect(planner.transformLeft(dates.create('2016-06-20 06:00:00'))).toBeCloseTo(cellWidthPercent, 5);
       expect(planner.transformWidth(dates.create('2016-06-20 06:00:00'), dates.create('2016-06-20 12:00:00'))).toBeCloseTo(cellWidthPercent, 5);
@@ -557,7 +557,7 @@ describe('Planner', function() {
       expect(planner.transformWidth(dates.create('2016-06-20 06:00:00'), dates.create('2016-06-21 12:00:00'))).toBeCloseTo(5 * cellWidthPercent, 5);
     });
 
-    it('calculates left and width in WEEK mode for limitted day range', function() {
+    it('calculates left and width in WEEK mode for limitted day range', () => {
       planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
       planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {
@@ -567,8 +567,8 @@ describe('Planner', function() {
       };
       planner._renderDisplayModeOptions();
 
-      var options = planner.displayModeOptions[planner.displayMode];
-      var cellWidthPercent = 100 / (((options.lastHourOfDay - options.firstHourOfDay + 1) * 7 * 60) / options.interval);
+      let options = planner.displayModeOptions[planner.displayMode];
+      let cellWidthPercent = 100 / (((options.lastHourOfDay - options.firstHourOfDay + 1) * 7 * 60) / options.interval);
 
       // during a day
       expect(planner.transformLeft(dates.create('2016-06-20 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
@@ -606,7 +606,7 @@ describe('Planner', function() {
       expect(planner.transformLeft(dates.create('2016-06-22 09:00:00'))).toBeCloseTo(21 * cellWidthPercent, 5);
     });
 
-    it('calculates left and width in WEEK mode for limitted day range (only firstHourOfDay set)', function() {
+    it('calculates left and width in WEEK mode for limitted day range (only firstHourOfDay set)', () => {
       planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
       planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {
@@ -616,8 +616,8 @@ describe('Planner', function() {
       };
       planner._renderDisplayModeOptions();
 
-      var options = planner.displayModeOptions[planner.displayMode];
-      var cellWidthPercent = 100 / (((options.lastHourOfDay - options.firstHourOfDay + 1) * 7 * 60) / options.interval);
+      let options = planner.displayModeOptions[planner.displayMode];
+      let cellWidthPercent = 100 / (((options.lastHourOfDay - options.firstHourOfDay + 1) * 7 * 60) / options.interval);
 
       // during a day
       expect(planner.transformLeft(dates.create('2016-06-20 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
@@ -637,16 +637,16 @@ describe('Planner', function() {
     });
   });
 
-  describe('select', function() {
-    var model, planner;
+  describe('select', () => {
+    let model, planner;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = createPlannerModel(1);
       planner = createPlanner(model);
       planner.render();
     });
 
-    it('selects at least the number of intervals configured by display mode options', function() {
+    it('selects at least the number of intervals configured by display mode options', () => {
       planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
       planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {
@@ -688,7 +688,7 @@ describe('Planner', function() {
       expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-20 17:00:00').toISOString());
     });
 
-    it('respects end of day if minSelectionIntervalCount is set', function() {
+    it('respects end of day if minSelectionIntervalCount is set', () => {
       planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
       planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {

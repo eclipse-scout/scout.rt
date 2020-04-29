@@ -63,7 +63,7 @@ export default class LabelField extends ValueField {
    * @override
    */
   _renderDisplayText() {
-    var displayText = this.displayText || '';
+    let displayText = this.displayText || '';
     if (this.htmlEnabled) {
       this.$field.html(displayText);
 
@@ -101,8 +101,8 @@ export default class LabelField extends ValueField {
   }
 
   _onAppLinkAction(event) {
-    var $target = $(event.delegateTarget);
-    var ref = $target.data('ref');
+    let $target = $(event.delegateTarget);
+    let ref = $target.data('ref');
     this.triggerAppLinkAction(ref);
   }
 

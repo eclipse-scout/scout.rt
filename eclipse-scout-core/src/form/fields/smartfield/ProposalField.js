@@ -46,7 +46,7 @@ export default class ProposalField extends SmartField {
     // use a timeout. Anyway: in case the popup is open at the time the user presses enter, we must
     // stop propagation (e.g. to avoid calls of other registered enter key-shortcuts, like the default
     // button on a form). See Widget.js for details about removing with or without CSS animations.
-    var hasPopup = !!this.popup;
+    let hasPopup = !!this.popup;
     this.acceptInput();
     if (this.popup) {
       this.closePopup();
@@ -76,7 +76,7 @@ export default class ProposalField extends SmartField {
     if (objects.isNullOrUndefined(value)) {
       return value;
     }
-    var validValue = strings.asString(value);
+    let validValue = strings.asString(value);
     if (this.trimText) {
       validValue = validValue.trim();
     }
@@ -99,7 +99,7 @@ export default class ProposalField extends SmartField {
    */
   _acceptByText(sync, searchText) {
     $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptByText) searchText=', searchText);
-    var async = !sync;
+    let async = !sync;
 
     // In case sync=true we cannot wait for the results of the lookup-call,
     // that's why we simply accept the text that's already in the field
@@ -120,7 +120,7 @@ export default class ProposalField extends SmartField {
 
     // when there's exactly one result, we accept that lookup row
     if (result.uniqueMatch) {
-      var lookupRow = result.uniqueMatch;
+      let lookupRow = result.uniqueMatch;
       if (this._isLookupRowActive(lookupRow)) {
         this.setLookupRow(lookupRow);
         this._inputAccepted();

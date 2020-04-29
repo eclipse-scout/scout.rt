@@ -41,12 +41,12 @@ export default class ColumnUserFilter extends TableUserFilter {
   }
 
   calculate() {
-    var containsSelectedValue, reorderAxis;
+    let containsSelectedValue, reorderAxis;
 
     this.matrix = new TableMatrix(this.table, this.session);
     this.matrix.addData(this.column, TableMatrix.NumberGroup.COUNT);
     this.xAxis = this.matrix.addAxis(this.column, this.axisGroup());
-    var cube = this.matrix.calculate();
+    let cube = this.matrix.calculate();
 
     this.selectedValues.forEach(function(selectedValue) {
       containsSelectedValue = false;
@@ -54,7 +54,7 @@ export default class ColumnUserFilter extends TableUserFilter {
         // selected value was not normalized -> normalize
         selectedValue = this.xAxis.norm(selectedValue);
       }
-      this.xAxis.some(function(key) {
+      this.xAxis.some(key => {
         if (key === selectedValue) {
           containsSelectedValue = true;
           return true;
@@ -72,7 +72,7 @@ export default class ColumnUserFilter extends TableUserFilter {
       this.xAxis.reorder();
     }
 
-    var text, displayKey, cubeValue, iconId;
+    let text, displayKey, cubeValue, iconId;
     this.availableValues = [];
     this.xAxis.forEach(function(key) {
       displayKey = key;
@@ -111,21 +111,21 @@ export default class ColumnUserFilter extends TableUserFilter {
    * @override TableUserFilter.js
    */
   createFilterAddedEventData() {
-    var data = super.createFilterAddedEventData();
+    let data = super.createFilterAddedEventData();
     data.columnId = this.column.id;
     data.selectedValues = this.selectedValues;
     return data;
   }
 
   createFilterRemovedEventData() {
-    var data = super.createFilterRemovedEventData();
+    let data = super.createFilterRemovedEventData();
     data.columnId = this.column.id;
     return data;
   }
 
   createLabel() {
     if (this.column.headerHtmlEnabled) {
-      var plainText = strings.plainText(this.column.text);
+      let plainText = strings.plainText(this.column.text);
       return plainText.replace(/\n/g, ' ');
     }
     return this.column.text || '';
@@ -140,7 +140,7 @@ export default class ColumnUserFilter extends TableUserFilter {
       // Lazy calculation. It is not possible on init, because the table is not rendered yet.
       this.calculate();
     }
-    var
+    let
       acceptByTable = true,
       acceptByFields = true,
       key = this.column.cellValueOrTextForCalculation(row),

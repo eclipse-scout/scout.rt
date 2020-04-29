@@ -171,7 +171,7 @@ export default class ProposalChooser extends Widget {
       return;
     }
 
-    var
+    let
       oldVisible = this.$status.isVisible(),
       oldMessage = this.$status.text(),
       visible = this._computeStatusVisible();
@@ -199,7 +199,7 @@ export default class ProposalChooser extends Widget {
   }
 
   _insertActiveFilterButton(value, index) {
-    var radio = scout.create('RadioButton', {
+    let radio = scout.create('RadioButton', {
       parent: this.activeFilterGroup,
       label: this._activeFilterLabel(index),
       radioValue: SmartField.ACTIVE_FILTER_VALUES[index],
@@ -210,13 +210,13 @@ export default class ProposalChooser extends Widget {
       }
     });
 
-    radio.on('propertyChange', function(event) {
+    radio.on('propertyChange', event => {
       if (event.propertyName === 'selected' && event.newValue === true) {
         this.trigger('activeFilterSelected', {
           activeFilter: event.source.radioValue
         });
       }
-    }.bind(this));
+    });
 
     this.activeFilterGroup.insertButton(radio);
   }

@@ -22,7 +22,7 @@ export default class TileTableHeaderSortByLookupCall extends StaticLookupCall {
   }
 
   _data() {
-    var lookupRows = [];
+    let lookupRows = [];
     this.table.visibleColumns().forEach(function(column) {
       if (column.isSortingPossible()) {
         lookupRows.push([

@@ -37,9 +37,9 @@ export default class DateColumn extends Column {
     this._setFormat(format);
     if (this.initialized) {
       // if format changes on the fly, just update the cell text
-      this.table.rows.forEach(function(row) {
+      this.table.rows.forEach(row => {
         this._updateCellText(row, this.cell(row));
-      }.bind(this));
+      });
     }
   }
 
@@ -58,9 +58,9 @@ export default class DateColumn extends Column {
     this._setGroupFormat(format);
     if (this.initialized) {
       // if format changes on the fly, just update the cell text
-      this.table.rows.forEach(function(row) {
+      this.table.rows.forEach(row => {
         this._updateCellText(row, this.cell(row));
-      }.bind(this));
+      });
     }
   }
 
@@ -97,7 +97,7 @@ export default class DateColumn extends Column {
   }
 
   cellTextForGrouping(row) {
-    var val = this.table.cellValue(this, row);
+    let val = this.table.cellValue(this, row);
     return this.groupFormat.format(val);
   }
 

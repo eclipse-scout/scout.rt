@@ -122,7 +122,7 @@ export default class Tab extends Widget {
   }
 
   _renderErrorStatus() {
-    var hasStatus = !!this.errorStatus,
+    let hasStatus = !!this.errorStatus,
       statusClass = hasStatus ? 'has-' + this.errorStatus.cssClass() : '';
     this._updateErrorStatusClasses(statusClass, hasStatus);
     this._updateStatus();
@@ -134,7 +134,7 @@ export default class Tab extends Widget {
   }
 
   _updateStatus() {
-    var visible = this._computeVisible(),
+    let visible = this._computeVisible(),
       status = null,
       autoRemove = true,
       initialShow = false;

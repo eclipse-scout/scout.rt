@@ -22,7 +22,7 @@ export default class DesktopHeaderLayout extends AbstractLayout {
    * @override AbstractLayout.js
    */
   layout($container) {
-    var viewButtonBoxPrefSize, toolBoxPrefSize,
+    let viewButtonBoxPrefSize, toolBoxPrefSize,
       htmlContainer = this.header.htmlComp,
       containerSize = htmlContainer.size(),
       toolBox = this.header.toolBox,

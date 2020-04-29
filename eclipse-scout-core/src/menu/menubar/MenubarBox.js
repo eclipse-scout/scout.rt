@@ -64,17 +64,17 @@ export default class MenubarBox extends Widget {
 
   _removeMenuItems() {
     this._removeMenuHandlers();
-    this.menuItems.forEach(function(item) {
+    this.menuItems.forEach(item => {
       item.overflow = false;
       item.remove();
     });
   }
 
   _renderMenuItems() {
-    this.menuItems.forEach(function(item) {
+    this.menuItems.forEach(item => {
       item.render(this.$container);
       item.$container.addClass('menubar-item');
-    }.bind(this));
+    });
 
     if (!this.rendering) {
       this.invalidateLayoutTree();
@@ -100,7 +100,7 @@ export default class MenubarBox extends Widget {
 
   _onMenuItemPropertyChange(event) {
     if (event.propertyName === 'visible') {
-      this.setVisible(this.menuItems.some(function(m) {
+      this.setVisible(this.menuItems.some(m => {
         return m.visible && !m.ellipsis;
       }));
     }

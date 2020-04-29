@@ -99,18 +99,18 @@ export default class OpenUriHandler {
 
   openUriInIFrame(uri) {
     // Create a hidden iframe and set the URI as src attribute value
-    var $iframe = this.session.$entryPoint.appendElement('<iframe>', 'download-frame')
+    let $iframe = this.session.$entryPoint.appendElement('<iframe>', 'download-frame')
       .attr('tabindex', -1)
       .attr('src', uri);
 
     // Remove the iframe again after 10s (should be enough to get the download started)
-    setTimeout(function() {
+    setTimeout(() => {
       $iframe.remove();
     }, 10 * 1000);
   }
 
   openUriAsNewWindow(uri) {
-    var popupBlockerHandler = new PopupBlockerHandler(this.session);
+    let popupBlockerHandler = new PopupBlockerHandler(this.session);
     if (Device.get().isInternetExplorer()) {
       popupBlockerHandler.openWindow(uri, null, 'location=yes,toolbar=yes,menubar=yes,resizable=yes,scrollbars=yes');
     } else {
@@ -119,7 +119,7 @@ export default class OpenUriHandler {
   }
 
   openUriAsPopupWindow(uri) {
-    var popupBlockerHandler = new PopupBlockerHandler(this.session);
+    let popupBlockerHandler = new PopupBlockerHandler(this.session);
     popupBlockerHandler.openWindow(uri, null, 'location=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes');
   }
 }

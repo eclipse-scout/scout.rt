@@ -45,9 +45,9 @@ export default class NumberColumn extends Column {
     this._setDecimalFormat(decimalFormat);
     if (this.initialized) {
       // if format changes on the fly, just update the cell text
-      this.table.rows.forEach(function(row) {
+      this.table.rows.forEach(row => {
         this._updateCellText(row, this.cell(row));
-      }.bind(this));
+      });
     }
   }
 
@@ -100,9 +100,7 @@ export default class NumberColumn extends Column {
       this.aggrFinish = aggregation.maxFinish;
       this.aggrSymbol = aggregation.maxSymbol;
     } else if (func === 'none') {
-      var undefinedFunc = function() {
-        return undefined;
-      };
+      let undefinedFunc = () => undefined;
       this.aggrStart = undefinedFunc;
       this.aggrStep = undefinedFunc;
       this.aggrFinish = undefinedFunc;
@@ -111,7 +109,7 @@ export default class NumberColumn extends Column {
   }
 
   createAggrValueCell(value) {
-    var formattedValue = this._formatValue(value);
+    let formattedValue = this._formatValue(value);
     return scout.create('Cell', {
       text: formattedValue,
       iconId: (formattedValue ? this.aggrSymbol : null),
@@ -121,14 +119,14 @@ export default class NumberColumn extends Column {
   }
 
   _cellStyle(cell, tableNodeColumn, rowPadding) {
-    var style = super._cellStyle(cell, tableNodeColumn, rowPadding);
+    let style = super._cellStyle(cell, tableNodeColumn, rowPadding);
     if (!this.backgroundEffect || cell.value === undefined || strings.contains(cell.cssClass, 'table-aggregate-cell')) {
       return style;
     }
     if (!this.backgroundEffectFunc) {
       this.backgroundEffectFunc = this._resolveBackgroundEffectFunc();
     }
-    var backgroundStyle = this.backgroundEffectFunc(this._preprocessValueOrTextForCalculation(cell.value));
+    let backgroundStyle = this.backgroundEffectFunc(this._preprocessValueOrTextForCalculation(cell.value));
     if (backgroundStyle.backgroundColor) {
       style += 'background-color: ' + backgroundStyle.backgroundColor + ';';
     }
@@ -185,7 +183,7 @@ export default class NumberColumn extends Column {
   }
 
   _resolveBackgroundEffectFunc() {
-    var effect = this.backgroundEffect;
+    let effect = this.backgroundEffect;
     if (effect === 'colorGradient1') {
       return this._colorGradient1.bind(this);
     }
@@ -198,9 +196,7 @@ export default class NumberColumn extends Column {
 
     if (effect !== null) {
       $.log.warn('Unsupported backgroundEffect: ' + effect);
-      return function() {
-        return {};
-      };
+      return () => ({});
     }
   }
 
@@ -209,7 +205,7 @@ export default class NumberColumn extends Column {
       if (!row.$row) {
         return;
       }
-      var cell = this.cell(row),
+      let cell = this.cell(row),
         $cell = this.table.$cell(this, row.$row);
 
       if (cell.value !== undefined) {
@@ -219,10 +215,10 @@ export default class NumberColumn extends Column {
   }
 
   calculateMinMaxValues() {
-    var row, calcMinValue, calcMaxValue, value,
+    let row, calcMinValue, calcMaxValue, value,
       rows = this.table.rows;
 
-    for (var i = 0; i < rows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
       row = rows[i];
       value = this.cellValueOrTextForCalculation(row);
 
@@ -238,7 +234,7 @@ export default class NumberColumn extends Column {
   }
 
   _colorGradient1(value) {
-    var startStyle = styles.get('column-background-effect-gradient1-start', 'backgroundColor'),
+    let startStyle = styles.get('column-background-effect-gradient1-start', 'backgroundColor'),
       endStyle = styles.get('column-background-effect-gradient1-end', 'backgroundColor'),
       startColor = styles.rgb(startStyle.backgroundColor),
       endColor = styles.rgb(endStyle.backgroundColor);
@@ -247,7 +243,7 @@ export default class NumberColumn extends Column {
   }
 
   _colorGradient2(value) {
-    var startStyle = styles.get('column-background-effect-gradient2-start', 'backgroundColor'),
+    let startStyle = styles.get('column-background-effect-gradient2-start', 'backgroundColor'),
       endStyle = styles.get('column-background-effect-gradient2-end', 'backgroundColor'),
       startColor = styles.rgb(startStyle.backgroundColor),
       endColor = styles.rgb(endStyle.backgroundColor);
@@ -256,9 +252,9 @@ export default class NumberColumn extends Column {
   }
 
   _colorGradient(value, startColor, endColor) {
-    var level = (value - this.calcMinValue) / (this.calcMaxValue - this.calcMinValue);
+    let level = (value - this.calcMinValue) / (this.calcMaxValue - this.calcMinValue);
 
-    var r = Math.ceil(startColor.red - level * (startColor.red - endColor.red)),
+    let r = Math.ceil(startColor.red - level * (startColor.red - endColor.red)),
       g = Math.ceil(startColor.green - level * (startColor.green - endColor.green)),
       b = Math.ceil(startColor.blue - level * (startColor.blue - endColor.blue));
 
@@ -268,8 +264,8 @@ export default class NumberColumn extends Column {
   }
 
   _barChart(value) {
-    var level = Math.ceil((value - this.calcMinValue) / (this.calcMaxValue - this.calcMinValue) * 100) + '';
-    var color = styles.get('column-background-effect-bar-chart', 'backgroundColor').backgroundColor;
+    let level = Math.ceil((value - this.calcMinValue) / (this.calcMaxValue - this.calcMinValue) * 100) + '';
+    let color = styles.get('column-background-effect-bar-chart', 'backgroundColor').backgroundColor;
     return {
       backgroundImage: 'linear-gradient(to left, ' + color + ' 0%, ' + color + ' ' + level + '%, transparent ' + level + '%, transparent 100% )'
     };

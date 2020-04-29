@@ -64,9 +64,9 @@ export default class TreeBox extends LookupBox {
       return;
     }
     this._valueSyncing = true;
-    var valueArray = objects.values(this.tree.nodesMap).filter(function(node) {
+    let valueArray = objects.values(this.tree.nodesMap).filter(node => {
       return node.checked;
-    }).map(function(node) {
+    }).map(node => {
       return node.id;
     });
 
@@ -85,7 +85,7 @@ export default class TreeBox extends LookupBox {
     }
 
     this._valueSyncing = true;
-    var opts = {
+    let opts = {
       checkOnlyEnabled: false,
       checkChildren: false
     };
@@ -94,7 +94,7 @@ export default class TreeBox extends LookupBox {
         this.uncheckAll(opts);
       } else {
         // if lookup was not executed yet: do it now.
-        var lookupScheduled = this._ensureLookupCallExecuted();
+        let lookupScheduled = this._ensureLookupCallExecuted();
         if (lookupScheduled) {
           return; // was the first lookup: tree has no nodes yet. cancel sync. Will be executed again after lookup execution.
         }
@@ -114,7 +114,7 @@ export default class TreeBox extends LookupBox {
   }
 
   uncheckAll(options) {
-    for (var nodeId in this.tree.nodesMap) {
+    for (let nodeId in this.tree.nodesMap) {
       if (this.tree.nodesMap.hasOwnProperty(nodeId)) {
         this.tree.uncheckNode(this.tree.nodesMap[nodeId], options);
       }
@@ -128,7 +128,7 @@ export default class TreeBox extends LookupBox {
   }
 
   _populateTree(result) {
-    var topLevelNodes = [];
+    let topLevelNodes = [];
     this._populating = true;
     this._populateTreeRecursive(null, topLevelNodes, result.lookupRows);
 
@@ -140,7 +140,7 @@ export default class TreeBox extends LookupBox {
   }
 
   _populateTreeRecursive(parentKey, nodesArray, lookupRows) {
-    var node;
+    let node;
     lookupRows.forEach(function(lookupRow) {
       if (lookupRow.parentKey === parentKey) {
         node = this._createNode(lookupRow);
@@ -159,15 +159,15 @@ export default class TreeBox extends LookupBox {
       return [];
     }
 
-    return objects.values(this.tree.nodesMap).filter(function(node) {
+    return objects.values(this.tree.nodesMap).filter(node => {
       return node.checked;
-    }).map(function(node) {
+    }).map(node => {
       return node.lookupRow;
     });
   }
 
   _createNode(lookupRow) {
-    var
+    let
       node = scout.create('TreeNode', {
         parent: this.tree,
         id: lookupRow.key,

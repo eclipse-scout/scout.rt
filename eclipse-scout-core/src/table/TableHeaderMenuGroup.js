@@ -32,7 +32,7 @@ export default class TableHeaderMenuGroup extends Widget {
       this.$container.addClass(this.cssClass);
     }
     this._renderText();
-    this.children.forEach(function(child) {
+    this.children.forEach(child => {
       child.render();
     }, this);
     widgets.updateFirstLastMarker(this.children);

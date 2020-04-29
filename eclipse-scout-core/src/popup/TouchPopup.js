@@ -81,7 +81,7 @@ export default class TouchPopup extends Popup {
    * @override Popup.js
    */
   prefLocation(verticalAlignment, horizontalAlignment) {
-    var popupSize = this.htmlComp.prefSize(),
+    let popupSize = this.htmlComp.prefSize(),
       windowWidth = this.$container.window().width(),
       x = Math.max(this.windowPaddingX, (windowWidth - popupSize.width) / 2);
     return new Point(x, 0);
@@ -128,7 +128,7 @@ export default class TouchPopup extends Popup {
    * Calls accept input on the embedded field.
    */
   _acceptInput() {
-    var promise = this._field.acceptInput();
+    let promise = this._field.acceptInput();
     if (promise) {
       promise.always(this.close.bind(this));
     } else {

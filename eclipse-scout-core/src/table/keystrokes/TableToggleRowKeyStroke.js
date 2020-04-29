@@ -22,18 +22,18 @@ export default class TableToggleRowKeyStroke extends KeyStroke {
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     return accepted &&
       this.field.checkable &&
       this.field.selectedRows.length;
   }
 
   handle(event) {
-    var selectedRows = this.field.selectedRows.filter(function(row) {
+    let selectedRows = this.field.selectedRows.filter(row => {
       return row.enabled;
     });
     // Toggle checked state to 'true', except if every row is already checked
-    var checked = selectedRows.some(function(row) {
+    let checked = selectedRows.some(row => {
       return !row.checked;
     });
     selectedRows.forEach(function(row) {

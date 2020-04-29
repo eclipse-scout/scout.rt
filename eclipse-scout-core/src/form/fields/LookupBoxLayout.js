@@ -20,7 +20,7 @@ export default class LookupBoxLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var htmlContainer = HtmlComponent.get($container),
+    let htmlContainer = HtmlComponent.get($container),
       size = htmlContainer.size(),
       height = size.height,
       filterBoxHeight;
@@ -31,18 +31,18 @@ export default class LookupBoxLayout extends AbstractLayout {
     }
 
     height = Math.max(height, 20);
-    var htmlStructure = HtmlComponent.get(this.structure.$container);
+    let htmlStructure = HtmlComponent.get(this.structure.$container);
     htmlStructure.setSize(new Dimension(size.width, height));
 
     if (this.filterBox && this.filterBox.rendered) {
-      var htmlFilterBox = HtmlComponent.get(this.filterBox.$container);
+      let htmlFilterBox = HtmlComponent.get(this.filterBox.$container);
       htmlFilterBox.setSize(new Dimension(size.width, filterBoxHeight));
     }
   }
 
   preferredLayoutSize($container, options) {
     options = options || {};
-    var prefSizeStructure, prefSizeFilterBox, structureContainer, filterContainer,
+    let prefSizeStructure, prefSizeFilterBox, structureContainer, filterContainer,
       width = 0,
       htmlContainer = HtmlComponent.get($container),
       height = HtmlEnvironment.get().formRowHeight,

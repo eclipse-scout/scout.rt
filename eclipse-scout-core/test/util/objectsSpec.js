@@ -10,12 +10,12 @@
  */
 import {FormField, objects} from '../../src/index';
 
-describe('scout.objects', function() {
+describe('scout.objects', () => {
 
-  describe('copyProperties', function() {
+  describe('copyProperties', () => {
 
-    it('copies all properties', function() {
-      var dest = {},
+    it('copies all properties', () => {
+      let dest = {},
         source = {
           foo: 6,
           bar: 7
@@ -25,12 +25,12 @@ describe('scout.objects', function() {
       expect(dest.bar).toBe(7);
     });
 
-    it('copies the properties from prototype as well', function() {
-      var dest = {};
-      var TestConstructor = function() {
+    it('copies the properties from prototype as well', () => {
+      let dest = {};
+      let TestConstructor = function() {
         this.foo = 6;
       };
-      var source = new TestConstructor();
+      let source = new TestConstructor();
       TestConstructor.prototype.bar = 7;
       source.qux = 8;
 
@@ -40,13 +40,13 @@ describe('scout.objects', function() {
       expect(dest.qux).toBe(8);
     });
 
-    it('copies only the properties specified by the filter, if there is one', function() {
-      var dest = {};
-      var TestConstructor = function() {
+    it('copies only the properties specified by the filter, if there is one', () => {
+      let dest = {};
+      let TestConstructor = function() {
         this.foo = 6;
         this.xyz = 9;
       };
-      var source = new TestConstructor();
+      let source = new TestConstructor();
       TestConstructor.prototype.bar = 7;
       TestConstructor.prototype.abc = 2;
       source.qux = 8;
@@ -63,10 +63,10 @@ describe('scout.objects', function() {
 
   });
 
-  describe('copyOwnProperties', function() {
+  describe('copyOwnProperties', () => {
 
-    it('copies all properties', function() {
-      var dest = {},
+    it('copies all properties', () => {
+      let dest = {},
         source = {
           foo: 6,
           bar: 7
@@ -76,13 +76,13 @@ describe('scout.objects', function() {
       expect(dest.bar).toBe(7);
     });
 
-    it('does not copy the properties from prototype', function() {
-      var dest = {};
-      var TestConstructor = function() {
+    it('does not copy the properties from prototype', () => {
+      let dest = {};
+      let TestConstructor = function() {
         this.foo = 6;
       };
       TestConstructor.prototype.bar = 7;
-      var source = new TestConstructor();
+      let source = new TestConstructor();
       source.qux = 8;
 
       objects.copyOwnProperties(source, dest);
@@ -91,8 +91,8 @@ describe('scout.objects', function() {
       expect(dest.qux).toBe(8);
     });
 
-    it('copies only the properties specified by the filter, if there is one', function() {
-      var dest = {},
+    it('copies only the properties specified by the filter, if there is one', () => {
+      let dest = {},
         source = {
           foo: 6,
           bar: 7,
@@ -107,21 +107,21 @@ describe('scout.objects', function() {
 
   });
 
-  describe('countOwnProperties', function() {
+  describe('countOwnProperties', () => {
 
-    it('counts all own properties', function() {
-      var o = {
+    it('counts all own properties', () => {
+      let o = {
         first: 1,
         second: 2
       };
-      var F = function() {
+      let F = function() {
         this.foo = 66;
         this.bar = 777;
       };
       F.myProp = 'hello';
       F.prototype.anotherProp = 'goodbye';
-      var x = new F();
-      var y = {};
+      let x = new F();
+      let y = {};
       objects.copyProperties(x, y);
       y.qux = 9999;
 
@@ -131,8 +131,8 @@ describe('scout.objects', function() {
       expect(objects.countOwnProperties(y)).toBe(4); // foo, bar, anotherProp, qux (because copyProperties also copies properties from prototype)
     });
 
-    it('works for objects created with createMap() function', function() {
-      var map = objects.createMap();
+    it('works for objects created with createMap() function', () => {
+      let map = objects.createMap();
       expect(objects.countOwnProperties(map)).toBe(0);
       map = objects.createMap({foo: 1});
       expect(objects.countOwnProperties(map)).toBe(1);
@@ -140,10 +140,10 @@ describe('scout.objects', function() {
 
   });
 
-  describe('valueCopy', function() {
+  describe('valueCopy', () => {
 
-    it('copies an object by value', function() {
-      var o = {
+    it('copies an object by value', () => {
+      let o = {
         first: 1,
         second: 2,
         arr: [],
@@ -170,7 +170,7 @@ describe('scout.objects', function() {
           }]
         }
       };
-      var o2 = objects.valueCopy(o);
+      let o2 = objects.valueCopy(o);
       o.first = 'one';
       o.second = 'two';
       o.arr.push('test');
@@ -189,14 +189,14 @@ describe('scout.objects', function() {
       expect(o2.hamlet.refs.length).toBe(2);
     });
 
-    it('works for objects created with createMap() function', function() {
+    it('works for objects created with createMap() function', () => {
       // Top-level map
-      var map = objects.createMap();
+      let map = objects.createMap();
       map.name = 'Linda';
       map.book = null;
       map.author = undefined;
 
-      var map2 = objects.valueCopy(map);
+      let map2 = objects.valueCopy(map);
       map.name = 'Hans';
       map.total = 444;
       expect(map).not.toBe(map2);
@@ -207,14 +207,14 @@ describe('scout.objects', function() {
       expect(map2.author).toBe(undefined);
 
       // Nested map
-      var o = {
+      let o = {
         first: 1,
         second: 2
       };
       o.map = objects.createMap();
       o.map['a-b-c'] = 'ABC';
 
-      var o2 = objects.valueCopy(o);
+      let o2 = objects.valueCopy(o);
       o.first = 'one';
       o.second = 'two';
       o.map['a-b-c'] = 'GREEN';
@@ -230,8 +230,8 @@ describe('scout.objects', function() {
 
   });
 
-  describe('isNumber', function() {
-    it('returns true iff argument is a number', function() {
+  describe('isNumber', () => {
+    it('returns true iff argument is a number', () => {
       expect(objects.isNumber(0)).toBe(true);
       expect(objects.isNumber(1)).toBe(true);
       expect(objects.isNumber(1.0)).toBe(true);
@@ -246,8 +246,8 @@ describe('scout.objects', function() {
     });
   });
 
-  describe('isArray', function() {
-    it('returns true when argument is an array', function() {
+  describe('isArray', () => {
+    it('returns true when argument is an array', () => {
       expect(objects.isArray([])).toBe(true);
 
       expect(objects.isArray(undefined)).toBe(false);
@@ -255,8 +255,8 @@ describe('scout.objects', function() {
     });
   });
 
-  describe('isNullOrUndefined', function() {
-    it('returns true when argument is null or undefined, but not when 0 or any other value', function() {
+  describe('isNullOrUndefined', () => {
+    it('returns true when argument is null or undefined, but not when 0 or any other value', () => {
       expect(objects.isNullOrUndefined(null)).toBe(true);
       expect(objects.isNullOrUndefined(undefined)).toBe(true);
       expect(objects.isNullOrUndefined(0)).toBe(false);
@@ -264,21 +264,22 @@ describe('scout.objects', function() {
     });
   });
 
-  describe('values', function() {
-    it('returns object values', function() {
-      var Class = function() {
+  describe('values', () => {
+    it('returns object values', () => {
+      let Class = function() {
         this.a = 'A';
         this.b = 'B';
       };
-      var o1 = {
+      let o1 = {
         a: 'X',
         b: 'Y',
         c: 'Z'
       };
-      var o2 = new Class();
+      let o2 = new Class();
       o2.a = 'X';
       o2.c = 'C';
 
+      // noinspection JSCheckFunctionSignatures
       expect(objects.values()).toEqual([]);
       expect(objects.values(null)).toEqual([]);
       expect(objects.values(undefined)).toEqual([]);
@@ -293,9 +294,9 @@ describe('scout.objects', function() {
       expect(objects.values(o2)).toContain('C');
     });
 
-    it('can handle maps', function() {
-      var map1 = objects.createMap();
-      var map2 = objects.createMap();
+    it('can handle maps', () => {
+      let map1 = objects.createMap();
+      let map2 = objects.createMap();
       map2['x'] = 'y'; // jshint ignore:line
       map2[7] = 7;
 
@@ -305,21 +306,21 @@ describe('scout.objects', function() {
       expect(objects.values(map2)).toContain(7);
     });
 
-    it('createMap with optional properties', function() {
-      var the = objects.createMap({world: 1});
+    it('createMap with optional properties', () => {
+      let the = objects.createMap({world: 1});
       expect(objects.countOwnProperties(the)).toBe(1);
       expect(the.world).toBe(1);
     });
 
-    it('createMap should not have a prototype', function() {
-      var map = objects.createMap();
+    it('createMap should not have a prototype', () => {
+      let map = objects.createMap();
       expect(Object.getPrototypeOf(map)).toBe(null);
     });
   });
 
-  describe('findChildObjectByKey', function() {
+  describe('findChildObjectByKey', () => {
 
-    var obj = {
+    let obj = {
       id: 'root',
       value: '.root',
       main: {
@@ -353,43 +354,43 @@ describe('scout.objects', function() {
       }]
     };
 
-    it('find root object', function() {
-      var child = objects.findChildObjectByKey(obj, 'id', 'root');
+    it('find root object', () => {
+      let child = objects.findChildObjectByKey(obj, 'id', 'root');
       expect(child.value).toBe('.root');
     });
-    it('find object in tree', function() {
-      var child = objects.findChildObjectByKey(obj, 'id', 'subMain');
+    it('find object in tree', () => {
+      let child = objects.findChildObjectByKey(obj, 'id', 'subMain');
       expect(child.value).toBe('.root.main.sub');
     });
-    it('find object in array', function() {
-      var child = objects.findChildObjectByKey(obj, 'id', 'arrayObj3');
+    it('find object in array', () => {
+      let child = objects.findChildObjectByKey(obj, 'id', 'arrayObj3');
       expect(child.value).toBe('.root.array.obj3');
     });
-    it('find object in nested array', function() {
-      var child = objects.findChildObjectByKey(obj, 'id', 'arrayObj2sub');
+    it('find object in nested array', () => {
+      let child = objects.findChildObjectByKey(obj, 'id', 'arrayObj2sub');
       expect(child.value).toBe('.root.array.array.obj2.sub');
     });
-    it('find object in array within the tree', function() {
-      var child = objects.findChildObjectByKey(obj, 'id', 'arrayObj1');
+    it('find object in array within the tree', () => {
+      let child = objects.findChildObjectByKey(obj, 'id', 'arrayObj1');
       expect(child.value).toBe('.root.main.sub.array.obj1');
     });
-    it('search for not existing property', function() {
-      var child = objects.findChildObjectByKey(obj, 'nope', 'arrayObj1');
+    it('search for not existing property', () => {
+      let child = objects.findChildObjectByKey(obj, 'nope', 'arrayObj1');
       expect(child).toBe(null);
     });
-    it('search for not existing id', function() {
-      var child = objects.findChildObjectByKey(obj, 'id', 'nope');
+    it('search for not existing id', () => {
+      let child = objects.findChildObjectByKey(obj, 'id', 'nope');
       expect(child).toBe(null);
     });
-    it('search for not existing property and value', function() {
-      var child = objects.findChildObjectByKey(obj, 'nope', 'nope');
+    it('search for not existing property and value', () => {
+      let child = objects.findChildObjectByKey(obj, 'nope', 'nope');
       expect(child).toBe(null);
     });
   });
 
-  describe('isPlainObject', function() {
+  describe('isPlainObject', () => {
 
-    it('works as expected', function() {
+    it('works as expected', () => {
       expect(objects.isPlainObject({})).toBe(true);
       expect(objects.isPlainObject({foo: 'bar'})).toBe(true);
       expect(objects.isPlainObject([])).toBe(false);
@@ -401,12 +402,12 @@ describe('scout.objects', function() {
 
   });
 
-  describe('argumentsToArray', function() {
+  describe('argumentsToArray', () => {
 
-    it('returns an array', function() {
-      var result;
-      var func = function() {
-        result = objects.argumentsToArray(arguments);
+    it('returns an array', () => {
+      let result;
+      let func = (...args) => {
+        result = args;
       };
 
       func();
@@ -422,9 +423,9 @@ describe('scout.objects', function() {
 
   });
 
-  describe('equals', function() {
+  describe('equals', () => {
 
-    it('works as expected', function() {
+    it('works as expected', () => {
       expect(objects.equals()).toBe(true); // undefined === undefined
       expect(objects.equals(2)).toBe(false);
       expect(objects.equals(2, 2)).toBe(true);
@@ -436,28 +437,24 @@ describe('scout.objects', function() {
       expect(objects.equals(true, true)).toBe(true);
       expect(objects.equals(null, null)).toBe(true);
       expect(objects.equals([], [])).toBe(false);
-      var arr01 = [1, 2, 3];
+      let arr01 = [1, 2, 3];
       expect(objects.equals(arr01, arr01)).toBe(true);
       expect(objects.equals(arr01, [1, 2, 3])).toBe(false);
-      var a = {};
+      let a = {};
       expect(objects.equals(a, a)).toBe(true);
       expect(objects.equals({}, {})).toBe(false);
       expect(objects.equals({
-        equals: function() {
-          return true;
-        }
+        equals: () => true
       }, {
-        equals: function() {
-          return true;
-        }
+        equals: () => true
       })).toBe(true);
     });
 
   });
 
-  describe('equalsRecursive', function() {
+  describe('equalsRecursive', () => {
 
-    it('works as expected', function() {
+    it('works as expected', () => {
       expect(objects.equalsRecursive()).toBe(true); // undefined === undefined
       expect(objects.equalsRecursive(2)).toBe(false);
       expect(objects.equalsRecursive(2, 2)).toBe(true);
@@ -469,40 +466,36 @@ describe('scout.objects', function() {
       expect(objects.equalsRecursive(true, true)).toBe(true);
       expect(objects.equalsRecursive(null, null)).toBe(true);
       expect(objects.equalsRecursive([], [])).toBe(true);
-      var arr01 = [1, 2, 3];
+      let arr01 = [1, 2, 3];
       expect(objects.equalsRecursive(arr01, arr01)).toBe(true);
       expect(objects.equalsRecursive(arr01, [1, 2, 3])).toBe(true);
       expect(objects.equalsRecursive(arr01, [3, 2, 1])).toBe(false);
-      var a = {};
+      let a = {};
       expect(objects.equalsRecursive(a, a)).toBe(true);
       expect(objects.equalsRecursive({}, {})).toBe(true);
       expect(objects.equalsRecursive({a: '1', b: '2'}, {b: '2', a: '1'})).toBe(true);
       expect(objects.equalsRecursive({a: [{a: '1', b: '2'}, {a: '3', b: '4'}]}, {a: [{a: '1', b: '2'}, {a: '3', b: '4'}]})).toBe(true);
       expect(objects.equalsRecursive({a: [{a: '3', b: '4'}, {a: '1', b: '2'}]}, {a: [{a: '1', b: '2'}, {a: '3', b: '4'}]})).toBe(false);
       expect(objects.equalsRecursive({
-        equals: function() {
-          return true;
-        }
+        equals: () => true
       }, {
-        equals: function() {
-          return true;
-        }
+        equals: () => true
       })).toBe(true);
     });
 
   });
 
-  describe('Constant resolving from plain object / JSON model', function() {
+  describe('Constant resolving from plain object / JSON model', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       window.myConst = 6;
     });
 
-    afterEach(function() {
+    afterEach(() => {
       delete window.myConst;
     });
 
-    it('resolveConst', function() {
+    it('resolveConst', () => {
       expect(objects.resolveConst('${const:scout.FormField.LabelPosition.RIGHT}')).toBe(FormField.LabelPosition.RIGHT);
       expect(objects.resolveConst('${const:myConst}')).toBe(6);
       expect(objects.resolveConst(3)).toBe(3); // everything that is not a string, should be returned unchanged
@@ -512,9 +505,9 @@ describe('scout.objects', function() {
       expect(objects.resolveConst('${const:scout.FormField.LabelPosition.XXX}')).toBe('${const:scout.FormField.LabelPosition.XXX}');
     });
 
-    it('resolveConstProperty', function() {
+    it('resolveConstProperty', () => {
       // case 1: provide the 'enum' object as constType - resolver takes that object as starting point
-      var model = {
+      let model = {
         labelPosition: '${const:RIGHT}'
       };
       objects.resolveConstProperty(model, {
@@ -536,10 +529,10 @@ describe('scout.objects', function() {
 
   });
 
-  describe('optProperty', function() {
+  describe('optProperty', () => {
 
-    it('should return the last property in the object chain', function() {
-      var obj = {};
+    it('should return the last property in the object chain', () => {
+      let obj = {};
       expect(objects.optProperty(obj)).toBe(obj);
       expect(objects.optProperty(null)).toBe(null);
       expect(objects.optProperty(obj, 'foo')).toBe(undefined);

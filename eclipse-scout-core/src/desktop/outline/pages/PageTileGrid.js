@@ -92,12 +92,12 @@ export default class PageTileGrid extends TileGrid {
   }
 
   _createPageTile(page) {
-    var button = scout.create('PageTileButton', {
+    let button = scout.create('PageTileButton', {
       parent: this,
       outline: this.outline,
       page: page
     });
-    var tile = scout.create('FormFieldTile', {
+    let tile = scout.create('FormFieldTile', {
       parent: this,
       colorScheme: 'default-inverted',
       tileWidget: button
@@ -111,8 +111,8 @@ export default class PageTileGrid extends TileGrid {
   }
 
   _onOutlineNodeChanged(event) {
-    var page = event.node || event.page;
-    var tile = page.tile;
+    let page = event.node || event.page;
+    let tile = page.tile;
     if (!tile) {
       return;
     }
@@ -125,7 +125,7 @@ export default class PageTileGrid extends TileGrid {
         this.setNodes(this.page.childNodes);
       }
     } else {
-      var eventContainsTopLevelNode = event.nodes && event.nodes.some(function(node) {
+      let eventContainsTopLevelNode = event.nodes && event.nodes.some(node => {
         return !node.parentNode;
       }) || event.type === 'allChildNodesDeleted';
       // only rebuild if top level nodes change

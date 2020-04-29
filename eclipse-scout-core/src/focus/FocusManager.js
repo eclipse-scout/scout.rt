@@ -23,7 +23,7 @@ import $ from 'jquery';
 export default class FocusManager {
 
   constructor(options) {
-    var defaults = {
+    let defaults = {
       // Auto focusing of elements is bad with on screen keyboards -> deactivate to prevent unwanted popping up of the keyboard
       active: !Device.get().supportsOnlyTouch(),
       // Preventing blur is bad on touch devices because every touch on a non input field is supposed to close the keyboard which does not happen if preventDefault is used on mouse down
@@ -41,8 +41,8 @@ export default class FocusManager {
     this._glassPaneRenderers = [];
 
     // Make $entryPoint focusable and install focus context.
-    var $mainEntryPoint = this.session.$entryPoint;
-    var portletPartId = $mainEntryPoint.data('partid') || '0';
+    let $mainEntryPoint = this.session.$entryPoint;
+    let portletPartId = $mainEntryPoint.data('partid') || '0';
     $mainEntryPoint.attr('tabindex', portletPartId);
 
     // Restricted focus gain means that not every click outside of the active element necessarily focuses another element but the active element stays focused
@@ -55,7 +55,7 @@ export default class FocusManager {
 
   installTopLevelMouseHandlers($container) {
     // Install 'mousedown' on top-level $container to accept or prevent focus gain
-    $container.on('mousedown', function(event) {
+    $container.on('mousedown', event => {
       if (!this._acceptFocusChangeOnMouseDown($(event.target))) {
         event.preventDefault();
       } else {
@@ -63,7 +63,7 @@ export default class FocusManager {
         this._handleIEEvent(event);
       }
       return true;
-    }.bind(this));
+    });
   }
 
   /**
@@ -79,7 +79,7 @@ export default class FocusManager {
       return;
     }
 
-    var
+    let
       $elementToFocus,
       $element = $(event.target);
 
@@ -99,8 +99,8 @@ export default class FocusManager {
       return;
     }
 
-    var userSelect = $element.css('user-select');
-    var selectableElements =
+    let userSelect = $element.css('user-select');
+    let selectableElements =
       'div:not(.desktop),[tabindex]:not([tabindex=-1]),radio,a[href],area[href],input:not([disabled]),' +
       'select:not([disabled]),textarea:not([disabled]),button:not([disabled]),iframe';
 
@@ -143,10 +143,10 @@ export default class FocusManager {
    * @returns {FocusContext} the installed context.
    */
   installFocusContext($container, focusRuleOrElement) {
-    var elementToFocus = this.evaluateFocusRule($container, focusRuleOrElement);
+    let elementToFocus = this.evaluateFocusRule($container, focusRuleOrElement);
 
     // Create and register the focus context.
-    var focusContext = new FocusContext($container, this);
+    let focusContext = new FocusContext($container, this);
     if (FocusRule.PREPARE !== focusRuleOrElement) {
       focusContext.ready();
     }
@@ -162,7 +162,7 @@ export default class FocusManager {
    * Evaluates the {@link FocusRule} or just returns the given element if focusRuleOrElement is not a focus rule.
    */
   evaluateFocusRule($container, focusRuleOrElement) {
-    var elementToFocus;
+    let elementToFocus;
     if (!focusRuleOrElement || scout.isOneOf(focusRuleOrElement, FocusRule.AUTO, FocusRule.PREPARE)) {
       elementToFocus = this.findFirstFocusableElement($container);
     } else if (focusRuleOrElement === FocusRule.NONE) {
@@ -178,20 +178,20 @@ export default class FocusManager {
    * This method has no effect, if there is no focus context installed for the given $container.
    */
   uninstallFocusContext($container) {
-    var focusContext = this.getFocusContext($container);
+    let focusContext = this.getFocusContext($container);
     if (!focusContext) {
       return;
     }
 
     // Filter to exclude the current focus context's container and any of its child elements to gain focus.
-    var filter = filters.outsideFilter(focusContext.$container);
+    let filter = filters.outsideFilter(focusContext.$container);
 
     // Remove and dispose the current focus context.
     arrays.remove(this._focusContexts, focusContext);
     focusContext.dispose();
 
     // Activate last active focus context.
-    var activeFocusContext = this._findActiveContext();
+    let activeFocusContext = this._findActiveContext();
     if (activeFocusContext) {
       activeFocusContext.validateAndSetFocus(activeFocusContext.lastValidFocusedElement, filter);
     }
@@ -209,7 +209,7 @@ export default class FocusManager {
    * @param {(FocusContext|$)} focusContextOr$Container
    */
   activateFocusContext(focusContextOr$Container) {
-    var focusContext = focusContextOr$Container;
+    let focusContext = focusContextOr$Container;
     if (!(focusContextOr$Container instanceof FocusContext)) {
       focusContext = this.getFocusContext(focusContextOr$Container);
     }
@@ -227,7 +227,7 @@ export default class FocusManager {
    * @param [filter] if specified, the filter is used to filter the array of glass pane targets
    */
   isElementCovertByGlassPane(element, filter) {
-    var targets = this._glassPaneTargets;
+    let targets = this._glassPaneTargets;
     if (filter) {
       targets = this._glassPaneTargets.filter(filter);
     }
@@ -240,7 +240,7 @@ export default class FocusManager {
     }
     // Checks whether the element is a child of a glasspane target.
     // If so, the some-iterator returns immediately with true.
-    return targets.some(function($glassPaneTarget) {
+    return targets.some($glassPaneTarget => {
       return $(element).closest($glassPaneTarget).length !== 0;
     });
   }
@@ -279,9 +279,9 @@ export default class FocusManager {
 
   rerenderGlassPanes() {
     // create a copy of the current glassPaneRenderers
-    var currGlassPaneRenderers = this._glassPaneRenderers.slice();
+    let currGlassPaneRenderers = this._glassPaneRenderers.slice();
     // remove and rerender every glassPaneRenderer to keep them (and their members) valid.
-    currGlassPaneRenderers.forEach(function(glassPaneRenderer) {
+    currGlassPaneRenderers.forEach(glassPaneRenderer => {
       glassPaneRenderer.removeGlassPanes();
       glassPaneRenderer.renderGlassPanes();
     });
@@ -294,7 +294,7 @@ export default class FocusManager {
    *        Filter to exclude elements to gain focus.
    */
   validateFocus(filter) {
-    var activeContext = this._findActiveContext();
+    let activeContext = this._findActiveContext();
     if (activeContext) {
       activeContext.validateFocus(filter);
     }
@@ -315,7 +315,7 @@ export default class FocusManager {
       return false;
     }
 
-    var context = this._findFocusContextFor(element);
+    let context = this._findFocusContextFor(element);
     if (context) {
       if (onlyIfReady && !context.prepared) {
         return false;
@@ -330,7 +330,7 @@ export default class FocusManager {
    * Finds the first focusable element of the given $container, or null if not found.
    */
   findFirstFocusableElement($container, filter) {
-    var firstElement, firstDefaultButton, firstButton, i, candidate, $candidate, $menuParents, $tabParents, $boxButtons,
+    let firstElement, firstDefaultButton, firstButton, i, candidate, $candidate, $menuParents, $tabParents, $boxButtons,
       $entryPoint = $container.entryPoint(),
       $candidates = $container
         .find(':focusable')
@@ -372,7 +372,7 @@ export default class FocusManager {
       return firstDefaultButton;
     } else if (firstButton) {
       if (firstButton !== firstElement && firstElement) {
-        var $tabParentsButton = $(firstButton).parents('.tab-box-header'),
+        let $tabParentsButton = $(firstButton).parents('.tab-box-header'),
           $firstItem = $(firstElement),
           $tabParentsFirstElement = $(firstElement).parents('.tab-box-header');
         if ($tabParentsFirstElement.length > 0 && $tabParentsButton.length > 0 && $firstItem.is('.tab-item')) {
@@ -395,21 +395,21 @@ export default class FocusManager {
    * Returns the focus context which is associated with the given $container, or null if not applicable.
    */
   getFocusContext($container) {
-    return arrays.find(this._focusContexts, function(focusContext) {
+    return arrays.find(this._focusContexts, focusContext => {
       return focusContext.$container === $container;
     });
   }
 
   _findFocusContextFor($element) {
     $element = $.ensure($element);
-    var context = null;
-    var distance = Number.MAX_VALUE;
-    this._focusContexts.forEach(function(focusContext) {
+    let context = null;
+    let distance = Number.MAX_VALUE;
+    this._focusContexts.forEach(focusContext => {
       if (!focusContext.$container.isOrHas($element)) {
         return;
       }
       // Return the context which is closest to the element
-      var length = $element.parentsUntil(focusContext.$container).length;
+      let length = $element.parentsUntil(focusContext.$container).length;
       if (length < distance) {
         context = focusContext;
       }

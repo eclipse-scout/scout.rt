@@ -10,18 +10,18 @@
  */
 import {dates, scout} from '../../src/index';
 
-describe('DatePicker', function() {
-  var session;
+describe('DatePicker', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  describe('showDate', function() {
+  describe('showDate', () => {
 
-    it('shows the month specified by the given date', function() {
-      var picker = scout.create('DatePicker', {
+    it('shows the month specified by the given date', () => {
+      let picker = scout.create('DatePicker', {
         parent: session.desktop
       });
       picker.render();

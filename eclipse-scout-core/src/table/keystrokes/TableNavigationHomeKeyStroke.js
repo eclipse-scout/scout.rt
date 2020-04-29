@@ -17,7 +17,7 @@ export default class TableNavigationHomeKeyStroke extends AbstractTableNavigatio
     this.which = [keys.HOME];
     this.renderingHints.text = 'Home';
     this.renderingHints.$drawingArea = function($drawingArea, event) {
-      var viewport = this._viewportInfo();
+      let viewport = this._viewportInfo();
       if (viewport.firstRow) {
         return viewport.firstRow.$row;
       }
@@ -25,7 +25,7 @@ export default class TableNavigationHomeKeyStroke extends AbstractTableNavigatio
   }
 
   handle(event) {
-    var table = this.field,
+    let table = this.field,
       rows = table.visibleRows,
       firstRow = arrays.first(rows),
       selectedRows = table.selectedRows,

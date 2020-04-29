@@ -12,13 +12,13 @@ import {QueryBy, RemoteEvent, scout, SmartField, Status} from '../../../../src/i
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
 /* global linkWidgetAndAdapter */
-describe('SmartFieldRemote', function() {
+describe('SmartFieldRemote', () => {
 
   // This spec contains test that use the SmartFieldAdapter (= remote case)
 
-  var session, helper;
+  let session, helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
@@ -26,7 +26,7 @@ describe('SmartFieldRemote', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
     removePopups(session);
@@ -34,47 +34,47 @@ describe('SmartFieldRemote', function() {
   });
 
   function createSmartFieldWithAdapter() {
-    var model = helper.createFieldModel('SmartField');
-    var smartField = new SmartField();
+    let model = helper.createFieldModel('SmartField');
+    let smartField = new SmartField();
     smartField.init(model);
     linkWidgetAndAdapter(smartField, 'SmartFieldAdapter');
     return smartField;
   }
 
-  describe('openPopup', function() {
-    var events = [null],
+  describe('openPopup', () => {
+    let events = [null],
       smartField;
 
-    beforeEach(function() {
+    beforeEach(() => {
       smartField = createSmartFieldWithAdapter();
       smartField.render();
       smartField.$field.val('foo');
-      smartField.remoteHandler = function(event, delay) {
+      smartField.remoteHandler = (event, delay) => {
         events[0] = event;
       };
     });
 
-    it('must "browse all" when field is valid and browse parameter is true', function() {
+    it('must "browse all" when field is valid and browse parameter is true', () => {
       smartField.openPopup(true);
       sendQueuedAjaxCalls();
-      var expectedEvent = new RemoteEvent(smartField.id, 'lookupByAll', {
+      let expectedEvent = new RemoteEvent(smartField.id, 'lookupByAll', {
         showBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
 
-    it('must "lookup by text" when called without arguments and display-text is not empty', function() {
+    it('must "lookup by text" when called without arguments and display-text is not empty', () => {
       smartField.openPopup();
       jasmine.clock().tick(500); // because we use a debounce in SmartField
       sendQueuedAjaxCalls();
-      var expectedEvent = new RemoteEvent(smartField.id, 'lookupByText', {
+      let expectedEvent = new RemoteEvent(smartField.id, 'lookupByText', {
         showBusyIndicator: false,
         text: 'foo'
       });
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
 
-    it('must "lookup by text" when error status is NOT_UNIQUE, even though the browse parameter is true', function() {
+    it('must "lookup by text" when error status is NOT_UNIQUE, even though the browse parameter is true', () => {
       smartField.errorStatus = Status.error({
         message: 'bar',
         code: SmartField.ErrorCode.NOT_UNIQUE
@@ -82,7 +82,7 @@ describe('SmartFieldRemote', function() {
       smartField.openPopup(true);
       jasmine.clock().tick(500); // because we use a debounce in SmartField
       sendQueuedAjaxCalls();
-      var expectedEvent = new RemoteEvent(smartField.id, 'lookupByText', {
+      let expectedEvent = new RemoteEvent(smartField.id, 'lookupByText', {
         showBusyIndicator: false,
         text: 'foo'
       });
@@ -90,21 +90,21 @@ describe('SmartFieldRemote', function() {
     });
   });
 
-  describe('acceptInput', function() {
-    var smartField;
+  describe('acceptInput', () => {
+    let smartField;
 
-    beforeEach(function() {
+    beforeEach(() => {
       smartField = createSmartFieldWithAdapter();
     });
 
-    it('must set displayText', function() {
+    it('must set displayText', () => {
       smartField.render();
       smartField.$field.val('foo');
       smartField.acceptInput();
       expect(smartField.displayText).toBe('foo');
     });
 
-    it('must call clearTimeout() for pending lookups', function() {
+    it('must call clearTimeout() for pending lookups', () => {
       smartField.render();
       smartField._pendingLookup = null;
       smartField.$field.val('bar');
@@ -114,7 +114,7 @@ describe('SmartFieldRemote', function() {
       expect(smartField._pendingLookup).toBe(null);
     });
 
-    it('don\'t send acceptInput event when display-text has not changed', function() {
+    it('don\'t send acceptInput event when display-text has not changed', () => {
       smartField._lastSearchText = 'foo';
       smartField.render();
       smartField.$field.val('foo');
@@ -124,8 +124,8 @@ describe('SmartFieldRemote', function() {
       expect(jasmine.Ajax.requests.count()).toBe(0);
     });
 
-    it('send acceptInput event when lookup row is set and display-text has not changed', function() {
-      var lookupRow = scout.create('LookupRow', {
+    it('send acceptInput event when lookup row is set and display-text has not changed', () => {
+      let lookupRow = scout.create('LookupRow', {
         key: 123,
         text: 'foo'
       }, {
@@ -145,7 +145,7 @@ describe('SmartFieldRemote', function() {
       smartField.acceptInput();
 
       sendQueuedAjaxCalls();
-      var expectedEvent = new RemoteEvent(smartField.id, 'acceptInput', {
+      let expectedEvent = new RemoteEvent(smartField.id, 'acceptInput', {
         value: 123,
         displayText: 'foo',
         errorStatus: null,
@@ -169,7 +169,7 @@ describe('SmartFieldRemote', function() {
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
 
-    it('do a "lookup by text" when display-text has changed and no lookup row is set', function() {
+    it('do a "lookup by text" when display-text has changed and no lookup row is set', () => {
       smartField.displayText = 'foo';
       smartField.render();
       // simulate the user has typed some text. Normally this would be done in _onFieldKeyDown/Up
@@ -180,7 +180,7 @@ describe('SmartFieldRemote', function() {
       smartField.acceptInput();
 
       sendQueuedAjaxCalls();
-      var expectedEvent = new RemoteEvent(smartField.id, 'lookupByText', {
+      let expectedEvent = new RemoteEvent(smartField.id, 'lookupByText', {
         text: 'bar',
         showBusyIndicator: false
       });
@@ -189,10 +189,10 @@ describe('SmartFieldRemote', function() {
 
   });
 
-  describe('touch mode', function() {
-    var smartField;
+  describe('touch mode', () => {
+    let smartField;
 
-    beforeEach(function() {
+    beforeEach(() => {
       smartField = createSmartFieldWithAdapter();
     });
 
@@ -207,11 +207,11 @@ describe('SmartFieldRemote', function() {
       jasmine.clock().tick(500);
     }
 
-    it('opens a touch popup when smart field gets touched', function() {
-      var lookupCallClone = null;
+    it('opens a touch popup when smart field gets touched', () => {
+      let lookupCallClone = null;
       smartField.touchMode = true;
       smartField.render();
-      smartField.on('prepareLookupCall', function(event) {
+      smartField.on('prepareLookupCall', event => {
         lookupCallClone = event.lookupCall;
       });
 
@@ -235,12 +235,12 @@ describe('SmartFieldRemote', function() {
       smartField.popup.close();
     });
 
-    it('shows smartfield with same text as clicked smartfield', function() {
-      var lookupCallClone = null;
+    it('shows smartfield with same text as clicked smartfield', () => {
+      let lookupCallClone = null;
       smartField.touchMode = true;
       smartField.displayText = 'row 1';
       smartField.render();
-      smartField.on('prepareLookupCall', function(event) {
+      smartField.on('prepareLookupCall', event => {
         lookupCallClone = event.lookupCall;
       });
       smartField.$field.triggerClick();

@@ -10,26 +10,26 @@
  */
 import {RemoteEvent, scout} from '../../../../src/index';
 
-describe('BrowserFieldAdapter', function() {
+describe('BrowserFieldAdapter', () => {
 
-  var session;
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
-  it('sends postMessage on message', function() {
-    var model = createSimpleModel('BrowserField', session, 'foo');
-    var adapter = scout.create('BrowserFieldAdapter', createAdapterModel(model));
-    var browserField = adapter.createWidget(model, session.desktop);
+  it('sends postMessage on message', () => {
+    let model = createSimpleModel('BrowserField', session, 'foo');
+    let adapter = scout.create('BrowserFieldAdapter', createAdapterModel(model));
+    let browserField = adapter.createWidget(model, session.desktop);
     browserField.render();
 
     // postMessage is an async call -> hard to test -> simulate it (window.postMessage('hello world', '*');)
@@ -41,7 +41,7 @@ describe('BrowserFieldAdapter', function() {
 
     sendQueuedAjaxCalls();
 
-    var event = new RemoteEvent(browserField.id, 'postMessage', {
+    let event = new RemoteEvent(browserField.id, 'postMessage', {
       data: 'hello world',
       origin: 'foo'
     });

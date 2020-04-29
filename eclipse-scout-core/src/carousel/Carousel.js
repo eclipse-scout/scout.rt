@@ -102,20 +102,20 @@ export default class Carousel extends Widget {
     }
     this.$carouselStatusItems = [];
     this.$carouselStatus.empty();
-    this.$carouselItems.forEach(function() {
-      var $statusItem = this.$carouselStatus.appendDiv('status-item');
+    this.$carouselItems.forEach(() => {
+      let $statusItem = this.$carouselStatus.appendDiv('status-item');
       $statusItem.html(this.statusItemHtml);
       this.$carouselStatusItems.push($statusItem);
-    }.bind(this));
+    });
   }
 
   _renderCurrentStatusItem() {
     if (!this.$carouselStatus) {
       return;
     }
-    this.$carouselStatusItems.forEach(function(e, i) {
+    this.$carouselStatusItems.forEach((e, i) => {
       e.toggleClass('current-item', i === this.currentItem);
-    }.bind(this));
+    });
   }
 
   recalcTransformation() {
@@ -138,14 +138,14 @@ export default class Carousel extends Widget {
   _renderItemsInternal(item, skipRemove) {
     item = item || this.currentItem;
     if (!skipRemove) {
-      this.widgets.forEach(function(w, j) {
+      this.widgets.forEach((w, j) => {
         if (w.rendered && (j < item - 1 || j > item + 1)) {
           w.remove();
         }
       }, this);
     }
-    for (var i = Math.max(item - 1, 0); i < Math.min(item + 2, this.widgets.length); i++) {
-      var widget = this.widgets[i];
+    for (let i = Math.max(item - 1, 0); i < Math.min(item + 2, this.widgets.length); i++) {
+      let widget = this.widgets[i];
       if (!widget.rendered) {
         widget.render(this.$carouselItems[i]);
         widget.htmlComp.revalidateLayout();
@@ -160,14 +160,14 @@ export default class Carousel extends Widget {
   _renderWidgets() {
     this.$carouselFilmstrip.empty();
     this.$carouselItems = this.widgets.map(function(widget) {
-      var $carouselItem = this.$carouselFilmstrip.appendDiv('carousel-item');
-      var htmlComp = HtmlComponent.install($carouselItem, this.session);
+      let $carouselItem = this.$carouselFilmstrip.appendDiv('carousel-item');
+      let htmlComp = HtmlComponent.install($carouselItem, this.session);
       htmlComp.setLayout(new SingleLayout());
 
       // Add the CSS classes of the widget to be able to style the carousel items.
       // Use a suffix to prevent conflicts
-      var cssClasses = widget.cssClassAsArray();
-      cssClasses.forEach(function(cssClass) {
+      let cssClasses = widget.cssClassAsArray();
+      cssClasses.forEach(cssClass => {
         $carouselItem.addClass(cssClass + '-carousel-item');
       });
 
@@ -181,31 +181,31 @@ export default class Carousel extends Widget {
   }
 
   _registerCarouselFilmstripEventListeners() {
-    var $window = this.$carouselFilmstrip.window();
-    this.$carouselFilmstrip.on('mousedown touchstart', function(event) {
-      var origPageX = events.pageX(event);
-      var origPosition = this.positionX;
-      var minPositionX = this.$container.width() - this.$carouselFilmstrip.width();
-      var containerWidth = this.$container.width();
-      $window.on('mousemove.carouselDrag touchmove.carouselDrag', function(event) {
-        var pageX = events.pageX(event);
-        var moveX = pageX - origPageX;
-        var positionX = origPosition + moveX;
+    let $window = this.$carouselFilmstrip.window();
+    this.$carouselFilmstrip.on('mousedown touchstart', event => {
+      let origPageX = events.pageX(event);
+      let origPosition = this.positionX;
+      let minPositionX = this.$container.width() - this.$carouselFilmstrip.width();
+      let containerWidth = this.$container.width();
+      $window.on('mousemove.carouselDrag touchmove.carouselDrag', event => {
+        let pageX = events.pageX(event);
+        let moveX = pageX - origPageX;
+        let positionX = origPosition + moveX;
         if (positionX !== this.positionX && positionX <= 0 && positionX >= minPositionX) {
           this.$carouselFilmstrip.css({
             transform: 'translateX(' + positionX + 'px)'
           });
           this.positionX = positionX;
           // item
-          var i = positionX / containerWidth * -1;
+          let i = positionX / containerWidth * -1;
           this._renderItemsInternal(positionX < origPosition ? Math.floor(i) : Math.ceil(i), true);
         }
-      }.bind(this));
-      $window.on('mouseup.carouselDrag touchend.carouselDrag touchcancel.carouselDrag', function(e) {
+      });
+      $window.on('mouseup.carouselDrag touchend.carouselDrag touchcancel.carouselDrag', e => {
         $window.off('.carouselDrag');
         // show only whole items
-        var mod = this.positionX % containerWidth;
-        var newCurrentItem = this.currentItem;
+        let mod = this.positionX % containerWidth;
+        let newCurrentItem = this.currentItem;
         if (this.positionX < origPosition && mod / containerWidth < (0 - this.moveThreshold)) { // next
           newCurrentItem = Math.ceil(this.positionX / containerWidth * -1);
         } else if (this.positionX > origPosition && mod / containerWidth >= this.moveThreshold - 1) { // prev
@@ -216,7 +216,7 @@ export default class Carousel extends Widget {
           this.positionX = newCurrentItem * containerWidth * -1;
           this.recalcTransformation();
         }
-      }.bind(this));
-    }.bind(this));
+      });
+    });
   }
 }

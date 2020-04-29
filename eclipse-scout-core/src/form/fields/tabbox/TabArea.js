@@ -92,7 +92,7 @@ export default class TabArea extends Widget {
   }
 
   getTabForItem(tabItem) {
-    return arrays.find(this.tabs, function(tab) {
+    return arrays.find(this.tabs, tab => {
       return tab.tabItem === tabItem;
     }, this);
   }
@@ -138,9 +138,9 @@ export default class TabArea extends Widget {
   }
 
   _setTabs(tabItems) {
-    var tabsToRemove = this.tabs.slice(),
+    let tabsToRemove = this.tabs.slice(),
       tabs = tabItems.map(function(tabItem) {
-        var tab = this.getTabForItem(tabItem);
+        let tab = this.getTabForItem(tabItem);
         if (!tab) {
           tab = scout.create('Tab', {
             parent: this,
@@ -180,7 +180,7 @@ export default class TabArea extends Widget {
 
   _removeTabs(tabs) {
     tabs = tabs || this.tabs;
-    tabs.forEach(function(tab) {
+    tabs.forEach(tab => {
       tab.remove();
     });
   }
@@ -203,8 +203,8 @@ export default class TabArea extends Widget {
   }
 
   _updateHasSubLabel() {
-    var items = this.tabs || [];
-    this._setHasSubLabel(items.some(function(item) {
+    let items = this.tabs || [];
+    this._setHasSubLabel(items.some(item => {
       return strings.hasText(item.subLabel);
     }));
   }
@@ -233,7 +233,7 @@ export default class TabArea extends Widget {
   }
 
   _moveSelectionHorizontal(directionRight, focusTab) {
-    var tabItems = this.tabs.slice(),
+    let tabItems = this.tabs.slice(),
       $focusedElement = this.$container.activeElement(),
       selectNext = false;
     if (!directionRight) {
@@ -265,11 +265,11 @@ export default class TabArea extends Widget {
   }
 
   _setTabbableItem(tabItem) {
-    var tabItems = this.tabs;
+    let tabItems = this.tabs;
     if (tabItem) {
       // clear old tabbable
       this.ellipsis.setTabbable(false);
-      tabItems.forEach(function(item) {
+      tabItems.forEach(item => {
         item.setTabbable(false);
       });
       tabItem.setTabbable(true);

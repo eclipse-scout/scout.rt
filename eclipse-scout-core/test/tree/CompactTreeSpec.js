@@ -11,11 +11,11 @@
 import {Range} from '../../src/index';
 import {TreeSpecHelper} from '@eclipse-scout/testing';
 
-describe('Compacttree', function() {
-  var session;
-  var helper;
+describe('Compacttree', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TreeSpecHelper(session);
@@ -24,43 +24,43 @@ describe('Compacttree', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
     $.fx.off = false;
   });
 
-  describe('creation', function() {
+  describe('creation', () => {
 
-    it('adds no empty section node', function() {
+    it('adds no empty section node', () => {
       // top-level node (section) is only rendered, if there are child nodes
-      var model = helper.createModelFixture(1);
-      var tree = helper.createCompactTree(model);
-      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 1));
+      let model = helper.createModelFixture(1);
+      let tree = helper.createCompactTree(model);
+      let spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 1));
       tree.render();
       expect(tree.nodes.length).toBe(1);
     });
 
-    it('adds a node with child node', function() {
-      var model = helper.createModelFixture(1, 1, true);
-      var tree = helper.createCompactTree(model);
-      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 4));
+    it('adds a node with child node', () => {
+      let model = helper.createModelFixture(1, 1, true);
+      let tree = helper.createCompactTree(model);
+      let spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 4));
       tree.render();
       expect(tree.nodes.length).toBe(1);
       expect(tree.visibleNodesFlat.length).toBe(2);
     });
 
-    it('adds a node with child nodes in correct order', function() {
-      var model = helper.createModelFixture(2, 1, true);
-      var tree = helper.createCompactTree(model);
-      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
+    it('adds a node with child nodes in correct order', () => {
+      let model = helper.createModelFixture(2, 1, true);
+      let tree = helper.createCompactTree(model);
+      let spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
       tree.render();
       expect(tree.nodes.length).toBe(2);
       expect(tree.visibleNodesFlat.length).toBe(6);
 
       // check $node
-      var firstNode = tree.nodes[0].$node.children();
+      let firstNode = tree.nodes[0].$node.children();
       expect($(firstNode[0]).hasClass('title')).toBe(true);
       expect($(firstNode[0]).text()).toBe('node 0');
       expect($(firstNode[1]).hasClass('section-node')).toBe(true);
@@ -70,17 +70,17 @@ describe('Compacttree', function() {
     });
 
     // deletion
-    it('deletes a node', function() {
-      var model = helper.createModelFixture(2, 1, true);
-      var tree = helper.createCompactTree(model);
-      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
+    it('deletes a node', () => {
+      let model = helper.createModelFixture(2, 1, true);
+      let tree = helper.createCompactTree(model);
+      let spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
       tree.render();
       tree.deleteNodes([tree.nodes[0].childNodes[0]], tree.nodes[0]);
       expect(tree.nodes.length).toBe(2);
       expect(tree.visibleNodesFlat.length).toBe(5);
 
       // check $node
-      var firstNode = tree.nodes[0].$node.children();
+      let firstNode = tree.nodes[0].$node.children();
       expect($(firstNode[0]).hasClass('title')).toBe(true);
       expect($(firstNode[0]).text()).toBe('node 0');
       expect($(firstNode[1]).hasClass('section-node')).toBe(true);
@@ -88,12 +88,12 @@ describe('Compacttree', function() {
     });
 
     // insertions
-    it('inserts a child node', function() {
-      var model = helper.createModelFixture(2, 1, true);
-      var tree = helper.createCompactTree(model);
-      var parent0 = tree.nodes[0];
-      var child0 = parent0.childNodes[0];
-      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
+    it('inserts a child node', () => {
+      let model = helper.createModelFixture(2, 1, true);
+      let tree = helper.createCompactTree(model);
+      let parent0 = tree.nodes[0];
+      let child0 = parent0.childNodes[0];
+      let spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
       tree.render();
       tree.deleteNodes([child0], parent0);
       tree.insertNodes([child0], parent0);
@@ -102,7 +102,7 @@ describe('Compacttree', function() {
       expect(tree.visibleNodesFlat.length).toBe(6);
 
       // check $node
-      var firstNode = parent0.$node.children();
+      let firstNode = parent0.$node.children();
       expect($(firstNode[0]).hasClass('title')).toBe(true);
       expect($(firstNode[0]).text()).toBe('node 0');
       expect($(firstNode[1]).hasClass('section-node')).toBe(true);
@@ -113,11 +113,11 @@ describe('Compacttree', function() {
 
   });
 
-  describe('node click', function() {
+  describe('node click', () => {
 
-    it('calls selectNodes', function() {
-      var model = helper.createModelFixture(2, 1, true);
-      var tree = helper.createCompactTree(model);
+    it('calls selectNodes', () => {
+      let model = helper.createModelFixture(2, 1, true);
+      let tree = helper.createCompactTree(model);
       spyOn(tree, 'selectNodes');
       tree.render();
 

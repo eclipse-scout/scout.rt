@@ -11,13 +11,13 @@
 import {BasicField, FormField, graphics, HtmlComponent, HtmlEnvironment} from '../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('FormFieldLayout', function() {
-  var session;
-  var helper;
+describe('FormFieldLayout', () => {
+  let session;
+  let helper;
   // Sizes are with margin, static widths and heights are without margin
-  var formField, rowHeight, mandatoryWidth, statusWidth, labelWidth, labelHeight;
-  var mandatorySize, mandatoryMargins, labelSize, labelMargins, fieldSize, fieldMargins, statusSize, statusMargins;
-  var origPrefSize;
+  let formField, rowHeight, mandatoryWidth, statusWidth, labelWidth, labelHeight;
+  let mandatorySize, mandatoryMargins, labelSize, labelMargins, fieldSize, fieldMargins, statusSize, statusMargins;
+  let origPrefSize;
 
   class CustomFormField extends BasicField {
     _render() {
@@ -60,7 +60,7 @@ describe('FormFieldLayout', function() {
     }
   }
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
@@ -98,7 +98,7 @@ describe('FormFieldLayout', function() {
       unspyForWidthHint();
     }
     origPrefSize = graphics.prefSize;
-    graphics.prefSize = function($elem, options) {
+    graphics.prefSize = ($elem, options) => {
       if ($elem[0] === formField.$fieldContainer[0]) {
         func(options.widthHint, options.heightHint);
       }
@@ -114,29 +114,29 @@ describe('FormFieldLayout', function() {
     origPrefSize = null;
   }
 
-  describe('prefSize', function() {
+  describe('prefSize', () => {
 
-    describe('labelPosition', function() {
+    describe('labelPosition', () => {
 
-      describe('default', function() {
-        it('returns the max height of the parts', function() {
+      describe('default', () => {
+        it('returns the max height of the parts', () => {
           readSizes();
-          var expectedHeight = Math.max(mandatorySize.height, labelHeight, fieldSize.height, statusSize.height);
+          let expectedHeight = Math.max(mandatorySize.height, labelHeight, fieldSize.height, statusSize.height);
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
         });
 
-        it('sums up the widhts of the parts', function() {
+        it('sums up the widhts of the parts', () => {
           readSizes();
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelWidth + labelMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelWidth + labelMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
         });
 
-        it('adjusts widthHint', function() {
+        it('adjusts widthHint', () => {
           readSizes();
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelWidth + labelMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
-          var expectedWidthHint = 400 - (expectedWidth - fieldSize.width + fieldMargins.horizontal());
-          var widthHint;
-          spyForWidthHint(function(spiedWidthHint) {
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelWidth + labelMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
+          let expectedWidthHint = 400 - (expectedWidth - fieldSize.width + fieldMargins.horizontal());
+          let widthHint;
+          spyForWidthHint(spiedWidthHint => {
             widthHint = spiedWidthHint;
           });
           expect(formField.htmlComp.prefSize({widthHint: 400}).width).toBe(400);
@@ -144,11 +144,11 @@ describe('FormFieldLayout', function() {
           unspyForWidthHint();
         });
 
-        it('does not adjust widthHint or heightHint if it is not set', function() {
+        it('does not adjust widthHint or heightHint if it is not set', () => {
           readSizes();
-          var widthHint;
-          var heightHint;
-          spyForWidthHint(function(spiedWidthHint, spiedHeightHint) {
+          let widthHint;
+          let heightHint;
+          spyForWidthHint((spiedWidthHint, spiedHeightHint) => {
             widthHint = spiedWidthHint;
             heightHint = spiedHeightHint;
           });
@@ -158,14 +158,14 @@ describe('FormFieldLayout', function() {
           unspyForWidthHint();
         });
 
-        it('does not adjust widthHint or heightHint even if margins are negative', function() {
+        it('does not adjust widthHint or heightHint even if margins are negative', () => {
           formField.$fieldContainer.css({
             margin: -5
           });
           readSizes();
-          var widthHint;
-          var heightHint;
-          spyForWidthHint(function(spiedWidthHint, spiedHeightHint) {
+          let widthHint;
+          let heightHint;
+          spyForWidthHint((spiedWidthHint, spiedHeightHint) => {
             widthHint = spiedWidthHint;
             heightHint = spiedHeightHint;
           });
@@ -175,198 +175,198 @@ describe('FormFieldLayout', function() {
           unspyForWidthHint();
         });
 
-        it('ignores label if label is invisible', function() {
+        it('ignores label if label is invisible', () => {
           formField.setLabelVisible(false);
           readSizes();
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
-          var expectedHeight = Math.max(mandatorySize.height, fieldSize.height, statusSize.height);
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
+          let expectedHeight = Math.max(mandatorySize.height, fieldSize.height, statusSize.height);
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
         });
 
-        it('ignores status if status is invisible', function() {
+        it('ignores status if status is invisible', () => {
           formField.setStatusVisible(false);
           readSizes();
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelWidth + labelMargins.horizontal() + fieldSize.width;
-          var expectedHeight = Math.max(mandatorySize.height, labelHeight, fieldSize.height);
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelWidth + labelMargins.horizontal() + fieldSize.width;
+          let expectedHeight = Math.max(mandatorySize.height, labelHeight, fieldSize.height);
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
         });
 
-        it('does not adjust widthHint or heightHint if container contains an html component', function() {
+        it('does not adjust widthHint or heightHint if container contains an html component', () => {
           HtmlComponent.install(formField.$fieldContainer, session);
           readSizes();
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelWidth + labelMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
-          var expectedWidthHint = 400 - (expectedWidth - fieldSize.width + fieldMargins.horizontal());
-          var widthHint;
-          spyForWidthHint(function(spiedWidthHint) {
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelWidth + labelMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
+          let expectedWidthHint = 400 - (expectedWidth - fieldSize.width + fieldMargins.horizontal());
+          let widthHint;
+          spyForWidthHint(spiedWidthHint => {
             widthHint = spiedWidthHint;
           });
-          var prefSize = formField.htmlComp.prefSize({widthHint: 400});
+          let prefSize = formField.htmlComp.prefSize({widthHint: 400});
           expect(prefSize.width).toBe(400);
           expect(widthHint).toBe(expectedWidthHint);
           unspyForWidthHint();
         });
       });
 
-      describe('top', function() {
-        it('adds label and field height if label is on top', function() {
+      describe('top', () => {
+        it('adds label and field height if label is on top', () => {
           formField.setLabelPosition(FormField.LabelPosition.TOP);
           readSizes();
-          var expectedHeight = labelSize.height + fieldSize.height;
+          let expectedHeight = labelSize.height + fieldSize.height;
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
         });
 
-        it('sums up the widths without label', function() {
+        it('sums up the widths without label', () => {
           formField.setLabelPosition(FormField.LabelPosition.TOP);
           readSizes();
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
         });
 
-        it('ignores label if label is invisible', function() {
+        it('ignores label if label is invisible', () => {
           formField.setLabelVisible(false);
           formField.setLabelPosition(FormField.LabelPosition.TOP);
           readSizes();
-          var expectedHeight = fieldSize.height;
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
+          let expectedHeight = fieldSize.height;
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
         });
 
-        it('ignores status if status is invisible', function() {
+        it('ignores status if status is invisible', () => {
           formField.setStatusVisible(false);
           formField.setLabelPosition(FormField.LabelPosition.TOP);
           readSizes();
-          var expectedHeight = labelSize.height + fieldSize.height;
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width;
+          let expectedHeight = labelSize.height + fieldSize.height;
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width;
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
         });
       });
 
-      describe('on_field', function() {
-        it('returns the max height of the parts', function() {
+      describe('on_field', () => {
+        it('returns the max height of the parts', () => {
           formField.setLabelPosition(FormField.LabelPosition.ON_FIELD);
           readSizes();
-          var expectedHeight = Math.max(mandatorySize.height, fieldSize.height, statusSize.height);
+          let expectedHeight = Math.max(mandatorySize.height, fieldSize.height, statusSize.height);
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
         });
 
-        it('sums up the widths without label', function() {
+        it('sums up the widths without label', () => {
           formField.setLabelPosition(FormField.LabelPosition.ON_FIELD);
           readSizes();
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
         });
 
-        it('ignores status if status is invisible', function() {
+        it('ignores status if status is invisible', () => {
           formField.setStatusVisible(false);
           formField.setLabelPosition(FormField.LabelPosition.ON_FIELD);
           readSizes();
-          var expectedHeight = Math.max(mandatorySize.height, fieldSize.height);
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width;
+          let expectedHeight = Math.max(mandatorySize.height, fieldSize.height);
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width;
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
         });
       });
     });
 
-    describe('labelWidthInPixel', function() {
+    describe('labelWidthInPixel', () => {
 
-      describe('UI', function() {
-        it('returns the max height of the parts', function() {
+      describe('UI', () => {
+        it('returns the max height of the parts', () => {
           formField.setLabelWidthInPixel(FormField.LabelWidth.UI);
           readSizes();
-          var expectedHeight = Math.max(mandatorySize.height, labelHeight, fieldSize.height, statusSize.height);
+          let expectedHeight = Math.max(mandatorySize.height, labelHeight, fieldSize.height, statusSize.height);
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
         });
 
-        it('sums up the widhts of the parts with label\'s preferred width', function() {
+        it('sums up the widhts of the parts with label\'s preferred width', () => {
           formField.setLabelWidthInPixel(FormField.LabelWidth.UI);
           readSizes();
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelSize.width + fieldSize.width + statusWidth + statusMargins.horizontal();
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelSize.width + fieldSize.width + statusWidth + statusMargins.horizontal();
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
         });
 
-        it('ignores label if label is invisible', function() {
+        it('ignores label if label is invisible', () => {
           formField.setLabelVisible(false);
           formField.setLabelWidthInPixel(FormField.LabelWidth.UI);
           readSizes();
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelSize.width + fieldSize.width + statusWidth + statusMargins.horizontal();
-          var expectedHeight = Math.max(mandatorySize.height, labelHeight, fieldSize.height, statusSize.height);
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelSize.width + fieldSize.width + statusWidth + statusMargins.horizontal();
+          let expectedHeight = Math.max(mandatorySize.height, labelHeight, fieldSize.height, statusSize.height);
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
         });
 
-        it('ignores status if status is invisible', function() {
+        it('ignores status if status is invisible', () => {
           formField.setStatusVisible(false);
           formField.setLabelWidthInPixel(FormField.LabelWidth.UI);
           readSizes();
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelSize.width + fieldSize.width;
-          var expectedHeight = Math.max(mandatorySize.height, labelHeight, fieldSize.height);
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelSize.width + fieldSize.width;
+          let expectedHeight = Math.max(mandatorySize.height, labelHeight, fieldSize.height);
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
         });
       });
 
-      describe('custom', function() {
-        it('returns the max height of the parts', function() {
+      describe('custom', () => {
+        it('returns the max height of the parts', () => {
           formField.setLabelWidthInPixel(123);
           readSizes();
-          var expectedHeight = Math.max(mandatorySize.height, labelHeight, fieldSize.height, statusSize.height);
+          let expectedHeight = Math.max(mandatorySize.height, labelHeight, fieldSize.height, statusSize.height);
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
         });
 
-        it('sums up the widths without label', function() {
+        it('sums up the widths without label', () => {
           formField.setLabelWidthInPixel(123);
           readSizes();
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + 123 + labelMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + 123 + labelMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
         });
 
-        it('ignores label if label is invisible', function() {
+        it('ignores label if label is invisible', () => {
           formField.setLabelVisible(false);
           formField.setLabelWidthInPixel(123);
           readSizes();
-          var expectedHeight = Math.max(mandatorySize.height, fieldSize.height, statusSize.height);
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
+          let expectedHeight = Math.max(mandatorySize.height, fieldSize.height, statusSize.height);
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
         });
 
-        it('ignores status if status is invisible', function() {
+        it('ignores status if status is invisible', () => {
           formField.setStatusVisible(false);
           formField.setLabelWidthInPixel(123);
           readSizes();
-          var expectedHeight = Math.max(mandatorySize.height, labelHeight, fieldSize.height);
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + 123 + labelMargins.horizontal() + fieldSize.width;
+          let expectedHeight = Math.max(mandatorySize.height, labelHeight, fieldSize.height);
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + 123 + labelMargins.horizontal() + fieldSize.width;
           expect(formField.htmlComp.prefSize().height).toBe(expectedHeight);
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
         });
       });
     });
 
-    describe('statusPosition', function() {
+    describe('statusPosition', () => {
 
-      describe('top without label position top', function() {
-        it('sums up the widths', function() {
+      describe('top without label position top', () => {
+        it('sums up the widths', () => {
           formField.setLabelPosition(FormField.LabelPosition.LEFT);
           formField.setStatusPosition(FormField.StatusPosition.TOP);
           readSizes();
           // Status is only pulled up if label is on top as well
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelWidth + labelMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelWidth + labelMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
         });
 
-        it('does not adjust widthHint', function() {
+        it('does not adjust widthHint', () => {
           formField.setLabelPosition(FormField.LabelPosition.LEFT);
           formField.setStatusPosition(FormField.StatusPosition.TOP);
           readSizes();
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelWidth + labelMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
-          var expectedWidthHint = 400 - (expectedWidth - fieldSize.width + fieldMargins.horizontal());
-          var widthHint;
-          spyForWidthHint(function(spiedWidthHint) {
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + labelWidth + labelMargins.horizontal() + fieldSize.width + statusWidth + statusMargins.horizontal();
+          let expectedWidthHint = 400 - (expectedWidth - fieldSize.width + fieldMargins.horizontal());
+          let widthHint;
+          spyForWidthHint(spiedWidthHint => {
             widthHint = spiedWidthHint;
           });
           expect(formField.htmlComp.prefSize({widthHint: 400}).width).toBe(400);
@@ -375,23 +375,23 @@ describe('FormFieldLayout', function() {
         });
       });
 
-      describe('top with label position top', function() {
-        it('sums up the widths without label and status', function() {
+      describe('top with label position top', () => {
+        it('sums up the widths without label and status', () => {
           formField.setLabelPosition(FormField.LabelPosition.TOP);
           formField.setStatusPosition(FormField.StatusPosition.TOP);
           readSizes();
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width;
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width;
           expect(formField.htmlComp.prefSize().width).toBe(expectedWidth);
         });
 
-        it('adjusts widthHint', function() {
+        it('adjusts widthHint', () => {
           formField.setLabelPosition(FormField.LabelPosition.TOP);
           formField.setStatusPosition(FormField.StatusPosition.TOP);
           readSizes();
-          var expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width;
-          var expectedWidthHint = 400 - (expectedWidth - fieldSize.width + fieldMargins.horizontal());
-          var widthHint;
-          spyForWidthHint(function(spiedWidthHint) {
+          let expectedWidth = mandatoryWidth + mandatoryMargins.horizontal() + fieldSize.width;
+          let expectedWidthHint = 400 - (expectedWidth - fieldSize.width + fieldMargins.horizontal());
+          let widthHint;
+          spyForWidthHint(spiedWidthHint => {
             widthHint = spiedWidthHint;
           });
           expect(formField.htmlComp.prefSize({widthHint: 400}).width).toBe(400);
@@ -402,13 +402,13 @@ describe('FormFieldLayout', function() {
     });
   });
 
-  describe('layout', function() {
+  describe('layout', () => {
 
-    describe('labelPosition', function() {
+    describe('labelPosition', () => {
 
-      describe('top', function() {
+      describe('top', () => {
 
-        it('positions the label on top of the field', function() {
+        it('positions the label on top of the field', () => {
           formField.setLabelPosition(FormField.LabelPosition.TOP);
           readSizes();
           formField.htmlComp.validateLayout();
@@ -417,11 +417,11 @@ describe('FormFieldLayout', function() {
       });
     });
 
-    describe('labelWidthInPixel', function() {
+    describe('labelWidthInPixel', () => {
 
-      describe('UI', function() {
+      describe('UI', () => {
 
-        it('makes the label as width as its content', function() {
+        it('makes the label as width as its content', () => {
           formField.setLabelWidthInPixel(FormField.LabelWidth.UI);
           readSizes();
           formField.htmlComp.validateLayout();

@@ -25,10 +25,10 @@ export default class TileGridLayout extends LogicalGridLayout {
 
   static getTileDimensions() {
     if (!(TileGridLayout._DEFAULTSIZE instanceof Rectangle)) {
-      var h = styles.getSize('tile-grid-layout-config', 'height', 'height', -1);
-      var w = styles.getSize('tile-grid-layout-config', 'width', 'width', -1);
-      var horizontalGap = styles.getSize('tile-grid-layout-config', 'margin-left', 'marginLeft', -1);
-      var verticalGap = styles.getSize('tile-grid-layout-config', 'margin-top', 'marginTop', -1);
+      let h = styles.getSize('tile-grid-layout-config', 'height', 'height', -1);
+      let w = styles.getSize('tile-grid-layout-config', 'width', 'width', -1);
+      let horizontalGap = styles.getSize('tile-grid-layout-config', 'margin-left', 'marginLeft', -1);
+      let verticalGap = styles.getSize('tile-grid-layout-config', 'margin-top', 'marginTop', -1);
       TileGridLayout._DEFAULTSIZE = new Rectangle(horizontalGap, verticalGap, w, h);
     }
     return TileGridLayout._DEFAULTSIZE;
@@ -36,7 +36,7 @@ export default class TileGridLayout extends LogicalGridLayout {
 
   _initDefaults() {
     super._initDefaults();
-    var dim = TileGridLayout.getTileDimensions();
+    let dim = TileGridLayout.getTileDimensions();
     this.hgap = dim.x;
     this.vgap = dim.y;
     this.columnWidth = dim.width;
@@ -45,7 +45,7 @@ export default class TileGridLayout extends LogicalGridLayout {
   }
 
   layout($container) {
-    var htmlComp = this.widget.htmlComp;
+    let htmlComp = this.widget.htmlComp;
     if (this.widget.scrolling) {
       // Try to layout only as much as needed while scrolling in virtual mode
       // Scroll top may be dirty when layout is validated before scrolling to a specific tile (see tileGrid.scrollTo)
@@ -58,7 +58,7 @@ export default class TileGridLayout extends LogicalGridLayout {
     }
 
     // Animate only once on startup (if enabled) but animate every time on resize
-    var animated = htmlComp.layouted || (this.widget.startupAnimationEnabled && !this.widget.startupAnimationDone) || this.widget.renderAnimationEnabled;
+    let animated = htmlComp.layouted || (this.widget.startupAnimationEnabled && !this.widget.startupAnimationDone) || this.widget.renderAnimationEnabled;
     this.tiles = this.widget.renderedTiles();
 
     // Make them invisible otherwise the influence scrollHeight (e.g. if grid is scrolled to the very bottom and tiles are filtered, scrollbar would still increase scroll height)
@@ -74,8 +74,8 @@ export default class TileGridLayout extends LogicalGridLayout {
 
     this.widget.invalidateLayout();
     this.widget.invalidateLogicalGrid(false);
-    var contentFits = false;
-    var containerWidth = $container.outerWidth();
+    let contentFits = false;
+    let containerWidth = $container.outerWidth();
     containerWidth = Math.max(containerWidth, this.minWidth);
     if (htmlComp.prefSize().width <= containerWidth) {
       this._layout($container);
@@ -104,14 +104,14 @@ export default class TileGridLayout extends LogicalGridLayout {
     if (this.widget.virtual && (!htmlComp.layouted || this._sizeChanged(htmlComp) || this.widget.withPlaceholders)) {
       // When changing size of the container, more or less tiles might be shown and some tiles might even change rows due to a new gridColumnCount -> ensure correct tiles are rendered in the range
       this.widget.setViewRangeSize(this.widget.calculateViewRangeSize(), false);
-      var newTiles = this.widget._renderTileDelta();
+      let newTiles = this.widget._renderTileDelta();
       // Make sure newly rendered tiles are animated (if enabled) and layouted as well
       this._storeBounds(newTiles);
       arrays.pushAll(this.tiles, newTiles);
       this._layout($container);
     }
 
-    var promises = [];
+    let promises = [];
     if (animated) {
       promises = this._animateTiles();
     }
@@ -130,8 +130,8 @@ export default class TileGridLayout extends LogicalGridLayout {
   }
 
   _storeBounds(tiles) {
-    tiles.forEach(function(tile, i) {
-      var bounds = graphics.cssBounds(tile.$container);
+    tiles.forEach((tile, i) => {
+      let bounds = graphics.cssBounds(tile.$container);
       tile.$container.data('oldBounds', bounds);
       tile.$container.data('was-layouted', tile.htmlComp.layouted);
     }, this);
@@ -157,8 +157,8 @@ export default class TileGridLayout extends LogicalGridLayout {
   }
 
   _animateTiles() {
-    var htmlComp = this.widget.htmlComp;
-    var $container = htmlComp.$comp;
+    let htmlComp = this.widget.htmlComp;
+    let $container = htmlComp.$comp;
 
     this.containerPos = htmlComp.offset();
     this.containerScrollTop = $container.scrollTop();
@@ -168,7 +168,7 @@ export default class TileGridLayout extends LogicalGridLayout {
     scrollbars.opacity($container, 0);
 
     // Animate the position change of the tiles
-    var promises = [];
+    let promises = [];
     this.tiles.forEach(function(tile, i) {
       if (!tile.rendered) {
         // Only animate tiles which were there at the beginning of the layout
@@ -176,7 +176,7 @@ export default class TileGridLayout extends LogicalGridLayout {
         return;
       }
 
-      var promise = this._animateTile(tile);
+      let promise = this._animateTile(tile);
       if (promise) {
         promises.push(promise);
       }
@@ -189,7 +189,7 @@ export default class TileGridLayout extends LogicalGridLayout {
   }
 
   _animateTile(tile) {
-    var htmlComp = this.widget.htmlComp;
+    let htmlComp = this.widget.htmlComp;
 
     // Stop running animations before starting the new ones to make sure existing promises are not resolved too early
     // It may also happen that while the animation of a tile is in progress, the layout is triggered again but the tile should not be animated anymore
@@ -206,8 +206,8 @@ export default class TileGridLayout extends LogicalGridLayout {
       return;
     }
 
-    var bounds = graphics.cssBounds(tile.$container);
-    var fromBounds = tile.$container.data('oldBounds');
+    let bounds = graphics.cssBounds(tile.$container);
+    let fromBounds = tile.$container.data('oldBounds');
     if (tile instanceof PlaceholderTile && !tile.$container.data('was-layouted')) {
       // Placeholders may not have fromBounds because they are added while layouting
       // Just let them appear at the correct position
@@ -241,9 +241,9 @@ export default class TileGridLayout extends LogicalGridLayout {
 
   _inViewport(bounds) {
     bounds = bounds.translate(this.containerPos.x, this.containerPos.y).translate(0, -this.containerScrollTop);
-    var topLeftPos = new Point(bounds.x, bounds.y);
-    var bottomRightPos = new Point(bounds.x + bounds.width, bounds.y + bounds.height);
-    var $scrollable = this.widget.$container.scrollParent();
+    let topLeftPos = new Point(bounds.x, bounds.y);
+    let bottomRightPos = new Point(bounds.x + bounds.width, bounds.y + bounds.height);
+    let $scrollable = this.widget.$container.scrollParent();
     return scrollbars.isLocationInView(topLeftPos, $scrollable) || scrollbars.isLocationInView(bottomRightPos, $scrollable);
   }
 
@@ -262,36 +262,36 @@ export default class TileGridLayout extends LogicalGridLayout {
     // CSS rules say something different.
     // As a workaround, we remember the correct original value ourselves and restore it manually after all
     // individual animations have been completed. Only then will the resulting promise be resolved.
-    var elem = tile.$container[0];
-    var oldOverflowStyles = [elem.style.overflow, elem.style.overflowX, elem.style.overflowY];
-    var restoreOverflowStyle = function() {
+    let elem = tile.$container[0];
+    let oldOverflowStyles = [elem.style.overflow, elem.style.overflowX, elem.style.overflowY];
+    let restoreOverflowStyle = () => {
       elem.style.overflow = oldOverflowStyles[0];
       elem.style.overflowX = oldOverflowStyles[1];
       elem.style.overflowY = oldOverflowStyles[2];
     };
 
-    var promises = [];
+    let promises = [];
     tile.$container
       .cssLeftAnimated(fromBounds.x, bounds.x, {
-        start: function(promise) {
+        start: promise => {
           promises.push(promise);
         },
         queue: false
       })
       .cssTopAnimated(fromBounds.y, bounds.y, {
-        start: function(promise) {
+        start: promise => {
           promises.push(promise);
         },
         queue: false
       })
       .cssWidthAnimated(fromBounds.width, bounds.width, {
-        start: function(promise) {
+        start: promise => {
           promises.push(promise);
         },
         queue: false
       })
       .cssHeightAnimated(fromBounds.height, bounds.height, {
-        start: function(promise) {
+        start: promise => {
           promises.push(promise);
         },
         queue: false
@@ -305,7 +305,7 @@ export default class TileGridLayout extends LogicalGridLayout {
     scrollbars.opacity(this.widget.$container, 1);
 
     // Update first scrollable parent (if widget itself is not scrollable, maybe a parent is)
-    var htmlComp = this.widget.htmlComp;
+    let htmlComp = this.widget.htmlComp;
     while (htmlComp) {
       if (htmlComp.scrollable) {
         // Update immediately to prevent flickering (scrollbar is made visible on the top of this function)
@@ -322,7 +322,7 @@ export default class TileGridLayout extends LogicalGridLayout {
    */
   _updateMaxWidth() {
     // Reset padding-right set by layout
-    var htmlComp = this.widget.htmlComp;
+    let htmlComp = this.widget.htmlComp;
     htmlComp.$comp.cssPaddingRight(null);
 
     if (this.maxWidth <= 0) {
@@ -330,13 +330,13 @@ export default class TileGridLayout extends LogicalGridLayout {
     }
 
     // Measure current padding-right (by CSS)
-    var cssPaddingRight = htmlComp.$comp.cssPaddingRight();
+    let cssPaddingRight = htmlComp.$comp.cssPaddingRight();
 
     // Calculate difference between current with and max. width
-    var containerSize = htmlComp.size();
-    var oldWidth = containerSize.width;
-    var newWidth = Math.min(containerSize.width, this.maxWidth);
-    var diff = oldWidth - newWidth - htmlComp.$comp.cssPaddingLeft() - htmlComp.$comp.cssBorderWidthX();
+    let containerSize = htmlComp.size();
+    let oldWidth = containerSize.width;
+    let newWidth = Math.min(containerSize.width, this.maxWidth);
+    let diff = oldWidth - newWidth - htmlComp.$comp.cssPaddingLeft() - htmlComp.$comp.cssBorderWidthX();
     if (diff > cssPaddingRight) {
       htmlComp.$comp.cssPaddingRight(diff);
     }
@@ -360,17 +360,17 @@ export default class TileGridLayout extends LogicalGridLayout {
    * Therefore only works if all tiles are of the same size (which is a precondition for the virtual scrolling anyway).
    */
   virtualPrefSize($container, options) {
-    var rowCount, columnCount;
-    var insets = HtmlComponent.get($container).insets();
-    var prefSize = new Dimension();
-    var columnWidth = this.columnWidth;
-    var rowHeight = this.rowHeight;
-    var hgap = this.hgap;
-    var vgap = this.vgap;
+    let rowCount, columnCount;
+    let insets = HtmlComponent.get($container).insets();
+    let prefSize = new Dimension();
+    let columnWidth = this.columnWidth;
+    let rowHeight = this.rowHeight;
+    let hgap = this.hgap;
+    let vgap = this.vgap;
 
     if (options.widthHint) {
       columnCount = Math.floor(options.widthHint / (columnWidth + hgap));
-      var width = columnCount * (columnWidth + hgap);
+      let width = columnCount * (columnWidth + hgap);
       if (options.widthHint - width > columnWidth) {
         // The last column does not have a hgap -> Correct the grid column count if another column would fit in
         columnCount++;
@@ -399,13 +399,13 @@ export default class TileGridLayout extends LogicalGridLayout {
       return super.preferredLayoutSize($container, options);
     }
     this._calculatingPrimitivePrefSize = true;
-    var prefSize = this._primitivePrefSize(options);
+    let prefSize = this._primitivePrefSize(options);
     this._calculatingPrimitivePrefSize = false;
     return prefSize;
   }
 
   _primitivePrefSize(options) {
-    var prefSize,
+    let prefSize,
       htmlComp = this.widget.htmlComp,
       contentFits = false,
       gridColumnCount = this.widget.gridColumnCount,

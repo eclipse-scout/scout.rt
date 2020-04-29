@@ -26,7 +26,7 @@ export default class DesktopFormController extends FormController {
 
   render() {
     super.render();
-    var activeForm = this.desktop.activeForm;
+    let activeForm = this.desktop.activeForm;
     if (activeForm) {
       activeForm.activate();
     } else {
@@ -38,9 +38,9 @@ export default class DesktopFormController extends FormController {
     super._renderViews();
 
     if (this.desktop.selectedViewTabs) {
-      this.desktop.selectedViewTabs.forEach(function(selectedView) {
+      this.desktop.selectedViewTabs.forEach(selectedView => {
         this._activateView(selectedView);
-      }.bind(this));
+      });
     }
 
     // ensure in all view stacks the last view is activated
@@ -55,15 +55,15 @@ export default class DesktopFormController extends FormController {
    * @override FormController.js
    */
   _renderPopupWindow(form) {
-    var windowSpecs,
+    let windowSpecs,
       resizeToPrefSize; // flag used to resize browser-window later (see PopupWindow.js)
 
-    var bounds = form.readCacheBounds();
+    let bounds = form.readCacheBounds();
     if (bounds) {
       windowSpecs = 'left=' + bounds.x + ',top=' + bounds.y + ',width=' + bounds.width + ',height=' + bounds.height;
       resizeToPrefSize = false;
     } else {
-      var $mainDocument = $(document),
+      let $mainDocument = $(document),
         documentSize = new Dimension($mainDocument.width(), $mainDocument.height());
       windowSpecs = 'left=0,top=0,width=' + documentSize.width + ',height=' + documentSize.height;
       resizeToPrefSize = true;
@@ -75,18 +75,18 @@ export default class DesktopFormController extends FormController {
     // See: https://developer.mozilla.org/en-US/docs/Web/API/Window/open#Position_and_size_features
     windowSpecs += ',location=no,toolbar=no,menubar=no,resizable=yes';
 
-    var popupBlockerHandler = new PopupBlockerHandler(this.session, true /* no external untrusted URI: Can keep the opener for callback. */),
+    let popupBlockerHandler = new PopupBlockerHandler(this.session, true /* no external untrusted URI: Can keep the opener for callback. */),
       // form ID in URL is required for 'reload window' support
       url = 'popup-window.html?formId=' + form.id;
 
     // use '_blank' as window-name so browser-windows are never reused
-    popupBlockerHandler.openWindow(url, '_blank', windowSpecs, function(popup) {
+    popupBlockerHandler.openWindow(url, '_blank', windowSpecs, popup => {
       this._addPopupWindow(popup, form, resizeToPrefSize);
-    }.bind(this));
+    });
   }
 
   _addPopupWindow(newWindow, form, resizeToPrefSize) {
-    var popupWindow = new PopupWindow(newWindow, form);
+    let popupWindow = new PopupWindow(newWindow, form);
     popupWindow.resizeToPrefSize = resizeToPrefSize;
     popupWindow.events.on('popupWindowUnload', this._onPopupWindowUnload.bind(this));
     this._popupWindows.push(popupWindow);
@@ -95,10 +95,10 @@ export default class DesktopFormController extends FormController {
 
   _onDocumentPopupWindowReady(event, data) {
     $.log.isDebugEnabled() && $.log.debug('(FormController#_onDocumentPopupWindowReady) data=' + data);
-    var popupWindow;
+    let popupWindow;
     if (data.formId) {
       // reload (existing popup window)
-      var i, formId = data.formId;
+      let i, formId = data.formId;
       $.log.isDebugEnabled() && $.log.debug('Popup window for form ID ' + formId + ' has been reloaded');
       for (i = 0; i < this._popupWindows.length; i++) {
         popupWindow = this._popupWindows[i];
@@ -120,7 +120,7 @@ export default class DesktopFormController extends FormController {
   }
 
   _onPopupWindowUnload(popupWindow) {
-    var form = popupWindow.form;
+    let form = popupWindow.form;
     $.log.isDebugEnabled() && $.log.debug('Popup window for form ID ' + form.id + ' is unloaded - don\'t know if its closed or reloaded yet');
 
     // this remove() is important: when a popup-window in IE is closed, all references to a HTMLDivElement become
@@ -131,7 +131,7 @@ export default class DesktopFormController extends FormController {
 
     // must do this with setTimeout because at this point window is always still open
     // Note: timeout with 0 milliseconds will not work
-    setTimeout(function() {
+    setTimeout(() => {
       // Check if popup is closed (when the unload event was triggered by page reload it will still be open)
       if (popupWindow.isClosed()) {
         $.log.isDebugEnabled() && $.log.debug('Popup window for form ID ' + form.id + ' has been closed');
@@ -157,7 +157,7 @@ export default class DesktopFormController extends FormController {
    * @override FormController.js
    */
   _removePopupWindow(form) {
-    var popupWindow = form.popupWindow;
+    let popupWindow = form.popupWindow;
     if (!popupWindow) {
       throw new Error('Form has no popupWindow reference');
     }

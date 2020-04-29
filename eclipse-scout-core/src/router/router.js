@@ -30,7 +30,7 @@ export function prepare($a, location) {
   }
   $a
     .attr('href', location)
-    .on('mousedown', function(event) {
+    .on('mousedown', event => {
       activate(location);
       return false; // prevent default
     });
@@ -39,8 +39,8 @@ export function prepare($a, location) {
 
 export function activate(location) {
   if (!location) {
-    var regexp = new RegExp('[^/]*$'); // match everything after last slash
-    var matches = regexp.exec(document.location.href);
+    let regexp = new RegExp('[^/]*$'); // match everything after last slash
+    let matches = regexp.exec(document.location.href);
     location = matches[0];
   }
 
@@ -49,7 +49,7 @@ export function activate(location) {
     location = defaultLocation;
   }
 
-  var i, route = null;
+  let i, route = null;
   for (i = 0; i < routes.length; i++) {
     route = routes[i];
     if (route.matches(location)) {
@@ -94,7 +94,7 @@ export function on(event, handler) {
  * @param {string} routeRef a string which identifies a route.
  */
 export function updateLocation(routeRef) {
-  var location = '#' + routeRef;
+  let location = '#' + routeRef;
   window.location.replace(location);
 }
 
@@ -111,7 +111,7 @@ export default {
   updateLocation
 };
 
-window.addEventListener('popstate', function(event) {
+window.addEventListener('popstate', event => {
   router.activate(null);
   return false;
 });

@@ -61,9 +61,9 @@ export default class FormMenu extends Menu {
       return;
     }
 
-    this.form.one('remove', function(event) {
+    this.form.one('remove', event => {
       this._onFormRemove(event);
-    }.bind(this));
+    });
   }
 
   /**
@@ -78,7 +78,7 @@ export default class FormMenu extends Menu {
       this.setSelected(false);
     }
 
-    var parentContextMenuPopup = this.findParent(function(p) {
+    let parentContextMenuPopup = this.findParent(p => {
       return p instanceof ContextMenuPopup;
     });
     if (parentContextMenuPopup && !(parentContextMenuPopup.destroying || parentContextMenuPopup.removing)) {

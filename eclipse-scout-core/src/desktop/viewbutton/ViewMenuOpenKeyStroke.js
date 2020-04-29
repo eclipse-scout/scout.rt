@@ -39,7 +39,7 @@ export default class ViewMenuOpenKeyStroke extends KeyStroke {
   }
 
   _postRenderKeyBox($drawingArea) {
-    var wKeybox = $drawingArea.find('.key-box').outerWidth(),
+    let wKeybox = $drawingArea.find('.key-box').outerWidth(),
       left = this.field.dropdown.$container.outerWidth();
 
     if (this.field.selected && !this.field.inBackground) {

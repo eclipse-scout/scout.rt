@@ -11,17 +11,17 @@
 import {DateColumnUserFilter, dates, FilterFieldsGroupBox, scout} from '../../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-describe('DateColumnUserFilter', function() {
-  var session;
-  var helper;
+describe('DateColumnUserFilter', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
   });
 
@@ -32,8 +32,8 @@ describe('DateColumnUserFilter', function() {
     });
   }
 
-  it('acceptByFields works', function() {
-    var filter = new DateColumnUserFilter(),
+  it('acceptByFields works', () => {
+    let filter = new DateColumnUserFilter(),
       date21 = dates.create('2015-12-21'),
       date22 = dates.create('2015-12-22'),
       date23 = dates.create('2015-12-23'),
@@ -56,8 +56,8 @@ describe('DateColumnUserFilter', function() {
     expect(filter.acceptByFields(null)).toBe(false);
   });
 
-  it('acceptByFields works with time', function() {
-    var filter = new DateColumnUserFilter(),
+  it('acceptByFields works with time', () => {
+    let filter = new DateColumnUserFilter(),
       filterDateFrom = dates.create('2015-12-21'),
       filterDateTo = dates.create('2015-12-21'),
       dateTimePrevDayMax = dates.create('2015-12-20 23:59:59.999'),
@@ -90,10 +90,10 @@ describe('DateColumnUserFilter', function() {
     expect(filter.acceptByFields(null)).toBe(false);
   });
 
-  it('addFilterFields must not create date fields with time', function() {
+  it('addFilterFields must not create date fields with time', () => {
     // In case this test case fails, the date filter fields are created with time.
     // If this is intended, the acceptByFields() implementation for DateColumnUserFilter has to be checked/adjusted to ensure correct filter functionality.
-    var model = createSimpleModel('DateColumnUserFilter', session),
+    let model = createSimpleModel('DateColumnUserFilter', session),
       filter = new DateColumnUserFilter(),
       box = new FilterFieldsGroupBox();
     model.filter = filter;

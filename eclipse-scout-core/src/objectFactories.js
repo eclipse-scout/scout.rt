@@ -12,18 +12,14 @@
 import {Action, ActionAdapter, scout, TreeField, TreeFieldAdapter} from './index';
 
 scout.addObjectFactories({
-  'KeyStroke': function() {
+  'KeyStroke': () => {
     // A model keystroke is represented as an Action
     return new Action();
   },
-  'KeyStrokeAdapter': function() {
-    return new ActionAdapter();
-  },
-  'ComposerField': function() {
+  'KeyStrokeAdapter': () => new ActionAdapter(),
+  'ComposerField': () => {
     // Composer is just a tree field, there is currently no need to duplicate the JS/CSS code
     return new TreeField();
   },
-  'ComposerFieldAdapter': function() {
-    return new TreeFieldAdapter();
-  }
+  'ComposerFieldAdapter': () => new TreeFieldAdapter()
 });

@@ -17,7 +17,7 @@ const DEFAULT_TOOLTIP_DELAY = 600; // ms
 const LONG_TOOLTIP_DELAY = 2000; // ms
 
 export function install($comp, options) {
-  var support = $comp.data('tooltipSupport');
+  let support = $comp.data('tooltipSupport');
   if (!support) {
     support = new TooltipSupport(options);
     support.install($comp);
@@ -27,7 +27,7 @@ export function install($comp, options) {
 }
 
 export function uninstall($comp) {
-  var support = $comp.data('tooltipSupport');
+  let support = $comp.data('tooltipSupport');
   if (support) {
     support.uninstall($comp);
   }
@@ -38,14 +38,14 @@ export function uninstall($comp) {
  * Otherwise, nothing happens.
  */
 export function update($comp, options) {
-  var support = $comp.data('tooltipSupport');
+  let support = $comp.data('tooltipSupport');
   if (support) {
     support.update($comp, options);
   }
 }
 
 export function close($comp) {
-  var support = $comp.data('tooltipSupport');
+  let support = $comp.data('tooltipSupport');
   if (support) {
     support.close();
   }
@@ -55,7 +55,7 @@ export function close($comp) {
  * Cancels the scheduled task to show the tooltip.
  */
 export function cancel($comp) {
-  var support = $comp.data('tooltipSupport');
+  let support = $comp.data('tooltipSupport');
   if (support) {
     support.cancel($comp);
   }
@@ -65,8 +65,8 @@ export function cancel($comp) {
  * Convenient function to install tooltip support for ellipsis only.
  */
 export function installForEllipsis($comp, options) {
-  var defaultOptions = {
-    text: function($label) {
+  let defaultOptions = {
+    text: $label => {
       if ($label.isContentTruncated()) {
         return $label.text();
       }
@@ -81,7 +81,7 @@ export function installForEllipsis($comp, options) {
  * Finds every tooltip whose $anchor belongs to $context.
  */
 export function find($context) {
-  var $tooltips, i, tooltip,
+  let $tooltips, i, tooltip,
     tooltips = [];
   $tooltips = $('.tooltip', $context.document(true));
 

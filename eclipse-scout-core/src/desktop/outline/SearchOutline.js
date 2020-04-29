@@ -32,7 +32,7 @@ export default class SearchOutline extends Outline {
   }
 
   _createKeyStrokeContextForSearchField() {
-    var keyStrokeContext = new InputFieldKeyStrokeContext();
+    let keyStrokeContext = new InputFieldKeyStrokeContext();
     keyStrokeContext.$scopeTarget = function() {
       return this.$searchPanel;
     }.bind(this);
@@ -90,7 +90,7 @@ export default class SearchOutline extends Outline {
   }
 
   _renderSearchStatus() {
-    var animate = this.rendered;
+    let animate = this.rendered;
 
     if (this.searchStatus && !this.$searchStatus.isVisible()) {
       if (animate) {
@@ -126,8 +126,8 @@ export default class SearchOutline extends Outline {
   }
 
   _createOnQueryFieldInputFunction(event) {
-    var debounceFunction = $.debounce(this._search.bind(this));
-    var fn = function(event) {
+    let debounceFunction = $.debounce(this._search.bind(this));
+    let fn = function(event) {
       this._updateHasText();
       // debounced search
       debounceFunction();
@@ -154,7 +154,7 @@ export default class SearchOutline extends Outline {
 
   _search(event) {
     // Don't send query if value did not change (may happen when _createOnQueryFieldInputFunction is executed after _onQueryFieldKeyPress)
-    var searchQuery = this.$queryField.val();
+    let searchQuery = this.$queryField.val();
     if (this.searchQuery !== searchQuery) {
       // Store locally so that the value persists when changing the outline without performing the search
       this._setSearchQuery(searchQuery);
@@ -179,7 +179,7 @@ export default class SearchOutline extends Outline {
     if (!this.rendered) {
       return;
     }
-    var elementToFocus = this.$queryField[0];
+    let elementToFocus = this.$queryField[0];
     if (this.session.focusManager.requestFocus(elementToFocus)) {
       elementToFocus.select();
     }

@@ -20,9 +20,9 @@ export default class TabBoxHeaderLayout extends AbstractLayout {
 
     this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
     HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
-    this.tabBoxHeader.one('remove', function() {
+    this.tabBoxHeader.one('remove', () => {
       HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
-    }.bind(this));
+    });
   }
 
   _initDefaults() {
@@ -35,7 +35,7 @@ export default class TabBoxHeaderLayout extends AbstractLayout {
   }
 
   layout($container) { //
-    var htmlContainer = HtmlComponent.get($container),
+    let htmlContainer = HtmlComponent.get($container),
       tabArea = this.tabBoxHeader.tabArea,
       tabAreaMargins = tabArea.htmlComp.margins(),
       tabAreaPrefSize,
@@ -93,7 +93,7 @@ export default class TabBoxHeaderLayout extends AbstractLayout {
   }
 
   preferredLayoutSize($container, options) {
-    var htmlContainer = HtmlComponent.get($container),
+    let htmlContainer = HtmlComponent.get($container),
       insets = htmlContainer.insets(),
       wHint = (options.widthHint || htmlContainer.availableSize().width) - htmlContainer.insets().horizontal(),
       prefSize = new Dimension(),

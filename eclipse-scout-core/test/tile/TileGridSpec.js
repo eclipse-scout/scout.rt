@@ -10,28 +10,28 @@
  */
 import {scout} from '../../src/index';
 
-describe('TileGrid', function() {
-  var session;
+describe('TileGrid', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     // Stop all running animations to not influence other specs
     $(':animated').finish();
   });
 
   function createTileGrid(numTiles, model) {
-    var tiles = [];
-    for (var i = 0; i < numTiles; i++) {
+    let tiles = [];
+    for (let i = 0; i < numTiles; i++) {
       tiles.push({
         objectType: 'Tile',
         label: 'Tile ' + i
       });
     }
-    var defaults = {
+    let defaults = {
       parent: session.desktop,
       tiles: tiles
     };
@@ -40,16 +40,16 @@ describe('TileGrid', function() {
   }
 
   function createTile(model) {
-    var defaults = {
+    let defaults = {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
     return scout.create('Tile', model);
   }
 
-  describe('selectTiles', function() {
-    it('selects the given tiles and unselects the previously selected ones', function() {
-      var tileGrid = createTileGrid(3, {
+  describe('selectTiles', () => {
+    it('selects the given tiles and unselects the previously selected ones', () => {
+      let tileGrid = createTileGrid(3, {
         selectable: true
       });
       tileGrid.selectTiles(tileGrid.tiles[0]);
@@ -90,8 +90,8 @@ describe('TileGrid', function() {
       expect(tileGrid.tiles[2].selected).toBe(false);
     });
 
-    it('does not select if selectable is false', function() {
-      var tileGrid = createTileGrid(3, {
+    it('does not select if selectable is false', () => {
+      let tileGrid = createTileGrid(3, {
         selectable: false
       });
       tileGrid.selectTiles(tileGrid.tiles[0]);
@@ -101,15 +101,13 @@ describe('TileGrid', function() {
       expect(tileGrid.tiles[0].selected).toBe(false);
     });
 
-    it('does not select tiles excluded by filter', function() {
-      var tileGrid = createTileGrid(3, {
+    it('does not select tiles excluded by filter', () => {
+      let tileGrid = createTileGrid(3, {
         selectable: true
       });
 
-      var filter = {
-        accept: function(tile) {
-          return tile.label.indexOf('1') < 0;
-        }
+      let filter = {
+        accept: tile => tile.label.indexOf('1') < 0
       };
       tileGrid.addFilter(filter);
       tileGrid.filter();
@@ -127,12 +125,12 @@ describe('TileGrid', function() {
       expect(tileGrid.tiles[1].selected).toBe(true);
     });
 
-    it('triggers a property change event', function() {
-      var tileGrid = createTileGrid(3, {
+    it('triggers a property change event', () => {
+      let tileGrid = createTileGrid(3, {
         selectable: true
       });
-      var eventTriggered = false;
-      tileGrid.on('propertyChange', function(event) {
+      let eventTriggered = false;
+      tileGrid.on('propertyChange', event => {
         if (event.propertyName === 'selectedTiles') {
           eventTriggered = true;
         }
@@ -142,9 +140,9 @@ describe('TileGrid', function() {
     });
   });
 
-  describe('deselectTiles', function() {
-    it('deselects the given tiles', function() {
-      var tileGrid = createTileGrid(3, {
+  describe('deselectTiles', () => {
+    it('deselects the given tiles', () => {
+      let tileGrid = createTileGrid(3, {
         selectable: true
       });
       tileGrid.selectAllTiles();
@@ -171,13 +169,13 @@ describe('TileGrid', function() {
       expect(tileGrid.tiles[2].selected).toBe(false);
     });
 
-    it('triggers a property change event', function() {
-      var tileGrid = createTileGrid(3, {
+    it('triggers a property change event', () => {
+      let tileGrid = createTileGrid(3, {
         selectable: true
       });
-      var eventTriggered = false;
+      let eventTriggered = false;
       tileGrid.selectAllTiles();
-      tileGrid.on('propertyChange', function(event) {
+      tileGrid.on('propertyChange', event => {
         if (event.propertyName === 'selectedTiles') {
           eventTriggered = true;
         }
@@ -187,12 +185,12 @@ describe('TileGrid', function() {
     });
   });
 
-  describe('insertTiles', function() {
-    it('inserts the given tiles', function() {
-      var tileGrid = createTileGrid(0);
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
+  describe('insertTiles', () => {
+    it('inserts the given tiles', () => {
+      let tileGrid = createTileGrid(0);
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
       expect(tileGrid.tiles.length).toBe(0);
 
       tileGrid.insertTiles(tile0);
@@ -206,11 +204,11 @@ describe('TileGrid', function() {
       expect(tileGrid.tiles[2]).toBe(tile2);
     });
 
-    it('triggers a property change event', function() {
-      var tileGrid = createTileGrid(0);
-      var tile0 = createTile();
-      var eventTriggered = false;
-      tileGrid.on('propertyChange', function(event) {
+    it('triggers a property change event', () => {
+      let tileGrid = createTileGrid(0);
+      let tile0 = createTile();
+      let eventTriggered = false;
+      tileGrid.on('propertyChange', event => {
         if (event.propertyName === 'tiles') {
           eventTriggered = true;
         }
@@ -219,11 +217,11 @@ describe('TileGrid', function() {
       expect(eventTriggered).toBe(true);
     });
 
-    it('links the inserted tiles with the tileGrid', function() {
-      var tileGrid = createTileGrid(0);
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
+    it('links the inserted tiles with the tileGrid', () => {
+      let tileGrid = createTileGrid(0);
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
       expect(tileGrid.tiles.length).toBe(0);
       expect(tile0.parent).toBe(session.desktop);
       expect(tile1.parent).toBe(session.desktop);
@@ -238,12 +236,12 @@ describe('TileGrid', function() {
     });
   });
 
-  describe('deleteTiles', function() {
-    it('deletes the given tiles', function() {
-      var tileGrid = createTileGrid(0);
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
+  describe('deleteTiles', () => {
+    it('deletes the given tiles', () => {
+      let tileGrid = createTileGrid(0);
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
       tileGrid.insertTiles([tile0, tile1, tile2]);
       expect(tileGrid.tiles.length).toBe(3);
 
@@ -256,13 +254,13 @@ describe('TileGrid', function() {
       expect(tileGrid.tiles.length).toBe(0);
     });
 
-    it('deselects the deleted tiles', function() {
-      var tileGrid = createTileGrid(0, {
+    it('deselects the deleted tiles', () => {
+      let tileGrid = createTileGrid(0, {
         selectable: true
       });
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
       tileGrid.insertTiles([tile0, tile1, tile2]);
       expect(tileGrid.tiles.length).toBe(3);
 
@@ -278,10 +276,10 @@ describe('TileGrid', function() {
       expect(tileGrid.selectedTiles.length).toBe(0);
     });
 
-    it('triggers a property change event', function() {
-      var tileGrid = createTileGrid(3);
-      var eventTriggered = false;
-      tileGrid.on('propertyChange', function(event) {
+    it('triggers a property change event', () => {
+      let tileGrid = createTileGrid(3);
+      let eventTriggered = false;
+      tileGrid.on('propertyChange', event => {
         if (event.propertyName === 'tiles') {
           eventTriggered = true;
         }
@@ -290,17 +288,17 @@ describe('TileGrid', function() {
       expect(eventTriggered).toBe(true);
     });
 
-    it('destroys the deleted tiles', function() {
-      var tileGrid = createTileGrid(0, {
+    it('destroys the deleted tiles', () => {
+      let tileGrid = createTileGrid(0, {
         animateTileRemoval: false
       });
-      var tile0 = createTile({
+      let tile0 = createTile({
         parent: tileGrid
       });
-      var tile1 = createTile({
+      let tile1 = createTile({
         parent: tileGrid
       });
-      var tile2 = createTile({
+      let tile2 = createTile({
         parent: tileGrid
       });
       tileGrid.render();
@@ -326,17 +324,17 @@ describe('TileGrid', function() {
     /**
      * This spec is important if a tile should be moved from one tileGrid to another.
      */
-    it('does not destroy the deleted tiles if the tileGrid is not the owner', function() {
-      var tileGrid = createTileGrid(0, {
+    it('does not destroy the deleted tiles if the tileGrid is not the owner', () => {
+      let tileGrid = createTileGrid(0, {
         animateTileRemoval: false
       });
-      var tile0 = createTile({
+      let tile0 = createTile({
         owner: session.desktop
       });
-      var tile1 = createTile({
+      let tile1 = createTile({
         owner: session.desktop
       });
-      var tile2 = createTile({
+      let tile2 = createTile({
         owner: session.desktop
       });
       tileGrid.render();
@@ -360,12 +358,12 @@ describe('TileGrid', function() {
     });
   });
 
-  describe('deleteAllTiles', function() {
-    it('deletes all tiles', function() {
-      var tileGrid = createTileGrid(0);
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
+  describe('deleteAllTiles', () => {
+    it('deletes all tiles', () => {
+      let tileGrid = createTileGrid(0);
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
       tileGrid.insertTiles([tile0, tile1, tile2]);
       expect(tileGrid.tiles.length).toBe(3);
 
@@ -373,13 +371,13 @@ describe('TileGrid', function() {
       expect(tileGrid.tiles.length).toBe(0);
     });
 
-    it('deselects the deleted tiles', function() {
-      var tileGrid = createTileGrid(0, {
+    it('deselects the deleted tiles', () => {
+      let tileGrid = createTileGrid(0, {
         selectable: true
       });
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
       tileGrid.insertTiles([tile0, tile1, tile2]);
       expect(tileGrid.tiles.length).toBe(3);
 
@@ -390,11 +388,11 @@ describe('TileGrid', function() {
       expect(tileGrid.selectedTiles.length).toBe(0);
     });
 
-    it('adds empty marker', function() {
-      var tileGrid = createTileGrid(0);
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
+    it('adds empty marker', () => {
+      let tileGrid = createTileGrid(0);
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
       tileGrid.render();
       expect(tileGrid.$container).toHaveClass('empty');
 
@@ -406,13 +404,13 @@ describe('TileGrid', function() {
     });
   });
 
-  describe('setTiles', function() {
+  describe('setTiles', () => {
 
-    it('applies the order of the new tiles to tiles and filteredTiles', function() {
-      var tileGrid = createTileGrid(0);
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
+    it('applies the order of the new tiles to tiles and filteredTiles', () => {
+      let tileGrid = createTileGrid(0);
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
       tileGrid.insertTiles([tile0, tile1, tile2]);
 
       tileGrid.setTiles([tile2, tile1, tile0]);
@@ -424,14 +422,14 @@ describe('TileGrid', function() {
       expect(tileGrid.filteredTiles[2]).toBe(tile0);
     });
 
-    it('applies the order of the new tiles to the rendered elements', function() {
-      var tileGrid = createTileGrid(0);
-      var tile0 = createTile();
-      var tile1 = createTile();
-      var tile2 = createTile();
+    it('applies the order of the new tiles to the rendered elements', () => {
+      let tileGrid = createTileGrid(0);
+      let tile0 = createTile();
+      let tile1 = createTile();
+      let tile2 = createTile();
       tileGrid.insertTiles([tile0, tile1, tile2]);
       tileGrid.render();
-      var $tiles = tileGrid.$container.children('.tile');
+      let $tiles = tileGrid.$container.children('.tile');
       expect($tiles.eq(0).data('widget')).toBe(tile0);
       expect($tiles.eq(1).data('widget')).toBe(tile1);
       expect($tiles.eq(2).data('widget')).toBe(tile2);
@@ -449,22 +447,20 @@ describe('TileGrid', function() {
       expect(tileGrid.filteredTiles[2]).toBe(tile0);
     });
 
-    it('applies the order of the new tiles to the filteredTiles if a filter is active', function() {
-      var tileGrid = createTileGrid(3);
-      var tile0 = tileGrid.tiles[0];
-      var tile1 = tileGrid.tiles[1];
-      var tile2 = tileGrid.tiles[2];
+    it('applies the order of the new tiles to the filteredTiles if a filter is active', () => {
+      let tileGrid = createTileGrid(3);
+      let tile0 = tileGrid.tiles[0];
+      let tile1 = tileGrid.tiles[1];
+      let tile2 = tileGrid.tiles[2];
 
-      var filter = {
-        accept: function(tile) {
-          return tile.label.indexOf('1') < 0;
-        }
+      let filter = {
+        accept: tile => tile.label.indexOf('1') < 0
       };
       tileGrid.addFilter(filter);
       tileGrid.filter();
 
       tileGrid.render();
-      var $tiles = tileGrid.$container.children('.tile');
+      let $tiles = tileGrid.$container.children('.tile');
       expect($tiles.eq(0).data('widget')).toBe(tile0);
       expect($tiles.eq(1).data('widget')).toBe(tile1);
       expect($tiles.eq(2).data('widget')).toBe(tile2);
@@ -490,22 +486,22 @@ describe('TileGrid', function() {
 
   });
 
-  describe('sort', function() {
+  describe('sort', () => {
 
-    it('uses the comparator to sort the tiles and filteredTiles', function() {
-      var tileGrid = createTileGrid(0);
-      var tile0 = createTile({
+    it('uses the comparator to sort the tiles and filteredTiles', () => {
+      let tileGrid = createTileGrid(0);
+      let tile0 = createTile({
         label: 'a'
       });
-      var tile1 = createTile({
+      let tile1 = createTile({
         label: 'b'
       });
-      var tile2 = createTile({
+      let tile2 = createTile({
         label: 'c'
       });
       tileGrid.insertTiles([tile0, tile1, tile2]);
 
-      tileGrid.setComparator(function(t0, t1) {
+      tileGrid.setComparator((t0, t1) => {
         // desc
         return (t0.label < t1.label ? 1 : ((t0.label > t1.label) ? -1 : 0));
       });
@@ -517,7 +513,7 @@ describe('TileGrid', function() {
       expect(tileGrid.filteredTiles[1]).toBe(tile1);
       expect(tileGrid.filteredTiles[2]).toBe(tile0);
 
-      tileGrid.setComparator(function(t0, t1) {
+      tileGrid.setComparator((t0, t1) => {
         // asc
         return (t0.label < t1.label ? -1 : ((t0.label > t1.label) ? 1 : 0));
       });
@@ -530,20 +526,20 @@ describe('TileGrid', function() {
       expect(tileGrid.filteredTiles[2]).toBe(tile2);
     });
 
-    it('is executed when new tiles are added', function() {
-      var tileGrid = createTileGrid(0);
-      var tile0 = createTile({
+    it('is executed when new tiles are added', () => {
+      let tileGrid = createTileGrid(0);
+      let tile0 = createTile({
         label: 'a'
       });
-      var tile1 = createTile({
+      let tile1 = createTile({
         label: 'b'
       });
-      var tile2 = createTile({
+      let tile2 = createTile({
         label: 'c'
       });
       tileGrid.insertTiles([tile0, tile1]);
 
-      tileGrid.setComparator(function(t0, t1) {
+      tileGrid.setComparator((t0, t1) => {
         // desc
         return (t0.label < t1.label ? 1 : ((t0.label > t1.label) ? -1 : 0));
       });
@@ -562,20 +558,20 @@ describe('TileGrid', function() {
       expect(tileGrid.filteredTiles[2]).toBe(tile0);
     });
 
-    it('reorders the DOM elements accordingly', function() {
-      var tileGrid = createTileGrid(0);
-      var tile0 = createTile({
+    it('reorders the DOM elements accordingly', () => {
+      let tileGrid = createTileGrid(0);
+      let tile0 = createTile({
         label: 'a'
       });
-      var tile1 = createTile({
+      let tile1 = createTile({
         label: 'b'
       });
-      var tile2 = createTile({
+      let tile2 = createTile({
         label: 'c'
       });
       tileGrid.insertTiles([tile0, tile1, tile2]);
 
-      tileGrid.setComparator(function(t0, t1) {
+      tileGrid.setComparator((t0, t1) => {
         // desc
         return (t0.label < t1.label ? 1 : ((t0.label > t1.label) ? -1 : 0));
       });
@@ -587,7 +583,7 @@ describe('TileGrid', function() {
       expect(tileGrid.filteredTiles[0]).toBe(tile2);
       expect(tileGrid.filteredTiles[1]).toBe(tile1);
       expect(tileGrid.filteredTiles[2]).toBe(tile0);
-      var $tiles = tileGrid.$container.children('.tile');
+      let $tiles = tileGrid.$container.children('.tile');
       expect($tiles.eq(0).data('widget')).toBe(tile2);
       expect($tiles.eq(1).data('widget')).toBe(tile1);
       expect($tiles.eq(2).data('widget')).toBe(tile0);
@@ -595,29 +591,29 @@ describe('TileGrid', function() {
 
   });
 
-  describe('mouseDown', function() {
+  describe('mouseDown', () => {
 
-    describe('with multiSelect = false', function() {
+    describe('with multiSelect = false', () => {
 
-      it('on a deselected tile selects the tile', function() {
-        var tileGrid = createTileGrid(3, {
+      it('on a deselected tile selects the tile', () => {
+        let tileGrid = createTileGrid(3, {
           selectable: true
         });
         tileGrid.render();
-        var tile0 = tileGrid.tiles[0];
+        let tile0 = tileGrid.tiles[0];
 
         tile0.$container.triggerMouseDown();
         expect(tile0.selected).toBe(true);
         expect(tileGrid.selectedTiles.length).toBe(1);
       });
 
-      it('on a deselected tile selects the tile and unselects others', function() {
-        var tileGrid = createTileGrid(3, {
+      it('on a deselected tile selects the tile and unselects others', () => {
+        let tileGrid = createTileGrid(3, {
           selectable: true
         });
         tileGrid.render();
-        var tile0 = tileGrid.tiles[0];
-        var tile1 = tileGrid.tiles[1];
+        let tile0 = tileGrid.tiles[0];
+        let tile1 = tileGrid.tiles[1];
         tileGrid.selectTile(tile1);
         expect(tile1.selected).toBe(true);
 
@@ -627,17 +623,17 @@ describe('TileGrid', function() {
         expect(tileGrid.selectedTiles.length).toBe(1);
       });
 
-      it('on a selected tile does nothing', function() {
-        var tileGrid = createTileGrid(3, {
+      it('on a selected tile does nothing', () => {
+        let tileGrid = createTileGrid(3, {
           selectable: true
         });
         tileGrid.render();
-        var tile0 = tileGrid.tiles[0];
+        let tile0 = tileGrid.tiles[0];
         tileGrid.selectTile(tile0);
         expect(tile0.selected).toBe(true);
 
-        var eventTriggered = false;
-        tileGrid.on('propertyChange', function(event) {
+        let eventTriggered = false;
+        tileGrid.on('propertyChange', event => {
           if (event.propertyName === 'selectedTiles') {
             eventTriggered = true;
           }
@@ -649,12 +645,12 @@ describe('TileGrid', function() {
         expect(eventTriggered).toBe(false);
       });
 
-      it('sets focusedTile property to clicked tile when selected', function() {
-        var tileGrid = createTileGrid(3, {
+      it('sets focusedTile property to clicked tile when selected', () => {
+        let tileGrid = createTileGrid(3, {
           selectable: true
         });
         tileGrid.render();
-        var tile0 = tileGrid.tiles[0];
+        let tile0 = tileGrid.tiles[0];
 
         tile0.$container.triggerMouseDown();
         expect(tile0.selected).toBe(true);
@@ -663,29 +659,29 @@ describe('TileGrid', function() {
 
     });
 
-    describe('with multiSelect = true', function() {
+    describe('with multiSelect = true', () => {
 
-      it('on a deselected tile selects the tile', function() {
-        var tileGrid = createTileGrid(3, {
+      it('on a deselected tile selects the tile', () => {
+        let tileGrid = createTileGrid(3, {
           selectable: true,
           multiSelect: true
         });
         tileGrid.render();
-        var tile0 = tileGrid.tiles[0];
+        let tile0 = tileGrid.tiles[0];
 
         tile0.$container.triggerMouseDown();
         expect(tile0.selected).toBe(true);
         expect(tileGrid.selectedTiles.length).toBe(1);
       });
 
-      it('on a deselected tile selects the tile and unselects others', function() {
-        var tileGrid = createTileGrid(3, {
+      it('on a deselected tile selects the tile and unselects others', () => {
+        let tileGrid = createTileGrid(3, {
           selectable: true,
           multiSelect: true
         });
         tileGrid.render();
-        var tile0 = tileGrid.tiles[0];
-        var tile1 = tileGrid.tiles[1];
+        let tile0 = tileGrid.tiles[0];
+        let tile1 = tileGrid.tiles[1];
         tileGrid.selectTile(tile1);
         expect(tile1.selected).toBe(true);
 
@@ -695,18 +691,18 @@ describe('TileGrid', function() {
         expect(tileGrid.selectedTiles.length).toBe(1);
       });
 
-      it('on a selected tile does nothing', function() {
-        var tileGrid = createTileGrid(3, {
+      it('on a selected tile does nothing', () => {
+        let tileGrid = createTileGrid(3, {
           selectable: true,
           multiSelect: true
         });
         tileGrid.render();
-        var tile0 = tileGrid.tiles[0];
+        let tile0 = tileGrid.tiles[0];
         tileGrid.selectTile(tile0);
         expect(tile0.selected).toBe(true);
 
-        var eventTriggered = false;
-        tileGrid.on('propertyChange', function(event) {
+        let eventTriggered = false;
+        tileGrid.on('propertyChange', event => {
           if (event.propertyName === 'selectedTiles') {
             eventTriggered = true;
           }
@@ -718,14 +714,14 @@ describe('TileGrid', function() {
         expect(eventTriggered).toBe(false);
       });
 
-      it('on a selected tile keeps the selection but deselects others if other tiles are selected', function() {
-        var tileGrid = createTileGrid(3, {
+      it('on a selected tile keeps the selection but deselects others if other tiles are selected', () => {
+        let tileGrid = createTileGrid(3, {
           selectable: true,
           multiSelect: true
         });
         tileGrid.render();
-        var tile0 = tileGrid.tiles[0];
-        var tile1 = tileGrid.tiles[1];
+        let tile0 = tileGrid.tiles[0];
+        let tile1 = tileGrid.tiles[1];
         tileGrid.selectTiles([tile0, tile1]);
         expect(tile0.selected).toBe(true);
         expect(tile1.selected).toBe(true);
@@ -736,16 +732,16 @@ describe('TileGrid', function() {
         expect(tileGrid.selectedTiles.length).toBe(1);
       });
 
-      describe('with CTRL pressed', function() {
+      describe('with CTRL pressed', () => {
 
-        it('on a deselected tile adds the tile to the selection', function() {
-          var tileGrid = createTileGrid(3, {
+        it('on a deselected tile adds the tile to the selection', () => {
+          let tileGrid = createTileGrid(3, {
             selectable: true,
             multiSelect: true
           });
           tileGrid.render();
-          var tile0 = tileGrid.tiles[0];
-          var tile1 = tileGrid.tiles[1];
+          let tile0 = tileGrid.tiles[0];
+          let tile1 = tileGrid.tiles[1];
           tileGrid.selectTile(tile1);
           expect(tile0.selected).toBe(false);
           expect(tile1.selected).toBe(true);
@@ -758,14 +754,14 @@ describe('TileGrid', function() {
           expect(tileGrid.selectedTiles.length).toBe(2);
         });
 
-        it('on a selected tile removes the tile from the selection', function() {
-          var tileGrid = createTileGrid(3, {
+        it('on a selected tile removes the tile from the selection', () => {
+          let tileGrid = createTileGrid(3, {
             selectable: true,
             multiSelect: true
           });
           tileGrid.render();
-          var tile0 = tileGrid.tiles[0];
-          var tile1 = tileGrid.tiles[1];
+          let tile0 = tileGrid.tiles[0];
+          let tile1 = tileGrid.tiles[1];
           tileGrid.selectTiles([tile0, tile1]);
           expect(tile0.selected).toBe(true);
           expect(tile1.selected).toBe(true);
@@ -778,12 +774,12 @@ describe('TileGrid', function() {
           expect(tileGrid.selectedTiles.length).toBe(1);
         });
 
-        it('sets focusedTile property to null when when clicked tile is unselected', function() {
-          var tileGrid = createTileGrid(3, {
+        it('sets focusedTile property to null when when clicked tile is unselected', () => {
+          let tileGrid = createTileGrid(3, {
             selectable: true
           });
           tileGrid.render();
-          var tile0 = tileGrid.tiles[0];
+          let tile0 = tileGrid.tiles[0];
           tileGrid.selectTile(tile0);
           expect(tile0.selected).toBe(true);
 
@@ -800,15 +796,15 @@ describe('TileGrid', function() {
 
   });
 
-  describe('click', function() {
-    it('triggers tileClick', function() {
-      var tileGrid = createTileGrid(3, {
+  describe('click', () => {
+    it('triggers tileClick', () => {
+      let tileGrid = createTileGrid(3, {
         selectable: false
       });
       tileGrid.render();
-      var tile0 = tileGrid.tiles[0];
-      var clickEventCount = 0;
-      tileGrid.on('tileClick', function(event) {
+      let tile0 = tileGrid.tiles[0];
+      let clickEventCount = 0;
+      tileGrid.on('tileClick', event => {
         if (event.tile === tile0 && event.mouseButton === 1) {
           clickEventCount++;
         }
@@ -821,22 +817,22 @@ describe('TileGrid', function() {
       expect(clickEventCount).toBe(1);
     });
 
-    it('triggers tileSelected and tileClick if selectable', function() {
-      var tileGrid = createTileGrid(3, {
+    it('triggers tileSelected and tileClick if selectable', () => {
+      let tileGrid = createTileGrid(3, {
         selectable: true
       });
       tileGrid.render();
-      var tile0 = tileGrid.tiles[0];
-      var clickEventCount = 0;
-      var selectEventCount = 0;
-      var events = [];
-      tileGrid.on('propertyChange', function(event) {
+      let tile0 = tileGrid.tiles[0];
+      let clickEventCount = 0;
+      let selectEventCount = 0;
+      let events = [];
+      tileGrid.on('propertyChange', event => {
         if (event.propertyName === 'selectedTiles') {
           selectEventCount++;
         }
         events.push('select');
       });
-      tileGrid.on('tileClick', function(event) {
+      tileGrid.on('tileClick', event => {
         if (event.tile === tile0 && event.mouseButton === 1) {
           clickEventCount++;
         }
@@ -855,29 +851,29 @@ describe('TileGrid', function() {
       expect(events[1]).toBe('click');
     });
 
-    it('triggers tileAction when clicked twice', function() {
-      var tileGrid = createTileGrid(3, {
+    it('triggers tileAction when clicked twice', () => {
+      let tileGrid = createTileGrid(3, {
         selectable: true
       });
       tileGrid.render();
-      var tile0 = tileGrid.tiles[0];
-      var selectEventCount = 0;
-      var clickEventCount = 0;
-      var actionEventCount = 0;
-      var events = [];
-      tileGrid.on('propertyChange', function(event) {
+      let tile0 = tileGrid.tiles[0];
+      let selectEventCount = 0;
+      let clickEventCount = 0;
+      let actionEventCount = 0;
+      let events = [];
+      tileGrid.on('propertyChange', event => {
         if (event.propertyName === 'selectedTiles') {
           selectEventCount++;
         }
         events.push('select');
       });
-      tileGrid.on('tileClick', function(event) {
+      tileGrid.on('tileClick', event => {
         if (event.tile === tile0) {
           clickEventCount++;
         }
         events.push('click');
       });
-      tileGrid.on('tileAction', function(event) {
+      tileGrid.on('tileAction', event => {
         if (event.tile === tile0) {
           actionEventCount++;
         }
@@ -900,16 +896,14 @@ describe('TileGrid', function() {
     });
   });
 
-  describe('filter', function() {
+  describe('filter', () => {
 
-    it('filters the tiles according to the added filters', function() {
-      var tileGrid = createTileGrid(3);
+    it('filters the tiles according to the added filters', () => {
+      let tileGrid = createTileGrid(3);
       expect(tileGrid.filteredTiles.length).toBe(3);
 
-      var filter1 = {
-        accept: function(tile) {
-          return tile.label.indexOf('1') < 0;
-        }
+      let filter1 = {
+        accept: tile => tile.label.indexOf('1') < 0
       };
       tileGrid.addFilter(filter1);
       tileGrid.filter();
@@ -920,10 +914,8 @@ describe('TileGrid', function() {
       expect(tileGrid.tiles[1].filterAccepted).toBe(false);
       expect(tileGrid.tiles[2].filterAccepted).toBe(true);
 
-      var filter2 = {
-        accept: function(tile) {
-          return tile.label.indexOf('2') < 0;
-        }
+      let filter2 = {
+        accept: tile => tile.label.indexOf('2') < 0
       };
       tileGrid.addFilter(filter2);
       tileGrid.filter();
@@ -964,18 +956,18 @@ describe('TileGrid', function() {
       expect(tileGrid.tiles[2].filterAccepted).toBe(true);
     });
 
-    it('considers newly inserted tiles', function() {
-      var tileGrid = createTileGrid(3);
-      var tile3 = createTile({
+    it('considers newly inserted tiles', () => {
+      let tileGrid = createTileGrid(3);
+      let tile3 = createTile({
         label: 'Tile 3'
       });
-      var tile4 = createTile({
+      let tile4 = createTile({
         label: 'Tile 4'
       });
       expect(tileGrid.tiles.length).toBe(3);
 
-      var filter = {
-        accept: function(tile) {
+      let filter = {
+        accept: tile => {
           // Accept tile 1 and 4 only
           return tile.label.indexOf('1') >= 0 || tile.label.indexOf('4') >= 0;
         }
@@ -997,8 +989,8 @@ describe('TileGrid', function() {
       expect(tileGrid.filteredTiles[1]).toBe(tileGrid.tiles[4]);
     });
 
-    it('deselects not accepted tiles', function() {
-      var tileGrid = createTileGrid(3, {
+    it('deselects not accepted tiles', () => {
+      let tileGrid = createTileGrid(3, {
         selectable: true
       });
       tileGrid.selectTiles([tileGrid.tiles[0], tileGrid.tiles[1]]);
@@ -1007,8 +999,8 @@ describe('TileGrid', function() {
       expect(tileGrid.selectedTiles[0]).toBe(tileGrid.tiles[0]);
       expect(tileGrid.selectedTiles[1]).toBe(tileGrid.tiles[1]);
 
-      var filter = {
-        accept: function(tile) {
+      let filter = {
+        accept: tile => {
           // Accept tile 1 only
           return tile.label.indexOf('1') >= 0;
         }
@@ -1020,10 +1012,10 @@ describe('TileGrid', function() {
       expect(tileGrid.selectedTiles[0]).toBe(tileGrid.tiles[1]);
     });
 
-    it('applies the filters initially, if there is one', function() {
-      var tileGrid = createTileGrid(3, {
+    it('applies the filters initially, if there is one', () => {
+      let tileGrid = createTileGrid(3, {
         filters: [{
-          accept: function(tile) {
+          accept: tile => {
             // Accept tile 1 only
             return tile.label.indexOf('1') >= 0;
           }
@@ -1034,10 +1026,10 @@ describe('TileGrid', function() {
       expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[1]);
     });
 
-    it('applies the filters initially even if every tile is accepted', function() {
-      var tileGrid = createTileGrid(3, {
+    it('applies the filters initially even if every tile is accepted', () => {
+      let tileGrid = createTileGrid(3, {
         filters: [{
-          accept: function(tile) {
+          accept: tile => {
             // Accept all
             return true;
           }
@@ -1050,13 +1042,13 @@ describe('TileGrid', function() {
       expect(tileGrid.filteredTiles[2]).toBe(tileGrid.tiles[2]);
     });
 
-    it('updates empty marker', function() {
-      var tileGrid = createTileGrid(3);
+    it('updates empty marker', () => {
+      let tileGrid = createTileGrid(3);
       tileGrid.render();
       expect(tileGrid.$container).not.toHaveClass('empty');
 
-      var filter = {
-        accept: function(tile) {
+      let filter = {
+        accept: tile => {
           // Accept none
           return false;
         }
@@ -1070,25 +1062,23 @@ describe('TileGrid', function() {
       expect(tileGrid.$container).not.toHaveClass('empty');
     });
 
-    it('still works if moved from one grid to anoter', function() {
-      var tileGrid = createTileGrid();
-      var tile0 = createTile({
+    it('still works if moved from one grid to anoter', () => {
+      let tileGrid = createTileGrid();
+      let tile0 = createTile({
         owner: session.desktop,
         label: 'Tile 0'
       });
-      var tile1 = createTile({
+      let tile1 = createTile({
         owner: session.desktop,
         label: 'Tile 1'
       });
-      var tile2 = createTile({
+      let tile2 = createTile({
         owner: session.desktop,
         label: 'Tile 2'
       });
 
-      var filter1 = {
-        accept: function(tile) {
-          return tile.label.indexOf('1') < 0;
-        }
+      let filter1 = {
+        accept: tile => tile.label.indexOf('1') < 0
       };
       tileGrid.setTiles([tile0, tile1, tile2]);
       tileGrid.addFilter(filter1);
@@ -1103,7 +1093,7 @@ describe('TileGrid', function() {
       tileGrid.deleteAllTiles();
       expect(tileGrid.filteredTiles.length).toBe(0);
 
-      var tileGrid2 = createTileGrid(3);
+      let tileGrid2 = createTileGrid(3);
       tileGrid2.setTiles([tile0, tile1, tile2]);
       tileGrid2.addFilter(filter1);
       tileGrid2.filter();
@@ -1117,29 +1107,23 @@ describe('TileGrid', function() {
 
   });
 
-  describe('addFilters', function() {
+  describe('addFilters', () => {
 
-    it('adds the given filters', function() {
-      var tileGrid = createTileGrid(3);
+    it('adds the given filters', () => {
+      let tileGrid = createTileGrid(3);
 
-      var filter0 = {
-        accept: function(tile) {
-          return tile.label.indexOf('0') < 0;
-        }
+      let filter0 = {
+        accept: tile => tile.label.indexOf('0') < 0
       };
       tileGrid.addFilters([filter0]);
       expect(tileGrid.filters.length).toBe(1);
       expect(tileGrid.filters).toEqual([filter0]);
 
-      var filter1 = {
-        accept: function(tile) {
-          return tile.label.indexOf('1') < 0;
-        }
+      let filter1 = {
+        accept: tile => tile.label.indexOf('1') < 0
       };
-      var filter2 = {
-        accept: function(tile) {
-          return tile.label.indexOf('2') < 0;
-        }
+      let filter2 = {
+        accept: tile => tile.label.indexOf('2') < 0
       };
       tileGrid.addFilters([filter1, filter2]);
       expect(tileGrid.filters.length).toBe(3);
@@ -1153,10 +1137,10 @@ describe('TileGrid', function() {
 
   });
 
-  describe('removeFilters', function() {
+  describe('removeFilters', () => {
 
-    it('invalidates the logical grid', function() {
-      var model = {
+    it('invalidates the logical grid', () => {
+      let model = {
         parent: session.desktop,
         objectType: 'Group',
         body: {
@@ -1164,9 +1148,9 @@ describe('TileGrid', function() {
           tiles: []
         }
       };
-      var group = scout.create(model);
-      var tileGrid = group.body;
-      var tileFilter = scout.create('RemoteTileFilter');
+      let group = scout.create(model);
+      let tileGrid = group.body;
+      let tileFilter = scout.create('RemoteTileFilter');
       tileFilter.setTileIds([4, 5, 6]);
       tileGrid.addFilter(tileFilter);
       group.render();
@@ -1194,23 +1178,17 @@ describe('TileGrid', function() {
       expect(tileGrid.filteredTiles.length).toBe(3);
     });
 
-    it('removes the given filters', function() {
-      var tileGrid = createTileGrid(3);
+    it('removes the given filters', () => {
+      let tileGrid = createTileGrid(3);
 
-      var filter0 = {
-        accept: function(tile) {
-          return tile.label.indexOf('0') < 0;
-        }
+      let filter0 = {
+        accept: tile => tile.label.indexOf('0') < 0
       };
-      var filter1 = {
-        accept: function(tile) {
-          return tile.label.indexOf('1') < 0;
-        }
+      let filter1 = {
+        accept: tile => tile.label.indexOf('1') < 0
       };
-      var filter2 = {
-        accept: function(tile) {
-          return tile.label.indexOf('2') < 0;
-        }
+      let filter2 = {
+        accept: tile => tile.label.indexOf('2') < 0
       };
       tileGrid.setFilters([filter0, filter1, filter2]);
       expect(tileGrid.filters.length).toBe(3);

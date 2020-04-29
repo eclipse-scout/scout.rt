@@ -10,10 +10,10 @@
  */
 import {graphics, NullWidget, scrollbars} from '../../src/index';
 
-describe('scrollbars', function() {
-  var session;
+describe('scrollbars', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
@@ -33,19 +33,19 @@ describe('scrollbars', function() {
       .appendTo($parent);
   }
 
-  describe('onScroll', function() {
+  describe('onScroll', () => {
 
-    it('attaches handler to scrolling parents which execute when scrolling', function() {
-      var exec = false;
-      var handler = function() {
+    it('attaches handler to scrolling parents which execute when scrolling', () => {
+      let exec = false;
+      let handler = () => {
         exec = true;
       };
-      var $container = createScrollable();
-      var $content = scrollbars.install($container, {
+      let $container = createScrollable();
+      let $content = scrollbars.install($container, {
         parent: new NullWidget(),
         session: session
       });
-      var $element = createContent($content);
+      let $element = createContent($content);
 
       scrollbars.onScroll($element, handler);
       $container.scroll();
@@ -54,19 +54,19 @@ describe('scrollbars', function() {
 
   });
 
-  describe('offScroll', function() {
+  describe('offScroll', () => {
 
-    it('detaches handler from scrolling parents', function() {
-      var exec = false;
-      var handler = function() {
+    it('detaches handler from scrolling parents', () => {
+      let exec = false;
+      let handler = () => {
         exec = true;
       };
-      var $container = createScrollable();
-      var $content = scrollbars.install($container, {
+      let $container = createScrollable();
+      let $content = scrollbars.install($container, {
         parent: new NullWidget(),
         session: session
       });
-      var $element = createContent($content);
+      let $element = createContent($content);
 
       scrollbars.onScroll($element, handler);
       $container.scroll();
@@ -80,10 +80,10 @@ describe('scrollbars', function() {
 
   });
 
-  describe('isLocationInView', function() {
-    var $scrollable, scrollableBounds, $element;
+  describe('isLocationInView', () => {
+    let $scrollable, scrollableBounds, $element;
 
-    beforeEach(function() {
+    beforeEach(() => {
       $scrollable = createScrollable();
       scrollableBounds = graphics.offsetBounds($scrollable);
       $element = $('<div>')
@@ -93,53 +93,53 @@ describe('scrollbars', function() {
         .appendTo($('#sandbox'));
     });
 
-    it('returns true if the given location is inside the given $scrollable', function() {
+    it('returns true if the given location is inside the given $scrollable', () => {
       $element
         .cssLeft(scrollableBounds.x)
         .cssTop(scrollableBounds.y);
-      var bounds = graphics.offsetBounds($element);
+      let bounds = graphics.offsetBounds($element);
       expect(scrollbars.isLocationInView(bounds, $scrollable)).toBe(true);
     });
 
-    it('returns false if x of the given location is outside of the given $scrollable (smaller)', function() {
+    it('returns false if x of the given location is outside of the given $scrollable (smaller)', () => {
       $element
         .cssLeft(scrollableBounds.x - 1)
         .cssTop(scrollableBounds.y);
-      var bounds = graphics.offsetBounds($element);
+      let bounds = graphics.offsetBounds($element);
       expect(scrollbars.isLocationInView(bounds, $scrollable)).toBe(false);
     });
 
-    it('returns false if y of the given location is outside of the given $scrollable (smaller)', function() {
+    it('returns false if y of the given location is outside of the given $scrollable (smaller)', () => {
       $element
         .cssLeft(scrollableBounds.x)
         .cssTop(scrollableBounds.y - 1);
-      var bounds = graphics.offsetBounds($element);
+      let bounds = graphics.offsetBounds($element);
       expect(scrollbars.isLocationInView(bounds, $scrollable)).toBe(false);
     });
 
-    it('returns false if x of the given location is outside of the given $scrollable (greater)', function() {
+    it('returns false if x of the given location is outside of the given $scrollable (greater)', () => {
       $element
         .cssLeft(scrollableBounds.x + scrollableBounds.width + 1)
         .cssTop(scrollableBounds.y);
-      var bounds = graphics.offsetBounds($element);
+      let bounds = graphics.offsetBounds($element);
       expect(scrollbars.isLocationInView(bounds, $scrollable)).toBe(false);
     });
 
-    it('returns false if y of the given location is outside of the given $scrollable (greater)', function() {
+    it('returns false if y of the given location is outside of the given $scrollable (greater)', () => {
       $element
         .cssLeft(scrollableBounds.x)
         .cssTop(scrollableBounds.y + scrollableBounds.height + 1);
-      var bounds = graphics.offsetBounds($element);
+      let bounds = graphics.offsetBounds($element);
       expect(scrollbars.isLocationInView(bounds, $scrollable)).toBe(false);
     });
 
   });
 
-  describe('render', function() {
+  describe('render', () => {
 
-    it('ensures parent has position absolute or relative', function() {
+    it('ensures parent has position absolute or relative', () => {
       // Create scrollable without explicit position
-      var $scrollable = $('<div>')
+      let $scrollable = $('<div>')
         .css('height', '50px')
         .css('width', '200px')
         .appendTo($('#sandbox'));
@@ -178,7 +178,7 @@ describe('scrollbars', function() {
 
       // Simulate "attach" lifecycle of widget
       $scrollable.appendTo($('#sandbox'));
-      $scrollable.data('scrollbars').forEach(function(scrollbar) {
+      $scrollable.data('scrollbars').forEach(scrollbar => {
         scrollbar.attached = false;
         scrollbar.attach();
       });

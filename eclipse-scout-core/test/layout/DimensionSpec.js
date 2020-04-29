@@ -20,27 +20,27 @@ import {Dimension} from '../../src/index';
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-describe('Dimension', function() {
+describe('Dimension', () => {
 
-  it('accepts two numbers as width and height arguments', function() {
-    var dim = new Dimension(6, 7);
+  it('accepts two numbers as width and height arguments', () => {
+    let dim = new Dimension(6, 7);
     expect(dim.width).toBe(6);
     expect(dim.height).toBe(7);
   });
 
-  it('accepts a single Dimension argument', function() {
-    var dim1 = new Dimension(6, 7);
-    var dim2 = new Dimension(dim1);
+  it('accepts a single Dimension argument', () => {
+    let dim1 = new Dimension(6, 7);
+    let dim2 = new Dimension(dim1);
     expect(dim2.width).toBe(6);
     expect(dim2.height).toBe(7);
     expect(dim1).toEqual(dim2);
   });
 
-  it('equals', function() {
-    var d1 = new Dimension(10, 5);
-    var d2 = new Dimension(20, 20);
-    var d3 = new Dimension(d2);
-    var d4 = new Dimension(10.2, 5.9);
+  it('equals', () => {
+    let d1 = new Dimension(10, 5);
+    let d2 = new Dimension(20, 20);
+    let d3 = new Dimension(d2);
+    let d4 = new Dimension(10.2, 5.9);
 
     expect(d1.equals(d2)).toBe(false);
     expect(d2.equals(d3)).toBe(true);

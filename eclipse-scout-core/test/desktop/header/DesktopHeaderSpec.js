@@ -11,10 +11,10 @@
 import {scout} from '../../../src/index';
 import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
 
-describe('DesktopHeader', function() {
-  var helper, session, desktop, formHelper;
+describe('DesktopHeader', () => {
+  let helper, session, desktop, formHelper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession({
       desktop: {
@@ -29,15 +29,15 @@ describe('DesktopHeader', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
-  describe('onBenchOutlineContentChange', function() {
-    var outline, bench, model, node0, node1;
+  describe('onBenchOutlineContentChange', () => {
+    let outline, bench, model, node0, node1;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(3, 2, true);
       outline = helper.createOutline(model);
       node0 = outline.nodes[0];
@@ -56,21 +56,21 @@ describe('DesktopHeader', function() {
       desktop.setOutline(outline);
     });
 
-    it('attaches listener to new outline content', function() {
-      var detailForm0MenuBar = node0.detailForm.rootGroupBox.menuBar;
-      var detailForm1MenuBar = node1.detailForm.rootGroupBox.menuBar;
-      var listenerCount0 = detailForm0MenuBar.events.count('propertyChange');
-      var listenerCount1 = detailForm1MenuBar.events.count('propertyChange');
+    it('attaches listener to new outline content', () => {
+      let detailForm0MenuBar = node0.detailForm.rootGroupBox.menuBar;
+      let detailForm1MenuBar = node1.detailForm.rootGroupBox.menuBar;
+      let listenerCount0 = detailForm0MenuBar.events.count('propertyChange');
+      let listenerCount1 = detailForm1MenuBar.events.count('propertyChange');
       outline.selectNodes(node0);
       expect(detailForm0MenuBar.events.count('propertyChange')).toBe(listenerCount0 + 1);
       expect(detailForm1MenuBar.events.count('propertyChange')).toBe(listenerCount1);
     });
 
-    it('removes listener from old outline content', function() {
-      var detailForm0MenuBar = node0.detailForm.rootGroupBox.menuBar;
-      var detailForm1MenuBar = node1.detailForm.rootGroupBox.menuBar;
-      var listenerCount0 = detailForm0MenuBar.events.count('propertyChange');
-      var listenerCount1 = detailForm1MenuBar.events.count('propertyChange');
+    it('removes listener from old outline content', () => {
+      let detailForm0MenuBar = node0.detailForm.rootGroupBox.menuBar;
+      let detailForm1MenuBar = node1.detailForm.rootGroupBox.menuBar;
+      let listenerCount0 = detailForm0MenuBar.events.count('propertyChange');
+      let listenerCount1 = detailForm1MenuBar.events.count('propertyChange');
       outline.selectNodes(node0);
       expect(detailForm0MenuBar.events.count('propertyChange')).toBe(listenerCount0 + 1);
       expect(detailForm1MenuBar.events.count('propertyChange')).toBe(listenerCount1);
@@ -84,9 +84,9 @@ describe('DesktopHeader', function() {
       expect(detailForm1MenuBar.events.count('propertyChange')).toBe(listenerCount1);
     });
 
-    it('removes listener when getting removed', function() {
-      var detailForm0MenuBar = node0.detailForm.rootGroupBox.menuBar;
-      var listenerCount0 = detailForm0MenuBar.events.count('propertyChange');
+    it('removes listener when getting removed', () => {
+      let detailForm0MenuBar = node0.detailForm.rootGroupBox.menuBar;
+      let listenerCount0 = detailForm0MenuBar.events.count('propertyChange');
       outline.selectNodes(node0);
       expect(detailForm0MenuBar.events.count('propertyChange')).toBe(listenerCount0 + 1);
 

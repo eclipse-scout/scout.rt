@@ -56,14 +56,14 @@ export default class TableLayoutResetter {
    * which is used to restore the CSS property later.
    */
   _cssBackup($element, property) {
-    var oldValue = $element.css(property);
+    let oldValue = $element.css(property);
     $element
       .css(property, '')
       .data('backup' + property, oldValue);
   }
 
   _cssRestore($element, property) {
-    var dataProperty = 'backup' + property,
+    let dataProperty = 'backup' + property,
       oldValue = $element.data(dataProperty);
     $element
       .css(property, oldValue)
@@ -74,12 +74,12 @@ export default class TableLayoutResetter {
    * Go through all rows and cells and call the given modifyFunc (backup/restore) on each element.
    */
   _modifyTableData(modifyFunc) {
-    var that = this;
+    let that = this;
     this._table.$rows().each(function() {
-      var $row = $(this);
+      let $row = $(this);
       modifyFunc($row, 'width');
       that._table.$cellsForRow($row).each(function() {
-        var $cell = $(this);
+        let $cell = $(this);
         modifyFunc($cell, 'min-width');
         modifyFunc($cell, 'max-width');
       });

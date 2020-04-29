@@ -66,7 +66,7 @@ export function prefSize($elem, options) {
     options = options || {};
   }
 
-  var defaults = {
+  let defaults = {
     includeMargin: false,
     useCssSize: false,
     widthHint: undefined,
@@ -79,9 +79,9 @@ export function prefSize($elem, options) {
     return prefSizeWithoutAnimation($elem, options);
   }
 
-  var oldStyle = $elem.attr('style');
-  var oldScrollLeft = $elem.scrollLeft();
-  var oldScrollTop = $elem.scrollTop();
+  let oldStyle = $elem.attr('style');
+  let oldScrollLeft = $elem.scrollLeft();
+  let oldScrollTop = $elem.scrollTop();
 
   if (options.restoreScrollPositions) {
     scrollbars.storeScrollPositions($elem);
@@ -89,10 +89,10 @@ export function prefSize($elem, options) {
 
   // UseCssSize is necessary if the css rules have a fix height or width set.
   // Otherwise setting the width/height to auto could result in a different size
-  var newWidth = (options.useCssSize ? '' : scout.nvl(options.widthHint, 'auto'));
-  var newHeight = (options.useCssSize ? '' : scout.nvl(options.heightHint, 'auto'));
+  let newWidth = (options.useCssSize ? '' : scout.nvl(options.widthHint, 'auto'));
+  let newHeight = (options.useCssSize ? '' : scout.nvl(options.heightHint, 'auto'));
 
-  var cssProperties = {
+  let cssProperties = {
     'width': newWidth,
     'height': newHeight
   };
@@ -109,8 +109,8 @@ export function prefSize($elem, options) {
   $elem.css(cssProperties);
 
   // measure
-  var bcr = $elem[0].getBoundingClientRect();
-  var prefSize = new Dimension(bcr.width, bcr.height);
+  let bcr = $elem[0].getBoundingClientRect();
+  let prefSize = new Dimension(bcr.width, bcr.height);
   if (options.includeMargin) {
     prefSize.width += $elem.cssMarginX();
     prefSize.height += $elem.cssMarginY();
@@ -141,7 +141,7 @@ export function prefSize($elem, options) {
  *    Firefox & Chrome     <div id="elem" style="height: 345.24px">     [Fractional part rounded to three digits]
  */
 export function exactPrefSize(prefSize, options) {
-  var exact = scout.nvl(options.exact, false);
+  let exact = scout.nvl(options.exact, false);
   if (!exact) {
     prefSize.width = Math.ceil(prefSize.width);
     prefSize.height = Math.ceil(prefSize.height);
@@ -155,8 +155,8 @@ export function exactPrefSize(prefSize, options) {
  * If prefSize is called during the animation, the current size is returned instead of the one after the animation.
  */
 export function prefSizeWithoutAnimation($elem, options) {
-  var animateClasses = arrays.ensure(options.animateClasses);
-  animateClasses = animateClasses.filter(function(cssClass) {
+  let animateClasses = arrays.ensure(options.animateClasses);
+  animateClasses = animateClasses.filter(cssClass => {
     return $elem.hasClass(cssClass);
   });
   options = $.extend({}, options);
@@ -167,11 +167,11 @@ export function prefSizeWithoutAnimation($elem, options) {
   }
 
   animateClasses = arrays.format(animateClasses, ' ');
-  var $clone = $elem
+  let $clone = $elem
     .clone()
     .removeClass(animateClasses)
     .appendTo($elem.parent());
-  var prefSizeResult = prefSize($clone, options);
+  let prefSizeResult = prefSize($clone, options);
   $clone.remove();
   return prefSizeResult;
 }
@@ -209,15 +209,15 @@ export function size($elem, options) {
     options = options || {};
   }
 
-  var bcr = $elem[0].getBoundingClientRect();
-  var size = new Dimension(bcr.width, bcr.height);
-  var includeMargin = scout.nvl(options.includeMargin, false);
+  let bcr = $elem[0].getBoundingClientRect();
+  let size = new Dimension(bcr.width, bcr.height);
+  let includeMargin = scout.nvl(options.includeMargin, false);
   if (includeMargin) {
     size.width += $elem.cssMarginX();
     size.height += $elem.cssMarginY();
   }
   // see comments in prefSize()
-  var exact = scout.nvl(options.exact, false);
+  let exact = scout.nvl(options.exact, false);
   if (!exact) {
     size.width = Math.ceil(size.width);
     size.height = Math.ceil(size.height);
@@ -247,7 +247,7 @@ export function cssMinSize($elem) {
 }
 
 export function setSize($comp, vararg, height) {
-  var size = vararg instanceof Dimension ?
+  let size = vararg instanceof Dimension ?
     vararg : new Dimension(vararg, height);
   $comp
     .cssWidth(size.width)
@@ -280,7 +280,7 @@ export function insets($comp, options) {
     options = options || {};
   }
 
-  var i,
+  let i,
     directions = ['top', 'right', 'bottom', 'left'],
     insets = [0, 0, 0, 0],
     includeMargin = scout.nvl(options.includeMargin, false),
@@ -341,7 +341,7 @@ export function borders($comp) {
  * @returns
  */
 export function setLocation($comp, vararg, y) {
-  var point = vararg instanceof Point ?
+  let point = vararg instanceof Point ?
     vararg : new Point(vararg, y);
   $comp
     .cssLeft(point.x)
@@ -380,7 +380,7 @@ export function bounds($elem, options) {
  * @returns {Point} the position relative to the offset parent ($elem.position()).
  */
 export function position($elem) {
-  var pos = $elem.position();
+  let pos = $elem.position();
   return new Point(pos.left, pos.top);
 }
 
@@ -408,17 +408,17 @@ export function offsetBounds($elem, options) {
  * @returns {Point} the position relative to the document ($elem.offset()).
  */
 export function offset($elem) {
-  var pos = $elem.offset();
+  let pos = $elem.offset();
   return new Point(pos.left, pos.top);
 }
 
 export function _bounds($elem, pos, options) {
-  var s = size($elem, options);
+  let s = size($elem, options);
   return new Rectangle(pos.left, pos.top, s.width, s.height);
 }
 
 export function setBounds($comp, vararg, y, width, height) {
-  var bounds = vararg instanceof Rectangle ?
+  let bounds = vararg instanceof Rectangle ?
     vararg : new Rectangle(vararg, y, width, height);
   $comp
     .cssLeft(bounds.x)
@@ -442,7 +442,7 @@ export function debugOutput($comp) {
   if ($comp.length === 0) {
     return '$comp doesn\t match any elements';
   }
-  var attrs = '';
+  let attrs = '';
   if ($comp.attr('id')) {
     attrs += 'id=' + $comp.attr('id');
   }
@@ -453,7 +453,7 @@ export function debugOutput($comp) {
     attrs += ' data-modelclass=' + $comp.attr('data-modelclass');
   }
   if (attrs.length === 0) {
-    var html = scout.nvl($comp.html(), '');
+    let html = scout.nvl($comp.html(), '');
     if (html.length > 30) {
       html = html.substring(0, 30) + '...';
     }

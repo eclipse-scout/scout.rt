@@ -84,15 +84,15 @@ export default class KeyStrokeContext {
    * Sets the propagation flags to the given event.
    */
   _applyPropagationFlags(event) {
-    var modifierBitMask = keyStrokeModifier.toModifierBitMask(event);
-    var keys = this._stopPropagationKeys[modifierBitMask];
+    let modifierBitMask = keyStrokeModifier.toModifierBitMask(event);
+    let keys = this._stopPropagationKeys[modifierBitMask];
 
     if (keys && scout.isOneOf(event.which, keys)) {
       event.stopPropagation();
     }
 
     // Let registered interceptors participate.
-    this.stopPropagationInterceptors.forEach(function(interceptor) {
+    this.stopPropagationInterceptors.forEach(interceptor => {
       interceptor(event);
     }, this);
   }

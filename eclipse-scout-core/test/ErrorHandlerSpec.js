@@ -10,20 +10,73 @@
  */
 import {scout} from '../src/index';
 
-describe('ErrorHandler', function() {
+describe('ErrorHandler', () => {
 
-  var errorHandler;
+  let errorHandler;
 
-  beforeEach(function() {
+  beforeEach(() => {
     errorHandler = scout.create('ErrorHandler');
   });
 
-  describe('analyzeError', function() {
+  describe('handle', () => {
+    it('accepts individually passed arguments', done => {
+      errorHandler = scout.create('ErrorHandler');
+      spyOn(errorHandler, 'analyzeError').and.callThrough();
 
-    it('can handle errors', function(done) {
-      var error = new TypeError('Oops, wrong type!');
+      let deferred = $.Deferred();
+      deferred.promise().then(() => {
+        return $.rejectedPromise('err', 'a', 'b');
+      }).catch((...args) => {
+        // eslint-disable-next-line prefer-rest-params
+        return errorHandler.handle(...args);
+      }).then(() => {
+        expect(errorHandler.analyzeError).toHaveBeenCalledWith('err', 'a', 'b');
+        done();
+      });
+      deferred.resolve();
+    });
+
+    it('accepts argument like object as first param', done => {
+      errorHandler = scout.create('ErrorHandler');
+      spyOn(errorHandler, 'analyzeError').and.callThrough();
+
+      let deferred = $.Deferred();
+      deferred.promise().then(() => {
+        return $.rejectedPromise('err', 'a', 'b');
+      }).catch(function() {
+        // eslint-disable-next-line prefer-rest-params
+        return errorHandler.handle(arguments);
+      }).then(() => {
+        expect(errorHandler.analyzeError).toHaveBeenCalledWith('err', 'a', 'b');
+        done();
+      });
+      deferred.resolve();
+    });
+
+    it('accepts array as first param', done => {
+      errorHandler = scout.create('ErrorHandler');
+      spyOn(errorHandler, 'analyzeError').and.callThrough();
+
+      let deferred = $.Deferred();
+      deferred.promise().then(() => {
+        return $.rejectedPromise('err', 'a', 'b');
+      }).catch((...args) => {
+        // eslint-disable-next-line prefer-rest-params
+        return errorHandler.handle(args);
+      }).then(() => {
+        expect(errorHandler.analyzeError).toHaveBeenCalledWith('err', 'a', 'b');
+        done();
+      });
+      deferred.resolve();
+    });
+  });
+
+  describe('analyzeError', () => {
+
+    it('can handle errors', done => {
+      let error = new TypeError('Oops, wrong type!');
       error.debugInfo = 'Dummy error';
-      errorHandler.analyzeError(error).then(function(errorInfo) {
+      errorHandler.analyzeError(error).then(errorInfo => {
         expect(errorInfo.code).toBe('T6');
         expect(errorInfo.message).toBe('Oops, wrong type!');
         expect(errorInfo.debugInfo).toBe('Dummy error');
@@ -31,21 +84,21 @@ describe('ErrorHandler', function() {
       }).always(done);
     });
 
-    it('can handle jQuery AJAX errors', function(done) {
-      var fakeXHR = {
+    it('can handle jQuery AJAX errors', done => {
+      let fakeXHR = {
         readyState: 4,
         status: 404,
         statusText: 'Not found'
       };
 
-      var promises = [];
-      promises.push(errorHandler.analyzeError(fakeXHR).then(function(errorInfo) {
+      let promises = [];
+      promises.push(errorHandler.analyzeError(fakeXHR).then(errorInfo => {
         expect(errorInfo.code).toBe('X404');
         expect(errorInfo.message).toBe('AJAX call failed [404]');
         expect(errorInfo.log).toContain('AJAX call failed [404]');
       }));
 
-      promises.push(errorHandler.analyzeError([fakeXHR]).then(function(errorInfo) {
+      promises.push(errorHandler.analyzeError([fakeXHR]).then(errorInfo => {
         expect(errorInfo.code).toBe('X404');
         expect(errorInfo.message).toBe('AJAX call failed [404]');
         expect(errorInfo.log).toContain('AJAX call failed [404]');
@@ -56,7 +109,7 @@ describe('ErrorHandler', function() {
       promises.push(errorHandler.analyzeError(fakeXHR, 'error', 'Internal Server Error', {
         type: 'POST',
         url: 'http://server.example/service'
-      }).then(function(errorInfo) {
+      }).then(errorInfo => {
         expect(errorInfo.code).toBe('X500');
         expect(errorInfo.message).toBe('AJAX call "POST http://server.example/service" failed [500 Internal Server Error]');
         expect(errorInfo.log).toContain('AJAX call "POST http://server.example/service" failed [500 Internal Server Error]');
@@ -65,45 +118,45 @@ describe('ErrorHandler', function() {
       $.promiseAll(promises).always(done);
     });
 
-    it('can handle no arguments', function(done) {
-      errorHandler.analyzeError().then(function(errorInfo) {
+    it('can handle no arguments', done => {
+      errorHandler.analyzeError().then(errorInfo => {
         expect(errorInfo.code).toBe('P3');
         expect(errorInfo.message).toBe('Unknown error');
         expect(errorInfo.log).toContain('Unexpected error (no reason provided)');
       }).always(done);
     });
 
-    it('can handle arbitrary error objects', function(done) {
-      var promises = [];
+    it('can handle arbitrary error objects', done => {
+      let promises = [];
       promises.push(errorHandler.analyzeError({
         exception: 'it does not work'
-      }).then(function(errorInfo) {
+      }).then(errorInfo => {
         expect(errorInfo.code).toBe('P4');
         expect(errorInfo.message).toBe('Unexpected error');
         expect(errorInfo.log).toContain('Unexpected error: {"exception":"it does not work"}');
       }));
 
-      var cyclicObject = {};
+      let cyclicObject = {};
       cyclicObject.ref = cyclicObject;
-      promises.push(errorHandler.analyzeError(cyclicObject).then(function(errorInfo) {
+      promises.push(errorHandler.analyzeError(cyclicObject).then(errorInfo => {
         expect(errorInfo.code).toBe('P4');
         expect(errorInfo.message).toBe('Unexpected error');
         expect(errorInfo.log).toContain('Unexpected error: [object Object]');
       }));
 
-      promises.push(errorHandler.analyzeError('still broken').then(function(errorInfo) {
+      promises.push(errorHandler.analyzeError('still broken').then(errorInfo => {
         expect(errorInfo.code).toBe('P4');
         expect(errorInfo.message).toBe('still broken');
         expect(errorInfo.log).toContain('Unexpected error: still broken');
       }));
 
-      promises.push(errorHandler.analyzeError(['a', 2, new Date()]).then(function(errorInfo) {
+      promises.push(errorHandler.analyzeError(['a', 2, new Date()]).then(errorInfo => {
         expect(errorInfo.code).toBe('P4');
         expect(errorInfo.message).toBe('Unexpected error');
         expect(errorInfo.log).toContain('Unexpected error: ["a",2,');
       }));
 
-      promises.push(errorHandler.analyzeError(1234567890).then(function(errorInfo) {
+      promises.push(errorHandler.analyzeError(1234567890).then(errorInfo => {
         expect(errorInfo.code).toBe('P4');
         expect(errorInfo.message).toBe('1234567890');
         expect(errorInfo.log).toContain('Unexpected error: 1234567890');

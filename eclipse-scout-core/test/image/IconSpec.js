@@ -10,19 +10,19 @@
  */
 import {icons, scout} from '../../src/index';
 
-describe('Icon', function() {
+describe('Icon', () => {
 
-  var session;
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  describe('render', function() {
+  describe('render', () => {
 
-    it('creates a span if it is a font icon', function() {
-      var icon = scout.create('Icon', {
+    it('creates a span if it is a font icon', () => {
+      let icon = scout.create('Icon', {
         parent: session.desktop,
         iconDesc: icons.INFO
       });
@@ -30,8 +30,8 @@ describe('Icon', function() {
       expect(icon.$container[0].tagName).toBe('SPAN');
     });
 
-    it('creates an img if it is an image icon', function() {
-      var icon = scout.create('Icon', {
+    it('creates an img if it is an image icon', () => {
+      let icon = scout.create('Icon', {
         parent: session.desktop,
         iconDesc: 'icon/image.png'
       });
@@ -41,10 +41,10 @@ describe('Icon', function() {
 
   });
 
-  describe('setIconDesc', function() {
+  describe('setIconDesc', () => {
 
-    it('accepts a string representing the iconId', function() {
-      var icon = scout.create('Icon', {
+    it('accepts a string representing the iconId', () => {
+      let icon = scout.create('Icon', {
         parent: session.desktop,
         iconDesc: 'icon/image.png'
       });
@@ -54,8 +54,8 @@ describe('Icon', function() {
       expect(icon.iconDesc.iconUrl).toBe('icon/image2.png');
     });
 
-    it('accepts a scout.IconDesc', function() {
-      var icon = scout.create('Icon', {
+    it('accepts a scout.IconDesc', () => {
+      let icon = scout.create('Icon', {
         parent: session.desktop,
         iconDesc: icons.parseIconId('icon/image.png')
       });

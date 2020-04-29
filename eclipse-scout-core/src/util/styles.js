@@ -21,15 +21,15 @@ let element = null;
  * The style is cached. Subsequent calls with the same css class will return the same style object.
  */
 export function get(cssClass, properties, additionalClass) {
-  var style = styleMap[cssClass];
+  let style = styleMap[cssClass];
   // ensure array
   properties = arrays.ensure(properties);
-  properties = properties.map(function(prop) {
+  properties = properties.map(prop => {
     return {
       name: prop,
       // replace property names like 'max-width' in 'maxWidth'
       nameCamelCase: prop.replace(/-(.)/g,
-        function(match, p1) {
+        (match, p1) => {
           return p1.toUpperCase();
         })
     };
@@ -41,7 +41,7 @@ export function get(cssClass, properties, additionalClass) {
     put(cssClass, style);
   }
 
-  var notResolvedProperties = properties.filter(function(prop) {
+  let notResolvedProperties = properties.filter(prop => {
     return !(prop.nameCamelCase in style);
   });
   if (notResolvedProperties.length === 0) {
@@ -49,7 +49,7 @@ export function get(cssClass, properties, additionalClass) {
   }
 
   // resolve missing properties
-  var elem = element;
+  let elem = element;
   if (!elem) {
     elem = window.document.createElement('div');
     elem.style.display = 'none';
@@ -60,8 +60,8 @@ export function get(cssClass, properties, additionalClass) {
   if (additionalClass) {
     elem.className += ' ' + additionalClass;
   }
-  var computedStyle = window.getComputedStyle(elem);
-  notResolvedProperties.forEach(function(property) {
+  let computedStyle = window.getComputedStyle(elem);
+  notResolvedProperties.forEach(property => {
     style[property.nameCamelCase] = computedStyle[property.name];
   });
   elem.className = '';
@@ -70,7 +70,7 @@ export function get(cssClass, properties, additionalClass) {
 }
 
 export function getSize(cssClass, cssProperty, property, defaultSize, additionalClass) {
-  var size = get(cssClass, cssProperty, additionalClass)[property];
+  let size = get(cssClass, cssProperty, additionalClass)[property];
   if ('auto' === size) {
     return defaultSize;
   }
@@ -105,7 +105,7 @@ export function rgb(rgbString) {
   if (!rgbString) {
     return undefined;
   }
-  var rgbVal = rgbString.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+),?(\d+(\.\d+)?)?/i);
+  let rgbVal = rgbString.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+),?(\d+(\.\d+)?)?/i);
   if (rgbVal === null) {
     return undefined;
   }
@@ -129,7 +129,7 @@ export function rgb(rgbString) {
  *          Default is 0.2.
  */
 export function darkerColor(color, ratio) {
-  var rgbVal = rgb(color);
+  let rgbVal = rgb(color);
   if (!rgbVal) {
     return undefined;
   }
@@ -149,7 +149,7 @@ export function darkerColor(color, ratio) {
  *          Default is 0.2.
  */
 export function lighterColor(color, ratio) {
-  var rgbVal = rgb(color);
+  let rgbVal = rgb(color);
   if (!rgbVal) {
     return undefined;
   }
@@ -199,11 +199,11 @@ export function mergeRgbColors(color1, ratio1, color2, ratio2) {
  * Example: Dialog-PLAIN-12
  */
 export function parseFontSpec(pattern) {
-  var fontSpec = {};
+  let fontSpec = {};
   if (strings.hasText(pattern)) {
-    var tokens = pattern.split(/[-_,/.;]/);
-    for (var i = 0; i < tokens.length; i++) {
-      var token = tokens[i].toUpperCase();
+    let tokens = pattern.split(/[-_,/.;]/);
+    for (let i = 0; i < tokens.length; i++) {
+      let token = tokens[i].toUpperCase();
       // styles
       if (token === 'NULL' || token === '0') {
         // nop (undefined values)
@@ -230,7 +230,7 @@ export function modelToCssColor(color) {
   if (!color) { // prevent conversion from null to 'null' by regex
     return '';
   }
-  var cssColor = '';
+  let cssColor = '';
   if (/^[A-Fa-f0-9]{3}([A-Fa-f0-9]{3})?$/.test(color)) { // hex color
     cssColor = '#' + color;
   } else if (/^[A-Za-z0-9().,%-]+$/.test(color)) { // named colors or color functions
@@ -252,7 +252,7 @@ export function modelToCssColor(color) {
  * just font, backgroundColor and foregroundColor.
  */
 export function legacyStyle(obj, $element, propertyPrefix) {
-  var style = '';
+  let style = '';
   style += legacyForegroundColor(obj, $element, propertyPrefix);
   style += legacyBackgroundColor(obj, $element, propertyPrefix);
   style += legacyFont(obj, $element, propertyPrefix);
@@ -262,15 +262,15 @@ export function legacyStyle(obj, $element, propertyPrefix) {
 export function legacyForegroundColor(obj, $element, propertyPrefix) {
   propertyPrefix = propertyPrefix || '';
 
-  var cssColor = '';
+  let cssColor = '';
   if (obj) {
-    var foregroundColorProperty = strings.lowercaseFirstLetter(propertyPrefix + 'ForegroundColor');
+    let foregroundColorProperty = strings.lowercaseFirstLetter(propertyPrefix + 'ForegroundColor');
     cssColor = modelToCssColor(obj[foregroundColorProperty]);
   }
   if ($element) {
     $element.css('color', cssColor);
   }
-  var style = '';
+  let style = '';
   if (cssColor) {
     style += 'color: ' + cssColor + '; ';
   }
@@ -280,15 +280,15 @@ export function legacyForegroundColor(obj, $element, propertyPrefix) {
 export function legacyBackgroundColor(obj, $element, propertyPrefix) {
   propertyPrefix = propertyPrefix || '';
 
-  var cssBackgroundColor = '';
+  let cssBackgroundColor = '';
   if (obj) {
-    var backgroundColorProperty = strings.lowercaseFirstLetter(propertyPrefix + 'BackgroundColor');
+    let backgroundColorProperty = strings.lowercaseFirstLetter(propertyPrefix + 'BackgroundColor');
     cssBackgroundColor = modelToCssColor(obj[backgroundColorProperty]);
   }
   if ($element) {
     $element.css('background-color', cssBackgroundColor);
   }
-  var style = '';
+  let style = '';
   if (cssBackgroundColor) {
     style += 'background-color: ' + cssBackgroundColor + '; ';
   }
@@ -298,13 +298,13 @@ export function legacyBackgroundColor(obj, $element, propertyPrefix) {
 export function legacyFont(obj, $element, propertyPrefix) {
   propertyPrefix = propertyPrefix || '';
 
-  var cssFontWeight = '';
-  var cssFontStyle = '';
-  var cssFontSize = '';
-  var cssFontFamily = '';
+  let cssFontWeight = '';
+  let cssFontStyle = '';
+  let cssFontSize = '';
+  let cssFontFamily = '';
   if (obj) {
-    var fontProperty = strings.lowercaseFirstLetter(propertyPrefix + 'Font');
-    var fontSpec = parseFontSpec(obj[fontProperty]);
+    let fontProperty = strings.lowercaseFirstLetter(propertyPrefix + 'Font');
+    let fontSpec = parseFontSpec(obj[fontProperty]);
     if (fontSpec.bold) {
       cssFontWeight = 'bold';
     }
@@ -325,7 +325,7 @@ export function legacyFont(obj, $element, propertyPrefix) {
       .css('font-size', cssFontSize)
       .css('font-family', cssFontFamily);
   }
-  var style = '';
+  let style = '';
   if (cssFontWeight) {
     style += 'font-weight: ' + cssFontWeight + '; ';
   }

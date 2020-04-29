@@ -12,10 +12,10 @@ import {scout} from '../index';
 
 export function get(name, doc) {
   doc = doc || document;
-  var prefix = name + '=';
-  var cookies = doc.cookie.split(';');
-  for (var i = 0; i < cookies.length; i++) {
-    var cookie = cookies[i].trim();
+  let prefix = name + '=';
+  let cookies = doc.cookie.split(';');
+  for (let i = 0; i < cookies.length; i++) {
+    let cookie = cookies[i].trim();
     if (cookie.indexOf(prefix) === 0) {
       return cookie.substring(prefix.length);
     }
@@ -32,9 +32,9 @@ export function set(name, value, maxAge, path) {
   value = scout.nvl(value, '');
   maxAge = scout.nvl(maxAge, -1);
 
-  var cookie = name + '=' + value;
+  let cookie = name + '=' + value;
   if (maxAge > -1) {
-    var expires = new Date();
+    let expires = new Date();
     expires.setTime(expires.getTime() + maxAge * 1000);
     cookie += ';max-age=' + maxAge + ';expires=' + expires;
   }

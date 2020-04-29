@@ -10,15 +10,15 @@
  */
 import {CheckBoxField, ValueField} from '../../../../src/index';
 
-describe('CheckBoxFieldWithTriState', function() {
+describe('CheckBoxFieldWithTriState', () => {
 
-  describe('inheritance', function() {
+  describe('inheritance', () => {
 
-    var session;
-    var checkBoxField;
-    var model;
+    let session;
+    let checkBoxField;
+    let model;
 
-    beforeEach(function() {
+    beforeEach(() => {
       setFixtures(sandbox());
       session = sandboxSession();
       model = createSimpleModel('CheckBoxField', session);
@@ -27,12 +27,12 @@ describe('CheckBoxFieldWithTriState', function() {
       checkBoxField.init(model);
     });
 
-    it('inherits from ValueField', function() {
+    it('inherits from ValueField', () => {
       expect(ValueField.prototype.isPrototypeOf(checkBoxField)).toBe(true);
     });
 
-    it('_renderValue sets checked and undefined classes', function() {
-      var $div = $('<div>');
+    it('_renderValue sets checked and undefined classes', () => {
+      let $div = $('<div>');
       checkBoxField.render($div);
 
       checkBoxField.setValue(false);
@@ -49,8 +49,8 @@ describe('CheckBoxFieldWithTriState', function() {
       expect(checkBoxField.$checkBox.hasClass('undefined')).toBe(false);
     });
 
-    it('_renderValue sets disabled property', function() {
-      var $div = $('<div>');
+    it('_renderValue sets disabled property', () => {
+      let $div = $('<div>');
       checkBoxField.render($div);
 
       checkBoxField.setEnabled(false);

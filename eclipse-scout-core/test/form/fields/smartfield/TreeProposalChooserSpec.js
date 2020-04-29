@@ -10,18 +10,18 @@
  */
 import {scout} from '../../../../src/index';
 
-describe('TreeProposalChooser', function() {
+describe('TreeProposalChooser', () => {
 
-  var session;
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     session.textMap.add('InactiveState', 'inactive');
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
@@ -35,20 +35,20 @@ describe('TreeProposalChooser', function() {
     };
   }
 
-  describe('ProposalTreeNode', function() {
+  describe('ProposalTreeNode', () => {
 
-    it('should display inactive state', function() {
+    it('should display inactive state', () => {
       // dummy smart field
-      var smartField = scout.create('SmartField', {
+      let smartField = scout.create('SmartField', {
         parent: session.desktop
       });
 
-      var chooser = scout.create('TreeProposalChooser', {
+      let chooser = scout.create('TreeProposalChooser', {
         parent: session.desktop,
         smartField: smartField
       });
 
-      var lookupRows = [
+      let lookupRows = [
         createLookupRow(1, null, 'root'),
         createLookupRow(2, 1, 'nodeA'),
         createLookupRow(3, 1, 'nodeB')
@@ -61,7 +61,7 @@ describe('TreeProposalChooser', function() {
       chooser.render();
 
       // Node must have inactive class and suffix ' (inactive)'
-      var $nodeB = chooser.$container.find('.inactive');
+      let $nodeB = chooser.$container.find('.inactive');
       expect($nodeB.text()).toBe('nodeB (inactive)');
     });
 

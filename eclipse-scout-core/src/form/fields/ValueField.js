@@ -118,7 +118,7 @@ export default class ValueField extends FormField {
    */
   acceptInput(whileTyping) {
     whileTyping = !!whileTyping; // cast to boolean
-    var displayText = scout.nvl(this._readDisplayText(), '');
+    let displayText = scout.nvl(this._readDisplayText(), '');
 
     // trigger only if displayText has really changed
     if (this._checkDisplayTextChanged(displayText, whileTyping)) {
@@ -137,12 +137,12 @@ export default class ValueField extends FormField {
   parseAndSetValue(displayText) {
     this.removeErrorStatus(ParsingFailedStatus);
     try {
-      var event = new Event({
+      let event = new Event({
         displayText: displayText
       });
       this.trigger('parse', event);
       if (!event.defaultPrevented) {
-        var parsedValue = this.parseValue(displayText);
+        let parsedValue = this.parseValue(displayText);
         this.setValue(parsedValue);
       }
     } catch (error) {
@@ -152,7 +152,7 @@ export default class ValueField extends FormField {
 
   _parsingFailed(displayText, error) {
     $.log.isDebugEnabled() && $.log.debug('Parsing failed for field with id ' + this.id, error);
-    var event = new Event({
+    let event = new Event({
       displayText: displayText,
       error: error
     });
@@ -163,7 +163,7 @@ export default class ValueField extends FormField {
   }
 
   _addParsingFailedErrorStatus(displayText, error) {
-    var status = this._createParsingFailedStatus(displayText, error);
+    let status = this._createParsingFailedStatus(displayText, error);
     this.addErrorStatus(status);
   }
 
@@ -196,7 +196,7 @@ export default class ValueField extends FormField {
    * @throws a message, a Status or an error if the parsing fails
    */
   parseValue(displayText) {
-    var defaultParser = this._parseValue.bind(this);
+    let defaultParser = this._parseValue.bind(this);
     return this.parser(displayText, defaultParser);
   }
 
@@ -208,7 +208,7 @@ export default class ValueField extends FormField {
   }
 
   _checkDisplayTextChanged(displayText, whileTyping) {
-    var oldDisplayText = scout.nvl(this.displayText, '');
+    let oldDisplayText = scout.nvl(this.displayText, '');
     return displayText !== oldDisplayText;
   }
 
@@ -222,7 +222,7 @@ export default class ValueField extends FormField {
    *        the DOM target where the mouse down event occurred.
    */
   aboutToBlurByMouseDown(target) {
-    var eventOnField = this.isFocusOnField(target);
+    let eventOnField = this.isFocusOnField(target);
     if (!eventOnField) {
       this.acceptInput(); // event outside this value field.
     }
@@ -240,7 +240,7 @@ export default class ValueField extends FormField {
   }
 
   _triggerAcceptInput(whileTyping) {
-    var event = {
+    let event = {
       displayText: this.displayText,
       whileTyping: !!whileTyping
     };
@@ -356,8 +356,8 @@ export default class ValueField extends FormField {
       this.removeErrorStatus(ParsingFailedStatus);
       this.removeErrorStatus(ValidationFailedStatus);
     }
-    var oldValue = this.value;
-    var typedValue = null;
+    let oldValue = this.value;
+    let typedValue = null;
     try {
       typedValue = this._ensureValue(value);
       this.value = this.validateValue(typedValue);
@@ -401,7 +401,7 @@ export default class ValueField extends FormField {
    * @param {boolean} [revalidate] True, to revalidate the value, false to just add the validator and do nothing else. Default is true.
    */
   addValidator(validator, revalidate) {
-    var validators = this.validators.slice();
+    let validators = this.validators.slice();
     validators.push(validator);
     this.setValidators(validators, revalidate);
   }
@@ -411,7 +411,7 @@ export default class ValueField extends FormField {
    * @param {boolean} [revalidate] True, to revalidate the value, false to just remove the validator and do nothing else. Default is true.
    */
   removeValidator(validator, revalidate) {
-    var validators = this.validators.slice();
+    let validators = this.validators.slice();
     arrays.remove(validators, validator);
     this.setValidators(validators, revalidate);
   }
@@ -426,7 +426,7 @@ export default class ValueField extends FormField {
     if (!validator) {
       validator = this._validateValue.bind(this);
     }
-    var validators = [];
+    let validators = [];
     if (validator) {
       validators = [validator];
     }
@@ -446,8 +446,8 @@ export default class ValueField extends FormField {
    * @throws a message, a Status or an error if the validation fails
    */
   validateValue(value) {
-    var defaultValidator = this._validateValue.bind(this);
-    this.validators.forEach(function(validator) {
+    let defaultValidator = this._validateValue.bind(this);
+    this.validators.forEach(validator => {
       value = validator(value, defaultValidator);
     });
     value = scout.nvl(value, null); // Ensure value is never undefined (necessary for _updateTouched and should make it easier generally)
@@ -469,7 +469,7 @@ export default class ValueField extends FormField {
 
   _validationFailed(value, error) {
     $.log.isDebugEnabled() && $.log.debug('Validation failed for field with id ' + this.id, error);
-    var status = this._createValidationFailedStatus(value, error);
+    let status = this._createValidationFailedStatus(value, error);
     this.addErrorStatus(status);
     this._updateDisplayText(value);
   }
@@ -483,12 +483,12 @@ export default class ValueField extends FormField {
    * @returns {Status}
    */
   _createInvalidValueStatus(statusType, value, error) {
-    var statusFunc = Status.classForName(statusType);
+    let statusFunc = Status.classForName(statusType);
     // type of status is correct
     if (error instanceof statusFunc) {
       return error;
     }
-    var message, severity = Status.Severity.ERROR;
+    let message, severity = Status.Severity.ERROR;
     if (error instanceof Status) {
       // its a Status, but it has the wrong specific type
       message = error.message;
@@ -512,15 +512,15 @@ export default class ValueField extends FormField {
       return;
     }
     value = scout.nvl(value, this.value);
-    var returned = this.formatValue(value);
+    let returned = this.formatValue(value);
     if (returned && $.isFunction(returned.promise)) {
       // Promise is returned -> set display text later
       returned
         .done(this.setDisplayText.bind(this))
-        .fail(function() {
+        .fail(() => {
           this.setDisplayText('');
           $.log.isInfoEnabled() && $.log.info('Could not resolve display text for value: ' + value);
-        }.bind(this));
+        });
     } else {
       this.setDisplayText(returned);
     }
@@ -550,7 +550,7 @@ export default class ValueField extends FormField {
    * @returns {string|Promise} the formatted display text
    */
   formatValue(value) {
-    var defaultFormatter = this._formatValue.bind(this);
+    let defaultFormatter = this._formatValue.bind(this);
     return this.formatter(value, defaultFormatter);
   }
 
@@ -594,7 +594,7 @@ export default class ValueField extends FormField {
 
   _getCurrentMenus() {
     if (this.currentMenuTypes) {
-      var menuTypes = this.currentMenuTypes.map(function(elem) {
+      let menuTypes = this.currentMenuTypes.map(elem => {
         return 'ValueField.' + elem;
       });
       return menus_1.filter(this.menus, menuTypes);
@@ -621,7 +621,7 @@ export default class ValueField extends FormField {
    * This method has no effect if another element is the focus owner.
    */
   static invokeValueFieldAboutToBlurByMouseDown(target) {
-    var activeValueField = this._getActiveValueField(target);
+    let activeValueField = this._getActiveValueField(target);
     if (activeValueField) {
       activeValueField.aboutToBlurByMouseDown(target);
     }
@@ -632,7 +632,7 @@ export default class ValueField extends FormField {
    * This method has no effect if another element is the focus owner.
    */
   static invokeValueFieldAcceptInput(target) {
-    var activeValueField = this._getActiveValueField(target);
+    let activeValueField = this._getActiveValueField(target);
     if (activeValueField) {
       activeValueField.acceptInput();
     }
@@ -644,7 +644,7 @@ export default class ValueField extends FormField {
    * That is used in DateField.js with multiple input elements.
    */
   static _getActiveValueField(target) {
-    var $activeElement = $(target).activeElement(),
+    let $activeElement = $(target).activeElement(),
       activeWidget = scout.widget($activeElement);
     if (activeWidget instanceof ValueField && activeWidget.enabledComputed) {
       return activeWidget;

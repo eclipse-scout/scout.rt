@@ -11,13 +11,13 @@
 import {FormSpecHelper, LocaleSpecHelper} from '@eclipse-scout/testing';
 import {DecimalFormat, scout, Status} from '../../../../src/index';
 
-describe('NumberField', function() {
-  var session;
-  var helper;
-  var locale;
-  var localeHelper;
+describe('NumberField', () => {
+  let session;
+  let helper;
+  let locale;
+  let localeHelper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
@@ -27,39 +27,39 @@ describe('NumberField', function() {
     locale = localeHelper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
     jasmine.Ajax.uninstall();
   });
 
-  describe('setValue', function() {
-    var field;
+  describe('setValue', () => {
+    let field;
 
-    beforeEach(function() {
+    beforeEach(() => {
       field = helper.createField('NumberField');
     });
 
-    it('sets the value and formats it using decimalFormat if the value is valid', function() {
+    it('sets the value and formats it using decimalFormat if the value is valid', () => {
       field.render();
       field.setValue(123.500);
       expect(field.value).toBe(123.5);
       expect(field.displayText).toBe('123.5');
     });
 
-    it('tries to convert the value into a number', function() {
+    it('tries to convert the value into a number', () => {
       field.render();
       field.setValue('123.5');
       expect(field.value).toBe(123.5);
       expect(field.displayText).toBe('123.5');
     });
 
-    it('does not set the value if it is invalid', function() {
+    it('does not set the value if it is invalid', () => {
       field.render();
       field.setValue('asdf');
       expect(field.value).toBe(null);
     });
 
-    it('sets the error status and display text if the value is invalid', function() {
+    it('sets the error status and display text if the value is invalid', () => {
       field.render();
       field.setValue('abc');
       expect(field.value).toBe(null);
@@ -67,7 +67,7 @@ describe('NumberField', function() {
       expect(field.displayText).toBe('abc');
     });
 
-    it('uses another invalidation message than the value field', function() {
+    it('uses another invalidation message than the value field', () => {
       field.render();
       field.setValue('asdf');
       expect(field.errorStatus.message).toBe('[undefined text: InvalidNumberMessageX]');
@@ -75,9 +75,9 @@ describe('NumberField', function() {
 
   });
 
-  describe('minMaxValue', function() {
-    it('is always in order', function() {
-      var field = helper.createField('NumberField');
+  describe('minMaxValue', () => {
+    it('is always in order', () => {
+      let field = helper.createField('NumberField');
       field.setMinValue(2);
       field.setMaxValue(1);
 
@@ -91,8 +91,8 @@ describe('NumberField', function() {
       expect(field.maxValue).toBe(11);
     });
 
-    it('is validated when setting new value', function() {
-      var field = helper.createField('NumberField');
+    it('is validated when setting new value', () => {
+      let field = helper.createField('NumberField');
       field.setMinValue(1);
       field.setMaxValue(10);
 
@@ -106,8 +106,8 @@ describe('NumberField', function() {
       expect(field.errorStatus instanceof Status).toBe(true);
     });
 
-    it('is validated when changing minMaxValue', function() {
-      var field = helper.createField('NumberField');
+    it('is validated when changing minMaxValue', () => {
+      let field = helper.createField('NumberField');
       field.setValue(5);
       expect(field.errorStatus).toBe(null);
 
@@ -124,8 +124,8 @@ describe('NumberField', function() {
       expect(field.errorStatus).toBe(null);
     });
 
-    it('works when max or min is null', function() {
-      var field = helper.createField('NumberField', helper.session.desktop, {
+    it('works when max or min is null', () => {
+      let field = helper.createField('NumberField', helper.session.desktop, {
         minValue: 6,
         maxValue: null
       });
@@ -160,9 +160,9 @@ describe('NumberField', function() {
     });
   });
 
-  describe('acceptInput', function() {
-    it('updates the display text after calculation even if the value was not changed', function() {
-      var field = helper.createField('NumberField');
+  describe('acceptInput', () => {
+    it('updates the display text after calculation even if the value was not changed', () => {
+      let field = helper.createField('NumberField');
       field.render();
       field.$field.val('6');
       field.acceptInput();
@@ -188,28 +188,28 @@ describe('NumberField', function() {
     });
   });
 
-  describe('setDecimalFormat', function() {
-    var field;
+  describe('setDecimalFormat', () => {
+    let field;
 
-    beforeEach(function() {
+    beforeEach(() => {
       field = helper.createField('NumberField');
     });
 
-    it('sets the decimal format', function() {
+    it('sets the decimal format', () => {
       expect(field.decimalFormat.pattern).not.toBe('###0.000');
 
       field.setDecimalFormat(new DecimalFormat(session.locale, '###0.000'));
       expect(field.decimalFormat.pattern).toBe('###0.000');
     });
 
-    it('if the parameter is a string, it is assumed it is the pattern', function() {
+    it('if the parameter is a string, it is assumed it is the pattern', () => {
       expect(field.decimalFormat.pattern).not.toBe('###0.000');
 
       field.setDecimalFormat('###0.000');
       expect(field.decimalFormat.pattern).toBe('###0.000');
     });
 
-    it('updates the value and the display text if the format changes', function() {
+    it('updates the value and the display text if the format changes', () => {
       field.setDecimalFormat('###0.###');
       field.setValue(123);
       expect(field.value).toBe(123);
@@ -220,7 +220,7 @@ describe('NumberField', function() {
       expect(field.displayText).toBe('123.000');
     });
 
-    it('updates the value and the display text if the multiplier changes', function() {
+    it('updates the value and the display text if the multiplier changes', () => {
       field.setValue(123);
       expect(field.value).toBe(123);
       expect(field.displayText).toBe('123');
@@ -254,14 +254,14 @@ describe('NumberField', function() {
 
   });
 
-  describe('calculates value', function() {
-    var field;
+  describe('calculates value', () => {
+    let field;
 
-    beforeEach(function() {
+    beforeEach(() => {
       field = helper.createField('NumberField');
     });
 
-    it('with . as separator and \' as grouping char', function() {
+    it('with . as separator and \' as grouping char', () => {
       field.render();
       field.decimalFormat.decimalSeparatorChar = '.';
       field.decimalFormat.groupingChar = '\'';
@@ -282,7 +282,7 @@ describe('NumberField', function() {
       expect(field.$field[0].value).toBe('10.000*2,0+3,1');
     });
 
-    it('with , as separator and . as grouping char', function() {
+    it('with , as separator and . as grouping char', () => {
       field.render();
       field.decimalFormat.decimalSeparatorChar = ',';
       field.decimalFormat.groupingChar = '.';
@@ -304,7 +304,7 @@ describe('NumberField', function() {
       expect(field.$field[0].value).toBe('51');
     });
 
-    it('of unary expressions', function() {
+    it('of unary expressions', () => {
       field.render();
       field.decimalFormat.decimalSeparatorChar = '.';
       field.decimalFormat.groupingChar = '\'';
@@ -360,7 +360,7 @@ describe('NumberField', function() {
       expect(field.$field[0].value).toBe('-123');
     });
 
-    it('of sum expressions', function() {
+    it('of sum expressions', () => {
       field.render();
       field.decimalFormat.decimalSeparatorChar = '.';
       field.decimalFormat.groupingChar = '\'';
@@ -401,7 +401,7 @@ describe('NumberField', function() {
       expect(field.$field[0].value).toBe('0');
     });
 
-    it('of product expressions', function() {
+    it('of product expressions', () => {
       field.render();
       field.decimalFormat.decimalSeparatorChar = '.';
       field.decimalFormat.groupingChar = '\'';
@@ -447,7 +447,7 @@ describe('NumberField', function() {
       expect(field.$field[0].value).toBe('1.5');
     });
 
-    it('of complex expressions', function() {
+    it('of complex expressions', () => {
       field.render();
       field.decimalFormat.decimalSeparatorChar = '.';
       field.decimalFormat.groupingChar = '\'';
@@ -478,7 +478,7 @@ describe('NumberField', function() {
       expect(field.$field[0].value).toBe('-1');
     });
 
-    it('of invalid expressions', function() {
+    it('of invalid expressions', () => {
       field.render();
       field.decimalFormat.decimalSeparatorChar = '.';
       field.decimalFormat.groupingChar = '\'';
@@ -546,10 +546,10 @@ describe('NumberField', function() {
 
   });
 
-  describe('label', function() {
+  describe('label', () => {
 
-    it('is linked with the field', function() {
-      var field = scout.create('NumberField', {
+    it('is linked with the field', () => {
+      let field = scout.create('NumberField', {
         parent: session.desktop,
         label: 'label'
       });
@@ -558,8 +558,8 @@ describe('NumberField', function() {
       expect(field.$field.attr('aria-labelledby')).toBe(field.$label.attr('id'));
     });
 
-    it('focuses the field when clicked', function() {
-      var field = scout.create('NumberField', {
+    it('focuses the field when clicked', () => {
+      let field = scout.create('NumberField', {
         parent: session.desktop,
         label: 'label'
       });

@@ -34,7 +34,7 @@ export default class EllipsisMenu extends Menu {
 
     if (childActions) {
       // close all actions that have been added to the ellipsis
-      childActions.forEach(function(ca) {
+      childActions.forEach(ca => {
         ca.setSelected(false);
       });
     }

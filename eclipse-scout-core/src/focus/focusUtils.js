@@ -18,7 +18,7 @@ import $ from 'jquery';
  * @return {boolean} whether the given element is focusable by mouse.
  */
 export function isFocusableByMouse(element) {
-  var $element = $(element);
+  let $element = $(element);
   return !$element.hasClass('unfocusable') && !$element.closest('.unfocusable').length;
 }
 
@@ -26,7 +26,7 @@ export function isFocusableByMouse(element) {
  * @return whether the given element has a parent which is focusable by mouse.
  */
 export function containsParentFocusableByMouse(element, entryPoint) {
-  var $focusableParentElements = $(element)
+  let $focusableParentElements = $(element)
     .parents(':focusable')
     .not(entryPoint) /* Exclude $entryPoint as all elements are its descendants. However, the $entryPoint is only focusable to provide Portlet support. */
     .filter(function() {
@@ -40,7 +40,7 @@ export function containsParentFocusableByMouse(element, entryPoint) {
  * It also returns true for disabled text-fields, because the user must be able to select and copy text from these text-fields.
  */
 export function isSelectableText(element) {
-  var $element = $(element);
+  let $element = $(element);
 
   // Find closest element which has a 'user-select' with a value other than 'auto'. If that value
   // is 'none', the text is not selectable. This code mimics the "inheritance behavior" of the CSS
@@ -51,7 +51,7 @@ export function isSelectableText(element) {
   //
   // [1] https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
   // [2] https://bugzilla.mozilla.org/show_bug.cgi?id=648624
-  var $el = $element;
+  let $el = $element;
   while ($el.css('user-select') === 'auto') {
     $el = $el.parent();
     // Fix for Firefox: parent of BODY element is HtmlDocument. When calling $el.css on the HtmlDocument
@@ -87,7 +87,7 @@ export function isActiveElement(element) {
   if (!element) {
     return false;
   }
-  var activeElement;
+  let activeElement;
   if (element instanceof $) {
     activeElement = element.activeElement(true);
     element = element[0];

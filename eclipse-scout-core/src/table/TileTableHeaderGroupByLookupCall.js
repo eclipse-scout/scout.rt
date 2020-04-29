@@ -22,7 +22,7 @@ export default class TileTableHeaderGroupByLookupCall extends StaticLookupCall {
   }
 
   _data() {
-    var lookupRows = [];
+    let lookupRows = [];
     lookupRows.push([null, this.session.text('NoGrouping'), 'BOLD']);
     this.table.visibleColumns().forEach(function(column) {
       if (this.table.isGroupingPossible(column)) {

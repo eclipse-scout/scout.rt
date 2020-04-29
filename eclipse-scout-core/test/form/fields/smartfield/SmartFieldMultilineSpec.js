@@ -10,17 +10,17 @@
  */
 import {QueryBy, scout} from '../../../../src/index';
 
-describe('SmartFieldMultiline', function() {
+describe('SmartFieldMultiline', () => {
 
-  var session, field;
+  let session, field;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
@@ -32,21 +32,21 @@ describe('SmartFieldMultiline', function() {
     return scout.create('SmartFieldMultiline', model);
   }
 
-  describe('display text', function() {
+  describe('display text', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       field = createFieldWithLookupCall({
         displayText: 'Foo\nBar'
       });
       field.render();
     });
 
-    it('show first line as INPUT value, additional lines in separate DIV', function() {
+    it('show first line as INPUT value, additional lines in separate DIV', () => {
       expect(field.$field.val()).toBe('Foo');
       expect(field._$multilineLines.text()).toBe('Bar');
     });
 
-    it('reset multiline-lines DIV on error', function() {
+    it('reset multiline-lines DIV on error', () => {
       field._acceptByTextDone({
         queryBy: QueryBy.TEXT,
         lookupRows: [],

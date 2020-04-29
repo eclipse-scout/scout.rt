@@ -12,7 +12,7 @@ import {arrays, icons, MenuDestinations, scout} from '../index';
 import $ from 'jquery';
 
 export function filterAccordingToSelection(prefix, selectionLength, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
-  var allowedTypes = [];
+  let allowedTypes = [];
 
   if (destination === MenuDestinations.MENU_BAR) {
     allowedTypes = [prefix + '.EmptySpace', prefix + '.SingleSelection', prefix + '.MultiSelection'];
@@ -29,10 +29,10 @@ export function filterAccordingToSelection(prefix, selectionLength, menus, desti
     arrays.remove(allowedTypes, prefix + '.MultiSelection');
   }
   notAllowedTypes = arrays.ensure(notAllowedTypes);
-  var fixedNotAllowedTypes = [];
+  let fixedNotAllowedTypes = [];
   // ensure prefix
   prefix = prefix + '.';
-  notAllowedTypes.forEach(function(type) {
+  notAllowedTypes.forEach(type => {
     if (type.slice(0, prefix.length) !== prefix) {
       type = prefix + type;
     }
@@ -54,11 +54,11 @@ export function filter(menus, types, onlyVisible, enableDisableKeyStrokes, notAl
   types = arrays.ensure(types);
   notAllowedTypes = arrays.ensure(notAllowedTypes);
 
-  var filteredMenus = [],
+  let filteredMenus = [],
     separatorCount = 0;
 
-  menus.forEach(function(menu) {
-    var childMenus = menu.childActions;
+  menus.forEach(menu => {
+    let childMenus = menu.childActions;
     if (childMenus.length > 0) {
       childMenus = filter(childMenus, types, onlyVisible, enableDisableKeyStrokes, notAllowedTypes);
       if (childMenus.length === 0) {
@@ -95,7 +95,7 @@ export function filter(menus, types, onlyVisible, enableDisableKeyStrokes, notAl
 export function updateSeparatorVisibility(menus) {
   menus = arrays.ensure(menus);
 
-  menus = menus.filter(function(menu) {
+  menus = menus.filter(menu => {
     return menu.visible || menu.separator;
   });
 
@@ -103,9 +103,9 @@ export function updateSeparatorVisibility(menus) {
     return;
   }
 
-  var hasMenuBefore = false;
-  var hasMenuAfter = false;
-  menus.forEach(function(menu, i) {
+  let hasMenuBefore = false;
+  let hasMenuAfter = false;
+  menus.forEach((menu, i) => {
     if (menu.ellipsis) {
       return;
     }
@@ -132,7 +132,7 @@ export function updateSeparatorVisibility(menus) {
 export function checkType(menu, types) {
   types = arrays.ensure(types);
   if (menu.childActions.length > 0) {
-    var childMenus = filter(menu.childActions, types);
+    let childMenus = filter(menu.childActions, types);
     return (childMenus.length > 0);
   }
   return _checkType(menu, types);
@@ -155,7 +155,7 @@ export function _checkType(menu, types) {
   if (!menu.menuTypes) {
     return false;
   }
-  for (var j = 0; j < types.length; j++) {
+  for (let j = 0; j < types.length; j++) {
     if (menu.menuTypes.indexOf(types[j]) > -1) {
       return true;
     }
@@ -163,7 +163,7 @@ export function _checkType(menu, types) {
 }
 
 export function createEllipsisMenu(options) {
-  var defaults = {
+  let defaults = {
     iconId: icons.ELLIPSIS_V,
     tabbable: false
   };
@@ -176,7 +176,7 @@ export function moveMenuIntoEllipsis(menu, ellipsis) {
   menu.overflow = true;
   menu.overflowMenu = ellipsis;
 
-  var menusInEllipsis = ellipsis.childActions.slice();
+  let menusInEllipsis = ellipsis.childActions.slice();
   menusInEllipsis.unshift(menu); // add as first element
   ellipsis.setChildActions(menusInEllipsis);
 }

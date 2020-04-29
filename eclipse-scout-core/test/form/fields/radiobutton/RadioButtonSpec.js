@@ -10,18 +10,18 @@
  */
 import {keys, scout} from '../../../../src/index';
 
-describe('RadioButton', function() {
-  var session;
+describe('RadioButton', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  describe('label', function() {
+  describe('label', () => {
 
-    it('is linked with the field', function() {
-      var field = scout.create('RadioButton', {
+    it('is linked with the field', () => {
+      let field = scout.create('RadioButton', {
         parent: session.desktop,
         label: 'label'
       });
@@ -32,10 +32,10 @@ describe('RadioButton', function() {
 
   });
 
-  describe('keyStroke', function() {
+  describe('keyStroke', () => {
 
-    it('selects the button', function() {
-      var field = scout.create('RadioButton', {
+    it('selects the button', () => {
+      let field = scout.create('RadioButton', {
         parent: session.desktop,
         keyStroke: 'ctrl-b'
       });
@@ -64,8 +64,8 @@ describe('RadioButton', function() {
       expect(field.selected).toBe(false);
     });
 
-    it('does not focus the button', function() {
-      var field = scout.create('RadioButton', {
+    it('does not focus the button', () => {
+      let field = scout.create('RadioButton', {
         parent: session.desktop,
         keyStroke: 'ctrl-b'
       });

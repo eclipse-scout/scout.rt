@@ -120,7 +120,7 @@ export default class Desktop extends Widget {
     // created. Also note that Scout Java uses a different pattern to solve the same problem, there a VirtualDesktop
     // is used during initialization. When initialization is done, all registered listeners on the virtual desktop
     // are copied to the real desktop instance.
-    var session = model.session || model.parent.session;
+    let session = model.session || model.parent.session;
     session.desktop = this;
 
     super._init(model);
@@ -146,10 +146,10 @@ export default class Desktop extends Widget {
     this.openUriHandler = scout.create('OpenUriHandler', {
       session: this.session
     });
-    this._glassPaneTargetFilters.push(function(targetElem, element) {
+    this._glassPaneTargetFilters.push((targetElem, element) => {
       // Exclude all child elements of the given widget
       // Use case: element is a popup and has tooltip open. The tooltip is displayed in the desktop and considered as glass pane target by the selector above
-      var target = scout.widget(targetElem);
+      let target = scout.widget(targetElem);
       return !element.has(target);
     });
   }
@@ -178,7 +178,7 @@ export default class Desktop extends Widget {
     if (this.initialFormRendering) {
       return;
     }
-    var view = event.view;
+    let view = event.view;
     if (view instanceof Form && this.bench.outlineContent !== view && !view.detailForm) {
       // Notify model that this form is active (only for regular views, not detail forms)
       this._setFormActivated(view);
@@ -210,7 +210,7 @@ export default class Desktop extends Widget {
     this._renderNotifications();
     this._renderBrowserHistoryEntry();
     this._renderDense();
-    this.addOns.forEach(function(addOn) {
+    this.addOns.forEach(addOn => {
       addOn.render();
     }, this);
 
@@ -245,7 +245,7 @@ export default class Desktop extends Widget {
   _setDisplayStyle(displayStyle) {
     this._setProperty('displayStyle', displayStyle);
 
-    var isCompact = this.displayStyle === Desktop.DisplayStyle.COMPACT;
+    let isCompact = this.displayStyle === Desktop.DisplayStyle.COMPACT;
 
     if (this.header) {
       this.header.setToolBoxVisible(!isCompact);
@@ -296,9 +296,9 @@ export default class Desktop extends Widget {
     this.outline.fileChooserController.render();
 
     if (this.outline.selectedViewTabs) {
-      this.outline.selectedViewTabs.forEach(function(selectedView) {
+      this.outline.selectedViewTabs.forEach(selectedView => {
         this.formController._activateView(selectedView);
-      }.bind(this));
+      });
     }
   }
 
@@ -314,7 +314,7 @@ export default class Desktop extends Widget {
   computeParentForDisplayParent(displayParent) {
     // Outline must not be used as parent, otherwise the children (form, messageboxes etc.) would be removed if navigation is made invisible
     // The functions _render/removeDisplayChildrenOfOutline take care that the elements are correctly rendered/removed on an outline switch
-    var parent = displayParent;
+    let parent = displayParent;
     if (displayParent instanceof Outline) {
       parent = this;
     }
@@ -322,11 +322,11 @@ export default class Desktop extends Widget {
   }
 
   _renderTitle() {
-    var title = this.title;
+    let title = this.title;
     if (title === undefined || title === null) {
       return;
     }
-    var $scoutDivs = $('div.scout');
+    let $scoutDivs = $('div.scout');
     if ($scoutDivs.length <= 1) { // only set document title in non-portlet case
       $scoutDivs.document(true).title = title;
     }
@@ -357,10 +357,10 @@ export default class Desktop extends Widget {
       return;
     }
     this.bench.off('viewActivate', this._benchActiveViewChangedHandler);
-    this.bench.on('destroy', function() {
+    this.bench.on('destroy', () => {
       this.bench = null;
       this.invalidateLayoutTree();
-    }.bind(this));
+    });
     this.bench.destroy();
   }
 
@@ -441,10 +441,10 @@ export default class Desktop extends Widget {
     if (!this.header) {
       return;
     }
-    this.header.on('destroy', function() {
+    this.header.on('destroy', () => {
       this.invalidateLayoutTree();
       this.header = null;
-    }.bind(this));
+    });
     this.header.destroy();
   }
 
@@ -505,11 +505,11 @@ export default class Desktop extends Widget {
     if (!Device.get().supportsHistoryApi()) {
       return;
     }
-    var myWindow = this.$container.window(true),
+    let myWindow = this.$container.window(true),
       history = this.browserHistoryEntry;
     if (history) {
-      var historyPath = this._createHistoryPath(history);
-      var setStateFunc = (this.rendered ? myWindow.history.pushState : myWindow.history.replaceState).bind(myWindow.history);
+      let historyPath = this._createHistoryPath(history);
+      let setStateFunc = (this.rendered ? myWindow.history.pushState : myWindow.history.replaceState).bind(myWindow.history);
       setStateFunc({
         deepLinkPath: history.deepLinkPath
       }, history.title, historyPath);
@@ -523,13 +523,13 @@ export default class Desktop extends Widget {
     if (!history.pathVisible) {
       return '';
     }
-    var historyPath = history.path;
-    var cloneUrl = this.url.clone();
+    let historyPath = history.path;
+    let cloneUrl = this.url.clone();
     cloneUrl.removeParameter('dl');
     cloneUrl.removeParameter('i');
     if (objects.countOwnProperties(cloneUrl.parameterMap) > 0) {
-      var pathUrl = new URL(historyPath);
-      for (var paramName in cloneUrl.parameterMap) {
+      let pathUrl = new URL(historyPath);
+      for (let paramName in cloneUrl.parameterMap) {
         pathUrl.addParameter(paramName, cloneUrl.getParameter(paramName));
       }
       historyPath = pathUrl.toString({alwaysFirst: ['dl', 'i']});
@@ -538,7 +538,7 @@ export default class Desktop extends Widget {
   }
 
   _setupDragAndDrop() {
-    var dragEnterOrOver = function(event) {
+    let dragEnterOrOver = event => {
       event.stopPropagation();
       event.preventDefault();
       // change cursor to forbidden (no dropping allowed)
@@ -547,7 +547,7 @@ export default class Desktop extends Widget {
 
     this.$container.on('dragenter', dragEnterOrOver);
     this.$container.on('dragover', dragEnterOrOver);
-    this.$container.on('drop', function(event) {
+    this.$container.on('drop', event => {
       event.stopPropagation();
       event.preventDefault();
     });
@@ -566,10 +566,10 @@ export default class Desktop extends Widget {
     if (!this.splitter) {
       return;
     }
-    var storedSplitterPosition = this.cacheSplitterPosition && this._loadCachedSplitterPosition();
+    let storedSplitterPosition = this.cacheSplitterPosition && this._loadCachedSplitterPosition();
     if (storedSplitterPosition) {
       // Restore splitter position
-      var splitterPosition = parseInt(storedSplitterPosition, 10);
+      let splitterPosition = parseInt(storedSplitterPosition, 10);
       this.splitter.setPosition(splitterPosition);
       this.invalidateLayoutTree();
     } else {
@@ -581,7 +581,7 @@ export default class Desktop extends Widget {
 
   _disableContextMenu() {
     // Switch off browser's default context menu for the entire scout desktop (except input fields)
-    this.$container.on('contextmenu', function(event) {
+    this.$container.on('contextmenu', event => {
       if (event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'TEXTAREA' && !event.target.isContentEditable) {
         event.preventDefault();
       }
@@ -621,9 +621,9 @@ export default class Desktop extends Widget {
 
   _setViews(views) {
     if (views) {
-      views.forEach(function(view) {
+      views.forEach(view => {
         view.setDisplayParent(this);
-      }.bind(this));
+      });
     }
     this._setProperty('views', views);
   }
@@ -766,16 +766,16 @@ export default class Desktop extends Widget {
     notification.fadeIn(this.$notifications);
     if (notification.duration > 0) {
       notification.removeTimeout = setTimeout(notification.hide.bind(notification), notification.duration);
-      notification.one('remove', function() {
+      notification.one('remove', () => {
         this.removeNotification(notification);
-      }.bind(this));
+      });
     }
   }
 
   _renderNotifications() {
-    this.notifications.forEach(function(notification) {
+    this.notifications.forEach(notification => {
       this._renderNotification(notification);
-    }.bind(this));
+    });
   }
 
   /**
@@ -784,8 +784,8 @@ export default class Desktop extends Widget {
    */
   removeNotification(notification) {
     if (typeof notification === 'string') {
-      var notificationId = notification;
-      notification = arrays.find(this.notifications, function(n) {
+      let notificationId = notification;
+      notification = arrays.find(this.notifications, n => {
         return notificationId === n.id;
       });
     }
@@ -806,9 +806,9 @@ export default class Desktop extends Widget {
   }
 
   getPopupsFor(widget) {
-    var popups = [];
-    this.$container.children('.popup').each(function(i, elem) {
-      var $popup = $(elem),
+    let popups = [];
+    this.$container.children('.popup').each((i, elem) => {
+      let $popup = $(elem),
         popup = widgets.get($popup);
 
       if (widget.has(popup)) {
@@ -822,7 +822,7 @@ export default class Desktop extends Widget {
    * Destroys every popup which is a descendant of the given widget.
    */
   destroyPopupsFor(widget) {
-    this.getPopupsFor(widget).forEach(function(popup) {
+    this.getPopupsFor(widget).forEach(popup => {
       popup.destroy();
     });
   }
@@ -894,7 +894,7 @@ export default class Desktop extends Widget {
    */
   _glassPaneTargets(element) {
     // Do not return $container, because this is the parent of all forms and message boxes. Otherwise, no form could gain focus, even the form requested desktop modality.
-    var $glassPaneTargets = this.$container
+    let $glassPaneTargets = this.$container
       .children()
       .not('.splitter') // exclude splitter to be locked
       .not('.desktop-notifications') // exclude notification box like 'connection interrupted' to be locked
@@ -904,14 +904,14 @@ export default class Desktop extends Widget {
       if (element.$container) {
         $glassPaneTargets = $glassPaneTargets.not(element.$container);
       }
-      $glassPaneTargets = $glassPaneTargets.filter(function(i, targetElem) {
-        return this._glassPaneTargetFilters.every(function(filter) {
+      $glassPaneTargets = $glassPaneTargets.filter((i, targetElem) => {
+        return this._glassPaneTargetFilters.every(filter => {
           return filter(targetElem, element);
         }, this);
-      }.bind(this));
+      });
     }
 
-    var glassPaneTargets;
+    let glassPaneTargets;
     if (element instanceof Form && element.displayHint === Form.DisplayHint.VIEW) {
       $glassPaneTargets = $glassPaneTargets
         .not('.desktop-bench')
@@ -955,15 +955,15 @@ export default class Desktop extends Widget {
    * pane.
    */
   _deferredGlassPaneTarget(popupWindow) {
-    var deferred = new DeferredGlassPaneTarget();
-    popupWindow.one('init', function() {
+    let deferred = new DeferredGlassPaneTarget();
+    popupWindow.one('init', () => {
       deferred.ready([popupWindow.$container]);
     });
     return deferred;
   }
 
   _getBenchGlassPaneTargetsForView(view) {
-    var $glassPanes = [];
+    let $glassPanes = [];
 
     $glassPanes = $glassPanes.concat(this._getTabGlassPaneTargetsForView(view, this.header));
 
@@ -983,9 +983,9 @@ export default class Desktop extends Widget {
   }
 
   _getTabGlassPaneTargetsForView(view, tabBox) {
-    var $glassPanes = [];
+    let $glassPanes = [];
     if (tabBox && tabBox.tabArea) {
-      tabBox.tabArea.tabs.forEach(function(tab) {
+      tabBox.tabArea.tabs.forEach(tab => {
         if (tab.view !== view) {
           $glassPanes.push(tab.$container);
           // Workaround for javascript not being able to prevent hover event propagation:
@@ -1010,7 +1010,7 @@ export default class Desktop extends Widget {
   }
 
   showForm(form, position) {
-    var displayParent = form.displayParent || this;
+    let displayParent = form.displayParent || this;
     form.setDisplayParent(displayParent);
 
     this._setFormActivated(form);
@@ -1028,7 +1028,7 @@ export default class Desktop extends Widget {
     }
 
     if (this.displayStyle === Desktop.DisplayStyle.COMPACT && form.isView() && this.benchVisible) {
-      var openViews = this.bench.getViews().slice();
+      let openViews = this.bench.getViews().slice();
       arrays.remove(openViews, form);
       if (openViews.length === 0) {
         // Hide bench and show navigation if this is the last view to be hidden
@@ -1044,7 +1044,7 @@ export default class Desktop extends Widget {
   }
 
   activateForm(form) {
-    var displayParent = form.displayParent || this;
+    let displayParent = form.displayParent || this;
     displayParent.formController.activateForm(form);
     this._setFormActivated(form);
 
@@ -1094,7 +1094,7 @@ export default class Desktop extends Widget {
   }
 
   cancelViews(forms) {
-    var event = new Event();
+    let event = new Event();
     event.forms = forms;
     this.trigger('cancelForms', event);
     if (!event.defaultPrevented) {
@@ -1104,8 +1104,8 @@ export default class Desktop extends Widget {
 
   _cancelViews(forms) {
     // do not cancel forms when the form child hierarchy does not get canceled.
-    forms = forms.filter(function(form) {
-      return !arrays.find(form.views, function(view) {
+    forms = forms.filter(form => {
+      return !arrays.find(form.views, view => {
         return view.modal;
       });
     });
@@ -1117,22 +1117,22 @@ export default class Desktop extends Widget {
     }
 
     // collect all forms in the display child hierarchy with unsaved changes.
-    var unsavedForms = forms.filter(function(form) {
-      var requiresSaveChildDialogs = false;
-      form.visitDisplayChildren(function(dialog) {
+    let unsavedForms = forms.filter(form => {
+      let requiresSaveChildDialogs = false;
+      form.visitDisplayChildren(dialog => {
         if (dialog.lifecycle.requiresSave()) {
           requiresSaveChildDialogs = true;
         }
-      }, function(displayChild) {
+      }, displayChild => {
         return displayChild instanceof Form;
       });
       return form.lifecycle.requiresSave() || requiresSaveChildDialogs;
     });
 
     // initialize with a resolved promise in case there are no unsaved forms.
-    var waitFor = $.resolvedPromise();
+    let waitFor = $.resolvedPromise();
     if (unsavedForms.length > 0) {
-      var unsavedFormChangesForm = scout.create('scout.UnsavedFormChangesForm', {
+      let unsavedFormChangesForm = scout.create('scout.UnsavedFormChangesForm', {
         parent: this,
         session: this.session,
         displayParent: this,
@@ -1140,10 +1140,10 @@ export default class Desktop extends Widget {
       });
       unsavedFormChangesForm.open();
       // promise that is resolved when the UnsavedFormChangesForm is stored
-      waitFor = unsavedFormChangesForm.whenSave().then(function() {
-        var formsToSave = unsavedFormChangesForm.openFormsField.value;
-        formsToSave.forEach(function(form) {
-          form.visitDisplayChildren(function(dialog) {
+      waitFor = unsavedFormChangesForm.whenSave().then(() => {
+        let formsToSave = unsavedFormChangesForm.openFormsField.value;
+        formsToSave.forEach(form => {
+          form.visitDisplayChildren(dialog => {
             // forms should be stored with ok(). Other display children can simply be closed.
             if (dialog instanceof Form) {
               dialog.ok();
@@ -1156,14 +1156,14 @@ export default class Desktop extends Widget {
         return formsToSave;
       });
     }
-    waitFor.then(function(formsToSave) {
+    waitFor.then(formsToSave => {
       if (formsToSave) {
         // already saved & closed forms (handled by the UnsavedFormChangesForm)
         arrays.removeAll(forms, formsToSave);
       }
       // close the remaining forms that don't require saving.
-      forms.forEach(function(form) {
-        form.visitDisplayChildren(function(dialog) {
+      forms.forEach(form => {
+        form.visitDisplayChildren(dialog => {
           dialog.close();
         });
         form.close();
@@ -1202,7 +1202,7 @@ export default class Desktop extends Widget {
 
   setPopstateHandler(handler) {
     if (this.rendered || this.rendering) {
-      var window = this.$container.window();
+      let window = this.$container.window();
       if (this._popstateHandler) {
         window.off('popstate', this._popstateHandler);
       }
@@ -1214,7 +1214,7 @@ export default class Desktop extends Widget {
   }
 
   onPopstate(event) {
-    var historyState = event.originalEvent.state;
+    let historyState = event.originalEvent.state;
     if (historyState && historyState.deepLinkPath) {
       this.trigger('historyEntryActivate', historyState);
     }
@@ -1223,7 +1223,7 @@ export default class Desktop extends Widget {
   _onSplitterMove(event) {
     // disallow a position greater than 50%
     this.resizing = true;
-    var max = Math.floor(this.$container.outerWidth(true) / 2);
+    let max = Math.floor(this.$container.outerWidth(true) / 2);
     if (event.position > max) {
       event.setPosition(max);
     }
@@ -1237,7 +1237,7 @@ export default class Desktop extends Widget {
   }
 
   _onSplitterMoveEnd(event) {
-    var splitterPosition = event.position;
+    let splitterPosition = event.position;
 
     // Store size
     if (this.cacheSplitterPosition) {
@@ -1327,7 +1327,7 @@ export default class Desktop extends Widget {
   }
 
   _initTheme() {
-    var theme = this.theme;
+    let theme = this.theme;
     if (this.url.hasParameter('theme')) {
       theme = strings.nullIfEmpty(this.url.getParameter('theme')) || Desktop.DEFAULT_THEME;
     } else if (theme === null) {
@@ -1358,7 +1358,7 @@ export default class Desktop extends Widget {
     // Reload page in order to download the CSS files for the new theme
     // Don't remove body but make it invisible, otherwise JS exceptions might be thrown if body is removed while an action executed
     $('body').setVisible(false);
-    var reloadOptions = {
+    let reloadOptions = {
       clearBody: false
     };
     // If parameter 'theme' exists in the URL, remove it now - otherwise the parameter would overrule the cookie settings
@@ -1378,7 +1378,7 @@ export default class Desktop extends Widget {
   moveOverlaysBehindAndFocus(overlaysToMove, $targetOverlay) {
     $targetOverlay = $.ensure($targetOverlay);
     $targetOverlay.nextAll().toArray()
-      .forEach(function(overlay) {
+      .forEach(overlay => {
         if (arrays.containsAll(overlaysToMove, [overlay])) {
           $(overlay).insertBefore($targetOverlay);
         }

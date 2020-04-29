@@ -18,10 +18,10 @@ export default class ImageLayout extends AbstractLayout {
   }
 
   preferredLayoutSize($container, options) {
-    var img = $container[0];
+    let img = $container[0];
     if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
-      var prefHeight = img.naturalHeight;
-      var prefWidth = img.naturalWidth;
+      let prefHeight = img.naturalHeight;
+      let prefWidth = img.naturalWidth;
       if (options.widthHint > 0 && options.widthHint < img.naturalWidth) {
         prefHeight = options.widthHint / img.naturalWidth * img.naturalHeight;
         prefWidth = options.widthHint;

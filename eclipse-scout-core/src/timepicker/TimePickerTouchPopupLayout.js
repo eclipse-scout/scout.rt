@@ -18,7 +18,7 @@ export default class TimePickerTouchPopupLayout extends TouchPopupLayout {
 
   layout($container) {
     super.layout($container);
-    var htmlPicker = this.popup.getTimePicker().htmlComp;
+    let htmlPicker = this.popup.getTimePicker().htmlComp;
     htmlPicker.setSize(this.popup._widgetContainerHtmlComp.size());
   }
 
@@ -26,18 +26,18 @@ export default class TimePickerTouchPopupLayout extends TouchPopupLayout {
    * @override
    */
   preferredLayoutSize($container, options) {
-    var containerInsets = this.popup.htmlComp.insets(),
+    let containerInsets = this.popup.htmlComp.insets(),
       fieldHtmlComp = this.popup._field.htmlComp,
       widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp;
 
-    var fieldPrefSize = fieldHtmlComp.prefSize(options)
+    let fieldPrefSize = fieldHtmlComp.prefSize(options)
       .add(fieldHtmlComp.margins());
-    var widgetContainerPrefSize = widgetContainerHtmlComp.prefSize(options)
+    let widgetContainerPrefSize = widgetContainerHtmlComp.prefSize(options)
       .add(widgetContainerHtmlComp.margins());
 
-    var headerHeight = graphics.size(this.popup._$header, true).height;
-    var popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical();
-    var popupWidth = Math.max(fieldPrefSize.width, widgetContainerPrefSize.width);
+    let headerHeight = graphics.size(this.popup._$header, true).height;
+    let popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical();
+    let popupWidth = Math.max(fieldPrefSize.width, widgetContainerPrefSize.width);
 
     return new Dimension(popupWidth, popupHeight);
   }

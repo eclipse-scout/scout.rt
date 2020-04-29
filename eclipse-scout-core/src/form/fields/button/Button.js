@@ -76,7 +76,7 @@ export default class Button extends FormField {
         return this.keyStrokeScope.$container;
       }
       // use form if available
-      var form = this.getForm();
+      let form = this.getForm();
       if (form) {
         return form.$container;
       }
@@ -113,7 +113,7 @@ export default class Button extends FormField {
    * Container and field are the same thing.
    */
   _render() {
-    var $button;
+    let $button;
     if (this.displayStyle === Button.DisplayStyle.LINK) {
       // Render as link-button/ menu-item.
       // This is a bit weird: the model defines a button, but in the UI it behaves like a menu-item.
@@ -146,7 +146,7 @@ export default class Button extends FormField {
         this.keyStrokeContext.registerKeyStroke(menu);
       }, this);
       if (this.label || !this.iconId) { // no indicator when _only_ the icon is visible
-        var icon = icons.parseIconId(Button.SUBMENU_ICON);
+        let icon = icons.parseIconId(Button.SUBMENU_ICON);
         this.$submenuIcon = (this.$link || $button)
           .appendSpan('submenu-icon')
           .text(icon.iconCharacter);
@@ -224,14 +224,14 @@ export default class Button extends FormField {
       this.popup.close();
     } else {
       this.popup = this._openPopup();
-      this.popup.one('destroy', function(event) {
+      this.popup.one('destroy', event => {
         this.popup = null;
-      }.bind(this));
+      });
     }
   }
 
   _openPopup() {
-    var popup = scout.create('ContextMenuPopup', {
+    let popup = scout.create('ContextMenuPopup', {
       parent: this,
       menuItems: this.menus,
       cloneMenuItems: false,
@@ -294,9 +294,9 @@ export default class Button extends FormField {
    * Adds an image or font-based icon to the button by adding either an IMG or SPAN element to the button.
    */
   _renderIconId() {
-    var $iconTarget = this.$link || this.$fieldContainer;
+    let $iconTarget = this.$link || this.$fieldContainer;
     $iconTarget.icon(this.iconId);
-    var $icon = $iconTarget.data('$icon');
+    let $icon = $iconTarget.data('$icon');
     if ($icon) {
       // <img>s are loaded asynchronously. The real image size is not known until the image is loaded.
       // We add a listener to revalidate the button layout after this has happened. The 'loading' and
@@ -328,12 +328,12 @@ export default class Button extends FormField {
   }
 
   get$Icon() {
-    var $iconTarget = this.$link || this.$fieldContainer;
+    let $iconTarget = this.$link || this.$fieldContainer;
     return $iconTarget.children('.icon');
   }
 
   _updateLabelAndIconStyle() {
-    var hasText = !!this.label;
+    let hasText = !!this.label;
     this.$buttonLabel.setVisible(hasText || !this.iconId);
     this.get$Icon().toggleClass('with-label', hasText);
   }
@@ -363,7 +363,7 @@ export default class Button extends FormField {
     // Basically, the desktop could be used to find the scope, but that would mean to traverse the whole widget tree.
     // To make it faster the form is used instead but that limits the resolving to the form.
     // This should be acceptable because the scope can still be set explicitly without using an id.
-    var form = this.findNonWrappedForm();
+    let form = this.findNonWrappedForm();
     if (!form) {
       throw new Error('Could not resolve keyStrokeScope ' + keyStrokeScope + ' because no form has been found.');
     }

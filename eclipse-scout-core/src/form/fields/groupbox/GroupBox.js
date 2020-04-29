@@ -123,7 +123,7 @@ export default class GroupBox extends CompositeField {
   }
 
   insertField(field, index) {
-    var newFields = this.fields.slice();
+    let newFields = this.fields.slice();
     index = scout.nvl(index, this.fields.length);
     newFields.splice(index, 0, field);
     this.setFields(newFields);
@@ -131,18 +131,18 @@ export default class GroupBox extends CompositeField {
 
   insertFieldBefore(field, sibling) {
     scout.assertParameter('sibling', sibling);
-    var index = this.fields.indexOf(sibling);
+    let index = this.fields.indexOf(sibling);
     this.insertField(field, index);
   }
 
   insertFieldAfter(field, sibling) {
     scout.assertParameter('sibling', sibling);
-    var index = this.fields.indexOf(sibling) + 1;
+    let index = this.fields.indexOf(sibling) + 1;
     this.insertField(field, index);
   }
 
   deleteField(field) {
-    var newFields = this.fields.slice(),
+    let newFields = this.fields.slice(),
       index = this.fields.indexOf(field);
     if (index < 0) {
       return;
@@ -180,10 +180,8 @@ export default class GroupBox extends CompositeField {
   _setKeyStrokes(keyStrokes) {
     keyStrokes = arrays.ensure(keyStrokes);
 
-    var groupBoxRenderingHints = {
-      render: function() {
-        return true;
-      },
+    let groupBoxRenderingHints = {
+      render: () => true,
       offset: 0,
       hAlign: HAlign.RIGHT,
       $drawingArea: function($drawingArea, event) {
@@ -195,7 +193,7 @@ export default class GroupBox extends CompositeField {
     };
 
     keyStrokes
-      .forEach(function(keyStroke) {
+      .forEach(keyStroke => {
         keyStroke.actionKeyStroke.renderingHints = $.extend({}, keyStroke.actionKeyStroke.renderingHints, groupBoxRenderingHints);
       }, this);
 
@@ -208,7 +206,7 @@ export default class GroupBox extends CompositeField {
    * form as a parent the container of the group-box.
    */
   _keyStrokeBindTarget() {
-    var form = this.getForm();
+    let form = this.getForm();
     if (form) {
       // keystrokes on a group-box have form scope
       return form.$container;
@@ -268,7 +266,7 @@ export default class GroupBox extends CompositeField {
   }
 
   _renderBodyLayoutConfig() {
-    var oldMinWidth = this.htmlBody.layout.minWidth;
+    let oldMinWidth = this.htmlBody.layout.minWidth;
     this.bodyLayoutConfig.applyToLayout(this.htmlBody.layout);
     if (oldMinWidth !== this.bodyLayoutConfig.minWidth) {
       this._renderScrollable();
@@ -289,7 +287,7 @@ export default class GroupBox extends CompositeField {
   }
 
   _removeControls() {
-    this.controls.forEach(function(control) {
+    this.controls.forEach(control => {
       control.remove();
     }, this);
   }
@@ -439,7 +437,7 @@ export default class GroupBox extends CompositeField {
     this.processButtons = [];
     this.processMenus = [];
 
-    var i, field;
+    let i, field;
     for (i = 0; i < this.fields.length; i++) {
       field = this.fields[i];
       if (field instanceof Button) {
@@ -456,7 +454,7 @@ export default class GroupBox extends CompositeField {
         }
       } else if (field instanceof TabBox) {
         this.controls.push(field);
-        for (var k = 0; k < field.tabItems.length; k++) {
+        for (let k = 0; k < field.tabItems.length; k++) {
           if (field.tabItems[k].selectionKeystroke) {
             this.keyStrokeContext.registerKeyStroke(new TabItemKeyStroke(field.tabItems[k].selectionKeystroke, field.tabItems[k]));
           }
@@ -502,7 +500,7 @@ export default class GroupBox extends CompositeField {
   }
 
   _renderBorderVisible() {
-    var borderVisible = this.borderVisible;
+    let borderVisible = this.borderVisible;
     if (this.borderDecoration === GroupBox.BorderDecoration.AUTO) {
       borderVisible = this._computeBorderVisible(borderVisible);
     }
@@ -562,12 +560,12 @@ export default class GroupBox extends CompositeField {
   }
 
   _renderMenuBarPosition() {
-    var position = this.menuBarPosition;
+    let position = this.menuBarPosition;
     if (position === GroupBox.MenuBarPosition.AUTO) {
       position = GroupBox.MenuBarPosition.TOP;
     }
 
-    var hasMenubar = position === GroupBox.MenuBarPosition.TITLE;
+    let hasMenubar = position === GroupBox.MenuBarPosition.TITLE;
     this.$title.toggleClass('has-menubar', hasMenubar);
 
     if (position === GroupBox.MenuBarPosition.BOTTOM) {
@@ -618,8 +616,8 @@ export default class GroupBox extends CompositeField {
   }
 
   _renderExpandable() {
-    var expandable = this.expandable;
-    var $control = this.$title.children('.group-box-control');
+    let expandable = this.expandable;
+    let $control = this.$title.children('.group-box-control');
 
     if (expandable) {
       if ($control.length === 0) {
@@ -736,7 +734,7 @@ export default class GroupBox extends CompositeField {
       // -> this makes sure the parent is not accidentally set to the group box, the other widget should remain responsible
       return;
     }
-    var menus = this.staticMenus
+    let menus = this.staticMenus
       .concat(this.processMenus)
       .concat(this.menus);
 
@@ -776,7 +774,7 @@ export default class GroupBox extends CompositeField {
     } else {
       ResponsiveManager.get().reset(this, true);
       if (this.responsive === null) {
-        var parent = this.findParent(function(parent) {
+        let parent = this.findParent(parent => {
           return parent instanceof GroupBox && parent.responsive;
         });
         ResponsiveManager.get().reset(parent, true);
@@ -786,7 +784,7 @@ export default class GroupBox extends CompositeField {
   }
 
   clone(model, options) {
-    var clone = super.clone(model);
+    let clone = super.clone(model);
     this._deepCloneProperties(clone, ['fields'], options);
     clone._prepareFields();
     return clone;

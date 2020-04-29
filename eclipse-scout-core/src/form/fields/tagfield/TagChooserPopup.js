@@ -21,7 +21,7 @@ export default class TagChooserPopup extends Popup {
   _init(model) {
     super._init(model);
 
-    var column = scout.create('Column', {
+    let column = scout.create('Column', {
       index: 0,
       session: this.session,
       text: 'Tag',
@@ -65,12 +65,12 @@ export default class TagChooserPopup extends Popup {
   }
 
   setLookupResult(result) {
-    var
+    let
       tableRows = [],
       lookupRows = result.lookupRows;
 
     this.table.deleteAllRows();
-    lookupRows.forEach(function(lookupRow) {
+    lookupRows.forEach(lookupRow => {
       tableRows.push(lookupField.createTableRow(lookupRow));
     }, this);
     this.table.insertRows(tableRows);

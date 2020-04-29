@@ -53,15 +53,15 @@ export default class TagBarOverflowPopup extends PopupWithHead {
   }
 
   _renderTags() {
-    var tagBar = this.parent;
-    var visibleTags = tagBar.visibleTags();
-    var allTags = arrays.ensure(tagBar.tags);
-    var overflowTags = allTags.filter(function(tagText) {
+    let tagBar = this.parent;
+    let visibleTags = tagBar.visibleTags();
+    let allTags = arrays.ensure(tagBar.tags);
+    let overflowTags = allTags.filter(tagText => {
       return visibleTags.indexOf(tagText) === -1;
     });
 
-    var clickHandler = tagBar._onTagClick.bind(tagBar);
-    var removeHandler = tagBar._onTagRemoveClick.bind(tagBar);
+    let clickHandler = tagBar._onTagClick.bind(tagBar);
+    let removeHandler = tagBar._onTagRemoveClick.bind(tagBar);
     TagBar.renderTags(this.$body, overflowTags, tagBar.enabledComputed, clickHandler, removeHandler);
 
     if (!this.rendering) {
@@ -89,9 +89,9 @@ export default class TagBarOverflowPopup extends PopupWithHead {
 
   _onTagBarPropertyChange(event) {
     if (event.propertyName === 'tags') {
-      var allTags = arrays.ensure(this.parent.tags);
-      var visibleTags = this.parent.visibleTags();
-      var numTags = allTags.length;
+      let allTags = arrays.ensure(this.parent.tags);
+      let visibleTags = this.parent.visibleTags();
+      let numTags = allTags.length;
       // close popup when no more tags left or all tags are visible (=no overflow icon)
       if (numTags === 0 || numTags === visibleTags.length) {
         this.close();
@@ -108,26 +108,22 @@ export default class TagBarOverflowPopup extends PopupWithHead {
 
   static createFieldAdapter(field) {
     return {
-      $container: function() {
-        return field.$body;
+      $container: () => field.$body,
+
+      enabled: () => true,
+
+      focus: () => {
       },
 
-      enabled: function() {
-        return true;
-      },
-
-      focus: function() {
-      },
-
-      one: function(p1, p2) {
+      one: (p1, p2) => {
         field.one(p1, p2);
       },
 
-      off: function(p1, p2) {
+      off: (p1, p2) => {
         field.off(p1, p2);
       },
 
-      removeTag: function(tag) {
+      removeTag: tag => {
         field.parent.parent.removeTag(tag);
       }
     };

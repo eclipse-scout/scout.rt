@@ -34,7 +34,7 @@ export default class Key {
   }
 
   toKeyStrokeString() {
-    var keyStroke = '';
+    let keyStroke = '';
     if (this.ctrl) {
       keyStroke += 'Ctrl-';
     }
@@ -44,7 +44,7 @@ export default class Key {
     if (this.shift) {
       keyStroke += 'Shift-';
     }
-    var key = keys.codesToKeys[this.which];
+    let key = keys.codesToKeys[this.which];
     if (key === undefined) {
       key = this.which;
     }

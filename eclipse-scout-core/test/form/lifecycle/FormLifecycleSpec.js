@@ -11,9 +11,9 @@
 import {FormSpecHelper} from '@eclipse-scout/testing';
 import {scout, Status} from '../../../src';
 
-describe('FormLifecycle', function() {
+describe('FormLifecycle', () => {
 
-  var session, helper, form, field;
+  let session, helper, form, field;
 
   function expectMessageBox(shown) {
     expect(session.$entryPoint.find('.messagebox').length).toBe(shown ? 1 : 0);
@@ -23,7 +23,7 @@ describe('FormLifecycle', function() {
     session.$entryPoint.find('.messagebox .box-button').click();
   }
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
@@ -35,26 +35,26 @@ describe('FormLifecycle', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
-  describe('cancel', function() {
+  describe('cancel', () => {
 
-    it('don\'t open popup when nothing has been changed', function() {
+    it('don\'t open popup when nothing has been changed', () => {
       form.lifecycle.cancel();
       expectMessageBox(false);
     });
 
-    it('open popup when value of field has been changed', function() {
+    it('open popup when value of field has been changed', () => {
       field.setValue('Foo');
       form.lifecycle.cancel();
       expectMessageBox(true);
     });
 
-    it('triggers close event after cancel', function() {
-      var disposed = false;
-      form.lifecycle.on('close', function() {
+    it('triggers close event after cancel', () => {
+      let disposed = false;
+      form.lifecycle.on('close', () => {
         disposed = true;
       });
       form.lifecycle.cancel();
@@ -64,9 +64,9 @@ describe('FormLifecycle', function() {
 
   });
 
-  describe('ok', function() {
+  describe('ok', () => {
 
-    it('should validate fields and display message box when form is saved', function() {
+    it('should validate fields and display message box when form is saved', () => {
       field.setMandatory(true);
       field.setValue(null);
       form.lifecycle.ok();
@@ -74,11 +74,11 @@ describe('FormLifecycle', function() {
       expectMessageBox(true);
     });
 
-    it('should call save handler when form is saved and all fields are valid', function() {
-      var saved = false;
+    it('should call save handler when form is saved and all fields are valid', () => {
+      let saved = false;
       field.setMandatory(true);
       field.setValue('Foo');
-      form.lifecycle.handle('save', function() {
+      form.lifecycle.handle('save', () => {
         saved = true;
         return $.resolvedPromise(Status.ok());
       });
@@ -88,35 +88,31 @@ describe('FormLifecycle', function() {
       expect(saved).toBe(true);
     });
 
-    it('stops lifecycle if severity is ERROR', function() {
-      var form2 = helper.createFormWithOneField();
+    it('stops lifecycle if severity is ERROR', () => {
+      let form2 = helper.createFormWithOneField();
       form2.lifecycle = scout.create('FormLifecycle', {
         widget: form
       });
-      form2.lifecycle._validate = function() {
-        return $.resolvedPromise(Status.error({
-          message: 'This is a fatal error'
-        }));
-      };
+      form2.lifecycle._validate = () => $.resolvedPromise(Status.error({
+        message: 'This is a fatal error'
+      }));
       runTestWithLifecycleOk(form2, false);
     });
 
-    it('continues lifecycle if severity is WARNING', function() {
-      var form2 = helper.createFormWithOneField();
+    it('continues lifecycle if severity is WARNING', () => {
+      let form2 = helper.createFormWithOneField();
       form2.lifecycle = scout.create('FormLifecycle', {
         widget: form
       });
-      form2.lifecycle._validate = function() {
-        return $.resolvedPromise(Status.warning({
-          message: 'This is only a warning'
-        }));
-      };
+      form2.lifecycle._validate = () => $.resolvedPromise(Status.warning({
+        message: 'This is only a warning'
+      }));
       runTestWithLifecycleOk(form2, true);
     });
 
     function runTestWithLifecycleOk(form2, expected) {
-      var lifecycleComplete = false;
-      form2.lifecycle.on('close', function() {
+      let lifecycleComplete = false;
+      form2.lifecycle.on('close', () => {
         lifecycleComplete = true;
       });
       form2.render();
@@ -128,14 +124,14 @@ describe('FormLifecycle', function() {
       expect(lifecycleComplete).toBe(expected);
     }
 
-    it('should call _validate function on form', function() {
+    it('should call _validate function on form', () => {
       // validate should always be called, even when there is not a single touched field in the form
-      var form2 = helper.createFormWithOneField();
+      let form2 = helper.createFormWithOneField();
       form2.lifecycle = scout.create('FormLifecycle', {
         widget: form2
       });
-      var validateCalled = false;
-      Object.getPrototypeOf(form2)._validate = function() {
+      let validateCalled = false;
+      Object.getPrototypeOf(form2)._validate = () => {
         validateCalled = true;
         return Status.ok();
       };
@@ -144,7 +140,7 @@ describe('FormLifecycle', function() {
 
       // validate should not be called when there is an invalid field (field is mandatory but empty in this case)
       validateCalled = false;
-      var formField = form2.rootGroupBox.fields[0];
+      let formField = form2.rootGroupBox.fields[0];
       formField.touch();
       formField.setMandatory(true);
       form2.ok();
@@ -160,7 +156,7 @@ describe('FormLifecycle', function() {
     });
 
     it('should handle errors that occur in promise', done => {
-      var form = helper.createFormWithOneField();
+      let form = helper.createFormWithOneField();
       form._load = () => {
         return $.resolvedPromise()
           .then(() => {
@@ -178,8 +174,8 @@ describe('FormLifecycle', function() {
      * and must be catched with try/catch or are finally handled by the global error handler.
      */
     it('should handle errors that occur in _load function', done => {
-      var form = helper.createFormWithOneField();
-      var error = null;
+      let form = helper.createFormWithOneField();
+      let error = null;
       form._load = () => {
         throw 'Something went wrong';
       };
@@ -196,15 +192,15 @@ describe('FormLifecycle', function() {
 
   });
 
-  describe('validation error message', function() {
+  describe('validation error message', () => {
 
-    it('should list labels of missing and invalid fields', function() {
+    it('should list labels of missing and invalid fields', () => {
       field.setLabel('FooField');
-      var missingFields = [field];
-      var invalidField = helper.createField('StringField', session.desktop);
+      let missingFields = [field];
+      let invalidField = helper.createField('StringField', session.desktop);
       invalidField.setLabel('BarField');
-      var invalidFields = [invalidField];
-      var html = form.lifecycle._createInvalidElementsMessageHtml(missingFields, invalidFields);
+      let invalidFields = [invalidField];
+      let html = form.lifecycle._createInvalidElementsMessageHtml(missingFields, invalidFields);
       expect(html).toContain('FooField');
       expect(html).toContain('BarField');
     });

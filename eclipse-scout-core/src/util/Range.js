@@ -35,8 +35,8 @@ export default class Range {
     }
     // other is contained completely
     if (other.from >= this.from && other.to <= this.to) {
-      var range1 = new Range(this.from, other.from);
-      var range2 = new Range(other.to, this.to);
+      let range1 = new Range(this.from, other.from);
+      let range2 = new Range(other.to, this.to);
       if (range1.size() === 0) {
         return [range2];
       }
@@ -61,9 +61,9 @@ export default class Range {
    * Subtracts every given range and returns an array of the remaining ranges.
    */
   subtractAll(others) {
-    var other = others.shift();
-    var remains = [this];
-    var newRemains = [];
+    let other = others.shift();
+    let remains = [this];
+    let newRemains = [];
     // Subtract every other element from the remains of every subtraction
     while (other) {
       remains.forEach(subtract.bind(other));
@@ -72,7 +72,7 @@ export default class Range {
       other = others.shift();
     }
     // Remove empty ranges
-    remains = remains.filter(function(remainingElem) {
+    remains = remains.filter(remainingElem => {
       return remainingElem.size() > 0;
     });
     // If nothing is left add one empty range to be consistent with .subtract()
@@ -117,8 +117,8 @@ export default class Range {
 
   union(other) {
     if (this.to < other.from || other.to < this.from) {
-      var range1 = new Range(this.from, this.to);
-      var range2 = new Range(other.from, other.to);
+      let range1 = new Range(this.from, this.to);
+      let range2 = new Range(other.from, other.to);
       if (range1.size() === 0) {
         return [range2];
       }
@@ -132,8 +132,8 @@ export default class Range {
 
   add(other) {
     if (this.to < other.from || other.to < this.from) {
-      var range1 = new Range(this.from, this.to);
-      var range2 = new Range(other.from, other.to);
+      let range1 = new Range(this.from, this.to);
+      let range2 = new Range(other.from, other.to);
       if (range1.size() === 0) {
         return range2;
       }

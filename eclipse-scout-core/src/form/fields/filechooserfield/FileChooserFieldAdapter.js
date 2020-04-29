@@ -25,7 +25,7 @@ export default class FileChooserFieldAdapter extends ValueFieldAdapter {
   }
 
   _onValueChange(event) {
-    var success = this.widget.fileInput.upload();
+    let success = this.widget.fileInput.upload();
     if (!success) {
       this.widget.fileInput.clear();
     }

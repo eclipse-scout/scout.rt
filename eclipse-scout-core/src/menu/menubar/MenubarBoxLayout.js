@@ -22,11 +22,11 @@ export default class MenubarBoxLayout extends AbstractLayout {
   }
 
   preferredLayoutSize($container, options) {
-    var menuItemSize = null;
+    let menuItemSize = null;
 
-    return this.menubox.menuItems.filter(function(menuItem) {
+    return this.menubox.menuItems.filter(menuItem => {
       return !menuItem.overflown && menuItem.isVisible();
-    }).reduce(function(prefSize, menuItem) {
+    }).reduce((prefSize, menuItem) => {
       menuItemSize = menuItem.htmlComp.prefSize({
         useCssSize: true,
         includeMargin: true

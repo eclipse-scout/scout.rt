@@ -19,9 +19,9 @@ export default class ViewButtonActionKeyStroke extends ActionKeyStroke {
 
   _postRenderKeyBox($drawingArea) {
     if (this.field.iconId && !this.field._isMenuItem) {
-      var width = $drawingArea.outerWidth();
-      var wKeybox = $drawingArea.find('.key-box').outerWidth();
-      var leftKeyBox = width / 2 - wKeybox / 2;
+      let width = $drawingArea.outerWidth();
+      let wKeybox = $drawingArea.find('.key-box').outerWidth();
+      let leftKeyBox = width / 2 - wKeybox / 2;
       $drawingArea.find('.key-box').cssLeft(leftKeyBox);
     }
   }

@@ -49,7 +49,7 @@ export function copyText(options) {
   }
   scout.assertProperty(options, 'session');
 
-  var promise = _copyText(options);
+  let promise = _copyText(options);
 
   if (options.parent && scout.nvl(options.showNotification, true)) {
     _showNotification(options, promise);
@@ -67,20 +67,20 @@ export function _copyText(options) {
 
   // Fallback for browsers that don't support the modern clipboard API (IE, Safari, Chrome < 66, Firefox < 63)
   // Create invisible textarea field and use document command "copy" to copy the text to the clipboard
-  var doc = (options.parent && options.parent.rendered ? options.parent.document(true) : document);
-  var f = doc.createElement('textarea');
+  let doc = (options.parent && options.parent.rendered ? options.parent.document(true) : document);
+  let f = doc.createElement('textarea');
   f.style.position = 'fixed';
   f.style.opacity = '0.0';
   f.value = options.text;
   doc.body.appendChild(f);
   // Preserve focus
-  var $f = $(f);
+  let $f = $(f);
   options.session.focusManager.installFocusContext($f, FocusRule.AUTO);
   f.select(); // cannot use jquery select(), because that is overridden by jquery-scout
 
-  var deferred = $.Deferred();
+  let deferred = $.Deferred();
   try {
-    var successful = doc.execCommand('copy');
+    let successful = doc.execCommand('copy');
     if (successful) {
       deferred.resolve();
     } else {
@@ -97,12 +97,12 @@ export function _copyText(options) {
 }
 
 export function _showNotification(options, promise) {
-  var status = _successStatus(options.parent.session);
+  let status = _successStatus(options.parent.session);
   promise
-    .catch(function() {
+    .catch(() => {
       status = _failedStatus(options.parent.session);
     })
-    .then(function() {
+    .then(() => {
       showNotification(options.parent, status);
     });
 }
@@ -131,7 +131,7 @@ export function _failedStatus(session) {
  */
 export function showNotification(parent, status) {
   scout.assertParameter('parent', parent);
-  var notification = scout.create('DesktopNotification', {
+  let notification = scout.create('DesktopNotification', {
     parent: parent,
     closable: false,
     duration: 1234,

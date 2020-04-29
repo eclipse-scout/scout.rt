@@ -26,7 +26,7 @@ export default class TagFieldNavigationKeyStroke extends KeyStroke {
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     if (!accepted) {
       return false;
     }
@@ -42,20 +42,20 @@ export default class TagFieldNavigationKeyStroke extends KeyStroke {
   }
 
   _focusTagElement(direction) {
-    var UNDEFINED = -1;
-    var INPUT = -2;
+    let UNDEFINED = -1;
+    let INPUT = -2;
 
     // find overflow-icon and all tag-elements
-    var $focusTargets = TagBar.findFocusableTagElements(this.fieldAdapter.$container());
-    var numTargets = $focusTargets.length;
+    let $focusTargets = TagBar.findFocusableTagElements(this.fieldAdapter.$container());
+    let numTargets = $focusTargets.length;
     if (numTargets === 0) {
       return;
     }
 
     // check which element has the focus
-    var focusIndex = UNDEFINED;
+    let focusIndex = UNDEFINED;
     $focusTargets.each(function(index) {
-      var $element = $(this);
+      let $element = $(this);
       if ($element.hasClass('focused')) {
         focusIndex = index;
       }
@@ -67,7 +67,7 @@ export default class TagFieldNavigationKeyStroke extends KeyStroke {
         focusIndex = numTargets - 1;
       }
     } else {
-      var nextFocusIndex = focusIndex + direction;
+      let nextFocusIndex = focusIndex + direction;
       if (nextFocusIndex >= numTargets) {
         focusIndex = INPUT;
       } else if (nextFocusIndex < 0) {

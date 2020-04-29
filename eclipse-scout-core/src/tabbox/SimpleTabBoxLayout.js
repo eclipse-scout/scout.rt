@@ -18,7 +18,7 @@ export default class SimpleTabBoxLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var containerSize, viewContentSize,
+    let containerSize, viewContentSize,
       htmlContainer = HtmlComponent.get($container),
       htmlViewContent = HtmlComponent.get(this.tabBox.$viewContent),
       tabAreaSize;
@@ -44,10 +44,10 @@ export default class SimpleTabBoxLayout extends AbstractLayout {
       return new Dimension(0, 0);
     }
     // exprected the tab area is layouted dynamically only
-    var htmlViewTabs = HtmlComponent.get(this.tabBox.$tabArea),
+    let htmlViewTabs = HtmlComponent.get(this.tabBox.$tabArea),
       prefSize = htmlViewTabs.prefSize(),
       margins = htmlViewTabs.margins();
-    var size = new Dimension(containerSize.width, prefSize.height + margins.top + margins.bottom);
+    let size = new Dimension(containerSize.width, prefSize.height + margins.top + margins.bottom);
     htmlViewTabs.setSize(size);
     return size;
   }
@@ -57,7 +57,7 @@ export default class SimpleTabBoxLayout extends AbstractLayout {
    */
   preferredLayoutSize($container, options) {
     options = options || {};
-    var htmlContainer = HtmlComponent.get($container),
+    let htmlContainer = HtmlComponent.get($container),
       htmlViewContent = HtmlComponent.get(this.tabBox.$viewContent),
       htmlViewTabs = HtmlComponent.get(this.tabBox.$tabArea),
       viewTabsSize = new Dimension(),

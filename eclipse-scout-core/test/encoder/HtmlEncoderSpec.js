@@ -15,7 +15,7 @@ describe('HtmlEncoder', () => {
 
   let encoder = new HtmlEncoder();
 
-  it('encodes HTML', function() {
+  it('encodes HTML', () => {
     expect(encoder.encode()).toBeUndefined();
     expect(encoder.encode('')).toBe('');
     expect(encoder.encode('hello')).toBe('hello');

@@ -83,9 +83,9 @@ export default class MessageBox extends Widget {
       new ClickActiveElementKeyStroke(this, [
         keys.SPACE, keys.ENTER
       ]),
-      new AbortKeyStroke(this, function() {
+      new AbortKeyStroke(this, (() => {
         return this._$abortButton;
-      }.bind(this))
+      }))
     ]);
   }
 
@@ -98,7 +98,7 @@ export default class MessageBox extends Widget {
       .on('mousedown', this._onMouseDown.bind(this))
       .on('copy', this._onCopy.bind(this));
 
-    var $handle = this.$container.appendDiv('drag-handle');
+    let $handle = this.$container.appendDiv('drag-handle');
     this.$container.draggable($handle);
 
     this.$content = this.$container.appendDiv('messagebox-content');
@@ -108,7 +108,7 @@ export default class MessageBox extends Widget {
     this.$buttons = this.$container.appendDiv('messagebox-buttons')
       .on('copy', this._onCopy.bind(this));
 
-    var boxButtons = new BoxButtons(this.$buttons, this._onButtonClick.bind(this));
+    let boxButtons = new BoxButtons(this.$buttons, this._onButtonClick.bind(this));
     this._$abortButton = null; // button to be executed when abort() is called, e.g. when ESCAPE is pressed
     if (this.yesButtonText) {
       this.$yesButton = boxButtons.addButton({
@@ -146,7 +146,7 @@ export default class MessageBox extends Widget {
 
     // Prevent resizing when message-box is dragged off the viewport
     this.$container.addClass('calc-helper');
-    var naturalWidth = this.$container.width();
+    let naturalWidth = this.$container.width();
     this.$container.removeClass('calc-helper');
     this.$container.css('min-width', Math.max(naturalWidth, boxButtons.buttonCount() * 100));
     boxButtons.updateButtonWidths(this.$container.width());
@@ -223,7 +223,7 @@ export default class MessageBox extends Widget {
 
   _onMouseDown() {
     // If there is a dialog in the parent-hierarchy activate it in order to bring it on top of other dialogs.
-    var parent = this.findParent(function(p) {
+    let parent = this.findParent(p => {
       return p instanceof Form && p.isDialog();
     });
     if (parent) {
@@ -239,31 +239,31 @@ export default class MessageBox extends Widget {
 
   copy() {
     this._setCopyable(true);
-    var myDocument = this.$container.document(true);
-    var range = myDocument.createRange();
+    let myDocument = this.$container.document(true);
+    let range = myDocument.createRange();
     range.selectNodeContents(this.$content[0]);
-    var selection = this.$container.window(true).getSelection();
+    let selection = this.$container.window(true).getSelection();
     selection.removeAllRanges();
     selection.addRange(range);
     myDocument.execCommand('copy');
   }
 
   _onCopy(event) {
-    var ie = Device.get().isInternetExplorer();
-    var clipboardData = ie ? this.$container.window(true).clipboardData : objects.optProperty(event, 'originalEvent', 'clipboardData');
+    let ie = Device.get().isInternetExplorer();
+    let clipboardData = ie ? this.$container.window(true).clipboardData : objects.optProperty(event, 'originalEvent', 'clipboardData');
 
     if (clipboardData) {
       // Internet Explorer only allows plain text (which must have data-type 'Text')
       if (!ie) {
-        var htmlText = strings.join('<br/>',
+        let htmlText = strings.join('<br/>',
           this.$header[0].outerHTML,
           this.$body[0].outerHTML,
           this.$html[0].outerHTML,
           this.hiddenText);
         clipboardData.setData('text/html', htmlText);
       }
-      var dataType = ie ? 'Text' : 'text/plain';
-      var plainText = strings.join('\n\n',
+      let dataType = ie ? 'Text' : 'text/plain';
+      let plainText = strings.join('\n\n',
         this.$header.text(),
         this.$body.text(),
         this.$html.text(),

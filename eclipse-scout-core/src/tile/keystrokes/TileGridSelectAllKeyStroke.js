@@ -18,7 +18,7 @@ export default class TileGridSelectAllKeyStroke extends TileGridSelectKeyStroke 
     this.shift = false;
     this.which = [keys.A];
     this.renderingHints.$drawingArea = function($drawingArea, event) {
-      var tile = this.getSelectionHandler().getVisibleTiles()[0];
+      let tile = this.getSelectionHandler().getVisibleTiles()[0];
       if (tile) {
         // Draw in first tile so that other key stroke hints (e.g. left, right etc.) don't overlap this one
         return tile.$container;
@@ -27,7 +27,7 @@ export default class TileGridSelectAllKeyStroke extends TileGridSelectKeyStroke 
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     if (!accepted) {
       return false;
     }

@@ -85,7 +85,7 @@ export default class DateFormatPatternDefinition {
   createFormatFunction(acceptedTerm) {
     return function(formatContext) {
       if (this.formatFunction) {
-        var result = this.formatFunction(formatContext, acceptedTerm);
+        let result = this.formatFunction(formatContext, acceptedTerm);
         if (result !== undefined) { // convenience
           formatContext.formattedString += result;
         }
@@ -95,9 +95,9 @@ export default class DateFormatPatternDefinition {
 
   createParseFunction(acceptedTerm) {
     return function(parseContext) {
-      var m, parsedTerm, match;
+      let m, parsedTerm, match;
 
-      var success = false;
+      let success = false;
       if (this.parseRegExp) {
         // RegEx handling (default)
         m = this.parseRegExp.exec(parseContext.inputString);
@@ -124,7 +124,7 @@ export default class DateFormatPatternDefinition {
         // the form that matches the length of the match.
         parsedTerm = this.terms[0];
         if (this.terms.length > 1) {
-          this.terms.some(function(term) {
+          this.terms.some(term => {
             if (term.length === match.length) {
               parsedTerm = term;
               return true; // found
@@ -144,7 +144,7 @@ export default class DateFormatPatternDefinition {
   accept(term) {
     if (term) {
       // Check if one of the terms matches
-      for (var i = 0; i < this.terms.length; i++) {
+      for (let i = 0; i < this.terms.length; i++) {
         if (term === this.terms[i]) {
           return this.terms[i];
         }

@@ -22,7 +22,7 @@ export default class OutlineSpecHelper {
   }
 
   createModel(nodes) {
-    var model = createSimpleModel('Outline', this.session);
+    let model = createSimpleModel('Outline', this.session);
     if (nodes) {
       model.nodes = nodes;
     }
@@ -45,12 +45,12 @@ export default class OutlineSpecHelper {
       return;
     }
 
-    var nodes = [],
+    let nodes = [],
       nodeId;
     if (!depth) {
       depth = 0;
     }
-    for (var i = 0; i < nodeCount; i++) {
+    for (let i = 0; i < nodeCount; i++) {
       nodeId = i;
       if (parentNode) {
         nodeId = parentNode.id + '_' + nodeId;
@@ -65,17 +65,17 @@ export default class OutlineSpecHelper {
   }
 
   createOutline(model) {
-    var defaults = {
+    let defaults = {
       parent: this.session.desktop
     };
     model = $.extend({}, defaults, model);
-    var tree = new Outline();
+    let tree = new Outline();
     tree.init(model);
     return tree;
   }
 
   createOutlineAdapter(model) {
-    var outlineAdapter = new OutlineAdapter();
+    let outlineAdapter = new OutlineAdapter();
     outlineAdapter.init(model);
     return outlineAdapter;
   }
@@ -84,9 +84,9 @@ export default class OutlineSpecHelper {
    * Creates an outline with 3 nodes, the first node has a visible detail form
    */
   createOutlineWithOneDetailForm() {
-    var model = this.createModelFixture(3, 2, true);
-    var outline = this.createOutline(model);
-    var node = outline.nodes[0];
+    let model = this.createModelFixture(3, 2, true);
+    let outline = this.createOutline(model);
+    let node = outline.nodes[0];
     node.detailForm = new FormSpecHelper(this.session).createFormWithOneField({
       modal: false
     });
@@ -98,9 +98,9 @@ export default class OutlineSpecHelper {
    * Creates an outline with 3 nodes, the first node has a visible detail table
    */
   createOutlineWithOneDetailTable() {
-    var model = this.createModelFixture(3, 2, true);
-    var outline = this.createOutline(model);
-    var node = outline.nodes[0];
+    let model = this.createModelFixture(3, 2, true);
+    let outline = this.createOutline(model);
+    let node = outline.nodes[0];
     node.detailTable = new TableSpecHelper(this.session).createTableWithOneColumn();
     node.detailTableVisible = true;
     return outline;

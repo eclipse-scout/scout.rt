@@ -43,13 +43,13 @@ export default class TimePicker extends Widget {
   }
 
   _renderTimeSelection() {
-    var i,
+    let i,
       date = dates.trunc(new Date()),
       now = dates.ceil(new Date(), this.resolution),
       currentHours = 0,
       $hourRow,
       $time;
-    var $box = this.$parent.makeDiv('day-table');
+    let $box = this.$parent.makeDiv('day-table');
     for (i = 0; i < 24; i++) {
       // reset minutes always every hour line starts with :00
       date.setMinutes(0);
@@ -105,9 +105,9 @@ export default class TimePicker extends Widget {
   }
 
   _renderPreselectedTime() {
-    var $scrollTo;
-    this.$container.find('.cell').each(function(i, elem) {
-      var $time = $(elem),
+    let $scrollTo;
+    this.$container.find('.cell').each((i, elem) => {
+      let $time = $(elem),
         time = $time.data('time');
       $time.removeClass('preselected');
       if (this.preselectedTime) {
@@ -119,7 +119,7 @@ export default class TimePicker extends Widget {
           $scrollTo = $time;
         }
       }
-    }.bind(this));
+    });
     if ($scrollTo) {
       scrollbars.scrollTo(this.$container, $scrollTo, 'center');
     }
@@ -142,9 +142,9 @@ export default class TimePicker extends Widget {
 
   _renderSelectedTime() {
 
-    var $scrollTo;
-    this.$container.find('.cell').each(function(i, elem) {
-      var $time = $(elem),
+    let $scrollTo;
+    this.$container.find('.cell').each((i, elem) => {
+      let $time = $(elem),
         time = $time.data('time');
       $time.removeClass('selected');
       if (this.selectedTime) {
@@ -156,20 +156,20 @@ export default class TimePicker extends Widget {
           $scrollTo = $time;
         }
       }
-    }.bind(this));
+    });
     if ($scrollTo) {
       scrollbars.scrollTo(this.$container, $scrollTo, 'center');
     }
   }
 
   shiftViewDate(years, months, days) {
-    var date = this.viewDate;
+    let date = this.viewDate;
     date = dates.shift(date, years, months, days);
     this.showDate(date);
   }
 
   shiftSelectedTime(hourUnits, minuteUnits, secondUnits) {
-    var time = this.preselectedTime;
+    let time = this.preselectedTime;
     if (this.selectedTime) {
       time = dates.shiftTime(this.selectedTime, hourUnits, minuteUnits * this.resolution, secondUnits);
     }
@@ -183,7 +183,7 @@ export default class TimePicker extends Widget {
     if (!time) {
       return time;
     }
-    var min = time.getMinutes();
+    let min = time.getMinutes();
     min = (parseInt(min / this.resolution) * this.resolution);
     time.setMinutes(min);
     return time;
@@ -191,7 +191,7 @@ export default class TimePicker extends Widget {
   }
 
   _findNextAllowedDate(years, months, days) {
-    var i, date,
+    let i, date,
       sum = years + months + days,
       dir = sum > 0 ? 1 : -1,
       now = this.selectedDate || dates.trunc(new Date());
@@ -229,23 +229,23 @@ export default class TimePicker extends Widget {
       return true;
     }
     // when allowedDates is set, only dates contained in this array are allowed
-    var allowedDateAsTimestamp,
+    let allowedDateAsTimestamp,
       dateAsTimestamp = date.getTime();
-    return this.allowedDates.some(function(allowedDate) {
+    return this.allowedDates.some(allowedDate => {
       allowedDateAsTimestamp = allowedDate.getTime();
       return allowedDateAsTimestamp === dateAsTimestamp;
     });
   }
 
   _onNavigationMouseDown(event) {
-    var $target = $(event.currentTarget);
-    var diff = $target.data('shift');
+    let $target = $(event.currentTarget);
+    let diff = $target.data('shift');
     this.shiftViewDate(0, diff, 0);
   }
 
   _onTimeClick(event) {
-    var $target = $(event.currentTarget);
-    var time = new Date($target.data('time'));
+    let $target = $(event.currentTarget);
+    let time = new Date($target.data('time'));
     this.selectTime(time);
     this.trigger('timeSelect', {
       time: time
@@ -254,8 +254,8 @@ export default class TimePicker extends Widget {
 
   _onMouseWheel(event) {
     event = event.originalEvent || this.$container.window(true).event.originalEvent;
-    var wheelData = event.wheelDelta ? event.wheelDelta / 10 : -event.detail * 3;
-    var diff = (wheelData >= 0 ? -1 : 1);
+    let wheelData = event.wheelDelta ? event.wheelDelta / 10 : -event.detail * 3;
+    let diff = (wheelData >= 0 ? -1 : 1);
     this.shiftViewDate(0, diff, 0);
     event.preventDefault();
   }

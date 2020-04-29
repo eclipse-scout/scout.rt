@@ -8,14 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ParsingFailedStatus, arrays, scout, Status, StringField, ValueField} from '../../../src/index';
+import {arrays, ParsingFailedStatus, scout, Status, StringField, ValueField} from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper} from '@eclipse-scout/testing';
 
 /* global removePopups */
-describe('ValueField', function() {
-  var session, helper, menuHelper;
+describe('ValueField', () => {
+  let session, helper, menuHelper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
@@ -24,15 +24,15 @@ describe('ValueField', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
     jasmine.Ajax.uninstall();
   });
 
-  describe('property status visible', function() {
-    var formField, model;
+  describe('property status visible', () => {
+    let formField, model;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createFieldModel();
       formField = new ValueField();
       formField._render = function() {
@@ -43,9 +43,9 @@ describe('ValueField', function() {
       formField.init(model);
     });
 
-    it('shows a status even though status visible is false but there are visible menus', function() {
+    it('shows a status even though status visible is false but there are visible menus', () => {
       formField.statusVisible = false;
-      var menu0 = menuHelper.createMenu(menuHelper.createModel());
+      let menu0 = menuHelper.createMenu(menuHelper.createModel());
       formField.menus = [menu0];
       formField.menusVisible = true;
       formField.render();
@@ -57,10 +57,10 @@ describe('ValueField', function() {
 
   });
 
-  describe('init', function() {
+  describe('init', () => {
 
-    it('sets display text using formatValue if value is set initially', function() {
-      var field = helper.createField('StringField', session.desktop, {
+    it('sets display text using formatValue if value is set initially', () => {
+      let field = helper.createField('StringField', session.desktop, {
         value: 'Foo'
       });
       expect(field.value).toBe('Foo');
@@ -68,9 +68,9 @@ describe('ValueField', function() {
       expect(field.empty).toBe(false);
     });
 
-    it('does not override display text using formatValue if display text is set initially', function() {
+    it('does not override display text using formatValue if display text is set initially', () => {
       // Don't parse the value, this is actually the same as one would call setDisplayText after the init
-      var field = helper.createField('StringField', session.desktop, {
+      let field = helper.createField('StringField', session.desktop, {
         displayText: 'Bar'
       });
       expect(field.value).toBe(null);
@@ -78,9 +78,9 @@ describe('ValueField', function() {
       expect(field.empty).toBe(true);
     });
 
-    it('does not override display text using formatValue if display text is set initially even if value is set as well', function() {
+    it('does not override display text using formatValue if display text is set initially even if value is set as well', () => {
       // Don't override display text, otherwise specifying the display text would not have any effect
-      var field = helper.createField('StringField', session.desktop, {
+      let field = helper.createField('StringField', session.desktop, {
         value: 'Foo',
         displayText: 'ABC'
       });
@@ -96,9 +96,9 @@ describe('ValueField', function() {
       expect(field.displayText).toBe('ABC');
     });
 
-    it('does not set value if value is invalid initially', function() {
-      var field = new StringField();
-      field.setValidator(function(value) {
+    it('does not set value if value is invalid initially', () => {
+      let field = new StringField();
+      field.setValidator(value => {
         throw 'Validation failed';
       });
       field.init({
@@ -110,9 +110,9 @@ describe('ValueField', function() {
       expect(field.empty).toBe(true);
     });
 
-    it('does not override the errorStatus if an errorStatus is set initially', function() {
+    it('does not override the errorStatus if an errorStatus is set initially', () => {
       // Mainly needed for page reload case with scout classic, but may be useful for scout JS too
-      var field = helper.createField('StringField', session.desktop, {
+      let field = helper.createField('StringField', session.desktop, {
         errorStatus: {
           message: 'initial error status'
         }
@@ -121,10 +121,10 @@ describe('ValueField', function() {
       expect(field.empty).toBe(true);
     });
 
-    it('does not override the errorStatus if an errorStatus set initially even if an invalid value is set', function() {
+    it('does not override the errorStatus if an errorStatus set initially even if an invalid value is set', () => {
       // Don't override error status, otherwise specifying the error status would not have any effect
-      var field = new StringField();
-      field.setValidator(function(value) {
+      let field = new StringField();
+      field.setValidator(value => {
         throw 'Validation failed';
       });
       field.init({
@@ -153,18 +153,18 @@ describe('ValueField', function() {
       expect(field.errorStatus.message).toBe('another error');
 
       function findInitialError(field) {
-        return arrays.find(field.errorStatus.children, function(status) {
+        return arrays.find(field.errorStatus.children, status => {
           return !(status instanceof ParsingFailedStatus);
         });
       }
     });
 
-    it('calls validate and format when value is set initially', function() {
-      var field = new StringField();
-      field.setValidator(function(value) {
+    it('calls validate and format when value is set initially', () => {
+      let field = new StringField();
+      field.setValidator(value => {
         return (value === 'gelb' ? 'rot' : value);
       });
-      field.setFormatter(function(value) {
+      field.setFormatter(value => {
         return (value === 'rot' ? 'lila' : value);
       });
       field.init({
@@ -178,10 +178,10 @@ describe('ValueField', function() {
     });
   });
 
-  describe('setValue', function() {
+  describe('setValue', () => {
 
-    it('sets the value, formats it and sets the display text', function() {
-      var field = helper.createField('StringField');
+    it('sets the value, formats it and sets the display text', () => {
+      let field = helper.createField('StringField');
       field.setValue('Foo');
       expect(field.value).toBe('Foo');
       expect(field.displayText).toBe('Foo');
@@ -190,9 +190,9 @@ describe('ValueField', function() {
       expect(field.displayText).toBe('');
     });
 
-    it('does not set the value but the error status and display text if the validation fails', function() {
-      var field = helper.createField('StringField');
-      field.setValidator(function(value) {
+    it('does not set the value but the error status and display text if the validation fails', () => {
+      let field = helper.createField('StringField');
+      field.setValidator(value => {
         throw new Error('Validation failed');
       });
       field.setValue('Foo');
@@ -201,16 +201,16 @@ describe('ValueField', function() {
       expect(field.displayText).toBe('Foo');
     });
 
-    it('deletes the error status if value is valid', function() {
-      var field = helper.createField('StringField');
-      field.setValidator(function(value) {
+    it('deletes the error status if value is valid', () => {
+      let field = helper.createField('StringField');
+      field.setValidator(value => {
         throw new Error('Validation failed');
       });
       field.setValue('Foo');
       expect(field.value).toBe(null);
       expect(field.errorStatus instanceof Status).toBe(true);
 
-      field.setValidator(function(value) {
+      field.setValidator(value => {
         return value;
       });
       field.setValue('Foo');
@@ -218,10 +218,10 @@ describe('ValueField', function() {
       expect(field.errorStatus).toBe(null);
     });
 
-    it('does not fire a property change if the value has not changed', function() {
-      var field = helper.createField('StringField');
-      var count = 0;
-      field.on('propertyChange', function(event) {
+    it('does not fire a property change if the value has not changed', () => {
+      let field = helper.createField('StringField');
+      let count = 0;
+      field.on('propertyChange', event => {
         if (event.propertyName === 'value') {
           count++;
         }
@@ -237,15 +237,15 @@ describe('ValueField', function() {
       expect(count).toBe(1);
     });
 
-    it('executes every validator when validating the value', function() {
-      var field = helper.createField('StringField');
-      field.addValidator(function(value) {
+    it('executes every validator when validating the value', () => {
+      let field = helper.createField('StringField');
+      field.addValidator(value => {
         if (value === 'hi') {
           throw 'Hi is not allowed';
         }
         return value;
       }, false);
-      field.addValidator(function(value) {
+      field.addValidator(value => {
         if (value === 'hello') {
           throw 'Hello is not allowed';
         }
@@ -260,9 +260,9 @@ describe('ValueField', function() {
       expect(field.errorStatus).toBe(null);
     });
 
-    it('converts undefined to null', function() {
+    it('converts undefined to null', () => {
       // Allowing undefined would break the equals checks in ValueField.js
-      var field = helper.createField('StringField');
+      let field = helper.createField('StringField');
       field.setValue(undefined);
       expect(field.value).toBe(null);
       expect(field.displayText).toBe('');
@@ -273,11 +273,11 @@ describe('ValueField', function() {
 
   });
 
-  describe('_validateValue', function() {
+  describe('_validateValue', () => {
 
-    it('may throw an error if value is invalid', function() {
-      var field = helper.createField('StringField');
-      field.setValidator(function(value) {
+    it('may throw an error if value is invalid', () => {
+      let field = helper.createField('StringField');
+      field.setValidator(value => {
         throw new Error('an error');
       });
       field.setValue('Foo');
@@ -285,9 +285,9 @@ describe('ValueField', function() {
       expect(field.errorStatus.message).toBe('[undefined text: InvalidValueMessageX]');
     });
 
-    it('may throw a ParsingFailedStatus if value is invalid', function() {
-      var field = helper.createField('StringField');
-      field.setValidator(function(value) {
+    it('may throw a ParsingFailedStatus if value is invalid', () => {
+      let field = helper.createField('StringField');
+      field.setValidator(value => {
         throw ParsingFailedStatus.error({
           message: 'Custom message'
         });
@@ -297,9 +297,9 @@ describe('ValueField', function() {
       expect(field.errorStatus.message).toBe('Custom message');
     });
 
-    it('may throw a message if value is invalid', function() {
-      var field = helper.createField('StringField');
-      field.setValidator(function(value) {
+    it('may throw a message if value is invalid', () => {
+      let field = helper.createField('StringField');
+      field.setValidator(value => {
         throw 'Invalid value';
       });
       field.setValue('Foo');
@@ -309,18 +309,18 @@ describe('ValueField', function() {
 
   });
 
-  describe('parseAndSetValue', function() {
+  describe('parseAndSetValue', () => {
 
-    it('parses and sets the value', function() {
-      var field = helper.createField('StringField');
+    it('parses and sets the value', () => {
+      let field = helper.createField('StringField');
       field.parseAndSetValue('Foo');
       expect(field.displayText).toBe('Foo');
       expect(field.value).toBe('Foo');
     });
 
-    it('does not set the value but the error status if the parsing fails', function() {
-      var field = helper.createField('StringField');
-      field.setParser(function(text) {
+    it('does not set the value but the error status if the parsing fails', () => {
+      let field = helper.createField('StringField');
+      field.setParser(text => {
         throw new Error('Parsing failed');
       });
       field.parseAndSetValue('Foo');
@@ -328,16 +328,16 @@ describe('ValueField', function() {
       expect(field.errorStatus instanceof Status).toBe(true);
     });
 
-    it('deletes the error status if parsing succeeds', function() {
-      var field = helper.createField('StringField');
-      field.setParser(function(value) {
+    it('deletes the error status if parsing succeeds', () => {
+      let field = helper.createField('StringField');
+      field.setParser(value => {
         throw new Error('Validation failed');
       });
       field.parseAndSetValue('Foo');
       expect(field.value).toBe(null);
       expect(field.errorStatus instanceof Status).toBe(true);
 
-      field.setParser(function(value) {
+      field.setParser(value => {
         return value;
       });
       field.parseAndSetValue('Foo');
@@ -347,22 +347,20 @@ describe('ValueField', function() {
 
   });
 
-  describe('acceptInput', function() {
+  describe('acceptInput', () => {
 
-    it('accepts the current display text by calling parse, validate and format', function() {
-      var field = helper.createField('StringField');
-      field.setParser(function(displayText) {
+    it('accepts the current display text by calling parse, validate and format', () => {
+      let field = helper.createField('StringField');
+      field.setParser(displayText => {
         return (displayText === 'blau' ? 'gelb' : displayText);
       });
-      field.setValidator(function(value) {
+      field.setValidator(value => {
         return (value === 'gelb' ? 'rot' : value);
       });
-      field.setFormatter(function(value) {
+      field.setFormatter(value => {
         return (value === 'rot' ? 'lila' : value);
       });
-      field._readDisplayText = function() {
-        return 'blau';
-      };
+      field._readDisplayText = () => 'blau';
       field.acceptInput();
       // 'blau' -> (parse) 'gelb' -> (validate) 'rot'
       expect(field.value).toBe('rot');
@@ -370,11 +368,11 @@ describe('ValueField', function() {
       expect(field.displayText).toBe('lila');
     });
 
-    it('is triggered when input is accepted', function() {
-      var field = helper.createField('StringField');
-      var displayText;
+    it('is triggered when input is accepted', () => {
+      let field = helper.createField('StringField');
+      let displayText;
       field.render();
-      field.on('acceptInput', function(event) {
+      field.on('acceptInput', event => {
         displayText = event.displayText;
       });
       field.$field.val('a value');
@@ -382,15 +380,15 @@ describe('ValueField', function() {
       expect(displayText).toBe('a value');
     });
 
-    it('contains the actual displayText even if it was changed using format value', function() {
-      var field = helper.createField('StringField');
+    it('contains the actual displayText even if it was changed using format value', () => {
+      let field = helper.createField('StringField');
       field.render();
-      field.setFormatter(function(value) {
+      field.setFormatter(value => {
         return 'formatted value';
       });
 
-      var displayText;
-      field.on('acceptInput', function(event) {
+      let displayText;
+      field.on('acceptInput', event => {
         displayText = event.displayText;
       });
       field.$field.val('a value');
@@ -398,9 +396,9 @@ describe('ValueField', function() {
       expect(displayText).toBe('formatted value');
     });
 
-    it('updates the display text even if it was changed using parse value', function() {
-      var field = helper.createField('StringField');
-      field.setParser(function(text) {
+    it('updates the display text even if it was changed using parse value', () => {
+      let field = helper.createField('StringField');
+      field.setParser(text => {
         if (text === 'Error') {
           throw new Error();
         } else if (text === 'Foo') {
@@ -434,13 +432,13 @@ describe('ValueField', function() {
 
   });
 
-  describe('validator', function() {
+  describe('validator', () => {
 
-    it('may be set initially', function() {
-      var field = scout.create('StringField', {
+    it('may be set initially', () => {
+      let field = scout.create('StringField', {
         parent: session.desktop,
         value: 'hi',
-        validator: function(value, defaultValidator) {
+        validator: (value, defaultValidator) => {
           value = defaultValidator(value);
           if (value === 'hi') {
             throw 'Hi is not allowed';
@@ -455,12 +453,12 @@ describe('ValueField', function() {
 
   });
 
-  describe('addValidator', function() {
+  describe('addValidator', () => {
 
-    it('adds a validator and revalidates the value', function() {
-      var field = helper.createField('StringField');
+    it('adds a validator and revalidates the value', () => {
+      let field = helper.createField('StringField');
       field.setValue('hi');
-      field.addValidator(function(value) {
+      field.addValidator(value => {
         if (value === 'hi') {
           throw 'Hi is not allowed';
         }
@@ -473,16 +471,16 @@ describe('ValueField', function() {
 
   });
 
-  describe('removeValidator', function() {
-    var validator = function(value) {
+  describe('removeValidator', () => {
+    let validator = value => {
       if (value === 'hi') {
         throw 'Hi is not allowed';
       }
       return value;
     };
 
-    it('removes a validator and revalidates the value', function() {
-      var field = helper.createField('StringField');
+    it('removes a validator and revalidates the value', () => {
+      let field = helper.createField('StringField');
       field.setValue('hi');
       field.addValidator(validator);
       expect(field.errorStatus.message).toBe('Hi is not allowed');
@@ -492,12 +490,12 @@ describe('ValueField', function() {
 
   });
 
-  describe('setValidator', function() {
+  describe('setValidator', () => {
 
-    it('removes every validator and sets the new one', function() {
-      var field = helper.createField('StringField');
+    it('removes every validator and sets the new one', () => {
+      let field = helper.createField('StringField');
       expect(field.validators.length).toBe(1);
-      field.setValidator(function(value, defaultValidator) {
+      field.setValidator((value, defaultValidator) => {
         value = defaultValidator(value);
         if (value === 'hi') {
           throw 'Hi is not allowed';
@@ -514,16 +512,16 @@ describe('ValueField', function() {
 
   });
 
-  describe('setValidators', function() {
+  describe('setValidators', () => {
 
-    it('replaces the list of validators with the given ones', function() {
-      var field = helper.createField('StringField');
-      field.setValidators([function(value) {
+    it('replaces the list of validators with the given ones', () => {
+      let field = helper.createField('StringField');
+      field.setValidators([value => {
         if (value === 'hi') {
           throw 'Hi is not allowed';
         }
         return value;
-      }, function(value) {
+      }, value => {
         if (value === 'hello') {
           throw 'Hello is not allowed';
         }
@@ -541,11 +539,11 @@ describe('ValueField', function() {
 
   });
 
-  describe('parser', function() {
-    it('may be set initially', function() {
-      var field = scout.create('StringField', {
+  describe('parser', () => {
+    it('may be set initially', () => {
+      let field = scout.create('StringField', {
         parent: session.desktop,
-        parser: function(displayText, defaultParser) {
+        parser: (displayText, defaultParser) => {
           if (displayText) {
             return displayText.replace(/-/g, '');
           }
@@ -557,15 +555,15 @@ describe('ValueField', function() {
     });
   });
 
-  describe('setParser', function() {
+  describe('setParser', () => {
 
-    it('replaces the existing parser by a new one and parses the display text again', function() {
-      var field = helper.createField('StringField');
+    it('replaces the existing parser by a new one and parses the display text again', () => {
+      let field = helper.createField('StringField');
       field.setValue('1234-1234-1234-1234');
       expect(field.displayText).toBe('1234-1234-1234-1234');
       expect(field.value).toBe('1234-1234-1234-1234');
 
-      field.setParser(function(displayText, defaultParser) {
+      field.setParser((displayText, defaultParser) => {
         if (displayText) {
           return displayText.replace(/-/g, '');
         }
@@ -577,13 +575,13 @@ describe('ValueField', function() {
 
   });
 
-  describe('formatter', function() {
-    it('may be set initially', function() {
-      var field = scout.create('StringField', {
+  describe('formatter', () => {
+    it('may be set initially', () => {
+      let field = scout.create('StringField', {
         parent: session.desktop,
         value: '1234123412341234',
-        formatter: function(value, defaultFormatter) {
-          var displayText = defaultFormatter(value);
+        formatter: (value, defaultFormatter) => {
+          let displayText = defaultFormatter(value);
           if (!displayText) {
             return displayText;
           }
@@ -595,16 +593,16 @@ describe('ValueField', function() {
     });
   });
 
-  describe('setFormatter', function() {
+  describe('setFormatter', () => {
 
-    it('replaces the existing formatter by a new one and formats the value again', function() {
-      var field = helper.createField('StringField');
+    it('replaces the existing formatter by a new one and formats the value again', () => {
+      let field = helper.createField('StringField');
       field.setValue('1234123412341234');
       expect(field.value).toBe('1234123412341234');
       expect(field.displayText).toBe('1234123412341234');
 
-      field.setFormatter(function(value, defaultFormatter) {
-        var displayText = defaultFormatter(value);
+      field.setFormatter((value, defaultFormatter) => {
+        let displayText = defaultFormatter(value);
         if (!displayText) {
           return displayText;
         }
@@ -616,16 +614,16 @@ describe('ValueField', function() {
 
   });
 
-  describe('clear', function() {
+  describe('clear', () => {
 
-    it('removes the text and accepts input', function() {
+    it('removes the text and accepts input', () => {
       // Not quite the same as ctrl-a del, but it is easier to handle.
       // E.g. DateField uses displayText to mark the day when the popup opens. If display text is not set a day might be selected even though input was cleared.
-      var field = helper.createField('StringField');
-      var inputAccepted = false;
+      let field = helper.createField('StringField');
+      let inputAccepted = false;
       field.render();
       field.setValue('abc');
-      field.on('acceptInput', function() {
+      field.on('acceptInput', () => {
         inputAccepted = true;
       });
       expect(field.$field.val()).toBe('abc');
@@ -641,15 +639,15 @@ describe('ValueField', function() {
 
   });
 
-  describe('validation: initialValue, touched, empty and mandatory', function() {
+  describe('validation: initialValue, touched, empty and mandatory', () => {
 
-    var field;
+    let field;
 
-    beforeEach(function() {
+    beforeEach(() => {
       field = helper.createField('StringField');
     });
 
-    it('sets initialValue when markAsSaved is called', function() {
+    it('sets initialValue when markAsSaved is called', () => {
       field.setValue('Foo');
       expect(field.initialValue).toBeFalsy();
       field.markAsSaved();
@@ -657,7 +655,7 @@ describe('ValueField', function() {
       expect(field.touched).toBe(false);
     });
 
-    it('sets touched to true when value is different from initial value', function() {
+    it('sets touched to true when value is different from initial value', () => {
       field.setValue('Foo');
       field.markAsSaved();
       expect(field.touched).toBe(false);
@@ -667,7 +665,7 @@ describe('ValueField', function() {
       expect(field.touched).toBe(false);
     });
 
-    it('sets empty to true when value is an empty string (for StringField)', function() {
+    it('sets empty to true when value is an empty string (for StringField)', () => {
       field.setValue(null);
       expect(field.empty).toBe(true);
       field.setValue('Foo');
@@ -676,20 +674,20 @@ describe('ValueField', function() {
       expect(field.empty).toBe(true);
     });
 
-    it('validate returns valid when errorStatus is not set and field is not mandatory', function() {
+    it('validate returns valid when errorStatus is not set and field is not mandatory', () => {
       field.setValue(null);
       field.setErrorStatus(null);
       field.setMandatory(false);
-      var result = field.getValidationResult();
+      let result = field.getValidationResult();
       expect(result.valid).toBe(true);
     });
 
-    it('validate returns not valid when errorStatus is set or field is mandatory and empty', function() {
-      var errorStatus = new Status({
+    it('validate returns not valid when errorStatus is set or field is mandatory and empty', () => {
+      let errorStatus = new Status({
         severity: Status.Severity.ERROR
       });
       field.setErrorStatus(errorStatus);
-      var result = field.getValidationResult();
+      let result = field.getValidationResult();
       expect(result.valid).toBe(false);
       expect(result.validByErrorStatus).toBe(false);
 
@@ -702,10 +700,10 @@ describe('ValueField', function() {
 
   });
 
-  describe('menu visibility', function() {
-    var formField, model;
+  describe('menu visibility', () => {
+    let formField, model;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createFieldModel();
       formField = new ValueField();
       formField._render = function() {
@@ -719,13 +717,13 @@ describe('ValueField', function() {
       formField.init(model);
     });
 
-    afterEach(function() {
+    afterEach(() => {
       // Close context menus
       removePopups(session);
     });
 
-    it('context menu only shows visible menus', function() {
-      var menuModel1 = menuHelper.createModel('menu'),
+    it('context menu only shows visible menus', () => {
+      let menuModel1 = menuHelper.createModel('menu'),
         menu1 = menuHelper.createMenu(menuModel1),
         menuModel2 = menuHelper.createModel('menu'),
         menu2 = menuHelper.createMenu(menuModel2);
@@ -736,13 +734,13 @@ describe('ValueField', function() {
 
       formField.$status.triggerContextMenu();
 
-      var $menu = $('body').find('.popup-body');
+      let $menu = $('body').find('.popup-body');
       expect($menu.find('.menu-item').length).toBe(1);
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
     });
 
-    it('context menu only shows only menus of specific type', function() {
-      var menuModel1 = menuHelper.createModel('menu'),
+    it('context menu only shows only menus of specific type', () => {
+      let menuModel1 = menuHelper.createModel('menu'),
         menu1 = menuHelper.createMenu(menuModel1),
         menuModel2 = menuHelper.createModel('menu'),
         menu2 = menuHelper.createMenu(menuModel2);
@@ -755,7 +753,7 @@ describe('ValueField', function() {
       formField.currentMenuTypes = ['Null'];
       formField.$status.triggerContextMenu();
 
-      var $menu = $('body').find('.popup-body');
+      let $menu = $('body').find('.popup-body');
       expect($menu.find('.menu-item').length).toBe(2);
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
       expect($menu.find('.menu-item').eq(1).isVisible()).toBe(true);

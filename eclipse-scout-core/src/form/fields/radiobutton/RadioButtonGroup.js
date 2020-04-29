@@ -88,7 +88,7 @@ export default class RadioButtonGroup extends ValueField {
   }
 
   _initButtons() {
-    this.radioButtons = this.fields.filter(function(formField) {
+    this.radioButtons = this.fields.filter(formField => {
       return formField instanceof RadioButton;
     });
     this.radioButtons.forEach(this._initButton.bind(this));
@@ -184,7 +184,7 @@ export default class RadioButtonGroup extends ValueField {
    * @override
    */
   visitFields(visitor) {
-    var treeVisitResult = super.visitFields(visitor);
+    let treeVisitResult = super.visitFields(visitor);
     if (treeVisitResult === TreeVisitResult.TERMINATE) {
       return TreeVisitResult.TERMINATE;
     }
@@ -193,9 +193,9 @@ export default class RadioButtonGroup extends ValueField {
       return;
     }
 
-    var fields = this.getFields();
-    for (var i = 0; i < fields.length; i++) {
-      var field = fields[i];
+    let fields = this.getFields();
+    for (let i = 0; i < fields.length; i++) {
+      let field = fields[i];
       treeVisitResult = field.visitFields(visitor);
       if (treeVisitResult === TreeVisitResult.TERMINATE) {
         return TreeVisitResult.TERMINATE;
@@ -247,7 +247,7 @@ export default class RadioButtonGroup extends ValueField {
    * Set the selected (or first if none is selected) to tabbable
    */
   _provideTabIndex() {
-    var tabSet;
+    let tabSet;
     this.radioButtons.forEach(function(radioButton) {
       if (radioButton.enabledComputed && this.enabledComputed && !tabSet) {
         radioButton.setTabbable(true);
@@ -280,7 +280,7 @@ export default class RadioButtonGroup extends ValueField {
   }
 
   _calcDefaultGridColumnCount() {
-    var height = 1,
+    let height = 1,
       hints = this.gridDataHints;
     if (hints && hints.h > 1) {
       height = hints.h;
@@ -292,7 +292,7 @@ export default class RadioButtonGroup extends ValueField {
     if (radioValue === null) {
       return null;
     }
-    return arrays.find(this.radioButtons, function(button) {
+    return arrays.find(this.radioButtons, button => {
       return objects.equals(button.radioValue, radioValue);
     });
   }
@@ -310,14 +310,14 @@ export default class RadioButtonGroup extends ValueField {
       return value;
     }
 
-    var lookupScheduled = this._ensureLookupCallExecuted();
+    let lookupScheduled = this._ensureLookupCallExecuted();
     if (lookupScheduled) {
       // the first lookup was scheduled now: buttons are not yet available, not possible to select one. will be done later as soon as the lookup call is finished.
       return value;
     }
 
     // only show error if value is not null or undefined
-    var buttonToSelect = this.getButtonForRadioValue(value);
+    let buttonToSelect = this.getButtonForRadioValue(value);
     if (!buttonToSelect && value !== null && value !== undefined && !this._lookupInProgress) {
       throw this.session.text('InvalidValueMessageX', value);
     }
@@ -365,8 +365,8 @@ export default class RadioButtonGroup extends ValueField {
 
     // Select new button
     if (radioButton) {
-      var tabbableButton = this.getTabbableButton();
-      var needsFocus = false;
+      let tabbableButton = this.getTabbableButton();
+      let needsFocus = false;
       if (tabbableButton) {
         // Only one button in the group should have a tab index -> remove it from the current tabbable button after the new button is tabbable.
         // If that button is focused the newly selected button needs to gain the focus otherwise the focus would fall back to the body.
@@ -386,20 +386,20 @@ export default class RadioButtonGroup extends ValueField {
   }
 
   getTabbableButton() {
-    return arrays.find(this.radioButtons, function(button) {
+    return arrays.find(this.radioButtons, button => {
       return button.visible && button.isTabbable();
     });
   }
 
   insertButton(radioButton) {
-    var newFields = this.fields.slice();
+    let newFields = this.fields.slice();
     newFields.push(radioButton);
     this.setFields(newFields);
   }
 
   _onButtonPropertyChange(event) {
     if (event.propertyName === 'selected') {
-      var selected = event.newValue;
+      let selected = event.newValue;
       if (selected) {
         this.setValue(event.source.radioValue);
         this.selectButton(event.source);
@@ -452,8 +452,8 @@ export default class RadioButtonGroup extends ValueField {
 
     this._clearPendingLookup();
 
-    var deferred = $.Deferred();
-    var doneHandler = function(result) {
+    let deferred = $.Deferred();
+    let doneHandler = function(result) {
       this._lookupByAllDone(result);
       deferred.resolve(result);
     }.bind(this);
@@ -489,13 +489,13 @@ export default class RadioButtonGroup extends ValueField {
 
     return lookupCall
       .execute()
-      .always(function() {
+      .always(() => {
         this._lookupInProgress = false;
         this._lookupExecuted = true;
         this._currentLookupCall = null;
         this.setLoading(false);
         this._clearLookupStatus();
-      }.bind(this));
+      });
   }
 
   _lookupByAllDone(result) {
@@ -528,8 +528,8 @@ export default class RadioButtonGroup extends ValueField {
   }
 
   _populateRadioButtonGroup(result) {
-    var lookupRows = result.lookupRows;
-    var newFields = this.fields.slice();
+    let lookupRows = result.lookupRows;
+    let newFields = this.fields.slice();
     lookupRows.forEach(function(lookupRow) {
       newFields.push(this._createLookupRowRadioButton(lookupRow));
     }, this);
@@ -557,7 +557,7 @@ export default class RadioButtonGroup extends ValueField {
   }
 
   _createLookupRowRadioButton(lookupRow) {
-    var button = {
+    let button = {
       parent: this,
       label: lookupRow.text,
       radioValue: lookupRow.key,
@@ -593,7 +593,7 @@ export default class RadioButtonGroup extends ValueField {
   }
 
   clone(model, options) {
-    var clone = super.clone(model, options);
+    let clone = super.clone(model, options);
     this._deepCloneProperties(clone, 'fields', options);
     clone._initButtons();
     return clone;

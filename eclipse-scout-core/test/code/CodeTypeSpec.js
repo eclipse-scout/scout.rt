@@ -10,9 +10,9 @@
  */
 import {Code, codes} from '../../src/index';
 
-describe('CodeType', function() {
+describe('CodeType', () => {
 
-  beforeEach(function() {
+  beforeEach(() => {
     codes.init({
       codeType0: {
         objectType: 'CodeType',
@@ -46,90 +46,90 @@ describe('CodeType', function() {
     });
   });
 
-  describe('init', function() {
+  describe('init', () => {
 
-    it('creates codes and hierarchy', function() {
-      var codeType = codes.codeType('codeType0');
+    it('creates codes and hierarchy', () => {
+      let codeType = codes.codeType('codeType0');
       expect(codeType.codes.length).toBe(7);
 
-      var code0 = codeType.get('code0');
+      let code0 = codeType.get('code0');
       expect(code0.children.length).toBe(2);
       expect(code0.parent).toBe(undefined);
 
-      var code01 = codeType.get('code01');
+      let code01 = codeType.get('code01');
       expect(code01.children.length).toBe(0);
       expect(code0.children[0]).toBe(code01);
       expect(code01.parent).toBe(code0);
 
-      var code02 = codeType.get('code02');
+      let code02 = codeType.get('code02');
       expect(code02.children.length).toBe(1);
       expect(code0.children[1]).toBe(code02);
       expect(code02.parent).toBe(code0);
 
-      var code021 = codeType.get('code021');
+      let code021 = codeType.get('code021');
       expect(code021.children.length).toBe(0);
       expect(code02.children[0]).toBe(code021);
       expect(code021.parent).toBe(code02);
 
-      var code1 = codeType.get('code1');
+      let code1 = codeType.get('code1');
       expect(code1.parent).toBe(undefined);
       expect(code1.children.length).toBe(1);
 
-      var code11 = codeType.get('code11');
+      let code11 = codeType.get('code11');
       expect(code11.children.length).toBe(0);
       expect(code1.children[0]).toBe(code11);
       expect(code11.parent).toBe(code1);
 
-      var code2 = codeType.get('code2');
+      let code2 = codeType.get('code2');
       expect(code2.parent).toBe(undefined);
       expect(code2.children.length).toBe(0);
     });
   });
 
-  describe('add', function() {
-    it('adds new root code to codeType', function() {
-      var codeType = codes.codeType('codeType0');
-      var code = new Code();
+  describe('add', () => {
+    it('adds new root code to codeType', () => {
+      let codeType = codes.codeType('codeType0');
+      let code = new Code();
       codeType.add(code);
       expect(code.parent).toBe(undefined);
       expect(code.children.length).toBe(0);
     });
 
-    it('adds new child code to codeType', function() {
-      var codeType = codes.codeType('codeType0');
-      var code2 = codeType.get('code2');
-      var childCode = new Code();
+    it('adds new child code to codeType', () => {
+      let codeType = codes.codeType('codeType0');
+      let code2 = codeType.get('code2');
+      let childCode = new Code();
       codeType.add(childCode, code2);
       expect(childCode.parent).toBe(code2);
       expect(childCode.children.length).toBe(0);
     });
   });
 
-  describe('get', function() {
-    it('returns code with codeId', function() {
-      var codeType = codes.codeType('codeType0');
-      var code = codeType.get('code11');
+  describe('get', () => {
+    it('returns code with codeId', () => {
+      let codeType = codes.codeType('codeType0');
+      let code = codeType.get('code11');
       expect(code.id).toBe('code11');
     });
 
-    it('throws error for unknown codeId', function() {
-      var codeType = codes.codeType('codeType0');
-      expect(function() {
+    it('throws error for unknown codeId', () => {
+      let codeType = codes.codeType('codeType0');
+      expect(() => {
         codeType.get('code6');
       }).toThrow(new Error('No code found for id=code6'));
     });
   });
 
-  describe('getCodes', function() {
-    it('returns all codes', function() {
-      var codeType = codes.codeType('codeType0');
-      var codeArr = codeType.getCodes();
+  describe('getCodes', () => {
+    it('returns all codes', () => {
+      let codeType = codes.codeType('codeType0');
+      let codeArr = codeType.getCodes();
       expect(codeArr.length).toBe(7);
     });
 
-    it('returns root codes', function() {
-      var codeType = codes.codeType('codeType0');
-      var codeArr = codeType.getCodes(true);
+    it('returns root codes', () => {
+      let codeType = codes.codeType('codeType0');
+      let codeArr = codeType.getCodes(true);
       expect(codeArr[0]).toBe(codeType.get('code0'));
       expect(codeArr[1]).toBe(codeType.get('code1'));
       expect(codeArr[2]).toBe(codeType.get('code2'));

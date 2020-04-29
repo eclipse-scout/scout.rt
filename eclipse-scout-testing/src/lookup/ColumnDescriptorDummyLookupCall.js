@@ -19,7 +19,7 @@ export default class ColumnDescriptorDummyLookupCall extends DummyLookupCall {
   }
 
   _dataToLookupRow(data) {
-    var lookupRow = super._dataToLookupRow(data);
+    let lookupRow = super._dataToLookupRow(data);
     lookupRow.additionalTableRowData = {
       column1: lookupRow.text + ' column1',
       column2: lookupRow.text + ' column2'

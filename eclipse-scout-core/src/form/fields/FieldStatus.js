@@ -115,7 +115,7 @@ export default class FieldStatus extends Widget {
   }
 
   hideTooltip() {
-    var event = new Event();
+    let event = new Event();
     if (this.tooltip) {
       this.trigger('hideTooltip', event);
       if (!event.defaultPrevented) {
@@ -154,7 +154,7 @@ export default class FieldStatus extends Widget {
     if (!this._requiresTooltip()) {
       return;
     }
-    var event = new Event();
+    let event = new Event();
     this.trigger('showTooltip', event);
     if (event.defaultPrevented) {
       return;
@@ -180,9 +180,9 @@ export default class FieldStatus extends Widget {
         autoRemove: this.autoRemove,
         menus: this.menus
       });
-      this.tooltip.one('destroy', function() {
+      this.tooltip.one('destroy', () => {
         this.hideTooltip();
-      }.bind(this));
+      });
       this.tooltip.render();
     }
   }
@@ -209,9 +209,9 @@ export default class FieldStatus extends Widget {
       cloneMenuItems: false,
       closeOnAnchorMouseDown: false
     });
-    this.contextMenu.one('destroy', function() {
+    this.contextMenu.one('destroy', () => {
       this.hideContextMenu();
-    }.bind(this));
+    });
     this.contextMenu.open();
   }
 
@@ -233,7 +233,7 @@ export default class FieldStatus extends Widget {
     }
     if (!arrays.empty(this.menus)) {
       this.hideTooltip();
-      var func = function func() {
+      let func = function func() {
         if (!this.rendered) { // check needed because function is called asynchronously
           return;
         }
@@ -267,14 +267,14 @@ export default class FieldStatus extends Widget {
        * invisible, thus the tooltip cannot be rendered. Because of the timeout we must double-check
        * the state of the FieldStatus, because it could have been removed in the meantime.
        */
-      setTimeout(function() {
+      setTimeout(() => {
         if (!this.rendered || !this.isEveryParentVisible()) {
           return;
         }
         if (this.tooltip && !this.tooltip.rendered) {
           this.tooltip.render();
         }
-      }.bind(this));
+      });
     } else {
       if (this.tooltip && this.tooltip.rendered) {
         this.tooltip.remove();
@@ -295,10 +295,10 @@ export default class FieldStatus extends Widget {
   }
 
   _removeParentListeners() {
-    this._parents.forEach(function(parent) {
+    this._parents.forEach(parent => {
       parent.off('hierarchyChange', this._parentHierarchyChangeListener);
       parent.off('propertyChange', this._parentPropertyChangeListener);
-    }.bind(this));
+    });
     this._parents = [];
   }
 
@@ -308,7 +308,7 @@ export default class FieldStatus extends Widget {
    */
   _updateParentListeners() {
     this._removeParentListeners();
-    var parent = this.parent;
+    let parent = this.parent;
     while (parent) {
       parent.on('hierarchyChange', this._parentHierarchyChangeListener);
       parent.on('propertyChange', this._parentPropertyChangeListener);

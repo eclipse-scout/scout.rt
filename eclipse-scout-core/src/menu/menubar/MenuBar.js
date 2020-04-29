@@ -67,9 +67,7 @@ export default class MenuBar extends Widget {
     this.menuSorter = options.menuOrder || new GroupBoxMenuItemsOrder();
     this.menuSorter.menuBar = this;
     if (options.menuFilter) {
-      this.menuFilter = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
-        return options.menuFilter(menus, MenuDestinations.MENU_BAR, onlyVisible, enableDisableKeyStroke);
-      };
+      this.menuFilter = (menus, destination, onlyVisible, enableDisableKeyStroke) => options.menuFilter(menus, MenuDestinations.MENU_BAR, onlyVisible, enableDisableKeyStroke);
     }
 
     this.menuboxLeft = scout.create('MenubarBox', {
@@ -177,10 +175,10 @@ export default class MenuBar extends Widget {
   }
 
   _detachMenuHandlers() {
-    this.orderedMenuItems.all.forEach(function(item) {
+    this.orderedMenuItems.all.forEach(item => {
       item.off('propertyChange', this._menuItemPropertyChangeHandler);
       item.off('focus', this._focusHandler);
-    }.bind(this));
+    });
   }
 
   setMenuItems(menuItems) {
@@ -229,10 +227,10 @@ export default class MenuBar extends Widget {
   }
 
   _createOrderedMenus(menuItems) {
-    var orderedMenuItems = this.menuSorter.order(menuItems, this),
+    let orderedMenuItems = this.menuSorter.order(menuItems, this),
       ellipsisIndex = -1,
       ellipsis;
-    orderedMenuItems.right.forEach(function(item) {
+    orderedMenuItems.right.forEach(item => {
       item.rightAligned = true;
     });
 
@@ -246,7 +244,7 @@ export default class MenuBar extends Widget {
       // add ellipsis to the correct position
       if (this.ellipsisPosition === MenuBar.EllipsisPosition.RIGHT) {
         // try right
-        var reverseIndexPosition = this._getFirstStackableIndexPosition(orderedMenuItems.right.slice().reverse());
+        let reverseIndexPosition = this._getFirstStackableIndexPosition(orderedMenuItems.right.slice().reverse());
         if (reverseIndexPosition > -1) {
           ellipsisIndex = orderedMenuItems.right.length - reverseIndexPosition;
           ellipsis.rightAligned = true;
@@ -279,8 +277,8 @@ export default class MenuBar extends Widget {
   }
 
   _getFirstStackableIndexPosition(menuList) {
-    var foundIndex = -1;
-    menuList.some(function(menu, index) {
+    let foundIndex = -1;
+    menuList.some((menu, index) => {
       if (menu.stackable && menu.visible) {
         foundIndex = index;
         return true;
@@ -298,7 +296,7 @@ export default class MenuBar extends Widget {
       if (this.defaultMenu && this.defaultMenu.enabledComputed) {
         this.setTabbableMenu(this.defaultMenu);
       } else {
-        this.setTabbableMenu(arrays.find(this.orderedMenuItems.all, function(item) {
+        this.setTabbableMenu(arrays.find(this.orderedMenuItems.all, item => {
           return item.isTabTarget();
         }));
       }
@@ -331,7 +329,7 @@ export default class MenuBar extends Widget {
   updateVisibility() {
     menus.updateSeparatorVisibility(this.orderedMenuItems.left);
     menus.updateSeparatorVisibility(this.orderedMenuItems.right);
-    this.setVisible(!this.hiddenByUi && this.orderedMenuItems.all.some(function(m) {
+    this.setVisible(!this.hiddenByUi && this.orderedMenuItems.all.some(m => {
       return m.visible && !m.ellipsis;
     }));
   }
@@ -340,8 +338,8 @@ export default class MenuBar extends Widget {
    * First rendered item that is enabled and reacts to ENTER keystroke shall be marked as 'defaultMenu'
    */
   updateDefaultMenu() {
-    var i, item;
-    var defaultMenu = null;
+    let i, item;
+    let defaultMenu = null;
     for (i = 0; i < this.orderedMenuItems.all.length; i++) {
       item = this.orderedMenuItems.all[i];
 
@@ -395,13 +393,13 @@ export default class MenuBar extends Widget {
   }
 
   _updateLeftOfButtonMarker(items) {
-    var item, previousItem;
+    let item, previousItem;
 
-    items = items.filter(function(item) {
+    items = items.filter(item => {
       return item.visible && item.rendered;
     });
 
-    for (var i = 0; i < items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
       item = items[i];
       item.$container.removeClass('left-of-button');
       if (i > 0 && item.isButton()) {
@@ -431,7 +429,7 @@ export default class MenuBar extends Widget {
       this.reorderMenus(event.newValue <= 0);
     }
     if (event.propertyName === 'visible') {
-      var oldVisible = this.visible;
+      let oldVisible = this.visible;
       this.updateVisibility();
       if (!oldVisible && this.visible) {
         // If the menubar was previously invisible (because all menus were invisible) but
@@ -457,7 +455,7 @@ export default class MenuBar extends Widget {
   }
 
   reorderMenus(rightFirst) {
-    var menuItems = this.menuItems;
+    let menuItems = this.menuItems;
     this._setMenuItems(menuItems, rightFirst);
     if (this.rendered) {
       this.updateLeftOfButtonMarker();

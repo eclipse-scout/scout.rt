@@ -18,7 +18,7 @@ export default class FormMenuPopupLayout extends PopupWithHeadLayout {
   }
 
   _setSize(prefSize) {
-    var popupSize,
+    let popupSize,
       htmlForm = this.popup.form.htmlComp;
 
     super._setSize(prefSize);
@@ -31,7 +31,7 @@ export default class FormMenuPopupLayout extends PopupWithHeadLayout {
   }
 
   preferredLayoutSize($container) {
-    var htmlComp = this.popup.htmlComp,
+    let htmlComp = this.popup.htmlComp,
       htmlForm = this.popup.form.htmlComp,
       prefSize;
 

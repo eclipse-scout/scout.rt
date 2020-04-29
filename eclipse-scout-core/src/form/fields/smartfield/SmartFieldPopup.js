@@ -32,7 +32,7 @@ export default class SmartFieldPopup extends Popup {
   }
 
   _createProposalChooser() {
-    var objectType = this.smartField.browseHierarchy ? 'TreeProposalChooser' : 'TableProposalChooser';
+    let objectType = this.smartField.browseHierarchy ? 'TreeProposalChooser' : 'TableProposalChooser';
     return scout.create(objectType, {
       parent: this
     });
@@ -43,7 +43,7 @@ export default class SmartFieldPopup extends Popup {
   }
 
   _render() {
-    var cssClass = this.smartField.cssClassName() + '-popup';
+    let cssClass = this.smartField.cssClassName() + '-popup';
     super._render();
     this.$container
       .addClass(cssClass)
@@ -61,7 +61,7 @@ export default class SmartFieldPopup extends Popup {
    * @returns the selected lookup row from the proposal chooser. If the row is disabled this function returns null.
    */
   getSelectedLookupRow() {
-    var lookupRow = this.proposalChooser.getSelectedLookupRow();
+    let lookupRow = this.proposalChooser.getSelectedLookupRow();
     if (lookupRow && lookupRow.enabled) {
       return lookupRow;
     }

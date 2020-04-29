@@ -36,17 +36,17 @@ export default class OutlineMediator {
       return;
     }
 
-    var pages = pageWithTable.updatePagesFromTableRows(event.rows);
+    let pages = pageWithTable.updatePagesFromTableRows(event.rows);
     pageWithTable.getTree().updateNodes(pages);
   }
 
   onTableRowAction(event, page) {
-    var childPage = event.row.page;
+    let childPage = event.row.page;
     if (!childPage) {
       return;
     }
 
-    var outline = childPage.getOutline();
+    let outline = childPage.getOutline();
     if (!outline) {
       return;
     }
@@ -60,8 +60,8 @@ export default class OutlineMediator {
       return;
     }
 
-    var table = event.source;
-    var childPages = pageWithTable.pagesForTableRows(table.rows);
+    let table = event.source;
+    let childPages = pageWithTable.pagesForTableRows(table.rows);
     pageWithTable.getOutline().updateNodeOrder(childPages, pageWithTable);
   }
 

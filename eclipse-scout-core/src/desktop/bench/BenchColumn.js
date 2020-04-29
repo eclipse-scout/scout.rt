@@ -74,9 +74,9 @@ export default class BenchColumn extends Widget {
   }
 
   _renderTabBoxes() {
-    this.visibleTabBoxes().forEach(function(tabBox) {
+    this.visibleTabBoxes().forEach(tabBox => {
       this._renderTabBox(tabBox);
-    }.bind(this));
+    });
     this.updateFirstLastMarker();
   }
 
@@ -87,7 +87,7 @@ export default class BenchColumn extends Widget {
   }
 
   postRender() {
-    this.tabBoxes.forEach(function(tabBox) {
+    this.tabBoxes.forEach(tabBox => {
       tabBox.postRender();
     });
   }
@@ -104,8 +104,8 @@ export default class BenchColumn extends Widget {
     this.setLayoutData(layoutData);
 
     // update columns
-    var rowDatas = this.layoutData.getRows();
-    this.tabBoxes.forEach(function(tb, i) {
+    let rowDatas = this.layoutData.getRows();
+    this.tabBoxes.forEach((tb, i) => {
       tb.setLayoutData(rowDatas[i]);
     });
     this._updateSplitterMovable();
@@ -150,17 +150,17 @@ export default class BenchColumn extends Widget {
   }
 
   activateView(view) {
-    var tabBox = this.getTabBox(view.displayViewId);
+    let tabBox = this.getTabBox(view.displayViewId);
     tabBox.activateView(view);
   }
 
   _createTabBoxes() {
-    var rowLayoutDatas = [];
+    let rowLayoutDatas = [];
     if (this.layoutData) {
       rowLayoutDatas = this.layoutData.getRows();
     }
-    for (var i = 0; i < 3; i++) {
-      var tabBox = scout.create('SimpleTabBox', {
+    for (let i = 0; i < 3; i++) {
+      let tabBox = scout.create('SimpleTabBox', {
         parent: this,
         cssClass: strings.join(' ', 'view-tab-box', BenchColumn.TAB_BOX_CLASSES[i]),
         controller: scout.create('DesktopTabBoxController')
@@ -177,17 +177,17 @@ export default class BenchColumn extends Widget {
   _revalidateSplitters(clearPosition) {
     // remove old splitters
     if (this.components) {
-      this.components.forEach(function(comp) {
+      this.components.forEach(comp => {
         if (comp instanceof Splitter) {
           comp.destroy();
         }
       });
     }
     this.components = this.visibleTabBoxes()
-      .reduce(function(arr, col) {
+      .reduce((arr, col) => {
         if (arr.length > 0) {
           // add sep
-          var splitter = scout.create('Splitter', {
+          let splitter = scout.create('Splitter', {
             parent: this,
             $anchor: arr[arr.length - 1].$container,
             $root: this.$container,
@@ -201,12 +201,12 @@ export default class BenchColumn extends Widget {
         }
         arr.push(col);
         return arr;
-      }.bind(this), []);
+      }, []);
     // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
-    this.components.filter(function(comp) {
+    this.components.filter(comp => {
       return comp instanceof SimpleTabBox;
     })
-      .reduce(function(c1, c2, index) {
+      .reduce((c1, c2, index) => {
         if (index > 0) {
           c2.$container.insertAfter(c1.$container);
         }
@@ -219,16 +219,16 @@ export default class BenchColumn extends Widget {
     if (!this.components) {
       return;
     }
-    this.components.forEach(function(c, i) {
+    this.components.forEach((c, i) => {
       if (c instanceof Splitter) {
-        var componentsBefore = this.components.slice(0, i).reverse();
-        var componentsAfter = this.components.slice(i + 1);
+        let componentsBefore = this.components.slice(0, i).reverse();
+        let componentsAfter = this.components.slice(i + 1);
         // shrink
         if (
-          componentsBefore.filter(function(c) {
+          componentsBefore.filter(c => {
             return c.getLayoutData().shrink > 0;
           }).length > 0 &&
-          componentsAfter.filter(function(c) {
+          componentsAfter.filter(c => {
             return c.getLayoutData().grow > 0;
           }).length > 0
         ) {
@@ -238,10 +238,10 @@ export default class BenchColumn extends Widget {
         }
         // grow
         if (
-          componentsBefore.filter(function(c) {
+          componentsBefore.filter(c => {
             return c.getLayoutData().grow > 0;
           }).length > 0 &&
-          componentsAfter.filter(function(c) {
+          componentsAfter.filter(c => {
             return c.getLayoutData().shrink > 0;
           }).length > 0
         ) {
@@ -252,13 +252,13 @@ export default class BenchColumn extends Widget {
         c.setEnabled(false);
 
       }
-    }.bind(this));
+    });
   }
 
   _onSplitterMove(event) {
-    var splitter = event.source;
+    let splitter = event.source;
     // noinspection UnnecessaryLocalVariableJS
-    var diff = event.position - splitter.htmlComp.location().y - splitter.htmlComp.margins().top - splitter.htmlComp.insets().top;
+    let diff = event.position - splitter.htmlComp.location().y - splitter.htmlComp.margins().top - splitter.htmlComp.insets().top;
     splitter.getLayoutData().diff = diff;
     this.revalidateLayout();
     splitter.getLayoutData().diff = null;
@@ -266,7 +266,7 @@ export default class BenchColumn extends Widget {
   }
 
   addView(view, bringToFront) {
-    var tabBox = this.getTabBox(view.displayViewId);
+    let tabBox = this.getTabBox(view.displayViewId);
     this._widgetToTabBox[view.id] = tabBox;
 
     tabBox.addView(view, bringToFront);
@@ -284,7 +284,7 @@ export default class BenchColumn extends Widget {
   }
 
   getTabBox(displayViewId) {
-    var tabBox;
+    let tabBox;
     switch (displayViewId) {
       case 'NW':
       case 'N':
@@ -304,7 +304,7 @@ export default class BenchColumn extends Widget {
   }
 
   removeView(view, showSiblingView) {
-    var tabBox = this._widgetToTabBox[view.id];
+    let tabBox = this._widgetToTabBox[view.id];
     if (tabBox) {
       this._removeViewInProgress++;
       tabBox.removeView(view, showSiblingView);
@@ -322,15 +322,15 @@ export default class BenchColumn extends Widget {
   }
 
   viewCount() {
-    return this.tabBoxes.map(function(tabBox) {
+    return this.tabBoxes.map(tabBox => {
       return tabBox.viewCount();
-    }).reduce(function(c1, c2) {
+    }).reduce((c1, c2) => {
       return c1 + c2;
     }, 0);
   }
 
   hasView(view) {
-    return this.tabBoxes.filter(function(tabBox) {
+    return this.tabBoxes.filter(tabBox => {
       return tabBox.hasView(view);
     }).length > 0;
   }
@@ -340,7 +340,7 @@ export default class BenchColumn extends Widget {
   }
 
   getViews(displayViewId) {
-    return this.tabBoxes.reduce(function(arr, tabBox) {
+    return this.tabBoxes.reduce((arr, tabBox) => {
       arrays.pushAll(arr, tabBox.getViews(displayViewId));
       return arr;
     }, []);
@@ -351,7 +351,7 @@ export default class BenchColumn extends Widget {
   }
 
   visibleTabBoxes() {
-    return this.tabBoxes.filter(function(tabBox) {
+    return this.tabBoxes.filter(tabBox => {
       return tabBox.hasViews();
     });
   }

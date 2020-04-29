@@ -94,20 +94,20 @@ export default class ContextMenuPopup extends PopupWithHead {
       parentMenu.__originalParent._doActionTogglesSubMenu();
     }
 
-    var actualBounds = this.htmlComp.offsetBounds();
+    let actualBounds = this.htmlComp.offsetBounds();
 
     this.revalidateLayout();
     this.position();
 
     if (animated) {
       this.bodyAnimating = true;
-      var duration = 300;
-      var position = parentMenu.$placeHolder.position();
+      let duration = 300;
+      let position = parentMenu.$placeHolder.position();
       parentMenu.$subMenuBody.css({
         width: 'auto',
         height: 'auto'
       });
-      var targetBounds = this.htmlComp.offsetBounds();
+      let targetBounds = this.htmlComp.offsetBounds();
       parentMenu.$subMenuBody.css('box-shadow', 'none');
       this.htmlComp.setBounds(actualBounds);
       if (this.verticalAlignment !== Popup.Alignment.TOP) {
@@ -123,7 +123,7 @@ export default class ContextMenuPopup extends PopupWithHead {
         queue: false
       });
 
-      var endTopposition = position.top - this.$body.cssHeight(),
+      let endTopposition = position.top - this.$body.cssHeight(),
         startTopposition = 0 - actualBounds.height;
 
       parentMenu.$subMenuBody.cssTopAnimated(startTopposition, endTopposition, {
@@ -143,7 +143,7 @@ export default class ContextMenuPopup extends PopupWithHead {
             this.bodyAnimating = false;
             // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
             this._invalidateLayoutTreeAndRepositionPopup();
-            var next = this._toggleSubMenuQueue.shift();
+            let next = this._toggleSubMenuQueue.shift();
             if (next) {
               next();
             }
@@ -184,11 +184,11 @@ export default class ContextMenuPopup extends PopupWithHead {
       return;
     }
 
-    var actualBounds = this.htmlComp.offsetBounds();
+    let actualBounds = this.htmlComp.offsetBounds();
 
     parentMenu.__originalParent.$subMenuBody = this.$body;
 
-    var $all = this.$body.find('.' + 'menu-item');
+    let $all = this.$body.find('.' + 'menu-item');
     $all.removeClass('next-to-selected');
 
     if (!parentMenu.$subMenuBody) {
@@ -199,8 +199,8 @@ export default class ContextMenuPopup extends PopupWithHead {
       // append $body
       this.$body = parentMenu.$subMenuBody;
     }
-    var $insertAfterElement = parentMenu.$container.prev();
-    var position = parentMenu.$container.position();
+    let $insertAfterElement = parentMenu.$container.prev();
+    let position = parentMenu.$container.position();
     parentMenu.$placeHolder = parentMenu.$container.clone();
     // HtmlComponent is necessary for the row layout (it would normally be installed by Menu.js, but $placeholder is just a jquery clone of parentMenu.$container and is not managed by a real widget)
     HtmlComponent.install(parentMenu.$placeHolder, this.session);
@@ -221,12 +221,12 @@ export default class ContextMenuPopup extends PopupWithHead {
 
     if (animated) {
       this.bodyAnimating = true;
-      var duration = 300;
+      let duration = 300;
       parentMenu.__originalParent.$subMenuBody.css({
         width: 'auto',
         height: 'auto'
       });
-      var targetBounds = this.htmlComp.offsetBounds();
+      let targetBounds = this.htmlComp.offsetBounds();
 
       this._animateTopAndLeft(this.htmlComp.$comp, actualBounds, targetBounds, duration);
 
@@ -244,7 +244,7 @@ export default class ContextMenuPopup extends PopupWithHead {
         queue: false
       });
 
-      var endTopposition = 0 - targetBounds.height,
+      let endTopposition = 0 - targetBounds.height,
         startTopposition = position.top - parentMenu.__originalParent.$subMenuBody.cssHeight(),
         topMargin = 0;
 
@@ -264,7 +264,7 @@ export default class ContextMenuPopup extends PopupWithHead {
           }
           // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
           this._invalidateLayoutTreeAndRepositionPopup();
-          var next = this._toggleSubMenuQueue.shift();
+          let next = this._toggleSubMenuQueue.shift();
           if (next) {
             next();
           }
@@ -307,7 +307,7 @@ export default class ContextMenuPopup extends PopupWithHead {
   }
 
   _animateTopAndLeft($comp, actualBounds, targetBounds, duration) {
-    var options = {
+    let options = {
       duration: duration,
       queue: false
     };
@@ -339,7 +339,7 @@ export default class ContextMenuPopup extends PopupWithHead {
       }
 
       // prevent loosing original parent
-      var originalParent = menu.parent;
+      let originalParent = menu.parent;
       if (this.cloneMenuItems && !menu.cloneOf) {
         // clone will recursively also clone all child actions.
         menu = menu.clone({
@@ -382,7 +382,7 @@ export default class ContextMenuPopup extends PopupWithHead {
 
   _onCloneMenuPropertyChange(event) {
     if (event.propertyName === 'selected') {
-      var menu = event.source;
+      let menu = event.source;
       // Only trigger property change, setSelected would try to render the selected state which must not happen for the original menu
       menu.cloneOf.triggerPropertyChange('selected', event.oldValue, event.newValue);
     }
@@ -392,7 +392,7 @@ export default class ContextMenuPopup extends PopupWithHead {
     if (initialSubMenuRendering) {
       return;
     }
-    var menusObj;
+    let menusObj;
     while (this.initialSubMenusToRender) {
       menusObj = this.initialSubMenusToRender;
       this.initialSubMenusToRender = undefined;
@@ -401,11 +401,11 @@ export default class ContextMenuPopup extends PopupWithHead {
   }
 
   _attachMenuListeners(menu) {
-    var menuItemActionHandler = this._onMenuItemAction.bind(this);
-    var menuItemPropertyChange = this._onMenuItemPropertyChange.bind(this);
+    let menuItemActionHandler = this._onMenuItemAction.bind(this);
+    let menuItemPropertyChange = this._onMenuItemPropertyChange.bind(this);
     menu.on('action', menuItemActionHandler);
     menu.on('propertyChange', menuItemPropertyChange);
-    this.one('remove', function() {
+    this.one('remove', () => {
       menu.off('action', menuItemActionHandler);
       menu.off('propertyChange', menuItemPropertyChange);
     });
@@ -450,10 +450,10 @@ export default class ContextMenuPopup extends PopupWithHead {
    * Necessary because invisible menu-items are rendered.
    */
   _updateFirstLastClass(event) {
-    var $firstMenuItem, $lastMenuItem;
+    let $firstMenuItem, $lastMenuItem;
 
     this.$body.children('.menu-item').each(function() {
-      var $menuItem = $(this);
+      let $menuItem = $(this);
       $menuItem.removeClass('context-menu-item-first context-menu-item-last');
 
       if ($menuItem.isVisible()) {
@@ -473,7 +473,7 @@ export default class ContextMenuPopup extends PopupWithHead {
 
   updateNextToSelected(menuItemClass, $selectedItem) {
     menuItemClass = menuItemClass ? menuItemClass : 'menu-item';
-    var $all = this.$body.find('.' + menuItemClass);
+    let $all = this.$body.find('.' + menuItemClass);
     $selectedItem = $selectedItem ? $selectedItem : this.$body.find('.' + menuItemClass + '.selected');
 
     $all.removeClass('next-to-selected');
@@ -509,19 +509,19 @@ export default class ContextMenuPopup extends PopupWithHead {
    * Deselects the visible siblings of the given menu item. It just removes the CSS class and does not modify the selected property.
    */
   _deselectSiblings(menuItem) {
-    menuItem.$container.siblings('.menu-item').each(function(i, elem) {
-      var $menuItem = $(elem);
+    menuItem.$container.siblings('.menu-item').each((i, elem) => {
+      let $menuItem = $(elem);
       $menuItem.select(false);
     }, this);
   }
 
   _invalidateLayoutTreeAndRepositionPopup() {
     this.invalidateLayoutTree();
-    this.session.layoutValidator.schedulePostValidateFunction(function() {
+    this.session.layoutValidator.schedulePostValidateFunction(() => {
       if (!this.rendered) { // check needed because this is an async callback
         return;
       }
       this.position();
-    }.bind(this));
+    });
   }
 }

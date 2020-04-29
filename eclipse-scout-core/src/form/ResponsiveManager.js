@@ -30,7 +30,7 @@ export default class ResponsiveManager {
   }
 
   destroy() {
-    this._responsiveHandlers.forEach(function(handler) {
+    this._responsiveHandlers.forEach(handler => {
       handler.destroy();
     });
   }
@@ -64,8 +64,8 @@ export default class ResponsiveManager {
       return false;
     }
 
-    var newState;
-    var state = target.responsiveHandler.state;
+    let newState;
+    let state = target.responsiveHandler.state;
     if (this.globalState) {
       newState = this.globalState;
     } else if (width < target.responsiveHandler.getCompactThreshold() && target.responsiveHandler.acceptState(ResponsiveManager.ResponsiveState.COMPACT)) {
@@ -115,7 +115,7 @@ export default class ResponsiveManager {
   }
 }
 
-App.addListener('prepare', function() {
+App.addListener('prepare', () => {
   if (instance) {
     // if it was created before the app itself, use it instead of creating a new one
     return;

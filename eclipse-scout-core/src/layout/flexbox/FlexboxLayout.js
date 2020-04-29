@@ -46,7 +46,7 @@ export default class FlexboxLayout extends AbstractLayout {
     if (!this.cacheKey || this.cacheKey.length === 0 || childCount < 2) {
       return;
     }
-    var keySequence = this.cacheKey.slice(),
+    let keySequence = this.cacheKey.slice(),
       cacheValue = webstorage.getItem(localStorage, keySequence[0]),
       i = 1,
       cacheObj;
@@ -65,7 +65,7 @@ export default class FlexboxLayout extends AbstractLayout {
     if (!this.cacheKey || this.cacheKey.length === 0 || childCount < 2) {
       return;
     }
-    var keySequence = this.cacheKey.slice(),
+    let keySequence = this.cacheKey.slice(),
       cacheValue = webstorage.getItem(localStorage, keySequence[0]),
       i = 1,
       cacheObj,
@@ -98,7 +98,7 @@ export default class FlexboxLayout extends AbstractLayout {
 
   // layout functions
   layout($container) {
-    var children = this._getChildren($container),
+    let children = this._getChildren($container),
       htmlContainer = HtmlComponent.get($container),
       containerSize = htmlContainer.availableSize({
         exact: true
@@ -107,7 +107,7 @@ export default class FlexboxLayout extends AbstractLayout {
 
     containerSize = containerSize.subtract(htmlContainer.insets());
 
-    splitterWithDelta = children.filter(function(c) {
+    splitterWithDelta = children.filter(c => {
       return c.layoutData.diff;
     })[0];
 
@@ -119,21 +119,21 @@ export default class FlexboxLayout extends AbstractLayout {
   }
 
   _getChildren($container) {
-    var children = [];
+    let children = [];
     $container.children().each(function() {
-      var htmlChild = HtmlComponent.optGet($(this));
+      let htmlChild = HtmlComponent.optGet($(this));
       if (htmlChild) {
         children.push(htmlChild);
       }
     });
-    children = children.sort(function(a, b) {
+    children = children.sort((a, b) => {
       return (a.layoutData.order || 0) - (b.layoutData.order || 0);
     });
     return children;
   }
 
   reset() {
-    this.childrenLayoutDatas.forEach(function(ld) {
+    this.childrenLayoutDatas.forEach(ld => {
       ld.sizePx = 0;
       ld.initialPx = 0;
       ld.diff = null;
@@ -143,7 +143,7 @@ export default class FlexboxLayout extends AbstractLayout {
 
   _layoutDelta(children, deltaComp, containerSize) {
     this.ensureInitialValues(children, containerSize);
-    var delta = deltaComp.layoutData.diff,
+    let delta = deltaComp.layoutData.diff,
       componentsBefore = children.slice(0, children.indexOf(deltaComp)).reverse(),
       componentsAfter = children.slice(children.indexOf(deltaComp) + 1),
       deltaDiffPrev,
@@ -166,7 +166,7 @@ export default class FlexboxLayout extends AbstractLayout {
 
     /* private functions */
     function _distributeDelta(components, delta, applyDelta) {
-      return components.reduce(function(diff, c) {
+      return components.reduce((diff, c) => {
         if (diff !== 0) {
           diff = c.layoutData.acceptDelta(diff, applyDelta);
         }
@@ -176,13 +176,13 @@ export default class FlexboxLayout extends AbstractLayout {
   }
 
   _layoutComponents(children, containerSize) {
-    var delta = this.ensureInitialValues(children, containerSize);
+    let delta = this.ensureInitialValues(children, containerSize);
     if (delta < 0) {
-      this._adjust(children, delta, function(ld) {
+      this._adjust(children, delta, ld => {
         return ld.shrink;
       });
     } else if (delta > 0) {
-      this._adjust(children, delta, function(ld) {
+      this._adjust(children, delta, ld => {
         return ld.grow;
       });
     }
@@ -190,11 +190,11 @@ export default class FlexboxLayout extends AbstractLayout {
   }
 
   _adjust(children, delta, getWeightFunction) {
-    var weightSum,
+    let weightSum,
       deltaFactor,
-      layoutDatas = children.map(function(c) {
+      layoutDatas = children.map(c => {
         return c.layoutData;
-      }).filter(function(ld) {
+      }).filter(ld => {
         // resizable
         return ld.acceptDelta(Math.sign(delta)) === 0;
       });
@@ -203,13 +203,13 @@ export default class FlexboxLayout extends AbstractLayout {
       return;
     }
 
-    weightSum = layoutDatas.reduce(function(sum, ld) {
+    weightSum = layoutDatas.reduce((sum, ld) => {
       return sum + getWeightFunction(ld);
     }, 0);
 
     // delta factor
     deltaFactor = delta / weightSum;
-    delta = layoutDatas.reduce(function(delta, ld) {
+    delta = layoutDatas.reduce((delta, ld) => {
       return ld.acceptDelta(deltaFactor * getWeightFunction(ld), true);
     }, delta);
     if (Math.abs(delta) > 0.2) {
@@ -219,7 +219,7 @@ export default class FlexboxLayout extends AbstractLayout {
   }
 
   _getPreferredSize(htmlComp) {
-    var prefSize;
+    let prefSize;
     prefSize = htmlComp.prefSize({
       useCssSize: true
     })
@@ -228,17 +228,17 @@ export default class FlexboxLayout extends AbstractLayout {
   }
 
   ensureInitialValues(children, containerSize) {
-    var totalPx = this._getDimensionValue(containerSize),
+    let totalPx = this._getDimensionValue(containerSize),
       sumOfAbsolutePx = 0,
       sumOfRelatives = 0,
-      colLayoutDatas = children.map(function(c) {
+      colLayoutDatas = children.map(c => {
         return c.layoutData;
       }),
       cachedSizes = this._readCache(children.length) || [];
 
     // setup initial values
-    children.forEach(function(comp, i) {
-      var ld = comp.layoutData;
+    children.forEach((comp, i) => {
+      let ld = comp.layoutData;
 
       if (ld.sizePx) {
         sumOfAbsolutePx += ld.sizePx;
@@ -254,19 +254,19 @@ export default class FlexboxLayout extends AbstractLayout {
         sumOfAbsolutePx += ld.initialPx;
       }
 
-    }.bind(this));
+    });
 
-    var relativeFactor = (totalPx - sumOfAbsolutePx) / sumOfRelatives;
-    colLayoutDatas.filter(function(ld) {
+    let relativeFactor = (totalPx - sumOfAbsolutePx) / sumOfRelatives;
+    colLayoutDatas.filter(ld => {
       return ld.relative && ld.initial > -1 && !ld.sizePx;
-    }).reduce(function(restWidth, ld) {
+    }).reduce((restWidth, ld) => {
       ld.initialPx = Math.max(30, relativeFactor * ld.initial);
       return restWidth - ld.initialPx;
     }, (totalPx - sumOfAbsolutePx));
 
     // set px values
     return colLayoutDatas
-      .reduce(function(restWidth, ld, i) {
+      .reduce((restWidth, ld, i) => {
         if (!ld.sizePx) {
           if (cachedSizes[i]) {
             ld.sizePx = ld.validate(Math.round(totalPx * cachedSizes[i]));
@@ -276,7 +276,7 @@ export default class FlexboxLayout extends AbstractLayout {
         }
         this.childrenLayoutDatas.push(ld);
         return restWidth - ld.sizePx;
-      }.bind(this), totalPx);
+      }, totalPx);
 
   }
 
@@ -286,9 +286,9 @@ export default class FlexboxLayout extends AbstractLayout {
   }
 
   _cacheSizes(children, containerSize) {
-    var totalPx = this._getDimensionValue(containerSize),
+    let totalPx = this._getDimensionValue(containerSize),
       value;
-    value = children.map(function(c) {
+    value = children.map(c => {
       return c.layoutData.sizePx / totalPx;
     });
     this._writeCache(children.length, value);
@@ -297,21 +297,21 @@ export default class FlexboxLayout extends AbstractLayout {
   // functions differ from row to column mode
 
   preferredLayoutSizeColumn($container, options) {
-    return this._getChildren($container).reduce(function(size, c) {
-      var prefSize = this._getPreferredSize(c);
+    return this._getChildren($container).reduce((size, c) => {
+      let prefSize = this._getPreferredSize(c);
       size.width = Math.max(prefSize.width, size.width);
       size.height += prefSize.height;
       return size;
-    }.bind(this), new Dimension(0, 0));
+    }, new Dimension(0, 0));
   }
 
   preferredLayoutSizeRow($container, options) {
-    return this._getChildren($container).reduce(function(size, c) {
-      var prefSize = this._getPreferredSize(c);
+    return this._getChildren($container).reduce((size, c) => {
+      let prefSize = this._getPreferredSize(c);
       size.height = Math.max(prefSize.height, size.height);
       size.width += prefSize.width;
       return size;
-    }.bind(this), new Dimension(0, 0));
+    }, new Dimension(0, 0));
   }
 
   _getWidth(dimension) {
@@ -323,22 +323,22 @@ export default class FlexboxLayout extends AbstractLayout {
   }
 
   _layoutFromLayoutDataRow(children, containerSize) {
-    children.reduce(function(x, comp) {
-      var margins = comp.margins();
-      var insets = comp.insets();
-      var w = comp.layoutData.sizePx;
-      var bounds = new Rectangle(x - insets.left - margins.left, 0, w + insets.left + insets.right, containerSize.height);
+    children.reduce((x, comp) => {
+      let margins = comp.margins();
+      let insets = comp.insets();
+      let w = comp.layoutData.sizePx;
+      let bounds = new Rectangle(x - insets.left - margins.left, 0, w + insets.left + insets.right, containerSize.height);
       comp.setBounds(bounds);
       return x + w;
     }, 0);
   }
 
   _layoutFromLayoutDataColumn(children, containerSize) {
-    children.reduce(function(y, comp) {
-      var margins = comp.margins();
-      var insets = comp.insets();
-      var h = comp.layoutData.sizePx;
-      var bounds = new Rectangle(0, y - insets.top - margins.top, containerSize.width, h + insets.top + insets.bottom);
+    children.reduce((y, comp) => {
+      let margins = comp.margins();
+      let insets = comp.insets();
+      let h = comp.layoutData.sizePx;
+      let bounds = new Rectangle(0, y - insets.top - margins.top, containerSize.width, h + insets.top + insets.bottom);
       comp.setBounds(bounds);
       return y + h;
     }, 0);

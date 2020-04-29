@@ -14,7 +14,7 @@ import $ from 'jquery';
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
 export function get(url, options) {
-  var opts = $.extend({}, {
+  let opts = $.extend({}, {
     url: url,
     type: 'GET'
   }, options);
@@ -30,7 +30,7 @@ export function get(url, options) {
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
 export function post(url, data, options) {
-  var opts = $.extend({}, {
+  let opts = $.extend({}, {
     url: url,
     type: 'POST',
     data: data
@@ -47,7 +47,7 @@ export function post(url, data, options) {
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
 export function put(url, data, options) {
-  var opts = $.extend({}, {
+  let opts = $.extend({}, {
     url: url,
     type: 'PUT',
     data: data
@@ -63,7 +63,7 @@ export function put(url, data, options) {
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
 export function remove(url, options) {
-  var opts = $.extend({}, {
+  let opts = $.extend({}, {
     url: url,
     type: 'DELETE'
   }, options);
@@ -78,7 +78,7 @@ export function remove(url, options) {
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
 export function getJson(url, options) {
-  var opts = $.extend({}, {
+  let opts = $.extend({}, {
     url: url,
     type: 'GET'
   }, options);
@@ -97,7 +97,7 @@ export function postJson(url, data, options) {
   if (data && typeof data !== 'string') {
     data = JSON.stringify(data);
   }
-  var opts = $.extend({}, {
+  let opts = $.extend({}, {
     url: url,
     type: 'POST',
     data: data
@@ -117,7 +117,7 @@ export function putJson(url, data, options) {
   if (data && typeof data !== 'string') {
     data = JSON.stringify(data);
   }
-  var opts = $.extend({}, {
+  let opts = $.extend({}, {
     url: url,
     type: 'PUT',
     data: data
@@ -133,7 +133,7 @@ export function putJson(url, data, options) {
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
 export function removeJson(url, options) {
-  var opts = $.extend({}, {
+  let opts = $.extend({}, {
     url: url,
     type: 'DELETE'
   }, options);
@@ -171,7 +171,7 @@ export function call(options) {
  * @returns {AjaxCall} the prepared Ajax call object. Execute it with the call() function.
  */
 export function createCallJson(options) {
-  var opts = $.extend({}, {
+  let opts = $.extend({}, {
     type: 'POST',
     dataType: 'json',
     contentType: 'application/json; charset=UTF-8'
@@ -186,7 +186,7 @@ export function createCallJson(options) {
  * @returns {AjaxCall} the prepared Ajax call object. Execute it with the call() function.
  */
 export function createCall(options) {
-  var opts = $.extend({}, {
+  let opts = $.extend({}, {
     cache: false
   }, options);
 

@@ -10,8 +10,8 @@
  */
 import {Button, FormField, graphics, HtmlEnvironment} from '../../../../src/index';
 
-describe('ButtonLayout', function() {
-  var session;
+describe('ButtonLayout', () => {
+  let session;
 
   class CustomButton extends Button {
     _render() {
@@ -32,16 +32,16 @@ describe('ButtonLayout', function() {
     }
   }
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  describe('prefSize', function() {
-    var button, statusWidth;
-    var fieldSize, statusMargins;
+  describe('prefSize', () => {
+    let button, statusWidth;
+    let fieldSize, statusMargins;
 
-    beforeEach(function() {
+    beforeEach(() => {
       statusWidth = HtmlEnvironment.get().fieldStatusWidth;
 
       button = new CustomButton();
@@ -57,16 +57,16 @@ describe('ButtonLayout', function() {
       statusMargins = graphics.margins(button.$status);
     }
 
-    describe('statusPosition', function() {
-      describe('top', function() {
-        it('increases width because status is always on the right side', function() {
+    describe('statusPosition', () => {
+      describe('top', () => {
+        it('increases width because status is always on the right side', () => {
           button.setStatusVisible(true);
           button.setLabelPosition(FormField.LabelPosition.TOP);
           button.setStatusPosition(FormField.StatusPosition.TOP);
           readSizes();
 
           // Status is still on the right side
-          var expectedWidth = fieldSize.width + statusWidth + statusMargins.horizontal();
+          let expectedWidth = fieldSize.width + statusWidth + statusMargins.horizontal();
           expect(button.htmlComp.prefSize().width).toBe(expectedWidth);
         });
       });

@@ -23,13 +23,13 @@ export default class MenuBarLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var menuItems = this._menuBar.orderedMenuItems.left.concat(this._menuBar.orderedMenuItems.right),
+    let menuItems = this._menuBar.orderedMenuItems.left.concat(this._menuBar.orderedMenuItems.right),
       htmlContainer = HtmlComponent.get($container),
       ellipsis;
 
     this.undoShrink(menuItems);
 
-    ellipsis = arrays.find(menuItems, function(menuItem) {
+    ellipsis = arrays.find(menuItems, menuItem => {
       return menuItem.ellipsis;
     });
 
@@ -41,18 +41,18 @@ export default class MenuBarLayout extends AbstractLayout {
     if (ellipsis && this._overflowMenuItems.length > 0) {
       ellipsis.setHidden(false);
     }
-    this._visibleMenuItems.forEach(function(menuItem) {
+    this._visibleMenuItems.forEach(menuItem => {
       menuItem._setOverflown(false);
     }, this);
 
-    this._overflowMenuItems.forEach(function(menuItem) {
+    this._overflowMenuItems.forEach(menuItem => {
       menuItem._setOverflown(true);
     });
     if (ellipsis && this._overflowMenuItems.length === 0) {
       ellipsis.setHidden(true);
     }
     // remove all separators
-    this._overflowMenuItems = this._overflowMenuItems.filter(function(menuItem) {
+    this._overflowMenuItems = this._overflowMenuItems.filter(menuItem => {
       return !menuItem.separator;
     });
 
@@ -63,11 +63,11 @@ export default class MenuBarLayout extends AbstractLayout {
     }
 
     // trigger menu items layout
-    this._visibleMenuItems.forEach(function(menuItem) {
+    this._visibleMenuItems.forEach(menuItem => {
       menuItem.validateLayout();
     });
 
-    this._visibleMenuItems.forEach(function(menuItem) {
+    this._visibleMenuItems.forEach(menuItem => {
       // Make sure open popups are at the correct position after layouting
       if (menuItem.popup) {
         menuItem.popup.position();
@@ -80,11 +80,11 @@ export default class MenuBarLayout extends AbstractLayout {
     if (!this._menuBar.isVisible()) {
       return new Dimension(0, 0);
     }
-    var visibleMenuItems = this._menuBar.orderedMenuItems.all.filter(function(menuItem) {
+    let visibleMenuItems = this._menuBar.orderedMenuItems.all.filter(menuItem => {
         return menuItem.visible;
       }, this),
-      overflowMenuItems = visibleMenuItems.filter(function(menuItem) {
-        var overflown = menuItem.overflown;
+      overflowMenuItems = visibleMenuItems.filter(menuItem => {
+        let overflown = menuItem.overflown;
         menuItem._setOverflown(false);
         return overflown;
       }),
@@ -100,7 +100,7 @@ export default class MenuBarLayout extends AbstractLayout {
     // shortcut for minimum size.
     if (prefWidth <= 0) {
       // reset overflown
-      overflowMenuItems.forEach(function(menuItem) {
+      overflowMenuItems.forEach(menuItem => {
         menuItem._setOverflown(true);
       });
       return this._minSize(visibleMenuItems);
@@ -112,13 +112,13 @@ export default class MenuBarLayout extends AbstractLayout {
     }
 
     // fill overflowable indexes
-    visibleMenuItems.forEach(function(menuItem, index) {
+    visibleMenuItems.forEach((menuItem, index) => {
       if (menuItem.stackable) {
         overflowableIndexes.push(index);
       }
     });
 
-    var overflowIndex = -1;
+    let overflowIndex = -1;
     this._setFirstLastMenuMarker(visibleMenuItems);
     prefSize = this._prefSize(visibleMenuItems);
     while (prefSize.width > prefWidth && overflowableIndexes.length > 0) {
@@ -134,7 +134,7 @@ export default class MenuBarLayout extends AbstractLayout {
     }
 
     // reset overflown
-    overflowMenuItems.forEach(function(menuItem) {
+    overflowMenuItems.forEach(menuItem => {
       menuItem._setOverflown(true);
     });
 
@@ -143,8 +143,8 @@ export default class MenuBarLayout extends AbstractLayout {
   }
 
   _minSize(visibleMenuItems) {
-    var prefSize,
-      minVisibleMenuItems = visibleMenuItems.filter(function(menuItem) {
+    let prefSize,
+      minVisibleMenuItems = visibleMenuItems.filter(menuItem => {
         return menuItem.ellisis || !menuItem.stackable;
       }, this);
     this._setFirstLastMenuMarker(minVisibleMenuItems, true);
@@ -153,7 +153,7 @@ export default class MenuBarLayout extends AbstractLayout {
   }
 
   _prefSize(menuItems, considerEllipsis) {
-    var prefSize = new Dimension(0, 0),
+    let prefSize = new Dimension(0, 0),
       itemSize = new Dimension(0, 0);
     considerEllipsis = scout.nvl(considerEllipsis, this._overflowMenuItems.length > 0);
     menuItems.forEach(function(menuItem) {
@@ -172,7 +172,7 @@ export default class MenuBarLayout extends AbstractLayout {
   }
 
   _menuItemSize(menuItem) {
-    var prefSize,
+    let prefSize,
       classList = menuItem.$container.attr('class');
 
     menuItem.$container.removeClass('overflown');
@@ -189,18 +189,18 @@ export default class MenuBarLayout extends AbstractLayout {
   }
 
   _setFirstLastMenuMarker(visibleMenuItems, considerEllipsis) {
-    var menuItems = visibleMenuItems;
+    let menuItems = visibleMenuItems;
     considerEllipsis = scout.nvl(considerEllipsis, this._overflowMenuItems.length > 0);
 
     // reset
-    this._menuBar.orderedMenuItems.all.forEach(function(menuItem) {
+    this._menuBar.orderedMenuItems.all.forEach(menuItem => {
       menuItem.$container.removeClass('first last');
     });
 
     // set first and last
     if (!considerEllipsis) {
       // remove ellipsis
-      menuItems = menuItems.filter(function(menuItem) {
+      menuItems = menuItems.filter(menuItem => {
         return !menuItem.ellipsis;
       });
     }
@@ -214,7 +214,7 @@ export default class MenuBarLayout extends AbstractLayout {
    * Makes the text invisible of all shrinkable menus with an icon
    */
   shrink(menus) {
-    menus.forEach(function(menu) {
+    menus.forEach(menu => {
       if (menu.textVisibleOrig !== undefined) {
         // already done
         return;
@@ -229,7 +229,7 @@ export default class MenuBarLayout extends AbstractLayout {
   }
 
   undoShrink(menus) {
-    menus.forEach(function(menu) {
+    menus.forEach(menu => {
       if (menu.textVisibleOrig === undefined) {
         return;
       }
@@ -247,7 +247,7 @@ export default class MenuBarLayout extends AbstractLayout {
    * @memberOf MenuBarLayout
    */
   static size(htmlMenuBar, containerSize) {
-    var menuBarSize = htmlMenuBar.prefSize();
+    let menuBarSize = htmlMenuBar.prefSize();
     menuBarSize.width = containerSize.width;
     menuBarSize = menuBarSize.subtract(htmlMenuBar.margins());
     return menuBarSize;

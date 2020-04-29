@@ -24,9 +24,9 @@ export default class PageTileButton extends TileButton {
     this.iconId = this.page.overviewIconId;
     this.labelHtmlEnabled = this.page.htmlEnabled;
 
-    this.on('click', function(event) {
+    this.on('click', event => {
       this.outline.selectNode(this.page);
-    }.bind(this));
+    });
   }
 
   notifyPageChanged() {

@@ -98,7 +98,7 @@ export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
       return;
     }
 
-    var inputField = $(event.target).is('input:text') || $(event.target).is('input:file') || $(event.target).is('textarea');
+    let inputField = $(event.target).is('input:text') || $(event.target).is('input:file') || $(event.target).is('textarea');
     if (inputField && (this._isLetterKeyStroke(event) || this._isNumberKeyStroke(event))) {
       event.stopPropagation();
     }

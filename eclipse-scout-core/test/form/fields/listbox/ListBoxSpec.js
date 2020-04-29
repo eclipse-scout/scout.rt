@@ -11,10 +11,10 @@
 import {ListBox, QueryBy, scout, Status} from '../../../../src/index';
 import {DummyLookupCall, FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('ListBox', function() {
-  var session, field, helper;
+describe('ListBox', () => {
+  let session, field, helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     field = new ListBox();
@@ -22,7 +22,7 @@ describe('ListBox', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
@@ -35,43 +35,43 @@ describe('ListBox', function() {
       parent: session.desktop,
       lookupCall: lookupCallModel
     }, model);
-    var box = scout.create('ListBox', model);
+    let box = scout.create('ListBox', model);
     box.render();
     return box;
   }
 
   function createListBoxWithAdapter() {
-    var model = helper.createFieldModel('ListBox');
-    var listBox = new ListBox();
+    let model = helper.createFieldModel('ListBox');
+    let listBox = new ListBox();
     listBox.init(model);
     linkWidgetAndAdapter(listBox, 'ListBoxAdapter');
     return listBox;
   }
 
-  describe('general behavior', function() {
-    it('defaults', function() {
+  describe('general behavior', () => {
+    it('defaults', () => {
       expect(field.value).toEqual([]);
       expect(field.displayText).toBe(null);
       expect(field.getCheckedLookupRows()).toEqual([]);
     });
 
-    it('init LookupCall when configured as string', function() {
+    it('init LookupCall when configured as string', () => {
       field = createFieldWithLookupCall();
       expect(field.lookupCall instanceof DummyLookupCall).toBe(true);
     });
 
-    it('LookupCall can be prepared if value is set explicitly', function(done) {
-      var box = scout.create('ListBox', {
+    it('LookupCall can be prepared if value is set explicitly', done => {
+      let box = scout.create('ListBox', {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
       });
 
-      var lookupPrepared = box.when('prepareLookupCall');
-      var lookupDone = box.when('lookupCallDone');
+      let lookupPrepared = box.when('prepareLookupCall');
+      let lookupDone = box.when('lookupCallDone');
       box.refreshLookup();
       jasmine.clock().tick(500);
 
-      $.promiseAll([lookupPrepared, lookupDone]).then(function(event) {
+      $.promiseAll([lookupPrepared, lookupDone]).then(event => {
         expect(event.lookupCall.objectType).toBe('DummyLookupCall');
       })
         .catch(fail)
@@ -79,19 +79,19 @@ describe('ListBox', function() {
       jasmine.clock().tick(500);
     });
 
-    it('LookupCall can be prepared if value is configured', function(done) {
-      var box = scout.create('ListBox', {
+    it('LookupCall can be prepared if value is configured', done => {
+      let box = scout.create('ListBox', {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall',
         value: 3
       });
 
-      var lookupPrepared = box.when('prepareLookupCall');
-      var lookupDone = box.when('lookupCallDone');
+      let lookupPrepared = box.when('prepareLookupCall');
+      let lookupDone = box.when('lookupCallDone');
       box.render();
       jasmine.clock().tick(500);
 
-      $.promiseAll([lookupPrepared, lookupDone]).then(function(event) {
+      $.promiseAll([lookupPrepared, lookupDone]).then(event => {
         expect(event.lookupCall.objectType).toBe('DummyLookupCall');
         expect(box.getCheckedLookupRows().length).toBe(1);
       })
@@ -100,7 +100,7 @@ describe('ListBox', function() {
       jasmine.clock().tick(500);
     });
 
-    it('when setValue is called, load and set the correct lookup rows', function() {
+    it('when setValue is called, load and set the correct lookup rows', () => {
       field = createFieldWithLookupCall();
       field.setValue([1, 3]);
       jasmine.clock().tick(300);
@@ -126,10 +126,10 @@ describe('ListBox', function() {
 
   });
 
-  describe('clear', function() {
+  describe('clear', () => {
 
-    it('clears the value', function() {
-      var field = createFieldWithLookupCall();
+    it('clears the value', () => {
+      let field = createFieldWithLookupCall();
 
       field.setValue([1, 2]);
       jasmine.clock().tick(500);
@@ -147,8 +147,8 @@ describe('ListBox', function() {
       expect(field.getCheckedLookupRows()).toEqual([]);
     });
 
-    it('uncheck all rows', function() {
-      var field = createFieldWithLookupCall();
+    it('uncheck all rows', () => {
+      let field = createFieldWithLookupCall();
       jasmine.clock().tick(500);
 
       field.setValue([1, 2, 3]);
@@ -165,9 +165,9 @@ describe('ListBox', function() {
     });
   });
 
-  describe('setEnabled', function() {
-    it('should disable check rows', function() {
-      var field = createFieldWithLookupCall();
+  describe('setEnabled', () => {
+    it('should disable check rows', () => {
+      let field = createFieldWithLookupCall();
       jasmine.clock().tick(500);
 
       field.setEnabled(false);
@@ -188,10 +188,10 @@ describe('ListBox', function() {
     });
   });
 
-  describe('lookupCall', function() {
+  describe('lookupCall', () => {
 
-    it('switching should refill table', function() {
-      var field = createFieldWithLookupCall({}, {
+    it('switching should refill table', () => {
+      let field = createFieldWithLookupCall({}, {
         objectType: 'LanguageDummyLookupCall'
       });
 
@@ -202,7 +202,7 @@ describe('ListBox', function() {
       expect(field.table.rows.length).toBe(5);
       expect(field.table.checkedRows().length).toBe(2);
 
-      var newLookupCall = scout.create('DummyLookupCall', {
+      let newLookupCall = scout.create('DummyLookupCall', {
         session: session
       });
       field.setLookupCall(newLookupCall);
@@ -214,11 +214,11 @@ describe('ListBox', function() {
       expect(field.table.rows.length).toBe(3);
     });
 
-    it('should be cloned and prepared for each lookup', function() {
-      var templatePropertyValue = 11;
-      var preparedPropertyValue = 22;
-      var eventCounter = 0;
-      var field = createFieldWithLookupCall({}, {
+    it('should be cloned and prepared for each lookup', () => {
+      let templatePropertyValue = 11;
+      let preparedPropertyValue = 22;
+      let eventCounter = 0;
+      let field = createFieldWithLookupCall({}, {
         customProperty: templatePropertyValue,
         _dataToLookupRow: function(data) { // overwrite mapping function to use the custom property
           return scout.create('LookupRow', {
@@ -227,7 +227,7 @@ describe('ListBox', function() {
           });
         }
       });
-      field.on('prepareLookupCall', function(event) {
+      field.on('prepareLookupCall', event => {
         expect(event.lookupCall.customProperty).toBe(templatePropertyValue);
         expect(event.lookupCall.id).not.toBe(field.lookupCall.id);
         expect(event.type).toBe('prepareLookupCall');
@@ -255,9 +255,9 @@ describe('ListBox', function() {
     });
   });
 
-  describe('lookup', function() {
-    it('should set error status when result has an exception', function() {
-      var field = createFieldWithLookupCall();
+  describe('lookup', () => {
+    it('should set error status when result has an exception', () => {
+      let field = createFieldWithLookupCall();
       field._lookupByAllDone({
         queryBy: QueryBy.ALL,
         lookupRows: [],
@@ -267,12 +267,12 @@ describe('ListBox', function() {
       expect(field.errorStatus.message).toBe('a total disaster');
     });
 
-    it('_executeLookup should always remove lookup-status (but not the error-status)', function() {
-      var field = createFieldWithLookupCall();
-      var lookupStatus = Status.warning({
+    it('_executeLookup should always remove lookup-status (but not the error-status)', () => {
+      let field = createFieldWithLookupCall();
+      let lookupStatus = Status.warning({
         message: 'bar'
       });
-      var errorStatus = Status.error({
+      let errorStatus = Status.error({
         message: 'foo'
       });
       field.setLookupStatus(lookupStatus);
@@ -283,18 +283,18 @@ describe('ListBox', function() {
       expect(field.lookupStatus).toBe(null);
     });
 
-    it('should be executed when lookup call is set', function() {
-      var field = createFieldWithLookupCall();
+    it('should be executed when lookup call is set', () => {
+      let field = createFieldWithLookupCall();
       jasmine.clock().tick(500);
 
       expect(field.table.rows.length).toBe(3);
     });
   });
 
-  describe('value', function() {
+  describe('value', () => {
 
-    it('should be synchronized when rows are checked', function() {
-      var field = createFieldWithLookupCall();
+    it('should be synchronized when rows are checked', () => {
+      let field = createFieldWithLookupCall();
       jasmine.clock().tick(500);
 
       field.table.checkAll();
@@ -317,20 +317,20 @@ describe('ListBox', function() {
     });
   });
 
-  describe('_formatValue', function() {
-    var lookupCall;
+  describe('_formatValue', () => {
+    let lookupCall;
 
-    beforeEach(function() {
+    beforeEach(() => {
       lookupCall = scout.create('DummyLookupCall', {
         session: session
       });
     });
 
-    it('uses a lookup call to format the value', function() {
-      var model = helper.createFieldModel('ListBox', session.desktop, {
+    it('uses a lookup call to format the value', () => {
+      let model = helper.createFieldModel('ListBox', session.desktop, {
         lookupCall: lookupCall
       });
-      var listBox = scout.create('ListBox', model);
+      let listBox = scout.create('ListBox', model);
       expect(listBox.displayText).toBe('');
       listBox.setValue([1]);
       jasmine.clock().tick(300);
@@ -342,11 +342,11 @@ describe('ListBox', function() {
       expect(listBox.displayText).toBe('Bar');
     });
 
-    it('returns empty string if value is null or undefined', function() {
-      var model = helper.createFieldModel('ListBox', session.desktop, {
+    it('returns empty string if value is null or undefined', () => {
+      let model = helper.createFieldModel('ListBox', session.desktop, {
         lookupCall: lookupCall
       });
-      var listBox = scout.create('ListBox', model);
+      let listBox = scout.create('ListBox', model);
       expect(listBox.displayText).toBe('');
 
       listBox.setValue(null);
@@ -362,10 +362,10 @@ describe('ListBox', function() {
 
   });
 
-  describe('label', function() {
+  describe('label', () => {
 
-    it('is linked with the field', function() {
-      var listBox = scout.create('ListBox', {
+    it('is linked with the field', () => {
+      let listBox = scout.create('ListBox', {
         parent: session.desktop
       });
       listBox.render();

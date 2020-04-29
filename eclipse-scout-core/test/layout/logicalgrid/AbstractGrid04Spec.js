@@ -40,8 +40,8 @@ import {GroupBoxSpecHelper} from '@eclipse-scout/testing';
  * @since 4.0.0 M6 25.02.2014
  */
 // see reference implementation org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout04Test
-describe('AbstractGrid04', function() {
-  var session;
+describe('AbstractGrid04', () => {
+  let session;
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -86,9 +86,9 @@ describe('AbstractGrid04', function() {
     this.groupBox.render();
   });
 
-  describe('group box layout 04', function() {
+  describe('group box layout 04', () => {
     it('test horizontal layout', function() {
-      var grid = new HorizontalGrid();
+      let grid = new HorizontalGrid();
       grid.setGridConfig(new GroupBoxGridConfig());
       grid.validate(this.groupBox);
 
@@ -113,7 +113,7 @@ describe('AbstractGrid04', function() {
     });
 
     it('test vertical smart layout', function() {
-      var grid = new VerticalSmartGrid();
+      let grid = new VerticalSmartGrid();
       grid.setGridConfig(new GroupBoxGridConfig());
       grid.validate(this.groupBox);
 

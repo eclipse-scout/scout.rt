@@ -42,8 +42,8 @@ import {GroupBoxSpecHelper} from '@eclipse-scout/testing';
  * @author Andreas Hoegger
  * @since 4.0.0 M6 25.02.2014
  */
-describe('AbstractGrid02', function() {
-  var session;
+describe('AbstractGrid02', () => {
+  let session;
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -95,9 +95,9 @@ describe('AbstractGrid02', function() {
     this.groupBox.render();
   });
 
-  describe('group box layout 02', function() {
+  describe('group box layout 02', () => {
     it('test horizontal layout', function() {
-      var grid = new HorizontalGrid();
+      let grid = new HorizontalGrid();
       grid.setGridConfig(new GroupBoxGridConfig());
       grid.validate(this.groupBox);
 
@@ -125,7 +125,7 @@ describe('AbstractGrid02', function() {
     });
 
     it('test vertical smart layout', function() {
-      var grid = new VerticalSmartGrid();
+      let grid = new VerticalSmartGrid();
       grid.setGridConfig(new GroupBoxGridConfig());
       grid.validate(this.groupBox);
 

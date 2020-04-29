@@ -10,18 +10,18 @@
  */
 import {scout} from '../../src/index';
 
-describe('LookupRow', function() {
+describe('LookupRow', () => {
 
-  it('constructor', function() {
-    var lookupRow = scout.create('LookupRow');
+  it('constructor', () => {
+    let lookupRow = scout.create('LookupRow');
     expect(lookupRow.key).toBe(null);
     expect(lookupRow.text).toBe(null);
     expect(lookupRow.enabled).toBe(true);
     expect(lookupRow.active).toBe(true);
   });
 
-  it('sets defaults when created with a plain object', function() {
-    var lookupRow = scout.create('LookupRow', {
+  it('sets defaults when created with a plain object', () => {
+    let lookupRow = scout.create('LookupRow', {
       key: 123,
       text: 'Foo'
     });
@@ -32,8 +32,8 @@ describe('LookupRow', function() {
     expect(lookupRow.active).toBe(true);
   });
 
-  it('uses values from plain object instead of defaults, when set', function() {
-    var lookupRow = scout.create('LookupRow', {
+  it('uses values from plain object instead of defaults, when set', () => {
+    let lookupRow = scout.create('LookupRow', {
       key: 123,
       text: 'Foo',
       enabled: false,

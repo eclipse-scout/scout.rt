@@ -11,18 +11,18 @@
 import {FormSpecHelper} from '@eclipse-scout/testing';
 import {scout} from '../../src/index';
 
-describe('ModeSelector', function() {
-  var session;
-  var helper;
+describe('ModeSelector', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
@@ -34,9 +34,9 @@ describe('ModeSelector', function() {
     }
   }
 
-  describe('enabled', function() {
-    it('propagation', function() {
-      var modeSelector = helper.createModeSelector(session.desktop, 2);
+  describe('enabled', () => {
+    it('propagation', () => {
+      let modeSelector = helper.createModeSelector(session.desktop, 2);
       modeSelector.render();
 
       expectEnabled(modeSelector, true, true);
@@ -50,13 +50,13 @@ describe('ModeSelector', function() {
     });
   });
 
-  describe('init', function() {
-    it('sets the selectedMode if it is provided', function() {
-      var mode1 = scout.create('Mode', {
+  describe('init', () => {
+    it('sets the selectedMode if it is provided', () => {
+      let mode1 = scout.create('Mode', {
         parent: session.desktop,
         ref: 1
       });
-      var modeSelector = scout.create('ModeSelector', {
+      let modeSelector = scout.create('ModeSelector', {
         objectType: 'ModeSelector',
         parent: session.desktop,
         selectedMode: mode1,
@@ -71,8 +71,8 @@ describe('ModeSelector', function() {
       expect(modeSelector.modes[1].selected).toBe(true);
     });
 
-    it('selects the correct mode if it is selected', function() {
-      var modeSelector = scout.create('ModeSelector', {
+    it('selects the correct mode if it is selected', () => {
+      let modeSelector = scout.create('ModeSelector', {
         parent: session.desktop,
         modes: [{
           objectType: 'Mode'
@@ -87,9 +87,9 @@ describe('ModeSelector', function() {
     });
   });
 
-  describe('selectModeByRef', function() {
-    it('updates the currently selected mode', function() {
-      var modeSelector = scout.create('ModeSelector', {
+  describe('selectModeByRef', () => {
+    it('updates the currently selected mode', () => {
+      let modeSelector = scout.create('ModeSelector', {
         parent: session.desktop,
         modes: [{
           objectType: 'Mode',
@@ -113,9 +113,9 @@ describe('ModeSelector', function() {
     });
   });
 
-  describe('selectModeById', function() {
-    it('updates the currently selected mode', function() {
-      var modeSelector = scout.create('ModeSelector', {
+  describe('selectModeById', () => {
+    it('updates the currently selected mode', () => {
+      let modeSelector = scout.create('ModeSelector', {
         parent: session.desktop,
         modes: [{
           objectType: 'Mode',
@@ -139,9 +139,9 @@ describe('ModeSelector', function() {
     });
   });
 
-  describe('setSelectedMode', function() {
-    it('unselects every mode when setting it to null', function() {
-      var modeSelector = scout.create('ModeSelector', {
+  describe('setSelectedMode', () => {
+    it('unselects every mode when setting it to null', () => {
+      let modeSelector = scout.create('ModeSelector', {
         parent: session.desktop,
         modes: [{
           objectType: 'Mode',
@@ -162,8 +162,8 @@ describe('ModeSelector', function() {
       expect(modeSelector.modes[1].selected).toBe(false);
     });
 
-    it('selects the new mode and unselects the old one', function() {
-      var modeSelector = helper.createModeSelector(session.desktop, 2);
+    it('selects the new mode and unselects the old one', () => {
+      let modeSelector = helper.createModeSelector(session.desktop, 2);
       modeSelector.render();
 
       modeSelector.setSelectedMode(modeSelector.modes[0]);
@@ -177,8 +177,8 @@ describe('ModeSelector', function() {
       expect(modeSelector.modes[1].selected).toBe(true);
     });
 
-    it('is called when setting the mode directly', function() {
-      var modeSelector = helper.createModeSelector(session.desktop, 2);
+    it('is called when setting the mode directly', () => {
+      let modeSelector = helper.createModeSelector(session.desktop, 2);
       modeSelector.render();
 
       modeSelector.modes[0].setSelected(true);
@@ -192,12 +192,12 @@ describe('ModeSelector', function() {
       expect(modeSelector.modes[1].selected).toBe(true);
     });
 
-    it('triggers a property change event', function() {
-      var modeSelector = helper.createModeSelector(session.desktop, 2);
+    it('triggers a property change event', () => {
+      let modeSelector = helper.createModeSelector(session.desktop, 2);
       modeSelector.render();
-      var triggeredEvent = null;
-      var eventCount = 0;
-      modeSelector.on('propertyChange', function(event) {
+      let triggeredEvent = null;
+      let eventCount = 0;
+      modeSelector.on('propertyChange', event => {
         if (event.propertyName === 'selectedMode') {
           triggeredEvent = event;
           eventCount++;
@@ -218,8 +218,8 @@ describe('ModeSelector', function() {
       expect(eventCount).toBe(2);
     });
 
-    it('makes sure only one mode is selected even if multiple modes are selected during init', function() {
-      var modeSelector = scout.create('ModeSelector', {
+    it('makes sure only one mode is selected even if multiple modes are selected during init', () => {
+      let modeSelector = scout.create('ModeSelector', {
         parent: session.desktop,
         modes: [{
           objectType: 'Mode',

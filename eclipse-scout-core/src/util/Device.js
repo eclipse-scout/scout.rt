@@ -71,7 +71,7 @@ export default class Device {
    * Also loads device specific scripts (e.g. fast click for ios devices)
    */
   bootstrap() {
-    var promises = [];
+    let promises = [];
 
     // Pre-calculate value and store in a simple property, to prevent many function calls inside loops
     this.scrollbarWidth = this._detectScrollbarWidth();
@@ -112,7 +112,7 @@ export default class Device {
   }
 
   _loadFastClickDeferred() {
-    return this._loadScriptDeferred('fastclick-1.0.6.js', function() {
+    return this._loadScriptDeferred('fastclick-1.0.6.js', () => {
       FastClick.attach(document.body);
       $.log.isInfoEnabled() && $.log.info('FastClick script loaded and attached');
     });
@@ -130,14 +130,14 @@ export default class Device {
    * To fix this we would have to work with a custom active class which will be toggled on touchstart/end
    */
   _installActiveHandler() {
-    document.addEventListener('touchstart', function() {
+    document.addEventListener('touchstart', () => {
     }, false);
   }
 
   hasOnScreenKeyboard() {
-    return this.supportsFeature('_onScreenKeyboard', function() {
+    return this.supportsFeature('_onScreenKeyboard', () => {
       return this.isIos() || this.isAndroid() || this.isWindowsTabletMode();
-    }.bind(this));
+    });
   }
 
   /**
@@ -222,7 +222,7 @@ export default class Device {
   isSupportedBrowser(browser, version) {
     browser = scout.nvl(browser, this.browser);
     version = scout.nvl(version, this.browserVersion);
-    var browsers = Device.Browser;
+    let browsers = Device.Browser;
     return !((browser === browsers.INTERNET_EXPLORER && version < 11) ||
       (browser === browsers.CHROME && version < 40) ||
       (browser === browsers.FIREFOX && version < 35) ||
@@ -250,7 +250,7 @@ export default class Device {
   }
 
   _parseSystem() {
-    var userAgent = this.userAgent;
+    let userAgent = this.userAgent;
     if (userAgent.indexOf('iPhone') > -1 || userAgent.indexOf('iPad') > -1) {
       this.system = Device.System.IOS;
     } else if (userAgent.indexOf('Android') > -1) {
@@ -264,7 +264,7 @@ export default class Device {
    * Currently only supports IOS
    */
   _parseSystemVersion() {
-    var versionRegex,
+    let versionRegex,
       System = Device.System,
       userAgent = this.userAgent;
 
@@ -282,7 +282,7 @@ export default class Device {
   }
 
   _parseBrowser() {
-    var userAgent = this.userAgent;
+    let userAgent = this.userAgent;
 
     if (userAgent.indexOf('Firefox') > -1) {
       this.browser = Device.Browser.FIREFOX;
@@ -307,7 +307,7 @@ export default class Device {
    * - 21.1.3 match: 21.1
    */
   _parseBrowserVersion() {
-    var versionRegex,
+    let versionRegex,
       browsers = Device.Browser,
       userAgent = this.userAgent;
 
@@ -335,7 +335,7 @@ export default class Device {
   }
 
   _parseVersion(userAgent, versionRegex) {
-    var matches = versionRegex.exec(userAgent);
+    let matches = versionRegex.exec(userAgent);
     if (Array.isArray(matches) && matches.length === 2) {
       return parseFloat(matches[1]);
     }
@@ -366,7 +366,7 @@ export default class Device {
    * @see https://codeburst.io/the-only-way-to-detect-touch-with-javascript-7791a3346685
    */
   supportsTouch() {
-    return this.supportsFeature('_touch', function check(property) {
+    return this.supportsFeature('_touch', property => {
       return (('ontouchstart' in window) || window.TouchEvent || window.DocumentTouch && document instanceof window.DocumentTouch);
     });
   }
@@ -396,8 +396,8 @@ export default class Device {
   }
 
   supportsCssGradient() {
-    var testValue = 'linear-gradient(to left, #000 0%, #000 50%, transparent 50%, transparent 100% )';
-    return this.supportsFeature('gradient', this.checkCssValue.bind(this, 'backgroundImage', testValue, function(actualValue) {
+    let testValue = 'linear-gradient(to left, #000 0%, #000 50%, transparent 50%, transparent 100% )';
+    return this.supportsFeature('gradient', this.checkCssValue.bind(this, 'backgroundImage', testValue, actualValue => {
       return (actualValue + '').indexOf('gradient') > 0;
     }));
   }
@@ -416,23 +416,23 @@ export default class Device {
   }
 
   supportsWebcam() {
-    return this.supportsFeature('_webcam', function check(property) {
-      var getUserMedia = objects.optProperty(navigator, 'mediaDevices', 'getUserMedia');
+    return this.supportsFeature('_webcam', property => {
+      let getUserMedia = objects.optProperty(navigator, 'mediaDevices', 'getUserMedia');
       return objects.isFunction(getUserMedia);
     });
   }
 
   hasPrettyScrollbars() {
-    return this.supportsFeature('_prettyScrollbars', function check(property) {
+    return this.supportsFeature('_prettyScrollbars', property => {
       return this.scrollbarWidth === 0;
-    }.bind(this));
+    });
   }
 
   canHideScrollbars() {
-    return this.supportsFeature('_canHideScrollbars', function check(property) {
+    return this.supportsFeature('_canHideScrollbars', property => {
       // Check if scrollbar is vanished if class hybrid-scrollable is applied which hides the scrollbar, see also scrollbars.js and Scrollbar.less
       return this._detectScrollbarWidth('hybrid-scrollable') === 0;
-    }.bind(this));
+    });
   }
 
   supportsCopyFromDisabledInputFields() {
@@ -448,13 +448,13 @@ export default class Device {
   }
 
   supportsCssProperty(property) {
-    return this.supportsFeature(property, function check(property) {
+    return this.supportsFeature(property, property => {
       if (document.body.style[property] !== undefined) {
         return true;
       }
 
       property = property.charAt(0).toUpperCase() + property.slice(1);
-      for (var i = 0; i < Device.VENDOR_PREFIXES.length; i++) {
+      for (let i = 0; i < Device.VENDOR_PREFIXES.length; i++) {
         if (document.body.style[Device.VENDOR_PREFIXES[i] + property] !== undefined) {
           return true;
         }
@@ -479,12 +479,12 @@ export default class Device {
   }
 
   supportsPassiveEventListener() {
-    return this.supportsFeature('_passiveEventListener', function check(property) {
+    return this.supportsFeature('_passiveEventListener', property => {
       // Code from MDN https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Safely_detecting_option_support
-      var passiveSupported = false;
+      let passiveSupported = false;
       try {
-        var options = Object.defineProperty({}, 'passive', {
-          get: function() {
+        let options = Object.defineProperty({}, 'passive', {
+          get: () => {
             passiveSupported = true;
             return false;
           }
@@ -503,15 +503,15 @@ export default class Device {
     if (document.body.style[property] === undefined) {
       return false;
     }
-    var div = document.createElement('div');
+    let div = document.createElement('div');
     div.style[property] = value;
     if (checkFunc(div.style[property])) {
       return true;
     }
 
     property = property.charAt(0).toUpperCase() + property.slice(1);
-    for (var i = 0; i < Device.VENDOR_PREFIXES.length; i++) {
-      var vendorProperty = Device.VENDOR_PREFIXES[i] + property;
+    for (let i = 0; i < Device.VENDOR_PREFIXES.length; i++) {
+      let vendorProperty = Device.VENDOR_PREFIXES[i] + property;
       if (document.body.style[vendorProperty] !== undefined) {
         div.style[vendorProperty] = value;
         if (checkFunc(div.style[vendorProperty])) {
@@ -530,14 +530,14 @@ export default class Device {
   }
 
   _detectScrollbarWidth(cssClass) {
-    var $measure = $('body')
+    let $measure = $('body')
         .appendDiv(cssClass)
         .attr('id', 'MeasureScrollbar')
         .css('width', 50)
         .css('height', 50)
         .css('overflow-y', 'scroll'),
       measureElement = $measure[0];
-    var scrollbarWidth = measureElement.offsetWidth - measureElement.clientWidth;
+    let scrollbarWidth = measureElement.offsetWidth - measureElement.clientWidth;
     $measure.remove();
     return scrollbarWidth;
   }
@@ -557,7 +557,7 @@ export default class Device {
   }
 }
 
-App.addListener('prepare', function() {
+App.addListener('prepare', () => {
   if (instance) {
     // if the device was created before the app itself, use it instead of creating a new one
     return;

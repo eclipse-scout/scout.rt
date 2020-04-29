@@ -26,8 +26,8 @@ export default class OkMenu extends Menu {
   }
 
   _doAction() {
-    var form = this.getForm();
-    var event = new Event();
+    let form = this.getForm();
+    let event = new Event();
     this.trigger('action', event);
     if (!event.defaultPrevented) {
       form.ok();

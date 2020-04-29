@@ -19,10 +19,10 @@ let objectFactories = {};
  * Returns the first of the given arguments that is not null or undefined. If no such element
  * is present, the last argument is returned. If no arguments are given, undefined is returned.
  */
-export function nvl() {
-  var result;
-  for (var i = 0; i < arguments.length; i++) {
-    result = arguments[i];
+export function nvl(...args) {
+  let result;
+  for (let i = 0; i < args.length; i++) {
+    result = args[i];
     if (result !== undefined && result !== null) {
       break;
     }
@@ -56,7 +56,7 @@ export function assertParameter(parameterName, value, type) {
  * @return the value (for direct assignment)
  */
 export function assertProperty(object, propertyName, type) {
-  var value = object[propertyName];
+  let value = object[propertyName];
   if (objects.isNullOrUndefined(value)) {
     throw new Error('Missing required property \'' + propertyName + '\'');
   }
@@ -69,17 +69,15 @@ export function assertProperty(object, propertyName, type) {
 /**
  * Checks if one of the arguments from 1-n is equal to the first argument.
  * @param value
- * @param arguments to check against the value, may be an array or a variable argument list.
+ * @param args to check against the value, may be an array or a variable argument list.
  */
-export function isOneOf(value) {
-  if (arguments.length < 2) {
+export function isOneOf(value, ...args) {
+  if (args.length === 0) {
     return false;
   }
-  var argsToCheck;
-  if (arguments.length === 2 && Array.isArray(arguments[1])) {
-    argsToCheck = arguments[1];
-  } else {
-    argsToCheck = Array.prototype.slice.call(arguments, 1);
+  let argsToCheck = args;
+  if (args.length === 1 && Array.isArray(args[0])) {
+    argsToCheck = args[0];
   }
   return argsToCheck.indexOf(value) !== -1;
 }
@@ -115,8 +113,8 @@ export function prepareDOM(targetDocument) {
 
   // Prevent "Do you want to translate this page?" in Google Chrome
   if (Device.get().browser === Device.Browser.CHROME) {
-    var metaNoTranslate = '<meta name="google" content="notranslate" />';
-    var $title = $('head > title', targetDocument);
+    let metaNoTranslate = '<meta name="google" content="notranslate" />';
+    let $title = $('head > title', targetDocument);
     if ($title.length === 0) {
       // Add to end of head
       $('head', targetDocument).append(metaNoTranslate);
@@ -130,7 +128,7 @@ export function prepareDOM(targetDocument) {
  * Installs a global 'mousedown' interceptor to invoke 'aboutToBlurByMouseDown' on value field before anything else gets executed.
  */
 export function installGlobalMouseDownInterceptor(myDocument) {
-  myDocument.addEventListener('mousedown', function(event) {
+  myDocument.addEventListener('mousedown', event => {
     ValueField.invokeValueFieldAboutToBlurByMouseDown(event.target || event.srcElement);
   }, true); // true=the event handler is executed in the capturing phase
 }
@@ -148,15 +146,15 @@ export function installSyntheticActiveStateHandler(myDocument) {
   if (Device.get().requiresSyntheticActiveState()) {
     $activeElements = [];
     $(myDocument)
-      .on('mousedown', function(event) {
-        var $element = $(event.target);
+      .on('mousedown', event => {
+        let $element = $(event.target);
         while ($element.length) {
           $activeElements.push($element.addClass('active'));
           $element = $element.parent();
         }
       })
-      .on('mouseup', function() {
-        $activeElements.forEach(function($element) {
+      .on('mouseup', () => {
+        $activeElements.forEach($element => {
           $element.removeClass('active');
         });
         $activeElements = [];
@@ -182,10 +180,10 @@ export function widget(widgetIdOrElement, partId) {
   if (objects.isNullOrUndefined(widgetIdOrElement)) {
     return null;
   }
-  var $elem = widgetIdOrElement;
+  let $elem = widgetIdOrElement;
   if (typeof widgetIdOrElement === 'string' || typeof widgetIdOrElement === 'number') {
     // Find widget for ID
-    var session = scout.getSession(partId);
+    let session = scout.getSession(partId);
     if (session) {
       widgetIdOrElement = strings.asString(widgetIdOrElement);
       return session.root.widget(widgetIdOrElement);
@@ -204,7 +202,7 @@ export function adapter(adapterId, partId) {
   if (objects.isNullOrUndefined(adapterId)) {
     return null;
   }
-  var session = scout.getSession(partId);
+  let session = scout.getSession(partId);
   if (session && session.modelAdapterRegistry) {
     return session.modelAdapterRegistry[adapterId];
   }
@@ -219,9 +217,8 @@ export function getSession(partId) {
   if (objects.isNullOrUndefined(partId)) {
     return sessions[0];
   }
-  for (var i = 0; i < sessions.length; i++) {
-    var session = sessions[i];
-    // noinspection EqualityComparisonWithCoercionJS
+  for (let i = 0; i < sessions.length; i++) {
+    let session = sessions[i];
     // eslint-disable-next-line eqeqeq
     if (session.partId == partId) { // <-- compare with '==' is intentional! (NOSONAR)
       return session;
@@ -241,13 +238,13 @@ export function getSession(partId) {
  * @param adapterId
  */
 export function exportAdapter(adapterId, partId) {
-  var session = scout.getSession(partId);
+  let session = scout.getSession(partId);
   if (session && session.modelAdapterRegistry) {
-    var adapter = session.getModelAdapter(adapterId);
+    let adapter = session.getModelAdapter(adapterId);
     if (!adapter) {
       return null;
     }
-    var adapterData = cloneAdapterData(adapterId);
+    let adapterData = cloneAdapterData(adapterId);
     resolveAdapterReferences(adapter, adapterData);
     adapterData.type = 'model'; // property 'type' is required for models.js
     return adapterData;
@@ -256,22 +253,22 @@ export function exportAdapter(adapterId, partId) {
   // ----- Helper functions -----
 
   function cloneAdapterData(adapterId) {
-    var adapterData = session.getAdapterData(adapterId);
+    let adapterData = session.getAdapterData(adapterId);
     adapterData = $.extend(true, {}, adapterData);
     return adapterData;
   }
 
   function resolveAdapterReferences(adapter, adapterData) {
-    var tmpAdapter, tmpAdapterData;
-    adapter.widget._widgetProperties.forEach(function(WidgetPropertyName) {
-      var WidgetPropertyValue = adapterData[WidgetPropertyName];
+    let tmpAdapter, tmpAdapterData;
+    adapter.widget._widgetProperties.forEach(WidgetPropertyName => {
+      let WidgetPropertyValue = adapterData[WidgetPropertyName];
       if (!WidgetPropertyValue) {
         return; // nothing to do when property is null
       }
       if (Array.isArray(WidgetPropertyValue)) {
         // value is an array of adapter IDs
-        var adapterDataArray = [];
-        WidgetPropertyValue.forEach(function(adapterId) {
+        let adapterDataArray = [];
+        WidgetPropertyValue.forEach(adapterId => {
           tmpAdapter = session.getModelAdapter(adapterId);
           tmpAdapterData = cloneAdapterData(adapterId);
           resolveAdapterReferences(tmpAdapter, tmpAdapterData);
@@ -293,14 +290,14 @@ export function exportAdapter(adapterId, partId) {
 /**
  * Reloads the entire browser window.
  *
- * Options:
- *   [schedule]
+ * @param [options]
+ * @param [options.schedule]
  *     If true, the page reload is not executed in the current thread but scheduled using setTimeout().
  *     This is useful if the caller wants to execute some other code before the reload. The default is false.
- *   [clearBody]
+ * @param [options.clearBody]
  *     If true, the body is cleared first before the reload is performed. This is useful to prevent
  *     showing "old" content in the browser until the new content arrives. The default is true.
- *   [redirectUrl]
+ * @param [options.redirectUrl]
  *      The new URL to load. If not specified, the current location is used (window.location).
  */
 export function reloadPage(options) {
@@ -320,7 +317,7 @@ export function reloadPage(options) {
     }
 
     // Reload window (using setTimeout, to overcome drawing issues in IE)
-    setTimeout(function() {
+    setTimeout(() => {
       if (options.redirectUrl) {
         window.location.href = options.redirectUrl;
       } else {
@@ -336,7 +333,7 @@ export function addObjectFactories(factories) {
 
 export function cloneShallow(template, properties, createUniqueId) {
   assertParameter('template', template);
-  var clone = Object.create(Object.getPrototypeOf(template));
+  let clone = Object.create(Object.getPrototypeOf(template));
   Object.getOwnPropertyNames(template)
     .forEach(key => {
       clone[key] = template[key];

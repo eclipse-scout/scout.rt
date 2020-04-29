@@ -21,8 +21,8 @@ export default class TabItemLayout extends GroupBoxLayout {
   }
 
   _menuBarSize(htmlMenuBar, containerSize, statusWidth) {
-    var menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
-    var tabBox = this.groupBox.parent;
+    let menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
+    let tabBox = this.groupBox.parent;
     menuBarSize.width = tabBox.header.$container.outerWidth();
     return menuBarSize;
   }

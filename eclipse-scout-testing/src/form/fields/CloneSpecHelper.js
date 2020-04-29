@@ -14,21 +14,21 @@ export default class CloneSpecHelper {
   }
 
   validateClone(original, clone, localProperties) {
-    var properties = original._cloneProperties.filter(function(prop) {
+    let properties = original._cloneProperties.filter(prop => {
         return original._widgetProperties.indexOf(prop) < 0;
       }),
-      widgetProperties = original._cloneProperties.filter(function(prop) {
+      widgetProperties = original._cloneProperties.filter(prop => {
         return original._widgetProperties.indexOf(prop) > -1;
       });
 
     // simple properties to be cloned
-    properties.forEach(function(prop) {
+    properties.forEach(prop => {
       expect(clone).definedProperty(original, prop);
       expect(original).sameProperty(clone, prop);
     });
 
     // widget properties to be cloned
-    widgetProperties.forEach(function(prop) {
+    widgetProperties.forEach(prop => {
       expect(clone).definedProperty(original, prop);
 
       expect(original).widgetCloneProperty(clone, prop);

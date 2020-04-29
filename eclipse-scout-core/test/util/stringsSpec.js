@@ -11,11 +11,11 @@
 
 import * as strings from './../../src/util/strings';
 
-describe('strings', function() {
+describe('strings', () => {
 
-  describe('nl2br', function() {
+  describe('nl2br', () => {
 
-    it('can convert newlines to br tags', function() {
+    it('can convert newlines to br tags', () => {
       expect(strings.nl2br()).toBe(undefined);
       expect(strings.nl2br(null)).toBe(null);
       expect(strings.nl2br('')).toBe('');
@@ -27,16 +27,16 @@ describe('strings', function() {
       expect(strings.nl2br(123)).toBe('123');
     });
 
-    it('encodes html, if the parameter is set to true (default)', function() {
+    it('encodes html, if the parameter is set to true (default)', () => {
       expect(strings.nl2br('<b>Hello</b>\nGoodbye')).toBe('&lt;b&gt;Hello&lt;/b&gt;<br>Goodbye');
       expect(strings.nl2br('Hello\n<br>\nGoodbye')).toBe('Hello<br>&lt;br&gt;<br>Goodbye');
     });
 
   });
 
-  describe('hasText', function() {
+  describe('hasText', () => {
 
-    it('can check if string has text', function() {
+    it('can check if string has text', () => {
       expect(strings.hasText()).toBe(false);
       expect(strings.hasText('')).toBe(false);
       expect(strings.hasText(' ')).toBe(false);
@@ -50,9 +50,9 @@ describe('strings', function() {
 
   });
 
-  describe('repeat', function() {
+  describe('repeat', () => {
 
-    it('can repeat strings', function() {
+    it('can repeat strings', () => {
       expect(strings.repeat()).toBe(undefined);
       expect(strings.repeat('')).toBe('');
       expect(strings.repeat('X')).toBe('');
@@ -64,9 +64,9 @@ describe('strings', function() {
 
   });
 
-  describe('padZeroLeft', function() {
+  describe('padZeroLeft', () => {
 
-    it('can pad strings with 0', function() {
+    it('can pad strings with 0', () => {
       expect(strings.padZeroLeft()).toBe(undefined);
       expect(strings.padZeroLeft('')).toBe('');
       expect(strings.padZeroLeft('X')).toBe('X');
@@ -79,9 +79,9 @@ describe('strings', function() {
 
   });
 
-  describe('startsWith', function() {
+  describe('startsWith', () => {
 
-    it('can check if a string starts with another', function() {
+    it('can check if a string starts with another', () => {
       expect(strings.startsWith('abc', 'a')).toBe(true);
       expect(strings.startsWith('abc', 'b')).toBe(false);
       expect(strings.startsWith('äabc', 'ä')).toBe(true);
@@ -107,9 +107,9 @@ describe('strings', function() {
 
   });
 
-  describe('endsWith', function() {
+  describe('endsWith', () => {
 
-    it('can check if a string ends with another', function() {
+    it('can check if a string ends with another', () => {
       expect(strings.endsWith('abc', 'c')).toBe(true);
       expect(strings.endsWith('abc', 'b')).toBe(false);
       expect(strings.endsWith('abcä', 'ä')).toBe(true);
@@ -128,9 +128,9 @@ describe('strings', function() {
 
   });
 
-  describe('count', function() {
+  describe('count', () => {
 
-    it('can count occurrences', function() {
+    it('can count occurrences', () => {
       expect(strings.count()).toBe(0);
       expect(strings.count('hello')).toBe(0);
       expect(strings.count('hello', 'xxx')).toBe(0);
@@ -148,9 +148,9 @@ describe('strings', function() {
 
   });
 
-  describe('join', function() {
+  describe('join', () => {
 
-    it('joins strings', function() {
+    it('joins strings', () => {
       expect(strings.join()).toBe('');
       expect(strings.join('')).toBe('');
       expect(strings.join(' ')).toBe('');
@@ -168,15 +168,15 @@ describe('strings', function() {
       expect(strings.join(2, 0, 0, 0)).toBe('02020');
     });
 
-    it('join works with array as second parameter', function() {
+    it('join works with array as second parameter', () => {
       expect(strings.join('-', ['hello', 'world'])).toBe('hello-world');
     });
 
   });
 
-  describe('box', function() {
+  describe('box', () => {
 
-    it('boxes strings', function() {
+    it('boxes strings', () => {
       expect(strings.box()).toBe('');
       expect(strings.box('(')).toBe('');
       expect(strings.box('(', undefined)).toBe('');
@@ -193,9 +193,9 @@ describe('strings', function() {
 
   });
 
-  describe('lowercaseFirstLetter', function() {
+  describe('lowercaseFirstLetter', () => {
 
-    it('converts first letter to lowercase', function() {
+    it('converts first letter to lowercase', () => {
       expect(strings.lowercaseFirstLetter()).toBe(undefined);
       expect(strings.lowercaseFirstLetter(null)).toBe(null);
       expect(strings.lowercaseFirstLetter(0)).toBe('0');
@@ -207,9 +207,9 @@ describe('strings', function() {
 
   });
 
-  describe('uppercaseFirstLetter', function() {
+  describe('uppercaseFirstLetter', () => {
 
-    it('converts first letter to uppercase', function() {
+    it('converts first letter to uppercase', () => {
       expect(strings.uppercaseFirstLetter()).toBe(undefined);
       expect(strings.uppercaseFirstLetter(null)).toBe(null);
       expect(strings.uppercaseFirstLetter(0)).toBe('0');
@@ -221,9 +221,9 @@ describe('strings', function() {
 
   });
 
-  describe('quote', function() {
+  describe('quote', () => {
 
-    it('quotes special characters for regexp', function() {
+    it('quotes special characters for regexp', () => {
       expect(strings.quote()).toBe(undefined);
       expect(strings.quote(null)).toBe(null);
       expect(strings.quote('bla')).toBe('bla');
@@ -234,9 +234,9 @@ describe('strings', function() {
 
   });
 
-  describe('asString', function() {
+  describe('asString', () => {
 
-    it('converts input to string', function() {
+    it('converts input to string', () => {
       expect(strings.asString()).toBe(undefined);
       expect(strings.asString(null)).toBe(null);
       expect(strings.asString('bla')).toBe('bla');
@@ -248,9 +248,9 @@ describe('strings', function() {
 
   });
 
-  describe('insertAt', function() {
+  describe('insertAt', () => {
 
-    it('can insert strings into other strings', function() {
+    it('can insert strings into other strings', () => {
       expect(strings.insertAt()).toBe(undefined);
       expect(strings.insertAt(null)).toBe(null);
       expect(strings.insertAt('')).toBe('');
@@ -264,26 +264,26 @@ describe('strings', function() {
 
   });
 
-  describe('nvl', function() {
+  describe('nvl', () => {
 
-    it('returns an empty string when input is null or undefined', function() {
+    it('returns an empty string when input is null or undefined', () => {
       expect(strings.nvl(null)).toBe('');
       expect(strings.nvl(undefined)).toBe('');
       expect(strings.nvl('')).toBe('');
       expect(strings.nvl('foo')).toBe('foo');
     });
 
-    it('should throw an error when called with more than one parameter', function() {
-      expect(function() {
+    it('should throw an error when called with more than one parameter', () => {
+      expect(() => {
         strings.nvl(null, 'foo');
       }).toThrow();
     });
 
   });
 
-  describe('countCodePoints', function() {
+  describe('countCodePoints', () => {
 
-    it('returns the number of codepoints in a string', function() {
+    it('returns the number of codepoints in a string', () => {
       expect(strings.countCodePoints('')).toBe(0);
       expect(strings.countCodePoints('foo')).toBe(3);
       expect(strings.countCodePoints('\uD83D\uDC4D')).toBe(1); // \uD83D\uDC4D is Unicode Character 'THUMBS UP SIGN' (U+1F44D)
@@ -291,9 +291,9 @@ describe('strings', function() {
 
   });
 
-  describe('splitMax', function() {
+  describe('splitMax', () => {
 
-    it('returns not more than limit elements', function() {
+    it('returns not more than limit elements', () => {
       expect(strings.splitMax()).toEqual([]);
       expect(strings.splitMax('')).toEqual(['']);
       expect(strings.splitMax('abc')).toEqual(['abc']);
@@ -310,14 +310,14 @@ describe('strings', function() {
 
   });
 
-  describe('removePrefix and removeSuffix', function() {
+  describe('removePrefix and removeSuffix', () => {
 
-    it('removePrefix', function() {
+    it('removePrefix', () => {
       expect(strings.removePrefix('crm.CodeType', 'crm.')).toBe('CodeType');
       expect(strings.removePrefix('crm.CodeType', 'foo.')).toBe('crm.CodeType');
     });
 
-    it('removeSuffix', function() {
+    it('removeSuffix', () => {
       expect(strings.removeSuffix('avatar.gif', '.gif')).toBe('avatar');
       expect(strings.removeSuffix('avatar.gif', '.exe')).toBe('avatar.gif');
     });

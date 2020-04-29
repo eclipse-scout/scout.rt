@@ -46,7 +46,7 @@ export default class CalendarComponent extends Widget {
 
   _remove() {
     // remove $parts because they're not children of this.$container
-    this._$parts.forEach(function($part) {
+    this._$parts.forEach($part => {
       $part.remove();
     });
     this._$parts = [];
@@ -62,20 +62,20 @@ export default class CalendarComponent extends Widget {
   }
 
   _render() {
-    var partDay, $day, $part;
+    let partDay, $day, $part;
     if (!this.coveredDaysRange) {
       // coveredDaysRange is not set on current CalendarComponent. Cannot show calendar component without from and to values.
       return;
     }
 
-    var loopDay = this._startLoopDay();
+    let loopDay = this._startLoopDay();
 
-    var appointmentToDate = dates.parseJsonDate(this.toDate);
-    var appointmentFromDate = dates.parseJsonDate(this.fromDate);
-    var coveredDaysRangeTo = this.coveredDaysRange.to;
+    let appointmentToDate = dates.parseJsonDate(this.toDate);
+    let appointmentFromDate = dates.parseJsonDate(this.fromDate);
+    let coveredDaysRangeTo = this.coveredDaysRange.to;
 
     if (!this.fullDay) {
-      var truncToDate = dates.trunc(appointmentToDate);
+      let truncToDate = dates.trunc(appointmentToDate);
       if (!dates.isSameDay(appointmentFromDate, appointmentToDate) && dates.compare(appointmentToDate, truncToDate) === 0) {
         appointmentToDate = dates.shiftTime(appointmentToDate, 0, 0, 0, -1);
         coveredDaysRangeTo = dates.shift(coveredDaysRangeTo, 0, 0, -1);
@@ -83,7 +83,7 @@ export default class CalendarComponent extends Widget {
     }
     appointmentToDate = dates.toJsonDate(appointmentToDate);
 
-    var lastComponentDay = dates.shift(coveredDaysRangeTo, 0, 0, 1);
+    let lastComponentDay = dates.shift(coveredDaysRangeTo, 0, 0, 1);
 
     if (dates.compare(loopDay, lastComponentDay) > 0) {
       // start day for the while loop is greater then the exit condition
@@ -123,19 +123,19 @@ export default class CalendarComponent extends Widget {
       this._$parts.push($part);
 
       if (this.parent._isMonth()) {
-        var width = $day.data('new-width') || $day.width(); // prefer width from layoutSize
+        let width = $day.data('new-width') || $day.width(); // prefer width from layoutSize
         $part.addClass('component-month')
           .toggleClass('compact', width < CalendarComponent.MONTH_COMPACT_THRESHOLD);
       } else {
         if (this.fullDay) {
           // Full day tasks are rendered in the topGrid
-          var alreadyExistingTasks = $('.component-task', $day).length;
+          let alreadyExistingTasks = $('.component-task', $day).length;
           // Offset of initial task: 30px for the day-of-month number
           // Offset of following tasks: 26px * preceding number of tasks. 26px: Task 23px high, 1px border. Spaced by 2px
           this._arrangeTask(30 + 26 * alreadyExistingTasks);
           $part.addClass('component-task');
         } else {
-          var
+          let
             fromDate = dates.parseJsonDate(this.fromDate),
             toDate = dates.parseJsonDate(appointmentToDate),
             partFrom = this._getHours(this.fromDate),
@@ -164,7 +164,7 @@ export default class CalendarComponent extends Widget {
   }
 
   _getHours(date) {
-    var d = dates.parseJsonDate(date);
+    let d = dates.parseJsonDate(date);
     return d.getHours() + d.getMinutes() / 60;
   }
 
@@ -180,7 +180,7 @@ export default class CalendarComponent extends Widget {
   }
 
   _arrangeTask(taskOffset) {
-    this._$parts.forEach(function($part) {
+    this._$parts.forEach($part => {
       $part.css('top', taskOffset + 'px');
     });
   }
@@ -190,8 +190,8 @@ export default class CalendarComponent extends Widget {
   }
 
   _getHourRange(day) {
-    var hourRange = new Range(this._getHours(this.fromDate), this._getHours(this.toDate));
-    var dateRange = new Range(dates.parseJsonDate(this.fromDate), dates.parseJsonDate(this.toDate));
+    let hourRange = new Range(this._getHours(this.fromDate), this._getHours(this.toDate));
+    let dateRange = new Range(dates.parseJsonDate(this.fromDate), dates.parseJsonDate(this.toDate));
 
     if (dates.isSameDay(day, dateRange.from) && dates.isSameDay(day, dateRange.to)) {
       return new Range(hourRange.from, hourRange.to);
@@ -209,9 +209,9 @@ export default class CalendarComponent extends Widget {
 
   _getDisplayDayPosition(range) {
     // Doesn't support minutes yet...
-    var preferredRange = new Range(this.parent._dayPosition(range.from, 0), this.parent._dayPosition(range.to, 0));
+    let preferredRange = new Range(this.parent._dayPosition(range.from, 0), this.parent._dayPosition(range.to, 0));
     // Fixed number of divisions...
-    var minRangeSize = Math.round(100 * 100 / 24 / this.parent.numberOfHourDivisions) / 100; // Round to two digits
+    let minRangeSize = Math.round(100 * 100 / 24 / this.parent.numberOfHourDivisions) / 100; // Round to two digits
     if (preferredRange.size() < minRangeSize) {
       return new Range(preferredRange.from, preferredRange.from + minRangeSize);
     }
@@ -220,11 +220,11 @@ export default class CalendarComponent extends Widget {
 
   _partPosition($part, y1, y2) {
     // Compensate open bottom (height: square of 16px, rotated 45°, approx. 23px = sqrt(16^2 + 16^2)
-    var compensateBottom = y2 === 25 ? 23 : 0;
+    let compensateBottom = y2 === 25 ? 23 : 0;
     y2 = Math.min(24, y2);
 
-    var range = new Range(y1, y2);
-    var r = this._getDisplayDayPosition(range);
+    let range = new Range(y1, y2);
+    let r = this._getDisplayDayPosition(range);
 
     // Convert to %, rounded to two decimal places
     compensateBottom = Math.round(100 * (100 / 1920 * compensateBottom)) / 100;
@@ -254,11 +254,11 @@ export default class CalendarComponent extends Widget {
   }
 
   _onMouseDown(event) {
-    var $part = $(event.delegateTarget);
+    let $part = $(event.delegateTarget);
     this.updateSelectedComponent($part, false);
 
     if (event.button === 0) {
-      var popup = scout.create('WidgetPopup', {
+      let popup = scout.create('WidgetPopup', {
         parent: this.parent,
         $anchor: $part,
         closeOnAnchorMouseDown: true,
@@ -299,7 +299,7 @@ export default class CalendarComponent extends Widget {
   }
 
   _description() {
-    var descParts = [],
+    let descParts = [],
       range = null,
       text = '',
       fromDate = dates.parseJsonDate(this.fromDate),
@@ -337,7 +337,7 @@ export default class CalendarComponent extends Widget {
     }
 
     // build text
-    descParts.forEach(function(part) {
+    descParts.forEach(part => {
       text += (part.cssClass ? '<span class="' + part.cssClass + '">' + part.text + '</span>' : part.text) + '<br/>';
     });
 

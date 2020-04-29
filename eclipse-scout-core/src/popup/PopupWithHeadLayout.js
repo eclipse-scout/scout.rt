@@ -19,7 +19,7 @@ export default class PopupWithHeadLayout extends PopupLayout {
   _setSize(prefSize) {
     super._setSize(prefSize);
 
-    var htmlComp = this.popup.htmlComp,
+    let htmlComp = this.popup.htmlComp,
       popupSize = prefSize,
       htmlBody = HtmlComponent.optGet(this.popup.$body);
 
@@ -28,7 +28,7 @@ export default class PopupWithHeadLayout extends PopupLayout {
       // Set size of body
       popupSize = popupSize.subtract(htmlComp.insets());
       if (this._headVisible) {
-        var headSize = graphics.size(this.popup.$head, true);
+        let headSize = graphics.size(this.popup.$head, true);
         // Adjust popup size if head changed size
         if (popupSize.width < headSize.width) {
           popupSize.width = headSize.width;
@@ -57,7 +57,7 @@ export default class PopupWithHeadLayout extends PopupLayout {
     // but do no try to switch the position if there is not enough space
     this._position(false);
 
-    var maxWidthLeft, maxWidthRight, maxHeightDown, maxHeightUp,
+    let maxWidthLeft, maxWidthRight, maxHeightDown, maxHeightUp,
       htmlComp = this.popup.htmlComp,
       windowPaddingLeft = this.popup.windowPaddingX,
       windowPaddingRight = this.popup.windowPaddingX,
@@ -77,13 +77,13 @@ export default class PopupWithHeadLayout extends PopupLayout {
   }
 
   preferredLayoutSize($container, options) {
-    var htmlComp = this.popup.htmlComp,
+    let htmlComp = this.popup.htmlComp,
       htmlBody,
       prefSize;
 
     if (!this.popup.bodyAnimating) {
-      var popupStyleBackup = this.popup.$container.attr('style');
-      var $siblingBodies = this.popup.$body.siblings('.popup-body');
+      let popupStyleBackup = this.popup.$container.attr('style');
+      let $siblingBodies = this.popup.$body.siblings('.popup-body');
       $siblingBodies.addClass('hidden');
       this.popup.$container.css({
         width: 'auto',
@@ -107,7 +107,7 @@ export default class PopupWithHeadLayout extends PopupLayout {
     }
 
     if (this.popup._headVisible) {
-      var headSize = graphics.size(this.popup.$head, options)
+      let headSize = graphics.size(this.popup.$head, options)
         .add(graphics.margins(this.popup.$head));
       prefSize.width = prefSize.width < headSize.width ? headSize.width : prefSize.width;
     }

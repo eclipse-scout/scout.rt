@@ -10,18 +10,18 @@
  */
 import {scout} from '../../../src/index';
 
-describe('ViewButtonBox', function() {
-  var session, desktop, outlineHelper;
+describe('ViewButtonBox', () => {
+  let session, desktop, outlineHelper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  describe('viewMenuTab', function() {
-    var viewButtonBox;
+  describe('viewMenuTab', () => {
+    let viewButtonBox;
 
-    beforeEach(function() {
+    beforeEach(() => {
       viewButtonBox = scout.create('ViewButtonBox', {
         parent: session.desktop,
         viewButtons: [scout.create('ViewButton', {
@@ -33,8 +33,8 @@ describe('ViewButtonBox', function() {
       });
     });
 
-    it('is only visible if there are at least 2 visible view buttons with displayStyle == "MENU"', function() {
-      var viewButtons = [
+    it('is only visible if there are at least 2 visible view buttons with displayStyle == "MENU"', () => {
+      let viewButtons = [
         scout.create('ViewButton', {
           parent: session.desktop,
           text: 'Button1',
@@ -53,24 +53,24 @@ describe('ViewButtonBox', function() {
       expect(viewButtonBox.viewMenuTab.visible).toBe(true);
     });
 
-    it('is not visible if there is only 1 visible view buttons with displayStyle == "MENU"', function() {
+    it('is not visible if there is only 1 visible view buttons with displayStyle == "MENU"', () => {
       viewButtonBox.render();
       expect(viewButtonBox.viewMenuTab.visible).toBe(false);
     });
 
-    it('is not visible if there are no visible view buttons ith displayStyle == "MENU"', function() {
+    it('is not visible if there are no visible view buttons ith displayStyle == "MENU"', () => {
       viewButtonBox.viewButtons[0].visible = false;
       viewButtonBox.render();
       expect(viewButtonBox.viewMenuTab.visible).toBe(false);
     });
 
-    it('is not visible if there are visible view buttons with displayStyle == "TAB"', function() {
+    it('is not visible if there are visible view buttons with displayStyle == "TAB"', () => {
       viewButtonBox.viewButtons[0].displayStyle = 'TAB';
       viewButtonBox.render();
       expect(viewButtonBox.viewMenuTab.visible).toBe(false);
     });
 
-    it('is not visible if there are no view buttons at all', function() {
+    it('is not visible if there are no view buttons at all', () => {
       viewButtonBox.viewButtons = [];
       viewButtonBox.render();
       expect(viewButtonBox.viewMenuTab.visible).toBe(false);
@@ -78,17 +78,17 @@ describe('ViewButtonBox', function() {
 
   });
 
-  describe('viewButtons', function() {
-    var viewButtonBox;
+  describe('viewButtons', () => {
+    let viewButtonBox;
 
-    beforeEach(function() {
+    beforeEach(() => {
       viewButtonBox = scout.create('ViewButtonBox', {
         parent: session.desktop
       });
     });
 
-    it('will be rendered as view tab when only one button with displayStyle == "MENU"', function() {
-      var viewButtons = [
+    it('will be rendered as view tab when only one button with displayStyle == "MENU"', () => {
+      let viewButtons = [
         scout.create('ViewButton', {
           parent: session.desktop,
           text: 'Button1',
@@ -107,8 +107,8 @@ describe('ViewButtonBox', function() {
      * if only one button with display style "MENU" is visible this button is rendered as tabButton since a dropdown
      *  with only one menu dos not make sense.
      */
-    it('will be rendered as menuButtons when two button with displayStyle == "MENU"', function() {
-      var viewButtons = [
+    it('will be rendered as menuButtons when two button with displayStyle == "MENU"', () => {
+      let viewButtons = [
         scout.create('ViewButton', {
           parent: session.desktop,
           text: 'Button1',
@@ -129,8 +129,8 @@ describe('ViewButtonBox', function() {
       expect(viewButtonBox.menuButtons.length).toBe(2);
     });
 
-    it('will be rendered correctly when displayStyle changes dynamically.', function() {
-      var viewButtons = [
+    it('will be rendered correctly when displayStyle changes dynamically.', () => {
+      let viewButtons = [
         scout.create('ViewButton', {
           parent: session.desktop,
           text: 'Button1',
@@ -157,8 +157,8 @@ describe('ViewButtonBox', function() {
 
     });
 
-    it('will be rendered correctly when visibility changes dynamically.', function() {
-      var viewButtons = [
+    it('will be rendered correctly when visibility changes dynamically.', () => {
+      let viewButtons = [
         scout.create('ViewButton', {
           parent: session.desktop,
           text: 'Button1',

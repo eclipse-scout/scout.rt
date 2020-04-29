@@ -24,17 +24,17 @@ export default class CodeType {
     this.modelClass = model.modelClass;
 
     if (model.codes) {
-      for (var i = 0; i < model.codes.length; i++) {
+      for (let i = 0; i < model.codes.length; i++) {
         this._initCode(model.codes[i]);
       }
     }
   }
 
   _initCode(modelCode, parent) {
-    var code = scout.create(modelCode);
+    let code = scout.create(modelCode);
     this.add(code, parent);
     if (modelCode.children) {
-      for (var i = 0; i < modelCode.children.length; i++) {
+      for (let i = 0; i < modelCode.children.length; i++) {
         this._initCode(modelCode.children[i], code);
       }
     }
@@ -55,7 +55,7 @@ export default class CodeType {
    * @throw {Error) if code does not exist
    */
   get(codeId) {
-    var code = this.optGet(codeId);
+    let code = this.optGet(codeId);
     if (!code) {
       throw new Error('No code found for id=' + codeId);
     }
@@ -78,8 +78,8 @@ export default class CodeType {
    */
   getCodes(rootOnly) {
     if (rootOnly) {
-      var rootCodes = [];
-      for (var i = 0; i < this.codes.length; i++) {
+      let rootCodes = [];
+      for (let i = 0; i < this.codes.length; i++) {
         if (!this.codes[i].parent) {
           rootCodes.push(this.codes[i]);
         }
@@ -98,13 +98,13 @@ export default class CodeType {
    * @returns {boolean} true if the visitor aborted the visiting, false if the visiting completed without aborting
    */
   visit(visitor) {
-    var codes = this.codes.filter(function(code) {
+    let codes = this.codes.filter(code => {
       // Only consider root codes
       return !code.parent;
     });
-    for (var i = 0; i < codes.length; i++) {
-      var code = codes[i];
-      var visitResult = visitor(code);
+    for (let i = 0; i < codes.length; i++) {
+      let code = codes[i];
+      let visitResult = visitor(code);
       if (visitResult === true || visitResult === TreeVisitResult.TERMINATE) {
         return TreeVisitResult.TERMINATE;
       }

@@ -114,7 +114,7 @@ export default class DateField extends ValueField {
   }
 
   createDatePopup() {
-    var popupType = this.touchMode ? 'DatePickerTouchPopup' : 'DatePickerPopup';
+    let popupType = this.touchMode ? 'DatePickerTouchPopup' : 'DatePickerPopup';
     return scout.create(popupType, {
       parent: this,
       $anchor: this.$field,
@@ -129,7 +129,7 @@ export default class DateField extends ValueField {
   }
 
   createTimePopup() {
-    var popupType = this.touchMode ? 'TimePickerTouchPopup' : 'TimePickerPopup';
+    let popupType = this.touchMode ? 'TimePickerTouchPopup' : 'TimePickerPopup';
     return scout.create(popupType, {
       parent: this,
       $anchor: this.$timeField,
@@ -393,7 +393,7 @@ export default class DateField extends ValueField {
   }
 
   _readDisplayText() {
-    var dateDisplayText, timeDisplayText;
+    let dateDisplayText, timeDisplayText;
     if (this.hasDate) {
       dateDisplayText = this._readDateDisplayText();
     }
@@ -439,7 +439,7 @@ export default class DateField extends ValueField {
     this.oldDisplayText = this.displayText;
     this._setProperty('displayText', displayText);
 
-    var parts = this._splitDisplayText(displayText);
+    let parts = this._splitDisplayText(displayText);
     if (this.hasDate) {
       // preserve dateDisplayText if hasDate is set to false (only override if it is true)
       this.dateDisplayText = parts.dateText;
@@ -491,7 +491,7 @@ export default class DateField extends ValueField {
 
   _setAllowedDates(allowedDates) {
     if (Array.isArray(allowedDates)) {
-      allowedDates = allowedDates.map(function(date) {
+      allowedDates = allowedDates.map(date => {
         return dates.ensure(date);
       });
       this._setProperty('allowedDates', allowedDates);
@@ -505,7 +505,7 @@ export default class DateField extends ValueField {
    */
   _renderErrorStatus() {
     super._renderErrorStatus();
-    var hasStatus = !!this.errorStatus,
+    let hasStatus = !!this.errorStatus,
       statusClass = this._errorStatusClass();
 
     if (this.$dateField) {
@@ -818,7 +818,7 @@ export default class DateField extends ValueField {
    * in _onDateFieldInput(), which is fired after 'keydown'.
    */
   _onDateFieldKeyDown(event) {
-    var delta = 0,
+    let delta = 0,
       diffYears = 0,
       diffMonths = 0,
       diffDays = 0,
@@ -880,7 +880,7 @@ export default class DateField extends ValueField {
       if (displayText && !this._isDateValid()) {
         // If there is an error, try to parse the date. If it may be parsed, the error was likely a validation error.
         // In that case use the parsed date as starting point and not the for the user invisible value
-        var parsedValue = this.isolatedDateFormat.parse(displayText, pickerStartDate);
+        let parsedValue = this.isolatedDateFormat.parse(displayText, pickerStartDate);
         if (parsedValue) {
           pickerStartDate = parsedValue;
           this._setDateValid(true);
@@ -956,7 +956,7 @@ export default class DateField extends ValueField {
    * in _onDateFieldKeyDown().
    */
   _onDateFieldInput(event) {
-    var displayText = fields.valOrText(this.$dateField);
+    let displayText = fields.valOrText(this.$dateField);
 
     // If the focus has changed to another field in the meantime, don't predict anything and
     // don't show the picker. Just validate the input.
@@ -971,7 +971,7 @@ export default class DateField extends ValueField {
 
     // Predict date
     this._removePredictErrorStatus();
-    var datePrediction = this._predictDate(displayText); // this also updates the errorStatus
+    let datePrediction = this._predictDate(displayText); // this also updates the errorStatus
     if (datePrediction) {
       fields.valOrText(this._$predictDateField, datePrediction.text);
       this.openDatePopupAndSelect(datePrediction.date);
@@ -987,21 +987,21 @@ export default class DateField extends ValueField {
     // Unfortunately, most browsers don't fire 'scroll' events for input fields. Also,
     // when the 'input' even is fired, the scrollLeft() position sometimes has not been
     // updated yet, that's why we must use setTimeout() with a short delay.
-    setTimeout(function() {
+    setTimeout(() => {
       if (this._$predictDateField) {
         this._$predictDateField.setVisible(this.$dateField.scrollLeft() === 0);
       }
-    }.bind(this), 50);
+    }, 50);
   }
 
   acceptInput() {
-    var displayText = scout.nvl(this._readDisplayText(), '');
+    let displayText = scout.nvl(this._readDisplayText(), '');
 
-    var inputChanged = this._checkDisplayTextChanged(displayText);
+    let inputChanged = this._checkDisplayTextChanged(displayText);
     if (inputChanged) {
       this.parseAndSetValue(displayText);
     } else {
-      var oldValue = this.value;
+      let oldValue = this.value;
       this.parseAndSetValue(displayText);
       if (!dates.equals(this.value, oldValue)) {
         inputChanged = true;
@@ -1017,7 +1017,7 @@ export default class DateField extends ValueField {
    * Don't delete invalid input from the time field.
    */
   acceptDate() {
-    var invalid = this.containsStatus(ParsingFailedStatus);
+    let invalid = this.containsStatus(ParsingFailedStatus);
     if (this.hasTime && !invalid && strings.empty(this.$dateField.val())) {
       this.$timeField.val('');
     }
@@ -1029,7 +1029,7 @@ export default class DateField extends ValueField {
    * Don't delete invalid input from the time field.
    */
   acceptTime() {
-    var invalid = this.containsStatus(ParsingFailedStatus);
+    let invalid = this.containsStatus(ParsingFailedStatus);
     if (this.hasDate && !invalid && strings.empty(this.$timeField.val())) {
       this.$dateField.val('');
     }
@@ -1049,7 +1049,7 @@ export default class DateField extends ValueField {
    * in _onTimeFieldInput(), which is fired after 'keydown'.
    */
   _onTimeFieldKeyDown(event) {
-    var delta = 0,
+    let delta = 0,
       diffHours = 0,
       diffMinutes = 0,
       diffSeconds = 0,
@@ -1143,7 +1143,7 @@ export default class DateField extends ValueField {
       } else {
         // without picker
         if (!this._tempTimeDate) {
-          var timePrediction = this._predictTime(displayText); // this also updates the errorStatus
+          let timePrediction = this._predictTime(displayText); // this also updates the errorStatus
           if (timePrediction && timePrediction.date) {
             this._tempTimeDate = timePrediction.date;
           } else {
@@ -1173,7 +1173,7 @@ export default class DateField extends ValueField {
    * in _onTimeFieldKeyDown().
    */
   _onTimeFieldInput(event) {
-    var displayText = this.$timeField.val();
+    let displayText = this.$timeField.val();
 
     // If the focus has changed to another field in the meantime, don't predict anything and
     // don't show the picker. Just validate the input.
@@ -1187,7 +1187,7 @@ export default class DateField extends ValueField {
     }
 
     // Predict time
-    var timePrediction = this._predictTime(displayText); // this also updates the errorStatus
+    let timePrediction = this._predictTime(displayText); // this also updates the errorStatus
     if (timePrediction) {
       this._$predictTimeField.val(timePrediction.text);
       this.openTimePopupAndSelect(timePrediction.date);
@@ -1199,17 +1199,17 @@ export default class DateField extends ValueField {
     this._updateTimeHasText();
 
     // See comment for similar code in _onDateFieldInput()
-    setTimeout(function() {
+    setTimeout(() => {
       if (this._$predictTimeField) {
         this._$predictTimeField.setVisible(this.$timeField.scrollLeft() === 0);
       }
-    }.bind(this), 50);
+    }, 50);
   }
 
   _onDatePickerDateSelect(event) {
     this._setDateValid(true);
     this._setTimeValid(true);
-    var newValue = this._newTimestampAsDate(event.date, this.value);
+    let newValue = this._newTimestampAsDate(event.date, this.value);
     this.setValue(newValue);
     this.closePopup();
     this._triggerAcceptInput();
@@ -1218,7 +1218,7 @@ export default class DateField extends ValueField {
   _onTimePickerTimeSelect(event) {
     this._setDateValid(true);
     this._setTimeValid(true);
-    var newValue = this._newTimestampAsDate(this.value, event.time);
+    let newValue = this._newTimestampAsDate(this.value, event.time);
     this.setValue(newValue);
     this.closePopup();
     this._triggerAcceptInput();
@@ -1226,7 +1226,7 @@ export default class DateField extends ValueField {
 
   _createPredictionField($inputField) {
     this.setSuppressStatus(FormField.SuppressStatus.ALL);
-    var $predictionField = $inputField.clone()
+    let $predictionField = $inputField.clone()
       .addClass('predict')
       .attr('tabIndex', '-1')
       .insertBefore($inputField);
@@ -1265,11 +1265,11 @@ export default class DateField extends ValueField {
   }
 
   _computeDisplayText(dateDisplayText, timeDisplayText) {
-    var dateText = dateDisplayText || '',
+    let dateText = dateDisplayText || '',
       timeText = timeDisplayText || '';
 
     // do not use strings.join which ignores empty components
-    var displayText = (this.hasDate ? dateText : '') + (this.hasDate && this.hasTime ? '\n' : '') + (this.hasTime ? timeText : '');
+    let displayText = (this.hasDate ? dateText : '') + (this.hasDate && this.hasTime ? '\n' : '') + (this.hasTime ? timeText : '');
 
     // empty display text should always be just an empty string
     if (displayText === '\n') {
@@ -1279,11 +1279,11 @@ export default class DateField extends ValueField {
   }
 
   _splitDisplayText(displayText) {
-    var dateText = '',
+    let dateText = '',
       timeText = '';
 
     if (strings.hasText(displayText)) {
-      var parts = displayText.split('\n');
+      let parts = displayText.split('\n');
       dateText = this.hasDate ? parts[0] : '';
       timeText = this.hasTime ? (this.hasDate ? parts[1] : parts[0]) : '';
     }
@@ -1301,7 +1301,7 @@ export default class DateField extends ValueField {
    * @override ValueField.js
    */
   aboutToBlurByMouseDown(target) {
-    var dateFieldActive, timeFieldActive, eventOnDatePicker, eventOnTimePicker,
+    let dateFieldActive, timeFieldActive, eventOnDatePicker, eventOnTimePicker,
       eventOnDateField = this.$dateField ? (this.$dateField.isOrHas(target) || this.$dateFieldIcon.isOrHas(target) || (this.$dateClearIcon && this.$dateClearIcon.isOrHas(target))) : false,
       eventOnTimeField = this.$timeField ? (this.$timeField.isOrHas(target) || this.$timeFieldIcon.isOrHas(target) || (this.$timeClearIcon && this.$timeClearIcon.isOrHas(target))) : false,
       eventOnPopup = this.popup && this.popup.$container.isOrHas(target),
@@ -1334,7 +1334,7 @@ export default class DateField extends ValueField {
    * is used as basis and the given arguments are applied to that date. The result is returned.
    */
   _newTimestampAsDate(date, time) {
-    var result = null;
+    let result = null;
     if (date || time) {
       result = this.value || this._referenceDate();
       if (date) {
@@ -1355,7 +1355,7 @@ export default class DateField extends ValueField {
    * - the current date/time
    */
   _referenceDate() {
-    var referenceDate = this.autoDate || dates.ceil(dates.newDate(), this.timePickerResolution);
+    let referenceDate = this.autoDate || dates.ceil(dates.newDate(), this.timePickerResolution);
     if (this.autoDate) {
       referenceDate = this.autoDate;
     } else if (this.hasTime) {
@@ -1373,7 +1373,7 @@ export default class DateField extends ValueField {
    * Find nearest allowed date which is equals or greater than the current referenceDate.
    */
   _findAllowedReferenceDate(referenceDate) {
-    var i, allowedDate;
+    let i, allowedDate;
     // 1st: try to find a date which is equals or greater than the referenceDate (today)
     for (i = 0; i < this.allowedDates.length; i++) {
       allowedDate = this.allowedDates[i];
@@ -1400,11 +1400,11 @@ export default class DateField extends ValueField {
     this.popup = this.createDatePopup();
     this.popup.open();
     this.$dateField.addClass('focused');
-    this.popup.on('remove', function(event) {
+    this.popup.on('remove', event => {
       this._onPopupRemove(event);
       this.popup = null;
       this.$dateField.removeClass('focused');
-    }.bind(this));
+    });
     this.getDatePicker().on('dateSelect', this._onDatePickerDateSelect.bind(this));
   }
 
@@ -1431,11 +1431,11 @@ export default class DateField extends ValueField {
     this.popup = this.createTimePopup();
     this.popup.open();
     this.$timeField.addClass('focused');
-    this.popup.on('remove', function(event) {
+    this.popup.on('remove', event => {
       this._onPopupRemove(event);
       this.popup = null;
       this.$timeField.removeClass('focused');
-    }.bind(this));
+    });
     this.getTimePicker().on('timeSelect', this._onTimePickerTimeSelect.bind(this));
   }
 
@@ -1449,12 +1449,12 @@ export default class DateField extends ValueField {
   }
 
   _parseValue(displayText) {
-    var parts = this._splitDisplayText(displayText);
-    var dateText = parts.dateText;
-    var datePrediction = {};
-    var timeText = parts.timeText;
-    var timePrediction = {};
-    var success = true;
+    let parts = this._splitDisplayText(displayText);
+    let dateText = parts.dateText;
+    let datePrediction = {};
+    let timeText = parts.timeText;
+    let timePrediction = {};
+    let success = true;
 
     this._removePredictErrorStatus();
     if (this.hasDate) {
@@ -1504,10 +1504,10 @@ export default class DateField extends ValueField {
     inputText = inputText || '';
 
     // "Date calculations"
-    var m = inputText.match(/^([+-])(\d*)$/);
+    let m = inputText.match(/^([+-])(\d*)$/);
     if (m) {
-      var now = dates.newDate();
-      var daysToAdd = Number(m[1] + (m[2] || '0'));
+      let now = dates.newDate();
+      let daysToAdd = Number(m[1] + (m[2] || '0'));
       now.setDate(now.getDate() + daysToAdd);
       if (isNaN(now.valueOf()) || now.getDate() < 0) { // Some older browsers don't set NaN but return invalid values
         this._setDateValid(false);
@@ -1520,7 +1520,7 @@ export default class DateField extends ValueField {
       };
     }
 
-    var analyzeInfo = this._analyzeInputAsDate(inputText, this.value || this._referenceDate());
+    let analyzeInfo = this._analyzeInputAsDate(inputText, this.value || this._referenceDate());
     if (analyzeInfo.error) {
       this._setDateValid(false);
       return null;
@@ -1535,9 +1535,9 @@ export default class DateField extends ValueField {
       };
     }
 
-    var predictedDate = analyzeInfo.predictedDate;
-    var predictionFormat = new DateFormat(this.isolatedDateFormat.locale, analyzeInfo.parsedPattern);
-    var predictedDateFormatted = predictionFormat.format(predictedDate, true);
+    let predictedDate = analyzeInfo.predictedDate;
+    let predictionFormat = new DateFormat(this.isolatedDateFormat.locale, analyzeInfo.parsedPattern);
+    let predictedDateFormatted = predictionFormat.format(predictedDate, true);
 
     // If predicted date format starts with validatedText, ensure that the capitalization matches.
     // Example: input = 'frid', predicted = 'Friday, 1.10.2014' --> return 'friday, 1.10.2014')
@@ -1559,7 +1559,7 @@ export default class DateField extends ValueField {
   _predictTime(inputText) {
     inputText = inputText || '';
 
-    var analyzeInfo = this._analyzeInputAsTime(inputText, this.value || this._referenceDate());
+    let analyzeInfo = this._analyzeInputAsTime(inputText, this.value || this._referenceDate());
     if (analyzeInfo.error) {
       this._setTimeValid(false);
       return null;
@@ -1574,13 +1574,13 @@ export default class DateField extends ValueField {
       };
     }
 
-    var predictedDate = analyzeInfo.predictedDate;
-    var predictionFormat = new DateFormat(this.isolatedTimeFormat.locale, analyzeInfo.parsedPattern);
-    var predictedTimeFormatted = predictionFormat.format(predictedDate, true);
+    let predictedDate = analyzeInfo.predictedDate;
+    let predictionFormat = new DateFormat(this.isolatedTimeFormat.locale, analyzeInfo.parsedPattern);
+    let predictedTimeFormatted = predictionFormat.format(predictedDate, true);
 
     // If predicted date format starts with validatedText, ensure that the capitalization matches.
     // Example: input = 'frid', predicted = 'Friday, 1.10.2014' --> return 'friday, 1.10.2014')
-    var m = predictedTimeFormatted.match(new RegExp('^' + strings.quote(inputText) + '(.*)$', 'i'));
+    let m = predictedTimeFormatted.match(new RegExp('^' + strings.quote(inputText) + '(.*)$', 'i'));
     if (m) {
       predictedTimeFormatted = inputText + m[1];
     }
@@ -1606,8 +1606,8 @@ export default class DateField extends ValueField {
   _setErrorStatusPart(property, valid) {
 
     // check if date/time error exists
-    var status = null;
-    var storedStatus = null;
+    let status = null;
+    let storedStatus = null;
     if (this.errorStatus) {
       storedStatus = arrays.find(this.errorStatus.asFlatList(), DateField.PARSE_ERROR_PREDICATE);
     }
@@ -1647,7 +1647,7 @@ export default class DateField extends ValueField {
    * @override
    */
   _createInvalidValueStatus(statusType, value, error) {
-    var errorStatus = super._createInvalidValueStatus(statusType, value, error);
+    let errorStatus = super._createInvalidValueStatus(statusType, value, error);
     // Set date and time to invalid, otherwise isDateValid and isTimeValid return false even though there is a validation error
     errorStatus.invalidDate = true;
     errorStatus.invalidTime = true;
@@ -1669,7 +1669,7 @@ export default class DateField extends ValueField {
     }
 
     // return false if one of the status has the invalid* property
-    return !this.errorStatus.asFlatList().some(function(status) {
+    return !this.errorStatus.asFlatList().some(status => {
       return !!status[property];
     });
   }
@@ -1760,14 +1760,14 @@ export default class DateField extends ValueField {
   }
 
   preselectDate(date, animated) {
-    var datePicker = this.getDatePicker();
+    let datePicker = this.getDatePicker();
     if (datePicker) {
       datePicker.preselectDate(date, animated);
     }
   }
 
   selectDate(date, animated) {
-    var datePicker = this.getDatePicker();
+    let datePicker = this.getDatePicker();
     if (datePicker) {
       datePicker.selectDate(date, animated);
     }
@@ -1804,14 +1804,14 @@ export default class DateField extends ValueField {
   }
 
   preselectTime(time) {
-    var timePicker = this.getTimePicker();
+    let timePicker = this.getTimePicker();
     if (timePicker) {
       timePicker.preselectTime(time);
     }
   }
 
   selectTime(time) {
-    var timePicker = this.getTimePicker();
+    let timePicker = this.getTimePicker();
     if (timePicker) {
       timePicker.selectTime(time);
     }
@@ -1828,7 +1828,7 @@ export default class DateField extends ValueField {
   }
 
   _formatValue(value) {
-    var
+    let
       dateText = '',
       timeText = '';
 
@@ -1870,7 +1870,7 @@ export default class DateField extends ValueField {
    * @override
    */
   _triggerAcceptInput() {
-    var event = {
+    let event = {
       displayText: this.displayText,
       errorStatus: this.errorStatus,
       value: this.value

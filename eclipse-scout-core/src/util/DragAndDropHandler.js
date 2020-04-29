@@ -68,7 +68,7 @@ export default class DragAndDropHandler {
       event.stopPropagation();
       event.preventDefault();
 
-      var files = event.originalEvent.dataTransfer.files;
+      let files = event.originalEvent.dataTransfer.files;
       if (files.length >= 1) {
         this.target.session.uploadFiles(this.target, files,
           this.additionalDropProperties ? this.additionalDropProperties(event) : undefined,

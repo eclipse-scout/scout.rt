@@ -278,7 +278,7 @@ export default class FormField extends Widget {
     this._renderFieldStyleInternal(this.$field);
     if (this.rendered) {
       // See _renderLabelPosition why it is necessary to invalidate parent as well.
-      var htmlCompParent = this.htmlComp.getParent();
+      let htmlCompParent = this.htmlComp.getParent();
       if (htmlCompParent) {
         htmlCompParent.invalidateLayoutTree();
       }
@@ -330,7 +330,7 @@ export default class FormField extends Widget {
     if (!(errorStatus instanceof Status)) {
       throw new Error('errorStatus is not a Status');
     }
-    var status = this._errorStatus();
+    let status = this._errorStatus();
     if (status) {
       status = status.ensureChildren(); // new instance is required for property change
     } else {
@@ -379,18 +379,18 @@ export default class FormField extends Widget {
    * @param {object} statusType
    */
   removeErrorStatus(statusType) {
-    this.removeErrorStatusByPredicate(function(status) {
+    this.removeErrorStatusByPredicate(status => {
       return status instanceof statusType;
     });
   }
 
   removeErrorStatusByPredicate(predicate) {
-    var status = this._errorStatus();
+    let status = this._errorStatus();
     if (!status) {
       return;
     }
     if (status.containsStatusByPredicate(predicate)) {
-      var newStatus = status.clone();
+      let newStatus = status.clone();
       newStatus.removeAllStatusByPredicate(predicate);
       // If no other status remains -> clear error status
       if (newStatus.hasChildren()) {
@@ -406,7 +406,7 @@ export default class FormField extends Widget {
   }
 
   _renderErrorStatus() {
-    var status = this._errorStatus(),
+    let status = this._errorStatus(),
       hasStatus = !!status,
       statusClass = (hasStatus && !this._isSuppressStatusField()) ? 'has-' + status.cssClass() : '';
 
@@ -445,7 +445,7 @@ export default class FormField extends Widget {
   }
 
   _updateTooltip() {
-    var hasTooltipText = this.hasStatusTooltip();
+    let hasTooltipText = this.hasStatusTooltip();
     this.$container.toggleClass('has-tooltip', hasTooltipText);
     if (this.$field) {
       this.$field.toggleClass('has-tooltip', hasTooltipText);
@@ -454,7 +454,7 @@ export default class FormField extends Widget {
 
     if (this.$fieldContainer) {
       if (this.hasOnFieldTooltip()) {
-        var creatorFunc = this.onFieldTooltipOptionsCreator || this._createOnFieldTooltipOptions;
+        let creatorFunc = this.onFieldTooltipOptionsCreator || this._createOnFieldTooltipOptions;
         tooltips.install(this.$fieldContainer, creatorFunc.call(this));
       } else {
         tooltips.uninstall(this.$fieldContainer);
@@ -500,7 +500,7 @@ export default class FormField extends Widget {
   }
 
   _renderLabel() {
-    var label = this.label;
+    let label = this.label;
     if (this.labelPosition === FormField.LabelPosition.ON_FIELD) {
       this._renderPlaceholder();
       if (this.$label) {
@@ -553,12 +553,12 @@ export default class FormField extends Widget {
   }
 
   _renderLabelVisible() {
-    var visible = this.labelVisible;
+    let visible = this.labelVisible;
     this._renderChildVisible(this.$label, visible);
     this.$container.toggleClass('label-hidden', !visible);
     if (this.rendered && this.labelPosition === FormField.LabelPosition.TOP) {
       // See _renderLabelPosition why it is necessary to invalidate parent as well.
-      var htmlCompParent = this.htmlComp.getParent();
+      let htmlCompParent = this.htmlComp.getParent();
       if (htmlCompParent) {
         htmlCompParent.invalidateLayoutTree();
       }
@@ -601,7 +601,7 @@ export default class FormField extends Widget {
       return;
     }
     // compute status
-    var menus,
+    let menus,
       errorStatus = this._errorStatus(),
       status = null,
       statusVisible = this._computeStatusVisible(),
@@ -648,7 +648,7 @@ export default class FormField extends Widget {
    * -> errorStatus and tooltip override statusVisible, so $status may be visible event though statusVisible is set to false
    */
   _computeStatusVisible() {
-    var status = this._errorStatus(),
+    let status = this._errorStatus(),
       statusVisible = this.statusVisible,
       hasStatus = !!status,
       hasTooltip = this.hasStatusTooltip();
@@ -677,7 +677,7 @@ export default class FormField extends Widget {
     if (this.rendered) {
       // Necessary to invalidate parent as well if parent uses the logical grid.
       // LogicalGridData uses another row height depending of the label position
-      var htmlCompParent = this.htmlComp.getParent();
+      let htmlCompParent = this.htmlComp.getParent();
       if (htmlCompParent) {
         htmlCompParent.invalidateLayoutTree();
       }
@@ -788,7 +788,7 @@ export default class FormField extends Widget {
 
   _renderGridData() {
     if (this.rendered) {
-      var htmlCompParent = this.htmlComp.getParent();
+      let htmlCompParent = this.htmlComp.getParent();
       if (htmlCompParent) { // may be null if $container is detached
         htmlCompParent.invalidateLayoutTree();
       }
@@ -834,7 +834,7 @@ export default class FormField extends Widget {
     if (menusToDelete.length === 0) {
       return;
     }
-    var menus = this.menus.slice();
+    let menus = this.menus.slice();
     arrays.removeAll(menus, menusToDelete);
     this.setMenus(menus);
   }
@@ -846,20 +846,20 @@ export default class FormField extends Widget {
   }
 
   _getCurrentMenus() {
-    return this.menus.filter(function(menu) {
+    return this.menus.filter(menu => {
       return menu.visible;
     });
   }
 
   _getMenusForStatus(status) {
-    return this.statusMenuMappings.filter(function(mapping) {
+    return this.statusMenuMappings.filter(mapping => {
       if (!mapping.menu || !mapping.menu.visible) {
         return false;
       }
       // Show the menus which are mapped to the status code and severity (if set)
       return (mapping.codes.length === 0 || mapping.codes.indexOf(status.code) > -1) &&
         (mapping.severities.length === 0 || mapping.severities.indexOf(status.severity) > -1);
-    }).map(function(mapping) {
+    }).map(mapping => {
       return mapping.menu;
     });
   }
@@ -916,7 +916,7 @@ export default class FormField extends Widget {
   }
 
   _showContextMenu() {
-    var menus = this._getCurrentMenus();
+    let menus = this._getCurrentMenus();
     if (menus.length === 0) {
       // at least one menu item must be visible
       return;
@@ -961,7 +961,7 @@ export default class FormField extends Widget {
       return false;
     }
 
-    var focusableElement = this.getFocusableElement();
+    let focusableElement = this.getFocusableElement();
     if (focusableElement) {
       return this.session.focusManager.requestFocus(focusableElement);
     }
@@ -998,7 +998,7 @@ export default class FormField extends Widget {
       return;
     }
     // Explicitly don't use this.focus() because this.focus uses the focus manager which may be disabled (e.g. on mobile devices)
-    var focusableElement = this.getFocusableElement();
+    let focusableElement = this.getFocusableElement();
     if (focusableElement) {
       $.ensure(focusableElement).focus();
     }
@@ -1012,7 +1012,7 @@ export default class FormField extends Widget {
   }
 
   getParentGroupBox() {
-    var parent = this.parent;
+    let parent = this.parent;
     while (parent && !(parent instanceof GroupBox)) {
       parent = parent.parent;
     }
@@ -1199,7 +1199,7 @@ export default class FormField extends Widget {
     if (cssClass) {
       this.$container.addClass(cssClass);
     }
-    var htmlComp = HtmlComponent.install(this.$container, this.session);
+    let htmlComp = HtmlComponent.install(this.$container, this.session);
     htmlComp.setLayout(layout || this._createLayout());
     this.htmlComp = htmlComp;
   }
@@ -1230,7 +1230,7 @@ export default class FormField extends Widget {
    */
   updateInnerAlignment(opts) {
     opts = opts || {};
-    var $fieldContainer = opts.$fieldContainer || this.$fieldContainer;
+    let $fieldContainer = opts.$fieldContainer || this.$fieldContainer;
 
     this._updateElementInnerAlignment(opts, $fieldContainer);
     if ($fieldContainer !== this.$container) {
@@ -1241,8 +1241,8 @@ export default class FormField extends Widget {
 
   _updateElementInnerAlignment(opts, $field) {
     opts = opts || {};
-    var useHorizontalAlignment = scout.nvl(opts.useHorizontalAlignment, true);
-    var useVerticalAlignment = scout.nvl(opts.useVerticalAlignment, true);
+    let useHorizontalAlignment = scout.nvl(opts.useHorizontalAlignment, true);
+    let useVerticalAlignment = scout.nvl(opts.useVerticalAlignment, true);
 
     if (!$field) {
       return;
@@ -1252,17 +1252,17 @@ export default class FormField extends Widget {
     if (useHorizontalAlignment || useVerticalAlignment) {
       // Set horizontal and vertical alignment (from gridData)
       $field.addClass('has-inner-alignment');
-      var gridData = this.gridData;
+      let gridData = this.gridData;
       if (this.parent.logicalGrid) {
         // If the logical grid is calculated by JS, use the hints instead of the calculated grid data
         gridData = this.gridDataHints;
       }
       if (useHorizontalAlignment) {
-        var hAlign = gridData.horizontalAlignment;
+        let hAlign = gridData.horizontalAlignment;
         $field.addClass(hAlign < 0 ? 'halign-left' : (hAlign > 0 ? 'halign-right' : 'halign-center'));
       }
       if (useVerticalAlignment) {
-        var vAlign = gridData.verticalAlignment;
+        let vAlign = gridData.verticalAlignment;
         $field.addClass(vAlign < 0 ? 'valign-top' : (vAlign > 0 ? 'valign-bottom' : 'valign-middle'));
       }
       // Alignment might have affected inner elements (e.g. clear icon)
@@ -1369,16 +1369,16 @@ export default class FormField extends Widget {
       return;
     }
 
-    var menu = scout.create('Menu', {
+    let menu = scout.create('Menu', {
       parent: this,
       text: this.session.text('ui.Copy'),
       inheritAccessibility: false
     });
-    menu.on('action', function(event) {
+    menu.on('action', event => {
       this.exportToClipboard();
-    }.bind(this));
+    });
 
-    var popup = scout.create('ContextMenuPopup', {
+    let popup = scout.create('ContextMenuPopup', {
       parent: this,
       menuItems: [menu],
       cloneMenuItems: false,
@@ -1403,7 +1403,7 @@ export default class FormField extends Widget {
    * Visit all parent form fields. The visit stops if the parent is no form field anymore (e.g. a form, desktop or session).
    */
   visitParents(visitor) {
-    var curParent = this.parent;
+    let curParent = this.parent;
     while (curParent instanceof FormField) {
       visitor(curParent);
       curParent = curParent.parent;
@@ -1444,9 +1444,9 @@ export default class FormField extends Widget {
    * @returns {object} which contains 3 properties: valid, validByErrorStatus and validByMandatory
    */
   getValidationResult() {
-    var validByErrorStatus = !this._errorStatus();
-    var validByMandatory = !this.mandatory || !this.empty;
-    var valid = validByErrorStatus && validByMandatory;
+    let validByErrorStatus = !this._errorStatus();
+    let validByMandatory = !this.mandatory || !this.empty;
+    let valid = validByErrorStatus && validByMandatory;
     return {
       valid: valid,
       validByErrorStatus: validByErrorStatus,
@@ -1465,7 +1465,7 @@ export default class FormField extends Widget {
   }
 
   clone(model, options) {
-    var clone = super.clone(model, options);
+    let clone = super.clone(model, options);
     this._deepCloneProperties(clone, 'menus', options);
     return clone;
   }
@@ -1474,7 +1474,7 @@ export default class FormField extends Widget {
     if (!this.displayText) {
       return;
     }
-    var event = new Event({
+    let event = new Event({
       text: this.displayText
     });
     this.trigger('clipboardExport', event);

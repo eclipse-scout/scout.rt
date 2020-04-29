@@ -55,7 +55,7 @@ export default class CalendarAdapter extends ModelAdapter {
   }
 
   _sendModelChange() {
-    var data = {
+    let data = {
       viewRange: this._jsonViewRange(),
       selectedDate: this._jsonSelectedDate(),
       displayMode: this.widget.displayMode
@@ -64,7 +64,7 @@ export default class CalendarAdapter extends ModelAdapter {
   }
 
   _sendSelectionChange() {
-    var selectedComponentId = this.widget.selectedComponent ? this.widget.selectedComponent.id : null;
+    let selectedComponentId = this.widget.selectedComponent ? this.widget.selectedComponent.id : null;
     this._send('selectionChange', {
       date: this._jsonSelectedDate(),
       componentId: selectedComponentId

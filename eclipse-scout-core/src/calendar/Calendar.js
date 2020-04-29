@@ -161,7 +161,7 @@ export default class Calendar extends Widget {
     if (objects.equals(this.displayMode, displayMode)) {
       return;
     }
-    var oldDisplayMode = this.displayMode;
+    let oldDisplayMode = this.displayMode;
     this._setDisplayMode(displayMode);
     if (this.rendered) {
       this._renderDisplayMode(oldDisplayMode);
@@ -174,7 +174,7 @@ export default class Calendar extends Widget {
     this.modesMenu.setDisplayMode(displayMode);
     if (this._isWorkWeek()) {
       // change date if selectedDate is on a weekend
-      var p = this._dateParts(this.selectedDate, true);
+      let p = this._dateParts(this.selectedDate, true);
       if (p.day > 4) {
         this.setSelectedDate(new Date(p.year, p.month, p.date - p.day + 4));
       }
@@ -202,7 +202,7 @@ export default class Calendar extends Widget {
 
   _setMenus(menus) {
     if (this._checkMenuInjectionTarget(this.menuInjectionTarget)) {
-      var originalMenus = this._removeInjectedMenus(this.menuInjectionTarget, this.menus);
+      let originalMenus = this._removeInjectedMenus(this.menuInjectionTarget, this.menus);
       this.menuInjectionTarget.setMenus(menus.concat(originalMenus));
     }
     this._setProperty('menus', menus);
@@ -215,22 +215,22 @@ export default class Calendar extends Widget {
     // Remove injected menus and installed listener from old injection target
     if (this._checkMenuInjectionTarget(this.menuInjectionTarget)) {
       menuInjectionTarget.off('propertyChange:menus', this._menuInjectionTargetMenusChangedHandler);
-      var originalMenus = this._removeInjectedMenus(this.menuInjectionTarget, this.menus);
+      let originalMenus = this._removeInjectedMenus(this.menuInjectionTarget, this.menus);
       this.menuInjectionTarget.setMenus(originalMenus);
     }
     if (this._checkMenuInjectionTarget(menuInjectionTarget)) {
       menuInjectionTarget.setMenus(this.menus.concat(menuInjectionTarget.menus));
       // Listen for menu changes on the injection target. Re inject menus into target if the menus have been altered.
       this._menuInjectionTargetMenusChangedHandler = menuInjectionTarget.on('propertyChange:menus',
-        function(evt) {
-          if (this.menuInjectionTarget.menus.some(function(element) {
+        evt => {
+          if (this.menuInjectionTarget.menus.some(element => {
             return this.menus.includes(element);
-          }.bind(this))) {
+          })) {
             // Menus have already been injected => Do nothing
             return;
           }
           this.menuInjectionTarget.setMenus(this.menus.concat(this.menuInjectionTarget.menus));
-        }.bind(this)
+        }
       );
     }
     this._setProperty('menuInjectionTarget', menuInjectionTarget);
@@ -241,7 +241,7 @@ export default class Calendar extends Widget {
   }
 
   _removeInjectedMenus(menuInjectionTarget, injectedMenus) {
-    return menuInjectionTarget.menus.filter(function(element) {
+    return menuInjectionTarget.menus.filter(element => {
       return !injectedMenus.includes(element);
     });
   }
@@ -249,7 +249,7 @@ export default class Calendar extends Widget {
   _render() {
     this.$container = this.$parent.appendDiv('calendar');
 
-    var layout = new CalendarLayout(this);
+    let layout = new CalendarLayout(this);
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(layout);
 
@@ -288,29 +288,29 @@ export default class Calendar extends Widget {
     this.$commands.appendDiv('calendar-toggle-list').click(this._onListClick.bind(this));
 
     // Append the top grid (day/week views)
-    var $weekHeader = this.$topGrid.appendDiv('calendar-week-header');
+    let $weekHeader = this.$topGrid.appendDiv('calendar-week-header');
     $weekHeader.appendDiv('calendar-week-name');
-    for (var dayTop = 0; dayTop < 7; dayTop++) {
+    for (let dayTop = 0; dayTop < 7; dayTop++) {
       $weekHeader.appendDiv('calendar-day-name')
         .data('day', dayTop);
     }
 
     this.$topGrid.appendDiv('calendar-week-task').attr('data-axis-name', this.session.text('ui.CalendarDay'));
-    var $weekTopGridDays = this.$topGrid.appendDiv('calendar-week-allday-container');
+    let $weekTopGridDays = this.$topGrid.appendDiv('calendar-week-allday-container');
     $weekTopGridDays.appendDiv('calendar-week-name');
 
-    var dayContextMenuCallback = this._onDayContextMenu.bind(this);
-    for (var dayBottom = 0; dayBottom < 7; dayBottom++) {
+    let dayContextMenuCallback = this._onDayContextMenu.bind(this);
+    for (let dayBottom = 0; dayBottom < 7; dayBottom++) {
       $weekTopGridDays.appendDiv('calendar-day')
         .addClass('calendar-scrollable-components')
         .data('day', dayBottom)
         .on('contextmenu', dayContextMenuCallback);
     }
 
-    for (var w = 1; w < 7; w++) {
-      var $w = this.$grid.appendDiv('calendar-week');
-      for (var d = 0; d < 8; d++) {
-        var $d = $w.appendDiv();
+    for (let w = 1; w < 7; w++) {
+      let $w = this.$grid.appendDiv('calendar-week');
+      for (let d = 0; d < 8; d++) {
+        let $d = $w.appendDiv();
         if (w > 0 && d === 0) {
           $d.addClass('calendar-week-name');
         } else if (w > 0 && d > 0) {
@@ -323,9 +323,9 @@ export default class Calendar extends Widget {
     }
 
     // click event on all day and children elements
-    var mousedownCallbackWithTime = this._onDayMouseDown.bind(this, true);
+    let mousedownCallbackWithTime = this._onDayMouseDown.bind(this, true);
     this.$grid.find('.calendar-day').on('mousedown', mousedownCallbackWithTime);
-    var mousedownCallback = this._onDayMouseDown.bind(this, false);
+    let mousedownCallback = this._onDayMouseDown.bind(this, false);
     this.$topGrid.find('.calendar-day').on('mousedown', mousedownCallback);
 
     this._updateScreen(false, false);
@@ -377,9 +377,9 @@ export default class Calendar extends Widget {
             this._scrollToInitialTime(animate); // scroll grid to initial time
           }
         } else {
-          var date = dates.parseJsonDate(this.selectedComponent.fromDate, this.selectedComponent);
-          var topPercent = this._dayPosition(date.getHours(), date.getMinutes()) / 100;
-          var topPos = this.heightPerDay * topPercent;
+          let date = dates.parseJsonDate(this.selectedComponent.fromDate, this.selectedComponent);
+          let topPercent = this._dayPosition(date.getHours(), date.getMinutes()) / 100;
+          let topPos = this.heightPerDay * topPercent;
           scrollbars.scrollTop(this.$grid, topPos - this.spaceBeforeScrollTop, {
             animate: animate
           });
@@ -402,14 +402,14 @@ export default class Calendar extends Widget {
     this.needsScrollToStartHour = false;
     if (!this._isMonth()) {
       if (this.selectedComponent && !this.selectedComponent.fullDay) {
-        var date = dates.parseJsonDate(this.selectedComponent.fromDate);
-        var topPercent = this._dayPosition(date.getHours(), date.getMinutes()) / 100;
-        var topPos = this.heightPerDay * topPercent;
+        let date = dates.parseJsonDate(this.selectedComponent.fromDate);
+        let topPercent = this._dayPosition(date.getHours(), date.getMinutes()) / 100;
+        let topPos = this.heightPerDay * topPercent;
         scrollbars.scrollTop(this.$grid, topPos - this.spaceBeforeScrollTop, {
           animate: animate
         });
       } else {
-        var scrollTargetTop = this.heightPerHour * this.startHour;
+        let scrollTargetTop = this.heightPerHour * this.startHour;
         scrollbars.scrollTop(this.$grid, scrollTargetTop - this.spaceBeforeScrollTop, {
           animate: animate
         });
@@ -428,7 +428,7 @@ export default class Calendar extends Widget {
   }
 
   _dateParts(date, modulo) {
-    var parts = {
+    let parts = {
       year: date.getFullYear(),
       month: date.getMonth(),
       date: date.getDate(),
@@ -446,7 +446,7 @@ export default class Calendar extends Widget {
   }
 
   _calcSelectedDate(direction) {
-    var p = this._dateParts(this.selectedDate),
+    let p = this._dateParts(this.selectedDate),
       dayOperand = direction,
       weekOperand = direction * 7,
       monthOperand = direction;
@@ -472,7 +472,7 @@ export default class Calendar extends Widget {
    * Calculates exact date range of displayed components based on selected-date.
    */
   _calcExactRange() {
-    var from, to,
+    let from, to,
       p = this._dateParts(this.selectedDate, true);
 
     if (this._isDay()) {
@@ -500,12 +500,12 @@ export default class Calendar extends Widget {
    * as it contains also dates from the previous and next month.
    */
   _calcViewRange() {
-    var viewFrom = calcViewFromDate(this._exactRange.from),
+    let viewFrom = calcViewFromDate(this._exactRange.from),
       viewTo = calcViewToDate(viewFrom);
     return new DateRange(viewFrom, viewTo);
 
     function calcViewFromDate(fromDate) {
-      var i, tmpDate = new Date(fromDate.valueOf());
+      let i, tmpDate = new Date(fromDate.valueOf());
       for (i = 0; i < 42; i++) {
         tmpDate.setDate(tmpDate.getDate() - 1);
         if ((tmpDate.getDay() === 1) && tmpDate.getMonth() !== fromDate.getMonth()) {
@@ -516,7 +516,7 @@ export default class Calendar extends Widget {
     }
 
     function calcViewToDate(fromDate) {
-      var i, tmpDate = new Date(fromDate.valueOf());
+      let i, tmpDate = new Date(fromDate.valueOf());
       for (i = 0; i < 42; i++) {
         tmpDate.setDate(tmpDate.getDate() + 1);
       }
@@ -530,7 +530,7 @@ export default class Calendar extends Widget {
   }
 
   _onDisplayModeClick(event) {
-    var displayMode = $(event.target).data('mode');
+    let displayMode = $(event.target).data('mode');
     this.setDisplayMode(displayMode);
   }
 
@@ -545,9 +545,9 @@ export default class Calendar extends Widget {
   }
 
   _onDayMouseDown(withTime, event) {
-    var selectedDate = new Date($(event.delegateTarget).data('date'));
+    let selectedDate = new Date($(event.delegateTarget).data('date'));
     if (withTime && (this._isDay() || this._isWeek() || this._isWorkWeek())) {
-      var seconds = Math.floor(event.originalEvent.layerY / this.heightPerDivision) / this.numberOfHourDivisions * 60 * 60;
+      let seconds = Math.floor(event.originalEvent.layerY / this.heightPerDivision) / this.numberOfHourDivisions * 60 * 60;
       if (seconds < 60 * 60 * 24) {
         selectedDate.setSeconds(seconds);
       }
@@ -560,20 +560,20 @@ export default class Calendar extends Widget {
    * @param selectedComponent may be null when a day is selected
    */
   _setSelection(selectedDate, selectedComponent, updateScrollPosition) {
-    var changed = false;
+    let changed = false;
 
     // selected date
     if (dates.compareDays(this.selectedDate, selectedDate) !== 0) {
       changed = true;
-      $('.calendar-day', this.$container).each(function(index, element) {
-        var $day = $(element),
+      $('.calendar-day', this.$container).each((index, element) => {
+        let $day = $(element),
           date = $day.data('date');
         if (!date || dates.compareDays(date, this.selectedDate) === 0) {
           $day.select(false); // de-select old date
         } else if (dates.compareDays(date, selectedDate) === 0) {
           $day.select(true); // select new date
         }
-      }.bind(this));
+      });
       this.selectedDate = selectedDate;
     }
 
@@ -643,7 +643,7 @@ export default class Calendar extends Widget {
     }
 
     // init vars (Selected: Day)
-    var $selected = $('.selected', this.$grid),
+    let $selected = $('.selected', this.$grid),
       $topSelected = $('.selected', this.$topGrid),
       containerW = this.$container.width(),
       gridH = this.$grid.height(),
@@ -672,14 +672,14 @@ export default class Calendar extends Widget {
     // basic grid width
     this.$grids.data('new-width', containerW);
 
-    var $weeksToHide = $(); // Empty
-    var $allWeeks = $('.calendar-week', this.$grid);
+    let $weeksToHide = $(); // Empty
+    let $allWeeks = $('.calendar-week', this.$grid);
     // layout week
 
     if (this._isDay() || this._isWeek() || this._isWorkWeek()) {
       $allWeeks.removeClass('calendar-week-noborder');
       // Parent of selected (Day) is a week
-      var selectedWeek = $selected.parent();
+      let selectedWeek = $selected.parent();
       $weeksToHide = $allWeeks.not(selectedWeek); // Hide all (other) weeks delayed, height will animate to zero
       $weeksToHide.data('new-height', 0);
       $weeksToHide.removeClass('invisible');
@@ -693,12 +693,12 @@ export default class Calendar extends Widget {
       $('.calendar-week-task', this.$topGrid).removeClass('hidden');
     } else {
       // Month
-      var newHeightMonth = gridH / this.monthViewNumberOfWeeks;
+      let newHeightMonth = gridH / this.monthViewNumberOfWeeks;
       $allWeeks.removeClass('calendar-week-noborder invisible hidden');
       $allWeeks.eq(0).addClass('calendar-week-noborder');
       $allWeeks.data('new-height', newHeightMonth);
       $('.calendar-day', this.$grid).data('new-height', newHeightMonth);
-      var $allDays = $('.calendar-week-name', this.$grid);
+      let $allDays = $('.calendar-week-name', this.$grid);
       $allDays.removeClass('hidden invisible');
       $allDays.data('new-height', newHeightMonth);
       $('.calendar-week-allday-container', this.$topGrid).addClass('hidden');
@@ -706,7 +706,7 @@ export default class Calendar extends Widget {
     }
 
     // layout days
-    var contentW = gridW - 45; // gridW - @calendar-week-name-width
+    let contentW = gridW - 45; // gridW - @calendar-week-name-width
     if (this._isDay()) {
       $('.calendar-day-name, .calendar-day', this.$topGrid).data('new-width', 0);
       $('.calendar-day', this.$grid).data('new-width', 0);
@@ -717,14 +717,14 @@ export default class Calendar extends Widget {
     } else if (this._isWorkWeek()) {
       this.$topGrid.find('.calendar-day-name').data('new-width', 0);
       this.$grids.find('.calendar-day').data('new-width', 0);
-      var newWidthWorkWeek = Math.round(contentW / this.workDayIndices.length);
+      let newWidthWorkWeek = Math.round(contentW / this.workDayIndices.length);
       $('.calendar-day-name:nth-child(-n+6), ' +
         '.calendar-day:nth-child(-n+6)', this.$topGrid)
         .data('new-width', newWidthWorkWeek);
       $('.calendar-day:nth-child(-n+6)', this.$grid)
         .data('new-width', newWidthWorkWeek);
     } else if (this._isMonth() || this._isWeek()) {
-      var newWidthMonthOrWeek = Math.round(contentW / 7);
+      let newWidthMonthOrWeek = Math.round(contentW / 7);
       this.$grids.find('.calendar-day').data('new-width', newWidthMonthOrWeek);
       this.$topGrid.find('.calendar-day-name').data('new-width', newWidthMonthOrWeek);
     }
@@ -732,17 +732,17 @@ export default class Calendar extends Widget {
     // layout components
     if (this._isMonth()) {
       $('.component-month', this.$grid).each(function() {
-        var $comp = $(this),
+        let $comp = $(this),
           $day = $comp.closest('.calendar-day');
         $comp.toggleClass('compact', $day.data('new-width') < CalendarComponent.MONTH_COMPACT_THRESHOLD);
       });
     }
 
-    var afterLayoutCallback = this._afterLayout.bind(this);
+    let afterLayoutCallback = this._afterLayout.bind(this);
 
     // animate old to new sizes
     $('div', this.$container).each(function() {
-      var $e = $(this),
+      let $e = $(this),
         w = $e.data('new-width'),
         h = $e.data('new-height');
       $e.stop(false, true);
@@ -760,7 +760,7 @@ export default class Calendar extends Widget {
           $e.removeClass('hidden');
         }
         if (animate) {
-          $e.animateAVCSD('height', h, function() {
+          $e.animateAVCSD('height', h, () => {
             if (h === 0) {
               $e.addClass('hidden');
             }
@@ -784,7 +784,7 @@ export default class Calendar extends Widget {
 
   _updateWeekdayNames() {
     // set day-name (based on width of shown column)
-    var weekdayWidth = this.$topGrid.width(),
+    let weekdayWidth = this.$topGrid.width(),
       weekdays;
 
     if (this._isDay()) {
@@ -809,19 +809,19 @@ export default class Calendar extends Widget {
   }
 
   _updateScrollbars($parent, animate) {
-    var $scrollables = $('.calendar-scrollable-components', $parent);
+    let $scrollables = $('.calendar-scrollable-components', $parent);
     $scrollables.each(function() {
-      var $scrollable = $(this);
+      let $scrollable = $(this);
       scrollbars.update($scrollable, true);
     });
     this.updateScrollPosition(animate);
   }
 
   _updateTopGrid() {
-    $('.calendar-component', this.$topGrid).each(function($index, part) {
+    $('.calendar-component', this.$topGrid).each(($index, part) => {
       $(part).data('component').remove();
     });
-    var allDayComponents = this.components.filter(component => component.fullDay);
+    let allDayComponents = this.components.filter(component => component.fullDay);
     // first remove all components and add them from scratch
     allDayComponents.forEach(component => component.remove());
     allDayComponents.forEach(component => component.render());
@@ -836,7 +836,7 @@ export default class Calendar extends Widget {
   }
 
   layoutLabel() {
-    var text, $dates, $topGridDates,
+    let text, $dates, $topGridDates,
       exFrom = this._exactRange.from,
       exTo = this._exactRange.to;
 
@@ -844,7 +844,7 @@ export default class Calendar extends Widget {
     if (this._isDay()) {
       text = this._format(exFrom, 'd. MMMM yyyy');
     } else if (this._isWorkWeek() || this._isWeek()) {
-      var toText = this.session.text('ui.to');
+      let toText = this.session.text('ui.to');
       if (exFrom.getMonth() === exTo.getMonth()) {
         text = strings.join(' ', this._format(exFrom, 'd.'), toText, this._format(exTo, 'd. MMMM yyyy'));
       } else if (exFrom.getFullYear() === exTo.getFullYear()) {
@@ -861,7 +861,7 @@ export default class Calendar extends Widget {
     // prepare to set all day date and mark selected one
     $dates = $('.calendar-day', this.$grid);
 
-    var w, d, cssClass,
+    let w, d, cssClass,
       currentMonth = this._exactRange.from.getMonth(),
       date = new Date(this.viewRange.from.valueOf());
 
@@ -903,7 +903,7 @@ export default class Calendar extends Widget {
     if (!this._isMonth()) {
       $topGridDates = $('.calendar-day', this.$topGrid);
       // From the view range, find the week we are in
-      var exactDate = new Date(this._exactRange.from.valueOf());
+      let exactDate = new Date(this._exactRange.from.valueOf());
 
       // Find first day of week.
       date = dates.firstDayOfWeek(exactDate, 1);
@@ -936,13 +936,13 @@ export default class Calendar extends Widget {
   }
 
   layoutAxis() {
-    var $e;
+    let $e;
 
     // remove old axis
     $('.calendar-week-axis, .calendar-week-task', this.$grid).remove();
 
     // set weekname
-    var session = this.session;
+    let session = this.session;
 
     $('.calendar-week-name', this.$container).each(function(index) {
       if (index > 0) {
@@ -955,14 +955,14 @@ export default class Calendar extends Widget {
     if (!this._isMonth()) {
       // Parent of selected day: Week
       //    var $parent = $selected.parent();
-      var $parent = $('.calendar-week', this.$grid);
+      let $parent = $('.calendar-week', this.$grid);
 
-      for (var h = 0; h < 24; h++) { // Render lines for each hour
-        var paddedHour = ('00' + h).slice(-2);
-        var topPos = h * this.heightPerHour;
+      for (let h = 0; h < 24; h++) { // Render lines for each hour
+        let paddedHour = ('00' + h).slice(-2);
+        let topPos = h * this.heightPerHour;
         $parent.appendDiv('calendar-week-axis hour' + (h === 0 ? ' first' : '')).attr('data-axis-name', paddedHour + ':00').css('top', topPos + 'px');
 
-        for (var m = 1; m < this.numberOfHourDivisions; m++) { // First one rendered above. Start at the next
+        for (let m = 1; m < this.numberOfHourDivisions; m++) { // First one rendered above. Start at the next
           topPos += this.heightPerDivision;
           $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '').css('top', topPos + 'px');
         }
@@ -981,7 +981,7 @@ export default class Calendar extends Widget {
     if (this._showListPanel) {
 
       // remove old list-components
-      this._listComponents.forEach(function(listComponent) {
+      this._listComponents.forEach(listComponent => {
         listComponent.remove();
       });
 
@@ -991,12 +991,12 @@ export default class Calendar extends Widget {
   }
 
   _remove() {
-    var $days = $('.calendar-day', this.$grid);
+    let $days = $('.calendar-day', this.$grid);
 
     // Ensure that scrollbars are unregistered
-    for (var k = 0; k < $days.length; k++) {
-      var $day = $days.eq(k);
-      var $scrollableContainer = $day.children('.calendar-scrollable-components');
+    for (let k = 0; k < $days.length; k++) {
+      let $day = $days.eq(k);
+      let $scrollableContainer = $day.children('.calendar-scrollable-components');
 
       if ($scrollableContainer.length > 0) {
         scrollbars.uninstall($scrollableContainer, this.session);
@@ -1011,29 +1011,29 @@ export default class Calendar extends Widget {
    * Renders the panel on the left, showing all components of the selected date.
    */
   _renderListPanel() {
-    var listComponent, components = [];
+    let listComponent, components = [];
 
     // set title
     this.$listTitle.text(this._format(this.selectedDate, 'd. MMMM yyyy'));
 
     // find components to display on the list panel
-    this.components.forEach(function(component) {
+    this.components.forEach(component => {
       if (belongsToSelectedDate.call(this, component)) {
         components.push(component);
       }
-    }.bind(this));
+    });
 
     function belongsToSelectedDate(component) {
-      var selectedDate = dates.trunc(this.selectedDate);
+      let selectedDate = dates.trunc(this.selectedDate);
       return dates.compare(selectedDate, component.coveredDaysRange.from) >= 0 &&
         dates.compare(selectedDate, component.coveredDaysRange.to) <= 0;
     }
 
-    components.forEach(function(component) {
+    components.forEach(component => {
       listComponent = new CalendarListComponent(this.selectedDate, component);
       listComponent.render(this.$list);
       this._listComponents.push(listComponent);
-    }.bind(this));
+    });
   }
 
   /* -- components, events-------------------------------------------- */
@@ -1050,16 +1050,16 @@ export default class Calendar extends Widget {
     event.preventDefault();
     event.stopPropagation();
 
-    var func = function func(event, allowedType) {
+    let func = function func(event, allowedType) {
       if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
         return;
       }
-      var filteredMenus = menus.filter(this.menus, [allowedType], true),
+      let filteredMenus = menus.filter(this.menus, [allowedType], true),
         $part = $(event.currentTarget);
       if (filteredMenus.length === 0) {
         return;
       }
-      var popup = scout.create('ContextMenuPopup', {
+      let popup = scout.create('ContextMenuPopup', {
         parent: this,
         menuItems: filteredMenus,
         location: {
@@ -1077,9 +1077,9 @@ export default class Calendar extends Widget {
   /* -- components, arrangement------------------------------------ */
 
   _arrangeComponents() {
-    var k, j, $day, $allChildren, $children, $scrollableContainer, dayComponents, day;
+    let k, j, $day, $allChildren, $children, $scrollableContainer, dayComponents, day;
 
-    var $days = $('.calendar-day', this.$grid);
+    let $days = $('.calendar-day', this.$grid);
     // Main (Bottom) grid: Iterate over days
     for (k = 0; k < $days.length; k++) {
       $day = $days.eq(k);
@@ -1098,7 +1098,7 @@ export default class Calendar extends Widget {
         $scrollableContainer = $day.appendDiv('calendar-scrollable-components');
 
         for (j = 0; j < $allChildren.length; j++) {
-          var $child = $allChildren.eq(j);
+          let $child = $allChildren.eq(j);
           // non-tasks (communications) are distributed manually
           // within the parent container in all views except the monthly view.
           if (!this._isMonth() && !$child.hasClass('component-task')) {
@@ -1138,9 +1138,9 @@ export default class Calendar extends Widget {
         axis: 'y'
       });
 
-      var $topDays = $('.calendar-scrollable-components', this.$topGrid);
+      let $topDays = $('.calendar-scrollable-components', this.$topGrid);
       for (k = 0; k < $topDays.length; k++) {
-        var $topDay = $topDays.eq(k);
+        let $topDay = $topDays.eq(k);
         scrollbars.install($topDay, {
           parent: this,
           session: this.session,
@@ -1151,8 +1151,8 @@ export default class Calendar extends Widget {
   }
 
   _getComponents($children) {
-    var i, $child;
-    var components = [];
+    let i, $child;
+    let components = [];
     for (i = 0; i < $children.length; i++) {
       $child = $children.eq(i);
       components.push($child.data('component'));
@@ -1168,7 +1168,7 @@ export default class Calendar extends Widget {
    * Arrange components (stack width, stack index) per day
    * */
   _arrange(components, day) {
-    var i, j, c, r, k,
+    let i, j, c, r, k,
       columns = [];
 
     // ordered by from, to
@@ -1212,7 +1212,7 @@ export default class Calendar extends Widget {
   }
 
   _allEndBefore(columns, pos, day) {
-    var i;
+    let i;
     for (i = 0; i < columns.length; i++) {
       if (!this._endsBefore(columns[i], pos, day)) {
         return false;
@@ -1222,7 +1222,7 @@ export default class Calendar extends Widget {
   }
 
   _findReplacableColumn(columns, pos, day) {
-    var j;
+    let j;
     for (j = 0; j < columns.length; j++) {
       if (this._endsBefore(columns[j], pos, day)) {
         return j;
@@ -1236,7 +1236,7 @@ export default class Calendar extends Widget {
   }
 
   _arrangeComponentSetPlacement($children, day) {
-    var i, $child, stack;
+    let i, $child, stack;
 
     // loop and place based on data
     for (i = 0; i < $children.length; i++) {
@@ -1259,7 +1259,7 @@ export default class Calendar extends Widget {
   _dayPosition(hour, minutes) {
     // Height position in percent of total calendar
 
-    var pos;
+    let pos;
     if (hour < 0) {
       pos = 0; // All day event
     } else {
@@ -1269,7 +1269,7 @@ export default class Calendar extends Widget {
   }
 
   _hourToNumber(hour) {
-    var splits = hour.split(':');
+    let splits = hour.split(':');
     return parseFloat(splits[0]) + parseFloat(splits[1]) / 60;
   }
 
@@ -1278,20 +1278,20 @@ export default class Calendar extends Widget {
   }
 
   _sortFromTo(c1, c2) {
-    var from1 = dates.parseJsonDate(c1.fromDate);
-    var from2 = dates.parseJsonDate(c2.fromDate);
-    var diffFrom = dates.compare(from1, from2);
+    let from1 = dates.parseJsonDate(c1.fromDate);
+    let from2 = dates.parseJsonDate(c2.fromDate);
+    let diffFrom = dates.compare(from1, from2);
     if (diffFrom !== 0) {
       return diffFrom;
     }
-    var to1 = dates.parseJsonDate(c1.toDate);
-    var to2 = dates.parseJsonDate(c2.toDate);
-    var diffTo = dates.compare(to1, to2);
+    let to1 = dates.parseJsonDate(c1.toDate);
+    let to2 = dates.parseJsonDate(c2.toDate);
+    let diffTo = dates.compare(to1, to2);
     if (diffTo !== 0) {
       return diffTo;
     }
-    var s1 = c1.item && c1.item.subject ? c1.item.subject : '';
-    var s2 = c2.item && c2.item.subject ? c2.item.subject : '';
+    let s1 = c1.item && c1.item.subject ? c1.item.subject : '';
+    let s2 = c2.item && c2.item.subject ? c2.item.subject : '';
     return s1.localeCompare(s2);
   }
 }

@@ -80,7 +80,7 @@ export default class DesktopBench extends Widget {
     if (this.headerTabAreaController) {
       this.headerTabAreaController.install(this, this.headerTabArea);
       // for all views
-      var tabBox = this.getTabBox('C');
+      let tabBox = this.getTabBox('C');
       tabBox.viewStack.slice().reverse().forEach(function(view) {
         this.headerTabAreaController._onViewAdd({
           view: view
@@ -99,18 +99,18 @@ export default class DesktopBench extends Widget {
   }
 
   _createColumns() {
-    var layoutData = this.getLayoutData(),
+    let layoutData = this.getLayoutData(),
       columnLayoutData = [];
 
     if (layoutData) {
       columnLayoutData = this.getLayoutData().getColumns();
     }
-    for (var i = 0; i < 3; i++) {
-      var cacheKey = this.layoutCacheKey.slice();
+    for (let i = 0; i < 3; i++) {
+      let cacheKey = this.layoutCacheKey.slice();
       if (cacheKey.length > 0) {
         cacheKey.push('column' + i);
       }
-      var column = scout.create('BenchColumn', {
+      let column = scout.create('BenchColumn', {
         parent: this,
         layoutData: columnLayoutData[i],
         cacheKey: cacheKey,
@@ -157,7 +157,7 @@ export default class DesktopBench extends Widget {
   }
 
   visibleColumns() {
-    return this.columns.filter(function(column) {
+    return this.columns.filter(column => {
       return column.hasViews();
     });
   }
@@ -252,7 +252,7 @@ export default class DesktopBench extends Widget {
    * is called in post render of desktop used to initialize the ui state. E.g. show default views
    */
   postRender() {
-    this.columns.forEach(function(column) {
+    this.columns.forEach(column => {
       column.postRender();
     });
   }
@@ -278,16 +278,16 @@ export default class DesktopBench extends Widget {
     this.setLayoutData(layoutData);
 
     // update columns
-    var columnDatas = layoutData.getColumns();
+    let columnDatas = layoutData.getColumns();
 
-    this.columns.forEach(function(c, i) {
-      var cacheKey;
+    this.columns.forEach((c, i) => {
+      let cacheKey;
       if (this.layoutCacheKey && this.layoutCacheKey.length > 0) {
         cacheKey = this.layoutCacheKey.slice();
         cacheKey.push('column' + i);
       }
       c.updateLayoutData(columnDatas[i], cacheKey);
-    }.bind(this));
+    });
     if (this.rendered) {
       this.htmlComp.layout.setCacheKey(this.layoutCacheKey);
       this.htmlComp.layout.reset();
@@ -333,7 +333,7 @@ export default class DesktopBench extends Widget {
   }
 
   setOutlineContent(content) {
-    var oldContent = this.outlineContent;
+    let oldContent = this.outlineContent;
     if (this.outlineContent === content) {
       return;
     }
@@ -392,7 +392,7 @@ export default class DesktopBench extends Widget {
       throw new Error('called _showDetailContentForPage without node');
     }
 
-    var content;
+    let content;
     if (node.detailForm && node.detailFormVisible && node.detailFormVisibleByUi) {
       content = node.detailForm;
       content.uiCssClass = 'detail-form';
@@ -408,7 +408,7 @@ export default class DesktopBench extends Widget {
     if (!this.outlineContentVisible || !this.outline) {
       return;
     }
-    var content,
+    let content,
       selectedPage = this.outline.selectedNode();
     if (selectedPage) {
       // Outline does not support multi selection
@@ -431,9 +431,9 @@ export default class DesktopBench extends Widget {
 
   updateOutlineContentDebounced() {
     clearTimeout(this._updateOutlineContentTimeout);
-    this._updateOutlineContentTimeout = setTimeout(function() {
+    this._updateOutlineContentTimeout = setTimeout(() => {
       this.updateOutlineContent();
-    }.bind(this), 300);
+    }, 300);
   }
 
   updateNavigationHandleVisibility() {
@@ -460,7 +460,7 @@ export default class DesktopBench extends Widget {
   }
 
   _onOutlinePageChanged(event) {
-    var selectedPage = this.outline.selectedNode();
+    let selectedPage = this.outline.selectedNode();
     if (!event.page && !selectedPage || event.page === selectedPage) {
       this.updateOutlineContent();
     }
@@ -512,17 +512,17 @@ export default class DesktopBench extends Widget {
   _revalidateSplitters() {
     // remove old splitters
     if (this.components) {
-      this.components.forEach(function(comp) {
+      this.components.forEach(comp => {
         if (comp instanceof Splitter) {
           comp.destroy();
         }
       });
     }
     this.components = this.visibleColumns()
-      .reduce(function(arr, col) {
+      .reduce((arr, col) => {
         if (arr.length > 0) {
           // add sep
-          var splitter = scout.create('Splitter', {
+          let splitter = scout.create('Splitter', {
             parent: this,
             $anchor: arr[arr.length - 1].$container,
             $root: this.$container,
@@ -536,12 +536,12 @@ export default class DesktopBench extends Widget {
         }
         arr.push(col);
         return arr;
-      }.bind(this), []);
+      }, []);
     // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
-    this.components.filter(function(comp) {
+    this.components.filter(comp => {
       return comp instanceof BenchColumn;
     })
-      .reduce(function(c1, c2, index) {
+      .reduce((c1, c2, index) => {
         if (index > 0) {
           c2.$container.insertAfter(c1.$container);
         }
@@ -554,16 +554,16 @@ export default class DesktopBench extends Widget {
     if (!this.components) {
       return;
     }
-    this.components.forEach(function(c, i) {
+    this.components.forEach((c, i) => {
       if (c instanceof Splitter) {
-        var componentsBefore = this.components.slice(0, i).reverse();
-        var componentsAfter = this.components.slice(i + 1);
+        let componentsBefore = this.components.slice(0, i).reverse();
+        let componentsAfter = this.components.slice(i + 1);
         // shrink
         if (
-          componentsBefore.filter(function(c) {
+          componentsBefore.filter(c => {
             return c.getLayoutData().shrink > 0;
           }).length > 0 &&
-          componentsAfter.filter(function(c) {
+          componentsAfter.filter(c => {
             return c.getLayoutData().grow > 0;
           }).length > 0
         ) {
@@ -573,10 +573,10 @@ export default class DesktopBench extends Widget {
         }
         // grow
         if (
-          componentsBefore.filter(function(c) {
+          componentsBefore.filter(c => {
             return c.getLayoutData().grow > 0;
           }).length > 0 &&
-          componentsAfter.filter(function(c) {
+          componentsAfter.filter(c => {
             return c.getLayoutData().shrink > 0;
           }).length > 0
         ) {
@@ -587,13 +587,13 @@ export default class DesktopBench extends Widget {
         c.setEnabled(false);
 
       }
-    }.bind(this));
+    });
   }
 
   _onSplitterMove(event) {
-    var splitter = event.source;
+    let splitter = event.source;
     // noinspection UnnecessaryLocalVariableJS
-    var diff = event.position - splitter.htmlComp.location().x - splitter.htmlComp.margins().left - splitter.htmlComp.insets().left;
+    let diff = event.position - splitter.htmlComp.location().x - splitter.htmlComp.margins().left - splitter.htmlComp.insets().left;
     splitter.getLayoutData().diff = diff;
     this.revalidateLayout();
     splitter.getLayoutData().diff = null;
@@ -613,7 +613,7 @@ export default class DesktopBench extends Widget {
   }
 
   _onViewActivate(event) {
-    var view = event.view;
+    let view = event.view;
     if (this.outlineContent === view) {
       this.desktop.bringOutlineToFront();
     }
@@ -649,7 +649,7 @@ export default class DesktopBench extends Widget {
         view.displayViewId = 'C';
         break;
     }
-    var column = this._getColumn(view.displayViewId);
+    let column = this._getColumn(view.displayViewId);
     this.tabBoxMap[view.id] = column;
     column.addView(view, activate);
 
@@ -676,14 +676,14 @@ export default class DesktopBench extends Widget {
     if (!this.hasView(view)) {
       return;
     }
-    var column = this._getColumn(view.displayViewId);
+    let column = this._getColumn(view.displayViewId);
     if (column) {
       column.activateView(view);
     }
   }
 
   _getColumn(displayViewId) {
-    var column;
+    let column;
 
     switch (displayViewId) {
       case 'NW':
@@ -704,7 +704,7 @@ export default class DesktopBench extends Widget {
   }
 
   removeView(view, showSiblingView) {
-    var column = this.tabBoxMap[view.id];
+    let column = this.tabBoxMap[view.id];
     if (column) {
       this._removeViewInProgress++;
       column.removeView(view, showSiblingView);
@@ -732,7 +732,7 @@ export default class DesktopBench extends Widget {
   }
 
   getTabBox(displayViewId) {
-    var viewColumn = this._getColumn(displayViewId);
+    let viewColumn = this._getColumn(displayViewId);
     if (!viewColumn) {
       return;
     }
@@ -740,28 +740,28 @@ export default class DesktopBench extends Widget {
   }
 
   visibleTabBoxes() {
-    return this.visibleColumns().reduce(function(arr, column) {
+    return this.visibleColumns().reduce((arr, column) => {
       arrays.pushAll(arr, column.visibleTabBoxes());
       return arr;
     }, []);
   }
 
   hasView(view) {
-    return this.columns.filter(function(column) {
+    return this.columns.filter(column => {
       return column.hasView(view);
     }).length > 0;
   }
 
   getViews(displayViewId) {
-    return this.columns.reduce(function(arr, column) {
+    return this.columns.reduce((arr, column) => {
       arrays.pushAll(arr, column.getViews(displayViewId));
       return arr;
     }, []);
   }
 
   getViewTab(view) {
-    var viewTab = null;
-    this.getTabs().some(function(vt) {
+    let viewTab = null;
+    this.getTabs().some(vt => {
       if (vt.view === view) {
         viewTab = vt;
         return true;
@@ -772,7 +772,7 @@ export default class DesktopBench extends Widget {
   }
 
   getTabs() {
-    var tabs = [];
+    let tabs = [];
     // consider right order
     tabs = tabs.concat(this.getTabBox('NW').getController().getTabs());
     tabs = tabs.concat(this.getTabBox('W').getController().getTabs());
@@ -794,9 +794,9 @@ export default class DesktopBench extends Widget {
    * @returns {array} all the currently active views (the selected ones) of all the visible tab boxes
    */
   activeViews() {
-    var activeViews = [];
-    this.visibleColumns().forEach(function(column) {
-      column.visibleTabBoxes().forEach(function(tabBox) {
+    let activeViews = [];
+    this.visibleColumns().forEach(column => {
+      column.visibleTabBoxes().forEach(tabBox => {
         activeViews.push(tabBox.currentView);
       });
     });

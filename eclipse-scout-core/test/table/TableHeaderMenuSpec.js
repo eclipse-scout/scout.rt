@@ -11,11 +11,11 @@
 import {ColumnUserFilter, TableHeaderMenu} from '../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-describe('TableHeaderMenu', function() {
-  var session;
-  var helper;
+describe('TableHeaderMenu', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
@@ -23,13 +23,13 @@ describe('TableHeaderMenu', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
   function createAndRegisterColumnFilter(table, column, selectedValues) {
-    var filter = new ColumnUserFilter();
+    let filter = new ColumnUserFilter();
     helper.createAndRegisterColumnFilter({
       session: session,
       table: table,
@@ -40,74 +40,74 @@ describe('TableHeaderMenu', function() {
   }
 
   function find$FilterItems(table) {
-    var $menu = table.header.tableHeaderMenu.$container;
+    let $menu = table.header.tableHeaderMenu.$container;
     return $menu.find('.table-data > .table-row');
   }
 
   function expectTableRowText($row, index, expectedText) {
-    var $cell = $row.eq(index).find('.table-cell');
+    let $cell = $row.eq(index).find('.table-cell');
     expect($cell.eq(0).text()).toBe(expectedText);
   }
 
   function createSingleColumnTableByTexts(texts) {
-    var model = helper.createModelSingleColumnByTexts(texts);
+    let model = helper.createModelSingleColumnByTexts(texts);
     return helper.createTable(model);
   }
 
   function createSingleColumnTableByValues(values) {
-    var model = helper.createModelSingleColumnByValues(values, 'BooleanColumn');
+    let model = helper.createModelSingleColumnByValues(values, 'BooleanColumn');
     return helper.createTable(model);
   }
 
-  describe('filter', function() {
+  describe('filter', () => {
 
-    describe('string column', function() {
+    describe('string column', () => {
 
-      it('shows the unique string values', function() {
-        var table = createSingleColumnTableByTexts(['Value', 'AnotherValue', 'Value']);
-        var column = table.columns[0];
+      it('shows the unique string values', () => {
+        let table = createSingleColumnTableByTexts(['Value', 'AnotherValue', 'Value']);
+        let column = table.columns[0];
         table.render();
         table.header.openHeaderMenu(column);
-        var $filterItems = find$FilterItems(table);
+        let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'AnotherValue');
         expectTableRowText($filterItems, 1, 'Value');
         table.header.closeHeaderMenu();
       });
 
-      it('converts multiline text to single line', function() {
-        var table = createSingleColumnTableByTexts(['First line\nSecond line', 'AnotherValue']);
-        var column = table.columns[0];
+      it('converts multiline text to single line', () => {
+        let table = createSingleColumnTableByTexts(['First line\nSecond line', 'AnotherValue']);
+        let column = table.columns[0];
         table.render();
         table.header.openHeaderMenu(column);
-        var $filterItems = find$FilterItems(table);
+        let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'AnotherValue');
         expectTableRowText($filterItems, 1, 'First line Second line');
         table.header.closeHeaderMenu();
       });
 
-      it('strips html tags if html is enabled', function() {
-        var table = createSingleColumnTableByTexts(['<b>contains html</b>', '<ul><li>line 1</li><li>line 2</li></ul>']);
+      it('strips html tags if html is enabled', () => {
+        let table = createSingleColumnTableByTexts(['<b>contains html</b>', '<ul><li>line 1</li><li>line 2</li></ul>']);
         table.rows[0].cells[0].htmlEnabled = true;
         table.rows[1].cells[0].htmlEnabled = true;
-        var column = table.columns[0];
+        let column = table.columns[0];
         table.render();
         table.header.openHeaderMenu(column);
-        var $filterItems = find$FilterItems(table);
+        let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'contains html');
         expectTableRowText($filterItems, 1, 'line 1 line 2');
         table.header.closeHeaderMenu();
       });
 
-      it('reflects the state of the filter', function() {
-        var table = createSingleColumnTableByTexts(['Value', 'AnotherValue', 'Value']);
-        var column = table.columns[0];
-        var filter = createAndRegisterColumnFilter(table, column, ['AnotherValue']);
+      it('reflects the state of the filter', () => {
+        let table = createSingleColumnTableByTexts(['Value', 'AnotherValue', 'Value']);
+        let column = table.columns[0];
+        let filter = createAndRegisterColumnFilter(table, column, ['AnotherValue']);
         table.filter();
         table.render();
         expect(table.filteredRows().length).toBe(1);
 
         table.header.openHeaderMenu(column);
-        var $filterItems = find$FilterItems(table);
+        let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'AnotherValue');
         expectTableRowText($filterItems, 1, 'Value');
         expect($filterItems.eq(0)).toHaveClass('checked');
@@ -115,21 +115,21 @@ describe('TableHeaderMenu', function() {
         table.header.closeHeaderMenu();
       });
 
-      it('correctly updates the list after inserting a new row, if a filter is applied', function() {
-        var table = createSingleColumnTableByTexts(['Value', 'AnotherValue', 'Value']);
-        var column = table.columns[0];
-        var filter = createAndRegisterColumnFilter(table, column, ['AnotherValue']);
+      it('correctly updates the list after inserting a new row, if a filter is applied', () => {
+        let table = createSingleColumnTableByTexts(['Value', 'AnotherValue', 'Value']);
+        let column = table.columns[0];
+        let filter = createAndRegisterColumnFilter(table, column, ['AnotherValue']);
         table.filter();
         table.render();
         expect(table.filteredRows().length).toBe(1);
 
         table.header.openHeaderMenu(column);
-        var $filterItems = find$FilterItems(table);
+        let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'AnotherValue');
         expectTableRowText($filterItems, 1, 'Value');
         table.header.closeHeaderMenu();
 
-        var newRows = helper.createModelRows(2, 1);
+        let newRows = helper.createModelRows(2, 1);
         newRows[0].cells[0].text = 'NewValue';
         table.insertRows(newRows);
 
@@ -141,44 +141,44 @@ describe('TableHeaderMenu', function() {
         table.header.closeHeaderMenu();
       });
 
-      it('always displays the selected value, even if the table does not contain the value anymore', function() {
-        var table = createSingleColumnTableByTexts(['Value', 'AnotherValue', 'Value']);
-        var column = table.columns[0];
-        var filter = createAndRegisterColumnFilter(table, column, ['AnotherValueNotInTable']);
+      it('always displays the selected value, even if the table does not contain the value anymore', () => {
+        let table = createSingleColumnTableByTexts(['Value', 'AnotherValue', 'Value']);
+        let column = table.columns[0];
+        let filter = createAndRegisterColumnFilter(table, column, ['AnotherValueNotInTable']);
         table.filter();
         table.render();
         expect(table.filteredRows().length).toBe(0);
 
         table.header.openHeaderMenu(column);
-        var $filterItems = find$FilterItems(table);
+        let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'AnotherValue');
         expectTableRowText($filterItems, 1, 'AnotherValueNotInTable');
         expectTableRowText($filterItems, 2, 'Value');
         table.header.closeHeaderMenu();
       });
 
-      it('displays empty values as -empty-', function() {
-        session.text = function(key) {
+      it('displays empty values as -empty-', () => {
+        session.text = key => {
           if (key === 'ui.EmptyCell') {
             return '-empty-';
           }
         };
-        var table = createSingleColumnTableByTexts(['', 'Value']);
-        var column = table.columns[0];
+        let table = createSingleColumnTableByTexts(['', 'Value']);
+        let column = table.columns[0];
         table.render();
         table.header.openHeaderMenu(column);
-        var $filterItems = find$FilterItems(table);
+        let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'Value');
         expectTableRowText($filterItems, 1, '-empty-');
         table.header.closeHeaderMenu();
       });
 
-      it('stores selected text in filter.selectedValues', function() {
-        var table = createSingleColumnTableByTexts(['Value', 'Value2']);
-        var column = table.columns[0];
+      it('stores selected text in filter.selectedValues', () => {
+        let table = createSingleColumnTableByTexts(['Value', 'Value2']);
+        let column = table.columns[0];
         table.render();
         table.header.openHeaderMenu(column);
-        var $filterItems = find$FilterItems(table);
+        let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'Value');
         expectTableRowText($filterItems, 1, 'Value2');
         $filterItems.eq(0).triggerClick();
@@ -188,17 +188,17 @@ describe('TableHeaderMenu', function() {
         table.header.closeHeaderMenu();
       });
 
-      it('stores empty as null and not \'-empty-\'', function() {
-        session.text = function(key) {
+      it('stores empty as null and not \'-empty-\'', () => {
+        session.text = key => {
           if (key === 'ui.EmptyCell') {
             return '-empty-';
           }
         };
-        var table = createSingleColumnTableByTexts(['Value', '']);
-        var column = table.columns[0];
+        let table = createSingleColumnTableByTexts(['Value', '']);
+        let column = table.columns[0];
         table.render();
         table.header.openHeaderMenu(column);
-        var $filterItems = find$FilterItems(table);
+        let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'Value');
         expectTableRowText($filterItems, 1, '-empty-');
         $filterItems.eq(1).triggerClick();
@@ -208,18 +208,18 @@ describe('TableHeaderMenu', function() {
       });
     });
 
-    describe('grouping / sorting', function() {
+    describe('grouping / sorting', () => {
 
-      var table, column;
+      let table, column;
 
-      beforeEach(function() {
+      beforeEach(() => {
         table = createSingleColumnTableByTexts(['Foo']);
         column = table.columns[0];
         table.render();
         table.header.openHeaderMenu(column);
       });
 
-      it('count sorted columns', function() {
+      it('count sorted columns', () => {
         expect(table.header.tableHeaderMenu._sortColumnCount()).toBe(0);
         table.header.closeHeaderMenu();
 
@@ -229,7 +229,7 @@ describe('TableHeaderMenu', function() {
         table.header.closeHeaderMenu();
       });
 
-      it('count grouped columns', function() {
+      it('count grouped columns', () => {
         expect(table.header.tableHeaderMenu._groupColumnCount()).toBe(0);
         table.header.closeHeaderMenu();
 
@@ -241,22 +241,22 @@ describe('TableHeaderMenu', function() {
 
     });
 
-    describe('boolean column', function() {
+    describe('boolean column', () => {
 
-      it('shows the unique string values', function() {
-        session.text = function(key) {
+      it('shows the unique string values', () => {
+        session.text = key => {
           if (key === 'ui.BooleanColumnGroupingTrue') {
             return 'marked';
           } else if (key === 'ui.BooleanColumnGroupingFalse') {
             return 'unmarked';
           }
         };
-        var table = createSingleColumnTableByValues([true, false, true]);
-        var column = table.columns[0];
+        let table = createSingleColumnTableByValues([true, false, true]);
+        let column = table.columns[0];
         column.type = 'boolean';
         table.render();
         table.header.openHeaderMenu(column);
-        var $filterItems = find$FilterItems(table);
+        let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'marked');
         expectTableRowText($filterItems, 1, 'unmarked');
         table.header.closeHeaderMenu();
@@ -264,27 +264,27 @@ describe('TableHeaderMenu', function() {
 
     });
 
-    describe('sort enabled', function() {
+    describe('sort enabled', () => {
 
-      it('option enabled shows sort options in table header menu', function() {
-        var table = createSingleColumnTableByTexts(['First', 'Second']);
-        var column = table.columns[0];
+      it('option enabled shows sort options in table header menu', () => {
+        let table = createSingleColumnTableByTexts(['First', 'Second']);
+        let column = table.columns[0];
         table.sortEnabled = true;
         table.render();
         table.header.openHeaderMenu(column);
-        var $menu = table.header.tableHeaderMenu.$container;
+        let $menu = table.header.tableHeaderMenu.$container;
         expect($menu.find('.table-header-menu-command.sort-asc').length).toBe(1);
         expect($menu.find('.table-header-menu-command.sort-desc').length).toBe(1);
         table.header.closeHeaderMenu();
       });
 
-      it('option disabled does not show sort options in table header menu', function() {
-        var table = createSingleColumnTableByTexts(['First', 'Second']);
-        var column = table.columns[0];
+      it('option disabled does not show sort options in table header menu', () => {
+        let table = createSingleColumnTableByTexts(['First', 'Second']);
+        let column = table.columns[0];
         table.sortEnabled = false;
         table.render();
         table.header.openHeaderMenu(column);
-        var $menu = table.header.tableHeaderMenu.$container;
+        let $menu = table.header.tableHeaderMenu.$container;
         expect($menu.find('.table-header-menu-command.sort-asc').length).toBe(0);
         expect($menu.find('.table-header-menu-command.sort-desc').length).toBe(0);
         table.header.closeHeaderMenu();
@@ -292,29 +292,29 @@ describe('TableHeaderMenu', function() {
 
     });
 
-    describe('sort mode', function() {
+    describe('sort mode', () => {
 
-      it('sorts alphabetically', function() {
-        var table = createSingleColumnTableByTexts(['BValue', 'AValue']);
-        var column = table.columns[0];
+      it('sorts alphabetically', () => {
+        let table = createSingleColumnTableByTexts(['BValue', 'AValue']);
+        let column = table.columns[0];
         table.render();
         table.header.openHeaderMenu(column);
-        var tableHeaderMenu = table.header.tableHeaderMenu;
-        var $filterItems = find$FilterItems(table);
+        let tableHeaderMenu = table.header.tableHeaderMenu;
+        let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'AValue');
         expectTableRowText($filterItems, 1, 'BValue');
         expect(tableHeaderMenu.filterSortMode).toBe(TableHeaderMenu.SortMode.ALPHABETICALLY);
         table.header.closeHeaderMenu();
       });
 
-      it('sorts by amount', function() {
-        var table = createSingleColumnTableByTexts(['BValue', 'AValue', 'BValue']);
-        var column = table.columns[0];
+      it('sorts by amount', () => {
+        let table = createSingleColumnTableByTexts(['BValue', 'AValue', 'BValue']);
+        let column = table.columns[0];
         table.render();
         table.header.openHeaderMenu(column);
-        var tableHeaderMenu = table.header.tableHeaderMenu;
+        let tableHeaderMenu = table.header.tableHeaderMenu;
         tableHeaderMenu._onSortModeClick(); // changes sort mode from 'alphabetically' (default) to 'amount'
-        var $filterItems = find$FilterItems(table);
+        let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'BValue');
         expectTableRowText($filterItems, 1, 'AValue');
         expect(tableHeaderMenu.filterSortMode).toBe(TableHeaderMenu.SortMode.AMOUNT);

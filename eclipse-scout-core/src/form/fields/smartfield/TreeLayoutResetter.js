@@ -39,7 +39,7 @@ export default class TreeLayoutResetter {
   }
 
   _ensureFirstLast() {
-    var $nodes = this._tree.$data
+    let $nodes = this._tree.$data
       .children('.tree-node')
       .removeClass('first last');
     $nodes.first()

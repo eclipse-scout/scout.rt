@@ -31,6 +31,8 @@ export default class Menu extends Action {
      */
     this.parentMenu = null;
     this.popup = null;
+    this.popupHorizontalAlignment = undefined;
+    this.popupVerticalAlignment = undefined;
     this.preventDoubleClick = false;
     this.stackable = true;
     this.separator = false;
@@ -115,7 +117,7 @@ export default class Menu extends Action {
       this.$container.addClass(this.uiCssClass);
     }
 
-    var mouseEventHandler = this._onMouseEvent.bind(this);
+    let mouseEventHandler = this._onMouseEvent.bind(this);
     this.$container
       .on('mousedown', mouseEventHandler)
       .on('contextmenu', mouseEventHandler)
@@ -155,7 +157,7 @@ export default class Menu extends Action {
   }
 
   _closeSubMenues() {
-    this.childActions.forEach(function(menu) {
+    this.childActions.forEach(menu => {
       if (menu._doActionTogglesPopup()) {
         menu._closeSubMenues();
         menu.setSelected(false);
@@ -174,15 +176,15 @@ export default class Menu extends Action {
   _renderSubMenuItems(parentMenu, menus) {
     if (this.parent instanceof ContextMenuPopup) {
       this.parent.renderSubMenuItems(parentMenu, menus, true);
-      var closeHandler = function(event) {
+      let closeHandler = event => {
         parentMenu.setSelected(false);
       };
-      var propertyChangeHandler = function(event) {
+      let propertyChangeHandler = event => {
         if (event.propertyName === 'selected' && event.newValue === false) {
           this.parent.off('close', closeHandler);
           parentMenu.off('propertyChange', propertyChangeHandler);
         }
-      }.bind(this);
+      };
       this.parent.on('close', closeHandler);
       parentMenu.on('propertyChange', propertyChangeHandler);
     } else if (this.parent instanceof Menu) {
@@ -250,8 +252,8 @@ export default class Menu extends Action {
    */
   _renderChildActions() {
     if (objects.optProperty(this.popup, 'rendered')) {
-      var $popup = this.popup.$container;
-      this.childActions.forEach(function(menu) {
+      let $popup = this.popup.$container;
+      this.childActions.forEach(menu => {
         menu.render($popup);
       });
     }
@@ -260,7 +262,7 @@ export default class Menu extends Action {
   }
 
   _renderSubMenuIcon() {
-    var visible = false;
+    let visible = false;
 
     // calculate visibility of sub-menu icon
     if (this.childActions.length > 0) {
@@ -279,7 +281,7 @@ export default class Menu extends Action {
 
     if (visible) {
       if (!this.$submenuIcon) {
-        var icon = icons.parseIconId(Menu.SUBMENU_ICON);
+        let icon = icons.parseIconId(Menu.SUBMENU_ICON);
         this.$submenuIcon = this.$container
           .appendSpan('submenu-icon')
           .text(icon.iconCharacter);
@@ -324,8 +326,8 @@ export default class Menu extends Action {
       parentEnabled = this._getInheritedAccessibility();
     }
 
-    var enabledComputed;
-    var enabledStateForChildren;
+    let enabledComputed;
+    let enabledStateForChildren;
     if (this.enabled && this.inheritAccessibility && !parentEnabled && this.childActions.length > 0) {
       // the enabledComputed state here depends on the child actions:
       // - if there are childActions which have inheritAccessibility=false (recursively): this action must be enabledComputed=true so that these children can be reached
@@ -356,8 +358,8 @@ export default class Menu extends Action {
    * One exception: if a parent menu itself is inheritAccessibility=false. Then the container is not relevant anymore but this parent is taken instead.
    */
   _getInheritedAccessibility() {
-    var menu = this;
-    var rootMenu = menu;
+    let menu = this;
+    let rootMenu = menu;
     while (menu) {
       if (!menu.inheritAccessibility) {
         // not inherited. no need to check any more parent widgets
@@ -367,7 +369,7 @@ export default class Menu extends Action {
       menu = menu.parentMenu;
     }
 
-    var container = rootMenu.parent;
+    let container = rootMenu.parent;
     if (container && container.initialized && container.enabledComputed !== undefined) {
       return container.enabledComputed;
     }
@@ -375,8 +377,8 @@ export default class Menu extends Action {
   }
 
   _findRootMenu() {
-    var menu = this;
-    var result;
+    let menu = this;
+    let result;
     while (menu) {
       result = menu;
       menu = menu.parentMenu;
@@ -385,8 +387,8 @@ export default class Menu extends Action {
   }
 
   _hasAccessibleChildMenu() {
-    var childFound = false;
-    this.visitChildMenus(function(child) {
+    let childFound = false;
+    this.visitChildMenus(child => {
       if (!child.inheritAccessibility && child.enabled /* do not use enabledComputed here */ && child.visible) {
         childFound = true;
         return TreeVisitResult.TERMINATE;
@@ -401,10 +403,10 @@ export default class Menu extends Action {
    * e.g. for ellipsis menus which declare childActions as 'PreserveOnPropertyChangeProperties'. this means the childActions are not automatically added to the children list even it is a widget property!
    */
   visitChildMenus(visitor) {
-    for (var i = 0; i < this.childActions.length; i++) {
-      var child = this.childActions[i];
+    for (let i = 0; i < this.childActions.length; i++) {
+      let child = this.childActions[i];
       if (child instanceof Menu) {
-        var treeVisitResult = visitor(child);
+        let treeVisitResult = visitor(child);
         if (treeVisitResult === true || treeVisitResult === TreeVisitResult.TERMINATE) {
           // Visitor wants to abort the visiting
           return TreeVisitResult.TERMINATE;
@@ -423,8 +425,8 @@ export default class Menu extends Action {
   }
 
   _updateIconAndTextStyle() {
-    var hasText = this._hasText();
-    var hasTextAndIcon = !!(hasText && this.iconId);
+    let hasText = this._hasText();
+    let hasTextAndIcon = !!(hasText && this.iconId);
     this.$container.toggleClass('menu-textandicon', hasTextAndIcon);
     this.$container.toggleClass('menu-icononly', !hasText);
   }
@@ -442,16 +444,16 @@ export default class Menu extends Action {
     }
     this.popup = this._createPopup();
     this.popup.open();
-    this.popup.on('remove', function(event) {
+    this.popup.on('remove', event => {
       this.popup = null;
-    }.bind(this));
+    });
     // Reason for separating remove and close event:
     // Remove may be called if parent (menubar) gets removed or rebuilt.
     // In that case, we do not want to change the selected state because after rebuilding the popup should still be open
     // In every other case the state of the menu needs to be reseted if the popup closes
-    this.popup.on('close', function(event) {
+    this.popup.on('close', event => {
       this.setSelected(false);
-    }.bind(this));
+    });
 
     if (this.uiCssClass) {
       this.popup.$container.addClass(this.uiCssClass);
@@ -459,7 +461,7 @@ export default class Menu extends Action {
   }
 
   _createPopup(event) {
-    var options = {
+    let options = {
       parent: this,
       menu: this,
       menuFilter: this.menuFilter,
@@ -484,7 +486,7 @@ export default class Menu extends Action {
   }
 
   addChildActions(childActions) {
-    var newActions = this.childActions.slice();
+    let newActions = this.childActions.slice();
     arrays.pushAll(newActions, arrays.ensure(childActions));
     this.setChildActions(newActions);
   }
@@ -495,16 +497,16 @@ export default class Menu extends Action {
 
   _setChildActions(childActions) {
     // disconnect existing
-    this.childActions.forEach(function(childAction) {
+    this.childActions.forEach(childAction => {
       childAction.parentMenu = null;
     });
 
     this._setProperty('childActions', childActions);
 
     // connect new actions
-    this.childActions.forEach(function(childAction) {
+    this.childActions.forEach(childAction => {
       childAction.parentMenu = this;
-    }.bind(this));
+    });
 
     if (this.initialized) {
       this.recomputeEnabled();
@@ -600,13 +602,13 @@ export default class Menu extends Action {
 
   setMenuFilter(menuFilter) {
     this.setProperty('menuFilter', menuFilter);
-    this.childActions.forEach(function(child) {
+    this.childActions.forEach(child => {
       child.setMenuFilter(menuFilter);
     });
   }
 
   clone(model, options) {
-    var clone = super.clone(model, options);
+    let clone = super.clone(model, options);
     this._deepCloneProperties(clone, 'childActions', options);
     clone._setChildActions(clone.childActions);
     return clone;
@@ -616,7 +618,7 @@ export default class Menu extends Action {
    * @override
    */
   focus() {
-    var event = new Event({source: this});
+    let event = new Event({source: this});
     this.trigger('focus', event);
     if (!event.defaultPrevented) {
       return super.focus();

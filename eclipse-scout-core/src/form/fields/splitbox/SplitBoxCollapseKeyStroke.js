@@ -23,7 +23,7 @@ export default class SplitBoxCollapseKeyStroke extends KeyStroke {
   }
 
   _postRenderKeyBox($drawingArea, $keyBox) {
-    var handleOffset,
+    let handleOffset,
       $collapseHandle = this.field._collapseHandle.$container;
 
     $keyBox.addClass('split-box-collapse-key-box');

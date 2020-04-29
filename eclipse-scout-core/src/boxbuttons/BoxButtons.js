@@ -55,7 +55,7 @@ export default class BoxButtons {
   addButton(opts) {
     opts = opts || {};
 
-    var $button = this._$parent.appendDiv()
+    let $button = this._$parent.appendDiv()
       .text(opts.text)
       .addClass('box-button')
       .unfocusable()
@@ -70,8 +70,8 @@ export default class BoxButtons {
     }
 
     if (opts.onClick) {
-      var onClick = opts.onClick;
-      $button.on('click', function(event) {
+      let onClick = opts.onClick;
+      $button.on('click', event => {
         if ($.suppressEventIfDisabled(event)) {
           return;
         }
@@ -87,7 +87,7 @@ export default class BoxButtons {
   }
 
   _onClick(event) {
-    var $button = $(event.target);
+    let $button = $(event.target);
     if ($.suppressEventIfDisabled(event, $button)) {
       return;
     }
@@ -96,21 +96,21 @@ export default class BoxButtons {
 
   updateButtonWidths(availableWidth) {
     // Find all visible buttons
-    var $visibleButtons = [];
-    this._$buttons.forEach(function($button) {
+    let $visibleButtons = [];
+    this._$buttons.forEach($button => {
       if ($button.isVisible()) {
         $visibleButtons.push($button);
       }
     });
 
-    var hasVisibleButtons = $visibleButtons.length > 0;
+    let hasVisibleButtons = $visibleButtons.length > 0;
     this._$parent.toggleClass('empty', !hasVisibleButtons);
 
     // Manually calculate equal width fore each button, adding remaining pixels to last button.
     // (We don't use CSS percentage values, because sometimes browser calculations lead to wrong results.)
     availableWidth = availableWidth || this._$parent.width();
-    var w = Math.floor(availableWidth / $visibleButtons.length);
-    $visibleButtons.forEach(function($button, index) {
+    let w = Math.floor(availableWidth / $visibleButtons.length);
+    $visibleButtons.forEach(($button, index) => {
       if (index === $visibleButtons.length - 1) {
         w = availableWidth;
       } else {

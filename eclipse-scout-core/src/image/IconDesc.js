@@ -40,7 +40,7 @@ export default class IconDesc {
    * Returns a CSS class string to be used with JQuery.add/removeClass().
    */
   appendCssClass(cssClass) {
-    var additionalCssClass = this.cssClass();
+    let additionalCssClass = this.cssClass();
     if (additionalCssClass.length > 0) {
       return cssClass + ' ' + additionalCssClass;
     }

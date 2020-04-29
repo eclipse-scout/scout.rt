@@ -18,10 +18,10 @@ export function toBase62(number) {
   if (number === undefined) {
     return undefined;
   }
-  var symbols = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
-  var base = 62;
-  var s = '';
-  var n;
+  let symbols = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+  let base = 62;
+  let s = '';
+  let n;
   while (number >= 1) {
     n = Math.floor(number / base);
     s = symbols[(number - (base * n))] + s;
@@ -36,9 +36,9 @@ export function toBase62(number) {
  */
 export function randomId(length) {
   length = length || 8;
-  var alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  var result = '';
-  for (var i = 0; i < length; i++) {
+  let alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
     result += alphabet[Math.floor(Math.random() * alphabet.length)];
   }
   return result;
@@ -69,10 +69,10 @@ let _correlationCounter = 1;
  */
 export function correlationId(length) {
   length = length || 11;
-  var letters = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ';
-  var digits = '23456789';
-  var result = '';
-  for (var i = 0; i < length; i++) {
+  let letters = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ';
+  let digits = '23456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
     if ((i + 1) % 3 === 0) {
       result += digits[Math.floor(Math.random() * digits.length)];
     } else {
@@ -161,15 +161,15 @@ export function shiftDecimalPoint(number, move) {
     return number;
   }
 
-  var sign = (number ? (number < 0 ? -1 : 1) : 0);
-  var distance = Math.abs(move);
+  let sign = (number ? (number < 0 ? -1 : 1) : 0);
+  let distance = Math.abs(move);
 
   number = Math.abs(number);
-  var s = strings.asString(number);
+  let s = strings.asString(number);
   if (s.indexOf('e') !== -1) {
     s = number.toFixed(20);
   }
-  var a;
+  let a;
   if (move < 0) {
     // move to left
     s = strings.repeat('0', distance) + s;

@@ -17,8 +17,8 @@ export default class LazyNodeFilter {
   accept(node) {
     if (!node.expanded && node.parentNode && node.parentNode.expandedLazy && node.parentNode.lazyExpandingEnabled && this.tree.lazyExpandingEnabled) {
       // if this node is not expanded and parent is lazyExpanding.
-      for (var i = 0; i < this.tree.selectedNodes.length; i++) {
-        var selectedNode = this.tree.selectedNodes[i];
+      for (let i = 0; i < this.tree.selectedNodes.length; i++) {
+        let selectedNode = this.tree.selectedNodes[i];
         // not initialized selected nodes
         if (typeof selectedNode === 'string') {
           break;

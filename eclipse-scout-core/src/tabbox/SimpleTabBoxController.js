@@ -66,7 +66,7 @@ export default class SimpleTabBoxController {
   }
 
   _onViewAdd(event) {
-    var view = event.view,
+    let view = event.view,
       siblingView = event.siblingView,
       viewTab,
       // the sibling to insert the tab after.
@@ -84,24 +84,24 @@ export default class SimpleTabBoxController {
   }
 
   _onViewRemove(event) {
-    var view = event.view;
+    let view = event.view;
     if (!view) {
       return;
     }
-    var viewTab = this._getTab(view);
+    let viewTab = this._getTab(view);
     if (viewTab) {
       this.tabArea.destroyTab(viewTab);
     }
   }
 
   _onViewActivate(event) {
-    var viewTab = this._getTab(event.view);
+    let viewTab = this._getTab(event.view);
     // also reset selection if no view tab of the view is found.
     this.tabArea.selectTab(viewTab);
   }
 
   _onViewDeactivate(event) {
-    var viewTab = this._getTab(event.view);
+    let viewTab = this._getTab(event.view);
     // also reset selection if no view tab of the view is found.
     this.tabArea.deselectTab(viewTab);
   }
@@ -110,7 +110,7 @@ export default class SimpleTabBoxController {
     if (!event.viewTab) {
       return;
     }
-    var view = event.viewTab.view;
+    let view = event.viewTab.view;
     this.tabBox.activateView(view);
   }
 
@@ -125,8 +125,8 @@ export default class SimpleTabBoxController {
     if (!view) {
       return;
     }
-    var viewTab = null;
-    this.tabArea.getTabs().some(function(tab) {
+    let viewTab = null;
+    this.tabArea.getTabs().some(tab => {
       if (tab.view === view) {
         viewTab = tab;
         return true;

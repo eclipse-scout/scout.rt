@@ -11,10 +11,10 @@
 import {BasicFieldAdapter, RemoteEvent, scout} from '../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('BasicField', function() {
-  var session, helper, field;
+describe('BasicField', () => {
+  let session, helper, field;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
@@ -23,15 +23,15 @@ describe('BasicField', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
     jasmine.Ajax.uninstall();
   });
 
   function createField(model) {
-    var adapter = new BasicFieldAdapter();
+    let adapter = new BasicFieldAdapter();
     adapter.init(model);
-    var field = adapter.createWidget(model, session.desktop);
+    let field = adapter.createWidget(model, session.desktop);
     field.$field = $('<input>').on('blur', field._onFieldBlur.bind(field));
     return field;
   }
@@ -40,15 +40,15 @@ describe('BasicField', function() {
     return helper.createFieldModel();
   }
 
-  describe('acceptInput must always be sent to server at the end of input, if at least one change has been made', function() {
-    it('updateDisplayTextOnModify = true, with changed text', function() {
+  describe('acceptInput must always be sent to server at the end of input, if at least one change has been made', () => {
+    it('updateDisplayTextOnModify = true, with changed text', () => {
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test1');
       field.$field.trigger('input');
       jasmine.clock().tick(251); // because of debounce
       sendQueuedAjaxCalls();
-      var event = new RemoteEvent(field.id, 'acceptInput', {
+      let event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1',
         whileTyping: true,
         showBusyIndicator: false
@@ -64,7 +64,7 @@ describe('BasicField', function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('updateDisplayTextOnModify = true, with custom delay', function() {
+    it('updateDisplayTextOnModify = true, with custom delay', () => {
       field.updateDisplayTextOnModify = true;
       field.updateDisplayTextOnModifyDelay = 20;
       field.render();
@@ -76,7 +76,7 @@ describe('BasicField', function() {
       expect(mostRecentJsonRequest()).toBeUndefined(); // not yet...
 
       jasmine.clock().tick(15);
-      var event = new RemoteEvent(field.id, 'acceptInput', {
+      let event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1',
         whileTyping: true,
         showBusyIndicator: false
@@ -84,14 +84,14 @@ describe('BasicField', function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('updateDisplayTextOnModify = true, with no delay', function() {
+    it('updateDisplayTextOnModify = true, with no delay', () => {
       field.updateDisplayTextOnModify = true;
       field.updateDisplayTextOnModifyDelay = 0;
       field.render();
       field.$field.val('Test7');
       field.$field.trigger('input');
       sendQueuedAjaxCalls();
-      var event = new RemoteEvent(field.id, 'acceptInput', {
+      let event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test7',
         whileTyping: true,
         showBusyIndicator: false
@@ -99,13 +99,13 @@ describe('BasicField', function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('updateDisplayTextOnModify = false, with changed text', function() {
+    it('updateDisplayTextOnModify = false, with changed text', () => {
       field.updateDisplayTextOnModify = false;
       field.render();
       field.$field.val('Test2');
       field.$field.trigger('input');
       sendQueuedAjaxCalls();
-      var event = new RemoteEvent(field.id, 'acceptInput', {
+      let event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test2',
         whileTyping: true,
         showBusyIndicator: false
@@ -121,14 +121,14 @@ describe('BasicField', function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with changed text', function() {
+    it('updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with changed text', () => {
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test3');
       field.$field.trigger('input');
       jasmine.clock().tick(251); // because of debounce
       sendQueuedAjaxCalls();
-      var event = new RemoteEvent(field.id, 'acceptInput', {
+      let event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test3',
         whileTyping: true,
         showBusyIndicator: false
@@ -145,14 +145,14 @@ describe('BasicField', function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with *pending* changed text', function() {
+    it('updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with *pending* changed text', () => {
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test3');
       field.$field.trigger('input');
       jasmine.clock().tick(100); // debounced function has not been executed yet!
       sendQueuedAjaxCalls();
-      var event = new RemoteEvent(field.id, 'acceptInput', {
+      let event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test3',
         whileTyping: true,
         showBusyIndicator: false
@@ -173,14 +173,14 @@ describe('BasicField', function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('updateDisplayTextOnModify = true, then acceptInput(false) is fired. -> send should be done immediately', function() {
+    it('updateDisplayTextOnModify = true, then acceptInput(false) is fired. -> send should be done immediately', () => {
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test3');
       field.$field.trigger('input');
       field.acceptInput(false);
       sendQueuedAjaxCalls();
-      var event = new RemoteEvent(field.id, 'acceptInput', {
+      let event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test3',
         whileTyping: false,
         showBusyIndicator: true
@@ -188,14 +188,14 @@ describe('BasicField', function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
-    it('updateDisplayTextOnModify = true, w/o changed text', function() {
+    it('updateDisplayTextOnModify = true, w/o changed text', () => {
       field.updateDisplayTextOnModify = true;
       field.render();
       field.displayText = 'Test4'; // fake previous display text
       field.$field.val('Test4');
       field.$field.trigger('input');
       sendQueuedAjaxCalls();
-      var event = new RemoteEvent(field.id, 'acceptInput', {
+      let event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test4',
         whileTyping: true,
         showBusyIndicator: false
@@ -211,14 +211,14 @@ describe('BasicField', function() {
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
     });
 
-    it('updateDisplayTextOnModify = false, w/o changed text', function() {
+    it('updateDisplayTextOnModify = false, w/o changed text', () => {
       field.updateDisplayTextOnModify = false;
       field.render();
       field.displayText = 'Test5'; // fake previous display text
       field.$field.val('Test5');
       field.$field.trigger('input');
       sendQueuedAjaxCalls();
-      var event = new RemoteEvent(field.id, 'acceptInput', {
+      let event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test5',
         whileTyping: true,
         showBusyIndicator: false
@@ -234,7 +234,7 @@ describe('BasicField', function() {
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
     });
 
-    it('does not fail if field is removed while acceptInput is still pending', function() {
+    it('does not fail if field is removed while acceptInput is still pending', () => {
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test1');
@@ -247,18 +247,18 @@ describe('BasicField', function() {
     });
   });
 
-  describe('clear', function() {
+  describe('clear', () => {
 
-    it('removes the text and accepts input also with updateDisplayTextOnAnyKey set to true', function() {
+    it('removes the text and accepts input also with updateDisplayTextOnAnyKey set to true', () => {
       // Behavior should be similar to ctrl+A
-      var field = scout.create('StringField', {
+      let field = scout.create('StringField', {
         parent: session.desktop,
         updateDisplayTextOnAnyKey: true
       });
-      var inputAccepted = false;
+      let inputAccepted = false;
       field.render();
       field.setValue('abc');
-      field.on('acceptInput', function() {
+      field.on('acceptInput', () => {
         inputAccepted = true;
       });
       expect(field.$field.val()).toBe('abc');

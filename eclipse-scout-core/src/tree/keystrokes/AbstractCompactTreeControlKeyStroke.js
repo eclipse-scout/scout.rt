@@ -20,7 +20,7 @@ export default class AbstractCompactTreeControlKeyStroke extends KeyStroke {
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     if (!accepted) {
       return false;
     }
@@ -29,10 +29,10 @@ export default class AbstractCompactTreeControlKeyStroke extends KeyStroke {
       return false;
     }
 
-    var $currentNode = this.field.$nodesContainer.find('.section-node.selected'),
+    let $currentNode = this.field.$nodesContainer.find('.section-node.selected'),
       currentNode = $currentNode.data('node');
 
-    var nextNode = this._findNextNode($currentNode, currentNode);
+    let nextNode = this._findNextNode($currentNode, currentNode);
     if (nextNode) {
       event._nextNode = nextNode;
       return true;

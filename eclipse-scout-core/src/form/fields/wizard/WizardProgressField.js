@@ -45,7 +45,7 @@ export default class WizardProgressField extends FormField {
 
     // If this field is the first field in a form's main box, mark the form as "wizard-container-form"
     if (this.parent instanceof GroupBox && this.parent.controls[0] === this && this.parent.parent instanceof Form) {
-      var form = this.parent.parent;
+      let form = this.parent.parent;
       form.$container.addClass('wizard-container-form');
     }
   }
@@ -70,9 +70,9 @@ export default class WizardProgressField extends FormField {
     });
     this.$wizardStepsBody.empty();
 
-    this.steps.forEach(function(step, index) {
+    this.steps.forEach((step, index) => {
       // Step
-      var $step = this.$wizardStepsBody
+      let $step = this.$wizardStepsBody
         .appendDiv('wizard-step')
         .addClass(step.cssClass)
         .data('wizard-step', step);
@@ -86,7 +86,7 @@ export default class WizardProgressField extends FormField {
       }
 
       // Content
-      var $content = $step.appendDiv('wizard-step-content');
+      let $content = $step.appendDiv('wizard-step-content');
       if (strings.hasText(step.tooltipText)) {
         tooltips.install($content, {
           parent: this,
@@ -96,7 +96,7 @@ export default class WizardProgressField extends FormField {
       }
 
       // Icon
-      var $icon = $content.appendDiv('wizard-step-content-icon-container').appendDiv('wizard-step-content-icon');
+      let $icon = $content.appendDiv('wizard-step-content-icon-container').appendDiv('wizard-step-content-icon');
       if (step.iconId) {
         $icon.icon(step.iconId);
       } else if (step.finished) {
@@ -105,7 +105,7 @@ export default class WizardProgressField extends FormField {
         $icon.text(index + 1);
       }
       // Text
-      var $text = $content.appendDiv('wizard-step-content-text');
+      let $text = $content.appendDiv('wizard-step-content-text');
       $text.appendDiv('wizard-step-title').textOrNbsp(step.title);
       if (step.subTitle) {
         $text.appendDiv('wizard-step-sub-title').textOrNbsp(step.subTitle);
@@ -117,7 +117,7 @@ export default class WizardProgressField extends FormField {
           .appendDiv('wizard-step-separator')
           .icon(icons.ANGLE_RIGHT);
       }
-    }.bind(this));
+    });
 
     this.invalidateLayoutTree(false);
   }
@@ -135,14 +135,14 @@ export default class WizardProgressField extends FormField {
   }
 
   _updateStepClasses(step) {
-    var $step = step.$step;
+    let $step = step.$step;
     $step.removeClass('active-step before-active-step after-active-step first last action-enabled disabled');
     $step.off('click.active-step');
 
     // Important: those indices correspond to the UI's data structures (this.steps) and are not necessarily
     // consistent with the server indices (because the server does not send invisible steps).
-    var stepIndex = this.steps.indexOf(step);
-    var activeStepIndex = this.steps.indexOf(this.stepsMap[this.activeStepIndex]);
+    let stepIndex = this.steps.indexOf(step);
+    let activeStepIndex = this.steps.indexOf(this.stepsMap[this.activeStepIndex]);
 
     if (this.enabledComputed && step.enabled && step.actionEnabled && stepIndex !== this.activeStepIndex) {
       $step.addClass('action-enabled');
@@ -177,7 +177,7 @@ export default class WizardProgressField extends FormField {
 
   _stepIndex($step) {
     if ($step) {
-      var step = $step.data('wizard-step');
+      let step = $step.data('wizard-step');
       if (step) {
         return step.index;
       }
@@ -187,16 +187,16 @@ export default class WizardProgressField extends FormField {
 
   _updateStepsMap() {
     this.stepsMap = {};
-    this.steps.forEach(function(step) {
+    this.steps.forEach(step => {
       this.stepsMap[step.index] = step;
-    }.bind(this));
+    });
   }
 
   _resolveStep(stepIndex) {
     // Because "step index" does not necessarily correspond to the array indices
     // (invisible model steps produce "holes"), we have to loop over the array.
-    for (var i = 0; i < this.steps.length; i++) {
-      var step = this.steps[i];
+    for (let i = 0; i < this.steps.length; i++) {
+      let step = this.steps[i];
       if (step.index === stepIndex) {
         return step;
       }
@@ -205,8 +205,8 @@ export default class WizardProgressField extends FormField {
   }
 
   _onStepClick(event) {
-    var $step = $(event.currentTarget); // currentTarget instead of target to support event bubbling from inner divs
-    var targetStepIndex = this._stepIndex($step);
+    let $step = $(event.currentTarget); // currentTarget instead of target to support event bubbling from inner divs
+    let targetStepIndex = this._stepIndex($step);
     if (targetStepIndex >= 0 && targetStepIndex !== this.activeStepIndex) {
       this.trigger('stepAction', {
         stepIndex: targetStepIndex
@@ -215,19 +215,19 @@ export default class WizardProgressField extends FormField {
   }
 
   scrollToActiveStep() {
-    var currentStep = this.stepsMap[this.activeStepIndex];
+    let currentStep = this.stepsMap[this.activeStepIndex];
     if (currentStep) {
-      var $currentStep = currentStep.$step;
-      var scrollLeft = this.$field.scrollLeft();
-      var currentStepLeft = $currentStep.position().left;
-      var currentStepWidth = $currentStep.width();
-      var fieldWidth = this.$field.width();
+      let $currentStep = currentStep.$step;
+      let scrollLeft = this.$field.scrollLeft();
+      let currentStepLeft = $currentStep.position().left;
+      let currentStepWidth = $currentStep.width();
+      let fieldWidth = this.$field.width();
 
       // If going forward, try to scroll the steps such that the center of active step is not after 75% of the available space.
       // If going backward, try to scroll the steps such that the center of the active step is not before 25% of the available space.
-      var goingBack = (this.previousActiveStepIndex > this.activeStepIndex);
-      var p1 = scrollLeft + Math.floor(fieldWidth * (goingBack ? 0.25 : 0.75));
-      var p2 = currentStepLeft + Math.floor(currentStepWidth / 2);
+      let goingBack = (this.previousActiveStepIndex > this.activeStepIndex);
+      let p1 = scrollLeft + Math.floor(fieldWidth * (goingBack ? 0.25 : 0.75));
+      let p2 = currentStepLeft + Math.floor(currentStepWidth / 2);
       if ((goingBack && p2 < p1) || (!goingBack && p2 > p1)) {
         scrollbars.scrollLeft(this.$field, scrollLeft + (p2 - p1));
       }

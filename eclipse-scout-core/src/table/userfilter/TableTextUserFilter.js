@@ -23,7 +23,7 @@ export default class TableTextUserFilter extends TableUserFilter {
    * @override TableUserFilter.js
    */
   createFilterAddedEventData() {
-    var data = super.createFilterAddedEventData();
+    let data = super.createFilterAddedEventData();
     data.text = this.text;
     return data;
   }
@@ -33,7 +33,7 @@ export default class TableTextUserFilter extends TableUserFilter {
   }
 
   accept(row) {
-    var rowText = this.table.visibleColumns().reduce(function(acc, column) {
+    let rowText = this.table.visibleColumns().reduce((acc, column) => {
       return acc + column.cellTextForTextFilter(row) + ' ';
     }, '');
     if (this.text !== this._cachedText) {

@@ -27,8 +27,8 @@ export function ensure(array) {
  * Creates an array with the given length and initializes each value with the given initValue.
  */
 export function init(length, initValue) {
-  var array = [];
-  for (var i = 0; i < length; i++) {
+  let array = [];
+  for (let i = 0; i < length; i++) {
     array[i] = initValue;
   }
   return array;
@@ -43,7 +43,7 @@ export function init(length, initValue) {
  */
 export function remove(arr, element) {
   if (arr) {
-    var index = arr.indexOf(element);
+    let index = arr.indexOf(element);
     if (index !== -1) {
       arr.splice(index, 1);
       return true;
@@ -58,11 +58,11 @@ export function remove(arr, element) {
  * @return {boolean} true if the array contained at least one of the specified elements
  */
 export function removeAll(arr, elements) {
-  var modified = false;
+  let modified = false;
   if (!elements || elements.length === 0) {
     return false;
   }
-  for (var i = arr.length - 1; i >= 0; i--) {
+  for (let i = arr.length - 1; i >= 0; i--) {
     if (elements.indexOf(arr[i]) > -1) {
       arr.splice(i, 1);
       modified = true;
@@ -75,7 +75,7 @@ export function removeAll(arr, elements) {
  * @return the index of the replaced element
  */
 export function replace(arr, element, replacement) {
-  var index = arr.indexOf(element);
+  let index = arr.indexOf(element);
   if (index !== -1) {
     arr[index] = replacement;
   }
@@ -119,11 +119,11 @@ export function insertArray(arr, elements, index) {
  */
 export function insertSorted(arr, element, compareFunc) {
   // https://en.wikipedia.org/wiki/Binary_search_algorithm
-  var left = 0;
-  var right = arr.length - 1;
+  let left = 0;
+  let right = arr.length - 1;
   while (left <= right) {
-    var middle = left + Math.floor((right - left) / 2);
-    var c = compareFunc(arr[middle], element);
+    let middle = left + Math.floor((right - left) / 2);
+    let c = compareFunc(arr[middle], element);
     if (c < 0) {
       // Search in right half
       left = middle + 1;
@@ -150,14 +150,14 @@ export function insertSorted(arr, element, compareFunc) {
  * This function uses insert() which relies on Array.prototype.splice(). Check its js-doc for details.
  */
 export function move(arr, fromIndex, toIndex) {
-  var element = arr.splice(fromIndex, 1)[0];
+  let element = arr.splice(fromIndex, 1)[0];
   insert(arr, element, toIndex);
 }
 
 export function containsAny(haystack, needles) {
   haystack = ensure(haystack);
   needles = ensure(needles);
-  return needles.some(function contains(element) {
+  return needles.some(element => {
     return haystack.indexOf(element) >= 0;
   });
 }
@@ -165,7 +165,7 @@ export function containsAny(haystack, needles) {
 export function containsAll(haystack, needles) {
   haystack = ensure(haystack);
   needles = ensure(needles);
-  return needles.every(function contains(element) {
+  return needles.every(element => {
     return haystack.indexOf(element) >= 0;
   });
 }
@@ -202,7 +202,8 @@ export function empty(arr) {
 }
 
 export function pushAll(arr, arr2) {
-  arr.push.apply(arr, arr2);
+  arr2 = ensure(arr2);
+  arr.push(...arr2);
 }
 
 /**
@@ -210,14 +211,14 @@ export function pushAll(arr, arr2) {
  * If the arrays contain objects instead of primitives, it uses their id to check for equality.
  */
 export function union(array1, array2) {
-  var result = [],
+  let result = [],
     map = {};
 
   array1 = ensure(array1);
   array2 = ensure(array2);
 
-  array1.forEach(function(entry) {
-    var key = entry;
+  array1.forEach(entry => {
+    let key = entry;
     if (typeof entry === 'object') {
       key = entry.id;
     }
@@ -225,8 +226,8 @@ export function union(array1, array2) {
     result.push(entry);
   });
 
-  array2.forEach(function(entry) {
-    var key = entry;
+  array2.forEach(entry => {
+    let key = entry;
     if (typeof entry === 'object') {
       key = entry.id;
     }
@@ -238,6 +239,7 @@ export function union(array1, array2) {
   return result;
 }
 
+// noinspection DuplicatedCode
 export function equalsIgnoreOrder(arr, arr2) {
   if (arr === arr2) {
     return true;
@@ -254,6 +256,7 @@ export function equalsIgnoreOrder(arr, arr2) {
   return containsAll(arr, arr2);
 }
 
+// noinspection DuplicatedCode
 export function equals(arr, arr2) {
   if (arr === arr2) {
     return true;
@@ -268,7 +271,7 @@ export function equals(arr, arr2) {
     return false;
   }
 
-  for (var i = 0; i < arr.length; i++) {
+  for (let i = 0; i < arr.length; i++) {
     if (arr[i] !== arr2[i]) {
       return false;
     }
@@ -277,7 +280,7 @@ export function equals(arr, arr2) {
 }
 
 export function greater(arr, arr2) {
-  var arrLength = 0,
+  let arrLength = 0,
     arr2Length = 0;
   if (arr) {
     arrLength = arr.length;
@@ -292,8 +295,8 @@ export function eachSibling(arr, element, func) {
   if (!arr || !func) {
     return;
   }
-  for (var i = 0; i < arr.length; i++) {
-    var elementAtI = arr[i];
+  for (let i = 0; i < arr.length; i++) {
+    let elementAtI = arr[i];
     if (elementAtI !== element) {
       func(elementAtI, i);
     }
@@ -308,7 +311,7 @@ export function findIndex(arr, predicate, thisArg) {
   if (!arr || !predicate) {
     return -1;
   }
-  for (var i = 0; i < arr.length; i++) {
+  for (let i = 0; i < arr.length; i++) {
     if (predicate.call(thisArg, arr[i], i, arr)) {
       return i;
     }
@@ -317,7 +320,7 @@ export function findIndex(arr, predicate, thisArg) {
 }
 
 export function find(arr, predicate, thisArg) {
-  var index = findIndex(arr, predicate, thisArg);
+  let index = findIndex(arr, predicate, thisArg);
   if (index === -1) {
     return null;
   }
@@ -339,7 +342,7 @@ export function findIndexFrom(arr, startIndex, predicate, reverse) {
 }
 
 export function findFromForward(arr, startIndex, predicate) {
-  var index = findIndexFromForward(arr, startIndex, predicate);
+  let index = findIndexFromForward(arr, startIndex, predicate);
   if (index === -1) {
     return null;
   }
@@ -350,8 +353,8 @@ export function findIndexFromForward(arr, startIndex, predicate) {
   if (!arr || !predicate) {
     return -1;
   }
-  for (var i = startIndex; i < arr.length; i++) {
-    var element = arr[i];
+  for (let i = startIndex; i < arr.length; i++) {
+    let element = arr[i];
     if (predicate(element, i)) {
       return i;
     }
@@ -360,7 +363,7 @@ export function findIndexFromForward(arr, startIndex, predicate) {
 }
 
 export function findFromReverse(arr, startIndex, predicate) {
-  var index = findIndexFromReverse(arr, startIndex, predicate);
+  let index = findIndexFromReverse(arr, startIndex, predicate);
   if (index === -1) {
     return null;
   }
@@ -371,8 +374,8 @@ export function findIndexFromReverse(arr, startIndex, predicate) {
   if (!arr || !predicate) {
     return -1;
   }
-  for (var i = startIndex; i >= 0; i--) {
-    var element = arr[i];
+  for (let i = startIndex; i >= 0; i--) {
+    let element = arr[i];
     if (predicate(element, i)) {
       return i;
     }
@@ -383,8 +386,8 @@ export function findIndexFromReverse(arr, startIndex, predicate) {
 /**
  * Pushes all elements to the given array that are not null or undefined.
  */
-export function pushIfDefined(arr, elements) {
-  elements = objects.argumentsToArray(arguments).slice(1).filter(function(element) {
+export function pushIfDefined(arr, ...elements) {
+  elements = elements.filter(element => {
     return element !== null && element !== undefined;
   });
   if (arr && elements.length) {
@@ -413,9 +416,9 @@ export function format(arr, delimiter, encodeHtml) {
     return '';
   }
 
-  var output = '';
-  for (var i = 0; i < arr.length; i++) {
-    var element = arr[i];
+  let output = '';
+  for (let i = 0; i < arr.length; i++) {
+    let element = arr[i];
     if (delimiter && i > 0 && i < arr.length) {
       output += delimiter;
     }
@@ -433,36 +436,36 @@ export function formatEncoded(arr, delimiter) {
 
 export function max(arr) {
   if (arr === null || arr === undefined) {
-    return Math.max.apply(Math, arr);
+    return Math.max(arr);
   }
 
   // Math.max() returns 0 (not null!) if arr contains only null and negative elements.
-  var filtered = arr.filter(objects.isNumber);
-  return Math.max.apply(Math, filtered);
+  let filtered = arr.filter(objects.isNumber);
+  return Math.max(...filtered);
 }
 
 export function min(arr) {
   if (arr === null || arr === undefined) {
-    return Math.min.apply(Math, arr);
+    return Math.min(arr);
   }
 
   // Math.min() returns 0 (not null!) if arr contains only null and non-negative elements.
-  var filtered = arr.filter(objects.isNumber);
-  return Math.min.apply(Math, filtered);
+  let filtered = arr.filter(objects.isNumber);
+  return Math.min(...filtered);
 }
 
 /**
  * @returns {[]} all elements of the first array which are not in the second array
  */
 export function diff(arr1, arr2) {
-  var diff = arr1.slice();
+  let diff = arr1.slice();
   removeAll(diff, arr2);
   return diff;
 }
 
 export function flatMap(arr, func) {
-  var result = [];
-  arr.forEach(function(element) {
+  let result = [];
+  arr.forEach(element => {
     pushAll(result, func(element));
   });
   return result;
@@ -475,7 +478,7 @@ export function flatMap(arr, func) {
 //
 
 export function $indexOf(arr, $element) {
-  for (var i = 0; i < arr.length; i++) {
+  for (let i = 0; i < arr.length; i++) {
     if (arr[i][0] === $element[0]) {
       return i;
     }
@@ -483,7 +486,7 @@ export function $indexOf(arr, $element) {
 }
 
 export function $remove(arr, $element) {
-  var index = $indexOf(arr, $element);
+  let index = $indexOf(arr, $element);
   if (index >= 0) {
     arr.splice(index, 1);
   }

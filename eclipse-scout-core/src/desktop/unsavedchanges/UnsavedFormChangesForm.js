@@ -62,46 +62,46 @@ export default class UnsavedFormChangesForm extends Form {
       unsavedForms: this.unsavedForms
     }));
 
-    this.openFormsField.table.one('rowsInserted', function(event) {
+    this.openFormsField.table.one('rowsInserted', event => {
       event.source.checkAll(true);
     });
 
-    var checkAllMenu = scout.create('Menu', {
+    let checkAllMenu = scout.create('Menu', {
       parent: this.openFormsField.table,
       id: 'CheckAllMenu',
       menuTypes: ['Table.EmptySpace'],
       text: '${textKey:CheckAll}'
     });
 
-    checkAllMenu.on('action', function(event) {
+    checkAllMenu.on('action', event => {
       this.openFormsField.table.checkAll(true);
-    }.bind(this));
+    });
 
-    var uncheckAllMenu = scout.create('Menu', {
+    let uncheckAllMenu = scout.create('Menu', {
       parent: this.openFormsField.table,
       id: 'UncheckAllMenu',
       menuTypes: ['Table.EmptySpace'],
       text: '${textKey:UncheckAll}'
     });
 
-    uncheckAllMenu.on('action', function(event) {
+    uncheckAllMenu.on('action', event => {
       this.openFormsField.table.uncheckAll();
-    }.bind(this));
+    });
 
     this.openFormsField.table.setMenus([checkAllMenu, uncheckAllMenu]);
 
-    this.on('postLoad', function(event) {
+    this.on('postLoad', event => {
       this.touch();
-    }.bind(this));
+    });
   }
 
   _validate(data) {
-    var invalidForms = this.getInvalidForms();
+    let invalidForms = this.getInvalidForms();
     if (invalidForms.length > 0) {
-      var msg = [];
+      let msg = [];
       msg.push('<p><b>', this.session.text('NotAllCheckedFormsCanBeSaved'), '</b></p>');
       msg.push(this.session.text('FormsCannotBeSaved'), '<br><br>');
-      invalidForms.forEach(function(form) {
+      invalidForms.forEach(form => {
         msg.push('- ', UnsavedFormChangesForm.getFormDisplayName(form), '<br>');
       }, this);
       return Status.error({
@@ -112,15 +112,15 @@ export default class UnsavedFormChangesForm extends Form {
   }
 
   getInvalidForms() {
-    var invalidForms = [];
-    this.openFormsField.value.forEach(function(form) {
-      var missingElements = form.lifecycle._invalidElements().missingElements.slice();
-      var invalidElements = form.lifecycle._invalidElements().invalidElements.slice();
-      form.visitDisplayChildren(function(dialog) {
-        var diagElem = dialog.lifecycle._invalidElements();
+    let invalidForms = [];
+    this.openFormsField.value.forEach(form => {
+      let missingElements = form.lifecycle._invalidElements().missingElements.slice();
+      let invalidElements = form.lifecycle._invalidElements().invalidElements.slice();
+      form.visitDisplayChildren(dialog => {
+        let diagElem = dialog.lifecycle._invalidElements();
         arrays.pushAll(missingElements, diagElem.missingElements);
         arrays.pushAll(invalidElements, diagElem.invalidElements);
-      }, function(dialog) {
+      }, dialog => {
         // forms are the only display children with a lifecycle, only visit those.
         return dialog instanceof Form;
       });

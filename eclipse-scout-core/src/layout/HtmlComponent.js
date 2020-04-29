@@ -59,7 +59,7 @@ export default class HtmlComponent {
    * Creates a new instance of HtmlComponent if the parent DOM element has no linked instance yet.
    */
   getParent() {
-    var $parent = this.$comp.parent();
+    let $parent = this.$comp.parent();
     if ($parent.length === 0) {
       return null;
     }
@@ -70,7 +70,7 @@ export default class HtmlComponent {
    * @returns {boolean} true if the given htmlComponent is an ancestor, false if not
    */
   isDescendantOf(htmlComp) {
-    var $parent = this.$comp.parent();
+    let $parent = this.$comp.parent();
     while ($parent.length > 0) {
       if (HtmlComponent.optGet($parent) === htmlComp) {
         return true;
@@ -94,12 +94,12 @@ export default class HtmlComponent {
    */
   availableSize(options) {
     options = options || {};
-    var size = this.size({
+    let size = this.size({
       exact: options.exact
     });
 
     if (this.scrollable) {
-      var prefSize = this.prefSize({
+      let prefSize = this.prefSize({
         widthHint: size.width,
         removeMarginFromHints: false // Since the width of this component is used as hint, the margin must not be removed
       });
@@ -164,12 +164,12 @@ export default class HtmlComponent {
     // Also check if one of the parents is currently being animated.
     // To improve performance (the check might loop to the top of the DOM tree), the following code is
     // not executed if the parent already executed it, which is the case if the parent is being layouted.
-    var parent = this.getParent();
+    let parent = this.getParent();
     if (!parent || !parent.layouting) {
-      var everyParentVisible = true;
-      var $animatedParent = null;
+      let everyParentVisible = true;
+      let $animatedParent = null;
       this.$comp.parents().each(function() {
-        var $parent = $(this);
+        let $parent = $(this);
         if (!$parent.isVisible()) {
           everyParentVisible = false;
           return false;
@@ -295,14 +295,14 @@ export default class HtmlComponent {
       // Create a copy to not modify the original options
       options = $.extend({}, options);
     }
-    var includeMargin = scout.nvl(options.includeMargin, false);
+    let includeMargin = scout.nvl(options.includeMargin, false);
     options.includeMargin = null;
     if (!this.layout) {
       throw new Error('Called prefSize() but component has no layout');
     }
 
-    var prefSizeCacheKey = this.computePrefSizeKey(options);
-    var prefSizeCached = this.prefSizeCached[prefSizeCacheKey];
+    let prefSizeCacheKey = this.computePrefSizeKey(options);
+    let prefSizeCached = this.prefSizeCached[prefSizeCacheKey];
     if (!$.isEmptyObject(prefSizeCached)) {
       $.log.isTraceEnabled() && $.log.trace('(HtmlComponent#prefSize) ' + this.debug() + ' widthHint=' + options.widthHint + ' heightHint=' + options.heightHint + ' prefSizeCached=' + prefSizeCached);
       if (includeMargin) {
@@ -311,13 +311,13 @@ export default class HtmlComponent {
       return prefSizeCached.clone();
     }
 
-    var minSize = graphics.cssMinSize(this.$comp);
-    var maxSize = graphics.cssMaxSize(this.$comp);
+    let minSize = graphics.cssMinSize(this.$comp);
+    let maxSize = graphics.cssMaxSize(this.$comp);
     if (options.widthHint || options.heightHint) {
       this._adjustSizeHintsForPrefSize(options, minSize, maxSize);
     }
 
-    var prefSize = this.layout.preferredLayoutSize(this.$comp, options);
+    let prefSize = this.layout.preferredLayoutSize(this.$comp, options);
     this._adjustPrefSizeWithMinMaxSize(prefSize, minSize, maxSize);
     this.prefSizeCached[prefSizeCacheKey] = prefSize;
 
@@ -337,13 +337,13 @@ export default class HtmlComponent {
    * Also makes sure the hints consider the min and max size set by CSS.
    */
   _adjustSizeHintsForPrefSize(options, minSize, maxSize) {
-    var removeMargins = scout.nvl(options.removeMarginFromHints, true);
+    let removeMargins = scout.nvl(options.removeMarginFromHints, true);
     options.removeMarginFromHints = null;
     if (!options.widthHint && !options.heightHint) {
       return;
     }
-    var margins = removeMargins ? this.margins() : new Insets();
-    var insets = this.insets();
+    let margins = removeMargins ? this.margins() : new Insets();
+    let insets = this.insets();
     if (options.widthHint) {
       // The order is important! Box-sizing: border-box is expected.
       options.widthHint -= margins.horizontal();
@@ -406,7 +406,7 @@ export default class HtmlComponent {
       // don't invalidate the layout if component is invisible because sizes may not be read correctly and therefore prefSize will be wrong
       return;
     }
-    var oldSize = this.sizeCached;
+    let oldSize = this.sizeCached;
     if (!size.equals(oldSize)) {
       this.invalidateLayout();
     }
@@ -449,7 +449,7 @@ export default class HtmlComponent {
       // don't invalidate the layout if component is invisible because sizes may not be read correctly and therefore prefSize will be wrong
       return;
     }
-    var oldSize = this.sizeCached;
+    let oldSize = this.sizeCached;
     if (!bounds.dimension().equals(oldSize)) {
       this.invalidateLayout();
     }
@@ -463,7 +463,7 @@ export default class HtmlComponent {
    * Sets the component to its preferred size.
    */
   pack() {
-    var preferredSize = this.prefSize();
+    let preferredSize = this.prefSize();
     this.setSize(preferredSize);
   }
 
@@ -503,7 +503,7 @@ export default class HtmlComponent {
       throw new Error('Missing argument "session"');
     }
 
-    var htmlComp = new HtmlComponent($comp, session);
+    let htmlComp = new HtmlComponent($comp, session);
     // link DOM element with the new instance
     $comp.data('htmlComponent', htmlComp);
 
@@ -517,9 +517,9 @@ export default class HtmlComponent {
    * @memberOf HtmlComponent
    */
   static get($comp) {
-    var htmlComp = this.optGet($comp);
+    let htmlComp = this.optGet($comp);
     if (!htmlComp) {
-      var details = '';
+      let details = '';
       if ($comp) {
         details = '\nClass: ' + $comp.attr('class');
         details += '\nId: ' + $comp.attr('id');

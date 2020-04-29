@@ -28,7 +28,7 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
    * @override AbstractLayout.js
    */
   layout($container) {
-    var tabWidth,
+    let tabWidth,
       htmlContainer = this.tabArea.htmlComp,
       containerSize = htmlContainer.size({
         exact: true
@@ -61,10 +61,10 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
     containerSize.width -= SimpleTabAreaLayout.OVERFLOW_MENU_WIDTH;
 
     // check how many tabs fit into remaining containerSize.width
-    var numVisibleTabs = Math.floor(containerSize.width / SimpleTabAreaLayout.TAB_WIDTH_SMALL),
+    let numVisibleTabs = Math.floor(containerSize.width / SimpleTabAreaLayout.TAB_WIDTH_SMALL),
       numOverflowTabs = numTabs - numVisibleTabs;
 
-    var i = 0,
+    let i = 0,
       selectedIndex = 0;
     $tabs.each(function() {
       if ($(this).hasClass('selected')) {
@@ -74,7 +74,7 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
     });
 
     // determine visible range
-    var rightEnd, leftEnd = selectedIndex - Math.floor(numVisibleTabs / 2);
+    let rightEnd, leftEnd = selectedIndex - Math.floor(numVisibleTabs / 2);
     if (leftEnd < 0) {
       leftEnd = 0;
       rightEnd = numVisibleTabs - 1;
@@ -91,7 +91,7 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
       .on('mousedown', this._onMouseDownOverflow.bind(this));
     this._$overflowTab.appendDiv('num-tabs').text(numOverflowTabs);
 
-    var that = this;
+    let that = this;
     tabWidth = SimpleTabAreaLayout.TAB_WIDTH_SMALL;
     i = 0;
     $tabs.each(function() {
@@ -106,12 +106,12 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
   }
 
   smallPrefSize() {
-    var numTabs = this.tabArea.getTabs().length;
+    let numTabs = this.tabArea.getTabs().length;
     return new Dimension(numTabs * SimpleTabAreaLayout.TAB_WIDTH_SMALL, this.tabArea.htmlComp.$comp.outerHeight(true));
   }
 
   preferredLayoutSize($container) {
-    var numTabs = this.tabArea.getTabs().length;
+    let numTabs = this.tabArea.getTabs().length;
     return new Dimension(numTabs * SimpleTabAreaLayout.TAB_WIDTH_LARGE, graphics.prefSize(this.tabArea.htmlComp.$comp, {
       includeMargin: true,
       useCssSize: true
@@ -119,7 +119,7 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
   }
 
   _onMouseDownOverflow(event) {
-    var menu, tab, popup,
+    let menu, tab, popup,
       tabArea = this.tabArea,
       overflowMenus = [];
 

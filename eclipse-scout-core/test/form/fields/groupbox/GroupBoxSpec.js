@@ -11,18 +11,18 @@
 import {DialogLayout, FormField, GroupBox, HorizontalGrid, scout, VerticalSmartGrid} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('GroupBox', function() {
-  var session;
-  var helper;
+describe('GroupBox', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
   });
 
   function createField(model, parent) {
-    var field = new GroupBox();
+    let field = new GroupBox();
     model.session = session;
     model.parent = parent || session.desktop;
     field.init(model);
@@ -41,10 +41,10 @@ describe('GroupBox', function() {
     }
   }
 
-  describe('_render', function() {
+  describe('_render', () => {
 
-    it('adds group-box div when label is set', function() {
-      var model = {
+    it('adds group-box div when label is set', () => {
+      let model = {
         id: '2',
         label: 'fooBar',
         gridDataHints: {
@@ -52,21 +52,21 @@ describe('GroupBox', function() {
           y: 0
         }
       };
-      var groupBox = createField(model);
+      let groupBox = createField(model);
       groupBox.render($('#sandbox'));
       expect($('#sandbox')).toContainElement('div.group-box');
       expect($('#sandbox')).toContainElement('div.group-box-title');
     });
 
-    it('renders controls initially if expanded', function() {
-      var groupBox = helper.createGroupBoxWithOneField(session.desktop);
+    it('renders controls initially if expanded', () => {
+      let groupBox = helper.createGroupBoxWithOneField(session.desktop);
       spyOn(groupBox, '_renderControls');
       groupBox.render();
       expect(groupBox._renderControls.calls.count()).toEqual(1);
     });
 
-    it('does not render controls initially if collapsed, but on expand', function() {
-      var groupBox = helper.createGroupBoxWithOneField(session.desktop);
+    it('does not render controls initially if collapsed, but on expand', () => {
+      let groupBox = helper.createGroupBoxWithOneField(session.desktop);
       spyOn(groupBox, '_renderControls');
       groupBox.setExpanded(false);
       groupBox.render();
@@ -75,9 +75,9 @@ describe('GroupBox', function() {
       expect(groupBox._renderControls.calls.count()).toEqual(1);
     });
 
-    it('automatically hides the label if it is empty', function() {
+    it('automatically hides the label if it is empty', () => {
       // Test 1: render first
-      var groupBox = createField({});
+      let groupBox = createField({});
       groupBox.render();
 
       expect(groupBox.labelVisible).toBe(true);
@@ -95,7 +95,7 @@ describe('GroupBox', function() {
       expect(groupBox.$title.text().trim()).toBe('test');
 
       // Test 2: render later
-      var groupBox2 = createField({});
+      let groupBox2 = createField({});
       expect(groupBox2.labelVisible).toBe(true);
       expect(groupBox2._computeTitleVisible()).toBe(false);
       groupBox2.setLabel('test2');
@@ -111,9 +111,9 @@ describe('GroupBox', function() {
     });
   });
 
-  describe('focus', function() {
-    it('focuses the first field', function() {
-      var box = scout.create('GroupBox', {
+  describe('focus', () => {
+    it('focuses the first field', () => {
+      let box = scout.create('GroupBox', {
         parent: session.desktop,
         fields: [{
           objectType: 'StringField'
@@ -128,8 +128,8 @@ describe('GroupBox', function() {
       expect(box.fields[0].$field).toBeFocused();
     });
 
-    it('focuses the second field if the first is disabled', function() {
-      var box = scout.create('GroupBox', {
+    it('focuses the second field if the first is disabled', () => {
+      let box = scout.create('GroupBox', {
         parent: session.desktop,
         fields: [{
           objectType: 'StringField',
@@ -146,8 +146,8 @@ describe('GroupBox', function() {
       expect(box.fields[1].$field).toBeFocused();
     });
 
-    it('focuses the second field if the first not focusable', function() {
-      var box = scout.create('GroupBox', {
+    it('focuses the second field if the first not focusable', () => {
+      let box = scout.create('GroupBox', {
         parent: session.desktop,
         fields: [{
           objectType: 'LabelField'
@@ -162,8 +162,8 @@ describe('GroupBox', function() {
       expect(box.fields[1].$field).toBeFocused();
     });
 
-    it('considers child group boxes', function() {
-      var box = scout.create('GroupBox', {
+    it('considers child group boxes', () => {
+      let box = scout.create('GroupBox', {
         parent: session.desktop,
         fields: [{
           objectType: 'GroupBox',
@@ -182,20 +182,20 @@ describe('GroupBox', function() {
     });
   });
 
-  describe('default values', function() {
+  describe('default values', () => {
 
-    it('gridDataHints', function() {
-      var groupBox = helper.createGroupBoxWithOneField(session.desktop);
-      var gdh = groupBox.gridDataHints;
+    it('gridDataHints', () => {
+      let groupBox = helper.createGroupBoxWithOneField(session.desktop);
+      let gdh = groupBox.gridDataHints;
       expect(gdh.useUiHeight).toBe(true);
       expect(gdh.w).toBe(FormField.FULL_WIDTH);
     });
 
   });
 
-  describe('enabled', function() {
-    it('is not propagated to children by default', function() {
-      var groupBoxWithTwoChildren = helper.createGroupBoxWithFields(session.desktop, 2);
+  describe('enabled', () => {
+    it('is not propagated to children by default', () => {
+      let groupBoxWithTwoChildren = helper.createGroupBoxWithFields(session.desktop, 2);
       groupBoxWithTwoChildren.render();
 
       expectEnabled(groupBoxWithTwoChildren, true, true);
@@ -208,8 +208,8 @@ describe('GroupBox', function() {
       expectEnabled(groupBoxWithTwoChildren.getFields()[1], true, false, 'disabled');
     });
 
-    it('but maybe propagated to children if required', function() {
-      var groupBoxWithTwoChildren = helper.createGroupBoxWithFields(session.desktop, 2);
+    it('but maybe propagated to children if required', () => {
+      let groupBoxWithTwoChildren = helper.createGroupBoxWithFields(session.desktop, 2);
       groupBoxWithTwoChildren.render();
 
       expectEnabled(groupBoxWithTwoChildren, true, true);
@@ -228,9 +228,9 @@ describe('GroupBox', function() {
     });
   });
 
-  describe('logical grid', function() {
-    it('is validated automatically by the logical grid layout', function() {
-      var groupBox = scout.create('GroupBox', {
+  describe('logical grid', () => {
+    it('is validated automatically by the logical grid layout', () => {
+      let groupBox = scout.create('GroupBox', {
         parent: session.desktop,
         gridColumnCount: 2,
         fields: [
@@ -263,8 +263,8 @@ describe('GroupBox', function() {
       expect(groupBox.fields[2].gridData.y).toBe(0);
     });
 
-    it('will get dirty if a field gets invisible', function() {
-      var groupBox = scout.create('GroupBox', {
+    it('will get dirty if a field gets invisible', () => {
+      let groupBox = scout.create('GroupBox', {
         parent: session.desktop,
         gridColumnCount: 2,
         fields: [
@@ -292,8 +292,8 @@ describe('GroupBox', function() {
       expect(groupBox.fields[1].gridData.y).toBe(0);
     });
 
-    it('may be specified using the object type', function() {
-      var groupBox = scout.create('GroupBox', {
+    it('may be specified using the object type', () => {
+      let groupBox = scout.create('GroupBox', {
         parent: session.desktop,
         logicalGrid: 'HorizontalGrid'
       });
@@ -312,16 +312,16 @@ describe('GroupBox', function() {
       expect(groupBox.logicalGrid instanceof HorizontalGrid).toBe(true);
     });
 
-    it('uses widthInPixel and heightInPixel as dialog width and height if set on main box', function(done) {
-      var $tmpStyle = $('<style type="text/css">.dialog { position: absolute; }</style>')
+    it('uses widthInPixel and heightInPixel as dialog width and height if set on main box', done => {
+      let $tmpStyle = $('<style type="text/css">.dialog { position: absolute; }</style>')
         .appendTo($('head'));
 
       // stub function because when running in phantom js the window has an unpredictable size, it seems to get smaller when adding new specs...
-      spyOn(DialogLayout, 'fitContainerInWindow').and.callFake(function(windowSize, containerPosition, containerSize, containerMargins) {
+      spyOn(DialogLayout, 'fitContainerInWindow').and.callFake((windowSize, containerPosition, containerSize, containerMargins) => {
         return containerSize;
       });
 
-      var form = scout.create('Form', {
+      let form = scout.create('Form', {
         parent: session.desktop,
         rootGroupBox: {
           objectType: 'GroupBox',
@@ -332,7 +332,7 @@ describe('GroupBox', function() {
         }
       });
       form.open()
-        .then(function() {
+        .then(() => {
           expect(form.rootGroupBox.$container.cssHeight()).toBe(30);
           expect(form.rootGroupBox.$container.cssWidth()).toBe(27);
           form.close();
@@ -343,16 +343,16 @@ describe('GroupBox', function() {
     });
   });
 
-  describe('scrollable', function() {
-    it('null by default', function() {
-      var groupBox = scout.create('GroupBox', {
+  describe('scrollable', () => {
+    it('null by default', () => {
+      let groupBox = scout.create('GroupBox', {
         parent: session.desktop
       });
       expect(groupBox.scrollable).toBe(null);
     });
 
-    it('is set to true if it is a mainbox', function() {
-      var groupBox = scout.create('GroupBox', {
+    it('is set to true if it is a mainbox', () => {
+      let groupBox = scout.create('GroupBox', {
         parent: session.desktop,
         mainBox: true
       });
@@ -367,8 +367,8 @@ describe('GroupBox', function() {
       expect(groupBox.scrollable).toBe(true);
     });
 
-    it('is not set to true if it is a mainbox but explicitly set to false', function() {
-      var groupBox = scout.create('GroupBox', {
+    it('is not set to true if it is a mainbox but explicitly set to false', () => {
+      let groupBox = scout.create('GroupBox', {
         parent: session.desktop,
         mainBox: true,
         scrollable: false
@@ -397,13 +397,13 @@ describe('GroupBox', function() {
     });
   });
 
-  describe('insertField', function() {
-    it('inserts the field at the given index', function() {
-      var groupBox = helper.createGroupBoxWithFields(session.desktop, 2);
+  describe('insertField', () => {
+    it('inserts the field at the given index', () => {
+      let groupBox = helper.createGroupBoxWithFields(session.desktop, 2);
       expect(groupBox.fields.length).toBe(2);
       expect(groupBox.controls.length).toBe(2);
 
-      var newField = scout.create('StringField', {parent: groupBox});
+      let newField = scout.create('StringField', {parent: groupBox});
       groupBox.insertField(newField, 1);
       expect(groupBox.fields.length).toBe(3);
       expect(groupBox.controls.length).toBe(3);
@@ -411,7 +411,7 @@ describe('GroupBox', function() {
       expect(groupBox.controls[1]).toBe(newField);
 
       // At the beginning
-      var newField2 = scout.create('StringField', {parent: groupBox});
+      let newField2 = scout.create('StringField', {parent: groupBox});
       groupBox.insertField(newField2, 0);
       expect(groupBox.fields.length).toBe(4);
       expect(groupBox.controls.length).toBe(4);
@@ -419,7 +419,7 @@ describe('GroupBox', function() {
       expect(groupBox.controls[0]).toBe(newField2);
 
       // At the end
-      var newField3 = scout.create('StringField', {parent: groupBox});
+      let newField3 = scout.create('StringField', {parent: groupBox});
       groupBox.insertField(newField3, 4);
       expect(groupBox.fields.length).toBe(5);
       expect(groupBox.controls.length).toBe(5);
@@ -427,12 +427,12 @@ describe('GroupBox', function() {
       expect(groupBox.controls[4]).toBe(newField3);
     });
 
-    it('inserts the field at the end if no index is provided', function() {
-      var groupBox = helper.createGroupBoxWithFields(session.desktop, 2);
+    it('inserts the field at the end if no index is provided', () => {
+      let groupBox = helper.createGroupBoxWithFields(session.desktop, 2);
       expect(groupBox.fields.length).toBe(2);
       expect(groupBox.controls.length).toBe(2);
 
-      var newField = scout.create('StringField', {parent: groupBox});
+      let newField = scout.create('StringField', {parent: groupBox});
       groupBox.insertField(newField);
       expect(groupBox.fields.length).toBe(3);
       expect(groupBox.controls.length).toBe(3);
@@ -441,14 +441,14 @@ describe('GroupBox', function() {
     });
   });
 
-  describe('insertBefore', function() {
-    it('inserts the field before the given other field', function() {
-      var groupBox = helper.createGroupBoxWithFields(session.desktop, 2);
+  describe('insertBefore', () => {
+    it('inserts the field before the given other field', () => {
+      let groupBox = helper.createGroupBoxWithFields(session.desktop, 2);
       expect(groupBox.fields.length).toBe(2);
       expect(groupBox.controls.length).toBe(2);
 
-      var newField = scout.create('StringField', {parent: groupBox});
-      var sibling = groupBox.fields[1];
+      let newField = scout.create('StringField', {parent: groupBox});
+      let sibling = groupBox.fields[1];
       groupBox.insertFieldBefore(newField, sibling);
       expect(groupBox.fields.length).toBe(3);
       expect(groupBox.controls.length).toBe(3);
@@ -458,7 +458,7 @@ describe('GroupBox', function() {
       expect(groupBox.controls[2]).toBe(sibling);
 
       // At the beginning
-      var newField2 = scout.create('StringField', {parent: groupBox});
+      let newField2 = scout.create('StringField', {parent: groupBox});
       sibling = groupBox.fields[0];
       groupBox.insertFieldBefore(newField2, sibling);
       expect(groupBox.fields.length).toBe(4);
@@ -470,14 +470,14 @@ describe('GroupBox', function() {
     });
   });
 
-  describe('insertAfter', function() {
-    it('inserts the field after the given other field', function() {
-      var groupBox = helper.createGroupBoxWithFields(session.desktop, 2);
+  describe('insertAfter', () => {
+    it('inserts the field after the given other field', () => {
+      let groupBox = helper.createGroupBoxWithFields(session.desktop, 2);
       expect(groupBox.fields.length).toBe(2);
       expect(groupBox.controls.length).toBe(2);
 
-      var newField = scout.create('StringField', {parent: groupBox});
-      var sibling = groupBox.fields[1];
+      let newField = scout.create('StringField', {parent: groupBox});
+      let sibling = groupBox.fields[1];
       groupBox.insertFieldAfter(newField, sibling);
       expect(groupBox.fields.length).toBe(3);
       expect(groupBox.controls.length).toBe(3);
@@ -487,7 +487,7 @@ describe('GroupBox', function() {
       expect(groupBox.controls[1]).toBe(sibling);
 
       // At the end
-      var newField3 = scout.create('StringField', {parent: groupBox});
+      let newField3 = scout.create('StringField', {parent: groupBox});
       sibling = groupBox.fields[2];
       groupBox.insertFieldAfter(newField, sibling);
       expect(groupBox.fields.length).toBe(4);

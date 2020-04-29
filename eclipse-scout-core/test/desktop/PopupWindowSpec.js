@@ -10,12 +10,12 @@
  */
 import {HtmlComponent, PopupWindow} from '../../src/index';
 
-describe('PopupWindow', function() {
-  var session, helper, $sandbox, origDevice, myForm, myWindow,
-    myErrorHandler = function() {
+describe('PopupWindow', () => {
+  let session, helper, $sandbox, origDevice, myForm, myWindow,
+    myErrorHandler = () => {
     };
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     $sandbox = $('#sandbox');
@@ -24,7 +24,7 @@ describe('PopupWindow', function() {
     myForm = {
       modelClass: 'Foo',
       session: session,
-      render: function() {
+      render: () => {
       },
       htmlComp: HtmlComponent.install($sandbox, session)
     };
@@ -37,27 +37,27 @@ describe('PopupWindow', function() {
     };
   });
 
-  afterEach(function() {
+  afterEach(() => {
   });
 
-  it('Constructor sets cross references and window-name', function() {
-    var popupWindow = new PopupWindow(myWindow, myForm);
+  it('Constructor sets cross references and window-name', () => {
+    let popupWindow = new PopupWindow(myWindow, myForm);
 
     expect(myWindow.popupWindow).toBe(popupWindow);
     expect(myWindow.name).toBe('Scout popup-window Foo');
     expect(myForm.popupWindow).toBe(popupWindow);
   });
 
-  it('Initialization in _onReady', function() {
-    var popupWindow = new PopupWindow(myWindow, myForm),
+  it('Initialization in _onReady', () => {
+    let popupWindow = new PopupWindow(myWindow, myForm),
       called = false;
 
-    popupWindow.one('init', function() {
+    popupWindow.one('init', () => {
       called = true;
     });
     expect(popupWindow.initialized).toBe(false);
     popupWindow._onReady();
-    popupWindow._onResize = function() {
+    popupWindow._onResize = () => {
       // Don't execute during spec
     };
     expect(called).toBe(true);

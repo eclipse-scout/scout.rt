@@ -10,17 +10,17 @@
  */
 import {Button, icons, scout} from '../../../../src/index';
 
-describe('Button', function() {
-  var session;
+describe('Button', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  describe('setLabel', function() {
-    it('toggles the class with-label on the icon', function() {
-      var button = scout.create('Button', {
+  describe('setLabel', () => {
+    it('toggles the class with-label on the icon', () => {
+      let button = scout.create('Button', {
         parent: session.desktop,
         label: 'label',
         iconId: icons.ANGLE_DOWN
@@ -36,9 +36,9 @@ describe('Button', function() {
     });
   });
 
-  describe('setIconId', function() {
-    it('toggles the class with-label on the icon', function() {
-      var button = scout.create('Button', {
+  describe('setIconId', () => {
+    it('toggles the class with-label on the icon', () => {
+      let button = scout.create('Button', {
         parent: session.desktop,
         label: 'label',
         iconId: icons.ANGLE_DOWN
@@ -54,9 +54,9 @@ describe('Button', function() {
     });
   });
 
-  describe('setting legacy styles', function() {
-    it('sets style attributes', function() {
-      var button = scout.create('Button', {
+  describe('setting legacy styles', () => {
+    it('sets style attributes', () => {
+      let button = scout.create('Button', {
         parent: session.desktop,
         label: 'label',
         foregroundColor: 'red',
@@ -121,9 +121,9 @@ describe('Button', function() {
     });
   });
 
-  describe('keyStrokeScope', function() {
-    it('may be an id of a form field and will be resolved when initialized', function() {
-      var form = scout.create('Form', {
+  describe('keyStrokeScope', () => {
+    it('may be an id of a form field and will be resolved when initialized', () => {
+      let form = scout.create('Form', {
         id: 'myForm',
         parent: session.desktop,
         rootGroupBox: {
@@ -137,12 +137,12 @@ describe('Button', function() {
           }]
         }
       });
-      var button = form.widget('myButton');
+      let button = form.widget('myButton');
       expect(button.keyStrokeScope).toBe(form.rootGroupBox);
     });
 
-    it('may be an an outer form', function() {
-      var form = scout.create('Form', {
+    it('may be an an outer form', () => {
+      let form = scout.create('Form', {
         parent: session.desktop,
         id: 'outerForm',
         rootGroupBox: {
@@ -165,19 +165,19 @@ describe('Button', function() {
           }]
         }
       });
-      var button = form.widget('myButton');
+      let button = form.widget('myButton');
       expect(button.keyStrokeScope).toBe(form);
     });
   });
 
-  describe('click event', function() {
+  describe('click event', () => {
 
-    it('is triggered when doAction is called', function() {
-      var button = scout.create('Button', {
+    it('is triggered when doAction is called', () => {
+      let button = scout.create('Button', {
         parent: session.desktop
       });
-      var executed = 0;
-      button.on('click', function(event) {
+      let executed = 0;
+      button.on('click', event => {
         executed++;
       });
 
@@ -186,14 +186,14 @@ describe('Button', function() {
       expect(executed).toBe(1);
     });
 
-    it('is fired when doAction is called even if it is a toggle button', function() {
-      var button = scout.create('Button', {
+    it('is fired when doAction is called even if it is a toggle button', () => {
+      let button = scout.create('Button', {
         parent: session.desktop,
         displayStyle: Button.DisplayStyle.TOGGLE
       });
-      var executed = 0;
-      var selected = null;
-      button.on('click', function(event) {
+      let executed = 0;
+      let selected = null;
+      button.on('click', event => {
         // State is already changed so that listener can react on new state
         selected = button.selected;
         executed++;

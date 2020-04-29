@@ -11,11 +11,11 @@
 import {LocaleSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
 import {DecimalFormat, scout} from '../../../src/index';
 
-describe('AggregateTableControl', function() {
-  var session;
-  var helper;
+describe('AggregateTableControl', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
@@ -26,7 +26,7 @@ describe('AggregateTableControl', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
@@ -34,7 +34,7 @@ describe('AggregateTableControl', function() {
   });
 
   function createAggregateTC(model) {
-    var defaults = {
+    let defaults = {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
@@ -48,20 +48,18 @@ describe('AggregateTableControl', function() {
   function createFilter(acceptFunc) {
     return {
       accept: acceptFunc,
-      createKey: function() {
+      createKey: () => {
         return 1; // dummy value
       },
-      createLabel: function() {
-        return '';
-      }
+      createLabel: () => ''
     };
   }
 
-  describe('aggregate', function() {
-    var model, table, column0, column1, column2, rows, tableControl;
+  describe('aggregate', () => {
+    let model, table, column0, column1, column2, rows, tableControl;
 
     function prepareTable() {
-      var columns = [helper.createModelColumn('col1'),
+      let columns = [helper.createModelColumn('col1'),
         helper.createModelColumn('col2', 'NumberColumn'),
         helper.createModelColumn('col3', 'NumberColumn')
       ];
@@ -82,22 +80,22 @@ describe('AggregateTableControl', function() {
       column2.setAggregationFunction('sum');
     }
 
-    it('creates an aggregate row', function() {
+    it('creates an aggregate row', () => {
       prepareTable();
       table.render();
 
       expect($aggregateRow(tableControl).length).toBe(1);
     });
 
-    it('sums up numbers in a number column', function() {
+    it('sums up numbers in a number column', () => {
       prepareTable();
       rows[0].cells[1].value = 1;
       rows[1].cells[1].value = 2;
       rows[2].cells[1].value = 3;
       table.render();
 
-      var $aggrRow = $aggregateRow(tableControl);
-      var $aggrCells = $aggrRow.children('.table-cell');
+      let $aggrRow = $aggregateRow(tableControl);
+      let $aggrCells = $aggrRow.children('.table-cell');
       $aggrCells.children('.table-cell-icon').remove();
       expect($aggrCells.eq(0).text()).toBe('\u00a0'); // nbsp
       expect($aggrCells.eq(1).text()).toBe('6');
@@ -129,7 +127,7 @@ describe('AggregateTableControl', function() {
       expect($aggrCells.eq(1).text()).toBe('0');
     });
 
-    it('aggregation type none does not aggregate', function() {
+    it('aggregation type none does not aggregate', () => {
       prepareTable();
       rows[0].cells[1].value = 1;
       rows[1].cells[1].value = 2;
@@ -137,13 +135,13 @@ describe('AggregateTableControl', function() {
       table.render();
       table.changeAggregation(table.columns[1], 'none');
 
-      var $aggrRow = $aggregateRow(tableControl);
-      var $aggrCells = $aggrRow.children('.table-cell');
+      let $aggrRow = $aggregateRow(tableControl);
+      let $aggrCells = $aggrRow.children('.table-cell');
       expect($aggrCells.eq(0).text()).toBe('\u00a0'); // nbsp
       expect($aggrCells.eq(1).text()).toBe('\u00a0'); // nbsp
     });
 
-    it('sums up numbers in a number column but only on filtered rows', function() {
+    it('sums up numbers in a number column but only on filtered rows', () => {
       prepareTable();
       rows[0].cells[1].value = 1;
       rows[1].cells[1].value = 2;
@@ -151,18 +149,18 @@ describe('AggregateTableControl', function() {
       table.render();
 
       table.addFilter(createFilter(
-        function(row) {
+        row => {
           return row.id !== table.rows[2].id;
         }));
       table.filter();
-      var $aggrRow = $aggregateRow(tableControl);
-      var $aggrCells = $aggrRow.children('.table-cell');
+      let $aggrRow = $aggregateRow(tableControl);
+      let $aggrCells = $aggrRow.children('.table-cell');
       $aggrCells.children('.table-cell-icon').remove();
       expect($aggrCells.eq(0).text()).toBe('\u00a0'); // nbsp
       expect($aggrCells.eq(1).text()).toBe('3');
     });
 
-    it('sums up numbers in a number column and considers format pattern', function() {
+    it('sums up numbers in a number column and considers format pattern', () => {
       prepareTable();
       rows[0].cells[1].value = 1000;
       rows[1].cells[1].value = 1000;
@@ -172,13 +170,13 @@ describe('AggregateTableControl', function() {
       });
       table.render();
 
-      var $aggrRow = $aggregateRow(tableControl);
-      var $aggrCell = $aggrRow.children('.table-cell').eq(1);
+      let $aggrRow = $aggregateRow(tableControl);
+      let $aggrCell = $aggrRow.children('.table-cell').eq(1);
       $aggrCell.children('.table-cell-icon').remove();
       expect($aggrCell.text()).toBe('4000.00');
     });
 
-    it('sums up numbers in a number column and considers rounded values fo aggregation', function() {
+    it('sums up numbers in a number column and considers rounded values fo aggregation', () => {
       prepareTable();
       rows[0].cells[1].value = 0.005;
       rows[1].cells[1].value = 0.006;
@@ -188,21 +186,21 @@ describe('AggregateTableControl', function() {
       });
       table.render();
 
-      var $aggrRow = $aggregateRow(tableControl);
-      var $aggrCell = $aggrRow.children('.table-cell').eq(1);
+      let $aggrRow = $aggregateRow(tableControl);
+      let $aggrCell = $aggrRow.children('.table-cell').eq(1);
       $aggrCell.children('.table-cell-icon').remove();
       expect($aggrCell.text()).toBe('.03');
     });
 
-    it('updates aggregation if a row is inserted', function() {
+    it('updates aggregation if a row is inserted', () => {
       prepareTable();
       rows[0].cells[1].value = 1;
       rows[1].cells[1].value = 2;
       rows[2].cells[1].value = 3;
       table.render();
 
-      var $aggrRow = $aggregateRow(tableControl);
-      var $aggrCells = $aggrRow.children('.table-cell');
+      let $aggrRow = $aggregateRow(tableControl);
+      let $aggrCells = $aggrRow.children('.table-cell');
       $aggrCells.children('.table-cell-icon').remove();
       expect($aggrCells.eq(1).text()).toBe('6');
 
@@ -213,15 +211,15 @@ describe('AggregateTableControl', function() {
       expect($aggrCells.eq(1).text()).toBe('11');
     });
 
-    it('updates aggregation if a row is updated', function() {
+    it('updates aggregation if a row is updated', () => {
       prepareTable();
       rows[0].cells[1].value = 1;
       rows[1].cells[1].value = 2;
       rows[2].cells[1].value = 3;
       table.render();
 
-      var $aggrRow = $aggregateRow(tableControl);
-      var $aggrCells = $aggrRow.children('.table-cell');
+      let $aggrRow = $aggregateRow(tableControl);
+      let $aggrCells = $aggrRow.children('.table-cell');
       $aggrCells.children('.table-cell-icon').remove();
       expect($aggrCells.eq(1).text()).toBe('6');
 
@@ -232,15 +230,15 @@ describe('AggregateTableControl', function() {
       expect($aggrCells.eq(1).text()).toBe('8');
     });
 
-    it('updates aggregation if a row is deleted', function() {
+    it('updates aggregation if a row is deleted', () => {
       prepareTable();
       rows[0].cells[1].value = 1;
       rows[1].cells[1].value = 2;
       rows[2].cells[1].value = 3;
       table.render();
 
-      var $aggrRow = $aggregateRow(tableControl);
-      var $aggrCells = $aggrRow.children('.table-cell');
+      let $aggrRow = $aggregateRow(tableControl);
+      let $aggrCells = $aggrRow.children('.table-cell');
       $aggrCells.children('.table-cell-icon').remove();
       expect($aggrCells.eq(1).text()).toBe('6');
 
@@ -251,7 +249,7 @@ describe('AggregateTableControl', function() {
       expect($aggrCells.eq(1).text()).toBe('5');
     });
 
-    it('does not apply background effect', function() {
+    it('does not apply background effect', () => {
       prepareTable();
       rows[0].cells[1].value = 1;
       rows[1].cells[1].value = 2;
@@ -259,18 +257,18 @@ describe('AggregateTableControl', function() {
       table.setColumnBackgroundEffect(column1, 'colorGradient1');
       table.render();
 
-      var $aggrRow = $aggregateRow(tableControl);
-      var $aggrCells = $aggrRow.children('.table-cell');
+      let $aggrRow = $aggregateRow(tableControl);
+      let $aggrCells = $aggrRow.children('.table-cell');
       expect(table.$cell(column1, table.$rows().eq(0)).attr('style').indexOf('background-color') > -1).toBe(true); // Real cell must have background effect
       expect($aggrCells.eq(0).attr('style').indexOf('background-color') > -1).toBe(false); // Aggregate cell must not have background effect
     });
   });
 
-  describe('eanbled state', function() {
-    var rows, model, table, tableControl;
+  describe('eanbled state', () => {
+    let rows, model, table, tableControl;
 
     function prepareTable() {
-      var columns = [helper.createModelColumn('col1'),
+      let columns = [helper.createModelColumn('col1'),
         helper.createModelColumn('col2')
       ];
       rows = helper.createModelRows(2, 3);
@@ -278,7 +276,7 @@ describe('AggregateTableControl', function() {
       table = helper.createTable(model);
     }
 
-    it('is false if there are no number columns', function() {
+    it('is false if there are no number columns', () => {
       prepareTable();
       tableControl = createAggregateTC({
         enabled: true,
@@ -292,8 +290,8 @@ describe('AggregateTableControl', function() {
       expect(tableControl.selected).toBe(false);
     });
 
-    it('is true if there is at least one number column', function() {
-      var columns = [
+    it('is true if there is at least one number column', () => {
+      let columns = [
         helper.createModelColumn('col1'),
         helper.createModelColumn('col2', 'NumberColumn')
       ];
@@ -314,8 +312,8 @@ describe('AggregateTableControl', function() {
       expect(tableControl.selected).toBe(true);
     });
 
-    it('is false if there is a number column but without an aggregate function', function() {
-      var columns = [
+    it('is false if there is a number column but without an aggregate function', () => {
+      let columns = [
         helper.createModelColumn('col1'),
         helper.createModelColumn('col2', 'NumberColumn')
       ];
@@ -338,21 +336,21 @@ describe('AggregateTableControl', function() {
 
   });
 
-  describe('selected state', function() {
-    var table;
+  describe('selected state', () => {
+    let table;
 
     function prepareTable() {
-      var columns = [helper.createModelColumn('col1'),
+      let columns = [helper.createModelColumn('col1'),
         helper.createModelColumn('col2')
       ];
-      var rows = helper.createModelRows(2, 3);
-      var model = helper.createModel(columns, rows);
+      let rows = helper.createModelRows(2, 3);
+      let model = helper.createModel(columns, rows);
       table = helper.createTable(model);
     }
 
-    it('is false if control is not enabled initially', function() {
+    it('is false if control is not enabled initially', () => {
       prepareTable();
-      var tableControl = createAggregateTC({
+      let tableControl = createAggregateTC({
         enabled: false,
         selected: true,
         table: table
@@ -363,9 +361,9 @@ describe('AggregateTableControl', function() {
       expect(tableControl.selected).toBe(false);
     });
 
-    it('is set to false if control will be disabled', function() {
+    it('is set to false if control will be disabled', () => {
       prepareTable();
-      var tableControl = createAggregateTC({
+      let tableControl = createAggregateTC({
         enabled: false,
         selected: true,
         table: table

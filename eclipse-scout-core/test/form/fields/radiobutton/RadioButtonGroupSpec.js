@@ -11,18 +11,18 @@
 import {RadioButtonGroup, scout} from '../../../../src/index';
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('RadioButtonGroup', function() {
-  var session;
-  var helper;
+describe('RadioButtonGroup', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
@@ -34,10 +34,10 @@ describe('RadioButtonGroup', function() {
     }
   }
 
-  describe('gridColumnCount', function() {
-    it('calculates column count correctly', function() {
-      var numButtons = 3;
-      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, numButtons);
+  describe('gridColumnCount', () => {
+    it('calculates column count correctly', () => {
+      let numButtons = 3;
+      let radioButtonGroup = helper.createRadioButtonGroup(session.desktop, numButtons);
       radioButtonGroup.render();
 
       expect(radioButtonGroup.gridColumnCount).toBe(numButtons);
@@ -65,9 +65,9 @@ describe('RadioButtonGroup', function() {
     });
   });
 
-  describe('enabled', function() {
-    it('propagation', function() {
-      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+  describe('enabled', () => {
+    it('propagation', () => {
+      let radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
       radioButtonGroup.render();
 
       expectEnabled(radioButtonGroup, true, true);
@@ -81,9 +81,9 @@ describe('RadioButtonGroup', function() {
     });
   });
 
-  describe('init', function() {
-    it('sets the value if it is provided', function() {
-      var radioButtonGroup = scout.create('RadioButtonGroup', {
+  describe('init', () => {
+    it('sets the value if it is provided', () => {
+      let radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         value: 1,
         fields: [{
@@ -100,8 +100,8 @@ describe('RadioButtonGroup', function() {
       expect(radioButtonGroup.radioButtons[1].selected).toBe(true);
     });
 
-    it('selects the correct button if it is selected', function() {
-      var radioButtonGroup = scout.create('RadioButtonGroup', {
+    it('selects the correct button if it is selected', () => {
+      let radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         fields: [{
           objectType: 'RadioButton'
@@ -117,8 +117,8 @@ describe('RadioButtonGroup', function() {
       expect(radioButtonGroup.radioButtons[1].selected).toBe(true);
     });
 
-    it('syncs this.radioButtons with this.fields', function() {
-      var radioButtonGroup = scout.create('RadioButtonGroup', {
+    it('syncs this.radioButtons with this.fields', () => {
+      let radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         fields: [{
           objectType: 'RadioButton'
@@ -135,21 +135,21 @@ describe('RadioButtonGroup', function() {
     });
   });
 
-  describe('lookupCall', function() {
+  describe('lookupCall', () => {
 
-    it('can be prepared with initial value', function(done) {
-      var group = scout.create('RadioButtonGroup', {
+    it('can be prepared with initial value', done => {
+      let group = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall',
         value: 2
       });
 
-      var lookupPrepared = group.when('prepareLookupCall');
-      var lookupDone = group.when('lookupCallDone');
+      let lookupPrepared = group.when('prepareLookupCall');
+      let lookupDone = group.when('lookupCallDone');
       group.render(); // triggers the execution of the lookup call
       jasmine.clock().tick(500);
 
-      $.promiseAll([lookupPrepared, lookupDone]).then(function(event) {
+      $.promiseAll([lookupPrepared, lookupDone]).then(event => {
         expect(event.lookupCall.objectType).toBe('DummyLookupCall');
         expect(group.radioButtons.length).toBe(3);
       })
@@ -158,18 +158,18 @@ describe('RadioButtonGroup', function() {
       jasmine.clock().tick(500);
     });
 
-    it('can be prepared with explicit value', function(done) {
-      var group = scout.create('RadioButtonGroup', {
+    it('can be prepared with explicit value', done => {
+      let group = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
       });
 
-      var lookupPrepared = group.when('prepareLookupCall');
-      var lookupDone = group.when('lookupCallDone');
+      let lookupPrepared = group.when('prepareLookupCall');
+      let lookupDone = group.when('lookupCallDone');
       group.setValue(2);
       jasmine.clock().tick(500);
 
-      $.promiseAll([lookupPrepared, lookupDone]).then(function(event) {
+      $.promiseAll([lookupPrepared, lookupDone]).then(event => {
         expect(event.lookupCall.objectType).toBe('DummyLookupCall');
         expect(group.radioButtons.length).toBe(3);
       })
@@ -178,8 +178,8 @@ describe('RadioButtonGroup', function() {
       jasmine.clock().tick(500);
     });
 
-    it('creates a radio button for each lookup row', function() {
-      var radioButtonGroup = scout.create('RadioButtonGroup', {
+    it('creates a radio button for each lookup row', () => {
+      let radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
       });
@@ -190,8 +190,8 @@ describe('RadioButtonGroup', function() {
       expect(radioButtonGroup.errorStatus).toBe(null);
     });
 
-    it('selects correct radio button', function() {
-      var radioButtonGroup = scout.create('RadioButtonGroup', {
+    it('selects correct radio button', () => {
+      let radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall',
         value: 1
@@ -217,8 +217,8 @@ describe('RadioButtonGroup', function() {
       expect(radioButtonGroup.value).toBe(2);
     });
 
-    it('lookupRow lives on the radioButton', function() {
-      var radioButtonGroup = scout.create('RadioButtonGroup', {
+    it('lookupRow lives on the radioButton', () => {
+      let radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
       });
@@ -234,9 +234,9 @@ describe('RadioButtonGroup', function() {
 
   });
 
-  describe('setValue', function() {
-    it('updates the currently selected button', function() {
-      var radioButtonGroup = scout.create('RadioButtonGroup', {
+  describe('setValue', () => {
+    it('updates the currently selected button', () => {
+      let radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         fields: [{
           objectType: 'RadioButton',
@@ -265,8 +265,8 @@ describe('RadioButtonGroup', function() {
       expect(radioButtonGroup.value).toBe(0);
     });
 
-    it('does nothing if radio buttons have no radioValue', function() {
-      var radioButtonGroup = scout.create('RadioButtonGroup', {
+    it('does nothing if radio buttons have no radioValue', () => {
+      let radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         fields: [{
           objectType: 'RadioButton'
@@ -288,8 +288,8 @@ describe('RadioButtonGroup', function() {
       expect(radioButtonGroup.selectedButton).toBe(radioButtonGroup.radioButtons[1]);
     });
 
-    it('unselects every button when setting it to null', function() {
-      var radioButtonGroup = scout.create('RadioButtonGroup', {
+    it('unselects every button when setting it to null', () => {
+      let radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         fields: [{
           objectType: 'RadioButton',
@@ -313,9 +313,9 @@ describe('RadioButtonGroup', function() {
     });
   });
 
-  describe('label', function() {
-    it('is linked with the buttons', function() {
-      var group = helper.createRadioButtonGroup(session.desktop, 2);
+  describe('label', () => {
+    it('is linked with the buttons', () => {
+      let group = helper.createRadioButtonGroup(session.desktop, 2);
       group.setLabel('label');
       group.radioButtons[0].setLabel('label 0');
       group.radioButtons[1].setLabel('label 1');
@@ -327,9 +327,9 @@ describe('RadioButtonGroup', function() {
     });
   });
 
-  describe('selectButton', function() {
-    it('selects the new button and unselects the old one', function() {
-      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+  describe('selectButton', () => {
+    it('selects the new button and unselects the old one', () => {
+      let radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
       radioButtonGroup.render();
 
       radioButtonGroup.selectButton(radioButtonGroup.radioButtons[0]);
@@ -343,8 +343,8 @@ describe('RadioButtonGroup', function() {
       expect(radioButtonGroup.radioButtons[1].selected).toBe(true);
     });
 
-    it('makes only the new button tabbable', function() {
-      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+    it('makes only the new button tabbable', () => {
+      let radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
       radioButtonGroup.render();
 
       radioButtonGroup.selectButton(radioButtonGroup.radioButtons[0]);
@@ -358,8 +358,8 @@ describe('RadioButtonGroup', function() {
       expect(radioButtonGroup.radioButtons[1].isTabbable()).toBe(true);
     });
 
-    it('does not remove the tabindex if the button is deselected', function() {
-      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+    it('does not remove the tabindex if the button is deselected', () => {
+      let radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
       radioButtonGroup.render();
 
       radioButtonGroup.selectButton(radioButtonGroup.radioButtons[0]);
@@ -377,8 +377,8 @@ describe('RadioButtonGroup', function() {
       expect(radioButtonGroup.radioButtons[1].selected).toBe(false);
     });
 
-    it('focuses the new button if the old button had the focus', function() {
-      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+    it('focuses the new button if the old button had the focus', () => {
+      let radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
       radioButtonGroup.render();
       radioButtonGroup.selectButton(radioButtonGroup.radioButtons[0]);
 
@@ -394,8 +394,8 @@ describe('RadioButtonGroup', function() {
       expect(radioButtonGroup.radioButtons[0].isFocused()).toBe(true);
     });
 
-    it('is called when setting the button directly', function() {
-      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+    it('is called when setting the button directly', () => {
+      let radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
       radioButtonGroup.render();
 
       radioButtonGroup.radioButtons[0].setSelected(true);
@@ -409,12 +409,12 @@ describe('RadioButtonGroup', function() {
       expect(radioButtonGroup.radioButtons[1].selected).toBe(true);
     });
 
-    it('triggers a property change event', function() {
-      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+    it('triggers a property change event', () => {
+      let radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
       radioButtonGroup.render();
-      var triggeredEvent = null;
-      var eventCount = 0;
-      radioButtonGroup.on('propertyChange', function(event) {
+      let triggeredEvent = null;
+      let eventCount = 0;
+      radioButtonGroup.on('propertyChange', event => {
         if (event.propertyName === 'selectedButton') {
           triggeredEvent = event;
           eventCount++;
@@ -435,8 +435,8 @@ describe('RadioButtonGroup', function() {
       expect(eventCount).toBe(2);
     });
 
-    it('makes sure only one button is selected even if multiple buttons are selected during init', function() {
-      var radioButtonGroup = scout.create('RadioButtonGroup', {
+    it('makes sure only one button is selected even if multiple buttons are selected during init', () => {
+      let radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         fields: [{
           objectType: 'RadioButton',
@@ -453,13 +453,13 @@ describe('RadioButtonGroup', function() {
     });
   });
 
-  describe('insertButton', function() {
-    it('inserts the button at the end', function() {
-      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+  describe('insertButton', () => {
+    it('inserts the button at the end', () => {
+      let radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
       expect(radioButtonGroup.fields.length).toBe(2);
       expect(radioButtonGroup.radioButtons.length).toBe(2);
 
-      var button = scout.create('RadioButton', {
+      let button = scout.create('RadioButton', {
         parent: radioButtonGroup,
         selected: true
       });
@@ -470,7 +470,7 @@ describe('RadioButtonGroup', function() {
       expect(radioButtonGroup.radioButtons[2]).toBe(button);
       expect(radioButtonGroup.selectedButton).toBe(button);
 
-      var button2 = scout.create('RadioButton', {
+      let button2 = scout.create('RadioButton', {
         parent: radioButtonGroup,
         selected: true
       });
@@ -483,9 +483,9 @@ describe('RadioButtonGroup', function() {
     });
   });
 
-  describe('focus', function() {
-    it('focuses the selected button', function() {
-      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+  describe('focus', () => {
+    it('focuses the selected button', () => {
+      let radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
       radioButtonGroup.render();
       radioButtonGroup.selectButton(radioButtonGroup.radioButtons[1]);
       expect(radioButtonGroup.radioButtons[1].$field).not.toBeFocused();
@@ -494,8 +494,8 @@ describe('RadioButtonGroup', function() {
       expect(radioButtonGroup.radioButtons[1].$field).toBeFocused();
     });
 
-    it('focuses the first button if no button is selected', function() {
-      var radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
+    it('focuses the first button if no button is selected', () => {
+      let radioButtonGroup = helper.createRadioButtonGroup(session.desktop, 2);
       radioButtonGroup.render();
       expect(radioButtonGroup.selectedButton).toBe(null);
       expect(radioButtonGroup.radioButtons[0].$field).not.toBeFocused();

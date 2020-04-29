@@ -62,7 +62,7 @@ export default class TileTableField extends TableField {
   }
 
   _onTableBlur(event) {
-    var popup = $('.popup').data('widget');
+    let popup = $('.popup').data('widget');
 
     // hide menu bar if context menu popup is not attached to TileTableField
     if (!this.has(popup)) {

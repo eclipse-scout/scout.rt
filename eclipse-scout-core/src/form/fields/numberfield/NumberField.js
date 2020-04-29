@@ -49,7 +49,7 @@ export default class NumberField extends BasicField {
     this.addContainer(this.$parent, 'number-field');
     this.addLabel();
     this.addMandatoryIndicator();
-    var $field = fields.makeTextField(this.$parent);
+    let $field = fields.makeTextField(this.$parent);
     this.addField($field);
     this.addStatus();
   }
@@ -106,7 +106,7 @@ export default class NumberField extends BasicField {
     // if only math symbols are in the input string...
     if (this.calc.isFormula(normalizedNumberString)) {
       // ...evaluate and return. If the display text changed, ValueField.js will make sure, the new display text is sent to the model.
-      var calculated = this.calc.evalFormula(normalizedNumberString);
+      let calculated = this.calc.evalFormula(normalizedNumberString);
       if (isNaN(calculated)) {
         // catch input that is not a valid expression (although it looks like one, e.g. "1.2.3")
         throw new Error(normalizedNumberString + ' is not a valid expression');

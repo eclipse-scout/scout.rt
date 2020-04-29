@@ -35,7 +35,7 @@ export default class CompositeField extends FormField {
    * @override FormField.js
    */
   visitFields(visitor) {
-    var treeVisitResult = super.visitFields(visitor);
+    let treeVisitResult = super.visitFields(visitor);
     if (treeVisitResult === TreeVisitResult.TERMINATE) {
       return TreeVisitResult.TERMINATE;
     }
@@ -44,9 +44,9 @@ export default class CompositeField extends FormField {
       return TreeVisitResult.CONTINUE;
     }
 
-    var fields = this.getFields();
-    for (var i = 0; i < fields.length; i++) {
-      var field = fields[i];
+    let fields = this.getFields();
+    for (let i = 0; i < fields.length; i++) {
+      let field = fields[i];
       treeVisitResult = field.visitFields(visitor);
       if (treeVisitResult === TreeVisitResult.TERMINATE) {
         return TreeVisitResult.TERMINATE;
@@ -59,7 +59,7 @@ export default class CompositeField extends FormField {
    * @override FormField.js
    */
   setFieldStyle(fieldStyle) {
-    this.getFields().forEach(function(field) {
+    this.getFields().forEach(field => {
       field.setFieldStyle(fieldStyle);
     });
     super.setFieldStyle(fieldStyle);
@@ -76,7 +76,7 @@ export default class CompositeField extends FormField {
    * @override
    */
   getFocusableElement() {
-    var field = widgets.findFirstFocusableWidget(this.getFields(), this);
+    let field = widgets.findFirstFocusableWidget(this.getFields(), this);
     if (field) {
       return field.getFocusableElement();
     }

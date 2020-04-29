@@ -19,7 +19,7 @@ export default class PageLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var containerSize, detailMenuBarSize,
+    let containerSize, detailMenuBarSize,
       htmlContainer = this.page.htmlComp,
       $text = this.page.$text,
       $icon = this.page.$icon(),
@@ -64,7 +64,7 @@ export default class PageLayout extends AbstractLayout {
   }
 
   preferredLayoutSize($container) {
-    var prefSize, containerSize, textHeight,
+    let prefSize, containerSize, textHeight,
       iconHeight = 0,
       htmlContainer = this.page.htmlComp,
       detailContentPrefSize = new Dimension(),

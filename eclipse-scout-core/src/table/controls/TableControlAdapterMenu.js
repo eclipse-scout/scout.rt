@@ -50,10 +50,10 @@ export default class TableControlAdapterMenu extends FormMenu {
 
   _onTableControlPropertyChange(event) {
     // Whenever a tableControl property changes, apply the changes to the menu
-    var changedProperties = {};
+    let changedProperties = {};
     changedProperties[event.propertyName] = event.newValue;
     changedProperties = TableControlAdapterMenu.adaptTableControlProperties(changedProperties);
-    for (var prop in changedProperties) { // NOSONAR
+    for (let prop in changedProperties) { // NOSONAR
       // Set the property (don't use callSetter because this may delegate to the table control)
       this.setProperty(prop, changedProperties[prop]);
     }
@@ -87,13 +87,13 @@ export default class TableControlAdapterMenu extends FormMenu {
     menuProperties = menuProperties || {};
 
     // Plain properties: simply copy, no translation required
-    ['text', 'iconId', 'enabled', 'visible', 'selected', 'tooltipText', 'keyStroke', 'keyStrokes', 'modelClass', 'classId', 'form'].forEach(function(prop) {
+    ['text', 'iconId', 'enabled', 'visible', 'selected', 'tooltipText', 'keyStroke', 'keyStrokes', 'modelClass', 'classId', 'form'].forEach(prop => {
       menuProperties[prop] = tableControlProperties[prop];
     });
 
     // Cleanup: Remove all properties that have value 'undefined' from the result object,
     // otherwise, they would be applied to the model adapter.
-    for (var prop in menuProperties) {
+    for (let prop in menuProperties) {
       if (menuProperties[prop] === undefined) {
         delete menuProperties[prop];
       }

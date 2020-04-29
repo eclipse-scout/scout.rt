@@ -42,7 +42,7 @@ export default class IconColumn extends Column {
    * @override
    */
   _cellCssClass(cell, tableNode) {
-    var cssClass = super._cellCssClass(cell, tableNode);
+    let cssClass = super._cellCssClass(cell, tableNode);
     cssClass += ' table-icon-cell';
     return cssClass;
   }
@@ -51,12 +51,12 @@ export default class IconColumn extends Column {
    * @override
    */
   cellTextForGrouping(row) {
-    var cell = this.table.cell(this, row);
+    let cell = this.table.cell(this, row);
     return cell.value;
   }
 
   createAggrGroupCell(row) {
-    var cell = super.createAggrGroupCell(row);
+    let cell = super.createAggrGroupCell(row);
     // Make sure only icon and no text is displayed
     cell.text = null;
     return cell;

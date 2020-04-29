@@ -141,7 +141,7 @@ export default class Outline extends Tree {
    * @override Tree.js
    */
   _createTreeNode(nodeModel) {
-    var model = $.extend({
+    let model = $.extend({
       objectType: 'Page'
     }, nodeModel);
     return this._createChild(model);
@@ -164,7 +164,7 @@ export default class Outline extends Tree {
    * @override Tree.js
    */
   _initTreeKeyStrokeContext() {
-    var modifierBitMask = keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT; // NOSONAR
+    let modifierBitMask = keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT; // NOSONAR
 
     this.keyStrokeContext.registerKeyStroke([
       new TreeNavigationUpKeyStroke(this, modifierBitMask),
@@ -335,14 +335,14 @@ export default class Outline extends Tree {
 
     // Mark form as detail form
     node.detailForm.detailForm = true;
-    node.detailForm.one('destroy', function() {
+    node.detailForm.one('destroy', () => {
       // Unlink detail form if it was closed. May happen in the following case:
       // The form gets closed on execPageDeactivated. No pageChanged event will
       // be fired because the deactivated page is not selected anymore.
       node.detailForm = null;
       // Also make sure other objects hold no reference to a destroyed form (e.g. bench)
       this._triggerPageChanged(node);
-    }.bind(this));
+    });
   }
 
   /**
@@ -362,9 +362,9 @@ export default class Outline extends Tree {
   // with the default keyStrokeContext which is already created when the CTOR
   // of Widget runs.
   _createNavigateButtons(node, parent) {
-    var menus = arrays.ensure(parent.staticMenus);
+    let menus = arrays.ensure(parent.staticMenus);
     if (!this._hasMenu(menus, NavigateUpButton)) {
-      var upButton = scout.create('NavigateUpButton', {
+      let upButton = scout.create('NavigateUpButton', {
         parent: parent,
         altKeyStrokeContext: parent.keyStrokeContext,
         outline: this,
@@ -373,7 +373,7 @@ export default class Outline extends Tree {
       menus.push(upButton);
     }
     if (!this._hasMenu(menus, NavigateDownButton)) {
-      var downButton = scout.create('NavigateDownButton', {
+      let downButton = scout.create('NavigateDownButton', {
         parent: parent,
         altKeyStrokeContext: parent.keyStrokeContext,
         outline: this,
@@ -385,7 +385,7 @@ export default class Outline extends Tree {
   }
 
   _getMenu(menus, menuClass) {
-    for (var i = 0; i < menus.length; i++) {
+    for (let i = 0; i < menus.length; i++) {
       if (menus[i] instanceof menuClass) {
         return menus[i];
       }
@@ -412,11 +412,11 @@ export default class Outline extends Tree {
   }
 
   handleInitialExpanded() {
-    this.visitNodes(function(node) {
+    this.visitNodes(node => {
       this.setNodeExpanded(node, node.initialExpanded, {
         renderExpansion: true
       });
-    }.bind(this));
+    });
   }
 
   _onNodeDeleted(node) {
@@ -464,7 +464,7 @@ export default class Outline extends Tree {
    * @override
    */
   _nodesSelectedInternal() {
-    var activePage = this.activePage();
+    let activePage = this.activePage();
     // This block here is similar to what's done in Java's DefaultPageChangeStrategy
     if (activePage) {
       activePage.activate();
@@ -575,24 +575,24 @@ export default class Outline extends Tree {
   }
 
   _appendNavigateButtonsForDetailForm(node) {
-    var menus = this._createNavigateButtons(node, node.detailForm.rootGroupBox);
+    let menus = this._createNavigateButtons(node, node.detailForm.rootGroupBox);
     node.detailForm.rootGroupBox.setStaticMenus(menus);
   }
 
   _appendNavigateButtonsForDetailTable(node) {
-    var menus = this._createNavigateButtons(node, node.detailTable);
+    let menus = this._createNavigateButtons(node, node.detailTable);
     node.detailTable.setStaticMenus(menus);
   }
 
   _removeNavigateButtonsForDetailForm(node) {
-    var staticMenus = node.detailForm.rootGroupBox.staticMenus.filter(function(menu) {
+    let staticMenus = node.detailForm.rootGroupBox.staticMenus.filter(menu => {
       return !(menu instanceof NavigateButton);
     });
     node.detailForm.rootGroupBox.setStaticMenus(staticMenus);
   }
 
   _removeNavigateButtonsForDetailTable(node) {
-    var staticMenus = node.detailTable.staticMenus.filter(function(menu) {
+    let staticMenus = node.detailTable.staticMenus.filter(menu => {
       return !(menu instanceof NavigateButton);
     });
     node.detailTable.setStaticMenus(staticMenus);
@@ -603,7 +603,7 @@ export default class Outline extends Tree {
    *    the first selected row is returned.
    */
   selectedRow() {
-    var node = this.selectedNode();
+    let node = this.selectedNode();
     if (!node || !node.detailTable) {
       return null;
     }
@@ -673,7 +673,7 @@ export default class Outline extends Tree {
     if (!this.detailContent || this.detailContent.rendered) {
       return;
     }
-    var page = this.selectedNode();
+    let page = this.selectedNode();
     if (!page.rendered) {
       return;
     }
@@ -785,7 +785,7 @@ export default class Outline extends Tree {
   }
 
   _computeDetailContent() {
-    var selectedPage = this.selectedNode();
+    let selectedPage = this.selectedNode();
     if (!selectedPage) {
       // Detail content is shown for the selected node only
       return null;
@@ -823,7 +823,7 @@ export default class Outline extends Tree {
     if (!this.embedDetailContent) {
       return;
     }
-    var selectedPages = this.selectedNodes,
+    let selectedPages = this.selectedNodes,
       selectedPage = selectedPages[0],
       menuItems = [],
       tableControls = [],
@@ -833,7 +833,7 @@ export default class Outline extends Tree {
 
     if (this.detailContent && this.detailContent instanceof Form) {
       // get menus from detail form
-      var rootGroupBox = this.detailContent.rootGroupBox;
+      let rootGroupBox = this.detailContent.rootGroupBox;
       menuItems = rootGroupBox.processMenus.concat(rootGroupBox.menus);
       rootGroupBox.setMenuBarVisible(false);
       this._attachDetailMenusListener(rootGroupBox);
@@ -847,7 +847,7 @@ export default class Outline extends Tree {
         this._attachDetailMenusListener(detailTable);
       }
       // get single selection menus from parent detail table
-      var parentPage = selectedPage.parentNode;
+      let parentPage = selectedPage.parentNode;
       if (parentPage && parentPage.detailTable) {
         detailTable = parentPage.detailTable;
         menuItems = menuItems.concat(menus_1.filter(detailTable.menus, ['Table.SingleSelection'], false, true));
@@ -858,7 +858,7 @@ export default class Outline extends Tree {
 
     // Add table controls to nodeMenus
     tableControls.forEach(function(tableControl) {
-      var menu = scout.create('TableControlAdapterMenu',
+      let menu = scout.create('TableControlAdapterMenu',
         TableControlAdapterMenu.adaptTableControlProperties(tableControl, {
           parent: this,
           tableControl: tableControl,
@@ -868,7 +868,7 @@ export default class Outline extends Tree {
     }, this);
 
     // Add right aligned menus to node menus, other to detail menus
-    menuItems.forEach(function(menuItem) {
+    menuItems.forEach(menuItem => {
       if (menuItem.horizontalAlignment === 1) {
         nodeMenus.push(menuItem);
       } else {
@@ -955,7 +955,7 @@ export default class Outline extends Tree {
     if (this.detailMenuBar.rendered) {
       return;
     }
-    var node = this.selectedNode();
+    let node = this.selectedNode();
     if (!node || !node.rendered) {
       return;
     }
@@ -1001,12 +1001,12 @@ export default class Outline extends Tree {
     if (this.nodeMenuBar.rendered) {
       return;
     }
-    var node = this.selectedNode();
+    let node = this.selectedNode();
     if (!node || !node.rendered) {
       return;
     }
 
-    var $text = node.$text;
+    let $text = node.$text;
     this.nodeMenuBar.render(node.$node);
     this.nodeMenuBar.$container.addClass('node-menubar');
     this.nodeMenuBar.$container.insertAfter($text);
@@ -1032,8 +1032,8 @@ export default class Outline extends Tree {
   }
 
   _glassPaneTargets(element) {
-    var desktop = this.session.desktop;
-    var $elements = [];
+    let desktop = this.session.desktop;
+    let $elements = [];
     if (desktop.navigation) {
       $elements.push(desktop.navigation.$body);
     }
@@ -1047,7 +1047,7 @@ export default class Outline extends Tree {
   }
 
   _getBenchGlassPaneTargetsForView(view) {
-    var $glassPanes = [];
+    let $glassPanes = [];
     $glassPanes = $glassPanes.concat(this._getTabGlassPaneTargetsForView(view, this.session.desktop.header));
     this.session.desktop.bench.visibleTabBoxes().forEach(function(tabBox) {
       if (tabBox.hasView(view)) {
@@ -1060,8 +1060,8 @@ export default class Outline extends Tree {
   }
 
   _getTabGlassPaneTargetsForView(view, tabBox) {
-    var $glassPanes = [];
-    tabBox.tabArea.tabs.forEach(function(tab) {
+    let $glassPanes = [];
+    tabBox.tabArea.tabs.forEach(tab => {
       if (tab.view !== view && tab.view.displayParent === this) {
         $glassPanes.push(tab.$container);
         // Workaround for javascript not being able to prevent hover event propagation:
@@ -1069,12 +1069,12 @@ export default class Outline extends Tree {
         // of the glass pane. Under these circumstances, the hover style isn't be prevented by the glass pane.
         tab.$container.addClass('no-hover');
       }
-    }.bind(this));
+    });
     return $glassPanes;
   }
 
   _onGlassPaneMouseDown(glassPaneOwner, $glassPane) {
-    var desktop = this.session.desktop;
+    let desktop = this.session.desktop;
     if (desktop.navigation) {
       if ($glassPane.parent()[0] === desktop.navigation.$body[0]) {
         desktop.bringOutlineToFront();
@@ -1109,7 +1109,7 @@ export default class Outline extends Tree {
 
   // see Java: AbstractOutline#makeActivePageToContextPage
   activateCurrentPage() {
-    var activePage = this.activePage();
+    let activePage = this.activePage();
     if (activePage) {
       activePage.activate();
     }
@@ -1121,9 +1121,9 @@ export default class Outline extends Tree {
 
   _setViews(views) {
     if (views) {
-      views.forEach(function(view) {
+      views.forEach(view => {
         view.setDisplayParent(this);
-      }.bind(this));
+      });
     }
     this._setProperty('views', views);
   }
@@ -1132,11 +1132,11 @@ export default class Outline extends Tree {
    * @override Tree.js (don't call parent)
    */
   _setMenus(menus) {
-    var oldMenus = this.menus;
+    let oldMenus = this.menus;
     this.updateKeyStrokes(menus, oldMenus);
     this._setProperty('menus', menus);
     if (this.titleMenuBar) { // _setMenus is called by parent class Tree.js, at this time titleMenuBar is not yet initialized
-      var menuItems = menus_1.filter(this.menus, ['Tree.Header']);
+      let menuItems = menus_1.filter(this.menus, ['Tree.Header']);
       this.titleMenuBar.setMenuItems(menuItems);
     }
   }
@@ -1158,7 +1158,7 @@ export default class Outline extends Tree {
       this._initDetailTableAndForm(page);
     }
 
-    var selectedPage = this.selectedNode();
+    let selectedPage = this.selectedNode();
     if (!page && !selectedPage || page === selectedPage) {
       this.updateDetailContent();
     }

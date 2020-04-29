@@ -65,7 +65,7 @@ export default class Cell {
   }
 
   setText(text) {
-    var oldText = this.text;
+    let oldText = this.text;
     this.text = text;
 
     // reset cached encodedText, so when encodedText() is called the next time

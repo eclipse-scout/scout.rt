@@ -19,7 +19,7 @@ export default class TableLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var menuBarHeight = 0,
+    let menuBarHeight = 0,
       footerHeight = 0,
       headerHeight = 0,
       tileTableHeight = 0,
@@ -41,8 +41,8 @@ export default class TableLayout extends AbstractLayout {
       }).subtract(htmlContainer.insets());
 
     if (this.table.menuBarVisible && menuBar.visible) {
-      var htmlMenuBar = HtmlComponent.get(menuBar.$container);
-      var menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
+      let htmlMenuBar = HtmlComponent.get(menuBar.$container);
+      let menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
       htmlMenuBar.setSize(menuBarSize);
       menuBarHeight = menuBarSize.height;
     }
@@ -64,7 +64,7 @@ export default class TableLayout extends AbstractLayout {
       }
     }
     if (tileTableHeader && tileTableHeader.visible) {
-      var groupBoxSize = tileTableHeader.htmlComp.prefSize({
+      let groupBoxSize = tileTableHeader.htmlComp.prefSize({
         widthHint: containerSize.width
       });
       groupBoxSize.width = containerSize.width;
@@ -72,8 +72,8 @@ export default class TableLayout extends AbstractLayout {
       tileTableHeader.htmlComp.setSize(groupBoxSize);
       tileTableHeight = groupBoxSize.height;
     }
-    var controlsHeight = dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight + tileTableHeight;
-    var dataHeight = containerSize.height - controlsHeight;
+    let controlsHeight = dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight + tileTableHeight;
+    let dataHeight = containerSize.height - controlsHeight;
     if ($data) {
       $data.css('height', 'calc(100% - ' + controlsHeight + 'px)');
       this._dataHeightPositive = $data.height() > 0;
@@ -103,7 +103,7 @@ export default class TableLayout extends AbstractLayout {
       this.table._renderViewport();
 
       // Make sure tooltips and editor popup are at correct position after layouting (e.g after window resizing)
-      this.table.tooltips.forEach(function(tooltip) {
+      this.table.tooltips.forEach(tooltip => {
         if (tooltip.rendered) {
           tooltip.position();
         }
@@ -120,10 +120,10 @@ export default class TableLayout extends AbstractLayout {
   _layoutColumns(widthHint) {
     this._autoOptimizeColumnsWidths();
 
-    var htmlContainer = this.table.htmlComp;
-    var columnLayoutDirty = this.table.columnLayoutDirty || !htmlContainer.sizeCached;
+    let htmlContainer = this.table.htmlComp;
+    let columnLayoutDirty = this.table.columnLayoutDirty || !htmlContainer.sizeCached;
     if (!columnLayoutDirty) {
-      var width = widthHint || htmlContainer.size().width;
+      let width = widthHint || htmlContainer.size().width;
       columnLayoutDirty = htmlContainer.sizeCached.width !== width;
     }
     // Auto resize only if table width or column structure has changed
@@ -166,7 +166,7 @@ export default class TableLayout extends AbstractLayout {
    * Resizes the visible columns to make them use all the available space.
    */
   _autoResizeColumns(widthHint) {
-    var newWidth, weight,
+    let newWidth, weight,
       relevantColumns = [],
       currentWidth = 0,
       totalInitialWidth = 0,
@@ -174,7 +174,7 @@ export default class TableLayout extends AbstractLayout {
       availableWidth = Math.floor(tableWidth - this.table.rowBorderWidth);
 
     // Don't resize fixed and auto optimize width columns
-    this.table.visibleColumns().forEach(function(column) {
+    this.table.visibleColumns().forEach(column => {
       if (column.fixedWidth || column.autoOptimizeWidth) {
         availableWidth -= column.width;
       } else {
@@ -189,13 +189,13 @@ export default class TableLayout extends AbstractLayout {
       return;
     }
 
-    var remainingWidth = availableWidth;
+    let remainingWidth = availableWidth;
 
     // First, filter columns which would get smaller than their minimal size
-    var minWidthColumns = relevantColumns.filter(function(column) {
+    let minWidthColumns = relevantColumns.filter(column => {
       // Use initial width as preferred width for auto resize columns.
       // This makes sure the column doesn't get too small on small screens. The user can still make the column smaller though.
-      var minWidth = Math.max(column.minWidth, column.initialWidth);
+      let minWidth = Math.max(column.minWidth, column.initialWidth);
       if (totalInitialWidth === 0) {
         weight = 1 / relevantColumns.length;
       } else {
@@ -211,8 +211,8 @@ export default class TableLayout extends AbstractLayout {
     });
 
     // Resize them to their minimal width
-    minWidthColumns.forEach(function(column, index) {
-      var minWidth = Math.max(column.minWidth, column.initialWidth);
+    minWidthColumns.forEach((column, index) => {
+      let minWidth = Math.max(column.minWidth, column.initialWidth);
       arrays.remove(relevantColumns, column);
 
       newWidth = minWidth;
@@ -225,11 +225,11 @@ export default class TableLayout extends AbstractLayout {
       if (newWidth !== column.width) {
         this.table.resizeColumn(column, newWidth);
       }
-    }.bind(this));
+    });
 
     // Then resize the others
     availableWidth = remainingWidth;
-    relevantColumns.forEach(function(column, index) {
+    relevantColumns.forEach((column, index) => {
       if (totalInitialWidth === 0) {
         weight = 1 / relevantColumns.length;
       } else {
@@ -245,7 +245,7 @@ export default class TableLayout extends AbstractLayout {
       if (newWidth !== column.width) {
         this.table.resizeColumn(column, newWidth);
       }
-    }.bind(this));
+    });
   }
 
   preferredLayoutSize($container, options) {

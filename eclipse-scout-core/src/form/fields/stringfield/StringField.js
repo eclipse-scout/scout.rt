@@ -83,7 +83,7 @@ export default class StringField extends BasicField {
     this.addLabel();
     this.addMandatoryIndicator();
 
-    var $field;
+    let $field;
     if (this.multilineText) {
       $field = this._makeMultilineField();
       this.$container.addClass('multiline');
@@ -97,29 +97,29 @@ export default class StringField extends BasicField {
   }
 
   _makeMultilineField() {
-    var mouseDownHandler = function() {
+    let mouseDownHandler = function() {
       this.mouseClicked = true;
     }.bind(this);
 
     return this.$parent.makeElement('<textarea>')
       .on('DOMMouseScroll mousewheel', this._onMouseWheel.bind(this))
       .on('mousedown', mouseDownHandler)
-      .on('focus', function(event) {
+      .on('focus', event => {
         this.$field.off('mousedown', mouseDownHandler);
         if (!this.mouseClicked) { // only trigger on tab focus in
-          setTimeout(function() {
+          setTimeout(() => {
             if (!this.rendered || this.session.focusManager.isElementCovertByGlassPane(this.$field)) {
               return;
             }
             this._renderSelectionStart();
             this._renderSelectionEnd();
-          }.bind(this));
+          });
         }
         this.mouseClicked = false;
-      }.bind(this))
-      .on('focusout', function() {
+      })
+      .on('focusout', () => {
         this.$field.on('mousedown', mouseDownHandler);
-      }.bind(this))
+      })
       .addDeviceClass();
   }
 
@@ -137,13 +137,13 @@ export default class StringField extends BasicField {
   _onMouseWheel(event) {
     event = event.originalEvent || this.$container.window(true).event.originalEvent;
     // noinspection JSUnresolvedVariable
-    var delta = event.wheelDelta ? -event.wheelDelta : event.detail;
-    var scrollTop = this.$field[0].scrollTop;
+    let delta = event.wheelDelta ? -event.wheelDelta : event.detail;
+    let scrollTop = this.$field[0].scrollTop;
     if (delta < 0 && scrollTop === 0) {
       // StringField is scrolled to the very top -> parent may scroll
       return;
     }
-    var maxScrollTop = this.$field[0].scrollHeight - this.$field[0].clientHeight;
+    let maxScrollTop = this.$field[0].scrollHeight - this.$field[0].clientHeight;
     if (delta > 0 && scrollTop >= maxScrollTop - 1) { // -1 because it can sometimes happen that scrollTop is maxScrollTop -1 or +1, just because clientHeight and scrollHeight are rounded values
       // StringField is scrolled to the very bottom -> parent may scroll
       this.$field[0].scrollTop = maxScrollTop; // Ensure it is really at the bottom (not -1px above)
@@ -195,9 +195,9 @@ export default class StringField extends BasicField {
       this.$field.attr('maxlength', this.maxLength);
     } else {
       // Fallback for IE9
-      this.$field.on('keyup paste', function(e) {
+      this.$field.on('keyup paste', e => {
         setTimeout(truncate.bind(this), 0);
-      }.bind(this));
+      });
     }
 
     // Make sure current text does not exceed max length
@@ -207,7 +207,7 @@ export default class StringField extends BasicField {
     }
 
     function truncate() {
-      var text = this.$field.val();
+      let text = this.$field.val();
       if (text.length > this.maxLength) {
         this.$field.val(text.slice(0, this.maxLength));
       }
@@ -345,14 +345,14 @@ export default class StringField extends BasicField {
       return;
     }
 
-    var displayText = strings.nvl(this.displayText);
-    var oldDisplayText = strings.nvl(this.$field.val());
-    var oldSelection = this._getSelection();
+    let displayText = strings.nvl(this.displayText);
+    let oldDisplayText = strings.nvl(this.$field.val());
+    let oldSelection = this._getSelection();
     super._renderDisplayText();
     // Try to keep the current selection for cases where the old and new display
     // text only differ because of the automatic trimming.
     if (this.trimText && oldDisplayText !== displayText) {
-      var matches = oldDisplayText.match(StringField.TRIM_REGEXP);
+      let matches = oldDisplayText.match(StringField.TRIM_REGEXP);
       if (matches && matches[2] === displayText) {
         this._setSelection({
           start: Math.max(oldSelection.start - matches[1].length, 0),
@@ -376,8 +376,8 @@ export default class StringField extends BasicField {
     }
 
     // Prevent insert if new length would exceed maxLength to prevent unintended deletion of characters at the end of the string
-    var selection = this._getSelection();
-    var text = this._applyTextToSelection(this.$field.val(), textToInsert, selection);
+    let selection = this._getSelection();
+    let text = this._applyTextToSelection(this.$field.val(), textToInsert, selection);
     if (text.length > this.maxLength) {
       this._showNotification('ui.CannotInsertTextTooLong');
       return;
@@ -440,12 +440,12 @@ export default class StringField extends BasicField {
 
   _onSelectionChangingAction(event) {
     if (event.type === 'mousedown') {
-      this.$field.window().one('mouseup.stringfield', function() {
+      this.$field.window().one('mouseup.stringfield', () => {
         // For some reason, when clicking side an existing selection (which clears the selection), the old
         // selection is still visible. To get around this case, we use setTimeout to handle the new selection
         // after it really has been changed.
         setTimeout(this._updateSelection.bind(this));
-      }.bind(this));
+      });
     } else if (event.type === 'keydown') {
       // Use set timeout to let the cursor move to the target position
       setTimeout(this._updateSelection.bind(this));
@@ -455,8 +455,8 @@ export default class StringField extends BasicField {
   }
 
   _getSelection() {
-    var start = scout.nvl(this.$field[0].selectionStart, null);
-    var end = scout.nvl(this.$field[0].selectionEnd, null);
+    let start = scout.nvl(this.$field[0].selectionStart, null);
+    let end = scout.nvl(this.$field[0].selectionEnd, null);
     if (start === null || end === null) {
       start = 0;
       end = 0;
@@ -480,12 +480,12 @@ export default class StringField extends BasicField {
   }
 
   _updateSelection() {
-    var oldSelectionStart = this.selectionStart;
-    var oldSelectionEnd = this.selectionEnd;
+    let oldSelectionStart = this.selectionStart;
+    let oldSelectionEnd = this.selectionEnd;
     this.selectionStart = this.$field[0].selectionStart;
     this.selectionEnd = this.$field[0].selectionEnd;
     if (this.selectionTrackingEnabled) {
-      var selectionChanged = this.selectionStart !== oldSelectionStart || this.selectionEnd !== oldSelectionEnd;
+      let selectionChanged = this.selectionStart !== oldSelectionStart || this.selectionEnd !== oldSelectionEnd;
       if (selectionChanged) {
         this.triggerSelectionChange();
       }
@@ -531,7 +531,7 @@ export default class StringField extends BasicField {
    * @override ValueField.js
    */
   acceptInput(whileTyping) {
-    var displayText = scout.nvl(this._readDisplayText(), '');
+    let displayText = scout.nvl(this._readDisplayText(), '');
     if (this.inputObfuscated && displayText !== '') {
       // Disable obfuscation if user has typed text (on focus, field will be cleared if obfuscated, so any typed text is new text).
       this.inputObfuscated = false;
@@ -550,14 +550,14 @@ export default class StringField extends BasicField {
       this.$field.val('');
 
       // Without properly setting selection start and end, cursor is not visible in IE and Firefox.
-      setTimeout(function() {
+      setTimeout(() => {
         if (!this.rendered) {
           return;
         }
-        var $field = this.$field[0];
+        let $field = this.$field[0];
         $field.selectionStart = 0;
         $field.selectionEnd = 0;
-      }.bind(this));
+      });
     }
   }
 
@@ -566,11 +566,11 @@ export default class StringField extends BasicField {
    * Must use a callback because this is required by Chrome's clipboard API.
    */
   _getClipboardData(event, doneHandler) {
-    var data = event.originalEvent.clipboardData || this.$container.window(true).clipboardData;
+    let data = event.originalEvent.clipboardData || this.$container.window(true).clipboardData;
     if (data) {
       // Chrome, Firefox
       if (data.items && data.items.length) {
-        var item = arrays.find(data.items, function(item) {
+        let item = arrays.find(data.items, item => {
           return item.type === 'text/plain';
         });
         if (item) {
@@ -590,10 +590,10 @@ export default class StringField extends BasicField {
 
   _onFieldPaste(event) {
     // must store text and selection because when the callback is executed, the clipboard content has already been applied to the input field
-    var text = this.$field.val();
-    var selection = this._getSelection();
+    let text = this.$field.val();
+    let selection = this._getSelection();
 
-    this._getClipboardData(event, function(pastedText) {
+    this._getClipboardData(event, pastedText => {
       if (!pastedText) {
         return;
       }
@@ -603,7 +603,7 @@ export default class StringField extends BasicField {
       if (text.length > this.maxLength) {
         this._showNotification('ui.PastedTextTooLong');
       }
-    }.bind(this));
+    });
   }
 
   _showNotification(textKey) {
@@ -618,7 +618,7 @@ export default class StringField extends BasicField {
    * @override BasicField.js
    */
   _checkDisplayTextChanged(displayText, whileTyping) {
-    var displayTextChanged = super._checkDisplayTextChanged(displayText, whileTyping);
+    let displayTextChanged = super._checkDisplayTextChanged(displayText, whileTyping);
 
     // Display text hasn't changed if input is obfuscated and current display text is empty (because field will be cleared if user focuses obfuscated text field).
     if (displayTextChanged && this.inputObfuscated && displayText === '') {

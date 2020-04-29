@@ -11,11 +11,11 @@
 import {scout, Status} from '../../src/index';
 import {TableSpecHelper} from '@eclipse-scout/testing';
 
-describe('TableFooterSpec', function() {
-  var session;
-  var helper;
+describe('TableFooterSpec', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
@@ -23,28 +23,28 @@ describe('TableFooterSpec', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
   function createTableControl() {
-    var control = scout.create('TableControl', {
+    let control = scout.create('TableControl', {
       parent: session.desktop
     });
     return control;
   }
 
-  describe('render', function() {
+  describe('render', () => {
 
-    it('attaches listener to the table but only once', function() {
-      var model = helper.createModelFixture(2);
+    it('attaches listener to the table but only once', () => {
+      let model = helper.createModelFixture(2);
       model.tableStatusVisible = true;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render();
       expect(table.footer).not.toBeUndefined();
-      var listenerCount = table.events._eventListeners.length;
+      let listenerCount = table.events._eventListeners.length;
 
       table.setTableStatusVisible(false);
       table.setTableStatusVisible(true);
@@ -55,12 +55,12 @@ describe('TableFooterSpec', function() {
 
   });
 
-  describe('remove', function() {
+  describe('remove', () => {
 
-    it('stops the open animation of the selected control', function() {
-      var model = helper.createModelFixture(2);
-      var table = helper.createTable(model);
-      var control = createTableControl();
+    it('stops the open animation of the selected control', () => {
+      let model = helper.createModelFixture(2);
+      let table = helper.createTable(model);
+      let control = createTableControl();
       table.setTableControls([control]);
       control.setSelected(true);
       table.render();
@@ -78,10 +78,10 @@ describe('TableFooterSpec', function() {
       expect(table.footer.open).toBe(true);
     });
 
-    it('stops the close animation of the selected control', function() {
-      var model = helper.createModelFixture(2);
-      var table = helper.createTable(model);
-      var control = createTableControl();
+    it('stops the close animation of the selected control', () => {
+      let model = helper.createModelFixture(2);
+      let table = helper.createTable(model);
+      let control = createTableControl();
       table.setTableControls([control]);
       control.setSelected(true);
       table.render();
@@ -108,19 +108,19 @@ describe('TableFooterSpec', function() {
 
   });
 
-  describe('controls', function() {
+  describe('controls', () => {
 
-    it('removes old and renders new controls on property change', function() {
-      var model = helper.createModelFixture(2);
+    it('removes old and renders new controls on property change', () => {
+      let model = helper.createModelFixture(2);
       model.tableStatusVisible = true;
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       table.render();
 
-      var controls = [createTableControl()];
+      let controls = [createTableControl()];
       table.setTableControls(controls);
       expect(controls[0].rendered).toBe(true);
 
-      var newControls = [createTableControl(), createTableControl()];
+      let newControls = [createTableControl(), createTableControl()];
       table.setTableControls(newControls);
       expect(controls[0].rendered).toBe(false);
       expect(newControls[0].rendered).toBe(true);
@@ -128,16 +128,16 @@ describe('TableFooterSpec', function() {
     });
   });
 
-  describe('TableStatusTooltip', function() {
+  describe('TableStatusTooltip', () => {
 
-    it('shows ERROR tooltip', function() {
-      var model = helper.createModelFixture(2);
+    it('shows ERROR tooltip', () => {
+      let model = helper.createModelFixture(2);
       model.tableStatusVisible = true;
       model.tableStatus = {
         severity: Status.Severity.ERROR,
         message: 'Table has an error'
       };
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
 
       // Check that status and tooltip is rendered when table is rendered
       table.render();
@@ -189,14 +189,14 @@ describe('TableFooterSpec', function() {
       expect(table.tableStatus.uiState).toBe('user-shown');
     });
 
-    it('shows INFO tooltip when table is rendered', function() {
-      var model = helper.createModelFixture(2);
+    it('shows INFO tooltip when table is rendered', () => {
+      let model = helper.createModelFixture(2);
       model.tableStatusVisible = true;
       model.tableStatus = {
         severity: Status.Severity.INFO,
         message: 'Table has an information'
       };
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
 
       // Check that status and tooltip is rendered when table is rendered
       table.render();
@@ -244,14 +244,14 @@ describe('TableFooterSpec', function() {
       expect(table.tableStatus.uiState).toBe('auto-hidden');
     });
 
-    it('hides INFO tooltip when user clicks in table', function() {
-      var model = helper.createModelFixture(2, 5);
+    it('hides INFO tooltip when user clicks in table', () => {
+      let model = helper.createModelFixture(2, 5);
       model.tableStatusVisible = true;
       model.tableStatus = {
         severity: Status.Severity.INFO,
         message: 'Table has an information'
       };
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       expect(table.tableStatus.uiState).toBe(undefined);
 
       // Check visible
@@ -267,14 +267,14 @@ describe('TableFooterSpec', function() {
       expect(table.tableStatus.uiState).toBe('auto-hidden');
     });
 
-    it('does not hide ERROR tooltip when user clicks in table', function() {
-      var model = helper.createModelFixture(2, 5);
+    it('does not hide ERROR tooltip when user clicks in table', () => {
+      let model = helper.createModelFixture(2, 5);
       model.tableStatusVisible = true;
       model.tableStatus = {
         severity: Status.Severity.ERROR,
         message: 'Table has an error'
       };
-      var table = helper.createTable(model);
+      let table = helper.createTable(model);
       expect(table.tableStatus.uiState).toBe(undefined);
 
       // Check visible

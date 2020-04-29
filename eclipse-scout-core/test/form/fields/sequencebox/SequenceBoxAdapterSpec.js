@@ -11,20 +11,20 @@
 import {scout} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper, MenuSpecHelper} from '@eclipse-scout/testing';
 
-describe('SequenceBoxAdapter', function() {
-  var session, helper, menuHelper;
+describe('SequenceBoxAdapter', () => {
+  let session, helper, menuHelper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
     menuHelper = new MenuSpecHelper(session);
   });
 
-  describe('clone', function() {
-    it('does not accidentally create a logical grid', function() {
-      var cloneHelper = new CloneSpecHelper();
-      var model = {
+  describe('clone', () => {
+    it('does not accidentally create a logical grid', () => {
+      let cloneHelper = new CloneSpecHelper();
+      let model = {
         id: 'seq01',
         parent: session.desktop,
         session: session,
@@ -40,11 +40,11 @@ describe('SequenceBoxAdapter', function() {
           objectType: 'DateField'
         }]
       };
-      var adapter = scout.create('SequenceBoxAdapter', createAdapterModel(model));
-      var seqBox = adapter.createWidget(model, session.desktop);
+      let adapter = scout.create('SequenceBoxAdapter', createAdapterModel(model));
+      let seqBox = adapter.createWidget(model, session.desktop);
       linkWidgetAndAdapter(seqBox.fields[0], 'StringFieldAdapter');
       linkWidgetAndAdapter(seqBox.fields[1], 'DateFieldAdapter');
-      var clone = seqBox.clone({
+      let clone = seqBox.clone({
         parent: seqBox.parent
       });
 

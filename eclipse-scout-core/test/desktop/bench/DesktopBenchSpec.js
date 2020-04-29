@@ -11,10 +11,10 @@
 import {Form} from '../../../src/index';
 import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
 
-describe('DesktopBench', function() {
-  var helper, session, desktop, formHelper;
+describe('DesktopBench', () => {
+  let helper, session, desktop, formHelper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession({
       desktop: {
@@ -28,15 +28,15 @@ describe('DesktopBench', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
-  describe('updateOutlineContent', function() {
-    var outline, bench, model, node;
+  describe('updateOutlineContent', () => {
+    let outline, bench, model, node;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(3, 2, true);
       outline = helper.createOutline(model);
       node = outline.nodes[0];
@@ -46,13 +46,13 @@ describe('DesktopBench', function() {
       desktop.setOutline(outline);
     });
 
-    it('called when an outline page gets selected', function() {
+    it('called when an outline page gets selected', () => {
       spyOn(bench, 'updateOutlineContent');
       outline.selectNodes(outline.nodes[1]);
       expect(bench.updateOutlineContent.calls.count()).toEqual(1);
     });
 
-    it('doesn\'t get called if page already is selected', function() {
+    it('doesn\'t get called if page already is selected', () => {
       spyOn(bench, 'updateOutlineContent');
       outline.selectNodes(outline.nodes[1]);
       expect(bench.updateOutlineContent.calls.count()).toEqual(1);
@@ -67,7 +67,7 @@ describe('DesktopBench', function() {
       expect(bench.updateOutlineContent.calls.count()).toEqual(2);
     });
 
-    it('sets detailForm as outlineContent if node gets selected', function() {
+    it('sets detailForm as outlineContent if node gets selected', () => {
       // node 0 has a detail form
       outline.selectNodes(outline.nodes[1]);
       expect(outline.selectedNodes[0].detailForm).toBeFalsy();
@@ -82,13 +82,13 @@ describe('DesktopBench', function() {
       expect(bench.outlineContent).toBeFalsy();
     });
 
-    it('preserves desktop.inBackground when updating outline content', function() {
+    it('preserves desktop.inBackground when updating outline content', () => {
       // select node 0 (which will be in foreground)
       outline.selectNodes(outline.nodes[0]);
       expect(desktop.inBackground).toBeFalsy();
 
       // open new form in foreground
-      var form = formHelper.createFormWithOneField();
+      let form = formHelper.createFormWithOneField();
       form.displayHint = Form.DisplayHint.VIEW;
       form.displayViewId = 'C';
       desktop.showForm(form);
@@ -97,7 +97,7 @@ describe('DesktopBench', function() {
 
       // test that replace view is not called
 
-      var form2 = formHelper.createFormWithOneField();
+      let form2 = formHelper.createFormWithOneField();
       outline.nodes[0].detailForm = form2;
       outline.nodes[0].detailFormVisible = true;
 
@@ -111,13 +111,13 @@ describe('DesktopBench', function() {
       expect(desktop.inBackground).toBeTruthy();
     });
 
-    it('preserves desktop.inBackground when switching nodes', function() {
+    it('preserves desktop.inBackground when switching nodes', () => {
       // select node 0 (which will be in foreground)
       outline.selectNodes(outline.nodes[0]);
       expect(desktop.inBackground).toBeFalsy();
 
       // open new form in foreground
-      var form = formHelper.createFormWithOneField();
+      let form = formHelper.createFormWithOneField();
       form.displayHint = Form.DisplayHint.VIEW;
       form.displayViewId = 'C';
       desktop.showForm(form);

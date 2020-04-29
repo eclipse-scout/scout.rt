@@ -10,17 +10,17 @@
  */
 import {scout} from '../../src/index';
 
-describe('IFrame', function() {
-  var session;
+describe('IFrame', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  describe('setLocation', function() {
-    it('sets the location of the iframe', function() {
-      var iframe = scout.create('IFrame', {
+  describe('setLocation', () => {
+    it('sets the location of the iframe', () => {
+      let iframe = scout.create('IFrame', {
         parent: session.desktop
       });
       iframe.render();
@@ -32,8 +32,8 @@ describe('IFrame', function() {
       expect(iframe.$iframe.attr('src')).toBe('http://www.bing.com');
     });
 
-    it('sets the location to about:blank if location is empty', function() {
-      var iframe = scout.create('IFrame', {
+    it('sets the location to about:blank if location is empty', () => {
+      let iframe = scout.create('IFrame', {
         parent: session.desktop,
         location: 'http://www.bing.com'
       });

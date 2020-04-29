@@ -11,51 +11,47 @@
 import {Dimension, Insets, LogicalGridData, LogicalGridLayoutInfo, Rectangle} from '../../../src/index';
 
 /* This test also exists as Java code, to make sure Java and JS code produces the same results */
-describe('LogicalGridLayoutInfo', function() {
+describe('LogicalGridLayoutInfo', () => {
 
-  describe('Rectangle.union', function() {
+  describe('Rectangle.union', () => {
 
-    var r1 = new Rectangle(0, 0, 675, 558);
-    var r2 = new Rectangle(687, 0, 674, 558);
+    let r1 = new Rectangle(0, 0, 675, 558);
+    let r2 = new Rectangle(687, 0, 674, 558);
 
-    it('produces same results as java.awt.Rectangle', function() {
-      var r = r1.union(r2);
-      var expected = new Rectangle(0, 0, 1361, 558);
+    it('produces same results as java.awt.Rectangle', () => {
+      let r = r1.union(r2);
+      let expected = new Rectangle(0, 0, 1361, 558);
       expect(expected.equals(r)).toBe(true);
     });
 
   });
 
-  describe('layoutCellBounds', function() {
+  describe('layoutCellBounds', () => {
     // Create some mock-objects for JQuery selector- and HtmlComponent instances.
-    var mockJquery = function(compName) {
-      var jquery = this;
+    let mockJquery = function(compName) {
+      let jquery = this;
       return {
-        data: function(dataKey) {
+        data: dataKey => {
           if ('htmlComponent' === dataKey) {
             return mockHtmlComp(jquery);
           }
         },
-        attr: function(attrKey) {
-          return attrKey === 'id' ? compName : undefined;
-        }
+        attr: attrKey => attrKey === 'id' ? compName : undefined
       };
     };
 
     function mockHtmlComp(jquery) {
       return {
-        prefSize: function() {
-          return new Dimension(1, 1);
-        }
+        prefSize: () => new Dimension(1, 1)
       };
     }
 
-    var components = [
+    let components = [
       mockJquery('DateField'),
       mockJquery('StringField')
     ];
 
-    var gd1 = new LogicalGridData();
+    let gd1 = new LogicalGridData();
     gd1.gridx = 0;
     gd1.gridy = 0;
     gd1.gridw = 1;
@@ -63,33 +59,33 @@ describe('LogicalGridLayoutInfo', function() {
     gd1.weightx = 0.0;
     gd1.widthHint = 70;
 
-    var gd2 = new LogicalGridData();
+    let gd2 = new LogicalGridData();
     gd2.gridx = 1;
     gd2.gridy = 0;
     gd2.gridw = 1;
     gd2.gridh = 1;
     gd2.weightx = 1.0;
 
-    var cons = [gd1, gd2];
-    var lgli = new LogicalGridLayoutInfo({
+    let cons = [gd1, gd2];
+    let lgli = new LogicalGridLayoutInfo({
       $components: components,
       cons: cons,
       hgap: 5,
       vgap: 5,
       rowHeight: 30
     });
-    var parentSize = new Dimension(500, 23);
-    var parentInsets = new Insets(0, 0, 0, 0);
+    let parentSize = new Dimension(500, 23);
+    let parentInsets = new Insets(0, 0, 0, 0);
 
-    it('calculates bounds', function() {
+    it('calculates bounds', () => {
       lgli.layoutCellBounds(parentSize, parentInsets);
 
-      var rows = lgli.layoutCellBounds(parentSize, parentInsets);
+      let rows = lgli.layoutCellBounds(parentSize, parentInsets);
       expect(rows.length).toBe(1);
-      var cells = rows[0];
+      let cells = rows[0];
       expect(cells.length).toBe(2);
 
-      var cell = cells[0];
+      let cell = cells[0];
       expect(cell.x).toBe(0);
       expect(cell.y).toBe(0);
       expect(cell.width).toBe(70);

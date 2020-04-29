@@ -17,6 +17,8 @@ import $ from 'jquery';
  */
 export default class ModelAdapter {
   constructor() {
+    this.id = null;
+    this.objectType = null;
     this.initialized = false;
     this.attached = false;
     this.destroyed = false;
@@ -32,6 +34,7 @@ export default class ModelAdapter {
     this._propertyChangeEventFilter = new PropertyChangeEventFilter();
     this._widgetEventTypeFilter = new WidgetEventTypeFilter();
     this.events = new EventSupport();
+    this.session = null;
   }
 
   init(model) {
@@ -58,7 +61,7 @@ export default class ModelAdapter {
   }
 
   createWidget(adapterData, parent) {
-    var model = this._initModel(adapterData, parent);
+    let model = this._initModel(adapterData, parent);
     this.widget = this._createWidget(model);
     this._attachWidget();
     this._postCreateWidget();
@@ -75,7 +78,7 @@ export default class ModelAdapter {
 
   _initModel(model, parent) {
     // Make a copy to prevent a modification of the given model
-    var deepCopy = this.session.adapterExportEnabled;
+    let deepCopy = this.session.adapterExportEnabled;
     model = $.extend(deepCopy, {}, model);
 
     // Fill in the missing default values
@@ -106,7 +109,7 @@ export default class ModelAdapter {
    * @returns A new widget instance. The default impl. uses calls scout.create() with property objectType from given model.
    */
   _createWidget(model) {
-    var widget = scout.create(model);
+    let widget = scout.create(model);
     widget._addCloneProperties(['modelClass', 'classId']);
     return widget;
   }
@@ -134,7 +137,7 @@ export default class ModelAdapter {
   }
 
   goOffline() {
-    this.widget.visitChildren(function(child) {
+    this.widget.visitChildren(child => {
       if (child.modelAdapter) {
         child.modelAdapter._goOffline();
       }
@@ -146,7 +149,7 @@ export default class ModelAdapter {
   }
 
   goOnline() {
-    this.widget.visitChildren(function(child) {
+    this.widget.visitChildren(child => {
       if (child.modelAdapter) {
         child.modelAdapter._goOnline();
       }
@@ -207,20 +210,23 @@ export default class ModelAdapter {
    */
   _send(type, data, options) {
     // Legacy fallback with all options as arguments
-    var opts = {};
+    let opts = {};
     if (arguments.length > 2) {
       if (options !== null && typeof options === 'object') {
         opts = options;
       } else {
+        // eslint-disable-next-line prefer-rest-params
         opts.delay = arguments[2];
+        // eslint-disable-next-line prefer-rest-params
         opts.coalesce = arguments[3];
+        // eslint-disable-next-line prefer-rest-params
         opts.showBusyIndicator = arguments[4];
       }
     }
     options = opts;
     // (End legacy fallback)
 
-    var event = new RemoteEvent(this.id, type, data);
+    let event = new RemoteEvent(this.id, type, data);
     // The following properties will not be sent to the server, see Session._requestToJson().
     if (options.coalesce !== undefined) {
       event.coalesce = options.coalesce;
@@ -238,7 +244,7 @@ export default class ModelAdapter {
    * Sends the given value as property event to the server.
    */
   _sendProperty(propertyName, value) {
-    var data = {};
+    let data = {};
     data[propertyName] = value;
     this._send('property', data);
   }
@@ -289,8 +295,8 @@ export default class ModelAdapter {
   }
 
   _onWidgetPropertyChange(event) {
-    var propertyName = event.propertyName;
-    var value = event.newValue;
+    let propertyName = event.propertyName;
+    let value = event.newValue;
 
     // TODO [7.0] cgu This does not work if value will be converted into another object (e.g DateRange.ensure(selectionRange) in Planner.js)
     // -> either do the check in this._send() or extract ensure into separate method and move the call of addFilterForProperties.
@@ -314,13 +320,13 @@ export default class ModelAdapter {
       return value.modelAdapter.id;
     }
 
-    return value.map(function(widget) {
+    return value.map(widget => {
       return widget.modelAdapter.id;
     });
   }
 
   _callSendProperty(propertyName, value) {
-    var sendFuncName = '_send' + strings.toUpperCaseFirstLetter(propertyName);
+    let sendFuncName = '_send' + strings.toUpperCaseFirstLetter(propertyName);
     if (this[sendFuncName]) {
       this[sendFuncName](value);
     } else {
@@ -350,10 +356,10 @@ export default class ModelAdapter {
   }
 
   _syncPropertiesOnPropertyChange(newProperties) {
-    var orderedPropertyNames = this._orderPropertyNamesOnSync(newProperties);
+    let orderedPropertyNames = this._orderPropertyNamesOnSync(newProperties);
     orderedPropertyNames.forEach(function(propertyName) {
-      var value = newProperties[propertyName];
-      var syncFuncName = '_sync' + strings.toUpperCaseFirstLetter(propertyName);
+      let value = newProperties[propertyName];
+      let syncFuncName = '_sync' + strings.toUpperCaseFirstLetter(propertyName);
       if (this[syncFuncName]) {
         this[syncFuncName](value);
       } else {
@@ -411,9 +417,9 @@ export default class ModelAdapter {
    */
   exportAdapterData(adapterData) {
     // use last part of class-name as ID (because that's better than having only a number as ID)
-    var modelClass = adapterData.modelClass;
+    let modelClass = adapterData.modelClass;
     if (modelClass) {
-      var pos = Math.max(0,
+      let pos = Math.max(0,
         modelClass.lastIndexOf('$') + 1,
         modelClass.lastIndexOf('.') + 1);
       adapterData.id = modelClass.substring(pos);

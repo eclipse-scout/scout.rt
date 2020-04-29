@@ -11,16 +11,16 @@
 // eslint-disable-next-line max-classes-per-file
 import {AbstractLayout, Dimension, GridData, HtmlComponent, LogicalGridData, LogicalGridLayout, Widget} from '../../../src/index';
 
-describe('LogicalGridLayout', function() {
-  var session;
-  var containerPadding = 5;
-  var childMargin = 2;
-  var rowHeight = 20;
-  var columnWidth = 40;
-  var hgap = 3;
-  var vgap = 1;
+describe('LogicalGridLayout', () => {
+  let session;
+  let containerPadding = 5;
+  let childMargin = 2;
+  let rowHeight = 20;
+  let columnWidth = 40;
+  let hgap = 3;
+  let vgap = 1;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
@@ -69,21 +69,21 @@ describe('LogicalGridLayout', function() {
   }
 
   function createLglChild(model) {
-    var defaults = {
+    let defaults = {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    var lglChild = new LglChild();
+    let lglChild = new LglChild();
     lglChild.init(model);
     lglChild.render();
     lglChild.setLayoutData(new LogicalGridData(lglChild));
     return lglChild;
   }
 
-  describe('prefSize', function() {
-    var lglContainer;
+  describe('prefSize', () => {
+    let lglContainer;
 
-    beforeEach(function() {
+    beforeEach(() => {
       lglContainer = new LglContainer();
       lglContainer.init({
         parent: session.desktop
@@ -91,34 +91,34 @@ describe('LogicalGridLayout', function() {
       lglContainer.render();
     });
 
-    it('returns row height and column width incl. insets', function() {
-      var lglChild = createLglChild({
+    it('returns row height and column width incl. insets', () => {
+      let lglChild = createLglChild({
         parent: lglContainer
       });
       lglChild.gridData.x = 0;
       lglChild.gridData.y = 0;
       lglChild.gridData.useUiHeight = false;
       lglChild.htmlComp.layout.prefSize = new Dimension(10, 20);
-      var prefSize = lglContainer.htmlComp.prefSize();
+      let prefSize = lglContainer.htmlComp.prefSize();
       expect(prefSize.height).toBe(rowHeight + containerPadding * 2);
       expect(prefSize.width).toBe(columnWidth + containerPadding * 2);
     });
 
-    it('returns pref size of its child incl. insets if useUiHeight is true', function() {
-      var lglChild = createLglChild({
+    it('returns pref size of its child incl. insets if useUiHeight is true', () => {
+      let lglChild = createLglChild({
         parent: lglContainer
       });
       lglChild.gridData.x = 0;
       lglChild.gridData.y = 0;
       lglChild.gridData.useUiHeight = true;
       lglChild.htmlComp.layout.prefSize = new Dimension(10, 20);
-      var prefSize = lglContainer.htmlComp.prefSize();
+      let prefSize = lglContainer.htmlComp.prefSize();
       expect(prefSize.height).toBe(20 + childMargin * 2 + containerPadding * 2);
       expect(prefSize.width).toBe(columnWidth + containerPadding * 2);
     });
 
-    it('returns max pref size of its children at on same row incl. insets if useUiHeight is true', function() {
-      var lglChild = createLglChild({
+    it('returns max pref size of its children at on same row incl. insets if useUiHeight is true', () => {
+      let lglChild = createLglChild({
         parent: lglContainer
       });
       lglChild.gridData.x = 0;
@@ -126,7 +126,7 @@ describe('LogicalGridLayout', function() {
       lglChild.gridData.useUiHeight = true;
       lglChild.htmlComp.layout.prefSize = new Dimension(10, 20);
 
-      var lglChild2 = createLglChild({
+      let lglChild2 = createLglChild({
         parent: lglContainer
       });
       lglChild2.gridData.x = 1;
@@ -134,36 +134,36 @@ describe('LogicalGridLayout', function() {
       lglChild2.gridData.useUiHeight = true;
       lglChild2.htmlComp.layout.prefSize = new Dimension(10, 88);
 
-      var prefSize = lglContainer.htmlComp.prefSize({
+      let prefSize = lglContainer.htmlComp.prefSize({
         widthHint: 100
       });
       expect(prefSize.height).toBe(88 + childMargin * 2 + containerPadding * 2);
       expect(prefSize.width).toBe(columnWidth * 2 + containerPadding * 2 + hgap);
     });
 
-    it('passes widthHint to its children', function() {
-      var lglChild = createLglChild({
+    it('passes widthHint to its children', () => {
+      let lglChild = createLglChild({
         parent: lglContainer
       });
       lglChild.gridData.x = 0;
       lglChild.gridData.y = 0;
       lglChild.gridData.useUiHeight = true;
-      lglChild.htmlComp.layout.preferredLayoutSize = function($container, options) {
+      lglChild.htmlComp.layout.preferredLayoutSize = ($container, options) => {
         if (options.widthHint === 100 - childMargin * 2 - containerPadding * 2) {
           return new Dimension(75, 75);
         }
         return new Dimension();
       };
-      var prefSize = lglContainer.htmlComp.prefSize({
+      let prefSize = lglContainer.htmlComp.prefSize({
         widthHint: 100
       });
       expect(prefSize.height).toBe(75 + childMargin * 2 + containerPadding * 2);
       expect(prefSize.width).toBe(columnWidth + containerPadding * 2);
     });
 
-    it('considers hgap when passing widthHint if there are multiple children on the same row', function() {
-      var widthHint;
-      var lglChild = createLglChild({
+    it('considers hgap when passing widthHint if there are multiple children on the same row', () => {
+      let widthHint;
+      let lglChild = createLglChild({
         parent: lglContainer
       });
       lglChild.gridData.x = 0;
@@ -175,8 +175,8 @@ describe('LogicalGridLayout', function() {
         return this.prefSize;
       };
 
-      var widthHint2;
-      var lglChild2 = createLglChild({
+      let widthHint2;
+      let lglChild2 = createLglChild({
         parent: lglContainer
       });
       lglChild2.gridData.x = 1;
@@ -188,16 +188,16 @@ describe('LogicalGridLayout', function() {
         return this.prefSize;
       };
 
-      var prefSize = lglContainer.htmlComp.prefSize({
+      let prefSize = lglContainer.htmlComp.prefSize({
         widthHint: 100
       });
       expect(widthHint).toBe(Math.ceil((100 - containerPadding * 2 - hgap) / 2) - childMargin * 2);
       expect(widthHint2).toBe(Math.floor((100 - containerPadding * 2 - hgap) / 2) - childMargin * 2);
     });
 
-    it('considers weightX when passing widthHint if there are multiple children on the same row', function() {
-      var widthHint;
-      var lglChild = createLglChild({
+    it('considers weightX when passing widthHint if there are multiple children on the same row', () => {
+      let widthHint;
+      let lglChild = createLglChild({
         parent: lglContainer
       });
       lglChild.gridData.x = 0;
@@ -210,8 +210,8 @@ describe('LogicalGridLayout', function() {
         return this.prefSize;
       };
 
-      var widthHint2;
-      var lglChild2 = createLglChild({
+      let widthHint2;
+      let lglChild2 = createLglChild({
         parent: lglContainer
       });
       lglChild2.gridData.x = 1;
@@ -224,7 +224,7 @@ describe('LogicalGridLayout', function() {
         return this.prefSize;
       };
 
-      var prefSize = lglContainer.htmlComp.prefSize({
+      let prefSize = lglContainer.htmlComp.prefSize({
         widthHint: 400
       });
       // First column has weightX = 0 -> should be as width as the configured columnWidth
@@ -232,10 +232,10 @@ describe('LogicalGridLayout', function() {
       expect(widthHint2).toBe(400 - containerPadding * 2 - hgap - childMargin * 2 - columnWidth);
     });
 
-    it('uses widthInPixel as widthHint', function() {
-      var widthHint;
-      var prefSize1Called = false;
-      var lglChild = createLglChild({
+    it('uses widthInPixel as widthHint', () => {
+      let widthHint;
+      let prefSize1Called = false;
+      let lglChild = createLglChild({
         parent: lglContainer
       });
       lglChild.gridData.x = 0;
@@ -249,8 +249,8 @@ describe('LogicalGridLayout', function() {
         return this.prefSize;
       };
 
-      var widthHint2;
-      var lglChild2 = createLglChild({
+      let widthHint2;
+      let lglChild2 = createLglChild({
         parent: lglContainer
       });
       lglChild2.gridData.x = 1;
@@ -263,7 +263,7 @@ describe('LogicalGridLayout', function() {
         return this.prefSize;
       };
 
-      var prefSize = lglContainer.htmlComp.prefSize({
+      let prefSize = lglContainer.htmlComp.prefSize({
         widthHint: 400
       });
       // First column has a fixed width -> pref size must not be called
@@ -272,9 +272,9 @@ describe('LogicalGridLayout', function() {
       expect(prefSize.height).toBe(50 + childMargin * 2 + containerPadding * 2); // First component does not use uiHeight -> will be cut
     });
 
-    it('uses preferred width as widthHint if fill horizontal is false', function() {
-      var widthHint;
-      var lglChild = createLglChild({
+    it('uses preferred width as widthHint if fill horizontal is false', () => {
+      let widthHint;
+      let lglChild = createLglChild({
         parent: lglContainer
       });
       lglChild.gridData.x = 0;
@@ -287,16 +287,16 @@ describe('LogicalGridLayout', function() {
         return this.prefSize;
       };
 
-      var prefSize = lglContainer.htmlComp.prefSize({
+      let prefSize = lglContainer.htmlComp.prefSize({
         widthHint: 400
       });
       expect(widthHint).toBe(120); // Needs to use pref width as width hint (cell bounds are larger than the child)
       expect(prefSize.height).toBe(50 + childMargin * 2 + containerPadding * 2);
     });
 
-    it('uses container width as widthHint if fill horizontal is false and pref width is bigger', function() {
-      var widthHint;
-      var lglChild = createLglChild({
+    it('uses container width as widthHint if fill horizontal is false and pref width is bigger', () => {
+      let widthHint;
+      let lglChild = createLglChild({
         parent: lglContainer
       });
       lglChild.gridData.x = 0;
@@ -309,16 +309,16 @@ describe('LogicalGridLayout', function() {
         return this.prefSize;
       };
 
-      var prefSize = lglContainer.htmlComp.prefSize({
+      let prefSize = lglContainer.htmlComp.prefSize({
         widthHint: 400
       });
       expect(widthHint).toBe(400 - containerPadding * 2 - childMargin * 2);
       expect(prefSize.height).toBe(50 + childMargin * 2 + containerPadding * 2);
     });
 
-    it('does not mess comp size up if fill horizontal and fill vertical are false', function() {
-      var widthHint;
-      var lglChild = createLglChild({
+    it('does not mess comp size up if fill horizontal and fill vertical are false', () => {
+      let widthHint;
+      let lglChild = createLglChild({
         parent: lglContainer
       });
       lglChild.gridData.x = 0;
@@ -331,7 +331,7 @@ describe('LogicalGridLayout', function() {
         return this.prefSize;
       };
 
-      var prefSize = lglContainer.htmlComp.prefSize({
+      let prefSize = lglContainer.htmlComp.prefSize({
         widthHint: 400
       });
       expect(widthHint).toBe(120);

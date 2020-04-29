@@ -34,10 +34,10 @@ export default class PopupLayout extends AbstractLayout {
       return;
     }
 
-    var htmlComp = this.popup.htmlComp;
+    let htmlComp = this.popup.htmlComp;
     // Read current bounds before calling pref size, because pref size may change position (_calcMaxSize)
-    var currentBounds = graphics.bounds(htmlComp.$comp);
-    var prefSize = this.preferredLayoutSize($container, {
+    let currentBounds = graphics.bounds(htmlComp.$comp);
+    let prefSize = this.preferredLayoutSize($container, {
       exact: true,
       onlyWidth: this.doubleCalcPrefSize
     });
@@ -60,11 +60,11 @@ export default class PopupLayout extends AbstractLayout {
 
   _resizeAnimated(currentBounds, prefSize) {
     this._position();
-    var htmlComp = this.popup.htmlComp;
-    var prefPosition = htmlComp.$comp.position();
+    let htmlComp = this.popup.htmlComp;
+    let prefPosition = htmlComp.$comp.position();
 
     // Preferred size are exact, current bounds are rounded -> round preferred size up to make compare work
-    var prefBounds = new Rectangle(prefPosition.left, prefPosition.top, Math.ceil(prefSize.width), Math.ceil(prefSize.height));
+    let prefBounds = new Rectangle(prefPosition.left, prefPosition.top, Math.ceil(prefSize.width), Math.ceil(prefSize.height));
     if (currentBounds.equals(prefBounds)) {
       // Bounds did not change -> do nothing
       return;
@@ -113,7 +113,7 @@ export default class PopupLayout extends AbstractLayout {
   }
 
   _adjustSize(prefSize) {
-    var popupSize = new Dimension(),
+    let popupSize = new Dimension(),
       maxSize = this._calcMaxSize();
 
     // Ensure the popup is not larger than max size
@@ -134,7 +134,7 @@ export default class PopupLayout extends AbstractLayout {
       this._position(false);
     }
 
-    var maxWidth, maxHeight,
+    let maxWidth, maxHeight,
       htmlComp = this.popup.htmlComp,
       windowPaddingX = this.popup.windowPaddingX,
       windowPaddingY = this.popup.windowPaddingY,
@@ -148,7 +148,7 @@ export default class PopupLayout extends AbstractLayout {
   }
 
   _adjustSizeWithAnchor(prefSize) {
-    var popupSize = new Dimension(),
+    let popupSize = new Dimension(),
       maxSize = this._calcMaxSizeAroundAnchor(),
       windowSize = this._calcMaxSize(),
       Alignment = Popup.Alignment,
@@ -227,7 +227,7 @@ export default class PopupLayout extends AbstractLayout {
       this._position(false);
     }
 
-    var maxWidthLeft, maxWidthRight, maxHeightDown, maxHeightUp,
+    let maxWidthLeft, maxWidthRight, maxHeightDown, maxHeightUp,
       htmlComp = this.popup.htmlComp,
       windowPaddingX = this.popup.windowPaddingX,
       windowPaddingY = this.popup.windowPaddingY,

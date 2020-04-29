@@ -38,7 +38,7 @@ export default class BooleanColumn extends Column {
    * @override
    */
   buildCell(cell, row) {
-    var style,
+    let style,
       content = '',
       cssClass,
       checkBoxCssClass,
@@ -86,12 +86,12 @@ export default class BooleanColumn extends Column {
   }
 
   $checkBox($row) {
-    var $cell = this.table.$cell(this, $row);
+    let $cell = this.table.$cell(this, $row);
     return $cell.children('.check-box');
   }
 
   _cellCssClass(cell, tableNode) {
-    var cssClass = super._cellCssClass(cell);
+    let cssClass = super._cellCssClass(cell);
     cssClass = cssClass.replace(' editable', '');
     cssClass += ' checkable';
     if (tableNode) {
@@ -106,7 +106,7 @@ export default class BooleanColumn extends Column {
    * show an editor for BooleanColumns when user clicks on a cell.
    */
   onMouseUp(event, $row) {
-    var row = $row.data('row'),
+    let row = $row.data('row'),
       cell = this.cell(row);
     if (this.table.checkableColumn === this) {
       this.table.checkRow(row, !row.checked);

@@ -45,11 +45,11 @@ export default class OfflineDesktopNotification extends DesktopNotification {
 
   reconnectFailed() {
     /* remove the connecting state with a small delay. otherwise it cannot be read because its only shown very shortly */
-    this.connectFailedReset = setTimeout(function() {
+    this.connectFailedReset = setTimeout(() => {
       this.connectFailedReset = null;
       this.setLoading(false);
       this.$messageText.show();
-    }.bind(this), 1100 /* this delay must be < Reconnector.interval */);
+    }, 1100 /* this delay must be < Reconnector.interval */);
   }
 
   reconnectSucceeded() {

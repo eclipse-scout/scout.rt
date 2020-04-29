@@ -17,7 +17,7 @@ export default class TreeNavigationDownKeyStroke extends AbstractTreeNavigationK
     this.which = [keys.DOWN];
     this.renderingHints.text = '↓';
     this.renderingHints.$drawingArea = function($drawingArea, event) {
-      var newSelectedNode = this._computeNewSelection(event._treeCurrentNode);
+      let newSelectedNode = this._computeNewSelection(event._treeCurrentNode);
       if (newSelectedNode) {
         return newSelectedNode.$node;
       }
@@ -25,7 +25,7 @@ export default class TreeNavigationDownKeyStroke extends AbstractTreeNavigationK
   }
 
   _computeNewSelection(currentNode) {
-    var nodes = this.field.visibleNodesFlat;
+    let nodes = this.field.visibleNodesFlat;
     if (nodes.length === 0) {
       return;
     }

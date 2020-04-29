@@ -37,7 +37,7 @@ export default class LogicalGridLayoutInfo {
     $.extend(this, model);
 
     // create a modifiable copy of the grid datas
-    var i, gd, x, y;
+    let i, gd, x, y;
     for (i = 0; i < this.cons.length; i++) {
       this.gridDatas[i] = new LogicalGridData(this.cons[i]);
     }
@@ -45,8 +45,8 @@ export default class LogicalGridLayoutInfo {
       return;
     }
     // eliminate unused rows and columns
-    var usedCols = new TreeSet();
-    var usedRows = new TreeSet();
+    let usedCols = new TreeSet();
+    let usedRows = new TreeSet();
     // ticket 86645 use member gridDatas instead of param cons
     for (i = 0; i < this.gridDatas.length; i++) {
       gd = this.gridDatas[i];
@@ -69,7 +69,7 @@ export default class LogicalGridLayoutInfo {
         usedRows.add(y);
       }
     }
-    var maxCol = usedCols.last();
+    let maxCol = usedCols.last();
     for (x = maxCol; x >= 0; x--) {
       if (!usedCols.contains(x)) {
         // eliminate column
@@ -82,7 +82,7 @@ export default class LogicalGridLayoutInfo {
         }
       }
     }
-    var maxRow = usedRows.last();
+    let maxRow = usedRows.last();
     for (y = maxRow; y >= 0; y--) {
       if (!usedRows.contains(y)) {
         // eliminate row
@@ -105,12 +105,12 @@ export default class LogicalGridLayoutInfo {
   }
 
   _initializeInfo() {
-    var compCount = this.$components.length;
-    var uiHeightElements = [];
-    for (var i = 0; i < compCount; i++) {
+    let compCount = this.$components.length;
+    let uiHeightElements = [];
+    for (let i = 0; i < compCount; i++) {
       // cleanup constraints
-      var $comp = this.$components[i];
-      var cons = this.gridDatas[i];
+      let $comp = this.$components[i];
+      let cons = this.gridDatas[i];
       if (cons.gridx < 0) {
         cons.gridx = 0;
       }
@@ -137,7 +137,7 @@ export default class LogicalGridLayoutInfo {
       }
 
       // Calculate and cache component size
-      var size = new Dimension(0, 0);
+      let size = new Dimension(0, 0);
       if (cons.widthHint > 0) {
         // Use explicit width hint, if set
         size.width = cons.widthHint;
@@ -174,13 +174,13 @@ export default class LogicalGridLayoutInfo {
 
     // Calculate preferred heights using the width hints
     if (this.widthHint && uiHeightElements.length > 0) {
-      var totalHGap = Math.max(0, (this.cols - 1) * this.hgap);
+      let totalHGap = Math.max(0, (this.cols - 1) * this.hgap);
       this.widthHints = this.layoutSizes(this.widthHint - totalHGap, this.width, this.weightX);
     }
     uiHeightElements.forEach(function(elem) {
-      var $comp = elem.$comp;
-      var cons = elem.cons;
-      var widthHint = this.widthHintForGridData(cons);
+      let $comp = elem.$comp;
+      let cons = elem.cons;
+      let widthHint = this.widthHintForGridData(cons);
       if (!cons.fillHorizontal) {
         widthHint = Math.min(widthHint, this.compSize[elem.index].width);
       }
@@ -194,11 +194,11 @@ export default class LogicalGridLayoutInfo {
   }
 
   _initializeColumns() {
-    var compSize = this.compSize;
-    var compCount = compSize.length;
-    var prefWidths = arrays.init(this.cols, 0);
-    var fixedWidths = arrays.init(this.cols, false);
-    var i, j, k, prefw, cons;
+    let compSize = this.compSize;
+    let compCount = compSize.length;
+    let prefWidths = arrays.init(this.cols, 0);
+    let fixedWidths = arrays.init(this.cols, false);
+    let i, j, k, prefw, cons;
     for (i = 0; i < compCount; i++) {
       cons = this.gridDatas[i];
       if (cons.gridw === 1) {
@@ -221,9 +221,9 @@ export default class LogicalGridLayoutInfo {
     for (i = 0; i < compCount; i++) {
       cons = this.gridDatas[i];
       if (cons.gridw > 1) {
-        var hSpan = cons.gridw;
-        var spanWidth = 0;
-        var distWidth;
+        let hSpan = cons.gridw;
+        let spanWidth = 0;
+        let distWidth;
         // pref
         for (j = cons.gridx; j < cons.gridx + cons.gridw && j < this.cols; j++) {
           if (!fixedWidths[j]) {
@@ -238,9 +238,9 @@ export default class LogicalGridLayoutInfo {
           distWidth = this.logicalWidthInPixel(cons) - spanWidth - (hSpan - 1) * this.hgap;
         }
         if (distWidth > 0) {
-          var equalWidth = Math.floor((distWidth + spanWidth) / hSpan);
-          var remainder = (distWidth + spanWidth) % hSpan;
-          var last = -1;
+          let equalWidth = Math.floor((distWidth + spanWidth) / hSpan);
+          let remainder = (distWidth + spanWidth) % hSpan;
+          let last = -1;
           for (j = cons.gridx; j < cons.gridx + cons.gridw && j < this.cols; j++) {
             last = j;
             if (!fixedWidths[j]) {
@@ -257,7 +257,7 @@ export default class LogicalGridLayoutInfo {
       }
     }
 
-    var lc = LayoutConstants;
+    let lc = LayoutConstants;
     for (i = 0; i < this.cols; i++) {
       this.width[i] = [];
       if (fixedWidths[i]) {
@@ -277,8 +277,8 @@ export default class LogicalGridLayoutInfo {
       if (fixedWidths[i]) {
         this.weightX[i] = 0;
       } else {
-        var weightSum = 0;
-        var weightCount = 0;
+        let weightSum = 0;
+        let weightCount = 0;
         for (k = 0; k < compCount; k++) {
           cons = this.gridDatas[k];
           if (cons.weightx > 0 && cons.gridx <= i && i <= cons.gridx + cons.gridw - 1) {
@@ -289,12 +289,12 @@ export default class LogicalGridLayoutInfo {
         this.weightX[i] = (weightCount > 0 ? weightSum / weightCount : 0);
       }
     }
-    var sumWeightX = 0;
+    let sumWeightX = 0;
     for (i = 0; i < this.cols; i++) {
       sumWeightX += this.weightX[i];
     }
     if (sumWeightX >= 1e-6) {
-      var f = 1.0 / sumWeightX;
+      let f = 1.0 / sumWeightX;
       for (i = 0; i < this.cols; i++) {
         this.weightX[i] = this.weightX[i] * f;
       }
@@ -302,11 +302,11 @@ export default class LogicalGridLayoutInfo {
   }
 
   _initializeRows() {
-    var compSize = this.compSize;
-    var compCount = compSize.length;
-    var prefHeights = arrays.init(this.rows, 0);
-    var fixedHeights = arrays.init(this.rows, false);
-    var i, j, k, prefh, cons;
+    let compSize = this.compSize;
+    let compCount = compSize.length;
+    let prefHeights = arrays.init(this.rows, 0);
+    let fixedHeights = arrays.init(this.rows, false);
+    let i, j, k, prefh, cons;
     for (i = 0; i < compCount; i++) {
       cons = this.gridDatas[i];
       if (cons.gridh === 1) {
@@ -329,9 +329,9 @@ export default class LogicalGridLayoutInfo {
     for (i = 0; i < compCount; i++) {
       cons = this.gridDatas[i];
       if (cons.gridh > 1) {
-        var vSpan = cons.gridh;
-        var spanHeight = 0;
-        var distHeight;
+        let vSpan = cons.gridh;
+        let spanHeight = 0;
+        let distHeight;
         // pref
         for (j = cons.gridy; j < cons.gridy + cons.gridh && j < this.rows; j++) {
           if (!fixedHeights[j]) {
@@ -346,9 +346,9 @@ export default class LogicalGridLayoutInfo {
           distHeight = this.logicalHeightInPixel(cons) - spanHeight - (vSpan - 1) * this.vgap;
         }
         if (distHeight > 0) {
-          var equalHeight = Math.floor((distHeight + spanHeight) / vSpan);
-          var remainder = (distHeight + spanHeight) % vSpan;
-          var last = -1;
+          let equalHeight = Math.floor((distHeight + spanHeight) / vSpan);
+          let remainder = (distHeight + spanHeight) % vSpan;
+          let last = -1;
           for (j = cons.gridy; j < cons.gridy + cons.gridh && j < this.rows; j++) {
             last = j;
             if (!fixedHeights[j]) {
@@ -365,7 +365,7 @@ export default class LogicalGridLayoutInfo {
       }
     }
 
-    var lc = LayoutConstants;
+    let lc = LayoutConstants;
     for (i = 0; i < this.rows; i++) {
       this.height[i] = [];
       if (fixedHeights[i]) {
@@ -384,8 +384,8 @@ export default class LogicalGridLayoutInfo {
       if (fixedHeights[i]) {
         this.weightY[i] = 0;
       } else {
-        var weightSum = 0;
-        var weightCount = 0;
+        let weightSum = 0;
+        let weightCount = 0;
         for (k = 0; k < compCount; k++) {
           cons = this.gridDatas[k];
           if (cons.weighty > 0 && cons.gridy <= i && i <= cons.gridy + cons.gridh - 1) {
@@ -396,12 +396,12 @@ export default class LogicalGridLayoutInfo {
         this.weightY[i] = (weightCount > 0 ? weightSum / weightCount : 0);
       }
     }
-    var sumWeightY = 0;
+    let sumWeightY = 0;
     for (i = 0; i < this.rows; i++) {
       sumWeightY += this.weightY[i];
     }
     if (sumWeightY >= 1e-6) {
-      var f = 1.0 / sumWeightY;
+      let f = 1.0 / sumWeightY;
       for (i = 0; i < this.rows; i++) {
         this.weightY[i] = this.weightY[i] * f;
       }
@@ -409,10 +409,10 @@ export default class LogicalGridLayoutInfo {
   }
 
   layoutCellBounds(size, insets) {
-    var w = this.layoutSizes(size.width - insets.horizontal() - Math.max(0, (this.cols - 1) * this.hgap), this.width, this.weightX);
-    var h = this.layoutSizes(size.height - insets.vertical() - Math.max(0, (this.rows - 1) * this.vgap), this.height, this.weightY);
+    let w = this.layoutSizes(size.width - insets.horizontal() - Math.max(0, (this.cols - 1) * this.hgap), this.width, this.weightX);
+    let h = this.layoutSizes(size.height - insets.vertical() - Math.max(0, (this.rows - 1) * this.vgap), this.height, this.weightY);
     this.cellBounds = arrays.init(this.rows, null);
-    var y = insets.top,
+    let y = insets.top,
       r, x, c;
     for (r = 0; r < this.rows; r++) {
       x = insets.left;
@@ -429,17 +429,17 @@ export default class LogicalGridLayoutInfo {
   }
 
   layoutSizes(targetSize, sizes, weights) {
-    var i;
-    var outSizes = arrays.init(sizes.length, 0);
+    let i;
+    let outSizes = arrays.init(sizes.length, 0);
     if (targetSize <= 0) {
       for (i = 0; i < sizes.length; i++) {
         outSizes[i] = sizes[i][LayoutConstants.MIN];
       }
       return outSizes;
     }
-    var sumSize = 0;
-    var tmpWeight = arrays.init(weights.length, 0.0);
-    var sumWeight = 0;
+    let sumSize = 0;
+    let tmpWeight = arrays.init(weights.length, 0.0);
+    let sumWeight = 0;
     for (i = 0; i < sizes.length; i++) {
       outSizes[i] = sizes[i][LayoutConstants.PREF];
       sumSize += outSizes[i];
@@ -463,13 +463,13 @@ export default class LogicalGridLayoutInfo {
         tmpWeight[i] = tmpWeight[i] / sumWeight;
       }
     }
-    var deltaInt = targetSize - sumSize;
+    let deltaInt = targetSize - sumSize;
     // expand or shrink
     if (Math.abs(deltaInt) > 0) {
       // setup accumulators
       /* float[] */
-      var accWeight = arrays.init(tmpWeight.length, 0.0);
-      var hasTargets;
+      let accWeight = arrays.init(tmpWeight.length, 0.0);
+      let hasTargets;
       if (deltaInt > 0) {
         // expand, if delta is > 0
         hasTargets = true;
@@ -510,18 +510,18 @@ export default class LogicalGridLayoutInfo {
   }
 
   logicalWidthInPixel(cons) {
-    var gridW = cons.gridw;
+    let gridW = cons.gridw;
     return (this.columnWidth * gridW) + (this.hgap * Math.max(0, gridW - 1));
   }
 
   logicalHeightInPixel(cons) {
-    var gridH = cons.gridh,
+    let gridH = cons.gridh,
       addition = cons.logicalRowHeightAddition || 0;
     return (this.rowHeight * gridH) + (this.vgap * Math.max(0, gridH - 1)) + addition;
   }
 
   uiSizeInPixel($comp, cons, options) {
-    var htmlComp = HtmlComponent.get($comp);
+    let htmlComp = HtmlComponent.get($comp);
     return htmlComp.prefSize(options).add(htmlComp.margins());
   }
 
@@ -532,8 +532,8 @@ export default class LogicalGridLayoutInfo {
     if (this.widthHints.length === 0) {
       return null;
     }
-    var widthHint = (gridData.gridw - 1) * this.hgap;
-    for (var i = gridData.gridx; i < gridData.gridx + gridData.gridw; i++) {
+    let widthHint = (gridData.gridw - 1) * this.hgap;
+    for (let i = gridData.gridx; i < gridData.gridx + gridData.gridw; i++) {
       widthHint += this.widthHints[i];
     }
     return widthHint;

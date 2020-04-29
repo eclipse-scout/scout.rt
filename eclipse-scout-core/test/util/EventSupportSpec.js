@@ -10,22 +10,22 @@
  */
 import {EventSupport} from '../../src/index';
 
-describe('EventSupport', function() {
+describe('EventSupport', () => {
 
-  var count, events;
+  let count, events;
 
   function fooListener() {
     count++;
   }
 
-  describe('on / trigger / off', function() {
+  describe('on / trigger / off', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       events = new EventSupport();
       count = 0;
     });
 
-    it('single event func only triggered until off() is called', function() {
+    it('single event func only triggered until off() is called', () => {
       events.on('foo', fooListener);
       events.trigger('foo');
       expect(count).toBe(1);
@@ -35,7 +35,7 @@ describe('EventSupport', function() {
       expect(count).toBe(1);
     });
 
-    it('multiple events', function() {
+    it('multiple events', () => {
       events.on('foo bar', fooListener);
       events.trigger('foo');
       events.trigger('bar');
@@ -44,14 +44,14 @@ describe('EventSupport', function() {
 
   });
 
-  describe('one', function() {
+  describe('one', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       events = new EventSupport();
       count = 0;
     });
 
-    it('single event func only triggered once when registered with one()', function() {
+    it('single event func only triggered once when registered with one()', () => {
       events.one('foo', fooListener);
       events.trigger('foo');
       events.trigger('foo');
@@ -59,9 +59,9 @@ describe('EventSupport', function() {
       expect(events._eventListeners.length).toBe(0);
     });
 
-    it('event parameter passed to registered func', function() {
-      var receivedEvent = null;
-      events.one('foo', function(event) {
+    it('event parameter passed to registered func', () => {
+      let receivedEvent = null;
+      events.one('foo', event => {
         receivedEvent = event;
       });
       events.trigger('foo', {
@@ -73,7 +73,7 @@ describe('EventSupport', function() {
       expect(receivedEvent.type).toBe('foo');
     });
 
-    it('de-register function registered with one()', function() {
+    it('de-register function registered with one()', () => {
       events.one('foo', fooListener);
       expect(events._eventListeners.length).toBe(1);
       events.off('foo', fooListener);
@@ -82,7 +82,7 @@ describe('EventSupport', function() {
 
   });
 
-  describe('off', function() {
+  describe('off', () => {
 
     function fooListener1() {
       count++;
@@ -112,12 +112,12 @@ describe('EventSupport', function() {
       count++;
     }
 
-    beforeEach(function() {
+    beforeEach(() => {
       events = new EventSupport();
       count = 0;
     });
 
-    it('remove all with same type', function() {
+    it('remove all with same type', () => {
       events.one('foo', fooListener);
       events.one('foo', fooListener1);
       events.one('asdf', fooListener2);
@@ -130,7 +130,7 @@ describe('EventSupport', function() {
       expect(events._eventListeners.length).toBe(6);
     });
 
-    it('remove specific listener', function() {
+    it('remove specific listener', () => {
       events.one('foo', fooListener);
       events.one('foo', fooListener1);
       events.one('asdf', fooListener2);

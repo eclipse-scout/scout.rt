@@ -51,7 +51,7 @@ export default class PlainTextEncoder {
       text = text.trim();
     }
 
-    var textarea = this.cache.get();
+    let textarea = this.cache.get();
     textarea.innerHTML = text;
     return textarea.value;
   }

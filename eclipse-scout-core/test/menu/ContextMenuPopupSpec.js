@@ -11,10 +11,10 @@
 import {scout} from '../../src/index';
 import {MenuSpecHelper} from '@eclipse-scout/testing';
 
-describe('ContextMenuPopup', function() {
-  var helper, session;
+describe('ContextMenuPopup', () => {
+  let helper, session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new MenuSpecHelper(session);
@@ -26,10 +26,10 @@ describe('ContextMenuPopup', function() {
    * has a data() referencing the widget instance.
    */
   function findClone(popup, originalMenu) {
-    var clone = null;
+    let clone = null;
     popup.$container.find('.menu-item').each(function() {
-      var $menuItem = $(this);
-      var widget = $menuItem.data('widget');
+      let $menuItem = $(this);
+      let widget = $menuItem.data('widget');
       if (widget.cloneOf === originalMenu) {
         clone = widget;
       }
@@ -37,19 +37,19 @@ describe('ContextMenuPopup', function() {
     return clone;
   }
 
-  describe('options.cloneMenuItems', function() {
-    var popup, menu, childMenu;
+  describe('options.cloneMenuItems', () => {
+    let popup, menu, childMenu;
 
-    beforeEach(function() {
+    beforeEach(() => {
       menu = helper.createMenu(helper.createModel());
       childMenu = helper.createMenu(helper.createModel());
       menu.childActions = [childMenu];
     });
 
-    describe('true', function() {
+    describe('true', () => {
 
-      it('clones the given menus and renders the clones', function() {
-        var menuItems = [menu];
+      it('clones the given menus and renders the clones', () => {
+        let menuItems = [menu];
         menu.render();
         popup = scout.create('ContextMenuPopup', {
           parent: session.desktop,
@@ -59,8 +59,8 @@ describe('ContextMenuPopup', function() {
         });
         popup.render();
 
-        var menuClone = findClone(popup, menu);
-        var childMenuClone = menuClone.childActions[0];
+        let menuClone = findClone(popup, menu);
+        let childMenuClone = menuClone.childActions[0];
         // clone is rendered in the popup
         expect(menuClone.rendered).toBe(true);
         expect(menuClone.$container.parent()[0]).toBe(popup.$body[0]);
@@ -72,8 +72,8 @@ describe('ContextMenuPopup', function() {
         popup.destroy();
       });
 
-      it('only destroys and removes the clones on popup close', function() {
-        var menuItems = [menu];
+      it('only destroys and removes the clones on popup close', () => {
+        let menuItems = [menu];
         menu.render();
 
         popup = scout.create('ContextMenuPopup', {
@@ -84,8 +84,8 @@ describe('ContextMenuPopup', function() {
         });
         popup.render();
 
-        var menuClone = findClone(popup, menu);
-        var childMenuClone = menuClone.childActions[0];
+        let menuClone = findClone(popup, menu);
+        let childMenuClone = menuClone.childActions[0];
         popup.destroy();
 
         expect(menuClone.destroyed).toBe(true);
@@ -98,10 +98,10 @@ describe('ContextMenuPopup', function() {
 
     });
 
-    describe('false', function() {
+    describe('false', () => {
 
-      it('renders the original menus', function() {
-        var menuItems = [menu];
+      it('renders the original menus', () => {
+        let menuItems = [menu];
         popup = scout.create('ContextMenuPopup', {
           parent: session.desktop,
           session: session,
@@ -110,7 +110,7 @@ describe('ContextMenuPopup', function() {
         });
         popup.render();
 
-        var menuClone = findClone(popup, menu);
+        let menuClone = findClone(popup, menu);
         expect(menuClone).toBe(null);
         // original menu is rendered in the popup
         expect(menu.rendered).toBe(true);
@@ -119,8 +119,8 @@ describe('ContextMenuPopup', function() {
         popup.destroy();
       });
 
-      it('removes but does not destroy the menus on popup close', function() {
-        var menuItems = [menu];
+      it('removes but does not destroy the menus on popup close', () => {
+        let menuItems = [menu];
         popup = scout.create('ContextMenuPopup', {
           parent: session.desktop,
           session: session,
@@ -129,7 +129,7 @@ describe('ContextMenuPopup', function() {
         });
         popup.render();
 
-        var menuClone = findClone(popup, menu);
+        let menuClone = findClone(popup, menu);
         expect(menuClone).toBe(null);
         // original menu is rendered in the popup
         expect(menu.rendered).toBe(true);
@@ -156,17 +156,17 @@ describe('ContextMenuPopup', function() {
 
   });
 
-  describe('renderMenuItems', function() {
-    var popup, menu0, menu1, menu2;
+  describe('renderMenuItems', () => {
+    let popup, menu0, menu1, menu2;
 
-    beforeEach(function() {
+    beforeEach(() => {
       menu0 = helper.createMenu(helper.createModel());
       menu1 = helper.createMenu(helper.createModel());
       menu2 = helper.createMenu(helper.createModel());
     });
 
-    it('renders invisible menus', function() {
-      var menuItems = [menu0, menu1, menu2];
+    it('renders invisible menus', () => {
+      let menuItems = [menu0, menu1, menu2];
       menu2.visible = false;
       popup = scout.create('ContextMenuPopup', {
         parent: session.desktop,
@@ -175,17 +175,17 @@ describe('ContextMenuPopup', function() {
       });
       popup.render();
 
-      var menu0Clone = findClone(popup, menu0);
-      var menu1Clone = findClone(popup, menu1);
-      var menu2Clone = findClone(popup, menu2);
+      let menu0Clone = findClone(popup, menu0);
+      let menu1Clone = findClone(popup, menu1);
+      let menu2Clone = findClone(popup, menu2);
       expect(menu0Clone.$container.isVisible()).toBe(true);
       expect(menu1Clone.$container.isVisible()).toBe(true);
       expect(menu2Clone.$container.isVisible()).toBe(false);
       popup.remove();
     });
 
-    it('adds last and first classes', function() {
-      var menuItems = [menu0, menu1, menu2];
+    it('adds last and first classes', () => {
+      let menuItems = [menu0, menu1, menu2];
       popup = scout.create('ContextMenuPopup', {
         parent: session.desktop,
         session: session,
@@ -193,16 +193,16 @@ describe('ContextMenuPopup', function() {
       });
       popup.render();
 
-      var menu0Clone = findClone(popup, menu0);
-      var menu1Clone = findClone(popup, menu1);
-      var menu2Clone = findClone(popup, menu2);
+      let menu0Clone = findClone(popup, menu0);
+      let menu1Clone = findClone(popup, menu1);
+      let menu2Clone = findClone(popup, menu2);
       expect(menu0Clone.$container).toHaveClass('context-menu-item-first');
       expect(menu2Clone.$container).toHaveClass('context-menu-item-last');
       popup.remove();
     });
 
-    it('considers visibility when adding last and first classes', function() {
-      var menuItems = [menu0, menu1, menu2];
+    it('considers visibility when adding last and first classes', () => {
+      let menuItems = [menu0, menu1, menu2];
       menu2.visible = false;
       popup = scout.create('ContextMenuPopup', {
         parent: session.desktop,
@@ -211,18 +211,18 @@ describe('ContextMenuPopup', function() {
       });
       popup.render();
 
-      var menu0Clone = findClone(popup, menu0);
-      var menu1Clone = findClone(popup, menu1);
-      var menu2Clone = findClone(popup, menu2);
+      let menu0Clone = findClone(popup, menu0);
+      let menu1Clone = findClone(popup, menu1);
+      let menu2Clone = findClone(popup, menu2);
       expect(menu0Clone.$container).toHaveClass('context-menu-item-first');
       expect(menu1Clone.$container).toHaveClass('context-menu-item-last');
       expect(menu2Clone.$container).not.toHaveClass('context-menu-item-last');
       popup.remove();
     });
 
-    it('makes cloned menus non-tabbable', function() {
+    it('makes cloned menus non-tabbable', () => {
       menu0.tabbable = true; // <-- !
-      var menuItems = [menu0, menu1, menu2];
+      let menuItems = [menu0, menu1, menu2];
       popup = scout.create('ContextMenuPopup', {
         parent: session.desktop,
         session: session,
@@ -230,9 +230,9 @@ describe('ContextMenuPopup', function() {
       });
       popup.render();
 
-      var menu0Clone = findClone(popup, menu0);
-      var menu1Clone = findClone(popup, menu1);
-      var menu2Clone = findClone(popup, menu2);
+      let menu0Clone = findClone(popup, menu0);
+      let menu1Clone = findClone(popup, menu1);
+      let menu2Clone = findClone(popup, menu2);
       expect(menu0Clone.tabbable).toBe(false); // <-- !
       expect(menu1Clone.tabbable).toBe(false);
       expect(menu2Clone.tabbable).toBe(false);

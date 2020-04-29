@@ -58,7 +58,7 @@ export default class LookupBox extends ValueField {
     this.addStatus();
     this.addFieldContainer(this.$parent.makeDiv());
 
-    var htmlComp = HtmlComponent.install(this.$fieldContainer, this.session);
+    let htmlComp = HtmlComponent.install(this.$fieldContainer, this.session);
     htmlComp.setLayout(this._createFieldContainerLayout());
 
     this._ensureLookupCallExecuted();
@@ -89,8 +89,8 @@ export default class LookupBox extends ValueField {
     }
     this._clearPendingLookup();
 
-    var deferred = $.Deferred();
-    var doneHandler = function(result) {
+    let deferred = $.Deferred();
+    let doneHandler = function(result) {
       this._lookupByAllDone(result);
       deferred.resolve(result);
     }.bind(this);
@@ -121,12 +121,12 @@ export default class LookupBox extends ValueField {
 
     return lookupCall
       .execute()
-      .always(function() {
+      .always(() => {
         this._currentLookupCall = null;
         this._lookupExecuted = true;
         this.setLoading(false);
         this._clearLookupStatus();
-      }.bind(this));
+      });
   }
 
   _lookupByAllDone(result) {
@@ -218,8 +218,8 @@ export default class LookupBox extends ValueField {
       return '';
     }
 
-    var formatted = [];
-    lookupRows.forEach(function(row) {
+    let formatted = [];
+    lookupRows.forEach(row => {
       formatted.push(row.text);
     });
     return strings.join(', ', formatted);

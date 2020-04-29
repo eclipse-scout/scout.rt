@@ -14,7 +14,7 @@ import $ from 'jquery';
 let localesMap = {};
 
 export function bootstrap(url) {
-  var promise = url ? $.ajaxJson(url) : $.resolvedPromise([]);
+  let promise = url ? $.ajaxJson(url) : $.resolvedPromise([]);
   return promise.then(_preInit.bind(this, url));
 }
 
@@ -30,7 +30,7 @@ export function _preInit(url, data) {
 }
 
 export function init(data) {
-  data.forEach(function(locale) {
+  data.forEach(locale => {
     localesMap[locale.languageTag] = new Locale(locale);
   }, this);
 }
@@ -58,10 +58,10 @@ export function has(languageTag, explicit) {
  * If there is still no locale found, null is returned.
  */
 export function get(languageTag) {
-  var locale,
+  let locale,
     tags = texts.createOrderedLanguageTags(languageTag);
 
-  tags.some(function(tag) {
+  tags.some(tag => {
     locale = _get(tag);
     return !!locale;
   }, this);
@@ -84,14 +84,14 @@ export function getNavigatorLanguage() {
  * If still no locale is found, the default locale {@link Locale.DEFAULT} is returned.
  */
 export function getNavigatorLocale() {
-  var languageTag = getNavigatorLanguage();
+  let languageTag = getNavigatorLanguage();
   if (!languageTag) {
     //  No language returned by the browser, using default locale (should not happen with modern browsers, but we never know...)
     $.log.warn('Browser returned no language. Using default locale.');
     return new Locale();
   }
 
-  var locale = get(languageTag);
+  let locale = get(languageTag);
   if (locale) {
     // If a locale was found for the language returned by the navigator, use that one
     return locale;
@@ -99,7 +99,7 @@ export function getNavigatorLocale() {
 
   // Otherwise search a locale with the same language
   $.log.isInfoEnabled() && $.log.info('Locale for languageTag ' + languageTag + ' not found. Trying to load best match.');
-  var language = splitLanguageTag(languageTag)[0];
+  let language = splitLanguageTag(languageTag)[0];
   locale = findFirstForLanguage(language);
   if (locale) {
     return locale;
@@ -124,7 +124,7 @@ export function getAllLanguageTags() {
  */
 export function findFirstForLanguage(language) {
   scout.assertParameter('language', language);
-  return arrays.find(getAll(), function(locale) {
+  return arrays.find(getAll(), locale => {
     if (locale.language === language) {
       return locale;
     }

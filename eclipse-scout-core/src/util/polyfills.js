@@ -39,7 +39,7 @@ export function _installPolyfillMath(window) {
     return; // Nothing to do
   }
 
-  Math.sign = function(x) {
+  Math.sign = x => {
     x = +x; // convert to a number
     if (x === 0 || isNaN(x)) {
       return x;
@@ -57,29 +57,29 @@ export function _installPolyfillFormData(window) {
     return; // Nothing to do
   }
 
-  window.FormData = function() {
+  window.FormData = () => {
     polyfill = true; // Marker
     _boundary = 'ScoutFormData-' + numbers.randomId(50);
     _data = [];
     _crlf = '\r\n';
   };
 
-  window.FormData.prototype.append = function(key, value, filename) {
-    var element = [key, value, filename];
+  window.FormData.prototype.append = (key, value, filename) => {
+    let element = [key, value, filename];
     _data.push(element);
   };
 
-  window.FormData.prototype.getContent = function() {
-    var result = '';
-    _data.forEach(function(element) {
-      var key = element[0];
-      var value = element[1];
-      var filename = element[2];
+  window.FormData.prototype.getContent = () => {
+    let result = '';
+    _data.forEach(element => {
+      let key = element[0];
+      let value = element[1];
+      let filename = element[2];
 
       result += '--' + _boundary + _crlf;
       if (Device.get().supportsFile() && value instanceof window.File) {
         // File
-        var file = value;
+        let file = value;
         filename = filename || file.name || key;
         result += 'Content-Disposition: form-data; name="' + key + '"; filename="' + filename + '"' + _crlf;
         result += 'Content-Type: ' + file.type + _crlf;
@@ -96,13 +96,13 @@ export function _installPolyfillFormData(window) {
     return result;
   };
 
-  window.FormData.prototype.applyToAjaxOptions = function(ajaxOpts) {
+  window.FormData.prototype.applyToAjaxOptions = ajaxOpts => {
     if (!ajaxOpts) {
       return;
     }
     // Make sure no text encoding stuff is done by xhr
-    ajaxOpts.xhr = function() {
-      var xhr = $.ajaxSettings.xhr();
+    ajaxOpts.xhr = () => {
+      let xhr = $.ajaxSettings.xhr();
       xhr.send = xhr.sendAsBinary || xhr.send; // sendAsBinary only exists in older browsers
       return xhr;
     };

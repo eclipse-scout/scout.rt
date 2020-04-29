@@ -31,13 +31,13 @@ export default class RowLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var htmlComp = HtmlComponent.get($container);
-    var containerSize = htmlComp.availableSize()
+    let htmlComp = HtmlComponent.get($container);
+    let containerSize = htmlComp.availableSize()
       .subtract(htmlComp.insets());
 
-    $container.children().each(function(index, elem) {
-      var $elem = $(elem);
-      var htmlChild = HtmlComponent.optGet($elem);
+    $container.children().each((index, elem) => {
+      let $elem = $(elem);
+      let htmlChild = HtmlComponent.optGet($elem);
       if (!htmlChild || !$elem.isVisible()) {
         return;
       }
@@ -45,7 +45,7 @@ export default class RowLayout extends AbstractLayout {
         htmlChild.validateLayout();
         return;
       }
-      var prefSize = htmlChild.prefSize({
+      let prefSize = htmlChild.prefSize({
         widthHint: containerSize.width
       });
 
@@ -55,21 +55,21 @@ export default class RowLayout extends AbstractLayout {
       }
 
       htmlChild.setSize(prefSize);
-    }.bind(this));
+    });
   }
 
   preferredLayoutSize($container, options) {
-    var prefSize = new Dimension(),
+    let prefSize = new Dimension(),
       htmlContainer = HtmlComponent.get($container),
       maxWidth = 0;
 
-    $container.children().each(function(index, elem) {
-      var $elem = $(elem);
-      var htmlChild = HtmlComponent.optGet($elem);
+    $container.children().each((index, elem) => {
+      let $elem = $(elem);
+      let htmlChild = HtmlComponent.optGet($elem);
       if (!htmlChild || !$elem.isVisible()) {
         return;
       }
-      var htmlChildPrefSize = htmlChild.prefSize(options)
+      let htmlChildPrefSize = htmlChild.prefSize(options)
         .add(htmlChild.margins());
       maxWidth = Math.max(htmlChildPrefSize.width, maxWidth);
       prefSize.height += htmlChildPrefSize.height;

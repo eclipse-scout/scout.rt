@@ -85,7 +85,7 @@ export default class Splitter extends Widget {
     if (!this.$anchor) {
       return null;
     }
-    var anchorBounds = graphics.offsetBounds(this.$anchor, {
+    let anchorBounds = graphics.offsetBounds(this.$anchor, {
       exact: true
     });
     if (this.splitHorizontal) {
@@ -102,7 +102,7 @@ export default class Splitter extends Widget {
       return;
     }
     this.position = position;
-    var event = {
+    let event = {
       position: position
     };
     this.trigger('positionChange', event);
@@ -116,16 +116,16 @@ export default class Splitter extends Widget {
       return;
     }
 
-    var splitterSize = graphics.size(this.$container, true);
+    let splitterSize = graphics.size(this.$container, true);
     if (this.splitHorizontal) {
-      var x = this.position - (splitterSize.width / 2);
+      let x = this.position - (splitterSize.width / 2);
       if (this.orientation === 'right') {
         this.$container.cssRight(x);
       } else {
         this.$container.cssLeft(x);
       }
     } else {
-      var y = this.position - (splitterSize.height / 2);
+      let y = this.position - (splitterSize.height / 2);
       if (this.orientation === 'bottom') {
         this.$container.cssBottom(y);
       } else {
@@ -138,13 +138,13 @@ export default class Splitter extends Widget {
     // The calculation of the offset bounds looks a bit complicated, because we cannot
     // use "scout.graphics.offsetBounds($el, true)" here. This method would only consider
     // any margins in the size, not the position.
-    var splitterMargins = graphics.margins(this.$container);
-    var splitterOffsetBounds = graphics.offsetBounds(this.$container);
+    let splitterMargins = graphics.margins(this.$container);
+    let splitterOffsetBounds = graphics.offsetBounds(this.$container);
     splitterOffsetBounds.x -= splitterMargins.left;
     splitterOffsetBounds.y -= splitterMargins.top;
     splitterOffsetBounds.width += splitterMargins.horizontal();
     splitterOffsetBounds.height += splitterMargins.vertical();
-    var splitterCenter = splitterOffsetBounds.center();
+    let splitterCenter = splitterOffsetBounds.center();
 
     // Add listeners (we add them to the window to make sure we get the mouseup event even when the cursor it outside the window)
     this._$window
@@ -165,20 +165,20 @@ export default class Splitter extends Widget {
   }
 
   _getSplitterPosition(event) {
-    var rootBounds = graphics.offsetBounds(this.$root);
+    let rootBounds = graphics.offsetBounds(this.$root);
     if (this.splitHorizontal) {
-      var x = event.pageX + this._cursorOffset.left - rootBounds.x;
+      let x = event.pageX + this._cursorOffset.left - rootBounds.x;
       return (this.orientation === 'right' ? rootBounds.width - x : x);
     }
-    var y = event.pageY + this._cursorOffset.top - rootBounds.y;
+    let y = event.pageY + this._cursorOffset.top - rootBounds.y;
     return (this.orientation === 'bottom' ? rootBounds.height - y : y);
 
   }
 
   _onMouseMove(event) {
-    var splitterPosition = this._getSplitterPosition(event);
+    let splitterPosition = this._getSplitterPosition(event);
     // fire event
-    var moveEvent = {
+    let moveEvent = {
       position: splitterPosition,
       defaultPrevented: false,
       preventDefault: function() {

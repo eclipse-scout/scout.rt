@@ -173,7 +173,7 @@ export default class Form extends Widget {
   }
 
   _renderForm() {
-    var layout, $handle;
+    let layout, $handle;
 
     this.$container = this.$parent.appendDiv()
       .addClass(this.isDialog() ? 'dialog' : 'form')
@@ -259,13 +259,13 @@ export default class Form extends Widget {
    */
   open() {
     return this.load()
-      .then(function() {
+      .then(() => {
         if (this.destroyed) {
           // If form has been closed right after it was opened don't try to show it
           return;
         }
         this.show();
-      }.bind(this));
+      });
   }
 
   /**
@@ -322,9 +322,9 @@ export default class Form extends Widget {
    * Method may be implemented to load the data. By default, the provided this.data is returned.
    */
   _load() {
-    return $.resolvedPromise().then(function() {
+    return $.resolvedPromise().then(() => {
       return this.data;
-    }.bind(this));
+    });
   }
 
   /**
@@ -335,9 +335,9 @@ export default class Form extends Widget {
   }
 
   _onLifecyclePostLoad() {
-    return this._postLoad().then(function() {
+    return this._postLoad().then(() => {
       this.trigger('postLoad');
-    }.bind(this));
+    });
   }
 
   _postLoad() {
@@ -382,12 +382,12 @@ export default class Form extends Widget {
   }
 
   _onLifecycleSave() {
-    var data = this.exportData();
-    return this._save(data).then(function(status) {
+    let data = this.exportData();
+    return this._save(data).then(status => {
       this.setData(data);
       this.trigger('save');
       return status;
-    }.bind(this));
+    });
   }
 
   /**
@@ -468,7 +468,7 @@ export default class Form extends Widget {
    * Destroys the form and removes it from the desktop.
    */
   _onLifecycleClose() {
-    var event = new Event();
+    let event = new Event();
     this.trigger('close', event);
     if (!event.defaultPrevented) {
       this._close();
@@ -485,7 +485,7 @@ export default class Form extends Widget {
    * It will either call {@link #close()} or {@link #cancel()), depending on the enabled and visible system buttons, see {@link _abort}.
    */
   abort() {
-    var event = new Event();
+    let event = new Event();
     this.trigger('abort', event);
     if (!event.defaultPrevented) {
       this._abort();
@@ -504,16 +504,16 @@ export default class Form extends Widget {
  */
   _abort() {
     // Search for a close button in the menus and buttons of the root group box
-    var hasCloseButton = this.rootGroupBox.controls
+    let hasCloseButton = this.rootGroupBox.controls
       .concat(this.rootGroupBox.menus)
-      .filter(function(control) {
-        var enabled = control.enabled;
+      .filter(control => {
+        let enabled = control.enabled;
         if (control.enabledComputed !== undefined) {
           enabled = control.enabledComputed; // Menus don't have enabledComputed, only form fields
         }
         return control.visible && enabled && control.systemType && control.systemType !== Button.SystemType.NONE;
       })
-      .some(function(control) {
+      .some(control => {
         return control.systemType === Button.SystemType.CLOSE;
       });
 
@@ -559,7 +559,7 @@ export default class Form extends Widget {
   }
 
   _onResize(event) {
-    var autoSizeOld = this.htmlComp.layout.autoSize;
+    let autoSizeOld = this.htmlComp.layout.autoSize;
     this.htmlComp.layout.autoSize = false;
     this.htmlComp.revalidateLayout();
     this.htmlComp.layout.autoSize = autoSizeOld;
@@ -680,21 +680,21 @@ export default class Form extends Widget {
       return;
     }
 
-    this.$statusIcons.forEach(function($icn) {
+    this.$statusIcons.forEach($icn => {
       $icn.remove();
     });
 
     this.$statusIcons = [];
 
     if (this.status) {
-      var statusList = this.status.asFlatList();
-      var $prevIcon;
-      statusList.forEach(function(sts) {
+      let statusList = this.status.asFlatList();
+      let $prevIcon;
+      statusList.forEach(sts => {
         $prevIcon = this._renderSingleStatus(sts, $prevIcon);
         if ($prevIcon) {
           this.$statusIcons.push($prevIcon);
         }
-      }.bind(this));
+      });
     }
     // Layout could have been changed, e.g. if subtitle becomes visible
     this.invalidateLayoutTree();
@@ -702,7 +702,7 @@ export default class Form extends Widget {
 
   _renderSingleStatus(status, $prevIcon) {
     if (status && status.iconId) {
-      var $statusIcon = this.$statusContainer.appendIcon(status.iconId, 'status');
+      let $statusIcon = this.$statusContainer.appendIcon(status.iconId, 'status');
       if (status.cssClass()) {
         $statusIcon.addClass(status.cssClass());
       }
@@ -713,19 +713,19 @@ export default class Form extends Widget {
   }
 
   _updateTitleForWindow() {
-    var formTitle = strings.join(' - ', this.title, this.subTitle),
+    let formTitle = strings.join(' - ', this.title, this.subTitle),
       applicationTitle = this.session.desktop.title;
     this.popupWindow.title(formTitle || applicationTitle);
   }
 
   _updateTitleForDom() {
-    var titleText = this.title;
+    let titleText = this.title;
     if (!titleText && this.closable) {
       // Add '&nbsp;' to prevent title-box of a closable form from collapsing if title is empty
       titleText = strings.plainText('&nbsp;');
     }
     if (titleText || this.subTitle) {
-      var $titles = getOrAppendChildDiv(this.$container, 'title-box');
+      let $titles = getOrAppendChildDiv(this.$container, 'title-box');
       // Render title
       if (titleText) {
         getOrAppendChildDiv($titles, 'title')
@@ -747,7 +747,7 @@ export default class Form extends Widget {
     // ----- Helper functions -----
 
     function getOrAppendChildDiv($parent, cssClass) {
-      var $div = $parent.children('.' + cssClass);
+      let $div = $parent.children('.' + cssClass);
       if ($div.length === 0) {
         $div = this.$parent.appendDiv(cssClass);
       }
@@ -830,9 +830,9 @@ export default class Form extends Widget {
 
   _setViews(views) {
     if (views) {
-      views.forEach(function(view) {
+      views.forEach(view => {
         view.setDisplayParent(this);
-      }.bind(this));
+      });
     }
     this._setProperty('views', views);
   }
@@ -909,7 +909,7 @@ export default class Form extends Widget {
   }
 
   renderInitialFocus() {
-    var focused = false;
+    let focused = false;
     if (this.initialFocus) {
       focused = this.initialFocus.focus();
     } else {
@@ -917,7 +917,7 @@ export default class Form extends Widget {
       // Do it only if the focus is not already on an element in the form (e.g. focus could have been requested explicitly by a child element)
       // And only if the context belonging to that element is ready. Not ready means, some other widget (probably an outer container) is still preparing the context and will do the initial focus later
       if (!this.$container.isOrHas(this.$container.activeElement())) {
-        var focusManager = this.session.focusManager;
+        let focusManager = this.session.focusManager;
         focused = focusManager.requestFocusIfReady(focusManager.findFirstFocusableElement(this.$container));
       }
     }
@@ -926,7 +926,7 @@ export default class Form extends Widget {
       // If the scroll area contains large (not absolutely positioned) content it can happen that the browsers scrolls the content even though the focused widget already is in the view area.
       // This is probably because the focus happens while the form is not layouted yet. We should actually refactor this and do the focusing after layouting, but this would be a bigger change.
       // The current workaround is to revert the scrolling done by the browser. Automatic scrolling to the focused widget when the form is not layouted does not work anyway.
-      var $scrollParent = this.$container.activeElement().scrollParent();
+      let $scrollParent = this.$container.activeElement().scrollParent();
       $scrollParent.scrollTop(0);
       $scrollParent.scrollLeft(0);
     }
@@ -941,7 +941,7 @@ export default class Form extends Widget {
    * the getFocusableElement() method.
    */
   _initialFocusElement() {
-    var focusElement;
+    let focusElement;
     if (this.initialFocus) {
       focusElement = this.initialFocus.getFocusableElement();
     }
@@ -989,12 +989,10 @@ export default class Form extends Widget {
    */
   visitDisplayChildren(visitor, filter) {
     if (!filter) {
-      filter = function(displayChild) {
-        return true;
-      };
+      filter = displayChild => true;
     }
 
-    var visitorFunc = function(child) {
+    let visitorFunc = child => {
       visitor(child);
       // only forms provide a deeper hierarchy
       if (child instanceof Form) {
@@ -1008,7 +1006,7 @@ export default class Form extends Widget {
 
   storeCacheBounds(bounds) {
     if (this.cacheBounds) {
-      var storageKey = 'scout:formBounds:' + this.cacheBoundsKey;
+      let storageKey = 'scout:formBounds:' + this.cacheBoundsKey;
       webstorage.setItem(localStorage, storageKey, JSON.stringify(bounds));
     }
   }
@@ -1018,8 +1016,8 @@ export default class Form extends Widget {
       return null;
     }
 
-    var storageKey = 'scout:formBounds:' + this.cacheBoundsKey;
-    var bounds = webstorage.getItem(localStorage, storageKey);
+    let storageKey = 'scout:formBounds:' + this.cacheBoundsKey;
+    let bounds = webstorage.getItem(localStorage, storageKey);
     if (!bounds) {
       return null;
     }
@@ -1031,7 +1029,7 @@ export default class Form extends Widget {
    * @returns {Form} the form the widget belongs to (returns the first parent which is a {@link Form}.
    */
   static findForm(widget) {
-    var parent = widget.parent;
+    let parent = widget.parent;
     while (parent && !(parent instanceof Form)) {
       parent = parent.parent;
     }
@@ -1045,8 +1043,8 @@ export default class Form extends Widget {
     if (!widget) {
       return null;
     }
-    var form = null;
-    widget.findParent(function(parent) {
+    let form = null;
+    widget.findParent(parent => {
       if (parent instanceof Form) {
         form = parent;
         // If form is an inner form of a wrapped form field -> continue search

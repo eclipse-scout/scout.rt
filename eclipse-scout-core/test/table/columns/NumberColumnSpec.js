@@ -13,12 +13,12 @@ import {DecimalFormat, Range, RemoteEvent, Status, styles} from '../../../src/in
 
 /* global LocaleSpecHelper */
 /* global linkWidgetAndAdapter */
-describe('NumberColumn', function() {
-  var session;
-  var helper;
-  var locale;
+describe('NumberColumn', () => {
+  let session;
+  let helper;
+  let locale;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
@@ -27,21 +27,21 @@ describe('NumberColumn', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
-  describe('background effect', function() {
-    var rgbLevel0 = 'rgb(255, 175, 175)';
-    var rgbLevel50 = 'rgb(213, 195, 161)';
-    var rgbLevel100 = 'rgb(171, 214, 147)';
-    var barChartColor = 'rgb(128, 193, 208)';
-    var imageLevel50 = 'linear-gradient(to left, ' + barChartColor + ' 0%, ' + barChartColor + ' 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0) 100%)';
-    var defaultBackgroundColor;
+  describe('background effect', () => {
+    let rgbLevel0 = 'rgb(255, 175, 175)';
+    let rgbLevel50 = 'rgb(213, 195, 161)';
+    let rgbLevel100 = 'rgb(171, 214, 147)';
+    let barChartColor = 'rgb(128, 193, 208)';
+    let imageLevel50 = 'linear-gradient(to left, ' + barChartColor + ' 0%, ' + barChartColor + ' 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0) 100%)';
+    let defaultBackgroundColor;
 
-    beforeEach(function() {
+    beforeEach(() => {
       styles.put('column-background-effect-gradient1-start', {
         backgroundColor: rgbLevel0
       });
@@ -58,19 +58,19 @@ describe('NumberColumn', function() {
         backgroundColor: barChartColor
       });
 
-      var $div = $('<div>').appendTo(session.$entryPoint);
+      let $div = $('<div>').appendTo(session.$entryPoint);
       defaultBackgroundColor = $div.css('background-color');
     });
 
-    afterEach(function() {
+    afterEach(() => {
       styles.clearCache();
     });
 
-    describe('colorGradient1', function() {
-      it('colors cells from red to green', function() {
-        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
-        var table = helper.createTable(model);
-        var column0 = table.columns[0];
+    describe('colorGradient1', () => {
+      it('colors cells from red to green', () => {
+        let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+        let table = helper.createTable(model);
+        let column0 = table.columns[0];
         table.render();
 
         table.setColumnBackgroundEffect(column0, 'colorGradient1');
@@ -79,10 +79,10 @@ describe('NumberColumn', function() {
         expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
       });
 
-      it('colors cells according to rounded values', function() {
-        var model = helper.createModelSingleColumnByValues([0, 0.005, 0.006, 0.02], 'NumberColumn');
-        var table = helper.createTable(model);
-        var column0 = table.columns[0];
+      it('colors cells according to rounded values', () => {
+        let model = helper.createModelSingleColumnByValues([0, 0.005, 0.006, 0.02], 'NumberColumn');
+        let table = helper.createTable(model);
+        let column0 = table.columns[0];
         table.render();
 
         column0.decimalFormat = new DecimalFormat(locale, {
@@ -96,10 +96,10 @@ describe('NumberColumn', function() {
       });
     });
 
-    it('considers view range -> only colors rendered cells', function() {
-      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
-      var table = helper.createTable(model);
-      var column0 = table.columns[0];
+    it('considers view range -> only colors rendered cells', () => {
+      let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+      let table = helper.createTable(model);
+      let column0 = table.columns[0];
       table.viewRangeSize = 2;
       table.render();
 
@@ -108,7 +108,7 @@ describe('NumberColumn', function() {
       expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
       expect(table.rows[2].$row).toBeFalsy();
 
-      var spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new Range(1, 3));
+      let spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new Range(1, 3));
       table._renderViewport();
 
       expect(table.rows[0].$row).toBeFalsy();
@@ -116,10 +116,10 @@ describe('NumberColumn', function() {
       expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
     });
 
-    it('updates colors if row gets deleted', function() {
-      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
-      var table = helper.createTable(model);
-      var column0 = table.columns[0];
+    it('updates colors if row gets deleted', () => {
+      let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+      let table = helper.createTable(model);
+      let column0 = table.columns[0];
       table.render();
 
       table.setColumnBackgroundEffect(column0, 'colorGradient1');
@@ -128,14 +128,14 @@ describe('NumberColumn', function() {
       expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel100);
     });
 
-    it('updates colors if row gets inserted', function() {
-      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
-      var table = helper.createTable(model);
-      var column0 = table.columns[0];
+    it('updates colors if row gets inserted', () => {
+      let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+      let table = helper.createTable(model);
+      let column0 = table.columns[0];
       table.render();
 
       table.setColumnBackgroundEffect(column0, 'colorGradient1');
-      var row = helper.createModelRowByValues(undefined, 200);
+      let row = helper.createModelRowByValues(undefined, 200);
       table.insertRow(row);
       expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
       expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(234, 185, 168)');
@@ -143,15 +143,15 @@ describe('NumberColumn', function() {
       expect(table.$cell(column0, table.rows[3].$row).css('background-color')).toBe(rgbLevel100);
     });
 
-    it('updates colors if row gets updated', function() {
-      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+    it('updates colors if row gets updated', () => {
+      let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       model.columns[0].backgroundEffect = 'colorGradient1';
-      var table = helper.createTable(model);
-      var column0 = table.columns[0];
+      let table = helper.createTable(model);
+      let column0 = table.columns[0];
       table.render();
 
       // Change row 0 value to 150, row 1 now has the lowest values
-      var rows = helper.createModelRows(1, 1);
+      let rows = helper.createModelRows(1, 1);
       rows[0].id = table.rows[0].id;
       rows[0].cells[0].value = 150;
       table.updateRows(rows);
@@ -161,11 +161,11 @@ describe('NumberColumn', function() {
       expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel50);
     });
 
-    it('colors cells if table gets rendered', function() {
-      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+    it('colors cells if table gets rendered', () => {
+      let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       model.columns[0].backgroundEffect = 'colorGradient1';
-      var table = helper.createTable(model);
-      var column0 = table.columns[0];
+      let table = helper.createTable(model);
+      let column0 = table.columns[0];
 
       table.render();
       expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
@@ -173,11 +173,11 @@ describe('NumberColumn', function() {
       expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
     });
 
-    it('restores existing background color if background effect gets removed', function() {
-      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+    it('restores existing background color if background effect gets removed', () => {
+      let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       model.rows[1].cells[0].backgroundColor = 'ff0000';
-      var table = helper.createTable(model);
-      var column0 = table.columns[0];
+      let table = helper.createTable(model);
+      let column0 = table.columns[0];
       table.render();
 
       expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(255, 0, 0)');
@@ -191,12 +191,12 @@ describe('NumberColumn', function() {
       expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
     });
 
-    describe('barChart', function() {
-      it('does not overwrite existing background color', function() {
-        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+    describe('barChart', () => {
+      it('does not overwrite existing background color', () => {
+        let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         model.rows[1].cells[0].backgroundColor = 'ff0000';
-        var table = helper.createTable(model);
-        var column0 = table.columns[0];
+        let table = helper.createTable(model);
+        let column0 = table.columns[0];
         table.render();
 
         table.setColumnBackgroundEffect(column0, 'barChart');
@@ -205,11 +205,11 @@ describe('NumberColumn', function() {
       });
     });
 
-    describe('setBackgroundEffect', function() {
-      it('changes the background effect', function() {
-        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
-        var table = helper.createTable(model);
-        var column0 = table.columns[0];
+    describe('setBackgroundEffect', () => {
+      it('changes the background effect', () => {
+        let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+        let table = helper.createTable(model);
+        let column0 = table.columns[0];
         table.render();
 
         // initial: No effect
@@ -236,10 +236,10 @@ describe('NumberColumn', function() {
         expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
       });
 
-      it('sends columnBackgroundEffectChanged event', function() {
-        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
-        var table = helper.createTable(model);
-        var column0 = table.columns[0];
+      it('sends columnBackgroundEffectChanged event', () => {
+        let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+        let table = helper.createTable(model);
+        let column0 = table.columns[0];
         table.render();
 
         linkWidgetAndAdapter(table, 'TableAdapter');
@@ -248,17 +248,17 @@ describe('NumberColumn', function() {
         sendQueuedAjaxCalls();
         expect(jasmine.Ajax.requests.count()).toBe(1);
 
-        var event = new RemoteEvent(table.id, 'columnBackgroundEffectChanged', {
+        let event = new RemoteEvent(table.id, 'columnBackgroundEffectChanged', {
           columnId: column0.id,
           backgroundEffect: 'barChart'
         });
         expect(mostRecentJsonRequest()).toContainEvents(event);
       });
 
-      it('does not send columnBackgroundEffectChanged if server triggered it', function() {
-        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
-        var table = helper.createTable(model);
-        var column0 = table.columns[0];
+      it('does not send columnBackgroundEffectChanged if server triggered it', () => {
+        let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
+        let table = helper.createTable(model);
+        let column0 = table.columns[0];
         table.render();
 
         linkWidgetAndAdapter(table, 'TableAdapter');
@@ -281,11 +281,11 @@ describe('NumberColumn', function() {
     });
   });
 
-  describe('calculateMinMaxValues', function() {
-    it('calculates the min/max values based on rounded values', function() {
-      var model = helper.createModelSingleColumnByValues([0.005, 0.006], 'NumberColumn');
-      var table = helper.createTable(model);
-      var column0 = table.columns[0];
+  describe('calculateMinMaxValues', () => {
+    it('calculates the min/max values based on rounded values', () => {
+      let model = helper.createModelSingleColumnByValues([0.005, 0.006], 'NumberColumn');
+      let table = helper.createTable(model);
+      let column0 = table.columns[0];
       table.render();
 
       column0.decimalFormat = new DecimalFormat(locale, {
@@ -298,11 +298,11 @@ describe('NumberColumn', function() {
     });
   });
 
-  describe('format', function() {
-    it('updates the value and the display text if the multiplier changes', function() {
-      var model = helper.createModelSingleColumnByValues([0.05, 0.06], 'NumberColumn');
-      var table = helper.createTable(model);
-      var column0 = table.columns[0];
+  describe('format', () => {
+    it('updates the value and the display text if the multiplier changes', () => {
+      let model = helper.createModelSingleColumnByValues([0.05, 0.06], 'NumberColumn');
+      let table = helper.createTable(model);
+      let column0 = table.columns[0];
       table.render();
 
       column0.setDecimalFormat({
@@ -325,12 +325,12 @@ describe('NumberColumn', function() {
     });
   });
 
-  describe('errorStatus on cell', function() {
-    it('gets errorStatus from editor', function() {
-      var model = helper.createModelSingleColumnByValues([3], 'NumberColumn');
-      var table = helper.createTable(model);
+  describe('errorStatus on cell', () => {
+    it('gets errorStatus from editor', () => {
+      let model = helper.createModelSingleColumnByValues([3], 'NumberColumn');
+      let table = helper.createTable(model);
       table.columns[0].setEditable(true);
-      var column0 = table.columns[0];
+      let column0 = table.columns[0];
       // just values between 2 and 4 are valid
       column0.minValue = 2;
       column0.maxValue = 4;
@@ -358,8 +358,8 @@ describe('NumberColumn', function() {
     });
   });
 
-  it('isContentValid', function() {
-    var table = helper.createTable({
+  it('isContentValid', () => {
+    let table = helper.createTable({
       columns: [{
         objectType: 'NumberColumn',
         mandatory: true
@@ -368,8 +368,8 @@ describe('NumberColumn', function() {
     table.insertRow({
       cells: [null]
     });
-    var column = table.columns[0];
-    var row = table.rows[0];
+    let column = table.columns[0];
+    let row = table.rows[0];
     expect(column.isContentValid(row).valid).toBe(false);
     column.setCellValue(row, 0);
     expect(column.isContentValid(row).valid).toBe(true);

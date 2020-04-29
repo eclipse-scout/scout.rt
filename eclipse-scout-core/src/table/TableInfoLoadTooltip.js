@@ -23,7 +23,7 @@ export default class TableInfoLoadTooltip extends Tooltip {
   }
 
   _renderText() {
-    var table = this.tableFooter.table,
+    let table = this.tableFooter.table,
       numRows = table.rows.length;
 
     this.$content.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.tableFooter.computeCountInfo(numRows)));

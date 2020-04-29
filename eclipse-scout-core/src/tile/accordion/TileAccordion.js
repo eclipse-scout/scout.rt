@@ -119,14 +119,14 @@ export default class TileAccordion extends Accordion {
    * @override
    */
   setGroups(groups) {
-    var oldTileCount = this.getTileCount();
-    var oldFilteredTileCount = this.getFilteredTileCount();
-    var oldSelectedTileCount = this.getSelectedTileCount();
+    let oldTileCount = this.getTileCount();
+    let oldFilteredTileCount = this.getFilteredTileCount();
+    let oldSelectedTileCount = this.getSelectedTileCount();
     super.setGroups(groups);
 
-    var tileCount = this.getTileCount();
-    var filteredTileCount = this.getFilteredTileCount();
-    var selectedTileCount = this.getSelectedTileCount();
+    let tileCount = this.getTileCount();
+    let filteredTileCount = this.getFilteredTileCount();
+    let selectedTileCount = this.getSelectedTileCount();
 
     // Trigger artificial property changes if necessary
     // See _onTileGridPropertyChange why parameters are null
@@ -142,14 +142,14 @@ export default class TileAccordion extends Accordion {
   }
 
   setGridColumnCount(gridColumnCount) {
-    this.groups.forEach(function(group) {
+    this.groups.forEach(group => {
       group.body.setGridColumnCount(gridColumnCount);
     });
     this.setProperty('gridColumnCount', gridColumnCount);
   }
 
   setTileGridLayoutConfig(layoutConfig) {
-    this.groups.forEach(function(group) {
+    this.groups.forEach(group => {
       group.body.setLayoutConfig(layoutConfig);
       layoutConfig = group.body.layoutConfig; // May be converted from plain object to TileGridLayoutConfig
     });
@@ -157,41 +157,41 @@ export default class TileAccordion extends Accordion {
   }
 
   setWithPlaceholders(withPlaceholders) {
-    this.groups.forEach(function(group) {
+    this.groups.forEach(group => {
       group.body.setWithPlaceholders(withPlaceholders);
     });
     this.setProperty('withPlaceholders', withPlaceholders);
   }
 
   setVirtual(virtual) {
-    this.groups.forEach(function(group) {
+    this.groups.forEach(group => {
       group.body.setVirtual(virtual);
     });
     this.setProperty('virtual', virtual);
   }
 
   setSelectable(selectable) {
-    this.groups.forEach(function(group) {
+    this.groups.forEach(group => {
       group.body.setSelectable(selectable);
     });
     this.setProperty('selectable', selectable);
   }
 
   setMultiSelect(multiSelect) {
-    this.groups.forEach(function(group) {
+    this.groups.forEach(group => {
       group.body.setMultiSelect(multiSelect);
     });
     this.setProperty('multiSelect', multiSelect);
   }
 
   getGroupById(id) {
-    return arrays.find(this.groups, function(group) {
+    return arrays.find(this.groups, group => {
       return group.id === id;
     });
   }
 
   getGroupByTile(tile) {
-    return tile.findParent(function(parent) {
+    return tile.findParent(parent => {
       return parent instanceof Group;
     });
   }
@@ -202,14 +202,14 @@ export default class TileAccordion extends Accordion {
    */
   _groupTiles(tiles) {
     // Create a map of groups, key is the id, value is an array of tiles
-    var tilesPerGroup = {};
-    this.groups.forEach(function(group) {
+    let tilesPerGroup = {};
+    this.groups.forEach(group => {
       tilesPerGroup[group.id] = [];
     });
 
     // Distribute the tiles to the corresponding groups
     tiles.forEach(function(tile) {
-      var group = this.getGroupByTile(tile);
+      let group = this.getGroupByTile(tile);
       if (!group) {
         throw new Error('No group found for tile ' + tile.id);
       }
@@ -231,7 +231,7 @@ export default class TileAccordion extends Accordion {
     if (tilesToDelete.length === 0) {
       return;
     }
-    var tiles = this.getTiles();
+    let tiles = this.getTiles();
     arrays.removeAll(tiles, tilesToDelete);
     this.setTiles(tiles, appendPlaceholders);
   }
@@ -255,33 +255,33 @@ export default class TileAccordion extends Accordion {
     tiles = this._createChildren(tiles);
 
     // Distribute the tiles to the corresponding groups (result may contain groups without tiles)
-    var tilesPerGroup = this._groupTiles(tiles);
+    let tilesPerGroup = this._groupTiles(tiles);
 
     // Update the tile grids
-    for (var id in tilesPerGroup) { // NOSONAR
-      var group = this.getGroupById(id);
+    for (let id in tilesPerGroup) { // NOSONAR
+      let group = this.getGroupById(id);
       group.body.setTiles(tilesPerGroup[id]);
     }
   }
 
   getTiles() {
-    var tiles = [];
-    this.groups.forEach(function(group) {
+    let tiles = [];
+    this.groups.forEach(group => {
       arrays.pushAll(tiles, group.body.tiles);
     });
     return tiles;
   }
 
   getTileCount() {
-    var count = 0;
-    this.groups.forEach(function(group) {
+    let count = 0;
+    this.groups.forEach(group => {
       count += group.body.tiles.length;
     });
     return count;
   }
 
   addTileFilter(filter) {
-    var filters = this.tileFilters.slice();
+    let filters = this.tileFilters.slice();
     if (filters.indexOf(filter) >= 0) {
       return;
     }
@@ -290,7 +290,7 @@ export default class TileAccordion extends Accordion {
   }
 
   removeTileFilter(filter) {
-    var filters = this.tileFilters.slice();
+    let filters = this.tileFilters.slice();
     if (!arrays.remove(filters, filter)) {
       return;
     }
@@ -299,29 +299,29 @@ export default class TileAccordion extends Accordion {
 
   setTileFilters(filters) {
     filters = arrays.ensure(filters);
-    this.groups.forEach(function(group) {
+    this.groups.forEach(group => {
       group.body.setFilters(filters);
     });
     this.setProperty('tileFilters', filters.slice());
   }
 
   filterTiles() {
-    this.groups.forEach(function(group) {
+    this.groups.forEach(group => {
       group.body.filter();
     });
   }
 
   getFilteredTiles() {
-    var tiles = [];
-    this.groups.forEach(function(group) {
+    let tiles = [];
+    this.groups.forEach(group => {
       arrays.pushAll(tiles, group.body.filteredTiles);
     });
     return tiles;
   }
 
   getFilteredTileCount() {
-    var count = 0;
-    this.groups.forEach(function(group) {
+    let count = 0;
+    this.groups.forEach(group => {
       count += group.body.filteredTiles.length;
     });
     return count;
@@ -331,8 +331,8 @@ export default class TileAccordion extends Accordion {
    * Compared to #getFilteredTiles(), this function considers the collapsed state of the group as well, meaning only filtered tiles of expanded groups are returned.
    */
   getVisibleTiles() {
-    var tiles = [];
-    this.expandedGroups().forEach(function(group) {
+    let tiles = [];
+    this.expandedGroups().forEach(group => {
       arrays.pushAll(tiles, group.body.filteredTiles);
     });
     return tiles;
@@ -342,8 +342,8 @@ export default class TileAccordion extends Accordion {
    * Compared to #getFilteredTiles(), this function considers the collapsed state of the group as well, meaning only filtered tiles of expanded groups are counted.
    */
   getVisibleTileCount() {
-    var count = 0;
-    this.expandedGroups().forEach(function(group) {
+    let count = 0;
+    this.expandedGroups().forEach(group => {
       count += group.body.filteredTiles.length;
     });
     return count;
@@ -351,9 +351,9 @@ export default class TileAccordion extends Accordion {
 
   findVisibleTileIndexAt(x, y, startIndex, reverse) {
     startIndex = scout.nvl(startIndex, 0);
-    return arrays.findIndexFrom(this.getVisibleTiles(), startIndex, function(tile, i) {
+    return arrays.findIndexFrom(this.getVisibleTiles(), startIndex, (tile, i) => {
       return this.getVisibleGridX(tile) === x && this.getVisibleGridY(tile) === y;
-    }.bind(this), reverse);
+    }, reverse);
   }
 
   /**
@@ -365,11 +365,11 @@ export default class TileAccordion extends Accordion {
     tiles = this._createChildren(tiles);
 
     // Split tiles into separate lists for each group (result may contain groups without tiles)
-    var tilesPerGroup = this._groupTiles(tiles);
+    let tilesPerGroup = this._groupTiles(tiles);
 
     // Select the tiles in the the corresponding tile grids
-    for (var id in tilesPerGroup) { // NOSONAR
-      var group = this.getGroupById(id);
+    for (let id in tilesPerGroup) { // NOSONAR
+      let group = this.getGroupById(id);
       group.body.selectTiles(tilesPerGroup[id]);
     }
   }
@@ -387,7 +387,7 @@ export default class TileAccordion extends Accordion {
 
   deselectTiles(tiles) {
     tiles = arrays.ensure(tiles);
-    var selectedTiles = this.getSelectedTiles().slice();
+    let selectedTiles = this.getSelectedTiles().slice();
     if (arrays.removeAll(selectedTiles, tiles)) {
       this.selectTiles(selectedTiles);
     }
@@ -411,8 +411,8 @@ export default class TileAccordion extends Accordion {
   }
 
   getSelectedTiles() {
-    var selectedTiles = [];
-    this.groups.forEach(function(group) {
+    let selectedTiles = [];
+    this.groups.forEach(group => {
       arrays.pushAll(selectedTiles, group.body.selectedTiles);
     });
     return selectedTiles;
@@ -423,8 +423,8 @@ export default class TileAccordion extends Accordion {
   }
 
   getSelectedTileCount() {
-    var count = 0;
-    this.groups.forEach(function(group) {
+    let count = 0;
+    this.groups.forEach(group => {
       count += group.body.selectedTiles.length;
     });
     return count;
@@ -439,24 +439,24 @@ export default class TileAccordion extends Accordion {
   }
 
   setTileComparator(comparator) {
-    this.groups.forEach(function(group) {
+    this.groups.forEach(group => {
       group.body.setComparator(comparator);
     });
     this.setProperty('tileComparator', comparator);
   }
 
   sortTiles() {
-    this.groups.forEach(function(group) {
+    this.groups.forEach(group => {
       group.body.sort();
     });
   }
 
   setFocusedTile(tile) {
-    var groupForTile = null;
+    let groupForTile = null;
     if (tile !== null) {
       groupForTile = this.getGroupByTile(tile);
     }
-    this.groups.forEach(function(group) {
+    this.groups.forEach(group => {
       if (group === groupForTile) {
         group.body.setFocusedTile(tile);
       } else {
@@ -466,8 +466,8 @@ export default class TileAccordion extends Accordion {
   }
 
   getFocusedTile() {
-    var focusedTile = null;
-    this.groups.some(function(group) {
+    let focusedTile = null;
+    this.groups.some(group => {
       if (group.body.focusedTile) {
         focusedTile = group.body.focusedTile;
         return true;
@@ -478,7 +478,7 @@ export default class TileAccordion extends Accordion {
   }
 
   getVisibleGridRowCount() {
-    return this.expandedGroups().reduce(function(acc, group) {
+    return this.expandedGroups().reduce((acc, group) => {
       return acc + group.body.logicalGrid.gridRows;
     }, 0);
   }
@@ -488,8 +488,8 @@ export default class TileAccordion extends Accordion {
   }
 
   getVisibleGridY(tile) {
-    var group = this.getGroupByTile(tile);
-    var yCorr = this.getVisibleRowByGroup(group);
+    let group = this.getGroupByTile(tile);
+    let yCorr = this.getVisibleRowByGroup(group);
     return tile.gridData.y + yCorr;
   }
 
@@ -497,9 +497,9 @@ export default class TileAccordion extends Accordion {
     if (rowToFind < 0 || rowToFind >= this.getVisibleGridRowCount()) {
       return null;
     }
-    var currentIndex = 0;
-    return arrays.find(this.expandedGroups(), function(group) {
-      var rowCount = group.body.logicalGrid.gridRows;
+    let currentIndex = 0;
+    return arrays.find(this.expandedGroups(), group => {
+      let rowCount = group.body.logicalGrid.gridRows;
       if (currentIndex <= rowToFind && rowToFind < currentIndex + rowCount) {
         return true;
       }
@@ -513,9 +513,9 @@ export default class TileAccordion extends Accordion {
    *          The index of the first group is 0, the index of the second group is 2.
    */
   getVisibleRowByGroup(groupToFind) {
-    var currentIndex = 0;
-    var found = this.expandedGroups().some(function(group) {
-      var rowCount = group.body.logicalGrid.gridRows;
+    let currentIndex = 0;
+    let found = this.expandedGroups().some(group => {
+      let rowCount = group.body.logicalGrid.gridRows;
       if (group === groupToFind) {
         return true;
       }
@@ -529,7 +529,7 @@ export default class TileAccordion extends Accordion {
   }
 
   expandedGroups() {
-    return this.groups.filter(function(group) {
+    return this.groups.filter(group => {
       return !group.collapsed;
     });
   }
@@ -539,7 +539,7 @@ export default class TileAccordion extends Accordion {
       // Don't execute when deselecting other tiles to minimize the amount of property change events
       return;
     }
-    var group = tileGrid.parent;
+    let group = tileGrid.parent;
     if (tileGrid.selectedTiles.length > 0 && group.collapsed) {
       // Do not allow selection in a collapsed group (breaks keyboard navigation and is confusing for the user if invisible tiles are selected)
       tileGrid.deselectAllTiles();
@@ -548,7 +548,7 @@ export default class TileAccordion extends Accordion {
     if (!this.multiSelect && tileGrid.selectedTiles.length > 0) {
       this._selectionUpdateLocked = true;
       // Ensure only one grid has a selected tile if multiSelect is false
-      this.groups.forEach(function(group) {
+      this.groups.forEach(group => {
         if (group.body !== tileGrid) {
           group.body.deselectAllTiles();
         }
@@ -593,7 +593,7 @@ export default class TileAccordion extends Accordion {
   }
 
   _onGroupBodyHeightChange(event) {
-    this.groups.forEach(function(group) {
+    this.groups.forEach(group => {
       if (event.source === group || group.bodyAnimating) {
         // No need to layout body for the group which is already expanding / collapsing since it does it anyway
         // Btw: another group may be doing it as well at the same time (e.g. because of exclusiveExpand)
@@ -615,9 +615,9 @@ export default class TileAccordion extends Accordion {
    * @returns {Tile} the first fully visible tile at the scrollTop.
    */
   _tileAtScrollTop(scrollTop) {
-    return arrays.find(this.getTiles().filter(function(tile) {
+    return arrays.find(this.getTiles().filter(tile => {
       return tile.rendered;
-    }), function(tile) {
+    }), tile => {
       return tile.$container.position().top >= scrollTop;
     }, this);
   }

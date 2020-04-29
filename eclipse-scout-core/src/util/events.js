@@ -59,8 +59,8 @@ export function isTouchEvent(event) {
 
 export function fixTouchEvent(event) {
   if (isTouchEvent(event)) {
-    var touches = event.touches || (event.originalEvent ? event.originalEvent.touches : null);
-    var touch = touches ? touches[0] : null;
+    let touches = event.touches || (event.originalEvent ? event.originalEvent.touches : null);
+    let touch = touches ? touches[0] : null;
     if (touch) {
       // Touch events may contain fractional values, while mouse events should not
       // - https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/pageX
@@ -75,7 +75,7 @@ export function fixTouchEvent(event) {
  * @returns an object containing passive: true if the browser supports passive event listeners, otherwise returns false.
  */
 export function passiveOptions() {
-  var options = false;
+  let options = false;
   if (Device.get().supportsPassiveEventListener()) {
     options = {
       passive: true
@@ -89,10 +89,10 @@ export function passiveOptions() {
  * If he does not release his finger the endHandler won't be called even if the pane has stopped scrolling.
  */
 export function onScrollStartEndDuringTouch($elem, startHandler, endHandler) {
-  var scrollTimeout;
-  var started = false;
-  var touchend = false;
-  var scrollHandler = function(event) {
+  let scrollTimeout;
+  let started = false;
+  let touchend = false;
+  let scrollHandler = event => {
     // Execute once on first scroll event (and not as soon as user touches the pane because he might not even want to scroll)
     if (!started) {
       startHandler();
@@ -105,14 +105,14 @@ export function onScrollStartEndDuringTouch($elem, startHandler, endHandler) {
     checkLater();
   };
 
-  var touchEndHandler = function(event) {
+  let touchEndHandler = event => {
     touchend = true;
     checkLater();
   };
 
   function checkLater() {
     clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(function() {
+    scrollTimeout = setTimeout(() => {
       if (touchend) {
         // Only stop processing if user released the finger
         removeHandlers();
@@ -149,7 +149,7 @@ export function propagateEvent(target, event) {
   if (typeof (Event) !== 'function') {
     return;
   }
-  var newEvent = new event.constructor(event.type, event);
+  let newEvent = new event.constructor(event.type, event);
   if (!target.dispatchEvent(newEvent)) {
     event.preventDefault();
   }
@@ -171,8 +171,8 @@ export function propagateEvent(target, event) {
  */
 export function addPropagationListener(source, target, types, filter) {
   types = arrays.ensure(types);
-  types.forEach(function(type) {
-    source.addEventListener(type, function(event) {
+  types.forEach(type => {
+    source.addEventListener(type, event => {
       if (filter && !filter(event)) {
         return;
       }

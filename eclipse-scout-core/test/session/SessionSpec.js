@@ -11,25 +11,25 @@
 import {BackgroundJobPollingStatus, Device, RemoteEvent, TextMap, UserAgent} from '../../src/index';
 
 /* global receiveResponseForAjaxCall */
-describe('Session', function() {
+describe('Session', () => {
 
-  beforeEach(function() {
+  beforeEach(() => {
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
   function createSession(userAgent) {
     setFixtures(sandbox());
-    var session = sandboxSession({
+    let session = sandboxSession({
       'userAgent': userAgent
     });
     // test request only, don't test response (would require valid session, desktop etc.)
-    session._processStartupResponse = function() {
+    session._processStartupResponse = () => {
     };
     return session;
   }
@@ -38,10 +38,10 @@ describe('Session', function() {
     session.sendEvent(new RemoteEvent(target, type, data), delay);
   }
 
-  describe('send', function() {
+  describe('send', () => {
 
-    it('sends multiple async events in one call', function() {
-      var session = createSession();
+    it('sends multiple async events in one call', () => {
+      let session = createSession();
       // initially there should be no request at all
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
@@ -60,12 +60,12 @@ describe('Session', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       // check that content is complete and in correct order
-      var requestData = mostRecentJsonRequest();
+      let requestData = mostRecentJsonRequest();
       expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected', 'nodeExpanded']);
     });
 
-    it('sends multiple async events in one call over multiple user interactions if sending was delayed', function() {
-      var session = createSession();
+    it('sends multiple async events in one call over multiple user interactions if sending was delayed', () => {
+      let session = createSession();
 
       // send first event delayed (in 500 ms)
       send(session, 1, 'nodeClick', '', 500);
@@ -87,12 +87,12 @@ describe('Session', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       // check that content is complete and in correct order
-      var requestData = mostRecentJsonRequest();
+      let requestData = mostRecentJsonRequest();
       expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected', 'nodeExpanded']);
     });
 
-    it('does not await the full delay if a susequent send call has a smaller delay', function() {
-      var session = createSession();
+    it('does not await the full delay if a susequent send call has a smaller delay', () => {
+      let session = createSession();
 
       // send first event delayed (in 500 ms)
       send(session, 1, 'nodeClick', '', 500);
@@ -114,12 +114,12 @@ describe('Session', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       // check that content is complete and in correct order
-      var requestData = mostRecentJsonRequest();
+      let requestData = mostRecentJsonRequest();
       expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected', 'nodeExpanded']);
     });
 
-    it('does not await the full delay if a previous send call has a smaller delay', function() {
-      var session = createSession();
+    it('does not await the full delay if a previous send call has a smaller delay', () => {
+      let session = createSession();
 
       // send first event with 300ms delay
       send(session, 1, 'nodeClick', '', 300);
@@ -141,37 +141,37 @@ describe('Session', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       // check that content is complete and in correct order
-      var requestData = mostRecentJsonRequest();
+      let requestData = mostRecentJsonRequest();
       expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected']);
     });
 
-    it('coalesces events if event provides a coalesce function', function() {
-      var session = createSession();
+    it('coalesces events if event provides a coalesce function', () => {
+      let session = createSession();
 
-      var coalesce = function(previous) {
+      let coalesce = function(previous) {
         return this.target === previous.target && this.type === previous.type && this.column === previous.column;
       };
 
-      var event0 = new RemoteEvent(1, 'columnResized', {
+      let event0 = new RemoteEvent(1, 'columnResized', {
         column: 'a'
       });
       event0.coalesce = coalesce;
       session.sendEvent(event0);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event1 = new RemoteEvent(1, 'rowSelected');
+      let event1 = new RemoteEvent(1, 'rowSelected');
       event1.coalesce = coalesce;
       session.sendEvent(event1);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event2 = new RemoteEvent(1, 'columnResized', {
+      let event2 = new RemoteEvent(1, 'columnResized', {
         column: 'a'
       });
       event2.coalesce = coalesce;
       session.sendEvent(event2);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event3 = new RemoteEvent(1, 'columnResized', {
+      let event3 = new RemoteEvent(1, 'columnResized', {
         column: 'z'
       });
       event3.coalesce = coalesce;
@@ -179,14 +179,14 @@ describe('Session', function() {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // event for another target
-      var event4 = new RemoteEvent(2, 'columnResized', {
+      let event4 = new RemoteEvent(2, 'columnResized', {
         column: 'a'
       });
       event4.coalesce = coalesce;
       session.sendEvent(event4);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event5 = new RemoteEvent(1, 'columnResized', {
+      let event5 = new RemoteEvent(1, 'columnResized', {
         column: 'a'
       });
       event5.coalesce = coalesce;
@@ -199,12 +199,12 @@ describe('Session', function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       // check whether the first and second resize events were correctly removed
-      var requestData = mostRecentJsonRequest();
+      let requestData = mostRecentJsonRequest();
       expect(requestData).toContainEvents([event1, event3, event4, event5]);
     });
 
-    it('sends requests consecutively', function() {
-      var session = createSession();
+    it('sends requests consecutively', () => {
+      let session = createSession();
 
       // send first request
       send(session, 1, 'nodeSelected');
@@ -241,8 +241,8 @@ describe('Session', function() {
       expect(session.areRequestsPending()).toBe(false);
     });
 
-    it('sends requests consecutively and respects delay', function() {
-      var session = createSession();
+    it('sends requests consecutively and respects delay', () => {
+      let session = createSession();
 
       // send first request
       send(session, 1, 'nodeSelected');
@@ -287,36 +287,36 @@ describe('Session', function() {
       expect(session.areRequestsPending()).toBe(false);
     });
 
-    it('splits events into separate requests if an event requires a new request', function() {
-      var session = createSession();
+    it('splits events into separate requests if an event requires a new request', () => {
+      let session = createSession();
 
-      var event0 = new RemoteEvent(1, 'eventType0');
+      let event0 = new RemoteEvent(1, 'eventType0');
       session.sendEvent(event0);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event1 = new RemoteEvent(1, 'eventType1', {
+      let event1 = new RemoteEvent(1, 'eventType1', {
         newRequest: true
       });
       session.sendEvent(event1);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event2 = new RemoteEvent(1, 'eventType2');
+      let event2 = new RemoteEvent(1, 'eventType2');
       session.sendEvent(event2);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event3 = new RemoteEvent(1, 'eventType3', {
+      let event3 = new RemoteEvent(1, 'eventType3', {
         newRequest: true
       });
       session.sendEvent(event3);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event4 = new RemoteEvent(1, 'eventType4');
+      let event4 = new RemoteEvent(1, 'eventType4');
       session.sendEvent(event4);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // Send first request (other requests must not be sent yet)
       jasmine.clock().tick(0);
-      var request = jasmine.Ajax.requests.at(0);
+      let request = jasmine.Ajax.requests.at(0);
       expect($.parseJSON(request.params)).toContainEvents([event0]);
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(true);
@@ -340,34 +340,34 @@ describe('Session', function() {
       receiveResponseForAjaxCall(request);
     });
 
-    it('does not split events into separate requests if only first request requires a new request', function() {
-      var session = createSession();
+    it('does not split events into separate requests if only first request requires a new request', () => {
+      let session = createSession();
 
-      var event0 = new RemoteEvent(1, 'eventType0', {
+      let event0 = new RemoteEvent(1, 'eventType0', {
         newRequest: true
       });
       session.sendEvent(event0);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event1 = new RemoteEvent(1, 'eventType1');
+      let event1 = new RemoteEvent(1, 'eventType1');
       session.sendEvent(event1);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event2 = new RemoteEvent(1, 'eventType2');
+      let event2 = new RemoteEvent(1, 'eventType2');
       session.sendEvent(event2);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // Send request
       jasmine.clock().tick(0);
-      var request = jasmine.Ajax.requests.at(0);
+      let request = jasmine.Ajax.requests.at(0);
       expect($.parseJSON(request.params)).toContainEvents([event0, event1, event2]);
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(true);
       expect(session.areEventsQueued()).toBe(false);
     });
 
-    it('queues ?poll results when user requests are pending', function() {
-      var session = createSession();
+    it('queues ?poll results when user requests are pending', () => {
+      let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
 
@@ -408,8 +408,8 @@ describe('Session', function() {
       expect(session._processSuccessResponse).toHaveBeenCalled();
     });
 
-    it('resumes polling after successful responses', function() {
-      var session = createSession();
+    it('resumes polling after successful responses', () => {
+      let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
       spyOn(session, '_processErrorJsonResponse').and.callThrough();
@@ -439,8 +439,8 @@ describe('Session', function() {
       expect(session._processErrorResponse).not.toHaveBeenCalled();
     });
 
-    it('does not resume polling after JS errors', function() {
-      var session = createSession();
+    it('does not resume polling after JS errors', () => {
+      let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
       spyOn(session, '_processErrorJsonResponse').and.callThrough();
@@ -456,7 +456,7 @@ describe('Session', function() {
       expect(session.areResponsesQueued()).toBe(false);
 
       // Send response for ?poll request
-      expect(function() {
+      expect(() => {
         receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
           status: 200,
           responseText: '{"events": [ { "target": "invalidTarget" } ]}' // <-- causes a JS error
@@ -472,8 +472,8 @@ describe('Session', function() {
       expect(session._processErrorResponse).not.toHaveBeenCalled();
     });
 
-    it('does not resume polling after UI server errors', function() {
-      var session = createSession();
+    it('does not resume polling after UI server errors', () => {
+      let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
       spyOn(session, '_processErrorJsonResponse').and.callThrough();
@@ -503,8 +503,8 @@ describe('Session', function() {
       expect(session._processErrorResponse).not.toHaveBeenCalled();
     });
 
-    it('does not resume polling after HTTP errors', function() {
-      var session = createSession();
+    it('does not resume polling after HTTP errors', () => {
+      let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
       spyOn(session, '_processErrorJsonResponse').and.callThrough();
@@ -534,8 +534,8 @@ describe('Session', function() {
       expect(session._processErrorResponse).toHaveBeenCalled(); // <--
     });
 
-    it('does not resume polling after session terminated', function() {
-      var session = createSession();
+    it('does not resume polling after session terminated', () => {
+      let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
       spyOn(session, '_processErrorJsonResponse').and.callThrough();
@@ -566,16 +566,16 @@ describe('Session', function() {
     });
   });
 
-  describe('init', function() {
+  describe('init', () => {
 
-    it('sends startup parameter', function() {
-      var session = createSession();
+    it('sends startup parameter', () => {
+      let session = createSession();
       session.start();
 
       uninstallUnloadHandlers(session);
       sendQueuedAjaxCalls();
 
-      var requestData = mostRecentJsonRequest();
+      let requestData = mostRecentJsonRequest();
       expect(requestData.startup).toBe(true);
 
       // don't send it on subsequent requests
@@ -586,8 +586,8 @@ describe('Session', function() {
       expect(requestData.startup).toBeUndefined();
     });
 
-    it('sends user agent on startup', function() {
-      var session = createSession(new UserAgent({
+    it('sends user agent on startup', () => {
+      let session = createSession(new UserAgent({
         deviceType: Device.Type.MOBILE
       }));
       session.start();
@@ -595,7 +595,7 @@ describe('Session', function() {
       uninstallUnloadHandlers(session);
       sendQueuedAjaxCalls();
 
-      var requestData = mostRecentJsonRequest();
+      let requestData = mostRecentJsonRequest();
       expect(requestData.userAgent.deviceType).toBe('MOBILE');
 
       // don't send it on subsequent requests
@@ -609,11 +609,11 @@ describe('Session', function() {
   });
 
   // Tests whether delegation to TextMap works as expected
-  describe('texts', function() {
+  describe('texts', () => {
 
-    var session;
+    let session;
 
-    beforeEach(function() {
+    beforeEach(() => {
       session = createSession();
       session.textMap = new TextMap({
         NoOptions: 'Keine Übereinstimmung',
@@ -624,43 +624,43 @@ describe('Session', function() {
       });
     });
 
-    it('check if correct text is returned', function() {
+    it('check if correct text is returned', () => {
       expect(session.text('NoOptions')).toBe('Keine Übereinstimmung');
     });
 
-    it('check if empty text is returned', function() {
+    it('check if empty text is returned', () => {
       expect(session.text('Empty')).toBe('');
     });
 
-    it('check if null text is returned', function() {
+    it('check if null text is returned', () => {
       expect(session.text('Null')).toBe(null);
     });
 
-    it('check if arguments are replaced in text', function() {
+    it('check if arguments are replaced in text', () => {
       expect(session.text('NumOptions', 3)).toBe('3 Optionen');
     });
 
-    it('check if multiple arguments are replaced in text', function() {
+    it('check if multiple arguments are replaced in text', () => {
       expect(session.text('Greeting', 'Computer', 'nice to meet you', 'User')).toBe('Hello Computer, my name is User, nice to meet you.');
     });
 
-    it('check if undefined texts return an error message', function() {
+    it('check if undefined texts return an error message', () => {
       expect(session.text('DoesNotExist')).toBe('[undefined text: DoesNotExist]');
     });
 
-    it('optText returns undefined if key is not found', function() {
+    it('optText returns undefined if key is not found', () => {
       expect(session.optText('DoesNotExist')).toBe(undefined);
     });
 
-    it('optText returns default value if key is not found', function() {
+    it('optText returns default value if key is not found', () => {
       expect(session.optText('DoesNotExist', '#Default', 'Any argument')).toBe('#Default');
     });
 
-    it('optText returns text if key found', function() {
+    it('optText returns text if key found', () => {
       expect(session.optText('NoOptions')).toBe('Keine Übereinstimmung');
     });
 
-    it('optText returns text if key found, with arguments', function() {
+    it('optText returns text if key found, with arguments', () => {
       expect(session.optText('NumOptions', '#Default', 7)).toBe('7 Optionen');
     });
 

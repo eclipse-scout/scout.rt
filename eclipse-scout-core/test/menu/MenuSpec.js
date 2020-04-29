@@ -11,11 +11,11 @@
 import {Action, scout, tooltips} from '../../src/index';
 import {MenuSpecHelper} from '@eclipse-scout/testing';
 
-describe('Menu', function() {
+describe('Menu', () => {
 
-  var helper, session, $sandbox, menu1, menu2;
+  let helper, session, $sandbox, menu1, menu2;
 
-  beforeEach(function() {
+  beforeEach(() => {
     jasmine.clock().install();
     setFixtures(sandbox());
     session = sandboxSession();
@@ -30,21 +30,21 @@ describe('Menu', function() {
     });
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
-  describe('defaults', function() {
+  describe('defaults', () => {
 
-    it('should have expected defaults', function() {
+    it('should have expected defaults', () => {
       expect(menu1.overflown).toBe(false);
     });
 
   });
 
-  describe('render', function() {
+  describe('render', () => {
 
-    it('render depending on the actionStyle', function() {
+    it('render depending on the actionStyle', () => {
       menu1.render($sandbox);
       expect(menu1.$container.hasClass('menu-item')).toBe(true);
       menu1.remove();
@@ -65,13 +65,13 @@ describe('Menu', function() {
       expect(menu1.$container.hasClass('menu-item')).toBe(true);
     });
 
-    it('render as separator', function() {
+    it('render as separator', () => {
       menu1.separator = true;
       menu1.render($sandbox);
       expect(menu1.$container.hasClass('menu-separator')).toBe(true);
     });
 
-    it('must not render childActions when popup is not open', function() {
+    it('must not render childActions when popup is not open', () => {
       // See ticket #173734
       // render menu1 (sub-menu not opened)
       menu1.childActions = [menu2];
@@ -85,12 +85,12 @@ describe('Menu', function() {
       menu1.setSelected(true);
       menu1.render($sandbox);
       expect(menu1.$container).toBeTruthy();
-      var $subMenu = $sandbox.find('.menu-item > span:contains(\'bar\')');
+      let $subMenu = $sandbox.find('.menu-item > span:contains(\'bar\')');
       expect($subMenu.length).toBe(1);
 
       // now the actual test case testing the bug from the ticket:
       // a property-change on 'childActions' occurs for menu1, when popup is not opened it must not render its submenus
-      var modelMenu3 = helper.createModel('baz');
+      let modelMenu3 = helper.createModel('baz');
       modelMenu3.id = '123';
       menu1.remove();
       menu1.setSelected(false);
@@ -103,9 +103,9 @@ describe('Menu', function() {
 
   });
 
-  describe('isTabTarget', function() {
+  describe('isTabTarget', () => {
 
-    it('should return true when menu can be a target of TAB action', function() {
+    it('should return true when menu can be a target of TAB action', () => {
       menu1.setEnabled(true);
       menu1.visible = true;
       menu1.actionStyle = Action.ActionStyle.BUTTON;
@@ -124,16 +124,16 @@ describe('Menu', function() {
 
   });
 
-  describe('setTooltipText', function() {
+  describe('setTooltipText', () => {
 
-    it('can update the tooltip text', function() {
-      var testMenu = helper.createMenu({
+    it('can update the tooltip text', () => {
+      let testMenu = helper.createMenu({
         text: 'My Test Menu',
         tooltipText: 'moo'
       });
       testMenu.render();
 
-      var tooltip = $('body').find('.tooltip');
+      let tooltip = $('body').find('.tooltip');
       expect(tooltip.length).toBe(0);
 
       testMenu.$container.triggerMouseEnter();
@@ -167,14 +167,14 @@ describe('Menu', function() {
 
   });
 
-  describe('status', function() {
-    it('is enabled if inheritAccessibility=true and parent is enabled', function() {
-      var menu = helper.createMenu({
+  describe('status', () => {
+    it('is enabled if inheritAccessibility=true and parent is enabled', () => {
+      let menu = helper.createMenu({
         text: 'menu',
         inheritAccessibility: true,
         enabled: true
       });
-      var parent = menu.parent;
+      let parent = menu.parent;
       parent.setEnabled(true);
 
       expect(menu.inheritAccessibility).toBe(true);
@@ -185,15 +185,15 @@ describe('Menu', function() {
       expect(parent.enabledComputed).toBe(true);
     });
 
-    it('is enabled if a child menu with inheritAccessibility=false is programmatically added', function() {
-      var menu = helper.createMenu({
+    it('is enabled if a child menu with inheritAccessibility=false is programmatically added', () => {
+      let menu = helper.createMenu({
         text: 'menu',
         inheritAccessibility: true,
         enabled: true
       });
-      var parent = menu.parent;
+      let parent = menu.parent;
 
-      var childMenu = scout.create('Menu', {
+      let childMenu = scout.create('Menu', {
         text: 'child',
         inheritAccessibility: false,
         session: parent.session,
@@ -224,13 +224,13 @@ describe('Menu', function() {
       expect(parent.enabledComputed).toBe(false);
     });
 
-    it('is enabled if inheritAccessibility=false and parent is disabled', function() {
-      var menu = helper.createMenu({
+    it('is enabled if inheritAccessibility=false and parent is disabled', () => {
+      let menu = helper.createMenu({
         text: 'menu',
         inheritAccessibility: false,
         enabled: true
       });
-      var parent = menu.parent;
+      let parent = menu.parent;
       parent.setEnabled(false);
 
       expect(menu.inheritAccessibility).toBe(false);
@@ -241,13 +241,13 @@ describe('Menu', function() {
       expect(parent.enabledComputed).toBe(false);
     });
 
-    it('is disabled if inheritAccessibility=true and parent is disabled', function() {
-      var menu = helper.createMenu({
+    it('is disabled if inheritAccessibility=true and parent is disabled', () => {
+      let menu = helper.createMenu({
         text: 'menu',
         inheritAccessibility: true,
         enabled: true
       });
-      var parent = menu.parent;
+      let parent = menu.parent;
       parent.setEnabled(false);
 
       expect(menu.inheritAccessibility).toBe(true);
@@ -258,8 +258,8 @@ describe('Menu', function() {
       expect(parent.enabledComputed).toBe(false);
     });
 
-    it('is enabled if inheritAccessibility=true and parent is disabled but has child actions with inheritAccessibility=false', function() {
-      var menu = helper.createMenu({
+    it('is enabled if inheritAccessibility=true and parent is disabled but has child actions with inheritAccessibility=false', () => {
+      let menu = helper.createMenu({
         text: 'menu',
         inheritAccessibility: true,
         enabled: true,
@@ -291,7 +291,7 @@ describe('Menu', function() {
           }]
         }]
       });
-      var parent = menu.parent;
+      let parent = menu.parent;
       parent.setEnabled(false);
 
       expect(menu.inheritAccessibility).toBe(true);
@@ -323,8 +323,8 @@ describe('Menu', function() {
       expect(parent.enabledComputed).toBe(false);
     });
 
-    it('is updated if a child menus inherit-status changes', function() {
-      var menu = helper.createMenu({
+    it('is updated if a child menus inherit-status changes', () => {
+      let menu = helper.createMenu({
         text: 'menu',
         inheritAccessibility: true,
         enabled: true,
@@ -347,7 +347,7 @@ describe('Menu', function() {
         }]
       });
 
-      var parent = menu.parent;
+      let parent = menu.parent;
       parent.setEnabled(false);
 
       expect(menu.inheritAccessibility).toBe(true);
@@ -392,8 +392,8 @@ describe('Menu', function() {
       expect(parent.enabledComputed).toBe(false);
     });
 
-    it('depends on next parent with inheritAccessibility=false if this.inheritAccessibility=true', function() {
-      var menu = helper.createMenu({
+    it('depends on next parent with inheritAccessibility=false if this.inheritAccessibility=true', () => {
+      let menu = helper.createMenu({
         text: 'menu',
         inheritAccessibility: true,
         enabled: true,
@@ -411,7 +411,7 @@ describe('Menu', function() {
         }]
       });
 
-      var parent = menu.parent;
+      let parent = menu.parent;
       parent.setEnabled(false);
 
       expect(menu.inheritAccessibility).toBe(true);
@@ -438,8 +438,8 @@ describe('Menu', function() {
       expect(menu.childActions[0].childActions[0].enabledComputed).toBe(true); // must stay true!
     });
 
-    it('is updated if a child menus enabled or visible status changes', function() {
-      var menu = helper.createMenu({
+    it('is updated if a child menus enabled or visible status changes', () => {
+      let menu = helper.createMenu({
         text: 'menu',
         inheritAccessibility: true,
         enabled: true,
@@ -462,7 +462,7 @@ describe('Menu', function() {
         }]
       });
 
-      var parent = menu.parent;
+      let parent = menu.parent;
       parent.setEnabled(false);
 
       expect(menu.inheritAccessibility).toBe(true);
@@ -497,10 +497,10 @@ describe('Menu', function() {
     });
   });
 
-  describe('clone', function() {
+  describe('clone', () => {
 
-    it('and change child actions', function() {
-      var clone,
+    it('and change child actions', () => {
+      let clone,
         menu = helper.createMenu({
           text: 'menu',
           keyStroke: 'F2'

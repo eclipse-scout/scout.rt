@@ -19,26 +19,26 @@ export default class HorizontalGridMatrix extends LogicalGridMatrix {
   }
 
   computeGridData(widgets) {
-    widgets.forEach(function(widget) {
-      var hints = GridData.createFromHints(widget, this.getColumnCount());
-      var gridData = new GridData(hints);
+    widgets.forEach(widget => {
+      let hints = GridData.createFromHints(widget, this.getColumnCount());
+      let gridData = new GridData(hints);
       gridData.w = Math.min(hints.w, this.getColumnCount());
       this._add(widget, hints, gridData);
       widget.gridData = gridData;
-    }.bind(this));
+    });
     this._cursor.rowCount = this.rowCount;
     return true;
   }
 
   _add(widget, hints, data) {
     this._nextFree(data.w, data.h);
-    var currentIndex = this._cursor.currentIndex();
+    let currentIndex = this._cursor.currentIndex();
     if (data.w <= (this.getColumnCount() - currentIndex.x)) {
       data.x = currentIndex.x;
       data.y = currentIndex.y;
       // add widget
-      for (var xx = currentIndex.x; xx < currentIndex.x + data.w; xx++) {
-        for (var yy = currentIndex.y; yy < currentIndex.y + data.h; yy++) {
+      for (let xx = currentIndex.x; xx < currentIndex.x + data.w; xx++) {
+        for (let yy = currentIndex.y; yy < currentIndex.y + data.h; yy++) {
           this._setAssignedCell({
             x: xx,
             y: yy

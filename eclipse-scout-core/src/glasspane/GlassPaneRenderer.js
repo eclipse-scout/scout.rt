@@ -59,7 +59,7 @@ export default class GlassPaneRenderer {
     // May happen if a part of the display parent is removed and rendered again while covered by a glass pane
     // E.g. display parent is set to outline and navigation is made invisible but bench is still there.
     // When navigation is made visible again, renderGlassPanes is called but only the glass panes of the navigation need to be added and not the ones of the bench (because they are already there)
-    var alreadyRendered = this._$glassPanes.some(function($pane) {
+    let alreadyRendered = this._$glassPanes.some($pane => {
       return $pane.parent()[0] === $glassPaneTarget[0];
     });
     if (alreadyRendered) {
@@ -67,7 +67,7 @@ export default class GlassPaneRenderer {
     }
 
     // Render glasspanes onto glasspane targets.
-    var $glassPane = $glassPaneTarget
+    let $glassPane = $glassPaneTarget
       .appendDiv('glasspane')
       .on('mousedown', this._onMouseDown.bind(this));
 
@@ -97,13 +97,13 @@ export default class GlassPaneRenderer {
 
   _adjustGlassPaneSize($glassPane, $glassPaneTarget) {
     // The glasspane must cover the border and overlapping children
-    var top = -$glassPaneTarget.cssBorderTopWidth(),
+    let top = -$glassPaneTarget.cssBorderTopWidth(),
       bottom = -$glassPaneTarget.cssBorderBottomWidth(),
       left = -$glassPaneTarget.cssBorderLeftWidth(),
       right = -$glassPaneTarget.cssBorderRightWidth();
 
-    $glassPaneTarget.children().each(function(idx, elem) {
-      var element = $(elem);
+    $glassPaneTarget.children().each((idx, elem) => {
+      let element = $(elem);
       top = Math.min(top, (element.cssTop() || 0) + (element.cssMarginTop() || 0));
       bottom = Math.min(bottom, (element.cssBottom() || 0) + (element.cssMarginBottom() || 0));
       left = Math.min(left, (element.cssLeft() || 0) + (element.cssMarginLeft() || 0));
@@ -134,7 +134,7 @@ export default class GlassPaneRenderer {
   }
 
   _removeGlassPane($glassPane) {
-    var $glassPaneTarget = $glassPane.parent();
+    let $glassPaneTarget = $glassPane.parent();
     $glassPane.off('remove', this._glassPaneRemoveHandler);
     $glassPane.remove();
     arrays.$remove(this._$glassPanes, $glassPane);
@@ -144,7 +144,7 @@ export default class GlassPaneRenderer {
   }
 
   eachGlassPane(func) {
-    this._$glassPanes.forEach(function($glassPane) {
+    this._$glassPanes.forEach($glassPane => {
       func($glassPane);
     });
   }
@@ -154,7 +154,7 @@ export default class GlassPaneRenderer {
       return []; // No glasspanes to be rendered, e.g. for none-modal dialogs.
     }
 
-    var displayParent = this._resolveDisplayParent();
+    let displayParent = this._resolveDisplayParent();
     if (!displayParent || !displayParent.glassPaneTargets) {
       return []; // Parent is not a valid display parent.
     }
@@ -196,10 +196,10 @@ export default class GlassPaneRenderer {
   }
 
   _onMouseDown(event) {
-    var $animationTarget = null;
+    let $animationTarget = null;
 
     // notify the display parent to handle the mouse down on the glass pane.
-    var displayParent = this._resolveDisplayParent();
+    let displayParent = this._resolveDisplayParent();
     if (displayParent._onGlassPaneMouseDown) {
       displayParent._onGlassPaneMouseDown(this._widget, $(event.target));
     }
@@ -208,7 +208,7 @@ export default class GlassPaneRenderer {
       // If the blocking widget is a view, the $container cannot be animated (this only works for dialogs). Instead,
       // highlight the view tab (or the overflow item, if the view tab is not visible).
 
-      var viewTab = this.session.desktop.bench.getViewTab(this._widget);
+      let viewTab = this.session.desktop.bench.getViewTab(this._widget);
       // View tab may not exist if view has neither a title nor a subtitle
       if (viewTab) {
         $animationTarget = viewTab.$container;
@@ -222,7 +222,7 @@ export default class GlassPaneRenderer {
 
     if ($animationTarget) {
       // If the animation target itself is covered by a glasspane, the event is passed on
-      var $glassPane = this._widget.$container.children('.glasspane');
+      let $glassPane = this._widget.$container.children('.glasspane');
       if ($glassPane.length) {
         $glassPane.trigger('mousedown');
       } else {
@@ -241,7 +241,7 @@ export default class GlassPaneRenderer {
   }
 
   _onGlassPaneRemove(event) {
-    var $glassPane = $(event.target);
+    let $glassPane = $(event.target);
     this._removeGlassPane($glassPane);
   }
 }

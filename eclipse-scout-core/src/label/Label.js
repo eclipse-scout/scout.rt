@@ -47,7 +47,7 @@ export default class Label extends Widget {
   }
 
   _renderValue() {
-    var value = this.value || '';
+    let value = this.value || '';
     if (this.htmlEnabled) {
       this.$container.html(value);
 
@@ -93,8 +93,8 @@ export default class Label extends Widget {
   }
 
   _onAppLinkAction(event) {
-    var $target = $(event.delegateTarget);
-    var ref = $target.data('ref');
+    let $target = $(event.delegateTarget);
+    let ref = $target.data('ref');
     this.triggerAppLinkAction(ref);
   }
 

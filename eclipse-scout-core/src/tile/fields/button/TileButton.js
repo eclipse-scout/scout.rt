@@ -22,7 +22,7 @@ export default class TileButton extends Button {
       super._render();
       return;
     }
-    var $button = this.$parent.makeDiv();
+    let $button = this.$parent.makeDiv();
     this.$buttonLabel = $button.appendSpan('label');
 
     this.addContainer(this.$parent, 'tile-button');

@@ -48,12 +48,12 @@ export default class RangeKeyStroke extends KeyStroke {
    * @override KeyStroke.js
    */
   keys() {
-    var keys = [];
+    let keys = [];
     this.ranges.forEach(function(range) {
-      var from = this._getRangeFrom(range);
-      var to = this._getRangeTo(range);
+      let from = this._getRangeFrom(range);
+      let to = this._getRangeTo(range);
 
-      for (var which = from; which <= to; which++) {
+      for (let which = from; which <= to; which++) {
         keys.push(new Key(this, which));
       }
     }, this);

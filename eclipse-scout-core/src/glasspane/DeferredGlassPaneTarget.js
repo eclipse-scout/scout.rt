@@ -36,9 +36,9 @@ export default class DeferredGlassPaneTarget {
 
   renderWhenReady() {
     if (this.glassPaneRenderer && this.$glassPaneTargets && this.$glassPaneTargets.length > 0) {
-      this.$glassPaneTargets.forEach(function($glassPaneTarget) {
+      this.$glassPaneTargets.forEach($glassPaneTarget => {
         this.glassPaneRenderer.renderGlassPane($glassPaneTarget);
-      }.bind(this));
+      });
     }
   }
 
@@ -53,14 +53,14 @@ export default class DeferredGlassPaneTarget {
       throw new Error('Don\'t call this function if widget is already rendered.');
     }
 
-    var deferred = new DeferredGlassPaneTarget();
-    var renderedHandler = function(event) {
-      var elements = findGlassPaneTargets();
+    let deferred = new DeferredGlassPaneTarget();
+    let renderedHandler = event => {
+      let elements = findGlassPaneTargets();
       deferred.ready(elements);
     };
 
     widget.one('render', renderedHandler);
-    widget.one('destroy', function() {
+    widget.one('destroy', () => {
       widget.off('render', renderedHandler);
     });
     return [deferred];

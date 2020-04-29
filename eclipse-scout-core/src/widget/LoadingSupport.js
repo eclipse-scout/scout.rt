@@ -82,14 +82,14 @@ export default class LoadingSupport {
       return;
     }
 
-    this._$loadingIndicator.fadeOutAndRemove(function() {
+    this._$loadingIndicator.fadeOutAndRemove(() => {
       this._$loadingIndicator = null;
       if (this.widget.rendered) {
         // Show widget's content (layout if necessary)
         this.$container.removeClass('loading');
         this.widget.invalidateLayoutTree();
       }
-    }.bind(this));
+    });
   }
 
   remove() {

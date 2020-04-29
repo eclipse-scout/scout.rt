@@ -46,7 +46,7 @@ export default class AbstractLayout {
    * More concrete: it adds border and padding to the hints again.
    */
   _revertSizeHintsAdjustments($container, options) {
-    var htmlContainer = HtmlComponent.get($container);
+    let htmlContainer = HtmlComponent.get($container);
     if (options.widthHint) {
       options.widthHint += htmlContainer.insets().horizontal();
     }

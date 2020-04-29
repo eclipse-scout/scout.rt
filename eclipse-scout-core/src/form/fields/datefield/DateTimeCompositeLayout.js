@@ -26,9 +26,9 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
 
     this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
     HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
-    this._dateField.one('remove', function() {
+    this._dateField.one('remove', () => {
       HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
-    }.bind(this));
+    });
   }
 
   _initDefaults() {
@@ -41,7 +41,7 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var htmlContainer = HtmlComponent.get($container),
+    let htmlContainer = HtmlComponent.get($container),
       $dateField = this._dateField.$dateField,
       $timeField = this._dateField.$timeField,
       $dateFieldIcon = this._dateField.$dateFieldIcon,
@@ -55,29 +55,29 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
       hasDate = ($dateField ? !$dateField.isDisplayNone() : false),
       hasTime = ($timeField ? !$timeField.isDisplayNone() : false);
 
-    var availableSize = htmlContainer.availableSize({
+    let availableSize = htmlContainer.availableSize({
       exact: true
     })
       .subtract(htmlContainer.insets());
 
-    var dateFieldSize, timeFieldSize;
+    let dateFieldSize, timeFieldSize;
     // --- Date and time ---
     if (hasDate && hasTime) {
       // Field size
-      var dateFieldMargins = htmlDateField.margins();
-      var timeFieldMargins = htmlTimeField.margins();
-      var compositeMargins = new Insets(
+      let dateFieldMargins = htmlDateField.margins();
+      let timeFieldMargins = htmlTimeField.margins();
+      let compositeMargins = new Insets(
         Math.max(dateFieldMargins.top, timeFieldMargins.top),
         Math.max(dateFieldMargins.right, timeFieldMargins.right),
         Math.max(dateFieldMargins.bottom, timeFieldMargins.bottom),
         Math.max(dateFieldMargins.left, timeFieldMargins.left)
       );
-      var compositeSize = availableSize.subtract(compositeMargins);
-      var hgap = this._hgap();
-      var totalWidth = compositeSize.width - hgap;
+      let compositeSize = availableSize.subtract(compositeMargins);
+      let hgap = this._hgap();
+      let totalWidth = compositeSize.width - hgap;
       // Date field 60%, time field 40%
-      var dateFieldWidth = (totalWidth * 0.6);
-      var timeFieldWidth = (totalWidth - dateFieldWidth);
+      let dateFieldWidth = (totalWidth * 0.6);
+      let timeFieldWidth = (totalWidth - dateFieldWidth);
 
       dateFieldSize = new Dimension(dateFieldWidth, compositeSize.height);
       timeFieldSize = new Dimension(timeFieldWidth, compositeSize.height);
@@ -171,7 +171,7 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
         graphics.setSize($predictTimeField, timeFieldSize);
       }
     }
-    var popup = this._dateField.popup;
+    let popup = this._dateField.popup;
     if (popup && popup.rendered) {
       // Make sure the popup is correctly positioned (especially necessary for cell editor)
       popup.position();
@@ -186,7 +186,7 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
   }
 
   preferredLayoutSize($container) {
-    var prefSize = new Dimension(),
+    let prefSize = new Dimension(),
       $dateField = this._dateField.$dateField,
       $timeField = this._dateField.$timeField,
       hasDate = ($dateField ? !$dateField.isDisplayNone() : false),

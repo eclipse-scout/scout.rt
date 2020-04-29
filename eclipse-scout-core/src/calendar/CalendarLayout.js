@@ -20,7 +20,7 @@ export default class CalendarLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var height = 0,
+    let height = 0,
       headerHeight = 0,
       $yearContainer = this.calendar._yearPanel.$container,
       $grids = this.calendar.$grids,
@@ -50,7 +50,7 @@ export default class CalendarLayout extends AbstractLayout {
     if (this.compacted) {
       return;
     }
-    var $headerRow2 = this.calendar.$headerRow2;
+    let $headerRow2 = this.calendar.$headerRow2;
     this.calendar.$title.appendTo(this.calendar.$headerRow2);
     $headerRow2.show();
     this.compacted = true;
@@ -60,7 +60,7 @@ export default class CalendarLayout extends AbstractLayout {
     if (!this.compacted) {
       return;
     }
-    var $headerRow2 = this.calendar.$headerRow2;
+    let $headerRow2 = this.calendar.$headerRow2;
     this.calendar.$title.insertBefore(this.calendar.$commands);
     $headerRow2.hide();
     this.compacted = false;

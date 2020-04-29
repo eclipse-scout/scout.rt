@@ -34,13 +34,13 @@ export default class FileChooserButton extends ValueField {
     this.button.on('click', this._onButtonClick.bind(this));
 
     this.fileInput.on('change', this._onFileChange.bind(this));
-    this.on('propertyChange', function(event) {
+    this.on('propertyChange', event => {
       if (event.propertyName === 'enabledComputed') {
         // Propagate "enabledComputed" to inner widgets
         this.button.setEnabled(event.newValue);
         this.fileInput.setEnabled(event.newValue);
       }
-    }.bind(this));
+    });
   }
 
   /**
@@ -68,8 +68,8 @@ export default class FileChooserButton extends ValueField {
     this.addContainer(this.$parent, 'file-chooser-button has-icon');
     this.addLabel();
 
-    var $field = this.$parent.makeDiv();
-    var fieldHtmlComp = HtmlComponent.install($field, this.session);
+    let $field = this.$parent.makeDiv();
+    let fieldHtmlComp = HtmlComponent.install($field, this.session);
     this.button.render($field);
 
     fieldHtmlComp.setLayout(new SingleLayout(this.button.htmlComp));
@@ -123,8 +123,8 @@ export default class FileChooserButton extends ValueField {
 
   setFileExtensions(fileExtensions) {
     this.setProperty('fileExtensions', fileExtensions);
-    var acceptTypes = arrays.ensure(fileExtensions);
-    acceptTypes = acceptTypes.map(function(acceptType) {
+    let acceptTypes = arrays.ensure(fileExtensions);
+    acceptTypes = acceptTypes.map(acceptType => {
       return acceptType.indexOf(0) === '.' ? acceptType : '.' + acceptType;
     });
     this.setAcceptTypes(strings.join(',', acceptTypes));

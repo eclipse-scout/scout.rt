@@ -53,7 +53,7 @@ export default class TreeNode {
   }
 
   init(model) {
-    var staticModel = this._jsonModel();
+    let staticModel = this._jsonModel();
     if (staticModel) {
       model = $.extend({}, staticModel, model);
     }
@@ -181,8 +181,8 @@ export default class TreeNode {
     if (this._loadChildrenPromise) {
       return this._loadChildrenPromise;
     }
-    var deferred = this.loadChildren();
-    var promise = deferred.promise();
+    let deferred = this.loadChildren();
+    let promise = deferred.promise();
     // check if we can get rid of this state-check in a future release
     if (deferred.state() === 'resolved') {
       this._loadChildrenPromise = null;
@@ -247,9 +247,9 @@ export default class TreeNode {
   }
 
   _renderIcon() {
-    this.$node.icon(this.iconId, function($icon) {
+    this.$node.icon(this.iconId, $icon => {
       $icon.insertBefore(this.$text);
-    }.bind(this));
+    });
   }
 
   $icon() {
@@ -257,7 +257,7 @@ export default class TreeNode {
   }
 
   _renderControl() {
-    var $control = this.$node.prependDiv('tree-node-control');
+    let $control = this.$node.prependDiv('tree-node-control');
     this._updateControl($control, this.getTree());
   }
 
@@ -268,8 +268,8 @@ export default class TreeNode {
   }
 
   _renderCheckbox() {
-    var $checkboxContainer = this.$node.prependDiv('tree-node-checkbox');
-    var $checkbox = $checkboxContainer
+    let $checkboxContainer = this.$node.prependDiv('tree-node-checkbox');
+    let $checkbox = $checkboxContainer
       .appendDiv('check-box')
       .toggleClass('checked', this.checked)
       .toggleClass('disabled', !(this.getTree().enabled && this.enabled));
@@ -282,7 +282,7 @@ export default class TreeNode {
       return;
     }
 
-    var $node = this.$node,
+    let $node = this.$node,
       tree = this.getTree();
 
     $node.attr('class', this._preserveCssClasses($node));
@@ -309,7 +309,7 @@ export default class TreeNode {
 
     // If parent node is marked as 'lazy', check if any visible child nodes remain.
     if (this.parentNode && this.parentNode.expandedLazy) {
-      var hasVisibleNodes = this.parentNode.childNodes.some(function(childNode) {
+      let hasVisibleNodes = this.parentNode.childNodes.some(childNode => {
         return !!tree.visibleNodesMap[childNode.id];
       });
       if (!hasVisibleNodes && this.parentNode.$node) {
@@ -333,7 +333,7 @@ export default class TreeNode {
    * by the node itself.
    */
   _preserveCssClasses($node) {
-    var cssClass = 'tree-node';
+    let cssClass = 'tree-node';
     if ($node.isSelected()) {
       cssClass += ' selected';
     }
@@ -347,7 +347,7 @@ export default class TreeNode {
   }
 
   _updateIconWidth() {
-    var cssWidth = '';
+    let cssWidth = '';
     if (this.iconId) {
       // always add 1 pixel to the result of outer-width to prevent rendering errors in IE, where
       // the complete text is replaced by an ellipsis, when the .text element is a bit too large

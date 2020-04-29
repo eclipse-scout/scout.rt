@@ -11,16 +11,16 @@
 // eslint-disable-next-line max-classes-per-file
 import {HtmlComponent, NullWidget, scout, TreeVisitResult, Widget} from '../../src/index';
 
-describe('Widget', function() {
+describe('Widget', () => {
 
-  var session, parent;
+  let session, parent;
 
   class TestWidget extends NullWidget {
     _render() {
       this.$container = this.$parent.appendDiv();
       this.$container.setTabbable(true);
       this.htmlComp = HtmlComponent.install(this.$container, this.session);
-      this.htmlComp.getParent = function() {
+      this.htmlComp.getParent = () => {
         return null; // Detach from parent because our parent does not layout children
       };
     }
@@ -30,7 +30,7 @@ describe('Widget', function() {
     _render() {
       this.$container = this.$parent.appendDiv();
       this.htmlComp = HtmlComponent.install(this.$container, this.session);
-      this.htmlComp.getParent = function() {
+      this.htmlComp.getParent = () => {
         return null; // Detach from parent because our parent does not layout children
       };
       this.$container.css({
@@ -51,7 +51,7 @@ describe('Widget', function() {
     }
   }
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
 
@@ -63,18 +63,18 @@ describe('Widget', function() {
   });
 
   function createWidget(model) {
-    var defaults = {
+    let defaults = {
       parent: parent,
       session: session
     };
     model = $.extend({}, defaults, model);
-    var widget = new TestWidget();
+    let widget = new TestWidget();
     widget.init(model);
     return widget;
   }
 
-  describe('visitChildren', function() {
-    var child1, child2, grandChild1, grandChild2, grandChild2_1;
+  describe('visitChildren', () => {
+    let child1, child2, grandChild1, grandChild2, grandChild2_1;
 
     function createVisitStructure() {
       child1 = new TestWidget();
@@ -113,23 +113,23 @@ describe('Widget', function() {
       });
     }
 
-    it('visits all descendants', function() {
-      var widget = createWidget({
+    it('visits all descendants', () => {
+      let widget = createWidget({
         session: session,
         parent: parent
       });
-      var counter = 0;
-      parent.visitChildren(function(item) {
+      let counter = 0;
+      parent.visitChildren(item => {
         counter++;
       });
       expect(counter).toBe(1); /* parent itself is not visited, only children */
     });
 
-    it('can be aborted when returning true', function() {
+    it('can be aborted when returning true', () => {
       createVisitStructure();
 
       // Abort at grandChild1 -> don't visit siblings of grandChild1 and siblings of parent
-      parent.visitChildren(function(child) {
+      parent.visitChildren(child => {
         child.wasVisited = true;
         return child === grandChild1;
       });
@@ -140,7 +140,7 @@ describe('Widget', function() {
       expect(grandChild2_1.wasVisited).toBe(false);
 
       // Reset wasVisited flag
-      parent.visitChildren(function(child) {
+      parent.visitChildren(child => {
         child.wasVisited = false;
         return false;
       });
@@ -151,7 +151,7 @@ describe('Widget', function() {
       expect(grandChild2_1.wasVisited).toBe(false);
 
       // Abort at child2 -> don't visit children of child2
-      parent.visitChildren(function(child) {
+      parent.visitChildren(child => {
         child.wasVisited = true;
         return child === child2;
       });
@@ -162,11 +162,11 @@ describe('Widget', function() {
       expect(grandChild2_1.wasVisited).toBe(false);
     });
 
-    it('can be aborted when returning TreeVisitResult.TERMINATE', function() {
+    it('can be aborted when returning TreeVisitResult.TERMINATE', () => {
       createVisitStructure();
 
       // Abort at grandChild1 -> don't visit siblings of grandChild1 and siblings of parent
-      parent.visitChildren(function(child) {
+      parent.visitChildren(child => {
         child.wasVisited = true;
         if (child === grandChild1) {
           return TreeVisitResult.TERMINATE;
@@ -179,7 +179,7 @@ describe('Widget', function() {
       expect(grandChild2_1.wasVisited).toBe(false);
 
       // Reset wasVisited flag
-      parent.visitChildren(function(child) {
+      parent.visitChildren(child => {
         child.wasVisited = false;
         return false;
       });
@@ -190,7 +190,7 @@ describe('Widget', function() {
       expect(grandChild2_1.wasVisited).toBe(false);
 
       // Abort at child2 -> don't visit children of child2
-      parent.visitChildren(function(child) {
+      parent.visitChildren(child => {
         child.wasVisited = true;
         if (child === child2) {
           return TreeVisitResult.TERMINATE;
@@ -203,11 +203,11 @@ describe('Widget', function() {
       expect(grandChild2_1.wasVisited).toBe(false);
     });
 
-    it('can skip a subtree when returning TreeVisitResult.SKIP_SUBTREE', function() {
+    it('can skip a subtree when returning TreeVisitResult.SKIP_SUBTREE', () => {
       createVisitStructure();
 
       // Abort at grandChild1 -> don't visit siblings of grandChild1 and siblings of parent
-      parent.visitChildren(function(child) {
+      parent.visitChildren(child => {
         child.wasVisited = true;
         if (child === child1) {
           return TreeVisitResult.SKIP_SUBTREE;
@@ -220,7 +220,7 @@ describe('Widget', function() {
       expect(grandChild2_1.wasVisited).toBe(true);
 
       // Reset wasVisited flag
-      parent.visitChildren(function(child) {
+      parent.visitChildren(child => {
         child.wasVisited = false;
         return false;
       });
@@ -231,7 +231,7 @@ describe('Widget', function() {
       expect(grandChild2_1.wasVisited).toBe(false);
 
       // Abort at child2 -> don't visit children of child2
-      parent.visitChildren(function(child) {
+      parent.visitChildren(child => {
         child.wasVisited = true;
         if (child === child2) {
           return TreeVisitResult.SKIP_SUBTREE;
@@ -245,27 +245,27 @@ describe('Widget', function() {
     });
   });
 
-  describe('widget', function() {
-    it('finds a child with the given widget id', function() {
-      var child1 = new TestWidget();
+  describe('widget', () => {
+    it('finds a child with the given widget id', () => {
+      let child1 = new TestWidget();
       child1.init({
         id: 'child1',
         session: session,
         parent: parent
       });
-      var child2 = new TestWidget();
+      let child2 = new TestWidget();
       child2.init({
         id: 'child2',
         session: session,
         parent: parent
       });
-      var grandChild1 = new TestWidget();
+      let grandChild1 = new TestWidget();
       grandChild1.init({
         id: 'grandChild1',
         session: session,
         parent: child1
       });
-      var grandChild2 = new TestWidget();
+      let grandChild2 = new TestWidget();
       grandChild2.init({
         id: 'grandChild2',
         session: session,
@@ -277,26 +277,26 @@ describe('Widget', function() {
       expect(parent.widget('grandChild2')).toBe(grandChild2);
     });
 
-    it('does not visit other children if the child has been found', function() {
-      var child1 = new TestWidget();
+    it('does not visit other children if the child has been found', () => {
+      let child1 = new TestWidget();
       child1.init({
         id: 'child1',
         session: session,
         parent: parent
       });
-      var child2 = new TestWidget();
+      let child2 = new TestWidget();
       child2.init({
         id: 'child2',
         session: session,
         parent: parent
       });
-      var grandChild1 = new TestWidget();
+      let grandChild1 = new TestWidget();
       grandChild1.init({
         id: 'grandChild1',
         session: session,
         parent: child1
       });
-      var grandChild2 = new TestWidget();
+      let grandChild2 = new TestWidget();
       grandChild2.init({
         id: 'grandChild2',
         session: session,
@@ -310,39 +310,39 @@ describe('Widget', function() {
     });
   });
 
-  describe('nearestWidget', function() {
-    it('finds the nearest widget when multiple widgets have the same id', function() {
+  describe('nearestWidget', () => {
+    it('finds the nearest widget when multiple widgets have the same id', () => {
       // p           parent
       // + w1        child1
       //   + w2      grandChild1         same ID
       // + w2        child2              same ID
       //   + w3      grandChild2
       //   + w2      grandChild3         same ID
-      var child1 = new TestWidget();
+      let child1 = new TestWidget();
       child1.init({
         id: 'w1',
         session: session,
         parent: parent
       });
-      var child2 = new TestWidget();
+      let child2 = new TestWidget();
       child2.init({
         id: 'w2',
         session: session,
         parent: parent
       });
-      var grandChild1 = new TestWidget();
+      let grandChild1 = new TestWidget();
       grandChild1.init({
         id: 'w2',
         session: session,
         parent: child1
       });
-      var grandChild2 = new TestWidget();
+      let grandChild2 = new TestWidget();
       grandChild2.init({
         id: 'w3',
         session: session,
         parent: child2
       });
-      var grandChild3 = new TestWidget();
+      let grandChild3 = new TestWidget();
       grandChild3.init({
         id: 'w2',
         session: session,
@@ -361,9 +361,9 @@ describe('Widget', function() {
     });
   });
 
-  describe('enabled', function() {
-    it('should be propagated correctly', function() {
-      var widget = createWidget({
+  describe('enabled', () => {
+    it('should be propagated correctly', () => {
+      let widget = createWidget({
         session: session,
         parent: parent
       });
@@ -404,8 +404,8 @@ describe('Widget', function() {
       expect(widget.parent.enabledComputed).toBe(true);
     });
 
-    it('should not be inherited if inheritAccessibility is disabled', function() {
-      var widget = createWidget({
+    it('should not be inherited if inheritAccessibility is disabled', () => {
+      let widget = createWidget({
         session: session,
         parent: parent
       });
@@ -426,9 +426,9 @@ describe('Widget', function() {
       expect(widget.parent.enabledComputed).toBe(false);
     });
 
-    it('recomputeEnabled should be called for all widgets at least once', function() {
+    it('recomputeEnabled should be called for all widgets at least once', () => {
 
-      var widget = scout.create('Form', {
+      let widget = scout.create('Form', {
         session: session,
         parent: parent,
         rootGroupBox: {
@@ -466,8 +466,8 @@ describe('Widget', function() {
       expect(widget.rootGroupBox.menus[0].enabledComputed).toBe(true);
     });
 
-    it('should correctly recalculate enabled state when adding a new field', function() {
-      var widget = createWidget({
+    it('should correctly recalculate enabled state when adding a new field', () => {
+      let widget = createWidget({
         session: session,
         parent: parent
       });
@@ -479,7 +479,7 @@ describe('Widget', function() {
       expect(widget.parent.enabledComputed).toBe(false);
 
       // add a new field which itself is enabled
-      var additionalWidget = new TestWidget();
+      let additionalWidget = new TestWidget();
       additionalWidget.init({
         session: session,
         parent: session.root
@@ -495,10 +495,10 @@ describe('Widget', function() {
     });
   });
 
-  describe('rendering', function() {
+  describe('rendering', () => {
 
-    it('should set rendering, rendered flags correctly', function() {
-      var widget = createWidget({
+    it('should set rendering, rendered flags correctly', () => {
+      let widget = createWidget({
         session: session,
         parent: parent
       });
@@ -509,9 +509,9 @@ describe('Widget', function() {
       expect(widget.rendering).toBe(false);
     });
 
-    it('should set rendering flag to true _while_ the component is rendering', function() {
-      var rendering;
-      var widget = createWidget();
+    it('should set rendering flag to true _while_ the component is rendering', () => {
+      let rendering;
+      let widget = createWidget();
       widget._render = function() {
         rendering = this.rendering;
       };
@@ -525,35 +525,35 @@ describe('Widget', function() {
 
   });
 
-  describe('clone', function() {
-    var model, widget, expectedProperties = ['id', 'session', 'objectType', 'parent', 'text'];
+  describe('clone', () => {
+    let model, widget, expectedProperties = ['id', 'session', 'objectType', 'parent', 'text'];
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = createSimpleModel('Menu', session);
       model.label = 'bar';
       widget = scout.create(model);
       widget.$container = 'dummy container property';
     });
 
-    it('clones only properties marked as clone property', function() {
-      var widgetClone = widget.clone({
+    it('clones only properties marked as clone property', () => {
+      let widgetClone = widget.clone({
         parent: widget.parent
       });
       // should contain the following properties:
-      expectedProperties.forEach(function(propertyName) {
+      expectedProperties.forEach(propertyName => {
         expect(widgetClone[propertyName]).not.toBe(undefined);
       });
       // but not the $container property (which has been added later)
       expect(widgetClone.$container).toBe(undefined);
     });
 
-    it('\'text\' must be recognized as clone property, but not \'$container\'', function() {
+    it('\'text\' must be recognized as clone property, but not \'$container\'', () => {
       expect(widget.isCloneProperty('text')).toBe(true);
       expect(widget.isCloneProperty('$container')).toBe(false);
     });
 
-    it('prefers properties passed as modelOverride', function() {
-      var widgetClone = widget.clone({
+    it('prefers properties passed as modelOverride', () => {
+      let widgetClone = widget.clone({
         parent: widget.parent,
         text: 'foo'
       });
@@ -562,13 +562,13 @@ describe('Widget', function() {
 
   });
 
-  describe('init', function() {
+  describe('init', () => {
 
-    it('links widget properties with the widget', function() {
-      var child = createWidget({
+    it('links widget properties with the widget', () => {
+      let child = createWidget({
         parent: parent
       });
-      var widget = createWidget({
+      let widget = createWidget({
         parent: parent,
         childWidget: child
       });
@@ -579,9 +579,9 @@ describe('Widget', function() {
 
   });
 
-  describe('destroy', function() {
-    it('destroys the widget', function() {
-      var widget = createWidget({
+  describe('destroy', () => {
+    it('destroys the widget', () => {
+      let widget = createWidget({
         parent: parent
       });
       expect(widget.destroyed).toBe(false);
@@ -590,14 +590,14 @@ describe('Widget', function() {
       expect(widget.destroyed).toBe(true);
     });
 
-    it('destroys the children', function() {
-      var widget = createWidget({
+    it('destroys the children', () => {
+      let widget = createWidget({
         parent: parent
       });
-      var child0 = createWidget({
+      let child0 = createWidget({
         parent: widget
       });
-      var child1 = createWidget({
+      let child1 = createWidget({
         parent: widget
       });
       expect(widget.destroyed).toBe(false);
@@ -610,18 +610,18 @@ describe('Widget', function() {
       expect(child1.destroyed).toBe(true);
     });
 
-    it('does only destroy children if the parent is the owner', function() {
-      var widget = createWidget({
+    it('does only destroy children if the parent is the owner', () => {
+      let widget = createWidget({
         parent: parent
       });
-      var another = createWidget({
+      let another = createWidget({
         parent: parent
       });
-      var child0 = createWidget({
+      let child0 = createWidget({
         parent: widget,
         owner: another
       });
-      var child1 = createWidget({
+      let child1 = createWidget({
         parent: widget
       });
       expect(widget.destroyed).toBe(false);
@@ -640,8 +640,8 @@ describe('Widget', function() {
       expect(child0.destroyed).toBe(true);
     });
 
-    it('removes the link to parent and owner', function() {
-      var widget = createWidget({
+    it('removes the link to parent and owner', () => {
+      let widget = createWidget({
         parent: parent
       });
       expect(widget.parent).toBe(parent);
@@ -655,12 +655,12 @@ describe('Widget', function() {
     });
   });
 
-  describe('setParent', function() {
-    it('links the widget with the new parent', function() {
-      var widget = createWidget({
+  describe('setParent', () => {
+    it('links the widget with the new parent', () => {
+      let widget = createWidget({
         parent: parent
       });
-      var another = createWidget({
+      let another = createWidget({
         parent: parent
       });
       expect(widget.parent).toBe(parent);
@@ -671,14 +671,14 @@ describe('Widget', function() {
       expect(another.parent).toBe(widget);
     });
 
-    it('removes the widget from the old parent if the old is not the owner', function() {
-      var widget = createWidget({
+    it('removes the widget from the old parent if the old is not the owner', () => {
+      let widget = createWidget({
         parent: parent
       });
-      var owner = createWidget({
+      let owner = createWidget({
         parent: new TestWidget()
       });
-      var another = createWidget({
+      let another = createWidget({
         parent: parent,
         owner: owner
       });
@@ -693,11 +693,11 @@ describe('Widget', function() {
       expect(widget.children[0]).toBe(another);
     });
 
-    it('does not remove the widget from the old parent if the old is the owner', function() {
-      var widget = createWidget({
+    it('does not remove the widget from the old parent if the old is the owner', () => {
+      let widget = createWidget({
         parent: parent
       });
-      var another = createWidget({
+      let another = createWidget({
         parent: parent
       });
       expect(another.owner).toBe(parent);
@@ -714,18 +714,18 @@ describe('Widget', function() {
       expect(widget.children[0]).toBe(another);
     });
 
-    it('relinks parent destroy listener to the new parent', function() {
-      var widget = createWidget({
+    it('relinks parent destroy listener to the new parent', () => {
+      let widget = createWidget({
         parent: parent
       });
-      var another = createWidget({
+      let another = createWidget({
         parent: parent
       });
       expect(widget.parent).toBe(parent);
       expect(another.parent).toBe(parent);
 
-      var widgetListenerCount = widget.events._eventListeners.length;
-      var parentListenerCount = parent.events._eventListeners.length;
+      let widgetListenerCount = widget.events._eventListeners.length;
+      let parentListenerCount = parent.events._eventListeners.length;
       another.setParent(widget);
       expect(parent.events._eventListeners.length).toBe(parentListenerCount - 1);
       expect(widget.events._eventListeners.length).toBe(widgetListenerCount + 1);
@@ -739,15 +739,15 @@ describe('Widget', function() {
       expect(parent.events._eventListeners.length).toBe(parentListenerCount - 1);
     });
 
-    it('triggers hierarchyChange event when parent changes', function() {
-      var widget = createWidget({
+    it('triggers hierarchyChange event when parent changes', () => {
+      let widget = createWidget({
         parent: parent
       });
-      var newParent = createWidget({
+      let newParent = createWidget({
         parent: parent
       });
-      var event = null;
-      widget.on('hierarchyChange', function(event0) {
+      let event = null;
+      widget.on('hierarchyChange', event0 => {
         event = event0;
       });
       widget.setParent(newParent);
@@ -756,9 +756,9 @@ describe('Widget', function() {
     });
   });
 
-  describe('remove', function() {
-    it('removes the widget', function() {
-      var widget = createWidget({
+  describe('remove', () => {
+    it('removes the widget', () => {
+      let widget = createWidget({
         parent: parent
       });
       widget.render(session.$entryPoint);
@@ -770,14 +770,14 @@ describe('Widget', function() {
       expect(widget.$container).toBe(null);
     });
 
-    it('removes the children', function() {
-      var widget = createWidget({
+    it('removes the children', () => {
+      let widget = createWidget({
         parent: parent
       });
-      var child0 = createWidget({
+      let child0 = createWidget({
         parent: widget
       });
-      var child0_0 = createWidget({
+      let child0_0 = createWidget({
         parent: child0
       });
       widget.render(session.$entryPoint);
@@ -793,17 +793,17 @@ describe('Widget', function() {
       expect(child0_0.rendered).toBe(false);
     });
 
-    it('does not remove the children if owner is removed but parent is still rendered', function() {
-      var widget = createWidget({
+    it('does not remove the children if owner is removed but parent is still rendered', () => {
+      let widget = createWidget({
         parent: parent
       });
-      var child0 = createWidget({
+      let child0 = createWidget({
         parent: widget
       });
-      var owner = createWidget({
+      let owner = createWidget({
         parent: new TestWidget()
       });
-      var anotherChild = createWidget({
+      let anotherChild = createWidget({
         parent: widget,
         owner: owner
       });
@@ -831,17 +831,17 @@ describe('Widget', function() {
       expect(child0.rendered).toBe(true);
     });
 
-    it('removes the widget if removing is animated but parent is removed while animation is running', function() {
-      var removeOrder = [];
-      var parentWidget = createWidget({
+    it('removes the widget if removing is animated but parent is removed while animation is running', () => {
+      let removeOrder = [];
+      let parentWidget = createWidget({
         parent: parent
       });
-      var origRemove = parentWidget._remove;
+      let origRemove = parentWidget._remove;
       parentWidget._remove = function() {
         origRemove.call(this);
         removeOrder.push('parent');
       };
-      var widget = createWidget({
+      let widget = createWidget({
         parent: parentWidget,
         animateRemoval: true
       });
@@ -872,12 +872,12 @@ describe('Widget', function() {
     });
   });
 
-  describe('setProperty', function() {
+  describe('setProperty', () => {
 
-    it('triggers a property change event if the value changes', function() {
-      var propertyChangeEvent;
-      var widget = createWidget();
-      widget.on('propertyChange', function(event) {
+    it('triggers a property change event if the value changes', () => {
+      let propertyChangeEvent;
+      let widget = createWidget();
+      widget.on('propertyChange', event => {
         propertyChangeEvent = event;
       });
       widget.setProperty('selected', true);
@@ -893,10 +893,10 @@ describe('Widget', function() {
       expect(propertyChangeEvent.newValue).toBe(false);
     });
 
-    it('does not trigger a property change event if the value does not change', function() {
-      var propertyChangeEvent;
-      var widget = createWidget();
-      widget.on('propertyChange', function(event) {
+    it('does not trigger a property change event if the value does not change', () => {
+      let propertyChangeEvent;
+      let widget = createWidget();
+      widget.on('propertyChange', event => {
         propertyChangeEvent = event;
       });
       widget.selected = true;
@@ -904,15 +904,15 @@ describe('Widget', function() {
       expect(propertyChangeEvent).toBe(undefined);
     });
 
-    describe('with widget property', function() {
-      it('links the widget with the new child widget', function() {
-        var widget = createWidget({
+    describe('with widget property', () => {
+      it('links the widget with the new child widget', () => {
+        let widget = createWidget({
           parent: parent
         });
-        var another = createWidget({
+        let another = createWidget({
           parent: parent
         });
-        var child = createWidget({
+        let child = createWidget({
           parent: parent
         });
 
@@ -925,14 +925,14 @@ describe('Widget', function() {
         expect(child.owner).toBe(parent);
       });
 
-      it('links the widget with the new child widgets if it is an array', function() {
-        var widget = createWidget({
+      it('links the widget with the new child widgets if it is an array', () => {
+        let widget = createWidget({
           parent: parent
         });
-        var another = createWidget({
+        let another = createWidget({
           parent: parent
         });
-        var children = [
+        let children = [
           createWidget({
             parent: parent
           }),
@@ -954,14 +954,14 @@ describe('Widget', function() {
         expect(children[1].owner).toBe(parent);
       });
 
-      it('does not fail if new widget is null', function() {
-        var widget = createWidget({
+      it('does not fail if new widget is null', () => {
+        let widget = createWidget({
           parent: parent
         });
-        var another = createWidget({
+        let another = createWidget({
           parent: parent
         });
-        var child = createWidget({
+        let child = createWidget({
           parent: parent
         });
 
@@ -971,8 +971,8 @@ describe('Widget', function() {
       });
     });
 
-    it('calls the _render* method if there is one for this property', function() {
-      var widget = createWidget({
+    it('calls the _render* method if there is one for this property', () => {
+      let widget = createWidget({
         parent: parent
       });
       widget.render(session.$entryPoint);
@@ -990,26 +990,26 @@ describe('Widget', function() {
 
   });
 
-  describe('on', function() {
-    it('supports propertyChange:propertyName', function() {
-      var type1ExecCount = 0;
-      var type1Type = null;
-      var type2ExecCount = 0;
-      var type2Type = null;
-      var noTypeExecCount = 0;
-      var noTypeType = null;
-      var widget = createWidget({
+  describe('on', () => {
+    it('supports propertyChange:propertyName', () => {
+      let type1ExecCount = 0;
+      let type1Type = null;
+      let type2ExecCount = 0;
+      let type2Type = null;
+      let noTypeExecCount = 0;
+      let noTypeType = null;
+      let widget = createWidget({
         parent: parent
       });
-      widget.on('propertyChange:type1', function(event) {
+      widget.on('propertyChange:type1', event => {
         type1ExecCount++;
         type1Type = event.propertyName;
       });
-      widget.on('propertyChange:type2', function(event) {
+      widget.on('propertyChange:type2', event => {
         type2ExecCount++;
         type2Type = event.propertyName;
       });
-      widget.on('propertyChange', function(event) {
+      widget.on('propertyChange', event => {
         noTypeExecCount++;
         noTypeType = event.propertyName;
       });
@@ -1047,27 +1047,27 @@ describe('Widget', function() {
     });
   });
 
-  describe('one', function() {
-    it('supports propertyChange:propertyName', function() {
-      var type1ExecCount = 0;
-      var type1Type = null;
-      var type2ExecCount = 0;
-      var type2Type = null;
-      var noTypeExecCount = 0;
-      var noTypeType = null;
-      var widget = createWidget({
+  describe('one', () => {
+    it('supports propertyChange:propertyName', () => {
+      let type1ExecCount = 0;
+      let type1Type = null;
+      let type2ExecCount = 0;
+      let type2Type = null;
+      let noTypeExecCount = 0;
+      let noTypeType = null;
+      let widget = createWidget({
         parent: parent
       });
-      widget.one('propertyChange:type1', function(event) {
+      widget.one('propertyChange:type1', event => {
         type1ExecCount++;
         type1Type = event.propertyName;
       });
-      widget.one('propertyChange:type2', function(event) {
+      widget.one('propertyChange:type2', event => {
         type2ExecCount++;
         type2Type = event.propertyName;
 
       });
-      widget.one('propertyChange', function(event) {
+      widget.one('propertyChange', event => {
         noTypeExecCount++;
         noTypeType = event.propertyName;
       });
@@ -1092,23 +1092,23 @@ describe('Widget', function() {
     });
   });
 
-  describe('off', function() {
-    it('supports propertyChange:propertyName', function() {
-      var type1ExecCount = 0;
-      var type2ExecCount = 0;
-      var noTypeExecCount = 0;
-      var widget = createWidget({
+  describe('off', () => {
+    it('supports propertyChange:propertyName', () => {
+      let type1ExecCount = 0;
+      let type2ExecCount = 0;
+      let noTypeExecCount = 0;
+      let widget = createWidget({
         parent: parent
       });
-      var func1 = function(event) {
+      let func1 = event => {
         type1ExecCount++;
       };
       widget.on('propertyChange:type1', func1);
-      var func2 = function(event) {
+      let func2 = event => {
         type2ExecCount++;
       };
       widget.on('propertyChange:type2', func2);
-      var noFunc = function(event) {
+      let noFunc = event => {
         noTypeExecCount++;
       };
       widget.on('propertyChange', noFunc);
@@ -1140,20 +1140,20 @@ describe('Widget', function() {
       expect(noTypeExecCount).toBe(4);
     });
 
-    it('supports propertyChange:propertyName also when only using type to detach', function() {
-      var type1ExecCount = 0;
-      var type2ExecCount = 0;
-      var noTypeExecCount = 0;
-      var widget = createWidget({
+    it('supports propertyChange:propertyName also when only using type to detach', () => {
+      let type1ExecCount = 0;
+      let type2ExecCount = 0;
+      let noTypeExecCount = 0;
+      let widget = createWidget({
         parent: parent
       });
-      var func1 = function(event) {
+      let func1 = event => {
         type1ExecCount++;
       };
-      var func2 = function(event) {
+      let func2 = event => {
         type2ExecCount++;
       };
-      var noFunc = function(event) {
+      let noFunc = event => {
         noTypeExecCount++;
       };
       widget.on('propertyChange:type1', func1);
@@ -1192,20 +1192,20 @@ describe('Widget', function() {
       expect(noTypeExecCount).toBe(3);
     });
 
-    it('supports propertyChange:propertyName also when only using func to detach', function() {
-      var type1ExecCount = 0;
-      var type2ExecCount = 0;
-      var noTypeExecCount = 0;
-      var widget = createWidget({
+    it('supports propertyChange:propertyName also when only using func to detach', () => {
+      let type1ExecCount = 0;
+      let type2ExecCount = 0;
+      let noTypeExecCount = 0;
+      let widget = createWidget({
         parent: parent
       });
-      var func1 = function(event) {
+      let func1 = event => {
         type1ExecCount++;
       };
-      var func2 = function(event) {
+      let func2 = event => {
         type2ExecCount++;
       };
-      var noFunc = function(event) {
+      let noFunc = event => {
         noTypeExecCount++;
       };
       widget.on('propertyChange:type1', func1);
@@ -1245,10 +1245,10 @@ describe('Widget', function() {
     });
   });
 
-  describe('property css class', function() {
+  describe('property css class', () => {
 
-    it('adds or removes custom css class', function() {
-      var widget = createWidget({
+    it('adds or removes custom css class', () => {
+      let widget = createWidget({
         parent: parent
       });
       widget.render(session.$entryPoint);
@@ -1260,8 +1260,8 @@ describe('Widget', function() {
       expect(widget.$container).not.toHaveClass('custom-class');
     });
 
-    it('does not accidentally remove other css classes on a property change', function() {
-      var widget = createWidget({
+    it('does not accidentally remove other css classes on a property change', () => {
+      let widget = createWidget({
         parent: parent
       });
       widget.render(session.$entryPoint);
@@ -1277,10 +1277,10 @@ describe('Widget', function() {
       expect(widget.$container).toHaveClass('xy');
     });
 
-    describe('addCssClass', function() {
+    describe('addCssClass', () => {
 
-      it('adds the cssClass to the existing classes', function() {
-        var widget = createWidget({
+      it('adds the cssClass to the existing classes', () => {
+        let widget = createWidget({
           parent: parent
         });
         widget.render(session.$entryPoint);
@@ -1294,8 +1294,8 @@ describe('Widget', function() {
         expect(widget.$container).toHaveClass('another-class2');
       });
 
-      it('does not add the same class multiple times', function() {
-        var widget = createWidget({
+      it('does not add the same class multiple times', () => {
+        let widget = createWidget({
           parent: parent
         });
         widget.render(session.$entryPoint);
@@ -1311,10 +1311,10 @@ describe('Widget', function() {
 
     });
 
-    describe('removeCssClass', function() {
+    describe('removeCssClass', () => {
 
-      it('removes the cssClass from the existing classes', function() {
-        var widget = createWidget({
+      it('removes the cssClass from the existing classes', () => {
+        let widget = createWidget({
           parent: parent
         });
         widget.render(session.$entryPoint);
@@ -1335,10 +1335,10 @@ describe('Widget', function() {
 
     });
 
-    describe('toggleCssClass', function() {
+    describe('toggleCssClass', () => {
 
-      it('toggles the cssClass based on a predicate', function() {
-        var widget = createWidget({
+      it('toggles the cssClass based on a predicate', () => {
+        let widget = createWidget({
           parent: parent
         });
         widget.render(session.$entryPoint);
@@ -1363,10 +1363,10 @@ describe('Widget', function() {
     });
   });
 
-  describe('focus', function() {
+  describe('focus', () => {
 
-    it('sets the focus on the container', function() {
-      var widget = createWidget({
+    it('sets the focus on the container', () => {
+      let widget = createWidget({
         parent: parent
       });
       widget.render(session.$entryPoint);
@@ -1374,8 +1374,8 @@ describe('Widget', function() {
       expect(document.activeElement).toBe(widget.$container[0]);
     });
 
-    it('schedules the focus request if the widget is not rendered', function() {
-      var widget = createWidget({
+    it('schedules the focus request if the widget is not rendered', () => {
+      let widget = createWidget({
         parent: parent
       });
       widget.focus();
@@ -1385,9 +1385,9 @@ describe('Widget', function() {
     });
   });
 
-  describe('prepareModel', function() {
-    it('default case', function() {
-      var model = {};
+  describe('prepareModel', () => {
+    it('default case', () => {
+      let model = {};
 
       class TestClass extends Widget {
         _init(model0) {
@@ -1395,14 +1395,14 @@ describe('Widget', function() {
         }
       }
 
-      var widget = new TestClass();
+      let widget = new TestClass();
 
       spyOn(widget, '_prepareModel').and.callThrough();
       widget.init(model);
       expect(widget._prepareModel.calls.count()).toBe(1);
     });
 
-    it('changes the model before _init', function() {
+    it('changes the model before _init', () => {
       class TestClass extends Widget {
         _prepareModel(model) {
           model.message = 'B';
@@ -1410,7 +1410,7 @@ describe('Widget', function() {
         }
       }
 
-      var widget = new TestClass();
+      let widget = new TestClass();
       widget.init({
         parent: parent,
         session: session,
@@ -1421,9 +1421,9 @@ describe('Widget', function() {
     });
   });
 
-  describe('Widget properties', function() {
+  describe('Widget properties', () => {
 
-    it('automatically resolves referenced widgets', function() {
+    it('automatically resolves referenced widgets', () => {
       window.testns = {};
 
       class ComplexTestWidget extends Widget {
@@ -1446,7 +1446,7 @@ describe('Widget', function() {
       window.testns.TestItem = TestItem;
 
       // Create an instance
-      var model1 = {
+      let model1 = {
         parent: parent,
         session: session,
         items: [{
@@ -1460,13 +1460,13 @@ describe('Widget', function() {
         }],
         selectedItem: 'TI2'
       };
-      var ctw1 = scout.create('testns.ComplexTestWidget', model1);
+      let ctw1 = scout.create('testns.ComplexTestWidget', model1);
       expect(ctw1.items.length).toBe(2);
       expect(ctw1.items[1].name).toBe('Item #2');
       expect(ctw1.selectedItem).toBe(ctw1.items[1]);
 
       // Create another instance with an invalid reference
-      var model2 = {
+      let model2 = {
         parent: parent,
         session: session,
         objectType: 'testns.ComplexTestWidget',
@@ -1477,18 +1477,18 @@ describe('Widget', function() {
         }],
         selectedItem: 'TI77'
       };
-      expect(function() {
+      expect(() => {
         scout.create(model2);
       }).toThrow(new Error('Referenced widget not found: TI77'));
       // fix it
       delete model2.selectedItem;
-      var ctw2 = scout.create(model2);
+      let ctw2 = scout.create(model2);
       expect(ctw2.items.length).toBe(1);
       expect(ctw2.items[0].name).toBe('Item #1');
       expect(ctw2.items[0]).not.toBe(ctw1.items[0]); // not same!
 
       // Create another instance with unsupported references (same level)
-      var model3 = {
+      let model3 = {
         parent: parent,
         session: session,
         items: [{
@@ -1502,27 +1502,27 @@ describe('Widget', function() {
           name: 'Item #2'
         }]
       };
-      expect(function() {
+      expect(() => {
         scout.create('testns.ComplexTestWidget', model3);
       }).toThrow(new Error('Referenced widget not found: TI2'));
       // fix it
       delete model3.items[0].linkedItem;
-      var ctw3 = scout.create('testns.ComplexTestWidget', model3);
+      let ctw3 = scout.create('testns.ComplexTestWidget', model3);
       ctw3.items[0].setProperty('linkedItem', ctw3.items[1]);
     });
   });
 
-  describe('scrollTop', function() {
-    beforeEach(function() {
+  describe('scrollTop', () => {
+    beforeEach(() => {
       jasmine.clock().install();
     });
 
-    afterEach(function() {
+    afterEach(() => {
       jasmine.clock().uninstall();
     });
 
-    it('is stored on scroll if scrollbars are installed', function() {
-      var widget = new ScrollableWidget();
+    it('is stored on scroll if scrollbars are installed', () => {
+      let widget = new ScrollableWidget();
       widget.init({
         parent: parent,
         session: session
@@ -1533,8 +1533,8 @@ describe('Widget', function() {
       expect(widget.scrollTop).toBe(40);
     });
 
-    it('is not stored on scroll if scrollbars are not installed', function() {
-      var widget = createWidget({
+    it('is not stored on scroll if scrollbars are not installed', () => {
+      let widget = createWidget({
         parent: parent
       });
       expect(widget.scrollTop).toBe(null);
@@ -1546,8 +1546,8 @@ describe('Widget', function() {
       expect(widget.scrollTop).toBe(null);
     });
 
-    it('is applied again on render after remove', function() {
-      var widget = new ScrollableWidget();
+    it('is applied again on render after remove', () => {
+      let widget = new ScrollableWidget();
       widget.init({
         parent: parent,
         session: session
@@ -1569,8 +1569,8 @@ describe('Widget', function() {
       expect(widget.$container[0].scrollTop).toBe(40);
     });
 
-    it('is set to null if scrollbars are not installed', function() {
-      var widget = createWidget({
+    it('is set to null if scrollbars are not installed', () => {
+      let widget = createWidget({
         parent: parent
       });
       expect(widget.scrollTop).toBe(null);
@@ -1582,8 +1582,8 @@ describe('Widget', function() {
       expect(widget._renderScrollTop.calls.count()).toBe(1); // Must not be executed again for non scrollable widgets
     });
 
-    it('is set to null if scrollbars are uninstalled on the fly', function() {
-      var widget = new ScrollableWidget();
+    it('is set to null if scrollbars are uninstalled on the fly', () => {
+      let widget = new ScrollableWidget();
       widget.init({
         parent: parent,
         session: session,
@@ -1610,11 +1610,11 @@ describe('Widget', function() {
     });
   });
 
-  describe('isEveryParentVisible', function() {
+  describe('isEveryParentVisible', () => {
 
-    var parentWidget1, parentWidget2, parentWidget3, testWidget;
+    let parentWidget1, parentWidget2, parentWidget3, testWidget;
 
-    beforeEach(function() {
+    beforeEach(() => {
       parentWidget1 = createWidget();
 
       parentWidget2 = createWidget({
@@ -1630,11 +1630,11 @@ describe('Widget', function() {
       });
     });
 
-    it('should correctly calculate the parents visible state if all parents are visible', function() {
+    it('should correctly calculate the parents visible state if all parents are visible', () => {
       expect(testWidget.isEveryParentVisible()).toBe(true);
     });
 
-    it('should correctly calculate the parents visible state if one parent is invisible', function() {
+    it('should correctly calculate the parents visible state if one parent is invisible', () => {
       parentWidget1.setVisible(false);
 
       expect(testWidget.isEveryParentVisible()).toBe(false);
@@ -1650,7 +1650,7 @@ describe('Widget', function() {
       expect(testWidget.isEveryParentVisible()).toBe(false);
     });
 
-    it('should correctly calculate the parents visible state if several parents are invisible', function() {
+    it('should correctly calculate the parents visible state if several parents are invisible', () => {
       parentWidget1.setVisible(false);
       parentWidget2.setVisible(false);
 
@@ -1670,7 +1670,7 @@ describe('Widget', function() {
       expect(testWidget.isEveryParentVisible()).toBe(false);
     });
 
-    it('should correctly calculate the parents visible state if all parents are invisible', function() {
+    it('should correctly calculate the parents visible state if all parents are invisible', () => {
       parentWidget1.setVisible(false);
       parentWidget2.setVisible(false);
       parentWidget3.setVisible(false);

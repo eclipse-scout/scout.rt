@@ -54,7 +54,7 @@ export default class Resizable {
   static FPS = 1000 / 15;
 
   setModes(modes) {
-    var ensuredModes = modes || [Resizable.MODES.SOUTH, Resizable.MODES.EAST, Resizable.MODES.WEST, Resizable.MODES.NORTH];
+    let ensuredModes = modes || [Resizable.MODES.SOUTH, Resizable.MODES.EAST, Resizable.MODES.WEST, Resizable.MODES.NORTH];
     if (arrays.equals(ensuredModes, this.modes)) {
       return;
     }
@@ -189,7 +189,7 @@ export default class Resizable {
   }
 
   _onMouseDown(event) {
-    var $resizable = this.$container,
+    let $resizable = this.$container,
       $myWindow = $resizable.window(),
       $handle = $(event.target),
       minWidth = $resizable.cssMinWidth(),
@@ -236,7 +236,7 @@ export default class Resizable {
   }
 
   _onMousemove(event) {
-    var ctx = this._context,
+    let ctx = this._context,
       newBounds = ctx.initialBounds.clone(),
       distance = this._calcDistance(ctx.mousedownEvent, event);
 
@@ -292,7 +292,7 @@ export default class Resizable {
   }
 
   _calcDistance(eventA, eventB) {
-    var
+    let
       distX = eventB.pageX - eventA.pageX,
       distY = eventB.pageY - eventA.pageY;
     return [distX, distY];

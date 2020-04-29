@@ -153,9 +153,9 @@ export default class SimpleTabBox extends Widget {
    * @param bringToTop whether the view should be placed on top of the view stack. the view tab will be selected.
    */
   addView(view, bringToTop) {
-    var activate = scout.nvl(bringToTop, true);
+    let activate = scout.nvl(bringToTop, true);
     // add to view stack
-    var siblingView = this._addToViewStack(view, activate);
+    let siblingView = this._addToViewStack(view, activate);
     // track focus when a view gets removed ond rerendered.
     view.setTrackFocus(true);
     view.setParent(this);
@@ -174,8 +174,8 @@ export default class SimpleTabBox extends Widget {
    * @return the view which is gonna be the sibling to insert the new view tab after.
    */
   _addToViewStack(view, bringToTop) {
-    var sibling;
-    var index = this.viewStack.indexOf(view);
+    let sibling;
+    let index = this.viewStack.indexOf(view);
     if (index > -1) {
       return this.viewStack[index - 1];
     }
@@ -193,7 +193,7 @@ export default class SimpleTabBox extends Widget {
       this._addDestroyListener(view);
       return sibling;
     }
-    var currentIndex = this.viewStack.indexOf(this.currentView);
+    let currentIndex = this.viewStack.indexOf(this.currentView);
     sibling = this.viewStack[currentIndex];
     // it does not matter when index is -1 will be inserted at first position
     this.viewStack.splice(currentIndex + 1, 0, view);
@@ -209,7 +209,7 @@ export default class SimpleTabBox extends Widget {
   }
 
   _onViewDestroyed(event) {
-    var view = event.source;
+    let view = event.source;
     arrays.remove(this.viewStack, view);
     if (this.currentView === view) {
       if (this.rendered) {
@@ -226,8 +226,8 @@ export default class SimpleTabBox extends Widget {
     // track focus when a view gets removed ond rerendered.
     view.setTrackFocus(false);
     showSiblingView = scout.nvl(showSiblingView, true);
-    var index = this.viewStack.indexOf(view);
-    var viewToActivate;
+    let index = this.viewStack.indexOf(view);
+    let viewToActivate;
     // if current view is the view to remove reset current view
     if (this.currentView === view) {
       this.currentView = null;
@@ -279,13 +279,13 @@ export default class SimpleTabBox extends Widget {
   }
 
   hasView(view) {
-    return this.viewStack.filter(function(v) {
+    return this.viewStack.filter(v => {
       return v === view;
     }).length > 0;
   }
 
   getViews(displayViewId) {
-    return this.viewStack.filter(function(view) {
+    return this.viewStack.filter(view => {
       if (!displayViewId) {
         return true;
       }

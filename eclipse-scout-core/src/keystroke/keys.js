@@ -235,9 +235,7 @@ const keys = {
    * @param keyCode {number}
    * @returns {number}
    */
-  forBrowser: function(keyCode) {
-    return keys.mapKey(keys.browserMap, keyCode);
-  },
+  forBrowser: keyCode => keys.mapKey(keys.browserMap, keyCode),
 
   /**
    * If a browser has a non-standard key-code for one of the keys defined in this file this function returns the original key for that browser.
@@ -245,11 +243,9 @@ const keys = {
    * @param keyCode {number}
    * @returns {number}
    */
-  fromBrowser: function(keyCode) {
-    return keys.mapKey(keys.browserMapReverse, keyCode);
-  },
+  fromBrowser: keyCode => keys.mapKey(keys.browserMapReverse, keyCode),
 
-  mapKey: function(map, keyCode) {
+  mapKey: (map, keyCode) => {
     let browserMap = map[Device.get().browser];
     if (browserMap && browserMap.hasOwnProperty(keyCode)) {
       // A mapping is defined for this browser and key-code

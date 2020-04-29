@@ -20,7 +20,7 @@ export default class DatePickerTouchPopupLayout extends TouchPopupLayout {
    * @override
    */
   preferredLayoutSize($container, options) {
-    var popupWidth = HtmlEnvironment.get().formColumnWidth,
+    let popupWidth = HtmlEnvironment.get().formColumnWidth,
       containerInsets = this.popup.htmlComp.insets(),
       fieldHtmlComp = this.popup._field.htmlComp,
       widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp,

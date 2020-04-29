@@ -133,15 +133,15 @@ export default class WidgetPopup extends Popup {
   }
 
   _calculateResizeBoundaries() {
-    var resizeBoundaries = new Insets();
+    let resizeBoundaries = new Insets();
     if (!this.$arrow) {
       return resizeBoundaries;
     }
-    var anchorMiddle = this._getAnchorMiddlePoint();
+    let anchorMiddle = this._getAnchorMiddlePoint();
     if (!anchorMiddle) {
       return resizeBoundaries;
     }
-    var arrowSize = graphics.size(this.$arrow);
+    let arrowSize = graphics.size(this.$arrow);
     if (this._isVerticallyAligned()) {
       resizeBoundaries.top = anchorMiddle.y - arrowSize.height;
       resizeBoundaries.bottom = anchorMiddle.y + arrowSize.height;
@@ -172,7 +172,7 @@ export default class WidgetPopup extends Popup {
   }
 
   _onResize(event) {
-    var autoSizeOrig = this.htmlComp.layout.autoSize;
+    let autoSizeOrig = this.htmlComp.layout.autoSize;
     this.htmlComp.layout.autoSize = false;
     this.htmlComp.revalidateLayout();
     this.htmlComp.layout.autoSize = autoSizeOrig;
@@ -186,7 +186,7 @@ export default class WidgetPopup extends Popup {
   position(switchIfNecessary) {
     super.position(switchIfNecessary);
     if (this.resizable) {
-      var resizable = this.$container.data('resizable');
+      let resizable = this.$container.data('resizable');
       resizable.setBoundaries(this._calculateResizeBoundaries());
       resizable.setModes(this._determineResizeModes());
       this._updateArrowPosition();
@@ -210,24 +210,24 @@ export default class WidgetPopup extends Popup {
     if (!this.$arrow) {
       return;
     }
-    var anchorMiddlePoint = this._getAnchorMiddlePoint();
+    let anchorMiddlePoint = this._getAnchorMiddlePoint();
     if (!anchorMiddlePoint) {
       return;
     }
     this.$arrow.removeClass('leftedge rightedge topedge bottomedge');
-    var arrowSize = graphics.size(this.$arrow);
-    var arrowMargins = graphics.margins(this.$arrow);
+    let arrowSize = graphics.size(this.$arrow);
+    let arrowMargins = graphics.margins(this.$arrow);
     if (this._isVerticallyAligned()) {
-      var verticalMarginShift = arrowMargins.top + arrowMargins.bottom;
+      let verticalMarginShift = arrowMargins.top + arrowMargins.bottom;
       this.$arrow.cssTop(anchorMiddlePoint.y - (verticalMarginShift + this.$container.position().top + (arrowSize.height / 2)));
     } else {
-      var horizontalMarginShift = arrowMargins.left + arrowMargins.right;
+      let horizontalMarginShift = arrowMargins.left + arrowMargins.right;
       this.$arrow.cssLeft(anchorMiddlePoint.x - (horizontalMarginShift + this.$container.position().left + (arrowSize.width / 2)));
     }
   }
 
   _getAnchorMiddlePoint() {
-    var anchorBounds = this.getAnchorBounds();
+    let anchorBounds = this.getAnchorBounds();
     return anchorBounds ? anchorBounds.center() : null;
   }
 

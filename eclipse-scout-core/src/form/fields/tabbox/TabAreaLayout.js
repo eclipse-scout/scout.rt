@@ -21,13 +21,13 @@ export default class TabAreaLayout extends AbstractLayout {
     this._tabAreaPropertyChangeHandler = this._onTabAreaPropertyChange.bind(this);
 
     this.tabArea.on('propertyChange', this._tabAreaPropertyChangeHandler);
-    this.tabArea.one('remove', function() {
+    this.tabArea.one('remove', () => {
       this.tabArea.off('propertyChange', this._tabAreaPropertyChangeHandler);
-    }.bind(this));
+    });
   }
 
   layout($container) {
-    var ellipsis = this.tabArea.ellipsis,
+    let ellipsis = this.tabArea.ellipsis,
       htmlContainer = HtmlComponent.get($container),
       containerSize = htmlContainer.availableSize().subtract(htmlContainer.insets());
 
@@ -40,11 +40,11 @@ export default class TabAreaLayout extends AbstractLayout {
       ellipsis.setHidden(false);
     }
 
-    this.visibleTabs.forEach(function(tabItem) {
+    this.visibleTabs.forEach(tabItem => {
       tabItem.setOverflown(false);
     });
 
-    this.overflowTabs.forEach(function(tabItem) {
+    this.overflowTabs.forEach(tabItem => {
       tabItem.setOverflown(true);
     });
 
@@ -54,14 +54,14 @@ export default class TabAreaLayout extends AbstractLayout {
 
     ellipsis.setText(this.overflowTabs.length + '');
 
-    ellipsis.setChildActions(this.overflowTabs.map(function(tab) {
-      var menu = scout.create('Menu', {
+    ellipsis.setChildActions(this.overflowTabs.map(tab => {
+      let menu = scout.create('Menu', {
         parent: ellipsis,
         text: tab.label,
         tab: tab,
         visible: tab.visible
       });
-      menu.on('action', function(event) {
+      menu.on('action', event => {
         $.log.isDebugEnabled() && $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tab);
         // first close popup to ensure the focus is handled in the correct focus context.
         ellipsis.popup.close();
@@ -75,7 +75,7 @@ export default class TabAreaLayout extends AbstractLayout {
   }
 
   _layoutSelectionMarker() {
-    var $selectionMarker = this.tabArea.$selectionMarker,
+    let $selectionMarker = this.tabArea.$selectionMarker,
       selectedTab = this.tabArea.selectedTab,
       selectedItemBounds;
 
@@ -90,18 +90,18 @@ export default class TabAreaLayout extends AbstractLayout {
   }
 
   preferredLayoutSize($container, options) {
-    var htmlComp = HtmlComponent.get($container),
+    let htmlComp = HtmlComponent.get($container),
       prefSize = new Dimension(0, 0),
       prefWidth = Number.MAX_VALUE,
-      visibleTabItems = this.tabArea.tabs.filter(function(tabItem) {
+      visibleTabItems = this.tabArea.tabs.filter(tabItem => {
         return tabItem.isVisible();
       }),
-      overflowableIndexes = visibleTabItems.map(function(tabItem, index) {
+      overflowableIndexes = visibleTabItems.map((tabItem, index) => {
         if (tabItem.selected) {
           return -1;
         }
         return index;
-      }).filter(function(index) {
+      }).filter(index => {
         return index >= 0;
       });
 
@@ -117,7 +117,7 @@ export default class TabAreaLayout extends AbstractLayout {
       return this._minSize(visibleTabItems).add(htmlComp.insets());
     }
 
-    var overflowIndex = -1;
+    let overflowIndex = -1;
     this._setFirstLastMarker(visibleTabItems);
     prefSize = this._prefSize(visibleTabItems);
     while (prefSize.width > prefWidth && overflowableIndexes.length > 0) {
@@ -139,9 +139,9 @@ export default class TabAreaLayout extends AbstractLayout {
   }
 
   _minSize(tabItems) {
-    var visibleTabItems = [],
+    let visibleTabItems = [],
       prefSize;
-    this.overflowTabs = tabItems.filter(function(tabItem) {
+    this.overflowTabs = tabItems.filter(tabItem => {
       if (tabItem.selected) {
         visibleTabItems.push(tabItem);
         return false;
@@ -157,9 +157,9 @@ export default class TabAreaLayout extends AbstractLayout {
   }
 
   _prefSize(tabItems, considerEllipsis) {
-    var prefSize = tabItems.map(function(tabItem) {
+    let prefSize = tabItems.map(function(tabItem) {
         return this._tabItemSize(tabItem.htmlComp);
-      }, this).reduce(function(prefSize, itemSize) {
+      }, this).reduce((prefSize, itemSize) => {
         prefSize.height = Math.max(prefSize.height, itemSize.height);
         prefSize.width += itemSize.width;
         return prefSize;
@@ -179,7 +179,7 @@ export default class TabAreaLayout extends AbstractLayout {
     considerEllipsis = scout.nvl(considerEllipsis, this.overflowTabs.length > 0);
 
     // reset
-    this.tabArea.tabs.forEach(function(tabItem) {
+    this.tabArea.tabs.forEach(tabItem => {
       tabItem.htmlComp.$comp.removeClass('first last');
     });
     this.tabArea.ellipsis.$container.removeClass('first last');
@@ -196,7 +196,7 @@ export default class TabAreaLayout extends AbstractLayout {
   }
 
   _tabItemSize(htmlComp) {
-    var prefSize,
+    let prefSize,
       classList = htmlComp.$comp.attr('class');
 
     // temporarly revert display style to default. otherwise the pref size of the tab item will be the size of the container.

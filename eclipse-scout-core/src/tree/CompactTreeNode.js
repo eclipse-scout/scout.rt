@@ -23,10 +23,10 @@ export default class CompactTreeNode extends TreeNode {
    * @override
    */
   render() {
-    var tree = this.getTree();
+    let tree = this.getTree();
 
     if (this.isSection()) {
-      var $section = tree.$container
+      let $section = tree.$container
         .makeDiv('section expanded')
         .data('node', this);
       $section
@@ -35,9 +35,9 @@ export default class CompactTreeNode extends TreeNode {
 
       this.$node = $section;
     } else {
-      var $parent = this.parentNode.$node;
+      let $parent = this.parentNode.$node;
       // Sections nodes
-      var $sectionNode = $parent.makeDiv('section-node')
+      let $sectionNode = $parent.makeDiv('section-node')
         .data('node', this)
         .on('mousedown', tree._onNodeMouseDown.bind(tree))
         .on('mouseup', tree._onNodeMouseUp.bind(tree));
@@ -57,7 +57,7 @@ export default class CompactTreeNode extends TreeNode {
       return;
     }
 
-    var formerClasses,
+    let formerClasses,
       $node = this.$node;
 
     if ($node.hasClass('section')) {

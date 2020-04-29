@@ -25,8 +25,8 @@ export default class OutlineKeyStrokeContext extends KeyStrokeContext {
   }
 
   isFormMenuOpen() {
-    var menus = this._outline.session.desktop.menus;
-    return menus.some(function(menu) {
+    let menus = this._outline.session.desktop.menus;
+    return menus.some(menu => {
       return menu.popup && menu.popup.$container && menu.popup.$container.isAttached();
     }, this);
   }

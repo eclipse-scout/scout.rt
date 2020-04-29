@@ -29,20 +29,20 @@ export default class NullLogger {
     // NOP - don't log debug, we don't want to spam the browser console
   }
 
-  info() {
-    this._log('info', objects.argumentsToArray(arguments));
+  info(...logArgs) {
+    this._log('info', logArgs);
   }
 
-  warn() {
-    this._log('warn', objects.argumentsToArray(arguments));
+  warn(...logArgs) {
+    this._log('warn', logArgs);
   }
 
-  error(logArgs) {
-    this._log('error', objects.argumentsToArray(arguments));
+  error(...logArgs) {
+    this._log('error', logArgs);
   }
 
-  fatal(logArgs) {
-    this._log('fatal', objects.argumentsToArray(arguments));
+  fatal(...logArgs) {
+    this._log('fatal', logArgs);
   }
 
   isEnabledFor() {
@@ -75,13 +75,13 @@ export default class NullLogger {
 
   _log(level, logArgs) {
     // check if console is available
-    var myConsole = objects.optProperty(window, 'console');
+    let myConsole = objects.optProperty(window, 'console');
     if (!myConsole) {
       return;
     }
 
     // map level to log function
-    var funcName;
+    let funcName;
     if ('fatal' === level) {
       funcName = 'error';
     } else {
@@ -89,7 +89,7 @@ export default class NullLogger {
     }
 
     // check if log function exists on console
-    var logFunc = myConsole[funcName];
+    let logFunc = myConsole[funcName];
     if (!logFunc) {
       return;
     }
@@ -108,7 +108,7 @@ export default class NullLogger {
   }
 
   _formatTime() {
-    var date = new Date();
+    let date = new Date();
     return strings.padZeroLeft(date.getHours(), 2) + ':' +
       strings.padZeroLeft(date.getMinutes(), 2) + ':' +
       strings.padZeroLeft(date.getSeconds(), 2) + '.' +

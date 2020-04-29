@@ -10,11 +10,11 @@
  */
 import {NullWidget, scout} from '../../../../src/index';
 
-describe('NavigateDownButton', function() {
+describe('NavigateDownButton', () => {
 
-  var session, outline, menu, node;
+  let session, outline, menu, node;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     outline = scout.create('Outline', {
@@ -30,11 +30,11 @@ describe('NavigateDownButton', function() {
     });
   });
 
-  it('_toggleDetail is always false', function() {
+  it('_toggleDetail is always false', () => {
     expect(menu._toggleDetail()).toBe(false);
   });
 
-  it('_isDetail returns true or false depending on the state of the detail-form and detail-table', function() {
+  it('_isDetail returns true or false depending on the state of the detail-form and detail-table', () => {
     // true when both detailForm and detailTable are visible
     node.detailForm = {};
     node.detailFormVisible = true;
@@ -72,24 +72,24 @@ describe('NavigateDownButton', function() {
     expect(menu._isDetail()).toBe(false);
   });
 
-  describe('_buttonEnabled', function() {
+  describe('_buttonEnabled', () => {
 
-    it('is disabled when node is a leaf', function() {
+    it('is disabled when node is a leaf', () => {
       node.leaf = true; // node is a leaf
       expect(menu._buttonEnabled()).toBe(false);
     });
 
-    it('is enabled when node is not a leaf and we\'re currently displaying the detail', function() {
+    it('is enabled when node is not a leaf and we\'re currently displaying the detail', () => {
       node.leaf = false; // node is not a leaf
-      menu._isDetail = function() { // currently we're displaying the detail-form
+      menu._isDetail = () => { // currently we're displaying the detail-form
         return true;
       };
       expect(menu._buttonEnabled()).toBe(true);
     });
 
-    it('is only enabled when detail-table has exactly one selected row', function() {
+    it('is only enabled when detail-table has exactly one selected row', () => {
       node.leaf = false; // node is not a leaf
-      menu._isDetail = function() { // currently we're not displaying the detail-form
+      menu._isDetail = () => { // currently we're not displaying the detail-form
         return false;
       };
       node.detailTable = scout.create('Table', {
@@ -105,9 +105,9 @@ describe('NavigateDownButton', function() {
       expect(menu._buttonEnabled()).toBe(true);
     });
 
-    it('is not enabled when selected row is not linked to a page', function() {
+    it('is not enabled when selected row is not linked to a page', () => {
       node.leaf = false; // node is not a leaf
-      menu._isDetail = function() { // currently we're not displaying the detail-form
+      menu._isDetail = () => { // currently we're not displaying the detail-form
         return false;
       };
       node.detailTable = scout.create('Table', {
@@ -125,10 +125,10 @@ describe('NavigateDownButton', function() {
       expect(menu._buttonEnabled()).toBe(true);
     });
 
-    it('is enabled when selected row is linked to a page later when page is inserted (remote case)', function() {
+    it('is enabled when selected row is linked to a page later when page is inserted (remote case)', () => {
       linkWidgetAndAdapter(outline, 'OutlineAdapter');
       node.leaf = false; // node is not a leaf
-      menu._isDetail = function() { // currently we're not displaying the detail-form
+      menu._isDetail = () => { // currently we're not displaying the detail-form
         return false;
       };
       node.detailTable = scout.create('Table', {
@@ -138,11 +138,11 @@ describe('NavigateDownButton', function() {
       outline.insertNode(node);
       expect(menu._buttonEnabled()).toBe(false);
 
-      var page = scout.create('Page', {
+      let page = scout.create('Page', {
         parent: outline,
         parentNode: node
       });
-      var row = scout.create('TableRow', {
+      let row = scout.create('TableRow', {
         parent: node.detailTable,
         nodeId: page.id
       });
@@ -155,7 +155,7 @@ describe('NavigateDownButton', function() {
     });
   });
 
-  it('_drill drills down to first selected row in the detail table', function() {
+  it('_drill drills down to first selected row in the detail table', () => {
     node.detailTable = scout.create('Table', {
       parent: new NullWidget(),
       session: session,
@@ -164,10 +164,10 @@ describe('NavigateDownButton', function() {
         nodeId: '123'
       }]
     });
-    var drillNode = scout.create('Page', {
+    let drillNode = scout.create('Page', {
       parent: outline
     });
-    var firstRow = node.detailTable.rows[0];
+    let firstRow = node.detailTable.rows[0];
     drillNode.linkWithRow(firstRow);
     node.detailTable.selectRows(firstRow);
     outline.nodesMap = {

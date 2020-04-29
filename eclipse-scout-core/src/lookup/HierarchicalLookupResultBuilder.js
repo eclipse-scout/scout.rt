@@ -27,18 +27,18 @@ export default class HierarchicalLookupResultBuilder {
   addParentLookupRows(lookupRows) {
     this._fillMap(lookupRows);
 
-    var promises = lookupRows.map(this._addParent.bind(this));
+    let promises = lookupRows.map(this._addParent.bind(this));
     return $.promiseAll(promises)
-      .then(function() {
+      .then(() => {
         return objects.values(this._lookupRowMap);
-      }.bind(this));
+      });
   }
 
   /**
    * @returns {Promise}
    */
   _addParent(lookupRow) {
-    var key = lookupRow.parentKey;
+    let key = lookupRow.parentKey;
 
     if (!key) {
       return $.resolvedPromise();
@@ -54,17 +54,17 @@ export default class HierarchicalLookupResultBuilder {
     return this.lookupCall
       .cloneForKey(key)
       .execute()
-      .then(function(result) {
-        var lookupRow = LookupCall.firstLookupRow(result);
+      .then(result => {
+        let lookupRow = LookupCall.firstLookupRow(result);
         this._lookupRowMap[lookupRow.key] = lookupRow;
         return this._addParent(lookupRow);
-      }.bind(this));
+      });
   }
 
   _fillMap(lookupRows) {
-    lookupRows.forEach(function(lookupRow) {
+    lookupRows.forEach(lookupRow => {
       this._lookupRowMap[lookupRow.key] = lookupRow;
-    }.bind(this));
+    });
   }
 
   /**
@@ -75,11 +75,11 @@ export default class HierarchicalLookupResultBuilder {
   addChildLookupRows(lookupRows) {
     this._fillMap(lookupRows);
 
-    var promises = lookupRows.map(this._addChildren.bind(this));
+    let promises = lookupRows.map(this._addChildren.bind(this));
     return $.promiseAll(promises)
-      .then(function() {
+      .then(() => {
         return objects.values(this._lookupRowMap);
-      }.bind(this));
+      });
   }
 
   /**
@@ -89,10 +89,10 @@ export default class HierarchicalLookupResultBuilder {
     return this.lookupCall
       .cloneForRec(lookupRow.key)
       .execute()
-      .then(function(result) {
+      .then(result => {
         if (result.lookupRows.length) {
           return this.addChildLookupRows(result.lookupRows);
         }
-      }.bind(this));
+      });
   }
 }

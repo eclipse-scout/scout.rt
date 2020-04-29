@@ -41,9 +41,7 @@ export default class KeyStroke {
       offset: 4,
       hAlign: HAlign.LEFT,
       text: null,
-      $drawingArea: function($drawingArea, event) {
-        return $drawingArea;
-      }
+      $drawingArea: ($drawingArea, event) => $drawingArea
     };
 
     /**
@@ -115,10 +113,10 @@ export default class KeyStroke {
 
         // Reset handleExecuted on the next key up event
         // (use capturing phase to execute even if event.stopPropagation has been called)
-        var $target = $(event.target);
-        var $window = $target.window();
-        var keyStroke = this;
-        var keyUpHandler = {
+        let $target = $(event.target);
+        let $window = $target.window();
+        let keyStroke = this;
+        let keyUpHandler = {
           handleEvent: function(event) {
             keyStroke._handleExecuted = false;
             $window[0].removeEventListener('keyup', this, true);
@@ -190,16 +188,16 @@ export default class KeyStroke {
       return null;
     }
 
-    var $keyBox = this._renderKeyBox($drawingArea, event.which);
+    let $keyBox = this._renderKeyBox($drawingArea, event.which);
     this._postRenderKeyBox($drawingArea, $keyBox);
     return $drawingArea;
   }
 
   _renderKeyBox($parent, keyCode) {
-    var $existingKeyBoxes = $('.key-box', $parent);
-    var text = this.renderingHints.text || keys.codesToKeys[keys.fromBrowser(keyCode)];
-    var align = this.renderingHints.hAlign === HAlign.RIGHT ? 'right' : 'left';
-    var offset = this.renderingHints.offset;
+    let $existingKeyBoxes = $('.key-box', $parent);
+    let text = this.renderingHints.text || keys.codesToKeys[keys.fromBrowser(keyCode)];
+    let align = this.renderingHints.hAlign === HAlign.RIGHT ? 'right' : 'left';
+    let offset = this.renderingHints.offset;
     $existingKeyBoxes = $existingKeyBoxes.filter(function() {
       if (align === 'right') {
         return $(this).hasClass('right');
@@ -207,7 +205,7 @@ export default class KeyStroke {
       return !$(this).hasClass('right');
     });
     if ($existingKeyBoxes.length > 0) {
-      var $boxLastAdded = $existingKeyBoxes.first();
+      let $boxLastAdded = $existingKeyBoxes.first();
       if (this.renderingHints.hAlign === HAlign.RIGHT) {
         offset = $parent.outerWidth() - $boxLastAdded.position().left + this.renderingHints.gap;
       } else {
@@ -223,11 +221,11 @@ export default class KeyStroke {
     if (this.ctrl) {
       text = 'Ctrl ' + text;
     }
-    var position = $parent.css('position');
+    let position = $parent.css('position');
     if (position === 'absolute' || position === 'relative' || (position === 'static' && $existingKeyBoxes.length > 0)) {
       return prependKeyBox.call(this, offset);
     }
-    var pos = $parent.position();
+    let pos = $parent.position();
     if (pos) {
       return prependKeyBox.call(this, pos.left + offset);
     }
@@ -276,14 +274,14 @@ export default class KeyStroke {
       return null;
     }
 
-    var keyStrokeObj = {
+    let keyStrokeObj = {
       alt: false,
       ctrl: false,
       shift: false,
       which: []
     };
 
-    keyStrokeName.split('-').forEach(function(part) {
+    keyStrokeName.split('-').forEach(part => {
       if (part === 'alternate' || part === 'alt') {
         keyStrokeObj.alt = true;
       } else if (part === 'control' || part === 'ctrl') {
@@ -291,7 +289,7 @@ export default class KeyStroke {
       } else if (part === 'shift') {
         keyStrokeObj.shift = true;
       } else {
-        var key = keys[part.toUpperCase()];
+        let key = keys[part.toUpperCase()];
         keyStrokeObj.which = key && [key];
       }
     });

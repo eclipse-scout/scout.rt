@@ -29,7 +29,7 @@ export default class IntegerField extends NumberField {
    * @override
    */
   _parseValue(displayText) {
-    var result = super._parseValue(displayText);
+    let result = super._parseValue(displayText);
     if (objects.isNullOrUndefined(result)) {
       return null;
     }

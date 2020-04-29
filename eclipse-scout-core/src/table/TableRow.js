@@ -54,7 +54,7 @@ export default class TableRow {
   _initCells() {
     this.getTable().columns.forEach(function(column) {
       if (!column.guiOnly) {
-        var cell = this.cells[column.index];
+        let cell = this.cells[column.index];
         cell = column.initCell(cell, this);
         this.cells[column.index] = cell;
       }
@@ -62,7 +62,7 @@ export default class TableRow {
   }
 
   animateExpansion() {
-    var $row = this.$row,
+    let $row = this.$row,
       $rowControl;
     if (!$row) {
       return;
@@ -76,7 +76,7 @@ export default class TableRow {
   }
 
   hasFilterAcceptedChildren() {
-    return this.childRows.some(function(childRow) {
+    return this.childRows.some(childRow => {
       return childRow.filterAccepted || childRow.hasFilterAcceptedChildren();
     });
   }

@@ -157,21 +157,21 @@ export default class TableField extends FormField {
   }
 
   getValidationResult() {
-    var desc = super.getValidationResult();
+    let desc = super.getValidationResult();
     if (desc && !desc.valid) {
       return desc;
     }
 
-    var validByErrorStatus = !this.errorStatus;
-    var validByMandatory = !this.mandatory || !this.empty;
+    let validByErrorStatus = !this.errorStatus;
+    let validByMandatory = !this.mandatory || !this.empty;
 
     // check cells
-    var rows = arrays.ensure(this.table.rows);
-    var columns = arrays.ensure(this.table.columns);
+    let rows = arrays.ensure(this.table.rows);
+    let columns = arrays.ensure(this.table.columns);
 
     rows.some(function(row) {
-      return columns.some(function(column) {
-        var ret = column.isContentValid(row);
+      return columns.some(column => {
+        let ret = column.isContentValid(row);
         if (!ret.valid) {
           validByErrorStatus = validByErrorStatus && ret.validByErrorStatus;
           validByMandatory = validByMandatory && ret.validByMandatory;

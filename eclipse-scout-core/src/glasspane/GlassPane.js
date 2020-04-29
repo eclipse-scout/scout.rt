@@ -29,7 +29,7 @@ export default class GlassPane extends Widget {
     }
 
     this.$parent.addClass('glasspane-parent');
-    var cssPosition = this.$parent.css('position');
+    let cssPosition = this.$parent.css('position');
     if (!scout.isOneOf(cssPosition, 'relative', 'absolute')) {
       this.$parent.css('position', 'relative');
     }

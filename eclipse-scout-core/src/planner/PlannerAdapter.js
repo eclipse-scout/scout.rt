@@ -24,7 +24,7 @@ export default class PlannerAdapter extends ModelAdapter {
   }
 
   _sendSelectedActivity() {
-    var activityId = null;
+    let activityId = null;
     if (this.widget.selectedActivity) {
       activityId = this.widget.selectedActivity.id;
     }
@@ -34,7 +34,7 @@ export default class PlannerAdapter extends ModelAdapter {
   }
 
   _sendSelectionRange() {
-    var selectionRange = dates.toJsonDateRange(this.widget.selectionRange);
+    let selectionRange = dates.toJsonDateRange(this.widget.selectionRange);
     this._send('property', {
       selectionRange: selectionRange
     });
@@ -45,7 +45,7 @@ export default class PlannerAdapter extends ModelAdapter {
   }
 
   _sendResourcesSelected() {
-    var resourceIds = this.widget.selectedResources.map(function(r) {
+    let resourceIds = this.widget.selectedResources.map(r => {
       return r.id;
     });
     this._send('resourcesSelected', {
@@ -66,7 +66,7 @@ export default class PlannerAdapter extends ModelAdapter {
   }
 
   _onResourcesDeleted(resourceIds) {
-    var resources = this.widget._resourcesByIds(resourceIds);
+    let resources = this.widget._resourcesByIds(resourceIds);
     this.addFilterForWidgetEventType('resourcesSelected');
     this.addFilterForProperties({
       selectionRange: new DateRange()
@@ -83,7 +83,7 @@ export default class PlannerAdapter extends ModelAdapter {
   }
 
   _onResourcesSelected(resourceIds) {
-    var resources = this.widget._resourcesByIds(resourceIds);
+    let resources = this.widget._resourcesByIds(resourceIds);
     this.addFilterForWidgetEventType('resourcesSelected');
     this.widget.selectResources(resources, false);
   }

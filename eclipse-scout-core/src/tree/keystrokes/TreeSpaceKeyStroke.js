@@ -21,18 +21,18 @@ export default class TreeSpaceKeyStroke extends KeyStroke {
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     return accepted &&
       this.field.checkable &&
       this.field.selectedNodes.length;
   }
 
   handle(event) {
-    var selectedNodes = this.field.selectedNodes.filter(function(node) {
+    let selectedNodes = this.field.selectedNodes.filter(node => {
       return node.enabled;
     });
     // Toggle checked state to 'true', except if every node is already checked
-    var checked = selectedNodes.some(function(node) {
+    let checked = selectedNodes.some(node => {
       return !node.checked;
     });
     selectedNodes.forEach(function(node) {

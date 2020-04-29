@@ -103,7 +103,7 @@ export default class EventDelegator {
   }
 
   static equalsProperty(propName, obj, value) {
-    var propValue = obj[propName];
+    let propValue = obj[propName];
     // Compare arrays using arrays.equals()
     if (Array.isArray(value) && Array.isArray(propValue)) {
       return arrays.equals(value, propValue);

@@ -22,7 +22,7 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     if (!accepted) {
       return false;
     }
@@ -31,7 +31,7 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
       return false;
     }
 
-    var activeElement = this.field.$container.activeElement(true),
+    let activeElement = this.field.$container.activeElement(true),
       elementType = activeElement.tagName.toLowerCase();
     if (activeElement.className !== 'table-text-filter' &&
       (elementType === 'textarea' || elementType === 'input') &&
@@ -46,7 +46,7 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
    * Returns viewport sensitive information containing the first and last visible row in the viewport.
    */
   _viewportInfo() {
-    var viewportBounds, dataInsets, dataMarginTop, firstRow, lastRow,
+    let viewportBounds, dataInsets, dataMarginTop, firstRow, lastRow,
       table = this.field,
       viewport = {},
       rows = table.visibleRows;
@@ -75,12 +75,12 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
   }
 
   firstRowAfterSelection() {
-    var $selectedRows = this.field.$selectedRows();
+    let $selectedRows = this.field.$selectedRows();
     if (!$selectedRows.length) {
       return;
     }
 
-    var rows = this.field.visibleRows,
+    let rows = this.field.visibleRows,
       row = $selectedRows.last().data('row'),
       rowIndex = this.field.filteredRows().indexOf(row);
 
@@ -88,11 +88,11 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
   }
 
   firstRowBeforeSelection() {
-    var $selectedRows = this.field.$selectedRows();
+    let $selectedRows = this.field.$selectedRows();
     if (!$selectedRows.length) {
       return;
     }
-    var rows = this.field.visibleRows,
+    let rows = this.field.visibleRows,
       row = $selectedRows.first().data('row'),
       rowIndex = this.field.visibleRows.indexOf(row);
 
@@ -103,12 +103,12 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
    * Searches for the last selected row in the current selection block, starting from rowIndex. Expects row at rowIndex to be selected.
    */
   _findLastSelectedRowBefore(table, rowIndex) {
-    var row, rows = table.visibleRows;
+    let row, rows = table.visibleRows;
     if (rowIndex === 0) {
       return rows[rowIndex];
     }
-    row = arrays.findFromReverse(rows, rowIndex, function(row, i) {
-      var previousRow = rows[i - 1];
+    row = arrays.findFromReverse(rows, rowIndex, (row, i) => {
+      let previousRow = rows[i - 1];
       if (!previousRow) {
         return false;
       }
@@ -125,12 +125,12 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
    * Searches for the last selected row in the current selection block, starting from rowIndex. Expects row at rowIndex to be selected.
    */
   _findLastSelectedRowAfter(table, rowIndex) {
-    var row, rows = table.visibleRows;
+    let row, rows = table.visibleRows;
     if (rowIndex === rows.length - 1) {
       return rows[rowIndex];
     }
-    row = arrays.findFrom(rows, rowIndex, function(row, i) {
-      var nextRow = rows[i + 1];
+    row = arrays.findFrom(rows, rowIndex, (row, i) => {
+      let nextRow = rows[i + 1];
       if (!nextRow) {
         return false;
       }
@@ -144,9 +144,9 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
   }
 
   _findFirstRowInViewport(table, viewportBounds) {
-    var rows = table.visibleRows;
-    return arrays.find(rows, function(row, i) {
-      var rowOffset, rowMarginTop,
+    let rows = table.visibleRows;
+    return arrays.find(rows, (row, i) => {
+      let rowOffset, rowMarginTop,
         $row = row.$row;
 
       if (!row.$row) {
@@ -167,12 +167,12 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
   }
 
   _findLastRowInViewport(table, startRowIndex, viewportBounds) {
-    var rows = table.visibleRows;
+    let rows = table.visibleRows;
     if (startRowIndex === rows.length - 1) {
       return rows[startRowIndex];
     }
-    return arrays.findFromForward(rows, startRowIndex, function(row, i) {
-      var nextRowOffsetBounds, $nextRow,
+    return arrays.findFromForward(rows, startRowIndex, (row, i) => {
+      let nextRowOffsetBounds, $nextRow,
         nextRow = rows[i + 1];
 
       if (!nextRow) {

@@ -10,10 +10,10 @@
  */
 import {codes, scout} from '../../src/index';
 
-describe('CodeLookupCall', function() {
-  var session, codeType123;
+describe('CodeLookupCall', () => {
+  let session, codeType123;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     codes.registry = {};
@@ -47,14 +47,14 @@ describe('CodeLookupCall', function() {
     });
   }
 
-  describe('getByKey', function() {
-    beforeEach(function() {
+  describe('getByKey', () => {
+    beforeEach(() => {
       codes.add(codeType123);
     });
 
-    it('returns a promise which will resolve with a lookup row for the code by key', function(done) {
+    it('returns a promise which will resolve with a lookup row for the code by key', done => {
       createLookupCall(codeType123).getByKey('code.1')
-        .then(function(result) {
+        .then(result => {
           expect(result.lookupRows[0].key).toBe('code.1');
           expect(result.lookupRows[0].text).toBe('code 1');
         })
@@ -62,26 +62,26 @@ describe('CodeLookupCall', function() {
         .always(done);
     });
 
-    it('returns a promise which will be rejected if key doesn\' exist', function(done) {
+    it('returns a promise which will be rejected if key doesn\' exist', done => {
       createLookupCall(codeType123).getByKey('asdf')
-        .then(function(result) {
+        .then(result => {
           fail('Promise should be rejected but was resolved.');
         })
-        .catch(function() {
+        .catch(() => {
           expect(true).toBe(true);
           done();
         });
     });
   });
 
-  describe('getByText', function() {
-    beforeEach(function() {
+  describe('getByText', () => {
+    beforeEach(() => {
       codes.add(codeType123);
     });
 
-    it('returns the lookupRows which match the given text', function(done) {
-      var promise1 = createLookupCall(codeType123).getByText('code')
-        .then(function(result) {
+    it('returns the lookupRows which match the given text', done => {
+      let promise1 = createLookupCall(codeType123).getByText('code')
+        .then(result => {
           expect(result.lookupRows.length).toBe(2);
           expect(result.lookupRows[0].key).toBe('code.1');
           expect(result.lookupRows[0].text).toBe('code 1');
@@ -90,8 +90,8 @@ describe('CodeLookupCall', function() {
         })
         .catch(fail);
 
-      var promise2 = createLookupCall(codeType123).getByText('code 2')
-        .then(function(result) {
+      let promise2 = createLookupCall(codeType123).getByText('code 2')
+        .then(result => {
           expect(result.lookupRows.length).toBe(1);
           expect(result.lookupRows[0].key).toBe('code.2');
           expect(result.lookupRows[0].text).toBe('code 2');
@@ -101,9 +101,9 @@ describe('CodeLookupCall', function() {
       $.promiseAll(promise1, promise2).then(done);
     });
 
-    it('returns no lookupRows if no codes match the given text', function(done) {
+    it('returns no lookupRows if no codes match the given text', done => {
       createLookupCall(codeType123).getByText('asdf')
-        .then(function(result) {
+        .then(result => {
           expect(result.lookupRows.length).toBe(0);
         })
         .catch(fail)
@@ -111,14 +111,14 @@ describe('CodeLookupCall', function() {
     });
   });
 
-  describe('getByRec', function() {
-    beforeEach(function() {
+  describe('getByRec', () => {
+    beforeEach(() => {
       codes.add(codeType123);
     });
 
-    it('returns the lookupRows of the children of the given parent key', function(done) {
+    it('returns the lookupRows of the children of the given parent key', done => {
       createLookupCall(codeType123).getByRec('code.2')
-        .then(function(result) {
+        .then(result => {
           expect(result.lookupRows.length).toBe(2);
           expect(result.lookupRows[0].key).toBe('childcode.2a');
           expect(result.lookupRows[0].text).toBe('child code 2a');
@@ -129,18 +129,18 @@ describe('CodeLookupCall', function() {
         .always(done);
     });
 
-    it('returns no lookupRows if the parent code doesn\'t have children', function(done) {
+    it('returns no lookupRows if the parent code doesn\'t have children', done => {
       createLookupCall(codeType123).getByRec('code.1')
-        .then(function(result) {
+        .then(result => {
           expect(result.lookupRows.length).toBe(0);
         })
         .catch(fail)
         .always(done);
     });
 
-    it('returns no lookupRows if no codes match the given text', function(done) {
+    it('returns no lookupRows if no codes match the given text', done => {
       createLookupCall(codeType123).getByRec('asdf')
-        .then(function(result) {
+        .then(result => {
           expect(result.lookupRows.length).toBe(0);
         })
         .catch(fail)
@@ -148,14 +148,14 @@ describe('CodeLookupCall', function() {
     });
   });
 
-  describe('getByAll', function() {
-    beforeEach(function() {
+  describe('getByAll', () => {
+    beforeEach(() => {
       codes.add(codeType123);
     });
 
-    it('returns lookupRows for every code', function(done) {
+    it('returns lookupRows for every code', done => {
       createLookupCall(codeType123).getAll()
-        .then(function(result) {
+        .then(result => {
           expect(result.lookupRows.length).toBe(4);
           expect(result.lookupRows[0].key).toBe('code.1');
           expect(result.lookupRows[0].text).toBe('code 1');
@@ -175,43 +175,43 @@ describe('CodeLookupCall', function() {
     });
   });
 
-  describe('scout.codes.remove', function() {
+  describe('scout.codes.remove', () => {
 
-    it('makes, that existing lookup calls don\'t return a result anymore', function(done) {
+    it('makes, that existing lookup calls don\'t return a result anymore', done => {
       codes.add(codeType123);
-      var lookupCall = createLookupCall(codeType123);
+      let lookupCall = createLookupCall(codeType123);
 
       lookupCall.cloneForKey('code.1').execute()
-        .then(function(result) {
+        .then(result => {
           expect(result.lookupRows[0].key).toBe('code.1');
           expect(result.lookupRows[0].text).toBe('code 1');
         })
         .catch(fail)
-        .then(function() {
+        .then(() => {
           codes.remove(codeType123);
           return lookupCall.cloneForKey('code.1').execute();
         })
-        .then(function(result) {
+        .then(result => {
           fail('Promise should be rejected but was resolved.');
         })
-        .catch(function() {
+        .catch(() => {
           done();
         });
     });
   });
 
-  describe('scout.codes.add', function() {
+  describe('scout.codes.add', () => {
 
-    it('makes, that existing lookups consider the new code type', function(done) {
+    it('makes, that existing lookups consider the new code type', done => {
       codes.add(codeType123);
-      var lookupCall = createLookupCall(codeType123);
+      let lookupCall = createLookupCall(codeType123);
 
       lookupCall.cloneForKey('code.1').execute()
-        .then(function(result) {
+        .then(result => {
           expect(result.lookupRows[0].key).toBe('code.1');
           expect(result.lookupRows[0].text).toBe('code 1');
         })
-        .then(function() {
+        .then(() => {
           codes.remove(codeType123);
           codes.add({
             id: 'codeType.123',
@@ -224,19 +224,19 @@ describe('CodeLookupCall', function() {
           });
           return lookupCall.cloneForKey('newcode.1').execute();
         })
-        .then(function(result) {
+        .then(result => {
           expect(result.lookupRows[0].key).toBe('newcode.1');
           expect(result.lookupRows[0].text).toBe('new code 1');
         })
         .catch(fail)
-        .then(function() {
+        .then(() => {
           return lookupCall.cloneForKey('code.1').execute();
         })
-        .then(function(result) {
+        .then(result => {
           // Code.1 does not exist anymore -> has to fail
           fail('Promise should be rejected but was resolved.');
         })
-        .catch(function() {
+        .catch(() => {
           done();
         });
     });

@@ -17,7 +17,7 @@ export default class TileGridSelectKeyStroke extends KeyStroke {
     this.field = tileGrid;
     this.shift = !tileGrid.multiSelect ? false : undefined;
     this.renderingHints.$drawingArea = function($drawingArea, event) {
-      var result = this._computeNewSelection();
+      let result = this._computeNewSelection();
       if (result && result.focusedTile) {
         return result.focusedTile.$container;
       }
@@ -34,7 +34,7 @@ export default class TileGridSelectKeyStroke extends KeyStroke {
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     if (!accepted) {
       return false;
     }

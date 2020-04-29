@@ -120,6 +120,7 @@ export default class Tree extends Widget {
     this.$data = null;
     this._scrolldirections = 'both';
     this.requestFocusOnNodeControlMouseDown = true;
+    this._$mouseDownNode = null;
   }
 
   static DisplayStyle = {
@@ -178,7 +179,7 @@ export default class Tree extends Widget {
    * @param nodes Array of node-models (plain object) or nodes (instance of TreeNode)
    */
   _ensureTreeNodes(nodes) {
-    var i, node;
+    let i, node;
     for (i = 0; i < nodes.length; i++) {
       node = nodes[i];
       node.childNodeIndex = scout.nvl(node.childNodeIndex, i);
@@ -212,7 +213,7 @@ export default class Tree extends Widget {
   }
 
   _initTreeKeyStrokeContext() {
-    var modifierBitMask = keyStrokeModifier.NONE;
+    let modifierBitMask = keyStrokeModifier.NONE;
 
     this.keyStrokeContext.registerKeyStroke([
       new TreeSpaceKeyStroke(this),
@@ -228,7 +229,7 @@ export default class Tree extends Widget {
     // Otherwise, an '↑-event' on the first node, or an '↓-event' on the last row will bubble up (because not consumed by tree navigation keystrokes) and cause a superior tree to move its selection;
     // Use case: - outline tree with a detail form that contains a tree;
     //           - preventDefault because of smartfield, so that the cursor is not moved on first or last row;
-    this.keyStrokeContext.registerStopPropagationInterceptor(function(event) {
+    this.keyStrokeContext.registerStopPropagationInterceptor(event => {
       if (!event.ctrlKey && !event.altKey && scout.isOneOf(event.which, keys.UP, keys.DOWN)) {
         event.stopPropagation();
         event.preventDefault();
@@ -243,9 +244,9 @@ export default class Tree extends Widget {
   }
 
   _updateMenuBar() {
-    var menuItems = this._filterMenus(this.menus, MenuDestinations.MENU_BAR, false, true);
+    let menuItems = this._filterMenus(this.menus, MenuDestinations.MENU_BAR, false, true);
     this.menuBar.setMenuItems(menuItems);
-    var contextMenuItems = this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true);
+    let contextMenuItems = this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true);
     if (this.contextMenu) {
       this.contextMenu.updateMenuItems(contextMenuItems);
     }
@@ -270,7 +271,7 @@ export default class Tree extends Widget {
   _updateFlatListAndSelectionPath(node, parentNode) {
     // if this node is selected all parent nodes have to be added to selectionPath
     if (this.isSelectedNode(node) && (node.parentNode && !this.visibleNodesMap[node.parentNode.id] || node.level === 0)) {
-      var p = node;
+      let p = node;
       while (p) {
         this._inSelectionPathList[p.id] = true;
         p.filterDirty = true;
@@ -357,7 +358,7 @@ export default class Tree extends Widget {
       this.$container.addClass(this._additionalContainerClasses);
     }
 
-    var layout = new TreeLayout(this);
+    let layout = new TreeLayout(this);
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(layout);
 
@@ -431,10 +432,10 @@ export default class Tree extends Widget {
    * @override
    */
   _onScroll() {
-    var scrollToSelectionBackup = this.scrollToSelection;
+    let scrollToSelectionBackup = this.scrollToSelection;
     this.scrollToSelection = false;
-    var scrollTop = this.$data[0].scrollTop;
-    var scrollLeft = this.$data[0].scrollLeft;
+    let scrollTop = this.$data[0].scrollTop;
+    let scrollLeft = this.$data[0].scrollLeft;
     if (this.scrollTop !== scrollTop) {
       this._renderViewport();
     }
@@ -488,12 +489,12 @@ export default class Tree extends Widget {
       // In that case, the tree won't be layouted either -> as soon as it will be layouted, renderViewport will be called again
       return;
     }
-    var viewRange = this._calculateCurrentViewRange();
+    let viewRange = this._calculateCurrentViewRange();
     this._renderViewRange(viewRange);
   }
 
   _calculateCurrentViewRange() {
-    var node,
+    let node,
       scrollTop = this.$data[0].scrollTop,
       maxScrollTop = this.$data[0].scrollHeight - this.$data[0].clientHeight;
 
@@ -519,33 +520,33 @@ export default class Tree extends Widget {
   }
 
   _removeRenderedNodes() {
-    var $nodes = this.$data.find('.tree-node');
-    $nodes.each(function(i, elem) {
-      var $node = $(elem),
+    let $nodes = this.$data.find('.tree-node');
+    $nodes.each((i, elem) => {
+      let $node = $(elem),
         node = $node.data('node');
       if ($node.hasClass('hiding')) {
         // Do not remove nodes which are removed using an animation
         return;
       }
       this._removeNode(node);
-    }.bind(this));
+    });
     this.viewRangeRendered = new Range(0, 0);
   }
 
   _renderViewRangeForNode(node) {
-    var viewRange = this._calculateViewRangeForNode(node);
+    let viewRange = this._calculateViewRangeForNode(node);
     this._renderViewRange(viewRange);
   }
 
   _renderNodesInRange(range) {
-    var prepend = false;
+    let prepend = false;
 
-    var nodes = this.visibleNodesFlat;
+    let nodes = this.visibleNodesFlat;
     if (nodes.length === 0) {
       return;
     }
 
-    var maxRange = new Range(0, nodes.length);
+    let maxRange = new Range(0, nodes.length);
     range = maxRange.intersect(range);
     if (this.viewRangeRendered.size() > 0 && !range.intersect(this.viewRangeRendered).equals(new Range(0, 0))) {
       throw new Error('New range must not intersect with existing.');
@@ -553,22 +554,22 @@ export default class Tree extends Widget {
     if (range.to <= this.viewRangeRendered.from) {
       prepend = true;
     }
-    var newRange = this.viewRangeRendered.union(range);
+    let newRange = this.viewRangeRendered.union(range);
     if (newRange.length === 2) {
       throw new Error('Can only prepend or append rows to the existing range. Existing: ' + this.viewRangeRendered + '. New: ' + newRange);
     }
     this.viewRangeRendered = newRange[0];
 
-    var numNodesRendered = this.ensureRangeVisible(range);
+    let numNodesRendered = this.ensureRangeVisible(range);
 
     $.log.isTraceEnabled() && $.log.trace(numNodesRendered + ' new nodes rendered from ' + range);
   }
 
   ensureRangeVisible(range) {
-    var nodes = this.visibleNodesFlat;
-    var nodesToInsert = [];
-    for (var r = range.from; r < range.to; r++) {
-      var node = nodes[r];
+    let nodes = this.visibleNodesFlat;
+    let nodesToInsert = [];
+    for (let r = range.from; r < range.to; r++) {
+      let node = nodes[r];
       if (!node.attached) {
         nodesToInsert.push(node);
       }
@@ -582,7 +583,7 @@ export default class Tree extends Widget {
       this.$fillBefore = this.$data.prependDiv('tree-data-fill');
     }
 
-    var fillBeforeDimensions = this._calculateFillerDimension(new Range(0, this.viewRangeRendered.from));
+    let fillBeforeDimensions = this._calculateFillerDimension(new Range(0, this.viewRangeRendered.from));
     this.$fillBefore.cssHeight(fillBeforeDimensions.height);
     if (this.isHorizontalScrollingEnabled()) {
       this.$fillBefore.cssWidth(fillBeforeDimensions.width);
@@ -594,7 +595,7 @@ export default class Tree extends Widget {
       this.$fillAfter = this.$data.appendDiv('tree-data-fill');
     }
 
-    var fillAfterDimensions = {
+    let fillAfterDimensions = {
       height: 0,
       width: 0
     };
@@ -608,17 +609,17 @@ export default class Tree extends Widget {
   }
 
   _calculateFillerDimension(range) {
-    var outerWidth = 0;
+    let outerWidth = 0;
     if (this.rendered) {
       // the outer-width is only correct if this tree is already rendered. otherwise wrong values are returned.
       outerWidth = this.$data.outerWidth();
     }
-    var dimension = {
+    let dimension = {
       height: 0,
       width: Math.max(outerWidth, this.maxNodeWidth)
     };
-    for (var i = range.from; i < range.to; i++) {
-      var node = this.visibleNodesFlat[i];
+    for (let i = range.from; i < range.to; i++) {
+      let node = this.visibleNodesFlat[i];
       dimension.height += this._heightForNode(node);
       dimension.width = Math.max(dimension.width, this._widthForNode(node));
     }
@@ -626,16 +627,16 @@ export default class Tree extends Widget {
   }
 
   _removeNodesInRange(range) {
-    var fromNode, toNode, node, i,
+    let fromNode, toNode, node, i,
       numNodesRemoved = 0,
       nodes = this.visibleNodesFlat;
 
-    var maxRange = new Range(0, nodes.length);
+    let maxRange = new Range(0, nodes.length);
     range = maxRange.intersect(range);
     fromNode = nodes[range.from];
     toNode = nodes[range.to];
 
-    var newRange = this.viewRangeRendered.subtract(range);
+    let newRange = this.viewRangeRendered.subtract(range);
     if (newRange.length === 2) {
       throw new Error('Can only remove nodes at the beginning or end of the existing range. ' + this.viewRangeRendered + '. New: ' + newRange);
     }
@@ -654,7 +655,7 @@ export default class Tree extends Widget {
    * Just removes the node, does NOT adjust this.viewRangeRendered
    */
   _removeNode(node) {
-    var $node = node.$node;
+    let $node = node.$node;
     if (!$node) {
       return;
     }
@@ -684,19 +685,19 @@ export default class Tree extends Widget {
       return;
     }
     if (!this.viewRangeDirty) {
-      var rangesToRender = viewRange.subtract(this.viewRangeRendered);
-      var rangesToRemove = this.viewRangeRendered.subtract(viewRange);
-      var maxRange = new Range(0, this.visibleNodesFlat.length);
+      let rangesToRender = viewRange.subtract(this.viewRangeRendered);
+      let rangesToRemove = this.viewRangeRendered.subtract(viewRange);
+      let maxRange = new Range(0, this.visibleNodesFlat.length);
 
-      rangesToRemove.forEach(function(range) {
+      rangesToRemove.forEach(range => {
         this._removeNodesInRange(range);
         if (maxRange.to < range.to) {
           this.viewRangeRendered = viewRange;
         }
-      }.bind(this));
-      rangesToRender.forEach(function(range) {
+      });
+      rangesToRender.forEach(range => {
         this._renderNodesInRange(range);
-      }.bind(this));
+      });
     } else {
       // expansion changed
       this.viewRangeRendered = viewRange;
@@ -705,13 +706,13 @@ export default class Tree extends Widget {
 
     // check if at least last and first row in range got correctly rendered
     if (this.viewRangeRendered.size() > 0) {
-      var nodes = this.visibleNodesFlat;
-      var firstNode = nodes[this.viewRangeRendered.from];
-      var lastNode = nodes[this.viewRangeRendered.to - 1];
+      let nodes = this.visibleNodesFlat;
+      let firstNode = nodes[this.viewRangeRendered.from];
+      let lastNode = nodes[this.viewRangeRendered.to - 1];
       if (this.viewRangeDirty) {
         // cleanup nodes before range and after
-        var $nodesBeforFirstNode = firstNode.$node.prevAll('.tree-node');
-        var $nodesAfterLastNode = lastNode.$node.nextAll('.tree-node');
+        let $nodesBeforFirstNode = firstNode.$node.prevAll('.tree-node');
+        let $nodesAfterLastNode = lastNode.$node.nextAll('.tree-node');
         this._cleanupNodes($nodesBeforFirstNode);
         this._cleanupNodes($nodesAfterLastNode);
       }
@@ -749,7 +750,7 @@ export default class Tree extends Widget {
     if (!this.rendered && !this.rendering) {
       return;
     }
-    this._visibleNodesInViewRange().forEach(function(node) {
+    this._visibleNodesInViewRange().forEach(node => {
       node._updateIconWidth();
     });
   }
@@ -765,21 +766,21 @@ export default class Tree extends Widget {
     if (!this.rendered || !this.nodeWidthDirty) {
       return;
     }
-    var nodes = this._visibleNodesInViewRange();
-    var maxNodeWidth = this.maxNodeWidth;
+    let nodes = this._visibleNodesInViewRange();
+    let maxNodeWidth = this.maxNodeWidth;
     // find max-width
-    maxNodeWidth = nodes.reduce(function(aggr, node) {
+    maxNodeWidth = nodes.reduce((aggr, node) => {
       return Math.max(node.width, aggr);
     }, scout.nvl(maxNodeWidth, 0));
     // set max width on all nodes
-    nodes.forEach(function(node) {
+    nodes.forEach(node => {
       node.$node.cssWidth(maxNodeWidth);
     });
     this.nodeWidthDirty = false;
   }
 
   _cleanupNodes($nodes) {
-    for (var i = 0; i < $nodes.length; i++) {
+    for (let i = 0; i < $nodes.length; i++) {
       this._removeNode($nodes.eq(i).data('node'));
     }
   }
@@ -788,16 +789,17 @@ export default class Tree extends Widget {
    * Returns the index of the node which is at position scrollTop.
    */
   _nodeAtScrollTop(scrollTop) {
-    var height = 0,
+    let height = 0,
       nodeTop;
-    this.visibleNodesFlat.some(function(node, i) {
+    this.visibleNodesFlat.some((node, i) => {
       height += this._heightForNode(node);
       if (scrollTop < height) {
         nodeTop = node;
         return true;
       }
-    }.bind(this));
-    var visibleNodesLength = this.visibleNodesFlat.length;
+      return false;
+    });
+    let visibleNodesLength = this.visibleNodesFlat.length;
     if (!nodeTop && visibleNodesLength > 0) {
       nodeTop = this.visibleNodesFlat[visibleNodesLength - 1];
     }
@@ -805,7 +807,7 @@ export default class Tree extends Widget {
   }
 
   _heightForNode(node) {
-    var height = 0;
+    let height = 0;
     if (node.height) {
       height = node.height;
     } else {
@@ -815,7 +817,7 @@ export default class Tree extends Widget {
   }
 
   _widthForNode(node) {
-    var width = 0;
+    let width = 0;
     if (node.width) {
       width = node.width;
     } else {
@@ -830,11 +832,11 @@ export default class Tree extends Widget {
    * assuming viewRangeSize is 2*number of possible nodes in the viewport (see calculateViewRangeSize).
    */
   _calculateViewRangeForNode(node) {
-    var viewRange = new Range(),
+    let viewRange = new Range(),
       quarterRange = Math.floor(this.viewRangeSize / Tree.VIEW_RANGE_DIVISOR),
       diff;
 
-    var nodeIndex = this.visibleNodesFlat.indexOf(node);
+    let nodeIndex = this.visibleNodesFlat.indexOf(node);
     viewRange.from = Math.max(nodeIndex - quarterRange, 0);
     viewRange.to = Math.min(viewRange.from + this.viewRangeSize, this.visibleNodesFlat.length);
     if (!node || nodeIndex === -1) {
@@ -864,8 +866,8 @@ export default class Tree extends Widget {
     if (this.nodeHeight === 0) {
       throw new Error('Cannot calculate view range with nodeHeight = 0');
     }
-    var viewRangeMultiplier = Tree.VIEW_RANGE_DIVISOR / 2; // See  _calculateViewRangeForNode
-    var viewRange = Math.ceil(this.$data.outerHeight() / this.nodeHeight) * viewRangeMultiplier;
+    let viewRangeMultiplier = Tree.VIEW_RANGE_DIVISOR / 2; // See  _calculateViewRangeForNode
+    let viewRange = Math.ceil(this.$data.outerHeight() / this.nodeHeight) * viewRangeMultiplier;
     return Math.max(Tree.VIEW_RANGE_DIVISOR, viewRange);
   }
 
@@ -880,11 +882,11 @@ export default class Tree extends Widget {
   }
 
   _updateNodeDimensions() {
-    var emptyNode = this._createTreeNode();
-    var $node = this._renderNode(emptyNode).appendTo(this.$data);
+    let emptyNode = this._createTreeNode();
+    let $node = this._renderNode(emptyNode).appendTo(this.$data);
     this.nodeHeight = $node.outerHeight(true);
     if (this.isHorizontalScrollingEnabled()) {
-      var oldNodeWidth = this.nodeWidth;
+      let oldNodeWidth = this.nodeWidth;
       this.nodeWidth = $node.outerWidth(true);
       if (oldNodeWidth !== this.nodeWidth) {
         this.viewRangeDirty = true;
@@ -897,7 +899,7 @@ export default class Tree extends Widget {
    * Updates the node heights for every visible node and clears the height of the others
    */
   updateNodeHeights() {
-    this.visibleNodesFlat.forEach(function(node) {
+    this.visibleNodesFlat.forEach(node => {
       if (!node.attached) {
         node.height = null;
       } else {
@@ -936,7 +938,7 @@ export default class Tree extends Widget {
 
     // If every child node was deleted mark node as collapsed (independent of the model state)
     // --> makes it consistent with addNodes and expand (expansion is not allowed if there are no child nodes)
-    arrays.ensure(parentNode).forEach(function(p) {
+    arrays.ensure(parentNode).forEach(p => {
       if (p && p.$node && p.childNodes.length === 0) {
         p.$node.removeClass('expanded lazy');
       }
@@ -948,7 +950,7 @@ export default class Tree extends Widget {
   }
 
   _renderNode(node) {
-    var paddingLeft = this._computeNodePaddingLeft(node);
+    let paddingLeft = this._computeNodePaddingLeft(node);
     node.render(this.$container, paddingLeft, this.checkable, this.enabledComputed);
     return node.$node;
   }
@@ -967,14 +969,14 @@ export default class Tree extends Widget {
   _renderEnabled() {
     super._renderEnabled();
 
-    var enabled = this.enabledComputed;
+    let enabled = this.enabledComputed;
     this.$data.setEnabled(enabled);
     this.$container.setTabbable(enabled);
 
     if (this.rendered) {
       // Enable/disable all checkboxes
       this.$nodes().each(function() {
-        var $node = $(this),
+        let $node = $(this),
           node = $node.data('node');
 
         $node.children('.tree-node-checkbox')
@@ -1011,13 +1013,11 @@ export default class Tree extends Widget {
 
   _renderCheckable() {
     // Define helper functions
-    var isNodeRendered = function(node) {
-      return Boolean(node.$node);
-    };
-    var updateCheckableStateRec = function(node) {
-      var $node = node.$node;
-      var $control = $node.children('.tree-node-control');
-      var $checkbox = $node.children('.tree-node-checkbox');
+    let isNodeRendered = node => Boolean(node.$node);
+    let updateCheckableStateRec = node => {
+      let $node = node.$node;
+      let $control = $node.children('.tree-node-control');
+      let $checkbox = $node.children('.tree-node-checkbox');
 
       node._updateControl($control, this);
       if (this.checkable) {
@@ -1034,7 +1034,7 @@ export default class Tree extends Widget {
       if (node.childNodes) {
         node.childNodes.filter(isNodeRendered).forEach(updateCheckableStateRec);
       }
-    }.bind(this);
+    };
 
     // Start recursion
     this.nodes.filter(isNodeRendered).forEach(updateCheckableStateRec);
@@ -1048,13 +1048,13 @@ export default class Tree extends Widget {
   }
 
   _renderExpansion(node, options) {
-    var opts = {
+    let opts = {
       expandLazyChanged: false,
       expansionChanged: false
     };
     $.extend(opts, options);
 
-    var $node = node.$node,
+    let $node = node.$node,
       expanded = node.expanded;
 
     // Only render if node is rendered to make it possible to expand/collapse currently hidden nodes (used by collapseAll).
@@ -1083,7 +1083,7 @@ export default class Tree extends Widget {
   _renderSelection() {
     // Add children class to root nodes if no nodes are selected
     if (this.selectedNodes.length === 0) {
-      this.nodes.forEach(function(childNode) {
+      this.nodes.forEach(childNode => {
         if (childNode.rendered) {
           childNode.$node.addClass('child-of-selected');
         }
@@ -1096,7 +1096,7 @@ export default class Tree extends Widget {
       }
 
       // Mark all ancestor nodes, especially necessary for bread crumb mode
-      var parentNode = node.parentNode;
+      let parentNode = node.parentNode;
       if (parentNode && parentNode.rendered) {
         parentNode.$node.addClass('parent-of-selected');
       }
@@ -1109,7 +1109,7 @@ export default class Tree extends Widget {
 
       // Mark all child nodes
       if (node.expanded) {
-        node.childNodes.forEach(function(childNode) {
+        node.childNodes.forEach(childNode => {
           if (childNode.rendered) {
             childNode.$node.addClass('child-of-selected');
           }
@@ -1122,11 +1122,11 @@ export default class Tree extends Widget {
     }, this);
 
     // Update 'group' markers for all rendered nodes
-    for (var i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {
+    for (let i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {
       if (i >= this.visibleNodesFlat.length) {
         break;
       }
-      var node = this.visibleNodesFlat[i];
+      let node = this.visibleNodesFlat[i];
       if (node && node.rendered) {
         node.$node.toggleClass('group', Boolean(this.groupedNodes[node.id]));
       }
@@ -1152,15 +1152,15 @@ export default class Tree extends Widget {
       return;
     }
     // Highlight previously selected node, but do it only once
-    this.prevSelectedNode.$node.addClassForAnimation('animate-prev-selected').oneAnimationEnd(function() {
+    this.prevSelectedNode.$node.addClassForAnimation('animate-prev-selected').oneAnimationEnd(() => {
       this.prevSelectedNode.prevSelectionAnimationDone = true;
-    }.bind(this));
+    });
   }
 
   _removeSelection() {
     // Remove children class on root nodes if no nodes were selected
     if (this.selectedNodes.length === 0) {
-      this.nodes.forEach(function(childNode) {
+      this.nodes.forEach(childNode => {
         if (childNode.rendered) {
           childNode.$node.removeClass('child-of-selected');
         }
@@ -1181,7 +1181,7 @@ export default class Tree extends Widget {
     }
 
     // remove ancestor and child classes
-    var parentNode = node.parentNode;
+    let parentNode = node.parentNode;
     if (parentNode && parentNode.rendered) {
       parentNode.$node.removeClass('parent-of-selected');
     }
@@ -1190,7 +1190,7 @@ export default class Tree extends Widget {
       parentNode = parentNode.parentNode;
     }
     if (node.expanded) {
-      node.childNodes.forEach(function(childNode) {
+      node.childNodes.forEach(childNode => {
         if (childNode.rendered) {
           childNode.$node.removeClass('child-of-selected');
         }
@@ -1218,13 +1218,13 @@ export default class Tree extends Widget {
       dropMaximumSize: function() {
         return this.dropMaximumSize;
       }.bind(this),
-      additionalDropProperties: function(event) {
-        var $target = $(event.currentTarget);
-        var properties = {
+      additionalDropProperties: event => {
+        let $target = $(event.currentTarget);
+        let properties = {
           nodeId: ''
         };
         if ($target.hasClass('tree-node')) {
-          var node = $target.data('node');
+          let node = $target.data('node');
           properties.nodeId = node.id;
         }
         return properties;
@@ -1247,9 +1247,9 @@ export default class Tree extends Widget {
     }
 
     if (checkChildrenChecked) {
-      var childrenFound = false;
-      for (var j = 0; j < node.childNodes.length > 0; j++) {
-        var childNode = node.childNodes[j];
+      let childrenFound = false;
+      for (let j = 0; j < node.childNodes.length > 0; j++) {
+        let childNode = node.childNodes[j];
         if (childNode.checked || childNode.childrenChecked) {
           node.childrenChecked = true;
           checked = true;
@@ -1277,12 +1277,12 @@ export default class Tree extends Widget {
       return;
     }
 
-    var stateChanged = false;
+    let stateChanged = false;
     if (!checked && !init) {
       // node was unchecked check siblings
-      var hasCheckedSiblings = false;
-      for (var i = 0; i < node.parentNode.childNodes.length > 0; i++) {
-        var siblingNode = node.parentNode.childNodes[i];
+      let hasCheckedSiblings = false;
+      for (let i = 0; i < node.parentNode.childNodes.length > 0; i++) {
+        let siblingNode = node.parentNode.childNodes[i];
         if (siblingNode.checked || siblingNode.childrenChecked) {
           hasCheckedSiblings = true;
           break;
@@ -1330,7 +1330,7 @@ export default class Tree extends Widget {
   }
 
   _nodeTooltipText($node) {
-    var node = $node.data('node');
+    let node = $node.data('node');
     if (node.tooltipText) {
       return node.tooltipText;
     } else if (this._isTruncatedNodeTooltipEnabled() && $node.isContentTruncated()) {
@@ -1359,7 +1359,7 @@ export default class Tree extends Widget {
 
     if (this.displayStyle === Tree.DisplayStyle.BREADCRUMB) {
       if (this.selectedNodes.length > 0) {
-        var selectedNode = this.selectedNodes[0];
+        let selectedNode = this.selectedNodes[0];
         if (!selectedNode.expanded) {
           this.expandNode(selectedNode);
         }
@@ -1373,12 +1373,12 @@ export default class Tree extends Widget {
   }
 
   _updateNodePaddingsLeft() {
-    this.$nodes().each(function(index, element) {
-      var $node = $(element),
+    this.$nodes().each((index, element) => {
+      let $node = $(element),
         node = $node.data('node'),
         paddingLeft = this._computeNodePaddingLeft(node);
       $node.css('padding-left', objects.isNullOrUndefined(paddingLeft) ? '' : paddingLeft);
-    }.bind(this));
+    });
   }
 
   setBreadcrumbStyleActive(active) {
@@ -1412,9 +1412,9 @@ export default class Tree extends Widget {
   collapseAll() {
     this.rebuildSuppressed = true;
     // Collapse all expanded child nodes (only model)
-    this.visitNodes(function(node) {
+    this.visitNodes(node => {
       this.collapseNode(node);
-    }.bind(this));
+    });
 
     if (this.rendered) {
       // ensure correct rendering
@@ -1426,7 +1426,7 @@ export default class Tree extends Widget {
 
   setNodeExpanded(node, expanded, opts) {
     opts = opts || {};
-    var lazy = opts.lazy;
+    let lazy = opts.lazy;
     if (objects.isNullOrUndefined(lazy)) {
       if (node.expanded === expanded) {
         // no state change: Keep the current "expandedLazy" state
@@ -1439,7 +1439,7 @@ export default class Tree extends Widget {
         lazy = false;
       }
     }
-    var renderAnimated = scout.nvl(opts.renderAnimated, true);
+    let renderAnimated = scout.nvl(opts.renderAnimated, true);
 
     // Never do lazy expansion if it is disabled on the tree
     if (!this.lazyExpandingEnabled) {
@@ -1457,16 +1457,16 @@ export default class Tree extends Widget {
     // Optionally collapse all children (recursively)
     if (opts.collapseChildNodes) {
       // Suppress render expansion
-      var childOpts = objects.valueCopy(opts);
+      let childOpts = objects.valueCopy(opts);
       childOpts.renderExpansion = false;
 
-      node.childNodes.forEach(function(childNode) {
+      node.childNodes.forEach(childNode => {
         if (childNode.expanded) {
           this.collapseNode(childNode, childOpts);
         }
-      }.bind(this));
+      });
     }
-    var renderExpansionOpts = {
+    let renderExpansionOpts = {
       expansionChanged: false,
       expandLazyChanged: false
     };
@@ -1478,7 +1478,7 @@ export default class Tree extends Widget {
       node.expanded = expanded;
       node.expandedLazy = lazy;
 
-      var filterStateChanged = this._applyFiltersForNode(node);
+      let filterStateChanged = this._applyFiltersForNode(node);
       if (filterStateChanged && renderExpansionOpts.expansionChanged) {
         if (node.parentNode) {
           // ensure node is visible under the parent node if there is a parent.
@@ -1489,9 +1489,9 @@ export default class Tree extends Widget {
           this._removeFromFlatList(node, false);
         }
       } else if (renderExpansionOpts.expandLazyChanged) {
-        node.childNodes.forEach(function(child) {
+        node.childNodes.forEach(child => {
           this._applyFiltersForNode(child);
-        }.bind(this));
+        });
       }
 
       if (this.groupedNodes[node.id]) {
@@ -1523,9 +1523,9 @@ export default class Tree extends Widget {
   }
 
   setNodeExpandedRecursive(nodes, expanded, opts) {
-    Tree.visitNodes(function(childNode) {
+    Tree.visitNodes(childNode => {
       this.setNodeExpanded(childNode, expanded, opts);
-    }.bind(this), nodes);
+    }, nodes);
   }
 
   _rebuildParent(node, opts) {
@@ -1539,7 +1539,7 @@ export default class Tree extends Widget {
     }
     // Render expansion
     if (this.rendered && scout.nvl(opts.renderExpansion, true)) {
-      var renderExpansionOpts = {
+      let renderExpansionOpts = {
         expansionChanged: true
       };
       this._renderExpansion(node, renderExpansionOpts);
@@ -1549,10 +1549,10 @@ export default class Tree extends Widget {
   _removeChildrenFromFlatList(parentNode, animatedRemove) {
     // Only if a parent is available the children are available.
     if (this.visibleNodesMap[parentNode.id]) {
-      var parentIndex = this.visibleNodesFlat.indexOf(parentNode);
-      var elementsToDelete = 0;
-      var parentLevel = parentNode.level;
-      var removedNodes = [];
+      let parentIndex = this.visibleNodesFlat.indexOf(parentNode);
+      let elementsToDelete = 0;
+      let parentLevel = parentNode.level;
+      let removedNodes = [];
       animatedRemove = animatedRemove && this.rendered;
       if (this._$animationWrapper) {
         // Note: Do _not_ use finish() here! Although documentation states that it is "similar" to stop(true, true),
@@ -1561,12 +1561,12 @@ export default class Tree extends Widget {
         // finish(), the callback is _not_ executed! (This may or may not be a bug in jQuery, I cannot tell...)
         this._$animationWrapper.stop(false, true);
       }
-      this._$expandAnimationWrappers.forEach(function($wrapper) {
+      this._$expandAnimationWrappers.forEach($wrapper => {
         $wrapper.stop(false, true);
       });
-      for (var i = parentIndex + 1; i < this.visibleNodesFlat.length; i++) {
+      for (let i = parentIndex + 1; i < this.visibleNodesFlat.length; i++) {
         if (this.visibleNodesFlat[i].level > parentLevel) {
-          var node = this.visibleNodesFlat[i];
+          let node = this.visibleNodesFlat[i];
           if (this.isHorizontalScrollingEnabled()) {
             // if node is the node which defines the widest width then recalculate width for render
             if (node.width === this.maxNodeWidth) {
@@ -1622,7 +1622,7 @@ export default class Tree extends Widget {
 
     // ----- Helper functions -----
     function onAnimationComplete(affectedNodes) {
-      affectedNodes.forEach(function(node) {
+      affectedNodes.forEach(node => {
         node.$node.detach();
         node.$node.css('display', node.displayBackup);
         node.displayBackup = null;
@@ -1636,9 +1636,9 @@ export default class Tree extends Widget {
   }
 
   _removeFromFlatList(node, animatedRemove) {
-    var removedNodes = [];
+    let removedNodes = [];
     if (this.visibleNodesMap[node.id]) {
-      var index = this.visibleNodesFlat.indexOf(node);
+      let index = this.visibleNodesFlat.indexOf(node);
       this._removeChildrenFromFlatList(node, false);
       if (this.isHorizontalScrollingEnabled()) {
         // if node is the node which defines the widest width then recalculate width for render
@@ -1667,7 +1667,7 @@ export default class Tree extends Widget {
         // for faster index calculation
         this._addToVisibleFlatListNoCheck(node, this.visibleNodesFlat.length, renderingAnimated);
       } else {
-        var insertIndex = this._findInsertPositionInFlatList(node);
+        let insertIndex = this._findInsertPositionInFlatList(node);
         this._addToVisibleFlatListNoCheck(node, insertIndex, renderingAnimated);
       }
     }
@@ -1684,7 +1684,7 @@ export default class Tree extends Widget {
       return 0;
     }
 
-    var isSubAdding = Boolean(insertBatch);
+    let isSubAdding = Boolean(insertBatch);
     parentIndex = parentIndex ? parentIndex : this.visibleNodesFlat.indexOf(parentNode);
     animatedRendering = animatedRendering && this.rendered; // don't animate while rendering (not necessary, or may even lead to timing issues)
     if (this._$animationWrapper && !isSubAdding) {
@@ -1701,12 +1701,12 @@ export default class Tree extends Widget {
       insertBatch = this.newInsertBatch(parentIndex + 1);
     }
 
-    parentNode.childNodes.forEach(function(node, index) {
+    parentNode.childNodes.forEach((node, index) => {
       if (!node.initialized || !node.isFilterAccepted(forceFilter)) {
         return;
       }
 
-      var insertIndex, isAlreadyAdded = this.visibleNodesMap[node.id];
+      let insertIndex, isAlreadyAdded = this.visibleNodesMap[node.id];
       if (isAlreadyAdded) {
         this.insertBatchInVisibleNodes(insertBatch, this._showNodes(insertBatch), animatedRendering);
         this.checkAndHandleBatchAnimationWrapper(parentNode, animatedRendering, insertBatch);
@@ -1720,7 +1720,7 @@ export default class Tree extends Widget {
         insertBatch = this.checkAndHandleBatch(insertBatch, parentNode, animatedRendering);
         insertBatch = this._addChildrenToFlatListIfExpanded(0, node, insertIndex, animatedRendering, insertBatch, forceFilter);
       }
-    }.bind(this));
+    });
 
     if (!isSubAdding) {
       // animation is not done yet and all added nodes are in visible range
@@ -1765,7 +1765,7 @@ export default class Tree extends Widget {
    * where in the flat list this position is.
    */
   _findInsertPositionInFlatList(node) {
-    var childNodes,
+    let childNodes,
       parentNode = node.parentNode;
 
     // use root nodes as nodes when no other parent node is available (root case)
@@ -1777,25 +1777,25 @@ export default class Tree extends Widget {
 
     // find all visible siblings for our node (incl. our own node, which is probably not yet
     // in the visible nodes map)
-    var thatNode = node;
-    var siblings = childNodes.filter(function(node) {
+    let thatNode = node;
+    let siblings = childNodes.filter(node => {
       return Boolean(this.visibleNodesMap[node.id]) || node === thatNode;
-    }.bind(this));
+    });
 
     // when there are no visible siblings, insert below the parent node
     if (siblings.length === 0) {
       return this._findPositionInFlatList(parentNode) + 1;
     }
 
-    var nodePos = siblings.indexOf(node);
+    let nodePos = siblings.indexOf(node);
 
     // when there are no prev. siblings in the flat list, insert below the parent node
     if (nodePos === 0) {
       return this._findPositionInFlatList(parentNode) + 1;
     }
 
-    var prevSiblingNode = siblings[nodePos - 1];
-    var prevSiblingPos = this._findPositionInFlatList(prevSiblingNode);
+    let prevSiblingNode = siblings[nodePos - 1];
+    let prevSiblingPos = this._findPositionInFlatList(prevSiblingNode);
 
     // when the prev. sibling is not in the flat list, insert below the parent node
     if (prevSiblingPos === -1) {
@@ -1806,7 +1806,7 @@ export default class Tree extends Widget {
     // that's where we want to insert the new node. We go down the flat list
     // starting from the prev. sibling node, until we hit a node that does not
     // belong to the sub tree of the prev. sibling node.
-    var i, checkNode;
+    let i, checkNode;
     for (i = prevSiblingPos; i < this.visibleNodesFlat.length; i++) {
       checkNode = this.visibleNodesFlat[i];
       if (!this._isInSameSubTree(prevSiblingNode, checkNode)) {
@@ -1862,6 +1862,7 @@ export default class Tree extends Widget {
    * Info: the object created here is a bit weird: the array 'insertNodes' is used as function arguments to the Array#splice function at some point.
    * The signature of that function is: array.splice(index, deleteCount[, element1[,  element2 [, ...]]])
    * So the first two elements are numbers and all the following elements are TreeNodes or Pages.
+   * @returns {*}
    */
   newInsertBatch(insertIndex) {
     return {
@@ -1899,7 +1900,7 @@ export default class Tree extends Widget {
     if (animatedRendering && this.viewRangeRendered.from <= insertBatch.lastBatchInsertIndex() && this.viewRangeRendered.to >= insertBatch.lastBatchInsertIndex() && !insertBatch.$animationWrapper) {
       // we are in visible area so we need a animation wrapper
       // if parent is in visible area insert after parent else insert before first node.
-      var lastNodeIndex = insertBatch.lastBatchInsertIndex() - 1,
+      let lastNodeIndex = insertBatch.lastBatchInsertIndex() - 1,
         nodeBefore = this.viewRangeRendered.from === insertBatch.lastBatchInsertIndex() ? null : this.visibleNodesFlat[lastNodeIndex];
       if (nodeBefore && lastNodeIndex >= this.viewRangeRendered.from && lastNodeIndex < this.viewRangeRendered.to && !nodeBefore.attached) {
         // ensure node before is visible
@@ -1912,7 +1913,7 @@ export default class Tree extends Widget {
       } else if (this.$fillBefore) {
         insertBatch.$animationWrapper = $('<div class="animation-wrapper">').insertAfter(this.$fillBefore);
       } else {
-        var nodeAfter = this.visibleNodesFlat[insertBatch.lastBatchInsertIndex()];
+        let nodeAfter = this.visibleNodesFlat[insertBatch.lastBatchInsertIndex()];
         insertBatch.$animationWrapper = $('<div class="animation-wrapper">').insertBefore(nodeAfter.$node);
       }
       insertBatch.animationCompleteFunc = onAnimationComplete;
@@ -1950,11 +1951,11 @@ export default class Tree extends Widget {
       // nothing to add
       return;
     }
-    this.visibleNodesFlat.splice.apply(this.visibleNodesFlat, insertBatch.insertNodes);
+    this.visibleNodesFlat.splice(...insertBatch.insertNodes);
     if (showNodes) {
-      var indexHint = insertBatch.insertAt();
-      for (var i = 2; i < insertBatch.insertNodes.length; i++) {
-        var node = insertBatch.insertNodes[i];
+      let indexHint = insertBatch.insertAt();
+      for (let i = 2; i < insertBatch.insertNodes.length; i++) {
+        let node = insertBatch.insertNodes[i];
         this.showNode(node, false, indexHint);
         if (insertBatch.$animationWrapper) {
           insertBatch.$animationWrapper.append(node.$node);
@@ -1962,7 +1963,7 @@ export default class Tree extends Widget {
         indexHint++;
       }
       if (insertBatch.$animationWrapper) {
-        var h = insertBatch.$animationWrapper.outerHeight();
+        let h = insertBatch.$animationWrapper.outerHeight();
         insertBatch.$animationWrapper
           .css('height', 0)
           .animate({
@@ -2024,12 +2025,8 @@ export default class Tree extends Widget {
       element: node,
       $element: node.$node,
       $scrollable: this.get$Scrollable(),
-      isExpanded: function(element) {
-        return element.expanded;
-      },
-      getChildren: function(parent) {
-        return parent.childNodes;
-      },
+      isExpanded: element => element.expanded,
+      getChildren: parent => parent.childNodes,
       nodePaddingLevel: this.nodePaddingLevel,
       defaultChildHeight: this.nodeHeight
     });
@@ -2086,14 +2083,14 @@ export default class Tree extends Widget {
     if (!this.isBreadcrumbStyleActive()) {
       return;
     }
-    var currentLevel = -1;
+    let currentLevel = -1;
     if (this.selectedNodes.length > 0) {
       currentLevel = this.selectedNodes[0].level;
     }
     // Remove positions after the current level (no restore when going down, only when going up)
     this.scrollTopHistory.splice(currentLevel + 1);
     // Read the scroll top for the current level and use that one if it is set
-    var scrollTopForLevel = this.scrollTopHistory[currentLevel];
+    let scrollTopForLevel = this.scrollTopHistory[currentLevel];
     if (scrollTopForLevel >= 0) {
       this.setScrollTop(scrollTopForLevel);
     }
@@ -2142,7 +2139,7 @@ export default class Tree extends Widget {
     if (options.collectChildren) {
       nodes = nodes.concat(this._collectNodesIfDescendants(nodes, this.selectedNodes));
     }
-    var selectedNodes = this.selectedNodes.slice(); // copy
+    let selectedNodes = this.selectedNodes.slice(); // copy
     if (arrays.removeAll(selectedNodes, nodes)) {
       this.selectNodes(selectedNodes);
     }
@@ -2157,7 +2154,7 @@ export default class Tree extends Widget {
     if (this.isBreadcrumbStyleActive()) {
       return null;
     }
-    var padding = node.level * this.nodePaddingLevel + this.nodePaddingLeft;
+    let padding = node.level * this.nodePaddingLevel + this.nodePaddingLeft;
     if (this.checkable) {
       padding += this.nodeCheckBoxPaddingLeft;
     }
@@ -2171,8 +2168,8 @@ export default class Tree extends Widget {
     if (this.nodePaddingLeft !== null && this.nodeControlPaddingLeft !== null) {
       return;
     }
-    var $dummyNode = this.$data.appendDiv('tree-node');
-    var $dummyNodeControl = $dummyNode.appendDiv('tree-node-control');
+    let $dummyNode = this.$data.appendDiv('tree-node');
+    let $dummyNodeControl = $dummyNode.appendDiv('tree-node-control');
     if (this.nodePaddingLeft === null) {
       this.nodePaddingLeft = $dummyNode.cssPaddingLeft();
     }
@@ -2183,11 +2180,11 @@ export default class Tree extends Widget {
   }
 
   _expandAllParentNodes(node) {
-    var i, currNode = node,
+    let i, currNode = node,
       parentNodes = [];
 
     currNode = node;
-    var nodesToInsert = [];
+    let nodesToInsert = [];
     while (currNode.parentNode) {
       parentNodes.push(currNode.parentNode);
       if (!this.visibleNodesMap[currNode.id]) {
@@ -2217,7 +2214,7 @@ export default class Tree extends Widget {
     if (!nodes || !nodes.length) {
       return;
     }
-    for (var i = scout.nvl(startIndex, 0); i < nodes.length; i++) {
+    for (let i = scout.nvl(startIndex, 0); i < nodes.length; i++) {
       nodes[i].childNodeIndex = i;
     }
   }
@@ -2234,14 +2231,14 @@ export default class Tree extends Widget {
     }
 
     // Append continuous node blocks
-    nodes.sort(function(a, b) {
+    nodes.sort((a, b) => {
       return a.childNodeIndex - b.childNodeIndex;
     });
 
     // Update parent with new child nodes
     if (parentNode) {
       if (parentNode.childNodes && parentNode.childNodes.length > 0) {
-        nodes.forEach(function(entry) {
+        nodes.forEach(entry => {
           // only insert node if not already existing
           if (parentNode.childNodes.indexOf(entry) < 0) {
             arrays.insert(parentNode.childNodes, entry, entry.childNodeIndex);
@@ -2249,7 +2246,7 @@ export default class Tree extends Widget {
         });
         this._updateChildNodeIndex(parentNode.childNodes, nodes[0].childNodeIndex);
       } else {
-        nodes.forEach(function(entry) {
+        nodes.forEach(entry => {
           parentNode.childNodes.push(entry);
         });
       }
@@ -2260,7 +2257,7 @@ export default class Tree extends Widget {
         this._updateItemPath(false, parentNode);
       }
       if (this.rendered) {
-        var opts = {
+        let opts = {
           expansionChanged: true
         };
         this._renderExpansion(parentNode, opts);
@@ -2268,12 +2265,12 @@ export default class Tree extends Widget {
       }
     } else {
       if (this.nodes && this.nodes.length > 0) {
-        nodes.forEach(function(entry) {
+        nodes.forEach(entry => {
           // only insert node if not already existing
           if (this.nodes.indexOf(entry) < 0) {
             arrays.insert(this.nodes, entry, entry.childNodeIndex);
           }
-        }.bind(this));
+        });
         this._updateChildNodeIndex(this.nodes, nodes[0].childNodeIndex);
       } else {
         arrays.pushAll(this.nodes, nodes);
@@ -2299,7 +2296,7 @@ export default class Tree extends Widget {
   updateNodes(nodes) {
     nodes = arrays.ensure(nodes);
     nodes.forEach(function(updatedNode) {
-      var propertiesChanged,
+      let propertiesChanged,
         oldNode = this.nodesMap[updatedNode.id];
 
       // if same instance has been updated we must set the flag always to true
@@ -2341,14 +2338,14 @@ export default class Tree extends Widget {
    *          The target node to be updated
    * @param updatedNode
    *          The new node with potentially updated properties. Default values are already applied!
-   * @returns
+   * @returns {boolean}
    *          true if at least one property has changed, false otherwise. This value is used to
    *          determine if the node has to be rendered again.
    */
   _applyUpdatedNodeProperties(oldNode, updatedNode) {
     // Note: We only update _some_ of the properties, because everything else will be handled
     // with separate events. --> See also: JsonTree.java/handleModelNodesUpdated()
-    var propertiesChanged = false;
+    let propertiesChanged = false;
     if (oldNode.leaf !== updatedNode.leaf) {
       oldNode.leaf = updatedNode.leaf;
       propertiesChanged = true;
@@ -2377,13 +2374,13 @@ export default class Tree extends Widget {
   }
 
   deleteNodes(nodes, parentNode) {
-    var deletedNodes = [];
-    var parentNodesToReindex = [];
-    var topLevelNodesToReindex = [];
+    let deletedNodes = [];
+    let parentNodesToReindex = [];
+    let topLevelNodesToReindex = [];
     nodes = arrays.ensure(nodes).slice(); // copy
 
     nodes.forEach(function(node) {
-      var p = parentNode || node.parentNode;
+      let p = parentNode || node.parentNode;
       if (p) {
         if (node.parentNode !== p) {
           throw new Error('Unexpected parent. Node.parent: ' + node.parentNode + ', parentNode: ' + parentNode);
@@ -2425,9 +2422,9 @@ export default class Tree extends Widget {
   }
 
   _collectNodesIfDescendants(nodes, nodesToCheck) {
-    var result = [];
-    nodesToCheck.forEach(function(nodeToCheck) {
-      if (nodes.some(function(node) {
+    let result = [];
+    nodesToCheck.forEach(nodeToCheck => {
+      if (nodes.some(node => {
         return node.isAncestorOf(nodeToCheck);
       })) {
         result.push(nodeToCheck);
@@ -2437,7 +2434,7 @@ export default class Tree extends Widget {
   }
 
   deleteAllChildNodes(parentNode) {
-    var nodes;
+    let nodes;
     if (parentNode) {
       nodes = parentNode.childNodes;
       parentNode.childNodes = [];
@@ -2503,21 +2500,21 @@ export default class Tree extends Widget {
   }
 
   checkNode(node, checked, options) {
-    var opts = $.extend(options, {
+    let opts = $.extend(options, {
       checked: checked
     });
     this.checkNodes([node], opts);
   }
 
   checkNodes(nodes, options) {
-    var opts = {
+    let opts = {
       checked: true,
       checkOnlyEnabled: true,
       checkChildren: this.autoCheckChildren,
       triggerNodesChecked: true
     };
     $.extend(opts, options);
-    var updatedNodes = [];
+    let updatedNodes = [];
     // use enabled computed because when the parent of the table is disabled, it should not be allowed to check rows
     if (!this.checkable || !this.enabledComputed && opts.checkOnlyEnabled) {
       return;
@@ -2531,7 +2528,7 @@ export default class Tree extends Widget {
         return;
       }
       if (!this.multiCheck && opts.checked) {
-        for (var i = 0; i < this.checkedNodes.length; i++) {
+        for (let i = 0; i < this.checkedNodes.length; i++) {
           this.checkedNodes[i].checked = false;
           this._updateMarkChildrenChecked(this.checkedNodes[i], false, false, true);
           updatedNodes.push(this.checkedNodes[i]);
@@ -2547,7 +2544,7 @@ export default class Tree extends Widget {
       updatedNodes.push(node);
       this._updateMarkChildrenChecked(node, false, opts.checked, true);
       if (opts.checkChildren) {
-        var childOpts = $.extend({}, opts, {
+        let childOpts = $.extend({}, opts, {
           triggerNodesChecked: false
         });
         this.checkNodes(node.childNodes, childOpts);
@@ -2560,14 +2557,14 @@ export default class Tree extends Widget {
       });
     }
     if (this.rendered) {
-      updatedNodes.forEach(function(node) {
+      updatedNodes.forEach(node => {
         node._renderChecked();
       });
     }
   }
 
   uncheckNode(node, options) {
-    var opts = $.extend({
+    let opts = $.extend({
       checkOnlyEnabled: true
     }, options);
     this.uncheckNodes([node], opts);
@@ -2578,7 +2575,7 @@ export default class Tree extends Widget {
    * @param options.collectChildren true to add the checked children to the list of nodes to uncheck
    */
   uncheckNodes(nodes, options) {
-    var opts = {
+    let opts = {
       checked: false
     };
     $.extend(opts, options);
@@ -2595,11 +2592,11 @@ export default class Tree extends Widget {
   }
 
   _showContextMenu(event) {
-    var func = function(event) {
+    let func = function(event) {
       if (!this.rendered) { // check needed because function is called asynchronously
         return;
       }
-      var filteredMenus = this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true),
+      let filteredMenus = this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true),
         $part = $(event.currentTarget);
       if (filteredMenus.length === 0) {
         return; // at least one menu item must be visible
@@ -2632,16 +2629,16 @@ export default class Tree extends Widget {
       return false;
     }
 
-    var $node = $(event.currentTarget);
-    var node = $node.data('node');
+    let $node = $(event.currentTarget);
+    let node = $node.data('node');
     if (!this.hasNode(node)) {
       // if node does not belong to this tree, do nothing (may happen if another tree is embedded inside the node)
       return;
     }
     this._$mouseDownNode = $node;
-    $node.window().one('mouseup', function() {
+    $node.window().one('mouseup', () => {
       this._$mouseDownNode = null;
-    }.bind(this));
+    });
 
     this.selectNodes(node);
 
@@ -2660,8 +2657,8 @@ export default class Tree extends Widget {
       return false;
     }
 
-    var $node = $(event.currentTarget);
-    var node = $node.data('node');
+    let $node = $(event.currentTarget);
+    let node = $node.data('node');
     if (!this._$mouseDownNode || this._$mouseDownNode[0] !== $node[0]) {
       // Don't accept if mouse up happens on another node than mouse down, or mousedown didn't happen on a node at all
       return;
@@ -2682,7 +2679,7 @@ export default class Tree extends Widget {
   }
 
   _updateItemPath(selectionChanged, ultimate) {
-    var selectedNodes, node, level;
+    let selectedNodes, node, level;
     if (selectionChanged) {
       // first remove and select selected
       this.groupedNodes = {};
@@ -2701,16 +2698,16 @@ export default class Tree extends Widget {
       if (selectionChanged) {
         this._inSelectionPathList[node.id] = true;
         if (node.childNodes) {
-          node.childNodes.forEach(function(child) {
+          node.childNodes.forEach(child => {
             this._inSelectionPathList[child.id] = true;
-          }.bind(this));
+          });
         }
       }
       level = node.level;
 
       // find grouping end (ultimate parent)
       while (node.parentNode) {
-        var parent = node.parentNode;
+        let parent = node.parentNode;
         if (this._isGroupingEnd(parent) && !ultimate) {
           ultimate = node;
           if (!selectionChanged) {
@@ -2734,13 +2731,13 @@ export default class Tree extends Widget {
     // ------ helper function ------//
 
     function addToGroup(nodes) {
-      nodes.forEach(function(node) {
+      nodes.forEach(node => {
         this.groupedNodes[node.id] = true;
         node._decorate();
         if (node.expanded && node.isFilterAccepted()) {
           addToGroup.call(this, node.childNodes);
         }
-      }.bind(this));
+      });
     }
   }
 
@@ -2788,11 +2785,11 @@ export default class Tree extends Widget {
   }
 
   filter(notAnimated) {
-    var useAnimation = Boolean(!notAnimated),
+    let useAnimation = Boolean(!notAnimated),
       newHiddenNodes = [];
     // Filter nodes
-    this.visitNodes(function(node) {
-      var changed = this._applyFiltersForNode(node);
+    this.visitNodes(node => {
+      let changed = this._applyFiltersForNode(node);
       if (changed) {
         if (!node.isFilterAccepted()) {
           arrays.pushAll(newHiddenNodes, this._removeFromFlatList(node, useAnimation));
@@ -2821,7 +2818,7 @@ export default class Tree extends Widget {
       }
       // don't process children->optimize performance
       return true;
-    }.bind(this));
+    });
 
     this._nodesFiltered(newHiddenNodes);
   }
@@ -2831,10 +2828,10 @@ export default class Tree extends Widget {
    */
   filterVisibleNodes(animated) {
     // Filter nodes
-    var newHiddenNodes = [];
-    for (var i = 0; i < this.visibleNodesFlat.length; i++) {
-      var node = this.visibleNodesFlat[i];
-      var changed = this._applyFiltersForNode(node);
+    let newHiddenNodes = [];
+    for (let i = 0; i < this.visibleNodesFlat.length; i++) {
+      let node = this.visibleNodesFlat[i];
+      let changed = this._applyFiltersForNode(node);
       if (changed) {
         if (!node.isFilterAccepted()) {
           i--;
@@ -2853,8 +2850,8 @@ export default class Tree extends Widget {
   }
 
   _nodeAcceptedByFilters(node) {
-    for (var i = 0; i < this._filters.length; i++) {
-      var filter = this._filters[i];
+    for (let i = 0; i < this._filters.length; i++) {
+      let filter = this._filters[i];
       if (!filter.accept(node)) {
         return false;
       }
@@ -2866,7 +2863,7 @@ export default class Tree extends Widget {
    * @returns {Boolean} true if node state has changed, false if not
    */
   _applyFiltersForNode(node) {
-    var changed = node.filterDirty;
+    let changed = node.filterDirty;
     if (this._nodeAcceptedByFilters(node)) {
       if (!node.filterAccepted) {
         node.filterAccepted = true;
@@ -2878,7 +2875,7 @@ export default class Tree extends Widget {
     }
     if (changed) {
       node.filterDirty = false;
-      node.childNodes.forEach(function(childNode) {
+      node.childNodes.forEach(childNode => {
         childNode.filterDirty = true;
       });
       return true;
@@ -2894,7 +2891,7 @@ export default class Tree extends Widget {
       return;
     }
     nodes = nodes.filter(function(node) {
-      var index = indexHint === undefined ? this.visibleNodesFlat.indexOf(node) : indexHint;
+      let index = indexHint === undefined ? this.visibleNodesFlat.indexOf(node) : indexHint;
       if (index === -1 || !(this.viewRangeRendered.from + this.viewRangeSize >= index && this.viewRangeRendered.from <= index && this.viewRangeRendered.size() > 0) || node.attached) {
         // node is not visible
         return false;
@@ -2918,7 +2915,7 @@ export default class Tree extends Widget {
     // The measuring is separated into 3 blocks for performance reasons -> separates reading and setting of styles
     // 1. Prepare style for measuring
     if (this.isHorizontalScrollingEnabled()) {
-      nodes.forEach(function(node) {
+      nodes.forEach(node => {
         node.$node.css('width', 'auto');
         node.$node.css('display', 'inline-block');
       }, this);
@@ -2930,8 +2927,8 @@ export default class Tree extends Widget {
       if (!this.isHorizontalScrollingEnabled()) {
         return;
       }
-      var newWidth = node.$node.outerWidth();
-      var oldWidth = node.width ? node.width : 0;
+      let newWidth = node.$node.outerWidth();
+      let oldWidth = node.width ? node.width : 0;
       if (oldWidth === this.maxNodeWidth && newWidth < this.maxNodeWidth) {
         this.maxNodeWidth = 0;
         this.nodeWidthDirty = true;
@@ -2963,7 +2960,7 @@ export default class Tree extends Widget {
   }
 
   _insertNodeInDOMAtPlace(node, index) {
-    var $node = node.$node;
+    let $node = node.$node;
 
     if (index === 0) {
       if (this.$fillBefore) {
@@ -2975,7 +2972,7 @@ export default class Tree extends Widget {
     }
 
     // append after index
-    var nodeBefore = this.visibleNodesFlat[index - 1];
+    let nodeBefore = this.visibleNodesFlat[index - 1];
     this._ensureNodeInDOM(nodeBefore, false, index - 1);
     if (nodeBefore.attached) {
       $node.insertAfter(nodeBefore.$node);
@@ -2983,7 +2980,7 @@ export default class Tree extends Widget {
     }
 
     if (index + 1 < this.visibleNodesFlat.length) {
-      var nodeAfter = this.visibleNodesFlat[index + 1];
+      let nodeAfter = this.visibleNodesFlat[index + 1];
       if (nodeAfter.attached) {
         $node.insertBefore(nodeAfter.$node);
         return;
@@ -3009,20 +3006,20 @@ export default class Tree extends Widget {
     if (!node.rendered) {
       return;
     }
-    var $node = node.$node;
+    let $node = node.$node;
     if ($node.is('.showing')) {
       return;
     }
     $node.addClass('showing');
     $node.removeClass('hiding');
-    var that = this;
+    let that = this;
     if (useAnimation) {
       // hide node first and then make it appear using slideDown (setVisible(false) won't work because it would stay invisible during the animation)
       $node.hide();
       $node.stop(false, true).slideDown({
         duration: 250,
         start: that.startAnimationFunc,
-        complete: function() {
+        complete: () => {
           that.runningAnimationsFinishFunc();
           $node.removeClass('showing');
         }
@@ -3035,7 +3032,7 @@ export default class Tree extends Widget {
       return;
     }
     this.viewRangeDirty = true;
-    var that = this,
+    let that = this,
       $node = node.$node;
     if (!$node) {
       // node is not rendered
@@ -3053,7 +3050,7 @@ export default class Tree extends Widget {
       $node.stop(false, true).slideUp({
         duration: 250,
         start: that.startAnimationFunc,
-        complete: function() {
+        complete: () => {
           that.runningAnimationsFinishFunc();
           $node.removeClass('hiding');
           if (!$node.hasClass('showing')) {
@@ -3070,15 +3067,15 @@ export default class Tree extends Widget {
   }
 
   _nodesToIds(nodes) {
-    return nodes.map(function(node) {
+    return nodes.map(node => {
       return node.id;
     });
   }
 
   _nodesByIds(ids) {
-    return ids.map(function(id) {
+    return ids.map(id => {
       return this.nodesMap[id];
-    }.bind(this));
+    });
   }
 
   _nodeById(id) {
@@ -3097,9 +3094,9 @@ export default class Tree extends Widget {
       return;
     }
 
-    var $node = $(event.currentTarget);
-    var node = $node.data('node');
-    var expanded = !$node.hasClass('expanded');
+    let $node = $(event.currentTarget);
+    let node = $node.data('node');
+    let expanded = !$node.hasClass('expanded');
     this.doNodeAction(node, expanded);
   }
 
@@ -3123,10 +3120,10 @@ export default class Tree extends Widget {
       return false;
     }
 
-    var $node = $(event.currentTarget).parent();
-    var node = $node.data('node');
-    var expanded = !$node.hasClass('expanded');
-    var expansionOpts = {
+    let $node = $(event.currentTarget).parent();
+    let node = $node.data('node');
+    let expanded = !$node.hasClass('expanded');
+    let expansionOpts = {
       lazy: false // always show all nodes when the control gets clicked
     };
 
@@ -3188,18 +3185,18 @@ export default class Tree extends Widget {
 
   // same as on Table.prototype._onDesktopPopupOpen
   _onDesktopPopupOpen(event) {
-    var popup = event.popup;
+    let popup = event.popup;
     if (!this.enabledComputed) {
       return;
     }
     // Set tree style to focused if a context menu or a menu bar popup opens, so that it looks as it still has the focus
     if (this.has(popup) && popup instanceof ContextMenuPopup) {
       this.$container.addClass('focused');
-      popup.one('destroy', function() {
+      popup.one('destroy', () => {
         if (this.rendered) {
           this.$container.removeClass('focused');
         }
-      }.bind(this));
+      });
     }
   }
 
@@ -3216,11 +3213,11 @@ export default class Tree extends Widget {
     if (!$rootNode) {
       return $();
     }
-    var rootLevel = parseFloat($rootNode.attr('data-level'));
+    let rootLevel = parseFloat($rootNode.attr('data-level'));
     // Find first node after the root element that has the same or a lower level
-    var $nextNode = $rootNode.next();
+    let $nextNode = $rootNode.next();
     while ($nextNode.length > 0) {
-      var level = parseFloat($nextNode.attr('data-level'));
+      let level = parseFloat($nextNode.attr('data-level'));
       if (isNaN(level) || level <= rootLevel) {
         break;
       }
@@ -3228,7 +3225,7 @@ export default class Tree extends Widget {
     }
 
     // The result set consists of all nodes between the root node and the found node
-    var $result = $rootNode.nextUntil($nextNode);
+    let $result = $rootNode.nextUntil($nextNode);
     if (includeRootNodeInResult === undefined || includeRootNodeInResult) {
       $result = $result.add($rootNode);
     }
@@ -3240,14 +3237,14 @@ export default class Tree extends Widget {
    * if func returns true the children of the visited node are not visited.
    */
   static visitNodes(func, nodes, parentNode) {
-    var i, node;
+    let i, node;
     if (!nodes) {
       return;
     }
 
     for (i = 0; i < nodes.length; i++) {
       node = nodes[i];
-      var doNotProcessChildren = func(node, parentNode);
+      let doNotProcessChildren = func(node, parentNode);
       if (!doNotProcessChildren && node.childNodes.length > 0) {
         Tree.visitNodes(func, node.childNodes, node);
       }

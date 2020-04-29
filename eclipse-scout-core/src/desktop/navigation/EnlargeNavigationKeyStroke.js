@@ -25,7 +25,7 @@ export default class EnlargeNavigationKeyStroke extends KeyStroke {
   }
 
   _isEnabled() {
-    var enabled = super._isEnabled();
+    let enabled = super._isEnabled();
     return enabled && this.field.rightVisible;
   }
 
@@ -34,7 +34,7 @@ export default class EnlargeNavigationKeyStroke extends KeyStroke {
   }
 
   _postRenderKeyBox($drawingArea, $keyBox) {
-    var handleOffset, keyBoxLeft, keyBoxTop,
+    let handleOffset, keyBoxLeft, keyBoxTop,
       handle = this.field;
 
     $keyBox.addClass('navigation-handle-key-box right');

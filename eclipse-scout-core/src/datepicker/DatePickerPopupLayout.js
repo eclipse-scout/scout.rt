@@ -19,7 +19,7 @@ export default class DatePickerPopupLayout extends PopupLayout {
   }
 
   layout($container) {
-    var size,
+    let size,
       htmlComp = this.popup.htmlComp,
       htmlPicker = this.popup.picker.htmlComp;
 
@@ -39,7 +39,7 @@ export default class DatePickerPopupLayout extends PopupLayout {
   }
 
   preferredLayoutSize($container) {
-    var prefSize,
+    let prefSize,
       htmlComp = this.popup.htmlComp,
       htmlPicker = this.popup.picker.htmlComp;
 

@@ -18,13 +18,13 @@ export default class SimpleTabViewContentLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var currentView = this.tabBox.currentView;
+    let currentView = this.tabBox.currentView;
     if (!currentView || !currentView.rendered || !currentView.htmlComp) {
       return;
     }
 
-    var htmlContainer = HtmlComponent.get($container);
-    var size = htmlContainer.availableSize({exact: true})
+    let htmlContainer = HtmlComponent.get($container);
+    let size = htmlContainer.availableSize({exact: true})
       .subtract(htmlContainer.insets())
       .subtract(currentView.htmlComp.margins());
 
@@ -32,13 +32,13 @@ export default class SimpleTabViewContentLayout extends AbstractLayout {
   }
 
   preferredLayoutSize($container) {
-    var currentView = this.tabBox.currentView;
+    let currentView = this.tabBox.currentView;
     if (!currentView || !currentView.rendered || !currentView.htmlComp) {
       return new Dimension();
     }
 
-    var htmlContainer = HtmlComponent.get($container);
-    var prefSize = currentView.htmlComp.prefSize()
+    let htmlContainer = HtmlComponent.get($container);
+    let prefSize = currentView.htmlComp.prefSize()
       .add(htmlContainer.insets())
       .add(currentView.htmlComp.margins());
 

@@ -19,7 +19,7 @@ export default class BrowserFieldLayout extends FormFieldLayout {
   }
 
   preferredLayoutSize($container, options) {
-    var prefSize = super.preferredLayoutSize($container, options);
+    let prefSize = super.preferredLayoutSize($container, options);
     if (this._isIFrameReadable()) {
       prefSize.height = this.browserField.$field.contents().height() + // get height of content
         this.browserField.iframe.htmlComp.insets().vertical() + // add insets of iframe
@@ -29,8 +29,8 @@ export default class BrowserFieldLayout extends FormFieldLayout {
   }
 
   _isIFrameReadable() {
-    var field = this.browserField;
-    var perms = field.sandboxPermissions;
+    let field = this.browserField;
+    let perms = field.sandboxPermissions;
     if (field.sandboxEnabled && (perms && perms.indexOf('allow-same-origin') === -1)) {
       $.log.isWarnEnabled() && $.log.warn('Access to IFrame denied, cannot read height.' +
         ' Reason: sandbox is enabled or "allow-same-origin" is not set');

@@ -25,7 +25,7 @@ export default class TextColumnUserFilter extends ColumnUserFilter {
    * @override ColumnUserFilter.js
    */
   createFilterAddedEventData() {
-    var data = super.createFilterAddedEventData();
+    let data = super.createFilterAddedEventData();
     data.freeText = this.freeText;
     return data;
   }
@@ -41,7 +41,7 @@ export default class TextColumnUserFilter extends ColumnUserFilter {
    * @override ColumnUserFilter.js
    */
   acceptByFields(key, normKey, row) {
-    var filterFieldText = strings.nvl(this.freeText).toLowerCase(),
+    let filterFieldText = strings.nvl(this.freeText).toLowerCase(),
       rowText = strings.nvl(this.column.cellTextForTextFilter(row)).toLowerCase();
     return rowText.indexOf(filterFieldText) > -1;
   }

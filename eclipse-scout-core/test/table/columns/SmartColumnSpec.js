@@ -11,23 +11,23 @@
 import {TableSpecHelper} from '@eclipse-scout/testing';
 import Cell from '../../../src/cell/Cell';
 
-describe('SmartColumn', function() {
-  var session, helper;
+describe('SmartColumn', () => {
+  let session, helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
   // SmartColumn must deal with values of type number or string
-  it('isContentValid', function() {
-    var table = helper.createTable({
+  it('isContentValid', () => {
+    let table = helper.createTable({
       columns: [{
         objectType: 'SmartColumn',
         mandatory: true
@@ -36,8 +36,8 @@ describe('SmartColumn', function() {
     table.insertRow({
       cells: [null]
     });
-    var column = table.columns[0];
-    var row = table.rows[0];
+    let column = table.columns[0];
+    let row = table.rows[0];
     expect(column.isContentValid(row).valid).toBe(false);
     column.setCellValue(row, '');
     expect(column.isContentValid(row).valid).toBe(false);
@@ -53,24 +53,24 @@ describe('SmartColumn', function() {
    * Makes sure no lookup call is executed (this would throw an error, because no lookup call
    * is configured for the column / smart-field.
    */
-  it('must NOT execute a lookup by key when the editor is initialized', function() {
-    var table = helper.createTable({
+  it('must NOT execute a lookup by key when the editor is initialized', () => {
+    let table = helper.createTable({
       columns: [{
         objectType: 'SmartColumn',
         mandatory: true
       }]
     });
-    var cell = new Cell();
+    let cell = new Cell();
     cell.setText('Foo');
     cell.setValue(7);
     cell.setEditable(true);
     table.insertRow({
       cells: [cell]
     });
-    var column = table.columns[0];
-    var row = table.rows[0];
-    var field = null;
-    table.on('startCellEdit', function(event) {
+    let column = table.columns[0];
+    let row = table.rows[0];
+    let field = null;
+    table.on('startCellEdit', event => {
       field = event.field;
     });
     table.render();

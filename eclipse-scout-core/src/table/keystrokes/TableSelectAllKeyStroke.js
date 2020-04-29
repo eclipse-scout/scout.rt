@@ -24,7 +24,7 @@ export default class TableSelectAllKeyStroke extends KeyStroke {
   }
 
   handle(event) {
-    var table = this.field;
+    let table = this.field;
     table.toggleSelection();
     table.selectionHandler.lastActionRow = null;
   }

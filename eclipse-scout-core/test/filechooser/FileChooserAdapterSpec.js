@@ -10,24 +10,24 @@
  */
 import {RemoteEvent, scout} from '../../src/index';
 
-describe('FileChooserAdapter', function() {
-  var session;
+describe('FileChooserAdapter', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
-  describe('cancel', function() {
-    it('does not close the chooser but sends a cancel event', function() {
-      var fileChooser = scout.create('FileChooser', {
+  describe('cancel', () => {
+    it('does not close the chooser but sends a cancel event', () => {
+      let fileChooser = scout.create('FileChooser', {
         parent: session.desktop
       });
       linkWidgetAndAdapter(fileChooser, 'FileChooserAdapter');
@@ -40,7 +40,7 @@ describe('FileChooserAdapter', function() {
       expect($('.file-chooser').length).toBe(1);
 
       sendQueuedAjaxCalls();
-      var event = new RemoteEvent(fileChooser.id, 'cancel');
+      let event = new RemoteEvent(fileChooser.id, 'cancel');
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
   });

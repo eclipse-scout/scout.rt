@@ -27,11 +27,11 @@ export default class PageWithNodes extends Page {
    * @override Page.js
    */
   _createTable() {
-    var nodeColumn = scout.create('Column', {
+    let nodeColumn = scout.create('Column', {
       id: 'NodeColumn',
       session: this.session
     });
-    var table = scout.create('Table', {
+    let table = scout.create('Table', {
       parent: this.parent,
       id: 'PageWithNodesTable',
       autoResizeColumns: true,
@@ -48,15 +48,15 @@ export default class PageWithNodes extends Page {
   }
 
   _rebuildDetailTable(childPages) {
-    var table = this.detailTable;
+    let table = this.detailTable;
     this._unlinkAllTableRows(table.rows);
     table.deleteAllRows();
-    var rows = this._createTableRowsForChildPages(childPages);
+    let rows = this._createTableRowsForChildPages(childPages);
     table.insertRows(rows);
   }
 
   _unlinkAllTableRows(rows) {
-    rows.forEach(function(row) {
+    rows.forEach(row => {
       if (row.page) {
         row.page.unlinkWithRow(row);
       }
@@ -65,7 +65,7 @@ export default class PageWithNodes extends Page {
 
   _createTableRowsForChildPages(childPages) {
     return childPages.map(function(childPage) {
-      var row = scout.create('TableRow', {
+      let row = scout.create('TableRow', {
         parent: this.detailTable,
         cells: [childPage.text]
       });
@@ -79,13 +79,13 @@ export default class PageWithNodes extends Page {
    */
   loadChildren() {
     this.childrenLoaded = false;
-    return this._createChildPages().done(function(childPages) {
+    return this._createChildPages().done(childPages => {
       this._rebuildDetailTable(childPages);
       if (childPages.length > 0) {
         this.getOutline().insertNodes(childPages, this);
       }
       this.childrenLoaded = true;
-    }.bind(this));
+    });
   }
 
   /**

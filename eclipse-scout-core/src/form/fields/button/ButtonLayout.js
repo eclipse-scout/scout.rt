@@ -20,34 +20,34 @@ export default class ButtonLayout extends FormFieldLayout {
   layout($container) {
     super.layout($container);
 
-    var $icon = this.button.get$Icon(),
+    let $icon = this.button.get$Icon(),
       $submenuIcon = this.button.$submenuIcon,
       $label = this.button.$buttonLabel,
       $fieldContainer = this.button.$fieldContainer;
 
     // Set max width to make it possible to set text-overflow: ellipsis using CSS
     $label.css('max-width', ''); // reset required because .size() operations below might return wrong results when label contains complex HTML
-    var submenuIconWidth = $submenuIcon ? graphics.size($submenuIcon, {
+    let submenuIconWidth = $submenuIcon ? graphics.size($submenuIcon, {
       includeMargin: true,
       exact: true
     }).width : 0;
-    var iconWidth = $icon.length ? graphics.size($icon, {
+    let iconWidth = $icon.length ? graphics.size($icon, {
       includeMargin: true,
       exact: true
     }).width : 0;
     // Round up to make sure ellipsis are not shown unnecessarily when having rounding issues (e.g. in IE 11)
-    var labelMaxWidth = Math.ceil($fieldContainer.width() - (submenuIconWidth + iconWidth));
+    let labelMaxWidth = Math.ceil($fieldContainer.width() - (submenuIconWidth + iconWidth));
     $label.css('max-width', labelMaxWidth);
   }
 
   preferredLayoutSize($container, options) {
-    var $label = this.button.$buttonLabel;
+    let $label = this.button.$buttonLabel;
 
     // Reset max width before calculating pref size
-    var maxWidth = $label.css('max-width');
+    let maxWidth = $label.css('max-width');
     $label.css('max-width', '');
 
-    var prefSize = super.preferredLayoutSize($container, options);
+    let prefSize = super.preferredLayoutSize($container, options);
     $label.css('max-width', maxWidth);
 
     return prefSize;

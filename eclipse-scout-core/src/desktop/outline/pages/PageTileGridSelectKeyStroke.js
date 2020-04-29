@@ -19,15 +19,15 @@ export default class PageTileGridSelectKeyStroke extends RangeKeyStroke {
     // range [1..9]
     this.registerRange(
       keys['1'], // range from
-      function() {
+      () => {
         return keys[Math.min(this._tiles().length, 9)]; // range to
-      }.bind(this)
+      }
     );
 
     // rendering hints
     this.renderingHints.$drawingArea = function($drawingArea, event) {
-      var index = event.which - keys['1'];
-      var tiles = this._tiles();
+      let index = event.which - keys['1'];
+      let tiles = this._tiles();
       if (index < tiles.length && tiles[index].tileWidget instanceof TileButton) {
         return tiles[index].tileWidget.$fieldContainer;
       }
@@ -39,13 +39,13 @@ export default class PageTileGridSelectKeyStroke extends RangeKeyStroke {
    * @override
    */
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     if (!accepted) {
       return false;
     }
 
-    var index = keys.codesToKeys[event.which] - 1;
-    var tiles = this._tiles();
+    let index = keys.codesToKeys[event.which] - 1;
+    let tiles = this._tiles();
 
     if (index < tiles.length && tiles[index].tileWidget instanceof TileButton) {
       event._$element = tiles[index].$container;
@@ -60,7 +60,7 @@ export default class PageTileGridSelectKeyStroke extends RangeKeyStroke {
    * @override
    */
   handle(event) {
-    var tile = event._$element.data('widget');
+    let tile = event._$element.data('widget');
     tile.tileWidget.doAction();
   }
 

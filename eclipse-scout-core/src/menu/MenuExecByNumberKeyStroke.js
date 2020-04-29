@@ -18,19 +18,17 @@ export default class MenuExecByNumberKeyStroke extends MenuNavigationExecKeyStro
     this.which = [keys[1], keys[2], keys[3], keys[4], keys[5], keys[6], keys[7], keys[8], keys[9]];
     this.renderingHints.render = true;
     this.renderingHints.hAlign = HAlign.RIGHT;
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
-      return event.$menuItem;
-    };
+    this.renderingHints.$drawingArea = ($drawingArea, event) => event.$menuItem;
   }
 
   _accept(event) {
-    var accepted = super._accept(event);
+    let accepted = super._accept(event);
     if (!accepted) {
       return false;
     }
 
-    var menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
-    var index = keys.codesToKeys[event.which];
+    let menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
+    let index = keys.codesToKeys[event.which];
     event.$menuItem = menuItems.$allVisible.eq(index - 1);
     if (event.$menuItem.length > 0) {
       return true;

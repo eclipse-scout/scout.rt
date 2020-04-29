@@ -34,7 +34,7 @@ export default class EventSupport {
    */
   on(type, func, origFunc) {
     this._assertFunc(func);
-    var listener = {
+    let listener = {
       type: type,
       func: func,
       origFunc: origFunc
@@ -52,11 +52,10 @@ export default class EventSupport {
    */
   one(type, func) {
     this._assertFunc(func);
-    var that = this,
-      offFunc = function(event) {
-        that.off(type, offFunc);
-        func(event);
-      };
+    let offFunc = event => {
+      this.off(type, offFunc);
+      func(event);
+    };
     return this.on(type, offFunc, func);
   }
 
@@ -65,11 +64,11 @@ export default class EventSupport {
       return;
     }
 
-    for (var i = this._eventListeners.length - 1; i >= 0; i--) {
-      var listener = this._eventListeners[i];
-      var funcMatches = (func === listener.func || func === listener.origFunc);
-      var typeMatches = (type === listener.type);
-      var remove = false;
+    for (let i = this._eventListeners.length - 1; i >= 0; i--) {
+      let listener = this._eventListeners[i];
+      let funcMatches = (func === listener.func || func === listener.origFunc);
+      let typeMatches = (type === listener.type);
+      let remove = false;
       if (func && type) {
         remove = (funcMatches && typeMatches);
       } else if (func) {
@@ -89,7 +88,7 @@ export default class EventSupport {
    * The promise is resolved as soon as the event is triggered.
    */
   when(type) {
-    var deferred = $.Deferred();
+    let deferred = $.Deferred();
     this.one(type, deferred.resolve.bind(deferred));
     return deferred.promise();
   }
@@ -103,8 +102,8 @@ export default class EventSupport {
   }
 
   count(type, func) {
-    var count = 0;
-    this._eventListeners.forEach(function(listener) {
+    let count = 0;
+    this._eventListeners.forEach(listener => {
       if (type && type !== listener.type) {
         return;
       }
@@ -120,7 +119,7 @@ export default class EventSupport {
     event = event || {};
     event.type = type;
 
-    var i, listener, listeners = this._eventListeners.slice();
+    let i, listener, listeners = this._eventListeners.slice();
     for (i = 0; i < listeners.length; i++) {
       listener = listeners[i];
       if (!listener.type || typeMatches.call(this, event, listener.type)) {
@@ -131,10 +130,10 @@ export default class EventSupport {
     // ---- Helper functions -----
 
     function typeMatches(event, listenerType) {
-      var eventType = event.type;
-      var types = listenerType.split(' ');
+      let eventType = event.type;
+      let types = listenerType.split(' ');
       // support for multi type definition 'type1 type2 [...]'
-      for (var i = 0; i < types.length; i++) {
+      for (let i = 0; i < types.length; i++) {
         if (eventType === types[i]) {
           return true;
         }
@@ -150,10 +149,10 @@ export default class EventSupport {
     if (listenerType.indexOf(':') < 0) {
       return false;
     }
-    var parts = listenerType.split(':');
-    var type = parts[0];
-    var subType = parts[1];
-    var predicate = this._subTypePredicates[type];
+    let parts = listenerType.split(':');
+    let type = parts[0];
+    let subType = parts[1];
+    let predicate = this._subTypePredicates[type];
     if (!predicate) {
       return;
     }

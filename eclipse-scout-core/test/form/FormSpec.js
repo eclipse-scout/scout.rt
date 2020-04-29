@@ -11,8 +11,8 @@
 import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
 import {Form, NullWidget, Rectangle, scout, Status, webstorage} from '../../src/index';
 
-describe('Form', function() {
-  var session, helper, outlineHelper;
+describe('Form', () => {
+  let session, helper, outlineHelper;
 
   function closeMessageBox() {
     if (session && session.$entryPoint) {
@@ -20,7 +20,7 @@ describe('Form', function() {
     }
   }
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     jasmine.Ajax.install();
     session = sandboxSession({
@@ -35,14 +35,14 @@ describe('Form', function() {
     uninstallUnloadHandlers(session);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
   });
 
-  describe('init', function() {
-    it('marks the root group box as main box', function() {
-      var form = scout.create('Form', {
+  describe('init', () => {
+    it('marks the root group box as main box', () => {
+      let form = scout.create('Form', {
         parent: session.desktop,
         rootGroupBox: {
           objectType: 'GroupBox',
@@ -56,12 +56,12 @@ describe('Form', function() {
     });
   });
 
-  describe('open', function() {
+  describe('open', () => {
 
-    it('opens the form', function(done) {
-      var form = helper.createFormWithOneField();
+    it('opens the form', done => {
+      let form = helper.createFormWithOneField();
       form.open()
-        .then(function() {
+        .then(() => {
           expect(form.rendered).toBe(true);
           expect(session.desktop.dialogs.indexOf(form) > -1).toBe(true);
         })
@@ -69,23 +69,23 @@ describe('Form', function() {
         .always(done);
     });
 
-    it('adds it to the desktop if no display parent is provided', function(done) {
-      var form = helper.createFormWithOneField();
+    it('adds it to the desktop if no display parent is provided', done => {
+      let form = helper.createFormWithOneField();
       form.open()
-        .then(function() {
+        .then(() => {
           expect(session.desktop.dialogs.indexOf(form) > -1).toBe(true);
         })
         .catch(fail)
         .always(done);
     });
 
-    it('adds it to the provided display parent', function(done) {
-      var parentForm = helper.createFormWithOneField();
-      var form = helper.createFormWithOneField();
+    it('adds it to the provided display parent', done => {
+      let parentForm = helper.createFormWithOneField();
+      let form = helper.createFormWithOneField();
       form.displayParent = parentForm;
       parentForm.open()
         .then(form.open.bind(form))
-        .then(function() {
+        .then(() => {
           expect(form.rendered).toBe(true);
           expect(session.desktop.dialogs.indexOf(form) > -1).toBe(false);
           expect(parentForm.dialogs.indexOf(form) > -1).toBe(true);
@@ -95,12 +95,12 @@ describe('Form', function() {
     });
   });
 
-  describe('close', function() {
+  describe('close', () => {
 
-    it('closes the form', function(done) {
-      var form = helper.createFormWithOneField();
+    it('closes the form', done => {
+      let form = helper.createFormWithOneField();
       form.open()
-        .then(function() {
+        .then(() => {
           form.close();
           expect(session.desktop.dialogs.indexOf(form) > -1).toBe(false);
           expect(form.rendered).toBe(false);
@@ -110,10 +110,10 @@ describe('Form', function() {
         .always(done);
     });
 
-    it('closes the form even if opening is still pending', function(done) {
-      var form = helper.createFormWithOneField();
+    it('closes the form even if opening is still pending', done => {
+      let form = helper.createFormWithOneField();
       form.open()
-        .then(function() {
+        .then(() => {
           expect(session.desktop.dialogs.indexOf(form) > -1).toBe(false);
           expect(form.rendered).toBe(false);
           expect(form.destroyed).toBe(true);
@@ -125,13 +125,13 @@ describe('Form', function() {
       form.close();
     });
 
-    it('removes it from the display parent', function(done) {
-      var parentForm = helper.createFormWithOneField();
-      var form = helper.createFormWithOneField();
+    it('removes it from the display parent', done => {
+      let parentForm = helper.createFormWithOneField();
+      let form = helper.createFormWithOneField();
       form.displayParent = parentForm;
       parentForm.open()
         .then(form.open.bind(form))
-        .then(function() {
+        .then(() => {
           expect(parentForm.dialogs.indexOf(form) > -1).toBe(true);
 
           form.close();
@@ -145,18 +145,18 @@ describe('Form', function() {
 
   });
 
-  describe('whenClose', function() {
+  describe('whenClose', () => {
 
-    it('returns a promise which is resolved when the form is closed', function(done) {
-      var form = helper.createFormWithOneField();
+    it('returns a promise which is resolved when the form is closed', done => {
+      let form = helper.createFormWithOneField();
       form.open()
-        .then(function() {
+        .then(() => {
           form.close();
         })
         .catch(fail);
 
       form.whenClose()
-        .then(function() {
+        .then(() => {
           expect(form.rendered).toBe(false);
           expect(form.destroyed).toBe(true);
         })
@@ -166,32 +166,32 @@ describe('Form', function() {
 
   });
 
-  describe('save', function() {
+  describe('save', () => {
 
-    it('calls _save', function(done) {
-      var form = helper.createFormWithOneField();
-      var saveCalled = false;
-      form._save = function(data) {
+    it('calls _save', done => {
+      let form = helper.createFormWithOneField();
+      let saveCalled = false;
+      form._save = data => {
         saveCalled = true;
         return $.resolvedPromise();
       };
 
       form.touch();
       form.save()
-        .then(function() {
+        .then(() => {
           expect(saveCalled).toBe(true);
         })
         .catch(fail)
         .always(done);
     });
 
-    it('is marked saved after save', function(done) {
-      var form = helper.createFormWithOneField();
-      var field = form.rootGroupBox.fields[0];
+    it('is marked saved after save', done => {
+      let form = helper.createFormWithOneField();
+      let field = form.rootGroupBox.fields[0];
 
       field.setValue('whatever');
       form.save()
-        .then(function() {
+        .then(() => {
           // it should be marked saved as the save was successful
           expect(field.touched).toBe(false);
         })
@@ -199,18 +199,16 @@ describe('Form', function() {
         .always(done);
     });
 
-    it('is not marked saved on error', function(done) {
+    it('is not marked saved on error', done => {
       jasmine.clock().install();
-      var form = helper.createFormWithOneField();
-      var field = form.rootGroupBox.fields[0];
+      let form = helper.createFormWithOneField();
+      let field = form.rootGroupBox.fields[0];
 
-      form._save = function(data) {
-        return $.resolvedPromise(Status.error());
-      };
+      form._save = data => $.resolvedPromise(Status.error());
 
       field.setValue('whatever');
       form.save()
-        .then(function() {
+        .then(() => {
           // it should not be marked saved because the save returned an error
           expect(field.touched).toBe(true);
         })
@@ -222,17 +220,17 @@ describe('Form', function() {
       jasmine.clock().uninstall();
     });
 
-    it('does not call save if save is not required', function(done) {
-      var form = helper.createFormWithOneField();
-      var saveCalled = false;
-      form._save = function(data) {
+    it('does not call save if save is not required', done => {
+      let form = helper.createFormWithOneField();
+      let saveCalled = false;
+      form._save = data => {
         saveCalled = true;
         return $.resolvedPromise();
       };
 
       // form.touch() has not been called -> _save must not be called
       form.save()
-        .then(function() {
+        .then(() => {
           expect(saveCalled).toBe(false);
         })
         .catch(fail)
@@ -241,18 +239,18 @@ describe('Form', function() {
 
   });
 
-  describe('whenSave', function() {
+  describe('whenSave', () => {
 
-    it('returns a promise which is resolved when the form is saved', function(done) {
-      var form = helper.createFormWithOneField();
-      var saveCalled = false;
-      form._save = function(data) {
+    it('returns a promise which is resolved when the form is saved', done => {
+      let form = helper.createFormWithOneField();
+      let saveCalled = false;
+      form._save = data => {
         saveCalled = true;
         return $.resolvedPromise();
       };
 
       form.whenSave()
-        .then(function() {
+        .then(() => {
           expect(saveCalled).toBe(true);
         })
         .catch(fail)
@@ -264,10 +262,10 @@ describe('Form', function() {
 
   });
 
-  describe('abort', function() {
+  describe('abort', () => {
 
-    it('closes the form if there is a close button', function(done) {
-      var form = scout.create('Form', {
+    it('closes the form if there is a close button', done => {
+      let form = scout.create('Form', {
         parent: session.desktop,
         rootGroupBox: {
           objectType: 'GroupBox',
@@ -279,7 +277,7 @@ describe('Form', function() {
       spyOn(form, 'close').and.callThrough();
       spyOn(form, 'cancel').and.callThrough();
       form.open()
-        .then(function() {
+        .then(() => {
           form.abort();
           expect(form.close.calls.count()).toEqual(1);
           expect(form.cancel.calls.count()).toEqual(0);
@@ -289,8 +287,8 @@ describe('Form', function() {
         .always(done);
     });
 
-    it('closes the form even if opening is still pending', function(done) {
-      var form = scout.create('Form', {
+    it('closes the form even if opening is still pending', done => {
+      let form = scout.create('Form', {
         parent: session.desktop,
         rootGroupBox: {
           objectType: 'GroupBox',
@@ -302,7 +300,7 @@ describe('Form', function() {
       spyOn(form, 'close').and.callThrough();
       spyOn(form, 'cancel').and.callThrough();
       form.open()
-        .then(function() {
+        .then(() => {
           expect(form.close.calls.count()).toEqual(1);
           expect(form.cancel.calls.count()).toEqual(0);
           expect(form.destroyed).toBe(true);
@@ -314,8 +312,8 @@ describe('Form', function() {
       form.abort();
     });
 
-    it('closes the form by using cancel if there is no close button', function(done) {
-      var form = scout.create('Form', {
+    it('closes the form by using cancel if there is no close button', done => {
+      let form = scout.create('Form', {
         parent: session.desktop,
         rootGroupBox: {
           objectType: 'GroupBox'
@@ -324,7 +322,7 @@ describe('Form', function() {
       spyOn(form, 'close').and.callThrough();
       spyOn(form, 'cancel').and.callThrough();
       form.open()
-        .then(function() {
+        .then(() => {
           form.abort();
           expect(form.close.calls.count()).toEqual(0);
           expect(form.cancel.calls.count()).toEqual(1);
@@ -335,10 +333,10 @@ describe('Form', function() {
     });
   });
 
-  describe('destroy', function() {
+  describe('destroy', () => {
 
-    it('destroys its children', function() {
-      var form = helper.createFormWithOneField();
+    it('destroys its children', () => {
+      let form = helper.createFormWithOneField();
 
       expect(form.rootGroupBox).toBeTruthy();
       expect(form.rootGroupBox.fields[0]).toBeTruthy();
@@ -348,16 +346,16 @@ describe('Form', function() {
       expect(form.rootGroupBox.fields[0].destroyed).toBeTruthy();
     });
 
-    it('does not fail on form close if a field has focus and validation wants to show a warning', function(done) {
-      var form = helper.createFormWithOneField();
+    it('does not fail on form close if a field has focus and validation wants to show a warning', done => {
+      let form = helper.createFormWithOneField();
       form.setDisplayHint(Form.DisplayHint.DIALOG);
-      var field = helper.createField('DateField');
-      field.setValidator(function(value) {
+      let field = helper.createField('DateField');
+      field.setValidator(value => {
         throw Status.warning({
           message: 'Invalid value'
         });
       });
-      field.getValidationResult = function() {
+      field.getValidationResult = () => {
         // Form has to close (warning state is not supported yet in Scout JS)
         return {
           valid: true,
@@ -368,7 +366,7 @@ describe('Form', function() {
       field.setOwner(form.rootGroupBox);
       form.rootGroupBox.insertField(field);
       form.open()
-        .then(function() {
+        .then(() => {
           field.focus();
           field.setValue(new Date());
           expect(field.errorStatus.message).toBe('Invalid value');
@@ -383,11 +381,11 @@ describe('Form', function() {
     });
   });
 
-  describe('cacheBounds', function() {
+  describe('cacheBounds', () => {
 
-    var form;
+    let form;
 
-    beforeEach(function() {
+    beforeEach(() => {
       form = helper.createFormWithOneField();
       form.cacheBounds = true;
       form.cacheBoundsKey = 'FOO';
@@ -396,23 +394,23 @@ describe('Form', function() {
       webstorage.removeItem(localStorage, 'scout:formBounds:FOO');
     });
 
-    it('read and store bounds', function() {
+    it('read and store bounds', () => {
       // should return null when local storage not contains the requested key
       expect(form.readCacheBounds()).toBe(null);
 
       // should return the stored Rectangle
-      var storeBounds = new Rectangle(0, 1, 2, 3);
+      let storeBounds = new Rectangle(0, 1, 2, 3);
       form.storeCacheBounds(storeBounds);
-      var readBounds = form.readCacheBounds();
+      let readBounds = form.readCacheBounds();
       expect(readBounds).toEqual(storeBounds);
     });
 
-    it('update bounds - if cacheBounds is true', function() {
+    it('update bounds - if cacheBounds is true', () => {
       form.updateCacheBounds();
       expect(form.readCacheBounds() instanceof Rectangle).toBe(true);
     });
 
-    it('update bounds - if cacheBounds is false', function() {
+    it('update bounds - if cacheBounds is false', () => {
       form.cacheBounds = false;
       form.updateCacheBounds();
       expect(form.readCacheBounds()).toBe(null);
@@ -420,14 +418,14 @@ describe('Form', function() {
 
   });
 
-  describe('modal', function() {
+  describe('modal', () => {
 
-    it('creates a glass pane if true', function(done) {
-      var form = helper.createFormWithOneField({
+    it('creates a glass pane if true', done => {
+      let form = helper.createFormWithOneField({
         modal: true
       });
       form.open()
-        .then(function() {
+        .then(() => {
           expect($('.glasspane').length).toBe(3);
           form.close();
           expect($('.glasspane').length).toBe(0);
@@ -436,12 +434,12 @@ describe('Form', function() {
         .always(done);
     });
 
-    it('does not create a glass pane if false', function(done) {
-      var form = helper.createFormWithOneField({
+    it('does not create a glass pane if false', done => {
+      let form = helper.createFormWithOneField({
         modal: false
       });
       form.open()
-        .then(function() {
+        .then(() => {
           expect($('.glasspane').length).toBe(0);
           form.close();
           expect($('.glasspane').length).toBe(0);
@@ -452,18 +450,18 @@ describe('Form', function() {
 
   });
 
-  describe('displayParent', function() {
-    var desktop;
+  describe('displayParent', () => {
+    let desktop;
 
-    beforeEach(function() {
+    beforeEach(() => {
       desktop = session.desktop;
     });
 
-    it('is required if form is managed by a form controller, defaults to desktop', function(done) {
-      var form = helper.createFormWithOneField();
+    it('is required if form is managed by a form controller, defaults to desktop', done => {
+      let form = helper.createFormWithOneField();
       expect(form.displayParent).toBe(null);
       form.open()
-        .then(function() {
+        .then(() => {
           expect(form.displayParent).toBe(desktop);
           form.close();
         })
@@ -471,25 +469,25 @@ describe('Form', function() {
         .always(done);
     });
 
-    it('is not required if form is just rendered', function() {
-      var form = helper.createFormWithOneField();
+    it('is not required if form is just rendered', () => {
+      let form = helper.createFormWithOneField();
       expect(form.displayParent).toBe(null);
       form.render();
       expect(form.displayParent).toBe(null);
       form.destroy();
     });
 
-    it('same as parent if display parent is set', function(done) {
+    it('same as parent if display parent is set', done => {
       // Parent would be something different, removing the parent would remove the form which is not expected, because only removing the display parent has to remove the form
-      var initialParent = new NullWidget();
-      var form = helper.createFormWithOneField({
+      let initialParent = new NullWidget();
+      let form = helper.createFormWithOneField({
         parent: initialParent,
         session: session
       });
       expect(form.displayParent).toBe(null);
       expect(form.parent).toBe(initialParent);
       form.open()
-        .then(function() {
+        .then(() => {
           expect(form.displayParent).toBe(desktop);
           expect(form.parent).toBe(desktop);
           form.close();
@@ -498,12 +496,12 @@ describe('Form', function() {
         .always(done);
     });
 
-    it('not same as parent if display parent is outline', function(done) {
+    it('not same as parent if display parent is outline', done => {
       // Parent must not be outline if display parent is outline, otherwise making the outline invisible would remove the form, which is not expected. See also DesktopSpec
-      var outline = outlineHelper.createOutlineWithOneDetailForm();
+      let outline = outlineHelper.createOutlineWithOneDetailForm();
       desktop.setOutline(outline);
-      var initialParent = new NullWidget();
-      var form = helper.createFormWithOneField({
+      let initialParent = new NullWidget();
+      let form = helper.createFormWithOneField({
         parent: initialParent,
         session: session,
         displayParent: outline
@@ -511,7 +509,7 @@ describe('Form', function() {
       expect(form.displayParent).toBe(outline);
       expect(form.parent).toBe(desktop);
       form.open()
-        .then(function() {
+        .then(() => {
           expect(form.displayParent).toBe(outline);
           expect(form.parent).toBe(desktop);
           form.close();
@@ -520,13 +518,13 @@ describe('Form', function() {
         .always(done);
     });
 
-    it('blocks desktop if modal and displayParent is desktop', function(done) {
-      var form = helper.createFormWithOneField({
+    it('blocks desktop if modal and displayParent is desktop', done => {
+      let form = helper.createFormWithOneField({
         modal: true,
         displayParent: desktop
       });
       form.open()
-        .then(function() {
+        .then(() => {
           expect($('.glasspane').length).toBe(3);
           expect(desktop.navigation.$container.children('.glasspane').length).toBe(1);
           expect(desktop.bench.$container.children('.glasspane').length).toBe(1);
@@ -538,17 +536,17 @@ describe('Form', function() {
         .always(done);
     });
 
-    it('blocks detail form and outline if modal and displayParent is outline', function(done) {
-      var outline = outlineHelper.createOutlineWithOneDetailForm();
+    it('blocks detail form and outline if modal and displayParent is outline', done => {
+      let outline = outlineHelper.createOutlineWithOneDetailForm();
       desktop.setOutline(outline);
       outline.selectNodes(outline.nodes[0]);
-      var form = helper.createFormWithOneField({
+      let form = helper.createFormWithOneField({
         displayHint: Form.DisplayHint.DIALOG,
         modal: true,
         displayParent: outline
       });
       form.open()
-        .then(function() {
+        .then(() => {
           expect($('.glasspane').length).toBe(2);
           expect(desktop.navigation.$body.children('.glasspane').length).toBe(1);
           expect(outline.nodes[0].detailForm.$container.children('.glasspane').length).toBe(1);
@@ -560,17 +558,17 @@ describe('Form', function() {
         .always(done);
     });
 
-    it('blocks form if modal and displayParent is form', function(done) {
-      var outline = outlineHelper.createOutlineWithOneDetailForm();
-      var detailForm = outline.nodes[0].detailForm;
+    it('blocks form if modal and displayParent is form', done => {
+      let outline = outlineHelper.createOutlineWithOneDetailForm();
+      let detailForm = outline.nodes[0].detailForm;
       desktop.setOutline(outline);
       outline.selectNodes(outline.nodes[0]);
-      var form = helper.createFormWithOneField({
+      let form = helper.createFormWithOneField({
         modal: true,
         displayParent: detailForm
       });
       form.open()
-        .then(function() {
+        .then(() => {
           expect($('.glasspane').length).toBe(1);
           expect(desktop.navigation.$body.children('.glasspane').length).toBe(0);
           expect(detailForm.$container.children('.glasspane').length).toBe(1);
@@ -584,9 +582,9 @@ describe('Form', function() {
 
   });
 
-  describe('rootGroupBox.gridData', function() {
-    it('is created using gridDataHints when the logical grid is validated', function() {
-      var form = scout.create('Form', {
+  describe('rootGroupBox.gridData', () => {
+    it('is created using gridDataHints when the logical grid is validated', () => {
+      let form = scout.create('Form', {
         parent: session.desktop,
         rootGroupBox: {
           objectType: 'GroupBox',
@@ -604,9 +602,9 @@ describe('Form', function() {
     });
   });
 
-  describe('initialFocus', function() {
-    it('references the widget which should gain focus after the form is displayed', function() {
-      var form = scout.create('Form', {
+  describe('initialFocus', () => {
+    it('references the widget which should gain focus after the form is displayed', () => {
+      let form = scout.create('Form', {
         parent: session.desktop,
         initialFocus: 'tabItem1',
         rootGroupBox: {
@@ -633,8 +631,8 @@ describe('Form', function() {
       expect(form.widget('tabItem2').parent).toBe(form.widget('tabBox'));
     });
 
-    it('works correctly even for wrapped forms', function(done) {
-      var form = scout.create({
+    it('works correctly even for wrapped forms', done => {
+      let form = scout.create({
         parent: session.desktop,
         objectType: 'Form',
         displayHint: Form.DisplayHint.VIEW,
@@ -675,11 +673,11 @@ describe('Form', function() {
     });
   });
 
-  describe('restore focus', function() {
+  describe('restore focus', () => {
 
-    var outlineHelper, desktop;
+    let outlineHelper, desktop;
 
-    beforeEach(function() {
+    beforeEach(() => {
       desktop = session.desktop;
       outlineHelper = new OutlineSpecHelper(session);
     });
@@ -687,16 +685,16 @@ describe('Form', function() {
     /**
      * Scenario: Switch between two outline nodes and expect the focus in its detail forms are preserved.
      */
-    it('on detail forms', function() {
+    it('on detail forms', () => {
       // setup an outline with 2 nodes each node has a detail form with 3 fields
-      var model = outlineHelper.createModelFixture(2, 0, true);
-      var outline = outlineHelper.createOutline(model);
-      outline.nodes.forEach(function(node) {
+      let model = outlineHelper.createModelFixture(2, 0, true);
+      let outline = outlineHelper.createOutline(model);
+      outline.nodes.forEach(node => {
         node.detailForm = helper.createFormWithFields(desktop, false, 3);
         node.detailForm.nodeText = node.text;
         node.detailForm.initialFocus = node.detailForm.rootGroupBox.fields[1];
         node.detailFormVisible = true;
-      }, this);
+      });
 
       desktop.setOutline(outline);
       outline.selectNodes(outline.nodes[0]);
@@ -716,9 +714,9 @@ describe('Form', function() {
     });
   });
 
-  describe('disabled form', function() {
-    it('can be closed although it is disabled', function(done) {
-      var form = scout.create('Form', {
+  describe('disabled form', () => {
+    it('can be closed although it is disabled', done => {
+      let form = scout.create('Form', {
         parent: session.desktop,
         rootGroupBox: {
           id: 'mainbox',
@@ -754,7 +752,7 @@ describe('Form', function() {
       });
       form.setEnabled(false);
       form.open()
-        .then(function() {
+        .then(() => {
           expect(session.desktop.activeForm).toBe(form);
 
           // enabled
@@ -779,7 +777,7 @@ describe('Form', function() {
           expect(form.widget('resetmenu').enabledComputed).toBe(false);
           expect(form.widget('savemenu').enabledComputed).toBe(false);
 
-          return form.close().then(function() {
+          return form.close().then(() => {
             expect(session.desktop.activeForm).toBe(null);
             done();
           });

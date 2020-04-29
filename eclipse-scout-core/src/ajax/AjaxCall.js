@@ -67,7 +67,7 @@ export default class AjaxCall extends Call {
   }
 
   _nextRetryImpl(jqXHR, textStatus, errorThrown) {
-    var offlineError = AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown, this.request);
+    let offlineError = AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown, this.request);
     if (!offlineError) {
       $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Unexpected HTTP error');
       return false;
@@ -79,7 +79,7 @@ export default class AjaxCall extends Call {
 
   static isOfflineError(jqXHR, textStatus, errorThrown, request) {
     // noinspection UnnecessaryLocalVariableJS
-    var offline = (
+    let offline = (
       // Status code = 0 -> no connection
       !jqXHR.status ||
       // Workaround for IE 9: Apparently, Windows network error codes (http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx)

@@ -56,14 +56,14 @@ export default class MenuBox extends Widget {
   }
 
   _renderMenus() {
-    this.menus.forEach(function(menu) {
+    this.menus.forEach(menu => {
       menu.render();
     }, this);
     this.invalidateLayoutTree();
   }
 
   _removeMenus() {
-    this.menus.forEach(function(menu) {
+    this.menus.forEach(menu => {
       menu.remove();
     });
     this.invalidateLayoutTree();

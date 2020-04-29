@@ -25,40 +25,34 @@ export default class TextMap {
    * @param textKey key to lookup the text
    * @param vararg texts to replace the placeholders specified by {0}, {1}, etc.
    */
-  get(textKey) {
+  get(textKey, ...vararg) {
     if (!this._exists(textKey)) {
       if (this.parent) {
-        return this.parent.get(...arguments);
+        return this.parent.get(textKey, ...vararg);
       }
       return '[undefined text: ' + textKey + ']';
     }
-    var len = arguments.length,
-      text = this.map[textKey];
+    let len = vararg.length;
+    let text = this.map[textKey];
 
-    if (len === 1) {
+    if (len === 0) {
       return text;
     }
 
-    for (var i = 1; i < len; i++) {
-      text = text.replace(new RegExp('\\{' + (i - 1) + '\\}', 'g'), arguments[i]);
+    for (let i = 0; i < len; i++) {
+      text = text.replace(new RegExp('\\{' + (i) + '\\}', 'g'), vararg[i]);
     }
     return text;
   }
 
-  optGet(textKey, defaultValue) {
+  optGet(textKey, defaultValue, ...vararg) {
     if (!this._exists(textKey)) {
       if (this.parent) {
-        return this.parent.optGet(...arguments);
+        return this.parent.optGet(textKey, defaultValue, ...vararg);
       }
       return defaultValue;
     }
-    if (arguments.length > 2) {
-      // dynamically call text() without 'defaultValue' argument
-      var args = [...arguments].slice(2);
-      args.unshift(textKey); // add textKey as first argument
-      return this.get(...args);
-    }
-    return this.get(textKey);
+    return this.get(textKey, ...vararg);
   }
 
   exists(textKey) {

@@ -11,12 +11,12 @@
 import {keys, scout, Widget} from '../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
 
-describe('CellEditor', function() {
-  var session;
-  var helper;
-  var formHelper;
+describe('CellEditor', () => {
+  let session;
+  let helper;
+  let formHelper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandboxDesktop());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
@@ -25,11 +25,11 @@ describe('CellEditor', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
-    var popup = findPopup();
+    let popup = findPopup();
     if (popup) {
       popup.close();
     }
@@ -50,20 +50,20 @@ describe('CellEditor', function() {
   }
 
   function assertCellEditorIsOpen(table, column, row) {
-    var popup = table.cellEditorPopup;
+    let popup = table.cellEditorPopup;
     expect(popup.cell.field.rendered).toBe(true);
     expect(popup.column).toBe(column);
     expect(popup.row).toBe(row);
-    var $popup = $findPopup();
+    let $popup = $findPopup();
     expect($popup.length).toBe(1);
     expect(popup.$container[0]).toBe($popup[0]);
     expect($popup.find('.form-field').length).toBe(1);
   }
 
-  describe('mouse click', function() {
-    var table, model, $rows, $cells0, $cells1, $cell0_0, $cell0_1, $cell1_0;
+  describe('mouse click', () => {
+    let table, model, $rows, $cells0, $cells1, $cell0_0, $cell0_1, $cell1_0;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(2, 2);
       table = helper.createTable(model);
       table.render();
@@ -76,7 +76,7 @@ describe('CellEditor', function() {
       $cell1_0 = $cells1.eq(0);
     });
 
-    it('starts cell edit if cell is editable', function() {
+    it('starts cell edit if cell is editable', () => {
       table.rows[0].cells[0].editable = true;
       table.rows[1].cells[0].editable = false;
 
@@ -87,7 +87,7 @@ describe('CellEditor', function() {
       expect(table.prepareCellEdit).toHaveBeenCalled();
     });
 
-    it('does not start cell edit if cell is not editable', function() {
+    it('does not start cell edit if cell is not editable', () => {
       table.rows[0].cells[0].editable = false;
 
       spyOn(table, 'prepareCellEdit');
@@ -95,7 +95,7 @@ describe('CellEditor', function() {
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
-    it('does not start cell edit if row is disabled', function() {
+    it('does not start cell edit if row is disabled', () => {
       table.rows[0].cells[0].editable = true;
       table.rows[0].enabled = false;
 
@@ -104,7 +104,7 @@ describe('CellEditor', function() {
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
-    it('does not start cell edit if table is disabled', function() {
+    it('does not start cell edit if table is disabled', () => {
       table.rows[0].cells[0].editable = true;
       table.enabled = false;
       table.recomputeEnabled();
@@ -114,7 +114,7 @@ describe('CellEditor', function() {
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
-    it('does not start cell edit if form is disabled', function() {
+    it('does not start cell edit if form is disabled', () => {
       table.rows[0].cells[0].editable = true;
       table.enabledComputed = false;
 
@@ -123,7 +123,7 @@ describe('CellEditor', function() {
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
-    it('does not start cell edit if mouse down and up happened on different cells', function() {
+    it('does not start cell edit if mouse down and up happened on different cells', () => {
       table.rows[0].cells[0].editable = true;
       table.rows[0].cells[1].editable = true;
 
@@ -133,7 +133,7 @@ describe('CellEditor', function() {
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
-    it('does not start cell edit if right mouse button was pressed', function() {
+    it('does not start cell edit if right mouse button was pressed', () => {
       table.rows[0].cells[0].editable = true;
 
       spyOn(table, 'prepareCellEdit');
@@ -142,7 +142,7 @@ describe('CellEditor', function() {
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
-    it('does not start cell edit if middle mouse button was pressed', function() {
+    it('does not start cell edit if middle mouse button was pressed', () => {
       table.rows[0].cells[0].editable = true;
 
       spyOn(table, 'prepareCellEdit');
@@ -151,7 +151,7 @@ describe('CellEditor', function() {
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
-    it('does not open cell editor if a ctrl or shift is pressed, because the user probably wants to do row selection rather than cell editing', function() {
+    it('does not open cell editor if a ctrl or shift is pressed, because the user probably wants to do row selection rather than cell editing', () => {
       table.rows[0].cells[0].editable = true;
       table.rows[1].cells[0].editable = true;
 
@@ -166,10 +166,10 @@ describe('CellEditor', function() {
     });
   });
 
-  describe('TAB key', function() {
-    var table, $rows, $cells0;
+  describe('TAB key', () => {
+    let table, $rows, $cells0;
 
-    beforeEach(function() {
+    beforeEach(() => {
       table = helper.createTable(helper.createModelFixture(2, 2));
       table.render();
       helper.applyDisplayStyle(table);
@@ -177,7 +177,7 @@ describe('CellEditor', function() {
       $cells0 = $rows.eq(0).find('.table-cell');
     });
 
-    it('starts the cell editor for the next editable cell', function() {
+    it('starts the cell editor for the next editable cell', () => {
       table.rows[0].cells[0].editable = true;
       table.rows[1].cells[0].editable = true;
 
@@ -192,17 +192,17 @@ describe('CellEditor', function() {
     });
   });
 
-  describe('prepareCellEdit', function() {
-    var table;
+  describe('prepareCellEdit', () => {
+    let table;
 
-    beforeEach(function() {
-      var model = helper.createModelFixture(2, 2);
+    beforeEach(() => {
+      let model = helper.createModelFixture(2, 2);
       table = helper.createTable(model);
       table.render();
       helper.applyDisplayStyle(table);
     });
 
-    it('creates field and calls start', function() {
+    it('creates field and calls start', () => {
       table.columns[0].setEditable(true);
       spyOn(table, 'startCellEdit').and.callThrough();
 
@@ -212,10 +212,10 @@ describe('CellEditor', function() {
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
     });
 
-    it('triggers prepareCellEdit event', function() {
-      var triggeredEvent;
+    it('triggers prepareCellEdit event', () => {
+      let triggeredEvent;
       table.columns[0].setEditable(true);
-      table.on('prepareCellEdit', function(event) {
+      table.on('prepareCellEdit', event => {
         triggeredEvent = event;
       });
       table.prepareCellEdit(table.columns[0], table.rows[0]);
@@ -225,28 +225,28 @@ describe('CellEditor', function() {
     });
   });
 
-  describe('startCellEdit', function() {
-    var table;
+  describe('startCellEdit', () => {
+    let table;
 
-    beforeEach(function() {
-      var model = helper.createModelFixture(2, 2);
+    beforeEach(() => {
+      let model = helper.createModelFixture(2, 2);
       table = helper.createTable(model);
       table.render();
       helper.applyDisplayStyle(table);
     });
 
-    it('opens popup with field', function() {
+    it('opens popup with field', () => {
       table.columns[0].setEditable(true);
-      var field = createStringField(table);
+      let field = createStringField(table);
       table.startCellEdit(table.columns[0], table.rows[0], field);
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
       expect(table.cellEditorPopup.cell.field).toBe(field);
     });
 
-    it('triggers startCellEdit event', function() {
-      var triggeredEvent;
+    it('triggers startCellEdit event', () => {
+      let triggeredEvent;
       table.columns[0].setEditable(true);
-      table.on('startCellEdit', function(event) {
+      table.on('startCellEdit', event => {
         triggeredEvent = event;
       });
       table.prepareCellEdit(table.columns[0], table.rows[0]);
@@ -257,22 +257,22 @@ describe('CellEditor', function() {
     });
   });
 
-  describe('completeCellEdit', function() {
-    var table;
+  describe('completeCellEdit', () => {
+    let table;
 
-    beforeEach(function() {
-      var model = helper.createModelFixture(2, 2);
+    beforeEach(() => {
+      let model = helper.createModelFixture(2, 2);
       table = helper.createTable(model);
       table.render();
       helper.applyDisplayStyle(table);
     });
 
-    it('triggers completeCellEdit event', function() {
-      var triggeredEvent;
+    it('triggers completeCellEdit event', () => {
+      let triggeredEvent;
       table.columns[0].setEditable(true);
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
-      table.on('completeCellEdit', function(event) {
+      table.on('completeCellEdit', event => {
         triggeredEvent = event;
       });
       table.completeCellEdit();
@@ -281,12 +281,12 @@ describe('CellEditor', function() {
       expect(triggeredEvent.field).toBe(table.rows[0].cells[0].field);
     });
 
-    it('calls endCellEdit with saveEditorValue=true', function() {
+    it('calls endCellEdit with saveEditorValue=true', () => {
       table.columns[0].setEditable(true);
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
       spyOn(table, 'endCellEdit').and.callThrough();
-      var field = table.cellEditorPopup.cell.field;
+      let field = table.cellEditorPopup.cell.field;
 
       table.completeCellEdit();
       expect(table.endCellEdit).toHaveBeenCalledWith(field, true);
@@ -294,7 +294,7 @@ describe('CellEditor', function() {
       expect($findPopup().length).toBe(0);
     });
 
-    it('saves editor value', function() {
+    it('saves editor value', () => {
       table.columns[0].setEditable(true);
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
@@ -304,14 +304,14 @@ describe('CellEditor', function() {
       expect(table.rows[0].cells[0].value).toBe('my new value');
     });
 
-    it('does not reopen the editor again', function() {
+    it('does not reopen the editor again', () => {
       table.columns[0].setEditable(true);
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
       table.cellEditorPopup.cell.field.setValue('my new value');
 
-      var triggeredStartCellEditEvent = null;
-      table.on('startCellEdit', function(event) {
+      let triggeredStartCellEditEvent = null;
+      table.on('startCellEdit', event => {
         triggeredStartCellEditEvent = event;
       });
       table.completeCellEdit();
@@ -320,22 +320,22 @@ describe('CellEditor', function() {
     });
   });
 
-  describe('cancelCellEdit', function() {
-    var table;
+  describe('cancelCellEdit', () => {
+    let table;
 
-    beforeEach(function() {
-      var model = helper.createModelFixture(2, 2);
+    beforeEach(() => {
+      let model = helper.createModelFixture(2, 2);
       table = helper.createTable(model);
       table.render();
       helper.applyDisplayStyle(table);
     });
 
-    it('triggers cancelCellEdit event', function() {
-      var triggeredEvent;
+    it('triggers cancelCellEdit event', () => {
+      let triggeredEvent;
       table.columns[0].setEditable(true);
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
-      table.on('cancelCellEdit', function(event) {
+      table.on('cancelCellEdit', event => {
         triggeredEvent = event;
       });
       table.cancelCellEdit();
@@ -344,12 +344,12 @@ describe('CellEditor', function() {
       expect(triggeredEvent.field).toBe(table.rows[0].cells[0].field);
     });
 
-    it('calls endCellEdit with saveEditorValue=false', function() {
+    it('calls endCellEdit with saveEditorValue=false', () => {
       table.columns[0].setEditable(true);
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
       spyOn(table, 'endCellEdit').and.callThrough();
-      var field = table.cellEditorPopup.cell.field;
+      let field = table.cellEditorPopup.cell.field;
 
       table.cancelCellEdit();
       expect(table.endCellEdit).toHaveBeenCalledWith(field);
@@ -357,7 +357,7 @@ describe('CellEditor', function() {
       expect($findPopup().length).toBe(0);
     });
 
-    it('does not save editor value', function() {
+    it('does not save editor value', () => {
       table.columns[0].setEditable(true);
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
@@ -368,32 +368,32 @@ describe('CellEditor', function() {
     });
   });
 
-  describe('endCellEdit', function() {
-    var table;
+  describe('endCellEdit', () => {
+    let table;
 
-    beforeEach(function() {
-      var model = helper.createModelFixture(2, 2);
+    beforeEach(() => {
+      let model = helper.createModelFixture(2, 2);
       table = helper.createTable(model);
       table.render();
       helper.applyDisplayStyle(table);
     });
 
-    it('destroys the field', function() {
+    it('destroys the field', () => {
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
-      var popup = table.cellEditorPopup;
-      var field = popup.cell.field;
+      let popup = table.cellEditorPopup;
+      let field = popup.cell.field;
       expect(field.destroyed).toBe(false);
 
       table.endCellEdit(field);
       expect(field.destroyed).toBe(true);
     });
 
-    it('removes the cell editor popup', function() {
+    it('removes the cell editor popup', () => {
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
-      var popup = table.cellEditorPopup;
-      var field = popup.cell.field;
+      let popup = table.cellEditorPopup;
+      let field = popup.cell.field;
       expect(field.destroyed).toBe(false);
 
       table.endCellEdit(field);
@@ -405,16 +405,16 @@ describe('CellEditor', function() {
     });
   });
 
-  describe('validation', function() {
-    var table, model, cell0_0, $tooltip;
+  describe('validation', () => {
+    let table, model, cell0_0, $tooltip;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(2, 2);
       table = helper.createTable(model);
       cell0_0 = table.rows[0].cells[0];
     });
 
-    it('shows a tooltip if field has an error', function() {
+    it('shows a tooltip if field has an error', () => {
       cell0_0.editable = true;
       cell0_0.errorStatus = 'Validation error';
       $tooltip = $('.tooltip');
@@ -425,7 +425,7 @@ describe('CellEditor', function() {
       expect($tooltip.length).toBe(1);
     });
 
-    it('does not sho a tooltip if field has no error', function() {
+    it('does not sho a tooltip if field has no error', () => {
       cell0_0.editable = true;
       $tooltip = $('.tooltip');
 
@@ -436,16 +436,16 @@ describe('CellEditor', function() {
     });
   });
 
-  describe('popup recovery', function() {
-    var model, table, row0, $cells0, $cell0_0;
+  describe('popup recovery', () => {
+    let model, table, row0, $cells0, $cell0_0;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(2, 3);
       table = helper.createTable(model);
       row0 = table.rows[0];
     });
 
-    it('reopens popup if row gets updated', function() {
+    it('reopens popup if row gets updated', () => {
       row0.cells[0].editable = true;
       table.render();
       $cells0 = table.$cellsForRow(row0.$row);
@@ -455,7 +455,7 @@ describe('CellEditor', function() {
       expect(table.cellEditorPopup.row).toBe(row0);
       expect(table.cellEditorPopup.$anchor[0]).toBe($cell0_0[0]);
 
-      var updatedRows = helper.createModelRows(2, 1);
+      let updatedRows = helper.createModelRows(2, 1);
       updatedRows[0].id = row0.id;
       table.updateRows(updatedRows);
 
@@ -468,7 +468,7 @@ describe('CellEditor', function() {
       expect(table.cellEditorPopup.$anchor[0]).toBe($cell0_0[0]);
     });
 
-    it('closes popup if row gets deleted', function() {
+    it('closes popup if row gets deleted', () => {
       row0.cells[0].editable = true;
       table.render();
       table.prepareCellEdit(table.columns[0], row0);
@@ -484,7 +484,7 @@ describe('CellEditor', function() {
       expect(table.cancelCellEdit).toHaveBeenCalled();
     });
 
-    it('closes popup if all rows get deleted', function() {
+    it('closes popup if all rows get deleted', () => {
       row0.cells[0].editable = true;
       table.render();
       table.prepareCellEdit(table.columns[0], row0);
@@ -500,7 +500,7 @@ describe('CellEditor', function() {
       expect(table.cancelCellEdit).toHaveBeenCalled();
     });
 
-    it('closes popup (before) table is removed', function() {
+    it('closes popup (before) table is removed', () => {
       row0.cells[0].editable = true;
       table.render();
       table.prepareCellEdit(table.columns[0], row0);
@@ -511,7 +511,7 @@ describe('CellEditor', function() {
       expect(table.cellEditorPopup).toBe(null);
     });
 
-    it('closes popup when table is removed', function() {
+    it('closes popup when table is removed', () => {
       row0.cells[0].editable = true;
       table.render();
       table.prepareCellEdit(table.columns[0], row0);
@@ -523,16 +523,16 @@ describe('CellEditor', function() {
     });
   });
 
-  describe('tooltip recovery', function() {
-    var model, table, row0;
+  describe('tooltip recovery', () => {
+    let model, table, row0;
 
-    beforeEach(function() {
+    beforeEach(() => {
       model = helper.createModelFixture(2, 3);
       table = helper.createTable(model);
       row0 = model.rows[0];
     });
 
-    it('removes tooltip if row gets deleted', function() {
+    it('removes tooltip if row gets deleted', () => {
       row0.cells[0].editable = true;
       row0.cells[0].errorStatus = 'Validation error';
 

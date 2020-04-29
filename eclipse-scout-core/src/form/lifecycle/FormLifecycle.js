@@ -26,7 +26,7 @@ export default class FormLifecycle extends Lifecycle {
   }
 
   _reset() {
-    this.widget.visitFields(function(field) {
+    this.widget.visitFields(field => {
       if (field instanceof ValueField) {
         field.resetValue();
       }
@@ -34,11 +34,11 @@ export default class FormLifecycle extends Lifecycle {
   }
 
   _invalidElements() {
-    var missingFields = [];
-    var invalidFields = [];
+    let missingFields = [];
+    let invalidFields = [];
 
-    this.widget.visitFields(function(field) {
-      var result = field.getValidationResult();
+    this.widget.visitFields(field => {
+      let result = field.getValidationResult();
       if (result.valid) {
         return;
       }
@@ -71,7 +71,7 @@ export default class FormLifecycle extends Lifecycle {
   }
 
   markAsSaved() {
-    this.widget.visitFields(function(field) {
+    this.widget.visitFields(field => {
       field.markAsSaved();
     });
   }
@@ -84,8 +84,8 @@ export default class FormLifecycle extends Lifecycle {
    * @see (Java) AbstractFormField #checkSaveNeeded, #isSaveNeeded
    */
   requiresSave() {
-    var requiresSave = false;
-    this.widget.visitFields(function(field) {
+    let requiresSave = false;
+    this.widget.visitFields(field => {
       field.updateRequiresSave();
       if (field.requiresSave) {
         requiresSave = true;

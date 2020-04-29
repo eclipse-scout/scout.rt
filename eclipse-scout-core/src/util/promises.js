@@ -19,7 +19,7 @@ import $ from 'jquery';
  * @returns {Promise}
  */
 export function oneByOne(promiseCreator) {
-  var deferred = $.Deferred();
+  let deferred = $.Deferred();
   _repeat(promiseCreator);
   return deferred.promise();
 
@@ -29,6 +29,7 @@ export function oneByOne(promiseCreator) {
   }
 
   function onFail() {
+    // eslint-disable-next-line prefer-spread
     deferred.reject.apply(deferred, promiseCreator.error);
   }
 
@@ -38,6 +39,7 @@ export function oneByOne(promiseCreator) {
         .done(onDone)
         .fail(onFail);
     } else {
+      // eslint-disable-next-line prefer-spread
       deferred.resolve.apply(deferred, promiseCreator.results);
     }
   }
@@ -52,7 +54,7 @@ export function oneByOne(promiseCreator) {
  * @returns {Promise}
  */
 export function groupwise(groupSize, promiseCreator) {
-  var deferred = $.Deferred();
+  let deferred = $.Deferred();
   _repeat(promiseCreator);
   return deferred.promise();
 
@@ -62,12 +64,13 @@ export function groupwise(groupSize, promiseCreator) {
   }
 
   function onFail() {
+    // eslint-disable-next-line prefer-spread
     deferred.reject.apply(deferred, promiseCreator.error);
   }
 
   function _repeat(promiseCreator) {
     if (promiseCreator.hasNext()) {
-      var promises = [];
+      let promises = [];
       while (promises.length < groupSize && promiseCreator.hasNext()) {
         promises.push(promiseCreator.next());
       }
@@ -75,6 +78,7 @@ export function groupwise(groupSize, promiseCreator) {
         .done(onDone)
         .fail(onFail);
     } else {
+      // eslint-disable-next-line prefer-spread
       deferred.resolve.apply(deferred, promiseCreator.results);
     }
   }
@@ -92,8 +96,8 @@ export function groupwise(groupSize, promiseCreator) {
  */
 export function parallel(maxPoolSize, promiseCreator, timeout) {
   timeout = timeout || 0;
-  var deferred = $.Deferred();
-  var poolSize = 0;
+  let deferred = $.Deferred();
+  let poolSize = 0;
   _startNext(promiseCreator);
   return deferred.promise();
 
@@ -104,6 +108,7 @@ export function parallel(maxPoolSize, promiseCreator, timeout) {
   }
 
   function onFail() {
+    // eslint-disable-next-line prefer-spread
     deferred.reject.apply(deferred, promiseCreator.error);
   }
 

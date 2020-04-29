@@ -10,11 +10,11 @@
  */
 import {TabBoxSpecHelper} from '@eclipse-scout/testing';
 
-describe('TabBoxAdapter', function() {
-  var session;
-  var helper;
+describe('TabBoxAdapter', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TabBoxSpecHelper(session);
@@ -22,16 +22,16 @@ describe('TabBoxAdapter', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
 
-  describe('onModelPropertyChange', function() {
+  describe('onModelPropertyChange', () => {
 
-    describe('selectedTab', function() {
-      it('selects the tab but does not send a selectTab event', function() {
-        var tabBox = helper.createTabBoxWith2Tabs();
+    describe('selectedTab', () => {
+      it('selects the tab but does not send a selectTab event', () => {
+        let tabBox = helper.createTabBoxWith2Tabs();
         linkWidgetAndAdapter(tabBox, 'TabBoxAdapter');
         linkWidgetAndAdapter(tabBox.tabItems[0], 'TabItemAdapter');
         linkWidgetAndAdapter(tabBox.tabItems[1], 'TabItemAdapter');
@@ -44,7 +44,7 @@ describe('TabBoxAdapter', function() {
         jasmine.Ajax.uninstall();
         jasmine.Ajax.install();
 
-        var event = createPropertyChangeEvent(tabBox, {
+        let event = createPropertyChangeEvent(tabBox, {
           selectedTab: tabBox.tabItems[1].id
         });
         tabBox.modelAdapter.onModelPropertyChange(event);

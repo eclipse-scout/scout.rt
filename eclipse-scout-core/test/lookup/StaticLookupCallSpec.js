@@ -20,29 +20,29 @@ import {scout} from '../../src/index';
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-describe('StaticLookupCall', function() {
+describe('StaticLookupCall', () => {
 
-  var session;
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
     jasmine.Ajax.uninstall();
   });
 
-  it('filter: active only (default)', function(done) {
-    var lookupCall = scout.create('ActiveDummyLookupCall', {
+  it('filter: active only (default)', done => {
+    let lookupCall = scout.create('ActiveDummyLookupCall', {
       session: session
     });
 
     expect(lookupCall.active).toBe(true);
-    lookupCall.getAll().then(function(result) {
+    lookupCall.getAll().then(result => {
       expect(result.lookupRows.length).toBe(2);
       expect(result.lookupRows[0].text).toBe('Foo');
       expect(result.lookupRows[0].active).toBe(true);
@@ -53,12 +53,12 @@ describe('StaticLookupCall', function() {
     jasmine.clock().tick(500);
   });
 
-  it('filter: inactive only', function(done) {
-    var lookupCall = scout.create('ActiveDummyLookupCall', {
+  it('filter: inactive only', done => {
+    let lookupCall = scout.create('ActiveDummyLookupCall', {
       session: session,
       active: false
     });
-    lookupCall.getAll().then(function(result) {
+    lookupCall.getAll().then(result => {
       expect(result.lookupRows.length).toBe(1);
       expect(result.lookupRows[0].text).toBe('Bar');
       expect(result.lookupRows[0].active).toBe(false);
@@ -67,12 +67,12 @@ describe('StaticLookupCall', function() {
     jasmine.clock().tick(500);
   });
 
-  it('filter: all', function(done) {
-    var lookupCall = scout.create('ActiveDummyLookupCall', {
+  it('filter: all', done => {
+    let lookupCall = scout.create('ActiveDummyLookupCall', {
       session: session,
       active: null // = all
     });
-    lookupCall.getAll().then(function(result) {
+    lookupCall.getAll().then(result => {
       expect(result.lookupRows.length).toBe(3);
       done();
     });

@@ -10,15 +10,15 @@
  */
 import {styles} from '../../src/index';
 
-describe('scout.styles', function() {
-  var $sandbox;
+describe('scout.styles', () => {
+  let $sandbox;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     $sandbox = $('#sandbox');
   });
 
-  it('can merge colors', function() {
+  it('can merge colors', () => {
     expect(styles.mergeRgbColors()).toBe(undefined);
     expect(styles.mergeRgbColors('rgb(1,2,3)')).toBe('rgb(0,0,0)'); // no ratio
     expect(styles.mergeRgbColors('#fff', 1)).toBe(undefined); // invalid format
@@ -27,7 +27,7 @@ describe('scout.styles', function() {
     expect(styles.mergeRgbColors('rgba(10,10,10,0.3)', 0.5, 'rgba(20,20,20,0.7)', 0.5)).toBe('rgb(15,15,15)'); // alpha is ignored
   });
 
-  it('can lighten and darken colors', function() {
+  it('can lighten and darken colors', () => {
     expect(styles.darkerColor()).toBe(undefined);
     expect(styles.darkerColor('#fff')).toBe(undefined);
     expect(styles.darkerColor('rgb(10,10,10)')).toBe('rgb(8,8,8)');
@@ -37,11 +37,11 @@ describe('scout.styles', function() {
     expect(styles.lighterColor('rgb(10,10,10)')).toBe('rgb(59,59,59)');
   });
 
-  it('can calculate and apply legacy styles', function() {
+  it('can calculate and apply legacy styles', () => {
     expect(styles.legacyStyle()).toBe('');
 
-    var $el = $sandbox.appendDiv();
-    var obj = {};
+    let $el = $sandbox.appendDiv();
+    let obj = {};
     expect(styles.legacyStyle(null, $el)).toBe('');
     expect($el.attr('style')).toBe(undefined);
     expect(styles.legacyStyle(obj, $el)).toBe('');
@@ -117,8 +117,8 @@ describe('scout.styles', function() {
     expect($el.attr('style')).toBe('background-color: purple;');
   });
 
-  describe('rgb', function() {
-    it('parses an rgb string', function() {
+  describe('rgb', () => {
+    it('parses an rgb string', () => {
       expect(styles.rgb('rgb(255,100,200)')).toEqual({
         red: 255,
         green: 100,
@@ -127,7 +127,7 @@ describe('scout.styles', function() {
       });
     });
 
-    it('supports alpha', function() {
+    it('supports alpha', () => {
       expect(styles.rgb('rgba(255,100,200,0.5)')).toEqual({
         red: 255,
         green: 100,

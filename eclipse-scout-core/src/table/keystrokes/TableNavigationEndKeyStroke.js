@@ -17,7 +17,7 @@ export default class TableNavigationEndKeyStroke extends AbstractTableNavigation
     this.which = [keys.END];
     this.renderingHints.text = 'End';
     this.renderingHints.$drawingArea = function($drawingArea, event) {
-      var viewport = this._viewportInfo();
+      let viewport = this._viewportInfo();
       if (viewport.lastRow) {
         return viewport.lastRow.$row;
       }
@@ -25,7 +25,7 @@ export default class TableNavigationEndKeyStroke extends AbstractTableNavigation
   }
 
   handle(event) {
-    var table = this.field,
+    let table = this.field,
       rows = table.visibleRows,
       lastRow = arrays.last(rows),
       selectedRows = table.selectedRows,

@@ -17,7 +17,7 @@ export default class TableNavigationPageUpKeyStroke extends AbstractTableNavigat
     this.which = [keys.PAGE_UP];
     this.renderingHints.text = 'PgUp';
     this.renderingHints.$drawingArea = function($drawingArea, event) {
-      var viewport = this._viewportInfo();
+      let viewport = this._viewportInfo();
       if (viewport.firstRow) {
         return viewport.firstRow.$row;
       }
@@ -25,7 +25,7 @@ export default class TableNavigationPageUpKeyStroke extends AbstractTableNavigat
   }
 
   handle(event) {
-    var table = this.field,
+    let table = this.field,
       viewport = this._viewportInfo(),
       rows = table.visibleRows,
       selectedRows = table.selectedRows,

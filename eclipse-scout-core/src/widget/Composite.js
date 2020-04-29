@@ -34,7 +34,7 @@ export default class Composite extends Widget {
   }
 
   _renderWidgets() {
-    this.widgets.forEach(function(widget) {
+    this.widgets.forEach(widget => {
       widget.render();
     }, this);
     this.invalidateLayoutTree();

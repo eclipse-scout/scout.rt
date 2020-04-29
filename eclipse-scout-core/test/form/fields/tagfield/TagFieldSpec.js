@@ -11,11 +11,11 @@
 import {arrays, keys, scout, TagChooserPopup, TagField} from '../../../../src/index';
 import {DummyLookupCall, FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('TagField', function() {
+describe('TagField', () => {
 
-  var session, field, lookupRow, helper;
+  let session, field, lookupRow, helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     field = new TagField();
@@ -28,13 +28,13 @@ describe('TagField', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
     removePopups(session);
   });
 
   function typeProposal(field, text, keyCode) {
-    var $input = field.$container.find('input');
+    let $input = field.$container.find('input');
     $input.val(text);
     $input.focus();
     // eslint-disable-next-line new-cap
@@ -43,15 +43,15 @@ describe('TagField', function() {
     }));
   }
 
-  describe('model', function() {
+  describe('model', () => {
 
-    it('add tag', function() {
+    it('add tag', () => {
       field.setValue(['foo']);
       field.addTag('bar');
       expect(arrays.equals(['foo', 'bar'], field.value)).toBe(true);
     });
 
-    it('remove tag', function() {
+    it('remove tag', () => {
       field.setValue(['foo', 'bar']);
       field.removeTag('bar');
       expect(arrays.equals(['foo'], field.value)).toBe(true);
@@ -59,9 +59,9 @@ describe('TagField', function() {
 
   });
 
-  describe('rendering', function() {
+  describe('rendering', () => {
 
-    it('should render tags (=value)', function() {
+    it('should render tags (=value)', () => {
       field = scout.create('TagField', {
         parent: session.desktop
       });
@@ -76,7 +76,7 @@ describe('TagField', function() {
 
       // add a tag
       field.addTag('baz');
-      var $res = field.$container.find('.tag-element');
+      let $res = field.$container.find('.tag-element');
       expect($res.length).toBe(2);
       expect($res.eq(0).text()).toBe('bar');
       expect($res.eq(1).text()).toBe('baz');
@@ -87,9 +87,9 @@ describe('TagField', function() {
   /**
    * Ticket #230409
    */
-  describe('key-strokes', function() {
+  describe('key-strokes', () => {
 
-    it('ENTER', function() {
+    it('ENTER', () => {
       field = scout.create('TagField', {
         parent: session.desktop,
         lookupCall: {
@@ -107,7 +107,7 @@ describe('TagField', function() {
 
       // trigger a keydown event, all the flags are required  to pass
       // the accept-checks in KeyStroke.js
-      var $input = field.$container.find('input');
+      let $input = field.$container.find('input');
       // eslint-disable-next-line new-cap
       $input.trigger(jQuery.Event('keydown', {
         keyCode: keys.ENTER,
@@ -125,12 +125,12 @@ describe('TagField', function() {
 
   });
 
-  describe('tag lookup', function() {
+  describe('tag lookup', () => {
 
-    it('start and prepare a lookup call clone when typing', function() {
-      var templatePropertyValue = 11;
-      var preparedPropertyValue = 22;
-      var eventCounter = 0;
+    it('start and prepare a lookup call clone when typing', () => {
+      let templatePropertyValue = 11;
+      let preparedPropertyValue = 22;
+      let eventCounter = 0;
       field = scout.create('TagField', {
         parent: session.desktop,
         lookupCall: {
@@ -138,7 +138,7 @@ describe('TagField', function() {
           customProperty: templatePropertyValue
         }
       });
-      field.on('prepareLookupCall', function(event) {
+      field.on('prepareLookupCall', event => {
         expect(event.lookupCall.customProperty).toBe(templatePropertyValue);
         expect(event.lookupCall.id).not.toBe(field.lookupCall.id);
         expect(event.type).toBe('prepareLookupCall');

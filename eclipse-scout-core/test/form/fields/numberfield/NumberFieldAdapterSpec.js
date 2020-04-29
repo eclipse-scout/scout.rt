@@ -10,25 +10,25 @@
  */
 import {FormSpecHelper} from '@eclipse-scout/testing';
 
-describe('NumberFieldAdapter', function() {
-  var session;
-  var helper;
+describe('NumberFieldAdapter', () => {
+  let session;
+  let helper;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
   });
 
-  describe('parse', function() {
-    var field;
+  describe('parse', () => {
+    let field;
 
-    beforeEach(function() {
+    beforeEach(() => {
       field = helper.createField('NumberField');
       linkWidgetAndAdapter(field, 'NumberFieldAdapter');
     });
 
-    it('prevents setting the error status', function() {
+    it('prevents setting the error status', () => {
       // The parsing might fail on JS side, but the server might handle it -> don't show the error status, let the server do it
       // Example: property percentage is not known by the DecimalFormat.js yet, parse would fail.
       // But even if that will be implemented some time the developer may still override execParseValue and implement a custom parse logic in Java
@@ -40,7 +40,7 @@ describe('NumberFieldAdapter', function() {
       expect(field.errorStatus).toBe(null);
     });
 
-    it('prevents clearing the error status', function() {
+    it('prevents clearing the error status', () => {
       // The error status is handled completely by the server, thus it must not be cleared by JS, even if the value is valid
       // Use case: SequenceBox with number fields, second field contains smaller (invalid) value than first one, user types another too small value
       // -> error status must stay (server won't send another error status because the message has not changed)
@@ -59,9 +59,9 @@ describe('NumberFieldAdapter', function() {
 
   });
 
-  it('supports the calculator', function() {
+  it('supports the calculator', () => {
     // Check if the calculator still works if a model adapter is attached
-    var field = helper.createField('NumberField');
+    let field = helper.createField('NumberField');
     linkWidgetAndAdapter(field, 'NumberFieldAdapter');
     field.render();
     field.decimalFormat.decimalSeparatorChar = '.';

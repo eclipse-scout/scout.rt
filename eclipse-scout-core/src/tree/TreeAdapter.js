@@ -18,7 +18,7 @@ export default class TreeAdapter extends ModelAdapter {
   }
 
   _sendNodesSelected(nodeIds, debounceSend) {
-    var eventData = {
+    let eventData = {
       nodeIds: nodeIds
     };
 
@@ -45,7 +45,7 @@ export default class TreeAdapter extends ModelAdapter {
   }
 
   _onWidgetNodesSelected(event) {
-    var nodeIds = this.widget._nodesToIds(this.widget.selectedNodes);
+    let nodeIds = this.widget._nodesToIds(this.widget.selectedNodes);
     this._sendNodesSelected(nodeIds, event.debounce);
   }
 
@@ -62,11 +62,11 @@ export default class TreeAdapter extends ModelAdapter {
   }
 
   _sendNodesChecked(nodes) {
-    var data = {
+    let data = {
       nodes: []
     };
 
-    for (var i = 0; i < nodes.length; i++) {
+    for (let i = 0; i < nodes.length; i++) {
       data.nodes.push({
         nodeId: nodes[i].id,
         checked: nodes[i].checked
@@ -121,7 +121,7 @@ export default class TreeAdapter extends ModelAdapter {
   }
 
   _onNodesInserted(nodes, parentNodeId) {
-    var parentNode;
+    let parentNode;
     if (parentNodeId !== null && parentNodeId !== undefined) {
       parentNode = this.widget.nodesMap[parentNodeId];
       if (!parentNode) {
@@ -136,7 +136,7 @@ export default class TreeAdapter extends ModelAdapter {
   }
 
   _onNodesDeleted(nodeIds, parentNodeId) {
-    var parentNode;
+    let parentNode;
     if (parentNodeId !== null && parentNodeId !== undefined) {
       parentNode = this.widget.nodesMap[parentNodeId];
       if (!parentNode) {
@@ -145,12 +145,12 @@ export default class TreeAdapter extends ModelAdapter {
     }
     this.addFilterForWidgetEventType('nodesSelected');
     this.addFilterForWidgetEventType('nodesChecked');
-    var nodes = this.widget._nodesByIds(nodeIds);
+    let nodes = this.widget._nodesByIds(nodeIds);
     this.widget.deleteNodes(nodes, parentNode);
   }
 
   _onAllChildNodesDeleted(parentNodeId) {
-    var parentNode;
+    let parentNode;
     if (parentNodeId !== null && parentNodeId !== undefined) {
       parentNode = this.widget.nodesMap[parentNodeId];
       if (!parentNode) {
@@ -163,11 +163,11 @@ export default class TreeAdapter extends ModelAdapter {
   }
 
   _onNodesSelected(nodeIds) {
-    this.addFilterForWidgetEvent(function(widgetEvent) {
+    this.addFilterForWidgetEvent(widgetEvent => {
       return widgetEvent.type === 'nodesSelected' &&
         arrays.equals(nodeIds, this.widget._nodesToIds(this.widget.selectedNodes));
-    }.bind(this));
-    var nodes = this.widget._nodesByIds(nodeIds);
+    });
+    let nodes = this.widget._nodesByIds(nodeIds);
     this.widget.selectNodes(nodes);
   }
 
@@ -177,19 +177,19 @@ export default class TreeAdapter extends ModelAdapter {
    * @param event.recursive true, to expand the descendant nodes as well
    */
   _onNodeExpanded(nodeId, event) {
-    var node = this.widget.nodesMap[nodeId],
+    let node = this.widget.nodesMap[nodeId],
       options = {
         lazy: event.expandedLazy
       };
 
-    var affectedNodesMap = objects.createMap();
+    let affectedNodesMap = objects.createMap();
     affectedNodesMap[nodeId] = true;
     if (event.recursive) {
-      Tree.visitNodes(function(n) {
+      Tree.visitNodes(n => {
         affectedNodesMap[n.id] = true;
       }, node.childNodes);
     }
-    this.addFilterForWidgetEvent(function(widgetEvent) {
+    this.addFilterForWidgetEvent(widgetEvent => {
       return widgetEvent.type === 'nodeExpanded' &&
         affectedNodesMap[widgetEvent.node.id] &&
         event.expanded === widgetEvent.expanded &&
@@ -204,7 +204,7 @@ export default class TreeAdapter extends ModelAdapter {
 
   // noinspection DuplicatedCode
   _onNodeChanged(nodeId, cell) {
-    var node = this.widget.nodesMap[nodeId];
+    let node = this.widget.nodesMap[nodeId];
 
     defaultValues.applyTo(cell, 'TreeNode');
     node.text = cell.text;
@@ -220,11 +220,11 @@ export default class TreeAdapter extends ModelAdapter {
   }
 
   _onNodesChecked(nodes) {
-    var checkedNodes = [],
+    let checkedNodes = [],
       uncheckedNodes = [];
 
     nodes.forEach(function(nodeData) {
-      var node = this.widget._nodeById(nodeData.id);
+      let node = this.widget._nodeById(nodeData.id);
       if (nodeData.checked) {
         checkedNodes.push(node);
       } else {
@@ -246,8 +246,8 @@ export default class TreeAdapter extends ModelAdapter {
   }
 
   _onChildNodeOrderChanged(childNodeIds, parentNodeId) {
-    var parentNode = this.widget._nodeById([parentNodeId]);
-    var nodes = this.widget._nodesByIds(childNodeIds);
+    let parentNode = this.widget._nodeById([parentNodeId]);
+    let nodes = this.widget._nodesByIds(childNodeIds);
     this.widget.updateNodeOrder(nodes, parentNode);
   }
 
