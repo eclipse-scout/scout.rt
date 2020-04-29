@@ -92,7 +92,7 @@ export default class VennAsync3Calculator {
 
   _iteration(alpha) {
     // optimize speed: no var lookup (should help the optimizer in general, and IE in particular)
-    var maxD = this.maxD,
+    let maxD = this.maxD,
       dStep = this.dStep,
       minR = this.helper.minR,
       rStep = this.rStep,
@@ -116,32 +116,32 @@ export default class VennAsync3Calculator {
       rBest = this.rBest,
       errorBest = this.errorBest;
 
-    var stepFactor = 1;
+    let stepFactor = 1;
     // sorry... ie is (verry, buggy) slow
     // TODO [15.4] bsh: find better solution for ie, or error calculation
     if (Device.get().isInternetExplorer()) {
       stepFactor = 5;
     }
 
-    for (var d = 0; d < maxD; d += dStep) {
+    for (let d = 0; d < maxD; d += dStep) {
       // calc x, y
-      var x = x1 + d * Math.cos(alpha);
-      var y = y1 - d * Math.sin(alpha);
+      let x = x1 + d * Math.cos(alpha);
+      let y = y1 - d * Math.sin(alpha);
 
-      for (var r = Math.max(minR, r3 * 0.75); r <= r3 * 1.25; r += rStep) {
+      for (let r = Math.max(minR, r3 * 0.75); r <= r3 * 1.25; r += rStep) {
 
         // find areas with monte carlo, do not laugh! i tried even this:
         // http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.507.1195&rep=rep1&type=pdf
 
-        var minX = Math.min(x1 - r1, x2 - r2, x - r);
-        var maxX = Math.max(x1 + r1, x2 + r2, x + r);
-        var minY = Math.min(y1 - r1, y2 - r2, y - r);
-        var maxY = Math.max(y1 + r1, y2 + r2, y + r);
-        var stepX = (maxX - minX) / 100 * stepFactor;
-        var stepY = (maxY - minY) / 100 * stepFactor;
+        let minX = Math.min(x1 - r1, x2 - r2, x - r);
+        let maxX = Math.max(x1 + r1, x2 + r2, x + r);
+        let minY = Math.min(y1 - r1, y2 - r2, y - r);
+        let maxY = Math.max(y1 + r1, y2 + r2, y + r);
+        let stepX = (maxX - minX) / 100 * stepFactor;
+        let stepY = (maxY - minY) / 100 * stepFactor;
 
         // areas of venn
-        var a1 = 0,
+        let a1 = 0,
           a2 = 0,
           a3 = 0,
           a12 = 0,
@@ -149,12 +149,12 @@ export default class VennAsync3Calculator {
           a23 = 0,
           a123 = 0;
 
-        for (var testX = minX; testX < maxX; testX += stepX) {
-          for (var testY = minY; testY < maxY; testY += stepY) {
+        for (let testX = minX; testX < maxX; testX += stepX) {
+          for (let testY = minY; testY < maxY; testY += stepY) {
             // optimize speed for ie: no function call
-            var t1 = ((testX - x1) * (testX - x1) + (testY - y1) * (testY - y1)) < (r1 * r1);
-            var t2 = ((testX - x2) * (testX - x2) + (testY - y2) * (testY - y2)) < (r2 * r2);
-            var t3 = ((testX - x) * (testX - x) + (testY - y) * (testY - y)) < (r * r);
+            let t1 = ((testX - x1) * (testX - x1) + (testY - y1) * (testY - y1)) < (r1 * r1);
+            let t2 = ((testX - x2) * (testX - x2) + (testY - y2) * (testY - y2)) < (r2 * r2);
+            let t3 = ((testX - x) * (testX - x) + (testY - y) * (testY - y)) < (r * r);
 
             // check if inside
             if (t1 && t2 && t3) {
@@ -175,10 +175,10 @@ export default class VennAsync3Calculator {
           }
         }
 
-        var aTotal = a1 + a2 + a3 + a12 + a13 + a23 + a123;
+        let aTotal = a1 + a2 + a3 + a12 + a13 + a23 + a123;
 
         // calc error
-        var error = d / maxD;
+        let error = d / maxD;
         error += this._error(uvw, total, a123, aTotal);
         error += this._error(uv, total, a12, aTotal);
         error += this._error(uw, total, a13, aTotal);

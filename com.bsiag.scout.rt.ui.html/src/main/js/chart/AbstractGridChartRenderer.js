@@ -50,12 +50,12 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
   }
 
   _findMaxMinValue() {
-    var maxValue = 0,
+    let maxValue = 0,
       minValue = 0,
       i = 0,
       j = 0,
       f;
-    var chartGroups = this.chart.chartData.chartValueGroups;
+    let chartGroups = this.chart.chartData.chartValueGroups;
     for (i = 0; i < chartGroups.length; i++) {
       for (j = 0; j < chartGroups[i].values.length; j++) {
         maxValue = Math.max(chartGroups[i].values[j], maxValue);
@@ -114,13 +114,13 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
   }
 
   renderYGrid(yLabels) {
-    var formatOptions = this._calculateLabelFormatOptions(yLabels);
-    var xBase = this.chartBox.xOffset + this.paddingLeft;
-    var xCoord = xBase - 5;
+    let formatOptions = this._calculateLabelFormatOptions(yLabels);
+    let xBase = this.chartBox.xOffset + this.paddingLeft;
+    let xCoord = xBase - 5;
     this._renderGridLineLabel(xCoord, this.paddingTop / 2 - 4, formatOptions.shortcut, false);
 
-    for (var l = 0; l < yLabels.length; l++) {
-      var label = yLabels[l],
+    for (let l = 0; l < yLabels.length; l++) {
+      let label = yLabels[l],
         yCoord = this._calculateYCoordinate(label);
       this._renderGridLine(xBase, yCoord, xBase + this.chartDataAreaWidth, yCoord);
       this._renderGridLineLabel(xCoord, yCoord, this._formatLabel(formatOptions, yLabels[l]), false);
@@ -128,14 +128,14 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
   }
 
   _formatLabel(formatOptions, numberLabel, withoutDecimalFormat) {
-    var label = numberLabel.toString(),
+    let label = numberLabel.toString(),
       decimalSep = '.', // not locale dependent here!
       decimalSepPos = label.indexOf(decimalSep),
       labelLength = decimalSepPos === -1 ? label.length : decimalSepPos,
       tmpLabel;
 
     if (labelLength > formatOptions.separatorPosition && formatOptions.separatorPosition > 0) {
-      var decimalInsertPosition = label.length - formatOptions.separatorPosition;
+      let decimalInsertPosition = label.length - formatOptions.separatorPosition;
       tmpLabel = strings.insertAt(label, decimalSep, decimalInsertPosition);
     } else if (label.length === formatOptions.separatorPosition) {
       if (numberLabel < 0) {
@@ -156,14 +156,14 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
 
   renderXGridLabel(chartGroups, xIndex, width, widthPerX, drawOnValuePoint) {
     // draw label only once
-    var key = this.chart.chartData.axes[0][xIndex].label,
+    let key = this.chart.chartData.axes[0][xIndex].label,
       paintedWidth = drawOnValuePoint ? 0 : width * chartGroups.length + 2 * Math.max(chartGroups.length - 1, 0),
       $text = this._renderGridLineLabel(this._calculateXCoordinate(xIndex) + paintedWidth / 2, this._calculateYCoordinate(this.maxMinValue.minValue) + 20, key, true);
 
     try {
       // Firefox throws error when $text is not in dom(already removed by navigating away). all other browser returns a boundingbox with 0
       // use first group to calculate w.
-      var w = chartGroups[0].values.length * chartGroups.length > 50 ? widthPerX : $text[0].getBBox().width;
+      let w = chartGroups[0].values.length * chartGroups.length > 50 ? widthPerX : $text[0].getBBox().width;
       this.maxWidthLabel = (w > this.maxWidthLabel) ? w : this.maxWidthLabel;
     } catch (e) {
       // NOP
@@ -177,10 +177,10 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
     this.toBigLabelHoverFunc = undefined;
     this.toBigLabelHoverOffFunc = undefined;
     if (this.maxWidthLabel > (widthPerX - 10) * 3) {
-      this.toBigLabelHoverOffFunc = function($label) {
+      this.toBigLabelHoverOffFunc = $label => {
         $label.attr('fill-opacity', 0);
       };
-      this.toBigLabelHoverFunc = function($label) {
+      this.toBigLabelHoverFunc = $label => {
         $label.attr('fill-opacity', 1);
       };
       this.$svg.children('.chart-x-axis-label').attr('fill-opacity', 0);
@@ -196,7 +196,7 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
   }
 
   getWidth(chartGroups) {
-    var width = this.getWidthPerX() / chartGroups.length - 2 * Math.max(chartGroups.length - 1, 0) - 4;
+    let width = this.getWidthPerX() / chartGroups.length - 2 * Math.max(chartGroups.length - 1, 0) - 4;
     width = Math.max(1, width);
     return width;
   }
@@ -206,7 +206,7 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
   }
 
   _calculateYCoordinate(yPoint) {
-    var coord = this.chartDataAreaHeight - (yPoint - this.maxMinValue.minValue) / this.maxMinValue.range * this.chartDataAreaHeight;
+    let coord = this.chartDataAreaHeight - (yPoint - this.maxMinValue.minValue) / this.maxMinValue.range * this.chartDataAreaHeight;
     if (isNaN(coord)) {
       coord = this.chartDataAreaHeight;
     }
@@ -218,22 +218,22 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
   }
 
   _createYLabelsAndAdjustDimensions(possibleYLines) {
-    var negNormalized = this.maxMinValue.minValue * (-1);
-    var maxLabel = Math.max(negNormalized, this.maxMinValue.maxValue);
-    var negValNormalizedBigger = maxLabel !== this.maxMinValue.maxValue;
-    var bigger = (negValNormalizedBigger ? negNormalized : this.maxMinValue.maxValue);
-    var smaller = (negValNormalizedBigger ? this.maxMinValue.maxValue : negNormalized);
+    let negNormalized = this.maxMinValue.minValue * (-1);
+    let maxLabel = Math.max(negNormalized, this.maxMinValue.maxValue);
+    let negValNormalizedBigger = maxLabel !== this.maxMinValue.maxValue;
+    let bigger = (negValNormalizedBigger ? negNormalized : this.maxMinValue.maxValue);
+    let smaller = (negValNormalizedBigger ? this.maxMinValue.maxValue : negNormalized);
     return this._calcNextLabelsAdjustDimensions(bigger, smaller, 0, possibleYLines, negValNormalizedBigger);
   }
 
   _calculateLabelFormatOptions(labels) {
-    var shortcut = '',
+    let shortcut = '',
       maxNumberLen = 0,
       separatorPosition = 0,
       decimalSep = this.session.locale.decimalFormatSymbols.decimalSeparator;
 
-    for (var i = 0; i < labels.length; i++) {
-      var label = labels[i].toString(),
+    for (let i = 0; i < labels.length; i++) {
+      let label = labels[i].toString(),
         decimalSepPos = label.indexOf(decimalSep);
       if (decimalSepPos > -1) {
         label = label.substr(0, decimalSepPos);
@@ -271,7 +271,7 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
   }
 
   _calcNextLabelsAdjustDimensions(bigger, smaller, exp, possibleLines, negValNormalizedBigger) {
-    var linesBigger = Math.pow(2, exp),
+    let linesBigger = Math.pow(2, exp),
       step = bigger / linesBigger,
       smallerLines = [],
       biggerLines = [];
@@ -281,8 +281,8 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
       return [];
     }
 
-    for (var i = step; i <= bigger; i = i + step) {
-      var negValue = i * (-1);
+    for (let i = step; i <= bigger; i = i + step) {
+      let negValue = i * (-1);
       if (smaller > i) {
         smallerLines.push(negValNormalizedBigger ? i : negValue);
       } else if (smaller <= i && smaller > i - step) {
@@ -290,14 +290,14 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
       }
       biggerLines.push(negValNormalizedBigger ? negValue : i);
     }
-    var spacesBetweenLines = smallerLines.length + biggerLines.length;
+    let spacesBetweenLines = smallerLines.length + biggerLines.length;
     if (possibleLines >= spacesBetweenLines) {
-      var labels = biggerLines.concat([0], smallerLines),
+      let labels = biggerLines.concat([0], smallerLines),
         newLabels = this._calcNextLabelsAdjustDimensions(bigger, smaller, exp + 1, possibleLines, negValNormalizedBigger);
       if (newLabels.length > 0) {
         return newLabels;
       }
-      var biggerLinesValue = biggerLines.length ? biggerLines[biggerLines.length - 1] : 0,
+      let biggerLinesValue = biggerLines.length ? biggerLines[biggerLines.length - 1] : 0,
         smallerLinesValue = smallerLines.length ? smallerLines[smallerLines.length - 1] : 0,
         maxValue = Math.ceil(negValNormalizedBigger ? smallerLinesValue : biggerLinesValue),
         minValue = Math.floor(negValNormalizedBigger ? biggerLinesValue : smallerLinesValue);
@@ -312,7 +312,7 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
   }
 
   _calcChartBoxWidth() {
-    var width = this.width;
+    let width = this.width;
 
     if (this.chart.legendVisible &&
       (this.chart.legendPosition === Chart.LEGEND_POSITION_RIGHT ||
@@ -333,7 +333,7 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
    * space, because we reduced the height). See: #_renderAxisLabels.
    */
   _calcChartBoxHeight() {
-    var height = super._calcChartBoxHeight();
+    let height = super._calcChartBoxHeight();
 
     if (this._xAxisLabel()) {
       height -= (this.labelSize.height + LABEL_GAP);
@@ -343,7 +343,7 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
   }
 
   _calcChartBoxXOffset() {
-    var offset = 0;
+    let offset = 0;
 
     if (this.chart.legendVisible && this.chart.legendPosition === Chart.LEGEND_POSITION_LEFT) {
       offset = this.width / 6 > this.minLegendWidth ? this.width / 6 : this.minLegendWidth;
@@ -365,7 +365,7 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
   }
 
   _renderAxisLabels() {
-    var textBounds,
+    let textBounds,
       xLabel = this._xAxisLabel(),
       yLabel = this._yAxisLabel(),
       x = 0,

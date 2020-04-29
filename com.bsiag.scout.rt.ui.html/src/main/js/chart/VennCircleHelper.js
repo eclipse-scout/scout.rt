@@ -18,8 +18,8 @@ export default class VennCircleHelper {
 
   findBalance2(venn1, venn2) {
     // find center
-    var midX = (venn1.r * venn1.x + venn2.r * venn2.x) / (venn1.r + venn2.r);
-    var midY = (venn1.r * venn1.y + venn2.r * venn2.y) / (venn1.r + venn2.r);
+    let midX = (venn1.r * venn1.x + venn2.r * venn2.x) / (venn1.r + venn2.r);
+    let midY = (venn1.r * venn1.y + venn2.r * venn2.y) / (venn1.r + venn2.r);
 
     // move to center
     venn1.x = venn1.x - midX;
@@ -31,8 +31,8 @@ export default class VennCircleHelper {
 
   findBalance3(venn1, venn2, venn3) {
     // find center
-    var midX = (venn1.r * venn1.x + venn2.r * venn2.x + venn3.r * venn3.x) / (venn1.r + venn2.r + venn3.r);
-    var midY = (venn1.r * venn1.y + venn2.r * venn2.y + venn3.r * venn3.y) / (venn1.r + venn2.r + venn3.r);
+    let midX = (venn1.r * venn1.x + venn2.r * venn2.x + venn3.r * venn3.x) / (venn1.r + venn2.r + venn3.r);
+    let midY = (venn1.r * venn1.y + venn2.r * venn2.y + venn3.r * venn3.y) / (venn1.r + venn2.r + venn3.r);
 
     // move to center
     venn1.x = venn1.x - midX;
@@ -52,7 +52,7 @@ export default class VennCircleHelper {
   }
 
   calcD(venn1, venn2, u, v, uv, changeR) {
-    var ret;
+    let ret;
     if (uv === 0) {
       // separated circles
       ret = venn1.r + venn2.r + this.distR * 2;
@@ -83,9 +83,9 @@ export default class VennCircleHelper {
 
     } else {
       //  this is pure magic ;) please do not touch!
-      var ri = Math.min(venn1.r, venn2.r);
-      var ra = Math.max(venn1.r, venn2.r);
-      var q = Math.min(u, v) / (Math.min(u, v) + uv);
+      let ri = Math.min(venn1.r, venn2.r);
+      let ra = Math.max(venn1.r, venn2.r);
+      let q = Math.min(u, v) / (Math.min(u, v) + uv);
 
       // unfortunately, there is no closed solution for cricles, so handle as squares
       ret = 2 * q * ri - ri + ra;

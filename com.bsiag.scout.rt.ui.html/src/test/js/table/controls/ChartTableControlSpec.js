@@ -10,10 +10,10 @@ import {ChartTableControl} from '../../../../main/js/index';
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 /* global sandboxSession, createSimpleModel*/
-describe('ChartTableControl', function() {
-  var $sandbox, session, chartTableControl, helper, $div;
+describe('ChartTableControl', () => {
+  let $sandbox, session, chartTableControl, helper, $div;
 
-  beforeEach(function() {
+  beforeEach(() => {
     $div = $('<div/>');
     setFixtures(sandbox());
     session = sandboxSession();
@@ -22,13 +22,13 @@ describe('ChartTableControl', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
   function createModelFromTable(table) {
-    var model = createSimpleModel('ChartTableControl', session);
-    var defaults = {
+    let model = createSimpleModel('ChartTableControl', session);
+    let defaults = {
       enabled: true,
       visible: true,
       selected: true,
@@ -40,8 +40,8 @@ describe('ChartTableControl', function() {
   }
 
   function createModel(rows, columns) {
-    var tableModel = helper.createModelFixture(rows, columns);
-    var table = helper.createTable(tableModel);
+    let tableModel = helper.createModelFixture(rows, columns);
+    let table = helper.createTable(tableModel);
 
     return createModelFromTable(table);
   }
@@ -53,9 +53,9 @@ describe('ChartTableControl', function() {
     return chartTableControl;
   }
 
-  describe('renderDefaultChart', function() {
+  describe('renderDefaultChart', () => {
 
-    it('does not draw a chart, if there are multiple columns in the table before all are removed', function() {
+    it('does not draw a chart, if there are multiple columns in the table before all are removed', () => {
       chartTableControl = createChartTableControl(createModel(2, 2));
       chartTableControl.table.render();
       expectEmptyChart(false);
@@ -65,30 +65,30 @@ describe('ChartTableControl', function() {
       expectEmptyChart(true);
     });
 
-    it('does not draw a chart, if there are no columns', function() {
+    it('does not draw a chart, if there are no columns', () => {
       chartTableControl = createChartTableControl(createModel(0, 0));
       chartTableControl.table.render();
       expectEmptyChart(true);
     });
 
-    it('draws a chart for a single column', function() {
+    it('draws a chart for a single column', () => {
       chartTableControl = createChartTableControl(createModel(1, 1));
       chartTableControl.table.render();
       expectEmptyChart(false);
     });
 
-    it('draws a chart for multiple columns', function() {
+    it('draws a chart for multiple columns', () => {
       chartTableControl = createChartTableControl(createModel(2, 2));
       chartTableControl.table.render();
       expectEmptyChart(false);
     });
 
-    it('draws a chart with date grouping for a date column', function() {
-      var columns = helper.createModelColumns(1, 'DateColumn');
-      var c0 = helper.createModelCell(0, new Date());
-      var rows = [helper.createModelRow(null, [c0])];
-      var model = helper.createModel(columns, rows);
-      var table = helper.createTable(model);
+    it('draws a chart with date grouping for a date column', () => {
+      let columns = helper.createModelColumns(1, 'DateColumn');
+      let c0 = helper.createModelCell(0, new Date());
+      let rows = [helper.createModelRow(null, [c0])];
+      let model = helper.createModel(columns, rows);
+      let table = helper.createTable(model);
       chartTableControl = createChartTableControl(createModelFromTable(table));
       chartTableControl._renderContent($div);
 
@@ -97,23 +97,23 @@ describe('ChartTableControl', function() {
       expectEmptyChart(false);
     });
 
-    it('renders header texts that contain HTML as plain text', function() {
-      var model = createModel(1, 1);
-      var firstCol = model.table.columns[0];
+    it('renders header texts that contain HTML as plain text', () => {
+      let model = createModel(1, 1);
+      let firstCol = model.table.columns[0];
       firstCol.headerHtmlEnabled = true;
       firstCol.text = '<b>Plain</b><br>Text';
       chartTableControl = createChartTableControl(model);
       chartTableControl._renderContent($sandbox);
-      var $result = $sandbox.find('.select-axis.selected');
+      let $result = $sandbox.find('.select-axis.selected');
       expect($result.length).toBe(2);
       expect($result.get(0).innerHTML).toBe('Plain Text');
     });
 
   });
 
-  describe('renderAfterColumnUpdate', function() {
+  describe('renderAfterColumnUpdate', () => {
 
-    it('does not draw a chart, if columns are updated, but rows are not updated yet', function() {
+    it('does not draw a chart, if columns are updated, but rows are not updated yet', () => {
       chartTableControl = createChartTableControl(createModel(2, 1));
       // remove first column
       chartTableControl.table.columns.shift();

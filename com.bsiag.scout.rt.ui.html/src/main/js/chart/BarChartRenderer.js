@@ -19,7 +19,7 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
   _render() {
     super._render();
 
-    var chartGroups = this.chart.chartData.chartValueGroups,
+    let chartGroups = this.chart.chartData.chartValueGroups,
       widthPerX = this.getWidthPerX(),
       width = this.getWidth(chartGroups),
       yLabels = this._createYLabelsAndAdjustDimensions(this.possibleYLines);
@@ -30,12 +30,12 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
     this._renderAxisLabels();
 
     // draw data
-    for (var cg = 0; cg < chartGroups.length; cg++) {
-      var barClass = 'bar-chart-bar' + (this.chart.autoColor ? ' color' + cg : '');
+    for (let cg = 0; cg < chartGroups.length; cg++) {
+      let barClass = 'bar-chart-bar' + (this.chart.autoColor ? ' color' + cg : '');
       this._renderLegendEntry(chartGroups[cg].groupName, !this.chart.autoColor ? this.chart.chartData.chartValueGroups[cg].colorHexValue : null, barClass, cg);
 
-      for (var i = 0; i < chartGroups[cg].values.length; i++) {
-        var key = this.chart.chartData.axes[0][i].label,
+      for (let i = 0; i < chartGroups[cg].values.length; i++) {
+        let key = this.chart.chartData.axes[0][i].label,
           value = chartGroups[cg].values[i];
         this._renderSingleBar(key, value, i, cg, width, widthPerX, chartGroups);
       }
@@ -46,7 +46,7 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
   }
 
   _renderSingleBar(key, value, valueIndex, chartGroupIndex, width, widthPerX) {
-    var yEnd = 0,
+    let yEnd = 0,
       heightEnd = 0,
       $text,
       chartGroups = this.chart.chartData.chartValueGroups,
@@ -67,7 +67,7 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
       heightEnd = this._calculateYCoordinate(value) - this._calculateYCoordinate(0);
     }
 
-    var renderRectOptions = this._initRectRenderOptions({
+    let renderRectOptions = this._initRectRenderOptions({
       xStart: xCoord,
       yStart: this._calculateYCoordinate(0),
       yEnd: yEnd,
@@ -83,10 +83,10 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
     renderRectOptions.customAttributes.push(['negValue', value < 0]);
     renderRectOptions.customAttributes.push(['data-xAxis', key]);
 
-    var $rect = this._renderRect(renderRectOptions);
+    let $rect = this._renderRect(renderRectOptions);
 
     // rect legend
-    var legendPositions = {
+    let legendPositions = {
       x1: xCoord + width / 2,
       x2: xCoord + width / 2 + 10,
       y1: yEnd,
@@ -96,7 +96,7 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
     };
 
     // calculate opening direction
-    var labelPositionFunc = function(labelWidth, labelHeight) {
+    let labelPositionFunc = function(labelWidth, labelHeight) {
       if (value <= 0 || legendPositions.y2 - labelHeight < 0) {
         legendPositions.v = 1;
         if (0 > xCoord - 10 - labelWidth) {
@@ -119,19 +119,19 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
     legendPositions.autoPosition = true;
     legendPositions.posFunc = labelPositionFunc;
 
-    var
+    let
       that = this,
       legend = this._renderWireLegend(
         strings.join(': ', this.chart.chartData.chartValueGroups[chartGroupIndex].groupName, this.session.locale.decimalFormat.format(value)),
         legendPositions, 'line-chart-wire-label', true
       ),
-      mouseIn = function() {
+      mouseIn = () => {
         legend.attachFunc();
         if (that.toBigLabelHoverFunc) {
           that.toBigLabelHoverFunc(that.xAxisLabels[valueIndex]);
         }
       },
-      mouseOut = function() {
+      mouseOut = () => {
         legend.detachFunc();
         if (that.toBigLabelHoverOffFunc) {
           that.toBigLabelHoverOffFunc(that.xAxisLabels[valueIndex]);
@@ -151,7 +151,7 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
     if (this.animationTriggered) {
       return;
     }
-    var yCoord = 0;
+    let yCoord = 0;
     if (this.$svg.children('.bar-chart-bar').length > 0) {
       yCoord = this._calculateYCoordinate(0);
     }
@@ -161,9 +161,9 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
       .animateSVG('y', yCoord, 200, null, true)
       .animateSVG('height', 0, 200, null, true)
       .promise()
-      .done(function() {
+      .done(() => {
         this._remove(afterRemoveFunc);
         this.animationTriggered = false;
-      }.bind(this));
+      });
   }
 }

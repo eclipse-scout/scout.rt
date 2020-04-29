@@ -9,20 +9,20 @@ import {FulfillmentChartRenderer} from '../../../main/js/index';
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-describe('FulfillmentChartRendererSpec', function() {
+describe('FulfillmentChartRendererSpec', () => {
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
   });
 
-  describe('should animate remove on update', function() {
+  describe('should animate remove on update', () => {
 
-    var opts = {
+    let opts = {
       requestAnimation: true
     };
 
-    it('without start value property', function() {
-      var fulfillment = new FulfillmentChartRenderer({});
+    it('without start value property', () => {
+      let fulfillment = new FulfillmentChartRenderer({});
       expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(true);
 
       fulfillment = new FulfillmentChartRenderer({
@@ -41,26 +41,26 @@ describe('FulfillmentChartRendererSpec', function() {
       expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(false);
     });
 
-    it('with start value property', function() {
+    it('with start value property', () => {
       opts.requestAnimation = true;
-      var actualChartValue = {
+      let actualChartValue = {
         values: [6]
       };
-      var totalChartValue = {
+      let totalChartValue = {
         values: [10]
       };
-      var chartData = {
+      let chartData = {
         axes: [],
         chartValueGroups: [actualChartValue, totalChartValue],
         customProperties: {
           startValue: 2
         }
       };
-      var chart = {
+      let chart = {
         chartData: chartData
       };
 
-      var fulfillment = new FulfillmentChartRenderer(chart);
+      let fulfillment = new FulfillmentChartRenderer(chart);
       expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(false);
 
       chartData.customProperties.startValue = 0;

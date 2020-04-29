@@ -36,7 +36,7 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
   static SEGMENT_GAP = 0.0103; // space between two segments (lines)
 
   _validate() {
-    var chartData = this.chart.chartData;
+    let chartData = this.chart.chartData;
     if (!chartData ||
       chartData.axes.length > 0 ||
       chartData.chartValueGroups.length !== 1 ||
@@ -48,7 +48,7 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
   }
 
   _render() {
-    var chartData = this.chart.chartData,
+    let chartData = this.chart.chartData,
       minValue = chartData.chartValueGroups[0].values[0],
       maxValue = chartData.chartValueGroups[0].values[2],
       value = chartData.chartValueGroups[0].values[1];
@@ -71,8 +71,8 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
     // to remember 'filled' parts
     this.$filledParts = [];
 
-    var numTotalSegments = this.parts * this.numSegmentsPerPart; // total number of lines in the whole chart (all colors)
-    var numTotalGaps = numTotalSegments - 1;
+    let numTotalSegments = this.parts * this.numSegmentsPerPart; // total number of lines in the whole chart (all colors)
+    let numTotalGaps = numTotalSegments - 1;
 
     // width of one segment (line)
     this.segmentWidth = (SpeedoChartRenderer.ARC_RANGE - (numTotalGaps * SpeedoChartRenderer.SEGMENT_GAP)) / numTotalSegments;
@@ -81,16 +81,16 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
     this.widthOfSegmentWithGap = this.segmentWidth + SpeedoChartRenderer.SEGMENT_GAP;
 
     // pointer value in range [0,1]
-    var valuePercentage = this._limitValue((value - minValue) / (maxValue - minValue), 1);
+    let valuePercentage = this._limitValue((value - minValue) / (maxValue - minValue), 1);
 
     // value in the range [0,1] rounded to one segment
-    var segmentToPointAt = Math.round(valuePercentage * numTotalGaps);
+    let segmentToPointAt = Math.round(valuePercentage * numTotalGaps);
 
     // value rounded to the closest segment so that the pointer never stays "in between" two segments but always on a segment
-    var valuePercentageRounded = this._getPercentageValueOfSegment(segmentToPointAt % this.numSegmentsPerPart,
+    let valuePercentageRounded = this._getPercentageValueOfSegment(segmentToPointAt % this.numSegmentsPerPart,
       this._getPartForValue(valuePercentage));
 
-    for (var i = 0; i < this.parts; i++) {
+    for (let i = 0; i < this.parts; i++) {
       this._renderCirclePart(i);
     }
 
@@ -114,10 +114,10 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
    */
   _getPercentageValueOfSegment(segmentIndexInPart, part) {
     // get the segment position
-    var pointerRange = this._calcSegmentPos(segmentIndexInPart, part);
+    let pointerRange = this._calcSegmentPos(segmentIndexInPart, part);
 
     // calculate the center position in the Arc range [0, 0.5] of the segment
-    var pointerPos = pointerRange.from - SpeedoChartRenderer.ARC_MIN + ((pointerRange.to - pointerRange.from) / 2);
+    let pointerPos = pointerRange.from - SpeedoChartRenderer.ARC_MIN + ((pointerRange.to - pointerRange.from) / 2);
 
     // calculate the percentage value of the center of the segment in range [0,1]
     return this._limitValue(pointerPos / SpeedoChartRenderer.ARC_RANGE, 1);
@@ -134,9 +134,9 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
       .attr('fill', 'none');
 
     if (this.animated) {
-      var that = this;
-      var tweenIn = function(now, fx) {
-        var val = this.getAttribute('data-end') * fx.pos;
+      let that = this;
+      let tweenIn = function(now, fx) {
+        let val = this.getAttribute('data-end') * fx.pos;
         that._updatePointer(val);
         that._updatePartsFill(val);
       };
@@ -164,10 +164,10 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
   }
 
   _renderCirclePart(part) {
-    var colorClass = this._getColorForPart(part);
+    let colorClass = this._getColorForPart(part);
     // render 'empty' segments
-    for (var i = 0; i < this.numSegmentsPerPart; i++) {
-      var segPos = this._calcSegmentPos(i, part);
+    for (let i = 0; i < this.numSegmentsPerPart; i++) {
+      let segPos = this._calcSegmentPos(i, part);
       this._renderSegment(segPos.from, segPos.to, colorClass);
     }
 
@@ -178,7 +178,7 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
   _renderLegend(minValue, value, maxValue, groupName) {
     this._renderLegendEntry(groupName, null, null, 0);
 
-    var minMaxLegendFontSize = this.scaleWeight * 0.8,
+    let minMaxLegendFontSize = this.scaleWeight * 0.8,
       padding = 5, // same as in AbstractChartRenderer#_renderWireLegend
       labelYPos = this.my + padding,
       labelMinMaxYPos = labelYPos + minMaxLegendFontSize * 0.8,
@@ -197,24 +197,24 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
     // interactive legend for min/max value
     if (this.chart.interactiveLegendVisible) {
       // min value
-      var $minLegend = this.$svg.appendSVG('text', 'line-label line-chart-wire-label')
+      let $minLegend = this.$svg.appendSVG('text', 'line-label line-chart-wire-label')
         .attr('x', this.chartBox.mX() - this.r)
         .attr('y', labelMinMaxYPos)
         .text(minLegendValue)
         .attr('style', 'font-size: ' + minMaxLegendFontSize + 'px; text-anchor: middle');
 
       // max value
-      var $maxLegend = this.$svg.appendSVG('text', 'line-label line-chart-wire-label')
+      let $maxLegend = this.$svg.appendSVG('text', 'line-label line-chart-wire-label')
         .attr('x', this.chartBox.mX() + this.r)
         .attr('y', labelMinMaxYPos)
         .text(maxLegendValue)
         .attr('style', 'font-size: ' + minMaxLegendFontSize + 'px; text-anchor: middle');
 
-      var mouseIn = function() {
+      let mouseIn = function() {
         this.$svg.append($minLegend);
         this.$svg.append($maxLegend);
       }.bind(this);
-      var mouseOut = function() {
+      let mouseOut = () => {
         $minLegend.detach();
         $maxLegend.detach();
       };
@@ -236,7 +236,7 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
    * returns the part index for the specified valuePercentage. The valuePercentage must be in the range [0,1].
    */
   _getPartForValue(valuePercentage) {
-    var part = Math.floor(valuePercentage * this.parts);
+    let part = Math.floor(valuePercentage * this.parts);
     return this._limitValue(part, this.parts - 1);
   }
 
@@ -254,7 +254,7 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
     if (value < SpeedoChartRenderer.ONE_MILLION) {
       return Math.floor(value / SpeedoChartRenderer.ONE_THOUSAND) + 'k';
     }
-    var millions = value / SpeedoChartRenderer.ONE_MILLION;
+    let millions = value / SpeedoChartRenderer.ONE_MILLION;
     millions = numbers.round(millions, RoundingMode.HALF_UP, 2);
     return this.session.locale.decimalFormat.format(millions) + 'M';
   }
@@ -273,8 +273,8 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
    * Updates the filling of the 'filled' segments to be filled up to the specified valuePercentage in range [0,1].
    */
   _updatePartsFill(valuePercentage) {
-    var from, to;
-    for (var part = 0; part < this.$filledParts.length; part++) {
+    let from, to;
+    for (let part = 0; part < this.$filledParts.length; part++) {
       from = this._calcSegmentPos(0, part, this.segmentWidth).from;
       if ((part + 1) / this.parts < valuePercentage) {
         // the current part is smaller than the value: completely filled part
@@ -297,18 +297,18 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
    * @param part the part index.
    */
   _calcSegmentPos(segmentIndexInPart, part) {
-    var result = {
+    let result = {
       from: 0,
       to: 0
     };
-    var segmentNum = segmentIndexInPart + part * this.numSegmentsPerPart;
+    let segmentNum = segmentIndexInPart + part * this.numSegmentsPerPart;
     result.from = segmentNum * this.widthOfSegmentWithGap - SpeedoChartRenderer.ARC_MAX;
     result.to = result.from + this.segmentWidth;
     return result;
   }
 
   _getColorForPart(part) {
-    var position = this.chart.chartData.customProperties.greenAreaPosition;
+    let position = this.chart.chartData.customProperties.greenAreaPosition;
     switch (position) {
       case SpeedoChartRenderer.GREEN_AREA_POSITION_LEFT:
         // only four parts
@@ -360,7 +360,7 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
    * calculates the path-values to be used in the 'd' attribute of the path tag for a segment.
    */
   _pathSegment(start, end) {
-    var s = start * 2 * Math.PI,
+    let s = start * 2 * Math.PI,
       e = end * 2 * Math.PI,
       pathString = '';
 
@@ -380,8 +380,8 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
    * calculates the path-values to be used in the 'd' attribute of the path tag for the pointer
    */
   _pathPointer(valuePercentage) {
-    var point = SpeedoChartRenderer.ARC_RANGE * valuePercentage - SpeedoChartRenderer.ARC_MAX;
-    var s = point * 2 * Math.PI,
+    let point = SpeedoChartRenderer.ARC_RANGE * valuePercentage - SpeedoChartRenderer.ARC_MAX;
+    let s = point * 2 * Math.PI,
       pointerOuterR = this.r - (1.4 * this.scaleWeight),
       pointerInnerR = this.r + (1.37 * this.scaleWeight),
       pathString = '';
@@ -399,9 +399,9 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
     if (this.animationTriggered) {
       return;
     }
-    var that = this,
+    let that = this,
       tweenOut = function(now, fx) {
-        var val = this.getAttribute('data-end') * (1 - fx.pos);
+        let val = this.getAttribute('data-end') * (1 - fx.pos);
         that._updatePointer(val);
         that._updatePartsFill(val);
       };
@@ -412,9 +412,9 @@ export default class SpeedoChartRenderer extends AbstractChartRenderer {
         tabIndex: 0
       }, this._createAnimationObjectWithTabindexRemoval(tweenOut))
       .promise()
-      .done(function() {
+      .done(() => {
         this._remove(afterRemoveFunc);
         this.animationTriggered = false;
-      }.bind(this));
+      });
   }
 }

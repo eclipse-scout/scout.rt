@@ -17,7 +17,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
   }
 
   _validate() {
-    var chartData = this.chart.chartData;
+    let chartData = this.chart.chartData;
     if (!chartData ||
       chartData.axes.length !== 0 ||
       chartData.chartValueGroups.length === 0 ||
@@ -42,10 +42,10 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
     this.numberOfCircles = this.chart.chartData.customProperties.NumberOfCircles;
 
     // render parameter
-    var distR = 10,
+    let distR = 10,
       maxR = Math.min(this.centerX, this.centerY),
       minR = maxR / 15,
-      total = this.data.reduce(function(s, e) {
+      total = this.data.reduce((s, e) => {
         return s + parseFloat(e.values[0]);
       }, 1);
 
@@ -69,7 +69,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
     }
 
     // Final callback
-    var draw = function() {
+    let draw = function() {
       this.readyToDraw = true;
       this.setLoading(false);
       if (!this.$svg.isAttached()) {
@@ -95,11 +95,11 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
       draw();
 
     } else if (this.numberOfCircles === 3) {
-      this._calc3(this.vennNumber1, this.vennNumber2, this.vennNumber3, false, function() {
+      this._calc3(this.vennNumber1, this.vennNumber2, this.vennNumber3, false, () => {
         if (this.rendering || this.rendered) {
           this._calc3(this.vennReal1, this.vennReal2, this.vennReal3, true, draw);
         }
-      }.bind(this));
+      });
     }
   }
 
@@ -130,7 +130,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
 
   _calc1(v1) {
     // set basic data
-    var a = this.data[0].values[0];
+    let a = this.data[0].values[0];
 
     // calc sizes
     if (a > 0) {
@@ -149,10 +149,10 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
 
   _calc2(v1, v2, real) {
     // set basic data
-    var a = this.data[0].values[0];
-    var b = this.data[1].values[0];
-    var ab = this.data[2].values[0];
-    var d12;
+    let a = this.data[0].values[0];
+    let b = this.data[1].values[0];
+    let ab = this.data[2].values[0];
+    let d12;
 
     if (real) {
       // basics calculation
@@ -210,15 +210,15 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
 
   _calc3(v1, v2, v3, real, callback) {
     // set basic data
-    var a = this.data[0].values[0];
-    var b = this.data[1].values[0];
-    var c = this.data[2].values[0];
-    var ab = this.data[3].values[0];
-    var ac = this.data[4].values[0];
-    var bc = this.data[5].values[0];
-    var abc = this.data[6].values[0];
+    let a = this.data[0].values[0];
+    let b = this.data[1].values[0];
+    let c = this.data[2].values[0];
+    let ab = this.data[3].values[0];
+    let ac = this.data[4].values[0];
+    let bc = this.data[5].values[0];
+    let abc = this.data[6].values[0];
 
-    var d12, d13, d23;
+    let d12, d13, d23;
 
     // calc sizes
     if (real) {
@@ -244,7 +244,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
       // c is much more difficult..., only changes v3
       this._cancelAsync3Calculator();
       this.async3Calculator = new VennAsync3Calculator(this.vennCircleHelper, v1, v2, v3, a, b, c, ab, ac, bc, abc, d12, d13, d23);
-      this.async3Calculator.start(function onCalculationFinished() {
+      this.async3Calculator.start(() => {
         this.async3Calculator = null;
 
         // balance circles
@@ -256,7 +256,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
         v3.setLegend(this.data[2].groupName, 1, -1);
 
         callback();
-      }.bind(this));
+      });
 
     } else {
       // draw label
@@ -308,7 +308,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
     this.animationTriggered = true;
 
     // remove labels and legends
-    var that = this;
+    let that = this;
     this.$svg.children('.venn-legend, .venn-label, .venn-axis-white, .label-line')
       .stop()
       .animateSVG('opacity', 1, 0, null, true)
@@ -319,7 +319,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
       });
 
     // find venns we will update
-    var showVenn = [];
+    let showVenn = [];
 
     if (this.numberOfCircles > 0) {
       showVenn.push(real ? this.vennReal1 : this.vennNumber1);
@@ -334,12 +334,12 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
     }
 
     // update venn and draw labels
-    for (var i = 0; i < showVenn.length; i++) {
-      var venn = showVenn[i];
+    for (let i = 0; i < showVenn.length; i++) {
+      let venn = showVenn[i];
       this._updateVenn(venn, animated);
 
-      for (var j = 0; j < venn.labels.length; j++) {
-        var label = venn.labels[j];
+      for (let j = 0; j < venn.labels.length; j++) {
+        let label = venn.labels[j];
         this._drawLabel(label.text, label.x, label.y, animated);
       }
     }
@@ -347,7 +347,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
 
   // handling of circles
   _createCircle(circleIndex, color, cssClass) {
-    var $circle = this.$svg.appendSVG('circle', 'venn-circle')
+    let $circle = this.$svg.appendSVG('circle', 'venn-circle')
       .attr('cx', this.centerX)
       .attr('cy', this.centerY)
       .attr('r', 0)
@@ -382,13 +382,13 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
       .animateSVG('r', venn.r, animated ? 300 : 0, null, true);
 
     // set up position legend
-    var minR = this.vennCircleHelper.minR,
+    let minR = this.vennCircleHelper.minR,
       x1 = this.centerX + venn.x + venn.legendH * Math.sin(Math.PI / 5) * venn.r,
       y1 = this.centerY + venn.y + venn.legendV * Math.cos(Math.PI / 5) * venn.r,
       x2 = this.centerX + venn.x + venn.legendH * Math.sin(Math.PI / 5) * (venn.legendR + minR * 1.5),
       y2 = this.centerY + venn.y + venn.legendV * Math.cos(Math.PI / 5) * (venn.legendR + minR * 1.5);
 
-    var legendPositions = {
+    let legendPositions = {
       x1: x1,
       x2: x2,
       y1: y1,
@@ -402,7 +402,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
 
   _drawLabel(text, dx, dy, animated) {
     // draw label
-    var $label = this.$svg.appendSVG('text', 'venn-label')
+    let $label = this.$svg.appendSVG('text', 'venn-label')
       .attr('x', this.centerX + dx)
       .attr('y', this.centerY + dy)
       .text(text);
@@ -422,10 +422,10 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
     }
 
     // target contains element that is entered, relatedTarget contains element that is left
-    var toElement = (event.type === 'mouseenter' ? event.target : event.relatedTarget);
+    let toElement = (event.type === 'mouseenter' ? event.target : event.relatedTarget);
 
     // check if true enter or just from one circle to another
-    var isCircle = toElement && $(toElement).hasClass('venn-circle');
+    let isCircle = toElement && $(toElement).hasClass('venn-circle');
     if (this.wasCircle && isCircle) {
       return false;
     }

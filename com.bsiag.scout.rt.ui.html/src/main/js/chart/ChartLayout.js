@@ -18,7 +18,7 @@ export default class ChartLayout extends AbstractLayout {
   }
 
   layout($container) {
-    var opts = {
+    let opts = {
       requestAnimation: true,
       debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
     };

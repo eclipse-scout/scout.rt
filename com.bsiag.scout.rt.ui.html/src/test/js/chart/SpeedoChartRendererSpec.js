@@ -13,19 +13,19 @@ import {Chart, SpeedoChartRenderer} from '../../../main/js/index';
 import {scout} from '@eclipse-scout/core';
 import {LocaleSpecHelper} from '@eclipse-scout/testing';
 
-describe('SpeedoChartRenderer', function() {
-  var locale, helper, session;
+describe('SpeedoChartRenderer', () => {
+  let locale, helper, session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new LocaleSpecHelper();
     locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
   });
 
-  describe('_formatValue', function() {
-    it('should display compact labels for large values', function() {
-      var speedo = new SpeedoChartRenderer({});
+  describe('_formatValue', () => {
+    it('should display compact labels for large values', () => {
+      let speedo = new SpeedoChartRenderer({});
       speedo.session = {
         locale: locale
       };
@@ -41,9 +41,9 @@ describe('SpeedoChartRenderer', function() {
     });
   });
 
-  describe('click handling', function() {
-    it('should handle click', function() {
-      var chart = scout.create('Chart', {
+  describe('click handling', () => {
+    it('should handle click', () => {
+      let chart = scout.create('Chart', {
         parent: session.desktop,
         clickable: true,
         chartType: Chart.SPEEDO,
@@ -65,11 +65,11 @@ describe('SpeedoChartRenderer', function() {
       chart.render();
       chart.revalidateLayout();
 
-      var event = null;
-      chart.on('valueClick', function(event0) {
+      let event = null;
+      chart.on('valueClick', event0 => {
         event = event0;
       });
-      var $svg = session.desktop.$container.find('svg');
+      let $svg = session.desktop.$container.find('svg');
       $svg.click();
       expect(event.data).toEqual({
         axisIndex: -1,

@@ -33,7 +33,7 @@ export default class ChartTableUserFilter extends TableUserFilter {
    * @override TableUserFilter.js
    */
   createFilterAddedEventData() {
-    var data = super.createFilterAddedEventData();
+    let data = super.createFilterAddedEventData();
     data.text = this.text;
     data.filters = this.filters;
     data.columnIdX = (this.xAxis && this.xAxis.column) ? this.xAxis.column.id : null;
@@ -42,13 +42,13 @@ export default class ChartTableUserFilter extends TableUserFilter {
   }
 
   calculate() {
-    var matrix = new TableMatrix(this.table, this.session);
-    var columnX = this.table.columnById(this.columnIdX);
-    var axisGroupX = columnX.createFilter().axisGroup();
+    let matrix = new TableMatrix(this.table, this.session);
+    let columnX = this.table.columnById(this.columnIdX);
+    let axisGroupX = columnX.createFilter().axisGroup();
     this.xAxis = matrix.addAxis(columnX, axisGroupX);
     if (this.columnIdY) {
-      var columnY = this.table.columnById(this.columnIdY);
-      var axisGroupY = columnY.createFilter().axisGroup();
+      let columnY = this.table.columnById(this.columnIdY);
+      let axisGroupY = columnY.createFilter().axisGroup();
       this.yAxis = matrix.addAxis(columnY, axisGroupY);
     }
     matrix.calculate();
@@ -59,14 +59,14 @@ export default class ChartTableUserFilter extends TableUserFilter {
       // Lazy calculation. It is not possible on init, because the table is not rendered yet.
       this.calculate();
     }
-    var key = this.xAxis.column.cellValueOrTextForCalculation(row);
-    var nX = this.xAxis.norm(key);
+    let key = this.xAxis.column.cellValueOrTextForCalculation(row);
+    let nX = this.xAxis.norm(key);
 
     if (!this.yAxis) {
       return (this.filters.indexOf(nX) > -1);
     }
     key = this.yAxis.column.cellValueOrTextForCalculation(row);
-    var nY = this.yAxis.norm(key);
+    let nY = this.yAxis.norm(key);
     return (this.filters.indexOf(JSON.stringify([nX, nY])) > -1);
   }
 }

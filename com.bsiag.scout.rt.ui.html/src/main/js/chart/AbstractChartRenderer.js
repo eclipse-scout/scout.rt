@@ -50,15 +50,15 @@ export default class AbstractChartRenderer {
   static FONT_SIZE_BIG = 'bigFont';
 
   validate() {
-    var chartData = this.chart && this.chart.chartData;
+    let chartData = this.chart && this.chart.chartData;
     if (!chartData || !chartData.chartValueGroups || chartData.chartValueGroups.length === 0) {
       return false;
     }
 
     // check lengths
-    var i, length = 0;
+    let i, length = 0;
     for (i = 0; i < chartData.chartValueGroups.length; i++) {
-      var chartValueGroup = chartData.chartValueGroups[i];
+      let chartValueGroup = chartData.chartValueGroups[i];
       if (!chartValueGroup.values) {
         return false;
       }
@@ -210,7 +210,7 @@ export default class AbstractChartRenderer {
     // init all values for animation with -1
 
     // Default options (end value of "null" means "don't set this attribute")
-    var options = {
+    let options = {
       xStart: 0,
       xEnd: null,
       yStart: 0,
@@ -252,7 +252,7 @@ export default class AbstractChartRenderer {
     if (!this.chart.legendVisible || this.suppressLegendBox) {
       return;
     }
-    var labelCount = Math.min(this.chart.chartData.chartValueGroups.length, this.chart.maxSegments),
+    let labelCount = Math.min(this.chart.chartData.chartValueGroups.length, this.chart.maxSegments),
       startY,
       startX,
       legendPadding = this.horizontalLegendPaddingLeft,
@@ -288,7 +288,7 @@ export default class AbstractChartRenderer {
   }
 
   _initLegendTextHeights() {
-    var textBounds = this._measureText('MeasureHeight', this.legendLabelClass),
+    let textBounds = this._measureText('MeasureHeight', this.legendLabelClass),
       textHeight = textBounds.height,
       textGap = textHeight / 5,
       paddingTopBottom = textHeight / 2,
@@ -304,12 +304,12 @@ export default class AbstractChartRenderer {
   }
 
   _measureText(text, legendLabelClass) {
-    var $label = this.$svg.appendSVG('text', legendLabelClass)
+    let $label = this.$svg.appendSVG('text', legendLabelClass)
       .attr('x', 0)
       .attr('y', 0)
       .attr('visibility', 'hidden')
       .text(text);
-    var textBounds;
+    let textBounds;
     try {
       // Firefox throws error when node is not in dom(already removed by navigating away). all other browser returns a boundingbox with 0
       textBounds = $label[0].getBBox();
@@ -340,15 +340,15 @@ export default class AbstractChartRenderer {
   }
 
   _renderHorizontalLegendEntry(label, color, colorClass, position) {
-    var line = Math.floor(position / this.horizontalLegendEntriesPerLine);
-    var posInLine = position % this.horizontalLegendEntriesPerLine;
-    var offsetTop = this.labelBox.y + line * this.labelBox.textGap + line * this.labelBox.textHeight;
-    var offsetLeft = this.labelBox.x + posInLine * this.labelBox.widthPerLabel;
+    let line = Math.floor(position / this.horizontalLegendEntriesPerLine);
+    let posInLine = position % this.horizontalLegendEntriesPerLine;
+    let offsetTop = this.labelBox.y + line * this.labelBox.textGap + line * this.labelBox.textHeight;
+    let offsetLeft = this.labelBox.x + posInLine * this.labelBox.widthPerLabel;
 
-    var shorterLabel = label;
-    var realTextWidth = this._measureText(shorterLabel).width;
+    let shorterLabel = label;
+    let realTextWidth = this._measureText(shorterLabel).width;
     if (realTextWidth > this.labelBox.textWidth) {
-      var i = 1; // number of deleted characters
+      let i = 1; // number of deleted characters
       while (realTextWidth > this.labelBox.textWidth && i < label.length) {
         shorterLabel = label.substr(0, label.length - i) + '...';
         realTextWidth = this._measureText(shorterLabel).width;
@@ -359,7 +359,7 @@ export default class AbstractChartRenderer {
       }
     }
 
-    var $label = this.$svg.appendSVG('text', this.legendLabelClass)
+    let $label = this.$svg.appendSVG('text', this.legendLabelClass)
       .attr('x', offsetLeft)
       .attr('y', offsetTop)
       .text(shorterLabel);
@@ -373,7 +373,7 @@ export default class AbstractChartRenderer {
     addTooltipIfShortLabel.call(this, $label);
 
     if (color || colorClass) {
-      var $bubble = this._renderLegendBubble(color, colorClass, offsetLeft, offsetTop);
+      let $bubble = this._renderLegendBubble(color, colorClass, offsetLeft, offsetTop);
       addTooltipIfShortLabel.call(this, $bubble);
     }
 
@@ -393,8 +393,8 @@ export default class AbstractChartRenderer {
   }
 
   _renderVerticalLegendEntry(label, color, colorClass, position) {
-    var offsetTop = this.labelBox.y + position * this.labelBox.textGap + position * this.labelBox.textHeight;
-    var $label = this.$svg.appendSVG('text', this.legendLabelClass)
+    let offsetTop = this.labelBox.y + position * this.labelBox.textGap + position * this.labelBox.textHeight;
+    let $label = this.$svg.appendSVG('text', this.legendLabelClass)
       .attr('x', this.labelBox.x)
       .attr('y', offsetTop)
       .text(label);
@@ -413,7 +413,7 @@ export default class AbstractChartRenderer {
   }
 
   _renderLegendBubble(color, colorClass, x, y) {
-    var $bubble = this.$svg.appendSVG('circle', 'legend-bubble' + strings.box(' ', colorClass, ''))
+    let $bubble = this.$svg.appendSVG('circle', 'legend-bubble' + strings.box(' ', colorClass, ''))
       .attr('cx', x - this.labelBox.bubblePadding - this.labelBox.bubbleR)
       .attr('cy', y - this.labelBox.bubbleR + 1)
       .attr('r', this.labelBox.bubbleR);
@@ -432,7 +432,7 @@ export default class AbstractChartRenderer {
   }
 
   _renderRect(renderRectOptions) {
-    var $rect = this.$svg.appendSVG('rect', renderRectOptions.cssClass, '', renderRectOptions.id)
+    let $rect = this.$svg.appendSVG('rect', renderRectOptions.cssClass, '', renderRectOptions.id)
       .attr('x', renderRectOptions.xStart)
       .attr('y', renderRectOptions.yStart)
       .attr('width', renderRectOptions.widthStart)
@@ -444,8 +444,8 @@ export default class AbstractChartRenderer {
       $rect.on('click', renderRectOptions.clickObject, this.chart._onValueClick.bind(this.chart));
     }
 
-    for (var i = 0; i < renderRectOptions.customAttributes.length; i++) {
-      var customAttribute = renderRectOptions.customAttributes[i];
+    for (let i = 0; i < renderRectOptions.customAttributes.length; i++) {
+      let customAttribute = renderRectOptions.customAttributes[i];
       if (customAttribute.length === 2) {
         $rect.attr(customAttribute[0], customAttribute[1]);
       }
@@ -477,7 +477,7 @@ export default class AbstractChartRenderer {
   }
 
   _renderLine(x1, y1, x2, y2, lineClass) {
-    var $line = this.$svg.appendSVG('line', lineClass)
+    let $line = this.$svg.appendSVG('line', lineClass)
       .attr('x1', x1).attr('y1', y1)
       .attr('x2', x2).attr('y2', y2);
     if (this.animated) {
@@ -490,14 +490,14 @@ export default class AbstractChartRenderer {
   }
 
   _renderLineLabel(x, y, label, labelClass, drawBackground) {
-    var $label = this.$svg.appendSVG('text', labelClass ? labelClass : 'line-label')
+    let $label = this.$svg.appendSVG('text', labelClass ? labelClass : 'line-label')
       .attr('x', x).attr('y', y)
       .text(label);
 
     if (drawBackground) {
       $label.attr('mask', 'url(#' + this.maskId + ')');
 
-      var $background = this.$svg.appendSVG('text', labelClass ? labelClass + ' background' : 'line-label-background')
+      let $background = this.$svg.appendSVG('text', labelClass ? labelClass + ' background' : 'line-label-background')
         .attr('x', x).attr('y', y)
         .attr('clip-path', 'url(#' + this.clipId + ')')
         .text(label);
@@ -547,7 +547,7 @@ export default class AbstractChartRenderer {
 
   _calcChartBoxHeight() {
     if (this.chart.legendVisible && !this.suppressLegendBox) {
-      var lines = Math.ceil(this.chart.chartData.chartValueGroups.length / this.horizontalLegendEntriesPerLine);
+      let lines = Math.ceil(this.chart.chartData.chartValueGroups.length / this.horizontalLegendEntriesPerLine);
       if (this.chart.legendPosition === Chart.LEGEND_POSITION_BOTTOM) {
         return this.height - this.legendTextHeights.legendBoxPaddingTopBottom - (this.legendTextHeights.textHeight + this.legendTextHeights.textGap) * lines + this.legendTextHeights.textGap;
       } else if (this.chart.legendPosition === Chart.LEGEND_POSITION_TOP) {
@@ -566,7 +566,7 @@ export default class AbstractChartRenderer {
 
   _calcChartBoxYOffset() {
     if (this.chart.legendVisible && !this.suppressLegendBox && this.chart.legendPosition === Chart.LEGEND_POSITION_TOP) {
-      var lines = Math.ceil(this.chart.chartData.chartValueGroups.length / this.horizontalLegendEntriesPerLine);
+      let lines = Math.ceil(this.chart.chartData.chartValueGroups.length / this.horizontalLegendEntriesPerLine);
       return (this.legendTextHeights.textHeight + this.legendTextHeights.textGap) * lines + this.legendTextHeights.textGap + this.legendTextHeights.legendBoxPaddingTopBottom;
     }
     return 0;
@@ -592,11 +592,11 @@ export default class AbstractChartRenderer {
 
   _addClipping(cssClass) {
     // add clip and mask paths for all relevant objects
-    var $clip = this.$svg
+    let $clip = this.$svg
       .appendSVG('clipPath');
     $clip[0].id = this.clipId;
 
-    var $mask = this.$svg.appendSVG('mask');
+    let $mask = this.$svg.appendSVG('mask');
     $mask.appendSVG('rect')
       .attr('x', 0)
       .attr('y', 0)
@@ -613,18 +613,18 @@ export default class AbstractChartRenderer {
   }
 
   _renderWireLegend(text, legendPositions, className, drawBackgroundBox) {
-    var legend = {
-      detachFunc: function() {
+    let legend = {
+      detachFunc: () => {
       },
-      attachFunc: function() {
+      attachFunc: () => {
       },
-      removeFunc: function() {
+      removeFunc: () => {
       }
     };
     if (!this.chart.interactiveLegendVisible) {
       return legend;
     }
-    var padding = 5,
+    let padding = 5,
       $background,
       backgroundWidth = 0,
       lineHeight = 17,
@@ -635,18 +635,18 @@ export default class AbstractChartRenderer {
         .attr('opacity', '1');
     }
 
-    var positions = legendPositions;
+    let positions = legendPositions;
 
     // draw and measure label
 
-    var $legend,
+    let $legend,
       lengthLegend = 0;
 
     if (Array.isArray(text)) {
-      for (var i = 0; i < text.length; i++) {
-        var posIndex = text.length - i - 1;
-        var yPos = positions.y2 + positions.v * padding - lineHeight * posIndex - padding * posIndex;
-        var $line = this._renderLineLabel(positions.x2 + padding, yPos, text[i], '', drawBackgroundBox);
+      for (let i = 0; i < text.length; i++) {
+        let posIndex = text.length - i - 1;
+        let yPos = positions.y2 + positions.v * padding - lineHeight * posIndex - padding * posIndex;
+        let $line = this._renderLineLabel(positions.x2 + padding, yPos, text[i], '', drawBackgroundBox);
         $line.addClass(className);
         lengthLegend = Math.max(lengthLegend, $line[0].getComputedTextLength());
         if (i === 0) {
@@ -678,7 +678,7 @@ export default class AbstractChartRenderer {
       $legend.attr('x', positions.x2 - padding - lengthLegend);
       $legend.css('text-anchor', 'left');
       if ($legend.data('lines')) {
-        $legend.data('lines').forEach(function($line) {
+        $legend.data('lines').forEach($line => {
           $line.attr('x', positions.x2 - padding - lengthLegend);
           $line.css('text-anchor', 'left');
         });
@@ -687,7 +687,7 @@ export default class AbstractChartRenderer {
       $legend.attr('x', positions.x2 + padding);
       $legend.css('text-anchor', 'right');
       if ($legend.data('lines')) {
-        $legend.data('lines').forEach(function($line) {
+        $legend.data('lines').forEach($line => {
           $line.attr('x', positions.x2 + padding);
           $line.css('text-anchor', 'right');
         });
@@ -695,18 +695,18 @@ export default class AbstractChartRenderer {
     }
     if (positions.v === 1) {
       if ($legend.data('lines')) {
-        $legend.data('lines').forEach(function($line, i) {
+        $legend.data('lines').forEach(($line, i) => {
           $line.attr('y', positions.x2 - padding - lengthLegend);
-          var index = 1 + i;
+          let index = 1 + i;
           $line.attr('y', positions.y2 + positions.v * padding + lineHeight * index + padding * (index + 1));
         });
       }
       $legend.attr('dy', '0.7em');
     } else {
       if ($legend.data('lines')) {
-        var index = $legend.data('lines').length;
+        let index = $legend.data('lines').length;
         $legend.attr('y', positions.y2 + positions.v * padding - lineHeight * index - padding * index);
-        $legend.data('lines').forEach(function($line, i) {
+        $legend.data('lines').forEach(($line, i) => {
           index = $legend.data('lines').length - 1 - i;
           $line.attr('y', positions.y2 + positions.v * padding - lineHeight * index - padding * index);
         });
@@ -714,8 +714,8 @@ export default class AbstractChartRenderer {
     }
 
     // align background text
-    $legend.add($legend.data('lines')).each(function(i, line) {
-      var $line = $(line),
+    $legend.add($legend.data('lines')).each((i, line) => {
+      let $line = $(line),
         $background = $line.data('$background');
       if ($background) {
         $background.attr('x', $line.attr('x'));
@@ -726,20 +726,20 @@ export default class AbstractChartRenderer {
     });
 
     // draw lines, if wished
-    var wires = [];
+    let wires = [];
     if (positions.x1 > 0 && positions.y1 > 0) {
       wires.push(this._renderLine(positions.x1, positions.y1, positions.x2, positions.y2, 'label-line'));
       wires.push(this._renderLine(positions.x2, positions.y2, positions.x2 + positions.h * (lengthLegend + 2 * padding), positions.y2, 'label-line'));
     }
     $legend.data('wires', wires);
 
-    var $svg = this.$svg;
-    legend.detachFunc = function() {
-      $legend.data('wires').forEach(function($wire) {
+    let $svg = this.$svg;
+    legend.detachFunc = () => {
+      $legend.data('wires').forEach($wire => {
         $wire.detach();
       });
       if ($legend.data('lines')) {
-        $legend.data('lines').forEach(function($line) {
+        $legend.data('lines').forEach($line => {
           if ($line.data('$background')) {
             $svg.append($line.data('$background'));
           }
@@ -752,14 +752,14 @@ export default class AbstractChartRenderer {
       $legend.detach();
     };
 
-    legend.attachFunc = function() {
+    legend.attachFunc = () => {
       $svg.append($legend);
       if ($legend.data('$background')) {
         $svg.append($legend.data('$background'));
       }
       $svg.append($legend.data('wires'));
       if ($legend.data('lines')) {
-        $legend.data('lines').forEach(function($line) {
+        $legend.data('lines').forEach($line => {
           $svg.append($line);
           if ($line.data('$background')) {
             $svg.append($line.data('$background'));
@@ -768,12 +768,12 @@ export default class AbstractChartRenderer {
       }
     };
 
-    legend.removeFunc = function() {
-      $legend.data('wires').forEach(function($wire) {
+    legend.removeFunc = () => {
+      $legend.data('wires').forEach($wire => {
         $wire.remove();
       });
       if ($legend.data('lines')) {
-        $legend.data('lines').forEach(function($line) {
+        $legend.data('lines').forEach($line => {
           if ($line.data('$background')) {
             $line.data('$background').remove();
           }

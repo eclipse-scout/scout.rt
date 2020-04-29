@@ -21,7 +21,7 @@ export default class AbstractCircleChartRenderer extends AbstractChartRenderer {
   }
 
   pathSegment(start, end) {
-    var s = start * 2 * Math.PI,
+    let s = start * 2 * Math.PI,
       e = end * 2 * Math.PI,
       pathString = '';
 
@@ -38,10 +38,10 @@ export default class AbstractCircleChartRenderer extends AbstractChartRenderer {
     if (this.animationTriggered) {
       return;
     }
-    var that = this;
-    var tweenOut = function(now, fx) {
-      var $this = $(this);
-      var start = $this.data('animation-start'),
+    let that = this;
+    let tweenOut = function(now, fx) {
+      let $this = $(this);
+      let start = $this.data('animation-start'),
         end = $this.data('animation-end');
       $this.attr('d', that.pathSegment(start * (1 - fx.pos), end * (1 - fx.pos)));
     };
@@ -52,9 +52,9 @@ export default class AbstractCircleChartRenderer extends AbstractChartRenderer {
         tabIndex: 0
       }, this._createAnimationObjectWithTabindexRemoval(tweenOut))
       .promise()
-      .done(function() {
+      .done(() => {
         this._remove(afterRemoveFunc);
         this.animationTriggered = false;
-      }.bind(this));
+      });
   }
 }

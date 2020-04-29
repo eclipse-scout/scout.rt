@@ -33,23 +33,23 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
 
   _render() {
     super._render();
-    var i,
+    let i,
       j,
       chartValueGroups = this.chart.chartData.chartValueGroups,
       widthPerX = this.getWidthPerX(),
       width = this.getWidth(chartValueGroups);
 
     // Grid
-    var yLabels = this._createYLabelsAndAdjustDimensions(this.possibleYLines);
+    let yLabels = this._createYLabelsAndAdjustDimensions(this.possibleYLines);
 
     this.renderYGrid(yLabels);
     this._renderAxisLabels();
 
     // Lines
-    var chartValueGroup,
+    let chartValueGroup,
       that = this,
       moveUpFunc = function(now, fx) {
-        var $this = $(this),
+        let $this = $(this),
           pointValues = $this.data('pointValues'),
           d = that._calcDForValuesString(pointValues, fx.pos, false),
           $highlightPath = $this.data('$highlightPath');
@@ -60,26 +60,26 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
       },
       lineColors = [];
 
-    var handleHover = function(event) {
-        var $this = $(this);
-        var $path = $this.data('$path');
+    let handleHover = function(event) {
+        let $this = $(this);
+        let $path = $this.data('$path');
         $path.addClass('hover-style');
-        $path.data('$bubbles').forEach(function($elem) {
+        $path.data('$bubbles').forEach($elem => {
           $elem.attr('opacity', 1);
         });
       },
       hoverOff = function(event) {
-        var $this = $(this);
-        var $path = $this.data('$path');
+        let $this = $(this);
+        let $path = $this.data('$path');
         $path.removeClass('hover-style');
-        $path.data('$bubbles').forEach(function($elem) {
+        $path.data('$bubbles').forEach($elem => {
           $elem.attr('opacity', 0);
         });
       };
     this.$paths = [];
     for (i = 0; i < chartValueGroups.length; i++) {
       chartValueGroup = chartValueGroups[i];
-      var lineClass = 'line-chart-line',
+      let lineClass = 'line-chart-line',
         legendClass = 'line-chart-line',
         pointValues = [],
         d = '';
@@ -99,7 +99,7 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
       // Loop over each pair of points
       for (j = 0; j < chartValueGroup.values.length; j++) {
         pointValues.push(chartValueGroup.values[j]);
-        var yCoord = this.animated ? this._calculateYCoordinate(0) : this._calculateYCoordinate(chartValueGroup.values[j]);
+        let yCoord = this.animated ? this._calculateYCoordinate(0) : this._calculateYCoordinate(chartValueGroup.values[j]);
         if (j === 0) {
           d += this._addFirstPoint(this._calculateXCoordinate(j), yCoord);
         } else {
@@ -111,12 +111,12 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
         }
       }
       // Draw a line from "j" to "j + 1"
-      var $path = this.$svg.appendSVG('path', lineClass)
+      let $path = this.$svg.appendSVG('path', lineClass)
         .attr('d', d)
         .attr('fill', 'none')
         .data('pointValues', pointValues);
 
-      var $highlightPath = this.$svg.appendSVG('path', 'highlight path')
+      let $highlightPath = this.$svg.appendSVG('path', 'highlight path')
         .attr('d', d)
         .attr('opacity', '0')
         .attr('fill', 'none')
@@ -162,14 +162,14 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
     if (!valuesArr) {
       return '';
     }
-    var d = '';
+    let d = '';
     if (fxPos === undefined) {
       fxPos = 1;
     }
     if (negativeDirection) {
       fxPos = 1 - fxPos;
     }
-    for (var i = 0; i < valuesArr.length; i++) {
+    for (let i = 0; i < valuesArr.length; i++) {
       if (i === 0) {
         d += this._addFirstPoint(this._calculateXCoordinate(i), this._calculateYCoordinate(valuesArr[i] * fxPos));
       } else {
@@ -191,10 +191,10 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
     if (this.animationTriggered) {
       return;
     }
-    var yCoord = 0,
+    let yCoord = 0,
       that = this,
       moveDownFunc = function(now, fx) {
-        var $this = $(this),
+        let $this = $(this),
           $highlightPath = $this.data('$highlightPath'),
           pointValues = $this.data('pointValues'),
           d = that._calcDForValuesString(pointValues, fx.pos, true);
@@ -211,25 +211,25 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
         tabIndex: 0
       }, this._createAnimationObjectWithTabindexRemoval(moveDownFunc))
       .promise()
-      .done(function() {
+      .done(() => {
         this._remove(afterRemoveFunc);
         this.animationTriggered = false;
-      }.bind(this));
+      });
   }
 
   _renderValueBubble(index, value, radius, color, groupIndex) {
-    var x = this._calculateXCoordinate(index),
+    let x = this._calculateXCoordinate(index),
       y = this.animated ? this._calculateYCoordinate(0) : this._calculateYCoordinate(value),
       endY = this._calculateYCoordinate(value);
 
-    var colorClass;
+    let colorClass;
     if (this.chart.autoColor) {
       colorClass = 'stroke-color' + (groupIndex % this.numSupportedColors);
     } else {
       colorClass = this.chart.chartData.chartValueGroups[groupIndex].cssClass || '';
     }
 
-    var $bubble = this.$svg.appendSVG('circle', 'line-chart-value-bubble' + strings.box(' ', colorClass, ''))
+    let $bubble = this.$svg.appendSVG('circle', 'line-chart-value-bubble' + strings.box(' ', colorClass, ''))
       .attr('cx', x)
       .attr('cy', y)
       .attr('r', radius)
@@ -241,7 +241,7 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
       $bubble.animateSVG('cy', endY, 600, null, true);
     }
 
-    var legendPositions = {
+    let legendPositions = {
       x1: x,
       x2: x + 2 * radius,
       y1: this._calculateYCoordinate(value) - radius,
@@ -250,7 +250,7 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
       h: 1
     };
     // calculate opening direction
-    var labelPositionFunc = function(labelWidth, labelHeight) {
+    let labelPositionFunc = function(labelWidth, labelHeight) {
       if (value <= 0 || legendPositions.y2 - labelHeight < 0) {
         legendPositions.v = 1;
         if (0 > x - 2 * radius - labelWidth) {
@@ -273,13 +273,13 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
     legendPositions.autoPosition = true;
     legendPositions.posFunc = labelPositionFunc;
 
-    var groupName = this.chart.chartData.chartValueGroups[groupIndex].groupName;
-    var legend = this._renderWireLegend(
+    let groupName = this.chart.chartData.chartValueGroups[groupIndex].groupName;
+    let legend = this._renderWireLegend(
       strings.join(': ', groupName, this.session.locale.decimalFormat.format(value)),
       legendPositions, 'line-chart-wire-label', false);
     legend.detachFunc();
 
-    var that = this,
+    let that = this,
       mouseIn = function() {
         legend.attachFunc();
         $(this).data('$path').addClass('hover-style');

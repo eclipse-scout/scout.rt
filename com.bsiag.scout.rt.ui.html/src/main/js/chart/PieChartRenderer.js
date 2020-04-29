@@ -22,7 +22,7 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
   }
 
   _validate() {
-    var chartData = this.chart.chartData;
+    let chartData = this.chart.chartData;
     if (chartData.axes.length > 0 || chartData.chartValueGroups.length === 0) {
       return false;
     }
@@ -30,7 +30,7 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
   }
 
   _render() {
-    var that = this,
+    let that = this,
       sum = this._sumValues(this.chart.chartData.chartValueGroups),
       roundingError = 0,
       segments = this._createSegments(),
@@ -38,16 +38,16 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
       endAngle = 0;
 
     this.r = Math.min(this.chartBox.height, this.chartBox.width) / 2;
-    var tweenInFunc = function(now, fx) {
-      var $this = $(this);
-      var start = $this.data('animation-start');
-      var end = $this.data('animation-end');
+    let tweenInFunc = function(now, fx) {
+      let $this = $(this);
+      let start = $this.data('animation-start');
+      let end = $this.data('animation-end');
       $this.attr('d', that.pathSegment(start * fx.pos, end * fx.pos));
     };
 
     // t = segment index
-    for (var t = 0; t < segments.length; t++) {
-      var segment = segments[t];
+    for (let t = 0; t < segments.length; t++) {
+      let segment = segments[t];
       endAngle = startAngle + segment.value / sum;
 
       // -0.00001, else: only 1 arc is not drawn, svg...
@@ -56,19 +56,19 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
       }
 
       // arc segment
-      var colorClass = 'color' + t,
+      let colorClass = 'color' + t,
         arcClass = 'pie-chart';
       if (this.chart.autoColor) {
         arcClass += ' auto-color ' + colorClass;
       } else if (segment.cssClass) {
         arcClass += ' ' + segment.cssClass;
       }
-      var clickable = this.chart.clickable && segment.clickable;
+      let clickable = this.chart.clickable && segment.clickable;
       if (clickable) {
         arcClass += ' clickable';
       }
 
-      var $arc = this.$svg.appendSVG('path', arcClass)
+      let $arc = this.$svg.appendSVG('path', arcClass)
         .data('animation-start', startAngle)
         .data('animation-end', endAngle);
       if (this.animated) {
@@ -87,7 +87,7 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
         $arc.attr('fill', segment.color);
       }
 
-      var legendClass = 'pie-chart';
+      let legendClass = 'pie-chart';
       if (this.chart.autoColor) {
         legendClass += ' auto-color ' + colorClass;
       } else if (segment.cssClass) {
@@ -99,11 +99,11 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
 
       // take into account the rounding error of the previous rounding
       // this guarantees that all rounded values add up to 100%
-      var result = segment.value / sum * 100 - roundingError;
-      var roundedResult = Math.round(result);
+      let result = segment.value / sum * 100 - roundingError;
+      let roundedResult = Math.round(result);
       roundingError = roundedResult - result;
 
-      var midPoint = (startAngle + (endAngle - startAngle) / 2) * 2 * Math.PI,
+      let midPoint = (startAngle + (endAngle - startAngle) / 2) * 2 * Math.PI,
         percentage = roundedResult + '%';
       if (endAngle - startAngle >= 0.05) {
         this._renderPieChartPercentage(midPoint, percentage);
@@ -121,11 +121,11 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
   }
 
   _renderPieChartPercentage(midPoint, percentage) {
-    var labelR = this.centerCircleR > 0 ? ((this.r - this.centerCircleR) / 2) + this.centerCircleR : this.r / 2 + this.r / 10,
+    let labelR = this.centerCircleR > 0 ? ((this.r - this.centerCircleR) / 2) + this.centerCircleR : this.r / 2 + this.r / 10,
       labelXPosition = this.chartBox.mX() + labelR * Math.sin(midPoint),
       labelYPosition = this.chartBox.mY() - labelR * Math.cos(midPoint);
 
-    var $label2 = this.$svg.appendSVG('text', 'pie-chart-percentage ')
+    let $label2 = this.$svg.appendSVG('text', 'pie-chart-percentage ')
       .attr('x', labelXPosition)
       .attr('y', labelYPosition)
       .text(percentage);
@@ -138,13 +138,13 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
   }
 
   _calcChartBoxHeight() {
-    var height = super._calcChartBoxHeight();
+    let height = super._calcChartBoxHeight();
     this.isBiggerThanMinHeight = this.minHeightForWireLegend < height;
     return this.chart.interactiveLegendVisible ? this.isBiggerThanMinHeight ? height - this.wireLegendUsedSpace / 2 : height - 2 * this.wireLegendUsedSpace : height;
   }
 
   _calcChartBoxYOffset() {
-    var yOffset = super._calcChartBoxYOffset();
+    let yOffset = super._calcChartBoxYOffset();
     return this.chart.interactiveLegendVisible ? this.isBiggerThanMinHeight ? yOffset + this.wireLegendUsedSpace / 4 : yOffset + this.wireLegendUsedSpace : yOffset;
   }
 
@@ -160,7 +160,7 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
 
   _addWireLabels($arc, midPoint, label, percentage) {
     // add wire angle
-    var wireLabelX1 = this.chartBox.mX() + this.r * Math.sin(midPoint),
+    let wireLabelX1 = this.chartBox.mX() + this.r * Math.sin(midPoint),
       wireLabelY1 = this.chartBox.mY() - this.r * Math.cos(midPoint),
       wireLabledistanceToChart = this.isBiggerThanMinHeight ? 5 : 10,
       legendPositions = {
@@ -171,15 +171,15 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
         v: wireLabelY1 > this.chartBox.mY() ? 1 : -1,
         h: wireLabelX1 > this.chartBox.mX() ? -1 : 1
       };
-    var legend = this._renderWireLegend(
+    let legend = this._renderWireLegend(
       strings.join(': ', label, percentage),
       legendPositions, 'line-chart-wire-label', false);
     legend.detachFunc();
     $arc
-      .mouseenter(function() {
+      .mouseenter(() => {
         legend.attachFunc();
       })
-      .mouseleave(function() {
+      .mouseleave(() => {
         legend.detachFunc();
       });
   }
@@ -204,8 +204,8 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
    * returns ordered segments with label, value and color
    */
   _createSegments() {
-    var valueGroups = this.chart.chartData.chartValueGroups;
-    var segments = valueGroups.map(function(valueGroup, index) {
+    let valueGroups = this.chart.chartData.chartValueGroups;
+    let segments = valueGroups.map((valueGroup, index) => {
       return scout.create('PieSegment', {
         label: valueGroup.groupName,
         value: valueGroup.values[0],
@@ -215,19 +215,19 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
         valueGroup: valueGroup,
         valueGroupIndex: index // must keep the original group-index for callback to server
       });
-    }.bind(this))
+    })
       .sort(this._sortSegments);
 
     // Collect small segments in an "others" segment
     // Note: this is pure UI logic, there's also some server logic that creates an "other" valueGroup
     // this may lead to cases where we have two "other" segments in the chart. I guess this is not 100% correct
-    var maxSegments = this.chart.maxSegments;
+    let maxSegments = this.chart.maxSegments;
     if (segments.length > maxSegments) {
-      for (var i = segments.length - 1; i >= maxSegments; i--) {
+      for (let i = segments.length - 1; i >= maxSegments; i--) {
         segments[maxSegments - 1].value += segments[i].value;
         segments.pop();
       }
-      var others = segments[maxSegments - 1];
+      let others = segments[maxSegments - 1];
       others.clickable = false;
       others.label = this.chart.session.text('ui.OtherValues');
     }
@@ -240,8 +240,8 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
   }
 
   _sumValues(groups) {
-    var sum = 0;
-    for (var i = 0; i < groups.length; i++) {
+    let sum = 0;
+    for (let i = 0; i < groups.length; i++) {
       sum += Number(groups[i].values[0]);
     }
     return sum;

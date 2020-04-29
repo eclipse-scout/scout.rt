@@ -21,7 +21,7 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
   }
 
   _validate() {
-    var chartValueGroups = this.chart.chartData.chartValueGroups;
+    let chartValueGroups = this.chart.chartData.chartValueGroups;
     if (chartValueGroups.length !== 2 ||
       chartValueGroups[0].values.length !== 1 ||
       chartValueGroups[1].values.length !== 1) {
@@ -32,9 +32,9 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
 
   _render() {
     // Calculate percentage
-    var chartData = this.chart.chartData;
-    var value = chartData.chartValueGroups[0].values[0];
-    var total = chartData.chartValueGroups[1].values[0];
+    let chartData = this.chart.chartData;
+    let value = chartData.chartValueGroups[0].values[0];
+    let total = chartData.chartValueGroups[1].values[0];
 
     this.fullR = (Math.min(this.chartBox.height, this.chartBox.width) / 2) - 2;
 
@@ -45,7 +45,7 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
 
   _renderPercentage(value, total) {
     // arc segment
-    var arcClass = 'fulfillment-chart',
+    let arcClass = 'fulfillment-chart',
       color = this.chart.chartData.chartValueGroups[0].colorHexValue,
       chartGroupCss = this.chart.chartData.chartValueGroups[0].cssClass;
 
@@ -55,33 +55,33 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
       arcClass += ' ' + chartGroupCss;
     }
 
-    var startValue = scout.nvl(this.chart.chartData.customProperties.startValue, 0);
-    var lastEnd = Math.min(startValue / total, 0.999999);
-    var end = 0;
+    let startValue = scout.nvl(this.chart.chartData.customProperties.startValue, 0);
+    let lastEnd = Math.min(startValue / total, 0.999999);
+    let end = 0;
     if (total) {
       // use slightly less than 1.0 as max value because otherwise, the SVG element would not be drawn correctly.
       end = Math.min(value / total, 0.999999);
     }
     this.r = this.fullR;
 
-    var that = this;
-    var tweenInFunc = function(now, fx) {
-      var $this = $(this);
-      var start = $this.data('animation-start'),
+    let that = this;
+    let tweenInFunc = function(now, fx) {
+      let $this = $(this);
+      let start = $this.data('animation-start'),
         end = $this.data('animation-end');
       $this.attr('d', that.pathSegment(start * fx.pos, lastEnd + (end - lastEnd) * fx.pos));
     };
 
-    var $arc = this.$svg.appendSVG('path', arcClass)
+    let $arc = this.$svg.appendSVG('path', arcClass)
       .data('animation-start', 0)
       .data('animation-end', end);
 
-    var radius2 = (this.fullR / 8) * 6.7;
+    let radius2 = (this.fullR / 8) * 6.7;
     this._renderCirclePath('fulfillment-chart-inner-circle-transparent', 'InnerCircle3', radius2);
 
     // Label
-    var percentage = (total ? Math.round((value / total) * 100) : 0);
-    var $label = this.$svg.appendSVG('text', 'fulfillment-chart-label ')
+    let percentage = (total ? Math.round((value / total) * 100) : 0);
+    let $label = this.$svg.appendSVG('text', 'fulfillment-chart-label ')
       .attr('x', this.chartBox.mX())
       .attr('y', this.chartBox.mY())
       .css('font-size', (this.fullR / 2) + 'px') // font of label in center relative to circle radius
@@ -117,8 +117,8 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
   }
 
   _renderCirclePath(cssClass, id, radius) {
-    var chartGroupCss = this.chart.chartData.chartValueGroups[0].cssClass;
-    var color = this.chart.chartData.chartValueGroups[1].colorHexValue;
+    let chartGroupCss = this.chart.chartData.chartValueGroups[0].cssClass;
+    let color = this.chart.chartData.chartValueGroups[1].colorHexValue;
 
     if (this.chart.autoColor) {
       cssClass += ' auto-color';
@@ -126,8 +126,8 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
       cssClass += ' ' + chartGroupCss;
     }
 
-    var radius2 = radius * 2;
-    var $path = this.$svg.appendSVG('path', cssClass)
+    let radius2 = radius * 2;
+    let $path = this.$svg.appendSVG('path', cssClass)
       .attr('id', id)
       .attr('d', 'M ' + this.chartBox.mX() + ' ' + this.chartBox.mY() +
         ' m 0, ' + (-radius) +
@@ -144,7 +144,7 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
   }
 
   _renderInnerCircle() {
-    var radius = (this.fullR / 8) * 7.5,
+    let radius = (this.fullR / 8) * 7.5,
       radius2 = (this.fullR / 8) * 7.2;
 
     this._renderCirclePath('fulfillment-chart-inner-circle', 'InnerCircle', radius);
@@ -156,7 +156,7 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
    * If startValue is not set use default implementation.
    */
   shouldAnimateRemoveOnUpdate(opts) {
-    var startValue = objects.optProperty(this.chart, 'chartData', 'customProperties', 'startValue');
+    let startValue = objects.optProperty(this.chart, 'chartData', 'customProperties', 'startValue');
     if (!objects.isNullOrUndefined(startValue)) {
       return false;
     }

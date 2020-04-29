@@ -184,8 +184,8 @@ export default class Chart extends Widget {
       this._updateChartOpts = null;
     }
 
-    var updateChartImplFn = updateChartImpl.bind(this);
-    var doDebounce = (opts.debounce === true || typeof opts.debounce === 'number');
+    let updateChartImplFn = updateChartImpl.bind(this);
+    let doDebounce = (opts.debounce === true || typeof opts.debounce === 'number');
     if (doDebounce) {
       this._updateChartOpts = opts;
       if (typeof opts.debounce === 'number') {
@@ -203,14 +203,14 @@ export default class Chart extends Widget {
       this._updateChartTimeoutId = null;
       this._updateChartOpts = null;
       if (this.chartRenderer) {
-        this.chartRenderer.remove(this.chartRenderer.shouldAnimateRemoveOnUpdate(opts), function(chartAnimationStopping) {
+        this.chartRenderer.remove(this.chartRenderer.shouldAnimateRemoveOnUpdate(opts), chartAnimationStopping => {
           if (this.removing || chartAnimationStopping) {
             // prevent exceptions trying to render after navigated away, and do not update/render while a running animation is being stopped
             return;
           }
           this.chartRenderer.render(opts.requestAnimation);
           this.trigger('chartRender');
-        }.bind(this));
+        });
       }
       this.updatedOnce = true;
     }
