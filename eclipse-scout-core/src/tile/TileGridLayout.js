@@ -178,7 +178,7 @@ export default class TileGridLayout extends LogicalGridLayout {
 
       var promise = this._animateTile(tile);
       if (promise) {
-        arrays.pushAll(promises, promise);
+        promises.push(promise);
       }
 
       tile.$container.removeData('oldBounds');
