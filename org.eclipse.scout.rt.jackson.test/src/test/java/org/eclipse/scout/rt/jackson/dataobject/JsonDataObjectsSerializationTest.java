@@ -84,6 +84,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestStringHolder;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestStringHolderPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestStringPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestSubPojo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestThrowableDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestVersionedDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -2233,6 +2234,38 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("false", s_dataObjectMapper.writeValueAsString(false));
     assertEquals("\"foo\"", s_dataObjectMapper.writeValueAsString("foo"));
     assertEquals("\"foo\\\\n\\\\rbar\"", s_dataObjectMapper.writeValueAsString("foo\\n\\rbar"));
+  }
+
+  /**
+   * <b>NOTE</b> Serializing java exception is discouraged, since most concrete exception classes are not
+   * JSON-serializable.
+   * <p>
+   * The Jackson library out of the box supports to serialize and deserialize an {@link Exception} or {@link Throwable}
+   * using its message, cause and stacktrace elements as fields. This test ensures this basic functionality when
+   * serializing {@link Exception} or {@link Throwable} within data objects.
+   */
+  @Test
+  public void testSerializeDeserializeThrowable() throws Exception {
+    // Throwable & Exception are serialized using Jackson default serializers, force alphabetically sorted attributes for unit test
+    final ObjectMapper customObjectMapper = BEANS.get(JacksonPrettyPrintDataObjectMapper.class).createObjectMapperInstance(false)
+        .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY);
+
+    Throwable throwable = new Throwable("throwable-message");
+    throwable.setStackTrace(new StackTraceElement[]{new StackTraceElement("mocked-throwable-class", "mocked-method-01", "mocked-file-01", 42)});
+    Exception exception = new Exception("exception-message");
+    exception.setStackTrace(new StackTraceElement[]{new StackTraceElement("mocked-exception-class", "mocked-method-02", "mocked-file-02", 43)});
+    TestThrowableDo entity = BEANS.get(TestThrowableDo.class)
+        .withThrowable(throwable)
+        .withException(exception);
+
+    String json = customObjectMapper.writeValueAsString(entity);
+    assertJsonEquals("TestThrowableDo.json", json);
+
+    TestThrowableDo marshalled = customObjectMapper.readValue(json, TestThrowableDo.class);
+    assertEquals(throwable.getMessage(), marshalled.getThrowable().getMessage());
+    assertEquals(exception.getMessage(), marshalled.getException().getMessage());
+    assertArrayEquals(throwable.getStackTrace(), marshalled.getThrowable().getStackTrace());
+    assertArrayEquals(exception.getStackTrace(), marshalled.getException().getStackTrace());
   }
 
   // ------------------------------------ common test helper methods ------------------------------------

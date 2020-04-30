@@ -1,0 +1,29 @@
+{
+  "_type" : "TestThrowable",
+  "exception" : {
+    "cause" : null,
+    "localizedMessage" : "exception-message",
+    "message" : "exception-message",
+    "stackTrace" : [ {
+      "className" : "mocked-exception-class",
+      "fileName" : "mocked-file-02",
+      "lineNumber" : 43,
+      "methodName" : "mocked-method-02",
+      "nativeMethod" : false
+    } ],
+    "suppressed" : [ ]
+  },
+  "throwable" : {
+    "cause" : null,
+    "localizedMessage" : "throwable-message",
+    "message" : "throwable-message",
+    "stackTrace" : [ {
+      "className" : "mocked-throwable-class",
+      "fileName" : "mocked-file-01",
+      "lineNumber" : 42,
+      "methodName" : "mocked-method-01",
+      "nativeMethod" : false
+    } ],
+    "suppressed" : [ ]
+  }
+}
