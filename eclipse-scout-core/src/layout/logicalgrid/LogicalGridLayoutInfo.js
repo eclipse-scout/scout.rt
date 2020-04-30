@@ -138,19 +138,18 @@ export default class LogicalGridLayoutInfo {
 
       // Calculate and cache component size
       var size = new Dimension(0, 0);
-      // Use explicit width hint, if set
       if (cons.widthHint > 0) {
+        // Use explicit width hint, if set
         size.width = cons.widthHint;
         // eslint-disable-next-line brace-style
-      }
-      // Calculate preferred width otherwise
-      // This size is needed by _initializeColumns
-      else if (cons.useUiWidth || !cons.fillHorizontal) {
+      } else if (cons.useUiWidth || !cons.fillHorizontal) {
+        // Calculate preferred width otherwise
+        // This size is needed by _initializeColumns
         // But only if really needed by the logical grid layout (because it is expensive)
         size = this.uiSizeInPixel($comp, cons);
       }
-      // Use explicit height hint, if set
       if (cons.heightHint > 0) {
+        // Use explicit height hint, if set
         size.height = cons.heightHint;
       } else if (cons.useUiHeight || !cons.fillVertical) {
         // Otherwise check if preferred height should be calculated.
@@ -185,10 +184,9 @@ export default class LogicalGridLayoutInfo {
       if (!cons.fillHorizontal) {
         widthHint = Math.min(widthHint, this.compSize[elem.index].width);
       }
-      var size = this.uiSizeInPixel($comp, cons, {
+      this.compSize[elem.index] = this.uiSizeInPixel($comp, cons, {
         widthHint: widthHint
       });
-      this.compSize[elem.index] = size;
     }, this);
 
     // Calculate this.height and this.weightY

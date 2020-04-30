@@ -929,7 +929,7 @@ export default class TableHeaderMenu extends Popup {
     // (bounds must be computed after setVisible, if it was hidden before bounds are not correct)
     containerBounds = graphics.offsetBounds(this.$container);
     this.$whiter
-    // if header is clipped on the left side, position whither at the left of the visible part of the header (same applies for width, see _computeWhitherWidth)
+      // if header is clipped on the left side, position whither at the left of the visible part of the header (same applies for width, see _computeWhitherWidth)
       .cssLeft(Math.max(headerItemBounds.x - containerBounds.x, $tableHeaderContainer.offset().left - containerBounds.x - this.tableHeader.table.$container.cssBorderLeftWidth()))
       .width(this._computeWhitherWidth());
   }

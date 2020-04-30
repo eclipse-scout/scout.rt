@@ -16,7 +16,6 @@ export default class TestingApp extends RemoteApp {
     super();
   }
 
-
   /**
    * @override
    */

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {strings, CachedElement} from '../index';
+import {CachedElement, strings} from '../index';
 
 /**
  * Replaces character HTML entities (e.g. &amp;nbsp;, &amp;gt;, etc.).

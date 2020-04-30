@@ -22,7 +22,6 @@ export default class LocaleSpecHelper {
     this._initDateFormatDefaultPatterns();
   }
 
-
   createModel(languageTag) {
     var model = {};
     model.languageTag = languageTag;

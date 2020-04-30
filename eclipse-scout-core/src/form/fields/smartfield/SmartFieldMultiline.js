@@ -14,8 +14,7 @@ export default class SmartFieldMultiline extends SmartField {
 
   constructor() {
     super();
-    this.options;
-    this._$multilineLines;
+    this._$multilineLines = null;
   }
 
   _render() {

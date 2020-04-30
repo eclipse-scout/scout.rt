@@ -201,7 +201,7 @@ export function mergeRgbColors(color1, ratio1, color2, ratio2) {
 export function parseFontSpec(pattern) {
   var fontSpec = {};
   if (strings.hasText(pattern)) {
-    var tokens = pattern.split(/[-_,\/.;]/);
+    var tokens = pattern.split(/[-_,/.;]/);
     for (var i = 0; i < tokens.length; i++) {
       var token = tokens[i].toUpperCase();
       // styles

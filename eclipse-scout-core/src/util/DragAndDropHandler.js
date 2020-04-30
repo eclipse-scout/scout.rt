@@ -15,9 +15,13 @@ export default class DragAndDropHandler {
 
   constructor(options) {
     options = options || {};
+    this.additionalDropProperties = null;
+    this.allowedTypes = null;
+    this.dropMaximumSize = null;
+    this.target = null;
+
     $.extend(this, options);
     this.supportedScoutTypes = arrays.ensure(options.supportedScoutTypes);
-
     this._onDragEnterHandler = this._onDragEnter.bind(this);
     this._onDragOverHandler = this._onDragOver.bind(this);
     this._onDropHandler = this._onDrop.bind(this);
@@ -59,7 +63,7 @@ export default class DragAndDropHandler {
 
   _onDrop(event) {
     if (this.supportedScoutTypes.indexOf(dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) >= 0 &&
-      this.dropType() & dragAndDrop.SCOUT_TYPES.FILE_TRANSFER === dragAndDrop.SCOUT_TYPES.FILE_TRANSFER && // NOSONAR
+      (this.dropType() & dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) === dragAndDrop.SCOUT_TYPES.FILE_TRANSFER && // NOSONAR
       dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
       event.stopPropagation();
       event.preventDefault();

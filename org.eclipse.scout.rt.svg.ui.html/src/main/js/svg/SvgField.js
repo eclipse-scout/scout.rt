@@ -17,7 +17,6 @@ export default class SvgField extends ValueField {
     super();
   }
 
-
   _render() {
     this.addContainer(this.$parent, 'svg-field');
     this.addLabel();

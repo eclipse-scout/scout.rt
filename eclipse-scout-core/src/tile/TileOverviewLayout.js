@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, graphics, HtmlComponent, Dimension} from '../index';
+import {AbstractLayout, Dimension, graphics, HtmlComponent} from '../index';
 
 export default class TileOverviewLayout extends AbstractLayout {
 
