@@ -48,7 +48,7 @@ export function verifyDataTransferTypesScoutTypes(event, scoutTypeArray, fieldAl
   // check if any scout type is allowed for field allowed types (or no field allowed types defined)
   if (fieldAllowedTypes !== undefined) {
     scoutTypeArray.forEach(function fieldAllowedTypesContainsElement(scoutType) {
-      if (fieldAllowedTypes & scoutType === scoutType) { // NOSONAR
+      if ((fieldAllowedTypes & scoutType) === scoutType) { // NOSONAR
         arrays.pushAll(dragTypeArray, scoutTypeToDragTypeMapping(scoutTypeArray));
       }
     });

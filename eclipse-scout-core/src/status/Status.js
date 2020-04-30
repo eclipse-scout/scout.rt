@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, objects, strings, DefaultStatus, ParsingFailedStatus, ValidationFailedStatus, ObjectFactory} from '../index';
+import {arrays, DefaultStatus, ObjectFactory, objects, ParsingFailedStatus, strings, ValidationFailedStatus} from '../index';
 import $ from 'jquery';
 
 export default class Status {

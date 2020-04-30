@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateFormatPatternDefinition, DateFormatPatternType, dates, numbers, scout, strings, objects} from '../index';
+import {DateFormatPatternDefinition, DateFormatPatternType, dates, numbers, objects, scout, strings} from '../index';
 
 /**
  * Custom JavaScript Date Format

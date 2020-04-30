@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, dates, FormFieldAdapter, ParsingFailedStatus, ValueFieldAdapter} from '../../../index';
+import {arrays, dates, ParsingFailedStatus, ValueFieldAdapter} from '../../../index';
 
 export default class DateFieldAdapter extends ValueFieldAdapter {
 

@@ -11,7 +11,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const THEME_JS_OUT_FILTER = f => /.*theme.*\.js/.test(f);
+const themeJsOutFilter = f => /.*theme.*\.js/.test(f);
 const listFiles = require('./list-files');
 
 function deleteFile(filename) {
@@ -36,11 +36,13 @@ module.exports = {
     listFiles(dir)
       .filter(fileName => fileName !== scoutBuild.fileListName)
       .filter(fileName => !fileName.endsWith('.LICENSE'))
-      .filter(fileName => !THEME_JS_OUT_FILTER(fileName))
+      .filter(fileName => !themeJsOutFilter(fileName))
       .map(file => file.substring(dir.length + 1))
       .map(path => path.replace(/\\/g, '/'))
       .map(fileName => `${fileName}\n`)
-      .forEach(line => content += line);
+      .forEach(line => {
+        content += line;
+      });
     if (content.length < 1) {
       return;
     }
@@ -52,7 +54,7 @@ module.exports = {
       return;
     }
     listFiles(dir)
-      .filter(THEME_JS_OUT_FILTER)
+      .filter(themeJsOutFilter)
       .forEach(f => deleteFile(f));
 
   }

@@ -93,6 +93,7 @@ export function contains(string, searchFor) {
   return string.indexOf(searchFor) > -1;
 }
 
+// noinspection DuplicatedCode
 export function startsWith(fullString, startString) {
   if (fullString === undefined || fullString === null || startString === undefined || startString === null) {
     return false;
@@ -108,6 +109,7 @@ export function startsWith(fullString, startString) {
   return (fullString.substr(0, startString.length) === startString);
 }
 
+// noinspection DuplicatedCode
 export function endsWith(fullString, endString) {
   if (fullString === undefined || fullString === null || endString === undefined || endString === null) {
     return false;
@@ -292,7 +294,7 @@ export function toUpperCaseFirstLetter(string) {
  */
 export function countCodePoints(string) {
   return string
-  // Replace every surrogate pair with a BMP symbol.
+    // Replace every surrogate pair with a BMP symbol.
     .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '_')
     // and then get the length.
     .length;

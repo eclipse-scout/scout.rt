@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {Form, TileOverviewLayout, HtmlComponent} from '../index';
+import {Form, HtmlComponent, TileOverviewLayout} from '../index';
 
 export default class TileOverviewForm extends Form {
   constructor() {

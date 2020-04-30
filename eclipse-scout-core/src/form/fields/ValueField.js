@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Event, focusUtils, FormField, menus as menus_1, objects, scout, Status, strings, ParsingFailedStatus, ValidationFailedStatus} from '../../index';
+import {arrays, Event, focusUtils, FormField, menus as menus_1, objects, ParsingFailedStatus, scout, Status, strings, ValidationFailedStatus} from '../../index';
 import $ from 'jquery';
 
 /**

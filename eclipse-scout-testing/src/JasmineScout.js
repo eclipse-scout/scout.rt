@@ -110,7 +110,6 @@ window.registerAdapterData = function(adapterDataArray, session) {
   session._copyAdapterData(adapterDataMap);
 };
 
-
 /**
  * Removes all open popups for the given session.
  * May be used to make sure handlers get properly detached
