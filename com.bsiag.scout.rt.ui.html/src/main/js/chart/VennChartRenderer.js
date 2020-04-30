@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -14,10 +14,17 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
 
   constructor(chart) {
     super(chart);
+
+    let defaultConfig = {
+      venn: {
+        numberOfCircles: undefined
+      }
+    };
+    chart.config = $.extend(true, {}, defaultConfig, chart.config);
   }
 
   _validate() {
-    let chartData = this.chart.chartData;
+    let chartData = this.chart.data;
     if (!chartData ||
       chartData.axes.length !== 0 ||
       chartData.chartValueGroups.length === 0 ||
@@ -27,7 +34,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
     return true;
   }
 
-  _render() {
+  _renderInternal() {
     this.centerX = this.width / 2;
     this.centerY = this.height / 2;
 
@@ -38,8 +45,8 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
     this.setLoading(true);
 
     // basic values
-    this.data = this.chart.chartData.chartValueGroups;
-    this.numberOfCircles = this.chart.chartData.customProperties.NumberOfCircles;
+    this.data = this.chart.data.chartValueGroups;
+    this.numberOfCircles = this.chart.config.venn.numberOfCircles;
 
     // render parameter
     let distR = 10,
@@ -358,7 +365,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
         showReal: true
       }, this._show.bind(this));
 
-    if (this.chart.autoColor) {
+    if (this.chart.config.options.autoColor) {
       $circle.addClass('auto-color color0');
     } else if (cssClass) {
       $circle.addClass(cssClass);
@@ -366,7 +373,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
       $circle.attr('fill', color);
     }
 
-    if (this.chart.clickable) {
+    if (this.chart.config.options.clickable) {
       $circle.on('click', this._createClickObject(-1, -1, circleIndex), this.chart._onValueClick.bind(this.chart));
     }
 

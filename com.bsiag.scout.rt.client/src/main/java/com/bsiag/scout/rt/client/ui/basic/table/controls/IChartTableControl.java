@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2016 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -24,13 +24,13 @@ public interface IChartTableControl extends ITableControl {
    *
    * @see IChartType
    */
-  void setChartType(int chartType);
+  void setChartType(String chartType);
 
   /**
    * @return chart type
    * @see IChartType
    */
-  int getChartType();
+  String getChartType();
 
   /**
    * set the configuration parameters for the first group represented by the first axis in the chart

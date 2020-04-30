@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -18,10 +18,17 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
 
     this.segmentSelectorForAnimation = '.fulfillment-chart';
     this.suppressLegendBox = true;
+
+    let defaultConfig = {
+      fulfillment: {
+        startValue: undefined
+      }
+    };
+    chart.config = $.extend(true, {}, defaultConfig, chart.config);
   }
 
   _validate() {
-    let chartValueGroups = this.chart.chartData.chartValueGroups;
+    let chartValueGroups = this.chart.data.chartValueGroups;
     if (chartValueGroups.length !== 2 ||
       chartValueGroups[0].values.length !== 1 ||
       chartValueGroups[1].values.length !== 1) {
@@ -30,9 +37,9 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
     return true;
   }
 
-  _render() {
+  _renderInternal() {
     // Calculate percentage
-    let chartData = this.chart.chartData;
+    let chartData = this.chart.data;
     let value = chartData.chartValueGroups[0].values[0];
     let total = chartData.chartValueGroups[1].values[0];
 
@@ -46,16 +53,16 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
   _renderPercentage(value, total) {
     // arc segment
     let arcClass = 'fulfillment-chart',
-      color = this.chart.chartData.chartValueGroups[0].colorHexValue,
-      chartGroupCss = this.chart.chartData.chartValueGroups[0].cssClass;
+      color = this.chart.data.chartValueGroups[0].colorHexValue,
+      chartGroupCss = this.chart.data.chartValueGroups[0].cssClass;
 
-    if (this.chart.autoColor) {
+    if (this.chart.config.options.autoColor) {
       arcClass += ' auto-color';
     } else if (chartGroupCss) {
       arcClass += ' ' + chartGroupCss;
     }
 
-    let startValue = scout.nvl(this.chart.chartData.customProperties.startValue, 0);
+    let startValue = scout.nvl(this.chart.config.fulfillment.startValue, 0);
     let end = 0;
     let lastEnd = 0;
     if (total) {
@@ -90,10 +97,10 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
       .attrXLINK('href', '#InnerCircle')
       .text(percentage + '%');
 
-    if (this.chart.clickable) {
+    if (this.chart.config.options.clickable) {
       $arc.on('click', this._createClickObject(-1, -1, -1), this.chart._onValueClick.bind(this.chart));
     }
-    if (!this.chart.autoColor && !chartGroupCss) {
+    if (!this.chart.config.options.autoColor && !chartGroupCss) {
       $arc.attr('fill', color);
     }
     if (this.animated) {
@@ -118,10 +125,10 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
   }
 
   _renderCirclePath(cssClass, id, radius) {
-    let chartGroupCss = this.chart.chartData.chartValueGroups[0].cssClass;
-    let color = this.chart.chartData.chartValueGroups[1].colorHexValue;
+    let chartGroupCss = this.chart.data.chartValueGroups[0].cssClass;
+    let color = this.chart.data.chartValueGroups[1].colorHexValue;
 
-    if (this.chart.autoColor) {
+    if (this.chart.config.options.autoColor) {
       cssClass += ' auto-color';
     } else if (chartGroupCss) {
       cssClass += ' ' + chartGroupCss;
@@ -135,7 +142,7 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
         ' a ' + radius + ',' + radius + ' 0 1, 1 0,' + radius2 +
         ' a ' + radius + ',' + radius + ' 0 1, 1 0,' + (-radius2));
 
-    if (!this.chart.autoColor && !chartGroupCss) {
+    if (!this.chart.config.options.autoColor && !chartGroupCss) {
       $path
         .attr('fill', color)
         .attr('stroke', color);
@@ -157,7 +164,7 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
    * If startValue is not set use default implementation.
    */
   shouldAnimateRemoveOnUpdate(opts) {
-    let startValue = objects.optProperty(this.chart, 'chartData', 'customProperties', 'startValue');
+    let startValue = objects.optProperty(this.chart, 'config', 'fulfillment', 'startValue');
     if (!objects.isNullOrUndefined(startValue)) {
       return false;
     }

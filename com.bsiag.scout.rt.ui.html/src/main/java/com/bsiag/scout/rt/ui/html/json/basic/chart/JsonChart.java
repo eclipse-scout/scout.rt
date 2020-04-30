@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -8,6 +8,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package com.bsiag.scout.rt.ui.html.json.basic.chart;
+
+import java.util.Map;
 
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
@@ -18,7 +20,7 @@ import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.json.JSONObject;
 
 import com.bsiag.scout.rt.client.ui.basic.chart.IChart;
-import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
+import com.bsiag.scout.rt.shared.data.basic.chart.IChartData;
 
 /**
  * @since 5.2
@@ -39,10 +41,10 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonWidget<CHART> {
   @Override
   protected void initJsonProperties(CHART model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_CHART_DATA, model) {
+    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_DATA, model) {
       @Override
-      protected IChartBean modelValue() {
-        return getModel().getChartData();
+      protected IChartData modelValue() {
+        return getModel().getData();
       }
 
       @Override
@@ -50,61 +52,21 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonWidget<CHART> {
         return MainJsonObjectFactory.get().createJsonObject(value).toJson();
       }
     });
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_AUTO_COLOR, model) {
+    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_CONFIG, model) {
       @Override
-      protected Boolean modelValue() {
-        return getModel().isAutoColor();
+      protected Map<String, Object> modelValue() {
+        return getModel().getConfig() != null ? getModel().getConfig().getProperties() : null;
       }
-    });
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_CHART_TYPE, model) {
+
       @Override
-      protected Integer modelValue() {
-        return getModel().getChartType();
+      public Object prepareValueForToJson(Object value) {
+        return MainJsonObjectFactory.get().createJsonObject(value).toJson();
       }
     });
     putJsonProperty(new JsonProperty<IChart>(IChart.PROP_VISIBLE, model) {
       @Override
       protected Object modelValue() {
         return getModel().isVisible();
-      }
-    });
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_MAX_SEGMENTS, model) {
-      @Override
-      protected Object modelValue() {
-        return getModel().getMaxSegments();
-      }
-    });
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_CLICKABLE, model) {
-      @Override
-      protected Object modelValue() {
-        return getModel().isClickable();
-      }
-    });
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_ANIMATED, model) {
-      @Override
-      protected Object modelValue() {
-        return getModel().isAnimated();
-      }
-    });
-
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_LEGEND_POSITION, model) {
-      @Override
-      protected Object modelValue() {
-        return getModel().getLegendPosition();
-      }
-    });
-
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_LEGEND_VISIBLE, model) {
-      @Override
-      protected Object modelValue() {
-        return getModel().isLegendVisible();
-      }
-    });
-
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_INTERACTIVE_LEGEND_VISIBLE, model) {
-      @Override
-      protected Object modelValue() {
-        return getModel().isInteractiveLegendVisible();
       }
     });
   }

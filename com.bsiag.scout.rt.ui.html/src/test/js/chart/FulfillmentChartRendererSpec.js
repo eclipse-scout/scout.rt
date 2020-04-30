@@ -1,7 +1,7 @@
 import {FulfillmentChartRenderer} from '../../../main/js/index';
 
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -26,13 +26,13 @@ describe('FulfillmentChartRendererSpec', () => {
       expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(true);
 
       fulfillment = new FulfillmentChartRenderer({
-        chartData: 'notEmpty'
+        config: 'notEmpty'
       });
       expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(true);
 
       fulfillment = new FulfillmentChartRenderer({
-        chartData: {
-          customProperties: 'notEmpty'
+        config: {
+          fulfillment: 'notEmpty'
         }
       });
       expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(true);
@@ -49,21 +49,24 @@ describe('FulfillmentChartRendererSpec', () => {
       let totalChartValue = {
         values: [10]
       };
-      let chartData = {
+      let data = {
         axes: [],
-        chartValueGroups: [actualChartValue, totalChartValue],
-        customProperties: {
+        chartValueGroups: [actualChartValue, totalChartValue]
+      };
+      let config = {
+        fulfillment: {
           startValue: 2
         }
       };
       let chart = {
-        chartData: chartData
+        data: data,
+        config: config
       };
 
       let fulfillment = new FulfillmentChartRenderer(chart);
       expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(false);
 
-      chartData.customProperties.startValue = 0;
+      config.fulfillment.startValue = 0;
       fulfillment = new FulfillmentChartRenderer(chart);
       expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(false);
     });

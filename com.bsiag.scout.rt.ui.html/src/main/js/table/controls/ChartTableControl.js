@@ -21,7 +21,7 @@ export default class ChartTableControl extends TableControl {
     this.chartAggregation = {
       modifier: TableMatrix.NumberGroup.COUNT
     };
-    this.chartType = Chart.BAR_VERTICAL;
+    this.chartType = Chart.Type.BAR_VERTICAL_OLD;
     // TODO [15.4] cgu: make use of XyChartRenderer.js and remove duplicate code
 
     // chart config selection
@@ -60,7 +60,7 @@ export default class ChartTableControl extends TableControl {
 
   _renderChartType() {
     this._selectChartType();
-    this.$yAxisSelect.animateAVCSD('width', this.chartType === Chart.SCATTER ? 175 : 0);
+    this.$yAxisSelect.animateAVCSD('width', this.chartType === Chart.Type.SCATTER ? 175 : 0);
     if (this.contentRendered) {
       this._drawChart();
     }
@@ -153,11 +153,11 @@ export default class ChartTableControl extends TableControl {
     // create chart types for selection
     this._chartTypeMap = {};
 
-    this._renderChartSelect('chart-bar', Chart.BAR_VERTICAL, renderSvgIconBar);
-    this._renderChartSelect('chart-stacked', Chart.BAR_HORIZONTAL, renderSvgIconStacked);
-    this._renderChartSelect('chart-line', Chart.LINE, renderSvgIconLine);
-    this._renderChartSelect('chart-pie', Chart.PIE, renderSvgIconPie.bind(this));
-    this._renderChartSelect('chart-scatter', Chart.SCATTER, renderSvgIconScatter);
+    this._renderChartSelect('chart-bar', Chart.Type.BAR_VERTICAL_OLD, renderSvgIconBar);
+    this._renderChartSelect('chart-stacked', Chart.Type.BAR_HORIZONTAL_OLD, renderSvgIconStacked);
+    this._renderChartSelect('chart-line', Chart.Type.LINE_OLD, renderSvgIconLine);
+    this._renderChartSelect('chart-pie', Chart.Type.PIE_OLD, renderSvgIconPie.bind(this));
+    this._renderChartSelect('chart-scatter', Chart.Type.SCATTER, renderSvgIconScatter);
 
     function renderSvgIconBar($svg) {
       let show = [2, 4, 3, 3.5, 5];
@@ -549,7 +549,7 @@ export default class ChartTableControl extends TableControl {
     let $axisColumns;
 
     if (!this.chartType) {
-      this.setChartType(Chart.BAR_VERTICAL);
+      this.setChartType(Chart.Type.BAR_VERTICAL_OLD);
     }
 
     // no id selected
@@ -704,7 +704,7 @@ export default class ChartTableControl extends TableControl {
 
     // find yAxis
     // in case of scatter
-    if (this.chartType === Chart.SCATTER && this.chartGroup2) {
+    if (this.chartType === Chart.Type.SCATTER && this.chartGroup2) {
       let axis2 = this._chartGroup2Map[this.chartGroup2.id].data('column');
       this.yAxis = matrix.addAxis(axis2, this.chartGroup2.modifier);
     }
@@ -725,15 +725,15 @@ export default class ChartTableControl extends TableControl {
     // based on chart type: set class and draw chart
     if (this.chartGroup1) {
       this._updateAxisClass();
-      if (this.chartType === Chart.BAR_VERTICAL) {
+      if (this.chartType === Chart.Type.BAR_VERTICAL_OLD) {
         this._drawBar(this.xAxis, dataAxis, cube);
-      } else if (this.chartType === Chart.BAR_HORIZONTAL) {
+      } else if (this.chartType === Chart.Type.BAR_HORIZONTAL_OLD) {
         this._drawStacked(this.xAxis, dataAxis, cube);
-      } else if (this.chartType === Chart.LINE) {
+      } else if (this.chartType === Chart.Type.LINE_OLD) {
         this._drawLine(this.xAxis, dataAxis, cube);
-      } else if (this.chartType === Chart.PIE) {
+      } else if (this.chartType === Chart.Type.PIE_OLD) {
         this._drawPie(this.xAxis, dataAxis, cube);
-      } else if (this.chartType === Chart.SCATTER && this.chartGroup2) {
+      } else if (this.chartType === Chart.Type.SCATTER && this.chartGroup2) {
         this._drawScatter(this.xAxis, this.yAxis, dataAxis, cube, group2, group);
       }
     }
@@ -763,15 +763,15 @@ export default class ChartTableControl extends TableControl {
    * */
   _updateAxisClass() {
     let $selectXAxis = this._chartGroup1Map[this.chartGroup1.id];
-    if (this.chartType === Chart.BAR_VERTICAL || this.chartType === Chart.LINE || this.chartType === Chart.SCATTER) {
+    if (this.chartType === Chart.Type.BAR_VERTICAL_OLD || this.chartType === Chart.Type.LINE_OLD || this.chartType === Chart.Type.SCATTER) {
       $selectXAxis.removeClass('axis-ver axis-around').addClass('axis-hor');
-    } else if (this.chartType === Chart.BAR_HORIZONTAL) {
+    } else if (this.chartType === Chart.Type.BAR_HORIZONTAL_OLD) {
       $selectXAxis.removeClass('axis-hor axis-around').addClass('axis-ver');
-    } else if (this.chartType === Chart.PIE) {
+    } else if (this.chartType === Chart.Type.PIE_OLD) {
       $selectXAxis.removeClass('axis-ver axis-hor').addClass('axis-around');
     }
 
-    if (this.chartType === Chart.SCATTER) {
+    if (this.chartType === Chart.Type.SCATTER) {
       this._chartGroup2Map[this.chartGroup2.id].addClass('axis-up');
     }
 

@@ -22,16 +22,16 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
   }
 
   _validate() {
-    let chartData = this.chart.chartData;
+    let chartData = this.chart.data;
     if (chartData.axes.length > 0 || chartData.chartValueGroups.length === 0) {
       return false;
     }
     return true;
   }
 
-  _render() {
+  _renderInternal() {
     let that = this,
-      sum = this._sumValues(this.chart.chartData.chartValueGroups),
+      sum = this._sumValues(this.chart.data.chartValueGroups),
       roundingError = 0,
       segments = this._createSegments(),
       startAngle = 0,
@@ -58,12 +58,12 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
       // arc segment
       let colorClass = 'color' + t,
         arcClass = 'pie-chart';
-      if (this.chart.autoColor) {
+      if (this.chart.config.options.autoColor) {
         arcClass += ' auto-color ' + colorClass;
       } else if (segment.cssClass) {
         arcClass += ' ' + segment.cssClass;
       }
-      let clickable = this.chart.clickable && segment.clickable;
+      let clickable = this.chart.config.options.clickable && segment.clickable;
       if (clickable) {
         arcClass += ' clickable';
       }
@@ -83,17 +83,17 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
       if (clickable) {
         $arc.on('click', this._createClickObject(-1, -1, segment.valueGroupIndex), this.chart._onValueClick.bind(this.chart));
       }
-      if (!this.chart.autoColor && !segment.cssClass) {
+      if (!this.chart.config.options.autoColor && !segment.cssClass) {
         $arc.attr('fill', segment.color);
       }
 
       let legendClass = 'pie-chart';
-      if (this.chart.autoColor) {
+      if (this.chart.config.options.autoColor) {
         legendClass += ' auto-color ' + colorClass;
       } else if (segment.cssClass) {
         legendClass += ' ' + segment.cssClass;
       }
-      this._renderLegendEntry(segment.label, (!this.chart.autoColor ? segment.color : null), legendClass, t);
+      this._renderLegendEntry(segment.label, (!this.chart.config.options.autoColor ? segment.color : null), legendClass, t);
 
       // data inside the arc
 
@@ -140,20 +140,20 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
   _calcChartBoxHeight() {
     let height = super._calcChartBoxHeight();
     this.isBiggerThanMinHeight = this.minHeightForWireLegend < height;
-    return this.chart.interactiveLegendVisible ? this.isBiggerThanMinHeight ? height - this.wireLegendUsedSpace / 2 : height - 2 * this.wireLegendUsedSpace : height;
+    return this.chart.config.options.tooltips.enabled ? this.isBiggerThanMinHeight ? height - this.wireLegendUsedSpace / 2 : height - 2 * this.wireLegendUsedSpace : height;
   }
 
   _calcChartBoxYOffset() {
     let yOffset = super._calcChartBoxYOffset();
-    return this.chart.interactiveLegendVisible ? this.isBiggerThanMinHeight ? yOffset + this.wireLegendUsedSpace / 4 : yOffset + this.wireLegendUsedSpace : yOffset;
+    return this.chart.config.options.tooltips.enabled ? this.isBiggerThanMinHeight ? yOffset + this.wireLegendUsedSpace / 4 : yOffset + this.wireLegendUsedSpace : yOffset;
   }
 
   _initLabelBox() {
-    if (!this.chart.legendVisible || this.suppressLegendBox) {
+    if (!this.chart.config.options.legend.display || this.suppressLegendBox) {
       return;
     }
     super._initLabelBox();
-    if (this.chart.interactiveLegendVisible && this.chart.legendPosition === Chart.LEGEND_POSITION_BOTTOM) {
+    if (this.chart.config.options.tooltips.enabled && this.chart.config.options.legend.position === Chart.Position.BOTTOM) {
       this.labelBox.y = this.isBiggerThanMinHeight ? this.labelBox.y + this.wireLegendUsedSpace / 2 : this.labelBox.y + 2 * this.wireLegendUsedSpace;
     }
   }
@@ -204,12 +204,12 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
    * returns ordered segments with label, value and color
    */
   _createSegments() {
-    let valueGroups = this.chart.chartData.chartValueGroups;
+    let valueGroups = this.chart.data.chartValueGroups;
     let segments = valueGroups.map((valueGroup, index) => {
       return scout.create('PieSegment', {
         label: valueGroup.groupName,
         value: valueGroup.values[0],
-        color: this.chart.autoColor ? 'auto' : valueGroup.colorHexValue,
+        color: this.chart.config.options.autoColor ? 'auto' : valueGroup.colorHexValue,
         cssClass: valueGroup.cssClass,
         clickable: valueGroup.clickable,
         valueGroup: valueGroup,
@@ -221,7 +221,7 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
     // Collect small segments in an "others" segment
     // Note: this is pure UI logic, there's also some server logic that creates an "other" valueGroup
     // this may lead to cases where we have two "other" segments in the chart. I guess this is not 100% correct
-    let maxSegments = this.chart.maxSegments;
+    let maxSegments = this.chart.config.options.maxSegments;
     if (segments.length > maxSegments) {
       for (let i = segments.length - 1; i >= maxSegments; i--) {
         segments[maxSegments - 1].value += segments[i].value;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -44,17 +44,17 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
   /**
    * Supported chart types:
    * <ul>
-   * <li>{@link IChartType#PIE}</li>
-   * <li>{@link IChartType#LINE}</li>
-   * <li>{@link IChartType#BAR_VERTICAL}</li>
-   * <li>{@link IChartType#BAR_HORIZONTAL}</li>
+   * <li>{@link IChartType#PIE_OLD}</li>
+   * <li>{@link IChartType#LINE_OLD}</li>
+   * <li>{@link IChartType#BAR_VERTICAL_OLD}</li>
+   * <li>{@link IChartType#BAR_HORIZONTAL_OLD}</li>
    * <li>{@link IChartType#SCATTER}</li>
    * </ul>
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(100)
-  protected int getConfiguredChartType() {
-    return IChartType.BAR_VERTICAL;
+  protected String getConfiguredChartType() {
+    return IChartType.BAR_VERTICAL_OLD;
   }
 
   @ConfigProperty(ConfigProperty.OBJECT)
@@ -76,13 +76,13 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
   }
 
   @Override
-  public void setChartType(int chartType) {
-    propertySupport.setPropertyInt(PROP_CHART_TYPE, chartType);
+  public void setChartType(String chartType) {
+    propertySupport.setPropertyString(PROP_CHART_TYPE, chartType);
   }
 
   @Override
-  public int getChartType() {
-    return propertySupport.getPropertyInt(PROP_CHART_TYPE);
+  public String getChartType() {
+    return propertySupport.getPropertyString(PROP_CHART_TYPE);
   }
 
   @Override

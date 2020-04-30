@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -15,10 +15,10 @@ export default class DonutChartRenderer extends PieChartRenderer {
     super(chart);
   }
 
-  _render() {
+  _renderInternal() {
     let outerCircleR = Math.min(this.chartBox.height, this.chartBox.width) / 2;
     this.centerCircleR = outerCircleR * 0.65; // donut thickness = 35% of outer circle
-    super._render();
+    super._renderInternal();
   }
 
   _renderPieChartPercentage(midPoint, percentage) {

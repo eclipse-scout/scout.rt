@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -29,58 +29,59 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 
 import com.bsiag.scout.rt.client.ui.basic.chart.ChartChains.ChartValueClickChain;
-import com.bsiag.scout.rt.shared.data.basic.chart.ChartBean;
+import com.bsiag.scout.rt.shared.data.basic.chart.ChartData;
 import com.bsiag.scout.rt.shared.data.basic.chart.ChartValueGroupBean;
-import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
+import com.bsiag.scout.rt.shared.data.basic.chart.IChartConfig;
+import com.bsiag.scout.rt.shared.data.basic.chart.IChartData;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
 
 /**
  * <h1>Chart types</h1>
- * <h2>Pie and Donut Chart</h2> ({@link IChartType.PIE}, {@link IChartType.DONUT})
+ * <h2>Pie and Donut Chart</h2> ({@link IChartType#PIE_OLD}, {@link IChartType#DONUT_OLD})
  * <p>
- * Sectors on pie or donut represent a single {@link ChartValueGroupBean} on the {@link ChartBean}. For each
- * {@link ChartValueGroupBean} there can be only one value. On the {@link ChartBean} there are no axes set.
- * <h2>Line Chart</h2> ({@link IChartType.LINE})
+ * Sectors on pie or donut represent a single {@link ChartValueGroupBean} on the {@link ChartData}. For each
+ * {@link ChartValueGroupBean} there can be only one value. On the {@link ChartData} there are no axes set.
+ * <h2>Line Chart</h2> ({@link IChartType#LINE_OLD})
  * <p>
- * Each line represents a single {@link ChartValueGroupBean} on the {@link ChartBean}. All added
+ * Each line represents a single {@link ChartValueGroupBean} on the {@link ChartData}. All added
  * {@link ChartValueGroupBean} must have the same value count. The labels of the x-axis are read out of
- * {@link ChartBean#getAxes()}<code>[0]</code>. Each label in this list corresponds to the index in the value list in
+ * {@link ChartData#getAxes()}<code>[0]</code>. Each label in this list corresponds to the index in the value list in
  * the {@link ChartValueGroupBean}.
- * <h2>Bar Chart</h2> ({@link IChartType.BAR})
+ * <h2>Bar Chart</h2> ({@link IChartType#BAR_VERTICAL_OLD})
  * <p>
- * Each bar group in the same color represents a single {@link ChartValueGroupBean} on the {@link ChartBean}. All added
+ * Each bar group in the same color represents a single {@link ChartValueGroupBean} on the {@link ChartData}. All added
  * {@link ChartValueGroupBean} must have the same value count. The labels of the x-axis are read out of
- * {@link ChartBean#getAxes()}<code>[0]</code>. Each label in this list corresponds to the index in the value list in
+ * {@link ChartData#getAxes()}<code>[0]</code>. Each label in this list corresponds to the index in the value list in
  * the {@link ChartValueGroupBean}.
  * <p>
- * <h2>Fulfillment Cart</h2> ({@link IChartType.FULFILLMENT})
+ * <h2>Fulfillment Cart</h2> ({@link IChartType#FULFILLMENT})
  * <p>
- * There have to be exactly two {@link ChartValueGroupBean} on the {@link ChartBean}, with just one value each. The
+ * There have to be exactly two {@link ChartValueGroupBean} on the {@link ChartData}, with just one value each. The
  * first group contains the degree of fulfillment and the second group contains the value to fulfill. This type has no
  * legendbox.
- * <h2>Sales Funnel Chart</h2> ({@link IChartType.SALESFUNNEL})
+ * <h2>Sales Funnel Chart</h2> ({@link IChartType#SALESFUNNEL})
  * <p>
  * A salesfunnel consists of n {@link ChartValueGroupBean}. Each represents a bar in the chart. Every group must have at
  * least one value and at most two values. This type has no legendbox.
  * <p>
  * There are custom attributes for the sales funnel chart:
  * <ul>
- * <li>{@link IChartType#PROP_SALESFUNNEL_NORMALIZED} defines if the bars should be rendered smaller from top to bottom
+ * <li>{@link IChartConfig#SALESFUNNEL_NORMALIZED} defines if the bars should be rendered smaller from top to bottom
  * (true) or if they get a size according to their values (false).
- * <li>{@link IChartType.PROP_SALESFUNNEL_CALC_CONVERSION_RATE} specifies whether the conversion rate should be rendered
+ * <li>{@link IChartConfig#SALESFUNNEL_CALC_CONVERSION_RATE} specifies whether the conversion rate should be rendered
  * (true or false).
  * </ul>
- * <h2>Speedo Chart</h2> ({@link IChartType.SPEEDO})
+ * <h2>Speedo Chart</h2> ({@link IChartType#SPEEDO})
  * <p>
- * For a speedo chart there have to be just one {@link ChartValueGroupBean} on the {@link ChartBean}. The first value on
+ * For a speedo chart there have to be just one {@link ChartValueGroupBean} on the {@link ChartData}. The first value on
  * the group is the min value of the range, the second the actual value is the actual value for the pointer and the
- * third value is the max value for the range. The {@link IChartType#PROP_SPEEDO_CHART_GREEN_AREA_POSITION} is a custom
+ * third value is the max value for the range. The {@link IChartConfig#SPEEDO_CHART_GREEN_AREA_POSITION} is a custom
  * property which defines where the green area is located on the speedo. This type has no legendbox.
- * <h2>Venn Chart</h2> ({@link IChartType.VENN})
+ * <h2>Venn Chart</h2> ({@link IChartType#VENN})
  * <p>
  * A Venn-chart consist of one to seven {@link ChartValueGroupBean} with exactly one value. First there are all values
  * for the own circle followed by all combinations. The venn chart is limited to three circles.
- * {@link IChartType.PROP_VENN_NUMBER_OF_CIRCLES} specifies the number of circles.
+ * {@link IChartConfig#VENN_NUMBER_OF_CIRCLES} specifies the number of circles.
  * <p>
  * Examples:
  * <ul>
@@ -119,15 +120,8 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
   protected void initConfig() {
     super.initConfig();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
-    setChartType(getConfiguredChartType());
-    setAutoColor(getConfiguredAutoColor());
+    setConfig(getConfiguredConfig());
     setVisible(getConfiguredVisible());
-    setMaxSegments(getConfiguredMaxSegments());
-    setClickable(getConfiguredClickable());
-    setAnimated(getConfiguredAnimated());
-    setLegendPosition(getConfiguredLegendPosition());
-    setLegendVisible(getConfiguredLegendVisible());
-    setInteractiveLegendVisible(getConfiguredInteractiveLegendVisible());
   }
 
   @Override
@@ -135,57 +129,23 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
     m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 
-  @ConfigProperty(ConfigProperty.INTEGER)
+  @ConfigProperty(ConfigProperty.OBJECT)
   @Order(10)
-  protected int getConfiguredChartType() {
-    return IChartType.PIE;
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(20)
-  protected boolean getConfiguredAutoColor() {
-    return true;
+  protected IChartConfig getConfiguredConfig() {
+    return BEANS.get(IChartConfig.class)
+        .withType(IChartType.PIE_OLD)
+        .withAutoColor(true)
+        .withMaxSegments(IChartConfig.DEFAULT_MAX_SEGMENTS_PIE)
+        .withClickable(false)
+        .withAnimated(true)
+        .withTooltipsEnabled(true)
+        .withLegendDisplay(true)
+        .withLegendPositionRight();
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(20)
   protected boolean getConfiguredVisible() {
-    return true;
-  }
-
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(30)
-  protected int getConfiguredMaxSegments() {
-    return DEFAULT_MAX_SEGMENTS_PIE;
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(50)
-  protected boolean getConfiguredClickable() {
-    return false;
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(60)
-  protected boolean getConfiguredAnimated() {
-    return true;
-  }
-
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(70)
-  protected int getConfiguredLegendPosition() {
-    return IChart.LEGEND_POSITION_RIGHT;
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(80)
-  protected boolean getConfiguredLegendVisible() {
-    return true;
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(90)
-  protected boolean getConfiguredInteractiveLegendVisible() {
     return true;
   }
 
@@ -244,38 +204,38 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
   }
 
   @Override
-  public void fireChartDataChanged() {
-    propertySupport.setPropertyAlwaysFire(PROP_CHART_DATA, getChartData());
+  public void setData(IChartData data) {
+    propertySupport.setProperty(PROP_DATA, data);
   }
 
   @Override
-  public void setChartType(int chartType) {
-    propertySupport.setProperty(PROP_CHART_TYPE, chartType);
+  public IChartData getData() {
+    return (IChartData) propertySupport.getProperty(PROP_DATA);
   }
 
   @Override
-  public int getChartType() {
-    return propertySupport.getPropertyInt(PROP_CHART_TYPE);
+  public void setConfig(IChartConfig config) {
+    propertySupport.setProperty(PROP_CONFIG, config != null ? config.copy() : null);
   }
 
   @Override
-  public void setAutoColor(boolean autoColor) {
-    propertySupport.setProperty(PROP_AUTO_COLOR, autoColor);
+  public IChartConfig getConfig() {
+    IChartConfig config = (IChartConfig) propertySupport.getProperty(PROP_CONFIG);
+    return config != null ? config.copy() : null;
   }
 
   @Override
-  public boolean isAutoColor() {
-    return propertySupport.getPropertyBool(PROP_AUTO_COLOR);
+  public void resetConfig() {
+    setConfig(getConfiguredConfig());
   }
 
   @Override
-  public void setChartData(IChartBean chartData) {
-    propertySupport.setProperty(PROP_CHART_DATA, chartData);
-  }
-
-  @Override
-  public IChartBean getChartData() {
-    return (IChartBean) propertySupport.getProperty(PROP_CHART_DATA);
+  public void extendConfig(IChartConfig config, boolean override) {
+    IChartConfig conf = getConfig();
+    if (conf != null) {
+      conf.addProperties(config, override);
+      setConfig(conf);
+    }
   }
 
   @Override
@@ -286,66 +246,6 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
   @Override
   public boolean isVisible() {
     return propertySupport.getPropertyBool(PROP_VISIBLE);
-  }
-
-  @Override
-  public int getMaxSegments() {
-    return propertySupport.getPropertyInt(PROP_MAX_SEGMENTS);
-  }
-
-  @Override
-  public void setMaxSegments(int maxSegments) {
-    propertySupport.setPropertyInt(PROP_MAX_SEGMENTS, maxSegments);
-  }
-
-  @Override
-  public boolean isClickable() {
-    return propertySupport.getPropertyBool(PROP_CLICKABLE);
-  }
-
-  @Override
-  public void setClickable(boolean clickable) {
-    propertySupport.setPropertyBool(PROP_CLICKABLE, clickable);
-  }
-
-  @Override
-  public boolean isAnimated() {
-    return propertySupport.getPropertyBool(PROP_ANIMATED);
-  }
-
-  @Override
-  public void setAnimated(boolean animated) {
-    propertySupport.setPropertyBool(PROP_ANIMATED, animated);
-  }
-
-  @Override
-  public void setLegendPosition(int position) {
-    propertySupport.setPropertyInt(PROP_LEGEND_POSITION, position);
-  }
-
-  @Override
-  public int getLegendPosition() {
-    return propertySupport.getPropertyInt(PROP_LEGEND_POSITION);
-  }
-
-  @Override
-  public boolean isLegendVisible() {
-    return propertySupport.getPropertyBool(PROP_LEGEND_VISIBLE);
-  }
-
-  @Override
-  public void setLegendVisible(boolean visible) {
-    propertySupport.setPropertyBool(PROP_LEGEND_VISIBLE, visible);
-  }
-
-  @Override
-  public boolean isInteractiveLegendVisible() {
-    return propertySupport.getPropertyBool(PROP_INTERACTIVE_LEGEND_VISIBLE);
-  }
-
-  @Override
-  public void setInteractiveLegendVisible(boolean visible) {
-    propertySupport.setPropertyBool(PROP_INTERACTIVE_LEGEND_VISIBLE, visible);
   }
 
   protected class P_UIFacade implements IChartUIFacade {

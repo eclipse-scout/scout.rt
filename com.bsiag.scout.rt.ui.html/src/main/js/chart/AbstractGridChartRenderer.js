@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -8,12 +8,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {strings} from '@eclipse-scout/core';
-import {AbstractChartRenderer, Chart} from '../index';
+import {AbstractSvgChartRenderer, Chart} from '../index';
 import $ from 'jquery';
 
 const LABEL_GAP = 5;
 
-export default class AbstractGridChartRenderer extends AbstractChartRenderer {
+export default class AbstractGridChartRenderer extends AbstractSvgChartRenderer {
 
   constructor(chart) {
     super(chart);
@@ -33,18 +33,40 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
     this.toBigLabelHoverFunc = undefined;
     this.toBigLabelHoverOffFunc = undefined;
     this.xAxisLabels = [];
+
+    let defaultConfig = {
+      options: {
+        scales: {
+          xAxes: [
+            {
+              scaleLabel: {
+                labelString: undefined
+              }
+            }
+          ],
+          yAxes: [
+            {
+              scaleLabel: {
+                labelString: undefined
+              }
+            }
+          ]
+        }
+      }
+    };
+    chart.config = $.extend(true, {}, defaultConfig, chart.config);
   }
 
   _validate() {
-    return !(this.chart.chartData.axes.length === 0 ||
-      this.chart.chartData.chartValueGroups.length === 0);
+    return !(this.chart.data.axes.length === 0 ||
+      this.chart.data.chartValueGroups.length === 0);
   }
 
-  _render() {
+  _renderInternal() {
     this.chartDataAreaHeight = this.chartBox.height - this.paddingTop - this.paddingBottom;
     this.chartDataAreaWidth = this.chartBox.width - this.paddingLeft - this.paddingRight;
     this.maxMinValue = this._findMaxMinValue();
-    this.xItems = this.chart.chartData.axes[0].length;
+    this.xItems = this.chart.data.axes[0].length;
     this.possibleYLines = Math.floor(this.chartDataAreaHeight / this.spaceBetweenYValues);
     this.spaceBetweenXValues = (this.chartDataAreaWidth - 2 * this.chartAreaXPadding) / (this.xItems - 1);
   }
@@ -55,7 +77,7 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
       i = 0,
       j = 0,
       f;
-    let chartGroups = this.chart.chartData.chartValueGroups;
+    let chartGroups = this.chart.data.chartValueGroups;
     for (i = 0; i < chartGroups.length; i++) {
       for (j = 0; j < chartGroups[i].values.length; j++) {
         maxValue = Math.max(chartGroups[i].values[j], maxValue);
@@ -97,10 +119,10 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
     this.labelBox.y = this.labelBox.y + this.paddingTop * 0.5 - this.paddingBottom * 0.5;
 
     // adjust label position for grid charts to have more space for the label text
-    if (this.chart.legendPosition === Chart.LEGEND_POSITION_RIGHT) {
+    if (this.chart.config.options.legend.position === Chart.Position.RIGHT) {
       this.labelBox.x = this.chartBox.width + (this._yAxisLabel() ? this.labelSize.height + LABEL_GAP : 0);
       this.labelBox.textWidth -= LABEL_GAP;
-    } else if (this.chart.legendPosition === Chart.LEGEND_POSITION_LEFT) {
+    } else if (this.chart.config.options.legend.position === Chart.Position.LEFT) {
       this.labelBox.x = this.verticalLegendPaddingLeft;
     }
   }
@@ -156,7 +178,7 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
 
   renderXGridLabel(chartGroups, xIndex, width, widthPerX, drawOnValuePoint) {
     // draw label only once
-    let key = this.chart.chartData.axes[0][xIndex].label,
+    let key = this.chart.data.axes[0][xIndex].label,
       paintedWidth = drawOnValuePoint ? 0 : width * chartGroups.length + 2 * Math.max(chartGroups.length - 1, 0),
       $text = this._renderGridLineLabel(this._calculateXCoordinate(xIndex) + paintedWidth / 2, this._calculateYCoordinate(this.maxMinValue.minValue) + 20, key, true);
 
@@ -314,9 +336,9 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
   _calcChartBoxWidth() {
     let width = this.width;
 
-    if (this.chart.legendVisible &&
-      (this.chart.legendPosition === Chart.LEGEND_POSITION_RIGHT ||
-        this.chart.legendPosition === Chart.LEGEND_POSITION_LEFT)) {
+    if (this.chart.config.options.legend.display &&
+      (this.chart.config.options.legend.position === Chart.Position.RIGHT ||
+        this.chart.config.options.legend.position === Chart.Position.LEFT)) {
       width = this.width / 6 > this.minLegendWidth ? this.width / 6 * 5 : this.width - this.minLegendWidth;
     }
 
@@ -345,7 +367,7 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
   _calcChartBoxXOffset() {
     let offset = 0;
 
-    if (this.chart.legendVisible && this.chart.legendPosition === Chart.LEGEND_POSITION_LEFT) {
+    if (this.chart.config.options.legend.display && this.chart.config.options.legend.position === Chart.Position.LEFT) {
       offset = this.width / 6 > this.minLegendWidth ? this.width / 6 : this.minLegendWidth;
     }
 
@@ -357,11 +379,11 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
   }
 
   _xAxisLabel() {
-    return this.chart.chartData.customProperties.gridXAxisLabel;
+    return this.chart.config.options.scales.xAxes[0].scaleLabel.labelString;
   }
 
   _yAxisLabel() {
-    return this.chart.chartData.customProperties.gridYAxisLabel;
+    return this.chart.config.options.scales.yAxes[0].scaleLabel.labelString;
   }
 
   _renderAxisLabels() {

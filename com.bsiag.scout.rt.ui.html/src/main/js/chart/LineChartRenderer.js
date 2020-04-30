@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -24,18 +24,18 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
     if (!super._validate()) {
       return false;
     }
-    if (this.chart.chartData.axes[0].length < 2 ||
-      this.chart.chartData.chartValueGroups[0].values.length < 2) {
+    if (this.chart.data.axes[0].length < 2 ||
+      this.chart.data.chartValueGroups[0].values.length < 2) {
       return false;
     }
     return true;
   }
 
-  _render() {
-    super._render();
+  _renderInternal() {
+    super._renderInternal();
     let i,
       j,
-      chartValueGroups = this.chart.chartData.chartValueGroups,
+      chartValueGroups = this.chart.data.chartValueGroups,
       widthPerX = this.getWidthPerX(),
       width = this.getWidth(chartValueGroups);
 
@@ -83,7 +83,7 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
         legendClass = 'line-chart-line',
         pointValues = [],
         d = '';
-      if (this.chart.autoColor) {
+      if (this.chart.config.options.autoColor) {
         lineClass += ' stroke-color' + (i % this.numSupportedColors);
         legendClass += ' color' + (i % this.numSupportedColors);
         lineColors[i] = null;
@@ -223,10 +223,10 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
       endY = this._calculateYCoordinate(value);
 
     let colorClass;
-    if (this.chart.autoColor) {
+    if (this.chart.config.options.autoColor) {
       colorClass = 'stroke-color' + (groupIndex % this.numSupportedColors);
     } else {
-      colorClass = this.chart.chartData.chartValueGroups[groupIndex].cssClass || '';
+      colorClass = this.chart.data.chartValueGroups[groupIndex].cssClass || '';
     }
 
     let $bubble = this.$svg.appendSVG('circle', 'line-chart-value-bubble' + strings.box(' ', colorClass, ''))
@@ -273,7 +273,7 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
     legendPositions.autoPosition = true;
     legendPositions.posFunc = labelPositionFunc;
 
-    let groupName = this.chart.chartData.chartValueGroups[groupIndex].groupName;
+    let groupName = this.chart.data.chartValueGroups[groupIndex].groupName;
     let legend = this._renderWireLegend(
       strings.join(': ', groupName, this.session.locale.decimalFormat.format(value)),
       legendPositions, 'line-chart-wire-label', false);

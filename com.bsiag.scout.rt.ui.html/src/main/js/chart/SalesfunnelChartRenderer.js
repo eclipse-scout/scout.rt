@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -8,10 +8,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {strings} from '@eclipse-scout/core';
-import {AbstractChartRenderer} from '../index';
+import {AbstractSvgChartRenderer} from '../index';
 import $ from 'jquery';
 
-export default class SalesfunnelChartRenderer extends AbstractChartRenderer {
+export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
 
   constructor(chart) {
     super(chart);
@@ -28,23 +28,33 @@ export default class SalesfunnelChartRenderer extends AbstractChartRenderer {
     // Percentage of the total width the last bar always has (delta might get smaller due to this constraint).
     this.lastBarMinWidthPercentage = 0.4;
     this.suppressLegendBox = true;
+
+    let defaultConfig = {
+      salesfunnel: {
+        normalized: undefined,
+        calcConversionRate: undefined
+      }
+    };
+    chart.config = $.extend(true, {}, defaultConfig, chart.config);
   }
 
   _validate() {
-    let chartData = this.chart.chartData;
+    let chartData = this.chart.data;
+    let chartConfig = this.chart.config;
     if (!chartData ||
+      !chartConfig ||
       chartData.axes.length !== chartData.chartValueGroups.length ||
       chartData.chartValueGroups.length === 0 ||
       chartData.chartValueGroups[0].values.length === 0 ||
-      chartData.customProperties.normalized === undefined ||
-      chartData.customProperties.calcConversionRate === undefined) {
+      chartConfig.salesfunnel.normalized === undefined ||
+      chartConfig.salesfunnel.calcConversionRate === undefined) {
       return false;
     }
     return true;
   }
 
-  _render() {
-    let chartData = this.chart.chartData,
+  _renderInternal() {
+    let chartData = this.chart.data,
       bars = chartData.chartValueGroups.length;
 
     this.conversionRateWidth = this._dynamicConversionRateWidth();
@@ -59,7 +69,7 @@ export default class SalesfunnelChartRenderer extends AbstractChartRenderer {
       this.conversionRateWidth;
     this.centerX = this.barAreaWidth / 2;
 
-    if (this.chart.chartData.customProperties.normalized) {
+    if (this.chart.config.salesfunnel.normalized) {
       this._renderBarsNormalized(chartData.chartValueGroups);
     } else {
       this._renderBarsAccordingToValues(chartData.chartValueGroups);
@@ -98,10 +108,10 @@ export default class SalesfunnelChartRenderer extends AbstractChartRenderer {
         clickObject: this._createClickObject(-1, -1, i)
       };
 
-      if (this.chart.autoColor) {
+      if (this.chart.config.options.autoColor) {
         renderPolyOptions.cssClass += ' auto-color color0';
-      } else if (this.chart.chartData.chartValueGroups[i].cssClass) {
-        renderPolyOptions.cssClass += ' ' + this.chart.chartData.chartValueGroups[i].cssClass;
+      } else if (this.chart.data.chartValueGroups[i].cssClass) {
+        renderPolyOptions.cssClass += ' ' + this.chart.data.chartValueGroups[i].cssClass;
       }
 
       // Adjust last widths to look like funnel.
@@ -120,7 +130,7 @@ export default class SalesfunnelChartRenderer extends AbstractChartRenderer {
       }
       if (i > 0) {
         this._renderLabelSeparatorLine(yCoord, labelLineWidth);
-        if (this.chart.chartData.customProperties.calcConversionRate) {
+        if (this.chart.config.salesfunnel.calcConversionRate) {
           this._renderConversionRate(i, startPointX, this._calcConversionRate(chartValueGroups[i - 1].values[0], chartValueGroups[i].values[0]));
         }
       }
@@ -147,8 +157,8 @@ export default class SalesfunnelChartRenderer extends AbstractChartRenderer {
         .delay(200)
         .animateSVG('opacity', 1, 600, null, true);
     }
-    if (this.chart.interactiveLegendVisible && this.chart.chartData.axes.length > 0) {
-      let desc = this.chart.chartData.axes[barIndexFromTop][secondLabel ? 1 : 0].label,
+    if (this.chart.config.options.tooltips.enabled && this.chart.data.axes.length > 0) {
+      let desc = this.chart.data.axes[barIndexFromTop][secondLabel ? 1 : 0].label,
         textBoundings = this._measureText(label, labelClass);
       this._renderWireLabels(desc, $label, x - textBoundings.width / 2, y - textBoundings.height);
     }
@@ -224,7 +234,7 @@ export default class SalesfunnelChartRenderer extends AbstractChartRenderer {
       .data('widthBar', renderPolyOptions.width)
       .data('widthBottom', renderPolyOptions.widthBottom)
       .data('heightBar', this.barHeight);
-    if (!this.chart.autoColor && renderPolyOptions.fill) {
+    if (!this.chart.config.options.autoColor && renderPolyOptions.fill) {
       $poly.attr('fill', renderPolyOptions.fill);
     }
 
@@ -244,7 +254,7 @@ export default class SalesfunnelChartRenderer extends AbstractChartRenderer {
           tabIndex: 0
         }, this._createAnimationObjectWithTabindexRemoval(expandFunc));
     }
-    if (this.chart.clickable) {
+    if (this.chart.config.options.clickable) {
       $poly.on('click', renderPolyOptions.clickObject, this.chart._onValueClick.bind(this.chart));
     }
     if (renderPolyOptions.fill) {
@@ -297,10 +307,10 @@ export default class SalesfunnelChartRenderer extends AbstractChartRenderer {
         clickObject: this._createClickObject(-1, -1, i)
       };
 
-      if (this.chart.autoColor) {
+      if (this.chart.config.options.autoColor) {
         renderPolyOptions.cssClass += ' auto-color color0';
-      } else if (this.chart.chartData.chartValueGroups[i].cssClass) {
-        renderPolyOptions.cssClass += ' ' + this.chart.chartData.chartValueGroups[i].cssClass;
+      } else if (this.chart.data.chartValueGroups[i].cssClass) {
+        renderPolyOptions.cssClass += ' ' + this.chart.data.chartValueGroups[i].cssClass;
       }
 
       this._renderPolygon(renderPolyOptions);
@@ -313,7 +323,7 @@ export default class SalesfunnelChartRenderer extends AbstractChartRenderer {
       }
       if (i > 0) {
         this._renderLabelSeparatorLine(yCoord, labelLineWidth);
-        if (this.chart.chartData.customProperties.calcConversionRate) {
+        if (this.chart.config.salesfunnel.calcConversionRate) {
           this._renderConversionRate(i, startPointX, this._calcConversionRate(chartValueGroups[i - 1].values[0], chartValueGroups[i].values[0]));
         }
       }
@@ -425,7 +435,7 @@ export default class SalesfunnelChartRenderer extends AbstractChartRenderer {
   }
 
   _dynamicConversionRateWidth() {
-    if (!this.chart.chartData.customProperties.calcConversionRate) {
+    if (!this.chart.config.salesfunnel.calcConversionRate) {
       return 0; // don't show conversion rate
     }
     if (this.chartBox.width <= this.widthThresholdSmall) {

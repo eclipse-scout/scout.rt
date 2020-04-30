@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -16,10 +16,10 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
     super(chart);
   }
 
-  _render() {
-    super._render();
+  _renderInternal() {
+    super._renderInternal();
 
-    let chartGroups = this.chart.chartData.chartValueGroups,
+    let chartGroups = this.chart.data.chartValueGroups,
       widthPerX = this.getWidthPerX(),
       width = this.getWidth(chartGroups),
       yLabels = this._createYLabelsAndAdjustDimensions(this.possibleYLines);
@@ -31,11 +31,11 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
 
     // draw data
     for (let cg = 0; cg < chartGroups.length; cg++) {
-      let barClass = 'bar-chart-bar' + (this.chart.autoColor ? ' color' + cg : '');
-      this._renderLegendEntry(chartGroups[cg].groupName, !this.chart.autoColor ? this.chart.chartData.chartValueGroups[cg].colorHexValue : null, barClass, cg);
+      let barClass = 'bar-chart-bar' + (this.chart.config.options.autoColor ? ' color' + cg : '');
+      this._renderLegendEntry(chartGroups[cg].groupName, !this.chart.config.options.autoColor ? this.chart.data.chartValueGroups[cg].colorHexValue : null, barClass, cg);
 
       for (let i = 0; i < chartGroups[cg].values.length; i++) {
-        let key = this.chart.chartData.axes[0][i].label,
+        let key = this.chart.data.axes[0][i].label,
           value = chartGroups[cg].values[i];
         this._renderSingleBar(key, value, i, cg, width, widthPerX, chartGroups);
       }
@@ -49,10 +49,10 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
     let yEnd = 0,
       heightEnd = 0,
       $text,
-      chartGroups = this.chart.chartData.chartValueGroups,
+      chartGroups = this.chart.data.chartValueGroups,
       xCoord = this._calculateXCoordinate(valueIndex) + chartGroupIndex * (2 + width),
-      chartGroupCss = this.chart.chartData.chartValueGroups[chartGroupIndex].cssClass,
-      barClass = 'bar-chart-bar' + (this.chart.autoColor ? ' color' + chartGroupIndex : strings.box(' ', chartGroupCss, ''));
+      chartGroupCss = this.chart.data.chartValueGroups[chartGroupIndex].cssClass,
+      barClass = 'bar-chart-bar' + (this.chart.config.options.autoColor ? ' color' + chartGroupIndex : strings.box(' ', chartGroupCss, ''));
 
     // draw label only once
     if (chartGroupIndex === 0) {
@@ -77,8 +77,8 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
       cssClass: barClass,
       clickObject: this._createClickObject(0, valueIndex, chartGroupIndex)
     });
-    if (!this.chart.autoColor && !chartGroupCss) {
-      renderRectOptions.fill = this.chart.chartData.chartValueGroups[chartGroupIndex].colorHexValue;
+    if (!this.chart.config.options.autoColor && !chartGroupCss) {
+      renderRectOptions.fill = this.chart.data.chartValueGroups[chartGroupIndex].colorHexValue;
     }
     renderRectOptions.customAttributes.push(['negValue', value < 0]);
     renderRectOptions.customAttributes.push(['data-xAxis', key]);
@@ -122,7 +122,7 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
     let
       that = this,
       legend = this._renderWireLegend(
-        strings.join(': ', this.chart.chartData.chartValueGroups[chartGroupIndex].groupName, this.session.locale.decimalFormat.format(value)),
+        strings.join(': ', this.chart.data.chartValueGroups[chartGroupIndex].groupName, this.session.locale.decimalFormat.format(value)),
         legendPositions, 'line-chart-wire-label', true
       ),
       mouseIn = () => {

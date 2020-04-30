@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -9,6 +9,7 @@
  */
 import {
   BarChartRenderer,
+  ChartJsRenderer,
   BarHorizontalChartRenderer,
   ChartLayout,
   DonutChartRenderer,
@@ -30,42 +31,51 @@ export default class Chart extends Widget {
     this.$container = null;
     this.chartRenderer = null;
 
-    /**
-     * @type {object}
-     * @property {object} [customProperties]
-     * @property {string} [customProperties.gridXAxisLabel]
-     * @property {string} [customProperties.gridYAxisLabel]
-     */
-    this.chartData = null;
+    this.data = null;
+    this.config = {
+      type: Chart.Type.PIE_OLD,
+      options: {
+        autoColor: true,
+        maxSegments: 5,
+        clickable: false,
+        animated: true,
+        tooltips: {
+          enabled: true
+        },
+        legend: {
+          display: true,
+          position: Chart.Position.RIGHT
+        }
+      }
+    };
     this._updateChartTimeoutId = null;
     this._updateChartOpts = null;
     this.updatedOnce = false;
-    this.animated = true;
-    this.autoColor = true;
-    this.clickable = false;
-    this.enabled = true;
-    this.legendPosition = Chart.LEGEND_POSITION_RIGHT;
-    this.legendVisible = true;
-    this.maxSegments = 5;
-    this.visible = true;
-    this.interactiveLegendVisible = true;
   }
 
-  static PIE = 1;
-  static LINE = 2;
-  static BAR_VERTICAL = 3;
-  static BAR_HORIZONTAL = 4;
-  static SCATTER = 5;
-  static FULFILLMENT = 6;
-  static SPEEDO = 7;
-  static SALESFUNNEL = 8;
-  static VENN = 9;
-  static DONUT = 10;
+  static Type = {
+    PIE: 'pie',
+    PIE_OLD: 'pie_old',
+    LINE: 'line',
+    LINE_OLD: 'line_old',
+    BAR: 'bar',
+    BAR_VERTICAL_OLD: 'barVertical_old',
+    BAR_HORIZONTAL_OLD: 'barHorizontal_old',
+    SCATTER: 'scatter',
+    FULFILLMENT: 'fulfillment',
+    SPEEDO: 'speedo',
+    SALESFUNNEL: 'salesfunnel',
+    VENN: 'venn',
+    DOUGHNUT: 'doughnut',
+    DONUT_OLD: 'donut_old'
+  };
 
-  static LEGEND_POSITION_BOTTOM = 0;
-  static LEGEND_POSITION_TOP = 2;
-  static LEGEND_POSITION_RIGHT = 4;
-  static LEGEND_POSITION_LEFT = 5;
+  static Position = {
+    TOP: 'top',
+    BOTTOM: 'bottom',
+    LEFT: 'left',
+    RIGHT: 'right'
+  };
 
   static DEFAULT_DEBOUNCE_TIMEOUT = 100; // ms
 
@@ -98,51 +108,24 @@ export default class Chart extends Widget {
     this.$container = null;
   }
 
-  _setChartType(chartType) {
-    this._setProperty('chartType', chartType);
+  setData(data) {
+    this.setProperty('data', data);
+  }
+
+  _renderData() {
+    this.updateChart({
+      requestAnimation: true,
+      debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
+    });
+  }
+
+  setConfig(config) {
+    this.setProperty('config', config);
     this._updateChartRenderer();
   }
 
-  _renderChartType() {
-    this.updateChart({
-      requestAnimation: true,
-      debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
-    });
-  }
-
-  _renderAutoColor() {
-    this.updateChart({
-      requestAnimation: true,
-      debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
-    });
-  }
-
-  _renderLegendVisible() {
-    this.updateChart({
-      requestAnimation: true,
-      debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
-    });
-  }
-
-  _renderInteractiveLegendVisible() {
-    this.updateChart({
-      requestAnimation: true,
-      debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
-    });
-  }
-
-  _renderLegendPosition() {
-    this.updateChart({
-      requestAnimation: true,
-      debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
-    });
-  }
-
-  setChartData(chartData) {
-    this.setProperty('chartData', chartData);
-  }
-
-  _renderChartData() {
+  _renderConfig() {
+    this._renderClickable();
     this.updateChart({
       requestAnimation: true,
       debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
@@ -156,13 +139,8 @@ export default class Chart extends Widget {
     this.updateChart();
   }
 
-  _renderMaxSegments() {
-    this.updateChart();
-  }
-
   _renderClickable() {
-    this.$container.toggleClass('clickable', this.clickable);
-    this.updateChart();
+    this.$container.toggleClass('clickable', this.config.options.clickable);
   }
 
   /**
@@ -217,27 +195,32 @@ export default class Chart extends Widget {
   }
 
   _resolveChartRenderer() {
-    switch (this.chartType) {
-      case Chart.PIE:
+    switch (this.config.type) {
+      case Chart.Type.PIE_OLD:
         return new PieChartRenderer(this);
-      case Chart.LINE:
+      case Chart.Type.LINE_OLD:
         return new LineChartRenderer(this);
-      case Chart.BAR_VERTICAL:
+      case Chart.Type.BAR_VERTICAL_OLD:
         return new BarChartRenderer(this);
-      case Chart.BAR_HORIZONTAL:
+      case Chart.Type.BAR_HORIZONTAL_OLD:
         return new BarHorizontalChartRenderer(this);
-      case Chart.SCATTER:
+      case Chart.Type.SCATTER:
         return new ScatterChartRenderer(this);
-      case Chart.FULFILLMENT:
+      case Chart.Type.FULFILLMENT:
         return new FulfillmentChartRenderer(this);
-      case Chart.SPEEDO:
+      case Chart.Type.SPEEDO:
         return new SpeedoChartRenderer(this);
-      case Chart.SALESFUNNEL:
+      case Chart.Type.SALESFUNNEL:
         return new SalesfunnelChartRenderer(this);
-      case Chart.VENN:
+      case Chart.Type.VENN:
         return new VennChartRenderer(this);
-      case Chart.DONUT:
+      case Chart.Type.DONUT_OLD:
         return new DonutChartRenderer(this);
+      case Chart.Type.BAR:
+      case Chart.Type.LINE:
+      case Chart.Type.PIE:
+      case Chart.Type.DOUGHNUT:
+        return new ChartJsRenderer(this);
     }
     return null;
   }

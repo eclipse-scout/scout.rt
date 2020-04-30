@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -45,9 +45,7 @@ describe('SpeedoChartRenderer', () => {
     it('should handle click', () => {
       let chart = scout.create('Chart', {
         parent: session.desktop,
-        clickable: true,
-        chartType: Chart.SPEEDO,
-        chartData: {
+        data: {
           axes: [],
           chartValueGroups: [{
             clickable: true,
@@ -56,9 +54,24 @@ describe('SpeedoChartRenderer', () => {
             values: [
               1, 5, 10
             ]
-          }],
-          customProperties: {
-            greenAreaPosition: SpeedoChartRenderer.GREEN_AREA_POSITION_CENTER
+          }]
+        },
+        config: {
+          type: Chart.Type.SPEEDO,
+          clickable: true,
+          options: {
+            autoColor: true,
+            clickable: true,
+            tooltips: {
+              enabled: true
+            },
+            legend: {
+              display: true,
+              position: Chart.Position.RIGHT
+            }
+          },
+          speedo: {
+            greenAreaPosition: SpeedoChartRenderer.Position.CENTER
           }
         }
       });

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -19,6 +19,7 @@ import com.bsiag.scout.rt.client.ui.basic.chart.AbstractChart;
 import com.bsiag.scout.rt.client.ui.form.fields.chartfield.AbstractChartField;
 import com.bsiag.scout.rt.client.ui.form.fields.tile.AbstractChartTile.ChartField;
 import com.bsiag.scout.rt.client.ui.form.fields.tile.AbstractChartTile.ChartField.Chart;
+import com.bsiag.scout.rt.shared.data.basic.chart.IChartConfig;
 
 /**
  * @since 5.2
@@ -39,7 +40,7 @@ public abstract class AbstractChartTile extends AbstractFormFieldTile<ChartField
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(70)
-  protected Integer getConfiguredChartType() {
+  protected String getConfiguredChartType() {
     return null;
   }
 
@@ -78,7 +79,7 @@ public abstract class AbstractChartTile extends AbstractFormFieldTile<ChartField
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(70)
-  protected Integer getConfiguredLegendPosition() {
+  protected String getConfiguredLegendPosition() {
     return null;
   }
 
@@ -96,7 +97,7 @@ public abstract class AbstractChartTile extends AbstractFormFieldTile<ChartField
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(90)
-  protected Boolean getConfiguredInteractiveLegendVisible() {
+  protected Boolean getConfiguredTooltipsEnabled() {
     return true;
   }
 
@@ -104,27 +105,29 @@ public abstract class AbstractChartTile extends AbstractFormFieldTile<ChartField
   protected void initTileWidgetConfig() {
     super.initTileWidgetConfig();
 
+    IChartConfig config = getTileWidget().getChart().getConfig();
     if (getConfiguredChartType() != null) {
-      getTileWidget().getChart().setChartType(getConfiguredChartType());
+      config.withType(getConfiguredChartType());
     }
     if (getConfiguredAutoColor() != null) {
-      getTileWidget().getChart().setAutoColor(getConfiguredAutoColor());
+      config.withAutoColor(getConfiguredAutoColor());
     }
     if (getConfiguredClickable() != null) {
-      getTileWidget().getChart().setClickable(getConfiguredClickable());
+      config.withClickable(getConfiguredClickable());
     }
     if (getConfiguredAnimated() != null) {
-      getTileWidget().getChart().setAnimated(getConfiguredAnimated());
+      config.withAnimated(getConfiguredAnimated());
     }
     if (getConfiguredLegendPosition() != null) {
-      getTileWidget().getChart().setLegendPosition(getConfiguredLegendPosition());
+      config.withLegendPosition(getConfiguredLegendPosition());
     }
     if (getConfiguredLegendVisible() != null) {
-      getTileWidget().getChart().setLegendVisible(getConfiguredLegendVisible());
+      config.withLegendDisplay(getConfiguredLegendVisible());
     }
-    if (getConfiguredInteractiveLegendVisible() != null) {
-      getTileWidget().getChart().setInteractiveLegendVisible(getConfiguredInteractiveLegendVisible());
+    if (getConfiguredTooltipsEnabled() != null) {
+      config.withTooltipsEnabled(getConfiguredTooltipsEnabled());
     }
+    getTileWidget().getChart().setConfig(config);
   }
 
   /**

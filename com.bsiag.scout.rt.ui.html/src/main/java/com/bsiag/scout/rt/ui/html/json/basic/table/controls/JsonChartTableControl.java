@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2016 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -38,7 +38,7 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<CHART_TABLE_CONTROL>(IChartTableControl.PROP_CHART_TYPE, model) {
       @Override
-      protected Integer modelValue() {
+      protected String modelValue() {
         return getModel().getChartType();
       }
     });
@@ -114,7 +114,7 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
   }
 
   protected void handleUiChartTypeChange(String propertyName, JSONObject data) {
-    int chartType = data.getInt(propertyName);
+    String chartType = data.getString(propertyName);
     addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_TYPE, chartType);
     getModel().setChartType(chartType);
   }

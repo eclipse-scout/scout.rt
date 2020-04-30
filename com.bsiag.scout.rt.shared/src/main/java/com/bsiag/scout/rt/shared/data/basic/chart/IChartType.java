@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2016 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -14,38 +14,18 @@ package com.bsiag.scout.rt.shared.data.basic.chart;
  */
 public interface IChartType {
 
-  int PIE = 1;
-  int LINE = 2;
-  int BAR_VERTICAL = 3;
-  int BAR_HORIZONTAL = 4;
-  int SCATTER = 5;
-  int FULFILLMENT = 6;
-  int SPEEDO = 7;
-  int SALESFUNNEL = 8;
-  int VENN = 9;
-  int DONUT = 10;
-
-  int SPEEDO_GREEN_AREA_POSITION_LEFT = 1;
-  int SPEEDO_GREEN_AREA_POSITION_CENTER = 2;
-  int SPEEDO_GREEN_AREA_POSITION_RIGHT = 3;
-
-  /**
-   * Possible values see <code>SPEEDO_GREEN_AREA_*</code> constants.
-   *
-   * @see SpeedoChartRenderer.js
-   */
-  String PROP_SPEEDO_CHART_GREEN_AREA_POSITION = "greenAreaPosition";
-
-  String PROP_SALESFUNNEL_NORMALIZED = "normalized";
-  String PROP_SALESFUNNEL_CALC_CONVERSION_RATE = "calcConversionRate";
-
-  String PROP_VENN_NUMBER_OF_CIRCLES = "NumberOfCircles";
-
-  /**
-   * Indicates the value from which the animation should be started. If not set, the animation starts from 0.
-   */
-  String PROP_FULFILLMENT_START_VALUE = "startValue";
-
-  String GRID_X_AXIS_LABEL = "gridXAxisLabel";
-  String GRID_Y_AXIS_LABEL = "gridYAxisLabel";
+  String PIE = "pie";
+  String PIE_OLD = "pie_old";
+  String LINE = "line";
+  String LINE_OLD = "line_old";
+  String BAR = "bar";
+  String BAR_VERTICAL_OLD = "barVertical_old";
+  String BAR_HORIZONTAL_OLD = "barHorizontal_old";
+  String SCATTER = "scatter";
+  String FULFILLMENT = "fulfillment";
+  String SPEEDO = "speedo";
+  String SALESFUNNEL = "salesfunnel";
+  String VENN = "venn";
+  String DOUGHNUT = "doughnut";
+  String DONUT_OLD = "donut_old";
 }
