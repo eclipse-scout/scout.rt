@@ -45,7 +45,7 @@ export default class VennCircleHelper {
   }
 
   calcR(count, factorMax) {
-    if (count == -1) {
+    if (count === -1) {
       return this.maxR * factorMax;
     }
     return Math.max(this.minR, Math.sqrt(count / this.total) * this.maxR * factorMax);

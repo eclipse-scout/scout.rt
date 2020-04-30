@@ -392,7 +392,7 @@ export default class AbstractGridChartRenderer extends AbstractChartRenderer {
         .attr('y', y)
         .attr('transform',
           'rotate(-90, ' + (x + textBounds.width / 2) + ', ' + y + ') ' +
-          'translate(0, -' + (textBounds.width / 2 - textBounds.height / 2) +')')
+          'translate(0, -' + (textBounds.width / 2 - textBounds.height / 2) + ')')
         .text(yLabel);
     }
   }
