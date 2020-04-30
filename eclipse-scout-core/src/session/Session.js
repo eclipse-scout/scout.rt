@@ -397,7 +397,8 @@ export default class Session {
     this.persistent = data.startupData.persistent;
 
     // Store clientSessionId in sessionStorage (to send the same ID again on page reload)
-    this._storeClientSessionIdInStorage(data.startupData.clientSessionId);
+    this.clientSessionId = data.startupData.clientSessionId;
+    this._storeClientSessionIdInStorage(this.clientSessionId);
 
     // Assign server generated uiSessionId. It must be sent along with all further requests.
     this.uiSessionId = data.startupData.uiSessionId;
