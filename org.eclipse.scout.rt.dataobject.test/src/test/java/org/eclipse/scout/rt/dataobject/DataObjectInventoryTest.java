@@ -11,23 +11,16 @@
 package org.eclipse.scout.rt.dataobject;
 
 import static org.junit.Assert.*;
-
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
-import org.eclipse.scout.rt.dataobject.DataObjectAttributeDescriptor;
-import org.eclipse.scout.rt.dataobject.DataObjectInventory;
-import org.eclipse.scout.rt.dataobject.DoEntity;
-import org.eclipse.scout.rt.dataobject.DoList;
-import org.eclipse.scout.rt.dataobject.DoValue;
-import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
-import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.fixture.DateFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureInvalidTypeNameDo;
 import org.eclipse.scout.rt.dataobject.fixture.OtherEntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ProjectFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.ProjectSubFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ScoutFixtureDo;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -115,6 +108,7 @@ public class DataObjectInventoryTest {
   @Test
   public void testGetAttributeDescription() throws Exception {
     Optional<DataObjectAttributeDescriptor> attributeDescription = m_inventory.getAttributeDescription(EntityFixtureDo.class, "id");
+    assertTrue(attributeDescription.isPresent());
     assertEquals("id", attributeDescription.get().getName());
     assertEquals(DoValue.class, attributeDescription.get().getType().getRawType());
     assertEquals(String.class, attributeDescription.get().getType().getActualTypeArguments()[0]);
@@ -122,6 +116,7 @@ public class DataObjectInventoryTest {
     assertFalse(attributeDescription.get().getFormatPattern().isPresent());
 
     attributeDescription = m_inventory.getAttributeDescription(EntityFixtureDo.class, "otherEntities");
+    assertTrue(attributeDescription.isPresent());
     assertEquals("otherEntities", attributeDescription.get().getName());
     assertEquals(DoList.class, attributeDescription.get().getType().getRawType());
     assertEquals(OtherEntityFixtureDo.class, attributeDescription.get().getType().getActualTypeArguments()[0]);
@@ -129,6 +124,7 @@ public class DataObjectInventoryTest {
     assertFalse(attributeDescription.get().getFormatPattern().isPresent());
 
     attributeDescription = m_inventory.getAttributeDescription(DateFixtureDo.class, "date");
+    assertTrue(attributeDescription.isPresent());
     assertEquals("date", attributeDescription.get().getName());
     assertEquals(DoValue.class, attributeDescription.get().getType().getRawType());
     assertEquals(Date.class, attributeDescription.get().getType().getActualTypeArguments()[0]);
@@ -136,6 +132,7 @@ public class DataObjectInventoryTest {
     assertEquals(IValueFormatConstants.DATE_PATTERN, attributeDescription.get().getFormatPattern().get());
 
     attributeDescription = m_inventory.getAttributeDescription(DateFixtureDo.class, "list");
+    assertTrue(attributeDescription.isPresent());
     assertEquals("list", attributeDescription.get().getName());
     assertEquals(DoList.class, attributeDescription.get().getType().getRawType());
     assertEquals(Integer.class, attributeDescription.get().getType().getActualTypeArguments()[0]);
@@ -189,6 +186,7 @@ public class DataObjectInventoryTest {
 
     m_inventory.registerClassByTypeVersion(ProjectFixtureDo.class);
     assertEquals("project-1.2.3.004", m_inventory.getTypeVersion(ProjectFixtureDo.class));
+    assertNull( m_inventory.getTypeVersion(ProjectSubFixtureDo.class));
   }
 
   @Test(expected = AssertionException.class)
@@ -205,8 +203,10 @@ public class DataObjectInventoryTest {
     DataObjectInventory inv = BEANS.get(DataObjectInventory.class);
     assertEquals("ScoutFixture", inv.toTypeName(ScoutFixtureDo.class));
     assertEquals("ScoutFixture", inv.toTypeName(ProjectFixtureDo.class));
+    assertEquals("ScoutFixture", inv.toTypeName(ProjectSubFixtureDo.class));
 
     assertEquals("scout-8.0.0.034", inv.getTypeVersion(ScoutFixtureDo.class));
     assertEquals("project-1.2.3.004", inv.getTypeVersion(ProjectFixtureDo.class));
+    assertNull(inv.getTypeVersion(ProjectSubFixtureDo.class));
   }
 }
