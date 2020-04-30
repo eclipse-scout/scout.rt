@@ -462,25 +462,32 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
     // read grouping char because it is different in java8 vs. java11
     DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(NlsLocale.get());
     char groupChar = df.getDecimalFormatSymbols().getGroupingSeparator();
+    String numberUnformatted = "12345";
+    String numberFormatted = "12" + groupChar + "345";
 
-    getUIFacade().parseAndSetValueFromUI("12345");
-    assertEquals("12" + groupChar + "345", getDisplayText());
-    getUIFacade().parseAndSetValueFromUI("12345"); // input does not match display text
-    assertEquals("12" + groupChar + "345", getDisplayText());
+    getUIFacade().parseAndSetValueFromUI(numberUnformatted);
+    assertEquals(numberFormatted, getDisplayText());
+    getUIFacade().parseAndSetValueFromUI(numberUnformatted); // input does not match display text
+    assertEquals(numberFormatted, getDisplayText());
 
     assertEquals(2, m_displayTextChangedCounter.get());
-    assertArrayEquals(new String[]{"12" + groupChar + "345", "12" + groupChar + "345"}, m_displayTextChangedHistory.toArray());
+    assertArrayEquals(new String[]{numberFormatted, numberFormatted}, m_displayTextChangedHistory.toArray());
   }
 
   @Test
   public void testDisplayTextSameTextTwiceFormatted() throws Exception {
-    getUIFacade().parseAndSetValueFromUI("12’345");
-    assertEquals("12’345", getDisplayText());
-    getUIFacade().parseAndSetValueFromUI("12’345"); // input matches display text
-    assertEquals("12’345", getDisplayText());
+    // read grouping char because it is different in java8 vs. java11
+    DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(NlsLocale.get());
+    char groupChar = df.getDecimalFormatSymbols().getGroupingSeparator();
+    String numberFormatted = "12" + groupChar + "345";
+
+    getUIFacade().parseAndSetValueFromUI(numberFormatted);
+    assertEquals(numberFormatted, getDisplayText());
+    getUIFacade().parseAndSetValueFromUI(numberFormatted); // input matches display text
+    assertEquals(numberFormatted, getDisplayText());
 
     assertEquals(1, m_displayTextChangedCounter.get());
-    assertArrayEquals(new String[]{"12’345"}, m_displayTextChangedHistory.toArray());
+    assertArrayEquals(new String[]{numberFormatted}, m_displayTextChangedHistory.toArray());
   }
 
   @Test
