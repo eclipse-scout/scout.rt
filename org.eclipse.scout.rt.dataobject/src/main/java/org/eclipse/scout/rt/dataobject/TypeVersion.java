@@ -37,7 +37,7 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RUNTIME)
 @Target({TYPE})
-@Inherited
+@Inherited // TODO [11.0] pbz: remove annotation, since implementation in DataObjectInventory does not consider inherited versions on data objects
 public @interface TypeVersion {
 
   /**
