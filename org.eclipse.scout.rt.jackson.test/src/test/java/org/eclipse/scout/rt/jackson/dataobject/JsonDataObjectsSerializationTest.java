@@ -2246,10 +2246,6 @@ public class JsonDataObjectsSerializationTest {
    */
   @Test
   public void testSerializeDeserializeThrowable() throws Exception {
-    // Throwable & Exception are serialized using Jackson default serializers, force alphabetically sorted attributes for unit test
-    final ObjectMapper customObjectMapper = BEANS.get(JacksonPrettyPrintDataObjectMapper.class).createObjectMapperInstance(false)
-        .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY);
-
     Throwable throwable = new Throwable("throwable-message");
     throwable.setStackTrace(new StackTraceElement[]{new StackTraceElement("mocked-throwable-class", "mocked-method-01", "mocked-file-01", 42)});
     Exception exception = new Exception("exception-message");
@@ -2258,10 +2254,10 @@ public class JsonDataObjectsSerializationTest {
         .withThrowable(throwable)
         .withException(exception);
 
-    String json = customObjectMapper.writeValueAsString(entity);
-    assertJsonEquals("TestThrowableDo.json", json);
+    // Note: no plain JSON comparison, since JSON-serialized Exception and Throwable depends on used JRE
 
-    TestThrowableDo marshalled = customObjectMapper.readValue(json, TestThrowableDo.class);
+    String json = s_dataObjectMapper.writeValueAsString(entity);
+    TestThrowableDo marshalled = s_dataObjectMapper.readValue(json, TestThrowableDo.class);
     assertEquals(throwable.getMessage(), marshalled.getThrowable().getMessage());
     assertEquals(exception.getMessage(), marshalled.getException().getMessage());
     assertArrayEquals(throwable.getStackTrace(), marshalled.getThrowable().getStackTrace());
