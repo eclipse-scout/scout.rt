@@ -111,7 +111,7 @@ export default class PopupWithHeadLayout extends PopupLayout {
         .add(graphics.margins(this.popup.$head));
       prefSize.width = prefSize.width < headSize.width ? headSize.width : prefSize.width;
     }
-    prefSize.add(htmlComp.insets());
+    prefSize = prefSize.add(htmlComp.insets());
     return prefSize;
   }
 }

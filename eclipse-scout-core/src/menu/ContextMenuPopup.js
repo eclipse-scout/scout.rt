@@ -61,6 +61,7 @@ export default class ContextMenuPopup extends PopupWithHead {
   }
 
   /**
+   * @param [options]
    * @override
    */
   _installScrollbars(options) {
@@ -94,7 +95,7 @@ export default class ContextMenuPopup extends PopupWithHead {
       parentMenu.__originalParent._doActionTogglesSubMenu();
     }
 
-    let actualBounds = this.htmlComp.offsetBounds();
+    let actualBounds = this.htmlComp.offsetBounds().subtractFromDimension(this.htmlComp.insets());
 
     this.revalidateLayout();
     this.position();
@@ -107,7 +108,7 @@ export default class ContextMenuPopup extends PopupWithHead {
         width: 'auto',
         height: 'auto'
       });
-      let targetBounds = this.htmlComp.offsetBounds();
+      let targetBounds = this.htmlComp.offsetBounds().subtractFromDimension(this.htmlComp.insets());
       parentMenu.$subMenuBody.css('box-shadow', 'none');
       this.htmlComp.setBounds(actualBounds);
       if (this.verticalAlignment !== Popup.Alignment.TOP) {
@@ -184,7 +185,7 @@ export default class ContextMenuPopup extends PopupWithHead {
       return;
     }
 
-    let actualBounds = this.htmlComp.offsetBounds();
+    let actualBounds = this.htmlComp.offsetBounds().subtractFromDimension(this.htmlComp.insets());
 
     parentMenu.__originalParent.$subMenuBody = this.$body;
 
@@ -226,7 +227,7 @@ export default class ContextMenuPopup extends PopupWithHead {
         width: 'auto',
         height: 'auto'
       });
-      let targetBounds = this.htmlComp.offsetBounds();
+      let targetBounds = this.htmlComp.offsetBounds().subtractFromDimension(this.htmlComp.insets());
 
       this._animateTopAndLeft(this.htmlComp.$comp, actualBounds, targetBounds, duration);
 
