@@ -90,7 +90,7 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
     parentMenu.parentMenu._doActionTogglesSubMenu();
   }
 
-  var actualBounds = this.htmlComp.offsetBounds();
+  var actualBounds = this.htmlComp.offsetBounds().subtractFromDimension(this.htmlComp.insets());
 
   this.revalidateLayout();
   this.position();
@@ -103,7 +103,7 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
       width: 'auto',
       height: 'auto'
     });
-    var targetBounds = this.htmlComp.offsetBounds();
+    var targetBounds = this.htmlComp.offsetBounds().subtractFromDimension(this.htmlComp.insets());
     parentMenu.$subMenuBody.css('box-shadow', 'none');
     this.htmlComp.setBounds(actualBounds);
     if (this.verticalAlignment !== scout.Popup.Alignment.TOP) {
@@ -180,7 +180,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
     return;
   }
 
-  var actualBounds = this.htmlComp.offsetBounds();
+  var actualBounds = this.htmlComp.offsetBounds().subtractFromDimension(this.htmlComp.insets());
 
   parentMenu.parentMenu.$subMenuBody = this.$body;
 
@@ -222,7 +222,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
       width: 'auto',
       height: 'auto'
     });
-    var targetBounds = this.htmlComp.offsetBounds();
+    var targetBounds = this.htmlComp.offsetBounds().subtractFromDimension(this.htmlComp.insets());
 
     this._animateTopAndLeft(this.htmlComp.$comp, actualBounds, targetBounds, duration);
 

@@ -623,6 +623,17 @@ scout.Rectangle.prototype.subtract = function(insets) {
 };
 
 /**
+ * Subtracts the insets only from the dimension properties (width and height)
+ */
+scout.Rectangle.prototype.subtractFromDimension = function(insets) {
+  return new scout.Rectangle(
+    this.x,
+    this.y,
+    this.width - insets.horizontal(),
+    this.height - insets.vertical());
+};
+
+/**
  * Moves the rectangle the given distance.
  * <p>
  * @param dx the distance to move the rectangle along the x axis.
