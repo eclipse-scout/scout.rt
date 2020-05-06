@@ -76,10 +76,25 @@ export default class Rectangle {
       r.y < this.bottom() && r.bottom() > this.y;
   }
 
+  /**
+   * @returns {Rectangle}
+   */
   subtract(insets) {
     return new Rectangle(
       this.x + insets.left,
       this.y + insets.top,
+      this.width - insets.horizontal(),
+      this.height - insets.vertical());
+  }
+
+  /**
+   * Subtracts the insets only from the dimension properties (width and height)
+   * @returns {Rectangle}
+   */
+  subtractFromDimension(insets) {
+    return new scout.Rectangle(
+      this.x,
+      this.y,
       this.width - insets.horizontal(),
       this.height - insets.vertical());
   }
