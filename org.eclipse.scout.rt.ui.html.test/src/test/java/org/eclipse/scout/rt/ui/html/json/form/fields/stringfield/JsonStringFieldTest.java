@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
+import org.eclipse.scout.rt.ui.html.json.fixtures.JsonAdapterMock;
 import org.eclipse.scout.rt.ui.html.json.form.fields.BaseFormFieldTest;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +35,7 @@ public class JsonStringFieldTest extends BaseFormFieldTest {
 
   };
 
-  private JsonStringField m_stringField = new JsonStringField<IStringField>(m_model, m_session, m_session.createUniqueId(), null);
+  private JsonStringField m_stringField = new JsonStringField<IStringField>(m_model, m_session, m_session.createUniqueId(), new JsonAdapterMock());
 
   @Before
   public void setUp() {

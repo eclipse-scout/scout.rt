@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.table;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -55,7 +53,7 @@ public class JsonCellToJsonTest {
     table.init();
     ITableRow row = table.addRow(table.createRow());
     table.getColumn().setValue(row, "A string");
-    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table);
 
     Object jsonObj = jsonTable.cellToJson(row, table.getColumn());
     assertTrue(jsonObj instanceof String);
@@ -70,7 +68,7 @@ public class JsonCellToJsonTest {
     table.init();
     ITableRow row = table.addRow(table.createRow());
     table.getColumn().setValue(row, 15L);
-    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table);
 
     JSONObject jsonObj = (JSONObject) jsonTable.cellToJson(row, table.getColumn());
     Assert.assertEquals("15", jsonObj.get("text"));
@@ -87,7 +85,7 @@ public class JsonCellToJsonTest {
     table.init();
     ITableRow row = table.addRow(table.createRow());
     table.getColumn().setValue(row, 15L);
-    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table);
 
     Object jsonObj = jsonTable.cellToJson(row, table.getColumn());
     assertTrue(jsonObj instanceof String);
@@ -103,7 +101,7 @@ public class JsonCellToJsonTest {
     ITableRow row = table.addRow(table.createRow());
     table.getColumn().setValue(row, null);
     row.getCellForUpdate(table.getColumn()).setText("-empty-");
-    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table);
 
     JSONObject jsonObj = (JSONObject) jsonTable.cellToJson(row, table.getColumn());
     assertEquals("-empty-", jsonObj.get("text"));
@@ -119,7 +117,7 @@ public class JsonCellToJsonTest {
     table.init();
     ITableRow row = table.addRow(table.createRow());
     table.getColumn().setValue(row, null);
-    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table);
 
     JSONObject jsonObj = (JSONObject) jsonTable.cellToJson(row, table.getColumn());
     assertEquals("", jsonObj.get("text"));
@@ -136,7 +134,7 @@ public class JsonCellToJsonTest {
     table.init();
     ITableRow row = table.addRow(table.createRow());
     table.getColumn().setValue(row, null);
-    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table);
 
     Object jsonObj = jsonTable.cellToJson(row, table.getColumn());
     assertEquals("", jsonObj);
@@ -150,7 +148,7 @@ public class JsonCellToJsonTest {
 
     table.getColumn().setFormat("dd.MM.yyyy");
     table.getColumn().setValue(row, DateUtility.parse("01.01.2015", "dd.MM.yyyy"));
-    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table);
 
     JSONObject jsonObj = (JSONObject) jsonTable.cellToJson(row, table.getColumn());
     Assert.assertEquals("01.01.2015", jsonObj.get("text"));
@@ -169,7 +167,7 @@ public class JsonCellToJsonTest {
 
     table.getColumn().setFormat(JsonDate.JSON_PATTERN_DATE_ONLY);
     table.getColumn().setValue(row, DateUtility.parse("01.01.2015", "dd.MM.yyyy"));
-    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table);
 
     Object jsonObj = jsonTable.cellToJson(row, table.getColumn());
     assertTrue(jsonObj instanceof String);
@@ -181,7 +179,7 @@ public class JsonCellToJsonTest {
     table.init();
     ITableRow row = table.addRow(table.createRow());
     table.getColumn().setValue(row, true);
-    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table);
 
     JSONObject jsonObj = (JSONObject) jsonTable.cellToJson(row, table.getColumn());
     Assert.assertEquals(true, jsonObj.get("value"));

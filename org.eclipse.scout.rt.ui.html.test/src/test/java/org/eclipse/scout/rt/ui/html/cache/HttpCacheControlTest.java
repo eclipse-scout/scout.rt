@@ -10,11 +10,14 @@
  */
 package org.eclipse.scout.rt.ui.html.cache;
 
+import java.nio.charset.StandardCharsets;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
@@ -35,9 +38,12 @@ public class HttpCacheControlTest {
   private HttpServletRequest req;
   private HttpServletResponse resp;
   private HttpCacheControl cc;
+  private boolean oldDevMode;
 
   @Before
   public void before() {
+    oldDevMode = BEANS.get(PlatformDevModeProperty.class).getValue();
+    BEANS.get(PlatformDevModeProperty.class).setValue(false);
     session = Mockito.mock(HttpSession.class);
 
     req = Mockito.mock(HttpServletRequest.class);
@@ -62,15 +68,16 @@ public class HttpCacheControlTest {
     Mockito.verifyNoMoreInteractions(session);
     Mockito.verifyNoMoreInteractions(req);
     Mockito.verifyNoMoreInteractions(resp);
+    BEANS.get(PlatformDevModeProperty.class).setValue(oldDevMode);
   }
 
   @Test
-  public void testCheckAndSet_DisableCaching() throws Exception {
+  public void testCheckAndSet_DisableCaching() {
     Mockito.when(req.getPathInfo()).thenReturn("/");
 
     BinaryResource res = BinaryResources.create()
         .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
+        .withContent("<html></html>".getBytes(StandardCharsets.UTF_8))
         .withCachingAllowed(false)
         .build();
     HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
@@ -83,7 +90,7 @@ public class HttpCacheControlTest {
   }
 
   @Test
-  public void testCheckAndSet_EnableCaching() throws Exception {
+  public void testCheckAndSet_EnableCaching() {
     Mockito.when(req.getPathInfo()).thenReturn("/");
     Mockito.when(req.getHeader(HttpCacheControl.ETAG)).thenReturn(null);
     Mockito.when(req.getHeader(HttpCacheControl.IF_NONE_MATCH)).thenReturn(null);
@@ -91,7 +98,7 @@ public class HttpCacheControlTest {
 
     BinaryResource res = BinaryResources.create()
         .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
+        .withContent("<html></html>".getBytes(StandardCharsets.UTF_8))
         .withCachingAllowed(true)
         .withLastModified(0L)
         .build();
@@ -109,7 +116,7 @@ public class HttpCacheControlTest {
   }
 
   @Test
-  public void testCheckAndSet_EnableCaching_MaxAge3() throws Exception {
+  public void testCheckAndSet_EnableCaching_MaxAge3() {
     Mockito.when(req.getPathInfo()).thenReturn("/");
     Mockito.when(req.getHeader(HttpCacheControl.ETAG)).thenReturn(null);
     Mockito.when(req.getHeader(HttpCacheControl.IF_NONE_MATCH)).thenReturn(null);
@@ -117,7 +124,7 @@ public class HttpCacheControlTest {
 
     BinaryResource res = BinaryResources.create()
         .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
+        .withContent("<html></html>".getBytes(StandardCharsets.UTF_8))
         .withCachingAllowed(true)
         .withCacheMaxAge(3)
         .withLastModified(0L)
@@ -136,7 +143,7 @@ public class HttpCacheControlTest {
   }
 
   @Test
-  public void testCheckAndSet_EnableCaching_LastModified() throws Exception {
+  public void testCheckAndSet_EnableCaching_LastModified() {
     Mockito.when(req.getPathInfo()).thenReturn("/");
     Mockito.when(req.getHeader(HttpCacheControl.ETAG)).thenReturn(null);
     Mockito.when(req.getHeader(HttpCacheControl.IF_NONE_MATCH)).thenReturn(null);
@@ -144,7 +151,7 @@ public class HttpCacheControlTest {
 
     BinaryResource res = BinaryResources.create()
         .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
+        .withContent("<html></html>".getBytes(StandardCharsets.UTF_8))
         .withCachingAllowed(true)
         .withLastModifiedNow()
         .build();
@@ -163,7 +170,7 @@ public class HttpCacheControlTest {
   }
 
   @Test
-  public void testCheckAndSet_EnableCaching_IfNoneMatch_false() throws Exception {
+  public void testCheckAndSet_EnableCaching_IfNoneMatch_false() {
     Mockito.when(req.getPathInfo()).thenReturn("/");
     Mockito.when(req.getHeader(HttpCacheControl.ETAG)).thenReturn(null);
     Mockito.when(req.getHeader(HttpCacheControl.IF_NONE_MATCH)).thenReturn("W/\"FooBar\"");//non-matching E-Tag
@@ -171,7 +178,7 @@ public class HttpCacheControlTest {
 
     BinaryResource res = BinaryResources.create()
         .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
+        .withContent("<html></html>".getBytes(StandardCharsets.UTF_8))
         .withCachingAllowed(true)
         .withLastModifiedNow()
         .build();
@@ -190,7 +197,7 @@ public class HttpCacheControlTest {
   }
 
   @Test
-  public void testCheckAndSet_EnableCaching_IfNoneMatch_true() throws Exception {
+  public void testCheckAndSet_EnableCaching_IfNoneMatch_true() {
     Mockito.when(req.getPathInfo()).thenReturn("/");
     Mockito.when(req.getHeader(HttpCacheControl.ETAG)).thenReturn(null);
     Mockito.when(req.getHeader(HttpCacheControl.IF_NONE_MATCH)).thenReturn("W/\"FooBar\", W/\"13-535168142\"");//matching E-Tag
@@ -198,7 +205,7 @@ public class HttpCacheControlTest {
 
     BinaryResource res = BinaryResources.create()
         .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
+        .withContent("<html></html>".getBytes(StandardCharsets.UTF_8))
         .withCachingAllowed(true)
         .withLastModifiedNow()
         .build();
@@ -216,7 +223,7 @@ public class HttpCacheControlTest {
   }
 
   @Test
-  public void testCheckAndSet_EnableCaching_IfModifiedSince_Modified() throws Exception {
+  public void testCheckAndSet_EnableCaching_IfModifiedSince_Modified() {
     Mockito.when(req.getPathInfo()).thenReturn("/");
     Mockito.when(req.getHeader(HttpCacheControl.ETAG)).thenReturn(null);
     Mockito.when(req.getHeader(HttpCacheControl.IF_NONE_MATCH)).thenReturn(null);
@@ -224,7 +231,7 @@ public class HttpCacheControlTest {
 
     BinaryResource res = BinaryResources.create()
         .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
+        .withContent("<html></html>".getBytes(StandardCharsets.UTF_8))
         .withCachingAllowed(true)
         .withLastModified(2000000L)
         .build();
@@ -243,7 +250,7 @@ public class HttpCacheControlTest {
   }
 
   @Test
-  public void testCheckAndSet_EnableCaching_IfModifiedSince_ModifiedAtFidelityPlus1() throws Exception {
+  public void testCheckAndSet_EnableCaching_IfModifiedSince_ModifiedAtFidelityPlus1() {
     Mockito.when(req.getPathInfo()).thenReturn("/");
     Mockito.when(req.getHeader(HttpCacheControl.ETAG)).thenReturn(null);
     Mockito.when(req.getHeader(HttpCacheControl.IF_NONE_MATCH)).thenReturn(null);
@@ -251,7 +258,7 @@ public class HttpCacheControlTest {
 
     BinaryResource res = BinaryResources.create()
         .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
+        .withContent("<html></html>".getBytes(StandardCharsets.UTF_8))
         .withCachingAllowed(true)
         .withLastModified(1000000L + HttpCacheControl.IF_MODIFIED_SINCE_FIDELITY + 1L)
         .build();
@@ -270,7 +277,7 @@ public class HttpCacheControlTest {
   }
 
   @Test
-  public void testCheckAndSet_EnableCaching_IfModifiedSince_NotModifiedAtFidelity() throws Exception {
+  public void testCheckAndSet_EnableCaching_IfModifiedSince_NotModifiedAtFidelity() {
     Mockito.when(req.getPathInfo()).thenReturn("/");
     Mockito.when(req.getHeader(HttpCacheControl.ETAG)).thenReturn(null);
     Mockito.when(req.getHeader(HttpCacheControl.IF_NONE_MATCH)).thenReturn(null);
@@ -278,7 +285,7 @@ public class HttpCacheControlTest {
 
     BinaryResource res = BinaryResources.create()
         .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
+        .withContent("<html></html>".getBytes(StandardCharsets.UTF_8))
         .withCachingAllowed(true)
         .withLastModified(1000000L + HttpCacheControl.IF_MODIFIED_SINCE_FIDELITY)
         .build();
@@ -296,7 +303,7 @@ public class HttpCacheControlTest {
   }
 
   @Test
-  public void testCheckAndSet_EnableCaching_IfModifiedSince_NotModified() throws Exception {
+  public void testCheckAndSet_EnableCaching_IfModifiedSince_NotModified() {
     Mockito.when(req.getPathInfo()).thenReturn("/");
     Mockito.when(req.getHeader(HttpCacheControl.ETAG)).thenReturn(null);
     Mockito.when(req.getHeader(HttpCacheControl.IF_NONE_MATCH)).thenReturn(null);
@@ -304,7 +311,7 @@ public class HttpCacheControlTest {
 
     BinaryResource res = BinaryResources.create()
         .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
+        .withContent("<html></html>".getBytes(StandardCharsets.UTF_8))
         .withCachingAllowed(true)
         .withLastModified(900000L)
         .build();

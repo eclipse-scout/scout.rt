@@ -57,7 +57,7 @@ public class JsonTileGridTest {
     P_TileGrid tileGrid = new P_TileGrid();
     tileGrid.setSelectable(true);
 
-    JsonTileGrid<ITileGrid<?>> jsonTileGrid = UiSessionTestUtility.newJsonAdapter(m_uiSession, tileGrid, null);
+    JsonTileGrid<ITileGrid<?>> jsonTileGrid = UiSessionTestUtility.newJsonAdapter(m_uiSession, tileGrid);
     jsonTileGrid.toJson();
 
     P_Tile tile0 = new P_Tile();
@@ -104,7 +104,7 @@ public class JsonTileGridTest {
     tileGrid.addTile(tile2);
     tileGrid.selectTiles(Arrays.asList(tile0));
 
-    JsonTileGrid<ITileGrid<?>> jsonTileGrid = UiSessionTestUtility.newJsonAdapter(m_uiSession, tileGrid, null);
+    JsonTileGrid<ITileGrid<?>> jsonTileGrid = UiSessionTestUtility.newJsonAdapter(m_uiSession, tileGrid);
     jsonTileGrid.toJson();
     JsonTile jsonTile1 = m_uiSession.getJsonAdapter(tile1, jsonTileGrid);
 

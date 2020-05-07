@@ -72,7 +72,7 @@ public class JsonFormTest {
   @Test
   public void testFormOpenCloseInTwoRequests() {
     // Create adapter for client session and desktop
-    UiSessionTestUtility.newJsonAdapter(m_uiSession, IClientSession.CURRENT.get(), null);
+    UiSessionTestUtility.newJsonAdapter(m_uiSession, IClientSession.CURRENT.get());
     JsonTestUtility.processBufferedEvents(m_uiSession);
     JsonTestUtility.endRequest(m_uiSession);
 
@@ -106,7 +106,7 @@ public class JsonFormTest {
   @Test
   public void testFormOpenCloseInSameRequest() {
     // Create adapter for client session and desktop
-    UiSessionTestUtility.newJsonAdapter(m_uiSession, IClientSession.CURRENT.get(), null);
+    UiSessionTestUtility.newJsonAdapter(m_uiSession, IClientSession.CURRENT.get());
     JsonTestUtility.processBufferedEvents(m_uiSession);
     JsonTestUtility.endRequest(m_uiSession);
 
@@ -125,7 +125,7 @@ public class JsonFormTest {
   @Test
   public void testFormOpenCloseInWrappedFormField() {
     // Create adapter for client session and desktop
-    UiSessionTestUtility.newJsonAdapter(m_uiSession, IClientSession.CURRENT.get(), null);
+    UiSessionTestUtility.newJsonAdapter(m_uiSession, IClientSession.CURRENT.get());
     JsonTestUtility.processBufferedEvents(m_uiSession);
     JsonTestUtility.endRequest(m_uiSession);
 
@@ -144,7 +144,7 @@ public class JsonFormTest {
   @Test
   public void testFormVisibleGrantedFalse() {
     // Create adapter for client session and desktop
-    UiSessionTestUtility.newJsonAdapter(m_uiSession, IClientSession.CURRENT.get(), null);
+    UiSessionTestUtility.newJsonAdapter(m_uiSession, IClientSession.CURRENT.get());
     JsonTestUtility.processBufferedEvents(m_uiSession);
     JsonTestUtility.endRequest(m_uiSession);
 

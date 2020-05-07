@@ -51,7 +51,7 @@ public class JsonFormTableControlTest {
     control.setTable(new Table());
     control.setForm(form);
     control.decorateForm();
-    JsonTableControl<ITableControl> jsonControl = UiSessionTestUtility.newJsonAdapter(m_uiSession, control, null);
+    JsonTableControl<ITableControl> jsonControl = UiSessionTestUtility.newJsonAdapter(m_uiSession, control);
     assertNull(jsonControl.getAdapter(form));
 
     control.setSelected(true);
@@ -69,7 +69,7 @@ public class JsonFormTableControlTest {
     control.setTable(new Table());
     control.setForm(form);
     control.decorateForm();
-    JsonTableControl<ITableControl> jsonControl = UiSessionTestUtility.newJsonAdapter(m_uiSession, control, null);
+    JsonTableControl<ITableControl> jsonControl = UiSessionTestUtility.newJsonAdapter(m_uiSession, control);
 
     assertNull(jsonControl.getAdapter(form));
 
@@ -104,7 +104,7 @@ public class JsonFormTableControlTest {
     control.setTable(new Table());
     control.setForm(form);
     control.decorateForm();
-    JsonTableControl<ITableControl> jsonControl = UiSessionTestUtility.newJsonAdapter(m_uiSession, control, null);
+    JsonTableControl<ITableControl> jsonControl = UiSessionTestUtility.newJsonAdapter(m_uiSession, control);
     assertNull(jsonControl.getAdapter(form));
 
     FormWithOneField anotherForm = new FormWithOneField();
@@ -134,7 +134,7 @@ public class JsonFormTableControlTest {
     control.setForm(form);
     control.decorateForm();
     control.setSelected(true);
-    JsonTableControl<ITableControl> jsonControl = UiSessionTestUtility.newJsonAdapter(m_uiSession, control, null);
+    JsonTableControl<ITableControl> jsonControl = UiSessionTestUtility.newJsonAdapter(m_uiSession, control);
 
     IJsonAdapter<?> formAdapter = jsonControl.getAdapter(form);
     assertNotNull(formAdapter);

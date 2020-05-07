@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.ui.html.json.fixtures.JsonAdapterMock;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -32,7 +33,7 @@ public class JsonFormFieldTest extends BaseFormFieldTest {
   AbstractGroupBox m_model = new AbstractGroupBox() {
   };
 
-  JsonFormField m_formField = new JsonFormField<IFormField>(m_model, m_session, m_session.createUniqueId(), null) {
+  JsonFormField m_formField = new JsonFormField<IFormField>(m_model, m_session, m_session.createUniqueId(), new JsonAdapterMock()) {
   };
 
   @Before
