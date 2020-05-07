@@ -258,7 +258,7 @@ public class JsonTableTest {
     // No reply (we assume that the UI state is correct and only the event was wrong, e.g. due to caching)
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
-    assertTrue(responseEvents.size() == 0);
+    assertEquals(0, responseEvents.size());
     JsonTestUtility.endRequest(m_uiSession);
 
     // ----------
@@ -275,7 +275,7 @@ public class JsonTableTest {
     // No reply (states should be equal)
     responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
-    assertTrue(responseEvents.size() == 0);
+    assertEquals(0, responseEvents.size());
     JsonTestUtility.endRequest(m_uiSession);
 
     // ----------
@@ -293,7 +293,7 @@ public class JsonTableTest {
     // Inform the UI about the change
     responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
-    assertTrue(responseEvents.size() == 1);
+    assertEquals(1, responseEvents.size());
     List<ITableRow> tableRows = jsonTable.extractTableRows(responseEvents.get(0).getData());
     assertEquals(row4, tableRows.get(0));
     JsonTestUtility.endRequest(m_uiSession);

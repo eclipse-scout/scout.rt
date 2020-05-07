@@ -112,7 +112,7 @@ public class JsonAdapterRegistry {
    * Returns the adapter which belongs to the given model object and has the given adapter as its parent adapter.
    */
   @SuppressWarnings("unchecked")
-  public <MODEL, ADAPTER extends IJsonAdapter<? super MODEL>> ADAPTER getByModelAndParentAdapter(final MODEL model, final IJsonAdapter<?> parent) {
+  public <MODEL, ADAPTER extends IJsonAdapter<? extends MODEL>> ADAPTER getByModelAndParentAdapter(final MODEL model, final IJsonAdapter<?> parent) {
     m_readLock.lock();
     try {
       return (ADAPTER) m_idxByModelAndParent.get(createModelAndParentAdapterPair(model, parent));

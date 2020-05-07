@@ -68,19 +68,19 @@ public interface IJsonAdapter<T> extends IJsonObject {
   // getAdapters -> getChildAdapters
   // getParent -> getParentAdapter
 
-  <A extends IJsonAdapter<? super MODEL>, MODEL> A attachAdapter(MODEL model, Predicate<MODEL> filter);
+  <A extends IJsonAdapter<M>, M> A attachAdapter(M model, Predicate<M> filter);
 
-  <MODEL> List<IJsonAdapter<?>> attachAdapters(Collection<MODEL> models);
+  <M> List<IJsonAdapter<?>> attachAdapters(Collection<M> models);
 
-  <MODEL> List<IJsonAdapter<?>> attachAdapters(Collection<MODEL> models, Predicate<MODEL> filter);
+  <M> List<IJsonAdapter<?>> attachAdapters(Collection<M> models, Predicate<M> filter);
 
-  <A extends IJsonAdapter<? super Object>> A getAdapter(Object model);
+  <A extends IJsonAdapter<M>, M> A getAdapter(M model);
 
-  <A extends IJsonAdapter<? super MODEL>, MODEL> A getAdapter(MODEL model, Predicate<MODEL> filter);
+  <A extends IJsonAdapter<M>, M> A getAdapter(M model, Predicate<M> filter);
 
   Collection<IJsonAdapter<?>> getAdapters(Collection<?> models);
 
-  <MODEL> Collection<IJsonAdapter<?>> getAdapters(Collection<MODEL> models, Predicate<MODEL> filter);
+  <M> Collection<IJsonAdapter<?>> getAdapters(Collection<M> models, Predicate<M> filter);
 
   IJsonAdapter<?> getParent();
 

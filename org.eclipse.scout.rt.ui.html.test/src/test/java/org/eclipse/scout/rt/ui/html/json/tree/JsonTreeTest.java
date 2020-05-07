@@ -102,7 +102,7 @@ public class JsonTreeTest {
     assertEquals(0, responseEvents.size());
   }
 
-  /**
+  /*
    * If the selection event triggers the selection of another node, the selection event must not be ignored.
    */
   //TODO [7.0] cgu: Test fails due to scout model bug: selectNode puts first selection event AFTER this new selection event -> gets filtered in processEventBuffers. With table it works though.
@@ -181,7 +181,7 @@ public class JsonTreeTest {
     // No reply (we assume that the UI state is correct and only the event was wrong, e.g. due to caching)
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODES_SELECTED);
-    assertTrue(responseEvents.size() == 0);
+    assertEquals(0, responseEvents.size());
     JsonTestUtility.endRequest(m_uiSession);
 
     // ----------
@@ -198,7 +198,7 @@ public class JsonTreeTest {
     // No reply (states should be equal)
     responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODES_SELECTED);
-    assertTrue(responseEvents.size() == 0);
+    assertEquals(0, responseEvents.size());
     JsonTestUtility.endRequest(m_uiSession);
 
     // ----------
@@ -216,7 +216,7 @@ public class JsonTreeTest {
     // Inform the UI about the change
     responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODES_SELECTED);
-    assertTrue(responseEvents.size() == 1);
+    assertEquals(1, responseEvents.size());
     List<ITreeNode> treeNodes = jsonTree.extractTreeNodes(responseEvents.get(0).getData());
     assertEquals(node1, treeNodes.get(0));
     JsonTestUtility.endRequest(m_uiSession);
@@ -752,14 +752,14 @@ public class JsonTreeTest {
 
   @Test
   public void testOptTreeNodeForNodeId() {
-    ITree tree = createTree(Collections.<ITreeNode> emptyList());
+    ITree tree = createTree(Collections.emptyList());
     JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
     assertNull(jsonTree.optTreeNodeForNodeId("foo"));
   }
 
   @Test(expected = UiException.class)
   public void testGetTreeNodeForNodeId() {
-    ITree tree = createTree(Collections.<ITreeNode> emptyList());
+    ITree tree = createTree(Collections.emptyList());
     JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
     jsonTree.getTreeNodeForNodeId("foo");
   }

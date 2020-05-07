@@ -49,7 +49,7 @@ public class HttpCacheKeyTest {
 
   @Test
   public void testAttributeWithNullKeyAndValue() {
-    Map<String, String> atts = Collections.singletonMap((String) null, (String) null);
+    Map<String, String> atts = Collections.singletonMap(null, null);
     HttpCacheKey key = new HttpCacheKey("/", atts);
     Assert.assertNull(key.getAttribute(null));
     Assert.assertNull(key.getAttribute("a"));
@@ -58,7 +58,7 @@ public class HttpCacheKeyTest {
 
   @Test
   public void testAttributeWithNullKey() {
-    Map<String, String> atts = Collections.singletonMap((String) null, "v");
+    Map<String, String> atts = Collections.singletonMap(null, "v");
     HttpCacheKey key = new HttpCacheKey("/", atts);
     Assert.assertEquals("v", key.getAttribute(null));
     Assert.assertNull(key.getAttribute("a"));
@@ -67,7 +67,7 @@ public class HttpCacheKeyTest {
 
   @Test
   public void testAttributeWithNullValue() {
-    Map<String, String> atts = Collections.singletonMap("a", (String) null);
+    Map<String, String> atts = Collections.singletonMap("a", null);
     HttpCacheKey key = new HttpCacheKey("/", atts);
     Assert.assertNull(key.getAttribute(null));
     Assert.assertNull(key.getAttribute("a"));
@@ -90,10 +90,10 @@ public class HttpCacheKeyTest {
     Assert.assertEquals(new HttpCacheKey(null), new HttpCacheKey(null, Collections.<String, String> emptyMap()));
     Assert.assertEquals(new HttpCacheKey("/"), new HttpCacheKey("/"));
     Assert.assertEquals(new HttpCacheKey("/", null), new HttpCacheKey("/", null));
-    Assert.assertEquals(new HttpCacheKey(null, Collections.singletonMap((String) null, (String) null)), new HttpCacheKey(null, Collections.singletonMap((String) null, (String) null)));
+    Assert.assertEquals(new HttpCacheKey(null, Collections.singletonMap(null, null)), new HttpCacheKey(null, Collections.singletonMap(null, null)));
     Assert.assertEquals(new HttpCacheKey(null, Collections.singletonMap("a", "v")), new HttpCacheKey(null, Collections.singletonMap("a", "v")));
 
-    Assert.assertNotEquals(new HttpCacheKey(null), new HttpCacheKey(null, Collections.singletonMap((String) null, (String) null)));
+    Assert.assertNotEquals(new HttpCacheKey(null), new HttpCacheKey(null, Collections.singletonMap(null, null)));
     Assert.assertNotEquals(new HttpCacheKey(null), new HttpCacheKey(null, Collections.singletonMap("a", "v")));
   }
 

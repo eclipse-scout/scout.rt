@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormMenu;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 
@@ -48,12 +49,12 @@ public class DesktopWithNonDisplayableActions extends AbstractDesktop {
 
   @Order(30)
   @ClassId("b6102dec-df0c-4f43-b295-955c14a0dd1e")
-  public class DisplayableFormMenu extends AbstractFormMenu {
+  public class DisplayableFormMenu extends AbstractFormMenu<IForm> {
   }
 
   @Order(40)
   @ClassId("7c287d3e-f15e-4af4-97e8-7970248de997")
-  public class NonDisplayableFormMenu extends AbstractFormMenu {
+  public class NonDisplayableFormMenu extends AbstractFormMenu<IForm> {
 
     @Override
     protected void execInitAction() {

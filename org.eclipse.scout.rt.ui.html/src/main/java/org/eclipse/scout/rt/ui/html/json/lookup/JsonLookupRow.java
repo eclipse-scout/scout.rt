@@ -25,13 +25,13 @@ public class JsonLookupRow<T> implements IJsonObject {
 
   private final ILookupRow<T> m_lookupRow;
   private final boolean m_multipleColumns;
-  private final Function<T, ? extends Object> m_keyMapper;
+  private final Function<T, ?> m_keyMapper;
 
   public JsonLookupRow(ILookupRow<T> lookupRow) {
     this(lookupRow, false, null);
   }
 
-  public JsonLookupRow(ILookupRow<T> lookupRow, boolean multipleColumns, Function<T, ? extends Object> keyMapper) {
+  public JsonLookupRow(ILookupRow<T> lookupRow, boolean multipleColumns, Function<T, ?> keyMapper) {
     Assertions.assertNotNull(lookupRow);
     m_lookupRow = lookupRow;
     m_multipleColumns = multipleColumns;
@@ -94,7 +94,7 @@ public class JsonLookupRow<T> implements IJsonObject {
     return toJson(lookupRow, false, null);
   }
 
-  public static <T> Object toJson(ILookupRow<T> lookupRow, boolean multipleColumns, Function<T, ? extends Object> keyMapper) {
+  public static <T> Object toJson(ILookupRow<T> lookupRow, boolean multipleColumns, Function<T, ?> keyMapper) {
     if (lookupRow == null) {
       return null;
     }

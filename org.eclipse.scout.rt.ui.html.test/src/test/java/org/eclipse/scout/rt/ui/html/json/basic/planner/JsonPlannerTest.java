@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html.json.basic.planner;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,8 +19,6 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.planner.AbstractPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
-import org.eclipse.scout.rt.client.ui.basic.planner.PlannerAdapter;
-import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.Range;
@@ -63,7 +60,7 @@ public class JsonPlannerTest {
     Activity<Resource<Integer>, Integer> activity = createActivity(resource, 2);
     resource.addActivity(activity);
     planner.addResource(resource);
-    JsonPlanner<IPlanner> jsonPlanner = UiSessionTestUtility.newJsonAdapter(m_uiSession, planner, null);
+    JsonPlanner<IPlanner<?, ?>> jsonPlanner = UiSessionTestUtility.newJsonAdapter(m_uiSession, planner, null);
     jsonPlanner.toJson();
     String resourceId = jsonPlanner.getResourceId(resource);
     String activityId = jsonPlanner.getActivityId(activity);
@@ -113,7 +110,7 @@ public class JsonPlannerTest {
         }
       }
     };
-    JsonPlanner<IPlanner> jsonPlanner = UiSessionTestUtility.newJsonAdapter(m_uiSession, planner, null);
+    JsonPlanner<IPlanner<?, ?>> jsonPlanner = UiSessionTestUtility.newJsonAdapter(m_uiSession, planner, null);
     jsonPlanner.toJson();
 
     JsonEvent event = createSelectionChangeEvent(jsonPlanner.getId(), originalRange);
@@ -158,7 +155,7 @@ public class JsonPlannerTest {
     // No reply (we assume that the UI state is correct and only the event was wrong, e.g. due to caching)
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonPlanner.EVENT_RESOURCES_SELECTED);
-    assertTrue(responseEvents.size() == 0);
+    assertEquals(0, responseEvents.size());
     JsonTestUtility.endRequest(m_uiSession);
 
     // ----------
@@ -175,7 +172,7 @@ public class JsonPlannerTest {
     // No reply (states should be equal)
     responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonPlanner.EVENT_RESOURCES_SELECTED);
-    assertTrue(responseEvents.size() == 0);
+    assertEquals(0, responseEvents.size());
     JsonTestUtility.endRequest(m_uiSession);
 
     // ----------
@@ -193,7 +190,7 @@ public class JsonPlannerTest {
     // Inform the UI about the change
     responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonPlanner.EVENT_RESOURCES_SELECTED);
-    assertTrue(responseEvents.size() == 1);
+    assertEquals(1, responseEvents.size());
     List<Resource<?>> resources = jsonPlanner.extractResources(responseEvents.get(0).getData());
     assertEquals(resource1, resources.get(0));
     JsonTestUtility.endRequest(m_uiSession);
@@ -212,7 +209,7 @@ public class JsonPlannerTest {
 
   public static JsonEvent createSelectionChangeEvent(String adapterId, Range<Date> range) throws JSONException {
     JSONObject data = new JSONObject();
-    data.put("selectionRange", new JsonDateRange((Range<Date>) range).toJson());
+    data.put("selectionRange", new JsonDateRange(range).toJson());
     return new JsonEvent(adapterId, "property", data);
   }
 
@@ -231,19 +228,6 @@ public class JsonPlannerTest {
 
   private Activity<Resource<Integer>, Integer> createActivity(Resource<Integer> resource, int id) {
     return new Activity<>(resource, id);
-  }
-
-  class CapturingPlannerAdapter extends PlannerAdapter {
-    private List<PlannerEvent> m_events = new ArrayList<>();
-
-    protected List<PlannerEvent> getEvents() {
-      return m_events;
-    }
-
-    @Override
-    public void plannerChanged(PlannerEvent e) {
-      m_events.add(e);
-    }
   }
 
   @ClassId("6e444198-b06e-4197-834c-6271fe2fb545")

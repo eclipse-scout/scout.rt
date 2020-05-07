@@ -104,12 +104,12 @@ public class JsonDesktopTest {
     form.setDisplayParent(desktop);
     form.setShowOnStart(false);
 
-    JsonForm formAdapter = (JsonForm) jsonDesktop.getAdapter(form);
+    JsonForm formAdapter = jsonDesktop.getAdapter(form);
     assertNull(formAdapter);
 
     desktop.showForm(form);
 
-    formAdapter = (JsonForm) jsonDesktop.getAdapter(form);
+    formAdapter = jsonDesktop.getAdapter(form);
     assertNotNull(formAdapter);
 
     JsonResponse jsonResp = m_uiSession.currentJsonResponse();
@@ -168,12 +168,12 @@ public class JsonDesktopTest {
     form.setDisplayParent(desktop);
     form.setShowOnStart(false);
 
-    JsonForm jsonForm = (JsonForm) jsonDesktop.getAdapter(form);
+    JsonForm jsonForm = jsonDesktop.getAdapter(form);
     assertNull(jsonForm);
 
     desktop.showForm(form);
 
-    jsonForm = (JsonForm) jsonDesktop.getAdapter(form);
+    jsonForm = jsonDesktop.getAdapter(form);
     assertNotNull(jsonForm);
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formShow");
@@ -209,12 +209,12 @@ public class JsonDesktopTest {
     form.setDisplayParent(desktop);
     form.setShowOnStart(false);
 
-    JsonForm jsonForm = (JsonForm) jsonDesktop.getAdapter(form);
+    JsonForm jsonForm = jsonDesktop.getAdapter(form);
     assertNull(jsonForm);
 
     desktop.showForm(form);
 
-    jsonForm = (JsonForm) jsonDesktop.getAdapter(form);
+    jsonForm = jsonDesktop.getAdapter(form);
     assertNotNull(jsonForm);
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formShow");

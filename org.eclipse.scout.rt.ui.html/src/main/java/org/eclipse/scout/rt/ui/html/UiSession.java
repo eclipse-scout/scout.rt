@@ -1015,12 +1015,12 @@ public class UiSession implements IUiSession {
   }
 
   @Override
-  public <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent) {
+  public <M, A extends IJsonAdapter<M>> A getJsonAdapter(M model, IJsonAdapter<?> parent) {
     return getJsonAdapter(model, parent, true);
   }
 
   @Override
-  public <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent, boolean checkRoot) {
+  public <M, A extends IJsonAdapter<M>> A getJsonAdapter(M model, IJsonAdapter<?> parent, boolean checkRoot) {
     A jsonAdapter = m_jsonAdapterRegistry.getByModelAndParentAdapter(model, parent);
     if (jsonAdapter == null && checkRoot) {
       jsonAdapter = m_jsonAdapterRegistry.getByModelAndParentAdapter(model, getRootJsonAdapter());
@@ -1029,7 +1029,7 @@ public class UiSession implements IUiSession {
   }
 
   @Override
-  public <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent) {
+  public <M, A extends IJsonAdapter<M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent) {
     A jsonAdapter = getJsonAdapter(model, parent);
     if (jsonAdapter != null) {
       return jsonAdapter;
@@ -1038,7 +1038,7 @@ public class UiSession implements IUiSession {
   }
 
   @Override
-  public <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent) {
+  public <M, A extends IJsonAdapter<M>> A createJsonAdapter(M model, IJsonAdapter<?> parent) {
     A jsonAdapter = newJsonAdapter(model, parent);
     m_listeners.fireEvent(new UiSessionEvent(this, UiSessionEvent.TYPE_ADAPTER_CREATED, jsonAdapter));
     // because it's a new adapter we must add it to the response
@@ -1050,7 +1050,7 @@ public class UiSession implements IUiSession {
    * Creates an adapter instance for the given model using {@link MainJsonObjectFactory} and calls the
    * <code>init()</code> method on the created instance.
    */
-  protected <M, A extends IJsonAdapter<? super M>> A newJsonAdapter(M model, IJsonAdapter<?> parent) {
+  protected <M, A extends IJsonAdapter<M>> A newJsonAdapter(M model, IJsonAdapter<?> parent) {
     String id = createUniqueId();
     @SuppressWarnings("unchecked")
     A adapter = (A) MainJsonObjectFactory.get().createJsonAdapter(model, this, id, parent);
