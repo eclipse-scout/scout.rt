@@ -19,6 +19,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,7 @@ public class RequestSynchronizer {
   private static final Logger LOG = LoggerFactory.getLogger(RequestSynchronizer.class);
 
   private final ConcurrentMap<String, CountDownLatch> m_requestLatches = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Thread> m_requestThreads = new ConcurrentHashMap<>();
 
   public String announceRequest() {
     String requestId = UUID.randomUUID().toString();
@@ -40,12 +42,15 @@ public class RequestSynchronizer {
     return requestId;
   }
 
-  public void notifyRequestArrived(String requestId) {
+  public IRegistrationHandle notifyRequestArrived(String requestId) {
     LOG.info("notifying request arrived: {}", requestId);
     CountDownLatch latch = m_requestLatches.get(requestId);
     if (latch != null) {
       latch.countDown();
+      m_requestThreads.put(requestId, Thread.currentThread());
+      return () -> m_requestThreads.remove(requestId);
     }
+    return null;
   }
 
   public void awaitRequest(String requestId, int timeoutSeconds) throws InterruptedException {
@@ -56,6 +61,13 @@ public class RequestSynchronizer {
     }
     finally {
       m_requestLatches.remove(requestId);
+    }
+  }
+
+  public void cancelRequest(String requestId) {
+    Thread workerThread = m_requestThreads.get(requestId);
+    if (workerThread != null) {
+      workerThread.interrupt();
     }
   }
 }

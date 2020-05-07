@@ -94,7 +94,7 @@ class ClosingApacheConnector extends ApacheConnector {
     ensureHttpHeaderCloseConnection(clientRequest.getHeaders(), request);
     final Map<String, String> clientHeadersSnapshot = writeOutBoundHeaders(clientRequest, request);
 
-    final IRegistrationHandle cancellableHandle = registerCancellable(request);
+    final IRegistrationHandle cancellableHandle = registerCancellable(clientRequest, request);
 
     try {
       final CloseableHttpResponse response;
@@ -207,24 +207,35 @@ class ClosingApacheConnector extends ApacheConnector {
    * Registers an {@link ICancellable} if this method is invoked in the context of a {@link RunMonitor} (i.e.
    * {@link RunMonitor#CURRENT} is not {@code null}).
    */
-  protected IRegistrationHandle registerCancellable(final HttpUriRequest request) {
+  protected IRegistrationHandle registerCancellable(ClientRequest clientRequest, final HttpUriRequest request) {
     final RunMonitor runMonitor = RunMonitor.CURRENT.get();
     if (runMonitor == null) {
       return IRegistrationHandle.NULL_HANDLE;
     }
-    ICancellable cancellable = new ICancellable() {
-      @Override
-      public boolean isCancelled() {
-        return request.isAborted();
+    ICancellable cancellable;
+    Object c = clientRequest.getProperty(RestClientProperties.CANCELLABLE);
+    if (c instanceof ICancellable) {
+      // use cancellable provided by the client request and ignore the default HTTP connection-aborting strategy
+      cancellable = (ICancellable) c;
+    }
+    else {
+      if (c != null) {
+        LOGGER.fine("non-null cancellable has unexpected type: " + c.getClass());
       }
+      cancellable = new ICancellable() {
+        @Override
+        public boolean isCancelled() {
+          return request.isAborted();
+        }
 
-      @Override
-      public boolean cancel(boolean interruptIfRunning) {
-        LOGGER.fine("Aborting HTTP REST request");
-        request.abort();
-        return true;
-      }
-    };
+        @Override
+        public boolean cancel(boolean interruptIfRunning) {
+          LOGGER.fine("Aborting HTTP REST request");
+          request.abort();
+          return true;
+        }
+      };
+    }
     runMonitor.registerCancellable(cancellable);
     return () -> runMonitor.unregisterCancellable(cancellable);
   }

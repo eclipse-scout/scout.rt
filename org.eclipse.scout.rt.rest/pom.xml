@@ -43,6 +43,22 @@
       <groupId>jakarta.annotation</groupId>
       <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
+
+    <!-- Dependency that is used by the cancellation servlet filter. It is optional because REST itself does not
+         have any dependencies on the servlet API, so it is not required unless cancellation of Scout REST
+         resources is desired. -->
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.platform.test</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>
 
