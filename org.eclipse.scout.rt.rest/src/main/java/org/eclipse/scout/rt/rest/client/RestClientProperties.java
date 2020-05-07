@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.rest.client;
 
+import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
+
 public final class RestClientProperties {
 
   /**
@@ -85,4 +87,9 @@ public final class RestClientProperties {
      */
     PAYLOAD_ANY
   }
+
+  /**
+   * Optional custom {@link ICancellable} used by HTTP connection providers that support cancellation.
+   */
+  public static final String CANCELLABLE = "scout.rest.client.cancellable";
 }
