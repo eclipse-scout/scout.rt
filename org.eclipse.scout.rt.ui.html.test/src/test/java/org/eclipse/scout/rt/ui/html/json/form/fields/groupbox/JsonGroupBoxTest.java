@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
+import org.eclipse.scout.rt.ui.html.json.fixtures.JsonAdapterMock;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fields.BaseFormFieldTest;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
@@ -42,7 +43,7 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
   private AbstractGroupBox m_model = new AbstractGroupBox() {
   };
 
-  private JsonGroupBox m_groupBox = new JsonGroupBox<IGroupBox>(m_model, m_session, m_session.createUniqueId(), null);
+  private JsonGroupBox m_groupBox = new JsonGroupBox<IGroupBox>(m_model, m_session, m_session.createUniqueId(), new JsonAdapterMock());
 
   @Before
   public void setUp() {
@@ -70,7 +71,7 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
     IGroupBox groupBox = new GroupBoxWithNonDisplayableField();
     groupBox.init();
 
-    JsonGroupBox<IGroupBox> jsonGroupBox = UiSessionTestUtility.newJsonAdapter(m_uiSession, groupBox, null);
+    JsonGroupBox<IGroupBox> jsonGroupBox = UiSessionTestUtility.newJsonAdapter(m_uiSession, groupBox);
     JsonFormField<IFormField> jsonDisplayableField = m_uiSession.getJsonAdapter(groupBox.getFieldByClass(GroupBoxWithNonDisplayableField.DisplayableField.class), jsonGroupBox);
     JsonFormField<IFormField> jsonNonDisplayableField = m_uiSession.getJsonAdapter(groupBox.getFieldByClass(GroupBoxWithNonDisplayableField.NonDisplayableField.class), jsonGroupBox);
 

@@ -10,14 +10,14 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.ui.html.json.fixtures.JsonAdapterMock;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -57,7 +57,7 @@ public class AbstractJsonAdapterTest {
   }
 
   private AbstractJsonAdapter<?> newAdapter(Object model) {
-    AbstractJsonAdapter<?> adapter = new AbstractJsonAdapter<Object>(model, new UiSessionMock(), "x", null) {
+    AbstractJsonAdapter<?> adapter = new AbstractJsonAdapter<Object>(model, new UiSessionMock(), "x", new JsonAdapterMock()) {
       @Override
       public String getObjectType() {
         return "Foo";

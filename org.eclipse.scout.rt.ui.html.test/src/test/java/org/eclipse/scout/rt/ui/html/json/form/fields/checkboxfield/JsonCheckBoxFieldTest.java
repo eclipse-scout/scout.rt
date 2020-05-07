@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.form.fields.checkboxfield;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -46,7 +45,7 @@ public class JsonCheckBoxFieldTest {
   public void testUiValueChangeEvent() throws JSONException {
     IBooleanField field = new AbstractBooleanField() {
     };
-    JsonCheckBoxField<IBooleanField> jsonField = UiSessionTestUtility.newJsonAdapter(m_uiSession, field, null);
+    JsonCheckBoxField<IBooleanField> jsonField = UiSessionTestUtility.newJsonAdapter(m_uiSession, field);
     jsonField.toJson();
 
     JsonEvent event = createJsonValueChangeEvent(jsonField.getId(), true);
@@ -69,7 +68,7 @@ public class JsonCheckBoxFieldTest {
         return false;
       }
     };
-    JsonCheckBoxField<IBooleanField> jsonField = UiSessionTestUtility.newJsonAdapter(m_uiSession, field, null);
+    JsonCheckBoxField<IBooleanField> jsonField = UiSessionTestUtility.newJsonAdapter(m_uiSession, field);
     jsonField.toJson();
 
     JsonEvent event = createJsonValueChangeEvent(jsonField.getId(), true);

@@ -86,7 +86,7 @@ public class JsonOutlineTest {
     IPage rowPage = (IPage) tablePage.getTreeNodeFor(tablePage.getTable().getRow(0));
     outline.selectNode(rowPage);
 
-    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline, null);
+    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline);
 
     Assert.assertNotNull(jsonOutline.getAdapter(nodePage.getDetailForm()));
     Assert.assertNotNull(jsonOutline.getAdapter(rowPage.getDetailForm()));
@@ -104,7 +104,7 @@ public class JsonOutlineTest {
     outline.addChildNode(nodePage, tablePage);
     outline.selectNode(tablePage);
 
-    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline, null);
+    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline);
 
     List<ITreeNode> allNodes = JsonTreeTest.getAllTreeNodes(outline);
     List<String> allNodeIds = new LinkedList<>();
@@ -144,7 +144,7 @@ public class JsonOutlineTest {
     pages.add(nodePage);
     IOutline outline = new Outline(pages);
     outline.addChildNode(nodePage, childPage);
-    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline, null);
+    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline);
 
     // Assert that pages have an id
     String nodeId = JsonTreeTest.getOrCreateNodeId(jsonOutline, nodePage);
@@ -186,7 +186,7 @@ public class JsonOutlineTest {
     pages.add(nodePage);
     IOutline outline = new Outline(pages);
     outline.addChildNode(nodePage, childPage);
-    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline, null);
+    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline);
 
     // Assert that pages have an id
     String nodeId = JsonTreeTest.getOrCreateNodeId(jsonOutline, nodePage);
@@ -231,7 +231,7 @@ public class JsonOutlineTest {
     List<IPage<?>> pages = new ArrayList<>();
     pages.add(nodePage);
     IOutline outline = new Outline(pages);
-    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline, null);
+    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline);
 
     JSONObject jsonNode = jsonOutline.toJson().getJSONArray("nodes").getJSONObject(0);
     Assert.assertNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
@@ -245,7 +245,7 @@ public class JsonOutlineTest {
   @Test
   public void testDispose() {
     ITree tree = new OutlineWithOneNode();
-    JsonTree<ITree> object = UiSessionTestUtility.newJsonAdapter(m_uiSession, tree, null);
+    JsonTree<ITree> object = UiSessionTestUtility.newJsonAdapter(m_uiSession, tree);
     WeakReference<JsonTree> ref = new WeakReference<>(object);
 
     object.dispose();
@@ -320,7 +320,7 @@ public class JsonOutlineTest {
     nonHeaderMenu.init();
     outline.getContextMenu().addChildAction(headerMenu);
     outline.getContextMenu().addChildAction(nonHeaderMenu);
-    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline, null);
+    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline);
 
     // ----------
 

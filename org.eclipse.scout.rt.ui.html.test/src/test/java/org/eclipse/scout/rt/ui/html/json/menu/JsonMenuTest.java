@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonResponseTestUtility;
+import org.eclipse.scout.rt.ui.html.json.fixtures.JsonAdapterMock;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
@@ -54,7 +55,7 @@ public class JsonMenuTest {
     menu.setText("foo");
 
     // when adapter has been created we have the complete adapter in the adapter-data section of the JSON response
-    JsonMenu<IMenu> menuAdapter = m_uiSession.getOrCreateJsonAdapter(menu, null);
+    JsonMenu<IMenu> menuAdapter = m_uiSession.getOrCreateJsonAdapter(menu, new JsonAdapterMock());
     JSONObject json = m_uiSession.currentJsonResponse().toJson();
     JSONObject adpaterData = JsonTestUtility.getAdapterData(json, menuAdapter.getId());
     assertEquals("foo", adpaterData.getString("text"));
@@ -81,7 +82,7 @@ public class JsonMenuTest {
     IMenu menu = new MenuWithNonDisplayableChild();
     menu.init();
 
-    JsonMenu<IMenu> jsonMenu = UiSessionTestUtility.newJsonAdapter(m_uiSession, menu, null);
+    JsonMenu<IMenu> jsonMenu = UiSessionTestUtility.newJsonAdapter(m_uiSession, menu);
 
     JsonMenu<IMenu> jsonDisplayableMenu = jsonMenu.getAdapter(new ActionFinder().findAction(menu.getChildActions(), MenuWithNonDisplayableChild.DisplayableMenu.class));
     JsonMenu<IMenu> jsonNonDisplayableMenu = jsonMenu.getAdapter(new ActionFinder().findAction(menu.getChildActions(), MenuWithNonDisplayableChild.NonDisplayableMenu.class));
@@ -107,7 +108,7 @@ public class JsonMenuTest {
     DisplayableMenu displayableMenu = new ActionFinder().findAction(menu.getChildActions(), MenuWithNonDisplayableChild.DisplayableMenu.class);
     NonDisplayableMenu nonDisplayableMenu = new ActionFinder().findAction(menu.getChildActions(), MenuWithNonDisplayableChild.NonDisplayableMenu.class);
 
-    JsonMenu<IMenu> jsonMenu = UiSessionTestUtility.newJsonAdapter(m_uiSession, menu, null);
+    JsonMenu<IMenu> jsonMenu = UiSessionTestUtility.newJsonAdapter(m_uiSession, menu);
     JsonMenu<IMenu> jsonDisplayableMenu = jsonMenu.getAdapter(displayableMenu);
     JsonMenu<IMenu> jsonNonDisplayableMenu = jsonMenu.getAdapter(nonDisplayableMenu);
     // Both adapters exist

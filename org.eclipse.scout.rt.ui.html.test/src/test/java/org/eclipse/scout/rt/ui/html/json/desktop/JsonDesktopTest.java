@@ -67,7 +67,7 @@ public class JsonDesktopTest {
   }
 
   private JsonDesktop<IDesktop> createJsonDesktop(IDesktop desktop) {
-    return UiSessionTestUtility.newJsonAdapter(m_uiSession, desktop, null);
+    return UiSessionTestUtility.newJsonAdapter(m_uiSession, desktop);
   }
 
   @Test

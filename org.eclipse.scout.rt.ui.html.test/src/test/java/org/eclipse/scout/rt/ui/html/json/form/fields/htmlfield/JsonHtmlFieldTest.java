@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.ui.html.json.fixtures.JsonAdapterMock;
 import org.eclipse.scout.rt.ui.html.json.form.fields.BaseFormFieldTest;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,7 +38,7 @@ public class JsonHtmlFieldTest extends BaseFormFieldTest {
   private AbstractHtmlField m_model = new AbstractHtmlField() {
   };
 
-  private JsonHtmlField m_htmlField = new JsonHtmlField<IHtmlField>(m_model, m_session, m_session.createUniqueId(), null);
+  private JsonHtmlField m_htmlField = new JsonHtmlField<IHtmlField>(m_model, m_session, m_session.createUniqueId(), new JsonAdapterMock());
 
   @Before
   public void setUp() {

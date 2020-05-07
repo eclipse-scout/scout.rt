@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.fixtures.JsonAdapterMock;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
@@ -60,7 +61,7 @@ public class JsonListBoxTest {
     ITable table = listBox.getTable();
     listBox.init();
 
-    JsonListBox<Long, IListBox<Long>> jsonListBox = m_uiSession.createJsonAdapter(listBox, null);
+    JsonListBox<Long, IListBox<Long>> jsonListBox = m_uiSession.createJsonAdapter(listBox, new JsonAdapterMock());
     JsonTable<ITable> jsonTable = jsonListBox.getAdapter(table);
 
     // Filter the first row

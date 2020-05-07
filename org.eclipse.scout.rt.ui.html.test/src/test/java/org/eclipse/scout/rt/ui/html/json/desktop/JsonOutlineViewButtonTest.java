@@ -16,7 +16,6 @@ import java.util.Collections;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -50,9 +49,9 @@ public class JsonOutlineViewButtonTest {
   public void testLazyLoadingOutline_onModelSelectionChanged() throws JSONException {
     OutlineWithOneNode outline = new OutlineWithOneNode();
     IDesktop desktop = Mockito.mock(IDesktop.class);
-    Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
+    Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.singletonList(outline));
     IOutlineViewButton button = new OutlineViewButton(desktop, outline.getClass());
-    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = UiSessionTestUtility.newJsonAdapter(m_uiSession, button, null);
+    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = UiSessionTestUtility.newJsonAdapter(m_uiSession, button);
     assertNull(jsonViewButton.getAdapter(outline));
 
     button.setSelected(true);
@@ -67,9 +66,9 @@ public class JsonOutlineViewButtonTest {
   public void testLazyLoadingOutline_onUiSelectionChanged() {
     OutlineWithOneNode outline = new OutlineWithOneNode();
     IDesktop desktop = Mockito.mock(IDesktop.class);
-    Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
+    Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.singletonList(outline));
     IOutlineViewButton button = new OutlineViewButton(desktop, outline.getClass());
-    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = UiSessionTestUtility.newJsonAdapter(m_uiSession, button, null);
+    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = UiSessionTestUtility.newJsonAdapter(m_uiSession, button);
     assertNull(jsonViewButton.getAdapter(outline));
 
     JsonEvent event = createJsonActionEvent(jsonViewButton.getId());
@@ -87,10 +86,10 @@ public class JsonOutlineViewButtonTest {
   public void testNonLazyLoadingOutlineWhenSelected() throws JSONException {
     OutlineWithOneNode outline = new OutlineWithOneNode();
     IDesktop desktop = Mockito.mock(IDesktop.class);
-    Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
+    Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.singletonList(outline));
     IOutlineViewButton button = new OutlineViewButton(desktop, outline.getClass());
     button.setSelected(true);
-    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = UiSessionTestUtility.newJsonAdapter(m_uiSession, button, null);
+    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = UiSessionTestUtility.newJsonAdapter(m_uiSession, button);
 
     IJsonAdapter<?> outlineAdapter = jsonViewButton.getAdapter(outline);
     assertNotNull(outlineAdapter);

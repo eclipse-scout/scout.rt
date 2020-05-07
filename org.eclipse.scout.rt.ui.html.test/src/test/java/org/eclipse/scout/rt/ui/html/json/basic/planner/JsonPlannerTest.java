@@ -60,7 +60,7 @@ public class JsonPlannerTest {
     Activity<Resource<Integer>, Integer> activity = createActivity(resource, 2);
     resource.addActivity(activity);
     planner.addResource(resource);
-    JsonPlanner<IPlanner<?, ?>> jsonPlanner = UiSessionTestUtility.newJsonAdapter(m_uiSession, planner, null);
+    JsonPlanner<IPlanner<?, ?>> jsonPlanner = UiSessionTestUtility.newJsonAdapter(m_uiSession, planner);
     jsonPlanner.toJson();
     String resourceId = jsonPlanner.getResourceId(resource);
     String activityId = jsonPlanner.getActivityId(activity);
@@ -110,7 +110,7 @@ public class JsonPlannerTest {
         }
       }
     };
-    JsonPlanner<IPlanner<?, ?>> jsonPlanner = UiSessionTestUtility.newJsonAdapter(m_uiSession, planner, null);
+    JsonPlanner<IPlanner<?, ?>> jsonPlanner = UiSessionTestUtility.newJsonAdapter(m_uiSession, planner);
     jsonPlanner.toJson();
 
     JsonEvent event = createSelectionChangeEvent(jsonPlanner.getId(), originalRange);
@@ -135,7 +135,7 @@ public class JsonPlannerTest {
     planner.addResource(resource2);
     planner.selectResource(resource0);
 
-    JsonPlanner<IPlanner<?, ?>> jsonPlanner = UiSessionTestUtility.newJsonAdapter(m_uiSession, planner, null);
+    JsonPlanner<IPlanner<?, ?>> jsonPlanner = UiSessionTestUtility.newJsonAdapter(m_uiSession, planner);
     jsonPlanner.toJson();
 
     assertTrue(planner.getSelectedResources().contains(resource0));

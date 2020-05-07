@@ -93,7 +93,7 @@ public class JsonTabBoxTest {
     ITabBox tabBox = new TabBoxWithNonDisplayableGroup();
     tabBox.init();
 
-    JsonTabBox<ITabBox> jsonTabBox = UiSessionTestUtility.newJsonAdapter(m_uiSession, tabBox, null);
+    JsonTabBox<ITabBox> jsonTabBox = UiSessionTestUtility.newJsonAdapter(m_uiSession, tabBox);
     JsonGroupBox<IGroupBox> jsonDisplayableGroup = m_uiSession.getJsonAdapter(tabBox.getFieldByClass(TabBoxWithNonDisplayableGroup.DisplayableGroup.class), jsonTabBox);
     JsonGroupBox<IGroupBox> jsonNonDisplayableGroup = m_uiSession.getJsonAdapter(tabBox.getFieldByClass(TabBoxWithNonDisplayableGroup.NonDisplayableGroup.class), jsonTabBox);
 

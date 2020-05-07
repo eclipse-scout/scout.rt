@@ -150,7 +150,7 @@ public class SessionMonitorMBean implements ISessionMonitorMBean {
             .forEach(uiSession -> list.add(createSessionInfo(uiSession, clients.get(clientSessionId)))));
 
     Comparator<SessionDetail> comp = Comparator
-        .<SessionDetail, String> comparing(SessionDetail::getHttpSessionId)
+        .comparing(SessionDetail::getHttpSessionId)
         .thenComparing(SessionDetail::getUiSessionId)
         .thenComparing(SessionDetail::getClientSessionId);
     Collections.sort(list, comp);

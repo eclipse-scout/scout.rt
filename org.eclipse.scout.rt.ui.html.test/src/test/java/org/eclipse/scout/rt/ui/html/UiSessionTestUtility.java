@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
+import org.eclipse.scout.rt.ui.html.json.fixtures.JsonAdapterMock;
 
 /**
  * Utility providing access to protected methods of {@link UiSession} - for testing purposes only!
@@ -27,6 +28,13 @@ public class UiSessionTestUtility {
 
   public static <M, A extends IJsonAdapter<M>> A newJsonAdapter(UiSession uiSession, M model, IJsonAdapter<?> parent) {
     return uiSession.newJsonAdapter(model, parent);
+  }
+
+  /**
+   * Creates a new {@link IJsonAdapter} for the given model using the {@link JsonAdapterMock} as parent adapter.
+   */
+  public static <M, A extends IJsonAdapter<M>> A newJsonAdapter(UiSession uiSession, M model) {
+    return uiSession.newJsonAdapter(model, new JsonAdapterMock());
   }
 
   public static JsonAdapterRegistry getJsonAdapterRegistry(UiSession session) {

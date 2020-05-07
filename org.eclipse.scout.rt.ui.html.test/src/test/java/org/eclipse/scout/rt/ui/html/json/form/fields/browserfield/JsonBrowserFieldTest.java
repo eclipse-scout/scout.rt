@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserFi
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.fixtures.JsonAdapterMock;
 import org.eclipse.scout.rt.ui.html.json.form.fields.BaseFormFieldTest;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,7 +55,7 @@ public class JsonBrowserFieldTest extends BaseFormFieldTest {
 
   };
 
-  private JsonBrowserField<IBrowserField> m_browserField = new JsonBrowserField<>(m_model, m_session, m_session.createUniqueId(), null);
+  private JsonBrowserField<IBrowserField> m_browserField = new JsonBrowserField<>(m_model, m_session, m_session.createUniqueId(), new JsonAdapterMock());
 
   @Before
   public void setUp() {

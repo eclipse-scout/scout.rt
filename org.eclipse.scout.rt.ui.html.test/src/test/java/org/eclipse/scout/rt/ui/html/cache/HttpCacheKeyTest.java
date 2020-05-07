@@ -87,7 +87,7 @@ public class HttpCacheKeyTest {
   @Test
   public void testEquals() {
     Assert.assertEquals(new HttpCacheKey(null), new HttpCacheKey(null));
-    Assert.assertEquals(new HttpCacheKey(null), new HttpCacheKey(null, Collections.<String, String> emptyMap()));
+    Assert.assertEquals(new HttpCacheKey(null), new HttpCacheKey(null, Collections.emptyMap()));
     Assert.assertEquals(new HttpCacheKey("/"), new HttpCacheKey("/"));
     Assert.assertEquals(new HttpCacheKey("/", null), new HttpCacheKey("/", null));
     Assert.assertEquals(new HttpCacheKey(null, Collections.singletonMap(null, null)), new HttpCacheKey(null, Collections.singletonMap(null, null)));
