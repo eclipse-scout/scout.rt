@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.html.HTML;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.rest.error.ErrorDo;
@@ -44,36 +45,46 @@ public class RestClientTestEchoServlet extends HttpServlet {
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     final String requestId = req.getParameter(REQUEST_ID);
+    IRegistrationHandle requestHandle = null;
     if (requestId != null) {
-      BEANS.get(RequestSynchronizer.class).notifyRequestArrived(requestId);
+      requestHandle = BEANS.get(RequestSynchronizer.class).notifyRequestArrived(requestId);
     }
+    try {
+      final int statusCode = parseStatusCode(req.getParameter(STATUS));
 
-    final int statusCode = parseStatusCode(req.getParameter(STATUS));
-
-    if (LOG.isInfoEnabled()) {
-      StringBuilder sb = new StringBuilder("HTTP Headers:");
-      for (Enumeration<String> headers = req.getHeaderNames(); headers.hasMoreElements();) {
-        String header = headers.nextElement();
-        sb.append(String.format("%n  %s: '%s'", header, req.getHeader(header)));
+      if (LOG.isInfoEnabled()) {
+        StringBuilder sb = new StringBuilder("HTTP Headers:");
+        for (Enumeration<String> headers = req.getHeaderNames(); headers.hasMoreElements();) {
+          String header = headers.nextElement();
+          sb.append(String.format("%n  %s: '%s'", header, req.getHeader(header)));
+        }
+        LOG.info(sb.toString());
       }
-      LOG.info(sb.toString());
-    }
 
-    String sleep = req.getParameter(SLEEP_SEC);
-    if (sleep != null) {
-      int sleepSeconds = Integer.parseInt(sleep);
-      SleepUtil.sleepSafe(sleepSeconds, TimeUnit.SECONDS);
-    }
+      String sleep = req.getParameter(SLEEP_SEC);
+      if (sleep != null) {
+        int sleepSeconds = Integer.parseInt(sleep);
+        SleepUtil.sleepSafe(sleepSeconds, TimeUnit.SECONDS);
+        if (Thread.interrupted()) {
+          resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
+      }
 
-    resp.setHeader(CorrelationId.HTTP_HEADER_NAME, req.getHeader(CorrelationId.HTTP_HEADER_NAME));
-    resp.setHeader(HttpHeaders.ACCEPT_LANGUAGE, req.getHeader(HttpHeaders.ACCEPT_LANGUAGE));
+      resp.setHeader(CorrelationId.HTTP_HEADER_NAME, req.getHeader(CorrelationId.HTTP_HEADER_NAME));
+      resp.setHeader(HttpHeaders.ACCEPT_LANGUAGE, req.getHeader(HttpHeaders.ACCEPT_LANGUAGE));
 
-    Status status = Status.fromStatusCode(statusCode);
-    if (status != null && status.getFamily() == Status.Family.SUCCESSFUL) {
-      sendEchoResponse(req, resp, statusCode, status);
+      Status status = Status.fromStatusCode(statusCode);
+      if (status != null && status.getFamily() == Status.Family.SUCCESSFUL) {
+        sendEchoResponse(req, resp, statusCode, status);
+      }
+      else {
+        sendErrorResponse(req, resp, statusCode, status);
+      }
     }
-    else {
-      sendErrorResponse(req, resp, statusCode, status);
+    finally {
+      if (requestHandle != null) {
+        requestHandle.dispose();
+      }
     }
   }
 
