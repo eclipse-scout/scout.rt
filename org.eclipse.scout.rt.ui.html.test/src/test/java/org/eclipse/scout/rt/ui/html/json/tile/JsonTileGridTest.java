@@ -125,7 +125,7 @@ public class JsonTileGridTest {
     // No reply (we assume that the UI state is correct and only the event was wrong, e.g. due to caching)
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonEventType.PROPERTY.getEventType());
-    assertTrue(responseEvents.size() == 0);
+    assertEquals(0, responseEvents.size());
     JsonTestUtility.endRequest(m_uiSession);
 
     // ----------
@@ -142,7 +142,7 @@ public class JsonTileGridTest {
     // No reply (states should be equal)
     responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonEventType.PROPERTY.getEventType());
-    assertTrue(responseEvents.size() == 0);
+    assertEquals(0, responseEvents.size());
     JsonTestUtility.endRequest(m_uiSession);
 
     // ----------
@@ -160,7 +160,7 @@ public class JsonTileGridTest {
     // Inform the UI about the change
     responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonEventType.PROPERTY.getEventType());
-    assertTrue(responseEvents.size() == 1);
+    assertEquals(1, responseEvents.size());
     JsonPropertyChangeEvent propertyChangeEvent = (JsonPropertyChangeEvent) responseEvents.get(0);
     JSONArray selectedTilesProperty = (JSONArray) propertyChangeEvent.getProperties().get(ITileGrid.PROP_SELECTED_TILES);
     assertEquals(jsonTile1.getId(), selectedTilesProperty.get(0));

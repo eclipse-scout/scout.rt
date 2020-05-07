@@ -690,6 +690,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     getModel().getUIFacade().fireRowClickFromUI(tableRow, mouseButton);
   }
 
+  @SuppressWarnings("DuplicatedCode")
   protected MouseButton extractMouseButton(JSONObject json) {
     int mouseButton = json.getInt("mouseButton");
     switch (mouseButton) {

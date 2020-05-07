@@ -67,11 +67,11 @@ public class JsonAdapterRegistryTest {
     FormWithOneField form = new FormWithOneField();
 
     form.start();
-    JsonForm formAdapter = (JsonForm) jsonDesktop.getAdapter(form);
+    JsonForm formAdapter = jsonDesktop.getAdapter(form);
     assertNotNull(formAdapter);
 
     form.doClose();
-    formAdapter = (JsonForm) jsonDesktop.getAdapter(form);
+    formAdapter = jsonDesktop.getAdapter(form);
     assertNull(formAdapter);
     assertEquals(1, uiSession.currentJsonResponse().eventList().size());
     assertEquals(uiSession.getUiSessionId(), uiSession.currentJsonResponse().eventList().get(0).getTarget());
@@ -92,7 +92,7 @@ public class JsonAdapterRegistryTest {
     desktop.addDesktopListener(listener, DesktopEvent.TYPE_FORM_SHOW);
 
     form.start();
-    JsonForm formAdapter = (JsonForm) jsonDesktop.getAdapter(form);
+    JsonForm formAdapter = jsonDesktop.getAdapter(form);
     assertNull(formAdapter);
     assertEquals(0, uiSession.currentJsonResponse().eventList().size());
     assertEquals(adaptersBeforeTest, uiSession.currentJsonResponse().adapterMap().size());

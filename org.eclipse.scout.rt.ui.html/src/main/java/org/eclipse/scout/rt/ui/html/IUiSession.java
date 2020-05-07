@@ -185,17 +185,17 @@ public interface IUiSession {
   /**
    * Returns an existing IJsonAdapter instance for the given model object.
    */
-  <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent);
+  <M, A extends IJsonAdapter<M>> A getJsonAdapter(M model, IJsonAdapter<?> parent);
 
-  <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent, boolean checkRoot);
+  <M, A extends IJsonAdapter<M>> A getJsonAdapter(M model, IJsonAdapter<?> parent, boolean checkRoot);
 
   /**
    * Creates a new initialized IJsonAdapter instance for the given model or returns an existing instance. As a
    * side-effect a newly created adapter is added to the current JSON response.
    */
-  <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent);
+  <M, A extends IJsonAdapter<M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent);
 
-  <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent);
+  <M, A extends IJsonAdapter<M>> A createJsonAdapter(M model, IJsonAdapter<?> parent);
 
   void registerJsonAdapter(IJsonAdapter<?> adapter);
 

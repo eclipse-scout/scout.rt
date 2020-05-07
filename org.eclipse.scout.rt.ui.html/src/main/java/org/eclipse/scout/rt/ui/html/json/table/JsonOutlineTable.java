@@ -30,12 +30,11 @@ public class JsonOutlineTable<T extends ITable> extends JsonTable<T> {
     m_page = page;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   protected JSONObject tableRowToJson(ITableRow row) {
     JSONObject json = super.tableRowToJson(row);
     ITreeNode treeNode = m_page.getTreeNodeFor(row);
-    JsonOutline<IOutline> jsonOutline = (JsonOutline)getGlobalAdapter(m_page.getOutline());
+    JsonOutline<IOutline> jsonOutline = getGlobalAdapter(m_page.getOutline());
     String nodeId = jsonOutline.getOrCreateNodeId(treeNode);
     putProperty(json, "nodeId", nodeId);
     return json;

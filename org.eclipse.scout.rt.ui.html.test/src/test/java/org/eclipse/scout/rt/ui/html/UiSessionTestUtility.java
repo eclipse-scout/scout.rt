@@ -25,7 +25,7 @@ public class UiSessionTestUtility {
     uiSession.httpContext().clear();
   }
 
-  public static <M, A extends IJsonAdapter<? super M>> A newJsonAdapter(UiSession uiSession, M model, IJsonAdapter<?> parent) {
+  public static <M, A extends IJsonAdapter<M>> A newJsonAdapter(UiSession uiSession, M model, IJsonAdapter<?> parent) {
     return uiSession.newJsonAdapter(model, parent);
   }
 

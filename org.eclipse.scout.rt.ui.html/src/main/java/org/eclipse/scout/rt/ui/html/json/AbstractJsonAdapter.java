@@ -192,12 +192,12 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
   }
 
-  public final <A extends IJsonAdapter<? super M>, M> A attachAdapter(M model) {
+  public final <A extends IJsonAdapter<M>, M> A attachAdapter(M model) {
     return attachAdapter(model, null);
   }
 
   @Override
-  public final <A extends IJsonAdapter<? super M>, M> A attachAdapter(M model, Predicate<M> filter) {
+  public final <A extends IJsonAdapter<M>, M> A attachAdapter(M model, Predicate<M> filter) {
     if (model == null) {
       return null;
     }
@@ -229,12 +229,12 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
    * return null. This method is a shortcut for <code>getUiSession().getJsonAdapter(model)</code>.
    */
   @Override
-  public final <A extends IJsonAdapter<? super Object>> A getAdapter(Object model) {
+  public final <A extends IJsonAdapter<M>, M> A getAdapter(M model) {
     return getAdapter(model, null);
   }
 
   @Override
-  public <A extends IJsonAdapter<? super MODEL>, MODEL> A getAdapter(MODEL model, Predicate<MODEL> filter) {
+  public <A extends IJsonAdapter<M>, M> A getAdapter(M model, Predicate<M> filter) {
     if (model == null) {
       return null;
     }
@@ -250,9 +250,9 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   @Override
-  public <MODEL> Collection<IJsonAdapter<?>> getAdapters(Collection<MODEL> models, Predicate<MODEL> filter) {
+  public <M> Collection<IJsonAdapter<?>> getAdapters(Collection<M> models, Predicate<M> filter) {
     List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
-    for (MODEL model : models) {
+    for (M model : models) {
       IJsonAdapter<?> adapter = getAdapter(model, filter);
       if (adapter != null) {
         adapters.add(adapter);
@@ -261,11 +261,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return adapters;
   }
 
-  public final <A extends IJsonAdapter<? super Object>> A getGlobalAdapter(Object model) {
+  public final <A extends IJsonAdapter<M>, M> A getGlobalAdapter(M model) {
     return getGlobalAdapter(model, null);
   }
 
-  public final <A extends IJsonAdapter<? super MODEL>, MODEL> A getGlobalAdapter(MODEL model, Predicate<MODEL> filter) {
+  public final <A extends IJsonAdapter<M>, M> A getGlobalAdapter(M model, Predicate<M> filter) {
     if (model == null) {
       return null;
     }
@@ -275,13 +275,13 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return m_uiSession.getJsonAdapter(model, getUiSession().getRootJsonAdapter());
   }
 
-  protected final <MODEL> List<IJsonAdapter<?>> attachGlobalAdapters(Collection<MODEL> models) {
+  protected final <M> List<IJsonAdapter<?>> attachGlobalAdapters(Collection<M> models) {
     return attachGlobalAdapters(models, null);
   }
 
-  protected final <MODEL> List<IJsonAdapter<?>> attachGlobalAdapters(Collection<MODEL> models, Predicate<MODEL> filter) {
+  protected final <M> List<IJsonAdapter<?>> attachGlobalAdapters(Collection<M> models, Predicate<M> filter) {
     List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
-    for (MODEL model : models) {
+    for (M model : models) {
       IJsonAdapter<?> adapter = attachGlobalAdapter(model, filter);
       if (adapter != null) {
         adapters.add(adapter);
@@ -298,11 +298,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
    * <p>
    * Global adapters (like every other) get disposed on session disposal.
    */
-  protected final <A extends IJsonAdapter<? super M>, M> A attachGlobalAdapter(M model) {
+  protected final <A extends IJsonAdapter<M>, M> A attachGlobalAdapter(M model) {
     return attachGlobalAdapter(model, null);
   }
 
-  protected final <A extends IJsonAdapter<? super M>, M> A attachGlobalAdapter(M model, Predicate<M> filter) {
+  protected final <A extends IJsonAdapter<M>, M> A attachGlobalAdapter(M model, Predicate<M> filter) {
     if (model == null) {
       return null;
     }

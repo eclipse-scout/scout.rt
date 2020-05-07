@@ -23,7 +23,7 @@ public class JsonStatusTest {
   public void testToJson() {
     assertNull(JsonStatus.toJson(null));
     Status status = new Status("foo", IStatus.INFO);
-    JSONObject json = (JSONObject) JsonStatus.toJson(status);
+    JSONObject json = JsonStatus.toJson(status);
     assertEquals("foo", json.getString("message"));
     assertEquals(IStatus.INFO, json.getInt("severity"));
   }
