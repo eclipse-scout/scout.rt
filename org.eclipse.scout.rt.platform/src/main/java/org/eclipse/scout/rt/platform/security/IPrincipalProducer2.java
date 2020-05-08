@@ -11,24 +11,25 @@
 package org.eclipse.scout.rt.platform.security;
 
 import java.security.Principal;
+import java.util.List;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
  * Producer for {@link Principal} objects to represent authenticated users.
- * <p>
- * See also {@link IPrincipalProducer2}
  *
- * @since 5.2
+ * @since 10.0
  */
 @FunctionalInterface
 @ApplicationScoped
-public interface IPrincipalProducer {
+public interface IPrincipalProducer2 {
 
   /**
    * @param username
    *          or userId
-   * @return a principal based on the username
+   * @param params
+   *          additional parameters
+   * @return a principal based on the arguments
    */
-  Principal produce(String username);
+  Principal produce(String username, List<String> params);
 }

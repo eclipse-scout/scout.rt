@@ -13,26 +13,30 @@ package org.eclipse.scout.rt.platform.security;
 import java.security.Principal;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+
 /**
- * Producer for {@link SimplePrincipal} objects to represent authenticated users.
- * <p>
- * There are exactly two scenarios for user principals
- * <ol>
- * <li>Container manager security with container Subject and Principal: Then this facility is not used at all</li>
- * <li>Scout based principals: Then this facility is used and by default creates {@link SimplePrincipal} objects</li>
- * </ol>
+ * JSON web token principal producer
  *
- * @since 5.2
+ * @since 10.0
  */
-public class SimplePrincipalProducer implements IPrincipalProducer, IPrincipalProducer2 {
+public class JwtPrincipalProducer implements IPrincipalProducer, IPrincipalProducer2 {
 
   @Override
   public Principal produce(String username) {
-    return new SimplePrincipal(username);
+    return new JwtPrincipal(username, null);
   }
 
+  /**
+   * @param username
+   *          or userId
+   * @param params
+   *          containing the idTokenString as first argument
+   * @return the new {@link Principal}
+   */
   @Override
   public Principal produce(String username, List<String> params) {
-    return new SimplePrincipal(username);
+    String jwtTokenString = CollectionUtility.firstElement(params);
+    return new JwtPrincipal(username, jwtTokenString);
   }
 }

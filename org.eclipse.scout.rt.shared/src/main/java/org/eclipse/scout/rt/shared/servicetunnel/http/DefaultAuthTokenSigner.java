@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.security.JwtPrincipal;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.security.IAccessControlService;
@@ -49,7 +50,7 @@ public class DefaultAuthTokenSigner {
   /**
    * Creates new token, sets {@link DefaultAuthToken#getUserId()} to user id of current subject and signs token.
    *
-   * @param tokenClass
+   * @param tokenClazz
    *          not null
    * @return null if not enabled or no userId could be determined else serialized token
    */
@@ -63,14 +64,18 @@ public class DefaultAuthTokenSigner {
     }
     T token = BEANS.get(tokenClazz);
     token.withUserId(userId);
+    final String jwtTokenString = JwtPrincipal.jwtTokenStringOfCurrentSubject();
+    if (jwtTokenString != null) {
+      token.withCustomArgs(jwtTokenString);
+    }
     return sign(token);
   }
 
   /**
    * Sets {@link DefaultAuthToken#getValidUntil()} and signs token.
    *
-   * @param non
-   *          null token to sign
+   * @param token
+   *          to be signed
    * @return token for method chaining
    */
   public <T extends DefaultAuthToken> T sign(T token) {
