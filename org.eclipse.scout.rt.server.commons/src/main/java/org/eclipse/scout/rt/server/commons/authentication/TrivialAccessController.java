@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,11 +68,21 @@ public class TrivialAccessController implements IAccessController {
 
     switch (getTarget(request)) {
       case "/login":
-        handleLoginRequest(request, response);
-        return true;
+        if (m_config.isHandleAuthentication()) {
+          handleLoginRequest(request, response);
+          return true;
+        }
+        else {
+          return false;
+        }
       case "/logout":
-        handleLogoutRequest(request, response);
-        return true;
+        if (m_config.isHandleAuthentication()) {
+          handleLogoutRequest(request, response);
+          return true;
+        }
+        else {
+          return false;
+        }
       case "/auth":
         return false;
       default:
@@ -104,13 +114,15 @@ public class TrivialAccessController implements IAccessController {
     }
 
     // Is already authenticated?
-    final Principal principal = BEANS.get(ServletFilterHelper.class).findPrincipal(request, m_config.getPrincipalProducer());
-    if (principal != null) {
-      if (m_config.getPrincipalVerifier() != null && !m_config.getPrincipalVerifier().verify(principal)) {
-        return false;
+    if (m_config.isHandleAuthentication()) {
+      final Principal principal = BEANS.get(ServletFilterHelper.class).findPrincipal(request, m_config.getPrincipalProducer());
+      if (principal != null) {
+        if (m_config.getPrincipalVerifier() != null && !m_config.getPrincipalVerifier().verify(principal)) {
+          return false;
+        }
+        BEANS.get(ServletFilterHelper.class).continueChainAsSubject(principal, request, response, chain);
+        return true;
       }
-      BEANS.get(ServletFilterHelper.class).continueChainAsSubject(principal, request, response, chain);
-      return true;
     }
 
     // Is request path excluded from authentication?
@@ -163,6 +175,7 @@ public class TrivialAccessController implements IAccessController {
     private boolean m_enabled = true;
     private IPrincipalProducer m_principalProducer = BEANS.get(SimplePrincipalProducer.class);
     private PathInfoFilter m_exclusionFilter;
+    private boolean m_handleAuthentication;
     private boolean m_loginPageInstalled = false;
     private IPrincipalVerifier m_principalVerifier;
 
@@ -204,6 +217,26 @@ public class TrivialAccessController implements IAccessController {
      */
     public TrivialAuthConfig withExclusionFilter(final String exclusionFilter) {
       m_exclusionFilter = new PathInfoFilter(exclusionFilter);
+      return this;
+    }
+
+    /**
+     * Default true. This filter forwards to login.html / logout.html and checks if the request already has a remoteUser
+     * set.
+     * <p>
+     * Set to false when using indirect login such as pac4j, keycloak or other third party identity provider in a
+     * servlet filter following this filter
+     */
+    public boolean isHandleAuthentication() {
+      return m_handleAuthentication;
+    }
+
+    /**
+     * Indicates whether this web application has a login and logout page installed, meaning that the request is
+     * dispatched to that page when requesting to log in, or upon logged out.
+     */
+    public TrivialAuthConfig withHandleAuthentication(final boolean handleAuthentication) {
+      m_handleAuthentication = handleAuthentication;
       return this;
     }
 
