@@ -48,7 +48,7 @@ public class PlatformError extends Error implements IThrowableWithContextInfo {
    *          the message with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param args
    *          optional arguments to substitute <em>formatting anchors</em> in the message, with the last argument used
-   *          as the execption's cause if of type {@link Throwable} and not referenced in the message.
+   *          as the exception's cause if of type {@link Throwable} and not referenced in the message.
    */
   public PlatformError(final String message, final Object... args) {
     this(MessageFormatter.arrayFormat(message, args));
