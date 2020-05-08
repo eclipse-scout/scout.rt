@@ -32,7 +32,7 @@ public class AptLogger {
 
   public AptLogger(final ProcessingEnvironment env) {
     m_message = env.getMessager();
-    m_consoleLog = Boolean.valueOf(env.getOptions().get("consoleLog"));
+    m_consoleLog = Boolean.parseBoolean(env.getOptions().get("consoleLog"));
   }
 
   /**
@@ -78,7 +78,7 @@ public class AptLogger {
    *          the message with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param args
    *          optional arguments to substitute <em>formatting anchors</em> in the message, with the last argument used
-   *          as the execption's cause if of type {@link Throwable} and not referenced in the message.
+   *          as the exception's cause if of type {@link Throwable} and not referenced in the message.
    */
   public void error(final String msg, final Object... args) {
     final FormattingTuple format = SLF4JMessageFormatter.format(msg, args);

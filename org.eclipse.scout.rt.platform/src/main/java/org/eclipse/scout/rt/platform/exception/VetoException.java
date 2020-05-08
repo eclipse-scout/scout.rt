@@ -50,7 +50,7 @@ public class VetoException extends ProcessingException {
    *          the message with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param args
    *          optional arguments to substitute <em>formatting anchors</em> in the message, with the last argument used
-   *          as the execption's cause if of type {@link Throwable} and not referenced in the message.
+   *          as the exception's cause if of type {@link Throwable} and not referenced in the message.
    */
   public VetoException(final String message, final Object... args) {
     super(message, args);
