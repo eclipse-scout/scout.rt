@@ -175,7 +175,7 @@ public class TrivialAccessController implements IAccessController {
     private boolean m_enabled = true;
     private IPrincipalProducer m_principalProducer = BEANS.get(SimplePrincipalProducer.class);
     private PathInfoFilter m_exclusionFilter;
-    private boolean m_handleAuthentication;
+    private boolean m_handleAuthentication = true;
     private boolean m_loginPageInstalled = false;
     private IPrincipalVerifier m_principalVerifier;
 
