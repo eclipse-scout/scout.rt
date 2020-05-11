@@ -109,8 +109,11 @@ describe('Desktop', function() {
 
   describe('outline', function() {
 
-    it('is displayed in desktop navigation', function() {
+    beforeEach(function() {
       session._renderDesktop();
+    });
+
+    it('is displayed in desktop navigation', function() {
       var model = outlineHelper.createModelFixture(3, 2);
       var outline = outlineHelper.createOutline(model);
 
@@ -121,6 +124,44 @@ describe('Desktop', function() {
       expect(desktop.outline).toBe(outline);
       expect(outline.rendered).toBe(true);
       expect(outline.$container.parent()[0]).toBe(desktop.navigation.$body[0]);
+    });
+
+    it('activates modal views when being rendered', function() {
+      var outline1 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+      var outline2 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+
+      desktop.setOutline(outline1);
+      desktop.bringOutlineToFront(outline1);
+      expect(desktop.outline).toBe(outline1);
+      expect(outline1.rendered).toBe(true);
+
+      // create a new modal view and activate it
+      var form = formHelper.createFormWithOneField({
+        parent: outline1,
+        displayHint: Form.DisplayHint.VIEW,
+        displayParent: outline1,
+        modal: true
+      });
+      desktop.showForm(form);
+      expect(form.rendered).toBe(true);
+
+      // switch the outline
+      desktop.setOutline(outline2);
+      desktop.bringOutlineToFront(outline2);
+      expect(desktop.outline).toBe(outline2);
+      expect(outline1.rendered).toBe(false);
+      expect(outline2.rendered).toBe(true);
+      expect(form.rendered).toBe(false);
+
+      // switch back to the outline with the modal form
+      desktop.setOutline(outline1);
+      desktop.bringOutlineToFront(outline1);
+      expect(desktop.outline).toBe(outline1);
+      expect(outline1.rendered).toBe(true);
+      expect(outline2.rendered).toBe(false);
+
+      // and check that the form is propertly rendered
+      expect(form.rendered).toBe(true);
     });
 
   });
@@ -621,10 +662,6 @@ describe('Desktop', function() {
 
     var desktopOverlayHtmlElements = function() {
       return desktop.$container.children('.overlay-separator').nextAll().toArray();
-    };
-
-    var formElt = function(form) {
-      return form.$container[0];
     };
 
     var widgetHtmlElements = function(forms) {
@@ -1275,7 +1312,6 @@ describe('Desktop', function() {
       var outline = outlineHelper.createOutlineWithOneDetailForm();
       desktop.setOutline(outline);
       outline.selectNodes(outline.nodes[0]);
-      var detailForm = outline.nodes[0].detailForm;
       var dialog = formHelper.createFormWithOneField({
         displayHint: 'dialog'
       });
@@ -1906,7 +1942,7 @@ describe('Desktop', function() {
 
   describe('modal form', function() {
 
-    var view1, view2, view3;
+    var view1;
 
     beforeEach(function() {
       session._renderDesktop();
