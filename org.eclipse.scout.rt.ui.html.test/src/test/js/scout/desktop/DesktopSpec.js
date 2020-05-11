@@ -106,8 +106,11 @@ describe('Desktop', function() {
 
   describe('outline', function() {
 
-    it('is displayed in desktop navigation', function() {
+    beforeEach(function() {
       session._renderDesktop();
+    });
+
+    it('is displayed in desktop navigation', function() {
       var model = outlineHelper.createModelFixture(3, 2);
       var outline = outlineHelper.createOutline(model);
 
