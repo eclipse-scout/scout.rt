@@ -765,11 +765,6 @@ scout.Desktop.prototype.bringOutlineToFront = function() {
     return;
   }
 
-  // Check if the activeForm blocks the current outline
-  if (this.activeForm && this.activeForm.modal && scout.isOneOf(this.activeForm.displayParent, this, this.outline)) {
-    return;
-  }
-
   this._setInBackground(false);
   this._setOutlineActivated();
 
