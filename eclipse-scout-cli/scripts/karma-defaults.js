@@ -13,6 +13,7 @@ const scoutBuild = require('./constants');
 
 const jquery = require.resolve('jquery');
 const fs = require('fs');
+const webpack = require('webpack');
 
 module.exports = (config, specEntryPoint) => {
   const webpackConfigFilePath = path.resolve('webpack.config.js');
@@ -26,6 +27,12 @@ module.exports = (config, specEntryPoint) => {
   const webpackArgs = Object.assign({mode: scoutBuild.mode.development}, config.webpackArgs);
   const webpackConfig = webpackConfigProvider(null, webpackArgs);
   delete webpackConfig.entry;
+
+  const sourceMapPlugin = webpackConfig.plugins.find(plugin => plugin instanceof webpack.SourceMapDevToolPlugin);
+  if (sourceMapPlugin) {
+    // Use inline source maps because external source maps are not supported by karma (https://github.com/webpack-contrib/karma-webpack/issues/224)
+    delete sourceMapPlugin.sourceMapFilename;
+  }
 
   const specIndex = specEntryPoint ? path.resolve(specEntryPoint) : path.resolve('test', 'test-index.js');
   const preprocessorObj = {};
