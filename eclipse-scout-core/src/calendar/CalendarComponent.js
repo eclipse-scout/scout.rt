@@ -274,7 +274,7 @@ export default class CalendarComponent extends Widget {
         cssClass: 'tooltip',
         scrollType: 'remove',
         location: {
-          y: event.originalEvent.y
+          y: event.originalEvent.clientY
         },
         widget: {
           objectType: 'Label',
