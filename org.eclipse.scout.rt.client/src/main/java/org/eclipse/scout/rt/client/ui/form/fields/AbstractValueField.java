@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
-import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -163,7 +163,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
    * @param menus
-   *          live and mutable collection of configured menus
+   *   live and mutable collection of configured menus
    */
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
@@ -242,11 +242,11 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
         }
         //
         VALUE newValue;
-        Object o = v.getValue();
+        VALUE o = v.getValue();
         if (o != null) {
           Class castType = getHolderType();
           if (castType.isAssignableFrom(o.getClass())) {
-            newValue = (VALUE) o;
+            newValue = o;
           }
           else {
             newValue = (VALUE) TypeCastUtility.castValue(o, castType);
@@ -394,6 +394,9 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
       // change text if auto-set-text enabled
       updateDisplayText(validatedValue);
 
+      // getValue() doesn't necessarily return the same value as is stored in the propertySupport.
+      // double check the oldValue against the new validatedValue to avoid unnecessary propertyChange events.
+      changed = changed && ObjectUtility.notEquals(oldValue, validatedValue);
       if (changed) {
         propertySupport.firePropertyChange(PROP_VALUE, oldValue, validatedValue);
         //
@@ -539,7 +542,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * broadcast this change to other fields by for example calling {@link IValueField#setValue(Object)} on another field.
    * <br>
    * If this new value seems to be invalid (even though it has been validated correctly) use
-   * {@link #setErrorStatus(IStatus)} to mark the value as incorrect. It will appear red in the gui.<br>
+   * {@link #setErrorStatus(IMultiStatus)} to mark the value as incorrect. It will appear red in the gui.<br>
    * In case this method throws exceptions, this will NOT invalidate the value of the field (like
    * {@link #execValidateValue(Object)} does)
    */
@@ -565,17 +568,14 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
       removeErrorStatus(ParsingFailedStatus.class);
       VALUE parsedValue = interceptParseValue(text);
       setValue(parsedValue);
-      return;
     }
     catch (ProcessingException pe) {
       addErrorStatus(new ParsingFailedStatus(pe, text));
-      return;
     }
     catch (Exception e) {
       LOG.error("Unexpected Error: ", e);
       ProcessingException pe = new ProcessingException(TEXTS.get("InvalidValueMessageX", text), e);
       addErrorStatus(new ParsingFailedStatus(pe, text));
-      return;
     }
     finally {
       setValueParsing(false);
