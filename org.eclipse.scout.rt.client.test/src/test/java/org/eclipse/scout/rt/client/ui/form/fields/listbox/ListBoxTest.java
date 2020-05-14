@@ -52,19 +52,20 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class ListBoxTest extends AbstractListBox<Long> {
 
-  private static List<IBean<?>> m_beans;
+  private static List<IBean<?>> s_beans;
 
   @BeforeClass
   public static void beforeClass() {
-    m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(ListBoxLookupCall.class));
+    s_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(ListBoxLookupCall.class));
   }
 
   @AfterClass
   public static void afterClass() {
-    BeanTestingHelper.get().unregisterBeans(m_beans);
+    BeanTestingHelper.get().unregisterBeans(s_beans);
   }
 
   private HashSet<Long> m_testValue;
+  private int m_valueChangedCounter;
 
   /**
    * Initialize test values
@@ -73,6 +74,7 @@ public class ListBoxTest extends AbstractListBox<Long> {
   public void setup() {
     m_testValue = new HashSet<>();
     m_testValue.add(1L);
+    m_valueChangedCounter = 0;
   }
 
   @Override
@@ -176,6 +178,25 @@ public class ListBoxTest extends AbstractListBox<Long> {
     assertEquals("a", listBox.getCheckedRowsString());
   }
 
+  @Test
+  public void testNoChangedValueOnValueNull() {
+    // ensure that value is initially null
+    propertySupport.setProperty(PROP_VALUE, null);
+    assertEquals(0, m_valueChangedCounter);
+    setValue(null);
+    // execChangedValue should not have been called
+    assertEquals(0, m_valueChangedCounter);
+    setValue(m_testValue);
+    assertEquals(1, m_valueChangedCounter);
+    ScoutAssert.assertSetEquals(m_testValue, getValue());
+  }
+
+  @Override
+  protected void execChangedValue() {
+    super.execChangedValue();
+    m_valueChangedCounter++;
+  }
+
   public class ValidatingListBox extends AbstractListBox<String> {
 
     @Override
@@ -192,9 +213,7 @@ public class ListBoxTest extends AbstractListBox<Long> {
           rawValue.add("a");
         }
         // "b" cannot be checked
-        if (rawValue.contains("b")) {
-          rawValue.remove("b");
-        }
+        rawValue.remove("b");
         // checking "c" automatically checkes "d" instead
         if (rawValue.contains("c")) {
           rawValue.remove("c");
