@@ -78,7 +78,7 @@ public class HtmlHelper {
 
   /**
    * Same as <code>toPlainText(String)</code>, except that leading and trailing whitespace is preserved.
-   * 
+   *
    * @param html
    * @return
    */
@@ -126,7 +126,7 @@ public class HtmlHelper {
 
   /**
    * Escapes the given string for use in HTML code. Useful when inserting data from an untrusted source directly inside
-   * HTML. Unlike {@link StringUtility#htmlEncode(String)}, this method does not alter whitespace.
+   * HTML. This method does not alter whitespace.
    * <p>
    * According to <a href=
    * "https://www.owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet#RULE_.231_-_HTML_Escape_Before_Inserting_Untrusted_Data_into_HTML_Element_Content">
@@ -156,8 +156,7 @@ public class HtmlHelper {
   }
 
   /**
-   * Reverse operation of {@link #escape(String)}. Unlike {@link StringUtility#htmlDecode(String)}, this method does not
-   * alter whitespace.
+   * Reverse operation of {@link #escape(String)}. This method does not alter whitespace.
    */
   public String unescape(String html) {
     if (html == null || html.isEmpty()) {

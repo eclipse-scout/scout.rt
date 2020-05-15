@@ -32,6 +32,9 @@ public class TextsTest {
   public void testGet() {
     assertEquals("Value 1", TEXTS.get("key1"));
     assertEquals("{undefined text anyKey}", TEXTS.get("anyKey"));
+    assertEquals("Value 1", TEXTS.get("key1", "X"));
+    assertEquals("value X", TEXTS.get("key6", "X", "Y"));
+    assertEquals("value {0}", TEXTS.get("key6"));
   }
 
   @Test
@@ -39,6 +42,9 @@ public class TextsTest {
     assertEquals("Value 2", TEXTS.getWithFallback("key2", "fallback"));
     assertEquals("fallback", TEXTS.getWithFallback("anyKey", "fallback"));
     assertNull(TEXTS.getWithFallback("anyKey", null));
+    assertEquals("value ABC", TEXTS.getWithFallback("key6", "fallback {0}", "ABC"));
+    assertEquals("fallback {0}", TEXTS.getWithFallback("anyKey", "fallback {0}", "ABC"));
+    assertEquals("value DEF", TEXTS.getWithFallback("anyKey", TEXTS.getWithFallback("key6", "fallback", "DEF"), "ABC"));
   }
 
   @Test
