@@ -40,8 +40,7 @@ public final class StringUtility {
 
   public static final Pattern PATTERN_TRIM_NEWLINES = Pattern.compile("^[\r\n]*(.*?)[\r\n]*$", Pattern.DOTALL);
   /**
-   * Special constant used by {@link #htmlEncode(String)} to preserve a tab character (<code>\t</code>) in the resulting
-   * HTML. {@link #htmlDecode(String)} can convert it back to <code>\t</code>, but only if the tag was not altered.
+   * Special constant that can be used to encode and decode a tab character (<code>\t</code>) to/from HTML.
    */
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public static final String HTML_ENCODED_TAB = "<span style=\"white-space:pre\">&#9;</span>";
@@ -2047,6 +2046,7 @@ public final class StringUtility {
    * @param length
    *          should be &gt; 0 (lower values will return an empty string)
    */
+  @SuppressWarnings("squid:S2245")
   public static String randomId(int length) {
     if (length < 1) {
       return "";
