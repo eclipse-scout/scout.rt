@@ -42,9 +42,6 @@ public class TextsTest {
     assertEquals("Value 2", TEXTS.getWithFallback("key2", "fallback"));
     assertEquals("fallback", TEXTS.getWithFallback("anyKey", "fallback"));
     assertNull(TEXTS.getWithFallback("anyKey", null));
-    assertEquals("value ABC", TEXTS.getWithFallback("key6", "fallback {0}", "ABC"));
-    assertEquals("fallback {0}", TEXTS.getWithFallback("anyKey", "fallback {0}", "ABC"));
-    assertEquals("value DEF", TEXTS.getWithFallback("anyKey", TEXTS.getWithFallback("key6", "fallback", "DEF"), "ABC"));
   }
 
   @Test
