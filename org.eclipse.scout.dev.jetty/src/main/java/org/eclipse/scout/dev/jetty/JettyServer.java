@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,22 +32,37 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.util.URIUtil;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyAutoCreateSelfSignedCertificateProperty;
+import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyCertificateAliasProperty;
+import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyKeyStorePasswordProperty;
+import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyKeyStorePathProperty;
+import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyPrivateKeyPasswordProperty;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JettyServer {
-
   private static final Logger LOG = LoggerFactory.getLogger(JettyServer.class);
 
   public static final String WEB_APP_FOLDER_KEY = "scout.jetty.webapp.folder";
@@ -99,8 +114,23 @@ public class JettyServer {
 
     WebAppContext webApp = createWebApp(webappFolder, contextPath);
     Handler serverHandler = createServerHandler(webApp);
-    m_server = new Server(port);
+    m_server = new Server();
     m_server.setHandler(serverHandler);
+
+    String protocol;
+    if (CONFIG.getPropertyValue(ScoutJettyKeyStorePathProperty.class) != null) {
+      // HTTPS Configuration
+      protocol = "https";
+      ServerConnector https = createHttpsServerConnector(port);
+      m_server.addConnector(https);
+    }
+    else {
+      // HTTP Configuration
+      protocol = "http";
+      ServerConnector http = createHttpServerConnector(port);
+      m_server.addConnector(http);
+    }
+
     m_server.start();
 
     startConsoleInputHandler();
@@ -109,12 +139,12 @@ public class JettyServer {
       StringBuilder sb = new StringBuilder();
       sb.append("Server ready. The application is available on the following addresses:\n");
       sb.append("---------------------------------------------------------------------\n");
-      sb.append("  http://localhost:").append(port).append(contextPath).append("\n");
+      sb.append("  ").append(protocol).append("://localhost:").append(port).append(contextPath).append("\n");
       String hostname = InetAddress.getLocalHost().getHostName().toLowerCase();
       String ip = InetAddress.getLocalHost().getHostAddress();
-      sb.append("  http://").append(hostname).append(":").append(port).append(contextPath).append("\n");
+      sb.append("  ").append(protocol).append("://").append(hostname).append(":").append(port).append(contextPath).append("\n");
       if (StringUtility.notEqualsIgnoreCase(hostname, ip)) {
-        sb.append("  http://").append(ip).append(":").append(port).append(contextPath).append("\n");
+        sb.append("  ").append(protocol).append("://").append(ip).append(":").append(port).append(contextPath).append("\n");
       }
       sb.append("---------------------------------------------------------------------\n");
       sb.append("To shut the server down, type \"shutdown\" in the console.\n");
@@ -143,8 +173,7 @@ public class JettyServer {
     final Thread t = new Thread("Console input handler") {
       @Override
       public void run() {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        try {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
           String command;
           while ((command = StringUtility.trim(br.readLine())) != null) {
             if ("shutdown".equalsIgnoreCase(command)) {
@@ -209,6 +238,93 @@ public class JettyServer {
       return new P_RedirectToContextPathHandler(webAppContext);
     }
     return webAppContext;
+  }
+
+  protected ServerConnector createHttpServerConnector(int port) {
+    HttpConfiguration httpConfig = new HttpConfiguration();
+    httpConfig.setSendServerVersion(false);
+    httpConfig.setSendDateHeader(false);
+    ServerConnector http = new ServerConnector(
+        m_server, new HttpConnectionFactory(httpConfig));
+    http.setPort(port);
+    return http;
+  }
+
+  protected ServerConnector createHttpsServerConnector(int port) {
+    SslContextFactory sslContextFactory = createSslContextFactory();
+    HttpConfiguration httpsConfig = new HttpConfiguration();
+    httpsConfig.addCustomizer(new SecureRequestCustomizer());
+    httpsConfig.setSendServerVersion(false);
+    httpsConfig.setSendDateHeader(false);
+    ServerConnector https = new ServerConnector(
+        m_server,
+        new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+        new HttpConnectionFactory(httpsConfig));
+    https.setPort(port);
+    return https;
+  }
+
+  protected SslContextFactory createSslContextFactory() {
+    SslContextFactory sslContextFactory = new SslContextFactory();
+    String keyStorePath = resolveKeyStorePath(CONFIG.getPropertyValue(ScoutJettyKeyStorePathProperty.class));
+    String autoCertName = CONFIG.getPropertyValue(ScoutJettyAutoCreateSelfSignedCertificateProperty.class);
+    String storepass = CONFIG.getPropertyValue(ScoutJettyKeyStorePasswordProperty.class);
+    String keypass = CONFIG.getPropertyValue(ScoutJettyPrivateKeyPasswordProperty.class);
+    String certAlias = CONFIG.getPropertyValue(ScoutJettyCertificateAliasProperty.class);
+    if (autoCertName != null) {
+      SecurityUtility.autoCreateSelfSignedCertificate(keyStorePath, storepass, keypass, certAlias, autoCertName);
+    }
+    LOG.info("Setup SSL certificate using alias '{}' from keystore '{}':\n{}", certAlias, keyStorePath, SecurityUtility.keyStoreToHumanReadableText(keyStorePath, storepass, null));
+    sslContextFactory.setKeyStorePath(keyStorePath);
+    sslContextFactory.setKeyStorePassword(storepass);
+    sslContextFactory.setKeyManagerPassword(keypass);
+    sslContextFactory.setCertAlias(certAlias);
+    sslContextFactory.setEndpointIdentificationAlgorithm("https");
+    sslContextFactory.setIncludeCipherSuites(
+        //TLS 1.2
+        "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+        "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+        "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
+        "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
+        "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
+        "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
+        "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+        "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+        "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+        "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+        "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+        "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+        "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256",
+        "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384",
+        "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
+        "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
+        "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256",
+        "TLS_DHE_RSA_WITH_AES_256_CBC_SHA256",
+        //TLS 1.3
+        "TLS_AES_256_GCM_SHA384",
+        "TLS_AES_128_GCM_SHA256");
+    return sslContextFactory;
+  }
+
+  protected String resolveKeyStorePath(String path) {
+    if (path.startsWith("classpath:")) {
+      String subPath = path.substring(10);
+      URL res;
+      res = getClass().getResource(subPath);
+      if (res == null) {
+        res = getClass().getClassLoader().getResource(subPath);
+      }
+      if (res == null) {
+        res = ClassLoader.getSystemClassLoader().getResource(subPath);
+      }
+      if (res == null) {
+        throw new ProcessingException("Missing resource defined by config property: {}={}",
+            BEANS.get(ScoutJettyKeyStorePathProperty.class).getKey(),
+            path);
+      }
+      return res.toExternalForm();
+    }
+    return path;
   }
 
   protected boolean isInDevMode() {
@@ -358,9 +474,7 @@ public class JettyServer {
    * '/META-INF/resources' folder.
    * <p>
    * This method works for both, packed and unpacked JAR files, which is crucial when running the application from
-   * within the IDE.
-   *
-   * @see 'javax.servlet.ServletContext.getResourcePaths(String)' for the specification.
+   * within the IDE. see 'javax.servlet.ServletContext.getResourcePaths(String)' for the specification.
    */
   protected static Set<String> getResourcePathsFromDependentJars(ClassLoader classloader, String path) {
     path = path.endsWith(URIUtil.SLASH) ? path : path + URIUtil.SLASH;
