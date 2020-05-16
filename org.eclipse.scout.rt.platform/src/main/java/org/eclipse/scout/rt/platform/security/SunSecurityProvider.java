@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,19 +10,21 @@
  */
 package org.eclipse.scout.rt.platform.security;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.assertGreater;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertGreaterOrEqual;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -31,11 +33,14 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Collections;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
@@ -49,7 +54,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.Base64Utility;
+import org.eclipse.scout.rt.platform.util.Assertions.*;
 
 /**
  * Utility class for encryption/decryption, hashing, random number generation and digital signatures.<br>
@@ -63,7 +69,6 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
  */
 @Order(5500)
 public class SunSecurityProvider implements ISecurityProvider {
-
   /**
    * Specifies the minimum of password hash iterations.
    */
@@ -453,5 +458,91 @@ public class SunSecurityProvider implements ISecurityProvider {
   protected String getCipherAlgorithmPadding() {
     // PKCS5 padding scheme (as defined in <a href="http://tools.ietf.org/html/rfc2898">PKCS #5</a>).
     return "PKCS5Padding";
+  }
+
+  @Override
+  public void createSelfSignedCertificate(
+      String certificateAlias,
+      String x500Name,
+      String storePass,
+      String keyPass,
+      int keyBits,
+      int validDays,
+      OutputStream out) {
+    try {
+      sun.security.tools.keytool.CertAndKeyGen certGen = new sun.security.tools.keytool.CertAndKeyGen("RSA", "SHA256WithRSA", null);
+      certGen.generate(keyBits);
+      sun.security.x509.X500Name name = new sun.security.x509.X500Name(x500Name);
+      long validSecs = (long) validDays * 24L * 3600L;
+      X509Certificate cert = certGen.getSelfCertificate(name, validSecs);
+      PrivateKey privateKey = certGen.getPrivateKey();
+
+      KeyStore ks = KeyStore.getInstance("jks");
+      ks.load(null, storePass.toCharArray());
+      ks.setKeyEntry(certificateAlias, privateKey, keyPass.toCharArray(), new X509Certificate[]{cert});
+      ks.store(out, storePass.toCharArray());
+    }
+    catch (GeneralSecurityException e) {
+      throw new ProcessingException("Security issue", e);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("IO issue", e);
+    }
+  }
+
+  @Override
+  public String keyStoreToHumanReadableText(InputStream keyStoreInput, String storePass, String keyPass) {
+    StringWriter sw = new StringWriter();
+    try (PrintWriter out = new PrintWriter(sw)) {
+      KeyStore ks = KeyStore.getInstance("jks");
+      ks.load(keyStoreInput, storePass.toCharArray());
+      for (String alias : Collections.list(ks.aliases())) {
+        out.println("Alias: " + alias);
+        try {
+          Certificate cert = ks.getCertificate(alias);
+          if (cert != null) {
+            out.println(" Certificate");
+            out.println("  format: " + cert.getType());
+            out.println("  base64: " + Base64Utility.encode(cert.getEncoded()));
+            if (cert instanceof X509Certificate) {
+              X509Certificate x = (X509Certificate) cert;
+              out.println("  issuerDN: " + x.getIssuerDN());
+              out.println("  subjectDN: " + x.getSubjectDN());
+              out.println("  notBefore: " + x.getNotBefore());
+              out.println("  notAfter: " + x.getNotAfter());
+              out.println("  sigAlgName: " + x.getSigAlgName());
+              out.println("  extendedKeyUsage: " + x.getExtendedKeyUsage());
+              out.println("  serialNumber: " + x.getSerialNumber());
+              out.println("  version: " + x.getVersion());
+            }
+            out.println(" PublicKey");
+            out.println("  format: " + cert.getPublicKey().getFormat());
+            out.println("  base64: " + Base64Utility.encode(cert.getPublicKey().getEncoded()));
+            out.println("  algo: " + cert.getPublicKey().getAlgorithm());
+          }
+        }
+        catch (Exception e) {
+          out.println("Error reading entry as certificate: " + e);
+        }
+        if (keyPass != null) {
+          try {
+            Key key = ks.getKey(alias, keyPass.toCharArray());
+            if (key != null) {
+              out.println(" PrivateKey");
+              out.println("  format: " + key.getFormat());
+              out.println("  base64: " + Base64Utility.encode(key.getEncoded()));
+              out.println("  algo: " + key.getAlgorithm());
+            }
+          }
+          catch (Exception e) {
+            out.println("Error reading entry as key: " + e);
+          }
+        }
+      }
+    }
+    catch (IOException | GeneralSecurityException | RuntimeException e) {
+      return "Error: " + e;
+    }
+    return sw.toString();
   }
 }

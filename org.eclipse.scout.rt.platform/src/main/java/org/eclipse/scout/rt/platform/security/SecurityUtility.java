@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,14 @@ package org.eclipse.scout.rt.platform.security;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -29,6 +35,8 @@ import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.platform.util.HexUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for encryption & decryption, hashing and creation of random numbers, message authentication codes and
@@ -41,6 +49,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * @see ISecurityProvider
  */
 public final class SecurityUtility {
+  private static final Logger LOG = LoggerFactory.getLogger(SecurityUtility.class);
 
   /**
    * Number of random bytes to be created by default.
@@ -229,7 +238,7 @@ public final class SecurityUtility {
    *           If there is an error creating the hash
    * @throws AssertionException
    *           If data is {@code null}.
-   * @see ISecurityProvider#createHash(InputStream, byte[])
+   * @see ISecurityProvider#createHash(InputStream, byte[], int)
    * @see ISecurityProvider#createPasswordHash(char[], byte[], int)
    */
   public static byte[] hash(byte[] data, byte[] salt) {
@@ -238,7 +247,7 @@ public final class SecurityUtility {
   }
 
   /**
-   * See {@link ISecurityProvider#createHash(InputStream, byte[])}
+   * See {@link ISecurityProvider#createHash(InputStream, byte[], int)}
    */
   public static byte[] hash(InputStream data, byte[] salt) {
     return SECURITY_PROVIDER.get().createHash(data, salt, 3557 /* number of default cycles for backwards compatibility */);
@@ -348,6 +357,111 @@ public final class SecurityUtility {
       principalNames.add(principal.getName());
     }
     return StringUtility.join(", ", principalNames);
+  }
+
+  /**
+   * Auto-generate a self-signed X509 certificate with public key and private key in a JKS keystore. If the keystore
+   * file already exists, then it is re-used and not created.
+   *
+   * @param keyStorePath
+   *          must be an URI starting with 'file:' for example file:/dev/data/... or file:/c:/dev/data/...
+   * @see #createSelfSignedCertificate(String, String, String, String, int, int, OutputStream)
+   * @since 10.0
+   */
+  public static void autoCreateSelfSignedCertificate(String keyStorePath, String storePass, String keyPass, String certificateAlias, String x500Name) {
+    if (x500Name != null) {
+      if (!keyStorePath.startsWith("file:")) {
+        throw new ProcessingException("When calling autoCreateSelfSignedCertificate then the keyStorePath ('{}') must be a 'file:' URL", keyStorePath);
+      }
+      try {
+        File f = new File(new URI(keyStorePath).getSchemeSpecificPart());
+        if (!f.exists()) {
+          LOG.info("Creating new self-signed certificate '{}' with X500 name '{}'", certificateAlias, x500Name);
+          try (FileOutputStream jks = new FileOutputStream(f)) {
+            createSelfSignedCertificate(certificateAlias, x500Name, storePass, keyPass, 4096, 365, jks);
+          }
+        }
+      }
+      catch (IOException | URISyntaxException e) {
+        throw new ProcessingException("Create self-signed certificate '{}' with X500 name '{}' in {}", certificateAlias, x500Name, keyStorePath, e);
+      }
+    }
+  }
+
+  /**
+   * Create a self-signed X509 certificate with public key and private key in a JKS keystore.
+   * <p>
+   * Similar to: openssl req -nodes -newkey rsa:4096 -days 3650 -x509 -keyout cert_private.key -out cert_public.pem
+   *
+   * @param certificateAlias
+   *          is the alias used in the keystore for accessing the certificate, this is not the certificate name (DN)
+   * @param x500Name
+   *          or Subject DN or Issuer DN for example "CN=host.domain.com,C=CH,S=ZH,L=Zurich,O=My Company",
+   *
+   *          <pre>
+  X.500 name format is
+  CN: CommonName: host.domain.com
+  C: CountryName: CH
+  S: StateOrProvinceName: ZH
+  L: Locality: Zurich
+  O: Organization: My Company
+  OU: OrganizationalUnit:
+   *          </pre>
+   *
+   * @param storePass
+   *          keystore password
+   * @param keyPass
+   *          private key password
+   * @param keyBits
+   *          typically 4096
+   * @param validDays
+   *          typically 365 days
+   * @param out
+   *          where to write the generated keystore to
+   * @since 10.0
+   */
+  public static void createSelfSignedCertificate(
+      String certificateAlias,
+      String x500Name,
+      String storePass,
+      String keyPass,
+      int keyBits,
+      int validDays,
+      OutputStream out) {
+    SECURITY_PROVIDER.get().createSelfSignedCertificate(certificateAlias, x500Name, storePass, keyPass, keyBits, validDays, out);
+  }
+
+  /**
+   * @param keyStorePath
+   *          url
+   * @param storePass
+   *          keystore password
+   * @param keyPass
+   *          private key password. Optional.
+   * @see #keyStoreToHumanReadableText(InputStream, String, String)
+   * @since 10.0
+   */
+  public static String keyStoreToHumanReadableText(String keyStorePath, String storePass, String keyPass) {
+    try (InputStream in = new URL(keyStorePath).openStream()) {
+      return keyStoreToHumanReadableText(in, storePass, keyPass);
+    }
+    catch (IOException | RuntimeException e) {
+      return "Error: " + e;
+    }
+  }
+
+  /**
+   * @param keyStoreInput
+   *          stream
+   * @param storePass
+   *          keystore password
+   * @param keyPass
+   *          private key password. Optional.
+   * @return human readable text of the keystore content
+   * @since 10.0
+   */
+  public static String keyStoreToHumanReadableText(InputStream keyStoreInput, String storePass, String keyPass) {
+    return SECURITY_PROVIDER.get().keyStoreToHumanReadableText(keyStoreInput, storePass, keyPass);
   }
 
   /**
