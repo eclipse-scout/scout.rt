@@ -241,7 +241,7 @@ module.exports = (env, args) => {
       new TerserPlugin({
         test: /\.js(\?.*)?$/i,
         cache: true,
-        parallel: 2
+        parallel: true
       })
     ];
   }
