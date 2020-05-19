@@ -33,4 +33,16 @@
       #scout.animation-flash-gray();
     }
   }
+
+  &.spread-even {
+    &:not(.overflown) {
+      & > .simple-tab.last {
+        border-right-width: 0;
+      }
+    }
+
+    & > .simple-overflow-tab-item {
+      border-right-width: 0;
+    }
+  }
 }

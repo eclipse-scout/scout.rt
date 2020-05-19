@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, graphics, SimpleTabAreaLayout} from '../../index';
+import {AbstractLayout, Dimension, graphics, SimpleTabArea, SimpleTabAreaLayout} from '../../index';
 
 export default class DesktopHeaderLayout extends AbstractLayout {
 
@@ -22,14 +22,12 @@ export default class DesktopHeaderLayout extends AbstractLayout {
    * @override AbstractLayout.js
    */
   layout($container) {
-    let viewButtonBoxPrefSize, toolBoxPrefSize,
+    let viewButtonBoxPrefSize, toolBoxPrefSize, tabsPrefSize, smallTabsPrefSize,
       htmlContainer = this.header.htmlComp,
       containerSize = htmlContainer.size(),
       toolBox = this.header.toolBox,
       viewButtonBox = this.header.viewButtonBox,
       tabArea = this.header.tabArea,
-      smallTabsPrefSize = tabArea.htmlComp.layout.smallPrefSize(),
-      tabsPrefSize = tabArea.htmlComp.prefSize(),
       tabsWidth = 0, // = available width for tabs
       logoWidth = 0,
       viewButtonBoxWidth = 0,
@@ -56,8 +54,10 @@ export default class DesktopHeaderLayout extends AbstractLayout {
     }
 
     tabsWidth = calcTabsWidth();
+    smallTabsPrefSize = tabArea.htmlComp.layout.smallPrefSize({widthHint: tabsWidth});
+    tabsPrefSize = tabArea.htmlComp.prefSize({widthHint: tabsWidth});
     if (tabsWidth >= smallTabsPrefSize.width) {
-      // All tabs fit when they have small size -> use available size but max the pref size -> prefSize = size of maximumtabs if tabs use their large (max) size
+      // All tabs fit when they have small size -> use available size but max the pref size -> prefSize = size of maximum tabs if tabs use their large (max) size
       tabsWidth = Math.min(tabsPrefSize.width, tabsWidth);
       tabArea.htmlComp.setSize(new Dimension(tabsWidth, tabsPrefSize.height));
       return;
@@ -87,7 +87,9 @@ export default class DesktopHeaderLayout extends AbstractLayout {
     }
 
     tabsWidth = calcTabsWidth();
-    tabsWidth = Math.min(smallTabsPrefSize.width, tabsWidth);
+    if (tabArea.displayStyle !== SimpleTabArea.DisplayStyle.SPREAD_EVEN) {
+      tabsWidth = Math.min(smallTabsPrefSize.width, tabsWidth);
+    }
     // Ensure minimum with for the the overflow menu - expect if there are no tabs at all (in that case ensure min width of 0)
     tabsWidth = Math.max(tabsWidth, (tabArea.tabs.length ? SimpleTabAreaLayout.OVERFLOW_MENU_WIDTH : 0));
     setTabsSize();

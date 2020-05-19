@@ -28,6 +28,7 @@ import {
   objects,
   Outline,
   scout,
+  SimpleTabArea,
   strings,
   styles,
   Tree,
@@ -245,22 +246,25 @@ export default class Desktop extends Widget {
   _setDisplayStyle(displayStyle) {
     this._setProperty('displayStyle', displayStyle);
 
-    let isCompact = this.displayStyle === Desktop.DisplayStyle.COMPACT;
-
+    let compact = this.displayStyle === Desktop.DisplayStyle.COMPACT;
     if (this.header) {
-      this.header.setToolBoxVisible(!isCompact);
-      this.header.animateRemoval = isCompact;
+      if (this.header.tabArea) {
+        const DisplayStyle = SimpleTabArea.DisplayStyle;
+        this.header.tabArea.setDisplayStyle(compact ? DisplayStyle.SPREAD_EVEN : DisplayStyle.DEFAULT);
+      }
+      this.header.setToolBoxVisible(!compact);
+      this.header.animateRemoval = compact;
     }
     if (this.navigation) {
-      this.navigation.setToolBoxVisible(isCompact);
-      this.navigation.htmlComp.layoutData.fullWidth = isCompact;
+      this.navigation.setToolBoxVisible(compact);
+      this.navigation.htmlComp.layoutData.fullWidth = compact;
     }
     if (this.bench) {
-      this.bench.setOutlineContentVisible(!isCompact);
+      this.bench.setOutlineContentVisible(!compact);
     }
     if (this.outline) {
-      this.outline.setCompact(isCompact);
-      this.outline.setEmbedDetailContent(isCompact);
+      this.outline.setCompact(compact);
+      this.outline.setEmbedDetailContent(compact);
     }
   }
 
@@ -346,16 +350,20 @@ export default class Desktop extends Widget {
     if (this.bench) {
       return;
     }
-    this.bench = scout.create('DesktopBench', {
+    this.bench = this._createBench();
+    this.bench.on('viewActivate', this._benchActiveViewChangedHandler);
+    this.bench.render();
+    this.bench.$container.insertBefore(this.$overlaySeparator);
+    this.invalidateLayoutTree();
+  }
+
+  _createBench() {
+    return scout.create('DesktopBench', {
       parent: this,
       animateRemoval: true,
       headerTabArea: this.header ? this.header.tabArea : undefined,
       outlineContentVisible: this.displayStyle !== Desktop.DisplayStyle.COMPACT
     });
-    this.bench.on('viewActivate', this._benchActiveViewChangedHandler);
-    this.bench.render();
-    this.bench.$container.insertBefore(this.$overlaySeparator);
-    this.invalidateLayoutTree();
   }
 
   _removeBench() {
@@ -384,7 +392,14 @@ export default class Desktop extends Widget {
     if (this.navigation) {
       return;
     }
-    this.navigation = scout.create('DesktopNavigation', {
+    this.navigation = this._createNavigation();
+    this.navigation.render();
+    this.navigation.$container.prependTo(this.$container);
+    this.invalidateLayoutTree();
+  }
+
+  _createNavigation() {
+    return scout.create('DesktopNavigation', {
       parent: this,
       outline: this.outline,
       toolBoxVisible: this.displayStyle === Desktop.DisplayStyle.COMPACT,
@@ -392,9 +407,6 @@ export default class Desktop extends Widget {
         fullWidth: this.displayStyle === Desktop.DisplayStyle.COMPACT
       }
     });
-    this.navigation.render();
-    this.navigation.$container.prependTo(this.$container);
-    this.invalidateLayoutTree();
   }
 
   _removeNavigation() {
@@ -424,12 +436,7 @@ export default class Desktop extends Widget {
     if (this.header) {
       return;
     }
-    this.header = scout.create('DesktopHeader', {
-      parent: this,
-      logoUrl: this.logoUrl,
-      animateRemoval: this.displayStyle === Desktop.DisplayStyle.COMPACT,
-      toolBoxVisible: this.displayStyle !== Desktop.DisplayStyle.COMPACT
-    });
+    this.header = this._createHeader();
     this.header.render();
     if (this.navigation && this.navigation.rendered) {
       this.header.$container.insertAfter(this.navigation.$container);
@@ -441,6 +448,19 @@ export default class Desktop extends Widget {
       this.bench._setTabArea(this.header.tabArea);
     }
     this.invalidateLayoutTree();
+  }
+
+  _createHeader() {
+    let compact = this.displayStyle === Desktop.DisplayStyle.COMPACT;
+    return scout.create('DesktopHeader', {
+      parent: this,
+      logoUrl: this.logoUrl,
+      animateRemoval: compact,
+      toolBoxVisible: !compact,
+      tabArea: {
+        displayStyle: compact ? SimpleTabArea.DisplayStyle.SPREAD_EVEN : SimpleTabArea.DisplayStyle.DEFAULT
+      }
+    });
   }
 
   _removeHeader() {

@@ -28,10 +28,10 @@ export default class DesktopHeader extends Widget {
     super._init(model);
     this.desktop = this.session.desktop;
     this.updateViewButtonBoxVisibility();
-    // create view tab box
-    this.tabArea = scout.create('SimpleTabArea', {
+    // create view tab area
+    this.tabArea = scout.create('SimpleTabArea', $.extend({
       parent: this
-    });
+    }, this.tabArea));
   }
 
   _render() {

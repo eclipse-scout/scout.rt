@@ -8,12 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, SimpleTabAreaLayout, Widget} from '../index';
+import {HtmlComponent, SimpleTabAreaLayout, Widget, widgets} from '../index';
 
 export default class SimpleTabArea extends Widget {
 
+  static DisplayStyle = {
+    DEFAULT: 'default',
+    SPREAD_EVEN: 'spreadEven'
+  };
+
   constructor() {
     super();
+    this.displayStyle = SimpleTabArea.DisplayStyle.DEFAULT;
     this.tabs = [];
     this._selectedViewTab = null;
   }
@@ -32,7 +38,17 @@ export default class SimpleTabArea extends Widget {
 
   _renderProperties() {
     super._renderProperties();
+    this._renderDisplayStyle();
     this._renderTabs();
+  }
+
+  setDisplayStyle(displayStyle) {
+    this.setProperty('displayStyle', displayStyle);
+  }
+
+  _renderDisplayStyle() {
+    this.$container.toggleClass('spread-even', this.displayStyle === SimpleTabArea.DisplayStyle.SPREAD_EVEN);
+    this.invalidateLayoutTree();
   }
 
   _renderTabs() {
@@ -123,6 +139,7 @@ export default class SimpleTabArea extends Widget {
     if (this.rendered) {
       this._renderVisible();
       tab.renderAfter(this.$container, sibling);
+      widgets.updateFirstLastMarker(this.getTabs());
       this.invalidateLayoutTree();
     }
   }
@@ -134,6 +151,7 @@ export default class SimpleTabArea extends Widget {
       tab.destroy();
       tab.off('click', this._tabClickHandler);
       this._renderVisible();
+      widgets.updateFirstLastMarker(this.getTabs());
       this.invalidateLayoutTree();
     }
   }

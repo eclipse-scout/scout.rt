@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, graphics, scout} from '../index';
+import {AbstractLayout, Dimension, graphics, scout, SimpleTabArea} from '../index';
 import $ from 'jquery';
 
 export default class SimpleTabAreaLayout extends AbstractLayout {
@@ -49,15 +49,21 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
 
     // All tabs in container
     if (smallPrefSize.width <= containerSize.width) {
-      tabWidth = Math.min(SimpleTabAreaLayout.TAB_WIDTH_LARGE, containerSize.width / numTabs);
+      if (this.tabArea.displayStyle === SimpleTabArea.DisplayStyle.SPREAD_EVEN) {
+        tabWidth = containerSize.width / numTabs;
+      } else {
+        tabWidth = Math.min(SimpleTabAreaLayout.TAB_WIDTH_LARGE, containerSize.width / numTabs);
+      }
       // 2nd - all Tabs fit when they have small size
       $tabs.each(function() {
         $(this).outerWidth(tabWidth);
       });
+      $container.removeClass('overflown');
       return;
     }
 
     // Not all tabs fit in container -> put tabs into overflow menu
+    $container.addClass('overflown');
     containerSize.width -= SimpleTabAreaLayout.OVERFLOW_MENU_WIDTH;
 
     // check how many tabs fit into remaining containerSize.width
@@ -92,7 +98,12 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
     this._$overflowTab.appendDiv('num-tabs').text(numOverflowTabs);
 
     let that = this;
-    tabWidth = SimpleTabAreaLayout.TAB_WIDTH_SMALL;
+    if (this.tabArea.displayStyle === SimpleTabArea.DisplayStyle.SPREAD_EVEN) {
+      // Distribute equally. This actually acts as max-width
+      tabWidth = containerSize.width / numVisibleTabs;
+    } else {
+      tabWidth = SimpleTabAreaLayout.TAB_WIDTH_SMALL;
+    }
     i = 0;
     $tabs.each(function() {
       if (i >= leftEnd && i <= rightEnd) {
@@ -105,17 +116,21 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
     });
   }
 
-  smallPrefSize() {
-    let numTabs = this.tabArea.getTabs().length;
-    return new Dimension(numTabs * SimpleTabAreaLayout.TAB_WIDTH_SMALL, this.tabArea.htmlComp.$comp.outerHeight(true));
+  smallPrefSize(options = {}) {
+    options = $.extend({minTabWidth: SimpleTabAreaLayout.TAB_WIDTH_SMALL}, options);
+    return this.preferredLayoutSize(this.tabArea.$container, options);
   }
 
-  preferredLayoutSize($container) {
+  preferredLayoutSize($container, options = {}) {
+    let minTabWidth = options.minTabWidth || SimpleTabAreaLayout.TAB_WIDTH_LARGE;
     let numTabs = this.tabArea.getTabs().length;
-    return new Dimension(numTabs * SimpleTabAreaLayout.TAB_WIDTH_LARGE, graphics.prefSize(this.tabArea.htmlComp.$comp, {
-      includeMargin: true,
-      useCssSize: true
-    }).height);
+    let minWidth = numTabs * minTabWidth;
+    options = $.extend({useCssSize: true}, options);
+    let prefSize = graphics.prefSize(this.tabArea.$container, options);
+    if (options.widthHint && this.tabArea.displayStyle === SimpleTabArea.DisplayStyle.SPREAD_EVEN) {
+      minWidth = Math.max(options.widthHint, minWidth);
+    }
+    return new Dimension(minWidth, prefSize.height);
   }
 
   _onMouseDownOverflow(event) {

@@ -199,7 +199,7 @@ export default class TabAreaLayout extends AbstractLayout {
     let prefSize,
       classList = htmlComp.$comp.attr('class');
 
-    // temporarly revert display style to default. otherwise the pref size of the tab item will be the size of the container.
+    // temporarily revert display style to default. otherwise the pref size of the tab item will be the size of the container.
     if (this.tabArea.displayStyle === TabArea.DisplayStyle.SPREAD_EVEN) {
       this.tabArea.$container.removeClass('spread-even');
     }
