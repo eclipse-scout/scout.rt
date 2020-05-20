@@ -42,7 +42,7 @@ public class DoEntityTest {
 
   @Test
   public void testPutGetHasAttribute() {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     assertNull(entity.get(null));
     assertNull(entity.get(""));
     assertNull(entity.get("foo"));
@@ -51,7 +51,7 @@ public class DoEntityTest {
     assertFalse(entity.has("foo"));
     assertFalse(entity.has(null));
 
-    DoEntity childEntity = new DoEntity();
+    DoEntity childEntity = BEANS.get(DoEntity.class);
     entity.put("foo", childEntity);
     assertEquals(childEntity, entity.get("foo"));
     assertEquals("foo", entity.getNode("foo").getAttributeName());
@@ -64,7 +64,7 @@ public class DoEntityTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testPutGetHasRefAttribute() {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     assertNull(entity.get(""));
     assertNull(entity.get("", Object.class));
     assertNull(entity.get("foo"));
@@ -92,7 +92,7 @@ public class DoEntityTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testPutGetHasListAttribute() {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     assertEquals(new ArrayList<>(), entity.getList("", Object.class));
     assertTrue(entity.has("")); // attribute was created using get()
     assertEquals(new ArrayList<>(), entity.getList("foo", Object.class));
@@ -108,7 +108,7 @@ public class DoEntityTest {
 
   @Test
   public void testOptListAttribute() {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
 
     assertFalse(entity.optList("foo").isPresent());
     assertFalse(entity.optList("foo", String.class).isPresent());
@@ -123,7 +123,7 @@ public class DoEntityTest {
 
   @Test
   public void testAllAttributeNodes() {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     assertTrue(entity.allNodes().isEmpty());
     entity.put("attribute", "foo");
     entity.put("attribute2", "bar");
@@ -135,7 +135,7 @@ public class DoEntityTest {
 
   @Test
   public void testAllAttributes() {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     assertTrue(entity.all().isEmpty());
     entity.put("attribute", "foo");
     entity.put("attribute2", "bar");
@@ -157,7 +157,7 @@ public class DoEntityTest {
 
   @Test
   public void testAllAttributesMapper() {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     assertTrue(entity.all().isEmpty());
     entity.put("attribute", 100);
     entity.put("attribute2", 200);
@@ -171,7 +171,7 @@ public class DoEntityTest {
 
   @Test
   public void testPutAttribute() {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("foo", "value1");
     DoNode<?> attribute = entity.getNode("foo");
     assertEquals("value1", entity.get("foo"));
@@ -182,7 +182,7 @@ public class DoEntityTest {
 
   @Test
   public void testPutListAttribute() {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     entity.putList("foo", Arrays.asList("value1"));
     DoNode<?> attribute = entity.getNode("foo");
     assertEquals("value1", entity.getList("foo", String.class).get(0));
@@ -237,7 +237,7 @@ public class DoEntityTest {
 
   @Test
   public void testRemoveIf() {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     entity.putList("foo", Arrays.asList("value1"));
     entity.put("foo2", "value2");
     entity.put("foo3", null);
@@ -250,13 +250,13 @@ public class DoEntityTest {
     assertEquals(CollectionUtility.hashSet("foo", "foo3"), entity.allNodes().keySet());
     assertTrue(entity.removeIf(n -> n.get() == null));
     assertEquals(CollectionUtility.hashSet("foo"), entity.allNodes().keySet());
-    assertTrue(entity.removeIf(n -> n.getAttributeName().equals("foo")));
+    assertTrue(entity.removeIf(n -> "foo".equals(n.getAttributeName())));
     assertEquals(Collections.emptySet(), entity.allNodes().keySet());
   }
 
   @Test
   public void testIsEmpty() {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     assertTrue(entity.isEmpty());
 
     entity.put("foo", "value2");
@@ -268,20 +268,20 @@ public class DoEntityTest {
 
   @Test(expected = UnsupportedOperationException.class)
   public void testAllAttributeNodesImmutable() {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     entity.allNodes().put("foo", null);
   }
 
   @Test(expected = AssertionException.class)
   public void testChangeAttributeNodeType() {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     entity.putList("foo", Arrays.asList("value1"));
     entity.put("foo", "bar");
   }
 
   @Test
   public void testUpdateAttributeNode() {
-    DoEntity entity = new DoEntity();
+    DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("foo", "bar");
     assertEquals("bar", entity.get("foo"));
     entity.put("foo", 42);

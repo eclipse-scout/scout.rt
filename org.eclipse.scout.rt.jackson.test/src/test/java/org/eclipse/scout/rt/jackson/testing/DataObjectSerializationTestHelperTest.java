@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.jackson.testing;
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,19 +22,19 @@ public class DataObjectSerializationTestHelperTest {
 
   protected static DataObjectSerializationTestHelper s_testHelper;
 
-  protected static String JSON = "{\n" +
+  protected static final String JSON = "{\n" +
       "  \"_type\" : \"foo\",\n" +
       "  \"attribute\" : \"bar\"\n" +
       "}";
 
-  protected static DoEntity ENTITY;
+  protected static IDoEntity s_entity;
 
   @BeforeClass
   public static void beforeClass() {
     s_testHelper = BEANS.get(DataObjectSerializationTestHelper.class);
-    ENTITY = BEANS.get(DoEntity.class);
-    ENTITY.put("_type", "foo");
-    ENTITY.put("attribute", "bar");
+    s_entity = BEANS.get(DoEntity.class);
+    s_entity.put("_type", "foo");
+    s_entity.put("attribute", "bar");
   }
 
   @Test
@@ -45,17 +46,17 @@ public class DataObjectSerializationTestHelperTest {
 
   @Test
   public void testAssertJsonEqualsStringIDoEntity() {
-    s_testHelper.assertJsonEquals(JSON, ENTITY);
+    s_testHelper.assertJsonEquals(JSON, s_entity);
   }
 
   @Test
   public void testAssertJsonEqualsIDoEntityString() {
-    s_testHelper.assertJsonEquals(ENTITY, JSON);
+    s_testHelper.assertJsonEquals(s_entity, JSON);
   }
 
   @Test
   public void testAssertJsonEqualsIDoEntityIDoEntity() {
-    s_testHelper.assertJsonEquals(ENTITY, ENTITY);
+    s_testHelper.assertJsonEquals(s_entity, s_entity);
   }
 
   @Test
@@ -70,27 +71,27 @@ public class DataObjectSerializationTestHelperTest {
 
   @Test
   public void testAssertJsonEqualsURLIDoEntity() {
-    s_testHelper.assertJsonEquals(DataObjectSerializationTestHelperTest.class.getResource("DataObjectSerializationTestHelperTest.json"), ENTITY);
+    s_testHelper.assertJsonEquals(DataObjectSerializationTestHelperTest.class.getResource("DataObjectSerializationTestHelperTest.json"), s_entity);
   }
 
   @Test(expected = AssertionError.class)
   public void testAssertJsonEqualsURLIDoEntity_invalidJson() {
-    s_testHelper.assertJsonEquals(DataObjectSerializationTestHelperTest.class.getResource("fooBar.json"), ENTITY);
+    s_testHelper.assertJsonEquals(DataObjectSerializationTestHelperTest.class.getResource("fooBar.json"), s_entity);
   }
 
   @Test
   public void testStringify() {
-    s_testHelper.assertJsonEquals(JSON, s_testHelper.stringify(ENTITY));
+    s_testHelper.assertJsonEquals(JSON, s_testHelper.stringify(s_entity));
   }
 
   @Test
   public void testParse() {
     DoEntity entity = s_testHelper.parse(JSON, DoEntity.class);
-    assertEqualsWithComparisonFailure(ENTITY, entity);
+    assertEqualsWithComparisonFailure(s_entity, entity);
   }
 
   @Test
   public void testCloneT() {
-    assertEqualsWithComparisonFailure(ENTITY, s_testHelper.clone(ENTITY));
+    assertEqualsWithComparisonFailure(s_entity, s_testHelper.clone(s_entity));
   }
 }

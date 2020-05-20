@@ -28,6 +28,7 @@ import javax.naming.NamingException;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.value.StringValueDo;
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
@@ -172,7 +173,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(TextMarshaller.class)));
     assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(ObjectMarshaller.class)));
     assertEquals("Hello World", testPublishAndConsumeInternal("Hello World", BEANS.get(JsonMarshaller.class)));
-    DoEntity entity = BEANS.get(DoEntityBuilder.class).put("message", "Hello World").build();
+    IDoEntity entity = BEANS.get(DoEntityBuilder.class).put("message", "Hello World").build();
     assertEquals(entity, testPublishAndConsumeInternal(entity, BEANS.get(JsonDataObjectMarshaller.class)));
     assertArrayEquals("Hello World".getBytes(StandardCharsets.UTF_8), (byte[]) testPublishAndConsumeInternal("Hello World".getBytes(StandardCharsets.UTF_8), BEANS.get(BytesMarshaller.class)));
 

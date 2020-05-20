@@ -24,6 +24,7 @@ import javax.annotation.Generated;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -35,7 +36,7 @@ public class JsonDataObjectMarshallerTest {
   public void test() {
     Map<String, String> context = new HashMap<>();
 
-    DoEntity data = BEANS.get(DoEntityBuilder.class).put("key", "value").build();
+    IDoEntity data = BEANS.get(DoEntityBuilder.class).put("key", "value").build();
     assertEquals(data, marshallAndUnmarshallAsDataObject(data, context));
 
     context = new HashMap<>();

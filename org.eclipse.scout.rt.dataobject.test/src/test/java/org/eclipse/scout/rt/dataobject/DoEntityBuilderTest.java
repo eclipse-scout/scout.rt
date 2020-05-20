@@ -31,7 +31,7 @@ public class DoEntityBuilderTest {
     expected.putList("listAttribute1", CollectionUtility.arrayList(1, 2, 3));
     expected.putList("listAttribute2", CollectionUtility.arrayList(4, 5, 6));
 
-    DoEntity actual = BEANS.get(DoEntityBuilder.class)
+    IDoEntity actual = BEANS.get(DoEntityBuilder.class)
         .put("attribute1", "foo")
         .put("attribute2", 42)
         .putIf("attribute3", "bar", Objects::nonNull)
@@ -54,7 +54,7 @@ public class DoEntityBuilderTest {
     expected.putList("listAttribute1", CollectionUtility.emptyArrayList());
     expected.putList("listAttribute2", CollectionUtility.emptyArrayList());
 
-    DoEntity actual = BEANS.get(DoEntityBuilder.class)
+    IDoEntity actual = BEANS.get(DoEntityBuilder.class)
         .put("attribute1", null)
         .putList("listAttribute1", (Object[]) null)
         .putList("listAttribute2", (List<Object>) null)

@@ -43,12 +43,12 @@ public class DataObjectHelperTest {
   protected static final UUID TEST_UUID = UUID.randomUUID();
 
   protected static final String SERIALIZED_DO_ENTITY_VALUE = "Serialized_DoEntity";
-  protected static final DoEntity DESERIALIZED_DO_ENTITY_VALUE = BEANS.get(DoEntity.class);
-  protected static final DoEntity DESERIALIZED_DO_ENTITY_VALUE_RAW = BEANS.get(DoEntity.class);
+  protected static final IDoEntity DESERIALIZED_DO_ENTITY_VALUE = BEANS.get(DoEntity.class);
+  protected static final IDoEntity DESERIALIZED_DO_ENTITY_VALUE_RAW = BEANS.get(DoEntity.class);
 
   protected IBean<TestingDataObjectHelper> m_testDataObjectHelperRegistrationBackup;
-  protected DoEntity m_entity;
-  protected DoEntity m_subEntity;
+  protected IDoEntity m_entity;
+  protected IDoEntity m_subEntity;
   protected DataObjectHelper m_helper;
   protected IDataObjectMapper m_dataObjectMapperMock;
   protected IBean<IDataObjectMapper> m_dataObjectMapperMockRegistration;

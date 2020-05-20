@@ -20,12 +20,12 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
- * Simple builder for ad-hoc {@link DoEntity} instances.
+ * Simple builder for ad-hoc {@link IDoEntity} instances.
  */
 @Bean
 public class DoEntityBuilder {
 
-  protected DoEntity m_entity;
+  protected IDoEntity m_entity;
 
   @PostConstruct
   protected void init() {
@@ -71,16 +71,14 @@ public class DoEntityBuilder {
   }
 
   /**
-   * // TODO [11.0] pbz change return value to IDoEntity
-   * 
-   * @return built {@link DoEntity} instance
+   * @return built {@link IDoEntity} instance
    */
-  public DoEntity build() {
+  public IDoEntity build() {
     return m_entity;
   }
 
   /**
-   * @return serialized {@link String} representation of builded {@link DoEntity}
+   * @return serialized {@link String} representation of builded {@link IDoEntity}
    */
   public String buildString() {
     return BEANS.get(IDataObjectMapper.class).writeValue(m_entity);

@@ -45,8 +45,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -583,7 +583,7 @@ public class ApiDocGenerator {
   }
 
   protected String toJsonString(List<ResourceDescriptor> resourceDescriptors) {
-    List<DoEntity> jsonMethods = resourceDescriptors.stream()
+    List<IDoEntity> jsonMethods = resourceDescriptors.stream()
         .flatMap(r -> r.getMethods().stream()
             .map(m -> BEANS.get(DoEntityBuilder.class)
                 .put("resource", r.getName())

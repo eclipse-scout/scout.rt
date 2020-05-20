@@ -27,6 +27,7 @@ import javax.jms.Message;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.mom.api.IBiDestination;
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
@@ -81,7 +82,7 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(TextMarshaller.class)));
     assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(ObjectMarshaller.class)));
     assertEquals("Hello World", testRequestReplyInternal("Hello World", BEANS.get(JsonMarshaller.class)));
-    DoEntity entity = BEANS.get(DoEntityBuilder.class).put("message", "Hello World").build();
+    IDoEntity entity = BEANS.get(DoEntityBuilder.class).put("message", "Hello World").build();
     assertEquals(entity, testRequestReplyInternal(entity, BEANS.get(JsonDataObjectMarshaller.class)));
     assertArrayEquals("Hello World".getBytes(StandardCharsets.UTF_8), (byte[]) testRequestReplyInternal("Hello World".getBytes(StandardCharsets.UTF_8), BEANS.get(BytesMarshaller.class)));
 
