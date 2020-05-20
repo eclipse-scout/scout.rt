@@ -18,6 +18,7 @@ export default class OkMenu extends Menu {
     this.actionStyle = Action.ActionStyle.BUTTON;
     this.keyStroke = 'enter';
     this.systemType = Button.SystemType.OK;
+    this.preventDoubleClick = true;
   }
 
   _init(model) {

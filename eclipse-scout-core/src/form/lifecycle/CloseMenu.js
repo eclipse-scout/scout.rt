@@ -19,6 +19,7 @@ export default class CloseMenu extends Menu {
     this.keyStroke = 'esc';
     this.systemType = Button.SystemType.CLOSE;
     this.inheritAccessibility = false;
+    this.preventDoubleClick = true;
   }
 
   _init(model) {

@@ -17,6 +17,7 @@ export default class ResetMenu extends Menu {
 
     this.actionStyle = Action.ActionStyle.BUTTON;
     this.systemType = Button.SystemType.RESET;
+    this.preventDoubleClick = true;
   }
 
   _init(model) {
