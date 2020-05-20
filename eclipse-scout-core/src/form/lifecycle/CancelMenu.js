@@ -19,6 +19,7 @@ export default class CancelMenu extends Menu {
     this.keyStroke = 'esc';
     this.systemType = Button.SystemType.CANCEL;
     this.inheritAccessibility = false;
+    this.preventDoubleClick = true;
   }
 
   _init(model) {

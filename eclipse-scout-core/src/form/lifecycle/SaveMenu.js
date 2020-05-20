@@ -18,6 +18,7 @@ export default class SaveMenu extends Menu {
     this.actionStyle = Action.ActionStyle.BUTTON;
     this.keyStroke = 'enter';
     this.systemType = Button.SystemType.SAVE;
+    this.preventDoubleClick = true;
   }
 
   _init(model) {

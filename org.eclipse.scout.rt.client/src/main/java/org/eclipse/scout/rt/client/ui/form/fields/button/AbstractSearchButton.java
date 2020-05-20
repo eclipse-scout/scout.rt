@@ -42,4 +42,9 @@ public abstract class AbstractSearchButton extends AbstractButton {
   protected String getConfiguredKeyStroke() {
     return IKeyStroke.ENTER;
   }
+
+  @Override
+  protected boolean getConfiguredPreventDoubleClick() {
+    return true;
+  }
 }

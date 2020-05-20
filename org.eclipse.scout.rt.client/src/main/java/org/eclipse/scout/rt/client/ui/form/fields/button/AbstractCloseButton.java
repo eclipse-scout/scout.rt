@@ -42,4 +42,9 @@ public abstract class AbstractCloseButton extends AbstractButton {
   protected String getConfiguredKeyStroke() {
     return IKeyStroke.ESCAPE;
   }
+
+  @Override
+  protected boolean getConfiguredPreventDoubleClick() {
+    return true;
+  }
 }

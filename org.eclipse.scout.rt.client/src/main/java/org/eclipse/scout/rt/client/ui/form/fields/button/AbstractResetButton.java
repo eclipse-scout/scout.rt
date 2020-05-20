@@ -43,4 +43,8 @@ public abstract class AbstractResetButton extends AbstractButton {
     return IKeyStroke.CONTROL + "-" + IKeyStroke.F6;
   }
 
+  @Override
+  protected boolean getConfiguredPreventDoubleClick() {
+    return true;
+  }
 }
