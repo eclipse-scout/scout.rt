@@ -13,6 +13,7 @@ scout.ResetMenu = function() {
 
   this.actionStyle = scout.Action.ActionStyle.BUTTON;
   this.systemType = scout.Button.SystemType.RESET;
+  this.preventDoubleClick = true;
 };
 scout.inherits(scout.ResetMenu, scout.Menu);
 

@@ -14,6 +14,7 @@ scout.SaveMenu = function() {
   this.actionStyle = scout.Action.ActionStyle.BUTTON;
   this.keyStroke = 'enter';
   this.systemType = scout.Button.SystemType.SAVE;
+  this.preventDoubleClick = true;
 };
 scout.inherits(scout.SaveMenu, scout.Menu);
 

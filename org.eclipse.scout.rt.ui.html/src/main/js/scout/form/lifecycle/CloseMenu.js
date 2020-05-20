@@ -15,6 +15,7 @@ scout.CloseMenu = function() {
   this.keyStroke = 'esc';
   this.systemType = scout.Button.SystemType.CLOSE;
   this.inheritAccessibility = false;
+  this.preventDoubleClick = true;
 };
 scout.inherits(scout.CloseMenu, scout.Menu);
 

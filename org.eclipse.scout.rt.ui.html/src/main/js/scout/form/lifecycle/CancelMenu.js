@@ -15,6 +15,7 @@ scout.CancelMenu = function() {
   this.keyStroke = 'esc';
   this.systemType = scout.Button.SystemType.CANCEL;
   this.inheritAccessibility = false;
+  this.preventDoubleClick = true;
 };
 scout.inherits(scout.CancelMenu, scout.Menu);
 

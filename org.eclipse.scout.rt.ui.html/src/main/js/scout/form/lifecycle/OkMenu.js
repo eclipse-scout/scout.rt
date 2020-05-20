@@ -14,6 +14,7 @@ scout.OkMenu = function() {
   this.actionStyle = scout.Action.ActionStyle.BUTTON;
   this.keyStroke = 'enter';
   this.systemType = scout.Button.SystemType.OK;
+  this.preventDoubleClick = true;
 };
 scout.inherits(scout.OkMenu, scout.Menu);
 

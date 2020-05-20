@@ -43,4 +43,8 @@ public abstract class AbstractOkButton extends AbstractButton {
     return IKeyStroke.ENTER;
   }
 
+  @Override
+  protected boolean getConfiguredPreventDoubleClick() {
+    return true;
+  }
 }
