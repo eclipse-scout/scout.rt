@@ -8,18 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ButtonKeyStroke, ButtonLayout, Device, FormField, icons, KeyStrokeContext, LoadingSupport, scout, styles, tooltips} from '../../../index';
+import {ButtonKeyStroke, ButtonLayout, Device, DoubleClickSupport, FormField, icons, KeyStrokeContext, LoadingSupport, scout, styles, tooltips} from '../../../index';
 
 export default class Button extends FormField {
 
   constructor() {
     super();
 
+    this.adaptedBy = null;
     this.defaultButton = false;
     this.displayStyle = Button.DisplayStyle.DEFAULT;
     this.gridDataHints.fillHorizontal = false;
     this.iconId = null;
     this.keyStroke = null;
+    this.keyStrokeScope = null;
     this.processButton = true;
     this.selected = false;
     this.statusVisible = false;
@@ -30,6 +32,7 @@ export default class Button extends FormField {
 
     this.$buttonLabel = null;
     this.buttonKeyStroke = new ButtonKeyStroke(this, null);
+    this._doubleClickSupport = new DoubleClickSupport();
     this._addCloneProperties(['defaultButton', 'displayStyle', 'iconId', 'keyStroke', 'processButton', 'selected', 'systemType', 'preventDoubleClick', 'stackable', 'shrinkable']);
   }
 
@@ -138,7 +141,9 @@ export default class Button extends FormField {
     // TODO [10.0] cgu: should we add a label? -> would make it possible to control the space left of the button using labelVisible, like it is possible with checkboxes
     this.addStatus();
 
-    $button.on('click', this._onClick.bind(this))
+    $button
+      .on('mousedown', event => this._doubleClickSupport.mousedown(event))
+      .on('click', this._onClick.bind(this))
       .unfocusable();
 
     if (this.menus && this.menus.length > 0) {
@@ -384,7 +389,7 @@ export default class Button extends FormField {
     if (event.which !== 1) {
       return; // Other button than left mouse button --> nop
     }
-    if (event.detail > 1 && this.preventDoubleClick) {
+    if (this.preventDoubleClick && this._doubleClickSupport.doubleClicked()) {
       return; // More than one consecutive click --> nop
     }
 
@@ -399,6 +404,10 @@ export default class Button extends FormField {
 
   setShrinkable(shrinkable) {
     this.setProperty('shrinkable', shrinkable);
+  }
+
+  setPreventDoubleClick(preventDoubleClick) {
+    this.setProperty('preventDoubleClick', preventDoubleClick);
   }
 
   /**

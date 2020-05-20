@@ -33,7 +33,6 @@ export default class Menu extends Action {
     this.popup = null;
     this.popupHorizontalAlignment = undefined;
     this.popupVerticalAlignment = undefined;
-    this.preventDoubleClick = false;
     this.stackable = true;
     this.separator = false;
     this.shrinkable = false;
@@ -222,6 +221,9 @@ export default class Menu extends Action {
   }
 
   _onMouseEvent(event) {
+    if (event.type === 'mousedown') {
+      this._doubleClickSupport.mousedown(event);
+    }
     if (!this._allowMouseEvent(event)) {
       return;
     }
@@ -450,7 +452,7 @@ export default class Menu extends Action {
     // Reason for separating remove and close event:
     // Remove may be called if parent (menubar) gets removed or rebuilt.
     // In that case, we do not want to change the selected state because after rebuilding the popup should still be open
-    // In every other case the state of the menu needs to be reseted if the popup closes
+    // In every other case the state of the menu needs to be reset if the popup closes
     this.popup.on('close', event => {
       this.setSelected(false);
     });
