@@ -27,6 +27,7 @@ scout.Button = function() {
 
   this.$buttonLabel = null;
   this.buttonKeyStroke = new scout.ButtonKeyStroke(this, null);
+  this._doubleClickSupport = new scout.DoubleClickSupport();
   this._addCloneProperties(['defaultButton', 'displayStyle', 'iconId', 'keyStroke', 'processButton', 'selected', 'systemType', 'preventDoubleClick', 'stackable', 'shrinkable']);
 };
 scout.inherits(scout.Button, scout.FormField);
@@ -143,7 +144,11 @@ scout.Button.prototype._render = function() {
   // TODO [10.0] cgu: should we add a label? -> would make it possible to control the space left of the button using labelVisible, like it is possible with checkboxes
   this.addStatus();
 
-  $button.on('click', this._onClick.bind(this))
+  $button
+    .on('mousedown', function(event) {
+      this._doubleClickSupport.mousedown(event);
+    }.bind(this))
+    .on('click', this._onClick.bind(this))
     .unfocusable();
 
   if (this.menus && this.menus.length > 0) {
@@ -402,7 +407,7 @@ scout.Button.prototype._onClick = function(event) {
   if (event.which !== 1) {
     return; // Other button than left mouse button --> nop
   }
-  if (event.detail > 1 && this.preventDoubleClick) {
+  if (this.preventDoubleClick && this._doubleClickSupport.doubleClicked()) {
     return; // More than one consecutive click --> nop
   }
 
@@ -417,6 +422,10 @@ scout.Button.prototype.setStackable = function(stackable) {
 
 scout.Button.prototype.setShrinkable = function(shrinkable) {
   this.setProperty('shrinkable', shrinkable);
+};
+
+scout.Button.prototype.setPreventDoubleClick = function(preventDoubleClick) {
+  this.setProperty('preventDoubleClick', preventDoubleClick);
 };
 
 /**

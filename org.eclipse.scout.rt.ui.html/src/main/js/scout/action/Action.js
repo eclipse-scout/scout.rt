@@ -18,6 +18,7 @@ scout.Action = function() {
   this.keyStroke = null;
   this.keyStrokeFirePolicy = scout.Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
   this.selected = false;
+  this.preventDoubleClick = false;
   /**
    * This property decides whether or not the tabindex attribute is set in the DOM.
    */
@@ -33,7 +34,8 @@ scout.Action = function() {
   this.tooltipText = null;
   this.showTooltipWhenSelected = true;
 
-  this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
+  this._doubleClickSupport = new scout.DoubleClickSupport();
+  this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'preventDoubleClick', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
 };
 scout.inherits(scout.Action, scout.Widget);
 
@@ -71,6 +73,9 @@ scout.Action.prototype._init = function(model) {
 
 scout.Action.prototype._render = function() {
   this.$container = this.$parent.appendDiv('action')
+    .on('mousedown', function(event) {
+      this._doubleClickSupport.mousedown(event);
+    }.bind(this))
     .on('click', this._onClick.bind(this));
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
@@ -331,11 +336,15 @@ scout.Action.prototype._createActionKeyStroke = function() {
   return new scout.ActionKeyStroke(this);
 };
 
+scout.Action.prototype.setPreventDoubleClick = function(preventDoubleClick) {
+  this.setProperty('preventDoubleClick', preventDoubleClick);
+};
+
 scout.Action.prototype._allowMouseEvent = function(event) {
   if (event.which !== 1) {
     return false; // Other button than left mouse button --> nop
   }
-  if (event.type === 'click' && event.detail > 1 && this.preventDoubleClick) {
+  if (event.type === 'click' && this.preventDoubleClick && this._doubleClickSupport.doubleClicked()) {
     return false; // More than one consecutive click --> nop
   }
   return true;
