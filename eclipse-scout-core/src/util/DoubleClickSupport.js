@@ -29,12 +29,17 @@ import {scout} from '../index';
  */
 export default class DoubleClickSupport {
 
+  /**
+   * @param {object} [options]
+   * @param options.maxDoubleClickInterval default 500ms
+   * @param options.maxDoubleClickDistance default 10px
+   */
   constructor(options) {
     options = options || {};
 
-    this._lastPosX;
-    this._lastPosY;
-    this._lastTimestamp;
+    this._lastPosX = null;
+    this._lastPosY = null;
+    this._lastTimestamp = null;
 
     this._maxDoubleClickInterval = options.maxDoubleClickInterval || 500; // ms
     this._maxDoubleClickDistance = options.maxDoubleClickDistance || 10; // px

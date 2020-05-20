@@ -8,11 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionKeyStroke, Device, HtmlComponent, Icon, KeyStrokeContext, NullLayout, scout, tooltips, Widget} from '../index';
+import {ActionKeyStroke, Device, DoubleClickSupport, HtmlComponent, Icon, KeyStrokeContext, NullLayout, scout, tooltips, Widget} from '../index';
 import $ from 'jquery';
 
 export default class Action extends Widget {
 
+  // noinspection DuplicatedCode
   constructor() {
     super();
 
@@ -23,6 +24,7 @@ export default class Action extends Widget {
     this.keyStroke = null;
     this.keyStrokeFirePolicy = Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
     this.selected = false;
+    this.preventDoubleClick = false;
     /**
      * This property decides whether or not the tabindex attribute is set in the DOM.
      */
@@ -38,7 +40,8 @@ export default class Action extends Widget {
     this.tooltipText = null;
     this.showTooltipWhenSelected = true;
 
-    this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
+    this._doubleClickSupport = new DoubleClickSupport();
+    this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'preventDoubleClick', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
   }
 
   static ActionStyle = {
@@ -75,6 +78,7 @@ export default class Action extends Widget {
 
   _render() {
     this.$container = this.$parent.appendDiv('action')
+      .on('mousedown', event => this._doubleClickSupport.mousedown(event))
       .on('click', this._onClick.bind(this));
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(this._createLayout());
@@ -335,11 +339,15 @@ export default class Action extends Widget {
     return new ActionKeyStroke(this);
   }
 
+  setPreventDoubleClick(preventDoubleClick) {
+    this.setProperty('preventDoubleClick', preventDoubleClick);
+  }
+
   _allowMouseEvent(event) {
     if (event.which !== 1) {
       return false; // Other button than left mouse button --> nop
     }
-    if (event.type === 'click' && event.detail > 1 && this.preventDoubleClick) {
+    if (event.type === 'click' && this.preventDoubleClick && this._doubleClickSupport.doubleClicked()) {
       return false; // More than one consecutive click --> nop
     }
     return true;
