@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.commons.authentication;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 
 import javax.annotation.PostConstruct;
@@ -40,8 +41,8 @@ import org.slf4j.LoggerFactory;
  * It is not recommended for production unless secure cookies are enabled in the web.xml and the corporate policy allows
  * for cookie-based auto login.
  * <p>
- * It uses the config.properties {@link CookieNameProperty()}, {@link MaxAgeProperty()},
- * {@link AuthTokenPrivateKeyProperty} for signing the cookie
+ * It uses the config.properties {@link NameProperty()}, {@link MaxAgeProperty()}, {@link AuthTokenPrivateKeyProperty}
+ * for signing the cookie
  * <p>
  * This access controller should be placed in front of {@link TrivialAccessController}. It needs to know about login,
  * logout and when login succeeded.
@@ -120,11 +121,12 @@ public class CookieAccessController implements IAccessController {
 
   /**
    * @param value
+   *          to be signed
    * @return signed value in the format <code>base64(signature):value</code>
    */
   protected String signValue(String value) {
     try {
-      byte[] sig = SecurityUtility.createMac(m_signKey, value.getBytes("UTF-8"));
+      byte[] sig = SecurityUtility.createMac(m_signKey, value.getBytes(StandardCharsets.UTF_8));
       return Base64Utility.encode(sig) + ":" + value;
     }
     catch (Exception e) {

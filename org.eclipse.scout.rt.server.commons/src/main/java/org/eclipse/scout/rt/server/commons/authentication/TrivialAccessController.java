@@ -114,15 +114,13 @@ public class TrivialAccessController implements IAccessController {
     }
 
     // Is already authenticated?
-    if (m_config.isHandleAuthentication()) {
-      final Principal principal = BEANS.get(ServletFilterHelper.class).findPrincipal(request, m_config.getPrincipalProducer());
-      if (principal != null) {
-        if (m_config.getPrincipalVerifier() != null && !m_config.getPrincipalVerifier().verify(principal)) {
-          return false;
-        }
-        BEANS.get(ServletFilterHelper.class).continueChainAsSubject(principal, request, response, chain);
-        return true;
+    final Principal principal = BEANS.get(ServletFilterHelper.class).findPrincipal(request, m_config.getPrincipalProducer());
+    if (principal != null) {
+      if (m_config.getPrincipalVerifier() != null && !m_config.getPrincipalVerifier().verify(principal)) {
+        return false;
       }
+      BEANS.get(ServletFilterHelper.class).continueChainAsSubject(principal, request, response, chain);
+      return true;
     }
 
     // Is request path excluded from authentication?
@@ -221,11 +219,10 @@ public class TrivialAccessController implements IAccessController {
     }
 
     /**
-     * Default true. This filter forwards to login.html / logout.html and checks if the request already has a remoteUser
-     * set.
+     * Default true. This filter forwards to login.html / logout.html
      * <p>
      * Set to false when using indirect login such as pac4j, keycloak or other third party identity provider in a
-     * servlet filter following this filter
+     * servlet filter following this filter that also handle /login and /logout
      */
     public boolean isHandleAuthentication() {
       return m_handleAuthentication;
