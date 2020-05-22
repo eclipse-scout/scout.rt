@@ -18,11 +18,11 @@ const scoutBuildConstants = require('./constants');
 const webpack = require('webpack');
 
 /**
- * @param args.mode {string} development or production
- * @param args.clean {boolean} true, to clean the dist folder before each build. Default is true.
- * @param args.progress {boolean} true, to show build progress in percentage. Default is true.
- * @param args.profile {boolean} true, to show timing information for each build step. Default is false.
- * @param args.resDirArray {[]} an array containing directories which should be copied to dist/res
+ * @param {string} args.mode development or production
+ * @param {boolean} args.clean true, to clean the dist folder before each build. Default is true.
+ * @param {boolean} args.progress true, to show build progress in percentage. Default is true.
+ * @param {boolean} args.profile true, to show timing information for each build step. Default is false.
+ * @param {[]} args.resDirArray an array containing directories which should be copied to dist/res
  */
 module.exports = (env, args) => {
   const {devMode, outSubDir, cssFilename, jsFilename} = scoutBuildConstants.getConstantsForMode(args.mode);
@@ -38,36 +38,6 @@ module.exports = (env, args) => {
         from: resDir,
         to: '../res'
       });
-  }
-
-  /**
-   * Don't reveal absolute file paths in production mode -> only return the file name relative to its module.
-   * @param info.resourcePath
-   */
-  function prodDevtoolModuleFilenameTemplate(info) {
-    let path = info.resourcePath || '';
-    // Search for the last /src/ in the path and return the fragment starting from its parent
-    let result = path.match(/.*\/(.*\/src\/.*)/);
-    if (result) {
-      return result[1];
-    }
-    // Match everything after the /last node_modules/ in the path
-    result = path.match(/.*\/node_modules\/(.*)/);
-    if (result) {
-      return result[1];
-    }
-    // Return only the file name (the part after the last /)
-    result = path.match(/([^/\\]*)$/);
-    if (result) {
-      return result[1];
-    }
-  }
-
-  function nvl(arg, defaultValue) {
-    if (arg === undefined || arg === null) {
-      return defaultValue;
-    }
-    return arg;
   }
 
   const config = {
@@ -265,3 +235,77 @@ module.exports = (env, args) => {
 
   return config;
 };
+
+/**
+ * @param {object} entry the webpack entry object
+ * @param {object} options the options object to configure which themes should be built and how
+ * @param {[string]} options.themes one or more themes of the availableThemes that should be built. Use 'all' to build all available themes, or 'none' to build no themes. Default is 'all'.
+ * @param {[string]} options.availableThemes the themes that are available.
+ * @param {function} options.generator a function that returns an array containing the key and value for the generated entry. The function will be called for each theme with the theme name as argument.
+ */
+function addThemes(entry, options = {}) {
+  let themes = ensureArray(nvl(options.themes, 'all'));
+  let availableThemes = options.availableThemes;
+  if (!availableThemes) {
+    throw 'Please specify the availableThemes';
+  }
+  let generator = options.generator;
+  if (!generator) {
+    throw 'Please specify a theme entry generator (themeEntryGen) that returns and array containing the key and value of the entry to generate for each theme.';
+  }
+  if (themes.includes('all')) {
+    themes = availableThemes;
+  }
+  themes = themes.filter(theme => availableThemes.includes(theme));
+  if (themes.length === 0) {
+    return;
+  }
+  console.log(`Themes: ${themes}`);
+  themes.forEach(theme => {
+    let name = theme === 'default' ? '' : `-${theme}`;
+    let [key, value] = generator(name);
+    entry[key] = value;
+  });
+}
+
+function ensureArray(array) {
+  if (array === undefined || array === null) {
+    return [];
+  }
+  if (!Array.isArray(array)) {
+    return [array];
+  }
+  return array;
+}
+
+function nvl(arg, defaultValue) {
+  if (arg === undefined || arg === null) {
+    return defaultValue;
+  }
+  return arg;
+}
+
+/**
+ * Don't reveal absolute file paths in production mode -> only return the file name relative to its module.
+ * @param info.resourcePath
+ */
+function prodDevtoolModuleFilenameTemplate(info) {
+  let path = info.resourcePath || '';
+  // Search for the last /src/ in the path and return the fragment starting from its parent
+  let result = path.match(/.*\/(.*\/src\/.*)/);
+  if (result) {
+    return result[1];
+  }
+  // Match everything after the /last node_modules/ in the path
+  result = path.match(/.*\/node_modules\/(.*)/);
+  if (result) {
+    return result[1];
+  }
+  // Return only the file name (the part after the last /)
+  result = path.match(/([^/\\]*)$/);
+  if (result) {
+    return result[1];
+  }
+}
+
+module.exports.addThemes = addThemes;

@@ -27,9 +27,10 @@ const parser = require('yargs-parser');
 const fs = require('fs');
 const path = require('path');
 const webpackConfigFileName = './webpack.config.js';
+const webpackCustomConfigFileName = './webpack.config.custom.js';
 const webpackYargsOptions = {
   boolean: ['progress', 'profile', 'clean'],
-  array: ['resDirArray']
+  array: ['resDirArray', 'themes']
 };
 const karmaYargsOptions = prepareWebpackYargsOptionsForKarma();
 
@@ -129,18 +130,30 @@ function runKarma(configFileName, headless, args) {
 }
 
 function runWebpack(args) {
-  const configFilePath = path.resolve(webpackConfigFileName);
+  const configFilePath = readWebpackConfig();
+  const {compiler, statsConfig} = createWebpackCompiler(configFilePath, args);
+  compiler.run((err, stats) => logWebpack(err, stats, statsConfig));
+}
+
+function readWebpackConfig() {
+  let configFilePath = null;
+  const devConfigFilePath = path.resolve(webpackCustomConfigFileName);
+  if (fs.existsSync(devConfigFilePath)) {
+    console.log(`Reading config from ${webpackCustomConfigFileName}`);
+    configFilePath = devConfigFilePath;
+  } else {
+    configFilePath = path.resolve(webpackConfigFileName);
+  }
   if (!fs.existsSync(configFilePath)) {
     // No config file found -> abort
     console.log(`Skipping webpack build (config file ${webpackConfigFileName} not found)`);
     return;
   }
-  const {compiler, statsConfig} = createWebpackCompiler(configFilePath, args);
-  compiler.run((err, stats) => logWebpack(err, stats, statsConfig));
+  return configFilePath;
 }
 
 function runWebpackWatch(args) {
-  const configFilePath = path.resolve(webpackConfigFileName);
+  const configFilePath = readWebpackConfig();
   // Don't clean the dist folder in watch mode, may be overridden by command line argument
   args = Object.assign({clean: false}, args);
   const {compiler, statsConfig} = createWebpackCompiler(configFilePath, args);
