@@ -25,8 +25,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractNumberColumnTest.P_PropertyTracker;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
@@ -194,24 +196,33 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
     for (Locale locale : Locale.getAvailableLocales()) {
       DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance(locale);
       setFormat(format);
+      if ("en_US_POSIX".equals(locale.toString())) {
+        // ignore 'en_US_POSIX' since this locale is specifically designed to yield US English results regardless of both user and system preferences
+        continue;
+      }
 
-      // grouping
-      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123,123,123"));
-      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123’123’123"));
-      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123'123'123"));
-      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123´123´123"));
-      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123.123.123"));
-      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123 123 123"));
-      assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123\u00A0123\u00A0123"));
-      assertParseToBigDecimalInternalThrowsRuntimeException("Parsing with unsupported grouping separator is expected to fail", this, "123~123~123");
+      try {
+        // grouping
+        assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123,123,123"));
+        assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123’123’123"));
+        assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123'123'123"));
+        assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123´123´123"));
+        assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123.123.123"));
+        assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123 123 123"));
+        assertEquals(new BigDecimal(123123123), parseToBigDecimalInternal("123\u00A0123\u00A0123"));
+        assertParseToBigDecimalInternalThrowsRuntimeException("Parsing with unsupported grouping separator is expected to fail", this, "123~123~123");
 
-      // decimal
-      setRoundingMode(RoundingMode.UP);
-      // if the parsing doesn't throw an exception it's successful
-      assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123'123.123"));
-      assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123,123.123"));
-      assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123.123,123"));
-      assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123'123,123"));
+        // decimal
+        setRoundingMode(RoundingMode.UP);
+        // if the parsing doesn't throw an exception it's successful
+        assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123'123.123"));
+        assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123,123.123"));
+        assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123.123,123"));
+        assertEquals(new BigDecimal(123124), parseToBigDecimalInternal("123'123,123"));
+      }
+      catch (ProcessingException e) {
+        fail("Lenient Parsing failed with locale (" + locale.toString() + ") and exception (" + e.getDisplayMessage() + ")");
+      }
     }
   }
 
