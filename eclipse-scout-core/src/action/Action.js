@@ -30,6 +30,7 @@ export default class Action extends Widget {
      */
     this.tabbable = false;
     this.text = null;
+    this.textPosition = Action.TextPosition.DEFAULT;
     /**
      * Supported action styles are:
      * - default: regular menu-look, also used in overflow menus
@@ -41,12 +42,20 @@ export default class Action extends Widget {
     this.showTooltipWhenSelected = true;
 
     this._doubleClickSupport = new DoubleClickSupport();
-    this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'preventDoubleClick', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
+    this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'preventDoubleClick', 'tabbable', 'text', 'textPosition', 'tooltipText', 'toggleAction']);
   }
 
   static ActionStyle = {
     DEFAULT: 0,
     BUTTON: 1
+  };
+
+  static TextPosition = {
+    DEFAULT: 'default',
+    /**
+     * The text will be positioned below the icon. It has no effect if no icon is set.
+     */
+    BOTTOM: 'bottom'
   };
 
   static KeyStrokeFirePolicy = {
@@ -67,6 +76,9 @@ export default class Action extends Widget {
     this.resolveConsts([{
       property: 'actionStyle',
       constType: Action.ActionStyle
+    }, {
+      property: 'textPosition',
+      constType: Action.TextPosition
     }, {
       property: 'keyStrokeFirePolicy',
       constType: Action.KeyStrokeFirePolicy
@@ -92,6 +104,7 @@ export default class Action extends Widget {
     super._renderProperties();
 
     this._renderText();
+    this._renderTextPosition();
     this._renderIconId();
     this._renderTooltipText();
     this._renderKeyStroke();
@@ -122,6 +135,15 @@ export default class Action extends Widget {
     } else {
       this._removeText();
     }
+  }
+
+  setTextPosition(textPosition) {
+    this.setProperty('textPosition', textPosition);
+  }
+
+  _renderTextPosition() {
+    this.$container.toggleClass('bottom-text', this.textPosition === Action.TextPosition.BOTTOM);
+    this.invalidateLayoutTree();
   }
 
   _removeText() {

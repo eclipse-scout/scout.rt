@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, scout, tooltips} from '../../src/index';
+import {Action, Menu, scout, tooltips} from '../../src/index';
 import {MenuSpecHelper} from '@eclipse-scout/testing';
 
 describe('Menu', () => {
@@ -527,4 +527,61 @@ describe('Menu', () => {
 
   });
 
+  describe('submenuIcon', () => {
+    it('is moved into text if text position is bottom', () => {
+      let menu = scout.create('Menu', {
+        parent: session.desktop,
+        text: 'text',
+        iconId: 'iconId',
+        childActions: [{objectType: 'Menu'}]
+      });
+      menu.render();
+      expect(menu.$submenuIcon.parent()[0]).toBe(menu.$container[0]);
+      menu.setTextPosition(Menu.TextPosition.BOTTOM);
+      expect(menu.$submenuIcon.parent()[0]).toBe(menu.$text[0]);
+      menu.setTextPosition(Menu.TextPosition.DEFAULT);
+      expect(menu.$submenuIcon.parent()[0]).toBe(menu.$container[0]);
+    });
+
+    it('is moved into text if text position is bottom and text set later', () => {
+      let menu = scout.create('Menu', {
+        parent: session.desktop,
+        iconId: 'iconId',
+        childActions: [{objectType: 'Menu'}]
+      });
+      menu.render();
+      menu.setTextPosition(Menu.TextPosition.BOTTOM);
+      expect(menu.$submenuIcon).toBe(null);
+      menu.setText('text');
+      expect(menu.$submenuIcon.parent()[0]).toBe(menu.$text[0]);
+    });
+
+    it('is moved into text if text position is bottom and icon set later', () => {
+      let menu = scout.create('Menu', {
+        parent: session.desktop,
+        text: 'text',
+        childActions: [{objectType: 'Menu'}]
+      });
+      menu.render();
+      menu.setTextPosition(Menu.TextPosition.BOTTOM);
+      expect(menu.$submenuIcon.parent()[0]).toBe(menu.$container[0]);
+      menu.setIconId('icon');
+      expect(menu.$submenuIcon.parent()[0]).toBe(menu.$text[0]);
+    });
+
+    it('is moved into text if text position is bottom and subMenuIVisibility set later', () => {
+      let menu = scout.create('Menu', {
+        parent: session.desktop,
+        iconId: 'iconId',
+        text: 'asdf',
+        subMenuVisibility: Menu.SubMenuVisibility.NEVER,
+        childActions: [{objectType: 'Menu'}]
+      });
+      menu.render();
+      menu.setTextPosition(Menu.TextPosition.BOTTOM);
+      expect(menu.$submenuIcon).toBe(null);
+      menu.setSubMenuVisibility(Menu.SubMenuVisibility.ALWAYS);
+      expect(menu.$submenuIcon.parent()[0]).toBe(menu.$text[0]);
+    });
+  });
 });

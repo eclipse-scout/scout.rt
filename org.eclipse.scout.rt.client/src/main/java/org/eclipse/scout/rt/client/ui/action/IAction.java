@@ -18,20 +18,12 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 
-/**
- * Actions have a trigger scope that is a combination of the "locations" {@link #isSingleSelectionAction()},
- * {@link #isMultiSelectionAction()}, {@link #isNonSelectionAction()}, {@link #isEmptySpaceAction()} and the granting
- * {@link #isEnabledIncludingParents()}, {@link #isInheritAccessibility()}.
- * <p>
- * Examples:<br>
- * A typical NEW menu on a table that is only visible on the empty space of the table and only when the table field is
- * enabled would have emptySpaceAction=false;
- */
 public interface IAction extends IWidget, IOrdered, IStyleable, IVisibleDimension {
 
   String PROP_CONTAINER = "container";
   String PROP_ICON_ID = "iconId";
   String PROP_TEXT = "text";
+  String PROP_TEXT_POSITION = "textPosition";
   String PROP_TOOLTIP_TEXT = "tooltipText";
   String PROP_SELECTED = "selected";
   String PROP_VISIBLE = "visible";
@@ -43,15 +35,21 @@ public interface IAction extends IWidget, IOrdered, IStyleable, IVisibleDimensio
   byte HORIZONTAL_ALIGNMENT_LEFT = -1;
   byte HORIZONTAL_ALIGNMENT_RIGHT = 1;
 
+  String TEXT_POSITION_DEFAULT = "default";
+  /**
+   * The text will be positioned below the icon. It has no effect if no icon is set.
+   */
+  String TEXT_POSITION_BOTTOM = "bottom";
+
   /**
    * Fire keystroke only when the action is accessible (e.g. not covered by a modal dialog)<br>
-   * see {@link #setKeyStrokeFirePolicy(keyStrokeFirePolicy)} and {@link #getKeyStrokeFirePolicy()}
+   * see {@link #setKeyStrokeFirePolicy(int)} and {@link #getKeyStrokeFirePolicy()}
    */
   int KEYSTROKE_FIRE_POLICY_ACCESSIBLE_ONLY = 0;
 
   /**
    * Always fire keystroke (even when the action itself is covered by a modal dialog)<br>
-   * see {@link #setKeyStrokeFirePolicy(keyStrokeFirePolicy)} and {@link #getKeyStrokeFirePolicy()}
+   * see {@link #setKeyStrokeFirePolicy(int)} and {@link #getKeyStrokeFirePolicy()}
    */
   int KEYSTROKE_FIRE_POLICY_ALWAYS = 1;
 
@@ -81,6 +79,10 @@ public interface IAction extends IWidget, IOrdered, IStyleable, IVisibleDimensio
   String getText();
 
   void setText(String text);
+
+  String getTextPosition();
+
+  void setTextPosition(String position);
 
   /**
    * Key stroke with format lowercase [shift-] [control-] [alternate-] key

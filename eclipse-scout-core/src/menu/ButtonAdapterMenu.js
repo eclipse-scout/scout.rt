@@ -119,6 +119,7 @@ export default class ButtonAdapterMenu extends Menu {
 
     // Properties requiring special handling (non-trivial mapping)
     menuProperties.text = buttonProperties.label;
+    menuProperties.textPosition = labelPositionToTextPosition(buttonProperties.labelPosition);
     menuProperties.horizontalAlignment = buttonProperties.gridData ? buttonProperties.gridData.horizontalAlignment : undefined;
     menuProperties.actionStyle = buttonStyleToActionStyle(buttonProperties.displayStyle);
     menuProperties.toggleAction = buttonProperties.displayStyle === Button.DisplayStyle.TOGGLE;
@@ -149,6 +150,16 @@ export default class ButtonAdapterMenu extends Menu {
         return Action.ActionStyle.DEFAULT;
       }
       return Action.ActionStyle.BUTTON;
+    }
+
+    function labelPositionToTextPosition(labelPosition) {
+      if (labelPosition === undefined) {
+        return undefined;
+      }
+      if (labelPosition === Button.LabelPosition.BOTTOM) {
+        return Action.TextPosition.BOTTOM;
+      }
+      return Action.TextPosition.DEFAULT;
     }
   }
 }

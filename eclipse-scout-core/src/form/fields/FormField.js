@@ -138,7 +138,8 @@ export default class FormField extends Widget {
     LEFT: 1,
     ON_FIELD: 2,
     RIGHT: 3,
-    TOP: 4
+    TOP: 4,
+    BOTTOM: 5
   };
 
   static TooltipAnchor = {

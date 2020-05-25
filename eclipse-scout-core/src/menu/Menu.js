@@ -37,9 +37,9 @@ export default class Menu extends Action {
     this.separator = false;
     this.shrinkable = false;
     this.subMenuVisibility = Menu.SubMenuVisibility.DEFAULT;
-
     this.menuFilter = null;
-
+    this.$submenuIcon = null;
+    this.$subMenuBody = null;
     this._addCloneProperties(['defaultMenu', 'menuTypes', 'overflow', 'stackable', 'separator', 'shrinkable', 'parentMenu', 'menuFilter']);
     this._addWidgetProperties('childActions');
   }
@@ -66,7 +66,11 @@ export default class Menu extends Action {
     /**
      * Always: sub-menu icon is always visible when menu has child-actions.
      */
-    ALWAYS: 'always'
+    ALWAYS: 'always',
+    /**
+     * Never: sub-menu icon never visible.
+     */
+    NEVER: 'never'
   };
 
   _init(options) {
@@ -98,6 +102,7 @@ export default class Menu extends Action {
     this._renderOverflown();
     this._renderMenuStyle();
     this._renderMenuButton();
+    this._updateIconAndTextStyle();
   }
 
   _remove() {
@@ -263,6 +268,14 @@ export default class Menu extends Action {
     this._renderSubMenuIcon();
   }
 
+  setSubMenuVisibility(subMenuVisibility) {
+    this.setProperty('subMenuVisibility', subMenuVisibility);
+  }
+
+  _renderSubMenuVisibility() {
+    this._renderSubMenuIcon();
+  }
+
   _renderSubMenuIcon() {
     let visible = false;
 
@@ -277,6 +290,9 @@ export default class Menu extends Action {
           break;
         case Menu.SubMenuVisibility.ALWAYS:
           visible = true;
+          break;
+        case Menu.SubMenuVisibility.NEVER:
+          visible = false;
           break;
       }
     }
@@ -296,23 +312,41 @@ export default class Menu extends Action {
         this.invalidateLayoutTree();
       }
     }
+    if (this.rendered) {
+      this._renderTextPosition();
+    }
   }
 
   _renderText(text) {
     super._renderText(text);
-    // Ensure submenu-icon is the last element in the DOM
-    if (this.$submenuIcon) {
-      this.$submenuIcon.appendTo(this.$container);
-    }
     this.$container.toggleClass('has-text', strings.hasText(this.text) && this.textVisible);
-    this._updateIconAndTextStyle();
+    if (this.rendered) {
+      this._updateIconAndTextStyle();
+      this._renderSubMenuIcon();
+    }
     this.invalidateLayoutTree();
+  }
+
+  _renderTextPosition() {
+    super._renderTextPosition();
+    let $parent = this.$container;
+    if (this.textPosition === Action.TextPosition.BOTTOM && this.$text && this.iconId) {
+      // Move submenu icon into text
+      $parent = this.$text;
+    }
+    if (this.$submenuIcon) {
+      // Always append to make sure submenu-icon is the last element in the DOM
+      this.$submenuIcon.appendTo($parent);
+    }
   }
 
   _renderIconId() {
     super._renderIconId();
     this.$container.toggleClass('has-icon', !!this.iconId);
-    this._updateIconAndTextStyle();
+    if (this.rendered) {
+      this._updateIconAndTextStyle();
+      this._renderSubMenuIcon();
+    }
     this.invalidateLayoutTree();
   }
 
@@ -587,7 +621,7 @@ export default class Menu extends Action {
 
   _renderOverflown() {
     this.$container.toggleClass('overflown', this.overflown);
-    this._renderMenuButton();
+    this._renderActionStyle();
   }
 
   setMenuStyle(menuStyle) {

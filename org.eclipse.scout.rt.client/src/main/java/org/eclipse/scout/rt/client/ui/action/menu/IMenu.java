@@ -42,6 +42,11 @@ public interface IMenu extends IActionNode<IMenu> {
   String SUB_MENU_VISIBILITY_ALWAYS = "always";
 
   /**
+   * Sub-menu icon is never visible.
+   */
+  String SUB_MENU_VISIBILITY_NEVER = "never";
+
+  /**
    * A menu can have several {@link IMenuType}s each menu type describes a certain usage in a specific context (e.g.
    * {@link ITable}, {@link ITree}, {@link IValueField} ) of the menu.
    *

@@ -128,6 +128,12 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
+  @Order(45)
+  protected String getConfiguredTextPosition() {
+    return TEXT_POSITION_DEFAULT;
+  }
+
+  @ConfigProperty(ConfigProperty.TEXT)
   @Order(50)
   protected String getConfiguredTooltipText() {
     return null;
@@ -260,6 +266,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
     super.initConfig();
     setIconId(getConfiguredIconId());
     setText(getConfiguredText());
+    setTextPosition(getConfiguredTextPosition());
     setTooltipText(getConfiguredTooltipText());
     setKeyStroke(getConfiguredKeyStroke());
     setKeyStrokeFirePolicy(getConfiguredKeyStrokeFirePolicy());
@@ -356,6 +363,16 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   @Override
   public void setText(String text) {
     propertySupport.setPropertyString(PROP_TEXT, text);
+  }
+
+  @Override
+  public String getTextPosition() {
+    return propertySupport.getPropertyString(PROP_TEXT_POSITION);
+  }
+
+  @Override
+  public void setTextPosition(String position) {
+    propertySupport.setPropertyString(PROP_TEXT_POSITION, position);
   }
 
   @Override

@@ -54,6 +54,13 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonWid
       }
     });
 
+    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_TEXT_POSITION, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getTextPosition();
+      }
+    });
+
     putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_ICON_ID, model) {
       @Override
       protected String modelValue() {

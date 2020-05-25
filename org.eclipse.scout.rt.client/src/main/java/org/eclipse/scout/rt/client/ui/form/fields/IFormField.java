@@ -53,7 +53,7 @@ import org.w3c.dom.Element;
  * Buttons allow the user to trigger events on the GUI. Typical examples on a form are the 'Ok' and 'Close' buttons (see
  * {@link org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton AbstractOkButton} or
  * {@link org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton AbstractCancelButton}).</li>
- * <li>{@link IComposite}:<br/>
+ * <li>{@link ICompositeField}:<br/>
  * Composite fields group multiple form fields. The most common are:<br/>
  * <ul>
  * <li>{@link IGroupBox}: Groups multiple form fields and draws a border on the GUI.</li>
@@ -114,29 +114,30 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
   String PROP_DISABLED_STYLE = "disabledStyle";
 
   /**
-   * position the label at the default location (normally left of the field)<br>
-   * see {@link #setLabelPosition(int)} and {@link #getLabelPosition()}
+   * Position the label at the default location (normally on the left of the field)<br>
+   * see {@link #setLabelPosition(byte)} and {@link #getLabelPosition()}
    */
   byte LABEL_POSITION_DEFAULT = 0;
   /**
-   * position the label left of the field<br>
-   * see {@link #setLabelPosition(int)} and {@link #getLabelPosition()}
+   * Position the label on the left of the field
    */
   byte LABEL_POSITION_LEFT = 1;
   /**
-   * position the label on the field, meaning that the label is only displayed when the field is empty (vista style)<br>
-   * see {@link #setLabelPosition(int)} and {@link #getLabelPosition()}
+   * Position the label on the field, meaning that the label is only displayed when the field is empty
    */
   byte LABEL_POSITION_ON_FIELD = 2;
   /**
-   * position the label right of the field<br>
-   * see {@link #setLabelPosition(int)} and {@link #getLabelPosition()}
+   * Position the label on the right of the field. Currently, no fields implement this position style.
    */
   byte LABEL_POSITION_RIGHT = 3;
   /**
-   * position the label on the top of the field
+   * Position the label on the top of the field.
    */
   byte LABEL_POSITION_TOP = 4;
+  /**
+   * Position the label on the bottom of the field. Currently, this display style is only supported by process buttons.
+   */
+  byte LABEL_POSITION_BOTTOM = 5;
 
   /**
    * see {@link #getGridDataHints()}<br>
@@ -335,15 +336,13 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
   /**
    * @since 19.11.2009
    * @param pos
-   *          one of the LABEL_POSITION_* constants or a custom constants interpreted by the ui
+   *          one of the LABEL_POSITION_* constants or a custom constant interpreted by the ui
    */
   void setLabelPosition(byte pos);
 
   /**
    * Sets whether the form-field label is HTML enabled (true) or plain-text (false). When label position
    * is <code>LABEL_POSITION_ON_FIELD</code> this property has no effect, since we can only render plain text.
-   *
-   * @param labelHtmlEnabled
    */
   void setLabelHtmlEnabled(boolean labelHtmlEnabled);
 
@@ -393,15 +392,11 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
 
   /**
    * Adds an error status to field. use {@link ScoutFieldStatus} in order to set a custom icon.
-   *
-   * @param newStatus
    */
   void addErrorStatus(IStatus newStatus);
 
   /**
    * Adds an error status of type {@link DefaultFieldStatus} with the given message to the field.
-   *
-   * @param message
    */
   void addErrorStatus(String message);
 
@@ -429,7 +424,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
 
   /**
    * @return true if field content (value on value fields) is valid, no error status is set on field and mandatory
-   *         property is met. Shorthand form for {@link #getContentProblemDescriptor()==null}
+   *         property is met.
    */
   boolean isContentValid();
 
@@ -448,7 +443,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
 
   /**
    * Rebuild the {@link IFormField#PROP_KEY_STROKES} property using the internal set of properties and by calling
-   * {@link #getContributedKeyStrokes()} and {@link #getLocalKeyStrokes()}
+   * getContributedKeyStrokes() and getLocalKeyStrokes()
    */
   void updateKeyStrokes();
 
@@ -800,7 +795,8 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    *
    * @param fieldStyle
    *          One of {@link #FIELD_STYLE_CLASSIC}, {@link #FIELD_STYLE_ALTERNATIVE}.
-   * @param {@code true} if the field style property of the children should be changed as well.
+   * @param recursive
+   *          {@code true} if the field style property of the children should be changed as well.
    */
   void setFieldStyle(String fieldStyle, boolean recursive);
 
@@ -823,7 +819,8 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    *
    * @param disabledStyle
    *          One of {@link #DISABLED_STYLE_DEFAULT}, {@link #DISABLED_STYLE_READ_ONLY}.
-   * @param {@code true} if the disabled style property of the children should be changed as well.
+   * @param recursive
+   *          {@code true} if the disabled style property of the children should be changed as well.
    */
   void setDisabledStyle(int disabledStyle, boolean recursive);
 

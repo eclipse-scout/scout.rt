@@ -40,7 +40,8 @@
 
   & > .icon,
   & > .text,
-  & > .submenu-icon {
+  & > .submenu-icon,
+  & > .text > .submenu-icon {
     position: relative;
     vertical-align: middle;
     display: inline-block;
@@ -87,7 +88,8 @@
     opacity: 0.5;
   }
 
-  & > .submenu-icon {
+  & > .submenu-icon,
+  & > .text > .submenu-icon {
     #scout.submenu-icon();
     padding-left: 8px;
     top: -1px;
@@ -106,6 +108,38 @@
 
     & > .submenu-icon {
       padding-left: 0;
+    }
+  }
+
+  &.bottom-text.menu-textandicon {
+    text-align: center;
+
+    &::before {
+      display: none;
+    }
+
+    & > .icon {
+      display: block;
+      margin-right: 0; // reset
+      padding-bottom: 3px;
+    }
+
+    &:not(.menu-button) > .icon {
+      top: 0; // reset
+    }
+
+    & > .text {
+      display: block;
+      font-size: @font-size-extra-small;
+      padding-bottom: 0; // reset
+
+      & > .submenu-icon {
+        font-size: 12px;
+        padding-left: 4px;
+        top: 0; // reset
+        // Make sure the icon does not increase the height and therefore the whole menu
+        line-height: 0;
+      }
     }
   }
 }

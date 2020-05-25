@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 /**
@@ -248,7 +249,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
       return;
     }
 
-    if (IFormField.LABEL_POSITION_ON_FIELD == field.getLabelPosition()) {
+    if (ObjectUtility.isOneOf(field.getLabelPosition(), IFormField.LABEL_POSITION_ON_FIELD, IFormField.LABEL_POSITION_BOTTOM)) {
       return;
     }
 

@@ -73,6 +73,8 @@ export default class MenuBarPopup extends ContextMenuPopup {
     }
     this._copyCssClassToHead('unfocusable');
     this._copyCssClassToHead('button');
+    this._copyCssClassToHead('menu-textandicon');
+    this._copyCssClassToHead('bottom-text');
   }
 
   _onParentMenuPropertyChange(event) {

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ContextMenuPopupLayout, HtmlComponent, MenuDestinations, menuNavigationKeyStrokes, Popup, PopupWithHead, RowLayout, scrollbars} from '../index';
+import {Action, arrays, ContextMenuPopupLayout, HtmlComponent, MenuDestinations, menuNavigationKeyStrokes, Popup, PopupWithHead, RowLayout, scrollbars} from '../index';
 import $ from 'jquery';
 
 export default class ContextMenuPopup extends PopupWithHead {
@@ -344,7 +344,8 @@ export default class ContextMenuPopup extends PopupWithHead {
       if (this.cloneMenuItems && !menu.cloneOf) {
         // clone will recursively also clone all child actions.
         menu = menu.clone({
-          parent: this
+          parent: this,
+          textPosition: Action.TextPosition.DEFAULT
         }, {
           delegateEventsToOriginal: ['acceptInput', 'action', 'click'],
           delegateAllPropertiesToClone: true,

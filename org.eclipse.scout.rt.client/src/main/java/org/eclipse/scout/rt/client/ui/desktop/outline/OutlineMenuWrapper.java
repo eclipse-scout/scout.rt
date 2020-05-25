@@ -67,8 +67,6 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
   /**
    * Constructs a wrapper for a menu where the menuType of the menu and of each menu in the sub-hierarchy is the same as
    * in the original
-   *
-   * @param wrappedMenu
    */
   protected OutlineMenuWrapper(IMenu wrappedMenu) {
     this(wrappedMenu, AUTO_MENU_TYPE_MAPPER, ACCEPT_ALL_FILTER);
@@ -247,6 +245,16 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
 
   @Override
   public void setText(String text) {
+    unsupported();
+  }
+
+  @Override
+  public String getTextPosition() {
+    return m_wrappedMenu.getTextPosition();
+  }
+
+  @Override
+  public void setTextPosition(String position) {
     unsupported();
   }
 
@@ -492,16 +500,14 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(getClass().getSimpleName());
-    sb.append("[wrappedMenu=").append(m_wrappedMenu.getClass().getSimpleName());
-    sb.append(" text='").append(getText()).append("'");
-    sb.append(" enabled=").append(isEnabled());
-    sb.append(" enabledGranted=").append(isEnabledGranted());
-    sb.append(" inheritAccessibility=").append(isInheritAccessibility());
-    sb.append(" visible=").append(isVisible());
-    sb.append(" visibleGranted=").append(isVisibleGranted());
-    sb.append("]");
-    return sb.toString();
+    return getClass().getSimpleName() + "[wrappedMenu=" + m_wrappedMenu.getClass().getSimpleName()
+        + " text='" + getText() + "'"
+        + " enabled=" + isEnabled()
+        + " enabledGranted=" + isEnabledGranted()
+        + " inheritAccessibility=" + isInheritAccessibility()
+        + " visible=" + isVisible()
+        + " visibleGranted=" + isVisibleGranted()
+        + "]";
   }
 
   private class P_WrappedMenuPropertyChangeListener implements PropertyChangeListener {
