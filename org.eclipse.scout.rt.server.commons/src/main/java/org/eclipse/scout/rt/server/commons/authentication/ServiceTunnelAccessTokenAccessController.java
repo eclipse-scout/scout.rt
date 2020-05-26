@@ -22,9 +22,9 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
 import org.eclipse.scout.rt.platform.security.IPrincipalProducer2;
-import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthToken;
+import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthTokenPrincipalProducer;
 import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthTokenVerifier;
 import org.eclipse.scout.rt.shared.servicetunnel.http.HttpServiceTunnel;
 
@@ -93,7 +93,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
     private Class<? extends DefaultAuthToken> m_tokenClazz = DefaultAuthToken.class;
     private DefaultAuthTokenVerifier m_tokenVerifier = BEANS.get(DefaultAuthTokenVerifier.class);
     private boolean m_enabled = true;
-    private IPrincipalProducer2 m_principalProducer = BEANS.get(SimplePrincipalProducer.class);
+    private IPrincipalProducer2 m_principalProducer = BEANS.get(DefaultAuthTokenPrincipalProducer.class);
 
     public Class<? extends DefaultAuthToken> getTokenClazz() {
       return m_tokenClazz;
@@ -140,6 +140,8 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
     }
 
     /**
+     * Default is {@link DefaultAuthTokenPrincipalProducer}
+     *
      * @since 10.0
      */
     public IPrincipalProducer2 getPrincipalProducer2() {
@@ -147,6 +149,8 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
     }
 
     /**
+     * Default is {@link DefaultAuthTokenPrincipalProducer}
+     *
      * @since 10.0
      */
     public ServiceTunnelAccessTokenAuthConfig withPrincipalProducer2(IPrincipalProducer2 principalProducer) {

@@ -11,11 +11,16 @@
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import java.nio.charset.StandardCharsets;
+import java.security.AccessController;
+import java.security.Principal;
+
+import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.security.JwtPrincipal;
+import org.eclipse.scout.rt.platform.security.SamlPrincipal;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.security.IAccessControlService;
@@ -27,6 +32,8 @@ import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenTimeToLivePro
  */
 @ApplicationScoped
 public class DefaultAuthTokenSigner {
+  public static final String JWT_IDENTIFIER = "jwt";
+  public static final String SAML_IDENTIFIER = "saml";
 
   protected long getTokenTimeToLive() {
     return CONFIG.getPropertyValue(AuthTokenTimeToLiveProperty.class);
@@ -64,11 +71,43 @@ public class DefaultAuthTokenSigner {
     }
     T token = BEANS.get(tokenClazz);
     token.withUserId(userId);
-    final String jwtTokenString = JwtPrincipal.jwtTokenStringOfCurrentSubject();
-    if (jwtTokenString != null) {
-      token.withCustomArgs(jwtTokenString);
-    }
+    appendCustomArgs(token);
     return sign(token);
+  }
+
+  /**
+   * Add principal specific params to the token. By default the {@link JwtPrincipal} and {@link SamlPrincipal} are
+   * detected. The custom param starts with the type of principal. {@link #JWT_IDENTIFIER} or {@link #SAML_IDENTIFIER}
+   * are implemented by default.
+   *
+   * @param token
+   *          the token in creation
+   * @since 10.0
+   */
+  protected void appendCustomArgs(DefaultAuthToken token) {
+    Principal principal = selectUserPrincipal();
+    if (principal instanceof JwtPrincipal) {
+      JwtPrincipal jwt = (JwtPrincipal) principal;
+      token.withCustomArgs(JWT_IDENTIFIER, jwt.getJwtTokenString(), jwt.getRefreshSecret());
+    }
+    else if (principal instanceof SamlPrincipal) {
+      SamlPrincipal saml = (SamlPrincipal) principal;
+      token.withCustomArgs(SAML_IDENTIFIER, saml.getSessionIndex());
+    }
+  }
+
+  /**
+   * @return the primary principal by default is the first principal
+   * @since 10.0
+   */
+  protected Principal selectUserPrincipal() {
+    Subject subject = Subject.getSubject(AccessController.getContext());
+    if (subject == null) {
+      return null;
+    }
+    return subject.getPrincipals().stream()
+        .findFirst()
+        .orElse(null);
   }
 
   /**
