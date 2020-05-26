@@ -27,14 +27,13 @@ export default class MenuBarLayout extends AbstractLayout {
       htmlContainer = HtmlComponent.get($container),
       ellipsis;
 
-    this.undoShrink(menuItems);
-
     ellipsis = arrays.find(menuItems, menuItem => {
       return menuItem.ellipsis;
     });
 
     this.preferredLayoutSize($container, {
-      widthHint: htmlContainer.availableSize().width
+      widthHint: htmlContainer.availableSize().width,
+      undo: false
     });
 
     // first set visible to ensure the correct menu gets the tabindex. Therefore the ellipsis visibility is split.
@@ -81,17 +80,22 @@ export default class MenuBarLayout extends AbstractLayout {
       return new Dimension(0, 0);
     }
     let visibleMenuItems = this._menuBar.orderedMenuItems.all.filter(menuItem => {
-        return menuItem.visible;
-      }, this),
-      overflowMenuItems = visibleMenuItems.filter(menuItem => {
-        let overflown = menuItem.overflown;
-        menuItem._setOverflown(false);
-        return overflown;
-      }),
-      overflowableIndexes = [],
-      htmlComp = HtmlComponent.get($container),
-      prefSize = new Dimension(0, 0),
-      prefWidth = Number.MAX_VALUE;
+      return menuItem.visible;
+    }, this);
+    let overflowMenuItems = visibleMenuItems.filter(menuItem => {
+      let overflown = menuItem.overflown;
+      menuItem._setOverflown(false);
+      return overflown;
+    });
+    let shrinkedMenuItems = visibleMenuItems.filter(menuItem => {
+      let shrinked = !menuItem.textVisible;
+      this.undoShrink([menuItem]);
+      return shrinked;
+    });
+    let overflowableIndexes = [];
+    let htmlComp = HtmlComponent.get($container);
+    let prefSize = new Dimension(0, 0);
+    let prefWidth = Number.MAX_VALUE;
 
     // consider avoid falsy 0 in tabboxes a 0 withHint will be used to calculate the minimum width
     if (options.widthHint === 0 || options.widthHint) {
@@ -133,10 +137,16 @@ export default class MenuBarLayout extends AbstractLayout {
       prefSize = this._prefSize(visibleMenuItems);
     }
 
-    // reset overflown
-    overflowMenuItems.forEach(menuItem => {
-      menuItem._setOverflown(true);
-    });
+    if (scout.nvl(options.undo, true)) {
+      // reset overflown
+      overflowMenuItems.forEach(menuItem => {
+        menuItem._setOverflown(true);
+      });
+
+      // reset shrink
+      this.undoShrink(visibleMenuItems);
+      this.shrink(shrinkedMenuItems);
+    }
 
     this._visibleMenuItems = visibleMenuItems;
     return prefSize.add(htmlComp.insets());
@@ -247,7 +257,7 @@ export default class MenuBarLayout extends AbstractLayout {
    * @memberOf MenuBarLayout
    */
   static size(htmlMenuBar, containerSize) {
-    let menuBarSize = htmlMenuBar.prefSize();
+    let menuBarSize = htmlMenuBar.prefSize({widthHint: containerSize.width});
     menuBarSize.width = containerSize.width;
     menuBarSize = menuBarSize.subtract(htmlMenuBar.margins());
     return menuBarSize;
