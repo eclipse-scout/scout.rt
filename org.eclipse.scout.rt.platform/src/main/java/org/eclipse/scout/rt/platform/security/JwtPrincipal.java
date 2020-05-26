@@ -10,7 +10,10 @@
  */
 package org.eclipse.scout.rt.platform.security;
 
+import java.io.Serializable;
 import java.security.AccessController;
+import java.security.Principal;
+import java.util.Objects;
 
 import javax.security.auth.Subject;
 
@@ -19,53 +22,42 @@ import javax.security.auth.Subject;
  *
  * @since 10.0
  */
-public class JwtPrincipal extends SimplePrincipal {
-
+public class JwtPrincipal implements Principal, Serializable {
   private static final long serialVersionUID = 1L;
+
+  private final String m_name;
   private final String m_jwtTokenString;
+  private String m_refreshSecret;
 
   /**
    * @param name
    *          is the username or userId
    * @param jwtTokenString
-   *          saml index or oicd token string
+   *          oidc token string
    */
   public JwtPrincipal(String name, String jwtTokenString) {
-    super(name);
+    if (name == null) {
+      throw new IllegalArgumentException("name must not be null");
+    }
+    m_name = name;
     m_jwtTokenString = jwtTokenString;
   }
 
+  @Override
+  public String getName() {
+    return m_name;
+  }
+
+  @Override
+  public String toString() {
+    return getName();
+  }
+
   /**
-   * @return String based representation of a JSON web token, saml index or oicd token string
+   * @return String based representation of a JSON web token, resp. oidc token string
    */
   public String getJwtTokenString() {
     return m_jwtTokenString;
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((m_jwtTokenString == null) ? 0 : m_jwtTokenString.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!super.equals(obj)) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    JwtPrincipal other = (JwtPrincipal) obj;
-    if (m_jwtTokenString == null) {
-      return other.m_jwtTokenString == null;
-    }
-    else return m_jwtTokenString.equals(other.m_jwtTokenString);
   }
 
   /**
@@ -89,5 +81,32 @@ public class JwtPrincipal extends SimplePrincipal {
         .map(f -> ((JwtPrincipal) f).getJwtTokenString())
         .findAny()
         .orElse(null);
+  }
+
+  public void setRefreshSecret(String refreshSecret) {
+    m_refreshSecret = refreshSecret;
+  }
+
+  public String getRefreshSecret() {
+    return m_refreshSecret;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    JwtPrincipal that = (JwtPrincipal) o;
+    return m_name.equals(that.m_name) &&
+        Objects.equals(m_jwtTokenString, that.m_jwtTokenString) &&
+        Objects.equals(m_refreshSecret, that.m_refreshSecret);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_name, m_jwtTokenString, m_refreshSecret);
   }
 }

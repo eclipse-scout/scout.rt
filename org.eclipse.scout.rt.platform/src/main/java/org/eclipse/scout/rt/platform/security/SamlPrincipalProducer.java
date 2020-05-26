@@ -14,15 +14,15 @@ import java.security.Principal;
 import java.util.List;
 
 /**
- * JSON web token principal producer
+ * SAML token principal producer
  *
  * @since 10.0
  */
-public class JwtPrincipalProducer implements IPrincipalProducer, IPrincipalProducer2 {
+public class SamlPrincipalProducer implements IPrincipalProducer, IPrincipalProducer2 {
 
   @Override
   public Principal produce(String username) {
-    return new JwtPrincipal(username, null);
+    return new SamlPrincipal(username, null);
   }
 
   /**
@@ -30,16 +30,13 @@ public class JwtPrincipalProducer implements IPrincipalProducer, IPrincipalProdu
    *          or userId
    * @param params
    *          <br/>
-   *          [0] = jwtTokenString<br/>
-   *          [1] = refreshSecret, Optional
+   *          [0] = sessionIndex
    * @return the new {@link Principal}
    */
   @Override
   public Principal produce(String username, List<String> params) {
-    String jwtTokenString = params != null && params.size() > 0 ? params.get(0) : null;
-    String refreshSecret = params != null && params.size() > 1 ? params.get(1) : null;
-    JwtPrincipal principal = new JwtPrincipal(username, jwtTokenString);
-    principal.setRefreshSecret(refreshSecret);
+    String sessionIndex = params != null && params.size() > 0 ? params.get(0) : null;
+    SamlPrincipal principal = new SamlPrincipal(username, sessionIndex);
     return principal;
   }
 }

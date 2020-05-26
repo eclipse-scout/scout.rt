@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import static org.junit.Assert.assertTrue;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +20,11 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.security.JwtPrincipal;
 import org.eclipse.scout.rt.platform.security.KeyPairBytes;
+import org.eclipse.scout.rt.platform.security.SamlPrincipal;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
+import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
@@ -98,7 +102,7 @@ public class DefaultAuthTokenTest {
   }
 
   @Test
-  public void testWithCustomToken() {
+  public void testWithCustomArgs() {
     DefaultAuthTokenVerifier verifier = BEANS.get(DefaultAuthTokenVerifier.class);
 
     DefaultAuthToken t = BEANS.get(DefaultAuthTokenSigner.class).sign(BEANS.get(DefaultAuthToken.class).withUserId("foo").withCustomArgs("bar"));
@@ -115,5 +119,41 @@ public class DefaultAuthTokenTest {
     Assert.assertEquals(t.getValidUntil(), t2.getValidUntil());
     Assert.assertEquals(t.getCustomArgs().get(0), t2.getCustomArgs().get(0));
     Assert.assertTrue(verifier.verify(t2));
+  }
+
+  @Test
+  public void testWithCustomArgsOfSimplePrincipal() {
+    DefaultAuthToken t1 = BEANS.get(DefaultAuthTokenSigner.class).sign(BEANS.get(DefaultAuthToken.class).withUserId("foo").withCustomArgs("bar"));
+    DefaultAuthToken t2 = BEANS.get(DefaultAuthToken.class).read(t1.toString());
+    Assert.assertTrue(BEANS.get(DefaultAuthTokenVerifier.class).verify(t2));
+    Principal principal = BEANS.get(DefaultAuthTokenPrincipalProducer.class).produce(t2.getUserId(), t2.getCustomArgs());
+    Assert.assertTrue(principal instanceof SimplePrincipal);
+    SimplePrincipal s = (SimplePrincipal) principal;
+    Assert.assertEquals("foo", s.getName());
+  }
+
+  @Test
+  public void testWithCustomArgsOfJwtPrincipal() {
+    DefaultAuthToken t1 = BEANS.get(DefaultAuthTokenSigner.class).sign(BEANS.get(DefaultAuthToken.class).withUserId("foo").withCustomArgs("jwt", "bar", "secret"));
+    DefaultAuthToken t2 = BEANS.get(DefaultAuthToken.class).read(t1.toString());
+    Assert.assertTrue(BEANS.get(DefaultAuthTokenVerifier.class).verify(t2));
+    Principal principal = BEANS.get(DefaultAuthTokenPrincipalProducer.class).produce(t2.getUserId(), t2.getCustomArgs());
+    Assert.assertTrue(principal instanceof JwtPrincipal);
+    JwtPrincipal jwt = (JwtPrincipal) principal;
+    Assert.assertEquals("foo", jwt.getName());
+    Assert.assertEquals("bar", jwt.getJwtTokenString());
+    Assert.assertEquals("secret", jwt.getRefreshSecret());
+  }
+
+  @Test
+  public void testWithCustomArgsOfSamlPrincipal() {
+    DefaultAuthToken t1 = BEANS.get(DefaultAuthTokenSigner.class).sign(BEANS.get(DefaultAuthToken.class).withUserId("foo").withCustomArgs("saml", "bar"));
+    DefaultAuthToken t2 = BEANS.get(DefaultAuthToken.class).read(t1.toString());
+    Assert.assertTrue(BEANS.get(DefaultAuthTokenVerifier.class).verify(t2));
+    Principal principal = BEANS.get(DefaultAuthTokenPrincipalProducer.class).produce(t2.getUserId(), t2.getCustomArgs());
+    Assert.assertTrue(principal instanceof SamlPrincipal);
+    SamlPrincipal saml = (SamlPrincipal) principal;
+    Assert.assertEquals("foo", saml.getName());
+    Assert.assertEquals("bar", saml.getSessionIndex());
   }
 }
