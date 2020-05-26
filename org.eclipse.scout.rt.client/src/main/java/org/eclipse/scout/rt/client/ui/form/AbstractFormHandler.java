@@ -78,7 +78,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
 
   /**
    * This method is called in order to check field validity.<br>
-   * This method is called just after the {@link IForm#interceptCheckFields()} but before the form is validated and
+   * This method is called just after the {@link AbstractForm#interceptCheckFields()} but before the form is validated and
    * stored.<br>
    * After this method, the form is checking fields itself and displaying a dialog with missing and invalid fields.
    *
@@ -94,7 +94,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
 
   /**
    * This method is called in order to update derived states like button enablings.<br>
-   * This method is called after the {@link IForm#interceptValidate()} but before the form is stored.<br>
+   * This method is called after the {@link AbstractForm#interceptValidate()} but before the form is stored.<br>
    *
    * @return true when validate is successful, false to silently cancel the current process
    * @throws ProcessingException
