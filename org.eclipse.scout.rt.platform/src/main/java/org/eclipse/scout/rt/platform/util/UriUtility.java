@@ -57,10 +57,10 @@ public final class UriUtility {
    * @return map with parsed query parameters. Never <code>null</code>.
    */
   public static Map<String, String> getQueryParameters(URL url, String encoding) {
-    if (url == null) {
+    if (url == null || url.getQuery() == null) {
       return new HashMap<>(0);
     }
-    return getQueryParameters(urlToUri(url), encoding);
+    return getQueryParameters(url.toString(), encoding);
   }
 
   /**
@@ -85,6 +85,10 @@ public final class UriUtility {
     if (uri == null || uri.getQuery() == null) {
       return new HashMap<>(0);
     }
+    return getQueryParameters(uri.toString(), encoding);
+  }
+
+  private static Map<String, String> getQueryParameters(String uri, String encoding) {
     String[] params = getQueryString(uri).split("&");
     Map<String, String> result = new HashMap<>(params.length);
     for (String param : params) {
@@ -109,8 +113,7 @@ public final class UriUtility {
    * Find exact query string instead of decoded query string from {@link URI#getQuery()} to allow for encoded characters
    * like '=' in query values.
    */
-  private static String getQueryString(URI uri) {
-    final String uriString = Assertions.assertNotNull(uri).toString();
+  private static String getQueryString(final String uriString) {
     final int start = uriString.indexOf('?');
     if (start > 0) {
       final int fragmentStart = uriString.indexOf('#', start);
