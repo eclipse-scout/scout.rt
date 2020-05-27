@@ -76,16 +76,16 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   ITreeContextMenu getContextMenu();
 
   /**
-   * @see #setScrollToSelection()
+   * @see #setScrollToSelection(boolean)
    */
   boolean isScrollToSelection();
 
   /**
-   * @param b
+   * @param scrollToSelection
    *          true: advices the attached ui to make the current selection visible. The current selection will be
    *          scrolled to visible (again, whenever the table size changes).
    */
-  void setScrollToSelection(boolean b);
+  void setScrollToSelection(boolean scrollToSelection);
 
   /**
    * May be used when {@link #isScrollToSelection()} = false on individual occasion where selection shall be scrolled to
@@ -119,11 +119,11 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   ITreeNode getRootNode();
 
-  void setRootNode(ITreeNode root);
+  void setRootNode(ITreeNode rootNode);
 
   String getTitle();
 
-  void setTitle(String s);
+  void setTitle(String title);
 
   String getIconId();
 
@@ -142,11 +142,11 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   boolean isAutoTitle();
 
-  void setAutoTitle(boolean b);
+  void setAutoTitle(boolean autoTitle);
 
   boolean isDragEnabled();
 
-  void setDragEnabled(boolean b);
+  void setDragEnabled(boolean dragEnabled);
 
   ITreeNode findNode(Object primaryKey);
 
@@ -154,11 +154,11 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   boolean isRootNodeVisible();
 
-  void setRootNodeVisible(boolean b);
+  void setRootNodeVisible(boolean rootNodeVisible);
 
   boolean isRootHandlesVisible();
 
-  void setRootHandlesVisible(boolean b);
+  void setRootHandlesVisible(boolean rootHandlesVisible);
 
   void ensureVisible(ITreeNode node);
 
@@ -190,7 +190,7 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   boolean isAutoCheckChildNodes();
 
-  void setAutoCheckChildNodes(boolean b);
+  void setAutoCheckChildNodes(boolean autoCheckChildNodes);
 
   boolean isSelectedNode(ITreeNode node);
 
@@ -261,7 +261,6 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   TreeListeners treeListeners();
 
   /**
-   * @param listener
    * @param eventTypes
    *          of {@link TreeEvent} TYPE_*
    */
@@ -276,9 +275,8 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   /**
    * Add the listener so it is called as <em>last</em> listener
    * <p>
-   * Use {@link #addTreeListener(TreeListener)} in all other cases
+   * Use {@link AbstractTree#addTreeListener(TreeListener, Integer...)} in all other cases
    *
-   * @param listener
    * @param eventTypes
    *          of {@link TreeEvent} TYPE_*
    */
@@ -309,21 +307,21 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
    * <b>Please note:</b> Multi-select is not supported by the HTML UI yet. Multiple nodes can be selected
    * programmatically using {@link #selectNodes(Collection, boolean)}.
    *
-   * @param b
+   * @param multiSelect
    *          {@code true} if it should be possible to select multiple nodes. {@code false} otherwise.
    */
-  void setMultiSelect(boolean b);
+  void setMultiSelect(boolean multiSelect);
 
   /**
    * true if multiple nodes can be checked (default true)
    */
   boolean isMultiCheck();
 
-  void setMultiCheck(boolean b);
+  void setMultiCheck(boolean multiCheck);
 
   boolean isCheckable();
 
-  void setCheckable(boolean b);
+  void setCheckable(boolean checkable);
 
   CheckableStyle getCheckableStyle();
 
@@ -342,23 +340,21 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   /**
    * see {@link #getNodeHeightHint()}
    */
-  void setNodeHeightHint(int h);
+  void setNodeHeightHint(int heightHint);
 
   boolean isAutoDiscardOnDelete();
 
-  void setAutoDiscardOnDelete(boolean on);
+  void setAutoDiscardOnDelete(boolean autoDiscardOnDelete);
 
   boolean isTreeChanging();
 
-  void setTreeChanging(boolean b);
+  void setTreeChanging(boolean changing);
 
   boolean isNodeExpanded(ITreeNode node);
 
   void setNodeExpanded(ITreeNode node, boolean expanded);
 
   /**
-   * @param node
-   * @param expanded
    * @param lazy
    *          true to expand the node lazily, false if not. Only has an effect if the expanded is set to true, see also
    *          {@link ITreeNode#isExpandedLazy()}
@@ -370,29 +366,29 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
    */
   void setNodeExpandedInternal(ITreeNode node, boolean expanded, boolean lazy);
 
-  void setNodeEnabledPermission(ITreeNode node, Permission p);
+  void setNodeEnabledPermission(ITreeNode node, Permission permission);
 
   boolean isNodeEnabled(ITreeNode node);
 
-  void setNodeEnabled(ITreeNode node, boolean b);
+  void setNodeEnabled(ITreeNode node, boolean enabled);
 
   boolean isNodeEnabledGranted(ITreeNode node);
 
-  void setNodeEnabledGranted(ITreeNode node, boolean b);
+  void setNodeEnabledGranted(ITreeNode node, boolean enabledGranted);
 
-  void setNodeVisiblePermission(ITreeNode node, Permission p);
+  void setNodeVisiblePermission(ITreeNode node, Permission permission);
 
   boolean isNodeVisible(ITreeNode node);
 
-  void setNodeVisible(ITreeNode node, boolean b);
+  void setNodeVisible(ITreeNode node, boolean visible);
 
   boolean isNodeVisibleGranted(ITreeNode node);
 
-  void setNodeVisibleGranted(ITreeNode node, boolean b);
+  void setNodeVisibleGranted(ITreeNode node, boolean visibleGranted);
 
   boolean isNodeLeaf(ITreeNode node);
 
-  void setNodeLeaf(ITreeNode node, boolean b);
+  void setNodeLeaf(ITreeNode node, boolean leaf);
 
   void setNodeChecked(ITreeNode node, boolean checked);
 
@@ -481,11 +477,11 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   Set<ITreeNode> getUpdatedNodes();
 
-  TreeVisitResult visitTree(IDepthFirstTreeVisitor<ITreeNode> v);
+  TreeVisitResult visitTree(IDepthFirstTreeVisitor<ITreeNode> visitor);
 
-  TreeVisitResult visitVisibleTree(IDepthFirstTreeVisitor<ITreeNode> v);
+  TreeVisitResult visitVisibleTree(IDepthFirstTreeVisitor<ITreeNode> visitor);
 
-  TreeVisitResult visitNode(ITreeNode node, IDepthFirstTreeVisitor<ITreeNode> v);
+  TreeVisitResult visitNode(ITreeNode node, IDepthFirstTreeVisitor<ITreeNode> visitor);
 
   /**
    * unload all children and mark node as not loaded
@@ -518,29 +514,28 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   boolean isSaveAndRestoreScrollbars();
 
   /**
-   * @param b
+   * @param saveAndRestoreScrollbars
    *          {@code true} advices the attached UI to save or restore its horizontal and vertical coordinates of its
    *          scrollbars.
    */
-  void setSaveAndRestoreScrollbars(boolean b);
+  void setSaveAndRestoreScrollbars(boolean saveAndRestoreScrollbars);
 
   String getDisplayStyle();
 
   /**
-   * @see {@link #DISPLAY_STYLE_DEFAULT}, {@link #DISPLAY_STYLE_BREADCRUMB}
+   * @see #DISPLAY_STYLE_DEFAULT, #DISPLAY_STYLE_BREADCRUMB
    */
-  void setDisplayStyle(String style);
+  void setDisplayStyle(String displayStyle);
 
   boolean isToggleBreadcrumbStyleEnabled();
 
-  void setToggleBreadcrumbStyleEnabled(boolean b);
+  void setToggleBreadcrumbStyleEnabled(boolean toggleBreadcrumbStyleEnabled);
 
   /**
    * informs the attached UI that a node has changed in a way that may affect its presentation (e.g. text, font,
    * color...) but no structural changes occurred
    *
-   * @param abstractTreeNode
    * @since 3.10.0-M5
    */
-  void fireNodeChanged(ITreeNode abstractTreeNode);
+  void fireNodeChanged(ITreeNode treeNode);
 }
