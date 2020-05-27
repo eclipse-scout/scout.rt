@@ -49,7 +49,7 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
     return m_global;
   }
 
-  protected boolean isDisposeOnChange() {
+  public boolean isDisposeOnChange() {
     return m_disposeOnChange;
   }
 
@@ -64,7 +64,7 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
   @Override
   public void handlePropertyChange(Object oldValue, Object newValue) {
     if (m_disposeOnChange) {
-      disposeAdapters(newValue);
+      disposeObsoleteAdapters(newValue);
     }
     createAdapters(newValue);
   }
@@ -122,17 +122,17 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
    * If the new value is <i>not</i> a collection:<br>
    * Dispose all old owned adapters.
    */
-  protected void disposeAdapters(Object newModels) {
+  protected void disposeObsoleteAdapters(Object newModels) {
     Set<IJsonAdapter<?>> attachedAdapters = new HashSet<>(m_ownedAdapters);
     for (IJsonAdapter<?> adapter : attachedAdapters) {
       if (newModels instanceof Collection) {
         // Dispose adapter only if's model is not part of the new models
         if (!((Collection<?>) newModels).contains(adapter.getModel())) {
-          disposeAdapterImpl(adapter);
+          disposeAdapter(adapter);
         }
       }
       else {
-        disposeAdapterImpl(adapter);
+        disposeAdapter(adapter);
       }
     }
   }
@@ -140,7 +140,7 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
   /**
    * Disposes the given adapter and removes it from the set of owned adapters.
    */
-  protected void disposeAdapterImpl(IJsonAdapter<?> adapter) {
+  public void disposeAdapter(IJsonAdapter<?> adapter) {
     adapter.dispose();
     m_ownedAdapters.remove(adapter);
   }

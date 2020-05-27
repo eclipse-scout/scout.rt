@@ -121,7 +121,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     }
     detachModel();
     disposeChildAdapters();
-    m_uiSession.unregisterJsonAdapter(m_id);
+    m_uiSession.unregisterJsonAdapter(this);
     m_disposed = true;
   }
 

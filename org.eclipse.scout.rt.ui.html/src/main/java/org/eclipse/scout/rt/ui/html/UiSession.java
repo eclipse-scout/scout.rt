@@ -1064,11 +1064,12 @@ public class UiSession implements IUiSession {
   }
 
   @Override
-  public void unregisterJsonAdapter(String id) {
+  public void unregisterJsonAdapter(IJsonAdapter<?> jsonAdapter) {
     // Remove it from the registry. All subsequent calls of "getAdapter(id)" will return null.
-    m_jsonAdapterRegistry.remove(id);
+    m_jsonAdapterRegistry.remove(jsonAdapter.getId());
     // Remove it completely from the response (including events targeting the adapter).
-    m_currentJsonResponse.removeJsonAdapter(id);
+    m_currentJsonResponse.removeJsonAdapter(jsonAdapter.getId());
+    m_listeners.fireEvent(new UiSessionEvent(this, UiSessionEvent.TYPE_ADAPTER_DISPOSED, jsonAdapter));
   }
 
   /**

@@ -199,7 +199,7 @@ public interface IUiSession {
 
   void registerJsonAdapter(IJsonAdapter<?> adapter);
 
-  void unregisterJsonAdapter(String id);
+  void unregisterJsonAdapter(IJsonAdapter<?> adapter);
 
   /**
    * Blocks the current thread/request until a model job started by a background job has terminated.

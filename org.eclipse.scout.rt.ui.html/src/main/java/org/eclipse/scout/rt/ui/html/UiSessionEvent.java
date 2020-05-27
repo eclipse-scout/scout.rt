@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 public class UiSessionEvent extends EventObject {
 
   public static final int TYPE_ADAPTER_CREATED = 100;
+  public static final int TYPE_ADAPTER_DISPOSED = 200;
 
   private final int m_type;
   private IJsonAdapter<?> m_jsonAdapter;
