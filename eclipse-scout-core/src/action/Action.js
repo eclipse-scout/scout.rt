@@ -386,4 +386,8 @@ export default class Action extends Widget {
 
     this.doAction();
   }
+
+  setActionStyle(actionStyle) {
+    this.setProperty('actionStyle', actionStyle);
+  }
 }

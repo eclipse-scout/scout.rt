@@ -259,6 +259,16 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
   }
 
   @Override
+  public int getActionStyle() {
+    return m_wrappedMenu.getActionStyle();
+  }
+
+  @Override
+  public void setActionStyle(int actionStyle) {
+    unsupported();
+  }
+
+  @Override
   public String getKeyStroke() {
     return m_wrappedMenu.getKeyStroke();
   }

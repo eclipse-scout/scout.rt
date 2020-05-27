@@ -64,7 +64,8 @@
       "toggleAction": false,
       "keyStroke": null,
       "keyStrokeFirePolicy": 0,
-      "textPosition": "default"
+      "textPosition": "default",
+      "actionStyle": 0
     },
     "Menu": {
       "defaultMenu": null,

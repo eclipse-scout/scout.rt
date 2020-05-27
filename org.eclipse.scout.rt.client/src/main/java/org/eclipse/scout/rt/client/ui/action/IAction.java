@@ -31,6 +31,7 @@ public interface IAction extends IWidget, IOrdered, IStyleable, IVisibleDimensio
   String PROP_KEYSTROKE_FIRE_POLICY = "keyStrokeFirePolicy";
   String PROP_ORDER = "order";
   String PROP_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
+  String PROP_ACTION_STYLE = "actionStyle";
 
   byte HORIZONTAL_ALIGNMENT_LEFT = -1;
   byte HORIZONTAL_ALIGNMENT_RIGHT = 1;
@@ -40,6 +41,9 @@ public interface IAction extends IWidget, IOrdered, IStyleable, IVisibleDimensio
    * The text will be positioned below the icon. It has no effect if no icon is set.
    */
   String TEXT_POSITION_BOTTOM = "bottom";
+
+  int ACTION_STYLE_DEFAULT = 0;
+  int ACTION_STYLE_BUTTON = 1;
 
   /**
    * Fire keystroke only when the action is accessible (e.g. not covered by a modal dialog)<br>
@@ -83,6 +87,10 @@ public interface IAction extends IWidget, IOrdered, IStyleable, IVisibleDimensio
   String getTextPosition();
 
   void setTextPosition(String position);
+
+  int getActionStyle();
+
+  void setActionStyle(int style);
 
   /**
    * Key stroke with format lowercase [shift-] [control-] [alternate-] key
