@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,7 +56,20 @@ export function get(cssClass, properties, additionalClass) {
     window.document.body.appendChild(elem);
     element = elem;
   }
-  elem.className = cssClass;
+
+  let cssClassArray = arrays.ensure(cssClass);
+  elem.className = cssClassArray[0];
+  for (let i = 1; i < cssClassArray.length; i++) {
+    let childElem = elem.children[0];
+    if (!childElem) {
+      childElem = window.document.createElement('div');
+      childElem.style.display = 'none';
+      elem.appendChild(childElem);
+    }
+    elem = childElem;
+    elem.className = cssClassArray[i];
+  }
+
   if (additionalClass) {
     elem.className += ' ' + additionalClass;
   }
@@ -64,7 +77,14 @@ export function get(cssClass, properties, additionalClass) {
   notResolvedProperties.forEach(property => {
     style[property.nameCamelCase] = computedStyle[property.name];
   });
-  elem.className = '';
+
+  elem = element;
+
+  do {
+    elem.className = '';
+    elem = elem.children[0];
+  }
+  while (elem);
 
   return style;
 }

@@ -16,6 +16,33 @@ describe('scout.styles', () => {
   beforeEach(() => {
     setFixtures(sandbox());
     $sandbox = $('#sandbox');
+    $('<style>' +
+      '.inner-class {' +
+      '  background-color: #FF0000;' +
+      '  border-color: #FFFFFF;' +
+      '}' +
+      '.outer-class .middle-class .inner-class {' +
+      '  background-color: #00FF00;' +
+      '}' +
+      '.outer-class .middle-class.variant-b .inner-class {' +
+      '  background-color: #0000FF;' +
+      '  border-color: #000000;' +
+      '}' +
+      '</style>').appendTo($sandbox);
+  });
+
+  it('can get styles', () => {
+    expect(styles.get()).toEqual({});
+    expect(styles.get('inner-class', 'backgroundColor').backgroundColor).toBe('rgb(255, 0, 0)');
+    expect(styles.get(['inner-class'], 'backgroundColor').backgroundColor).toBe('rgb(255, 0, 0)');
+    expect(styles.get(['inner-class'], 'borderColor').borderColor).toBe('rgb(255, 255, 255)');
+    expect(styles.get(['outer-class', 'inner-class'], 'backgroundColor').backgroundColor).toBe('rgb(255, 0, 0)');
+    expect(styles.get(['middle-class', 'inner-class'], 'backgroundColor').backgroundColor).toBe('rgb(255, 0, 0)');
+    expect(styles.get(['outer-class', 'middle-class', 'inner-class'], 'backgroundColor').backgroundColor).toBe('rgb(0, 255, 0)');
+    expect(styles.get(['outer-class', 'middle-class', 'inner-class'], 'borderColor').borderColor).toBe('rgb(255, 255, 255)');
+    expect(styles.get(['middle-class variant-b', 'inner-class'], 'backgroundColor').backgroundColor).toBe('rgb(255, 0, 0)');
+    expect(styles.get(['outer-class', 'middle-class variant-b', 'inner-class'], 'backgroundColor').backgroundColor).toBe('rgb(0, 0, 255)');
+    expect(styles.get(['outer-class', 'middle-class variant-b', 'inner-class'], 'borderColor').borderColor).toBe('rgb(0, 0, 0)');
   });
 
   it('can merge colors', () => {
