@@ -144,7 +144,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
       .attr('stroke-width', (this.scaleWeight / 6) + 'px') // width of the pointer bar depends on size of chart
       .attr('fill', 'none');
 
-    if (this.animated) {
+    if (this.animationDuration) {
       let that = this;
       let tweenIn = function(now, fx) {
         let val = this.getAttribute('data-end') * fx.pos;
@@ -153,10 +153,9 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
       };
 
       this.$pointer
-        .delay(200)
         .animate({
           tabIndex: 0
-        }, this._createAnimationObjectWithTabindexRemoval(tweenIn));
+        }, this._createAnimationObjectWithTabindexRemoval(tweenIn, this.animationDuration));
     } else {
       this._updatePointer(valuePercentage);
       this._updatePartsFill(valuePercentage);

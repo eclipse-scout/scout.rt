@@ -29,65 +29,387 @@
   }
 
   /* Internal mixin used to define a single auto color */
-  .chart-auto-color-fill(@color, @hover-color) {
+  .chart-auto-color-fill(@color) {
     fill: @color;
+  }
 
+  .chart-auto-color-fill-hover(@hover-color) {
+    &.hover,
     &:not(.legend-bubble):hover {
       fill: @hover-color;
     }
   }
 
+  .chart-auto-color-stroke(@color) {
+    stroke: @color;
+  }
+
+  .chart-auto-color-stroke-hover(@hover-color) {
+    &.hover {
+      stroke: @hover-color;
+    }
+  }
+
   /* Mixin to define .color0 - .color5 fill and stroke colors */
-  .chart-auto-colors(@color1, @color2, @color3, @color4, @color5, @color6, @active-color:red) {
+  .chart-auto-colors(@color1, @color2, @color3, @color4, @color5, @color6) {
     fill: @color1;
 
     & .color0 {
-      #scout.chart-auto-color-fill(@color1, @active-color);
+      #scout.chart-auto-color-fill(@color1);
     }
 
     & .color1 {
-      #scout.chart-auto-color-fill(@color2, @active-color);
+      #scout.chart-auto-color-fill(@color2);
     }
 
     & .color2 {
-      #scout.chart-auto-color-fill(@color3, @active-color);
+      #scout.chart-auto-color-fill(@color3);
     }
 
     & .color3 {
-      #scout.chart-auto-color-fill(@color4, @active-color);
+      #scout.chart-auto-color-fill(@color4);
     }
 
     & .color4 {
-      #scout.chart-auto-color-fill(@color5, @active-color);
+      #scout.chart-auto-color-fill(@color5);
     }
 
     & .color5 {
-      #scout.chart-auto-color-fill(@color6, @active-color);
+      #scout.chart-auto-color-fill(@color6);
     }
+  }
 
+  .chart-auto-stroke-colors(@color1, @color2, @color3, @color4, @color5, @color6) {
     & .stroke-color0 {
-      stroke: @color1;
+      #scout.chart-auto-color-stroke(@color1);
     }
 
     & .stroke-color1 {
-      stroke: @color2;
+      #scout.chart-auto-color-stroke(@color2);
     }
 
     & .stroke-color2 {
-      stroke: @color3;
+      #scout.chart-auto-color-stroke(@color3);
     }
 
     & .stroke-color3 {
-      stroke: @color4;
+      #scout.chart-auto-color-stroke(@color4);
     }
 
     & .stroke-color4 {
-      stroke: @color5;
+      #scout.chart-auto-color-stroke(@color5);
     }
 
     & .stroke-color5 {
-      stroke: @color6;
+      #scout.chart-auto-color-stroke(@color6);
     }
+  }
+
+  .chart-auto-colors-hover(@active-color:red) {
+    & .color0 {
+      #scout.chart-auto-color-fill-hover(@active-color);
+    }
+
+    & .color1 {
+      #scout.chart-auto-color-fill-hover(@active-color);
+    }
+
+    & .color2 {
+      #scout.chart-auto-color-fill-hover(@active-color);
+    }
+
+    & .color3 {
+      #scout.chart-auto-color-fill-hover(@active-color);
+    }
+
+    & .color4 {
+      #scout.chart-auto-color-fill-hover(@active-color);
+    }
+
+    & .color5 {
+      #scout.chart-auto-color-fill-hover(@active-color);
+    }
+  }
+
+  .chart-auto-stroke-colors-hover(@active-color) {
+
+    & .stroke-color0 {
+      #scout.chart-auto-color-stroke-hover(@active-color);
+    }
+
+    & .stroke-color1 {
+      #scout.chart-auto-color-stroke-hover(@active-color);
+    }
+
+    & .stroke-color2 {
+      #scout.chart-auto-color-stroke-hover(@active-color);
+    }
+
+    & .stroke-color3 {
+      #scout.chart-auto-color-stroke-hover(@active-color);
+    }
+
+    & .stroke-color4 {
+      #scout.chart-auto-color-stroke-hover(@active-color);
+    }
+
+    & .stroke-color5 {
+      #scout.chart-auto-color-stroke-hover(@active-color);
+    }
+  }
+
+  /* Mixin to define auto color for different color schemes */
+  .chart-auto-colors-schemes() {
+    #scout.chart-auto-colors(
+      @chart-data-color-1,
+      @chart-data-color-2,
+      @chart-data-color-3,
+      @chart-data-color-4,
+      @chart-data-color-5,
+      @chart-data-color-6);
+
+    .inverted & {
+      #scout.chart-auto-colors(
+        @chart-data-color-1-inverted,
+        @chart-data-color-2-inverted,
+        @chart-data-color-3-inverted,
+        @chart-data-color-4-inverted,
+        @chart-data-color-5-inverted,
+        @chart-data-color-6-inverted);
+    }
+
+    .color-alternative & {
+      #scout.chart-auto-colors(
+        @chart-data-color-1-alternative,
+        @chart-data-color-2-alternative,
+        @chart-data-color-3-alternative,
+        @chart-data-color-4-alternative,
+        @chart-data-color-5-alternative,
+        @chart-data-color-6-alternative);
+    }
+
+    .color-alternative.inverted & {
+      #scout.chart-auto-colors(
+        @chart-data-color-1-alternative-inverted,
+        @chart-data-color-2-alternative-inverted,
+        @chart-data-color-3-alternative-inverted,
+        @chart-data-color-4-alternative-inverted,
+        @chart-data-color-5-alternative-inverted,
+        @chart-data-color-6-alternative-inverted);
+    }
+
+    .color-rainbow & {
+      #scout.chart-auto-colors(
+        @chart-data-color-1-rainbow,
+        @chart-data-color-2-rainbow,
+        @chart-data-color-3-rainbow,
+        @chart-data-color-4-rainbow,
+        @chart-data-color-5-rainbow,
+        @chart-data-color-6-rainbow);
+    }
+  }
+
+  .chart-auto-stroke-colors-schemes() {
+    #scout.chart-auto-stroke-colors(
+      @chart-data-color-1,
+      @chart-data-color-2,
+      @chart-data-color-3,
+      @chart-data-color-4,
+      @chart-data-color-5,
+      @chart-data-color-6);
+
+    .inverted & {
+      #scout.chart-auto-stroke-colors(
+        @chart-data-color-1-inverted,
+        @chart-data-color-2-inverted,
+        @chart-data-color-3-inverted,
+        @chart-data-color-4-inverted,
+        @chart-data-color-5-inverted,
+        @chart-data-color-6-inverted);
+    }
+
+    .color-alternative & {
+      #scout.chart-auto-stroke-colors(
+        @chart-data-color-1-alternative,
+        @chart-data-color-2-alternative,
+        @chart-data-color-3-alternative,
+        @chart-data-color-4-alternative,
+        @chart-data-color-5-alternative,
+        @chart-data-color-6-alternative);
+    }
+
+    .color-alternative.inverted & {
+      #scout.chart-auto-stroke-colors(
+        @chart-data-color-1-alternative-inverted,
+        @chart-data-color-2-alternative-inverted,
+        @chart-data-color-3-alternative-inverted,
+        @chart-data-color-4-alternative-inverted,
+        @chart-data-color-5-alternative-inverted,
+        @chart-data-color-6-alternative-inverted);
+    }
+
+    .color-rainbow & {
+      #scout.chart-auto-stroke-colors(
+        @chart-data-color-1-rainbow,
+        @chart-data-color-2-rainbow,
+        @chart-data-color-3-rainbow,
+        @chart-data-color-4-rainbow,
+        @chart-data-color-5-rainbow,
+        @chart-data-color-6-rainbow);
+    }
+  }
+
+  .chart-auto-colors-schemes-hover() {
+    #scout.chart-auto-colors-hover(@chart-data-active-color);
+
+    .inverted & {
+      #scout.chart-auto-colors-hover(@chart-data-active-color-inverted);
+    }
+
+    .color-alternative & {
+      #scout.chart-auto-colors-hover(@chart-data-active-color-alternative);
+    }
+
+    .color-alternative.inverted & {
+      #scout.chart-auto-colors-hover(@chart-data-active-color-alternative-inverted);
+    }
+
+    .color-rainbow & {
+      #scout.chart-auto-colors-hover(@chart-data-active-color-rainbow);
+    }
+  }
+
+  .chart-auto-stroke-colors-schemes-hover() {
+    #scout.chart-auto-stroke-colors-hover(@chart-data-active-color);
+
+    .inverted & {
+      #scout.chart-auto-stroke-colors-hover(@chart-data-active-color-inverted);
+    }
+
+    .color-alternative & {
+      #scout.chart-auto-stroke-colors-hover(@chart-data-active-color-alternative);
+    }
+
+    .color-alternative.inverted & {
+      #scout.chart-auto-stroke-colors-hover(@chart-data-active-color-alternative-inverted);
+    }
+
+    .color-rainbow & {
+      #scout.chart-auto-stroke-colors-hover(@chart-data-active-color-rainbow);
+    }
+  }
+
+  /* Mixin to define different colors for different color schemes */
+  .chart-stroke-colors-schemes(@stroke-color-default:red, @stroke-color-inverted:red, @stroke-color-alternative:red, @stroke-color-alternative-inverted:red, @stroke-color-rainbow:red) {
+    #scout.chart-auto-stroke-colors(
+      @stroke-color-default,
+      @stroke-color-default,
+      @stroke-color-default,
+      @stroke-color-default,
+      @stroke-color-default,
+      @stroke-color-default);
+
+    .inverted & {
+      #scout.chart-auto-stroke-colors(
+        @stroke-color-inverted,
+        @stroke-color-inverted,
+        @stroke-color-inverted,
+        @stroke-color-inverted,
+        @stroke-color-inverted,
+        @stroke-color-inverted);
+    }
+
+    .color-alternative & {
+      #scout.chart-auto-stroke-colors(
+        @stroke-color-alternative,
+        @stroke-color-alternative,
+        @stroke-color-alternative,
+        @stroke-color-alternative,
+        @stroke-color-alternative,
+        @stroke-color-alternative);
+    }
+
+    .color-alternative.inverted & {
+      #scout.chart-auto-stroke-colors(
+        @stroke-color-alternative-inverted,
+        @stroke-color-alternative-inverted,
+        @stroke-color-alternative-inverted,
+        @stroke-color-alternative-inverted,
+        @stroke-color-alternative-inverted,
+        @stroke-color-alternative-inverted);
+    }
+
+    .color-rainbow & {
+      #scout.chart-auto-stroke-colors(
+        @stroke-color-rainbow,
+        @stroke-color-rainbow,
+        @stroke-color-rainbow,
+        @stroke-color-rainbow,
+        @stroke-color-rainbow,
+        @stroke-color-rainbow);
+    }
+  }
+
+  .chart-colors-schemes-hover(@active-color-default:red, @active-color-inverted:red, @active-color-alternative:red, @active-color-alternative-inverted:red, @active-color-rainbow:red) {
+    #scout.chart-auto-colors-hover(@active-color-default);
+
+    .inverted & {
+      #scout.chart-auto-colors-hover(@active-color-inverted);
+    }
+
+    .color-alternative & {
+      #scout.chart-auto-colors-hover(@active-color-alternative);
+    }
+
+    .color-alternative.inverted & {
+      #scout.chart-auto-colors-hover(@active-color-alternative-inverted);
+    }
+
+    .color-rainbow & {
+      #scout.chart-auto-colors-hover(@active-color-rainbow);
+    }
+  }
+
+  .chart-stroke-colors-schemes-hover(@active-color-default:red, @active-color-inverted:red, @active-color-alternative:red, @active-color-alternative-inverted:red, @active-color-rainbow:red) {
+    #scout.chart-auto-stroke-colors-hover(@active-color-default);
+
+    .inverted & {
+      #scout.chart-auto-stroke-colors-hover(@active-color-inverted);
+    }
+
+    .color-alternative & {
+      #scout.chart-auto-stroke-colors-hover(@active-color-alternative);
+    }
+
+    .color-alternative.inverted & {
+      #scout.chart-auto-stroke-colors-hover(@active-color-alternative-inverted);
+    }
+
+    .color-rainbow & {
+      #scout.chart-auto-stroke-colors-hover(@active-color-rainbow);
+    }
+  }
+
+  /* Mixin to define colors for all color schemes */
+  .chart-colors-hover(@active-color:red) {
+    #scout.chart-colors-schemes-hover(@active-color, @active-color, @active-color, @active-color, @active-color);
+  }
+
+  /* Mixin to define label and grid color */
+  .chart-label-grid-colors() {
+    & .label {
+
+      fill: @chart-legend-label-color;
+
+      .inverted & {
+        fill: @palette-white;
+      }
+    }
+
+    & .grid {
+      fill: @chart-axis-line-color;
+    }
+
   }
 }
 
@@ -105,12 +427,8 @@
   margin-top: 10px;
 }
 
-.chart > canvas {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-}
-
+.bar-chart > .elements,
+.chart > canvas,
 .chart > svg {
   width: 100%;
   height: 100%;
@@ -121,58 +439,37 @@
     outline: none;
   }
 
-  #scout.chart-auto-colors(
-    @chart-data-color-1,
-    @chart-data-color-2,
-    @chart-data-color-3,
-    @chart-data-color-4,
-    @chart-data-color-5,
-    @chart-data-color-6,
-    @chart-data-active-color);
+  #scout.chart-label-grid-colors();
+  #scout.chart-auto-colors-schemes();
+  #scout.chart-auto-stroke-colors-schemes();
+  #scout.chart-auto-colors-schemes-hover();
+  #scout.chart-auto-stroke-colors-schemes-hover();
+}
 
-  .tile.inverted & {
-    #scout.chart-auto-colors(
-      @chart-data-color-1-inverted,
-      @chart-data-color-2-inverted,
-      @chart-data-color-3-inverted,
-      @chart-data-color-4-inverted,
-      @chart-data-color-5-inverted,
-      @chart-data-color-6-inverted,
-      @chart-data-active-color-inverted);
-  }
+.pie-chart > .elements,
+.doughnut-chart > .elements {
+  #scout.chart-label-grid-colors();
+  #scout.chart-auto-colors-schemes();
+  #scout.chart-stroke-colors-schemes(
+    @tile-default-background-color,
+    @tile-default-inverted-background-color,
+    @tile-alternative-background-color,
+    @tile-alternative-inverted-background-color,
+    @tile-default-background-color);
+  #scout.chart-auto-colors-schemes-hover();
+  #scout.chart-stroke-colors-schemes-hover(
+    @tile-default-background-color,
+    @tile-default-inverted-background-color,
+    @tile-alternative-background-color,
+    @tile-alternative-inverted-background-color,
+    @tile-default-background-color);
+}
 
-  .tile.color-alternative & {
-    #scout.chart-auto-colors(
-      @chart-data-color-1-alternative,
-      @chart-data-color-2-alternative,
-      @chart-data-color-3-alternative,
-      @chart-data-color-4-alternative,
-      @chart-data-color-5-alternative,
-      @chart-data-color-6-alternative,
-      @chart-data-active-color-alternative);
-  }
-
-  .tile.color-alternative.inverted & {
-    #scout.chart-auto-colors(
-      @chart-data-color-1-alternative-inverted,
-      @chart-data-color-2-alternative-inverted,
-      @chart-data-color-3-alternative-inverted,
-      @chart-data-color-4-alternative-inverted,
-      @chart-data-color-5-alternative-inverted,
-      @chart-data-color-6-alternative-inverted,
-      @chart-data-active-color-alternative-inverted);
-  }
-
-  .tile.color-rainbow & {
-    #scout.chart-auto-colors(
-      @chart-data-color-1-rainbow,
-      @chart-data-color-2-rainbow,
-      @chart-data-color-3-rainbow,
-      @chart-data-color-4-rainbow,
-      @chart-data-color-5-rainbow,
-      @chart-data-color-6-rainbow,
-      @chart-data-active-color-rainbow);
-  }
+.line-chart > .elements {
+  #scout.chart-label-grid-colors();
+  #scout.chart-auto-colors-schemes();
+  #scout.chart-auto-stroke-colors-schemes();
+  #scout.chart-colors-hover(@palette-white);
 }
 
 text.legend-label,
@@ -180,7 +477,7 @@ text.legend-label-grid {
 
   fill: @chart-legend-label-color;
 
-  .tile.inverted & {
+  .inverted & {
     fill: @palette-white;
   }
 }
@@ -208,7 +505,7 @@ text.chart-y-axis-label {
   dominant-baseline: central;
   font-size: @font-size-normal;
 
-  .tile.inverted & {
+  .inverted & {
     fill: @palette-white;
   }
 }
@@ -217,7 +514,7 @@ text.line-label {
   fill: @chart-line-label-color;
   font-size: @font-size-normal;
 
-  .tile.inverted & {
+  .inverted & {
     fill: @palette-white;
   }
 }
@@ -252,7 +549,7 @@ textPath.chart-x-axis-label {
   dominant-baseline: middle;
   font-size: @font-size-normal;
 
-  .tile.inverted & {
+  .inverted & {
     fill: @palette-white;
   }
 }
@@ -336,7 +633,7 @@ path.fulfillment-chart {
     }
   }
 
-  .tile.inverted & {
+  .inverted & {
     &.auto-color {
       fill: @chart-data-color-1-inverted;
 
@@ -376,7 +673,7 @@ text.fulfillment-chart-label {
   fill: @chart-axis-text-color;
   text-anchor: middle;
 
-  .tile.inverted & {
+  .inverted & {
     fill: @fulfillment-chart-inverted-label-color;
   }
 }
@@ -470,7 +767,7 @@ path.speedo-chart-arc, path.pointer {
 line.label-separator {
   stroke: @chart-axis-line-color;
 
-  .tile.inverted & {
+  .inverted & {
     stroke: @palette-white;
   }
 }
@@ -486,12 +783,12 @@ polygon.salesfunnel-chart-bar {
 
   /* Override standard colors set for auto-colors in SVG (see above) */
 
-  .tile.inverted &.auto-color:not(:hover),
-  .tile.inverted.color-alternative &.auto-color:not(:hover) {
+  .inverted &.auto-color:not(:hover),
+  .inverted.color-alternative &.auto-color:not(:hover) {
     fill: @palette-white;
   }
 
-  .tile.inverted &.auto-color:hover {
+  .inverted &.auto-color:hover {
     fill: @salesfunnel-inverted-hover-color;
   }
 }
@@ -527,7 +824,7 @@ text.salesfunnel-label {
   dominant-baseline: central;
   font-size: @font-size-normal;
 
-  .tile.inverted & {
+  .inverted & {
     fill: @palette-white;
   }
 }
@@ -538,7 +835,7 @@ text.salesfunnel-conversionrate-label {
   dominant-baseline: central;
   font-size: @font-size-normal;
 
-  .tile.inverted & {
+  .inverted & {
     fill: @palette-white;
   }
 }
@@ -556,15 +853,15 @@ circle.venn-circle {
   &.auto-color {
     fill: @chart-data-color-2;
 
-    .tile.inverted & {
+    .inverted & {
       fill: @chart-data-text-color;
     }
 
-    .tile.color-alternative & {
+    .color-alternative & {
       fill: @chart-data-color-2-alternative;
     }
 
-    .tile.color-alternative.inverted & {
+    .color-alternative.inverted & {
       fill: @chart-data-color-2-alternative-inverted;
     }
   }

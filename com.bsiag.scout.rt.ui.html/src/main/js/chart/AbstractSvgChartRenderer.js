@@ -128,8 +128,7 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
       heightStart: 0,
       heightEnd: null,
       delay: 200,
-      animate: this.animated,
-      animationDuration: 600,
+      animationDuration: this.animationDuration,
       clickObject: null,
       fill: null,
       opacity: 1,
@@ -271,11 +270,10 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
       .attr('x', offsetLeft)
       .attr('y', offsetTop)
       .text(shorterLabel);
-    if (this.animated) {
+    if (this.animationDuration) {
       $label
         .attr('opacity', 0)
-        .delay(400)
-        .animateSVG('opacity', 1, 400, null, true);
+        .animateSVG('opacity', 1, this.animationDuration, null, true);
     }
 
     addTooltipIfShortLabel.call(this, $label);
@@ -306,11 +304,10 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
       .attr('x', this.labelBox.x)
       .attr('y', offsetTop)
       .text(label);
-    if (this.animated) {
+    if (this.animationDuration) {
       $label
         .attr('opacity', 0)
-        .delay(400)
-        .animateSVG('opacity', 1, 400, null, true);
+        .animateSVG('opacity', 1, this.animationDuration, null, true);
     }
 
     if (color || colorClass) {
@@ -329,11 +326,10 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     if (color) {
       $bubble.attr('fill', color);
     }
-    if (this.animated) {
+    if (this.animationDuration) {
       $bubble
         .attr('opacity', 0)
-        .delay(400)
-        .animateSVG('opacity', 1, 400, null, true);
+        .animateSVG('opacity', 1, this.animationDuration, null, true);
     }
 
     return $bubble;
@@ -376,7 +372,7 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
       if (scout.nvl(value, -1) < 0) {
         return;
       }
-      if (renderRectOptions.animate) {
+      if (renderRectOptions.animationDuration > 0) {
         $rect.animateSVG(attribute, value, renderRectOptions.animationDuration, null, true);
       } else {
         $rect.attr(attribute, value);
@@ -388,11 +384,10 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     let $line = this.$svg.appendSVG('line', lineClass)
       .attr('x1', x1).attr('y1', y1)
       .attr('x2', x2).attr('y2', y2);
-    if (this.animated) {
+    if (this.animationDuration) {
       $line
         .attr('opacity', 0)
-        .delay(200)
-        .animateSVG('opacity', 1, 600, null, true);
+        .animateSVG('opacity', 1, this.animationDuration, null, true);
     }
     return $line;
   }
@@ -412,19 +407,17 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
 
       $label.data('$background', $background);
 
-      if (this.animated) {
+      if (this.animationDuration) {
         $background
           .attr('opacity', 0)
-          .delay(200)
-          .animateSVG('opacity', 1, 600, null, true);
+          .animateSVG('opacity', 1, this.animationDuration, null, true);
       }
     }
 
-    if (this.animated) {
+    if (this.animationDuration) {
       $label
         .attr('opacity', 0)
-        .delay(200)
-        .animateSVG('opacity', 1, 600, null, true);
+        .animateSVG('opacity', 1, this.animationDuration, null, true);
     }
     return $label;
   }
@@ -491,7 +484,7 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
           throw e;
         }
       },
-      duration: duration ? duration : 600,
+      duration: duration ? duration : Chart.DEFAULT_ANIMATION_DURATION,
       complete: function() {
         $(this).removeAttr('tabindex');
       }

@@ -71,12 +71,11 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
       let $arc = this.$svg.appendSVG('path', arcClass)
         .data('animation-start', startAngle)
         .data('animation-end', endAngle);
-      if (this.animated) {
+      if (this.animationDuration) {
         $arc
-          .delay(200)
           .animate({
             tabIndex: 0
-          }, this._createAnimationObjectWithTabindexRemoval(tweenInFunc));
+          }, this._createAnimationObjectWithTabindexRemoval(tweenInFunc, this.animationDuration));
       } else {
         $arc.attr('d', this.pathSegment(startAngle, endAngle));
       }
@@ -129,11 +128,10 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
       .attr('x', labelXPosition)
       .attr('y', labelYPosition)
       .text(percentage);
-    if (this.animated) {
+    if (this.animationDuration) {
       $label2
         .attr('opacity', 0)
-        .delay(600)
-        .animateSVG('opacity', 1, 300, null, true);
+        .animateSVG('opacity', 1, this.animationDuration, null, true);
     }
   }
 

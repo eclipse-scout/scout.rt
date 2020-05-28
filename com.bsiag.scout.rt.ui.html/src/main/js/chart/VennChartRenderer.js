@@ -84,7 +84,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
         return;
       }
       this.readyToDraw = false;
-      this._draw(this.animated, true);
+      this._draw(true, true);
     }.bind(this);
 
     // save callback if user navigated away while calculating and _draw is not executed.
@@ -384,9 +384,9 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
   _updateVenn(venn, animated) {
     // move circle
     venn.$circle
-      .animateSVG('cx', this.centerX + venn.x, animated ? 300 : 0, null, true)
-      .animateSVG('cy', this.centerY + venn.y, animated ? 300 : 0, null, true)
-      .animateSVG('r', venn.r, animated ? 300 : 0, null, true);
+      .animateSVG('cx', this.centerX + venn.x, animated ? this.animationDuration : 0, null, true)
+      .animateSVG('cy', this.centerY + venn.y, animated ? this.animationDuration : 0, null, true)
+      .animateSVG('r', venn.r, animated ? this.animationDuration : 0, null, true);
 
     // set up position legend
     let minR = this.vennCircleHelper.minR,
@@ -415,10 +415,10 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
       .text(text);
 
     // animate if needed
-    if (animated) {
+    if (animated && this.animationDuration) {
       $label
         .attr('opacity', 0)
-        .animateSVG('opacity', 1, 300, null, true);
+        .animateSVG('opacity', 1, this.animationDuration, null, true);
     }
   }
 

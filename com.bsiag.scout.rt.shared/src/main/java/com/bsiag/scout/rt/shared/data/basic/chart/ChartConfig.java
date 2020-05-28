@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.Pair;
@@ -43,7 +44,8 @@ public class ChartConfig implements IChartConfig {
   protected static final String AUTO_COLOR = combine(OPTIONS, "autoColor");
   protected static final String MAX_SEGMENTS = combine(OPTIONS, "maxSegments");
   protected static final String CLICKABLE = combine(OPTIONS, "clickable");
-  protected static final String ANIMATED = combine(OPTIONS, "animated");
+  protected static final String ANIMATION = combine(OPTIONS, "animation");
+  protected static final String ANIMATION_DURATION = combine(ANIMATION, "duration");
   protected static final String TOOLTIPS = combine(OPTIONS, "tooltips");
   protected static final String TOOLTIPS_ENABLED = combine(TOOLTIPS, "enabled");
   protected static final String LEGEND = combine(OPTIONS, "legend");
@@ -73,16 +75,11 @@ public class ChartConfig implements IChartConfig {
     return box(regex ? escapeRegexMetachars("[") : "[", index, regex ? escapeRegexMetachars("]") : "]");
   }
 
-  private ChartConfig() {
-  }
-
-  protected ChartConfig(ChartConfig configToCopy) {
-    m_properties.putAll(configToCopy.m_properties);
-  }
-
   @Override
   public ChartConfig copy() {
-    return new ChartConfig(this);
+    ChartConfig chartConfig = BEANS.get(ChartConfig.class);
+    chartConfig.m_properties.putAll(m_properties);
+    return chartConfig;
   }
 
   /**
@@ -402,18 +399,37 @@ public class ChartConfig implements IChartConfig {
   }
 
   @Override
+  public IChartConfig withAnimationDuration(int duration) {
+    return withProperty(ANIMATION_DURATION, duration);
+  }
+
+  @Override
+  public IChartConfig removeAnimationDuration() {
+    return removeProperty(ANIMATION_DURATION);
+  }
+
+  @Override
+  public int getAnimationDuration() {
+    return (int) getProperty(ANIMATION_DURATION);
+  }
+
+  protected int getDefaultAnimationDuration() {
+    return 600;
+  }
+
+  @Override
   public IChartConfig withAnimated(boolean animated) {
-    return withProperty(ANIMATED, animated);
+    return withAnimationDuration(animated ? getDefaultAnimationDuration() : 0);
   }
 
   @Override
   public IChartConfig removeAnimated() {
-    return removeProperty(ANIMATED);
+    return removeAnimationDuration();
   }
 
   @Override
   public boolean isAnimated() {
-    return (boolean) getProperty(ANIMATED);
+    return getAnimationDuration() > 0;
   }
 
   @Override

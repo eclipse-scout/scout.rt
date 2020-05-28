@@ -23,7 +23,7 @@ export default class AbstractChartRenderer {
     this.session = chart.session;
     this.rendering = false; // true while this.render() is executing
     this.rendered = false;
-    this.animated = false; // set by render() and remove(), makes it unnecessary to carry an argument through all method calls
+    this.animationDuration = 0; // set by render() and remove(), makes it unnecessary to carry an argument through all method calls
   }
 
   validate() {
@@ -69,10 +69,10 @@ export default class AbstractChartRenderer {
   /**
    * @param requestAnimation
    *          Whether animations should be used while rendering the chart. Note that his
-   *          property is ignored when chart.config.options.animated is <code>false</code>!
+   *          property is ignored when chart.config.options.animation.duration is <code>0</code>!
    */
   render(requestAnimation) {
-    this.animated = requestAnimation && this.chart.config.options.animated;
+    this.animationDuration = requestAnimation ? this.chart.config.options.animation.duration : 0;
     if (!this.validate() || !this.chart.rendered) {
       return;
     }
@@ -96,11 +96,11 @@ export default class AbstractChartRenderer {
   /**
    * @param requestAnimation
    *          Whether animations should be used while removing the chart. Note that his
-   *          property is ignored when chart.config.options.animated is <code>false</code>!
+   *          property is ignored when chart.config.options.animation.duration is <code>0</code>!
    */
   remove(requestAnimation, afterRemoveFunc) {
-    this.animated = requestAnimation && this.chart.config.options.animated;
-    if (this.animated && this.rendered) {
+    this.animationDuration = requestAnimation && this.chart.config.options.animation.duration;
+    if (this.animationDuration && this.rendered) {
       this._removeAnimated(afterRemoveFunc);
     } else {
       this._remove(afterRemoveFunc);
@@ -123,4 +123,9 @@ export default class AbstractChartRenderer {
   shouldAnimateRemoveOnUpdate(opts) {
     return opts.requestAnimation;
   }
+
+  renderColorScheme(colorSchemeCssClass) {
+    // Override in subclasses
+  }
+
 }

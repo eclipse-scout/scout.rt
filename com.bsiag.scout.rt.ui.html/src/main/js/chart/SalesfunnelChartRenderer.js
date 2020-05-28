@@ -151,11 +151,10 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       .attr('x', x)
       .attr('y', y)
       .text(this.session.locale.decimalFormat.format(label));
-    if (this.animated) {
+    if (this.animationDuration) {
       $label
         .attr('opacity', 0)
-        .delay(200)
-        .animateSVG('opacity', 1, 600, null, true);
+        .animateSVG('opacity', 1, this.animationDuration, null, true);
     }
     if (this.chart.config.options.tooltips.enabled && this.chart.data.axes.length > 0) {
       let desc = this.chart.data.axes[barIndexFromTop][secondLabel ? 1 : 0].label,
@@ -214,17 +213,16 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       .attr('x', startPointX)
       .attr('y', labelRenderPointY)
       .text('↓ ' + conversionRate + '%');
-    if (this.animated) {
+    if (this.animationDuration) {
       $label
         .attr('opacity', 0)
-        .delay(200)
-        .animateSVG('opacity', 1, 600, null, true);
+        .animateSVG('opacity', 1, this.animationDuration, null, true);
     }
   }
 
   _renderPolygon(renderPolyOptions) {
     let that = this,
-      points = this._calcPolygonPoints(true, this.animated ? 0 : 1, renderPolyOptions.xStart, renderPolyOptions.yStart, renderPolyOptions.width, renderPolyOptions.widthBottom, this.barHeight - 1);
+      points = this._calcPolygonPoints(true, this.animationDuration ? 0 : 1, renderPolyOptions.xStart, renderPolyOptions.yStart, renderPolyOptions.width, renderPolyOptions.widthBottom, this.barHeight - 1);
 
     let $poly = this.$svg.appendSVG('polygon', renderPolyOptions.cssClass, '', renderPolyOptions.id)
       .attr('points', points)
@@ -248,11 +246,10 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       $this.attr('points', that._calcPolygonPoints(true, fx.pos, xStart, yStart, width, widthBottom, height));
     };
 
-    if (this.animated) {
-      $poly.delay(200)
-        .animate({
-          tabIndex: 0
-        }, this._createAnimationObjectWithTabindexRemoval(expandFunc));
+    if (this.animationDuration) {
+      $poly.animate({
+        tabIndex: 0
+      }, this._createAnimationObjectWithTabindexRemoval(expandFunc, this.animationDuration));
     }
     if (this.chart.config.options.clickable) {
       $poly.on('click', renderPolyOptions.clickObject, this.chart._onValueClick.bind(this.chart));
@@ -336,11 +333,10 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       .attr('y1', yCoord)
       .attr('x2', this.barAreaWidth + labelLineWidth)
       .attr('y2', yCoord);
-    if (this.animated) {
+    if (this.animationDuration) {
       $line
         .attr('opacity', 0)
-        .delay(200)
-        .animateSVG('opacity', 1, 600, null, true);
+        .animateSVG('opacity', 1, this.animationDuration, null, true);
     }
   }
 

@@ -103,18 +103,16 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
     if (!this.chart.config.options.autoColor && !chartGroupCss) {
       $arc.attr('fill', color);
     }
-    if (this.animated) {
+    if (this.animationDuration) {
       $arc
         .attr('d', this.pathSegment(0, lastEnd))
-        .delay(200)
         .animate({
           tabIndex: 0
-        }, this._createAnimationObjectWithTabindexRemoval(tweenInFunc));
+        }, this._createAnimationObjectWithTabindexRemoval(tweenInFunc, this.animationDuration));
 
       $label
         .attr('opacity', 0)
-        .delay(400)
-        .animateSVG('opacity', 1, 400, null, true);
+        .animateSVG('opacity', 1, this.animationDuration, null, true);
     } else {
       $arc.attr('d', this.pathSegment(0, end));
     }

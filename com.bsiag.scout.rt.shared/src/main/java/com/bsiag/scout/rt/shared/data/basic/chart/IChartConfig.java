@@ -116,6 +116,12 @@ public interface IChartConfig extends Serializable {
 
   boolean isClickable();
 
+  IChartConfig withAnimationDuration(int duration);
+
+  IChartConfig removeAnimationDuration();
+
+  int getAnimationDuration();
+
   IChartConfig withAnimated(boolean animated);
 
   IChartConfig removeAnimated();

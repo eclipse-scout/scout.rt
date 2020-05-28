@@ -99,7 +99,7 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
       // Loop over each pair of points
       for (j = 0; j < chartValueGroup.values.length; j++) {
         pointValues.push(chartValueGroup.values[j]);
-        let yCoord = this.animated ? this._calculateYCoordinate(0) : this._calculateYCoordinate(chartValueGroup.values[j]);
+        let yCoord = this.animationDuration ? this._calculateYCoordinate(0) : this._calculateYCoordinate(chartValueGroup.values[j]);
         if (j === 0) {
           d += this._addFirstPoint(this._calculateXCoordinate(j), yCoord);
         } else {
@@ -129,12 +129,11 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
         .mouseenter(handleHover)
         .mouseleave(hoverOff);
 
-      if (this.animated) {
+      if (this.animationDuration) {
         $path
-          .delay(200)
           .animate({
             tabIndex: 0
-          }, this._createAnimationObjectWithTabindexRemoval(moveUpFunc));
+          }, this._createAnimationObjectWithTabindexRemoval(moveUpFunc, this.animationDuration));
 
       }
       if (lineColors[i]) {
@@ -152,10 +151,6 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
       }
     }
     this.handleTooBigLabels(widthPerX);
-  }
-
-  remove(animated, afterRemoveFunc) {
-    super.remove(animated, afterRemoveFunc);
   }
 
   _calcDForValuesString(valuesArr, fxPos, negativeDirection) {
@@ -219,7 +214,7 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
 
   _renderValueBubble(index, value, radius, color, groupIndex) {
     let x = this._calculateXCoordinate(index),
-      y = this.animated ? this._calculateYCoordinate(0) : this._calculateYCoordinate(value),
+      y = this.animationDuration ? this._calculateYCoordinate(0) : this._calculateYCoordinate(value),
       endY = this._calculateYCoordinate(value);
 
     let colorClass;
@@ -237,8 +232,8 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
     if (color) {
       $bubble.attr('stroke', color);
     }
-    if (this.animated) {
-      $bubble.animateSVG('cy', endY, 600, null, true);
+    if (this.animationDuration) {
+      $bubble.animateSVG('cy', endY, this.animationDuration, null, true);
     }
 
     let legendPositions = {

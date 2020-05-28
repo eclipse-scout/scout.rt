@@ -38,7 +38,9 @@ export default class Chart extends Widget {
         autoColor: true,
         maxSegments: 5,
         clickable: false,
-        animated: true,
+        animation: {
+          duration: Chart.DEFAULT_ANIMATION_DURATION
+        },
         tooltips: {
           enabled: true
         },
@@ -77,6 +79,7 @@ export default class Chart extends Widget {
     RIGHT: 'right'
   };
 
+  static DEFAULT_ANIMATION_DURATION = 600; // ms
   static DEFAULT_DEBOUNCE_TIMEOUT = 100; // ms
 
   _init(model) {
@@ -227,7 +230,7 @@ export default class Chart extends Widget {
 
   _updateChartRenderer() {
     this.chartRenderer && this.chartRenderer.remove();
-    this.chartRenderer = this._resolveChartRenderer();
+    this.setProperty('chartRenderer', this._resolveChartRenderer());
   }
 
   _onValueClick(event) {
