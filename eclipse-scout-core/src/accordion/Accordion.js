@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, HtmlComponent, LoadingSupport, objects, RowLayout, Widget, widgets} from '../index';
+import {AccordionLayout, arrays, HtmlComponent, LoadingSupport, objects, Widget, widgets} from '../index';
 
 export default class Accordion extends Widget {
   constructor() {
@@ -47,7 +47,7 @@ export default class Accordion extends Widget {
   }
 
   _createLayout() {
-    return new RowLayout();
+    return new AccordionLayout();
   }
 
   _renderProperties() {

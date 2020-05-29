@@ -133,6 +133,7 @@ export {default as AbortKeyStroke} from './keystroke/AbortKeyStroke';
 export {default as TabItemKeyStroke} from './keystroke/TabItemKeyStroke';
 export {default as Accordion} from './accordion/Accordion';
 export {default as AccordionAdapter} from './accordion/AccordionAdapter';
+export {default as AccordionLayout} from './accordion/AccordionLayout';
 export {default as BoxButtons} from './boxbuttons/BoxButtons';
 export {default as Carousel} from './carousel/Carousel';
 export {default as CarouselLayout} from './carousel/CarouselLayout';
