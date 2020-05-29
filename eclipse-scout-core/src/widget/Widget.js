@@ -361,11 +361,11 @@ export default class Widget {
    * Here values of the model are applied to the DOM / UI.
    */
   _renderProperties() {
-    this._renderTrackFocus();
+    this._renderCssClass();
     this._renderEnabled();
     this._renderVisible();
+    this._renderTrackFocus();
     this._renderFocused();
-    this._renderCssClass();
     this._renderLoading();
     this._renderScrollTop();
     this._renderScrollLeft();
