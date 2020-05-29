@@ -521,10 +521,38 @@ export default class Menu extends Action {
     return Action.ActionStyle.BUTTON === this.actionStyle;
   }
 
+  /**
+   * @deprecated use insertChildActions instead
+   * @param childActions
+   */
   addChildActions(childActions) {
-    let newActions = this.childActions.slice();
-    arrays.pushAll(newActions, arrays.ensure(childActions));
-    this.setChildActions(newActions);
+    this.insertChildActions(childActions);
+  }
+
+  insertChildAction(actionsToInsert) {
+    this.insertChildActions([actionsToInsert]);
+  }
+
+  insertChildActions(actionsToInsert) {
+    actionsToInsert = arrays.ensure(actionsToInsert);
+    if (actionsToInsert.length === 0) {
+      return;
+    }
+    this.setChildActions(this.childActions.concat(actionsToInsert));
+  }
+
+  deleteChildAction(actionToDelete) {
+    this.deleteChildActions([actionToDelete]);
+  }
+
+  deleteChildActions(actionsToDelete) {
+    actionsToDelete = arrays.ensure(actionsToDelete);
+    if (actionsToDelete.length === 0) {
+      return;
+    }
+    let actions = this.childActions.slice();
+    arrays.removeAll(actions, actionsToDelete);
+    this.setChildActions(actions);
   }
 
   setChildActions(childActions) {
