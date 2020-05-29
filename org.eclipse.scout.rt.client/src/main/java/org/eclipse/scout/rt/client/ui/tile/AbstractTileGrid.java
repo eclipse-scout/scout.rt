@@ -223,8 +223,8 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   /**
    * Configures the layout hints.
    * <p>
-   * You may use {@link #calculatePreferredWidth()} if you want to limit the max width based on the column count, column
-   * width and column gap.
+   * You may use {@link TileGridLayoutConfig#usePreferredWidth(int)} if you want to limit the max width based on the
+   * column count, column width and column gap.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(10)
@@ -694,7 +694,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   @Override
   public JobInput createAsyncLoadJobInput(ITile tile) {
     return Jobs.newInput()
-        .withRunContext(ClientRunContexts.copyCurrent().withProperty(PROP_RUN_CONTEXT_TILE, tile))
+        .withRunContext(ClientRunContexts.copyCurrent().withProperty(PROP_RUN_CONTEXT_TILE_LOAD_CANCELLABLE, tile))
         .withName(PROP_ASYNC_LOAD_JOBNAME_PREFIX)
         .withExecutionHint(PROP_ASYNC_LOAD_IDENTIFIER_PREFIX + getAsyncLoadIdentifier())
         .withExecutionHint(PROP_WINDOW_IDENTIFIER_PREFIX + getWindowIdentifier());

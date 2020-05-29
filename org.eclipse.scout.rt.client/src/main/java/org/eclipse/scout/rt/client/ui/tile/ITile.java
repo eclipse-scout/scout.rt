@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 /**
  * @since 8.0
  */
-public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject, IDataChangeObserver {
+public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject, IDataChangeObserver, ITileLoadCancellable {
   String PROP_ORDER = "order";
   String PROP_COLOR_SCHEME = "colorScheme";
   String PROP_GRID_DATA_HINTS = "gridDataHints";
@@ -64,8 +64,6 @@ public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject,
   void ensureDataLoaded();
 
   void loadData();
-
-  void onLoadDataCancel();
 
   @Override
   void setLoading(boolean loading);
