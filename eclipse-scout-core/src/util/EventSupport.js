@@ -119,30 +119,30 @@ export default class EventSupport {
     event = event || {};
     event.type = type;
 
-    let i, listener, listeners = this._eventListeners.slice();
-    for (i = 0; i < listeners.length; i++) {
-      listener = listeners[i];
-      if (!listener.type || typeMatches.call(this, event, listener.type)) {
+    // Create copy because firing a trigger might modify the list of listeners
+    let listeners = this._eventListeners.slice();
+    // Use traditional "for" loop to reduce size of stack trace
+    for (let i = 0; i < listeners.length; i++) {
+      let listener = listeners[i];
+      if (!listener.type || this._typeMatches(event, listener.type)) {
         listener.func(event);
       }
     }
+  }
 
-    // ---- Helper functions -----
-
-    function typeMatches(event, listenerType) {
-      let eventType = event.type;
-      let types = listenerType.split(' ');
-      // support for multi type definition 'type1 type2 [...]'
-      for (let i = 0; i < types.length; i++) {
-        if (eventType === types[i]) {
-          return true;
-        }
-        if (this._subTypeMatches(event, types[i])) {
-          return true;
-        }
+  _typeMatches(event, listenerType) {
+    let eventType = event.type;
+    let types = listenerType.split(' ');
+    // support for multi type definition 'type1 type2 [...]'
+    for (let i = 0; i < types.length; i++) {
+      if (eventType === types[i]) {
+        return true;
       }
-      return false;
+      if (this._subTypeMatches(event, types[i])) {
+        return true;
+      }
     }
+    return false;
   }
 
   _subTypeMatches(event, listenerType) {
