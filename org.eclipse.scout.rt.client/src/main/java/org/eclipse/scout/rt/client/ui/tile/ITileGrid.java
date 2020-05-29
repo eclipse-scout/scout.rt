@@ -46,7 +46,7 @@ public interface ITileGrid<T extends ITile> extends IWidget, IExtensibleObject, 
   String PROP_ASYNC_LOAD_JOBNAME_PREFIX = "tileAsyncDataLoadJob";
   String PROP_ASYNC_LOAD_IDENTIFIER_PREFIX = "tileAsyncDataLoadIdentifier";
   String PROP_WINDOW_IDENTIFIER_PREFIX = "tileDataLoadWindowsIdentifier";
-  String PROP_RUN_CONTEXT_TILE = "tileDataLoadWindowsIdentifier";
+  String PROP_RUN_CONTEXT_TILE_LOAD_CANCELLABLE = "tileDataLoadWindowsIdentifier";
 
   String LOGICAL_GRID_HORIZONTAL = "HorizontalGrid";
   String LOGICAL_GRID_VERTICAL_SMART = "VerticalSmartGrid";
@@ -210,9 +210,6 @@ public interface ITileGrid<T extends ITile> extends IWidget, IExtensibleObject, 
    */
   void sort();
 
-  /**
-   * @param menus
-   */
   void setMenus(List<? extends IMenu> menus);
 
   @Override

@@ -36,7 +36,6 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.data.tile.ITileColorScheme;
 import org.eclipse.scout.rt.shared.data.tile.TileColorScheme;
@@ -140,7 +139,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     if (viewOrder == IOrdered.DEFAULT_ORDER) {
       while (cls != null && ITile.class.isAssignableFrom(cls)) {
         if (cls.isAnnotationPresent(Order.class)) {
-          Order order = (Order) cls.getAnnotation(Order.class);
+          Order order = cls.getAnnotation(Order.class);
           return order.value();
         }
         cls = cls.getSuperclass();
@@ -474,13 +473,13 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
         BEANS.get(TileDataLoadManager.class).schedule(() -> {
           try {
             final DATA data = doLoadData();
-            runInModelJob(() -> {
+            BEANS.get(TileDataLoadManager.class).runInModelJob(() -> {
               setLoading(false);
               updateModelData(data);
             });
           }
           catch (final Throwable e) { // Catch Throwable so we can handle all AbstractInterruptionError accordingly
-            runInModelJob(() -> {
+            BEANS.get(TileDataLoadManager.class).runInModelJob(() -> {
               setLoading(false);
               handleLoadDataException(e);
             });
@@ -493,13 +492,6 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
         setLoading(false);
         handleLoadDataException(e);
       }
-    }
-
-    protected void runInModelJob(IRunnable r) {
-      ModelJobs.schedule(r,
-          ModelJobs.newInput(ClientRunContexts.copyCurrent()
-              .withRunMonitor(BEANS.get(RunMonitor.class))) // do not use same RunMonitor since it might have been canceled and job will not execute in that case
-              .withName("setting tile data"));
     }
 
     protected DATA doLoadData() {

@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.job.filter.future.ModelJobFutureFilter;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -56,8 +57,8 @@ public class TileDataLoadManager {
           if (event.getData().getFuture().isCancelled()) { // still needed, MANUAL_CANCELLATION_MARKER used to filter Jobs cancelled manually, Jobs cancelled e.g. when expired should be handled here
             final ClientRunContext runContext = (ClientRunContext) event.getData().getFuture().getJobInput().getRunContext();
             ModelJobs.schedule(() -> {
-              ITile tile = runContext.getProperty(ITileGrid.PROP_RUN_CONTEXT_TILE);
-              tile.onLoadDataCancel();
+              ITileLoadCancellable tileLoadCancellable = runContext.getProperty(ITileGrid.PROP_RUN_CONTEXT_TILE_LOAD_CANCELLABLE);
+              tileLoadCancellable.onLoadDataCancel();
             }, ModelJobs.newInput(runContext.copy().withRunMonitor(BEANS.get(RunMonitor.class))).withName("handling of cancelled tile data load jobs"));
           }
         });
@@ -86,6 +87,13 @@ public class TileDataLoadManager {
     // cancel running jobs that do not have the excludeJobName but share the same windowIdentifier
     Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
         .andMatchFuture(futures).toFilter(), true);
+  }
+
+  public void runInModelJob(IRunnable r) {
+    ModelJobs.schedule(r,
+        ModelJobs.newInput(ClientRunContexts.copyCurrent()
+            .withRunMonitor(BEANS.get(RunMonitor.class))) // do not use same RunMonitor since it might have been canceled and job will not execute in that case
+            .withName("setting tile data"));
   }
 
   public static class JobExcludeCurrentByIdentifierFilter implements Predicate<IFuture<?>> {
