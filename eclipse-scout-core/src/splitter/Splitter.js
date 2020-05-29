@@ -16,12 +16,16 @@ export default class Splitter extends Widget {
   constructor() {
     super();
     this.splitHorizontal = true;
-    this.$anchor = null;
-    this.$root = null;
+    this.$anchor = null; // optional
+    this.$root = null; // optional (fallback is this.$parent)
     this.position = null; // current splitter position in pixels, updated by updatePosition()
     this.orientation = 'top'; // Direction set to position the splitter inside the root element ('top', 'right', 'bottom' or 'left')
+    this.layoutData = null;
+
     this._cursorOffset = 0; // distance from cursor to splitter, makes resizing smoother by preventing initial 'jump'
     this._mouseDownHandler = this._onMouseDown.bind(this);
+    this._$window = null;
+    this._$body = null;
   }
 
   _init(model) {
@@ -33,6 +37,7 @@ export default class Splitter extends Widget {
     this.$container = this.$parent.appendDiv('splitter')
       .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
+
     this._$window = this.$parent.window();
     this._$body = this.$parent.body();
   }
@@ -71,10 +76,9 @@ export default class Splitter extends Widget {
     if (!$.isNumeric(position)) {
       position = this._derivePositionFromAnchor();
     }
-    if (position === this.position) {
-      return;
+    if (position !== this.position) {
+      this._setPosition(position);
     }
-    this._setPosition(position);
     return position;
   }
 
@@ -165,14 +169,13 @@ export default class Splitter extends Widget {
   }
 
   _getSplitterPosition(event) {
-    let rootBounds = graphics.offsetBounds(this.$root);
+    let rootBounds = graphics.offsetBounds(this.$root || this.$parent);
     if (this.splitHorizontal) {
       let x = event.pageX + this._cursorOffset.left - rootBounds.x;
       return (this.orientation === 'right' ? rootBounds.width - x : x);
     }
     let y = event.pageY + this._cursorOffset.top - rootBounds.y;
     return (this.orientation === 'bottom' ? rootBounds.height - y : y);
-
   }
 
   _onMouseMove(event) {
