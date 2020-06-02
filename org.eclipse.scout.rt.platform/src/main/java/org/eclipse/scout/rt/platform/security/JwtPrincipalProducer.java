@@ -30,16 +30,33 @@ public class JwtPrincipalProducer implements IPrincipalProducer, IPrincipalProdu
    *          or userId
    * @param params
    *          <br/>
-   *          [0] = jwtTokenString<br/>
-   *          [1] = refreshSecret, Optional
+   *          [0] = id_token resp. jwtTokenString<br/>
+   *          [1] = access_token, Optional [2] = refresh_token, Optional
    * @return the new {@link Principal}
    */
   @Override
   public Principal produce(String username, List<String> params) {
     String jwtTokenString = params != null && params.size() > 0 ? params.get(0) : null;
-    String refreshSecret = params != null && params.size() > 1 ? params.get(1) : null;
+    String accessToken = params != null && params.size() > 1 ? params.get(1) : null;
+    String refreshToken = params != null && params.size() > 2 ? params.get(2) : null;
+    return produceJwt(username, jwtTokenString, accessToken, refreshToken);
+  }
+
+  /**
+   * @param username
+   *          or userId
+   * @param jwtTokenString
+   *          id_token
+   * @param accessToken
+   *          access_token
+   * @param refreshToken
+   *          refresh_token
+   * @return a new {@link JwtPrincipal}
+   */
+  public JwtPrincipal produceJwt(String username, String jwtTokenString, String accessToken, String refreshToken) {
     JwtPrincipal principal = new JwtPrincipal(username, jwtTokenString);
-    principal.setRefreshSecret(refreshSecret);
+    principal.setAccessToken(accessToken);
+    principal.setRefreshToken(refreshToken);
     return principal;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.PathValidator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.commons.authentication.ServletFilterHelper;
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
 import org.eclipse.scout.rt.server.commons.servlet.CookieUtility;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
@@ -233,14 +234,8 @@ public class UiServlet extends AbstractHttpServlet {
    * @return <code>true</code> if request was handled, <code>false</code> otherwise.
    */
   protected boolean handleRequestInternal(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    if ("GET".equals(req.getMethod())) {
-      // To make relative URLs work, we need to make sure the request URL has a trailing '/'.
-      // It is not possible to just check for an empty pathInfo because the container returns "/" even if the user has not entered a '/' at the end.
-      String path = req.getServletContext().getContextPath() + req.getServletPath();
-      if (StringUtility.hasText(path) && req.getRequestURI().endsWith(path)) {
-        resp.sendRedirect(req.getRequestURI() + "/");
-        return true;
-      }
+    if (BEANS.get(ServletFilterHelper.class).redirectIncompleteBasePath(req, resp)) {
+      return true;
     }
 
     long start = System.nanoTime();

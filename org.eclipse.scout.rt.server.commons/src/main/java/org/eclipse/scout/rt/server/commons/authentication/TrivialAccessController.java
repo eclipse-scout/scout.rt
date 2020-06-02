@@ -96,30 +96,24 @@ public class TrivialAccessController implements IAccessController {
   }
 
   protected boolean handleRequest(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain) throws IOException, ServletException {
-    // Is a request to base URL? (copy from UiServlet.doGet)
-    final String contextPath = request.getServletContext().getContextPath();
-    if (StringUtility.hasText(contextPath) && request.getRequestURI().endsWith(contextPath)) {
-      StringBuilder uriBuilder = new StringBuilder(request.getRequestURI()).append("/");
-      if (StringUtility.hasText(request.getQueryString())) {
-        uriBuilder.append("?").append(request.getQueryString());
-      }
-      response.sendRedirect(uriBuilder.toString());
+    ServletFilterHelper helper = BEANS.get(ServletFilterHelper.class);
+    if (helper.redirectIncompleteBasePath(request, response)) {
       return true;
     }
 
     // Is running within a valid subject?
-    if (BEANS.get(ServletFilterHelper.class).isRunningWithValidSubject(request)) {
+    if (helper.isRunningWithValidSubject(request)) {
       chain.doFilter(request, response);
       return true;
     }
 
     // Is already authenticated?
-    final Principal principal = BEANS.get(ServletFilterHelper.class).findPrincipal(request, m_config.getPrincipalProducer());
+    final Principal principal = helper.findPrincipal(request, m_config.getPrincipalProducer());
     if (principal != null) {
       if (m_config.getPrincipalVerifier() != null && !m_config.getPrincipalVerifier().verify(principal)) {
         return false;
       }
-      BEANS.get(ServletFilterHelper.class).continueChainAsSubject(principal, request, response, chain);
+      helper.continueChainAsSubject(principal, request, response, chain);
       return true;
     }
 

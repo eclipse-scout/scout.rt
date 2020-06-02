@@ -88,7 +88,7 @@ public class DefaultAuthTokenSigner {
     Principal principal = selectUserPrincipal();
     if (principal instanceof JwtPrincipal) {
       JwtPrincipal jwt = (JwtPrincipal) principal;
-      token.withCustomArgs(JWT_IDENTIFIER, jwt.getJwtTokenString(), jwt.getRefreshSecret());
+      token.withCustomArgs(JWT_IDENTIFIER, jwt.getJwtTokenString(), jwt.getAccessToken(), jwt.getRefreshToken());
     }
     else if (principal instanceof SamlPrincipal) {
       SamlPrincipal saml = (SamlPrincipal) principal;

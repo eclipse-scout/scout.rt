@@ -27,7 +27,8 @@ public class JwtPrincipal implements Principal, Serializable {
 
   private final String m_name;
   private final String m_jwtTokenString;
-  private String m_refreshSecret;
+  private String m_accessToken;
+  private String m_refreshToken;
 
   /**
    * @param name
@@ -83,12 +84,20 @@ public class JwtPrincipal implements Principal, Serializable {
         .orElse(null);
   }
 
-  public void setRefreshSecret(String refreshSecret) {
-    m_refreshSecret = refreshSecret;
+  public void setAccessToken(String accessToken) {
+    m_accessToken = accessToken;
   }
 
-  public String getRefreshSecret() {
-    return m_refreshSecret;
+  public String getAccessToken() {
+    return m_accessToken;
+  }
+
+  public void setRefreshToken(String refreshToken) {
+    m_refreshToken = refreshToken;
+  }
+
+  public String getRefreshToken() {
+    return m_refreshToken;
   }
 
   @Override
@@ -102,11 +111,12 @@ public class JwtPrincipal implements Principal, Serializable {
     JwtPrincipal that = (JwtPrincipal) o;
     return m_name.equals(that.m_name) &&
         Objects.equals(m_jwtTokenString, that.m_jwtTokenString) &&
-        Objects.equals(m_refreshSecret, that.m_refreshSecret);
+        Objects.equals(m_accessToken, that.m_accessToken) &&
+        Objects.equals(m_refreshToken, that.m_refreshToken);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_name, m_jwtTokenString, m_refreshSecret);
+    return Objects.hash(m_name, m_jwtTokenString, m_accessToken, m_refreshToken);
   }
 }

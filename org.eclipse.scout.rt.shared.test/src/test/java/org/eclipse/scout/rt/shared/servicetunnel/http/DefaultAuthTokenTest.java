@@ -134,7 +134,7 @@ public class DefaultAuthTokenTest {
 
   @Test
   public void testWithCustomArgsOfJwtPrincipal() {
-    DefaultAuthToken t1 = BEANS.get(DefaultAuthTokenSigner.class).sign(BEANS.get(DefaultAuthToken.class).withUserId("foo").withCustomArgs("jwt", "bar", "secret"));
+    DefaultAuthToken t1 = BEANS.get(DefaultAuthTokenSigner.class).sign(BEANS.get(DefaultAuthToken.class).withUserId("foo").withCustomArgs("jwt", "bar", "secret", "refresh"));
     DefaultAuthToken t2 = BEANS.get(DefaultAuthToken.class).read(t1.toString());
     Assert.assertTrue(BEANS.get(DefaultAuthTokenVerifier.class).verify(t2));
     Principal principal = BEANS.get(DefaultAuthTokenPrincipalProducer.class).produce(t2.getUserId(), t2.getCustomArgs());
@@ -142,7 +142,8 @@ public class DefaultAuthTokenTest {
     JwtPrincipal jwt = (JwtPrincipal) principal;
     Assert.assertEquals("foo", jwt.getName());
     Assert.assertEquals("bar", jwt.getJwtTokenString());
-    Assert.assertEquals("secret", jwt.getRefreshSecret());
+    Assert.assertEquals("secret", jwt.getAccessToken());
+    Assert.assertEquals("refresh", jwt.getRefreshToken());
   }
 
   @Test
