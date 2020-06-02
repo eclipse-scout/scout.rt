@@ -36,7 +36,17 @@ public class SamlPrincipalProducer implements IPrincipalProducer, IPrincipalProd
   @Override
   public Principal produce(String username, List<String> params) {
     String sessionIndex = params != null && params.size() > 0 ? params.get(0) : null;
-    SamlPrincipal principal = new SamlPrincipal(username, sessionIndex);
-    return principal;
+    return produceSaml(username, sessionIndex);
+  }
+
+  /**
+   * @param username
+   *          or userId
+   * @param sessionIndex
+   *          session_index
+   * @return a new {@link SamlPrincipal}
+   */
+  public SamlPrincipal produceSaml(String username, String sessionIndex) {
+    return new SamlPrincipal(username, sessionIndex);
   }
 }
