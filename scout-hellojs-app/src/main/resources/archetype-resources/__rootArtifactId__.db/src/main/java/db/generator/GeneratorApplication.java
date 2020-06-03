@@ -34,38 +34,30 @@ public class GeneratorApplication {
   }
 
   public void generate(DSLContext context) {
-	    Configuration configuration = new Configuration()
-	        .withGenerator(new Generator()
-	            .withName(JavaGenerator.class.getName())
-	            .withDatabase(new Database()
-	                .withForcedTypes(
-	                    new ForcedType()
-	                        .withName(UUID.class.getName())
-	                        .withTypes("varchar(36)"),
-	                    new ForcedType()
-	                        .withUserType(Date.class.getName())
-	                        .withConverter(DateConverter.class.getName())
-	                        .withTypes("timestamp"),
-	                    new ForcedType()
-	                        .withName(BigDecimal.class.getName())
-	                        .withTypes("bigint"))
-	                .withName(DerbyDatabase.class.getName())
-	                .withIncludes(".*")
-	                .withSchemata(new Schema()
-	                    .withInputSchema(CONFIG.getPropertyValue(SchemaProperty.class))
-	                    .withOutputSchema("Schema"))
-	                .withExcludes("SYS*.*"))
-	            .withTarget(new Target()
-	                .withDirectory(OUTPUT_DIRECTORY)
-	                .withPackageName(OUTPUT_PACKAGE)));
+      Configuration configuration = new Configuration()
+          .withGenerator(new Generator()
+              .withName(JavaGenerator.class.getName())
+              .withDatabase(new Database()
+                  .withForcedTypes(
+                      new ForcedType().withName(UUID.class.getName()).withTypes("varchar(36)"),
+                      new ForcedType().withUserType(Date.class.getName()).withConverter(DateConverter.class.getName()).withTypes("timestamp"),
+                      new ForcedType().withName(BigDecimal.class.getName()).withTypes("bigint"))
+                  .withName(DerbyDatabase.class.getName())
+                  .withIncludes(".*")
+                  .withInputSchema(CONFIG.getPropertyValue(SchemaProperty.class))
+                  .withOutputSchema("Schema")
+                  .withExcludes("SYS*.*"))
+              .withTarget(new Target()
+                  .withDirectory(OUTPUT_DIRECTORY)
+                  .withPackageName(OUTPUT_PACKAGE)));
 
-	    GenerationTool tool = new GenerationTool();
-	    tool.setConnection(context.configuration().connectionProvider().acquire());
-	    try {
-	      tool.run(configuration);
-	    }
-	    catch (Exception e) {
-	      throw new PlatformException("Error generating jooq classes.", e);
-	    }
-	  }
-	}
+      GenerationTool tool = new GenerationTool();
+      tool.setConnection(context.configuration().connectionProvider().acquire());
+      try {
+        tool.run(configuration);
+      }
+      catch (Exception e) {
+        throw new PlatformException("Error generating jooq classes.", e);
+      }
+    }
+  }
