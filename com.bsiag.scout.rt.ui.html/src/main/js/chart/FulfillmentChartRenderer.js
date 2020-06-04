@@ -56,11 +56,12 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
     }
 
     let startValue = scout.nvl(this.chart.chartData.customProperties.startValue, 0);
-    let lastEnd = Math.min(startValue / total, 0.999999);
     let end = 0;
+    let lastEnd = 0;
     if (total) {
       // use slightly less than 1.0 as max value because otherwise, the SVG element would not be drawn correctly.
       end = Math.min(value / total, 0.999999);
+      lastEnd = Math.min(startValue / total, 0.999999);
     }
     this.r = this.fullR;
 
