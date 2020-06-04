@@ -1,8 +1,0 @@
-autoEnabled=true
-eclipse.preferences.version=1
-extraProperties=
-fileExclusions=
-idePrefixKey=
-projectKey=org.eclipse.scout.sdk\:org.eclipse.scout.sdk\:releases_10.0
-serverId=Scout
-sqPrefixKey=org.eclipse.scout.sdk.core.ecj

@@ -23,7 +23,7 @@
 
   <groupId>org.eclipse.scout.archetypes</groupId>
   <artifactId>scout-helloworld-app</artifactId>
-  <version>10.0.0-SNAPSHOT</version>
+  <version>11.0-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
 
   <name>Scout Hello World Sample Application</name>
@@ -31,7 +31,7 @@
   <url>https://eclipse.org/scout</url>
 
   <properties>
-    <scout.base.version>10.0.0</scout.base.version>
+    <scout.base.version>11.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -108,7 +108,7 @@
   <scm>
     <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</connection>
     <developerConnection>scm:git:ssh://${eclipse_gerrit_username}@git.eclipse.org:29418/scout/org.eclipse.scout.sdk</developerConnection>
-    <tag>releases/10.0</tag>
+    <tag>releases/11.0</tag>
     <url>http://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git/</url>
   </scm>
 

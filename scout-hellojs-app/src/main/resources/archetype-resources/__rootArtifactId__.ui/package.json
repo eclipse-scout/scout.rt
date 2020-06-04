@@ -25,16 +25,16 @@
     "release-postdependency": "releng-scripts release-publish-dependency"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": ">=10.0.0-snapshot <10.0.0",
-    "@eclipse-scout/testing": ">=10.0.0-snapshot <10.0.0",
+    "@eclipse-scout/cli": ">=11.0.0-snapshot <11.0.0",
+    "@eclipse-scout/testing": ">=11.0.0-snapshot <11.0.0",
     "@eclipse-scout/releng": "^10.0.0",
-    "@eclipse-scout/eslint-config": ">=10.0.0-snapshot <10.0.0",
+    "@eclipse-scout/eslint-config": ">=11.0.0-snapshot <11.0.0",
     "eslint": "6.5.1",
     "babel-eslint": "10.0.3",
     "eslint-plugin-babel": "5.3.0"
   },
   "dependencies": {
-    "@eclipse-scout/core": ">=10.0.0-snapshot <10.0.0",
+    "@eclipse-scout/core": ">=11.0.0-snapshot <11.0.0",
     "jquery": "3.4.1"
   }
 }

@@ -25,11 +25,11 @@
     "release-postdependency": "releng-scripts release-publish-dependency"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": ">=10.0.0-snapshot <10.0.0",
+    "@eclipse-scout/cli": ">=11.0.0-snapshot <11.0.0",
     "@eclipse-scout/releng": "^10.0.0"
   },
   "dependencies": {
-    "@eclipse-scout/core": ">=10.0.0-snapshot <10.0.0",
+    "@eclipse-scout/core": ">=11.0.0-snapshot <11.0.0",
     "@${simpleArtifactName}/ui": "file:../${rootArtifactId}.ui/"
   }
 }
