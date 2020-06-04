@@ -184,17 +184,14 @@ export function prefSizeWithoutAnimation($elem, options) {
 /**
  * Returns the size of the element, insets included. The sizes are rounded up, unless the option 'exact' is set to true.
  *
- * OPTION                   DEFAULT VALUE   DESCRIPTION
- * ------------------------------------------------------------------------------------------------------
- * includeMargin            false           Whether to include $elem's margins in the returned size.
- *
- * exact                    false           When set to true the returned dimensions may contain fractional digits, otherwise the sizes are rounded up.
- *
  * @param $elem
  *          the jQuery element to measure
- * @param options
+ * @param {object|boolean} [options]
  *          an optional options object (see table above). Short-hand version: If a boolean is passed instead
  *          of an object, the value is automatically converted to the option "includeMargin".
+ * @param {boolean} [options.includeMargin] Whether to include $elem's margins in the returned size. Default is false.
+ * @param {boolean} [options.exact] When set to true the returned dimensions may contain fractional digits, otherwise the sizes are rounded up. Default is false.
+ * @returns {Dimension}
  */
 export function size($elem, options) {
   if (!$elem[0] || $elem.isDisplayNone()) {

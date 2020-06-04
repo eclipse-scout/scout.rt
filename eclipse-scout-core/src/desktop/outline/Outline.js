@@ -71,6 +71,7 @@ export default class Outline extends Tree {
     this.nodeMenuBarVisible = false;
     this.detailMenuBar = null;
     this.detailMenuBarVisible = false;
+    this.detailContent = null;
 
     this.dialogs = [];
     this.views = [];

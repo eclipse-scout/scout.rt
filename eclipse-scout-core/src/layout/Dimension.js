@@ -11,8 +11,8 @@
 
 /**
  * JavaScript port from java.awt.Dimension.
- * @param vararg width (number) or otherDimension (Dimension)
- * @param height number or undefined (when vararg is Dimension)
+ * @param {number|Dimension} vararg width (number) or otherDimension (Dimension)
+ * @param {number} [height] number or undefined (when vararg is Dimension)
  */
 export default class Dimension {
 

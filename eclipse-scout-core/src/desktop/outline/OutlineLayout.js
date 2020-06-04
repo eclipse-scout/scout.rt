@@ -32,10 +32,7 @@ export default class OutlineLayout extends TreeLayout {
         let pageHtmlComp = selectedNode.htmlComp;
         // pageHtmlComp is null if there is no detail form and no detail menubar
         if (pageHtmlComp) {
-          // Fix width so that prefSize returns the appropriate height (necessary for elements with text wrap)
-          pageHtmlComp.$comp.cssWidth(containerSize.width);
-
-          let prefSize = pageHtmlComp.prefSize();
+          let prefSize = pageHtmlComp.prefSize({widthHint: containerSize.width});
           pageHtmlComp.setSize(new Dimension(containerSize.width, prefSize.height));
           selectedNode.height = prefSize.height + pageHtmlComp.margins().vertical();
         }
@@ -67,6 +64,7 @@ export default class OutlineLayout extends TreeLayout {
   }
 
   _setDataHeight(heightOffset) {
+    /** @type Dimension */
     let titleSize = null;
     if (this.outline.titleVisible) {
       titleSize = graphics.size(this.outline.$title, true);

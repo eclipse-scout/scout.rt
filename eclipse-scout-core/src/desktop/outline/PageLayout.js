@@ -63,8 +63,8 @@ export default class PageLayout extends AbstractLayout {
     }
   }
 
-  preferredLayoutSize($container) {
-    let prefSize, containerSize, textHeight,
+  preferredLayoutSize($container, options) {
+    let prefSize, textHeight,
       iconHeight = 0,
       htmlContainer = this.page.htmlComp,
       detailContentPrefSize = new Dimension(),
@@ -76,9 +76,7 @@ export default class PageLayout extends AbstractLayout {
       nodeMenuBar = this.outline.nodeMenuBar,
       textWidth = 0;
 
-    containerSize = htmlContainer.size()
-      .subtract(htmlContainer.insets());
-    textWidth = containerSize.width;
+    textWidth = options.widthHint;
 
     if ($icon.length > 0) {
       textWidth -= graphics.prefSize($icon).width;
@@ -88,7 +86,7 @@ export default class PageLayout extends AbstractLayout {
       textWidth -= nodeMenuBar.htmlComp.prefSize().width;
     }
 
-    // needs a width to be able to calculate the pref height -> container width needs to be correct already
+    // needs a width to be able to calculate the pref height
     textHeight = graphics.prefSize($text, {
       includeMargin: true,
       widthHint: textWidth
@@ -103,8 +101,7 @@ export default class PageLayout extends AbstractLayout {
       detailMenuBarPrefSize = detailMenuBar.htmlComp.prefSize();
     }
     if (this.outline.detailContent) {
-      // Table row detail may contain wrapped text as well, but since it uses the full width there is no need to give a width hint
-      detailContentPrefSize = this.outline.detailContent.htmlComp.prefSize();
+      detailContentPrefSize = this.outline.detailContent.htmlComp.prefSize(options);
     }
 
     prefSize = new Dimension(Math.max(detailContentPrefSize.width, detailMenuBarPrefSize.width), titlePrefHeight + detailMenuBarPrefSize.height + detailContentPrefSize.height);
