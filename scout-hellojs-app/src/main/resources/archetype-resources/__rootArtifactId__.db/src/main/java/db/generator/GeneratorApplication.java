@@ -17,7 +17,6 @@ import org.jooq.meta.jaxb.Configuration;
 import org.jooq.meta.jaxb.Database;
 import org.jooq.meta.jaxb.ForcedType;
 import org.jooq.meta.jaxb.Generator;
-import org.jooq.meta.jaxb.Schema;
 import org.jooq.meta.jaxb.Target;
 
 import ${package}.db.Environment;
