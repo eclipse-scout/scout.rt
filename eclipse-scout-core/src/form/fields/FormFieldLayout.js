@@ -31,12 +31,13 @@ export default class FormFieldLayout extends AbstractLayout {
   }
 
   // Minimum field with to normal state, for smaller widths the "compact" style is applied.
-  static MIN_FIELD_WIDTH = 61;
+  static COMPACT_FIELD_WIDTH = 61;
 
   _initDefaults() {
     this.mandatoryIndicatorWidth = HtmlEnvironment.get().fieldMandatoryIndicatorWidth;
     this.statusWidth = HtmlEnvironment.get().fieldStatusWidth;
     this.rowHeight = HtmlEnvironment.get().formRowHeight;
+    this.compactFieldWidth = FormFieldLayout.COMPACT_FIELD_WIDTH;
   }
 
   _onHtmlEnvironmenPropertyChange() {
@@ -144,8 +145,10 @@ export default class FormFieldLayout extends AbstractLayout {
       } else {
         graphics.setBounds(formField.$fieldContainer, fieldBounds);
       }
-      formField.$field.toggleClass('compact', fieldBounds.width <= FormFieldLayout.MIN_FIELD_WIDTH);
-      formField.$container.toggleClass('compact', fieldBounds.width <= FormFieldLayout.MIN_FIELD_WIDTH);
+      if (this.compactFieldWidth > -1) {
+        formField.$field.toggleClass('compact', fieldBounds.width <= this.compactFieldWidth);
+        formField.$container.toggleClass('compact', fieldBounds.width <= this.compactFieldWidth);
+      }
 
       if (labelHasFieldWidth) {
         let fieldWidth = fieldSize.add(fieldMargins).width - formField.$label.cssMarginX();
