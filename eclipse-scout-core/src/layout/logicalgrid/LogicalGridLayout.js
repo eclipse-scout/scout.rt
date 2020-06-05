@@ -31,7 +31,7 @@ export default class LogicalGridLayout extends AbstractLayout {
     this.layoutConfig = LogicalGridLayoutConfig.ensure(layoutConfig || {});
     this.layoutConfig.applyToLayout(this);
 
-    this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
+    this.htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);
     HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
     this.widget.one('remove', () => {
       HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
@@ -48,7 +48,7 @@ export default class LogicalGridLayout extends AbstractLayout {
     this.minWidth = 0;
   }
 
-  _onHtmlEnvironmenPropertyChange() {
+  _onHtmlEnvironmentPropertyChange() {
     this._initDefaults();
     this.layoutConfig.applyToLayout(this);
     this.widget.invalidateLayoutTree();

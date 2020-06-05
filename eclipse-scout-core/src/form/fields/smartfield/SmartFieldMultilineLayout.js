@@ -21,7 +21,7 @@ export default class SmartFieldMultilineLayout extends AbstractLayout {
 
     this._initDefaults();
 
-    this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
+    this.htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);
     HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
     this.smartField.one('remove', () => {
       HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
@@ -32,7 +32,7 @@ export default class SmartFieldMultilineLayout extends AbstractLayout {
     this.rowHeight = HtmlEnvironment.get().formRowHeight;
   }
 
-  _onHtmlEnvironmenPropertyChange() {
+  _onHtmlEnvironmentPropertyChange() {
     this._initDefaults();
     this.smartField.invalidateLayoutTree();
   }

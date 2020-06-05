@@ -24,7 +24,7 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
 
     this._initDefaults();
 
-    this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
+    this.htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);
     HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
     this._dateField.one('remove', () => {
       HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
@@ -35,7 +35,7 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
     this.hgap = HtmlEnvironment.get().smallColumnGap;
   }
 
-  _onHtmlEnvironmenPropertyChange() {
+  _onHtmlEnvironmentPropertyChange() {
     this._initDefaults();
     this._dateField.invalidateLayoutTree();
   }

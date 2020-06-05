@@ -36,7 +36,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     // Event handlers
     this._formFieldAddedHandler = this._onFormFieldAdded.bind(this);
     this._compositeFields = [];
-    this._htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
+    this._htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);
   }
 
   static TransformationType = {
@@ -55,7 +55,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     this.compactThreshold = HtmlEnvironment.get().formColumnWidth;
   }
 
-  _onHtmlEnvironmenPropertyChange() {
+  _onHtmlEnvironmentPropertyChange() {
     this._initDefaults();
   }
 
@@ -91,7 +91,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     this._enableTransformation(responsiveState.COMPACT, transformationType.HIDE_PLACE_HOLDER_FIELD);
     this._enableTransformation(responsiveState.COMPACT, transformationType.FIELD_SCALABLE);
 
-    this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
+    this.htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);
     HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
     this.widget.one('remove', () => {
       HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);

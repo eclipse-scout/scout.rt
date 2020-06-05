@@ -23,7 +23,7 @@ export default class FormFieldLayout extends AbstractLayout {
     this.formField = formField;
     this._initDefaults();
 
-    this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
+    this.htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);
     HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
     this.formField.one('remove', () => {
       HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
@@ -40,7 +40,7 @@ export default class FormFieldLayout extends AbstractLayout {
     this.compactFieldWidth = FormFieldLayout.COMPACT_FIELD_WIDTH;
   }
 
-  _onHtmlEnvironmenPropertyChange() {
+  _onHtmlEnvironmentPropertyChange() {
     this._initDefaults();
     this.formField.invalidateLayoutTree();
   }

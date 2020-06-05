@@ -18,7 +18,7 @@ export default class TabBoxLayout extends AbstractLayout {
 
     this._initDefaults();
 
-    this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
+    this.htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);
     HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
     this._tabBox.one('remove', () => {
       HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
@@ -29,7 +29,7 @@ export default class TabBoxLayout extends AbstractLayout {
     this._statusWidth = HtmlEnvironment.get().fieldStatusWidth;
   }
 
-  _onHtmlEnvironmenPropertyChange() {
+  _onHtmlEnvironmentPropertyChange() {
     this._initDefaults();
     this._tabBox.invalidateLayoutTree();
   }
