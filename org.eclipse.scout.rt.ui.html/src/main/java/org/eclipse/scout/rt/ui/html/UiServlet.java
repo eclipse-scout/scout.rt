@@ -217,6 +217,7 @@ public class UiServlet extends AbstractHttpServlet {
   /**
    * @return <code>true</code> if request was handled, <code>false</code> otherwise.
    */
+  @SuppressWarnings("RedundantThrows")
   protected boolean handleRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     m_uiThreadInterruption.detectAndClear(this, "handleRequest");
     m_httpServletControl.doDefaults(this, req, resp);
@@ -234,7 +235,7 @@ public class UiServlet extends AbstractHttpServlet {
    * @return <code>true</code> if request was handled, <code>false</code> otherwise.
    */
   protected boolean handleRequestInternal(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    if (BEANS.get(ServletFilterHelper.class).redirectIncompleteBasePath(req, resp)) {
+    if (BEANS.get(ServletFilterHelper.class).redirectIncompleteBasePath(req, resp, true)) {
       return true;
     }
 

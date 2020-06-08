@@ -97,7 +97,7 @@ public class TrivialAccessController implements IAccessController {
 
   protected boolean handleRequest(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain) throws IOException, ServletException {
     ServletFilterHelper helper = BEANS.get(ServletFilterHelper.class);
-    if (helper.redirectIncompleteBasePath(request, response)) {
+    if (helper.redirectIncompleteBasePath(request, response, false)) {
       return true;
     }
 
