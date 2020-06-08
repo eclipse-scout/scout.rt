@@ -65,23 +65,24 @@ public class ServletFilterHelper {
    * It is not possible to just check for an empty pathInfo because the container returns "/" even if the user has not
    * entered a '/' at the end.
    *
-   * @param request
-   *          required
-   * @param response
-   *          required
    * @param includeServletPath
    *          true: include the servletPath in the decision if a redirect should be sent.<br/>
    *          false: only use the contextPath to decide if a redirect should be sent.
    * @return true if a redirect was sent to the browser. Only idempotent request methods are potentially redirected. See
    *         {@link #IDEMPOTENT_HTTP_REQUEST_METHODS}.
-   * @throws IOException
-   *           if an error occurs
    */
   public boolean redirectIncompleteBasePath(HttpServletRequest request, HttpServletResponse response, boolean includeServletPath) throws IOException {
     if (IDEMPOTENT_HTTP_REQUEST_METHODS.contains(request.getMethod())) {
-      String path = request.getServletContext().getContextPath() + request.getServletPath();
+      String path = request.getServletContext().getContextPath();
+      if (includeServletPath) {
+        path += request.getServletPath();
+      }
       if (StringUtility.hasText(path) && request.getRequestURI().endsWith(path)) {
-        response.sendRedirect(request.getRequestURI() + "/");
+        String uri = request.getRequestURI() + "/";
+        if (StringUtility.hasText(request.getQueryString())) {
+          uri += "?" + request.getQueryString();
+        }
+        response.sendRedirect(uri);
         return true;
       }
     }
