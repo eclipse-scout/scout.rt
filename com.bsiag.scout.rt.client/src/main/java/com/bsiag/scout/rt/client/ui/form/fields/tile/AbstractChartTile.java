@@ -75,6 +75,16 @@ public abstract class AbstractChartTile extends AbstractFormFieldTile<ChartField
   }
 
   /**
+   * If set, this value is applied to the tile field chart's "legendClickable" property.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(70)
+  @SuppressWarnings("findbugs:NP_BOOLEAN_RETURN_NULL")
+  protected Boolean getConfiguredLegendClickable() {
+    return null;
+  }
+
+  /**
    * If set, this value is applied to the tile field chart's "legend position" property.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -117,6 +127,9 @@ public abstract class AbstractChartTile extends AbstractFormFieldTile<ChartField
     }
     if (getConfiguredAnimated() != null) {
       config.withAnimated(getConfiguredAnimated());
+    }
+    if (getConfiguredLegendClickable() != null) {
+      config.withLegendClickable(getConfiguredLegendClickable());
     }
     if (getConfiguredLegendPosition() != null) {
       config.withLegendPosition(getConfiguredLegendPosition());

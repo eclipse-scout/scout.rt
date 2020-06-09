@@ -9,7 +9,7 @@
  */
 import {AbstractChartRenderer, Chart} from '../index';
 import ChartJs from 'chart.js';
-import {styles} from '@eclipse-scout/core';
+import {Event, styles} from '@eclipse-scout/core';
 
 /**
  * @typedef ChartJs
@@ -46,6 +46,13 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this.minSpaceBetweenYTicks = 40;
     this.numSupportedColors = 6;
     this.colorSchemeCssClass = '';
+
+    this._clickHandler = this._onClick.bind(this);
+    this._hoverHandler = this._onHover.bind(this);
+
+    this._legendClickHandler = this._onLegendClick.bind(this);
+    this._legendHoverHandler = this._onLegendHover.bind(this);
+    this._legendLeaveHandler = this._onLegendLeave.bind(this);
   }
 
   _render() {
@@ -96,6 +103,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this._adjustData(config);
     this._adjustLayout(config);
     this._adjustColors(config);
+    this._adjustClickHandler(config);
   }
 
   _computeDatasets(chartData) {
@@ -320,6 +328,83 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       maxValue: Math.ceil(maxValue),
       minValue: Math.floor(minValue)
     };
+  }
+
+  _adjustClickHandler(config) {
+    if (!config || !config.options) {
+      return;
+    }
+
+    if (config.options.clickable) {
+      config.options.onClick = this._clickHandler;
+      config.options.onHover = this._hoverHandler;
+    }
+
+    if (!config.options.legend) {
+      return;
+    }
+
+    if (config.options.legend.clickable) {
+      config.options.legend.onClick = this._legendClickHandler;
+      config.options.legend.onHover = this._legendHoverHandler;
+      config.options.legend.onLeave = this._legendLeaveHandler;
+    } else {
+      config.options.legend.onClick = e => e.stopPropagation();
+    }
+  }
+
+  /**
+   * @param {object[]} items
+   * @param {number} items._index
+   * @param {number} items._datasetIndex
+   */
+  _onClick(event, items) {
+    if (items.length) {
+      if (this._isMaxSegmentsExceeded(this.chartJs.config, items[0]._index)) {
+        return;
+      }
+      let clickObject = {
+        axisIndex: 0,
+        valueIndex: items[0]._index,
+        groupIndex: items[0]._datasetIndex
+      };
+      let e = new Event();
+      e.data = clickObject;
+      this.chart._onValueClick(e);
+    }
+  }
+
+  _onHover(event, items) {
+    if (items.length && !this._isMaxSegmentsExceeded(this.chartJs.config, items[0]._index)) {
+      this.$canvas.css('cursor', 'pointer');
+    } else {
+      this.$canvas.css('cursor', 'default');
+    }
+  }
+
+  _onLegendClick(event, item) {
+    let defaultLegendClick = ((ChartJs.defaults[this.chartJs.config.type] || {}).legend || {}).onClick || ChartJs.defaults.global.legend.onClick;
+    defaultLegendClick.call(this.chartJs, event, item);
+    this._onLegendHover(event, item);
+  }
+
+  _onLegendHover(event, item) {
+    this.$canvas.css('cursor', 'pointer');
+  }
+
+  _onLegendLeave(event, item) {
+    this.$canvas.css('cursor', 'default');
+  }
+
+  _isMaxSegmentsExceeded(config, index) {
+    if (config.type === Chart.Type.PIE || config.type === Chart.Type.DOUGHNUT) {
+      let maxSegments = config.options.maxSegments;
+      if (!maxSegments) {
+        return false;
+      }
+      return maxSegments - 1 <= index;
+    }
+    return false;
   }
 
   renderColorScheme(colorSchemeCssClass) {

@@ -50,6 +50,7 @@ public class ChartConfig implements IChartConfig {
   protected static final String TOOLTIPS_ENABLED = combine(TOOLTIPS, "enabled");
   protected static final String LEGEND = combine(OPTIONS, "legend");
   protected static final String LEGEND_DISPLAY = combine(LEGEND, "display");
+  protected static final String LEGEND_CLICKABLE = combine(LEGEND, "clickable");
   protected static final String LEGEND_POSITION = combine(LEGEND, "position");
   protected static final String SCALES = combine(OPTIONS, "scales");
   protected static final String X_AXES = combine(SCALES, "xAxes");
@@ -460,6 +461,21 @@ public class ChartConfig implements IChartConfig {
   @Override
   public boolean isLegendDisplay() {
     return (boolean) getProperty(LEGEND_DISPLAY);
+  }
+
+  @Override
+  public IChartConfig withLegendClickable(boolean legendClickable) {
+    return withProperty(LEGEND_CLICKABLE, legendClickable);
+  }
+
+  @Override
+  public IChartConfig removeLegendClickable() {
+    return removeProperty(LEGEND_CLICKABLE);
+  }
+
+  @Override
+  public boolean isLegendClickable() {
+    return (boolean) getProperty(LEGEND_CLICKABLE);
   }
 
   @Override

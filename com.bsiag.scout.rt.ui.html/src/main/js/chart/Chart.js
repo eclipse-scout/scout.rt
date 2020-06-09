@@ -46,6 +46,7 @@ export default class Chart extends Widget {
         },
         legend: {
           display: true,
+          clickable: false,
           position: Chart.Position.RIGHT
         }
       }

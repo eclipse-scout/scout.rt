@@ -140,6 +140,12 @@ public interface IChartConfig extends Serializable {
 
   boolean isLegendDisplay();
 
+  IChartConfig withLegendClickable(boolean legendClickable);
+
+  IChartConfig removeLegendClickable();
+
+  boolean isLegendClickable();
+
   IChartConfig withLegendPosition(String legendPosition);
 
   IChartConfig removeLegendPosition();
