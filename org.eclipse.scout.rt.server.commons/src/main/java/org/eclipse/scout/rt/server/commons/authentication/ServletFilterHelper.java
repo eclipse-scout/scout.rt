@@ -69,10 +69,10 @@ public class ServletFilterHelper {
    *          true: include the servletPath in the decision if a redirect should be sent.<br/>
    *          false: only use the contextPath to decide if a redirect should be sent.
    * @return true if a redirect was sent to the browser. Only idempotent request methods are potentially redirected. See
-   *         {@link #IDEMPOTENT_HTTP_REQUEST_METHODS}.
+   *         {@link #isIdempotent(HttpServletRequest)}.
    */
   public boolean redirectIncompleteBasePath(HttpServletRequest request, HttpServletResponse response, boolean includeServletPath) throws IOException {
-    if (IDEMPOTENT_HTTP_REQUEST_METHODS.contains(request.getMethod())) {
+    if (isIdempotent(request)) {
       String path = request.getServletContext().getContextPath();
       if (includeServletPath) {
         path += request.getServletPath();
@@ -87,6 +87,10 @@ public class ServletFilterHelper {
       }
     }
     return false;
+  }
+
+  public boolean isIdempotent(HttpServletRequest request) {
+    return IDEMPOTENT_HTTP_REQUEST_METHODS.contains(request.getMethod());
   }
 
   /**
@@ -215,18 +219,17 @@ public class ServletFilterHelper {
   }
 
   public String createBasicAuthRequest(String username, char[] password) {
-    String cred = username + ':' + String.valueOf(password);
-    String encodedCred;
-    encodedCred = Base64Utility.encode(cred.getBytes(HTTP_BASIC_AUTH_CHARSET));
-    return HTTP_BASIC_AUTH_NAME + ' ' + encodedCred;
+    String cred = username + ":" + String.valueOf(password);
+    String encodedCred = Base64Utility.encode(cred.getBytes(HTTP_BASIC_AUTH_CHARSET));
+    return HTTP_BASIC_AUTH_NAME + " " + encodedCred;
   }
 
   public String[] parseBasicAuthRequest(HttpServletRequest req) {
     String h = req.getHeader(HTTP_HEADER_AUTHORIZATION);
-    if (h == null || !h.matches(HTTP_BASIC_AUTH_NAME + " .*")) {
+    if (h == null || !h.startsWith(HTTP_BASIC_AUTH_NAME + " ")) {
       return null;
     }
-    return new String(Base64Utility.decode(h.substring(6)), HTTP_BASIC_AUTH_CHARSET).split(":", 2);
+    return new String(Base64Utility.decode(h.substring(HTTP_BASIC_AUTH_NAME.length() + 1)), HTTP_BASIC_AUTH_CHARSET).split(":", 2);
   }
 
   /**
