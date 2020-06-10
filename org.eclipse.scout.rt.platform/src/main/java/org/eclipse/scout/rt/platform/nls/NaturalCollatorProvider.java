@@ -1,15 +1,21 @@
 /*
- * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
- * http://www.bsiag.com/
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.platform.nls;
 
 import java.text.Collator;
 import java.text.ParseException;
 import java.text.RuleBasedCollator;
+import java.util.HashMap;
 import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -41,28 +47,19 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  */
 @ApplicationScoped
 public class NaturalCollatorProvider {
-
-  private final ConcurrentMap<Locale, Collator> m_cache = new ConcurrentHashMap<>();
+  private static final ThreadLocal<Map<Locale, Collator>> THREAD_LOCAL = ThreadLocal.withInitial(HashMap::new);
 
   public Collator getInstance(Locale locale) {
-    Collator result = m_cache.get(locale);
-    if (result == null) {
-      result = create(locale);
-      Collator tmp = m_cache.putIfAbsent(locale, result);
-      if (tmp != null) {
-        // always used same shared instance
-        result = tmp;
-      }
-    }
     // always return a cloned instance
-    return (Collator) result.clone();
+    return (Collator) THREAD_LOCAL.get()
+        .computeIfAbsent(locale, this::create)
+        .clone();
   }
 
   /**
    * Create a patched collator for a given locale, if the collator is a {@link RuleBasedCollator}. Otherwise the default
    * collator.
    *
-   * @param locale
    * @return {@link Collator} not <code>null</code>
    */
   protected Collator create(Locale locale) {
@@ -76,7 +73,7 @@ public class NaturalCollatorProvider {
         throw new ProcessingException("Collation rules cannot be parsed", e);
       }
     }
-    return c;
+    return (Collator) c.clone();
   }
 
   /**
