@@ -56,6 +56,7 @@ public class ChartConfig implements IChartConfig {
   protected static final String X_AXES = combine(SCALES, "xAxes");
   protected static final String Y_AXES = combine(SCALES, "yAxes");
   protected static final String SCALE_LABEL = "scaleLabel";
+  protected static final String SCALE_LABEL_DISPLAY = combine(SCALE_LABEL, "display");
   protected static final String SCALE_LABEL_LABEL = combine(SCALE_LABEL, "labelString");
 
   private final Map<String, Object> m_properties = new HashMap<>();
@@ -180,6 +181,18 @@ public class ChartConfig implements IChartConfig {
   @Override
   public Object getProperty(String name) {
     return modifyProperties(ModifyMode.GET, name, null);
+  }
+
+  protected IChartConfig withArrayProperty(String array, int index, String name, Object value) {
+    return withProperty(combine(array + arrayIndex(index), name), value);
+  }
+
+  protected IChartConfig removeArrayProperty(String array, int index, String name) {
+    return removeProperty(combine(array + arrayIndex(index), name));
+  }
+
+  protected Object getArrayProperty(String array, int index, String name) {
+    return getProperty(combine(array + arrayIndex(index), name));
   }
 
   /**
@@ -513,57 +526,111 @@ public class ChartConfig implements IChartConfig {
     return withLegendPosition(RIGHT);
   }
 
-  protected IChartConfig withXAxesLabel(String label, int index) {
-    return withProperty(combine(X_AXES + arrayIndex(index), SCALE_LABEL_LABEL), label);
+  protected IChartConfig withXAxisLabelDisplay(boolean display, int index) {
+    return withArrayProperty(X_AXES, index, SCALE_LABEL_DISPLAY, display);
   }
 
-  protected IChartConfig removeXAxesLabel(int index) {
-    return removeProperty(combine(X_AXES + arrayIndex(index), SCALE_LABEL_LABEL));
+  protected IChartConfig removeXAxisLabelDisplay(int index) {
+    return removeArrayProperty(X_AXES, index, SCALE_LABEL_DISPLAY);
   }
 
-  protected String getXAxesLabel(int index) {
-    return (String) getProperty(combine(X_AXES + arrayIndex(index), SCALE_LABEL_LABEL));
-  }
-
-  @Override
-  public IChartConfig withXAxesLabel(String label) {
-    return withXAxesLabel(label, 0);
+  protected boolean isXAxisLabelDisplay(int index) {
+    return (boolean) getArrayProperty(X_AXES, index, SCALE_LABEL_DISPLAY);
   }
 
   @Override
-  public IChartConfig removeXAxesLabel() {
-    return removeXAxesLabel(0);
+  public IChartConfig withXAxisLabelDisplay(boolean display) {
+    return withXAxisLabelDisplay(display, 0);
   }
 
   @Override
-  public String getXAxesLabel() {
-    return getXAxesLabel(0);
-  }
-
-  protected IChartConfig withYAxesLabel(String label, int index) {
-    return withProperty(combine(Y_AXES + arrayIndex(index), SCALE_LABEL_LABEL), label);
-  }
-
-  protected IChartConfig removeYAxesLabel(int index) {
-    return removeProperty(combine(Y_AXES + arrayIndex(index), SCALE_LABEL_LABEL));
-  }
-
-  protected String getYAxesLabel(int index) {
-    return (String) getProperty(combine(Y_AXES + arrayIndex(index), SCALE_LABEL_LABEL));
+  public IChartConfig removeXAxisLabelDisplay() {
+    return removeXAxisLabelDisplay(0);
   }
 
   @Override
-  public IChartConfig withYAxesLabel(String label) {
-    return withYAxesLabel(label, 0);
+  public boolean isXAxisLabelDisplay() {
+    return isXAxisLabelDisplay(0);
+  }
+
+  protected IChartConfig withXAxisLabel(String label, int index) {
+    return withArrayProperty(X_AXES, index, SCALE_LABEL_LABEL, label);
+  }
+
+  protected IChartConfig removeXAxisLabel(int index) {
+    return removeArrayProperty(X_AXES, index, SCALE_LABEL_LABEL);
+  }
+
+  protected String getXAxisLabel(int index) {
+    return (String) getArrayProperty(X_AXES, index, SCALE_LABEL_LABEL);
   }
 
   @Override
-  public IChartConfig removeYAxesLabel() {
-    return removeYAxesLabel(0);
+  public IChartConfig withXAxisLabel(String label) {
+    return withXAxisLabel(label, 0);
   }
 
   @Override
-  public String getYAxesLabel() {
-    return getYAxesLabel(0);
+  public IChartConfig removeXAxisLabel() {
+    return removeXAxisLabel(0);
+  }
+
+  @Override
+  public String getXAxisLabel() {
+    return getXAxisLabel(0);
+  }
+
+  protected IChartConfig withYAxisLabelDisplay(boolean display, int index) {
+    return withArrayProperty(Y_AXES, index, SCALE_LABEL_DISPLAY, display);
+  }
+
+  protected IChartConfig removeYAxisLabelDisplay(int index) {
+    return removeArrayProperty(Y_AXES, index, SCALE_LABEL_DISPLAY);
+  }
+
+  protected boolean isYAxisLabelDisplay(int index) {
+    return (boolean) getArrayProperty(Y_AXES, index, SCALE_LABEL_DISPLAY);
+  }
+
+  @Override
+  public IChartConfig withYAxisLabelDisplay(boolean display) {
+    return withYAxisLabelDisplay(display, 0);
+  }
+
+  @Override
+  public IChartConfig removeYAxisLabelDisplay() {
+    return removeYAxisLabelDisplay(0);
+  }
+
+  @Override
+  public boolean isYAxisLabelDisplay() {
+    return isYAxisLabelDisplay(0);
+  }
+
+  protected IChartConfig withYAxisLabel(String label, int index) {
+    return withArrayProperty(Y_AXES, index, SCALE_LABEL_LABEL, label);
+  }
+
+  protected IChartConfig removeYAxisLabel(int index) {
+    return removeArrayProperty(Y_AXES, index, SCALE_LABEL_LABEL);
+  }
+
+  protected String getYAxisLabel(int index) {
+    return (String) getArrayProperty(Y_AXES, index, SCALE_LABEL_LABEL);
+  }
+
+  @Override
+  public IChartConfig withYAxisLabel(String label) {
+    return withYAxisLabel(label, 0);
+  }
+
+  @Override
+  public IChartConfig removeYAxisLabel() {
+    return removeYAxisLabel(0);
+  }
+
+  @Override
+  public String getYAxisLabel() {
+    return getYAxisLabel(0);
   }
 }

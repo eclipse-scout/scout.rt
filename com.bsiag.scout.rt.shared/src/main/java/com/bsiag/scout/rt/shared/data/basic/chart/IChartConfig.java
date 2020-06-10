@@ -160,15 +160,27 @@ public interface IChartConfig extends Serializable {
 
   IChartConfig withLegendPositionRight();
 
-  IChartConfig withXAxesLabel(String label);
+  IChartConfig withXAxisLabelDisplay(boolean display);
 
-  IChartConfig removeXAxesLabel();
+  IChartConfig removeXAxisLabelDisplay();
 
-  String getXAxesLabel();
+  boolean isXAxisLabelDisplay();
 
-  IChartConfig withYAxesLabel(String label);
+  IChartConfig withXAxisLabel(String label);
 
-  IChartConfig removeYAxesLabel();
+  IChartConfig removeXAxisLabel();
 
-  String getYAxesLabel();
+  String getXAxisLabel();
+
+  IChartConfig withYAxisLabelDisplay(boolean display);
+
+  IChartConfig removeYAxisLabelDisplay();
+
+  boolean isYAxisLabelDisplay();
+
+  IChartConfig withYAxisLabel(String label);
+
+  IChartConfig removeYAxisLabel();
+
+  String getYAxisLabel();
 }

@@ -397,8 +397,7 @@
 
   /* Mixin to define label and grid color */
   .chart-label-grid-colors() {
-    & .label {
-
+    > .label {
       fill: @chart-legend-label-color;
 
       .inverted & {
@@ -406,10 +405,17 @@
       }
     }
 
-    & .grid {
-      fill: @chart-axis-line-color;
+    > .axis-label {
+      fill: @chart-axis-label-color;
+
+      .inverted & {
+        fill: @palette-white;
+      }
     }
 
+    > .grid {
+      fill: @chart-axis-line-color;
+    }
   }
 }
 

@@ -47,6 +47,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this.numSupportedColors = 6;
     this.colorSchemeCssClass = '';
 
+    this._labelFormatter = this._formatLabel.bind(this);
+
     this._clickHandler = this._onClick.bind(this);
     this._hoverHandler = this._onHover.bind(this);
 
@@ -184,10 +186,38 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           borderDash: [2, 4]
         },
         ticks: {
-          padding: 5
+          padding: 5,
+          callback: this._labelFormatter
         }
       });
     }
+  }
+
+  _formatLabel(label) {
+    if (isNaN(label)) {
+      return label;
+    }
+    let abs = Math.abs(label);
+    let abbreviation = '';
+    if (abs >= 1000000) {
+      abs = abs / 1000000;
+      abbreviation = ' ' + this.chart.session.text('ui.Mio');
+      let abbreviations = [
+        this.chart.session.text('ui.Mrd'),
+        this.chart.session.text('ui.Bio'),
+        this.chart.session.text('ui.Brd'),
+        this.chart.session.text('ui.Tri'),
+        this.chart.session.text('ui.Trd')];
+      for (let i = 0; i < abbreviations.length; i++) {
+        if (abs >= 1000000) {
+          abs = abs / 1000;
+          abbreviation = ' ' + abbreviations[i];
+        } else {
+          break;
+        }
+      }
+    }
+    return this.session.locale.decimalFormat.format(Math.sign(label) * abs) + abbreviation;
   }
 
   _adjustColors(config) {
@@ -206,10 +236,12 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         hoverBackgroundColors: [],
         hoverBorderColors: [],
         labelColor: undefined,
+        axisLabelColor: undefined,
         gridColor: undefined
       };
 
     colors.labelColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'label'], 'fill').fill;
+    colors.axisLabelColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'axis-label'], 'fill').fill;
     colors.gridColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'grid'], 'fill').fill;
 
     if (autoColor) {
@@ -249,6 +281,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         elem.ticks = $.extend(true, {}, elem.ticks, {
           fontColor: colors.labelColor
         });
+        elem.scaleLabel = $.extend(true, {}, elem.scaleLabel, {
+          fontColor: colors.axisLabelColor
+        });
       });
       ((config.options.scales || {}).yAxes || []).forEach(elem => {
         elem.gridLines = $.extend(true, {}, elem.gridLines, {
@@ -257,6 +292,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         });
         elem.ticks = $.extend(true, {}, elem.ticks, {
           fontColor: colors.labelColor
+        });
+        elem.scaleLabel = $.extend(true, {}, elem.scaleLabel, {
+          fontColor: colors.axisLabelColor
         });
       });
     }
