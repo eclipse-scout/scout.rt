@@ -58,6 +58,9 @@ public class ChartConfig implements IChartConfig {
   protected static final String SCALE_LABEL = "scaleLabel";
   protected static final String SCALE_LABEL_DISPLAY = combine(SCALE_LABEL, "display");
   protected static final String SCALE_LABEL_LABEL = combine(SCALE_LABEL, "labelString");
+  protected static final String PLUGINS = combine(OPTIONS, "plugins");
+  protected static final String DATALABELS = combine(PLUGINS, "datalabels");
+  protected static final String DATALABELS_DISPLAY = combine(DATALABELS, "display");
 
   private final Map<String, Object> m_properties = new HashMap<>();
 
@@ -632,5 +635,20 @@ public class ChartConfig implements IChartConfig {
   @Override
   public String getYAxisLabel() {
     return getYAxisLabel(0);
+  }
+
+  @Override
+  public IChartConfig withDatalabelsDisplay(boolean display) {
+    return withProperty(DATALABELS_DISPLAY, display);
+  }
+
+  @Override
+  public IChartConfig removeDatalabelsDisplay() {
+    return removeProperty(DATALABELS_DISPLAY);
+  }
+
+  @Override
+  public boolean isDatalabelsDisplay() {
+    return (boolean) getProperty(DATALABELS_DISPLAY);
   }
 }

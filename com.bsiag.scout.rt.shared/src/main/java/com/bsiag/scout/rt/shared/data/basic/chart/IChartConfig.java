@@ -183,4 +183,10 @@ public interface IChartConfig extends Serializable {
   IChartConfig removeYAxisLabel();
 
   String getYAxisLabel();
+
+  IChartConfig withDatalabelsDisplay(boolean display);
+
+  IChartConfig removeDatalabelsDisplay();
+
+  boolean isDatalabelsDisplay();
 }

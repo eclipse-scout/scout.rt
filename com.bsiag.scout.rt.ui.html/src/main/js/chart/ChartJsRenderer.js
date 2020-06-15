@@ -10,6 +10,8 @@
 import {AbstractChartRenderer, Chart} from '../index';
 import ChartJs from 'chart.js';
 import {Event, styles} from '@eclipse-scout/core';
+// noinspection ES6UnusedImports
+import chartjs_plugin_datalabels from 'chartjs-plugin-datalabels';
 
 /**
  * @typedef ChartJs
@@ -46,8 +48,14 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this.minSpaceBetweenYTicks = 40;
     this.numSupportedColors = 6;
     this.colorSchemeCssClass = '';
+    this.minRadialChartDatalabelSpace = 25;
 
     this._labelFormatter = this._formatLabel.bind(this);
+
+    this._radialChartDatalabelsDisplayHandler = this._displayDatalabelsOnRadialChart.bind(this);
+    this._radialChartDatalabelsFormatter = this._formatDatalabelsOnRadialChart.bind(this);
+
+    this._datalabelBackgroundColorHandler = this._getBackgroundColorOfDataset.bind(this);
 
     this._clickHandler = this._onClick.bind(this);
     this._hoverHandler = this._onHover.bind(this);
@@ -191,6 +199,17 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         }
       });
     }
+
+    if (config.options.plugins && config.options.plugins.datalabels && config.options.plugins.datalabels.display) {
+      if (config.type === Chart.Type.PIE || config.type === Chart.Type.DOUGHNUT) {
+        config.options.plugins.datalabels.display = this._radialChartDatalabelsDisplayHandler;
+        config.options.plugins.datalabels.formatter = this._radialChartDatalabelsFormatter;
+      } else if (config.type === Chart.Type.BAR || config.type === Chart.Type.LINE) {
+        config.options.plugins.datalabels.display = 'auto';
+        config.options.plugins.datalabels.backgroundColor = this._datalabelBackgroundColorHandler;
+        config.options.plugins.datalabels.borderRadius = 4;
+      }
+    }
   }
 
   _formatLabel(label) {
@@ -220,6 +239,53 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     return this.session.locale.decimalFormat.format(Math.sign(label) * abs) + abbreviation;
   }
 
+  _displayDatalabelsOnRadialChart(context) {
+    let data = context.chart.getDatasetMeta(context.datasetIndex).data[context.dataIndex],
+      model = data._model,
+      // Compute the biggest circle that fits inside sector/arc with center in the middle between inner and outer radius.
+      // First compute a circle C1 that touches the straight boundaries of the sector/arc. Then compute a circle C2 that touches the inner and the outer radius.
+      // The smaller one of these two circles is the biggest possible circle that fits inside sector/arc with center in the middle between inner and outer radius.
+      // circle C1:
+      midRadius = (model.outerRadius + model.innerRadius) / 2,
+      // If the difference between the angles is greater than pi, it is no longer possible for a circle to be inside the sector/arc and touch both straight boundaries.
+      angle = Math.min((model.endAngle - model.startAngle), Math.PI) / 2,
+      radius1 = Math.abs(Math.sin(angle)) * midRadius,
+      diameter1 = radius1 * 2,
+      // circle C2:
+      diameter2 = model.outerRadius - model.innerRadius;
+    return Math.min(diameter1, diameter2) > this.minRadialChartDatalabelSpace;
+  }
+
+  _formatDatalabelsOnRadialChart(value, context) {
+    let sum = this._computeSumOfVisibleElements(context),
+      dataset = context.dataset,
+      roundingError = 0,
+      roundedResults = [];
+    for (let i = 0; i < context.dataIndex + 1; i++) {
+      let result = dataset.data[i] / sum * 100 - roundingError,
+        roundedResult = Math.round(result);
+      roundingError = roundedResult - result;
+      roundedResults.push(roundedResult + '%');
+    }
+    return roundedResults[context.dataIndex];
+  }
+
+  _computeSumOfVisibleElements(context) {
+    let dataset = context.dataset,
+      meta = context.chart.getDatasetMeta(context.datasetIndex),
+      sum = 0;
+    for (let i = 0; i < dataset.data.length; i++) {
+      if (meta.data[i] && !meta.data[i].hidden) {
+        sum += dataset.data[i];
+      }
+    }
+    return sum;
+  }
+
+  _getBackgroundColorOfDataset(context) {
+    return context.dataset.backgroundColor;
+  }
+
   _adjustColors(config) {
     if (!config || !config.data || !config.type) {
       return;
@@ -236,11 +302,13 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         hoverBackgroundColors: [],
         hoverBorderColors: [],
         labelColor: undefined,
+        datalabelColor: undefined,
         axisLabelColor: undefined,
         gridColor: undefined
       };
 
     colors.labelColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'label'], 'fill').fill;
+    colors.datalabelColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'datalabel'], 'fill').fill;
     colors.axisLabelColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'axis-label'], 'fill').fill;
     colors.gridColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'grid'], 'fill').fill;
 
@@ -297,6 +365,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           fontColor: colors.axisLabelColor
         });
       });
+      if (config.options.plugins && config.options.plugins.datalabels) {
+        config.options.plugins.datalabels = $.extend(true, {}, config.options.plugins.datalabels, {
+          color: colors.datalabelColor
+        });
+      }
     }
   }
 

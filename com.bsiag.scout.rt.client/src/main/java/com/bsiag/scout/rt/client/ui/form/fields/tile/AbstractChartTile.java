@@ -111,6 +111,15 @@ public abstract class AbstractChartTile extends AbstractFormFieldTile<ChartField
     return true;
   }
 
+  /**
+   * If set, this value is applied to the tile field chart's "datalabels visible" property.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(100)
+  protected Boolean getConfiguredDatalabelsVisible() {
+    return null;
+  }
+
   @Override
   protected void initTileWidgetConfig() {
     super.initTileWidgetConfig();
@@ -139,6 +148,9 @@ public abstract class AbstractChartTile extends AbstractFormFieldTile<ChartField
     }
     if (getConfiguredTooltipsEnabled() != null) {
       config.withTooltipsEnabled(getConfiguredTooltipsEnabled());
+    }
+    if (getConfiguredDatalabelsVisible() != null) {
+      config.withDatalabelsDisplay(getConfiguredDatalabelsVisible());
     }
     getTileWidget().getChart().setConfig(config);
   }

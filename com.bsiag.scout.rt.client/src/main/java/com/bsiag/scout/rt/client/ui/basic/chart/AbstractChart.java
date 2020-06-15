@@ -141,7 +141,8 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
         .withTooltipsEnabled(true)
         .withLegendDisplay(true)
         .withLegendClickable(false)
-        .withLegendPositionRight();
+        .withLegendPositionRight()
+        .withDatalabelsDisplay(false);
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
