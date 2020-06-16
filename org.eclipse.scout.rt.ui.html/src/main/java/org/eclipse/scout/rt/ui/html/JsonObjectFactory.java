@@ -99,6 +99,7 @@ import org.eclipse.scout.rt.client.ui.group.IGroup;
 import org.eclipse.scout.rt.client.ui.label.ILabel;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.notification.INotification;
+import org.eclipse.scout.rt.client.ui.popup.IMobilePopup;
 import org.eclipse.scout.rt.client.ui.popup.IPopup;
 import org.eclipse.scout.rt.client.ui.popup.IWidgetPopup;
 import org.eclipse.scout.rt.client.ui.popup.PopupManager;
@@ -185,6 +186,7 @@ import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.form.field.JsonFormFieldMenu;
 import org.eclipse.scout.rt.ui.html.json.messagebox.JsonMessageBox;
 import org.eclipse.scout.rt.ui.html.json.notification.JsonNotification;
+import org.eclipse.scout.rt.ui.html.json.popup.JsonMobilePopup;
 import org.eclipse.scout.rt.ui.html.json.popup.JsonPopup;
 import org.eclipse.scout.rt.ui.html.json.popup.JsonPopupManager;
 import org.eclipse.scout.rt.ui.html.json.popup.JsonWidgetPopup;
@@ -474,8 +476,11 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     if (model instanceof PopupManager) {
       return new JsonPopupManager<>((PopupManager) model, session, id, parent);
     }
+    if (model instanceof IMobilePopup<?>) {
+      return new JsonMobilePopup<>((IMobilePopup<?>) model, session, id, parent);
+    }
     if (model instanceof IWidgetPopup<?>) {
-      return new JsonWidgetPopup<IWidgetPopup<?>>((IWidgetPopup<?>) model, session, id, parent);
+      return new JsonWidgetPopup<>((IWidgetPopup<?>) model, session, id, parent);
     }
     if (model instanceof IPopup) {
       return new JsonPopup((IPopup) model, session, id, parent);

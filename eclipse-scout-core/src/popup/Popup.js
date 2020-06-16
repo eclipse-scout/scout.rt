@@ -204,7 +204,14 @@ export default class Popup extends Widget {
     // be shifted for a few pixels.
     this.validateFocus();
     if (this.animateOpening) {
-      this.$container.addClassForAnimation('animate-open');
+      this.$container.addClass('invisible');
+      setTimeout(() => {
+        if (!this.rendered || this.removing) {
+          return;
+        }
+        this.$container.removeClass('invisible');
+        this.$container.addClassForAnimation('animate-open');
+      });
     }
   }
 

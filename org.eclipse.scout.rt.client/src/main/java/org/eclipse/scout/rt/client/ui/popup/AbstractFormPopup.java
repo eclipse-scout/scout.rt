@@ -40,9 +40,15 @@ public abstract class AbstractFormPopup<T extends IForm> extends AbstractWidgetP
    */
   @Override
   protected T createWidget() {
-    T form = createForm();
-    decorateForm(form);
-    return form;
+    return createForm();
+  }
+
+  @Override
+  public void setWidget(T widget) {
+    super.setWidget(widget);
+    if (widget != null) {
+      decorateForm(widget);
+    }
   }
 
   /**

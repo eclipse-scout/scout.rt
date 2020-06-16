@@ -8,31 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, MobilePopupLayout, Point, Popup} from '../index';
+import {HtmlComponent, icons, MobilePopupLayout, Point, scout, WidgetPopup} from '../index';
 
-export default class MobilePopup extends Popup {
+export default class MobilePopup extends WidgetPopup {
 
   constructor() {
     super();
-    this.animateOpening = true;
     this.boundToAnchor = false;
-    this.windowPaddingX = 0;
-    this.windowPaddingY = 0;
     this.closable = true;
-    this.animateRemoval = true;
-    this.widget = null;
     this.title = null;
     this.withGlassPane = true;
-    this._addWidgetProperties('widget');
   }
 
   _createLayout() {
     return new MobilePopupLayout(this);
   }
 
-  /**
-   * @override Popup.js
-   */
+  _createCloseAction() {
+    return scout.create('Action', {
+      parent: this,
+      cssClass: 'closer',
+      iconId: icons.REMOVE_BOLD
+    });
+  }
+
   prefLocation(verticalAlignment, horizontalAlignment) {
     let popupSize = this.htmlComp.prefSize(),
       windowHeight = this.$container.window().height(),
@@ -52,43 +51,26 @@ export default class MobilePopup extends Popup {
 
   _renderProperties() {
     super._renderProperties();
-    this._renderWidget();
     this._renderTitle();
-    this._renderClosable();
-  }
-
-  setWidget(widget) {
-    this.setProperty('widget', widget);
   }
 
   _renderWidget() {
+    super._renderWidget();
     if (!this.widget) {
       return;
     }
-    this.widget.render();
     this.widget.$container.addClass('mobile-popup-widget');
-    this.invalidateLayoutTree();
   }
 
   _renderClosable() {
-    this.$container.toggleClass('closable');
-    if (this.closable) {
-      if (this.$close) {
-        return;
-      }
-      this.$close = this.$title
-        .afterDiv('closer')
-        .on('click', this.close.bind(this));
-    } else {
-      if (!this.$close) {
-        return;
-      }
-      this.$close.remove();
-      this.$close = null;
+    if (this.closeAction) {
+      this.closeAction.render(this.$header);
     }
+    this.$header.setVisible(this.title || this.closable);
   }
 
   _renderTitle() {
     this.$title.textOrNbsp(this.title);
+    this.$header.setVisible(this.title || this.closable);
   }
 }
