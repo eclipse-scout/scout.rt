@@ -1042,8 +1042,13 @@ scout.SmartField.prototype._onFieldKeyUp = function(event) {
   var w = event.which;
   var isPaste = ((event.ctrlKey || event.metaKey) && w === scout.keys.V) || (event.shiftKey && w === scout.keys.INSERT);
   var isCut = ((event.ctrlKey || event.metaKey) && w === scout.keys.X) || (event.shiftKey && w === scout.keys.DELETE);
+  if (this.isDropdown()) {
+    isPaste = false;
+    isCut = false;
+  }
+  var isCutOrPaste = (isPaste || isCut) && !this.isDropdown();
 
-  if (!isPaste && !isCut && (
+  if (!isCutOrPaste && (
       event.ctrlKey ||
       event.altKey ||
       event.metaKey ||
