@@ -259,7 +259,7 @@ scout.Popup.prototype._renderOnDetach = function() {
 
 scout.Popup.prototype.remove = function() {
   var currentAnimateRemoval = this.animateRemoval;
-  if (!this._isInView()) {
+  if ((this.boundToAnchor && this.$anchor) && !this._isInView()) {
     this.animateRemoval = false;
   }
   scout.Popup.parent.prototype.remove.call(this);
