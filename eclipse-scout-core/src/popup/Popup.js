@@ -288,7 +288,7 @@ export default class Popup extends Widget {
 
   remove() {
     let currentAnimateRemoval = this.animateRemoval;
-    if (!this._isInView()) {
+    if ((this.boundToAnchor && this.$anchor) && !this._isAnchorInView()) {
       this.animateRemoval = false;
     }
     super.remove();
@@ -882,7 +882,7 @@ export default class Popup extends Widget {
     if (!this.boundToAnchor || !this.$anchor) {
       return;
     }
-    let inView = this._isInView();
+    let inView = this._isAnchorInView();
     let needsLayouting = this.$container.hasClass('invisible') === inView && inView;
     this.$container.toggleClass('invisible', !inView); // Use visibility: hidden to not break layouting / size measurement
     if (needsLayouting) {
@@ -896,7 +896,7 @@ export default class Popup extends Widget {
     }
   }
 
-  _isInView() {
+  _isAnchorInView() {
     if (!this.boundToAnchor || !this.$anchor) {
       return;
     }
