@@ -60,6 +60,7 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
 
   String PROP_TITLE = "title";
   String PROP_SUB_TITLE = "subTitle";
+  String PROP_HEADER_VISIBLE = "headerVisible";
   String PROP_MINIMIZE_ENABLED = "minimizeEnabled";
   String PROP_MAXIMIZE_ENABLED = "maximizeEnabled";
   String PROP_MINIMIZED = "minimized";
@@ -453,6 +454,10 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   void touch();
 
   boolean isEmpty();
+
+  Boolean isHeaderVisible();
+
+  void setHeaderVisible(Boolean visible);
 
   String getTitle();
 

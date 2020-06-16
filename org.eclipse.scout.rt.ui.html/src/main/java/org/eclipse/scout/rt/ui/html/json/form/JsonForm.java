@@ -83,6 +83,12 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonWidget<FORM> {
   @Override
   protected void initJsonProperties(FORM model) {
     super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<IForm>(IForm.PROP_HEADER_VISIBLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isHeaderVisible();
+      }
+    });
     putJsonProperty(new JsonProperty<IForm>(PROP_TITLE, model) {
       @Override
       protected String modelValue() {

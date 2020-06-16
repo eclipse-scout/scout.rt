@@ -298,6 +298,18 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     return null;
   }
 
+  /**
+   * The header contains the title, subtitle, icon, save needed status and close action.
+   *
+   * @return true, to show a header, false to not show a header. Null, to let the UI decide what to do, which means:
+   *         show a header if it is a dialog, otherwise don't show one.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(25)
+  protected Boolean getConfiguredHeaderVisible() {
+    return null;
+  }
+
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(30)
   protected String getConfiguredCancelVerificationText() {
@@ -708,6 +720,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     if (getConfiguredSubTitle() != null) {
       setSubTitle(getConfiguredSubTitle());
     }
+    setHeaderVisible(getConfiguredHeaderVisible());
     setMinimizeEnabled(getConfiguredMinimizeEnabled());
     setMaximizeEnabled(getConfiguredMaximizeEnabled());
     setMinimized(getConfiguredMinimized());
@@ -2536,6 +2549,16 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
           .withContextInfo("form", getClass().getName())
           .withContextInfo("field", (f == null ? "<null>" : f.getClass().getName()));
     }
+  }
+
+  @Override
+  public void setHeaderVisible(Boolean visible) {
+    propertySupport.setProperty(PROP_HEADER_VISIBLE, visible);
+  }
+
+  @Override
+  public Boolean isHeaderVisible() {
+    return (Boolean) propertySupport.getProperty(PROP_HEADER_VISIBLE);
   }
 
   @Override

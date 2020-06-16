@@ -45,6 +45,7 @@ export default class Form extends Widget {
     this.maximized = false;
     this.minimizeEnabled = true;
     this.minimized = false;
+    this.headerVisible = null;
     this.modal = true;
     this.logicalGrid = scout.create('FormGrid');
     this.dialogs = [];
@@ -114,13 +115,8 @@ export default class Form extends Widget {
    */
   _renderProperties() {
     super._renderProperties();
-    this._renderTitle();
-    this._renderSubTitle();
-    this._renderIconId();
-    this._renderClosable();
-    this._renderSaveNeeded();
+    this._renderHeaderVisible();
     this._renderCssClass();
-    this._renderStatus();
     this._renderModal();
 
     this._installFocusContext();
@@ -159,16 +155,7 @@ export default class Form extends Widget {
     }
 
     this._uninstallFocusContext();
-
-    this.$statusIcons = [];
-    this.$header = null;
-    this.$statusContainer = null;
-    this.$close = null;
-    this.$saveNeeded = null;
-    this.$icon = null;
-    this.$title = null;
-    this.$subTitle = null;
-
+    this._removeHeader();
     super._remove();
   }
 
@@ -192,7 +179,6 @@ export default class Form extends Widget {
       if (this.resizable) {
         this._initResizable();
       }
-      this._renderHeader();
       // Attach to capture phase to activate focus context before regular mouse down handlers may set the focus.
       // E.g. clicking a check box label on another dialog executes mouse down handler of the check box which will focus the box. This only works if the focus context of the dialog is active.
       this.$container[0].addEventListener('mousedown', this._onDialogMouseDown.bind(this), true);
@@ -529,7 +515,7 @@ export default class Form extends Widget {
   }
 
   _renderClosable() {
-    if (!this.isDialog()) {
+    if (!this.$header) {
       return;
     }
     this.$container.toggleClass('closable');
@@ -584,21 +570,44 @@ export default class Form extends Widget {
   }
 
   _renderHeader() {
-    if (this.isDialog()) {
-      this.$header = this.$container.appendDiv('header');
-      this.$statusContainer = this.$header.appendDiv('status-container');
-      this.$icon = this.$header.appendDiv('icon-container');
+    this.$header = this.$container.prependDiv('header');
+    this.$statusContainer = this.$header.appendDiv('status-container');
+    this.$icon = this.$header.appendDiv('icon-container');
 
-      this.$title = this.$header.appendDiv('title');
-      tooltips.installForEllipsis(this.$title, {
-        parent: this
-      });
+    this.$title = this.$header.appendDiv('title');
+    tooltips.installForEllipsis(this.$title, {
+      parent: this
+    });
 
-      this.$subTitle = this.$header.appendDiv('sub-title');
-      tooltips.installForEllipsis(this.$subTitle, {
-        parent: this
-      });
+    this.$subTitle = this.$header.appendDiv('sub-title');
+    tooltips.installForEllipsis(this.$subTitle, {
+      parent: this
+    });
+    this._renderTitle();
+    this._renderSubTitle();
+    this._renderIconId();
+    this._renderStatus();
+    this._renderClosable();
+    this._renderSaveNeeded();
+  }
+
+  _removeHeader() {
+    if (this.$title) {
+      tooltips.uninstall(this.$title);
     }
+    if (this.$subTitle) {
+      tooltips.uninstall(this.$subTitle);
+    }
+    if (this.$header) {
+      this.$header.remove();
+      this.$header = null;
+    }
+    this.$title = null;
+    this.$subTitle = null;
+    this.$statusContainer = null;
+    this.$icon = null;
+    this.$close = null;
+    this.$saveNeeded = null;
   }
 
   _setRootGroupBox(rootGroupBox) {
@@ -613,7 +622,7 @@ export default class Form extends Widget {
   }
 
   _renderSaveNeeded() {
-    if (!this.isDialog()) {
+    if (!this.$header) {
       return;
     }
     if (this.saveNeeded && this.saveNeededVisible) {
@@ -676,7 +685,7 @@ export default class Form extends Widget {
   }
 
   _renderStatus() {
-    if (!this.isDialog()) {
+    if (!this.$header) {
       return;
     }
 
@@ -786,15 +795,30 @@ export default class Form extends Widget {
     this.$container.appendTo($parent);
   }
 
+  setHeaderVisible(headerVisible) {
+    this.setProperty('headerVisible', headerVisible);
+  }
+
+  _renderHeaderVisible() {
+    let headerVisible = this.headerVisible === null ? this.isDialog() : this.headerVisible;
+    if (headerVisible && !this.$header) {
+      this._renderHeader();
+    } else if (!headerVisible && this.$header) {
+      this._removeHeader();
+    }
+    this.invalidateLayoutTree();
+  }
+
   setTitle(title) {
     this.setProperty('title', title);
   }
 
   _renderTitle() {
-    if (this.isDialog()) {
+    if (this.$header) {
       this.$title.text(this.title);
       this.$header.toggleClass('no-title', !this.title && !this.subTitle);
-    } else if (this.isPopupWindow()) {
+    }
+    if (this.isPopupWindow()) {
       this._updateTitleForWindow();
     }
     // Layout could have been changed, e.g. if subtitle becomes visible
@@ -806,10 +830,11 @@ export default class Form extends Widget {
   }
 
   _renderSubTitle() {
-    if (this.isDialog()) {
+    if (this.$header) {
       this.$subTitle.text(this.subTitle);
       this.$header.toggleClass('no-title', !this.title && !this.subTitle);
-    } else if (this.isPopupWindow()) {
+    }
+    if (this.isPopupWindow()) {
       this._updateTitleForWindow();
     }
     // Layout could have been changed, e.g. if subtitle becomes visible
@@ -821,7 +846,7 @@ export default class Form extends Widget {
   }
 
   _renderIconId() {
-    if (this.isDialog()) {
+    if (this.$header) {
       this.$icon.icon(this.iconId);
       // Layout could have been changed, e.g. if subtitle becomes visible
       this.invalidateLayoutTree();

@@ -71,64 +71,65 @@
   & > .resizable-ne {
     margin-top: -@dialog-border-top-size;
   }
+}
 
-  & > .header {
-    overflow: auto; /* clearfix */
-    zoom: 1; /* clearfix */
-    margin-top: @form-title-margin-top;
-    margin-left: 20px;
-    margin-right: 14px;
+.dialog > .header,
+.form > .header {
+  overflow: auto; /* clearfix */
+  zoom: 1; /* clearfix */
+  margin-top: @form-title-margin-top;
+  margin-left: 20px;
+  margin-right: 14px;
 
-    &.no-title {
-      position: absolute;
-      top: 0;
-      right: 0;
-      z-index: 1;
+  &.no-title {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
 
-      & > .title,
-      & > .sub-title {
-        .hidden();
-      }
-    }
-
-    & > .icon-container {
-      float: left;
-
-      & > .icon {
-        margin-right: 5px;
-
-        &.font-icon {
-          font-size: 14px;
-        }
-      }
-    }
-
-    & > .title {
-      #scout.overflow-ellipsis-nowrap();
-      #scout.font-text-large();
-      color: @active-color;
-    }
-
+    & > .title,
     & > .sub-title {
-      #scout.overflow-ellipsis-nowrap();
-      #scout.font-text-normal();
-      color: @active-color;
+      .hidden();
     }
+  }
 
-    & > .status-container {
-      float: right;
+  & > .icon-container {
+    float: left;
 
-      & > .status {
-        /* make sure close icon overlaps drag-handle */
-        position: relative;
+    & > .icon {
+      margin-right: 5px;
 
-        vertical-align: middle;
-        display: inline-block;
-        margin-left: 5px;
+      &.font-icon {
+        font-size: 14px;
+      }
+    }
+  }
 
-        &.closer {
-          margin-left: 7px;
-        }
+  & > .title {
+    #scout.overflow-ellipsis-nowrap();
+    #scout.font-text-large();
+    color: @active-color;
+  }
+
+  & > .sub-title {
+    #scout.overflow-ellipsis-nowrap();
+    #scout.font-text-normal();
+    color: @active-color;
+  }
+
+  & > .status-container {
+    float: right;
+
+    & > .status {
+      /* make sure close icon overlaps drag-handle */
+      position: relative;
+
+      vertical-align: middle;
+      display: inline-block;
+      margin-left: 5px;
+
+      &.closer {
+        margin-left: 7px;
       }
     }
   }

@@ -29,9 +29,7 @@ export default class FormLayout extends AbstractLayout {
       .subtract(htmlContainer.insets())
       .subtract(htmlRootGb.margins());
 
-    if (this.form.isDialog()) {
-      rootGbSize.height -= this._titleHeight();
-    }
+    rootGbSize.height -= this._headerHeight();
 
     $.log.isTraceEnabled() && $.log.trace('(FormLayout#layout) rootGbSize=' + rootGbSize);
     htmlRootGb.setSize(rootGbSize);
@@ -45,7 +43,7 @@ export default class FormLayout extends AbstractLayout {
 
     this.form.validateLogicalGrid();
 
-    let titleHeight = this._titleHeight();
+    let titleHeight = this._headerHeight();
     if (options.heightHint) {
       options.heightHint -= titleHeight;
     }
@@ -62,7 +60,7 @@ export default class FormLayout extends AbstractLayout {
     return HtmlComponent.get($rootGroupBox);
   }
 
-  _titleHeight() {
+  _headerHeight() {
     if (this.form.$header && this.form.$header.css('position') !== 'absolute') {
       return graphics.prefSize(this.form.$header, true).height;
     }
