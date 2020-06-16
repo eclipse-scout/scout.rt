@@ -290,7 +290,7 @@ export default class Popup extends Widget {
 
   remove() {
     var currentAnimateRemoval = this.animateRemoval;
-    if (!this._isInView()) {
+    if ((this.boundToAnchor && this.$anchor) && !this._isInView()) {
       this.animateRemoval = false;
     }
     super.remove();
