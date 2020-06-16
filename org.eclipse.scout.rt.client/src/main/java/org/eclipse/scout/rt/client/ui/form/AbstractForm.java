@@ -128,8 +128,6 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.PreferredValue;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.event.FastListenerList;
-import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.platform.util.visitor.CollectingVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.security.ACCESS;
@@ -171,7 +169,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   private static final NamedBitMaskHelper STATE_BIT_HELPER = new NamedBitMaskHelper(FORM_STORED, FORM_LOADING, FORM_STARTED);
 
   private final PreferredValue<IDisplayParent> m_displayParent;
-  private final FastListenerList<FormListener> m_listenerList;
+  private final FormListeners m_listenerList;
   private final PreferredValue<Boolean> m_modal; // no property, is fixed
   private final IBlockingCondition m_blockingCondition;
   private final ObjectExtensions<AbstractForm, IFormExtension<? extends AbstractForm>> m_objectExtensions;
@@ -218,7 +216,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   public AbstractForm(boolean callInitializer) {
     super(false);
-    m_listenerList = new FastListenerList<>();
+    m_listenerList = new FormListeners();
     m_modal = new PreferredValue<>(false, false);
     m_closeType = IButton.SYSTEM_TYPE_NONE;
     m_displayParent = new PreferredValue<>(null, false);
@@ -454,8 +452,6 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    * Override this method to mark a form as closable. In case of closable the close button [X] is displayed either in
    * the form or the view header. The default implementations says a form displayed as a dialog containing a
    * {@link AbstractCloseButton} or a {@link AbstractCancelButton} is closable.
-   *
-   * @return
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(190)
@@ -2397,7 +2393,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    * Model Observer.
    */
   @Override
-  public IFastListenerList<FormListener> formListeners() {
+  public FormListeners formListeners() {
     return m_listenerList;
   }
 
@@ -2473,7 +2469,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   protected void fireFormEvent(FormEvent e) {
     RuntimeException pe = null;
-    for (FormListener listener : formListeners().list()) {
+    for (FormListener listener : formListeners().list(e.getType())) {
       try {
         listener.formChanged(e);
       }
@@ -2948,9 +2944,6 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    */
   protected static class LocalFormExtension<FORM extends AbstractForm> extends AbstractExtension<FORM> implements IFormExtension<FORM> {
 
-    /**
-     * @param owner
-     */
     public LocalFormExtension(FORM owner) {
       super(owner);
     }

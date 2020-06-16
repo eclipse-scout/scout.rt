@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.wizard;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -115,7 +113,7 @@ public class AbstractWizardTest {
     wizard.getContainerForm().doClose();
 
     assertTrue(wizard.isClosed());
-    assertEquals("All listeners should be removed from the container form.", 0, wizard.getContainerForm().formListeners().list().size());
+    assertEquals("All listeners should be removed from the container form.", 0, wizard.getContainerForm().formListeners().listAll().size());
   }
 
   @Test
@@ -130,7 +128,7 @@ public class AbstractWizardTest {
     wizard.close();
 
     assertTrue(wizard.isClosed());
-    assertEquals("All listeners should be removed from the container form.", 0, wizard.getContainerForm().formListeners().list().size());
+    assertEquals("All listeners should be removed from the container form.", 0, wizard.getContainerForm().formListeners().listAll().size());
   }
 
   private class P_AbstractWizard extends AbstractWizard {

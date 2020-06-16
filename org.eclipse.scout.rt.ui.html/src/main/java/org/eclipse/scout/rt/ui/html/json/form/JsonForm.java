@@ -157,7 +157,7 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonWidget<FORM> {
 
     Assertions.assertNull(m_formListener);
     m_formListener = new P_FormListener();
-    getModel().addFormListener(m_formListener);
+    getModel().addUIFormListener(m_formListener);
   }
 
   @Override

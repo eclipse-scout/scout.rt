@@ -133,7 +133,6 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * Container of this table, {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage IPage},
    * {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField ITableField},
    * {@link org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox IListBox},
-   * {@link org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldOld IPlannerField}
    * <p>
    * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
    *
@@ -408,8 +407,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   Object[][] getTableData();
 
   /**
-   * see {@link TableUtility#exportRowsAsCSV(List<? extends ITableRow>, List<? extends IColumn<?>>, boolean, boolean,
-   * boolean)}
+   * see {@link TableUtility#exportRowsAsCSV(List, List, boolean, boolean, boolean)}
    */
   Object[][] exportTableRowsAsCSV(List<? extends ITableRow> rows, List<? extends IColumn> columns, boolean includeLineForColumnNames, boolean includeLineForColumnTypes, boolean includeLineForColumnFormat);
 
@@ -574,10 +572,10 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   void setMultiCheck(boolean b);
 
   /**
-   * This property changes the behaviour of {@link #replaceRows(List<? extends ITableRow>)} and
-   * {@link #deleteRows(int[])} true discards rows when deleted, false keeps them in the cache for later usage in change
-   * management Default value is true for {@link IPageWithTable} and false for
-   * {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField ITableField}
+   * This property changes the behaviour of {@link #replaceRows(List)} and {@link #deleteRows(int[])} true discards rows
+   * when deleted, false keeps them in the cache for later usage in change management Default value is true for
+   * {@link IPageWithTable} and false for {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField
+   * ITableField}
    */
   boolean isAutoDiscardOnDelete();
 
@@ -632,7 +630,6 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   TableListeners tableListeners();
 
   /**
-   * @param listener
    * @param eventTypes
    *          of {@link TableEvent} TYPE_*
    */
@@ -647,9 +644,8 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   /**
    * Add the listener so it is called as <em>last</em> listener.
    * <p>
-   * Use {@link #addTableListener(TableListener)} in all other cases
+   * Use {@link #addTableListener(TableListener, Integer...)} in all other cases
    *
-   * @param listener
    * @param eventTypes
    *          of {@link TableEvent} TYPE_*
    */
@@ -821,30 +817,21 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    */
   ITableRow addRow(boolean markAsInserted);
 
-  /**
-   * calls {@link #addRow(ITableRow, false)}
-   */
   ITableRow addRow(ITableRow newRow);
 
   /**
    * the newRow is added to the table. After the add succeeds the argument row newRow has a valid reference to its
-   * coresponding ITableRow and the new ITableRow is returned
+   * corresponding ITableRow and the new ITableRow is returned
    */
   ITableRow addRow(ITableRow newRow, boolean markAsInserted);
 
-  /**
-   * calls {@link #addRows(List<? extends ITableRow>, false)}
-   */
   List<ITableRow> addRows(List<? extends ITableRow> newRows);
 
-  /**
-   * calls {@link #addRows(List<? extends ITableRow>, markAsInserted, null)}
-   */
   List<ITableRow> addRows(List<? extends ITableRow> newRows, boolean markAsInserted);
 
   /**
    * all newRows are added to the table. After the add succeeds the argument rows newRows have valid references to their
-   * coresponding ITableRow and the new ITableRows are returned Using insertIndexes: assume the rows have been added to
+   * corresponding ITableRow and the new ITableRows are returned Using insertIndexes: assume the rows have been added to
    * the table; insertIndexes = what indexes should they cover
    *
    * @return added rows in order as they were passed to the method
@@ -938,7 +925,7 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * <p>
    * This property is currently also used for internal purposes after certain column property changes (e.g. visibility)
    * the value of this property may be changed. To adjust this behavior, see
-   * {@link AbstractTable#checkIfColumnPreventsUiSortForTable(IColumn)}.
+   * {@link AbstractTable#checkIfColumnPreventsUiSortForTable()}
    */
   boolean isUiSortPossible();
 
@@ -1047,7 +1034,6 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * {@link IColumn}s to {@link AbstractTableRowData} properties is based on the property name and the
    * {@link IColumn#getColumnId()}.
    *
-   * @param target
    * @since 3.10.0-M3
    */
   void exportToTableBeanData(AbstractTableFieldBeanData target);
@@ -1056,7 +1042,6 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * Imports the contents of the given {@link AbstractTableFieldBeanData}. The mapping from {@link AbstractTableRowData}
    * properties to {@link IColumn}s is based on the property name and the {@link IColumn#getColumnId()}.
    *
-   * @param source
    * @since 3.10.0-M3
    */
   void importFromTableBeanData(AbstractTableFieldBeanData source);
@@ -1065,20 +1050,12 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * Creates a {@link TableRowDataMapper} that is used for reading and writing data from the given
    * {@link AbstractTableRowData} type.
    *
-   * @param rowType
-   * @return
    * @since 3.10.0-M5
    */
   ITableRowDataMapper createTableRowDataMapper(Class<? extends AbstractTableRowData> rowType);
 
-  /**
-   * @param menus
-   */
   void setMenus(List<? extends IMenu> menus);
 
-  /**
-   * @param menu
-   */
   void addMenu(IMenu menu);
 
   @Override
@@ -1118,7 +1095,6 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * the holder to null while processing.
    * </p>
    *
-   * @param dataMatrixOrReference
    * @param rowStatus
    *          The row status to be set for each created table row
    * @return the list of the created table rows
@@ -1128,7 +1104,6 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   /**
    * Creates table rows from the codes. The created rows are not added to the table yet.
    *
-   * @param codes
    * @return the list of the created table rows
    */
   List<ITableRow> createRowsByCodes(Collection<? extends ICode<?>> codes);

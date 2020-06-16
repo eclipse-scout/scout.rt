@@ -36,7 +36,6 @@ import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
 import org.eclipse.scout.rt.platform.reflect.IPropertyFilter;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
-import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.w3c.dom.Document;
@@ -192,7 +191,6 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   IMultiStatus getStatus();
 
   /**
-   * @param status
    * @return true if the status is present recursive in all children.
    */
   boolean hasStatus(IStatus status);
@@ -327,7 +325,7 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    *          a filter that can be used to specify which form properties should be imported
    * @param formFieldFilter
    *          a filter that can be used to specify which form fields should be imported
-   * @see IPropertyFilter#accept(FastPropertyDescriptor) 
+   * @see IPropertyFilter#accept(FastPropertyDescriptor)
    * @see IFormFieldFilter#accept(IFormField)
    */
   void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter, IFormFieldFilter formFieldFilter);
@@ -687,21 +685,36 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    */
   void requestInput(IFormField field);
 
-  IFastListenerList<FormListener> formListeners();
+  FormListeners formListeners();
 
   /**
    * Add a {@link FormListener}. These listeners will be called when the form is activated, closed, discarded, before
    * loading, after loading, before storing, after storing, when the structure changes, when it is printed, etc.
+   *
+   * @param eventTypes
+   *          of {@link FormEvent} TYPE_*
    */
-  default void addFormListener(FormListener listener) {
-    formListeners().add(listener);
+  default void addFormListener(FormListener listener, Integer... eventTypes) {
+    formListeners().add(listener, false, eventTypes);
   }
 
   /**
    * Remove a {@link FormListener} that was added to the form before.
    */
-  default void removeFormListener(FormListener listener) {
-    formListeners().remove(listener);
+  default void removeFormListener(FormListener listener, Integer... eventTypes) {
+    formListeners().remove(listener, eventTypes);
+  }
+
+  /**
+   * Add the listener so it is called as <em>last</em> listener.
+   * <p>
+   * Use {@link #addFormListener(FormListener, Integer...)}
+   *
+   * @param eventTypes
+   *          of {@link FormEvent} TYPE_*
+   */
+  default void addUIFormListener(FormListener listener, Integer... eventTypes) {
+    formListeners().addLastCalled(listener, false, eventTypes);
   }
 
   /**
