@@ -27,7 +27,6 @@ export default class TabBoxHeader extends Widget {
 
   _init(options) {
     super._init(options);
-    this.tabBox = options.tabBox;
 
     this.tabArea = scout.create('TabArea', {
       parent: this,
@@ -39,10 +38,10 @@ export default class TabBoxHeader extends Widget {
       parent: this,
       menuOrder: new GroupBoxMenuItemsOrder()
     });
-    // tabbox listener
-    this.tabBox.on('propertyChange', this._tabBoxPropertyChangeHandler);
 
+    this.tabBox.on('propertyChange', this._tabBoxPropertyChangeHandler);
     this.menuBar.setMenuItems(this.tabBox.menus);
+    this.setVisible(this.tabBox.labelVisible);
   }
 
   _render() {
@@ -93,6 +92,8 @@ export default class TabBoxHeader extends Widget {
   _onTabBoxPropertyChange(event) {
     if (event.propertyName === 'menus') {
       this.menuBar.setMenuItems(this.tabBox.menus);
+    } else if (event.propertyName === 'labelVisible') {
+      this.setVisible(this.tabBox.labelVisible);
     }
   }
 
