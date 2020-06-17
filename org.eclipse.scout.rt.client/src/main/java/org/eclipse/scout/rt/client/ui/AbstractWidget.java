@@ -575,6 +575,17 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
   }
 
   @Override
+  public boolean has(IWidget child) {
+    while (child != null) {
+      if (this.equals(child.getParent())) {
+        return true;
+      }
+      child = child.getParent();
+    }
+    return false;
+  }
+
+  @Override
   public String classId() {
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
     IWidget parent = getParent();

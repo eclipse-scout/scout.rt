@@ -41,7 +41,7 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
   String PROP_INHERIT_ACCESSIBILITY = "inheritAccessibility";
 
   /**
-   * @return {@code true} if {@link #initConfig()} has been called, {@code false} if not.
+   * @return {@code true} if initConfig has been called, {@code false} if not.
    */
   boolean isInitConfigDone();
 
@@ -49,9 +49,9 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * Init is supposed to be called after the widget has been created. This is usually done by the framework itself. E.g.
    * if the widgets are used on a form, the form will initialize all the widgets on form startup.
    * <p>
-   * After the execution of this method, {@link #isInitDone()} will return true. A repeated execution of {@link #init()}
-   * will do nothing unless initDone would be set to false again which is done by {@link #reinit()} and
-   * {@link #dispose()}. This means a widget may be initialized again after it has been disposed.
+   * After the execution of this method, {@link #isInitDone()} will return true. A repeated execution of init() will do
+   * nothing unless initDone would be set to false again which is done by {@link #reinit()} and {@link #dispose()}. This
+   * means a widget may be initialized again after it has been disposed.
    * <p>
    * This method initializes this widget and all child widgets recursively.
    */
@@ -74,9 +74,9 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * is usually done by the framework itself. E.g. if the widgets are used on a form, the form will dispose all the
    * widgets when the form closes.
    * <p>
-   * After the execution of this method, {@link #isDisposeDone()} will return true. A repeated execution of
-   * {@link #dispose()} will do nothing unless the disposeDone would be set to false which is done by {@link #init()}.
-   * This means a widget may be initialized again after it has been disposed.
+   * After the execution of this method, {@link #isDisposeDone()} will return true. A repeated execution of dispose()
+   * will do nothing unless the disposeDone would be set to false which is done by {@link #init()}. This means a widget
+   * may be initialized again after it has been disposed.
    * <p>
    * By calling this method the complete widget tree is disposed recursively.
    */
@@ -160,7 +160,7 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * Visits this {@link IWidget} and all of its child {@link IWidget}s recursively.
    * <p>
    * The specified {@link IDepthFirstTreeVisitor} controls the visited elements using the {@link TreeVisitResult}
-   * returned by {@link IDepthFirstTreeVisitor#preVisit(T, int, int)}. Every {@link IWidget} is only visited once.
+   * returned by {@link IDepthFirstTreeVisitor#preVisit(Object, int, int)}. Every {@link IWidget} is only visited once.
    *
    * @param visitor
    *          The {@link IDepthFirstTreeVisitor} to call. Must not be {@code null}.
@@ -176,8 +176,8 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * Visits this {@link IWidget} and all of its child {@link IWidget}s recursively.
    * <p>
    * The specified {@link IDepthFirstTreeVisitor} controls the visited elements using the {@link TreeVisitResult}
-   * returned by {@link IDepthFirstTreeVisitor#preVisit(T, int, int)}. Every {@link IWidget} is only visited once. The
-   * specified visitor is only called for {@link IWidget}s that are of the specified type.
+   * returned by {@link IDepthFirstTreeVisitor#preVisit(Object, int, int)}. Every {@link IWidget} is only visited once.
+   * The specified visitor is only called for {@link IWidget}s that are of the specified type.
    *
    * @param visitor
    *          The {@link IDepthFirstTreeVisitor} to call. Must not be {@code null}.
@@ -197,8 +197,8 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * Visits this {@link IWidget} and all of its child {@link IWidget}s recursively using a level-order strategy.
    * <p>
    * The specified {@link IBreadthFirstTreeVisitor} controls the visited elements using the {@link TreeVisitResult}
-   * returned by {@link IBreadthFirstTreeVisitor#visit(T, int, int)}. Every {@link IWidget} is only visited once. The
-   * specified visitor is only called for {@link IWidget}s that are of the specified type.
+   * returned by {@link IBreadthFirstTreeVisitor#visit(Object, int, int)}. Every {@link IWidget} is only visited once.
+   * The specified visitor is only called for {@link IWidget}s that are of the specified type.
    *
    * @param visitor
    *          The {@link IBreadthFirstTreeVisitor} to use. Must not be {@code null}.
@@ -218,7 +218,7 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    * Visits this {@link IWidget} and all of its child {@link IWidget}s recursively using a level-order strategy.
    * <p>
    * The specified {@link IBreadthFirstTreeVisitor} controls the visited elements using the {@link TreeVisitResult}
-   * returned by {@link IBreadthFirstTreeVisitor#visit(T, int, int)}. Every {@link IWidget} is only visited once.
+   * returned by {@link IBreadthFirstTreeVisitor#visit(Object, int, int)}. Every {@link IWidget} is only visited once.
    *
    * @param visitor
    *          The {@link IBreadthFirstTreeVisitor} to use. Must not be {@code null}.
@@ -481,6 +481,15 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    *          {@code false}.
    */
   <T extends IWidget> boolean visitParents(Predicate<T> visitor, Class<T> typeFilter);
+
+  /**
+   * Checks whether the widget contains the given child. Uses the parent hierarchy which makes it faster than visiting
+   * children. Hence, works only if the child widgets are properly connected to their parents ({@link #getParent()} must
+   * not return null).
+   *
+   * @return true if the widget contains the given child, false if not.
+   */
+  boolean has(IWidget child);
 
   void scrollToTop();
 

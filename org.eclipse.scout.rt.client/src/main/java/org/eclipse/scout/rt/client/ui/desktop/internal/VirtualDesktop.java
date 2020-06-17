@@ -628,6 +628,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public boolean has(IWidget child) {
+    return false;
+  }
+
+  @Override
   public boolean doBeforeClosingInternal() {
     throw createUnsupportedOperationException();
   }

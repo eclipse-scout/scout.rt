@@ -58,71 +58,71 @@ public class WidgetTest {
   public void testInitConfig() {
     Widget widget = new Widget();
     assertEquals(1, widget.initConfigCalls);
-    assertEquals(true, widget.isInitConfigDone());
+    assertTrue(widget.isInitConfigDone());
   }
 
   @Test
   public void testInit() {
     Widget widget = new Widget();
     assertEquals(0, widget.initCalls);
-    assertEquals(false, widget.isInitDone());
+    assertFalse(widget.isInitDone());
 
     widget.init();
     assertEquals(1, widget.initCalls);
-    assertEquals(true, widget.isInitDone());
+    assertTrue(widget.isInitDone());
 
     // Does not execute init again
     widget.init();
     assertEquals(1, widget.initCalls);
-    assertEquals(true, widget.isInitDone());
+    assertTrue(widget.isInitDone());
   }
 
   @Test
   public void testDispose() {
     Widget widget = new Widget();
     assertEquals(0, widget.disposeCalls);
-    assertEquals(false, widget.isDisposeDone());
+    assertFalse(widget.isDisposeDone());
 
     widget.init();
     assertEquals(0, widget.disposeCalls);
-    assertEquals(false, widget.isDisposeDone());
+    assertFalse(widget.isDisposeDone());
 
     widget.dispose();
     assertEquals(1, widget.disposeCalls);
-    assertEquals(true, widget.isDisposeDone());
+    assertTrue(widget.isDisposeDone());
 
     // Does not execute dispose again
     widget.dispose();
     assertEquals(1, widget.disposeCalls);
-    assertEquals(true, widget.isDisposeDone());
+    assertTrue(widget.isDisposeDone());
   }
 
   @Test
   public void testInitAfterDispose() {
     Widget widget = new Widget();
     assertEquals(0, widget.disposeCalls);
-    assertEquals(false, widget.isDisposeDone());
+    assertFalse(widget.isDisposeDone());
 
     widget.init();
     assertEquals(0, widget.disposeCalls);
-    assertEquals(false, widget.isDisposeDone());
+    assertFalse(widget.isDisposeDone());
 
     widget.dispose();
     assertEquals(1, widget.disposeCalls);
-    assertEquals(false, widget.isInitDone());
-    assertEquals(true, widget.isDisposeDone());
+    assertFalse(widget.isInitDone());
+    assertTrue(widget.isDisposeDone());
 
     // Init may be called again after dispose
     // The reason is: it has always been like this for forms and we don't want to break existing code
     widget.init();
     assertEquals(2, widget.initCalls);
-    assertEquals(true, widget.isInitDone());
-    assertEquals(false, widget.isDisposeDone());
+    assertTrue(widget.isInitDone());
+    assertFalse(widget.isDisposeDone());
 
     widget.dispose();
     assertEquals(2, widget.disposeCalls);
-    assertEquals(false, widget.isInitDone());
-    assertEquals(true, widget.isDisposeDone());
+    assertFalse(widget.isInitDone());
+    assertTrue(widget.isDisposeDone());
   }
 
   @Test
@@ -157,6 +157,19 @@ public class WidgetTest {
   }
 
   @Test
+  public void testHas() {
+    IWidget widget = new WidgetWithChildren();
+    widget.init();
+    ChildWidget childWidget = widget.getWidgetByClass(ChildWidget.class);
+    ChildChildWidget childChildWidget = widget.getWidgetByClass(ChildChildWidget.class);
+    assertTrue(widget.has(childWidget));
+    assertTrue(widget.has(childChildWidget));
+    assertFalse(widget.has(widget));
+    assertFalse(childWidget.has(widget));
+    assertFalse(childChildWidget.has(widget));
+  }
+
+  @Test
   public void testGetWidgetByClass() {
     IWidget widget = new WidgetWithChildren();
     assertEquals(ChildWidget.class, widget.getWidgetByClass(ChildWidget.class).getClass());
@@ -168,7 +181,7 @@ public class WidgetTest {
   public void testGetWidgetByClass_replacedWidget() {
     IDesktop desktop = new Desktop();
     assertEquals(ViewButton.class, desktop.getWidgetByClass(ViewButton.class).getClass());
-    assertEquals(null, desktop.getWidgetByClass(ReplacedViewButton.class));
+    assertNull(desktop.getWidgetByClass(ReplacedViewButton.class));
 
     IDesktop replacedDesktop = new ReplacedDesktop();
     assertEquals(ReplacedViewButton.class, replacedDesktop.getWidgetByClass(ViewButton.class).getClass());
@@ -248,19 +261,40 @@ public class WidgetTest {
     }
   }
 
-  protected static class WidgetWithChildren extends AbstractWidget {
+  protected static class ConnectedWidget extends AbstractWidget {
+    private List<? extends IWidget> m_children;
+
+    @Override
+    protected void initConfig() {
+      super.initConfig();
+      m_children = createChildren();
+      getChildren().forEach(child -> child.setParentInternal(this));
+    }
+
+    public List<? extends IWidget> createChildren() {
+      return new ArrayList<>();
+    }
 
     @Override
     public List<? extends IWidget> getChildren() {
+      return m_children;
+    }
+  }
+
+  protected static class WidgetWithChildren extends ConnectedWidget {
+
+    @Override
+    public List<? extends IWidget> createChildren() {
       List<IWidget> result = new ArrayList<>();
       result.add(new ChildWidget());
       result.add(new ChildWidget2());
       return result;
     }
 
-    public class ChildWidget extends AbstractWidget {
+    public class ChildWidget extends ConnectedWidget {
+
       @Override
-      public List<? extends IWidget> getChildren() {
+      public List<? extends IWidget> createChildren() {
         List<IWidget> result = new ArrayList<>();
         result.add(new ChildChildWidget());
         return result;
