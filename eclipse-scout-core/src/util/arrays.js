@@ -492,6 +492,19 @@ export function $remove(arr, $element) {
   }
 }
 
+export function randomElement(array) {
+  if (!array) {
+    return undefined;
+  }
+  if (!Array.isArray(array)) {
+    return array;
+  }
+  if (!array.length) {
+    return undefined;
+  }
+  return array[Math.floor(Math.random() * array.length)];
+}
+
 export default {
   $indexOf,
   $remove,
@@ -532,5 +545,6 @@ export default {
   remove,
   removeAll,
   replace,
-  union
+  union,
+  randomElement
 };

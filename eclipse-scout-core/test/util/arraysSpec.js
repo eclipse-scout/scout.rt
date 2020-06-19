@@ -699,4 +699,26 @@ describe('scout.arrays', () => {
 
   });
 
+  describe('randomElement', () => {
+
+    it('returns a random element', () => {
+      // Edge cases
+      expect(arrays.randomElement()).toBeUndefined();
+      expect(arrays.randomElement([])).toBeUndefined();
+      expect(arrays.randomElement('not-an-array')).toBe('not-an-array');
+      expect(arrays.randomElement(123)).toBe(123);
+      let o = {x: 'x', y: 'y'};
+      expect(arrays.randomElement(o)).toBe(o);
+
+      // Main case
+      let arr = ['a', 'b', 'c'];
+      for (let i = 0; i < 1000; i++) {
+        let result = arrays.randomElement(arr);
+        let index = arr.indexOf(result);
+        expect(index >= 0 && index < arr.length).toBeTrue();
+      }
+    });
+
+  });
+
 });
