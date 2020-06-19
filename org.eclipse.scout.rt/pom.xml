@@ -101,7 +101,6 @@
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.rt/target/jacoco-all.exec</master_coverage_jacoco_destFile>
     <master_test_forkCount>1</master_test_forkCount>
     <!-- Sonar properties -->
-    <sonar.branch>releases_11.0</sonar.branch>
     <sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
     <sonar.exclusions>
       **/resources/WebContent/**,
