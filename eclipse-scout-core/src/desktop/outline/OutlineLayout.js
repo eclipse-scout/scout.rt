@@ -64,7 +64,7 @@ export default class OutlineLayout extends TreeLayout {
   }
 
   _setDataHeight(heightOffset) {
-    /** @type Dimension */
+    /** @type {Dimension} */
     let titleSize = null;
     if (this.outline.titleVisible) {
       titleSize = graphics.size(this.outline.$title, true);

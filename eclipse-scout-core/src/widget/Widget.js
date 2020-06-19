@@ -86,7 +86,10 @@ export default class Widget {
     this.scrollTop = null;
     this.scrollLeft = null;
 
-    this.$container;
+    /** @type {$} */
+    this.$parent = null;
+    /** @type {$} */
+    this.$container = null;
 
     // If set to true, remove won't remove the element immediately but after the animation has been finished
     // This expects a css animation which may be triggered by the class 'animate-remove'
@@ -110,7 +113,7 @@ export default class Widget {
     this.loadingSupport = this._createLoadingSupport();
     this.keyStrokeContext = this._createKeyStrokeContext();
     // Widgets using LogicalGridLayout may have a grid to calculate the grid data of the children
-    this.logicalGrid;
+    this.logicalGrid = null;
 
     // focus tracking
     this.trackFocus = false;
