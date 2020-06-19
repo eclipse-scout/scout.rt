@@ -1795,12 +1795,15 @@ $.fn._getClientAndScrollWidthReliable = function() {
 
 /**
  * Checks if content is truncated.
+ *
+ * @return {boolean}
  */
 $.fn.isContentTruncated = function() {
   let widths = this._getClientAndScrollWidthReliable();
   if (widths.scrollWidth > widths.clientWidth) {
     return true;
   }
+  return false;
 };
 
 /**
