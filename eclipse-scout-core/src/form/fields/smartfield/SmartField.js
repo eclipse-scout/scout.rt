@@ -1059,8 +1059,9 @@ export default class SmartField extends ValueField {
     var w = event.which;
     var isPaste = ((event.ctrlKey || event.metaKey) && w === keys.V) || (event.shiftKey && w === keys.INSERT);
     var isCut = ((event.ctrlKey || event.metaKey) && w === keys.X) || (event.shiftKey && w === keys.DELETE);
+    var isCutOrPaste = (isPaste || isCut) && !this.isDropdown();
 
-    if (!isPaste && !isCut && (
+    if (!isCutOrPaste && (
       event.ctrlKey ||
       event.altKey ||
       event.metaKey ||
@@ -1163,6 +1164,7 @@ export default class SmartField extends ValueField {
         this.openPopup(!this.searchRequired);
       }
       event.stopPropagation(); // key has been handled (popup open). do not allow propagation to other listeners because this could remove tooltips
+      event.preventDefault(); // prevent scrolling of container
     }
   }
 
@@ -1191,8 +1193,9 @@ export default class SmartField extends ValueField {
     var w = event.which;
     var isPaste = ((event.ctrlKey || event.metaKey) && w === keys.V) || (event.shiftKey && w === keys.INSERT);
     var isCut = ((event.ctrlKey || event.metaKey) && w === keys.X) || (event.shiftKey && w === keys.DELETE);
+    var isCutOrPaste = (isPaste || isCut) && !this.isDropdown();
 
-    if (!isPaste && !isCut && (
+    if (!isCutOrPaste && (
       event.ctrlKey ||
       event.altKey ||
       event.metaKey ||
