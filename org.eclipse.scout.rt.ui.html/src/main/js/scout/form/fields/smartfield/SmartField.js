@@ -1042,10 +1042,6 @@ scout.SmartField.prototype._onFieldKeyUp = function(event) {
   var w = event.which;
   var isPaste = ((event.ctrlKey || event.metaKey) && w === scout.keys.V) || (event.shiftKey && w === scout.keys.INSERT);
   var isCut = ((event.ctrlKey || event.metaKey) && w === scout.keys.X) || (event.shiftKey && w === scout.keys.DELETE);
-  if (this.isDropdown()) {
-    isPaste = false;
-    isCut = false;
-  }
   var isCutOrPaste = (isPaste || isCut) && !this.isDropdown();
 
   if (!isCutOrPaste && (
@@ -1151,6 +1147,7 @@ scout.SmartField.prototype._onFieldKeyDown = function(event) {
       this.openPopup(!this.searchRequired);
     }
     event.stopPropagation(); // key has been handled (popup open). do not allow propagation to other listeners because this could remove tooltips
+    event.preventDefault(); // prevent scrolling of container
   }
 };
 
@@ -1179,8 +1176,9 @@ scout.SmartField.prototype._updateUserWasTyping = function(event) {
   var w = event.which;
   var isPaste = ((event.ctrlKey || event.metaKey) && w === scout.keys.V) || (event.shiftKey && w === scout.keys.INSERT);
   var isCut = ((event.ctrlKey || event.metaKey) && w === scout.keys.X) || (event.shiftKey && w === scout.keys.DELETE);
+  var isCutOrPaste = (isPaste || isCut) && !this.isDropdown();
 
-  if (!isPaste && !isCut && (
+  if (!isCutOrPaste && (
       event.ctrlKey ||
       event.altKey ||
       event.metaKey ||
