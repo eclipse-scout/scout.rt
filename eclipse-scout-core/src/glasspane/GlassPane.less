@@ -9,6 +9,7 @@
   outline: none;
   z-index: 100;
   cursor: default;
+  pointer-events: auto; /* Capture all pointer events, so they will not be received by elements behind the glass pane */
 
   &.busy {
     /* Make glasspane transparent and disable animation */
