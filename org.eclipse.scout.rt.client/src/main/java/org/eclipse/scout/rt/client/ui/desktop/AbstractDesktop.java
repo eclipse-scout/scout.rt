@@ -2151,7 +2151,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       }
     }
     catch (DeepLinkException e) {
-      LOG.warn("Failed to execute deep-link '{}', reason: {}", deepLinkPath, e.getMessage());
+      LOG.info("Failed to execute deep-link '{}', reason: {}", deepLinkPath, e.getMessage());
       interceptDefaultView();
       showDeepLinkError(e);
     }
