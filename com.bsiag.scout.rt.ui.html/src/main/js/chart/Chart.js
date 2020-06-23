@@ -32,25 +32,8 @@ export default class Chart extends Widget {
     this.chartRenderer = null;
 
     this.data = null;
-    this.config = {
-      type: Chart.Type.PIE_OLD,
-      options: {
-        autoColor: true,
-        maxSegments: 5,
-        clickable: false,
-        animation: {
-          duration: Chart.DEFAULT_ANIMATION_DURATION
-        },
-        tooltips: {
-          enabled: true
-        },
-        legend: {
-          display: true,
-          clickable: false,
-          position: Chart.Position.RIGHT
-        }
-      }
-    };
+    this.config = null;
+
     this._updateChartTimeoutId = null;
     this._updateChartOpts = null;
     this.updatedOnce = false;
@@ -85,7 +68,7 @@ export default class Chart extends Widget {
 
   _init(model) {
     super._init(model);
-    this._updateChartRenderer();
+    this.setConfig(this.config);
   }
 
   _render() {
@@ -124,7 +107,26 @@ export default class Chart extends Widget {
   }
 
   setConfig(config) {
-    this.setProperty('config', config);
+    let defaultConfig = {
+      type: Chart.Type.PIE_OLD,
+      options: {
+        autoColor: true,
+        maxSegments: 5,
+        clickable: false,
+        animation: {
+          duration: Chart.DEFAULT_ANIMATION_DURATION
+        },
+        tooltips: {
+          enabled: true
+        },
+        legend: {
+          display: true,
+          clickable: false,
+          position: Chart.Position.RIGHT
+        }
+      }
+    };
+    this.setProperty('config', $.extend(true, {}, defaultConfig, config));
     this._updateChartRenderer();
   }
 
