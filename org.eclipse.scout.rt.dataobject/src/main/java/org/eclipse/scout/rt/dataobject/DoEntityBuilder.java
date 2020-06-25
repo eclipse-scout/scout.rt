@@ -44,9 +44,7 @@ public class DoEntityBuilder {
    * Adds new value to attribute map of entity if the value satisfies the given {@code predicate}.
    */
   public DoEntityBuilder putIf(String attributeName, Object value, Predicate<? super Object> predicate) {
-    if (predicate.test(value)) {
-      put(attributeName, value);
-    }
+    m_entity.putIf(attributeName, value, predicate);
     return this;
   }
 
@@ -57,6 +55,14 @@ public class DoEntityBuilder {
    */
   public <V> DoEntityBuilder putList(String attributeName, List<V> value) {
     m_entity.putList(attributeName, value);
+    return this;
+  }
+
+  /**
+   * Adds new list value to attribute map of entity if the value satisfies the given {@code predicate}.
+   */
+  public <V> DoEntityBuilder putListIf(String attributeName, List<V> value, Predicate<? super List<V>> predicate) {
+    m_entity.putListIf(attributeName, value, predicate);
     return this;
   }
 
