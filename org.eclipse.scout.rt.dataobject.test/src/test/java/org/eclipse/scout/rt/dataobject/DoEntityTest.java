@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
+import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
 import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
@@ -22,6 +23,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -610,8 +612,8 @@ public class DoEntityTest {
     DoEntity entity1 = BEANS.get(DoEntity.class);
     DoEntity entity2 = BEANS.get(DoEntity.class);
 
-    assertFalse(entity1.equals(null));
-    assertFalse(entity1.equals(new Object()));
+    assertNotEquals(null, entity1);
+    assertNotEquals(entity1, new Object());
 
     assertEquals(entity1, entity1);
     assertEquals(entity1, entity2);
@@ -678,5 +680,33 @@ public class DoEntityTest {
 
     entity2.getOtherEntities().get(0).withId("bar");
     assertNotEquals(entity1, entity2);
+  }
+
+  @Test
+  public void testPutIf() {
+    DoEntity expected = BEANS.get(DoEntity.class);
+    expected.put("foo1", "value1");
+    expected.put("foo3", "value3");
+
+    DoEntity actual = BEANS.get(DoEntity.class);
+    actual.putIf("foo1", "value1", Objects::nonNull);
+    actual.putIf("foo2", null, Objects::nonNull);
+    actual.putIf("foo3", "value3", Objects::nonNull);
+
+    assertEqualsWithComparisonFailure(expected, actual);
+  }
+
+  @Test
+  public void testPutListIf() {
+    DoEntity expected = BEANS.get(DoEntity.class);
+    expected.putList("listAttribute1", CollectionUtility.arrayList(1, 2, 3));
+    expected.putList("listAttribute3", CollectionUtility.arrayList(4, 5, 6));
+
+    DoEntity actual = BEANS.get(DoEntity.class);
+    actual.putListIf("listAttribute1", CollectionUtility.arrayList(1, 2, 3), v -> !v.isEmpty());
+    actual.putListIf("listAttribute2", CollectionUtility.emptyArrayList(), v -> !v.isEmpty());
+    actual.putListIf("listAttribute3", CollectionUtility.arrayList(4, 5, 6), v -> !v.isEmpty());
+
+    assertEqualsWithComparisonFailure(expected, actual);
   }
 }
