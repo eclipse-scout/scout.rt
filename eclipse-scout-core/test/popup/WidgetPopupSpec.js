@@ -66,6 +66,7 @@ describe('WidgetPopup', function() {
       field2.focus();
 
       var popup = createPopupWithFormAnd2Fields('Second Field');
+      popup.animateRemoval = false;
       popup.open();
       expect(popup.widget.widget('Second Field').isFocused()).toBe(true);
 
