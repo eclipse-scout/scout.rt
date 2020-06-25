@@ -38,6 +38,7 @@ public class DoEntityBuilderTest {
         .putIf("attribute4", null, Objects::nonNull)
         .putList("listAttribute1", 1, 2, 3)
         .putList("listAttribute2", Arrays.asList(4, 5, 6))
+        .putListIf("listAttribute3", CollectionUtility.emptyArrayList(), v -> !v.isEmpty())
         .build();
     assertEqualsWithComparisonFailure(expected, actual);
 
