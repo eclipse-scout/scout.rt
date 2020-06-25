@@ -30,6 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -40,6 +41,7 @@ import org.eclipse.scout.rt.platform.dataobject.fixture.OtherEntityFixtureDo;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
+import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.junit.Test;
 
 /**
@@ -673,5 +675,33 @@ public class DoEntityTest {
 
     entity2.getOtherEntities().get(0).withId("bar");
     assertNotEquals(entity1, entity2);
+  }
+
+  @Test
+  public void testPutIf() {
+    DoEntity expected = BEANS.get(DoEntity.class);
+    expected.put("foo1", "value1");
+    expected.put("foo3", "value3");
+
+    DoEntity actual = BEANS.get(DoEntity.class);
+    actual.putIf("foo1", "value1", Objects::nonNull);
+    actual.putIf("foo2", null, Objects::nonNull);
+    actual.putIf("foo3", "value3", Objects::nonNull);
+
+    ScoutAssert.assertEqualsWithComparisonFailure(expected, actual);
+  }
+
+  @Test
+  public void testPutListIf() {
+    DoEntity expected = BEANS.get(DoEntity.class);
+    expected.putList("listAttribute1", CollectionUtility.arrayList(1, 2, 3));
+    expected.putList("listAttribute3", CollectionUtility.arrayList(4, 5, 6));
+
+    DoEntity actual = BEANS.get(DoEntity.class);
+    actual.putListIf("listAttribute1", CollectionUtility.arrayList(1, 2, 3), v -> !v.isEmpty());
+    actual.putListIf("listAttribute2", CollectionUtility.emptyArrayList(), v -> !v.isEmpty());
+    actual.putListIf("listAttribute3", CollectionUtility.arrayList(4, 5, 6), v -> !v.isEmpty());
+
+    ScoutAssert.assertEqualsWithComparisonFailure(expected, actual);
   }
 }
