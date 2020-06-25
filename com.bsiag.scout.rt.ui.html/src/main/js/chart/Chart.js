@@ -53,7 +53,9 @@ export default class Chart extends Widget {
     SALESFUNNEL: 'salesfunnel',
     VENN: 'venn',
     DOUGHNUT: 'doughnut',
-    DONUT_OLD: 'donut_old'
+    DONUT_OLD: 'donut_old',
+    POLAR_AREA: 'polarArea',
+    RADAR: 'radar'
   };
 
   static Position = {
@@ -231,6 +233,8 @@ export default class Chart extends Widget {
       case Chart.Type.LINE:
       case Chart.Type.PIE:
       case Chart.Type.DOUGHNUT:
+      case Chart.Type.POLAR_AREA:
+      case Chart.Type.RADAR:
         return new ChartJsRenderer(this);
     }
     return null;

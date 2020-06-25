@@ -160,6 +160,14 @@ public interface IChartConfig extends Serializable {
 
   IChartConfig withLegendPositionRight();
 
+  IChartConfig removeScales();
+
+  IChartConfig withXAxisStacked(boolean stacked);
+
+  IChartConfig removeXAxisStacked();
+
+  boolean isXAxisStacked();
+
   IChartConfig withXAxisLabelDisplay(boolean display);
 
   IChartConfig removeXAxisLabelDisplay();
@@ -171,6 +179,12 @@ public interface IChartConfig extends Serializable {
   IChartConfig removeXAxisLabel();
 
   String getXAxisLabel();
+
+  IChartConfig withYAxisStacked(boolean stacked);
+
+  IChartConfig removeYAxisStacked();
+
+  boolean isYAxisStacked();
 
   IChartConfig withYAxisLabelDisplay(boolean display);
 

@@ -45,7 +45,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   constructor(chart) {
     super(chart);
     this.chartJs = null;
-    this.minSpaceBetweenYTicks = 40;
+    this.minSpaceBetweenYTicks = 35;
     this.numSupportedColors = 6;
     this.colorSchemeCssClass = '';
     this.minRadialChartDatalabelSpace = 25;
@@ -120,7 +120,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let labels = [],
       datasets = [];
 
-    chartData.axes[0].forEach(elem => labels.push(elem.label));
+    (chartData.axes[0] || []).forEach(elem => labels.push(elem.label));
 
     chartData.chartValueGroups.forEach(elem => datasets.push({
       label: elem.groupName,
@@ -138,7 +138,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       return;
     }
 
-    if (config.type === Chart.Type.PIE || config.type === Chart.Type.DOUGHNUT) {
+    if (config.type === Chart.Type.PIE || config.type === Chart.Type.DOUGHNUT || config.type === Chart.Type.POLAR_AREA || config.type === Chart.Type.RADAR) {
       let maxSegments = config.options.maxSegments;
       if (!(maxSegments && config.data.datasets.length && maxSegments < config.data.datasets[0].data.length)) {
         return;
@@ -154,6 +154,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       let newLabels = config.data.labels.slice(0, maxSegments);
       newLabels[maxSegments - 1] = this.chart.session.text('ui.OtherValues');
       config.data.labels = newLabels;
+      config.data.maxSegmentsExceeded = true;
     }
   }
 
@@ -169,11 +170,27 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         mode: 'nearest'
       }
     });
-    if (type === Chart.Type.BAR || type === Chart.Type.LINE) {
+    if (type === Chart.Type.POLAR_AREA || type === Chart.Type.RADAR) {
+      config.options = $.extend(true, {}, config.options, {
+        scale: {}
+      });
+    } else if (type === Chart.Type.BAR || type === Chart.Type.LINE) {
       config.options = $.extend(true, {}, config.options, {
         scales: {
           xAxes: [{}],
           yAxes: [{}]
+        }
+      });
+    }
+    if (config.options.scale) {
+      config.options.scale = $.extend(true, {}, config.options.scale, {
+        angleLines: {
+          display: false
+        }, gridLines: {
+          borderDash: [2, 4]
+        },
+        ticks: {
+          callback: this._labelFormatter
         }
       });
     }
@@ -204,7 +221,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       if (config.type === Chart.Type.PIE || config.type === Chart.Type.DOUGHNUT) {
         config.options.plugins.datalabels.display = this._radialChartDatalabelsDisplayHandler;
         config.options.plugins.datalabels.formatter = this._radialChartDatalabelsFormatter;
-      } else if (config.type === Chart.Type.BAR || config.type === Chart.Type.LINE) {
+      } else if (config.type === Chart.Type.BAR || config.type === Chart.Type.LINE || config.type === Chart.Type.POLAR_AREA || config.type === Chart.Type.RADAR) {
         config.options.plugins.datalabels.display = 'auto';
         config.options.plugins.datalabels.backgroundColor = this._datalabelBackgroundColorHandler;
         config.options.plugins.datalabels.borderRadius = 4;
@@ -295,19 +312,21 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       type = config.type,
       autoColor = config.options && config.options.autoColor;
 
-    let multipleColorsPerDataset = autoColor && (type === Chart.Type.PIE || type === Chart.Type.DOUGHNUT),
+    let multipleColorsPerDataset = autoColor && (type === Chart.Type.PIE || type === Chart.Type.DOUGHNUT || type === Chart.Type.POLAR_AREA),
       colors = {
         backgroundColors: [],
         borderColors: [],
         hoverBackgroundColors: [],
         hoverBorderColors: [],
         labelColor: undefined,
+        labelBackdropColor: undefined,
         datalabelColor: undefined,
         axisLabelColor: undefined,
         gridColor: undefined
       };
 
     colors.labelColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'label'], 'fill').fill;
+    colors.labelBackdropColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'label-backdrop'], 'fill').fill;
     colors.datalabelColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'datalabel'], 'fill').fill;
     colors.axisLabelColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'axis-label'], 'fill').fill;
     colors.gridColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'grid'], 'fill').fill;
@@ -321,9 +340,15 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         colors.hoverBorderColors.push(styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'stroke-color' + (i % this.numSupportedColors) + ' hover'], 'stroke').stroke);
       }
     } else {
-      colors.backgroundColors = this._computeColors(this.chart.data);
-      colors.borderColors = colors.backgroundColors;
-      if (type === Chart.Type.PIE || type === Chart.Type.DOUGHNUT) {
+      colors.borderColors = this._computeColors(this.chart.data);
+      if (type === Chart.Type.POLAR_AREA) {
+        colors.backgroundColors = this._computeColors(this.chart.data, 0.7);
+      } else if (type === Chart.Type.RADAR) {
+        colors.backgroundColors = this._computeColors(this.chart.data, 0.2);
+      } else {
+        colors.backgroundColors = colors.borderColors;
+      }
+      if (type === Chart.Type.PIE || type === Chart.Type.DOUGHNUT || type === Chart.Type.POLAR_AREA) {
         let borderColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'stroke-color0'], 'stroke').stroke;
         colors.borderColors = Array(colors.borderColors.length).fill(borderColor);
         colors.hoverBorderColors = colors.borderColors;
@@ -345,6 +370,18 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           }
         }
       });
+      if (config.options.scale) {
+        config.options.scale.ticks = $.extend(true, {}, config.options.scale.ticks, {
+          fontColor: colors.labelColor,
+          backdropColor: colors.labelBackdropColor
+        });
+        config.options.scale.pointLabels = $.extend(true, {}, config.options.scale.pointLabels, {
+          fontColor: colors.labelColor
+        });
+        config.options.scale.gridLines = $.extend(true, {}, config.options.scale.gridLines, {
+          color: colors.gridColor
+        });
+      }
       ((config.options.scales || {}).xAxes || []).forEach(elem => {
         elem.ticks = $.extend(true, {}, elem.ticks, {
           fontColor: colors.labelColor
@@ -373,17 +410,21 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
   }
 
-  _computeColors(chartData) {
-    let colors = [];
-    chartData.chartValueGroups.forEach(elem => colors.push(elem.colorHexValue));
+  _computeColors(chartData, opacity = 1) {
+    let colors = [],
+      opacityHex = Math.round(opacity * 255).toString(16);
+    if (opacityHex.length === 1) {
+      opacityHex = '0' + opacityHex;
+    }
+    chartData.chartValueGroups.forEach(elem => colors.push(elem.colorHexValue + opacityHex));
     return colors;
   }
 
   _adjustGrid(config, chartArea) {
-    if (!config || !config.type || !config.options || !config.options.scales || !chartArea) {
+    if (!config || !config.type || !config.options || (!config.options.scale && !config.options.scales) || !chartArea) {
       return;
     }
-    if (!(config.type === Chart.Type.BAR || config.type === Chart.Type.LINE)) {
+    if (!(config.type === Chart.Type.BAR || config.type === Chart.Type.LINE || config.type === Chart.Type.POLAR_AREA || config.type === Chart.Type.RADAR)) {
       return;
     }
 
@@ -391,15 +432,25 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       maxYTicks = Math.floor(height / this.minSpaceBetweenYTicks),
       maxMinValue = this._computeMaxMinValue(config.data);
 
-    for (let i = 0; i < (config.options.scales.yAxes || []).length; i++) {
-      config.options.scales.yAxes[i] = $.extend(true, {}, config.options.scales.yAxes[i], {
-        ticks: {
-          maxTicksLimit: maxYTicks
-        }
+    if (config.options.scale) {
+      config.options.scale.ticks = $.extend(true, {}, config.options.scale.ticks, {
+        maxTicksLimit: Math.ceil(maxYTicks / 2)
       });
       if (maxMinValue) {
-        config.options.scales.yAxes[i].ticks.suggestedMax = maxMinValue.maxValue;
-        config.options.scales.yAxes[i].ticks.suggestedMin = maxMinValue.minValue;
+        config.options.scale.ticks.suggestedMax = maxMinValue.maxValue;
+        config.options.scale.ticks.suggestedMin = maxMinValue.minValue;
+      }
+    } else {
+      for (let i = 0; i < (config.options.scales.yAxes || []).length; i++) {
+        config.options.scales.yAxes[i] = $.extend(true, {}, config.options.scales.yAxes[i], {
+          ticks: {
+            maxTicksLimit: maxYTicks
+          }
+        });
+        if (maxMinValue) {
+          config.options.scales.yAxes[i].ticks.suggestedMax = maxMinValue.maxValue;
+          config.options.scales.yAxes[i].ticks.suggestedMin = maxMinValue.minValue;
+        }
       }
     }
   }
@@ -508,12 +559,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _isMaxSegmentsExceeded(config, index) {
-    if (config.type === Chart.Type.PIE || config.type === Chart.Type.DOUGHNUT) {
-      let maxSegments = config.options.maxSegments;
-      if (!maxSegments) {
+    if (config.type === Chart.Type.PIE || config.type === Chart.Type.DOUGHNUT || config.type === Chart.Type.POLAR_AREA || config.type === Chart.Type.RADAR) {
+      if (!config.data.maxSegmentsExceeded || !config.options.maxSegments) {
         return false;
       }
-      return maxSegments - 1 <= index;
+      return config.options.maxSegments - 1 <= index;
     }
     return false;
   }

@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.Pair;
@@ -55,6 +56,7 @@ public class ChartConfig implements IChartConfig {
   protected static final String SCALES = combine(OPTIONS, "scales");
   protected static final String X_AXES = combine(SCALES, "xAxes");
   protected static final String Y_AXES = combine(SCALES, "yAxes");
+  protected static final String STACKED = "stacked";
   protected static final String SCALE_LABEL = "scaleLabel";
   protected static final String SCALE_LABEL_DISPLAY = combine(SCALE_LABEL, "display");
   protected static final String SCALE_LABEL_LABEL = combine(SCALE_LABEL, "labelString");
@@ -382,7 +384,7 @@ public class ChartConfig implements IChartConfig {
 
   @Override
   public boolean isAutoColor() {
-    return (boolean) getProperty(AUTO_COLOR);
+    return BooleanUtility.nvl((Boolean) getProperty(AUTO_COLOR));
   }
 
   @Override
@@ -412,7 +414,7 @@ public class ChartConfig implements IChartConfig {
 
   @Override
   public boolean isClickable() {
-    return (boolean) getProperty(CLICKABLE);
+    return BooleanUtility.nvl((Boolean) getProperty(CLICKABLE));
   }
 
   @Override
@@ -461,7 +463,7 @@ public class ChartConfig implements IChartConfig {
 
   @Override
   public boolean isTooltipsEnabled() {
-    return (boolean) getProperty(TOOLTIPS_ENABLED);
+    return BooleanUtility.nvl((Boolean) getProperty(TOOLTIPS_ENABLED));
   }
 
   @Override
@@ -476,7 +478,7 @@ public class ChartConfig implements IChartConfig {
 
   @Override
   public boolean isLegendDisplay() {
-    return (boolean) getProperty(LEGEND_DISPLAY);
+    return BooleanUtility.nvl((Boolean) getProperty(LEGEND_DISPLAY));
   }
 
   @Override
@@ -491,7 +493,7 @@ public class ChartConfig implements IChartConfig {
 
   @Override
   public boolean isLegendClickable() {
-    return (boolean) getProperty(LEGEND_CLICKABLE);
+    return BooleanUtility.nvl((Boolean) getProperty(LEGEND_CLICKABLE));
   }
 
   @Override
@@ -529,6 +531,38 @@ public class ChartConfig implements IChartConfig {
     return withLegendPosition(RIGHT);
   }
 
+  @Override
+  public IChartConfig removeScales() {
+    return removeProperty(SCALES);
+  }
+
+  protected IChartConfig withXAxisStacked(boolean stacked, int index) {
+    return withArrayProperty(X_AXES, index, STACKED, stacked);
+  }
+
+  protected IChartConfig removeXAxisStacked(int index) {
+    return removeArrayProperty(X_AXES, index, STACKED);
+  }
+
+  protected boolean isXAxisStacked(int index) {
+    return BooleanUtility.nvl((Boolean) getArrayProperty(X_AXES, index, STACKED));
+  }
+
+  @Override
+  public IChartConfig withXAxisStacked(boolean stacked) {
+    return withXAxisStacked(stacked, 0);
+  }
+
+  @Override
+  public IChartConfig removeXAxisStacked() {
+    return removeXAxisStacked(0);
+  }
+
+  @Override
+  public boolean isXAxisStacked() {
+    return isXAxisStacked(0);
+  }
+
   protected IChartConfig withXAxisLabelDisplay(boolean display, int index) {
     return withArrayProperty(X_AXES, index, SCALE_LABEL_DISPLAY, display);
   }
@@ -538,7 +572,7 @@ public class ChartConfig implements IChartConfig {
   }
 
   protected boolean isXAxisLabelDisplay(int index) {
-    return (boolean) getArrayProperty(X_AXES, index, SCALE_LABEL_DISPLAY);
+    return BooleanUtility.nvl((Boolean) getArrayProperty(X_AXES, index, SCALE_LABEL_DISPLAY));
   }
 
   @Override
@@ -583,6 +617,33 @@ public class ChartConfig implements IChartConfig {
     return getXAxisLabel(0);
   }
 
+  protected IChartConfig withYAxisStacked(boolean stacked, int index) {
+    return withArrayProperty(Y_AXES, index, STACKED, stacked);
+  }
+
+  protected IChartConfig removeYAxisStacked(int index) {
+    return removeArrayProperty(Y_AXES, index, STACKED);
+  }
+
+  protected boolean isYAxisStacked(int index) {
+    return BooleanUtility.nvl((Boolean) getArrayProperty(Y_AXES, index, STACKED));
+  }
+
+  @Override
+  public IChartConfig withYAxisStacked(boolean stacked) {
+    return withYAxisStacked(stacked, 0);
+  }
+
+  @Override
+  public IChartConfig removeYAxisStacked() {
+    return removeYAxisStacked(0);
+  }
+
+  @Override
+  public boolean isYAxisStacked() {
+    return isYAxisStacked(0);
+  }
+
   protected IChartConfig withYAxisLabelDisplay(boolean display, int index) {
     return withArrayProperty(Y_AXES, index, SCALE_LABEL_DISPLAY, display);
   }
@@ -592,7 +653,7 @@ public class ChartConfig implements IChartConfig {
   }
 
   protected boolean isYAxisLabelDisplay(int index) {
-    return (boolean) getArrayProperty(Y_AXES, index, SCALE_LABEL_DISPLAY);
+    return BooleanUtility.nvl((Boolean) getArrayProperty(Y_AXES, index, SCALE_LABEL_DISPLAY));
   }
 
   @Override
@@ -649,6 +710,6 @@ public class ChartConfig implements IChartConfig {
 
   @Override
   public boolean isDatalabelsDisplay() {
-    return (boolean) getProperty(DATALABELS_DISPLAY);
+    return BooleanUtility.nvl((Boolean) getProperty(DATALABELS_DISPLAY));
   }
 }

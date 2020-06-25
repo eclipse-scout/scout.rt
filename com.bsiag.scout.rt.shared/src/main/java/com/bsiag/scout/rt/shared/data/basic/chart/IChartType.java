@@ -28,4 +28,6 @@ public interface IChartType {
   String VENN = "venn";
   String DOUGHNUT = "doughnut";
   String DONUT_OLD = "donut_old";
+  String POLAR_AREA = "polarArea";
+  String RADAR = "radar";
 }
