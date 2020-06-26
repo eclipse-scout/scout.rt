@@ -14,7 +14,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -22,6 +21,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -57,6 +57,7 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDev
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
+import org.eclipse.scout.rt.platform.util.LocalHostAddressHelper;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
@@ -140,8 +141,9 @@ public class JettyServer {
       sb.append("Server ready. The application is available on the following addresses:\n");
       sb.append("---------------------------------------------------------------------\n");
       sb.append("  ").append(protocol).append("://localhost:").append(port).append(contextPath).append("\n");
-      String hostname = InetAddress.getLocalHost().getHostName().toLowerCase();
-      String ip = InetAddress.getLocalHost().getHostAddress();
+      LocalHostAddressHelper localHostAddressHelper = BEANS.get(LocalHostAddressHelper.class);
+      String hostname = localHostAddressHelper.getHostName().toLowerCase(Locale.US);
+      String ip = localHostAddressHelper.getHostAddress();
       sb.append("  ").append(protocol).append("://").append(hostname).append(":").append(port).append(contextPath).append("\n");
       if (StringUtility.notEqualsIgnoreCase(hostname, ip)) {
         sb.append("  ").append(protocol).append("://").append(ip).append(":").append(port).append(contextPath).append("\n");

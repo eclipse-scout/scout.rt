@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.server.admin.diagnostic;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,11 +21,13 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.LocalHostAddressHelper;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.security.ACCESS;
@@ -41,14 +41,13 @@ public class DiagnosticSession {
   public void serviceRequest(HttpServletRequest req, HttpServletResponse res) throws IOException {
     if (!req.getParameterMap().isEmpty()) {
       for (Entry<String, String[]> stringEntry : req.getParameterMap().entrySet()) {
-        Entry next = (Entry) stringEntry;
-        String action = (String) next.getKey();
-        Object value = next.getValue();
+        String action = stringEntry.getKey();
+        String[] value = stringEntry.getValue();
         IDiagnostic diagnosticProvider = DiagnosticFactory.getDiagnosticProvider(action);
-        if (diagnosticProvider != null && value instanceof Object[]) {
+        if (diagnosticProvider != null && value != null) {
           boolean hasUpdateDiagnosticsServletPermission = ACCESS.check(new UpdateDiagnosticServletPermission());
           if (hasUpdateDiagnosticsServletPermission) {
-            diagnosticProvider.call(action, (Object[]) value);
+            diagnosticProvider.call(action, value);
           }
         }
       }
@@ -191,8 +190,7 @@ public class DiagnosticSession {
     DiagnosticFactory.addDiagnosticItemToList(result, "System properties", sb.toString(), DiagnosticFactory.STATUS_INFO);
 
     // environment
-    List<String> envKeys = new ArrayList<>();
-    envKeys.addAll(System.getenv().keySet());
+    List<String> envKeys = new ArrayList<>(System.getenv().keySet());
     Collections.sort(envKeys);
     sb = new StringBuilder();
     sb.append("<a href=\"#\" onClick=\"javascript:toggle_visibility('env'); return false;\">(show / hide)</a>");
@@ -288,18 +286,9 @@ public class DiagnosticSession {
 
     result.add(String.valueOf(rt.availableProcessors()));
 
-    String hostname, ip = "";
-    try {
-      InetAddress addr = InetAddress.getLocalHost();
-      ip = addr.getHostAddress();
-      hostname = addr.getHostName();
-    }
-    catch (UnknownHostException e) { // NOSONAR
-      hostname = "Unknown";
-      ip = "Unknown";
-    }
-    result.add(ip);
-    result.add(hostname);
+    LocalHostAddressHelper localHostHelper = BEANS.get(LocalHostAddressHelper.class);
+    result.add(localHostHelper.getHostAddress());
+    result.add(localHostHelper.getHostName());
 
     return result;
   }

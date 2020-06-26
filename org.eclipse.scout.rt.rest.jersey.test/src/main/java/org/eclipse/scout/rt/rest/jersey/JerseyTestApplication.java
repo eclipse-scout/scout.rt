@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.rest.jersey;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 
 import org.eclipse.jetty.server.Handler;
@@ -25,6 +24,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.LocalHostAddressHelper;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,8 +70,9 @@ public class JerseyTestApplication {
       sb.append("Server ready. The application is available on the following addresses:\n");
       sb.append("---------------------------------------------------------------------\n");
       sb.append("  http://localhost:").append(m_port).append('\n');
-      String hostname = InetAddress.getLocalHost().getHostName().toLowerCase();
-      String ip = InetAddress.getLocalHost().getHostAddress();
+      LocalHostAddressHelper localHostAddressHelper = BEANS.get(LocalHostAddressHelper.class);
+      String hostname = localHostAddressHelper.getHostName().toLowerCase();
+      String ip = localHostAddressHelper.getHostAddress();
       sb.append("  http://").append(hostname).append(":").append(m_port).append('\n');
       if (StringUtility.notEqualsIgnoreCase(hostname, ip)) {
         sb.append("  http://").append(ip).append(":").append(m_port).append('\n');
