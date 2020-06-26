@@ -12,6 +12,7 @@ import {
   arrays,
   HtmlComponent,
   InputFieldKeyStrokeContext,
+  fields,
   keys,
   LookupCall,
   scout,
@@ -33,7 +34,7 @@ export default class TagField extends ValueField {
 
     this.$field = null;
     this.fieldHtmlComp = null;
-    this.chooser = null;
+    this.popup = null;
     this.lookupCall = null;
     this._currentLookupCall = null;
     this.tagBar = null;
@@ -180,11 +181,11 @@ export default class TagField extends ValueField {
    * @override
    */
   acceptInput(whileTyping) {
-    if (this.chooser) {
-      if (this.chooser.selectedRow()) {
-        this.chooser.triggerLookupRowSelected();
+    if (this.popup) {
+      if (this.popup.selectedRow()) {
+        this.popup.triggerLookupRowSelected();
       } else {
-        this.closeChooserPopup();
+        this.closePopup();
       }
       return;
     }
@@ -198,12 +199,18 @@ export default class TagField extends ValueField {
     });
   }
 
+  aboutToBlurByMouseDown(target) {
+    if (fields.eventOutsideProposalField(this, target)) {
+      this.acceptInput(true);
+    }
+  }
+
   /**
    * @override
    */
   _onFieldBlur(event) {
     // We cannot call super until chooser popup has been closed (see #acceptInput)
-    this.closeChooserPopup();
+    this.closePopup();
     super._onFieldBlur(event);
     if (this.rendered && !this.removing) {
       this.tagBar.blur();
@@ -248,8 +255,10 @@ export default class TagField extends ValueField {
   }
 
   _onInputKeydown(event) {
-    if (this._isNavigationKey(event) && this.chooser) {
-      this.chooser.delegateKeyEvent(event);
+    if (this._isNavigationKey(event) && this.popup) {
+      this.popup.delegateKeyEvent(event);
+    } else if (event.which === keys.ESC) {
+      this.closePopup();
     }
   }
 
@@ -267,7 +276,6 @@ export default class TagField extends ValueField {
     if (event.which === keys.ESC) {
       return;
     }
-
     if (!this._isNavigationKey(event)) {
       this._lookupByText(this.$field.val());
     }
@@ -278,7 +286,7 @@ export default class TagField extends ValueField {
       return null;
     }
     if (strings.empty(text) || text.length < 2) {
-      this.closeChooserPopup();
+      this.closePopup();
       return;
     }
 
@@ -297,12 +305,12 @@ export default class TagField extends ValueField {
   _onLookupDone(result) {
     try {
       if (!this.rendered || !this.isFocused() || result.lookupRows.length === 0) {
-        this.closeChooserPopup();
+        this.closePopup();
         return;
       }
 
-      this.openChooserPopup();
-      this.chooser.setLookupResult(result);
+      this.openPopup();
+      this.popup.setLookupResult(result);
     } finally {
       this.trigger('lookupCallDone', {
         result: result
@@ -310,24 +318,25 @@ export default class TagField extends ValueField {
     }
   }
 
-  openChooserPopup() {
-    if (this.chooser) {
+  openPopup() {
+    if (this.popup) {
       return;
     }
-    this.chooser = scout.create('TagChooserPopup', {
+    this.popup = scout.create('TagChooserPopup', {
       parent: this,
       $anchor: this.$field,
+      boundToAnchor: true,
       closeOnAnchorMouseDown: false,
       field: this
     });
-    this.chooser.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
-    this.chooser.one('close', this._onChooserPopupClose.bind(this));
-    this.chooser.open();
+    this.popup.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
+    this.popup.one('close', this._onPopupClose.bind(this));
+    this.popup.open();
   }
 
-  closeChooserPopup() {
-    if (this.chooser && !this.chooser.destroying) {
-      this.chooser.close();
+  closePopup() {
+    if (this.popup && !this.popup.destroying) {
+      this.popup.close();
     }
   }
 
@@ -335,11 +344,11 @@ export default class TagField extends ValueField {
     this._clear();
     this._updateHasText();
     this.addTag(event.lookupRow.key);
-    this.closeChooserPopup();
+    this.closePopup();
   }
 
-  _onChooserPopupClose(event) {
-    this.chooser = null;
+  _onPopupClose(event) {
+    this.popup = null;
   }
 
   isInputFocused() {
