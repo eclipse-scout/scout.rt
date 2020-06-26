@@ -358,6 +358,9 @@ export default class TableHeader extends Widget {
    * @param [oldColumnState] only necessary when the css class was updated
    */
   updateHeader(column, oldColumnState) {
+    if (!column.isVisible()) {
+      return;
+    }
     this._decorateHeader(column, oldColumnState);
   }
 

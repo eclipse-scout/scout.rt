@@ -90,6 +90,12 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * Boolean
    */
   String PROP_CHECKABLE = "checkable";
+
+  /**
+   * Boolean
+   */
+  String PROP_COMPACT = "compact";
+
   /**
    * Boolean
    */
@@ -516,6 +522,14 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   boolean isCheckable();
 
   void setCheckable(boolean b);
+
+  boolean isCompact();
+
+  void setCompact(boolean compact);
+
+  ICompactHandler getCompactHandler();
+
+  void setCompactHandler(ICompactHandler handler);
 
   boolean isHeaderVisible();
 

@@ -110,6 +110,7 @@ import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
@@ -195,6 +196,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   private ContributionComposite m_contributionHolder;
   private List<ITableControl> m_tableControls;
   private IReloadHandler m_reloadHandler;
+  private ICompactHandler m_compactHandler;
   private int m_valueChangeTriggerEnabled = 1;// >=1 is true
   private boolean m_treeStructureDirty;
 
@@ -264,9 +266,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public String classId() {
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
-    Object container = getContainer();
+    ITypeWithClassId container = getContainer();
     if (container instanceof ITypeWithClassId) {
-      return simpleClassId + ID_CONCAT_SYMBOL + ((ITypeWithClassId) container).classId();
+      return simpleClassId + ID_CONCAT_SYMBOL + container.classId();
     }
     return simpleClassId;
   }
@@ -495,7 +497,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * Subclasses can override this method. Default is {@code false}.
    *
    * @return {@code true} if the columns are auto resized, {@code false} otherwise.
-   * @see {@link AbstractColumn#getConfiguredWidth()}
+   * @see AbstractColumn#getConfiguredWidth()
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(80)
@@ -666,6 +668,17 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(280)
   protected boolean getConfiguredTileMode() {
+    return false;
+  }
+
+  /**
+   * Configurues whether the table should be in compact mode. Default is false.
+   *
+   * @see ICompactHandler
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(290)
+  protected boolean getConfiguredCompact() {
     return false;
   }
 
@@ -1037,6 +1050,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     // setTileMode() creates the mediator and tileTableHeader lazy if set to true. Do this here to
     // already have a mostly initialized table (AbstractTileTableHeader requires an initialized columnSet).
     setTileMode(getConfiguredTileMode());
+
+    setCompactHandler(createCompactHandler());
+    setCompact(getConfiguredCompact());
 
     // add Convenience observer for drag & drop callbacks, event history and ui sort possible check
     addTableListener(new TableAdapter() {
@@ -1680,6 +1696,40 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   @Override
+  public void setCompact(boolean compact) {
+    if (propertySupport.setPropertyBool(PROP_COMPACT, compact)) {
+      getCompactHandler().handle(isCompact());
+    }
+  }
+
+  @Override
+  public boolean isCompact() {
+    return propertySupport.getPropertyBool(PROP_COMPACT);
+  }
+
+  @Override
+  public ICompactHandler getCompactHandler() {
+    return m_compactHandler;
+  }
+
+  protected ICompactHandler createCompactHandler() {
+    return BEANS.get(ICompactHandlerProvider.class).createCompactHandler(this);
+  }
+
+  @Override
+  public void setCompactHandler(ICompactHandler compactHandler) {
+    Assertions.assertNotNull(compactHandler);
+    if (m_compactHandler != null && isCompact()) {
+      // Reset compact state
+      m_compactHandler.handle(false);
+    }
+    m_compactHandler = compactHandler;
+    if (isInitConfigDone()) {
+      m_compactHandler.handle(isCompact());
+    }
+  }
+
+  @Override
   public void setDragType(int dragType) {
     propertySupport.setPropertyInt(PROP_DRAG_TYPE, dragType);
   }
@@ -1861,7 +1911,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * Returns a modifiable live list
    */
   protected List<IKeyStroke> getKeyStrokesInternal() {
-    return propertySupport.<IKeyStroke> getPropertyList(PROP_KEY_STROKES);
+    return propertySupport.getPropertyList(PROP_KEY_STROKES);
   }
 
   @Override
@@ -1943,8 +1993,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * Creates a {@link TableRowDataMapper} that is used for reading and writing data from the given
    * {@link AbstractTableRowData} type.
    *
-   * @param rowType
-   * @return
    * @since 3.8.2
    */
   @ConfigOperation
@@ -2061,7 +2109,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * Checks whether the menu with the given class has been replaced by another menu. If so, the replacing menu's class
    * is returned. Otherwise the given class itself.
    *
-   * @param c
    * @return Returns the possibly available replacing menu class for the given class.
    * @see Replace
    * @since 3.8.2
@@ -2416,7 +2463,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   private void ensureInvalidColumnsVisible(ITableRow row) {
     for (IColumn<?> col : getColumns()) {
-      col.ensureVisibileIfInvalid(row);
+      col.ensureVisibleIfInvalid(row);
     }
   }
 
@@ -2493,11 +2540,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     TreeSet<ITableRow> newSelection = new TreeSet<>(new RowIndexComparator());
     if (append) {
       newSelection.addAll(m_selectedRows);
-      newSelection.addAll(rows);
     }
-    else {
-      newSelection.addAll(rows);
-    }
+    newSelection.addAll(rows);
     // check selection count with multiselect
     if (newSelection.size() > 1 && !isMultiSelect()) {
       ITableRow first = newSelection.first();
@@ -3052,8 +3096,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       // Fire ROWS_INSERTED event before really adding the internal rows to the table, because adding might trigger ROWS_UPDATED events (due to validation)
       fireRowsInserted(newIRows);
       for (int i = 0; i < newIRows.size(); i++) {
-        ITableRow newIRow = newIRows.get(i);
-        addInternalRow((InternalTableRow) newIRow);
+        InternalTableRow newIRow = newIRows.get(i);
+        addInternalRow(newIRow);
         // copy check status of rows after adding them to the table since InternalTableRow maintains this on the table, not on the row
         checkRow(newIRow, newRows.get(i).isChecked());
       }
@@ -3257,9 +3301,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
-   * @see {@link List#add(int, Object)}
-   * @param sourceIndex
-   * @param targetIndex
+   * @see List#add(int, Object)
    */
   private void moveRowImpl(int sourceIndex, int targetIndex) {
     if (sourceIndex < 0) {
@@ -3779,6 +3821,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       }
       // re link existing filters to new columns
       linkColumnFilters();
+      // reapply compact state
+      if (isCompact()) {
+        getCompactHandler().handle(isCompact());
+      }
       // reset context column (disposed column must not be used anymore)
       setContextColumn(null);
       fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED));
@@ -3900,7 +3946,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       List<IColumn<?>> list = new ArrayList<>();
       for (IColumn<?> col : getColumnSet().getAllColumnsInUserOrder()) {
         if (col.isDisplayable()) {
-          boolean configuredVisible = ((IColumn<?>) col).isInitialVisible();
+          boolean configuredVisible = col.isInitialVisible();
           if (configuredVisible) {
             list.add(col);
           }

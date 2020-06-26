@@ -1,0 +1,71 @@
+/*
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+
+@table-compact-cell-line-height: 20px;
+
+.compact-cell-title {
+  display: flex;
+  align-items: baseline;
+  line-height: @table-compact-cell-line-height;
+
+  & > .left {
+    flex-grow: 1;
+    font-size: @font-size-large;
+    #scout.overflow-ellipsis();
+  }
+
+  & > .right {
+    flex-grow: 0;
+  }
+}
+
+.compact-cell-subtitle {
+  #scout.overflow-ellipsis();
+
+  &:not(:empty) {
+    padding-top: 2px;
+  }
+}
+
+.compact-cell-content,
+.compact-cell-more-content {
+  color: @table-compact-cell-content-color;
+  line-height: @table-compact-cell-line-height;
+}
+
+.compact-cell-more {
+  line-height: @table-compact-cell-line-height;
+}
+
+.compact-cell-content:not(:empty).has-header {
+  padding-top: 5px;
+}
+
+.compact-cell-line {
+  #scout.overflow-ellipsis();
+}
+
+.compact-cell-line-label {
+  &:not(:empty) {
+    margin-right: 4px;
+  }
+
+  & > .icon {
+    margin-right: 2px;
+  }
+}
+
+.compact-cell-line-label,
+.compact-cell-line-value {
+  & > .icon.with-text {
+    margin-right: 8px;
+  }
+}

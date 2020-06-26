@@ -281,6 +281,7 @@ export {default as TileOverviewForm} from './form/TileOverviewForm';
 export {default as TileOverviewFormAdapter} from './form/TileOverviewFormAdapter';
 export {default as Table} from './table/Table';
 export {default as TableAdapter} from './table/TableAdapter';
+export {default as TableCompactHandler} from './table/TableCompactHandler';
 export {default as TableRow} from './table/TableRow';
 export {default as TableMatrix} from './table/TableMatrix';
 export {default as TableFooter} from './table/TableFooter';
@@ -311,6 +312,10 @@ export {default as ColumnOptimalWidthMeasurer} from './table/columns/ColumnOptim
 export {default as AlphanumericSortingStringColumn} from './table/columns/AlphanumericSortingStringColumn';
 export {default as BeanColumn} from './table/columns/BeanColumn';
 export {default as BooleanColumn} from './table/columns/BooleanColumn';
+export {default as CompactColumn} from './table/columns/CompactColumn';
+export {default as CompactBean} from './table/columns/CompactBean';
+export {default as CompactLine} from './table/columns/CompactLine';
+export {default as CompactLineBlock} from './table/columns/CompactLineBlock';
 export {default as DateColumn} from './table/columns/DateColumn';
 export {default as IconColumn} from './table/columns/IconColumn';
 export {default as NumberColumn} from './table/columns/NumberColumn';

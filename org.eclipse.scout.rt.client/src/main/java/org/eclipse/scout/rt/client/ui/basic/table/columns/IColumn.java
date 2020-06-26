@@ -76,7 +76,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    */
   String PROP_FOREGROUND_COLOR = "foregroundColor";
   /**
-   * type {@link ScoutFont}
+   * type {@link String}
    */
   String PROP_FONT = "font";
   /**
@@ -115,6 +115,10 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
 
   void setVisibleGranted(boolean b);
 
+  void setCompacted(boolean compacted);
+
+  boolean isCompacted();
+
   int getColumnIndex();
 
   /**
@@ -140,8 +144,6 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * If any cell editor is active, editing is canceled and it's value rejected.
    * </p>
    *
-   * @param r
-   * @param value
    */
   void setValue(ITableRow r, VALUE value);
 
@@ -153,8 +155,6 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * If any cell editor is active, editing is canceled and it's value rejected.
    * </p>
    *
-   * @param r
-   * @param value
    */
   void setValue(int rowIndex, VALUE value);
 
@@ -302,7 +302,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   void setDisplayable(boolean b);
 
   /**
-   * @return Returns whether the column is visible to the user using the three properties visible, dispalyable and
+   * @return Returns whether the column is visible to the user using the three properties visible, displayable and
    *         visiblePermission.
    */
   boolean isVisible();
@@ -411,7 +411,6 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   void parseValueAndSet(ITableRow row, Object rawValue);
 
   /**
-   * @param rawValue
    * @return value in correct type, derived from rawValue
    * @throws ProcessingException
    *           parse AND validate value
@@ -432,7 +431,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    *
    * @param row
    *          on which editing occurs
-   * @return a field for editing, use super.{@link #prepareEdit(ITableRow)} for the default implementation.
+   * @return a field for editing, use super.prepareEdit(row) for the default implementation.
    */
   IFormField prepareEdit(ITableRow row);
 
@@ -476,7 +475,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   /**
    * Ensure that a displayable columns is visible, if there is an error
    */
-  void ensureVisibileIfInvalid(ITableRow row);
+  void ensureVisibleIfInvalid(ITableRow row);
 
   /**
    * Initialize cell properties with column properties

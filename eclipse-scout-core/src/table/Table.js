@@ -74,6 +74,9 @@ export default class Table extends Widget {
     this.contextColumn = null;
     this.checkable = false;
     this.checkableStyle = Table.CheckableStyle.CHECKBOX;
+    this.compact = false;
+    this.compactHandler = scout.create('TableCompactHandler', {table: this});
+    this.compactColumn = null;
     this.dropType = 0;
     this.dropMaximumSize = dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
     this.groupingStyle = Table.GroupingStyle.BOTTOM;
@@ -304,6 +307,7 @@ export default class Table extends Widget {
       this._insertRowIconColumn();
     }
 
+    this._setCompact(this.compact);
     this._calculateTableNodeColumn();
 
     // Sync head and tail sort columns
@@ -321,6 +325,8 @@ export default class Table extends Widget {
       column.destroy();
     });
     this.checkableColumn = null;
+    this.compactColumn = null;
+    this.rowIconColumn = null;
     this.columns = [];
   }
 
@@ -454,7 +460,8 @@ export default class Table extends Widget {
   handleAppLinkAction(event) {
     let $appLink = $(event.target);
     let column = this._columnAtX($appLink.offset().left);
-    this._triggerAppLinkAction(column, $appLink.data('ref'));
+    let row = $appLink.findUp($elem => $elem.hasClass('table-row'), this.$container).data('row');
+    this._triggerAppLinkAction(column, row, $appLink.data('ref'), $appLink);
   }
 
   _isDataRendered() {
@@ -684,10 +691,10 @@ export default class Table extends Widget {
       column.onMouseUp(event, $row);
       $appLink = this._find$AppLink(event);
     }
+    let row = $row.data('row');
     if ($appLink) {
-      this._triggerAppLinkAction(column, $appLink.data('ref'));
+      this._triggerAppLinkAction(column, row, $appLink.data('ref'), $appLink);
     } else {
-      let row = $row.data('row');
       this._triggerRowClick(row, mouseButton);
     }
   }
@@ -766,14 +773,15 @@ export default class Table extends Widget {
     return null;
   }
 
-  onColumnVisibilityChanged(column) {
+  onColumnVisibilityChanged() {
     this.columnLayoutDirty = true;
+    this._calculateTableNodeColumn();
+    this.trigger('columnStructureChanged');
     if (this._isDataRendered()) {
       this._updateRowWidth();
       this._redraw();
       this.invalidateLayoutTree();
     }
-    this.trigger('columnStructureChanged');
   }
 
   /**
@@ -2048,17 +2056,11 @@ export default class Table extends Widget {
   }
 
   _find$AppLink(event) {
-    // bubble up from target to delegateTarget
-    let $elem = $(event.target);
+    let $start = $(event.target);
     let $stop = $(event.delegateTarget);
-    while ($elem.length > 0) {
-      if ($elem.hasClass('app-link')) {
-        return $elem;
-      }
-      if ($elem[0] === $stop[0]) {
-        return null;
-      }
-      $elem = $elem.parent();
+    let $appLink = $start.findUp($elem => $elem.hasClass('app-link'), $stop);
+    if ($appLink.length > 0) {
+      return $appLink;
     }
     return null;
   }
@@ -2151,6 +2153,13 @@ export default class Table extends Widget {
         value: row.checked,
         editable: true,
         cssClass: row.cssClass
+      });
+    }
+
+    if (column === this.compactColumn) {
+      return scout.create('Cell', {
+        text: row.compactValue,
+        htmlEnabled: true
       });
     }
 
@@ -2693,11 +2702,6 @@ export default class Table extends Widget {
     }
 
     column = column || this.columns[0];
-    if (column && column.guiOnly) {
-      column = arrays.find(this.columns, col => {
-        return !col.guiOnly;
-      });
-    }
     if (!row || !column) {
       return;
     }
@@ -4020,10 +4024,12 @@ export default class Table extends Widget {
     this.trigger('filterReset');
   }
 
-  _triggerAppLinkAction(column, ref) {
+  _triggerAppLinkAction(column, row, ref, $appLink) {
     this.trigger('appLinkAction', {
       column: column,
-      ref: ref
+      row: row,
+      ref: ref,
+      $appLink: $appLink
     });
   }
 
@@ -4209,11 +4215,26 @@ export default class Table extends Widget {
       this._calculateTableNodeColumn();
       this.trigger('columnStructureChanged');
     } else if (!this.rowIconVisible && column) {
+      column.destroy();
       arrays.remove(this.columns, column);
       this.rowIconColumn = null;
       this._calculateTableNodeColumn();
       this.trigger('columnStructureChanged');
     }
+  }
+
+  _renderRowIconVisible() {
+    this.columnLayoutDirty = true;
+    this._updateRowWidth();
+    this._redraw();
+    this.invalidateLayoutTree();
+  }
+
+  _renderRowIconColumnWidth() {
+    if (!this.rowIconVisible) {
+      return;
+    }
+    this._renderRowIconVisible();
   }
 
   setRowIconColumnWidth(width) {
@@ -4430,6 +4451,7 @@ export default class Table extends Widget {
       this._calculateTableNodeColumn();
       this.trigger('columnStructureChanged');
     } else if (!showCheckBoxes && column && column.guiOnly) {
+      column.destroy();
       arrays.remove(this.columns, column);
       this.checkableColumn = null;
       this._calculateTableNodeColumn();
@@ -4461,18 +4483,52 @@ export default class Table extends Widget {
     }
   }
 
-  _renderRowIconVisible() {
+  /**
+   * @param {boolean} compact
+   */
+  setCompact(compact) {
+    this.setProperty('compact', compact);
+  }
+
+  _setCompact(compact) {
+    this._setProperty('compact', compact);
+    this._updateCompactColumn();
+    if (this.compactHandler) {
+      this.compactHandler.handle(this.compact);
+    }
+  }
+
+  _updateCompactColumn() {
+    let column = this.compactColumn;
+    if (this.compact && !column) {
+      this._insertCompactColumn();
+      return true;
+    }
+    if (!this.compact && column) {
+      column.destroy();
+      arrays.remove(this.columns, column);
+      this.compactColumn = null;
+      return true;
+    }
+    return false;
+  }
+
+  _insertCompactColumn() {
+    let column = scout.create('CompactColumn', {
+      session: this.session,
+      table: this,
+      guiOnly: true,
+      headerMenuEnabled: false
+    });
+    this.columns.push(column); // Insert after the other ui columns
+    this.compactColumn = column;
+  }
+
+  _renderCompact() {
     this.columnLayoutDirty = true;
     this._updateRowWidth();
     this._redraw();
     this.invalidateLayoutTree();
-  }
-
-  _renderRowIconColumnWidth() {
-    if (!this.rowIconVisible) {
-      return;
-    }
-    this._renderRowIconVisible();
   }
 
   setGroupingStyle(groupingStyle) {
@@ -4972,14 +5028,13 @@ export default class Table extends Widget {
     this._destroyColumns();
     this.columns = columns;
     this._initColumns();
-
+    this.trigger('columnStructureChanged');
     if (this._isDataRendered()) {
       this._updateRowWidth();
       this.$rows(true).css('width', this.rowWidth);
       this._rerenderHeaderColumns();
       this._renderEmptyData();
     }
-    this.trigger('columnStructureChanged');
   }
 
   updateColumnOrder(columns) {
@@ -5152,10 +5207,16 @@ export default class Table extends Widget {
   }
 
   visibleColumns(includeGuiColumns) {
+    return this.filterColumns(column => column.isVisible(), includeGuiColumns);
+  }
+
+  displayableColumns(includeGuiColumns) {
+    return this.filterColumns(column => column.displayable, includeGuiColumns);
+  }
+
+  filterColumns(filter, includeGuiColumns) {
     includeGuiColumns = scout.nvl(includeGuiColumns, true);
-    return this.columns.filter(column => {
-      return column.isVisible() && (includeGuiColumns || !column.guiOnly);
-    }, this);
+    return this.columns.filter(column => filter(column) && (includeGuiColumns || !column.guiOnly));
   }
 
   // same as on Tree.prototype._onDesktopPopupOpen

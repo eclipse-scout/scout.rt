@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, BooleanColumn, Column, defaultValues, ModelAdapter, objects, scout, Table, TableUserFilter} from '../index';
+import {App, arrays, BooleanColumn, Column, ColumnUserFilter, defaultValues, ModelAdapter, objects, scout, Table, TableUserFilter} from '../index';
 import $ from 'jquery';
 
 export default class TableAdapter extends ModelAdapter {
@@ -16,6 +16,11 @@ export default class TableAdapter extends ModelAdapter {
   constructor() {
     super();
     this._addRemoteProperties(['contextColumn']);
+  }
+
+  _initProperties(model) {
+    super._initProperties(model);
+    model.compactHandler = null; // Disable Scout JS compact handling, will be done on the server
   }
 
   _postCreateWidget() {
@@ -68,16 +73,18 @@ export default class TableAdapter extends ModelAdapter {
 
   _onWidgetFilterAdded(event) {
     let filter = event.filter;
-    if (filter instanceof TableUserFilter) {
-      this._send('filterAdded', filter.createFilterAddedEventData());
+    if (!(filter instanceof TableUserFilter) || (filter instanceof ColumnUserFilter && filter.column.guiOnly)) {
+      return;
     }
+    this._send('filterAdded', filter.createFilterAddedEventData());
   }
 
   _onWidgetFilterRemoved(event) {
     let filter = event.filter;
-    if (filter instanceof TableUserFilter) {
-      this._send('filterRemoved', filter.createFilterRemovedEventData());
+    if (!(filter instanceof TableUserFilter) || (filter instanceof ColumnUserFilter && filter.column.guiOnly)) {
+      return;
     }
+    this._send('filterRemoved', filter.createFilterRemovedEventData());
   }
 
   _onWidgetColumnResized(event) {
@@ -85,7 +92,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendColumnResized(column) {
-    if (column.fixedWidth || this.widget.autoResizeColumns) {
+    if (column.fixedWidth || column.guiOnly || this.widget.autoResizeColumns) {
       return;
     }
 
@@ -110,6 +117,9 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendAggregationFunctionChanged(column) {
+    if (column.guiOnly) {
+      return;
+    }
     let data = {
       columnId: column.id,
       aggregationFunction: column.aggregationFunction
@@ -122,6 +132,9 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendColumnBackgroundEffectChanged(column) {
+    if (column.guiOnly) {
+      return;
+    }
     let data = {
       columnId: column.id,
       backgroundEffect: column.backgroundEffect
@@ -148,6 +161,9 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendColumnMoved(column, index) {
+    if (column.guiOnly) {
+      return;
+    }
     let data = {
       columnId: column.id,
       index: index
@@ -161,6 +177,9 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendPrepareCellEdit(row, column) {
+    if (column.guiOnly) {
+      return;
+    }
     let data = {
       rowId: row.id,
       columnId: column.id
@@ -252,6 +271,9 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onWidgetSort(event) {
+    if (event.column.guiOnly) {
+      return;
+    }
     this._send('sort', {
       columnId: event.column.id,
       sortAscending: event.sortAscending,
@@ -262,6 +284,9 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _onWidgetGroup(event) {
+    if (event.column.guiOnly) {
+      return;
+    }
     this._send('group', {
       columnId: event.column.id,
       groupAscending: event.groupAscending,
@@ -276,9 +301,17 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _sendRowAction(row, column) {
+    if (column.guiOnly) {
+      // Send row action with a real column
+      // If there is only one guiOnly column (e.g. CompactColumn), sent column will be null
+      column = arrays.find(this.columns, col => {
+        return !col.guiOnly;
+      });
+    }
+    let columnId = column ? column.id : null;
     this._send('rowAction', {
       rowId: row.id,
-      columnId: column.id
+      columnId: columnId
     });
   }
 

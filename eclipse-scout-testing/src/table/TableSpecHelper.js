@@ -36,7 +36,6 @@ export default class TableSpecHelper {
     return {
       id: scout.nvl(id, ObjectFactory.get().createUniqueId()),
       cells: cells,
-      enabled: true,
       parentRow: parentRow
     };
   }

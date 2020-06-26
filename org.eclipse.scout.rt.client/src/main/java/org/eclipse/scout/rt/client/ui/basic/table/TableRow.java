@@ -41,6 +41,7 @@ public class TableRow implements ITableRow {
   private final ColumnSet m_columnSet;
   private final Map<String, Object> m_customValues;
   protected final List<Cell> m_cells;
+  private String m_compactValue;
 
   /**
    * Provides 8 boolean flags.<br>
@@ -76,6 +77,7 @@ public class TableRow implements ITableRow {
     m_childRowList = new ArrayList<>();
     m_columnSet = columnSet;
     m_customValues = new HashMap<>(row.getCustomValues());
+    m_compactValue = row.getCompactValue();
 
     int colCount = columnSet != null ? columnSet.getColumnCount() : 0;
     m_cells = new ArrayList<>(colCount);
@@ -279,6 +281,16 @@ public class TableRow implements ITableRow {
   @Override
   public void setCustomValue(String id, Object value) {
     m_customValues.put(id, value);
+  }
+
+  @Override
+  public String getCompactValue() {
+    return m_compactValue; // TODO CGU maybe better use custom values, should save some space
+  }
+
+  @Override
+  public void setCompactValue(String compactValue) {
+    m_compactValue = compactValue;
   }
 
   @Override

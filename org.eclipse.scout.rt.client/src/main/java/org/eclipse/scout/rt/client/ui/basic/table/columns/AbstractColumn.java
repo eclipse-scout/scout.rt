@@ -39,7 +39,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowCustomValueContributor;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRowDataMapper;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
@@ -90,13 +89,14 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   private static final String INITIALLY_SORTED_ASC = "INITIALLY_SORTED_ASC";
   private static final String INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN = "INITIALLY_ALWWAYS_INCLUDE_SORT_AT_BEGIN";
   private static final String INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END = "INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END";
+  private static final String COMPACTED = "COMPACTED";
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractColumn.class);
-  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED, DISPLAYABLE);
+  private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED, DISPLAYABLE, COMPACTED);
   private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, PRIMARY_KEY, SUMMARY, INITIALLY_VISIBLE,
       INITIALLY_GROUPED, INITIALLY_SORTED_ASC, INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN, INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END);
 
-  private static final NamedBitMaskHelper FLAGS2_BIT_HELPER = new NamedBitMaskHelper(PARENT_KEY);
+  private static final NamedBitMaskHelper FLAGS2_BIT_HELPER = new NamedBitMaskHelper(PARENT_KEY, COMPACTED);
 
   private ITable m_table;
 
@@ -664,7 +664,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * Called after this column has been added to the column set of the surrounding table. This method may execute
    * additional initialization for this column (e.g. register listeners).
    * <p>
-   * Do not load table data here, this should be done lazily in {@link AbstractPageWithTable#execLoadTableData()},
+   * Do not load table data here, this should be done lazily in AbstractPageWithTable#execLoadTableData(),
    * {@link AbstractTableField#reloadTableData()} or via {@link AbstractForm#importFormData(AbstractFormData)}.
    * <p>
    * Subclasses can override this method. The default does nothing.
@@ -761,8 +761,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * <p>
    * Subclasses can override this method. The default returns an appropriate field based on the column data type.
    * <p>
-   * The mapping from the cell value to the field value is achieved using {@link #cellToEditField(Object, String,
-   * IMultiStatus, IFormField))}
+   * The mapping from the cell value to the field value is achieved using
+   * {@link #cellValueToEditor(ITableRow, IFormField)}.
    *
    * @param row
    *          on which editing occurs
@@ -900,9 +900,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * <p>
    * Thereby, if sorting is enabled on table, it is temporarily suspended to prevent rows from scampering.
    * </p>
-   *
-   * @param row
-   * @param newValue
    */
   protected void applyValueInternal(ITableRow row, VALUE newValue) {
     if (!getTable().isSortEnabled()) {
@@ -977,7 +974,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     setFixedWidth(getConfiguredFixedWidth());
     setFixedPosition(getConfiguredFixedPosition());
     m_flags = FLAGS_BIT_HELPER.changeBit(PRIMARY_KEY, getConfiguredPrimaryKey(), m_flags);
-    m_flags2 = FLAGS2_BIT_HELPER.changeBit(PARENT_KEY, getConfiguredParentKey(), m_flags);
+    m_flags2 = FLAGS2_BIT_HELPER.changeBit(PARENT_KEY, getConfiguredParentKey(), m_flags2);
     m_flags = FLAGS_BIT_HELPER.changeBit(SUMMARY, getConfiguredSummary(), m_flags);
     setEditable(getConfiguredEditable());
     setMandatory(getConfiguredMandatory());
@@ -1253,7 +1250,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
         }
       }
 
-      ensureVisibileIfInvalid(r);
+      ensureVisibleIfInvalid(r);
       if (updateValidDisplayText) {
         updateDisplayText(r, newValue);
       }
@@ -1945,6 +1942,16 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   @Override
+  public void setCompacted(boolean compacted) {
+    m_flags2 = FLAGS2_BIT_HELPER.changeBit(COMPACTED, compacted, m_flags2);
+  }
+
+  @Override
+  public boolean isCompacted() {
+    return FLAGS2_BIT_HELPER.isBitSet(COMPACTED, m_flags2);
+  }
+
+  @Override
   public boolean isPrimaryKey() {
     return FLAGS_BIT_HELPER.isBitSet(PRIMARY_KEY, m_flags);
   }
@@ -2077,7 +2084,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * Ensure that displayable columns are visible, if there is an error
    */
   @Override
-  public void ensureVisibileIfInvalid(ITableRow row) {
+  public void ensureVisibleIfInvalid(ITableRow row) {
     ICell cell = row.getCell(this);
     if (!cell.isContentValid() && isDisplayable() && !isVisible()) {
       setVisible(true);

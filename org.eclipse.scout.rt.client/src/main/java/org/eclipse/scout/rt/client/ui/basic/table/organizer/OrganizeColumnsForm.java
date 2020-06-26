@@ -220,6 +220,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
           }
 
           @Override
+          protected boolean getConfiguredGridUseUiHeight() {
+            return UserAgentUtility.isMobileDevice();
+          }
+
+          @Override
           protected int getConfiguredGridW() {
             return 1;
           }
@@ -650,7 +655,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
             @Override
             protected void execDrop(ITableRow row, TransferObject transfer) {
-              if (row != null && transfer != null && transfer instanceof JavaTransferObject) {
+              if (row != null && transfer instanceof JavaTransferObject) {
                 List<ITableRow> draggedRows = ((JavaTransferObject) transfer).getLocalObjectAsList(ITableRow.class);
                 if (CollectionUtility.hasElements(draggedRows)) {
                   ITableRow draggedRow = CollectionUtility.firstElement(draggedRows);

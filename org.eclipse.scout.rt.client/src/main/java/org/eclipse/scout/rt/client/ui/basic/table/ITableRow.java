@@ -105,6 +105,10 @@ public interface ITableRow {
 
   void setCustomValue(String id, Object value);
 
+  String getCompactValue();
+
+  void setCompactValue(String compactValue);
+
   /**
    * Warning: this method is not validating the new value against the corresponding table column use
    * {@link IColumn#setValue(ITableRow, Object)} instead

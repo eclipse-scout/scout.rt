@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -221,6 +222,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       @Override
       protected Boolean modelValue() {
         return getModel().isCheckable();
+      }
+    });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_COMPACT, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isCompact();
       }
     });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_ROW_ICON_VISIBLE, model) {
@@ -448,7 +455,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected void attachColumns() {
     int offset = 0;
     for (IColumn<?> column : getModel().getColumns()) {
-      if (!column.isVisible()) {
+      if (!column.isVisible() || column.isCompacted()) {
         // since we don't send row data for invisible columns, we have to adjust the column index
         offset += 1;
         continue;
@@ -998,7 +1005,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     JSONArray jsonCells = new JSONArray();
     for (IColumn<?> column : getModel().getColumnSet().getColumns()) {
       // Don't use getColumnsInViewOrder because the cells of the rows have to be returned in the model order. The ui does a lookup using column.index.
-      if (column.isVisible()) {
+      if (column.isVisible() && !column.isCompacted()) {
         jsonCells.put(cellToJson(row, column));
       }
     }
@@ -1015,6 +1022,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       JSONObject geoLocations = new JSONObject((Map<?, ?>) row.getCustomValue(AbstractTableRowData.CUSTOM_VALUES_ID_GEO_LOCATION));
       putProperty(jsonRow, "geoLocationValues", geoLocations);
     }
+    putProperty(jsonRow, "compactValue", BinaryResourceUrlUtility.replaceImageUrls(this, row.getCompactValue()));
     JsonObjectUtility.filterDefaultValues(jsonRow, "TableRow");
     return jsonRow;
   }
@@ -1047,7 +1055,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
    * @return columns in the right order to be presented to the user
    */
   protected List<IColumn<?>> getColumnsInViewOrder() {
-    return getModel().getColumnSet().getVisibleColumns();
+    return getModel().getColumnSet().getVisibleColumns().stream().filter(column -> !column.isCompacted()).collect(Collectors.toList());
   }
 
   protected String getOrCreateRowId(ITableRow row) {
@@ -1652,7 +1660,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected Collection<IColumn<?>> filterVisibleColumns(Collection<IColumn<?>> columns) {
     List<IColumn<?>> visibleColumns = new LinkedList<>();
     for (IColumn<?> column : columns) {
-      if (column.isVisible()) {
+      if (column.isVisible() && column.isCompacted()) {
         visibleColumns.add(column);
       }
     }
@@ -1698,9 +1706,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   }
 
   protected TableEventFilterCondition addTableEventFilterCondition(int tableEventType) {
-    TableEventFilterCondition conditon = new TableEventFilterCondition(tableEventType);
-    m_tableEventFilter.addCondition(conditon);
-    return conditon;
+    TableEventFilterCondition condition = new TableEventFilterCondition(tableEventType);
+    m_tableEventFilter.addCondition(condition);
+    return condition;
   }
 
   @Override

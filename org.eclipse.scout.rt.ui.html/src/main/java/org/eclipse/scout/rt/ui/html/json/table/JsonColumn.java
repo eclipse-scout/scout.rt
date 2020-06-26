@@ -35,6 +35,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
 
   private static final String PROP_REMOVABLE = "removable";
   private static final String PROP_MODIFIABLE = "modifiable";
+  private static final String PROP_COMPACTED = "compacted";
 
   public JsonColumn(T model) {
     m_column = model;
@@ -105,6 +106,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     json.put(PROP_REMOVABLE, getColumn().isRemovable());
     json.put(PROP_MODIFIABLE, getColumn().isModifiable());
     json.put(IColumn.PROP_NODE_COLUMN_CANDIDATE, getColumn().isNodeColumnCandidate());
+    json.put(PROP_COMPACTED, getColumn().isCompacted());
 
     return json;
   }
@@ -112,8 +114,6 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   /**
    * This method creates a type specific filter-state model for the given column and JSON data. Sub-classes may
    * implement this method to return a different type. The default impl. returns a {@link ColumnUserFilterState}.
-   *
-   * @return
    */
   protected ColumnUserFilterState createFilterStateFromJson(JSONObject json) {
     return new JsonTextColumnUserFilter(null).createFilterStateFromJson(getColumn(), json);

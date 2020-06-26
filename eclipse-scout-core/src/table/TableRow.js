@@ -18,6 +18,7 @@ export default class TableRow {
     this.aggregateRowAfter = null;
     this.cells = [];
     this.checked = false;
+    this.compactValue = null;
     this.enabled = true;
     this.filterAccepted = true;
     this.height = null;
@@ -83,5 +84,9 @@ export default class TableRow {
 
   getTable() {
     return this.parent;
+  }
+
+  setCompactValue(compactValue) {
+    this.compactValue = compactValue;
   }
 }

@@ -18,6 +18,7 @@ export default class Column {
     this.autoOptimizeWidthRequired = false; // true if content of the column changed and width has to be optimized
     this.autoOptimizeMaxWidth = -1;
     this.cssClass = null;
+    this.compacted = false;
     this.editable = false;
     this.removable = false;
     this.modifiable = false;
@@ -64,6 +65,8 @@ export default class Column {
     this._tableColumnsChangedHandler = this._onTableColumnsChanged.bind(this);
     // Contains the width the cells of the column really have (only set in Chrome due to a Chrome bug, see Table._updateRealColumnWidths)
     this._realWidth = null;
+    this.$header = null; // Set by TableHeader.js
+    this.$separator = null;
   }
 
   static DEFAULT_MIN_WIDTH = 60;
@@ -104,7 +107,7 @@ export default class Column {
   /**
    * Override this function in order to implement custom destroy logic.
    */
-  _destroy(model) {
+  _destroy() {
     // NOP
   }
 
@@ -194,7 +197,7 @@ export default class Column {
 
   /**
    * If cell does not define properties, use column values.
-   * Override this function to impl. type specific init cell behavior.
+   * Override this function to implement type specific init cell behavior.
    *
    * @param {Cell} cell
    */
@@ -399,6 +402,21 @@ export default class Column {
   }
 
   /**
+   * Creates an artificial cell from the properties relevant for the column header.
+   * @returns {Cell}
+   */
+  headerCell() {
+    return scout.create('Cell', {
+      value: this.text,
+      text: this.text,
+      iconId: this.headerIconId,
+      cssClass: this.headerCssClass,
+      tooltipText: this.headerTooltipText,
+      htmlEnabled: this.headerHtmlEnabled
+    });
+  }
+
+  /**
    * @returns {Cell} the cell object for this column from the first selected row in the table.
    */
   selectedCell() {
@@ -406,11 +424,19 @@ export default class Column {
     return this.table.cell(this, selectedRow);
   }
 
+  /**
+   * @param row
+   * @returns {string|*} the text of the cell if {@link Column.textBased} is true, otherwise the value of the cell.
+   */
   cellValueOrText(row) {
     if (this.textBased) {
       return this.table.cellText(this, row);
     }
     return this.table.cellValue(this, row);
+  }
+
+  cellText(row) {
+    return this.table.cellText(this, row);
   }
 
   /**
@@ -731,34 +757,66 @@ export default class Column {
   }
 
   isVisible() {
-    return this.displayable && this.visible;
+    return this.displayable && this.visible && !this.compacted;
   }
 
-  setVisible(visible) {
+  /**
+   *
+   * @param {boolean} visible
+   * @param {boolean} [redraw] true, to redraw the table immediately, false if not.
+   * When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}. Default is true.
+   */
+  setVisible(visible, redraw) {
     if (this.visible === visible) {
       return;
     }
-    this._setVisible(visible);
+    this._setVisible(visible, redraw);
   }
 
-  _setVisible(visible) {
+  _setVisible(visible, redraw) {
     this.visible = visible;
-    if (this.initialized) {
-      this.table.onColumnVisibilityChanged(this);
+    if (scout.nvl(redraw, this.initialized)) {
+      this.table.onColumnVisibilityChanged();
     }
   }
 
-  setDisplayable(displayable) {
+  /**
+   *
+   * @param {boolean} displayable
+   * @param {boolean} [redraw] true, to redraw the table immediately, false if not.
+   * When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}. Default is true.
+   */
+  setDisplayable(displayable, redraw) {
     if (this.displayable === displayable) {
       return;
     }
-    this._setDisplayable(displayable);
+    this._setDisplayable(displayable, redraw);
   }
 
-  _setDisplayable(displayable) {
+  _setDisplayable(displayable, redraw) {
     this.displayable = displayable;
-    if (this.initialized) {
-      this.table.onColumnVisibilityChanged(this);
+    if (scout.nvl(redraw, this.initialized)) {
+      this.table.onColumnVisibilityChanged();
+    }
+  }
+
+  /**
+   *
+   * @param {boolean} compacted
+   * @param {boolean} [redraw] true, to redraw the table immediately, false if not.
+   * When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}. Default is true.
+   */
+  setCompacted(compacted, redraw) {
+    if (this.compacted === compacted) {
+      return;
+    }
+    this._setCompacted(compacted, redraw);
+  }
+
+  _setCompacted(compacted, redraw) {
+    this.compacted = compacted;
+    if (scout.nvl(redraw, this.initialized)) {
+      this.table.onColumnVisibilityChanged();
     }
   }
 

@@ -960,6 +960,26 @@ $.fn.scrollParents = function() {
   return $scrollParents;
 };
 
+/**
+ * Similar to closest() but with a predicate function and the ability to stop at a given element.
+ * @param {function} predicate the search predicate
+ * @param {$} [$stop] If provided, the search is done until this element is reached.
+ * @returns {$}
+ */
+$.fn.findUp = function(predicate, $stop) {
+  let $elem = $(this);
+  while ($elem.length > 0) {
+    if (predicate($elem)) {
+      return $elem;
+    }
+    if ($stop && $elem[0] === $stop[0]) {
+      return $();
+    }
+    $elem = $elem.parent();
+  }
+  return $();
+};
+
 // most used animate
 $.fn.animateAVCSD = function(attr, value, complete, step, duration) {
   let properties = {};
