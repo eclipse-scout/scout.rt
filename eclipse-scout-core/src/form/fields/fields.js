@@ -123,9 +123,35 @@ export function linkElementWithLabel($elem, $label) {
   $elem.attr('aria-labelledby', labelId);
 }
 
+/**
+ * @param field a ValueField which works like a Proposal- or SmartField. The field must have a property <i>popup</i> and
+ *     a <i>_tooltip</i> function.
+ * @param target
+ * @returns {boolean} Whether or not the target is on the field (including popup and tooltip)
+ */
+export function eventOutsideProposalField(field, target) {
+  let eventOnField =
+    safeIsOrHas(field.$field, target) ||
+    safeIsOrHas(field.$icon, target) ||
+    safeIsOrHas(field.$clearIcon, target);
+  let eventOnPopup = safeWidgetIsOrHas(field.popup, target);
+  let eventOnTooltip = safeWidgetIsOrHas(field._tooltip(), target);
+
+  return !eventOnField && !eventOnPopup && !eventOnTooltip;
+
+  function safeIsOrHas($elem, target) {
+    return $elem && $elem.isOrHas(target);
+  }
+
+  function safeWidgetIsOrHas(widget, target) {
+    return widget && widget.rendered && widget.$container.isOrHas(target);
+  }
+}
+
 export default {
   activateFirstField,
   appendIcon,
+  eventOutsideProposalField,
   handleOnClick,
   initTouch,
   linkElementWithLabel,

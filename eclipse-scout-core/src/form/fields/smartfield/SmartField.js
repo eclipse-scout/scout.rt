@@ -942,11 +942,8 @@ export default class SmartField extends ValueField {
     if (this.touchMode) {
       return false;
     }
-    let eventOnField = this.$field.isOrHas(target) || this.$icon.isOrHas(target) || (this.$clearIcon && this.$clearIcon.isOrHas(target));
-    let eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
-    let eventOnTooltip = this._tooltip() && this._tooltip().rendered && this._tooltip().$container.isOrHas(target);
-    if (!eventOnField && !eventOnPopup && !eventOnTooltip) {
-      this.acceptInput(true); // event outside this value field
+    if (fields.eventOutsideProposalField(this, target)) {
+      this.acceptInput(true);
     }
   }
 
