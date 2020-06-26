@@ -1729,8 +1729,8 @@ describe('Table', () => {
       let $menu = helper.getDisplayingContextMenu(table);
       expect($menu.find('.menu-item').length).toBe(1);
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
-      expect(menu2.$container).not.toBeDefined();
-      expect(menu1.$container).toBeDefined();
+      expect(menu2.$container).toBeNull();
+      expect(menu1.$container).not.toBeNull();
     });
 
     it('context menu only shows visible menus', () => {
@@ -1855,7 +1855,7 @@ describe('Table', () => {
   });
 
   describe('menu bar popup ', () => {
-    let menuBarMenu, singleSelMenu, singleMultiSelMenu, multiSelMenu, bothSelMenu, emptySpaceMenu, headerMenu, table;
+    let menuBarMenu, singleSelMenu, singleMultiSelMenu, multiSelMenu, emptySpaceMenu, table;
 
     beforeEach(() => {
       let model = helper.createModelFixture(2, 2);
@@ -2205,7 +2205,7 @@ describe('Table', () => {
   describe('initColumns', () => {
 
     it('table is available in _init', () => {
-      let table = scout.create('Table', {
+      scout.create('Table', {
         parent: session.desktop,
         columns: [{
           objectType: 'TestBeanColumn'
@@ -2816,7 +2816,7 @@ describe('Table', () => {
       ]);
 
       // Filter active
-      let filter = helper.createAndRegisterColumnFilter({
+      helper.createAndRegisterColumnFilter({
         table: table,
         session: session,
         column: table.columns[0],
@@ -2885,7 +2885,7 @@ describe('Table', () => {
       ]);
 
       // Filter active
-      let filter = helper.createAndRegisterColumnFilter({
+      helper.createAndRegisterColumnFilter({
         table: table,
         session: session,
         column: table.columns[0],
@@ -2982,7 +2982,7 @@ describe('Table', () => {
   });
 
   describe('ensureExpansionVisible', () => {
-    let model, table, rows, $scrollable, nodeHeight;
+    let model, table, rows, $scrollable;
 
     beforeEach(() => {
       $('<style>' +

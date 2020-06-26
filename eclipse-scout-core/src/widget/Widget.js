@@ -1891,7 +1891,7 @@ export default class Widget {
    *
    * @param {string} widgetId
    *          The ID of the widget to find.
-   * @param {boolean} deep
+   * @param {boolean} [deep=false]
    *          If false, only this widget and the next level are checked. This is the default.
    *          If true, the entire tree is traversed.
    * @return {Widget} the first found widget, or null if no widget was found.

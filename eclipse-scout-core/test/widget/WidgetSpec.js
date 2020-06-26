@@ -114,7 +114,7 @@ describe('Widget', () => {
     }
 
     it('visits all descendants', () => {
-      let widget = createWidget({
+      createWidget({
         session: session,
         parent: parent
       });
@@ -544,7 +544,7 @@ describe('Widget', () => {
         expect(widgetClone[propertyName]).not.toBe(undefined);
       });
       // but not the $container property (which has been added later)
-      expect(widgetClone.$container).toBe(undefined);
+      expect(widgetClone.$container).toBeNull();
     });
 
     it('\'text\' must be recognized as clone property, but not \'$container\'', () => {
@@ -958,6 +958,7 @@ describe('Widget', () => {
         let widget = createWidget({
           parent: parent
         });
+        // noinspection JSUnusedLocalSymbols
         let another = createWidget({
           parent: parent
         });
@@ -967,6 +968,7 @@ describe('Widget', () => {
 
         widget.setChildWidget(child);
         widget.setChildWidget(null);
+        // noinspection JSCheckFunctionSignatures
         expect().nothing();
       });
     });
