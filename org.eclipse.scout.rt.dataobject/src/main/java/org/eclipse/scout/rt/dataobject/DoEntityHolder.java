@@ -31,7 +31,12 @@ public class DoEntityHolder<T extends IDoEntity> implements IHolder<T>, Serializ
   }
 
   public DoEntityHolder(Class<T> clazz) {
+    this(clazz, null);
+  }
+
+  public DoEntityHolder(Class<T> clazz, T value) {
     m_clazz = clazz;
+    m_value = value;
   }
 
   @Override
