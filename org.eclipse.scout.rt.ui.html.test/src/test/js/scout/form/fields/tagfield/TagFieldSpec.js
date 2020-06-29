@@ -99,7 +99,7 @@ describe('TagField', function() {
       typeProposal(field, 'fo', scout.keys.O);
       jasmine.clock().tick(500);
 
-      expect(field.chooser instanceof scout.TagChooserPopup).toBe(true);
+      expect(field.popup instanceof scout.TagChooserPopup).toBe(true);
 
       // trigger a keydown event, all the flags are required  to pass
       // the accept-checks in KeyStroke.js
@@ -114,7 +114,7 @@ describe('TagField', function() {
       }));
 
       // expect the value to be accepted and the chooser to be closed
-      expect(field.chooser).toBe(null);
+      expect(field.popup).toBe(null);
       expect(field.value).toEqual(['fo']);
     });
 
@@ -124,7 +124,6 @@ describe('TagField', function() {
 
     it('start and prepare a lookup call clone when typing', function() {
       var templatePropertyValue = 11;
-      var preparedPropertyValue = 22;
       var eventCounter = 0;
       field = scout.create('TagField', {
         parent: session.desktop,
@@ -149,8 +148,8 @@ describe('TagField', function() {
       jasmine.clock().tick(500);
 
       // expect popup is open and has 2 lookup rows (Bar, Baz)
-      expect(field.chooser instanceof scout.TagChooserPopup).toBe(true);
-      expect(field.chooser.table.rows.length).toBe(2);
+      expect(field.popup instanceof scout.TagChooserPopup).toBe(true);
+      expect(field.popup.table.rows.length).toBe(2);
       expect(eventCounter).toBe(1);
     });
 

@@ -13,7 +13,7 @@ scout.TagField = function() {
 
   this.$field = null;
   this.fieldHtmlComp = null;
-  this.chooser = null;
+  this.popup = null;
   this.lookupCall = null;
   this._currentLookupCall = null;
   this.tagBar = null;
@@ -161,11 +161,11 @@ scout.TagField.prototype._clear = function() {
  * @override
  */
 scout.TagField.prototype.acceptInput = function(whileTyping) {
-  if (this.chooser) {
-    if (this.chooser.selectedRow()) {
-      this.chooser.triggerLookupRowSelected();
+  if (this.popup) {
+    if (this.popup.selectedRow()) {
+      this.popup.triggerLookupRowSelected();
     } else {
-      this.closeChooserPopup();
+      this.closePopup();
     }
     return;
   }
@@ -182,9 +182,19 @@ scout.TagField.prototype._triggerAcceptInput = function() {
 /**
  * @override
  */
+scout.TagField.prototype.aboutToBlurByMouseDown = function(target) {
+  if (scout.fields.eventOutsideProposalField(this, target)) {
+    this.acceptInput(true);
+  }
+};
+
+
+/**
+ * @override
+ */
 scout.TagField.prototype._onFieldBlur = function(event) {
   // We cannot call super until chooser popup has been closed (see #acceptInput)
-  this.closeChooserPopup();
+  this.closePopup();
   scout.TagField.parent.prototype._onFieldBlur.call(this, event);
   if (this.rendered && !this.removing) {
     this.tagBar.blur();
@@ -229,8 +239,10 @@ scout.TagField.prototype.removeTag = function(tag) {
 };
 
 scout.TagField.prototype._onInputKeydown = function(event) {
-  if (this._isNavigationKey(event) && this.chooser) {
-    this.chooser.delegateKeyEvent(event);
+  if (this._isNavigationKey(event) && this.popup) {
+    this.popup.delegateKeyEvent(event);
+  } else if (event.which === scout.keys.ESC) {
+    this.closePopup();
   }
 };
 
@@ -259,7 +271,7 @@ scout.TagField.prototype._lookupByText = function(text) {
     return null;
   }
   if (scout.strings.empty(text) || text.length < 2) {
-    this.closeChooserPopup();
+    this.closePopup();
     return;
   }
 
@@ -278,12 +290,12 @@ scout.TagField.prototype._lookupByText = function(text) {
 scout.TagField.prototype._onLookupDone = function(result) {
   try {
     if (!this.rendered || !this.isFocused() || result.lookupRows.length === 0) {
-      this.closeChooserPopup();
+      this.closePopup();
       return;
     }
 
-    this.openChooserPopup();
-    this.chooser.setLookupResult(result);
+    this.openPopup();
+    this.popup.setLookupResult(result);
   } finally {
     this.trigger('lookupCallDone', {
       result: result
@@ -291,24 +303,25 @@ scout.TagField.prototype._onLookupDone = function(result) {
   }
 };
 
-scout.TagField.prototype.openChooserPopup = function() {
-  if (this.chooser) {
+scout.TagField.prototype.openPopup = function() {
+  if (this.popup) {
     return;
   }
-  this.chooser = scout.create('TagChooserPopup', {
+  this.popup = scout.create('TagChooserPopup', {
     parent: this,
     $anchor: this.$field,
+    boundToAnchor: true,
     closeOnAnchorMouseDown: false,
     field: this
   });
-  this.chooser.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
-  this.chooser.one('close', this._onChooserPopupClose.bind(this));
-  this.chooser.open();
+  this.popup.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
+  this.popup.one('close', this._onPopupClose.bind(this));
+  this.popup.open();
 };
 
-scout.TagField.prototype.closeChooserPopup = function() {
-  if (this.chooser && !this.chooser.destroying) {
-    this.chooser.close();
+scout.TagField.prototype.closePopup = function() {
+  if (this.popup && !this.popup.destroying) {
+    this.popup.close();
   }
 };
 
@@ -316,11 +329,11 @@ scout.TagField.prototype._onLookupRowSelected = function(event) {
   this._clear();
   this._updateHasText();
   this.addTag(event.lookupRow.key);
-  this.closeChooserPopup();
+  this.closePopup();
 };
 
-scout.TagField.prototype._onChooserPopupClose = function(event) {
-  this.chooser = null;
+scout.TagField.prototype._onPopupClose = function(event) {
+  this.popup = null;
 };
 
 scout.TagField.prototype.isInputFocused = function() {

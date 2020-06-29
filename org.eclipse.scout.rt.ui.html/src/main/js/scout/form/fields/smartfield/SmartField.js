@@ -925,11 +925,8 @@ scout.SmartField.prototype.aboutToBlurByMouseDown = function(target) {
   if (this.touchMode) {
     return false;
   }
-  var eventOnField = this.$field.isOrHas(target) || this.$icon.isOrHas(target) || (this.$clearIcon && this.$clearIcon.isOrHas(target));
-  var eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
-  var eventOnTooltip = this._tooltip() && this._tooltip().rendered && this._tooltip().$container.isOrHas(target);
-  if (!eventOnField && !eventOnPopup && !eventOnTooltip) {
-    this.acceptInput(true); // event outside this value field
+  if (scout.fields.eventOutsideProposalField(this, target)) {
+    this.acceptInput(true);
   }
 };
 
