@@ -46,6 +46,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     super(chart);
     this.chartJs = null;
     this.minSpaceBetweenYTicks = 35;
+    this.minSpaceBetweenXTicks = 150;
     this.numSupportedColors = 6;
     this.colorSchemeCssClass = '';
     this.minRadialChartDatalabelSpace = 25;
@@ -174,7 +175,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       config.options = $.extend(true, {}, config.options, {
         scale: {}
       });
-    } else if (type === Chart.Type.BAR || type === Chart.Type.LINE) {
+    } else if (type === Chart.Type.BAR || type === Chart.Type.LINE || type === Chart.Type.BUBBLE) {
       config.options = $.extend(true, {}, config.options, {
         scales: {
           xAxes: [{}],
@@ -195,12 +196,28 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       });
     }
     for (let i = 0; i < ((config.options.scales || {}).xAxes || []).length; i++) {
-      config.options.scales.xAxes[i] = $.extend(true, {}, config.options.scales.xAxes[i], {
-        offset: true,
-        gridLines: {
-          display: false
-        }
-      });
+      if (type === Chart.Type.BUBBLE) {
+        config.options.scales.xAxes[i] = $.extend(true, {}, config.options.scales.xAxes[i], {
+          offset: true,
+          gridLines: {
+            drawBorder: false,
+            drawTicks: false,
+            zeroLineBorderDash: [2, 4],
+            borderDash: [2, 4]
+          },
+          ticks: {
+            padding: 5,
+            callback: this._labelFormatter
+          }
+        });
+      } else {
+        config.options.scales.xAxes[i] = $.extend(true, {}, config.options.scales.xAxes[i], {
+          offset: true,
+          gridLines: {
+            display: false
+          }
+        });
+      }
     }
     for (let i = 0; i < ((config.options.scales || {}).yAxes || []).length; i++) {
       config.options.scales.yAxes[i] = $.extend(true, {}, config.options.scales.yAxes[i], {
@@ -221,7 +238,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       if (config.type === Chart.Type.PIE || config.type === Chart.Type.DOUGHNUT) {
         config.options.plugins.datalabels.display = this._radialChartDatalabelsDisplayHandler;
         config.options.plugins.datalabels.formatter = this._radialChartDatalabelsFormatter;
-      } else if (config.type === Chart.Type.BAR || config.type === Chart.Type.LINE || config.type === Chart.Type.POLAR_AREA || config.type === Chart.Type.RADAR) {
+      } else if (config.type === Chart.Type.BAR || config.type === Chart.Type.LINE || config.type === Chart.Type.POLAR_AREA || config.type === Chart.Type.RADAR || config.type === Chart.Type.BUBBLE) {
         config.options.plugins.datalabels.display = 'auto';
         config.options.plugins.datalabels.backgroundColor = this._datalabelBackgroundColorHandler;
         config.options.plugins.datalabels.borderRadius = 4;
@@ -343,7 +360,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       colors.borderColors = this._computeColors(this.chart.data);
       if (type === Chart.Type.POLAR_AREA) {
         colors.backgroundColors = this._computeColors(this.chart.data, 0.7);
-      } else if (type === Chart.Type.RADAR) {
+      } else if (type === Chart.Type.RADAR || type === Chart.Type.BUBBLE) {
         colors.backgroundColors = this._computeColors(this.chart.data, 0.2);
       } else {
         colors.backgroundColors = colors.borderColors;
@@ -382,15 +399,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           color: colors.gridColor
         });
       }
-      ((config.options.scales || {}).xAxes || []).forEach(elem => {
-        elem.ticks = $.extend(true, {}, elem.ticks, {
-          fontColor: colors.labelColor
-        });
-        elem.scaleLabel = $.extend(true, {}, elem.scaleLabel, {
-          fontColor: colors.axisLabelColor
-        });
-      });
-      ((config.options.scales || {}).yAxes || []).forEach(elem => {
+      [...((config.options.scales || {}).xAxes || []), ...((config.options.scales || {}).yAxes || [])].forEach(elem => {
         elem.gridLines = $.extend(true, {}, elem.gridLines, {
           zeroLineColor: colors.gridColor,
           color: colors.gridColor
@@ -424,38 +433,60 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (!config || !config.type || !config.options || (!config.options.scale && !config.options.scales) || !chartArea) {
       return;
     }
-    if (!(config.type === Chart.Type.BAR || config.type === Chart.Type.LINE || config.type === Chart.Type.POLAR_AREA || config.type === Chart.Type.RADAR)) {
+    if (!(config.type === Chart.Type.BAR || config.type === Chart.Type.LINE || config.type === Chart.Type.POLAR_AREA || config.type === Chart.Type.RADAR || config.type === Chart.Type.BUBBLE)) {
       return;
     }
 
     let height = Math.abs(chartArea.top - chartArea.bottom),
       maxYTicks = Math.floor(height / this.minSpaceBetweenYTicks),
-      maxMinValue = this._computeMaxMinValue(config.data);
+      yBoundaries;
+
+    let padding = 0;
+    if (config.type === Chart.Type.BUBBLE) {
+      let maxR = this._computeMaxMinValue(config.data, 'r', true);
+      padding = maxR.maxValue + (((config.options.elements || {}).point || {}).hoverRadius || 0);
+      yBoundaries = this._computeMaxMinValue(config.data, 'y', false, padding, height);
+    } else {
+      yBoundaries = this._computeMaxMinValue(config.data);
+    }
 
     if (config.options.scale) {
       config.options.scale.ticks = $.extend(true, {}, config.options.scale.ticks, {
         maxTicksLimit: Math.ceil(maxYTicks / 2)
       });
-      if (maxMinValue) {
-        config.options.scale.ticks.suggestedMax = maxMinValue.maxValue;
-        config.options.scale.ticks.suggestedMin = maxMinValue.minValue;
+      if (yBoundaries) {
+        config.options.scale.ticks.suggestedMax = yBoundaries.maxValue;
+        config.options.scale.ticks.suggestedMin = yBoundaries.minValue;
       }
     } else {
-      for (let i = 0; i < (config.options.scales.yAxes || []).length; i++) {
-        config.options.scales.yAxes[i] = $.extend(true, {}, config.options.scales.yAxes[i], {
-          ticks: {
-            maxTicksLimit: maxYTicks
-          }
-        });
-        if (maxMinValue) {
-          config.options.scales.yAxes[i].ticks.suggestedMax = maxMinValue.maxValue;
-          config.options.scales.yAxes[i].ticks.suggestedMin = maxMinValue.minValue;
+      this._adjustAxes(config.options.scales.yAxes, maxYTicks, yBoundaries);
+    }
+
+    if (!(config.type === Chart.Type.BUBBLE)) {
+      return;
+    }
+
+    let width = Math.abs(chartArea.right - chartArea.left),
+      maxXTicks = Math.floor(width / this.minSpaceBetweenXTicks),
+      xBoundaries = this._computeMaxMinValue(config.data, 'x', false, padding, width);
+    this._adjustAxes(config.options.scales.xAxes, maxXTicks, xBoundaries);
+  }
+
+  _adjustAxes(axes, maxTicks, maxMinValue) {
+    for (let i = 0; i < (axes || []).length; i++) {
+      axes[i] = $.extend(true, {}, axes[i], {
+        ticks: {
+          maxTicksLimit: maxTicks
         }
+      });
+      if (maxMinValue) {
+        axes[i].ticks.suggestedMax = maxMinValue.maxValue;
+        axes[i].ticks.suggestedMin = maxMinValue.minValue;
       }
     }
   }
 
-  _computeMaxMinValue(data) {
+  _computeMaxMinValue(data, identifier, exact, padding, space) {
     if (!data) {
       return;
     }
@@ -463,33 +494,49 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let maxValue = 0,
       minValue = 0,
       i = 0,
-      j = 0,
-      f;
+      j = 0;
     for (i = 0; i < data.datasets.length; i++) {
       for (j = 0; j < data.datasets[i].data.length; j++) {
-        maxValue = Math.max(data.datasets[i].data[j], maxValue);
-        minValue = Math.min(data.datasets[i].data[j], minValue);
+        if (identifier) {
+          maxValue = Math.max(data.datasets[i].data[j][identifier], maxValue);
+          minValue = Math.min(data.datasets[i].data[j][identifier], minValue);
+        } else {
+          maxValue = Math.max(data.datasets[i].data[j], maxValue);
+          minValue = Math.min(data.datasets[i].data[j], minValue);
+        }
       }
     }
 
-    if (maxValue > 0) {
-      f = Math.ceil(Math.log(maxValue) / Math.LN10) - 1;
-      maxValue = Math.ceil(maxValue / Math.pow(10, f)) * Math.pow(10, f);
-      maxValue = Math.ceil(maxValue / 4) * 4;
+    if (padding && space && space > 2 * padding) {
+      let valuePerPixel = (maxValue - minValue) / (space - 2 * padding),
+        paddingValue = valuePerPixel * padding;
+      maxValue = maxValue + paddingValue;
+      minValue = minValue - paddingValue;
     }
 
-    if (minValue < 0) {
-      minValue = minValue * (-1);
-      f = Math.ceil(Math.log(minValue) / Math.LN10) - 1;
-      minValue = Math.ceil(minValue / Math.pow(10, f)) * Math.pow(10, f);
-      minValue = Math.ceil(minValue / 4) * 4;
-      minValue = minValue * (-1);
+    if (!exact) {
+      if (maxValue > 0) {
+        maxValue = this._calculateBoundary(maxValue);
+      }
+
+      if (minValue < 0) {
+        minValue = minValue * (-1);
+        minValue = this._calculateBoundary(minValue);
+        minValue = minValue * (-1);
+      }
     }
 
     return {
       maxValue: Math.ceil(maxValue),
       minValue: Math.floor(minValue)
     };
+  }
+
+  _calculateBoundary(value) {
+    let f = Math.ceil(Math.log(value) / Math.LN10) - 1;
+    value = Math.ceil(value / Math.pow(10, f)) * Math.pow(10, f);
+    value = Math.ceil(value / 4) * 4;
+    return value;
   }
 
   _adjustClickHandler(config) {

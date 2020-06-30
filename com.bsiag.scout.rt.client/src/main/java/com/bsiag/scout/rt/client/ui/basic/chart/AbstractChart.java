@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 
 import com.bsiag.scout.rt.client.ui.basic.chart.ChartChains.ChartValueClickChain;
 import com.bsiag.scout.rt.shared.data.basic.chart.ChartData;
-import com.bsiag.scout.rt.shared.data.basic.chart.ChartValueGroupBean;
+import com.bsiag.scout.rt.shared.data.basic.chart.MonupleChartValueGroupBean;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartConfig;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartData;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
@@ -39,30 +39,30 @@ import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
  * <h1>Chart types</h1>
  * <h2>Pie and Donut Chart</h2> ({@link IChartType#PIE_OLD}, {@link IChartType#DONUT_OLD})
  * <p>
- * Sectors on pie or donut represent a single {@link ChartValueGroupBean} on the {@link ChartData}. For each
- * {@link ChartValueGroupBean} there can be only one value. On the {@link ChartData} there are no axes set.
+ * Sectors on pie or donut represent a single {@link MonupleChartValueGroupBean} on the {@link ChartData}. For each
+ * {@link MonupleChartValueGroupBean} there can be only one value. On the {@link ChartData} there are no axes set.
  * <h2>Line Chart</h2> ({@link IChartType#LINE_OLD})
  * <p>
- * Each line represents a single {@link ChartValueGroupBean} on the {@link ChartData}. All added
- * {@link ChartValueGroupBean} must have the same value count. The labels of the x-axis are read out of
+ * Each line represents a single {@link MonupleChartValueGroupBean} on the {@link ChartData}. All added
+ * {@link MonupleChartValueGroupBean} must have the same value count. The labels of the x-axis are read out of
  * {@link ChartData#getAxes()}<code>[0]</code>. Each label in this list corresponds to the index in the value list in
- * the {@link ChartValueGroupBean}.
+ * the {@link MonupleChartValueGroupBean}.
  * <h2>Bar Chart</h2> ({@link IChartType#BAR_VERTICAL_OLD})
  * <p>
- * Each bar group in the same color represents a single {@link ChartValueGroupBean} on the {@link ChartData}. All added
- * {@link ChartValueGroupBean} must have the same value count. The labels of the x-axis are read out of
+ * Each bar group in the same color represents a single {@link MonupleChartValueGroupBean} on the {@link ChartData}. All
+ * added {@link MonupleChartValueGroupBean} must have the same value count. The labels of the x-axis are read out of
  * {@link ChartData#getAxes()}<code>[0]</code>. Each label in this list corresponds to the index in the value list in
- * the {@link ChartValueGroupBean}.
+ * the {@link MonupleChartValueGroupBean}.
  * <p>
  * <h2>Fulfillment Cart</h2> ({@link IChartType#FULFILLMENT})
  * <p>
- * There have to be exactly two {@link ChartValueGroupBean} on the {@link ChartData}, with just one value each. The
- * first group contains the degree of fulfillment and the second group contains the value to fulfill. This type has no
- * legendbox.
+ * There have to be exactly two {@link MonupleChartValueGroupBean} on the {@link ChartData}, with just one value each.
+ * The first group contains the degree of fulfillment and the second group contains the value to fulfill. This type has
+ * no legendbox.
  * <h2>Sales Funnel Chart</h2> ({@link IChartType#SALESFUNNEL})
  * <p>
- * A salesfunnel consists of n {@link ChartValueGroupBean}. Each represents a bar in the chart. Every group must have at
- * least one value and at most two values. This type has no legendbox.
+ * A salesfunnel consists of n {@link MonupleChartValueGroupBean}. Each represents a bar in the chart. Every group must
+ * have at least one value and at most two values. This type has no legendbox.
  * <p>
  * There are custom attributes for the sales funnel chart:
  * <ul>
@@ -73,14 +73,14 @@ import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
  * </ul>
  * <h2>Speedo Chart</h2> ({@link IChartType#SPEEDO})
  * <p>
- * For a speedo chart there have to be just one {@link ChartValueGroupBean} on the {@link ChartData}. The first value on
- * the group is the min value of the range, the second the actual value is the actual value for the pointer and the
- * third value is the max value for the range. The {@link IChartConfig#SPEEDO_CHART_GREEN_AREA_POSITION} is a custom
+ * For a speedo chart there have to be just one {@link MonupleChartValueGroupBean} on the {@link ChartData}. The first
+ * value on the group is the min value of the range, the second the actual value is the actual value for the pointer and
+ * the third value is the max value for the range. The {@link IChartConfig#SPEEDO_CHART_GREEN_AREA_POSITION} is a custom
  * property which defines where the green area is located on the speedo. This type has no legendbox.
  * <h2>Venn Chart</h2> ({@link IChartType#VENN})
  * <p>
- * A Venn-chart consist of one to seven {@link ChartValueGroupBean} with exactly one value. First there are all values
- * for the own circle followed by all combinations. The venn chart is limited to three circles.
+ * A Venn-chart consist of one to seven {@link MonupleChartValueGroupBean} with exactly one value. First there are all
+ * values for the own circle followed by all combinations. The venn chart is limited to three circles.
  * {@link IChartConfig#VENN_NUMBER_OF_CIRCLES} specifies the number of circles.
  * <p>
  * Examples:
@@ -89,7 +89,7 @@ import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
  * <li>Two circles:{"Set A", "Set B", "A-B"}
  * </ul>
  * <h1>Other attributes</h1>
- * <h2>Legend</h2> Write the text for the legend into groupName of {@link ChartValueGroupBean}.
+ * <h2>Legend</h2> Write the text for the legend into groupName of {@link MonupleChartValueGroupBean}.
  * <p>
  *
  * @since 5.2

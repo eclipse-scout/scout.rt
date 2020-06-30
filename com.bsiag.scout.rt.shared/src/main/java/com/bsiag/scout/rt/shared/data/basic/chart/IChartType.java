@@ -30,4 +30,5 @@ public interface IChartType {
   String DONUT_OLD = "donut_old";
   String POLAR_AREA = "polarArea";
   String RADAR = "radar";
+  String BUBBLE = "bubble";
 }

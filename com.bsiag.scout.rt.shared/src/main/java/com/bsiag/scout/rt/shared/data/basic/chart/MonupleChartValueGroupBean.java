@@ -9,30 +9,20 @@
  */
 package com.bsiag.scout.rt.shared.data.basic.chart;
 
-import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @since 5.2
  */
-public interface IChartValueGroupBean extends Serializable {
+public class MonupleChartValueGroupBean extends AbstractChartValueGroupBean implements IMonupleChartValueGroupBean {
+  private static final long serialVersionUID = 1L;
 
-  Object getGroupKey();
+  private final List<BigDecimal> m_values = new ArrayList<>();
 
-  void setGroupKey(Object groupKey);
-
-  String getGroupName();
-
-  void setGroupName(String groupName);
-
-  String getColorHexValue();
-
-  void setColorHexValue(String colorHexValue);
-
-  String getCssClass();
-
-  void setCssClass(String cssClass);
-
-  boolean isClickable();
-
-  void setClickable(boolean clickable);
+  @Override
+  public List<BigDecimal> getValues() {
+    return m_values;
+  }
 }

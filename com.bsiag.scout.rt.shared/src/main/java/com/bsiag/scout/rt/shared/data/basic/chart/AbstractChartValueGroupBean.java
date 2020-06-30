@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -9,21 +9,13 @@
  */
 package com.bsiag.scout.rt.shared.data.basic.chart;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.scout.rt.platform.annotations.IgnoreProperty;
 
-/**
- * @since 5.2
- */
-public class ChartValueGroupBean implements IChartValueGroupBean {
+public abstract class AbstractChartValueGroupBean implements IChartValueGroupBean {
   private static final long serialVersionUID = 1L;
 
   private Object m_groupKey;
   private String m_groupName;
-  private final List<BigDecimal> m_values = new ArrayList<>();
   private String m_colorHexValue;
   private String m_cssClass;
   private boolean m_clickable = true;
@@ -48,11 +40,6 @@ public class ChartValueGroupBean implements IChartValueGroupBean {
   @Override
   public void setGroupName(String groupName) {
     m_groupName = groupName;
-  }
-
-  @Override
-  public List<BigDecimal> getValues() {
-    return m_values;
   }
 
   @Override
