@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
@@ -108,8 +109,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   private List<ITreeNode> m_currentParentNodes;
 
   /**
-   * Provides 8 boolean flags.<br>
-   * Currently used: {@link #INITIALIZED}, {@link #AUTO_DISCARD_ON_DELETE}, {@link #AUTO_TITLE},
+   * Provides 4 boolean flags.<br>
+   * Currently used: {@link #AUTO_DISCARD_ON_DELETE}, {@link #AUTO_TITLE},
    * {@link #ACTION_RUNNING}, {@link #SAVE_AND_RESTORE_SCROLLBARS}
    */
   private byte m_flags;
@@ -329,8 +330,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
 
   /**
    * Configures whether this tree should save and restore its coordinates of the vertical and horizontal scrollbars. If
-   * this property is set to {@code true}, the tree saves its scrollbars coordinates to the {@link #ClientSession} upon
-   * detaching the UI component from Scout. The coordinates are restored (if the coordnates are available), when the UI
+   * this property is set to {@code true}, the tree saves its scrollbars coordinates to the {@link AbstractClientSession} upon
+   * detaching the UI component from Scout. The coordinates are restored (if the coordinates are available), when the UI
    * component is attached to Scout.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
@@ -348,7 +349,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
    * <p>
    * Only has an effect if the tree is checkable.
    *
-   * @see {@link #getConfiguredCheckable()}
+   * @see #getConfiguredCheckable()
    * @since 5.1
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -455,8 +456,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   /**
-   * this method should not be implemented if you support {@link AbstractTree#interceptDrag(ITreeNode[])} (drag of
-   * mulitple nodes), as it takes precedence
+   * this method should not be implemented if you support {@link #interceptDrag(Collection)} (drag of
+   * multiple nodes), as it takes precedence
    *
    * @return a transferable object representing the given row
    */
@@ -693,7 +694,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
       injectMenusInternal(menus);
     }
     catch (Exception e) {
-      LOG.error("Error occured while dynamically contributing menus.", e);
+      LOG.error("Error occurred while dynamically contributing menus.", e);
     }
 
     menus.addAllOrdered(contributedMenus);
@@ -1030,7 +1031,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   public String getPathText(ITreeNode selectedNode, String delimiter) {
     // construct the path to the data
     ITreeNode root = getRootNode();
-    StringBuilder pathStr = new StringBuilder("");
+    StringBuilder pathStr = new StringBuilder();
     ITreeNode node = selectedNode;
     while (node != null) {
       if (node != root || isRootNodeVisible()) {
@@ -1559,7 +1560,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   protected List<IKeyStroke> getKeyStrokesInternal() {
-    return propertySupport.<IKeyStroke> getPropertyList(PROP_KEY_STROKES);
+    return propertySupport.<IKeyStroke>getPropertyList(PROP_KEY_STROKES);
   }
 
   @Override
@@ -2161,10 +2162,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   /**
-   * keeps order of input
-   *
-   * @param nodes
-   * @return
+   * Keeps order of input.
    */
   private List<ITreeNode> resolveNodes(Collection<? extends ITreeNode> nodes) {
     if (!CollectionUtility.hasElements(nodes)) {
@@ -2326,9 +2324,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     updateNodeMenus(m_selectedNodes);
   }
 
-  /**
-   * @param newSelectedNodes
-   */
   protected void updateNodeMenus(Set<ITreeNode> newSelectedNodes) {
     // remove old
     if (m_currentNodeMenus != null) {
@@ -2682,8 +2677,8 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   /**
-   * @return the new tree node for this node data or null to skip this node It is the responsibility of this method to
-   *         add the new nopde to the tree.
+   * @return the new tree node for this node data or null to skip this node. It is the responsibility of this method to
+   *         add the new node to the tree.
    */
   protected ITreeNode importTreeNodeData(ITreeNode parentNode, AbstractTreeFieldData treeData, TreeNodeData nodeData) {
     return null;
