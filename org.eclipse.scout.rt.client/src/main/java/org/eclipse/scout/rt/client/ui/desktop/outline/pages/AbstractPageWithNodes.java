@@ -339,8 +339,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     List<IMenu> menus = mainBoxContextMenu.getChildActions();
 
     for (IMenu menu : getOutline().getMenusForPage(this)) {
-      if (menu.getMenuTypes().contains(TreeMenuType.Header) && menu.getMenuTypes().size() == 1) {
-        // Don't show TreeMenuType.Header. These menus should only be shown on outline title
+      if (!acceptPageMenuForDetailForm(menu, form)) {
         continue;
       }
       menus.add(MenuWrapper.wrapMenuIfNotWrapped(menu));
@@ -348,6 +347,14 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     if (!CollectionUtility.equalsCollection(menus, mainBoxContextMenu.getChildActions())) {
       mainBoxContextMenu.setChildActions(menus);
     }
+  }
+
+  protected boolean acceptPageMenuForDetailForm(IMenu menu, IForm form) {
+    if (menu.getMenuTypes().contains(TreeMenuType.Header) && menu.getMenuTypes().size() == 1) {
+      // Don't show TreeMenuType.Header. These menus should only be shown on outline title
+      return false;
+    }
+    return true;
   }
 
   /**

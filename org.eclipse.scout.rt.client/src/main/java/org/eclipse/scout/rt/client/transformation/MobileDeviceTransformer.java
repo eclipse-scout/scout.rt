@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.SearchFormTableControl;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.MenuWrapper;
@@ -61,6 +62,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     transformations.add(MobileDeviceTransformation.MOVE_FIELD_STATUS_TO_TOP);
     transformations.add(MobileDeviceTransformation.MAKE_FIELD_SCALEABLE);
     transformations.add(MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE);
+    transformations.add(MobileDeviceTransformation.MAKE_OUTLINE_ROOT_NODE_VISIBLE);
     transformations.add(MobileDeviceTransformation.REDUCE_GROUPBOX_COLUMNS_TO_ONE);
     transformations.add(MobileDeviceTransformation.HIDE_PLACEHOLDER_FIELD);
     transformations.add(MobileDeviceTransformation.HIDE_FIELD_STATUS);
@@ -102,6 +104,32 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     outline.setLazyExpandingEnabled(false);
     outline.setToggleBreadcrumbStyleEnabled(false);
     outline.setDisplayStyle(ITree.DISPLAY_STYLE_BREADCRUMB);
+    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MAKE_OUTLINE_ROOT_NODE_VISIBLE)) {
+      ensureOutlineRootContentVisible(outline);
+    }
+  }
+
+  protected void ensureOutlineRootContentVisible(IOutline outline) {
+    if (outline.getDefaultDetailForm() == null && !outline.isOutlineOverviewVisible()) {
+      // No root content available
+      return;
+    }
+    // The root content (default detail form / outline overview) will be embedded into the root node
+    // To make this work the root node needs to be visible. We also have to mark is as compact root so that the UI knows where to embed the root content.
+    // We also need to make sure that deselecting all nodes actually select the root node
+    // The root node will only be visible when it is selected which is done by using CSS, see Outline.less
+    outline.setRootNodeVisible(true);
+    outline.getRootPage().setCompactRoot(true);
+    // Use _UI_TreeListener to make sure the event buffer in JsonTree contains the event with no selection when we select the root node,
+    // otherwise changing the selection during a selection event would not be possible
+    outline.addUITreeListener(event -> {
+      if (event.getNewSelectedNodes().size() == 0) {
+        outline.selectNode(outline.getRootNode());
+      }
+    }, TreeEvent.TYPE_NODES_SELECTED);
+    if (outline.getSelectedNodes().size() == 0) {
+      outline.selectNode(outline.getRootNode());
+    }
   }
 
   @Override

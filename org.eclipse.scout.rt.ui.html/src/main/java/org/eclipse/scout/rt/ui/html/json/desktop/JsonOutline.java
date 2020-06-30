@@ -46,6 +46,8 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   private static final String PROP_DETAIL_FORM_VISIBLE = "detailFormVisible";
   private static final String PROP_DETAIL_TABLE_VISIBLE = "detailTableVisible";
   private static final String PROP_OVERVIEW_ICON_ID = "overviewIconId";
+  private static final String PROP_SHOW_TILE_OVERVIEW = "showTileOverview";
+  private static final String PROP_COMPACT_ROOT = "compactRoot";
 
   private final IDesktop m_desktop;
 
@@ -177,6 +179,8 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     putDetailFormAndTable(json, page);
     putNodeType(json, node);
     json.put(PROP_OVERVIEW_ICON_ID, page.getOverviewIconId());
+    json.put(PROP_SHOW_TILE_OVERVIEW, page.isShowTileOverview());
+    json.put(PROP_COMPACT_ROOT, page.isCompactRoot());
     BEANS.get(InspectorInfo.class).put(getUiSession(), json, page);
     return json;
   }

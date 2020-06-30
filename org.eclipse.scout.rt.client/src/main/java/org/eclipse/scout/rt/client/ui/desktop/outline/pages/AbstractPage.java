@@ -90,6 +90,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   private static final String TABLE_VISIBLE = "TABLE_VISIBLE";
   private static final String DETAIL_FORM_VISIBLE = "DETAIL_FORM_VISIBLE";
   private static final String SHOW_TILE_OVERVIEW = "SHOW_TILE_OVERVIEW";
+  private static final String COMPACT_ROOT = "COMPACT_ROOT";
   private static final String PAGE_MENUS_ADDED = "PAGE_MENUS_ADDED";
   private static final String PAGE_ACTIVE = "PAGE_ACTIVE";
   private static final String PAGE_ACTIVATED = "PAGE_ACTIVATED";
@@ -127,7 +128,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   /**
    * Provides 8 boolean flags.<br>
-   * Currently used: {@link #PAGE_ACTIVATED}, {@link #SHOW_TILE_OVERVIEW}
+   * Currently used: {@link #PAGE_ACTIVATED}, {@link #SHOW_TILE_OVERVIEW}, {@link #COMPACT_ROOT}
    */
   byte m_flags2;
 
@@ -1043,6 +1044,16 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
     m_flags = FLAGS_BIT_HELPER.changeBit(DETAIL_FORM_VISIBLE, detailFormVisible, m_flags);
     firePageChanged();
+  }
+
+  @Override
+  public boolean isCompactRoot() {
+    return FLAGS2_BIT_HELPER.isBitSet(COMPACT_ROOT, m_flags2);
+  }
+
+  @Override
+  public void setCompactRoot(boolean compactRoot) {
+    m_flags2 = FLAGS2_BIT_HELPER.changeBit(COMPACT_ROOT, compactRoot, m_flags2);
   }
 
   @Override

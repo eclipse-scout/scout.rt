@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, OutlineOverview, scout, TileOverviewLayout} from '../../../index';
+import {HtmlComponent, OutlineOverview, RowLayout, scout} from '../../../index';
 
 export default class TileOutlineOverview extends OutlineOverview {
 
@@ -24,15 +24,18 @@ export default class TileOutlineOverview extends OutlineOverview {
     if (!this.pageTileGrid) {
       this.pageTileGrid = this._createPageTileGrid();
     }
+    this.scrollable = !this.outline.compact;
   }
 
   _render() {
     this.$container = this.$parent.appendDiv('tile-overview');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
-    this.htmlComp.setLayout(new TileOverviewLayout(this));
+    this.htmlComp.setLayout(new RowLayout({stretch: this.outline.compact}));
     this.$content = this.$container.appendDiv('tile-overview-content');
     this.contentHtmlComp = HtmlComponent.install(this.$content, this.session);
+    this.contentHtmlComp.setLayout(new RowLayout({stretch: this.outline.compact}));
     this.$title = this.$content.appendDiv('tile-overview-title').text(this.outline.title);
+    HtmlComponent.install(this.$title, this.session);
   }
 
   _renderProperties() {
@@ -46,10 +49,25 @@ export default class TileOutlineOverview extends OutlineOverview {
   }
 
   _createPageTileGrid() {
+    let page;
+    let nodes;
+    if (this.outline.compact) {
+      page = this.outline.compactRootNode();
+      if (page) {
+        nodes = page.childNodes;
+      }
+    }
     return scout.create('PageTileGrid', {
       parent: this,
-      outline: this.outline
+      outline: this.outline,
+      compact: this.outline.compact,
+      page: page,
+      nodes: nodes
     });
+  }
+
+  setScrollable(scrollable) {
+    this.setProperty('scrollable', scrollable);
   }
 
   _renderScrollable() {

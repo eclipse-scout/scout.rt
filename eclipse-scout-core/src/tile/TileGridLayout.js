@@ -214,7 +214,7 @@ export default class TileGridLayout extends LogicalGridLayout {
       fromBounds = bounds.clone();
     }
 
-    if (!htmlComp.layouted && this.widget.startupAnimationDone && this.widget.renderAnimationEnabled) {
+    if (!htmlComp.layouted && (this.widget.startupAnimationDone || !this.widget.startupAnimationEnabled) && this.widget.renderAnimationEnabled) {
       // This is a small, discreet render animation, just move the tiles a little
       // It will happen if the startup animation is disabled or done and every time the tiles are rendered anew
       fromBounds = new Rectangle(bounds.x * 0.95, bounds.y * 0.95, bounds.width, bounds.height);

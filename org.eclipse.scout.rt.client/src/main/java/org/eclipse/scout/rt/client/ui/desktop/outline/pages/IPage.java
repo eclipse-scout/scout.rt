@@ -174,6 +174,14 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, ID
 
   void setDetailFormVisible(boolean visible);
 
+  boolean isCompactRoot();
+
+  /**
+   * A node marked as compact root will embed the root content (default detail form or outline overview) in compact
+   * mode. Only the first node in an outline can be a compact root (which typically is the invisible root node).
+   */
+  void setCompactRoot(boolean compactRoot);
+
   boolean isShowTileOverview();
 
   /**

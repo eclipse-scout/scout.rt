@@ -58,7 +58,10 @@ export default class PageLayout extends AbstractLayout {
       if ($icon.length > 0) {
         iconHeight = $icon.outerHeight(true);
       }
-      titleHeight = Math.max($text.outerHeight(true), iconHeight);
+      if ($text.isVisible()) {
+        titleHeight = $text.outerHeight(true);
+      }
+      titleHeight = Math.max(titleHeight, iconHeight);
       this.outline.detailContent.htmlComp.setSize(new Dimension(containerSize.width, containerSize.height - titleHeight - detailMenuBarHeight));
     }
   }

@@ -8,12 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {KeyStrokeContext, PageTileGridSelectKeyStroke, scout, TileGrid} from '../../../index';
+import {KeyStrokeContext, PageTileGridSelectKeyStroke, scout, TileGrid, TileGridLayoutConfig} from '../../../index';
 
 export default class PageTileGrid extends TileGrid {
 
   constructor() {
     super();
+    this.compact = false;
+    this.compactLayoutConfig = new TileGridLayoutConfig({
+      columnWidth: 120,
+      rowHeight: 100,
+      hgap: 15,
+      vgap: 15
+    });
     this.outline = null;
     this.page = null;
     this.nodes = null;
@@ -28,9 +35,11 @@ export default class PageTileGrid extends TileGrid {
   _init(model) {
     super._init(model);
     this.nodes = this.nodes || (this.page && this.page.childNodes) || (this.outline && this.outline.nodes);
+    this._setCompact(this.compact);
     this.setOutline(this.outline);
     this.setPage(this.page);
     this.setNodes(this.nodes);
+    this._setCompactLayoutConfig(this.compactLayoutConfig);
   }
 
   _destroy() {
@@ -76,6 +85,33 @@ export default class PageTileGrid extends TileGrid {
     }
   }
 
+  setCompact(compact) {
+    this.setProperty('compact', compact);
+  }
+
+  _setCompact(compact) {
+    this._setProperty('compact', compact);
+    if (this.compact) {
+      this.setLayoutConfig(this.compactLayoutConfig);
+    } else if (this.initialized) {
+      // Initially, don't set layout config so that it can be passed by model. If compact is changed later, reset compact layout config to a default one
+      this.setLayoutConfig(new TileGridLayoutConfig());
+    }
+    this.setWithPlaceholders(!this.compact);
+    this.setGridColumnCount(this.compact ? 3 : 4);
+    this.startupAnimationEnabled = !this.compact;
+    if (this.initialized) {
+      this._rebuild();
+    }
+  }
+
+  _setCompactLayoutConfig(layoutConfig) {
+    if (!layoutConfig) {
+      layoutConfig = new TileGridLayoutConfig();
+    }
+    this._setProperty('compactLayoutConfig', TileGridLayoutConfig.ensure(layoutConfig));
+  }
+
   setPage(page) {
     this._setProperty('page', page);
   }
@@ -100,6 +136,7 @@ export default class PageTileGrid extends TileGrid {
     let tile = scout.create('FormFieldTile', {
       parent: this,
       colorScheme: 'default-inverted',
+      cssClass: this.compact ? 'compact' : null,
       tileWidget: button
     });
     page.tile = tile;

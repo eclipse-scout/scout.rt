@@ -425,7 +425,9 @@
     },
     "Page": {
       "detailTableVisible": true,
-      "detailFormVisible": true
+      "detailFormVisible": true,
+      "compactRoot": false,
+      "showTileOverview": false
     },
     "Tile": {
       "colorScheme": "default",

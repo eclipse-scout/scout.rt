@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {Form, HtmlComponent, TileOverviewLayout} from '../index';
+import {Form, HtmlComponent, RowLayout} from '../index';
 
 export default class TileOverviewForm extends Form {
   constructor() {
@@ -34,10 +34,12 @@ export default class TileOverviewForm extends Form {
 
   _renderForm() {
     super._renderForm();
-    this.htmlComp.setLayout(new TileOverviewLayout(this));
+    this.htmlComp.setLayout(new RowLayout());
     this.$content = this.$container.appendDiv('tile-overview-content');
     this.contentHtmlComp = HtmlComponent.install(this.$content, this.session);
+    this.contentHtmlComp.setLayout(new RowLayout({stretch: this.outline.compact}));
     this.$title = this.$content.appendDiv('tile-overview-title').text(this.tileOverviewTitle);
+    HtmlComponent.install(this.$title, this.session);
   }
 
   _renderProperties() {
@@ -61,6 +63,10 @@ export default class TileOverviewForm extends Form {
     });
   }
 
+  setScrollable(scrollable) {
+    this.setProperty('scrollable', scrollable);
+  }
+
   _renderScrollable() {
     if (this.scrollable) {
       this._installScrollbars({
@@ -75,7 +81,9 @@ export default class TileOverviewForm extends Form {
     this.outline = page.getOutline();
     this.nodes = page.childNodes;
     this.tileOverviewTitle = page.text;
+    this.setScrollable(!this.outline.compact);
 
+    this.pageTileGrid.setCompact(this.outline.compact);
     this.pageTileGrid.setOutline(this.outline);
     this.pageTileGrid.setPage(page);
     this.pageTileGrid.setNodes(this.nodes);

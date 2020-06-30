@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons, inspector, MenuBar, Outline, TableRow, TreeNode} from '../../../index';
+import {icons, inspector, MenuBar, Outline, TableRow, TileOutlineOverview, TreeNode} from '../../../index';
 import $ from 'jquery';
 
 /**
@@ -30,6 +30,7 @@ export default class Page extends TreeNode {
      * This property is set by the server, see: JsonOutline#putNodeType.
      */
     this.nodeType = null;
+    this.compactRoot = false;
     this.detailTable = null;
     this.detailTableVisible = true;
     this.detailForm = null;
@@ -49,6 +50,7 @@ export default class Page extends TreeNode {
      * The icon id which is used for icons in the tile outline overview.
      */
     this.overviewIconId = null;
+    this.showTileOverview = false;
   }
 
   /**
@@ -151,9 +153,15 @@ export default class Page extends TreeNode {
    */
   _decorate() {
     super._decorate();
-    if (this.$node && this.session.inspector) {
+    if (!this.$node) {
+      return;
+    }
+    if (this.session.inspector) {
       inspector.applyInfo(this, this.$node);
     }
+    this.$node.toggleClass('compact-root', this.compactRoot);
+    this.$node.toggleClass('has-tile-overview', this.showTileOverview ||
+      (this.compactRoot && this.getOutline().detailContent instanceof TileOutlineOverview));
   }
 
   // see Java: AbstractPage#pageActivatedNotify

@@ -11,6 +11,7 @@
 import {
   arrays,
   defaultValues,
+  Desktop,
   DetailTableTreeFilter,
   Device,
   FileChooserController,
@@ -33,6 +34,7 @@ import {
   TableControlAdapterMenu,
   TableRow,
   TableRowDetail,
+  TileOutlineOverview,
   Tree,
   TreeCollapseOrDrillUpKeyStroke,
   TreeExpandOrDrillDownKeyStroke,
@@ -54,14 +56,18 @@ export default class Outline extends Tree {
 
     this.compact = false;
     this.defaultDetailForm = null;
+    this.detailContent = null;
     this.embedDetailContent = false;
     this.inBackground = false;
+    this.iconId = null;
+    this.iconVisible = false;
     this.mediator = null;
     this.navigateButtonsVisible = true;
     this.navigateUpInProgress = false; // see NavigateUpButton.js
     this.outlineOverview = null;
     this.outlineOverviewVisible = true;
     this.toggleBreadcrumbStyleEnabled = true;
+    this.title = null;
     this.titleVisible = true;
 
     this.menus = [];
@@ -90,6 +96,10 @@ export default class Outline extends Tree {
   }
 
   _init(model) {
+    // initialize now and don't wait for desktop to call setters so that compact state is correct when upcoming widgets are initialized (TileOverviewForm etc.)
+    this.compact = scout.nvl(model.compact, model.parent.session.desktop.displayStyle === Desktop.DisplayStyle.COMPACT);
+    this.embedDetailContent = scout.nvl(model.embedDetailContent, this.compact);
+
     // add filter before first traversal of tree -> tree is only traversed once.
     this.addFilter(new DetailTableTreeFilter(), true);
     super._init(model);
@@ -118,7 +128,6 @@ export default class Outline extends Tree {
       position: MenuBar.Position.BOTTOM,
       menuOrder: new GroupBoxMenuItemsOrder()
     });
-
     this._setDefaultDetailForm(this.defaultDetailForm);
     this._setOutlineOverviewVisible(this.outlineOverviewVisible);
     this._setOutlineOverview(this.outlineOverview);
@@ -396,9 +405,17 @@ export default class Outline extends Tree {
   }
 
   navigateToTop() {
-    this.deselectAll();
+    if (this.compact && this.embedDetailContent) {
+      this.selectNode(this.compactRootNode() || []);
+    } else {
+      this.deselectAll();
+    }
     this.handleInitialExpanded();
     this.setScrollTop(0);
+  }
+
+  compactRootNode() {
+    return this.nodes[0] && this.nodes[0].compactRoot ? this.nodes[0] : null;
   }
 
   handleInitialExpanded() {
@@ -533,7 +550,8 @@ export default class Outline extends Tree {
   _createOutlineOverview() {
     return scout.create('TileOutlineOverview', {
       parent: this,
-      outline: this
+      outline: this,
+      page: this.compact ? this.compactRootNode() : null
     });
   }
 
@@ -667,7 +685,10 @@ export default class Outline extends Tree {
     if (!page.rendered) {
       return;
     }
-
+    // Hide text if it is empty
+    page.$text.setVisible(!!page.text);
+    // Allow page to decorate based on content
+    page._decorate();
     this.detailContent.render(page.$node);
     if (this.detailContent.htmlComp) {
       this.detailContent.htmlComp.validateRoot = false;
@@ -678,7 +699,7 @@ export default class Outline extends Tree {
 
   _ensurePageLayout(page) {
     // selected page now has content (menubar and form) -> needs a layout
-    // always create new htmlComp, otherwise we would have to remove them when $node or outline gets remvoed
+    // always create new htmlComp, otherwise we would have to remove them when $node or outline gets removed
     page.htmlComp = HtmlComponent.install(page.$node, this.session);
     page.htmlComp.setLayout(new PageLayout(this, page));
   }
@@ -781,12 +802,20 @@ export default class Outline extends Tree {
       return null;
     }
 
-    // if there is a detail form, use this
     if (selectedPage.detailForm && selectedPage.detailFormVisible && selectedPage.detailFormVisibleByUi) {
+      // if there is a detail form, use this
       return selectedPage.detailForm;
+    }
+    if (selectedPage === this.compactRootNode()) {
+      // If the root node is selected and there is root content, use this
+      let rootContent = this._computeRootContent();
+      if (rootContent) {
+        return rootContent;
+      }
+    }
+    if (selectedPage.row && selectedPage.parentNode.nodeType === Page.NodeType.TABLE) {
       // otherwise show the content of the table row
       // but never if parent is a node page -> the table contains only one column with no essential information
-    } else if (selectedPage.row && selectedPage.parentNode.nodeType === Page.NodeType.TABLE) {
       return scout.create('TableRowDetail', {
         parent: this,
         table: selectedPage.parentNode.detailTable,
@@ -794,6 +823,13 @@ export default class Outline extends Tree {
       });
     }
     return null;
+  }
+
+  _computeRootContent() {
+    if (this.defaultDetailForm) {
+      return this.defaultDetailForm;
+    }
+    return this.outlineOverview;
   }
 
   /**
@@ -821,12 +857,15 @@ export default class Outline extends Tree {
       detailTable,
       detailMenus = [];
 
-    if (this.detailContent && this.detailContent instanceof Form) {
-      // get menus from detail form
-      let rootGroupBox = this.detailContent.rootGroupBox;
-      menuItems = rootGroupBox.processMenus.concat(rootGroupBox.menus);
-      rootGroupBox.setMenuBarVisible(false);
-      this._attachDetailMenusListener(rootGroupBox);
+    if (this.detailContent) {
+      // DetailContent may be a form or the outline overview -> only process forms
+      if (this.detailContent instanceof Form) {
+        // get menus from detail form
+        let rootGroupBox = this.detailContent.rootGroupBox;
+        menuItems = rootGroupBox.processMenus.concat(rootGroupBox.menus);
+        rootGroupBox.setMenuBarVisible(false);
+        this._attachDetailMenusListener(rootGroupBox);
+      }
     } else if (selectedPage) {
       // get empty space menus and table controls from detail table
       if (selectedPage.detailTable) {
@@ -857,7 +896,7 @@ export default class Outline extends Tree {
       nodeMenus.push(menu);
     }, this);
 
-    // Add right aligned menus to node menus, other to detail menus
+    // Add right aligned menus to node menus, others to detail menus
     menuItems.forEach(menuItem => {
       if (menuItem.horizontalAlignment === 1) {
         nodeMenus.push(menuItem);

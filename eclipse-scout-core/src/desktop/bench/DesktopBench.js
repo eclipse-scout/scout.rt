@@ -379,14 +379,6 @@ export default class DesktopBench extends Widget {
     // nop
   }
 
-  _computeDefaultDetailForm() {
-    return this.outline.defaultDetailForm;
-  }
-
-  _computeOutlineOverview() {
-    return this.outline.outlineOverview;
-  }
-
   _computeDetailContentForPage(node) {
     if (!node) {
       throw new Error('called _showDetailContentForPage without node');
@@ -414,11 +406,7 @@ export default class DesktopBench extends Widget {
       // Outline does not support multi selection
       content = this._computeDetailContentForPage(selectedPage);
     } else {
-      if (this.outline.defaultDetailForm) {
-        content = this._computeDefaultDetailForm();
-      } else if (this.outline.outlineOverview) {
-        content = this._computeOutlineOverview();
-      }
+      content = this.outline._computeRootContent();
     }
     if (content) {
       if (content instanceof Table) {
