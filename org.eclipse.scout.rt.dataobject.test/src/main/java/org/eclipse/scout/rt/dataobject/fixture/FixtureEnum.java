@@ -18,18 +18,25 @@ import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 @EnumVersion("scout-8.0.0.036")
 public enum FixtureEnum implements IEnum {
 
-  ONE("one"),
-  TWO("two"),
-  THREE("three");
+  ONE("one", "One"),
+  TWO("two", "Two"),
+  THREE("three", "Three");
 
   private final String m_stringValue;
+  private final String m_text;
 
-  FixtureEnum(String stringValue) {
+  FixtureEnum(String stringValue, String text) {
     m_stringValue = stringValue;
+    m_text = text;
   }
 
   @Override
   public String stringValue() {
     return m_stringValue;
+  }
+
+  @Override
+  public String text() {
+    return m_text;
   }
 }
