@@ -237,6 +237,11 @@ export default class MenuBar extends Widget {
     });
 
     if (orderedMenuItems.all.length > 0) {
+      if (this._ellipsis) {
+        // Disconnect existing child actions from ellipsis menu
+        this._ellipsis.setChildActions([]);
+        this._ellipsis.destroy();
+      }
       ellipsis = scout.create('EllipsisMenu', {
         parent: this,
         cssClass: 'overflow-menu-item'
