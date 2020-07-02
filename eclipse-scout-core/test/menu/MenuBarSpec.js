@@ -23,6 +23,7 @@ describe('MenuBar', () => {
       '.menubar > .menubox { display: inline-block; height: 100% }' +
       '.menubar > .menubox.right { float:right }' +
       '.menu-item { min-width: 110px; max-width: 110px; padding: 5px; display: inline-block; background-color: orange;}' +
+      '.ellipsis { min-width: 40px; max-width: 40px; }' +
       '</style>').appendTo($('#sandbox'));
   });
 
@@ -305,6 +306,53 @@ describe('MenuBar', () => {
 
       // no error is thrown.
       expect(true).toBe(true);
+    });
+  });
+
+  describe('enabled', () => {
+    it('updates enabledComputed properly if disabled menu is moved out of ellipsis', () => {
+      let menu1 = helper.createMenu(createModel('move it'));
+      let menu2 = helper.createMenu(createModel('my menu'));
+      menu2.setEnabled(false);
+      let menuBar = createMenuBar();
+      menuBar.setMenuItems([menu1, menu2]);
+      menuBar.render();
+      // Menu is 110px, make menu bar larger so that first is displayed and second in ellipsis
+      menuBar.htmlComp.setSize(new Dimension(160, 50));
+      expect(menu1.$container.isVisible()).toBe(true);
+      expect(menu2.enabledComputed).toBe(false);
+      expect(menu2.$container).toHaveClass('overflown');
+
+      menu1.setVisible(false);
+      menu2.setEnabled(true);
+      menuBar.validateLayout();
+
+      expect(menu1.$container.isVisible()).toBe(false);
+      expect(menu2.enabledComputed).toBe(true);
+      expect(menu2.$container).not.toHaveClass('overflown');
+    });
+
+    it('updates enabledComputed properly if disabled menu is moved into ellipsis', () => {
+      let menu1 = helper.createMenu(createModel('move it'));
+      menu1.setVisible(false);
+      let menu2 = helper.createMenu(createModel('my menu'));
+      menu2.setEnabled(false);
+      let menuBar = createMenuBar();
+      menuBar.setMenuItems([menu1, menu2]);
+      menuBar.render();
+      // Menu is 110px, make menu bar larger so that first is displayed and second in ellipsis
+      menuBar.htmlComp.setSize(new Dimension(160, 50));
+      expect(menu1.$container.isVisible()).toBe(false);
+      expect(menu2.enabledComputed).toBe(false);
+      expect(menu2.$container).not.toHaveClass('overflown');
+
+      menu1.setVisible(true);
+      menu2.setEnabled(true);
+      menuBar.validateLayout();
+
+      expect(menu1.$container.isVisible()).toBe(true);
+      expect(menu2.enabledComputed).toBe(true);
+      expect(menu2.$container).toHaveClass('overflown');
     });
   });
 
