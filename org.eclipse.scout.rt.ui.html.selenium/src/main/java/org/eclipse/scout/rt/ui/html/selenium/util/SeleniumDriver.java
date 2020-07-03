@@ -27,6 +27,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
@@ -120,32 +121,39 @@ public final class SeleniumDriver {
     Map<String, String> env = new HashMap<>();
     env.put("LANG", "en_US.UTF-8");
     System.out.println("Using custom environment variables for driver: " + new JSONObject(env).toString(2));
-    RemoteWebDriver driver = new ChromeDriver(
+    try {
+      RemoteWebDriver driver = new ChromeDriver(
         new Builder()
-            .usingAnyFreePort()
-            .withEnvironment(env) // <--
-            .build(),
+          .usingAnyFreePort()
+          .withEnvironment(env) // <--
+          .build(),
         options);
-    //RemoteWebDriver driver = new ChromeDriver(options)
-    // </WORKAROUND>
+      // RemoteWebDriver driver = new ChromeDriver(options)
+      // </WORKAROUND>
+      driver.manage().timeouts().setScriptTimeout(10000, TimeUnit.SECONDS);
+      // Set window size roughly to the minimal supported screen size
+      // (1280x1024 minus some borders for browser toolbar and windows taskbar)
+      driver.manage().window().setPosition(new Point(0, 0));
+      driver.manage().window().setSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
 
-    driver.manage().timeouts().setScriptTimeout(10000, TimeUnit.SECONDS);
-    // Set window size roughly to the minimal supported screen size
-    // (1280x1024 minus some borders for browser toolbar and windows taskbar)
-    driver.manage().window().setPosition(new Point(0, 0));
-    driver.manage().window().setSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+      // Start unit tests with the following VM property to simulate slow network:
+      // -Dslow.network=true
+      if (System.getProperty("slow.network") != null) {
+        setSlowNetwork(driver);
+      }
 
-    // Start unit tests with the following VM property to simulate slow network:
-    // -Dslow.network=true
-    if (System.getProperty("slow.network") != null) {
-      setSlowNetwork(driver);
-    }
-
-    Capabilities caps = driver.getCapabilities();
-    System.out.println("Selenium driver configured with driver=" + driver.getClass().getName()
+      Capabilities caps = driver.getCapabilities();
+      System.out.println("Selenium driver configured with driver=" + driver.getClass().getName()
         + " browser.name=" + caps.getBrowserName()
         + " browser.version=" + caps.getVersion());
-    return driver;
+      return driver;
+
+    } catch (SessionNotCreatedException e) {
+      System.out.println("* Most likely your Chrome browser version is not supported by the ChromeDriver version configured in the pom.xml.");
+      System.out.println("* Update the properties 'chromedriver_base_url' and 'chromedriver_hash_*' in your local pom.xml to run Selenium tests in your browser, but don't commit that change.");
+      System.out.println("* Look for a suitable ChromeDriver version here: http://chromedriver.storage.googleapis.com/index.html");
+      throw new RuntimeException(e);
+    }
   }
 
   /**
