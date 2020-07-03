@@ -46,6 +46,7 @@ public class ServletFilterHelper {
   private static final Logger LOG = LoggerFactory.getLogger(ServletFilterHelper.class);
 
   public static final String SESSION_ATTRIBUTE_FOR_PRINCIPAL = ServletFilterHelper.class.getName() + ".PRINCIPAL";
+  public static final String SESSION_ATTRIBUTE_FOR_LOGIN_REDIRECT = ServletFilterHelper.class.getName() + ".LOGIN_REDIRECT";
   public static final String HTTP_HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
   public static final String HTTP_HEADER_AUTHORIZATION = "Authorization";
   public static final String HTTP_HEADER_AUTHORIZED = "Authorized";
@@ -238,7 +239,32 @@ public class ServletFilterHelper {
    * Detects if the request is a POST. For json send a timeout message, otherwise log a warning
    */
   public void forwardToLoginForm(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    if (redirectToLoginFormIfNecessary(req, resp)) {
+      return;
+    }
     forwardTo(req, resp, "/login.html");
+  }
+
+  /**
+   * Redirects to /login if forwarding would not work.
+   * <p>
+   * Forwarding won't work if the requested path has subfolders because the resources loaded by login.html are addressed
+   * relatively.
+   * <p>
+   * Example: if the request url is /folder/file, forwarding to /login.html would correctly return login.html but the
+   * resources (login.js etc) could not be loaded because the location of the browser still is /folder/file. The
+   * requests would fail because they expect the resources to be in the root folder (e.g. /login.js) instead of the
+   * subfolder (e.g. /folder/login.js).
+   */
+  protected boolean redirectToLoginFormIfNecessary(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    String pathInfo = req.getPathInfo();
+    if (pathInfo.length() > 1 && pathInfo.substring(1).contains("/")) {
+      // Store the path on the session if it contains more than one / (e.g. /folder/file)
+      req.getSession(true).setAttribute(SESSION_ATTRIBUTE_FOR_LOGIN_REDIRECT, pathInfo);
+      redirectTo(req, resp, "/login");
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -314,5 +340,45 @@ public class ServletFilterHelper {
       LOG.info("Invalidating HTTP session with ID {}", session.getId());
       session.invalidate();
     }
+  }
+
+  /**
+   * Invalidates the current session. If the session attribute
+   * {@link ServletFilterHelper#SESSION_ATTRIBUTE_FOR_LOGIN_REDIRECT} is set, a new session is created and the attribute
+   * copied to the new session. The next request (which will be the reload request executed by the login page) will read
+   * this attribute and return a redirect instruction with the value of the attribute (see
+   * {@link #redirectAfterLogin(HttpServletRequest, HttpServletResponse, ServletFilterHelper)}.
+   * <p>
+   * If that session attribute is not set, no new session will be created.
+   */
+  public void invalidateSessionAfterLogin(HttpServletRequest request) {
+    final HttpSession session = request.getSession(false);
+    if (session == null) {
+      return;
+    }
+    // Invalidate the session and copy the login redirect url to the new session
+    Object redirectUrl = session.getAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_LOGIN_REDIRECT);
+    session.invalidate();
+    if (redirectUrl != null) {
+      request.getSession().setAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_LOGIN_REDIRECT, redirectUrl);
+    }
+  }
+
+  /**
+   * Redirects to the page which was originally requested before the login. The path to that page is stored in the
+   * session attribute {@link #SESSION_ATTRIBUTE_FOR_LOGIN_REDIRECT}.
+   */
+  public boolean redirectAfterLogin(HttpServletRequest request, HttpServletResponse response, ServletFilterHelper helper) throws IOException, ServletException {
+    HttpSession session = request.getSession(false);
+    if (session == null) {
+      return false;
+    }
+    Object redirectPath = session.getAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_LOGIN_REDIRECT);
+    if (redirectPath != null) {
+      session.removeAttribute(ServletFilterHelper.SESSION_ATTRIBUTE_FOR_LOGIN_REDIRECT);
+      helper.redirectTo(request, response, (String) redirectPath);
+      return true;
+    }
+    return false;
   }
 }

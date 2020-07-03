@@ -18,7 +18,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.security.ICredentialVerifier;
@@ -44,9 +43,8 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * Instead, the JavaScript login module take appropriate actions upon HTTP 200 response code.
  * </ol>
  *
- * @see scout-login-module.js
- * @see login.js
- * @see logout.js
+ * @see "login.js"
+ * @see "logout.js"
  * @since 5.2
  */
 public class FormBasedAccessController implements IAccessController {
@@ -87,7 +85,7 @@ public class FormBasedAccessController implements IAccessController {
    * @return <code>true</code> if the request was handled (caller should exit chain), or <code>false</code> if nothing
    *         was done (caller should continue by invoking subsequent authenticators).
    */
-  @SuppressWarnings("squid:RedundantThrowsDeclarationCheck") // required so that overriding subclasses can throw ServletExceptions
+  @SuppressWarnings({"squid:RedundantThrowsDeclarationCheck", "DuplicatedCode"}) // required so that overriding subclasses can throw ServletExceptions
   protected boolean handleAuthRequest(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
     // Never cache authentication requests.
     response.setHeader("Cache-Control", "private, no-store, no-cache, max-age=0"); // HTTP 1.1
@@ -107,14 +105,12 @@ public class FormBasedAccessController implements IAccessController {
     }
 
     // OWASP: force a new HTTP session to be created.
-    final HttpSession session = request.getSession(false);
-    if (session != null) {
-      session.invalidate();
-    }
+    ServletFilterHelper helper = BEANS.get(ServletFilterHelper.class);
+    helper.invalidateSessionAfterLogin(request);
 
     // Put authenticated principal onto (new) HTTP session
     final Principal principal = m_config.getPrincipalProducer().produce(credentials.getLeft());
-    BEANS.get(ServletFilterHelper.class).putPrincipalOnSession(request, principal);
+    helper.putPrincipalOnSession(request, principal);
     return true;
   }
 
@@ -124,7 +120,6 @@ public class FormBasedAccessController implements IAccessController {
    *
    * @param status
    *          is a {@link ICredentialVerifier} AUTH_* constant
-   * @param response
    */
   protected void handleForbidden(final int status, final HttpServletResponse response) throws IOException {
     if (m_config.getStatus403WaitMillis() > 0L) {
