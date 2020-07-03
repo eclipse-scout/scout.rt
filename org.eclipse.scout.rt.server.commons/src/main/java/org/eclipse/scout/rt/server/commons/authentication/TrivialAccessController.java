@@ -103,6 +103,9 @@ public class TrivialAccessController implements IAccessController {
 
     // Is running within a valid subject?
     if (helper.isRunningWithValidSubject(request)) {
+      if (helper.redirectAfterLogin(request, response, helper)) {
+        return true;
+      }
       chain.doFilter(request, response);
       return true;
     }
@@ -112,6 +115,9 @@ public class TrivialAccessController implements IAccessController {
     if (principal != null) {
       if (m_config.getPrincipalVerifier() != null && !m_config.getPrincipalVerifier().verify(principal)) {
         return false;
+      }
+      if (helper.redirectAfterLogin(request, response, helper)) {
+        return true;
       }
       helper.continueChainAsSubject(principal, request, response, chain);
       return true;
