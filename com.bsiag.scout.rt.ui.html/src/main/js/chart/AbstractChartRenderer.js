@@ -27,6 +27,14 @@ export default class AbstractChartRenderer {
   }
 
   validate() {
+    if (!this._validateChartData()) {
+      return false;
+    }
+
+    return this._validate();
+  }
+
+  _validateChartData() {
     let chartData = this.chart && this.chart.data;
     if (!chartData || !chartData.chartValueGroups || chartData.chartValueGroups.length === 0) {
       return false;
@@ -58,7 +66,7 @@ export default class AbstractChartRenderer {
       }
     }
 
-    return this._validate();
+    return true;
   }
 
   _validate() {

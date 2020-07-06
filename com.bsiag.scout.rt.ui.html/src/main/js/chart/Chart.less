@@ -510,6 +510,11 @@
     @tile-default-background-color);
 }
 
+:not(.tile) > .pie-chart > .elements,
+:not(.tile) > .doughnut-chart > .elements {
+  #scout.chart-stroke-colors-schemes(@form-background-color);
+}
+
 .polarArea-chart > .elements {
   #scout.chart-label-grid-colors();
   #scout.chart-auto-colors-schemes(70);
@@ -528,18 +533,44 @@
     @tile-default-background-color);
 }
 
+:not(.tile) > .polarArea-chart > .elements {
+  #scout.chart-stroke-colors-schemes(@form-background-color);
+
+  > .label-backdrop {
+    fill: @form-background-color;
+  }
+}
+
 .line-chart > .elements {
   #scout.chart-label-grid-colors();
-  #scout.chart-auto-colors-schemes();
+  #scout.chart-auto-colors-schemes(20);
   #scout.chart-auto-stroke-colors-schemes();
-  #scout.chart-colors-hover(@palette-white);
+  #scout.chart-auto-colors-schemes-hover(20);
+
+  > .point {
+    &.hover {
+      fill: @palette-white;
+    }
+  }
 }
 
 .radar-chart > .elements {
   #scout.chart-label-grid-colors();
   #scout.chart-auto-colors-schemes(20);
   #scout.chart-auto-stroke-colors-schemes();
-  #scout.chart-colors-hover(@palette-white);
+  #scout.chart-auto-colors-schemes-hover(20);
+
+  > .point {
+    &.hover {
+      fill: @palette-white;
+    }
+  }
+}
+
+:not(.tile) > .radar-chart > .elements {
+  > .label-backdrop {
+    fill: @form-background-color;
+  }
 }
 
 .bubble-chart > .elements {
@@ -563,7 +594,7 @@ text.legend-label-grid {
 line.chart-axis {
   stroke-width: 1px;
   stroke: @chart-axis-line-color;
-  stroke-dasharray: 2,4;
+  stroke-dasharray: 2, 4;
 }
 
 text.axis-label {

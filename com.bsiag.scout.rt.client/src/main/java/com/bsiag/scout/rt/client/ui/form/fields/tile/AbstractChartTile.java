@@ -114,6 +114,7 @@ public abstract class AbstractChartTile extends AbstractFormFieldTile<ChartField
   /**
    * If set, this value is applied to the tile field chart's "datalabels visible" property.
    */
+  @SuppressWarnings("findbugs:NP_BOOLEAN_RETURN_NULL")
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
   protected Boolean getConfiguredDatalabelsVisible() {

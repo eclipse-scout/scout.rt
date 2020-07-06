@@ -10,6 +10,8 @@
 package com.bsiag.scout.rt.shared.data.basic.chart;
 
 import static org.eclipse.scout.rt.platform.util.StringUtility.*;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,6 +55,10 @@ public class ChartConfig implements IChartConfig {
   protected static final String LEGEND_DISPLAY = combine(LEGEND, "display");
   protected static final String LEGEND_CLICKABLE = combine(LEGEND, "clickable");
   protected static final String LEGEND_POSITION = combine(LEGEND, "position");
+  protected static final String ELEMENTS = combine(OPTIONS, "elements");
+  protected static final String LINE = combine(ELEMENTS, "line");
+  protected static final String LINE_TENSION = combine(LINE, "tension");
+  protected static final String LINE_FILL = combine(LINE, "fill");
   protected static final String SCALES = combine(OPTIONS, "scales");
   protected static final String X_AXES = combine(SCALES, "xAxes");
   protected static final String Y_AXES = combine(SCALES, "yAxes");
@@ -529,6 +535,36 @@ public class ChartConfig implements IChartConfig {
   @Override
   public IChartConfig withLegendPositionRight() {
     return withLegendPosition(RIGHT);
+  }
+
+  @Override
+  public IChartConfig withLineTension(BigDecimal tension) {
+    return withProperty(LINE_TENSION, tension);
+  }
+
+  @Override
+  public IChartConfig removeLineTension() {
+    return removeProperty(LINE_TENSION);
+  }
+
+  @Override
+  public BigDecimal getLineTension() {
+    return (BigDecimal) getProperty(LINE_TENSION);
+  }
+
+  @Override
+  public IChartConfig withLineFill(boolean fill) {
+    return withProperty(LINE_FILL, fill);
+  }
+
+  @Override
+  public IChartConfig removeLineFill() {
+    return removeProperty(LINE_FILL);
+  }
+
+  @Override
+  public boolean isLineFill() {
+    return BooleanUtility.nvl((Boolean) getProperty(LINE_FILL));
   }
 
   @Override

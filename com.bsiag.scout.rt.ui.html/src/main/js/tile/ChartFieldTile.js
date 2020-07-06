@@ -25,7 +25,7 @@ export default class ChartFieldTile extends FormFieldTile {
     if (!this.$container) {
       return;
     }
-    let colorScheme = '';
+    let colorScheme = 'tile';
     this.$container.get(0).classList.forEach(cssClass => {
       if (['color-alternative', 'color-rainbow', 'inverted'].indexOf(cssClass) > -1) {
         colorScheme += ' ' + cssClass;

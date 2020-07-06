@@ -10,6 +10,7 @@
 package com.bsiag.scout.rt.shared.data.basic.chart;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.Bean;
@@ -159,6 +160,18 @@ public interface IChartConfig extends Serializable {
   IChartConfig withLegendPositionLeft();
 
   IChartConfig withLegendPositionRight();
+
+  IChartConfig withLineTension(BigDecimal tension);
+
+  IChartConfig removeLineTension();
+
+  BigDecimal getLineTension();
+
+  IChartConfig withLineFill(boolean fill);
+
+  IChartConfig removeLineFill();
+
+  boolean isLineFill();
 
   IChartConfig removeScales();
 
