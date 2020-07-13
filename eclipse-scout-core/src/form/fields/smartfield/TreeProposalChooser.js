@@ -163,7 +163,8 @@ export default class TreeProposalChooser extends ProposalChooser {
       initialExpanded: expandAll,
       text: lookupRow.text,
       lookupRow: lookupRow,
-      leaf: initialLeaf
+      leaf: initialLeaf,
+      tooltipText: lookupRow.tooltipText
     });
   }
 
