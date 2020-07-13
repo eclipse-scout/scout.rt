@@ -19,7 +19,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class StringIdStructureTest extends AbstractStringIdStructureTest {
 
   @Parameters(name = "{0}")
-  public static Iterable<? extends Object> parameters() {
+  public static Iterable<?> parameters() {
     return streamStringIdClasses("org.eclipse.scout.rt.jackson")
         .collect(Collectors.toList());
   }
