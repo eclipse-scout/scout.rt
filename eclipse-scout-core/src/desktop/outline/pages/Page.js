@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons, MenuBar, Outline, TableRow, TreeNode} from '../../../index';
+import {icons, inspector, MenuBar, Outline, TableRow, TreeNode} from '../../../index';
 import $ from 'jquery';
 
 /**
@@ -144,6 +144,16 @@ export default class Page extends TreeNode {
       form.setDisplayParent(this.getOutline());
     }
     this.setDetailForm(form);
+  }
+
+  /**
+   * @override
+   */
+  _decorate() {
+    super._decorate();
+    if (this.$node && this.session.inspector) {
+      inspector.applyInfo(this, this.$node);
+    }
   }
 
   // see Java: AbstractPage#pageActivatedNotify

@@ -17,7 +17,6 @@ import {
   Form,
   GroupBoxMenuItemsOrder,
   HtmlComponent,
-  inspector,
   keyStrokeModifier,
   MenuBar,
   menus as menus_1,
@@ -344,16 +343,6 @@ export default class Outline extends Tree {
       // Also make sure other objects hold no reference to a destroyed form (e.g. bench)
       this._triggerPageChanged(node);
     });
-  }
-
-  /**
-   * @override
-   */
-  _decorateNode(node) {
-    super._decorateNode(node);
-    if (this.session.inspector) {
-      inspector.applyInfo(node, node.$node);
-    }
   }
 
   // Info: we pass the keyStrokeContext of the parent (table or form) to
