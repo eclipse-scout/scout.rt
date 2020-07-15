@@ -232,8 +232,8 @@ public final class HTML {
    *          Specifies if the opener and referrer should be available to the target browser window. Because of security
    *          reasons this should be disabled ({@code false}) in most cases. If disabled, the attribute
    *          {@code rel="noreferrer noopener"} is added to the link element.
-   * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types
-   * @see https://mathiasbynens.github.io/rel-noopener/
+   * @see "https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types"
+   * @see "https://mathiasbynens.github.io/rel-noopener/"
    */
   public static IHtmlElement link(CharSequence url, CharSequence text, boolean preserveOpener) {
     return new HtmlLinkBuilder(url, text, preserveOpener);
@@ -283,7 +283,7 @@ public final class HTML {
    * </ul>
    *
    * @param icon
-   *          icon like {@link AbstractIcons#Info}
+   *          icon like AbstractIcons#Info
    */
   public static IHtmlElement icon(final CharSequence icon) {
     final Matcher matcher = FONT_ICON_PATTERN.matcher(icon);

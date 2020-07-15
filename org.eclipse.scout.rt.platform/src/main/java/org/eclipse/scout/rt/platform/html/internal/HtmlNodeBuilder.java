@@ -13,9 +13,12 @@ package org.eclipse.scout.rt.platform.html.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
 import org.eclipse.scout.rt.platform.html.IHtmlElement;
+import org.eclipse.scout.rt.platform.html.StyleHelper;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
@@ -99,6 +102,26 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
     return this;
   }
 
+  /**
+   * Removes the attribute with the given name and returns its value without quotes.
+   */
+  public String removeAttribute(String name) {
+    ListIterator<IHtmlContent> iterator = m_attributes.listIterator();
+    while (iterator.hasNext()) {
+      IHtmlContent attr = iterator.next();
+      String[] pair = attr.toHtml().split("=", 2);
+      if (pair[0].equals(name)) {
+        iterator.remove();
+        if (pair.length != 2) {
+          return null;
+        }
+        // Remove quotes at start and end
+        return StringUtility.substring(pair[1], 1, pair[1].length() - 2);
+      }
+    }
+    return null;
+  }
+
   @Override
   public IHtmlElement addBooleanAttribute(String name) {
     IHtmlContent content = new HtmlPlainBuilder(escape(name));
@@ -116,6 +139,17 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
   @Override
   public IHtmlElement cssClass(CharSequence cssClass) {
     addAttribute("class", cssClass);
+    return this;
+  }
+
+  @Override
+  public IHtmlElement addCssClass(CharSequence cssClass) {
+    if (cssClass == null) {
+      return this;
+    }
+    String value = removeAttribute("class");
+    value = BEANS.get(StyleHelper.class).addCssClasses(value, cssClass.toString());
+    addAttribute("class", value);
     return this;
   }
 

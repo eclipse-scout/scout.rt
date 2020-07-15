@@ -241,6 +241,21 @@ public class HTMLTest {
   }
 
   @Test
+  public void testAddCssClassToIcon() {
+    IHtmlContent html = HTML.icon("font:\uE002").addCssClass("my-class");
+    assertEquals("<span class=\"font-icon my-class\">\uE002</span>", html.toHtml());
+  }
+
+  @Test
+  public void testAddCssClass() {
+    IHtmlContent html = HTML.span("text").addCssClass("my-class");
+    assertEquals("<span class=\"my-class\">text</span>", html.toHtml());
+
+    html = HTML.span("text").cssClass("first").addCssClass("second").addCssClass("third").addCssClass("third");
+    assertEquals("<span class=\"first second third\">text</span>", html.toHtml());
+  }
+
+  @Test
   public void testFullHtml() {
     IHtmlDocument html = HTML.html(HTML.cssStyle(SAMPLE_CSS), HTML_TEXT);
     String expected = "<html><head><style type=\"text/css\">" + SAMPLE_CSS + "</style>" + "</head><body>" + ESCAPED_HTML_TEXT + "</body></html>";

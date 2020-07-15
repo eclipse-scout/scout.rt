@@ -21,6 +21,12 @@ public interface IHtmlElement extends IHtmlContent {
   IHtmlElement cssClass(CharSequence cssClass);
 
   /**
+   * Sets the 'class' attribute (CSS), or if the attribute is already set, adds the css class to the existing css
+   * classes in the 'class' attribute.
+   */
+  IHtmlElement addCssClass(CharSequence cssClass);
+
+  /**
    * Sets the 'style' attribute (CSS).
    */
   IHtmlElement style(CharSequence style);

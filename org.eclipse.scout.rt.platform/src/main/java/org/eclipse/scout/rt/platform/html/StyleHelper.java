@@ -50,7 +50,7 @@ public class StyleHelper {
   public String addCssClasses(String cssClasses, List<String> cssClassesToAdd) {
     List<String> existingCssClasses = cssClassesAsList(cssClasses);
     for (String candidate : cssClassesToAdd) {
-      if (existingCssClasses.indexOf(candidate) == -1) {
+      if (!existingCssClasses.contains(candidate)) {
         existingCssClasses.add(candidate);
       }
     }

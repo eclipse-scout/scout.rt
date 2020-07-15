@@ -78,12 +78,8 @@ public class HtmlHelper {
 
   /**
    * Same as <code>toPlainText(String)</code>, except that leading and trailing whitespace is preserved.
-   *
-   * @param html
-   * @return
    */
   public String toPlainTextNoTrim(String html) {
-
     if (html == null || html.isEmpty()) {
       return html;
     }
@@ -140,7 +136,7 @@ public class HtmlHelper {
    * <li><code>&#47;</code> --> <code>&amp;#47;</code>
    * </ul>
    *
-   * @see https://www.owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet
+   * @see "https://www.owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet"
    */
   public String escape(String text) {
     if (text == null || text.isEmpty()) {
