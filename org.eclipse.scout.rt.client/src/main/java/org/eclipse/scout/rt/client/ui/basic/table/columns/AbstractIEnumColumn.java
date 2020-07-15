@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("25538f8b-3433-40c1-808e-9c387866c4e7")
-public class AbstractIEnumColumn<VALUE extends IEnum> extends AbstractColumn<VALUE> {
+public abstract class AbstractIEnumColumn<VALUE extends IEnum> extends AbstractColumn<VALUE> {
 
   @Override
   protected String formatValueInternal(ITableRow row, IEnum value) {
