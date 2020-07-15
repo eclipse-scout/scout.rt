@@ -31,7 +31,7 @@ public final class DataObjectVisitors {
    * Visits all nodes and calls on each element of given type the provided consumer. Matching nodes are visited
    * <b>not</b> recursively. If a node matches child nodes of this node are not visited.
    */
-  public static <T> void forEach(IDataObject root, Class<? extends T> elementType, Consumer<T> consumer) {
+  public static <T> void forEach(Object root, Class<? extends T> elementType, Consumer<T> consumer) {
     forEach(root, new P_TypedElementConsumer<>(elementType, consumer, false));
   }
 
@@ -39,7 +39,7 @@ public final class DataObjectVisitors {
    * Visits all nodes and calls on each element of given type the provided consumer. Matching nodes are visited
    * recursively. If a node matches, child nodes of this node are also visited.
    */
-  public static <T> void forEachRec(IDataObject root, Class<? extends T> elementType, Consumer<T> consumer) {
+  public static <T> void forEachRec(Object root, Class<? extends T> elementType, Consumer<T> consumer) {
     forEach(root, new P_TypedElementConsumer<>(elementType, consumer, true));
   }
 
@@ -47,11 +47,11 @@ public final class DataObjectVisitors {
    * Visits all nodes and calls on each element of given type the provided consumer. If consumer returns {@code true}
    * then matching node is visited recursively.
    */
-  public static <T> void forEachRecIf(IDataObject root, Class<? extends T> elementType, Predicate<T> consumer) {
+  public static <T> void forEachRecIf(Object root, Class<? extends T> elementType, Predicate<T> consumer) {
     forEach(root, new P_TypedElementConsumer<>(elementType, consumer));
   }
 
-  private static void forEach(IDataObject root, Predicate<Object> elementConsumer) {
+  private static void forEach(Object root, Predicate<Object> elementConsumer) {
     new P_DataObjectVisitor(elementConsumer).visit(root);
   }
 
@@ -61,7 +61,7 @@ public final class DataObjectVisitors {
    * <p>
    * Note: this operation might fail if data object contains unmodifiable collections or maps.
    */
-  public static <T> void replaceEach(IDataObject root, Class<? extends T> elementType, UnaryOperator<T> operator) {
+  public static <T> void replaceEach(Object root, Class<? extends T> elementType, UnaryOperator<T> operator) {
     new P_ReplaceDataObjectVisitor<>(elementType, operator).visit(root);
   }
 
