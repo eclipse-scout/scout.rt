@@ -274,16 +274,24 @@ export default class TableMatrix {
       };
     } else if (axis instanceof BooleanColumn) {
       keyAxis.norm = f => {
-        if (!f) {
-          return 0;
+        if (axis.triStateEnabled && f === null) {
+          return -1;
         }
-        return 1;
+        if (f === true) {
+          return 1;
+        }
+        return 0;
       };
       keyAxis.format = n => {
+        if (n === -1) {
+          return getText('ui.BooleanColumnGroupingMixed');
+        }
         if (n === 0) {
           return getText('ui.BooleanColumnGroupingFalse');
         }
-        return getText('ui.BooleanColumnGroupingTrue');
+        if (n === 1) {
+          return getText('ui.BooleanColumnGroupingTrue');
+        }
       };
       keyAxis.deterministicKeyToKey = deterministicKey => {
         return deterministicKey;
