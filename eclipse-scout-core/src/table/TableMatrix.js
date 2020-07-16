@@ -208,8 +208,7 @@ export default class TableMatrix {
           if (f === null || f === '') {
             return null;
           }
-          var b = (f.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
-          return b;
+          return (f.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
         };
         keyAxis.format = function(n) {
           if (n === null) {
@@ -246,16 +245,21 @@ export default class TableMatrix {
       };
     } else if (axis instanceof BooleanColumn) {
       keyAxis.norm = function(f) {
-        if (!f) {
-          return 0;
+        if (axis.triStateEnabled && f === null) {
+          return -1;
+        } else if (f === true) {
+          return 1;
         }
-        return 1;
+        return 0;
       };
       keyAxis.format = function(n) {
-        if (n === 0) {
+        if (n === -1) {
+          return getText('ui.BooleanColumnGroupingMixed');
+        } else if (n === 0) {
           return getText('ui.BooleanColumnGroupingFalse');
+        } else if (n === 1) {
+          return getText('ui.BooleanColumnGroupingTrue');
         }
-        return getText('ui.BooleanColumnGroupingTrue');
       };
     } else if (axis instanceof IconColumn) {
       keyAxis.textIsIcon = true;
