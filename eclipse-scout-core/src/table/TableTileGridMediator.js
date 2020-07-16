@@ -230,12 +230,12 @@ export default class TableTileGridMediator extends Widget {
     tiles.forEach(function(tile) {
       let row = this.table.rowsMap[tile.rowId];
       let groupId = primaryGroupingColumn ? primaryGroupingColumn.cellTextForGrouping(row) : 'default';
-      let htmlEnabled = primaryGroupingColumn ? primaryGroupingColumn.htmlEnabled : false;
+      groupId = scout.nvl(groupId, ''); // use empty group to avoid NPE
       this.groupForTileMap[row.id] = groupId;
       // check if group already exists, otherwise create it
       let group = this.tileAccordion.getGroupById(groupId);
       if (!group) {
-        group = this._createTileGroup(groupId, htmlEnabled);
+        group = this._createTileGroup(groupId, primaryGroupingColumn, row);
         this._adaptTileGrid(group.body);
         this.tileAccordion.insertGroup(group);
       }
@@ -271,13 +271,21 @@ export default class TableTileGridMediator extends Widget {
     });
   }
 
-  _createTileGroup(groupId, htmlEnabled) {
+  _createTileGroup(groupId, primaryGroupingColumn, row) {
+    let htmlEnabled, title, iconId;
+    if (primaryGroupingColumn) {
+      htmlEnabled = primaryGroupingColumn.htmlEnabled;
+      let cell = primaryGroupingColumn.createAggrGroupCell(row);
+      title = cell.text;
+      iconId = cell.iconId;
+    }
     return scout.create('Group', {
       parent: this.tileAccordion,
       id: groupId,
       headerVisible: groupId !== 'default',
-      title: groupId,
+      title: title,
       titleHtmlEnabled: htmlEnabled,
+      iconId: iconId,
       body: {
         objectType: 'TileGrid',
         scrollable: false

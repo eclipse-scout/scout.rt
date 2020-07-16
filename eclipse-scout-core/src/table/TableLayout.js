@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, arrays, Dimension, graphics, HtmlComponent, MenuBarLayout, scout, scrollbars} from '../index';
+import {AbstractLayout, arrays, Dimension, graphics, HtmlComponent, MenuBarLayout, RowLayout, scout, scrollbars} from '../index';
 
 export default class TableLayout extends AbstractLayout {
 
@@ -249,6 +249,10 @@ export default class TableLayout extends AbstractLayout {
   }
 
   preferredLayoutSize($container, options) {
+    if (this.table.tileMode) {
+      // Use RowLayout to calculate preferredLayoutSize of TileTableHeader, TileAccordion and Footer.
+      return new RowLayout().preferredLayoutSize($container, options);
+    }
     // If autoResizeColumns and text wrap is enabled, the height of the table depends on the width
     this._layoutColumns(options.widthHint);
 

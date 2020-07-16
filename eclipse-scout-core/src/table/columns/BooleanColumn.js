@@ -119,7 +119,17 @@ export default class BooleanColumn extends Column {
    * @see TableAdapter.js
    */
   _toggleCellValue(row, cell) {
-    this.setCellValue(row, !cell.value);
+    if (!this.triStateEnabled) {
+      this.setCellValue(row, !cell.value);
+    } else {
+      if (cell.value === false) {
+        this.setCellValue(row, true);
+      } else if (cell.value === true) {
+        this.setCellValue(row, null);
+      } else if (cell.value === null) {
+        this.setCellValue(row, false);
+      }
+    }
   }
 
   /**
@@ -129,5 +139,18 @@ export default class BooleanColumn extends Column {
     return scout.create('CheckBoxField', {
       parent: this.table
     });
+  }
+
+  /**
+   * @override
+   */
+  cellTextForGrouping(row) {
+    var cell = this.cell(row);
+    if (this.triStateEnabled && cell.value === null) {
+      return this.session.text('ui.BooleanColumnGroupingMixed');
+    } else if (cell.value === true) {
+      return this.session.text('ui.BooleanColumnGroupingTrue');
+    }
+    return this.session.text('ui.BooleanColumnGroupingFalse');
   }
 }
