@@ -18,13 +18,15 @@ public class SimplePrincipalWithDelegation implements Principal {
 
   private final String m_name;
   private final GSSCredential m_delegatedCred;
+  private final String m_origToken;
 
-  public SimplePrincipalWithDelegation(String name, final GSSCredential delegCred) {
+  public SimplePrincipalWithDelegation(String name, final GSSCredential delegCred, String origToken) {
     if (name == null) {
       throw new IllegalArgumentException("name must not be null");
     }
     m_name = name;
     m_delegatedCred = delegCred;
+    m_origToken = origToken;
   }
 
   @Override
@@ -34,5 +36,9 @@ public class SimplePrincipalWithDelegation implements Principal {
 
   public GSSCredential getDelegatedCred() {
     return m_delegatedCred;
+  }
+
+  public String getOrigToken() {
+    return m_origToken;
   }
 }
