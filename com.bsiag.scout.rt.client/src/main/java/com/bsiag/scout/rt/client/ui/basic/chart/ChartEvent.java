@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2016 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -9,6 +9,7 @@
  */
 package com.bsiag.scout.rt.client.ui.basic.chart;
 
+import java.math.BigDecimal;
 import java.util.EventObject;
 
 import org.eclipse.scout.rt.client.ui.IModelEvent;
@@ -22,9 +23,9 @@ public class ChartEvent extends EventObject implements IModelEvent {
   public static final int TYPE_VALUE_CLICK = 1;
 
   private final int m_type;
-  private int m_axisIndex;
-  private int m_valueIndex;
-  private int m_groupIndex;
+  private BigDecimal m_xIndex;
+  private BigDecimal m_yIndex;
+  private Integer m_datasetIndex;
 
   public ChartEvent(IChart source, int type) {
     super(source);
@@ -41,28 +42,27 @@ public class ChartEvent extends EventObject implements IModelEvent {
     return m_type;
   }
 
-  public int getValueIndex() {
-    return m_valueIndex;
+  public BigDecimal getXIndex() {
+    return m_xIndex;
   }
 
-  public void setValueIndex(int valueIndex) {
-    m_valueIndex = valueIndex;
+  public void setXIndex(BigDecimal xIndex) {
+    m_xIndex = xIndex;
   }
 
-  public int getGroupIndex() {
-    return m_groupIndex;
+  public BigDecimal getYIndex() {
+    return m_yIndex;
   }
 
-  public void setGroupIndex(int groupIndex) {
-    m_groupIndex = groupIndex;
+  public void setYIndex(BigDecimal yIndex) {
+    m_yIndex = yIndex;
   }
 
-  public int getAxisIndex() {
-    return m_axisIndex;
+  public Integer getDatasetIndex() {
+    return m_datasetIndex;
   }
 
-  public void setAxisIndex(int axisIndex) {
-    m_axisIndex = axisIndex;
+  public void setDatasetIndex(Integer datasetIndex) {
+    m_datasetIndex = datasetIndex;
   }
-
 }

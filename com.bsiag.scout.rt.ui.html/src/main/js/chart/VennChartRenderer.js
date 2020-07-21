@@ -374,7 +374,7 @@ export default class VennChartRenderer extends AbstractGridChartRenderer {
     }
 
     if (this.chart.config.options.clickable) {
-      $circle.on('click', this._createClickObject(-1, -1, circleIndex), this.chart._onValueClick.bind(this.chart));
+      $circle.on('click', this._createClickObject(null, circleIndex), this.chart._onValueClick.bind(this.chart));
     }
 
     return $circle;

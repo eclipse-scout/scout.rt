@@ -291,7 +291,7 @@ export default class LineChartRenderer extends AbstractGridChartRenderer {
       };
     this.$paths[groupIndex].data('$bubbles').push($bubble);
 
-    $bubble.on('click', this._createClickObject(0, index, groupIndex), this.chart._onValueClick.bind(this.chart));
+    $bubble.on('click', this._createClickObject(index, groupIndex), this.chart._onValueClick.bind(this.chart));
 
     $bubble
       .mouseenter(mouseIn)

@@ -80,7 +80,7 @@ export default class PieChartRenderer extends AbstractCircleChartRenderer {
         $arc.attr('d', this.pathSegment(startAngle, endAngle));
       }
       if (clickable) {
-        $arc.on('click', this._createClickObject(-1, -1, segment.valueGroupIndex), this.chart._onValueClick.bind(this.chart));
+        $arc.on('click', this._createClickObject(null, segment.valueGroupIndex), this.chart._onValueClick.bind(this.chart));
       }
       if (!this.chart.config.options.autoColor && !segment.cssClass) {
         $arc.attr('fill', segment.color);

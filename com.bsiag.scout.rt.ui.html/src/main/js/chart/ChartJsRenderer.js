@@ -50,10 +50,13 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this.numSupportedColors = 6;
     this.colorSchemeCssClass = '';
     this.minRadialChartDatalabelSpace = 25;
+    this.bubbleScalingFactor = 1;
 
     this.resetDatasetAfterHover = false;
 
     this._labelFormatter = this._formatLabel.bind(this);
+    this._xLabelFormatter = this._formatXLabel.bind(this);
+    this._yLabelFormatter = this._formatYLabel.bind(this);
 
     this._radialChartDatalabelsDisplayHandler = this._displayDatalabelsOnRadialChart.bind(this);
     this._radialChartDatalabelsFormatter = this._formatDatalabelsOnRadialChart.bind(this);
@@ -76,7 +79,68 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _validateChartData() {
-    return super._validateChartData() || ((this.chart.config.data || {}).datasets || []).length;
+    let chartDataValid = true;
+    let chartData = this.chart && this.chart.data;
+
+    if (!chartData || !chartData.chartValueGroups || chartData.chartValueGroups.length === 0) {
+      chartDataValid = false;
+    }
+
+    if (chartDataValid && (this.chart.config.type === Chart.Type.POLAR_AREA || this.chart.config.type === Chart.Type.RADAR)) {
+      // check lengths
+      let i, length = 0;
+      for (i = 0; i < chartData.chartValueGroups.length; i++) {
+        let chartValueGroup = chartData.chartValueGroups[i];
+        if (!chartValueGroup.values) {
+          chartDataValid = false;
+        }
+        // Length of all "values" arrays have to be equal
+        if (i === 0) {
+          length = chartValueGroup.values.length;
+        } else {
+          if (chartValueGroup.values.length !== length) {
+            chartDataValid = false;
+          }
+        }
+      }
+      for (i = 0; i < chartData.axes.length; i++) {
+        if (chartData.axes[i].length !== length) {
+          chartDataValid = false;
+        }
+      }
+    }
+
+    if (chartDataValid) {
+      return true;
+    }
+
+    let chartConfigDataValid = true;
+    let config = this.chart && this.chart.config;
+
+    if (!config || !config.data || !config.data.datasets || config.data.datasets.length === 0) {
+      chartConfigDataValid = false;
+    }
+
+    if (chartConfigDataValid && (this.chart.config.type === Chart.Type.POLAR_AREA || this.chart.config.type === Chart.Type.RADAR)) {
+      // check lengths
+      let i, length = 0;
+      for (i = 0; i < config.data.datasets.length; i++) {
+        let dataset = config.data.datasets.length[i];
+        if (!dataset.data) {
+          chartConfigDataValid = false;
+        }
+        // Length of all "data" arrays have to be equal
+        if (i === 0) {
+          length = dataset.data.length;
+        } else {
+          if (dataset.data.length !== length) {
+            chartConfigDataValid = false;
+          }
+        }
+      }
+    }
+
+    return chartConfigDataValid;
   }
 
   _render() {
@@ -87,6 +151,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       ChartJs.defaults.global.defaultFontFamily = this.$canvas.css('font-family');
       chartJsGlobalsInitialized = true;
     }
+    /**
+     * @property {number} options.bubble.sizeOfLargestBubble
+     * @property {object} options.scales.xLabelMap
+     * @property {object} options.scales.yLabelMap
+     */
     let config = this.chart.config;
     this._adjustConfig(config);
     this._renderChart(config, true);
@@ -124,7 +193,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       return;
     }
     if (this.chart.data) {
-      config.data = this._computeDatasets(this.chart.data);
+      this._computeDatasets(this.chart.data, config);
     }
     this._adjustData(config);
     this._adjustLayout(config);
@@ -132,21 +201,49 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this._adjustClickHandler(config);
   }
 
-  _computeDatasets(chartData) {
+  _computeDatasets(chartData, config) {
     let labels = [],
       datasets = [];
 
     (chartData.axes[0] || []).forEach(elem => labels.push(elem.label));
+
+    let xLabelMap = this._computeLabelMap(chartData.axes[0]);
+
+    if (!$.isEmptyObject(xLabelMap)) {
+      config.options = $.extend(true, {}, config.options, {
+        scales: {}
+      });
+
+      config.options.scales.xLabelMap = xLabelMap;
+    }
+
+    let yLabelMap = this._computeLabelMap(chartData.axes[1]);
+
+    if (!$.isEmptyObject(yLabelMap)) {
+      config.options = $.extend(true, {}, config.options, {
+        scales: {}
+      });
+
+      config.options.scales.yLabelMap = yLabelMap;
+    }
 
     chartData.chartValueGroups.forEach(elem => datasets.push({
       label: elem.groupName,
       data: elem.values
     }));
 
-    return {
+    config.data = {
       labels: labels,
       datasets: datasets
     };
+  }
+
+  _computeLabelMap(axis) {
+    let labelMap = {};
+    (axis || []).forEach((elem, idx) => {
+      labelMap[idx] = elem.label;
+    });
+    return labelMap;
   }
 
   _adjustData(config) {
@@ -171,6 +268,15 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       newLabels[maxSegments - 1] = this.chart.session.text('ui.OtherValues');
       config.data.labels = newLabels;
       config.data.maxSegmentsExceeded = true;
+    }
+    if (config.type === Chart.Type.BUBBLE) {
+      let maxR = this._computeMaxMinValue(config.data, 'r', true).maxValue;
+      if (maxR > 0 && (config.bubble || {}).sizeOfLargestBubble) {
+        this.bubbleScalingFactor = config.bubble.sizeOfLargestBubble / maxR;
+        config.data.datasets.forEach(dataset => dataset.data.forEach(data => {
+          data.r = data.r * this.bubbleScalingFactor;
+        }));
+      }
     }
   }
 
@@ -225,7 +331,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           },
           ticks: {
             padding: 5,
-            callback: this._labelFormatter
+            callback: this._xLabelFormatter
           }
         });
       } else {
@@ -247,7 +353,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         },
         ticks: {
           padding: 5,
-          callback: this._labelFormatter
+          callback: this._yLabelFormatter
         }
       });
     }
@@ -265,6 +371,21 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _formatLabel(label) {
+    return this._formatLabelMap(label);
+  }
+
+  _formatXLabel(label) {
+    return this._formatLabelMap(label, this.chart.config.options.scales.xLabelMap);
+  }
+
+  _formatYLabel(label) {
+    return this._formatLabelMap(label, this.chart.config.options.scales.yLabelMap);
+  }
+
+  _formatLabelMap(label, labelMap) {
+    if (labelMap) {
+      return labelMap[label];
+    }
     if (isNaN(label)) {
       return label;
     }
@@ -492,7 +613,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (config.type === Chart.Type.BUBBLE) {
       let maxR = this._computeMaxMinValue(config.data, 'r', true);
       padding = maxR.maxValue + (((config.options.elements || {}).point || {}).hoverRadius || 0);
-      yBoundaries = this._computeMaxMinValue(config.data, 'y', false, padding, height);
+      yBoundaries = this._computeMaxMinValue(config.data, 'y', config.options.scales.yLabelMap, padding, height);
     } else {
       yBoundaries = this._computeMaxMinValue(config.data);
     }
@@ -515,7 +636,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
     let width = Math.abs(chartArea.right - chartArea.left),
       maxXTicks = Math.floor(width / this.minSpaceBetweenXTicks),
-      xBoundaries = this._computeMaxMinValue(config.data, 'x', false, padding, width);
+      xBoundaries = this._computeMaxMinValue(config.data, 'x', config.options.scales.xLabelMap, padding, width);
     this._adjustAxes(config.options.scales.xAxes, maxXTicks, xBoundaries);
   }
 
@@ -538,20 +659,33 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       return;
     }
 
-    let maxValue = 0,
-      minValue = 0,
-      i = 0,
-      j = 0;
-    for (i = 0; i < data.datasets.length; i++) {
-      for (j = 0; j < data.datasets[i].data.length; j++) {
+    let maxValue, minValue;
+    for (let i = 0; i < data.datasets.length; i++) {
+      for (let j = 0; j < data.datasets[i].data.length; j++) {
+        let value;
         if (identifier) {
-          maxValue = Math.max(data.datasets[i].data[j][identifier], maxValue);
-          minValue = Math.min(data.datasets[i].data[j][identifier], minValue);
+          value = data.datasets[i].data[j][identifier];
         } else {
-          maxValue = Math.max(data.datasets[i].data[j], maxValue);
-          minValue = Math.min(data.datasets[i].data[j], minValue);
+          value = data.datasets[i].data[j];
+        }
+        if (isNaN(maxValue)) {
+          maxValue = value;
+        } else {
+          maxValue = Math.max(value, maxValue);
+        }
+        if (isNaN(minValue)) {
+          minValue = value;
+        } else {
+          minValue = Math.min(value, minValue);
         }
       }
+    }
+
+    if (isNaN(maxValue)) {
+      maxValue = 0;
+    }
+    if (isNaN(minValue)) {
+      minValue = 0;
     }
 
     if (padding && space && space > 2 * padding) {
@@ -623,11 +757,20 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       if (this._isMaxSegmentsExceeded(this.chartJs.config, items[0]._index)) {
         return;
       }
-      let clickObject = {
-        axisIndex: 0,
-        valueIndex: items[0]._index,
-        groupIndex: items[0]._datasetIndex
-      };
+
+      let itemIndex = items[0]._index,
+        datasetIndex = items[0]._datasetIndex,
+        clickObject = {
+          datasetIndex: datasetIndex
+        };
+      if (this.chartJs.config.type === Chart.Type.BUBBLE) {
+        let data = this.chartJs.config.data.datasets[datasetIndex].data[itemIndex];
+        clickObject.xIndex = data.x;
+        clickObject.yIndex = data.y;
+      } else {
+        clickObject.xIndex = itemIndex;
+      }
+
       let e = new Event();
       e.data = clickObject;
       this.chart._onValueClick(e);
@@ -727,7 +870,10 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       }
       this.chartJs.updateHoverStyle(elements, 'point', enabled);
     } else {
-      this.chartJs.updateHoverStyle(this.chartJs.getDatasetMeta(index).data, 'dataset', enabled);
+      let elements = this.chartJs.getDatasetMeta(index).data;
+      if (elements && elements.length) {
+        this.chartJs.updateHoverStyle(this.chartJs.getDatasetMeta(index).data, 'dataset', enabled);
+      }
     }
   }
 

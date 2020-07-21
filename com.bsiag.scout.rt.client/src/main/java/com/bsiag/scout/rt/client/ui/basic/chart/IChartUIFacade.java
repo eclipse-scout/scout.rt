@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the BSI CRM Software License v1.0
  * which accompanies this distribution as bsi-v10.html
@@ -9,6 +9,8 @@
  */
 package com.bsiag.scout.rt.client.ui.basic.chart;
 
+import java.math.BigDecimal;
+
 /**
  * @since 5.2
  */
@@ -16,14 +18,14 @@ package com.bsiag.scout.rt.client.ui.basic.chart;
 public interface IChartUIFacade {
 
   /**
-   * For all parameters: use -1 when parameter is not used or set by a chart type.
+   * For all parameters: use null when parameter is not used or set by a chart type.
    *
-   * @param axisIndex
+   * @param xIndex
    *          number
-   * @param valueIndex
+   * @param yIndex
    *          number
-   * @param groupIndex
+   * @param datasetIndex
    *          number
    */
-  void fireValueClickFromUI(int axisIndex, int valueIndex, int groupIndex);
+  void fireValueClickFromUI(BigDecimal xIndex, BigDecimal yIndex, Integer datasetIndex);
 }

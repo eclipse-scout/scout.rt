@@ -9,8 +9,10 @@
  */
 package com.bsiag.scout.rt.ui.html.json.basic.chart;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -83,9 +85,9 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonWidget<CHART> {
 
   protected void handleUiValueClick(JsonEvent event) {
     JSONObject data = event.getData();
-    int axisIndex = data.getInt("axisIndex");
-    int valueIndex = data.getInt("valueIndex");
-    int groupIndex = data.getInt("groupIndex");
-    getModel().getUIFacade().fireValueClickFromUI(axisIndex, valueIndex, groupIndex);
+    BigDecimal xIndex = !data.isNull("xIndex") ? NumberUtility.getBigDecimalValue(data.get("xIndex")) : null;
+    BigDecimal yIndex = !data.isNull("yIndex") ? NumberUtility.getBigDecimalValue(data.get("yIndex")) : null;
+    Integer datasetIndex = !data.isNull("datasetIndex") ? (Integer) data.get("datasetIndex") : null;
+    getModel().getUIFacade().fireValueClickFromUI(xIndex, yIndex, datasetIndex);
   }
 }

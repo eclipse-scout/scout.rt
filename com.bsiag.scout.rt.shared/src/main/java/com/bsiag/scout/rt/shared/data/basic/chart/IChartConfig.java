@@ -55,6 +55,8 @@ public interface IChartConfig extends Serializable {
    */
   String FULFILLMENT_START_VALUE = "fulfillment.startValue";
 
+  String BUBBLE_SIZE_OF_LARGEST_BUBBLE = "bubble.sizeOfLargestBubble";
+
   IChartConfig copy();
 
   /**
@@ -175,6 +177,12 @@ public interface IChartConfig extends Serializable {
 
   IChartConfig removeScales();
 
+  IChartConfig withXLabelMap(Map<String, String> xLabelMap);
+
+  IChartConfig removeXLabelMap();
+
+  Map<String, String> getXLabelMap();
+
   IChartConfig withXAxisStacked(boolean stacked);
 
   IChartConfig removeXAxisStacked();
@@ -192,6 +200,12 @@ public interface IChartConfig extends Serializable {
   IChartConfig removeXAxisLabel();
 
   String getXAxisLabel();
+
+  IChartConfig withYLabelMap(Map<String, String> yLabelMap);
+
+  IChartConfig removeYLabelMap();
+
+  Map<String, String> getYLabelMap();
 
   IChartConfig withYAxisStacked(boolean stacked);
 

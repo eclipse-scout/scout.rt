@@ -110,7 +110,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
 
     this.$svg.addClass('speedo-chart-svg');
     if (this.chart.config.options.clickable) {
-      this.$svg.on('click', this._createClickObject(-1, -1, -1), this.chart._onValueClick.bind(this.chart));
+      this.$svg.on('click', this._createClickObject(null, null), this.chart._onValueClick.bind(this.chart));
     }
   }
 

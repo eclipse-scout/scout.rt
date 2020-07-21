@@ -75,7 +75,7 @@ export default class BarChartRenderer extends AbstractGridChartRenderer {
       heightStart: 0,
       heightEnd: heightEnd,
       cssClass: barClass,
-      clickObject: this._createClickObject(0, valueIndex, chartGroupIndex)
+      clickObject: this._createClickObject(valueIndex, chartGroupIndex)
     });
     if (!this.chart.config.options.autoColor && !chartGroupCss) {
       renderRectOptions.fill = this.chart.data.chartValueGroups[chartGroupIndex].colorHexValue;

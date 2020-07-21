@@ -98,7 +98,7 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
       .text(percentage + '%');
 
     if (this.chart.config.options.clickable) {
-      $arc.on('click', this._createClickObject(-1, -1, -1), this.chart._onValueClick.bind(this.chart));
+      $arc.on('click', this._createClickObject(null, null), this.chart._onValueClick.bind(this.chart));
     }
     if (!this.chart.config.options.autoColor && !chartGroupCss) {
       $arc.attr('fill', color);

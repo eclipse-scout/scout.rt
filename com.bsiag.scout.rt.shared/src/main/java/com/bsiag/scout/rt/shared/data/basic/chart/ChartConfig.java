@@ -60,6 +60,8 @@ public class ChartConfig implements IChartConfig {
   protected static final String LINE_TENSION = combine(LINE, "tension");
   protected static final String LINE_FILL = combine(LINE, "fill");
   protected static final String SCALES = combine(OPTIONS, "scales");
+  protected static final String X_LABEL_MAP = combine(SCALES, "xLabelMap");
+  protected static final String Y_LABEL_MAP = combine(SCALES, "yLabelMap");
   protected static final String X_AXES = combine(SCALES, "xAxes");
   protected static final String Y_AXES = combine(SCALES, "yAxes");
   protected static final String STACKED = "stacked";
@@ -572,6 +574,22 @@ public class ChartConfig implements IChartConfig {
     return removeProperty(SCALES);
   }
 
+  @Override
+  public IChartConfig withXLabelMap(Map<String, String> xLabelMap) {
+    return withProperty(X_LABEL_MAP, xLabelMap);
+  }
+
+  @Override
+  public IChartConfig removeXLabelMap() {
+    return removeProperty(X_LABEL_MAP);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Map<String, String> getXLabelMap() {
+    return (Map<String, String>) getProperty(X_LABEL_MAP);
+  }
+
   protected IChartConfig withXAxisStacked(boolean stacked, int index) {
     return withArrayProperty(X_AXES, index, STACKED, stacked);
   }
@@ -651,6 +669,22 @@ public class ChartConfig implements IChartConfig {
   @Override
   public String getXAxisLabel() {
     return getXAxisLabel(0);
+  }
+
+  @Override
+  public IChartConfig withYLabelMap(Map<String, String> yLabelMap) {
+    return withProperty(Y_LABEL_MAP, yLabelMap);
+  }
+
+  @Override
+  public IChartConfig removeYLabelMap() {
+    return removeProperty(Y_LABEL_MAP);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Map<String, String> getYLabelMap() {
+    return (Map<String, String>) getProperty(Y_LABEL_MAP);
   }
 
   protected IChartConfig withYAxisStacked(boolean stacked, int index) {

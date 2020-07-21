@@ -141,17 +141,15 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
   }
 
   /**
-   * For all parameters: use -1 when parameter is not used or set by a chart type.
+   * For all parameters: use null when parameter is not used or set by a chart type.
    *
-   * @param axisIndex number
-   * @param valueIndex number
-   * @param groupIndex number
+   * @param xIndex number
+   * @param datasetIndex number
    */
-  _createClickObject(axisIndex, valueIndex, groupIndex) {
+  _createClickObject(xIndex, datasetIndex) {
     return {
-      axisIndex: axisIndex,
-      valueIndex: valueIndex,
-      groupIndex: groupIndex
+      xIndex: xIndex,
+      datasetIndex: datasetIndex
     };
   }
 

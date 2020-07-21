@@ -9,6 +9,7 @@
  */
 package com.bsiag.scout.rt.client.ui.basic.chart;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -30,10 +31,10 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 
 import com.bsiag.scout.rt.client.ui.basic.chart.ChartChains.ChartValueClickChain;
 import com.bsiag.scout.rt.shared.data.basic.chart.ChartData;
-import com.bsiag.scout.rt.shared.data.basic.chart.MonupleChartValueGroupBean;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartConfig;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartData;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
+import com.bsiag.scout.rt.shared.data.basic.chart.MonupleChartValueGroupBean;
 
 /**
  * <h1>Chart types</h1>
@@ -171,10 +172,10 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
     return m_listenerList;
   }
 
-  protected final void interceptValueClick(int axisIndex, int valueIndex, int groupIndex) {
+  protected final void interceptValueClick(BigDecimal xIndex, BigDecimal yIndex, Integer datasetIndex) {
     List<? extends IChartExtension<? extends AbstractChart>> extensions = getAllExtensions();
     ChartValueClickChain chain = new ChartValueClickChain(extensions);
-    chain.execValueClick(axisIndex, valueIndex, groupIndex);
+    chain.execValueClick(xIndex, yIndex, datasetIndex);
   }
 
   @Override
@@ -193,11 +194,11 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
 
   @ConfigOperation
   @Order(10)
-  protected void execValueClick(int axisIndex, int valueIndex, int groupIndex) {
+  protected void execValueClick(BigDecimal xIndex, BigDecimal yIndex, Integer datasetIndex) {
     ChartEvent event = new ChartEvent(this, ChartEvent.TYPE_VALUE_CLICK);
-    event.setAxisIndex(axisIndex);
-    event.setValueIndex(valueIndex);
-    event.setGroupIndex(groupIndex);
+    event.setXIndex(xIndex);
+    event.setYIndex(yIndex);
+    event.setDatasetIndex(datasetIndex);
     fireChartEventInternal(event);
   }
 
@@ -253,10 +254,10 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
   protected class P_UIFacade implements IChartUIFacade {
 
     @Override
-    public void fireValueClickFromUI(int axisIndex, int valueIndex, int groupIndex) {
+    public void fireValueClickFromUI(BigDecimal xIndex, BigDecimal yIndex, Integer datasetIndex) {
       try {
         if (isEnabled() && isVisible()) {
-          interceptValueClick(axisIndex, valueIndex, groupIndex);
+          interceptValueClick(xIndex, yIndex, datasetIndex);
         }
       }
       catch (Exception e) {
@@ -272,8 +273,8 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
     }
 
     @Override
-    public void execValueClick(ChartValueClickChain chain, int axisIndex, int valueIndex, int groupIndex) {
-      getOwner().execValueClick(axisIndex, valueIndex, groupIndex);
+    public void execValueClick(ChartValueClickChain chain, BigDecimal xIndex, BigDecimal yIndex, Integer datasetIndex) {
+      getOwner().execValueClick(xIndex, yIndex, datasetIndex);
     }
   }
 

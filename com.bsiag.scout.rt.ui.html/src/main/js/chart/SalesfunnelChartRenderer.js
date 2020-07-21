@@ -105,7 +105,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
         cssClass: 'salesfunnel-chart-bar',
         fill: chartValueGroups[i].colorHexValue,
         label: chartValueGroups[i].groupName,
-        clickObject: this._createClickObject(-1, -1, i)
+        clickObject: this._createClickObject(null, i)
       };
 
       if (this.chart.config.options.autoColor) {
@@ -301,7 +301,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
         cssClass: 'salesfunnel-chart-bar',
         fill: chartValueGroups[i].colorHexValue,
         label: chartValueGroups[i].groupName,
-        clickObject: this._createClickObject(-1, -1, i)
+        clickObject: this._createClickObject(null, i)
       };
 
       if (this.chart.config.options.autoColor) {

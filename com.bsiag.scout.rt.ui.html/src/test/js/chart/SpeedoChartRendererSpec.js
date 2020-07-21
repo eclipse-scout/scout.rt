@@ -85,9 +85,8 @@ describe('SpeedoChartRenderer', () => {
       let $svg = session.desktop.$container.find('svg');
       $svg.click();
       expect(event.data).toEqual({
-        axisIndex: -1,
-        groupIndex: -1,
-        valueIndex: -1
+        xIndex: null,
+        datasetIndex: null
       });
     });
   });

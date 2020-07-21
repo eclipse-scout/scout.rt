@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  */
 package com.bsiag.scout.rt.client.ui.basic.chart;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
@@ -32,14 +33,14 @@ public final class ChartChains {
       super(extensions);
     }
 
-    public void execValueClick(int axisIndex, int valueIndex, int groupIndex) {
+    public void execValueClick(BigDecimal xIndex, BigDecimal yIndex, Integer datasetIndex) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IChartExtension<? extends AbstractChart> next) {
-          next.execValueClick(ChartValueClickChain.this, axisIndex, valueIndex, groupIndex);
+          next.execValueClick(ChartValueClickChain.this, xIndex, yIndex, datasetIndex);
         }
       };
-      callChain(methodInvocation, axisIndex, valueIndex, groupIndex);
+      callChain(methodInvocation, xIndex, yIndex, datasetIndex);
     }
   }
 
