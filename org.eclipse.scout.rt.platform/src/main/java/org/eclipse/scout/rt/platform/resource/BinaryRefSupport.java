@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (c) 2020 BSI Business Systems Integration AG.
+/*
+ * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.platform.resource;
 
 import java.net.URI;
@@ -78,7 +78,7 @@ public class BinaryRefSupport implements IPlatformListener {
    * Looks up handler for a binref URI. URI must be a binref URI. At least the root handler is returned.
    *
    * @param uri
-   *          non null binref {@link URI} (see {@link #isBinaryRef(URI)})
+   *          non null binref {@link URI} (see {@link BinaryRefs#isBinaryRef})
    * @return non null handler for URI
    */
   protected IBinaryRefHandler lookupHandlerUnsafe(URI uri) {

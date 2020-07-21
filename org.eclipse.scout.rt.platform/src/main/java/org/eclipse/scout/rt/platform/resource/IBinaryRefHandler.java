@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (c) 2020 BSI Business Systems Integration AG.
+/*
+ * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.platform.resource;
 
 import java.net.URI;
@@ -81,7 +81,7 @@ public interface IBinaryRefHandler {
    */
   default void getContentTypes(Map<URI, String> resultCollector, Collection<URI> uris) {
     // get content types from filenames
-    Map<URI, String> filenames = new HashMap<URI, String>();
+    Map<URI, String> filenames = new HashMap<>();
     getFilenames(filenames, uris);
     for (Entry<URI, String> entry : filenames.entrySet()) {
       resultCollector.put(entry.getKey(), FileUtility.getMimeType(entry.getValue()));
