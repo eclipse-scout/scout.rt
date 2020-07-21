@@ -1660,7 +1660,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected Collection<IColumn<?>> filterVisibleColumns(Collection<IColumn<?>> columns) {
     List<IColumn<?>> visibleColumns = new LinkedList<>();
     for (IColumn<?> column : columns) {
-      if (column.isVisible() && column.isCompacted()) {
+      if (column.isVisible() && !column.isCompacted()) {
         visibleColumns.add(column);
       }
     }

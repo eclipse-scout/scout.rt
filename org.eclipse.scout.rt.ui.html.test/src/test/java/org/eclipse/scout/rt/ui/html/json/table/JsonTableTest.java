@@ -1217,7 +1217,7 @@ public class JsonTableTest {
   }
 
   /**
-   * Tests that multiple model events are coalseced in JSON layer
+   * Tests that multiple model events are coalesced in JSON layer
    */
   @Test
   public void testTableEventCoalesceInUi_InsertAndRowOrderChanged() {
