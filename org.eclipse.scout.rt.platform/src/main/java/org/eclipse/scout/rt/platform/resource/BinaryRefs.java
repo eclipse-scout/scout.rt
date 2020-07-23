@@ -26,6 +26,9 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 public final class BinaryRefs {
   public static final String URI_SCHEME = "binref";
 
+  private BinaryRefs() {
+  }
+
   public static boolean isBinaryRef(URI uri) {
     return uri != null && URI_SCHEME.equals(uri.getScheme());
   }
