@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
-import {Form, NullWidget, Rectangle, scout, Status, webstorage} from '../../src/index';
+import {Dimension, Form, NullWidget, Rectangle, scout, Status, webstorage} from '../../src/index';
 
 describe('Form', () => {
   let session, helper, outlineHelper;
@@ -786,4 +786,102 @@ describe('Form', () => {
     });
   });
 
+  describe('maximized', () => {
+    let mockPrefSize = () => new Dimension(50, 50);
+
+    it('makes form as big as window after open', done => {
+      let form = helper.createFormWithOneField();
+      form.animateOpening = false;
+      form.setMaximized(true);
+      form.one('render', () => {
+        form.htmlComp.layout.preferredLayoutSize = mockPrefSize;
+      });
+      form.open()
+        .then(() => {
+          expect(form.$container.width()).toBeGreaterThan(50);
+          expect(form.$container.height()).toBeGreaterThan(50);
+          form.close();
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('can be toggled dynamically', done => {
+      let form = helper.createFormWithOneField();
+      form.animateOpening = false;
+      form.one('render', () => {
+        form.htmlComp.layout.preferredLayoutSize = mockPrefSize;
+      });
+      form.open()
+        .then(() => {
+          expect(form.$container.width()).toBe(50);
+          expect(form.$container.height()).toBe(50);
+          form.setMaximized(true);
+          expect(form.$container.width()).toBeGreaterThan(50);
+          expect(form.$container.height()).toBeGreaterThan(50);
+          form.close();
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('sets size to prefSize when set to false', done => {
+      let form = helper.createFormWithOneField();
+      form.animateOpening = false;
+      form.setMaximized(true);
+      form.one('render', () => {
+        form.htmlComp.layout.preferredLayoutSize = mockPrefSize;
+      });
+      form.open()
+        .then(() => {
+          form.setMaximized(false);
+          expect(form.$container.width()).toBe(50);
+          expect(form.$container.height()).toBe(50);
+          form.close();
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('sets size to previous size when set to false when modified before', done => {
+      let form = helper.createFormWithOneField();
+      form.animateOpening = false;
+      form.one('render', () => {
+        form.htmlComp.layout.preferredLayoutSize = mockPrefSize;
+      });
+      form.open()
+        .then(() => {
+          form.$container.width(60);
+          form.$container.height(70);
+          form.setMaximized(true);
+          expect(form.$container.width()).toBeGreaterThan(50);
+          expect(form.$container.height()).toBeGreaterThan(50);
+          form.setMaximized(false);
+          expect(form.$container.width()).toBe(60);
+          expect(form.$container.height()).toBe(70);
+          form.close();
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('removes resize handles', done => {
+      let form = helper.createFormWithOneField();
+      form.animateOpening = false;
+      form.one('render', () => {
+        form.htmlComp.layout.preferredLayoutSize = mockPrefSize;
+      });
+      form.open()
+        .then(() => {
+          expect(form.$container.data('resizable')).toBeTruthy();
+          form.setMaximized(true);
+          expect(form.$container.data('resizable')).toBeFalsy();
+          form.setMaximized(false);
+          expect(form.$container.data('resizable')).toBeTruthy();
+          form.close();
+        })
+        .catch(fail)
+        .always(done);
+    });
+  });
 });

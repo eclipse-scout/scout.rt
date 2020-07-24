@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Desktop, DialogLayout, Form, Outline, scout} from '../index';
+import {arrays, Desktop, Form, Outline, scout} from '../index';
 
 /**
  * Controller with functionality to register and render views and dialogs.
@@ -325,23 +325,8 @@ export default class FormController {
   }
 
   _layoutDialog(dialog) {
-    let cacheBounds, position;
     dialog.htmlComp.validateLayout();
-
-    cacheBounds = dialog.readCacheBounds();
-    if (cacheBounds) {
-      position = cacheBounds.point();
-    } else {
-      position = DialogLayout.positionContainerInWindow(dialog.$container);
-    }
-
-    dialog.$container.cssPosition(position);
-    dialog.trigger('move', {
-      left: position.x,
-      top: position.y
-    });
-
-    dialog.updateCacheBounds();
+    dialog.position();
 
     // If not validated anew, focus on single-button forms is not gained.
     // Maybe, this is the same problem as in BusyIndicator.js
@@ -349,7 +334,9 @@ export default class FormController {
 
     // Animate _after_ the layout is valid (otherwise, the position would be wrong, because
     // HtmlComponent defers the layout when a component is currently being animated)
-    dialog.$container.addClassForAnimation('animate-open');
-    dialog.$container.addDeviceClass(); // no animation in IE
+    if (dialog.animateOpening) {
+      dialog.$container.addClassForAnimation('animate-open');
+      dialog.$container.addDeviceClass(); // no animation in IE
+    }
   }
 }

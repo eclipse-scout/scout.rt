@@ -36,15 +36,13 @@ export default class Form extends Widget {
     this._addWidgetProperties(['rootGroupBox', 'views', 'dialogs', 'initialFocus', 'messageBoxes', 'fileChoosers']);
     this._addPreserveOnPropertyChangeProperties(['initialFocus']);
 
+    this.animateOpening = true;
     this.askIfNeedSave = true;
     this.askIfNeedSaveText = null; // if not set, a default text is used (see Lifecycle.js)
     this.data = {};
     this.displayHint = Form.DisplayHint.DIALOG;
     this.displayParent = null; // only relevant if form is opened, not relevant if form is just rendered into another widget (not managed by a form controller)
-    this.maximizeEnabled = true;
     this.maximized = false;
-    this.minimizeEnabled = true;
-    this.minimized = false;
     this.headerVisible = null;
     this.modal = true;
     this.logicalGrid = scout.create('FormGrid');
@@ -57,6 +55,7 @@ export default class Form extends Widget {
     this.cacheBounds = false;
     this.cacheBoundsKey = null;
     this.resizable = true;
+    this.movable = true;
     this.rootGroupBox = null;
     this.saveNeeded = false;
     this.saveNeededVisible = false;
@@ -64,6 +63,9 @@ export default class Form extends Widget {
     this.messageBoxController = null;
     this.fileChooserController = null;
     this._glassPaneRenderer = null;
+    this._preMaximizedBounds = null;
+    this._resizeHandler = this._onResize.bind(this);
+    this._windowResizeHandler = this._onWindowResize.bind(this);
     /**
      * Whether this form should render its initial focus
      */
@@ -77,6 +79,7 @@ export default class Form extends Widget {
     this.$icon = null;
     this.$title = null;
     this.$subTitle = null;
+    this.$dragHandle = null;
   }
 
   static DisplayHint = {
@@ -115,6 +118,9 @@ export default class Form extends Widget {
    */
   _renderProperties() {
     super._renderProperties();
+    this._renderMaximized();
+    this._renderMovable();
+    this._renderResizable();
     this._renderHeaderVisible();
     this._renderCssClass();
     this._renderModal();
@@ -156,11 +162,12 @@ export default class Form extends Widget {
 
     this._uninstallFocusContext();
     this._removeHeader();
+    this.$dragHandle = null;
     super._remove();
   }
 
   _renderForm() {
-    let layout, $handle;
+    let layout;
 
     this.$container = this.$parent.appendDiv()
       .addClass(this.isDialog() ? 'dialog' : 'form')
@@ -174,11 +181,6 @@ export default class Form extends Widget {
     if (this.isDialog()) {
       layout = new DialogLayout(this);
       this.htmlComp.validateRoot = true;
-      $handle = this.$container.appendDiv('drag-handle');
-      this.$container.draggable($handle, $.throttle(this._onMove.bind(this), 1000 / 60)); // 60fps
-      if (this.resizable) {
-        this._initResizable();
-      }
       // Attach to capture phase to activate focus context before regular mouse down handlers may set the focus.
       // E.g. clicking a check box label on another dialog executes mouse down handler of the check box which will focus the box. This only works if the focus context of the dialog is active.
       this.$container[0].addEventListener('mousedown', this._onDialogMouseDown.bind(this), true);
@@ -538,10 +540,20 @@ export default class Form extends Widget {
     this.abort();
   }
 
-  _initResizable() {
-    this.$container
-      .resizable()
-      .on('resize', this._onResize.bind(this));
+  setResizable(resizable) {
+    this.setProperty('resizable', resizable);
+  }
+
+  _renderResizable() {
+    if (this.resizable && this.isDialog() && !this.maximized) {
+      this.$container
+        .resizable()
+        .on('resize', this._resizeHandler);
+    } else {
+      this.$container
+        .unresizable()
+        .off('resize', this._resizeHandler);
+    }
   }
 
   _onResize(event) {
@@ -551,6 +563,27 @@ export default class Form extends Widget {
     this.htmlComp.layout.autoSize = autoSizeOld;
     this.updateCacheBounds();
     return false;
+  }
+
+  setMovable(movable) {
+    this.setProperty('movable', movable);
+  }
+
+  _renderMovable() {
+    if (this.movable && this.isDialog() && !this.maximized) {
+      if (this.$dragHandle) {
+        return;
+      }
+      this.$dragHandle = this.$container.prependDiv('drag-handle');
+      this.$container.draggable(this.$dragHandle, $.throttle(this._onMove.bind(this), 1000 / 60)); // 60fps
+    } else {
+      if (!this.$dragHandle) {
+        return;
+      }
+      this.$container.undraggable(this.$dragHandle);
+      this.$dragHandle.remove();
+      this.$dragHandle = null;
+    }
   }
 
   _onDialogMouseDown() {
@@ -615,7 +648,7 @@ export default class Form extends Widget {
     if (this.rootGroupBox) {
       this.rootGroupBox.setMainBox(true);
 
-      if (this.isDialog() || this.searchForm || this.parent instanceof WrappedFormField) {
+      if (this.isDialog() || this.parent instanceof WrappedFormField) {
         this.rootGroupBox.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
       }
     }
@@ -785,8 +818,28 @@ export default class Form extends Widget {
     this.updateCacheBounds();
   }
 
+  moveTo(position) {
+    this.$container.cssPosition(position);
+    this.trigger('move', {
+      left: position.x,
+      top: position.y
+    });
+    this.updateCacheBounds();
+  }
+
+  position() {
+    let position;
+    let prefBounds = this.prefBounds();
+    if (prefBounds) {
+      position = prefBounds.point();
+    } else {
+      position = DialogLayout.positionContainerInWindow(this.$container);
+    }
+    this.moveTo(position);
+  }
+
   updateCacheBounds() {
-    if (this.cacheBounds) {
+    if (this.cacheBounds && !this.maximized) {
       this.storeCacheBounds(this.htmlComp.bounds());
     }
   }
@@ -882,6 +935,68 @@ export default class Form extends Widget {
     if (displayParent) {
       this.setParent(this.findDesktop().computeParentForDisplayParent(displayParent));
     }
+  }
+
+  setMaximized(maximized) {
+    this.setProperty('maximized', maximized);
+  }
+
+  _renderMaximized() {
+    if (!this.isDialog()) {
+      return;
+    }
+    if (this.maximized && this.htmlComp.layouted) {
+      // Store the current bounds before it is maximized.
+      // The layout will read it using this.prefBounds() the first time it is called when maximized is set to false.
+      this._preMaximizedBounds = this.htmlComp.bounds();
+    }
+    this._maximize();
+    if (!this.maximized) {
+      this._preMaximizedBounds = null;
+    }
+
+    if (this.maximized) {
+      this.$container.window()
+        .on('resize', this._windowResizeHandler);
+    } else {
+      this.$container.window()
+        .off('resize', this._windowResizeHandler);
+    }
+    if (this.rendered) {
+      // Remove move and resize handles when maximized
+      this._renderMovable();
+      this._renderResizable();
+    }
+  }
+
+  _onWindowResize() {
+    if (this.maximized) {
+      this._maximize();
+    }
+  }
+
+  _maximize() {
+    if (!this.rendered) {
+      return;
+    }
+    let shrinkEnabled = this.htmlComp.layout.shrinkEnabled;
+    this.htmlComp.layout.shrinkEnabled = true;
+    this.revalidateLayoutTree();
+    this.position();
+    this.htmlComp.layout.shrinkEnabled = shrinkEnabled;
+  }
+
+  prefBounds() {
+    if (this.maximized) {
+      return null;
+    }
+    if (this._preMaximizedBounds) {
+      return this._preMaximizedBounds;
+    }
+    if (this.cacheBounds) {
+      return this.readCacheBounds();
+    }
+    return null;
   }
 
   _attach() {

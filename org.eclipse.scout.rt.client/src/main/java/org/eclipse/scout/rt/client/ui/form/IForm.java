@@ -476,19 +476,9 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
 
   void setCloseSystemType(int saveType);
 
-  /**
-   * This method does nothing since Scout moved to the web with version 5.2.
-   * @deprecated since Scout 10, will be removed with Scout 11
-   */
-  @Deprecated
   boolean isMaximized();
 
-  /**
-   * This method does nothing since Scout moved to the web with version 5.2.
-   * @deprecated since Scout 10, will be removed with Scout 11
-   */
-  @Deprecated
-  void setMaximized(boolean b);
+  void setMaximized(boolean maximized);
 
   /**
    * This method does nothing since Scout moved to the web with version 5.2.

@@ -15,6 +15,7 @@ export default class DialogLayout extends FormLayout {
   constructor(form) {
     super(form);
     this.autoSize = true;
+    this.shrinkEnabled = false;
   }
 
   layout($container) {
@@ -25,16 +26,16 @@ export default class DialogLayout extends FormLayout {
 
     let currentBounds,
       htmlComp = this.form.htmlComp,
-      cacheBounds = this.form.readCacheBounds(),
+      prefBounds = this.form.prefBounds(),
       dialogMargins = htmlComp.margins(),
       windowSize = $container.windowSize();
 
-    if (cacheBounds) {
-      currentBounds = cacheBounds;
+    if (prefBounds) {
+      currentBounds = prefBounds;
     } else {
       currentBounds = htmlComp.bounds();
     }
-    let dialogSize = this._calcSize($container, currentBounds, cacheBounds);
+    let dialogSize = this._calcSize($container, currentBounds, prefBounds);
 
     // Add markers to be able to style the dialog in a different way when it uses the full width or height
     $container
@@ -44,7 +45,7 @@ export default class DialogLayout extends FormLayout {
     // Ensure the dialog can only get larger, not smaller.
     // This prevents 'snapping' the dialog back to the calculated size when a field changes its visibility, but the user previously enlarged the dialog.
     // This must not happen when the dialog is laid out the first time (-> when it is opened, because it has not the right size yet and may get too big)
-    if (htmlComp.layouted) {
+    if (htmlComp.layouted && !this.shrinkEnabled) {
       dialogSize.width = Math.max(dialogSize.width, currentBounds.width);
       dialogSize.height = Math.max(dialogSize.height, currentBounds.height);
     }
@@ -57,22 +58,26 @@ export default class DialogLayout extends FormLayout {
    * @param currentBounds
    *          bounds as returned by the graphics.bounds() function, i.e. position is the CSS
    *          position (top-left of "margin box"), dimension excludes margins
-   * @param cacheBounds
-   *          optional cached bounds (same expectations as with "currentBounds")
-   * @return
+   * @param prefBounds
+   *          optional preferred bounds (same expectations as with "currentBounds")
+   * @return {Dimension}
    *          adjusted size excluding margins (suitable to pass to graphics.setSize())
    */
-  _calcSize($container, currentBounds, cacheBounds) {
+  _calcSize($container, currentBounds, prefBounds) {
     let dialogSize,
       htmlComp = this.form.htmlComp,
       dialogMargins = htmlComp.margins(),
       windowSize = $container.windowSize();
 
-    if (cacheBounds) {
-      dialogSize = cacheBounds.dimension();
-      currentBounds = cacheBounds;
+    if (this.form.maximized) {
+      return windowSize;
+    }
+
+    if (prefBounds) {
+      dialogSize = prefBounds.dimension();
+      currentBounds = prefBounds;
       dialogSize = DialogLayout.fitContainerInWindow(windowSize, currentBounds.point(), dialogSize, dialogMargins);
-      if (cacheBounds.dimension().width === dialogSize.width) {
+      if (prefBounds.dimension().width === dialogSize.width) {
         // If width is still the same (=fitContainerInWindow did not reduce the width), then just return it. Otherwise read pref size again
         return dialogSize;
       }

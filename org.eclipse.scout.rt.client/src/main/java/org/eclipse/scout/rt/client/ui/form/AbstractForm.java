@@ -920,7 +920,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     for (IForm simCandidate : getDesktop().getSimilarForms(this)) {
       if (handler != null
           && simCandidate.getHandler() != null
-          && handler.getClass().getName() == simCandidate.getHandler().getClass().getName()
+          && handler.getClass().getName().equals(simCandidate.getHandler().getClass().getName())
           && simCandidate.getHandler().isOpenExclusive()
           && handler.isOpenExclusive()) {
         getDesktop().activateForm(simCandidate);
@@ -2607,14 +2607,8 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   @Override
-  public void setMaximized(boolean b) {
-    if (isMaximizeEnabled()) {
-      if (b) {
-        propertySupport.setPropertyBool(PROP_MINIMIZED, false);
-      }
-      // maximized state of ui could be out of sync, fire always
-      propertySupport.setPropertyAlwaysFire(PROP_MAXIMIZED, b);
-    }
+  public void setMaximized(boolean maximized) {
+    propertySupport.setPropertyBool(PROP_MAXIMIZED, maximized);
   }
 
   @Override

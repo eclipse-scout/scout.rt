@@ -142,6 +142,12 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonWidget<FORM> {
         return JsonStatus.toJson((IStatus) value);
       }
     });
+    putJsonProperty(new JsonProperty<IForm>(IForm.PROP_MAXIMIZED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isMaximized();
+      }
+    });
   }
 
   @Override
