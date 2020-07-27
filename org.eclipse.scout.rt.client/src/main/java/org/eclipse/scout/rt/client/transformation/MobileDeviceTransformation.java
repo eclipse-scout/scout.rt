@@ -24,5 +24,6 @@ public enum MobileDeviceTransformation implements IDeviceTransformation {
   HIDE_FIELD_STATUS,
   DISABLE_FORM_CANCEL_CONFIRMATION,
   AUTO_CLOSE_SEARCH_FORM,
+  MAXIMIZE_DIALOG,
   SET_SEQUENCEBOX_UI_HEIGHT
 }

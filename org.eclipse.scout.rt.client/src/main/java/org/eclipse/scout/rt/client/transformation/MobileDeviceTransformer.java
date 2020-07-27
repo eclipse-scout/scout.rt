@@ -68,6 +68,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     transformations.add(MobileDeviceTransformation.HIDE_FIELD_STATUS);
     transformations.add(MobileDeviceTransformation.DISABLE_FORM_CANCEL_CONFIRMATION);
     transformations.add(MobileDeviceTransformation.AUTO_CLOSE_SEARCH_FORM);
+    transformations.add(MobileDeviceTransformation.MAXIMIZE_DIALOG);
     transformations.add(MobileDeviceTransformation.SET_SEQUENCEBOX_UI_HEIGHT);
 
     for (IDeviceTransformation transformation : transformations) {
@@ -92,10 +93,19 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     if (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW) {
       transformView(form);
     }
+    else if (form.getDisplayHint() == IForm.DISPLAY_HINT_DIALOG) {
+      transformDialog(form);
+    }
   }
 
   protected void transformView(IForm form) {
     form.setDisplayViewId(IForm.VIEW_ID_CENTER);
+  }
+
+  protected void transformDialog(IForm form) {
+    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MAXIMIZE_DIALOG, form)) {
+      form.setMaximized(true);
+    }
   }
 
   @Override
@@ -301,7 +311,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
 
   protected void hideStatus(IFormField field) {
     if ((field instanceof ICompositeField)) {
-      ((ICompositeField) field).setStatusVisible(false, false);
+      field.setStatusVisible(false, false);
     }
     else {
       field.setStatusVisible(false);
