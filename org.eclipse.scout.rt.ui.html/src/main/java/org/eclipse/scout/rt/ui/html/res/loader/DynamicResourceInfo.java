@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,9 +19,12 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DynamicResourceInfo {
 
+  private static final Logger LOG = LoggerFactory.getLogger(DynamicResourceInfo.class);
   public static final String PATH_PREFIX = "dynamic";
   /**
    * Pattern to determine if the provided url path is a dynamic resource path. Allow an additional / at the start.
@@ -66,7 +69,6 @@ public class DynamicResourceInfo {
   }
 
   /**
-   * @param jsonAdapter
    * @param path
    *          decoded path (non url-encoded)
    */
@@ -88,6 +90,7 @@ public class DynamicResourceInfo {
 
   /**
    * @param req
+   *          The {@link HttpServletRequest} to get the {@link UiSession} from.
    * @param path
    *          decoded path (non url-encoded)
    */
@@ -100,6 +103,7 @@ public class DynamicResourceInfo {
     // is from one of the UiSessions of the currently authenticated user!
     IUiSession uiSession = UiSession.get(req, components.getUiSessionId());
     if (uiSession == null) {
+      LOG.debug("Cannot process dynamic resource request: No UiSession with id '{}' found.", components.getUiSessionId());
       return null;
     }
 
@@ -137,11 +141,13 @@ public class DynamicResourceInfo {
      */
     public static DynamicResourcePathComponents fromPath(String path) {
       if (path == null) {
+        LOG.info("Cannot parse dynamic resource path components: path is null.");
         return null;
       }
 
       Matcher m = PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH.matcher(path);
       if (!m.matches()) {
+        LOG.warn("Invalid dynamic resources request path: '{}'. Skipping request.", path);
         return null;
       }
 

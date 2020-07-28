@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.ui.html.res.loader;
-
-import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,8 +21,6 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class loads resources that are temporary or dynamically registered on the {@link IUiSession}. This includes
@@ -34,8 +30,6 @@ import org.slf4j.LoggerFactory;
  * The pathInfo is expected to have the following form: <code>/dynamic/[uiSessionId]/[adapterId]/[filename]</code>
  */
 public class DynamicResourceLoader extends AbstractResourceLoader {
-
-  private static final Logger LOG = LoggerFactory.getLogger(DynamicResourceLoader.class);
 
   private final HttpServletRequest m_req;
 
@@ -61,7 +55,6 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
   public HttpCacheObject loadResource(HttpCacheKey cacheKey) {
     DynamicResourceInfo info = createDynamicResourceInfo(cacheKey);
     if (info == null) {
-      LOG.warn("invalid dynamic-resource request received.", new Exception("origin"));
       return null;
     }
 
@@ -84,7 +77,7 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
   }
 
   @Override
-  public BinaryResource loadResource(String pathInfo) throws IOException {
+  public BinaryResource loadResource(String pathInfo) {
     throw new UnsupportedOperationException();
   }
 
