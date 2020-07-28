@@ -613,7 +613,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (config.type === Chart.Type.BUBBLE) {
       let maxR = this._computeMaxMinValue(config.data, 'r', true);
       padding = maxR.maxValue + (((config.options.elements || {}).point || {}).hoverRadius || 0);
-      yBoundaries = this._computeMaxMinValue(config.data, 'y', config.options.scales.yLabelMap, padding, height);
+      let yPadding = padding;
+      if (((config.options.scales.yAxes || [])[0] || {}).offset) {
+        yPadding = yPadding - (this.minSpaceBetweenYTicks / 2);
+      }
+      yBoundaries = this._computeMaxMinValue(config.data, 'y', config.options.scales.yLabelMap, yPadding, height);
     } else {
       yBoundaries = this._computeMaxMinValue(config.data);
     }
@@ -636,7 +640,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
     let width = Math.abs(chartArea.right - chartArea.left),
       maxXTicks = Math.floor(width / this.minSpaceBetweenXTicks),
-      xBoundaries = this._computeMaxMinValue(config.data, 'x', config.options.scales.xLabelMap, padding, width);
+      xPadding = padding;
+    if (((config.options.scales.xAxes || [])[0] || {}).offset) {
+      xPadding = xPadding - (this.minSpaceBetweenXTicks / 2);
+    }
+    let xBoundaries = this._computeMaxMinValue(config.data, 'x', config.options.scales.xLabelMap, xPadding, width);
     this._adjustAxes(config.options.scales.xAxes, maxXTicks, xBoundaries);
   }
 
@@ -696,15 +704,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
 
     if (!exact) {
-      if (maxValue > 0) {
-        maxValue = this._calculateBoundary(maxValue);
-      }
-
-      if (minValue < 0) {
-        minValue = minValue * (-1);
-        minValue = this._calculateBoundary(minValue);
-        minValue = minValue * (-1);
-      }
+      maxValue = this._calculateBoundary(maxValue, Math.ceil, Math.floor);
+      minValue = this._calculateBoundary(minValue, Math.floor, Math.ceil);
     }
 
     return {
@@ -713,10 +714,34 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     };
   }
 
-  _calculateBoundary(value) {
-    let f = Math.ceil(Math.log(value) / Math.LN10) - 1;
-    value = Math.ceil(value / Math.pow(10, f)) * Math.pow(10, f);
-    value = Math.ceil(value / 4) * 4;
+  _calculateBoundary(value, roundingFunctionPositive, roundingFunctionNegative) {
+    let roundingFunction = roundingFunctionPositive;
+    let changeValueSign = false;
+    if (value < 0) {
+      changeValueSign = true;
+      value = value * (-1);
+      roundingFunction = roundingFunctionNegative;
+    }
+    value = this._calculateBoundaryPositive(value, roundingFunction);
+    if (changeValueSign) {
+      value = value * (-1);
+    }
+    return value;
+  }
+
+  _calculateBoundaryPositive(value, roundingFunction) {
+    if (!(value > 0) || !roundingFunction) {
+      return value;
+    }
+    // example: the value 32689 should be rounded to 30000 for the roundingFunction Math.floor or 35000 for Math.ceil or Math.round
+
+    // first calculate the exponent p of the largest 1ep smaller than the given value
+    // example: the largest 1ep smaller than the value 32689 is 10000 = 1e4 and therefore p = 4
+    let p = Math.floor(Math.log(value) / Math.LN10);
+    // divide by 5e(p-1), round and multiply with 5e(p-1) to round the value in 5e(p-1) steps
+    // example: the value is now divided by 5e(p-1) which means 32689 / 5e(4-1) = 32689 / 5e3 = 32689 / 5000 = 6.5378
+    //          this result is now rounded (Math.floor gives 6, Math.ceil and Math.round gives 7) and multiplied again with 5000 which results in 30000 or 35000 respectively
+    value = roundingFunction(value / (5 * Math.pow(10, p - 1))) * 5 * Math.pow(10, p - 1);
     return value;
   }
 
