@@ -350,8 +350,11 @@ export function findFromForward(arr, startIndex, predicate) {
 }
 
 export function findIndexFromForward(arr, startIndex, predicate) {
-  if (!arr || !predicate) {
+  if (!arr || !predicate || startIndex >= arr.length) {
     return -1;
+  }
+  if (startIndex < 0) {
+    startIndex = 0;
   }
   for (let i = startIndex; i < arr.length; i++) {
     let element = arr[i];
@@ -371,8 +374,11 @@ export function findFromReverse(arr, startIndex, predicate) {
 }
 
 export function findIndexFromReverse(arr, startIndex, predicate) {
-  if (!arr || !predicate) {
+  if (!arr || !predicate || startIndex < 0) {
     return -1;
+  }
+  if (startIndex >= arr.length) {
+    startIndex = arr.length - 1;
   }
   for (let i = startIndex; i >= 0; i--) {
     let element = arr[i];
