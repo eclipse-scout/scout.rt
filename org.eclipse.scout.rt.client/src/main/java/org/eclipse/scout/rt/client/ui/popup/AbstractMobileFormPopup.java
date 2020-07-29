@@ -11,9 +11,17 @@
 package org.eclipse.scout.rt.client.ui.popup;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("07574e67-a74e-4155-9f0f-9b8dadaf0af5")
 public abstract class AbstractMobileFormPopup<T extends IForm> extends AbstractFormPopup<T> implements IMobilePopup<T> {
 
+  @Override
+  protected void decorateForm(IForm form) {
+    super.decorateForm(form);
+    if (form.getRootGroupBox() != null) {
+      form.getRootGroupBox().setMenuBarPosition(IGroupBox.MENU_BAR_POSITION_BOTTOM);
+    }
+  }
 }

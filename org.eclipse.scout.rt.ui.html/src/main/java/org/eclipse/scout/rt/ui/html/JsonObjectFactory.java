@@ -51,7 +51,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTileField;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormMenu;
 import org.eclipse.scout.rt.client.ui.form.ITileOverviewForm;
@@ -135,7 +134,6 @@ import org.eclipse.scout.rt.ui.html.json.desktop.JsonFormMenu;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutlineTileField;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutlineViewButton;
-import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchForm;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
@@ -362,9 +360,6 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IKeyStroke) {
       return new JsonKeyStroke<>((IKeyStroke) model, session, id, parent);
-    }
-    if (model instanceof ISearchForm) {
-      return new JsonSearchForm<>((ISearchForm) model, session, id, parent);
     }
     if (model instanceof ITileOverviewForm) {
       return new JsonTileOverviewForm((ITileOverviewForm) model, session, id, parent);
