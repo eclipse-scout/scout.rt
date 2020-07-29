@@ -28,6 +28,7 @@ import {
   OutlineKeyStrokeContext,
   OutlineLayout,
   OutlineNavigateToTopKeyStroke,
+  OutlineOverview,
   Page,
   PageLayout,
   scout,
@@ -857,17 +858,15 @@ export default class Outline extends Tree {
       detailTable,
       detailMenus = [];
 
-    if (this.detailContent) {
-      // DetailContent may be a form or the outline overview -> only process forms
-      if (this.detailContent instanceof Form) {
-        // get menus from detail form
-        let rootGroupBox = this.detailContent.rootGroupBox;
-        menuItems = rootGroupBox.processMenus.concat(rootGroupBox.menus);
-        rootGroupBox.setMenuBarVisible(false);
-        this._attachDetailMenusListener(rootGroupBox);
-      }
-    } else if (selectedPage) {
-      // get empty space menus and table controls from detail table
+    if (this.detailContent && this.detailContent instanceof Form) {
+      // Get menus from detail form
+      let rootGroupBox = this.detailContent.rootGroupBox;
+      menuItems = rootGroupBox.processMenus.concat(rootGroupBox.menus);
+      rootGroupBox.setMenuBarVisible(false);
+      this._attachDetailMenusListener(rootGroupBox);
+    } else if (selectedPage && !(this.detailContent instanceof OutlineOverview)) {
+      // Get empty space menus and table controls from detail table
+      // DetailContent can be null or it is the tableRowDetail. Don't show menus on OutlineOverview.
       if (selectedPage.detailTable) {
         detailTable = selectedPage.detailTable;
         menuItems = menus_1.filter(detailTable.menus, ['Table.EmptySpace'], false, true);
@@ -875,7 +874,7 @@ export default class Outline extends Tree {
         detailTable.setMenuBarVisible(false);
         this._attachDetailMenusListener(detailTable);
       }
-      // get single selection menus from parent detail table
+      // Get single selection menus from parent detail table
       let parentPage = selectedPage.parentNode;
       if (parentPage && parentPage.detailTable) {
         detailTable = parentPage.detailTable;
