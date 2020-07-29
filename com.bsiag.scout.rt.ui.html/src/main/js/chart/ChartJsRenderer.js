@@ -24,6 +24,7 @@ import chartjs_plugin_datalabels from 'chartjs-plugin-datalabels';
  * @property {object} [defaults.global.elements.point]
  * @property {object} [defaults.global.elements.arc]
  * @property {object} [defaults.global.elements.rectangle]
+ * @property {object} [defaults.global.tooltips]
  */
 ChartJs.defaults.global.maintainAspectRatio = false;
 ChartJs.defaults.global.legend.labels.usePointStyle = true;
@@ -37,10 +38,20 @@ ChartJs.defaults.global.elements.point.hoverRadius = 5;
 ChartJs.defaults.global.elements.point.hoverBorderWidth = 2;
 ChartJs.defaults.global.elements.arc.borderWidth = 1;
 ChartJs.defaults.global.elements.rectangle.borderWidth = 1;
+ChartJs.defaults.global.tooltips.borderWidth = 1;
+ChartJs.defaults.global.tooltips.cornerRadius = 4;
+ChartJs.defaults.global.tooltips.xPadding = 8;
+ChartJs.defaults.global.tooltips.yPadding = 8;
+ChartJs.defaults.global.tooltips.titleSpacing = 4;
+ChartJs.defaults.global.tooltips.titleMarginBottom = 8;
+ChartJs.defaults.global.tooltips.bodySpacing = 4;
 
 let chartJsGlobalsInitialized = false;
 
 export default class ChartJsRenderer extends AbstractChartRenderer {
+
+  static ARROW_LEFT_RIGHT = '\u2194';
+  static ARROW_UP_DOWN = '\u2195';
 
   constructor(chart) {
     super(chart);
@@ -50,7 +61,6 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this.numSupportedColors = 6;
     this.colorSchemeCssClass = '';
     this.minRadialChartDatalabelSpace = 25;
-    this.bubbleScalingFactor = 1;
 
     this.resetDatasetAfterHover = false;
 
@@ -60,10 +70,15 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
     this._radialChartDatalabelsDisplayHandler = this._displayDatalabelsOnRadialChart.bind(this);
     this._radialChartDatalabelsFormatter = this._formatDatalabelsOnRadialChart.bind(this);
+    this._datalabelsFormatter = this._formatDatalabels.bind(this);
 
     this._datalabelBackgroundColorHandler = this._getBackgroundColorOfDataset.bind(this);
 
     this._legendLabelGenerator = this._generateLegendLabels.bind(this);
+
+    this._tooltipTitle = this._formatTooltipTitle.bind(this);
+    this._tooltipLabel = this._formatTooltipLabel.bind(this);
+    this._tooltipLabelColor = this._computeTooltipLabelColor.bind(this);
 
     this._clickHandler = this._onClick.bind(this);
     this._hoverHandler = this._onHover.bind(this);
@@ -86,7 +101,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       chartDataValid = false;
     }
 
-    if (chartDataValid && (this.chart.config.type === Chart.Type.POLAR_AREA || this.chart.config.type === Chart.Type.RADAR)) {
+    if (chartDataValid && scout.isOneOf(this.chart.config.type, Chart.Type.POLAR_AREA, Chart.Type.RADAR)) {
       // check lengths
       let i, length = 0;
       for (i = 0; i < chartData.chartValueGroups.length; i++) {
@@ -121,7 +136,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       chartConfigDataValid = false;
     }
 
-    if (chartConfigDataValid && (this.chart.config.type === Chart.Type.POLAR_AREA || this.chart.config.type === Chart.Type.RADAR)) {
+    if (chartConfigDataValid && scout.isOneOf(this.chart.config.type, Chart.Type.POLAR_AREA, Chart.Type.RADAR)) {
       // check lengths
       let i, length = 0;
       for (i = 0; i < config.data.datasets.length; i++) {
@@ -229,7 +244,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
     chartData.chartValueGroups.forEach(elem => datasets.push({
       label: elem.groupName,
-      data: elem.values
+      data: $.extend(true, [], elem.values)
     }));
 
     config.data = {
@@ -251,7 +266,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       return;
     }
 
-    if (config.type === Chart.Type.PIE || config.type === Chart.Type.DOUGHNUT || config.type === Chart.Type.POLAR_AREA || config.type === Chart.Type.RADAR) {
+    if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.RADAR)) {
       let maxSegments = config.options.maxSegments;
       if (!(maxSegments && config.data.datasets.length && maxSegments < config.data.datasets[0].data.length)) {
         return;
@@ -269,13 +284,14 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       config.data.labels = newLabels;
       config.data.maxSegmentsExceeded = true;
     }
-    if (config.type === Chart.Type.BUBBLE) {
+    if (config.type === Chart.Type.BUBBLE && !(config.bubble || {}).bubbleScalingFactor) {
       let maxR = this._computeMaxMinValue(config.data, 'r', true).maxValue;
       if (maxR > 0 && (config.bubble || {}).sizeOfLargestBubble) {
-        this.bubbleScalingFactor = config.bubble.sizeOfLargestBubble / maxR;
+        let bubbleScalingFactor = config.bubble.sizeOfLargestBubble / maxR;
         config.data.datasets.forEach(dataset => dataset.data.forEach(data => {
-          data.r = data.r * this.bubbleScalingFactor;
+          data.r = data.r * bubbleScalingFactor;
         }));
+        config.bubble = $.extend(true, {}, config.bubble, {bubbleScalingFactor: bubbleScalingFactor});
       }
     }
   }
@@ -290,13 +306,20 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     config.options = $.extend(true, {}, config.options, {
       hover: {
         mode: 'nearest'
+      },
+      tooltips: {
+        callbacks: {
+          title: this._tooltipTitle,
+          label: this._tooltipLabel,
+          labelColor: this._tooltipLabelColor
+        }
       }
     });
-    if (type === Chart.Type.POLAR_AREA || type === Chart.Type.RADAR) {
+    if (scout.isOneOf(type, Chart.Type.POLAR_AREA, Chart.Type.RADAR)) {
       config.options = $.extend(true, {}, config.options, {
         scale: {}
       });
-    } else if (type === Chart.Type.BAR || type === Chart.Type.LINE || type === Chart.Type.BUBBLE) {
+    } else if (scout.isOneOf(type, Chart.Type.BAR, Chart.Type.LINE, Chart.Type.BUBBLE)) {
       config.options = $.extend(true, {}, config.options, {
         scales: {
           xAxes: [{}],
@@ -359,10 +382,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
 
     if (config.options.plugins && config.options.plugins.datalabels && config.options.plugins.datalabels.display) {
-      if (config.type === Chart.Type.PIE || config.type === Chart.Type.DOUGHNUT) {
+      config.options.plugins.datalabels.formatter = this._datalabelsFormatter;
+      if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT)) {
         config.options.plugins.datalabels.display = this._radialChartDatalabelsDisplayHandler;
         config.options.plugins.datalabels.formatter = this._radialChartDatalabelsFormatter;
-      } else if (config.type === Chart.Type.BAR || config.type === Chart.Type.LINE || config.type === Chart.Type.POLAR_AREA || config.type === Chart.Type.RADAR || config.type === Chart.Type.BUBBLE) {
+      } else if (scout.isOneOf(config.type, Chart.Type.BAR, Chart.Type.LINE, Chart.Type.POLAR_AREA, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
         config.options.plugins.datalabels.display = 'auto';
         config.options.plugins.datalabels.backgroundColor = this._datalabelBackgroundColorHandler;
         config.options.plugins.datalabels.borderRadius = 4;
@@ -443,6 +467,13 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     return roundedResults[context.dataIndex];
   }
 
+  _formatDatalabels(value, context) {
+    if (context.chart.config.type === Chart.Type.BUBBLE) {
+      return this._formatLabel(value.r / (context.chart.config.bubble.bubbleScalingFactor || 1));
+    }
+    return this._formatLabel(value);
+  }
+
   _computeSumOfVisibleElements(context) {
     let dataset = context.dataset,
       meta = context.chart.getDatasetMeta(context.datasetIndex),
@@ -468,7 +499,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       type = config.type,
       autoColor = config.options && config.options.autoColor;
 
-    let multipleColorsPerDataset = autoColor && (type === Chart.Type.PIE || type === Chart.Type.DOUGHNUT || type === Chart.Type.POLAR_AREA),
+    let multipleColorsPerDataset = autoColor && scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA),
       colors = {
         backgroundColors: [],
         borderColors: [],
@@ -479,7 +510,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         datalabelColor: undefined,
         axisLabelColor: undefined,
         gridColor: undefined,
-        pointHoverColor: undefined
+        pointHoverColor: undefined,
+        tooltipBackgroundColor: undefined,
+        tooltipBorderColor: undefined
       };
 
     colors.labelColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'label'], 'fill').fill;
@@ -488,6 +521,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     colors.axisLabelColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'axis-label'], 'fill').fill;
     colors.gridColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'grid'], 'fill').fill;
     colors.pointHoverColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'point hover'], 'fill').fill;
+    colors.tooltipBackgroundColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'tooltip-background'], 'fill').fill;
+    colors.tooltipBorderColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'tooltip-border'], 'fill').fill;
 
     if (autoColor) {
       let colorsLength = multipleColorsPerDataset ? ((data.datasets.length && data.datasets[0].data.length) || 0) : data.datasets.length;
@@ -501,12 +536,12 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       colors.borderColors = this._computeColors(this.chart.data);
       if (type === Chart.Type.POLAR_AREA) {
         colors.backgroundColors = this._computeColors(this.chart.data, 0.7);
-      } else if (type === Chart.Type.LINE || type === Chart.Type.RADAR || type === Chart.Type.BUBBLE) {
+      } else if (scout.isOneOf(type, Chart.Type.LINE, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
         colors.backgroundColors = this._computeColors(this.chart.data, 0.2);
       } else {
         colors.backgroundColors = colors.borderColors;
       }
-      if (type === Chart.Type.PIE || type === Chart.Type.DOUGHNUT || type === Chart.Type.POLAR_AREA) {
+      if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
         let borderColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'stroke-color0'], 'stroke').stroke;
         colors.borderColors = Array(colors.borderColors.length).fill(borderColor);
         colors.hoverBorderColors = colors.borderColors;
@@ -525,8 +560,14 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       config.options = $.extend(true, {}, config.options, {
         legend: {
           labels: {
-            fontColor: colors.labelColor
+            fontColor: colors.labelColor,
+            generateLabels: this._legendLabelGenerator
           }
+        },
+        tooltips: {
+          backgroundColor: colors.tooltipBackgroundColor,
+          borderColor: colors.tooltipBorderColor,
+          multiKeyBackground: colors.tooltipBackgroundColor
         }
       });
       if (config.options.scale) {
@@ -559,49 +600,142 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         });
       }
     }
-
-    config.options = $.extend(true, {}, config.options, {
-      legend: {
-        labels: {
-          generateLabels: this._legendLabelGenerator
-        }
-      }
-    });
   }
 
   _computeColors(chartData, opacity = 1) {
-    let colors = [],
-      opacityHex = Math.round(opacity * 255).toString(16);
-    if (opacityHex.length === 1) {
-      opacityHex = '0' + opacityHex;
-    }
-    chartData.chartValueGroups.forEach(elem => colors.push(elem.colorHexValue + opacityHex));
+    let colors = [];
+    chartData.chartValueGroups.forEach(elem => colors.push(this._adjustColorOpacity(elem.colorHexValue, opacity)));
     return colors;
   }
 
+  _adjustColorOpacity(color, opacity = 1) {
+    if (!color) {
+      return color;
+    }
+
+    if (color.indexOf('rgb') === 0) {
+      return this._adjustRgbColorOpacity(color, opacity);
+    }
+    if (color.indexOf('#') === 0) {
+      return this._adjustHexColorOpacity(color, opacity);
+    }
+    return color;
+  }
+
+  _adjustRgbColorOpacity(rgbColor, opacity = 1) {
+    if (!rgbColor || rgbColor.indexOf('rgb') !== 0) {
+      return rgbColor;
+    }
+    let rgba = styles.rgb(rgbColor);
+    rgba.alpha = opacity;
+    return 'rgba(' + rgba.red + ', ' + rgba.green + ', ' + rgba.blue + ', ' + rgba.alpha + ')';
+  }
+
+  _adjustHexColorOpacity(hexColor, opacity = 1) {
+    if (!hexColor || hexColor.indexOf('#') !== 0) {
+      return hexColor;
+    }
+    if (hexColor.length > 7) {
+      hexColor = hexColor.substring(0, 7);
+    }
+    let opacityHex = Math.round(opacity * 255).toString(16);
+    if (opacityHex.length === 1) {
+      opacityHex = '0' + opacityHex;
+    }
+    return hexColor + opacityHex;
+  }
+
   _generateLegendLabels(chart) {
-    let defaultGenerateLabels = (((ChartJs.defaults[chart.config.type] || {}).legend || {}).labels || {}).generateLabels || ChartJs.defaults.global.legend.labels.generateLabels;
+    let config = chart.config,
+      data = config.data;
+    let defaultGenerateLabels = (((ChartJs.defaults[config.type] || {}).legend || {}).labels || {}).generateLabels || ChartJs.defaults.global.legend.labels.generateLabels;
     let labels = defaultGenerateLabels.call(chart, chart);
     labels.forEach((elem, idx) => {
-      if (chart.config.type === Chart.Type.LINE || chart.config.type === Chart.Type.RADAR || chart.config.type === Chart.Type.BUBBLE) {
-        elem.fillStyle = chart.config.data.datasets[idx].borderColor;
-      } else if (chart.config.type === Chart.Type.POLAR_AREA) {
-        if (chart.config.options.autoColor) {
-          let rgba = styles.rgb(chart.config.data.datasets[0].backgroundColor[idx]);
-          rgba.alpha = 1;
-          elem.fillStyle = 'rgba(' + rgba.red + ', ' + rgba.green + ', ' + rgba.blue + ', ' + rgba.alpha + ')';
-        }
+      if (scout.isOneOf(config.type, Chart.Type.LINE, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
+        elem.fillStyle = data.datasets[idx].borderColor;
+      } else if (config.type === Chart.Type.POLAR_AREA) {
+        elem.fillStyle = this._adjustColorOpacity(config.options.autoColor ? data.datasets[0].backgroundColor[idx] : data.datasets[0].backgroundColor, 1);
       }
       elem.strokeStyle = elem.fillStyle;
     });
     return labels;
   }
 
+  _formatTooltipTitle(tooltipItems, data) {
+    let config = this.chartJs.config,
+      tooltipItem = tooltipItems[0];
+    if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
+      return data.datasets[tooltipItem.datasetIndex].label;
+    }
+    if (scout.isOneOf(config.type, Chart.Type.LINE, Chart.Type.BAR, Chart.Type.RADAR)) {
+      return data.labels[tooltipItem.index];
+    }
+    if (config.type === Chart.Type.BUBBLE) {
+      let xAxisLabel = config.options.scales.xAxes[0].scaleLabel.labelString,
+        yAxisLabel = config.options.scales.yAxes[0].scaleLabel.labelString;
+      xAxisLabel = xAxisLabel ? (xAxisLabel + ':') : ChartJsRenderer.ARROW_LEFT_RIGHT;
+      yAxisLabel = yAxisLabel ? (yAxisLabel + ':') : ' ' + ChartJsRenderer.ARROW_UP_DOWN + ' ';
+      return [xAxisLabel + ' ' + this._formatXLabel(tooltipItem.xLabel),
+        yAxisLabel + ' ' + this._formatYLabel(tooltipItem.yLabel)];
+    }
+    let defaultTitle = (((ChartJs.defaults[config.type] || {}).tooltips || {}).callbacks || {}).title || ChartJs.defaults.global.tooltips.callbacks.title;
+    return defaultTitle.call(this.chartJs, tooltipItems, data);
+  }
+
+  _formatTooltipLabel(tooltipItem, data) {
+    let config = this.chartJs.config,
+      dataset = ((data || {}).datasets || [])[tooltipItem.datasetIndex];
+    if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
+      return ' ' + data.labels[tooltipItem.index] + ': ' + this._formatLabel(dataset.data[tooltipItem.index]);
+    }
+    if (scout.isOneOf(config.type, Chart.Type.LINE, Chart.Type.BAR, Chart.Type.RADAR)) {
+      return ' ' + dataset.label + ': ' + this._formatLabel(dataset.data[tooltipItem.index]);
+    }
+    if (config.type === Chart.Type.BUBBLE) {
+      return ' ' + dataset.label + ': ' + this._formatLabel(dataset.data[tooltipItem.index].r / (config.bubble.bubbleScalingFactor || 1));
+    }
+    let defaultLabel = (((ChartJs.defaults[config.type] || {}).tooltips || {}).callbacks || {}).label || ChartJs.defaults.global.tooltips.callbacks.label;
+    return ' ' + defaultLabel.call(this.chartJs, tooltipItem, data);
+  }
+
+  _computeTooltipLabelColor(tooltipItem, chart) {
+    let config = chart.config,
+      autoColor = config.options.autoColor,
+      tooltipBackgroundColor = ((config.options || {}).tooltips || {}).backgroundColor,
+      dataset = ((chart.data || {}).datasets || [])[tooltipItem.datasetIndex];
+    if (scout.isOneOf(config.type, Chart.Type.LINE, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
+      return {
+        borderColor: tooltipBackgroundColor,
+        backgroundColor: dataset.borderColor
+      };
+    }
+    if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT)) {
+      return {
+        borderColor: tooltipBackgroundColor,
+        backgroundColor: autoColor ? dataset.backgroundColor[tooltipItem.index] : dataset.backgroundColor
+      };
+    }
+    if (config.type === Chart.Type.BAR) {
+      return {
+        borderColor: tooltipBackgroundColor,
+        backgroundColor: dataset.backgroundColor
+      };
+    }
+    if (config.type === Chart.Type.POLAR_AREA) {
+      return {
+        borderColor: tooltipBackgroundColor,
+        backgroundColor: this._adjustColorOpacity(autoColor ? dataset.backgroundColor[tooltipItem.index] : dataset.backgroundColor, 1)
+      };
+    }
+    let defaultLabelColor = (((ChartJs.defaults[config.type] || {}).tooltips || {}).callbacks || {}).labelColor || ChartJs.defaults.global.tooltips.callbacks.labelColor;
+    return defaultLabelColor.call(chart, tooltipItem, chart);
+  }
+
   _adjustGrid(config, chartArea) {
     if (!config || !config.type || !config.options || (!config.options.scale && !config.options.scales) || !chartArea) {
       return;
     }
-    if (!(config.type === Chart.Type.BAR || config.type === Chart.Type.LINE || config.type === Chart.Type.POLAR_AREA || config.type === Chart.Type.RADAR || config.type === Chart.Type.BUBBLE)) {
+    if (!scout.isOneOf(config.type, Chart.Type.BAR, Chart.Type.LINE, Chart.Type.POLAR_AREA, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
       return;
     }
 
@@ -803,7 +937,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _onHover(event, items) {
-    if (this.chartJs.config && this.chartJs.config.type && (this.chartJs.config.type === Chart.Type.LINE || this.chartJs.config.type === Chart.Type.RADAR) && this.chartJs.config.options && this.chartJs.config.options.autoColor) {
+    if (this.chartJs.config && this.chartJs.config.type && scout.isOneOf(this.chartJs.config.type, Chart.Type.LINE, Chart.Type.RADAR) && this.chartJs.config.options && this.chartJs.config.options.autoColor) {
       let update = false;
       if (this.resetDatasetAfterHover) {
         this._adjustColors(this.chartJs.config);
@@ -840,7 +974,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _onLegendHover(event, item, animated) {
     let index = item.datasetIndex;
-    if (this.chartJs.config.type === Chart.Type.PIE || this.chartJs.config.type === Chart.Type.DOUGHNUT || this.chartJs.config.type === Chart.Type.POLAR_AREA) {
+    if (scout.isOneOf(this.chartJs.config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
       index = item.index;
     }
     if (this.legendHoverDatasets.indexOf(index) < 0) {
@@ -866,7 +1000,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _onLegendLeave(event, item) {
     let index = item.datasetIndex;
-    if (this.chartJs.config.type === Chart.Type.PIE || this.chartJs.config.type === Chart.Type.DOUGHNUT || this.chartJs.config.type === Chart.Type.POLAR_AREA) {
+    if (scout.isOneOf(this.chartJs.config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
       index = item.index;
     }
     if (this.legendHoverDatasets.indexOf(index) > -1) {
@@ -888,7 +1022,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   _updateHoverStyle(index, enabled) {
     if (this.chartJs.config.type === Chart.Type.LINE) {
       this.chartJs.updateHoverStyle(this.chartJs.getDatasetMeta(index).data, 'point', enabled);
-    } else if (this.chartJs.config.type === Chart.Type.PIE || this.chartJs.config.type === Chart.Type.DOUGHNUT || this.chartJs.config.type === Chart.Type.POLAR_AREA) {
+    } else if (scout.isOneOf(this.chartJs.config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
       let elements = [];
       for (let i = 0; i < this.chartJs.config.data.datasets.length; i++) {
         elements.push(this.chartJs.getDatasetMeta(i).data[index]);
@@ -903,7 +1037,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _isMaxSegmentsExceeded(config, index) {
-    if (config.type === Chart.Type.PIE || config.type === Chart.Type.DOUGHNUT || config.type === Chart.Type.POLAR_AREA || config.type === Chart.Type.RADAR) {
+    if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.RADAR)) {
       if (!config.data.maxSegmentsExceeded || !config.options.maxSegments) {
         return false;
       }
