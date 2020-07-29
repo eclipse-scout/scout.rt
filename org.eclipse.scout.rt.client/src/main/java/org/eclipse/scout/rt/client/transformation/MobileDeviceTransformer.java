@@ -38,9 +38,11 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
+import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 /**
@@ -301,6 +303,10 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     // The actual label of the boolean field is on the right side and position=top has no effect.
     // Removing the label actually removes the place on the left side so that it gets aligned to the other fields.
     if (field instanceof IBooleanField) {
+      field.setLabelVisible(false);
+    }
+    else if (!StringUtility.hasText(field.getLabel()) && !(field instanceof ITabBox)) {
+      // If label is empty and moved to top it will waste space -> don't show it
       field.setLabelVisible(false);
     }
   }
