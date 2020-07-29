@@ -56,6 +56,9 @@ export default class HtmlEnvironment {
     return this.events.off(type, func);
   }
 
+  /**
+   * @returns {HtmlEnvironment}
+   */
   static get() {
     return instance;
   }
