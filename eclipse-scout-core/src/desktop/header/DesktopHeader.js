@@ -28,8 +28,11 @@ export default class DesktopHeader extends Widget {
     super._init(model);
     this.desktop = this.session.desktop;
     this.updateViewButtonBoxVisibility();
-    // create view tab area
-    this.tabArea = scout.create('SimpleTabArea', $.extend({
+    this.tabArea = this._createTabArea();
+  }
+
+  _createTabArea() {
+    return scout.create('SimpleTabArea', $.extend({
       parent: this
     }, this.tabArea));
   }
@@ -67,11 +70,15 @@ export default class DesktopHeader extends Widget {
     if (this.toolBox) {
       return;
     }
-    this.toolBox = scout.create('DesktopToolBox', {
+    this.toolBox = this._createToolBox();
+    this.toolBox.render();
+  }
+
+  _createToolBox() {
+    return scout.create('DesktopToolBox', {
       parent: this,
       menus: this.desktop.menus
     });
-    this.toolBox.render();
   }
 
   _removeToolBox() {
@@ -106,14 +113,18 @@ export default class DesktopHeader extends Widget {
       return;
     }
     if (!this.logo) {
-      this.logo = scout.create('DesktopLogo', {
-        parent: this,
-        url: this.logoUrl
-      });
+      this.logo = this._createLogo();
       this.logo.render();
     } else {
       this.logo.setUrl(this.logoUrl);
     }
+  }
+
+  _createLogo() {
+    return scout.create('DesktopLogo', {
+      parent: this,
+      url: this.logoUrl
+    });
   }
 
   _removeLogo() {
@@ -128,10 +139,7 @@ export default class DesktopHeader extends Widget {
     if (this.viewButtonBox) {
       return;
     }
-    this.viewButtonBox = scout.create('ViewButtonBox', {
-      parent: this,
-      viewButtons: this.desktop.viewButtons
-    });
+    this.viewButtonBox = this._createViewButtonBox();
     this.viewButtonBox.on('propertyChange', this._viewButtonBoxPropertyChangeHandler);
     this.viewButtonBox.render();
     this.viewButtonBox.$container.prependTo(this.$container);
@@ -139,6 +147,13 @@ export default class DesktopHeader extends Widget {
       this.viewButtonBox.sendToBack();
     }
     this.updateViewButtonStyling();
+  }
+
+  _createViewButtonBox() {
+    return scout.create('ViewButtonBox', {
+      parent: this,
+      viewButtons: this.desktop.viewButtons
+    });
   }
 
   _removeViewButtonBox() {
