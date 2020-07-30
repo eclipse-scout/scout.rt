@@ -11,7 +11,7 @@
 import {scout} from '../../../src/index';
 
 describe('ViewButtonBox', () => {
-  let session, desktop, outlineHelper;
+  let session;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -154,7 +154,6 @@ describe('ViewButtonBox', () => {
       expect(viewButtonBox.viewMenuTab.visible).toBe(false);
       expect(viewButtonBox.tabButtons.length).toBe(2);
       expect(viewButtonBox.menuButtons.length).toBe(0);
-
     });
 
     it('will be rendered correctly when visibility changes dynamically.', () => {
@@ -182,6 +181,78 @@ describe('ViewButtonBox', () => {
       expect(viewButtonBox.viewMenuTab.visible).toBe(false);
       expect(viewButtonBox.tabButtons.length).toBe(1);
       expect(viewButtonBox.menuButtons.length).toBe(0);
+    });
+
+    it('will remember the current view button when selecting another tab', () => {
+      let viewButtons = [
+        scout.create('ViewButton', {
+          parent: session.desktop,
+          text: 'Button1',
+          displayStyle: 'MENU',
+          selected: true
+        }),
+        scout.create('ViewButton', {
+          parent: session.desktop,
+          text: 'Button2',
+          displayStyle: 'MENU'
+        }),
+        scout.create('ViewButton', {
+          parent: session.desktop,
+          text: 'Button3',
+          displayStyle: 'TAB'
+        })
+      ];
+      viewButtonBox.setViewButtons(viewButtons);
+
+      expect(viewButtonBox.viewMenuTab.visible).toBe(true);
+      expect(viewButtonBox.tabButtons.length).toBe(1);
+      expect(viewButtonBox.menuButtons.length).toBe(2);
+
+      expect(viewButtonBox.viewMenuTab.selected).toBe(true);
+      expect(viewButtonBox.viewMenuTab.selectedButton).toBeDefined();
+      expect(viewButtonBox.viewMenuTab.selectedButton.cloneOf).toBe(viewButtons[0]);
+      expect(viewButtons[0].selected).toBe(true);
+      expect(viewButtons[1].selected).toBe(false);
+      expect(viewButtons[2].selected).toBe(false);
+      expect(viewButtons[0].selectedAsMenu).toBe(true);
+      expect(viewButtons[1].selectedAsMenu).toBe(false);
+      expect(viewButtons[2].selectedAsMenu).toBe(false);
+
+      viewButtons[0].setSelected(false);
+      viewButtons[2].setSelected(true);
+      expect(viewButtonBox.viewMenuTab.selected).toBe(false);
+      expect(viewButtonBox.viewMenuTab.selectedButton).toBeDefined();
+      expect(viewButtonBox.viewMenuTab.selectedButton.cloneOf).toBe(viewButtons[0]);
+      expect(viewButtons[0].selected).toBe(false);
+      expect(viewButtons[1].selected).toBe(false);
+      expect(viewButtons[2].selected).toBe(true);
+      expect(viewButtons[0].selectedAsMenu).toBe(true);
+      expect(viewButtons[1].selectedAsMenu).toBe(false);
+      expect(viewButtons[2].selectedAsMenu).toBe(false);
+
+      viewButtons[2].setSelected(false);
+      viewButtons[1].setSelected(true);
+      expect(viewButtonBox.viewMenuTab.selected).toBe(true);
+      expect(viewButtonBox.viewMenuTab.selectedButton).toBeDefined();
+      expect(viewButtonBox.viewMenuTab.selectedButton.cloneOf).toBe(viewButtons[1]);
+      expect(viewButtons[0].selected).toBe(false);
+      expect(viewButtons[1].selected).toBe(true);
+      expect(viewButtons[2].selected).toBe(false);
+      expect(viewButtons[0].selectedAsMenu).toBe(false);
+      expect(viewButtons[1].selectedAsMenu).toBe(true);
+      expect(viewButtons[2].selectedAsMenu).toBe(false);
+
+      viewButtons[1].setSelected(false);
+      viewButtons[2].setSelected(true);
+      expect(viewButtonBox.viewMenuTab.selected).toBe(false);
+      expect(viewButtonBox.viewMenuTab.selectedButton).toBeDefined();
+      expect(viewButtonBox.viewMenuTab.selectedButton.cloneOf).toBe(viewButtons[1]);
+      expect(viewButtons[0].selected).toBe(false);
+      expect(viewButtons[1].selected).toBe(false);
+      expect(viewButtons[2].selected).toBe(true);
+      expect(viewButtons[0].selectedAsMenu).toBe(false);
+      expect(viewButtons[1].selectedAsMenu).toBe(true);
+      expect(viewButtons[2].selectedAsMenu).toBe(false);
     });
   });
 

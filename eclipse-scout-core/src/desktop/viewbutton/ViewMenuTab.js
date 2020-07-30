@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics, HtmlComponent, icons, KeyStrokeContext, scout, ViewMenuOpenKeyStroke, Widget} from '../../index';
+import {arrays, graphics, HtmlComponent, icons, KeyStrokeContext, scout, ViewMenuOpenKeyStroke, Widget} from '../../index';
 
 /**
  * Shows a list of view buttons with displayStyle=MENU
@@ -84,7 +84,7 @@ export default class ViewMenuTab extends Widget {
     if (selectedButton) {
       this.setSelectedButton(selectedButton);
     } else {
-      this.setSelectedButton(this.viewButtons[0]);
+      this.setSelectedButton(arrays.find(this.viewButtons, v => v.selectedAsMenu) || this.viewButtons[0]);
     }
     this.setSelected(!!selectedButton);
   }
@@ -99,6 +99,8 @@ export default class ViewMenuTab extends Widget {
   }
 
   _setSelectedButton(viewButton) {
+    this.viewButtons.forEach(vb => vb.setSelectedAsMenu(vb === viewButton));
+
     viewButton = viewButton.clone({
       parent: this,
       displayStyle: 'TAB'
@@ -147,14 +149,7 @@ export default class ViewMenuTab extends Widget {
   }
 
   _findSelectedViewButton() {
-    let viewMenu;
-    for (let i = 0; i < this.viewButtons.length; i++) {
-      viewMenu = this.viewButtons[i];
-      if (viewMenu.selected) {
-        return viewMenu;
-      }
-    }
-    return null;
+    return arrays.find(this.viewButtons, v => v.selected);
   }
 
   /**
@@ -211,7 +206,7 @@ export default class ViewMenuTab extends Widget {
   onViewButtonSelected() {
     let viewButton = this._findSelectedViewButton();
     if (viewButton) {
-      this.setSelectedButton(this._findSelectedViewButton());
+      this.setSelectedButton(viewButton);
     }
     this.setSelected(!!viewButton);
     this._closePopup();

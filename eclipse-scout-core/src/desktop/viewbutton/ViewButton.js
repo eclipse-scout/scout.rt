@@ -16,6 +16,16 @@ export default class ViewButton extends Action {
     super();
     this.showTooltipWhenSelected = false;
     this.displayStyle = 'TAB';
+    /**
+     * Indicates if this view button is currently the "selected button" in the ViewMenuTab widget,
+     * i.e. if it was the last view button of type MENU to have been selected. Note that the
+     * "selected" property does not necessarily have to be true as well, since an other button of
+     * type TAB might currently be selected. This information is used when restoring the "selected
+     * button" when the ViewMenuTab widget is removed and restored again, e.g. when toggling the
+     * desktop's 'navigationVisible' property.
+     * @type {boolean}
+     */
+    this.selectedAsMenu = false;
     this._renderedAsMenu = false;
   }
 
@@ -77,5 +87,9 @@ export default class ViewButton extends Action {
    */
   _createActionKeyStroke() {
     return new ViewButtonActionKeyStroke(this);
+  }
+
+  setSelectedAsMenu(selectedAsMenu) {
+    this.selectedAsMenu = selectedAsMenu;
   }
 }
