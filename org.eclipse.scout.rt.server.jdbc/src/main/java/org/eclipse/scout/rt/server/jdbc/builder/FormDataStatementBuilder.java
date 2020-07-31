@@ -1313,11 +1313,6 @@ public class FormDataStatementBuilder implements DataModelConstants {
         negation = true;
         break;
       }
-      case OPERATOR_TIME_IS_NOT_NOW: {
-        positiveOperation = OPERATOR_TIME_IS_NOW;
-        negation = true;
-        break;
-      }
       default: {
         positiveOperation = operation;
         negation = false;
@@ -1893,48 +1888,6 @@ public class FormDataStatementBuilder implements DataModelConstants {
           addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
         }
         return m_sqlStyle.createNotStartsWith(sql, names[0]);
-      }
-      case OPERATOR_TIME_IS_IN_GE_HOURS: {
-        if (!plainBind) {
-          addBinds(names, values);
-        }
-        return m_sqlStyle.createTimeIsInGEHours(sql, names[0]);
-      }
-      case OPERATOR_TIME_IS_IN_GE_MINUTES: {
-        if (!plainBind) {
-          addBinds(names, values);
-        }
-        return m_sqlStyle.createTimeIsInGEMinutes(sql, names[0]);
-      }
-      case OPERATOR_TIME_IS_IN_HOURS: {
-        if (!plainBind) {
-          addBinds(names, values);
-        }
-        return m_sqlStyle.createTimeIsInHours(sql, names[0]);
-      }
-      case OPERATOR_TIME_IS_IN_LE_HOURS: {
-        if (!plainBind) {
-          addBinds(names, values);
-        }
-        return m_sqlStyle.createTimeIsInLEHours(sql, names[0]);
-      }
-      case OPERATOR_TIME_IS_IN_LE_MINUTES: {
-        if (!plainBind) {
-          addBinds(names, values);
-        }
-        return m_sqlStyle.createTimeIsInLEMinutes(sql, names[0]);
-      }
-      case OPERATOR_TIME_IS_IN_MINUTES: {
-        if (!plainBind) {
-          addBinds(names, values);
-        }
-        return m_sqlStyle.createTimeIsInMinutes(sql, names[0]);
-      }
-      case OPERATOR_TIME_IS_NOW: {
-        return m_sqlStyle.createTimeIsNow(sql);
-      }
-      case OPERATOR_TIME_IS_NOT_NOW: {
-        return m_sqlStyle.createTimeIsNotNow(sql);
       }
       default: {
         throw new IllegalArgumentException("invalid operator: " + operation);

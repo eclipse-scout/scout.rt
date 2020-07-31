@@ -67,12 +67,6 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
         if (attribute.isNotOperatorEnabled() && attribute.isNullOperatorEnabled()) {
           operatorList.add(DataModelAttributeOp.create(OPERATOR_NOT_NULL));
         }
-        operatorList.add(DataModelAttributeOp.create(OPERATOR_TIME_IS_IN_GE_HOURS));
-        operatorList.add(DataModelAttributeOp.create(OPERATOR_TIME_IS_IN_GE_MINUTES));
-        operatorList.add(DataModelAttributeOp.create(OPERATOR_TIME_IS_IN_HOURS));
-        operatorList.add(DataModelAttributeOp.create(OPERATOR_TIME_IS_IN_LE_HOURS));
-        operatorList.add(DataModelAttributeOp.create(OPERATOR_TIME_IS_IN_LE_MINUTES));
-        operatorList.add(DataModelAttributeOp.create(OPERATOR_TIME_IS_NOW));
         break;
       }
       case IDataModelAttribute.TYPE_DATE: {
@@ -337,22 +331,6 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
         return new StartsWith(OPERATOR_STARTS_WITH, (shortText == null) ? TEXTS.get("LogicStartsWith") : shortText, (text == null) ? TEXTS.get("LogicStartsWith") : text, explanationText);
       case OPERATOR_NOT_STARTS_WITH:
         return new NotStartsWith(OPERATOR_NOT_STARTS_WITH, (shortText == null) ? TEXTS.get("LogicNotStartsWith") : shortText, (text == null) ? TEXTS.get("LogicNotStartsWith") : text, explanationText);
-      case OPERATOR_TIME_IS_IN_GE_HOURS:
-        return new TimeIsInGEHours(OPERATOR_TIME_IS_IN_GE_HOURS, (shortText == null) ? TEXTS.get("LogicTimeIsInGEHours") : shortText, (text == null) ? TEXTS.get("LogicTimeIsInGEHours") : text, explanationText);
-      case OPERATOR_TIME_IS_IN_GE_MINUTES:
-        return new TimeIsInGEMinutes(OPERATOR_TIME_IS_IN_GE_MINUTES, (shortText == null) ? TEXTS.get("LogicTimeIsInGEMinutes") : shortText, (text == null) ? TEXTS.get("LogicTimeIsInGEMinutes") : text, explanationText);
-      case OPERATOR_TIME_IS_IN_HOURS:
-        return new TimeIsInHours(OPERATOR_TIME_IS_IN_HOURS, (shortText == null) ? TEXTS.get("LogicTimeIsInHours") : shortText, (text == null) ? TEXTS.get("LogicTimeIsInHours") : text, explanationText);
-      case OPERATOR_TIME_IS_IN_LE_HOURS:
-        return new TimeIsInLEHours(OPERATOR_TIME_IS_IN_LE_HOURS, (shortText == null) ? TEXTS.get("LogicTimeIsInLEHours") : shortText, (text == null) ? TEXTS.get("LogicTimeIsInLEHours") : text, explanationText);
-      case OPERATOR_TIME_IS_IN_LE_MINUTES:
-        return new TimeIsInLEMinutes(OPERATOR_TIME_IS_IN_LE_MINUTES, (shortText == null) ? TEXTS.get("LogicTimeIsInLEMinutes") : shortText, (text == null) ? TEXTS.get("LogicTimeIsInLEMinutes") : text, explanationText);
-      case OPERATOR_TIME_IS_IN_MINUTES:
-        return new TimeIsInMinutes(OPERATOR_TIME_IS_IN_MINUTES, (shortText == null) ? TEXTS.get("LogicTimeIsInMinutes") : shortText, (text == null) ? TEXTS.get("LogicTimeIsInMinutes") : text, explanationText);
-      case OPERATOR_TIME_IS_NOW:
-        return new TimeIsNow(OPERATOR_TIME_IS_NOW, (shortText == null) ? TEXTS.get("LogicTimeIsNow") : shortText, (text == null) ? TEXTS.get("LogicTimeIsNow") : text, explanationText);
-      case OPERATOR_TIME_IS_NOT_NOW:
-        return new TimeIsNotNow(OPERATOR_TIME_IS_NOT_NOW, (shortText == null) ? TEXTS.get("LogicTimeIsNotNow") : shortText, (text == null) ? TEXTS.get("LogicTimeIsNotNow") : text, explanationText);
     }
     return null;
   }

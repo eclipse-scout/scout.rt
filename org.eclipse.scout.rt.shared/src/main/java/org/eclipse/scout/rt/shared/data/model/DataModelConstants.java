@@ -74,14 +74,15 @@ public interface DataModelConstants {
    */
   int TYPE_FULL_TEXT = 18;
   /**
-   * Attribute used for rich text searches. Note: since 16.2 this type is only used to store data from the old RichTextField (RichTextData).
-   * Now the SimpleHtmlEditorField is used in place of the old RichTextField. Like the regular HtmlEditorField this field produces a HTML
-   * string and uses the {@link #TYPE_HTML}. You should not use this type anymore.
+   * Attribute used for rich text searches. Note: since 16.2 this type is only used to store data from the old
+   * RichTextField (RichTextData). Now the SimpleHtmlEditorField is used in place of the old RichTextField. Like the
+   * regular HtmlEditorField this field produces a HTML string and uses the {@link #TYPE_HTML}. You should not use this
+   * type anymore.
    */
   int TYPE_RICH_TEXT = 19;
   /**
-   * Attribute used for HTML content (which is basically a simple string, but we need to distinct between regular strings and HTML strings because
-   * we must apply htmlEncode on regular strings but not on HTML strings.
+   * Attribute used for HTML content (which is basically a simple string, but we need to distinct between regular
+   * strings and HTML strings because we must apply htmlEncode on regular strings but not on HTML strings.
    */
   int TYPE_HTML = 20;
 
@@ -569,89 +570,6 @@ public interface DataModelConstants {
    * </p>
    */
   int OPERATOR_STARTS_WITH = 36;
-  /**
-   * <p>
-   * Is a time value (a float, 1 = one day) larger or equal to a time as many hours in the future as specified by a
-   * value?
-   * </p>
-   * <p>
-   * When using the SqlService, this corresponds to
-   * {@link org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle#createTimeIsInGEHours(String, String)}
-   * </p>
-   */
-  int OPERATOR_TIME_IS_IN_GE_HOURS = 37;
-  /**
-   * <p>
-   * Is a time value (a float, 1 = one day) larger or equal to a time as many minutes in the future as specified by a
-   * value?
-   * </p>
-   * <p>
-   * When using the SqlService, this corresponds to
-   * {@link org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle#createTimeIsInGEMinutes(String, String)}
-   * </p>
-   */
-  int OPERATOR_TIME_IS_IN_GE_MINUTES = 38;
-  /**
-   * <p>
-   * Is a time value (a float, 1 = one day) less or equal hours in the future as a value specified?
-   * </p>
-   * <p>
-   * When using the SqlService, this corresponds to
-   * {@link org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle#createTimeIsInHours(String, String)}
-   * </p>
-   */
-  int OPERATOR_TIME_IS_IN_HOURS = 39;
-  /**
-   * <p>
-   * Is a time value (a float, 1 = one day) less or equal to a time as many hours in the future as specified by a value?
-   * </p>
-   * <p>
-   * When using the SqlService, this corresponds to
-   * {@link org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle#createTimeIsInLEHours(String, String)}
-   * </p>
-   */
-  int OPERATOR_TIME_IS_IN_LE_HOURS = 40;
-  /**
-   * <p>
-   * Is a time value (a float, 1 = one day) less or equal to a time as many minutes in the future as specified by a
-   * value?
-   * </p>
-   * <p>
-   * When using the SqlService, this corresponds to
-   * {@link org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle#createTimeIsInLEMinutes(String, String)}
-   * </p>
-   */
-  int OPERATOR_TIME_IS_IN_LE_MINUTES = 41;
-  /**
-   * <p>
-   * Is a time value (a float, 1 = one day) a number of minutes in the future equal to a value?
-   * </p>
-   * <p>
-   * When using the SqlService, this corresponds to
-   * {@link org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle#createTimeIsInMinutes(String, String)}
-   * </p>
-   */
-  int OPERATOR_TIME_IS_IN_MINUTES = 42;
-  /**
-   * <p>
-   * Is a time value (a float, 1 = one day) not equal to the current time?
-   * </p>
-   * <p>
-   * When using the SqlService, this corresponds to
-   * {@link org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle#createTimeIsNotNow(String)}
-   * </p>
-   */
-  int OPERATOR_TIME_IS_NOT_NOW = 43;
-  /**
-   * <p>
-   * Is a time value (a float, 1 = one day) equal to the current time?
-   * </p>
-   * <p>
-   * When using the SqlService, this corresponds to
-   * {@link org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle#createTimeIsNow(String)}
-   * </p>
-   */
-  int OPERATOR_TIME_IS_NOW = 44;
   /**
    * <p>
    * Is a value between two other values (including those values)?
