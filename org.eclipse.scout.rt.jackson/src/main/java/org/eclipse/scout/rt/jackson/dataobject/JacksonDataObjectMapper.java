@@ -54,7 +54,10 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
       return null;
     }
     try {
-      return m_objectMapper.get().readValue(value, valueType);
+//      return m_objectMapper.get().readValue(value, valueType);
+
+      return m_objectMapper.get().readerFor(valueType).withAttribute("foo", "bar").readValue(value);
+
     }
     catch (IOException e) {
       throw BEANS.get(PlatformExceptionTranslator.class).translate(e);

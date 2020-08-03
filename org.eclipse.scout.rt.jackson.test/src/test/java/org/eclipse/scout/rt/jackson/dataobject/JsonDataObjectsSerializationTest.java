@@ -206,7 +206,9 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testDeserialize_TestBigIntegerDo() throws Exception {
     String inputJson = readResourceAsString("TestBigIntegerDo.json");
-    TestBigIntegerDo testDo = s_dataObjectMapper.readValue(inputJson, TestBigIntegerDo.class);
+//    TestBigIntegerDo testDo = s_dataObjectMapper.readValue(inputJson, TestBigIntegerDo.class);
+
+    TestBigIntegerDo testDo = s_dataObjectMapper.readerFor(TestBigIntegerDo.class).withAttribute("foo", "bar").readValue(inputJson);
     assertEquals("123456", testDo.getBigIntegerAttribute().toString());
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
@@ -1091,7 +1093,8 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testDeserialize_ComplexEntityDo() throws Exception {
     String jsonInput = readResourceAsString("TestComplexEntityDo.json");
-    TestComplexEntityDo testDo = s_dataObjectMapper.readValue(jsonInput, TestComplexEntityDo.class);
+    TestComplexEntityDo testDo = s_dataObjectMapper.readerFor(TestComplexEntityDo.class).withAttribute("foo", "bar").readValue(jsonInput);
+
     TestComplexEntityDo testDoExpected = createTestDo();
     assertEqualsWithComparisonFailure(testDoExpected, testDo);
   }

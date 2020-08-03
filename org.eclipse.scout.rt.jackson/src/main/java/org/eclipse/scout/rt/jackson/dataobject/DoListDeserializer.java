@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.type.ResolvedType;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -43,14 +42,14 @@ public class DoListDeserializer extends StdDeserializer<DoList<?>> {
     DoList<Object> list = new DoList<>();
     p.setCurrentValue(list);
     for (JsonToken t = p.nextToken(); t != JsonToken.END_ARRAY; t = p.nextToken()) {
-      ResolvedType elementType = resolveListElementType(p);
-      Object element = p.getCodec().readValue(p, elementType);
+      JavaType elementType = resolveListElementType(p);
+      Object element = ctxt.readValue(p, elementType);
       list.add(element);
     }
     return list;
   }
 
-  protected ResolvedType resolveListElementType(JsonParser p) {
+  protected JavaType resolveListElementType(JsonParser p) {
     if (p.getCurrentToken() == JsonToken.START_OBJECT) {
       // deserialize object-like JSON structure using specified type binding (DoList<T> generic parameter), fallback to generic DoEntity if no type information available
       JavaType listItemType = m_listType.getBindings().getBoundType(0);

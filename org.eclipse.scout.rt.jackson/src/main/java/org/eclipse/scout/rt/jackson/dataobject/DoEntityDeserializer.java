@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.type.ResolvedType;
 import com.fasterxml.jackson.core.util.JsonParserSequence;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
@@ -131,19 +130,23 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   }
 
   protected IDoEntity derializeDoEntityAttributes(JsonParser p, DeserializationContext ctxt, IDoEntity entity) throws IOException {
+
+//    Object val = ctxt.getAttribute("foo");
+//    System.out.println(val);
+
     // read and deserialize all fields of entity
     for (JsonToken t = p.currentToken(); t == JsonToken.FIELD_NAME; t = p.nextToken()) {
       String attributeName = p.getCurrentName();
       p.nextToken(); // let current token point to the value
       boolean isArray = p.getCurrentToken() == JsonToken.START_ARRAY;
       boolean isObject = p.getCurrentToken() == JsonToken.START_OBJECT;
-      ResolvedType attributeType = findResolvedAttributeType(entity, attributeName, isObject, isArray);
+      JavaType attributeType = findResolvedAttributeType(entity, attributeName, isObject, isArray);
       if (attributeType.hasRawClass(DoList.class)) {
-        DoList<?> listValue = p.getCodec().readValue(p, attributeType);
+        DoList<?> listValue = ctxt.readValue(p, attributeType);
         entity.putNode(attributeName, listValue);
       }
       else {
-        Object value = p.getCodec().readValue(p, attributeType);
+        Object value = ctxt.readValue(p, attributeType);
 
         // check if reading the 'type version' property
         if (m_moduleContext.getTypeVersionAttributeName().equals(attributeName)) {

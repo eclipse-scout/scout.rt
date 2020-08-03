@@ -46,9 +46,9 @@ public class DataObjectDeserializer extends StdDeserializer<IDataObject> {
   protected IDataObject deserializeDataObject(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException {
     switch (p.currentToken()) {
       case START_OBJECT:
-        return p.getCodec().readValue(p, IDoEntity.class); // delegate to DoEntityDeserializer for object-like structure
+        return ctxt.readValue(p, IDoEntity.class); // delegate to DoEntityDeserializer for object-like structure
       case START_ARRAY:
-        return p.getCodec().readValue(p, DoList.class); // delegate to DoListDeserializer for collection-like structure
+        return ctxt.readValue(p, DoList.class); // delegate to DoListDeserializer for collection-like structure
       default:
         throw ctxt.wrongTokenException(p, handledType(), JsonToken.START_OBJECT, "expected start object or start array token");
     }
