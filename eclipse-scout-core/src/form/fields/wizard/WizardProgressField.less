@@ -47,7 +47,6 @@
     line-height: normal;
     vertical-align: middle;
     table-layout: fixed;
-    max-width: 200px;
     min-height: 30px;
 
     & > .wizard-step-content-icon-container {
@@ -173,4 +172,42 @@
   font-size: 28px;
   color: @wizard-step-disabled-color;
   vertical-align: middle;
+}
+
+.wizard-steps.compact {
+  & > .wizard-steps-body {
+    height: @wizard-progress-compact-height;
+
+    & > .wizard-step {
+      padding-left: @wizard-progress-compact-content-h-padding - @wizard-progress-icon-container-padding;
+      padding-right: @wizard-progress-compact-content-h-padding;
+      height: @wizard-progress-compact-height - @wizard-progress-border-width;
+      line-height: @wizard-progress-compact-height - @wizard-progress-border-width;
+
+      & > .wizard-step-content {
+        min-height: 0;
+
+        & > .wizard-step-content-icon-container {
+          width: @wizard-progress-compact-icon-container-size;
+          height: @wizard-progress-compact-icon-container-size;
+          margin-right: @wizard-progress-compact-icon-container-margin-right;
+
+          & > .wizard-step-content-icon {
+            line-height: @wizard-progress-compact-icon-container-size - (2 * @wizard-progress-icon-container-padding) - (2 * @wizard-progress-icon-container-border-width);
+            font-size: 11px;
+
+            & > .icon {
+              font-size: 9px;
+            }
+          }
+        }
+      }
+    }
+
+    & > .wizard-step-separator {
+      padding-left: @wizard-progress-compact-content-h-padding;
+      padding-right: @wizard-progress-compact-content-h-padding;
+      font-size: 22px;
+    }
+  }
 }

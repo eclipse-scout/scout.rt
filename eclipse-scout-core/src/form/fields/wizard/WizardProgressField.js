@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, FormField, GroupBox, icons, inspector, scout, scrollbars, strings, tooltips, WizardProgressFieldLayout} from '../../../index';
+import {Device, Form, FormField, GroupBox, icons, inspector, scout, scrollbars, strings, tooltips, WizardProgressFieldLayout} from '../../../index';
 import $ from 'jquery';
 
 export default class WizardProgressField extends FormField {
@@ -36,6 +36,11 @@ export default class WizardProgressField extends FormField {
     this.addField(this.$parent.makeDiv('wizard-steps'));
     this.addStatus();
     this.addLabel();
+
+    // Add compact class on mobile. It is not based on width because height will be smaller too which is not desired on desktop or tablet
+    // (field would not be correctly aligned with other components anymore)
+    this.$field.toggleClass('compact', Device.get().type === Device.Type.MOBILE);
+    this.htmlComp.layout.compactFieldWidth = -1; // disable compact toggling
 
     this.$wizardStepsBody = this.$field.appendDiv('wizard-steps-body');
 
