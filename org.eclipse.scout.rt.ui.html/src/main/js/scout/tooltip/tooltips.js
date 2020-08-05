@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2016 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -174,6 +174,14 @@ scout.TooltipSupport.prototype._text = function($comp) {
   return text;
 };
 
+scout.TooltipSupport.prototype._htmlEnabled = function($comp) {
+  var htmlEnabled = this._options.htmlEnabled;
+  if ($.isFunction(htmlEnabled)) {
+    htmlEnabled = htmlEnabled($comp);
+  }
+  return htmlEnabled;
+};
+
 scout.TooltipSupport.prototype._showTooltip = function($comp) {
   if (!$comp || !$comp.isAttached()) {
     return; // removed in the meantime (this method is called using setTimeout)
@@ -182,6 +190,8 @@ scout.TooltipSupport.prototype._showTooltip = function($comp) {
   if (!text) {
     return; // treat undefined and no text as no tooltip
   }
+
+  var htmlEnabled = this._htmlEnabled($comp);
 
   if (this._tooltip && this._tooltip.rendered) {
     // update existing tooltip
@@ -192,7 +202,8 @@ scout.TooltipSupport.prototype._showTooltip = function($comp) {
     // create new tooltip
     var options = $.extend({}, this._options, {
       $anchor: $comp,
-      text: text
+      text: text,
+      htmlEnabled: htmlEnabled
     });
     this._tooltip = scout.create('Tooltip', options);
     this._tooltip.render(options.$parent);

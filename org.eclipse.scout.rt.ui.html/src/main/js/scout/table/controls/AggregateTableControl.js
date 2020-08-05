@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -82,12 +82,19 @@ scout.AggregateTableControl.prototype._renderAggregate = function() {
     }
     $cell = $(column.buildCell(cell, {}));
 
+    // install tooltips
+    this._installCellTooltip($cell);
+
     // If aggregation is based on the selection and not on all rows -> mark it
     if (this.aggregateRow.selection) {
       $cell.addClass('selection');
     }
 
     $cell.appendTo(this.$contentContainer);
+
+    if ($cell.isContentTruncated()) {
+      $cell.children('.table-cell-icon').setVisible(false);
+    }
   }, this);
 
   if (this.aggregateRow.selection) {
@@ -98,6 +105,26 @@ scout.AggregateTableControl.prototype._renderAggregate = function() {
 scout.AggregateTableControl.prototype._rerenderAggregate = function() {
   this.$contentContainer.empty();
   this._renderAggregate();
+};
+
+scout.AggregateTableControl.prototype._installCellTooltip = function($cell) {
+  scout.tooltips.install($cell, {
+    parent: this,
+    text: this._cellTooltipText.bind(this),
+    htmlEnabled: true,
+    arrowPosition: 50,
+    arrowPositionUnit: '%',
+    nativeTooltip: !scout.device.isCustomEllipsisTooltipPossible()
+  });
+};
+
+scout.AggregateTableControl.prototype._cellTooltipText = function($cell) {
+  if ($cell.text().trim() && ($cell.isContentTruncated() || ($cell.children('.table-cell-icon').length && !$cell.children('.table-cell-icon').isVisible()))) {
+    $cell = $cell.clone();
+    $cell.children('.table-cell-icon').setVisible(true);
+    return $cell.html();
+  }
+  return null;
 };
 
 scout.AggregateTableControl.prototype._aggregate = function() {
