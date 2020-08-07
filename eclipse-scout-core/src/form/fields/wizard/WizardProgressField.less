@@ -46,7 +46,6 @@
     display: inline-table;
     line-height: normal;
     vertical-align: middle;
-    table-layout: fixed;
     min-height: 30px;
 
     & > .wizard-step-content-icon-container {
@@ -60,12 +59,13 @@
       font-weight: bold;
 
       & > .wizard-step-content-icon {
-        text-align: center;
         height: 100%;
         width: 100%;
         border-radius: 50%;
         border: @wizard-progress-icon-container-border-width solid;
-        line-height: @wizard-progress-icon-container-size - (2 * @wizard-progress-icon-container-padding) - (2 * @wizard-progress-icon-container-border-width);
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
 
@@ -193,7 +193,6 @@
           margin-right: @wizard-progress-compact-icon-container-margin-right;
 
           & > .wizard-step-content-icon {
-            line-height: @wizard-progress-compact-icon-container-size - (2 * @wizard-progress-icon-container-padding) - (2 * @wizard-progress-icon-container-border-width);
             font-size: 11px;
 
             & > .icon {
