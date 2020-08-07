@@ -16,14 +16,18 @@ export default class WizardProgressField extends FormField {
   constructor() {
     super();
 
+    this.activeStepIndex = -1;
     this.steps = [];
 
     // Used to determine direction of transition ("going backward" or "going forward")
-    this.previousActiveStepIndex;
+    this.previousActiveStepIndex = -1;
 
     // Helper map to find a step by step index. The step index does not necessarily correspond to the
     // array index, because invisible model steps can produce "holes" in the sequence of indices.
     this.stepsMap = {};
+    this.$wizardStepsBody = null;
+    this.keepActiveStepAtLeftBorder = Device.get().type === Device.Type.MOBILE;
+    this.animateScrolling = Device.get().type === Device.Type.MOBILE;
   }
 
   _init(model) {
@@ -221,10 +225,18 @@ export default class WizardProgressField extends FormField {
 
   scrollToActiveStep() {
     let currentStep = this.stepsMap[this.activeStepIndex];
-    if (currentStep) {
-      let $currentStep = currentStep.$step;
+    if (!currentStep) {
+      return;
+    }
+    let $currentStep = currentStep.$step;
+    let currentStepLeft = $currentStep.position().left;
+    let animate = this.animateScrolling && this.htmlComp.layouted;
+    if (this.keepActiveStepAtLeftBorder) {
+      let $firstStep = this.steps[0].$step;
+      let scrollLeft = currentStepLeft - $firstStep.cssPaddingLeft() + $currentStep.cssPaddingLeft();
+      scrollbars.scrollLeft(this.$field, scrollLeft, {animate: animate});
+    } else {
       let scrollLeft = this.$field.scrollLeft();
-      let currentStepLeft = $currentStep.position().left;
       let currentStepWidth = $currentStep.width();
       let fieldWidth = this.$field.width();
 
@@ -234,7 +246,7 @@ export default class WizardProgressField extends FormField {
       let p1 = scrollLeft + Math.floor(fieldWidth * (goingBack ? 0.25 : 0.75));
       let p2 = currentStepLeft + Math.floor(currentStepWidth / 2);
       if ((goingBack && p2 < p1) || (!goingBack && p2 > p1)) {
-        scrollbars.scrollLeft(this.$field, scrollLeft + (p2 - p1));
+        scrollbars.scrollLeft(this.$field, scrollLeft + (p2 - p1), {animate: animate});
       }
     }
   }

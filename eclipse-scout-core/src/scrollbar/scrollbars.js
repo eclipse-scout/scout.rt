@@ -67,6 +67,8 @@ export function removeScrollable(session, $container) {
  * @param [options.axis] x, y or both. Default is both.
  * @param {boolean} [options.nativeScrollbars]
  * @param {boolean} [options.hybridScrollbars]
+ * @param {Session} [options.session]
+ * @param {Widget} [options.parent]
  */
 export function install($container, options) {
   options = _createDefaultScrollToOptions(options);
@@ -389,6 +391,13 @@ export function scrollHorizontalTo($scrollable, $element, options) {
   }
 }
 
+/**
+ * @param {$} $scrollable the scrollable object
+ * @param {number} scrollTop the new scroll position
+ * @param {object} [options]
+ * @param {boolean} [options.animate] whether the scrolling should be animated. Default is false.
+ * @param {boolean} [options.stop] whether the animation should be stopped. Default is false.
+ */
 export function scrollTop($scrollable, scrollTop, options) {
   options = _createDefaultScrollToOptions(options);
   let scrollbarElement = scrollbar($scrollable, 'y');
@@ -417,6 +426,13 @@ export function scrollTop($scrollable, scrollTop, options) {
   });
 }
 
+/**
+ * @param {$} $scrollable the scrollable object
+ * @param {number} scrollLeft the new scroll position
+ * @param {object} [options]
+ * @param {boolean} [options.animate] whether the scrolling should be animated. Default is false.
+ * @param {boolean} [options.stop] whether the animation should be stopped. Default is false.
+ */
 export function scrollLeft($scrollable, scrollLeft, options) {
   options = _createDefaultScrollToOptions(options);
   let scrollbarElement = scrollbar($scrollable, 'x');
