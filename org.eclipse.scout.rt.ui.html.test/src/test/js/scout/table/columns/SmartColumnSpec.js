@@ -54,4 +54,72 @@ describe('SmartColumn', function() {
     expect(field.value).toEqual(7);
   });
 
+
+  it('must use batch lookup calls when enabled', function() {
+    var table = helper.createTable({
+      columns: [{
+        objectType: 'SmartColumn',
+      }]
+    });
+
+    var lookupCall = scout.create('LookupCall', {session: session, batch: true});
+    table.columns[0].setLookupCall(lookupCall);
+
+    var valueMap = {key1: "Value 1", key2: "Value 2", key3: "Value 3"};
+    spyOn(lookupCall, 'textByKeys').and.returnValue($.resolvedPromise(valueMap));
+    spyOn(lookupCall, 'textByKey').and.callFake(function(key) {
+      return $.resolvedPromise(valueMap[key]);
+    });
+
+    var getRow = function(key) {
+      return {cells: [key]};
+    };
+
+    // insert 6 rows
+    table.insertRows(Object.keys(valueMap).concat(Object.keys(valueMap)).map(getRow));
+    table.render();
+    jasmine.clock().tick(500);
+
+    // text should get resolved with a single batch lookup call
+    expect(lookupCall.textByKeys).toHaveBeenCalledTimes(1);
+
+    var arrayEqualsIgnoreOrder = function(arr) {
+      return {
+        asymmetricMatch: function(compareTo) {
+          return scout.arrays.equalsIgnoreOrder(arr, compareTo);
+        },
+        jasmineToString: function() {
+          return "<arrayWithEqualElements: [" + arr.toString() + "]>";
+        }
+      };
+    };
+    // textByKeys should be called with unique keys
+    expect(lookupCall.textByKeys).toHaveBeenCalledWith(arrayEqualsIgnoreOrder(Object.keys(valueMap)));
+
+    table.insertRow(getRow('key1'));
+    jasmine.clock().tick(500);
+    expect(lookupCall.textByKeys).toHaveBeenCalledTimes(2);
+
+    table.insertRow(getRow('key2'));
+    jasmine.clock().tick(500);
+    expect(lookupCall.textByKeys).toHaveBeenCalledTimes(3);
+
+    // textByKey should never be called in batch mode
+    expect(lookupCall.textByKey).not.toHaveBeenCalled();
+
+    // disable batch mode, now textByKey should be called instead
+    lookupCall.setBatch(false);
+
+    table.insertRows(Object.keys(valueMap).map(getRow));
+    jasmine.clock().tick(500);
+
+    expect(lookupCall.textByKeys).toHaveBeenCalledTimes(3);
+    expect(lookupCall.textByKey).toHaveBeenCalledTimes(3);
+
+    // rows have texts returned by lookup call
+    table.rows.forEach(function(row) {
+      expect(row.cells[0].text).toEqual(valueMap[row.cells[0].value]);
+    });
+  });
+
 });

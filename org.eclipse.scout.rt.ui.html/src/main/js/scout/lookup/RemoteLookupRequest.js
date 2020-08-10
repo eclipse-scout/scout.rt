@@ -41,5 +41,6 @@ scout.QueryBy = {
   ALL: 'ALL',
   TEXT: 'TEXT',
   KEY: 'KEY',
+  KEYS: 'KEYS',
   REC: 'REC'
 };

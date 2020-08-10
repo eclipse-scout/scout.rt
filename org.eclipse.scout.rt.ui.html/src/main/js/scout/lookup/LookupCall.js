@@ -15,10 +15,12 @@ scout.LookupCall = function() {
   this.session = null;
   this.hierarchical = false;
   this.loadIncremental = false;
+  this.batch = false; // indicates if the lookup call implements <code>getByKeys</code> and therefore supports <code>textByKeys</code>
 
   this.queryBy = null;
   this.searchText = null; // used on QueryBy.TEXT
   this.key = null; // used on QueryBy.KEY
+  this.keys = null; // used on QueryBy.KEYS
   this.parentKey = null; // used on QueryBy.REC
 };
 
@@ -37,6 +39,10 @@ scout.LookupCall.prototype.setLoadIncremental = function(loadIncremental) {
 
 scout.LookupCall.prototype.setHierarchical = function(hierarchical) {
   this.hierarchical = hierarchical;
+};
+
+scout.LookupCall.prototype.setBatch = function(batch) {
+  this.batch = batch;
 };
 
 /**
@@ -65,6 +71,43 @@ scout.LookupCall.prototype._textByKey = function(key) {
     .then(function(result) {
       var lookupRow = scout.LookupCall.firstLookupRow(result);
       return lookupRow ? lookupRow.text : '';
+    });
+};
+
+/**
+ * This method may be called directly on any LookupCall. For the keys lookup an internal clone is created automatically.
+ *
+ * You should not override this function. Instead override <code>_textByKeys</code>.
+ *
+ * @returns {Promise} which returns an object that maps every key to the text of the resolved lookup row
+ */
+scout.LookupCall.prototype.textByKeys = function(keys) {
+  if (scout.arrays.empty(keys)) {
+    return $.resolvedPromise({});
+  }
+  return this._textByKeys(keys);
+};
+
+/**
+ * Override this function to provide your own textByKeys implementation.
+ *
+ * @returns {Promise} which returns an object that maps every key to the text of the lookup row
+ */
+scout.LookupCall.prototype._textByKeys = function(keys) {
+  return this
+    .cloneForKeys(keys)
+    .execute()
+    .then(function(result) {
+      if (!result || !scout.objects.isArray(result.lookupRows)) {
+        return {};
+      }
+
+      var textMap = {};
+      result.lookupRows.forEach(function(row) {
+        textMap[row.key] = row.text;
+      });
+
+      return textMap;
     });
 };
 
@@ -128,6 +171,26 @@ scout.LookupCall.prototype._getByKey = function(key) {
 };
 
 /**
+ * Only call this function if this LookupCall is not used again. Otherwise use <code>.cloneForKeys(keys).execute()</code> or <code>.clone().getByKeys(keys)</code>.
+ *
+ * You should not override this function. Instead override <code>_getByKeys</code>.
+ *
+ * @return {Promise} resolves to a result object with an array of {scout.LookupRow}s
+ */
+scout.LookupCall.prototype.getByKeys = function(keys) {
+  this.queryBy = scout.QueryBy.KEYS;
+  this.keys = keys;
+  return this._getByKeys(keys);
+};
+
+/**
+ * Override this method to implement.
+ */
+scout.LookupCall.prototype._getByKeys = function(keys) {
+  throw new Error('getByKeys() not implemented');
+};
+
+/**
  * Only call this function if this LookupCall is not used again. Otherwise use <code>.cloneForRec(parentKey).execute()</code> or <code>.clone().getByRec(parentKey)</code>.
  *
  * You should not override this function. Instead override <code>_getByRec</code>.
@@ -157,6 +220,9 @@ scout.LookupCall.prototype._getByRec = function(rec) {
 scout.LookupCall.prototype.execute = function() {
   if (scout.QueryBy.KEY === this.queryBy) {
     return this._getByKey(this.key);
+  }
+  if (scout.QueryBy.KEYS === this.queryBy) {
+    return this._getByKeys(this.keys);
   }
   if (scout.QueryBy.ALL === this.queryBy) {
     return this._getAll();
@@ -195,6 +261,13 @@ scout.LookupCall.prototype.cloneForKey = function(key) {
   return this.clone({
     queryBy: scout.QueryBy.KEY,
     key: key
+  });
+};
+
+scout.LookupCall.prototype.cloneForKeys = function(keys) {
+  return this.clone({
+    queryBy: scout.QueryBy.KEYS,
+    keys: keys
   });
 };
 
