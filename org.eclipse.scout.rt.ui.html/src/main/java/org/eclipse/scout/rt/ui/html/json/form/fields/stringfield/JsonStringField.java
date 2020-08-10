@@ -168,6 +168,18 @@ public class JsonStringField<T extends IStringField> extends JsonBasicField<T> i
     }
   }
 
+  @Override
+  protected String readDisplayText(JsonEvent event) {
+    String displayText = super.readDisplayText(event);
+    if (getModel().isFormatUpper()) {
+      return StringUtility.uppercase(displayText);
+    }
+    if (getModel().isFormatLower()) {
+      return StringUtility.lowercase(displayText);
+    }
+    return displayText;
+  }
+
   protected void handleUiAction() {
     getModel().getUIFacade().fireActionFromUI();
   }

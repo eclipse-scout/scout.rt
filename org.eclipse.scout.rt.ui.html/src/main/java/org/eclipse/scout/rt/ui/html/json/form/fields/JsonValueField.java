@@ -168,7 +168,7 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
   }
 
   protected void handleUiAcceptInput(JsonEvent event) {
-    String displayText = event.getData().optString(IValueField.PROP_DISPLAY_TEXT);
+    String displayText = readDisplayText(event);
     addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
     boolean whileTyping = event.getData().optBoolean("whileTyping", false);
     if (whileTyping) {
@@ -177,6 +177,10 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
     else {
       handleUiAcceptInputAfterTyping(displayText);
     }
+  }
+
+  protected String readDisplayText(JsonEvent event) {
+    return event.getData().optString(IValueField.PROP_DISPLAY_TEXT);
   }
 
   /**
