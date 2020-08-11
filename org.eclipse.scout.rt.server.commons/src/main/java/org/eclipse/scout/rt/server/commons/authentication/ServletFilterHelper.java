@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.UriUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -258,13 +259,32 @@ public class ServletFilterHelper {
    */
   protected boolean redirectToLoginFormIfNecessary(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
     String pathInfo = req.getPathInfo();
+    // Store the path on the session if it contains more than one / (e.g. /folder/file)
     if (pathInfo.length() > 1 && pathInfo.substring(1).contains("/")) {
-      // Store the path on the session if it contains more than one / (e.g. /folder/file)
+      // Encode path info to make redirect to urls containing special characters work (e.g. ü, ä etc.)
+      pathInfo = encodePathInfo(pathInfo);
+      if (req.getQueryString() != null) {
+        pathInfo += "?" + req.getQueryString(); // Compared to path info, query string is already encoded
+      }
       req.getSession(true).setAttribute(SESSION_ATTRIBUTE_FOR_LOGIN_REDIRECT, pathInfo);
       redirectTo(req, resp, "/login");
       return true;
     }
     return false;
+  }
+
+  /**
+   * Encodes each part of the given path info with UTF-8.
+   */
+  public String encodePathInfo(String pathInfo) {
+    if (pathInfo == null) {
+      return null;
+    }
+    String encodedPathInfo = Arrays.stream(pathInfo.split("/")).map(UriUtility::encode).collect(Collectors.joining("/"));
+    if (pathInfo.endsWith("/")) {
+      encodedPathInfo += "/";
+    }
+    return encodedPathInfo;
   }
 
   /**
