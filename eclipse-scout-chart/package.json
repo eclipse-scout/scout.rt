@@ -1,0 +1,52 @@
+{
+  "name": "@eclipse-scout/chart",
+  "version": "11.0.0-snapshot",
+  "description": "Eclipse Scout chart",
+  "author": "BSI Business Systems Integration AG",
+  "homepage": "https://www.eclipse.org/scout",
+  "repository": {
+    "type": "git",
+    "url": "https://git.eclipse.org/c/scout/org.eclipse.scout.rt.git"
+  },
+  "license": "EPL-1.0",
+  "engines": {
+    "node": ">=12.1.0",
+    "npm": ">=6.9.0",
+    "pnpm": ">=4"
+  },
+  "keywords": [
+    "scout",
+    "eclipse-scout",
+    "chart"
+  ],
+  "main": "./src/index.js",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "testserver:start": "scout-scripts test-server:start",
+    "testserver:stop": "scout-scripts test-server:stop",
+    "test:ci": "scout-scripts test:ci",
+    "build:dev": "scout-scripts build:dev",
+    "build:prod": "scout-scripts build:prod",
+    "build:all": "scout-scripts build:dev && scout-scripts build:prod",
+    "build:dev:watch": "scout-scripts build:dev:watch",
+    "snapshot-cleanup": "releng-scripts snapshot-cleanup",
+    "snapshot-predependency": "releng-scripts snapshot-install-dependency",
+    "snapshot-postdependency": "releng-scripts snapshot-publish-dependency",
+    "release-predependency": "releng-scripts release-install-dependency",
+    "release-postdependency": "releng-scripts release-publish-dependency"
+  },
+  "devDependencies": {
+    "@eclipse-scout/cli": "11.0.0-snapshot",
+    "@eclipse-scout/releng": "^10.0.0",
+    "@eclipse-scout/testing": "11.0.0-snapshot",
+    "karma": "4.3.0"
+  },
+  "dependencies": {
+    "jquery": "3.4.1",
+    "@eclipse-scout/core": "11.0.0-snapshot",
+    "chart.js": "2.9.3",
+    "chartjs-plugin-datalabels": "0.7.0"
+  }
+}
