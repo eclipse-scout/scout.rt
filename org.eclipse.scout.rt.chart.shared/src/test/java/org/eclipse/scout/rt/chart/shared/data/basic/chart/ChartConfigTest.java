@@ -18,32 +18,32 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class ChartConfigTest {
 
-  private static String TYPE1 = "doughnut";
-  private static String TYPE2 = "pie";
+  private static final String TYPE1 = "doughnut";
+  private static final String TYPE2 = "pie";
 
-  private static String LEVEL1 = "level1";
-  private static String LEVEL2 = LEVEL1 + ".level2";
-  private static String LEVEL3 = LEVEL2 + ".level3";
+  private static final String LEVEL1 = "level1";
+  private static final String LEVEL2 = LEVEL1 + ".level2";
+  private static final String LEVEL3 = LEVEL2 + ".level3";
 
-  private static String INT_PROPERTY = LEVEL3 + ".int";
-  private static int INT_PROPERTY_VALUE1 = 42;
-  private static int INT_PROPERTY_VALUE2 = 43;
-  private static String STRING_PROPERTY = LEVEL3 + ".string";
-  private static String STRING_PROPERTY_VALUE = "lorem ipsum dolor";
-  private static String BOOLEAN_PROPERTY = LEVEL2 + ".boolean";
-  private static boolean BOOLEAN_PROPERTY_VALUE = false;
+  private static final String INT_PROPERTY = LEVEL3 + ".int";
+  private static final int INT_PROPERTY_VALUE1 = 42;
+  private static final int INT_PROPERTY_VALUE2 = 43;
+  private static final String STRING_PROPERTY = LEVEL3 + ".string";
+  private static final String STRING_PROPERTY_VALUE = "lorem ipsum dolor";
+  private static final String BOOLEAN_PROPERTY = LEVEL2 + ".boolean";
+  private static final boolean BOOLEAN_PROPERTY_VALUE = false;
 
-  private static String LIST = LEVEL1 + ".list";
-  private static String LIST0 = LIST + "[0]";
-  private static String LIST0_PROPERTY = LIST0 + ".property";
-  private static int LIST0_PROPERTY_VALUE = 1;
-  private static String LIST3 = LIST + "[3]";
-  private static String LIST3_PROPERTY = LIST3 + ".property";
-  private static int LIST3_PROPERTY_VALUE = 8;
-  private static String LIST7 = LIST + "[7]";
-  private static String LIST7_PROPERTY = LIST7 + ".property";
-  private static int LIST7_PROPERTY_VALUE1 = 128;
-  private static int LIST7_PROPERTY_VALUE2 = 129;
+  private static final String LIST = LEVEL1 + ".list";
+  private static final String LIST0 = LIST + "[0]";
+  private static final String LIST0_PROPERTY = LIST0 + ".property";
+  private static final int LIST0_PROPERTY_VALUE = 1;
+  private static final String LIST3 = LIST + "[3]";
+  private static final String LIST3_PROPERTY = LIST3 + ".property";
+  private static final int LIST3_PROPERTY_VALUE = 8;
+  private static final String LIST7 = LIST + "[7]";
+  private static final String LIST7_PROPERTY = LIST7 + ".property";
+  private static final int LIST7_PROPERTY_VALUE1 = 128;
+  private static final int LIST7_PROPERTY_VALUE2 = 129;
 
   @Test
   public void testWithAndRemove() {
@@ -55,7 +55,7 @@ public class ChartConfigTest {
         .withProperty(BOOLEAN_PROPERTY, BOOLEAN_PROPERTY_VALUE);
 
     Assert.assertEquals(config.getType(), TYPE1);
-    Assert.assertEquals(config.isAnimated(), true);
+    Assert.assertTrue(config.isAnimated());
     Assert.assertEquals(config.getProperty(INT_PROPERTY), INT_PROPERTY_VALUE1);
     Assert.assertEquals(config.getProperty(STRING_PROPERTY), STRING_PROPERTY_VALUE);
     Assert.assertEquals(config.getProperty(BOOLEAN_PROPERTY), BOOLEAN_PROPERTY_VALUE);

@@ -171,7 +171,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
      * @property {object} options.scales.xLabelMap
      * @property {object} options.scales.yLabelMap
      */
-    let config = this.chart.config;
+    let config = $.extend(true, {}, this.chart.config);
     this._adjustConfig(config);
     this._renderChart(config, true);
   }
@@ -399,11 +399,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _formatXLabel(label) {
-    return this._formatLabelMap(label, this.chart.config.options.scales.xLabelMap);
+    return this._formatLabelMap(label, (((this.chartJs || {config: {}}).config.options || {}).scales || {}).xLabelMap);
   }
 
   _formatYLabel(label) {
-    return this._formatLabelMap(label, this.chart.config.options.scales.yLabelMap);
+    return this._formatLabelMap(label, (((this.chartJs || {config: {}}).config.options || {}).scales || {}).yLabelMap);
   }
 
   _formatLabelMap(label, labelMap) {
