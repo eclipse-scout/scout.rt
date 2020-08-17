@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, QueryBy, scout} from '../index';
+import {objects, arrays, QueryBy, scout} from '../index';
 import $ from 'jquery';
 
 /**
@@ -21,10 +21,12 @@ export default class LookupCall {
     this.session = null;
     this.hierarchical = false;
     this.loadIncremental = false;
+    this.batch = false; // indicates if the lookup call implements 'getByKeys' and therefore supports 'textsByKeys'
 
     this.queryBy = null;
     this.searchText = null; // used on QueryBy.TEXT
     this.key = null; // used on QueryBy.KEY
+    this.keys = null; // used on QueryBy.KEYS
     this.parentKey = null; // used on QueryBy.REC
     this.active = null;
   }
@@ -44,6 +46,10 @@ export default class LookupCall {
 
   setHierarchical(hierarchical) {
     this.hierarchical = hierarchical;
+  }
+
+  setBatch(batch) {
+    this.batch = batch;
   }
 
   /**
@@ -72,6 +78,43 @@ export default class LookupCall {
       .then(function(result) {
         var lookupRow = LookupCall.firstLookupRow(result);
         return lookupRow ? lookupRow.text : '';
+      });
+  }
+
+  /**
+   * This method may be called directly on any LookupCall. For the keys lookup an internal clone is created automatically.
+   *
+   * You should not override this function. Instead override <code>_textsByKeys</code>.
+   *
+   * @returns {Promise} which returns an object that maps every key to the text of the resolved lookup row
+   */
+  textsByKeys(keys) {
+    if (arrays.empty(keys)) {
+      return $.resolvedPromise({});
+    }
+    return this._textsByKeys(keys);
+  }
+
+  /**
+   * Override this function to provide your own textsByKeys implementation.
+   *
+   * @returns {Promise} which returns an object that maps every key to the text of the lookup row
+   */
+  _textsByKeys(keys) {
+    return this
+      .cloneForKeys(keys)
+      .execute()
+      .then(function(result) {
+        if (!result || !objects.isArray(result.lookupRows)) {
+          return {};
+        }
+
+        var textMap = {};
+        result.lookupRows.forEach(function(row) {
+          textMap[row.key] = row.text;
+        });
+
+        return textMap;
       });
   }
 
@@ -135,6 +178,26 @@ export default class LookupCall {
   }
 
   /**
+   * Only call this function if this LookupCall is not used again. Otherwise use <code>.cloneForKeys(keys).execute()</code> or <code>.clone().getByKeys(keys)</code>.
+   *
+   * You should not override this function. Instead override <code>_getByKeys</code>.
+   *
+   * @return {Promise} resolves to a result object with an array of {scout.LookupRow}s
+   */
+  getByKeys(keys) {
+    this.queryBy = QueryBy.KEYS;
+    this.keys = keys;
+    return this._getByKeys(keys);
+  }
+
+  /**
+   * Override this method to implement.
+   */
+  _getByKeys(keys) {
+    throw new Error('getByKeys() not implemented');
+  }
+
+  /**
    * Only call this function if this LookupCall is not used again. Otherwise use <code>.cloneForRec(parentKey).execute()</code> or <code>.clone().getByRec(parentKey)</code>.
    *
    * You should not override this function. Instead override <code>_getByRec</code>.
@@ -168,6 +231,9 @@ export default class LookupCall {
     if (QueryBy.ALL === this.queryBy) {
       return this._getAll();
     }
+    if (QueryBy.KEYS === this.queryBy) {
+      return this._getByKeys(this.keys);
+    }
     if (QueryBy.TEXT === this.queryBy) {
       return this._getByText(this.searchText);
     }
@@ -200,6 +266,13 @@ export default class LookupCall {
     return this.clone({
       queryBy: QueryBy.KEY,
       key: key
+    });
+  }
+
+  cloneForKeys(keys) {
+    return this.clone({
+      queryBy: QueryBy.KEYS,
+      keys: keys
     });
   }
 
