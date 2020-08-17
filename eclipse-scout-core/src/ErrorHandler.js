@@ -152,7 +152,7 @@ export default class ErrorHandler {
     }
     let stack = errorInfo.mappedStack || errorInfo.stack;
     let log = [];
-    if (!stack || stack.indexOf(errorInfo.message === -1)) {
+    if (!stack || stack.indexOf(errorInfo.message) === -1) {
       // Only log message if not already included in stack
       log.push(errorInfo.message);
     }
