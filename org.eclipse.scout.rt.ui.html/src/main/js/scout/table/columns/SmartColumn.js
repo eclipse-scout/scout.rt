@@ -104,7 +104,10 @@ scout.SmartColumn.prototype._batchFormatValue = function(key) {
   if (!currentBatchContext) {
     // create new batch context for this column
     var batchResult = $.Deferred();
-    currentBatchContext = {keySet: {}, result: batchResult.promise()};
+    currentBatchContext = {
+      keySet: {},
+      result: batchResult.promise()
+    };
     this._lookupCallBatchContext = currentBatchContext;
 
     setTimeout(function() {
@@ -112,9 +115,11 @@ scout.SmartColumn.prototype._batchFormatValue = function(key) {
       this._lookupCallBatchContext = null;
 
       // batch lookup texts
-      this.lookupCall.textByKeys(Object.keys(currentBatchContext.keySet)).then(function(textMap) {
+      this.lookupCall.textsByKeys(Object.keys(currentBatchContext.keySet)).then(function(textMap) {
         // resolve result in current batch context
         batchResult.resolve(textMap);
+      }).catch(function(e) {
+        batchResult.reject(e);
       });
     }.bind(this));
   }

@@ -66,7 +66,7 @@ describe('SmartColumn', function() {
     table.columns[0].setLookupCall(lookupCall);
 
     var valueMap = {key1: "Value 1", key2: "Value 2", key3: "Value 3"};
-    spyOn(lookupCall, 'textByKeys').and.returnValue($.resolvedPromise(valueMap));
+    spyOn(lookupCall, 'textsByKeys').and.returnValue($.resolvedPromise(valueMap));
     spyOn(lookupCall, 'textByKey').and.callFake(function(key) {
       return $.resolvedPromise(valueMap[key]);
     });
@@ -81,7 +81,7 @@ describe('SmartColumn', function() {
     jasmine.clock().tick(500);
 
     // text should get resolved with a single batch lookup call
-    expect(lookupCall.textByKeys).toHaveBeenCalledTimes(1);
+    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(1);
 
     var arrayEqualsIgnoreOrder = function(arr) {
       return {
@@ -93,16 +93,16 @@ describe('SmartColumn', function() {
         }
       };
     };
-    // textByKeys should be called with unique keys
-    expect(lookupCall.textByKeys).toHaveBeenCalledWith(arrayEqualsIgnoreOrder(Object.keys(valueMap)));
+    // textsByKeys should be called with unique keys
+    expect(lookupCall.textsByKeys).toHaveBeenCalledWith(arrayEqualsIgnoreOrder(Object.keys(valueMap)));
 
     table.insertRow(getRow('key1'));
     jasmine.clock().tick(500);
-    expect(lookupCall.textByKeys).toHaveBeenCalledTimes(2);
+    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(2);
 
     table.insertRow(getRow('key2'));
     jasmine.clock().tick(500);
-    expect(lookupCall.textByKeys).toHaveBeenCalledTimes(3);
+    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(3);
 
     // textByKey should never be called in batch mode
     expect(lookupCall.textByKey).not.toHaveBeenCalled();
@@ -113,7 +113,7 @@ describe('SmartColumn', function() {
     table.insertRows(Object.keys(valueMap).map(getRow));
     jasmine.clock().tick(500);
 
-    expect(lookupCall.textByKeys).toHaveBeenCalledTimes(3);
+    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(3);
     expect(lookupCall.textByKey).toHaveBeenCalledTimes(3);
 
     // rows have texts returned by lookup call
