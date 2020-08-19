@@ -22,6 +22,7 @@ export default class SmartColumn extends Column {
     this.browseAutoExpandAll = true;
     this.browseLoadIncremental = false;
     this.activeFilterEnabled = false;
+    this._lookupCallBatchContext = null;
   }
 
   /**
@@ -86,7 +87,49 @@ export default class SmartColumn extends Column {
     if (!this.lookupCall) {
       return strings.nvl(value) + '';
     }
+
+    if (this.lookupCall.batch) {
+      return this._batchFormatValue(value);
+    }
+
     return this.lookupCall.textByKey(value);
+  }
+
+  /**
+   * Defers all invocations of the lookup call for the duration of the current event handler.
+   * Once the current event handler completes, all lookup calls are resolved in a single batch.
+   */
+  _batchFormatValue(key) {
+    if (objects.isNullOrUndefined(key)) {
+      return $.resolvedPromise('');
+    }
+
+    let currentBatchContext = this._lookupCallBatchContext;
+    if (!currentBatchContext) {
+      // create new batch context for this column
+      const batchResult = $.Deferred();
+      currentBatchContext = {
+        keySet: {},
+        result: batchResult.promise()
+      };
+      this._lookupCallBatchContext = currentBatchContext;
+
+      setTimeout(() => {
+        // reset batch context for next batch run
+        this._lookupCallBatchContext = null;
+
+        // batch lookup texts
+        this.lookupCall.textsByKeys(Object.keys(currentBatchContext.keySet))
+          .then(textMap => batchResult.resolve(textMap)) // resolve result in current batch context
+          .catch(e => batchResult.reject(e)); // reject any errors
+      });
+    }
+
+    // add key to current batch
+    currentBatchContext.keySet[key] = true;
+
+    // return text for current key
+    return currentBatchContext.result.then(textMap => textMap[key] || '');
   }
 
   /**

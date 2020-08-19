@@ -10,6 +10,7 @@
  */
 import {TableSpecHelper} from '@eclipse-scout/testing';
 import Cell from '../../../src/cell/Cell';
+import arrays from '../../../src/util/arrays';
 
 describe('SmartColumn', () => {
   let session, helper;
@@ -78,6 +79,63 @@ describe('SmartColumn', () => {
     jasmine.clock().tick();
     expect(field.displayText).toEqual('Foo');
     expect(field.value).toEqual(7);
+  });
+
+  it('must use batch lookup calls when enabled', () => {
+    const table = helper.createTable({
+      columns: [{
+        objectType: 'SmartColumn'
+      }]
+    });
+
+    const lookupCall = scout.create('LookupCall', {session: session, batch: true});
+    table.columns[0].setLookupCall(lookupCall);
+
+    const valueMap = {key1: 'Value 1', key2: 'Value 2', key3: 'Value 3'};
+    spyOn(lookupCall, 'textsByKeys').and.returnValue($.resolvedPromise(valueMap));
+    spyOn(lookupCall, 'textByKey').and.callFake(key => $.resolvedPromise(valueMap[key]));
+
+    const getRow = key => ({cells: [key]});
+
+    // insert 6 rows
+    table.insertRows(Object.keys(valueMap).concat(Object.keys(valueMap)).map(getRow));
+    table.render();
+    jasmine.clock().tick(500);
+
+    // text should get resolved with a single batch lookup call
+    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(1);
+
+    const arrayEqualsIgnoreOrder = arr => {
+      return {
+        asymmetricMatch: compareTo => arrays.equalsIgnoreOrder(arr, compareTo),
+        jasmineToString: () => '<arrayWithEqualElements: [' + arr.toString() + ']>'
+      };
+    };
+    // textsByKeys should be called with unique keys
+    expect(lookupCall.textsByKeys).toHaveBeenCalledWith(arrayEqualsIgnoreOrder(Object.keys(valueMap)));
+
+    table.insertRow(getRow('key1'));
+    jasmine.clock().tick(500);
+    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(2);
+
+    table.insertRow(getRow('key2'));
+    jasmine.clock().tick(500);
+    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(3);
+
+    // textByKey should never be called in batch mode
+    expect(lookupCall.textByKey).not.toHaveBeenCalled();
+
+    // disable batch mode, now textByKey should be called instead
+    lookupCall.setBatch(false);
+
+    table.insertRows(Object.keys(valueMap).map(getRow));
+    jasmine.clock().tick(500);
+
+    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(3);
+    expect(lookupCall.textByKey).toHaveBeenCalledTimes(3);
+
+    // rows have texts returned by lookup call
+    table.rows.forEach(row => expect(row.cells[0].text).toEqual(valueMap[row.cells[0].value]));
   });
 
 });
