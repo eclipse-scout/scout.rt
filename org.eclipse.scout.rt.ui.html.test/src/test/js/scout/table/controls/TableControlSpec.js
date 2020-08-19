@@ -66,6 +66,7 @@ describe("TableControl", function() {
       expect($controlContainer).toBeVisible();
 
       action.setSelected(false);
+      table.footer.$controlContainer.stop(true, true); // immediately end closing animation to make toBeHidden() reliable
       expect($controlContainer).toBeHidden();
     });
 
