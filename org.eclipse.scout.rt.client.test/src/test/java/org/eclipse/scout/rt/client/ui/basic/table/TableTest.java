@@ -815,4 +815,94 @@ public class TableTest {
       m_events.add(e);
     }
   }
+
+  @Test
+  public void testUnwrapText() {
+    P_Table table = new P_Table();
+
+    assertEquals("abc", table.unwrapText("abc"));
+    assertEquals("abc", table.unwrapText(" abc"));
+    assertEquals("abc", table.unwrapText("abc "));
+    assertEquals("abc", table.unwrapText(" abc "));
+
+    assertEquals("abc", table.unwrapText("abc"));
+    assertEquals("abc", table.unwrapText("\fabc"));
+    assertEquals("abc", table.unwrapText("abc\f"));
+    assertEquals("abc", table.unwrapText("\fabc\f"));
+
+    assertEquals("a bc", table.unwrapText("a bc"));
+    assertEquals("a bc", table.unwrapText(" a bc"));
+    assertEquals("a bc", table.unwrapText("a bc "));
+    assertEquals("a bc", table.unwrapText(" a bc "));
+
+    assertEquals("a  bc", table.unwrapText("a  bc"));
+    assertEquals("a  bc", table.unwrapText("  a  bc"));
+    assertEquals("a  bc", table.unwrapText("a  bc  "));
+    assertEquals("a  bc", table.unwrapText("  a  bc  "));
+
+    assertEquals("a  bc", table.unwrapText("a \tbc"));
+    assertEquals("a  bc", table.unwrapText(" \ta \tbc"));
+    assertEquals("a  bc", table.unwrapText("a \tbc \t"));
+    assertEquals("a  bc", table.unwrapText(" \ta \tbc \t"));
+
+    assertEquals("a bc", table.unwrapText("a\tbc"));
+    assertEquals("a bc", table.unwrapText(" a\tbc"));
+    assertEquals("a bc", table.unwrapText("a\tbc "));
+    assertEquals("a bc", table.unwrapText(" a\tbc "));
+
+    assertEquals("a bc", table.unwrapText("a\tbc"));
+    assertEquals("a bc", table.unwrapText("\ta\tbc"));
+    assertEquals("a bc", table.unwrapText("a\tbc\t"));
+    assertEquals("a bc", table.unwrapText("\ta\tbc\t"));
+
+    assertEquals("abc", table.unwrapText("abc"));
+    assertEquals("abc", table.unwrapText("\tabc"));
+    assertEquals("abc", table.unwrapText("abc\t"));
+    assertEquals("abc", table.unwrapText("\tabc\t"));
+
+    assertEquals("abc", table.unwrapText("abc"));
+    assertEquals("abc", table.unwrapText(" \tabc"));
+    assertEquals("abc", table.unwrapText("abc\t "));
+    assertEquals("abc", table.unwrapText(" \tabc\t "));
+
+    assertEquals("abc", table.unwrapText("abc"));
+    assertEquals("abc", table.unwrapText(" \t\nabc"));
+    assertEquals("abc", table.unwrapText("abc\n\t "));
+    assertEquals("abc", table.unwrapText(" \t\nabc\n\t "));
+
+    assertEquals("abc\n123", table.unwrapText("abc\n123"));
+    assertEquals("abc\n123", table.unwrapText(" \t\nabc\n123"));
+    assertEquals("abc\n123", table.unwrapText("abc\n123\n\t "));
+    assertEquals("abc\n123", table.unwrapText(" \t\nabc\n123\n\t "));
+
+    assertEquals("abc\n123", table.unwrapText("abc\n 123"));
+    assertEquals("abc\n123", table.unwrapText(" \t\nabc\n 123"));
+    assertEquals("abc\n123", table.unwrapText("abc\n 123\n\t "));
+    assertEquals("abc\n123", table.unwrapText(" \t\nabc\n 123\n\t "));
+
+    assertEquals("abc\n123", table.unwrapText("abc\n \n123"));
+    assertEquals("abc\n123", table.unwrapText(" \t\nabc\n \n123"));
+    assertEquals("abc\n123", table.unwrapText("abc\n \n123\n\t "));
+    assertEquals("abc\n123", table.unwrapText(" \t\nabc\n \n123\n\t "));
+
+    assertEquals("a bc\n123", table.unwrapText("a bc\n \n123"));
+    assertEquals("a bc\n123", table.unwrapText(" \t\na bc\n \n123"));
+    assertEquals("a bc\n123", table.unwrapText("a bc\n \n123\n\t "));
+    assertEquals("a bc\n123", table.unwrapText(" \t\na bc\n \n123\n\t "));
+
+    assertEquals("a bc\n123", table.unwrapText("a bc\r\n \r\n123"));
+    assertEquals("a bc\n123", table.unwrapText(" \t\r\na bc\n \r\n123"));
+    assertEquals("a bc\n123", table.unwrapText("a bc\r\n \r\n123\r\n\t "));
+    assertEquals("a bc\n123", table.unwrapText(" \t\r\na bc\r\n \r\n123\r\n\t "));
+
+    assertEquals("a bc\n12 3", table.unwrapText("a bc\n\r \n\r \n\r  12\t3"));
+    assertEquals("a bc\n12 3", table.unwrapText(" \t\n\ra bc\n\r \n\r \n\r  12\t3"));
+    assertEquals("a bc\n12 3", table.unwrapText("a bc\n\r \n\r \n\r  12\t3\n\r\t "));
+    assertEquals("a bc\n12 3", table.unwrapText(" \t\n\ra bc\n\r \n\r \n\r  12\t3\n\r\t "));
+
+    assertEquals("a  bc\n12 3", table.unwrapText("a\t bc\n\r \n\r \n\r  12\t3"));
+    assertEquals("a  bc\n12 3", table.unwrapText(" \t\n\ra\t bc\n\r \n\r \n\r  12\t3"));
+    assertEquals("a  bc\n12 3", table.unwrapText("a\t bc\n\r \n\r \n\r  12\t3\n\r\t "));
+    assertEquals("a  bc\n12 3", table.unwrapText(" \t\n\ra\t bc\n\r \n\r \n\r  12\t3\n\r\t "));
+  }
 }
