@@ -173,8 +173,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   /**
    * Provides 4 boolean flags.<br>
-   * Currently used: {@link #AUTO_DISCARD_ON_DELETE}, {@link #SORT_VALID},
-   * {@link #INITIAL_MULTI_LINE_TEXT}, {@link #ACTION_RUNNING}
+   * Currently used: {@link #AUTO_DISCARD_ON_DELETE}, {@link #SORT_VALID}, {@link #INITIAL_MULTI_LINE_TEXT},
+   * {@link #ACTION_RUNNING}
    */
   private byte m_flags;
   private ColumnSet m_columnSet;
@@ -786,7 +786,23 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       clipboardPlainText.append("\t");
     }
 
-    clipboardPlainText.append(StringUtility.emptyIfNull(StringUtility.unwrapText(text)));
+    clipboardPlainText.append(unwrapText(text));
+  }
+
+  /**
+   * transform text for drag & drop: remove TABs (they would destroy column consistency), trim all lines and remove
+   * empty lines in a cell
+   */
+  protected String unwrapText(String s) {
+    if (s == null || s.isEmpty()) {
+      return "";
+    }
+
+    return Arrays.stream(s.split("[\n\r]"))
+        .map(line -> line.replaceAll("\t", " "))
+        .map(String::trim)
+        .filter(line -> !line.isEmpty())
+        .collect(Collectors.joining("\n"));
   }
 
   /**
@@ -2136,9 +2152,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   /**
    * Factory method to return a table customizer instance.
    * <p>
-   * The default implementation uses <code>BEANS.get()</code> to retrieve an instance of {@link ITableCustomizerProvider} which
-   * returns {@link NullTableCustomizerProvider} if no other provider is registered. You may register your own provider to create
-   * a custom table customizer which is used by all tables in a Scout application without sub-classing <code>AbstractTable</code>.
+   * The default implementation uses <code>BEANS.get()</code> to retrieve an instance of
+   * {@link ITableCustomizerProvider} which returns {@link NullTableCustomizerProvider} if no other provider is
+   * registered. You may register your own provider to create a custom table customizer which is used by all tables in a
+   * Scout application without sub-classing <code>AbstractTable</code>.
    */
   protected ITableCustomizer createTableCustomizer() {
     return BEANS.get(ITableCustomizerProvider.class).createTableCustomizer(this);
@@ -2147,9 +2164,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   /**
    * Factory method to return a table organizer instance.
    * <p>
-   * The default implementation uses <code>BEANS.get()</code> to retrieve an instance of {@link ITableOrganizerProvider} which
-   * returns {@link TableOrganizer} if no other provider is registered. You may register your own provider to create
-   * a custom table organizer which is used by all tables in a Scout application without sub-classing <code>AbstractTable</code>.
+   * The default implementation uses <code>BEANS.get()</code> to retrieve an instance of {@link ITableOrganizerProvider}
+   * which returns {@link TableOrganizer} if no other provider is registered. You may register your own provider to
+   * create a custom table organizer which is used by all tables in a Scout application without sub-classing
+   * <code>AbstractTable</code>.
    */
   protected ITableOrganizer createTableOrganizer() {
     return BEANS.get(ITableOrganizerProvider.class).createTableOrganizer(this);
