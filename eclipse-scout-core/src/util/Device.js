@@ -158,6 +158,10 @@ export default class Device {
     return this.browser !== Device.Browser.SAFARI;
   }
 
+  /**
+   * @returns {boolean} true if the current device is an iPhone. This is more specific than the <code>isIos</code> function
+   * which also includes iPads and iPods.
+   */
   isIos() {
     return Device.System.IOS === this.system;
   }
@@ -171,6 +175,17 @@ export default class Device {
    */
   cssClassForEdge() {
     return this.isEdge() ? 'ms-edge' : '';
+  }
+
+  /**
+   * @returns {string} 'iphone' if the current device is an iPhone
+   */
+  cssClassForIphone() {
+    return this.isIphone() ? 'iphone' : '';
+  }
+
+  isIphone() {
+    return this.userAgent.indexOf('iPhone') > -1;
   }
 
   isInternetExplorer() {

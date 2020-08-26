@@ -28,11 +28,12 @@ export default class IFrame extends Widget {
   }
 
   _render() {
+    var cssClass = 'iframe ' + Device.get().cssClassForIphone();
     if (this.wrapIframe) {
       this.$container = this.$parent.appendDiv('iframe-wrapper');
-      this.$iframe = this.$container.appendElement('<iframe>', 'iframe');
+      this.$iframe = this.$container.appendElement('<iframe>', cssClass);
     } else {
-      this.$iframe = this.$parent.appendElement('<iframe>', 'iframe');
+      this.$iframe = this.$parent.appendElement('<iframe>', cssClass);
       this.$container = this.$iframe;
     }
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
