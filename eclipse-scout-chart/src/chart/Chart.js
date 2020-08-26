@@ -47,6 +47,7 @@ export default class Chart extends Widget {
     BAR: 'bar',
     BAR_VERTICAL_OLD: 'barVertical_old',
     BAR_HORIZONTAL_OLD: 'barHorizontal_old',
+    COMBO_BAR_LINE: 'combo_bar_line',
     SCATTER: 'scatter',
     FULFILLMENT: 'fulfillment',
     SPEEDO: 'speedo',
@@ -232,6 +233,7 @@ export default class Chart extends Widget {
         return new DonutChartRenderer(this);
       case Chart.Type.BAR:
       case Chart.Type.LINE:
+      case Chart.Type.COMBO_BAR_LINE:
       case Chart.Type.PIE:
       case Chart.Type.DOUGHNUT:
       case Chart.Type.POLAR_AREA:

@@ -28,9 +28,11 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.TooMuchData",
         "ui.Tri",
         "ui.Trd",
+        "ui.bar",
         "ui.groupedByWeekday",
         "ui.groupedByMonth",
         "ui.groupedByYear",
-        "ui.groupedByDate"));
+        "ui.groupedByDate",
+        "ui.line"));
   }
 }

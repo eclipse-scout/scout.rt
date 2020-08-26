@@ -16,6 +16,10 @@ import java.io.Serializable;
  */
 public interface IChartValueGroupBean extends Serializable {
 
+  String getType();
+
+  void setType(String type);
+
   Object getGroupKey();
 
   void setGroupKey(Object groupKey);

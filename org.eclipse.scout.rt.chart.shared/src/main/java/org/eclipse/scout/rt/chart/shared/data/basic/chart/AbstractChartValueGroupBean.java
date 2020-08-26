@@ -14,11 +14,22 @@ import org.eclipse.scout.rt.platform.annotations.IgnoreProperty;
 public abstract class AbstractChartValueGroupBean implements IChartValueGroupBean {
   private static final long serialVersionUID = 1L;
 
+  private String m_type;
   private Object m_groupKey;
   private String m_groupName;
   private String m_colorHexValue;
   private String m_cssClass;
   private boolean m_clickable = true;
+
+  @Override
+  public String getType() {
+    return m_type;
+  }
+
+  @Override
+  public void setType(String type) {
+    m_type = type;
+  }
 
   @Override
   @IgnoreProperty

@@ -177,6 +177,12 @@ public interface IChartConfig extends Serializable {
 
   IChartConfig removeScales();
 
+  IChartConfig withScaleLabelByTypeMap(Map<String, String> scaleLabelByTypeMap);
+
+  IChartConfig removeScaleLabelByTypeMap();
+
+  Map<String, String> getScaleLabelByTypeMap();
+
   IChartConfig withXLabelMap(Map<String, String> xLabelMap);
 
   IChartConfig removeXLabelMap();

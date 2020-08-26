@@ -60,6 +60,7 @@ public class ChartConfig implements IChartConfig {
   protected static final String LINE_TENSION = combine(LINE, "tension");
   protected static final String LINE_FILL = combine(LINE, "fill");
   protected static final String SCALES = combine(OPTIONS, "scales");
+  protected static final String SCALE_LABEL_BY_TYPE_MAP = combine(SCALES, "scaleLabelByTypeMap");
   protected static final String X_LABEL_MAP = combine(SCALES, "xLabelMap");
   protected static final String Y_LABEL_MAP = combine(SCALES, "yLabelMap");
   protected static final String X_AXES = combine(SCALES, "xAxes");
@@ -572,6 +573,22 @@ public class ChartConfig implements IChartConfig {
   @Override
   public IChartConfig removeScales() {
     return removeProperty(SCALES);
+  }
+
+  @Override
+  public IChartConfig withScaleLabelByTypeMap(Map<String, String> scaleLabelByTypeMap) {
+    return withProperty(SCALE_LABEL_BY_TYPE_MAP, scaleLabelByTypeMap);
+  }
+
+  @Override
+  public IChartConfig removeScaleLabelByTypeMap() {
+    return removeProperty(SCALE_LABEL_BY_TYPE_MAP);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Map<String, String> getScaleLabelByTypeMap() {
+    return (Map<String, String>) getProperty(SCALE_LABEL_BY_TYPE_MAP);
   }
 
   @Override
