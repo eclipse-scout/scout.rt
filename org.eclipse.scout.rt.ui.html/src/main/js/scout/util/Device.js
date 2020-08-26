@@ -166,6 +166,21 @@ scout.Device.prototype.isCustomEllipsisTooltipPossible = function() {
   return this.browser !== scout.Device.Browser.SAFARI;
 };
 
+/**
+ * @returns {string} 'iphone' if the current device is an iPhone
+ */
+scout.Device.prototype.cssClassForIphone = function() {
+  return this.isIphone() ? 'iphone' : '';
+};
+
+/**
+ * @returns {boolean} true if the current device is an iPhone. This is more specific than the <code>isIos</code> function
+ * which also includes iPads and iPods.
+ */
+scout.Device.prototype.isIphone = function() {
+  return this.userAgent.indexOf('iPhone') > -1;
+};
+
 scout.Device.prototype.isIos = function() {
   return scout.Device.System.IOS === this.system;
 };

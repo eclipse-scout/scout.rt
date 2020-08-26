@@ -23,11 +23,12 @@ scout.IFrame = function() {
 scout.inherits(scout.IFrame, scout.Widget);
 
 scout.IFrame.prototype._render = function() {
+  var cssClass = 'iframe ' + scout.device.cssClassForIphone();
   if (this.wrapIframe) {
     this.$container = this.$parent.appendDiv('iframe-wrapper');
-    this.$iframe = this.$container.appendElement('<iframe>', 'iframe');
+    this.$iframe = this.$container.appendElement('<iframe>', cssClass);
   } else {
-    this.$iframe = this.$parent.appendElement('<iframe>', 'iframe');
+    this.$iframe = this.$parent.appendElement('<iframe>', cssClass);
     this.$container = this.$iframe;
   }
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
