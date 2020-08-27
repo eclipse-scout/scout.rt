@@ -19,6 +19,8 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.form.fields.IFormFieldMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
+import org.eclipse.scout.rt.client.ui.basic.breadcrumbbar.IBreadcrumbBar;
+import org.eclipse.scout.rt.client.ui.basic.breadcrumbbar.IBreadcrumbItem;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
@@ -56,6 +58,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IStatusMenuMapping;
 import org.eclipse.scout.rt.client.ui.form.fields.accordionfield.IAccordionField;
 import org.eclipse.scout.rt.client.ui.form.fields.beanfield.IBeanField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
+import org.eclipse.scout.rt.client.ui.form.fields.breadcrumbbarfield.IBreadcrumbBarField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
@@ -114,6 +117,8 @@ import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonDecimalFormat;
 import org.eclipse.scout.rt.ui.html.json.accordion.JsonAccordion;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
+import org.eclipse.scout.rt.ui.html.json.basic.breadcrumbbar.JsonBreadcrumbBar;
+import org.eclipse.scout.rt.ui.html.json.basic.breadcrumbbar.JsonBreadcrumbItem;
 import org.eclipse.scout.rt.ui.html.json.basic.filechooser.JsonFileChooser;
 import org.eclipse.scout.rt.ui.html.json.basic.planner.JsonPlanner;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendar;
@@ -133,6 +138,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonDateField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonStatusMenuMapping;
 import org.eclipse.scout.rt.ui.html.json.form.fields.accordionfield.JsonAccordionField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.beanfield.JsonBeanField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.breadcrumbbarfield.JsonBreadcrumbBarField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.browserfield.JsonBrowserField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.calendar.JsonCalendarField;
@@ -327,6 +333,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     if (model instanceof IModeSelectorField<?>) {
       return new JsonModeSelectorField<IModeSelectorField<?>>((IModeSelectorField<?>) model, session, id, parent);
     }
+    if (model instanceof IBreadcrumbBarField) {
+      return new JsonBreadcrumbBarField<IBreadcrumbBarField>((IBreadcrumbBarField) model, session, id, parent);
+    }
 
     // --- other model objects ---
     if (model instanceof IDesktop) {
@@ -444,6 +453,12 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IMode<?>) {
       return new JsonMode<IMode<?>>((IMode<?>) model, session, id, parent);
+    }
+    if (model instanceof IBreadcrumbBar) {
+      return new JsonBreadcrumbBar<IBreadcrumbBar>((IBreadcrumbBar) model, session, id, parent);
+    }
+    if (model instanceof IBreadcrumbItem) {
+      return new JsonBreadcrumbItem<IBreadcrumbItem>((IBreadcrumbItem) model, session, id, parent);
     }
     if (model instanceof PopupManager) {
       return new JsonPopupManager<>((PopupManager) model, session, id, parent);

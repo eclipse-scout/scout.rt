@@ -249,6 +249,11 @@
   __include("scout/modeselector/ModeAdapter.js");
   __include("scout/modeselector/ModeSelector.js");
   __include("scout/modeselector/ModeSelectorLayout.js");
+  __include("scout/breadcrumbbar/BreadcrumbItem.js");
+  __include("scout/breadcrumbbar/BreadcrumbItemAdapter.js");
+  __include("scout/breadcrumbbar/BreadcrumbBar.js");
+  __include("scout/breadcrumbbar/BreadcrumbBarAdapter.js");
+  __include("scout/breadcrumbbar/BreadcrumbBarLayout.js");
   // Form
   __include("scout/form/Form.js");
   __include("scout/form/FormAdapter.js");
@@ -447,6 +452,8 @@
   __include("scout/form/fields/lookupfield/LookupFieldAdapter.js");
   __include("scout/form/fields/modeselectorfield/ModeSelectorField.js");
   __include("scout/form/fields/modeselectorfield/ModeSelectorFieldAdapter.js");
+  __include("scout/form/fields/breadcrumbbarfield/BreadcrumbBarField.js");
+  __include("scout/form/fields/breadcrumbbarfield/BreadcrumbBarFieldAdapter.js");
   __include("scout/form/fields/numberfield/NumberField.js");
   __include("scout/form/fields/numberfield/NumberFieldAdapter.js");
   __include("scout/form/fields/numberfield/Calculator.js");
