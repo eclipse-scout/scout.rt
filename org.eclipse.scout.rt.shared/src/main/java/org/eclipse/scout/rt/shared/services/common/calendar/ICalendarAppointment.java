@@ -43,6 +43,10 @@ public interface ICalendarAppointment extends ICalendarItem {
 
   void setLocation(String a);
 
+  String getMailboxName();
+
+  void setMailboxName(String mailboxName);
+
   /**
    * One of {@link #STATUS_BUSY}, {@link #STATUS_FREE}, {@link #STATUS_OUTOFOFFICE}, {@link #STATUS_TENTATIVE},
    * {@link #STATUS_WORKING_ELSEWHERE}

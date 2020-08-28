@@ -99,7 +99,7 @@ public class CalendarComponentTest {
 
   @Test
   public void testCoveredDayRange1() {
-    ICalendarAppointment appointment = new CalendarAppointment(UUID.randomUUID(), null, DATE_1, DATE_2, false, "Subject", "Body", null);
+    ICalendarAppointment appointment = new CalendarAppointment(UUID.randomUUID(), null, DATE_1, DATE_2, false, "LOCATION", "Subject", "Body", null);
     CalendarComponent component = createComponent(appointment);
     Range<Date> coveredDayRange = component.getCoveredDaysRange();
     assertNotNull(coveredDayRange);
@@ -109,7 +109,7 @@ public class CalendarComponentTest {
 
   @Test
   public void testCoveredDayRange2() {
-    ICalendarAppointment appointment = new CalendarAppointment(UUID.randomUUID(), null, DATE_1, null, false, "Subject", "Body", null);
+    ICalendarAppointment appointment = new CalendarAppointment(UUID.randomUUID(), null, DATE_1, null, false, "LOCATION", "Subject", "Body", null);
     CalendarComponent component = createComponent(appointment);
     Range<Date> coveredDayRange = component.getCoveredDaysRange();
     assertNotNull(coveredDayRange);
@@ -119,7 +119,7 @@ public class CalendarComponentTest {
 
   @Test
   public void testCoveredDayRange3() {
-    ICalendarAppointment appointment = new CalendarAppointment(UUID.randomUUID(), null, null, DATE_2, false, "Subject", "Body", null);
+    ICalendarAppointment appointment = new CalendarAppointment(UUID.randomUUID(), null, null, DATE_2, false, "LOCATION", "Subject", "Body", null);
     CalendarComponent component = createComponent(appointment);
     Range<Date> coveredDayRange = component.getCoveredDaysRange();
     assertNotNull(coveredDayRange);

@@ -587,13 +587,17 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     return CollectionUtility.hashSet(propertySupport.getPropertySet(PROP_COMPONENTS));
   }
 
-  private void updateComponentsInternal(List<ICalendarItemProvider> changedProviders) {
+  protected CalendarComponent createCalendarComponent(ICalendar calendar, ICalendarItemProvider producer, ICalendarItem item) {
+    return new CalendarComponent(calendar, producer, item);
+  }
+
+  protected void updateComponentsInternal(List<ICalendarItemProvider> changedProviders) {
     Range<Date> d = getViewRange();
     if (d.getFrom() != null && d.getTo() != null) {
       for (ICalendarItemProvider p : changedProviders) {
         Deque<CalendarComponent> components = new LinkedList<>();
         for (ICalendarItem item : p.getItems(d.getFrom(), d.getTo())) {
-          components.add(new CalendarComponent(this, p, item));
+          components.add(createCalendarComponent(this, p, item));
         }
         m_componentsByProvider.put(p.getClass(), components);
       }
