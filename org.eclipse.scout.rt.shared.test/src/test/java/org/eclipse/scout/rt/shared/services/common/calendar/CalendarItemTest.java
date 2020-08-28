@@ -102,7 +102,7 @@ public class CalendarItemTest {
     assertEquals("appointment start", DATE_1, app.getStart());
     assertNotNull(app.getEnd());
     assertEquals("appointment end", DATE_2, app.getEnd());
-    assertNull(app.getLocation());
+    assertEquals("LOCATION", app.getLocation());
     assertTrue(app.isFullDay());
     assertNotNull(app.getSubject());
     assertEquals("appointment subject", "1", app.getSubject());

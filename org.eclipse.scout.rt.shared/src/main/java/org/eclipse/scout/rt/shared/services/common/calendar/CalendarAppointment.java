@@ -95,14 +95,18 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
               break;
             }
             case 5: {
-              setSubject((String) data[i]);
+              setLocation((String) data[i]);
               break;
             }
             case 6: {
-              setBody((String) data[i]);
+              setSubject((String) data[i]);
               break;
             }
             case 7: {
+              setBody((String) data[i]);
+              break;
+            }
+            case 8: {
               setCssClass((String) data[i]);
               break;
             }
