@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.services.common.calendar;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 
@@ -89,13 +85,13 @@ public class CalendarItemTest {
 
   @Test
   public void testCalendarAppointmentConstruction2() {
-    ICalendarAppointment app = new CalendarAppointment(0L, null, DATE_1, DATE_2, true, "1", "2", "3");
+    ICalendarAppointment app = new CalendarAppointment(0L, null, DATE_1, DATE_2, true, "LOCATION", "1", "2", "3");
     verifyCalendarAppointment(app);
   }
 
   @Test
   public void testCalendarAppointmentConstruction3() {
-    ICalendarAppointment task = new CalendarAppointment(new Object[]{0L, null, DATE_1, DATE_2, true, "1", "2", "3"});
+    ICalendarAppointment task = new CalendarAppointment(new Object[]{0L, null, DATE_1, DATE_2, true, "LOCATION", "1", "2", "3"});
     verifyCalendarAppointment(task);
   }
 

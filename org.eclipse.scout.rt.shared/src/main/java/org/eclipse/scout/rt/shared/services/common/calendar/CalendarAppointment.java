@@ -29,6 +29,7 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
   private String m_location;
   private int m_busyStatus;
   private final AbstractCollection<String> m_recipientEmail = new HashSet<>();
+  private String m_mailboxName;
 
   public CalendarAppointment() {
     super();
@@ -45,12 +46,13 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
    * @param cssClass
    */
   @SuppressWarnings("squid:S00107")
-  public CalendarAppointment(Object itemId, Object person, Date startDate, Date endDate, boolean fullDay, String subject, String body, String cssClass) {
+  public CalendarAppointment(Object itemId, Object person, Date startDate, Date endDate, boolean fullDay, String location, String subject, String body, String cssClass) {
     setItemId(itemId);
     setPerson(person);
     setStart(startDate);
     setEnd(endDate);
     setFullDay(fullDay);
+    setLocation(location);
     setSubject(subject);
     setBody(body);
     setCssClass(cssClass);
@@ -62,6 +64,7 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
    * @param startDate
    * @param endDate
    * @param fullDay
+   * @param location
    * @param subject
    * @param body
    * @param cssClass
@@ -175,6 +178,16 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
   }
 
   @Override
+  public String getMailboxName() {
+    return m_mailboxName;
+  }
+
+  @Override
+  public void setMailboxName(String mailboxName) {
+    m_mailboxName = mailboxName;
+  }
+
+  @Override
   public String[] getRecipientEmail() {
     return m_recipientEmail.toArray(new String[0]);
   }
@@ -218,12 +231,19 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
     attributes.put("location", m_location);
     attributes.put("busyStatus", m_busyStatus);
     attributes.put("recipientEmail", m_recipientEmail);
+    attributes.put("mailboxName", m_mailboxName);
   }
 
   @Override
   public String getDescription() {
     StringBuilder sb = new StringBuilder();
+    if (!StringUtility.isNullOrEmpty(m_mailboxName)) {
+      sb.append(m_mailboxName);
+    }
     if (!StringUtility.isNullOrEmpty(m_location)) {
+      if (sb.length() > 0) {
+        sb.append("\n");
+      }
       sb.append(m_location);
     }
     if (!StringUtility.isNullOrEmpty(getBody())) {
@@ -234,5 +254,4 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
     }
     return sb.toString();
   }
-
 }
