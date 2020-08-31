@@ -77,4 +77,34 @@ describe('TabItem', function() {
       expect(tabItem.$container.hasClass('foo3')).toBe(true);
     });
   });
+
+  describe('_renderTooltipText', function() {
+    var tabItem, tabBox, tab;
+
+    beforeEach(function() {
+      tabItem = helper.createTabItem({
+        tooltipText: 'foo1'
+      });
+      tabBox = helper.createTabBoxWith([tabItem]);
+      tabBox.render();
+      tab = tabBox.header.tabArea.tabs[0];
+    });
+
+    it('initially adds the tooltipText to the Tab', function() {
+      expect(tab.$container.hasClass('has-tooltip')).toBe(true);
+      expect(tab.tooltipText).toBe('foo1');
+    });
+
+    it('changes the tooltipText from the Tab', function() {
+      tabItem.setProperty('tooltipText', 'foo2');
+      expect(tab.$container.hasClass('has-tooltip')).toBe(true);
+      expect(tab.tooltipText).toBe('foo2');
+    });
+
+    it('clears the tooltipText from the Tab', function() {
+      tabItem.setProperty('tooltipText', null);
+      expect(tab.$container.hasClass('has-tooltip')).toBe(false);
+      expect(tab.tooltipText).toBe(null);
+    });
+  });
 });

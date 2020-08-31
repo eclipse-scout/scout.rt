@@ -35,6 +35,7 @@ export default class Tab extends Widget {
     this.subLabel = this.tabItem.subLabel;
     this.cssClass = this.tabItem.cssClass;
     this.marked = this.tabItem.marked;
+    this.tooltipText = this.tabItem.tooltipText;
 
     this.fieldStatus = scout.create('FieldStatus', {
       parent: this,
