@@ -306,6 +306,12 @@ export function eachSibling(arr, element, func) {
 /**
  * Alternative implementation of Array.findIndex(callback [, thisArg]), which is supported by most browsers.
  * See Array.findIndex for a detailed description.
+ *
+ * @template T
+ * @param {T[]} arr
+ * @param {function(T): boolean} predicate
+ * @param {?*} thisArg
+ * @returns {number}
  */
 export function findIndex(arr, predicate, thisArg) {
   if (!arr || !predicate) {
@@ -319,6 +325,13 @@ export function findIndex(arr, predicate, thisArg) {
   return -1;
 }
 
+/**
+ * @template T
+ * @param {T[]} arr
+ * @param {function(T): boolean} predicate
+ * @param {?*} thisArg
+ * @returns {T|null}
+ */
 export function find(arr, predicate, thisArg) {
   let index = findIndex(arr, predicate, thisArg);
   if (index === -1) {
