@@ -310,7 +310,7 @@ export function eachSibling(arr, element, func) {
  * @template T
  * @param {T[]} arr
  * @param {function(T): boolean} predicate
- * @param {?*} thisArg
+ * @param [*] thisArg
  * @returns {number}
  */
 export function findIndex(arr, predicate, thisArg) {
@@ -329,7 +329,7 @@ export function findIndex(arr, predicate, thisArg) {
  * @template T
  * @param {T[]} arr
  * @param {function(T): boolean} predicate
- * @param {?*} thisArg
+ * @param [*] thisArg
  * @returns {T|null}
  */
 export function find(arr, predicate, thisArg) {
