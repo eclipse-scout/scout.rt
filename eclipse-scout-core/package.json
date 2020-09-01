@@ -45,7 +45,7 @@
     "@eclipse-scout/testing": "10.0.0-snapshot",
     "jasmine-ajax": "3.4.0",
     "jasmine-jquery": "2.1.1",
-    "karma": "4.3.0"
+    "karma": "5.2.0"
   },
   "dependencies": {
     "jquery": "3.4.1",
