@@ -88,6 +88,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestStringPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestSubPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestThrowableDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestVersionedDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestWithoutTypeDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -2319,6 +2320,19 @@ public class JsonDataObjectsSerializationTest {
     testPoJo.setStringListAttribute(stringList);
 
     return testPoJo;
+  }
+
+  @Test
+  public void testSerialize_TestWithoutTypeDo() throws Exception {
+    TestWithoutTypeDo testWithoutTypeDoNested = BEANS.get(TestWithoutTypeDo.class);
+    testWithoutTypeDoNested.withId("5678");
+    TestWithoutTypeDo testWithoutTypeDo = BEANS.get(TestWithoutTypeDo.class);
+    testWithoutTypeDo
+        .withId("1234")
+        .withNested(testWithoutTypeDoNested);
+
+    String json = s_dataObjectMapper.writeValueAsString(testWithoutTypeDo);
+    assertJsonEquals("TestWithoutTypeDo.json", json);
   }
 
   protected TestItemDo createTestItemDo(String id, String attribute) {

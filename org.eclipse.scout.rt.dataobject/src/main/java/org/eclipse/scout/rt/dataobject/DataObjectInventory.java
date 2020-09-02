@@ -82,6 +82,14 @@ public class DataObjectInventory {
   }
 
   /**
+   * @return if specified class {@code clazz} has a type name. If the class does not have a type name, the super class
+   *         hierarchy is searched for the first available type name.
+   */
+  public boolean hasTypeName(Class<?> queryClazz) {
+    return toTypeName(queryClazz) != null;
+  }
+
+  /**
    * @return type name for specified class {@code clazz}. If the class does not have a type name, the super class
    *         hierarchy is searched for the first available type name. Returns {@code null} if no type name can be found.
    */
