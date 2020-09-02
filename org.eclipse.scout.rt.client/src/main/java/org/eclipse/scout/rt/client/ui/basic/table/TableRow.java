@@ -285,7 +285,7 @@ public class TableRow implements ITableRow {
 
   @Override
   public String getCompactValue() {
-    return m_compactValue; // TODO CGU maybe better use custom values, should save some space
+    return m_compactValue;
   }
 
   @Override
