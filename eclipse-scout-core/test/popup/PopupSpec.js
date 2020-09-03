@@ -926,6 +926,62 @@ describe('Popup', () => {
         expect(popup.$container.cssWidth()).toBe(50);
         expect(popup.$container.cssMarginX()).toBe(20);
       });
+
+      it('move popup if it overlaps the desktop bottom without and with horizontal switch', function() {
+        var $anchor = $desktop.appendDiv('anchor');
+        var desktopHeight = 70 + 80 + 20;
+        $desktop.cssHeight(desktopHeight);
+
+        // without switch
+        $desktop.cssWidth(70 + 80 + 70);
+        var popup = scout.create('WidgetPopup', {
+          parent: session.desktop,
+          cssClass: 'scalable with-margin',
+          horizontalAlignment: Popup.Alignment.RIGHT,
+          verticalAlignment: Popup.Alignment.TOPEDGE,
+          horizontalSwitch: true,
+          verticalSwitch: false,
+          $anchor: $anchor,
+          withArrow: true,
+          scrollType: 'position',
+          widget: {
+            objectType: 'scouttests.LargeContent',
+            numBlocks: 5
+          }
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssWidth()).toBe(25);
+        expect(popup.$container.cssHeight()).toBe(5 * 25);
+        expect(popup.$container.cssMarginX()).toBe(20);
+        expect(popup.$container.cssMarginY()).toBe(20);
+        expect(popup.$container.cssLeft()).toBe(70 + 80); // anchor-position + anchor-width
+        expect(popup.$container.cssTop()).toBe(desktopHeight - (5 * 25) - (2 * 10)); // desktop-height - popup-height - margin
+        popup.close();
+
+        // with switch
+        $desktop.cssWidth(70 + 80 + 20);
+        popup = scout.create('WidgetPopup', {
+          parent: session.desktop,
+          cssClass: 'scalable with-margin',
+          horizontalAlignment: Popup.Alignment.RIGHT,
+          verticalAlignment: Popup.Alignment.TOPEDGE,
+          horizontalSwitch: true,
+          verticalSwitch: false,
+          $anchor: $anchor,
+          scrollType: 'position',
+          withArrow: true,
+          widget: {
+            objectType: 'scouttests.LargeContent',
+            numBlocks: 5
+          }
+        });
+        popup.getWindowSize = entryPointSizeFunc;
+        popup.open();
+        expect(popup.$container.cssLeft()).toBe(70 - 25 - (2 * 10)); // anchor-position - popup-width - margin
+        expect(popup.$container.cssTop()).toBe(desktopHeight - (5 * 25) - (2 * 10)); // desktop-height - popup-height - margin
+        popup.close();
+      });
     });
 
     describe('with horizontalAlign = left', () => {

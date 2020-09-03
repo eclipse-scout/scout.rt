@@ -810,20 +810,10 @@ export default class Popup extends Widget {
       if (verticalSwitch) {
         // Switch vertical alignment
         this.calculatedVerticalAlignment = Popup.SwitchRule[this.calculatedVerticalAlignment];
-        location = this.prefLocation(this.calculatedVerticalAlignment);
+        location.y = this.prefLocation(this.calculatedVerticalAlignment).y;
       } else {
         // Move popup to the top until it gets fully visible (if switch is disabled)
         location.y -= overlap.y;
-
-        // Also move arrow so that it still points to the center of the anchor
-        if (this.$arrow && (this.$arrow.hasClass(Popup.Alignment.LEFT) || this.$arrow.hasClass(Popup.Alignment.RIGHT))) {
-          this.$arrow.cssMarginTop(overlap.y);
-          if (overlap.y > 0) {
-            this.$arrow.cssMarginTop(overlap.y);
-          } else {
-            this.$arrow.cssMarginBottom(-overlap.y);
-          }
-        }
       }
     }
     if (overlap.x !== 0) {
@@ -831,21 +821,31 @@ export default class Popup extends Widget {
       if (horizontalSwitch) {
         // Switch horizontal alignment
         this.calculatedHorizontalAlignment = Popup.SwitchRule[this.calculatedHorizontalAlignment];
-        location = this.prefLocation(this.calculatedVerticalAlignment, this.calculatedHorizontalAlignment);
+        location.x = this.prefLocation(this.calculatedVerticalAlignment, this.calculatedHorizontalAlignment).x;
       } else {
         // Move popup to the left until it gets fully visible (if switch is disabled)
         location.x -= overlap.x;
+      }
+    }
 
-        // Also move arrow so that it still points to the center of the anchor
-        if (this.$arrow && (this.$arrow.hasClass(Popup.Alignment.TOP) || this.$arrow.hasClass(Popup.Alignment.BOTTOM))) {
-          if (overlap.x > 0) {
-            this.$arrow.cssMarginLeft(overlap.x);
-          } else {
-            this.$arrow.cssMarginRight(-overlap.x);
-          }
+    // Also move arrow so that it still points to the center of the anchor
+    if (this.$arrow) {
+      if (overlap.y !== 0 && (this.$arrow.hasClass(Popup.Alignment.LEFT) || this.$arrow.hasClass(Popup.Alignment.RIGHT))) {
+        if (overlap.y > 0) {
+          this.$arrow.cssMarginTop(overlap.y);
+        } else {
+          this.$arrow.cssMarginBotton(-overlap.y);
+        }
+      }
+      if (overlap.x !== 0 && (this.$arrow.hasClass(Popup.Alignment.TOP) || this.$arrow.hasClass(Popup.Alignment.BOTTOM))) {
+        if (overlap.x > 0) {
+          this.$arrow.cssMarginLeft(overlap.x);
+        } else {
+          this.$arrow.cssMarginRight(-overlap.x);
         }
       }
     }
+
     return location;
   }
 
