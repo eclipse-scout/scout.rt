@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.html.IHtmlElement;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 public class TableCompactHandler implements ICompactHandler {
@@ -121,13 +122,13 @@ public class TableCompactHandler implements ICompactHandler {
   private void attachTableListener() {
     if (m_tableListener == null) {
       m_tableListener = new P_TableListener();
-      getTable().addTableListener(m_tableListener, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
+      getTable().addTableListener(m_tableListener, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED, TableEvent.TYPE_COLUMN_HEADERS_UPDATED);
     }
   }
 
   private void detachTableListener() {
     if (m_tableListener != null) {
-      getTable().removeTableListener(m_tableListener, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
+      getTable().removeTableListener(m_tableListener, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED, TableEvent.TYPE_COLUMN_HEADERS_UPDATED);
       m_tableListener = null;
     }
   }
@@ -259,7 +260,7 @@ public class TableCompactHandler implements ICompactHandler {
     @Override
     public void tableChanged(TableEvent e) {
       List<ITableRow> rows = e.getRows();
-      if (e.getType() == TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED) {
+      if (ObjectUtility.isOneOf(e.getType(), TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED, TableEvent.TYPE_COLUMN_HEADERS_UPDATED)) {
         rows = getTable().getRows();
       }
       updateValues(rows);

@@ -1229,6 +1229,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
         bufferColumnStructureChanged(event);
         break;
       }
+      case TableEvent.TYPE_COLUMN_HEADERS_UPDATED: {
+        bufferColumnHeadersUpdated(event);
+        break;
+      }
       default: {
         m_eventBuffer.add(event);
       }
@@ -1254,6 +1258,14 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     // Ensure selection is preserved.
     if (getModel().getSelectedRowCount() > 0) {
       m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ROWS_SELECTED, getModel().getSelectedRows()));
+    }
+  }
+
+  protected void bufferColumnHeadersUpdated(TableEvent event) {
+    m_eventBuffer.add(event);
+    if (getModel().isCompact()) {
+      // If header is updated the compact value may have changed -> ensure ui will be informed about the change
+      m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ROWS_UPDATED, getModel().getRows()));
     }
   }
 
