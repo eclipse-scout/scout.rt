@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/core",
-  "version": "10.0.0-snapshot",
+  "version": "10.0.32",
   "description": "Eclipse Scout runtime",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
@@ -40,9 +40,9 @@
     "release-postdependency": "releng-scripts release-publish-dependency"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": "10.0.0-snapshot",
+    "@eclipse-scout/cli": "10.0.32",
     "@eclipse-scout/releng": "^10.0.0",
-    "@eclipse-scout/testing": "10.0.0-snapshot",
+    "@eclipse-scout/testing": "10.0.32",
     "jasmine-ajax": "3.4.0",
     "jasmine-jquery": "2.1.1",
     "karma": "5.2.0"
