@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,16 +10,13 @@
  */
 package org.eclipse.scout.rt.testing.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.junit.Assert;
 import org.junit.ComparisonFailure;
 import org.junit.Test;
 
@@ -103,12 +100,12 @@ public class ScoutAssertTest {
   public void testAssertThrows() {
     // runtime exception
     final VetoException runtimeException = new VetoException("msg");
-    assertSame(runtimeException, ScoutAssert.assertThrows(VetoException.class, () -> raise(runtimeException)));
-    assertSame(runtimeException, ScoutAssert.assertThrows(RuntimeException.class, () -> raise(runtimeException)));
-    assertSame(runtimeException, ScoutAssert.assertThrows(Exception.class, () -> raise(runtimeException)));
-    assertSame(runtimeException, ScoutAssert.assertThrows(Throwable.class, () -> raise(runtimeException)));
+    assertSame(runtimeException, Assert.assertThrows(VetoException.class, () -> raise(runtimeException)));
+    assertSame(runtimeException, Assert.assertThrows(RuntimeException.class, () -> raise(runtimeException)));
+    assertSame(runtimeException, Assert.assertThrows(Exception.class, () -> raise(runtimeException)));
+    assertSame(runtimeException, Assert.assertThrows(Throwable.class, () -> raise(runtimeException)));
     try {
-      ScoutAssert.assertThrows(Error.class, () -> raise(runtimeException));
+      Assert.assertThrows(Error.class, () -> raise(runtimeException));
       fail("expecting assertion to fail");
     }
     catch (AssertionError expected) {
@@ -116,11 +113,11 @@ public class ScoutAssertTest {
 
     // runtime exception
     final InterruptedException exception = new InterruptedException("msg");
-    assertSame(exception, ScoutAssert.assertThrows(InterruptedException.class, () -> raise(exception)));
-    assertSame(exception, ScoutAssert.assertThrows(Exception.class, () -> raise(exception)));
-    assertSame(exception, ScoutAssert.assertThrows(Throwable.class, () -> raise(exception)));
+    assertSame(exception, Assert.assertThrows(InterruptedException.class, () -> raise(exception)));
+    assertSame(exception, Assert.assertThrows(Exception.class, () -> raise(exception)));
+    assertSame(exception, Assert.assertThrows(Throwable.class, () -> raise(exception)));
     try {
-      ScoutAssert.assertThrows(Error.class, () -> raise(exception));
+      Assert.assertThrows(Error.class, () -> raise(exception));
       fail("expecting assertion to fail");
     }
     catch (AssertionError expected) {
@@ -128,11 +125,11 @@ public class ScoutAssertTest {
 
     // error
     final PlatformError error = new PlatformError("msg");
-    assertSame(error, ScoutAssert.assertThrows(PlatformError.class, () -> raise(error)));
-    assertSame(error, ScoutAssert.assertThrows(Error.class, () -> raise(error)));
-    assertSame(error, ScoutAssert.assertThrows(Throwable.class, () -> raise(error)));
+    assertSame(error, Assert.assertThrows(PlatformError.class, () -> raise(error)));
+    assertSame(error, Assert.assertThrows(Error.class, () -> raise(error)));
+    assertSame(error, Assert.assertThrows(Throwable.class, () -> raise(error)));
     try {
-      ScoutAssert.assertThrows(Exception.class, () -> raise(error));
+      Assert.assertThrows(Exception.class, () -> raise(error));
       fail("expecting assertion to fail");
     }
     catch (AssertionError expected) {

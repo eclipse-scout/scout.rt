@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,14 +13,14 @@ package org.eclipse.scout.rt.mom.api.marshaller;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 public class JsonMarshallerTest {
@@ -33,13 +33,13 @@ public class JsonMarshallerTest {
     assertEquals("ABC", marshallAndUnmarshallAsBytes("ABC", context));
 
     context = new HashMap<>();
-    assertThat(marshallAndUnmarshallAsText(new TestObject(), context), instanceOf(TestObject.class));
-    assertThat(marshallAndUnmarshallAsBytes(new TestObject(), context), instanceOf(TestObject.class));
+    MatcherAssert.assertThat(marshallAndUnmarshallAsText(new TestObject(), context), instanceOf(TestObject.class));
+    MatcherAssert.assertThat(marshallAndUnmarshallAsBytes(new TestObject(), context), instanceOf(TestObject.class));
 
     context = new HashMap<>();
     TestObject testee = new TestObject();
-    assertThat((TestObject) marshallAndUnmarshallAsText(testee, context), is(equalTo(testee)));
-    assertThat((TestObject) marshallAndUnmarshallAsBytes(testee, context), is(equalTo(testee)));
+    MatcherAssert.assertThat(marshallAndUnmarshallAsText(testee, context), is(equalTo(testee)));
+    MatcherAssert.assertThat(marshallAndUnmarshallAsBytes(testee, context), is(equalTo(testee)));
   }
 
   @Test
@@ -58,10 +58,10 @@ public class JsonMarshallerTest {
     Map<String, String> context = new HashMap<>();
 
     String jsonText = (String) BEANS.get(JsonMarshaller.class).marshall(null, context);
-    assertEquals(null, BEANS.get(JsonMarshaller.class).unmarshall(jsonText, context));
+    assertNull(BEANS.get(JsonMarshaller.class).unmarshall(jsonText, context));
 
     byte[] jsonBytes = (byte[]) BEANS.get(JsonAsBytesMarshaller.class).marshall(null, context);
-    assertEquals(null, BEANS.get(JsonAsBytesMarshaller.class).unmarshall(jsonBytes, context));
+    assertNull(BEANS.get(JsonAsBytesMarshaller.class).unmarshall(jsonBytes, context));
   }
 
   private static Object marshallAndUnmarshallAsText(Object object, Map<String, String> context) {

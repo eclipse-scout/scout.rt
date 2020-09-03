@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.rt.platform.resource;
 
-import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
 import static org.junit.Assert.*;
 
 import java.net.URI;
@@ -28,6 +27,7 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -145,9 +145,9 @@ public class BinaryRefTest {
   public void testLoadBinaryResource() {
     assertNull(BinaryRefs.loadBinaryResource(null));
     assertNull(BinaryRefs.loadBinaryResource(NO_BINREF_URI));
-    assertThrows(IllegalStateException.class, () -> BinaryRefs.loadBinaryResource(NO_HANDLER_BINREF_URI));
-    assertThrows(IllegalStateException.class, () -> BinaryRefs.loadBinaryResource(UNKNOWN_BINREF_URI));
-    assertThrows(IllegalStateException.class, () -> BinaryRefs.loadBinaryResource(RELATIVE_BINREF_URI));
+    Assert.assertThrows(IllegalStateException.class, () -> BinaryRefs.loadBinaryResource(NO_HANDLER_BINREF_URI));
+    Assert.assertThrows(IllegalStateException.class, () -> BinaryRefs.loadBinaryResource(UNKNOWN_BINREF_URI));
+    Assert.assertThrows(IllegalStateException.class, () -> BinaryRefs.loadBinaryResource(RELATIVE_BINREF_URI));
     assertEquals(new BinaryResource("existing1.txt", new byte[0]), BinaryRefs.loadBinaryResource(EXISTING_1_BINREF_URI));
     assertEquals(new BinaryResource("existing2.png", new byte[0]), BinaryRefs.loadBinaryResource(EXISTING_2_BINREF_URI));
   }

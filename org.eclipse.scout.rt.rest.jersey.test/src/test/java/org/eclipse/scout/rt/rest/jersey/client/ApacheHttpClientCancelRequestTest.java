@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+/*
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.rest.jersey.client;
 
 import static org.junit.Assert.assertTrue;
@@ -32,9 +32,9 @@ import org.eclipse.scout.rt.rest.jersey.JerseyTestApplication;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestRestClientHelper;
 import org.eclipse.scout.rt.rest.jersey.RequestSynchronizer;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.glassfish.jersey.apache.connector.RestEnsureHttpHeaderConnectionCloseProperty;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -100,7 +100,7 @@ public class ApacheHttpClientCancelRequestTest {
     }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
 
     requestSynchronizer.awaitRequest(requestId, 5);
-    ScoutAssert.assertThrows(TimedOutError.class, () -> future.awaitDoneAndGet(300, TimeUnit.MILLISECONDS));
+    Assert.assertThrows(TimedOutError.class, () -> future.awaitDoneAndGet(300, TimeUnit.MILLISECONDS));
     future.cancel(true);
 
     assertTrue(cancellable.isCancelled());

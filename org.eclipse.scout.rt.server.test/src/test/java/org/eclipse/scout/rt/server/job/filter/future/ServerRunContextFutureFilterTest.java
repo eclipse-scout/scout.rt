@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,8 +42,8 @@ public class ServerRunContextFutureFilterTest {
   private IServerSession m_serverSession2;
 
   @Before
-  public void before() {
-    MockitoAnnotations.initMocks(this);
+  public void before() throws Exception {
+    MockitoAnnotations.openMocks(this).close();
 
     when(m_serverJobFuture.getJobInput()).thenReturn(Jobs.newInput().withRunContext(ServerRunContexts.empty().withSession(m_serverSession1)));
     when(m_jobFuture.getJobInput()).thenReturn(Jobs.newInput().withRunContext(RunContexts.empty()));

@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.rt.dataobject.lookup;
 
-import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -23,18 +22,17 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.dataobject.fixture.FixtureEnum;
+import org.eclipse.scout.rt.dataobject.lookup.fixture.FixtureData;
+import org.eclipse.scout.rt.dataobject.lookup.fixture.FixtureDataLookupRestrictionDo;
+import org.eclipse.scout.rt.dataobject.lookup.fixture.FixtureDataLookupRowDo;
+import org.eclipse.scout.rt.dataobject.lookup.fixture.FixtureEnumLookupRestrictionDo;
+import org.eclipse.scout.rt.dataobject.lookup.fixture.FixtureEnumLookupRowDo;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.eclipse.scout.rt.dataobject.lookup.fixture.FixtureData;
-import org.eclipse.scout.rt.dataobject.lookup.fixture.FixtureDataLookupRestrictionDo;
-import org.eclipse.scout.rt.dataobject.lookup.fixture.FixtureDataLookupRowDo;
-import org.eclipse.scout.rt.dataobject.lookup.fixture.FixtureEnumLookupRestrictionDo;
-import org.eclipse.scout.rt.dataobject.lookup.fixture.FixtureEnumLookupRowDo;
 
 @RunWith(PlatformTestRunner.class)
 public class LookupHelperTest {
@@ -178,7 +176,7 @@ public class LookupHelperTest {
     // get all
     FixtureEnumLookupRestrictionDo restriction = BEANS.get(FixtureEnumLookupRestrictionDo.class);
     assertLookupResponse(helper.filterEnumKeepSorting(restriction, FixtureEnum.class, FixtureEnumLookupRowDo.class),
-      FixtureEnum.ONE, FixtureEnum.TWO, FixtureEnum.THREE);
+        FixtureEnum.ONE, FixtureEnum.TWO, FixtureEnum.THREE);
 
     // get by id
     restriction = BEANS.get(FixtureEnumLookupRestrictionDo.class).withIds(FixtureEnum.THREE);
@@ -192,7 +190,7 @@ public class LookupHelperTest {
     // get by text using wildcard
     restriction = BEANS.get(FixtureEnumLookupRestrictionDo.class).withText("*");
     assertLookupResponse(helper.filterEnumKeepSorting(restriction, FixtureEnum.class, FixtureEnumLookupRowDo.class),
-      FixtureEnum.ONE, FixtureEnum.TWO, FixtureEnum.THREE);
+        FixtureEnum.ONE, FixtureEnum.TWO, FixtureEnum.THREE);
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,9 +11,7 @@
 package org.eclipse.scout.rt.platform.exception;
 
 import static org.eclipse.scout.rt.platform.util.CollectionUtility.arrayList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
@@ -152,6 +150,7 @@ public class PlatformExceptionTest {
     System.err.println("formatting " + msg);
     System.err.println("==============");
     System.err.println("Sys.err.println(t)");
+    //noinspection ThrowablePrintedToSystemOut
     System.err.println(t);
     System.err.println("-------");
     System.err.println("t.printStackTrace()");

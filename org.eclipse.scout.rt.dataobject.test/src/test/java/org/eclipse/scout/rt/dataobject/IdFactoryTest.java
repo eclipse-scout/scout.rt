@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.dataobject.id.AbstractUuId;
 import org.eclipse.scout.rt.dataobject.id.IdFactory;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -98,7 +98,7 @@ public class IdFactoryTest {
     FixtureUuId id1 = BEANS.get(IdFactory.class).createFromString(FixtureUuId.class, goodUuuid);
     assertEquals(goodUuuid, id1.unwrapAsString());
 
-    ScoutAssert.assertThrows(PlatformException.class, () -> BEANS.get(IdFactory.class).createFromString(FixtureUuId.class, badUuid));
+    Assert.assertThrows(PlatformException.class, () -> BEANS.get(IdFactory.class).createFromString(FixtureUuId.class, badUuid));
 
     FixtureUuIdWithCustomFromString id2 = BEANS.get(IdFactory.class).createFromString(FixtureUuIdWithCustomFromString.class, badUuid);
     assertEquals(goodUuuid, id2.unwrapAsString());

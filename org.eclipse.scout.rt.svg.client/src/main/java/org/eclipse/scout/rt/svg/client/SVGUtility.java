@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,9 +29,9 @@ import org.apache.batik.bridge.BridgeContext;
 import org.apache.batik.bridge.DynamicGVTBuilder;
 import org.apache.batik.bridge.GVTBuilder;
 import org.apache.batik.bridge.UserAgentAdapter;
+import org.apache.batik.constants.XMLConstants;
 import org.apache.batik.dom.svg.SVGOMRect;
 import org.apache.batik.util.SVGConstants;
-import org.apache.batik.util.XMLConstants;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
@@ -221,8 +221,6 @@ public final class SVGUtility {
    * Set the text content of a text element, in case it contains newlines then add tspan elements. Requires the GVT tree
    * to be attached to the svg document.
    *
-   * @param textElement
-   * @param value
    * @param rowGap
    *          in px
    */
@@ -279,7 +277,7 @@ public final class SVGUtility {
   }
 
   /**
-   * @param set
+   * @param textContent
    *          the text content on a node by using the child text node. Use this instead of e.setTextContent to be
    *          compatible with batik 1.6 (jdk 1.4)
    */
@@ -300,7 +298,7 @@ public final class SVGUtility {
    *          is the {@link SVGTextContentElement} containing optional style and font information context for the
    *          wrapping algorithm
    * @param text
-   * @param wordWrapWidth
+   * @param wordWrap
    *          in px
    * @return the wrapped text with additional newline characters where it was wrapped.
    */

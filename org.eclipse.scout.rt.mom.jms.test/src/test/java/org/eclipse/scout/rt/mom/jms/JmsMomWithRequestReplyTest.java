@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -66,6 +66,7 @@ import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.eclipse.scout.rt.testing.platform.testcategory.SlowTest;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -152,7 +153,7 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
       assertNotNull(testee);
       assertEquals("smith", testee.getTransferObject().getLastname());
       assertEquals("anna", testee.getTransferObject().getFirstname());
-      assertThat(testee.getAdapter(Message.class), instanceOf(Message.class));
+      MatcherAssert.assertThat(testee.getAdapter(Message.class), instanceOf(Message.class));
       assertEquals("cid_test", testee.getAdapter(Message.class).getJMSCorrelationID());
     }
     finally {

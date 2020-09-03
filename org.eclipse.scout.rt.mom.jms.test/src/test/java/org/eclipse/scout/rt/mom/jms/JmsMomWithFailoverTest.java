@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,7 +43,7 @@ public class JmsMomWithFailoverTest extends AbstractJmsMomTest {
   public void testSubscribeFailover() throws InterruptedException {
     Assume.assumeFalse(J2eeJmsMomImplementor.class.isAssignableFrom(m_testParameter.getImplementor()));
 
-    //retryCount=3, retryInterval=1s, sesionRetryInterval=2s
+    //retryCount=3, retryInterval=1s, sessionRetryInterval=2s
     FixtureMomWithFailover mom = installMom(FixtureMomWithFailover.class);
 
     IDestination<String> queue = MOM.newDestination("test/mom/testSubscribeFailover", DestinationType.QUEUE, ResolveMethod.DEFINE, null);

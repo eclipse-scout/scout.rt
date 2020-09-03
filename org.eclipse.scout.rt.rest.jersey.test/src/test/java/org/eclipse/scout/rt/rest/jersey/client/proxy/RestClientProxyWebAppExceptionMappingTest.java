@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.rest.jersey.client.proxy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.WebTarget;
@@ -21,9 +20,9 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.client.proxy.RestClientProxyFactory;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestApplication;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestRestClientHelper;
-import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyInvocation;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -52,7 +51,7 @@ public class RestClientProxyWebAppExceptionMappingTest {
     for (int status = 300; status < 1000; status++) {
       // invoke REST service and let jersey transform the status code into an exception
       final int finalStatus = status;
-      final WebApplicationException remoteException = ScoutAssert.assertThrows(WebApplicationException.class, () -> target
+      final WebApplicationException remoteException = Assert.assertThrows(WebApplicationException.class, () -> target
           .queryParam("status", finalStatus)
           .request()
           .get());

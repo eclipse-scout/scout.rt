@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,10 +13,7 @@ package org.eclipse.scout.rt.server;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -30,6 +27,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -94,8 +92,8 @@ public class ServiceOperationInvokerTest {
    */
   private void assertProcessingException(ServiceTunnelResponse res, String customMessage) {
     Throwable exception = res.getException();
-    assertThat(exception, instanceOf(ProcessingException.class));
-    assertThat("Exception message should not reveil anything (security)", exception.getMessage(), not(containsString(customMessage)));
+    MatcherAssert.assertThat(exception, instanceOf(ProcessingException.class));
+    MatcherAssert.assertThat("Exception message should not reveil anything (security)", exception.getMessage(), not(containsString(customMessage)));
     assertEquals("Stacktrace must be empty (security)", 0, exception.getStackTrace().length);
     assertNotNull(res.getProcessingDuration());
   }

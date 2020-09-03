@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,15 +12,14 @@ package org.eclipse.scout.rt.mom.api.marshaller;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 public class TextMarshallerTest {
@@ -34,10 +33,10 @@ public class TextMarshallerTest {
     assertEquals("ABC", BEANS.get(TextMarshaller.class).unmarshall("ABC", context));
 
     byte[] testee = (byte[]) BEANS.get(TextAsBytesMarshaller.class).marshall("ABC", context);
-    assertThat(testee, is(equalTo(toBytes("ABC"))));
+    MatcherAssert.assertThat(testee, is(equalTo(toBytes("ABC"))));
 
     testee = (byte[]) BEANS.get(TextAsBytesMarshaller.class).marshall(new TestObject(), context);
-    assertThat(testee, is(equalTo(toBytes("TestObject.toString()"))));
+    MatcherAssert.assertThat(testee, is(equalTo(toBytes("TestObject.toString()"))));
     assertEquals("ABC", BEANS.get(TextAsBytesMarshaller.class).unmarshall(toBytes("ABC"), context));
   }
 
@@ -60,7 +59,7 @@ public class TextMarshallerTest {
     assertEquals("", BEANS.get(TextMarshaller.class).unmarshall("", context));
 
     byte[] testee = (byte[]) BEANS.get(TextAsBytesMarshaller.class).marshall("", context);
-    assertThat(testee, is(equalTo(toBytes(""))));
+    MatcherAssert.assertThat(testee, is(equalTo(toBytes(""))));
     assertEquals("", BEANS.get(TextAsBytesMarshaller.class).unmarshall(toBytes(""), context));
   }
 

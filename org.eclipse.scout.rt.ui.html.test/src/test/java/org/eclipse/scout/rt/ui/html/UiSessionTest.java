@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeep
 import org.eclipse.scout.rt.ui.html.fixtures.SessionStoreTestForm;
 import org.eclipse.scout.rt.ui.html.fixtures.SessionStoreTestForm.CloseAction;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
+import org.hamcrest.MatcherAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -171,7 +172,7 @@ public class UiSessionTest {
     // register ui session in session store
     final ISessionStore sessionStore = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
     sessionStore.registerUiSession(uiSession);
-    assertThat(sessionStore, is(instanceOf(HttpSessionBindingListener.class)));
+    MatcherAssert.assertThat(sessionStore, is(instanceOf(HttpSessionBindingListener.class)));
 
     // create and start test form in a model job
     final SessionStoreTestForm form = ModelJobs.schedule(() -> {
@@ -185,7 +186,7 @@ public class UiSessionTest {
         .awaitDoneAndGet(5, TimeUnit.SECONDS);
 
     // schedule a job that emulates servlet container that performs session invalidation on session timeout
-    IFuture<Void> appServerSessionTimeoutFuture = Jobs.schedule(() -> httpSession.invalidate(), Jobs.newInput()
+    IFuture<Void> appServerSessionTimeoutFuture = Jobs.schedule(httpSession::invalidate, Jobs.newInput()
         .withName("simulate session timeout")
         .withExecutionTrigger(Jobs
             .newExecutionTrigger()
@@ -252,7 +253,7 @@ public class UiSessionTest {
     // register ui session in session store
     final ISessionStore sessionStore = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
     sessionStore.registerUiSession(uiSession);
-    assertThat(sessionStore, is(instanceOf(HttpSessionBindingListener.class)));
+    MatcherAssert.assertThat(sessionStore, is(instanceOf(HttpSessionBindingListener.class)));
 
     // create and start test form in a model job
     SessionStoreTestForm form = ModelJobs.schedule(() -> {

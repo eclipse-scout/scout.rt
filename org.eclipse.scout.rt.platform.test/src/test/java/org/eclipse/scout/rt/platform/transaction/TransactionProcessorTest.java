@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.rt.platform.transaction;
 
-import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -48,8 +47,8 @@ public class TransactionProcessorTest {
   private ITransaction m_transaction;
 
   @Before
-  public void before() {
-    MockitoAnnotations.initMocks(this);
+  public void before() throws Exception {
+    MockitoAnnotations.openMocks(this).close();
 
     m_transaction = Mockito.spy(BEANS.get(ITransaction.class));
 
@@ -120,8 +119,8 @@ public class TransactionProcessorTest {
 
     assertEquals("result", result);
     assertSame(callingTransaction, actualTransaction.getValue());
-    verifyZeroInteractions(m_transaction);
-    verifyZeroInteractions(callingTransaction);
+    verifyNoInteractions(m_transaction);
+    verifyNoInteractions(callingTransaction);
   }
 
   @Test
@@ -147,8 +146,8 @@ public class TransactionProcessorTest {
     assertSame(callingTransaction, actualTransaction.getValue());
     assertFalse(supplierWasInvoked.get());
 
-    verifyZeroInteractions(m_transaction);
-    verifyZeroInteractions(callingTransaction);
+    verifyNoInteractions(m_transaction);
+    verifyNoInteractions(callingTransaction);
   }
 
   @Test
@@ -173,7 +172,7 @@ public class TransactionProcessorTest {
       assertSame(exception, e);
 
       assertSame(callingTransaction, actualTransaction.getValue());
-      verifyZeroInteractions(m_transaction);
+      verifyNoInteractions(m_transaction);
       verify(callingTransaction, never()).commitPhase1();
       verify(callingTransaction, never()).commitPhase2();
       verify(callingTransaction, never()).rollback();
@@ -322,7 +321,7 @@ public class TransactionProcessorTest {
     assertSame(m_transaction, actualTransaction.getValue());
     assertEquals("result", result);
 
-    verifyZeroInteractions(callingTransaction);
+    verifyNoInteractions(callingTransaction);
     verify(m_transaction, times(1)).release();
 
     InOrder inOrder = Mockito.inOrder(m_transaction);
@@ -345,15 +344,15 @@ public class TransactionProcessorTest {
           supplierWasInvoked.set(true);
           return null;
         }));
-    assertThrows(AssertionException.class, () -> chain.call(() -> {
+    Assert.assertThrows(AssertionException.class, () -> chain.call(() -> {
       Assert.fail("callable is not expected to be invoked");
       return null;
     }));
 
     // verify
     assertTrue(supplierWasInvoked.get());
-    verifyZeroInteractions(callingTransaction);
-    verifyZeroInteractions(m_transaction);
+    verifyNoInteractions(callingTransaction);
+    verifyNoInteractions(m_transaction);
   }
 
   @Test
@@ -380,7 +379,7 @@ public class TransactionProcessorTest {
     assertEquals("result", result);
     assertTrue(supplierWasInvoked.get());
 
-    verifyZeroInteractions(callingTransaction);
+    verifyNoInteractions(callingTransaction);
     verify(m_transaction, times(1)).release();
 
     InOrder inOrder = Mockito.inOrder(m_transaction);
@@ -413,7 +412,7 @@ public class TransactionProcessorTest {
       assertSame(exception, e);
       assertSame(m_transaction, actualTransaction.getValue());
 
-      verifyZeroInteractions(callingTransaction);
+      verifyNoInteractions(callingTransaction);
       verify(m_transaction, times(1)).release();
 
       InOrder inOrder = Mockito.inOrder(m_transaction);
@@ -571,8 +570,8 @@ public class TransactionProcessorTest {
     assertEquals("result", result);
     assertSame(callingTransaction, actualTransaction.getValue());
 
-    verifyZeroInteractions(m_transaction);
-    verifyZeroInteractions(callingTransaction);
+    verifyNoInteractions(m_transaction);
+    verifyNoInteractions(callingTransaction);
   }
 
   @Test
@@ -599,8 +598,8 @@ public class TransactionProcessorTest {
     assertSame(callingTransaction, actualTransaction.getValue());
     assertFalse(supplierWasInvoked.get());
 
-    verifyZeroInteractions(m_transaction);
-    verifyZeroInteractions(callingTransaction);
+    verifyNoInteractions(m_transaction);
+    verifyNoInteractions(callingTransaction);
   }
 
   @Test
@@ -626,7 +625,7 @@ public class TransactionProcessorTest {
       assertSame(exception, e);
       assertSame(callingTransaction, actualTransaction.getValue());
 
-      verifyZeroInteractions(m_transaction);
+      verifyNoInteractions(m_transaction);
 
       verify(callingTransaction, never()).commitPhase1();
       verify(callingTransaction, never()).commitPhase2();

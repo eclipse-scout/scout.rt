@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,13 +16,14 @@ import org.eclipse.scout.rt.platform.Bean;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTypeResolverBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 
 @Bean
 public class DataObjectTypeResolverBuilder extends DefaultTypeResolverBuilder {
   private static final long serialVersionUID = 1L;
 
   public DataObjectTypeResolverBuilder() {
-    super(DefaultTyping.NON_FINAL);
+    super(DefaultTyping.NON_FINAL, LaissezFaireSubTypeValidator.instance);
   }
 
   @Override

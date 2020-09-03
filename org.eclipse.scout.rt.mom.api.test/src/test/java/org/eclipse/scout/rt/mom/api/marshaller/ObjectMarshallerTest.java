@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,9 +13,7 @@ package org.eclipse.scout.rt.mom.api.marshaller;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;
@@ -24,6 +22,7 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 public class ObjectMarshallerTest {
@@ -36,11 +35,11 @@ public class ObjectMarshallerTest {
     assertEquals("ABC", marshaller.unmarshall(marshaller.marshall("ABC", context), context));
 
     context = new HashMap<>();
-    assertThat(marshaller.unmarshall(marshaller.marshall(new TestObject(), context), context), instanceOf(TestObject.class));
+    MatcherAssert.assertThat(marshaller.unmarshall(marshaller.marshall(new TestObject(), context), context), instanceOf(TestObject.class));
 
     context = new HashMap<>();
     TestObject testee = new TestObject();
-    assertThat((TestObject) marshaller.unmarshall(marshaller.marshall(testee, context), context), is(equalTo(testee)));
+    MatcherAssert.assertThat(marshaller.unmarshall(marshaller.marshall(testee, context), context), is(equalTo(testee)));
   }
 
   @Test
@@ -51,7 +50,7 @@ public class ObjectMarshallerTest {
       fail("NotSerializableException expected");
     }
     catch (Exception e) {
-      assertThat(e.getCause(), is(instanceOf(NotSerializableException.class)));
+      MatcherAssert.assertThat(e.getCause(), is(instanceOf(NotSerializableException.class)));
     }
   }
 
@@ -70,7 +69,7 @@ public class ObjectMarshallerTest {
     Map<String, String> context = new HashMap<>();
 
     byte[] bytes = (byte[]) marshaller.marshall(null, context);
-    assertEquals(null, marshaller.unmarshall(bytes, context));
+    assertNull(marshaller.unmarshall(bytes, context));
   }
 
   public static class TestObject implements Serializable {

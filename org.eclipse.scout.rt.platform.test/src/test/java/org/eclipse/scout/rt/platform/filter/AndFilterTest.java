@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.filter;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -33,8 +32,8 @@ public class AndFilterTest {
   private Predicate<Object> m_filter3;
 
   @Before
-  public void before() {
-    MockitoAnnotations.initMocks(this);
+  public void before() throws Exception {
+    MockitoAnnotations.openMocks(this).close();
   }
 
   @Test(expected = AssertionException.class)

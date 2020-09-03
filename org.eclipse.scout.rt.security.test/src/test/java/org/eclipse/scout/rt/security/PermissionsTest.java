@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+/*
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,9 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.security;
 
-import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -41,6 +40,7 @@ import org.eclipse.scout.rt.security.fixture.UJFixturePermission;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -288,10 +288,10 @@ public class PermissionsTest {
     m_support.checkAndThrow(new AFixturePermission());
     m_support.checkAndThrow(new JFixturePermission());
 
-    assertThrows(AccessForbiddenException.class, () -> m_support.checkAndThrow(null));
-    assertThrows(AccessForbiddenException.class, () -> m_support.checkAndThrow(new NFixturePermission()));
-    assertThrows(AccessForbiddenException.class, () -> m_support.checkAndThrow(new DFixturePermission()));
-    assertThrows(AccessForbiddenException.class, () -> m_support.checkAndThrow(new UJFixturePermission()));
+    Assert.assertThrows(AccessForbiddenException.class, () -> m_support.checkAndThrow(null));
+    Assert.assertThrows(AccessForbiddenException.class, () -> m_support.checkAndThrow(new NFixturePermission()));
+    Assert.assertThrows(AccessForbiddenException.class, () -> m_support.checkAndThrow(new DFixturePermission()));
+    Assert.assertThrows(AccessForbiddenException.class, () -> m_support.checkAndThrow(new UJFixturePermission()));
   }
 
   @Test
@@ -380,9 +380,9 @@ public class PermissionsTest {
   @Test
   public void testSealing() {
     IPermissionCollection permissions = createDefaultPermissionCollection();
-    assertThrows(AssertionException.class, () -> permissions.add(new UJFixturePermission()));
+    Assert.assertThrows(AssertionException.class, () -> permissions.add(new UJFixturePermission()));
 
     List<Permission> permissionList = Collections.list(((PermissionCollection) permissions).elements());
-    assertThrows(AssertionException.class, () -> ((IPermission) permissionList.get(0)).setLevelInternal(PermissionLevel.ALL));
+    Assert.assertThrows(AssertionException.class, () -> ((IPermission) permissionList.get(0)).setLevelInternal(PermissionLevel.ALL));
   }
 }

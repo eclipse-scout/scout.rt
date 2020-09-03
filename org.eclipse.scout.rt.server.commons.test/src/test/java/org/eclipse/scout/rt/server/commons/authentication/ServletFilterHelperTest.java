@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -29,7 +29,7 @@ public class ServletFilterHelperTest {
   @Test
   public void testIsIdempotent() {
     final ServletFilterHelper helper = BEANS.get(ServletFilterHelper.class);
-    ScoutAssert.assertThrows(NullPointerException.class, () -> helper.isIdempotent(null));
+    Assert.assertThrows(NullPointerException.class, () -> helper.isIdempotent(null));
     assertTrue(helper.isIdempotent(mockRequest("GET")));
     assertTrue(helper.isIdempotent(mockRequest("PUT")));
     assertTrue(helper.isIdempotent(mockRequest("HEAD")));
@@ -88,8 +88,8 @@ public class ServletFilterHelperTest {
   public void testCreateBasicAuthRequest() {
     final ServletFilterHelper helper = BEANS.get(ServletFilterHelper.class);
 
-    ScoutAssert.assertThrows(NullPointerException.class, () -> helper.createBasicAuthRequest(null, null));
-    ScoutAssert.assertThrows(NullPointerException.class, () -> helper.createBasicAuthRequest("scott", null));
+    Assert.assertThrows(NullPointerException.class, () -> helper.createBasicAuthRequest(null, null));
+    Assert.assertThrows(NullPointerException.class, () -> helper.createBasicAuthRequest("scott", null));
 
     assertEquals("Basic bnVsbDo=", helper.createBasicAuthRequest(null, "".toCharArray()));
     assertEquals("Basic c2NvdHQ6", helper.createBasicAuthRequest("scott", "".toCharArray()));

@@ -267,7 +267,7 @@ public class JettyServer {
   }
 
   protected SslContextFactory createSslContextFactory() {
-    SslContextFactory sslContextFactory = new SslContextFactory();
+    SslContextFactory sslContextFactory = new SslContextFactory.Server();
     String keyStorePath = resolveKeyStorePath(CONFIG.getPropertyValue(ScoutJettyKeyStorePathProperty.class));
     String autoCertName = CONFIG.getPropertyValue(ScoutJettyAutoCreateSelfSignedCertificateProperty.class);
     String storepass = CONFIG.getPropertyValue(ScoutJettyKeyStorePasswordProperty.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,19 +10,14 @@
  */
 package org.eclipse.scout.rt.mom.jms;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -36,9 +31,11 @@ import org.apache.activemq.broker.BrokerService;
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
@@ -96,9 +93,13 @@ public abstract class AbstractJmsMomTest {
   }
 
   @After
-  public void after() throws Exception {
+  public void after() {
     dispose(m_disposables);
     cancelJobs();
+
+    // remember used used brokers here because they might be removed after mom.destroy()
+    // but it is necessary to wait for broker stop completion later because stopping is executed asynchronously.
+    List<BrokerService> brokers = new ArrayList<>(BrokerRegistry.getInstance().getBrokers().values());
     if (m_mom != null) {
       m_mom.destroy();
       m_mom = null;
@@ -106,12 +107,16 @@ public abstract class AbstractJmsMomTest {
     BeanTestingHelper.get().unregisterBeans(m_beans);
     m_beans.clear();
 
-    // ensure activeMQ is stopped
-    BrokerService brokerService = BrokerRegistry.getInstance().findFirst();
-    if (brokerService != null) {
-      brokerService.stop();
-      brokerService.waitUntilStopped();
-    }
+    // ensure activeMQ is stopped and wait for it
+    brokers.stream().filter(Objects::nonNull).forEach(brokerService -> {
+      try {
+        brokerService.stop();
+        brokerService.waitUntilStopped();
+      }
+      catch (Exception e) {
+        throw new ProcessingException("Unable to stop broker {}.", brokerService, e);
+      }
+    });
 
     LOG.info("Finished test in {} ms", StringUtility.formatNanos(System.nanoTime() - m_testStarted));
     LOG.info("</{}>", m_testName.getMethodName());
@@ -125,8 +130,24 @@ public abstract class AbstractJmsMomTest {
   protected <MOM extends FixtureMom> MOM installMom(Class<MOM> transportType) {
     assertNull("installMom was already called in this test", m_mom);
     IJmsMessageHandler messageHandler = mock(IJmsMessageHandler.class);
+    LOG.info("Registering IJmsMessageHandler mock '{}'.", messageHandler, new Exception("Register Stack"));
     m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(IJmsMessageHandler.class, messageHandler).withAnnotation(AnnotationFactory.createApplicationScoped())));
-    assertSame(messageHandler, BEANS.get(IJmsMessageHandler.class));
+    if (messageHandler != BEANS.get(IJmsMessageHandler.class)) {
+      StringBuilder registeredBeans = new StringBuilder();
+      for (IBean<IJmsMessageHandler> bean : BEANS.getBeanManager().getBeans(IJmsMessageHandler.class)) {
+        registeredBeans.append("\n - instance=").append(bean.getInstance()).append(", beanClass=").append(bean.getBeanClazz());
+        Order orderAnnotation = bean.getBeanAnnotation(Order.class);
+        if (orderAnnotation != null) {
+          registeredBeans.append(", order=").append(orderAnnotation.value());
+        }
+        ApplicationScoped applicationScopedAnnotation = bean.getBeanAnnotation(ApplicationScoped.class);
+        if (applicationScopedAnnotation != null) {
+          registeredBeans.append(", ApplicationScoped");
+        }
+
+      }
+      fail("IJmsMessageHandler mock registration unsuccessful. Registered mock is not returned from BEANS.get. Available beans:" + registeredBeans);
+    }
 
     FixtureMom transport = BeanUtility.createInstance(transportType, m_testParameter);
     m_beans.add(BEANS.getBeanManager().registerBean(new BeanMetaData(transportType, transport)));

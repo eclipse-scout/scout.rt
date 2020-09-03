@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -161,9 +161,9 @@ public class ClientNotificationRegistryTest {
     try {
       ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
       reg.registerSession("testNodeId", "testSessionId", TEST_USER);
-      reg.publish(Collections.<ClientNotificationMessage> emptySet());
+      reg.publish(Collections.emptySet());
       assertEquals(Collections.emptyList(), consumeNoWait(reg, "testNodeId"));
-      Mockito.verifyZeroInteractions(mockClusterSyncService);
+      Mockito.verifyNoInteractions(mockClusterSyncService);
     }
     finally {
       BeanTestingHelper.get().unregisterBean(bean);
@@ -188,7 +188,7 @@ public class ClientNotificationRegistryTest {
       List<ClientNotificationMessage> notificationsNode2 = consumeNoWait(reg, "testNodeId2");
       assertSingleTestNotification(notificationsNode1);
       assertSingleTestNotification(notificationsNode2);
-      Mockito.verifyZeroInteractions(mockClusterSyncService);
+      Mockito.verifyNoInteractions(mockClusterSyncService);
     }
     finally {
       BeanTestingHelper.get().unregisterBean(bean);

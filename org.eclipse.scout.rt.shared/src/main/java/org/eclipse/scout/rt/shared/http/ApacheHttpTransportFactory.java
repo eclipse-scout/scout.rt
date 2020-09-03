@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,10 +41,10 @@ import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTr
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty;
 import org.eclipse.scout.rt.shared.http.proxy.ConfigurableProxySelector;
 import org.eclipse.scout.rt.shared.http.retry.CustomHttpRequestRetryHandler;
-import org.eclipse.scout.rt.shared.http.transport.ApacheHttpTransport;
 import org.eclipse.scout.rt.shared.servicetunnel.http.MultiSessionCookieStore;
 
 import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.apache.v2.ApacheHttpTransport;
 
 /**
  * Factory to create the {@link ApacheHttpTransport} instances.
@@ -71,18 +71,12 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     return new ApacheHttpTransport(builder.build());
   }
 
-  /**
-   * @param builder
-   */
   protected void setConnectionKeepAliveAndRetrySettings(HttpClientBuilder builder) {
     addConnectionKeepAliveSettings(builder);
     addRetrySettings(builder);
     addRedirectSettings(builder);
   }
 
-  /**
-   * @param builder
-   */
   protected void addConnectionKeepAliveSettings(HttpClientBuilder builder) {
     final boolean keepAliveProp = CONFIG.getPropertyValue(ApacheHttpTransportKeepAliveProperty.class);
     if (keepAliveProp) {
@@ -93,9 +87,6 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     }
   }
 
-  /**
-   * @param builder
-   */
   protected void addRetrySettings(HttpClientBuilder builder) {
     final boolean retryOnNoHttpResponseException = CONFIG.getPropertyValue(ApacheHttpTransportRetryOnNoHttpResponseExceptionProperty.class);
     final boolean retryOnSocketExceptionByConnectionReset = CONFIG.getPropertyValue(ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty.class);
@@ -107,9 +98,6 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     }
   }
 
-  /**
-   * @param builder
-   */
   protected void addRedirectSettings(HttpClientBuilder builder) {
     final boolean redirectPost = CONFIG.getPropertyValue(ApacheHttpTransportRedirectPostProperty.class);
     if (redirectPost) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import static org.mockito.Mockito.*;
 
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.MultiStatus;
 import org.eclipse.scout.rt.platform.status.Status;
@@ -92,7 +93,7 @@ public class CellTest {
     assertTrue(c.isHtmlEnabled());
 
     assertSame(observer, c.getObserver());
-    verifyZeroInteractions(observer);
+    verifyNoInteractions(observer);
   }
 
   @Test
@@ -111,7 +112,7 @@ public class CellTest {
     assertNull(c.getCssClass());
     assertFalse(c.isHtmlEnabled());
     assertSame(observer, c.getObserver());
-    verifyZeroInteractions(observer);
+    verifyNoInteractions(observer);
   }
 
   @Test
@@ -227,7 +228,7 @@ public class CellTest {
     ICellObserver observer = installMockObserver(c);
     c.setTooltipText(null);
     assertNull(c.getTooltipText());
-    verifyZeroInteractions(observer);
+    verifyNoInteractions(observer);
   }
 
   @Test
@@ -294,7 +295,7 @@ public class CellTest {
     ICellObserver observer = Mockito.mock(ICellObserver.class);
     c.setObserver(observer);
     assertSame(observer, c.getObserver());
-    verifyZeroInteractions(observer);
+    verifyNoInteractions(observer);
   }
 
   private ICellObserver installMockObserver(Cell c) {
@@ -305,7 +306,7 @@ public class CellTest {
 
   /**
    * When creating a cell. The errorstatus should not be set.
-   * {@link Cell#setErrorStatus(org.eclipse.scout.rt.platform.status.IStatus)}
+   * {@link Cell#setErrorStatusInternal(IMultiStatus)}
    */
   @Test
   public void testInitialErrorStatus() {
@@ -314,7 +315,7 @@ public class CellTest {
   }
 
   /**
-   * {@link Cell#setErrorStatus(org.eclipse.scout.rt.platform.status.IStatus)}
+   * {@link Cell#setErrorStatusInternal(IMultiStatus)}
    */
   @Test
   public void testSetErrorStatus() {
@@ -325,7 +326,7 @@ public class CellTest {
 
   /**
    * When creating a cell. The errorstatus should not be set.
-   * {@link Cell#setErrorStatus(org.eclipse.scout.rt.platform.status.IStatus)}
+   * {@link Cell#setErrorStatusInternal(IMultiStatus)}
    */
   @Test
   public void testClearErrorStatus() {
@@ -337,7 +338,7 @@ public class CellTest {
 
   /**
    * When creating a cell. The errorstatus should not be set.
-   * {@link Cell#setErrorStatus(org.eclipse.scout.rt.platform.status.IStatus)}
+   * {@link Cell#setErrorStatusInternal(IMultiStatus)}
    */
   @Test
   public void testIconCellSetErrorStatus() {
@@ -354,7 +355,7 @@ public class CellTest {
   }
 
   /**
-   * {@link Cell#setErrorStatus(org.eclipse.scout.rt.platform.status.IStatus)}
+   * {@link Cell#setErrorStatusInternal(IMultiStatus)}
    */
   @Test
   public void testAddRemoveMultistatus() {

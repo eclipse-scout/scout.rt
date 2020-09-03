@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,9 @@ import java.util.Objects;
 
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.junit.Assert;
 import org.junit.ComparisonFailure;
+import org.junit.function.ThrowingRunnable;
 
 public final class ScoutAssert {
 
@@ -140,9 +142,11 @@ public final class ScoutAssert {
   }
 
   /**
-   * Asserts that the given {@link ITestExecutable} throws an exception of expected type. <br/>
-   * This method was motivated by Junit 5 and could be replaced when upgrading form Junit 4.
+   * Asserts that the given {@link ITestExecutable} throws an exception of expected type.
+   *
+   * @deprecated Use {@link Assert#assertThrows(Class, ThrowingRunnable)} instead. Will be removed in Scout 12.
    */
+  @Deprecated
   public static <T extends Throwable> T assertThrows(Class<T> expectedType, ITestExecutable r) {
     try {
       r.execute();

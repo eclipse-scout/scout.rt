@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,8 +28,8 @@ import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -180,10 +180,10 @@ public class DataObjectHelperTest {
         .withId(TEST_UUID)
         .withName1("Hugo");
 
-    ScoutAssert.assertThrows(AssertionException.class, () -> m_helper.assertValue(null));
-    ScoutAssert.assertThrows(AssertionException.class, () -> m_helper.assertValue(testObj.createDate()));
-    ScoutAssert.assertThrows(AssertionException.class, () -> m_helper.assertValue(testObj.name2()));
-    ScoutAssert.assertThrows(AssertionException.class, () -> m_helper.assertValue((DoValue<?>) testObj.get("doesNotExist")));
+    Assert.assertThrows(AssertionException.class, () -> m_helper.assertValue(null));
+    Assert.assertThrows(AssertionException.class, () -> m_helper.assertValue(testObj.createDate()));
+    Assert.assertThrows(AssertionException.class, () -> m_helper.assertValue(testObj.name2()));
+    Assert.assertThrows(AssertionException.class, () -> m_helper.assertValue((DoValue<?>) testObj.get("doesNotExist")));
     assertEquals(TEST_UUID, m_helper.assertValue(testObj.id()));
     assertEquals("Hugo", m_helper.assertValue(testObj.name1()));
   }
@@ -194,11 +194,11 @@ public class DataObjectHelperTest {
         .withId(TEST_UUID)
         .withName1("Hugo");
 
-    ScoutAssert.assertThrows(AssertionException.class, () -> m_helper.assertValueHasText(null));
-    ScoutAssert.assertThrows(AssertionException.class, () -> m_helper.assertValueHasText(testObj.name2()));
+    Assert.assertThrows(AssertionException.class, () -> m_helper.assertValueHasText(null));
+    Assert.assertThrows(AssertionException.class, () -> m_helper.assertValueHasText(testObj.name2()));
     @SuppressWarnings("unchecked")
     DoValue<String> dummyDoValue = (DoValue<String>) testObj.get("doesNotExist");
-    ScoutAssert.assertThrows(AssertionException.class, () -> m_helper.assertValueHasText(dummyDoValue));
+    Assert.assertThrows(AssertionException.class, () -> m_helper.assertValueHasText(dummyDoValue));
     assertEquals("Hugo", m_helper.assertValueHasText(testObj.name1()));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.rt.mom.api.marshaller;
 
-import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -28,6 +27,8 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.hamcrest.MatcherAssert;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class JsonDataObjectMarshallerTest {
@@ -40,11 +41,11 @@ public class JsonDataObjectMarshallerTest {
     assertEquals(data, marshallAndUnmarshallAsDataObject(data, context));
 
     context = new HashMap<>();
-    assertThat(marshallAndUnmarshallAsDataObject(new JsonMarshallerTestEntity(), context), instanceOf(JsonMarshallerTestEntity.class));
+    MatcherAssert.assertThat(marshallAndUnmarshallAsDataObject(new JsonMarshallerTestEntity(), context), instanceOf(JsonMarshallerTestEntity.class));
 
     context = new HashMap<>();
     JsonMarshallerTestEntity testee = new JsonMarshallerTestEntity();
-    assertThat(marshallAndUnmarshallAsDataObject(testee, context), is(equalTo(testee)));
+    MatcherAssert.assertThat(marshallAndUnmarshallAsDataObject(testee, context), is(equalTo(testee)));
   }
 
   @Test
@@ -65,7 +66,7 @@ public class JsonDataObjectMarshallerTest {
 
   @Test
   public void testNonDataObject() {
-    assertThrows(AssertionException.class, () -> BEANS.get(JsonDataObjectMarshaller.class).marshall("foo", null));
+    Assert.assertThrows(AssertionException.class, () -> BEANS.get(JsonDataObjectMarshaller.class).marshall("foo", null));
   }
 
   private static Object marshallAndUnmarshallAsDataObject(Object object, Map<String, String> context) {

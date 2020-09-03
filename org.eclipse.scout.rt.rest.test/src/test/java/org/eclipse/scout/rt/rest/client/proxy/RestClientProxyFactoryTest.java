@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.rt.rest.client.proxy;
 
-import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
 import static org.junit.Assert.*;
 
 import javax.ws.rs.client.AsyncInvoker;
@@ -25,6 +24,7 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -86,7 +86,7 @@ public class RestClientProxyFactoryTest {
 
   @Test
   public void testCreateAndConfigureProxiedClient() {
-    assertThrows(AssertionException.class, () -> getFactory().createClientProxy(null, null));
+    Assert.assertThrows(AssertionException.class, () -> getFactory().createClientProxy(null, null));
 
     Client client = mockClient();
     // ensure client is not mistakenly considered as async proxy

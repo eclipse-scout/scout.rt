@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.dataobject.enumeration.EnumResolver;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureEnum;
@@ -19,7 +18,7 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureEnumWithCustomResolve;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
-import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class EnumResolverTest {
@@ -30,7 +29,7 @@ public class EnumResolverTest {
     assertEquals(FixtureEnum.TWO, BEANS.get(EnumResolver.class).resolve(FixtureEnum.class, "two"));
     assertEquals(FixtureEnum.THREE, BEANS.get(EnumResolver.class).resolve(FixtureEnum.class, "three"));
     assertNull(BEANS.get(EnumResolver.class).resolve(FixtureEnum.class, null));
-    ScoutAssert.assertThrows(AssertionException.class, () -> BEANS.get(EnumResolver.class).resolve(FixtureEnum.class, "foo"));
+    Assert.assertThrows(AssertionException.class, () -> BEANS.get(EnumResolver.class).resolve(FixtureEnum.class, "foo"));
   }
 
   @Test
@@ -39,6 +38,6 @@ public class EnumResolverTest {
     assertEquals(FixtureEnumWithCustomResolve.TWO, BEANS.get(EnumResolver.class).resolve(FixtureEnumWithCustomResolve.class, "Two"));
     assertEquals(FixtureEnumWithCustomResolve.THREE, BEANS.get(EnumResolver.class).resolve(FixtureEnumWithCustomResolve.class, "thRee"));
     assertNull(BEANS.get(EnumResolver.class).resolve(FixtureEnumWithCustomResolve.class, null));
-    ScoutAssert.assertThrows(PlatformException.class, () -> BEANS.get(EnumResolver.class).resolve(FixtureEnumWithCustomResolve.class, "foo"));
+    Assert.assertThrows(PlatformException.class, () -> BEANS.get(EnumResolver.class).resolve(FixtureEnumWithCustomResolve.class, "foo"));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -71,7 +71,7 @@ public class HttpServletControlTest {
 
       httpServletControl.setResponseHeaders(servlet, req, resp);
 
-      Mockito.verifyZeroInteractions(servlet);
+      Mockito.verifyNoInteractions(servlet);
       if (expectXHeaders) {
         Mockito.verify(resp).setHeader(HttpServletControl.HTTP_HEADER_X_FRAME_OPTIONS, HttpServletControl.SAMEORIGIN);
         Mockito.verify(resp).setHeader(HttpServletControl.HTTP_HEADER_X_XSS_PROTECTION, HttpServletControl.XSS_MODE_BLOCK);

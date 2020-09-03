@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -106,7 +106,7 @@ class ClosingApacheConnector extends ApacheConnector {
         context.setAuthCache(authCache);
       }
       response = getClient().execute(getHost(request), request, context);
-      HeaderUtils.checkHeaderChanges(clientHeadersSnapshot, clientRequest.getHeaders(), this.getClass().getName());
+      HeaderUtils.checkHeaderChanges(clientHeadersSnapshot, clientRequest.getHeaders(), this.getClass().getName(), null);
 
       final Response.StatusType status = response.getStatusLine().getReasonPhrase() == null
           ? Statuses.from(response.getStatusLine().getStatusCode())

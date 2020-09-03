@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.*;
+import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -101,6 +101,7 @@ import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.platform.util.date.StrictSimpleDateFormat;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -1003,7 +1004,7 @@ public class JsonDataObjectsSerializationTest {
   public void testDeserialize_TestItemDoListAsObjectList() throws Exception {
     String json = readResourceAsString("TestItemDoList.json");
     // read value as raw DoList without concrete bind type information
-    DoList<TestItemDo> testDo = s_dataObjectMapper.readValue(json, new TypeReference<DoList<Object>>() {
+    DoList<TestItemDo> testDo = s_dataObjectMapper.readValue(json, new TypeReference<DoList<TestItemDo>>() {
     });
     assertEquals("foo", testDo.get(0).getId());
     assertEquals("bar", testDo.get(0).getStringAttribute());
@@ -2168,23 +2169,23 @@ public class JsonDataObjectsSerializationTest {
     entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"123.456\""), TestComplexEntityDo.class);
     assertEquals(new BigDecimal("123.456"), entity.getBigDecimalAttribute());
 
-    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123-456"), TestComplexEntityDo.class));
-    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123-456-100"), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"123-456\""), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"10-03-2019\""), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"123,456\""), TestComplexEntityDo.class));
+    Assert.assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123-456"), TestComplexEntityDo.class));
+    Assert.assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123-456-100"), TestComplexEntityDo.class));
+    Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"123-456\""), TestComplexEntityDo.class));
+    Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"10-03-2019\""), TestComplexEntityDo.class));
+    Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"123,456\""), TestComplexEntityDo.class));
 
-    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doublelAttribute", "123-456"), TestComplexEntityDo.class));
-    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "123-456-100"), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"123-456\""), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"10-03-2019\""), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"123,456\""), TestComplexEntityDo.class));
+    Assert.assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doublelAttribute", "123-456"), TestComplexEntityDo.class));
+    Assert.assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "123-456-100"), TestComplexEntityDo.class));
+    Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"123-456\""), TestComplexEntityDo.class));
+    Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"10-03-2019\""), TestComplexEntityDo.class));
+    Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"123,456\""), TestComplexEntityDo.class));
 
-    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "123-456"), TestComplexEntityDo.class));
-    assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "123-456-100"), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"123-456\""), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"10-03-2019\""), TestComplexEntityDo.class));
-    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"123,456\""), TestComplexEntityDo.class));
+    Assert.assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "123-456"), TestComplexEntityDo.class));
+    Assert.assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "123-456-100"), TestComplexEntityDo.class));
+    Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"123-456\""), TestComplexEntityDo.class));
+    Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"10-03-2019\""), TestComplexEntityDo.class));
+    Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"123,456\""), TestComplexEntityDo.class));
   }
 
   protected String createTestComplexEntityJson(String attributeName, String value) {

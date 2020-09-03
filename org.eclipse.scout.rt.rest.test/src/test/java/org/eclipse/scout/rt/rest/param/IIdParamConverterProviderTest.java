@@ -1,15 +1,16 @@
 /*
- * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
- * http://www.bsiag.com/
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.rest.param;
 
-import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import java.util.UUID;
 
@@ -19,7 +20,7 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +39,7 @@ public class IIdParamConverterProviderTest {
 
   @Test
   public void testGetConverterUnhandeledType() {
-    ScoutAssert.assertThrows(NullPointerException.class, () -> m_provider.getConverter(null, null, null));
+    Assert.assertThrows(NullPointerException.class, () -> m_provider.getConverter(null, null, null));
     assertNull(m_provider.getConverter(String.class, null, null));
   }
 
@@ -64,7 +65,7 @@ public class IIdParamConverterProviderTest {
     ParamConverter<FixtureUuId> conv = m_provider.getConverter(FixtureUuId.class, null, null);
 
     assertNull(conv.fromString(null));
-    assertThrows(PlatformException.class, () -> conv.fromString("invalid UUID"));
+    Assert.assertThrows(PlatformException.class, () -> conv.fromString("invalid UUID"));
 
     assertNotNull(conv);
     FixtureUuId id = conv.fromString(TEST_UUID.toString());

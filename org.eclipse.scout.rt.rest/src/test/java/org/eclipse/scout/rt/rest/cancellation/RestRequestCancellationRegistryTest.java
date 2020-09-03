@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.rt.rest.cancellation;
 
-import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
 import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
@@ -19,6 +18,7 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,10 +37,10 @@ public class RestRequestCancellationRegistryTest {
 
   @Test
   public void testRegisterInvalid() {
-    assertThrows(AssertionException.class, () -> m_registry.register(null, null, null));
-    assertThrows(AssertionException.class, () -> m_registry.register("1", null, null));
-    assertThrows(AssertionException.class, () -> m_registry.register(null, "1", null));
-    assertThrows(AssertionException.class, () -> m_registry.register(null, null, m_runMonitor));
+    Assert.assertThrows(AssertionException.class, () -> m_registry.register(null, null, null));
+    Assert.assertThrows(AssertionException.class, () -> m_registry.register("1", null, null));
+    Assert.assertThrows(AssertionException.class, () -> m_registry.register(null, "1", null));
+    Assert.assertThrows(AssertionException.class, () -> m_registry.register(null, null, m_runMonitor));
 
     m_registry.register("1", null, m_runMonitor);
   }
@@ -72,10 +72,10 @@ public class RestRequestCancellationRegistryTest {
     assertFalse(m_runMonitor.isCancelled());
     assertNotNull(m_registry.register("1", "alice", m_runMonitor));
 
-    assertThrows(AccessForbiddenException.class, () -> m_registry.cancel("1", null));
+    Assert.assertThrows(AccessForbiddenException.class, () -> m_registry.cancel("1", null));
     assertFalse(m_runMonitor.isCancelled());
 
-    assertThrows(AccessForbiddenException.class, () -> m_registry.cancel("1", "eve"));
+    Assert.assertThrows(AccessForbiddenException.class, () -> m_registry.cancel("1", "eve"));
     assertFalse(m_runMonitor.isCancelled());
 
     assertTrue(m_registry.cancel("1", "alice"));

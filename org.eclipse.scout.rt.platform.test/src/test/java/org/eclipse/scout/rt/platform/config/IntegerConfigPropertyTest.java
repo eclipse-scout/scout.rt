@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,36 +12,36 @@ package org.eclipse.scout.rt.platform.config;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 /**
- * Tests for {@link AbsteactLongConfigProperty}
+ * Tests for {@link AbstractLongConfigProperty}
  */
 public class IntegerConfigPropertyTest {
 
   @Test
   public void testDefaultForEmptyValue() {
     Integer propertyValue = CONFIG.getPropertyValue(SampleTestProperty.class);
-    assertThat(propertyValue, is(42));
+    MatcherAssert.assertThat(propertyValue, is(42));
 
     propertyValue = CONFIG.getPropertyValue(PositiveSampleTestProperty.class);
-    assertThat(propertyValue, is(42));
+    MatcherAssert.assertThat(propertyValue, is(42));
   }
 
   @Test
   public void testParse() {
-    assertThat(new SampleTestProperty().parse(null), is(nullValue()));
-    assertThat(new SampleTestProperty().parse("0"), is(0));
-    assertThat(new SampleTestProperty().parse("123"), is(123));
-    assertThat(new SampleTestProperty().parse("-123"), is(-123));
+    MatcherAssert.assertThat(new SampleTestProperty().parse(null), is(nullValue()));
+    MatcherAssert.assertThat(new SampleTestProperty().parse("0"), is(0));
+    MatcherAssert.assertThat(new SampleTestProperty().parse("123"), is(123));
+    MatcherAssert.assertThat(new SampleTestProperty().parse("-123"), is(-123));
 
-    assertThat(new PositiveSampleTestProperty().parse(null), is(nullValue()));
-    assertThat(new PositiveSampleTestProperty().parse("0"), is(0));
-    assertThat(new PositiveSampleTestProperty().parse("123"), is(123));
+    MatcherAssert.assertThat(new PositiveSampleTestProperty().parse(null), is(nullValue()));
+    MatcherAssert.assertThat(new PositiveSampleTestProperty().parse("0"), is(0));
+    MatcherAssert.assertThat(new PositiveSampleTestProperty().parse("123"), is(123));
   }
 
   @Test(expected = NumberFormatException.class)
