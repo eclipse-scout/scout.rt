@@ -287,13 +287,13 @@ scout.Outline.prototype._initDetailTableAndForm = function(node) {
 };
 
 scout.Outline.prototype._initDetailTable = function(node) {
-  if (this.navigateButtonsVisible) {
+  if (this.navigateButtonsVisible && node.navigateButtonsVisible) {
     this._appendNavigateButtonsForDetailTable(node);
   }
 };
 
 scout.Outline.prototype._initDetailForm = function(node) {
-  if (this.navigateButtonsVisible) {
+  if (this.navigateButtonsVisible && node.navigateButtonsVisible) {
     this._appendNavigateButtonsForDetailForm(node);
   }
 

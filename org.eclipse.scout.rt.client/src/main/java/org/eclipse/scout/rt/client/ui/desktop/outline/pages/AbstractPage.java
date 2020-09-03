@@ -90,6 +90,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   private static final String TABLE_VISIBLE = "TABLE_VISIBLE";
   private static final String DETAIL_FORM_VISIBLE = "DETAIL_FORM_VISIBLE";
   private static final String SHOW_TILE_OVERVIEW = "SHOW_TILE_OVERVIEW";
+  private static final String NAVIGATE_BUTTONS_VISIBLE = "NAVIGATE_BUTTONS_VISIBLE";
   private static final String PAGE_MENUS_ADDED = "PAGE_MENUS_ADDED";
   private static final String PAGE_ACTIVE = "PAGE_ACTIVE";
   private static final String PAGE_ACTIVATED = "PAGE_ACTIVATED";
@@ -100,7 +101,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(TABLE_VISIBLE, DETAIL_FORM_VISIBLE, PAGE_MENUS_ADDED,
       LIMITED_RESULT, ALWAYS_CREATE_CHILD_PAGE, SEARCH_ACTIVE, SEARCH_REQUIRED, PAGE_ACTIVE);
-  static final NamedBitMaskHelper FLAGS2_BIT_HELPER = new NamedBitMaskHelper(PAGE_ACTIVATED, SHOW_TILE_OVERVIEW);
+  static final NamedBitMaskHelper FLAGS2_BIT_HELPER = new NamedBitMaskHelper(PAGE_ACTIVATED, SHOW_TILE_OVERVIEW, NAVIGATE_BUTTONS_VISIBLE);
   private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = menuType -> {
     if (menuType == TreeMenuType.SingleSelection) {
       return TableMenuType.EmptySpace;
@@ -336,6 +337,17 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   @Order(37)
   protected boolean getConfiguredShowTileOverview() {
     return false;
+  }
+
+  /**
+   * Configures if the navigation buttons up and down should be inserted
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(38)
+  protected boolean getConfiguredNavigateButtonsVisible() {
+    return true;
   }
 
   /**
@@ -622,6 +634,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     setDetailFormVisible(getConfiguredDetailFormVisible());
     setShowTileOverview(getConfiguredShowTileOverview());
     setOverviewIconId(getConfiguredOverviewIconId());
+    setNavigateButtonsVisible(getConfiguredNavigateButtonsVisible());
   }
 
   /*
@@ -1059,6 +1072,20 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       return; // no change
     }
     m_flags2 = FLAGS2_BIT_HELPER.changeBit(SHOW_TILE_OVERVIEW, showTileOverview, m_flags2);
+    firePageChanged();
+  }
+
+  @Override
+  public boolean isNavigateButtonsVisible() {
+    return FLAGS2_BIT_HELPER.isBitSet(NAVIGATE_BUTTONS_VISIBLE, m_flags2);
+  }
+
+  @Override
+  public void setNavigateButtonsVisible(boolean navigateButtonsVisible) {
+    if (isNavigateButtonsVisible() == navigateButtonsVisible) {
+      return; // no change
+    }
+    m_flags2 = FLAGS2_BIT_HELPER.changeBit(NAVIGATE_BUTTONS_VISIBLE, navigateButtonsVisible, m_flags2);
     firePageChanged();
   }
 

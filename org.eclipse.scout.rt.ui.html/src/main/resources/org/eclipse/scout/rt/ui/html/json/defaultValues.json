@@ -409,7 +409,8 @@
     },
     "Page": {
       "detailTableVisible": true,
-      "detailFormVisible": true
+      "detailFormVisible": true,
+      "navigateButtonsVisible": true
     },
     "Tile": {
       "colorScheme": "default",

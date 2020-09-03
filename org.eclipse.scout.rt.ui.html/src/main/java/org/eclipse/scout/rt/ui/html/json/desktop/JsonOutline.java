@@ -34,8 +34,8 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
-import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.eclipse.scout.rt.ui.html.json.tree.IChildNodeIndexLookup;
+import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
 
 public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
@@ -43,6 +43,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   private static final String PROP_DETAIL_FORM = IOutline.PROP_DETAIL_FORM;
   private static final String PROP_DETAIL_TABLE = IOutline.PROP_DETAIL_TABLE;
   private static final String PROP_DETAIL_FORM_VISIBLE = "detailFormVisible";
+  private static final String PROP_NAVIGATE_BUTTONS_VISIBLE = "navigateButtonsVisible";
   private static final String PROP_DETAIL_TABLE_VISIBLE = "detailTableVisible";
   private static final String PROP_OVERVIEW_ICON_ID = "overviewIconId";
 
@@ -174,6 +175,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     JSONObject json = super.treeNodeToJson(node, childIndexes);
     putDetailFormAndTable(json, page);
     putNodeType(json, node);
+    putProperty(json, PROP_NAVIGATE_BUTTONS_VISIBLE, page.isNavigateButtonsVisible());
     json.put(PROP_OVERVIEW_ICON_ID, page.getOverviewIconId());
     BEANS.get(InspectorInfo.class).put(getUiSession(), json, page);
     return json;
@@ -277,6 +279,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(page));
     putDetailFormAndTable(jsonEvent, page);
+    putProperty(jsonEvent, PROP_NAVIGATE_BUTTONS_VISIBLE, page.isNavigateButtonsVisible());
     jsonEvent.put(PROP_OVERVIEW_ICON_ID, page.getOverviewIconId());
     addActionEvent("pageChanged", jsonEvent);
   }
