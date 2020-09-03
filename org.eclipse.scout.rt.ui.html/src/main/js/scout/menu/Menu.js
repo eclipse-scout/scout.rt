@@ -75,7 +75,7 @@ scout.Menu.prototype._renderProperties = function() {
   scout.Menu.parent.prototype._renderProperties.call(this);
   this._renderOverflown();
   this._renderMenuStyle();
-  this._renderMenuButton();
+  this._renderActionStyle();
 };
 
 scout.Menu.prototype._remove = function() {
@@ -103,7 +103,7 @@ scout.Menu.prototype._renderItem = function() {
   this._renderSubMenuIcon();
 };
 
-scout.Menu.prototype._renderMenuButton = function() {
+scout.Menu.prototype._renderActionStyle = function() {
   this.$container.toggleClass('menu-button', this.isButton() && !this.overflown);
 };
 
@@ -375,7 +375,7 @@ scout.Menu.prototype._setOverflown = function(overflown) {
 
 scout.Menu.prototype._renderOverflown = function() {
   this.$container.toggleClass('overflown', this.overflown);
-  this._renderMenuButton();
+  this._renderActionStyle();
 };
 
 scout.Menu.prototype.setMenuStyle = function(menuStyle) {

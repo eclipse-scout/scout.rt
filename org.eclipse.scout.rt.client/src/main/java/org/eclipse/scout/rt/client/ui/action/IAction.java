@@ -42,9 +42,13 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
   String PROP_KEYSTROKE_FIRE_POLICY = "keyStrokeFirePolicy";
   String PROP_ORDER = "order";
   String PROP_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
+  String PROP_ACTION_STYLE = "actionStyle";
 
   byte HORIZONTAL_ALIGNMENT_LEFT = -1;
   byte HORIZONTAL_ALIGNMENT_RIGHT = 1;
+
+  int ACTION_STYLE_DEFAULT = 0;
+  int ACTION_STYLE_BUTTON = 1;
 
   /**
    * Fire keystroke only when the action is accessible (e.g. not covered by a modal dialog)<br>
@@ -84,6 +88,10 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
   String getText();
 
   void setText(String text);
+
+  int getActionStyle();
+
+  void setActionStyle(int style);
 
   /**
    * Key stroke with format lowercase [shift-] [control-] [alternate-] key

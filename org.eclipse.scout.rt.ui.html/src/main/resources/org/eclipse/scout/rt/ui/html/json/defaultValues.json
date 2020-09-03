@@ -58,7 +58,8 @@
       "horizontalAlignment": -1,
       "toggleAction": false,
       "keyStroke": null,
-      "keyStrokeFirePolicy": 0
+      "keyStrokeFirePolicy": 0,
+      "actionStyle": 0
     },
     "Menu": {
       "defaultMenu": null,

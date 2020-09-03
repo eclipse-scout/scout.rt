@@ -255,6 +255,12 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
     return HORIZONTAL_ALIGNMENT_LEFT;
   }
 
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(140)
+  protected int getConfiguredActionStyle() {
+    return ACTION_STYLE_DEFAULT;
+  }
+
   /**
    * called by {@link #init()}<br>
    * this way a menu can for example add/remove custom child menus
@@ -306,6 +312,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
     setSeparator(getConfiguredSeparator());
     setOrder(calculateViewOrder());
     setHorizontalAlignment(getConfiguredHorizontalAlignment());
+    setActionStyle(getConfiguredActionStyle());
     setCssClass(getConfiguredCssClass());
   }
 
@@ -394,6 +401,16 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   @Override
   public void setText(String text) {
     propertySupport.setPropertyString(PROP_TEXT, text);
+  }
+
+  @Override
+  public int getActionStyle() {
+    return propertySupport.getPropertyInt(PROP_ACTION_STYLE);
+  }
+
+  @Override
+  public void setActionStyle(int actionStyle) {
+    propertySupport.setPropertyInt(PROP_ACTION_STYLE, actionStyle);
   }
 
   @Override

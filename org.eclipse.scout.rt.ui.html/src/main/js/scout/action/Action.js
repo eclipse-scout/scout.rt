@@ -361,3 +361,8 @@ scout.Action.prototype._onClick = function(event) {
 
   this.doAction();
 };
+
+scout.Action.prototype.setActionStyle = function(actionStyle) {
+  this.setProperty('actionStyle', actionStyle);
+};
+
