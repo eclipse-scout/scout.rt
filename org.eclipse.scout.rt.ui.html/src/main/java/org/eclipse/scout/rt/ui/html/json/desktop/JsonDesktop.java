@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.BrowserHistoryEntry;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
@@ -170,9 +171,26 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
       addPropertyEventFilterCondition(propertyName, inBackground);
       getModel().getUIFacade().setInBackgroundFromUI(inBackground);
     }
+    else if (IDesktop.PROP_FOCUSED_ELEMENT.equals(propertyName)) {
+      String id = data.optString(propertyName, null);
+      IWidget focusedElement = getWidgetById(id);
+      addPropertyEventFilterCondition(propertyName, focusedElement);
+      getModel().getUIFacade().setFocusedElementFromUI(focusedElement);
+    }
     else {
       super.handleUiPropertyChange(propertyName, data);
     }
+  }
+
+  protected IWidget getWidgetById(String id) {
+    if (id == null) {
+      return null;
+    }
+    IJsonAdapter<?> jsonAdapter = getUiSession().getJsonAdapter(id);
+    if (jsonAdapter == null) {
+      return null;
+    }
+    return (IWidget) jsonAdapter.getModel();
   }
 
   protected void handleCancelAllForms(JsonEvent event) {
@@ -390,6 +408,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
       @Override
       protected Boolean modelValue() {
         return getModel().isDense();
+      }
+    });
+    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_TRACK_FOCUS, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isTrackFocus();
       }
     });
   }

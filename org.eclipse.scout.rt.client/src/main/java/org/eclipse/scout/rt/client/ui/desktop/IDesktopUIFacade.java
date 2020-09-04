@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop;
 
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
@@ -90,4 +91,6 @@ public interface IDesktopUIFacade {
   void removedNotificationFromUI(IDesktopNotification desktopNotification);
 
   void setInBackgroundFromUI(boolean inBackground);
+
+  void setFocusedElementFromUI(IWidget widget);
 }

@@ -90,7 +90,8 @@ export default class Desktop extends Widget {
     this._glassPaneTargetFilters = [];
     this.url = null;
 
-    this._addWidgetProperties(['viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes', 'activeForm']);
+    this._addWidgetProperties(['viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes', 'activeForm', 'focusedElement']);
+    this._addPreserveOnPropertyChangeProperties(['focusedElement']);
 
     // event listeners
     this._benchActiveViewChangedHandler = this._onBenchActivateViewChanged.bind(this);
@@ -1425,5 +1426,21 @@ export default class Desktop extends Widget {
     this.$container.children('.tooltip').each(function() {
       scout.widget($(this)).position();
     });
+  }
+
+  _renderTrackFocus() {
+    if (this.trackFocus) {
+      // Use capture phase because FocusContext stops propagation
+      this.$container[0].addEventListener('focusin', this._focusInListener, true);
+    } else {
+      this.$container[0].removeEventListener('focusin', this._focusInListener, true);
+    }
+  }
+
+  _onFocusIn(event) {
+    super._onFocusIn(event);
+    let $target = $(event.target);
+    let focusedElement = scout.widget($target);
+    this.setProperty('focusedElement', focusedElement);
   }
 }

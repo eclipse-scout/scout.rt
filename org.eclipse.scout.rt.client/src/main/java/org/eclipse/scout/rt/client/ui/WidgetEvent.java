@@ -17,6 +17,8 @@ public class WidgetEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
 
   public static final int TYPE_SCROLL_TO_TOP = 100;
+  public static final int TYPE_FOCUS_IN = 200;
+  public static final int TYPE_FOCUS_OUT = 300;
 
   private int m_type;
 

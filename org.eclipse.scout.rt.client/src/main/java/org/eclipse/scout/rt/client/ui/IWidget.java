@@ -493,8 +493,14 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
 
   void scrollToTop();
 
-  void addWidgetListener(WidgetListener listener);
+  default void addWidgetListener(WidgetListener listener, Integer... eventTypes) {
+    widgetListeners().add(listener, false, eventTypes);
+  }
 
-  void removeWidgetListener(WidgetListener listener);
+  default void removeWidgetListener(WidgetListener listener, Integer... eventTypes) {
+    widgetListeners().remove(listener, eventTypes);
+  }
+
+  WidgetListeners widgetListeners();
 
 }

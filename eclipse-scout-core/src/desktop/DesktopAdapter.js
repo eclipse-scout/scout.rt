@@ -14,7 +14,7 @@ export default class DesktopAdapter extends ModelAdapter {
 
   constructor() {
     super();
-    this._addRemoteProperties(['benchVisible', 'navigationVisible', 'navigationHandleVisible', 'headerVisible', 'geolocationServiceAvailable', 'inBackground']);
+    this._addRemoteProperties(['benchVisible', 'navigationVisible', 'navigationHandleVisible', 'headerVisible', 'geolocationServiceAvailable', 'inBackground', 'focusedElement']);
   }
 
   _goOffline() {
@@ -51,6 +51,22 @@ export default class DesktopAdapter extends ModelAdapter {
           !(previous.formId === null && this.formId !== null);
       }
     });
+  }
+
+  _prepareRemoteProperty(propertyName, value) {
+    if (propertyName === 'focusedElement') {
+      return value;
+    }
+    return super._prepareRemoteProperty(propertyName, value);
+  }
+
+  _sendFocusedElement(focusedElement) {
+    // Find the nearest widget with a model adapter
+    while (focusedElement && !focusedElement.modelAdapter) {
+      focusedElement = focusedElement.parent;
+    }
+    focusedElement = focusedElement ? focusedElement.id : null;
+    this._sendProperty('focusedElement', focusedElement);
   }
 
   _logoAction(event) {

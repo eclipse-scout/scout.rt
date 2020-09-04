@@ -103,6 +103,7 @@ import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.ChangeStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
@@ -873,6 +874,45 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       }
     }
     propertySupport.setProperty(PROP_ACTIVE_FORM, form);
+  }
+
+  @Override
+  public IWidget getFocusedElement() {
+    return (IWidget) propertySupport.getProperty(PROP_FOCUSED_ELEMENT);
+  }
+
+  protected void setFocusedElement(IWidget focusedElement) {
+    if (ObjectUtility.equals(focusedElement, getFocusedElement())) {
+      return;
+    }
+    if (getFocusedElement() instanceof AbstractWidget) {
+      ((AbstractWidget) getFocusedElement()).notifyFocusOut();
+    }
+    propertySupport.setProperty(PROP_FOCUSED_ELEMENT, focusedElement);
+    if (focusedElement instanceof AbstractWidget) {
+      ((AbstractWidget) focusedElement).notifyFocusIn();
+    }
+  }
+
+  @Override
+  public void setTrackFocus(boolean trackFocus) {
+    int trackFocusCount = getTrackFocus();
+    if (trackFocus) {
+      trackFocusCount++;
+    }
+    else {
+      trackFocusCount = Math.max(trackFocusCount - 1, 0);
+    }
+    propertySupport.setPropertyInt(PROP_TRACK_FOCUS, trackFocusCount);
+  }
+
+  protected int getTrackFocus() {
+    return propertySupport.getPropertyInt(PROP_TRACK_FOCUS);
+  }
+
+  @Override
+  public boolean isTrackFocus() {
+    return getTrackFocus() > 0;
   }
 
   @Override
@@ -2579,6 +2619,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
         m_selectedViewTabs.remove(IForm.VIEW_ID_CENTER);
       }
       AbstractDesktop.this.activateForm(form);
+    }
+
+    @Override
+    public void setFocusedElementFromUI(IWidget widget) {
+      setFocusedElement(widget);
     }
 
     @Override

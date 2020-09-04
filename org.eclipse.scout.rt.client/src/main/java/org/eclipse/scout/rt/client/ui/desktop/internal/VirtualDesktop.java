@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.Coordinates;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.client.ui.WidgetListener;
+import org.eclipse.scout.rt.client.ui.WidgetListeners;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -648,6 +648,20 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public IWidget getFocusedElement() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void setTrackFocus(boolean trackFocus) {
+  }
+
+  @Override
+  public boolean isTrackFocus() {
+    return false;
+  }
+
+  @Override
   public void addAddOn(Object addOn) {
     throw createUnsupportedOperationException();
   }
@@ -1008,12 +1022,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void addWidgetListener(WidgetListener listener) {
-    // NOP
-  }
-
-  @Override
-  public void removeWidgetListener(WidgetListener listener) {
-    // NOP
+  public WidgetListeners widgetListeners() {
+    return null;
   }
 }

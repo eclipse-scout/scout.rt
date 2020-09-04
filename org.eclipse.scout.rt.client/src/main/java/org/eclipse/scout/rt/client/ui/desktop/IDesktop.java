@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.WidgetEvent;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
@@ -118,6 +119,10 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   String PROP_DISPLAY_STYLE = "displayStyle";
 
   String PROP_ACTIVE_FORM = "activeForm";
+
+  String PROP_FOCUSED_ELEMENT = "focusedElement";
+
+  String PROP_TRACK_FOCUS = "trackFocus";
 
   String PROP_THEME = "theme";
 
@@ -753,6 +758,28 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * @since 4.2.0
    */
   IForm getActiveForm();
+
+  /**
+   * @return the currently focused element as long as {@link #isTrackFocus()} is set to true.
+   */
+  IWidget getFocusedElement();
+
+  /**
+   * Set to true to enable focus tracking so that {@link #getFocusedElement()} will return the focused element and the
+   * widget will be notified when it gains or looses the focus.<br>
+   * Remember to disable the tracking when you don't need it anymore since it will create a http request on each focus
+   * change. <br>
+   * <b>Important</b>: do not call the function multiple times with the same parameter, because internally a counter is
+   * used instead of a boolean to ensure the state is not accidentally changed by another widget.
+   *
+   * @param trackFocus
+   *          true to enable the focus tracking, false to disable it.
+   * @see WidgetEvent#TYPE_FOCUS_IN
+   * @see WidgetEvent#TYPE_FOCUS_OUT
+   */
+  void setTrackFocus(boolean trackFocus);
+
+  boolean isTrackFocus();
 
   /**
    * @return the collection of untyped add-ons in this Desktop

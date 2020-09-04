@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.WidgetEvent;
 import org.eclipse.scout.rt.client.ui.WidgetListener;
@@ -65,24 +66,39 @@ public abstract class AbstractJsonWidget<T extends IWidget> extends AbstractJson
   @Override
   protected void attachModel() {
     super.attachModel();
-    m_listener = event -> {
-      if (event.getType() == WidgetEvent.TYPE_SCROLL_TO_TOP) {
-        handleModelScrollTopTop();
-      }
-      else {
-        throw new IllegalStateException("Unsupported event type " + event.getType());
-      }
-    };
+    if (m_listener != null) {
+      throw new IllegalStateException();
+    }
+    m_listener = new P_WidgetListener();
     getModel().addWidgetListener(m_listener);
+  }
+
+  @Override
+  protected void detachModel() {
+    super.detachModel();
+    if (m_listener == null) {
+      throw new IllegalStateException();
+    }
+    getModel().removeWidgetListener(m_listener);
+    m_listener = null;
+  }
+
+  protected void handleModelWidgetEvent(WidgetEvent event) {
+    if (event.getType() == WidgetEvent.TYPE_SCROLL_TO_TOP) {
+      handleModelScrollTopTop();
+    }
   }
 
   protected void handleModelScrollTopTop() {
     addActionEvent(EVENT_SCROLL_TO_TOP);
   }
 
-  @Override
-  protected void detachModel() {
-    super.detachModel();
-    getModel().removeWidgetListener(m_listener);
+  protected class P_WidgetListener implements WidgetListener {
+
+    @Override
+    public void widgetChanged(WidgetEvent e) {
+      ModelJobs.assertModelThread();
+      handleModelWidgetEvent(e);
+    }
   }
 }

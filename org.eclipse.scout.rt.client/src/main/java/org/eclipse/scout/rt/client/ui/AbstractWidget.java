@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import java.security.Permission;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -22,6 +21,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -49,13 +49,14 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
   private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED);
   private static final String PROP_ENABLED_BYTE = "enabledByte";
 
-  private List<WidgetListener> m_listeners;
+  private final WidgetListeners m_listenerList;
 
   public AbstractWidget() {
     this(true);
   }
 
   public AbstractWidget(boolean callInitializer) {
+    m_listenerList = new WidgetListeners();
     setEnabledByte(NamedBitMaskHelper.ALL_BITS_SET, false); // default enabled
     if (callInitializer) {
       callInitializer();
@@ -600,25 +601,36 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
     fireWidgetEvent(new WidgetEvent(this, WidgetEvent.TYPE_SCROLL_TO_TOP));
   }
 
+  public final void notifyFocusIn() {
+    fireWidgetEvent(new WidgetEvent(this, WidgetEvent.TYPE_FOCUS_IN));
+    execFocusIn();
+  }
+
+  public final void notifyFocusOut() {
+    fireWidgetEvent(new WidgetEvent(this, WidgetEvent.TYPE_FOCUS_OUT));
+    execFocusOut();
+  }
+
+  /**
+   * Function is called when the widget gains the focus, but only if {@link IDesktop#isTrackFocus()} is set to true.
+   */
+  protected void execFocusIn() {
+    // nop
+  }
+
+  /**
+   * Function is called when the widget looses the focus, but only if {@link IDesktop#isTrackFocus()} is set to true.
+   */
+  protected void execFocusOut() {
+    // nop
+  }
+
   protected void fireWidgetEvent(WidgetEvent event) {
-    if (m_listeners != null) {
-      m_listeners.forEach(listener -> listener.widgetChanged(event));
-    }
+    widgetListeners().fireEvent(event);
   }
 
   @Override
-  public void addWidgetListener(WidgetListener listener) {
-    if (m_listeners == null) {
-      m_listeners = new ArrayList<>();
-    }
-    m_listeners.add(listener);
+  public WidgetListeners widgetListeners() {
+    return m_listenerList;
   }
-
-  @Override
-  public void removeWidgetListener(WidgetListener listener) {
-    if (m_listeners != null) {
-      m_listeners.remove(listener);
-    }
-  }
-
 }
