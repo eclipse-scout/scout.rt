@@ -669,6 +669,13 @@ export {default as LoginApp} from './login/LoginApp';
 export {default as LoginBox} from './login/LoginBox';
 export {default as LogoutApp} from './login/LogoutApp';
 export {default as LogoutBox} from './login/LogoutBox';
+export {default as BreadcrumbItem} from './breadcrumbbar/BreadcrumbItem';
+export {default as BreadcrumbItemAdapter} from './breadcrumbbar/BreadcrumbItemAdapter';
+export {default as BreadcrumbBar} from './breadcrumbbar/BreadcrumbBar';
+export {default as BreadcrumbBarLayout} from './breadcrumbbar/BreadcrumbBarLayout';
+export {default as BreadcrumbBarAdapter} from './breadcrumbbar/BreadcrumbBarAdapter';
+export {default as BreadcrumbBarField} from './form/fields/breadcrumbbarfield/BreadcrumbBarField';
+export {default as BreadcrumbBarFieldAdapter} from './form/fields/breadcrumbbarfield/BreadcrumbBarFieldAdapter';
 
 // The following files don't export anything but they need to be imported so they participate on the webpack build
 // noinspection ES6UnusedImports
