@@ -434,6 +434,7 @@
     "Page": {
       "detailTableVisible": true,
       "detailFormVisible": true,
+      "navigateButtonsVisible": true,
       "compactRoot": false,
       "showTileOverview": false
     },

@@ -333,13 +333,13 @@ export default class Outline extends Tree {
   }
 
   _initDetailTable(node) {
-    if (this.navigateButtonsVisible) {
+    if (this.navigateButtonsVisible && node.navigateButtonsVisible) {
       this._appendNavigateButtonsForDetailTable(node);
     }
   }
 
   _initDetailForm(node) {
-    if (this.navigateButtonsVisible) {
+    if (this.navigateButtonsVisible && node.navigateButtonsVisible) {
       this._appendNavigateButtonsForDetailForm(node);
     }
 
