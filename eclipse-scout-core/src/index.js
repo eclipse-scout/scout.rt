@@ -358,6 +358,8 @@ export {default as NumberColumnUserFilter} from './table/userfilter/NumberColumn
 export {default as TextColumnUserFilter} from './table/userfilter/TextColumnUserFilter';
 export {default as TableTextUserFilter} from './table/userfilter/TableTextUserFilter';
 export {default as TileTableHierarchyFilter} from './table/TileTableHierarchyFilter';
+export {default as KeyTableFilter} from './table/KeyTableFilter';
+export {default as TextTableFilter} from './table/TextTableFilter';
 export {default as TimePicker} from './timepicker/TimePicker';
 export {default as TimePickerPopup} from './timepicker/TimePickerPopup';
 export {default as TimePickerPopupLayout} from './timepicker/TimePickerPopupLayout';
