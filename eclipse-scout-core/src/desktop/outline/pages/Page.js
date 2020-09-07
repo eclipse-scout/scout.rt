@@ -35,6 +35,7 @@ export default class Page extends TreeNode {
     this.detailForm = null;
     this.detailFormVisible = true;
     this.detailFormVisibleByUi = true;
+    this.navigateButtonsVisible = true;
 
     /**
      * This property contains the class-name of the form to be instantiated, when createDetailForm() is called.

@@ -184,6 +184,10 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, ID
    */
   void setShowTileOverview(boolean showTileOverview);
 
+  boolean isNavigateButtonsVisible();
+
+  void setNavigateButtonsVisible(boolean navigateButtonsVisible);
+
   /**
    * Sets the icon ID which is used for icons in the tile outline overview.
    */

@@ -44,6 +44,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   private static final String PROP_DETAIL_FORM = IOutline.PROP_DETAIL_FORM;
   private static final String PROP_DETAIL_TABLE = IOutline.PROP_DETAIL_TABLE;
   private static final String PROP_DETAIL_FORM_VISIBLE = "detailFormVisible";
+  private static final String PROP_NAVIGATE_BUTTONS_VISIBLE = "navigateButtonsVisible";
   private static final String PROP_DETAIL_TABLE_VISIBLE = "detailTableVisible";
   private static final String PROP_OVERVIEW_ICON_ID = "overviewIconId";
 
@@ -176,6 +177,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     JSONObject json = super.treeNodeToJson(node, childIndexes, acceptedNodes);
     putDetailFormAndTable(json, page);
     putNodeType(json, node);
+    putProperty(json, PROP_NAVIGATE_BUTTONS_VISIBLE, page.isNavigateButtonsVisible());
     json.put(PROP_OVERVIEW_ICON_ID, page.getOverviewIconId());
     BEANS.get(InspectorInfo.class).put(getUiSession(), json, page);
     return json;
@@ -280,6 +282,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(page));
     putDetailFormAndTable(jsonEvent, page);
+    putProperty(jsonEvent, PROP_NAVIGATE_BUTTONS_VISIBLE, page.isNavigateButtonsVisible());
     jsonEvent.put(PROP_OVERVIEW_ICON_ID, page.getOverviewIconId());
     addActionEvent("pageChanged", jsonEvent);
   }
