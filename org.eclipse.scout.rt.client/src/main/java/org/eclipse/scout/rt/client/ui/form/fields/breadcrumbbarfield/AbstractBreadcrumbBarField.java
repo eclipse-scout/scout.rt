@@ -40,7 +40,7 @@ public abstract class AbstractBreadcrumbBarField extends AbstractFormField imple
     getBreadcrumbBar().setBreadcrumbItems(breadcrumbItems);
   }
 
-  public List<IBreadcrumbItem> getBreadcrumbItems(List<IBreadcrumbItem> breadcrumbItems) {
+  public List<IBreadcrumbItem> getBreadcrumbItems() {
     return getBreadcrumbBar().getBreadcrumbItems();
   }
 

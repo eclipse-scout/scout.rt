@@ -19,6 +19,8 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 public class AbstractBreadcrumbBar extends AbstractWidget implements IBreadcrumbBar {
 
+  protected final BreadcrumbItemListener m_breadcrumbListener = this::onBreadcrumbItemAction;
+
   @ConfigOperation
   protected void execBreadcrumbItemAction(IBreadcrumbItem item) {
     // noop
@@ -30,10 +32,14 @@ public class AbstractBreadcrumbBar extends AbstractWidget implements IBreadcrumb
   }
 
   protected void setBreadcrumbItemsInternal(List<IBreadcrumbItem> breadcrumbItems) {
+    for (IBreadcrumbItem b : getBreadcrumbItems()) {
+      b.removeBreadcrumbItemListener(m_breadcrumbListener);
+    }
+
     propertySupport.setPropertyAlwaysFire(PROP_BREADCRUMBS, breadcrumbItems);
 
     for (IBreadcrumbItem b : breadcrumbItems) {
-      b.addBreadcrumbItemListener(this::onBreadcrumbItemAction);
+      b.addBreadcrumbItemListener(m_breadcrumbListener);
     }
   }
 
