@@ -66,6 +66,7 @@ export {default as RemoteLookupCall} from './lookup/RemoteLookupCall';
 export {default as RemoteLookupRequest} from './lookup/RemoteLookupRequest';
 export {default as QueryBy} from './lookup/QueryBy';
 export {default as StaticLookupCall} from './lookup/StaticLookupCall';
+export {default as PrepopulatedLookupCall} from './lookup/PrepopulatedLookupCall';
 export {default as HierarchicalLookupResultBuilder} from './lookup/HierarchicalLookupResultBuilder';
 export {default as Code} from './code/Code';
 export {default as CodeType} from './code/CodeType';
