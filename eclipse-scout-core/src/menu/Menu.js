@@ -97,7 +97,7 @@ export default class Menu extends Action {
     super._renderProperties();
     this._renderOverflown();
     this._renderMenuStyle();
-    this._renderMenuButton();
+    this._renderActionStyle();
   }
 
   _remove() {
@@ -125,7 +125,7 @@ export default class Menu extends Action {
     this._renderSubMenuIcon();
   }
 
-  _renderMenuButton() {
+  _renderActionStyle() {
     this.$container.toggleClass('menu-button', this.isButton() && !this.overflown);
   }
 
@@ -587,7 +587,7 @@ export default class Menu extends Action {
 
   _renderOverflown() {
     this.$container.toggleClass('overflown', this.overflown);
-    this._renderMenuButton();
+    this._renderActionStyle();
   }
 
   setMenuStyle(menuStyle) {

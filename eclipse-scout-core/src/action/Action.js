@@ -321,6 +321,10 @@ export default class Action extends Widget {
     }
   }
 
+  setActionStyle(actionStyle) {
+    this.setProperty('actionStyle', actionStyle);
+  }
+
   setCompact(compact) {
     if (this.compact === compact) {
       return;
