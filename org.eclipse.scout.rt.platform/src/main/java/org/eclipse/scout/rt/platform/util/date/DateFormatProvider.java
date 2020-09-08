@@ -11,10 +11,13 @@
 package org.eclipse.scout.rt.platform.util.date;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -37,6 +40,16 @@ public class DateFormatProvider {
    * Constant for isolated time pattern.
    */
   public static final int PATTERN_STYLE_ISOLATED_TIME = 2;
+
+  /**
+   * Constant for isolated time pattern with seconds.
+   */
+  public static final int PATTERN_STYLE_ISOLATED_TIME_WITH_SECONDS = 3;
+
+  /**
+   * Constant for isolated time pattern with seconds and milliseconds.
+   */
+  public static final int PATTERN_STYLE_ISOLATED_TIME_WITH_MILLISECONDS = 4;
 
   /**
    * delegates to {@link DateFormat#getAvailableLocales()}
@@ -71,7 +84,9 @@ public class DateFormatProvider {
       case PATTERN_STYLE_ISOLATED_DATE:
         return getIsolatedDateFormatPattern(locale);
       case PATTERN_STYLE_ISOLATED_TIME:
-        return getIsolatedTimeFormatPattern(locale);
+      case PATTERN_STYLE_ISOLATED_TIME_WITH_SECONDS:
+      case PATTERN_STYLE_ISOLATED_TIME_WITH_MILLISECONDS:
+        return getIsolatedTimeFormatPattern(patternStyle, locale);
       default:
         throw new IllegalArgumentException("Illegal patternStyle " + patternStyle);
     }
@@ -187,18 +202,30 @@ public class DateFormatProvider {
    *
    * default  "HH:mm"
    * </pre>
+   *
+   * If pattern style requests seconds and/or milliseconds, :ss or :ss[decimal separator]SSS is added after :mm.
    */
-  protected String getIsolatedTimeFormatPattern(Locale locale) {
+  protected String getIsolatedTimeFormatPattern(int patternStyle, Locale locale) {
     if (locale == null) {
       locale = NlsLocale.get();
     }
     String localeName = StringUtility.emptyIfNull(locale.toLanguageTag()).toLowerCase();
 
+    String secondsSuffix = "";
+    if (patternStyle == PATTERN_STYLE_ISOLATED_TIME_WITH_SECONDS) {
+      secondsSuffix = ":ss";
+    }
+    else if (patternStyle == PATTERN_STYLE_ISOLATED_TIME_WITH_MILLISECONDS) {
+      DecimalFormat decimalFormat = BEANS.get(NumberFormatProvider.class).getNumberInstance(locale);
+      char decimalSeparator = decimalFormat.getDecimalFormatSymbols().getDecimalSeparator();
+      secondsSuffix += ":ss" + decimalSeparator + "SSS";
+    }
+
     if (localeName.startsWith("en")) {
-      return "h:mm a";
+      return "h:mm" + secondsSuffix + " a";
     }
 
     // Default format
-    return "HH:mm";
+    return "HH:mm" + secondsSuffix;
   }
 }
