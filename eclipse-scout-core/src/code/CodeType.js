@@ -30,14 +30,28 @@ export default class CodeType {
     }
   }
 
-  _initCode(modelCode, parent) {
-    var code = scout.create(modelCode);
-    this.add(code, parent);
-    if (modelCode.children) {
-      for (var i = 0; i < modelCode.children.length; i++) {
-        this._initCode(modelCode.children[i], code);
+  _initCode(modelCode) {
+    // Init codes NON recursively to keep the call stack small for large code types
+    let childCodeStack = [];
+    childCodeStack.push({modelCode: modelCode});
+    while (childCodeStack.length > 0) {
+      let entry = childCodeStack.pop();
+      let modelCode = entry.modelCode;
+      let parent = entry.parent;
+      let code = this._initCodeImpl(modelCode, parent, 0);
+      if (modelCode.children && modelCode.children.length > 0) {
+        for (let i = modelCode.children.length - 1; i >= 0; i--) {
+          let child = modelCode.children[i];
+          childCodeStack.push({modelCode: child, parent: code});
+        }
       }
     }
+  }
+
+  _initCodeImpl(modelCode, parent) {
+    var code = scout.create(modelCode);
+    this.add(code, parent);
+    return code;
   }
 
   add(code, parent) {
