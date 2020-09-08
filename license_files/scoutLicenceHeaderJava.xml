@@ -13,7 +13,7 @@
 -->
 <additionalHeaders>
     <scout_javadoc_style>
-        <firstLine>/*******************************************************************************</firstLine>
+        <firstLine>/*</firstLine>
         <beforeEachLine> * </beforeEachLine>
         <endLine> */</endLine>
 <!--         <afterEachLine></afterEachLine> -->

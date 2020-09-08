@@ -62,6 +62,7 @@ export {default as AjaxCall} from './ajax/AjaxCall';
 export {default as AjaxError} from './ajax/AjaxError';
 export {default as LookupCall} from './lookup/LookupCall';
 export {default as LookupRow} from './lookup/LookupRow';
+export {default as RestLookupCall} from './lookup/RestLookupCall';
 export {default as RemoteLookupCall} from './lookup/RemoteLookupCall';
 export {default as RemoteLookupRequest} from './lookup/RemoteLookupRequest';
 export {default as QueryBy} from './lookup/QueryBy';
