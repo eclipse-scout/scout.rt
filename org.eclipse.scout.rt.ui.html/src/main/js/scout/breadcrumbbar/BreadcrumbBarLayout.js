@@ -121,7 +121,7 @@ scout.BreadcrumbBarLayout.prototype._breadcrumbItemsWidth = function(breadcrumbI
     }
   }, this);
 
-  if (considerEllipsis && this._breadcrumbBar._ellipsisBreadcrumbItem) {
+  if (considerEllipsis && this._breadcrumbBar._ellipsisBreadcrumbItem && this._breadcrumbBar._ellipsisBreadcrumbItem.rendered) {
     breadcrumbsWidth += this._breadcrumbBar._ellipsisBreadcrumbItem.$container.outerWidth(true);
   }
   return breadcrumbsWidth;

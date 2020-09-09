@@ -25,8 +25,10 @@ scout.BreadcrumbBarField.prototype._render = function() {
 // Will also be called by model adapter on property change event
 scout.BreadcrumbBarField.prototype._renderBreadcrumbBar = function() {
   this.breadcrumbBar.render();
+  this.addLabel();
   this.addMandatoryIndicator();
   this.addField(this.breadcrumbBar.$container);
+  this.addStatus();
 };
 
 scout.BreadcrumbBarField.prototype.setBreadcrumbBar = function(breadcrumbBar) {

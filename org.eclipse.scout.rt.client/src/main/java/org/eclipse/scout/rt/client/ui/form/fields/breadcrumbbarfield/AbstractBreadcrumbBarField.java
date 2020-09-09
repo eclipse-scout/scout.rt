@@ -34,10 +34,21 @@ public abstract class AbstractBreadcrumbBarField extends AbstractFormField imple
       }
     }
     setBreadcrumbBar(breadcrumbBar);
+    addPropertyChangeListener(e -> {
+      if (getBreadcrumbBar() == null) {
+        return;
+      }
+
+      String name = e.getPropertyName();
+      if (PROP_ENABLED_COMPUTED.equals(name)) {
+        propagateEnabled();
+      }
+    });
   }
 
   public void setBreadcrumbItems(List<IBreadcrumbItem> breadcrumbItems) {
     getBreadcrumbBar().setBreadcrumbItems(breadcrumbItems);
+    propagateEnabled();
   }
 
   public List<IBreadcrumbItem> getBreadcrumbItems() {
@@ -52,6 +63,7 @@ public abstract class AbstractBreadcrumbBarField extends AbstractFormField imple
   @Override
   public void setBreadcrumbBar(IBreadcrumbBar bar) {
     propertySupport.setPropertyAlwaysFire(PROP_BREADCRUMB_BAR, bar);
+    propagateEnabled();
   }
 
   private Class<? extends IBreadcrumbBar> getConfiguredBreadcrumbBar() {
@@ -67,6 +79,16 @@ public abstract class AbstractBreadcrumbBarField extends AbstractFormField imple
         }
       }
       return null;
+    }
+  }
+
+  protected void propagateEnabled() {
+    if (getBreadcrumbBar() != null) {
+      getBreadcrumbBar().getBreadcrumbItems().forEach(item -> {
+        if (item.isInheritAccessibility()) {
+          item.setEnabledInheritAccessibility(isEnabled());
+        }
+      });
     }
   }
 
