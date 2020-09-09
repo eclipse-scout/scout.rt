@@ -9,7 +9,7 @@
  */
 import {AbstractChartRenderer, Chart} from '../index';
 import ChartJs from 'chart.js';
-import {Event, styles} from '@eclipse-scout/core';
+import {Event, styles, arrays} from '@eclipse-scout/core';
 // noinspection ES6UnusedImports
 import chartjs_plugin_datalabels from 'chartjs-plugin-datalabels';
 
@@ -299,14 +299,15 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       config.data.maxSegmentsExceeded = true;
     }
     if (config.type === Chart.Type.BUBBLE && !(config.bubble || {}).bubbleScalingFactor) {
-      let maxR = this._computeMaxMinValue(config.data.datasets, 'r', true).maxValue;
+      let maxR = this._computeMaxMinValue(config.data.datasets, 'r', true).maxValue,
+        bubbleScalingFactor = 1;
       if (maxR > 0 && (config.bubble || {}).sizeOfLargestBubble) {
-        let bubbleScalingFactor = config.bubble.sizeOfLargestBubble / maxR;
+        bubbleScalingFactor = config.bubble.sizeOfLargestBubble / maxR;
         config.data.datasets.forEach(dataset => dataset.data.forEach(data => {
           data.r = data.r * bubbleScalingFactor;
         }));
-        config.bubble = $.extend(true, {}, config.bubble, {bubbleScalingFactor: bubbleScalingFactor});
       }
+      config.bubble = $.extend(true, {}, config.bubble, {bubbleScalingFactor: bubbleScalingFactor});
     }
   }
 
@@ -541,7 +542,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (autoColor) {
       let types = [];
       if (multipleColorsPerDataset) {
-        types = Array((data.datasets.length && data.datasets[0].data.length) || 0).fill(type);
+        types = arrays.init((data.datasets.length && data.datasets[0].data.length) || 0, type);
       } else {
         data.datasets.forEach(dataset => types.push(dataset.type || type));
       }
@@ -556,7 +557,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       colors.backgroundColors = this._computeColors(this.chart.data, type, true);
       if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
         let borderColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'stroke-color0'], 'stroke').stroke;
-        colors.borderColors = Array(colors.borderColors.length).fill(borderColor);
+        colors.borderColors = arrays.init(colors.borderColors.length, borderColor);
         colors.hoverBorderColors = colors.borderColors;
       }
     }
@@ -657,17 +658,10 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _adjustHexColorOpacity(hexColor, opacity = 1) {
-    if (!hexColor || hexColor.indexOf('#') !== 0) {
+    if (!hexColor || hexColor.indexOf('#') !== 0 || !(hexColor.length === 4 || hexColor.length === 5 || hexColor.length === 7 || hexColor.length === 9)) {
       return hexColor;
     }
-    if (hexColor.length > 7) {
-      hexColor = hexColor.substring(0, 7);
-    }
-    let opacityHex = Math.round(opacity * 255).toString(16);
-    if (opacityHex.length === 1) {
-      opacityHex = '0' + opacityHex;
-    }
-    return hexColor + opacityHex;
+    return this._adjustRgbColorOpacity(styles.hexToRgb(hexColor), opacity);
   }
 
   _generateLegendLabels(chart) {

@@ -14,11 +14,16 @@ import java.util.List;
 
 import org.eclipse.scout.rt.chart.client.ui.basic.chart.AbstractChart;
 import org.eclipse.scout.rt.chart.client.ui.basic.chart.IChart;
+import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 /**
  * @since 5.2
@@ -27,6 +32,8 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 public abstract class AbstractChartField<T extends IChart> extends AbstractFormField implements IChartField<T> {
 
   private T m_chart;
+
+  private IContextMenu m_contextMenu;
 
   public AbstractChartField() {
     super(true);
@@ -40,7 +47,56 @@ public abstract class AbstractChartField<T extends IChart> extends AbstractFormF
   protected void initConfig() {
     super.initConfig();
     setChartInternal(createChart());
+
+    // menus
+    List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
+    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
+    for (Class<? extends IMenu> menuClazz : declaredMenus) {
+      menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
+    }
+    menus.addAllOrdered(contributedMenus);
+    injectMenusInternal(menus);
+    new MoveActionNodesHandler<>(menus).moveModelObjects();
+    m_contextMenu = new FormFieldContextMenu<>(this, menus.getOrderedList());
   }
+
+  protected List<Class<? extends IMenu>> getDeclaredMenus() {
+    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
+    return ConfigurationUtility.removeReplacedClasses(filtered);
+  }
+
+  /**
+   * Override this internal method only in order to make use of dynamic menus<br>
+   * Used to add and/or remove menus<br>
+   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
+   *
+   * @param menus
+   *          live and mutable collection of configured menus
+   */
+  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
+  }
+
+  @Override
+  public IContextMenu getContextMenu() {
+    return m_contextMenu;
+  }
+
+  @Override
+  public List<IMenu> getMenus() {
+    return getContextMenu().getChildActions();
+  }
+
+  @Override
+  public <M extends IMenu> M getMenuByClass(Class<M> menuType) {
+    return null;
+  }
+
+  /*@Override
+  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
+    return MenuUtility.getMenuByClass(this, menuType);
+  }*/
 
   protected Class<? extends IChart> getConfiguredChart() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());

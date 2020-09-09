@@ -26,11 +26,15 @@ export default class ChartFieldTile extends FormFieldTile {
       return;
     }
     let colorScheme = 'tile';
-    this.$container.get(0).classList.forEach(cssClass => {
-      if (['color-alternative', 'color-rainbow', 'inverted'].indexOf(cssClass) > -1) {
-        colorScheme += ' ' + cssClass;
-      }
-    });
+    if (this.$container.hasClass('color-alternative')) {
+      colorScheme += ' color-alternative';
+    }
+    if (this.$container.hasClass('color-rainbow')) {
+      colorScheme += ' color-rainbow';
+    }
+    if (this.$container.hasClass('inverted')) {
+      colorScheme += ' inverted';
+    }
     this.tileWidget.chart.chartRenderer.renderColorScheme(colorScheme);
   }
 

@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.chart.client.ui.form.fields.tile;
 import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.chart.client.ui.basic.chart.AbstractChart;
+import org.eclipse.scout.rt.chart.client.ui.basic.chart.IChart;
 import org.eclipse.scout.rt.chart.client.ui.form.fields.chartfield.AbstractChartField;
 import org.eclipse.scout.rt.chart.client.ui.form.fields.tile.AbstractChartTile.ChartField;
-import org.eclipse.scout.rt.chart.client.ui.form.fields.tile.AbstractChartTile.ChartField.Chart;
 import org.eclipse.scout.rt.chart.shared.data.basic.chart.IChartConfig;
 import org.eclipse.scout.rt.client.ui.tile.fields.AbstractFormFieldTile;
 import org.eclipse.scout.rt.platform.Order;
@@ -165,13 +165,13 @@ public abstract class AbstractChartTile extends AbstractFormFieldTile<ChartField
     // NOP
   }
 
-  public Chart getChart() {
+  public IChart getChart() {
     return getTileWidget().getChart();
   }
 
   @Order(10)
   @ClassId("fb72a598-b9ca-44b7-b1be-0ca1a33bca6b")
-  public class ChartField extends AbstractChartField<Chart> {
+  public class ChartField extends AbstractChartField<IChart> {
 
     @Override
     public String classId() {
