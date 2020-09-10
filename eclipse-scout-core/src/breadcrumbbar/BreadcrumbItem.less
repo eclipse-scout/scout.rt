@@ -24,12 +24,15 @@
     color: @link-hover-color;
   }
 
+  &.first {
+    vertical-align: top;
+  }
+
   &:not(.first)::before {
     #scout.font-icon();
     content: @icon-angle-right-bold;
     color: @text-color;
     display: block;
-    padding-top: 1px;
     margin: 0 5px;
     cursor: default;
   }

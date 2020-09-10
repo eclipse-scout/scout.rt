@@ -26,8 +26,10 @@ export default class BreadcrumbBarField extends FormField {
 
   _renderBreadcrumbBar() {
     this.breadcrumbBar.render();
+    this.addLabel();
     this.addMandatoryIndicator();
     this.addField(this.breadcrumbBar.$container);
+    this.addStatus();
   }
 
   setBreadcrumbBar(breadcrumbBar) {

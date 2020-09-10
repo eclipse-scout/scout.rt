@@ -34,11 +34,14 @@ public class AbstractBreadcrumbBar extends AbstractWidget implements IBreadcrumb
   }
 
   protected void setBreadcrumbItemsInternal(List<IBreadcrumbItem> breadcrumbItems) {
+    for (IBreadcrumbItem oldItem : getBreadcrumbItems()) {
+      oldItem.removeBreadcrumbItemListener(m_breadcrumbListener);
+    }
+
     propertySupport.setPropertyAlwaysFire(PROP_BREADCRUMBS, breadcrumbItems);
 
-    for (IBreadcrumbItem b : breadcrumbItems) {
-      b.removeBreadcrumbItemListener(m_breadcrumbListener);
-      b.addBreadcrumbItemListener(m_breadcrumbListener);
+    for (IBreadcrumbItem newItem : breadcrumbItems) {
+      newItem.addBreadcrumbItemListener(m_breadcrumbListener);
     }
   }
 
