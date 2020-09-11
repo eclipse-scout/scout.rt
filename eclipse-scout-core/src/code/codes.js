@@ -58,13 +58,17 @@ export function add(codeTypes) {
 export function remove(codeTypes) {
   codeTypes = arrays.ensure(codeTypes);
   codeTypes.forEach(function(codeType) {
-    var id;
     if (typeof codeType === 'string') {
-      id = codeType;
-    } else {
-      id = codeType.id;
+      codeType = registry[codeType];
     }
-    delete registry[id];
+    if (!codeType) {
+      // Not in registry, ignore
+      return;
+    }
+    codeType.visit(function(code) {
+      unregisterTexts(code);
+    });
+    delete registry[codeType.id];
   }, this);
 }
 
@@ -163,6 +167,10 @@ export function registerTexts(code, textsArg) {
   return key;
 }
 
+export function unregisterTexts(code) {
+  objects.values(texts.textsByLocale).forEach(textMap => textMap.remove(generateTextKey(code)));
+}
+
 export default {
   add,
   bootstrap,
@@ -173,6 +181,7 @@ export default {
   init,
   optGet,
   registerTexts,
+  unregisterTexts,
   registry,
   remove
 };
