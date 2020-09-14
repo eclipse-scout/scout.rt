@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,16 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.testing.platform;
-/*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
- */
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,7 +49,7 @@ public class BeanTestingHelper {
    * Registers the given beans in the {@link IBeanManager} of {@link Platform#get()} with an {@link Order} value of
    * {@link #TESTING_BEAN_ORDER} (if none is already set) that overrides all other beans
    * <p>
-   * If registering Mockito mocks, use {@link BeanMetaData#BeanData(Class, Object)}.
+   * If registering Mockito mocks, use {@link BeanMetaData(Class, Object)}.
    *
    * @return the registrations
    */
@@ -78,7 +68,7 @@ public class BeanTestingHelper {
    * Registers the given bean in the {@link IBeanManager} of {@link Platform#get()} with an {@link Order} value of
    * {@link #TESTING_BEAN_ORDER} (if none is already set) that overrides all other beans.
    * <p>
-   * If registering Mockito mocks, use {@link BeanMetaData#BeanData(Class, Object)}.
+   * If registering Mockito mocks, use {@link BeanMetaData(Class, Object)}.
    *
    * @return the registration
    */
@@ -87,8 +77,7 @@ public class BeanTestingHelper {
       return null;
     }
     boolean isMock = Mockito.mockingDetails(beanData.getBeanClazz()).isMock();
-    Assertions.assertFalse(isMock && beanData.getInitialInstance() == null, "Cannot register mocked bean without initial instance. [mock={}]",
-        beanData.getBeanClazz());
+    Assertions.assertFalse(isMock && beanData.getInitialInstance() == null, "Cannot register mocked bean without initial instance. [mock={}]", beanData.getBeanClazz());
     if (beanData.getBeanAnnotation(Order.class) == null) {
       beanData.withOrder(TESTING_BEAN_ORDER);
     }
@@ -111,6 +100,7 @@ public class BeanTestingHelper {
    * Unregisters the given beans
    *
    * @param beans
+   *          The {@link IBean beans} to remove from the {@link IBeanManager}.
    */
   public void unregisterBeans(List<? extends IBean<?>> beans) {
     if (beans == null) {

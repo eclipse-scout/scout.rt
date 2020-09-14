@@ -43,6 +43,7 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.platform.util.IDisposable;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
@@ -95,31 +96,34 @@ public abstract class AbstractJmsMomTest {
   @After
   public void after() {
     dispose(m_disposables);
-    cancelJobs();
-
-    // remember used used brokers here because they might be removed after mom.destroy()
-    // but it is necessary to wait for broker stop completion later because stopping is executed asynchronously.
-    List<BrokerService> brokers = new ArrayList<>(BrokerRegistry.getInstance().getBrokers().values());
-    if (m_mom != null) {
-      m_mom.destroy();
-      m_mom = null;
+    try {
+      cancelJobs();
     }
-    BeanTestingHelper.get().unregisterBeans(m_beans);
-    m_beans.clear();
-
-    // ensure activeMQ is stopped and wait for it
-    brokers.stream().filter(Objects::nonNull).forEach(brokerService -> {
-      try {
-        brokerService.stop();
-        brokerService.waitUntilStopped();
+    finally {
+      // remember used used brokers here because they might be removed after mom.destroy()
+      // but it is necessary to wait for broker stop completion later because stopping is executed asynchronously.
+      List<BrokerService> brokers = new ArrayList<>(BrokerRegistry.getInstance().getBrokers().values());
+      if (m_mom != null) {
+        m_mom.destroy();
+        m_mom = null;
       }
-      catch (Exception e) {
-        throw new ProcessingException("Unable to stop broker {}.", brokerService, e);
-      }
-    });
+      BeanTestingHelper.get().unregisterBeans(m_beans);
+      m_beans.clear();
 
-    LOG.info("Finished test in {} ms", StringUtility.formatNanos(System.nanoTime() - m_testStarted));
-    LOG.info("</{}>", m_testName.getMethodName());
+      // ensure activeMQ is stopped and wait for it
+      brokers.stream().filter(Objects::nonNull).forEach(brokerService -> {
+        try {
+          brokerService.stop();
+          brokerService.waitUntilStopped();
+        }
+        catch (Exception e) {
+          throw new ProcessingException("Unable to stop broker {}.", brokerService, e);
+        }
+      });
+
+      LOG.info("Finished test in {} ms", StringUtility.formatNanos(System.nanoTime() - m_testStarted));
+      LOG.info("</{}>", m_testName.getMethodName());
+    }
   }
 
   protected void installMom() {
@@ -156,13 +160,20 @@ public abstract class AbstractJmsMomTest {
   }
 
   protected void dispose(Collection<IDisposable> disposables) {
-    if (!disposables.isEmpty()) {
-      LOG.info("Disposing {} objects: {}", disposables.size(), disposables);
-      for (IDisposable disposable : disposables) {
+    if (disposables.isEmpty()) {
+      return;
+    }
+
+    LOG.info("Disposing {} objects: {}", disposables.size(), disposables);
+    for (IDisposable disposable : disposables) {
+      try {
         disposable.dispose();
       }
-      disposables.clear();
+      catch (Throwable t) {
+        LOG.info("Unable to dispose '{}'.", disposable, t);
+      }
     }
+    disposables.clear();
   }
 
   protected void cancelJobs() {
@@ -185,6 +196,9 @@ public abstract class AbstractJmsMomTest {
       catch (TimedOutError e) {
         LOG.warn("Some cancelled regular jobs are still running after {} ms! Please check their implementation.", StringUtility.formatNanos(System.nanoTime() - t0));
       }
+      catch (ThreadInterruptedError e) {
+        LOG.warn("Interrupted while waiting for Mom Jobs to complete.", e);
+      }
     }
     // Cancel jms subscriber jobs
     Predicate<IFuture<?>> jmsJobsFilter = Jobs.newFutureFilterBuilder()
@@ -204,6 +218,9 @@ public abstract class AbstractJmsMomTest {
       }
       catch (TimedOutError e) {
         LOG.warn("Some cancelled subscriber jobs are still running after {} ms! Please check their implementation.", StringUtility.formatNanos(System.nanoTime() - t0));
+      }
+      catch (ThreadInterruptedError e) {
+        LOG.warn("Interrupted while waiting for Mom Jobs to complete.", e);
       }
     }
   }
