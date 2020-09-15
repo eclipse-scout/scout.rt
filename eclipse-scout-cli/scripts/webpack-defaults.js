@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -90,8 +90,10 @@ module.exports = (env, args) => {
           loader: require.resolve('less-loader'),
           options: {
             sourceMap: devMode,
-            relativeUrls: false, // deprecated in future rewriteUrls is used
-            rewriteUrls: 'off'
+            lessOptions: {
+              relativeUrls: false,
+              rewriteUrls: 'off'
+            }
           }
         }]
       }, {
@@ -132,9 +134,7 @@ module.exports = (env, args) => {
       new AfterEmitWebpackPlugin({
         createFileList: !devMode,
         outDir: outDir
-      }),
-      // # Copy resources
-      new CopyPlugin(copyPluginConfig)
+      })
     ],
     optimization: {
       splitChunks: {
@@ -188,6 +188,12 @@ module.exports = (env, args) => {
       }
     }
   };
+
+  // # Copy resources
+  if (copyPluginConfig.length > 0) {
+    // only add the plugin if there are resources to copy. Otherwise the plugin fails.
+    config.plugins.push(new CopyPlugin({patterns: copyPluginConfig}));
+  }
 
   if (nvl(args.progress, true)) {
     // Shows progress information in the console in dev mode

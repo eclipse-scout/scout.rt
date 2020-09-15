@@ -12,7 +12,7 @@
   "engines": {
     "node": ">=12.1.0",
     "npm": ">=6.9.0",
-    "pnpm": ">=4"
+    "pnpm": ">=5"
   },
   "keywords": [
     "scout",
@@ -36,7 +36,7 @@
     "@eclipse-scout/releng": "^10.0.0"
   },
   "dependencies": {
-    "jquery": "3.4.1",
+    "jquery": "3.5.1",
     "@eclipse-scout/core": "11.0.0-snapshot"
   }
 }
