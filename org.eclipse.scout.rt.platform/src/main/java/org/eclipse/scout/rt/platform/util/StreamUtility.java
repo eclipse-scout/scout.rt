@@ -169,7 +169,7 @@ public final class StreamUtility {
     // ArrayList would require O(n) for every insertion at the beginning, resulting in total costs of O(n^2)!
     return Collector.of(
         LinkedList::new,
-      LinkedList::addFirst,
+        LinkedList::addFirst,
         (l1, l2) -> {
           l2.addAll(l1);
           return l2;
@@ -180,10 +180,11 @@ public final class StreamUtility {
    * Returns a {@code Collector} that accumulates elements into a {@code HashMap} whose keys and values are the result
    * of applying the provided mapping functions to the input elements.
    * <p>
-   * <b>Note:</b> Unlike {@link Collectors#toMap()}, this collector supports map values that are {@code null}.
+   * <b>Note:</b> Unlike {@link Collectors#toMap(Function, Function)}, this collector supports map values that are
+   * {@code null}.
    * <p>
-   * If the mapped keys contains duplicates (according to {@link Object#equals(Object)}), an
-   * {@code IllegalStateException} is thrown when the collection operation is performed. To handle duplicate keys
+   * If the mapped keys contains duplicates (according to {@link Object#equals(Object)}), a remapping function which
+   * always overrides the existing element is used (e.g. the last value for each key is used). To handle duplicate keys
    * differently, use {@link #toMap(Function, Function, BiFunction)} instead.
    *
    * @param <T>
@@ -203,17 +204,18 @@ public final class StreamUtility {
   public static <T, K, U> Collector<T, ?, Map<K, U>> toMap(
       Function<? super T, ? extends K> keyMapper,
       Function<? super T, ? extends U> valueMapper) {
-    return toMap(HashMap::new, keyMapper, valueMapper, throwingMerger());
+    return toMap(HashMap::new, keyMapper, valueMapper, replacingMerger());
   }
 
   /**
    * Returns a {@code Collector} that accumulates elements into a {@code Map} whose keys and values are the result of
    * applying the provided mapping functions to the input elements.
    * <p>
-   * <b>Note:</b> Unlike {@link Collectors#toMap()}, this collector supports map values that are {@code null}.
+   * <b>Note:</b> Unlike {@link Collectors#toMap(Function, Function)}, this collector supports map values that are
+   * {@code null}.
    * <p>
-   * If the mapped keys contains duplicates (according to {@link Object#equals(Object)}), an
-   * {@code IllegalStateException} is thrown when the collection operation is performed. To handle duplicate keys
+   * If the mapped keys contains duplicates (according to {@link Object#equals(Object)}), a remapping function which
+   * always overrides the existing element is used (e.g. the last value for each key is used). To handle duplicate keys
    * differently, use {@link #toMap(Supplier, Function, Function, BiFunction, Characteristics...)} instead.
    *
    * @param <T>
@@ -237,14 +239,15 @@ public final class StreamUtility {
       Supplier<M> mapSupplier,
       Function<? super T, ? extends K> keyMapper,
       Function<? super T, ? extends U> valueMapper) {
-    return toMap(mapSupplier, keyMapper, valueMapper, throwingMerger());
+    return toMap(mapSupplier, keyMapper, valueMapper, replacingMerger());
   }
 
   /**
    * Returns a {@code Collector} that accumulates elements into a {@code HashMap} whose keys and values are the result
    * of applying the provided mapping functions to the input elements.
    * <p>
-   * <b>Note:</b> Unlike {@link Collectors#toMap()}, this collector supports map values that are {@code null}.
+   * <b>Note:</b> Unlike {@link Collectors#toMap(Function, Function)}, this collector supports map values that are
+   * {@code null}.
    * <p>
    * Duplicate keys are merged by applying the specified {@code remappingFunction}.
    *
@@ -259,7 +262,7 @@ public final class StreamUtility {
    * @param valueMapper
    *          a mapping function to produce values
    * @param remappingFunction
-   *          a function to handle duplicate keys, e.g. {@link #throwingMerger()}
+   *          a function to handle duplicate keys, e.g. {@link #replacingMerger()} or {@link #throwingMerger()}
    * @return a {@code Collector} which collects elements into a {@code HashMap} whose keys and values are the result of
    *         applying mapping functions to the input elements
    * @see StreamUtility#toMap(Supplier, Function, Function, BiFunction, Characteristics...)
@@ -275,7 +278,8 @@ public final class StreamUtility {
    * Returns a {@code Collector} that accumulates elements into a {@code Map} whose keys and values are the result of
    * applying the provided mapping functions to the input elements.
    * <p>
-   * <b>Note:</b> Unlike {@link Collectors#toMap()}, this collector supports map values that are {@code null}.
+   * <b>Note:</b> Unlike {@link Collectors#toMap(Function, Function)}, this collector supports map values that are
+   * {@code null}.
    * <p>
    * Duplicate keys are merged by applying the specified {@code remappingFunction}.
    *
@@ -314,8 +318,8 @@ public final class StreamUtility {
   }
 
   /**
-   * @returns Resulting merged map after putting all elements of {@code map2} into {@code map1}, applying the
-   *          {@code remappingFunction} for duplicated keys.
+   * @return Resulting merged map after putting all elements of {@code map2} into {@code map1}, applying the
+   *         {@code remappingFunction} for duplicated keys.
    */
   private static <K, U, M extends Map<K, U>> M mergeMap(M map1, M map2, BiFunction<? super U, ? super U, ? extends U> remappingFunction) {
     map2.forEach((k, u) -> putEntry(map1, k, u, remappingFunction));

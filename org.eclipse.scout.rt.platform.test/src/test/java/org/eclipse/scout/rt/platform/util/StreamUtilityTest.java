@@ -55,7 +55,7 @@ public class StreamUtilityTest {
 
   @Test
   public void testIterate() {
-    assertEquals(0, StreamUtility.iterate(0, i -> false, i -> failUnaryOperator(i)).count());
+    assertEquals(0, StreamUtility.iterate(0, i -> false, StreamUtilityTest::failUnaryOperator).count());
     assertEquals(Arrays.asList(0), StreamUtility.iterate(0, i -> i <= 0, i -> i + 1).collect(Collectors.toList()));
     assertEquals(Arrays.asList(0, 1), StreamUtility.iterate(0, i -> i <= 1, i -> i + 1).collect(Collectors.toList()));
 
@@ -120,10 +120,10 @@ public class StreamUtilityTest {
   @Test
   public void testTakeWhileMultipleElementsStream() {
     assertEquals(2, StreamUtility.takeWhile(Stream.of("a", "b"), x -> true).count());
-    assertEquals(1, StreamUtility.takeWhile(Stream.of("a", "b"), x -> "a".equals(x)).count());
+    assertEquals(1, StreamUtility.takeWhile(Stream.of("a", "b"), "a"::equals).count());
 
     // takeWhile is not a filter, i.e. if the takeWhile predicate states false, no more elemnts are taken
-    assertEquals(1, StreamUtility.takeWhile(Stream.of("a", "b", "a"), x -> "a".equals(x)).count());
+    assertEquals(1, StreamUtility.takeWhile(Stream.of("a", "b", "a"), "a"::equals).count());
   }
 
   @Test
@@ -251,7 +251,25 @@ public class StreamUtilityTest {
   @Test(expected = IllegalStateException.class)
   public void testToMapWithDuplicatedKey() {
     String[] items = new String[]{"one", "one", "three"};
-    Stream.of(items).collect(StreamUtility.toMap(t -> t, t -> t));
+    Stream.of(items).collect(StreamUtility.toMap(t -> t, t -> t, StreamUtility.throwingMerger()));
+  }
+
+  @Test
+  public void testToMapWithDuplicatedKeyReplacingValue() {
+    Pair<String, String>[] items = new Pair[] { ImmutablePair.of("key1", "valueA"),  ImmutablePair.of("key2", "valueB"),  ImmutablePair.of("key1", "valueC")};
+    Map<String, String> result = Stream.of(items).collect(StreamUtility.toMap(Pair::getLeft, Pair::getRight, StreamUtility.replacingMerger()));
+    assertEquals(2, result.size());
+    assertEquals("valueC", result.get("key1"));
+    assertEquals("valueB", result.get("key2"));
+  }
+
+  @Test
+  public void testToMapWithDuplicatedKeyDefaultRemappingFunction() {
+    Pair<String, String>[] items = new Pair[] { ImmutablePair.of("key1", "valueA"),  ImmutablePair.of("key2", "valueB"),  ImmutablePair.of("key1", "valueC")};
+    Map<String, String> result = Stream.of(items).collect(StreamUtility.toMap(Pair::getLeft, Pair::getRight));
+    assertEquals(2, result.size());
+    assertEquals("valueC", result.get("key1"));
+    assertEquals("valueB", result.get("key2"));
   }
 
   @Test
@@ -261,10 +279,12 @@ public class StreamUtilityTest {
     assertArrayEquals(values, map.keySet().toArray());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testToLinkedHashMapDuplicatedKey() {
-    String[] values = new String[]{"one", "one"};
-    Stream.of(values).collect(StreamUtility.toLinkedHashMap(t -> t, StringUtility::length));
+    Pair<String, String>[] items = new Pair[] { ImmutablePair.of("key1", "valueA"),  ImmutablePair.of("key2", "valueB"),  ImmutablePair.of("key1", "valueC")};
+    Map<String, String> map = Stream.of(items).collect(StreamUtility.toLinkedHashMap(Pair::getLeft, Pair::getRight));
+    assertEquals("valueC", map.get("key1"));
+    assertEquals("valueB", map.get("key2"));
   }
 
   @Test
@@ -334,7 +354,7 @@ public class StreamUtilityTest {
         new ImmutablePair<>("a", "1"),
         new ImmutablePair<>("b", "2"),
         new ImmutablePair<>("a", "3"));
-    Map<Object, ImmutablePair<String, String>> map = items.stream().collect(Collectors.toMap(
+    Map<Object, Pair<String, String>> map = items.stream().collect(Collectors.toMap(
         i -> i.getLeft(),
         Function.identity(),
         StreamUtility.replacingMerger()));
