@@ -227,6 +227,7 @@ public class ClipboardForm extends AbstractForm {
       super.execLoad();
       getClipboardLabel().setValue(TEXTS.get("CopyToClipboardFromFieldBelow"));
       getCancelButton().setVisibleGranted(false);
+      getOkButton().setLabel(TEXTS.get("CloseButton"));
       checkOkButtonEnabled();
       getClipboardField().setReadOnly(true);
     }
