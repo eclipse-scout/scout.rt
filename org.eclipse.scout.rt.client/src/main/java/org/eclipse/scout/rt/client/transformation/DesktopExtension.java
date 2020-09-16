@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.transformation;
 
 import org.eclipse.scout.rt.client.extension.ui.desktop.AbstractDesktopExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopClosingChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopFormAboutToShowChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopInitChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageDetailFormChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageDetailTableChangedChain;
@@ -48,5 +49,12 @@ public class DesktopExtension extends AbstractDesktopExtension<AbstractDesktop> 
   public void execPageDetailTableChanged(DesktopPageDetailTableChangedChain chain, ITable oldTable, ITable newTable) {
     super.execPageDetailTableChanged(chain, oldTable, newTable);
     BEANS.get(IDeviceTransformationService.class).getDeviceTransformer().notifyPageDetailTableChanged(newTable);
+  }
+
+  @Override
+  public IForm execFormAboutToShow(DesktopFormAboutToShowChain chain, IForm form) {
+    form = super.execFormAboutToShow(chain, form);
+    BEANS.get(IDeviceTransformationService.class).getDeviceTransformer().notifyFormAboutToShow(form);
+    return form;
   }
 }

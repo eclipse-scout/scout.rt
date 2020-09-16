@@ -72,6 +72,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     transformations.add(MobileDeviceTransformation.AUTO_CLOSE_SEARCH_FORM);
     transformations.add(MobileDeviceTransformation.MAXIMIZE_DIALOG);
     transformations.add(MobileDeviceTransformation.SET_SEQUENCEBOX_UI_HEIGHT);
+    transformations.add(MobileDeviceTransformation.USE_DIALOG_STYLE_FOR_VIEW);
 
     for (IDeviceTransformation transformation : transformations) {
       getDeviceTransformationConfig().enableTransformation(transformation);
@@ -85,10 +86,18 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
 
   @Override
   public void transformForm(IForm form) {
+    // Called for every form (desktop forms, embedded forms).
+  }
+
+  @Override
+  public void notifyFormAboutToShow(IForm form) {
+    transformDesktopForm(form);
+  }
+
+  protected void transformDesktopForm(IForm form) {
     if (getDeviceTransformationConfig().isFormExcluded(form)) {
       return;
     }
-
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.DISABLE_FORM_CANCEL_CONFIRMATION)) {
       form.setAskIfNeedSave(false);
     }
@@ -102,6 +111,15 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
 
   protected void transformView(IForm form) {
     form.setDisplayViewId(IForm.VIEW_ID_CENTER);
+    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.USE_DIALOG_STYLE_FOR_VIEW)) {
+      // Style the view to make it look like a regular dialog.
+      // The desktop header will be made invisible by the ui if the form has a header. This saves some space because desktop header would always be about 60px big.
+      form.setHeaderVisible(true);
+      // mobile-view: add top border, colorize colored menu bar, same as for dialogs
+      form.addCssClass("mobile-view");
+      // Use same position as for dialogs
+      form.getRootGroupBox().setMenuBarPosition(IGroupBox.MENU_BAR_POSITION_BOTTOM);
+    }
   }
 
   protected void transformDialog(IForm form) {

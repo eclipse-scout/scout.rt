@@ -732,8 +732,11 @@ export default class Desktop extends Widget {
     }
   }
 
-  switchToBench() {
-    this.setHeaderVisible(true);
+  /**
+   * @param {boolean} headerVisible whether the desktop header should be made visible
+   */
+  switchToBench(headerVisible) {
+    this.setHeaderVisible(scout.nvl(headerVisible, true));
     this.setBenchVisible(true);
     this.setNavigationVisible(false);
   }

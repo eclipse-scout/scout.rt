@@ -22,4 +22,9 @@ export default class DesktopTabBoxController extends SimpleTabBoxController {
       view: view
     });
   }
+
+  _shouldCreateTabForView(view) {
+    // Don't create a tab if the view itself already has a header.
+    return !view.headerVisible;
+  }
 }

@@ -76,6 +76,11 @@ public class NullDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void notifyFormAboutToShow(IForm form) {
+    // NOP
+  }
+
+  @Override
   public void notifyFormDisposed(IForm form) {
     // NOP
   }

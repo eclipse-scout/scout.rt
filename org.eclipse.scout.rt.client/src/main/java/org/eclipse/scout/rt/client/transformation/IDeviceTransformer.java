@@ -47,6 +47,8 @@ public interface IDeviceTransformer {
 
   void notifyPageDetailTableChanged(ITable table);
 
+  void notifyFormAboutToShow(IForm form);
+
   void notifyFormDisposed(IForm form);
 
   void notifyFieldDisposed(IFormField formField);

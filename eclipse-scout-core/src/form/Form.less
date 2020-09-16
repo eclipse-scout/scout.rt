@@ -13,10 +13,14 @@
   background-color: @form-background-color;
 }
 
-.view:not(.detail-form) {
+.view:not(.detail-form):not(.mobile-view) {
   & > .root-group-box > .main-menubar {
     #scout.main-menubar-light;
   }
+}
+
+.mobile-view {
+  border-top: @dialog-border-top-size solid @active-color;
 }
 
 .dialog {
@@ -73,7 +77,6 @@
   }
 }
 
-.dialog > .header,
 .form > .header {
   overflow: auto; /* clearfix */
   zoom: 1; /* clearfix */

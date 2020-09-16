@@ -145,16 +145,18 @@ export default class FormController {
     if (view.rendered) {
       return false;
     }
-    if (this.session.desktop.displayStyle === Desktop.DisplayStyle.COMPACT && !this.session.desktop.bench) {
+    let desktop = this.session.desktop;
+    if (desktop.displayStyle === Desktop.DisplayStyle.COMPACT && !desktop.bench) {
       // Show bench and hide navigation if this is the first view to be shown
-      this.session.desktop.sendOutlineToBack();
-      this.session.desktop.switchToBench();
-    } else if (this.session.desktop.bench.removalPending) {
+      desktop.sendOutlineToBack();
+      // Don't show header if the view itself already has a header. Additionally, DesktopTabBoxController takes care of not rendering a tab if there is a view header.
+      desktop.switchToBench(!view.headerVisible);
+    } else if (desktop.bench.removalPending) {
       // If a new form should be shown while the bench is being removed because the last form was closed, schedule the rendering to make sure the bench and the new form will be opened right after the bench has been removed
       setTimeout(this._renderView.bind(this, view, register, position, selectView));
       return;
     }
-    this.session.desktop.bench.addView(view, selectView);
+    desktop.bench.addView(view, selectView);
   }
 
   acceptDialog(dialog) {

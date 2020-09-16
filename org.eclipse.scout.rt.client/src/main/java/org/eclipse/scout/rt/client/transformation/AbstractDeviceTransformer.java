@@ -120,6 +120,10 @@ public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void notifyFormAboutToShow(IForm form) {
+  }
+
+  @Override
   public void notifyFormDisposed(IForm form) {
     getDeviceTransformationConfig().removeFormExclusion(form);
   }

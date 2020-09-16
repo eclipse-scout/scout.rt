@@ -76,11 +76,15 @@ export default class SimpleTabBoxController {
       return;
     }
     viewTab = this._getTab(view);
-    if (!viewTab) {
+    if (!viewTab && this._shouldCreateTabForView(view)) {
       siblingViewTab = this._getTab(siblingView);
       viewTab = this._createTab(view);
       this.tabArea.addTab(viewTab, siblingViewTab);
     }
+  }
+
+  _shouldCreateTabForView(view) {
+    return true;
   }
 
   _onViewRemove(event) {

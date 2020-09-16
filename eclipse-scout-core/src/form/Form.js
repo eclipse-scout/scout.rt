@@ -169,8 +169,7 @@ export default class Form extends Widget {
   _renderForm() {
     let layout;
 
-    this.$container = this.$parent.appendDiv()
-      .addClass(this.isDialog() ? 'dialog' : 'form')
+    this.$container = this.$parent.appendDiv('form')
       .data('model', this);
 
     if (this.uiCssClass) {
@@ -179,6 +178,7 @@ export default class Form extends Widget {
 
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     if (this.isDialog()) {
+      this.$container.addClass('dialog');
       layout = new DialogLayout(this);
       this.htmlComp.validateRoot = true;
       // Attach to capture phase to activate focus context before regular mouse down handlers may set the focus.

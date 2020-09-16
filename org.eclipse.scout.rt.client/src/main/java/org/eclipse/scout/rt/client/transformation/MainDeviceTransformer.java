@@ -78,6 +78,13 @@ public class MainDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void notifyFormAboutToShow(IForm form) {
+    for (IDeviceTransformer transformer : getTransformers()) {
+      transformer.notifyFormAboutToShow(form);
+    }
+  }
+
+  @Override
   public void notifyFormDisposed(IForm form) {
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.notifyFormDisposed(form);
