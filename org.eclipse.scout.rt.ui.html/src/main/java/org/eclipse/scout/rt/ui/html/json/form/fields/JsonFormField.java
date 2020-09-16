@@ -164,6 +164,12 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
         return getModel().getLabelWidthInPixel();
       }
     });
+    putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_LABEL_USE_UI_WIDTH, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isLabelUseUiWidth();
+      }
+    });
     putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_ERROR_STATUS, model) {
       @Override
       protected IStatus modelValue() {

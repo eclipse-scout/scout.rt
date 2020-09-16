@@ -85,6 +85,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
   String PROP_LABEL_POSITION = "labelPosition";
   String PROP_LABEL_VISIBLE = "labelVisible";
   String PROP_LABEL_WIDTH_IN_PIXEL = "labelWidthInPixel";
+  String PROP_LABEL_USE_UI_WIDTH = "labelUseUiWidth";
   String PROP_LABEL_HTML_ENABLED = "labelHtmlEnabled";
   String PROP_KEY_STROKES = "keyStrokes";
   String PROP_STATUS_VISIBLE = "statusVisible";
@@ -363,6 +364,19 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    *          the fixed label witdh &gt;0 or LABEL_WIDTH_DEFAULT or LABEL_WIDTH_UI for ui-dependent label width
    */
   void setLabelWidthInPixel(int w);
+
+  /**
+   * @since 10.09.2020
+   * @return {@code true} if this fields label should be as width as preferred by the ui, {@code false} otherwise
+   */
+  boolean isLabelUseUiWidth();
+
+  /**
+   * @since 10.09.2020
+   * @param labelUseUiWidth
+   *          {@code true} if this fields label should be as width as preferred by the ui, {@code false} otherwise
+   */
+  void setLabelUseUiWidth(boolean labelUseUiWidth);
 
   /**
    * @since 19.11.2009

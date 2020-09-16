@@ -232,12 +232,22 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
+   * @since 10.09.2020
+   * @return {@code true} if this fields label should be as width as preferred by the ui, {@code false} otherwise
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(17)
+  protected boolean getConfiguredLabelUseUiWidth() {
+    return false;
+  }
+
+  /**
    * @since 19.11.2009
    * @return one of the following {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_LEFT},
    *         {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_CENTER}, {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_RIGHT}
    *         or {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_DEFAULT}.
    */
-  @Order(17)
+  @Order(18)
   @ConfigProperty(ConfigProperty.LABEL_HORIZONTAL_ALIGNMENT)
   protected byte getConfiguredLabelHorizontalAlignment() {
     return LABEL_HORIZONTAL_ALIGNMENT_DEFAULT;
@@ -848,6 +858,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     setLabel(getConfiguredLabel());
     setLabelPosition(getConfiguredLabelPosition());
     setLabelWidthInPixel(getConfiguredLabelWidthInPixel());
+    setLabelUseUiWidth(getConfiguredLabelUseUiWidth());
     setLabelHorizontalAlignment(getConfiguredLabelHorizontalAlignment());
     setLabelVisible(getConfiguredLabelVisible());
     setLabelHtmlEnabled(getConfiguredLabelHtmlEnabled());
@@ -1333,6 +1344,16 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   @Override
   public void setLabelWidthInPixel(int w) {
     propertySupport.setPropertyInt(PROP_LABEL_WIDTH_IN_PIXEL, w);
+  }
+
+  @Override
+  public boolean isLabelUseUiWidth() {
+    return propertySupport.getPropertyBool(PROP_LABEL_USE_UI_WIDTH);
+  }
+
+  @Override
+  public void setLabelUseUiWidth(boolean labelUseUiWidth) {
+    propertySupport.setPropertyBool(PROP_LABEL_USE_UI_WIDTH, labelUseUiWidth);
   }
 
   @Override

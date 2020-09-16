@@ -55,6 +55,7 @@ export default class FormField extends Widget {
     this.labelVisible = true;
     this.labelPosition = FormField.LabelPosition.DEFAULT;
     this.labelWidthInPixel = 0;
+    this.labelUseUiWidth = false;
     this.labelHtmlEnabled = false;
     this.mandatory = false;
     this.statusMenuMappings = [];
@@ -99,7 +100,7 @@ export default class FormField extends Widget {
 
     this._addWidgetProperties(['keyStrokes', 'menus', 'statusMenuMappings']);
     this._addCloneProperties(['dropType', 'dropMaximumSize', 'errorStatus', 'fieldStyle', 'gridDataHints', 'gridData', 'label', 'labelVisible', 'labelPosition',
-      'labelWidthInPixel', 'mandatory', 'mode', 'preventInitialFocus', 'requiresSave', 'touched', 'statusVisible', 'statusPosition', 'statusMenuMappings',
+      'labelWidthInPixel', 'labelUseUiWidth', 'mandatory', 'mode', 'preventInitialFocus', 'requiresSave', 'touched', 'statusVisible', 'statusPosition', 'statusMenuMappings',
       'tooltipText', 'tooltipAnchor']);
 
     this._menuPropertyChangeHandler = this._onMenuPropertyChange.bind(this);
@@ -571,6 +572,14 @@ export default class FormField extends Widget {
   }
 
   _renderLabelWidthInPixel() {
+    this.invalidateLayoutTree();
+  }
+
+  setLabelUseUiWidth(labelUseUiWidth) {
+    this.setProperty('labelUseUiWidth', labelUseUiWidth);
+  }
+
+  _renderLabelUseUiWidth() {
     this.invalidateLayoutTree();
   }
 
