@@ -111,4 +111,10 @@ export default class LabelField extends ValueField {
       ref: ref
     });
   }
+
+  addField($field) {
+    super.addField($field);
+    this.$field.off('blur')
+      .off('focus');
+  }
 }
