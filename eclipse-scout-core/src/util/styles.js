@@ -138,6 +138,42 @@ export function rgb(rgbString) {
 }
 
 /**
+ * Converts the given hex string to a rgb string.
+ */
+export function hexToRgb(hexString) {
+  if (!hexString) {
+    return;
+  }
+
+  let r = 0,
+    g = 0,
+    b = 0,
+    a = 255;
+
+  if (hexString.length === 4 || hexString.length === 5) {
+    r = '0x' + hexString[1] + hexString[1];
+    g = '0x' + hexString[2] + hexString[2];
+    b = '0x' + hexString[3] + hexString[3];
+    if (hexString.length === 5) {
+      a = '0x' + hexString[4] + hexString[4];
+    }
+  }
+
+  if (hexString.length === 7 || hexString.length === 9) {
+    r = '0x' + hexString[1] + hexString[2];
+    g = '0x' + hexString[3] + hexString[4];
+    b = '0x' + hexString[5] + hexString[6];
+    if (hexString.length === 9) {
+      a = '0x' + hexString[7] + hexString[8];
+    }
+  }
+
+  a = +(a / 255).toFixed(3);
+
+  return 'rgba(' + +r + ',' + +g + ',' + +b + ',' + a + ')';
+}
+
+/**
  * Make a given color darker by mixing it with a certain amount of black.
  * If no color is specified or the color cannot be parsed, undefined is returned.
  *
@@ -372,6 +408,7 @@ export default {
   darkerColor,
   get,
   getSize,
+  hexToRgb,
   legacyBackgroundColor,
   legacyFont,
   legacyForegroundColor,

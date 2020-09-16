@@ -176,4 +176,34 @@ describe('scout.styles', () => {
     });
   });
 
+  describe('hex to rgb', () => {
+    it('converts a hex string to a rgb string', () => {
+      expect(styles.hexToRgb('#000')).toEqual('rgba(0,0,0,1)');
+      expect(styles.hexToRgb('#123')).toEqual('rgba(17,34,51,1)');
+      expect(styles.hexToRgb('#12a')).toEqual('rgba(17,34,170,1)');
+      expect(styles.hexToRgb('#abc')).toEqual('rgba(170,187,204,1)');
+      expect(styles.hexToRgb('#fff')).toEqual('rgba(255,255,255,1)');
+
+      expect(styles.hexToRgb('#000000')).toEqual('rgba(0,0,0,1)');
+      expect(styles.hexToRgb('#123456')).toEqual('rgba(18,52,86,1)');
+      expect(styles.hexToRgb('#123abc')).toEqual('rgba(18,58,188,1)');
+      expect(styles.hexToRgb('#abcdef')).toEqual('rgba(171,205,239,1)');
+      expect(styles.hexToRgb('#ffffff')).toEqual('rgba(255,255,255,1)');
+    });
+
+    it('supports alpha', () => {
+      expect(styles.hexToRgb('#0000')).toEqual('rgba(0,0,0,0)');
+      expect(styles.hexToRgb('#1234')).toEqual('rgba(17,34,51,0.267)'); // 68/255=0.26666666...
+      expect(styles.hexToRgb('#12ab')).toEqual('rgba(17,34,170,0.733)'); // 187/255=0.73333333...
+      expect(styles.hexToRgb('#abcd')).toEqual('rgba(170,187,204,0.867)'); // 221/255=0.86666666...
+      expect(styles.hexToRgb('#ffff')).toEqual('rgba(255,255,255,1)');
+
+      expect(styles.hexToRgb('#00000000')).toEqual('rgba(0,0,0,0)');
+      expect(styles.hexToRgb('#12345678')).toEqual('rgba(18,52,86,0.471)'); // 120/255=0.47058823...
+      expect(styles.hexToRgb('#1234abcd')).toEqual('rgba(18,52,171,0.804)'); // 205/255=0.80392156...
+      expect(styles.hexToRgb('#abcdefab')).toEqual('rgba(171,205,239,0.671)'); // 171/255=0.67058823...
+      expect(styles.hexToRgb('#ffffffff')).toEqual('rgba(255,255,255,1)');
+    });
+  });
+
 });
