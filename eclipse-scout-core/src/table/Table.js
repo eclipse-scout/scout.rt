@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -830,6 +830,7 @@ export default class Table extends Widget {
       parent: this,
       selector: '.table-cell',
       text: this._cellTooltipText.bind(this),
+      htmlEnabled: this._isAggregatedTooltip.bind(this),
       arrowPosition: 50,
       arrowPositionUnit: '%',
       nativeTooltip: !Device.get().isCustomEllipsisTooltipPossible()
@@ -853,6 +854,10 @@ export default class Table extends Widget {
 
     if (tooltipText) {
       return tooltipText;
+    } else if ($row.data('aggregateRow') && $cell.text().trim() && ($cell.isContentTruncated() || ($cell.children('.table-cell-icon').length && !$cell.children('.table-cell-icon').isVisible()))) {
+      $cell = $cell.clone();
+      $cell.children('.table-cell-icon').setVisible(true);
+      return $cell.html();
     } else if (this._isTruncatedCellTooltipEnabled(column) && $cell.isContentTruncated()) {
       return strings.plainText($cell.html(), {
         trim: true
@@ -873,6 +878,13 @@ export default class Table extends Widget {
       return !this.headerVisible || !this.headerEnabled || column.fixedWidth;
     }
     return this.truncatedCellTooltipEnabled;
+  }
+
+  _isAggregatedTooltip($cell) {
+    var $row = $cell.parent();
+    if ($row.data('aggregateRow')) {
+      return true;
+    }
   }
 
   reload(reloadReason) {
@@ -2413,12 +2425,14 @@ export default class Table extends Widget {
       $aggregateRow = this.$container.makeDiv('table-aggregate-row')
         .data('aggregateRow', aggregateRow);
 
+      $aggregateRow[insertFunc](refRow.$row).width(this.rowWidth);
+
       this.visibleColumns().forEach(function(column) {
         $cell = $(column.buildCellForAggregateRow(aggregateRow));
         $cell.appendTo($aggregateRow);
-      });
+        this._resizeCell($cell);
+      }, this);
 
-      $aggregateRow[insertFunc](refRow.$row).width(this.rowWidth);
       aggregateRow.height = $aggregateRow.outerHeight(true);
       aggregateRow.$row = $aggregateRow;
       if (animate) {
@@ -3888,7 +3902,21 @@ export default class Table extends Widget {
       this._renderEmptyData();
     }
 
+    this._aggregateRows.forEach(function(aggregateRow) {
+      if (aggregateRow.$row) {
+        this._resizeCell(this.$cell(column, aggregateRow.$row));
+      }
+    }, this);
+
     this._triggerColumnResized(column);
+  }
+
+  _resizeCell($cell) {
+    var $cellIcon = $cell.children('.table-cell-icon');
+    $cellIcon.setVisible(true);
+    if ($cell.isContentTruncated()) {
+      $cellIcon.setVisible(false);
+    }
   }
 
   moveColumn(column, visibleOldPos, visibleNewPos, dragged) {

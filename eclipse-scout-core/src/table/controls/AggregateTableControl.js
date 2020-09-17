@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, graphics, icons, TableControl} from '../../index';
+import {arrays, Device, graphics, icons, TableControl, tooltips} from '../../index';
 import $ from 'jquery';
 
 export default class AggregateTableControl extends TableControl {
@@ -86,12 +86,19 @@ export default class AggregateTableControl extends TableControl {
       }
       $cell = $(column.buildCell(cell, {}));
 
+      // install tooltips
+      this._installCellTooltip($cell);
+
       // If aggregation is based on the selection and not on all rows -> mark it
       if (this.aggregateRow.selection) {
         $cell.addClass('selection');
       }
 
       $cell.appendTo(this.$contentContainer);
+
+      if ($cell.isContentTruncated()) {
+        $cell.children('.table-cell-icon').setVisible(false);
+      }
     }, this);
 
     if (this.aggregateRow.selection) {
@@ -102,6 +109,26 @@ export default class AggregateTableControl extends TableControl {
   _rerenderAggregate() {
     this.$contentContainer.empty();
     this._renderAggregate();
+  }
+
+  _installCellTooltip($cell) {
+    tooltips.install($cell, {
+      parent: this,
+      text: this._cellTooltipText.bind(this),
+      htmlEnabled: true,
+      arrowPosition: 50,
+      arrowPositionUnit: '%',
+      nativeTooltip: !Device.get().isCustomEllipsisTooltipPossible()
+    });
+  }
+
+  _cellTooltipText($cell) {
+    if ($cell.text().trim() && ($cell.isContentTruncated() || ($cell.children('.table-cell-icon').length && !$cell.children('.table-cell-icon').isVisible()))) {
+      $cell = $cell.clone();
+      $cell.children('.table-cell-icon').setVisible(true);
+      return $cell.html();
+    }
+    return null;
   }
 
   _aggregate() {
