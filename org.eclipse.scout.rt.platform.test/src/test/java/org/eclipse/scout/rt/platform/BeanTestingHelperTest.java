@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,13 +10,18 @@
  */
 package org.eclipse.scout.rt.platform;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
+
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.config.AbstractLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * @author oca
@@ -36,6 +41,30 @@ public class BeanTestingHelperTest {
   public void testUnregisterBeanNull() {
     BeanTestingHelper.get().unregisterBean(null);
     BeanTestingHelper.get().unregisterBeans(null);
+  }
+
+  @Test
+  public void testReRegisterWithSameClass() {
+    IBean<Object> bean1 = null;
+    IBean<Object> bean2 = null;
+    try {
+      ITestInterface mock1 = Mockito.mock(ITestInterface.class);
+      ITestInterface mock2 = Mockito.mock(ITestInterface.class);
+      assertNotSame(mock1, mock2);
+
+      bean1 = BeanTestingHelper.get().registerBean(new BeanMetaData(ITestInterface.class, mock1).withAnnotation(AnnotationFactory.createApplicationScoped()));
+      assertSame(mock1, BEANS.get(ITestInterface.class));
+
+      // register again without unregistering the first. The "newer" bean (=the second) should always win
+      bean2 = BeanTestingHelper.get().registerBean(new BeanMetaData(ITestInterface.class, mock2).withAnnotation(AnnotationFactory.createApplicationScoped()));
+      assertSame(mock2, BEANS.get(ITestInterface.class));
+    }
+    finally {
+      BeanTestingHelper.get().unregisterBeans(Stream.of(bean1, bean2).filter(Objects::nonNull).collect(Collectors.toList()));
+    }
+  }
+
+  public interface ITestInterface {
   }
 
   @Test

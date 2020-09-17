@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.ToDoubleFunction;
 
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
@@ -35,7 +36,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 public class BeanHierarchy<T> {
 
   private final Class<T> m_clazz;
-  private final Set<IBean<T>> m_beans;
+  private final List<IBean<T>> m_beans;
   private final ReadWriteLock m_queryCacheLock;
 
   private List<IBean<T>> m_single;
@@ -43,7 +44,7 @@ public class BeanHierarchy<T> {
 
   public BeanHierarchy(Class<T> clazz) {
     m_clazz = clazz;
-    m_beans = new HashSet<>();
+    m_beans = new ArrayList<>();
     m_queryCacheLock = new ReentrantReadWriteLock();
   }
 
@@ -54,15 +55,15 @@ public class BeanHierarchy<T> {
   /**
    * @return all beans in this hierarchy regardless of {@link Order} and {@link Replace}
    */
-  public Set<IBean<T>> getBeans() {
+  public List<IBean<T>> getBeans() {
     return m_beans;
   }
 
   /**
-   * @returns the exact matching {@link IBean} for specified {@code beanClazz}. The {@link IBean} is returned even if
-   *          the {@code beanClazz} was replaced by another bean implementation or is not the most specific bean for the
-   *          specified {@code beanClazz}. Returns {@code null} if no bean is available for the specified
-   *          {@code beanClazz}.
+   * @return the exact matching {@link IBean} for specified {@code beanClazz}. The {@link IBean} is returned even if the
+   *         {@code beanClazz} was replaced by another bean implementation or is not the most specific bean for the
+   *         specified {@code beanClazz}. Returns {@code null} if no bean is available for the specified
+   *         {@code beanClazz}.
    */
   public IBean<T> getExactBean(Class<?> beanClazz) {
     List<IBean<T>> beans = CollectionUtility.arrayList(m_beans);
@@ -109,6 +110,29 @@ public class BeanHierarchy<T> {
     }
   }
 
+  /**
+   * @return A copy of m_beans with duplicate beans removed sorted first by {@link #ORDER_COMPARATOR} and second by
+   *         bean-insertion-order.
+   */
+  protected List<IBean<T>> sortedBeanCopy() {
+    ArrayList<IBean<T>> sorted = new ArrayList<>(m_beans);
+
+    // m_beans contains the beans in insertion order.
+    // In case there are duplicates (with the same order) the one last added should win.
+    // Therefore the list must be reversed so that the "newest" beans come first.
+    // As the following sort is stable, "newer" beans (having the same order) will stay first.
+    Collections.reverse(sorted);
+
+    // sort by Order ascending (lowest order first)
+    sorted.sort(ORDER_COMPARATOR);
+
+    // Remove duplicate registered classes, keep only bean with lowest order
+    Set<Class<?>> seenBeans = new HashSet<>(sorted.size());
+    sorted.removeIf(bean -> !seenBeans.add(bean.getBeanClazz()));
+
+    return sorted;
+  }
+
   @SuppressWarnings({"unchecked", "squid:S1244" /* Floating point numbers should not be tested for equality */})
   protected List<IBean<T>> query(boolean querySingle) {
     boolean isInitialized = false;
@@ -125,22 +149,7 @@ public class BeanHierarchy<T> {
       try {
         isInitialized = m_single != null && m_all != null;
         if (!isInitialized) {
-          List<IBean<T>> list = new ArrayList<>(m_beans);
-          //sort by Order ascending
-          list.sort(ORDER_COMPARATOR);
-
-          //remove duplicate registered classes, keep only bean with lowest order
-          Set<Class<?>> seenBeans = new HashSet<>();
-          for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {
-            IBean<T> bean = it.next();
-            if (seenBeans.contains(bean.getBeanClazz())) {
-              it.remove();
-            }
-            else {
-              seenBeans.add(bean.getBeanClazz());
-            }
-          }
-
+          List<IBean<T>> list = sortedBeanCopy();
           //manage replaced beans
           final Map<Class<?>, IBean<?>> extendsMap = new HashMap<>();//key is replaced by value
           for (IBean<T> bean : list) {
@@ -225,12 +234,12 @@ public class BeanHierarchy<T> {
   }
 
   /**
-   * @returns the exact matching {@link IBean} for the specified {@code beanClazz} according to {@code Order}. The
-   *          {@link IBean} is returned even if the {@code beanClazz} was replaced by another bean implementation or is
-   *          not the most specific bean for the specified {@code beanClazz}. Returns {@code null} if no bean is
-   *          available for the specified {@code beanClazz}.
-   *          <p>
-   *          <b>The list of beans is expected to be sorted using {@link #ORDER_COMPARATOR}.</b>
+   * @return the exact matching {@link IBean} for the specified {@code beanClazz} according to {@code Order}. The
+   *         {@link IBean} is returned even if the {@code beanClazz} was replaced by another bean implementation or is
+   *         not the most specific bean for the specified {@code beanClazz}. Returns {@code null} if no bean is
+   *         available for the specified {@code beanClazz}.
+   *         <p>
+   *         <b>The list of beans is expected to be sorted using {@link #ORDER_COMPARATOR}.</b>
    */
   protected static <T> IBean<T> getExactBean(List<IBean<T>> list, Class<?> beanClazz) {
     for (IBean<T> bean : list) {
@@ -241,13 +250,7 @@ public class BeanHierarchy<T> {
     return null; // no exact match found
   }
 
-  private static final Comparator<IBean<?>> ORDER_COMPARATOR = (o1, o2) -> {
-    int cmp = Double.compare(orderOf(o1), orderOf(o2));
-    if (cmp != 0) {
-      return cmp;
-    }
-    return o1.getBeanClazz().getName().compareTo(o2.getBeanClazz().getName());
-  };
+  private static final Comparator<IBean<?>> ORDER_COMPARATOR = Comparator.comparingDouble((ToDoubleFunction<IBean<?>>) BeanHierarchy::orderOf).thenComparing(o -> o.getBeanClazz().getName());
 
   public static double orderOf(IBean<?> b) {
     Order orderAnnotation = b.getBeanAnnotation(Order.class);

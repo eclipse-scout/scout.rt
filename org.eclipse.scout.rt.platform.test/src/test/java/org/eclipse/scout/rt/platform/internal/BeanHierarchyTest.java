@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.platform.internal;
 
 import static org.junit.Assert.*;
+
+import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -99,6 +101,25 @@ public class BeanHierarchyTest {
 
     assertEquals(SubClassA.class, h.getExactBean(SubClassA.class).getBeanClazz());
     assertEquals(subA1, h.getExactBean(SubClassA.class).getInstance()); // expect to get instance of registered bean with lowest order
+  }
+
+  @Test
+  public void testInsertionOrderIsRespected() {
+    BeanHierarchy<ITestInterface> h = new BeanHierarchy<>(ITestInterface.class);
+    BeanImplementor<ITestInterface> bean1 = new BeanImplementor<>(new BeanMetaData(ITestInterface.class, Mockito.mock(ITestInterface.class)).withApplicationScoped(true).withOrder(100));
+    BeanImplementor<ITestInterface> bean2 = new BeanImplementor<>(new BeanMetaData(ITestInterface.class, Mockito.mock(ITestInterface.class)).withApplicationScoped(true).withOrder(200));
+    BeanImplementor<ITestInterface> bean3 = new BeanImplementor<>(new BeanMetaData(ITestInterface.class, Mockito.mock(ITestInterface.class)).withApplicationScoped(true).withOrder(200));
+    h.addBean(bean1);
+    h.addBean(bean2);
+    h.addBean(bean3);
+
+    assertEquals(Arrays.asList(bean1), h.sortedBeanCopy());
+    h.removeBean(bean1);
+
+    assertEquals(Arrays.asList(bean3), h.sortedBeanCopy());
+  }
+
+  public interface ITestInterface {
   }
 
   public static abstract class AbstractBaseClass {

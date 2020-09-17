@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ public class BeanImplementor<T> implements IBean<T> {
   private IBeanInstanceProducer<T> m_producer;
 
   /**
-   * Creates a {@link BeanImplementor} with {@link DefaultBeanInstanceProducer} to produce beans upon bean lookup.
+   * Creates a {@link BeanImplementor} with the default producer.
    */
   public BeanImplementor(BeanMetaData beanData) {
     this(beanData, getDefaultBeanInstanceProducer(beanData));
@@ -118,7 +118,7 @@ public class BeanImplementor<T> implements IBean<T> {
 
   @Override
   public boolean equals(Object obj) {
-    return (this == obj);
+    return this == obj;
   }
 
   @Override
