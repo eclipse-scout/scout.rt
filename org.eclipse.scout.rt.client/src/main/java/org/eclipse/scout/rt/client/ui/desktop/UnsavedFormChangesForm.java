@@ -244,7 +244,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
     protected void execStore() {
       for (IForm f : getOpenFormsField().getValue()) {
         if (f instanceof IWizardContainerForm) {
-          ((IWizardContainerForm) f).getWizard().doFinish();
+          ((IWizardContainerForm) f).getWizard().doSuspend();
         }
         else {
           f.doOk();
