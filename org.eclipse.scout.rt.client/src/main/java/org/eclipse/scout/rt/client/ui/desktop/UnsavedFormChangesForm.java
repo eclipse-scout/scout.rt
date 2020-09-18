@@ -271,7 +271,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
 
       for (IForm f : formsToStore) {
         if (isWizardContainerForm(f)) {
-          ((IWizardContainerForm) f).getWizard().doFinish();
+          ((IWizardContainerForm) f).getWizard().doSuspend();
         }
         else {
           f.doOk();
