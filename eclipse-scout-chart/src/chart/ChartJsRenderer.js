@@ -140,7 +140,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       // check lengths
       let i, length = 0;
       for (i = 0; i < config.data.datasets.length; i++) {
-        let dataset = config.data.datasets.length[i];
+        let dataset = config.data.datasets[i];
         if (!dataset.data) {
           chartConfigDataValid = false;
         }
@@ -553,21 +553,38 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         colors.hoverBorderColors.push(styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'stroke-color' + (index % this.numSupportedColors) + ' hover'], 'stroke').stroke);
       });
     } else {
-      colors.borderColors = this._computeColors(this.chart.data, type);
-      colors.backgroundColors = this._computeColors(this.chart.data, type, true);
+      if (this.chart.data) {
+        colors.borderColors = this._computeColors(this.chart.data, type);
+        colors.backgroundColors = this._computeColors(this.chart.data, type, true);
+      }
       if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
         let borderColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'stroke-color0'], 'stroke').stroke;
-        colors.borderColors = arrays.init(colors.borderColors.length, borderColor);
+        colors.borderColors = arrays.init(data.datasets.length, borderColor);
         colors.hoverBorderColors = colors.borderColors;
       }
     }
 
     data.datasets.forEach((elem, idx) => {
-      elem.backgroundColor = (multipleColorsPerDataset ? colors.backgroundColors : colors.backgroundColors[idx]);
-      elem.borderColor = (multipleColorsPerDataset ? colors.borderColors : colors.borderColors[idx]);
-      elem.hoverBackgroundColor = (multipleColorsPerDataset ? colors.hoverBackgroundColors : colors.hoverBackgroundColors[idx]);
-      elem.hoverBorderColor = (multipleColorsPerDataset ? colors.hoverBorderColors : colors.hoverBorderColors[idx]);
-      elem.pointHoverBackgroundColor = colors.pointHoverColor;
+      let backgroundColor = (multipleColorsPerDataset ? colors.backgroundColors : colors.backgroundColors[idx]),
+        borderColor = (multipleColorsPerDataset ? colors.borderColors : colors.borderColors[idx]),
+        hoverBackgroundColor = (multipleColorsPerDataset ? colors.hoverBackgroundColors : colors.hoverBackgroundColors[idx]),
+        hoverBorderColor = (multipleColorsPerDataset ? colors.hoverBorderColors : colors.hoverBorderColors[idx]),
+        pointHoverBackgroundColor = colors.pointHoverColor;
+      if (backgroundColor && backgroundColor.length) {
+        elem.backgroundColor = backgroundColor;
+      }
+      if (borderColor && borderColor.length) {
+        elem.borderColor = borderColor;
+      }
+      if (hoverBackgroundColor && hoverBackgroundColor.length) {
+        elem.hoverBackgroundColor = hoverBackgroundColor;
+      }
+      if (hoverBorderColor && hoverBorderColor.length) {
+        elem.hoverBorderColor = hoverBorderColor;
+      }
+      if (pointHoverBackgroundColor && pointHoverBackgroundColor.length) {
+        elem.pointHoverBackgroundColor = pointHoverBackgroundColor;
+      }
     });
 
     if (config.options) {
