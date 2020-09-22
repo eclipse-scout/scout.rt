@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.chart.client.ui.basic.chart.IChart;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -90,13 +91,8 @@ public abstract class AbstractChartField<T extends IChart> extends AbstractFormF
 
   @Override
   public <M extends IMenu> M getMenuByClass(Class<M> menuType) {
-    return null;
-  }
-
-  /*@Override
-  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
     return MenuUtility.getMenuByClass(this, menuType);
-  }*/
+  }
 
   protected Class<? extends IChart> getConfiguredChart() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
