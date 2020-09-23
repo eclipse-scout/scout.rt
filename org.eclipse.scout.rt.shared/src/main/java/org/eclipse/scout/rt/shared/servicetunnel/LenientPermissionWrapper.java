@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectInputStream.GetField;
@@ -21,6 +19,7 @@ import java.io.Serializable;
 import java.security.Permission;
 import java.security.Permissions;
 
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,11 +54,7 @@ public class LenientPermissionWrapper implements Serializable {
    */
   private void writeObject(ObjectOutputStream out) throws IOException {
     //no call to defaultWriteObject
-    ByteArrayOutputStream bout = new ByteArrayOutputStream();
-    try (ObjectOutputStream localOut = new ObjectOutputStream(bout)) {
-      localOut.writeObject(m_permission);
-    }
-    byte[] data = bout.toByteArray();
+    byte[] data = SerializationUtility.createObjectSerializer().serialize(m_permission);
     //
     PutField pfields = out.putFields();
     pfields.put("m_className", m_className);
@@ -74,10 +69,7 @@ public class LenientPermissionWrapper implements Serializable {
       GetField gfields = in.readFields();
       m_className = (String) gfields.get("m_className", null);
       byte[] data = (byte[]) gfields.get("m_permission", null);
-
-      try (ObjectInputStream localIn = new ObjectInputStream(new ByteArrayInputStream(data))) {
-        m_permission = (Permission) localIn.readObject();
-      }
+      m_permission = SerializationUtility.createObjectSerializer().deserialize(data, Permission.class);
     }
     catch (Throwable t) {
       LOG.warn("cannot deserialize permission", t);

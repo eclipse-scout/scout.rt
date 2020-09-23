@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.bookmark.internal;
 
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -47,6 +45,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.text.TEXTS;
@@ -880,11 +879,7 @@ public final class BookmarkUtility {
     }
     try {
       CRC32 crc = new CRC32();
-      ByteArrayOutputStream bo = new ByteArrayOutputStream();
-      ObjectOutputStream oo = new ObjectOutputStream(bo);
-      oo.writeObject(filter);
-      oo.close();
-      crc.update(bo.toByteArray());
+      crc.update(SerializationUtility.createObjectSerializer().serialize(filter));
       return crc.getValue();
     }
     catch (Exception t) { // NOSONAR

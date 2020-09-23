@@ -10,10 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,6 +25,7 @@ import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
@@ -98,28 +96,19 @@ public class DevelopmentScriptFileCacheInitialLoader implements IPlatformListene
   }
 
   protected synchronized Set<HttpCacheKey> loadCachedKeys() throws IOException, ClassNotFoundException {
-    ObjectInputStream objectinputstream = null;
-    try {
-      objectinputstream = new ObjectInputStream(Files.newInputStream(m_cacheFile));
-      @SuppressWarnings("unchecked")
-      Set<HttpCacheKey> loadedFiles = (Set<HttpCacheKey>) objectinputstream.readObject();
-      if (LOG.isInfoEnabled()) {
-        LOG.info("Load keys from persist cache in user.home '{}'.", loadedFiles
-            .stream()
-            .map(k -> k.getResourcePath())
-            .collect(Collectors.joining(", ")));
-      }
-      return loadedFiles;
-    }
-    catch (EOFException e) { //NOSONAR
+    if (m_cacheFile.toFile().length() == 0) {
       // file is empty
       return CollectionUtility.emptyHashSet();
     }
-    finally {
-      if (objectinputstream != null) {
-        objectinputstream.close();
-      }
+    @SuppressWarnings("unchecked")
+    Set<HttpCacheKey> loadedFiles = SerializationUtility.createObjectSerializer().deserialize(Files.newInputStream(m_cacheFile), Set.class);
+    if (LOG.isInfoEnabled()) {
+      LOG.info("Load keys from persist cache in user.home '{}'.", loadedFiles
+          .stream()
+          .map(k -> k.getResourcePath())
+          .collect(Collectors.joining(", ")));
     }
+    return loadedFiles;
   }
 
   public synchronized void storeInitialScriptfiles(Set<HttpCacheKey> keys) throws IOException {
@@ -136,16 +125,7 @@ public class DevelopmentScriptFileCacheInitialLoader implements IPlatformListene
           .map(k -> k.getResourcePath())
           .collect(Collectors.joining(", ")));
     }
-    ObjectOutputStream oos = null;
-    try {
-      oos = new ObjectOutputStream(Files.newOutputStream(m_cacheFile));
-      oos.writeObject(keys);
-      m_cachedKeys = CollectionUtility.hashSet(keys);
-    }
-    finally {
-      if (oos != null) {
-        oos.close();
-      }
-    }
+    SerializationUtility.createObjectSerializer().serialize(Files.newOutputStream(m_cacheFile), keys);
+    m_cachedKeys = CollectionUtility.hashSet(keys);
   }
 }

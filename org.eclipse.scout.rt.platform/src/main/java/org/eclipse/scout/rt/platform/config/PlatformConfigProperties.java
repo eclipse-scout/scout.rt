@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.platform.config;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.serialization.DefaultSerializerBlacklist;
+import org.eclipse.scout.rt.platform.serialization.DefaultSerializerWhitelist;
 
 public final class PlatformConfigProperties {
 
@@ -182,6 +184,72 @@ public final class PlatformConfigProperties {
     @Override
     public Boolean getDefaultValue() {
       return Boolean.FALSE;
+    }
+  }
+
+  /**
+   * see {@link DefaultSerializerBlacklist}
+   *
+   * @since 11.0
+   */
+  public static class DefaultSerializerBlacklistAppendProperty extends AbstractStringConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.serial.blacklistAppend";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies a blacklist regex for fully qualified class names that are blocked in object serialization."
+          + "\nThese rules are appended to the existing built-in blacklist (recommended)."
+          + "\nComma separated list of regular expressions (regex).";
+    }
+  }
+
+  /**
+   * see {@link DefaultSerializerBlacklist}
+   *
+   * @since 11.0
+   */
+  public static class DefaultSerializerBlacklistReplaceProperty extends AbstractStringConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.serial.blacklistReplace";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies a blacklist regex for fully qualified class names that are blocked in object serialization."
+          + "\nThese rules replace the existing built-in blacklist (not recommended)."
+          + "\nComma separated list of regular expressions (regex).";
+    }
+  }
+
+  /**
+   * see {@link DefaultSerializerWhitelist}
+   *
+   * @since 11.0
+   */
+  public static class DefaultSerializerWhitelistProperty extends AbstractStringConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.serial.whitelist";
+    }
+
+    @Override
+    public String getDefaultValue() {
+      return ".*";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies the secure whitelist of fully qualified class names that are allowed to be used in object serialization."
+          + "\nComma separated list of regular expressions (regex)."
+          + "\nThe default regex .* is used for back compatibility only, this is unsafe."
+          + "\nMake sure to define the property 'scout.serial.whitelist' in the config.properties";
     }
   }
 }

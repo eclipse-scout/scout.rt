@@ -204,7 +204,14 @@ public class JandexInventoryBuilder {
     LOG.info("Found no pre-built '{}'. Scanning location...", indexUri);
     File jarFile = new File(new URI(s.substring(0, s.lastIndexOf('!'))));
     Indexer indexer = new Indexer();
-    return JarIndexer.createJarIndex(jarFile, indexer, false, false, false).getIndex();
+    //use a temp file, we don't want jandex to create a file in .m2 directories!
+    File tmp = File.createTempFile("jandex", ".idx");
+    try {
+      return JarIndexer.createJarIndex(jarFile, indexer, tmp, false, false, false).getIndex();
+    }
+    finally {
+      tmp.delete();
+    }
   }
 
   protected Index scanOther(URI indexUri) {
