@@ -489,6 +489,14 @@ export default class Outline extends Tree {
     this.$container.toggleClass('node-selected', this.selectedNodes.length > 0);
   }
 
+  _removeNodeSelection(node) {
+    if (node.$text && !this.isHorizontalScrollingEnabled()) {
+      // PageLayout sets the width -> remove it when node is not selected anymore to ensure text can use full width
+      node.$text.cssWidth(null);
+    }
+    super._removeNodeSelection(node);
+  }
+
   setDefaultDetailForm(defaultDetailForm) {
     this.setProperty('defaultDetailForm', defaultDetailForm);
     this._updateOutlineOverview();
