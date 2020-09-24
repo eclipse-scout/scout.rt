@@ -68,7 +68,8 @@
 }
 
 .tree-node {
-  display: block;
+  display: flex;
+  align-items: start;
   position: relative;
   border: 1px solid transparent;
   border-left: 0 solid transparent;
@@ -110,7 +111,7 @@
   & > .text {
     vertical-align: top;
     display: inline-block;
-    width: 100%; /* required for ellipsis */
+    flex-grow: 1;
     #scout.overflow-ellipsis-nowrap();
   }
 
@@ -246,12 +247,12 @@
       padding: 8px;
 
       &.ancestor-of-selected,
-      &.child-of-selected,
-      &.selected {
-        display: block;
+      &.child-of-selected {
+        display: flex;
       }
 
       &.selected {
+        display: block;
         color: @outline-selection-color;
         cursor: default;
       }
@@ -307,7 +308,6 @@
 
       & > .text {
         white-space: normal;
-        width: auto;
       }
     }
   }

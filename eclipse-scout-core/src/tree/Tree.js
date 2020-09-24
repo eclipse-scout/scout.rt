@@ -357,11 +357,16 @@ export default class Tree extends Widget {
     if (this._additionalContainerClasses) {
       this.$container.addClass(this._additionalContainerClasses);
     }
-
     let layout = new TreeLayout(this);
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(layout);
+    this._renderData();
+    this.menuBar.render();
+    this.session.desktop.on('popupOpen', this._popupOpenHandler);
+    this._renderCheckableStyle();
+  }
 
+  _renderData() {
     this.$data = this.$container.appendDiv('tree-data')
       .on('contextmenu', this._onContextMenu.bind(this))
       .on('mousedown', '.tree-node', this._onNodeMouseDown.bind(this))
@@ -380,13 +385,10 @@ export default class Tree extends Widget {
       axis: this._scrolldirections
     });
     this._installNodeTooltipSupport();
-    this.menuBar.render();
     this._updateNodeDimensions();
     // render display style before viewport (not in renderProperties) to have a correct style from the beginning
     this._renderDisplayStyle();
     this._renderViewport();
-    this.session.desktop.on('popupOpen', this._popupOpenHandler);
-    this._renderCheckableStyle();
   }
 
   _postRender() {
@@ -515,7 +517,6 @@ export default class Tree extends Widget {
     this._removeRenderedNodes();
     this._renderFiller();
     this._updateDomNodeWidth();
-    this._updateDomNodeIconWidth();
     this._renderViewport();
   }
 
@@ -678,7 +679,6 @@ export default class Tree extends Widget {
       if (this.nodeWidthDirty) {
         this._renderFiller();
         this._updateDomNodeWidth();
-        this._updateDomNodeIconWidth();
       }
 
       // Range already rendered -> do nothing
@@ -728,31 +728,7 @@ export default class Tree extends Widget {
   _postRenderViewRange() {
     this._renderFiller();
     this._updateDomNodeWidth();
-    this._updateDomNodeIconWidth();
     this._renderSelection();
-  }
-
-  /**
-   * The handling of the icon-size here depends on two assumptions:
-   *
-   * 1. font icons are always pre-loaded on application startup. This means outerWidth() will always return the correct
-   *    size of the icon at any time.
-   *
-   * 2. bitmap icons are not pre-loaded. This means, when the icon is shown, the size can be unknown because the
-   *    browser has not yet loaded the image resource. Because of that outerWidth() could not return the correct size
-   *    and also layout would have trouble. Because in a tree all icons should have the same size, we simply define
-   *    the min-width and min-height of bitmap icons by CSS. So we always have a proper value when we read the icon
-   *    size. We don't support the case where the same tree has bitmap icons in different sizes. When someone needs
-   *    larger icons, one could simple change the global constant @tree-node-bitmap-icon-size to change the icon size
-   *    for all trees, or set a CSS rule/class when only a single tree must have a different icon size.
-   */
-  _updateDomNodeIconWidth($nodes) {
-    if (!this.rendered && !this.rendering) {
-      return;
-    }
-    this._visibleNodesInViewRange().forEach(node => {
-      node._updateIconWidth();
-    });
   }
 
   _visibleNodesInViewRange() {

@@ -84,8 +84,4 @@ export default class CompactTreeNode extends TreeNode {
   isSection() {
     return this.level === 0;
   }
-
-  _updateIconWidth() {
-    // NOP
-  }
 }

@@ -345,14 +345,4 @@ export default class TreeNode {
     }
     return cssClass;
   }
-
-  _updateIconWidth() {
-    let cssWidth = '';
-    if (this.iconId) {
-      // always add 1 pixel to the result of outer-width to prevent rendering errors in IE, where
-      // the complete text is replaced by an ellipsis, when the .text element is a bit too large
-      cssWidth = 'calc(100% - ' + (this.$icon().outerWidth() + 1) + 'px)';
-    }
-    this.$text.css('max-width', cssWidth);
-  }
 }
