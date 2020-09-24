@@ -91,6 +91,12 @@
     <module>../eclipse-scout-testing</module>
     <module>../karma-jasmine-scout</module>
     <module>../eslint-config</module>
+
+    <!-- chart -->
+    <module>../eclipse-scout-chart</module>
+    <module>../org.eclipse.scout.rt.chart.client</module>
+    <module>../org.eclipse.scout.rt.chart.shared</module>
+    <module>../org.eclipse.scout.rt.chart.ui.html</module>
   </modules>
 
   <properties>
@@ -517,6 +523,21 @@
         <artifactId>org.eclipse.scout.dev.jetty.test.affix</artifactId>
         <version>11.0-SNAPSHOT</version>
       </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.chart.client</artifactId>
+        <version>11.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.chart.shared</artifactId>
+        <version>11.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.chart.ui.html</artifactId>
+        <version>11.0-SNAPSHOT</version>
+      </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
@@ -541,6 +562,11 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>karma-jasmine-scout</artifactId>
+        <version>11.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>eclipse-scout-chart</artifactId>
         <version>11.0-SNAPSHOT</version>
       </dependency>
 
