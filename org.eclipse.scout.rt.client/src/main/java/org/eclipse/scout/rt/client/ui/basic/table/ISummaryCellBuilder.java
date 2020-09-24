@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,17 +10,8 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 
-/**
- * Provider interface for {@link ICompactHandler}.
- *
- * @since 11.0
- */
-@FunctionalInterface
-@ApplicationScoped
-public interface ICompactHandlerProvider {
-
-  ICompactHandler createCompactHandler(ITable table);
-
+public interface ISummaryCellBuilder {
+  ICell build(ITableRow row);
 }

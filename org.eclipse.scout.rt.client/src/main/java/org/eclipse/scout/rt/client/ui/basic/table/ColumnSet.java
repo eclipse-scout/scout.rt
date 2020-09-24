@@ -561,19 +561,8 @@ public class ColumnSet {
     }
   }
 
-  public IColumn getFirstDefinedVisibileColumn() {
-    int colIdx = m_columns.size();
-    for (int m_visibleIndexe : m_visibleIndexes) {
-      if (Integer.compare(m_visibleIndexe, colIdx) < 0) {
-        colIdx = m_visibleIndexe;
-      }
-    }
-    if (colIdx != m_columns.size()) {
-      return m_columns.get(colIdx);
-    }
-    else {
-      return null;
-    }
+  public IColumn getFirstDefinedVisibleColumn() {
+    return m_columns.stream().filter(IColumn::isVisible).findFirst().orElse(null);
   }
 
   public List<IColumn<?>> getSummaryColumns() {

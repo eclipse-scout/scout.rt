@@ -123,8 +123,16 @@ public class CompactBean {
   /**
    * Converts the compact lines into strings and fills the responding properties (title, subtitle, content, more
    * content).
+   *
+   * @param removeEmptyContentLines
+   *          true, to remove empty content lines.
+   * @param maxContentLines
+   *          the number of content lines to consider. Empty lines are not counted.
+   * @param moreLinkAvailable
+   *          if true, maxContentLines may be increased by 1 if the more link would reveal only one line. Does not have
+   *          any effect if it is false.
    */
-  public void transform(boolean removeEmptyContentLines, int maxContentLines) {
+  public void transform(boolean removeEmptyContentLines, int maxContentLines, boolean moreLinkAvailable) {
     CompactLine titleLine = getTitleLine();
     if (titleLine != null) {
       setTitle(titleLine.build());
@@ -144,7 +152,7 @@ public class CompactBean {
     if (removeEmptyContentLines) {
       contentLines = contentLines.stream().filter(line -> !StringUtility.isNullOrEmpty(line.build())).collect(Collectors.toList());
     }
-    if (maxContentLines + 1 == contentLines.size()) {
+    if (moreLinkAvailable && maxContentLines + 1 == contentLines.size()) {
       // Don't show more link if it would only reveal one element
       maxContentLines++;
     }

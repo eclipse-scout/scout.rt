@@ -206,7 +206,7 @@ export default class TableCompactHandler {
   <div class="compact-cell-subtitle">${bean.subtitle}</div>
 </div>
 <div class="compact-cell-content${hasHeader}">${bean.content}</div>
-<div class="compact-cell-more-content hidden">${bean.moreContent}</div>
+<div class="compact-cell-more-content hidden${hasHeader}">${bean.moreContent}</div>
   ${moreLink}`;
   }
 

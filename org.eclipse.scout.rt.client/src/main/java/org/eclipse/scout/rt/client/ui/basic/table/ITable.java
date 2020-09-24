@@ -527,9 +527,9 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
 
   void setCompact(boolean compact);
 
-  ICompactHandler getCompactHandler();
+  ITableCompactHandler getCompactHandler();
 
-  void setCompactHandler(ICompactHandler handler);
+  void setCompactHandler(ITableCompactHandler handler);
 
   boolean isHeaderVisible();
 

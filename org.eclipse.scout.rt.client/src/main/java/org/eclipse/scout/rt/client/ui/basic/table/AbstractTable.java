@@ -132,6 +132,7 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -196,7 +197,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   private ContributionComposite m_contributionHolder;
   private List<ITableControl> m_tableControls;
   private IReloadHandler m_reloadHandler;
-  private ICompactHandler m_compactHandler;
+  private ITableCompactHandler m_compactHandler;
+  private ISummaryCellBuilder m_summaryCellBuilder;
   private int m_valueChangeTriggerEnabled = 1;// >=1 is true
   private boolean m_treeStructureDirty;
 
@@ -674,7 +676,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   /**
    * Configurues whether the table should be in compact mode. Default is false.
    *
-   * @see ICompactHandler
+   * @see ITableCompactHandler
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(290)
@@ -1067,6 +1069,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     // already have a mostly initialized table (AbstractTileTableHeader requires an initialized columnSet).
     setTileMode(getConfiguredTileMode());
 
+    setSummaryCellBuilder(createSummaryCellBuilder());
     setCompactHandler(createCompactHandler());
     setCompact(getConfiguredCompact());
 
@@ -1646,40 +1649,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   @Override
   public ICell getSummaryCell(ITableRow row) {
-    List<IColumn<?>> a = getColumnSet().getSummaryColumns();
-    if (a.isEmpty()) {
-      IColumn<?> col = getColumnSet().getFirstDefinedVisibileColumn();
-      if (col != null) {
-        a = CollectionUtility.arrayList(col);
-      }
-    }
-    if (a.isEmpty()) {
-      return new Cell();
-    }
-    else if (a.size() == 1) {
-      Cell cell = new Cell(getCell(row, a.get(0)));
-      if (cell.getIconId() == null) {
-        // use icon of row
-        cell.setIconId(row.getIconId());
-      }
-      return cell;
-    }
-    else {
-      Cell cell = new Cell(getCell(row, a.get(0)));
-      if (cell.getIconId() == null) {
-        // use icon of row
-        cell.setIconId(row.getIconId());
-      }
-      StringBuilder b = new StringBuilder();
-      for (IColumn<?> c : a) {
-        if (b.length() > 0) {
-          b.append(" ");
-        }
-        b.append(getCell(row, c).toPlainText());
-      }
-      cell.setText(b.toString());
-      return cell;
-    }
+    return getSummaryCellBuilder().build(row);
   }
 
   @Override
@@ -1724,16 +1694,16 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   @Override
-  public ICompactHandler getCompactHandler() {
+  public ITableCompactHandler getCompactHandler() {
     return m_compactHandler;
   }
 
-  protected ICompactHandler createCompactHandler() {
-    return BEANS.get(ICompactHandlerProvider.class).createCompactHandler(this);
+  protected ITableCompactHandler createCompactHandler() {
+    return BEANS.get(ITableCompactHandlerProvider.class).createCompactHandler(this);
   }
 
   @Override
-  public void setCompactHandler(ICompactHandler compactHandler) {
+  public void setCompactHandler(ITableCompactHandler compactHandler) {
     Assertions.assertNotNull(compactHandler);
     if (m_compactHandler != null && isCompact()) {
       // Reset compact state
@@ -1743,6 +1713,35 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     if (isInitConfigDone()) {
       m_compactHandler.handle(isCompact());
     }
+  }
+
+  /**
+   * Creates a compact handler used by {@link MobileSummaryCellBuilder} to create a summary cell. The created handler is
+   * not the same instance as used by {@link #isCompact()} and returned by {@link #getCompactHandler()} because it uses
+   * a different configuration (e.g. links are disabled). But it uses the same factory method to create the handler
+   * which is {@link #createCompactHandler()}.
+   *
+   * @see #createSummaryCellBuilder()
+   */
+  protected ITableCompactHandler createSummaryCompactHandler() {
+    return createCompactHandler()
+        .withMoreLinkAvailable(false)
+        .withLineCustomizer(line -> line.getTextBlock().setHtmlToPlainTextEnabled(true));
+  }
+
+  protected ISummaryCellBuilder createSummaryCellBuilder() {
+    if (UserAgentUtility.isMobileDevice()) {
+      return new MobileSummaryCellBuilder(createSummaryCompactHandler());
+    }
+    return new SummaryCellBuilder(this);
+  }
+
+  public ISummaryCellBuilder getSummaryCellBuilder() {
+    return m_summaryCellBuilder;
+  }
+
+  public void setSummaryCellBuilder(ISummaryCellBuilder summaryCellBuilder) {
+    m_summaryCellBuilder = summaryCellBuilder;
   }
 
   @Override
