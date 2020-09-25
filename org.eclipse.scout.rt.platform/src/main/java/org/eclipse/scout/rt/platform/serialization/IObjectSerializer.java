@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.platform.serialization;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.function.Predicate;
 
@@ -73,4 +75,15 @@ public interface IObjectSerializer {
    * given expected type, if it is not null, using {@link Class#isAssignableFrom(Class)}.
    */
   <T> T deserialize(InputStream stream, Class<T> expectedType) throws IOException, ClassNotFoundException;
+
+  /**
+   * @return a new {@link ObjectOutputStream} based on this object serializer
+   */
+  ObjectOutputStream createObjectOutputStream(OutputStream out) throws IOException;
+
+  /**
+   * @return a new {@link ObjectInputStream} based on this object serializer, using {@link #getBlacklist()} and
+   *         {@link #getWhitelist()}
+   */
+  ObjectInputStream createObjectInputStream(InputStream in) throws IOException;
 }
