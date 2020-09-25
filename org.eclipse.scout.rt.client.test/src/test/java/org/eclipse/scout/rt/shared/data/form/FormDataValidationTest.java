@@ -13,14 +13,11 @@ package org.eclipse.scout.rt.shared.data.form;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -86,14 +83,9 @@ public class FormDataValidationTest {
     MyFormData d1 = new MyFormData();
     AbstractValueFieldData<Object> v1 = (AbstractValueFieldData<Object>) d1.getFieldById(fieldId);
     v1.setValue(expectedValue);
+    byte[] serial = SerializationUtility.createObjectSerializer().serialize(d1);
     //
-    ByteArrayOutputStream o = new ByteArrayOutputStream();
-    ObjectOutputStream oo = new ObjectOutputStream(o);
-    oo.writeObject(d1);
-    oo.close();
-    ObjectInputStream oi = new ObjectInputStream(new ByteArrayInputStream(o.toByteArray()));
-    MyFormData d2 = (MyFormData) oi.readObject();
-    //
+    MyFormData d2 = SerializationUtility.createObjectSerializer().deserialize(serial, MyFormData.class);
     AbstractValueFieldData<Object> v2 = (AbstractValueFieldData<Object>) d2.getFieldById(fieldId);
     if (expectedValue != null && expectedValue.getClass().isArray()) {
       //nop
@@ -107,14 +99,10 @@ public class FormDataValidationTest {
     MyFormData d1 = new MyFormData();
     AbstractValueFieldData<Object> v1 = (AbstractValueFieldData<Object>) d1.getFieldById(fieldId);
     v1.setValue(expectedValue);
+    byte[] serial = SerializationUtility.createObjectSerializer().serialize(d1);
     //
-    ByteArrayOutputStream o = new ByteArrayOutputStream();
-    ObjectOutputStream oo = new ObjectOutputStream(o);
-    oo.writeObject(d1);
-    oo.close();
-    ObjectInputStream oi = new ObjectInputStream(new ByteArrayInputStream(o.toByteArray()));
     try {
-      oi.readObject();
+      SerializationUtility.createObjectSerializer().deserialize(serial, MyFormData.class);
     }
     catch (SecurityException e) {
       //ok

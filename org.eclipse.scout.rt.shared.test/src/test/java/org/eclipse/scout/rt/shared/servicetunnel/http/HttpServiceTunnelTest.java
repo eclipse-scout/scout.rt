@@ -17,14 +17,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
 import org.eclipse.scout.rt.shared.http.AbstractHttpTransportManager;
 import org.eclipse.scout.rt.shared.http.IHttpTransportBuilder;
@@ -57,7 +54,7 @@ public class HttpServiceTunnelTest {
   @Test
   public void testTunnel() throws IOException {
     when(mockUrl.getValue()).thenReturn("http://localhost");
-    MockLowLevelHttpResponse expectedResponse = new MockLowLevelHttpResponse().setContent(getInputStream(new ServiceTunnelResponse("testData")));
+    MockLowLevelHttpResponse expectedResponse = new MockLowLevelHttpResponse().setContent(serialize(new ServiceTunnelResponse("testData")));
     HttpServiceTunnel tunnel = createHttpServiceTunnel(expectedResponse);
     tunnel.setContentHandler(getTestContentHandler());
 
@@ -152,13 +149,8 @@ public class HttpServiceTunnelTest {
     assertTrue(tunnel.isActive());
   }
 
-  private ByteArrayInputStream getInputStream(ServiceTunnelResponse response) throws IOException {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
-      oos.writeObject(response);
-      oos.flush();
-    }
-    return new ByteArrayInputStream(baos.toByteArray());
+  protected byte[] serialize(ServiceTunnelResponse response) throws IOException {
+    return SerializationUtility.createObjectSerializer().serialize(response);
   }
 
   private IServiceTunnelContentHandler getTestContentHandler() {
@@ -174,10 +166,7 @@ public class HttpServiceTunnelTest {
 
       @Override
       public ServiceTunnelResponse readResponse(InputStream in) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream bi = (ByteArrayInputStream) in;
-        ObjectInputStream in2 = new ObjectInputStream(bi);
-        Object o = in2.readObject();
-        return (ServiceTunnelResponse) o;
+        return SerializationUtility.createObjectSerializer().deserialize(in, ServiceTunnelResponse.class);
       }
 
       @Override
