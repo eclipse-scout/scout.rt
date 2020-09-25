@@ -10,6 +10,13 @@
  */
 package org.eclipse.scout.rt.platform.serialization;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 /**
  * Utility for serializing and deserializing java objects. The utility works in a standard java environment.
  * <p/>
@@ -45,6 +52,87 @@ public final class SerializationUtility {
    */
   public static IObjectSerializer createObjectSerializer(IObjectReplacer objectReplacer) {
     return FACTORY.createObjectSerializer(objectReplacer);
+  }
+
+  /**
+   * Create a blacklist policy
+   *
+   * @param regexLists
+   *          regex expressions separated with comma
+   * @return a composite regex based on the individual regex
+   * @since 11.0
+   */
+  public static Predicate<String> createBlacklistPolicy(String... regexLists) {
+    return createPolicy(false, regexLists);
+  }
+
+  /**
+   * Create a whitelist policy
+   *
+   * @param regexLists
+   *          regex expressions separated with comma
+   * @return a composite regex based on the individual regex
+   * @since 11.0
+   */
+  public static Predicate<String> createWhitelistPolicy(String... regexLists) {
+    return createPolicy(true, regexLists);
+  }
+
+  /**
+   * Create a minimalistic whitelist policy that only knows the eclipse scout namespace. This whitelist is an
+   * illustration of what a whitelist could look like. Implementors using serialization must analyze and craft a
+   * specific per case whitelist for every usage point.
+   * <p>
+   * This policy contains the following regex
+   *
+   * <pre>
+  \[.*
+  (byte|char|short|int|long|double|float|boolean)
+  java\..*
+  org\.eclipse\.scout\..*
+  org\.eclipsescout\..*
+  net\.sourceforge\.spnego\.SpnegoAuthenticatorWithCache.*
+   * </pre>
+   *
+   * @since 11.0
+   */
+  public static Predicate<String> createDefaultScoutWhitelistPolicy() {
+    return createPolicy(true,
+        "\\[.*",
+        "(byte|char|short|int|long|double|float|boolean)",
+        "java\\..*",
+        "org\\.eclipse\\.scout\\..*",
+        "org\\.eclipsescout\\..*",
+        "net\\.sourceforge\\.spnego\\.SpnegoAuthenticatorWithCache.*");
+  }
+
+  /**
+   * Create a blacklist or a whitelist policy
+   *
+   * @param regexLists
+   *          regex expressions separated with comma
+   * @return a composite regex based on the individual regex
+   * @since 11.0
+   */
+  public static Predicate<String> createPolicy(boolean defaultWhenEmpty, String... regexLists) {
+    if (regexLists == null || regexLists.length == 0) {
+      return c -> defaultWhenEmpty;
+    }
+    List<String> regexParts = Arrays
+        .stream(regexLists)
+        .filter(Objects::nonNull)
+        .flatMap(regexList -> Arrays.stream(regexList.split(",")))
+        .map(String::trim)
+        .filter(s -> !s.isEmpty())
+        .collect(Collectors.toList());
+    if (regexParts.isEmpty()) {
+      return c -> defaultWhenEmpty;
+    }
+    String compositeRegex = regexParts
+        .stream()
+        .collect(Collectors.joining("|", "(", ")"));
+    Pattern p = Pattern.compile(compositeRegex);
+    return c -> p.matcher(c).matches();
   }
 
   /**

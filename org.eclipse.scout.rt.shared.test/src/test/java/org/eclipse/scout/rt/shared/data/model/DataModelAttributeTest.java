@@ -16,8 +16,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -27,6 +25,7 @@ import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
@@ -371,26 +370,22 @@ public class DataModelAttributeTest {
     IDataModelAttribute dataModelAttribute = new DynamicDataModelAttribute(DataModelConstants.TYPE_NONE);
     writeObjectToFile(dataModelAttribute, tmpFile);
     Object readObject = readObjectFromFile(tmpFile);
+    //noinspection ResultOfMethodCallIgnored
     tmpFile.delete();
     assertTrue(readObject instanceof IDataModelAttribute);
     assertEquals(((IDataModelAttribute) readObject).getType(), DataModelConstants.TYPE_NONE);
   }
 
   private void writeObjectToFile(Object input, File file) throws IOException {
-    FileOutputStream fos = new FileOutputStream(file);
-    ObjectOutputStream oos = new ObjectOutputStream(fos);
-    oos.writeObject(input);
-    oos.close();
-    fos.close();
+    try (FileOutputStream fos = new FileOutputStream(file)) {
+      SerializationUtility.createObjectSerializer().serialize(fos, input);
+    }
   }
 
   private Object readObjectFromFile(File file) throws IOException, ClassNotFoundException {
-    FileInputStream fis = new FileInputStream(file);
-    ObjectInputStream ois = new ObjectInputStream(fis);
-    Object result = ois.readObject();
-    ois.close();
-    fis.close();
-    return result;
+    try (FileInputStream fis = new FileInputStream(file)) {
+      return SerializationUtility.createObjectSerializer().deserialize(fis, Object.class);
+    }
   }
 
   public static class DynamicDataModelAttribute extends AbstractDataModelAttribute {

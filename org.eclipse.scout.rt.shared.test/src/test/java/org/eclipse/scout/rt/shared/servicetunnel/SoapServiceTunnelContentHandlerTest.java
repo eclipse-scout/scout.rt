@@ -10,58 +10,30 @@
  */
 package org.eclipse.scout.rt.shared.servicetunnel;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanManager;
-import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.CompressServiceTunnelRequestProperty;
-import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.After;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 
 /**
  * JUnit test for {@link SoapServiceTunnelContentHandler}
  */
 @RunWith(PlatformTestRunner.class)
+@RunWithNewPlatform
 public class SoapServiceTunnelContentHandlerTest {
-
-  private IConfigProperty m_compressProperty;
-  private IBean m_serviceReg;
-  private List<IBean<IConfigProperty>> m_oldBeans;
 
   @Before
   public void before() {
-    m_oldBeans = BEANS.getBeanManager().getRegisteredBeans(IConfigProperty.class);
-    for (IBean<IConfigProperty> iBean : m_oldBeans) {
-      BEANS.getBeanManager().unregisterBean(iBean);
-    }
-    m_compressProperty = Mockito.mock(IConfigProperty.class);
-    Mockito.when(m_compressProperty.getValue(ArgumentMatchers.<String> any())).thenReturn(true);
-    m_serviceReg = BeanTestingHelper.get().registerBean(new BeanMetaData(CompressServiceTunnelRequestProperty.class, m_compressProperty));
-  }
-
-  @After
-  public void after() {
-    BeanTestingHelper.get().unregisterBean(m_serviceReg);
-
-    IBeanManager beanManager = BEANS.getBeanManager();
-    // restore
-    for (IBean<?> bean : m_oldBeans) {
-      beanManager.registerBean(new BeanMetaData(bean));
-    }
+    CompressServiceTunnelRequestProperty prop = BEANS.get(CompressServiceTunnelRequestProperty.class);
+    prop.invalidate();
   }
 
   @Test
@@ -97,7 +69,9 @@ public class SoapServiceTunnelContentHandlerTest {
     bos.close();
     int sizeCompressed = bos.size();
 
-    Mockito.when(m_compressProperty.getValue(ArgumentMatchers.<String> any())).thenReturn(Boolean.FALSE);
+    CompressServiceTunnelRequestProperty prop = BEANS.get(CompressServiceTunnelRequestProperty.class);
+    prop.invalidate();
+    prop.setValue(Boolean.FALSE);
 
     handler = new SoapServiceTunnelContentHandler();
     handler.initialize();
@@ -121,7 +95,9 @@ public class SoapServiceTunnelContentHandlerTest {
     bos.close();
     int sizeCompressed = bos.size();
 
-    Mockito.when(m_compressProperty.getValue(ArgumentMatchers.<String> any())).thenReturn(Boolean.FALSE);
+    CompressServiceTunnelRequestProperty prop = BEANS.get(CompressServiceTunnelRequestProperty.class);
+    prop.invalidate();
+    prop.setValue(Boolean.FALSE);
 
     handler = new SoapServiceTunnelContentHandler();
     handler.initialize();
