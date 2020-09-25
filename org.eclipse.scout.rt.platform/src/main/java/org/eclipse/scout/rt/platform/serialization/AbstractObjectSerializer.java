@@ -87,7 +87,7 @@ public abstract class AbstractObjectSerializer implements IObjectSerializer {
     if (out == null) {
       return;
     }
-    try (ObjectOutputStream oos = createObjectOutputStream(out, getObjectReplacer())) {
+    try (ObjectOutputStream oos = createObjectOutputStream(out)) {
       oos.writeObject(o);
       oos.flush();
     }
@@ -106,7 +106,7 @@ public abstract class AbstractObjectSerializer implements IObjectSerializer {
     if (in == null) {
       return null;
     }
-    try (ObjectInputStream ois = createObjectInputStream(in, getObjectReplacer())) {
+    try (ObjectInputStream ois = createObjectInputStream(in)) {
       Object o = ois.readObject();
       if (expectedType != null && !expectedType.isInstance(o)) {
         throw new IOException("deserialized object has unexpected type: expected '" + expectedType + "', actual '" + o.getClass() + "'.");
@@ -117,12 +117,32 @@ public abstract class AbstractObjectSerializer implements IObjectSerializer {
     }
   }
 
+  @Override
+  public ObjectOutputStream createObjectOutputStream(OutputStream out) throws IOException {
+    return createObjectOutputStream(out, getObjectReplacer());
+  }
+
+  @Override
+  public ObjectInputStream createObjectInputStream(InputStream in) throws IOException {
+    return createObjectInputStream(in, getObjectReplacer());
+  }
+
+  /**
+   * @deprecated use {@link #createObjectOutputStream(OutputStream)}
+   */
+  @SuppressWarnings("DeprecatedIsStillUsed")
+  @Deprecated
   protected ObjectOutputStream createObjectOutputStream(OutputStream out, IObjectReplacer objectReplacer) throws IOException {
     return new ReplacingObjectOutputStream(out, objectReplacer);
   }
 
+  /**
+   * @deprecated use {@link #createObjectInputStream(InputStream)}
+   */
+  @SuppressWarnings("DeprecatedIsStillUsed")
+  @Deprecated
   protected ObjectInputStream createObjectInputStream(InputStream in, IObjectReplacer objectReplacer) throws IOException {
-    return new ResolvingObjectInputStream(in, objectReplacer, m_blacklist, m_whitelist);
+    return new ResolvingObjectInputStream(in, objectReplacer, getBlacklist(), getWhitelist());
   }
 
   public static class ReplacingObjectOutputStream extends ObjectOutputStream {
