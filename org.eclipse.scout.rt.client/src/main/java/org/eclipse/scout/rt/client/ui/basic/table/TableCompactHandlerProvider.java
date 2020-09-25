@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.TableCompactHandler;
 
-public class TableCompactHandlerProvider implements ITableCompactHandlerProvider {
+public class TableCompactHandlerProvider implements ICompactHandlerProvider {
   @Override
-  public ITableCompactHandler createCompactHandler(ITable table) {
+  public ICompactHandler createCompactHandler(ITable table) {
     return new TableCompactHandler(table);
   }
 }
