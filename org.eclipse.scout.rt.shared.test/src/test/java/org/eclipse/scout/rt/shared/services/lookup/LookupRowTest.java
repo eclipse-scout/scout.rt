@@ -12,12 +12,9 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import static org.junit.Assert.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.junit.Test;
 
@@ -31,7 +28,7 @@ public class LookupRowTest {
    */
   @Test
   public void testCreateEmpty() {
-    ILookupRow<String> row = new LookupRow<>((String) null, (String) null);
+    ILookupRow<String> row = new LookupRow<>((String) null, null);
     assertNull(row.getKey());
     assertNull(row.getText());
     assertNull(row.getTooltipText());
@@ -94,8 +91,8 @@ public class LookupRowTest {
         "text",
         "testIcon"
     };
-    ILookupRow<String> row = new LookupRow<>(cells, Long.class);
-    assertEquals(0L, row.getKey());
+    ILookupRow<Long> row = new LookupRow<>(cells, Long.class);
+    assertEquals(new Long(0L), row.getKey());
     assertEquals("text", row.getText());
     assertEquals("testIcon", row.getIconId());
   }
@@ -107,8 +104,8 @@ public class LookupRowTest {
         null,
         null
     };
-    ILookupRow<String> row = new LookupRow<>(cells, Long.class);
-    assertEquals(0L, row.getKey());
+    ILookupRow<Long> row = new LookupRow<>(cells, Long.class);
+    assertEquals(new Long(0L), row.getKey());
     assertNull(row.getText());
     assertNull(row.getIconId());
   }
@@ -129,18 +126,10 @@ public class LookupRowTest {
   }
 
   private Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
-    try (ByteArrayInputStream bin = new ByteArrayInputStream(data);
-        ObjectInputStream oin = new ObjectInputStream(bin)) {
-      return oin.readObject();
-    }
+    return SerializationUtility.createObjectSerializer().deserialize(data, Object.class);
   }
 
   private byte[] serialize(ILookupRow<String> row) throws IOException {
-    try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ObjectOutputStream oout = new ObjectOutputStream(bout)) {
-      oout.writeObject(row);
-      return bout.toByteArray();
-    }
+    return SerializationUtility.createObjectSerializer().serialize(row);
   }
-
 }
