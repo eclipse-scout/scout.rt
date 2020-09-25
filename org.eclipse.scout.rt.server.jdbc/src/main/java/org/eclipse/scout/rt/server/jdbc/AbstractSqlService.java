@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -131,7 +131,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
         style = styleClass.getConstructor().newInstance();
       }
       catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Failed to create instance of class '{}'.", new Object[]{styleClass.getName(), e}));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Failed to create instance of class '{}'.", styleClass.getName(), e));
       }
     }
     else {
@@ -360,14 +360,14 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
       String codeClassName = args[0];
       Class codeClass = loadBundleClassLenient(m_codeNameToDescriptor, codeClassName);
       if (codeClass == null) {
-        throw new ProcessingException("Cannot find class for code '{}", new Object[]{args[0]});
+        throw new ProcessingException("Cannot find class for code '{}", args[0]);
       }
       try {
         Object ret = codeClass.getField("ID").get(null);
         return ret != null ? ret : new LongHolder();
       }
       catch (Exception t) {
-        throw new ProcessingException("ID of code '{}'", new Object[]{args[0], t});
+        throw new ProcessingException("ID of code '{}'", args[0], t);
       }
     }
     else if ("text".equals(functionName)) {
@@ -396,7 +396,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
       }
     }
     catch (Exception e) {
-      throw new ProcessingException("getLevel of permission '{}'.", new Object[]{permissionClass.getName(), e});
+      throw new ProcessingException("getLevel of permission '{}'.", permissionClass.getName(), e);
     }
   }
 
@@ -536,7 +536,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
       execReleaseConnection(conn);
     }
     catch (SQLException | RuntimeException e) {
-      LOG.error("Could not release connection", e);
+      LOG.warn("Could not release connection", e);
     }
   }
 
@@ -720,21 +720,21 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
   @SuppressWarnings("squid:S1643")
   private Class loadBundleClassLenient(Map<String, List<Class<?>>> map, String name) {
     String base = name;
-    String suffix = "";
+    StringBuilder suffix = new StringBuilder();
     ClassLoader classLoader = getClass().getClassLoader();
     while (!base.isEmpty()) {
       List<Class<?>> list = map.get(base);
       if (list != null) {
         for (Class<?> desc : list) {
           try {
-            Class c = classLoader.loadClass(desc.getName());
-            if (!suffix.isEmpty()) {
-              c = classLoader.loadClass(desc.getName() + suffix.replace('.', '$'));
-              return c;
+            Class c;
+            if (suffix.length() == 0) {
+              c = classLoader.loadClass(desc.getName());
             }
             else {
-              return c;
+              c = classLoader.loadClass(desc.getName() + suffix.toString().replace('.', '$'));
             }
+            return c;
           }
           catch (ClassNotFoundException t) { // NOSONAR
             LOG.warn("Could not load class with lenient name '{}'", new Object[]{name});
@@ -743,16 +743,16 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
       }
       //
       int i = base.lastIndexOf('.');
+      String seg;
       if (i >= 0) {
-        String seg = base.substring(i);
+        seg = base.substring(i);
         base = base.substring(0, i);
-        suffix = seg + suffix;
       }
       else {
-        String seg = base;
+        seg = base;
         base = "";
-        suffix = seg + suffix;
       }
+      suffix.insert(0, seg);
     }
     LOG.warn("Could not find class with lenient name '{}'", new Object[]{name});
     return null;
@@ -821,7 +821,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
         m_conn.commit();
       }
       catch (Exception e) {
-        LOG.error("Failed to commit transaction", e);
+        LOG.warn("Failed to commit transaction", e);
       }
     }
 
@@ -840,7 +840,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
       }
       catch (Exception e) {
         if (!ITransaction.CURRENT.get().isCancelled()) {
-          LOG.error("Failed to rollback transaction", e);
+          LOG.warn("Failed to rollback transaction", e);
         }
       }
     }
@@ -859,9 +859,17 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
 
     @Override
     public void stateChanged(final PlatformEvent event) {
-      if (event.getState() == State.PlatformStopping) {
-        for (final AbstractSqlService sqlService : BEANS.all(AbstractSqlService.class)) {
+      if (event.getState() != State.PlatformStopping) {
+        return;
+      }
+
+      for (final AbstractSqlService sqlService : BEANS.all(AbstractSqlService.class)) {
+        try {
           sqlService.destroy();
+        }
+        catch (RuntimeException e) {
+          // catch exceptions so that other services are destroyed as well.
+          LOG.warn("Error destroying SQL service '{}'.", sqlService, e);
         }
       }
     }
