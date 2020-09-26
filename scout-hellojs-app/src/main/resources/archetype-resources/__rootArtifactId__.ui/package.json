@@ -4,7 +4,7 @@
   "engines": {
     "node": ">=12.1.0",
     "npm": ">=6.9.0",
-    "pnpm": ">=4"
+    "pnpm": ">=5"
   },
   "main": "./src/main/js/index.js",
   "files": [
@@ -29,12 +29,12 @@
     "@eclipse-scout/testing": ">=11.0.0-snapshot <11.0.0",
     "@eclipse-scout/releng": "^10.0.0",
     "@eclipse-scout/eslint-config": ">=11.0.0-snapshot <11.0.0",
-    "eslint": "6.5.1",
-    "babel-eslint": "10.0.3",
-    "eslint-plugin-babel": "5.3.0"
+    "eslint": "7.9.0",
+    "babel-eslint": "10.1.0",
+    "eslint-plugin-babel": "5.3.1"
   },
   "dependencies": {
     "@eclipse-scout/core": ">=11.0.0-snapshot <11.0.0",
-    "jquery": "3.4.1"
+    "jquery": "3.5.1"
   }
 }
