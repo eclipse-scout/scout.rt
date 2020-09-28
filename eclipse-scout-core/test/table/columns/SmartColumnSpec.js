@@ -148,4 +148,48 @@ describe('SmartColumn', function() {
     });
   });
 
+  /**
+   * The LookupCall must trigger an prepareLookupCall Event.
+   */
+  it('must trigger an "prepareLookupCall" event.', function() {
+    var table = helper.createTable({
+      columns: [{
+        objectType: 'SmartColumn'
+      }]
+    });
+
+    var lookupCall = scout.create('LookupCall', {session: session, batch: true});
+    table.columns[0].setLookupCall(lookupCall);
+
+    var counter = 0;
+    table.columns[0].on('prepareLookupCall', function(event) {
+      counter++;
+      expect(event.lookupCall.id).toBe(table.columns[0].lookupCall.id);
+      expect(event.type).toBe('prepareLookupCall');
+      expect(event.source).toBe(table.columns[0]);
+    });
+
+    var valueMap = {key1: 'Value 1', key2: 'Value 2', key3: 'Value 3'};
+    spyOn(lookupCall, 'textsByKeys').and.returnValue($.resolvedPromise(valueMap));
+    spyOn(lookupCall, 'textByKey').and.callFake(function(key) {
+      return $.resolvedPromise(valueMap[key]);
+    });
+
+    var getRow = function(key) {
+      return {cells: [key]};
+    };
+
+    table.insertRows(Object.keys(valueMap).map(getRow));
+    table.render();
+    jasmine.clock().tick(500);
+    expect(counter).toBe(1); // Batch lookup
+
+    lookupCall.batch = false;
+    counter = 0;
+    table.deleteAllRows();
+    table.insertRows(Object.keys(valueMap).map(getRow));
+    jasmine.clock().tick(500);
+    expect(counter).toBe(3); // Key lookups
+  });
+
 });
