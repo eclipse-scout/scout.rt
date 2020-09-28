@@ -540,13 +540,19 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     // draw and measure label
 
     let $legend,
-      lengthLegend = 0;
+      lengthLegend = 0,
+      horizontalSpace = 0;
+    if (positions.h === -1) {
+      horizontalSpace = positions.x2 - 2 * padding;
+    } else {
+      horizontalSpace = this.width - positions.x2 - 2 * padding;
+    }
 
     if (Array.isArray(text)) {
       for (let i = 0; i < text.length; i++) {
         let posIndex = text.length - i - 1;
         let yPos = positions.y2 + positions.v * padding - lineHeight * posIndex - padding * posIndex;
-        let $line = this._renderLineLabel(positions.x2 + padding, yPos, text[i], '', drawBackgroundBox);
+        let $line = this._renderLineLabel(positions.x2 + padding, yPos, strings.truncateText(text[i], horizontalSpace, this._measureText.bind(this)), '', drawBackgroundBox);
         $line.addClass(className);
         lengthLegend = Math.max(lengthLegend, $line[0].getComputedTextLength());
         if (i === 0) {
@@ -560,7 +566,7 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
         }
       }
     } else {
-      $legend = this._renderLineLabel(positions.x2 + padding, positions.y2 + positions.v * padding, text, '', drawBackgroundBox);
+      $legend = this._renderLineLabel(positions.x2 + padding, positions.y2 + positions.v * padding, strings.truncateText(text, horizontalSpace, this._measureText.bind(this)), '', drawBackgroundBox);
       $legend.addClass(className);
       lengthLegend = $legend[0].getComputedTextLength();
     }
