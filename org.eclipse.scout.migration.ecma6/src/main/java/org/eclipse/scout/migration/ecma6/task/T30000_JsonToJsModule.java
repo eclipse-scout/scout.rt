@@ -63,8 +63,7 @@ public class T30000_JsonToJsModule extends AbstractTask {
     String step3 = step2.replace('"', '\'');
     String step4 = step3.replace(ESCAPED_REPLACEMENT1, "\"").replace(ESCAPED_REPLACEMENT2, "\\'");
     String step5 = TRAILING_WHITESPACE_CHARS_PAT.matcher(step4).replaceAll("");
-    String step6 = "export default function() {\n" +
-        "  return " + step5 + ";\n}\n";
+    String step6 = "export default () => (" + step5 + ");\n";
 
     String step7 = T25000_ModelsGetModelToImport.replace(PLACEHOLDER_PAT, step6, (m, r) -> migratePlaceholders(m, r, pathInfo.getPath(), context));
     workingCopy.setSource(step7);
