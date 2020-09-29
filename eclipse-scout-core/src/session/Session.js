@@ -780,6 +780,12 @@ export default class Session {
         if (!this._sendTimeoutId) {
           this._sendNow();
         }
+      } else {
+        // Ensure busy is false when an error occurred an we won't be sending more requests.
+        // It could still be true when here were more busy indicated events in the queue when
+        // the error response was received (e.g. when selecting some table rows just when the
+        // server is restarted).
+        this.setBusy(false);
       }
       this.layoutValidator.validate();
 
