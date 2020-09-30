@@ -60,6 +60,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   protected void initTransformationConfig() {
     List<IDeviceTransformation> transformations = new LinkedList<>();
 
+    transformations.add(MobileDeviceTransformation.MAKE_DESKTOP_COMPACT);
     transformations.add(MobileDeviceTransformation.MOVE_FIELD_LABEL_TO_TOP);
     transformations.add(MobileDeviceTransformation.MOVE_FIELD_STATUS_TO_TOP);
     transformations.add(MobileDeviceTransformation.MAKE_FIELD_SCALEABLE);
@@ -81,7 +82,9 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
 
   @Override
   public void transformDesktop() {
-    getDesktop().setDisplayStyle(IDesktop.DISPLAY_STYLE_COMPACT);
+    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MAKE_DESKTOP_COMPACT)) {
+      getDesktop().setDisplayStyle(IDesktop.DISPLAY_STYLE_COMPACT);
+    }
   }
 
   @Override
@@ -98,7 +101,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     if (getDeviceTransformationConfig().isFormExcluded(form)) {
       return;
     }
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.DISABLE_FORM_CANCEL_CONFIRMATION)) {
+    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.DISABLE_FORM_CANCEL_CONFIRMATION, form)) {
       form.setAskIfNeedSave(false);
     }
     if (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW) {
@@ -111,7 +114,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
 
   protected void transformView(IForm form) {
     form.setDisplayViewId(IForm.VIEW_ID_CENTER);
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.USE_DIALOG_STYLE_FOR_VIEW)) {
+    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.USE_DIALOG_STYLE_FOR_VIEW, form)) {
       // Style the view to make it look like a regular dialog.
       // The desktop header will be made invisible by the ui if the form has a header. This saves some space because desktop header would always be about 60px big.
       form.setHeaderVisible(true);

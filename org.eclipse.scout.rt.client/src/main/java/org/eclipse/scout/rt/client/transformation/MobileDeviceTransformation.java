@@ -14,6 +14,7 @@ package org.eclipse.scout.rt.client.transformation;
  * @since 3.9.0
  */
 public enum MobileDeviceTransformation implements IDeviceTransformation {
+  MAKE_DESKTOP_COMPACT,
   MOVE_FIELD_LABEL_TO_TOP,
   MOVE_FIELD_STATUS_TO_TOP,
   MAKE_FIELD_SCALEABLE,
