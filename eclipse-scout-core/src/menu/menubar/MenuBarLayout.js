@@ -92,7 +92,7 @@ export default class MenuBarLayout extends AbstractLayout {
       this.undoShrink([menuItem]);
       return shrinked;
     });
-    let overflowableIndexes = [];
+    let notShrinkedMenuItems = [...visibleMenuItems];
     let htmlComp = HtmlComponent.get($container);
     let prefSize = new Dimension(0, 0);
     let prefWidth = Number.MAX_VALUE;
@@ -101,21 +101,35 @@ export default class MenuBarLayout extends AbstractLayout {
     if (options.widthHint === 0 || options.widthHint) {
       prefWidth = options.widthHint - htmlComp.insets().horizontal();
     }
-    // shortcut for minimum size.
     if (prefWidth <= 0) {
-      // reset overflown
-      overflowMenuItems.forEach(menuItem => {
-        menuItem._setOverflown(true);
-      });
-      return this._minSize(visibleMenuItems);
+      // shortcut for minimum size.
+      prefSize = this._minSize(visibleMenuItems);
+    } else {
+      prefSize = this._prefSize(visibleMenuItems);
+      if (prefSize.width > prefWidth) {
+        this.shrink(visibleMenuItems);
+      }
+      prefSize = this._prefSizeWithOverflow(visibleMenuItems, prefWidth);
     }
 
-    prefSize = this._prefSize(visibleMenuItems);
-    if (prefSize.width > prefWidth) {
-      this.shrink(visibleMenuItems);
+    if (scout.nvl(options.undo, true)) {
+      // Reset state
+      this.undoOverflow(overflowMenuItems);
+      this.undoShrink(notShrinkedMenuItems);
+      this.shrink(shrinkedMenuItems);
     }
 
-    // fill overflowable indexes
+    this._visibleMenuItems = visibleMenuItems;
+    return prefSize.add(htmlComp.insets());
+  }
+
+  /**
+   * Moves menu items into _overflowMenuItems until prefSize.width is smaller than prefWidth.
+   * The moved menu items will be removed from the given visibleMenuItems parameter.
+   * @returns the calculated preferred size
+   */
+  _prefSizeWithOverflow(visibleMenuItems, prefWidth) {
+    let overflowableIndexes = [];
     visibleMenuItems.forEach((menuItem, index) => {
       if (menuItem.stackable) {
         overflowableIndexes.push(index);
@@ -124,7 +138,7 @@ export default class MenuBarLayout extends AbstractLayout {
 
     let overflowIndex = -1;
     this._setFirstLastMenuMarker(visibleMenuItems);
-    prefSize = this._prefSize(visibleMenuItems);
+    let prefSize = this._prefSize(visibleMenuItems);
     while (prefSize.width > prefWidth && overflowableIndexes.length > 0) {
       if (this._menuBar.ellipsisPosition === MenuBar.EllipsisPosition.RIGHT) {
         overflowIndex = overflowableIndexes.splice(-1)[0];
@@ -136,30 +150,14 @@ export default class MenuBarLayout extends AbstractLayout {
       this._setFirstLastMenuMarker(visibleMenuItems);
       prefSize = this._prefSize(visibleMenuItems);
     }
-
-    if (scout.nvl(options.undo, true)) {
-      // reset overflown
-      overflowMenuItems.forEach(menuItem => {
-        menuItem._setOverflown(true);
-      });
-
-      // reset shrink
-      this.undoShrink(visibleMenuItems);
-      this.shrink(shrinkedMenuItems);
-    }
-
-    this._visibleMenuItems = visibleMenuItems;
-    return prefSize.add(htmlComp.insets());
+    return prefSize;
   }
 
   _minSize(visibleMenuItems) {
-    let prefSize,
-      minVisibleMenuItems = visibleMenuItems.filter(menuItem => {
-        return menuItem.ellisis || !menuItem.stackable;
-      }, this);
+    let minVisibleMenuItems = visibleMenuItems.filter(menuItem => !menuItem.stackable);
+    this.shrink(visibleMenuItems);
     this._setFirstLastMenuMarker(minVisibleMenuItems, true);
-    prefSize = this._prefSize(minVisibleMenuItems, true);
-    return prefSize;
+    return this._prefSize(minVisibleMenuItems, true);
   }
 
   _prefSize(menuItems, considerEllipsis) {
@@ -218,6 +216,12 @@ export default class MenuBarLayout extends AbstractLayout {
       menuItems[0].$container.addClass('first');
       menuItems[menuItems.length - 1].$container.addClass('last');
     }
+  }
+
+  undoOverflow(overflowMenuItems) {
+    overflowMenuItems.forEach(menuItem => {
+      menuItem._setOverflown(true);
+    });
   }
 
   /**

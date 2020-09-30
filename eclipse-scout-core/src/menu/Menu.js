@@ -629,8 +629,16 @@ export default class Menu extends Action {
     this.setProperty('stackable', stackable);
   }
 
+  _renderStackable() {
+    this.invalidateLayoutTree();
+  }
+
   setShrinkable(shrinkable) {
     this.setProperty('shrinkable', shrinkable);
+  }
+
+  _renderShrinkable() {
+    this.invalidateLayoutTree();
   }
 
   /**
