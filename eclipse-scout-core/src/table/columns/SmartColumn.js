@@ -92,9 +92,6 @@ export default class SmartColumn extends Column {
       return this._batchFormatValue(value);
     }
 
-    this.trigger('prepareLookupCall', {
-      lookupCall: this.lookupCall
-    });
     return this.lookupCall.textByKey(value);
   }
 
@@ -122,9 +119,6 @@ export default class SmartColumn extends Column {
         this._lookupCallBatchContext = null;
 
         // batch lookup texts
-        this.trigger('prepareLookupCall', {
-          lookupCall: this.lookupCall
-        });
         this.lookupCall.textsByKeys(Object.keys(currentBatchContext.keySet)).then(function(textMap) {
           // resolve result in current batch context
           batchResult.resolve(textMap);
