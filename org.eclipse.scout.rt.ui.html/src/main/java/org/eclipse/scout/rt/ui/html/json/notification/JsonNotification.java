@@ -15,6 +15,8 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 
@@ -22,6 +24,8 @@ import org.eclipse.scout.rt.ui.html.json.JsonStatus;
  * @since 8.0
  */
 public class JsonNotification<NOTIFICATION extends INotification> extends AbstractJsonWidget<NOTIFICATION> {
+
+  public static final String EVENT_CLOSE = "close";
 
   public JsonNotification(NOTIFICATION model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -47,5 +51,39 @@ public class JsonNotification<NOTIFICATION extends INotification> extends Abstra
         return JsonStatus.toJson((IStatus) value);
       }
     });
+    putJsonProperty(new JsonProperty<NOTIFICATION>("closable", model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isClosable();
+      }
+    });
+    putJsonProperty(new JsonProperty<NOTIFICATION>("htmlEnabled", model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isHtmlEnabled();
+      }
+    });
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event) {
+    if (EVENT_CLOSE.equals(event.getType())) {
+      handleUiClose();
+    }
+    else if (JsonEventType.APP_LINK_ACTION.matches(event.getType())) {
+      handleUiAppLinkAction(event);
+    }
+    else {
+      super.handleUiEvent(event);
+    }
+  }
+
+  protected void handleUiClose() {
+    getModel().getUIFacade().fireClosedFromUI();
+  }
+
+  protected void handleUiAppLinkAction(JsonEvent event) {
+    String ref = event.getData().optString("ref", null);
+    getModel().getUIFacade().fireAppLinkActionFromUI(ref);
   }
 }

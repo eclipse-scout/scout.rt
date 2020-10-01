@@ -13,14 +13,10 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.notification.JsonNotification;
 
 public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotification> extends JsonNotification<DESKTOP_NOTIFICATION> {
-
-  public static final String EVENT_CLOSE = "close";
 
   public JsonDesktopNotification(DESKTOP_NOTIFICATION model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -41,41 +37,5 @@ public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotifi
         return getModel().getDuration();
       }
     });
-
-    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>("closable", model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isClosable();
-      }
-    });
-
-    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>("htmlEnabled", model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isHtmlEnabled();
-      }
-    });
-  }
-
-  @Override
-  public void handleUiEvent(JsonEvent event) {
-    if (EVENT_CLOSE.equals(event.getType())) {
-      handleUiClose();
-    }
-    else if (JsonEventType.APP_LINK_ACTION.matches(event.getType())) {
-      handleUiAppLinkAction(event);
-    }
-    else {
-      super.handleUiEvent(event);
-    }
-  }
-
-  protected void handleUiClose() {
-    getModel().getUIFacade().fireClosedFromUI();
-  }
-
-  protected void handleUiAppLinkAction(JsonEvent event) {
-    String ref = event.getData().optString("ref", null);
-    getModel().getUIFacade().fireAppLinkActionFromUI(ref);
   }
 }

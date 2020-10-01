@@ -22,4 +22,19 @@ public interface INotification extends IWidget {
 
   IStatus getStatus();
 
+  /**
+   * Whether or not the notification can be closed by the user.
+   */
+  boolean isClosable();
+
+  /**
+   * @return true, if the notification may contain html that needs to be rendered. false otherwise.
+   */
+  boolean isHtmlEnabled();
+
+  void addNotificationListener(NotificationListener listener);
+
+  void removeNotificationListener(NotificationListener listener);
+
+  INotificationUIFacade getUIFacade();
 }

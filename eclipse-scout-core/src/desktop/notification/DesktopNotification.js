@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, Notification, strings} from '../../index';
-import $ from 'jquery';
+import {Device, Notification} from '../../index';
 
 export default class DesktopNotification extends Notification {
 
@@ -17,7 +16,6 @@ export default class DesktopNotification extends Notification {
     super();
     this.closable = true;
     this.duration = 5000;
-    this.htmlEnabled = false;
     this.removeTimeout;
     this._removing = false;
   }
@@ -42,26 +40,8 @@ export default class DesktopNotification extends Notification {
     }
   }
 
-  _remove() {
-    super._remove();
-    this._removeCloser();
-  }
-
   _renderProperties() {
     super._renderProperties();
-    this._renderClosable();
-  }
-
-  _renderMessage() {
-    let message = this.status.message || '';
-    if (this.htmlEnabled) {
-      this.$messageText.html(message);
-      // Add action to app-links
-      this.$messageText.find('.app-link')
-        .on('click', this._onAppLinkAction.bind(this));
-    } else {
-      this.$messageText.html(strings.nl2br(message));
-    }
   }
 
   /**
@@ -70,36 +50,6 @@ export default class DesktopNotification extends Notification {
   _renderLoading() {
     this.$container.toggleClass('loading', this.loading);
     this.$loader.setVisible(this.loading);
-  }
-
-  setClosable(closable) {
-    this.setProperty('closable', closable);
-  }
-
-  _renderClosable() {
-    this.$content.toggleClass('closable', this.closable);
-    if (!this.closable) {
-      this._removeCloser();
-    } else {
-      this._renderCloser();
-    }
-  }
-
-  _removeCloser() {
-    if (!this.$closer) {
-      return;
-    }
-    this.$closer.remove();
-    this.$closer = null;
-  }
-
-  _renderCloser() {
-    if (this.$closer) {
-      return;
-    }
-    this.$closer = this.$content
-      .appendDiv('closer')
-      .on('click', this._onCloseIconClick.bind(this));
   }
 
   _onCloseIconClick() {
@@ -151,17 +101,5 @@ export default class DesktopNotification extends Notification {
    */
   invalidateLayoutTree() {
     // called by notification.js. Since desktop notification has no htmlComp, no need to invalidate
-  }
-
-  _onAppLinkAction(event) {
-    let $target = $(event.delegateTarget);
-    let ref = $target.data('ref');
-    this.triggerAppLinkAction(ref);
-  }
-
-  triggerAppLinkAction(ref) {
-    this.trigger('appLinkAction', {
-      ref: ref
-    });
   }
 }

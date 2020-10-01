@@ -9,12 +9,15 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {HtmlComponent, scout, Status, strings, texts, Widget} from '../index';
+import $ from 'jquery';
 
 export default class Notification extends Widget {
 
   constructor() {
     super();
     this.status = Status.info();
+    this.closable = false;
+    this.htmlEnabled = false;
   }
 
   _init(model) {
@@ -35,13 +38,20 @@ export default class Notification extends Widget {
 
   _render() {
     this.$container = this.$parent.appendDiv('notification');
+    this.$content = this.$container.appendDiv('notification-content');
+    this.$messageText = this.$content.appendDiv('notification-message');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  }
+
+  _remove() {
+    super._remove();
+    this._removeCloser();
   }
 
   _renderProperties() {
     super._renderProperties();
-
     this._renderStatus();
+    this._renderClosable();
   }
 
   setStatus(status) {
@@ -70,8 +80,64 @@ export default class Notification extends Widget {
   }
 
   _renderMessage() {
-    let message = scout.nvl(strings.nl2br(this.status.message), '');
-    this.$container.html(message);
+    let message = this.status.message || '';
+    if (this.htmlEnabled) {
+      this.$messageText.html(message);
+      // Add action to app-links
+      this.$messageText.find('.app-link')
+        .on('click', this._onAppLinkAction.bind(this));
+    } else {
+      this.$messageText.html(strings.nl2br(message));
+    }
     this.invalidateLayoutTree();
+  }
+
+  setClosable(closable) {
+    this.setProperty('closable', closable);
+  }
+
+  _renderClosable() {
+    this.$content.toggleClass('closable', this.closable);
+    if (!this.closable) {
+      this._removeCloser();
+    } else {
+      this._renderCloser();
+    }
+  }
+
+  _removeCloser() {
+    if (!this.$closer) {
+      return;
+    }
+    this.$closer.remove();
+    this.$closer = null;
+  }
+
+  _renderCloser() {
+    if (this.$closer) {
+      return;
+    }
+    this.$closer = this.$content
+      .appendDiv('closer')
+      .on('click', this._onCloseIconClick.bind(this));
+  }
+
+  _onCloseIconClick() {
+    if (this._removing) {
+      return;
+    }
+    this.trigger('close');
+  }
+
+  _onAppLinkAction(event) {
+    let $target = $(event.delegateTarget);
+    let ref = $target.data('ref');
+    this.triggerAppLinkAction(ref);
+  }
+
+  triggerAppLinkAction(ref) {
+    this.trigger('appLinkAction', {
+      ref: ref
+    });
   }
 }

@@ -9,12 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .notification {
-  #scout.user-select(text);
-  #scout.overflow-ellipsis();
+  position: relative;
   padding: 10px;
   margin: 10px 10px 0 10px;
   border: 1px solid transparent;
   color: @text-color;
+  pointer-events: auto;
 
   &.ok {
     background-color: @notification-ok-background-color;
@@ -42,4 +42,26 @@
     margin-left: 10px + @root-group-box-padding-left;
     margin-right: @root-group-box-padding-right;
   }
+}
+
+.notification-content {
+  /* Prevent overlay of text and close icon */
+
+  &.closable {
+    padding-right: 25px;
+  }
+
+  & > .closer {
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    // Enlarge region to click
+    padding: 8px;
+  }
+}
+
+.notification-message {
+  // display: inline-block;
+  #scout.user-select(text);
+  #scout.overflow-ellipsis();
 }

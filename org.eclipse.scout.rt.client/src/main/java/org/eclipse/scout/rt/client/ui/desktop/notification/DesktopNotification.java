@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.notification.INotificationUIFacade;
 import org.eclipse.scout.rt.client.ui.notification.Notification;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -25,10 +26,7 @@ import org.eclipse.scout.rt.platform.status.Status;
 public class DesktopNotification extends Notification implements IDesktopNotification {
 
   private final long m_duration;
-  private final boolean m_closable;
-  private final boolean m_htmlEnabled;
-  private final Consumer<String> m_appLinkConsumer;
-  private final IDesktopNotificationUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
+  private final INotificationUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
 
   /**
    * Creates a closable, simple info notification with a text and the {@linkplain IDesktopNotification#DEFAULT_DURATION
@@ -72,11 +70,8 @@ public class DesktopNotification extends Notification implements IDesktopNotific
    * @param appLinkConsumer
    */
   public DesktopNotification(IStatus status, long duration, boolean closable, boolean htmlEnabled, Consumer<String> appLinkConsumer) {
-    super(status);
+    super(status, closable, htmlEnabled, appLinkConsumer);
     m_duration = duration;
-    m_closable = closable;
-    m_htmlEnabled = htmlEnabled;
-    m_appLinkConsumer = appLinkConsumer;
   }
 
   @Override
@@ -85,21 +80,11 @@ public class DesktopNotification extends Notification implements IDesktopNotific
   }
 
   @Override
-  public boolean isClosable() {
-    return m_closable;
-  }
-
-  @Override
-  public boolean isHtmlEnabled() {
-    return m_htmlEnabled;
-  }
-
-  @Override
-  public IDesktopNotificationUIFacade getUIFacade() {
+  public INotificationUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
-  protected class P_UIFacade implements IDesktopNotificationUIFacade {
+  protected class P_UIFacade implements INotificationUIFacade {
 
     @Override
     public void fireClosedFromUI() {
@@ -108,8 +93,8 @@ public class DesktopNotification extends Notification implements IDesktopNotific
 
     @Override
     public void fireAppLinkActionFromUI(String ref) {
-      if (m_appLinkConsumer != null) {
-        m_appLinkConsumer.accept(ref);
+      if (getAppLinkConsumer() != null) {
+        getAppLinkConsumer().accept(ref);
       }
     }
   }

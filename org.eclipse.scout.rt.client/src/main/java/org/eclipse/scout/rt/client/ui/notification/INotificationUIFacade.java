@@ -8,17 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.client.ui.desktop.notification;
+package org.eclipse.scout.rt.client.ui.notification;
 
-public interface IDesktopNotificationUIFacade {
+public interface INotificationUIFacade {
 
   /**
-   * Notification that the DesktopNotification was closed in the UI
+   * Notification that the Notification was closed in the UI
    */
   void fireClosedFromUI();
 
   /**
-   * Notification that the AppLink of the DesktopNotification was clicked
+   * Notification that the AppLink of the Notification was clicked
    */
   void fireAppLinkActionFromUI(String ref);
 }

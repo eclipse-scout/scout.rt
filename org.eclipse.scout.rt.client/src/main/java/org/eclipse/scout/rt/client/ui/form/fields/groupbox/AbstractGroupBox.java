@@ -34,6 +34,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxProcessButtonGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmartGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.notification.INotification;
+import org.eclipse.scout.rt.client.ui.notification.NotificationEvent;
+import org.eclipse.scout.rt.client.ui.notification.NotificationListener;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
@@ -742,6 +744,20 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   @Override
   public void setNotification(INotification notification) {
+    if (notification != null) {
+      notification.setParentInternal(this);
+      notification.addNotificationListener(new NotificationListener() {
+        @Override
+        public void notificationChanged(NotificationEvent event) {
+          if (NotificationEvent.TYPE_CLOSED == event.getType()) {
+            if (event.getNotification() != null) {
+              event.getNotification().removeNotificationListener(this);
+            }
+            removeNotification();
+          }
+        }
+      });
+    }
     propertySupport.setProperty(PROP_NOTIFICATION, notification);
   }
 

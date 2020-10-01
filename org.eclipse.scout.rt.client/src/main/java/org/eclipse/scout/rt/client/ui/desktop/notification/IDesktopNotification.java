@@ -38,16 +38,4 @@ public interface IDesktopNotification extends INotification {
    * A value <= 0 indicates an infinite duration, i.e. the notification is never closed automatically.
    */
   long getDuration();
-
-  /**
-   * Whether or not the notification can be closed by the user.
-   */
-  boolean isClosable();
-
-  /**
-   * @return true, if the notification may contain html that needs to be rendered. false otherwise.
-   */
-  boolean isHtmlEnabled();
-
-  IDesktopNotificationUIFacade getUIFacade();
 }
