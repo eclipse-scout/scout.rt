@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -230,16 +230,16 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   }
 
   /**
-   * Intercepter is called after data was fetched from LookupCall and is adding a table row for every LookupRow using
+   * Interceptor is called after data was fetched from LookupCall and is adding a table row for every LookupRow using
    * IListBoxTable.createTableRow(row) and ITable.addRows()
    * <p>
    * For most cases the override of just {@link #interceptLoadTableData()} is sufficient
    *
    * <pre>
-   * List<ILookupRow<T>> data=execLoadTableData();
-   * List<ITableRow> rows=new ArrayList();
-   * if(data!=null){
-   *   for(int i=0; i{@code<}data.length; i++){
+   * List<ILookupRow<T>> data = execLoadTableData();
+   * List<ITableRow> rows = new ArrayList();
+   * if (data != null) {
+   *   for (int i = 0; i &lt; data.length; i++) {
    *     rows.add(createTableRow(data[i]));
    *   }
    * }
@@ -305,7 +305,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
 
     if (m_table != null) {
       if (m_table instanceof AbstractTable) {
-        ((AbstractTable) m_table).setParentInternal(this);
+        m_table.setParentInternal(this);
       }
       updateActiveRowsFilter();
       updateCheckedRowsFilter();
@@ -390,7 +390,8 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
 
   @Override
   public void moveFieldTo(IFormField f, ICompositeField newContainer) {
-    CompositeFieldUtility.moveFieldTo(f, this, newContainer, m_movedFormFieldsByClass);
+    CompositeFieldUtility.moveFieldTo(f, this, newContainer);
+    m_movedFormFieldsByClass.put(f.getClass(), f);
   }
 
   @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -98,8 +98,8 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
 
   /**
    * All codes returned by the configured {@link ICodeType} are used as radio buttons.<br>
-   * However, the {@link #interceptFilterLookupResult(LookupCall, List)} can be used to manipulate the codes which shall
-   * be used.
+   * However, the {@link #interceptFilterLookupResult(ILookupCall, List)} can be used to manipulate the codes which
+   * shall be used.
    */
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(250)
@@ -303,7 +303,8 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
 
   @Override
   public void moveFieldTo(IFormField f, ICompositeField newContainer) {
-    CompositeFieldUtility.moveFieldTo(f, this, newContainer, m_movedFormFieldsByClass);
+    CompositeFieldUtility.moveFieldTo(f, this, newContainer);
+    m_movedFormFieldsByClass.put(f.getClass(), f);
   }
 
   @Override
@@ -397,10 +398,8 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   /**
-   * Returns the LookupRows using {@link #getLookupCall()}, {@link #prepareLookupCall(LookupCall)} and
-   * {@link #filterLookup(LookupCall, List)}.
-   *
-   * @return
+   * Returns the LookupRows using {@link #getLookupCall()}, {@link #prepareLookupCall(ILookupCall)} and
+   * {@link #filterLookup(ILookupCall, List)}.
    */
   protected List<ILookupRow<T>> getLookupRows() {
     List<ILookupRow<T>> data;
@@ -647,18 +646,20 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   private class P_FieldPropertyChangeListenerEx implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent e) {
-      if (e.getPropertyName().equals(IFormField.PROP_VISIBLE)) {
-        // fire group box visibility
-        handleFieldVisibilityChanged();
-      }
-      else if (e.getPropertyName().equals(IFormField.PROP_SAVE_NEEDED)) {
-        checkSaveNeeded();
-      }
-      else if (e.getPropertyName().equals(IFormField.PROP_EMPTY)) {
-        checkEmpty();
+      switch (e.getPropertyName()) {
+        case IFormField.PROP_VISIBLE:
+          // fire group box visibility
+          handleFieldVisibilityChanged();
+          break;
+        case IFormField.PROP_SAVE_NEEDED:
+          checkSaveNeeded();
+          break;
+        case IFormField.PROP_EMPTY:
+          checkEmpty();
+          break;
       }
     }
-  }// end private class
+  }
 
   /**
    * Implementation of PropertyChangeListener Proxy on all attached fields (not groups)

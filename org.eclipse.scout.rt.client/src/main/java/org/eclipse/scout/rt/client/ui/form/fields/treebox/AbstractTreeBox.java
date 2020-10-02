@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -194,16 +194,8 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   /**
    * Checks / unchecks all visible child nodes if the parent node gets checked / unchecked.
-   * <p>
-   * Makes only sense if
    *
-   * <pre>
-   * {@link #getConfiguredCheckable()}
-   * </pre>
-   *
-   * is set to true.
-   *
-   * @since 3.10-M1 (backported to 3.8 / 3.9)
+   * @since 3.10-M1
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(310)
@@ -323,7 +315,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     }
     if (m_tree != null) {
       if (m_tree instanceof AbstractTree) {
-        ((AbstractTree) m_tree).setParentInternal(this);
+        m_tree.setParentInternal(this);
       }
       m_tree.setRootNode(getTreeNodeBuilder().createTreeNode(new LookupRow(null, "Root"), ITreeNode.STATUS_NON_CHANGED, false));
       m_tree.setAutoDiscardOnDelete(false);
@@ -417,7 +409,8 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   public void moveFieldTo(IFormField f, ICompositeField newContainer) {
-    CompositeFieldUtility.moveFieldTo(f, this, newContainer, m_movedFormFieldsByClass);
+    CompositeFieldUtility.moveFieldTo(f, this, newContainer);
+    m_movedFormFieldsByClass.put(f.getClass(), f);
   }
 
   @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -83,14 +83,52 @@ public final class CompositeFieldUtility {
     }
   }
 
+  /**
+   * Changes the order of the given field and reorders its parent {@link ICompositeField} to ensure it is placed at the
+   * new position.
+   *
+   * @param field
+   *          The {@link IFormField} whose order should be changed. Must not be {@code null}.
+   * @param newOrder
+   *          The new order value.
+   */
+  public static void changeFieldOrder(IFormField field, double newOrder) {
+    assertNotNull(field).setOrder(newOrder);
+    reorderChildFields(field.getParentField());
+  }
+
+  /**
+   * Reorders the child fields of the given {@link ICompositeField} so that the order matches the value of
+   * {@link IFormField#getOrder()}. This may be useful after the order values of fields have been changed using
+   * {@link IFormField#setOrder(double)}.
+   *
+   * @param compositeField
+   *          The {@link ICompositeField} for which the child form fields should be reordered. Must not be {@code null}.
+   */
+  public static void reorderChildFields(ICompositeField compositeField) {
+    assertNotNull(compositeField);
+    List<IFormField> fields = compositeField.getFields();
+    fields.sort(new OrderedComparator());
+    compositeField.setFields(fields);
+    compositeField.rebuildFieldGrid();
+  }
+
+  /**
+   * @deprecated Will be removed with Scout 12. Use {@link #moveFieldTo(IFormField, ICompositeField, ICompositeField)}
+   *             instead.
+   */
+  @Deprecated
   public static void moveFieldTo(IFormField f, ICompositeField oldContainer, ICompositeField newContainer, Map<Class<? extends IFormField>, IFormField> movedFormFieldsByClass) {
+    moveFieldTo(f, oldContainer, newContainer);
+  }
+
+  public static void moveFieldTo(IFormField f, ICompositeField oldContainer, ICompositeField newContainer) {
     assertNotNull(f, "field must not be null");
     assertNotNull(oldContainer, "old container must not be null");
     assertNotNull(newContainer, "new container must not be null");
 
     oldContainer.removeField(f);
     newContainer.addField(f);
-    movedFormFieldsByClass.put(f.getClass(), f);
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -159,7 +159,8 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   @Override
   public void moveFieldTo(IFormField f, ICompositeField newContainer) {
-    CompositeFieldUtility.moveFieldTo(f, this, newContainer, m_movedFormFieldsByClass);
+    CompositeFieldUtility.moveFieldTo(f, this, newContainer);
+    m_movedFormFieldsByClass.put(f.getClass(), f);
   }
 
   @Override
@@ -235,9 +236,8 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * <p/>
    * This default implementation checks the path of super classes, starting by the most specific one and stopping by
    * this class or one of its well known direct sub classes (i.e {@link AbstractGroupBox}, {@link AbstractSequenceBox},
-   * {@link AbstractSnapBox}, {@link AbstractSplitBox} and {@link AbstractTabBox}). If there exists an abstract class
-   * containing {@link IFormField}, this method returns <code>true</code>. Subclasses may override this default
-   * behavior.
+   * {@link AbstractSplitBox} and {@link AbstractTabBox}). If there exists an abstract class containing
+   * {@link IFormField}, this method returns <code>true</code>. Subclasses may override this default behavior.
    *
    * @since 4.0.1
    */
@@ -354,7 +354,6 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * Checks whether the form field with the given class has been replaced by another form field. If so, the replacing
    * form field's class is returned. Otherwise the given class itself.
    *
-   * @param c
    * @return Returns the possibly available replacing field class for the given class.
    * @see Replace
    * @since 3.8.2
