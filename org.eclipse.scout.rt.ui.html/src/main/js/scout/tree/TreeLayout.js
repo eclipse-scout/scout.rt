@@ -48,8 +48,7 @@ scout.TreeLayout.prototype._layout = function($container) {
   this.tree.setViewRangeSize(this.tree.calculateViewRangeSize());
 
   // Check if width has changed
-  this.nodeDimensionsDirty = this.nodeDimensionsDirty ||
-    (htmlContainer.sizeCached && htmlContainer.sizeCached.width !== htmlContainer.size().width);
+  this.nodeDimensionsDirty = this.nodeDimensionsDirty || this._sizeChanged(htmlContainer);
   if (this.nodeDimensionsDirty) {
     this.nodeDimensionsDirty = false;
     if (this.tree.isHorizontalScrollingEnabled()) {
@@ -59,6 +58,7 @@ scout.TreeLayout.prototype._layout = function($container) {
     } else {
       // Nodes may contain wrapped text (with breadcrumb style-or if nodes contain html) -> update heights
       this.tree.updateNodeHeights();
+      this.tree._renderViewport(); // Ensure viewRangeRendered is up to date and matches visibleNodesFlat (can diverge after filtering)
       this.tree._renderFiller();
     }
   }
@@ -74,6 +74,11 @@ scout.TreeLayout.prototype._layout = function($container) {
   if (!htmlContainer.layouted) {
     this.tree._renderScrollTop();
   }
+};
+
+scout.TreeLayout.prototype._sizeChanged = function(htmlContainer) {
+  // Ceil because sizeCached is exact but .size() is not)
+  return htmlContainer.sizeCached && Math.ceil(htmlContainer.sizeCached.width) !== Math.ceil(htmlContainer.size().width);
 };
 
 scout.TreeLayout.prototype._setDataHeight = function(heightOffset) {

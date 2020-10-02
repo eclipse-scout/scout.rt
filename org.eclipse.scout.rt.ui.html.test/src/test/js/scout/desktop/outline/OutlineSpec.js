@@ -26,23 +26,6 @@ describe("Outline", function() {
     jasmine.clock().uninstall();
   });
 
-  function createNodesDeletedEvent(model, nodeIds, commonParentNodeId) {
-    return {
-      target: model.id,
-      commonParentNodeId: commonParentNodeId,
-      nodeIds: nodeIds,
-      type: 'nodesDeleted'
-    };
-  }
-
-  function createAllChildNodesDeletedEvent(model, commonParentNodeId) {
-    return {
-      target: model.id,
-      commonParentNodeId: commonParentNodeId,
-      type: 'allChildNodesDeleted'
-    };
-  }
-
   describe("collapsing", function() {
     // Regression test for erroneous behavior of MessageBoxController
     it("still allows a messagebox to be shown", function() {
@@ -400,6 +383,28 @@ describe("Outline", function() {
 
       outline.selectNodes(node0.childNodes[0]);
       expect(outline.detailContent).toBe(node0.childNodes[0].detailForm);
+      expect(outline.detailContent.rendered).toBe(true);
+    });
+
+    it('can select a node when scrolled first', function() {
+      // Reduce the viewport size so that only some rows are rendered
+      $('<style>' +
+        '.tree-node {height: 20px; }' +
+        '.tree-data {height: 60px !important; overflow: hidden;}' +
+        '</style>').appendTo($('#sandbox'));
+      var outline = helper.createOutlineWithOneDetailTable();
+      helper.setMobileFlags(outline);
+      outline.render();
+      outline.htmlComp.validateRoot = true; // Ensure layout calls will not be swallowed by DesktopLayout because there is no bench
+      var node0 = outline.nodes[0];
+      outline.insertNodes(helper.createModelNodes(10), node0);
+      var childNode9 = outline.nodes[0].childNodes[9];
+      childNode9.detailForm = new scout.FormSpecHelper(session).createFormWithOneField({modal: false});
+
+      outline.selectNodes(node0);
+      outline.scrollTo(childNode9);
+      outline.selectNodes(childNode9);
+      expect(outline.detailContent).toBe(childNode9.detailForm);
       expect(outline.detailContent.rendered).toBe(true);
     });
 

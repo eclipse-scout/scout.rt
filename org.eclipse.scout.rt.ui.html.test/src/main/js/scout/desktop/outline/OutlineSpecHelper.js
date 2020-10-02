@@ -102,3 +102,10 @@ scout.OutlineSpecHelper.prototype.createOutlineWithOneDetailTable = function() {
   node.detailTableVisible = true;
   return outline;
 };
+
+scout.OutlineSpecHelper.prototype.setMobileFlags = function(outline) {
+  outline.setBreadcrumbStyleActive(true);
+  outline.setToggleBreadcrumbStyleEnabled(false);
+  outline.setCompact(true);
+  outline.setEmbedDetailContent(true);
+};

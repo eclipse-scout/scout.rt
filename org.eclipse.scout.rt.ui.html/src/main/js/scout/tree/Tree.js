@@ -1369,6 +1369,10 @@ scout.Tree.prototype.isBreadcrumbStyleActive = function() {
   return this.displayStyle === scout.Tree.DisplayStyle.BREADCRUMB;
 };
 
+scout.Tree.prototype.setToggleBreadcrumbStyleEnabled = function(enabled) {
+  this.setProperty('toggleBreadcrumbStyleEnabled', enabled);
+};
+
 scout.Tree.prototype.setBreadcrumbTogglingThreshold = function(width) {
   this.setProperty('breadcrumbTogglingThreshold', width);
 };
