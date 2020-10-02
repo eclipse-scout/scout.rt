@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DatePickerTouchPopupLayout, scout, TouchPopup} from '../index';
+import {DatePickerTouchPopupLayout, ParsingFailedStatus, scout, TouchPopup} from '../index';
 
 export default class DatePickerTouchPopup extends TouchPopup {
 
@@ -56,7 +56,8 @@ export default class DatePickerTouchPopup extends TouchPopup {
     // Delegate to original field
     this._touchField.setDisplayText(event.displayText);
     this._touchField.setErrorStatus(event.errorStatus);
-    if (!event.errorStatus) {
+    let hasParsingFailedError = event.errorStatus ? event.errorStatus.containsStatus(ParsingFailedStatus) : false;
+    if (!hasParsingFailedError) {
       this._touchField.setValue(event.value);
     }
     this._touchField._triggerAcceptInput();
