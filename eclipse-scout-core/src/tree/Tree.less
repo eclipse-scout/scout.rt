@@ -247,7 +247,10 @@
       padding: 8px;
 
       &.ancestor-of-selected,
-      &.child-of-selected {
+      &.child-of-selected,
+        /* Selecting a node will remove all child-of-selected classes of the parent's children, hence the selected node will be temporarily invisible.
+        If that happens the active state won't be removed correctly (browser bug?). To prevent this we make sure the node will not get invisible when touched. */
+      &:active {
         display: flex;
       }
 

@@ -1129,6 +1129,9 @@ export default class Tree extends Widget {
       return;
     }
     // Highlight previously selected node, but do it only once
+    if (this.prevSelectedNode.$node.hasClass('animate-prev-selected')) {
+      return this;
+    }
     this.prevSelectedNode.$node.addClassForAnimation('animate-prev-selected').oneAnimationEnd(() => {
       this.prevSelectedNode.prevSelectionAnimationDone = true;
     });
@@ -2991,10 +2994,10 @@ export default class Tree extends Widget {
     if ($node.is('.showing')) {
       return;
     }
-    $node.addClass('showing');
     $node.removeClass('hiding');
     let that = this;
     if (useAnimation) {
+      $node.addClass('showing');
       // hide node first and then make it appear using slideDown (setVisible(false) won't work because it would stay invisible during the animation)
       $node.hide();
       $node.stop(false, true).slideDown({
@@ -3023,10 +3026,9 @@ export default class Tree extends Widget {
     if ($node.is('.hiding')) {
       return;
     }
-
-    $node.addClass('hiding');
     $node.removeClass('showing');
     if (useAnimation) {
+      $node.addClass('hiding');
       this._renderViewportBlocked = true;
       $node.stop(false, true).slideUp({
         duration: 250,
