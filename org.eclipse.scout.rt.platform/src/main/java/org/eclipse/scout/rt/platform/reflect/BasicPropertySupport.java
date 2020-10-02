@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,9 +26,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.eclipse.scout.rt.platform.events.ListenerListRegistry;
 import org.eclipse.scout.rt.platform.events.IListenerListWithManagement;
 import org.eclipse.scout.rt.platform.events.ISnapshotCollector;
+import org.eclipse.scout.rt.platform.events.ListenerListRegistry;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.WeakEventListener;
@@ -198,6 +198,21 @@ public class BasicPropertySupport implements IListenerListWithManagement {
 
   public Object getProperty(String name) {
     return m_props.get(name);
+  }
+
+  /**
+   * Gets the property with given name.
+   *
+   * @param name
+   *          The name of the property.
+   * @param type
+   *          The expected type of the property. The value will be cast to this type.
+   * @return The value of the property with the name specified or {@code null} if the property does not exist or has the
+   *         value {@code null}.
+   */
+  @SuppressWarnings("unchecked")
+  public <T> T getProperty(String name, Class<T> type) {
+    return (T) getProperty(name);
   }
 
   public <T> boolean setPropertyList(String name, List<T> newValue) {

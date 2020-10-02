@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,178 +10,178 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import org.eclipse.scout.rt.client.ui.IStyleable;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HeaderCell implements IHeaderCell, IStyleable {
+public class HeaderCell extends AbstractPropertyObserver implements IHeaderCell {
   private static final Logger LOG = LoggerFactory.getLogger(HeaderCell.class);
 
-  private int m_columnIndex = -1;
-  private boolean m_sortAscending;
-  private boolean m_sortActive;
-  private boolean m_sortPermanent;
-  private boolean m_groupingActive;
-  private String m_iconId;
-  private String m_text;
-  private String m_tooltip;
-  private boolean m_tooltipHtmlEnabled;
-  private int m_horizontalAlignment = -1;
-  private String m_cssClass;
-  private boolean m_htmlEnabled;
-  private String m_foregroundColor;
-  private String m_backgroundColor;
-  private FontSpec m_font;
+  public HeaderCell() {
+    doSetColumnIndex(-1);
+    setHorizontalAlignment(-1);
+  }
 
   @Override
   public int getColumnIndex() {
-    return m_columnIndex;
+    return propertySupport.getPropertyInt(PROP_COLUMN_INDEX);
   }
 
   /**
    * do not use this internal method
    */
   public void setColumnIndexInternal(int index) {
-    if (m_columnIndex < 0) {
-      m_columnIndex = index;
+    int currentColIndex = getColumnIndex();
+    if (currentColIndex < 0) {
+      doSetColumnIndex(index);
     }
     else {
       LOG.warn(null, new IllegalAccessException("do not use this internal method"));
     }
   }
 
-  @Override
-  public boolean isSortAscending() {
-    return m_sortAscending;
+  protected void doSetColumnIndex(int index) {
+    propertySupport.setPropertyInt(PROP_COLUMN_INDEX, index);
   }
 
-  public void setSortAscending(boolean b) {
-    m_sortAscending = b;
+  @Override
+  public boolean isSortAscending() {
+    return propertySupport.getPropertyBool(PROP_SORT_ASC);
+  }
+
+  @Override
+  public boolean setSortAscending(boolean sortAscending) {
+    return propertySupport.setPropertyBool(PROP_SORT_ASC, sortAscending);
   }
 
   @Override
   public String getCssClass() {
-    return m_cssClass;
+    return propertySupport.getPropertyString(PROP_CSS_CLASS);
   }
 
   @Override
   public void setCssClass(String cssClass) {
-    m_cssClass = cssClass;
+    propertySupport.setPropertyString(PROP_CSS_CLASS, cssClass);
   }
 
   @Override
   public boolean isHtmlEnabled() {
-    return m_htmlEnabled;
+    return propertySupport.getPropertyBool(PROP_HTML_ENABLED);
   }
 
-  public void setHtmlEnabled(boolean htmlEnabled) {
-    m_htmlEnabled = htmlEnabled;
+  @Override
+  public boolean setHtmlEnabled(boolean htmlEnabled) {
+    return propertySupport.setPropertyBool(PROP_HTML_ENABLED, htmlEnabled);
   }
 
   @Override
   public String getBackgroundColor() {
-    return m_backgroundColor;
+    return propertySupport.getPropertyString(PROP_BACKGROUND_COLOR);
   }
 
-  public void setBackgroundColor(String c) {
-    m_backgroundColor = c;
+  @Override
+  public boolean setBackgroundColor(String backgroundColor) {
+    return propertySupport.setPropertyString(PROP_BACKGROUND_COLOR, backgroundColor);
   }
 
   @Override
   public FontSpec getFont() {
-    return m_font;
+    return propertySupport.getProperty(PROP_FONT, FontSpec.class);
   }
 
-  public void setFont(FontSpec f) {
-    m_font = f;
+  @Override
+  public boolean setFont(FontSpec font) {
+    return propertySupport.setProperty(PROP_FONT, font);
   }
 
   @Override
   public String getForegroundColor() {
-    return m_foregroundColor;
+    return propertySupport.getPropertyString(PROP_FOREGROUND_COLOR);
   }
 
-  public void setForegroundColor(String c) {
-    m_foregroundColor = c;
+  @Override
+  public boolean setForegroundColor(String foregroundColor) {
+    return propertySupport.setPropertyString(PROP_FOREGROUND_COLOR, foregroundColor);
   }
 
   @Override
   public int getHorizontalAlignment() {
-    return m_horizontalAlignment;
+    return propertySupport.getPropertyInt(PROP_HORIZONTAL_ALIGNMENT);
   }
 
-  public void setHorizontalAlignment(int a) {
-    m_horizontalAlignment = a;
+  @Override
+  public boolean setHorizontalAlignment(int horizontalAlignment) {
+    return propertySupport.setPropertyInt(PROP_HORIZONTAL_ALIGNMENT, horizontalAlignment);
   }
 
   @Override
   public String getIconId() {
-    return m_iconId;
+    return propertySupport.getPropertyString(PROP_ICON_ID);
   }
 
-  public void setIconId(String id) {
-    m_iconId = id;
+  @Override
+  public boolean setIconId(String iconId) {
+    return propertySupport.setPropertyString(PROP_ICON_ID, iconId);
   }
 
   @Override
   public String getText() {
-    return m_text;
+    return propertySupport.getPropertyString(PROP_TEXT);
   }
 
-  /**
-   * this method is not in interface, use {@link IColumn#decorateHeaderCell()} and
-   * {@link AbstractColumn#execDecorateHeaderCell()}
-   */
-  public void setText(String s) {
-    m_text = s;
+  @Override
+  public boolean setText(String text) {
+    return propertySupport.setPropertyString(PROP_TEXT, text);
   }
 
   @Override
   public String getTooltipText() {
-    return m_tooltip;
+    return propertySupport.getPropertyString(PROP_TOOLTIP_TEXT);
   }
 
-  public void setTooltipText(String s) {
-    m_tooltip = s;
+  @Override
+  public boolean setTooltipText(String tooltipText) {
+    return propertySupport.setPropertyString(PROP_TOOLTIP_TEXT, tooltipText);
   }
 
   @Override
   public boolean isTooltipHtmlEnabled() {
-    return m_tooltipHtmlEnabled;
+    return propertySupport.getPropertyBool(PROP_TOOLTIP_HTML_ENABLED);
   }
 
-  public void setTooltipHtmlEnabled(boolean tooltipHtmlEnabled) {
-    m_tooltipHtmlEnabled = tooltipHtmlEnabled;
+  @Override
+  public boolean setTooltipHtmlEnabled(boolean tooltipHtmlEnabled) {
+    return propertySupport.setPropertyBool(PROP_TOOLTIP_HTML_ENABLED, tooltipHtmlEnabled);
   }
 
   @Override
   public boolean isSortActive() {
-    return m_sortActive;
+    return propertySupport.getPropertyBool(PROP_SORT_ACTIVE);
   }
 
-  public void setSortActive(boolean b) {
-    m_sortActive = b;
+  @Override
+  public boolean setSortActive(boolean sortActive) {
+    return propertySupport.setPropertyBool(PROP_SORT_ACTIVE, sortActive);
   }
 
   @Override
   public boolean isGroupingActive() {
-    return m_groupingActive;
+    return propertySupport.getPropertyBool(PROP_GROUPING_ACTIVE);
   }
 
-  public void setGroupingActive(boolean b) {
-    m_groupingActive = b;
+  @Override
+  public boolean setGroupingActive(boolean groupingActive) {
+    return propertySupport.setPropertyBool(PROP_GROUPING_ACTIVE, groupingActive);
   }
 
   @Override
   public boolean isSortPermanent() {
-    return m_sortPermanent;
+    return propertySupport.getPropertyBool(PROP_SORT_PERMANENT);
   }
 
-  public void setSortPermanent(boolean b) {
-    m_sortPermanent = b;
+  @Override
+  public boolean setSortPermanent(boolean sortPermanent) {
+    return propertySupport.setPropertyBool(PROP_SORT_PERMANENT, sortPermanent);
   }
-
 }

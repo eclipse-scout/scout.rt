@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1777,16 +1777,20 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   public void decorateHeaderCell() {
     HeaderCell cell = m_headerCell;
     decorateHeaderCellInternal(cell);
-    try {
-      interceptDecorateHeaderCell(cell);
+    interceptDecorateHeaderCell(cell);
+    updateThisColumnOnTable();
+  }
 
-      if (getTable() != null && getTable().getColumnSet() != null) {
-        getTable().getColumnSet().updateColumn(this);
-      }
+  protected void updateThisColumnOnTable() {
+    ITable table = getTable();
+    if (table == null) {
+      return;
     }
-    catch (Exception e) {
-      LOG.warn("Error decorating header", e);
+    ColumnSet columnSet = table.getColumnSet();
+    if (columnSet == null) {
+      return;
     }
+    columnSet.updateColumn(this);
   }
 
   /**

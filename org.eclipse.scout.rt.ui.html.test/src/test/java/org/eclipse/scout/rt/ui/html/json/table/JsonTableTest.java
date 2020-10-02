@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.HeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
@@ -419,14 +418,14 @@ public class JsonTableTest {
 
     // ----------
 
-    ((HeaderCell) column0.getHeaderCell()).setText("newHeaderText");
+    column0.getHeaderCell().setText("newHeaderText");
     table.getColumnSet().updateColumn(column0);
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonTable.EVENT_COLUMN_HEADERS_UPDATED);
     assertEquals(0, responseEvents.size());
 
-    ((HeaderCell) column1.getHeaderCell()).setText("newHeaderText2");
+    column1.getHeaderCell().setText("newHeaderText2");
     table.getColumnSet().updateColumn(column1);
 
     responseEvents = JsonTestUtility.extractEventsFromResponse(

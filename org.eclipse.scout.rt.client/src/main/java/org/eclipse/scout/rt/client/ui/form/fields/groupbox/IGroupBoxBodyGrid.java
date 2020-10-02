@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmar
  *
  * @author Andreas Hoegger
  * @since 4.0.0 M6 25.02.2014
- * @see {@link VerticalSmartGroupBoxBodyGrid}, {@link HorizontalGroupBoxBodyGrid}
+ * @see VerticalSmartGroupBoxBodyGrid
+ * @see HorizontalGroupBoxBodyGrid
  * @author awe
  */
 public interface IGroupBoxBodyGrid extends ICompositeFieldGrid<IGroupBox> {
