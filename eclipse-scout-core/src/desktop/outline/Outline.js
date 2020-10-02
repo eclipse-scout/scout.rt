@@ -487,6 +487,13 @@ export default class Outline extends Tree {
   _renderSelection() {
     super._renderSelection();
     this.$container.toggleClass('node-selected', this.selectedNodes.length > 0);
+    let prevNode = this.prevSelectedNode;
+    if (this.embedDetailContent && prevNode && prevNode.$node) {
+      // Remove height and width set by OutlineLayout.
+      // Doing it here rather than later in the layout improves scrolling done by _updateScrollTopAfterSelection
+      prevNode.$node.cssHeight(null).cssWidth(null);
+      prevNode.height = prevNode.$node.outerHeight(true);
+    }
   }
 
   _removeNodeSelection(node) {
@@ -782,14 +789,16 @@ export default class Outline extends Tree {
    * @override
    */
   _updateScrollTopAfterSelection() {
-    super._updateScrollTopAfterSelection();
     if (!this.embedDetailContent) {
+      super._updateScrollTopAfterSelection();
       return;
     }
-    // Layout immediate to prevent 'laggy' detail form visualization,
+    // Layout immediately to prevent 'laggy' detail form visualization,
     // but not initially while desktop gets rendered because it will be done at the end anyway
     // It is important that this is done after _renderSelection, because node could be invisible due to the missing .selected class which means it won't be layouted
+    // It is also important to do it before scroll top is set by the super call because the detail content of the newly selected node needs to get the correct height first to get the correct scroll top.
     this.validateLayoutTree();
+    super._updateScrollTopAfterSelection();
 
     // Scroll to the parent node to hide ancestor nodes and give as much room as possible for the content
     if (this.selectedNodes[0] && this.selectedNodes[0].parentNode) {

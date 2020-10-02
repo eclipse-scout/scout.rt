@@ -37,24 +37,6 @@ export default class OutlineLayout extends TreeLayout {
           selectedNode.height = prefSize.height + pageHtmlComp.margins().vertical();
         }
       }
-
-      // Remove width and height from non selected nodes (at this point we don't know the previously selected node anymore, so we need to process all visible nodes)
-      // It is not enough to only process rendered nodes, we need to update the detached nodes as well
-      this.outline.visibleNodesFlat.forEach(node => {
-        let $node = node.$node;
-        if (!$node) {
-          // Do nothing if node has never been rendered
-          return;
-        }
-        // check for style.height to prevent unnecessary updates, no need to update nodes without a fixed height
-        if ($node.isSelected() || !$node[0].style.height || $node[0].style.height === 'auto') {
-          return;
-        }
-
-        $node.css('height', 'auto')
-          .css('width', 'auto');
-        node.height = $node.outerHeight(true);
-      });
     }
 
     // layout menu bars
