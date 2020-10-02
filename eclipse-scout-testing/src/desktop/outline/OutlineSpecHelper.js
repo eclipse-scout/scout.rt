@@ -106,4 +106,10 @@ export default class OutlineSpecHelper {
     return outline;
   }
 
+  setMobileFlags(outline) {
+    outline.setBreadcrumbStyleActive(true);
+    outline.setToggleBreadcrumbStyleEnabled(false);
+    outline.setCompact(true);
+    outline.setEmbedDetailContent(true);
+  }
 }
