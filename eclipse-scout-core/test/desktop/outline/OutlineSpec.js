@@ -29,23 +29,6 @@ describe('Outline', () => {
     jasmine.clock().uninstall();
   });
 
-  function createNodesDeletedEvent(model, nodeIds, commonParentNodeId) {
-    return {
-      target: model.id,
-      commonParentNodeId: commonParentNodeId,
-      nodeIds: nodeIds,
-      type: 'nodesDeleted'
-    };
-  }
-
-  function createAllChildNodesDeletedEvent(model, commonParentNodeId) {
-    return {
-      target: model.id,
-      commonParentNodeId: commonParentNodeId,
-      type: 'allChildNodesDeleted'
-    };
-  }
-
   describe('collapsing', () => {
     // Regression test for erroneous behavior of MessageBoxController
     it('still allows a messagebox to be shown', () => {
@@ -199,8 +182,7 @@ describe('Outline', () => {
 
     it('adds the empty space menus of the detail table to the detail menu bar', () => {
       let outline = helper.createOutlineWithOneDetailTable();
-      outline.setCompact(true);
-      outline.setEmbedDetailContent(true);
+      helper.setMobileFlags(outline);
       let node0 = outline.nodes[0];
       node0.detailTable.menus = [
         menuHelper.createMenu({
@@ -220,8 +202,7 @@ describe('Outline', () => {
 
     it('adds the single selection menus of the parent detail table to the detail menu bar', () => {
       let outline = helper.createOutlineWithOneDetailTable();
-      outline.setCompact(true);
-      outline.setEmbedDetailContent(true);
+      helper.setMobileFlags(outline);
       let node0 = outline.nodes[0];
       node0.detailTable.menus = [
         menuHelper.createMenu({
@@ -241,8 +222,7 @@ describe('Outline', () => {
 
     it('attaches a listener to the detail table to get dynamic menu changes', () => {
       let outline = helper.createOutlineWithOneDetailTable();
-      outline.setCompact(true);
-      outline.setEmbedDetailContent(true);
+      helper.setMobileFlags(outline);
       let node0 = outline.nodes[0];
       expect(outline.detailMenuBarVisible).toBe(false);
       expect(outline.detailMenuBar.menuItems.length).toBe(0);
@@ -261,8 +241,7 @@ describe('Outline', () => {
 
     it('removes the listener from the detail tables on selection changes and destroy', () => {
       let outline = helper.createOutlineWithOneDetailTable();
-      outline.setCompact(true);
-      outline.setEmbedDetailContent(true);
+      helper.setMobileFlags(outline);
       let node0 = outline.nodes[0];
       let node1 = outline.nodes[1];
       let initialListenerCount = node0.detailTable.events._eventListeners.length;
@@ -285,8 +264,7 @@ describe('Outline', () => {
 
     it('makes sure table does not update the menu parent for empty space menus', () => {
       let outline = helper.createOutlineWithOneDetailTable();
-      outline.setCompact(true);
-      outline.setEmbedDetailContent(true);
+      helper.setMobileFlags(outline);
       outline.render();
       let node0 = outline.nodes[0];
       let emptySpaceMenu = menuHelper.createMenu({
@@ -316,8 +294,7 @@ describe('Outline', () => {
 
     it('makes sure table does not update the menu parent for single selection menus', () => {
       let outline = helper.createOutlineWithOneDetailTable();
-      outline.setCompact(true);
-      outline.setEmbedDetailContent(true);
+      helper.setMobileFlags(outline);
       outline.render();
       let node0 = outline.nodes[0];
       // Select child node -> single selection menus are active
@@ -348,8 +325,7 @@ describe('Outline', () => {
 
     it('does not fail if same menus are set again', () => {
       let outline = helper.createOutlineWithOneDetailTable();
-      outline.setCompact(true);
-      outline.setEmbedDetailContent(true);
+      helper.setMobileFlags(outline);
       outline.render();
       let node0 = outline.nodes[0];
       let emptySpaceMenu = menuHelper.createMenu({
@@ -387,8 +363,7 @@ describe('Outline', () => {
 
     it('is shown when a node is selected', () => {
       let outline = helper.createOutlineWithOneDetailTable();
-      outline.setCompact(true);
-      outline.setEmbedDetailContent(true);
+      helper.setMobileFlags(outline);
       outline.render();
       let node0 = outline.nodes[0];
       node0.childNodes[0].detailForm = new FormSpecHelper(session).createFormWithOneField({
@@ -408,13 +383,33 @@ describe('Outline', () => {
       expect(outline.detailContent.rendered).toBe(true);
     });
 
+    it('can select a node when scrolled first', () => {
+      // Reduce the viewport size so that only some rows are rendered
+      $('<style>' +
+        '.tree-node {height: 20px; }' +
+        '.tree-data {height: 60px !important; overflow: hidden;}' +
+        '</style>').appendTo($('#sandbox'));
+      let outline = helper.createOutlineWithOneDetailTable();
+      helper.setMobileFlags(outline);
+      outline.render();
+      outline.htmlComp.validateRoot = true; // Ensure layout calls will not be swallowed by DesktopLayout because there is no bench
+      let node0 = outline.nodes[0];
+      outline.insertNodes(helper.createModelNodes(10), node0);
+      let childNode9 = outline.nodes[0].childNodes[9];
+      childNode9.detailForm = new FormSpecHelper(session).createFormWithOneField({modal: false});
+
+      outline.selectNodes(node0);
+      outline.scrollTo(childNode9);
+      outline.selectNodes(childNode9);
+      expect(outline.detailContent).toBe(childNode9.detailForm);
+      expect(outline.detailContent.rendered).toBe(true);
+    });
+
     describe('click on a node inside the detail content', () => {
 
       it('does not modify the outline', () => {
         let outline = helper.createOutline(helper.createModelFixture(3, 2));
-        outline.setCompact(true);
-        outline.setEmbedDetailContent(true);
-        let node0 = outline.nodes[0];
+        helper.setMobileFlags(outline);
         outline.render();
         outline.selectNodes(outline.nodes[1]);
 

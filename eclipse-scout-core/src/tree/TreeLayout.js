@@ -51,8 +51,7 @@ export default class TreeLayout extends AbstractLayout {
     this.tree.setViewRangeSize(this.tree.calculateViewRangeSize());
 
     // Check if width has changed
-    this.nodeDimensionsDirty = this.nodeDimensionsDirty ||
-      (htmlContainer.sizeCached && htmlContainer.sizeCached.width !== htmlContainer.size().width);
+    this.nodeDimensionsDirty = this.nodeDimensionsDirty || this._sizeChanged(htmlContainer);
     if (this.nodeDimensionsDirty) {
       this.nodeDimensionsDirty = false;
       if (this.tree.isHorizontalScrollingEnabled()) {
@@ -62,6 +61,7 @@ export default class TreeLayout extends AbstractLayout {
       } else {
         // Nodes may contain wrapped text (with breadcrumb style-or if nodes contain html) -> update heights
         this.tree.updateNodeHeights();
+        this.tree._renderViewport(); // Ensure viewRangeRendered is up to date and matches visibleNodesFlat (can diverge after filtering)
         this.tree._renderFiller();
       }
     }
@@ -77,6 +77,11 @@ export default class TreeLayout extends AbstractLayout {
     if (!htmlContainer.layouted) {
       this.tree._renderScrollTop();
     }
+  }
+
+  _sizeChanged(htmlContainer) {
+    // Ceil because sizeCached is exact but .size() is not)
+    return htmlContainer.sizeCached && Math.ceil(htmlContainer.sizeCached.width) !== Math.ceil(htmlContainer.size().width);
   }
 
   _setDataHeight(heightOffset) {

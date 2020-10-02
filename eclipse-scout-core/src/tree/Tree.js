@@ -52,6 +52,7 @@ export default class Tree extends Widget {
     super();
 
     this.toggleBreadcrumbStyleEnabled = false;
+    this.breadcrumbTogglingThreshold = null;
     this.autoCheckChildren = false;
     this.checkable = false;
     this.checkableStyle = Tree.CheckableStyle.CHECKBOX_TREE_NODE;
@@ -1373,6 +1374,10 @@ export default class Tree extends Widget {
     return this.displayStyle === Tree.DisplayStyle.BREADCRUMB;
   }
 
+  setToggleBreadcrumbStyleEnabled(enabled) {
+    this.setProperty('toggleBreadcrumbStyleEnabled', enabled);
+  }
+
   setBreadcrumbTogglingThreshold(width) {
     this.setProperty('breadcrumbTogglingThreshold', width);
   }
@@ -2084,7 +2089,7 @@ export default class Tree extends Widget {
 
     this._updateItemPath(true);
     if (this.isBreadcrumbStyleActive()) {
-      // In breadcrumb mode selected node has to expanded
+      // In breadcrumb mode selected node has to be expanded
       if (this.selectedNodes.length > 0 && !this.selectedNodes[0].expanded) {
         this.expandNode(this.selectedNodes[0]);
         this.selectedNodes[0].filterDirty = true;
