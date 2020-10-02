@@ -21,9 +21,6 @@ export default class ChartTableControlLayout extends AbstractLayout {
     if (!this.control.contentRendered) {
       return;
     }
-    // ChartTableControl enlarges the content which would lead to scrollbars -> make them invisible while size is dirty
-    if (!this.control.sizeDirty) {
-      scrollbars.update(this.control.$contentContainer);
-    }
+    scrollbars.update(this.control.$contentContainer);
   }
 }

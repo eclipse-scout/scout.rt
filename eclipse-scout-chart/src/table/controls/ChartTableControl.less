@@ -17,6 +17,8 @@
   position: relative;
   height: 100%;
   width: 100%;
+  display: flex;
+  align-items: flex-start;
 
   & > .scrollbar.y-axis {
     width: 22px;
@@ -26,7 +28,6 @@
 /* chart - type select */
 
 .chart-select {
-  float: left;
   padding: 10px 40px 10px 30px;
 }
 
@@ -83,8 +84,8 @@ svg.select-chart.selected:not(.disabled) {
 /* chart - axis and data select */
 
 .xaxis-select, .yaxis-select, .data-select {
-  float: left;
   margin-top: 10px;
+  margin-right: 15px;
   width: 175px;
   display: inline-block;
   overflow: hidden;
@@ -100,17 +101,9 @@ svg.select-chart.selected:not(.disabled) {
   }
 }
 
-.xaxis-select {
-  margin-right: 15px;
-}
-
 .yaxis-select {
   width: 0;
-}
-
-.data-select {
-  margin-left: 15px;
-  margin-right: 15px;
+  margin-right: 0;
 }
 
 .select-axis, .select-data {
@@ -208,72 +201,20 @@ svg.select-chart.selected:not(.disabled) {
   }
 }
 
-/* chart - main */
+.chart-container > .chart {
+  flex-grow: 1;
+  align-self: stretch;
+  margin: 10px 15px 10px 0;
+  min-width: 350px;
+  min-height: 300px;
+  max-height: 600px;
 
-.chart-main {
-  & :focus {
-    outline: none;
+  & > canvas {
+    opacity: inherit;
   }
 }
 
-.main-chart {
 
-  rect&, circle& {
-    fill: @chart-data-color;
-    stroke: @palette-white;
-    stroke-width: 0;
-    cursor: pointer;
-  }
-
-  circle& {
-    opacity: 0.7;
-  }
-
-  path& {
-    fill: @chart-data-color;
-    stroke: @table-control-container-background-color;
-    stroke-width: 2px;
-    cursor: pointer;
-  }
-
-  line& {
-    stroke: @chart-data-color;
-    stroke-width: 4px;
-    stroke-linejoin: round;
-    stroke-linecap: round;
-  }
-
-  &:hover {
-    fill: @chart-data-active-color;
-  }
-
-  &.selected {
-    fill: @chart-data-active-color;
-  }
-}
-
-line.main-axis {
-  stroke: @chart-axis-line-color;
-  stroke-width: 1px;
-}
-
-text.main-axis {
-  fill: @chart-data-text-color;
-  text-anchor: middle;
-  dominant-baseline: middle;
-  pointer-events: none;
-}
-
-text.main-axis-y {
-  fill: @chart-axis-text-color;
-  text-anchor: end;
-  dominant-baseline: central;
-  font-size: @font-size-extra-small;
-}
-
-text.main-axis-x, textPath.main-axis-x {
-  fill: @chart-axis-text-color;
-  text-anchor: middle;
-  dominant-baseline: middle;
-  font-size: @font-size-extra-small;
+.chart-table-control > .pie-chart > .elements {
+  #scout.chart-stroke-colors-schemes(@table-control-container-background-color);
 }

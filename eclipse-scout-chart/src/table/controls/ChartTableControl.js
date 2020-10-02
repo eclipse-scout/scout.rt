@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateColumn, icons, NumberColumn, objects, scout, scrollbars, strings, TableControl, TableMatrix, tooltips} from '@eclipse-scout/core';
+import {DateColumn, icons, NumberColumn, objects, scout, strings, styles, TableControl, TableMatrix, tooltips} from '@eclipse-scout/core';
 import {Chart, ChartTableControlLayout, ChartTableUserFilter} from '../../index';
 import $ from 'jquery';
 
@@ -16,29 +16,23 @@ export default class ChartTableControl extends TableControl {
 
   constructor() {
     super();
-    this.cssClass = 'chart';
-    this.iconId = icons.CHART;
     this.tooltipText = '${textKey:ui.Chart}';
     this.chartAggregation = {
       modifier: TableMatrix.NumberGroup.COUNT
     };
-    this.chartType = Chart.Type.BAR_VERTICAL_OLD;
-    // TODO [15.4] cgu: make use of XyChartRenderer.js and remove duplicate code
+    this.chartType = Chart.Type.BAR;
+    this.oldChartType = null;
 
     // chart config selection
-    this.$chartSelect;
-    this.$xAxisSelect;
-    this.$yAxisSelect;
-    // main chart svg element
-    this.$chartMain;
+    this.$chartSelect = null;
+    this.$xAxisSelect = null;
+    this.$yAxisSelect = null;
+    this.$dataSelect = null;
 
-    this.xAxis;
-    this.yAxis;
+    this.xAxis = null;
+    this.yAxis = null;
 
-    // remove chart function
-    this.removeChart = null;
-
-    this.dateGroup;
+    this.dateGroup = null;
 
     this._tableUpdatedHandler = this._onTableUpdated.bind(this);
   }
@@ -48,11 +42,18 @@ export default class ChartTableControl extends TableControl {
 
   _init(model) {
     super._init(model);
+
+    this.chart = scout.create('Chart', {
+      parent: this
+    });
+
     this.setEnabled(this._hasColumns());
   }
 
-  _destroy() {
-    super._destroy();
+  _renderChart() {
+    if (this.chart) {
+      this.chart.render(this.$contentContainer);
+    }
   }
 
   _createLayout() {
@@ -61,9 +62,19 @@ export default class ChartTableControl extends TableControl {
 
   _renderChartType() {
     this._selectChartType();
-    this.$yAxisSelect.animateAVCSD('width', this.chartType === Chart.Type.SCATTER ? 175 : 0);
+    if (this.oldChartType) {
+      this.$yAxisSelect.animateAVCSD('width', this.chartType === Chart.Type.BUBBLE ? 175 : 0);
+      this.$yAxisSelect.animateAVCSD('margin-right', this.chartType === Chart.Type.BUBBLE ? 15 : 0);
+    } else {
+      this.$yAxisSelect.css('width', this.chartType === Chart.Type.BUBBLE ? 175 : 0);
+      this.$yAxisSelect.css('margin-right', this.chartType === Chart.Type.BUBBLE ? 15 : 0);
+    }
+
     if (this.contentRendered) {
-      this._drawChart();
+      this.chart.$container.animateAVCSD('opacity', 0, () => {
+        this.chart.$container.css('opacity', 1);
+        this._drawChart();
+      });
     }
   }
 
@@ -154,26 +165,38 @@ export default class ChartTableControl extends TableControl {
     // create chart types for selection
     this._chartTypeMap = {};
 
-    this._renderChartSelect('chart-bar', Chart.Type.BAR_VERTICAL_OLD, renderSvgIconBar);
-    this._renderChartSelect('chart-stacked', Chart.Type.BAR_HORIZONTAL_OLD, renderSvgIconStacked);
-    this._renderChartSelect('chart-line', Chart.Type.LINE_OLD, renderSvgIconLine);
-    this._renderChartSelect('chart-pie', Chart.Type.PIE_OLD, renderSvgIconPie.bind(this));
-    this._renderChartSelect('chart-scatter', Chart.Type.SCATTER, renderSvgIconScatter);
+    let supportedChartTypes = this._getSupportedChartTypes();
+
+    if (scout.isOneOf(Chart.Type.BAR, supportedChartTypes)) {
+      this._renderChartSelect('chart-bar', Chart.Type.BAR, renderSvgIconBar);
+    }
+    if (scout.isOneOf(Chart.Type.BAR_HORIZONTAL, supportedChartTypes)) {
+      this._renderChartSelect('chart-stacked', Chart.Type.BAR_HORIZONTAL, renderSvgIconStacked);
+    }
+    if (scout.isOneOf(Chart.Type.LINE, supportedChartTypes)) {
+      this._renderChartSelect('chart-line', Chart.Type.LINE, renderSvgIconLine);
+    }
+    if (scout.isOneOf(Chart.Type.PIE, supportedChartTypes)) {
+      this._renderChartSelect('chart-pie', Chart.Type.PIE, renderSvgIconPie.bind(this));
+    }
+    if (scout.isOneOf(Chart.Type.BUBBLE, supportedChartTypes)) {
+      this._renderChartSelect('chart-bubble', Chart.Type.BUBBLE, renderSvgIconBubble);
+    }
 
     function renderSvgIconBar($svg) {
       let show = [2, 4, 3, 3.5, 5];
 
       for (let s = 0; s < show.length; s++) {
         $svg.appendSVG('rect', 'select-fill')
-          .attr('x', s * 14)
+          .attr('x', s * 13)
           .attr('y', 50 - show[s] * 9)
-          .attr('width', 12)
+          .attr('width', 11)
           .attr('height', show[s] * 9);
       }
     }
 
     function renderSvgIconStacked($svg) {
-      let show = [2, 4, 3.5, 5];
+      let show = [2, 4, 3.5, 4.5];
 
       for (let s = 0; s < show.length; s++) {
         $svg.appendSVG('rect', 'select-fill')
@@ -185,11 +208,11 @@ export default class ChartTableControl extends TableControl {
     }
 
     function renderSvgIconLine($svg) {
-      let show = [0, 1.7, 1, 2, 1.5, 3],
+      let show = [0, 1.7, 1, 2, 1.5, 2.5],
         pathPoints = [];
 
       for (let s = 0; s < show.length; s++) {
-        pathPoints.push(2 + (s * 14) + ',' + (45 - show[s] * 11));
+        pathPoints.push(2 + (s * 12) + ',' + (45 - show[s] * 11));
       }
 
       $svg
@@ -211,10 +234,10 @@ export default class ChartTableControl extends TableControl {
       }
     }
 
-    function renderSvgIconScatter($svg) {
+    function renderSvgIconBubble($svg) {
       $svg.appendSVG('line', 'select-fill-line')
         .attr('x1', 3).attr('y1', 53)
-        .attr('x2', 70).attr('y2', 53);
+        .attr('x2', 63).attr('y2', 53);
 
       $svg.appendSVG('line', 'select-fill-line')
         .attr('x1', 8).attr('y1', 12)
@@ -228,6 +251,16 @@ export default class ChartTableControl extends TableControl {
         .attr('cx', 50).attr('cy', 26)
         .attr('r', 11);
     }
+  }
+
+  _getSupportedChartTypes() {
+    return [
+      Chart.Type.BAR,
+      Chart.Type.BAR_HORIZONTAL,
+      Chart.Type.LINE,
+      Chart.Type.PIE,
+      Chart.Type.BUBBLE
+    ];
   }
 
   _onClickChartType(event) {
@@ -334,6 +367,7 @@ export default class ChartTableControl extends TableControl {
   }
 
   setChartType(chartType) {
+    this.oldChartType = this.chartType;
     this.setProperty('chartType', chartType);
   }
 
@@ -369,9 +403,6 @@ export default class ChartTableControl extends TableControl {
     this._renderChartSelectContainer();
 
     // group functions for dates
-    let $dataSelect,
-      that = this;
-
     this.dateGroup = [
       [TableMatrix.DateGroup.YEAR, this.session.text('ui.groupedByYear')],
       [TableMatrix.DateGroup.MONTH, this.session.text('ui.groupedByMonth')],
@@ -381,12 +412,10 @@ export default class ChartTableControl extends TableControl {
 
     // listeners
     this._filterResetListener = this.table.on('filterReset', event => {
-      $('.main-chart.selected', that.$contentContainer).removeClass('selected');
+      $('.main-chart.selected', this.$contentContainer).removeClass('selected');
     });
-    this.table.on('columnStructureChanged', this._tableUpdatedHandler);
-    this.table.on('rowsInserted', this._tableUpdatedHandler);
-    this.table.on('rowsDeleted', this._tableUpdatedHandler);
-    this.table.on('allRowsDeleted', this._tableUpdatedHandler);
+
+    this._addListeners();
 
     // add addition rectangle for hover and event handling
     $('.select-chart', this.$contentContainer)
@@ -396,6 +425,26 @@ export default class ChartTableControl extends TableControl {
       .attr('fill', 'none')
       .attr('pointer-events', 'all');
 
+    let columnCount = this._renderAxisSelectors();
+
+    // draw first chart
+    this._renderChart();
+
+    this._initializeSelection(columnCount);
+
+    this._renderChartParts();
+
+    this._drawChart();
+  }
+
+  _addListeners() {
+    this.table.on('columnStructureChanged', this._tableUpdatedHandler);
+    this.table.on('rowsInserted', this._tableUpdatedHandler);
+    this.table.on('rowsDeleted', this._tableUpdatedHandler);
+    this.table.on('allRowsDeleted', this._tableUpdatedHandler);
+  }
+
+  _renderAxisSelectors() {
     // create container for x/y-axis
     this.$xAxisSelect = this.$contentContainer
       .appendDiv('xaxis-select')
@@ -439,7 +488,7 @@ export default class ChartTableControl extends TableControl {
         enabled = (axisCount <= ChartTableControl.MAX_AXIS_COUNT);
       }
 
-      content = that._axisContentForColumn(column1);
+      content = this._axisContentForColumn(column1);
 
       $div = this.$contentContainer
         .makeDiv('select-axis', this._plainAxisText(column1, content.text))
@@ -488,9 +537,9 @@ export default class ChartTableControl extends TableControl {
     }
 
     if (numberOfAxisItems < 2) {
-      let $scatterSelect = this.$contentContainer.find('.chart-scatter.select-chart');
-      if ($scatterSelect) {
-        $scatterSelect.remove();
+      let $bubbleSelect = this.$contentContainer.find('.chart-bubble.select-chart');
+      if ($bubbleSelect) {
+        $bubbleSelect.remove();
       }
     }
 
@@ -499,11 +548,11 @@ export default class ChartTableControl extends TableControl {
 
     if (this._hasColumns()) {
       // create container for data
-      $dataSelect = this.$contentContainer.appendDiv('data-select');
+      this.$dataSelect = this.$contentContainer.appendDiv('data-select');
 
       // add data-count for no column restriction (all columns)
       let countDesc = this.session.text('ui.Count');
-      this._aggregationMap.all = $dataSelect
+      this._aggregationMap.all = this.$dataSelect
         .appendDiv('select-data data-count', countDesc)
         .data('column', null)
         .data('modifier', TableMatrix.NumberGroup.COUNT);
@@ -523,7 +572,7 @@ export default class ChartTableControl extends TableControl {
             columnText = '[' + fakeNumberLabelCol2 + ']';
           }
 
-          this._aggregationMap[column2.id] = $dataSelect
+          this._aggregationMap[column2.id] = this.$dataSelect
             .appendDiv('select-data data-sum', columnText)
             .data('column', column2)
             .data('modifier', TableMatrix.NumberGroup.SUM);
@@ -535,22 +584,14 @@ export default class ChartTableControl extends TableControl {
         .on('click', this._onClickAggregation.bind(this));
     }
 
-    // draw first chart
-    this.$chartMain = this.$contentContainer.appendSVG('svg', 'chart-main');
-
-    this._initializeSelection(columnCount);
-    this._renderChartType();
-    this._renderChartAggregation();
-    this._renderChartGroup1();
-    this._renderChartGroup2();
-    this._drawChart();
+    return columnCount;
   }
 
   _initializeSelection(columnCount) {
     let $axisColumns;
 
     if (!this.chartType) {
-      this.setChartType(Chart.Type.BAR_VERTICAL_OLD);
+      this.setChartType(Chart.Type.BAR);
     }
 
     // no id selected
@@ -578,7 +619,7 @@ export default class ChartTableControl extends TableControl {
    * From all these columns the last match that is lower or equal to the specified maxIndex is set as default chart group.
    *
    * @param {number} chartGroup The number of the chart group (1 or 2) for which the default column should be set.
-   * @param {matrix} columnCount Colum-count matrix as returned by TableMatrix#columnCount(). Holds possible grouping columns.
+   * @param {matrix} columnCount Column-count matrix as returned by TableMatrix#columnCount(). Holds possible grouping columns.
    * @param {array} $candidates jQuery array holding all axis columns that could be used as default.
    * @param {number} maxIndex The maximum column index to use as default column for the specified chartGroup.
    */
@@ -603,9 +644,9 @@ export default class ChartTableControl extends TableControl {
     return result;
   }
 
-  _existsInAxisColumns($candidates, columToSearch) {
+  _existsInAxisColumns($candidates, columnToSearch) {
     for (let i = 0; i < $candidates.length; i++) {
-      if ($candidates.eq(i).data('column') === columToSearch) {
+      if ($candidates.eq(i).data('column') === columnToSearch) {
         return true;
       }
     }
@@ -623,79 +664,209 @@ export default class ChartTableControl extends TableControl {
     };
   }
 
-  _drawStacked(xAxis, dataAxis, cube) {
-    // dimension functions
-    let maxHeight = 0,
-      maxWidth = Math.max(280, this.$contentContainer.width() - 700),
-      height = Math.max(10, Math.min(240 / xAxis.length, 30)),
-      x = i => 100 + i / dataAxis.max * maxWidth,
-      y = i => {
-        i = i === null ? xAxis.length : i;
-        return 50 + i * height;
-      };
-
-    // draw data-axis
-    let labels = [0, dataAxis.max / 4, dataAxis.max / 2, dataAxis.max / 4 * 3, dataAxis.max];
-    for (let l = 0; l < labels.length; l++) {
-      let label = labels[l];
-
-      this._drawAxisLine(x(label), y(0) - 10, x(label), y(xAxis.length) + 7);
-      this._drawAxisText(x(label), y(0) - 20, 'x', dataAxis, label);
-    }
-
-    // draw x-axis and values
-    for (let a = 0; a < xAxis.length; a++) {
-      let key = xAxis[a],
-        value = cube.getValue([key])[0];
-
-      // bbox is expensive, test only if there is a chance so draw label
-      let $text = this._drawAxisText(x(0) - 8, y(a) + height / 2, 'y', xAxis, key),
-        h = xAxis.length > 50 ? height * 10 : $text[0].getBBox().height;
-
-      maxHeight = (h > maxHeight) ? h : maxHeight;
-
-      this.$chartMain.appendSVG('rect', 'main-chart')
-        .attr('x', x(0)).attr('y', y(a))
-        .attr('width', 0).attr('height', height - 3)
-        .delay(200)
-        .animateSVG('width', x(value) - 100)
-        .attr('data-xAxis', key)
-        .data('data-text', $text)
-        .mouseenter(this._chartMouseenter)
-        .mouseleave(this._chartMouseleave)
-        .click(this._chartClick.bind(this));
-    }
-
-    // in case of to many elements, hide label
-    if (maxHeight > height) {
-      // IE doesn't support finding SVG elements by class. See comment in _drawBar()
-      this.$chartMain.find('[class=main-axis-y]').attr('fill-opacity', 0);
-    }
-
-    // function for later remove
-    this.removeChart = function() {
-      this.$chartMain
-        .children('.main-chart')
-        .animateSVG('width', 0, 200, $.removeThis);
-    };
+  _renderChartParts() {
+    this._renderChartType();
+    this._renderChartAggregation();
+    this._renderChartGroup1();
+    this._renderChartGroup2();
   }
 
   _drawChart() {
-    let group, group2;
+    let datasetLabel = this._getDatasetLabel(),
+      cube = this._calculateValues();
 
-    // remove axis and chart
-    if (this.removeChart) {
-      this.removeChart();
+    if (cube.length) {
+      this.chart.setVisible(true);
+    } else {
+      this.chart.setVisible(false);
+      return;
     }
-    this.$chartMain.children('.main-axis, .main-axis-x, .main-axis-y')
-      .animateSVG('opacity', 0, 250, $.removeThis);
 
+    let config = {
+      type: this.chartType,
+      data: {
+        datasets: [{
+          label: datasetLabel
+        }]
+      },
+      options: {
+        legend: {
+          display: false
+        }
+      }
+    };
+
+    let xAxis = this._getXAxis(),
+      yAxis = this._getYAxis(),
+      data = [],
+      labels = [],
+      iconClasses = [];
+
+    if (this.chartType === Chart.Type.BUBBLE) {
+      for (let x = 0; x < xAxis.length; x++) {
+        let keyX = xAxis[x],
+          xValue = keyX;
+        this._handleIconLabel(xAxis.format(keyX), xAxis, iconClasses);
+        if (!(xAxis.column instanceof NumberColumn) && xValue === null) {
+          xValue = xAxis.max;
+        }
+        if (xAxis.column instanceof DateColumn) {
+          xValue = xValue - xAxis.min;
+        }
+        for (let y = 0; y < yAxis.length; y++) {
+          let keyY = yAxis[y],
+            yValue = keyY,
+            cubeValues = cube.getValue([keyX, keyY]);
+          this._handleIconLabel(yAxis.format(keyY), yAxis, iconClasses);
+          if (cubeValues && cubeValues.length) {
+            if (!(yAxis.column instanceof NumberColumn) && yValue === null) {
+              yValue = yAxis.max;
+            }
+            if (yAxis.column instanceof DateColumn) {
+              yValue = yValue - yAxis.min;
+            }
+            data.push({
+              x: xValue,
+              y: yValue,
+              r: cubeValues[0]
+            });
+          }
+        }
+      }
+    } else {
+      let segments = [];
+      for (let x = 0; x < xAxis.length; x++) {
+        let label,
+          keyX = xAxis[x];
+        if (xAxis.column instanceof NumberColumn) {
+          label = keyX;
+        } else {
+          label = this._handleIconLabel(xAxis.format(keyX), xAxis, iconClasses);
+        }
+        segments.push({
+          value: cube.getValue([keyX])[0],
+          label: label
+        });
+      }
+      if (this.chartType === Chart.Type.PIE) {
+        segments.sort((a, b) => {
+          return (b.value - a.value);
+        });
+      }
+      segments.forEach(elem => {
+        data.push(elem.value);
+        labels.push(elem.label);
+      });
+    }
+
+    config.data.datasets[0].data = data;
+
+    if (labels.length) {
+      config.data.labels = labels;
+    }
+
+    iconClasses = iconClasses.filter((value, index, self) => {
+      return self.indexOf(value) === index;
+    });
+    if (iconClasses.length) {
+      let fontFamily = styles.get(iconClasses, 'font-family').fontFamily;
+      if (this.chartType !== Chart.Type.PIE) {
+        config.options = $.extend(true, {}, config.options, {
+          scales: {
+            xAxes: [{
+              ticks: {
+                fontFamily: fontFamily
+              }
+            }],
+            yAxes: [{
+              ticks: {
+                fontFamily: fontFamily
+              }
+            }]
+          }
+        });
+      }
+      config.options = $.extend(true, {}, config.options, {
+        tooltips: {
+          titleFontFamily: fontFamily
+        }
+      });
+    }
+
+    if (this.chartType === Chart.Type.BUBBLE) {
+      config.bubble = $.extend(true, {}, config.bubble, {
+        sizeOfLargestBubble: 25
+      });
+
+      if (!(xAxis.column instanceof NumberColumn)) {
+        config.options = $.extend(true, {}, config.options, {
+          scales: {
+            xAxes: [{
+              ticks: {
+                callback: label => this._formatLabel(label, xAxis)
+              }
+            }]
+          }
+        });
+      }
+      if (!(yAxis.column instanceof NumberColumn)) {
+        config.options = $.extend(true, {}, config.options, {
+          scales: {
+            yAxes: [{
+              ticks: {
+                callback: label => this._formatLabel(label, yAxis)
+              }
+            }]
+          }
+        });
+      }
+    } else {
+      if (xAxis.column instanceof NumberColumn) {
+        config.data.reformatLabels = true;
+      }
+      if (this.chartType === Chart.Type.PIE) {
+        config.options = $.extend(true, {}, config.options, {
+          plugins: {
+            datalabels: {
+              display: true
+            }
+          }
+        });
+      } else {
+        config.options = $.extend(true, {}, config.options, {
+          scales: {
+            xAxes: [{
+              ticks: {
+                beginAtZero: true
+              }
+            }],
+            yAxes: [{
+              ticks: {
+                beginAtZero: true
+              }
+            }]
+          }
+        });
+      }
+    }
+
+    this._adjustConfig(config);
+
+    this.chart.setConfig(config);
+    this.chart.chartRenderer.renderColorScheme('chart-table-control');
+  }
+
+  _getDatasetLabel() {
+    return this._aggregationMap[this.chartAggregation.id || 'all'].text() || this.session.text('ui.Value');
+  }
+
+  _calculateValues() {
     // build matrix
     let matrix = new TableMatrix(this.table, this.session);
 
     // aggregation (data axis)
-    let data = this.chartAggregation.id ? this._aggregationMap[this.chartAggregation.id].data('column') : -1;
-    let dataAxis = matrix.addData(data, this.chartAggregation.modifier);
+    let tableData = this.chartAggregation.id ? this._aggregationMap[this.chartAggregation.id].data('column') : -1;
+    matrix.addData(tableData, this.chartAggregation.modifier);
 
     // find xAxis
     if (this.chartGroup1) {
@@ -704,8 +875,8 @@ export default class ChartTableControl extends TableControl {
     }
 
     // find yAxis
-    // in case of scatter
-    if (this.chartType === Chart.Type.SCATTER && this.chartGroup2) {
+    // in case of bubble
+    if (this.chartType === Chart.Type.BUBBLE && this.chartGroup2) {
       let axis2 = this._chartGroup2Map[this.chartGroup2.id].data('column');
       this.yAxis = matrix.addAxis(axis2, this.chartGroup2.modifier);
     }
@@ -716,514 +887,56 @@ export default class ChartTableControl extends TableControl {
     }
 
     // calculate matrix
-    let cube = matrix.calculate();
-
-    // set max width
-    this.$chartMain.css('width', '3000px');
-    this.$chartMain.css('height', '1500px');
-    this.sizeDirty = true;
-
-    // based on chart type: set class and draw chart
-    if (this.chartGroup1) {
-      this._updateAxisClass();
-      if (this.chartType === Chart.Type.BAR_VERTICAL_OLD) {
-        this._drawBar(this.xAxis, dataAxis, cube);
-      } else if (this.chartType === Chart.Type.BAR_HORIZONTAL_OLD) {
-        this._drawStacked(this.xAxis, dataAxis, cube);
-      } else if (this.chartType === Chart.Type.LINE_OLD) {
-        this._drawLine(this.xAxis, dataAxis, cube);
-      } else if (this.chartType === Chart.Type.PIE_OLD) {
-        this._drawPie(this.xAxis, dataAxis, cube);
-      } else if (this.chartType === Chart.Type.SCATTER && this.chartGroup2) {
-        this._drawScatter(this.xAxis, this.yAxis, dataAxis, cube, group2, group);
-      }
-    }
-
-    // update
-    this.$chartMain.children().promise().done(() => {
-      // adapt size of svg
-      try {
-        // Firefox throws error when node is not in dom(already removed by navigating away). all other browser returns a boundingbox with 0
-        let box = this.$chartMain[0].getBBox();
-        this.$chartMain.css('width', box.x + box.width);
-        this.$chartMain.css('height', box.y + box.height);
-
-        // update scrollbar
-        scrollbars.update(this.$contentContainer);
-        this.sizeDirty = false;
-      } catch (e) {
-        // nop
-      }
-    });
-
-    return false;
+    return matrix.calculate();
   }
 
-  /**
-   * Update the class on the selected axes depending on the chart type
-   * */
-  _updateAxisClass() {
-    let $selectXAxis = this._chartGroup1Map[this.chartGroup1.id];
-    if (this.chartType === Chart.Type.BAR_VERTICAL_OLD || this.chartType === Chart.Type.LINE_OLD || this.chartType === Chart.Type.SCATTER) {
-      $selectXAxis.removeClass('axis-ver axis-around').addClass('axis-hor');
-    } else if (this.chartType === Chart.Type.BAR_HORIZONTAL_OLD) {
-      $selectXAxis.removeClass('axis-hor axis-around').addClass('axis-ver');
-    } else if (this.chartType === Chart.Type.PIE_OLD) {
-      $selectXAxis.removeClass('axis-ver axis-hor').addClass('axis-around');
-    }
-
-    if (this.chartType === Chart.Type.SCATTER) {
-      this._chartGroup2Map[this.chartGroup2.id].addClass('axis-up');
-    }
-
+  _getXAxis() {
+    return this.xAxis;
   }
 
-  _drawBar(xAxis, dataAxis, cube) {
-    // dimension functions
-    let maxWidth = 0,
-      width = Math.max(12, Math.min(800 / xAxis.length, 70)),
-      x = i => {
-        i = i === null ? xAxis.length : i;
-        return 100 + i * width;
-      },
-      y = i => 280 - i / (dataAxis.max - 0) * 240;
-
-    // draw data-axis
-    let labels = [0, dataAxis.max / 4, dataAxis.max / 2, dataAxis.max / 4 * 3, dataAxis.max];
-    for (let l = 0; l < labels.length; l++) {
-      let label = labels[l];
-
-      this._drawAxisLine(x(0) - 10, y(label), x(xAxis.length) + 7, y(label));
-      this._drawAxisText(x(0) - 20, y(label), 'y', dataAxis, label);
-    }
-
-    // draw x-axis and values
-    for (let a = 0; a < xAxis.length; a++) {
-      let key = xAxis[a],
-        value = cube.getValue([key])[0];
-
-      // bbox is expensive, test only if there is a chance so draw label
-      let $text = this._drawAxisText(x(a) + width / 2 - 1.5, y(0) + 14, 'x', xAxis, key),
-        w = xAxis.length > 50 ? width * 10 : $text[0].getBBox().width;
-
-      maxWidth = (w > maxWidth) ? w : maxWidth;
-
-      this.$chartMain.appendSVG('rect', 'main-chart')
-        .attr('x', x(a)).attr('y', y(0))
-        .attr('width', width - 3).attr('height', 0)
-        .delay(200)
-        .animateSVG('height', 280 - y(value), 600)
-        .animateSVG('y', y(value), 600)
-        .attr('data-xAxis', key)
-        .data('data-text', $text)
-        .mouseenter(this._chartMouseenter)
-        .mouseleave(this._chartMouseleave)
-        .click(this._chartClick.bind(this));
-    }
-
-    // in case of to many elements, hide or rotate label
-    // Note: do not use CSS style JQuery selector '.main-axis-x' here, since in IE the SVGElement doesn't have
-    // the method getElementsByCssClass(). Instead we must use an attribute selector for the class attribute.
-    // see: http://stackoverflow.com/questions/30885991/using-jquery-find-to-target-svg-elements-fails-in-ie-only
-    if (maxWidth > (width - 3) * 3) {
-      $('[class=main-axis-x]', this.$chartMain).attr('fill-opacity', 0);
-    } else if (maxWidth > width) {
-      $('[class=main-axis-x]', this.$chartMain).each(function() {
-        $(this)
-          .css('text-anchor', 'end')
-          .attr('y', parseFloat($(this).attr('y')) - 4)
-          .attr('x', parseFloat($(this).attr('x')) + 4)
-          .attr('transform', 'rotate(-25 ' + $(this).attr('x') + ', ' + $(this).attr('y') + ')');
-      });
-    }
-
-    // function for later remove
-    this.removeChart = function() {
-      this.$chartMain.children('.main-chart')
-        .animateSVG('height', 0, 200)
-        .animateSVG('y', y(0), 200, $.removeThis);
-    };
-
+  _getYAxis() {
+    return this.yAxis;
   }
 
-  _drawLine(xAxis, dataAxis, cube) {
-    // chart only possible with 2 or more values
-    if (xAxis.length <= 1) {
-      return false;
-    }
-
-    // dimension functions
-    let maxWidth = Math.max(280, this.$contentContainer.width() - 700),
-      x = i => {
-        i = i === null ? xAxis.max : i;
-        return 100 + (i - xAxis.min) / (xAxis.max - xAxis.min) * maxWidth;
-      },
-      y = i => 280 - i / (dataAxis.max - 0) * 240;
-
-    // draw data-axis
-    let labels = [0, dataAxis.max / 4, dataAxis.max / 2, dataAxis.max / 4 * 3, dataAxis.max];
-    for (let l = 0; l < labels.length; l++) {
-      let label = labels[l];
-
-      this._drawAxisLine(x(xAxis.min) - 10, y(label), x(xAxis.max) + 10, y(label));
-      this._drawAxisText(x(xAxis.min) - 20, y(label), 'y', dataAxis, label);
-    }
-
-    // draw x-axis
-    let labelsX;
-    if (xAxis.length > 14) {
-      let delta = xAxis.max - xAxis.min;
-      labelsX = [xAxis.min,
-        xAxis.min + delta / 4,
-        xAxis.min + delta / 2,
-        xAxis.min + delta / 4 * 3,
-        xAxis.max
-      ];
-    } else {
-      labelsX = xAxis;
-    }
-
-    // Given an index into the array of labels, get a position on the x-axis corresponding to the label index, not its
-    // value. E.g. If the labels are [2, 3, 5], this returns equally spaced x positions instead of double spacing the
-    // gap between 3 and 5.
-    let xPos = labelIndex => xAxis.min + (xAxis.max - xAxis.min) * (labelIndex / (labelsX.length - 1));
-
-    for (let k = 0; k < labelsX.length; k++) {
-      let labelX = labelsX[k];
-
-      this._drawAxisLine(x(xPos(k)), y(0) - 3, x(xPos(k)), y(0) + 3);
-      this._drawAxisText(x(xPos(k)), y(0) + 14, 'x', xAxis, labelX);
-    }
-
-    // draw values
-    let valueForNullLabel = cube.getValue([null]) ? cube.getValue([null])[0] : 0;
-    for (let i = 1; i < labelsX.length; ++i) {
-      let fromLabel = labelsX[i - 1];
-      let toLabel = labelsX[i];
-
-      // The label with a text like '-empty-' will have toLabel === null.
-      let fromValue = xAxis.indexOf(fromLabel) === -1 ? valueForNullLabel : cube.getValue([fromLabel])[0];
-      let toValue = xAxis.indexOf(toLabel) === -1 ? valueForNullLabel : cube.getValue([toLabel])[0];
-
-      let fromXPos = xPos(i - 1);
-      let toXPos = xPos(i);
-
-      this.$chartMain.appendSVG('line', 'main-chart')
-        .attr('x1', x(fromXPos)).attr('y1', y(0))
-        .attr('x2', x(toXPos)).attr('y2', y(0))
-        .delay(200)
-        .animateSVG('y1', y(fromValue), 600)
-        .animateSVG('y2', y(toValue), 600);
-    }
-
-    // function for later remove
-    this.removeChart = function() {
-      this.$chartMain.children('.main-chart')
-        .animateSVG('y1', y(0), 200)
-        .animateSVG('y2', y(0), 200, $.removeThis);
-    };
-  }
-
-  _drawPie(xAxis, dataAxis, cube) {
-    // circle for surrounding text, hehe: svg ;)
-    this.$chartMain.appendSVG('path', 'main-axis')
-      .attr('id', 'ArcAxis')
-      .attr('fill', 'none')
-      .attr('d', 'M 210 160 m 0, -110 a 110,110 0 1, 1 0,220 a 110,110 0 1, 1 0,-220');
-
-    this.$chartMain.appendSVG('path', 'main-axis')
-      .attr('id', 'ArcAxisWide')
-      .attr('fill', 'none')
-      .attr('d', 'M 210 160 m 0, -122 a 122,122 0 1, 1 0,244 a 122,122 0 1, 1 0,-244');
-
-    let startAngle = 0,
-      endAngle;
-
-    let me = this;
-    let tweenIn = function(now, fx) {
-      let start = this.getAttribute('data-start'),
-        end = this.getAttribute('data-end');
-      this.setAttribute('d', me._pathSegment(210, 160, 105, start * fx.pos, end * fx.pos));
-    };
-
-    let tweenOut = function(now, fx) {
-      let start = this.getAttribute('data-start'),
-        end = this.getAttribute('data-end');
-      this.setAttribute('d', me._pathSegment(210, 160, 105, start * (1 - fx.pos), end * (1 - fx.pos)));
-    };
-
-    // find data
-    let segments = [];
-    for (let a = 0; a < xAxis.length; a++) {
-      let k = xAxis[a],
-        m = xAxis.format(k),
-        v = cube.getValue([k])[0];
-
-      segments.push([k, m, v]);
-    }
-
-    // order segments
-    segments.sort((a, b) => {
-      return (b[2] - a[2]);
-    });
-
-    // collect small segments
-    let TRESHOLD = 5;
-    if (segments.length > TRESHOLD) {
-      for (let s = segments.length - 1; s >= TRESHOLD; s--) {
-        if (typeof segments[TRESHOLD - 1][0] === 'number') {
-          segments[TRESHOLD - 1][0] = [segments[TRESHOLD - 1][0], segments[s][0]];
-        } else { // i guess we assume that this else branch covers the 'is array' case (?)
-          if (!segments[TRESHOLD - 1][0]) {
-            segments[TRESHOLD - 1][0] = [segments[s][0]];
-          } else {
-            segments[TRESHOLD - 1][0].push(segments[s][0]);
-          }
-        }
-        segments[TRESHOLD - 1][2] += segments[s][2];
-        segments.pop();
-      }
-      segments[TRESHOLD - 1][1] = this.session.text('ui.OtherValues');
-    }
-
-    let roundingError = 0;
-
-    for (let t = 0; t < segments.length; t++) {
-      let icon,
-        key = segments[t][0],
-        mark = segments[t][1],
-        value = segments[t][2];
-
-      if (dataAxis.total > 0) {
-        endAngle = startAngle + value / dataAxis.total;
-      } else {
-        endAngle = 1;
-      }
-
-      // -0.001, else: only 1 arc is not drawn, svg...
-      if (endAngle === 1) {
-        endAngle = endAngle - 0.001;
-      }
-
-      // arc segment
-      let $arc = this.$chartMain.appendSVG('path', 'main-chart')
-        .attr('data-start', startAngle)
-        .attr('data-end', endAngle - 0.001)
-        .delay(200)
-        .animate({
-          tabIndex: 0
-        }, {
-          step: tweenIn,
-          duration: 600
-        })
-        .attr('data-xAxis', JSON.stringify(key))
-        .click(this._chartClick.bind(this));
-
-      // labels
-      let $label1 = this.$chartMain.appendSVG('text', 'main-axis-x')
-        .appendSVG('textPath')
-        .attr('startOffset', (startAngle + endAngle) / 2 * 100 + '%')
-        .attrXLINK('href', '#ArcAxis')
-        .attr('opacity', 0)
-        .delay(400).animateSVG('opacity', 1, 400);
-
-      if (mark !== this.session.text('ui.OtherValues') && xAxis.textIsIcon) {
-        icon = icons.parseIconId(mark);
-      }
+  _handleIconLabel(label, axis, iconClasses) {
+    if (axis && axis.textIsIcon) {
+      let icon = icons.parseIconId(label);
       if (icon && icon.isFontIcon()) {
-        $label1.addClass(icon.appendCssClass('font-icon'));
-        $label1.text(icon.iconCharacter);
-      } else {
-        $label1.text(mark);
+        iconClasses.push(...icon.appendCssClass('font-icon').split(' '));
+        return icon.iconCharacter;
       }
-
-      // data inside the arc
-      let midPoint = (startAngle + (endAngle - startAngle) / 2) * 2 * Math.PI;
-      let roundedResult;
-      if (dataAxis.total === 0) {
-        roundedResult = 100;
-      } else {
-        // take into account the rounding error of the previous rounding
-        // this guarantees that all rounded values add up to 100%
-        let result = value / dataAxis.total * 100 - roundingError;
-        roundedResult = Math.round(result);
-        roundingError = roundedResult - result;
-      }
-      let percentage = roundedResult + '%';
-      let $label2 = this.$chartMain.appendSVG('text', 'main-axis')
-        .attr('x', 210 + 70 * Math.sin(midPoint))
-        .attr('y', 160 - 70 * Math.cos(midPoint))
-        .text(percentage)
-        .attr('opacity', 0)
-        .delay(600).animateSVG('opacity', 1, 300);
-
-      // handling of small arcs
-      $arc
-        .data('data-text', $label1)
-        .mouseenter(this._chartMouseenter)
-        .mouseleave(this._chartMouseleave);
-
-      if (endAngle - startAngle < 0.05) {
-        $label1
-          .attr('fill-opacity', 0)
-          .attrXLINK('href', '#ArcAxisWide');
-        $label2
-          .attr('fill-opacity', 0);
-      }
-
-      startAngle = endAngle;
     }
-
-    // function for later remove
-    this.removeChart = function() {
-      this.$chartMain.children('.main-chart')
-        .animate({
-          tabIndex: 0
-        }, {
-          step: tweenOut,
-          complete: $.removeThis,
-          duration: 200
-        });
-    };
+    return label;
   }
 
-  _drawScatter(xAxis, yAxis, dataAxis, cube, yGroup, xGroup) {
-    // dimension functions
-    let maxWidth = Math.max(280, this.$contentContainer.width() - 860),
-      yAxisSpecialDateTreating = yAxis.column instanceof DateColumn && yGroup === TableMatrix.DateGroup.YEAR && yAxis.indexOf(null) > -1,
-      xAxisSpecialDateTreating = xAxis.column instanceof DateColumn && xGroup === TableMatrix.DateGroup.YEAR && xAxis.indexOf(null) > -1;
-
-    // init drawY axis
-    let deltaY = yAxis.max - yAxis.min,
-      labelsY;
-
-    if (yAxis.length > 14) {
-      deltaY = Math.ceil(deltaY / 4) * 4;
-      yAxis.max = yAxis.min + deltaY;
-      if (yAxisSpecialDateTreating) {
-        // if key value with undefined or null
-        let clone2 = yAxis.slice(0, yAxis.length - 1);
-        yAxis.min = Math.min.apply(null, clone2);
-        deltaY = yAxis.max - yAxis.min;
-        labelsY = [null, yAxis.min, yAxis.min + deltaY / 4, yAxis.min + deltaY / 2, yAxis.min + deltaY / 4 * 3, yAxis.max];
-      } else {
-        labelsY = [yAxis.min, yAxis.min + deltaY / 4, yAxis.min + deltaY / 2, yAxis.min + deltaY / 4 * 3, yAxis.max];
-      }
-    } else {
-      if (yAxisSpecialDateTreating) {
-        let clone4 = yAxis.slice(0, yAxis.length - 1);
-        yAxis.min = Math.min.apply(null, clone4);
-        deltaY = yAxis.max - yAxis.min;
-      }
-      labelsY = yAxis;
-    }
-
-    let y = i => {
-      if (yAxis.length <= 1) {
-        return 280;
-      }
-      if (yAxisSpecialDateTreating) {
-        if (i === null) {
-          return 40;
+  _formatLabel(label, axis) {
+    if (axis) {
+      if (axis.column instanceof DateColumn) {
+        label = label + axis.min;
+        if (label !== parseInt(label) || (axis.length < 2 && (label < axis.min || label > axis.max))) {
+          return null;
         }
-        return 280 - (i - yAxis.min) / (yAxis.max - yAxis.min - 1) * (240 - (240 / labelsY.length));
       }
-      i = i === null ? yAxis.max : i;
-      return 280 - (i - yAxis.min) / (yAxis.max - yAxis.min) * 240;
-    };
-
-    // draw x-axis
-    let deltaX = xAxis.max - xAxis.min,
-      labelsX;
-
-    if (xAxis.length > 14) {
-      deltaX = Math.ceil(deltaX / 4) * 4;
-      xAxis.max = xAxis.min + deltaX;
-      if (xAxisSpecialDateTreating) {
-        let clone = xAxis.slice(0, xAxis.length - 1);
-        xAxis.min = Math.min.apply(null, clone);
-        deltaX = xAxis.max - xAxis.min;
-        labelsX = [null, xAxis.min, xAxis.min + deltaX / 4, xAxis.min + deltaX / 2, xAxis.min + deltaX / 4 * 3, xAxis.max];
-      } else {
-        labelsX = [xAxis.min, xAxis.min + deltaX / 4, xAxis.min + deltaX / 2, xAxis.min + deltaX / 4 * 3, xAxis.max];
-      }
-    } else {
-      if (xAxisSpecialDateTreating) {
-        let clone3 = xAxis.slice(0, xAxis.length - 1);
-        xAxis.min = Math.min.apply(null, clone3);
-      }
-      labelsX = xAxis;
-    }
-
-    let x = i => {
-
-      if (xAxis.length <= 1) {
-        return 100;
-      }
-      if (xAxisSpecialDateTreating) {
-        let offset = maxWidth / labelsX.length;
-        if (i === null) {
-          return 100;
+      if (axis.indexOf(null) !== -1) {
+        if (label === axis.max) {
+          label = null;
+        } else if (label > axis.max) {
+          return null;
         }
-        return 100 + offset + (i - xAxis.min) / (xAxis.max - xAxis.min) * (maxWidth - offset);
-
       }
-      i = i === null ? xAxis.max : i;
-      return 100 + (i - xAxis.min) / (xAxis.max - xAxis.min) * maxWidth;
-    };
-
-    for (let k = 0; k < labelsX.length; k++) {
-      let labelX = labelsX[k];
-
-      this._drawAxisLine(x(labelX), y(yAxisSpecialDateTreating ? null : yAxis.max) - 7, x(labelX), y(yAxis.min) + 3);
-      this._drawAxisText(x(labelX), y(yAxis.min) + 14, 'x', xAxis, labelX);
-    }
-
-    // draw y-axis
-
-    for (let l = 0; l < labelsY.length; l++) {
-      let labelY = labelsY[l];
-
-      this._drawAxisLine(x(xAxisSpecialDateTreating ? null : xAxis.min) - 10, y(labelY), x(xAxis.max), y(labelY));
-      this._drawAxisText(x(xAxisSpecialDateTreating ? null : xAxis.min) - 20, y(labelY), 'y', yAxis, labelY);
-    }
-    // draw values
-    for (let a1 = 0; a1 < xAxis.length; a1++) {
-      for (let a2 = 0; a2 < yAxis.length; a2++) {
-        let key1 = xAxis[a1],
-          key2 = yAxis[a2],
-          testValue = cube.getValue([key1, key2]);
-
-        if (testValue) {
-          let value = testValue[0],
-            r;
-
-          if (value === null) {
-            continue;
-          } else if (dataAxis.max === dataAxis.min) {
-            r = 40;
-          } else {
-            r = Math.max(Math.sqrt((value - dataAxis.min) / (dataAxis.max - dataAxis.min)) * 40, 10);
-          }
-
-          this.$chartMain.appendSVG('circle', 'main-chart')
-            .attr('cx', x(key1))
-            .attr('cy', y(key2))
-            .attr('r', 0)
-            .delay(200)
-            .animateSVG('r', r, 600)
-            .attr('data-xAxis', key1)
-            .attr('data-yAxis', key2)
-            .click(this._chartClick.bind(this));
+      label = axis.format(label);
+      if (axis.textIsIcon) {
+        let icon = icons.parseIconId(label);
+        if (icon && icon.isFontIcon()) {
+          label = icon.iconCharacter;
         }
       }
     }
+    return label;
+  }
 
-    // function for later remove
-    this.removeChart = function() {
-      this.$chartMain.children('.main-chart')
-        .animateSVG('r', 0, 200, $.removeThis);
-    };
+  _adjustConfig(config) {
+    // nop
   }
 
   _chartClick(event) {
@@ -1243,7 +956,7 @@ export default class ChartTableControl extends TableControl {
 
     //  prepare filter
     let filters = [],
-      oneDim = !$('.selected', this.$chartSelect).hasClass('chart-scatter');
+      oneDim = !$('.selected', this.$chartSelect).hasClass('chart-bubble');
 
     // find all filter
     // different data may be stored: undefined, arrays (of keys )and single numbers (keys)
@@ -1278,8 +991,8 @@ export default class ChartTableControl extends TableControl {
         session: this.session,
         table: this.table,
         text: this.tooltipText,
-        xAxis: this.xAxis,
-        yAxis: this.yAxis,
+        xAxis: this._getXAxis(),
+        yAxis: this._getYAxis(),
         filters: filters
       });
 
@@ -1289,21 +1002,6 @@ export default class ChartTableControl extends TableControl {
     }
 
     this.table.filter();
-  }
-
-  _chartMouseleave(event) {
-    let $element = $(this),
-      $text = $element.data('data-text');
-
-    $text.attr('fill-opacity', $element.data('data-store-opacity'));
-  }
-
-  _chartMouseenter(event) {
-    let $element = $(this),
-      $text = $element.data('data-text');
-
-    $element.data('data-store-opacity', $text.attr('fill-opacity'));
-    $text.attr('fill-opacity', '1');
   }
 
   _axisContentForColumn(column) {
@@ -1338,6 +1036,15 @@ export default class ChartTableControl extends TableControl {
   }
 
   _removeContent() {
+    this._removeScrollbars();
+    this.$contentContainer.remove();
+    this.chart.remove();
+    this.table.events.removeListener(this._filterResetListener);
+    this._removeListeners();
+    this.oldChartType = null;
+  }
+
+  _removeScrollbars() {
     this.$xAxisSelect.each((index, element) => {
       tooltips.uninstall($(element));
     });
@@ -1345,41 +1052,13 @@ export default class ChartTableControl extends TableControl {
       tooltips.uninstall($(element));
     });
     this._uninstallScrollbars();
-    this.$contentContainer.remove();
-    this.table.events.removeListener(this._filterResetListener);
+  }
+
+  _removeListeners() {
     this.table.off('columnStructureChanged', this._tableUpdatedHandler);
     this.table.off('rowsInserted', this._tableUpdatedHandler);
     this.table.off('rowsDeleted', this._tableUpdatedHandler);
     this.table.off('allRowsDeleted', this._tableUpdatedHandler);
-  }
-
-  _drawAxisText(x, y, c, axis, key) {
-    let icon,
-      text = axis.format(key),
-      $text = this.$chartMain.appendSVG('text', 'main-axis-' + c)
-        .attr('x', x).attr('y', y)
-        .attr('opacity', 0);
-
-    if (axis.textIsIcon) {
-      icon = icons.parseIconId(text);
-    }
-    if (icon && icon.isFontIcon()) {
-      $text.addClass(icon.appendCssClass('font-icon'));
-      $text.text(icon.iconCharacter);
-    } else {
-      $text.text(text);
-    }
-    $text.delay(200).animateSVG('opacity', 1, 600);
-
-    return $text;
-  }
-
-  _drawAxisLine(x1, y1, x2, y2) {
-    this.$chartMain.appendSVG('line', 'main-axis')
-      .attr('x1', x1).attr('y1', y1)
-      .attr('x2', x2).attr('y2', y2)
-      .attr('opacity', 0)
-      .delay(200).animateSVG('opacity', 1, 600);
   }
 
   _pathSegment(mx, my, r, start, end) {

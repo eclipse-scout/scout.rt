@@ -44,17 +44,17 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
   /**
    * Supported chart types:
    * <ul>
-   * <li>{@link IChartType#PIE_OLD}</li>
-   * <li>{@link IChartType#LINE_OLD}</li>
-   * <li>{@link IChartType#BAR_VERTICAL_OLD}</li>
-   * <li>{@link IChartType#BAR_HORIZONTAL_OLD}</li>
-   * <li>{@link IChartType#SCATTER}</li>
+   * <li>{@link IChartType#PIE}</li>
+   * <li>{@link IChartType#LINE}</li>
+   * <li>{@link IChartType#BAR}</li>
+   * <li>{@link IChartType#BAR_HORIZONTAL}</li>
+   * <li>{@link IChartType#BUBBLE}</li>
    * </ul>
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(100)
   protected String getConfiguredChartType() {
-    return IChartType.BAR_VERTICAL_OLD;
+    return IChartType.BAR;
   }
 
   @ConfigProperty(ConfigProperty.OBJECT)

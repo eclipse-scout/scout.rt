@@ -33,10 +33,6 @@ public interface IChartValueGroupBean extends Serializable {
 
   void setColorHexValue(String colorHexValue);
 
-  String getCssClass();
-
-  void setCssClass(String cssClass);
-
   boolean isClickable();
 
   void setClickable(boolean clickable);

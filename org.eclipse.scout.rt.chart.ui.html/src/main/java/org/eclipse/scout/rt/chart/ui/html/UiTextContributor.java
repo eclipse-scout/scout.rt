@@ -28,6 +28,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.TooMuchData",
         "ui.Tri",
         "ui.Trd",
+        "ui.Value",
         "ui.bar",
         "ui.groupedByWeekday",
         "ui.groupedByMonth",

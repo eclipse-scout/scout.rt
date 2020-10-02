@@ -65,16 +65,6 @@ public abstract class AbstractChartValueGroupBean implements IChartValueGroupBea
   }
 
   @Override
-  public String getCssClass() {
-    return m_cssClass;
-  }
-
-  @Override
-  public void setCssClass(String cssClass) {
-    m_cssClass = cssClass;
-  }
-
-  @Override
   public boolean isClickable() {
     return m_clickable;
   }

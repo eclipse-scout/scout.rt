@@ -46,6 +46,7 @@ export default class Chart extends Widget {
     LINE: 'line',
     LINE_OLD: 'line_old',
     BAR: 'bar',
+    BAR_HORIZONTAL: 'horizontalBar',
     BAR_VERTICAL_OLD: 'barVertical_old',
     BAR_HORIZONTAL_OLD: 'barHorizontal_old',
     COMBO_BAR_LINE: 'combo_bar_line',
@@ -233,6 +234,7 @@ export default class Chart extends Widget {
       case Chart.Type.DONUT_OLD:
         return new DonutChartRenderer(this);
       case Chart.Type.BAR:
+      case Chart.Type.BAR_HORIZONTAL:
       case Chart.Type.LINE:
       case Chart.Type.COMBO_BAR_LINE:
       case Chart.Type.PIE:

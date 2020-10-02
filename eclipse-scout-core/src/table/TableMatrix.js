@@ -200,8 +200,7 @@ export default class TableMatrix {
           if (f === null || f === '') {
             return null;
           }
-          let b = (f.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
-          return b;
+          return (f.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
         };
         keyAxis.format = n => {
           if (n === null) {
@@ -277,7 +276,8 @@ export default class TableMatrix {
    */
   calculate() {
     let cube = {},
-      r, v, k, data, key, normData, normKey;
+      r, v, k, data, key, normData, normKey,
+      length = 0;
 
     // collect data from table
     for (r = 0; r < this._rows.length; r++) {
@@ -311,6 +311,7 @@ export default class TableMatrix {
         cube[keys].push(values);
       } else {
         cube[keys] = [values];
+        length++;
       }
     }
 
@@ -385,6 +386,7 @@ export default class TableMatrix {
 
     };
 
+    cube.length = length;
     return cube;
   }
 

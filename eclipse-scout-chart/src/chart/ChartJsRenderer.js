@@ -169,6 +169,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
     /**
      * @property {number} options.bubble.sizeOfLargestBubble
+     * @property {object} options.numberFormatter
      * @property {object} options.scales.scaleLabelByTypeMap
      * @property {object} options.scales.xLabelMap
      * @property {object} options.scales.yLabelMap
@@ -243,7 +244,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         scales: {}
       });
 
-      config.options.scales.xLabelMap = xLabelMap;
+      if (config.type === Chart.Type.BAR_HORIZONTAL) {
+        config.options.scales.yLabelMap = xLabelMap;
+      } else {
+        config.options.scales.xLabelMap = xLabelMap;
+      }
     }
 
     let yLabelMap = this._computeLabelMap(chartData.axes[1]);
@@ -253,7 +258,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         scales: {}
       });
 
-      config.options.scales.yLabelMap = yLabelMap;
+      if (config.type === Chart.Type.BAR_HORIZONTAL) {
+        config.options.scales.xLabelMap = yLabelMap;
+      } else {
+        config.options.scales.yLabelMap = yLabelMap;
+      }
     }
 
     chartData.chartValueGroups.forEach(elem => datasets.push({
@@ -324,6 +333,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         mode: 'nearest'
       },
       tooltips: {
+        mode: 'nearest',
         callbacks: {
           title: this._tooltipTitle,
           label: this._tooltipLabel,
@@ -335,7 +345,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       config.options = $.extend(true, {}, config.options, {
         scale: {}
       });
-    } else if (scout.isOneOf(type, Chart.Type.BAR, Chart.Type.LINE, Chart.Type.BUBBLE)) {
+    } else if (scout.isOneOf(type, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.LINE, Chart.Type.BUBBLE)) {
       config.options = $.extend(true, {}, config.options, {
         scales: {
           xAxes: [{}],
@@ -351,18 +361,20 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           borderDash: [2, 4]
         },
         ticks: {
-          callback: this._labelFormatter,
           beginAtZero: true
         },
         pointLabels: {
           fontSize: ChartJs.defaults.global.defaultFontSize
         }
       });
+      config.options.scale.ticks = $.extend(true, {}, {
+        callback: this._labelFormatter
+      }, config.options.scale.ticks);
     }
     for (let i = 0; i < ((config.options.scales || {}).xAxes || []).length; i++) {
-      if (type === Chart.Type.BUBBLE) {
+      if (scout.isOneOf(type, Chart.Type.BAR_HORIZONTAL, Chart.Type.BUBBLE)) {
         config.options.scales.xAxes[i] = $.extend(true, {}, config.options.scales.xAxes[i], {
-          offset: true,
+          offset: type === Chart.Type.BUBBLE,
           gridLines: {
             drawBorder: false,
             drawTicks: false,
@@ -371,7 +383,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           },
           ticks: {
             padding: 5,
-            callback: this._xLabelFormatter
+            beginAtZero: type === Chart.Type.BAR_HORIZONTAL
           }
         });
       } else {
@@ -382,21 +394,42 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           }
         });
       }
+      if (scout.isOneOf(type, Chart.Type.BAR_HORIZONTAL, Chart.Type.BUBBLE) || config.data.reformatLabels) {
+        config.options.scales.xAxes[i] = $.extend(true, {}, {
+          ticks: {
+            callback: this._xLabelFormatter
+          }
+        }, config.options.scales.xAxes[i]);
+      }
     }
     for (let i = 0; i < ((config.options.scales || {}).yAxes || []).length; i++) {
-      config.options.scales.yAxes[i] = $.extend(true, {}, config.options.scales.yAxes[i], {
-        gridLines: {
-          drawBorder: false,
-          drawTicks: false,
-          zeroLineBorderDash: [2, 4],
-          borderDash: [2, 4]
-        },
-        ticks: {
-          padding: 5,
-          callback: this._yLabelFormatter,
-          beginAtZero: type !== Chart.Type.BUBBLE
-        }
-      });
+      if (type === Chart.Type.BAR_HORIZONTAL) {
+        config.options.scales.yAxes[i] = $.extend(true, {}, config.options.scales.yAxes[i], {
+          gridLines: {
+            display: false
+          }
+        });
+      } else {
+        config.options.scales.yAxes[i] = $.extend(true, {}, config.options.scales.yAxes[i], {
+          gridLines: {
+            drawBorder: false,
+            drawTicks: false,
+            zeroLineBorderDash: [2, 4],
+            borderDash: [2, 4]
+          },
+          ticks: {
+            padding: 5,
+            beginAtZero: type !== Chart.Type.BUBBLE
+          }
+        });
+      }
+      if (type !== Chart.Type.BAR_HORIZONTAL || config.data.reformatLabels) {
+        config.options.scales.yAxes[i] = $.extend(true, {}, {
+          ticks: {
+            callback: this._yLabelFormatter
+          }
+        }, config.options.scales.yAxes[i]);
+      }
     }
 
     if (config.options.plugins && config.options.plugins.datalabels && config.options.plugins.datalabels.display) {
@@ -404,7 +437,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT)) {
         config.options.plugins.datalabels.display = this._radialChartDatalabelsDisplayHandler;
         config.options.plugins.datalabels.formatter = this._radialChartDatalabelsFormatter;
-      } else if (scout.isOneOf(config.type, Chart.Type.BAR, Chart.Type.LINE, Chart.Type.POLAR_AREA, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
+      } else if (scout.isOneOf(config.type, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.LINE, Chart.Type.POLAR_AREA, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
         config.options.plugins.datalabels.display = 'auto';
         config.options.plugins.datalabels.backgroundColor = this._datalabelBackgroundColorHandler;
         config.options.plugins.datalabels.borderRadius = 4;
@@ -413,21 +446,31 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _formatLabel(label) {
-    return this._formatLabelMap(label);
+    return this._formatLabelMap(label, null, ((this.chartJs || {config: {}}).config.options || {}).numberFormatter);
   }
 
   _formatXLabel(label) {
-    return this._formatLabelMap(label, (((this.chartJs || {config: {}}).config.options || {}).scales || {}).xLabelMap);
+    return this._formatLabelMap(label, (((this.chartJs || {config: {}}).config.options || {}).scales || {}).xLabelMap, ((this.chartJs || {config: {}}).config.options || {}).numberFormatter);
   }
 
   _formatYLabel(label) {
-    return this._formatLabelMap(label, (((this.chartJs || {config: {}}).config.options || {}).scales || {}).yLabelMap);
+    return this._formatLabelMap(label, (((this.chartJs || {config: {}}).config.options || {}).scales || {}).yLabelMap, ((this.chartJs || {config: {}}).config.options || {}).numberFormatter);
   }
 
-  _formatLabelMap(label, labelMap) {
+  _formatLabelMap(label, labelMap, numberFormatter) {
     if (labelMap) {
       return labelMap[label];
     }
+    if (isNaN(label)) {
+      return label;
+    }
+    if (numberFormatter) {
+      return numberFormatter(label, this._formatNumberLabel.bind(this));
+    }
+    return this._formatNumberLabel(label);
+  }
+
+  _formatNumberLabel(label) {
     if (isNaN(label)) {
       return label;
     }
@@ -703,19 +746,16 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   _formatTooltipTitle(tooltipItems, data) {
     let config = this.chartJs.config,
       tooltipItem = tooltipItems[0];
-    if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
-      return data.datasets[tooltipItem.datasetIndex].label;
-    }
-    if (scout.isOneOf(config.type, Chart.Type.LINE, Chart.Type.BAR, Chart.Type.RADAR)) {
-      return data.labels[tooltipItem.index];
+    if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR)) {
+      return config.data.reformatLabels ? this._formatLabel(data.labels[tooltipItem.index]) : data.labels[tooltipItem.index];
     }
     if (config.type === Chart.Type.BUBBLE) {
       let xAxisLabel = config.options.scales.xAxes[0].scaleLabel.labelString,
         yAxisLabel = config.options.scales.yAxes[0].scaleLabel.labelString;
       xAxisLabel = xAxisLabel ? (xAxisLabel + ':') : ChartJsRenderer.ARROW_LEFT_RIGHT;
       yAxisLabel = yAxisLabel ? (yAxisLabel + ':') : ' ' + ChartJsRenderer.ARROW_UP_DOWN + ' ';
-      return [xAxisLabel + ' ' + this._formatXLabel(tooltipItem.xLabel),
-        yAxisLabel + ' ' + this._formatYLabel(tooltipItem.yLabel)];
+      return [xAxisLabel + ' ' + config.options.scales.xAxes[0].ticks.callback(tooltipItem.xLabel),
+        yAxisLabel + ' ' + config.options.scales.yAxes[0].ticks.callback(tooltipItem.yLabel)];
     }
     let defaultTitle = (((ChartJs.defaults[config.type] || {}).tooltips || {}).callbacks || {}).title || ChartJs.defaults.global.tooltips.callbacks.title;
     return defaultTitle.call(this.chartJs, tooltipItems, data);
@@ -724,10 +764,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   _formatTooltipLabel(tooltipItem, data) {
     let config = this.chartJs.config,
       dataset = ((data || {}).datasets || [])[tooltipItem.datasetIndex];
-    if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
-      return ' ' + data.labels[tooltipItem.index] + ': ' + this._formatLabel(dataset.data[tooltipItem.index]);
-    }
-    if (scout.isOneOf(config.type, Chart.Type.LINE, Chart.Type.BAR, Chart.Type.RADAR)) {
+    if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR)) {
       return ' ' + dataset.label + ': ' + this._formatLabel(dataset.data[tooltipItem.index]);
     }
     if (config.type === Chart.Type.BUBBLE) {
@@ -754,7 +791,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         backgroundColor: autoColor ? dataset.backgroundColor[tooltipItem.index] : dataset.backgroundColor
       };
     }
-    if ((dataset.type || config.type) === Chart.Type.BAR) {
+    if (scout.isOneOf((dataset.type || config.type), Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL)) {
       return {
         borderColor: tooltipBackgroundColor,
         backgroundColor: dataset.backgroundColor
@@ -774,11 +811,13 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (!config || !config.type || !config.options || (!config.options.scale && !config.options.scales) || !chartArea) {
       return;
     }
-    if (!scout.isOneOf(config.type, Chart.Type.BAR, Chart.Type.LINE, Chart.Type.POLAR_AREA, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
+    if (!scout.isOneOf(config.type, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.LINE, Chart.Type.POLAR_AREA, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
       return;
     }
 
-    let height = Math.abs(chartArea.top - chartArea.bottom),
+    let width = Math.abs(chartArea.right - chartArea.left),
+      height = Math.abs(chartArea.top - chartArea.bottom),
+      maxXTicks = Math.max(Math.floor(width / this.minSpaceBetweenXTicks), 3),
       maxYTicks = Math.max(Math.floor(height / this.minSpaceBetweenYTicks), 3),
       yBoundaries,
       yBoundaries2;
@@ -865,6 +904,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     } else if (yBoundaries2) {
       this._adjustAxes([config.options.scales.yAxes[0]], maxYTicks, yBoundaries);
       this._adjustAxes([config.options.scales.yAxes[1]], maxYTicks, yBoundaries2);
+    } else if (config.type === Chart.Type.BAR_HORIZONTAL) {
+      this._adjustAxes(config.options.scales.xAxes, maxXTicks, yBoundaries);
     } else {
       this._adjustAxes(config.options.scales.yAxes, maxYTicks, yBoundaries);
     }
@@ -873,9 +914,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       return;
     }
 
-    let width = Math.abs(chartArea.right - chartArea.left),
-      maxXTicks = Math.max(Math.floor(width / this.minSpaceBetweenXTicks), 3),
-      xBoundaries;
+    let xBoundaries;
     if (((config.options.scales.xAxes || [])[0] || {}).offset) {
       xBoundaries = this._computeMaxMinValue(config.data.datasets, 'x', config.options.scales.xLabelMap, true);
     } else {
@@ -1058,7 +1097,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _onHover(event, items) {
-    if (this.chartJs.config && this.chartJs.config.type && scout.isOneOf(this.chartJs.config.type, Chart.Type.LINE, Chart.Type.BAR, Chart.Type.RADAR) && this.chartJs.config.options && this.chartJs.config.options.autoColor) {
+    if (this.chartJs.config && this.chartJs.config.type && scout.isOneOf(this.chartJs.config.type, Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR) &&
+      this.chartJs.config.options && this.chartJs.config.options.autoColor) {
       let update = false;
       if (this.resetDatasetAfterHover) {
         this._adjustColors(this.chartJs.config);
