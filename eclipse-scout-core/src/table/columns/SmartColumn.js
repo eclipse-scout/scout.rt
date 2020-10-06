@@ -154,7 +154,7 @@ export default class SmartColumn extends Column {
     field.setLookupRow(lookupRow);
   }
 
-  _createEditor() {
+  _createEditor(row) {
     var field = scout.create('SmartField', {
       parent: this.table,
       codeType: this.codeType,
@@ -168,7 +168,8 @@ export default class SmartColumn extends Column {
 
     field.on('prepareLookupCall', function(event) {
       this.trigger('prepareLookupCall', {
-        lookupCall: event.lookupCall
+        lookupCall: event.lookupCall,
+        row: row
       });
     }.bind(this));
     field.on('lookupCallDone', function(event) {

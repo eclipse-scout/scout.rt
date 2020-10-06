@@ -148,4 +148,48 @@ describe('SmartColumn', function() {
     });
   });
 
+  /**
+   * Makes sure the prepareLookupCall event contains a property 'row'.
+   */
+  it('prepareLookupCall event contains a property row', function() {
+    var table = helper.createTable({
+      columns: [{
+        objectType: 'SmartColumn',
+        mandatory: true
+      }]
+    });
+    var column = table.columns[0];
+
+    var lookupCall = scout.create('LookupCall', {session: session, batch: true});
+    column.setLookupCall(lookupCall);
+
+    var cell0 = new Cell();
+    var value0 = 7;
+    cell0.setText('Foo');
+    cell0.setValue(value0);
+    cell0.setEditable(true);
+    var cell1 = new Cell();
+    var value1 = 9;
+    cell1.setText('Bar');
+    cell1.setValue(value1);
+    cell1.setEditable(true);
+
+    table.insertRows([
+      {cells: [cell0]},
+      {cells: [cell1]}
+    ]);
+
+    var field = column.createEditor(table.rows[1]);
+
+    column.on('prepareLookupCall', function(event) {
+      event.row.cells[0].value += 1;
+    });
+    field.trigger('prepareLookupCall', {
+      lookupCall: lookupCall
+    });
+
+    jasmine.clock().tick(500);
+    expect(table.rows[0].cells[0].value).toEqual(value0);
+    expect(table.rows[1].cells[0].value).toEqual(value1 + 1);
+  });
 });
