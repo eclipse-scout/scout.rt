@@ -197,6 +197,9 @@ public class LookupHelper {
           LOOKUP_ROW row = BEANS.get(rowClass)
               .withId(idAccessor.apply(data))
               .withText(textAccessor.apply(data));
+          if (activeAccessor != null) {
+            row.withActive(activeAccessor.apply(data));
+          }
           return additionalMapper.apply(row, data);
         });
     if (lookupRowDoComparator != null) {

@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.dataobject.lookup.fixture.FixtureEnumLookupRestricti
 import org.eclipse.scout.rt.dataobject.lookup.fixture.FixtureEnumLookupRowDo;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,46 +58,55 @@ public class LookupHelperTest {
     // get all, no restrictions
     LookupResponse<LongLookupRowDo> lookupResponse = m_helper.filterData(restriction, m_testData.values().stream(), FixtureData::getId, FixtureData::getText, FixtureData::getActive, LongLookupRowDo.class);
     assertLookupResponse(lookupResponse, 2L, 3L, 1L);
+    assertActiveLookupRows(lookupResponse, 1L);
 
     // get by id
     restriction = BEANS.get(LongLookupRestrictionDo.class).withIds(1L, 3L);
     lookupResponse = m_helper.filterData(restriction, m_testData.values().stream(), FixtureData::getId, FixtureData::getText, FixtureData::getActive, LongLookupRowDo.class);
     assertLookupResponse(lookupResponse, 3L, 1L);
+    assertActiveLookupRows(lookupResponse, 1L);
 
     // get by text (full)
     restriction = BEANS.get(LongLookupRestrictionDo.class).withText("bar");
     lookupResponse = m_helper.filterData(restriction, m_testData.values().stream(), FixtureData::getId, FixtureData::getText, FixtureData::getActive, LongLookupRowDo.class);
     assertLookupResponse(lookupResponse, 2L);
+    assertActiveLookupRows(lookupResponse); // no active rows
 
     // get by text (b*)
     restriction = BEANS.get(LongLookupRestrictionDo.class).withText("b*");
     lookupResponse = m_helper.filterData(restriction, m_testData.values().stream(), FixtureData::getId, FixtureData::getText, FixtureData::getActive, LongLookupRowDo.class);
     assertLookupResponse(lookupResponse, 2L, 3L);
+    assertActiveLookupRows(lookupResponse); // no active rows
 
     // get by text (*a*)
     restriction = BEANS.get(LongLookupRestrictionDo.class).withText("*a*");
     lookupResponse = m_helper.filterData(restriction, m_testData.values().stream(), FixtureData::getId, FixtureData::getText, FixtureData::getActive, LongLookupRowDo.class);
     assertLookupResponse(lookupResponse, 2L, 3L);
+    assertActiveLookupRows(lookupResponse); // no active rows
 
     // get by text (*o)
     restriction = BEANS.get(LongLookupRestrictionDo.class).withText("*o");
     lookupResponse = m_helper.filterData(restriction, m_testData.values().stream(), FixtureData::getId, FixtureData::getText, FixtureData::getActive, LongLookupRowDo.class);
     assertLookupResponse(lookupResponse, 1L);
+    assertActiveLookupRows(lookupResponse, 1L);
 
     // get by text (*)
     restriction = BEANS.get(LongLookupRestrictionDo.class).withText("*");
     lookupResponse = m_helper.filterData(restriction, m_testData.values().stream(), FixtureData::getId, FixtureData::getText, FixtureData::getActive, LongLookupRowDo.class);
     assertLookupResponse(lookupResponse, 2L, 3L, 1L);
+    assertActiveLookupRows(lookupResponse, 1L);
 
     // get by active true
     restriction = BEANS.get(LongLookupRestrictionDo.class).withActive(true);
     lookupResponse = m_helper.filterData(restriction, m_testData.values().stream(), FixtureData::getId, FixtureData::getText, FixtureData::getActive, LongLookupRowDo.class);
     assertLookupResponse(lookupResponse, 1L);
+    assertActiveLookupRows(lookupResponse, 1L);
 
     // get by active false
     restriction = BEANS.get(LongLookupRestrictionDo.class).withActive(false);
     lookupResponse = m_helper.filterData(restriction, m_testData.values().stream(), FixtureData::getId, FixtureData::getText, FixtureData::getActive, LongLookupRowDo.class);
     assertLookupResponse(lookupResponse, 2L);
+    assertActiveLookupRows(lookupResponse); // no active rows
   }
 
   @Test
@@ -226,6 +236,16 @@ public class LookupHelperTest {
         .map(AbstractLookupRowDo::getId)
         .collect(Collectors.toList());
     assertEquals(Arrays.asList(expectedIds), actualIds);
+  }
+
+  @SafeVarargs
+  protected final <ID, LOOKUP_ROW extends AbstractLookupRowDo<LOOKUP_ROW, ID>> void assertActiveLookupRows(LookupResponse<LOOKUP_ROW> response, @SuppressWarnings("unchecked") ID... expectedActiveIds) {
+    assertNotNull(response);
+    List<ID> actualActiveIds = response.rows().stream()
+        .filter(row -> BooleanUtility.nvl(row.isActive()))
+        .map(AbstractLookupRowDo::getId)
+        .collect(Collectors.toList());
+    assertEquals(Arrays.asList(expectedActiveIds), actualActiveIds);
   }
 
   @Test
