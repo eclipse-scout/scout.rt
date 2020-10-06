@@ -19,9 +19,24 @@ package org.eclipse.scout.rt.platform.util;
  */
 public enum TriState {
 
-  FALSE(Boolean.FALSE),
-  TRUE(Boolean.TRUE),
-  UNDEFINED(null);
+  FALSE(Boolean.FALSE) {
+    @Override
+    public TriState negate() {
+      return TriState.TRUE;
+    }
+  },
+  TRUE(Boolean.TRUE){
+    @Override
+    public TriState negate() {
+      return TriState.FALSE;
+    }
+  },
+  UNDEFINED(null){
+    @Override
+    public TriState negate() {
+      return this;
+    }
+  };
 
   private final Boolean m_value;
 
@@ -55,6 +70,8 @@ public enum TriState {
     return m_value == null;
   }
 
+  public abstract TriState negate();
+
   /**
    * Boolean: true -&gt; true false -&gt; false null -&gt; null
    * <p>
@@ -70,7 +87,7 @@ public enum TriState {
       return (TriState) value;
     }
     else if (value instanceof Boolean) {
-      return parseBoolean((Boolean) value);
+      return ((Boolean) value) ? TRUE : FALSE;
     }
     else if (value instanceof Number) {
       return parseInt(((Number) value).intValue());
@@ -83,8 +100,11 @@ public enum TriState {
     }
   }
 
-  private static TriState parseBoolean(Boolean value) {
-    if (value) {
+  public static TriState parseBoolean(Boolean value) {
+    if (value == null) {
+      return UNDEFINED;
+    }
+    else if (value) {
       return TRUE;
     }
     else {

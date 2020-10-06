@@ -107,9 +107,23 @@ public class TriStateTest {
     assertTrue(TriState.UNDEFINED.isUndefined());
   }
 
+  @Test
+  public void testNegate() {
+    assertEquals(TriState.FALSE, TriState.TRUE.negate());
+    assertEquals(TriState.TRUE, TriState.FALSE.negate());
+    assertEquals(TriState.UNDEFINED, TriState.UNDEFINED.negate());
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void testParseAnyObject() {
     TriState.parse(new Object());
+  }
+
+  @Test
+  public void testParseBoolean() {
+    assertEquals(TriState.TRUE, TriState.parseBoolean(Boolean.TRUE));
+    assertEquals(TriState.FALSE, TriState.parseBoolean(Boolean.FALSE));
+    assertEquals(TriState.UNDEFINED, TriState.parseBoolean(null));
   }
 
   @Test
@@ -119,5 +133,4 @@ public class TriStateTest {
     assertTrue(TriState.UNDEFINED.compareTo(TriState.TRUE) > 0);
     assertEquals(0, TriState.UNDEFINED.compareTo(TriState.UNDEFINED));
   }
-
 }

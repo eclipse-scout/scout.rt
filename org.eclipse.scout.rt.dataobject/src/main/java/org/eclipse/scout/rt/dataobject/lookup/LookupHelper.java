@@ -367,7 +367,7 @@ public class LookupHelper {
   }
 
   /**
-   * Text lookup pattern like CRM CoreUtility
+   * Text lookup pattern
    */
   protected Pattern createTextSearchPattern(String text) {
     if (text == null) {
