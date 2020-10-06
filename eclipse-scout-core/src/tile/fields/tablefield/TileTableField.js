@@ -19,6 +19,19 @@ export default class TileTableField extends TableField {
     this._tableBlurHandler = this._onTableBlur.bind(this);
     this._tableFocusHandler = this._onTableFocus.bind(this);
     this._menuBarPropertyChangeHandler = this._onMenuBarPropertyChange.bind(this);
+    this._documentMouseDownHandler = this._onDocumentMouseDown.bind(this);
+  }
+
+  _render() {
+    super._render();
+    if (!this.session.focusManager.restrictedFocusGain) {
+      this.$container.document(true).addEventListener('mousedown', this._documentMouseDownHandler, true);
+    }
+  }
+
+  _remove() {
+    this.$container.document(true).removeEventListener('mousedown', this._documentMouseDownHandler, true);
+    super._remove();
   }
 
   /**
@@ -91,5 +104,16 @@ export default class TileTableField extends TableField {
     }
     // adjust menu bar on TileTableField with the additional class has-menubar.
     this.$container.toggleClass('has-menubar', this.table.menuBar.visible);
+  }
+
+  _onDocumentMouseDown(event) {
+    let $popup = $('.popup');
+    let popup = $popup.data('widget');
+    if (this.table && popup && this.table.has(popup) && $popup.has(event.target)) {
+      // Ensure focus is not removed from table when clicking on a context-menu
+      // Otherwise the menubar would get invisible while closing the context-menu (e.g. by clicking on header)
+      // This is only necessary if restrictedFocusGain is false (e.g. on mobile).
+      event.preventDefault();
+    }
   }
 }
