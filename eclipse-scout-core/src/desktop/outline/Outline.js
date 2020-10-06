@@ -507,6 +507,7 @@ export default class Outline extends Tree {
   setDefaultDetailForm(defaultDetailForm) {
     this.setProperty('defaultDetailForm', defaultDetailForm);
     this._updateOutlineOverview();
+    this.updateDetailContent();
   }
 
   _setDefaultDetailForm(defaultDetailForm) {
