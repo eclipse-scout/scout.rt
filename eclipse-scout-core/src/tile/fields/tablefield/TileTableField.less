@@ -9,6 +9,19 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .tile.dashboard > .table-field {
+  .dashboard-tile-small-horizontal-padding(@tile-field-padding, @tile-field-padding - @table-cell-padding-left - 1); // -1 = table-row padding, see below
+
+  & > label {
+    padding-bottom: @dashboard-tile-label-large-padding-bottom;
+  }
+
+  .compact& {
+    .dashboard-tile-small-horizontal-padding(@tile-field-compact-padding-x, @tile-field-compact-padding-x - @table-cell-padding-left - 1); // -1 = table-row padding, see below
+
+    & > label {
+      padding-bottom: @dashboard-tile-label-padding-bottom;
+    }
+  }
 
   /* adjust menu bar when visible */
 

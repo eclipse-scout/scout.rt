@@ -16,17 +16,26 @@
   overflow: hidden;
 
   & > .form-field {
-    padding: @tile-field-padding;
-    padding-top: 12px;
+    padding: 12px @tile-field-padding @tile-field-padding;
 
     &.label-hidden {
       padding-top: @tile-field-padding;
+
+      .compact& {
+        // reduce padding-top only if there is no label
+        // the padding with label is already fine
+        padding-top: @tile-field-compact-padding-y;
+      }
+    }
+
+    .compact& {
+      padding-bottom: @tile-field-compact-padding-y;
+      padding-left: @tile-field-compact-padding-x;
+      padding-right: @tile-field-compact-padding-x;
     }
 
     &.no-padding {
       padding: 0;
-      /* set padding-top explicitly to override label-hidden */
-      padding-top: 0;
 
       & > .field {
         border: 0;
@@ -40,7 +49,11 @@
       font-size: 18px;
       padding-top: 0;
       padding-bottom: @dashboard-tile-label-padding-bottom;
-      font-weight: bold;
+      padding-right: 0;
+
+      .compact& {
+        font-size: @font-size-large;
+      }
     }
 
     & > .field {
@@ -66,8 +79,12 @@
     /* This makes it possible to draw the scrollbar (seemingly) outside the field. */
 
     &.scrollbar-y-outside {
-      @offset: 14px;
+      @offset: 10px;
       padding-right: @tile-field-padding - @offset;
+
+      .compact& {
+        padding-right: 0;
+      }
 
       & > label {
         margin-right: @offset;
@@ -89,7 +106,6 @@
         }
       }
     }
-
 
     /* --- Special rules for specific tile fields --- */
 
@@ -329,5 +345,19 @@
       border-radius: @border-radius;
       z-index: 1;
     }
+  }
+}
+
+/*
+ Mixing that can be used to reduce the horizontal padding.
+ To ensure the label is aligned with the label from other tiles the h-padding of the label is increased.
+ */
+.dashboard-tile-small-horizontal-padding(@padding-x: @tile-field-compact-padding-x, @small-padding-x: @tile-field-small-compact-padding-x) {
+  padding-left: @small-padding-x;
+  padding-right: @small-padding-x;
+
+  & > label {
+    padding-left: @padding-x - @small-padding-x;
+    padding-right: @padding-x - @small-padding-x;
   }
 }

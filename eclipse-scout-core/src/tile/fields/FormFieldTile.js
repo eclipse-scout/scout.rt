@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BrowserField, Tile, WidgetTile} from '../../index';
+import {BrowserField, Device, Tile, WidgetTile} from '../../index';
 
 export default class FormFieldTile extends WidgetTile {
 
@@ -26,6 +26,7 @@ export default class FormFieldTile extends WidgetTile {
   _renderProperties() {
     super._renderProperties();
     this._renderFieldLabelVisible();
+    this._renderCompact();
   }
 
   _renderDisplayStyle() {
@@ -41,6 +42,10 @@ export default class FormFieldTile extends WidgetTile {
     if (this.tileWidget instanceof BrowserField) {
       this.tileWidget.$container.toggleClass('no-padding', !this.tileWidget.labelVisible && !this.tileWidget.errorStatus);
     }
+  }
+
+  _renderCompact() {
+    this.$container.toggleClass('compact', Device.get().type === Device.Type.MOBILE);
   }
 
   _onFieldPropertyChange(event) {
