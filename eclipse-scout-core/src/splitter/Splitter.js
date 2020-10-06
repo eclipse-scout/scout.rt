@@ -56,6 +56,13 @@ export default class Splitter extends Widget {
     }
   }
 
+  _renderVisible() {
+    super._renderVisible();
+    if (this.initialized) {
+      this._renderPosition();
+    }
+  }
+
   setLayoutData(layoutData) {
     super.setLayoutData(layoutData);
     this.layoutData = layoutData;
@@ -116,7 +123,7 @@ export default class Splitter extends Widget {
   }
 
   _renderPosition() {
-    if (this.position === null) {
+    if (this.position === null || !this.visible) {
       return;
     }
 
