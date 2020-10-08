@@ -14,7 +14,11 @@ scout.GroupBoxLayout = function(groupBox) {
 
   this._initDefaults();
 
-  scout.HtmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
+  this._htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);
+  scout.HtmlEnvironment.on('propertyChange', this._htmlPropertyChangeHandler);
+  this.groupBox.one('remove', function() {
+    scout.HtmlEnvironment.off('propertyChange', this._htmlPropertyChangeHandler);
+  }.bind(this));
 };
 scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 
@@ -22,7 +26,7 @@ scout.GroupBoxLayout.prototype._initDefaults = function() {
   this._statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
 };
 
-scout.GroupBoxLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
+scout.GroupBoxLayout.prototype._onHtmlEnvironmentPropertyChange = function() {
   this._initDefaults();
   this.groupBox.invalidateLayoutTree();
 };

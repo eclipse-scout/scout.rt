@@ -73,20 +73,13 @@ scout.GroupBoxResponsiveHandler.prototype.init = function(model) {
   this._enableTransformation(responsiveState.COMPACT, transformationType.HIDE_PLACE_HOLDER_FIELD);
   this._enableTransformation(responsiveState.COMPACT, transformationType.FIELD_SCALABLE);
 
-  this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
-  scout.HtmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
-  this.widget.one('remove', function() {
-    scout.HtmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
-  }.bind(this));
-
+  scout.HtmlEnvironment.on('propertyChange', this._htmlPropertyChangeHandler);
   this.widget.visitFields(function(field) {
     if (field instanceof scout.CompositeField) {
       field.on('propertyChange', this._formFieldAddedHandler);
       this._compositeFields.push(field);
     }
   }.bind(this));
-
-  scout.HtmlEnvironment.on('propertyChange', this._htmlPropertyChangeHandler);
 };
 
 /**
