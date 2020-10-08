@@ -141,8 +141,12 @@ export default class RestLookupCall extends LookupCall {
     super.abort();
   }
 
+  _getCallUrl() {
+    return this.resourceUrl;
+  }
+
   _createAjaxCall() {
-    let url = this.resourceUrl;
+    let url = this._getCallUrl();
     let data = this.restriction || this._restriction ? JSON.stringify($.extend({}, this.restriction, this._restriction)) : null;
     let ajaxOptions = {
       type: 'POST',
