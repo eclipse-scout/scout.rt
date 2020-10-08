@@ -91,20 +91,13 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     this._enableTransformation(responsiveState.COMPACT, transformationType.HIDE_PLACE_HOLDER_FIELD);
     this._enableTransformation(responsiveState.COMPACT, transformationType.FIELD_SCALABLE);
 
-    this.htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);
-    HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
-    this.widget.one('remove', () => {
-      HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
-    });
-
+    HtmlEnvironment.get().on('propertyChange', this._htmlPropertyChangeHandler);
     this.widget.visitFields(field => {
       if (field instanceof CompositeField) {
         field.on('propertyChange', this._formFieldAddedHandler);
         this._compositeFields.push(field);
       }
     });
-
-    HtmlEnvironment.get().on('propertyChange', this._htmlPropertyChangeHandler);
   }
 
   /**

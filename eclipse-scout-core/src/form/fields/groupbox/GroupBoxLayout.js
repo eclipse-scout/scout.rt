@@ -19,7 +19,11 @@ export default class GroupBoxLayout extends AbstractLayout {
 
     this._initDefaults();
 
-    HtmlEnvironment.get().on('propertyChange', this._onHtmlEnvironmentPropertyChange.bind(this));
+    this._htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);
+    HtmlEnvironment.get().on('propertyChange', this._htmlPropertyChangeHandler);
+    this.groupBox.one('remove', () => {
+      HtmlEnvironment.get().off('propertyChange', this._htmlPropertyChangeHandler);
+    });
   }
 
   _initDefaults() {
