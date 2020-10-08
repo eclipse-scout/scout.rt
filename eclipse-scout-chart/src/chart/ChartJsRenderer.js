@@ -303,7 +303,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       let maxR = this._computeMaxMinValue(config.data.datasets, 'r', true).maxValue,
         bubbleScalingFactor = 1;
       if (maxR > 0 && (config.bubble || {}).sizeOfLargestBubble) {
-        bubbleScalingFactor = config.bubble.sizeOfLargestBubble / maxR;
+        bubbleScalingFactor = Math.min(config.bubble.sizeOfLargestBubble, Math.floor(this.$canvas.cssWidth() / 8)) / maxR;
         config.data.datasets.forEach(dataset => dataset.data.forEach(data => {
           data.r = data.r * bubbleScalingFactor;
         }));
@@ -351,7 +351,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           borderDash: [2, 4]
         },
         ticks: {
-          callback: this._labelFormatter
+          callback: this._labelFormatter,
+          beginAtZero: true
         },
         pointLabels: {
           fontSize: ChartJs.defaults.global.defaultFontSize
@@ -392,7 +393,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         },
         ticks: {
           padding: 5,
-          callback: this._yLabelFormatter
+          callback: this._yLabelFormatter,
+          beginAtZero: type !== Chart.Type.BUBBLE
         }
       });
     }
@@ -777,7 +779,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
 
     let height = Math.abs(chartArea.top - chartArea.bottom),
-      maxYTicks = Math.floor(height / this.minSpaceBetweenYTicks),
+      maxYTicks = Math.max(Math.floor(height / this.minSpaceBetweenYTicks), 3),
       yBoundaries,
       yBoundaries2;
 
@@ -785,11 +787,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (config.type === Chart.Type.BUBBLE) {
       let maxR = this._computeMaxMinValue(config.data.datasets, 'r', true);
       padding = maxR.maxValue + (((config.options.elements || {}).point || {}).hoverRadius || 0);
-      let yPadding = padding;
       if (((config.options.scales.yAxes || [])[0] || {}).offset) {
-        yPadding = yPadding - (this.minSpaceBetweenYTicks / 2);
+        yBoundaries = this._computeMaxMinValue(config.data.datasets, 'y', config.options.scales.yLabelMap, true);
+      } else {
+        yBoundaries = this._computeMaxMinValue(config.data.datasets, 'y', config.options.scales.yLabelMap, true, padding, height);
       }
-      yBoundaries = this._computeMaxMinValue(config.data.datasets, 'y', config.options.scales.yLabelMap, yPadding, height);
     } else {
       let datasets = [],
         datasetsDiffType = [];
@@ -872,12 +874,13 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
 
     let width = Math.abs(chartArea.right - chartArea.left),
-      maxXTicks = Math.floor(width / this.minSpaceBetweenXTicks),
-      xPadding = padding;
+      maxXTicks = Math.max(Math.floor(width / this.minSpaceBetweenXTicks), 3),
+      xBoundaries;
     if (((config.options.scales.xAxes || [])[0] || {}).offset) {
-      xPadding = xPadding - (this.minSpaceBetweenXTicks / 2);
+      xBoundaries = this._computeMaxMinValue(config.data.datasets, 'x', config.options.scales.xLabelMap, true);
+    } else {
+      xBoundaries = this._computeMaxMinValue(config.data.datasets, 'x', config.options.scales.xLabelMap, true, padding, width);
     }
-    let xBoundaries = this._computeMaxMinValue(config.data.datasets, 'x', config.options.scales.xLabelMap, xPadding, width);
     this._adjustAxes(config.options.scales.xAxes, maxXTicks, xBoundaries);
   }
 
@@ -895,7 +898,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
   }
 
-  _computeMaxMinValue(datasets, identifier, exact, padding, space) {
+  _computeMaxMinValue(datasets, identifier, exact, boundRange, padding, space) {
     if (!datasets) {
       return;
     }
@@ -929,21 +932,35 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       minValue = 0;
     }
 
+    let adjust = 0,
+      maxBoundary = maxValue,
+      minBoundary = minValue;
+
+    if (!exact) {
+      if (boundRange && Math.sign(minValue) === Math.sign(maxValue)) {
+        adjust = Math.floor(minValue);
+      }
+      maxBoundary = this._calculateBoundary(maxValue - adjust, Math.ceil, Math.floor);
+      minBoundary = this._calculateBoundary(minValue - adjust, Math.floor, Math.ceil);
+    }
+
     if (padding && space && space > 2 * padding) {
       let valuePerPixel = (maxValue - minValue) / (space - 2 * padding),
         paddingValue = valuePerPixel * padding;
-      maxValue = maxValue + paddingValue;
-      minValue = minValue - paddingValue;
+      maxBoundary = Math.max(maxBoundary, maxValue - adjust + paddingValue);
+      minBoundary = Math.min(minBoundary, minValue - adjust - paddingValue);
     }
 
     if (!exact) {
-      maxValue = this._calculateBoundary(maxValue, Math.ceil, Math.floor);
-      minValue = this._calculateBoundary(minValue, Math.floor, Math.ceil);
+      return {
+        maxValue: maxBoundary + adjust,
+        minValue: minBoundary + adjust
+      };
     }
 
     return {
-      maxValue: Math.ceil(maxValue),
-      minValue: Math.floor(minValue)
+      maxValue: Math.ceil(maxBoundary),
+      minValue: Math.floor(minBoundary)
     };
   }
 
@@ -974,7 +991,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     // divide by 5e(p-1), round and multiply with 5e(p-1) to round the value in 5e(p-1) steps
     // example: the value is now divided by 5e(p-1) which means 32689 / 5e(4-1) = 32689 / 5e3 = 32689 / 5000 = 6.5378
     //          this result is now rounded (Math.floor gives 6, Math.ceil and Math.round gives 7) and multiplied again with 5000 which results in 30000 or 35000 respectively
-    value = roundingFunction(value / (5 * Math.pow(10, p - 1))) * 5 * Math.pow(10, p - 1);
+    if (p < 0) {
+      value = roundingFunction(value * Math.pow(10, Math.abs(p)) / 5) * 5 / Math.pow(10, Math.abs(p));
+    } else {
+      value = roundingFunction(value / (5 * Math.pow(10, p - 1))) * 5 * Math.pow(10, p - 1);
+    }
     return value;
   }
 
@@ -1031,6 +1052,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
       let e = new Event();
       e.data = clickObject;
+      e.originalEvent = event;
       this.chart._onValueClick(e);
     }
   }
