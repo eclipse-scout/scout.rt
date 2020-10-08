@@ -1471,7 +1471,7 @@ export default class Widget {
    * Method required for widgets which are supposed to be directly covered by a glasspane.<p>
    *
    * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box or file-chooser is shown with this widget as its 'displayParent'.<br>
-   * If the widget is not rendered yet, a scout.DerredGlassPaneTarget is returned.<br>
+   * If the widget is not rendered yet, a scout.DeferredGlassPaneTarget is returned.<br>
    * In both cases the method _glassPaneTargets is called which may be overridden by the actual widget.
    */
   glassPaneTargets(element) {
