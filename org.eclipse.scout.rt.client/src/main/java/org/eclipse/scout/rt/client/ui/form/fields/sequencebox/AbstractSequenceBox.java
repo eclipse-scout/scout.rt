@@ -77,7 +77,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
 
   /**
    * @return true: A value change trigger ensures that all fields in the range box have consistent (ascending values) by
-   *         calling {@link #execCheckFromTo(IValueField)}
+   *         calling {@link #execCheckFromTo(IValueField[], int)}
    *         <p>
    *         Examples:
    *
@@ -180,8 +180,6 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
 
   /**
    * Validate all fields including own and remove error status when it is an InvalidSequenceStatus
-   *
-   * @param valueFields
    */
   private <T extends Comparable<T>> void clearSequenceErrors(List<IValueField<T>> valueFields) {
     for (IValueField<T> v : valueFields) {
@@ -193,7 +191,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   @Override
   protected void initConfig() {
     m_labelCompositionLock = new OptimisticLock();
-    m_grid = new SequenceBoxGrid();
+    setFieldGrid(new SequenceBoxGrid());
     super.initConfig();
     setAutoCheckFromTo(getConfiguredAutoCheckFromTo());
     setLayoutConfig(getConfiguredLayoutConfig());
@@ -289,6 +287,10 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     if (isInitConfigDone() && getForm() != null) {
       getForm().structureChanged(this);
     }
+  }
+
+  protected void setFieldGrid(SequenceBoxGrid grid) {
+    m_grid = grid;
   }
 
   @Override

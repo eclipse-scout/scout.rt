@@ -30,8 +30,8 @@ public class SequenceBoxGrid implements ICompositeFieldGrid<ISequenceBox> {
   @Override
   public void validate(ISequenceBox sequenceBox) {
     // reset
-    m_gridColumns = 0;
-    m_gridRows = 0;
+    setGridColumns(0);
+    setGridRows(0);
     List<IFormField> list = new ArrayList<>();
     // filter
     for (IFormField f : sequenceBox.getFields()) {
@@ -46,26 +46,34 @@ public class SequenceBoxGrid implements ICompositeFieldGrid<ISequenceBox> {
     layoutStatic(list);
   }
 
-  private void layoutStatic(List<IFormField> fields) {
+  protected void layoutStatic(List<IFormField> fields) {
     int x = 0;
     for (IFormField field : fields) {
       GridData data = GridDataBuilder.createFromHints(field, 1);
       data.x = x;
       data.y = 0;
       if (data.weightX < 0) {
-        if (field instanceof IButton) {
-          data.useUiWidth = true;
-          data.weightX = 0;
-        }
-        else {
-          data.weightX = data.w;
-        }
+        updateWeightX(field, data);
       }
       field.setGridDataInternal(data);
       x = x + data.w;
-      m_gridRows = Math.max(m_gridRows, data.h);
+      setGridRows(Math.max(m_gridRows, data.h));
     }
-    m_gridColumns = x;
+    setGridColumns(x);
+  }
+
+  protected void updateWeightX(IFormField field, GridData data) {
+    if (field instanceof IButton) {
+      updateButtonWeightX(data);
+    }
+    else {
+      data.weightX = data.w;
+    }
+  }
+
+  protected void updateButtonWeightX(GridData data) {
+    data.useUiWidth = true;
+    data.weightX = 0;
   }
 
   @Override
@@ -73,8 +81,16 @@ public class SequenceBoxGrid implements ICompositeFieldGrid<ISequenceBox> {
     return m_gridColumns;
   }
 
+  protected void setGridColumns(int gridColumns) {
+    m_gridColumns = gridColumns;
+  }
+
   @Override
   public int getGridRowCount() {
     return m_gridRows;
+  }
+
+  protected void setGridRows(int gridRows) {
+    m_gridRows = gridRows;
   }
 }
