@@ -123,6 +123,7 @@ scout.MessageBox.prototype._render = function() {
   this._renderBody();
   this._renderHtml();
   this._renderHiddenText();
+  this._registerGlassPaneTargetFilter();
 
   // Prevent resizing when message-box is dragged off the viewport
   this.$container.addClass('calc-helper');
@@ -138,6 +139,21 @@ scout.MessageBox.prototype._render = function() {
 
   this.$container.addClassForAnimation('animate-open');
   this.$container.select();
+};
+
+scout.MessageBox.prototype._registerGlassPaneTargetFilter = function() {
+  // The desktop must not cover the message-box with a glass pane, in case the message-box
+  // is opened by a (modal) form. See ticket #274353.
+  var desktop = this.session.desktop;
+  if (desktop === this.displayParent) {
+    return;
+  }
+
+  var glassPaneTargetFilter = function(target, element) {
+    return target !== this.$container[0];
+  }.bind(this);
+  desktop.addGlassPaneTargetFilter(glassPaneTargetFilter);
+  this.one('remove', desktop.removeGlassPaneTargetFilter.bind(desktop, glassPaneTargetFilter));
 };
 
 scout.MessageBox.prototype.get$Scrollable = function() {

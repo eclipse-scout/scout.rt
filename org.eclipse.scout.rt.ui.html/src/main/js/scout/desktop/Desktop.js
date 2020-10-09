@@ -53,6 +53,7 @@ scout.Desktop = function() {
   this.openUriHandler = null;
   this.theme = null;
   this.dense = false;
+  this._glassPaneTargetFilters = [];
 
   this._addWidgetProperties(['viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes', 'activeForm']);
 
@@ -109,6 +110,12 @@ scout.Desktop.prototype._init = function(model) {
   this._setDense(this.dense);
   this.openUriHandler = scout.create('OpenUriHandler', {
     session: this.session
+  });
+  this._glassPaneTargetFilters.push(function(targetElem, element) {
+    // Exclude all child elements of the given widget
+    // Use case: element is a popup and has tooltip open. The tooltip is displayed in the desktop and considered as glass pane target by the selector above
+    var target = scout.widget(targetElem);
+    return !element.has(target);
   });
 };
 
@@ -832,6 +839,20 @@ scout.Desktop.prototype.inFront = function() {
 };
 
 /**
+ * Adds a filter which is applied when the glass pane targets are collected.
+ * If the filter returns false, the target won't be accepted and not covered by a glass pane.
+ * @param filter a function with the parameter target and element. Target is the element which would be covered by a glass pane, element is the element the user interacts with (e.g. the modal dialog).
+ * @see _glassPaneTargets
+ */
+scout.Desktop.prototype.addGlassPaneTargetFilter = function(filter) {
+  this._glassPaneTargetFilters.push(filter);
+};
+
+scout.Desktop.prototype.removeGlassPaneTargetFilter = function(filter) {
+  scout.arrays.remove(this._glassPaneTargetFilters, filter);
+};
+
+/**
  * === Method required for objects that act as 'displayParent' ===
  *
  * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box, file-chooser or wait-dialog is showed with the Desktop as its 'displayParent'.
@@ -848,12 +869,11 @@ scout.Desktop.prototype._glassPaneTargets = function(element) {
     if (element.$container) {
       $glassPaneTargets = $glassPaneTargets.not(element.$container);
     }
-    // Exclude all child elements of the given widget
-    // Use case: element is a popup and has tooltip open. The tooltip is displayed in the desktop and considered as glass pane target by the selector above
     $glassPaneTargets = $glassPaneTargets.filter(function(i, targetElem) {
-      var target = scout.widget(targetElem);
-      return !element.has(target);
-    });
+      return this._glassPaneTargetFilters.every(function(filter) {
+        return filter(targetElem, element);
+      }, this);
+    }.bind(this));
   }
 
   var glassPaneTargets;
