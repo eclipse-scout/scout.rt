@@ -167,8 +167,10 @@ export default class FocusContext {
    *        the element to gain focus, or null to focus the context's first focusable element matching the given filter.
    * @param filter
    *        filter to control which element to gain focus, or null to accept all focusable candidates.
+   * @param {object} [options]
+   * @param {boolean} [options.preventScroll] a boolean whether to prevent scrolling to focused element or not (defaults to false)
    */
-  validateAndSetFocus(element, filter) {
+  validateAndSetFocus(element, filter, options) {
     // Ensure the element to be a child element, or set it to null otherwise.
     if (element && !$.contains(this.$container[0], element)) {
       element = null;
@@ -187,7 +189,7 @@ export default class FocusContext {
     this.lastValidFocusedElement = elementToFocus;
 
     // Focus the element.
-    this._focus(elementToFocus);
+    this._focus(elementToFocus, options);
   }
 
   /**
@@ -208,8 +210,11 @@ export default class FocusContext {
 
   /**
    * Focuses the requested element.
+   * @param {object} [options]
+   * @param {boolean} [options.preventScroll] a boolean whether to prevent scrolling to focused element or not (defaults to false)
    */
-  _focus(elementToFocus) {
+  _focus(elementToFocus, options) {
+    options = options || {};
     // Only focus element if focus manager is active
     if (!this.focusManager.active) {
       return;
@@ -246,7 +251,9 @@ export default class FocusContext {
     }
 
     // Focus the requested element
-    elementToFocus.focus();
+    elementToFocus.focus({
+      preventScroll: scout.nvl(options.preventScroll, false)
+    });
 
     $.log.isDebugEnabled() && $.log.debug('Focus set to ' + graphics.debugOutput(elementToFocus));
   }

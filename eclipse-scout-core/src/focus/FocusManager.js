@@ -176,8 +176,14 @@ export default class FocusManager {
   /**
    * Uninstalls the focus context for the given $container, and activates the last active context.
    * This method has no effect, if there is no focus context installed for the given $container.
+   * @param container
+   * @param {object} [options]
+   * @param {boolean} [options.preventScroll] a boolean whether to prevent scrolling to focused element or not (defaults to true)
    */
-  uninstallFocusContext($container) {
+  uninstallFocusContext($container, options) {
+    options = $.extend({}, {
+      preventScroll: true
+    }, options);
     let focusContext = this.getFocusContext($container);
     if (!focusContext) {
       return;
@@ -193,7 +199,7 @@ export default class FocusManager {
     // Activate last active focus context.
     let activeFocusContext = this._findActiveContext();
     if (activeFocusContext) {
-      activeFocusContext.validateAndSetFocus(activeFocusContext.lastValidFocusedElement, filter);
+      activeFocusContext.validateAndSetFocus(activeFocusContext.lastValidFocusedElement, filter, options);
     }
   }
 
