@@ -324,4 +324,19 @@ describe('strings', () => {
 
   });
 
+  describe('truncateText', () => {
+    it('returns the truncated text', () => {
+      let measureText = text => ({
+          width: (text || '').length
+        }),
+        loremIpsum = 'Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.';
+      expect(strings.truncateText(loremIpsum, 120, measureText)).toBe(loremIpsum);
+      expect(strings.truncateText(loremIpsum + ' ', 117, measureText)).toBe(loremIpsum);
+      expect(strings.truncateText(' ' + loremIpsum, 117, measureText)).toBe(loremIpsum);
+      expect(strings.truncateText(loremIpsum, 100, measureText)).toBe('Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et...');
+      expect(strings.truncateText(loremIpsum, 50, measureText)).toBe('Lorem ipsum dolor sit amet, consectetur adipisi...');
+      expect(strings.truncateText(loremIpsum, 0, measureText)).toBe(loremIpsum);
+    });
+  });
+
 });

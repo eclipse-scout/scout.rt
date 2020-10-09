@@ -135,8 +135,8 @@ describe('ChartTableControl', () => {
   });
 
   function expectEmptyChart(empty) {
-    expect(chartTableControl.$chartMain).toBeDefined();
-    expect(chartTableControl.$chartMain.children().length === 0).toBe(empty);
+    expect(chartTableControl.chart).toBeDefined();
+    expect(((((chartTableControl.chart.config.data || {}).datasets || [])[0] || {}).data || []).length === 0).toBe(empty);
   }
 
 });

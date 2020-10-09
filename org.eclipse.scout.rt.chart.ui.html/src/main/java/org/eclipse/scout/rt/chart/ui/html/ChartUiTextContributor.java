@@ -15,7 +15,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.ui.html.IUiTextContributor;
 
-public class UiTextContributor implements IUiTextContributor {
+public class ChartUiTextContributor implements IUiTextContributor {
 
   @Override
   public void contributeUiTextKeys(Set<String> textKeys) {

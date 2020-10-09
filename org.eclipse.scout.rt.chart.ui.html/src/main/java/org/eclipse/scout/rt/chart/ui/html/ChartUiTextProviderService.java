@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.AbstractDynamicNlsTextProviderService;
 
 @Order(5015)
-public class UiTextProviderService extends AbstractDynamicNlsTextProviderService {
+public class ChartUiTextProviderService extends AbstractDynamicNlsTextProviderService {
 
   @Override
   public String getDynamicNlsBaseName() {

@@ -678,6 +678,9 @@ export default class ChartTableControl extends TableControl {
     if (cube.length) {
       this.chart.setVisible(true);
     } else {
+      this.chart.setConfig({
+        type: this.chartType
+      });
       this.chart.setVisible(false);
       return;
     }
@@ -857,7 +860,8 @@ export default class ChartTableControl extends TableControl {
   }
 
   _getDatasetLabel() {
-    return this._aggregationMap[this.chartAggregation.id || 'all'].text() || this.session.text('ui.Value');
+    let elem = this._aggregationMap[this.chartAggregation.id || 'all'];
+    return (elem ? elem.text() : null) || this.session.text('ui.Value');
   }
 
   _calculateValues() {

@@ -10,7 +10,7 @@
  */
 import {AbstractChartRenderer, Chart} from '../index';
 import ChartJs from 'chart.js';
-import {Event, styles, arrays} from '@eclipse-scout/core';
+import {Event, styles, arrays, strings} from '@eclipse-scout/core';
 // noinspection ES6UnusedImports
 import chartjs_plugin_datalabels from 'chartjs-plugin-datalabels';
 
@@ -68,6 +68,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this._labelFormatter = this._formatLabel.bind(this);
     this._xLabelFormatter = this._formatXLabel.bind(this);
     this._yLabelFormatter = this._formatYLabel.bind(this);
+
+    this._yAxisFitter = this._fitYAxis.bind(this);
 
     this._radialChartDatalabelsDisplayHandler = this._displayDatalabelsOnRadialChart.bind(this);
     this._radialChartDatalabelsFormatter = this._formatDatalabelsOnRadialChart.bind(this);
@@ -170,6 +172,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     /**
      * @property {number} options.bubble.sizeOfLargestBubble
      * @property {object} options.numberFormatter
+     * @property {number} options.tooltips.titleFontFamily
      * @property {object} options.scales.scaleLabelByTypeMap
      * @property {object} options.scales.xLabelMap
      * @property {object} options.scales.yLabelMap
@@ -312,7 +315,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       let maxR = this._computeMaxMinValue(config.data.datasets, 'r', true).maxValue,
         bubbleScalingFactor = 1;
       if (maxR > 0 && (config.bubble || {}).sizeOfLargestBubble) {
-        bubbleScalingFactor = Math.min(config.bubble.sizeOfLargestBubble, Math.floor(this.$canvas.cssWidth() / 8)) / maxR;
+        bubbleScalingFactor = Math.min(config.bubble.sizeOfLargestBubble, Math.floor(this.$canvas.cssWidth() / 8), Math.floor(this.$canvas.cssHeight() / 6)) / maxR;
         config.data.datasets.forEach(dataset => dataset.data.forEach(data => {
           data.r = data.r * bubbleScalingFactor;
         }));
@@ -430,6 +433,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           }
         }, config.options.scales.yAxes[i]);
       }
+      config.options.scales.yAxes[i].afterFit = this._yAxisFitter;
     }
 
     if (config.options.plugins && config.options.plugins.datalabels && config.options.plugins.datalabels.display) {
@@ -495,6 +499,16 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       }
     }
     return this.session.locale.decimalFormat.format(Math.sign(label) * abs) + abbreviation;
+  }
+
+  _fitYAxis(yAxis) {
+    if (yAxis && yAxis.longestLabelWidth > yAxis.maxWidth - (((yAxis.options || {}).ticks || {}).padding || 0)) {
+      let horizontalSpace = yAxis.maxWidth - (((yAxis.options || {}).ticks || {}).padding || 0),
+        measureText = yAxis.ctx.measureText.bind(yAxis.ctx);
+      yAxis._ticks.forEach(tick => {
+        tick.label = strings.truncateText(tick.label, horizontalSpace, measureText);
+      });
+    }
   }
 
   _displayDatalabelsOnRadialChart(context) {
@@ -729,10 +743,18 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _generateLegendLabels(chart) {
     let config = chart.config,
-      data = config.data;
+      data = config.data,
+      measureText = chart.ctx.measureText.bind(chart.ctx),
+      horizontalSpace;
+    if (scout.isOneOf(config.options.legend.position, Chart.Position.LEFT, Chart.Position.RIGHT)) {
+      horizontalSpace = Math.min(250, this.$canvas.cssWidth() / 3);
+    } else {
+      horizontalSpace = Math.min(250, this.$canvas.cssWidth() * 2 / 3);
+    }
     let defaultGenerateLabels = (((ChartJs.defaults[config.type] || {}).legend || {}).labels || {}).generateLabels || ChartJs.defaults.global.legend.labels.generateLabels;
     let labels = defaultGenerateLabels.call(chart, chart);
     labels.forEach((elem, idx) => {
+      elem.text = strings.truncateText(elem.text, horizontalSpace, measureText);
       if (scout.isOneOf(((data.datasets[idx] || {}).type || config.type), Chart.Type.LINE, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
         elem.fillStyle = data.datasets[idx].borderColor;
       } else if (config.type === Chart.Type.POLAR_AREA) {
@@ -745,33 +767,71 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _formatTooltipTitle(tooltipItems, data) {
     let config = this.chartJs.config,
-      tooltipItem = tooltipItems[0];
+      ctx = this.chartJs.ctx,
+      tooltipItem = tooltipItems[0],
+      title;
     if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR)) {
-      return config.data.reformatLabels ? this._formatLabel(data.labels[tooltipItem.index]) : data.labels[tooltipItem.index];
-    }
-    if (config.type === Chart.Type.BUBBLE) {
+      title = config.data.reformatLabels ? this._formatLabel(data.labels[tooltipItem.index]) : data.labels[tooltipItem.index];
+    } else if (config.type === Chart.Type.BUBBLE) {
       let xAxisLabel = config.options.scales.xAxes[0].scaleLabel.labelString,
         yAxisLabel = config.options.scales.yAxes[0].scaleLabel.labelString;
       xAxisLabel = xAxisLabel ? (xAxisLabel + ':') : ChartJsRenderer.ARROW_LEFT_RIGHT;
       yAxisLabel = yAxisLabel ? (yAxisLabel + ':') : ' ' + ChartJsRenderer.ARROW_UP_DOWN + ' ';
-      return [xAxisLabel + ' ' + config.options.scales.xAxes[0].ticks.callback(tooltipItem.xLabel),
+      title = [xAxisLabel + ' ' + config.options.scales.xAxes[0].ticks.callback(tooltipItem.xLabel),
         yAxisLabel + ' ' + config.options.scales.yAxes[0].ticks.callback(tooltipItem.yLabel)];
+    } else {
+      let defaultTitle = (((ChartJs.defaults[config.type] || {}).tooltips || {}).callbacks || {}).title || ChartJs.defaults.global.tooltips.callbacks.title;
+      title = defaultTitle.call(this.chartJs, tooltipItems, data);
     }
-    let defaultTitle = (((ChartJs.defaults[config.type] || {}).tooltips || {}).callbacks || {}).title || ChartJs.defaults.global.tooltips.callbacks.title;
-    return defaultTitle.call(this.chartJs, tooltipItems, data);
+    let horizontalSpace = this.$canvas.cssWidth() - (2 * config.options.tooltips.xPadding),
+      measureText = ctx.measureText.bind(ctx),
+      oldFont = ctx.font,
+      titleFontStyle = config.options.tooltips.titleFontStyle ||
+        ((ChartJs.defaults[config.type] || {}).tooltips || {}).titleFontStyle || ChartJs.defaults.global.tooltips.titleFontStyle ||
+        ChartJs.defaults.global.defaultFontStyle,
+      titleFontSize = config.options.tooltips.titleFontSize ||
+        ((ChartJs.defaults[config.type] || {}).tooltips || {}).titleFontSize || ChartJs.defaults.global.tooltips.titleFontSize ||
+        ChartJs.defaults.global.defaultFontSize,
+      titleFontFamily = config.options.tooltips.titleFontFamily ||
+        ((ChartJs.defaults[config.type] || {}).tooltips || {}).titleFontFamily || ChartJs.defaults.global.tooltips.titleFontFamily ||
+        ChartJs.defaults.global.defaultFontFamily,
+      result = [];
+    ctx.font = titleFontStyle + ' ' + titleFontSize + 'px ' + titleFontFamily;
+    arrays.ensure(title).forEach(titleLine => result.push(strings.truncateText(titleLine, horizontalSpace, measureText)));
+    ctx.font = oldFont;
+    return result;
   }
 
   _formatTooltipLabel(tooltipItem, data) {
     let config = this.chartJs.config,
-      dataset = ((data || {}).datasets || [])[tooltipItem.datasetIndex];
+      ctx = this.chartJs.ctx,
+      dataset = ((data || {}).datasets || [])[tooltipItem.datasetIndex],
+      label, value;
     if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR)) {
-      return ' ' + dataset.label + ': ' + this._formatLabel(dataset.data[tooltipItem.index]);
+      label = dataset.label;
+      value = this._formatLabel(dataset.data[tooltipItem.index]);
+    } else if (config.type === Chart.Type.BUBBLE) {
+      label = dataset.label;
+      value = this._formatLabel(dataset.data[tooltipItem.index].r / (config.bubble.bubbleScalingFactor || 1));
+    } else {
+      let defaultLabel = (((ChartJs.defaults[config.type] || {}).tooltips || {}).callbacks || {}).label || ChartJs.defaults.global.tooltips.callbacks.label;
+      label = defaultLabel.call(this.chartJs, tooltipItem, data);
     }
-    if (config.type === Chart.Type.BUBBLE) {
-      return ' ' + dataset.label + ': ' + this._formatLabel(dataset.data[tooltipItem.index].r / (config.bubble.bubbleScalingFactor || 1));
+    label = ' ' + label;
+    value = value ? ' ' + value : '';
+    let colorRectSize = config.options.tooltips.displayColors ? config.options.tooltips.bodyFontSize ||
+      ((ChartJs.defaults[config.type] || {}).tooltips || {}).bodyFontSize || ChartJs.defaults.global.tooltips.bodyFontSize ||
+      ChartJs.defaults.global.defaultFontSize : 0,
+      horizontalSpace = this.$canvas.cssWidth() - (2 * config.options.tooltips.xPadding) - colorRectSize,
+      measureText = ctx.measureText.bind(ctx),
+      result = label + (value ? ':' + value : '');
+    if (measureText(result).width > horizontalSpace) {
+      if (measureText(value).width > horizontalSpace / 2) {
+        return strings.truncateText(value, horizontalSpace, measureText);
+      }
+      return strings.truncateText(label, horizontalSpace - measureText(value ? ':' + value : '').width, measureText) + (value ? ':' + value : '');
     }
-    let defaultLabel = (((ChartJs.defaults[config.type] || {}).tooltips || {}).callbacks || {}).label || ChartJs.defaults.global.tooltips.callbacks.label;
-    return ' ' + defaultLabel.call(this.chartJs, tooltipItem, data);
+    return result;
   }
 
   _computeTooltipLabelColor(tooltipItem, chart) {

@@ -371,6 +371,34 @@ export function removeSuffix(string, suffix) {
   return s;
 }
 
+/**
+ * Truncates the given text and appends '...' so it fits into the given horizontal space.
+ * @param {string} text the text to be truncated
+ * @param {number} horizontalSpace the horizontal space the text needs to fit into
+ * @param {function} measureText a function that measures the span of a text, it needs to return an object containing a 'width' property.
+ * @return {string} the truncated text
+ */
+export function truncateText(text, horizontalSpace, measureText) {
+  if (text && horizontalSpace && measureText && horizontalSpace > 0 && measureText(text).width > horizontalSpace) {
+    text = text.trim();
+    if (measureText(text).width <= horizontalSpace) {
+      return text;
+    }
+    let upperBound = text.length, // exclusive
+      lowerBound = 0; // inclusive
+    while (lowerBound + 1 < upperBound) {
+      let textLength = Math.round((upperBound + lowerBound) / 2);
+      if (measureText(text.slice(0, textLength) + '...').width > horizontalSpace) {
+        upperBound = textLength;
+      } else {
+        lowerBound = textLength;
+      }
+    }
+    return text.slice(0, lowerBound).trim() + '...';
+  }
+  return text;
+}
+
 export default {
   asString,
   box,
@@ -398,5 +426,6 @@ export default {
   splitMax,
   startsWith,
   toUpperCaseFirstLetter,
+  truncateText,
   uppercaseFirstLetter
 };
