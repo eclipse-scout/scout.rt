@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +67,11 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
   @Override
   protected double getConfiguredGridWeightY() {
     return 1;
+  }
+
+  @Override
+  protected int getConfiguredGridH() {
+    return UserAgentUtility.isMobileDevice() ? 11 : 9;
   }
 
   @Override

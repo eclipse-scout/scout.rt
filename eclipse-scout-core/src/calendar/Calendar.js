@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CalendarComponent, CalendarLayout, CalendarListComponent, DateRange, dates, GroupBox, HtmlComponent, KeyStrokeContext, menus, objects, scout, scrollbars, strings, Widget} from '../index';
+import {
+  CalendarComponent,
+  CalendarLayout,
+  CalendarListComponent,
+  DateRange,
+  dates,
+  Device,
+  GroupBox,
+  HtmlComponent,
+  KeyStrokeContext,
+  menus,
+  objects,
+  scout,
+  scrollbars,
+  strings,
+  Widget
+} from '../index';
 import $ from 'jquery';
 
 export default class Calendar extends Widget {
@@ -252,16 +268,20 @@ export default class Calendar extends Widget {
     let layout = new CalendarLayout(this);
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(layout);
+    let isMobile = Device.get().type === Device.Type.MOBILE;
 
     // main elements
     this.$header = this.$container.appendDiv('calendar-header');
+    this.$header.toggleClass('mobile', isMobile);
     this.$headerRow1 = this.$header.appendDiv('calendar-header-row first');
     this.$headerRow2 = this.$header.appendDiv('calendar-header-row last');
     this._yearPanel.render();
 
     this.$grids = this.$container.appendDiv('calendar-grids');
     this.$topGrid = this.$grids.appendDiv('calendar-top-grid');
+    this.$topGrid.toggleClass('mobile', isMobile);
     this.$grid = this.$grids.appendDiv('calendar-grid');
+    this.$grid.toggleClass('mobile', isMobile);
 
     this.$list = this.$container.appendDiv('calendar-list-container').appendDiv('calendar-list');
     this.$listTitle = this.$list.appendDiv('calendar-list-title');
@@ -446,6 +466,7 @@ export default class Calendar extends Widget {
   }
 
   _calcSelectedDate(direction) {
+    // noinspection UnnecessaryLocalVariableJS
     let p = this._dateParts(this.selectedDate),
       dayOperand = direction,
       weekOperand = direction * 7,
@@ -647,7 +668,8 @@ export default class Calendar extends Widget {
       $topSelected = $('.selected', this.$topGrid),
       containerW = this.$container.width(),
       gridH = this.$grid.height(),
-      gridW = containerW - 20; // containerW - @root-group-box-padding-right
+      gridPaddingX = this.$grid.innerWidth() - this.$grid.width(),
+      gridW = containerW - gridPaddingX;
 
     // show or hide year
     $('.calendar-toggle-year', this.$commands).select(this._showYearPanel);
