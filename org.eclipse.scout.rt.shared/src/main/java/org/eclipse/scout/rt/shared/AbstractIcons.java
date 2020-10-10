@@ -16,6 +16,7 @@ import java.io.Serializable;
  * See also icons.css.
  */
 //SONAR:OFF
+@SuppressWarnings("FieldNamingConvention")
 public abstract class AbstractIcons implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -72,6 +73,10 @@ public abstract class AbstractIcons implements Serializable {
   public static final String StarSolid = "font:\uE033";
   public static final String PersonSolid = "font:\uE034";
   public static final String Remove = "font:\uE035";
+  public static final String ExpandAll = "font:\uE036";
+  public static final String CollapseAll = "font:\uE037";
+  public static final String Min = "font:\uE038";
+  public static final String Max = "font:\uE039";
   public static final String EllipsisVBold = "font:\uE040";
   public static final String EllipsisV = "font:\uE041";
   public static final String Search = "font:\uE02A";

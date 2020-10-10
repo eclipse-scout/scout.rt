@@ -64,8 +64,10 @@ const AVG = 'font:\uE03A';
 const AVG_BOLD = 'font:\uE026';
 const MAX = 'font:\uE039';
 const MAX_BOLD = 'font:\uE027';
-const MIN = 'font:\uE037';
+const MIN = 'font:\uE038';
 const MIN_BOLD = 'font:\uE028';
+const EXPAND_ALL = 'font:\uE036';
+const COLLAPSE_ALL = 'font:\uE037';
 const COLLAPSE = 'font:\uE600';
 const ELLIPSIS_V_BOLD = 'font:\uE040';
 const ELLIPSIS_V = 'font:\uE041';
@@ -266,6 +268,8 @@ export default {
   MINUS,
   MINUS_BOLD,
   MIN_BOLD,
+  EXPAND_ALL,
+  COLLAPSE_ALL,
   PENCIL,
   PENCIL_BOLD,
   PENCIL_SOLID,
