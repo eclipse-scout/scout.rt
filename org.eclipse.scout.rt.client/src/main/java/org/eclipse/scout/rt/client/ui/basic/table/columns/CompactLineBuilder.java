@@ -31,7 +31,7 @@ public class CompactLineBuilder {
     this(null);
   }
 
-  public void clearCache() {
+  public void prepare() {
     m_cachedColumn = null;
   }
 

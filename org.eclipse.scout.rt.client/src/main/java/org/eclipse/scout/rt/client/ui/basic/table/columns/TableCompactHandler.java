@@ -38,8 +38,11 @@ import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TableCompactHandler implements ITableCompactHandler {
+  private static final Logger LOG = LoggerFactory.getLogger(TableCompactHandler.class);
   private ITable m_table;
   private TableListener m_tableListener;
   private Map<String, Object> m_oldStates;
@@ -216,8 +219,9 @@ public class TableCompactHandler implements ITableCompactHandler {
    */
   @Override
   public List<IColumn<?>> getColumns() {
+    m_beanBuilder.prepare();
     for (CompactLineBuilder builder : getBuilders()) {
-      builder.clearCache();
+      builder.prepare();
     }
 
     List<IColumn<?>> columns = getTable().getColumns().stream()
@@ -500,7 +504,9 @@ public class TableCompactHandler implements ITableCompactHandler {
       if (ObjectUtility.isOneOf(e.getType(), TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED, TableEvent.TYPE_COLUMN_HEADERS_UPDATED)) {
         rows = getTable().getRows();
       }
+      long time = System.currentTimeMillis();
       updateValues(rows);
+      LOG.debug("Event {} handled. Updating values took {}ms for {} rows.", e.getType(), System.currentTimeMillis() - time, rows.size());
     }
   }
 

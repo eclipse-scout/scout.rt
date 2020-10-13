@@ -23,5 +23,12 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
  * or by accessing the desired columns directly using the named column getters of the table.
  */
 public interface CompactBeanBuilder extends BiFunction<List<IColumn<?>>, ITableRow, CompactBean> {
-  // DO NOT add methods so that it can be used as lambda
+  // DO NOT add methods without default implementation so that it can be used as lambda
+
+  /**
+   * Called before any row is processed. May be used to prepare general data.
+   */
+  default void prepare() {
+    // NOP
+  }
 }
