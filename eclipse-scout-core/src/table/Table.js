@@ -361,9 +361,12 @@ export default class Table extends Widget {
   _createLoadingSupport() {
     return new LoadingSupport({
       widget: this,
-      $container: function() {
+      $container: () => {
+        if (this.$container.hasClass('knight-rider-loading')) {
+          return this.$container;
+        }
         return this.$data;
-      }.bind(this)
+      }
     });
   }
 

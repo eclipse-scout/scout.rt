@@ -252,6 +252,29 @@
     }
   }
 
+  .loading-indicator-knight-rider() {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    opacity: 0;
+    animation: fade-in 1s forwards, slideout-right 1.5s ease-in-out infinite alternate;
+    animation-delay: 0.5s;
+
+    &::before {
+      animation: slideout-left 1.5s ease-in-out infinite alternate;
+      animation-delay: 0.5s;
+      content: '';
+      position: absolute;
+      background: linear-gradient(to right, transparent 0%, @loading-indicator-knight-rider-color 20%, @loading-indicator-knight-rider-color 80%, transparent 100%);
+      left: 0;
+      width: 50px;
+      height: 100%;
+    }
+  }
+
   .user-select(@mode) {
     -webkit-user-select: @mode;
     -moz-user-select: @mode;

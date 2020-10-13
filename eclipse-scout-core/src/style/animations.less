@@ -290,6 +290,22 @@
     .keyframes-slideout-right();
   }
 
+  /*** Slide Out Left ***
+       Moves the element out of left screen border */
+
+  .keyframes-slideout-left() {
+    100% {
+      #scout.transform(translateX(-100%));
+    }
+  }
+
+  @-webkit-keyframes slideout-left {
+    .keyframes-slideout-left();
+  }
+  @keyframes slideout-left {
+    .keyframes-slideout-left();
+  }
+
   /*** Grow Y ***
     Scales the element along the y axis until 1. Expects the element to be scaled (e.g. scaleY(0)) when the animation starts.
     To create a slide down animation (as known from jQuery) set transform-origin to top. */

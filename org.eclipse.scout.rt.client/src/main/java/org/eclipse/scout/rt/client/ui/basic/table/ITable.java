@@ -274,6 +274,12 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   String PROP_CLIENT_UI_PREFERENCES_ENABLED = "clientUiPreferencesEnabled";
 
   /**
+   * Alternative loading style. Adds a decent loading animation at the top of the table. To enable it, add this css
+   * class and then activate the loading using {@link #setLoading(boolean)}.
+   */
+  String KNIGHT_RIDER_LOADING = "knight-rider-loading";
+
+  /**
    * @since 5.1.0
    */
   AbstractEventBuffer<TableEvent> createEventBuffer();

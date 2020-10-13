@@ -149,8 +149,10 @@
     opacity: 1;
     transition: opacity @loading-fade-duration;
   }
+}
 
-  &.loading {
+.table {
+  &:not(.knight-rider-loading) > .table-data.loading {
     & > .table-row,
     & > .table-data-fill,
     & > .scrollbar {
@@ -160,6 +162,10 @@
     & > .loading-indicator {
       #scout.loading-indicator();
     }
+  }
+
+  &.knight-rider-loading > .loading-indicator {
+    #scout.loading-indicator-knight-rider;
   }
 }
 
