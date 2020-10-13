@@ -1330,4 +1330,12 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    */
   void setTableTileGridMediator(ITableTileGridMediator mediator);
 
+  /**
+   * Immediately fires all pending events which have been buffered because the table has previously been marked as
+   * changing with {@link #setTableChanging(boolean)}. <br>
+   * After firing the events the table changing count will be restored to the previous value so that upcoming events
+   * will still be buffered. <br>
+   * <b>Caution</b>: use this with care because it should only be necessary in very rare cases.
+   */
+  void firePendingEvents();
 }

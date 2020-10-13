@@ -1918,6 +1918,18 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   @Override
+  public void firePendingEvents() {
+    int tableChanging = m_tableChanging;
+    for (int i = 0; i < tableChanging; i++) {
+      setTableChanging(false);
+    }
+    // Restore previous changing count so that upcoming events will be buffered again
+    for (int i = 0; i < tableChanging; i++) {
+      setTableChanging(true);
+    }
+  }
+
+  @Override
   public List<IKeyStroke> getKeyStrokes() {
     return CollectionUtility.arrayList(getKeyStrokesInternal());
   }
