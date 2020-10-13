@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.jackson.dataobject.JacksonDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.rest.RestApplication;
+import org.eclipse.scout.rt.rest.RestApplicationContributors.ContextResolverContributor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,7 +25,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * <p>
  * This class is intended to be registered in a REST application class.
  *
- * @see RestApplication#registerContextResolver()
+ * @see RestApplication
+ * @see ContextResolverContributor
  */
 @Bean
 public class ObjectMapperResolver implements ContextResolver<ObjectMapper> {
