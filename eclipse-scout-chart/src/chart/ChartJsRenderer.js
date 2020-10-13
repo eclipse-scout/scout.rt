@@ -311,16 +311,23 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       config.data.labels = newLabels;
       config.data.maxSegmentsExceeded = true;
     }
-    if (config.type === Chart.Type.BUBBLE && !(config.bubble || {}).bubbleScalingFactor) {
-      let maxR = this._computeMaxMinValue(config.data.datasets, 'r', true).maxValue,
-        bubbleScalingFactor = 1;
-      if (maxR > 0 && (config.bubble || {}).sizeOfLargestBubble) {
-        bubbleScalingFactor = Math.min(config.bubble.sizeOfLargestBubble, Math.floor(this.$canvas.cssWidth() / 8), Math.floor(this.$canvas.cssHeight() / 6)) / maxR;
-        config.data.datasets.forEach(dataset => dataset.data.forEach(data => {
-          data.r = data.r * bubbleScalingFactor;
-        }));
+    if (config.type === Chart.Type.BUBBLE) {
+      config.data.datasets.forEach(dataset => dataset.data.forEach(data => {
+        if (isNaN(data.r) && !isNaN(data.z)) {
+          data.r = Math.sqrt(data.z);
+        }
+      }));
+      if (!(config.bubble || {}).bubbleScalingFactor) {
+        let maxR = this._computeMaxMinValue(config.data.datasets, 'r', true).maxValue,
+          bubbleScalingFactor = 1;
+        if (maxR > 0 && (config.bubble || {}).sizeOfLargestBubble) {
+          bubbleScalingFactor = Math.min(config.bubble.sizeOfLargestBubble, Math.floor(this.$canvas.cssWidth() / 8), Math.floor(this.$canvas.cssHeight() / 6)) / maxR;
+          config.data.datasets.forEach(dataset => dataset.data.forEach(data => {
+            data.r = data.r * bubbleScalingFactor;
+          }));
+        }
+        config.bubble = $.extend(true, {}, config.bubble, {bubbleScalingFactor: bubbleScalingFactor});
       }
-      config.bubble = $.extend(true, {}, config.bubble, {bubbleScalingFactor: bubbleScalingFactor});
     }
   }
 
@@ -503,7 +510,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _fitYAxis(yAxis) {
     if (yAxis && yAxis.longestLabelWidth > yAxis.maxWidth - (((yAxis.options || {}).ticks || {}).padding || 0)) {
-      let horizontalSpace = yAxis.maxWidth - (((yAxis.options || {}).ticks || {}).padding || 0),
+      let horizontalSpace = yAxis.maxWidth - (((yAxis.options || {}).ticks || {}).padding || 0) - (((yAxis.options || {}).gridLines || {}).tickMarkLength || 0),
         measureText = yAxis.ctx.measureText.bind(yAxis.ctx);
       yAxis._ticks.forEach(tick => {
         tick.label = strings.truncateText(tick.label, horizontalSpace, measureText);
@@ -544,7 +551,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _formatDatalabels(value, context) {
     if (context.chart.config.type === Chart.Type.BUBBLE) {
-      return this._formatLabel(value.r / (context.chart.config.bubble.bubbleScalingFactor || 1));
+      return this._formatLabel(Math.pow(value.r / (context.chart.config.bubble.bubbleScalingFactor || 1), 2));
     }
     return this._formatLabel(value);
   }
@@ -812,7 +819,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       value = this._formatLabel(dataset.data[tooltipItem.index]);
     } else if (config.type === Chart.Type.BUBBLE) {
       label = dataset.label;
-      value = this._formatLabel(dataset.data[tooltipItem.index].r / (config.bubble.bubbleScalingFactor || 1));
+      value = this._formatLabel(Math.pow(dataset.data[tooltipItem.index].r / (config.bubble.bubbleScalingFactor || 1), 2));
     } else {
       let defaultLabel = (((ChartJs.defaults[config.type] || {}).tooltips || {}).callbacks || {}).label || ChartJs.defaults.global.tooltips.callbacks.label;
       label = defaultLabel.call(this.chartJs, tooltipItem, data);
