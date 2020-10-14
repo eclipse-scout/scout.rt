@@ -90,7 +90,7 @@
     <jetty.version>9.4.14.v20181114</jetty.version>
     <slf4j.version>1.7.25</slf4j.version>
     <jackson.version>2.9.10</jackson.version>
-    <jackson-databind.version>2.9.10.5</jackson-databind.version>
+    <jackson-databind.version>2.9.10.6</jackson-databind.version>
     <batik.version>1.10</batik.version>
     <activemq.version>5.15.13</activemq.version>
     <artemis.version>2.6.3</artemis.version>
