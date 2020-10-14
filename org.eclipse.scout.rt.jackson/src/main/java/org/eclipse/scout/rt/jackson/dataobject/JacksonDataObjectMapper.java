@@ -143,6 +143,7 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
     prepareScoutDataModuleContext(scoutDataObjectModule.getModuleContext());
     om.registerModule(scoutDataObjectModule);
     om.setDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN)); // FIXME [9.0] pbz: [JSON] check if it can be moved to ScoutDataObjectModule class
+    om.disableDefaultTyping(); // disabled for security reasons
     return om;
   }
 
