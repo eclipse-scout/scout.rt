@@ -10,24 +10,37 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import java.util.Collection;
+
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.Bean;
 
+import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper.DefaultTypeResolverBuilder;
-import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder;
 
 @Bean
-public class DataObjectTypeResolverBuilder extends DefaultTypeResolverBuilder {
-  private static final long serialVersionUID = 1L;
+public class DataObjectTypeResolverBuilder extends StdTypeResolverBuilder {
 
-  public DataObjectTypeResolverBuilder() {
-    super(DefaultTyping.NON_FINAL, LaissezFaireSubTypeValidator.instance);
+  @Override
+  public TypeDeserializer buildTypeDeserializer(DeserializationConfig config,
+                                                JavaType baseType, Collection<NamedType> subtypes)
+  {
+    return useForType(baseType) ? super.buildTypeDeserializer(config, baseType, subtypes) : null;
   }
 
   @Override
-  public boolean useForType(JavaType t) {
+  public TypeSerializer buildTypeSerializer(SerializationConfig config,
+                                            JavaType baseType, Collection<NamedType> subtypes)
+  {
+    return useForType(baseType) ? super.buildTypeSerializer(config, baseType, subtypes) : null;
+  }
+
+  protected boolean useForType(JavaType t) {
     // do not write type information for "raw" DoEntity instances (only concrete instances, without IDoEntity marker interface)
     return !DoEntity.class.equals(t.getRawClass());
   }
