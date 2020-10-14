@@ -46,6 +46,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.type.TypeFactory;
+
 /**
  * Various test cases with requires a real jackson serializer/deserializer for testing
  */
@@ -196,5 +198,17 @@ public class JacksonDataObjectMapperTest {
 
     DoEntityHolder<TestCustomImplementedEntityDo> holderClone = CloneUtility.createDeepCopyBySerializing(holder);
     assertEqualsWithComparisonFailure(holder.getValue(), holderClone.getValue());
+  }
+
+  @Test
+  @SuppressWarnings("deprecation")
+  public void testDisabledDefaultTyping() {
+    assertNull(m_mapper.getObjectMapper().getSerializationConfig().getDefaultTyper(null));
+    assertNull(m_mapper.getObjectMapper().getSerializationConfig().getDefaultTyper(TypeFactory.defaultInstance().constructType(DoEntity.class)));
+    assertNull(m_mapper.getObjectMapper().getSerializationConfig().getDefaultTyper(TypeFactory.defaultInstance().constructType(Object.class)));
+
+    assertNull(m_mapper.getObjectMapper().getDeserializationConfig().getDefaultTyper(null));
+    assertNull(m_mapper.getObjectMapper().getDeserializationConfig().getDefaultTyper(TypeFactory.defaultInstance().constructType(DoEntity.class)));
+    assertNull(m_mapper.getObjectMapper().getDeserializationConfig().getDefaultTyper(TypeFactory.defaultInstance().constructType(Object.class)));
   }
 }
