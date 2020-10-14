@@ -34,9 +34,9 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.activemq:activemq-client:5.16.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.fusesource.hawtbuf:hawtbuf:1.11" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.geronimo.specs:geronimo-j2ee-management_1.1_spec:1.0.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.11.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.11.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-core:2.11.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.11.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.11.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-core:2.11.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.activemq:artemis-jms-client:2.15.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.activemq:artemis-core-client:2.15.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jgroups:jgroups:3.6.13.Final" level="project" />

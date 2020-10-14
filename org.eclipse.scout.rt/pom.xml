@@ -105,8 +105,8 @@
     <org.eclipse.scout.rt.version>${project.version}</org.eclipse.scout.rt.version>
     <jetty.version>9.4.31.v20200723</jetty.version>
     <slf4j.version>1.7.30</slf4j.version>
-    <jackson.version>2.11.2</jackson.version>
-    <jackson-databind.version>2.11.2</jackson-databind.version>
+    <jackson.version>2.11.3</jackson.version>
+    <jackson-databind.version>2.11.3</jackson-databind.version>
     <batik.version>1.13</batik.version>
     <activemq.version>5.16.0</activemq.version>
     <artemis.version>2.15.0</artemis.version>
