@@ -75,7 +75,7 @@ export default class DateColumn extends Column {
   /**
    * @override Columns.js
    */
-  _formatValue(value) {
+  _formatValue(value, row) {
     return this.format.format(value);
   }
 

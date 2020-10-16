@@ -65,7 +65,7 @@ export default class NumberColumn extends Column {
   /**
    * @override Columns.js
    */
-  _formatValue(value) {
+  _formatValue(value, row) {
     return this.decimalFormat.format(value);
   }
 

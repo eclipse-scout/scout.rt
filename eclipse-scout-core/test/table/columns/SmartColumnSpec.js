@@ -138,4 +138,92 @@ describe('SmartColumn', () => {
     table.rows.forEach(row => expect(row.cells[0].text).toEqual(valueMap[row.cells[0].value]));
   });
 
+  /**
+   * Makes sure the prepareLookupCall event contains a property 'row'.
+   */
+  it('prepareLookupCall event contains a property row', () => {
+    let table = helper.createTable({
+      columns: [{
+        objectType: 'SmartColumn',
+        mandatory: true
+      }]
+    });
+    let column = table.columns[0];
+
+    let lookupCall = scout.create('LookupCall', {session: session, batch: true});
+    column.setLookupCall(lookupCall);
+
+    let cell0 = new Cell();
+    let value0 = 7;
+    cell0.setText('Foo');
+    cell0.setValue(value0);
+    cell0.setEditable(true);
+    let cell1 = new Cell();
+    let value1 = 9;
+    cell1.setText('Bar');
+    cell1.setValue(value1);
+    cell1.setEditable(true);
+
+    table.insertRows([
+      {cells: [cell0]},
+      {cells: [cell1]}
+    ]);
+
+    let field = column.createEditor(table.rows[1]);
+
+    column.on('prepareLookupCall', event => {
+      event.row.cells[0].value += 1;
+    });
+    field.trigger('prepareLookupCall', {
+      lookupCall: lookupCall
+    });
+
+    jasmine.clock().tick(500);
+    expect(table.rows[0].cells[0].value).toEqual(value0);
+    expect(table.rows[1].cells[0].value).toEqual(value1 + 1);
+  });
+
+  /**
+   * The LookupCall must trigger a prepareLookupCall event.
+   */
+  it('must trigger a prepareLookupCall event.', () => {
+    let table = helper.createTable({
+      columns: [{
+        objectType: 'SmartColumn'
+      }]
+    });
+
+    let lookupCall = scout.create('LookupCall', {session: session, batch: true});
+    table.columns[0].setLookupCall(lookupCall);
+
+    let counter = 0;
+    let rowAvailable;
+    table.columns[0].on('prepareLookupCall', event => {
+      counter++;
+      expect(event.type).toBe('prepareLookupCall');
+      expect(event.source).toBe(table.columns[0]);
+      rowAvailable = event.row;
+    });
+
+    let valueMap = {key1: 'Value 1', key2: 'Value 2', key3: 'Value 3'};
+    spyOn(lookupCall, 'textsByKeys').and.returnValue($.resolvedPromise(valueMap));
+    spyOn(lookupCall, 'textByKey').and.callFake(key => $.resolvedPromise(valueMap[key]));
+
+    let getRow = key => ({cells: [key]});
+
+    lookupCall.batch = false;
+    table.insertRows(Object.keys(valueMap).map(getRow));
+    jasmine.clock().tick(500);
+    expect(counter).toBe(3); // Key lookups
+    expect(rowAvailable).not.toBe(undefined);
+
+    counter = 0;
+    lookupCall.batch = true;
+    table.deleteAllRows();
+    table.insertRows(Object.keys(valueMap).map(getRow));
+    table.render();
+    jasmine.clock().tick(500);
+    expect(counter).toBe(1); // Only one prepareLookup event should be triggered when doing batch lookups
+    expect(rowAvailable).toBe(undefined);
+  });
 });

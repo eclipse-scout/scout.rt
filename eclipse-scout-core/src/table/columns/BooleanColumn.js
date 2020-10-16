@@ -29,7 +29,7 @@ export default class BooleanColumn extends Column {
   /**
    * @override
    */
-  _formatValue(value) {
+  _formatValue(value, row) {
     // cell renders a checkbox, text is not visible
     return null;
   }

@@ -33,7 +33,7 @@ export default class IconColumn extends Column {
   /**
    * @override
    */
-  _formatValue(value) {
+  _formatValue(value, row) {
     // only display icon, no text
     return null;
   }

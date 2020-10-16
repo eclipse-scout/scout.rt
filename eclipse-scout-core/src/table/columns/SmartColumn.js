@@ -11,6 +11,14 @@
 import {Column, LookupCall, LookupRow, scout, SmartField, strings} from '../../index';
 import objects from '../../util/objects';
 
+/**
+ * Column where each cell fetches its value using a lookup call.
+ *
+ * A 'prepareLookupCall' event gets triggered before executing the lookup call and contains two properties, 'lookupCall' and 'row'. Here, 'lookupCall' is the
+ * lookup call which is used to fetch one ore more values for a cell. 'row' is the row containing the cell and usually corresponds to the selected row.
+ * It should be used instead of the property selectedRows from Table.js which must not be used here.
+ * 'row' can be null or undefined in some cases. Hence some care is needed when listening to this event.
+ */
 export default class SmartColumn extends Column {
 
   constructor() {
@@ -83,7 +91,7 @@ export default class SmartColumn extends Column {
     this.activeFilterEnabled = activeFilterEnabled;
   }
 
-  _formatValue(value) {
+  _formatValue(value, row) {
     if (!this.lookupCall) {
       return strings.nvl(value) + '';
     }
@@ -92,7 +100,13 @@ export default class SmartColumn extends Column {
       return this._batchFormatValue(value);
     }
 
-    return this.lookupCall.textByKey(value);
+    let lookupCall = this.lookupCall.clone();
+    this.trigger('prepareLookupCall', {
+      lookupCall: lookupCall,
+      row: row
+    });
+
+    return lookupCall.textByKey(value);
   }
 
   /**
@@ -118,8 +132,13 @@ export default class SmartColumn extends Column {
         // reset batch context for next batch run
         this._lookupCallBatchContext = null;
 
+        let lookupCall = this.lookupCall.clone();
+        this.trigger('prepareLookupCall', {
+          lookupCall: lookupCall
+        });
+
         // batch lookup texts
-        this.lookupCall.textsByKeys(Object.keys(currentBatchContext.keySet))
+        lookupCall.textsByKeys(Object.keys(currentBatchContext.keySet))
           .then(textMap => batchResult.resolve(textMap)) // resolve result in current batch context
           .catch(e => batchResult.reject(e)); // reject any errors
       });
@@ -149,11 +168,11 @@ export default class SmartColumn extends Column {
     field.setLookupRow(lookupRow);
   }
 
-  _createEditor() {
+  _createEditor(row) {
     let field = scout.create('SmartField', {
       parent: this.table,
       codeType: this.codeType,
-      lookupCall: this.lookupCall,
+      lookupCall: this.lookupCall ? this.lookupCall.clone() : null,
       browseHierarchy: this.browseHierarchy,
       browseMaxRowCount: this.browseMaxRowCount,
       browseAutoExpandAll: this.browseAutoExpandAll,
@@ -163,7 +182,8 @@ export default class SmartColumn extends Column {
 
     field.on('prepareLookupCall', event => {
       this.trigger('prepareLookupCall', {
-        lookupCall: event.lookupCall
+        lookupCall: event.lookupCall,
+        row: row
       });
     });
     field.on('lookupCallDone', event => {

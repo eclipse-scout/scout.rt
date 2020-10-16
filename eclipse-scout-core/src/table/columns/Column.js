@@ -182,7 +182,7 @@ export default class Column {
       return;
     }
 
-    let returned = this._formatValue(value);
+    let returned = this._formatValue(value, row);
     if (returned && $.isFunction(returned.promise)) {
       // Promise is returned -> set display text later
       this.setCellTextDeferred(returned, row, cell);
@@ -191,7 +191,7 @@ export default class Column {
     }
   }
 
-  _formatValue(value) {
+  _formatValue(value, row) {
     return scout.nvl(value, '');
   }
 
