@@ -405,11 +405,12 @@ export function scrollTop($scrollable, scrollTop, options) {
     scrollbarElement.notifyBeforeScroll();
   }
 
+  if (options.stop) {
+    $scrollable.stop('scroll');
+  }
+
   // Not animated
   if (!options.animate) {
-    if (options.stop) {
-      $scrollable.stop('scroll');
-    }
     $scrollable.scrollTop(scrollTop);
     if (scrollbarElement) {
       scrollbarElement.notifyAfterScroll();
@@ -418,7 +419,7 @@ export function scrollTop($scrollable, scrollTop, options) {
   }
 
   // Animated
-  animateScrollTop($scrollable, scrollTop, options);
+  animateScrollTop($scrollable, scrollTop);
   $scrollable.promise('scroll').always(() => {
     if (scrollbarElement) {
       scrollbarElement.notifyAfterScroll();
@@ -440,11 +441,12 @@ export function scrollLeft($scrollable, scrollLeft, options) {
     scrollbarElement.notifyBeforeScroll();
   }
 
+  if (options.stop) {
+    $scrollable.stop('scroll');
+  }
+
   // Not animated
   if (!options.animate) {
-    if (options.stop) {
-      $scrollable.stop('scroll');
-    }
     $scrollable.scrollLeft(scrollLeft);
     if (scrollbarElement) {
       scrollbarElement.notifyAfterScroll();
@@ -453,7 +455,7 @@ export function scrollLeft($scrollable, scrollLeft, options) {
   }
 
   // Animated
-  animateScrollLeft($scrollable, scrollLeft, options);
+  animateScrollLeft($scrollable, scrollLeft);
   $scrollable.promise('scroll').always(() => {
     if (scrollbarElement) {
       scrollbarElement.notifyAfterScroll();
@@ -461,10 +463,7 @@ export function scrollLeft($scrollable, scrollLeft, options) {
   });
 }
 
-export function animateScrollTop($scrollable, scrollTop, options) {
-  if (options.stop) {
-    $scrollable.stop('scroll');
-  }
+function animateScrollTop($scrollable, scrollTop) {
   $scrollable.animate({
     scrollTop: scrollTop
   }, {
@@ -473,10 +472,7 @@ export function animateScrollTop($scrollable, scrollTop, options) {
     .dequeue('scroll');
 }
 
-export function animateScrollLeft($scrollable, scrollLeft, options) {
-  if (options.stop) {
-    $scrollable.stop('scroll');
-  }
+function animateScrollLeft($scrollable, scrollLeft) {
   $scrollable.animate({
     scrollLeft: scrollLeft
   }, {
@@ -726,8 +722,6 @@ export function ensureExpansionVisible(parent) {
 }
 
 export default {
-  animateScrollLeft,
-  animateScrollTop,
   ensureExpansionVisible,
   fix,
   getScrollables,
