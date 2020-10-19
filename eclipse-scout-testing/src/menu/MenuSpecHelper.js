@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,30 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import $ from 'jquery';
-import {scout} from '@eclipse-scout/core';
+import {MenuSpecHelper} from '@eclipse-scout/core/src/testing/index';
 
-export default class MenuSpecHelper {
-  constructor(session) {
-    this.session = session;
-  }
-
-  createModel(text, iconId, menuTypes) {
-    var model = createSimpleModel('Menu', this.session);
-    $.extend(model, {
-      text: text,
-      iconId: iconId,
-      menuTypes: menuTypes,
-      visible: true
-    });
-    return model;
-  }
-
-  createMenu(model) {
-    model.objectType = model.objectType || 'Menu';
-    model.session = this.session;
-    model.parent = this.session.desktop;
-    return scout.create('Menu', model);
-  }
-}
-
+export default MenuSpecHelper;

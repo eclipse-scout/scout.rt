@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FieldStatus, scout, Status, StringField} from '../../../src/index';
-import {FormSpecHelper} from '@eclipse-scout/testing';
+import {FormSpecHelper} from '../../../src/testing/index';
 
 describe('FieldStatus', function() {
   var session, helper;

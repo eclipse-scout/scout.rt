@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {GroupBoxSpecHelper} from '@eclipse-scout/core/src/testing/index';
 
-export default class GroupBoxSpecHelper {
-  static assertGridData(x, y, w, h, gd) {
-    expect(gd.x).toEqual(x); // GridData[x]
-    expect(gd.y).toEqual(y); // GridData[y]
-    expect(gd.w).toEqual(w); // GridData[w]
-    expect(gd.h).toEqual(h); // GridData[h]
-  }
-}
+export default GroupBoxSpecHelper;

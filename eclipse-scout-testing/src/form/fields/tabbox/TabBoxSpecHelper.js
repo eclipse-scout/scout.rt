@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,49 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import $ from 'jquery';
-import {scout} from '@eclipse-scout/core';
+import {TabBoxSpecHelper} from '@eclipse-scout/core/src/testing/index';
 
-export default class TabBoxSpecHelper {
-
-  constructor(session) {
-    this.session = session;
-  }
-
-  createTabBoxWith2Tabs(model) {
-    model = $.extend({
-      tabItems: [{
-        objectType: 'TabItem',
-        label: 'first'
-      }, {
-        objectType: 'TabItem',
-        label: 'second'
-      }]
-    }, model);
-    return this.createTabBox(model);
-  }
-
-  createTabBoxWith(tabItems) {
-    tabItems = scout.nvl(tabItems, []);
-    return this.createTabBox({
-      tabItems: tabItems,
-      selectedTab: tabItems[0]
-    });
-  }
-
-  createTabBox(model) {
-    model = $.extend({
-      parent: this.session.desktop
-    }, model);
-
-    return scout.create('TabBox', model);
-  }
-
-  createTabItem(model) {
-    model = $.extend({
-      parent: this.session.desktop
-    }, model);
-    return scout.create('TabItem', model);
-  }
-
-}
+export default TabBoxSpecHelper;
