@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
@@ -149,9 +148,8 @@ public final class MOM {
    *          that destination. By default, {@link JsonMarshaller} is used.
    * @param <DTO>
    *          the type of the transfer object to be published.
-   * @see #newQueue(String)
-   * @see #newTopic(String)
    * @see #subscribe(Class, IDestination, IMessageListener)
+   * @see #newDestination(String, IDestinationType, IResolveMethod, Map)
    */
   public static <DTO> void publish(final Class<? extends IMomTransport> transport, final IDestination<DTO> destination, final DTO transferObject) {
     publish(transport, destination, transferObject, null);
@@ -173,9 +171,8 @@ public final class MOM {
    *          specifies how to publish the message.
    * @param <DTO>
    *          the type of the transfer object to be published.
-   * @see #newQueue(String)
-   * @see #newTopic(String)
    * @see #subscribe(Class, IDestination, IMessageListener)
+   * @see #newDestination(String, IDestinationType, IResolveMethod, Map)
    */
   public static <DTO> void publish(final Class<? extends IMomTransport> transport, final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) {
     BEANS.get(transport).publish(destination, transferObject, input != null ? input : newPublishInput());
@@ -199,6 +196,7 @@ public final class MOM {
    * @param <DTO>
    *          the type of the transfer object a subscription is created for.
    * @see #publish(Class, IDestination, Object)
+   * @see #newDestination(String, IDestinationType, IResolveMethod, Map)
    */
   public static <DTO> ISubscription subscribe(final Class<? extends IMomTransport> transport, final IDestination<DTO> destination, final IMessageListener<DTO> listener) {
     return subscribe(transport, destination, listener, null);
@@ -221,6 +219,7 @@ public final class MOM {
    * @param <DTO>
    *          the type of the transfer object a subscription is created for.
    * @see #publish(Class, IDestination, Object)
+   * @see #newDestination(String, IDestinationType, IResolveMethod, Map)
    */
   public static <DTO> ISubscription subscribe(final Class<? extends IMomTransport> transport, final IDestination<DTO> destination, final IMessageListener<DTO> listener, final SubscribeInput input) {
     return BEANS.get(transport).subscribe(destination, listener, input != null ? input : newSubscribeInput());
@@ -284,7 +283,8 @@ public final class MOM {
    *          the type of the request object
    * @param <REPLY>
    *          the type of the reply object
-   * @see {@link #reply(IDestination, IRequestListener, RunContext)}
+   * @see #reply(Class, IBiDestination, IRequestListener)
+   * @see #newBiDestination(String, IDestinationType, IResolveMethod, Map)
    */
   public static <REQUEST, REPLY> REPLY request(final Class<? extends IMomTransport> transport, final IBiDestination<REQUEST, REPLY> destination, final REQUEST requestObject) {
     return BEANS.get(transport).request(destination, requestObject, newPublishInput());
@@ -312,7 +312,7 @@ public final class MOM {
    * @param destination
    *          specifies the target of the message, and is either a queue (P2P) or topic (pub/sub). See {@link IMom}
    *          documentation for more information about the difference between topic and queue based messaging.
-   * @param transferObject
+   * @param requestObject
    *          specifies the transfer object to be sent to the destination.<br>
    *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
    *          that destination. By default, {@link JsonMarshaller} is used.
@@ -332,7 +332,8 @@ public final class MOM {
    *          the type of the request object
    * @param <REPLY>
    *          the type of the reply object
-   * @see #reply(IDestination, IRequestListener, RunContext)
+   * @see #reply(Class, IBiDestination, IRequestListener)
+   * @see #newBiDestination(String, IDestinationType, IResolveMethod, Map)
    */
   public static <REQUEST, REPLY> REPLY request(final Class<? extends IMomTransport> transport, final IBiDestination<REQUEST, REPLY> destination, final REQUEST requestObject, final PublishInput input) {
     return BEANS.get(transport).request(destination, requestObject, input);
@@ -358,7 +359,8 @@ public final class MOM {
    *          the type of the request object
    * @param <REPLY>
    *          the type of the reply object
-   * @see #request(IDestination, Object)
+   * @see #request(Class, IBiDestination, Object)
+   * @see #newBiDestination(String, IDestinationType, IResolveMethod, Map)
    */
   public static <REQUEST, REPLY> ISubscription reply(final Class<? extends IMomTransport> transport, final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener) {
     return reply(transport, destination, listener, null);
@@ -383,7 +385,8 @@ public final class MOM {
    *          the type of the request object
    * @param <REPLY>
    *          the type of the reply object
-   * @see #request(IDestination, Object)
+   * @see #request(Class, IBiDestination, Object)
+   * @see #newBiDestination(String, IDestinationType, IResolveMethod, Map)
    */
   public static <REQUEST, REPLY> ISubscription reply(final Class<? extends IMomTransport> transport, final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener,
       final SubscribeInput input) {
