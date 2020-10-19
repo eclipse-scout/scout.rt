@@ -88,7 +88,6 @@
 
     <module>../eclipse-scout-cli</module>
     <module>../eclipse-scout-core</module>
-    <module>../eclipse-scout-testing</module>
     <module>../karma-jasmine-scout</module>
     <module>../eslint-config</module>
 
@@ -547,11 +546,6 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>eclipse-scout-core</artifactId>
-        <version>11.0-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>eclipse-scout-testing</artifactId>
         <version>11.0-SNAPSHOT</version>
       </dependency>
       <dependency>

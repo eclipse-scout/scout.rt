@@ -40,7 +40,6 @@
   "devDependencies": {
     "@eclipse-scout/cli": "11.0.0-snapshot",
     "@eclipse-scout/releng": "^10.0.0",
-    "@eclipse-scout/testing": "11.0.0-snapshot",
     "karma": "5.2.2"
   },
   "dependencies": {

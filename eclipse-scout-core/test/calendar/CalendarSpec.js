@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Calendar, dates} from '../../src/index';
-import {CalendarSpecHelper} from '@eclipse-scout/testing';
+import {CalendarSpecHelper} from '../../src/testing/index';
 
 describe('Calendar', () => {
   let session, helper;

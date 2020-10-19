@@ -10,7 +10,7 @@
  */
 
 import {CompactColumn} from '../../src';
-import {TableSpecHelper} from '@eclipse-scout/testing';
+import {TableSpecHelper} from '../../src/testing/index';
 
 describe('TableCompactHandler', () => {
   let session, helper;

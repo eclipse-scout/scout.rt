@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableSpecHelper} from '@eclipse-scout/testing';
+import {TableSpecHelper} from '../../../src/testing/index';
 import Cell from '../../../src/cell/Cell';
 import arrays from '../../../src/util/arrays';
 
