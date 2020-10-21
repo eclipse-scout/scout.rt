@@ -27,16 +27,12 @@ import com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder;
 public class DataObjectTypeResolverBuilder extends StdTypeResolverBuilder {
 
   @Override
-  public TypeDeserializer buildTypeDeserializer(DeserializationConfig config,
-                                                JavaType baseType, Collection<NamedType> subtypes)
-  {
+  public TypeDeserializer buildTypeDeserializer(DeserializationConfig config, JavaType baseType, Collection<NamedType> subtypes) {
     return useForType(baseType) ? super.buildTypeDeserializer(config, baseType, subtypes) : null;
   }
 
   @Override
-  public TypeSerializer buildTypeSerializer(SerializationConfig config,
-                                            JavaType baseType, Collection<NamedType> subtypes)
-  {
+  public TypeSerializer buildTypeSerializer(SerializationConfig config, JavaType baseType, Collection<NamedType> subtypes) {
     return useForType(baseType) ? super.buildTypeSerializer(config, baseType, subtypes) : null;
   }
 
