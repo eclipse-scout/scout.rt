@@ -4348,6 +4348,8 @@ export default class Table extends Widget {
       let menuItems = this._filterMenus(this.menus, MenuDestinations.MENU_BAR, false, true, notAllowedTypes);
       menuItems = this.staticMenus.concat(menuItems);
       this.menuBar.setMenuItems(menuItems);
+    } else {
+      this.menuBar.setMenuItems([]);
     }
     if (this.contextMenu) {
       let contextMenuItems = this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true, false, ['Header']);

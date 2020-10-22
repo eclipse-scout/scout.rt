@@ -28,6 +28,7 @@ export default class MenuSpecHelper {
   }
 
   createMenu(model) {
+    model = model || {};
     model.objectType = model.objectType || 'Menu';
     model.session = this.session;
     model.parent = this.session.desktop;

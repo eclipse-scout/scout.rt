@@ -732,6 +732,7 @@ export default class GroupBox extends CompositeField {
     if (!this.menuBarVisible) {
       // Do not update menuBar while it is invisible, the menus may now be managed by another widget.
       // -> this makes sure the parent is not accidentally set to the group box, the other widget should remain responsible
+      this.menuBar.setMenuItems([]);
       return;
     }
     let menus = this.staticMenus

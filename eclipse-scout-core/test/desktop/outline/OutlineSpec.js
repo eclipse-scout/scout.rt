@@ -184,13 +184,13 @@ describe('Outline', () => {
       let outline = helper.createOutlineWithOneDetailTable();
       helper.setMobileFlags(outline);
       let node0 = outline.nodes[0];
-      node0.detailTable.menus = [
+      node0.detailTable.setMenus([
         menuHelper.createMenu({
           menuTypes: ['Table.SingleSelection']
         }), menuHelper.createMenu({
           menuTypes: ['Table.EmptySpace']
         })
-      ];
+      ]);
       expect(outline.detailMenuBarVisible).toBe(false);
       expect(outline.detailMenuBar.menuItems.length).toBe(0);
 
@@ -204,13 +204,13 @@ describe('Outline', () => {
       let outline = helper.createOutlineWithOneDetailTable();
       helper.setMobileFlags(outline);
       let node0 = outline.nodes[0];
-      node0.detailTable.menus = [
+      node0.detailTable.setMenus([
         menuHelper.createMenu({
           menuTypes: ['Table.SingleSelection']
         }), menuHelper.createMenu({
           menuTypes: ['Table.EmptySpace']
         })
-      ];
+      ]);
       expect(outline.detailMenuBarVisible).toBe(false);
       expect(outline.detailMenuBar.menuItems.length).toBe(0);
 
@@ -273,7 +273,7 @@ describe('Outline', () => {
       let emptySpaceMenu2 = menuHelper.createMenu({
         menuTypes: ['Table.EmptySpace']
       });
-      node0.detailTable.menus = [emptySpaceMenu];
+      node0.detailTable.setMenus([emptySpaceMenu]);
 
       // Select node -> empty space menus are active
       outline.selectNodes(node0);
@@ -323,6 +323,40 @@ describe('Outline', () => {
       outline.validateLayout();
     });
 
+    it('makes sure group box does not update the menu parent if menu visibility changes', () => {
+      let outline = helper.createOutlineWithOneDetailForm();
+      helper.setMobileFlags(outline);
+      outline.render();
+      let node0 = outline.nodes[0];
+      let menu0 = menuHelper.createMenu({
+        horizontalAlignment: 1,
+        visible: false
+      });
+      let menu1 = menuHelper.createMenu({
+        horizontalAlignment: 1
+      });
+      node0.detailForm.rootGroupBox.setMenus([menu0, menu1]);
+
+      outline.selectNodes(node0);
+      expect(outline.nodeMenuBar.menuItems.length).toBe(2);
+      expect(outline.nodeMenuBar.menuItems[0]).toBe(menu0);
+      expect(outline.nodeMenuBar.menuItems[0].parent).toBe(outline.nodeMenuBar.menuboxRight);
+      expect(outline.nodeMenuBar.menuItems[1]).toBe(menu1);
+      expect(outline.nodeMenuBar.menuItems[1].parent).toBe(outline.nodeMenuBar.menuboxRight);
+
+      menu0.setVisible(true);
+      // GroupBox MenuBar must not contain the menu items because they were moved to the nodeMenuBar
+      expect(node0.detailForm.rootGroupBox.menuBar.menuItems.length).toBe(0);
+      // Parents must not be changed
+      expect(outline.nodeMenuBar.menuItems[0].parent).toBe(outline.nodeMenuBar.menuboxRight);
+      expect(outline.nodeMenuBar.menuItems[1].parent).toBe(outline.nodeMenuBar.menuboxRight);
+      // Unfortunately this test case could not reproduce the exception we had in the real app
+      // The problem was that the menu item was removed due to relinking the parent, same as for the other test cases
+      // But we did not find the exact constellation to reproduce it.
+      // But the main problem was that the menuBar contained the menuItems even though they were moved to the nodeMenuBar
+      outline.validateLayout();
+    });
+
     it('does not fail if same menus are set again', () => {
       let outline = helper.createOutlineWithOneDetailTable();
       helper.setMobileFlags(outline);
@@ -334,7 +368,7 @@ describe('Outline', () => {
       let emptySpaceMenu2 = menuHelper.createMenu({
         menuTypes: ['Table.EmptySpace']
       });
-      node0.detailTable.menus = [emptySpaceMenu, emptySpaceMenu2];
+      node0.detailTable.setMenus([emptySpaceMenu, emptySpaceMenu2]);
 
       // Select node -> empty space menus are active
       outline.selectNodes(node0);
