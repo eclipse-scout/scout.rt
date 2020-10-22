@@ -49,14 +49,6 @@ export default class TextColumnUserFilter extends ColumnUserFilter {
   /**
    * @override
    */
-  _useTextInsteadOfNormValue(value) {
-    // null is valid, if for text columns. We do not want to store -empty-
-    return value !== null;
-  }
-
-  /**
-   * @override
-   */
   filterFieldsTitle() {
     return this.session.text('ui.FreeText');
   }

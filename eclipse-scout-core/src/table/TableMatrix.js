@@ -142,6 +142,18 @@ export default class TableMatrix {
       }
       return keyAxis.normTable[n];
     };
+    keyAxis.deterministicKeyToKey = deterministicKey => {
+      return keyAxis.norm(deterministicKey);
+    };
+    keyAxis.keyToDeterministicKey = key => {
+      if (key === null) {
+        return key;
+      }
+      return keyAxis.format(key);
+    };
+    keyAxis.normDeterministic = f => {
+      return keyAxis.keyToDeterministicKey(keyAxis.norm(f));
+    };
 
     // norm and format depends of datatype and group functionality
     if (axis instanceof DateColumn) {
@@ -222,6 +234,15 @@ export default class TableMatrix {
           return dates.format(new Date(n), locale, locale.dateFormatPatternDefault);
         };
       }
+      keyAxis.deterministicKeyToKey = deterministicKey => {
+        return deterministicKey;
+      };
+      keyAxis.keyToDeterministicKey = key => {
+        return key;
+      };
+      keyAxis.normDeterministic = f => {
+        return keyAxis.norm(f);
+      };
     } else if (axis instanceof NumberColumn) {
       keyAxis.norm = f => {
         if (isNaN(f) || f === null || f === '') {
@@ -234,6 +255,15 @@ export default class TableMatrix {
           return emptyCell;
         }
         return axis.decimalFormat.format(n);
+      };
+      keyAxis.deterministicKeyToKey = deterministicKey => {
+        return deterministicKey;
+      };
+      keyAxis.keyToDeterministicKey = key => {
+        return key;
+      };
+      keyAxis.normDeterministic = f => {
+        return keyAxis.norm(f);
       };
     } else if (axis instanceof BooleanColumn) {
       keyAxis.norm = f => {
@@ -248,8 +278,26 @@ export default class TableMatrix {
         }
         return getText('ui.BooleanColumnGroupingTrue');
       };
+      keyAxis.deterministicKeyToKey = deterministicKey => {
+        return deterministicKey;
+      };
+      keyAxis.keyToDeterministicKey = key => {
+        return key;
+      };
+      keyAxis.normDeterministic = f => {
+        return keyAxis.norm(f);
+      };
     } else if (axis instanceof IconColumn) {
       keyAxis.textIsIcon = true;
+      keyAxis.deterministicKeyToKey = deterministicKey => {
+        return deterministicKey;
+      };
+      keyAxis.keyToDeterministicKey = key => {
+        return key;
+      };
+      keyAxis.normDeterministic = f => {
+        return keyAxis.norm(f);
+      };
     } else {
       keyAxis.reorder = () => {
         let comparator = comparators.TEXT;

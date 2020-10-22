@@ -48,6 +48,7 @@ public class ChartConfig implements IChartConfig {
   protected static final String AUTO_COLOR = combine(OPTIONS, "autoColor");
   protected static final String MAX_SEGMENTS = combine(OPTIONS, "maxSegments");
   protected static final String CLICKABLE = combine(OPTIONS, "clickable");
+  protected static final String CHECKABLE = combine(OPTIONS, "checkable");
   protected static final String ANIMATION = combine(OPTIONS, "animation");
   protected static final String ANIMATION_DURATION = combine(ANIMATION, "duration");
   protected static final String TOOLTIPS = combine(OPTIONS, "tooltips");
@@ -425,6 +426,21 @@ public class ChartConfig implements IChartConfig {
   @Override
   public boolean isClickable() {
     return BooleanUtility.nvl((Boolean) getProperty(CLICKABLE));
+  }
+
+  @Override
+  public IChartConfig withCheckable(boolean checkable) {
+    return withProperty(CHECKABLE, checkable);
+  }
+
+  @Override
+  public IChartConfig removeCheckable() {
+    return removeProperty(CHECKABLE);
+  }
+
+  @Override
+  public boolean isCheckable() {
+    return BooleanUtility.nvl((Boolean) getProperty(CHECKABLE));
   }
 
   @Override

@@ -87,6 +87,7 @@ describe('SpeedoChartRenderer', () => {
       $svg.click();
       expect(event.data).toEqual({
         xIndex: null,
+        dataIndex: null,
         datasetIndex: null
       });
     });

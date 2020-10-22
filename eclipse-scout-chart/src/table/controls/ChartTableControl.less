@@ -214,7 +214,17 @@ svg.select-chart.selected:not(.disabled) {
   }
 }
 
+.chart-table-control > .pie-chart {
+  & > .elements {
+    #scout.chart-colors-schemes(@chart-data-color-1);
+    #scout.chart-colors-schemes(@chart-data-color-1, @darken: 10, @additional-classes: ~".hover");
+    #scout.chart-stroke-colors-schemes(@table-control-container-background-color);
+  }
 
-.chart-table-control > .pie-chart > .elements {
-  #scout.chart-stroke-colors-schemes(@table-control-container-background-color);
+  &.checkable > .elements {
+    #scout.chart-colors-schemes(@chart-data-color-1, @opacity: 70);
+    #scout.chart-colors-schemes(@chart-data-color-1, @additional-classes: ~".checked");
+    #scout.chart-colors-schemes(@chart-data-color-1, @opacity: 85, @additional-classes: ~".hover");
+    #scout.chart-colors-schemes(@chart-data-color-1, @darken: 10, @additional-classes: ~".hover.checked");
+  }
 }

@@ -102,6 +102,16 @@ export default class AbstractChartRenderer {
     this.render();
   }
 
+  renderCheckedItems() {
+    if (this.rendered) {
+      this._renderCheckedItems();
+    }
+  }
+
+  _renderCheckedItems() {
+    // nop
+  }
+
   /**
    * @param requestAnimation
    *          Whether animations should be used while removing the chart. Note that his

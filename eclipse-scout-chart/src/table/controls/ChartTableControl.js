@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateColumn, icons, NumberColumn, objects, scout, strings, styles, TableControl, TableMatrix, tooltips} from '@eclipse-scout/core';
+import {arrays, DateColumn, icons, NumberColumn, objects, scout, strings, styles, TableControl, TableMatrix, tooltips} from '@eclipse-scout/core';
 import {Chart, ChartTableControlLayout, ChartTableUserFilter} from '../../index';
 import $ from 'jquery';
 
@@ -35,6 +35,7 @@ export default class ChartTableControl extends TableControl {
     this.dateGroup = null;
 
     this._tableUpdatedHandler = this._onTableUpdated.bind(this);
+    this._chartValueClickedHandler = this._onChartValueClick.bind(this);
   }
 
   static DATE_GROUP_FLAG = 0x100;
@@ -412,7 +413,9 @@ export default class ChartTableControl extends TableControl {
 
     // listeners
     this._filterResetListener = this.table.on('filterReset', event => {
-      $('.main-chart.selected', this.$contentContainer).removeClass('selected');
+      if (this.chart) {
+        this.chart.setCheckedItems([]);
+      }
     });
 
     this._addListeners();
@@ -442,6 +445,7 @@ export default class ChartTableControl extends TableControl {
     this.table.on('rowsInserted', this._tableUpdatedHandler);
     this.table.on('rowsDeleted', this._tableUpdatedHandler);
     this.table.on('allRowsDeleted', this._tableUpdatedHandler);
+    this.chart.on('valueClick', this._chartValueClickedHandler);
   }
 
   _renderAxisSelectors() {
@@ -693,6 +697,7 @@ export default class ChartTableControl extends TableControl {
         }]
       },
       options: {
+        maxSegments: 5,
         legend: {
           display: false
         }
@@ -703,7 +708,15 @@ export default class ChartTableControl extends TableControl {
       yAxis = this._getYAxis(),
       data = [],
       labels = [],
-      iconClasses = [];
+      deterministicKeys = [],
+      iconClasses = [],
+      tableFilter = this.table.getFilter(ChartTableUserFilter.TYPE),
+      filters = [],
+      checkedIndices = [];
+
+    if (tableFilter && (tableFilter.xAxis || {}).column === (xAxis || {}).column && (tableFilter.yAxis || {}).column === (yAxis || {}).column) {
+      filters = tableFilter.filters;
+    }
 
     if (this.chartType === Chart.Type.BUBBLE) {
       for (let x = 0; x < xAxis.length; x++) {
@@ -731,8 +744,9 @@ export default class ChartTableControl extends TableControl {
             data.push({
               x: xValue,
               y: yValue,
-              r: cubeValues[0]
+              z: cubeValues[0]
             });
+            deterministicKeys.push([xAxis.keyToDeterministicKey(keyX), yAxis.keyToDeterministicKey(keyY)]);
           }
         }
       }
@@ -748,7 +762,8 @@ export default class ChartTableControl extends TableControl {
         }
         segments.push({
           value: cube.getValue([keyX])[0],
-          label: label
+          label: label,
+          deterministicKey: xAxis.keyToDeterministicKey(keyX)
         });
       }
       if (this.chartType === Chart.Type.PIE) {
@@ -759,6 +774,7 @@ export default class ChartTableControl extends TableControl {
       segments.forEach(elem => {
         data.push(elem.value);
         labels.push(elem.label);
+        deterministicKeys.push(elem.deterministicKey);
       });
     }
 
@@ -766,6 +782,31 @@ export default class ChartTableControl extends TableControl {
 
     if (labels.length) {
       config.data.labels = labels;
+    }
+
+    config.data.datasets[0].deterministicKeys = deterministicKeys;
+
+    deterministicKeys.forEach((deterministicKey, idx) => {
+      if (filters.filter(filter => (Array.isArray(filter.deterministicKey) && Array.isArray(deterministicKey)) ? arrays.equals(filter.deterministicKey, deterministicKey) : filter.deterministicKey === deterministicKey).length) {
+        checkedIndices.push(idx);
+      }
+    });
+    if (this.chartType === Chart.Type.PIE) {
+      let collapsedIndices = arrays.init(deterministicKeys.length - config.options.maxSegments).map((elem, idx) => idx + config.options.maxSegments);
+      if (!arrays.containsAll(checkedIndices, collapsedIndices)) {
+        arrays.remove(checkedIndices, config.options.maxSegments - 1);
+      }
+      arrays.removeAll(checkedIndices, collapsedIndices);
+    }
+
+    let checkedItems = [];
+    if (checkedIndices.length) {
+      checkedIndices.forEach(index => {
+        checkedItems.push({
+          datasetIndex: 0,
+          dataIndex: index
+        });
+      });
     }
 
     iconClasses = iconClasses.filter((value, index, self) => {
@@ -857,6 +898,7 @@ export default class ChartTableControl extends TableControl {
 
     this.chart.setConfig(config);
     this.chart.chartRenderer.renderColorScheme('chart-table-control');
+    this.chart.setCheckedItems(checkedItems);
   }
 
   _getDatasetLabel() {
@@ -883,6 +925,8 @@ export default class ChartTableControl extends TableControl {
     if (this.chartType === Chart.Type.BUBBLE && this.chartGroup2) {
       let axis2 = this._chartGroup2Map[this.chartGroup2.id].data('column');
       this.yAxis = matrix.addAxis(axis2, this.chartGroup2.modifier);
+    } else {
+      this.yAxis = null;
     }
 
     // return not possible to draw chart
@@ -940,54 +984,42 @@ export default class ChartTableControl extends TableControl {
   }
 
   _adjustConfig(config) {
-    // nop
+    if (this._isChartClickable()) {
+      config.options = $.extend(true, {}, config.options, {
+        clickable: true,
+        checkable: true,
+        otherSegmentClickable: true
+      });
+    }
   }
 
-  _chartClick(event) {
-    let $clicked = $(event.target);
+  _isChartClickable() {
+    return true;
+  }
 
-    // change state
-    if (event.ctrlKey) {
-      if ($clicked.hasClass('selected')) {
-        $clicked.removeClass('selected');
-      } else {
-        $clicked.addClass('selected');
-      }
-    } else {
-      $clicked.addClass('selected');
-      $clicked.siblings('.main-chart').removeClass('selected');
-    }
-
+  _onChartValueClick() {
     //  prepare filter
-    let filters = [],
-      oneDim = !$('.selected', this.$chartSelect).hasClass('chart-bubble');
-
-    // find all filter
-    // different data may be stored: undefined, arrays (of keys )and single numbers (keys)
-    let readData = (object, attribute) => {
-      let a = object.attr(attribute);
-      if (a === undefined) {
-        return [null];
+    let filters = [];
+    if (this.chart && this.chart.config.data) {
+      let maxSegments = this.chart.config.options.maxSegments,
+        dataset = this.chart.config.data.datasets[0],
+        getFilters = index => ({deterministicKey: dataset.deterministicKeys[index]});
+      if (this.chartType === Chart.Type.PIE) {
+        getFilters = index => {
+          index = parseInt(index);
+          if (maxSegments && maxSegments === index + 1) {
+            return arrays.init(dataset.deterministicKeys.length - index).map((elem, idx) => ({deterministicKey: dataset.deterministicKeys[idx + index]}));
+          }
+          return {deterministicKey: dataset.deterministicKeys[index]};
+        };
       }
-      let n = parseFloat(a);
-      if (isNaN(n)) {
-        return JSON.parse(a);
-      }
-      return [n];
-    };
 
-    $('.main-chart.selected', this.$contentContainer).each(function() {
-      let dX, dY;
-
-      if (oneDim) {
-        dX = readData($(this), 'data-xAxis');
-        filters = filters.concat(dX);
-      } else {
-        dX = readData($(this), 'data-xAxis');
-        dY = readData($(this), 'data-yAxis');
-        filters.push(JSON.stringify([dX[0], dY[0]]));
-      }
-    });
+      let checkedIndices = this.chart.checkedItems.filter(item => item.datasetIndex === 0)
+        .map(item => item.dataIndex);
+      checkedIndices.forEach(index => {
+        arrays.pushAll(filters, getFilters(index));
+      });
+    }
 
     //  filter function
     if (filters.length) {
@@ -1063,6 +1095,7 @@ export default class ChartTableControl extends TableControl {
     this.table.off('rowsInserted', this._tableUpdatedHandler);
     this.table.off('rowsDeleted', this._tableUpdatedHandler);
     this.table.off('allRowsDeleted', this._tableUpdatedHandler);
+    this.chart.off('valueClick', this._chartValueClickedHandler);
   }
 
   _pathSegment(mx, my, r, start, end) {

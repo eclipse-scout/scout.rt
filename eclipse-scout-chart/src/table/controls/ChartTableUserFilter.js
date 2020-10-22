@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableMatrix, TableUserFilter} from '@eclipse-scout/core';
+import {arrays, TableMatrix, TableUserFilter} from '@eclipse-scout/core';
 
 export default class ChartTableUserFilter extends TableUserFilter {
 
@@ -59,14 +59,14 @@ export default class ChartTableUserFilter extends TableUserFilter {
       // Lazy calculation. It is not possible on init, because the table is not rendered yet.
       this.calculate();
     }
-    let key = this.xAxis.column.cellValueOrTextForCalculation(row);
-    let nX = this.xAxis.norm(key);
+    let value = this.xAxis.column.cellValueOrTextForCalculation(row);
+    let deterministicKeyX = this.xAxis.normDeterministic(value);
 
     if (!this.yAxis) {
-      return (this.filters.indexOf(nX) > -1);
+      return (this.filters.filter(filter => filter.deterministicKey === deterministicKeyX).length);
     }
-    key = this.yAxis.column.cellValueOrTextForCalculation(row);
-    let nY = this.yAxis.norm(key);
-    return (this.filters.indexOf(JSON.stringify([nX, nY])) > -1);
+    value = this.yAxis.column.cellValueOrTextForCalculation(row);
+    let deterministicKeyY = this.yAxis.normDeterministic(value);
+    return (this.filters.filter(filter => arrays.equals(filter.deterministicKey, [deterministicKeyX, deterministicKeyY])).length);
   }
 }

@@ -150,6 +150,7 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
   _createClickObject(xIndex, datasetIndex) {
     return {
       xIndex: xIndex,
+      dataIndex: xIndex,
       datasetIndex: datasetIndex
     };
   }

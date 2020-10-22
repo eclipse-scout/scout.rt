@@ -16,9 +16,22 @@ let styleMap = {};
 let element = null;
 
 /**
+ * @typedef StyleMap
+ * @property {string} [minHeight]
+ * @property {string} [minWidth]
+ * @property {string} [fill]
+ * @property {string} [stroke]
+ * @property {string} [fontFamily]
+ * @property {string} [backgroundColor]
+ * @property {string} [borderColor]
+ */
+
+/**
  * Generates an invisible div and appends it to the body, only once. The same div will be reused on subsequent calls.
  * Adds the given css class to that element and returns a style object containing the values for every given property.
  * The style is cached. Subsequent calls with the same css class will return the same style object.
+ *
+ * @return {StyleMap} style
  */
 export function get(cssClass, properties, additionalClass) {
   let style = styleMap[cssClass];

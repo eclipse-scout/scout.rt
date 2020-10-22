@@ -22,7 +22,20 @@ import {
   SpeedoChartRenderer,
   VennChartRenderer
 } from '../index';
-import {HtmlComponent, Widget} from '@eclipse-scout/core';
+import {arrays, HtmlComponent, Widget} from '@eclipse-scout/core';
+
+/**
+ * @typedef ChartValueGroup
+ * @property {string} type
+ */
+
+/**
+ * @typedef ClickObject
+ * @property {number} datasetIndex
+ * @property {number} dataIndex
+ * @property {number} [xIndex]
+ * @property {number} [yIndex]
+ */
 
 export default class Chart extends Widget {
 
@@ -32,8 +45,16 @@ export default class Chart extends Widget {
     this.$container = null;
     this.chartRenderer = null;
 
+    /**
+     * @type {object}
+     * @property {ChartValueGroup[]} chartValueGroups
+     */
     this.data = null;
     this.config = null;
+    /**
+     *  @type {ClickObject[]}
+     */
+    this.checkedItems = [];
 
     this._updateChartTimeoutId = null;
     this._updateChartOpts = null;
@@ -84,13 +105,14 @@ export default class Chart extends Widget {
     this.htmlComp.setLayout(new ChartLayout(this));
 
     // !!! Do _not_ update the chart here, because usually the container size
-    // !!! is not correct anyways during during the render phase. The ChartLayout
+    // !!! is not correct anyways during the render phase. The ChartLayout
     // !!! will eventually call updateChart() when the layout is validated.
   }
 
   _renderProperties() {
     super._renderProperties();
     this._renderClickable();
+    this._renderCheckable();
   }
 
   _remove() {
@@ -103,6 +125,7 @@ export default class Chart extends Widget {
 
   setData(data) {
     this.setProperty('data', data);
+    this.setCheckedItems(this.checkedItems);
   }
 
   _renderData() {
@@ -138,15 +161,44 @@ export default class Chart extends Widget {
       }
     };
     this.setProperty('config', $.extend(true, {}, defaultConfig, config));
+    this.setCheckedItems(this.checkedItems);
     this._updateChartRenderer();
   }
 
   _renderConfig() {
     this._renderClickable();
+    this._renderCheckable();
     this.updateChart({
       requestAnimation: true,
       debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
     });
+  }
+
+  setCheckedItems(checkedItems) {
+    this.setProperty('checkedItems', arrays.ensure(this._filterCheckedItems(checkedItems)));
+  }
+
+  _filterCheckedItems(checkedItems) {
+    if (!Array.isArray(checkedItems)) {
+      return checkedItems;
+    }
+    let datasetLengths = [];
+    if (this.data) {
+      this.data.chartValueGroups.forEach(chartValueGroup => datasetLengths.push(chartValueGroup.values.length));
+    } else if (this.config && this.config.data) {
+      this.config.data.datasets.forEach(dataset => datasetLengths.push(dataset.data.length));
+    }
+    let filteredCheckedItems = checkedItems.filter(item => datasetLengths[item.datasetIndex] && item.dataIndex < datasetLengths[item.datasetIndex]);
+    if (filteredCheckedItems.length < checkedItems.length) {
+      return filteredCheckedItems;
+    }
+    return checkedItems;
+  }
+
+  _renderCheckedItems() {
+    if (this.chartRenderer) {
+      this.chartRenderer.renderCheckedItems();
+    }
   }
 
   /**
@@ -158,6 +210,10 @@ export default class Chart extends Widget {
 
   _renderClickable() {
     this.$container.toggleClass('clickable', this.config.options.clickable);
+  }
+
+  _renderCheckable() {
+    this.$container.toggleClass('checkable', this.config.options.checkable);
   }
 
   /**
@@ -253,6 +309,17 @@ export default class Chart extends Widget {
   }
 
   _onValueClick(event) {
+    if (this.config.options.checkable) {
+      let checkedItems = [...this.checkedItems],
+        clickedItem = event.data,
+        checkedItem = checkedItems.filter(item => item.datasetIndex === clickedItem.datasetIndex && item.dataIndex === clickedItem.dataIndex)[0];
+      if (checkedItem) {
+        arrays.remove(checkedItems, checkedItem);
+      } else {
+        checkedItems.push(clickedItem);
+      }
+      this.setCheckedItems(checkedItems);
+    }
     this.trigger('valueClick', event);
   }
 }
