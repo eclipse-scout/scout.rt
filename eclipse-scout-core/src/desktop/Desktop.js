@@ -912,11 +912,20 @@ export default class Desktop extends Widget {
       if (element.$container) {
         $glassPaneTargets = $glassPaneTargets.not(element.$container);
       }
-      $glassPaneTargets = $glassPaneTargets.filter(function(i, targetElem) {
-        return this._glassPaneTargetFilters.every(function(filter) {
+      let overlays = this.$overlaySeparator.nextAll().toArray();
+      let nextSiblings = [];
+      // If the element is an overlay, get all next siblings and exclude them because they must not be covered
+      if (element.$container && overlays.indexOf(element.$container[0]) > -1) {
+        nextSiblings = element.$container.nextAll().toArray();
+      }
+      $glassPaneTargets = $glassPaneTargets.filter((i, targetElem) => {
+        if (nextSiblings.indexOf(targetElem) > -1) {
+          return false;
+        }
+        return this._glassPaneTargetFilters.every(filter => {
           return filter(targetElem, element);
         }, this);
-      }.bind(this));
+      });
     }
 
     var glassPaneTargets;
