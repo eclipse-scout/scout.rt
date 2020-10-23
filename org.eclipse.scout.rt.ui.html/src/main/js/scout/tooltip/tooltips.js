@@ -179,7 +179,7 @@ scout.TooltipSupport.prototype._htmlEnabled = function($comp) {
   if ($.isFunction(htmlEnabled)) {
     htmlEnabled = htmlEnabled($comp);
   }
-  return htmlEnabled;
+  return scout.nvl(htmlEnabled, false);
 };
 
 scout.TooltipSupport.prototype._showTooltip = function($comp) {
