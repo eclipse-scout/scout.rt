@@ -413,6 +413,9 @@
   }
 }
 
+/* min-width for charts */
+@chart-min-width: 75px;
+
 /* use padding area for label, legend */
 .tile > .form-field > .field.chart {
   overflow: visible;
@@ -427,9 +430,6 @@
   margin-top: 10px;
 }
 
-.chart > {
-  min-width: 75px;
-}
 
 .bar-chart > .elements,
 .horizontalBar-chart > .elements,
@@ -457,40 +457,52 @@
   }
 }
 
-.bar-chart > .elements,
-.horizontalBar-chart > .elements {
-  .checkable& {
-    #scout.chart-auto-colors-schemes(@opacity: 20);
-    #scout.chart-auto-colors-schemes(@additional-classes: ~".checked");
-    #scout.chart-auto-colors-schemes(@opacity: 35, @additional-classes: ~".hover");
-    #scout.chart-auto-colors-schemes(@darken: 10, @additional-classes: ~".hover.checked");
+.bar-chart,
+.horizontalBar-chart {
+  min-width: @chart-min-width;
+
+  & > .elements {
+    .checkable& {
+      #scout.chart-auto-colors-schemes(@opacity: 20);
+      #scout.chart-auto-colors-schemes(@additional-classes: ~".checked");
+      #scout.chart-auto-colors-schemes(@opacity: 35, @additional-classes: ~".hover");
+      #scout.chart-auto-colors-schemes(@darken: 10, @additional-classes: ~".hover.checked");
+    }
   }
 }
 
-.pie-chart > .elements,
-.doughnut-chart > .elements {
-  #scout.chart-label-grid-colors();
-  #scout.chart-auto-colors-schemes();
-  #scout.chart-stroke-colors-schemes(
-    @tile-default-background-color,
-    @tile-default-inverted-background-color,
-    @tile-alternative-background-color,
-    @tile-alternative-inverted-background-color,
-    @tile-default-background-color);
-  #scout.chart-auto-colors-schemes(@darken: 10, @additional-classes: ~".hover");
-  #scout.chart-stroke-colors-schemes(
-    @tile-default-background-color,
-    @tile-default-inverted-background-color,
-    @tile-alternative-background-color,
-    @tile-alternative-inverted-background-color,
-    @tile-default-background-color,
-    @additional-classes: ~".hover");
+.comboBarLine-chart {
+  min-width: @chart-min-width;
+}
 
-  .checkable& {
-    #scout.chart-auto-colors-schemes(@opacity: 70);
-    #scout.chart-auto-colors-schemes(@darken: 10, @additional-classes: ~".checked");
-    #scout.chart-auto-colors-schemes(@opacity: 85, @additional-classes: ~".hover");
-    #scout.chart-auto-colors-schemes(@additional-classes: ~".hover.checked");
+.pie-chart,
+.doughnut-chart {
+  min-width: @chart-min-width;
+
+  & > .elements {
+    #scout.chart-label-grid-colors();
+    #scout.chart-auto-colors-schemes();
+    #scout.chart-stroke-colors-schemes(
+      @tile-default-background-color,
+      @tile-default-inverted-background-color,
+      @tile-alternative-background-color,
+      @tile-alternative-inverted-background-color,
+      @tile-default-background-color);
+    #scout.chart-auto-colors-schemes(@darken: 10, @additional-classes: ~".hover");
+    #scout.chart-stroke-colors-schemes(
+      @tile-default-background-color,
+      @tile-default-inverted-background-color,
+      @tile-alternative-background-color,
+      @tile-alternative-inverted-background-color,
+      @tile-default-background-color,
+      @additional-classes: ~".hover");
+
+    .checkable& {
+      #scout.chart-auto-colors-schemes(@opacity: 70);
+      #scout.chart-auto-colors-schemes(@darken: 10, @additional-classes: ~".checked");
+      #scout.chart-auto-colors-schemes(@opacity: 85, @additional-classes: ~".hover");
+      #scout.chart-auto-colors-schemes(@additional-classes: ~".hover.checked");
+    }
   }
 }
 
@@ -499,30 +511,34 @@
   #scout.chart-stroke-colors-schemes(@form-background-color);
 }
 
-.polarArea-chart > .elements {
-  #scout.chart-label-grid-colors();
-  #scout.chart-auto-colors-schemes(@opacity: 70);
-  #scout.chart-stroke-colors-schemes(
-    @tile-default-background-color,
-    @tile-default-inverted-background-color,
-    @tile-alternative-background-color,
-    @tile-alternative-inverted-background-color,
-    @tile-default-background-color);
-  #scout.chart-auto-colors-schemes(@opacity: 85, @additional-classes: ~".hover");
-  #scout.chart-stroke-colors-schemes(
-    @tile-default-background-color,
-    @tile-default-inverted-background-color,
-    @tile-alternative-background-color,
-    @tile-alternative-inverted-background-color,
-    @tile-default-background-color,
-    @additional-classes: ~".hover");
+.polarArea-chart {
+  min-width: @chart-min-width;
 
-  .checkable& {
-    #scout.chart-auto-colors-schemes(@darken: 10, @additional-classes: ~".checked");
-    #scout.chart-auto-colors-schemes(@additional-classes: ~".hover.checked");
+  & > .elements {
+    #scout.chart-label-grid-colors();
+    #scout.chart-auto-colors-schemes(@opacity: 70);
+    #scout.chart-stroke-colors-schemes(
+      @tile-default-background-color,
+      @tile-default-inverted-background-color,
+      @tile-alternative-background-color,
+      @tile-alternative-inverted-background-color,
+      @tile-default-background-color);
+    #scout.chart-auto-colors-schemes(@opacity: 85, @additional-classes: ~".hover");
+    #scout.chart-stroke-colors-schemes(
+      @tile-default-background-color,
+      @tile-default-inverted-background-color,
+      @tile-alternative-background-color,
+      @tile-alternative-inverted-background-color,
+      @tile-default-background-color,
+      @additional-classes: ~".hover");
+
+    .checkable& {
+      #scout.chart-auto-colors-schemes(@darken: 10, @additional-classes: ~".checked");
+      #scout.chart-auto-colors-schemes(@additional-classes: ~".hover.checked");
+    }
+
+    #scout.chart-auto-colors-schemes(@additional-classes: ~".legend");
   }
-
-  #scout.chart-auto-colors-schemes(@additional-classes: ~".legend");
 }
 
 :not(.tile) > .polarArea-chart > .elements {
@@ -533,18 +549,22 @@
   }
 }
 
-.line-chart > .elements,
-.radar-chart > .elements {
-  #scout.chart-label-grid-colors();
-  #scout.chart-auto-colors-schemes(@opacity: 20);
-  #scout.chart-auto-stroke-colors-schemes();
-  #scout.chart-auto-colors-schemes(@opacity: 35, @additional-classes: ~".hover");
+.line-chart,
+.radar-chart {
+  min-width: @chart-min-width;
 
-  #scout.chart-auto-colors-schemes(@additional-classes: ~".legend");
+  & > .elements {
+    #scout.chart-label-grid-colors();
+    #scout.chart-auto-colors-schemes(@opacity: 20);
+    #scout.chart-auto-stroke-colors-schemes();
+    #scout.chart-auto-colors-schemes(@opacity: 35, @additional-classes: ~".hover");
 
-  > .point {
-    &.hover {
-      fill: @palette-white;
+    #scout.chart-auto-colors-schemes(@additional-classes: ~".legend");
+
+    > .point {
+      &.hover {
+        fill: @palette-white;
+      }
     }
   }
 }
@@ -555,19 +575,23 @@
   }
 }
 
-.bubble-chart > .elements {
-  #scout.chart-label-grid-colors();
-  #scout.chart-auto-colors-schemes(@opacity: 20);
-  #scout.chart-auto-stroke-colors-schemes();
-  #scout.chart-auto-colors-schemes(@opacity: 35, @additional-classes: ~".hover");
-  #scout.chart-auto-stroke-colors-schemes(@darken: 10, @additional-classes: ~".hover");
+.bubble-chart {
+  min-width: @chart-min-width;
 
-  .checkable& {
-    #scout.chart-auto-colors-schemes(@additional-classes: ~".checked");
-    #scout.chart-auto-colors-schemes(@darken: 10, @additional-classes: ~".hover.checked");
+  & > .elements {
+    #scout.chart-label-grid-colors();
+    #scout.chart-auto-colors-schemes(@opacity: 20);
+    #scout.chart-auto-stroke-colors-schemes();
+    #scout.chart-auto-colors-schemes(@opacity: 35, @additional-classes: ~".hover");
+    #scout.chart-auto-stroke-colors-schemes(@darken: 10, @additional-classes: ~".hover");
+
+    .checkable& {
+      #scout.chart-auto-colors-schemes(@additional-classes: ~".checked");
+      #scout.chart-auto-colors-schemes(@darken: 10, @additional-classes: ~".hover.checked");
+    }
+
+    #scout.chart-auto-colors-schemes(@additional-classes: ~".legend");
   }
-
-  #scout.chart-auto-colors-schemes(@additional-classes: ~".legend");
 }
 
 text.legend-label,

@@ -23,7 +23,7 @@ public interface IChartType {
   String BAR_HORIZONTAL = "horizontalBar";
   String BAR_VERTICAL_OLD = "barVertical_old";
   String BAR_HORIZONTAL_OLD = "barHorizontal_old";
-  String COMBO_BAR_LINE = "combo_bar_line";
+  String COMBO_BAR_LINE = "comboBarLine";
   String SCATTER = "scatter";
   String FULFILLMENT = "fulfillment";
   String SPEEDO = "speedo";

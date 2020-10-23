@@ -138,6 +138,7 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
         .withAutoColor(true)
         .withMaxSegments(IChartConfig.DEFAULT_MAX_SEGMENTS_PIE)
         .withClickable(false)
+        .withCheckable(false)
         .withAnimated(true)
         .withTooltipsEnabled(true)
         .withLegendDisplay(true)

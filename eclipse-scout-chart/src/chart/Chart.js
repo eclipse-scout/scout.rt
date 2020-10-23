@@ -70,7 +70,7 @@ export default class Chart extends Widget {
     BAR_HORIZONTAL: 'horizontalBar',
     BAR_VERTICAL_OLD: 'barVertical_old',
     BAR_HORIZONTAL_OLD: 'barHorizontal_old',
-    COMBO_BAR_LINE: 'combo_bar_line',
+    COMBO_BAR_LINE: 'comboBarLine',
     SCATTER: 'scatter',
     FULFILLMENT: 'fulfillment',
     SPEEDO: 'speedo',
@@ -113,6 +113,7 @@ export default class Chart extends Widget {
     super._renderProperties();
     this._renderClickable();
     this._renderCheckable();
+    this._renderChartType();
   }
 
   _remove() {
@@ -142,6 +143,7 @@ export default class Chart extends Widget {
         autoColor: true,
         maxSegments: 5,
         clickable: false,
+        checkable: false,
         animation: {
           duration: Chart.DEFAULT_ANIMATION_DURATION
         },
@@ -160,6 +162,9 @@ export default class Chart extends Widget {
         }
       }
     };
+    if (this.rendered && this.config && this.config.type) {
+      this.$container.removeClass(this.config.type + '-chart');
+    }
     this.setProperty('config', $.extend(true, {}, defaultConfig, config));
     this.setCheckedItems(this.checkedItems);
     this._updateChartRenderer();
@@ -168,6 +173,7 @@ export default class Chart extends Widget {
   _renderConfig() {
     this._renderClickable();
     this._renderCheckable();
+    this._renderChartType();
     this.updateChart({
       requestAnimation: true,
       debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
@@ -214,6 +220,10 @@ export default class Chart extends Widget {
 
   _renderCheckable() {
     this.$container.toggleClass('checkable', this.config.options.checkable);
+  }
+
+  _renderChartType() {
+    this.$container.addClass(this.config.type + '-chart');
   }
 
   /**
