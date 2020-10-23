@@ -95,6 +95,45 @@ describe('Popup', () => {
       expect(session.desktop.navigation.$container.children('.glasspane').length).toBe(0);
       expect(popup.$container.children('.glasspane').length).toBe(0);
     });
+
+    it('does not get covered with glasspane when multiple popups are open', () => {
+      let popup = scout.create('Popup', {
+        parent: session.desktop,
+        withGlassPane: true
+      });
+      popup.render();
+      expect(session.desktop.navigation.$container.children('.glasspane').length).toBe(1);
+      expect(popup.$container.children('.glasspane').length).toBe(0);
+
+      let popup2 = scout.create('Popup', {
+        parent: session.desktop,
+        withGlassPane: true
+      });
+      popup2.render();
+      expect(session.desktop.navigation.$container.children('.glasspane').length).toBe(2);
+      expect(popup.$container.children('.glasspane').length).toBe(1); // First popup needs to be covered
+      expect(popup2.$container.children('.glasspane').length).toBe(0); // Current popup must not be covered
+
+      let popup3 = scout.create('Popup', {
+        parent: session.desktop
+      });
+      popup3.render();
+      expect(session.desktop.navigation.$container.children('.glasspane').length).toBe(2);
+      expect(popup.$container.children('.glasspane').length).toBe(1); // First popup needs to be covered
+      expect(popup2.$container.children('.glasspane').length).toBe(0); // Still no glass pane because popup3 does not set withGlassPane
+      expect(popup3.$container.children('.glasspane').length).toBe(0); // Current popup must not be covered
+
+      let popup4 = scout.create('Popup', {
+        parent: session.desktop,
+        withGlassPane: true
+      });
+      popup4.render();
+      expect(session.desktop.navigation.$container.children('.glasspane').length).toBe(3);
+      expect(popup.$container.children('.glasspane').length).toBe(2); // First popup needs to be covered
+      expect(popup2.$container.children('.glasspane').length).toBe(1); // Gets glasspane
+      expect(popup3.$container.children('.glasspane').length).toBe(1); // Gets glasspane
+      expect(popup4.$container.children('.glasspane').length).toBe(0); // Current popup must not be covered
+    });
   });
 
   describe('horizontalAlignment', () => {
