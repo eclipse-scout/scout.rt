@@ -869,7 +869,16 @@ scout.Desktop.prototype._glassPaneTargets = function(element) {
     if (element.$container) {
       $glassPaneTargets = $glassPaneTargets.not(element.$container);
     }
+    var overlays = this.$overlaySeparator.nextAll().toArray();
+    var nextSiblings = [];
+    // If the element is an overlay, get all next siblings and exclude them because they must not be covered
+    if (element.$container && overlays.indexOf(element.$container[0]) > -1) {
+      nextSiblings = element.$container.nextAll().toArray();
+    }
     $glassPaneTargets = $glassPaneTargets.filter(function(i, targetElem) {
+      if (nextSiblings.indexOf(targetElem) > -1) {
+        return false;
+      }
       return this._glassPaneTargetFilters.every(function(filter) {
         return filter(targetElem, element);
       }, this);
