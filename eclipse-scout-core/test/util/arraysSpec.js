@@ -699,6 +699,86 @@ describe('scout.arrays', () => {
 
   });
 
+  describe('flattenRec', () => {
+
+    it('returns flat list of all elements and the recursive child elements', () => {
+      let result = arrays.flattenRec();
+      expect(result).toEqual([]);
+
+      result = arrays.flattenRec([]);
+      expect(result).toEqual([]);
+
+      result = arrays.flattenRec(['a', 'b', 'c']);
+      expect(result).toEqual(['a', 'b', 'c']);
+
+      // --- Complex example ---
+
+      let arr = [
+        null,
+        {
+          id: 'n1',
+          children: [
+            {
+              id: 'm1',
+              children: null
+            },
+            {
+              id: 'm2',
+              children: []
+            },
+            {
+              id: 'm3',
+              children: ['x', 'y']
+            },
+            {
+              id: 'm4',
+              children: [
+                {
+                  id: 'o1'
+                },
+                {
+                  id: 'o2'
+                }
+              ]
+            },
+            {
+              id: 'm5',
+              children: [
+                {
+                  id: 'o3'
+                },
+                'ggg',
+                'lll',
+                {
+                  id: 'o4'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'n2',
+          children: []
+        }
+      ];
+
+      function elementToString(element) {
+        return (typeof element === 'string' || !element ? element : element.id);
+      }
+
+      result = arrays.flattenRec(arr);
+      expect(result.map(elementToString)).toEqual([null, 'n1', 'n2']);
+
+      // noinspection JSUnresolvedVariable
+      result = arrays.flattenRec(arr, item => item.doesNotExist);
+      expect(result.map(elementToString)).toEqual([null, 'n1', 'n2']);
+
+      result = arrays.flattenRec(arr, item => item.children);
+      expect(result.map(elementToString)).toEqual([null, 'n1', 'm1', 'm2', 'm3', 'x', 'y', 'm4', 'o1', 'o2', 'm5', 'o3', 'ggg', 'lll', 'o4', 'n2']);
+    });
+
+  });
+
   describe('randomElement', () => {
 
     it('returns a random element', () => {

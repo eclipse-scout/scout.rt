@@ -483,6 +483,22 @@ export function flatMap(arr, func) {
   return result;
 }
 
+/**
+ * Returns a flat array of all elements and their recursive child elements.
+ *
+ * @param arr The top-level list of all elements
+ * @param childrenAccessor Function than extracts a list of child elements from a given element. Used to traverse the object structure.
+ */
+export function flattenRec(arr, childrenAccessor) {
+  return ensure(arr).reduce((acc, cur) => {
+    acc.push(cur);
+    if (cur && childrenAccessor) {
+      acc = acc.concat(flattenRec(childrenAccessor(cur), childrenAccessor));
+    }
+    return acc;
+  }, []);
+}
+
 //
 // Use these methods if you have an array of jquery objects.
 // Reason $elem1 === $elem2 does often not work because new jquery objects are created for the same html node.
@@ -538,6 +554,7 @@ export default {
   findIndexFromReverse,
   first,
   flatMap,
+  flattenRec,
   format,
   formatEncoded,
   greater,
