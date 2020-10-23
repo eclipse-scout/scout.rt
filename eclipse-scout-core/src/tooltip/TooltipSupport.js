@@ -98,7 +98,7 @@ export default class TooltipSupport {
     if ($.isFunction(htmlEnabled)) {
       htmlEnabled = htmlEnabled($comp);
     }
-    return htmlEnabled;
+    return scout.nvl(htmlEnabled, false);
   }
 
   _showTooltip($comp) {
