@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -186,19 +186,6 @@ public final class CollectionUtility {
     return c1.equals(c2);
   }
 
-  /**
-   * @deprecated do not use this 'dynamic-typed' method which could easily lead to errors. Use instead the strong typed
-   *             version {@link #firstElement(Collection)}
-   */
-  @Deprecated
-  @SuppressWarnings("unchecked")
-  public static <T> T firstElement(Object c) {
-    if (c instanceof Collection<?>) {
-      return (T) firstElement((Collection<?>) c);
-    }
-    return null;
-  }
-
   /*
    * Collection/List handling
    */
@@ -228,11 +215,6 @@ public final class CollectionUtility {
    * the last element and -2 the 2nd last. For positive indices, the methods uses {@link List#subList(int, int)} with
    * one change: It is returning the sub list starting with c[fromIndex] to c[toIndex]. slice(c, 0, 0): first element of
    * c slice(c, 0, -3): c without the last two elements
-   *
-   * @param c
-   * @param fromIndex
-   * @param toIndex
-   * @return
    */
   public static <T> List<T> slice(List<T> c, int fromIndex, int toIndex) {
     List<T> result = new ArrayList<>();
@@ -357,8 +339,6 @@ public final class CollectionUtility {
   /**
    * exception safe access of an element of a list by index.
    *
-   * @param list
-   * @param index
    * @return null if the index is out of the list bounds or the element is null by itself.
    */
   public static <T> T getElement(List<T> list, int index) {
@@ -418,7 +398,6 @@ public final class CollectionUtility {
    * Null safe creation of a {@link ArrayList} out of a given collection. The returned {@link ArrayList} is modifiable
    * and not null.
    *
-   * @param c
    * @return an {@link ArrayList} containing the given collection's elements. Never null.
    */
   public static <T> ArrayList<T> arrayList(Collection<? extends T> c) {
@@ -432,7 +411,6 @@ public final class CollectionUtility {
    * Null safe creation of a {@link ArrayList} out of a given collection. The returned {@link ArrayList} is modifiable.
    * The result list is never null and does not contain any null elements.
    *
-   * @param c
    * @return an {@link ArrayList} containing the given collection's elements. Never null
    */
   public static <T> ArrayList<T> arrayListWithoutNullElements(Collection<? extends T> c) {
@@ -453,7 +431,6 @@ public final class CollectionUtility {
    * Null safe creation of a {@link HashSet} out of a given collection. The returned {@link HashSet} is modifiable and
    * never null.
    *
-   * @param c
    * @return an {@link HashSet} containing the given collection's elements. Never null.
    */
   public static <T> HashSet<T> hashSet(Collection<? extends T> c) {
@@ -467,7 +444,6 @@ public final class CollectionUtility {
    * Null safe creation of a {@link HashSet} out of a given collection without <code>null</code> elements. The returned
    * {@link HashSet} is modifiable and never null.
    *
-   * @param c
    * @return an {@link HashSet} containing the given collection's elements without <code>null</code> elements. Never
    *         null.
    */
@@ -481,7 +457,6 @@ public final class CollectionUtility {
    * Null safe creation of a {@link LinkedHashSet} out of a given collection. The returned {@link LinkedHashSet} is
    * modifiable and never null.
    *
-   * @param c
    * @return an {@link LinkedHashSet} containing the given collection's elements. Never null.
    */
   public static <T> LinkedHashSet<T> orderedHashSet(Collection<? extends T> c) {
@@ -495,7 +470,6 @@ public final class CollectionUtility {
    * Null safe creation of a {@link LinkedHashSet} out of a given collection without <code>null</code> elements. The
    * returned {@link LinkedHashSet} is modifiable and never null.
    *
-   * @param c
    * @return an {@link LinkedHashSet} containing the given collection's elements without <code>null</code> elements.
    *         Never null.
    */

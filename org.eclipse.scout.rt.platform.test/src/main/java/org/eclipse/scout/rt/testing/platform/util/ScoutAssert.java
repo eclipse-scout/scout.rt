@@ -124,8 +124,6 @@ public final class ScoutAssert {
   /**
    * compares two textfiles
    *
-   * @param expectedFile
-   * @param actualFile
    * @param charsetName
    *          The name of a supported {@link java.nio.charset.Charset </code>charset<code>}
    */

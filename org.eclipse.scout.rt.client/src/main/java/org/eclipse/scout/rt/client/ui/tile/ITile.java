@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,12 +50,6 @@ public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject,
   GridData getGridDataHints();
 
   void setGridDataHints(GridData data);
-
-  /**
-   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
-   */
-  @Deprecated
-  ITileGrid<?> getContainer();
 
   void setFilterAccepted(boolean filterAccepted);
 

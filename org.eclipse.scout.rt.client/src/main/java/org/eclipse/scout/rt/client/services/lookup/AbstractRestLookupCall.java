@@ -84,14 +84,6 @@ public abstract class AbstractRestLookupCall<RESTRICTION extends AbstractLookupR
     return m_restrictionDo.getIds();
   }
 
-  /**
-   * @deprecated will be removed in 1.3, use {@link #getKeys()} instead
-   */
-  @Deprecated
-  public List<ID> getIds() {
-    return getKeys();
-  }
-
   public void setKeys(Collection<? extends ID> keys) {
     m_restrictionDo.withIds(keys);
   }

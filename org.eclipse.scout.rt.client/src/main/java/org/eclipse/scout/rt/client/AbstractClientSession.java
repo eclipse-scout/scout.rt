@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -423,14 +423,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     finally {
       termLoop.cancel(true);
     }
-  }
-
-  /**
-   * @deprecated since 6.1 this code moved to {@link ClientSessionStopHelper#scheduleJobTerminationLoop(IClientSession)}
-   */
-  @Deprecated
-  protected void cancelRunningJobs() {
-    //nop
   }
 
   protected void inactivateSession() {

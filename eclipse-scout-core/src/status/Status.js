@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -137,14 +137,13 @@ export default class Status {
       this.children.forEach(status => {
         status.removeAllStatusByPredicate(predicate);
       });
-      let newChildren = this.children.filter(status => {
+      this.children = this.children.filter(status => {
         // when status is not deletable we must add it as child again, thus --> true
         if (!status.deletable) {
           return true;
         }
         return !predicate(status); // negate predicate
       });
-      this.children = newChildren;
       this._updateProperties();
     }
   }
@@ -274,20 +273,6 @@ export default class Status {
    */
   static info(model) {
     return new Status(Status.ensureModel(model, Status.Severity.INFO));
-  }
-
-  /**
-   * @returns {Status} a Status object with severity WARNING.
-   * @deprecated do not use this legacy function, use Status.warning() instead!
-   */
-  static _warnDeprecationLogged = false;
-
-  static warn(model) {
-    if (!Status._warnDeprecationLogged && window.console && (window.console.warn || window.console.log)) {
-      (window.console.warn || window.console.log)('scout.Status.warn() is deprecated and will be removed in a future release. Please use Status.warning() instead.');
-      Status._warnDeprecationLogged = true; // only warn once
-    }
-    return Status.warning(model);
   }
 
   /**

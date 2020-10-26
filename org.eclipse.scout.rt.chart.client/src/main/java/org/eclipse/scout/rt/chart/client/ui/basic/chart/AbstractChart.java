@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
@@ -156,16 +155,6 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
   @Override
   public IChartUIFacade getUIFacade() {
     return m_uiFacade;
-  }
-
-  /**
-   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
-   */
-  @Override
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public ITypeWithClassId getContainer() {
-    return getParent();
   }
 
   @Override

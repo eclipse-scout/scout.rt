@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITileGridContextMenu;
-import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -146,12 +145,6 @@ public interface ITileGrid<T extends ITile> extends IWidget, IExtensibleObject, 
   T getSelectedTile();
 
   T getTileByClass(Class<T> tileClass);
-
-  /**
-   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
-   */
-  @Deprecated
-  ITypeWithClassId getContainer();
 
   /**
    * Creates a {@link JobInput} which is used by {@link AbstractTile} to schedule the asynchronous data load.<br>

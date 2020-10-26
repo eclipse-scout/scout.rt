@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -342,16 +342,6 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   @Order(80)
   protected boolean getConfiguredAutoLoadDataOnInit() {
     return true;
-  }
-
-  /**
-   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
-   */
-  @Override
-  @Deprecated
-  @SuppressWarnings({"unchecked", "deprecation"})
-  public ITileGrid<? extends ITile> getContainer() {
-    return getParentOfType(ITileGrid.class);
   }
 
   @Override

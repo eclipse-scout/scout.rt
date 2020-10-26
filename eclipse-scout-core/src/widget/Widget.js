@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,8 +30,7 @@ import {
   scrollbars,
   strings,
   texts,
-  TreeVisitResult,
-  widgets
+  TreeVisitResult
 } from '../index';
 import $ from 'jquery';
 
@@ -2248,13 +2247,6 @@ export default class Widget {
   }
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */
-
-  /**
-   * @deprecated use {@link widgets.get}
-   */
-  static getWidgetFor($elem) {
-    return widgets.get($elem);
-  }
 
   static cssClassAsArray(cssClass) {
     let cssClasses = [],

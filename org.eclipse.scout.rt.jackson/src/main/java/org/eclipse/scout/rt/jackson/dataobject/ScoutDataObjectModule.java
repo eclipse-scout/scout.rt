@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -94,8 +94,6 @@ public class ScoutDataObjectModule extends Module {
 
   @Override
   public void setupModule(SetupContext context) {
-    prepareScoutDataModuleContext(m_moduleContext);
-
     context.addSerializers(BEANS.get(DataObjectSerializers.class).withModuleContext(m_moduleContext));
     context.addDeserializers(BEANS.get(DataObjectDeserializers.class).withModuleContext(m_moduleContext));
 
@@ -104,18 +102,6 @@ public class ScoutDataObjectModule extends Module {
 
     context.addTypeModifier(BEANS.get(DataObjectTypeModifier.class).withModuleContext(m_moduleContext));
     context.insertAnnotationIntrospector(BEANS.get(DataObjectAnnotationIntrospector.class).withModuleContext(m_moduleContext));
-  }
-
-  /**
-   * Override this method to add custom properties to {@code moduleContext}.
-   * <p>
-   * TODO [11.0] pbz remove this method > consider move {@link #init()} to {@link JacksonDataObjectMapper}
-   *
-   * @deprecated use JacksonDataObjectMapper#prepareScoutDataModuleContext(ScoutDataObjectModuleContext) instead
-   */
-  @Deprecated
-  protected void prepareScoutDataModuleContext(ScoutDataObjectModuleContext moduleContext) {
-    // NOP
   }
 
   @Override

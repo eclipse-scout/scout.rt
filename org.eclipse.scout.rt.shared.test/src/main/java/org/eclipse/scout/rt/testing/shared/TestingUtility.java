@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,144 +11,33 @@
 package org.eclipse.scout.rt.testing.shared;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 import java.text.DecimalFormatSymbols;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
-import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-// TODO sme [11.0] remove deprecated methods
 public final class TestingUtility {
-
-  private static final Logger LOG = LoggerFactory.getLogger(TestingUtility.class);
-
-  /**
-   * @see TestingHelper#TESTING_BEAN_ORDER.
-   */
-  public static final int TESTING_BEAN_ORDER = BeanTestingHelper.TESTING_BEAN_ORDER;
-
-  /**
-   * @see TestingHelper#TESTING_RESOURCE_ORDER.
-   */
-  public static final int TESTING_RESOURCE_ORDER = BeanTestingHelper.TESTING_RESOURCE_ORDER;
 
   private TestingUtility() {
   }
 
   /**
-   * @deprecated Use {@link BeanTestingHelper#registerBeans(BeanMetaData...)} instead. Will be removed in Scout 11.
-   */
-  @Deprecated
-  public static List<IBean<?>> registerBeans(BeanMetaData... beanDatas) {
-    return BeanTestingHelper.get().registerBeans(beanDatas);
-  }
-
-  /**
-   * @deprecated Use {@link BeanTestingHelper#registerBean(BeanMetaData)} instead. Will be removed in Scout 11.
-   */
-  @Deprecated
-  public static IBean<?> registerBean(BeanMetaData beanData) {
-    return BeanTestingHelper.get().registerBean(beanData);
-  }
-
-  /**
-   * Register a new bean to replace an existing bean.
-   *
-   * @deprecated Will be removed in Scout 11, no replacement.
-   */
-  @Deprecated
-  public static IBean<?> registerWithReplace(Class<?> beanClass) {
-    IBean<?> bean = BEANS.getBeanManager().getBean(beanClass);
-    BeanMetaData newBean = new BeanMetaData(bean).withReplace(true);
-    return BEANS.getBeanManager().registerBean(newBean);
-  }
-
-  /**
-   * Register an existing bean with order {@link TESTING_BEAN_ORDER}
-   *
-   * @deprecated Will be removed in Scout 11, no replacement.
-   */
-  @Deprecated
-  public static IBean<?> registerWithTestingOrder(Class<?> beanClass) {
-    IBean<?> bean = BEANS.getBeanManager().getBean(beanClass);
-    BeanMetaData newBean = new BeanMetaData(bean).withOrder(TESTING_BEAN_ORDER);
-    return BEANS.getBeanManager().registerBean(newBean);
-  }
-
-  /**
-   * @deprecated Use {@link BeanTestingHelper#unregisterBean(IBean)} instead. Will be removed in Scout 11.
-   */
-  @Deprecated
-  public static void unregisterBean(IBean<?> bean) {
-    BeanTestingHelper.get().unregisterBean(bean);
-  }
-
-  /**
-   * @deprecated Use {@link BeanTestingHelper#unregisterBeans(List)} instead. Will be removed in Scout 11.
-   */
-  @Deprecated
-  public static void unregisterBeans(List<? extends IBean<?>> beans) {
-    BeanTestingHelper.get().unregisterBeans(beans);
-  }
-
-  /**
-   * Clears Java's HTTP authentication cache.
-   *
-   * @return Returns <code>true</code> if the operation was successful, otherwise <code>false</code>.
-   * @deprecated Will be removed in Scout 11, no replacement.
-   */
-  @Deprecated
-  public static boolean clearHttpAuthenticationCache() {
-    boolean successful = true;
-    try {
-      Class<?> c = Class.forName("sun.net.www.protocol.http.AuthCacheValue");
-      Field cacheField = c.getDeclaredField("cache");
-      cacheField.setAccessible(true);
-      Object cache = cacheField.get(null);
-      Field hashtableField = cache.getClass().getDeclaredField("hashtable");
-      hashtableField.setAccessible(true);
-      Map<?, ?> map = (Map<?, ?>) hashtableField.get(cache);
-      map.clear();
-    }
-    catch (Exception e) {
-      LOG.warn("Could not clear HTTP authentication cache", e);
-      successful = false;
-    }
-    return successful;
-  }
-
-  /**
-   * convenience overload for {@link #createLocaleSpecificNumberString(minus, integerPart, fractionPart, percent)} with
+   * convenience overload for
+   * {@link #createLocaleSpecificNumberString(Locale, boolean, String, String, NumberStringPercentSuffix)} with
    * <code>percent=0</code>
-   *
-   * @param minus
-   * @param integerPart
-   * @param fractionPart
-   * @return
    */
   public static String createLocaleSpecificNumberString(Locale loc, boolean minus, String integerPart, String fractionPart) {
     return createLocaleSpecificNumberString(loc, minus, integerPart, fractionPart, NumberStringPercentSuffix.NONE);
   }
 
   /**
-   * convenience overload for {@link #createLocaleSpecificNumberString(minus, integerPart, fractionPart, percent)} with
+   * convenience overload for
+   * {@link #createLocaleSpecificNumberString(Locale, boolean, String, String, NumberStringPercentSuffix)} with
    * <code>fractionPart=null</code> and <code>percent=0</code>
-   *
-   * @param minus
-   * @param integerPart
-   * @return
    */
   public static String createLocaleSpecificNumberString(Locale loc, boolean minus, String integerPart) {
     return createLocaleSpecificNumberString(loc, minus, integerPart, null, NumberStringPercentSuffix.NONE);
@@ -231,13 +120,5 @@ public final class TestingUtility {
       SleepUtil.sleepSafe(50, TimeUnit.MILLISECONDS);
     }
     Assert.fail("Potential memory leak, object " + ref.get() + "still exists after gc");
-  }
-
-  /**
-   * @deprecated Use {@link BeanTestingHelper#mockConfigProperty(Class, Object)} instead. Will be removed in Scout 11.
-   */
-  @Deprecated
-  public static <T> IBean<?> mockConfigProperty(Class<? extends IConfigProperty<T>> propertyClass, T value) {
-    return BeanTestingHelper.get().mockConfigProperty(propertyClass, value);
   }
 }

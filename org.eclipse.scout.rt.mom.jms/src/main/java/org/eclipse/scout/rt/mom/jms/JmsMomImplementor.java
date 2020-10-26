@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,10 +11,7 @@
 package org.eclipse.scout.rt.mom.jms;
 
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.JMS_PROP_REPLY_ID;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertEqual;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertFalse;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -78,13 +75,13 @@ import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.platform.util.Assertions.*;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
@@ -140,12 +137,6 @@ public class JmsMomImplementor implements IMomImplementor {
   protected ConnectionFactory m_connectionFactory;
   protected String m_clientId;
 
-  /**
-   * @deprecated do NOT use this connection directly, use {@link #getConnection()}
-   */
-  @Deprecated
-  protected Connection m_connection;
-
   protected JmsConnectionWrapper m_connectionWrapper;
   protected boolean m_requestReplyEnabled;
   protected IDestination<?> m_requestReplyCancellationTopic;
@@ -199,14 +190,10 @@ public class JmsMomImplementor implements IMomImplementor {
 
   protected JmsConnectionWrapper createConnectionWrapper(final Map<Object, Object> properties) {
     return new JmsConnectionWrapper(properties)
-        .withConnectionFunction(
-            () -> {
-              Connection c = createConnection();
-              m_connection = c;
-              return c;
-            });
+        .withConnectionFunction(this::createConnection);
   }
 
+  @SuppressWarnings("RedundantThrows")
   protected void initRequestReply(final Map<Object, Object> properties) throws JMSException {//NOSONAR
     m_requestReplyEnabled = BooleanUtility.nvl(
         TypeCastUtility.castValue(properties.get(REQUEST_REPLY_ENABLED), Boolean.class),
@@ -672,7 +659,7 @@ public class JmsMomImplementor implements IMomImplementor {
     return new InitialContext(m_contextEnvironment);
   }
 
-  @SuppressWarnings("squid:S1149")
+  @SuppressWarnings({"squid:S1149", "RedundantThrows"})
   protected Hashtable<Object, Object> createContextEnvironment(final Map<Object, Object> properties) throws NamingException {//NOSONAR
     Hashtable<Object, Object> env = new Hashtable<>();
     if (properties != null) {

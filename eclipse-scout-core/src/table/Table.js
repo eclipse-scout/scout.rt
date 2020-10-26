@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1734,14 +1734,6 @@ export default class Table extends Widget {
     this.moveRow(rowIndex, targetIndex);
   }
 
-  /**
-   * Moves the row one up with respected to filtered rows. Row must be one of the filtered rows.
-   * @deprecated use moveVisibleRowUp instead
-   */
-  moveFilteredRowUp(row) {
-    this.moveVisibleRowUp(row);
-  }
-
   moveVisibleRowUp(row) {
     let rowIndex = this.rows.indexOf(row),
       visibleIndex = this.visibleRows.indexOf(row),
@@ -1768,14 +1760,6 @@ export default class Table extends Widget {
       targetIndex = this.rows.indexOf(sibling);
     }
     this.moveRow(rowIndex, targetIndex);
-  }
-
-  /**
-   * Moves the row one down with respected to filtered rows. Row must be one of the filtered rows.
-   * @deprecated use moveVisibleRowDown instead
-   */
-  moveFilteredRowDown(row) {
-    this.moveVisibleRowDown(row);
   }
 
   moveVisibleRowDown(row) {

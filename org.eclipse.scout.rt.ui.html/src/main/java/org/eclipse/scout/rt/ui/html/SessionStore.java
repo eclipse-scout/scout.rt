@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -431,16 +431,6 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       LOG.debug("Remaining sessions: [clientSessions: {}, clientSessionFlat: {}, uiSessions: {}, uiSessionsByClientSession: {}, preregisteredUiSessions: {}, preregisteredUiSessionsByClientSession: {}]",
           m_clientSessionMap.size(), flatClientSessions.size(), m_uiSessionMap.size(), uiSessionsByClientSession.size(), m_preregisteredUiSessionMap.size(), preregisteredUiSessionsByClientSession.size());
     }
-  }
-
-  /**
-   * Moved to {@link ClientSessionStopHelper#scheduleStop(IClientSession, boolean, String)}
-   *
-   * @deprecated since 6.1
-   */
-  @Deprecated
-  protected void forceClientSessionShutdown(IClientSession clientSession) {
-    LOG.error("This code moved to ClientSessionStopHelper#scheduleStop}");
   }
 
   @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -128,7 +128,7 @@ public abstract class AbstractObjectSerializer implements IObjectSerializer {
   }
 
   /**
-   * @deprecated use {@link #createObjectOutputStream(OutputStream)}
+   * @deprecated use {@link #createObjectOutputStream(OutputStream)} instead. Will be removed in Scout 12.
    */
   @SuppressWarnings("DeprecatedIsStillUsed")
   @Deprecated
@@ -137,7 +137,7 @@ public abstract class AbstractObjectSerializer implements IObjectSerializer {
   }
 
   /**
-   * @deprecated use {@link #createObjectInputStream(InputStream)}
+   * @deprecated use {@link #createObjectInputStream(InputStream)} instead. Will be removed in Scout 12.
    */
   @SuppressWarnings("DeprecatedIsStillUsed")
   @Deprecated

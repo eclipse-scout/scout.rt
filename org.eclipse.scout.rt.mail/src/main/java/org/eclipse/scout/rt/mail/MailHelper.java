@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -101,7 +101,6 @@ public class MailHelper {
    *
    * @param message
    *          Message to look for body parts.
-   * @return
    */
   public List<Part> getBodyParts(Part message) {
     List<Part> bodyCollector = new ArrayList<>();
@@ -114,7 +113,6 @@ public class MailHelper {
    *
    * @param message
    *          Message to look for attachment parts.
-   * @return
    */
   public List<Part> getAttachmentParts(Part message) {
     List<Part> attachmentCollector = new ArrayList<>();
@@ -156,6 +154,7 @@ public class MailHelper {
           content = part.getContent();
         }
         catch (MessagingException | IOException e) {
+          //noinspection PlaceholderCountMatchesArgumentCount
           LOG.info("Unable to get mime part content due to {}: {}", e.getClass().getSimpleName(), e.getMessage(), LOG.isDebugEnabled() ? e : null);
         }
 
@@ -357,12 +356,10 @@ public class MailHelper {
   }
 
   /**
-   * @param inStream
    * @param fileName
    *          e.g. "file.txt"
    * @param fileExtension
    *          e.g. "txt", "jpg"
-   * @return
    */
   public DataSource createDataSource(InputStream inStream, String fileName, String fileExtension) {
     try {
@@ -545,8 +542,6 @@ public class MailHelper {
    *          Body text
    * @param contentType
    *          Content type
-   * @return Crated mime body part
-   * @throws MessagingException
    */
   protected void setSingleBodyPart(MimePart part, String bodyText, String contentType) throws MessagingException {
     part.setText(bodyText, StandardCharsets.UTF_8.name());
@@ -639,8 +634,6 @@ public class MailHelper {
    * @param msg
    *          Mime message to prepare
    * @return Multipart to which attachments can be added
-   * @throws IOException
-   * @throws MessagingException
    */
   protected Multipart prepareMessageForAttachments(MimeMessage msg) throws IOException, MessagingException {
     Object messageContent = msg.getContent();
@@ -784,21 +777,6 @@ public class MailHelper {
       }
     }
     return addrList.toArray(new InternetAddress[0]);
-  }
-
-  /**
-   * detects the character-encoding for the given part, default is UTF-8 if none is found
-   *
-   * @param part
-   * @return
-   * @throws MessagingException
-   * @deprecated Use {@link #getPartCharset(Part)} and apply desired fallback charset if required (was
-   *             {@link StandardCharsets#UTF_8}).
-   */
-  // TODO sme [11.0] remove deprecated method
-  @Deprecated
-  public String getCharacterEncodingOfPart(Part part) throws MessagingException {
-    return ObjectUtility.nvl(getPartCharset(part), StandardCharsets.UTF_8).name(); // default, a good guess in Europe
   }
 
   /**
@@ -967,7 +945,7 @@ public class MailHelper {
   /**
    * Retrieves the value of the 'Message-Id' header field of the message, without throwing an exception.
    *
-   * @param Mime
+   * @param mimeMessage
    *          message
    * @return Message-Id or <code>null</code>
    */
@@ -1031,7 +1009,7 @@ public class MailHelper {
   /**
    * Decodes an attachment filename.
    * <p>
-   * Used internal by {@link #getAttachmentFilename(Part)}.
+   * Used internal by {@link #getAttachmentFilename(Part, Function)}.
    *
    * @param filename
    *          Filename as provided by {@link Part#getFileName()}.
@@ -1053,10 +1031,6 @@ public class MailHelper {
 
   /**
    * Encodes an attachment filename.
-   *
-   * @param filename
-   * @param charset
-   * @param encoding
    */
   protected String encodeAttachmentFilename(String filename, String charset, String encoding) {
     if (filename == null) {
@@ -1077,7 +1051,7 @@ public class MailHelper {
   /**
    * Guesses attachment file extension based on a content type.
    * <p>
-   * Used internal by {@link #getAttachmentFilename(Part)} if not filename is available.
+   * Used internal by {@link #getAttachmentFilename(Part, Function)} if not filename is available.
    *
    * @param contentType
    *          Content type as provided by {@link Part#getContentType()}.

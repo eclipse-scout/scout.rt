@@ -84,7 +84,6 @@
     <module>../org.eclipse.scout.dev.jetty.test</module>
     <module>../org.eclipse.scout.dev.jetty.test.affix</module>
     <module>../org.eclipse.scout.rt-settings</module>
-    <module>../org.eclipse.scout.migration.ecma6</module>
 
     <module>../eclipse-scout-cli</module>
     <module>../eclipse-scout-core</module>

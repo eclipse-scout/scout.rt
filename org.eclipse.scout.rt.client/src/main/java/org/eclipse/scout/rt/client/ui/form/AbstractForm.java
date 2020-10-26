@@ -151,7 +151,6 @@ import org.w3c.dom.Element;
 
 @ClassId("cec05259-9e6f-480c-94fa-f02f56e777f7")
 @FormData(value = AbstractFormData.class, sdkCommand = SdkCommand.USE)
-@SuppressWarnings("deprecation")
 public abstract class AbstractForm extends AbstractWidget implements IForm, IExtensibleObject, IContributionOwner {
 
   private static final String CACHE_BOUNDS = "CACHE_BOUNDS";
@@ -355,15 +354,6 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   @Order(60)
   protected String getConfiguredDisplayViewId() {
     return null;
-  }
-
-  /**
-   * @return if the form can be minimized.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(70)
-  protected boolean getConfiguredMinimizeEnabled() {
-    return false;
   }
 
   /**
@@ -721,9 +711,6 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       setSubTitle(getConfiguredSubTitle());
     }
     setHeaderVisible(getConfiguredHeaderVisible());
-    setMinimizeEnabled(getConfiguredMinimizeEnabled());
-    setMaximizeEnabled(getConfiguredMaximizeEnabled());
-    setMinimized(getConfiguredMinimized());
     setMaximized(getConfiguredMaximized());
     setCacheBounds(getConfiguredCacheBounds());
     setAskIfNeedSave(getConfiguredAskIfNeedSave());
@@ -2582,26 +2569,6 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   @Override
-  public boolean isMaximizeEnabled() {
-    return propertySupport.getPropertyBool(PROP_MAXIMIZE_ENABLED);
-  }
-
-  @Override
-  public void setMaximizeEnabled(boolean b) {
-    propertySupport.setPropertyBool(PROP_MAXIMIZE_ENABLED, b);
-  }
-
-  @Override
-  public boolean isMinimizeEnabled() {
-    return propertySupport.getPropertyBool(PROP_MINIMIZE_ENABLED);
-  }
-
-  @Override
-  public void setMinimizeEnabled(boolean b) {
-    propertySupport.setPropertyBool(PROP_MINIMIZE_ENABLED, b);
-  }
-
-  @Override
   public boolean isMaximized() {
     return propertySupport.getPropertyBool(PROP_MAXIMIZED);
   }
@@ -2609,23 +2576,6 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   @Override
   public void setMaximized(boolean maximized) {
     propertySupport.setPropertyBool(PROP_MAXIMIZED, maximized);
-  }
-
-  @Override
-  public boolean isMinimized() {
-    return propertySupport.getPropertyBool(PROP_MINIMIZED);
-  }
-
-  @Override
-  public void setMinimized(boolean b) {
-    if (isMinimizeEnabled()) {
-      if (b) {
-        propertySupport.setPropertyBool(PROP_MAXIMIZED, false);
-      }
-      // minimized state of ui could be out of sync, fire always
-      propertySupport.setPropertyAlwaysFire(PROP_MINIMIZED, b);
-
-    }
   }
 
   @Override

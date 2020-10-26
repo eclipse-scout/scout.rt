@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.IOrdered;
-import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
@@ -38,12 +37,6 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   String COLLAPSE_STYLE_LEFT = "left";
   String COLLAPSE_STYLE_RIGHT = "right";
   String COLLAPSE_STYLE_BOTTOM = "bottom";
-
-  /**
-   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
-   */
-  @Deprecated
-  ITypeWithClassId getContainer();
 
   boolean isCollapsed();
 

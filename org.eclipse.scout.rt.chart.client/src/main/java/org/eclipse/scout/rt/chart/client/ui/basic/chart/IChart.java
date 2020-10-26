@@ -10,12 +10,10 @@
  */
 package org.eclipse.scout.rt.chart.client.ui.basic.chart;
 
-import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
-import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
-
 import org.eclipse.scout.rt.chart.shared.data.basic.chart.IChartConfig;
 import org.eclipse.scout.rt.chart.shared.data.basic.chart.IChartData;
+import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 /**
  * @since 5.2
@@ -28,12 +26,6 @@ public interface IChart extends IWidget {
   String PROP_VISIBLE = "visible";
 
   IChartUIFacade getUIFacade();
-
-  /**
-   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
-   */
-  @Deprecated
-  ITypeWithClassId getContainer();
 
   IFastListenerList<ChartListener> chartListeners();
 

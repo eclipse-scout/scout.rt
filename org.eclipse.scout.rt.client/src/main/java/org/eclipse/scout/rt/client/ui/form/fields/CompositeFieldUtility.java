@@ -131,14 +131,6 @@ public final class CompositeFieldUtility {
     newContainer.addField(f);
   }
 
-  /**
-   * @deprecated use {@link IWidget#getWidgetByClass(Class)} instead. Will be removed with 10.0
-   */
-  @Deprecated
-  public static <T extends IWidget> T getWidgetByClass(final IWidget widget, final Class<T> classToFind) {
-    return widget.getWidgetByClass(classToFind);
-  }
-
   public static <T extends IWidget> TreeVisitResult getWidgetByClassInternal(final IWidget widget, Holder<T> result, Class<T> classToFind) {
     if (widget.getClass() == classToFind) {
       result.setValue(classToFind.cast(widget));

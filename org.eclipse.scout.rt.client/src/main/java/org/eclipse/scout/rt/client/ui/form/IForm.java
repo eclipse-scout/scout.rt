@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,9 +61,6 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   String PROP_TITLE = "title";
   String PROP_SUB_TITLE = "subTitle";
   String PROP_HEADER_VISIBLE = "headerVisible";
-  String PROP_MINIMIZE_ENABLED = "minimizeEnabled";
-  String PROP_MAXIMIZE_ENABLED = "maximizeEnabled";
-  String PROP_MINIMIZED = "minimized";
   String PROP_MAXIMIZED = "maximized";
   String PROP_EMPTY = "empty";
   String PROP_SAVE_NEEDED = "saveNeeded";
@@ -479,48 +476,6 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   boolean isMaximized();
 
   void setMaximized(boolean maximized);
-
-  /**
-   * This method does nothing since Scout moved to the web with version 5.2.
-   * @deprecated since Scout 10, will be removed with Scout 11
-   */
-  @Deprecated
-  boolean isMaximizeEnabled();
-
-  /**
-   * UI hint that GUI should be maximized. This method does nothing since Scout moved to the web with version 5.2.
-   * @deprecated since Scout 10, will be removed with Scout 11
-   */
-  @Deprecated
-  void setMaximizeEnabled(boolean b);
-
-  /**
-   * This method does nothing since Scout moved to the web with version 5.2.
-   * @deprecated since Scout 10, will be removed with Scout 11
-   */
-  @Deprecated
-  boolean isMinimized();
-
-  /**
-   * UI hint that GUI should be minimized. This method does nothing since Scout moved to the web with version 5.2.
-   * @deprecated since Scout 10, will be removed with Scout 11
-   */
-  @Deprecated
-  void setMinimized(boolean b);
-
-  /**
-   * This method does nothing since Scout moved to the web with version 5.2.
-   * @deprecated since Scout 10, will be removed with Scout 11
-   */
-  @Deprecated
-  boolean isMinimizeEnabled();
-
-  /**
-   * This method does nothing since Scout moved to the web with version 5.2.
-   * @deprecated since Scout 10, will be removed with Scout 11
-   */
-  @Deprecated
-  void setMinimizeEnabled(boolean b);
 
   /**
    * @return <code>true</code> to make this {@link IForm} modal in respect to its {@link IDisplayParent}, or

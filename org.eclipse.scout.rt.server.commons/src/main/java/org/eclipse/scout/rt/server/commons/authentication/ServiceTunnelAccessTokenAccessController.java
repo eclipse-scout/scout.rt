@@ -123,7 +123,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
     }
 
     /**
-     * @deprecated use {@link #getPrincipalProducer2()} instead
+     * @deprecated use {@link #getPrincipalProducer2()} instead. Will be removed in Scout 12.
      */
     @Deprecated
     public IPrincipalProducer getPrincipalProducer() {
@@ -131,7 +131,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
     }
 
     /**
-     * @deprecated use {@link #withPrincipalProducer2(IPrincipalProducer2)} instead
+     * @deprecated use {@link #withPrincipalProducer2(IPrincipalProducer2)} instead. Will be removed in Scout 12.
      */
     @Deprecated
     public ServiceTunnelAccessTokenAuthConfig withPrincipalProducer(IPrincipalProducer principalProducer) {
@@ -142,7 +142,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
     /**
      * Default is {@link DefaultAuthTokenPrincipalProducer}
      *
-     * @since 10.0
+     * @since 11.0
      */
     public IPrincipalProducer2 getPrincipalProducer2() {
       return m_principalProducer;
@@ -151,7 +151,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
     /**
      * Default is {@link DefaultAuthTokenPrincipalProducer}
      *
-     * @since 10.0
+     * @since 11.0
      */
     public ServiceTunnelAccessTokenAuthConfig withPrincipalProducer2(IPrincipalProducer2 principalProducer) {
       m_principalProducer = principalProducer;

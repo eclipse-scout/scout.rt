@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,8 +38,7 @@ public final class FastBeanUtility {
   }
 
   /**
-   * @deprecated use {@link Introspector#decapitalize(String)}
-   * @param s
+   * @deprecated use {@link Introspector#decapitalize(String)} instead. Will be removed in Scout 12.
    * @return Introspector#decapitalize(String)
    */
   @Deprecated
@@ -69,7 +68,7 @@ public final class FastBeanUtility {
   private static final Pattern BEAN_METHOD_PAT = Pattern.compile("(get|set|is)([A-Z].*)");
 
   /**
-   * @return a map of property to its {@link InternalPropertyDescriptor}
+   * @return a map of property to its {@link FastPropertyDescriptor}
    */
   public static Map<String/*propertyName*/, FastPropertyDescriptor> createPropertyDescriptorMap(Class<?> beanClazz, Class<?> stopClazz) {
     Map<String, FastPropertyDescriptor> map = new HashMap<>();

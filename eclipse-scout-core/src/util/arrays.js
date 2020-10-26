@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -103,13 +103,6 @@ export function insert(arr, element, index) {
 export function insertAll(arr, elements, index) {
   elements = ensure(elements);
   arr.splice(...[index, 0].concat(elements));
-}
-
-/**
- * @deprecated use insertAll(arr, elements, index) instead
- */
-export function insertArray(arr, elements, index) {
-  return insertAll(arr, elements, index);
 }
 
 /**
@@ -552,7 +545,6 @@ export default {
   init,
   insert,
   insertAll,
-  insertArray,
   insertSorted,
   last,
   max,
