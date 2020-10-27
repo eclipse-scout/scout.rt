@@ -43,7 +43,7 @@ public class SmtpConnectionPoolEntry {
       m_transport.sendMessage(message, recipients);
       m_messagesSent++;
     }
-    catch (MessagingException e) {
+    catch (RuntimeException | MessagingException e) {
       m_failed = true;
       throw e;
     }
