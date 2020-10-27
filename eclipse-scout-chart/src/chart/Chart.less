@@ -516,6 +516,11 @@
 
   & > .elements {
     #scout.chart-label-grid-colors();
+
+    :not(.inverted) > & > .grid {
+      fill: darken(@chart-axis-line-color, 15);
+    }
+
     #scout.chart-auto-colors-schemes(@opacity: 70);
     #scout.chart-stroke-colors-schemes(
       @tile-default-background-color,
