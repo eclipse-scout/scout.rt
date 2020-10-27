@@ -116,7 +116,7 @@ export default class SimpleTabBox extends Widget {
     if (this.rendered) {
       this._renderView(view);
     }
-    if (!view.attached) {
+    if (view && !view.attached) {
       view.attach();
     }
 
