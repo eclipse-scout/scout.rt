@@ -116,6 +116,7 @@ public class SmtpConnectionPool {
       poolEntry.sendMessage(message, recipients);
     }
     catch (MessagingException e) {
+      // the type of the caught exception must follow the checks done in the isConnectionFailure method
       if (!isConnectionFailure(e)) {
         throw e;
       }
@@ -127,7 +128,7 @@ public class SmtpConnectionPool {
       try {
         poolEntry.sendMessage(message, recipients);
       }
-      catch (MessagingException e1) {
+      catch (RuntimeException | MessagingException e1) {
         LOG.error("Sending failed with the second try", e1);
         throw e1;
       }
@@ -156,7 +157,7 @@ public class SmtpConnectionPool {
         try {
           candidate = tryGetIdleOrCreateNewConnection(smtpServerConfig);
         }
-        catch (MessagingException e) {
+        catch (RuntimeException | MessagingException e) {
           throw new ProcessingException("MessagingException caught while trying to connect to smtp server.", e);
         }
 
@@ -380,7 +381,7 @@ public class SmtpConnectionPool {
     try {
       poolEntry.getTransport().close();
     }
-    catch (MessagingException e) {
+    catch (RuntimeException | MessagingException e) {
       LOG.warn("Could not close transport for pooled SMTP connection {}; assume already closed/crashed.", poolEntry, e);
     }
   }
