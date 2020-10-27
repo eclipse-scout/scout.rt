@@ -151,17 +151,6 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.eclipse.scout</groupId>
-          <artifactId>eclipse-settings-maven-plugin</artifactId>
-          <dependencies>
-            <dependency>
-              <groupId>org.eclipse.scout.rt</groupId>
-              <artifactId>org.eclipse.scout.rt-settings</artifactId>
-              <version>${project.version}</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-        <plugin>
           <artifactId>maven-dependency-plugin</artifactId>
           <version>3.1.2</version>
           <configuration>
