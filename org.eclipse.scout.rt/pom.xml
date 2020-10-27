@@ -83,7 +83,6 @@
     <module>../org.eclipse.scout.dev.jetty</module>
     <module>../org.eclipse.scout.dev.jetty.test</module>
     <module>../org.eclipse.scout.dev.jetty.test.affix</module>
-    <module>../org.eclipse.scout.rt-settings</module>
 
     <module>../eclipse-scout-cli</module>
     <module>../eclipse-scout-core</module>
@@ -930,21 +929,6 @@
   </dependencyManagement>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.eclipse.scout</groupId>
-          <artifactId>eclipse-settings-maven-plugin</artifactId>
-          <dependencies>
-            <dependency>
-              <groupId>org.eclipse.scout.rt</groupId>
-              <artifactId>org.eclipse.scout.rt-settings</artifactId>
-              <version>${project.version}</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
