@@ -697,6 +697,7 @@ export default class ChartTableControl extends TableControl {
         }]
       },
       options: {
+        handleResize: true,
         maxSegments: 5,
         legend: {
           display: false
@@ -839,7 +840,8 @@ export default class ChartTableControl extends TableControl {
 
     if (this.chartType === Chart.Type.BUBBLE) {
       config.bubble = $.extend(true, {}, config.bubble, {
-        sizeOfLargestBubble: 25
+        sizeOfLargestBubble: 25,
+        minBubbleSize: 5
       });
 
       if (!(xAxis.column instanceof NumberColumn)) {
@@ -989,6 +991,18 @@ export default class ChartTableControl extends TableControl {
         clickable: true,
         checkable: true,
         otherSegmentClickable: true
+      });
+    }
+    if (this.chartType === Chart.Type.PIE) {
+      // Compensate the margin of the container so that the chart is always centered vertically
+      let margin = this.chart.$container.cssMarginTop() - this.chart.$container.cssMarginBottom();
+      config.options = $.extend(true, {}, config.options, {
+        layout: {
+          padding: {
+            top: Math.sign(margin) < 0 ? Math.abs(margin) : 0,
+            bottom: Math.sign(margin) > 0 ? margin : 0
+          }
+        }
       });
     }
   }

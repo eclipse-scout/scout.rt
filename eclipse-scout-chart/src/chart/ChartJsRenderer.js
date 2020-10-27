@@ -13,6 +13,8 @@ import ChartJs from 'chart.js';
 import {Event, styles, arrays, strings} from '@eclipse-scout/core';
 // noinspection ES6UnusedImports
 import chartjs_plugin_datalabels from 'chartjs-plugin-datalabels';
+// noinspection ES6UnusedImports
+import ChartJsTooltipDelay from './ChartJsTooltipDelay';
 
 /**
  * @typedef ChartJs
@@ -34,11 +36,13 @@ ChartJs.defaults.global.elements.line.tension = 0;
 ChartJs.defaults.global.elements.line.fill = false;
 ChartJs.defaults.global.elements.line.borderWidth = 2;
 ChartJs.defaults.global.elements.point.radius = 0;
-ChartJs.defaults.global.elements.point.hitRadius = 5;
+ChartJs.defaults.global.elements.point.hitRadius = 10;
 ChartJs.defaults.global.elements.point.hoverRadius = 5;
 ChartJs.defaults.global.elements.point.hoverBorderWidth = 2;
 ChartJs.defaults.global.elements.arc.borderWidth = 1;
 ChartJs.defaults.global.elements.rectangle.borderWidth = 1;
+ChartJs.defaults.global.elements.rectangle.borderSkipped = '';
+ChartJs.defaults.horizontalBar.elements.rectangle.borderSkipped = '';
 ChartJs.defaults.global.tooltips.borderWidth = 1;
 ChartJs.defaults.global.tooltips.cornerRadius = 4;
 ChartJs.defaults.global.tooltips.xPadding = 8;
@@ -85,6 +89,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this.minRadialChartDatalabelSpace = 25;
 
     this.resetDatasetAfterHover = false;
+
+    this._resizeHandler = this._onResize.bind(this);
 
     this._labelFormatter = this._formatLabel.bind(this);
     this._xLabelFormatter = this._formatXLabel.bind(this);
@@ -220,7 +226,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
      * @property {object} chartArea
      */
     this.chartJs = new ChartJs(this.$canvas[0].getContext('2d'), config);
-    this._adjustGrid(this.chartJs.config, this.chartJs.chartArea);
+    this._adjustSize(this.chartJs.config, this.chartJs.chartArea);
     this.chartJs.update();
   }
 
@@ -377,24 +383,18 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       config.data.labels = newLabels;
       config.data.maxSegmentsExceeded = true;
     }
-    if (config.type === Chart.Type.BUBBLE) {
-      config.data.datasets.forEach(dataset => dataset.data.forEach(data => {
-        if (isNaN(data.r) && !isNaN(data.z)) {
-          data.r = Math.sqrt(data.z);
-        }
-      }));
-      if (!(config.bubble || {}).bubbleScalingFactor) {
-        let maxR = this._computeMaxMinValue(config.data.datasets, 'r', true).maxValue,
-          bubbleScalingFactor = 1;
-        if (maxR > 0 && (config.bubble || {}).sizeOfLargestBubble) {
-          bubbleScalingFactor = Math.min(config.bubble.sizeOfLargestBubble, Math.floor(this.$canvas.cssWidth() / 8), Math.floor(this.$canvas.cssHeight() / 6)) / maxR;
-          config.data.datasets.forEach(dataset => dataset.data.forEach(data => {
-            data.r = data.r * bubbleScalingFactor;
-          }));
-        }
-        config.bubble = $.extend(true, {}, config.bubble, {bubbleScalingFactor: bubbleScalingFactor});
-      }
+
+    if (config.type !== Chart.Type.BUBBLE) {
+      return;
     }
+
+    config.data.datasets.forEach(dataset => dataset.data.forEach(data => {
+      if (!isNaN(data.r)) {
+        data.z = Math.pow(data.r, 2);
+      } else if (!isNaN(data.z)) {
+        data.r = Math.sqrt(data.z);
+      }
+    }));
   }
 
   _adjustLayout(config) {
@@ -417,6 +417,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         }
       }
     });
+    if (config.options.handleResize) {
+      config.options.onResize = this._resizeHandler;
+    }
     if (scout.isOneOf(type, Chart.Type.POLAR_AREA, Chart.Type.RADAR)) {
       config.options = $.extend(true, {}, config.options, {
         scale: {}
@@ -522,6 +525,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
   }
 
+  _onResize(chart, size) {
+    chart.update();
+    this._adjustSize(chart.config, chart.chartArea);
+  }
+
   _formatLabel(label) {
     return this._formatLabelMap(label, null, ((this.chartJs || {config: {}}).config.options || {}).numberFormatter);
   }
@@ -617,7 +625,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _formatDatalabels(value, context) {
     if (context.chart.config.type === Chart.Type.BUBBLE) {
-      return this._formatLabel(Math.pow(value.r / (context.chart.config.bubble.bubbleScalingFactor || 1), 2));
+      return this._formatLabel(value.z);
     }
     return this._formatLabel(value);
   }
@@ -970,7 +978,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       value = this._formatLabel(dataset.data[tooltipItem.index]);
     } else if (config.type === Chart.Type.BUBBLE) {
       label = dataset.label;
-      value = this._formatLabel(Math.pow(dataset.data[tooltipItem.index].r / (config.bubble.bubbleScalingFactor || 1), 2));
+      value = this._formatLabel(dataset.data[tooltipItem.index].z);
     } else {
       let defaultLabel = (((ChartJs.defaults[config.type] || {}).tooltips || {}).callbacks || {}).label || ChartJs.defaults.global.tooltips.callbacks.label;
       label = defaultLabel.call(this.chartJs, tooltipItem, data);
@@ -1013,6 +1021,72 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     return defaultLabelColor.call(chart, tooltipItem, chart);
   }
 
+  _adjustSize(config, chartArea) {
+    this._adjustBubbleSizes(config, chartArea);
+    this._adjustGrid(config, chartArea);
+  }
+
+  _adjustBubbleSizes(config, chartArea) {
+    if (config.type !== Chart.Type.BUBBLE) {
+      return;
+    }
+    // Scale all bubbles so that the largest radius is equal to sizeOfLargestBubble and the smallest greater than or equal to minBubbleSize.
+    // First reset all radii.
+    config.data.datasets.forEach(dataset => dataset.data.forEach(data => {
+      if (!isNaN(data.z)) {
+        data.r = Math.sqrt(data.z);
+      }
+    }));
+    let maxMinR = this._computeMaxMinValue(config.data.datasets, 'r', true),
+      maxR = maxMinR.maxValue,
+      minR = maxMinR.minValue,
+      // Compute a scalingFactor and an offset to get the new radius newR = r * scalingFactor + offset.
+      bubbleScalingFactor = 1,
+      bubbleRadiusOffset = 0;
+    if ((config.bubble || {}).sizeOfLargestBubble) {
+      let width = Math.abs(chartArea.right - chartArea.left),
+        height = Math.abs(chartArea.top - chartArea.bottom),
+        sizeOfLargestBubble = Math.min(config.bubble.sizeOfLargestBubble, Math.floor(Math.min(width, height) / 6));
+      if (maxR === 0) {
+        // If maxR is equal to 0, all radii are equal to 0, therefore set bubbleRadiusOffset to sizeOfLargestBubble.
+        bubbleRadiusOffset = sizeOfLargestBubble;
+      } else if ((config.bubble || {}).minBubbleSize && config.bubble.sizeOfLargestBubble > config.bubble.minBubbleSize && (minR / maxR) < (config.bubble.minBubbleSize / sizeOfLargestBubble)) {
+        // If minR/maxR is smaller than minBubbleSize/sizeOfLargestBubble, then it is not sufficient to scale all radii.
+
+        // The scalingFactor and the result from the following two conditions:
+        // (1) minBubbleSize = offset + scalingFactor * minR
+        // (2) sizeOfLargestBubble = offset + scalingFactor * maxR
+
+        // Therefore
+        // (1*) offset = minBubbleSize - scalingFactor * minR
+        // (2*) offset = sizeOfLargestBubble - scalingFactor * maxR
+
+        // (1*) = (2*):
+        // minBubbleSize - scalingFactor * minR = sizeOfLargestBubble - scalingFactor * maxR
+        // <=> scalingFactor * maxR - scalingFactor * minR = sizeOfLargestBubble - minBubbleSize
+        // <=> scalingFactor * (maxR - minR) = sizeOfLargestBubble - minBubbleSize
+        // <=> scalingFactor = (sizeOfLargestBubble - minBubbleSize) / (maxR - minR)
+        bubbleScalingFactor = (sizeOfLargestBubble - config.bubble.minBubbleSize) / (maxR - minR);
+        bubbleRadiusOffset = config.bubble.minBubbleSize - bubbleScalingFactor * minR;
+      } else {
+        // Scaling is sufficient.
+        bubbleScalingFactor = sizeOfLargestBubble / maxR;
+      }
+    } else if ((config.bubble || {}).minBubbleSize && config.bubble.minBubbleSize > minR) {
+      // sizeOfLargestBubble is not set
+      if (minR === 0) {
+        // If the smallest radius equals 0 scaling will have no effect.
+        bubbleRadiusOffset = config.bubble.minBubbleSize;
+      } else {
+        // Scaling is sufficient.
+        bubbleScalingFactor = config.bubble.minBubbleSize / minR;
+      }
+    }
+    config.data.datasets.forEach(dataset => dataset.data.forEach(data => {
+      data.r = data.r * bubbleScalingFactor + bubbleRadiusOffset;
+    }));
+  }
+
   _adjustGrid(config, chartArea) {
     if (!config || !config.type || !config.options || (!config.options.scale && !config.options.scales) || !chartArea) {
       return;
@@ -1036,6 +1110,10 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         yBoundaries = this._computeMaxMinValue(config.data.datasets, 'y', config.options.scales.yLabelMap, true);
       } else {
         yBoundaries = this._computeMaxMinValue(config.data.datasets, 'y', config.options.scales.yLabelMap, true, padding, height);
+      }
+      if (config.options.scales.yLabelMap) {
+        yBoundaries.maxValue = Math.ceil(yBoundaries.maxValue);
+        yBoundaries.minValue = Math.floor(yBoundaries.minValue);
       }
     } else {
       let datasets = [],
@@ -1126,6 +1204,10 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     } else {
       xBoundaries = this._computeMaxMinValue(config.data.datasets, 'x', config.options.scales.xLabelMap, true, padding, width);
     }
+    if (config.options.scales.xLabelMap) {
+      xBoundaries.maxValue = Math.ceil(xBoundaries.maxValue);
+      xBoundaries.minValue = Math.floor(xBoundaries.minValue);
+    }
     this._adjustAxes(config.options.scales.xAxes, maxXTicks, xBoundaries);
   }
 
@@ -1204,8 +1286,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
 
     return {
-      maxValue: Math.ceil(maxBoundary),
-      minValue: Math.floor(minBoundary)
+      maxValue: maxBoundary,
+      minValue: minBoundary
     };
   }
 

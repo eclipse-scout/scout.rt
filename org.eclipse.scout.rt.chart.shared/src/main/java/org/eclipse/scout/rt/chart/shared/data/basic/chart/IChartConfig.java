@@ -57,6 +57,7 @@ public interface IChartConfig extends Serializable {
   String FULFILLMENT_START_VALUE = "fulfillment.startValue";
 
   String BUBBLE_SIZE_OF_LARGEST_BUBBLE = "bubble.sizeOfLargestBubble";
+  String BUBBLE_MIN_BUBBLE_SIZE = "bubble.minBubbleSize";
 
   IChartConfig copy();
 
