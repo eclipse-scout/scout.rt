@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * {@link ExceptionMapper} transforming {@link RemoteSystemUnavailableException} into
- * {@link Response.Status.SERVICE_UNAVAILABLE}
+ * {@link Response.Status#SERVICE_UNAVAILABLE}
  */
 public class RemoteSystemUnavailableExceptionMapper extends AbstractExceptionMapper<RemoteSystemUnavailableException> {
 

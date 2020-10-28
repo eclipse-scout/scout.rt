@@ -28,6 +28,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.UriBuilder;
 import org.eclipse.scout.rt.rest.client.proxy.IRestClientExceptionTransformer;
 import org.eclipse.scout.rt.rest.client.proxy.RestClientProxyFactory;
@@ -187,9 +189,21 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
   }
 
   protected URI buildUri(String resourcePath) {
-    return new UriBuilder(getBaseUri())
+    return new UriBuilder(validateBaseUri(getBaseUri()))
         .addPath(resourcePath)
         .createURI();
+  }
+
+  /**
+   * @return the given baseUri if it is valid (otherwise, an exception is thrown)
+   * @throws RemoteSystemUnavailableException
+   *           if the given baseUri is not set
+   */
+  protected String validateBaseUri(String baseUri) {
+    if (!StringUtility.hasText(baseUri)) {
+      throw new RemoteSystemUnavailableException("Missing base URI for {}", getClass().getName());
+    }
+    return baseUri;
   }
 
   /**
