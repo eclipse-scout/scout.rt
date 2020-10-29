@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -37,6 +38,7 @@ import org.eclipse.scout.rt.rest.RestApplication.IRestApplicationPropertiesContr
 import org.eclipse.scout.rt.rest.RestApplication.IRestApplicationSingletonsContributor;
 import org.eclipse.scout.rt.rest.container.AntiCsrfContainerFilter;
 import org.eclipse.scout.rt.rest.container.IRestContainerRequestFilter;
+import org.eclipse.scout.rt.rest.container.IRestContainerResponseFilter;
 import org.eclipse.scout.rt.rest.container.PathValidationFilter;
 import org.eclipse.scout.rt.rest.exception.DefaultExceptionMapper;
 import org.eclipse.scout.rt.rest.exception.VetoExceptionMapper;
@@ -78,6 +80,13 @@ public class RestApplicationTest {
   public static class FixtureRestContainerRequestFilter implements IRestContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) {
+    }
+  }
+
+  @IgnoreBean
+  public static class FixtureRestContainerResponseFilter implements IRestContainerResponseFilter {
+    @Override
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
     }
   }
 
@@ -143,6 +152,7 @@ public class RestApplicationTest {
     s_registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(FixtureExceptionMapper.class)));
     s_registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(FixtureParamConverterProvider.class)));
     s_registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(FixtureRestContainerRequestFilter.class)));
+    s_registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(FixtureRestContainerResponseFilter.class)));
     s_registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(FixtureResource.class)));
 
     s_registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(FixtureClassesContributor.class)));
@@ -164,6 +174,7 @@ public class RestApplicationTest {
     assertTrue(classes.contains(FixtureExceptionMapper.class));
     assertTrue(classes.contains(FixtureParamConverterProvider.class));
     assertTrue(classes.contains(FixtureRestContainerRequestFilter.class));
+    assertTrue(classes.contains(FixtureRestContainerResponseFilter.class));
     assertTrue(classes.contains(FixtureResource.class));
     assertTrue(classes.contains(FixtureClassesContributor.CLASS));
 

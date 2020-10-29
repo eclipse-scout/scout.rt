@@ -10,20 +10,20 @@
  */
 package org.eclipse.scout.rt.rest.container;
 
-import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseFilter;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.rest.RestApplication;
 import org.eclipse.scout.rt.rest.RestApplicationContributors;
 
 /**
- * Global {@link ContainerRequestFilter} marked as {@link Bean}.
+ * Global {@link ContainerResponseFilter} marked as {@link Bean}.
  * <p>
  * Implementations of this interface are automatically registered within the {@link RestApplication}.
  *
- * @see ContainerRequestFilter
- * @see RestApplicationContributors.RestContainerRequestFilterContributor
+ * @see ContainerResponseFilter
+ * @see RestApplicationContributors.RestContainerResponseFilterContributor
  */
 @Bean
-public interface IRestContainerRequestFilter extends ContainerRequestFilter {
+public interface IRestContainerResponseFilter extends ContainerResponseFilter {
 }
