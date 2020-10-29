@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.mail;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -553,16 +554,36 @@ public class MailHelper {
     part.addHeader(CONTENT_TYPE_ID, contentType);
   }
 
+  /**
+   * @return {@link MimeMessage} created out of given {@code byte[]}
+   */
   public MimeMessage createMessageFromBytes(byte[] bytes) {
     return createMessageFromBytes(bytes, null);
   }
 
+  /**
+   * @return {@link MimeMessage} created out of given {@code byte[]}
+   */
   public MimeMessage createMessageFromBytes(byte[] bytes, Session session) {
     try {
       ByteArrayInputStream st = new ByteArrayInputStream(bytes);
       return new MimeMessage(session, st);
     }
     catch (Exception e) {
+      throw new ProcessingException("Unexpected: ", e);
+    }
+  }
+
+  /**
+   * @return The given {@link MimeMessage} as byte[] formatted according to RFC 822.
+   */
+  public byte[] getMessageAsBytes(MimeMessage mimeMessage) {
+    try {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      mimeMessage.writeTo(baos);
+      return baos.toByteArray();
+    }
+    catch (MessagingException | IOException e) {
       throw new ProcessingException("Unexpected: ", e);
     }
   }
