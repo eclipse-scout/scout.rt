@@ -67,6 +67,8 @@ export function removeScrollable(session, $container) {
  * @param [options.axis] x, y or both. Default is both.
  * @param {boolean} [options.nativeScrollbars]
  * @param {boolean} [options.hybridScrollbars]
+ * @param {Session} [options.session]
+ * @param {Widget} [options.parent]
  */
 export function install($container, options) {
   options = _createDefaultScrollToOptions(options);

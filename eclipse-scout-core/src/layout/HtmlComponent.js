@@ -23,6 +23,7 @@ export default class HtmlComponent {
     this.layout = new NullLayout();
     this.layoutData = null;
     this.valid = false;
+    this.validateRoot = false;
 
     /**
      * Flag to indicate that the component has been layouted at least once. Invalidation should NOT reset this flag.
@@ -52,6 +53,7 @@ export default class HtmlComponent {
      */
     this.prefSizeCached = {};
     this.session = session;
+    this.scrollable = false;
   }
 
   /**
@@ -265,21 +267,19 @@ export default class HtmlComponent {
   }
 
   /**
-   * Returns the preferred size of the component, insets included, margin excluded<p>
+   * Returns the preferred size of the component, insets included, margin excluded.<p>
    * The preferred size is cached until the component will be invalidated.
    * Hence, subsequent calls to this function will return the cached preferred size unless the component is invalidated.
    * <p>
    *
-   * OPTION                  DEFAULT VALUE   DESCRIPTION
-   * --------------------------------------------------
-   * includeMargin           false           Whether to include the margin in the returned size.
-   * widthHint               null            When set, horizontal padding, border and margin are removed from it so that the actual layout does not need to take care of it.
-   * heightHint              null            When set, vertical padding, border and margin are removed from it so that the actual layout does not need to take care of it.
-   * removeMarginFromHints   true            Whether or not to automatically remove the margin from the hints.
-   *
-   * @param (options) an optional options object. Short-hand version: If a boolean is passed instead of an object, the value is automatically converted to the option "includeMargin".
-   *                  May contain the options of the above table. All other options are passed as they are to the layout when @{link layout.preferredLayoutSize()} is called.
-   *                  Possible options may be found at @{link graphics.prefSize()}, but it depends on the actual layout if these options have an effect or not.
+   * @param {object|boolean} [options] an optional options object. Short-hand version: If a boolean is passed instead of an object, the value is automatically converted to the option "includeMargin".
+   *                  May contain the options described below. All other options are passed as they are to the layout when layout.preferredLayoutSize() is called.
+   *                  Possible options may be found at graphics.prefSize(), but it depends on the actual layout if these options have an effect or not.
+   * @param {boolean|null} [options.includeMargin] Whether to include the margin in the returned size. Default is false.
+   * @param {number} [options.widthHint] When set, horizontal padding, border and margin are removed from it so that the actual layout does not need to take care of it. Default is null.
+   * @param {number} [options.heightHint] When set, vertical padding, border and margin are removed from it so that the actual layout does not need to take care of it. Default is null.
+   * @param {boolean|null} [options.removeMarginFromHints] Whether or not to automatically remove the margin from the hints. Default is true.
+   * @param {boolean|null} [options.removeInsetsFromHints] Whether or not to automatically remove the insets (padding and border) from the hints. Default is true.
    * @exception When component has no layout
    */
   prefSize(options) {
@@ -338,12 +338,14 @@ export default class HtmlComponent {
    */
   _adjustSizeHintsForPrefSize(options, minSize, maxSize) {
     var removeMargins = scout.nvl(options.removeMarginFromHints, true);
+    var removeInsets = scout.nvl(options.removeInsetsFromHints, true);
     options.removeMarginFromHints = null;
+    options.removeInsetsFromHints = null;
     if (!options.widthHint && !options.heightHint) {
       return;
     }
     var margins = removeMargins ? this.margins() : new Insets();
-    var insets = this.insets();
+    var insets = removeInsets ? this.insets() : new Insets();
     if (options.widthHint) {
       // The order is important! Box-sizing: border-box is expected.
       options.widthHint -= margins.horizontal();
