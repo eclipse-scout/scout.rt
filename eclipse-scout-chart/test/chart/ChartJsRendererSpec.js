@@ -27,6 +27,9 @@ describe('ChartJsRendererSpec', () => {
             data: [11, 13, 17, 31, 37, 41, 43],
             label: 'Dataset 1'
           }]
+        },
+        options: {
+          adjustGrid: true
         }
       },
       defaultScalesConfig = $.extend(true, {}, defaultConfig, {

@@ -142,6 +142,7 @@ export default class Chart extends Widget {
       options: {
         autoColor: true,
         maxSegments: 5,
+        adjustGrid: true,
         clickable: false,
         checkable: false,
         animation: {
