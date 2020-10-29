@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.rest.RestApplication.IRestApplicationClassesContributor;
 import org.eclipse.scout.rt.rest.container.IRestContainerRequestFilter;
+import org.eclipse.scout.rt.rest.container.IRestContainerResponseFilter;
 
 /**
  * Collection of built-in contributors for {@link RestApplication} classes.
@@ -55,6 +56,13 @@ public final class RestApplicationContributors {
     @Override
     public Set<Class<?>> contribute() {
       return lookupBeanClasses(IRestContainerRequestFilter.class);
+    }
+  }
+
+  public static class RestContainerResponseFilterContributor implements IRestApplicationClassesContributor {
+    @Override
+    public Set<Class<?>> contribute() {
+      return lookupBeanClasses(IRestContainerResponseFilter.class);
     }
   }
 
