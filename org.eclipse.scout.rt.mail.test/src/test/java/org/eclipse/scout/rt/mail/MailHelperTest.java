@@ -729,6 +729,22 @@ public class MailHelperTest {
     assertEquals("Lorem", helper.getPlainText(message)); // failed with javax.mail.internet.ParseException: Expected disposition, got null
   }
 
+  @Test
+  public void testConvertMessageFromToBytes() throws Exception {
+    MailHelper helper = BEANS.get(MailHelper.class);
+
+    MailMessage mailMessage = BEANS.get(MailMessage.class)
+        .withSubject("mock subject")
+        .withBodyPlainText("lorem ipsum");
+    MimeMessage message = BEANS.get(MailHelper.class).createMimeMessage(mailMessage);
+
+    byte[] bytes = helper.getMessageAsBytes(message);
+    MimeMessage message2 = helper.createMessageFromBytes(bytes);
+
+    assertEquals(message.getSubject(), message2.getSubject());
+    assertEquals(message.getContent(), message2.getContent());
+  }
+
   protected void verifyAddPrefixToSubject(String messageSubject, String subjectPrefix, String expectedSubject) throws MessagingException {
     MailMessage mailMessage = BEANS.get(MailMessage.class)
         .withSubject(messageSubject)
