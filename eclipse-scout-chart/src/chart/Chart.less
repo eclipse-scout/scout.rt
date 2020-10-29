@@ -224,7 +224,6 @@
     }
   }
 
-
   /* Mixin to define different colors for different color schemes */
   .chart-colors-schemes(@color-default:red, @color-inverted:red, @color-alternative:red, @color-alternative-inverted:red, @color-rainbow:red, @opacity: 100, @darken: 0, @additional-classes: ~"") {
     #scout.chart-auto-colors(
@@ -356,7 +355,6 @@
     }
   }
 
-
   /* Mixin to define label and grid color */
   .chart-label-grid-colors() {
     > .label {
@@ -429,7 +427,6 @@
 .tile > .form-field:not(.label-hidden) > .field.chart {
   margin-top: 10px;
 }
-
 
 .bar-chart > .elements,
 .horizontalBar-chart > .elements,
@@ -599,44 +596,6 @@
   }
 }
 
-text.legend-label,
-text.legend-label-grid {
-
-  fill: @chart-legend-label-color;
-
-  .inverted & {
-    fill: @palette-white;
-  }
-}
-
-line.chart-axis {
-  stroke-width: 1px;
-  stroke: @chart-axis-line-color;
-  stroke-dasharray: 2, 4;
-}
-
-text.axis-label {
-  fill: @chart-axis-label-color;
-}
-
-text.chart-x-axis {
-  fill: @palette-white;
-  text-anchor: middle;
-  dominant-baseline: middle;
-  pointer-events: none;
-}
-
-text.chart-y-axis-label {
-  fill: @chart-axis-text-color;
-  text-anchor: end;
-  dominant-baseline: central;
-  font-size: @font-size-normal;
-
-  .inverted & {
-    fill: @palette-white;
-  }
-}
-
 text.line-label {
   fill: @chart-line-label-color;
   font-size: @font-size-normal;
@@ -669,18 +628,6 @@ line.label-line {
   stroke: @chart-axis-line-color;
 }
 
-text.chart-x-axis-label,
-textPath.chart-x-axis-label {
-  fill: @chart-axis-text-color;
-  text-anchor: middle;
-  dominant-baseline: middle;
-  font-size: @font-size-normal;
-
-  .inverted & {
-    fill: @palette-white;
-  }
-}
-
 /* --- Wire labels default ---*/
 
 .line-chart-wire-label {
@@ -697,34 +644,6 @@ textPath.chart-x-axis-label {
   fill: @background-color;
   #scout.tile-colors(fill);
   stroke-width: 0;
-}
-
-/* --- PieChart / Donutchart --- */
-
-circle.innerCircle {
-  fill: @background-color;
-  #scout.tile-colors(fill);
-}
-
-.pie-chart {
-  stroke-width: 1px;
-  stroke: @background-color;
-  #scout.tile-colors(stroke);
-
-  &.clickable {
-    cursor: pointer;
-  }
-
-  &.selected {
-    fill: @chart-data-active-color;
-  }
-}
-
-text.pie-chart-percentage {
-  fill: @palette-white;
-  text-anchor: middle;
-  dominant-baseline: middle;
-  pointer-events: none;
 }
 
 /* --- FulfillmentChart --- */
@@ -802,58 +721,6 @@ text.fulfillment-chart-label {
 
   .inverted & {
     fill: @fulfillment-chart-inverted-label-color;
-  }
-}
-
-/* --- LineChart --- */
-
-path.line-chart-line {
-  stroke-width: 2px;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  transition: stroke 0.7s ease;
-
-  &.hover-style {
-    stroke: @chart-data-active-color
-  }
-}
-
-.line-chart-value-bubble {
-  fill: @palette-white;
-  stroke-width: 2px;
-  transition: opacity 0.7s ease;
-
-  &:hover {
-    opacity: 1;
-  }
-
-  .clickable & {
-    cursor: pointer;
-  }
-
-  .clickable &:hover {
-    fill: @chart-data-active-color;
-  }
-}
-
-.line-chart-value-box {
-  fill: @palette-white;
-  stroke: @border-color;
-  stroke-width: 1px;
-}
-
-/* --- BarChart --- */
-
-rect.bar-chart-bar {
-  stroke: @palette-white;
-  stroke-width: 0;
-
-  &:hover {
-    fill: @chart-data-active-color;
-  }
-
-  .clickable & {
-    cursor: pointer;
   }
 }
 
@@ -966,7 +833,6 @@ text.salesfunnel-conversionrate-label {
     fill: @palette-white;
   }
 }
-
 
 /* --- Venn --- */
 

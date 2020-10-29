@@ -9,16 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  BarChartRenderer,
   ChartJsRenderer,
-  BarHorizontalChartRenderer,
   ChartLayout,
-  DonutChartRenderer,
   FulfillmentChartRenderer,
-  LineChartRenderer,
-  PieChartRenderer,
   SalesfunnelChartRenderer,
-  ScatterChartRenderer,
   SpeedoChartRenderer,
   VennChartRenderer
 } from '../index';
@@ -63,21 +57,15 @@ export default class Chart extends Widget {
 
   static Type = {
     PIE: 'pie',
-    PIE_OLD: 'pie_old',
     LINE: 'line',
-    LINE_OLD: 'line_old',
     BAR: 'bar',
     BAR_HORIZONTAL: 'horizontalBar',
-    BAR_VERTICAL_OLD: 'barVertical_old',
-    BAR_HORIZONTAL_OLD: 'barHorizontal_old',
     COMBO_BAR_LINE: 'comboBarLine',
-    SCATTER: 'scatter',
     FULFILLMENT: 'fulfillment',
     SPEEDO: 'speedo',
     SALESFUNNEL: 'salesfunnel',
     VENN: 'venn',
     DOUGHNUT: 'doughnut',
-    DONUT_OLD: 'donut_old',
     POLAR_AREA: 'polarArea',
     RADAR: 'radar',
     BUBBLE: 'bubble'
@@ -138,7 +126,7 @@ export default class Chart extends Widget {
 
   setConfig(config) {
     let defaultConfig = {
-      type: Chart.Type.PIE_OLD,
+      type: Chart.Type.PIE,
       options: {
         autoColor: true,
         maxSegments: 5,
@@ -280,16 +268,6 @@ export default class Chart extends Widget {
 
   _resolveChartRenderer() {
     switch (this.config.type) {
-      case Chart.Type.PIE_OLD:
-        return new PieChartRenderer(this);
-      case Chart.Type.LINE_OLD:
-        return new LineChartRenderer(this);
-      case Chart.Type.BAR_VERTICAL_OLD:
-        return new BarChartRenderer(this);
-      case Chart.Type.BAR_HORIZONTAL_OLD:
-        return new BarHorizontalChartRenderer(this);
-      case Chart.Type.SCATTER:
-        return new ScatterChartRenderer(this);
       case Chart.Type.FULFILLMENT:
         return new FulfillmentChartRenderer(this);
       case Chart.Type.SPEEDO:
@@ -298,8 +276,6 @@ export default class Chart extends Widget {
         return new SalesfunnelChartRenderer(this);
       case Chart.Type.VENN:
         return new VennChartRenderer(this);
-      case Chart.Type.DONUT_OLD:
-        return new DonutChartRenderer(this);
       case Chart.Type.BAR:
       case Chart.Type.BAR_HORIZONTAL:
       case Chart.Type.LINE:

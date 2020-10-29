@@ -250,7 +250,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
     if (this.animationDuration) {
       $poly.animate({
         tabIndex: 0
-      }, this._createAnimationObjectWithTabindexRemoval(expandFunc, this.animationDuration));
+      }, this._createAnimationObjectWithTabIndexRemoval(expandFunc, this.animationDuration));
     }
     if (this.chart.config.options.clickable) {
       $poly.on('click', renderPolyOptions.clickObject, this.chart._onValueClick.bind(this.chart));
@@ -397,28 +397,12 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       };
     this.$svg.children(this.segmentSelectorForAnimation).animate({
       tabIndex: 0
-    }, this._createAnimationObjectWithTabindexRemoval(shrink))
+    }, this._createAnimationObjectWithTabIndexRemoval(shrink))
       .promise()
       .done(() => {
         this._remove(afterRemoveFunc);
         this.animationTriggered = false;
       });
-  }
-
-  _calcChartBoxWidth() {
-    return this.width;
-  }
-
-  _calcChartBoxHeight() {
-    return this.height;
-  }
-
-  _calcChartBoxXOffset() {
-    return 0;
-  }
-
-  _calcChartBoxYOffset() {
-    return 0;
   }
 
   _dynamicCssClass(cssClass) {

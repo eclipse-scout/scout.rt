@@ -37,17 +37,17 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 
 /**
  * <h1>Chart types</h1>
- * <h2>Pie and Donut Chart</h2> ({@link IChartType#PIE_OLD}, {@link IChartType#DONUT_OLD})
+ * <h2>Pie and Donut Chart</h2> ({@link IChartType#PIE}, {@link IChartType#DOUGHNUT})
  * <p>
  * Sectors on pie or donut represent a single {@link MonupleChartValueGroupBean} on the {@link ChartData}. For each
  * {@link MonupleChartValueGroupBean} there can be only one value. On the {@link ChartData} there are no axes set.
- * <h2>Line Chart</h2> ({@link IChartType#LINE_OLD})
+ * <h2>Line Chart</h2> ({@link IChartType#LINE})
  * <p>
  * Each line represents a single {@link MonupleChartValueGroupBean} on the {@link ChartData}. All added
  * {@link MonupleChartValueGroupBean} must have the same value count. The labels of the x-axis are read out of
  * {@link ChartData#getAxes()}<code>[0]</code>. Each label in this list corresponds to the index in the value list in
  * the {@link MonupleChartValueGroupBean}.
- * <h2>Bar Chart</h2> ({@link IChartType#BAR_VERTICAL_OLD})
+ * <h2>Bar Chart</h2> ({@link IChartType#BAR})
  * <p>
  * Each bar group in the same color represents a single {@link MonupleChartValueGroupBean} on the {@link ChartData}. All
  * added {@link MonupleChartValueGroupBean} must have the same value count. The labels of the x-axis are read out of
@@ -133,7 +133,7 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
   @Order(10)
   protected IChartConfig getConfiguredConfig() {
     return BEANS.get(IChartConfig.class)
-        .withType(IChartType.PIE_OLD)
+        .withType(IChartType.PIE)
         .withAutoColor(true)
         .withMaxSegments(IChartConfig.DEFAULT_MAX_SEGMENTS_PIE)
         .withClickable(false)

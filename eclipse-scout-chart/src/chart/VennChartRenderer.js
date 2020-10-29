@@ -8,13 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractGridChartRenderer, VennAsync3Calculator, VennCircle, VennCircleHelper} from '../index';
+import {AbstractSvgChartRenderer, VennAsync3Calculator, VennCircle, VennCircleHelper} from '../index';
 import $ from 'jquery';
 
-export default class VennChartRenderer extends AbstractGridChartRenderer {
+export default class VennChartRenderer extends AbstractSvgChartRenderer {
 
   constructor(chart) {
     super(chart);
+    this.animationTriggered = false;
+    this.suppressLegendBox = true;
 
     let defaultConfig = {
       venn: {

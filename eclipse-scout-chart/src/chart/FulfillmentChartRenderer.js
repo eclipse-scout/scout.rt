@@ -9,13 +9,16 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {objects, scout} from '@eclipse-scout/core';
-import {AbstractCircleChartRenderer} from '../index';
+import {AbstractSvgChartRenderer} from '../index';
 import $ from 'jquery';
 
-export default class FulfillmentChartRenderer extends AbstractCircleChartRenderer {
+export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
 
   constructor(chart) {
     super(chart);
+
+    this.animationTriggered = false;
+    this.r;
 
     this.segmentSelectorForAnimation = '.fulfillment-chart';
     this.suppressLegendBox = true;
@@ -48,7 +51,6 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
 
     this._renderInnerCircle();
     this._renderPercentage(value, total);
-    this._renderLegendEntry(chartData.chartValueGroups[0].groupName, null, null, 0);
   }
 
   _renderPercentage(value, total) {
@@ -109,7 +111,7 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
         .attr('d', this.pathSegment(0, lastEnd))
         .animate({
           tabIndex: 0
-        }, this._createAnimationObjectWithTabindexRemoval(tweenInFunc, this.animationDuration));
+        }, this._createAnimationObjectWithTabIndexRemoval(tweenInFunc, this.animationDuration));
 
       $label
         .attr('opacity', 0)
@@ -119,8 +121,18 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
     }
   }
 
-  _useFontSizeBig() {
-    return false;
+  pathSegment(start, end) {
+    let s = start * 2 * Math.PI,
+      e = end * 2 * Math.PI,
+      pathString = '';
+
+    pathString += 'M' + (this.chartBox.mX() + this.r * Math.sin(s)) + ',' + (this.chartBox.mY() - this.r * Math.cos(s));
+    pathString += 'A' + this.r + ', ' + this.r;
+    pathString += (end - start < 0.5) ? ' 0 0,1 ' : ' 0 1,1 ';
+    pathString += (this.chartBox.mX() + this.r * Math.sin(e)) + ',' + (this.chartBox.mY() - this.r * Math.cos(e));
+    pathString += 'L' + this.chartBox.mX() + ',' + this.chartBox.mY() + 'Z';
+
+    return pathString;
   }
 
   _renderCirclePath(cssClass, id, radius) {
@@ -169,5 +181,29 @@ export default class FulfillmentChartRenderer extends AbstractCircleChartRendere
     }
 
     return super.shouldAnimateRemoveOnUpdate(opts);
+  }
+
+  _removeAnimated(afterRemoveFunc) {
+    if (this.animationTriggered) {
+      return;
+    }
+    let that = this;
+    let tweenOut = function(now, fx) {
+      let $this = $(this);
+      let start = $this.data('animation-start'),
+        end = $this.data('animation-end');
+      $this.attr('d', that.pathSegment(start * (1 - fx.pos), end * (1 - fx.pos)));
+    };
+
+    this.animationTriggered = true;
+    this.$svg.children(this.segmentSelectorForAnimation)
+      .animate({
+        tabIndex: 0
+      }, this._createAnimationObjectWithTabIndexRemoval(tweenOut))
+      .promise()
+      .done(() => {
+        this._remove(afterRemoveFunc);
+        this.animationTriggered = false;
+      });
   }
 }

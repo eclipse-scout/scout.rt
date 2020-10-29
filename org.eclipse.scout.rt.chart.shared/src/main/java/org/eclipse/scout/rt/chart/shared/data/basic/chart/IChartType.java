@@ -16,21 +16,15 @@ package org.eclipse.scout.rt.chart.shared.data.basic.chart;
 public interface IChartType {
 
   String PIE = "pie";
-  String PIE_OLD = "pie_old";
   String LINE = "line";
-  String LINE_OLD = "line_old";
   String BAR = "bar";
   String BAR_HORIZONTAL = "horizontalBar";
-  String BAR_VERTICAL_OLD = "barVertical_old";
-  String BAR_HORIZONTAL_OLD = "barHorizontal_old";
   String COMBO_BAR_LINE = "comboBarLine";
-  String SCATTER = "scatter";
   String FULFILLMENT = "fulfillment";
   String SPEEDO = "speedo";
   String SALESFUNNEL = "salesfunnel";
   String VENN = "venn";
   String DOUGHNUT = "doughnut";
-  String DONUT_OLD = "donut_old";
   String POLAR_AREA = "polarArea";
   String RADAR = "radar";
   String BUBBLE = "bubble";

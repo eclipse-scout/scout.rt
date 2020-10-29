@@ -156,7 +156,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
       this.$pointer
         .animate({
           tabIndex: 0
-        }, this._createAnimationObjectWithTabindexRemoval(tweenIn, this.animationDuration));
+        }, this._createAnimationObjectWithTabIndexRemoval(tweenIn, this.animationDuration));
     } else {
       this._updatePointer(valuePercentage);
       this._updatePartsFill(valuePercentage);
@@ -187,8 +187,6 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
   }
 
   _renderLegend(minValue, value, maxValue, groupName) {
-    this._renderLegendEntry(groupName, null, null, 0);
-
     let minMaxLegendFontSize = this.scaleWeight * 0.8,
       padding = 5, // same as in AbstractChartRenderer#_renderWireLegend
       labelYPos = this.my + padding,
@@ -421,7 +419,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
     this.$svg.children(this.segmentSelectorForAnimation)
       .animate({
         tabIndex: 0
-      }, this._createAnimationObjectWithTabindexRemoval(tweenOut))
+      }, this._createAnimationObjectWithTabIndexRemoval(tweenOut))
       .promise()
       .done(() => {
         this._remove(afterRemoveFunc);

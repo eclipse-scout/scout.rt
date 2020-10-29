@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ObjectFactory, scout, strings, tooltips} from '@eclipse-scout/core';
+import {ObjectFactory, strings} from '@eclipse-scout/core';
 import $ from 'jquery';
 import {Chart, AbstractChartRenderer} from '../index';
 
@@ -18,19 +18,11 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     super(chart);
     this.chartBox = {};
     this.labelBox = {};
-    this.labelSize = null;
 
     // Clipping and masking
     this.clipId = 'Clip-' + ObjectFactory.get().createUniqueId();
     this.maskId = 'Mask-' + ObjectFactory.get().createUniqueId();
 
-    // Padding constants
-    this.legendBubblePadding = 5;
-    this.horizontalLegendPaddingLeft = 0;
-    this.horizontalLegendEntriesPerLine = 3;
-    this.verticalLegendPaddingLeft = 20;
-
-    this.legendLabelClass = 'legend-label';
     this.suppressLegendBox = false;
   }
 
@@ -45,16 +37,10 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     }
     this.svgHeight = this.$svg.height();
     this.svgWidth = this.$svg.width();
-    // When chart is smaller than 300px only show two elements per line in legend
-    if (this.svgWidth < 300) {
-      this.horizontalLegendEntriesPerLine = 2;
-    }
     // This works, because CSS specifies 100% width/height
     this.height = this.svgHeight;
     this.width = this.svgWidth;
-    this._initLegendTextHeights();
     this._initChartBox();
-    this._initLabelBox();
     if (this._useFontSizeBig()) {
       this.$svg.addClass(AbstractSvgChartRenderer.FONT_SIZE_BIG);
     } else if (this._useFontSizeMiddle()) {
@@ -115,32 +101,6 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     afterRemoveFunc && afterRemoveFunc(this.chartAnimationStopping);
   }
 
-  _initRectRenderOptions(renderRectOptions) {
-    // init all values for animation with -1
-
-    // Default options (end value of "null" means "don't set this attribute")
-    let options = {
-      xStart: 0,
-      xEnd: null,
-      yStart: 0,
-      yEnd: null,
-      widthStart: 0,
-      widthEnd: null,
-      heightStart: 0,
-      heightEnd: null,
-      delay: 200,
-      animationDuration: this.animationDuration,
-      clickObject: null,
-      fill: null,
-      opacity: 1,
-      id: '',
-      cssClass: '',
-      customAttributes: [] // add custom attributes like this-> [[0]=>attributeName [1]=>attributeValue]
-    };
-    $.extend(options, renderRectOptions || {});
-    return options;
-  }
-
   /**
    * For all parameters: use null when parameter is not used or set by a chart type.
    *
@@ -152,61 +112,6 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
       xIndex: xIndex,
       dataIndex: xIndex,
       datasetIndex: datasetIndex
-    };
-  }
-
-  _initLabelBox() {
-    if (!this.chart.config.options.legend.display || this.suppressLegendBox) {
-      return;
-    }
-    let labelCount = Math.min(this.chart.data.chartValueGroups.length, this.chart.config.options.maxSegments),
-      startY,
-      startX,
-      legendPadding = this.horizontalLegendPaddingLeft,
-      bubblePadding = this.legendBubblePadding,
-      widthPerLabel;
-
-    if (this.chart.config.options.legend.position === Chart.Position.RIGHT || this.chart.config.options.legend.position === Chart.Position.LEFT) {
-      if (labelCount % 2 === 0) {
-        startY = this.chartBox.mY() - ((labelCount / 2 - 1) * this.legendTextHeights.textHeight) - ((labelCount / 2) * this.legendTextHeights.textGap);
-      } else {
-        startY = this.chartBox.mY() - ((labelCount / 2 - 0.75) * this.legendTextHeights.textHeight) - (Math.floor(labelCount / 2) * this.legendTextHeights.textGap);
-      }
-      widthPerLabel = 0; // not used in vertical rendering
-      startX = this.chart.config.options.legend.position === Chart.Position.RIGHT ? this.chartBox.width : 0;
-      startX = this.verticalLegendPaddingLeft + bubblePadding + this.legendTextHeights.bubbleR * 2 + startX;
-    } else {
-      startY = this.chart.config.options.legend.position === Chart.Position.BOTTOM ? this.chartBox.height + this.legendTextHeights.textHeight : this.legendTextHeights.textGap + this.legendTextHeights.textHeight;
-      startY += this.legendTextHeights.legendBoxPaddingTopBottom;
-      widthPerLabel = (this.chartBox.width - 2 * legendPadding) / Math.min(labelCount, this.horizontalLegendEntriesPerLine);
-      startX = legendPadding + bubblePadding + this.legendTextHeights.bubbleR * 2;
-    }
-
-    this.labelBox = {
-      y: startY,
-      x: startX,
-      textGap: this.legendTextHeights.textGap,
-      textHeight: this.legendTextHeights.textHeight,
-      bubbleR: this.legendTextHeights.bubbleR,
-      bubblePadding: bubblePadding,
-      widthPerLabel: widthPerLabel,
-      textWidth: widthPerLabel - this.legendTextHeights.bubbleR * 2 - bubblePadding * 2
-    };
-  }
-
-  _initLegendTextHeights() {
-    let textBounds = this._measureText('MeasureHeight', this.legendLabelClass),
-      textHeight = textBounds.height,
-      textGap = textHeight / 5,
-      paddingTopBottom = textHeight / 2,
-      bubbleR = textHeight / 8 * 3;
-
-    this.labelSize = textBounds;
-    this.legendTextHeights = {
-      textHeight: textHeight,
-      textGap: textGap,
-      legendBoxPaddingTopBottom: paddingTopBottom,
-      bubbleR: bubbleR
     };
   }
 
@@ -229,155 +134,6 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     $label.remove();
 
     return textBounds;
-  }
-
-  _renderLegendEntry(label, color, colorClass, position) {
-    if (!this.chart.config.options.legend.display || this.suppressLegendBox) {
-      return;
-    }
-    if (this.chart.config.options.legend.position === Chart.Position.RIGHT ||
-      this.chart.config.options.legend.position === Chart.Position.LEFT) {
-      this._renderVerticalLegendEntry(label, color, colorClass, position);
-    }
-    if (this.chart.config.options.legend.position === Chart.Position.BOTTOM ||
-      this.chart.config.options.legend.position === Chart.Position.TOP) {
-      this._renderHorizontalLegendEntry(label, color, colorClass, position);
-    }
-
-  }
-
-  _renderHorizontalLegendEntry(label, color, colorClass, position) {
-    let line = Math.floor(position / this.horizontalLegendEntriesPerLine);
-    let posInLine = position % this.horizontalLegendEntriesPerLine;
-    let offsetTop = this.labelBox.y + line * this.labelBox.textGap + line * this.labelBox.textHeight;
-    let offsetLeft = this.labelBox.x + posInLine * this.labelBox.widthPerLabel;
-
-    let shorterLabel = label;
-    let realTextWidth = this._measureText(shorterLabel).width;
-    if (realTextWidth > this.labelBox.textWidth) {
-      let i = 1; // number of deleted characters
-      while (realTextWidth > this.labelBox.textWidth && i < label.length) {
-        shorterLabel = label.substr(0, label.length - i) + '...';
-        realTextWidth = this._measureText(shorterLabel).width;
-        i++;
-      }
-      if (i === label.length) {
-        shorterLabel = '';
-      }
-    }
-
-    let $label = this.$svg.appendSVG('text', this.legendLabelClass)
-      .attr('x', offsetLeft)
-      .attr('y', offsetTop)
-      .text(shorterLabel);
-    if (this.animationDuration) {
-      $label
-        .attr('opacity', 0)
-        .animateSVG('opacity', 1, this.animationDuration, null, true);
-    }
-
-    addTooltipIfShortLabel.call(this, $label);
-
-    if (color || colorClass) {
-      let $bubble = this._renderLegendBubble(color, colorClass, offsetLeft, offsetTop);
-      addTooltipIfShortLabel.call(this, $bubble);
-    }
-
-    return $label;
-
-    // ----- Helper function -----
-
-    function addTooltipIfShortLabel($element) {
-      if (shorterLabel !== label) {
-        tooltips.install($element, {
-          parent: this.chart,
-          text: label,
-          delay: 0
-        });
-      }
-    }
-  }
-
-  _renderVerticalLegendEntry(label, color, colorClass, position) {
-    let offsetTop = this.labelBox.y + position * this.labelBox.textGap + position * this.labelBox.textHeight;
-    let $label = this.$svg.appendSVG('text', this.legendLabelClass)
-      .attr('x', this.labelBox.x)
-      .attr('y', offsetTop)
-      .text(label);
-    if (this.animationDuration) {
-      $label
-        .attr('opacity', 0)
-        .animateSVG('opacity', 1, this.animationDuration, null, true);
-    }
-
-    if (color || colorClass) {
-      this._renderLegendBubble(color, colorClass, this.labelBox.x, offsetTop);
-    }
-
-    return $label;
-  }
-
-  _renderLegendBubble(color, colorClass, x, y) {
-    let $bubble = this.$svg.appendSVG('circle', 'legend-bubble' + strings.box(' ', colorClass, ''))
-      .attr('cx', x - this.labelBox.bubblePadding - this.labelBox.bubbleR)
-      .attr('cy', y - this.labelBox.bubbleR + 1)
-      .attr('r', this.labelBox.bubbleR);
-
-    if (color) {
-      $bubble.attr('fill', color);
-    }
-    if (this.animationDuration) {
-      $bubble
-        .attr('opacity', 0)
-        .animateSVG('opacity', 1, this.animationDuration, null, true);
-    }
-
-    return $bubble;
-  }
-
-  _renderRect(renderRectOptions) {
-    let $rect = this.$svg.appendSVG('rect', renderRectOptions.cssClass, '', renderRectOptions.id)
-      .attr('x', renderRectOptions.xStart)
-      .attr('y', renderRectOptions.yStart)
-      .attr('width', renderRectOptions.widthStart)
-      .attr('height', renderRectOptions.heightStart)
-      .attr('opacity', renderRectOptions.opacity)
-      .delay(renderRectOptions.delay);
-
-    if (this.chart.config.options.clickable) {
-      $rect.on('click', renderRectOptions.clickObject, this.chart._onValueClick.bind(this.chart));
-    }
-
-    for (let i = 0; i < renderRectOptions.customAttributes.length; i++) {
-      let customAttribute = renderRectOptions.customAttributes[i];
-      if (customAttribute.length === 2) {
-        $rect.attr(customAttribute[0], customAttribute[1]);
-      }
-    }
-
-    applyAttribute('x', renderRectOptions.xEnd);
-    applyAttribute('y', renderRectOptions.yEnd);
-    applyAttribute('height', renderRectOptions.heightEnd);
-    applyAttribute('width', renderRectOptions.widthEnd);
-
-    if (renderRectOptions.fill) {
-      $rect.attr('fill', renderRectOptions.fill);
-    }
-
-    return $rect;
-
-    // ----- Helper functions -----
-
-    function applyAttribute(attribute, value) {
-      if (scout.nvl(value, -1) < 0) {
-        return;
-      }
-      if (renderRectOptions.animationDuration > 0) {
-        $rect.animateSVG(attribute, value, renderRectOptions.animationDuration, null, true);
-      } else {
-        $rect.attr(attribute, value);
-      }
-    }
   }
 
   _renderLine(x1, y1, x2, y2, lineClass) {
@@ -424,10 +180,10 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
 
   _initChartBox() {
     this.chartBox = {
-      width: this._calcChartBoxWidth(),
-      height: this._calcChartBoxHeight(),
-      xOffset: this._calcChartBoxXOffset(),
-      yOffset: this._calcChartBoxYOffset(),
+      width: this.width,
+      height: this.height,
+      xOffset: 0,
+      yOffset: 0,
       mX: function() {
         return this.xOffset + (this.width / 2);
       },
@@ -437,43 +193,7 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     };
   }
 
-  _calcChartBoxWidth() {
-    if (this.chart.config.options.legend.display && !this.suppressLegendBox &&
-      (this.chart.config.options.legend.position === Chart.Position.RIGHT ||
-        this.chart.config.options.legend.position === Chart.Position.LEFT)) {
-      return this.width / 2;
-    }
-    return this.width;
-  }
-
-  _calcChartBoxHeight() {
-    if (this.chart.config.options.legend.display && !this.suppressLegendBox) {
-      let lines = Math.ceil(this.chart.data.chartValueGroups.length / this.horizontalLegendEntriesPerLine);
-      if (this.chart.config.options.legend.position === Chart.Position.BOTTOM) {
-        return this.height - this.legendTextHeights.legendBoxPaddingTopBottom - (this.legendTextHeights.textHeight + this.legendTextHeights.textGap) * lines + this.legendTextHeights.textGap;
-      } else if (this.chart.config.options.legend.position === Chart.Position.TOP) {
-        return this.height - this.legendTextHeights.legendBoxPaddingTopBottom - (this.legendTextHeights.textHeight + this.legendTextHeights.textGap) * lines;
-      }
-    }
-    return this.height;
-  }
-
-  _calcChartBoxXOffset() {
-    if (this.chart.config.options.legend.display && !this.suppressLegendBox && this.chart.config.options.legend.position === Chart.Position.LEFT) {
-      return this.width / 2;
-    }
-    return 0;
-  }
-
-  _calcChartBoxYOffset() {
-    if (this.chart.config.options.legend.display && !this.suppressLegendBox && this.chart.config.options.legend.position === Chart.Position.TOP) {
-      let lines = Math.ceil(this.chart.data.chartValueGroups.length / this.horizontalLegendEntriesPerLine);
-      return (this.legendTextHeights.textHeight + this.legendTextHeights.textGap) * lines + this.legendTextHeights.textGap + this.legendTextHeights.legendBoxPaddingTopBottom;
-    }
-    return 0;
-  }
-
-  _createAnimationObjectWithTabindexRemoval(animationFunc, duration) {
+  _createAnimationObjectWithTabIndexRemoval(animationFunc, duration) {
     return {
       step: function(now, fx) {
         try {
