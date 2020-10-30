@@ -407,6 +407,10 @@ scout.TileGridLayout.prototype._primitivePrefSize = function(options) {
     gridColumnCount = this.widget.gridColumnCount,
     width = options.widthHint;
 
+
+  // prefSize will be called for tileGrid itself, hints must not be adjusted
+  options.removeInsetsFromHints = false;
+
   width += htmlComp.insets().horizontal();
   this._resetGridColumnCount();
 

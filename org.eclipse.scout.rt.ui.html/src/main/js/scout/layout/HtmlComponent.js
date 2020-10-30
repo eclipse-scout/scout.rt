@@ -336,12 +336,14 @@ scout.HtmlComponent.prototype.computePrefSizeKey = function(options) {
  */
 scout.HtmlComponent.prototype._adjustSizeHintsForPrefSize = function(options, minSize, maxSize) {
   var removeMargins = scout.nvl(options.removeMarginFromHints, true);
+  var removeInsets = scout.nvl(options.removeInsetsFromHints, true);
   options.removeMarginFromHints = null;
+  options.removeInsetsFromHints = null;
   if (!options.widthHint && !options.heightHint) {
     return;
   }
   var margins = removeMargins ? this.margins() : new scout.Insets();
-  var insets = this.insets();
+  var insets = removeInsets ? this.insets() : new scout.Insets();
   if (options.widthHint) {
     // The order is important! Box-sizing: border-box is expected.
     options.widthHint -= margins.horizontal();
