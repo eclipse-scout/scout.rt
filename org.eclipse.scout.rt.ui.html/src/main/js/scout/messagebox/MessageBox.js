@@ -145,7 +145,7 @@ scout.MessageBox.prototype._registerGlassPaneTargetFilter = function() {
   // The desktop must not cover the message-box with a glass pane, in case the message-box
   // is opened by a (modal) form. See ticket #274353.
   var desktop = this.session.desktop;
-  if (desktop === this.displayParent) {
+  if (!desktop || desktop === this.displayParent) {
     return;
   }
 
