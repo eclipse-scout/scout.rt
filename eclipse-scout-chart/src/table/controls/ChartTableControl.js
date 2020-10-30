@@ -676,8 +676,7 @@ export default class ChartTableControl extends TableControl {
   }
 
   _drawChart() {
-    let datasetLabel = this._getDatasetLabel(),
-      cube = this._calculateValues();
+    let cube = this._calculateValues();
 
     if (cube.length) {
       this.chart.setVisible(true);
@@ -691,11 +690,6 @@ export default class ChartTableControl extends TableControl {
 
     let config = {
       type: this.chartType,
-      data: {
-        datasets: [{
-          label: datasetLabel
-        }]
-      },
       options: {
         handleResize: true,
         maxSegments: 5,
@@ -705,201 +699,16 @@ export default class ChartTableControl extends TableControl {
       }
     };
 
-    let xAxis = this._getXAxis(),
-      yAxis = this._getYAxis(),
-      data = [],
-      labels = [],
-      deterministicKeys = [],
-      iconClasses = [],
-      tableFilter = this.table.getFilter(ChartTableUserFilter.TYPE),
-      filters = [],
-      checkedIndices = [];
-
-    if (tableFilter && (tableFilter.xAxis || {}).column === (xAxis || {}).column && (tableFilter.yAxis || {}).column === (yAxis || {}).column) {
-      filters = tableFilter.filters;
-    }
-
-    if (this.chartType === Chart.Type.BUBBLE) {
-      for (let x = 0; x < xAxis.length; x++) {
-        let keyX = xAxis[x],
-          xValue = keyX;
-        this._handleIconLabel(xAxis.format(keyX), xAxis, iconClasses);
-        if (!(xAxis.column instanceof NumberColumn) && xValue === null) {
-          xValue = xAxis.max;
-        }
-        if (xAxis.column instanceof DateColumn) {
-          xValue = xValue - xAxis.min;
-        }
-        for (let y = 0; y < yAxis.length; y++) {
-          let keyY = yAxis[y],
-            yValue = keyY,
-            cubeValues = cube.getValue([keyX, keyY]);
-          this._handleIconLabel(yAxis.format(keyY), yAxis, iconClasses);
-          if (cubeValues && cubeValues.length) {
-            if (!(yAxis.column instanceof NumberColumn) && yValue === null) {
-              yValue = yAxis.max;
-            }
-            if (yAxis.column instanceof DateColumn) {
-              yValue = yValue - yAxis.min;
-            }
-            data.push({
-              x: xValue,
-              y: yValue,
-              z: cubeValues[0]
-            });
-            deterministicKeys.push([xAxis.keyToDeterministicKey(keyX), yAxis.keyToDeterministicKey(keyY)]);
-          }
-        }
-      }
-    } else {
-      let segments = [];
-      for (let x = 0; x < xAxis.length; x++) {
-        let label,
-          keyX = xAxis[x];
-        if (xAxis.column instanceof NumberColumn) {
-          label = keyX;
-        } else {
-          label = this._handleIconLabel(xAxis.format(keyX), xAxis, iconClasses);
-        }
-        segments.push({
-          value: cube.getValue([keyX])[0],
-          label: label,
-          deterministicKey: xAxis.keyToDeterministicKey(keyX)
-        });
-      }
-      if (this.chartType === Chart.Type.PIE) {
-        segments.sort((a, b) => {
-          return (b.value - a.value);
-        });
-      }
-      segments.forEach(elem => {
-        data.push(elem.value);
-        labels.push(elem.label);
-        deterministicKeys.push(elem.deterministicKey);
-      });
-    }
-
-    config.data.datasets[0].data = data;
-
-    if (labels.length) {
-      config.data.labels = labels;
-    }
-
-    config.data.datasets[0].deterministicKeys = deterministicKeys;
-
-    deterministicKeys.forEach((deterministicKey, idx) => {
-      if (filters.filter(filter => (Array.isArray(filter.deterministicKey) && Array.isArray(deterministicKey)) ? arrays.equals(filter.deterministicKey, deterministicKey) : filter.deterministicKey === deterministicKey).length) {
-        checkedIndices.push(idx);
-      }
-    });
-    if (this.chartType === Chart.Type.PIE) {
-      let collapsedIndices = arrays.init(deterministicKeys.length - config.options.maxSegments).map((elem, idx) => idx + config.options.maxSegments);
-      if (!arrays.containsAll(checkedIndices, collapsedIndices)) {
-        arrays.remove(checkedIndices, config.options.maxSegments - 1);
-      }
-      arrays.removeAll(checkedIndices, collapsedIndices);
-    }
-
-    let checkedItems = [];
-    if (checkedIndices.length) {
-      checkedIndices.forEach(index => {
-        checkedItems.push({
-          datasetIndex: 0,
-          dataIndex: index
-        });
-      });
-    }
-
-    iconClasses = iconClasses.filter((value, index, self) => {
-      return self.indexOf(value) === index;
-    });
-    if (iconClasses.length) {
-      let fontFamily = styles.get(iconClasses, 'font-family').fontFamily;
-      if (this.chartType !== Chart.Type.PIE) {
-        config.options = $.extend(true, {}, config.options, {
-          scales: {
-            xAxes: [{
-              ticks: {
-                fontFamily: fontFamily
-              }
-            }],
-            yAxes: [{
-              ticks: {
-                fontFamily: fontFamily
-              }
-            }]
-          }
-        });
-      }
-      config.options = $.extend(true, {}, config.options, {
-        tooltips: {
-          titleFontFamily: fontFamily
-        }
-      });
-    }
-
-    if (this.chartType === Chart.Type.BUBBLE) {
-      config.bubble = $.extend(true, {}, config.bubble, {
-        sizeOfLargestBubble: 25,
-        minBubbleSize: 5
-      });
-
-      if (!(xAxis.column instanceof NumberColumn)) {
-        config.options = $.extend(true, {}, config.options, {
-          scales: {
-            xAxes: [{
-              ticks: {
-                callback: label => this._formatLabel(label, xAxis)
-              }
-            }]
-          }
-        });
-      }
-      if (!(yAxis.column instanceof NumberColumn)) {
-        config.options = $.extend(true, {}, config.options, {
-          scales: {
-            yAxes: [{
-              ticks: {
-                callback: label => this._formatLabel(label, yAxis)
-              }
-            }]
-          }
-        });
-      }
-    } else {
-      if (xAxis.column instanceof NumberColumn) {
-        config.data.reformatLabels = true;
-      }
-      if (this.chartType === Chart.Type.PIE) {
-        config.options = $.extend(true, {}, config.options, {
-          plugins: {
-            datalabels: {
-              display: true
-            }
-          }
-        });
-      } else {
-        config.options = $.extend(true, {}, config.options, {
-          scales: {
-            xAxes: [{
-              ticks: {
-                beginAtZero: true
-              }
-            }],
-            yAxes: [{
-              ticks: {
-                beginAtZero: true
-              }
-            }]
-          }
-        });
-      }
-    }
+    let iconClasses = [];
+    config.data = this._computeData(iconClasses, cube);
+    this._adjustFont(config, iconClasses);
 
     this._adjustConfig(config);
 
     this.chart.setConfig(config);
     this.chart.chartRenderer.renderColorScheme('chart-table-control');
+
+    let checkedItems = this._computeCheckedItems(config.data.datasets[0].deterministicKeys);
     this.chart.setCheckedItems(checkedItems);
   }
 
@@ -948,6 +757,109 @@ export default class ChartTableControl extends TableControl {
     return this.yAxis;
   }
 
+  _computeData(iconClasses, cube) {
+    let data = {
+      datasets: [{
+        label: this._getDatasetLabel()
+      }]
+    };
+    if (!cube) {
+      return data;
+    }
+    iconClasses = iconClasses || [];
+
+    let segments = [];
+
+    if (this.chartType === Chart.Type.BUBBLE) {
+      segments = this._computeBubbleData(iconClasses, cube);
+    } else {
+      let xAxis = this._getXAxis();
+      for (let x = 0; x < xAxis.length; x++) {
+        let label,
+          keyX = xAxis[x];
+        if (xAxis.column instanceof NumberColumn) {
+          label = keyX;
+        } else {
+          label = this._handleIconLabel(xAxis.format(keyX), xAxis, iconClasses);
+        }
+        segments.push({
+          value: cube.getValue([keyX])[0],
+          label: label,
+          deterministicKey: xAxis.keyToDeterministicKey(keyX)
+        });
+      }
+      if (this.chartType === Chart.Type.PIE) {
+        segments.sort((a, b) => {
+          return (b.value - a.value);
+        });
+      }
+    }
+    let dataset = data.datasets[0],
+      labels = [];
+
+    dataset.data = [];
+    dataset.deterministicKeys = [];
+
+    segments.forEach(elem => {
+      dataset.data.push(elem.value);
+      dataset.deterministicKeys.push(elem.deterministicKey);
+      if (elem.label) {
+        labels.push(elem.label);
+      }
+    });
+
+    if (labels.length) {
+      data.labels = labels;
+    }
+
+    return data;
+  }
+
+  _computeBubbleData(iconClasses, cube) {
+    if (!cube) {
+      return [];
+    }
+    iconClasses = iconClasses || [];
+
+    let xAxis = this._getXAxis(),
+      yAxis = this._getYAxis(),
+      segments = [];
+    for (let x = 0; x < xAxis.length; x++) {
+      let keyX = xAxis[x],
+        xValue = keyX;
+      this._handleIconLabel(xAxis.format(keyX), xAxis, iconClasses);
+      if (!(xAxis.column instanceof NumberColumn) && xValue === null) {
+        xValue = xAxis.max;
+      }
+      if (xAxis.column instanceof DateColumn) {
+        xValue = xValue - xAxis.min;
+      }
+      for (let y = 0; y < yAxis.length; y++) {
+        let keyY = yAxis[y],
+          yValue = keyY,
+          cubeValues = cube.getValue([keyX, keyY]);
+        this._handleIconLabel(yAxis.format(keyY), yAxis, iconClasses);
+        if (cubeValues && cubeValues.length) {
+          if (!(yAxis.column instanceof NumberColumn) && yValue === null) {
+            yValue = yAxis.max;
+          }
+          if (yAxis.column instanceof DateColumn) {
+            yValue = yValue - yAxis.min;
+          }
+          segments.push({
+            value: {
+              x: xValue,
+              y: yValue,
+              z: cubeValues[0]
+            },
+            deterministicKey: [xAxis.keyToDeterministicKey(keyX), yAxis.keyToDeterministicKey(keyY)]
+          });
+        }
+      }
+    }
+    return segments;
+  }
+
   _handleIconLabel(label, axis, iconClasses) {
     if (axis && axis.textIsIcon) {
       let icon = icons.parseIconId(label);
@@ -957,6 +869,77 @@ export default class ChartTableControl extends TableControl {
       }
     }
     return label;
+  }
+
+  _adjustFont(config, iconClasses) {
+    if (!config || !iconClasses) {
+      return;
+    }
+
+    iconClasses = iconClasses.filter((value, index, self) => {
+      return self.indexOf(value) === index;
+    });
+    if (iconClasses.length) {
+      let fontFamily = styles.get(iconClasses, 'font-family').fontFamily;
+      if (this.chartType !== Chart.Type.PIE) {
+        config.options = $.extend(true, {}, config.options, {
+          scales: {
+            xAxes: [{
+              ticks: {
+                fontFamily: fontFamily
+              }
+            }],
+            yAxes: [{
+              ticks: {
+                fontFamily: fontFamily
+              }
+            }]
+          }
+        });
+      }
+      config.options = $.extend(true, {}, config.options, {
+        tooltips: {
+          titleFontFamily: fontFamily
+        }
+      });
+    }
+  }
+
+  _adjustLabels(config) {
+    if (!config) {
+      return;
+    }
+
+    let xAxis = this._getXAxis(),
+      yAxis = this._getYAxis();
+    if (this.chartType === Chart.Type.BUBBLE) {
+      if (!(xAxis.column instanceof NumberColumn)) {
+        config.options = $.extend(true, {}, config.options, {
+          scales: {
+            xAxes: [{
+              ticks: {
+                callback: label => this._formatLabel(label, xAxis)
+              }
+            }]
+          }
+        });
+      }
+      if (!(yAxis.column instanceof NumberColumn)) {
+        config.options = $.extend(true, {}, config.options, {
+          scales: {
+            yAxes: [{
+              ticks: {
+                callback: label => this._formatLabel(label, yAxis)
+              }
+            }]
+          }
+        });
+      }
+    } else {
+      if (config.data && xAxis.column instanceof NumberColumn) {
+        config.data.reformatLabels = true;
+      }
+    }
   }
 
   _formatLabel(label, axis) {
@@ -986,6 +969,27 @@ export default class ChartTableControl extends TableControl {
   }
 
   _adjustConfig(config) {
+    if (!config) {
+      return;
+    }
+
+    this._adjustLabels(config);
+    this._adjustClickable(config);
+
+    if (this.chartType === Chart.Type.BUBBLE) {
+      this._adjustBubble(config);
+    } else if (this.chartType === Chart.Type.PIE) {
+      this._adjustPie(config);
+    } else {
+      this._adjustScales(config);
+    }
+  }
+
+  _adjustClickable(config) {
+    if (!config) {
+      return;
+    }
+
     if (this._isChartClickable()) {
       config.options = $.extend(true, {}, config.options, {
         clickable: true,
@@ -993,22 +997,108 @@ export default class ChartTableControl extends TableControl {
         otherSegmentClickable: true
       });
     }
-    if (this.chartType === Chart.Type.PIE) {
-      // Compensate the margin of the container so that the chart is always centered vertically
-      let margin = this.chart.$container.cssMarginTop() - this.chart.$container.cssMarginBottom();
-      config.options = $.extend(true, {}, config.options, {
-        layout: {
-          padding: {
-            top: Math.sign(margin) < 0 ? Math.abs(margin) : 0,
-            bottom: Math.sign(margin) > 0 ? margin : 0
-          }
-        }
-      });
-    }
   }
 
   _isChartClickable() {
     return true;
+  }
+
+  _adjustBubble(config) {
+    if (!config || this.chartType !== Chart.Type.BUBBLE) {
+      return;
+    }
+
+    config.bubble = $.extend(true, {}, config.bubble, {
+      sizeOfLargestBubble: 25,
+      minBubbleSize: 5
+    });
+  }
+
+  _adjustPie(config) {
+    if (!config || this.chartType !== Chart.Type.PIE) {
+      return;
+    }
+
+    config.options = $.extend(true, {}, config.options, {
+      plugins: {
+        datalabels: {
+          display: true
+        }
+      }
+    });
+    // Compensate the margin of the container so that the chart is always centered vertically
+    let margin = this.chart.$container.cssMarginTop() - this.chart.$container.cssMarginBottom();
+    config.options = $.extend(true, {}, config.options, {
+      layout: {
+        padding: {
+          top: Math.sign(margin) < 0 ? Math.abs(margin) : 0,
+          bottom: Math.sign(margin) > 0 ? margin : 0
+        }
+      }
+    });
+  }
+
+  _adjustScales(config) {
+    if (!config) {
+      return;
+    }
+
+    config.options = $.extend(true, {}, config.options, {
+      scales: {
+        xAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }],
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      }
+    });
+  }
+
+  _computeCheckedItems(deterministicKeys) {
+    if (!deterministicKeys) {
+      return [];
+    }
+
+    let xAxis = this._getXAxis(),
+      yAxis = this._getYAxis(),
+      tableFilter = this.table.getFilter(ChartTableUserFilter.TYPE),
+      filters = [],
+      checkedIndices = [];
+
+    if (tableFilter && (tableFilter.xAxis || {}).column === (xAxis || {}).column && (tableFilter.yAxis || {}).column === (yAxis || {}).column) {
+      filters = tableFilter.filters;
+    }
+
+    deterministicKeys.forEach((deterministicKey, idx) => {
+      if (filters.filter(filter => (Array.isArray(filter.deterministicKey) && Array.isArray(deterministicKey)) ? arrays.equals(filter.deterministicKey, deterministicKey) : filter.deterministicKey === deterministicKey).length) {
+        checkedIndices.push(idx);
+      }
+    });
+    if (this.chartType === Chart.Type.PIE) {
+      let maxSegments = this.chart.config.options.maxSegments,
+        collapsedIndices = arrays.init(deterministicKeys.length - maxSegments).map((elem, idx) => idx + maxSegments);
+      if (!arrays.containsAll(checkedIndices, collapsedIndices)) {
+        arrays.remove(checkedIndices, maxSegments - 1);
+      }
+      arrays.removeAll(checkedIndices, collapsedIndices);
+    }
+
+    let checkedItems = [];
+    if (checkedIndices.length) {
+      checkedIndices.forEach(index => {
+        checkedItems.push({
+          datasetIndex: 0,
+          dataIndex: index
+        });
+      });
+    }
+
+    return checkedItems;
   }
 
   _onChartValueClick() {

@@ -13,7 +13,7 @@ import {Chart, ChartJsRenderer} from '../../src/index';
 
 describe('ChartJsRendererSpec', () => {
 
-  describe('_adjustGrid', () => {
+  describe('_adjustGridMaxMin', () => {
     let renderer = new ChartJsRenderer({}),
       chartArea = {
         top: 0,
@@ -29,7 +29,7 @@ describe('ChartJsRendererSpec', () => {
           }]
         },
         options: {
-          adjustGrid: true
+          adjustGridMaxMin: true
         }
       },
       defaultScalesConfig = $.extend(true, {}, defaultConfig, {
@@ -49,7 +49,7 @@ describe('ChartJsRendererSpec', () => {
     it('bar chart, min/max is set on y axis', () => {
       let config = $.extend(true, {}, defaultScalesConfig, {type: Chart.Type.BAR});
 
-      renderer._adjustGrid(config, chartArea);
+      renderer._adjustGridMaxMin(config, chartArea);
 
       expect(config.options.scales.xAxes[0]).toEqual({});
       expect(config.options.scales.yAxes[0]).toEqual({
@@ -64,7 +64,7 @@ describe('ChartJsRendererSpec', () => {
     it('horizontal bar chart, min/max is set on x axis', () => {
       let config = $.extend(true, {}, defaultScalesConfig, {type: Chart.Type.BAR_HORIZONTAL});
 
-      renderer._adjustGrid(config, chartArea);
+      renderer._adjustGridMaxMin(config, chartArea);
 
       expect(config.options.scales.xAxes[0]).toEqual({
         ticks: {
@@ -79,7 +79,7 @@ describe('ChartJsRendererSpec', () => {
     it('polar area chart, min/max is set on scale', () => {
       let config = $.extend(true, {}, defaultScaleConfig, {type: Chart.Type.POLAR_AREA});
 
-      renderer._adjustGrid(config, chartArea);
+      renderer._adjustGridMaxMin(config, chartArea);
 
       expect(config.options.scale).toEqual({
         ticks: {
@@ -114,7 +114,7 @@ describe('ChartJsRendererSpec', () => {
         {x: 43, y: 13, r: 37}
       ];
 
-      renderer._adjustGrid(config, chartArea);
+      renderer._adjustGridMaxMin(config, chartArea);
 
       let height = Math.abs(chartArea.top - chartArea.bottom),
         padding = 53, // max(r)
@@ -176,7 +176,7 @@ describe('ChartJsRendererSpec', () => {
         {x: 43, y: 13, r: 37}
       ];
 
-      renderer._adjustGrid(config, chartArea);
+      renderer._adjustGridMaxMin(config, chartArea);
 
       expect(config.options.scales.xAxes[0]).toEqual({
         offset: true,
