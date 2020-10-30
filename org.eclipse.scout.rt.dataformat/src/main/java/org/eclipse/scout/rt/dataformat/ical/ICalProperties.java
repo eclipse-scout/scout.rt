@@ -47,12 +47,12 @@ public final class ICalProperties {
   public static final String PROP_VALUE_PUBLIC = "PUBLIC";
   public static final String PROP_VALUE_DISPLAY = "DISPLAY";
   public static final String PROP_VALUE_INDIVIDUAL = "INDIVIDUAL";
-  public static final String PROP_VALUE_VERSION_2_1 = "2.1";
+  public static final String PROP_VALUE_VERSION_2_0 = "2.0";
 
   public static final Property PROP_UNKNOWN = new Property(PROP_NAME_UNKNOWN);
   public static final Property PROP_BEGIN_ICALENDAR = new Property(PROP_NAME_BEGIN, PROP_VALUE_ICALENDAR);
   public static final Property PROP_END_ICALENDAR = new Property(PROP_NAME_END, PROP_VALUE_ICALENDAR);
-  public static final Property PROP_VERSION_2_1 = new Property(PROP_NAME_VERSION, PROP_VALUE_VERSION_2_1);
+  public static final Property PROP_VERSION_2_0 = new Property(PROP_NAME_VERSION, PROP_VALUE_VERSION_2_0);
   public static final Property PROP_BEGIN_VEVENT = new Property(PROP_NAME_BEGIN, PROP_VALUE_VEVENT);
   public static final Property PROP_END_VEVENT = new Property(PROP_NAME_END, PROP_VALUE_VEVENT);
   public static final Property PROP_BEGIN_VTODO = new Property(PROP_NAME_BEGIN, PROP_VALUE_VTODO);
