@@ -188,7 +188,7 @@ export default class FormFieldLayout extends AbstractLayout {
 
     // Check for scrollbars, update them if necessary
     if (formField.$field) {
-      scrollbars.update(formField.$field);
+      scrollbars.update(formField.$field, true);
     }
 
     this._layoutDisabledCopyOverlay();
