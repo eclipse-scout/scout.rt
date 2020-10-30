@@ -24,7 +24,7 @@ public class ICalBuilder {
 
   protected ICalBuilder begin() {
     m_ical.addProperty(ICalProperties.PROP_BEGIN_ICALENDAR);
-    m_ical.addProperty(ICalProperties.PROP_VERSION_2_1);
+    m_ical.addProperty(ICalProperties.PROP_VERSION_2_0);
     return this;
   }
 

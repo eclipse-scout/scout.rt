@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.dataformat.ical;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -39,7 +40,7 @@ public class ICalBeanTest {
     String uid = "e11d9aac-890f-409b-a016-3acef4685dc6";
 
     cal.addProperty(ICalProperties.PROP_BEGIN_ICALENDAR);
-    cal.addProperty(ICalProperties.PROP_VERSION_2_1);
+    cal.addProperty(ICalProperties.PROP_VERSION_2_0);
     cal.addProperty(new Property(ICalProperties.PROP_NAME_PRODID, "prodid doe corporation"));
     cal.addProperty(ICalProperties.PROP_BEGIN_VEVENT);
     cal.addProperty(new Property(ICalProperties.PROP_NAME_DTSTAMP, helper.createDateTime(prodDate)));
@@ -58,7 +59,7 @@ public class ICalBeanTest {
     String writtenIcal = bw.toString();
 
     assertEquals("BEGIN:VCALENDAR\r\n" +
-        "VERSION:2.1\r\n" +
+        "VERSION:2.0\r\n" +
         "PRODID;CHARSET=utf-8:prodid doe corporation\r\n" +
         "BEGIN:VEVENT\r\n" +
         "DTSTAMP;CHARSET=utf-8:" + helper.createDateTime(prodDate) + "\r\n" +
@@ -79,7 +80,7 @@ public class ICalBeanTest {
     String uid = "478bb47d-c9a7-43d2-a920-c5a8b952d478";
 
     final String ical = "BEGIN:VCALENDAR\r\n" +
-        "VERSION:2.1\r\n" +
+        "VERSION:2.0\r\n" +
         "PRODID;CHARSET=utf-8:prodid doe corporation\r\n" +
         "BEGIN:VEVENT\r\n" +
         "DTSTAMP;CHARSET=utf-8:" + helper.createDateTime(prodDate) + "\r\n" +
@@ -101,7 +102,7 @@ public class ICalBeanTest {
     assertNotNull(bean.getProperty(ICalProperties.PROP_NAME_DTEND));
     assertNotNull(bean.getProperty(ICalProperties.PROP_NAME_ORGANIZER));
 
-    assertEquals(ICalProperties.PROP_VALUE_VERSION_2_1, bean.getProperty(ICalProperties.PROP_NAME_VERSION).getValue());
+    assertEquals(ICalProperties.PROP_VALUE_VERSION_2_0, bean.getProperty(ICalProperties.PROP_NAME_VERSION).getValue());
     assertEquals("prodid doe corporation", bean.getProperty(ICalProperties.PROP_NAME_PRODID).getValue());
     assertEquals(helper.createDateTime(prodDate), bean.getProperty(ICalProperties.PROP_NAME_DTSTAMP).getValue());
     assertEquals(uid, bean.getProperty(ICalProperties.PROP_NAME_UID).getValue());

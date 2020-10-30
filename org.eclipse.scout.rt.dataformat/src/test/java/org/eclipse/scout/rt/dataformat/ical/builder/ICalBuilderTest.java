@@ -11,7 +11,8 @@
 package org.eclipse.scout.rt.dataformat.ical.builder;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.Duration;
 import java.util.Date;
@@ -66,7 +67,7 @@ public class ICalBuilderTest {
         .build();
 
     assertEquals("BEGIN:VCALENDAR\r\n" +
-        "VERSION:2.1\r\n" +
+        "VERSION:2.0\r\n" +
         "PRODID;CHARSET=utf-8:IDENTIFIER\r\n" +
         "BEGIN:VEVENT\r\n" +
         "DTSTAMP;CHARSET=utf-8:" + helper.createDateTime(s_mockDate) + "\r\n" +
@@ -104,7 +105,7 @@ public class ICalBuilderTest {
         .build();
 
     assertEquals("BEGIN:VCALENDAR\r\n" +
-        "VERSION:2.1\r\n" +
+        "VERSION:2.0\r\n" +
         "PRODID;CHARSET=utf-8:IDENTIFIER\r\n" +
         "BEGIN:VEVENT\r\n" +
         "DTSTAMP;CHARSET=utf-8:" + helper.createDateTime(s_mockDate) + "\r\n" +
