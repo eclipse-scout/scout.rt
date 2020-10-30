@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.ui.webresource;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,16 +44,24 @@ public final class ScriptRequest {
    *
    * <pre>
    * path/basename.js
-   * path/basename.min.js
+   * path/entryPoint1~entryPoint2.min.js
    * path/basename-34fce3bc.min.js
    * </pre>
    */
-  public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)([-_\\.\\w\\d]+?)(?:\\-([a-f0-9]+))?(?:\\.(" + MINIMIZED_URL_KEYWORD + ")?)?\\.(js|css|less)");
+  public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)([-_.~\\w\\d]+?)(?:-([a-f0-9]+))?(?:\\.(" + MINIMIZED_URL_KEYWORD + ")?)?\\.(js|css)");
 
-  private final Matcher m_matcher;
+  private final String m_path;
+  private final String m_baseName;
+  private final String m_fingerprint;
+  private final boolean m_minimized;
+  private final String m_fileExtension;
 
   private ScriptRequest(Matcher m) {
-    m_matcher = m;
+    m_path = m.group(1);
+    m_baseName = m.group(2);
+    m_fingerprint = m.group(3);
+    m_minimized = MINIMIZED_URL_KEYWORD.equals(m.group(4));
+    m_fileExtension = m.group(5);
   }
 
   /**
@@ -103,7 +112,7 @@ public final class ScriptRequest {
    *         {@code null}).
    */
   public String path() {
-    return m_matcher.group(1);
+    return m_path;
   }
 
   /**
@@ -111,7 +120,7 @@ public final class ScriptRequest {
    *         present (never {@code null}).
    */
   public String baseName() {
-    return m_matcher.group(2);
+    return m_baseName;
   }
 
   /**
@@ -120,7 +129,7 @@ public final class ScriptRequest {
    * @see BinaryResource#getFingerprintAsHexString()
    */
   public String fingerprint() {
-    return m_matcher.group(3);
+    return m_fingerprint;
   }
 
   /**
@@ -128,14 +137,14 @@ public final class ScriptRequest {
    *         {@code false} otherwise.
    */
   public boolean minimized() {
-    return MINIMIZED_URL_KEYWORD.equals(m_matcher.group(4));
+    return m_minimized;
   }
 
   /**
    * @return The file extension of the requested file (without preceding dot). Can be 'js', 'css' or 'less'.
    */
   public String fileExtension() {
-    return m_matcher.group(5);
+    return m_fileExtension;
   }
 
   /**
@@ -153,16 +162,25 @@ public final class ScriptRequest {
     return toString(false, true);
   }
 
-  /**
-   * @return A ScriptRequest instance with the requested 'minimized' state. When minimized is set to true, the file name
-   *         contains the '.min' suffix otherwise the file name does not contain the suffix.
-   */
-  public ScriptRequest toMinimized(boolean minimized) {
-    if (minimized == minimized()) {
-      return new ScriptRequest(m_matcher);
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-    String minPath = toFullPath(path(), baseName(), fingerprint(), minimized, fileExtension());
-    return tryParse(minPath).get();
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    ScriptRequest that = (ScriptRequest) o;
+    return m_minimized == that.m_minimized
+        && Objects.equals(m_path, that.m_path)
+        && Objects.equals(m_baseName, that.m_baseName)
+        && Objects.equals(m_fingerprint, that.m_fingerprint)
+        && Objects.equals(m_fileExtension, that.m_fileExtension);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_path, m_baseName, m_fingerprint, m_minimized, m_fileExtension);
   }
 
   @Override
@@ -248,5 +266,4 @@ public final class ScriptRequest {
     }
     return result.toString();
   }
-
 }

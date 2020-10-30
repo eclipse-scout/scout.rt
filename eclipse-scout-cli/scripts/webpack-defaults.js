@@ -127,64 +127,13 @@ module.exports = (env, args) => {
     },
     plugins: [
       // see: extracts css into separate files
-      new MiniCssExtractPlugin({
-        filename: cssFilename
-      }),
+      new MiniCssExtractPlugin({filename: cssFilename}),
       // run post-build script hook
-      new AfterEmitWebpackPlugin({
-        createFileList: !devMode,
-        outDir: outDir
-      })
+      new AfterEmitWebpackPlugin({outDir: outDir})
     ],
     optimization: {
       splitChunks: {
-        chunks: 'all',
-        cacheGroups: {
-          // Disable default behaviour so that only the junks defined below and the entry points are built.
-          // This makes it easier if the dependencies are added manually to the html document because it is clear what the output will be (= it is clear which bundles will be created).
-          // It is always possible to disable or change the Scout defaults by deleting or extending the Scout cache groups (e.g. delete config.optimization.splitChunks.cacheGroups.default).
-          default: false,
-          scout: {
-            // Scout may be loaded as node module or may be part of the workspace
-            // Also make sure the regex only matches *.js files to prevent the output from mixing with css
-            // sourcemapped-stacktrace is included as well because it is not worth it to have a separate bundle for it.
-            // Adding it to vendors.js would force the users to add the vendors.js to login.html as well, which may not be desired if they have custom third party libs not required by the login.html.
-            test: /[\\/]node_modules[\\/]@eclipse-scout[\\/].*\.js|[\\/]eclipse-scout-core[\\/].*\.js|[\\/]org.eclipse.scout.rt.svg.ui.html[\\/].*\.js|[\\/]node_modules[\\/]sourcemapped-stacktrace[\\/].*\.js/,
-            name: 'eclipse-scout',
-            priority: -5,
-            reuseExistingChunk: true,
-            enforce: true
-          },
-          jquery: {
-            test: /[\\/]node_modules[\\/]jquery[\\/]/,
-            name: 'jquery',
-            priority: -1,
-            reuseExistingChunk: true,
-            enforce: true
-          },
-          vendors: {
-            /**
-             * @param module.nameForCondition
-             */
-            test: module => {
-              if (!module.nameForCondition) {
-                return false; // raw or external modules do not have the method
-              }
-              const nameForCondition = module.nameForCondition();
-              // Extract all other node_modules into vendors.js
-              if (!nameForCondition.match(/[\\/]node_modules[\\/].*\.js/)) {
-                return false;
-              }
-              // Exclude the webpack module to make sure the vendors.js only contains "real" runtime third party dependencies necessary for the actual application.
-              // So, for a simple Scout app without dependencies, vendors.js won't be generated. This is also important for login.html and logout.html which don't require vendors.js as well.
-              return !nameForCondition.match(/[\\/]node_modules[\\/]webpack[\\/]/);
-            },
-            name: 'vendors',
-            priority: -10,
-            reuseExistingChunk: true,
-            enforce: true
-          }
-        }
+        chunks: 'all'
       }
     }
   };
@@ -198,9 +147,7 @@ module.exports = (env, args) => {
   if (nvl(args.progress, true)) {
     // Shows progress information in the console in dev mode
     const webpack = require('webpack');
-    config.plugins.push(new webpack.ProgressPlugin({
-      profile: args.profile
-    }));
+    config.plugins.push(new webpack.ProgressPlugin({profile: args.profile}));
   }
 
   if (!devMode) {
@@ -231,11 +178,11 @@ module.exports = (env, args) => {
   }
 
   if (devMode) {
-    // Generating source maps for vendors.js may take some time and is not necessary
+    // Generating source maps for vendors may take some time and is not necessary
     // Use external source maps also in dev mode because the browser is very slow in displaying a file containing large lines which is the case if source maps are inlined
     config.plugins.push(new webpack.SourceMapDevToolPlugin({
       filename: '[file].map',
-      exclude: ['vendors.js', 'jquery.js']
+      exclude: [/vendors.*\.js/]
     }));
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ import static org.junit.Assert.*;
 
 import java.util.Optional;
 
-import org.eclipse.scout.rt.shared.ui.webresource.ScriptRequest;
 import org.junit.Test;
 
 public class ScriptRequestTest {
@@ -34,7 +33,7 @@ public class ScriptRequestTest {
 
   @Test
   public void testTryParseWithValidInput() {
-    String[] tests = {"path/basename.js", "path/basename.min.js", "path/basename-34fce3bc.min.js", "path/subpath/basename-34fce3bc.min.css", "/res/lib-1.10.88/lib.js"};
+    String[] tests = {"path/basename.js", "path/basename.min.js", "path/basename-34fce3bc.min.js", "path/subpath/basename-34fce3bc.min.css", "path/subpath/entry1~entry2-34fce3bc.min.css", "/res/lib-1.10.88/lib.js"};
     for (String test : tests) {
       assertEquals("invalid input: " + test, test, ScriptRequest.tryParse(test).orElseThrow(() -> new IllegalArgumentException("invalid input: " + test)).toString());
     }
@@ -61,26 +60,5 @@ public class ScriptRequestTest {
     assertEquals(fingerprint, opt.get().fingerprint());
     assertTrue(opt.get().minimized());
     assertEquals(extension, opt.get().fileExtension());
-  }
-
-  @Test
-  public void testToMinimized() {
-    ScriptRequest request = ScriptRequest.tryParse("chartjs/Chart-2.8.0.js").get();
-    ScriptRequest minRequest = request.toMinimized(true);
-    assertEquals("chartjs/Chart-2.8.0.min.js", minRequest.toString());
-
-    // already minified
-    request = ScriptRequest.tryParse("chartjs/Chart-2.8.0.min.js").get();
-    minRequest = request.toMinimized(true);
-    assertEquals("chartjs/Chart-2.8.0.min.js", minRequest.toString());
-
-    // Should remove the .min suffix from the filename
-    ScriptRequest nonMinRequest = request.toMinimized(false);
-    assertEquals("chartjs/Chart-2.8.0.js", nonMinRequest.toString());
-
-    // already non-minified
-    request = ScriptRequest.tryParse("chartjs/Chart-2.8.0.js").get();
-    nonMinRequest = request.toMinimized(false);
-    assertEquals("chartjs/Chart-2.8.0.js", nonMinRequest.toString());
   }
 }

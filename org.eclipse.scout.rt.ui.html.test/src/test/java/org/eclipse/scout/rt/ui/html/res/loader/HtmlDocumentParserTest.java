@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -34,6 +35,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class HtmlDocumentParserTest {
+
+  private static final String SCRIPT1_NAME = "script1.js";
+  private static final String SCRIPT2_NAME = "script2.js";
+  private static final String SCRIPT3_NAME = "script3.js";
+  private static final String SCRIPT4_NAME = "style.css";
 
   @BeforeClass
   public static void beforeClass() {
@@ -54,6 +60,11 @@ public class HtmlDocumentParserTest {
       @Override
       protected URL resolveInclude(String includeName) {
         return HtmlDocumentParserTest.class.getResource("include.html");
+      }
+
+      @Override
+      protected Stream<String> getAssetsForEntryPoint(String entryPoint) {
+        return Stream.of(SCRIPT4_NAME, SCRIPT1_NAME, SCRIPT2_NAME, SCRIPT3_NAME);
       }
     };
   }
@@ -84,6 +95,11 @@ public class HtmlDocumentParserTest {
   @Test
   public void testHtmlDocumentParser_02() throws IOException {
     testParser("test02_input.html", "test02_output.html");
+  }
+
+  @Test
+  public void testHtmlDocumentParser_03() throws IOException {
+    testParser("test03_input.html", "test03_output.html");
   }
 
   /**
