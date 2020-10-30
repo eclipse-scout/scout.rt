@@ -1855,7 +1855,7 @@ describe('Table', function() {
   });
 
   describe('menu bar popup ', function() {
-    var menuBarMenu, singleSelMenu, singleMultiSelMenu, multiSelMenu, bothSelMenu, emptySpaceMenu, headerMenu, table;
+    var menuBarMenu, singleSelMenu, singleMultiSelMenu, multiSelMenu, emptySpaceMenu, table;
 
     beforeEach(function() {
       var model = helper.createModelFixture(2, 2);
@@ -2205,7 +2205,7 @@ describe('Table', function() {
   describe('initColumns', function() {
 
     it('table is available in _init', function() {
-      var table = scout.create('Table', {
+      scout.create('Table', {
         parent: session.desktop,
         columns: [{
           objectType: 'TestBeanColumn'
@@ -2816,7 +2816,7 @@ describe('Table', function() {
       ]);
 
       // Filter active
-      var filter = helper.createAndRegisterColumnFilter({
+      helper.createAndRegisterColumnFilter({
         table: table,
         session: session,
         column: table.columns[0],
@@ -2885,7 +2885,7 @@ describe('Table', function() {
       ]);
 
       // Filter active
-      var filter = helper.createAndRegisterColumnFilter({
+      helper.createAndRegisterColumnFilter({
         table: table,
         session: session,
         column: table.columns[0],
@@ -2982,7 +2982,7 @@ describe('Table', function() {
   });
 
   describe('ensureExpansionVisible', function() {
-    var model, table, rows, $scrollable, nodeHeight;
+    var model, table, rows, $scrollable;
 
     beforeEach(function() {
       $('<style>' +
@@ -3071,6 +3071,123 @@ describe('Table', function() {
       expect(tableField.htmlComp.valid).toBe(true);
       expect(table.htmlComp.valid).toBe(true);
       expect(table.rows[0].height).toBeGreaterThan(0);
+    });
+  });
+
+  describe('_unwrapText', () => {
+    it('converts multi-line text to single-line text', () => {
+      let model = helper.createModelFixture(2, 1);
+      let table = helper.createTable(model);
+
+      expect(table._unwrapText()).toBe('');
+      expect(table._unwrapText(null)).toBe('');
+      expect(table._unwrapText('')).toBe('');
+      expect(table._unwrapText('abc')).toBe('abc');
+
+      expect(table._unwrapText('abc')).toBe('abc');
+      expect(table._unwrapText(' abc')).toBe('abc');
+      expect(table._unwrapText('abc ')).toBe('abc');
+      expect(table._unwrapText(' abc ')).toBe('abc');
+
+      expect(table._unwrapText('abc')).toBe('abc');
+      expect(table._unwrapText('\fabc')).toBe('abc');
+      expect(table._unwrapText('abc\f')).toBe('abc');
+      expect(table._unwrapText('\fabc\f')).toBe('abc');
+
+      expect(table._unwrapText('a bc')).toBe('a bc');
+      expect(table._unwrapText(' a bc')).toBe('a bc');
+      expect(table._unwrapText('a bc ')).toBe('a bc');
+      expect(table._unwrapText(' a bc ')).toBe('a bc');
+
+      expect(table._unwrapText('a  bc')).toBe('a  bc');
+      expect(table._unwrapText('  a  bc')).toBe('a  bc');
+      expect(table._unwrapText('a  bc  ')).toBe('a  bc');
+      expect(table._unwrapText('  a  bc  ')).toBe('a  bc');
+
+      expect(table._unwrapText('a \tbc')).toBe('a  bc');
+      expect(table._unwrapText(' \ta \tbc')).toBe('a  bc');
+      expect(table._unwrapText('a \tbc \t')).toBe('a  bc');
+      expect(table._unwrapText(' \ta \tbc \t')).toBe('a  bc');
+
+      expect(table._unwrapText('a\tbc')).toBe('a bc');
+      expect(table._unwrapText(' a\tbc')).toBe('a bc');
+      expect(table._unwrapText('a\tbc ')).toBe('a bc');
+      expect(table._unwrapText(' a\tbc ')).toBe('a bc');
+
+      expect(table._unwrapText('a\tbc')).toBe('a bc');
+      expect(table._unwrapText('\ta\tbc')).toBe('a bc');
+      expect(table._unwrapText('a\tbc\t')).toBe('a bc');
+      expect(table._unwrapText('\ta\tbc\t')).toBe('a bc');
+
+      expect(table._unwrapText('abc')).toBe('abc');
+      expect(table._unwrapText('\tabc')).toBe('abc');
+      expect(table._unwrapText('abc\t')).toBe('abc');
+      expect(table._unwrapText('\tabc\t')).toBe('abc');
+
+      expect(table._unwrapText('abc')).toBe('abc');
+      expect(table._unwrapText(' \tabc')).toBe('abc');
+      expect(table._unwrapText('abc\t ')).toBe('abc');
+      expect(table._unwrapText(' \tabc\t ')).toBe('abc');
+
+      expect(table._unwrapText('abc')).toBe('abc');
+      expect(table._unwrapText(' \t\nabc')).toBe('abc');
+      expect(table._unwrapText('abc\n\t ')).toBe('abc');
+      expect(table._unwrapText(' \t\nabc\n\t ')).toBe('abc');
+
+      expect(table._unwrapText('abc\n123')).toBe('abc 123');
+      expect(table._unwrapText(' \t\nabc\n123')).toBe('abc 123');
+      expect(table._unwrapText('abc\n123\n\t ')).toBe('abc 123');
+      expect(table._unwrapText(' \t\nabc\n123\n\t ')).toBe('abc 123');
+
+      expect(table._unwrapText('abc\n 123')).toBe('abc 123');
+      expect(table._unwrapText(' \t\nabc\n 123')).toBe('abc 123');
+      expect(table._unwrapText('abc\n 123\n\t ')).toBe('abc 123');
+      expect(table._unwrapText(' \t\nabc\n 123\n\t ')).toBe('abc 123');
+
+      expect(table._unwrapText('abc\n \n123')).toBe('abc 123');
+      expect(table._unwrapText(' \t\nabc\n \n123')).toBe('abc 123');
+      expect(table._unwrapText('abc\n \n123\n\t ')).toBe('abc 123');
+      expect(table._unwrapText(' \t\nabc\n \n123\n\t ')).toBe('abc 123');
+
+      expect(table._unwrapText('a bc\n \n123')).toBe('a bc 123');
+      expect(table._unwrapText(' \t\na bc\n \n123')).toBe('a bc 123');
+      expect(table._unwrapText('a bc\n \n123\n\t ')).toBe('a bc 123');
+      expect(table._unwrapText(' \t\na bc\n \n123\n\t ')).toBe('a bc 123');
+
+      expect(table._unwrapText('a bc\r\n \r\n123')).toBe('a bc 123');
+      expect(table._unwrapText(' \t\r\na bc\n \r\n123')).toBe('a bc 123');
+      expect(table._unwrapText('a bc\r\n \r\n123\r\n\t ')).toBe('a bc 123');
+      expect(table._unwrapText(' \t\r\na bc\r\n \r\n123\r\n\t ')).toBe('a bc 123');
+
+      expect(table._unwrapText('a bc\n\r \n\r \n\r  12\t3')).toBe('a bc 12 3');
+      expect(table._unwrapText(' \t\n\ra bc\n\r \n\r \n\r  12\t3')).toBe('a bc 12 3');
+      expect(table._unwrapText('a bc\n\r \n\r \n\r  12\t3\n\r\t ')).toBe('a bc 12 3');
+      expect(table._unwrapText(' \t\n\ra bc\n\r \n\r \n\r  12\t3\n\r\t ')).toBe('a bc 12 3');
+
+      expect(table._unwrapText('a\t bc\n\r \n\r \n\r  12\t3')).toBe('a  bc 12 3');
+      expect(table._unwrapText(' \t\n\ra\t bc\n\r \n\r \n\r  12\t3')).toBe('a  bc 12 3');
+      expect(table._unwrapText('a\t bc\n\r \n\r \n\r  12\t3\n\r\t ')).toBe('a  bc 12 3');
+      expect(table._unwrapText(' \t\n\ra\t bc\n\r \n\r \n\r  12\t3\n\r\t ')).toBe('a  bc 12 3');
+    });
+
+    it('can convert selected rows to text', () => {
+      let model = helper.createModelFixture(2, 0);
+      model.columns[0].multilineText = true;
+      model.rows = [
+        helper.createModelRow(1, [
+          '\n  \n\tline 1  \n line   2\n\n\nline 3  ',
+          ' second\ncolumn '
+        ]),
+        helper.createModelRow(2, [
+          '',
+          'test'
+        ])
+      ];
+      let table = helper.createTable(model);
+
+      table.selectAll();
+      let text = table._selectedRowsToText();
+      expect(text).toBe('line 1 line   2 line 3\tsecond column\n\ttest');
     });
   });
 });

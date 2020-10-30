@@ -777,8 +777,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
-   * transform text for drag & drop: remove TABs (they would destroy column consistency), trim all lines and remove
-   * empty lines in a cell
+   * Transform text for copy: remove TABs and NEWLINEs because they would destroy column consistency when pasting into
+   * excel.
+   * <p>
+   * Trim and concatenate non-empty lines, but preserve multiple whitespace within original line.
    */
   protected String unwrapText(String s) {
     if (s == null || s.isEmpty()) {
@@ -789,7 +791,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         .map(line -> line.replaceAll("\t", " "))
         .map(String::trim)
         .filter(line -> !line.isEmpty())
-        .collect(Collectors.joining("\n"));
+        .collect(Collectors.joining(" "));
   }
 
   /**

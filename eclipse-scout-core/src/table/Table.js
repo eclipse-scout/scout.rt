@@ -926,8 +926,8 @@ export default class Table extends Widget {
 
   _selectedRowsToText() {
     var columns = this.visibleColumns();
-    return this.selectedRows.map(function(row) {
-      return columns.map(function(column) {
+    return this.selectedRows.map(row => {
+      return columns.map(column => {
         var cell = column.cell(row);
         var text;
         if (column instanceof BooleanColumn) {
@@ -938,12 +938,19 @@ export default class Table extends Widget {
           text = cell.text;
         }
         // unwrap
-        return strings.nvl(text)
-          .replace(/\r/g, '')
-          .replace(/[\n\t]/g, ' ')
-          .replace(/[ ]+/g, ' ');
+        return this._unwrapText(text);
       }).join('\t');
     }).join('\n');
+  }
+
+  _unwrapText(text) {
+    // Same implementation as in AbstractTable#unwrapText(String)
+    return strings.nvl(text)
+      .split(/[\n\r]/)
+      .map(line => line.replace(/\t/g, ' '))
+      .map(line => line.trim())
+      .filter(line => !!line.length)
+      .join(' ');
   }
 
   setMultiSelect(multiSelect) {
