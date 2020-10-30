@@ -949,12 +949,19 @@ export default class Table extends Widget {
           text = cell.text;
         }
         // unwrap
-        return strings.nvl(text)
-          .replace(/\r/g, '')
-          .replace(/[\n\t]/g, ' ')
-          .replace(/[ ]+/g, ' ');
+        return this._unwrapText(text);
       }).join('\t');
     }).join('\n');
+  }
+
+  _unwrapText(text) {
+    // Same implementation as in AbstractTable#unwrapText(String)
+    return strings.nvl(text)
+      .split(/[\n\r]/)
+      .map(line => line.replace(/\t/g, ' '))
+      .map(line => line.trim())
+      .filter(line => !!line.length)
+      .join(' ');
   }
 
   setMultiSelect(multiSelect) {
