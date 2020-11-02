@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.ui.html.res.loader;
 
+import static java.util.stream.Collectors.joining;
+
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -27,6 +30,7 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.GlobalHttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
+import org.eclipse.scout.rt.shared.ui.webresource.ScriptResourceIndexes;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResources;
 import org.eclipse.scout.rt.ui.html.UiThemeHelper;
@@ -46,12 +50,13 @@ public class HtmlDocumentParser {
   protected static final Pattern PATTERN_MESSAGE_TAG = Pattern.compile("<scout:message(.*?)\\s*/?>", Pattern.DOTALL);
   protected static final Pattern PATTERN_STYLESHEET_TAG = Pattern.compile("<scout:stylesheet\\s+src=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL);
   protected static final Pattern PATTERN_SCRIPT_TAG = Pattern.compile("<scout:script\\s+src=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL);
+  protected static final Pattern PATTERN_SCRIPTS_TAG = Pattern.compile("<scout:scripts\\s+entryPoint=\"([^\"~]*)\"\\s*/?>", Pattern.DOTALL);
   protected static final Pattern PATTERN_BASE_TAG = Pattern.compile("<scout:base\\s*/?>", Pattern.DOTALL);
   protected static final Pattern PATTERN_VERSION_TAG = Pattern.compile("<scout:version\\s*/?>", Pattern.DOTALL);
-
   protected static final Pattern PATTERN_UNKNOWN_TAG = Pattern.compile("<scout:(\"[^\"]*\"|[^>]*?)*>", Pattern.DOTALL);
-
   protected static final Pattern PATTERN_KEY_VALUE = Pattern.compile("([^\\s]+)=\"([^\"]*)\"");
+  protected static final String SCRIPT_TAG_PREFIX = "<script src=\"";
+  public static final String SCRIPT_TAG_SUFFIX = "\"></script>";
 
   protected final HtmlDocumentParserParameters m_params;
   protected final IHttpResourceCache m_cache;
@@ -75,17 +80,19 @@ public class HtmlDocumentParser {
     replaceVersionTags();
     replaceMessageTags();
     replaceStylesheetTags();
+    replaceScriptsTags();
     replaceScriptTags();
 
     stripUnknownTags();
   }
 
   @SuppressWarnings("squid:S1149")
-  protected void replaceScriptTags(Pattern pattern, String tagPrefix, String tagSuffix) throws IOException {
+  protected void replaceScriptTags(Pattern pattern, String tagPrefix, String tagSuffix) {
     Matcher m = pattern.matcher(m_workingContent);
     StringBuffer sb = new StringBuffer();
     while (m.find()) {
       String srcPath = m.group(1);
+      //noinspection StringBufferReplaceableByString
       StringBuilder scriptTag = new StringBuilder(tagPrefix);
       scriptTag.append(createExternalPath(srcPath));
       scriptTag.append(tagSuffix);
@@ -99,49 +106,46 @@ public class HtmlDocumentParser {
    * Creates the external path of the given resource, including fingerprint and '.min' extensions. This method also
    * deals with caching, since we must build a script file first, before we can calculate its fingerprint.
    */
-  protected String createExternalPath(String internalPath) throws IOException {
+  protected String createExternalPath(String internalPath) {
     String theme = UiThemeHelper.get().isDefaultTheme(m_params.getTheme()) ? null : m_params.getTheme();
     return new WebResourceLoader(m_params.isMinify(), false, theme)
-        .resolveResource(internalPath)
-        .map(WebResourceDescriptor::getResolvedPath)
-        .orElse(internalPath);
+      .resolveResource(internalPath)
+      .map(WebResourceDescriptor::getResolvedPath)
+      .orElse(internalPath);
   }
 
-  /**
-   * Returns the external name for the given file name.
-   * <p>
-   * When file is a macro or module, remove that suffix. ScriptFileLocator tries to find the macro and module files by
-   * adding the suffix again and looking it up in the classpath.
-   */
-  protected String getScriptFileName(String fileName) {
-    if (fileName.endsWith("-macro")) {
-      return fileName.substring(0, fileName.length() - 6);
-    }
-    if (fileName.endsWith("-module")) {
-      return fileName.substring(0, fileName.length() - 7);
-    }
-    return fileName;
-  }
-
-  /**
-   * Returns the external extension for the given file extension.
-   */
-  protected String getScriptFileExtension(String extension) {
-    if ("less".equals(extension)) {
-      return "css";
-    }
-    return extension;
-  }
-
-  protected void replaceStylesheetTags() throws IOException {
+  protected void replaceStylesheetTags() {
     // <scout:stylesheet src="scout-all-macro.css" />
     replaceScriptTags(PATTERN_STYLESHEET_TAG, "<link rel=\"stylesheet\" type=\"text/css\" href=\"", "\">");
   }
 
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
-  protected void replaceScriptTags() throws IOException {
+  protected void replaceScriptTags() {
     // <scout:script src="scout-all-macro.css" />
-    replaceScriptTags(PATTERN_SCRIPT_TAG, "<script src=\"", "\"></script>");
+    replaceScriptTags(PATTERN_SCRIPT_TAG, SCRIPT_TAG_PREFIX, SCRIPT_TAG_SUFFIX);
+  }
+
+  protected void replaceScriptsTags() {
+    // <scout:scripts entryPoint="entry-point-name"/>
+    Matcher m = PATTERN_SCRIPTS_TAG.matcher(m_workingContent);
+    StringBuffer sb = new StringBuffer();
+    while (m.find()) {
+      String entryPoint = m.group(1);
+      m.appendReplacement(sb, buildScriptTagsForEntryPoint(entryPoint));
+    }
+    m.appendTail(sb);
+    m_workingContent = sb.toString();
+  }
+
+  protected String buildScriptTagsForEntryPoint(String entryPoint) {
+    return getAssetsForEntryPoint(entryPoint)
+      .filter(script -> script.toLowerCase().endsWith(".js"))
+      .map(path -> SCRIPT_TAG_PREFIX + path + SCRIPT_TAG_SUFFIX)
+      .collect(joining("\n"));
+  }
+
+  protected Stream<String> getAssetsForEntryPoint(String entryPoint) {
+    return ScriptResourceIndexes.getAssetsForEntryPoint(entryPoint, m_params.isMinify()).stream();
   }
 
   protected void replaceBaseTags() {
@@ -191,9 +195,9 @@ public class HtmlDocumentParser {
 
   protected URL resolveInclude(String includeName) {
     return WebResources
-        .resolveWebResource(includeName, m_params.isMinify())
-        .map(WebResourceDescriptor::getUrl)
-        .orElse(null);
+      .resolveWebResource(includeName, m_params.isMinify())
+      .map(WebResourceDescriptor::getUrl)
+      .orElse(null);
   }
 
   @SuppressWarnings("squid:S1149")

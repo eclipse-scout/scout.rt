@@ -156,10 +156,7 @@ module.exports = (env, args) => {
         filename: cssFilename
       }),
       // run post-build script hook
-      new AfterEmitWebpackPlugin({
-        createFileList: !devMode,
-        outDir: outDir
-      }),
+      new AfterEmitWebpackPlugin({outDir: outDir}),
       // # Copy resources
       new CopyPlugin(copyPluginConfig)
     ],
