@@ -940,13 +940,30 @@ export default class Desktop extends Widget {
       if (element.$container && overlays.indexOf(element.$container[0]) > -1) {
         nextSiblings = element.$container.nextAll().toArray();
       }
+
+      // The top-most element should not have a glass-pane (#274353)
+      let topMostElement = null;
+      if (overlays.length) {
+        for (let i = overlays.length - 1; i >= 0; i--) {
+          // Don't consider filtered glass-pane targets like the HelpPopup.js
+          // These targets stand outside the regular modality hierarchy.
+          let overlay = overlays[i];
+          if (!this._isGlassPaneTargetFiltered(overlay, element)) {
+            continue;
+          }
+          topMostElement = overlay;
+          break; // stop looking further
+        }
+      }
+
       $glassPaneTargets = $glassPaneTargets.filter((i, targetElem) => {
         if (nextSiblings.indexOf(targetElem) > -1) {
           return false;
         }
-        return this._glassPaneTargetFilters.every(filter => {
-          return filter(targetElem, element);
-        }, this);
+        if (targetElem === topMostElement) {
+          return false;
+        }
+        return this._isGlassPaneTargetFiltered(targetElem, element);
       });
     }
 
@@ -972,10 +989,20 @@ export default class Desktop extends Widget {
     return glassPaneTargets;
   }
 
+  _isGlassPaneTargetFiltered(targetElem, element) {
+    return this._glassPaneTargetFilters.every(filter => {
+      return filter(targetElem, element);
+    }, this);
+  }
+
   /**
    * Adds a filter which is applied when the glass pane targets are collected.
-   * If the filter returns false, the target won't be accepted and not covered by a glass pane.
-   * @param filter a function with the parameter target and element. Target is the element which would be covered by a glass pane, element is the element the user interacts with (e.g. the modal dialog).
+   * If the filter returns <code>false</code>, the target won't be accepted and not covered by a glass pane.
+   * This filter should be used primarily for elements like the help-popup which stand outside
+   * of the regular modality hierarchy.
+   *
+   * @param filter a function with the parameter target and element. Target is the element which
+   *     would be covered by a glass pane, element is the element the user interacts with (e.g. the modal dialog).
    * @see _glassPaneTargets
    */
   addGlassPaneTargetFilter(filter) {
