@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
-import {arrays, Desktop, Device, Form, RemoteEvent, scout, Status, strings, Widget} from '../../src/index';
+import {arrays, Desktop, Device, Form, MessageBoxes, RemoteEvent, scout, Status, strings, Widget} from '../../src/index';
 
 describe('Desktop', function() {
   var session, desktop, outlineHelper, formHelper;
@@ -2031,6 +2031,99 @@ describe('Desktop', function() {
       viewModal.close();
       expect(form.$container.children('.glasspane').length).toBe(0);
 
+    });
+
+  });
+
+  describe('glassPanes', function() {
+
+    /**
+     * This test makes sure glass panes are rendered correctly for message-boxes and file-choosers
+     * when opened over a modal dialog. This case occurred in ticket #274353.
+     */
+    it('modal dialog should not be clickable when desktop-modal message-box is opened', function() {
+      var desktop = session.desktop;
+      desktop.render(session.$entryPoint);
+      var modalDialog = scout.create('Form', {
+        parent: desktop,
+        displayHint: Form.DisplayHint.DIALOG,
+        modal: true,
+        rootGroupBox: {
+          objectType: 'GroupBox'
+        }
+      });
+      desktop.showForm(modalDialog, 0);
+
+      // Test with message-box
+      MessageBoxes.createOk(desktop).withBody('foo').buildAndOpen();
+      var $glassPanes = modalDialog.$container.find('.glasspane');
+      expect($glassPanes.length > 0).toBe(true);
+      var messageBox = scout.widget(desktop.$container.find('.messagebox')[0]);
+      messageBox.close();
+
+      // Test with file-chooser
+      var fileChooser = scout.create('FileChooser', {
+        parent: desktop
+      });
+      fileChooser.open();
+      $glassPanes = modalDialog.$container.find('.glasspane');
+      expect($glassPanes.length > 0).toBe(true);
+      fileChooser.close();
+    });
+
+    /**
+     * This test creates two modal views, the second view opens a message-box
+     * modal to the second view. #274353
+     */
+    it('message-box in modal-view should be clickable (have no glass-pane)', function() {
+      var desktop = session.desktop;
+      desktop.render(session.$entryPoint);
+      var viewA = scout.create('Form', {
+        parent: desktop,
+        displayHint: Form.DisplayHint.VIEW,
+        modal: true,
+        rootGroupBox: {
+          objectType: 'GroupBox'
+        }
+      });
+      var viewB = scout.create('Form', {
+        parent: desktop,
+        displayHint: Form.DisplayHint.VIEW,
+        modal: true,
+        rootGroupBox: {
+          objectType: 'GroupBox'
+        }
+      });
+      desktop.showForm(viewA, 0);
+      desktop.showForm(viewB, 1);
+      MessageBoxes.createOk(viewB).withBody('foo').buildAndOpen();
+
+      // trigger re-rendering of glass-panes. This is what happens in the ticket,
+      // when the table cell-editor is closed.
+      session.focusManager.rerenderGlassPanes();
+
+      var $messageBox = desktop.$container.find('.messagebox');
+      expect($messageBox.length).toBe(1);
+      expect($messageBox.find('.glasspane').length).toBe(0);
+
+      // Additionally to the case in the ticket, open a popup which makes use of the
+      // glass-pane filter: should not have an effect on modality.
+      var helpPopup = scout.create('WidgetPopup', {
+        parent: viewB,
+        widget: {
+          objectType: 'StringField'
+        }
+      });
+      var glassPaneTargetFilter = (target, element) => {
+        return target !== helpPopup.$container[0];
+      };
+      desktop.addGlassPaneTargetFilter(glassPaneTargetFilter);
+      helpPopup.open();
+
+      session.focusManager.rerenderGlassPanes();
+      desktop.$container.find('.messagebox');
+      expect($messageBox.length).toBe(1);
+      expect($messageBox.find('.glasspane').length).toBe(0);
     });
 
   });

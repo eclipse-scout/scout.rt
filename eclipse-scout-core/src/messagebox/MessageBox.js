@@ -90,10 +90,6 @@ export default class MessageBox extends Widget {
   }
 
   _render() {
-    // Render modality glasspanes (must precede adding the message box to the DOM)
-    this._glassPaneRenderer = new GlassPaneRenderer(this);
-    this._glassPaneRenderer.renderGlassPanes();
-
     this.$container = this.$parent.appendDiv('messagebox')
       .on('mousedown', this._onMouseDown.bind(this))
       .on('copy', this._onCopy.bind(this));
@@ -143,7 +139,6 @@ export default class MessageBox extends Widget {
     this._renderBody();
     this._renderHtml();
     this._renderHiddenText();
-    this._registerGlassPaneTargetFilter();
 
     // Prevent resizing when message-box is dragged off the viewport
     this.$container.addClass('calc-helper');
@@ -158,21 +153,10 @@ export default class MessageBox extends Widget {
 
     this.$container.addClassForAnimation('animate-open');
     this.$container.select();
-  }
 
-  _registerGlassPaneTargetFilter() {
-    // The desktop must not cover the message-box with a glass pane, in case the message-box
-    // is opened by a (modal) form. See ticket #274353.
-    let desktop = this.session.desktop;
-    if (!desktop || desktop === this.displayParent) {
-      return;
-    }
-
-    let glassPaneTargetFilter = function(target, element) {
-      return target !== this.$container[0];
-    }.bind(this);
-    desktop.addGlassPaneTargetFilter(glassPaneTargetFilter);
-    this.one('remove', desktop.removeGlassPaneTargetFilter.bind(desktop, glassPaneTargetFilter));
+    // Render modality glasspanes
+    this._glassPaneRenderer = new GlassPaneRenderer(this);
+    this._glassPaneRenderer.renderGlassPanes();
   }
 
   get$Scrollable() {
