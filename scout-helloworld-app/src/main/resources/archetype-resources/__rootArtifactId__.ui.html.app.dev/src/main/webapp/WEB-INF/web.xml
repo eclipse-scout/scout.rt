@@ -34,11 +34,9 @@
         /favicon/*
         /fonts/*
         /logo.png
-        /jquery*.js
-        /login*.js
-        /logout*.js
+        /*login*.js
+        /*logout*.js
         /${simpleArtifactName}-theme*.css
-        /eclipse-scout*.js
       </param-value>
     </init-param>
   </filter>
