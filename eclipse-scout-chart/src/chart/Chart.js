@@ -16,7 +16,7 @@ import {
   SpeedoChartRenderer,
   VennChartRenderer
 } from '../index';
-import {arrays, HtmlComponent, Widget} from '@eclipse-scout/core';
+import {arrays, colorSchemes, HtmlComponent, objects, Widget} from '@eclipse-scout/core';
 
 /**
  * @typedef ChartValueGroup
@@ -102,6 +102,7 @@ export default class Chart extends Widget {
     this._renderClickable();
     this._renderCheckable();
     this._renderChartType();
+    this._renderColorScheme();
   }
 
   _remove() {
@@ -129,6 +130,8 @@ export default class Chart extends Widget {
       type: Chart.Type.PIE,
       options: {
         autoColor: true,
+        colorScheme: colorSchemes.ColorSchemeId.DEFAULT,
+        transparent: false,
         maxSegments: 5,
         adjustGridMaxMin: true,
         clickable: false,
@@ -151,10 +154,16 @@ export default class Chart extends Widget {
         }
       }
     };
+    config = $.extend(true, {}, defaultConfig, config);
+    config.options.colorScheme = colorSchemes.ensureColorScheme(config.options.colorScheme);
+    if (objects.equalsRecursive(this.config, config)) {
+      return;
+    }
+
     if (this.rendered && this.config && this.config.type) {
       this.$container.removeClass(this.config.type + '-chart');
     }
-    this.setProperty('config', $.extend(true, {}, defaultConfig, config));
+    this.setProperty('config', config);
     this.setCheckedItems(this.checkedItems);
     this._updateChartRenderer();
   }
@@ -163,6 +172,7 @@ export default class Chart extends Widget {
     this._renderClickable();
     this._renderCheckable();
     this._renderChartType();
+    this._renderColorScheme();
     this.updateChart({
       requestAnimation: true,
       debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
@@ -213,6 +223,10 @@ export default class Chart extends Widget {
 
   _renderChartType() {
     this.$container.addClass(this.config.type + '-chart');
+  }
+
+  _renderColorScheme() {
+    colorSchemes.toggleColorSchemeClasses(this.$container, this.config.options.colorScheme);
   }
 
   /**

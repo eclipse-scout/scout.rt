@@ -142,9 +142,4 @@ export default class AbstractChartRenderer {
   shouldAnimateRemoveOnUpdate(opts) {
     return opts.requestAnimation;
   }
-
-  renderColorScheme(colorSchemeCssClass) {
-    // Override in subclasses
-  }
-
 }

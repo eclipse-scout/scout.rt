@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
+import org.eclipse.scout.rt.shared.data.colorscheme.ColorScheme;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -135,6 +136,8 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
     return BEANS.get(IChartConfig.class)
         .withType(IChartType.PIE)
         .withAutoColor(true)
+        .withColorScheme(ColorScheme.DEFAULT)
+        .withTransparent(false)
         .withMaxSegments(IChartConfig.DEFAULT_MAX_SEGMENTS_PIE)
         .withClickable(false)
         .withCheckable(false)

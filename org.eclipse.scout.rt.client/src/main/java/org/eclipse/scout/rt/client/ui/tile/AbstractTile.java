@@ -37,8 +37,8 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
-import org.eclipse.scout.rt.shared.data.tile.ITileColorScheme;
-import org.eclipse.scout.rt.shared.data.tile.TileColorScheme;
+import org.eclipse.scout.rt.shared.data.colorscheme.IColorScheme;
+import org.eclipse.scout.rt.shared.data.colorscheme.ColorScheme;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
@@ -165,8 +165,8 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(10)
-  protected ITileColorScheme getConfiguredColorScheme() {
-    return TileColorScheme.DEFAULT;
+  protected IColorScheme getConfiguredColorScheme() {
+    return ColorScheme.DEFAULT;
   }
 
   /**
@@ -270,12 +270,12 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   @Override
-  public ITileColorScheme getColorScheme() {
-    return (ITileColorScheme) propertySupport.getProperty(PROP_COLOR_SCHEME);
+  public IColorScheme getColorScheme() {
+    return (IColorScheme) propertySupport.getProperty(PROP_COLOR_SCHEME);
   }
 
   @Override
-  public void setColorScheme(ITileColorScheme colorScheme) {
+  public void setColorScheme(IColorScheme colorScheme) {
     propertySupport.setProperty(PROP_COLOR_SCHEME, colorScheme);
   }
 

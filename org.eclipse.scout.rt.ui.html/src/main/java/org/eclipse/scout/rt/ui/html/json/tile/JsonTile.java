@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.tile;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.tile.IFormFieldTile;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
-import org.eclipse.scout.rt.shared.data.tile.ITileColorScheme;
+import org.eclipse.scout.rt.shared.data.colorscheme.IColorScheme;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -39,13 +39,13 @@ public class JsonTile<T extends ITile> extends AbstractJsonWidget<T> {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<ITile>(ITile.PROP_COLOR_SCHEME, model) {
       @Override
-      protected ITileColorScheme modelValue() {
+      protected IColorScheme modelValue() {
         return getModel().getColorScheme();
       }
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        return ((ITileColorScheme) value).getIdentifier();
+        return ((IColorScheme) value).getIdentifier();
       }
     });
     putJsonProperty(new JsonProperty<T>(IFormFieldTile.PROP_DISPLAY_STYLE, model) {

@@ -10,7 +10,7 @@
  */
 import {AbstractChartRenderer, Chart} from '../index';
 import ChartJs from 'chart.js';
-import {Event, styles, arrays, strings} from '@eclipse-scout/core';
+import {arrays, colorSchemes, Event, strings, styles} from '@eclipse-scout/core';
 // noinspection ES6UnusedImports
 import chartjs_plugin_datalabels from 'chartjs-plugin-datalabels';
 // noinspection ES6UnusedImports
@@ -876,12 +876,20 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _adjustColors(config) {
+    this._adjustColorSchemeCssClass(config);
     this._adjustDatasetColors(config);
     this._adjustLegendColors(config);
     this._adjustTooltipColors(config);
     this._adjustScaleColors(config);
     this._adjustScalesColors(config);
     this._adjustPluginColors(config);
+  }
+
+  _adjustColorSchemeCssClass(config) {
+    if (!config || !config.options) {
+      return;
+    }
+    this.colorSchemeCssClass = colorSchemes.getCssClasses(config.options.colorScheme).join(' ');
   }
 
   _adjustDatasetColors(config) {
@@ -1004,6 +1012,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let data = config.data,
       type = config.type,
       checkable = config.options && config.options.checkable,
+      transparent = config.options && config.options.transparent,
       colors = {
         backgroundColors: [],
         borderColors: [],
@@ -1021,9 +1030,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       data.datasets.forEach(dataset => types.push(dataset.type || type));
     }
     types.forEach((type, index) => {
-      colors.backgroundColors.push(this._computeBackgroundColor(type, index, checkable));
+      colors.backgroundColors.push(this._computeBackgroundColor(type, index, checkable || transparent));
       colors.borderColors.push(this._computeBorderColor(type, index));
-      colors.hoverBackgroundColors.push(this._computeHoverBackgroundColor(type, index, checkable));
+      colors.hoverBackgroundColors.push(this._computeHoverBackgroundColor(type, index, checkable || transparent));
       colors.hoverBorderColors.push(this._computeHoverBorderColor(type, index));
 
       colors.checkedBackgroundColors.push(this._computeCheckedBackgroundColor(type, index, checkable));
@@ -1070,6 +1079,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
     let type = config.type,
       checkable = config.options && config.options.checkable,
+      transparent = config.options && config.options.transparent,
       colors = {
         backgroundColors: [],
         borderColors: [],
@@ -1127,9 +1137,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         hoverBackgroundDarker = 0;
       }
 
-      colors.backgroundColors.push(adjustColor(checkable ? uncheckedBackgroundOpacity : backgroundOpacity, 0));
+      colors.backgroundColors.push(adjustColor((checkable || transparent) ? uncheckedBackgroundOpacity : backgroundOpacity, 0));
       colors.borderColors.push(adjustColor(1, 0));
-      colors.hoverBackgroundColors.push(adjustColor(checkable ? uncheckedHoverBackgroundOpacity : hoverBackgroundOpacity, checkable ? 0 : hoverBackgroundDarker));
+      colors.hoverBackgroundColors.push(adjustColor((checkable || transparent) ? uncheckedHoverBackgroundOpacity : hoverBackgroundOpacity, (checkable || transparent) ? 0 : hoverBackgroundDarker));
       colors.hoverBorderColors.push(adjustColor(1, hoverBorderDarker));
 
       colors.checkedBackgroundColors.push(adjustColor(checkedBackgroundOpacity, checkedBackgroundDarker));
@@ -1920,13 +1930,6 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         axes[i].ticks.suggestedMax = maxMinValue.maxValue;
         axes[i].ticks.suggestedMin = maxMinValue.minValue;
       }
-    }
-  }
-
-  renderColorScheme(colorSchemeCssClass) {
-    this.colorSchemeCssClass = colorSchemeCssClass;
-    if (this.rendered && this.chartJs) {
-      this._updateChart(false);
     }
   }
 

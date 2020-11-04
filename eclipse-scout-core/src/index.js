@@ -16,6 +16,7 @@ export {default as NullWidgetAdapter} from './widget/NullWidgetAdapter';
 export {default as arrays} from './util/arrays';
 export {default as Call} from './util/Call';
 export {default as clipboard} from './util/clipboard';
+export {default as colorSchemes} from './util/colorSchemes';
 export {default as EventDelegator} from './util/EventDelegator';
 export {default as dates} from './util/dates';
 export {default as defaultValues} from './util/defaultValues';

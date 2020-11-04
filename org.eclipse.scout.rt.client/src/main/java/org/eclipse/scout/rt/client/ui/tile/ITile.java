@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeObserver;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.platform.IOrdered;
-import org.eclipse.scout.rt.shared.data.tile.ITileColorScheme;
+import org.eclipse.scout.rt.shared.data.colorscheme.IColorScheme;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
 /**
@@ -40,9 +40,9 @@ public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject,
 
   String getDisplayStyle();
 
-  ITileColorScheme getColorScheme();
+  IColorScheme getColorScheme();
 
-  void setColorScheme(ITileColorScheme colorScheme);
+  void setColorScheme(IColorScheme colorScheme);
 
   /**
    * @return the grid data hints used by the logical grids to create the final grid data

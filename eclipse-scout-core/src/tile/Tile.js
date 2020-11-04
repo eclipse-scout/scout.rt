@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GridData, HtmlComponent, LoadingSupport, SingleLayout, strings, Widget} from '../index';
+import {colorSchemes, GridData, HtmlComponent, LoadingSupport, SingleLayout, Widget} from '../index';
 import $ from 'jquery';
 
 export default class Tile extends Widget {
@@ -23,13 +23,6 @@ export default class Tile extends Widget {
     this.selected = false;
     this.selectable = false;
   }
-
-  // These constants need to correspond to the IDs defined in TileColorScheme.java
-  static ColorSchemeId = {
-    DEFAULT: 'default',
-    ALTERNATIVE: 'alternative',
-    RAINBOW: 'rainbow'
-  };
 
   static DisplayStyle = {
     DEFAULT: 'default',
@@ -99,40 +92,16 @@ export default class Tile extends Widget {
 
   _setColorScheme(colorScheme) {
     let defaultScheme = {
-      scheme: Tile.ColorSchemeId.DEFAULT,
+      scheme: colorSchemes.ColorSchemeId.DEFAULT,
       inverted: false
     };
-    colorScheme = this._ensureColorScheme(colorScheme);
+    colorScheme = colorSchemes.ensureColorScheme(colorScheme, true);
     colorScheme = $.extend({}, defaultScheme, colorScheme);
     this._setProperty('colorScheme', colorScheme);
   }
 
-  /**
-   * ColorScheme may be a string -> convert to an object
-   */
-  _ensureColorScheme(colorScheme) {
-    if (typeof colorScheme === 'object') {
-      return colorScheme;
-    }
-    let colorSchemeObj = {};
-    if (typeof colorScheme === 'string') {
-      // Split up colorScheme in two individual parts ("scheme" and "inverted").
-      // This information is then used when rendering the color scheme.
-      if (strings.startsWith(colorScheme, Tile.ColorSchemeId.ALTERNATIVE)) {
-        colorSchemeObj.scheme = Tile.ColorSchemeId.ALTERNATIVE;
-      }
-      if (strings.startsWith(colorScheme, Tile.ColorSchemeId.RAINBOW)) {
-        colorSchemeObj.scheme = Tile.ColorSchemeId.RAINBOW;
-      }
-      colorSchemeObj.inverted = strings.endsWith(colorScheme, '-inverted');
-    }
-    return colorSchemeObj;
-  }
-
   _renderColorScheme() {
-    this.$container.toggleClass('color-alternative', (this.colorScheme.scheme === Tile.ColorSchemeId.ALTERNATIVE));
-    this.$container.toggleClass('color-rainbow', (this.colorScheme.scheme === Tile.ColorSchemeId.RAINBOW));
-    this.$container.toggleClass('inverted', this.colorScheme.inverted);
+    colorSchemes.toggleColorSchemeClasses(this.$container, this.colorScheme);
   }
 
   setSelected(selected) {

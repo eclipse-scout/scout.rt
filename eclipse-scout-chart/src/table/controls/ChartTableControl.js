@@ -692,6 +692,9 @@ export default class ChartTableControl extends TableControl {
       type: this.chartType,
       options: {
         handleResize: true,
+        colorScheme: {
+          scheme: 'chart-table-control'
+        },
         maxSegments: 5,
         legend: {
           display: false
@@ -706,7 +709,6 @@ export default class ChartTableControl extends TableControl {
     this._adjustConfig(config);
 
     this.chart.setConfig(config);
-    this.chart.chartRenderer.renderColorScheme('chart-table-control');
 
     let checkedItems = this._computeCheckedItems(config.data.datasets[0].deterministicKeys);
     this.chart.setCheckedItems(checkedItems);

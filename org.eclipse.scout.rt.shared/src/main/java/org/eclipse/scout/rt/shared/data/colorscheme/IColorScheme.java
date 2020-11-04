@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.shared.data.tile;
+package org.eclipse.scout.rt.shared.data.colorscheme;
 
 /**
  * @since 8.0
  */
-public interface ITileColorScheme {
+public interface IColorScheme {
 
   /**
    * @return the static identifier (known to the UI) for this scheme.

@@ -360,7 +360,7 @@
     > .label {
       fill: @chart-legend-label-color;
 
-      .inverted & {
+      .inverted > & {
         fill: @palette-white;
       }
     }
@@ -368,20 +368,25 @@
     > .label-backdrop {
       fill: @tile-default-background-color;
 
-      .inverted & {
+      .inverted > & {
         fill: @tile-default-inverted-background-color;
       }
 
-      .color-alternative & {
+      .color-alternative > & {
         fill: @tile-alternative-background-color;
       }
 
-      .color-alternative.inverted & {
+      .color-alternative.inverted > & {
         fill: @tile-alternative-inverted-background-color;
       }
 
-      .color-rainbow & {
+      .color-rainbow > & {
         fill: @tile-default-background-color;
+      }
+
+      :not(.tile) > &,
+      :not(.tile).inverted > & {
+        fill: @form-background-color;
       }
     }
 
@@ -392,7 +397,7 @@
     > .axis-label {
       fill: @chart-axis-label-color;
 
-      .inverted & {
+      .inverted > & {
         fill: @palette-white;
       }
     }
@@ -504,7 +509,9 @@
 }
 
 :not(.tile) > .pie-chart > .elements,
-:not(.tile) > .doughnut-chart > .elements {
+:not(.tile).inverted > .pie-chart > .elements,
+:not(.tile) > .doughnut-chart > .elements,
+:not(.tile).inverted > .doughnut-chart > .elements {
   #scout.chart-stroke-colors-schemes(@form-background-color);
 }
 
@@ -543,12 +550,9 @@
   }
 }
 
-:not(.tile) > .polarArea-chart > .elements {
+:not(.tile) > .polarArea-chart > .elements,
+:not(.tile).inverted > .polarArea-chart > .elements {
   #scout.chart-stroke-colors-schemes(@form-background-color);
-
-  > .label-backdrop {
-    fill: @form-background-color;
-  }
 }
 
 .line-chart,
@@ -568,12 +572,6 @@
         fill: @palette-white;
       }
     }
-  }
-}
-
-:not(.tile) > .radar-chart > .elements {
-  > .label-backdrop {
-    fill: @form-background-color;
   }
 }
 
@@ -769,6 +767,7 @@ line.label-separator {
 polygon.salesfunnel-chart-bar {
   stroke: @background-color;
   #scout.tile-colors(stroke);
+  #scout.chart-auto-colors-schemes();
   stroke-width: 1px;
 
   .clickable & {

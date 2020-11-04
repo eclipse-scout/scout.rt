@@ -8,12 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.shared.data.tile;
+package org.eclipse.scout.rt.shared.data.colorscheme;
+
+import java.util.stream.Stream;
 
 /**
  * @since 5.2
  */
-public enum TileColorScheme implements ITileColorScheme {
+public enum ColorScheme implements IColorScheme {
   DEFAULT(SchemeIds.SCHEME_ID_DEFAULT, false),
   DEFAULT_INVERTED(SchemeIds.SCHEME_ID_DEFAULT, true),
   ALTERNATIVE(SchemeIds.SCHEME_ID_ALTERNATIVE, false),
@@ -23,7 +25,7 @@ public enum TileColorScheme implements ITileColorScheme {
   private final String m_schemeId;
   private final boolean m_inverted;
 
-  TileColorScheme(String schemeId, boolean inverted) {
+  ColorScheme(String schemeId, boolean inverted) {
     m_schemeId = schemeId;
     m_inverted = inverted;
   }
@@ -33,10 +35,17 @@ public enum TileColorScheme implements ITileColorScheme {
     return m_schemeId + (m_inverted ? "-inverted" : "");
   }
 
+  public static ColorScheme parse(String identifier) {
+    return Stream.of(values())
+        .filter(colorScheme -> colorScheme.getIdentifier().equals(identifier))
+        .findFirst()
+        .orElse(null);
+  }
+
   /**
    * Utility method returning the inverted color scheme for this scheme.
    */
-  public TileColorScheme invert() {
+  public ColorScheme invert() {
     switch (this) {
       case DEFAULT:
         return DEFAULT_INVERTED;
@@ -54,7 +63,7 @@ public enum TileColorScheme implements ITileColorScheme {
   /**
    * Utility method returning the "opposite" color scheme for this scheme.
    */
-  public TileColorScheme toggle() {
+  public ColorScheme toggle() {
     switch (this) {
       case DEFAULT:
         return ALTERNATIVE;

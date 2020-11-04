@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.chart.shared.data.basic.chart;
 
 import static org.eclipse.scout.rt.platform.util.StringUtility.*;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +30,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.shared.data.colorscheme.ColorScheme;
 
 public class ChartConfig implements IChartConfig {
 
@@ -46,6 +46,8 @@ public class ChartConfig implements IChartConfig {
   protected static final String TYPE = "type";
   protected static final String OPTIONS = "options";
   protected static final String AUTO_COLOR = combine(OPTIONS, "autoColor");
+  protected static final String COLOR_SCHEME = combine(OPTIONS, "colorScheme");
+  protected static final String TRANSPARENT = combine(OPTIONS, "transparent");
   protected static final String MAX_SEGMENTS = combine(OPTIONS, "maxSegments");
   protected static final String CLICKABLE = combine(OPTIONS, "clickable");
   protected static final String CHECKABLE = combine(OPTIONS, "checkable");
@@ -396,6 +398,36 @@ public class ChartConfig implements IChartConfig {
   @Override
   public boolean isAutoColor() {
     return BooleanUtility.nvl((Boolean) getProperty(AUTO_COLOR));
+  }
+
+  @Override
+  public IChartConfig withColorScheme(ColorScheme colorScheme) {
+    return withProperty(COLOR_SCHEME, colorScheme != null ? colorScheme.getIdentifier() : null);
+  }
+
+  @Override
+  public IChartConfig removeColorScheme() {
+    return removeProperty(COLOR_SCHEME);
+  }
+
+  @Override
+  public ColorScheme getColorScheme() {
+    return ColorScheme.parse((String) getProperty(COLOR_SCHEME));
+  }
+
+  @Override
+  public IChartConfig withTransparent(boolean transparent) {
+    return withProperty(TRANSPARENT, transparent);
+  }
+
+  @Override
+  public IChartConfig removeTransparent() {
+    return removeProperty(TRANSPARENT);
+  }
+
+  @Override
+  public boolean isTransparent() {
+    return BooleanUtility.nvl((Boolean) getProperty(TRANSPARENT));
   }
 
   @Override
