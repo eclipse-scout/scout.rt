@@ -181,8 +181,7 @@ module.exports = (env, args) => {
     // Generating source maps for vendors may take some time and is not necessary
     // Use external source maps also in dev mode because the browser is very slow in displaying a file containing large lines which is the case if source maps are inlined
     config.plugins.push(new webpack.SourceMapDevToolPlugin({
-      filename: '[file].map',
-      exclude: [/vendors.*\.js/]
+      filename: '[file].map'
     }));
   }
 
