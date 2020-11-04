@@ -12,8 +12,9 @@ package org.eclipse.scout.rt.shared.ui.webresource;
 
 import static java.util.Collections.*;
 import static java.util.stream.Collectors.*;
+import static org.eclipse.scout.rt.platform.util.StreamUtility.ignoringMerger;
 import static org.eclipse.scout.rt.shared.ui.webresource.AbstractWebResourceResolver.stripLeadingSlash;
-import static org.eclipse.scout.rt.shared.ui.webresource.WebResources.resolveScriptResource;
+import static org.eclipse.scout.rt.shared.ui.webresource.WebResources.resolveScriptResources;
 
 import java.net.URL;
 import java.util.Map;
@@ -98,7 +99,7 @@ public class ScriptResourceIndexes {
 
   protected Map<String, String> createIndexAssetNameToMinifiedName() {
     return getFileListEntries(true)
-      .collect(toMap(this::getEntryBasePath, FileListEntry::rawLine /* throws on duplicates */));
+        .collect(toMap(this::getEntryBasePath, FileListEntry::rawLine, ignoringMerger()));
   }
 
   protected String getEntryBasePath(FileListEntry entry) {
@@ -113,10 +114,9 @@ public class ScriptResourceIndexes {
   }
 
   public Stream<FileListEntry> getFileListEntries(boolean minified) {
-    return resolveScriptResource(INDEX_FILE_NAME, minified, null)
-      .map(WebResourceDescriptor::getUrl)
-      .map(this::parseFileListEntries)
-      .orElseGet(Stream::empty);
+    return resolveScriptResources(INDEX_FILE_NAME, minified, null).stream()
+        .map(WebResourceDescriptor::getUrl)
+        .flatMap(this::parseFileListEntries);
   }
 
   protected Stream<FileListEntry> parseFileListEntries(URL url) {
