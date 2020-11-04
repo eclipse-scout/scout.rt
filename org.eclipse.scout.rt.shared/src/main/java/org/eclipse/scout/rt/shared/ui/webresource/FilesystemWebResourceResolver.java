@@ -10,11 +10,16 @@
  */
 package org.eclipse.scout.rt.shared.ui.webresource;
 
+import static java.util.Collections.singleton;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
@@ -27,14 +32,49 @@ public class FilesystemWebResourceResolver extends AbstractWebResourceResolver {
   }
 
   @Override
-  protected URL getResourceImpl(String resourcePath) {
+  protected Stream<URL> getResourceImpl(String resourcePath) {
     try {
-      Path candidate = m_root.resolve(resourcePath);
-      return toUrl(candidate);
-    } catch (java.nio.file.InvalidPathException e){
+      return resolveUrls(m_root, resourcePath);
+    }
+    catch (java.nio.file.InvalidPathException e) {
       // filesystem implementation does not understand/allow this path
       return null;
     }
+  }
+
+  /**
+   * Tries to resolve the given relative path in the given root directory and returns the {@link URL} to the file if it
+   * was found.
+   *
+   * @param root
+   *          The root directory in which the given relative path should be resolved.
+   * @param relPath
+   *          The relative path to resolve.
+   * @return The {@link URL} pointing to the file found in the given root or an empty {@link Stream} if the file could
+   *         not be found.
+   */
+  protected static Stream<URL> resolveUrls(Path root, String relPath) {
+    return resolveUrls(singleton(root), relPath);
+  }
+
+  /**
+   * Tries to resolve the given relative path in the given root directories and returns all {@link URL urls} that point
+   * to existing files.
+   *
+   * @param roots
+   *          The root directories in which the given relative path should be resolved.
+   * @param relPath
+   *          The relative path to resolve.
+   * @return {@link URL Urls} pointing to all files found for the given relative path within the given roots.
+   */
+  protected static Stream<URL> resolveUrls(Collection<Path> roots, String relPath) {
+    if (roots == null || relPath == null) {
+      return Stream.empty();
+    }
+    return roots.stream()
+        .map(root -> root.resolve(relPath))
+        .map(FilesystemWebResourceResolver::toUrl)
+        .filter(Objects::nonNull);
   }
 
   protected static URL toUrl(Path path) {

@@ -10,8 +10,14 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
+import static java.util.stream.StreamSupport.stream;
+
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators.AbstractSpliterator;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * Collection of additional {@link Enumeration} support that is missing in Java 8.
@@ -62,4 +68,35 @@ public final class EnumerationUtility {
     };
   }
 
+  /**
+   * Converts the given {@link Enumeration} into a {@link Stream}. The {@link Enumeration} is evaluated lazy by the
+   * {@link Stream}.<br>
+   * Because {@link Enumeration enumerations} cannot be reset a fresh instance should be passed to this method.
+   * Otherwise the resulting {@link Stream} only processes the remaining elements of the {@link Enumeration}.
+   *
+   * @param e
+   *          The {@link Enumeration} to convert. Must not be {@code null}.
+   * @return A non-parallel, ordered {@link Stream} backed by the {@link Enumeration} given.
+   */
+  public static <T> Stream<T> asStream(Enumeration<T> e) {
+    Assertions.assertNotNull(e);
+    Spliterator<T> spliterator = new AbstractSpliterator<T>(Long.MAX_VALUE, Spliterator.ORDERED) {
+      @Override
+      public boolean tryAdvance(Consumer<? super T> action) {
+        if (!e.hasMoreElements()) {
+          return false;
+        }
+        action.accept(e.nextElement());
+        return true;
+      }
+
+      @Override
+      public void forEachRemaining(Consumer<? super T> action) {
+        while (e.hasMoreElements()) {
+          action.accept(e.nextElement());
+        }
+      }
+    };
+    return stream(spliterator, false);
+  }
 }

@@ -10,9 +10,14 @@
  */
 package org.eclipse.scout.rt.shared.ui.webresource;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.rt.platform.util.CollectionUtility.hasElements;
+
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -35,23 +40,23 @@ public abstract class AbstractWebResourceResolver implements IWebResourceResolve
   }
 
   @Override
-  public Optional<WebResourceDescriptor> resolveScriptResource(String path, boolean minified, String theme) {
+  public List<WebResourceDescriptor> resolveScriptResource(String path, boolean minified, String theme) {
     if (path == null) {
-      return Optional.empty();
+      return emptyList();
     }
     String subFolder = getScriptResourceFolder(minified);
     String themePath = getThemePath(path, theme);
-    Optional<WebResourceDescriptor> themeResource = lookupResource(path, themePath, subFolder, minified);
-    if (themeResource.isPresent() || Objects.equals(path, themePath)) {
+    List<WebResourceDescriptor> themeResource = lookupResource(path, themePath, subFolder, minified);
+    if (hasElements(themeResource) || Objects.equals(path, themePath)) {
       return themeResource;
     }
     return lookupResource(path, path, subFolder, minified);
   }
 
   @Override
-  public Optional<WebResourceDescriptor> resolveWebResource(String path, boolean minified) {
+  public List<WebResourceDescriptor> resolveWebResource(String path, boolean minified) {
     if (path == null) {
-      return Optional.empty();
+      return emptyList();
     }
     return lookupResource(path, path, WEB_RESOURCE_FOLDER_NAME, minified);
   }
@@ -60,7 +65,7 @@ public abstract class AbstractWebResourceResolver implements IWebResourceResolve
     return minified ? MIN_FOLDER_NAME : DEV_FOLDER_NAME;
   }
 
-  protected Optional<WebResourceDescriptor> lookupResource(String requestedPath, String path, String subFolder, boolean minified) {
+  protected List<WebResourceDescriptor> lookupResource(String requestedPath, String path, String subFolder, boolean minified) {
     String[] lookupList = {null, null, path};
     if (minified) {
       String pathFromIndex = ScriptResourceIndexes.getMinifiedPath(path);
@@ -80,12 +85,18 @@ public abstract class AbstractWebResourceResolver implements IWebResourceResolve
       if (lookupPath == null) {
         continue;
       }
-      URL url = getResourceImpl(subFolder + '/' + stripLeadingSlash(lookupPath));
-      if (url != null) {
-        return Optional.of(new WebResourceDescriptor(url, requestedPath, lookupPath));
+      Stream<URL> resourceStream = getResourceImpl(subFolder + '/' + stripLeadingSlash(lookupPath));
+      if (resourceStream == null) {
+        continue;
+      }
+      List<WebResourceDescriptor> resources = resourceStream
+          .map(url -> new WebResourceDescriptor(url, requestedPath, lookupPath))
+          .collect(toList());
+      if (hasElements(resources)) {
+        return resources;
       }
     }
-    return Optional.empty();
+    return emptyList();
   }
 
   protected String getMinifiedPath(String path) {
@@ -108,8 +119,9 @@ public abstract class AbstractWebResourceResolver implements IWebResourceResolve
   }
 
   /**
-   * @return The {@link URL} or {@code null}.
+   * @return The {@link URL urls} for the resourcePath given or {@code null} or an empty {@link Stream} if the resource
+   *         could not be found.
    */
-  protected abstract URL getResourceImpl(String resourcePath);
+  protected abstract Stream<URL> getResourceImpl(String resourcePath);
 
 }
