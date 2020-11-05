@@ -834,7 +834,7 @@ export default class Popup extends Widget {
         if (overlap.y > 0) {
           this.$arrow.cssMarginTop(overlap.y);
         } else {
-          this.$arrow.cssMarginBotton(-overlap.y);
+          this.$arrow.cssMarginBottom(-overlap.y);
         }
       }
       if (overlap.x !== 0 && (this.$arrow.hasClass(Popup.Alignment.TOP) || this.$arrow.hasClass(Popup.Alignment.BOTTOM))) {
