@@ -88,7 +88,8 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
       .data('animation-end', end);
 
     let radius2 = (this.fullR / 8) * 6.7;
-    this._renderCirclePath('fulfillment-chart-inner-circle-transparent', 'InnerCircle3', radius2);
+    let $transparentCircle = this._renderCirclePath('fulfillment-chart-inner-circle-transparent', 'InnerCircle3', radius2);
+    $transparentCircle.css('fill', this.firstOpaqueBackgroundColor);
 
     // Label
     let percentage = (total ? Math.round((value / total) * 100) : 0);
@@ -167,7 +168,8 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
       radius2 = (this.fullR / 8) * 7.2;
 
     this._renderCirclePath('fulfillment-chart-inner-circle', 'InnerCircle', radius);
-    this._renderCirclePath('fulfillment-chart-inner-circle-transparent', 'InnerCircle2', radius2);
+    let $transparentCircle = this._renderCirclePath('fulfillment-chart-inner-circle-transparent', 'InnerCircle2', radius2);
+    $transparentCircle.css('fill', this.firstOpaqueBackgroundColor);
   }
 
   /**

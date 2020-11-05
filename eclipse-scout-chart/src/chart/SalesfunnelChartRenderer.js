@@ -236,6 +236,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
     if (!this.chart.config.options.autoColor && renderPolyOptions.fill) {
       $poly.attr('fill', renderPolyOptions.fill);
     }
+    $poly.css('stroke', this.firstOpaqueBackgroundColor);
 
     let expandFunc = function(now, fx) {
       let $this = $(this);

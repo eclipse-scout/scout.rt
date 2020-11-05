@@ -31,10 +31,39 @@ let element = null;
  * Adds the given css class to that element and returns a style object containing the values for every given property.
  * The style is cached. Subsequent calls with the same css class will return the same style object.
  *
+ * @param {object} styleProperties in the form {backgroundColor: 'black'}
  * @return {StyleMap} style
  */
-export function get(cssClass, properties, additionalClass) {
-  let style = styleMap[cssClass];
+export function get(cssClass, properties, styleProperties) {
+  // create invisible div
+  let elem = element;
+  if (!elem) {
+    elem = window.document.createElement('div');
+    elem.style.display = 'none';
+    window.document.body.appendChild(elem);
+    element = elem;
+  }
+
+  let displayNoneStyleCssText = elem.style.cssText;
+  styleProperties = $.extend(true, {}, styleProperties, {
+    display: ''
+  });
+  Object.keys(styleProperties).sort().forEach(key => {
+    elem.style[key] = styleProperties[key];
+  });
+  // get cssText as additional key component, display is not part of the key component
+  let keyCssText = elem.style.cssText;
+  // always add display: 'none'
+  elem.style.display = 'none';
+  let styleCssText = elem.style.cssText;
+
+  // reset style
+  elem.style.cssText = displayNoneStyleCssText;
+
+  let cssClassArray = arrays.ensure(cssClass),
+    mapKey = keyCssText ? [...cssClassArray, keyCssText] : cssClassArray;
+
+  let style = styleMap[mapKey];
   // ensure array
   properties = arrays.ensure(properties);
   properties = properties.map(prop => {
@@ -51,7 +80,7 @@ export function get(cssClass, properties, additionalClass) {
   // ensure style
   if (!style) {
     style = {};
-    put(cssClass, style);
+    put(mapKey, style);
   }
 
   let notResolvedProperties = properties.filter(prop => {
@@ -62,15 +91,6 @@ export function get(cssClass, properties, additionalClass) {
   }
 
   // resolve missing properties
-  let elem = element;
-  if (!elem) {
-    elem = window.document.createElement('div');
-    elem.style.display = 'none';
-    window.document.body.appendChild(elem);
-    element = elem;
-  }
-
-  let cssClassArray = arrays.ensure(cssClass);
   elem.className = cssClassArray[0];
   for (let i = 1; i < cssClassArray.length; i++) {
     let childElem = elem.children[0];
@@ -83,14 +103,15 @@ export function get(cssClass, properties, additionalClass) {
     elem.className = cssClassArray[i];
   }
 
-  if (additionalClass) {
-    elem.className += ' ' + additionalClass;
-  }
+  // set style properties
+  elem.style.cssText = styleCssText;
+
   let computedStyle = window.getComputedStyle(elem);
   notResolvedProperties.forEach(property => {
     style[property.nameCamelCase] = computedStyle[property.name];
   });
 
+  elem.style.cssText = displayNoneStyleCssText;
   elem = element;
 
   do {
@@ -102,8 +123,28 @@ export function get(cssClass, properties, additionalClass) {
   return style;
 }
 
-export function getSize(cssClass, cssProperty, property, defaultSize, additionalClass) {
-  let size = get(cssClass, cssProperty, additionalClass)[property];
+/**
+ * Traverses the parents of the given $elem and returns the first opaque background color.
+ * @param {jQuery} $elem
+ */
+export function getFirstOpaqueBackgroundColor($elem) {
+  if (!$elem) {
+    return;
+  }
+
+  let document = $elem.document(true);
+  while ($elem && $elem.length && document !== $elem[0]) {
+    let rgbString = $elem.css('background-color'),
+      rgba = rgb(rgbString);
+    if (rgba && rgba.alpha === 1) {
+      return rgbString;
+    }
+    $elem = $elem.parent();
+  }
+}
+
+export function getSize(cssClass, cssProperty, property, defaultSize) {
+  let size = get(cssClass, cssProperty)[property];
   if ('auto' === size) {
     return defaultSize;
   }
@@ -420,6 +461,7 @@ export default {
   clearCache,
   darkerColor,
   get,
+  getFirstOpaqueBackgroundColor,
   getSize,
   hexToRgb,
   legacyBackgroundColor,

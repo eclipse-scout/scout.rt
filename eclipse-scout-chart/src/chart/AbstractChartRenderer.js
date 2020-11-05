@@ -25,6 +25,8 @@ export default class AbstractChartRenderer {
     this.rendering = false; // true while this.render() is executing
     this.rendered = false;
     this.animationDuration = 0; // set by render() and remove(), makes it unnecessary to carry an argument through all method calls
+
+    this.firstOpaqueBackgroundColor = '';
   }
 
   validate() {

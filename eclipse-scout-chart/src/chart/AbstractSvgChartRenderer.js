@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ObjectFactory, strings} from '@eclipse-scout/core';
+import {ObjectFactory, strings, styles} from '@eclipse-scout/core';
 import $ from 'jquery';
 import {Chart, AbstractChartRenderer} from '../index';
 
@@ -35,6 +35,7 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     if (!this.$svg) {
       this.$svg = this.chart.$container.appendSVG('svg', 'chart-svg');
     }
+    this.firstOpaqueBackgroundColor = styles.getFirstOpaqueBackgroundColor(this.$svg);
     this.svgHeight = this.$svg.height();
     this.svgWidth = this.$svg.width();
     // This works, because CSS specifies 100% width/height

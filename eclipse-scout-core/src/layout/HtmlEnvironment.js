@@ -33,14 +33,15 @@ export default class HtmlEnvironment {
   }
 
   init(additionalClass) {
-    this.formRowHeight = styles.getSize('html-env-logical-grid-row', 'height', 'height', this.formRowHeight, additionalClass);
-    this.formRowGap = styles.getSize('html-env-logical-grid-row', 'margin-bottom', 'marginBottom', this.formRowGap, additionalClass);
-    this.formColumnWidth = styles.getSize('html-env-logical-grid-column', 'width', 'width', this.formColumnWidth, additionalClass);
-    this.formColumnGap = styles.getSize('html-env-logical-grid-column', 'margin-right', 'marginRight', this.formColumnGap, additionalClass);
-    this.smallColumnGap = styles.getSize('html-env-logical-grid-column', 'margin-left', 'marginLeft', this.smallColumnGap, additionalClass);
-    this.fieldLabelWidth = styles.getSize('html-env-field-label', 'width', 'width', this.fieldLabelWidth, additionalClass);
-    this.fieldMandatoryIndicatorWidth = styles.getSize('html-env-field-mandatory-indicator', 'width', 'width', this.fieldMandatoryIndicatorWidth, additionalClass);
-    this.fieldStatusWidth = styles.getSize('html-env-field-status', 'width', 'width', this.fieldStatusWidth, additionalClass);
+    additionalClass = additionalClass ? ' ' + additionalClass : '';
+    this.formRowHeight = styles.getSize('html-env-logical-grid-row' + additionalClass, 'height', 'height', this.formRowHeight);
+    this.formRowGap = styles.getSize('html-env-logical-grid-row' + additionalClass, 'margin-bottom', 'marginBottom', this.formRowGap);
+    this.formColumnWidth = styles.getSize('html-env-logical-grid-column' + additionalClass, 'width', 'width', this.formColumnWidth);
+    this.formColumnGap = styles.getSize('html-env-logical-grid-column' + additionalClass, 'margin-right', 'marginRight', this.formColumnGap);
+    this.smallColumnGap = styles.getSize('html-env-logical-grid-column' + additionalClass, 'margin-left', 'marginLeft', this.smallColumnGap);
+    this.fieldLabelWidth = styles.getSize('html-env-field-label' + additionalClass, 'width', 'width', this.fieldLabelWidth);
+    this.fieldMandatoryIndicatorWidth = styles.getSize('html-env-field-mandatory-indicator' + additionalClass, 'width', 'width', this.fieldMandatoryIndicatorWidth);
+    this.fieldStatusWidth = styles.getSize('html-env-field-status' + additionalClass, 'width', 'width', this.fieldStatusWidth);
 
     let event = {
       source: this

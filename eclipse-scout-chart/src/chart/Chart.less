@@ -365,31 +365,6 @@
       }
     }
 
-    > .label-backdrop {
-      fill: @tile-default-background-color;
-
-      .inverted > & {
-        fill: @tile-default-inverted-background-color;
-      }
-
-      .color-alternative > & {
-        fill: @tile-alternative-background-color;
-      }
-
-      .color-alternative.inverted > & {
-        fill: @tile-alternative-inverted-background-color;
-      }
-
-      .color-rainbow > & {
-        fill: @tile-default-background-color;
-      }
-
-      :not(.tile) > &,
-      :not(.tile).inverted > & {
-        fill: @form-background-color;
-      }
-    }
-
     > .datalabel {
       fill: @palette-white;
     }
@@ -484,20 +459,7 @@
   & > .elements {
     #scout.chart-label-grid-colors();
     #scout.chart-auto-colors-schemes();
-    #scout.chart-stroke-colors-schemes(
-      @tile-default-background-color,
-      @tile-default-inverted-background-color,
-      @tile-alternative-background-color,
-      @tile-alternative-inverted-background-color,
-      @tile-default-background-color);
     #scout.chart-auto-colors-schemes(@darken: 10, @additional-classes: ~".hover");
-    #scout.chart-stroke-colors-schemes(
-      @tile-default-background-color,
-      @tile-default-inverted-background-color,
-      @tile-alternative-background-color,
-      @tile-alternative-inverted-background-color,
-      @tile-default-background-color,
-      @additional-classes: ~".hover");
 
     .checkable& {
       #scout.chart-auto-colors-schemes(@opacity: 70);
@@ -506,13 +468,6 @@
       #scout.chart-auto-colors-schemes(@additional-classes: ~".hover.checked");
     }
   }
-}
-
-:not(.tile) > .pie-chart > .elements,
-:not(.tile).inverted > .pie-chart > .elements,
-:not(.tile) > .doughnut-chart > .elements,
-:not(.tile).inverted > .doughnut-chart > .elements {
-  #scout.chart-stroke-colors-schemes(@form-background-color);
 }
 
 .polarArea-chart {
@@ -526,20 +481,7 @@
     }
 
     #scout.chart-auto-colors-schemes(@opacity: 70);
-    #scout.chart-stroke-colors-schemes(
-      @tile-default-background-color,
-      @tile-default-inverted-background-color,
-      @tile-alternative-background-color,
-      @tile-alternative-inverted-background-color,
-      @tile-default-background-color);
     #scout.chart-auto-colors-schemes(@opacity: 85, @additional-classes: ~".hover");
-    #scout.chart-stroke-colors-schemes(
-      @tile-default-background-color,
-      @tile-default-inverted-background-color,
-      @tile-alternative-background-color,
-      @tile-alternative-inverted-background-color,
-      @tile-default-background-color,
-      @additional-classes: ~".hover");
 
     .checkable& {
       #scout.chart-auto-colors-schemes(@darken: 10, @additional-classes: ~".checked");
@@ -548,11 +490,6 @@
 
     #scout.chart-auto-colors-schemes(@additional-classes: ~".legend");
   }
-}
-
-:not(.tile) > .polarArea-chart > .elements,
-:not(.tile).inverted > .polarArea-chart > .elements {
-  #scout.chart-stroke-colors-schemes(@form-background-color);
 }
 
 .line-chart,
@@ -708,11 +645,6 @@ path.fulfillment-chart-inner-circle {
   fill: @palette-gray-3;
 }
 
-path.fulfillment-chart-inner-circle-transparent {
-  fill: @background-color;
-  #scout.tile-colors(fill);
-}
-
 text.fulfillment-chart-label {
   fill: @chart-axis-text-color;
   text-anchor: middle;
@@ -765,8 +697,6 @@ line.label-separator {
 }
 
 polygon.salesfunnel-chart-bar {
-  stroke: @background-color;
-  #scout.tile-colors(stroke);
   #scout.chart-auto-colors-schemes();
   stroke-width: 1px;
 
@@ -781,8 +711,24 @@ polygon.salesfunnel-chart-bar {
     fill: @palette-white;
   }
 
+  &.auto-color:hover {
+    fill: @chart-data-active-color;
+  }
+
   .inverted &.auto-color:hover {
-    fill: @salesfunnel-inverted-hover-color;
+    fill: @chart-data-active-color-inverted;
+  }
+
+  .color-alternative &.auto-color:hover {
+    fill: @chart-data-active-color-alternative;
+  }
+
+  .color-alternative.inverted &.auto-color:hover {
+    fill: @chart-data-active-color-alternative-inverted;
+  }
+
+  .color-rainbow &.auto-color:hover {
+    fill: @chart-data-active-color-rainbow;
   }
 }
 

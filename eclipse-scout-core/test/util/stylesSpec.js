@@ -19,14 +19,14 @@ describe('scout.styles', () => {
     $('<style>' +
       '.inner-class {' +
       '  background-color: #FF0000;' +
-      '  border-color: #FFFFFF;' +
+      '  border-color: #FFFFFF !important;' +
       '}' +
       '.outer-class .middle-class .inner-class {' +
       '  background-color: #00FF00;' +
       '}' +
       '.outer-class .middle-class.variant-b .inner-class {' +
       '  background-color: #0000FF;' +
-      '  border-color: #000000;' +
+      '  border-color: #000000 !important;' +
       '}' +
       '</style>').appendTo($sandbox);
   });
@@ -43,6 +43,50 @@ describe('scout.styles', () => {
     expect(styles.get(['middle-class variant-b', 'inner-class'], 'backgroundColor').backgroundColor).toBe('rgb(255, 0, 0)');
     expect(styles.get(['outer-class', 'middle-class variant-b', 'inner-class'], 'backgroundColor').backgroundColor).toBe('rgb(0, 0, 255)');
     expect(styles.get(['outer-class', 'middle-class variant-b', 'inner-class'], 'borderColor').borderColor).toBe('rgb(0, 0, 0)');
+
+    expect(styles.get('inner-class', 'display').display).toBe('none');
+    expect(styles.get('inner-class', 'display', {display: 'flex'}).display).toBe('none');
+    expect(styles.get('inner-class', 'backgroundColor', {backgroundColor: '#000000'}).backgroundColor).toBe('rgb(0, 0, 0)');
+    expect(styles.get('inner-class', 'borderColor', {borderColor: '#000000'}).borderColor).toBe('rgb(255, 255, 255)');
+  });
+
+  it('can get first opaque background color', () => {
+    let $elem = $sandbox.appendDiv(),
+      $childElemBlue = $elem.appendDiv(),
+      $childElemTransparentBlue = $elem.appendDiv(),
+      $childElemRed = $elem.appendDiv(),
+      $childElemTransparentRed = $elem.appendDiv(),
+      $grandChildElemBlue = $childElemBlue.appendDiv(),
+      $grandChildElemTransparentBlue = $childElemTransparentBlue.appendDiv(),
+      $grandChildElemRed = $childElemRed.appendDiv(),
+      $grandChildElemTransparentRed = $childElemTransparentRed.appendDiv();
+
+    $childElemBlue.css('background-color', 'rgb(0, 0, 255)');
+    $childElemTransparentBlue.css('background-color', 'rgba(0, 0, 255, 0.5)');
+    $childElemRed.css('background-color', 'rgb(255, 0, 0)');
+    $childElemTransparentRed.css('background-color', 'rgba(255, 0, 0, 0.5)');
+
+    expect(styles.getFirstOpaqueBackgroundColor($grandChildElemBlue)).toBe('rgb(0, 0, 255)');
+    expect(styles.getFirstOpaqueBackgroundColor($grandChildElemTransparentBlue)).toBe(undefined);
+    expect(styles.getFirstOpaqueBackgroundColor($grandChildElemRed)).toBe('rgb(255, 0, 0)');
+    expect(styles.getFirstOpaqueBackgroundColor($grandChildElemTransparentRed)).toBe(undefined);
+
+    $elem.css('background-color', 'rgb(0, 0, 0)');
+
+    expect(styles.getFirstOpaqueBackgroundColor($grandChildElemBlue)).toBe('rgb(0, 0, 255)');
+    expect(styles.getFirstOpaqueBackgroundColor($grandChildElemTransparentBlue)).toBe('rgb(0, 0, 0)');
+    expect(styles.getFirstOpaqueBackgroundColor($grandChildElemRed)).toBe('rgb(255, 0, 0)');
+    expect(styles.getFirstOpaqueBackgroundColor($grandChildElemTransparentRed)).toBe('rgb(0, 0, 0)');
+
+    $grandChildElemBlue.css('background-color', 'rgb(0, 255, 0)');
+    $grandChildElemTransparentBlue.css('background-color', 'rgb(255, 255, 0)');
+    $grandChildElemRed.css('background-color', 'rgb(255, 0, 255)');
+    $grandChildElemTransparentRed.css('background-color', 'rgb(0, 255, 255)');
+
+    expect(styles.getFirstOpaqueBackgroundColor($grandChildElemBlue)).toBe('rgb(0, 255, 0)');
+    expect(styles.getFirstOpaqueBackgroundColor($grandChildElemTransparentBlue)).toBe('rgb(255, 255, 0)');
+    expect(styles.getFirstOpaqueBackgroundColor($grandChildElemRed)).toBe('rgb(255, 0, 255)');
+    expect(styles.getFirstOpaqueBackgroundColor($grandChildElemTransparentRed)).toBe('rgb(0, 255, 255)');
   });
 
   it('can merge colors', () => {

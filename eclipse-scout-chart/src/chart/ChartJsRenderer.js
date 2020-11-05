@@ -191,6 +191,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (!this.$canvas) {
       this.$canvas = this.chart.$container.appendElement('<canvas>');
     }
+    this.firstOpaqueBackgroundColor = styles.getFirstOpaqueBackgroundColor(this.$canvas);
     if (!chartJsGlobalsInitialized) {
       ChartJs.defaults.global.defaultFontFamily = this.$canvas.css('font-family');
       chartJsGlobalsInitialized = true;
@@ -995,7 +996,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     } else {
       colors = this._computeDatasetColorsChartValueGroups(config, multipleColorsPerDataset);
       if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
-        let borderColor = styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'stroke-color0'], 'stroke').stroke;
+        let borderColor = this._computeBorderColor(type, 0);
         colors.borderColors = arrays.init(data.datasets.length, borderColor);
         colors.hoverBorderColors = colors.borderColors;
       }
@@ -1049,7 +1050,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _computeBorderColor(type, index) {
-    return styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'stroke-color' + (index % this.numSupportedColors)], 'stroke').stroke;
+    let additionalProperties;
+    if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
+      additionalProperties = {stroke: this.firstOpaqueBackgroundColor};
+    }
+    return styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'stroke-color' + (index % this.numSupportedColors)], 'stroke', additionalProperties).stroke;
   }
 
   _computeHoverBackgroundColor(type, index, checkable) {
@@ -1057,7 +1062,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _computeHoverBorderColor(type, index) {
-    return styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'stroke-color' + (index % this.numSupportedColors) + ' hover'], 'stroke').stroke;
+    let additionalProperties;
+    if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
+      additionalProperties = {stroke: this.firstOpaqueBackgroundColor};
+    }
+    return styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'stroke-color' + (index % this.numSupportedColors) + ' hover'], 'stroke', additionalProperties).stroke;
   }
 
   _computeCheckedBackgroundColor(type, index, checkable) {
@@ -1284,7 +1293,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _computeLabelBackdropColor(type) {
-    return styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'label-backdrop'], 'fill').fill;
+    return styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'label-backdrop'], 'fill', {fill: this.firstOpaqueBackgroundColor}).fill;
   }
 
   _computeGridColor(type) {
