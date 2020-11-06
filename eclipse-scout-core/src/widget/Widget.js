@@ -36,6 +36,8 @@ import $ from 'jquery';
 
 export default class Widget {
   constructor() {
+    this.id = null;
+    this.objectType = null;
     this.session = null;
 
     /**
@@ -52,6 +54,12 @@ export default class Widget {
     this.parent = null;
     this.children = [];
     this.initialized = false;
+
+    /**
+     * Will be set on the clone after a widget has been cloned.
+     * @type {Widget}
+     */
+    this.cloneOf = null;
 
     /**
      * The 'rendering' flag is set the true while the _inital_ rendering is performed.
@@ -89,6 +97,13 @@ export default class Widget {
     this.$parent = null;
     /** @type {$} */
     this.$container = null;
+
+    /**
+     * Widgets creating a HtmlComponent for the main $container should assign it to this variable.
+     * This enables the execution of layout related operations like invalidateLayoutTree directly on the widget.
+     * @type {HtmlComponent}
+     */
+    this.htmlComp = null;
 
     // If set to true, remove won't remove the element immediately but after the animation has been finished
     // This expects a css animation which may be triggered by the class 'animate-remove'
@@ -1674,30 +1689,15 @@ export default class Widget {
    * Clones the widget and returns the clone. Only the properties defined in this._cloneProperties are copied to the clone.
    * The parameter model has to contain at least the property 'parent'.
    *
-   * OPTION                          DEFAULT VALUE   DESCRIPTION
-   * --------------------------------------------------------------------------------------------------------
-   * delegatePropertiesToClone       []              An array of all properties to be delegated from the original
-   *                                                 to the to the clone when changed on the original widget.
-   *
-   * delegatePropertiesToOriginal    []              An array of all properties to be delegated from the clone
-   *                                                 to the original when changed on the clone widget.
-   *
-   * excludePropertiesToOriginal     []              An array of all properties to be excluded from delegating
-   *                                                 from the clone to the original in any cases.
-   *
-   * delegateEventsToOriginal        []              An array of all events to be delegated from the clone to
-   *                                                 the original when fired on the clone widget.
-   *
-   * delegateAllPropertiesToClone    false           True to delegate all property changes from the original to
-   *                                                 the clone.
-   *
-   * delegateAllPropertiesToOriginal false           True to delegate all property changes from the clone to
-   *                                                 the original.
-   *
    * @param model The model used to create the clone is a combination of the clone properties and this model.
    * Therefore this model may be used to override the cloned properties or to add additional properties.
-   * @param options Options used for the clone widgets. See above.
-   *
+   * @param {object} [options] Options passed to the mirror function.
+   * @param {[string]} [options.delegatePropertiesToClone] An array of all properties to be delegated from the original to the clone when changed on the original widget. Default is [].
+   * @param {[string]} [options.delegatePropertiesToOriginal] An array of all properties to be delegated from the clone to the original when changed on the clone widget. Default is [].
+   * @param {[string]} [options.excludePropertiesToOriginal] An array of all properties to be excluded from delegating from the clone to the original in any cases. Default is [].
+   * @param {[string]} [options.delegateEventsToOriginal] An array of all events to be delegated from the clone to the original when fired on the clone widget. Default is [].
+   * @param {boolean} [options.delegateAllPropertiesToClone] True to delegate all property changes from the original to the clone. Default is false.
+   * @param {boolean} [options.delegateAllPropertiesToOriginal] True to delegate all property changes from the clone to the original. Default is false.
    */
   clone(model, options) {
     let clone, cloneModel;
@@ -1758,6 +1758,7 @@ export default class Widget {
   /**
    * Delegates every property change event from the original widget to this cloned widget by calling the appropriate setter.
    * If no target is set it works only if this widget is a clone.
+   * @param {object} [options]
    */
   mirror(options, target) {
     target = target || this.cloneOf;
