@@ -17,6 +17,17 @@ h2 {
   margin-top: 0;
 }
 
+.scope-links {
+  position: absolute;
+  top: 2em;
+  right: 2em;
+  color: #cccccc;
+}
+
+.scope-links > .scope > a {
+  color: currentColor;
+}
+
 .toc {
   padding: 2em;
   background-color: #f0f0f0;
@@ -119,7 +130,12 @@ h2 {
   white-space: nowrap;
 }
 
-.path>.method {
+.path > .scope {
+  color: darkseagreen;
+  margin-right: 1em;
+}
+
+.path > .method {
   color: tomato;
 }
 
@@ -156,6 +172,18 @@ h2 {
   font-style: italic;
 }
 
+/* Small screen */
+
+@media (max-width: 999px) {
+
+  .scope-links {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin-bottom: 2em;
+  }
+}
+
 /* Print rules */
 
 @page {
@@ -177,6 +205,10 @@ h2 {
   }
 
   .top-link {
+    display: none;
+  }
+
+  .scope-links {
     display: none;
   }
 }
