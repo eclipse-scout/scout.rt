@@ -38,9 +38,9 @@ public class GeneratorApplication {
               .withName(JavaGenerator.class.getName())
               .withDatabase(new Database()
                   .withForcedTypes(
-                      new ForcedType().withName(UUID.class.getName()).withTypes("varchar(36)"),
-                      new ForcedType().withUserType(Date.class.getName()).withConverter(DateConverter.class.getName()).withTypes("timestamp"),
-                      new ForcedType().withName(BigDecimal.class.getName()).withTypes("bigint"))
+                      new ForcedType().withName(UUID.class.getName()).withIncludeTypes("varchar(36)"),
+                      new ForcedType().withUserType(Date.class.getName()).withConverter(DateConverter.class.getName()).withIncludeTypes("timestamp"),
+                      new ForcedType().withName(BigDecimal.class.getName()).withIncludeTypes("bigint"))
                   .withName(DerbyDatabase.class.getName())
                   .withIncludes(".*")
                   .withInputSchema(CONFIG.getPropertyValue(SchemaProperty.class))
