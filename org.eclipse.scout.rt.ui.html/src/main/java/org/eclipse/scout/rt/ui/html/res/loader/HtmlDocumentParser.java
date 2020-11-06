@@ -46,14 +46,14 @@ import org.slf4j.LoggerFactory;
 public class HtmlDocumentParser {
   private static final Logger LOG = LoggerFactory.getLogger(HtmlDocumentParser.class);
 
-  protected static final Pattern PATTERN_INCLUDE_TAG = Pattern.compile("<scout:include\\s+template=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL);
-  protected static final Pattern PATTERN_MESSAGE_TAG = Pattern.compile("<scout:message(.*?)\\s*/?>", Pattern.DOTALL);
-  protected static final Pattern PATTERN_STYLESHEET_TAG = Pattern.compile("<scout:stylesheet\\s+src=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL);
-  protected static final Pattern PATTERN_SCRIPT_TAG = Pattern.compile("<scout:script\\s+src=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL);
-  protected static final Pattern PATTERN_SCRIPTS_TAG = Pattern.compile("<scout:scripts\\s+entryPoint=\"([^\"~]*)\"\\s*/?>", Pattern.DOTALL);
-  protected static final Pattern PATTERN_BASE_TAG = Pattern.compile("<scout:base\\s*/?>", Pattern.DOTALL);
-  protected static final Pattern PATTERN_VERSION_TAG = Pattern.compile("<scout:version\\s*/?>", Pattern.DOTALL);
-  protected static final Pattern PATTERN_UNKNOWN_TAG = Pattern.compile("<scout:(\"[^\"]*\"|[^>]*?)*>", Pattern.DOTALL);
+  protected static final Pattern PATTERN_INCLUDE_TAG = Pattern.compile("<scout:include\\s+template=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  protected static final Pattern PATTERN_MESSAGE_TAG = Pattern.compile("<scout:message(.*?)\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  protected static final Pattern PATTERN_STYLESHEET_TAG = Pattern.compile("<scout:stylesheet\\s+src=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  protected static final Pattern PATTERN_SCRIPT_TAG = Pattern.compile("<scout:script\\s+src=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  protected static final Pattern PATTERN_SCRIPTS_TAG = Pattern.compile("<scout:scripts\\s+entrypoint=\"([^\"~]*)\"\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  protected static final Pattern PATTERN_BASE_TAG = Pattern.compile("<scout:base\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  protected static final Pattern PATTERN_VERSION_TAG = Pattern.compile("<scout:version\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  protected static final Pattern PATTERN_UNKNOWN_TAG = Pattern.compile("<scout:(\"[^\"]*\"|[^>]*?)*>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   protected static final Pattern PATTERN_KEY_VALUE = Pattern.compile("([^\\s]+)=\"([^\"]*)\"");
   protected static final String SCRIPT_TAG_PREFIX = "<script src=\"";
   public static final String SCRIPT_TAG_SUFFIX = "\"></script>";
