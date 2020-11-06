@@ -36,10 +36,10 @@ public class DoEntityBeanMappings<DO_ENTITY extends DoEntity, ENTITY_BEAN> {
   }
 
   public void fromEntityBeanToDo(ENTITY_BEAN entityBean, DO_ENTITY doNode) {
-    getMappings().stream().forEach(n -> n.fromEntityBeanToDo(entityBean, doNode));
+    getMappings().forEach(n -> n.fromEntityBeanToDo(entityBean, doNode));
   }
 
   public void fromDoToRecord(DO_ENTITY doNode, ENTITY_BEAN entityBean) {
-    getMappings().stream().forEach(n -> n.fromDoToEntityBean(doNode, entityBean));
+    getMappings().forEach(n -> n.fromDoToEntityBean(doNode, entityBean));
   }
 }

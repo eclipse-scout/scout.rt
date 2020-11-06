@@ -1,6 +1,8 @@
 import {Repository} from '../index';
 import {scout, App} from '@eclipse-scout/core';
 
+let persons;
+
 export default class PersonRepository extends Repository {
 
   constructor() {
@@ -55,8 +57,14 @@ export default class PersonRepository extends Repository {
   create(person) {
     return this.postJson(this.targetUrl, JSON.stringify(person));
   }
-}
 
-App.addListener('bootstrap', function() {
-  ${simpleArtifactName}.persons = Repository.register('${simpleArtifactName}.PersonRepository');
-});
+  /**
+   * @returns {PersonRepository}
+   */
+  static get() {
+    if (!persons) {
+      persons = Repository.register('${simpleArtifactName}.PersonRepository');
+    }
+    return persons;
+  }
+}

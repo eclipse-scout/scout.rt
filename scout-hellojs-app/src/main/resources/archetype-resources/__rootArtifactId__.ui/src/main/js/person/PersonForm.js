@@ -1,6 +1,6 @@
 import PersonFormModel from './PersonFormModel';
 import {Form, models} from '@eclipse-scout/core';
-import {Person} from '../index';
+import {Person, PersonRepository} from '../index';
 import * as $ from 'jquery';
 
 export default class PersonForm extends Form {
@@ -52,7 +52,7 @@ export default class PersonForm extends Form {
   }
 
   _save(data) {
-    return (data.personId ? ${simpleArtifactName}.persons.store(data) : ${simpleArtifactName}.persons.create(data))
+    return (data.personId ? PersonRepository.get().store(data) : PersonRepository.get().create(data))
       .then(this._onSaveDone.bind(this));
   }
 
@@ -68,7 +68,7 @@ export default class PersonForm extends Form {
   _load() {
     if (this.data.personId) {
       // refresh data from server
-      return ${simpleArtifactName}.persons.load(this.data.personId);
+      return PersonRepository.get().load(this.data.personId);
     }
     return ${symbol_dollar}.resolvedPromise(this.data);
   }

@@ -4,7 +4,6 @@
 package ${package}.data.person;
 
 import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toCollection;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,14 +20,15 @@ public class PersonResponse extends DoEntity {
     return doList("items");
   }
 
-  public PersonResponse withItem(PersonDo persons) {
-    items().get().add(persons);
+  public PersonResponse withItem(PersonDo person) {
+    items().get().add(person);
     return this;
   }
 
   public PersonResponse withItems(Stream<PersonDo> persons) {
     items().clear();
-    persons.collect(toCollection(items()::get));
+    List<PersonDo> personDos = items().get();
+    persons.forEachOrdered(personDos::add);
     return this;
   }
 
@@ -39,7 +39,6 @@ public class PersonResponse extends DoEntity {
   }
 
   public PersonResponse withItems(PersonDo... persons) {
-    items().clear();
     return withItems(asList(persons));
   }
 

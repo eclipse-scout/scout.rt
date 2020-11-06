@@ -25,7 +25,7 @@ public class RestAuthFilter implements Filter {
   private AnonymousAccessController m_anonymousAccessController;
 
   @Override
-  public void init(FilterConfig filterConfig) throws ServletException {
+  public void init(FilterConfig filterConfig) {
     m_anonymousAccessController = BEANS.get(AnonymousAccessController.class).init();
   }
 

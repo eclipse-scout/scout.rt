@@ -25,6 +25,13 @@
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>${rootArtifactId}.persistence</artifactId>
+      <exclusions>
+        <exclusion>
+          <!-- Required because org.eclipse.scout.rt.rest contains jakarta.xml.bind:jakarta.xml.bind-api and jooq contains javax.xml.bind:jaxb-api which contains the same classes -->
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>

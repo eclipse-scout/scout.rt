@@ -1,5 +1,5 @@
 import {PageWithTable, MessageBoxes, MessageBox, models, scout} from '@eclipse-scout/core';
-import {Person} from '../index';
+import {Person, PersonRepository} from '../index';
 import PersonTablePageModel from './PersonTablePageModel';
 import * as $ from 'jquery';
 
@@ -53,7 +53,7 @@ export default class PersonTablePage extends PageWithTable {
     var restriction = scout.create('${simpleArtifactName}.PersonRestriction', searchFilter, {
       ensureUniqueId: false
     });
-    return ${simpleArtifactName}.persons.list(restriction);
+    return PersonRepository.get().list(restriction);
   }
 
   _transformTableDataToTableRows(tableData) {
@@ -98,7 +98,8 @@ export default class PersonTablePage extends PageWithTable {
     MessageBoxes.openYesNo(this.session.desktop, this.session.text('DeleteConfirmationTextNoItemList'))
       .then(function(button) {
         if (button === MessageBox.Buttons.YES) {
-          ${simpleArtifactName}.persons.remove(this._getSelectedPerson().personId)
+          PersonRepository.get()
+            .remove(this._getSelectedPerson().personId)
             .then(this._onPersonDeleted.bind(this));
         }
       }.bind(this));
