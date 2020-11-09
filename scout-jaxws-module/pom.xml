@@ -29,9 +29,6 @@
   <url>https://eclipse.org/scout</url>
 
   <properties>
-    <scout.base.version>11.0.0</scout.base.version>
-    <base.version>${scout.base.version}</base.version>
-
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
