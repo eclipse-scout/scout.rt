@@ -188,7 +188,7 @@ export default class Chart extends Widget {
       return checkedItems;
     }
     let datasetLengths = [];
-    if (this.data) {
+    if (this.data && this.data.chartValueGroups) {
       this.data.chartValueGroups.forEach(chartValueGroup => datasetLengths.push(chartValueGroup.values.length));
     } else if (this.config && this.config.data) {
       this.config.data.datasets.forEach(dataset => datasetLengths.push(dataset.data.length));

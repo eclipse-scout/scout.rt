@@ -938,8 +938,10 @@ export default class ChartTableControl extends TableControl {
         });
       }
     } else {
-      if (config.data && xAxis.column instanceof NumberColumn) {
-        config.data.reformatLabels = true;
+      if (xAxis.column instanceof NumberColumn) {
+        config.options = $.extend(true, {}, config.options, {
+          reformatLabels: true
+        });
       }
     }
   }

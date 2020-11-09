@@ -461,7 +461,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
     if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR)) {
       let label = data.labels[tooltipItem.index];
-      title = config.data.reformatLabels ? this._formatLabel(label) : label;
+      title = config.options.reformatLabels ? this._formatLabel(label) : label;
     } else if (config.type === Chart.Type.BUBBLE) {
       let xAxis = config.options.scales.xAxes[0],
         yAxis = config.options.scales.yAxes[0],
@@ -652,7 +652,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           }
         }, xAxes[i]);
       }
-      if (scout.isOneOf(type, Chart.Type.BAR_HORIZONTAL, Chart.Type.BUBBLE) || config.data.reformatLabels) {
+      if (scout.isOneOf(type, Chart.Type.BAR_HORIZONTAL, Chart.Type.BUBBLE) || config.options.reformatLabels) {
         xAxes[i] = $.extend(true, {}, {
           ticks: {
             callback: this._xLabelFormatter
@@ -691,7 +691,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           }
         }, yAxes[i]);
       }
-      if (type !== Chart.Type.BAR_HORIZONTAL || config.data.reformatLabels) {
+      if (type !== Chart.Type.BAR_HORIZONTAL || config.options.reformatLabels) {
         yAxes[i] = $.extend(true, {}, {
           ticks: {
             callback: this._yLabelFormatter
