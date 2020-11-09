@@ -12,7 +12,7 @@ scout.FileChooser = function() {
   scout.FileChooser.parent.call(this);
   this.displayParent = null;
   this.files = [];
-  this._glassPaneRenderer;
+  this._glassPaneRenderer = null;
   this.maximumUploadSize = scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
 };
 scout.inherits(scout.FileChooser, scout.Widget);
@@ -56,8 +56,6 @@ scout.FileChooser.prototype._initKeyStrokeContext = function() {
 };
 
 scout.FileChooser.prototype._render = function() {
-  // Render modality glasspanes (must precede adding the file chooser to the DOM)
-  this._glassPaneRenderer.renderGlassPanes();
   this.$container = this.$parent.appendDiv('file-chooser')
     .on('mousedown', this._onMouseDown.bind(this));
   var $handle = this.$container.appendDiv('drag-handle');
@@ -125,6 +123,10 @@ scout.FileChooser.prototype._render = function() {
   this.$container.css('max-width', w);
   this.$container.removeClass('calc-helper');
   boxButtons.updateButtonWidths(this.$container.width());
+
+  // Render modality glasspanes
+  this._glassPaneRenderer.renderGlassPanes();
+
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
 };
