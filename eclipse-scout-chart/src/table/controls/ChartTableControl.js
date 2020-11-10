@@ -692,9 +692,7 @@ export default class ChartTableControl extends TableControl {
       type: this.chartType,
       options: {
         handleResize: true,
-        colorScheme: {
-          scheme: 'chart-table-control'
-        },
+        colorScheme: 'chart-table-control',
         maxSegments: 5,
         legend: {
           display: false

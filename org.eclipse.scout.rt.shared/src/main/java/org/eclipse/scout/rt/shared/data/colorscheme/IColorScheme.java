@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.shared.data.colorscheme;
 
+import java.util.Optional;
+
 /**
  * @since 8.0
  */
@@ -19,4 +21,8 @@ public interface IColorScheme {
    * @return the static identifier (known to the UI) for this scheme.
    */
   String getIdentifier();
+
+  public static IColorScheme parse(String identifier) {
+    return Optional.ofNullable((IColorScheme) ColorScheme.parse(identifier)).orElse(() -> identifier);
+  }
 }

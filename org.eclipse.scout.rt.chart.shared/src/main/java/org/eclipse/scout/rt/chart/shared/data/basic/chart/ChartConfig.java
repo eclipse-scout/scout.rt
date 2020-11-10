@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.eclipse.scout.rt.shared.data.colorscheme.ColorScheme;
+import org.eclipse.scout.rt.shared.data.colorscheme.IColorScheme;
 
 public class ChartConfig implements IChartConfig {
 
@@ -401,7 +401,7 @@ public class ChartConfig implements IChartConfig {
   }
 
   @Override
-  public IChartConfig withColorScheme(ColorScheme colorScheme) {
+  public IChartConfig withColorScheme(IColorScheme colorScheme) {
     return withProperty(COLOR_SCHEME, colorScheme != null ? colorScheme.getIdentifier() : null);
   }
 
@@ -411,8 +411,8 @@ public class ChartConfig implements IChartConfig {
   }
 
   @Override
-  public ColorScheme getColorScheme() {
-    return ColorScheme.parse((String) getProperty(COLOR_SCHEME));
+  public IColorScheme getColorScheme() {
+    return IColorScheme.parse((String) getProperty(COLOR_SCHEME));
   }
 
   @Override

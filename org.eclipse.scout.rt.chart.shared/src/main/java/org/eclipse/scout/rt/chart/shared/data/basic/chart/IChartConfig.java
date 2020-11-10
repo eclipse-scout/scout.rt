@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.shared.data.colorscheme.ColorScheme;
+import org.eclipse.scout.rt.shared.data.colorscheme.IColorScheme;
 
 /**
  * Support for the config of a chart. One can add, remove or modify properties using this wrapper class. In the end an
@@ -110,11 +110,11 @@ public interface IChartConfig extends Serializable {
 
   boolean isAutoColor();
 
-  IChartConfig withColorScheme(ColorScheme colorScheme);
+  IChartConfig withColorScheme(IColorScheme colorScheme);
 
   IChartConfig removeColorScheme();
 
-  ColorScheme getColorScheme();
+  IColorScheme getColorScheme();
 
   IChartConfig withTransparent(boolean transparent);
 
