@@ -15,14 +15,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.eclipse.scout.rt</groupId>
-  <artifactId>org.eclipse.scout.rt-root</artifactId>
+  <artifactId>org.eclipse.scout.rt.root</artifactId>
   <version>11.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Eclipse Scout RT ROOT Module</name>
-
-  <prerequisites>
-    <maven>3.5.3</maven>
-  </prerequisites>
 
   <modules>
     <module>org.eclipse.scout.rt</module>
