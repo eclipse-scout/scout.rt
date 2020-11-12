@@ -32,7 +32,7 @@ public final class TEXTS {
    * @see NlsUtility
    * @see Locale
    */
-  public static String get(String key) {
+  public static String get(@NlsKey String key) {
     return BEANS.get(ScoutTexts.class).getText(key);
   }
 
@@ -59,7 +59,7 @@ public final class TEXTS {
    * @see NlsUtility
    * @see Locale
    */
-  public static String get(String key, String... messageArguments) {
+  public static String get(@NlsKey String key, String... messageArguments) {
     return BEANS.get(ScoutTexts.class).getText(key, messageArguments);
   }
 
@@ -85,7 +85,7 @@ public final class TEXTS {
    * @see ScoutTexts
    * @see Locale
    */
-  public static String get(Locale locale, String key, String... messageArguments) {
+  public static String get(Locale locale, @NlsKey String key, String... messageArguments) {
     return BEANS.get(ScoutTexts.class).getText(locale, key, messageArguments);
   }
 
@@ -99,11 +99,11 @@ public final class TEXTS {
    *          The fallback is returned when the text for the given key is undefinded.
    * @return
    */
-  public static String getWithFallback(String key, String fallback, String... messageArguments) {
+  public static String getWithFallback(@NlsKey String key, String fallback, String... messageArguments) {
     return getWithFallback(null, key, fallback, messageArguments);
   }
 
-  public static String getWithFallback(Locale locale, String key, String fallback, String... messageArguments) {
+  public static String getWithFallback(Locale locale, @NlsKey String key, String fallback, String... messageArguments) {
     return BEANS.get(ScoutTexts.class).getTextWithFallback(locale, key, fallback, messageArguments);
   }
 }
