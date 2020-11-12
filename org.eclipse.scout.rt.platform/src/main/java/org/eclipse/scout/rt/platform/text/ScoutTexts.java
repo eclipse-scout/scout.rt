@@ -48,11 +48,11 @@ public class ScoutTexts {
     m_textProviders = BEANS.all(ITextProviderService.class);
   }
 
-  public final String getText(String key, String... messageArguments) {
+  public final String getText(@NlsKey String key, String... messageArguments) {
     return getText(null, key, messageArguments);
   }
 
-  public final String getText(Locale locale, String key, String... messageArguments) {
+  public final String getText(Locale locale, @NlsKey String key, String... messageArguments) {
     return getTextInternal(locale, key, getDefaultFallback(key), messageArguments);
   }
 
@@ -69,7 +69,7 @@ public class ScoutTexts {
     return m_textProviders;
   }
 
-  protected String getTextInternal(Locale locale, String key, String fallback, String... messageArguments) {
+  protected String getTextInternal(Locale locale, @NlsKey String key, String fallback, String... messageArguments) {
     for (ITextProviderService provider : getTextProviders()) {
       String result = provider.getText(locale, key, messageArguments);
       if (result != null) {
@@ -83,7 +83,7 @@ public class ScoutTexts {
     return "{undefined text " + key + "}";
   }
 
-  public String getTextWithFallback(Locale locale, String key, String fallback, String... messageArguments) {
+  public String getTextWithFallback(Locale locale, @NlsKey String key, String fallback, String... messageArguments) {
     return getTextInternal(locale, key, fallback, messageArguments);
   }
 }

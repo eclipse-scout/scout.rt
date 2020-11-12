@@ -40,7 +40,7 @@ public interface ITextProviderService extends IService {
    *          </ul>
    * @return
    */
-  String getText(Locale locale, String key, String... messageArguments);
+  String getText(Locale locale, @NlsKey String key, String... messageArguments);
 
   /**
    * returns all key/text pairs defined for the given locale.
