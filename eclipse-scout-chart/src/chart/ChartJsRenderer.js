@@ -1344,7 +1344,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _adjustPluginsDatalabelColors(config) {
-    if (!config || !config.type || !config.options || !config.options.plugins || !config.options.plugins.datalabels || !(config.options.autoColor || this.chart.data)) {
+    if (!config || !config.type || !config.options || !config.options.plugins || !config.options.plugins.datalabels) {
       return;
     }
 
