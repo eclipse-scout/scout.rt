@@ -22,7 +22,7 @@ public interface IColorScheme {
    */
   String getIdentifier();
 
-  public static IColorScheme parse(String identifier) {
+  static IColorScheme parse(String identifier) {
     return Optional.ofNullable((IColorScheme) ColorScheme.parse(identifier)).orElse(() -> identifier);
   }
 }
