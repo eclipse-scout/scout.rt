@@ -105,7 +105,7 @@ public class TileGridLayoutConfig extends LogicalGridLayoutConfig {
   }
 
   /**
-   * @returns the preferred width based on grid column count, column width and horizontal gap.
+   * @return the preferred width based on grid column count, column width and horizontal gap.
    */
   public int calculatePreferredWidth(int gridColumnCount) {
     return gridColumnCount * getColumnWidth() + (gridColumnCount - 1) * getHGap();

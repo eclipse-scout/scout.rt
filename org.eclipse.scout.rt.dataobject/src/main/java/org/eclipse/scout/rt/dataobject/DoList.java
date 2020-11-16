@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.dataobject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -35,7 +34,7 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
     this(null, null);
   }
 
-  protected DoList(String attributeName, Consumer<DoNode<List<V>>> lazyCreate) {
+  DoList(String attributeName, Consumer<DoNode<List<V>>> lazyCreate) {
     super(attributeName, lazyCreate, new ArrayList<>());
   }
 
@@ -93,7 +92,8 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
    * Appends all of the elements in the specified array to the end of this list, in the order that they are contained in
    * the array. Does not append any values if {@code items} is null.
    */
-  public void addAll(@SuppressWarnings("unchecked") V... items) {
+  @SafeVarargs
+  public final void addAll(@SuppressWarnings("unchecked") V... items) {
     if (items != null) {
       addAll(Arrays.asList(items));
     }
@@ -200,14 +200,14 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
   }
 
   /**
-   * @returns a sequential {@code Stream} with this list as its source.
+   * @return a sequential {@code Stream} with this list as its source.
    */
   public Stream<V> stream() {
     return get().stream();
   }
 
   /**
-   * @returns a possibly parallel {@code Stream} with this list as its source.
+   * @return a possibly parallel {@code Stream} with this list as its source.
    */
   public Stream<V> parallelStream() {
     return get().parallelStream();
@@ -229,8 +229,9 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
    * Sorts the internal list using {@code comparator} and returns the list.
    */
   public List<V> sort(Comparator<V> comparator) {
-    Collections.sort(get(), comparator);
-    return get();
+    List<V> list = get();
+    list.sort(comparator);
+    return list;
   }
 
   /**

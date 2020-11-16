@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.ToDoubleFunction;
 
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
@@ -250,7 +249,9 @@ public class BeanHierarchy<T> {
     return null; // no exact match found
   }
 
-  private static final Comparator<IBean<?>> ORDER_COMPARATOR = Comparator.comparingDouble((ToDoubleFunction<IBean<?>>) BeanHierarchy::orderOf).thenComparing(o -> o.getBeanClazz().getName());
+  private static final Comparator<IBean<?>> ORDER_COMPARATOR = Comparator
+      .<IBean<?>> comparingDouble(BeanHierarchy::orderOf)
+      .thenComparing(o -> o.getBeanClazz().getName());
 
   public static double orderOf(IBean<?> b) {
     Order orderAnnotation = b.getBeanAnnotation(Order.class);

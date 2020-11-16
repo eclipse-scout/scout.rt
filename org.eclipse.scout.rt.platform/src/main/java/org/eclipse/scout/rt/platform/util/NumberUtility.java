@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 public final class NumberUtility {
   private static final Logger LOG = LoggerFactory.getLogger(NumberUtility.class);
   @SuppressWarnings("squid:S2245") // pseudo-random number generator for cases where cryptographic strength is not required
-  private static final Random UNSECURE_RANDOM = new Random();
+  private static final Random INSECURE_RANDOM = new Random();
 
   private NumberUtility() {
   }
@@ -54,14 +54,14 @@ public final class NumberUtility {
   /**
    * Divides dividend by divisor and rounds up to the next integer value.
    * <p>
-   * More formally: Performs the same calculation as {@code (int) Math.ceil((double) divident / divisor)} but without
+   * More formally: Performs the same calculation as {@code (int) Math.ceil((double) dividend / divisor)} but without
    * using floating point arithmetics.
    *
    * @param dividend
    *          The dividend
    * @param divisor
    *          The divisor. Must not be zero!
-   * @return {@code (int)ceil(divident / divisor)}
+   * @return {@code (int)ceil(dividend / divisor)}
    * @throws ArithmeticException
    *           if divisor is zero.
    */
@@ -101,8 +101,6 @@ public final class NumberUtility {
    * Converts a Number into a BigDecimal using its String representation. If the <code>number</code>'s String
    * representation cannot be converted to a BigDecimal this method returns <code>null</code> (e.g. for Double and
    * Floats special values: NaN, POSITIVE_INFINITY and NEGATIVE_INFINITY).
-   *
-   * @param number
    */
   public static BigDecimal numberToBigDecimal(Number number) {
     if (number instanceof BigDecimal) {
@@ -175,8 +173,6 @@ public final class NumberUtility {
   /**
    * Checks whether the bit at a given position is set.
    *
-   * @param value
-   * @param index
    * @return <code>true</code> if the bit at position index is set, <code>false</code> otherwise.
    */
   public static boolean hasBit(int value, int index) {
@@ -186,8 +182,6 @@ public final class NumberUtility {
   /**
    * Checks whether the bit at a given position is set.
    *
-   * @param value
-   * @param index
    * @return <code>true</code> if the bit at position index is set, <code>false</code> otherwise.
    */
   public static boolean getBit(int value, int index) {
@@ -203,8 +197,8 @@ public final class NumberUtility {
     if (CollectionUtility.hasElements(numbers)) {
       for (Number number : numbers) {
         if (number != null) {
-          BigDecimal augend = numberToBigDecimal(number);
-          sum = sum.add(augend == null ? BigDecimal.ZERO : augend);
+          BigDecimal decimal = numberToBigDecimal(number);
+          sum = sum.add(decimal == null ? BigDecimal.ZERO : decimal);
         }
       }
     }
@@ -227,7 +221,7 @@ public final class NumberUtility {
   /**
    * Computes the minimum value of a vararg of doubles.
    *
-   * @param The
+   * @param a
    *          vararg of doubles.
    * @return The minimum. Returns 0 if the parameter is null or the length of the vararg is 0.
    */
@@ -271,7 +265,7 @@ public final class NumberUtility {
    *         For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
    */
   public static long randomLong() {
-    return UNSECURE_RANDOM.nextLong();
+    return INSECURE_RANDOM.nextLong();
   }
 
   /**
@@ -279,16 +273,15 @@ public final class NumberUtility {
    *         For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
    */
   public static int randomInt() {
-    return UNSECURE_RANDOM.nextInt();
+    return INSECURE_RANDOM.nextInt();
   }
 
   /**
-   * @param size
-   * @return an insecure random integer using <code>{@link Random#nextInt(size)}</code><br>
+   * @return an insecure random integer using <code>{@link Random#nextInt(int)}</code><br>
    *         For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
    */
   public static int randomInt(int size) {
-    return UNSECURE_RANDOM.nextInt(size);
+    return INSECURE_RANDOM.nextInt(size);
   }
 
   /**
@@ -296,7 +289,7 @@ public final class NumberUtility {
    *         For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
    */
   public static double randomDouble() {
-    return UNSECURE_RANDOM.nextDouble();
+    return INSECURE_RANDOM.nextDouble();
   }
 
   /**
@@ -309,8 +302,6 @@ public final class NumberUtility {
   /**
    * Sets a bit of a value at a given position.
    *
-   * @param value
-   * @param index
    * @return The value with the bit at the given index set to 1.
    */
   public static int setBit(int value, int index) {
@@ -320,8 +311,6 @@ public final class NumberUtility {
   /**
    * Clears a bit of a value at a given position.
    *
-   * @param value
-   * @param index
    * @return The value with the bit at the given index set to 0.
    */
   public static int clearBit(int value, int index) {
@@ -522,7 +511,7 @@ public final class NumberUtility {
    *          {@link String}
    * @param thousandsSeparator
    *          {@link String}
-   * @returns <code>true</code> if, and only if the given String is a valid number according to the given separators
+   * @return {@code true} if, and only if the given String is a valid number according to the given separators
    */
   public static boolean isValidDouble(String str, String decimalSeparator, String thousandsSeparator) {
     if (str == null || str.isEmpty()) {

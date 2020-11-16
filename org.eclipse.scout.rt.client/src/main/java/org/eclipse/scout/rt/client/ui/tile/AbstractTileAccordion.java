@@ -191,7 +191,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
   }
 
   /**
-   * @returns the active group manager
+   * @return the active group manager
    */
   @Override
   public ITileAccordionGroupManager<T> getGroupManager() {
@@ -246,9 +246,8 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     // when a group manager is active and one or more tile could not be put into a matching group
     // thus this group acts as a "catch-all" for tiles without a group.
     GroupTemplate defaultGroup = createDefaultGroupTemplate();
-    List<GroupTemplate> requiredGroups = new ArrayList<>();
     List<GroupTemplate> groupTemplates = m_groupManager.createGroups();
-    requiredGroups.addAll(groupTemplates);
+    List<GroupTemplate> requiredGroups = new ArrayList<>(groupTemplates);
     requiredGroups.add(defaultGroup);
     int currentSize = currentGroups.size();
     int requiredSize = requiredGroups.size();

@@ -49,7 +49,7 @@ public interface ITileAccordion<T extends ITile> extends IAccordion, IExtensible
   void setGroupManager(ITileAccordionGroupManager<T> groupManager);
 
   /**
-   * @returns the active group manager
+   * @return the active group manager
    */
   ITileAccordionGroupManager<T> getGroupManager();
 
