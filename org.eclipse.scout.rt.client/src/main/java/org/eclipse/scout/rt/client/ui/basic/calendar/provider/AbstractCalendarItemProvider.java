@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -396,6 +397,9 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
         }
         catch (ThreadInterruptedError | FutureCancelledError e) { // NOSONAR
           // NOOP
+        }
+        catch (VetoException e) { // NOSONAR
+          LOG.info("Failed to reload calendar items: {}", e.getDisplayMessage());
         }
         catch (RuntimeException e) {
           LOG.error("Failed to reload calendar items", e);
