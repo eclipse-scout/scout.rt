@@ -10,8 +10,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:guava:28.2-jre" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.checkerframework:checker-qual:2.10.0" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.mom.jms" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.mom.api" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.dataobject" />
