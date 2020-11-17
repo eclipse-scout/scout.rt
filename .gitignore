@@ -17,17 +17,23 @@
 *_gitignore.java
 
 # Eclipse #
-/.project
+.project
+.classpath
 bin
 classes
 
 # IntelliJ IDEA #
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/**/usage.statistics.xml
-.idea/**/dictionaries
-.idea/**/shelf
-.idea/sonarlint
+/.idea/**/workspace.xml
+/.idea/**/tasks.xml
+/.idea/**/usage.statistics.xml
+/.idea/**/dataSources.local.xml
+/.idea/**/jarRepositories.xml
+/.idea/**/shelf
+/.idea/sonarlint
+/.idea/**/dataSources/
+/.idea/httpRequests/
+/.idea/libraries/
+/.idea/artifacts/
 
 # Maven #
 target/
