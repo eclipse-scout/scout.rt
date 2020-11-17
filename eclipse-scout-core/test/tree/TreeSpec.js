@@ -600,9 +600,8 @@ describe('Tree', function() {
         expect(node0.childNodes[2].$node).toBeDefined();
       });
 
-      it('updates child node indices', function() {
-        var node2Child0 = node2.childNodes[0];
-        var node2Child1 = node2.childNodes[1];
+      it('updates child node indices', () => {
+        let node2Child0 = node2.childNodes[0];
         expect(tree.nodes.length).toBe(3);
         expect(node2.childNodes.length).toBe(3);
         expect(node2.childNodes[0].childNodeIndex).toBe(0);
@@ -620,7 +619,7 @@ describe('Tree', function() {
         expect(tree.nodes[1].childNodeIndex).toBe(1);
       });
 
-      it('considers view range (distinguishes between rendered and non rendered rows, adjusts viewRangeRendered)', function() {
+      it('considers view range (distinguishes between rendered and non rendered nodes, adjusts viewRangeRendered)', () => {
         // initial view range
         model = helper.createModelFixture(6, 0, false);
         tree = helper.createTree(model);
@@ -1097,8 +1096,8 @@ describe('Tree', function() {
       expect(checkedNodes.length).toBe(0);
     });
 
-    it('checkablestyle.checkbox_tree_node checks row with click event', function() {
-      var model = helper.createModelFixture(5, 0);
+    it('checkablestyle.checkbox_tree_node checks node with click event', () => {
+      let model = helper.createModelFixture(5, 0);
       model.checkableStyle = Tree.CheckableStyle.CHECKBOX_TREE_NODE;
       model.checkable = true;
       var tree = helper.createTree(model);
@@ -1108,8 +1107,6 @@ describe('Tree', function() {
 
       var checkedNodes = findCheckedNodes(nodes);
       expect(checkedNodes.length).toBe(0);
-
-      var node = tree.$nodes;
 
       tree.$nodes().eq(2).triggerClick();
       tree.$nodes().eq(1).triggerClick();
@@ -1383,12 +1380,11 @@ describe('Tree', function() {
       expect($parents.length).toBe(0);
     });
 
-    it('sets css class child-of-selected on direct children of the selected element', function() {
-      var model = helper.createModelFixture(3, 1, true);
-      var tree = helper.createTree(model);
-      var nodes = tree.nodes;
-      var node1 = nodes[1];
-      var child1 = node1.childNodes[1];
+    it('sets css class child-of-selected on direct children of the selected element', () => {
+      let model = helper.createModelFixture(3, 1, true);
+      let tree = helper.createTree(model);
+      let nodes = tree.nodes;
+      let node1 = nodes[1];
 
       tree.render();
 
@@ -2181,15 +2177,12 @@ describe('Tree', function() {
       expect(tree.visibleNodesFlat[4].text).toBe('B1');
     });
 
-    it('shows nodes correctly if nodes are made hidden right before', function(done) {
-      var model = helper.createModelFixture(2, 1, true);
-      var tree = helper.createTree(model);
-      var node0 = tree.nodes[0];
-      var node1 = tree.nodes[1];
-      var filter = {
-        accept: function(node) {
-          return node.text === 'node 0';
-        }
+    it('shows nodes correctly if nodes are made hidden right before', done => {
+      let model = helper.createModelFixture(2, 1, true);
+      let tree = helper.createTree(model);
+      let node1 = tree.nodes[1];
+      let filter = {
+        accept: node => node.text === 'node 0'
       };
       tree.render();
 
@@ -2616,12 +2609,12 @@ describe('Tree', function() {
       tree.selectNode(nodes[7]);
       tree.setNodeExpanded(nodes[7], true);
       expect(nodes[7].expanded).toBe(true);
-      // first visible row should be row3 (one above the expanded node)
+      // first visible node should be node3 (one above the expanded node)
       expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[6].$node), $scrollable)).toBe(true);
       expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[7].$node), $scrollable)).toBe(true);
       expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[7].childNodes[0].$node), $scrollable)).toBe(true);
       expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[7].childNodes[1].$node), $scrollable)).toBe(true);
-      // half of row8 should still be visible after the expansion
+      // half of node8 should still be visible after the expansion
       expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[8].$node), $scrollable)).toBe(true);
       expect(scrollbars.isLocationInView(graphics.offsetBounds(nodes[9].$node), $scrollable)).toBe(false);
     });
@@ -2654,6 +2647,21 @@ describe('Tree', function() {
       expect(treeField.htmlComp.valid).toBe(true);
       expect(tree.htmlComp.valid).toBe(true);
       expect(tree.nodes[0].width).toBeGreaterThan(0);
+    });
+  });
+
+  describe('scrollTo', () => {
+    it('does not scroll if node is invisible due to filter', () => {
+      let model = helper.createModelFixture(3, 2);
+      let tree = helper.createTree(model);
+      let node = tree.nodes[1];
+      tree.render();
+      tree.addFilter({
+        accept: n => node !== n
+      });
+      tree.scrollTo(node);
+      // Expect no error and no scrolling
+      expect(tree.$data[0].scrollTop).toBe(0);
     });
   });
 });

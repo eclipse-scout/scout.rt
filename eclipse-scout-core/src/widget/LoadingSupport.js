@@ -10,15 +10,16 @@
  */
 import {objects, scout} from '../index';
 
-/**
- * @param {object} options The following properties are supported:
- *  widget                  Widget that created the loading support
- *  [$container]            jQuery element that should be hidden when the widget is in loading state. If this property is not
- *                          set the $container of the widget is used by default (see _ensureContainer).
- *  [loadingIndicatorDelay] if not set: 250 ms
- */
 export default class LoadingSupport {
 
+  /**
+   * @param {object} options a mandatory options object
+   * @param {Widget} options.widget Widget that created the loading support
+   * @param {$|function} [options.$container] jQuery element that will be used for the loading visualization.
+   *  It may be a function to resolve the container later when the loading state will be visualized.
+   *  If this property is not set the $container of the widget is used by default.
+   * @param {number} [options.loadingIndicatorDelay] if not set: 250 ms
+   */
   constructor(options) {
     scout.assertParameter('widget', options.widget);
 

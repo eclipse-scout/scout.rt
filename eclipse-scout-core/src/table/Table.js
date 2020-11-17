@@ -194,7 +194,7 @@ export default class Table extends Widget {
    */
   static ReloadReason = {
     /**
-     * No specificv reason, just reload data using the current search settings, the current row limits and the current
+     * No specific reason, just reload data using the current search settings, the current row limits and the current
      * filter (Default)
      */
     UNSPECIFIED: 'unspecified',
@@ -353,6 +353,7 @@ export default class Table extends Widget {
    * @override
    */
   _createLoadingSupport() {
+    // noinspection JSCheckFunctionSignatures
     return new LoadingSupport({
       widget: this,
       $container: function() {
@@ -1010,7 +1011,7 @@ export default class Table extends Widget {
       this._renderRowOrderChanges();
     }
 
-    // Do it after row order has been rendered, because renderRowOrderChangeds rerenders the whole viewport which would destroy the animation
+    // Do it after row order has been rendered, because renderRowOrderChanges rerenders the whole viewport which would destroy the animation
     this._group(animateAggregateRows);
 
     // Sort was possible -> return true
@@ -3179,6 +3180,10 @@ export default class Table extends Widget {
       return;
     }
     this.ensureRowRendered(row);
+    if (!row.$row) {
+      // Row may not be visible due to the filter -> don't try to scroll because it would fail
+      return;
+    }
     scrollbars.scrollTo(this.$data, row.$row, options);
   }
 
@@ -4944,11 +4949,20 @@ export default class Table extends Widget {
     }
   }
 
+  /**
+   * Renders the view range that contains the given row.<br>
+   * Does nothing if the row is already rendered or not visible (e.g. due to filtering).
+   * @param {TableRow} row
+   */
   ensureRowRendered(row) {
-    if (!row.$row) {
-      var rowIndex = this.visibleRows.indexOf(row);
-      this._renderViewRangeForRowIndex(rowIndex);
+    if (row.$row) {
+      return;
     }
+    let rowIndex = this.visibleRows.indexOf(row);
+    if (rowIndex < 0) {
+      return;
+    }
+    this._renderViewRangeForRowIndex(rowIndex);
   }
 
   _renderFiller() {
