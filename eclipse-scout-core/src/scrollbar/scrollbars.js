@@ -288,24 +288,24 @@ export function reset($scrollable) {
 /**
  * Scrolls the $scrollable to the given $element (must be a child of $scrollable)
  *
- * OPTION                   DEFAULT VALUE   DESCRIPTION
- * ------------------------------------------------------------------------------------------------------
- * align                    undefined       Specifies where the element should be positioned in the view port. Can either be 'top', 'center' or 'bottom'.
- *                                          If unspecified, the following rules apply:
- *                                          - If the element is above the visible area it will be aligned to top.
- *                                          - If the element is below the visible area it will be aligned to bottom.
- *                                          - If the element is already in the visible area no scrolling is done.
- *
- * animate                  false           If true, the scroll position will be animated so that the element moves smoothly to its new position
- * stop                     true            If true, all running animations are stopped before executing the current scroll request.
- *
  * @param {$} $scrollable
  *          the scrollable object
  * @param {$} $element
  *          the element to scroll to
- * @param [options]
- *          an optional options object, see table above. Short-hand version: If a string is passed instead
+ * @param {object|string} [options]
+ *          an optional options object. Short-hand version: If a string is passed instead
  *          of an object, the value is automatically converted to the option "align".
+ * @param {string} [options.align]
+ *          Specifies where the element should be positioned in the view port. Can either be 'top', 'center' or 'bottom'.
+ *          If unspecified, the following rules apply:
+ *          - If the element is above the visible area it will be aligned to top.
+ *          - If the element is below the visible area it will be aligned to bottom.
+ *          - If the element is already in the visible area no scrolling is done.
+ *          Default is undefined.
+ * @param {boolean} [options.animate]
+ *          If true, the scroll position will be animated so that the element moves smoothly to its new position. Default is false.
+ * @param {boolean} [options.stop]
+ *          If true, all running animations are stopped before executing the current scroll request. Default is true.
  */
 export function scrollTo($scrollable, $element, options) {
   let scrollTo,

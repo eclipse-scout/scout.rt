@@ -1981,6 +1981,10 @@ export default class Tree extends Widget {
     if (!node.attached) {
       this._renderViewRangeForNode(node);
     }
+    if (!node.attached) {
+      // Node may not be visible due to the filter -> don't try to scroll because it would fail
+      return;
+    }
     scrollbars.scrollTo(this.$data, node.$node, options);
   }
 

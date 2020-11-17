@@ -54,14 +54,14 @@ describe('Table', () => {
       let model = helper.createModelFixture(2, 1);
       let table = helper.createTable(model);
       table.render();
-      expect('table', table.$container.attr('class'));
+      expect(table.$container).toHaveClass('table');
 
       // checkable table (row style)
       model.checkable = true;
       model.checkableStyle = Table.CheckableStyle.TABLE_ROW;
       table = helper.createTable(model);
       table.render();
-      expect('table checkable', table.$container.attr('class'));
+      expect(table.$container).toHaveClass('table checkable');
 
       // row must have 'checked' class
       table.checkRow(table.rows[0], true, true);
@@ -3188,6 +3188,23 @@ describe('Table', () => {
       table.selectAll();
       let text = table._selectedRowsToText();
       expect(text).toBe('line 1 line   2 line 3\tsecond column\n\ttest');
+    });
+  });
+
+  describe('scrollTo', () => {
+    it('does not scroll if row is invisible due to filter', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      let row = table.rows[1];
+      table.render();
+      table.addFilter({
+        createKey: () => 1,
+        accept: r => row !== r
+      });
+      table.filter();
+      table.scrollTo(row);
+      // Expect no error and no scrolling
+      expect(table.$data[0].scrollTop).toBe(0);
     });
   });
 });

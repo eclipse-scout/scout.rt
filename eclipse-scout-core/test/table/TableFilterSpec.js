@@ -84,7 +84,7 @@ describe('TableFilter', () => {
         table = helper.createTable(model),
         column0 = table.columns[0];
 
-      let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+      createAndRegisterColumnFilter(table, column0, ['1_0']);
       table.filter();
       table.render();
       expect(table.filteredRows().length).toBe(1);
@@ -113,7 +113,7 @@ describe('TableFilter', () => {
         table = helper.createTable(model),
         column0 = table.columns[0];
 
-      let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+      createAndRegisterColumnFilter(table, column0, ['1_0']);
       table.filter();
       expect(table.filteredRows().length).toBe(1);
 
@@ -139,7 +139,7 @@ describe('TableFilter', () => {
         row1 = table.rows[1];
 
       // expects 1 row to be visible
-      let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+      createAndRegisterColumnFilter(table, column0, ['1_0']);
       table.filter();
       table.render();
       expect(table.filteredRows().length).toBe(1);
@@ -192,7 +192,7 @@ describe('TableFilter', () => {
         row1 = table.rows[1];
 
       // expects 1 row to be visible
-      let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+      createAndRegisterColumnFilter(table, column0, ['1_0']);
       table.filter();
       expect(table.filteredRows().length).toBe(1);
 
@@ -215,11 +215,10 @@ describe('TableFilter', () => {
     it('properly handles successive row insertion and updates', () => {
       let model = helper.createModelFixture(2, 2),
         table = helper.createTable(model),
-        column0 = table.columns[0],
-        row1 = table.rows[1];
+        column0 = table.columns[0];
 
       // expects 1 row to be visible
-      let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+      createAndRegisterColumnFilter(table, column0, ['1_0']);
       table.filter();
       table.render();
       expect(table.filteredRows().length).toBe(1);
@@ -249,11 +248,10 @@ describe('TableFilter', () => {
     it('properly handles reset table case', () => {
       let model = helper.createModelFixture(2, 2),
         table = helper.createTable(model),
-        column0 = table.columns[0],
-        row1 = table.rows[1];
+        column0 = table.columns[0];
 
       // Filter active
-      let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+      createAndRegisterColumnFilter(table, column0, ['1_0']);
       table.filter();
       table.render();
       expect(table._filterCount()).toBe(1);
@@ -282,13 +280,12 @@ describe('TableFilter', () => {
     it('considers view range', () => {
       let model = helper.createModelFixture(2, 7),
         table = helper.createTable(model),
-        column0 = table.columns[0],
-        row1 = table.rows[1];
+        column0 = table.columns[0];
 
       table.viewRangeSize = 1;
 
       // expects 1 row to be visible
-      let filter = createAndRegisterColumnFilter(table, column0, ['1_0', '3_0']);
+      createAndRegisterColumnFilter(table, column0, ['1_0', '3_0']);
       table.filter();
       table.render();
 
@@ -298,7 +295,7 @@ describe('TableFilter', () => {
       expect(table.$rows().eq(0).data('row')).toBe(table.filteredRows()[0]);
 
       // Use last filtered row as base row index
-      let spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new Range(1, 2));
+      spyOn(table, '_calculateCurrentViewRange').and.returnValue(new Range(1, 2));
       table._renderViewport();
 
       expect(table.$rows().length).toBe(1); // only one row in view range
@@ -308,13 +305,12 @@ describe('TableFilter', () => {
     it('renders empty data if all rows are removed due to filtering', () => {
       let model = helper.createModelFixture(2, 7),
         table = helper.createTable(model),
-        column0 = table.columns[0],
-        row1 = table.rows[1];
+        column0 = table.columns[0];
 
       table.render();
       expect(table.$emptyData).toBe(null);
 
-      let filter = createAndRegisterColumnFilter(table, column0, ['asdf']);
+      createAndRegisterColumnFilter(table, column0, ['asdf']);
       table.filter();
 
       expect(table.rows.length).toBe(7);
@@ -322,7 +318,7 @@ describe('TableFilter', () => {
       expect(table.$rows().length).toBe(0);
       expect(table.$emptyData).toBeDefined();
 
-      filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+      createAndRegisterColumnFilter(table, column0, ['1_0']);
       table.filter();
       expect(table.$emptyData).toBe(null);
 
@@ -344,7 +340,7 @@ describe('TableFilter', () => {
       table.selectAll();
       expect(table.selectedRows.length).toBe(2);
 
-      let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+      createAndRegisterColumnFilter(table, column0, ['1_0']);
       table.filter();
 
       expect(table.selectedRows.length).toBe(1);
@@ -396,7 +392,7 @@ describe('TableFilter', () => {
         column0 = table.columns[0],
         row1 = table.rows[1];
 
-      let filter = createAndRegisterColumnFilter(table, column0, ['1_0', '2_0']);
+      createAndRegisterColumnFilter(table, column0, ['1_0', '2_0']);
       table.filter();
       table.render();
       table.selectAll();
@@ -417,7 +413,6 @@ describe('TableFilter', () => {
     it('gets restored for visible rows after filtering', () => {
       let model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'NumberColumn'),
         table = helper.createTable(model),
-        column0 = model.columns[0],
         rows = table.rows;
       table._animationRowLimit = 0;
       table.render();
@@ -505,7 +500,7 @@ describe('TableFilter', () => {
         spyOn(listener, '_onFilter');
         table.on('filter', listener._onFilter);
 
-        let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+        createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
 
         expect(listener._onFilter).toHaveBeenCalled();
@@ -519,7 +514,7 @@ describe('TableFilter', () => {
         spyOn(listener, '_onFilter');
         table.on('filter', listener._onFilter);
 
-        let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+        createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
 
         expect(listener._onFilter).toHaveBeenCalled();
@@ -532,7 +527,7 @@ describe('TableFilter', () => {
 
         table.render();
 
-        let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+        createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
 
         spyOn(listener, '_onFilter');
@@ -548,7 +543,7 @@ describe('TableFilter', () => {
           column0 = table.columns[0],
           row1 = table.rows[1];
 
-        let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+        createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
         table.render();
 
@@ -567,10 +562,9 @@ describe('TableFilter', () => {
       it('gets fired if rows are filtered during insertRows', () => {
         let model = helper.createModelFixture(2, 2),
           table = helper.createTable(model),
-          column0 = table.columns[0],
-          row1 = table.rows[1];
+          column0 = table.columns[0];
 
-        let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+        createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
         table.render();
         expect(table.filteredRows().length).toBe(1);
@@ -599,7 +593,7 @@ describe('TableFilter', () => {
           column0 = table.columns[0],
           row1 = table.rows[1];
 
-        let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+        createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
         table.render();
         expect(table.filteredRows().length).toBe(1);
@@ -616,10 +610,9 @@ describe('TableFilter', () => {
       it('gets fired if rows are filtered during deleteAllRows', () => {
         let model = helper.createModelFixture(2, 2),
           table = helper.createTable(model),
-          column0 = table.columns[0],
-          row1 = table.rows[1];
+          column0 = table.columns[0];
 
-        let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+        createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
         table.render();
         expect(table.filteredRows().length).toBe(1);
@@ -639,7 +632,7 @@ describe('TableFilter', () => {
           column0 = table.columns[0],
           row1 = table.rows[1];
 
-        let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+        createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
         table.render();
 
@@ -665,7 +658,7 @@ describe('TableFilter', () => {
 
         table.render();
 
-        let filter = createAndRegisterColumnFilter(table, column0, ['1_0']);
+        createAndRegisterColumnFilter(table, column0, ['1_0']);
         table.filter();
 
         expect(table.rows[0].filterAccepted).toBe(false);
