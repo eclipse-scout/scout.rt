@@ -16,6 +16,11 @@ import org.json.JSONObject;
 
 public class JsonChartTableUserFilter<T extends ChartTableUserFilterState> extends JsonTableUserFilter<T> {
 
+  public static final String ATTRIBUTE_TEXT = "text";
+  public static final String ATTRIBUTE_FILTERS = "filters";
+  public static final String ATTRIBUTE_COLUMN_ID_X = "columnIdX";
+  public static final String ATTRIBUTE_COLUMN_ID_Y = "columnIdY";
+
   public JsonChartTableUserFilter(T filter) {
     super(filter);
   }
@@ -33,10 +38,10 @@ public class JsonChartTableUserFilter<T extends ChartTableUserFilterState> exten
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    json.put("text", getFilterState().getText());
-    json.put("filters", new JSONArray(getFilterState().getFilters()));
-    json.put("columnIdX", getJsonTable().getColumnId(getFilterState().getColumnX()));
-    json.put("columnIdY", getJsonTable().getColumnId(getFilterState().getColumnY()));
+    json.put(ATTRIBUTE_TEXT, getFilterState().getText());
+    json.put(ATTRIBUTE_FILTERS, new JSONArray(getFilterState().getFilters()));
+    json.put(ATTRIBUTE_COLUMN_ID_X, getJsonTable().getColumnId(getFilterState().getColumnX()));
+    json.put(ATTRIBUTE_COLUMN_ID_Y, getJsonTable().getColumnId(getFilterState().getColumnY()));
     return json;
   }
 

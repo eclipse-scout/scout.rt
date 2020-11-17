@@ -765,7 +765,7 @@ public class JSONObject {
   /**
    * Wraps the given object if necessary.
    * <p>
-   * If the object is null or , returns {@link #NULL}. If the object is a {@code JSONArray} or {@code JSONObject}, no
+   * If the object is null, returns {@link #NULL}. If the object is a {@code JSONArray} or {@code JSONObject}, no
    * wrapping is necessary. If the object is {@code NULL}, no wrapping is necessary. If the object is an array or
    * {@code Collection}, returns an equivalent {@code JSONArray}. If the object is a {@code Map}, returns an equivalent
    * {@code JSONObject}. If the object is a primitive wrapper type or {@code String}, returns the object. Otherwise if

@@ -10,7 +10,9 @@
  */
 package org.eclipse.scout.rt.chart.ui.html.json.basic.table.userfilter;
 
-import java.util.ArrayList;
+import static java.util.Arrays.asList;
+import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.unwrap;
+
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -28,32 +30,20 @@ public class UserFilterStateFactory implements IUserFilterStateFactory {
   @Override
   public IUserFilterState createUserFilterState(JsonTable<? extends ITable> table, JSONObject data) {
     String filterType = data.getString("filterType");
-    if ("CHART".equals(filterType)) {
+    if (ChartTableUserFilterState.TYPE.equals(filterType)) {
       ChartTableUserFilterState filterState = new ChartTableUserFilterState();
-      filterState.setText(data.getString("text"));
-      filterState.setFilters(createArrayValuesFromJson(data, "filters"));
-      filterState.setColumnX(extractColumn(table, data, "columnIdX"));
-      filterState.setColumnY(extractColumn(table, data, "columnIdY"));
+      filterState.setText(data.getString(JsonChartTableUserFilter.ATTRIBUTE_TEXT));
+      filterState.setFilters(createArrayValuesFromJson(data, JsonChartTableUserFilter.ATTRIBUTE_FILTERS));
+      filterState.setColumnX(extractColumn(table, data, JsonChartTableUserFilter.ATTRIBUTE_COLUMN_ID_X));
+      filterState.setColumnY(extractColumn(table, data, JsonChartTableUserFilter.ATTRIBUTE_COLUMN_ID_Y));
       return filterState;
     }
     return null;
   }
 
   protected List<Object> createArrayValuesFromJson(JSONObject json, String propName) {
-    JSONArray jsonValues = json.optJSONArray(propName);
-    if (jsonValues == null) {
-      return null;
-    }
-    List<Object> values = new ArrayList<>();
-    for (int i = 0; i < jsonValues.length(); i++) {
-      if (jsonValues.isNull(i)) {
-        values.add(null);
-      }
-      else {
-        values.add(jsonValues.get(i));
-      }
-    }
-    return values;
+    JSONArray jsonArr = json.optJSONArray(propName);
+    return asList(unwrap(jsonArr));
   }
 
   protected IColumn extractColumn(JsonTable<? extends ITable> table, JSONObject json, String propName) {
@@ -63,5 +53,4 @@ public class UserFilterStateFactory implements IUserFilterStateFactory {
     }
     return table.optColumn(columnId);
   }
-
 }

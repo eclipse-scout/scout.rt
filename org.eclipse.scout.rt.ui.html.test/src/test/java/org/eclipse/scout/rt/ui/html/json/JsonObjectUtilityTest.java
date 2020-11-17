@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,11 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
+import static java.util.Collections.singletonMap;
+import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.unwrap;
 import static org.junit.Assert.*;
+
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,6 +33,29 @@ public class JsonObjectUtilityTest {
 
   private String toJson(String s) {
     return MainJsonObjectFactory.get().createJsonObject(s).toJson().toString();
+  }
+
+  @Test
+  public void testUnwrap() {
+    String input = "abc";
+    assertNull(unwrap((Object) null));
+    assertNull(unwrap(JSONObject.NULL));
+    assertSame(input, unwrap(input));
+
+    Map<String, Object> expanded = unwrap(new JSONObject("{\"a\": \"1\", \"b\": [{\"c\":\"2\"}, {\"d\": \"3\"}]}"));
+    assertEquals(2, expanded.size());
+    assertEquals("1", expanded.get("a"));
+    Object[] second = (Object[]) expanded.get("b");
+    assertArrayEquals(second, new Object[]{singletonMap("c", "2"), singletonMap("d", "3")});
+  }
+
+  @Test
+  public void testUnwrapWithNullValues() {
+    Map<String, Object> expanded = unwrap(new JSONObject("{\"a\": null, \"b\": [null,, {\"d\": \"3\"}]}"));
+    assertEquals(2, expanded.size());
+    assertNull(expanded.get("1"));
+    Object[] secondArr = (Object[]) expanded.get("b");
+    assertArrayEquals(new Object[]{null, null, singletonMap("d", "3")}, secondArr);
   }
 
   @Test
@@ -161,13 +188,13 @@ public class JsonObjectUtilityTest {
     FixtureDataBean b = JsonObjectUtility.jsonArrayElementToJava(a, 0, FixtureDataBean.class, false);
     assertEquals("foo", b.getFilename());
     assertArrayEquals(new byte[0], b.getContent());
-    assertFalse(b.isAvaliable());
+    assertFalse(b.isAvailable());
   }
 
   public static class FixtureDataBean {
     private String m_filename;
     private byte[] m_content;
-    private boolean m_avaliable;
+    private boolean m_available;
 
     public String getFilename() {
       return m_filename;
@@ -185,12 +212,12 @@ public class JsonObjectUtilityTest {
       m_content = content;
     }
 
-    public boolean isAvaliable() {
-      return m_avaliable;
+    public boolean isAvailable() {
+      return m_available;
     }
 
-    public void setAvaliable(boolean b) {
-      m_avaliable = b;
+    public void setAvailable(boolean b) {
+      m_available = b;
     }
   }
 }

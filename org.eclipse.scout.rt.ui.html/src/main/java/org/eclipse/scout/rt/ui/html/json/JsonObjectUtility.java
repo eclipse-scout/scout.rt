@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,17 +10,24 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
+import static org.eclipse.scout.rt.platform.util.StreamUtility.*;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.reflect.FastBeanInfo;
@@ -196,7 +203,6 @@ public final class JsonObjectUtility {
    *
    * @param jsonObject
    *          {@link JSONObject}
-   * @param type
    * @param throwForMissingProperty
    *          when set to true then throws an exception if a json property does not exist in the java object, when set
    *          to false ignores this event.
@@ -204,6 +210,68 @@ public final class JsonObjectUtility {
   public static <T> T jsonObjectPropertyToJava(JSONObject jsonObject, String propertyName, Class<T> type, boolean throwForMissingProperty) {
     Object jval = getTyped(jsonObject, propertyName, type);
     return jsonValueToJava(jval, type, throwForMissingProperty);
+  }
+
+  /**
+   * Recursively unwraps the {@link JSONObject} given into a {@link Map}.<br>
+   * This is the inverse operation to {@link JSONObject#wrap(Object)}
+   *
+   * @param obj
+   *          The {@link JSONObject} to unwrap or {@code null}.
+   * @return A {@link LinkedHashMap} holding all attributes of the given {@link JSONObject}.
+   */
+  public static Map<String, Object> unwrap(JSONObject obj) {
+    if (obj == null || obj == JSONObject.NULL) {
+      return null;
+    }
+    return obj.keySet().stream()
+        .map(key -> new SimpleImmutableEntry<>(key, unwrap(obj.opt(key))))
+        .collect(toMap(LinkedHashMap::new, Entry::getKey, Entry::getValue, throwingMerger()));
+  }
+
+  /**
+   * Recursively unwraps the {@link JSONArray} given into an {@link Object} array.<br>
+   * This is the inverse operation to {@link JSONObject#wrap(Object)}
+   *
+   * @param jsonArr
+   *          The {@link JSONArray} to unwrap or {@code null}.
+   * @return An {@link Object} array holding all items of the given {@link JSONArray}.
+   */
+  public static Object[] unwrap(JSONArray jsonArr) {
+    if (jsonArr == null || jsonArr == JSONObject.NULL) {
+      return null;
+    }
+    return IntStream.range(0, jsonArr.length())
+        .mapToObj(jsonArr::opt)
+        .map(JsonObjectUtility::unwrap)
+        .toArray();
+  }
+
+  /**
+   * Recursively unwraps the {@link Object} given:
+   * <ol>
+   * <li>Returns {@code null} if the object is {@code null} or {@link JSONObject#NULL}.</li>
+   * <li>Returns a {@link Map} if the given object is a {@link JSONObject}.</li>
+   * <li>Returns an {@link Object} array if the given object is a {@link JSONArray}.</li>
+   * <li>Otherwise returns the input object.</li>
+   * </ol>
+   * This is the inverse operation to {@link JSONObject#wrap(Object)}
+   *
+   * @param o
+   *          The {@link Object} to unwrap or {@code null}.
+   * @return The unwrapped object.
+   */
+  public static Object unwrap(Object o) {
+    if (o == null || o == JSONObject.NULL) {
+      return null;
+    }
+    if (o instanceof JSONObject) {
+      return unwrap((JSONObject) o);
+    }
+    if (o instanceof JSONArray) {
+      return unwrap((JSONArray) o);
+    }
+    return o;
   }
 
   /**
@@ -215,7 +283,6 @@ public final class JsonObjectUtility {
    *
    * @param jsonArray
    *          {@link JSONArray}
-   * @param type
    * @param throwForMissingProperty
    *          when set to true then throws an exception if a json property does not exist in the java object, when set
    *          to false ignores this event.
@@ -321,6 +388,7 @@ public final class JsonObjectUtility {
    * @return null, {@link JSONObject}, {@link JSONArray} or a basic type (int, long, boolean, byte[], String) depending
    *         on the value of <code>type</code>
    */
+  @SuppressWarnings("DuplicatedCode")
   private static Object getTyped(JSONObject jsonObject, String propertyName, Class<?> type) {
     Object jval = jsonObject.opt(propertyName);
     //null
@@ -362,6 +430,7 @@ public final class JsonObjectUtility {
    * @return null, {@link JSONObject}, {@link JSONArray} or a basic type (int, long, boolean, byte[], String) depending
    *         on the value of <code>type</code>
    */
+  @SuppressWarnings("DuplicatedCode")
   private static Object getTyped(JSONArray jsonArray, int index, Class<?> type) {
     Object jval = jsonArray.opt(index);
     //null
