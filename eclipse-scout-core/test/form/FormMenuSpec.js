@@ -70,28 +70,42 @@ describe('FormMenu', () => {
       ellipsisMenu.setSelected(false);
     });
 
-    it('opens the popup but not the ellipsis if the menu is overflown and mobile popup style is used', () => {
-      let ellipsisMenu = menus.createEllipsisMenu({
-        parent: session.desktop
+    describe('with mobile popup style', () => {
+
+      it('opens and closes the form popup even if menu is not rendered', () => {
+        let menu = createMenu({popupStyle: FormMenu.PopupStyle.MOBILE});
+        expect(findPopup()).not.toExist();
+
+        menu.setSelected(true);
+        expect(findPopup()).toBeVisible();
+
+        menu.popup.animateRemoval = false;
+        menu.setSelected(false);
+        expect(findPopup()).not.toExist();
       });
-      ellipsisMenu.render();
 
-      let menu = createMenu({popupStyle: FormMenu.PopupStyle.MOBILE});
-      menu.render();
+      it('opens the popup but not the ellipsis if the menu is overflown', () => {
+        let ellipsisMenu = menus.createEllipsisMenu({
+          parent: session.desktop
+        });
+        ellipsisMenu.render();
 
-      menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
-      expect(menu.rendered).toBe(false);
-      expect(findPopup()).not.toExist();
+        let menu = createMenu({popupStyle: FormMenu.PopupStyle.MOBILE});
+        menu.render();
 
-      menu.setSelected(true);
-      expect(ellipsisMenu.selected).toBe(false);
-      expect(menu.selected).toBe(true);
-      expect(findPopup()).toBeVisible();
+        menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
+        expect(menu.rendered).toBe(false);
+        expect(findPopup()).not.toExist();
 
-      // cleanup
-      menu.setSelected(false);
+        menu.setSelected(true);
+        expect(ellipsisMenu.selected).toBe(false);
+        expect(menu.selected).toBe(true);
+        expect(findPopup()).toBeVisible();
+
+        // cleanup
+        menu.setSelected(false);
+      });
     });
-
   });
 
   describe('detach', () => {

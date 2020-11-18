@@ -14,8 +14,9 @@ export default class FormMenu extends Menu {
 
   constructor() {
     super();
-    this.form;
+    this.form = null;
     this.toggleAction = true;
+    this.popupStyle = null;
     this._addWidgetProperties('form');
   }
 
@@ -34,6 +35,7 @@ export default class FormMenu extends Menu {
         this.popupStyle = FormMenu.PopupStyle.DEFAULT;
       }
     }
+    this._setSelected(this.selected);
   }
 
   _renderForm() {
@@ -87,10 +89,27 @@ export default class FormMenu extends Menu {
     }
   }
 
+  _setSelected(selected) {
+    this._setProperty('selected', selected);
+    if (this.popupStyle === FormMenu.PopupStyle.MOBILE && this._doActionTogglesPopup()) {
+      // Mobile Popup can be rendered even if menu is not. This is useful if a tool form menu should be opened while the desktop bench is open instead of the outline
+      // Open will be called in renderSelected again but won't do anything
+      if (this.selected) {
+        this._openPopup();
+      } else {
+        this._closePopup();
+      }
+    }
+  }
+
   /**
    * @override Menu.js
    */
   _openPopup() {
+    if (this.popup) {
+      // already open
+      return;
+    }
     super._openPopup();
     this._addFormRemoveHandler();
   }
@@ -126,24 +145,13 @@ export default class FormMenu extends Menu {
   }
 
   _handleSelectedInEllipsis() {
-    if (this.popupStyle !== FormMenu.PopupStyle.MOBILE) {
-      super._handleSelectedInEllipsis();
+    if (this.popupStyle === FormMenu.PopupStyle.MOBILE) {
+      // The mobile popup is not attached to a header -> no need to open the overflow menu (popup is already open due to _setSelected)
       return;
     }
-    if (!this._doActionTogglesPopup()) {
-      return;
-    }
-    // The mobile popup is not atached to a header -> no need to open the parent menu, just show the poupup
-    if (this.selected) {
-      this._openPopup();
-    } else {
-      this._closePopup();
-    }
+    super._handleSelectedInEllipsis();
   }
 
-  /**
-   * @override
-   */
   _createActionKeyStroke() {
     return new FormMenuActionKeyStroke(this);
   }

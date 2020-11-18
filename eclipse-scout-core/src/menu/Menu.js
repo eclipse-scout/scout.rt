@@ -468,7 +468,7 @@ export default class Menu extends Action {
   }
 
   _closePopup() {
-    if (this.popup) {
+    if (this.popup && !this.popup._isRemovalPending()) {
       this.popup.close();
     }
   }
