@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.IThrowableWithContextInfo;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowHandledExceptionStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +40,7 @@ public class JUnitExceptionHandler extends ExceptionHandler {
 
   @Override
   public void handle(final Throwable t) {
-    if (t instanceof ProcessingException && ((IThrowableWithContextInfo) t).isConsumed()) {
+    if (t instanceof IThrowableWithContextInfo && ((IThrowableWithContextInfo) t).isConsumed()) {
       LOG.info("Exception will not be re-thrown for JUnit assertion because already consumed. [exception={}]", t.getMessage());
     }
     else {
