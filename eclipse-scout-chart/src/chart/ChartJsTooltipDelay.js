@@ -54,6 +54,9 @@ let _notifyOthers = (chart, hook, args) => {
  */
 let _drawTooltip = (chart, args) => {
   // <customized>
+  if (!chart.ctx) {
+    return;
+  }
   let tooltip = chart.tooltip;
 
   if (_notifyOthers(chart, 'beforeTooltipDraw', [args]) === false) {
