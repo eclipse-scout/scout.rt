@@ -35,6 +35,7 @@ export default class ChartTableControl extends TableControl {
     this.dateGroup = null;
 
     this._tableUpdatedHandler = this._onTableUpdated.bind(this);
+    this._tableColumnStructureChangedHandler = this._onTableColumnStructureChanged.bind(this);
     this._chartValueClickedHandler = this._onChartValueClick.bind(this);
   }
 
@@ -43,12 +44,23 @@ export default class ChartTableControl extends TableControl {
 
   _init(model) {
     super._init(model);
+    this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
 
     this.chart = scout.create('Chart', {
       parent: this
     });
+  }
 
-    this.setEnabled(this._hasColumns());
+  _destroy() {
+    this.table.off('columnStructureChanged', this._tableColumnStructureChangedHandler);
+    super._destroy();
+  }
+
+  _computeEnabled(inheritAccessibility, parentEnabled) {
+    if (!this._hasColumns() && !this.selected) {
+      return false;
+    }
+    return super._computeEnabled(inheritAccessibility, parentEnabled);
   }
 
   _renderChart() {
@@ -95,6 +107,9 @@ export default class ChartTableControl extends TableControl {
   }
 
   _renderChartGroup(groupId) {
+    if (!this._hasColumns()) {
+      return;
+    }
     let groupName = 'chartGroup' + groupId;
     let map = '_' + groupName + 'Map';
     let chartGroup = this[groupName];
@@ -144,10 +159,10 @@ export default class ChartTableControl extends TableControl {
   _renderChartSelect(cssClass, chartType, renderSvgIcon) {
     let $svg = this.$chartSelect
       .appendSVG('svg', cssClass + ' select-chart')
-      .toggleClass('disabled', !this.enabledComputed)
+      .toggleClass('disabled', !this.enabledComputed || !this._hasColumns())
       .data('chartType', chartType);
 
-    if (this.enabledComputed) {
+    if (this.enabledComputed && this._hasColumns()) {
       $svg.on('click', this._onClickChartType.bind(this));
     }
 
@@ -441,7 +456,6 @@ export default class ChartTableControl extends TableControl {
   }
 
   _addListeners() {
-    this.table.on('columnStructureChanged', this._tableUpdatedHandler);
     this.table.on('rowsInserted', this._tableUpdatedHandler);
     this.table.on('rowsDeleted', this._tableUpdatedHandler);
     this.table.on('allRowsDeleted', this._tableUpdatedHandler);
@@ -676,15 +690,17 @@ export default class ChartTableControl extends TableControl {
   }
 
   _drawChart() {
+    if (!this._hasColumns()) {
+      this._hideChart();
+      return;
+    }
+
     let cube = this._calculateValues();
 
     if (cube.length) {
       this.chart.setVisible(true);
     } else {
-      this.chart.setConfig({
-        type: this.chartType
-      });
-      this.chart.setVisible(false);
+      this._hideChart();
       return;
     }
 
@@ -710,6 +726,13 @@ export default class ChartTableControl extends TableControl {
 
     let checkedItems = this._computeCheckedItems(config.data.datasets[0].deterministicKeys);
     this.chart.setCheckedItems(checkedItems);
+  }
+
+  _hideChart() {
+    this.chart.setConfig({
+      type: this.chartType
+    });
+    this.chart.setVisible(false);
   }
 
   _getDatasetLabel() {
@@ -1184,6 +1207,7 @@ export default class ChartTableControl extends TableControl {
     this.table.events.removeListener(this._filterResetListener);
     this._removeListeners();
     this.oldChartType = null;
+    this.recomputeEnabled();
   }
 
   _removeScrollbars() {
@@ -1197,7 +1221,6 @@ export default class ChartTableControl extends TableControl {
   }
 
   _removeListeners() {
-    this.table.off('columnStructureChanged', this._tableUpdatedHandler);
     this.table.off('rowsInserted', this._tableUpdatedHandler);
     this.table.off('rowsDeleted', this._tableUpdatedHandler);
     this.table.off('allRowsDeleted', this._tableUpdatedHandler);
@@ -1226,7 +1249,6 @@ export default class ChartTableControl extends TableControl {
     this._tableUpdatedTimeOutId = setTimeout(() => {
       this._tableUpdatedTimeOutId = null;
 
-      this.setEnabled(this._hasColumns());
       if (!this.rendered) {
         return;
       }
@@ -1236,5 +1258,12 @@ export default class ChartTableControl extends TableControl {
       this.removeContent();
       this.renderContent();
     });
+  }
+
+  _onTableColumnStructureChanged() {
+    this.recomputeEnabled();
+    if (this.contentRendered && this.selected) {
+      this._onTableUpdated();
+    }
   }
 }

@@ -103,6 +103,10 @@ export default class Chart extends Widget {
     this._renderCheckable();
     this._renderChartType();
     this._renderColorScheme();
+    this.updateChart({
+      requestAnimation: true,
+      debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
+    });
   }
 
   _remove() {
