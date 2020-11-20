@@ -1738,10 +1738,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     return new SummaryCellBuilder(this);
   }
 
+  @Override
   public ISummaryCellBuilder getSummaryCellBuilder() {
     return m_summaryCellBuilder;
   }
 
+  @Override
   public void setSummaryCellBuilder(ISummaryCellBuilder summaryCellBuilder) {
     m_summaryCellBuilder = summaryCellBuilder;
   }

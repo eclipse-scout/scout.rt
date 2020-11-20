@@ -515,6 +515,10 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    */
   ICell getSummaryCell(ITableRow row);
 
+  ISummaryCellBuilder getSummaryCellBuilder();
+
+  void setSummaryCellBuilder(ISummaryCellBuilder summaryCellBuilder);
+
   /**
    * Convenience for {@link ICell#isEditable()}
    */

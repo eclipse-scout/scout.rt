@@ -20,6 +20,14 @@ public class MobileSummaryCellBuilder implements ISummaryCellBuilder {
     m_compactHandler = compactHandler;
   }
 
+  public ITableCompactHandler getCompactHandler() {
+    return m_compactHandler;
+  }
+
+  public void setCompactHandler(ITableCompactHandler compactHandler) {
+    m_compactHandler = compactHandler;
+  }
+
   @Override
   public ICell build(ITableRow row) {
     Cell cell = new Cell();
