@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -161,6 +161,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   @Override
   protected void initConfig() {
     super.initConfig();
+    setValidateContentDescriptor(new ValidateTableFieldDescriptor(this));
     setTableInternal(createTable());
   }
 
@@ -412,30 +413,43 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
       return desc;
     }
     ITable table = getTable();
+    if (table == null) {
+      return null;
+    }
     // ensureCellEditComplete
     if (table instanceof AbstractTable) {
       table.completeCellEdit();
     }
     // check cells
-    ValidateTableFieldDescriptor tableDesc = null;
+    IValidateContentDescriptor validateContentDescriptor = getValidateContentDescriptor();
+    boolean isTableFieldDescriptor = validateContentDescriptor instanceof ValidateTableFieldDescriptor;
+    if (isTableFieldDescriptor) {
+      // reset descriptor so that no old rows or columns are referenced
+      ValidateTableFieldDescriptor tableDesc = (ValidateTableFieldDescriptor) validateContentDescriptor;
+      tableDesc.setRow(null);
+      tableDesc.setColumn(null);
+    }
     Set<String> columnNames = new TreeSet<>();
-    if (table != null) {
-      for (ITableRow row : table.getRows()) {
-        for (IColumn col : table.getColumns()) {
-          if (!col.isContentValid(row)) {
-            if (tableDesc == null) {
-              tableDesc = new ValidateTableFieldDescriptor(this, row, col);
-            }
-            columnNames.add(getColumnName(col));
+    for (ITableRow row : table.getRows()) {
+      for (IColumn col : table.getColumns()) {
+        if (!col.isContentValid(row)) {
+          if (columnNames.isEmpty() && isTableFieldDescriptor) {
+            // set the first invalid column to the descriptor
+            ValidateTableFieldDescriptor tableDesc = (ValidateTableFieldDescriptor) validateContentDescriptor;
+            tableDesc.setRow(row);
+            tableDesc.setColumn(col);
           }
+          columnNames.add(getColumnName(col));
         }
       }
-      table.ensureInvalidColumnsVisible();
     }
-    if (tableDesc != null) {
-      tableDesc.setDisplayText(TEXTS.get("TableName") + " " + getLabel() + ": " + CollectionUtility.format(columnNames));
+    if (columnNames.isEmpty()) {
+      return null; // all content valid
     }
-    return tableDesc;
+
+    table.ensureInvalidColumnsVisible();
+    validateContentDescriptor.setDisplayText(TEXTS.get("TableName") + " " + getLabel() + ": " + CollectionUtility.format(columnNames));
+    return validateContentDescriptor;
   }
 
   /**
@@ -492,7 +506,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   /**
    * Saves the table. The call order is as follows:
    * <ol>
-   * <li>{@link #interceptSave(ITableRow[], ITableRow[], ITableRow[])}</li>
+   * <li>{@link #interceptSave(List, List, List)}</li>
    * <li>{@link #interceptSaveDeletedRow(ITableRow)}</li>
    * <li>{@link #interceptSaveInsertedRow(ITableRow)}</li>
    * <li>{@link #interceptSaveUpdatedRow(ITableRow)}</li>

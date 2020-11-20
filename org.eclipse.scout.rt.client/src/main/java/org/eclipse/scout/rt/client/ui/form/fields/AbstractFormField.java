@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -129,6 +129,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   protected ContributionComposite m_contributionHolder;
   private String m_initialLabel;
   private final ObjectExtensions<AbstractFormField, IFormFieldExtension<? extends AbstractFormField>> m_objectExtensions;
+  private IValidateContentDescriptor m_validateContentDescriptor;
 
   public AbstractFormField() {
     this(true);
@@ -222,8 +223,8 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * @since 19.11.2009
    * @return the fixed label witdh &gt;0 or LABEL_WIDTH_DEFAULT or LABEL_WIDTH_UI for ui-dependent label width
+   * @since 19.11.2009
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(16)
@@ -232,8 +233,8 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * @since 10.09.2020
    * @return {@code true} if this fields label should be as width as preferred by the ui, {@code false} otherwise
+   * @since 10.09.2020
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(17)
@@ -242,10 +243,10 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * @since 19.11.2009
    * @return one of the following {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_LEFT},
-   *         {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_CENTER}, {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_RIGHT}
-   *         or {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_DEFAULT}.
+   * {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_CENTER}, {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_RIGHT}
+   * or {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_DEFAULT}.
+   * @since 19.11.2009
    */
   @Order(18)
   @ConfigProperty(ConfigProperty.LABEL_HORIZONTAL_ALIGNMENT)
@@ -457,8 +458,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * It is not necessary to explicitly set a column count by {@link AbstractGroupBox#getConfiguredGridColumnCount()}.
    * <p>
    * This property only has an effect if every field inside the group box has a fix position which means every field
-   * inside the group box need to have x and y to be set which can be configured by {@link #getConfiguredGridX()} and
-   * {@link #getConfiguredGridY()}.
+   * inside the group box need to have x and y to be set which can be configured by this method and {@link #getConfiguredGridY()}.
    * <p>
    * Subclasses can override this method. Default is -1.
    *
@@ -477,7 +477,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * <p>
    * This property only has an effect if every field inside the group box has a fix position which means every field
    * inside the group box need to have x and y to be set which can be configured by {@link #getConfiguredGridX()} and
-   * {@link #getConfiguredGridY()}.
+   * this method.
    * <p>
    * Subclasses can override this method. Default is -1.
    *
@@ -549,7 +549,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    *
    * @return the number of rows to span
    * @see #getConfiguredGridWeightY() comment about weightY logic which depends on the gridH value configured
-   *      here
+   * here
    * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -700,8 +700,8 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   /**
    * @return <code>false</code> if this field can get the initial focus when the form is opened (default). Set to
-   *         <code>true</code> to prevent this field from getting the initial focus. In both cases, the field will still
-   *         be manually focusable by the user.
+   * <code>true</code> to prevent this field from getting the initial focus. In both cases, the field will still
+   * be manually focusable by the user.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(195)
@@ -865,6 +865,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     setStatusVisible(getConfiguredStatusVisible());
     setStatusPosition(getConfiguredStatusPosition());
     setCssClass((getConfiguredCssClass()));
+    setValidateContentDescriptor(new ValidateFormFieldDescriptor(this));
     if (getConfiguredBackgroundColor() != null) {
       setBackgroundColor((getConfiguredBackgroundColor()));
     }
@@ -979,14 +980,14 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    *      |                |                      |
    *  form field B      form field C      form field in menu D
    * </pre>
-   *
+   * <p>
    * In this scenario this method would return field A and D.
    *
    * @param limitToSameFieldTree
-   *          Specifies if only the same-field-tree should be considered. A same-field-tree is a tree that only consists
-   *          of {@link IFormField}s and {@link IForm}s. So if this parameter is {@code true}, {@link IFormField}s in
-   *          e.g. menus are not returned because they don't belong to the same-field-tree according to the
-   *          specification above.
+   *     Specifies if only the same-field-tree should be considered. A same-field-tree is a tree that only consists
+   *     of {@link IFormField}s and {@link IForm}s. So if this parameter is {@code true}, {@link IFormField}s in
+   *     e.g. menus are not returned because they don't belong to the same-field-tree according to the
+   *     specification above.
    * @return A {@link List} with the child {@link IFormField}s. Is never {@code null}.
    */
   protected List<IFormField> getFirstChildFormFields(boolean limitToSameFieldTree) {
@@ -1779,10 +1780,10 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   @Override
   public IValidateContentDescriptor validateContent() {
-    if (!isContentValid()) {
-      return new ValidateFormFieldDescriptor(this);
+    if (isContentValid()) {
+      return null;
     }
-    return null;
+    return getValidateContentDescriptor();
   }
 
   @Override
@@ -2050,6 +2051,16 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   protected void addChildFieldPropertyChangeListener(IPropertyObserver f) {
     f.addPropertyChangeListener(m_fieldPropertyChangeListener);
+  }
+
+  @Override
+  public IValidateContentDescriptor getValidateContentDescriptor() {
+    return m_validateContentDescriptor;
+  }
+
+  @Override
+  public void setValidateContentDescriptor(IValidateContentDescriptor validateContentDescriptor) {
+    m_validateContentDescriptor = validateContentDescriptor;
   }
 
   private final class FindClassIdVisitor implements IBreadthFirstTreeVisitor<IFormField> {

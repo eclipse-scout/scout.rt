@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +19,8 @@ import java.util.function.Function;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.platform.OrderedComparator;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
@@ -46,13 +47,39 @@ public final class CompositeFieldUtility {
     }
   }
 
+  static void selectIfIsTab(IGroupBox groupBox) {
+    ICompositeField parentField = groupBox.getParentField();
+    if (!(parentField instanceof ITabBox)) {
+      return;
+    }
+
+    ITabBox t = (ITabBox) parentField;
+    if (t.getSelectedTab() != groupBox) {
+      t.setSelectedTab(groupBox);
+    }
+  }
+
+  /**
+   * Selects the tab containing the given {@link IFormField} for all parent tabboxes.<br>
+   * This ensures that the given {@link IFormField} could be seen (if visible itself).
+   *
+   * @param formField
+   *     The {@link IFormField} whose parent tabs should be selected.
+   */
+  public static void selectAllParentTabsOf(IFormField formField) {
+    if (formField == null) {
+      return;
+    }
+    formField.visitParents(CompositeFieldUtility::selectIfIsTab, IGroupBox.class);
+  }
+
   /**
    * Connects the specified fields. This includes setting the parent form field and form of the specified child.
    *
    * @param child
-   *          The child to connect. May not be {@code null}.
+   *     The child to connect. May not be {@code null}.
    * @param parent
-   *          The parent form field. May be {@code null}.
+   *     The parent form field. May be {@code null}.
    */
   public static void connectFields(IFormField child, ICompositeField parent) {
     if (parent == null) {
@@ -88,9 +115,9 @@ public final class CompositeFieldUtility {
    * new position.
    *
    * @param field
-   *          The {@link IFormField} whose order should be changed. Must not be {@code null}.
+   *     The {@link IFormField} whose order should be changed. Must not be {@code null}.
    * @param newOrder
-   *          The new order value.
+   *     The new order value.
    */
   public static void changeFieldOrder(IFormField field, double newOrder) {
     assertNotNull(field).setOrder(newOrder);
@@ -103,7 +130,7 @@ public final class CompositeFieldUtility {
    * {@link IFormField#setOrder(double)}.
    *
    * @param compositeField
-   *          The {@link ICompositeField} for which the child form fields should be reordered. Must not be {@code null}.
+   *     The {@link ICompositeField} for which the child form fields should be reordered. Must not be {@code null}.
    */
   public static void reorderChildFields(ICompositeField compositeField) {
     assertNotNull(compositeField);
@@ -115,7 +142,7 @@ public final class CompositeFieldUtility {
 
   /**
    * @deprecated Will be removed with Scout 12. Use {@link #moveFieldTo(IFormField, ICompositeField, ICompositeField)}
-   *             instead.
+   * instead.
    */
   @Deprecated
   public static void moveFieldTo(IFormField f, ICompositeField oldContainer, ICompositeField newContainer, Map<Class<? extends IFormField>, IFormField> movedFormFieldsByClass) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,11 +11,11 @@
 package org.eclipse.scout.rt.client.ui.form;
 
 import static org.junit.Assert.*;
-
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormTest.WrapperTestFormWithClassId.MainBox.EmbeddedField;
+import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
@@ -106,7 +106,7 @@ public class AbstractFormTest {
   }
 
   /**
-   * Tests that validating a valid form with an ok status should not result in any error.
+   * Tests that the text of the error status is used instead of the display text of the {@link IValidateContentDescriptor}.
    */
   @Test
   public void testValidForm_ErrorStatus() {

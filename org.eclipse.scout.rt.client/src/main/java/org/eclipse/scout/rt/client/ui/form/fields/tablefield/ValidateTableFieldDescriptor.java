@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,10 +12,8 @@ package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractValidateContentDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.platform.status.IStatus;
 
 /**
@@ -24,25 +22,29 @@ import org.eclipse.scout.rt.platform.status.IStatus;
  * <p>
  * see {@link IFormField#validateContent()}
  */
-public class ValidateTableFieldDescriptor implements IValidateContentDescriptor {
+public class ValidateTableFieldDescriptor extends AbstractValidateContentDescriptor {
   private final ITableField<?> m_tableField;
-  private final ITableRow m_row;
-  private final IColumn<?> m_col;
-  private String m_displayText;
+  private ITableRow m_row;
+  private IColumn<?> m_col;
 
-  public ValidateTableFieldDescriptor(ITableField<?> tableField, ITableRow row, IColumn<?> col) {
+  public ValidateTableFieldDescriptor(ITableField<?> tableField) {
     m_tableField = tableField;
+  }
+
+  public ITableRow getRow() {
+    return m_row;
+  }
+
+  public void setRow(ITableRow row) {
     m_row = row;
+  }
+
+  public IColumn<?> getColumn() {
+    return m_col;
+  }
+
+  public void setColumn(IColumn<?> col) {
     m_col = col;
-  }
-
-  @Override
-  public String getDisplayText() {
-    return m_displayText;
-  }
-
-  public void setDisplayText(String displayText) {
-    m_displayText = displayText;
   }
 
   @Override
@@ -51,20 +53,13 @@ public class ValidateTableFieldDescriptor implements IValidateContentDescriptor 
   }
 
   @Override
-  public void activateProblemLocation() {
-    //make sure the table is showing (activate parent tabs)
-    IGroupBox g = m_tableField.getParentGroupBox();
-    while (g != null) {
-      if (g.getParentField() instanceof ITabBox) {
-        ITabBox t = (ITabBox) g.getParentField();
-        if (t.getSelectedTab() != g) {
-          t.setSelectedTab(g);
-        }
-      }
-      g = g.getParentGroupBox();
-    }
-    if (m_row != null && m_col != null) {
-      m_tableField.getTable().requestFocusInCell(m_col, m_row);
+  protected void activateProblemLocationDefault() {
+    // make sure the table is showing (activate parent tabs)
+    selectAllParentTabsOf(m_tableField);
+    ITableRow row = getRow();
+    IColumn<?> col = getColumn();
+    if (row != null && col != null) {
+      m_tableField.getTable().requestFocusInCell(col, row);
     }
   }
 }

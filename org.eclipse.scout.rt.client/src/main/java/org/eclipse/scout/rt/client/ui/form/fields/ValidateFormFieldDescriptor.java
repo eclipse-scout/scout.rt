@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,8 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * This interface is used to check fields for valid content and - in case invalid - activate / select / focus the
@@ -21,51 +19,31 @@ import org.eclipse.scout.rt.platform.status.IStatus;
  * <p>
  * see {@link IFormField#validateContent()}
  */
-public class ValidateFormFieldDescriptor implements IValidateContentDescriptor {
+public class ValidateFormFieldDescriptor extends AbstractValidateContentDescriptor {
   private final IFormField m_field;
-  private final IStatus m_errorStatus;
 
   public ValidateFormFieldDescriptor(IFormField field) {
     m_field = field;
-    m_errorStatus = field.getErrorStatus();
   }
 
   @Override
   public String getDisplayText() {
-    return m_field.getFullyQualifiedLabel(": ");
+    String displayText = super.getDisplayText();
+    if (StringUtility.isNullOrEmpty(displayText)) {
+      return m_field.getFullyQualifiedLabel(": "); // do not set default in constructor. qualified label may change
+    }
+    return displayText;
   }
 
   @Override
   public IStatus getErrorStatus() {
-    return m_errorStatus;
+    return m_field.getErrorStatus();
   }
 
   @Override
-  public void activateProblemLocation() {
+  protected void activateProblemLocationDefault() {
     // make sure the field is showing (activate parent tabs)
-    IGroupBox groupBox = m_field.getParentGroupBox();
-    IForm form = m_field.getForm();
-
-    while (groupBox != null) {
-      if (groupBox.getParentField() instanceof ITabBox) {
-        ITabBox t = (ITabBox) groupBox.getParentField();
-        if (t.getSelectedTab() != groupBox) {
-          t.setSelectedTab(groupBox);
-        }
-      }
-      groupBox = groupBox.getParentGroupBox();
-
-      // when no tab has been found we must check if we're inside a wrapped form field
-      // in that case we must go further up starting from the wrapped form field
-      if (groupBox == null) {
-        IFormField outerFormField = form.getOuterFormField();
-        if (outerFormField != null) {
-          groupBox = outerFormField.getParentGroupBox();
-          form = outerFormField.getForm();
-        }
-      }
-    }
-
+    selectAllParentTabsOf(m_field);
     m_field.requestFocus();
   }
 }
