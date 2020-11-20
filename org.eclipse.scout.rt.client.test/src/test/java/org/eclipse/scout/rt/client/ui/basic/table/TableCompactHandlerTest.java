@@ -335,6 +335,25 @@ public class TableCompactHandlerTest {
     assertTrue(bean.getContent().contains("fifth"));
   }
 
+  /**
+   * When the first column is excluded, the second column moves to the top so that it will be used for the title.
+   */
+  @Test
+  public void testBuildBean_ExcludeFirst() {
+    TableCompactHandler handler = new TableCompactHandler(m_table);
+    handler.withColumnFilter(column -> column != m_table.getFirstColumn());
+    CompactBean bean = handler.buildBean(m_table.getRow(0));
+    assertTrue(bean.getTitle().contains("second"));
+    assertTrue(bean.getTitleSuffix().isEmpty());
+    assertTrue(bean.getSubtitle().contains("third"));
+    assertTrue(bean.getContent().contains("fourth"));
+    assertTrue(bean.getContent().contains("fifth"));
+    assertTrue(bean.getContent().contains("fifth"));
+    assertFalse(bean.getContent().contains("first"));
+    assertFalse(bean.getTitle().contains("first"));
+    assertFalse(bean.getSubtitle().contains("first"));
+  }
+
   public static class P_Table extends AbstractTable {
 
     public InvisibleFirstColumn getInvisibleFirstColumn() {

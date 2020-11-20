@@ -478,19 +478,17 @@ public class TableCompactHandler implements ITableCompactHandler {
   }
 
   protected IColumn<?> getDefaultTitleColumn() {
-    return getColumnAt(0, isUseOnlyVisibleColumns());
+    return getColumnAt(0);
   }
 
   protected IColumn<?> getDefaultSubtitleColumn() {
-    return getColumnAt(1, isUseOnlyVisibleColumns());
+    return getColumnAt(1);
   }
 
-  protected IColumn<?> getColumnAt(int index, boolean onlyVisible) {
+  protected IColumn<?> getColumnAt(int index) {
     List<IColumn<?>> columns = getTable().getColumnSet().getColumns();
-    if (onlyVisible) {
-      // Stream columns rather than using columnSet.getVisibleColumn(index) because we want the original order (defined visible) and not the order configured by the user
-      columns = columns.stream().filter(IColumn::isVisible).collect(Collectors.toList());
-    }
+    // Stream columns rather than using columnSet.getVisibleColumn(index) because we want the original order (defined visible) and not the order configured by the user
+    columns = columns.stream().filter(this::acceptColumn).collect(Collectors.toList());
     if (columns.size() < index + 1) {
       return null;
     }
