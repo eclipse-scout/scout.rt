@@ -11,12 +11,12 @@
 import {keys, KeyStroke} from '../../../index';
 import $ from 'jquery';
 
-export default class RadioButtonGroupLeftKeyStroke extends KeyStroke {
+export default class RadioButtonGroupLeftOrUpKeyStroke extends KeyStroke {
 
   constructor(radioButtonGroup) {
     super();
     this.field = radioButtonGroup;
-    this.which = [keys.LEFT];
+    this.which = [keys.LEFT, keys.UP];
     this.renderingHints.render = false;
   }
 

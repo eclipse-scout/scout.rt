@@ -19,8 +19,8 @@ import {
   RadioButton,
   RadioButtonGroupGridConfig,
   RadioButtonGroupLayout,
-  RadioButtonGroupLeftKeyStroke,
-  RadioButtonGroupRightKeyStroke,
+  RadioButtonGroupLeftOrUpKeyStroke,
+  RadioButtonGroupRightOrDownKeyStroke,
   scout,
   Status,
   TreeVisitResult,
@@ -82,8 +82,8 @@ export default class RadioButtonGroup extends ValueField {
     super._initKeyStrokeContext();
 
     this.keyStrokeContext.registerKeyStroke([
-      new RadioButtonGroupLeftKeyStroke(this),
-      new RadioButtonGroupRightKeyStroke(this)
+      new RadioButtonGroupLeftOrUpKeyStroke(this),
+      new RadioButtonGroupRightOrDownKeyStroke(this)
     ]);
   }
 

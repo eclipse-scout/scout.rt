@@ -482,8 +482,8 @@ export {default as RadioButtonGroup} from './form/fields/radiobutton/RadioButton
 export {default as RadioButtonGroupAdapter} from './form/fields/radiobutton/RadioButtonGroupAdapter';
 export {default as RadioButtonGroupGridConfig} from './form/fields/radiobutton/RadioButtonGroupGridConfig';
 export {default as RadioButtonGroupLayout} from './form/fields/radiobutton/RadioButtonGroupLayout';
-export {default as RadioButtonGroupLeftKeyStroke} from './form/fields/radiobutton/RadioButtonGroupLeftKeyStroke';
-export {default as RadioButtonGroupRightKeyStroke} from './form/fields/radiobutton/RadioButtonGroupRightKeyStroke';
+export {default as RadioButtonGroupLeftOrUpKeyStroke} from './form/fields/radiobutton/RadioButtonGroupLeftOrUpKeyStroke';
+export {default as RadioButtonGroupRightOrDownKeyStroke} from './form/fields/radiobutton/RadioButtonGroupRightOrDownKeyStroke';
 export {default as RadioButtonKeyStroke} from './form/fields/radiobutton/RadioButtonKeyStroke';
 export {default as SequenceBox} from './form/fields/sequencebox/SequenceBox';
 export {default as SequenceBoxGridConfig} from './form/fields/sequencebox/SequenceBoxGridConfig';
