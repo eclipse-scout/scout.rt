@@ -84,6 +84,7 @@ export default class Calendar extends Widget {
     this._menuInjectionTargetMenusChangedHandler = null;
 
     this._addWidgetProperties(['components', 'menus', 'selectedComponent']);
+    this._addPreserveOnPropertyChangeProperties(['selectedComponent']);
   }
 
   init(model, session, register) {
