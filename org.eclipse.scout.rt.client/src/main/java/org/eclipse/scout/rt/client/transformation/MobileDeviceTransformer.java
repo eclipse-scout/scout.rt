@@ -200,6 +200,9 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   @Override
   public void notifyPageDetailTableChanged(ITable table) {
     IPage<?> activePage = getDesktop().getOutline().getActivePage();
+    if (activePage == null) {
+      return;
+    }
     IPage<?> parentPage = activePage.getParentPage();
     if (parentPage == null) {
       return;
