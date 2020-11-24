@@ -15,6 +15,7 @@ export default class TableControlAdapterMenu extends FormMenu {
   constructor() {
     super();
 
+    this.tableControl = null;
     this._tableControlPropertyChangeHandler = this._onTableControlPropertyChange.bind(this);
     this._tableControlDestroyHandler = this._onTableControlDestroy.bind(this);
 
@@ -30,6 +31,11 @@ export default class TableControlAdapterMenu extends FormMenu {
       throw new Error('Cannot adapt to undefined tableControl');
     }
     this._installListeners();
+  }
+
+  _destroy() {
+    this._uninstallListeners();
+    super._destroy();
   }
 
   _installListeners() {

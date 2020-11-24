@@ -184,6 +184,9 @@ export default class WidgetPopup extends Popup {
    * @Override
    */
   position(switchIfNecessary) {
+    if (!this.rendered) {
+      return;
+    }
     super.position(switchIfNecessary);
     if (this.resizable) {
       let resizable = this.$container.data('resizable');

@@ -862,6 +862,9 @@ export default class Popup extends Widget {
   }
 
   position(switchIfNecessary) {
+    if (!this.rendered) {
+      return;
+    }
     this._validateVisibility();
     this._position(switchIfNecessary);
   }
@@ -876,6 +879,9 @@ export default class Popup extends Widget {
   }
 
   setLocation(location) {
+    if (!this.rendered) {
+      return;
+    }
     this.$container
       .css('left', location.x)
       .css('top', location.y);

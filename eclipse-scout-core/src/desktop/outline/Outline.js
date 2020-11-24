@@ -506,8 +506,6 @@ export default class Outline extends Tree {
 
   setDefaultDetailForm(defaultDetailForm) {
     this.setProperty('defaultDetailForm', defaultDetailForm);
-    this._updateOutlineOverview();
-    this.updateDetailContent();
   }
 
   _setDefaultDetailForm(defaultDetailForm) {
@@ -517,6 +515,10 @@ export default class Outline extends Tree {
     this._setProperty('defaultDetailForm', defaultDetailForm);
     if (this.defaultDetailForm) {
       this.defaultDetailForm.detailForm = true;
+    }
+    if (this.initialized) {
+      this._updateOutlineOverview();
+      this.updateDetailContent();
     }
   }
 
@@ -742,6 +744,10 @@ export default class Outline extends Tree {
 
   setEmbedDetailContent(embedDetailContent) {
     this.setProperty('embedDetailContent', embedDetailContent);
+  }
+
+  _setEmbedDetailContent(embedDetailContent) {
+    this._setProperty('embedDetailContent', embedDetailContent);
     this.updateDetailContent();
   }
 
@@ -902,7 +908,9 @@ export default class Outline extends Tree {
       }
     }
 
-    // Add table controls to nodeMenus
+    // Add table controls to nodeMenus (destroy previously created ones first to cleanup correctly)
+    let oldMenus = this.nodeMenuBar.menuItems.filter(menu => menu instanceof TableControlAdapterMenu);
+    oldMenus.forEach(oldMenu => oldMenu.destroy());
     tableControls.forEach(function(tableControl) {
       let menu = scout.create('TableControlAdapterMenu',
         TableControlAdapterMenu.adaptTableControlProperties(tableControl, {
