@@ -31,8 +31,8 @@ export default class TableControl extends Action {
     this.table = this.getTable();
     super._init(model);
     // retain the size with 'dense' in case we're in dense mode
-    let denseClass = this.session.desktop.dense ? ' dense' : '';
-    TableControl.CONTAINER_SIZE = styles.getSize('table-control-container' + denseClass, 'height', 'height', TableControl.CONTAINER_SIZE);
+    this.denseClass = this.session.desktop.dense ? ' dense' : '';
+    TableControl.CONTAINER_SIZE = styles.getSize('table-control-container' + this.denseClass, 'height', 'height', TableControl.CONTAINER_SIZE);
     this.height = TableControl.CONTAINER_SIZE;
     this.animateDuration = TableControl.CONTAINER_ANIMATE_DURATION;
     this._setSelected(this.selected);

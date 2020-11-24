@@ -66,6 +66,7 @@ export default class ChartTableControl extends TableControl {
   _renderChart() {
     if (this.chart) {
       this.chart.render(this.$contentContainer);
+      this.chart.$container.addClass(this.denseClass);
     }
   }
 
