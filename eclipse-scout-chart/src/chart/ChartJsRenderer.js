@@ -84,6 +84,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this.chartJs = null;
     this.minSpaceBetweenYTicks = 35;
     this.minSpaceBetweenXTicks = 150;
+    this.maxXAxesTicksHeigth = 75;
     this.numSupportedColors = 6;
     this.colorSchemeCssClass = '';
     this.minRadialChartDatalabelSpace = 25;
@@ -96,6 +97,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this._xLabelFormatter = this._formatXLabel.bind(this);
     this._yLabelFormatter = this._formatYLabel.bind(this);
 
+    this._xAxisFitter = this._fitXAxis.bind(this);
     this._yAxisFitter = this._fitYAxis.bind(this);
 
     this._radialChartDatalabelsDisplayHandler = this._displayDatalabelsOnRadialChart.bind(this);
@@ -659,6 +661,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           }
         }, xAxes[i]);
       }
+      xAxes[i].afterCalculateTickRotation = this._xAxisFitter;
     }
   }
 
@@ -799,6 +802,48 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       }
     }
     return this.session.locale.decimalFormat.format(Math.sign(label) * abs) + abbreviation;
+  }
+
+  _fitXAxis(xAxis) {
+    if (!xAxis || xAxis.labelRotation === 0) {
+      return;
+    }
+    let maxHeight = this.maxXAxesTicksHeigth,
+      defaultGlobal = ChartJs.defaults.global,
+      defaultTicks = ChartJs.defaults.scale.ticks,
+      fontSize,
+      maxRotation;
+    if (this.chartJs) {
+      let chartArea = this.chartJs.chartArea,
+        chartAreaHeight = Math.abs(chartArea.top - chartArea.bottom);
+      maxHeight = Math.min(maxHeight, chartAreaHeight / 3);
+    }
+    if (xAxis.options && xAxis.options.ticks) {
+      maxRotation = xAxis.options.ticks.maxRotation;
+      fontSize = xAxis.options.ticks.fontSize;
+    }
+    maxRotation = maxRotation || defaultTicks.maxRotation;
+    fontSize = fontSize || defaultTicks.fontSize || defaultGlobal.defaultFontSize;
+    // if the chart is very narrow, chart.js sometimes calculates with a negative width of the canvas
+    // this causes NaN for labelRotation and height
+    if (isNaN(xAxis.labelRotation)) {
+      xAxis.labelRotation = maxRotation;
+    }
+    xAxis.height = isNaN(xAxis.height) ? maxHeight : Math.min(xAxis.height, maxHeight);
+    // the rotation (degrees), needs to be transformed to radians ((labelRotation / 180) * pi)
+    let labelRotation = xAxis.labelRotation,
+      // the label is a rectangle (labelWidth x fontSize) which is rotated
+      // => height = sin(labelRotation) * labelLength + sin(90° - labelRotation) * fontSize
+      // <=> labelLength = (height - sin(90° - labelRotation) * fontSize) / sin(labelRotation)
+      maxLabelLength = (maxHeight - (fontSize * Math.sin(((90 - labelRotation) / 180) * Math.PI))) / Math.sin((labelRotation / 180) * Math.PI);
+    if (xAxis.longestLabelWidth > maxLabelLength) {
+      let measureText = xAxis.ctx.measureText.bind(xAxis.ctx);
+      xAxis._ticks.forEach(tick => {
+        tick.label = strings.truncateText(tick.label, maxLabelLength, measureText);
+      });
+      // reset label sizes, chart.js will recalculate them using the new truncated labels
+      xAxis._labelSizes = null;
+    }
   }
 
   _fitYAxis(yAxis) {
