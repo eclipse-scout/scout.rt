@@ -74,6 +74,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     transformations.add(MobileDeviceTransformation.MAXIMIZE_DIALOG);
     transformations.add(MobileDeviceTransformation.SET_SEQUENCEBOX_UI_HEIGHT);
     transformations.add(MobileDeviceTransformation.USE_DIALOG_STYLE_FOR_VIEW);
+    transformations.add(MobileDeviceTransformation.AVOID_DETAIL_FORM_AS_DISPLAY_PARENT);
 
     for (IDeviceTransformation transformation : transformations) {
       getDeviceTransformationConfig().enableTransformation(transformation);
@@ -122,6 +123,15 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
       form.addCssClass("mobile-view");
       // Use same position as for dialogs
       form.getRootGroupBox().setMenuBarPosition(IGroupBox.MENU_BAR_POSITION_BOTTOM);
+    }
+
+    // If a detail form were used as display parent, it would immediately disappear after the bench is displayed.
+    // This happens because the detail form is removed along with the navigation because it is embedded into a page, and if a display parent is removed the child forms are removed as well.
+    // Since the navigation is only removed in compact mode it only needs to be done if that mode is active.
+    if (IDesktop.DISPLAY_STYLE_COMPACT.equals(getDesktop().getDisplayStyle())
+        && getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.AVOID_DETAIL_FORM_AS_DISPLAY_PARENT, form)
+        && getDesktop().getPageDetailForm() == form.getDisplayParent()) {
+      form.setDisplayParent(getDesktop().getOutline());
     }
   }
 
