@@ -144,12 +144,7 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
           LOG.debug("HealthCheck[{}] has started", getName());
           try {
             boolean result = execCheckHealth();
-            if (result) {
-              LOG.debug("HealthCheck[{}] was successful", getName());
-            }
-            else {
-              LOG.warn("HealthCheck[{}] failed.", getName());
-            }
+            notifyHealthCheckResult(result);
             return result;
           }
           catch (InterruptedException e) {
@@ -169,4 +164,18 @@ public abstract class AbstractHealthChecker implements IHealthChecker {
     }
   }
 
+  /**
+   * Called after a health check was executed.
+   * 
+   * @param result
+   *          status of last executed health check
+   */
+  protected void notifyHealthCheckResult(boolean result) {
+    if (result) {
+      LOG.debug("HealthCheck[{}] was successful", getName());
+    }
+    else {
+      LOG.warn("HealthCheck[{}] failed.", getName());
+    }
+  }
 }
