@@ -70,6 +70,9 @@ export function shiftToNextDayOfType(date, day) {
  */
 export function shiftToNextDayAndDate(date, dayInWeek, dayInMonth) {
   let tmpDate = new Date(date.getTime());
+  if (dayInMonth < tmpDate.getDate()) {
+    tmpDate.setMonth(tmpDate.getMonth() + 1);
+  }
   tmpDate.setDate(dayInMonth);
   while (tmpDate.getDay() !== dayInWeek || tmpDate.getDate() !== dayInMonth) {
     tmpDate = shift(tmpDate, 0, 1, 0);
