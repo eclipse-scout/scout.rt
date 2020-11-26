@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -154,23 +154,24 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
       return;
     }
 
-    // suppress a revalidate of the layout tree, since setLabelPosition would trigger it.
+    // suppress a validate of the layout tree, because these widgets will be validated later anyway.
+    // the component still might be marked as invalid (which is necessary) caused by the responsive modifications applied.
     let htmlParent;
     if (widget.htmlComp) {
-      widget.htmlComp.suppressInvalidate = true;
+      widget.htmlComp.suppressValidate = true;
       htmlParent = widget.htmlComp.getParent();
       if (htmlParent) {
-        htmlParent.suppressInvalidate = true;
+        htmlParent.suppressValidate = true;
       }
     }
 
     super._transformWidget(widget);
 
     if (widget.htmlComp) {
-      widget.htmlComp.suppressInvalidate = false;
+      widget.htmlComp.suppressValidate = false;
     }
     if (htmlParent) {
-      htmlParent.suppressInvalidate = false;
+      htmlParent.suppressValidate = false;
     }
   }
 

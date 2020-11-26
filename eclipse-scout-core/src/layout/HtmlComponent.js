@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,6 +39,14 @@ export default class HtmlComponent {
      * May be set to temporarily disable invalidation (e.g. if the component gets modified during the layouting process)
      */
     this.suppressInvalidate = false;
+
+    /**
+     * May be set to temporarily disable layout validation (e.g. if the component gets modified during the layouting process).
+     * It is still possible to invalidate its layout. But as long as this flag is set, it will not validate the layout.
+     * It is the responsibility of the caller to ensure that the component is validated again (if necessary) when the layout validation suppression is removed.
+     * @type {boolean}
+     */
+    this.suppressValidate = false;
 
     /**
      * Set pixelBasedSizing to false if your component automatically adjusts its size,
@@ -135,18 +143,26 @@ export default class HtmlComponent {
     if (!this.layout) {
       throw new Error('Called layout() but component has no layout');
     }
-    if (!this.valid) {
-      if (!this._checkValidationPossible()) {
-        return false;
-      }
-      this.layouting = true;
-      this.layout.layout(this.$comp);
-      this.layouting = false;
-      this.layouted = true;
-      // Save size for later use (necessary if pixelBasedSizing is set to false)
-      this.sizeCached = this.size({exact: true});
-      this.valid = true;
+    if (this.valid) {
+      return true;
     }
+    if (this.suppressValidate) {
+      return false;
+    }
+    if (this.layouting) {
+      return false;
+    }
+    if (!this._checkValidationPossible()) {
+      return false;
+    }
+
+    this.layouting = true;
+    this.layout.layout(this.$comp);
+    this.layouting = false;
+    this.layouted = true;
+    // Save size for later use (necessary if pixelBasedSizing is set to false)
+    this.sizeCached = this.size({exact: true});
+    this.valid = true;
     return true;
   }
 
@@ -226,6 +242,9 @@ export default class HtmlComponent {
    * Layouts all invalid components
    */
   validateLayoutTree() {
+    if (this.suppressValidate) {
+      return;
+    }
     this.session.layoutValidator.validate();
   }
 
