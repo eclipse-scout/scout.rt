@@ -84,6 +84,10 @@ export default class Device {
       this._installActiveHandler();
     }
 
+    if (this._needsIPhoneRotationHack()) {
+      this._fixIPhoneRotationBug();
+    }
+
     return promises;
   }
 
@@ -132,6 +136,59 @@ export default class Device {
   _installActiveHandler() {
     document.addEventListener('touchstart', () => {
     }, false);
+  }
+
+  _needsIPhoneRotationHack() {
+    $.log.isInfoEnabled() && $.log.info('FastClick script loaded and attached');
+    // iPad does not automatically switch to minimal-ui mode on rotation.
+    // Also the hack is not necessary if the body is scrollable (which can be achieved with a custom desktop).
+    return this.isIphone() && !this.isStandalone() && $(document.body).css('overflow') === 'hidden';
+  }
+
+  /**
+   * The iphone wants to activate the minimal-ui mode when it is rotated to landscape. This would actually be a good thing but unfortunately it is buggy.
+   * When the device is rotated there will be a white bar visible at the bottom of the screen.
+   * When it is rotated back it may look ok at first but touching an element does not work anymore because the touchpoint is about 30px at the wrong location.
+   * <p>
+   * This happens because the height used for layouting the desktop is smaller than it should be. This layouting is triggered by the window resize event, so obviously
+   * the resize event comes too early and no resize event will be triggered when the minimal-ui mode is activated.
+   * <p>
+   * Unfortunately it is also not possible to schedule the relayouting after a rotation because the height does not seem to be reliable.
+   * Even if the window or body size will explicitly be set to the viewport size, there will be a white bar at the bottom, even though the scout desktop is layouted with the correct size.
+   * <p>
+   * Luckily, it is possible to show the address bar programmatically but we need to wait for the rotation animation to complete.
+   * Since there is no event for that we need to try it several times, sometimes it will work after 150ms, sometimes we have to wait 250ms.
+   * This is quite a hack and will likely break with a future ios release...
+   */
+  _fixIPhoneRotationBug() {
+    $.log.isDebugEnabled() && $.log.debug('Enabling iPhone rotation workaround.');
+    let orientation = this.orientation();
+    let count = 0;
+    let docElem = document.documentElement;
+    window.addEventListener('resize', event => {
+      let newOrientation = Device.get().orientation();
+      if (orientation !== newOrientation) {
+        orientation = newOrientation;
+        count = 0;
+        tryShowAddressBar();
+      }
+    });
+
+    function tryShowAddressBar() {
+      setTimeout(() => {
+        docElem.scrollTop = 0;
+        if (++count < 5) {
+          tryShowAddressBar();
+        }
+      }, 50);
+    }
+  }
+
+  orientation() {
+    if (window.innerHeight > window.innerWidth) {
+      return 'portrait';
+    }
+    return 'landscape';
   }
 
   hasOnScreenKeyboard() {
