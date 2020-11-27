@@ -10,6 +10,9 @@
  */
 package org.eclipse.scout.rt.client.ui.form.useradmin;
 
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
@@ -26,6 +29,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
 
 @ClassId("5bcb48f0-9b72-4f28-9c08-038cd5d9a1c4")
@@ -177,6 +181,9 @@ public class DefaultPasswordForm extends AbstractForm {
       }
       IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
       svc.resetPassword(getUserId(), getNewPasswordField().getValue().toCharArray());
+      //owasp: reset session
+      IClientSession session = (IClientSession) ISession.CURRENT.get();
+      ModelJobs.schedule(() -> session.stop(), ModelJobs.newInput(ClientRunContexts.empty().withSession(session, false)));
     }
   }
 
@@ -188,6 +195,9 @@ public class DefaultPasswordForm extends AbstractForm {
       }
       IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
       svc.changePassword(getUserId(), getOldPasswordField().getValue().toCharArray(), getNewPasswordField().getValue().toCharArray());
+      //owasp: reset session
+      IClientSession session = (IClientSession) ISession.CURRENT.get();
+      ModelJobs.schedule(() -> session.stop(), ModelJobs.newInput(ClientRunContexts.empty().withSession(session, false)));
     }
   }
 }
