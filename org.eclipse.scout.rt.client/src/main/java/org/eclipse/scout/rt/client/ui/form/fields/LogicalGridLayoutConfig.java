@@ -102,6 +102,14 @@ public class LogicalGridLayoutConfig {
   }
 
   /**
+   * Reduces the hgap to a smaller size. This small size is used by the UI itself for some specific situations (e.g. for
+   * the SequenceBox). It is the same value as used for the less variable @logical-grid-small-column-gap.
+   */
+  public LogicalGridLayoutConfig withSmallHGap() {
+    return withHGap(4);
+  }
+
+  /**
    * @return the vertical gap in pixels to use between two logical grid rows.
    */
   public int getVGap() {
