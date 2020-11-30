@@ -139,7 +139,7 @@ export default class Device {
   }
 
   _needsIPhoneRotationHack() {
-    $.log.isInfoEnabled() && $.log.info('FastClick script loaded and attached');
+    $.log.isDebugEnabled() && $.log.debug('Activating iPhone rotation workaround.');
     // iPad does not automatically switch to minimal-ui mode on rotation.
     // Also the hack is not necessary if the body is scrollable (which can be achieved with a custom desktop).
     return this.isIphone() && !this.isStandalone() && $(document.body).css('overflow') === 'hidden';
