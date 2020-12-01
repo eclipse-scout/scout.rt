@@ -48,6 +48,10 @@ export default class PopupWindow {
       $myWindow = $(this.myWindow),
       $myDocument = $(myDocument);
 
+    // Establish the link again, as Chrome removes this property after a page load.
+    // (page load is made by design in PopupBlockerHandler.openWindow)
+    this.myWindow.popupWindow = this;
+
     // Install polyfills on new window
     polyfills.install(this.myWindow);
     scout.prepareDOM(myDocument);
