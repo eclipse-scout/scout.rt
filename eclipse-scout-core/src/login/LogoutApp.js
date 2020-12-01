@@ -11,15 +11,22 @@
 import {App, ObjectFactory, scout, texts} from '../index';
 import $ from 'jquery';
 
-/**
- * init options:
- * - loginUrl: URL to redirect after login again button click
- * - logoUrl: default points to 'logo.png'
- */
 export default class LogoutApp extends App {
 
   constructor() {
     super();
+  }
+
+  /**
+   * @inheritDoc
+   * @param {{bootstrap?: {textsUrl?, localesUrl?, codesUrl?}}} [options] see {@link App.init}
+   * @param {string} [options.logoUrl] the url to the logo. Default is 'logo.png'.
+   * @param {string} [options.loginUrl] the url to use by the login again button. Default is './';
+   * @param {object} [options.texts] texts to be used in the logout box. By default the texts provided by the <scout-texts> tags are used, see {@link texts.readFromDOM}.
+   * Otherwise the texts will only be in English.
+   */
+  init(options) {
+    return super.init(options);
   }
 
   /**
