@@ -52,14 +52,7 @@ scout.BusyIndicator.prototype.render = function($parent) {
 };
 
 scout.BusyIndicator.prototype._render = function() {
-  // 1. Render modality glasspanes (must precede adding the busy indicator to the DOM)
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(this);
-  this._glassPaneRenderer.renderGlassPanes();
-  this._glassPaneRenderer.eachGlassPane(function($glassPane) {
-    $glassPane.addClass('busy');
-  });
-
-  // 2. Render busy indicator (still hidden by CSS, will be shown later in setTimeout.
+  // Render busy indicator (still hidden by CSS, will be shown later in setTimeout.
   // But don't use .hidden, otherwise the box' size cannot be calculated correctly!)
   this.$container = this.$parent.appendDiv('busyindicator invisible');
 
@@ -100,6 +93,13 @@ scout.BusyIndicator.prototype._render = function() {
     // Maybe, this is not required if problem with single-button form is solved (see FormController.js)
     this.session.focusManager.validateFocus();
   }.bind(this), this.showTimeout);
+
+  // Render modality glasspanes (must precede adding the busy indicator to the DOM)
+  this._glassPaneRenderer = new scout.GlassPaneRenderer(this);
+  this._glassPaneRenderer.renderGlassPanes();
+  this._glassPaneRenderer.eachGlassPane(function($glassPane) {
+    $glassPane.addClass('busy');
+  });
 };
 
 scout.BusyIndicator.prototype._postRender = function() {

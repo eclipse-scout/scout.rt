@@ -2047,6 +2047,15 @@ describe('Desktop', function() {
       $glassPanes = modalDialog.$container.find('.glasspane');
       expect($glassPanes.length > 0).toBe(true);
       fileChooser.close();
+
+      // Test with busy-indicator
+      var busyIndicator = scout.create('BusyIndicator', {
+        parent: desktop
+      });
+      busyIndicator.render();
+      $glassPanes = modalDialog.$container.find('.glasspane');
+      expect($glassPanes.length > 0).toBe(true);
+      busyIndicator.remove();
     });
 
     /**
