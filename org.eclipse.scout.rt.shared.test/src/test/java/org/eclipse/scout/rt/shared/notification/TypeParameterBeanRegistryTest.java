@@ -16,9 +16,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.eclipse.scout.rt.platform.TypeParameterBeanRegistry;
+import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
+import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.junit.Test;
 
 /**
@@ -104,6 +107,48 @@ public class TypeParameterBeanRegistryTest {
     assertEquals(l.get(3), res.get(0));
   }
 
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testFunctionalInterface_innerClass() {
+    final TypeParameterBeanRegistry<Consumer> reg = new TypeParameterBeanRegistry<>(Consumer.class);
+    StringHolder holder1 = new StringHolder();
+    Consumer<String> stringConsumer1 = new Consumer<String>() {
+      @Override
+      public void accept(String t) {
+        holder1.setValue(t);
+      }
+    };
+    reg.registerBean(stringConsumer1);
+    reg.getBeans(String.class).get(0).accept("foo");
+    assertEquals("foo", holder1.getValue());
+  }
+
+  @Test
+  public void testFunctionalInterface_lamdbaExpression() {
+    final TypeParameterBeanRegistry<Consumer> reg = new TypeParameterBeanRegistry<>(Consumer.class);
+    Consumer<String> stringConsumer = this::consume;
+
+    // fails to register without additional type information (used TypeCastUtility is not able to detect generic type parameter out of lambda)
+    ScoutAssert.assertThrows(IllegalArgumentException.class, () -> reg.registerBean(stringConsumer));
+
+    StringHolder holder = new StringHolder();
+    Consumer<String> stringConsumer2 = input -> {
+      holder.setValue(input);
+    };
+    // register lambda with corresponding type parameter
+    reg.registerBean(stringConsumer2, String.class);
+    List<Consumer> beans = reg.getBeans(String.class);
+    assertEquals(1, beans.size());
+    @SuppressWarnings("unchecked")
+    Consumer<String> consumer = beans.get(0);
+    consumer.accept("foo");
+    assertEquals("foo", holder.getValue());
+  }
+
+  protected void consume(String string) {
+    // NOP
+  }
+
   interface ITestHandler<T> {
   }
 
@@ -118,5 +163,4 @@ public class TypeParameterBeanRegistryTest {
 
   class LongHandler implements ITestHandler<Long> {
   }
-
 }
