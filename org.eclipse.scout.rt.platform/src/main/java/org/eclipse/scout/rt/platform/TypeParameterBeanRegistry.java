@@ -85,18 +85,28 @@ public class TypeParameterBeanRegistry<BEAN> {
   }
 
   /**
-   * Registers the given bean.
+   * Registers the given bean by using its (first) generic type parameter as key.
    *
    * @return A token representing the registration of the given bean. This token can later be used to unregister the
    *         bean.
    */
   public IRegistrationHandle registerBean(final BEAN bean) {
+    final Class genericTypeParameter = TypeCastUtility.getGenericsParameterClass(bean.getClass(), m_beanType);
+    return registerBean(bean, genericTypeParameter);
+  }
+
+  /**
+   * Registers the given bean using the given {@code genericTypeParameter} as key.
+   *
+   * @return A token representing the registration of the given bean. This token can later be used to unregister the
+   *         bean.
+   */
+  public IRegistrationHandle registerBean(final BEAN bean, final Class<?> genericTypeParameter) {
     m_computedLookupTypes.clear();
 
     m_lock.writeLock().lock();
     try {
-      final Class genericParameterType = TypeCastUtility.getGenericsParameterClass(bean.getClass(), m_beanType);
-      final BeanRegistration<BEAN> beanRegistration = new BeanRegistration<>(bean, genericParameterType);
+      final BeanRegistration<BEAN> beanRegistration = new BeanRegistration<>(bean, genericTypeParameter);
 
       // Add the bean to the inventory. Thereby, the indexes are computed for that element.
       m_inventory.add(beanRegistration);
