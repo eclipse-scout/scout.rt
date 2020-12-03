@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.messagebox;
 
 import java.beans.PropertyChangeListener;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -26,18 +27,21 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.DisplayParentResolver;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
+import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Implementation of message box.<br/>
@@ -363,18 +367,28 @@ public class MessageBox extends AbstractWidget implements IMessageBox {
   }
 
   @Override
+  public void doOk() {
+    closeInternal(CollectionUtility.arrayList(
+        new ImmutablePair<>(m_yesButtonText, YES_OPTION),
+        new ImmutablePair<>(m_noButtonText, NO_OPTION),
+        new ImmutablePair<>(m_cancelButtonText, CANCEL_OPTION)));
+  }
+
+  @Override
   public void doClose() {
+    closeInternal(CollectionUtility.arrayList(
+        new ImmutablePair<>(m_cancelButtonText, CANCEL_OPTION),
+        new ImmutablePair<>(m_noButtonText, NO_OPTION),
+        new ImmutablePair<>(m_yesButtonText, YES_OPTION)));
+  }
+
+  private void closeInternal(List<Pair<String, Integer>> options) {
     if (!m_answerSet) {
       m_answerSet = true;
-      if (StringUtility.hasText(m_yesButtonText)) {
-        m_answer = YES_OPTION;
-      }
-      else if (StringUtility.hasText(m_noButtonText)) {
-        m_answer = NO_OPTION;
-      }
-      else if (StringUtility.hasText(m_cancelButtonText)) {
-        m_answer = CANCEL_OPTION;
-      }
+      options.stream()
+          .filter(option -> StringUtility.hasText(option.getLeft()))
+          .findFirst()
+          .ifPresent(option -> m_answer = option.getRight());
     }
     closeMessageBox();
   }

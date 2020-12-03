@@ -230,7 +230,13 @@ public interface IMessageBox extends IWidget {
 
   /**
    * Closes the message box and resolves the blocking call. The close result is set according to the available buttons
-   * on the message box with the following priority: {@link #CANCEL_OPTION}, {@link #NO_OPTION}, ({@link #YES_OPTION}.
+   * on the message box with the following priority: {@link #YES_OPTION}, {@link #NO_OPTION}, {@link #CANCEL_OPTION}.
+   */
+  void doOk();
+
+  /**
+   * Closes the message box and resolves the blocking call. The close result is set according to the available buttons
+   * on the message box with the following priority: {@link #CANCEL_OPTION}, {@link #NO_OPTION}, {@link #YES_OPTION}.
    */
   void doClose();
 }
