@@ -368,6 +368,14 @@ public class TableCompactHandler implements ITableCompactHandler {
   }
 
   @Override
+  public TableCompactHandler addColumnFilter(Predicate<IColumn<?>> filter) {
+    if (m_columnFilter != null) {
+      filter = m_columnFilter.and(filter);
+    }
+    return withColumnFilter(filter);
+  }
+
+  @Override
   public Predicate<IColumn<?>> getColumnFilter() {
     return m_columnFilter;
   }

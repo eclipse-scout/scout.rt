@@ -354,6 +354,21 @@ public class TableCompactHandlerTest {
     assertFalse(bean.getSubtitle().contains("first"));
   }
 
+  @Test
+  public void testBuildBean_AddFilter() {
+    TableCompactHandler handler = new TableCompactHandler(m_table);
+    handler.withColumnFilter(column -> column != m_table.getThirdColumn());
+    handler.addColumnFilter(column -> column != m_table.getSecondColumn());
+    CompactBean bean = handler.buildBean(m_table.getRow(0));
+    assertTrue(bean.getTitle().contains("first"));
+    assertTrue(bean.getTitleSuffix().isEmpty());
+    assertFalse(bean.getSubtitle().contains("second"));
+    assertFalse(bean.getContent().contains("second"));
+    assertFalse(bean.getContent().contains("third"));
+    assertTrue(bean.getSubtitle().contains("fourth"));
+    assertTrue(bean.getContent().contains("fifth"));
+  }
+
   public static class P_Table extends AbstractTable {
 
     public InvisibleFirstColumn getInvisibleFirstColumn() {

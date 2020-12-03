@@ -180,6 +180,12 @@ public interface ITableCompactHandler {
    */
   ITableCompactHandler withColumnFilter(Predicate<IColumn<?>> filter);
 
+  /**
+   * Compared to {@link #withColumnFilter(Predicate)}, the existing filter, if there is one, won't be replaced but
+   * concatenated using {@link Predicate#and(Predicate)}.
+   */
+  ITableCompactHandler addColumnFilter(Predicate<IColumn<?>> filter);
+
   Predicate<IColumn<?>> getColumnFilter();
 
   Consumer<CompactLine> getLineCustomizer();
