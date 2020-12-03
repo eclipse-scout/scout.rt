@@ -10,7 +10,7 @@
  */
 import {AbstractChartRenderer, Chart} from '../index';
 import ChartJs from 'chart.js';
-import {arrays, colorSchemes, Event, strings, styles} from '@eclipse-scout/core';
+import {arrays, colorSchemes, Event, objects, strings, styles} from '@eclipse-scout/core';
 // noinspection ES6UnusedImports
 import chartjs_plugin_datalabels from 'chartjs-plugin-datalabels';
 // noinspection ES6UnusedImports
@@ -1677,7 +1677,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       }
     }
     datasets.forEach(dataset => dataset.data.forEach(data => {
-      data.r = data.r * bubbleScalingFactor + bubbleRadiusOffset;
+      if (!objects.isNullOrUndefined(data.r)) {
+        data.r = data.r * bubbleScalingFactor + bubbleRadiusOffset;
+      }
     }));
   }
 
