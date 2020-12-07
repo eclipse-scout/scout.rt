@@ -818,8 +818,11 @@ export default class Calendar extends Widget {
   }
 
   _updateTopGrid() {
-    $('.calendar-component', this.$topGrid).each(function($index, part) {
-      $(part).data('component').remove();
+    $('.calendar-component', this.$topGrid).each((index, part) => {
+      let component = $(part).data('component');
+      if (component) {
+        component.remove();
+      }
     });
     var allDayComponents = this.components.filter(component => component.fullDay);
     // first remove all components and add them from scratch
