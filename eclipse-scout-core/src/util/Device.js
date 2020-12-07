@@ -177,7 +177,7 @@ export default class Device {
     function tryShowAddressBar() {
       setTimeout(() => {
         docElem.scrollTop = 0;
-        if (++count < 5) {
+        if (++count < 8) {
           tryShowAddressBar();
         }
       }, 50);
