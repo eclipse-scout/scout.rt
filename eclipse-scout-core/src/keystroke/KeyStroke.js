@@ -302,10 +302,14 @@ export default class KeyStroke {
       return false;
     }
     // event.ctrlKey||event.metaKey  --> some keystrokes with ctrl modifier are captured and suppressed by osx use in this cases command key
+    return KeyStroke.acceptModifiers(keyStroke, event) &&
+      scout.isOneOf(event.which, keyStroke.which);
+  }
+
+  static acceptModifiers(keyStroke, event) {
     return KeyStroke._acceptModifier(keyStroke.ctrl, (event.ctrlKey || event.metaKey)) &&
       KeyStroke._acceptModifier(keyStroke.alt, event.altKey) &&
-      KeyStroke._acceptModifier(keyStroke.shift, event.shiftKey) &&
-      scout.isOneOf(event.which, keyStroke.which);
+      KeyStroke._acceptModifier(keyStroke.shift, event.shiftKey);
   }
 
   static _acceptModifier(modifier, eventModifier) {

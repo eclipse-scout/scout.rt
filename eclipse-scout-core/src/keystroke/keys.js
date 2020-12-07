@@ -224,6 +224,12 @@ const keys = {
   browserMap: {
     [Device.Browser.FIREFOX]: {
       226: 60
+    },
+    [Device.Browser.SAFARI]: {
+      226: 188,
+      ctrl: {
+        226: 192
+      }
     }
   },
 
@@ -232,21 +238,25 @@ const keys = {
   /**
    * If a browser has a non-standard key-code for one of the keys defined in this file this function returns the correct key code for that browser.
    *
-   * @param keyCode {number}
+   * @param {number} keyCode
+   * @param {string} [modifier] some key codes change when a modifier is pressed
    * @returns {number}
    */
-  forBrowser: keyCode => keys.mapKey(keys.browserMap, keyCode),
+  forBrowser: (keyCode, modifier) => keys.mapKey(keys.browserMap, keyCode, modifier),
 
   /**
    * If a browser has a non-standard key-code for one of the keys defined in this file this function returns the original key for that browser.
    *
-   * @param keyCode {number}
+   * @param {number} keyCode
    * @returns {number}
    */
   fromBrowser: keyCode => keys.mapKey(keys.browserMapReverse, keyCode),
 
-  mapKey: (map, keyCode) => {
+  mapKey: (map, keyCode, modifier) => {
     let browserMap = map[Device.get().browser];
+    if (browserMap && modifier) {
+      browserMap = browserMap[modifier];
+    }
     if (browserMap && browserMap.hasOwnProperty(keyCode)) {
       // A mapping is defined for this browser and key-code
       return browserMap[keyCode];
