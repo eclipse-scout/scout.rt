@@ -29,7 +29,9 @@
   <url>https://eclipse.org/scout</url>
 
   <properties>
+    <org.eclipse.scout.rt_version>11.0-SNAPSHOT</org.eclipse.scout.rt_version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <eclipse_gerrit_username/>
   </properties>
 
   <build>

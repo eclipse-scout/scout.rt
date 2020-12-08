@@ -44,7 +44,7 @@
     <module id="parent" dir="__rootArtifactId__" name="parent">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory></directory>
+          <directory/>
           <includes>
             <include>**/*.xml</include>
             <include>**/*.launch</include>
@@ -176,7 +176,7 @@
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory></directory>
+          <directory/>
           <includes>
             <include>**/*.launch</include>
           </includes>
@@ -192,7 +192,7 @@
     <module id="ui.html" dir="__rootArtifactId__.ui.html" name="ui.html">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory></directory>
+          <directory/>
           <includes>
             <include>**/*.gitignore</include>
             <include>**/*.json</include>
@@ -263,7 +263,7 @@
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory></directory>
+          <directory/>
           <includes>
             <include>**/*.launch</include>
           </includes>
@@ -274,8 +274,8 @@
             <include>**/*.xml</include>
           </includes>
         </fileSet>
-        <fileSet filtered="false" encoding="UTF-8">
-          <directory></directory>
+        <fileSet encoding="UTF-8">
+          <directory/>
           <includes>
             <include>**/*.nls</include>
           </includes>
