@@ -483,7 +483,8 @@
   }
 
   /*
-  * Hides the scrollbars but lets the user still scroll (e.g. using mousewheel or touch). Does not work for Firefox.
+  * Hides the scrollbars but lets the user still scroll (e.g. using mousewheel or touch).
+  * This works a bit different for every browser.
   */
 
   .hide-scrollbars {
@@ -492,6 +493,9 @@
     }
 
     -ms-overflow-style: none;
+
+    /* Firefox: https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-width */
+    scrollbar-width: none;
   }
 
   /**
