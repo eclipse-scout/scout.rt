@@ -4178,7 +4178,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         resolvedRows.add(row);
       }
       else {
-        LOG.warn("could not resolve row {}", row);
+        LOG.info("Could not resolve row with keys {} in table {}",
+            row.getKeyValues(), this.getClass().getName(),
+            LOG.isDebugEnabled() ? new Exception("stacktrace") : null);
       }
     }
     return resolvedRows;
@@ -4298,7 +4300,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     synchronized (m_cachedFilteredRowsLock) {
       m_cachedFilteredRows = null;
     }
-    LOG.debug("fire rows updated {}", rows);
     TableEvent e = new TableEvent(this, TableEvent.TYPE_ROWS_UPDATED, rows);
     // For each row, add information about updated columns to the event. (A row may also be updated if
     // not specific column was changed, e.g. when a row's enabled state changes.)
