@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.sequencebox;
 
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
@@ -18,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
  * A {@link IFormField} that contains an ordered sequence of {@link IFormField}s.<br>
  * E.g. a range with start and end date.
  */
-public interface ISequenceBox extends ICompositeField {
+public interface ISequenceBox extends ICompositeField, IContextMenuOwner {
 
   String PROP_LAYOUT_CONFIG = "layoutConfig";
 

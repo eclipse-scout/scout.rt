@@ -16,11 +16,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.ISequenceBoxExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.SequenceBoxChains.SequenceBoxCheckFromToChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.SequenceBoxChains.SequenceBoxCreateLabelSuffixChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.SequenceBoxChains.SequenceBoxIsLabelSuffixCandidateChain;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -35,10 +40,12 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.IHolder;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +69,8 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   private SequenceBoxGrid m_grid;
   private String m_labelBase;
   private String m_labelSuffix;
+
+  private IContextMenu m_contextMenu;
 
   public AbstractSequenceBox() {
     this(true);
@@ -216,6 +225,50 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     updateLabelComposition();
     hideFieldStatusOfChildren();
     // attach change triggers
+
+    // menus
+    List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
+    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
+    for (Class<? extends IMenu> menuClazz : declaredMenus) {
+      menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
+    }
+    menus.addAllOrdered(contributedMenus);
+    injectMenusInternal(menus);
+    new MoveActionNodesHandler<>(menus).moveModelObjects();
+    m_contextMenu = new FormFieldContextMenu<>(this, menus.getOrderedList());
+  }
+
+  protected List<Class<? extends IMenu>> getDeclaredMenus() {
+    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
+    return ConfigurationUtility.removeReplacedClasses(filtered);
+  }
+
+  /**
+   * Override this internal method only in order to make use of dynamic menus<br>
+   * Used to add and/or remove menus<br>
+   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
+   *
+   * @param menus
+   *          live and mutable collection of configured menus
+   */
+  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
+  }
+
+  @Override
+  public IContextMenu getContextMenu() {
+    return m_contextMenu;
+  }
+
+  @Override
+  public List<IMenu> getMenus() {
+    return getContextMenu().getChildActions();
+  }
+
+  @Override
+  public <M extends IMenu> M getMenuByClass(Class<M> menuType) {
+    return MenuUtility.getMenuByClass(this, menuType);
   }
 
   @Override
