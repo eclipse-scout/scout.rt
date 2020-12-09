@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -31,14 +33,14 @@ import org.slf4j.LoggerFactory;
 import com.google.api.client.http.HttpResponse;
 
 /**
- * This class is a {@link Callable} to invoke the service operation as described by {@link IServiceTunnelRequest}
- * remotely on backend server. The HTTP connection is established based on the {@link AbstractHttpServiceTunnel}.
- * Additionally, this class implements {@link ICancellable} to cancel the ongoing request.
+ * This class is a {@link Callable} to invoke the service operation as described by {@link ServiceTunnelRequest}
+ * remotely on backend server. The HTTP connection is established based on the {@link HttpServiceTunnel}. Additionally,
+ * this class implements {@link ICancellable} to cancel the ongoing request.
  * <p>
  * This class is intended to be given to the job manager for execution and to be registered within the
  * {@link RunMonitor} for cancellation support.
  *
- * @see AbstractHttpServiceTunnel
+ * @see HttpServiceTunnel
  */
 public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelResponse> {
 
@@ -55,7 +57,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
   /**
    * Invokes the remote service operation.
    *
-   * @return {@link IServiceTunnelResponse}; is never <code>null</code>.
+   * @return {@link ServiceTunnelResponse}; is never <code>null</code>.
    */
   @Override
   public ServiceTunnelResponse call() throws Exception {
@@ -108,6 +110,13 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
       else if (RunMonitor.CURRENT.get().isCancelled()) {
         LOG.debug("Ignoring IOException for cancelled thread.", e);
         return new ServiceTunnelResponse(new FutureCancelledError("RunMonitor is cancelled.", e));
+      }
+      else if (e instanceof EOFException) {
+        ISession session = ISession.CURRENT.get();
+        if (session == null || session.isStopping() || !session.isActive()) {
+          LOG.debug("EOF detected for non-existing/stopping/non-active session.", e);
+          return new ServiceTunnelResponse(new FutureCancelledError("EOF detected.", e));
+        }
       }
       throw e;
     }
