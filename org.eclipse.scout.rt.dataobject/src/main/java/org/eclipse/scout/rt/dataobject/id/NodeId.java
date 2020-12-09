@@ -4,7 +4,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.NodeIdentifier;
 
 /**
- * Representing unique identifier of one node.
+ * Represents the unique identifier for one node.
  *
  * @see NodeIdentifier
  */
@@ -23,7 +23,7 @@ public final class NodeId extends AbstractStringId {
   }
 
   /**
-   * Returns {@link NodeId} of current node.
+   * Returns the {@link NodeId} of the current node.
    *
    * @see NodeIdentifier
    */
