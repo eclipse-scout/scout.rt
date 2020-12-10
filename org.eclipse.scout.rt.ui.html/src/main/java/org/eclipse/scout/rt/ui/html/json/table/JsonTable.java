@@ -393,7 +393,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
         if (value == null) {
           return null;
         }
-        return m_jsonColumns.get(value).getId();
+        JsonColumn<?> jsonColumn = m_jsonColumns.get(value);
+        if (jsonColumn == null) {
+          logContextColumnInconsistency(value);
+          return null;
+        }
+        return jsonColumn.getId();
       }
     });
 
@@ -1796,6 +1801,41 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   public void removeListener(JsonTableListener listener, Integer... eventTypes) {
     listeners().remove(listener, eventTypes);
+  }
+
+  // Temporary logging to analyze non-reproducible bug
+  protected void logContextColumnInconsistency(Object value) {
+    String debugInfo = "\nAdapterId : " + getId();
+    debugInfo += "\nModel     : " + getModel();
+    debugInfo += "\nValue     : " + (value instanceof IColumn ? toDebugInfo((IColumn<?>) value) : value);
+    debugInfo += "\nCtxColumn : " + toDebugInfo(getModel().getContextColumn());
+    debugInfo += "\nColumns:\n" + getModel().getColumns().stream()
+        .map(column -> "  " + toDebugInfo(column))
+        .collect(Collectors.joining("\n"));
+    debugInfo += "\nAdapters:\n" + m_jsonColumns.entrySet().stream()
+        .map(entry -> "  " + Integer.toHexString(entry.getKey().hashCode()) + " = " + toDebugInfo(entry.getValue()))
+        .collect(Collectors.joining("\n"));
+    LOG.info("Could not resolve context column, assuming null.\n--- DEBUG INFO --- {}", debugInfo);
+  }
+
+  protected String toDebugInfo(IColumn<?> column) {
+    if (column == null) {
+      return "null";
+    }
+    String text = column.getHeaderCell().getText();
+    return column.getClass().getName() + "@" + Integer.toHexString(column.hashCode()) +
+        " [" + (text == null ? "null" : "\"" + text + "\"") +
+        " viewIndexHint=" + column.getVisibleColumnIndexHint() +
+        " visible=" + column.isVisible() + "]";
+  }
+
+  protected String toDebugInfo(JsonColumn<?> jsonColumn) {
+    if (jsonColumn == null) {
+      return "null";
+    }
+    return jsonColumn.getClass().getName() + "@" + Integer.toHexString(jsonColumn.hashCode()) +
+        " adapterId: " + jsonColumn.getId() +
+        " model: " + toDebugInfo(jsonColumn.getColumn());
   }
 
   protected class P_TableListener extends TableAdapter {
