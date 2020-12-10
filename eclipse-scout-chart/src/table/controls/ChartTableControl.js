@@ -22,6 +22,7 @@ export default class ChartTableControl extends TableControl {
     };
     this.chartType = Chart.Type.BAR;
     this.oldChartType = null;
+    this.chartColorScheme = 'chart-table-control';
 
     // chart config selection
     this.$chartSelect = null;
@@ -709,7 +710,7 @@ export default class ChartTableControl extends TableControl {
       type: this.chartType,
       options: {
         handleResize: true,
-        colorScheme: 'chart-table-control',
+        colorScheme: this.chartColorScheme,
         maxSegments: 5,
         legend: {
           display: false
@@ -827,13 +828,18 @@ export default class ChartTableControl extends TableControl {
     segments.forEach(elem => {
       dataset.data.push(elem.value);
       dataset.deterministicKeys.push(elem.deterministicKey);
-      if (elem.label) {
+      if (!objects.isNullOrUndefined(elem.label)) {
         labels.push(elem.label);
       }
     });
 
     if (labels.length) {
       data.labels = labels;
+    }
+
+    // duplicate the dataset for pie charts, this is necessary for datalabels on the segments and outside of the pie chart
+    if (this.chartType === Chart.Type.PIE) {
+      data.datasets[1] = $.extend(true, {}, dataset);
     }
 
     return data;
@@ -1045,6 +1051,21 @@ export default class ChartTableControl extends TableControl {
       return;
     }
 
+    // first dataset is hidden but datalabels are displayed outside of the chart
+    config.data.datasets[0].weight = 0;
+    config.data.datasets[0].datalabels = {
+      display: 'auto',
+      color: styles.get([this.chartColorScheme, this.chartType + '-chart', 'elements', 'label'], 'fill').fill,
+      formatter: (value, context) => {
+        return context.chart.data.labels[context.dataIndex];
+      },
+      anchor: 'end',
+      align: 'end',
+      clamp: true,
+      offset: 10,
+      padding: 4
+    };
+
     config.options = $.extend(true, {}, config.options, {
       plugins: {
         datalabels: {
@@ -1057,8 +1078,8 @@ export default class ChartTableControl extends TableControl {
     config.options = $.extend(true, {}, config.options, {
       layout: {
         padding: {
-          top: Math.sign(margin) < 0 ? Math.abs(margin) : 0,
-          bottom: Math.sign(margin) > 0 ? margin : 0
+          top: 30 + (Math.sign(margin) < 0 ? Math.abs(margin) : 0),
+          bottom: 30 + (Math.sign(margin) > 0 ? margin : 0)
         }
       }
     });
@@ -1105,6 +1126,7 @@ export default class ChartTableControl extends TableControl {
         checkedIndices.push(idx);
       }
     });
+    let datasetIndex = 0;
     if (this.chartType === Chart.Type.PIE) {
       let maxSegments = this.chart.config.options.maxSegments,
         collapsedIndices = arrays.init(deterministicKeys.length - maxSegments).map((elem, idx) => idx + maxSegments);
@@ -1112,13 +1134,16 @@ export default class ChartTableControl extends TableControl {
         arrays.remove(checkedIndices, maxSegments - 1);
       }
       arrays.removeAll(checkedIndices, collapsedIndices);
+
+      // first dataset is hidden on pie charts
+      datasetIndex = 1;
     }
 
     let checkedItems = [];
     if (checkedIndices.length) {
       checkedIndices.forEach(index => {
         checkedItems.push({
-          datasetIndex: 0,
+          datasetIndex: datasetIndex,
           dataIndex: index
         });
       });
@@ -1132,7 +1157,9 @@ export default class ChartTableControl extends TableControl {
     let filters = [];
     if (this.chart && this.chart.config.data) {
       let maxSegments = this.chart.config.options.maxSegments,
-        dataset = this.chart.config.data.datasets[0],
+        // first dataset is hidden on pie charts
+        datasetIndex = this.chartType === Chart.Type.PIE ? 1 : 0,
+        dataset = this.chart.config.data.datasets[datasetIndex],
         getFilters = index => ({deterministicKey: dataset.deterministicKeys[index]});
       if (this.chartType === Chart.Type.PIE) {
         getFilters = index => {
@@ -1144,7 +1171,7 @@ export default class ChartTableControl extends TableControl {
         };
       }
 
-      let checkedIndices = this.chart.checkedItems.filter(item => item.datasetIndex === 0)
+      let checkedIndices = this.chart.checkedItems.filter(item => item.datasetIndex === datasetIndex)
         .map(item => item.dataIndex);
       checkedIndices.forEach(index => {
         arrays.pushAll(filters, getFilters(index));

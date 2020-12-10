@@ -727,6 +727,27 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       }, plugins.datalabels);
       plugins.datalabels.display = 'auto';
     }
+    if (config.options.reformatLabels) {
+      let handleFormatter = formatter => {
+        return (value, context) => {
+          let label = formatter.call(context.chart, value, context);
+          return this._formatLabel(label);
+        };
+      };
+
+      if (config.data) {
+        let datasets = config.data.datasets;
+        datasets.forEach(dataset => {
+          if (dataset.datalabels && dataset.datalabels.formatter) {
+            dataset.datalabels.formatter = handleFormatter(dataset.datalabels.formatter);
+          }
+        });
+      }
+      if (plugins.datalabels.formatter) {
+        plugins.datalabels.formatter = handleFormatter(plugins.datalabels.formatter);
+      }
+    }
+
     plugins.datalabels = $.extend(true, {}, {
       formatter: this._datalabelsFormatter
     }, plugins.datalabels);
