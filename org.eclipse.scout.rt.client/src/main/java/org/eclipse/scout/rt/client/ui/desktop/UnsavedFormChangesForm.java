@@ -270,9 +270,11 @@ public class UnsavedFormChangesForm extends AbstractForm {
           .flatMap(Collection::stream)
           .collect(Collectors.toSet());
 
+      IDesktop desktop = getDesktop();
       for (IForm f : formsToStore) {
+        desktop.activateForm(f);
         if (isWizardContainerForm(f)) {
-          ((IWizardContainerForm) f).getWizard().doSuspend();
+          f.getWizard().doSuspend();
         }
         else {
           f.doOk();
@@ -282,7 +284,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
       // handle wizards which were not stored previously
       m_forms.stream()
           .filter(f -> !formsToStore.contains(f) && isWizardContainerForm(f))
-          .map(f -> ((IWizardContainerForm) f).getWizard())
+          .map(IForm::getWizard)
           .forEach(this::closeWizard);
     }
 
