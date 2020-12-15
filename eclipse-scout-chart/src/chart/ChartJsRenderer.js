@@ -10,7 +10,7 @@
  */
 import {AbstractChartRenderer, Chart} from '../index';
 import ChartJs from 'chart.js';
-import {arrays, colorSchemes, Event, objects, strings, styles} from '@eclipse-scout/core';
+import {arrays, colorSchemes, Event, numbers, objects, strings, styles} from '@eclipse-scout/core';
 // noinspection ES6UnusedImports
 import chartjs_plugin_datalabels from 'chartjs-plugin-datalabels';
 // noinspection ES6UnusedImports
@@ -82,6 +82,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   constructor(chart) {
     super(chart);
     this.chartJs = null;
+    this.onlyIntegers = true;
     this.minSpaceBetweenYTicks = 35;
     this.minSpaceBetweenXTicks = 150;
     this.maxXAxesTicksHeigth = 75;
@@ -366,6 +367,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this._adjustBarBorderWidth(config);
     this._adjustMaxSegments(config);
     this._adjustBubbleRadii(config);
+    this._adjustOnlyIntegers(config);
   }
 
   _adjustBarBorderWidth(config) {
@@ -428,6 +430,20 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         data.r = Math.sqrt(data.z);
       }
     }));
+  }
+
+  _adjustOnlyIntegers(config) {
+    this.onlyIntegers = true;
+
+    if (!config || !config.data || !config.type) {
+      return;
+    }
+
+    if (config.type === Chart.Type.BUBBLE) {
+      this.onlyIntegers = config.data.datasets.every(dataset => dataset.data.every(data => numbers.isInteger(data.x) && numbers.isInteger(data.y)));
+    } else {
+      this.onlyIntegers = config.data.datasets.every(dataset => dataset.data.every(data => numbers.isInteger(data)));
+    }
   }
 
   _adjustTooltip(config) {
@@ -591,7 +607,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       options.scale = $.extend(true, {}, {
         angleLines: {
           display: false
-        }, gridLines: {
+        },
+        gridLines: {
           borderDash: [2, 4]
         },
         ticks: {
@@ -1984,7 +2001,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _adjustScaleMaxMin(scale, maxTicks, maxMinValue) {
     scale.ticks = $.extend(true, {}, scale.ticks, {
-      maxTicksLimit: Math.ceil(maxTicks / 2)
+      maxTicksLimit: Math.ceil(maxTicks / 2),
+      stepSize: (this.onlyIntegers ? 1 : undefined)
     });
     if (maxMinValue) {
       scale.ticks.suggestedMax = maxMinValue.maxValue;
@@ -2000,7 +2018,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     for (let i = 0; i < axes.length; i++) {
       axes[i] = $.extend(true, {}, axes[i], {
         ticks: {
-          maxTicksLimit: maxTicks
+          maxTicksLimit: maxTicks,
+          stepSize: (this.onlyIntegers ? 1 : undefined)
         }
       });
       if (maxMinValue) {

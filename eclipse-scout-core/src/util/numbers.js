@@ -214,6 +214,13 @@ export function isNumber(number) {
   return typeof number === 'number' && !isNaN(number);
 }
 
+/**
+ * Returns true if the given number is an integer.
+ */
+export function isInteger(number) {
+  return isNumber(number) && isFinite(number) && Math.floor(number) === number;
+}
+
 export function _setCorrelationCounter(val) {
   _correlationCounter = val;
 }
@@ -222,6 +229,7 @@ export default {
   correlationId,
   ensure,
   isNumber,
+  isInteger,
   randomId,
   round,
   shiftDecimalPoint,

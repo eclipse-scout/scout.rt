@@ -55,6 +55,7 @@ describe('ChartJsRendererSpec', () => {
       expect(config.options.scales.yAxes[0]).toEqual({
         ticks: {
           maxTicksLimit: 8,
+          stepSize: 1, // default value, not part of this test
           suggestedMax: 45,
           suggestedMin: 10
         }
@@ -69,6 +70,7 @@ describe('ChartJsRendererSpec', () => {
       expect(config.options.scales.xAxes[0]).toEqual({
         ticks: {
           maxTicksLimit: 5,
+          stepSize: 1, // default value, not part of this test
           suggestedMax: 45,
           suggestedMin: 10
         }
@@ -84,6 +86,7 @@ describe('ChartJsRendererSpec', () => {
       expect(config.options.scale).toEqual({
         ticks: {
           maxTicksLimit: 4,
+          stepSize: 1, // default value, not part of this test
           suggestedMax: 45,
           suggestedMin: 10
         }
@@ -127,6 +130,7 @@ describe('ChartJsRendererSpec', () => {
         offset: true,
         ticks: {
           maxTicksLimit: 5,
+          stepSize: 1, // default value, not part of this test
           suggestedMax: 46,
           suggestedMin: 11
         }
@@ -134,6 +138,7 @@ describe('ChartJsRendererSpec', () => {
       expect(config.options.scales.yAxes[0]).toEqual({
         ticks: {
           maxTicksLimit: 8,
+          stepSize: 1, // default value, not part of this test
           suggestedMax: 43 + yPaddingValue,
           suggestedMin: 11 - yPaddingValue
         }
@@ -182,6 +187,7 @@ describe('ChartJsRendererSpec', () => {
         offset: true,
         ticks: {
           maxTicksLimit: 5,
+          stepSize: 1, // default value, not part of this test
           suggestedMax: 43,
           suggestedMin: 11
         }
@@ -189,6 +195,7 @@ describe('ChartJsRendererSpec', () => {
       expect(config.options.scales.yAxes[0]).toEqual({
         ticks: {
           maxTicksLimit: 8,
+          stepSize: 1, // default value, not part of this test
           suggestedMax: 52,
           suggestedMin: 2
         }
