@@ -41,6 +41,15 @@ scout.CellEditorPopup.prototype._initKeyStrokeContext = function() {
     new scout.CellEditorCompleteEditKeyStroke(this),
     new scout.CellEditorTabKeyStroke(this)
   ]);
+
+  // Don't propagate up/down key strokes to the table, because the table
+  // would call event.preventDefault() in its own "stop propagation
+  // interceptor" and the cursor would not move in multi line string fields.
+  this.keyStrokeContext.registerStopPropagationInterceptor(function(event) {
+    if (scout.isOneOf(event.which, scout.keys.UP, scout.keys.DOWN)) {
+      event.stopPropagation();
+    }
+  });
 };
 
 /**
