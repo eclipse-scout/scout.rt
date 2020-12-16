@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke} from '../../index';
+import {keys, KeyStroke, scout} from '../../index';
 
 export default class ShrinkNavigationKeyStroke extends KeyStroke {
 
@@ -17,9 +17,15 @@ export default class ShrinkNavigationKeyStroke extends KeyStroke {
     this.field = handle;
     this.desktop = handle.session.desktop;
     this.ctrl = true;
-    // FF und Safari use different key codes for this key. Safari even changes the code when ctrl is pressed (it stays the same with cmd).
-    this.which = [keys.forBrowser(keys.ANGULAR_BRACKET), keys.forBrowser(keys.ANGULAR_BRACKET, 'ctrl')];
+    // FF und Safari use different key codes for this key.
+    this.which = [keys.forBrowser(keys.ANGULAR_BRACKET)];
     this.renderingHints.$drawingArea = ($drawingArea, event) => this.desktop.$container;
+  }
+
+  _accept(event) {
+    // Safari changes the code when ctrl is pressed (it stays the same with cmd).
+    return super._accept(event) ||
+      (KeyStroke.acceptModifiers(this, event) && scout.isOneOf(event.which, keys.forBrowser(keys.ANGULAR_BRACKET, 'ctrl')));
   }
 
   _isEnabled() {
