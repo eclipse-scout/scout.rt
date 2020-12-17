@@ -714,7 +714,7 @@ export default class Desktop extends Widget {
   }
 
   shrinkNavigation() {
-    if (this.outline.toggleBreadcrumbStyleEnabled && this.navigationVisible &&
+    if (this.outline && this.outline.toggleBreadcrumbStyleEnabled && this.navigationVisible &&
       this.outlineDisplayStyle() === Tree.DisplayStyle.DEFAULT) {
       this.outline.setDisplayStyle(Tree.DisplayStyle.BREADCRUMB);
     } else {
@@ -723,7 +723,7 @@ export default class Desktop extends Widget {
   }
 
   enlargeNavigation() {
-    if (this.navigationVisible && this.outlineDisplayStyle() === Tree.DisplayStyle.BREADCRUMB) {
+    if (this.outline && this.navigationVisible && this.outlineDisplayStyle() === Tree.DisplayStyle.BREADCRUMB) {
       this.outline.setDisplayStyle(Tree.DisplayStyle.DEFAULT);
     } else {
       this.setNavigationVisible(true);
