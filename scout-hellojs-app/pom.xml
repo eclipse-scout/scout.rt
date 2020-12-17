@@ -4,12 +4,12 @@
   ~ All rights reserved. This program and the accompanying materials
   ~ are made available under the terms of the Eclipse Public License v1.0
   ~ which accompanies this distribution, and is available at
-  ~ http://www.eclipse.org/legal/epl-v10.html
+  ~ https://www.eclipse.org/legal/epl-v10.html
   ~
   ~ Contributors:
   ~     BSI Business Systems Integration AG - initial API and implementation
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -73,13 +73,13 @@
   <licenses>
     <license>
       <name>Eclipse Public License v1.0</name>
-      <url>http://www.eclipse.org/legal/epl-v10.html</url>
+      <url>https://www.eclipse.org/legal/epl-v10.html</url>
       <comments>All rights reserved.
 
        This program and the accompanying materials are made
        available under the terms of the Eclipse Public License v1.0
        which accompanies this distribution, and is available at
-       http://www.eclipse.org/legal/epl-v10.htm</comments>
+       https://www.eclipse.org/legal/epl-v10.html</comments>
     </license>
   </licenses>
 
@@ -98,7 +98,7 @@
       <subscribe>https://dev.eclipse.org/mailman/listinfo/scout-dev</subscribe>
       <unsubscribe>https://dev.eclipse.org/mailman/listinfo/scout-dev</unsubscribe>
       <post>scout-dev@eclipse.org</post>
-      <archive>http://dev.eclipse.org/mhonarc/lists/scout-dev</archive>
+      <archive>https://www.eclipse.org/lists/scout-dev/</archive>
     </mailingList>
   </mailingLists>
 
@@ -106,7 +106,7 @@
     <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</connection>
     <developerConnection>scm:git:ssh://${eclipse_gerrit_username}@git.eclipse.org:29418/scout/org.eclipse.scout.sdk</developerConnection>
     <tag>releases/11.0</tag>
-    <url>http://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git/</url>
+    <url>https://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git/</url>
   </scm>
 
   <issueManagement>
