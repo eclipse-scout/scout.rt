@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,9 +27,6 @@ import org.eclipse.scout.rt.platform.util.CompositeObject;
 @ClassId("ea5a9db8-b80c-4795-9e33-187a1750dc48")
 public class ImageFieldContextMenu extends FormFieldContextMenu<IImageField> implements IFormFieldContextMenu {
 
-  /**
-   * @param owner
-   */
   public ImageFieldContextMenu(IImageField owner, List<? extends IMenu> initialChildMenus) {
     super(owner, initialChildMenus);
   }

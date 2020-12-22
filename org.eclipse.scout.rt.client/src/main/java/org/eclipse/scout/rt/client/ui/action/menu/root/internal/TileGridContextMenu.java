@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,9 +29,6 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 @ClassId("6c1c8e1a-bee2-49fc-8bcc-e2169037fb7e")
 public class TileGridContextMenu extends AbstractContextMenu<ITileGrid<? extends ITile>> implements ITileGridContextMenu {
 
-  /**
-   * @param owner
-   */
   public TileGridContextMenu(ITileGrid<? extends ITile> owner, List<? extends IMenu> initialChildMenus) {
     super(owner, initialChildMenus);
   }
@@ -64,10 +61,13 @@ public class TileGridContextMenu extends AbstractContextMenu<ITileGrid<? extends
   @Override
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
     super.handleOwnerPropertyChanged(evt);
-    if (evt.getPropertyName() == ITileGrid.PROP_SELECTED_TILES) {
+    if (ITileGrid.PROP_SELECTED_TILES.equals(evt.getPropertyName())) {
       handleOwnerValueChanged();
     }
-    // FIXME [8.0] CGU tiles necessary to handle tile update events as done in table?
+    // FIXME [8.0] CGU tiles necessary to handle tile update events (e.g. enabled) as done in table?
+    // either add a method to the grid that allows to specify widget-listeners which are then applied to all tiles in the gird (and removed if tiles are removed)
+    // this is flexible but maybe has bad performance because lot of events may be fired for grids having lots of tiles.
+    // another solution would be to add dedicated tile-grid events which allows the grid to buffer events (setChanging, etc.) for batch updates.
   }
 
   @Override
@@ -79,11 +79,9 @@ public class TileGridContextMenu extends AbstractContextMenu<ITileGrid<? extends
     if (CollectionUtility.isEmpty(selection)) {
       return CollectionUtility.hashSet(TileGridMenuType.EmptySpace);
     }
-    else if (CollectionUtility.size(selection) == 1) {
+    if (CollectionUtility.size(selection) == 1) {
       return CollectionUtility.hashSet(TileGridMenuType.SingleSelection);
     }
-    else {
-      return CollectionUtility.hashSet(TileGridMenuType.MultiSelection);
-    }
+    return CollectionUtility.hashSet(TileGridMenuType.MultiSelection);
   }
 }

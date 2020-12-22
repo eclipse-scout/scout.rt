@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,12 +14,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
 
 public final class ActionUtility {
 
@@ -108,9 +114,50 @@ public final class ActionUtility {
     };
   }
 
+  /**
+   * Updates the enabled state of the given {@link AbstractContextMenu} to the enabled state of its containing
+   * widget.<br>
+   * If the widget is enabled, the given selectionEnabledStateSupplier is evaluated and all child {@link IActionNode
+   * action-nodes} (having at least one of the given menu types) are updated according to the value of the supplier.
+   *
+   * @param contextMenu
+   *          The {@link AbstractContextMenu} to update. Must not be {@code null}.
+   * @param selectionEnabledStateSupplier
+   *          Only invoked if the container of the context menu itself is enabled. Returns if all selected elements of
+   *          the container are enabled ({@code true}) or not.
+   * @see #updateEnabledStateOfMenus(IWidget, boolean, IMenuType...)
+   * @see UpdateMenuEnabledStateVisitor
+   */
+  public static void updateContextMenuEnabledState(AbstractContextMenu<? extends IWidget> contextMenu, BooleanSupplier selectionEnabledStateSupplier, IMenuType... menuTypes) {
+    boolean containerEnabled = contextMenu.getContainer().isEnabled();
+    contextMenu.setEnabled(containerEnabled);
+    if (containerEnabled) {
+      updateEnabledStateOfMenus(contextMenu, selectionEnabledStateSupplier.getAsBoolean(), menuTypes);
+    }
+  }
+
+  /**
+   * Recursively updates the {@link IDimensions#ENABLED_SLAVE} for all {@link IActionNode} instances (having at least
+   * one of the given menu types) of the given {@link IWidget}.
+   *
+   * @param widget
+   *          The {@link IWidget} whose {@link IActionNode actions} should be changed (recursively). Must not be
+   *          {@code null}.
+   * @param enabled
+   *          The new enabled state of the {@link IActionNode actions} found.
+   * @param menuTypes
+   *          The menu types to update
+   */
+  public static void updateEnabledStateOfMenus(IWidget widget, boolean enabled, IMenuType... menuTypes) {
+    Predicate<IAction> menusToUpdate = createMenuFilterMenuTypes(false, menuTypes);
+    widget.visit(new UpdateMenuEnabledStateVisitor<>(enabled, menusToUpdate), IActionNode.class);
+  }
+
+  /**
+   * @see #createMenuFilterMenuTypes(Set, boolean)
+   */
   public static Predicate<IAction> createMenuFilterMenuTypes(boolean visibleOnly, IMenuType... menuTypes) {
     return createMenuFilterMenuTypes(CollectionUtility.hashSet(menuTypes), visibleOnly);
-
   }
 
   /**
@@ -121,14 +168,9 @@ public final class ActionUtility {
    * visibleOnly) and at least one of its leaf children (recursively) is visible (depending on visible only) and and has
    * one of the passed menu types.</li>
    * </ul>
-   *
-   * @param menuTypes
-   * @param visibleOnly
-   * @return
    */
   public static Predicate<IAction> createMenuFilterMenuTypes(Set<? extends IMenuType> menuTypes, boolean visibleOnly) {
     return new MenuTypeFilter(menuTypes, visibleOnly);
-
   }
 
   @SafeVarargs
@@ -154,7 +196,6 @@ public final class ActionUtility {
     public MenuTypeFilter(Set<? extends IMenuType> menuTypes, boolean visibleOnly) {
       m_menuTypes = menuTypes;
       m_visibleOnly = visibleOnly;
-
     }
 
     @Override
@@ -180,7 +221,6 @@ public final class ActionUtility {
           else {
             return true;
           }
-
         }
       }
       return false;
@@ -192,6 +232,48 @@ public final class ActionUtility {
 
     public boolean isVisibleOnly() {
       return m_visibleOnly;
+    }
+  }
+
+  /**
+   * Updates the {@link IDimensions#ENABLED_SLAVE} state to the given value for all {@link IActionNode} instances
+   * accepting the given {@link Predicate}.<br>
+   * If a menu contains children it is disabled if all the child menus are disabled (according to
+   * {@link IDimensions#ENABLED_SLAVE}) as well.<br>
+   * Separators (see {@link IAction#isSeparator()}) are always ignored.<br>
+   * {@link IActionNode} instances not matching the given filter are not touched.
+   */
+  public static class UpdateMenuEnabledStateVisitor<T extends IActionNode<?>> extends DepthFirstTreeVisitor<T> {
+
+    private final boolean m_enabled;
+    private final Predicate<? super T> m_filter;
+
+    public UpdateMenuEnabledStateVisitor(boolean enabled, Predicate<? super T> filter) {
+      m_enabled = enabled;
+      m_filter = filter;
+    }
+
+    @Override
+    public TreeVisitResult preVisit(T element, int level, int index) {
+      if (isSkipElement(element)) {
+        return TreeVisitResult.SKIP_SUBTREE;
+      }
+      return TreeVisitResult.CONTINUE;
+    }
+
+    protected boolean isSkipElement(T element) {
+      return element.isSeparator() || !element.isInheritAccessibility();
+    }
+
+    @Override
+    public boolean postVisit(T element, int level, int index) {
+      if (isSkipElement(element)) {
+        return true;
+      }
+      if (!element.hasChildActions() && m_filter.test(element)) {
+        element.setEnabled(m_enabled, IDimensions.ENABLED_SLAVE);
+      }
+      return true;
     }
   }
 }

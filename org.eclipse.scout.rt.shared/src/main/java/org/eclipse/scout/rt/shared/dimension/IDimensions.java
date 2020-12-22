@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,6 +39,11 @@ public interface IDimensions {
    * Dimension for the enabled-granted flag
    */
   String ENABLED_GRANTED = "ENABLED_GRANTED";
+
+  /**
+   * Dimension for internal secondary dependance between components
+   */
+  String ENABLED_SLAVE = "ENABLED_SLAVE";
 
   /**
    * Dimension for a custom enabled flag

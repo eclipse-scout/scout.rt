@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,8 @@ import java.beans.PropertyChangeEvent;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
@@ -31,9 +33,6 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 public class TableContextMenu extends AbstractContextMenu<ITable> implements ITableContextMenu {
   private List<? extends ITableRow> m_currentSelection;
 
-  /**
-   * @param owner
-   */
   public TableContextMenu(ITable owner, List<? extends IMenu> initialChildMenus) {
     super(owner, initialChildMenus);
   }
@@ -42,24 +41,23 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
   protected void initConfig() {
     super.initConfig();
     ITable container = getContainer();
-    container.addTableListener(
-        e -> {
-          switch (e.getType()) {
-            case TableEvent.TYPE_ROWS_SELECTED:
-              handleOwnerValueChanged();
-              break;
-            case TableEvent.TYPE_ROWS_UPDATED:
-              if (CollectionUtility.containsAny(e.getRows(), m_currentSelection)) {
-                handleOwnerValueChanged();
-              }
-              break;
-          }
-        },
-        TableEvent.TYPE_ROWS_SELECTED,
-        TableEvent.TYPE_ROWS_UPDATED);
+    container.addTableListener(this::tableChanged, TableEvent.TYPE_ROWS_SELECTED, TableEvent.TYPE_ROWS_UPDATED);
     // set active filter
     setCurrentMenuTypes(getMenuTypesForSelection(container.getSelectedRows()));
     calculateLocalVisibility();
+  }
+
+  protected void tableChanged(TableEvent e) {
+    switch (e.getType()) {
+      case TableEvent.TYPE_ROWS_SELECTED:
+        handleOwnerValueChanged();
+        break;
+      case TableEvent.TYPE_ROWS_UPDATED:
+        if (CollectionUtility.containsAny(e.getRows(), m_currentSelection)) {
+          handleOwnerValueChanged();
+        }
+        break;
+    }
   }
 
   @Override
@@ -75,8 +73,8 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
   @Override
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
     super.handleOwnerPropertyChanged(evt);
-    if (ITable.PROP_ENABLED.equals(evt.getPropertyName())) {
-      calculateEnableState();
+    if (IWidget.PROP_ENABLED.equals(evt.getPropertyName())) {
+      calculateEnabledState();
     }
   }
 
@@ -89,39 +87,30 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
       setCurrentMenuTypes(getMenuTypesForSelection(ownerValue));
       visit(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()), IMenu.class);
       calculateLocalVisibility();
-      calculateEnableState();
+      calculateEnabledState();
     }
   }
 
-  protected boolean isTableAndSelectionEnabled() {
-    ITable container = getContainer();
-    boolean enabled = container.isEnabled();
-    if (!enabled) {
-      return false;
-    }
-
-    final List<ITableRow> ownerValue = container.getSelectedRows();
-    for (ITableRow row : ownerValue) {
-      if (!row.isEnabled()) {
-        return false;
-      }
-    }
-    return true;
+  protected boolean isSelectionEnabled() {
+    return getContainer()
+        .getSelectedRows().stream()
+        .allMatch(ITableRow::isEnabled);
   }
 
-  protected void calculateEnableState() {
-    setEnabled(isTableAndSelectionEnabled());
+  /**
+   * called on selection change (selected rows) or when the table enabled state changes
+   */
+  protected void calculateEnabledState() {
+    ActionUtility.updateContextMenuEnabledState(this, this::isSelectionEnabled, TableMenuType.MultiSelection, TableMenuType.SingleSelection);
   }
 
   protected Set<TableMenuType> getMenuTypesForSelection(List<? extends ITableRow> selection) {
     if (CollectionUtility.isEmpty(selection)) {
       return CollectionUtility.hashSet(TableMenuType.EmptySpace);
     }
-    else if (CollectionUtility.size(selection) == 1) {
+    if (CollectionUtility.size(selection) == 1) {
       return CollectionUtility.hashSet(TableMenuType.SingleSelection);
     }
-    else {
-      return CollectionUtility.hashSet(TableMenuType.MultiSelection);
-    }
+    return CollectionUtility.hashSet(TableMenuType.MultiSelection);
   }
 }
