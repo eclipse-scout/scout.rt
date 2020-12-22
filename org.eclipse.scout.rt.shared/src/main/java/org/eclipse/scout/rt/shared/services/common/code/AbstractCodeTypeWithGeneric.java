@@ -294,8 +294,6 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
 
   /**
    * The extension support for {@link AbstractCodeTypeWithGeneric#execCreateCodes()} method.
-   *
-   * @return
    */
   protected final List<? extends CODE> interceptCreateCodes() {
     List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> extensions = getAllExtensions();
@@ -305,8 +303,6 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
 
   /**
    * The extension support for {@link AbstractCodeTypeWithGeneric#execCreateCode(ICodeRow)} method.
-   *
-   * @return
    */
   protected final CODE interceptCreateCode(ICodeRow<CODE_ID> newRow) {
     List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> extensions = getAllExtensions();
@@ -316,9 +312,6 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
 
   /**
    * The extension support for {@link AbstractCodeTypeWithGeneric#execLoadCodes(Class)} method.
-   *
-   * @param codeRowType
-   * @return
    */
   protected List<? extends ICodeRow<CODE_ID>> interceptLoadCodes(Class<? extends ICodeRow<CODE_ID>> codeRowType) {
     List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> extensions = getAllExtensions();
@@ -382,6 +375,9 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   @SuppressWarnings("unchecked")
   @Override
   public CODE getCodeByExtKey(Object extKey) {
+    if (extKey == null) {
+      return null;
+    }
     CODE c = null;
     for (CODE childCode : m_rootCodeList) {
       if (extKey.equals(childCode.getExtKey())) {
