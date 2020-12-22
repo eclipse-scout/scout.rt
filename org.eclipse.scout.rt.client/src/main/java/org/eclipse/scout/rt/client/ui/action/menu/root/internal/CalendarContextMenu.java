@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,9 +28,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  */
 @ClassId("7c6a0c17-90f1-4f1f-bad0-c6d417eaf5b5")
 public class CalendarContextMenu extends AbstractContextMenu<ICalendar> implements ICalendarContextMenu {
-  /**
-   * @param container
-   */
+
   public CalendarContextMenu(ICalendar container, List<? extends IMenu> initialChildMenus) {
     super(container, initialChildMenus);
   }
@@ -74,9 +72,6 @@ public class CalendarContextMenu extends AbstractContextMenu<ICalendar> implemen
     if (selectedComponent == null) {
       return CollectionUtility.hashSet(CalendarMenuType.EmptySpace);
     }
-    else {
-      return CollectionUtility.hashSet(CalendarMenuType.CalendarComponent);
-    }
+    return CollectionUtility.hashSet(CalendarMenuType.CalendarComponent);
   }
-
 }

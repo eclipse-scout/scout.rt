@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,8 @@
  */
 package org.eclipse.scout.rt.client.ui.action.menu;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.eclipse.scout.rt.platform.util.CollectionUtility.hashSet;
+import static org.junit.Assert.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,11 +21,22 @@ import java.util.function.Predicate;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuTest.Table2.CompositeMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuTest.Table2.CompositeMenu.CompositeSubMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuTest.Table2.CompositeMenu.CompositeSubMenu.EmptySpaceSubSubMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuTest.Table2.CompositeMenu.CompositeSubMenu.MultiSelectionSubSubMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuTest.Table2.CompositeMenu.CompositeSubMenu.SingleSelectionSubSubMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuTest.Table2.CompositeMenu.EmptySpaceSubMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuTest.Table2.CompositeMenu.MultiSelectionSubMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuTest.Table2.CompositeMenu.SingleSelectionSubMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuTest.Table2.EmptySpaceMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuTest.Table2.MultiSelectionMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuTest.Table2.SingleSelectionMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.fixture.OwnerValueCapturingMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -38,7 +49,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests for {@link AbstractTableMenu}
+ * Tests for {@link TableContextMenu}
  */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
@@ -104,7 +115,6 @@ public class TableMenuTest {
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
     assertEquals(1, visibleMenus.size());
     assertEquals("MultiSelectionMenu", visibleMenus.get(0).getClass().getSimpleName());
-
   }
 
   /**
@@ -116,7 +126,7 @@ public class TableMenuTest {
     t.addRowsByMatrix(TEST_ROWS);
     ITableContextMenu contextMenu = t.getContextMenu();
     // empty selection
-    t.selectRows(CollectionUtility.<ITableRow> emptyArrayList(), false);
+    t.selectRows(CollectionUtility.emptyArrayList(), false);
     Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
     assertEquals(1, visibleMenus.size());
@@ -133,10 +143,10 @@ public class TableMenuTest {
     t.addRowsByMatrix(TEST_ROWS);
     ITableContextMenu contextMenu = t.getContextMenu();
 
-    t.selectRows(CollectionUtility.<ITableRow> emptyArrayList(), false);
+    t.selectRows(CollectionUtility.emptyArrayList(), false);
     Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
-    assertEquals(false, visibleMenus.get(0).isEnabledIncludingParents());
+    assertFalse(visibleMenus.get(0).isEnabledIncludingParents());
   }
 
   /**
@@ -152,7 +162,7 @@ public class TableMenuTest {
     t.selectRows(CollectionUtility.arrayList(t.getRow(0)), false);
     Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
-    assertEquals(false, visibleMenus.get(0).isEnabledIncludingParents());
+    assertFalse(visibleMenus.get(0).isEnabledIncludingParents());
   }
 
   /**
@@ -166,10 +176,10 @@ public class TableMenuTest {
 
     t.getRow(0).setEnabled(false);
 
-    t.selectRows(CollectionUtility.<ITableRow> emptyArrayList(), false);
+    t.selectRows(CollectionUtility.emptyArrayList(), false);
     Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
-    assertEquals(true, visibleMenus.get(0).isEnabled());
+    assertTrue(visibleMenus.get(0).isEnabled());
   }
 
   /**
@@ -186,7 +196,7 @@ public class TableMenuTest {
     t.selectRows(CollectionUtility.arrayList(t.getRow(0)), false);
     Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
-    assertEquals(false, visibleMenus.get(0).isEnabledIncludingParents());
+    assertFalse(visibleMenus.get(0).isEnabledIncludingParents());
   }
 
   /**
@@ -224,7 +234,7 @@ public class TableMenuTest {
   }
 
   /**
-   * Tests that {@link AbstractMenu#execOwnerValueChanged} is only called only empty space menus, if empty space is
+   * Tests that {@link AbstractMenu#execOwnerValueChanged} is only called for empty space menus, if empty space is
    * selected.
    */
   @Test
@@ -238,6 +248,53 @@ public class TableMenuTest {
     assertOwnerValueChange(m_all, 0);
     assertNoOwnerValueChange(m_multi);
     assertNoOwnerValueChange(m_single);
+  }
+
+  @Test
+  public void testMenuEnabledStateDisabledRow() {
+    Table2 table = new Table2();
+    table.addRowsByMatrix(TEST_ROWS);
+    table.getRow(0).setEnabled(false);
+
+    SingleSelectionMenu singleSelectionMenu = table.getMenuByClass(SingleSelectionMenu.class);
+    MultiSelectionMenu multiSelectionMenu = table.getMenuByClass(MultiSelectionMenu.class);
+    EmptySpaceMenu emptySpaceMenu = table.getMenuByClass(EmptySpaceMenu.class);
+    CompositeMenu compositeMenu = table.getMenuByClass(CompositeMenu.class);
+    SingleSelectionSubMenu singleSelectionSubMenu = table.getMenuByClass(SingleSelectionSubMenu.class);
+    MultiSelectionSubMenu multiSelectionSubMenu = table.getMenuByClass(MultiSelectionSubMenu.class);
+    EmptySpaceSubMenu emptySpaceSubMenu = table.getMenuByClass(EmptySpaceSubMenu.class);
+    CompositeSubMenu compositeSubMenu = table.getMenuByClass(CompositeSubMenu.class); // has inheritAccessibility=false
+    SingleSelectionSubSubMenu selectionSubSubMenu = table.getMenuByClass(SingleSelectionSubSubMenu.class);
+    MultiSelectionSubSubMenu multiSelectionSubSubMenu = table.getMenuByClass(MultiSelectionSubSubMenu.class);
+    EmptySpaceSubSubMenu emptySpaceSubSubMenu = table.getMenuByClass(EmptySpaceSubSubMenu.class);
+
+    assertTrue(singleSelectionMenu.isEnabled());
+    assertTrue(multiSelectionMenu.isEnabled());
+    assertTrue(emptySpaceMenu.isEnabled());
+    assertTrue(compositeMenu.isEnabled());
+    assertTrue(singleSelectionSubMenu.isEnabled());
+    assertTrue(multiSelectionSubMenu.isEnabled());
+    assertTrue(emptySpaceSubMenu.isEnabled());
+    assertTrue(compositeSubMenu.isEnabled());
+    assertTrue(selectionSubSubMenu.isEnabled());
+    assertTrue(multiSelectionSubSubMenu.isEnabled());
+    assertTrue(emptySpaceSubSubMenu.isEnabled());
+
+    table.selectFirstRow();
+    assertFalse(singleSelectionMenu.isEnabled());
+    assertFalse(multiSelectionMenu.isEnabled());
+    assertTrue(emptySpaceMenu.isEnabled()); // stays enabled because it is an empty-space menu and therefore not selection dependent
+    assertTrue(compositeMenu.isEnabled()); // stays enabled because there are enabled child menus
+    assertFalse(singleSelectionSubMenu.isEnabled());
+    assertFalse(multiSelectionSubMenu.isEnabled());
+    assertTrue(emptySpaceSubMenu.isEnabled()); // stays enabled because it is an empty-space menu and therefore not selection dependent
+    assertTrue(compositeSubMenu.isEnabled());
+    assertTrue(selectionSubSubMenu.isEnabled());
+    assertTrue(multiSelectionSubSubMenu.isEnabled());
+    assertTrue(emptySpaceSubSubMenu.isEnabled());
+
+    table.setEnabled(false);
+    assertFalse(table.getContextMenu().isEnabled());
   }
 
   /// HELPERS
@@ -292,7 +349,7 @@ public class TableMenuTest {
 
       @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-        return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+        return hashSet(TableMenuType.SingleSelection);
       }
 
       @Override
@@ -306,7 +363,7 @@ public class TableMenuTest {
 
       @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-        return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+        return hashSet(TableMenuType.SingleSelection);
       }
 
       @Override
@@ -321,7 +378,7 @@ public class TableMenuTest {
 
       @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-        return CollectionUtility.hashSet(TableMenuType.MultiSelection);
+        return hashSet(TableMenuType.MultiSelection);
       }
 
       @Override
@@ -335,7 +392,7 @@ public class TableMenuTest {
 
       @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-        return CollectionUtility.hashSet(TableMenuType.EmptySpace);
+        return hashSet(TableMenuType.EmptySpace);
       }
 
       @Override
@@ -352,4 +409,120 @@ public class TableMenuTest {
     }
   }
 
+  public static class Table2 extends AbstractTable {
+    @Order(10)
+    public class LastNameColumn extends AbstractStringColumn {
+    }
+
+    @Order(20)
+    public class FirstNameColumn extends AbstractStringColumn {
+    }
+
+    @Order(10)
+    public class SingleSelectionMenu extends AbstractMenu {
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return hashSet(TableMenuType.SingleSelection);
+      }
+    }
+
+    @Order(20)
+    public class MultiSelectionMenu extends AbstractMenu {
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return hashSet(TableMenuType.MultiSelection);
+      }
+    }
+
+    @Order(25)
+    public class EmptySpaceMenu extends AbstractMenu {
+      @Override
+      protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+        return hashSet(TableMenuType.EmptySpace);
+      }
+    }
+
+    @Order(30)
+    public class Separator1Menu extends AbstractMenu {
+      @Override
+      protected boolean getConfiguredSeparator() {
+        return true;
+      }
+    }
+
+    @Order(40)
+    public class CompositeMenu extends AbstractMenu {
+      @Order(10)
+      public class SingleSelectionSubMenu extends AbstractMenu {
+        @Override
+        protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+          return hashSet(TableMenuType.SingleSelection);
+        }
+      }
+
+      @Order(20)
+      public class MultiSelectionSubMenu extends AbstractMenu {
+        @Override
+        protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+          return hashSet(TableMenuType.MultiSelection);
+        }
+      }
+
+      @Order(25)
+      public class EmptySpaceSubMenu extends AbstractMenu {
+        @Override
+        protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+          return hashSet(TableMenuType.EmptySpace);
+        }
+      }
+
+      @Order(30)
+      public class Separator2Menu extends AbstractMenu {
+        @Override
+        protected boolean getConfiguredSeparator() {
+          return true;
+        }
+      }
+
+      @Order(40)
+      public class CompositeSubMenu extends AbstractMenu {
+        @Override
+        protected boolean getConfiguredInheritAccessibility() {
+          return false;
+        }
+
+        @Order(10)
+        public class SingleSelectionSubSubMenu extends AbstractMenu {
+          @Override
+          protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+            return hashSet(TableMenuType.SingleSelection);
+          }
+        }
+
+        @Order(20)
+        public class Separator3Menu extends AbstractMenu {
+          @Override
+          protected boolean getConfiguredSeparator() {
+            return true;
+          }
+        }
+
+        @Order(25)
+        public class EmptySpaceSubSubMenu extends AbstractMenu {
+          @Override
+          protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+            return hashSet(TableMenuType.EmptySpace);
+          }
+        }
+
+        @Order(30)
+        public class MultiSelectionSubSubMenu extends AbstractMenu {
+          @Override
+          protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+            return hashSet(TableMenuType.MultiSelection);
+          }
+        }
+      }
+    }
+  }
 }

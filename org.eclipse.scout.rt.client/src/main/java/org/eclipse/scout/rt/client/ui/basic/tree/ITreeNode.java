@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,7 +64,7 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContex
   void setExpandedInternal(boolean b);
 
   /**
-   * Note: this method is a Convenience for {@link ITree#setNodeExpanded(this, boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeExpanded(ITreeNode, boolean)}
    */
   void setExpanded(boolean b);
 
@@ -74,32 +74,32 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContex
   void setExpanded(boolean b, boolean lazy);
 
   /**
-   * Note: this method is a Convenience for {@link ITree#setNodeEnabledPermission(this, boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeEnabledPermission(ITreeNode, Permission)}
    */
   void setEnabledPermission(Permission p);
 
   /**
-   * Note: this method is a Convenience for {@link ITree#setNodeEnabledGranted(this, boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeEnabledGranted(ITreeNode, boolean)}
    */
   void setEnabledGranted(boolean b);
 
   /**
-   * Note: this method is a Convenience for {@link ITree#setNodeEnabled(this, boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeEnabled(ITreeNode, boolean)}
    */
   void setEnabled(boolean b);
 
   /**
-   * Note: this method is a Convenience for {@link ITree#setNodeVisiblePermission(this, boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeVisiblePermission(ITreeNode, Permission)}
    */
   void setVisiblePermission(Permission p);
 
   /**
-   * Note: this method is a Convenience for {@link ITree#setNodeVisibleGranted(this, boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeVisibleGranted(ITreeNode, boolean)}
    */
   void setVisibleGranted(boolean b);
 
   /**
-   * Note: this method is a Convenience for {@link ITree#setNodeVisible(this, boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeVisible(ITreeNode, boolean)}
    */
   void setVisible(boolean b);
 
@@ -109,7 +109,7 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContex
   void setLeafInternal(boolean b);
 
   /**
-   * Note: this method is a Convenience for {@link ITree#setNodeLeaf(this, boolean)}
+   * Note: this method is a Convenience for {@link ITree#setNodeLeaf(ITreeNode, boolean)}
    */
   void setLeaf(boolean b);
 
@@ -128,7 +128,7 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContex
   void setStatusInternal(int status);
 
   /**
-   * Note: this method is a Convenience for {@link ITree#setNodeStatus(this, int)}
+   * Note: this method is a Convenience for {@link ITree#setNodeStatus(ITreeNode, int)}
    */
   void setStatus(int status);
 
@@ -173,9 +173,9 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContex
 
   /**
    * a dirty marked node is marked for child reload its children are reloaded on the next ui call to
-   * {@link ITreeUIFacade#setNodeExpandedFromUI(ITreeNode, boolean)}
+   * {@link ITreeUIFacade#setNodeExpandedFromUI(ITreeNode, boolean, boolean)}
    * {@link ITreeUIFacade#setNodeSelectedAndExpandedFromUI(ITreeNode)}
-   * {@link ITreeUIFacade#setNodesSelectedFromUI(ITreeNode[])} and the dirty flag is reset to false default is false
+   * {@link ITreeUIFacade#setNodesSelectedFromUI(List)} and the dirty flag is reset to false default is false
    */
   boolean isChildrenDirty();
 
@@ -186,9 +186,9 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContex
 
   /**
    * a node with volatile (rapidly and constantly changing) children is reloaded on ANY ui call to
-   * {@link ITreeUIFacade#setNodeExpandedFromUI(ITreeNode, boolean)}
+   * {@link ITreeUIFacade#setNodeExpandedFromUI(ITreeNode, boolean, boolean)}
    * {@link ITreeUIFacade#setNodeSelectedAndExpandedFromUI(ITreeNode)}
-   * {@link ITreeUIFacade#setNodesSelectedFromUI(ITreeNode[])} default is false
+   * {@link ITreeUIFacade#setNodesSelectedFromUI(List)} default is false
    */
   boolean isChildrenVolatile();
 

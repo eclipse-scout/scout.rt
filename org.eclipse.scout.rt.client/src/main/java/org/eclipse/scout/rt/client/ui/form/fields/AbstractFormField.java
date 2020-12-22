@@ -86,7 +86,6 @@ import org.w3c.dom.Element;
 @FormData(value = AbstractFormFieldData.class, sdkCommand = SdkCommand.USE)
 public abstract class AbstractFormField extends AbstractWidget implements IFormField, IContributionOwner, IExtensibleObject {
 
-  private static final String ENABLED_SLAVE = "ENABLED_SLAVE";
   private static final String TOUCHED = "TOUCHED";
   private static final String LABEL_VISIBLE = "LABEL_VISIBLE";
   private static final String MASTER_REQUIRED = "MASTER_REQUIRED";
@@ -137,7 +136,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   public AbstractFormField(boolean callInitializer) {
     super(false);
-    setEnabled(true, ENABLED_SLAVE); // lease enabled bit for master-slave
     m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
     m_labelVisible = NamedBitMaskHelper.ALL_BITS_SET; // default label visible
     m_objectExtensions = new ObjectExtensions<>(this, false);
@@ -1426,7 +1424,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   private void setEnabledSlave(boolean enabled) {
-    setEnabled(enabled, ENABLED_SLAVE);
+    setEnabled(enabled, IDimensions.ENABLED_SLAVE);
   }
 
   @Override

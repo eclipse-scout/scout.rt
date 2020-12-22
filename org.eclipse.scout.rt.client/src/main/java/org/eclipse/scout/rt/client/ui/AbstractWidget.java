@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractWidget extends AbstractPropertyObserver implements IWidget {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractWidget.class);
-  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED);
+  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED, IDimensions.ENABLED_SLAVE);
   private static final String PROP_ENABLED_BYTE = "enabledByte";
 
   private final WidgetListeners m_listenerList;
