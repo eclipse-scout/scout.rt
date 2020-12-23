@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -114,7 +115,9 @@ public class ClientNotificationPoller {
           LOG.debug("Client notification polling has been interrupted.", e);
         }
         catch (RuntimeException e) {
-          LOG.error("Error receiving client notifications", e);
+          if (!(e instanceof PlatformException && ((PlatformException) e).isConsumed())) {
+            LOG.error("Error receiving client notifications", e);
+          }
           SleepUtil.sleepSafe(10, TimeUnit.SECONDS); // sleep some time before connecting anew
         }
       }

@@ -15,10 +15,12 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.net.ConnectException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
@@ -111,12 +113,19 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
         LOG.debug("Ignoring IOException for cancelled thread.", e);
         return new ServiceTunnelResponse(new FutureCancelledError("RunMonitor is cancelled.", e));
       }
-      else if (e instanceof EOFException) {
+      else if (e instanceof EOFException) { // NOSONAR
         ISession session = ISession.CURRENT.get();
         if (session == null || session.isStopping() || !session.isActive()) {
           LOG.debug("EOF detected for non-existing/stopping/non-active session.", e);
           return new ServiceTunnelResponse(new FutureCancelledError("EOF detected.", e));
         }
+      }
+      else if (e instanceof ConnectException) { // NOSONAR
+        // only single line logging for ConnectException (server not ready yet)
+        LOG.error("Connection to {} failed: {}", m_tunnel.getServerUrl(), e.getLocalizedMessage());
+        PlatformException pe = new PlatformException("Connection failed");
+        pe.consume();
+        return new ServiceTunnelResponse(pe);
       }
       throw e;
     }
