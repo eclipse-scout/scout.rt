@@ -307,6 +307,43 @@ public class ChartConfig implements IChartConfig {
   }
 
   @Override
+  public Map<String, Object> getPropertiesFlat() {
+    return getPropertiesFlatRec(m_properties);
+  }
+
+  protected Map<String, Object> getPropertiesFlatRec(Map<String, Object> properties) {
+    return getPropertiesFlatRec(properties, null);
+  }
+
+  protected Map<String, Object> getPropertiesFlatRec(Map<String, Object> properties, String parentProperty) {
+    Map<String, Object> result = new HashMap<>();
+    if (properties == null) {
+      return result;
+    }
+
+    properties.forEach((key, value) -> {
+      String property = join(DELIMITER, parentProperty, key);
+      if (value instanceof Map) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = (Map<String, Object>) value;
+        result.putAll(getPropertiesFlatRec(map, property));
+      }
+      else if (value instanceof List) {
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> list = (List<Map<String, Object>>) value;
+        for (int i = 0; i < list.size(); i++) {
+          result.putAll(getPropertiesFlatRec(list.get(i), property + "[" + i + "]"));
+        }
+      }
+      else if (value != null) {
+        result.put(property, value);
+      }
+    });
+
+    return result;
+  }
+
+  @Override
   public IChartConfig addProperties(IChartConfig config, boolean override) {
     if (config != null && !CollectionUtility.isEmpty(config.getProperties())) {
       Map<String, Object> source = override ? config.getProperties() : m_properties;

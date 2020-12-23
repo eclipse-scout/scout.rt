@@ -94,7 +94,31 @@ public interface IChartConfig extends Serializable {
    */
   Object getProperty(String name);
 
+  /**
+   * Get property map.
+   *
+   * @return A recursive map with all properties. E.g.:
+   *
+   *         <pre>
+   *         "options"<br>
+   *          - "legend"<br>
+   *            - "position": "bottom"<br>
+   *            - "display": true<br>
+   *         </pre>
+   */
   Map<String, Object> getProperties();
+
+  /**
+   * Get flat property map.
+   *
+   * @return A flat map with all properties. E.g.:
+   *
+   *         <pre>
+   *         "options.legend.position": "bottom"<br>
+   *         "options.legend.display": true<br>
+   *         </pre>
+   */
+  Map<String, Object> getPropertiesFlat();
 
   IChartConfig addProperties(IChartConfig config, boolean override);
 
