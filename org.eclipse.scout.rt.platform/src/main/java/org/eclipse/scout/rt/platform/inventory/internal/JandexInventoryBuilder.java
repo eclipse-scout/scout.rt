@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -181,9 +181,14 @@ public class JandexInventoryBuilder {
       LOG.info("Rebuild index '{}'. Scanning location...", indexUri);
       Indexer indexer = new Indexer();
       index = createFolderIndex(classesFolder.toPath(), indexer);
-      writeIndex(index, indexFile);
-      if (!indexFile.setLastModified(newMeta.lastModified())) {
-        LOG.warn("Cannot set lastModified on '{}'", indexFile);
+      if (indexFile.isReadOnly()) {
+        LOG.info("Cannot write index to file '{}'. File is read-only. Using newly created index without flushing it to the storage.", indexFile);
+      }
+      else {
+        writeIndex(index, indexFile);
+        if (!indexFile.setLastModified(newMeta.lastModified())) {
+          LOG.warn("Cannot set lastModified on '{}'", indexFile);
+        }
       }
       return index;
     }
