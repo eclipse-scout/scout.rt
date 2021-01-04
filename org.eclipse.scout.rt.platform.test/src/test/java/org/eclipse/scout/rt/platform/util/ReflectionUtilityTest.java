@@ -10,16 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
-import static org.eclipse.scout.rt.platform.util.CollectionUtility.emptyHashSet;
-import static org.eclipse.scout.rt.platform.util.CollectionUtility.hashSet;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.eclipse.scout.rt.platform.util.CollectionUtility.*;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
+import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.junit.Test;
 
 public class ReflectionUtilityTest {
@@ -41,6 +42,16 @@ public class ReflectionUtilityTest {
     assertNull(ReflectionUtility.getConstructor(Bottom.class, new Class<?>[]{Integer.class, String.class}));
   }
 
+  @Test
+  public void testGetAllFields() throws Exception {
+    List<Field> expectedFields = CollectionUtility.arrayList(Top.class.getDeclaredFields());
+    ScoutAssert.assertListEquals(expectedFields, ReflectionUtility.getAllFields(Top.class));
+    expectedFields.addAll(0, Arrays.asList(Middle.class.getDeclaredFields()));
+    ScoutAssert.assertListEquals(expectedFields, ReflectionUtility.getAllFields(Middle.class));
+    expectedFields.addAll(0, Arrays.asList(Bottom.class.getDeclaredFields()));
+    ScoutAssert.assertListEquals(expectedFields, ReflectionUtility.getAllFields(Bottom.class));
+  }
+
   // === Test classes ===
 
   public static class Top {
@@ -50,6 +61,9 @@ public class ReflectionUtilityTest {
 
     private static final long serialVersionUID = 1L;
 
+    @SuppressWarnings("unused")
+    private Top m_parent = null;
+
     @Override
     public void run() {
     }
@@ -58,6 +72,9 @@ public class ReflectionUtilityTest {
   public static class Bottom extends Middle implements Callable {
 
     private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings("unused")
+    private Top m_child = null;
 
     public Bottom(String string, Integer integer) {
     }

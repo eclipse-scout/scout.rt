@@ -15,8 +15,10 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -85,5 +87,20 @@ public final class ReflectionUtility {
       }
     }
     return null;
+  }
+
+  /**
+   * Returns all declared fields of the specified class and its parents.
+   * <p>
+   * The fields are sorted by class level beginning from the given class.
+   *
+   * @return a list of Fields (possibly empty).
+   */
+  public static List<Field> getAllFields(Class<?> clazz) {
+    List<Field> fields = new ArrayList<>();
+    for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
+      fields.addAll(Arrays.asList(c.getDeclaredFields()));
+    }
+    return fields;
   }
 }

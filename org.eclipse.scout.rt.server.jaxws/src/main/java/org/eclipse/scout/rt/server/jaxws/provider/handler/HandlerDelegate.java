@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.platform.context.RunContextProducer;
 import org.eclipse.scout.rt.platform.context.RunWithRunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
 import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsHandlerSubjectProperty;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.ClazzUtil;
@@ -115,7 +116,7 @@ public class HandlerDelegate<CONTEXT extends MessageContext> implements Handler<
    * Injects the given 'init-params' into the given handler.
    */
   protected void injectInitParams(final Handler<CONTEXT> handler, final Map<String, String> initParams) {
-    for (final Field field : handler.getClass().getDeclaredFields()) {
+    for (final Field field : ReflectionUtility.getAllFields(handler.getClass())) {
       if (field.getAnnotation(Resource.class) != null && field.getType().isAssignableFrom(initParams.getClass())) {
         try {
           LOG.info("Inject 'initParams' to JAX-WS handler [path={}#{}]", handler.getClass().getName(), field.getName());
