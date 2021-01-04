@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
  * <p>
  * Uses the lookup call {@link DataModelOperatorLookupCall}
  * <p>
- * Expects the property {@link #setAttribute(IDataModelAttribute)} to be set.
+ * Expects the property {@link #setAttribute(IDataModelAttribute, IDataModelAttributeOp)} to be set.
  */
 @ClassId("46d6ba4b-07a6-4fd8-bf84-7e372e0f80bc")
 public abstract class AbstractDataModelOperatorField extends AbstractSmartField<IDataModelAttributeOp> {
@@ -56,7 +56,22 @@ public abstract class AbstractDataModelOperatorField extends AbstractSmartField<
     //nop
   }
 
+  /**
+   * @deprecated use {@link #setAttribute(IDataModelAttribute, IDataModelAttributeOp)})}
+   */
+  @Deprecated
   public void setAttribute(IDataModelAttribute attribute) {
+    setAttribute(attribute, null);
+  }
+
+  /**
+   * Sets an operator according to the given attribute.
+   * <p>
+   * Sets the desired operator if it is suitable for the given attribute and not <code>null</code>, otherwise the
+   * default operator. (The default operator is defined as the first operator of the list of all suitable operators.)
+   * </p>
+   */
+  public void setAttribute(IDataModelAttribute attribute, IDataModelAttributeOp desiredOperator) {
     IDataModelAttributeOp oldOp = getValue();
     ((DataModelOperatorLookupCall) getLookupCall()).setAttribute(attribute);
     IDataModelAttributeOp newOp = null;
@@ -65,7 +80,10 @@ public abstract class AbstractDataModelOperatorField extends AbstractSmartField<
       Set<IDataModelAttributeOp> tmp = new HashSet<>();
       List<IDataModelAttributeOp> ops = attribute.getOperators();
       tmp.addAll(ops);
-      if (tmp.contains(oldOp)) {
+      if (tmp.contains(desiredOperator)) {
+        newOp = desiredOperator;
+      }
+      else if (tmp.contains(oldOp)) {
         newOp = oldOp;
       }
       else {
