@@ -194,7 +194,7 @@ export default class TableFooter extends Widget {
       }
 
       function resizeEnd() {
-        if (this.rendered && this.$controlContainer.height() < 100) {
+        if (this.selectedControl && this.rendered && this.$controlContainer.height() < 100) {
           this.selectedControl.setSelected(false);
         }
 
