@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.function.BinaryOperator;
@@ -31,6 +32,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,6 +103,7 @@ public class PropertiesHelper {
   public static final String CLASSPATH_PROTOCOL_NAME = "classpath";
   public static final char PROTOCOL_DELIMITER = ':';
   public static final char NAMESPACE_DELIMITER = '|';
+  public static final String NAMESPACE_DELIMITER_FOR_ENV = "__";
   public static final char COLLECTION_DELIMITER_START = '[';
   public static final char COLLECTION_DELIMITER_END = ']';
   public static final String CLASSPATH_PREFIX = CLASSPATH_PROTOCOL_NAME + PROTOCOL_DELIMITER;
@@ -308,33 +312,50 @@ public class PropertiesHelper {
     }
 
     String propKey = toPropertyKey(key, namespace).toString();
-    String value = null;
 
-    // system config
-    value = System.getProperty(propKey);
+    List<Function<String, String>> propertyValueRetrievers = Arrays.asList(
+        this::getSystemPropertyValue,
+        this::getEnvironmentPropertyValue,
+        this::getEnvFilePropertyValue,
+        this::getConfigPropertyValue);
+
+    return propertyValueRetrievers.stream()
+        .map(propertyValueRetriever -> propertyValueRetriever.apply(propKey))
+        .filter(Objects::nonNull)
+        .findFirst()
+        .orElse(defaultValue);
+  }
+
+  protected String getSystemPropertyValue(String propKey) {
+    String value = System.getProperty(propKey);
     if (StringUtility.hasText(value)) {
       return resolve(value, PLACEHOLDER_PATTERN);
     }
+    return null;
+  }
 
-    // environment config
+  protected String getEnvironmentPropertyValue(String propKey) {
     String envValue = lookupEnvironmentVariableValue(propKey);
     if (StringUtility.hasText(envValue)) {
       return resolve(envValue, PLACEHOLDER_PATTERN);
     }
+    return null;
+  }
 
-    // env file
-    value = m_envProperties.get(propKey);
+  protected String getEnvFilePropertyValue(String propKey) {
+    String value = m_envProperties.get(propKey);
     if (StringUtility.hasText(value)) {
       return value;
     }
+    return null;
+  }
 
-    // properties file
-    value = m_configProperties.get(propKey);
+  protected String getConfigPropertyValue(String propKey) {
+    String value = m_configProperties.get(propKey);
     if (StringUtility.hasText(value)) {
       return value;
     }
-
-    return defaultValue;
+    return null;
   }
 
   /**
@@ -347,10 +368,14 @@ public class PropertiesHelper {
    * <li>Original in uppercase: <code>MY.PROPERTY</code></li>
    * <li>Periods replaced, in uppercase: <code>MY_PROPERTY</code></li>
    * </ol>
+   * The standard namespace delimiter (|) will always be replaced by a delimiter more suited for use in environment
+   * variables (__).
    */
   protected String lookupEnvironmentVariableValue(String propKey) {
+    String nsDelimiterReplacedPropKey = propKey.replace(String.valueOf(NAMESPACE_DELIMITER), NAMESPACE_DELIMITER_FOR_ENV);
+
     // 1. Original
-    String value = getEnvironmentVariable(propKey);
+    String value = getEnvironmentVariable(nsDelimiterReplacedPropKey);
     if (value != null) {
       return value;
     }
@@ -358,7 +383,7 @@ public class PropertiesHelper {
     // Periods in environment variable names are not POSIX compliant (See IEEE Standard 1003.1-2017, Chapter 8.1 "Environment Variable Definition"),
     // but supported by some shells. To allow overriding via environment variables (Bugzilla 541099) in any shell, convert them to underscores.
     // 2. With periods replaced
-    String keyWithoutDots = propKey.replace('.', ENVIRONMENT_VARIABLE_DOT_REPLACEMENT);
+    String keyWithoutDots = nsDelimiterReplacedPropKey.replace('.', ENVIRONMENT_VARIABLE_DOT_REPLACEMENT);
     value = getEnvironmentVariable(keyWithoutDots);
     if (value != null) {
       logInexactEnvNameMatch(propKey, keyWithoutDots);
@@ -368,7 +393,7 @@ public class PropertiesHelper {
     // Applications may define environment variable names with lower case, but only upper case is POSIX compliant for the environment.
     // To override from a shell, we should also check for upper case.
     // 3. In Uppercase, original periods
-    String uppercasedKey = propKey.toUpperCase();
+    String uppercasedKey = nsDelimiterReplacedPropKey.toUpperCase();
     value = getEnvironmentVariable(uppercasedKey);
     if (value != null) {
       logInexactEnvNameMatch(propKey, uppercasedKey);
@@ -615,9 +640,10 @@ public class PropertiesHelper {
     String keyPrefix = toCollectionKeyPrefix(key, namespace).toString();
 
     Map<String, String> result = new HashMap<>();
-    collectMapEntriesWith(keyPrefix, m_configProperties.keySet(), result);
-    collectMapEntriesWith(keyPrefix, System.getenv().keySet(), result);
-    collectMapEntriesWith(keyPrefix, System.getProperties().keySet(), result);
+    collectMapEntriesWith(keyPrefix, m_configProperties.keySet(), this::getConfigPropertyValue, result);
+    collectMapEntriesWith(keyPrefix, m_envProperties.keySet(), this::getEnvFilePropertyValue, result);
+    collectMapEntriesFromEnvironment(key, namespace, result);
+    collectMapEntriesWith(keyPrefix, System.getProperties().keySet(), this::getSystemPropertyValue, result);
 
     if (result.isEmpty()) {
       return defaultValue;
@@ -903,13 +929,34 @@ public class PropertiesHelper {
     return m_hasProviderProperties;
   }
 
-  protected void collectMapEntriesWith(String keyPrefix, Set<?> keySet, Map<String, String> collector) {
+  protected void collectMapEntriesWith(String keyPrefix, Set<?> keySet, Function<String, String> propertyValueRetriever, Map<String, String> collector) {
     for (Object propKey : keySet) {
       String k = propKey.toString();
       String mapKey = toMapKey(k, keyPrefix);
       if (mapKey != null) {
-        // we can overwrite here because the old entry has already the same value
-        collector.put(mapKey, getProperty(k));
+        collector.put(mapKey, propertyValueRetriever.apply(k));
+      }
+    }
+  }
+
+  protected void collectMapEntriesFromEnvironment(String key, String namespace, Map<String, String> collector) {
+    String envKey = toPropertyKey(key, namespace).toString();
+    String keyValueFromEnv = lookupEnvironmentVariableValue(envKey);
+    if (StringUtility.hasText(keyValueFromEnv)) {
+      try {
+        JSONObject jsonObject = new JSONObject(keyValueFromEnv);
+        for (String mapKey : jsonObject.keySet()) {
+          Object mapValue = jsonObject.get(mapKey);
+          if (JSONObject.NULL.equals(mapValue)) {
+            collector.remove(mapKey);
+          }
+          else {
+            collector.put(mapKey, resolve((String) mapValue, PLACEHOLDER_PATTERN));
+          }
+        }
+      }
+      catch (JSONException e) {
+        throw new IllegalArgumentException(String.format("Error parsing value of environment variable '%s' as JSON value", envKey), e);
       }
     }
   }

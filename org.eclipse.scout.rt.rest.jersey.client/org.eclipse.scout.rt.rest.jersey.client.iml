@@ -13,6 +13,7 @@
     <orderEntry type="module" module-name="org.eclipse.scout.rt.rest" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.dataobject" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.platform" />
+    <orderEntry type="module" module-name="org.eclipse.scout.json" />
     <orderEntry type="library" name="Maven: org.jboss:jandex:2.0.5.Final" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:2.3.2" level="project" />
