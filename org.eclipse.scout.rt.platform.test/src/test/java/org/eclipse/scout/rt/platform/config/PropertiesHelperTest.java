@@ -10,7 +10,10 @@
  */
 package org.eclipse.scout.rt.platform.config;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -80,6 +85,10 @@ public class PropertiesHelperTest {
     assertEquals(null, instance.getProperty(NAMESPACE_PROP + "-not-existing", null, NAMESPACE));
     assertEquals(null, instance.getProperty(NAMESPACE_PROP, null, NAMESPACE + "-not-existing"));
     assertEquals("defaultval", instance.getProperty(NAMESPACE_PROP, "defaultval", NAMESPACE + "-not-existing"));
+
+    PropertiesHelper spiedInstance = spy(instance);
+    when(spiedInstance.getEnvironmentVariable(NAMESPACE + "__" + NAMESPACE_PROP)).thenReturn(NAMESPACE_PROP_VAL + "-from-env");
+    assertThat(spiedInstance.getProperty(NAMESPACE_PROP, null, NAMESPACE), is(NAMESPACE_PROP_VAL + "-from-env"));
   }
 
   @Test
@@ -213,6 +222,141 @@ public class PropertiesHelperTest {
     catch (IllegalArgumentException e) {
       Assert.assertNotNull(e);
     }
+  }
+
+  @Test
+  public void testReadPropertyMapFromEnvironment() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(SAMPLE_CONFIG_PROPS));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+    when(spiedInstance.getEnvironmentVariable("map_not_in_file")).thenReturn("{\"keya\": \"valuea\",\"keyb\": \"valueb\",\"keyc\": \"valuec\"}");
+
+    assertThat(spiedInstance.getPropertyMap("map.not.in.file"), is(CollectionUtility.hashMap(
+        new ImmutablePair<>("keya", "valuea"),
+        new ImmutablePair<>("keyb", "valueb"),
+        new ImmutablePair<>("keyc", "valuec"))));
+  }
+
+  @Test
+  public void testReadPropertyMapFromEnvironmentWithVariableReference() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(SAMPLE_CONFIG_PROPS), new SimpleConfigPropertyProvider("envFile")
+        .withProperty("envFileKey", "value-from-envfile"));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+    try {
+      System.setProperty("sysProp", "sysPropVal");
+      System.setProperty("stringKey", "stringKeyValueFromSystemProperty");
+      when(spiedInstance.getEnvironmentVariable("envProp")).thenReturn("envPropVal");
+      when(spiedInstance.getEnvironmentVariable("intKey")).thenReturn("intKeyFromEnv");
+      when(spiedInstance.getEnvironmentVariable("map_not_in_file")).thenReturn("{" +
+          "\"propFromConfigProperties\": \"${otherProp}\"," +
+          "\"propFromSystemProperties\": \"${sysProp}\"," +
+          "\"propFromEnvironment\": \"${envProp}\"," +
+          "\"propFromConfigPropertiesOverriddenByEnv\": \"${intKey}\"," +
+          "\"propFromConfigPropertiesOverriddenBySystemProperty\": \"${stringKey}\"," +
+          "\"propFromConfigPropertiesInString\": \"test${longKey}testtest\"," +
+          "\"propFromEnvFileInString\": \"test${envFileKey}testtest\"" +
+          "}");
+
+      assertThat(spiedInstance.getPropertyMap("map.not.in.file"), is(CollectionUtility.hashMap(
+          new ImmutablePair<>("propFromConfigProperties", "otherVal"),
+          new ImmutablePair<>("propFromSystemProperties", "sysPropVal"),
+          new ImmutablePair<>("propFromEnvironment", "envPropVal"),
+          new ImmutablePair<>("propFromConfigPropertiesOverriddenByEnv", "intKeyFromEnv"),
+          new ImmutablePair<>("propFromConfigPropertiesOverriddenBySystemProperty", "stringKeyValueFromSystemProperty"),
+          new ImmutablePair<>("propFromConfigPropertiesInString", "test2testtest"),
+          new ImmutablePair<>("propFromEnvFileInString", "testvalue-from-envfiletesttest"))));
+    }
+    finally {
+      System.clearProperty("sysProp");
+      System.clearProperty("stringKey");
+    }
+  }
+
+  @Test
+  public void testReadPropertyMapFromEnvironmentMixingWithOtherPropertyMapSources() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(MAP_CONFIG_PROPS));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+    when(spiedInstance.getEnvironmentVariable("mapKey")).thenReturn("{\"second\": \"zwei\", \"third\": null}");
+
+    assertThat(spiedInstance.getPropertyMap("mapKey"), is(CollectionUtility.hashMap(
+        new ImmutablePair<>("first", "one"),
+        new ImmutablePair<>("second", "zwei"),
+        new ImmutablePair<>("empty", null),
+        new ImmutablePair<>("last", "last"))));
+  }
+
+  @Test
+  public void testReadPropertyMapRespectingPrecedence() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(MAP_CONFIG_PROPS), new SimpleConfigPropertyProvider("envFile")
+        .withProperty("mapKey[third]", "third-from-env-file")
+        .withProperty("mapKey[empty]", "really-nothing-from-env-file"));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+    try {
+      System.setProperty("mapKey[first]", "one-from-system-property");
+      when(spiedInstance.getEnvironmentVariable("mapKey")).thenReturn("{\"first\": \"one-from-env\", \"second\": \"two-from-env\", \"empty\": \"really-empty-from-env\"}");
+
+      assertThat(spiedInstance.getPropertyMap("mapKey"), is(CollectionUtility.hashMap(
+          new ImmutablePair<>("first", "one-from-system-property"),
+          new ImmutablePair<>("second", "two-from-env"),
+          new ImmutablePair<>("third", "third-from-env-file"),
+          new ImmutablePair<>("empty", "really-empty-from-env"),
+          new ImmutablePair<>("last", "last"))));
+    }
+    finally {
+      System.clearProperty("mapKey[first]");
+    }
+  }
+
+  @Test
+  public void testReadPropertyMapFromEnvironmentWithNamespace() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(MAP_CONFIG_PROPS));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+    when(spiedInstance.getEnvironmentVariable("mapKey")).thenReturn("{\"second\": \"zwei\", \"third\": null}");
+    when(spiedInstance.getEnvironmentVariable("namespace1__mapKey")).thenReturn("{\"a\": null, \"b\": \"b\", \"c\": \"ce\"}");
+    when(spiedInstance.getEnvironmentVariable("namespace2__mapKey")).thenReturn("{\"d\": \"de\", \"e\": \"ee\"}");
+
+    assertThat(spiedInstance.getPropertyMap("mapKey"), is(CollectionUtility.hashMap(
+        new ImmutablePair<>("first", "one"),
+        new ImmutablePair<>("second", "zwei"),
+        new ImmutablePair<>("empty", null),
+        new ImmutablePair<>("last", "last"))));
+    assertThat(spiedInstance.getPropertyMap("mapKey", "namespace1"), is(CollectionUtility.hashMap(
+        new ImmutablePair<>("b", "b"),
+        new ImmutablePair<>("c", "ce"))));
+    assertThat(spiedInstance.getPropertyMap("mapKey", "namespace2"), is(CollectionUtility.hashMap(
+        new ImmutablePair<>("d", "de"),
+        new ImmutablePair<>("e", "ee"))));
+  }
+
+  @Test
+  public void testExpectedExceptionForMalformedJsonStringMissingComma() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(MAP_CONFIG_PROPS));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+
+    when(spiedInstance.getEnvironmentVariable("mapKey")).thenReturn("{\"second\": \"zwei\" \"third\": null}"); // missing comma after "zwei"
+
+    Assert.assertThrows("Error parsing value of environment variable 'mapKey' as JSON value", IllegalArgumentException.class, () -> spiedInstance.getPropertyMap("mapKey"));
+  }
+
+  @Test
+  public void testExpectedExceptionForMalformedJsonStringMissingClosingBraces() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(MAP_CONFIG_PROPS));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+
+    when(spiedInstance.getEnvironmentVariable("mapKey")).thenReturn("{\"second\": \"zwei\", \"third\": null"); // missing } at the end
+
+    Assert.assertThrows("Error parsing value of environment variable 'mapKey' as JSON value", IllegalArgumentException.class, () -> spiedInstance.getPropertyMap("mapKey"));
+  }
+
+  @Test
+  public void testReadPropertyListFromEnvironment() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(LIST_PROPS));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+
+    when(spiedInstance.getEnvironmentVariable("list")).thenReturn("{\"0\": \"zero\", \"1\": \"one\", \"2\": \"two\", \"3\": \"three\"}");
+    when(spiedInstance.getEnvironmentVariable("listWithValidIndices")).thenReturn("{\"2\": \"two\", \"4\": \"four\", \"5\": \"five\"}");
+
+    assertThat(spiedInstance.getPropertyList("list"), is(Arrays.asList("zero", "one", "two", "three")));
+    assertThat(spiedInstance.getPropertyList("listWithValidIndices"), is(Arrays.asList("a", null, "two", "b", "four", "five")));
   }
 
   @Test
