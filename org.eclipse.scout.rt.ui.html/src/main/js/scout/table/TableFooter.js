@@ -189,7 +189,7 @@ scout.TableFooter.prototype._renderResizer = function() {
     }
 
     function resizeEnd() {
-      if (this.rendered && this.$controlContainer.height() < 100) {
+      if (this.selectedControl && this.rendered && this.$controlContainer.height() < 100) {
         this.selectedControl.setSelected(false);
       }
 
