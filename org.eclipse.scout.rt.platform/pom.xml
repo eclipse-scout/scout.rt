@@ -26,6 +26,11 @@
 
   <name>${project.groupId}:${project.artifactId}</name>
   <dependencies>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.json</artifactId>
+    </dependency>
+
     <!-- Build Dependencies -->
     <dependency>
       <groupId>org.jboss</groupId>
