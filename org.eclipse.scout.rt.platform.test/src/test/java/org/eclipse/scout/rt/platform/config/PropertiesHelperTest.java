@@ -10,21 +10,41 @@
  */
 package org.eclipse.scout.rt.platform.config;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 /**
  * Tests for class {@link PropertiesHelper}.
  */
+@RunWith(PlatformTestRunner.class)
 public class PropertiesHelperTest {
 
   private static final String SAMPLE_CONFIG_PROPS = "classpath:org/eclipse/scout/rt/platform/config/sample-config.properties";
@@ -61,6 +81,23 @@ public class PropertiesHelperTest {
   private static final String MAP_KEY = "mapKey";
   private static final String EMPTY_KEY = "emptyKey";
 
+  private static final List<IBean<?>> s_beans = new ArrayList<>();
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    s_beans.addAll(BEANS.get(BeanTestingHelper.class).registerBeans(new BeanMetaData(TestJsonPropertyReader.class)));
+  }
+
+  @Before
+  public void before() {
+    BEANS.get(TestJsonPropertyReader.class).clear();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    BEANS.get(BeanTestingHelper.class).unregisterBeans(s_beans);
+  }
+
   @Test
   public void testPropertiesHelper() {
     PropertiesHelper instance = new PropertiesHelper(new ConfigPropertyProvider(SAMPLE_CONFIG_PROPS));
@@ -80,6 +117,10 @@ public class PropertiesHelperTest {
     assertEquals(null, instance.getProperty(NAMESPACE_PROP + "-not-existing", null, NAMESPACE));
     assertEquals(null, instance.getProperty(NAMESPACE_PROP, null, NAMESPACE + "-not-existing"));
     assertEquals("defaultval", instance.getProperty(NAMESPACE_PROP, "defaultval", NAMESPACE + "-not-existing"));
+
+    PropertiesHelper spiedInstance = spy(instance);
+    when(spiedInstance.getEnvironmentVariable(NAMESPACE + "__" + NAMESPACE_PROP)).thenReturn(NAMESPACE_PROP_VAL + "-from-env");
+    assertThat(spiedInstance.getProperty(NAMESPACE_PROP, null, NAMESPACE), is(NAMESPACE_PROP_VAL + "-from-env"));
   }
 
   @Test
@@ -213,6 +254,237 @@ public class PropertiesHelperTest {
     catch (IllegalArgumentException e) {
       Assert.assertNotNull(e);
     }
+  }
+
+  @Test
+  public void testReadPropertyMapFromEnvironment() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(SAMPLE_CONFIG_PROPS));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+
+    String mapNotInFilePropertyValue = "{\"keya\": \"valuea\",\"keyb\": \"valueb\",\"keyc\": \"valuec\"}";
+
+    BEANS.get(TestJsonPropertyReader.class).putMapping(mapNotInFilePropertyValue, CollectionUtility.hashMap(
+        new ImmutablePair<>("keya", "valuea"),
+        new ImmutablePair<>("keyb", "valueb"),
+        new ImmutablePair<>("keyc", "valuec")));
+
+    when(spiedInstance.getEnvironmentVariable("map_not_in_file")).thenReturn(mapNotInFilePropertyValue);
+
+    assertThat(spiedInstance.getPropertyMap("map.not.in.file"), is(CollectionUtility.hashMap(
+        new ImmutablePair<>("keya", "valuea"),
+        new ImmutablePair<>("keyb", "valueb"),
+        new ImmutablePair<>("keyc", "valuec"))));
+  }
+
+  @Test
+  public void testReadPropertyMapFromEnvironmentWithVariableReference() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(SAMPLE_CONFIG_PROPS), new SimpleConfigPropertyProvider("envFile")
+        .withProperty("envFileKey", "value-from-envfile"));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+    try {
+      System.setProperty("sysProp", "sysPropVal");
+      System.setProperty("stringKey", "stringKeyValueFromSystemProperty");
+
+      String mapNotInFilePropertyValue = "{" +
+          "\"propFromConfigProperties\": \"${otherProp}\"," +
+          "\"propFromSystemProperties\": \"${sysProp}\"," +
+          "\"propFromEnvironment\": \"${envProp}\"," +
+          "\"propFromConfigPropertiesOverriddenByEnv\": \"${intKey}\"," +
+          "\"propFromConfigPropertiesOverriddenBySystemProperty\": \"${stringKey}\"," +
+          "\"propFromConfigPropertiesInString\": \"test${longKey}testtest\"," +
+          "\"propFromEnvFileInString\": \"test${envFileKey}testtest\"}";
+
+      BEANS.get(TestJsonPropertyReader.class).putMapping(mapNotInFilePropertyValue, CollectionUtility.hashMap(
+          new ImmutablePair<>("propFromConfigProperties", "${otherProp}"),
+          new ImmutablePair<>("propFromSystemProperties", "${sysProp}"),
+          new ImmutablePair<>("propFromEnvironment", "${envProp}"),
+          new ImmutablePair<>("propFromConfigPropertiesOverriddenByEnv", "${intKey}"),
+          new ImmutablePair<>("propFromConfigPropertiesOverriddenBySystemProperty", "${stringKey}"),
+          new ImmutablePair<>("propFromConfigPropertiesInString", "test${longKey}testtest"),
+          new ImmutablePair<>("propFromEnvFileInString", "test${envFileKey}testtest")));
+
+      when(spiedInstance.getEnvironmentVariable("envProp")).thenReturn("envPropVal");
+      when(spiedInstance.getEnvironmentVariable("intKey")).thenReturn("intKeyFromEnv");
+      when(spiedInstance.getEnvironmentVariable("map_not_in_file")).thenReturn(mapNotInFilePropertyValue);
+
+      assertThat(spiedInstance.getPropertyMap("map.not.in.file"), is(CollectionUtility.hashMap(
+          new ImmutablePair<>("propFromConfigProperties", "otherVal"),
+          new ImmutablePair<>("propFromSystemProperties", "sysPropVal"),
+          new ImmutablePair<>("propFromEnvironment", "envPropVal"),
+          new ImmutablePair<>("propFromConfigPropertiesOverriddenByEnv", "intKeyFromEnv"),
+          new ImmutablePair<>("propFromConfigPropertiesOverriddenBySystemProperty", "stringKeyValueFromSystemProperty"),
+          new ImmutablePair<>("propFromConfigPropertiesInString", "test2testtest"),
+          new ImmutablePair<>("propFromEnvFileInString", "testvalue-from-envfiletesttest"))));
+    }
+    finally {
+      System.clearProperty("sysProp");
+      System.clearProperty("stringKey");
+    }
+  }
+
+  @Test
+  public void testReadPropertyMapFromEnvironmentMixingWithOtherPropertyMapSources() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(MAP_CONFIG_PROPS));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+
+    String mapKeyPropertyValue = "{\"second\": \"zwei\", \"third\": null}";
+
+    BEANS.get(TestJsonPropertyReader.class).putMapping(mapKeyPropertyValue, CollectionUtility.hashMap(
+        new ImmutablePair<>("second", "zwei"),
+        new ImmutablePair<>("third", null)));
+
+    when(spiedInstance.getEnvironmentVariable("mapKey")).thenReturn(mapKeyPropertyValue);
+
+    assertThat(spiedInstance.getPropertyMap("mapKey"), is(CollectionUtility.hashMap(
+        new ImmutablePair<>("first", "one"),
+        new ImmutablePair<>("second", "zwei"),
+        new ImmutablePair<>("empty", null),
+        new ImmutablePair<>("last", "last"))));
+  }
+
+  @Test
+  public void testReadPropertyMapRespectingPrecedence() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(MAP_CONFIG_PROPS), new SimpleConfigPropertyProvider("envFile")
+        .withProperty("mapKey[third]", "third-from-env-file")
+        .withProperty("mapKey[empty]", "really-nothing-from-env-file"));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+    try {
+      System.setProperty("mapKey[first]", "one-from-system-property");
+
+      String mapKeyPropertyValue = "{\"first\": \"one-from-env\", \"second\": \"two-from-env\", \"empty\": \"really-empty-from-env\"}";
+
+      BEANS.get(TestJsonPropertyReader.class).putMapping(mapKeyPropertyValue, CollectionUtility.hashMap(
+          new ImmutablePair<>("first", "one-from-env"),
+          new ImmutablePair<>("second", "two-from-env")));
+
+      when(spiedInstance.getEnvironmentVariable("mapKey")).thenReturn(mapKeyPropertyValue);
+
+      assertThat(spiedInstance.getPropertyMap("mapKey"), is(CollectionUtility.hashMap(
+          new ImmutablePair<>("first", "one-from-system-property"),
+          new ImmutablePair<>("second", "two-from-env"),
+          new ImmutablePair<>("third", "third-from-env-file"),
+          new ImmutablePair<>("empty", "really-nothing-from-env-file"),
+          new ImmutablePair<>("last", "last"))));
+    }
+    finally {
+      System.clearProperty("mapKey[first]");
+    }
+  }
+
+  @Test
+  public void testReadPropertyMapFromEnvironmentWithNamespace() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(MAP_CONFIG_PROPS));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+
+    String mapKeyPropertyValue = "{\"second\": \"zwei\", \"third\": null}";
+    String namespace1MapKeyPropertyValue = "{\"a\": null, \"b\": \"b\", \"c\": \"ce\"}";
+    String namespace2MapKeyPropertyValue = "{\"d\": \"de\", \"e\": \"ee\"}";
+
+    BEANS.get(TestJsonPropertyReader.class).putMapping(mapKeyPropertyValue, CollectionUtility.hashMap(
+        new ImmutablePair<>("second", "zwei"),
+        new ImmutablePair<>("third", null)));
+
+    BEANS.get(TestJsonPropertyReader.class).putMapping(namespace1MapKeyPropertyValue, CollectionUtility.hashMap(
+        new ImmutablePair<>("a", null),
+        new ImmutablePair<>("b", "b"),
+        new ImmutablePair<>("c", "ce")));
+
+    BEANS.get(TestJsonPropertyReader.class).putMapping(namespace2MapKeyPropertyValue, CollectionUtility.hashMap(
+        new ImmutablePair<>("d", "de"),
+        new ImmutablePair<>("e", "ee")));
+
+    when(spiedInstance.getEnvironmentVariable("mapKey")).thenReturn(mapKeyPropertyValue);
+    when(spiedInstance.getEnvironmentVariable("namespace1__mapKey")).thenReturn(namespace1MapKeyPropertyValue);
+    when(spiedInstance.getEnvironmentVariable("namespace2__mapKey")).thenReturn(namespace2MapKeyPropertyValue);
+
+    assertThat(spiedInstance.getPropertyMap("mapKey"), is(CollectionUtility.hashMap(
+        new ImmutablePair<>("first", "one"),
+        new ImmutablePair<>("second", "zwei"),
+        new ImmutablePair<>("empty", null),
+        new ImmutablePair<>("last", "last"))));
+    assertThat(spiedInstance.getPropertyMap("mapKey", "namespace1"), is(CollectionUtility.hashMap(
+        new ImmutablePair<>("b", "b"),
+        new ImmutablePair<>("c", "ce"))));
+    assertThat(spiedInstance.getPropertyMap("mapKey", "namespace2"), is(CollectionUtility.hashMap(
+        new ImmutablePair<>("d", "de"),
+        new ImmutablePair<>("e", "ee"))));
+  }
+
+  @Test
+  public void testExpectedExceptionOnPlatformExceptionFromIJsonPropertyReader() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(MAP_CONFIG_PROPS));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+
+    BEANS.get(TestJsonPropertyReader.class).setThrowExceptionOnRead(true);
+
+    when(spiedInstance.getEnvironmentVariable("mapKey")).thenReturn("{\"second\": \"zwei\" \"third\": null}"); // missing comma after "zwei"
+
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> spiedInstance.getPropertyMap("mapKey"));
+    assertThat(exception.getMessage(), is("Error parsing value of property map 'mapKey' as JSON value from an environment variable."));
+  }
+
+  @Test
+  public void testCorrectBehaviorWhenNoIJsonPropertyReaderCouldBeFound() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(MAP_CONFIG_PROPS));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+
+    // unregister IJsonPropertyReader Bean
+    Platform.get().getBeanManager().unregisterClass(TestJsonPropertyReader.class);
+
+    when(spiedInstance.getEnvironmentVariable("mapKey")).thenReturn("{\"second\": \"zwei\", \"third\": null}");
+    try {
+      PlatformException exception = assertThrows(PlatformException.class, () -> spiedInstance.getPropertyMap("mapKey"));
+      assertThat(exception.getMessage(), is("No IJsonPropertyReader instance found while trying to decode the value of property map 'mapKey' from an environment variable. " +
+          "Make sure to provide an appropriate implementation or unset the respective environment variable."));
+    }
+    finally {
+      BeanTestingHelper.get().registerBean(new BeanMetaData(TestJsonPropertyReader.class));
+    }
+  }
+
+  @Test
+  public void testCorrectBehaviorWhenIJsonPropertyReaderIsNotPresentButAlsoNotNeeded() throws Exception {
+    PropertiesHelper helper = new PropertiesHelper(new ConfigPropertyProvider(MAP_CONFIG_PROPS));
+
+    Platform.get().getBeanManager().unregisterClass(TestJsonPropertyReader.class);
+
+    try {
+      assertThat(helper.getPropertyMap("mapKey"), is(CollectionUtility.hashMap(
+          new ImmutablePair<>("first", "one"),
+          new ImmutablePair<>("second", "two"),
+          new ImmutablePair<>("third", "three"),
+          new ImmutablePair<>("empty", null),
+          new ImmutablePair<>("last", "last"))));
+    }
+    finally {
+      BeanTestingHelper.get().registerBean(new BeanMetaData(TestJsonPropertyReader.class));
+    }
+  }
+
+  @Test
+  public void testReadPropertyListFromEnvironment() {
+    PropertiesHelper originalInstance = new PropertiesHelper(new ConfigPropertyProvider(LIST_PROPS));
+    PropertiesHelper spiedInstance = spy(originalInstance);
+
+    String listPropertyValue = "{\"0\": \"zero\", \"1\": \"one\", \"2\": \"two\", \"3\": \"three\"}";
+    String listWithValidIndicesPropertyValue = "{\"2\": \"two\", \"4\": \"four\", \"5\": \"five\"}";
+
+    BEANS.get(TestJsonPropertyReader.class).putMapping(listPropertyValue, CollectionUtility.hashMap(
+        new ImmutablePair<>("0", "zero"),
+        new ImmutablePair<>("1", "one"),
+        new ImmutablePair<>("2", "two"),
+        new ImmutablePair<>("3", "three")));
+
+    BEANS.get(TestJsonPropertyReader.class).putMapping(listWithValidIndicesPropertyValue, CollectionUtility.hashMap(
+        new ImmutablePair<>("2", "two"),
+        new ImmutablePair<>("4", "four"),
+        new ImmutablePair<>("5", "five")));
+
+    when(spiedInstance.getEnvironmentVariable("list")).thenReturn(listPropertyValue);
+    when(spiedInstance.getEnvironmentVariable("listWithValidIndices")).thenReturn(listWithValidIndicesPropertyValue);
+
+    assertThat(spiedInstance.getPropertyList("list"), is(Arrays.asList("zero", "one", "two", "three")));
+    assertThat(spiedInstance.getPropertyList("listWithValidIndices"), is(Arrays.asList("a", null, "two", "b", "four", "five")));
   }
 
   @Test
@@ -627,4 +899,36 @@ public class PropertiesHelperTest {
     }
   }
 
+  /**
+   * Used in {@link PropertiesHelperTest} as a test implementation for {@link IJsonPropertyReader}.
+   */
+  @IgnoreBean
+  public static class TestJsonPropertyReader implements IJsonPropertyReader {
+
+    private final Map<String, Map<String, String>> m_propertyValueToMap = new HashMap<>();
+
+    private boolean m_throwExceptionOnRead = false;
+
+    @Override
+    public Map<String, String> readJsonPropertyValue(String propertyValue) {
+      if (m_throwExceptionOnRead) {
+        throw new PlatformException("Simulated exception from {}", this.getClass());
+      }
+      Assertions.assertTrue(m_propertyValueToMap.containsKey(propertyValue), "Prepare mapping for value {} before using this {}.", propertyValue, this.getClass());
+      return m_propertyValueToMap.get(propertyValue);
+    }
+
+    public void clear() {
+      m_propertyValueToMap.clear();
+      m_throwExceptionOnRead = false;
+    }
+
+    public void putMapping(String propertyValue, Map<String, String> parsedMap) {
+      m_propertyValueToMap.put(propertyValue, parsedMap);
+    }
+
+    public void setThrowExceptionOnRead(boolean throwExceptionOnRead) {
+      m_throwExceptionOnRead = throwExceptionOnRead;
+    }
+  }
 }
