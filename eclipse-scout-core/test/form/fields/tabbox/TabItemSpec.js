@@ -78,10 +78,10 @@ describe('TabItem', function() {
     });
   });
 
-  describe('_renderTooltipText', function() {
-    var tabItem, tabBox, tab;
+  describe('tooltip text', () => {
+    let tabItem, tabBox, tab;
 
-    beforeEach(function() {
+    beforeEach(() => {
       tabItem = helper.createTabItem({
         tooltipText: 'foo1'
       });
@@ -90,18 +90,18 @@ describe('TabItem', function() {
       tab = tabBox.header.tabArea.tabs[0];
     });
 
-    it('initially adds the tooltipText to the Tab', function() {
+    it('is shown initially', () => {
       expect(tab.$container.hasClass('has-tooltip')).toBe(true);
       expect(tab.tooltipText).toBe('foo1');
     });
 
-    it('changes the tooltipText from the Tab', function() {
+    it('is updated', () => {
       tabItem.setProperty('tooltipText', 'foo2');
       expect(tab.$container.hasClass('has-tooltip')).toBe(true);
       expect(tab.tooltipText).toBe('foo2');
     });
 
-    it('clears the tooltipText from the Tab', function() {
+    it('is removed', () => {
       tabItem.setProperty('tooltipText', null);
       expect(tab.$container.hasClass('has-tooltip')).toBe(false);
       expect(tab.tooltipText).toBe(null);

@@ -35,6 +35,7 @@ export default class Tab extends Widget {
     this.subLabel = this.tabItem.subLabel;
     this.cssClass = this.tabItem.cssClass;
     this.marked = this.tabItem.marked;
+    this.errorStatus = this.tabItem.errorStatus;
     this.tooltipText = this.tabItem.tooltipText;
 
     this.fieldStatus = scout.create('FieldStatus', {
@@ -259,5 +260,6 @@ export default class Tab extends Widget {
     } else if (event.propertyName === 'tooltipText') {
       this.setTooltipText(event.newValue);
     }
+    // Note: If you add a property here, also add it to _init()
   }
 }
