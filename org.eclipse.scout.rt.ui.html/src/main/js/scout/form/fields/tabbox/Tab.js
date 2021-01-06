@@ -31,6 +31,8 @@ scout.Tab.prototype._init = function(options) {
   this.subLabel = this.tabItem.subLabel;
   this.cssClass = this.tabItem.cssClass;
   this.marked = this.tabItem.marked;
+  this.errorStatus = this.tabItem.errorStatus;
+  this.tooltipText = this.tabItem.tooltipText;
 
   this.fieldStatus = scout.create('FieldStatus', {
     parent: this,
@@ -253,4 +255,5 @@ scout.Tab.prototype._onTabPropertyChange = function(event) {
   } else if (event.propertyName === 'tooltipText') {
     this.setTooltipText(event.newValue);
   }
+  // Note: If you add a property here, also add it to _init()
 };
