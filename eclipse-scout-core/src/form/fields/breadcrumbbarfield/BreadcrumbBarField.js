@@ -14,34 +14,44 @@ import {FormField} from '../../../index';
 export default class BreadcrumbBarField extends FormField {
   constructor() {
     super();
+    this.breadcrumbBar = null;
     this._addWidgetProperties(['breadcrumbBar']);
   }
 
   _render() {
     this.addContainer(this.$parent, 'breadcrumb-bar-field');
-    if (this.breadcrumbBar) {
-      this._renderBreadcrumbBar();
-    }
-  }
-
-  _renderBreadcrumbBar() {
-    this.breadcrumbBar.render();
     this.addLabel();
     this.addMandatoryIndicator();
-    this.addField(this.breadcrumbBar.$container);
     this.addStatus();
-  }
-
-  setBreadcrumbBar(breadcrumbBar) {
-    this._setBreadcrumbBar(breadcrumbBar);
+    this._renderBreadcrumbBar();
   }
 
   setBreadcrumbItems(breadcrumbItems) {
+    if (!this.breadcrumbBar) {
+      return;
+    }
     this.breadcrumbBar.setBreadcrumbItems(breadcrumbItems);
   }
 
+  setBreadcrumbBar(breadcrumbBar) {
+    this.setProperty('breadcrumbBar', breadcrumbBar);
+  }
+
+  _renderBreadcrumbBar() {
+    if (!this.breadcrumbBar) {
+      return;
+    }
+    this.breadcrumbBar.render();
+    this.addField(this.breadcrumbBar.$container);
+    this.invalidateLayoutTree();
+  }
+
   _removeBreadcrumbBar() {
+    if (!this.breadcrumbBar) {
+      return;
+    }
     this.breadcrumbBar.remove();
     this._removeField();
+    this.invalidateLayoutTree();
   }
 }
