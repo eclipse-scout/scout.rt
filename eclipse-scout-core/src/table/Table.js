@@ -88,7 +88,6 @@ export default class Table extends Widget {
     this.hierarchical = false;
     this.hierarchicalStyle = Table.HierarchicalStyle.DEFAULT;
     this.keyStrokes = [];
-    this.keyboardNavigation = true;
     this.menus = [];
     this.menuBar = null;
     this.menuBarVisible = true;

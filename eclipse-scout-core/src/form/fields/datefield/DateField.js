@@ -46,7 +46,6 @@ export default class DateField extends ValueField {
     this.dateFormatPattern = null;
     this.disabledCopyOverlay = true;
     this.hasDate = true;
-    this.oldDisplayText = null;
     this.touchMode = false;
     this.embedded = false;
 
@@ -436,7 +435,6 @@ export default class DateField extends ValueField {
   }
 
   _setDisplayText(displayText) {
-    this.oldDisplayText = this.displayText;
     this._setProperty('displayText', displayText);
 
     let parts = this._splitDisplayText(displayText);
