@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,14 +70,14 @@ public abstract class AbstractDerbySqlService extends AbstractSqlService {
 
   protected void runDerbyCommand(String commands) throws SQLException {
     Assertions.assertTrue(StringUtility.hasText(commands), "Commands must be provided.");
-    try (Connection connection = DriverManager.getConnection(getJdbcMappingName() + commands)) {
+    try (Connection connection = DriverManager.getConnection(commands)) {
       LOG.debug("Executed derby command '{}' on connection '{}'.", commands, connection);
     }
   }
 
   public void dropDB() {
     try {
-      runDerbyCommand(";drop=true");
+      runDerbyCommand(getJdbcMappingName() + ";drop=true");
     }
     catch (SQLException e) {
       throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
@@ -87,19 +87,28 @@ public abstract class AbstractDerbySqlService extends AbstractSqlService {
   @Override
   public void destroy() {
     try {
-      // Destroy connection pool first
-      super.destroy(); // Expects the property scout.sql.jdbc.driverUnload to be set to false, otherwise super.destroy() will throw an exception
+      super.destroy(); // Destroy connection pool first
     }
     finally {
       shutdownDB();
     }
   }
 
+  @Override
+  protected void deregisterDriver() {
+    // nop
+    // do not deregister the derby driver in destroy() because the driver is still used in shutdownDB() for the shutdown command.
+    // it will be de-registered by the shutdown command
+  }
+
   protected void shutdownDB() {
     // How to embed derby: https://db.apache.org/derby/papers/DerbyTut/embedded_intro.html
-    // Shutdown: https://docs.oracle.com/javadb/10.8.3.0/ref/rrefattrib16471.html
+    // Shutdown: https://db.apache.org/derby/docs/10.9/devguide/tdevdvlp40464.html
+    // completely shutdown the database AND the engine.
+    // Shutting down only this DB instance would not shutdown the engine and leaks threads and memory. Therefore use full shutdown command.
+    String derbyShutdownCommand = "jdbc:derby:;shutdown=true";
     try {
-      runDerbyCommand(";shutdown=true"); // Shutdown derby
+      runDerbyCommand(derbyShutdownCommand); // Shutdown derby
     }
     catch (SQLException e) {
       boolean shutDownSuccessful = (e.getErrorCode() == 50000 && "XJ015".equals(e.getSQLState())) // error codes for successful full Derby shutdown
