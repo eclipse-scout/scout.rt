@@ -39,6 +39,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -288,6 +289,9 @@ public final class IOUtility {
   /**
    * Unzips the given ZIP archive as a collection of BinaryResources. Unzipping happens in-memory, no files are written.
    * The optional parameter <code>entryNameFilterPattern</code> allows to filter the ZIP for matching file entries.
+   * Unzipping will be performed with the UTF-8 charset. If this fails, unzipping with the legacy charset Cp437 will
+   * performed. If this fails again or Cp437 is not supported by the JVM used, an <code>IllegalArgumentException</code>
+   * is thrown.
    *
    * @return A collection of binary resources contained in the ZIP archive
    * @param zipArchive
@@ -296,7 +300,34 @@ public final class IOUtility {
    *          optional filter, may be null
    */
   public static Collection<BinaryResource> unzip(byte[] zipArchive, Pattern filterPattern) throws IOException {
-    try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipArchive))) {
+    try {
+      return unzip(zipArchive, filterPattern, StandardCharsets.UTF_8);
+    }
+    catch (IllegalArgumentException e) {
+      Charset charset;
+      try {
+        charset = Charset.forName("Cp437");
+      }
+      catch (UnsupportedCharsetException charsetException) { // NOSONAR
+        throw e;
+      }
+      return unzip(zipArchive, filterPattern, charset);
+    }
+  }
+
+  /**
+   * Unzips the given ZIP archive as a collection of BinaryResources. Unzipping happens in-memory, no files are written.
+   * The optional parameter <code>entryNameFilterPattern</code> allows to filter the ZIP for matching file entries.
+   *
+   * @return A collection of binary resources contained in the ZIP archive
+   * @param zipArchive
+   * @param charset
+   *          the charset to use for the unzipping
+   * @param filterPattern
+   *          optional filter, may be null
+   */
+  public static Collection<BinaryResource> unzip(byte[] zipArchive, Pattern filterPattern, Charset charset) throws IOException {
+    try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipArchive), charset)) {
       List<BinaryResource> list = new ArrayList<>();
       ZipEntry entry;
       while ((entry = zis.getNextEntry()) != null) {
