@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.server.jdbc;
 
 import java.security.Permission;
@@ -45,7 +45,6 @@ import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlDirectJdbcConnectionProperty;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlJdbcDriverNameProperty;
-import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlJdbcDriverUnloadProperty;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlJdbcMappingNameProperty;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlJdbcPoolConnectionBusyTimeoutProperty;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlJdbcPoolConnectionLifetimeProperty;
@@ -782,16 +781,16 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
 
     if (isDirectJdbcConnection()) {
       destroySqlConnectionPool();
+      deregisterDriver(); // Destroy JDBC driver
+    }
+  }
 
-      // Destroy JDBC driver
-      if (CONFIG.getPropertyValue(SqlJdbcDriverUnloadProperty.class)) {
-        try {
-          DriverManager.deregisterDriver(DriverManager.getDriver(getJdbcMappingName()));
-        }
-        catch (final SQLException e) {
-          LOG.warn("Failed to deregister JDBC driver [driver={}, url={}]", getJdbcDriverName(), getJdbcMappingName(), e);
-        }
-      }
+  protected void deregisterDriver() {
+    try {
+      DriverManager.deregisterDriver(DriverManager.getDriver(getJdbcMappingName()));
+    }
+    catch (final SQLException e) {
+      LOG.warn("Failed to deregister JDBC driver [driver={}, url={}]", getJdbcDriverName(), getJdbcMappingName(), e);
     }
   }
 

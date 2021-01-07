@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.server.jdbc;
 
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
@@ -215,24 +215,6 @@ public final class SqlConfigProperties {
     @Override
     public String description() {
       return "The maximum number of connections to create. The default pool size is 25.";
-    }
-  }
-
-  public static class SqlJdbcDriverUnloadProperty extends AbstractBooleanConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.sql.jdbc.driverUnload";
-    }
-
-    @Override
-    public String description() {
-      return "Indicates whether to uninstall JDBC driver upon platform shutdown. This property has no effect if working with JNDI JDBC connections. By default this property is enabled.";
-    }
-
-    @Override
-    public Boolean getDefaultValue() {
-      return Boolean.TRUE;
     }
   }
 }
