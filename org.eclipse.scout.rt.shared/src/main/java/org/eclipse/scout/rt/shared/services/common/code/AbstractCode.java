@@ -424,22 +424,19 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
 
   @Override
   public ICode<T> getChildCodeByExtKey(Object extKey) {
-    if (m_codeList == null) {
+    if (m_codeList == null || extKey == null) {
       return null;
     }
-    ICode<T> c = null;
     for (ICode<T> childCode : m_codeList) {
       if (extKey.equals(childCode.getExtKey())) {
         return childCode;
       }
-      else {
-        c = childCode.getChildCodeByExtKey(extKey);
-        if (c != null) {
-          return c;
-        }
+      ICode<T> c = childCode.getChildCodeByExtKey(extKey);
+      if (c != null) {
+        return c;
       }
     }
-    return c;
+    return null;
   }
 
   @Override
