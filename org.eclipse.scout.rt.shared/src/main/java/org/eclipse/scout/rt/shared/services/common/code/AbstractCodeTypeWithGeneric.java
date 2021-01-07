@@ -385,19 +385,16 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     if (extKey == null) {
       return null;
     }
-    CODE c = null;
     for (CODE childCode : m_rootCodeList) {
       if (extKey.equals(childCode.getExtKey())) {
-        c = childCode;
+        return childCode;
       }
-      else {
-        c = (CODE) childCode.getChildCodeByExtKey(extKey);
-      }
+      CODE c = (CODE) childCode.getChildCodeByExtKey(extKey);
       if (c != null) {
         return c;
       }
     }
-    return c;
+    return null;
   }
 
   @Override
