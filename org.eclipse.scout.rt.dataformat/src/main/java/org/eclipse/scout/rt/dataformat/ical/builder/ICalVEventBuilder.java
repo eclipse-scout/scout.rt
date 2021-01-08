@@ -1,8 +1,23 @@
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 package org.eclipse.scout.rt.dataformat.ical.builder;
 
+import static org.eclipse.scout.rt.platform.util.date.DateUtility.nextDay;
+
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.eclipse.scout.rt.dataformat.ical.ICalBean;
 import org.eclipse.scout.rt.dataformat.ical.ICalProperties;
@@ -44,20 +59,72 @@ public class ICalVEventBuilder {
   }
 
   /**
-   * If start date is null, no dates will be written. If end date is null, no end date will be written (means all-day
-   * event)
+   * Adds start and (optionally) end date.
+   *
+   * @param startDate
+   *          The start date.
+   * @param endDate
+   *          The optional end date.
+   * @return this instance
+   */
+  public ICalVEventBuilder withScheduling(LocalDate startDate, LocalDate endDate) {
+    if (startDate == null) {
+      return this;
+    }
+
+    ZoneId utc = ZoneId.of("UTC");
+    Date start = Date.from(startDate.atStartOfDay().atZone(utc).toInstant());
+    Date end = null;
+    if (endDate != null) {
+      end = Date.from(endDate.atStartOfDay().atZone(utc).toInstant());
+    }
+    return withScheduling(start, end, true, TimeZone.getTimeZone(utc));
+  }
+
+  /**
+   * Adds start and (optionally) end date.
+   *
+   * @param startDate
+   *          The start date. The UTC time zone is used to interpret the {@link Date}.
+   * @param endDate
+   *          The optional end date. The UTC time zone is used to interpret the {@link Date}.
+   * @param allDay
+   *          Specifies if it is an all-day event. If {@code true}, the time is ignored.
+   * @return this instance
    */
   public ICalVEventBuilder withScheduling(Date startDate, Date endDate, Boolean allDay) {
+    return withScheduling(startDate, endDate, allDay, TimeZone.getDefault());
+  }
+
+  /**
+   * Adds start and (optionally) end date.
+   *
+   * @param startDate
+   *          The start date. The UTC time zone is used to interpret the {@link Date}.
+   * @param endDate
+   *          The optional end date. The UTC time zone is used to interpret the {@link Date}.
+   * @param allDay
+   *          Specifies if it is an all-day event. If {@code true}, the time is ignored.
+   * @param zone
+   *          The {@link TimeZone} of the given {@link Date} arguments. Specifies in which timezone the given dates
+   *          should be interpreted and therefore which date the iCal event will have. Only used for allDay events.
+   * @return this instance
+   */
+  public ICalVEventBuilder withScheduling(Date startDate, Date endDate, Boolean allDay, TimeZone zone) {
     if (startDate == null) {
       return this;
     }
     if (BooleanUtility.nvl(allDay)) {
-      m_cal.addProperty(new Property(ICalProperties.PROP_NAME_DTSTART, m_helper.createDate(startDate)));
-      m_cal.addProperty(new Property(ICalProperties.PROP_NAME_DTEND, m_helper.createDate(endDate)));
+      m_cal.addProperty(new Property(ICalProperties.PROP_NAME_DTSTART, m_helper.createDate(m_helper.removeTimeZoneOffset(startDate, zone))));
+      if (endDate != null) {
+        m_cal.addProperty(new Property(ICalProperties.PROP_NAME_DTEND, m_helper.createDate(nextDay(m_helper.removeTimeZoneOffset(endDate, zone)))));
+      }
     }
     else {
       m_cal.addProperty(new Property(ICalProperties.PROP_NAME_DTSTART, m_helper.createDateTime(startDate)));
-      m_cal.addProperty(new Property(ICalProperties.PROP_NAME_DTEND, m_helper.createDateTime(endDate)));
+      if (endDate != null) {
+        m_cal.addProperty(new Property(ICalProperties.PROP_NAME_DTEND, m_helper.createDateTime(endDate)));
+      }
     }
     return this;
   }

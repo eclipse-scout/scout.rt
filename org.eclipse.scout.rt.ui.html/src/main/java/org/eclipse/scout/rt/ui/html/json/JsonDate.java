@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,6 +49,7 @@ public class JsonDate implements IJsonObject {
   public static final String JSON_PATTERN_DATE_ONLY = "yyyy-MM-dd";
   public static final String JSON_PATTERN_TIME_ONLY = "HH:mm:ss.SSS";
   public static final String UTC_MARKER = "Z";
+  public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
   private Date m_javaDate = null;
   private String m_jsonString = null;
@@ -169,8 +170,8 @@ public class JsonDate implements IJsonObject {
       Locale loc = NlsLocale.get();
       SimpleDateFormat sdf = new SimpleDateFormat(pattern, loc);
       if (input.endsWith(UTC_MARKER)) {
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        input = input.substring(0, input.length() - 1);
+        sdf.setTimeZone(UTC);
+        input = input.substring(0, input.length() - UTC_MARKER.length());
       }
       return sdf.parse(input);
     }

@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.dataformat.ical.model;
 
 import static org.junit.Assert.assertEquals;
@@ -25,7 +25,7 @@ public class ICalVCardHelperTest {
     ICalVCardHelper helper = BEANS.get(ICalVCardHelper.class);
     Calendar cal = Calendar.getInstance();
     cal.setTimeZone(TimeZone.getTimeZone("GMT"));
-    cal.set(2019, 7, 23, 15, 22, 11); // month is 0 based 8 (august)
+    cal.set(2019, Calendar.AUGUST, 23, 15, 22, 11);
     assertEquals("20190823T152200Z", helper.createDateTime(cal.getTime()));
   }
 
@@ -34,7 +34,7 @@ public class ICalVCardHelperTest {
     ICalVCardHelper helper = BEANS.get(ICalVCardHelper.class);
     Calendar cal = Calendar.getInstance();
     cal.setTimeZone(TimeZone.getTimeZone("GMT+1"));
-    cal.set(2019, 7, 23, 15, 22, 11); // month is 0 based 8 (august)
+    cal.set(2019, Calendar.AUGUST, 23, 15, 22, 11);
     assertEquals("20190823T142200Z", helper.createDateTime(cal.getTime()));
   }
 
@@ -43,7 +43,7 @@ public class ICalVCardHelperTest {
     ICalVCardHelper helper = BEANS.get(ICalVCardHelper.class);
     Calendar cal = Calendar.getInstance();
     cal.setTimeZone(TimeZone.getTimeZone("GMT"));
-    cal.set(2019, 7, 23, 15, 22, 00); // month is 0 based 8 (august)
+    cal.set(2019, Calendar.AUGUST, 23, 15, 22, 0);
     assertEquals("20190823", helper.createDate(cal.getTime()));
   }
 

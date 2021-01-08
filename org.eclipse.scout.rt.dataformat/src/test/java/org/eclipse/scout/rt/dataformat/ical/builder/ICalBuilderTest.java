@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,16 +7,19 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.dataformat.ical.builder;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.eclipse.scout.rt.dataformat.ical.ICalBean;
 import org.eclipse.scout.rt.dataformat.ical.model.ICalVCardHelper;
@@ -33,6 +36,7 @@ import org.junit.Test;
 public class ICalBuilderTest {
   private static List<IBean<?>> mockedBeans;
   private static Date s_mockDate;
+  private TimeZone m_testingTimeZone = TimeZone.getTimeZone("GMT+3");
 
   @BeforeClass
   public static void beforeClass() {
@@ -52,7 +56,7 @@ public class ICalBuilderTest {
   public void testMeetingWithAlarm() {
     final String uid = "5edf8af0-5347-4331-ae0f-3b4980180b37";
     ICalVCardHelper helper = BEANS.get(ICalVCardHelper.class);
-    Date startDate = BEANS.get(IDateProvider.class).currentMillis();
+    Date startDate = createTestDate(14, 30, 0);
     Date endDate = DateUtility.addHours(startDate, 1);
 
     ICalBean cal = BEANS.get(ICalBuilder.class)
@@ -62,11 +66,11 @@ public class ICalBuilderTest {
             .withLocation("location")
             .withAlarm(Duration.ofDays(1), "ALARMDESC")
             .withSummary("summary")
-            .withScheduling(startDate, endDate, false)
+            .withScheduling(startDate, endDate, false, m_testingTimeZone)
             .withUid(uid))
         .build();
 
-    assertEquals("BEGIN:VCALENDAR\r\n" +
+    String expectedContent = "BEGIN:VCALENDAR\r\n" +
         "VERSION:2.0\r\n" +
         "PRODID;CHARSET=utf-8:IDENTIFIER\r\n" +
         "BEGIN:VEVENT\r\n" +
@@ -79,32 +83,59 @@ public class ICalBuilderTest {
         "DESCRIPTION;CHARSET=utf-8:ALARMDESC\r\n" +
         "END:VALARM\r\n" +
         "SUMMARY;CHARSET=utf-8:summary\r\n" +
-        "DTSTART;CHARSET=utf-8:" + helper.createDateTime(startDate) + "\r\n" +
-        "DTEND;CHARSET=utf-8:" + helper.createDateTime(endDate) + "\r\n" +
+        "DTSTART;CHARSET=utf-8:20200820T113000Z\r\n" + // -3 from the input date because it is converted to UTC
+        "DTEND;CHARSET=utf-8:20200820T123000Z\r\n" + // -3 from the input date because it is converted to UTC
         "UID;CHARSET=utf-8:5edf8af0-5347-4331-ae0f-3b4980180b37\r\n" +
         "END:VEVENT\r\n" +
-        "END:VCALENDAR\r\n" +
-        "", new String(cal.toBytes("utf-8")));
+        "END:VCALENDAR\r\n";
+    String createdContent = new String(cal.toBytes(StandardCharsets.UTF_8.name()), StandardCharsets.UTF_8);
+    assertEquals(expectedContent, createdContent);
   }
 
   @Test
-  public void testMeetingAllDay() {
+  public void testMeetingAllDayLate() {
+    Date startDate = createTestDate(23, 45, 50);
+    Date endDate = DateUtility.addDays(startDate, 2);
+    assertMeetingAllDay(startDate, endDate, "20200820", "20200823"); // end date is exclusive. therefore expect one more
+  }
+
+  @Test
+  public void testMeetingAllDayEarly() {
+    Date startDate = createTestDate(1, 1, 0);
+    Date endDate = DateUtility.addDays(startDate, 2);
+    assertMeetingAllDay(startDate, endDate, "20200820", "20200823"); // end date is exclusive. therefore expect one more
+  }
+
+  @Test
+  public void testMeetingAllDayTrunc() {
+    Date startDate = createTestDate(0, 0, 0);
+    Date endDate = DateUtility.addDays(startDate, 2);
+    assertMeetingAllDay(startDate, endDate, "20200820", "20200823"); // end date is exclusive. therefore expect one more
+  }
+
+  @Test
+  public void testMeetingAllDaySingle() {
+    Date startDate = createTestDate(1, 30, 0);
+    Date endDate = createTestDate(11, 30, 0);
+    assertMeetingAllDay(startDate, endDate, "20200820", "20200821"); // end date is exclusive. therefore expect one more
+  }
+
+  @Test
+  public void testWithLocalDate() {
+    LocalDate startDate = LocalDate.of(2020, 3, 11);
+    LocalDate endDate = LocalDate.of(2020, 3, 13);
     final String uid = "5edf8af0-5347-4331-ae0f-3b4980180b37";
     ICalVCardHelper helper = BEANS.get(ICalVCardHelper.class);
-    Date startDate = BEANS.get(IDateProvider.class).currentMillis();
-    Date endDate = DateUtility.addDays(startDate, 2);
-
     ICalBean cal = BEANS.get(ICalBuilder.class)
         .withProductIdentifier("IDENTIFIER")
         .withComponent(BEANS.get(ICalVEventBuilder.class)
             .withDescription("description")
             .withLocation("location")
             .withSummary("summary")
-            .withScheduling(startDate, endDate, true)
+            .withScheduling(startDate, endDate)
             .withUid(uid))
         .build();
-
-    assertEquals("BEGIN:VCALENDAR\r\n" +
+    String expectedContent = "BEGIN:VCALENDAR\r\n" +
         "VERSION:2.0\r\n" +
         "PRODID;CHARSET=utf-8:IDENTIFIER\r\n" +
         "BEGIN:VEVENT\r\n" +
@@ -112,11 +143,49 @@ public class ICalBuilderTest {
         "DESCRIPTION;CHARSET=utf-8:description\r\n" +
         "LOCATION;CHARSET=utf-8:location\r\n" +
         "SUMMARY;CHARSET=utf-8:summary\r\n" +
-        "DTSTART;CHARSET=utf-8:" + helper.createDate(startDate) + "\r\n" +
-        "DTEND;CHARSET=utf-8:" + helper.createDate(endDate) + "\r\n" +
+        "DTSTART;CHARSET=utf-8:20200311\r\n" +
+        "DTEND;CHARSET=utf-8:20200314\r\n" +
         "UID;CHARSET=utf-8:5edf8af0-5347-4331-ae0f-3b4980180b37\r\n" +
         "END:VEVENT\r\n" +
-        "END:VCALENDAR\r\n" +
-        "", new String(cal.toBytes("utf-8")));
+        "END:VCALENDAR\r\n";
+    String createdContent = new String(cal.toBytes(StandardCharsets.UTF_8.name()), StandardCharsets.UTF_8);
+    assertEquals(expectedContent, createdContent);
+  }
+
+  protected Date createTestDate(int hourOfDay, int minute, int second) {
+    Calendar cal = Calendar.getInstance();
+    cal.setTimeZone(m_testingTimeZone);
+    cal.set(2020, Calendar.AUGUST, 20, hourOfDay, minute, second);
+    return cal.getTime();
+  }
+
+  protected void assertMeetingAllDay(Date startDate, Date endDate, String expectedStart, String expectedEnd) {
+    final String uid = "5edf8af0-5347-4331-ae0f-3b4980180b37";
+    ICalVCardHelper helper = BEANS.get(ICalVCardHelper.class);
+    ICalBean cal = BEANS.get(ICalBuilder.class)
+        .withProductIdentifier("IDENTIFIER")
+        .withComponent(BEANS.get(ICalVEventBuilder.class)
+            .withDescription("description")
+            .withLocation("location")
+            .withSummary("summary")
+            .withScheduling(startDate, endDate, true, m_testingTimeZone)
+            .withUid(uid))
+        .build();
+    String expectedContent = "BEGIN:VCALENDAR\r\n" +
+        "VERSION:2.0\r\n" +
+        "PRODID;CHARSET=utf-8:IDENTIFIER\r\n" +
+        "BEGIN:VEVENT\r\n" +
+        "DTSTAMP;CHARSET=utf-8:" + helper.createDateTime(s_mockDate) + "\r\n" +
+        "DESCRIPTION;CHARSET=utf-8:description\r\n" +
+        "LOCATION;CHARSET=utf-8:location\r\n" +
+        "SUMMARY;CHARSET=utf-8:summary\r\n" +
+        "DTSTART;CHARSET=utf-8:" + expectedStart + "\r\n" +
+        "DTEND;CHARSET=utf-8:" + expectedEnd + "\r\n" +
+        "UID;CHARSET=utf-8:5edf8af0-5347-4331-ae0f-3b4980180b37\r\n" +
+        "END:VEVENT\r\n" +
+        "END:VCALENDAR\r\n";
+    String createdContent = new String(cal.toBytes(StandardCharsets.UTF_8.name()), StandardCharsets.UTF_8);
+    System.out.println(createdContent);
+    assertEquals(expectedContent, createdContent);
   }
 }

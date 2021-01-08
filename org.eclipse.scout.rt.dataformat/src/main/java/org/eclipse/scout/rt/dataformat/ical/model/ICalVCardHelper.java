@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.dataformat.ical.model;
 
 import java.io.ByteArrayOutputStream;
@@ -18,8 +18,10 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
@@ -30,6 +32,7 @@ import org.eclipse.scout.rt.dataformat.io.UnfoldingReader;
 import org.eclipse.scout.rt.dataformat.vcard.VCardProperties;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
@@ -85,9 +88,35 @@ public class ICalVCardHelper {
   }
 
   public byte[] toBytes(AbstractEntity entity, String charset) {
+    //noinspection resource
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     write(entity, new OutputStreamWriter(bos), charset);
     return bos.toByteArray();
+  }
+
+  /**
+   * Computes a {@link Date} which results in the same text representation when interpreted in UTC as the given
+   * {@link Date} when interpreted in the given {@link TimeZone}.<br>
+   * In other words: When converting a {@link Date} to a text representation, a timezone must be used (because
+   * {@link Date} is basically just a long) and has no {@link TimeZone} information. The given date converted to text in
+   * the given {@link TimeZone} results in a certain text (different for every timezone). This method creates a
+   * {@link Date} which results in the same text representation for the UTC timezone.
+   *
+   * @param d
+   *          The date. Must not be {@code null}.
+   * @param zone
+   *          The {@link TimeZone} in which to read the {@link Date}.
+   * @return A {@link Date} which has the same text representation in UTC as the given {@link Date} in the given
+   *         {@link TimeZone}.
+   */
+  public Date removeTimeZoneOffset(Date d, TimeZone zone) {
+    Locale locale = NlsLocale.get();
+    Calendar dateCal = Calendar.getInstance(zone, locale);
+    dateCal.setTime(d);
+    int zoneOffset = dateCal.get(Calendar.ZONE_OFFSET);
+    int dayLightSavingOffset = dateCal.get(Calendar.DST_OFFSET);
+    dateCal.add(Calendar.MILLISECOND, zoneOffset + dayLightSavingOffset);
+    return dateCal.getTime();
   }
 
   /**
@@ -106,12 +135,13 @@ public class ICalVCardHelper {
    */
   public String createDateTime(Date d) {
     // Shift the timezone to UTC
+    TimeZone utc = TimeZone.getTimeZone("UTC");
     SimpleDateFormat dateFormatter = new SimpleDateFormat(YEAR_MONTH_DAY_FORMAT);
-    dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+    dateFormatter.setTimeZone(utc);
     SimpleDateFormat timeFormatter = new SimpleDateFormat(HOUR_MINUTE_FORMAT);
-    timeFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-    // ICal pattern: <yyyyMMdd>T<HHmmss>Z; T => time start marker, Z => time end marker; we always truncate secs like in CRM
-    return dateFormatter.format(d) + "T" + timeFormatter.format(d) + "00" + "Z";
+    timeFormatter.setTimeZone(utc);
+    // ICal pattern: <yyyyMMdd>T<HHmmss>Z; T => time start marker, Z => time end marker; we always truncate secs
+    return dateFormatter.format(d) + "T" + timeFormatter.format(d) + "00Z";
   }
 
   /**
@@ -135,9 +165,6 @@ public class ICalVCardHelper {
    * concatenateStrings(null, "hello", "", "foo", "world") returns "hellofooworld"
    * </pre>
    * </p>
-   *
-   * @param delimiter
-   * @param parts
    */
   public String concatenateStrings(String delimiter, String... parts) {
     if (parts == null) {
@@ -147,7 +174,7 @@ public class ICalVCardHelper {
       delimiter = "";
     }
 
-    return Stream.<String> of(parts)
+    return Stream.of(parts)
         .map(StringUtility::emptyIfNull)
         .collect(Collectors.joining(delimiter));
   }
@@ -220,7 +247,7 @@ public class ICalVCardHelper {
 
     String cAsString = String.valueOf(c);
     for (int i = 0; i < values.length; i++) {
-      values[i] = StringUtility.replace(values[i], cAsString, String.valueOf(ESCAPE_CHARACTER) + cAsString);
+      values[i] = StringUtility.replace(values[i], cAsString, ESCAPE_CHARACTER + cAsString);
     }
     return values;
   }
@@ -273,7 +300,7 @@ public class ICalVCardHelper {
       String characterAsString = character.toString();
       // escape character in all of the values
       for (int i = 0; i < values.length; i++) {
-        values[i] = StringUtility.replace(values[i], characterAsString, String.valueOf(ESCAPE_CHARACTER) + characterAsString);
+        values[i] = StringUtility.replace(values[i], characterAsString, ESCAPE_CHARACTER + characterAsString);
       }
     }
     return values;
