@@ -1,6 +1,12 @@
 /*
- * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
- * http://www.bsiag.com/
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.dataformat.ical.model;
 
@@ -42,7 +48,7 @@ public class Property implements Serializable {
   /**
    * @param name
    *          Property name, not case sensitive (stored upper case)
-   * @param parameter
+   * @param parameters
    *          the order in which this parameters are added is important, as a new parameter with the same name as the
    *          existing one will overwrite the existing one
    * @param value
