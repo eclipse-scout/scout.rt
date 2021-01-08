@@ -16,12 +16,12 @@ export default class TableNavigationPageUpKeyStroke extends AbstractTableNavigat
     super(table);
     this.which = [keys.PAGE_UP];
     this.renderingHints.text = 'PgUp';
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       let viewport = this._viewportInfo();
       if (viewport.firstRow) {
         return viewport.firstRow.$row;
       }
-    }.bind(this);
+    };
   }
 
   handle(event) {

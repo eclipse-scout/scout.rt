@@ -15,6 +15,7 @@ export default class MenuNavigationKeyStroke extends KeyStroke {
   constructor(popup) {
     super();
     this.field = popup;
+    this.inheritAccessibility = false;
   }
 
   _accept(event) {

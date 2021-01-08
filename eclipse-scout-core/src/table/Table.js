@@ -4853,7 +4853,7 @@ export default class Table extends Widget {
       this.$data.setEnabled(enabled);
     }
 
-    this.$container.setTabbable(enabled);
+    this.$container.setTabbableOrFocusable(enabled);
   }
 
   /**
@@ -5443,7 +5443,7 @@ export default class Table extends Widget {
   // same as on Tree.prototype._onDesktopPopupOpen
   _onDesktopPopupOpen(event) {
     let popup = event.popup;
-    if (!this.enabledComputed) {
+    if (!this.isFocusable(false)) {
       return;
     }
     // Set table style to focused if a context menu or a menu bar popup opens, so that it looks as it still has the focus

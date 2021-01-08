@@ -19,9 +19,7 @@ export default class FileChooserFieldBrowseKeyStroke extends KeyStroke {
     this.stopPropagation = true;
 
     this.renderingHints.hAlign = HAlign.LEFT;
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
-      return this.field.$fieldContainer;
-    }.bind(this);
+    this.renderingHints.$drawingArea = ($drawingArea, event) => this.field.$fieldContainer;
   }
 
   /**

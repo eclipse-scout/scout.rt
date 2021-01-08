@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {KeyStroke, keys} from '../../index';
+import {keys, KeyStroke} from '../../index';
 
 export default class ViewMenuPopupEnterKeyStroke extends KeyStroke {
 
@@ -24,6 +24,7 @@ export default class ViewMenuPopupEnterKeyStroke extends KeyStroke {
         return tile.$container;
       }
     };
+    this.inheritAccessibility = false;
   }
 
   accept(event) {

@@ -33,6 +33,7 @@ export default class DisableBrowserF5ReloadKeyStroke extends KeyStroke {
     this.preventDefault = true;
     this.keyStrokeFirePolicy = Action.KeyStrokeFirePolicy.ALWAYS; // ignore glass panes
     this.renderingHints.render = false;
+    this.inheritAccessibility = false;
   }
 
   /**

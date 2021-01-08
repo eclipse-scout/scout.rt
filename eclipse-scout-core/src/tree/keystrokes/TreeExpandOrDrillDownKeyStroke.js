@@ -16,14 +16,14 @@ export default class TreeExpandOrDrillDownKeyStroke extends AbstractTreeNavigati
     super(tree, modifierBitMask);
     this.which = [keys.ADD];
     this.renderingHints.text = '+';
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       let currentNode = event._treeCurrentNode;
       if (this.isNodeExpandable(currentNode)) {
         return currentNode.$node;
       } else if (currentNode.childNodes.length > 0) {
         return currentNode.childNodes[0].$node;
       }
-    }.bind(this);
+    };
   }
 
   _accept(event) {

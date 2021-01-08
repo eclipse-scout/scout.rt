@@ -16,12 +16,13 @@ export default class TileGridSelectKeyStroke extends KeyStroke {
     super();
     this.field = tileGrid;
     this.shift = !tileGrid.multiSelect ? false : undefined;
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       let result = this._computeNewSelection();
       if (result && result.focusedTile) {
         return result.focusedTile.$container;
       }
-    }.bind(this);
+    };
+    this.inheritAccessibility = false;
   }
 
   /**

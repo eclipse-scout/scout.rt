@@ -12,6 +12,7 @@ import {keys, KeyStroke} from '../../index';
 
 export default class MenuBarLeftKeyStroke extends KeyStroke {
 
+  // noinspection DuplicatedCode
   constructor(menuBar) {
     super();
     this.field = menuBar;
@@ -19,6 +20,7 @@ export default class MenuBarLeftKeyStroke extends KeyStroke {
     this.renderingHints.render = false;
     this.stopPropagation = true;
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
+    this.inheritAccessibility = false;
   }
 
   handle(event) {

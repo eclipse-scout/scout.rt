@@ -19,6 +19,7 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
     this.shift = !table.multiSelect ? false : undefined;
     this.stopPropagation = true;
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
+    this.inheritAccessibility = false;
   }
 
   _accept(event) {

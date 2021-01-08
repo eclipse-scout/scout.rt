@@ -16,12 +16,12 @@ export default class TableNavigationEndKeyStroke extends AbstractTableNavigation
     super(table);
     this.which = [keys.END];
     this.renderingHints.text = 'End';
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       let viewport = this._viewportInfo();
       if (viewport.lastRow) {
         return viewport.lastRow.$row;
       }
-    }.bind(this);
+    };
   }
 
   handle(event) {

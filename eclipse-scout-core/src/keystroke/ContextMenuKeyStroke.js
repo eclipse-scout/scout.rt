@@ -24,6 +24,7 @@ export default class ContextMenuKeyStroke extends KeyStroke {
     this.ctrl = false;
     this.shift = false;
     this.stopPropagation = true;
+    this.inheritAccessibility = false;
   }
 
   /**

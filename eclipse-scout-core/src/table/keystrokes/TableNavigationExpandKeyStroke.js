@@ -17,12 +17,12 @@ export default class TableNavigationExpandKeyStroke extends AbstractTableNavigat
     this.field = table;
     this.which = [keys.ADD, keys.RIGHT];
     this.renderingHints.text = '+';
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       let row = this.field.selectedRows[0];
       if (row) {
         return row.$row;
       }
-    }.bind(this);
+    };
   }
 
   _accept(event) {

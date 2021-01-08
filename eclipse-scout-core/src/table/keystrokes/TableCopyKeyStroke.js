@@ -18,6 +18,7 @@ export default class TableCopyKeyStroke extends KeyStroke {
     this.which = [keys.C];
     this.ctrl = true;
     this.renderingHints.render = false;
+    this.inheritAccessibility = false;
   }
 
   handle(event) {

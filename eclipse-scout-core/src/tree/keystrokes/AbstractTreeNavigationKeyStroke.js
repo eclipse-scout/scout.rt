@@ -24,6 +24,7 @@ export default class AbstractTreeNavigationKeyStroke extends KeyStroke {
     this.alt = keyStrokeModifier.isAlt(modifierBitMask);
 
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
+    this.inheritAccessibility = false;
   }
 
   _accept(event) {

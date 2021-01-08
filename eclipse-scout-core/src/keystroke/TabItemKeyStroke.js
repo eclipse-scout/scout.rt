@@ -19,9 +19,9 @@ export default class TabItemKeyStroke extends KeyStroke {
 
     this.renderingHints.offset = 16;
     this.renderingHints.hAlign = HAlign.RIGHT;
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       return this.field.$tabContainer;
-    }.bind(this);
+    };
   }
 
   /**
