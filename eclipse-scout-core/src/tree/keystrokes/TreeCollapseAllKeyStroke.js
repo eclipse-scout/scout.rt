@@ -16,11 +16,11 @@ export default class TreeCollapseAllKeyStroke extends AbstractTreeNavigationKeyS
     super(tree, keyStrokeModifier);
     this.which = [keys.HOME];
     this.renderingHints.hAlign = HAlign.RIGHT;
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       if (this.field.visibleNodesFlat.length > 0) {
         return this.field.visibleNodesFlat[0].$node;
       }
-    }.bind(this);
+    };
   }
 
   handle(event) {

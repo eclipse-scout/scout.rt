@@ -834,8 +834,20 @@ $.fn.isDisplayNone = function() {
   return this.css('display') === 'none';
 };
 
+/**
+ * @param {boolean} tabbable true, to make the component tabbable. False, to make it neither tabbable nor focusable.
+ * @returns {$}
+ */
 $.fn.setTabbable = function(tabbable) {
   return this.attr('tabIndex', tabbable ? 0 : null);
+};
+
+/**
+ * @param {boolean} tabbable true, to make the component tabbable. False, to make it not tabbable but focusable, so the user can focus it with the mouse but not with the keyboard.
+ * @returns {$}
+ */
+$.fn.setTabbableOrFocusable = function(tabbable) {
+  return this.attr('tabIndex', tabbable ? 0 : -1);
 };
 
 $.fn.isTabbable = function() {

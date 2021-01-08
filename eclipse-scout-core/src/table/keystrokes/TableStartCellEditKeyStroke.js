@@ -18,7 +18,7 @@ export default class TableStartCellEditKeyStroke extends KeyStroke {
     this.ctrl = true;
     this.which = [keys.ENTER];
     this.stopPropagation = true;
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       let editPosition = event._editPosition,
         columnIndex = this.field.visibleColumns().indexOf(editPosition.column);
       if (columnIndex === 0) {
@@ -26,7 +26,7 @@ export default class TableStartCellEditKeyStroke extends KeyStroke {
         return editPosition.row.$row;
       }
       return this.field.$cell(columnIndex, editPosition.row.$row);
-    }.bind(this);
+    };
   }
 
   _accept(event) {

@@ -17,9 +17,9 @@ export default class TableRefreshKeyStroke extends KeyStroke {
     this.field = table;
     this.which = [keys.F5];
     this.renderingHints.offset = 14;
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       return this.field.footer ? this.field.footer._$infoLoad.find('.table-info-button') : null;
-    }.bind(this);
+    };
   }
 
   _accept(event) {

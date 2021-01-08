@@ -20,6 +20,7 @@ export default class ShrinkNavigationKeyStroke extends KeyStroke {
     // FF und Safari use different key codes for this key.
     this.which = [keys.forBrowser(keys.ANGULAR_BRACKET)];
     this.renderingHints.$drawingArea = ($drawingArea, event) => this.desktop.$container;
+    this.inheritAccessibility = false;
   }
 
   _accept(event) {

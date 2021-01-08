@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HAlign, keys, RangeKeyStroke} from '../../index';
+import {keys, RangeKeyStroke} from '../../index';
 
 /**
  * Composite keystroke to provide a numeric keystroke to select view tabs.
@@ -35,6 +35,7 @@ export default class DesktopTabSelectKeyStroke extends RangeKeyStroke {
       let viewIndex = event.which - keys['1'];
       return this._viewTabs()[viewIndex].$container;
     };
+    this.inheritAccessibility = false;
   }
 
   /**

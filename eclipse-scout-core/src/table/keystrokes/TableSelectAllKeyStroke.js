@@ -18,9 +18,10 @@ export default class TableSelectAllKeyStroke extends KeyStroke {
     this.ctrl = true;
     this.which = [keys.A];
     this.renderingHints.offset = 14;
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       return this.field.footer ? this.field.footer._$infoSelection.find('.table-info-button') : null;
-    }.bind(this);
+    };
+    this.inheritAccessibility = false;
   }
 
   handle(event) {

@@ -12,6 +12,7 @@ import {keys, KeyStroke} from '../../../index';
 
 export default class TabAreaLeftKeyStroke extends KeyStroke {
 
+  // noinspection DuplicatedCode
   constructor(tabArea) {
     super();
     this.field = tabArea;
@@ -19,6 +20,7 @@ export default class TabAreaLeftKeyStroke extends KeyStroke {
     this.renderingHints.render = false;
     this.stopPropagation = true;
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
+    this.inheritAccessibility = false;
   }
 
   handle(event) {

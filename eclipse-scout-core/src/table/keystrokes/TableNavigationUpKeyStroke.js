@@ -16,12 +16,12 @@ export default class TableNavigationUpKeyStroke extends AbstractTableNavigationK
     super(table);
     this.which = [keys.UP];
     this.renderingHints.text = '↑';
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       let row = this.firstRowBeforeSelection();
       if (row) {
         return row.$row;
       }
-    }.bind(this);
+    };
   }
 
   handle(event) {

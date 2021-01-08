@@ -20,9 +20,7 @@ export default class FileChooserFieldDeleteKeyStroke extends KeyStroke {
 
     this.renderingHints.offset = 25;
     this.renderingHints.hAlign = HAlign.RIGHT;
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
-      return this.field.$fieldContainer;
-    }.bind(this);
+    this.renderingHints.$drawingArea = ($drawingArea, event) => this.field.$fieldContainer;
   }
 
   /**

@@ -20,9 +20,6 @@ export default class ButtonKeyStroke extends KeyStroke {
     this.stopImmediatePropagation = true;
 
     this.renderingHints.hAlign = HAlign.RIGHT;
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
-      return this.field.$container;
-    }.bind(this);
   }
 
   /**

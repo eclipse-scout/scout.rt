@@ -911,7 +911,7 @@ export default class Tree extends Widget {
     this._installOrUninstallDragAndDropHandler();
     let enabled = this.enabledComputed;
     this.$data.setEnabled(enabled);
-    this.$container.setTabbable(enabled);
+    this.$container.setTabbableOrFocusable(enabled);
   }
 
   /**
@@ -3170,7 +3170,7 @@ export default class Tree extends Widget {
   // same as on Table.prototype._onDesktopPopupOpen
   _onDesktopPopupOpen(event) {
     let popup = event.popup;
-    if (!this.enabledComputed) {
+    if (!this.isFocusable(false)) {
       return;
     }
     // Set tree style to focused if a context menu or a menu bar popup opens, so that it looks as it still has the focus

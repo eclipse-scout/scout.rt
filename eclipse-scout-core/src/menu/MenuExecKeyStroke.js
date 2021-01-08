@@ -19,9 +19,9 @@ export default class MenuExecKeyStroke extends KeyStroke {
     this.stopPropagation = true;
 
     this.renderingHints.offset = 16;
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       return this.field.$container;
-    }.bind(this);
+    };
   }
 
   /**

@@ -18,6 +18,7 @@ export default class KeyStroke {
 
     this.which = []; // keys which this keystroke is bound to. Typically, this is a single key, but may be multiple keys if handling the same action (e.g. ENTER and SPACE on a button).
     this.ctrl = false;
+    this.inheritAccessibility = true;
     this.alt = false;
     this.shift = false;
     this.preventDefault = true;
@@ -138,9 +139,16 @@ export default class KeyStroke {
       if (this.field.visible !== undefined && !this.field.visible) {
         return false;
       }
-      // Check enabled state
-      if (this.field.enabled !== undefined && !this.field.enabled) {
-        return false;
+      // Check enabled state (if inheritAccessibility is true)
+      if (!this.inheritAccessibility) {
+        return true;
+      }
+      if (this.field.enabledComputed !== undefined) {
+        return this.field.enabledComputed;
+      }
+      if (this.field.enabled !== undefined) {
+        // This should actually not happen because this.field should always be a hypothetical case if this.field is not a widget
+        return this.field.enabled;
       }
     }
     return true;

@@ -16,12 +16,12 @@ export default class TreeNavigationUpKeyStroke extends AbstractTreeNavigationKey
     super(tree, modifierBitMask);
     this.which = [keys.UP];
     this.renderingHints.text = '↑';
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       let newSelectedNode = this._computeNewSelection(event._treeCurrentNode);
       if (newSelectedNode) {
         return newSelectedNode.$node;
       }
-    }.bind(this);
+    };
   }
 
   _computeNewSelection(currentNode) {

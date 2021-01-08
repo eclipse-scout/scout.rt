@@ -35,6 +35,7 @@ export default class DisableBrowserTabSwitchingKeyStroke extends RangeKeyStroke 
     this.renderingHints.render = false;
 
     this.preventDefault = true;
+    this.inheritAccessibility = false;
   }
 
   /**

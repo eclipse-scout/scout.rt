@@ -30,6 +30,7 @@ export default class FocusFilterFieldKeyStroke extends KeyStroke {
     this.preventDefault = false; // false so that the key is inserted into the search field.
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
     this.stopPropagation = true;
+    this.inheritAccessibility = false;
   }
 
   /**

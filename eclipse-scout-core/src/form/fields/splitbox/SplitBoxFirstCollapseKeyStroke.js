@@ -16,6 +16,7 @@ export default class SplitBoxFirstCollapseKeyStroke extends KeyStroke {
     super();
     this.field = splitBox;
     this.parseAndSetKeyStroke(keyStroke);
+    this.inheritAccessibility = false;
   }
 
   handle(event) {

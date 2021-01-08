@@ -22,6 +22,7 @@ export default class CloseKeyStroke extends KeyStroke {
       render: !!$drawingArea,
       $drawingArea: $drawingArea
     };
+    this.inheritAccessibility = false;
   }
 
   handle(event) {
