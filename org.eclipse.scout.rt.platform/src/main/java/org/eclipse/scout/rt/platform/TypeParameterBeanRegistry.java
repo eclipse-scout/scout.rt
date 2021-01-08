@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,16 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-/*
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Eclipse Public License v1.0
-* which accompanies this distribution, and is available at
-* http://www.eclipse.org/legal/epl-v10.html
-*
-* Contributors:
-*     BSI Business Systems Integration AG - initial API and implementation
-******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
 import java.util.ArrayList;
@@ -121,7 +111,7 @@ public class TypeParameterBeanRegistry<BEAN> {
   /**
    * Returns all beans with the given generic type parameter, or which are declared with a super type of that parameter.
    * <p>
-   * The beans are returned in the original order (see {@link #registerBeans(Class, List)}).
+   * The beans are returned in the original order (see {@link #registerBeans(List)}).
    * </p>
    *
    * @param lookupType

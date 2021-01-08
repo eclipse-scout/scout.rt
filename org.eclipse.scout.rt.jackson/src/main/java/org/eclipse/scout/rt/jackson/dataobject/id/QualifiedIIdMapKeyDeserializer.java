@@ -1,10 +1,14 @@
 /*
- * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
- * http://www.bsiag.com/
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.jackson.dataobject.id;
-
-import java.io.IOException;
 
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IdExternalFormatter;
@@ -22,7 +26,7 @@ public class QualifiedIIdMapKeyDeserializer extends KeyDeserializer {
   protected final LazyValue<IdExternalFormatter> m_idExternalFormatter = new LazyValue<>(IdExternalFormatter.class);
 
   @Override
-  public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
+  public Object deserializeKey(String key, DeserializationContext ctxt) {
     return m_idExternalFormatter.get().fromExternalForm(key);
   }
 }

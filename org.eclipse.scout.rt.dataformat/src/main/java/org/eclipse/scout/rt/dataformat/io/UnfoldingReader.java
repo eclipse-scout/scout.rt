@@ -1,6 +1,12 @@
 /*
- * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
- * http://www.bsiag.com/
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.dataformat.io;
 
@@ -72,9 +78,9 @@ public class UnfoldingReader extends BufferedReader {
       return null;
     }
 
-    /**************************************
+    /*====================================
      * SEPARATE PARAMETER LIST FROM VALUE *
-     **************************************/
+     =====================================*/
 
     /*
      * NOTE: Use indexOfNonQuoted(String string, String substring) to find the separators for parameters,
@@ -140,9 +146,9 @@ public class UnfoldingReader extends BufferedReader {
 
     Property property = parseParameters(parameterList.toArray(new String[0]));
 
-    /**************
+    /*====================================
      * READ VALUE *
-     **************/
+     =====================================*/
 
     StringBuilder value = new StringBuilder();
     String tmp = s.substring(indexOfColon + 1);
@@ -151,19 +157,15 @@ public class UnfoldingReader extends BufferedReader {
     if (property.hasParameter(PropertyParameter.ENCODING_QUOTED_PRINTABLE)) {
       if (tmp != null && tmp.matches("^.*=$")) {
         // unfold according to quoted-printable folding scheme
-        value.append(tmp.substring(0, tmp.length() - 1));
+        value.append(tmp, 0, tmp.length() - 1);
         tmp = readLine();
         while (tmp != null && tmp.matches("^.*=$")) {
-          value.append(tmp.substring(0, tmp.length() - 1));
+          value.append(tmp, 0, tmp.length() - 1);
           tmp = readLine();
         }
         // append last line (not containing a '=' at the end)
-        value.append(tmp);
       }
-      else {
-        // append single line
-        value.append(tmp);
-      }
+      value.append(tmp);
     }
     else {
       // normally unfold the value
@@ -213,7 +215,7 @@ public class UnfoldingReader extends BufferedReader {
    */
   private Property parseParameters(String[] parameters) {
     // consider the optional group part for vCards => parameters[0] could be "FOO.BAR" => the name is only "BAR"
-    Property property = new Property(parameters[0].replaceAll("^[^\\.]*\\.", ""));
+    Property property = new Property(parameters[0].replaceAll("^[^.]*\\.", ""));
 
     for (int i = 1; i < parameters.length; i++) {
       String name = null;
@@ -233,7 +235,7 @@ public class UnfoldingReader extends BufferedReader {
             start = m.start();
             end = m.end();
             if (sofar < start) {
-              rest.append(valuesPart.substring(sofar, start));
+              rest.append(valuesPart, sofar, start);
             }
             sofar = end;
             values.add(valuesPart.substring(start + 1, end - 1));
@@ -262,6 +264,7 @@ public class UnfoldingReader extends BufferedReader {
         for (String v : values.toArray(new String[0])) {
           // the parameter values of the parameter "TYPE" are case-insensitive for all properties defined in RFC-2426
           v = v.toUpperCase();
+          //noinspection IfCanBeSwitch
           if (VCardProperties.PARAM_VALUE_CAR.equals(v)) {
             property.addParameters(VCardProperties.PARAM_CAR);
           }

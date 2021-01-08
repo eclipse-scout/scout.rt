@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.ArrayList;
@@ -38,7 +38,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 @ClassId("c6ee18fd-e630-4d92-81b1-cd0147c902d4")
 public abstract class AbstractTileTableHeader extends AbstractGroupBox implements ITileTableHeader {
 
-  private TableListener m_tableListener;
   private boolean m_isGrouping;
   private boolean m_isSorting;
 
@@ -96,8 +95,8 @@ public abstract class AbstractTileTableHeader extends AbstractGroupBox implement
   @Override
   protected void execInitField() {
     super.execInitField();
-    m_tableListener = createTableListener();
-    getTable().addTableListener(m_tableListener);
+    TableListener tableListener = createTableListener();
+    getTable().addTableListener(tableListener);
     getGroupByField().setVisible(getTable().getColumnSet().isUserColumnGroupingAllowed());
     getSortByField().setVisible(getTable().isSortEnabled());
     // execute once for default values

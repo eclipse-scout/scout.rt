@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.rest.jersey.client;
 
 import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.STATUS;
@@ -43,7 +43,6 @@ public class ApacheHttpClientConnectionHeaderTest {
   private static final String CON_KEEP_ALIVE = "keep-alive";
 
   private WebTarget m_target;
-  private JerseyTestRestClientHelper m_helper;
 
   @BeforeClass
   public static void beforeClass() {
@@ -58,8 +57,8 @@ public class ApacheHttpClientConnectionHeaderTest {
 
   @Before
   public void before() {
-    m_helper = BEANS.get(JerseyTestRestClientHelper.class);
-    m_target = m_helper.target("echo");
+    JerseyTestRestClientHelper helper = BEANS.get(JerseyTestRestClientHelper.class);
+    m_target = helper.target("echo");
   }
 
   @Test

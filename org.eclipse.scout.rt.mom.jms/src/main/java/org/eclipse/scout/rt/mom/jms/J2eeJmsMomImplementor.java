@@ -1,15 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
- */
-/*
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -85,7 +75,7 @@ public class J2eeJmsMomImplementor extends JmsMomImplementor {
   }
 
   @Override
-  protected void postCreateConnection(Connection connection) throws JMSException {
+  protected void postCreateConnection(Connection connection) {
     // We do not set client id nor exception handler and  we do NOT start the shared connection.
     // As a result the shared connection for publishing message is not started.
     // For only publishing messages, a connection must not be started.
