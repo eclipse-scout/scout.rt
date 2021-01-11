@@ -16,7 +16,6 @@ import {
   DoubleClickSupport,
   dragAndDrop,
   HtmlComponent,
-  keys,
   KeyStrokeContext,
   keyStrokeModifier,
   LazyNodeFilter,
@@ -225,17 +224,6 @@ export default class Tree extends Widget {
       new TreeNavigationEndKeyStroke(this, modifierBitMask),
       new TreeExpandOrDrillDownKeyStroke(this, modifierBitMask)
     ]);
-
-    // Prevent default action and do not propagate ↓ or ↑ keys if ctrl- or alt-modifier is not pressed.
-    // Otherwise, an '↑-event' on the first node, or an '↓-event' on the last row will bubble up (because not consumed by tree navigation keystrokes) and cause a superior tree to move its selection;
-    // Use case: - outline tree with a detail form that contains a tree;
-    //           - preventDefault because of smartfield, so that the cursor is not moved on first or last row;
-    this.keyStrokeContext.registerStopPropagationInterceptor(event => {
-      if (!event.ctrlKey && !event.altKey && scout.isOneOf(event.which, keys.UP, keys.DOWN)) {
-        event.stopPropagation();
-        event.preventDefault();
-      }
-    });
   }
 
   _setMenus(argMenus) {

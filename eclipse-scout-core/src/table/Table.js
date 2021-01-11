@@ -23,7 +23,6 @@ import {
   Event,
   graphics,
   HtmlComponent,
-  keys,
   KeyStrokeContext,
   LoadingSupport,
   MenuBar,
@@ -405,18 +404,6 @@ export default class Table extends Widget {
       new ContextMenuKeyStroke(this, this.showContextMenu, this),
       new AppLinkKeyStroke(this, this.handleAppLinkAction)
     ]);
-
-    // Prevent default action and do not propagate ↓ or ↑ keys if ctrl- or alt-modifier is not pressed.
-    // Otherwise, an '↑-event' on the first row, or an '↓-event' on the last row will bubble up (because not consumed by table navigation keystrokes) and cause a superior table to move its selection.
-    // Use case: - outline page table with search form that contains a table field;
-    //           - shift + '↑-event'/'↓-event' are not consumed by a single selection table, and would propagate otherwise;
-    //           - preventDefault because of smartfield, so that the cursor is not moved on first or last row;
-    this.keyStrokeContext.registerStopPropagationInterceptor(event => {
-      if (!event.ctrlKey && !event.altKey && scout.isOneOf(event.which, keys.UP, keys.DOWN)) {
-        event.stopPropagation();
-        event.preventDefault();
-      }
-    });
   }
 
   _insertBooleanColumn() {
