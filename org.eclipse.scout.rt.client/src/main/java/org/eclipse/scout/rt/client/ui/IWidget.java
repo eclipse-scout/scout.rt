@@ -491,7 +491,26 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    */
   boolean has(IWidget child);
 
+  /**
+   * @see #scrollToTop(ScrollOptions)
+   */
   void scrollToTop();
+
+  /**
+   * Scrolls the widget to the top, if it is a scrollable container.
+   */
+  void scrollToTop(ScrollOptions options);
+
+  /**
+   * @see #reveal(ScrollOptions)
+   */
+  void reveal();
+
+  /**
+   * Brings the widget into view by scrolling the first scrollable parent. It has no effect on other display properties
+   * (e.g. visible).
+   */
+  void reveal(ScrollOptions options);
 
   default void addWidgetListener(WidgetListener listener, Integer... eventTypes) {
     widgetListeners().add(listener, false, eventTypes);

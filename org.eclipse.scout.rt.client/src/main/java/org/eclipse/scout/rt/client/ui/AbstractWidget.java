@@ -598,7 +598,26 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
 
   @Override
   public void scrollToTop() {
-    fireWidgetEvent(new WidgetEvent(this, WidgetEvent.TYPE_SCROLL_TO_TOP));
+    scrollToTop(null);
+  }
+
+  @Override
+  public void scrollToTop(ScrollOptions options) {
+    WidgetEvent event = new WidgetEvent(this, WidgetEvent.TYPE_SCROLL_TO_TOP);
+    event.setScrollOptions(options);
+    fireWidgetEvent(event);
+  }
+
+  @Override
+  public void reveal() {
+    reveal(null);
+  }
+
+  @Override
+  public void reveal(ScrollOptions options) {
+    WidgetEvent event = new WidgetEvent(this, WidgetEvent.TYPE_REVEAL);
+    event.setScrollOptions(options);
+    fireWidgetEvent(event);
   }
 
   public final void notifyFocusIn() {

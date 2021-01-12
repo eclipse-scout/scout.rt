@@ -488,8 +488,8 @@ export function scrollbar($scrollable, axis) {
   });
 }
 
-export function scrollToBottom($scrollable) {
-  scrollTop($scrollable, $scrollable[0].scrollHeight - $scrollable[0].offsetHeight);
+export function scrollToBottom($scrollable, options) {
+  scrollTop($scrollable, $scrollable[0].scrollHeight - $scrollable[0].offsetHeight, options);
 }
 
 /**

@@ -19,8 +19,10 @@ public class WidgetEvent extends EventObject implements IModelEvent {
   public static final int TYPE_SCROLL_TO_TOP = 100;
   public static final int TYPE_FOCUS_IN = 200;
   public static final int TYPE_FOCUS_OUT = 300;
+  public static final int TYPE_REVEAL = 400;
 
   private int m_type;
+  private ScrollOptions m_scrollOptions;
 
   public WidgetEvent(Object source, int type) {
     super(source);
@@ -32,4 +34,11 @@ public class WidgetEvent extends EventObject implements IModelEvent {
     return m_type;
   }
 
+  public void setScrollOptions(ScrollOptions scrollOptions) {
+    m_scrollOptions = scrollOptions;
+  }
+
+  public ScrollOptions getScrollOptions() {
+    return m_scrollOptions;
+  }
 }

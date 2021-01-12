@@ -2164,7 +2164,7 @@ export default class Widget {
     return null;
   }
 
-  scrollToTop() {
+  scrollToTop(options) {
     if (this.getDelegateScrollable()) {
       this.getDelegateScrollable().scrollToTop();
       return;
@@ -2177,10 +2177,10 @@ export default class Widget {
       this.session.layoutValidator.schedulePostValidateFunction(this.scrollToTop.bind(this));
       return;
     }
-    scrollbars.scrollTop($scrollable, 0);
+    scrollbars.scrollTop($scrollable, 0, options);
   }
 
-  scrollToBottom() {
+  scrollToBottom(options) {
     if (this.getDelegateScrollable()) {
       this.getDelegateScrollable().scrollToBottom();
       return;
@@ -2193,7 +2193,7 @@ export default class Widget {
       this.session.layoutValidator.schedulePostValidateFunction(this.scrollToBottom.bind(this));
       return;
     }
-    scrollbars.scrollToBottom($scrollable);
+    scrollbars.scrollToBottom($scrollable, options);
   }
 
   /**

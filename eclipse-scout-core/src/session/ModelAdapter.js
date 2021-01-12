@@ -402,7 +402,9 @@ export default class ModelAdapter {
    */
   onModelAction(event) {
     if (event.type === 'scrollToTop') {
-      this.widget.scrollToTop();
+      this.widget.scrollToTop({animate: event.animate});
+    } else if (event.type === 'reveal') {
+      this.widget.reveal({animate: event.animate});
     } else {
       $.log.warn('Model action "' + event.type + '" is not supported by model-adapter ' + this.objectType);
     }

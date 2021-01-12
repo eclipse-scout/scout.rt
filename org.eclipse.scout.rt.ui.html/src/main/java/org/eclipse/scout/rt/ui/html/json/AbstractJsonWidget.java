@@ -12,9 +12,11 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.ScrollOptions;
 import org.eclipse.scout.rt.client.ui.WidgetEvent;
 import org.eclipse.scout.rt.client.ui.WidgetListener;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.json.JSONObject;
 
 /**
  * @since 8.0
@@ -22,6 +24,7 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 public abstract class AbstractJsonWidget<T extends IWidget> extends AbstractJsonPropertyObserver<T> {
 
   protected static final String EVENT_SCROLL_TO_TOP = "scrollToTop";
+  protected static final String EVENT_REVEAL = "reveal";
 
   private WidgetListener m_listener;
 
@@ -85,12 +88,26 @@ public abstract class AbstractJsonWidget<T extends IWidget> extends AbstractJson
 
   protected void handleModelWidgetEvent(WidgetEvent event) {
     if (event.getType() == WidgetEvent.TYPE_SCROLL_TO_TOP) {
-      handleModelScrollTopTop();
+      handleModelScrollTopTop(event.getScrollOptions());
+    }
+    else if (event.getType() == WidgetEvent.TYPE_REVEAL) {
+      handleModelReveal(event.getScrollOptions());
     }
   }
 
-  protected void handleModelScrollTopTop() {
-    addActionEvent(EVENT_SCROLL_TO_TOP);
+  protected void handleModelScrollTopTop(ScrollOptions options) {
+    addActionEvent(EVENT_SCROLL_TO_TOP, scrollOptionsToJson(options));
+  }
+
+  protected void handleModelReveal(ScrollOptions options) {
+    addActionEvent(EVENT_REVEAL, scrollOptionsToJson(options));
+  }
+
+  protected JSONObject scrollOptionsToJson(ScrollOptions options) {
+    if (options == null) {
+      return null;
+    }
+    return (JSONObject) MainJsonObjectFactory.get().createJsonObject(options).toJson();
   }
 
   protected class P_WidgetListener implements WidgetListener {

@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.Coordinates;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.ScrollOptions;
 import org.eclipse.scout.rt.client.ui.WidgetListeners;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -1018,6 +1019,21 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void scrollToTop() {
+    // NOP
+  }
+
+  @Override
+  public void scrollToTop(ScrollOptions options) {
+    // NOP
+  }
+
+  @Override
+  public void reveal() {
+    // NOP
+  }
+
+  @Override
+  public void reveal(ScrollOptions options) {
     // NOP
   }
 
