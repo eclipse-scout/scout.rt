@@ -14,6 +14,12 @@ scout.PlannerAdapter = function() {
 };
 scout.inherits(scout.PlannerAdapter, scout.ModelAdapter);
 
+scout.PlannerAdapter.PROPERTIES_ORDER = ['displayMode', 'viewRange'];
+
+scout.PlannerAdapter.prototype._orderPropertyNamesOnSync = function(newProperties) {
+  return Object.keys(newProperties).sort(this._createPropertySortFunc(scout.PlannerAdapter.PROPERTIES_ORDER));
+};
+
 scout.PlannerAdapter.prototype._sendViewRange = function(viewRange) {
   this._send('property', {
     viewRange: scout.dates.toJsonDateRange(viewRange)
