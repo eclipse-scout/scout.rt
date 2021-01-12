@@ -10,8 +10,6 @@
  */
 package org.eclipse.scout.rt.ui.html.res.loader;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -61,7 +59,6 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
   public HttpCacheObject loadResource(HttpCacheKey cacheKey) {
     DynamicResourceInfo info = createDynamicResourceInfo(cacheKey);
     if (info == null) {
-      LOG.warn("invalid dynamic-resource request received.", new Exception("origin"));
       return null;
     }
 
@@ -84,7 +81,7 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
   }
 
   @Override
-  public BinaryResource loadResource(String pathInfo) throws IOException {
+  public BinaryResource loadResource(String pathInfo) {
     throw new UnsupportedOperationException();
   }
 
