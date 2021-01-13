@@ -123,6 +123,10 @@ export default class GroupBoxLayout extends AbstractLayout {
       setWidthForStatus($groupBoxTitle, statusWidth);
     }
 
+    if (this.groupBox.notification) {
+      setWidthForStatus(this.groupBox.notification.$container, statusWidth);
+    }
+
     gbBodySize = containerSize.subtract(htmlGbBody.margins());
     gbBodySize.height -= this._titleHeight();
     gbBodySize.height -= this._notificationHeight();
