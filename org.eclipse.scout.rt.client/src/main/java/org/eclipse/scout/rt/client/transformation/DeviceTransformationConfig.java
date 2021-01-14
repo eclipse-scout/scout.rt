@@ -60,7 +60,6 @@ public class DeviceTransformationConfig {
     if (isFormTransformationExcluded(field.getForm(), transformation)) {
       return false;
     }
-
     if (isFieldTransformationExcluded(field, transformation)) {
       return false;
     }

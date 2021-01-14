@@ -69,5 +69,11 @@ public interface IDeviceTransformer {
 
   boolean isFormFieldExcluded(IFormField formField);
 
+  void enableTransformation(IDeviceTransformation transformation);
+
+  void disableTransformation(IDeviceTransformation transformation);
+
+  boolean isTransformationEnabled(IDeviceTransformation transformation);
+
   DeviceTransformationConfig getDeviceTransformationConfig();
 }

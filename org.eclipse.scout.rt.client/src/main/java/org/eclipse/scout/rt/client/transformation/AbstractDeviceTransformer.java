@@ -96,6 +96,21 @@ public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void enableTransformation(IDeviceTransformation transformation) {
+    getDeviceTransformationConfig().enableTransformation(transformation);
+  }
+
+  @Override
+  public void disableTransformation(IDeviceTransformation transformation) {
+    getDeviceTransformationConfig().disableTransformation(transformation);
+  }
+
+  @Override
+  public boolean isTransformationEnabled(IDeviceTransformation transformation) {
+    return getDeviceTransformationConfig().isTransformationEnabled(transformation);
+  }
+
+  @Override
   public void transformFormField(IFormField field) {
   }
 

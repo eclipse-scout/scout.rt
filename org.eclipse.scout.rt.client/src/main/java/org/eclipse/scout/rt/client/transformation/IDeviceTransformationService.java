@@ -33,4 +33,10 @@ public interface IDeviceTransformationService extends IService {
   void excludeField(IFormField formField);
 
   void excludeFieldTransformation(IFormField formField, IDeviceTransformation transformation);
+
+  void enableTransformation(IDeviceTransformation transformation);
+
+  void disableTransformation(IDeviceTransformation transformation);
+
+  boolean isTransformationEnabled(IDeviceTransformation transformation);
 }

@@ -111,6 +111,21 @@ public class DeviceTransformationService implements IDeviceTransformationService
     getDeviceTransformer().excludeFieldTransformation(formField, transformation);
   }
 
+  @Override
+  public void enableTransformation(IDeviceTransformation transformation) {
+    getDeviceTransformer().enableTransformation(transformation);
+  }
+
+  @Override
+  public void disableTransformation(IDeviceTransformation transformation) {
+    getDeviceTransformer().disableTransformation(transformation);
+  }
+
+  @Override
+  public boolean isTransformationEnabled(IDeviceTransformation transformation) {
+    return getDeviceTransformer().isTransformationEnabled(transformation);
+  }
+
   private class P_SessionListener implements ISessionListener {
     @Override
     public void sessionChanged(SessionEvent event) {

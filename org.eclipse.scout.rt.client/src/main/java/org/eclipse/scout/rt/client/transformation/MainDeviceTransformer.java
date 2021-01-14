@@ -147,6 +147,30 @@ public class MainDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void enableTransformation(IDeviceTransformation transformation) {
+    for (IDeviceTransformer transformer : getTransformers()) {
+      transformer.enableTransformation(transformation);
+    }
+  }
+
+  @Override
+  public void disableTransformation(IDeviceTransformation transformation) {
+    for (IDeviceTransformer transformer : getTransformers()) {
+      transformer.disableTransformation(transformation);
+    }
+  }
+
+  @Override
+  public boolean isTransformationEnabled(IDeviceTransformation transformation) {
+    for (IDeviceTransformer transformer : getTransformers()) {
+      if (transformer.isTransformationEnabled(transformation)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   public void transformFormField(IFormField field) {
     if (isFormExcluded(field.getForm()) || isFormFieldExcluded(field)) {
       return;

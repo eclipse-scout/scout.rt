@@ -131,6 +131,21 @@ public class NullDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void enableTransformation(IDeviceTransformation transformation) {
+    // NOP
+  }
+
+  @Override
+  public void disableTransformation(IDeviceTransformation transformation) {
+    // NOP
+  }
+
+  @Override
+  public boolean isTransformationEnabled(IDeviceTransformation transformation) {
+    return false;
+  }
+
+  @Override
   public DeviceTransformationConfig getDeviceTransformationConfig() {
     return null;
   }
