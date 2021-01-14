@@ -1208,6 +1208,9 @@ export default class FormField extends Widget {
   _createDragAndDropHandler() {
     return dragAndDrop.handler(this, {
       supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+      onDrop: function(event) {
+        this.trigger('fileDrop', event);
+      }.bind(this),
       dropType: function() {
         return this.dropType;
       }.bind(this),
@@ -1217,15 +1220,18 @@ export default class FormField extends Widget {
     });
   }
 
-  _installDragAndDropHandler(event) {
+  _installDragAndDropHandler() {
     if (this.dragAndDropHandler) {
       return;
     }
     this.dragAndDropHandler = this._createDragAndDropHandler();
+    if (!this.dragAndDropHandler) {
+      return;
+    }
     this.dragAndDropHandler.install(this.$field);
   }
 
-  _uninstallDragAndDropHandler(event) {
+  _uninstallDragAndDropHandler() {
     if (!this.dragAndDropHandler) {
       return;
     }

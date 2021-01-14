@@ -31,7 +31,6 @@ import {
   Status,
   Widget
 } from '../index';
-import $ from 'jquery';
 
 export default class FileChooser extends Widget {
 
@@ -101,11 +100,6 @@ export default class FileChooser extends Widget {
     // DnD and Multiple files are only supported with the new file api
     if (!this.fileInput.legacy) {
 
-      // Install DnD support
-      this.$container.on('dragenter', this._onDragEnterOrOver.bind(this))
-        .on('dragover', this._onDragEnterOrOver.bind(this))
-        .on('drop', this._onDrop.bind(this));
-
       // explanation for file chooser
       this.$content.appendDiv('file-chooser-label')
         .text(this.session.text('ui.FileChooserHint'));
@@ -163,6 +157,7 @@ export default class FileChooser extends Widget {
       this.setFiles([]);
     }
     this._renderFiles();
+    this._installDragAndDropHandler();
   }
 
   _postRender() {
@@ -172,6 +167,7 @@ export default class FileChooser extends Widget {
 
   _remove() {
     this._glassPaneRenderer.removeGlassPanes();
+    this._uninstallDragAndDropHandler();
     this._uninstallFocusContext();
     super._remove();
   }
@@ -182,6 +178,40 @@ export default class FileChooser extends Widget {
 
   _uninstallFocusContext() {
     this.session.focusManager.uninstallFocusContext(this.$container);
+  }
+
+  _createDragAndDropHandler() {
+    return dragAndDrop.handler(this, {
+      supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+      onDrop: function(event) {
+        this.addFiles(event.files);
+      }.bind(this),
+      dropType: function() {
+        return dragAndDrop.SCOUT_TYPES.FILE_TRANSFER;
+      },
+      dropMaximumSize: function() {
+        return this.maximumUploadSize;
+      }.bind(this)
+    });
+  }
+
+  _installDragAndDropHandler() {
+    if (this.dragAndDropHandler) {
+      return;
+    }
+    this.dragAndDropHandler = this._createDragAndDropHandler();
+    if (!this.dragAndDropHandler) {
+      return;
+    }
+    this.dragAndDropHandler.install(this.$container);
+  }
+
+  _uninstallDragAndDropHandler() {
+    if (!this.dragAndDropHandler) {
+      return;
+    }
+    this.dragAndDropHandler.uninstall();
+    this.dragAndDropHandler = null;
   }
 
   /**
@@ -332,17 +362,6 @@ export default class FileChooser extends Widget {
       scrollbars.update(this.$files);
     }
     this.$uploadButton.setEnabled(files.length > 0);
-  }
-
-  _onDragEnterOrOver(event) {
-    dragAndDrop.verifyDataTransferTypesScoutTypes(event, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER);
-  }
-
-  _onDrop(event) {
-    if (dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
-      $.suppressEvent(event);
-      this.addFiles(event.originalEvent.dataTransfer.files);
-    }
   }
 
   _onUploadButtonClicked(event) {

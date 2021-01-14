@@ -4692,12 +4692,12 @@ export default class Table extends Widget {
     }
   }
 
-  _installDragAndDropHandler(event) {
-    if (this.dragAndDropHandler) {
-      return;
-    }
-    this.dragAndDropHandler = dragAndDrop.handler(this, {
+  _createDragAndDropHandler() {
+    return dragAndDrop.handler(this, {
       supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+      onDrop: function(event) {
+        this.trigger('fileDrop', event);
+      }.bind(this),
       dropType: function() {
         return this.dropType;
       }.bind(this),
@@ -4716,10 +4716,20 @@ export default class Table extends Widget {
         return properties;
       }
     });
+  }
+
+  _installDragAndDropHandler() {
+    if (this.dragAndDropHandler) {
+      return;
+    }
+    this.dragAndDropHandler = this._createDragAndDropHandler();
+    if (!this.dragAndDropHandler) {
+      return;
+    }
     this.dragAndDropHandler.install(this.$container, '.table-data,.table-row');
   }
 
-  _uninstallDragAndDropHandler(event) {
+  _uninstallDragAndDropHandler() {
     if (!this.dragAndDropHandler) {
       return;
     }
