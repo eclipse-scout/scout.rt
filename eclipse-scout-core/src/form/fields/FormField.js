@@ -1323,24 +1323,24 @@ export default class FormField extends Widget {
   _createDragAndDropHandler() {
     return dragAndDrop.handler(this, {
       supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-      dropType: function() {
-        return this.dropType;
-      }.bind(this),
-      dropMaximumSize: function() {
-        return this.dropMaximumSize;
-      }.bind(this)
+      onDrop: event => this.trigger('fileDrop', event),
+      dropType: () => this.dropType,
+      dropMaximumSize: () => this.dropMaximumSize
     });
   }
 
-  _installDragAndDropHandler(event) {
+  _installDragAndDropHandler() {
     if (this.dragAndDropHandler) {
       return;
     }
     this.dragAndDropHandler = this._createDragAndDropHandler();
+    if (!this.dragAndDropHandler) {
+      return;
+    }
     this.dragAndDropHandler.install(this.$field);
   }
 
-  _uninstallDragAndDropHandler(event) {
+  _uninstallDragAndDropHandler() {
     if (!this.dragAndDropHandler) {
       return;
     }

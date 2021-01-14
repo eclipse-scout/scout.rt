@@ -31,6 +31,7 @@ export {default as EventDelegator} from './util/EventDelegator';
 export {default as dates} from './util/dates';
 export {default as defaultValues} from './util/defaultValues';
 export {default as events} from './util/events';
+export {default as files} from './util/files';
 export {default as Device} from './util/Device';
 export {default as DoubleClickSupport} from './util/DoubleClickSupport';
 export {default as DragAndDropHandler} from './util/DragAndDropHandler';

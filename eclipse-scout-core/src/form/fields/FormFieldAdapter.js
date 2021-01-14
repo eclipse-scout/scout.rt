@@ -37,4 +37,11 @@ export default class FormFieldAdapter extends ModelAdapter {
     this.widget.setEnabled(this._enabledBeforeOffline);
   }
 
+  _onWidgetEvent(event) {
+    if (event.type === 'fileDrop' && this.widget.dragAndDropHandler) {
+      this.widget.dragAndDropHandler.uploadFiles(event.files);
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
 }

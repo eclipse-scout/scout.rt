@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, dragAndDrop, InputFieldKeyStrokeContext, strings, URL, Widget} from '../index';
+import {arrays, Device, dragAndDrop, files as fileUtil, InputFieldKeyStrokeContext, strings, URL, Widget} from '../index';
 import $ from 'jquery';
 
 export default class FileInput extends Widget {
@@ -56,10 +56,7 @@ export default class FileInput extends Widget {
       .on('change', this._onFileChange.bind(this));
 
     if (!this.legacy) {
-      this.$container = this.$parent.appendDiv('file-input input-field')
-        .on('dragenter', this._onDragEnterOrOver.bind(this))
-        .on('dragover', this._onDragEnterOrOver.bind(this))
-        .on('drop', this._onDrop.bind(this));
+      this.$container = this.$parent.appendDiv('file-input input-field');
       this.$fileInput.appendTo(this.$container);
       this.$container.on('mousedown', this._onMouseDown.bind(this));
       this.$text = this.$container.appendDiv('file-input-text');
@@ -108,6 +105,7 @@ export default class FileInput extends Widget {
     this._renderText();
     this._renderAcceptTypes();
     this._renderMultiSelect();
+    this._installDragAndDropHandler();
   }
 
   _renderEnabled() {
@@ -151,6 +149,43 @@ export default class FileInput extends Widget {
 
   setMaximumUploadSize(maximumUploadSize) {
     this.setProperty('maximumUploadSize', maximumUploadSize);
+  }
+
+  _remove() {
+    this._uninstallDragAndDropHandler();
+    super._remove();
+  }
+
+  _createDragAndDropHandler() {
+    return dragAndDrop.handler(this, {
+      supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+      onDrop: event => {
+        if (event.files.length >= 1) {
+          this._setFiles(event.files);
+        }
+      },
+      dropType: () => dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+      dropMaximumSize: () => this.maximumUploadSize
+    });
+  }
+
+  _installDragAndDropHandler() {
+    if (this.dragAndDropHandler) {
+      return;
+    }
+    this.dragAndDropHandler = this._createDragAndDropHandler();
+    if (!this.dragAndDropHandler) {
+      return;
+    }
+    this.dragAndDropHandler.install(this.$container);
+  }
+
+  _uninstallDragAndDropHandler() {
+    if (!this.dragAndDropHandler) {
+      return;
+    }
+    this.dragAndDropHandler.uninstall();
+    this.dragAndDropHandler = null;
   }
 
   clear() {
@@ -225,22 +260,6 @@ export default class FileInput extends Widget {
     this.browse();
   }
 
-  _onDragEnterOrOver(event) {
-    dragAndDrop.verifyDataTransferTypesScoutTypes(event, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER);
-  }
-
-  _onDrop(event) {
-    if (dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
-      event.stopPropagation();
-      event.preventDefault();
-
-      let files = event.originalEvent.dataTransfer.files;
-      if (files.length >= 1) {
-        this._setFiles(files);
-      }
-    }
-  }
-
   static fileListToArray(fileList) {
     let files = [],
       i;
@@ -251,16 +270,7 @@ export default class FileInput extends Widget {
   }
 
   validateMaximumUploadSize(files) {
-    files = arrays.ensure(files);
-    if (files.length === 0) {
-      return;
-    }
-
-    let totalSize = files.reduce((total, file) => {
-      return total + file.size;
-    }, 0);
-
-    if (this.maximumUploadSize !== null && totalSize > this.maximumUploadSize) {
+    if (!fileUtil.validateMaximumUploadSize(files, this.maximumUploadSize)) {
       throw this.session.text('ui.FileSizeLimit', (this.maximumUploadSize / 1024 / 1024));
     }
   }

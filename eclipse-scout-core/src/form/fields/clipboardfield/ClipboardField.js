@@ -95,15 +95,10 @@ export default class ClipboardField extends ValueField {
   _createDragAndDropHandler() {
     return dragAndDrop.handler(this, {
       supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-      dropType: function() {
-        return this.dropType;
-      }.bind(this),
-      dropMaximumSize: function() {
-        return this.maximumSize;
-      }.bind(this),
-      allowedTypes: function() {
-        return this.allowedMimeTypes;
-      }.bind(this)
+      onDrop: event => this.trigger('fileDrop', event),
+      dropType: () => this.dropType,
+      dropMaximumSize: () => this.maximumSize,
+      allowedTypes: () => this.allowedMimeTypes
     });
   }
 

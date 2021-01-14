@@ -71,7 +71,7 @@ export default class ImageField extends FormField {
     }
   }
 
-  _installDragAndDropHandler(event) {
+  _installDragAndDropHandler() {
     if (this.dragAndDropHandler) {
       return;
     }

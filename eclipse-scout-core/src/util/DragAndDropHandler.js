@@ -19,6 +19,7 @@ export default class DragAndDropHandler {
     this.allowedTypes = null;
     this.dropMaximumSize = null;
     this.target = null;
+    this.onDrop = null;
 
     $.extend(this, options);
     this.supportedScoutTypes = arrays.ensure(options.supportedScoutTypes);
@@ -65,16 +66,30 @@ export default class DragAndDropHandler {
     if (this.supportedScoutTypes.indexOf(dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) >= 0 &&
       (this.dropType() & dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) === dragAndDrop.SCOUT_TYPES.FILE_TRANSFER && // NOSONAR
       dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
+      if (!this.onDrop ||
+        !(event.originalEvent.dataTransfer.files instanceof FileList)) {
+        return;
+      }
+      let files = Array.from(event.originalEvent.dataTransfer.files);
+      if (arrays.empty(files)) {
+        return;
+      }
       event.stopPropagation();
       event.preventDefault();
+      let formattedDropEvent = {
+        originalEvent: event,
+        files: files
+      };
+      this.onDrop(formattedDropEvent);
+    }
+  }
 
-      let files = event.originalEvent.dataTransfer.files;
-      if (files.length >= 1) {
-        this.target.session.uploadFiles(this.target, files,
-          this.additionalDropProperties ? this.additionalDropProperties(event) : undefined,
-          this.dropMaximumSize ? this.dropMaximumSize() : undefined,
-          this.allowedTypes ? this.allowedTypes() : undefined);
-      }
+  uploadFiles(files) {
+    if (files.length >= 1) {
+      this.target.session.uploadFiles(this.target, files,
+        this.additionalDropProperties ? this.additionalDropProperties(event) : undefined,
+        this.dropMaximumSize ? this.dropMaximumSize() : undefined,
+        this.allowedTypes ? this.allowedTypes() : undefined);
     }
   }
 }

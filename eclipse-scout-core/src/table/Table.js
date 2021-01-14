@@ -4719,18 +4719,12 @@ export default class Table extends Widget {
     }
   }
 
-  _installDragAndDropHandler(event) {
-    if (this.dragAndDropHandler) {
-      return;
-    }
-    this.dragAndDropHandler = dragAndDrop.handler(this, {
+  _createDragAndDropHandler() {
+    return dragAndDrop.handler(this, {
       supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-      dropType: function() {
-        return this.dropType;
-      }.bind(this),
-      dropMaximumSize: function() {
-        return this.dropMaximumSize;
-      }.bind(this),
+      onDrop: event => this.trigger('fileDrop', event),
+      dropType: () => this.dropType,
+      dropMaximumSize: () => this.dropMaximumSize,
       additionalDropProperties: event => {
         let $target = $(event.currentTarget);
         let properties = {
@@ -4743,10 +4737,20 @@ export default class Table extends Widget {
         return properties;
       }
     });
+  }
+
+  _installDragAndDropHandler() {
+    if (this.dragAndDropHandler) {
+      return;
+    }
+    this.dragAndDropHandler = this._createDragAndDropHandler();
+    if (!this.dragAndDropHandler) {
+      return;
+    }
     this.dragAndDropHandler.install(this.$container, '.table-data,.table-row');
   }
 
-  _uninstallDragAndDropHandler(event) {
+  _uninstallDragAndDropHandler() {
     if (!this.dragAndDropHandler) {
       return;
     }
