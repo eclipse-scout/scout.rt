@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, defaultValues, EventSupport, objects, PropertyChangeEventFilter, RemoteEvent, scout, strings, Widget, WidgetEventTypeFilter} from '../index';
+import {App, arrays, comparators, defaultValues, EventSupport, objects, PropertyChangeEventFilter, RemoteEvent, scout, strings, Widget, WidgetEventTypeFilter} from '../index';
 import $ from 'jquery';
 
 /**
@@ -367,6 +367,23 @@ export default class ModelAdapter {
    */
   _orderPropertyNamesOnSync(newProperties) {
     return Object.keys(newProperties);
+  }
+
+  _createPropertySortFunc(order) {
+    return function(a, b) {
+      var ia = order.indexOf(a);
+      var ib = order.indexOf(b);
+      if (ia > -1 && ib > -1) { // both are in the list
+        return ia - ib;
+      }
+      if (ia > -1) { // B is not in list
+        return -1;
+      }
+      if (ib > -1) { // A is not in list
+        return 1;
+      }
+      return comparators.TEXT.compare(a, b); // both are not in list
+    };
   }
 
   /**
