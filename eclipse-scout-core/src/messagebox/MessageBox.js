@@ -264,9 +264,9 @@ export default class MessageBox extends Widget {
       }
       let dataType = ie ? 'Text' : 'text/plain';
       let plainText = strings.join('\n\n',
-        this.$header.text(),
-        this.$body.text(),
-        this.$html.text(),
+        this.header,
+        this.body,
+        strings.plainText(this.$html[0].outerHTML, {compact: true, trim: true}),
         this.hiddenText);
       clipboardData.setData(dataType, plainText);
       this.$container.window(true).getSelection().removeAllRanges();
