@@ -888,7 +888,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
     }
     Date truncated = DateUtility.truncDate(date);
     if (!date.equals(truncated)) {
-      LOG.warn("Had to truncate {} date of range, bacause UI does not support intra day ranges: {}", fromOrTo, date);
+      LOG.warn("Had to truncate {} date of range, because UI does not support intra day ranges: {}", fromOrTo, date);
     }
     return truncated;
   }

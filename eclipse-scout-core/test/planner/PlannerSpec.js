@@ -12,7 +12,6 @@ import {DateRange, dates, ObjectFactory, Planner} from '../../src/index';
 
 describe('Planner', () => {
   let session;
-  let helper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -376,7 +375,7 @@ describe('Planner', () => {
       });
 
       function validateRendering() {
-        let options, interval, labelPeriod, months, days;
+        let options, labelPeriod, months, days;
         options = planner.displayModeOptions[planner.displayMode];
         labelPeriod = options.labelPeriod;
 
@@ -426,7 +425,7 @@ describe('Planner', () => {
       });
 
       function validateRendering() {
-        let options, interval, labelPeriod, months, weeks;
+        let options, labelPeriod, months, weeks;
         options = planner.displayModeOptions[planner.displayMode];
         labelPeriod = options.labelPeriod;
 
@@ -486,7 +485,7 @@ describe('Planner', () => {
       });
 
       function validateRendering() {
-        let options, interval, labelPeriod, years, months;
+        let options, labelPeriod, years, months;
         options = planner.displayModeOptions[planner.displayMode];
         labelPeriod = options.labelPeriod;
 
@@ -557,7 +556,7 @@ describe('Planner', () => {
       expect(planner.transformWidth(dates.create('2016-06-20 06:00:00'), dates.create('2016-06-21 12:00:00'))).toBeCloseTo(5 * cellWidthPercent, 5);
     });
 
-    it('calculates left and width in WEEK mode for limitted day range', () => {
+    it('calculates left and width in WEEK mode for limited day range', () => {
       planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
       planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {
@@ -728,6 +727,73 @@ describe('Planner', () => {
       planner._select();
       expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-20 15:00:00').toISOString());
       expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-20 18:00:00').toISOString());
+    });
+  });
+
+  describe('clickToday', () => {
+    let model, planner;
+
+    beforeEach(() => {
+      model = createPlannerModel(0);
+      planner = createPlanner(model);
+      planner.displayModeOptions = {};
+      planner.displayMode = Planner.DisplayMode.WEEK;
+    });
+
+    describe('Regular view range', () => {
+
+      beforeEach(() => {
+        planner.viewRange = new DateRange(dates.create('2020-10-01'), dates.create('2020-10-10')); // 9 days (starts Thursday)
+        planner._today = () => dates.create('2021-01-19'); // Tuesday
+        planner._onTodayClick();
+      });
+
+      it('correct viewRange', () => {
+        expect(planner.viewRange.from.toISOString()).toBe(dates.create('2021-01-18').toISOString()); // Monday (today will use first day of week)
+        expect(planner.viewRange.to.toISOString()).toBe(dates.create('2021-01-27').toISOString());
+      });
+    });
+
+    describe('Current view range with summer and winter time', () => {
+
+      beforeEach(() => {
+        planner.viewRange = new DateRange(dates.create('2020-10-22'), dates.create('2020-11-03')); // 12 days
+        planner._today = () => dates.create('2021-01-19'); // Tuesday
+        planner._onTodayClick();
+      });
+
+      it('correct viewRange', () => {
+        expect(planner.viewRange.from.toISOString()).toBe(dates.create('2021-01-18').toISOString()); // Monday (today will use first day of week)
+        expect(planner.viewRange.to.toISOString()).toBe(dates.create('2021-01-30').toISOString());
+      });
+    });
+
+    describe('New view range with summer and winter time', () => {
+
+      beforeEach(() => {
+        planner.viewRange = new DateRange(dates.create('2020-10-01'), dates.create('2020-10-10')); // 9 days (starts Thursday)
+        planner._today = () => dates.create('2021-03-26'); // Friday
+        planner._onTodayClick();
+      });
+
+      it('correct viewRange', () => {
+        expect(planner.viewRange.from.toISOString()).toBe(dates.create('2021-03-22').toISOString()); // Monday (today will use first day of week)
+        expect(planner.viewRange.to.toISOString()).toBe(dates.create('2021-03-31').toISOString());
+      });
+    });
+
+    describe('Current/new view range with summer and winter time', () => {
+
+      beforeEach(() => {
+        planner.viewRange = new DateRange(dates.create('2020-10-22'), dates.create('2020-11-03')); // 12 days
+        planner._today = () => dates.create('2021-03-26'); // Friday
+        planner._onTodayClick();
+      });
+
+      it('correct viewRange', () => {
+        expect(planner.viewRange.from.toISOString()).toBe(dates.create('2021-03-22').toISOString()); // Monday (today will use first day of week)
+        expect(planner.viewRange.to.toISOString()).toBe(dates.create('2021-04-03').toISOString());
+      });
     });
   });
 });

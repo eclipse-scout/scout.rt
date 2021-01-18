@@ -252,7 +252,7 @@ export default class Planner extends Widget {
   }
 
   _onTodayClick(event) {
-    let today = new Date(),
+    let today = this._today(),
       year = today.getFullYear(),
       month = today.getMonth(),
       date = today.getDate(),
@@ -264,10 +264,14 @@ export default class Planner extends Widget {
     } else if (this.displayMode === displayMode.YEAR) {
       today = new Date(year, month, 1);
     } else {
-      today = new Date(year, month, date - day);
+      today = new Date(year, month, date - day); // set day to Monday
     }
 
     this.setViewRangeFrom(today);
+  }
+
+  _today() {
+    return new Date();
   }
 
   _onDisplayModeClick(event) {
@@ -1510,11 +1514,11 @@ export default class Planner extends Widget {
   }
 
   setViewRangeFrom(date) {
-    let diff = this.viewRange.to.getTime() - this.viewRange.from.getTime(),
-      viewRange = new DateRange(this.viewRange.from, this.viewRange.to);
+    let daysDiff = dates.compareDays(this.viewRange.to, this.viewRange.from);
+    let viewRange = new DateRange(this.viewRange.from, this.viewRange.to);
 
     viewRange.from = date;
-    viewRange.to = new Date(date.getTime() + diff);
+    viewRange.to = dates.shift(date, 0, 0, daysDiff);
     this.setViewRange(viewRange);
   }
 
