@@ -556,6 +556,13 @@ export default class Session {
       return; // nothing to send
     }
 
+    if (this.loggedOut) {
+      // Don't send any JSON requests when we are logged out. They would fail since the UI session
+      // no longer exists. This could happen when views are open and the client session is stopped.
+      // Destroying the form adapters makes the Desktop send an "activeForm = null" event.
+      return;
+    }
+
     if (this.offline && !request.unload) { // In Firefox, "offline" is already true when page is unloaded
       this._handleSendWhenOffline(request);
       return;
@@ -999,6 +1006,12 @@ export default class Session {
         return;
       }
       webstorage.removeItem(sessionStorage, 'scout:versionMismatch');
+    }
+
+    if (this.loggedOut) {
+      // When the session is terminated via user request (logout button), the poller might return
+      // with a code 20. If we are already logged out, there is no need to show a message box.
+      return;
     }
 
     // Default values for fatal message boxes
