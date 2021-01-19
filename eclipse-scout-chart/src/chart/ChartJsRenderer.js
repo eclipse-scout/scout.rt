@@ -129,7 +129,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let chartDataValid = true;
     let chartData = this.chart && this.chart.data;
 
-    if (!chartData || !chartData.chartValueGroups || chartData.chartValueGroups.length === 0) {
+    if (!chartData || !chartData.chartValueGroups || chartData.chartValueGroups.length === 0 || !chartData.axes) {
       chartDataValid = false;
     }
 

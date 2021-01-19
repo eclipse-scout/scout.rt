@@ -75,7 +75,8 @@ export default class Chart extends Widget {
     TOP: 'top',
     BOTTOM: 'bottom',
     LEFT: 'left',
-    RIGHT: 'right'
+    RIGHT: 'right',
+    CENTER: 'center'
   };
 
   static DEFAULT_ANIMATION_DURATION = 600; // ms
