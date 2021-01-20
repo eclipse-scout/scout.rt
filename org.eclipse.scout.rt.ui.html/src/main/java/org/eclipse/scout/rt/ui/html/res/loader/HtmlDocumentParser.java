@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,17 +46,21 @@ import org.slf4j.LoggerFactory;
 public class HtmlDocumentParser {
   private static final Logger LOG = LoggerFactory.getLogger(HtmlDocumentParser.class);
 
+  protected static final String ENTRY_POINT_VALUE_REGEX = "[^\"~]*";
   protected static final Pattern PATTERN_INCLUDE_TAG = Pattern.compile("<scout:include\\s+template=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   protected static final Pattern PATTERN_MESSAGE_TAG = Pattern.compile("<scout:message(.*?)\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   protected static final Pattern PATTERN_STYLESHEET_TAG = Pattern.compile("<scout:stylesheet\\s+src=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   protected static final Pattern PATTERN_SCRIPT_TAG = Pattern.compile("<scout:script\\s+src=\"([^\"]*)\"\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-  protected static final Pattern PATTERN_SCRIPTS_TAG = Pattern.compile("<scout:scripts\\s+entrypoint=\"([^\"~]*)\"\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  protected static final Pattern PATTERN_SCRIPTS_TAG = Pattern.compile("<scout:scripts\\s+entrypoint=\"(" + ENTRY_POINT_VALUE_REGEX + ")\"\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+  protected static final Pattern PATTERN_STYLESHEETS_TAG = Pattern.compile("<scout:stylesheets\\s+entrypoint=\"(" + ENTRY_POINT_VALUE_REGEX + ")\"\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   protected static final Pattern PATTERN_BASE_TAG = Pattern.compile("<scout:base\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   protected static final Pattern PATTERN_VERSION_TAG = Pattern.compile("<scout:version\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   protected static final Pattern PATTERN_UNKNOWN_TAG = Pattern.compile("<scout:(\"[^\"]*\"|[^>]*?)*>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   protected static final Pattern PATTERN_KEY_VALUE = Pattern.compile("([^\\s]+)=\"([^\"]*)\"");
-  protected static final String SCRIPT_TAG_PREFIX = "<script src=\"";
+  public static final String SCRIPT_TAG_PREFIX = "<script src=\"";
   public static final String SCRIPT_TAG_SUFFIX = "\"></script>";
+  public static final String STYLESHEET_TAG_PREFIX = "<link rel=\"stylesheet\" type=\"text/css\" href=\"";
+  public static final String STYLESHEET_TAG_SUFFIX = "\">";
 
   protected final HtmlDocumentParserParameters m_params;
   protected final IHttpResourceCache m_cache;
@@ -79,10 +83,10 @@ public class HtmlDocumentParser {
     replaceBaseTags();
     replaceVersionTags();
     replaceMessageTags();
+    replaceStylesheetsTags();
     replaceStylesheetTags();
     replaceScriptsTags();
     replaceScriptTags();
-
     stripUnknownTags();
   }
 
@@ -116,7 +120,7 @@ public class HtmlDocumentParser {
 
   protected void replaceStylesheetTags() {
     // <scout:stylesheet src="scout-all-macro.css" />
-    replaceScriptTags(PATTERN_STYLESHEET_TAG, "<link rel=\"stylesheet\" type=\"text/css\" href=\"", "\">");
+    replaceScriptTags(PATTERN_STYLESHEET_TAG, STYLESHEET_TAG_PREFIX, STYLESHEET_TAG_SUFFIX);
   }
 
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
@@ -127,20 +131,29 @@ public class HtmlDocumentParser {
 
   protected void replaceScriptsTags() {
     // <scout:scripts entryPoint="entry-point-name"/>
-    Matcher m = PATTERN_SCRIPTS_TAG.matcher(m_workingContent);
+    replaceEntryPointTags(PATTERN_SCRIPTS_TAG, ".js", SCRIPT_TAG_PREFIX, SCRIPT_TAG_SUFFIX);
+  }
+
+  protected void replaceStylesheetsTags() {
+    // <scout:stylesheets entrypoint="entry-point-name"/>
+    replaceEntryPointTags(PATTERN_STYLESHEETS_TAG, ".css", STYLESHEET_TAG_PREFIX, STYLESHEET_TAG_SUFFIX);
+  }
+
+  protected void replaceEntryPointTags(Pattern pattern, String fileSuffixFilter, String tagPrefix, String tagSuffix) {
+    Matcher m = pattern.matcher(m_workingContent);
     StringBuffer sb = new StringBuffer();
     while (m.find()) {
       String entryPoint = m.group(1);
-      m.appendReplacement(sb, buildScriptTagsForEntryPoint(entryPoint));
+      m.appendReplacement(sb, buildScriptTagsForEntryPoint(entryPoint, fileSuffixFilter, tagPrefix, tagSuffix));
     }
     m.appendTail(sb);
     m_workingContent = sb.toString();
   }
 
-  protected String buildScriptTagsForEntryPoint(String entryPoint) {
+  protected String buildScriptTagsForEntryPoint(String entryPoint, String fileSuffixFilter, String tagPrefix, String tagSuffix) {
     return getAssetsForEntryPoint(entryPoint)
-        .filter(script -> script.toLowerCase().endsWith(".js"))
-        .map(path -> SCRIPT_TAG_PREFIX + path + SCRIPT_TAG_SUFFIX)
+        .filter(script -> script.toLowerCase().endsWith(fileSuffixFilter))
+        .map(path -> tagPrefix + path + tagSuffix)
         .collect(joining("\n"));
   }
 
