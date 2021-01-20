@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,6 +40,8 @@ public class HtmlDocumentParserTest {
   private static final String SCRIPT2_NAME = "script2.js";
   private static final String SCRIPT3_NAME = "script3.js";
   private static final String SCRIPT4_NAME = "style.css";
+  private static final String SCRIPT5_NAME = "vendors~style.css";
+  private static final String SCRIPT6_NAME = "style.css";
 
   @BeforeClass
   public static void beforeClass() {
@@ -64,6 +66,9 @@ public class HtmlDocumentParserTest {
 
       @Override
       protected Stream<String> getAssetsForEntryPoint(String entryPoint) {
+        if ("style".equals(entryPoint)) {
+          return Stream.of(SCRIPT5_NAME, SCRIPT6_NAME);
+        }
         return Stream.of(SCRIPT4_NAME, SCRIPT1_NAME, SCRIPT2_NAME, SCRIPT3_NAME);
       }
     };
@@ -100,6 +105,11 @@ public class HtmlDocumentParserTest {
   @Test
   public void testHtmlDocumentParser_03() throws IOException {
     testParser("test03_input.html", "test03_output.html");
+  }
+
+  @Test
+  public void testHtmlDocumentParser_04() throws IOException {
+    testParser("test04_input.html", "test04_output.html");
   }
 
   /**
