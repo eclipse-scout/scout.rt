@@ -20,6 +20,7 @@ export default class Icon extends Widget {
   constructor() {
     super();
 
+    this.autoFit = false;
     /** @type {IconDesc} */
     this.iconDesc = null;
 
@@ -114,9 +115,10 @@ export default class Icon extends Widget {
   }
 
   /**
-   * Delegates to this.image.setAutoFit, but only if Icon is an image. This method has no effect when icon is a font-icon.
+   * Delegates to this.image.setAutoFit, but only if Icon is an image. Beside updating the autoFit property, this method has no effect if the icon is a font-icon.
    */
   setAutoFit(autoFit) {
+    this.setProperty('autoFit', autoFit);
     if (this.image) {
       this.image.setAutoFit(autoFit);
     }

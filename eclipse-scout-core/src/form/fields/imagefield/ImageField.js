@@ -17,6 +17,7 @@ export default class ImageField extends FormField {
     super();
 
     this.autoFit = false;
+    this.imageUrl = null;
     this.scrollBarEnabled = false;
     this.uploadEnabled = false;
     this.acceptTypes = null;
@@ -107,6 +108,10 @@ export default class ImageField extends FormField {
     scrollbars.update(this.$fieldContainer);
   }
 
+  setScrollBarEnabled(scrollBarEnabled) {
+    this.setProperty('scrollBarEnabled', scrollBarEnabled)
+  }
+
   _renderScrollBarEnabled() {
     // Note: Inner alignment has to be updated _before_ installing the scrollbar, because the inner
     // alignment uses absolute positioning, which confuses the scrollbar calculations.
@@ -144,13 +149,13 @@ export default class ImageField extends FormField {
     });
   }
 
-  setUploadEnabled(uploadEnabled) {
-    this.setProperty('uploadEnabled', uploadEnabled);
-  }
-
   _renderEnabled() {
     super._renderEnabled();
     this._updateUploadEnabled();
+  }
+
+  setUploadEnabled(uploadEnabled) {
+    this.setProperty('uploadEnabled', uploadEnabled);
   }
 
   _renderUploadEnabled() {
