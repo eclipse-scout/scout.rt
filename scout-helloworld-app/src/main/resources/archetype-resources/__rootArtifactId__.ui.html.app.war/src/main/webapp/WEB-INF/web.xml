@@ -26,7 +26,7 @@
         /logo.png
         /*login*.js
         /*logout*.js
-        /${simpleArtifactName}-theme*.css
+        /*${simpleArtifactName}-theme*.css
       </param-value>
     </init-param>
   </filter>
