@@ -16,8 +16,13 @@ export default class TabItemLayout extends GroupBoxLayout {
     super(tabItem);
   }
 
+  _$status() {
+    // Use status area from tab box for alignment purposes (e.g. to align notification with title border)
+    return this.groupBox.parent.$status;
+  }
+
   _layoutStatus() {
-    // NOP: $status width is set in TabItem.addStatus()
+    // Nothing to layout here because the status of the tab item is displayed in the tab (see TabItem.addStatus, Tab._updateStatus)
   }
 
   _menuBarSize(htmlMenuBar, containerSize, statusWidth) {

@@ -47,7 +47,6 @@ export default class GroupBoxLayout extends AbstractLayout {
       tooltip = this.groupBox._tooltip(),
       $groupBoxTitle = this.groupBox.$title,
       $label = this.groupBox.$label,
-      $status = this.groupBox.$status,
       containerSize = htmlContainer.availableSize()
         .subtract(htmlContainer.insets());
 
@@ -56,6 +55,7 @@ export default class GroupBoxLayout extends AbstractLayout {
       ResponsiveManager.get().handleResponsive(this.groupBox, containerSize.width);
     }
 
+    var $status = this._$status();
     if ($status && $status.isVisible()) {
       this._layoutStatus();
       statusWidth = $status.outerWidth(true);
@@ -154,6 +154,10 @@ export default class GroupBoxLayout extends AbstractLayout {
     }
   }
 
+  _$status() {
+    return this.groupBox.$status;
+  }
+
   _layoutStatus() {
     let htmlContainer = this.groupBox.htmlComp,
       containerPadding = htmlContainer.insets({
@@ -163,7 +167,7 @@ export default class GroupBoxLayout extends AbstractLayout {
       right = containerPadding.right,
       $groupBoxTitle = this.groupBox.$title,
       titleInnerHeight = $groupBoxTitle.innerHeight(),
-      $status = this.groupBox.$status,
+      $status = this._$status(),
       statusMargins = graphics.margins($status),
       statusPosition = this.groupBox.statusPosition;
 

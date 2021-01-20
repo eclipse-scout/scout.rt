@@ -213,6 +213,14 @@ export default class TabBox extends CompositeField {
     this.invalidateLayoutTree();
   }
 
+  _updateFieldStatus() {
+    super._updateFieldStatus();
+    if (this.selectedTab && this.selectedTab.notification) {
+      // Also invalidate tab item if a notification is shown because notification size depends on status visibility
+      this.selectedTab.invalidateLayoutTree();
+    }
+  }
+
   /**
    * @override CompositeField.js
    */
