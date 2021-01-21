@@ -101,6 +101,21 @@ public class NullDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void excludeTransformation(IDeviceTransformation transformation) {
+
+  }
+
+  @Override
+  public void removeTransformationExclusion(IDeviceTransformation transformation) {
+
+  }
+
+  @Override
+  public boolean isTransformationExcluded(IDeviceTransformation transformation) {
+    return false;
+  }
+
+  @Override
   public void excludeForm(IForm form) {
     // NOP
   }
@@ -142,6 +157,16 @@ public class NullDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public boolean isTransformationEnabled(IDeviceTransformation transformation) {
+    return false;
+  }
+
+  @Override
+  public boolean isTransformationEnabled(IDeviceTransformation transformation, IFormField field) {
+    return false;
+  }
+
+  @Override
+  public boolean isTransformationEnabled(IDeviceTransformation transformation, IForm form) {
     return false;
   }
 

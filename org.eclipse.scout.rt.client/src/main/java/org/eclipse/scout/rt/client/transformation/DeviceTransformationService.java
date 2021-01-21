@@ -92,6 +92,21 @@ public class DeviceTransformationService implements IDeviceTransformationService
   }
 
   @Override
+  public void excludeTransformation(IDeviceTransformation transformation) {
+    getDeviceTransformer().excludeTransformation(transformation);
+  }
+
+  @Override
+  public void removeTransformationExclusion(IDeviceTransformation transformation) {
+    getDeviceTransformer().removeTransformationExclusion(transformation);
+  }
+
+  @Override
+  public boolean isTransformationExcluded(IDeviceTransformation transformation) {
+    return getDeviceTransformer().isTransformationExcluded(transformation);
+  }
+
+  @Override
   public void excludeForm(IForm form) {
     getDeviceTransformer().excludeForm(form);
   }
@@ -124,6 +139,16 @@ public class DeviceTransformationService implements IDeviceTransformationService
   @Override
   public boolean isTransformationEnabled(IDeviceTransformation transformation) {
     return getDeviceTransformer().isTransformationEnabled(transformation);
+  }
+
+  @Override
+  public boolean isTransformationEnabled(IDeviceTransformation transformation, IForm form) {
+    return getDeviceTransformer().isTransformationEnabled(transformation, form);
+  }
+
+  @Override
+  public boolean isTransformationEnabled(IDeviceTransformation transformation, IFormField field) {
+    return getDeviceTransformer().isTransformationEnabled(transformation, field);
   }
 
   private class P_SessionListener implements ISessionListener {

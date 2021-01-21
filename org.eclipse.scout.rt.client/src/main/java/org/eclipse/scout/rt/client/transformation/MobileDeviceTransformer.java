@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.transformation;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -58,32 +57,26 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
 
   @Override
   protected void initTransformationConfig() {
-    List<IDeviceTransformation> transformations = new LinkedList<>();
-
-    transformations.add(MobileDeviceTransformation.MAKE_DESKTOP_COMPACT);
-    transformations.add(MobileDeviceTransformation.MOVE_FIELD_LABEL_TO_TOP);
-    transformations.add(MobileDeviceTransformation.MOVE_FIELD_STATUS_TO_TOP);
-    transformations.add(MobileDeviceTransformation.MAKE_FIELD_SCALEABLE);
-    transformations.add(MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE);
-    transformations.add(MobileDeviceTransformation.MAKE_OUTLINE_ROOT_NODE_VISIBLE);
-    transformations.add(MobileDeviceTransformation.REDUCE_GROUPBOX_COLUMNS_TO_ONE);
-    transformations.add(MobileDeviceTransformation.HIDE_PLACEHOLDER_FIELD);
-    transformations.add(MobileDeviceTransformation.HIDE_FIELD_STATUS);
-    transformations.add(MobileDeviceTransformation.DISABLE_FORM_CANCEL_CONFIRMATION);
-    transformations.add(MobileDeviceTransformation.AUTO_CLOSE_SEARCH_FORM);
-    transformations.add(MobileDeviceTransformation.MAXIMIZE_DIALOG);
-    transformations.add(MobileDeviceTransformation.SET_SEQUENCEBOX_UI_HEIGHT);
-    transformations.add(MobileDeviceTransformation.USE_DIALOG_STYLE_FOR_VIEW);
-    transformations.add(MobileDeviceTransformation.AVOID_DETAIL_FORM_AS_DISPLAY_PARENT);
-
-    for (IDeviceTransformation transformation : transformations) {
-      getDeviceTransformationConfig().enableTransformation(transformation);
-    }
+    enableTransformation(MobileDeviceTransformation.MAKE_DESKTOP_COMPACT);
+    enableTransformation(MobileDeviceTransformation.MOVE_FIELD_LABEL_TO_TOP);
+    enableTransformation(MobileDeviceTransformation.MOVE_FIELD_STATUS_TO_TOP);
+    enableTransformation(MobileDeviceTransformation.MAKE_FIELD_SCALEABLE);
+    enableTransformation(MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE);
+    enableTransformation(MobileDeviceTransformation.MAKE_OUTLINE_ROOT_NODE_VISIBLE);
+    enableTransformation(MobileDeviceTransformation.REDUCE_GROUPBOX_COLUMNS_TO_ONE);
+    enableTransformation(MobileDeviceTransformation.HIDE_PLACEHOLDER_FIELD);
+    enableTransformation(MobileDeviceTransformation.HIDE_FIELD_STATUS);
+    enableTransformation(MobileDeviceTransformation.DISABLE_FORM_CANCEL_CONFIRMATION);
+    enableTransformation(MobileDeviceTransformation.AUTO_CLOSE_SEARCH_FORM);
+    enableTransformation(MobileDeviceTransformation.MAXIMIZE_DIALOG);
+    enableTransformation(MobileDeviceTransformation.SET_SEQUENCEBOX_UI_HEIGHT);
+    enableTransformation(MobileDeviceTransformation.USE_DIALOG_STYLE_FOR_VIEW);
+    enableTransformation(MobileDeviceTransformation.AVOID_DETAIL_FORM_AS_DISPLAY_PARENT);
   }
 
   @Override
   public void transformDesktop() {
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MAKE_DESKTOP_COMPACT)) {
+    if (isTransformationEnabled(MobileDeviceTransformation.MAKE_DESKTOP_COMPACT)) {
       getDesktop().setDisplayStyle(IDesktop.DISPLAY_STYLE_COMPACT);
     }
   }
@@ -99,10 +92,10 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   protected void transformDesktopForm(IForm form) {
-    if (getDeviceTransformationConfig().isFormExcluded(form)) {
+    if (isFormExcluded(form)) {
       return;
     }
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.DISABLE_FORM_CANCEL_CONFIRMATION, form)) {
+    if (isTransformationEnabled(MobileDeviceTransformation.DISABLE_FORM_CANCEL_CONFIRMATION, form)) {
       form.setAskIfNeedSave(false);
     }
     if (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW) {
@@ -115,7 +108,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
 
   protected void transformView(IForm form) {
     form.setDisplayViewId(IForm.VIEW_ID_CENTER);
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.USE_DIALOG_STYLE_FOR_VIEW, form)) {
+    if (isTransformationEnabled(MobileDeviceTransformation.USE_DIALOG_STYLE_FOR_VIEW, form)) {
       // Style the view to make it look like a regular dialog.
       // The desktop header will be made invisible by the ui if the form has a header. This saves some space because desktop header would always be about 60px big.
       form.setHeaderVisible(true);
@@ -129,14 +122,14 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     // This happens because the detail form is removed along with the navigation because it is embedded into a page, and if a display parent is removed the child forms are removed as well.
     // Since the navigation is only removed in compact mode it only needs to be done if that mode is active.
     if (IDesktop.DISPLAY_STYLE_COMPACT.equals(getDesktop().getDisplayStyle())
-        && getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.AVOID_DETAIL_FORM_AS_DISPLAY_PARENT, form)
+        && isTransformationEnabled(MobileDeviceTransformation.AVOID_DETAIL_FORM_AS_DISPLAY_PARENT, form)
         && getDesktop().getPageDetailForm() == form.getDisplayParent()) {
       form.setDisplayParent(getDesktop().getOutline());
     }
   }
 
   protected void transformDialog(IForm form) {
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MAXIMIZE_DIALOG, form)) {
+    if (isTransformationEnabled(MobileDeviceTransformation.MAXIMIZE_DIALOG, form)) {
       form.setMaximized(true);
     }
   }
@@ -147,7 +140,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     outline.setLazyExpandingEnabled(false);
     outline.setToggleBreadcrumbStyleEnabled(false);
     outline.setDisplayStyle(ITree.DISPLAY_STYLE_BREADCRUMB);
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MAKE_OUTLINE_ROOT_NODE_VISIBLE)) {
+    if (isTransformationEnabled(MobileDeviceTransformation.MAKE_OUTLINE_ROOT_NODE_VISIBLE)) {
       ensureOutlineRootContentVisible(outline);
     }
   }
@@ -250,7 +243,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
 
   @Override
   public void notifyPageSearchFormInit(final IPageWithTable<ITable> page) {
-    if (!getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.AUTO_CLOSE_SEARCH_FORM)) {
+    if (!isTransformationEnabled(MobileDeviceTransformation.AUTO_CLOSE_SEARCH_FORM)) {
       return;
     }
     ISearchForm searchForm = page.getSearchFormInternal();
@@ -270,16 +263,16 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
 
   @Override
   public void transformFormField(IFormField field) {
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MOVE_FIELD_LABEL_TO_TOP, field)) {
+    if (isTransformationEnabled(MobileDeviceTransformation.MOVE_FIELD_LABEL_TO_TOP, field)) {
       moveLabelToTop(field);
     }
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MAKE_FIELD_SCALEABLE, field)) {
+    if (isTransformationEnabled(MobileDeviceTransformation.MAKE_FIELD_SCALEABLE, field)) {
       makeFieldScalable(field);
     }
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.HIDE_FIELD_STATUS, field)) {
+    if (isTransformationEnabled(MobileDeviceTransformation.HIDE_FIELD_STATUS, field)) {
       hideStatus(field);
     }
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MOVE_FIELD_STATUS_TO_TOP, field)) {
+    if (isTransformationEnabled(MobileDeviceTransformation.MOVE_FIELD_STATUS_TO_TOP, field)) {
       moveStatusToTop(field);
     }
 
@@ -359,7 +352,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   protected void transformMainBox(IGroupBox groupBox) {
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE, groupBox)) {
+    if (isTransformationEnabled(MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE, groupBox)) {
       makeGroupBoxScrollable(groupBox);
     }
   }
@@ -382,7 +375,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     if (groupBox.isMainBox()) {
       transformMainBox(groupBox);
     }
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.REDUCE_GROUPBOX_COLUMNS_TO_ONE, groupBox)) {
+    if (isTransformationEnabled(MobileDeviceTransformation.REDUCE_GROUPBOX_COLUMNS_TO_ONE, groupBox)) {
       groupBox.setGridColumnCount(1);
     }
     // Transformations already done.
@@ -393,7 +386,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
    * Makes placeholder fields invisible since they just waste space on 1 column layouts
    */
   protected void transformPlaceholderField(IPlaceholderField field) {
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.HIDE_PLACEHOLDER_FIELD, field)) {
+    if (isTransformationEnabled(MobileDeviceTransformation.HIDE_PLACEHOLDER_FIELD, field)) {
       field.setVisible(false);
     }
   }
@@ -403,7 +396,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
    * because in that case a logical row height of 1 is not sufficient anymore.
    */
   protected void transformSequenceBox(ISequenceBox box) {
-    if (!getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.SET_SEQUENCEBOX_UI_HEIGHT, box)) {
+    if (!isTransformationEnabled(MobileDeviceTransformation.SET_SEQUENCEBOX_UI_HEIGHT, box)) {
       return;
     }
     GridData gridDataHints = box.getGridDataHints();

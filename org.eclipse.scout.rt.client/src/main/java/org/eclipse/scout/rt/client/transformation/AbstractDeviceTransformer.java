@@ -66,6 +66,21 @@ public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void excludeTransformation(IDeviceTransformation transformation) {
+    getDeviceTransformationConfig().excludeTransformation(transformation);
+  }
+
+  @Override
+  public void removeTransformationExclusion(IDeviceTransformation transformation) {
+    getDeviceTransformationConfig().removeTransformationExclusion(transformation);
+  }
+
+  @Override
+  public boolean isTransformationExcluded(IDeviceTransformation transformation) {
+    return getDeviceTransformationConfig().isTransformationExcluded(transformation);
+  }
+
+  @Override
   public void excludeForm(IForm form) {
     getDeviceTransformationConfig().excludeForm(form);
   }
@@ -108,6 +123,16 @@ public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
   @Override
   public boolean isTransformationEnabled(IDeviceTransformation transformation) {
     return getDeviceTransformationConfig().isTransformationEnabled(transformation);
+  }
+
+  @Override
+  public boolean isTransformationEnabled(IDeviceTransformation transformation, IForm form) {
+    return getDeviceTransformationConfig().isTransformationEnabled(transformation, form);
+  }
+
+  @Override
+  public boolean isTransformationEnabled(IDeviceTransformation transformation, IFormField field) {
+    return getDeviceTransformationConfig().isTransformationEnabled(transformation, field);
   }
 
   @Override

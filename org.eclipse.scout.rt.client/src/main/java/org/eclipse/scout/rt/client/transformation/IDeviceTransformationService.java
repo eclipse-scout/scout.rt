@@ -26,6 +26,12 @@ public interface IDeviceTransformationService extends IService {
 
   IDeviceTransformer getDeviceTransformer();
 
+  void excludeTransformation(IDeviceTransformation transformation);
+
+  void removeTransformationExclusion(IDeviceTransformation transformation);
+
+  boolean isTransformationExcluded(IDeviceTransformation transformation);
+
   void excludeForm(IForm form);
 
   void excludeFormTransformation(IForm form, IDeviceTransformation transformation);
@@ -39,4 +45,8 @@ public interface IDeviceTransformationService extends IService {
   void disableTransformation(IDeviceTransformation transformation);
 
   boolean isTransformationEnabled(IDeviceTransformation transformation);
+
+  boolean isTransformationEnabled(IDeviceTransformation transformation, IForm form);
+
+  boolean isTransformationEnabled(IDeviceTransformation transformation, IFormField field);
 }

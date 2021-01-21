@@ -30,6 +30,13 @@ public class DeviceTransformationConfig {
   private final Map<IForm, ExclusionInfo> m_excludedForms = new WeakHashMap<>();
   private final Map<IFormField, ExclusionInfo> m_excludedFields = new WeakHashMap<>();
 
+  /**
+   * Contains transformations that are currently not active. Makes it easier to temporarily disable a transformation.
+   * Otherwise the user would have to disable the transformation and store a state whether it was active at all so that
+   * re enabling can be done correctly.
+   */
+  private final Set<IDeviceTransformation> m_excludedTransformations = new HashSet<>();
+
   public void enableTransformation(IDeviceTransformation transformation) {
     m_enabledTransformations.add(transformation);
   }
@@ -39,6 +46,9 @@ public class DeviceTransformationConfig {
   }
 
   public boolean isTransformationEnabled(IDeviceTransformation transformation) {
+    if (isTransformationExcluded(transformation)) {
+      return false;
+    }
     return m_enabledTransformations.contains(transformation);
   }
 
@@ -65,6 +75,18 @@ public class DeviceTransformationConfig {
     }
 
     return true;
+  }
+
+  public void excludeTransformation(IDeviceTransformation transformation) {
+    m_excludedTransformations.add(transformation);
+  }
+
+  public void removeTransformationExclusion(IDeviceTransformation transformation) {
+    m_excludedTransformations.remove(transformation);
+  }
+
+  public boolean isTransformationExcluded(IDeviceTransformation transformation) {
+    return m_excludedTransformations.contains(transformation);
   }
 
   public void excludeForm(IForm form) {

@@ -99,6 +99,30 @@ public class MainDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void excludeTransformation(IDeviceTransformation transformation) {
+    for (IDeviceTransformer transformer : getTransformers()) {
+      transformer.excludeTransformation(transformation);
+    }
+  }
+
+  @Override
+  public void removeTransformationExclusion(IDeviceTransformation transformation) {
+    for (IDeviceTransformer transformer : getTransformers()) {
+      transformer.removeTransformationExclusion(transformation);
+    }
+  }
+
+  @Override
+  public boolean isTransformationExcluded(IDeviceTransformation transformation) {
+    for (IDeviceTransformer transformer : getTransformers()) {
+      if (transformer.isTransformationExcluded(transformation)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   public void excludeForm(IForm form) {
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.excludeForm(form);
@@ -164,6 +188,26 @@ public class MainDeviceTransformer implements IDeviceTransformer {
   public boolean isTransformationEnabled(IDeviceTransformation transformation) {
     for (IDeviceTransformer transformer : getTransformers()) {
       if (transformer.isTransformationEnabled(transformation)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isTransformationEnabled(IDeviceTransformation transformation, IForm form) {
+    for (IDeviceTransformer transformer : getTransformers()) {
+      if (transformer.isTransformationEnabled(transformation, form)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isTransformationEnabled(IDeviceTransformation transformation, IFormField field) {
+    for (IDeviceTransformer transformer : getTransformers()) {
+      if (transformer.isTransformationEnabled(transformation, field)) {
         return true;
       }
     }
