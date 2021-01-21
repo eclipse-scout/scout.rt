@@ -187,6 +187,8 @@ export default class FileChooser extends Widget {
   _createDragAndDropHandler() {
     return dragAndDrop.handler(this, {
       supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+      validateFiles: () => {
+      },
       onDrop: event => this.addFiles(event.files),
       dropType: () => dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
       dropMaximumSize: () => this.maximumUploadSize

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, dragAndDrop} from '../index';
+import {arrays, dragAndDrop, files as fileUtil, MessageBoxes, Status} from '../index';
 import $ from 'jquery';
 
 export default class DragAndDropHandler {
@@ -74,6 +74,12 @@ export default class DragAndDropHandler {
       if (arrays.empty(files)) {
         return;
       }
+      try {
+        this.validateFiles(files);
+      } catch (error) {
+        this._validationFailed(files, error);
+        return;
+      }
       event.stopPropagation();
       event.preventDefault();
       let formattedDropEvent = {
@@ -82,6 +88,37 @@ export default class DragAndDropHandler {
       };
       this.onDrop(formattedDropEvent);
     }
+  }
+
+  validateFiles(files) {
+    if (!this.dropMaximumSize) {
+      return;
+    }
+    let dropMaximumSize = this.dropMaximumSize();
+    if (!fileUtil.validateMaximumUploadSize(files, dropMaximumSize)) {
+      throw {
+        title: this.target.session.text('ui.FileSizeLimitTitle'),
+        message: this.target.session.text('ui.FileSizeLimit', (dropMaximumSize / 1024 / 1024))
+      };
+    }
+  }
+
+  /**
+   * @param {object} error object containing message and optionally a title
+   */
+  _validationFailed(files, error) {
+    $.log.isDebugEnabled() && $.log.debug('File validation failed', error);
+    let title = '';
+    let message = 'Invalid files';
+    if (typeof error === 'object') {
+      title = error.title || title;
+      message = error.message || message;
+    }
+    MessageBoxes.createOk(this.target)
+      .withSeverity(Status.Severity.ERROR)
+      .withHeader(title)
+      .withBody(message)
+      .buildAndOpen();
   }
 
   uploadFiles(files) {

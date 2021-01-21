@@ -1162,14 +1162,22 @@ export default class Tree extends Widget {
     }
   }
 
+  setDropType(dropType) {
+    this.setProperty('dropType', dropType);
+  }
+
   _renderDropType() {
     this._installOrUninstallDragAndDropHandler();
+  }
+
+  setDropMaximumSize(dropMaximumSize) {
+    this.setProperty('dropMaximumSize', dropMaximumSize);
   }
 
   _createDragAndDropHandler() {
     return dragAndDrop.handler(this, {
       supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-      onDrop: event => this.trigger('fileDrop', event),
+      onDrop: event => this.trigger('drop', event),
       dropType: () => this.dropType,
       dropMaximumSize: () => this.dropMaximumSize,
       additionalDropProperties: event => {
