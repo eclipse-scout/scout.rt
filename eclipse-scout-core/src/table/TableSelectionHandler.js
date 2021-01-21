@@ -24,7 +24,6 @@ export default class TableSelectionHandler {
     this.mouseMoveSelectionEnabled = true;
     this._mouseDown = false;
     this.lastActionRow = null;
-    this._allRows = null;
     this.mouseOverHandler = null;
     this.select = true;
     this.counterDebug = 0;
@@ -43,12 +42,12 @@ export default class TableSelectionHandler {
 
   // TODO [7.0] bsh: Table Selection | Try to merge this with TableKeystrokeContext
   onMouseDown(event) {
-    let $row = $(event.currentTarget),
-      row = $row.data('row'),
-      oldSelectedState = $row.isSelected();
-    this._mouseDown = true;
+    let $row = $(event.currentTarget);
+    let row = $row.data('row');
+    let oldSelectedState = $row.isSelected();
+    let rows = this.table.visibleRows;
 
-    this._allRows = this.table.visibleRows;
+    this._mouseDown = true;
     this.select = true;
     if (this.table.multiSelect && event.shiftKey) {
       // when a selected row in the middle of a selection-block has
@@ -64,18 +63,18 @@ export default class TableSelectionHandler {
         // The last action row may have been cleared, e.g. when rows have been replaced. In that case, simply assume
         // the first or the last of the currently selected rows as being the last action row to make shift-click
         // behave as expected (depending on which row is nearer from the clicked row).
-        let thisRowIndex = this._allRows.indexOf(row);
+        let thisRowIndex = rows.indexOf(row);
         let firstSelectedRow = this.table.selectedRows[0];
         let lastSelectedRow = this.table.selectedRows[this.table.selectedRows.length - 1];
-        if (thisRowIndex <= (this._allRows.indexOf(firstSelectedRow) + this._allRows.indexOf(lastSelectedRow)) / 2) {
+        if (thisRowIndex <= (rows.indexOf(firstSelectedRow) + rows.indexOf(lastSelectedRow)) / 2) {
           this.lastActionRow = firstSelectedRow;
         } else {
           this.lastActionRow = lastSelectedRow;
         }
-        this._maxSelectedRowIndex = this._allRows.indexOf(lastSelectedRow);
-        this._prevSelectedRowIndex = this._allRows.indexOf(this.lastActionRow);
+        this._maxSelectedRowIndex = rows.indexOf(lastSelectedRow);
+        this._prevSelectedRowIndex = rows.indexOf(this.lastActionRow);
       }
-      this.fromIndex = this._allRows.indexOf(this.lastActionRow);
+      this.fromIndex = rows.indexOf(this.lastActionRow);
     } else if (event.ctrlKey) {
       this.select = !oldSelectedState;
     } else {
@@ -87,11 +86,11 @@ export default class TableSelectionHandler {
       }
     }
     if (this.fromIndex < 0) {
-      this.fromIndex = this._allRows.indexOf(row);
+      this.fromIndex = rows.indexOf(row);
     }
 
     if (event.which !== 3 || !oldSelectedState) {
-      this.toIndex = this._allRows.indexOf(row);
+      this.toIndex = rows.indexOf(row);
       this.handleSelection(event);
       this.table.notifyRowSelectionFinished();
     }
@@ -109,15 +108,18 @@ export default class TableSelectionHandler {
   }
 
   onMouseOver(event) {
-    let $row = $(event.currentTarget),
-      row = $row.data('row');
-    this.toIndex = this._allRows.indexOf(row);
+    let $row = $(event.currentTarget);
+    let row = $row.data('row');
+    let rows = this.table.visibleRows;
+
+    this.toIndex = rows.indexOf(row);
     this.handleSelection(event);
     this.lastActionRow = row;
   }
 
   handleSelection(event) {
     let rowsToUnselect;
+    let rows = this.table.visibleRows;
     if (this.table.multiSelect) {
       // Multi-selection -> expand/shrink selection
       let thisIndex = this.toIndex;
@@ -134,16 +136,16 @@ export default class TableSelectionHandler {
         // If we are going _towards_ the startIndex, unselect all rows between the current row and the
         // selected row with the greatest distance (this._maxSelectedRowIndex).
         if (goingUp && afterFromSelection) {
-          rowsToUnselect = this._allRows.slice(thisIndex + 1, this._maxSelectedRowIndex + 1);
+          rowsToUnselect = rows.slice(thisIndex + 1, this._maxSelectedRowIndex + 1);
         } else if (goingDown && beforeFromSelection) {
-          rowsToUnselect = this._allRows.slice(this._maxSelectedRowIndex, thisIndex);
+          rowsToUnselect = rows.slice(this._maxSelectedRowIndex, thisIndex);
         }
 
         // when shift is pressed: only unselect when first or last row (but not in the middle of the selection, see #172929)
         if (rowsToUnselect && event.shiftKey) {
           let selectionIndizes = this.getMinMaxSelectionIndizes();
           rowsToUnselect = rowsToUnselect.reduce((aggr, row) => {
-            let rowIndex = this._allRows.indexOf(row);
+            let rowIndex = rows.indexOf(row);
             if (scout.isOneOf(rowIndex, selectionIndizes[0], selectionIndizes[1])) {
               aggr.push(row);
             }
@@ -176,9 +178,11 @@ export default class TableSelectionHandler {
   }
 
   _selectRange(fromIndex, toIndex, select) {
-    let startIndex = Math.min(fromIndex, toIndex),
-      endIndex = Math.max(fromIndex, toIndex) + 1,
-      actionRows = this._allRows.slice(startIndex, endIndex);
+    let rows = this.table.visibleRows;
+    let startIndex = Math.min(fromIndex, toIndex);
+    let endIndex = Math.max(fromIndex, toIndex) + 1;
+    let actionRows = rows.slice(startIndex, endIndex);
+
     // set/remove selection
     if (select) {
       actionRows.forEach(function(row) {
@@ -227,12 +231,9 @@ export default class TableSelectionHandler {
 
     this._mouseDown = false;
     this.table.$data.off('mouseover', this.mouseOverHandler);
-    this._allRows = null;
     this.fromIndex = -1;
     this.toIndex = -1;
     this.select = true;
-    // Update selectedRows and allRows, this might have changed in the meantime (e.g. when row
-    // was replaced by update event due to cell editing)
     this.table.notifyRowSelectionFinished();
   }
 }
