@@ -56,7 +56,6 @@ export default class ImageField extends FormField {
   _renderProperties() {
     super._renderProperties();
     this._renderScrollBarEnabled();
-    this._renderDropType();
     this._renderImageUrl();
     this._renderUploadEnabled();
   }

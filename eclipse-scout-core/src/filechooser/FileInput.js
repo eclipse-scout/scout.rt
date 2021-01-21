@@ -105,11 +105,11 @@ export default class FileInput extends Widget {
     this._renderText();
     this._renderAcceptTypes();
     this._renderMultiSelect();
-    this._installDragAndDropHandler();
   }
 
   _renderEnabled() {
     super._renderEnabled();
+    this._installOrUninstallDragAndDropHandler();
 
     if (this.legacy) {
       this.$fileInput.setEnabled(this.enabledComputed);
@@ -171,6 +171,14 @@ export default class FileInput extends Widget {
         return this.maximumUploadSize;
       }.bind(this)
     });
+  }
+
+  _installOrUninstallDragAndDropHandler() {
+    if (this.enabledComputed) {
+      this._installDragAndDropHandler();
+    } else {
+      this._uninstallDragAndDropHandler();
+    }
   }
 
   _installDragAndDropHandler() {

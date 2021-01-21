@@ -508,7 +508,6 @@ export default class Table extends Widget {
     this._renderTableHeader();
     this._renderMenuBarVisible();
     this._renderFooterVisible();
-    this._renderDropType();
     this._renderCheckableStyle();
     this._renderHierarchicalStyle();
   }
@@ -4634,6 +4633,7 @@ export default class Table extends Widget {
   _renderEnabled() {
     super._renderEnabled();
 
+    this._installOrUninstallDragAndDropHandler();
     var enabled = this.enabledComputed;
     if (!this.tileMode) {
       this.$data.setEnabled(enabled);
@@ -4685,11 +4685,7 @@ export default class Table extends Widget {
   }
 
   _renderDropType() {
-    if (this.dropType) {
-      this._installDragAndDropHandler();
-    } else {
-      this._uninstallDragAndDropHandler();
-    }
+    this._installOrUninstallDragAndDropHandler();
   }
 
   _createDragAndDropHandler() {
@@ -4716,6 +4712,14 @@ export default class Table extends Widget {
         return properties;
       }
     });
+  }
+
+  _installOrUninstallDragAndDropHandler() {
+    if (this.dropType && this.enabledComputed) {
+      this._installDragAndDropHandler();
+    } else {
+      this._uninstallDragAndDropHandler();
+    }
   }
 
   _installDragAndDropHandler() {
