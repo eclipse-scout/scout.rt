@@ -406,11 +406,6 @@ export default class Tree extends Widget {
     super._remove();
   }
 
-  _renderProperties() {
-    super._renderProperties();
-    this._renderDropType();
-  }
-
   isHorizontalScrollingEnabled() {
     return this._scrolldirections === 'both' || this._scrolldirections === 'x';
   }
@@ -934,6 +929,7 @@ export default class Tree extends Widget {
   _renderEnabled() {
     super._renderEnabled();
 
+    this._installOrUninstallDragAndDropHandler();
     let enabled = this.enabledComputed;
     this.$data.setEnabled(enabled);
     this.$container.setTabbable(enabled);
@@ -1167,11 +1163,7 @@ export default class Tree extends Widget {
   }
 
   _renderDropType() {
-    if (this.dropType) {
-      this._installDragAndDropHandler();
-    } else {
-      this._uninstallDragAndDropHandler();
-    }
+    this._installOrUninstallDragAndDropHandler();
   }
 
   _createDragAndDropHandler() {
@@ -1192,6 +1184,14 @@ export default class Tree extends Widget {
         return properties;
       }
     });
+  }
+
+  _installOrUninstallDragAndDropHandler() {
+    if (this.dropType && this.enabledComputed) {
+      this._installDragAndDropHandler();
+    } else {
+      this._uninstallDragAndDropHandler();
+    }
   }
 
   _installDragAndDropHandler() {

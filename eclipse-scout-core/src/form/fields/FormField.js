@@ -713,7 +713,7 @@ export default class FormField extends Widget {
       this.$field.setEnabled(this.enabledComputed);
     }
     this._updateDisabledCopyOverlay();
-    this._updateDropType();
+    this._installOrUninstallDragAndDropHandler();
   }
 
   /**
@@ -1309,15 +1309,7 @@ export default class FormField extends Widget {
   }
 
   _renderDropType() {
-    this._updateDropType();
-  }
-
-  _updateDropType() {
-    if (this.dropType && this.enabledComputed) {
-      this._installDragAndDropHandler();
-    } else {
-      this._uninstallDragAndDropHandler();
-    }
+    this._installOrUninstallDragAndDropHandler();
   }
 
   _createDragAndDropHandler() {
@@ -1327,6 +1319,14 @@ export default class FormField extends Widget {
       dropType: () => this.dropType,
       dropMaximumSize: () => this.dropMaximumSize
     });
+  }
+
+  _installOrUninstallDragAndDropHandler() {
+    if (this.dropType && this.enabledComputed) {
+      this._installDragAndDropHandler();
+    } else {
+      this._uninstallDragAndDropHandler();
+    }
   }
 
   _installDragAndDropHandler() {

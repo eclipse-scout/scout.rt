@@ -157,7 +157,11 @@ export default class FileChooser extends Widget {
       this.setFiles([]);
     }
     this._renderFiles();
-    this._installDragAndDropHandler();
+  }
+
+  _renderEnabled() {
+    super._renderEnabled();
+    this._installOrUninstallDragAndDropHandler();
   }
 
   _postRender() {
@@ -187,6 +191,14 @@ export default class FileChooser extends Widget {
       dropType: () => dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
       dropMaximumSize: () => this.maximumUploadSize
     });
+  }
+
+  _installOrUninstallDragAndDropHandler() {
+    if (this.enabledComputed) {
+      this._installDragAndDropHandler();
+    } else {
+      this._uninstallDragAndDropHandler();
+    }
   }
 
   _installDragAndDropHandler() {
