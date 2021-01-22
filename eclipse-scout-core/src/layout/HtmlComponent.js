@@ -311,8 +311,8 @@ export default class HtmlComponent {
       return prefSizeCached.clone();
     }
 
-    var minSize = graphics.cssMinSize(this.$comp);
-    var maxSize = graphics.cssMaxSize(this.$comp);
+    var minSize = this.cssMinSize();
+    var maxSize = this.cssMaxSize();
     if (options.widthHint || options.heightHint) {
       this._adjustSizeHintsForPrefSize(options, minSize, maxSize);
     }
@@ -366,8 +366,8 @@ export default class HtmlComponent {
    * The html element may define a min or max height/height -> adjust the pref size accordingly
    */
   _adjustPrefSizeWithMinMaxSize(prefSize, minSize, maxSize) {
-    minSize = minSize || graphics.cssMinSize(this.$comp);
-    maxSize = maxSize || graphics.cssMaxSize(this.$comp);
+    minSize = minSize || this.cssMinSize();
+    maxSize = maxSize || this.cssMaxSize();
     prefSize.height = Math.max(prefSize.height, minSize.height);
     prefSize.height = Math.min(prefSize.height, maxSize.height);
     prefSize.width = Math.max(prefSize.width, minSize.width);
@@ -387,6 +387,14 @@ export default class HtmlComponent {
 
   borders() {
     return graphics.borders(this.$comp);
+  }
+
+  cssMinSize() {
+    return graphics.cssMinSize(this.$comp);
+  }
+
+  cssMaxSize() {
+    return graphics.cssMaxSize(this.$comp);
   }
 
   /**
