@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -111,11 +111,11 @@ public abstract class AbstractWebResourceResolver implements IWebResourceResolve
     if (!StringUtility.hasText(theme)) {
       return path;
     }
-    String[] parts = FileUtility.getFilenameParts(path);
-    if (parts == null || !"css".equals(parts[1])) {
-      return path;
-    }
-    return parts[0] + '-' + theme + ".css";
+    return ScriptRequest.tryParse(path)
+        .filter(r -> "css".equalsIgnoreCase(r.fileExtension()))
+        .flatMap(r -> ScriptRequest.tryParse(r.path(), r.baseName() + '-' + theme, r.fingerprint(), r.minimized(), r.fileExtension()))
+        .map(r -> r.toString(false, false))
+        .orElse(path);
   }
 
   /**
