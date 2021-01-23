@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,11 +34,11 @@ public final class ScriptRequest {
    * <p>
    * <b>Regex groups:</b> <code>$1$2[-$3][.$4].$5</code><br>
    * <ul>
-   * <li><code>$1</code> = path
+   * <li><code>$1</code> = path (optional)
    * <li><code>$2</code> = basename
    * <li><code>$3</code> = fingerprint (optional)
    * <li><code>$4</code> = min (optional)
-   * <li><code>$5</code> = <code>"js"</code>, <code>"css"</code> or <code>"less"</code>
+   * <li><code>$5</code> = <code>"js"</code> or <code>"css"</code>
    * </ul>
    * Examples:
    *
@@ -46,9 +46,10 @@ public final class ScriptRequest {
    * path/basename.js
    * path/entryPoint1~entryPoint2.min.js
    * path/basename-34fce3bc.min.js
+   * basename.css
    * </pre>
    */
-  public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)([-_.~\\w\\d]+?)(?:-([a-f0-9]+))?(?:\\.(" + MINIMIZED_URL_KEYWORD + ")?)?\\.(js|css)");
+  public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)?([-_.~\\w\\d]+?)(?:-([a-f0-9]+))?(?:\\.(" + MINIMIZED_URL_KEYWORD + ")?)?\\.(js|css)");
 
   private final String m_path;
   private final String m_baseName;
@@ -108,8 +109,8 @@ public final class ScriptRequest {
   }
 
   /**
-   * @return The path segment of the request including a trailing slash. This element is always present (never
-   *         {@code null}).
+   * @return The path segment of the request including a trailing slash (if present). May be {@code  null} if the
+   *         request does not contain a path information.
    */
   public String path() {
     return m_path;
@@ -172,10 +173,10 @@ public final class ScriptRequest {
     }
     ScriptRequest that = (ScriptRequest) o;
     return m_minimized == that.m_minimized
-      && Objects.equals(m_path, that.m_path)
-      && Objects.equals(m_baseName, that.m_baseName)
-      && Objects.equals(m_fingerprint, that.m_fingerprint)
-      && Objects.equals(m_fileExtension, that.m_fileExtension);
+        && Objects.equals(m_path, that.m_path)
+        && Objects.equals(m_baseName, that.m_baseName)
+        && Objects.equals(m_fingerprint, that.m_fingerprint)
+        && Objects.equals(m_fileExtension, that.m_fileExtension);
   }
 
   @Override
