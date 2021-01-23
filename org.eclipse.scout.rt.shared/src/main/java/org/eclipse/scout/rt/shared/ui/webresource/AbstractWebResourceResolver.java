@@ -107,7 +107,7 @@ public abstract class AbstractWebResourceResolver implements IWebResourceResolve
     return parts[0] + ".min." + parts[1];
   }
 
-  protected String getThemePath(String path, String theme) {
+  public static String getThemePath(String path, String theme) {
     if (!StringUtility.hasText(theme)) {
       return path;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,12 +28,13 @@ public class ScriptRequestTest {
     assertFalse(ScriptRequest.tryParse("path/basename-34fce3bc.jpg").isPresent());
     assertFalse(ScriptRequest.tryParse("path/basename.jpg").isPresent());
     assertFalse(ScriptRequest.tryParse("path/basename.jpg").isPresent());
-    assertFalse(ScriptRequest.tryParse("basename.less").isPresent()); // path is mandatory
+    assertFalse(ScriptRequest.tryParse("basename.less").isPresent()); // less is not supported
+    assertTrue(ScriptRequest.tryParse("basename.css").isPresent());
   }
 
   @Test
   public void testTryParseWithValidInput() {
-    String[] tests = {"path/basename.js", "path/basename.min.js", "path/basename-34fce3bc.min.js", "path/subpath/basename-34fce3bc.min.css", "path/subpath/entry1~entry2-34fce3bc.min.css", "/res/lib-1.10.88/lib.js"};
+    String[] tests = {"path/basename.js", "path/basename.min.js", "path/basename-34fce3bc.min.js", "path/subpath/basename-34fce3bc.min.css", "path/subpath/entry1~entry2-34fce3bc.min.css", "/res/lib-1.10.88/lib.js", "base.css"};
     for (String test : tests) {
       assertEquals("invalid input: " + test, test, ScriptRequest.tryParse(test).orElseThrow(() -> new IllegalArgumentException("invalid input: " + test)).toString());
     }

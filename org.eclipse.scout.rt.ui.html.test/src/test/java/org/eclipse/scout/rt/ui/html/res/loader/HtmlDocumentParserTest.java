@@ -29,8 +29,8 @@ import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.text.ITextProviderService;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.shared.ui.webresource.AbstractWebResourceResolver;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -53,12 +53,9 @@ public class HtmlDocumentParserTest {
     BEANS.getBeanManager().unregisterClass(TestTextProviderService.class);
   }
 
-  private HtmlDocumentParser m_parser;
-
-  @Before
-  public void before() {
-    HtmlDocumentParserParameters params = new HtmlDocumentParserParameters("html/path", "testTheme", false, false, "base-path");
-    m_parser = new HtmlDocumentParser(params) {
+  protected HtmlDocumentParser newParser(String theme) {
+    HtmlDocumentParserParameters params = new HtmlDocumentParserParameters("html/path", theme, false, false, "base-path");
+    return new HtmlDocumentParser(params) {
       @Override
       protected URL resolveInclude(String includeName) {
         return HtmlDocumentParserTest.class.getResource("include.html");
@@ -71,6 +68,11 @@ public class HtmlDocumentParserTest {
         }
         return Stream.of(SCRIPT4_NAME, SCRIPT1_NAME, SCRIPT2_NAME, SCRIPT3_NAME);
       }
+
+      @Override
+      protected String createExternalPath(String internalPath) {
+        return AbstractWebResourceResolver.getThemePath(internalPath, m_params.getTheme());
+      }
     };
   }
 
@@ -78,19 +80,20 @@ public class HtmlDocumentParserTest {
     return IOUtility.readFromUrl(HtmlDocumentParserTest.class.getResource(filename));
   }
 
-  private void testParser(String inputFilename, String expectedResultFilename) throws IOException {
+  private void testParser(HtmlDocumentParser parser, String inputFilename, String expectedResultFilename) throws IOException {
     byte[] input = read(inputFilename);
     String expectedResult = new String(read(expectedResultFilename), StandardCharsets.UTF_8)
         .replaceAll("\\$PROTECT-LINE-ENDING\\$", "");
-    String result = new String(m_parser.parseDocument(input), StandardCharsets.UTF_8);
+    String result = new String(parser.parseDocument(input), StandardCharsets.UTF_8);
     assertEquals(expectedResult, result);
   }
 
   @Test
   public void testHtmlDocumentParser_01() throws IOException {
+    HtmlDocumentParser parser = newParser(null);
     IBean<TestApplicationVersionProperty> bean = BEANS.getBeanManager().registerBean(new BeanMetaData(TestApplicationVersionProperty.class).withReplace(true));
     try {
-      testParser("test01_input.html", "test01_output.html");
+      testParser(parser, "test01_input.html", "test01_output.html");
     }
     finally {
       BEANS.getBeanManager().unregisterBean(bean);
@@ -99,17 +102,26 @@ public class HtmlDocumentParserTest {
 
   @Test
   public void testHtmlDocumentParser_02() throws IOException {
-    testParser("test02_input.html", "test02_output.html");
+    HtmlDocumentParser parser = newParser(null);
+    testParser(parser, "test02_input.html", "test02_output.html");
   }
 
   @Test
   public void testHtmlDocumentParser_03() throws IOException {
-    testParser("test03_input.html", "test03_output.html");
+    HtmlDocumentParser parser = newParser(null);
+    testParser(parser, "test03_input.html", "test03_output.html");
   }
 
   @Test
   public void testHtmlDocumentParser_04() throws IOException {
-    testParser("test04_input.html", "test04_output.html");
+    HtmlDocumentParser parser = newParser(null);
+    testParser(parser, "test04_input.html", "test04_output.html");
+  }
+
+  @Test
+  public void testHtmlDocumentParser_05() throws IOException {
+    HtmlDocumentParser parser = newParser("mytheme");
+    testParser(parser, "test05_input.html", "test05_output.html");
   }
 
   /**

@@ -107,8 +107,7 @@ public class HtmlDocumentParser {
   }
 
   /**
-   * Creates the external path of the given resource, including fingerprint and '.min' extensions. This method also
-   * deals with caching, since we must build a script file first, before we can calculate its fingerprint.
+   * Creates the external path of the given resource, including theme, fingerprint and '.min' extensions.
    */
   protected String createExternalPath(String internalPath) {
     String theme = UiThemeHelper.get().isDefaultTheme(m_params.getTheme()) ? null : m_params.getTheme();
@@ -153,7 +152,7 @@ public class HtmlDocumentParser {
   protected String buildScriptTagsForEntryPoint(String entryPoint, String fileSuffixFilter, String tagPrefix, String tagSuffix) {
     return getAssetsForEntryPoint(entryPoint)
         .filter(script -> script.toLowerCase().endsWith(fileSuffixFilter))
-        .map(path -> tagPrefix + path + tagSuffix)
+        .map(path -> tagPrefix + createExternalPath(path) + tagSuffix)
         .collect(joining("\n"));
   }
 
