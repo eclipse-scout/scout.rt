@@ -11,10 +11,16 @@
 package org.eclipse.scout.rt.testing.client.runner;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
 import org.eclipse.scout.rt.testing.client.runner.statement.ClientRunContextStatement;
@@ -73,7 +79,8 @@ public class ClientTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement interceptClassLevelStatement(final Statement next, final Class<?> testClass) {
-    final Statement s3 = new RunInModelJobStatement(next);
+    final Statement s4 = new CleanupDesktopStatement(next);
+    final Statement s3 = new RunInModelJobStatement(s4);
     final Statement s2 = new ClientRunContextStatement(s3, ReflectionUtility.getAnnotation(RunWithClientSession.class, testClass));
     final Statement s1 = super.interceptClassLevelStatement(s2, testClass);
     return s1;
@@ -152,4 +159,43 @@ public class ClientTestRunner extends PlatformTestRunner {
     }
   }
 
+  /**
+   * {@link Statement} which closes all forms which were started during the test evaluation.
+   */
+  protected static class CleanupDesktopStatement extends Statement {
+
+    private final Statement m_statement;
+
+    public CleanupDesktopStatement(Statement statement) {
+      m_statement = statement;
+    }
+
+    @Override
+    public void evaluate() throws Throwable {
+      final Set<IForm> initialOpenForms = getDisplayedForms();
+      try {
+        m_statement.evaluate();
+      }
+      finally {
+        final IDesktop desktop = IDesktop.CURRENT.get();
+        if (desktop != null) {
+          Set<IForm> openForms = getDisplayedForms();
+          openForms.removeAll(initialOpenForms);
+          // Close all opened (including all depending forms display parent hierarchy) forms which were started during test evaluation.
+          desktop.closeForms(openForms);
+        }
+      }
+    }
+
+    private Set<IForm> getDisplayedForms() {
+      final IDesktop desktop = IDesktop.CURRENT.get();
+      if (desktop == null || desktop instanceof VirtualDesktop) {
+        return Collections.emptySet();
+      }
+      Set<IForm> forms = new HashSet<>();
+      forms.addAll(desktop.getDialogs());
+      forms.addAll(desktop.getViews());
+      return forms;
+    }
+  }
 }
