@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.reflect.FastBeanInfo;
@@ -34,14 +35,12 @@ import org.slf4j.LoggerFactory;
 public final class BeanUtility {
   private static final Logger LOG = LoggerFactory.getLogger(BeanUtility.class);
 
-  private static final Object BEAN_INFO_CACHE_LOCK;
   private static final Map<CompositeObject/*Class,Class*/, FastBeanInfo> BEAN_INFO_CACHE;
   private static final Map<Class, Class> PRIMITIVE_COMPLEX_CLASS_MAP;
   private static final Map<Class, Class> COMPLEX_PRIMITIVE_CLASS_MAP;
 
   static {
-    BEAN_INFO_CACHE_LOCK = new Object();
-    BEAN_INFO_CACHE = new HashMap<>();
+    BEAN_INFO_CACHE = new ConcurrentHashMap<>(10_000);
     // primitive -> complex classes mappings
     PRIMITIVE_COMPLEX_CLASS_MAP = new HashMap<>();
     PRIMITIVE_COMPLEX_CLASS_MAP.put(boolean.class, Boolean.class);
@@ -126,20 +125,16 @@ public final class BeanUtility {
     if (beanClass == null) {
       return new FastBeanInfo(beanClass, stopClass);
     }
-    synchronized (BEAN_INFO_CACHE_LOCK) {
       CompositeObject key = new CompositeObject(beanClass, stopClass);
       FastBeanInfo info = BEAN_INFO_CACHE.computeIfAbsent(key, k -> new FastBeanInfo(beanClass, stopClass));
       return info;
-    }
   }
 
   /**
-   * Clear the cache used by {@link #getBeanInfoEx(Class, Class)}
+   * Clear the cache used by {@link #getFastBeanInfo(Class, Class)}
    */
   public static void clearFastBeanInfoCache() {
-    synchronized (BEAN_INFO_CACHE_LOCK) {
       BEAN_INFO_CACHE.clear();
-    }
   }
 
   /**
