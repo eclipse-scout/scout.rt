@@ -210,7 +210,7 @@ export default class FileInput extends Widget {
 
   _setFiles(files) {
     if (files instanceof FileList) {
-      files = FileInput.fileListToArray(files);
+      files = fileUtil.fileListToArray(files);
     }
     files = arrays.ensure(files);
     if (arrays.equals(this.files, files)) {
@@ -270,13 +270,11 @@ export default class FileInput extends Widget {
     this.browse();
   }
 
+  /**
+   * @deprecated use files.fileListToArray instead
+   */
   static fileListToArray(fileList) {
-    let files = [],
-      i;
-    for (i = 0; i < fileList.length; i++) {
-      files.push(fileList[i]);
-    }
-    return files;
+    return fileUtil.fileListToArray(fileList);
   }
 
   validateMaximumUploadSize(files) {

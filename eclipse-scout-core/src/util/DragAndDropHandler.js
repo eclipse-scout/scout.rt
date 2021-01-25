@@ -70,7 +70,7 @@ export default class DragAndDropHandler {
         !(event.originalEvent.dataTransfer.files instanceof FileList)) {
         return;
       }
-      let files = Array.from(event.originalEvent.dataTransfer.files);
+      let files = fileUtil.fileListToArray(event.originalEvent.dataTransfer.files);
       if (arrays.empty(files)) {
         return;
       }
