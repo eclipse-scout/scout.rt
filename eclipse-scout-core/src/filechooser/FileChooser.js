@@ -17,6 +17,7 @@ import {
   dragAndDrop,
   Event,
   FileInput,
+  files as fileUtil,
   FocusAdjacentElementKeyStroke,
   FocusRule,
   Form,
@@ -310,7 +311,7 @@ export default class FileChooser extends Widget {
 
   addFiles(files) {
     if (files instanceof FileList) {
-      files = FileInput.fileListToArray(files);
+      files = fileUtil.fileListToArray(files);
     }
     files = arrays.ensure(files);
     if (files.length === 0) {
@@ -338,7 +339,7 @@ export default class FileChooser extends Widget {
 
   setFiles(files) {
     if (files instanceof FileList) {
-      files = FileInput.fileListToArray(files);
+      files = fileUtil.fileListToArray(files);
     }
     files = arrays.ensure(files);
 

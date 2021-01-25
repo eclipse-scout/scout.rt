@@ -40,6 +40,16 @@ export function validateMaximumUploadSize(files, maximumUploadSize) {
   return totalSize <= maximumUploadSize;
 }
 
+export function fileListToArray(fileList) {
+  var files = [],
+    i;
+  for (i = 0; i < fileList.length; i++) {
+    files.push(fileList[i]);
+  }
+  return files;
+}
+
 export default {
+  fileListToArray,
   validateMaximumUploadSize
 };
