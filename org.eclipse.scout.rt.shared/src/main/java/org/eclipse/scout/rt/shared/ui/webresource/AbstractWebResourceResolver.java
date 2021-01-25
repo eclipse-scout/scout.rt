@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 
 public abstract class AbstractWebResourceResolver implements IWebResourceResolver {
 
-  public static final String OUTPUT_FOLDER_NAME = "dist";
+  public static final String OUTPUT_FOLDER_NAME = "target/dist";
   public static final String DEV_FOLDER_NAME = "dev";
   public static final String MIN_FOLDER_NAME = "prod";
   public static final String WEB_RESOURCE_FOLDER_NAME = "res";

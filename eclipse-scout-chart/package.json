@@ -21,6 +21,7 @@
   ],
   "main": "./src/index.js",
   "files": [
+    "dist",
     "src"
   ],
   "scripts": {

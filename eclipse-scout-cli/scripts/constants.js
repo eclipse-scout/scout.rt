@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+const fs = require('fs');
+const path = require('path');
+
 const mode = {
   production: 'production',
   development: 'development'
@@ -28,9 +31,17 @@ const cssFilename = {
   development: '[name].css'
 };
 
+function getOutputDir() {
+  let workingDir = process.cwd();
+  if (fs.existsSync(path.resolve(workingDir, 'src', 'main')) || fs.existsSync(path.resolve(workingDir, 'src', 'test'))) {
+    return 'target/dist'; // default for scout classic
+  }
+  return 'dist'; // default for scout js
+}
+
 module.exports = {
   mode: mode,
-  outDir: 'dist',
+  outDir: getOutputDir(),
   outSubDir: outSubDir,
   fileListName: 'file-list',
   jsFilename: jsFilename,
