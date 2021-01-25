@@ -159,6 +159,8 @@ export default class FileInput extends Widget {
   _createDragAndDropHandler() {
     return dragAndDrop.handler(this, {
       supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+      validateFiles: function() {
+      },
       onDrop: function(event) {
         if (event.files.length >= 1) {
           this._setFiles(event.files);

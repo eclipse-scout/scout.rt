@@ -4684,15 +4684,23 @@ export default class Table extends Widget {
     this.invalidateLayoutTree();
   }
 
+  setDropType(dropType) {
+    this.setProperty('dropType', dropType);
+  }
+
   _renderDropType() {
     this._installOrUninstallDragAndDropHandler();
+  }
+
+  setDropMaximumSize(dropMaximumSize) {
+    this.setProperty('dropMaximumSize', dropMaximumSize);
   }
 
   _createDragAndDropHandler() {
     return dragAndDrop.handler(this, {
       supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
       onDrop: function(event) {
-        this.trigger('fileDrop', event);
+        this.trigger('drop', event);
       }.bind(this),
       dropType: function() {
         return this.dropType;

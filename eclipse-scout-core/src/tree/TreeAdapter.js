@@ -87,7 +87,7 @@ export default class TreeAdapter extends ModelAdapter {
       this._onWidgetNodeExpanded(event);
     } else if (event.type === 'nodesChecked') {
       this._onWidgetNodesChecked(event);
-    } else if (event.type === 'fileDrop' && this.widget.dragAndDropHandler) {
+    } else if (event.type === 'drop' && this.widget.dragAndDropHandler) {
       this.widget.dragAndDropHandler.uploadFiles(event.files);
     } else {
       super._onWidgetEvent(event);

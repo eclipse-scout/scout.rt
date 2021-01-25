@@ -16,8 +16,8 @@ export default class ClipboardField extends ValueField {
   constructor() {
     super();
 
-    this.dropType = 0;
-    this.dropMaximumSize = dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
+    this.allowedMimeTypes = null;
+    this.maximumSize = null;
     this._fileUploadWaitRetryCountTimeout = 99;
     this._fullSelectionLength = 0;
   }
@@ -94,7 +94,7 @@ export default class ClipboardField extends ValueField {
     return dragAndDrop.handler(this, {
       supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
       onDrop: function(event) {
-        this.trigger('fileDrop', event);
+        this.trigger('drop', event);
       }.bind(this),
       dropType: function() {
         return this.dropType;
