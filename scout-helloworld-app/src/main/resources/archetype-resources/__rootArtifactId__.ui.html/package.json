@@ -8,7 +8,7 @@
   },
   "main": "./src/main/js/index.js",
   "files": [
-    "dist",
+    "src/main/resources/WebContent",
     "src/main/js"
   ],
   "scripts": {
