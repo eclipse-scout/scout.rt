@@ -314,8 +314,8 @@ public class PlatformImplementor implements IPlatform {
       return; // can happen if there is an error creating the bean manager. cannot move to status invalid. just do nothing.
     }
     PlatformEvent event = new PlatformEvent(this, newState);
-    try {
-      for (IBean<IPlatformListener> bean : m_beanManager.getBeans(IPlatformListener.class)) {
+    for (IBean<IPlatformListener> bean : m_beanManager.getBeans(IPlatformListener.class)) {
+      try {
         IPlatformListener listener = bean.getInstance();
         long t0 = System.nanoTime();
         listener.stateChanged(event);
@@ -324,11 +324,18 @@ public class PlatformImplementor implements IPlatform {
           LOG.debug("StateEvent {} took {} ms for '{}' ", newState, StringUtility.formatNanos(t1 - t0), bean);
         }
       }
-    }
-    catch (RuntimeException | Error e) {
-      LOG.error("Error during event listener notification.", e);
-      changeState(State.PlatformInvalid, true);
-      throw e;
+      catch (RuntimeException | Error e) {
+        LOG.error("Error during event listener notification.", e);
+        switch (newState) {
+          case PlatformStopping:
+          case PlatformStopped:
+            //go on
+            break;
+          default:
+            changeState(State.PlatformInvalid, true);
+            throw e;
+        }
+      }
     }
   }
 
