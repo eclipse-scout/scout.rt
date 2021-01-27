@@ -1160,8 +1160,10 @@ export default class Table extends Widget {
   }
 
   /**
-   * @param multiSort true to add the column to list of sorted columns. False to use this column exclusively as sort column (reset other columns)
-   * @param remove true to remove the column from the sort columns
+   * @param {Column} column the column to sort by.
+   * @param {string} [direction] the sorting direction. Either 'asc' or 'desc'. If not specified the direction specified by the column is used {@link Column.sortAscending}.
+   * @param {boolean} [multiSort] true to add the column to the list of sorted columns. False to use this column exclusively as sort column (reset other columns). Default is true.
+   * @param {boolean} [remove] true to remove the column from the sort columns. Default is false.
    */
   sort(column, direction, multiSort, remove) {
     let data, sorted, animateAggregateRows;
@@ -2106,7 +2108,7 @@ export default class Table extends Widget {
     if (this.cellEditorPopup) {
       promise = this.cellEditorPopup.waitForCompleteCellEdit();
     }
-    promise.then(this.prepareCellEditInternal.bind(this, column, row, openFieldPopupOnCellEdit));
+    return promise.then(this.prepareCellEditInternal.bind(this, column, row, openFieldPopupOnCellEdit));
   }
 
   /**
@@ -3087,32 +3089,33 @@ export default class Table extends Widget {
       return;
     }
 
-    // the cellEditorPopup could already be removed by scrolling (out of view range) or be removed by update rows
-    if (this.cellEditorPopup) {
-      let context = this.cellEditorPopup;
+    if (!this.cellEditorPopup) {
+      // the cellEditorPopup could already be removed by scrolling (out of view range) or be removed by update rows
+      field.destroy();
+      return;
+    }
+    // Remove the cell-editor popup prior to destroying the field, so that the 'cell-editor-popup's focus context is
+    // uninstalled first and the focus can be restored onto the last focused element of the surrounding focus context.
+    // Otherwise, if the currently focused field is removed from DOM, the $entryPoint would be focused first, which can
+    // be avoided if removing the popup first.
+    // Also, Column.setCellValue needs to be called _after_ cellEditorPopup is set to null
+    // because in updateRows we check if the popup is still there and start cell editing mode again.
+    this._destroyCellEditorPopup(this._updateCellFromEditor.bind(this, this.cellEditorPopup, field, saveEditorValue));
+  }
 
-      // Remove the cell-editor popup prior destroying the field, so that the 'cell-editor-popup's focus context is
-      // uninstalled first and the focus can be restored onto the last focused element of the surrounding focus context.
-      // Otherwise, if the currently focused field is removed from DOM, the $entryPoint would be focused first, which can
-      // be avoided if removing the popup first.
-      this._destroyCellEditorPopup();
-
-      // Must store context in a local variable and call setCellValue _after_ cellEditorPopup is set to null
-      // because in updateRows we check if the popup is still there and start cell editing mode again.
-      saveEditorValue = scout.nvl(saveEditorValue, false);
-      if (saveEditorValue) {
-        let column = context.column;
-        let row = context.row;
-        this.setCellErrorStatus(column, row, field.errorStatus); // always get the errorStatus from the editor
-        if (field.errorStatus) {
-          // if there is an error from the editor, the displayText of the cell has to be updated
-          this.setCellText(column, row, field.displayText);
-        } else {
-          this.setCellValue(column, row, field.value);
-        }
+  _updateCellFromEditor(cellEditorPopup, field, saveEditorValue) {
+    saveEditorValue = scout.nvl(saveEditorValue, false);
+    if (saveEditorValue) {
+      let column = cellEditorPopup.column;
+      let row = cellEditorPopup.row;
+      this.setCellErrorStatus(column, row, field.errorStatus); // always get the errorStatus from the editor
+      if (field.errorStatus) {
+        // if there is an error from the editor, the displayText of the cell has to be updated
+        this.setCellText(column, row, field.displayText);
+      } else {
+        this.setCellValue(column, row, field.value);
       }
     }
-
     field.destroy();
   }
 
@@ -5206,27 +5209,33 @@ export default class Table extends Widget {
     this._destroyCellEditorPopup();
   }
 
-  _destroyCellEditorPopup() {
+  /**
+   * @param {function} [callback] function to be called right after the popup is destroyed
+   */
+  _destroyCellEditorPopup(callback) {
     // When a cell editor popup is open and table is detached, we close the popup immediately
     // and don't wait for the model event 'endCellEdit'. By doing this we can avoid problems
     // with invalid focus contexts.
     // However: when 'completeCellEdit' is already scheduled, we must wait because Scout classic
     // must send a request to the server first #249385.
-    if (this.cellEditorPopup) {
-      let destroyEditor = function() {
-        this.cellEditorPopup.destroy();
-        this.cellEditorPopup = null;
-      }.bind(this);
-
-      let promise = this.cellEditorPopup.waitForCompleteCellEdit();
-      if (promise.state() === 'resolved') {
-        // Do it immediately if promise has already been resolved.
-        // This makes sure updateRow does not immediately reopen the editor after closing.
-        // At least for Scout JS, for Scout Classic it prevents flickering (endCellEdit comes after updateRows, but updateRows does not know whether the editor is closing so it will reopen it)
-        destroyEditor();
-      } else {
-        promise.then(destroyEditor);
+    if (!this.cellEditorPopup) {
+      return;
+    }
+    let destroyEditor = () => {
+      this.cellEditorPopup.destroy();
+      this.cellEditorPopup = null;
+      if (callback) {
+        callback();
       }
+    };
+    let promise = this.cellEditorPopup.waitForCompleteCellEdit();
+    if (promise.state() === 'resolved') {
+      // Do it immediately if promise has already been resolved.
+      // This makes sure updateRow does not immediately reopen the editor after closing.
+      // At least for Scout JS, for Scout Classic it prevents flickering (endCellEdit comes after updateRows, but updateRows does not know whether the editor is closing so it will reopen it)
+      destroyEditor();
+    } else {
+      promise.then(destroyEditor);
     }
   }
 
