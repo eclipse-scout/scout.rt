@@ -309,16 +309,6 @@ scout.Outline.prototype._initDetailForm = function(node) {
   }.bind(this));
 };
 
-/**
- * @override
- */
-scout.Outline.prototype._decorateNode = function(node) {
-  scout.Outline.parent.prototype._decorateNode.call(this, node);
-  if (this.session.inspector) {
-    scout.inspector.applyInfo(node, node.$node);
-  }
-};
-
 // Info: we pass the keyStrokeContext of the parent (table or form) to
 // the created buttons, we cannot use keyStrokeContext of the outline
 // because that context is disabled when the outline is collapsed. We

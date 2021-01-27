@@ -142,6 +142,13 @@ scout.Page.prototype._ensureDetailForm = function() {
   this.setDetailForm(form);
 };
 
+scout.Page.prototype._decorate = function() {
+  scout.Page.parent.prototype._decorate.call(this);
+  if (this.$node && this.session.inspector) {
+    scout.inspector.applyInfo(this, this.$node);
+  }
+};
+
 // see Java: AbstractPage#pageActivatedNotify
 scout.Page.prototype.activate = function() {
   this._ensureDetailForm();
