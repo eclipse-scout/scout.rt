@@ -34,6 +34,7 @@ classes
 /.idea/httpRequests/
 /.idea/libraries/
 /.idea/artifacts/
+*.iml
 
 # Maven #
 target/
