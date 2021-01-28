@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,6 +51,7 @@ import org.eclipse.scout.rt.client.ui.dnd.TextTransferObject;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -71,7 +72,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
-import org.eclipse.scout.rt.ui.html.json.basic.cell.ICellValueReader;
 import org.eclipse.scout.rt.ui.html.json.basic.cell.JsonCell;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
@@ -1035,8 +1035,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected Object cellToJson(final ITableRow row, final IColumn<?> column) {
     ICell cell = row.getCell(column);
     JsonColumn<?> jsonColumn = m_jsonColumns.get(column);
-    ICellValueReader reader = new TableCellValueReader(jsonColumn, cell);
-    return new JsonCell(cell, this, reader).toJsonOrString();
+    if (jsonColumn == null) {
+      throw new ProcessingException("No JsonColumn for column " + column);
+    }
+    JsonCell jsonCell = jsonColumn.createJsonCell(cell, this);
+    return jsonCell.toJsonOrString();
   }
 
   protected JSONArray columnsToJson(Collection<IColumn<?>> columns) {

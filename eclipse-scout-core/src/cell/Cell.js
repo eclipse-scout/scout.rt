@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,7 @@ export default class Cell {
     this.text = null;
     this.value = null;
     this.tooltipText = null;
+    this.sortCode = null;
   }
 
   init(model) {
@@ -87,4 +88,7 @@ export default class Cell {
     this.cssClass = cssClass;
   }
 
+  setSortCode(sortCode) {
+    this.sortCode = sortCode;
+  }
 }

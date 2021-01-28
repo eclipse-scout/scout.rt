@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,13 +10,17 @@
  */
 package org.eclipse.scout.rt.ui.html.json.table;
 
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
+import org.eclipse.scout.rt.ui.html.json.basic.cell.ICellValueReader;
+import org.eclipse.scout.rt.ui.html.json.basic.cell.JsonCell;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextColumnUserFilter;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
@@ -124,6 +128,14 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
       return value;
     }
     return null;
+  }
+
+  protected ICellValueReader createCellValueReader(ICell cell) {
+    return new TableCellValueReader(this, cell);
+  }
+
+  public JsonCell createJsonCell(ICell cell, IJsonAdapter<?> parentAdapter) {
+    return new JsonCell(cell, parentAdapter, createCellValueReader(cell));
   }
 
   public T getColumn() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,18 +25,24 @@ public class JsonCell implements IJsonObject {
   private final String m_cellText;
   private final IJsonAdapter<?> m_parentAdapter;
   private Object m_cellValue;
+  private final Integer m_cellSortCode;
 
   public JsonCell(ICell cell, IJsonAdapter<?> parentAdapter) {
     this(cell, parentAdapter, null);
   }
 
   public JsonCell(ICell cell, IJsonAdapter<?> parentAdapter, ICellValueReader cellValueReader) {
+    this(cell, parentAdapter, cellValueReader, null);
+  }
+
+  public JsonCell(ICell cell, IJsonAdapter<?> parentAdapter, ICellValueReader cellValueReader, Integer cellSortCode) {
     m_cell = cell;
     m_cellText = cell.getText();
     m_parentAdapter = parentAdapter;
     if (cellValueReader != null) {
       m_cellValue = cellValueReader.read();
     }
+    m_cellSortCode = cellSortCode;
   }
 
   public final ICell getCell() {
@@ -49,6 +55,10 @@ public class JsonCell implements IJsonObject {
 
   public final String getCellText() {
     return m_cellText;
+  }
+
+  public final Integer getCellSortCode() {
+    return m_cellSortCode;
   }
 
   @Override
@@ -77,6 +87,9 @@ public class JsonCell implements IJsonObject {
     json.put("editable", m_cell.isEditable());
     json.put("htmlEnabled", m_cell.isHtmlEnabled());
     json.put("mandatory", m_cell.isMandatory());
+    if (getCellSortCode() != null) {
+      json.put("sortCode", getCellSortCode());
+    }
     return json;
   }
 

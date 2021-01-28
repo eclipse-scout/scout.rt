@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -560,6 +560,24 @@ describe('scout.objects', () => {
       expect(objects.optProperty(obj, 'foo', 'bar', 'baz')).toBe(1);
     });
 
+  });
+
+  describe('isEmpty', () => {
+    it('returns true if argument is an empty object, false if it is a non-empty object, undefined if argument is not an object', () => {
+      expect(objects.isEmpty({})).toBe(true);
+
+      expect(objects.isEmpty({test: 'test'})).toBe(false);
+      expect(objects.isEmpty({test: 42})).toBe(false);
+
+      expect(objects.isEmpty({})).toBe(true);
+
+      expect(objects.isEmpty(undefined)).toBe(undefined);
+      expect(objects.isEmpty(null)).toBe(undefined);
+      expect(objects.isEmpty('test')).toBe(undefined);
+      expect(objects.isEmpty(42)).toBe(undefined);
+      expect(objects.isEmpty(['test'])).toBe(undefined);
+      expect(objects.isEmpty([42])).toBe(undefined);
+    });
   });
 
 });

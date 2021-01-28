@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, BooleanColumn, comparators, DateColumn, DateFormat, dates, IconColumn, NumberColumn, scout} from '../index';
+import {arrays, BooleanColumn, comparators, DateColumn, DateFormat, dates, IconColumn, NumberColumn, objects, scout} from '../index';
 
 export default class TableMatrix {
 
@@ -105,6 +105,8 @@ export default class TableMatrix {
     // normalized string data
     keyAxis.normTable = [];
 
+    keyAxis.sortCodeMap = {};
+
     // add a key to the axis
     keyAxis.add = k => {
       if (keyAxis.indexOf(k) === -1) {
@@ -121,6 +123,11 @@ export default class TableMatrix {
         }
         if (b === null) {
           return -1;
+        }
+        let sortCodeA = keyAxis.sortCodeMap[a],
+          sortCodeB = keyAxis.sortCodeMap[b];
+        if (!objects.isNullOrUndefined(sortCodeA) || !objects.isNullOrUndefined(sortCodeB)) {
+          return comparators.NUMERIC.compare(sortCodeA, sortCodeB);
         }
         // sort others
         return (a - b);
@@ -311,6 +318,11 @@ export default class TableMatrix {
           if (b === null) {
             return -1;
           }
+          let sortCodeA = keyAxis.sortCodeMap[a],
+            sortCodeB = keyAxis.sortCodeMap[b];
+          if (!objects.isNullOrUndefined(sortCodeA) || !objects.isNullOrUndefined(sortCodeB)) {
+            return comparators.NUMERIC.compare(sortCodeA, sortCodeB);
+          }
           // sort others
           return comparator.compare(keyAxis.format(a), keyAxis.format(b));
         });
@@ -339,6 +351,9 @@ export default class TableMatrix {
 
         if (normKey !== undefined) {
           this._allAxis[k].add(normKey);
+          if (column.cell(row).sortCode !== null) {
+            this._allAxis[k].sortCodeMap[normKey] = column.cell(row).sortCode;
+          }
           keys.push(normKey);
         }
       }

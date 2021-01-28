@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Column, LookupCall, LookupRow, scout, SmartField, strings} from '../../index';
+import {codes, Column, LookupCall, LookupRow, scout, SmartField, strings} from '../../index';
 import objects from '../../util/objects';
 
 /**
@@ -42,11 +42,30 @@ export default class SmartColumn extends Column {
     this._setCodeType(this.codeType);
   }
 
+  _initCell(cell) {
+    super._initCell(cell);
+    cell.sortCode = this._calculateCellSortCode(cell);
+    return cell;
+  }
+
+  _calculateCellSortCode(cell) {
+    if (!this.codeType) {
+      return null;
+    }
+    let code = codes.get(this.codeType, cell.value);
+    return code ? code.sortCode : null;
+  }
+
+  _updateAllCellSortCodes() {
+    this.table.rows.map(row => this.cell(row)).forEach(cell => cell.setSortCode(this._calculateCellSortCode(cell)));
+  }
+
   setLookupCall(lookupCall) {
     if (this.lookupCall === lookupCall) {
       return;
     }
     this._setLookupCall(lookupCall);
+    this._updateAllCellSortCodes();
   }
 
   _setLookupCall(lookupCall) {
@@ -58,6 +77,7 @@ export default class SmartColumn extends Column {
       return;
     }
     this._setCodeType(codeType);
+    this._updateAllCellSortCodes();
   }
 
   _setCodeType(codeType) {
@@ -204,5 +224,11 @@ export default class SmartColumn extends Column {
       return !objects.isNullOrUndefined(value); // Zero (0) is valid too
     }
     return !!value;
+  }
+
+  setCellValue(row, value) {
+    super.setCellValue(row, value);
+    let cell = this.cell(row);
+    cell.setSortCode(this._calculateCellSortCode(cell));
   }
 }
