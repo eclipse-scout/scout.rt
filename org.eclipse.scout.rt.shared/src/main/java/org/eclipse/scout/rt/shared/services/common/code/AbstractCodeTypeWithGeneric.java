@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.holders.IntegerHolder;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -57,6 +56,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   private int m_maxLevel;
   private transient Map<CODE_ID, CODE> m_rootCodeMap = new HashMap<>();
   private List<CODE> m_rootCodeList = new ArrayList<>();
+  private transient Map<CODE_ID, Integer> m_codeIndexMap = new HashMap<>();
   protected IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>, ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> m_objectExtensions;
 
@@ -390,46 +390,32 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     return null;
   }
 
-  @Override
-  public int getCodeIndex(final CODE_ID id) {
-    final IntegerHolder result = new IntegerHolder(-1);
+  protected void rebuildCodeIndexMap() {
+    m_codeIndexMap = new HashMap<>();
     ICodeVisitor<ICode<CODE_ID>> v = new ICodeVisitor<ICode<CODE_ID>>() {
       private int m_index = 0;
 
       @Override
       public boolean visit(ICode<CODE_ID> code, int treeLevel) {
-        if (ObjectUtility.equals(code.getId(), id)) {
-          result.setValue(m_index);
-        }
-        else {
-          m_index++;
-        }
-        return result.getValue() < 0;
+        m_codeIndexMap.put(code.getId(), m_index);
+        m_index++;
+        return true;
       }
     };
     visit(v, false);
-    return result.getValue();
+  }
+
+  @Override
+  public int getCodeIndex(final CODE_ID id) {
+    return ObjectUtility.nvl(m_codeIndexMap.get(id), -1);
   }
 
   @Override
   public int getCodeIndex(final ICode<CODE_ID> c) {
-    final IntegerHolder result = new IntegerHolder(-1);
-    ICodeVisitor<ICode<CODE_ID>> v = new ICodeVisitor<ICode<CODE_ID>>() {
-      private int m_index = 0;
-
-      @Override
-      public boolean visit(ICode<CODE_ID> code, int treeLevel) {
-        if (code == c) {
-          result.setValue(m_index);
-        }
-        else {
-          m_index++;
-        }
-        return result.getValue() < 0;
-      }
-    };
-    visit(v, false);
-    return result.getValue();
+    if (c == null) {
+      return -1;
+    }
+    return getCodeIndex(c.getId());
   }
 
   @Override
@@ -525,6 +511,8 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
       }
       return true;
     }, false);
+    // 4 rebuild code indices
+    rebuildCodeIndexMap();
   }
 
   /**
@@ -623,6 +611,8 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
         code.setCodeTypeInternal(this);
       }
     }
+    rebuildCodeIndexMap();
+
     return this;
   }
 

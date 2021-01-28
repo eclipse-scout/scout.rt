@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1552,6 +1552,25 @@ describe('Table', () => {
 
         table.sort(column0, 'asc');
         helper.assertDatesInCells(table.rows, 0, [new Date('1999-01-10'), new Date('2012-08-10'), new Date('2014-03-01')]);
+      });
+
+      it('sorts columns with sortcode', () => {
+        let model = helper.createModelSingleColumnByValues([0, 1, 2, 3, 4], 'NumberColumn');
+        let table = helper.createTable(model);
+        column0 = table.columns[0];
+
+        let sortCodes = [13, 0, 42, 7, null];
+        table.rows.forEach((row, index) => {
+          column0.cell(row).sortCode = sortCodes[index];
+        });
+
+        table.render();
+
+        table.sort(column0, 'desc');
+        helper.assertValuesInCells(table.rows, 0, [2, 0, 3, 1, 4]);
+
+        table.sort(column0, 'asc');
+        helper.assertValuesInCells(table.rows, 0, [4, 1, 3, 0, 2]);
       });
 
       it('uses non sort columns as fallback', () => {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -751,6 +751,13 @@ export default class Column {
   }
 
   compare(row1, row2) {
+    let cell1 = this.table.cell(this, row1),
+      cell2 = this.table.cell(this, row2);
+
+    if (cell1.sortCode !== null || cell2.sortCode !== null) {
+      return comparators.NUMERIC.compare(cell1.sortCode, cell2.sortCode);
+    }
+
     let valueA = this.cellValueOrText(row1);
     let valueB = this.cellValueOrText(row2);
     return this.comparator.compare(valueA, valueB);

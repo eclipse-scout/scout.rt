@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -572,6 +572,20 @@ export function resolveConstProperty(object, config) {
   }
 }
 
+/**
+ * @param {object} obj
+ * @returns {Boolean|undefined}
+ *  - true if the obj is empty
+ *  - false if the obj is not empty
+ *  - nothing if the obj is not an object
+ */
+export function isEmpty(obj) {
+  if (!isPlainObject(obj)) {
+    return;
+  }
+  return Object.keys(obj).length === 0;
+}
+
 export default {
   CONST_REGEX,
   argumentsToArray,
@@ -586,6 +600,7 @@ export default {
   findChildObjectByKey,
   forEachArgument,
   isArray,
+  isEmpty,
   isFunction,
   isNullOrUndefined,
   isNumber,

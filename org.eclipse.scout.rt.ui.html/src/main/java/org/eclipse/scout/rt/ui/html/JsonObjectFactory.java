@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IIconColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.IAggregateTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.IFormTableControl;
@@ -202,6 +203,7 @@ import org.eclipse.scout.rt.ui.html.json.table.JsonDateColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonIconColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonNumberColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
+import org.eclipse.scout.rt.ui.html.json.table.JsonSmartColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonStringColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTableRowTileMapping;
@@ -348,7 +350,7 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       return new JsonModeSelectorField<IModeSelectorField<?>>((IModeSelectorField<?>) model, session, id, parent);
     }
     if (model instanceof IBreadcrumbBarField) {
-      return new JsonBreadcrumbBarField<IBreadcrumbBarField>((IBreadcrumbBarField) model, session, id, parent);
+      return new JsonBreadcrumbBarField<>((IBreadcrumbBarField) model, session, id, parent);
     }
 
     // --- other model objects ---
@@ -478,10 +480,10 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       return new JsonMode<IMode<?>>((IMode<?>) model, session, id, parent);
     }
     if (model instanceof IBreadcrumbBar) {
-      return new JsonBreadcrumbBar<IBreadcrumbBar>((IBreadcrumbBar) model, session, id, parent);
+      return new JsonBreadcrumbBar<>((IBreadcrumbBar) model, session, id, parent);
     }
     if (model instanceof IBreadcrumbItem) {
-      return new JsonBreadcrumbItem<IBreadcrumbItem>((IBreadcrumbItem) model, session, id, parent);
+      return new JsonBreadcrumbItem<>((IBreadcrumbItem) model, session, id, parent);
     }
     if (model instanceof PopupManager) {
       return new JsonPopupManager<>((PopupManager) model, session, id, parent);
@@ -536,6 +538,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (object instanceof IIconColumn) {
       return new JsonIconColumn((IIconColumn) object);
+    }
+    if (object instanceof ISmartColumn) {
+      return new JsonSmartColumn((ISmartColumn) object);
     }
     if (object instanceof IColumn<?>) {
       return new JsonColumn((IColumn<?>) object);
