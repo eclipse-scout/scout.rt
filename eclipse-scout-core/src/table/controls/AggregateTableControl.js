@@ -109,6 +109,7 @@ export default class AggregateTableControl extends TableControl {
   _rerenderAggregate() {
     this.$contentContainer.empty();
     this._renderAggregate();
+    this._reconcileScrollPos();
   }
 
   _installCellTooltip($cell) {
