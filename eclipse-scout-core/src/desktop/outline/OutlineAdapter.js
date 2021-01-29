@@ -18,16 +18,6 @@ export default class OutlineAdapter extends TreeAdapter {
     this._detailTableRowInitHandler = this._onDetailTableRowInit.bind(this);
   }
 
-  /**
-   * We must call onWidgetPageInit because this adapter cannot process the 'pageInit' event
-   * while the widget is initialized, since the listener is not attached until the widget
-   * is created completely.
-   */
-  _postCreateWidget() {
-    let outline = this.widget;
-    outline.visitNodes(this._onWidgetPageInit.bind(this));
-  }
-
   _onPageChanged(event) {
     let page = this.widget._nodeById(event.nodeId);
     page.overviewIconId = event.overviewIconId;
@@ -54,27 +44,12 @@ export default class OutlineAdapter extends TreeAdapter {
     this.widget.pageChanged(page);
   }
 
-  _onWidgetEvent(event) {
-    if (event.type === 'pageInit') {
-      this._onWidgetPageInit(event.page);
-    } else {
-      super._onWidgetEvent(event);
-    }
-  }
-
   onModelAction(event) {
     if (event.type === 'pageChanged') {
       this._onPageChanged(event);
     } else {
       super.onModelAction(event);
     }
-  }
-
-  _onWidgetPageInit(page) {
-    if (page.detailTable) {
-      this._initDetailTable(page);
-    }
-    this._linkNodeWithRowLater(page);
   }
 
   _initDetailTable(page) {
@@ -163,6 +138,7 @@ export default class OutlineAdapter extends TreeAdapter {
 
     objects.replacePrototypeFunction(Outline, '_computeDetailContent', OutlineAdapter._computeDetailContentRemote, true);
     objects.replacePrototypeFunction(Outline, 'updateDetailMenus', OutlineAdapter.updateDetailMenusRemote, true);
+    objects.replacePrototypeFunction(Outline, '_initTreeNodeInternal', OutlineAdapter._initTreeNodeInternalRemote, true);
   }
 
   /**
@@ -215,6 +191,25 @@ export default class OutlineAdapter extends TreeAdapter {
     if (this.selectedNode() && this.selectedNode().detailFormResolved) {
       return this.updateDetailMenusOrig();
     }
+  }
+
+  /**
+   * Replaced to make sure page is correctly initialized (linked with row).
+   * This cannot be done using pageInit event because the page needs to be initialized during the outline initialization
+   * and the event listener can only be attached afterwards.
+   */
+  static _initTreeNodeInternalRemote(page, parentNode) {
+    this._initTreeNodeInternalOrig(page, parentNode);
+    if (!this.modelAdapter) {
+      return;
+    }
+    // The current method may be called during init of the Outline
+    // -> widget is not set yet but the following methods need it
+    this.modelAdapter.widget = this;
+    if (page.detailTable) {
+      this.modelAdapter._initDetailTable(page);
+    }
+    this.modelAdapter._linkNodeWithRowLater(page);
   }
 }
 
