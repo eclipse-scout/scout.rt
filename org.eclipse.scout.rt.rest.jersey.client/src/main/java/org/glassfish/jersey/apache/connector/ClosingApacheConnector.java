@@ -88,7 +88,7 @@ class ClosingApacheConnector extends ApacheConnector {
     final HttpUriRequest request = getUriHttpRequest(clientRequest);
 
     // Work around for rare abnormal connection terminations (258238)
-    ensureHttpHeaderCloseConnection(clientRequest.getHeaders(), request);
+    ensureHttpHeaderCloseConnection(clientRequest, request);
     final Map<String, String> clientHeadersSnapshot = writeOutBoundHeaders(clientRequest.getHeaders(), request);
 
     final IRegistrationHandle cancellableHandle = registerCancellable(clientRequest, request);
@@ -189,14 +189,16 @@ class ClosingApacheConnector extends ApacheConnector {
   }
 
   /**
-   * Adds the HTTP header {@code Connection: close} if {@link RestEnsureHttpHeaderConnectionCloseProperty} is
-   * {@code true} and the given {@code headers} do not contain the key {@code Connection}.
+   * Adds the HTTP header {@code Connection: close} if {@code RestClientProperties.CONNECTION_CLOSE} is {@code true} or
+   * {@link RestEnsureHttpHeaderConnectionCloseProperty} is {@code true} and the given {@code headers} do not contain
+   * the key {@code Connection}.
    */
-  protected void ensureHttpHeaderCloseConnection(MultivaluedMap<String, Object> headers, HttpUriRequest request) {
-    if (CONFIG.getPropertyValue(RestEnsureHttpHeaderConnectionCloseProperty.class).booleanValue()
-        && !headers.containsKey(HTTP.CONN_DIRECTIVE)) {
+  protected void ensureHttpHeaderCloseConnection(ClientRequest clientRequest, HttpUriRequest httpRequest) {
+    boolean closeConnection = BooleanUtility.nvl(clientRequest.resolveProperty(RestClientProperties.CONNECTION_CLOSE, CONFIG.getPropertyValue(RestEnsureHttpHeaderConnectionCloseProperty.class)), true);
+    MultivaluedMap<String, Object> headers = clientRequest.getHeaders();
+    if (closeConnection && !headers.containsKey(HTTP.CONN_DIRECTIVE)) {
       LOGGER.finest("Adding HTTP header '" + HTTP.CONN_DIRECTIVE + ": " + HTTP.CONN_CLOSE + "'");
-      request.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);
+      httpRequest.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);
     }
   }
 

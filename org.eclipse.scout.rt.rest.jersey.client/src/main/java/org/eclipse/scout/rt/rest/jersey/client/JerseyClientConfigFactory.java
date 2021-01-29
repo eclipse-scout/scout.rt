@@ -20,14 +20,21 @@ import javax.ws.rs.core.Configuration;
 
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.conn.HttpConnectionFactory;
+import org.apache.http.conn.ManagedHttpClientConnection;
+import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.util.PublicSuffixMatcherLoader;
+import org.apache.http.impl.conn.DefaultHttpResponseParserFactory;
+import org.apache.http.impl.conn.ManagedHttpClientConnectionFactory;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.impl.io.DefaultHttpRequestWriterFactory;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.rest.IRestHttpRequestUriEncoder;
 import org.eclipse.scout.rt.rest.client.IRestClientConfigFactory;
 import org.eclipse.scout.rt.rest.client.RestClientProperties;
 import org.eclipse.scout.rt.rest.client.RestClientProperties.LoggerVerbosity;
@@ -48,24 +55,14 @@ public class JerseyClientConfigFactory implements IRestClientConfigFactory {
 
   @Override
   public ClientConfig createClientConfig() {
-    ClientConfig clientConfig = new ClientConfig();
-    initConnectionProvider(clientConfig);
-    return clientConfig;
-  }
-
-  /**
-   * This default implementation delegates to {@link IJerseyConnectorProviderFactory#createConnectorProvider()}
-   */
-  protected void initConnectionProvider(ClientConfig clientConfig) {
-    clientConfig.connectorProvider(new ClosingApacheConnectorProvider());
-    clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, createConnectionManager());
+    return new ClientConfig();
   }
 
   /**
    * Creates a preconfigured Apache HTTP {@link HttpClientConnectionManager}. This default implementation supports up to
    * 32 concurrent connections to one particular route and 128 in total.
    */
-  protected HttpClientConnectionManager createConnectionManager() {
+  protected HttpClientConnectionManager createConnectionManager(ClientConfig clientConfig) {
     String[] sslProtocols = StringUtility.split(System.getProperty("https.protocols"), "\\s*,\\s*");
     String[] sslCipherSuites = StringUtility.split(System.getProperty("https.cipherSuites"), "\\s*,\\s*");
 
@@ -75,12 +72,22 @@ public class JerseyClientConfigFactory implements IRestClientConfigFactory {
         sslCipherSuites != null && sslCipherSuites.length > 0 ? sslCipherSuites : null,
         new DefaultHostnameVerifier(PublicSuffixMatcherLoader.getDefault()));
 
+    HttpConnectionFactory<HttpRoute, ManagedHttpClientConnection> connFactory = null;
+    IRestHttpRequestUriEncoder uriEncoder = (IRestHttpRequestUriEncoder) clientConfig.getProperty(RestClientProperties.REQUEST_URI_ENCODER);
+    if (uriEncoder != null) {
+      // explicitly create connection factory to replace default LineFormatter
+      connFactory = new ManagedHttpClientConnectionFactory(
+          new DefaultHttpRequestWriterFactory(new LineFormatterWithUriEncoder(uriEncoder)),
+          DefaultHttpResponseParserFactory.INSTANCE
+      );
+    }
+
     final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
         RegistryBuilder.<ConnectionSocketFactory> create()
             .register("http", PlainConnectionSocketFactory.getSocketFactory())
             .register("https", sslConnectionSocketFactory)
             .build(),
-        null, null, null, getKeepAliveTimeoutMillis(), TimeUnit.MILLISECONDS);
+        connFactory, null, null, getKeepAliveTimeoutMillis(), TimeUnit.MILLISECONDS);
     connectionManager.setValidateAfterInactivity(1);
 
     final int maxTotal = getMaxConnectionsTotal();
@@ -129,7 +136,9 @@ public class JerseyClientConfigFactory implements IRestClientConfigFactory {
    * Post-process {@link ClientBuilder} instance before building {@link Client}.
    */
   protected void postProcessClientBuilder(ClientBuilder clientBuilder) {
-    initLoggingFeature(Assertions.assertType(clientBuilder.getConfiguration(), ClientConfig.class));
+    final ClientConfig clientConfig = Assertions.assertType(clientBuilder.getConfiguration(), ClientConfig.class);
+    initLoggingFeature(clientConfig);
+    initConnectionProvider(clientConfig);
   }
 
   /**
@@ -147,6 +156,17 @@ public class JerseyClientConfigFactory implements IRestClientConfigFactory {
     }
     if (clientConfig.getProperty(RestClientProperties.LOGGING_LOGGER_MAX_ENTITY_SIZE) != null) {
       clientConfig.property(LoggingFeature.LOGGING_FEATURE_MAX_ENTITY_SIZE_CLIENT, clientConfig.getProperty(RestClientProperties.LOGGING_LOGGER_MAX_ENTITY_SIZE));
+    }
+  }
+
+  /**
+   * Initializes connection provider. Additionally, creates a default connection manager if none has been set previously
+   * in {@code clientConfig}, allowing for consumers to provide their own connection manager.
+   */
+  protected void initConnectionProvider(ClientConfig clientConfig) {
+    clientConfig.connectorProvider(new ClosingApacheConnectorProvider());
+    if (clientConfig.getProperty(ApacheClientProperties.CONNECTION_MANAGER) == null) {
+      clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, createConnectionManager(clientConfig));
     }
   }
 
