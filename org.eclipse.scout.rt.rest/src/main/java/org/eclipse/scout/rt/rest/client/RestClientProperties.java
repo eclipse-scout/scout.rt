@@ -39,6 +39,18 @@ public final class RestClientProperties {
   public static final String DISABLE_CHUNKED_TRANSFER_ENCODING = "scout.rest.client.disableChunkedTransferEncoding";
 
   /**
+   * A value of {@code true} ensures that the header 'Connection: close' is added to every REST HTTP request where the
+   * 'Connection' header is not already set.
+   * <p>
+   * The value MUST be an instance convertible to {@link java.lang.Boolean}.
+   * <p>
+   * The default value is {@code true}.
+   * <p>
+   * The name of the configuration property is <tt>{@value}</tt>.
+   */
+  public static final String CONNECTION_CLOSE = "scout.rest.client.connectionClose";
+
+  /**
    * Name used for REST client request/response logger.
    * <p>
    * Note: REST client request response logger is activated if at lease one of the LOGGING_LOGGER_* properties is set.
@@ -92,4 +104,16 @@ public final class RestClientProperties {
    * Optional custom {@link ICancellable} used by HTTP connection providers that support cancellation.
    */
   public static final String CANCELLABLE = "scout.rest.client.cancellable";
+
+  /**
+   * Implementation to use for encoding the request URI, i.e. the URI used in the request line (GET [request-uri]
+   * HTTP/1.1)
+   * <p>
+   * The value MUST implement {@link org.eclipse.scout.rt.rest.IRestHttpRequestUriEncoder}.
+   * <p>
+   * The default value is {@code null}, meaning the http client's default implementation is used.
+   * <p>
+   * The name of the configuration property is <tt>{@value}</tt>.
+   */
+  public static final String REQUEST_URI_ENCODER = "scout.rest.client.requestUriEncoder";
 }
