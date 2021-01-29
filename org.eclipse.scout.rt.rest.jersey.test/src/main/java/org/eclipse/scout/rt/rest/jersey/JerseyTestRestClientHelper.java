@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.client.AbstractRestClientHelper;
 import org.eclipse.scout.rt.rest.client.proxy.ErrorDoRestClientExceptionTransformer;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
-import org.glassfish.jersey.apache.connector.ClosingApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 
 @ApplicationScoped
@@ -53,7 +52,6 @@ public class JerseyTestRestClientHelper extends AbstractRestClientHelper {
   @Override
   protected Configuration createClientConfig() {
     ClientConfig clientConfig = new ClientConfig();
-    clientConfig.connectorProvider(new ClosingApacheConnectorProvider());
     clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, createTestingConnectionManager());
     clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, true); // FIXME [8.0] pbz: Check test failure at CI Jenkins with abr
     return clientConfig;
