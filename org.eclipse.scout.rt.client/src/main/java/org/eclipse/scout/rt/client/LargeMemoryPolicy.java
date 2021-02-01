@@ -30,7 +30,7 @@ public class LargeMemoryPolicy extends AbstractMemoryPolicy {
   //cache all search form contents
   private final Map<String/*pageFormIdentifier*/, SearchFormState> m_searchFormCache;
   private final Map<String /*pageTableIdentifier*/, byte[]> m_tableUserFilterState;
-  private long m_maxMemThreshold = 90L;
+  private long m_maxMemThreshold = 100L;
 
   public LargeMemoryPolicy() {
     m_searchFormCache = new HashMap<>();
@@ -88,6 +88,9 @@ public class LargeMemoryPolicy extends AbstractMemoryPolicy {
 
   @Override
   public void afterOutlineSelectionChanged(final IDesktop desktop) {
+    if (getMaxMemThreshold() >= 100) {
+      return;
+    }
     long memTotal = Runtime.getRuntime().totalMemory();
     long memUsed = (memTotal - Runtime.getRuntime().freeMemory());
     long memMax = Runtime.getRuntime().maxMemory();
