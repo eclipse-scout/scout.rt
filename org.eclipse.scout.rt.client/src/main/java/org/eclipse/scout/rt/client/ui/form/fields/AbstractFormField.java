@@ -453,6 +453,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * @return the x position in the grid.
    * @see #getGridData(), {@link #getGridDataHints()}
    */
+  @SuppressWarnings("JavaDoc")
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(90)
   protected int getConfiguredGridX() {
@@ -472,6 +473,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * @return the y position in the grid.
    * @see #getGridData(), {@link #getGridDataHints()}
    */
+  @SuppressWarnings("JavaDoc")
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(95)
   protected int getConfiguredGridY() {
@@ -1485,7 +1487,8 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   public final void checkSaveNeeded() {
     if (isInitConfigDone()) {
       try {
-        propertySupport.setPropertyBool(PROP_SAVE_NEEDED, isTouched() || interceptIsSaveNeeded());
+        boolean saveNeeded = isTouched() || interceptIsSaveNeeded();
+        propertySupport.setPropertyBool(PROP_SAVE_NEEDED, saveNeeded);
       }
       catch (RuntimeException | PlatformError e) {
         BEANS.get(ExceptionHandler.class).handle(e);
