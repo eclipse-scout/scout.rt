@@ -152,7 +152,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    * Subclasses can override this method. Default is {@code null}.
    *
    * @return a form type token
-   * @see {@link #startDefaultDetailForm(IForm)} for details how the form gets started
+   * @see {@link #startDefaultDetailForm()} for details how the form gets started
    */
   @ConfigProperty(ConfigProperty.FORM)
   @Order(130)
@@ -388,7 +388,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public void releaseUnusedPages() {
-    final Set<IPage> preservationSet = new HashSet<>();
+    final Set<ITreeNode> preservationSet = new HashSet<>();
     IPage<?> oldSelection = (IPage) getSelectedNode();
     IPage<?> p = oldSelection;
     if (p != null) {
@@ -397,6 +397,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         p = p.getParentPage();
       }
     }
+    preservationSet.add(getRootNode());
     IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
       @Override
       public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
