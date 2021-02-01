@@ -88,7 +88,7 @@ export default class FormTableControl extends TableControl {
   }
 
   onControlContainerOpened() {
-    if (!this.form.rendered) {
+    if (!this.form || !this.form.rendered) {
       return;
     }
     this.form.renderInitialFocus();
