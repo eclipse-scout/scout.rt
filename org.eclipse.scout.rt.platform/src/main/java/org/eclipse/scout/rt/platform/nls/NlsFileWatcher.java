@@ -51,7 +51,9 @@ public class NlsFileWatcher {
 
   @PreDestroy
   public void destroy() throws IOException {
-    m_watcher.close();
+    if (m_watcher != null) {
+      m_watcher.close();
+    }
   }
 
   /**
