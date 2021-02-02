@@ -216,6 +216,24 @@ export default class SmartColumn extends Column {
   }
 
   /**
+   * @override
+   */
+  updateCellFromEditor(row, field) {
+    // Always set the text even if there is no error and the value will be set (by the super call).
+    // This prevents flickering when display text is updated async.
+    // In most of the cases the text computed by the column will be the same as the one from the field.
+    if (!this.errorStatus) {
+      let cell = this.cell(row);
+      if (cell.value === field.value) {
+        // If value did not change do nothing (important if column formats the value in a different way than the field)
+        return;
+      }
+      this.setCellText(row, field.displayText);
+    }
+    super.updateCellFromEditor(row, field);
+  }
+
+  /**
    * Since we don't know the type of the key from the lookup-row we must deal with numeric and string types here.
    */
   _hasCellValue(cell) {
@@ -230,5 +248,17 @@ export default class SmartColumn extends Column {
     super.setCellValue(row, value);
     let cell = this.cell(row);
     cell.setSortCode(this._calculateCellSortCode(cell));
+  }
+
+  setCellText(row, text, cell) {
+    if (!cell) {
+      cell = this.cell(row);
+    }
+    if (cell.text === text) {
+      // Break if text did not change.
+      // This should actually be in Column.js but some columns never use a text but still need updateRows to be called (e.g. BooleanColumn)
+      return;
+    }
+    super.setCellText(row, text, cell);
   }
 }

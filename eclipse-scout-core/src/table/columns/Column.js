@@ -730,6 +730,15 @@ export default class Column {
     });
   }
 
+  updateCellFromEditor(row, field) {
+    this.setCellErrorStatus(row, field.errorStatus);
+    if (field.errorStatus) {
+      this.setCellText(row, field.displayText);
+    } else {
+      this.setCellValue(row, field.value);
+    }
+  }
+
   /**
    * Override this function to install a specific compare function on a column instance.
    * The default impl. installs a generic comparator working with less than and greater than.
