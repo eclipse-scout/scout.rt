@@ -3133,17 +3133,8 @@ export default class Table extends Widget {
   _updateCellFromEditor(cellEditorPopup, field, saveEditorValue) {
     saveEditorValue = scout.nvl(saveEditorValue, false);
     if (saveEditorValue) {
-      var column = cellEditorPopup.column;
-      var row = cellEditorPopup.row;
-      // Always update text even if value will be set to prevent flickering when display text is updated async.
-      // In most of the cases the text computed by the column will be the same as the one from the field.
-      this.setCellText(column, row, field.displayText);
-      // Always get the errorStatus from the editor
-      this.setCellErrorStatus(column, row, field.errorStatus);
-      if (!field.errorStatus) {
-        // Only update the cell value if there is no error
-        this.setCellValue(column, row, field.value);
-      }
+      let column = cellEditorPopup.column;
+      column.updateCellFromEditor(cellEditorPopup.row, field);
     }
     field.destroy();
   }

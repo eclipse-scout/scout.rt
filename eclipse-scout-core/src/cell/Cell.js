@@ -69,7 +69,7 @@ export default class Cell {
     this.text = text;
 
     // reset cached encodedText, so when encodedText() is called the next time
-    // will be set to the a new value
+    // it will be set to the a new value
     if (oldText !== this.text) {
       this._cachedEncodedText = null;
     }
