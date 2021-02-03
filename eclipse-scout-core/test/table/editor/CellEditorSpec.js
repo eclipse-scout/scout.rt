@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, keys, scout, StaticLookupCall, Widget} from '../../../src/index';
+import {Cell, keys, scout, StaticLookupCall, Status, Widget} from '../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '../../../src/testing/index';
 
 describe('CellEditor', () => {
@@ -225,6 +225,36 @@ describe('CellEditor', () => {
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
     });
 
+    it('copies the value to the field if cell was valid', () => {
+      let column = table.columns[0];
+      let row = table.rows[0];
+      column.setEditable(true);
+      column.setCellValue(row, 'valid value');
+      table.prepareCellEdit(column, row);
+      jasmine.clock().tick(0);
+      assertCellEditorIsOpen(table, column, row);
+      let field = table.cellEditorPopup.cell.field;
+      expect(field.value).toEqual('valid value');
+      expect(field.displayText).toEqual('valid value');
+      expect(field.errorStatus).toEqual(null);
+    });
+
+    it('copies the text and the error to the field if cell was invalid', () => {
+      let column = table.columns[0];
+      let row = table.rows[0];
+      column.setEditable(true);
+      column.setCellValue(row, 'valid value');
+      column.setCellText(row, 'invalid value');
+      column.setCellErrorStatus(row, Status.error('error'));
+      table.prepareCellEdit(column, row);
+      jasmine.clock().tick(0);
+      assertCellEditorIsOpen(table, column, row);
+      let field = table.cellEditorPopup.cell.field;
+      expect(field.value).toEqual(null);
+      expect(field.displayText).toEqual('invalid value');
+      expect(field.errorStatus.message).toEqual('error');
+    });
+
     it('triggers prepareCellEdit event', () => {
       let triggeredEvent;
       table.columns[0].setEditable(true);
@@ -315,6 +345,131 @@ describe('CellEditor', () => {
 
       table.completeCellEdit();
       expect(table.rows[0].cells[0].value).toBe('my new value');
+    });
+
+    it('copies the value to the cell if field was valid', () => {
+      table.columns[0].setEditable(true);
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick(0);
+      table.cellEditorPopup.cell.field.setValue('my new value');
+
+      table.completeCellEdit();
+      let cell = table.rows[0].cells[0];
+      expect(cell.value).toBe('my new value');
+      expect(cell.text).toBe('my new value');
+      expect(cell.errorStatus).toBe(null);
+      expect($('.tooltip').length).toBe(0);
+    });
+
+    it('copies the text and error to the cell if field was invalid', () => {
+      let column = table.columns[0];
+      let row = table.rows[0];
+      let cell = row.cells[0];
+      expect($('.tooltip').length).toBe(0);
+
+      column.setEditable(true);
+      column.setCellValue(row, 'valid value');
+      table.prepareCellEdit(column, row);
+      jasmine.clock().tick(0);
+
+      let field = table.cellEditorPopup.cell.field;
+      field.setValidator(value => {
+        throw 'Validation failed';
+      });
+      field.setValue('invalid value');
+      expect(field.value).toBe('valid value');
+      expect(field.errorStatus.message).toBe('Validation failed');
+      expect(field.displayText).toBe('invalid value');
+      table.completeCellEdit();
+      expect(cell.value).toBe('valid value');
+      expect(cell.text).toBe('invalid value');
+      expect(cell.errorStatus.message).toBe('Validation failed');
+      expect($('.tooltip').length).toBe(1);
+      expect($('.tooltip')).toContainText('Validation failed');
+    });
+
+    it('clears the error if value is now valid', () => {
+      let column = table.columns[0];
+      let row = table.rows[0];
+      let cell = row.cells[0];
+      expect($('.tooltip').length).toBe(0);
+
+      column.setEditable(true);
+      column.setCellValue(row, 'valid value');
+      table.prepareCellEdit(column, row);
+      jasmine.clock().tick(0);
+
+      let field = table.cellEditorPopup.cell.field;
+      field.setValidator(value => {
+        throw 'Validation failed';
+      });
+      field.setValue('invalid value');
+      expect(field.value).toBe('valid value');
+      expect(field.errorStatus.message).toBe('Validation failed');
+      expect(field.displayText).toBe('invalid value');
+      table.completeCellEdit();
+      expect(cell.value).toBe('valid value');
+      expect(cell.text).toBe('invalid value');
+      expect(cell.errorStatus.message).toBe('Validation failed');
+      expect($('.tooltip').length).toBe(1);
+      expect($('.tooltip')).toContainText('Validation failed');
+
+      // Second time -> make it valid
+      table.prepareCellEdit(column, row);
+      jasmine.clock().tick(0);
+      field = table.cellEditorPopup.cell.field;
+      field.setValidator(null);
+      field.setValue('new valid value');
+      expect(field.value).toBe('new valid value');
+      expect(field.errorStatus).toBe(null);
+      expect(field.displayText).toBe('new valid value');
+      table.completeCellEdit();
+      expect(cell.value).toBe('new valid value');
+      expect(cell.text).toBe('new valid value');
+      expect(cell.errorStatus).toBe(null);
+      expect($('.tooltip').length).toBe(0);
+    });
+
+    it('clears the error if value is now valid even when changed to the original value', () => {
+      let column = table.columns[0];
+      let row = table.rows[0];
+      let cell = row.cells[0];
+      expect($('.tooltip').length).toBe(0);
+
+      column.setEditable(true);
+      column.setCellValue(row, 'valid value');
+      table.prepareCellEdit(column, row);
+      jasmine.clock().tick(0);
+
+      let field = table.cellEditorPopup.cell.field;
+      field.setValidator(value => {
+        throw 'Validation failed';
+      });
+      field.setValue('invalid value');
+      expect(field.value).toBe('valid value');
+      expect(field.errorStatus.message).toBe('Validation failed');
+      expect(field.displayText).toBe('invalid value');
+      table.completeCellEdit();
+      expect(cell.value).toBe('valid value');
+      expect(cell.text).toBe('invalid value');
+      expect(cell.errorStatus.message).toBe('Validation failed');
+      expect($('.tooltip').length).toBe(1);
+      expect($('.tooltip')).toContainText('Validation failed');
+
+      // Second time -> make it valid
+      table.prepareCellEdit(column, row);
+      jasmine.clock().tick(0);
+      field = table.cellEditorPopup.cell.field;
+      field.setValidator(null);
+      field.setValue('valid value'); // Same as at the beginning
+      expect(field.value).toBe('valid value');
+      expect(field.errorStatus).toBe(null);
+      expect(field.displayText).toBe('valid value');
+      table.completeCellEdit();
+      expect(cell.value).toBe('valid value');
+      expect(cell.text).toBe('valid value');
+      expect(cell.errorStatus).toBe(null);
+      expect($('.tooltip').length).toBe(0);
     });
 
     it('does not reopen the editor again', () => {
@@ -487,7 +642,7 @@ describe('CellEditor', () => {
       expect($tooltip.length).toBe(1);
     });
 
-    it('does not sho a tooltip if field has no error', () => {
+    it('does not show a tooltip if field has no error', () => {
       cell0_0.editable = true;
       $tooltip = $('.tooltip');
 

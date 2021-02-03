@@ -533,15 +533,14 @@ export default class Column {
     // value may have the wrong type (e.g. text instead of date) -> ensure type
     value = this._parseValue(value);
 
-    // do not trigger value change when value did not change
-    if (cell.value === value) {
-      return;
+    // Only update row status when value changed.
+    // Cell text needs to be updated even if value did not change
+    // (text may cause an invalid value that won't be saved on the cell, reverting to the valid value needs to update the text again)
+    if (cell.value !== value && row.status === TableRow.Status.NON_CHANGED) {
+      row.status = TableRow.Status.UPDATED;
     }
 
     cell.setValue(value);
-    if (row.status === TableRow.Status.NON_CHANGED) {
-      row.status = TableRow.Status.UPDATED;
-    }
     this._updateCellText(row, cell);
   }
 
@@ -715,10 +714,23 @@ export default class Column {
 
   /**
    * Depending on the type of column the editor may need to be initialized differently.
-   * The default implementation calls setValue on the field.
+   * The default implementation either copies the value to the field if the field has no error or copies the text and error status if it has an error.
    */
   _initEditorField(field, cell) {
+    if (cell.errorStatus) {
+      this._updateEditorFromInvalidCell(field, cell);
+    } else {
+      this._updateEditorFromValidCell(field, cell)
+    }
+  }
+
+  _updateEditorFromValidCell(field, cell) {
     field.setValue(cell.value);
+  }
+
+  _updateEditorFromInvalidCell(field, cell) {
+    field.setErrorStatus(cell.errorStatus);
+    field.setDisplayText(cell.text);
   }
 
   _createEditor() {
@@ -731,12 +743,21 @@ export default class Column {
   }
 
   updateCellFromEditor(row, field) {
-    this.setCellErrorStatus(row, field.errorStatus);
     if (field.errorStatus) {
-      this.setCellText(row, field.displayText);
+      this._updateCellFromInvalidEditor(row, field);
     } else {
-      this.setCellValue(row, field.value);
+      this._updateCellFromValidEditor(row, field);
     }
+  }
+
+  _updateCellFromInvalidEditor(row, field) {
+    this.setCellErrorStatus(row, field.errorStatus);
+    this.setCellText(row, field.displayText);
+  }
+
+  _updateCellFromValidEditor(row, field) {
+    this.setCellErrorStatus(row, null);
+    this.setCellValue(row, field.value);
   }
 
   /**

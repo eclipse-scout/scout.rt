@@ -14,7 +14,6 @@ import {TableSpecHelper} from '../../../src/testing/index';
 describe('Column', () => {
   let session;
   let helper;
-  let locale;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -230,7 +229,7 @@ describe('Column', () => {
   });
 
   describe('textWrap', () => {
-    let table, model, $rows, $cells0, $cell0_0, $cell0_1;
+    let table, model, $rows, $cells0, $cell0_0;
 
     beforeEach(() => {
       model = helper.createModelFixture(2, 2);
