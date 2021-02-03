@@ -176,7 +176,7 @@ export default class SmartColumn extends Column {
    * which is not necessary, since the cell already contains text and value. This also avoids a problem
    * with multiple lookups running at once, see ticket 236960.
    */
-  _initEditorField(field, cell) {
+  _updateEditorFromValidCell(field, cell) {
     if (objects.isNullOrUndefined(cell.value)) {
       field.setValue(null);
       return;
@@ -215,25 +215,13 @@ export default class SmartColumn extends Column {
     return field;
   }
 
-  /**
-   * @override
-   */
-  updateCellFromEditor(row, field) {
-    this.setCellErrorStatus(row, field.errorStatus);
-    if (field.errorStatus) {
-      this.setCellText(row, field.displayText);
-    } else {
-      let cell = this.cell(row);
-      if (cell.value === field.value) {
-        // If value did not change do nothing (important if column formats the value in a different way than the field)
-        return;
-      }
-      // Always set the text even the value will be set
-      // This prevents flickering when display text is updated async.
-      // In most of the cases the text computed by the column will be the same as the one from the field.
-      this.setCellText(row, field.displayText);
-      this.setCellValue(row, field.value);
-    }
+  _updateCellFromValidEditor(row, field) {
+    this.setCellErrorStatus(row, null);
+    // Always set the text even if the value will be set
+    // This prevents flickering when display text is updated async.
+    // In most of the cases the text computed by the column will be the same as the one from the field.
+    this.setCellText(row, field.displayText);
+    this.setCellValue(row, field.value);
   }
 
   /**
