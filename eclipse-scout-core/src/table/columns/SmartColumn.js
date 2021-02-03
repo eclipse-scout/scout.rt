@@ -219,18 +219,21 @@ export default class SmartColumn extends Column {
    * @override
    */
   updateCellFromEditor(row, field) {
-    // Always set the text even if there is no error and the value will be set (by the super call).
-    // This prevents flickering when display text is updated async.
-    // In most of the cases the text computed by the column will be the same as the one from the field.
-    if (!this.errorStatus) {
+    this.setCellErrorStatus(row, field.errorStatus);
+    if (field.errorStatus) {
+      this.setCellText(row, field.displayText);
+    } else {
       let cell = this.cell(row);
       if (cell.value === field.value) {
         // If value did not change do nothing (important if column formats the value in a different way than the field)
         return;
       }
+      // Always set the text even the value will be set
+      // This prevents flickering when display text is updated async.
+      // In most of the cases the text computed by the column will be the same as the one from the field.
       this.setCellText(row, field.displayText);
+      this.setCellValue(row, field.value);
     }
-    super.updateCellFromEditor(row, field);
   }
 
   /**
