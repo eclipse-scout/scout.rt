@@ -26,11 +26,13 @@ export function ensureColorScheme(colorScheme, tile) {
   } else if (typeof colorScheme === 'string') {
     // Split up colorScheme in two individual parts ("scheme" and "inverted").
     // This information is then used when rendering the color scheme.
-    if (strings.startsWith(colorScheme, ColorSchemeId.ALTERNATIVE)) {
+    if (strings.startsWith(colorScheme, ColorSchemeId.DEFAULT)) {
+      colorSchemeObj.scheme = ColorSchemeId.DEFAULT;
+    } else if (strings.startsWith(colorScheme, ColorSchemeId.ALTERNATIVE)) {
       colorSchemeObj.scheme = ColorSchemeId.ALTERNATIVE;
     } else if (strings.startsWith(colorScheme, ColorSchemeId.RAINBOW)) {
       colorSchemeObj.scheme = ColorSchemeId.RAINBOW;
-    } else if (!strings.startsWith(colorScheme, ColorSchemeId.DEFAULT)) {
+    } else {
       colorSchemeObj.scheme = strings.removeSuffix(colorScheme, '-inverted');
     }
     colorSchemeObj.inverted = strings.endsWith(colorScheme, '-inverted');

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,14 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  ChartJsRenderer,
-  ChartLayout,
-  FulfillmentChartRenderer,
-  SalesfunnelChartRenderer,
-  SpeedoChartRenderer,
-  VennChartRenderer
-} from '../index';
+import {ChartJsRenderer, ChartLayout, FulfillmentChartRenderer, SalesfunnelChartRenderer, SpeedoChartRenderer, VennChartRenderer} from '../index';
 import {arrays, colorSchemes, HtmlComponent, objects, Widget} from '@eclipse-scout/core';
 
 /**
@@ -126,7 +119,8 @@ export default class Chart extends Widget {
   _renderData() {
     this.updateChart({
       requestAnimation: true,
-      debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
+      debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT,
+      onlyUpdateData: true
     });
   }
 
@@ -165,6 +159,18 @@ export default class Chart extends Widget {
       return;
     }
 
+    // check if only data has changed
+    let oldConfigWithNewData = $.extend(true, {}, this.config);
+    oldConfigWithNewData.data = config.data;
+    if (objects.equalsRecursive(oldConfigWithNewData, config)) {
+      this._setProperty('config', config);
+      if (this.rendered) {
+        this._renderConfig(true);
+      }
+      this.setCheckedItems(this.checkedItems);
+      return;
+    }
+
     if (this.rendered && this.config && this.config.type) {
       this.$container.removeClass(this.config.type + '-chart');
     }
@@ -173,14 +179,15 @@ export default class Chart extends Widget {
     this._updateChartRenderer();
   }
 
-  _renderConfig() {
+  _renderConfig(onlyUpdateData) {
     this._renderClickable();
     this._renderCheckable();
     this._renderChartType();
     this._renderColorScheme();
     this.updateChart({
       requestAnimation: true,
-      debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
+      debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT,
+      onlyUpdateData: onlyUpdateData
     });
   }
 
@@ -238,6 +245,7 @@ export default class Chart extends Widget {
    * @param opts
    *   [requestAnimation] default false
    *   [debounce] default 0
+   *   [onlyUpdateData] default false
    */
   updateChart(opts) {
     opts = opts || {};
@@ -271,7 +279,9 @@ export default class Chart extends Widget {
     function updateChartImpl() {
       this._updateChartTimeoutId = null;
       this._updateChartOpts = null;
-      if (this.chartRenderer) {
+      if (opts.onlyUpdateData && this.chartRenderer && this.chartRenderer.isDataUpdatable()) {
+        this.chartRenderer.updateData(opts.requestAnimation);
+      } else if (this.chartRenderer) {
         this.chartRenderer.remove(this.chartRenderer.shouldAnimateRemoveOnUpdate(opts), chartAnimationStopping => {
           if (this.removing || chartAnimationStopping) {
             // prevent exceptions trying to render after navigated away, and do not update/render while a running animation is being stopped
