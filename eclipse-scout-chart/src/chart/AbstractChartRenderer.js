@@ -116,6 +116,31 @@ export default class AbstractChartRenderer {
 
   /**
    * @param requestAnimation
+   *          Whether animations should be used while updating the chart. Note that his
+   *          property is ignored when chart.config.options.animation.duration is <code>0</code>!
+   */
+  updateData(requestAnimation) {
+    if (!this.rendered) {
+      this.render(requestAnimation);
+      return;
+    }
+    this.animationDuration = requestAnimation ? this.chart.config.options.animation.duration : 0;
+    if (!this.validate() || !this.isDataUpdatable()) {
+      return;
+    }
+    this._updateData();
+  }
+
+  _updateData() {
+    // Override in subclasses
+  }
+
+  isDataUpdatable() {
+    return false;
+  }
+
+  /**
+   * @param requestAnimation
    *          Whether animations should be used while removing the chart. Note that his
    *          property is ignored when chart.config.options.animation.duration is <code>0</code>!
    */

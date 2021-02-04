@@ -233,6 +233,153 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this.chartJs.update();
   }
 
+  _updateData() {
+    if (!this.chartJs) {
+      return;
+    }
+    let config = $.extend(true, {}, this.chart.config);
+    this._adjustConfig(config);
+
+    let hiddenDataIndices = [],
+      applyHiddenDatasetIndices = [];
+
+    let targetData = this.chartJs.config.data,
+      sourceData = config.data;
+
+    if (targetData && sourceData) {
+      // Transfer property from source object to target object:
+      // 1. If the property is not set on the target object, copy it from source.
+      // 2. If the property is not set on the source object, set it to undefined if setToUndefined = true. Otherwise empty the array if it is an array property or set it to undefined.
+      // 3. If the property is not an array on the source or the target object, copy the property from the source to the target object.
+      // 4. If the property is an array on both objects, do not update the array, but transfer the elements (update elements directly, use pop(), push() or splice() if one array is longer than the other).
+      //    This needs to be done to have a smooth animation from the old to the new state and not a complete rebuild of the chart.
+      let transferProperty = (source, target, property, setToUndefined) => {
+        if (!source || !target || !property) {
+          return;
+        }
+        // 1. Property not set on target
+        if (!target[property]) {
+          target[property] = source[property];
+          return;
+        }
+        // 2. Property not set on source
+        if (!source[property]) {
+          if (setToUndefined) {
+            // Set to undefined if setToUndefined = true
+            target[property] = undefined;
+            return;
+          }
+          // Empty array
+          if (Array.isArray(target[property])) {
+            target[property].splice(0);
+            return;
+          }
+          // Otherwise set to undefined
+          target[property] = undefined;
+          return;
+        }
+        // 3. Property is not an array on the source or the target object
+        if (!Array.isArray(source[property]) || !Array.isArray(target[property])) {
+          target[property] = source[property];
+          return;
+        }
+        // 4. Property is an array on the source and the target object
+        for (let i = 0; i < Math.min(source[property].length, target[property].length); i++) {
+          // Update elements directly
+          target[property][i] = source[property][i];
+        }
+        let targetLength = target[property].length,
+          sourceLength = source[property].length;
+        if (targetLength > sourceLength) {
+          // Target array is longer than source array
+          target[property].splice(sourceLength);
+        } else if (targetLength < sourceLength) {
+          // Source array is longer than target array
+          target[property].push(...source[property].splice(targetLength));
+        }
+      };
+
+      transferProperty(sourceData, targetData, 'labels');
+
+      if (!targetData.datasets) {
+        targetData.datasets = [];
+      }
+      if (!sourceData.datasets) {
+        sourceData.datasets = [];
+      }
+
+      // If the chart is a pie-, doughnut- or polar-area-chart, not complete datasets are hidden but elements of each dataset.
+      // Store these hidden data indices to apply them to newly added datasets.
+      if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA) && targetData.datasets.length) {
+        let meta = this.chartJs.getDatasetMeta(0);
+        if (meta && meta.data && Array.isArray(meta.data)) {
+          meta.data.forEach((dataMeta, idx) => {
+            if (dataMeta.hidden) {
+              hiddenDataIndices.push(idx);
+            }
+          });
+        }
+      }
+
+      for (let i = 0; i < Math.min(sourceData.datasets.length, targetData.datasets.length); i++) {
+        let targetDataset = targetData.datasets[i],
+          sourceDataset = sourceData.datasets[i];
+
+        targetDataset.label = sourceDataset.label;
+        targetDataset.type = sourceDataset.type;
+
+        transferProperty(sourceDataset, targetDataset, 'data');
+
+        transferProperty(sourceDataset, targetDataset, 'backgroundColor', true);
+        transferProperty(sourceDataset, targetDataset, 'borderColor', true);
+        transferProperty(sourceDataset, targetDataset, 'hoverBackgroundColor', true);
+        transferProperty(sourceDataset, targetDataset, 'hoverBorderColor', true);
+        transferProperty(sourceDataset, targetDataset, 'legendColor', true);
+        transferProperty(sourceDataset, targetDataset, 'pointHoverBackgroundColor', true);
+      }
+      let targetLength = targetData.datasets.length,
+        sourceLength = sourceData.datasets.length;
+      if (targetLength > sourceLength) {
+        targetData.datasets.splice(sourceLength);
+      } else if (targetLength < sourceLength) {
+        targetData.datasets.push(...sourceData.datasets.splice(targetLength));
+        applyHiddenDatasetIndices = arrays.init(sourceLength - targetLength).map((elem, idx) => targetLength + idx);
+      }
+    } else {
+      this.chartJs.config.data = sourceData;
+    }
+
+    $.extend(true, this.chartJs.config, {
+      options: {
+        animation: {
+          duration: this.animationDuration
+        }
+      }
+    });
+    this.chartJs.update();
+
+    // Apply hidden data indices (only set for pie-, doughnut- or polar-area-chart)
+    if (hiddenDataIndices.length && applyHiddenDatasetIndices.length) {
+      applyHiddenDatasetIndices.forEach(datasetIndex => {
+        let meta = this.chartJs.getDatasetMeta(datasetIndex);
+        if (meta && meta.data && Array.isArray(meta.data)) {
+          hiddenDataIndices
+            .filter(dataIndex => meta.data.length > dataIndex)
+            .forEach(dataIndex => {
+              meta.data[dataIndex].hidden = true;
+            });
+        }
+      });
+    }
+
+    this._adjustSize(this.chartJs.config, this.chartJs.chartArea);
+    this.chartJs.update();
+  }
+
+  isDataUpdatable() {
+    return true;
+  }
+
   _updateChart(animated) {
     let config = this.chartJs.config;
     this._adjustColors(config);
