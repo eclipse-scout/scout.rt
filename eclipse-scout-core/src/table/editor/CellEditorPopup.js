@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorTabKeyStroke, FormField, graphics, Point, Popup, scout} from '../../index';
+import {CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorTabKeyStroke, events, FormField, graphics, Point, Popup, scout} from '../../index';
 import $ from 'jquery';
 
 export default class CellEditorPopup extends Popup {
@@ -48,7 +48,7 @@ export default class CellEditorPopup extends Popup {
   }
 
   /**
-   * @override Popup.js
+   * @override
    */
   _createCloseKeyStroke() {
     return new CellEditorCancelEditKeyStroke(this);
@@ -188,7 +188,27 @@ export default class CellEditorPopup extends Popup {
   }
 
   _onMouseDownOutside(event) {
+    let $clickedRow = $(event.target).closest('.table-row', this.table.$container[0]);
+    // noinspection JSIgnoredPromiseFromCall
     this.completeEdit();
+
+    // When the edit completes the edited row is updated and replaced with new html elements.
+    // When the user clicks on a cell of such a row that will be updated in order to complete the edit, the mouse down handler of the table won't be triggered.
+    // The mouse up handler will be triggered but does nothing because _$mouseDownRow is not set (which would be done by the mouse down handler).
+    // To make sure the new cell editor opens correctly we need to delegate the event to the new row that should receive the click to ensure table._onRowMouseDown is executed.
+    if ($clickedRow.length > 0 && !$clickedRow.isAttached()) {
+      this._propagateMouseDownToTableRow(event);
+    }
+  }
+
+  _propagateMouseDownToTableRow(event) {
+    let doc = this.table.$container.document(true);
+    let $target = $(doc.elementFromPoint(event.pageX, event.pageY));
+    let $clickedRow = $target.closest('.table-row', this.table.$container[0]);
+    if ($clickedRow.length === 0) {
+      return;
+    }
+    events.propagateEvent($target[0], event);
   }
 
   _onKeyStroke(event) {
@@ -201,6 +221,7 @@ export default class CellEditorPopup extends Popup {
     }
     // Make sure completeEdit is called immediately after calling acceptInput.
     // Otherwise the key stroke will be executed before completing the edit which prevents the input from being saved
+    // noinspection JSIgnoredPromiseFromCall
     this.completeEdit(false);
   }
 

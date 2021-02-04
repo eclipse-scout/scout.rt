@@ -153,6 +153,7 @@ export default class Popup extends Widget {
   /**
    * Override this method to provide a key stroke which closes the popup.
    * The default impl. returns a CloseKeyStroke which handles the ESC key.
+   * @return KeyStroke
    */
   _createCloseKeyStroke() {
     return new CloseKeyStroke(this);
