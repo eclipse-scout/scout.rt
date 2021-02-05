@@ -95,6 +95,98 @@ describe('BooleanColumn', () => {
       expect($checkbox).not.toHaveClass('checked');
     });
 
-  });
+    describe('setCellValue', () => {
+      it('rebuilds the cell', () => {
+        let model = helper.createModelSingleColumnByValues([true], 'BooleanColumn');
+        let table = helper.createTable(model);
+        let column0 = table.columns[0];
+        let updateRowCount = 0;
+        table.render();
 
+        expect(column0.cell(table.rows[0]).text).toBe('X');
+        expect(column0.cell(table.rows[0]).value).toBe(true);
+        expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).toHaveClass('checked');
+
+        table.on('rowsUpdated', event => updateRowCount++);
+        column0.setCellValue(table.rows[0], false);
+        expect(column0.cell(table.rows[0]).text).toBe('');
+        expect(column0.cell(table.rows[0]).value).toBe(false);
+        expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).not.toHaveClass('checked');
+        expect(updateRowCount).toBe(1);
+      });
+    });
+
+    describe('triStateEnabled', () => {
+      describe('onMouseUp', () => {
+        it('toggles the check box if column is editable', () => {
+          let model = helper.createModelSingleColumnByValues([true], 'BooleanColumn');
+          let table = helper.createTable(model);
+          let column0 = table.columns[0];
+          column0.setTriStateEnabled(true);
+          column0.setEditable(true);
+          let updateRowCount = 0;
+          table.render();
+
+          expect(column0.cell(table.rows[0]).text).toBe('X');
+          expect(column0.cell(table.rows[0]).value).toBe(true);
+          expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).toHaveClass('checked');
+
+          table.on('rowsUpdated', event => updateRowCount++);
+          column0.onMouseUp({}, table.rows[0].$row);
+          expect(column0.cell(table.rows[0]).text).toBe('?');
+          expect(column0.cell(table.rows[0]).value).toBe(null);
+          expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).toHaveClass('undefined');
+          expect(updateRowCount).toBe(1);
+
+          column0.onMouseUp({}, table.rows[0].$row);
+          expect(column0.cell(table.rows[0]).text).toBe('');
+          expect(column0.cell(table.rows[0]).value).toBe(false);
+          expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).not.toHaveClass('undefined checked');
+          expect(updateRowCount).toBe(2);
+
+          column0.onMouseUp({}, table.rows[0].$row);
+          expect(column0.cell(table.rows[0]).text).toBe('X');
+          expect(column0.cell(table.rows[0]).value).toBe(true);
+          expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).not.toHaveClass('undefined');
+          expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).toHaveClass('checked');
+          expect(updateRowCount).toBe(3);
+        });
+      });
+
+      describe('cell edit', () => {
+        it('updates the cell correctly', () => {
+          let model = helper.createModelSingleColumnByValues([true], 'BooleanColumn');
+          let table = helper.createTable(model);
+          let column0 = table.columns[0];
+          column0.setTriStateEnabled(true);
+          column0.setEditable(true);
+          let updateRowCount = 0;
+          table.render();
+
+          table.on('rowsUpdated', event => updateRowCount++);
+          table.prepareCellEdit(column0, table.rows[0]);
+          jasmine.clock().tick(0);
+          let field = table.cellEditorPopup.cell.field;
+          field.setValue(null);
+          expect(field.value).toBe(null);
+          table.completeCellEdit();
+          expect(column0.cell(table.rows[0]).text).toBe('?');
+          expect(column0.cell(table.rows[0]).value).toBe(null);
+          expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).toHaveClass('undefined');
+          expect(updateRowCount).toBe(1);
+
+          table.prepareCellEdit(column0, table.rows[0]);
+          jasmine.clock().tick(0);
+          field = table.cellEditorPopup.cell.field;
+          field.setValue(false);
+          expect(field.value).toBe(false);
+          table.completeCellEdit();
+          expect(column0.cell(table.rows[0]).text).toBe('');
+          expect(column0.cell(table.rows[0]).value).toBe(false);
+          expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).not.toHaveClass('undefined checked');
+          expect(updateRowCount).toBe(2);
+        });
+      });
+    });
+  });
 });

@@ -67,7 +67,7 @@ export default class TableSpecHelper {
     values = arrays.ensure(values);
     let cells = [];
     for (let i = 0; i < values.length; i++) {
-      cells[i] = this.createModelCell(values[i] + '', values[i]);
+      cells[i] = this.createModelCell(null, values[i]);
     }
     return this.createModelRow(id, cells);
   }

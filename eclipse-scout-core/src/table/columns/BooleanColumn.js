@@ -30,6 +30,9 @@ export default class BooleanColumn extends Column {
    * @override
    */
   _formatValue(value, row) {
+    if (this.triStateEnabled && value === null) {
+      return '?';
+    }
     return value ? 'X' : '';
   }
 
@@ -137,7 +140,8 @@ export default class BooleanColumn extends Column {
    */
   _createEditor(row) {
     return scout.create('CheckBoxField', {
-      parent: this.table
+      parent: this.table,
+      triStateEnabled: this.triStateEnabled
     });
   }
 
@@ -145,12 +149,20 @@ export default class BooleanColumn extends Column {
    * @override
    */
   cellTextForGrouping(row) {
-    var cell = this.cell(row);
+    let cell = this.cell(row);
     if (this.triStateEnabled && cell.value === null) {
       return this.session.text('ui.BooleanColumnGroupingMixed');
     } else if (cell.value === true) {
       return this.session.text('ui.BooleanColumnGroupingTrue');
     }
     return this.session.text('ui.BooleanColumnGroupingFalse');
+  }
+
+  setTriStateEnabled(triStateEnabled) {
+    if (this.triStateEnabled === triStateEnabled) {
+      return;
+    }
+    this.triStateEnabled = triStateEnabled;
+    this.table.rows.forEach(row => this._updateCellText(row, this.cell(row)));
   }
 }
