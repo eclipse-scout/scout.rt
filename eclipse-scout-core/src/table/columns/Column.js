@@ -724,7 +724,7 @@ export default class Column {
     if (cell.errorStatus) {
       this._updateEditorFromInvalidCell(field, cell);
     } else {
-      this._updateEditorFromValidCell(field, cell)
+      this._updateEditorFromValidCell(field, cell);
     }
   }
 
