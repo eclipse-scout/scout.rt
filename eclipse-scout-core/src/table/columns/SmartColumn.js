@@ -240,16 +240,4 @@ export default class SmartColumn extends Column {
     let cell = this.cell(row);
     cell.setSortCode(this._calculateCellSortCode(cell));
   }
-
-  setCellText(row, text, cell) {
-    if (!cell) {
-      cell = this.cell(row);
-    }
-    if (cell.text === text) {
-      // Break if text did not change.
-      // This should actually be in Column.js but some columns never use a text but still need updateRows to be called (e.g. BooleanColumn)
-      return;
-    }
-    super.setCellText(row, text, cell);
-  }
 }
