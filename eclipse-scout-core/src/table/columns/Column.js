@@ -563,6 +563,10 @@ export default class Column {
     if (!cell) {
       cell = this.cell(row);
     }
+    if (cell.text === text) {
+      // Don't trigger row update if text has not changed
+      return;
+    }
     cell.setText(text);
 
     // Don't update row while initializing (it is either added to the table later, or being added / updated right now)
