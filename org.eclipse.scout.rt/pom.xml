@@ -1047,9 +1047,6 @@
   </mailingLists>
 
   <scm>
-    <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git</connection>
-    <developerConnection>scm:git:ssh://${eclipse_gerrit_username}@git.eclipse.org:29418/scout/org.eclipse.scout.rt</developerConnection>
-    <tag>releases/11.0</tag>
     <url>http://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/</url>
   </scm>
 
