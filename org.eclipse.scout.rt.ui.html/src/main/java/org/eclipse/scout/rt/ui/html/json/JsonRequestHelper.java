@@ -14,16 +14,20 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.ui.html.UiException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,7 +161,12 @@ public class JsonRequestHelper {
     finally {
       interruption.restore();
     }
-    LOG.debug("Returned: {}", formatJsonForLogging(jsonText));
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Returned: {}", formatJsonForLogging(jsonText));
+    }
+    else if (LOG.isDebugEnabled()) {
+      LOG.debug("Returned: {}", formatJsonResponseForLogging(jsonResponse));
+    }
   }
 
   /**
@@ -166,8 +175,14 @@ public class JsonRequestHelper {
   public JSONObject readJsonRequest(final ServletRequest servletRequest) {
     try (Reader in = servletRequest.getReader()) {
       final String jsonData = IOUtility.readString(in);
-      LOG.debug("Received: {}", formatJsonForLogging(jsonData));
-      return (jsonData == null ? new JSONObject() : new JSONObject(jsonData));
+      if (LOG.isTraceEnabled()) { // log before json parsing (in case parsing fails)
+        LOG.trace("Received: {}", formatJsonForLogging(jsonData));
+      }
+      JSONObject jsonRequest = (jsonData == null ? new JSONObject() : new JSONObject(jsonData));
+      if (LOG.isDebugEnabled() && !LOG.isTraceEnabled()) {
+        LOG.debug("Received: {}", formatJsonRequestForLogging(jsonRequest));
+      }
+      return jsonRequest;
     }
     catch (RuntimeException | IOException e) {
       throw new UiException(e.getMessage(), e);
@@ -180,5 +195,92 @@ public class JsonRequestHelper {
       return jsonText.substring(0, 10000) + "...";
     }
     return jsonText;
+  }
+
+  /**
+   * @return the given json response formatted as string without user data (safe for logging)
+   */
+  protected String formatJsonResponseForLogging(JSONObject jsonResponse) {
+    List<String> list = new ArrayList<>();
+    if (jsonResponse.has(JsonResponse.PROP_SEQUENCE_NO)) {
+      list.add("#" + jsonResponse.get(JsonResponse.PROP_SEQUENCE_NO));
+    }
+    if (jsonResponse.has(JsonResponse.PROP_COMBINED)) {
+      list.add("combined: " + jsonResponse.get(JsonResponse.PROP_COMBINED));
+    }
+    if (jsonResponse.has(JsonResponse.PROP_ERROR)) {
+      list.add("error: " + jsonResponse.get(JsonResponse.PROP_ERROR));
+    }
+    if (jsonResponse.has(JsonResponse.PROP_STARTUP_DATA)) {
+      JSONObject o = jsonResponse.optJSONObject(JsonResponse.PROP_STARTUP_DATA);
+      list.add("startupData: " + (o == null ? "(invalid)" : "{" + o.length() + "}"));
+    }
+    if (jsonResponse.has(JsonResponse.PROP_EVENTS)) {
+      JSONArray a = jsonResponse.optJSONArray(JsonResponse.PROP_EVENTS);
+      list.add("events: " + (a == null ? "(invalid)" : formatEventTypesForLogging(a)));
+    }
+    if (jsonResponse.has(JsonResponse.PROP_ADAPTER_DATA)) {
+      JSONObject o = jsonResponse.optJSONObject(JsonResponse.PROP_ADAPTER_DATA);
+      list.add("adapterData: " + (o == null ? "(invalid)" : "{" + o.length() + "}"));
+    }
+    return CollectionUtility.format(list);
+  }
+
+  /**
+   * @return the given json request formatted as string without personal data or user input (safe for logging)
+   */
+  protected String formatJsonRequestForLogging(JSONObject jsonRequest) {
+    List<String> list = new ArrayList<>();
+    if (jsonRequest.has(JsonRequest.PROP_SEQUENCE_NO)) {
+      list.add("#" + jsonRequest.get(JsonRequest.PROP_SEQUENCE_NO));
+    }
+    if (jsonRequest.has(JsonRequest.PROP_ACK_SEQUENCE_NO)) {
+      list.add("#ACK: " + jsonRequest.get(JsonRequest.PROP_ACK_SEQUENCE_NO));
+    }
+    if (jsonRequest.has(JsonRequest.PROP_STARTUP)) {
+      list.add(JsonRequest.PROP_STARTUP + ": " + jsonRequest.get(JsonRequest.PROP_STARTUP));
+    }
+    if (jsonRequest.has(JsonRequest.PROP_UNLOAD)) {
+      list.add(JsonRequest.PROP_UNLOAD + ": " + jsonRequest.get(JsonRequest.PROP_UNLOAD));
+    }
+    if (jsonRequest.has(JsonRequest.PROP_LOG)) {
+      list.add(JsonRequest.PROP_LOG + ": " + jsonRequest.get(JsonRequest.PROP_LOG));
+    }
+    if (jsonRequest.has(JsonRequest.PROP_POLL)) {
+      list.add(JsonRequest.PROP_POLL + ": " + jsonRequest.get(JsonRequest.PROP_POLL));
+    }
+    if (jsonRequest.has(JsonRequest.PROP_CANCEL)) {
+      list.add(JsonRequest.PROP_CANCEL + ": " + jsonRequest.get(JsonRequest.PROP_CANCEL));
+    }
+    if (jsonRequest.has(JsonRequest.PROP_PING)) {
+      list.add(JsonRequest.PROP_PING + ": " + jsonRequest.get(JsonRequest.PROP_PING));
+    }
+    if (jsonRequest.has(JsonRequest.PROP_SYNC_RESPONSE_QUEUE)) {
+      list.add(JsonRequest.PROP_SYNC_RESPONSE_QUEUE + ": " + jsonRequest.get(JsonRequest.PROP_SYNC_RESPONSE_QUEUE));
+    }
+    if (jsonRequest.has(JsonRequest.PROP_EVENTS)) {
+      JSONArray a = jsonRequest.optJSONArray(JsonRequest.PROP_EVENTS);
+      list.add("events: " + (a == null ? "(invalid)" : formatEventTypesForLogging(a)));
+    }
+    if (jsonRequest.has(JsonRequest.PROP_UI_SESSION_ID)) {
+      list.add("uiSessionId: " + jsonRequest.get(JsonRequest.PROP_UI_SESSION_ID));
+    }
+    return CollectionUtility.format(list);
+  }
+
+  protected String formatEventTypesForLogging(JSONArray events) {
+    List<String> types = new ArrayList<>();
+    if (events != null) {
+      for (int i = 0; i < events.length(); i++) {
+        JSONObject event = events.optJSONObject(i);
+        if (event != null && event.has(JsonEvent.TYPE)) {
+          types.add(event.get(JsonEvent.TYPE) + "");
+        }
+        else {
+          types.add("?");
+        }
+      }
+    }
+    return "[" + CollectionUtility.format(types) + "]";
   }
 }
