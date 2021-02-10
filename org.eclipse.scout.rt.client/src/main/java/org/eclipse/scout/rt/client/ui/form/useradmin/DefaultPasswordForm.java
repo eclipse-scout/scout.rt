@@ -29,6 +29,8 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
 
@@ -181,9 +183,7 @@ public class DefaultPasswordForm extends AbstractForm {
       }
       IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
       svc.resetPassword(getUserId(), getNewPasswordField().getValue().toCharArray());
-      //owasp: reset session
-      IClientSession session = (IClientSession) ISession.CURRENT.get();
-      ModelJobs.schedule(() -> session.stop(), ModelJobs.newInput(ClientRunContexts.empty().withSession(session, false)));
+      resetSessionIfCurrentUser(svc);
     }
   }
 
@@ -195,9 +195,18 @@ public class DefaultPasswordForm extends AbstractForm {
       }
       IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
       svc.changePassword(getUserId(), getOldPasswordField().getValue().toCharArray(), getNewPasswordField().getValue().toCharArray());
-      //owasp: reset session
-      IClientSession session = (IClientSession) ISession.CURRENT.get();
-      ModelJobs.schedule(() -> session.stop(), ModelJobs.newInput(ClientRunContexts.empty().withSession(session, false)));
+      resetSessionIfCurrentUser(svc);
     }
   }
+
+  protected void resetSessionIfCurrentUser(IPasswordManagementService svc) {
+    //owasp: reset session
+    IClientSession session = (IClientSession) ISession.CURRENT.get();
+    String userName = svc.getUsernameFor(getUserId());
+    String myNameIs = BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
+    if (myNameIs.equals(userName)) {
+      ModelJobs.schedule((IRunnable) session::stop, ModelJobs.newInput(ClientRunContexts.empty().withSession(session, false)));
+    }
+  }
+
 }

@@ -56,8 +56,6 @@ public abstract class AbstractPasswordManagementService implements IPasswordMana
    */
   protected abstract void checkAccess(String userId, char[] password);
 
-  protected abstract String getUsernameFor(String userId);
-
   /**
    * @return the previous passwords of the user
    */

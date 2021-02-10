@@ -49,4 +49,5 @@ public interface IPasswordManagementService extends IService {
    */
   void resetPassword(String userId, char[] newPassword);
 
+  public String getUsernameFor(String userId);
 }
