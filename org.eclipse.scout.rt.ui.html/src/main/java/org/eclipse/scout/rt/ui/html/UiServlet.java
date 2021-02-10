@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.PathValidator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.authentication.ServletFilterHelper;
@@ -241,9 +242,6 @@ public class UiServlet extends AbstractHttpServlet {
 
     long start = System.nanoTime();
     try {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Request started");
-      }
       if (!PathValidator.isValid(req.getPathInfo())) {
         LOG.info("Request with invalid path detected: '{}'. Parent paths are not allowed by default. To change this behavior replace {}.", req.getPathInfo(), PathValidator.class);
         resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -265,7 +263,9 @@ public class UiServlet extends AbstractHttpServlet {
     }
     finally {
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Request completed in {} ms", StringUtility.formatNanos(System.nanoTime() - start));
+        LOG.debug("[{}] {} {} took {} ms", resp.getStatus(), req.getMethod(),
+            StringUtility.join("?", IOUtility.urlDecode(req.getRequestURL().toString()), IOUtility.urlDecode(req.getQueryString())),
+            StringUtility.formatNanos(System.nanoTime() - start));
       }
     }
   }
