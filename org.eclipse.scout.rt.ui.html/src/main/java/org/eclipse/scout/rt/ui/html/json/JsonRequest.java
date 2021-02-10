@@ -29,13 +29,13 @@ public class JsonRequest {
    */
   public static final ThreadLocal<JsonRequest> CURRENT = new ThreadLocal<>();
 
-  private static final String PROP_STARTUP = "startup";
-  private static final String PROP_UNLOAD = "unload";
-  private static final String PROP_LOG = "log";
-  private static final String PROP_POLL = "pollForBackgroundJobs";
-  private static final String PROP_CANCEL = "cancel";
-  private static final String PROP_PING = "ping";
-  private static final String PROP_SYNC_RESPONSE_QUEUE = "syncResponseQueue";
+  public static final String PROP_STARTUP = "startup";
+  public static final String PROP_UNLOAD = "unload";
+  public static final String PROP_LOG = "log";
+  public static final String PROP_POLL = "pollForBackgroundJobs";
+  public static final String PROP_CANCEL = "cancel";
+  public static final String PROP_PING = "ping";
+  public static final String PROP_SYNC_RESPONSE_QUEUE = "syncResponseQueue";
 
   public static final String PROP_UI_SESSION_ID = "uiSessionId";
   public static final String PROP_EVENTS = "events";
@@ -153,7 +153,7 @@ public class JsonRequest {
     /**
      * Returns the <code>enum constant</code> which represents the given {@link JSONObject}.
      */
-    private static RequestType valueOf(JSONObject request) {
+    public static RequestType valueOf(JSONObject request) {
       if (request.has(PROP_PING)) {
         return PING_REQUEST;
       }
