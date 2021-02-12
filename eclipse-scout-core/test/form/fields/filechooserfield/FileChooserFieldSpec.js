@@ -52,6 +52,16 @@ describe('FileChooserField', function() {
       expect(field.value).toBe(null);
       expect(field.displayText).toBe('');
     });
+
+    // Test for ticket #288702. Value had wrong type 'string' after clear() has been called.
+    // Thus an error status has been displayed for no reason.
+    it('uses proper value type after clear() has been called', () => {
+      field.render();
+      field.setDisplayText('unicorn-website-design.zip');
+      expect(field.errorStatus).toBe(null);
+      field.clear();
+      expect(field.errorStatus).toBe(null);
+    });
   });
 
   describe('maximumUploadSize', function() {

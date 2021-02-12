@@ -10,13 +10,15 @@
  */
 import {arrays, FileChooserFieldBrowseKeyStroke, FileChooserFieldDeleteKeyStroke, FileInput, objects, scout, ValueField} from '../../../index';
 
+/**
+ * The <code>value</code> of the FormChooserField is a <code>File</code> object.
+ */
 export default class FileChooserField extends ValueField {
 
   constructor() {
     super();
 
     this.fileInput = null;
-
     this.acceptTypes = null;
     this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
   }
@@ -157,4 +159,13 @@ export default class FileChooserField extends ValueField {
   _formatValue(value) {
     return !value ? '' : value.name;
   }
+
+  _parseValue(displayText) {
+    if (!displayText) {
+      return null;
+    }
+    let files = this.fileInput.files;
+    return files && files.length ? files[0] : null;
+  }
+
 }
