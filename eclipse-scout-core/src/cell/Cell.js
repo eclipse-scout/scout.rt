@@ -76,6 +76,10 @@ export default class Cell {
     }
   }
 
+  setIconId(iconId) {
+    this.iconId = iconId;
+  }
+
   encodedText() {
     if (!this._cachedEncodedText) {
       // Encode text and cache it, encoding is expensive

@@ -47,6 +47,11 @@ export default class IconColumn extends Column {
     return cssClass;
   }
 
+  setCellValue(row, value) {
+    super.setCellValue(row, value);
+    this.setCellIconId(row, this.cell(row).value);
+  }
+
   /**
    * @override
    */

@@ -584,6 +584,17 @@ export default class Column {
     cell.setErrorStatus(errorStatus);
   }
 
+  setCellIconId(row, iconId) {
+    let cell = this.cell(row);
+    if (cell.iconId === iconId) {
+      return;
+    }
+    cell.setIconId(iconId);
+    if (row.initialized) {
+      this.table.updateRow(row);
+    }
+  }
+
   setHorizontalAlignment(hAlign) {
     if (this.horizontalAlignment === hAlign) {
       return;

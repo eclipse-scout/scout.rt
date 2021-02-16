@@ -11,12 +11,9 @@
 import {dates} from '../../../src/index';
 import {TableSpecHelper} from '../../../src/testing/index';
 
-/* global LocaleSpecHelper */
-/* global linkWidgetAndAdapter */
 describe('DateColumn', () => {
   let session;
   let helper;
-  let locale;
 
   beforeEach(() => {
     setFixtures(sandbox());
