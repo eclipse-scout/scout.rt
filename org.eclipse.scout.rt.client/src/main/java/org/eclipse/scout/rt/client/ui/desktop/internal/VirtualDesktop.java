@@ -255,7 +255,8 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void dataChanged(Object... dataTypes) {
-    throw createUnsupportedOperationException();
+    // Session is registered for notifications before fully initialized, resulting in notification handlers being executed and maybe causing a data changed event on IDesktop.
+    // If the VirtualDesktop is still in place these events are ignored (not yet relevant).
   }
 
   @Override
