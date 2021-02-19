@@ -27,6 +27,10 @@
   <description>Eclipse Scout RT</description>
 
   <modules>
+    <module>../scout-helloworld-app</module>
+    <module>../scout-jaxws-module</module>
+    <module>../scout-hellojs-app</module>
+
     <module>../org.eclipse.scout.json</module>
     <module>../org.eclipse.scout.rt.platform</module>
     <module>../org.eclipse.scout.rt.platform.test</module>
