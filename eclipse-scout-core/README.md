@@ -9,7 +9,7 @@
   <a href="https://www.eclipse.org/legal/epl-v10.html" target="_blank" rel="noopener noreferrer"><img alt="NPM" src="https://img.shields.io/npm/l/@eclipse-scout/core"></a>
   <a href="https://www.npmjs.com/package/@eclipse-scout/core" target="_blank" rel="noopener noreferrer"><img alt="npm (scoped)" src="https://img.shields.io/npm/v/@eclipse-scout/core"></a>
   <a href="https://www.npmjs.com/package/@eclipse-scout/core" target="_blank" rel="noopener noreferrer"><img alt="node" src="https://img.shields.io/node/v/@eclipse-scout/core"></a>
-  <a href="https://www.eclipse.org/scout/" target="_blank" rel="noopener noreferrer"><img alt="Website" src="https://img.shields.io/website?url=https%3A%2F%2Fwww.eclipse.org%2Fscout%2F"></a>  
+  <a href="https://www.eclipse.org/scout/" target="_blank" rel="noopener noreferrer"><img alt="Website" src="https://img.shields.io/website?url=https%3A%2F%2Fwww.eclipse.org%2Fscout%2F"></a>
 </p>
 
 
@@ -25,7 +25,7 @@ Scout comes with multi-device support. With a single code base Scout application
 
 ![alt text][logo]
 
-[logo]: https://eclipsescout.github.io/10.0/images/bsi_crm_indigo.png "Scout Application"
+[logo]: https://eclipsescout.github.io/22.0/images/bsi_crm_indigo.png "Scout Application"
 
 Scout supports a modularization of applications into layers and slices. This helps to define a clean architecture for large applications. The layering is driven by the fact the Scout applications have a rendering part, a frontend part and a backend part. The modularization into slices is controlled by different business needs such as front office, back office, reporting or the administration of application users, roles and permissions.
 
