@@ -2709,6 +2709,10 @@ export default class Table extends Widget {
   }
 
   insertRows(rows) {
+    rows = arrays.ensure(rows);
+    if (rows.length === 0) {
+      return;
+    }
     let wasEmpty = this.rows.length === 0;
 
     // Update model
@@ -2773,6 +2777,10 @@ export default class Table extends Widget {
   }
 
   deleteRows(rows) {
+    rows = arrays.ensure(rows);
+    if (rows.length === 0) {
+      return;
+    }
     let invalidate,
       filterChanged,
       removedRows = [];
@@ -2883,6 +2891,10 @@ export default class Table extends Widget {
   }
 
   updateRows(rows) {
+    rows = arrays.ensure(rows);
+    if (rows.length === 0) {
+      return;
+    }
     if (this.updateBuffer.isBuffering()) {
       this.updateBuffer.buffer(rows);
       return;

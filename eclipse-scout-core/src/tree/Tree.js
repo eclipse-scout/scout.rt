@@ -2213,6 +2213,9 @@ export default class Tree extends Widget {
 
   insertNodes(nodes, parentNode) {
     nodes = arrays.ensure(nodes).slice();
+    if (nodes.length === 0) {
+      return;
+    }
     this._ensureTreeNodes(nodes);
     if (parentNode && !(parentNode instanceof TreeNode)) {
       throw new Error('parent has to be a tree node: ' + parentNode);
@@ -2283,6 +2286,9 @@ export default class Tree extends Widget {
 
   updateNodes(nodes) {
     nodes = arrays.ensure(nodes);
+    if (nodes.length === 0) {
+      return;
+    }
     nodes.forEach(function(updatedNode) {
       let propertiesChanged,
         oldNode = this.nodesMap[updatedNode.id];
@@ -2366,6 +2372,9 @@ export default class Tree extends Widget {
     let parentNodesToReindex = [];
     let topLevelNodesToReindex = [];
     nodes = arrays.ensure(nodes).slice(); // copy
+    if (nodes.length === 0) {
+      return;
+    }
 
     nodes.forEach(function(node) {
       let p = parentNode || node.parentNode;
