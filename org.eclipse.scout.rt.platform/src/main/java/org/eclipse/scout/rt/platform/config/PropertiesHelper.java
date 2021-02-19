@@ -31,9 +31,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -940,23 +940,30 @@ public class PropertiesHelper {
   }
 
   protected void collectMapEntriesFromEnvironment(String key, String namespace, Map<String, String> collector) {
-    String envKey = toPropertyKey(key, namespace).toString();
-    String keyValueFromEnv = lookupEnvironmentVariableValue(envKey);
-    if (StringUtility.hasText(keyValueFromEnv)) {
+    String propertyKey = toPropertyKey(key, namespace).toString();
+    String valueFromEnv = lookupEnvironmentVariableValue(propertyKey);
+    if (StringUtility.hasText(valueFromEnv)) {
+      IJsonPropertyReader jsonPropertyReader = BEANS.opt(IJsonPropertyReader.class);
+
+      if (jsonPropertyReader == null) {
+        throw new PlatformException("No {} instance found while trying to decode the value of property map '{}' from an environment variable. " +
+            "Make sure to provide an appropriate implementation or unset the respective environment variable.", IJsonPropertyReader.class.getSimpleName(), propertyKey);
+      }
+
       try {
-        JSONObject jsonObject = new JSONObject(keyValueFromEnv);
-        for (String mapKey : jsonObject.keySet()) {
-          Object mapValue = jsonObject.get(mapKey);
-          if (JSONObject.NULL.equals(mapValue)) {
-            collector.remove(mapKey);
+        Map<String, String> decodedValue = jsonPropertyReader.readJsonPropertyValue(valueFromEnv);
+
+        for (Entry<String, String> entry : decodedValue.entrySet()) {
+          if (entry.getValue() == null) {
+            collector.remove(entry.getKey());
           }
           else {
-            collector.put(mapKey, resolve((String) mapValue, PLACEHOLDER_PATTERN));
+            collector.put(entry.getKey(), resolve((String) entry.getValue(), PLACEHOLDER_PATTERN));
           }
         }
       }
-      catch (JSONException e) {
-        throw new IllegalArgumentException(String.format("Error parsing value of environment variable '%s' as JSON value", envKey), e);
+      catch (RuntimeException e) {
+        throw new IllegalArgumentException(String.format("Error parsing value of property map '%s' as JSON value from an environment variable.", propertyKey), e);
       }
     }
   }
