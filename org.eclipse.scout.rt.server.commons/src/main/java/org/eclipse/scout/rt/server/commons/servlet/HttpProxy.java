@@ -52,7 +52,7 @@ import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.InputStreamContent;
 
 /**
- * Forwards GET and POST requests to the given remote URL.
+ * Forwards HTTP requests to the given remote URL.
  */
 @Bean
 public class HttpProxy {
@@ -110,10 +110,10 @@ public class HttpProxy {
 
   /**
    * @return <code>true</code> if the request payload should be included in the proxy call, <code>false</code>
-   *         otherwise. The default implementation returns <code>true</code> for POST and PUT requests.
+   *         otherwise. The default implementation returns <code>true</code> for POST, PUT and PATCH requests.
    */
   protected boolean shouldIncludeRequestPayload(HttpServletRequest req) {
-    return ObjectUtility.isOneOf(req.getMethod(), "POST", "PUT");
+    return ObjectUtility.isOneOf(req.getMethod(), "POST", "PUT", "PATCH");
   }
 
   /**
