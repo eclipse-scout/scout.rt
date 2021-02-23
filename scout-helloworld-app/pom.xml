@@ -19,7 +19,7 @@
   <packaging>maven-archetype</packaging>
 
   <name>Scout Hello World Sample Application</name>
-  <description>Maven Archetype which creates a Scout Hello World Sample Application</description>
+  <description>Creates a Hello World sample application using Scout Classic (UI written in Java)</description>
   <url>https://eclipse.org/scout</url>
 
   <properties>
