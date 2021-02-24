@@ -32,11 +32,15 @@ const cssFilename = {
 };
 
 function getOutputDir() {
-  let workingDir = process.cwd();
-  if (fs.existsSync(path.resolve(workingDir, 'src', 'main')) || fs.existsSync(path.resolve(workingDir, 'src', 'test'))) {
+  if (isMavenModule()) {
     return 'target/dist'; // default for scout classic
   }
   return 'dist'; // default for scout js
+}
+
+function isMavenModule() {
+  const workingDir = process.cwd();
+  return fs.existsSync(path.resolve(workingDir, 'src', 'main')) || fs.existsSync(path.resolve(workingDir, 'src', 'test'));
 }
 
 module.exports = {
@@ -46,6 +50,7 @@ module.exports = {
   fileListName: 'file-list',
   jsFilename: jsFilename,
   cssFilename: cssFilename,
+  isMavenModule,
   getConstantsForMode: buildMode => {
     if (buildMode !== mode.production) {
       return {
