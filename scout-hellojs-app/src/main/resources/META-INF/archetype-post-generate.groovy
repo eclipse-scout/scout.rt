@@ -51,7 +51,7 @@ writeDbPassword(appDevModuleFile)
 
 log('Post processing done.')
 
-static def deleteFile(File file) {
+def deleteFile(File file) {
   if (!file.delete()) {
     throw new RuntimeException('Could not delete file: '.concat(file.toString()))
   }
@@ -63,7 +63,7 @@ static def renameFile(File file, String newName) {
   }
 }
 
-static def writeDbPassword(File appDevModuleFile) {
+def writeDbPassword(File appDevModuleFile) {
   log('Generate random password for dev db')
   Path dbConfig = new File(appDevModuleFile, 'src/main/resources/dev.db.config.properties').toPath()
   byte[] rnd = new byte[32]

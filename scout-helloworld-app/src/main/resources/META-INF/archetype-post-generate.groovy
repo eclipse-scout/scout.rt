@@ -78,7 +78,7 @@ static def replaceIn(Path file, String search, String replace) {
     Files.writeString(file, content, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)
 }
 
-static def generateKeyPairSafe() {
+def generateKeyPairSafe() {
     try {
         return generateKeyPair()
     }
