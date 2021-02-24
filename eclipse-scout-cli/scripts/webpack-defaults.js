@@ -54,9 +54,6 @@ module.exports = (env, args) => {
     output: {
       filename: jsFilename,
       path: outDir,
-      libraryTarget: 'umd',
-      globalObject: 'this',
-      umdNamedDefine: true,
       devtoolModuleFilenameTemplate: devMode ? undefined : prodDevtoolModuleFilenameTemplate
     },
     performance: {

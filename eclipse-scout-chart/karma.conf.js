@@ -9,4 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 const baseConfig = require('@eclipse-scout/cli/scripts/karma-defaults');
-module.exports = baseConfig;
+
+module.exports = (config, specEntryPoint) => {
+  baseConfig(config, specEntryPoint);
+  // noinspection JSUnresolvedVariable
+  config.webpack.externals = {
+    // jQuery is the only external, all other dependencies are imported regularly by the specs
+    'jquery': 'jQuery'
+  };
+};

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html;
 
 import static java.util.Collections.unmodifiableList;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -67,7 +68,7 @@ public final class UiHtmlConfigProperties {
 
     @Override
     public String description() {
-      return "Contains a comma separated list of supported locales (e.g. en,en-US,de-CH).\n" +
+      return "Contains a comma separated list of supported locales (e.g. en,en-US,de-CH). To support all locales, use the keyword 'all' instead.\n" +
           "This is only relevant if locales.json and texts.json should be sent to the client, which is not the case for remote apps. So this property is only used for JS only apps.\n"
           + "By default no locales are supported.";
     }
