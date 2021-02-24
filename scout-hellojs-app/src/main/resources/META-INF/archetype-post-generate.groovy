@@ -51,7 +51,7 @@ writeDbPassword(appDevModuleFile)
 
 log('Post processing done.')
 
-def deleteFile(File file) {
+static def deleteFile(File file) {
   if (!file.delete()) {
     throw new RuntimeException('Could not delete file: '.concat(file.toString()))
   }
