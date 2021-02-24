@@ -10,10 +10,11 @@
  */
 package org.eclipse.scout.rt.ui.html.res.loader;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -27,8 +28,9 @@ import org.json.JSONObject;
 public class LocalesLoader extends AbstractResourceLoader {
 
   @Override
-  public BinaryResource loadResource(String pathInfo) throws IOException {
-    List<String> languageTags = CONFIG.getPropertyValue(UiLocalesProperty.class);
+  public BinaryResource loadResource(String pathInfo) {
+    List<String> languageTags = getLanguageTags();
+
     JSONArray jsonLocales = new JSONArray();
     for (String tag : languageTags) {
       jsonLocales.put(jsonLocale(tag));
@@ -44,9 +46,20 @@ public class LocalesLoader extends AbstractResourceLoader {
         .build();
   }
 
+  public static List<String> getLanguageTags() {
+    List<String> languageTags = CONFIG.getPropertyValue(UiLocalesProperty.class);
+    if (languageTags.size() == 1 && "all".equals(languageTags.get(0))) {
+      languageTags = getAvailableLanguageTags();
+    }
+    return languageTags;
+  }
+
   protected JSONObject jsonLocale(String languageTag) {
     Locale locale = Locale.forLanguageTag(languageTag);
     return JsonLocale.toJson(locale);
   }
 
+  public static List<String> getAvailableLanguageTags() {
+    return Arrays.stream(Locale.getAvailableLocales()).map(Locale::toLanguageTag).collect(Collectors.toList());
+  }
 }

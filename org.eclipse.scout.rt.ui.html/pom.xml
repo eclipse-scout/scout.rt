@@ -49,11 +49,6 @@
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
     </dependency>
-    <dependency>
-      <!-- only used that the IDEs create a module dependency from here to the js code (code completion) -->
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>eclipse-scout-core</artifactId>
-    </dependency>
   </dependencies>
 
   <!-- primarily for license header generation -->

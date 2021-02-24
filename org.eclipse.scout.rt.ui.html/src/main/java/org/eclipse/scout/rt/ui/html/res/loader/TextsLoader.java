@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.rt.ui.html.res.loader;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -20,22 +19,30 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.nls.NlsResourceBundle;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.text.AbstractDynamicNlsTextProviderService;
 import org.eclipse.scout.rt.platform.util.FileUtility;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiLocalesProperty;
 import org.json.JSONObject;
 
 public class TextsLoader extends AbstractResourceLoader {
+  private Predicate<Entry<String, String>> m_entryFilter;
+
+  public void setEntryFilter(Predicate<Entry<String, String>> entryFilter) {
+    m_entryFilter = entryFilter;
+  }
+
+  public Predicate<Entry<String, String>> getEntryFilter() {
+    return m_entryFilter;
+  }
 
   @Override
-  public BinaryResource loadResource(String pathInfo) throws IOException {
+  public BinaryResource loadResource(String pathInfo) {
     List<Locale> languageLocales = getLanguageLocales();
     JSONObject jsonTexts = new JSONObject();
 
@@ -50,7 +57,9 @@ public class TextsLoader extends AbstractResourceLoader {
 
         Map<String, String> map = textsByLanguageTag.computeIfAbsent(locale, k -> new TreeMap<>());
         for (Entry<String, String> entry : bundle.getTextMap().entrySet()) {
-          map.putIfAbsent(entry.getKey(), entry.getValue());
+          if (acceptEntry(entry)) {
+            map.putIfAbsent(entry.getKey(), entry.getValue());
+          }
         }
       }
     }
@@ -61,7 +70,9 @@ public class TextsLoader extends AbstractResourceLoader {
       String languageTag = (locale == null || locale == Locale.ROOT) ? "default" : locale.toLanguageTag();
 
       JSONObject jsonTextMap = textsToJson(languageTag, entry.getValue());
-      jsonTexts.put(languageTag, jsonTextMap);
+      if (jsonTextMap.length() > 0) {
+        jsonTexts.put(languageTag, jsonTextMap);
+      }
     }
 
     // Create a binary resource
@@ -75,6 +86,13 @@ public class TextsLoader extends AbstractResourceLoader {
         .build();
   }
 
+  protected boolean acceptEntry(Entry<String, String> entry) {
+    if (m_entryFilter == null) {
+      return true;
+    }
+    return m_entryFilter.test(entry);
+  }
+
   protected JSONObject textsToJson(String languageTag, Map<String, String> textMap) {
     JSONObject texts = new JSONObject();
     for (Entry<String, String> entry : textMap.entrySet()) {
@@ -84,8 +102,7 @@ public class TextsLoader extends AbstractResourceLoader {
   }
 
   protected List<Locale> getLanguageLocales() {
-    List<String> languageTags = CONFIG.getPropertyValue(UiLocalesProperty.class);
-    return processLanguageTags(languageTags);
+    return processLanguageTags(LocalesLoader.getLanguageTags());
   }
 
   /**

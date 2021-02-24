@@ -12,5 +12,25 @@
 const baseConfig = require('@eclipse-scout/cli/scripts/webpack-defaults');
 module.exports = (env, args) => {
   args.resDirArray = [];
-  return baseConfig(env, args);
+  const config = baseConfig(env, args);
+
+  // This build creates resources that can directly be included in a html file without needing a build stack (webpack, babel etc.).
+  // The resources are available by a CDN that provides npm modules (e.g. https://www.jsdelivr.com/package/npm/@eclipse-scout/chart)
+  config.entry = {
+    'eclipse-scout-chart': './src/index.js',
+    'eclipse-scout-chart-theme': './src/eclipse-scout-chart-theme.less',
+    'eclipse-scout-chart-theme-dark': './src/eclipse-scout-chart-theme-dark.less'
+  };
+  config.externals = {
+    // Dependencies should not be included in the resulting js file.
+    // The consumer has to include them by himself which gives him more control (maybe his site has already added jQuery or he wants to use another version)
+    // Left side is the import name, right side the name of the global variable added by the plugin (e.g. window.jQuery)
+    'jquery': 'jQuery',
+    '@eclipse-scout/core': 'scout',
+    'chart.js': 'Chart',
+    'chartjs-plugin-datalabels': 'ChartDataLabels'
+  };
+  config.optimization.splitChunks = undefined; // disable splitting
+
+  return config;
 };

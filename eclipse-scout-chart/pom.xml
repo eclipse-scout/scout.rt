@@ -52,6 +52,60 @@
           </filesets>
         </configuration>
       </plugin>
+      <!--
+        The ResourceBuilder builds texts.json and locales.json and puts them into the dist folder.
+        These files may be used for plain Scout JS apps that don't have a Scout backend generating and serving these files.
+      -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <mainClass>org.eclipse.scout.rt.ui.html.res.loader.ResourceBuilder</mainClass>
+          <includeProjectDependencies>false</includeProjectDependencies>
+          <includePluginDependencies>true</includePluginDependencies>
+          <!-- The Scout platform uses parallel streams for some operations which uses the ForkJoinPool.
+          exec-maven-plugin must not wait for threads of this pool to stop because that may take a while.-->
+          <cleanupDaemonThreads>false</cleanupDaemonThreads>
+          <arguments>
+            <argument>texts.json</argument>
+            <argument>-outputDir</argument>
+            <argument>dist</argument>
+            <argument>-contributors</argument>
+            <argument>org.eclipse.scout.rt.chart.ui.html.ChartUiTextContributor</argument>
+          </arguments>
+          <systemProperties>
+            <systemProperty>
+              <key>scout.ui.locales</key>
+              <value>all</value>
+            </systemProperty>
+            <systemProperty>
+              <key>logback.configurationFile</key>
+              <value>../eclipse-scout-core/logback.xml</value>
+            </systemProperty>
+          </systemProperties>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.eclipse.scout.rt</groupId>
+            <artifactId>org.eclipse.scout.rt.chart.ui.html</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <!--suppress MavenModelInspection -->
+            <version>${logback.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
     </plugins>
   </build>
 
