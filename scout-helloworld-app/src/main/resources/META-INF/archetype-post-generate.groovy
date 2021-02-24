@@ -133,5 +133,5 @@ def log(String message) {
     }
     SimpleDateFormat format = new SimpleDateFormat('yyyy-MM-dd HH:mm:ss')
     message = format.format(new Date()) + ' ' + message + '\n'
-    new File('archetype-log.txt').append(message as Object, StandardCharsets.UTF_8.name(), false)
+  new File('archetype-log.txt').append(message)
 }
