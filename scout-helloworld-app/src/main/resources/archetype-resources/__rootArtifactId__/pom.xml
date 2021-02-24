@@ -39,8 +39,10 @@
     <module>../${rootArtifactId}.server</module>
     <module>../${rootArtifactId}.client</module>
     <module>../${rootArtifactId}.server.app.war</module>
+    <module>../${rootArtifactId}.server.app.dev</module>
     <module>../${rootArtifactId}.ui.html</module>
     <module>../${rootArtifactId}.ui.html.app.war</module>
+    <module>../${rootArtifactId}.ui.html.app.dev</module>
   </modules>
 
   <dependencyManagement>

@@ -45,6 +45,7 @@
     <!-- App modules -->
     <module>../${rootArtifactId}.app</module>
     <module>../${rootArtifactId}.app.war</module>
+    <module>../${rootArtifactId}.app.dev</module>
 
     <!-- Test modules -->
     <module>../${rootArtifactId}.core.test</module>
