@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,17 +26,19 @@ const webpack = require('webpack');
  */
 module.exports = (env, args) => {
   const {devMode, outSubDir, cssFilename, jsFilename} = scoutBuildConstants.getConstantsForMode(args.mode);
-  const outDir = path.resolve(scoutBuildConstants.outDir, outSubDir);
+  const isMavenModule = scoutBuildConstants.isMavenModule();
+  const outDir = isMavenModule ? path.resolve(scoutBuildConstants.outDir, outSubDir) : path.resolve(scoutBuildConstants.outDir);
   const resDirArray = args.resDirArray || ['res'];
   console.log(`Webpack mode: ${args.mode}`);
 
   // # Copy static web-resources delivered by the modules
   const copyPluginConfig = [];
+  const copyTarget = isMavenModule ? '../res' : '.';
   for (const resDir of resDirArray) {
     copyPluginConfig.push(
       {
         from: resDir,
-        to: '../res'
+        to: copyTarget
       });
   }
 
@@ -172,7 +174,7 @@ module.exports = (env, args) => {
     ];
   }
 
-  if (nvl(args.clean, true)) {
+  if (nvl(args.clean, false)) {
     // see: https://webpack.js.org/guides/output-management/#cleaning-up-the-dist-folder
     config.plugins.push(new CleanWebpackPlugin());
   }
