@@ -44,6 +44,10 @@ export default class PageTileGridSelectKeyStroke extends RangeKeyStroke {
       return false;
     }
 
+    if (this.field && this.field.outline && this.field.outline.inBackground) {
+      return false;
+    }
+
     var index = keys.codesToKeys[event.which] - 1;
     var tiles = this._tiles();
 
