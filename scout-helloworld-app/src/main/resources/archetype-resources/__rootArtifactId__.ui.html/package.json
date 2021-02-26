@@ -12,6 +12,7 @@
     "src/main/js"
   ],
   "scripts": {
+    "pnpm-install": "pnpm install --ignore-scripts",
     "testserver:start": "scout-scripts test-server:start",
     "testserver:stop": "scout-scripts test-server:stop",
     "test:ci": "scout-scripts test:ci",

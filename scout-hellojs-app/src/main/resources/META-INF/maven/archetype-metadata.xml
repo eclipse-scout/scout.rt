@@ -29,6 +29,15 @@
       <defaultValue>false</defaultValue>
     </requiredProperty>
   </requiredProperties>
+  <fileSets>
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory/>
+      <includes>
+        <include>**/*.yaml</include>
+        <include>**/*.editorconfig</include>
+      </includes>
+    </fileSet>
+  </fileSets>
   <modules>
     <module id="parent" dir="__rootArtifactId__" name="parent">
       <fileSets>
@@ -75,6 +84,7 @@
             <include>**/*.gitignore</include>
             <include>**/*.js</include>
             <include>**/*.launch</include>
+            <include>**/*.xml</include>
             <include>**/*.json</include>
             <include>**/*.less</include>
             <include>**/*.sh</include>
@@ -96,6 +106,7 @@
           <directory/>
           <includes>
             <include>**/*.launch</include>
+            <include>**/*.xml</include>
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
@@ -200,6 +211,7 @@
           <directory/>
           <includes>
             <include>**/*.launch</include>
+            <include>**/*.xml</include>
           </includes>
         </fileSet>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">
@@ -262,6 +274,7 @@
           <includes>
             <include>**/*.launch</include>
             <include>**/*.jshintrc</include>
+            <include>**/*.xml</include>
             <include>**/*.gitignore</include>
             <include>**/*.json</include>
             <include>**/*.js</include>

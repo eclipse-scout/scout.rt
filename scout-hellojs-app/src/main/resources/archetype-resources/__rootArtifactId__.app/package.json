@@ -12,6 +12,7 @@
     "src/main/js"
   ],
   "scripts": {
+    "pnpm-install": "pnpm install --ignore-scripts",
     "testserver:start": "scout-scripts test-server:start",
     "testserver:stop": "scout-scripts test-server:stop",
     "test:ci": "scout-scripts test:ci",
@@ -31,6 +32,6 @@
   },
   "dependencies": {
     "@eclipse-scout/core": ">=22.0.0-snapshot <22.0.0",
-    "@${simpleArtifactName}/ui": "file:../${rootArtifactId}.ui/"
+    "@${simpleArtifactName}/ui": "${version}"
   }
 }

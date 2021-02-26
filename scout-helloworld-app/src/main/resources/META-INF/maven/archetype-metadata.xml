@@ -28,6 +28,15 @@
       <defaultValue>false</defaultValue>
     </requiredProperty>
   </requiredProperties>
+  <fileSets>
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory/>
+      <includes>
+        <include>**/*.yaml</include>
+        <include>**/*.editorconfig</include>
+      </includes>
+    </fileSet>
+  </fileSets>
   <modules>
     <module id="parent" dir="__rootArtifactId__" name="parent">
       <fileSets>
@@ -167,6 +176,7 @@
           <directory/>
           <includes>
             <include>**/*.launch</include>
+            <include>**/*.xml</include>
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
@@ -185,6 +195,7 @@
             <include>**/*.gitignore</include>
             <include>**/*.json</include>
             <include>**/*.launch</include>
+            <include>**/*.xml</include>
             <include>**/*.js</include>
             <include>**/*.sh</include>
             <include>**/*.cmd</include>
@@ -254,6 +265,7 @@
           <directory/>
           <includes>
             <include>**/*.launch</include>
+            <include>**/*.xml</include>
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">

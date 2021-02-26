@@ -1,0 +1,12 @@
+<!--
+  ~ Copyright (c) BSI Business Systems Integration AG. All rights reserved.
+  ~ http://www.bsiag.com/
+  -->
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="[webapp] all" type="CompoundRunConfigurationType">
+    <toRun name="[webapp] dev server" type="Application" />
+    <toRun name="[webapp] dev ui" type="Application" />
+    <toRun name="js build" type="js.build_tools.npm" />
+    <method v="2" />
+  </configuration>
+</component>
