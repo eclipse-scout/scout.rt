@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TextMap} from '../index';
+import {arrays, TextMap} from '../index';
 import $ from 'jquery';
 
 const TEXT_KEY_REGEX = /\${textKey:([^}]*)}/;
@@ -16,8 +16,15 @@ const TEXT_KEY_REGEX = /\${textKey:([^}]*)}/;
 let textsByLocale = {};
 
 export function bootstrap(url) {
-  let promise = url ? $.ajaxJson(url) : $.resolvedPromise({});
-  return promise.then(_preInit.bind(this, url));
+  if (!url) {
+    return $.resolvedPromise({});
+  }
+  let promises = [];
+  let urls = arrays.ensure(url);
+  urls.forEach(url => promises.push(
+    $.ajaxJson(url).then(_preInit.bind(this, url)))
+  );
+  return $.promiseAll(promises);
 }
 
 // private
