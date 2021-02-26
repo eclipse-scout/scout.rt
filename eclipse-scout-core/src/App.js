@@ -57,10 +57,10 @@ export default class App {
    * During the bootstrap phase additional scripts may get loaded required for a successful session startup.<br>
    * The actual initialization does not get started before these bootstrap scripts are loaded.
    *
-   * @param [options]
-   * @param [options.bootstrap.textsUrl] URL pointing to a json resource containing texts that will be available through texts.js
-   * @param [options.bootstrap.localesUrl] URL pointing to a json resource containing locale information processed by locales.js
-   * @param [options.bootstrap.codesUrl] URL pointing to a json resources containing codes that will be available through codes.js
+   * @param {object} [options]
+   * @param {string|string[]} [options.bootstrap.textsUrl] URL or multiple URLs pointing to a json resource containing texts that will be available through texts.js.
+   * @param {string} [options.bootstrap.localesUrl] URL pointing to a json resource containing locale information processed by locales.js
+   * @param {string} [options.bootstrap.codesUrl] URL pointing to a json resources containing codes that will be available through codes.js
    */
   init(options) {
     options = options || {};
