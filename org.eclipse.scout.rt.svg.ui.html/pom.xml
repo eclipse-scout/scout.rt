@@ -44,6 +44,12 @@
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
     </dependency>
+    <!-- Necessary for JS code completion when Scout is in the same IntelliJ Project -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>eclipse-scout-core</artifactId>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
 
   <!-- primarily for license header generation -->
