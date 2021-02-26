@@ -98,10 +98,17 @@ export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
       return;
     }
 
-    let inputField = $(event.target).is('input:text') || $(event.target).is('input:file') || $(event.target).is('textarea');
-    if (inputField && (this._isLetterKeyStroke(event) || this._isNumberKeyStroke(event))) {
+    if (this._isInputField(event.target) && (this._isLetterKeyStroke(event) || this._isNumberKeyStroke(event))) {
       event.stopPropagation();
     }
+  }
+
+  _isInputField(element) {
+    if (element && element.isContentEditable) {
+      return true;
+    }
+    let $element = $(element);
+    return $element.is('input:text') || $element.is('input:file') || $element.is('textarea');
   }
 
   _isNumberKeyStroke(event) {
