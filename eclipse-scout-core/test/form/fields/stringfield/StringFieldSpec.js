@@ -39,6 +39,33 @@ describe('StringField', () => {
     return helper.createFieldModel();
   }
 
+  describe('init', () => {
+    it('clear does not throw exception when called in init function', () => {
+      class MyStringField extends StringField {
+        /**
+         * @override
+         */
+        init(model) {
+          super.init(model);
+          this.clear();
+        }
+      }
+      let myField = new MyStringField();
+      myField.init(createModel());
+      // without the bugfix the init function would throw an error
+      expect(true).toBe(true);
+
+      // When not rendered, _readDisplayText must return an empty string
+      // This function is also called by clear()
+      expect(myField._readDisplayText()).toEqual('');
+
+      // When rendered, _readDisplayText must return $field.val()
+      myField.render();
+      myField.setValue('foo');
+      expect(myField._readDisplayText()).toEqual('foo');
+    });
+  });
+
   describe('inputMasked', () => {
     it('sets the field into password mode, if true', () => {
       field.inputMasked = true;

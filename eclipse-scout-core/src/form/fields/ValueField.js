@@ -312,7 +312,7 @@ export default class ValueField extends FormField {
   }
 
   _clear() {
-    // to be implemented by sublcasses
+    // to be implemented by sub-classes
   }
 
   _triggerClear() {
