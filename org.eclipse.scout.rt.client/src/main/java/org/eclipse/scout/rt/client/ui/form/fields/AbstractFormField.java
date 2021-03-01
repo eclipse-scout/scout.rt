@@ -210,9 +210,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * One of the LABEL_POSITION_* constants or a custom constants interpreted by the ui.
-   *
-   * @since 17.11.2009
+   * @return One of the <code>LABEL_POSITION_*</code> constants. Default is {@link #LABEL_POSITION_DEFAULT}.
    */
   @Order(15)
   @ConfigProperty(ConfigProperty.LABEL_POSITION)
@@ -221,8 +219,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * @return the fixed label witdh &gt;0 or LABEL_WIDTH_DEFAULT or LABEL_WIDTH_UI for ui-dependent label width
-   * @since 19.11.2009
+   * @return the fixed label width &gt;0 or LABEL_WIDTH_DEFAULT or LABEL_WIDTH_UI for ui-dependent label width
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(16)
@@ -231,8 +228,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * @return {@code true} if this fields label should be as width as preferred by the ui, {@code false} otherwise
-   * @since 10.09.2020
+   * @return {@code true} if this fields label should be as width as preferred by the UI, {@code false} otherwise
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(17)
@@ -241,10 +237,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * @return one of the following {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_LEFT},
-   * {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_CENTER}, {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_RIGHT}
-   * or {@link IFormField#LABEL_HORIZONTAL_ALIGNMENT_DEFAULT}.
-   * @since 19.11.2009
+   * @return One of the <code>LABEL_HORIZONTAL_*</code> constants. Default is {@link #LABEL_HORIZONTAL_ALIGNMENT_DEFAULT}.
    */
   @Order(18)
   @ConfigProperty(ConfigProperty.LABEL_HORIZONTAL_ALIGNMENT)
@@ -264,12 +257,18 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     return false;
   }
 
+  /**
+   * @return One of the <code>FIELD_STYLE_*</code> constants. Default is {@link #FIELD_STYLE_ALTERNATIVE}.
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(32)
   protected String getConfiguredFieldStyle() {
     return FIELD_STYLE_ALTERNATIVE;
   }
 
+  /**
+   * @return One of the <code>DISABLED_STYLE_*</code> constants. Default is {@link #DISABLED_STYLE_DEFAULT}.
+   */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(35)
   protected int getConfiguredDisabledStyle() {
@@ -317,6 +316,9 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     return null;
   }
 
+  /**
+   * @return One of the <code>TOOLTIP_ANCHOR_*</code> constants. Default is {@link #TOOLTIP_ANCHOR_DEFAULT}.
+   */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(55)
   protected String getConfiguredTooltipAnchor() {
@@ -621,14 +623,14 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * Configures whether the field should be as width as preferred by the ui. The preferred width normally is the
+   * Configures whether the field should be as width as preferred by the UI. The preferred width normally is the
    * computed width of the child fields.<br>
    * This property typically has less priority than {@link #getConfiguredWidthInPixel()} and therefore only has an
    * effect if no explicit width is set.
    * <p>
    * Subclasses can override this method. Default is false.
    *
-   * @return {@code true} if this field should be as width as preferred by the ui, {@code false} otherwise
+   * @return {@code true} if this field should be as width as preferred by the UI, {@code false} otherwise
    * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -638,14 +640,14 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * Configures whether the field should be as height as preferred by the ui. The preferred height normally is the
+   * Configures whether the field should be as height as preferred by the UI. The preferred height normally is the
    * computed height of the child fields.<br>
    * This property typically has less priority than {@link #getConfiguredHeightInPixel()} and therefore only has an
    * effect if no explicit height is set.
    * <p>
    * Subclasses can override this method. Default is false.
    *
-   * @return {@code true} if this field should be as height as preferred by the ui, {@code false} otherwise
+   * @return {@code true} if this field should be as height as preferred by the UI, {@code false} otherwise
    * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -656,7 +658,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   /**
    * Configures the preferred width of the field. <br>
-   * If the value is <=0 the property will be ignored by the ui layout manager.
+   * If the value is <=0 the property will be ignored by the UI layout manager.
    * <p>
    * Subclasses can override this method. Default is 0.
    *
@@ -671,7 +673,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   /**
    * Configures the preferred height of the field. <br>
-   * If the value is <=0 the property will be ignored by the ui layout manager.
+   * If the value is <=0 the property will be ignored by the UI layout manager.
    * <p>
    * Subclasses can override this method. Default is 0.
    *
@@ -725,8 +727,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Configures the position of the status.
    * <p>
    * Subclasses can override this method. Default is {@value IFormField#STATUS_POSITION_DEFAULT}.
-   *
-   * @since 6.0
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(200)
@@ -752,7 +752,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   /**
    * On any value change or call to {@link #checkSaveNeeded()} this method is called to calculate if the field needs
-   * save
+   * save.
    */
   @ConfigOperation
   @Order(11)
@@ -766,7 +766,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * Make field saved, for example a table is marking all rows as non-changed
+   * Make field saved, for example a table is marking all rows as non-changed.
    */
   @ConfigOperation
   @Order(12)
@@ -783,8 +783,8 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * on any value change or call to {@link #checkEmpty()} this method is called to calculate if the field represents an
-   * empty state (semantics)
+   * On any value change or call to {@link #checkEmpty()} this method is called to calculate if the field represents an
+   * empty state (semantics).
    */
   @ConfigOperation
   @Order(13)
@@ -793,8 +793,8 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * see {@link IDesktop#dataChanged(Object...)} and
-   * {@link IDesktop#fireDataChangeEvent(org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent)}
+   * See {@link IDesktop#dataChanged(Object...)} and
+   * {@link IDesktop#fireDataChangeEvent(org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent)}.
    */
   @ConfigOperation
   @Order(14)
@@ -893,8 +893,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   /**
    * Calculates the formfield's view order, e.g. if the @Order annotation is set to 30.0, the method will return 30.0.
    * If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
-   *
-   * @since 4.0.1
    */
   @SuppressWarnings("squid:S1244") // Floating point numbers should not be tested for equality
   protected double calculateViewOrder() {
@@ -914,8 +912,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   /**
    * Searching the nearest field implementing the specified class by processing the enclosing field list bottom-up.
-   *
-   * @since 3.8.1
    */
   private <T extends IFormField> T findNearestFieldByClass(final Class<T> c) {
     List<ICompositeField> enclosingFields = getEnclosingFieldList();
