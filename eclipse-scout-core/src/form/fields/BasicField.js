@@ -46,7 +46,9 @@ export default class BasicField extends ValueField {
   }
 
   _clear() {
-    this.$field.val('');
+    if (this.rendered) {
+      this.$field.val('');
+    }
   }
 
   _onFieldInput() {
@@ -92,7 +94,7 @@ export default class BasicField extends ValueField {
   }
 
   _readDisplayText() {
-    return this.$field.val();
+    return this.rendered ? this.$field.val() : '';
   }
 
   /**
