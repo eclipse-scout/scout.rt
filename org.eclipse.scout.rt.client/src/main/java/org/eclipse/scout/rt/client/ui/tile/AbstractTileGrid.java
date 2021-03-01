@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -875,7 +875,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   }
 
   @Override
-  public final List<ITileGridExtension<T, ? extends AbstractTileGrid>> getAllExtensions() {
+  public final List<? extends ITileGridExtension<T, ? extends AbstractTileGrid>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 
@@ -912,19 +912,19 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   }
 
   protected final void interceptTilesSelected(List<T> tiles) {
-    List<ITileGridExtension<T, ? extends AbstractTileGrid>> extensions = getAllExtensions();
+    List<? extends ITileGridExtension<T, ? extends AbstractTileGrid>> extensions = getAllExtensions();
     TilesSelectedChain<T> chain = new TilesSelectedChain<>(extensions);
     chain.execTilesSelected(tiles);
   }
 
   protected final void interceptTileClick(T tile, MouseButton mouseButton) {
-    List<ITileGridExtension<T, ? extends AbstractTileGrid>> extensions = getAllExtensions();
+    List<? extends ITileGridExtension<T, ? extends AbstractTileGrid>> extensions = getAllExtensions();
     TileClickChain<T> chain = new TileClickChain<>(extensions);
     chain.execTileClick(tile, mouseButton);
   }
 
   protected final void interceptTileAction(T tile) {
-    List<ITileGridExtension<T, ? extends AbstractTileGrid>> extensions = getAllExtensions();
+    List<? extends ITileGridExtension<T, ? extends AbstractTileGrid>> extensions = getAllExtensions();
     TileActionChain<T> chain = new TileActionChain<>(extensions);
     chain.execTileAction(tile);
   }

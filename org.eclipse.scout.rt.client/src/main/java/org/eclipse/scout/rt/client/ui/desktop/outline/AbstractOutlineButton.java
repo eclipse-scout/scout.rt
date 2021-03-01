@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -93,7 +93,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
     }
     if (m_outline != null) {
       setVisible(m_outline.isVisible());
-      setEnabled(m_outline.isEnabled(), true, false);
+      setEnabled(m_outline.isEnabled(), true);
       setLabel(m_outline.getTitle());
       setTooltipText(m_outline.getTitle());
       setSelected(desktop.getOutline() == m_outline);
@@ -112,14 +112,16 @@ public abstract class AbstractOutlineButton extends AbstractButton {
           e -> {
             String n = e.getPropertyName();
             Object v = e.getNewValue();
-            if (n.equals(IOutline.PROP_VISIBLE)) {
-              setVisible((Boolean) v);
-            }
-            else if (n.equals(IOutline.PROP_TITLE)) {
-              setLabel((String) v);
-            }
-            else if (n.equals(IOutline.PROP_DEFAULT_ICON_ID)) {
-              setIconId((String) v);
+            switch (n) {
+              case IOutline.PROP_VISIBLE:
+                setVisible((Boolean) v);
+                break;
+              case IOutline.PROP_TITLE:
+                setLabel((String) v);
+                break;
+              case IOutline.PROP_DEFAULT_ICON_ID:
+                setIconId((String) v);
+                break;
             }
           });
     }
@@ -129,7 +131,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
    * Activates the outline associated with this outline button (i.e. sets the outline as the active outline on the
    * desktop) if {@code selected} is {@code true}, does nothing otherwise.
    *
-   * @param selected
+   * @param selection
    *          the state of the toggle button
    */
   @Override
