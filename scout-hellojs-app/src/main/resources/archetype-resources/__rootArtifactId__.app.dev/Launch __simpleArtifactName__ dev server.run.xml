@@ -1,7 +1,3 @@
-<!--
-  ~ Copyright (c) BSI Business Systems Integration AG. All rights reserved.
-  ~ http://www.bsiag.com/
-  -->
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Launch ${rootArtifactId} dev server" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="org.eclipse.scout.dev.jetty.JettyServer" />

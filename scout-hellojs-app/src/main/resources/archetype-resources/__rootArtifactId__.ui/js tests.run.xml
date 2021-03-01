@@ -1,7 +1,3 @@
-<!--
-  ~ Copyright (c) BSI Business Systems Integration AG. All rights reserved.
-  ~ http://www.bsiag.com/
-  -->
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="js tests" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/${simpleArtifactName}/${simpleArtifactName}.ui/package.json" />

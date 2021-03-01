@@ -25,7 +25,7 @@ command -v pnpm >/dev/null 2>&1 || { echo >&2 "pnpm cannot be found. Make sure p
 
 # Install all JavaScript dependencies => creates the node_modules folders
 cd ..
-echo "Running 'pnpm install' in ${PWD}"
+echo "Running 'pnpm install' in ${symbol_dollar}{PWD}"
 pnpm install --ignore-scripts
 echo "pnpm install finished successfully!\n"
 

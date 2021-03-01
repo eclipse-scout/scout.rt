@@ -11,8 +11,8 @@ set -e
 # Specify the path to the node and npm binaries
 PATH=$PATH:/usr/local/bin
 
-# Check if npm is available
-command -v npm >/dev/null 2>&1 || { echo >&2 "npm cannot be found. Make sure Node.js is installed and the PATH variable correctly set. See the content of this script for details."; exit 1; }
+# Check if node is available
+command -v node >/dev/null 2>&1 || { echo >&2 "node cannot be found. Make sure Node.js is installed and the PATH variable correctly set. See the content of this script for details."; exit 1; }
 
 # Execute the tests
 echo "Running 'npm testserver:start'"
