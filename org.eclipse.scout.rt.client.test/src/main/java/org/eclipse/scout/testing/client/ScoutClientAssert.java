@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -108,7 +108,8 @@ public final class ScoutClientAssert {
 
   public static void assertView(boolean visible, boolean enabled, boolean mandatory, IFormField field) {
     Assert.assertNotNull(field);
-    if ((field.isVisible() != visible) || (field.isEnabled() != enabled) || (field.isMandatory() != mandatory)) {
+    if ((field.isVisible() != visible) || (field.isEnabledIncludingParents() != enabled) || (field.isMandatory() != mandatory)) {
+      //noinspection StringBufferReplaceableByString
       StringBuilder builder = new StringBuilder();
       builder.append(field.getFieldId());
       builder.append(" (");
@@ -123,7 +124,7 @@ public final class ScoutClientAssert {
       builder.append(" but was ");
       builder.append(field.isVisible() ? "visible" : "invisible");
       builder.append(", ");
-      builder.append(field.isEnabled() ? "enabled" : "disabled");
+      builder.append(field.isEnabledIncludingParents() ? "enabled" : "disabled");
       builder.append(", ");
       builder.append(field.isMandatory() ? "mandatory" : "non-mandatory");
       Assert.fail(builder.toString());
@@ -131,11 +132,11 @@ public final class ScoutClientAssert {
   }
 
   public static void assertVisibleStrictly(IForm form, IFormField... fields) {
-    assertView(ViewKind.VISIBILE, true, form, fields);
+    assertView(ViewKind.VISIBLE, true, form, fields);
   }
 
   public static void assertInvisibleStrictly(IForm form, IFormField... fields) {
-    assertView(ViewKind.INVISIBILE, true, form, fields);
+    assertView(ViewKind.INVISIBLE, true, form, fields);
   }
 
   public static void assertEnabledStrictly(IForm form, IFormField... fields) {
@@ -151,15 +152,15 @@ public final class ScoutClientAssert {
   }
 
   public static void assertNonMandatoryStrictly(IForm form, IFormField... fields) {
-    assertView(ViewKind.NONMANDATORY, true, form, fields);
+    assertView(ViewKind.NON_MANDATORY, true, form, fields);
   }
 
   public static void assertVisible(IForm form, IFormField... fields) {
-    assertView(ViewKind.VISIBILE, false, form, fields);
+    assertView(ViewKind.VISIBLE, false, form, fields);
   }
 
   public static void assertInvisible(IForm form, IFormField... fields) {
-    assertView(ViewKind.INVISIBILE, false, form, fields);
+    assertView(ViewKind.INVISIBLE, false, form, fields);
   }
 
   public static void assertEnabled(IForm form, IFormField... fields) {
@@ -175,17 +176,17 @@ public final class ScoutClientAssert {
   }
 
   public static void assertNonMandatory(IForm form, IFormField... fields) {
-    assertView(ViewKind.NONMANDATORY, false, form, fields);
+    assertView(ViewKind.NON_MANDATORY, false, form, fields);
   }
 
   private enum ViewKind {
-    VISIBILE("Visible", "visible", "invisible") {
+    VISIBLE("Visible", "visible", "invisible") {
       @Override
       public boolean testField(IFormField field) {
         return field.isVisible();
       }
     },
-    INVISIBILE("Invisible", "invisible", "visible") {
+    INVISIBLE("Invisible", "invisible", "visible") {
       @Override
       public boolean testField(IFormField field) {
         return !field.isVisible();
@@ -209,7 +210,7 @@ public final class ScoutClientAssert {
         return field.isMandatory();
       }
     },
-    NONMANDATORY("Non-mandatory", "non-mandatory", "mandatory") {
+    NON_MANDATORY("Non-mandatory", "non-mandatory", "mandatory") {
       @Override
       public boolean testField(IFormField field) {
         return !field.isMandatory();
