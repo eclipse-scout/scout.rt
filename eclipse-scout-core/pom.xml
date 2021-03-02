@@ -69,7 +69,7 @@
             <argument>locales.json</argument>
             <argument>texts.json</argument>
             <argument>-outputDir</argument>
-            <argument>dist</argument>
+            <argument>${project.basedir}/dist</argument>
             <argument>-contributors</argument>
             <argument>all</argument>
           </arguments>
@@ -80,7 +80,7 @@
             </systemProperty>
             <systemProperty>
               <key>logback.configurationFile</key>
-              <value>logback.xml</value>
+              <value>${project.basedir}/logback.xml</value>
             </systemProperty>
           </systemProperties>
         </configuration>
