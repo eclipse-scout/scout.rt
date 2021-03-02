@@ -46,7 +46,7 @@ export default class BasicField extends ValueField {
   }
 
   _clear() {
-    if (this.rendered) {
+    if (this.$field) {
       this.$field.val('');
     }
   }
@@ -94,7 +94,7 @@ export default class BasicField extends ValueField {
   }
 
   _readDisplayText() {
-    return this.rendered ? this.$field.val() : '';
+    return this.$field ? this.$field.val() : '';
   }
 
   /**
