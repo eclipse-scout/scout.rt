@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import java.util.HashMap;
 
 import org.eclipse.scout.rt.platform.cache.BasicCache;
 import org.eclipse.scout.rt.platform.cache.CacheRegistryService;
+import org.eclipse.scout.rt.platform.cache.ICache;
 import org.eclipse.scout.rt.platform.cache.ICacheRegistryService;
 import org.eclipse.scout.rt.platform.cache.ICacheValueResolver;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -37,6 +38,16 @@ public class CacheRegistryServiceTest {
     assertEquals(testCache, s.get(testKey));
   }
 
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testRegistryIfAbsent() {
+    CacheRegistryService s = new CacheRegistryService();
+    String testKey = "testkey";
+    BasicCache<String, String> testCache = new BasicCache<String, String>(testKey, mock(ICacheValueResolver.class), new HashMap<>(), false);
+    s.registerIfAbsent(testCache);
+    assertEquals(testCache, s.get(testKey));
+  }
+
   @Test(expected = AssertionException.class)
   public void testNotRegisteredCache() {
     CacheRegistryService s = new CacheRegistryService();
@@ -49,4 +60,24 @@ public class CacheRegistryServiceTest {
     assertNull(s.opt("unknown"));
   }
 
+  @Test(expected = AssertionException.class)
+  public void testDuplicateCreate() {
+    CacheRegistryService s = new CacheRegistryService();
+    String cacheId = "testcacheid";
+    BasicCache<String, String> cache1 = new BasicCache<String, String>(cacheId, key -> "Valuf of " + key, new HashMap<>(), false);
+    s.register(cache1);
+    BasicCache<String, String> cache2 = new BasicCache<String, String>(cacheId, key -> "Valuf of " + key, new HashMap<>(), false);
+    s.register(cache2);
+  }
+
+  @Test
+  public void testDuplicateCreateIfAbsent() {
+    CacheRegistryService s = new CacheRegistryService();
+    String cacheId = "testcacheid";
+    ICache<String, String> cache1 = new BasicCache<String, String>(cacheId, key -> "Valuf of " + key, new HashMap<>(), false);
+    s.registerIfAbsent(cache1);
+    ICache<String, String> cache2 = new BasicCache<String, String>(cacheId, key -> "Valuf of " + key, new HashMap<>(), false);
+    ICache<String, String> cache = s.registerIfAbsent(cache2);
+    assertSame(cache1, cache);
+  }
 }

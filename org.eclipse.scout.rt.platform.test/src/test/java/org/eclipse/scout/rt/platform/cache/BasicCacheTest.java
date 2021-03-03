@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,14 +10,11 @@
  */
 package org.eclipse.scout.rt.platform.cache;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.cache.ICache;
-import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
-import org.eclipse.scout.rt.platform.cache.ICacheValueResolver;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Test;
@@ -26,12 +23,10 @@ import org.junit.Test;
  * @since 5.2
  */
 public class BasicCacheTest {
-  private final static String CACHE_ID = "BasicCacheTestCacheId";
 
-  protected ICache<Integer, String> createCache() {
-    return createCache(new ICacheValueResolver<Integer, String>() {
-      private int m_counter = 0;
-
+  protected ICache<Integer, String> createCache(String id) {
+    return createCache(id, new ICacheValueResolver<Integer, String>() {
+      private int m_counter;
       @Override
       public String resolve(Integer key) {
         if (13 == key) {
@@ -41,20 +36,27 @@ public class BasicCacheTest {
           throw new ProcessingException("Test exception - thrown");
         }
         m_counter++;
-        return String.valueOf(key) + "." + String.valueOf(m_counter);
+        return key + "." + m_counter;
       }
     });
   }
 
-  protected ICache<Integer, String> createCache(ICacheValueResolver<Integer, String> resolver) {
+  protected ICache<Integer, String> createCache(String id, ICacheValueResolver<Integer, String> resolver) {
     @SuppressWarnings("unchecked")
     ICacheBuilder<Integer, String> cacheBuilder = BEANS.get(ICacheBuilder.class);
-    return cacheBuilder.withCacheId(CACHE_ID).withValueResolver(resolver).withThreadSafe(false).build();
+    ICache<Integer, String> cache = cacheBuilder
+        .withCacheId(id)
+        .withValueResolver(resolver)
+        .withThreadSafe(false)
+        .withReplaceIfExists(true)
+        .build();
+    cache.invalidate(new AllCacheEntryFilter<>(), true);
+    return cache;
   }
 
   @Test
   public void testCacheBasic() {
-    ICache<Integer, String> cache = createCache();
+    ICache<Integer, String> cache = createCache("BasicCacheTestCacheId_testCacheBasic");
 
     // test get
     assertEquals("2.1", cache.get(2));
@@ -90,13 +92,13 @@ public class BasicCacheTest {
 
   @Test
   public void testCacheNullValues() {
-    ICache<Integer, String> cache = createCache();
+    ICache<Integer, String> cache = createCache("BasicCacheTestCacheId_testCacheNullValues");
 
     assertEquals("2.1", cache.get(2));
-    assertEquals(null, cache.get(null));
+    assertNull(cache.get(null));
 
     // unresolvable keys
-    assertEquals(null, cache.get(13));
+    assertNull(cache.get(13));
 
     assertEquals(1, cache.getUnmodifiableMap().size());
 
@@ -117,7 +119,7 @@ public class BasicCacheTest {
 
   @Test(expected = ProcessingException.class)
   public void testCacheExceptionDuringCreation() {
-    ICache<Integer, String> cache = createCache();
+    ICache<Integer, String> cache = createCache("BasicCacheTestCacheId_testCacheExceptionDuringCreation");
     cache.get(1337);
   }
 

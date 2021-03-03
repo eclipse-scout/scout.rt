@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.services.common.code.fixture.TestCodeType3;
@@ -40,26 +41,24 @@ public class CodeServiceTest {
   private static final Long ZYX_ID = 550L;
 
   /**
-   * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#getAllCodeTypeClasses(java.lang.String)} .
+   * Test method for {@link CodeService#getAllCodeTypeClasses()} .
    */
   @Test
   public void testGetAllCodeTypeClasses() {
     ICodeService service = newCodeServiceInstance();
     Collection<Class<? extends ICodeType<?, ?>>> codeTypeClasses1 = service.getAllCodeTypeClasses();
     assertEquals("codeTypeClasses1 size", 2, codeTypeClasses1.size());
-    assertEquals("codeTypeClasses1 contains AbcCodeType", true, codeTypeClasses1.contains(AbcCodeType.class));
-    assertEquals("codeTypeClasses1 contains ZyxCodeType", true, codeTypeClasses1.contains(ZyxCodeType.class));
+    assertTrue("codeTypeClasses1 contains AbcCodeType", codeTypeClasses1.contains(AbcCodeType.class));
+    assertTrue("codeTypeClasses1 contains ZyxCodeType", codeTypeClasses1.contains(ZyxCodeType.class));
 
     Collection<Class<? extends ICodeType<?, ?>>> codeTypeClasses2 = service.getAllCodeTypeClasses();
     assertEquals("codeTypeClasses2 size", 1, codeTypeClasses2.size());
-    assertEquals("codeTypeClasses2 contains AbcCodeType", true, codeTypeClasses2.contains(AbcCodeType.class));
-    assertEquals("codeTypeClasses2 contains ZyxCodeType", false, codeTypeClasses2.contains(ZyxCodeType.class));
+    assertTrue("codeTypeClasses2 contains AbcCodeType", codeTypeClasses2.contains(AbcCodeType.class));
+    assertFalse("codeTypeClasses2 contains ZyxCodeType", codeTypeClasses2.contains(ZyxCodeType.class));
   }
 
   /**
-   * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.CodeService#getAllCodeTypes(java.lang.String)} .
+   * Test method for {@link CodeService#getAllCodeTypes()} .
    */
   @Test
   public void testGetAllCodeTypesString() {
@@ -219,7 +218,7 @@ public class CodeServiceTest {
   public void testReplaceCodeServiceGetCodeTypes() {
     ICodeService service = newCodeServiceInstance();
 
-    List<ICodeType<?, ?>> codeTypes = service.getCodeTypes(Arrays.<Class<? extends ICodeType<?, ?>>> asList(TestCodeType3.class, TestCodeType4.class));
+    List<ICodeType<?, ?>> codeTypes = service.getCodeTypes(Arrays.asList(TestCodeType3.class, TestCodeType4.class));
     assertEquals(2, codeTypes.size());
     assertThat(codeTypes.get(0), instanceOf(TestCodeType4.class));
     assertThat(codeTypes.get(1), instanceOf(TestCodeType4.class));
@@ -229,7 +228,7 @@ public class CodeServiceTest {
   public void testReplaceCodeServiceGetCodeTypeMap() {
     ICodeService service = newCodeServiceInstance();
 
-    Map<Class<? extends ICodeType<?, ?>>, ICodeType<?, ?>> codeTypes = service.getCodeTypeMap(Arrays.<Class<? extends ICodeType<?, ?>>> asList(TestCodeType3.class, TestCodeType4.class));
+    Map<Class<? extends ICodeType<?, ?>>, ICodeType<?, ?>> codeTypes = service.getCodeTypeMap(Arrays.asList(TestCodeType3.class, TestCodeType4.class));
     assertEquals(2, codeTypes.size());
     assertThat(codeTypes.get(TestCodeType3.class), instanceOf(TestCodeType4.class));
     assertThat(codeTypes.get(TestCodeType4.class), instanceOf(TestCodeType4.class));
@@ -253,6 +252,13 @@ public class CodeServiceTest {
         m_isFirst = false;
       }
       return result;
+    }
+
+    @Override
+    protected ICacheBuilder<CodeTypeCacheKey, ICodeType<?, ?>> createCacheBuilder() {
+      return super.createCacheBuilder()
+          .withCacheId(CODE_SERVICE_CACHE_ID + ".for.test")
+          .withReplaceIfExists(true);
     }
   }
 

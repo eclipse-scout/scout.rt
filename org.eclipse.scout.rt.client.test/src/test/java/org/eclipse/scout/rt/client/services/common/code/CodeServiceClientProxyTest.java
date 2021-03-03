@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,8 +19,10 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.services.common.code.fixture.CompanyRatingCodeType;
 import org.eclipse.scout.rt.client.services.common.code.fixture.CompanyTypeCodeType;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.shared.services.common.code.CodeService;
+import org.eclipse.scout.rt.shared.services.common.code.CodeTypeCacheKey;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -30,7 +32,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * JUnit test class for {@link CodeServiceClientProxy}.
+ * JUnit test class for {@link CodeService} client proxy.
  *
  * @since Scout 4.1-M2
  */
@@ -46,9 +48,30 @@ public class CodeServiceClientProxyTest {
     m_service = createServiceUnderTest();
   }
 
+  private static CodeService createServiceUnderTest() {
+    CodeService serviceUnderTest = new CodeService() {
+
+      @Override
+      public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses() {
+        Set<Class<? extends ICodeType<?, ?>>> hashSet = new HashSet<>();
+        hashSet.add(CompanyRatingCodeType.class);
+        hashSet.add(CompanyTypeCodeType.class);
+        return hashSet;
+      }
+
+      @Override
+      protected ICacheBuilder<CodeTypeCacheKey, ICodeType<?, ?>> createCacheBuilder() {
+        return super.createCacheBuilder()
+            .withCacheId(CODE_SERVICE_CACHE_ID + ".for.test")
+            .withReplaceIfExists(true);
+      }
+    };
+    BeanInstanceUtil.initializeBeanInstance(serviceUnderTest);
+    return serviceUnderTest;
+  }
+
   /**
-   * Test method for
-   * {@link org.eclipse.scout.rt.client.services.common.code.CodeServiceClientProxy#getCodeType(java.lang.Class)}.
+   * Test method for {@link CodeService#getCodeType(Class)}.
    */
   @Test
   public void testGetCodeType() {
@@ -57,15 +80,14 @@ public class CodeServiceClientProxyTest {
 
     CompanyRatingCodeType ct2 = m_service.getCodeType(CompanyRatingCodeType.class);
     assertNotNull(ct2);
-    assertTrue(ct1 == ct2);
+    assertSame(ct1, ct2);
 
     CompanyTypeCodeType ct3 = m_service.getCodeType(CompanyTypeCodeType.class);
     assertNotNull(ct3);
   }
 
   /**
-   * Test method for
-   * {@link org.eclipse.scout.rt.client.services.common.code.CodeServiceClientProxy#getAllCodeTypes(java.lang.String)}.
+   * Test method for {@link CodeService#getAllCodeTypes()}.
    */
   @Test
   public void testGetAllCodeTypes() {
@@ -90,8 +112,7 @@ public class CodeServiceClientProxyTest {
   }
 
   /**
-   * Test method for
-   * {@link org.eclipse.scout.rt.client.services.common.code.CodeServiceClientProxy#findCodeTypeById(java.lang.Object)}.
+   * Test method for {@link CodeService#findCodeTypeById(Object)}.
    */
   @Test
   public void testFindCodeTypeById() {
@@ -107,21 +128,6 @@ public class CodeServiceClientProxyTest {
 
     ICodeType<Long, ?> companyRatingCodeType2 = m_service.findCodeTypeById(CompanyRatingCodeType.ID);
     assertEquals("CompanyRatingCodeType class", CompanyRatingCodeType.class, companyRatingCodeType2.getClass());
-    assertTrue("CompanyRatingCodeType classes are the same", companyRatingCodeType == companyRatingCodeType2);
-  }
-
-  private static CodeService createServiceUnderTest() {
-    CodeService serviceUnderTest = new CodeService() {
-
-      @Override
-      public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses() {
-        Set<Class<? extends ICodeType<?, ?>>> hashSet = new HashSet<>();
-        hashSet.add(CompanyRatingCodeType.class);
-        hashSet.add(CompanyTypeCodeType.class);
-        return hashSet;
-      }
-    };
-    BeanInstanceUtil.initializeBeanInstance(serviceUnderTest);
-    return serviceUnderTest;
+    assertSame("CompanyRatingCodeType classes are the same", companyRatingCodeType, companyRatingCodeType2);
   }
 }

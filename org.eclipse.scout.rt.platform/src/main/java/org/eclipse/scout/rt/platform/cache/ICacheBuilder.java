@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
 
 /**
@@ -30,14 +31,17 @@ import org.eclipse.scout.rt.platform.util.BeanUtility;
 public interface ICacheBuilder<K, V> {
 
   /**
-   * Calls {@link ICacheBuilderService} which creates a new cache according to this builder
+   * Calls {@link CacheRegistryService} which creates a new cache according to this builder
    *
    * @throws IllegalStateException
    *           if no cacheId or value-resolver is set
    * @throws IllegalArgumentException
    *           if an additional custom wrapper does not have a public constructor with a single argument of type
    *           {@link ICache} or cannot be instantiated
-   * @return created cache instance
+   * @throws AssertionException
+   *           if there is already a cache with this cacheId and #withReplaceIfExists is false and #withThrowIfExists is
+   *           true (Default)
+   * @return created cache instance or existing instance depending on #withReplaceIfExists and #withThrowIfExists
    */
   ICache<K, V> build();
 
@@ -51,9 +55,29 @@ public interface ICacheBuilder<K, V> {
   ICacheBuilder<K, V> withCacheId(String cacheId);
 
   /**
+   * true: if a cache with the same cacheId already exists it is overwritten
+   * <p>
+   * false (Default): if a cache with the same cacheId already exists then {@link #withThrowIfExists(boolean)} is
+   * evaluated.
+   *
+   * @since 11
+   */
+  ICacheBuilder<K, V> withReplaceIfExists(boolean b);
+
+  /**
+   * This flag only has an effect if {@link #withReplaceIfExists(boolean)} is not set
+   * <p>
+   * true (Default): if a cache with the same cacheId already exists and then an AssertionException is thrown
+   * <p>
+   * false: if a cache with the same cacheId already exists then #withThrowIfExists is evaluated.
+   *
+   * @since 11
+   */
+  ICacheBuilder<K, V> withThrowIfExists(boolean b);
+
+  /**
    * Required property which is used to resolve a value of a key.
    *
-   * @param valueResolver
    * @return this builder
    * @see ICacheValueResolver
    */
@@ -161,7 +185,7 @@ public interface ICacheBuilder<K, V> {
    * <b>Warning: Potential deadlock</b>
    * <p>
    * Can be used to bound the maximum number of concurrent value resolve operations (non-fair). There is a risk of
-   * deadlocks if the {@link #valueResolver(ICacheValueResolver)} itself may be blocked.
+   * deadlocks if the {@link #withValueResolver(ICacheValueResolver)} itself may be blocked.
    *
    * @param maxConcurrentResolve
    *          maximum concurrent resolves
@@ -177,7 +201,6 @@ public interface ICacheBuilder<K, V> {
    * takes as first argument an {@link ICache}. See also {@link BeanUtility#createInstance(Class, Object...)} for
    * creation details.
    *
-   * @param cacheClass
    * @param arguments
    *          any additional arguments (beside the first {@link ICache} argument) used to create the cache wrapper
    *          instance
@@ -187,8 +210,6 @@ public interface ICacheBuilder<K, V> {
 
   /**
    * Removes the additional custom cache wrapper of the given type.
-   *
-   * @param cacheClass
    */
   void removeAdditionalCustomWrapper(Class<? extends ICache> cacheClass);
 

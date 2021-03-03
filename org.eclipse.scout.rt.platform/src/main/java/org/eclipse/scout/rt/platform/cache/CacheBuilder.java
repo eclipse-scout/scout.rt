@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
-import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap.ExpiringElement;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentTransactionalMap;
 import org.eclipse.scout.rt.platform.util.collection.CopyOnWriteTransactionalMap;
 
@@ -50,11 +49,15 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
   private boolean m_touchOnGet;
   private Integer m_sizeBound;
   private Integer m_maxConcurrentResolve;
+  private boolean m_throwIfExists;
+  private boolean m_replaceIfExists;
 
   public CacheBuilder() {
     m_customWrappers = new ArrayList<>();
     m_remoteValueResolverEnabled = true;
     m_threadSafe = true;
+    m_throwIfExists = true;
+    m_replaceIfExists = false;
   }
 
   @Override
@@ -67,8 +70,23 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
     cache = addBeforeCustomWrappers(cache);
     cache = addCustomWrappers(cache);
     cache = addAfterCustomWrappers(cache);
-    register(cache);
-    return cache;
+    if (isReplaceIfExists()) {
+      registerAndReplace(cache);
+      return cache;
+    }
+    if (isThrowIfExists()) {
+      register(cache);
+      return cache;
+    }
+    return registerIfAbsent(cache);
+  }
+
+  protected ICache<K, V> registerIfAbsent(ICache<K, V> cache) {
+    return BEANS.get(ICacheRegistryService.class).registerIfAbsent(cache);
+  }
+
+  protected void registerAndReplace(ICache<K, V> cache) {
+    BEANS.get(ICacheRegistryService.class).registerAndReplace(cache);
   }
 
   protected void register(ICache<K, V> cache) {
@@ -83,7 +101,7 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
       boolean touchOnGet = isTouchOnGet() || getSizeBound() != null;
       long timeToLive = NumberUtility.nvl(getTimeToLive(), -1L);
       int targetSize = NumberUtility.nvl(getSizeBound(), -1);
-      return new ConcurrentExpiringMap<>(this.<K, ExpiringElement<V>> createConcurrentMap(), timeToLive, touchOnGet, targetSize);
+      return new ConcurrentExpiringMap<>(this.createConcurrentMap(), timeToLive, touchOnGet, targetSize);
     }
     else if (isThreadSafe() || isTransactional()) {
       return createConcurrentMap();
@@ -147,6 +165,26 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
 
   public String getCacheId() {
     return m_cacheId;
+  }
+
+  @Override
+  public ICacheBuilder<K, V> withReplaceIfExists(boolean b) {
+    m_replaceIfExists = b;
+    return this;
+  }
+
+  public boolean isReplaceIfExists() {
+    return m_replaceIfExists;
+  }
+
+  @Override
+  public ICacheBuilder<K, V> withThrowIfExists(boolean b) {
+    m_throwIfExists = b;
+    return this;
+  }
+
+  public boolean isThrowIfExists() {
+    return m_throwIfExists;
   }
 
   @Override
