@@ -1103,6 +1103,13 @@ public final class StringUtility {
     return s.toLowerCase();
   }
 
+  public static String lowercaseFirst(String s) {
+    if (isNullOrEmpty(s)) {
+      return s;
+    }
+    return s.substring(0, 1).toLowerCase() + s.substring(1);
+  }
+
   public static String uppercase(String s) {
     if (s == null) {
       return null;
