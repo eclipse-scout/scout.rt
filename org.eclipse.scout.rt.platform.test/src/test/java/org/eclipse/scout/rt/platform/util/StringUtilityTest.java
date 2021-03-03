@@ -23,6 +23,7 @@ import org.junit.Test;
 /**
  * JUnit tests for {@link StringUtility}
  */
+@SuppressWarnings("SimplifiableJUnitAssertion")
 public class StringUtilityTest {
 
   /**
@@ -716,9 +717,24 @@ public class StringUtilityTest {
   public void testUppercaseFirst() {
     assertEquals(null, StringUtility.uppercaseFirst(null));
     assertEquals("", StringUtility.uppercaseFirst(""));
+    assertEquals(" ", StringUtility.uppercaseFirst(" "));
     assertEquals("A", StringUtility.uppercaseFirst("A"));
     assertEquals("B", StringUtility.uppercaseFirst("b"));
+    assertEquals(".AB.", StringUtility.lowercaseFirst(".AB."));
     assertEquals("Foo", StringUtility.uppercaseFirst("foo"));
+    assertEquals("Foo bar", StringUtility.uppercaseFirst("foo bar"));
+  }
+
+  @Test
+  public void testLowercaseFirst() {
+    assertEquals(null, StringUtility.lowercaseFirst(null));
+    assertEquals("", StringUtility.lowercaseFirst(""));
+    assertEquals(" ", StringUtility.lowercaseFirst(" "));
+    assertEquals("a", StringUtility.lowercaseFirst("A"));
+    assertEquals("b", StringUtility.lowercaseFirst("b"));
+    assertEquals(".AB.", StringUtility.lowercaseFirst(".AB."));
+    assertEquals("foo", StringUtility.lowercaseFirst("Foo"));
+    assertEquals("fOO BAR", StringUtility.lowercaseFirst("FOO BAR"));
   }
 
   @Test
