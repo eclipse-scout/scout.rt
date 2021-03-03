@@ -83,8 +83,6 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     super(chart);
     this.chartJs = null;
     this.onlyIntegers = true;
-    this.minSpaceBetweenYTicks = 35;
-    this.minSpaceBetweenXTicks = 150;
     this.maxXAxesTicksHeigth = 75;
     this.numSupportedColors = 6;
     this.colorSchemeCssClass = '';
@@ -752,6 +750,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let options = config.options;
     if (options.scale) {
       options.scale = $.extend(true, {}, {
+        minSpaceBetweenTicks: 35,
         angleLines: {
           display: false
         },
@@ -777,6 +776,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (scout.isOneOf(config.type, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.LINE, Chart.Type.BUBBLE)) {
       config.options = $.extend(true, {}, {
         scales: {
+          minSpaceBetweenXTicks: 150,
+          minSpaceBetweenYTicks: 35,
           xAxes: [{}],
           yAxes: [{}]
         }
@@ -1979,22 +1980,33 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       return;
     }
 
+    let scales = config.options.scales,
+      scale = config.options.scale,
+      minSpaceBetweenXTicks, minSpaceBetweenYTicks;
+    if (scale) {
+      minSpaceBetweenXTicks = scale.minSpaceBetweenTicks;
+      minSpaceBetweenYTicks = scale.minSpaceBetweenTicks;
+    } else {
+      minSpaceBetweenXTicks = scales.minSpaceBetweenXTicks;
+      minSpaceBetweenYTicks = scales.minSpaceBetweenYTicks;
+    }
+
     let width = Math.abs(chartArea.right - chartArea.left),
       height = Math.abs(chartArea.top - chartArea.bottom),
-      maxXTicks = Math.max(Math.floor(width / this.minSpaceBetweenXTicks), 3),
-      maxYTicks = Math.max(Math.floor(height / this.minSpaceBetweenYTicks), 3);
+      maxXTicks = Math.max(Math.floor(width / minSpaceBetweenXTicks), 3),
+      maxYTicks = Math.max(Math.floor(height / minSpaceBetweenYTicks), 3);
 
     let yBoundaries = this._computeYBoundaries(config, height),
       yBoundary = yBoundaries.yBoundary,
       yBoundaryDiffType = yBoundaries.yBoundaryDiffType;
 
-    if (config.options.scale) {
-      this._adjustScaleMaxMin(config.options.scale, maxYTicks, yBoundary);
+    if (scale) {
+      this._adjustScaleMaxMin(scale, Math.min(maxXTicks, maxYTicks), yBoundary);
       return;
     }
 
-    let xAxes = config.options.scales.xAxes,
-      yAxes = config.options.scales.yAxes;
+    let xAxes = scales.xAxes,
+      yAxes = scales.yAxes;
 
     if (yBoundaryDiffType) {
       this._adjustAxes(arrays.ensure(yAxes[0]), maxYTicks, yBoundary);

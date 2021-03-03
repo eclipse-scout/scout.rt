@@ -35,6 +35,8 @@ describe('ChartJsRendererSpec', () => {
       defaultScalesConfig = $.extend(true, {}, defaultConfig, {
         options: {
           scales: {
+            minSpaceBetweenXTicks: 150,
+            minSpaceBetweenYTicks: 35,
             xAxes: [{}],
             yAxes: [{}]
           }
@@ -42,7 +44,9 @@ describe('ChartJsRendererSpec', () => {
       }),
       defaultScaleConfig = $.extend(true, {}, defaultConfig, {
         options: {
-          scale: {}
+          scale: {
+            minSpaceBetweenTicks: 35
+          }
         }
       });
 
@@ -84,6 +88,7 @@ describe('ChartJsRendererSpec', () => {
       renderer._adjustGridMaxMin(config, chartArea);
 
       expect(config.options.scale).toEqual({
+        minSpaceBetweenTicks: 35, // default value, not part of this test
         ticks: {
           maxTicksLimit: 4,
           stepSize: 1, // default value, not part of this test
