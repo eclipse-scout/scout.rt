@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -89,7 +89,6 @@ public class CodeService implements ICodeService {
   /**
    * Creates a new cache key. Method hook allows to customize cache key instances.
    *
-   * @param type
    * @return new cache key
    */
   protected <T extends ICodeType<?, ?>> CodeTypeCacheKey createCacheKey(Class<T> type) {
@@ -173,11 +172,12 @@ public class CodeService implements ICodeService {
     return result;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <CODE extends ICode<?>> CODE getCode(Class<CODE> type) {
-    Class<? extends ICode<?>> typeClass = type;
-    Class<? extends ICodeType<?, ?>> declaringCodeTypeClass = getDeclaringCodeTypeClass(typeClass);
-    ICodeType<?, ?> codeType = getCodeType(declaringCodeTypeClass);
+    Class typeClass = type;
+    Class declaringCodeTypeClass = getDeclaringCodeTypeClass(typeClass);
+    ICodeType codeType = getCodeType(declaringCodeTypeClass);
     return findCode(type, codeType);
   }
 
