@@ -333,4 +333,20 @@ public final class PlatformConfigProperties {
           + "\nMake sure to define the property 'scout.serial.whitelist' in the config.properties";
     }
   }
+
+  /**
+   * @since 10.0
+   */
+  public static class MalwareScannerPathProperty extends AbstractStringConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.malwareScanner.path";
+    }
+
+    @Override
+    public String description() {
+      return "Path to a malware scanner checked directory. The default value is null which means the system temp path is used.";
+    }
+  }
 }

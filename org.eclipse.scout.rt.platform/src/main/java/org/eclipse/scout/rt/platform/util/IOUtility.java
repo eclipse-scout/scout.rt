@@ -10,6 +10,9 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -54,9 +57,6 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 @SuppressWarnings("findbugs:RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
 public final class IOUtility {
@@ -109,6 +109,7 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    *
    * @param in
+   *          input reader
    * @return the content bytes
    */
   public static byte[] readBytes(InputStream in) {
@@ -121,6 +122,7 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    *
    * @param in
+   *          input reader
    * @param len
    *          optional known length or -1 if unknown
    * @return the content bytes
@@ -160,6 +162,7 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    *
    * @param in
+   *          input reader
    * @param charset
    *          optional charset, if null is provided, the system default encoding is used
    * @return the content string
@@ -174,6 +177,7 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    *
    * @param in
+   *          input reader
    * @return the content string
    */
   public static String readStringUTF8(InputStream in) {
@@ -186,6 +190,7 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    *
    * @param in
+   *          input reader
    * @param charset
    *          optional charset, if null is provided, the system default encoding is used
    * @param len
@@ -212,6 +217,7 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    *
    * @param in
+   *          input reader
    * @return the content string
    */
   public static String readString(Reader in) {
@@ -224,6 +230,7 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    *
    * @param in
+   *          input reader
    * @param maxLen
    *          max number of characters to read or -1 if the whole stream should be read.
    * @return the content string
@@ -284,6 +291,7 @@ public final class IOUtility {
    *
    * @return A collection of binary resources contained in the ZIP archive
    * @param zipArchive
+   *          file to unzip
    * @param filterPattern
    *          optional filter, may be null
    */
@@ -327,10 +335,12 @@ public final class IOUtility {
 
   /**
    * Reads all text lines from the {@link URL} specified.
-   * @param url The {@link URL} to read from. Must not be {@code null}.
-   * @param charset The {@link Charset} used to read the url content. Must not be {@code null}.
+   *
+   * @param url
+   *          The {@link URL} to read from. Must not be {@code null}.
+   * @param charset
+   *          The {@link Charset} used to read the url content. Must not be {@code null}.
    * @return A {@link List} with all lines
-   * @throws IOException
    */
   public static List<String> readAllLinesFromUrl(URL url, Charset charset) throws IOException {
     try (BufferedReader in = new BufferedReader(new InputStreamReader(assertNotNull(url).openConnection().getInputStream(), charset))) {
@@ -366,9 +376,6 @@ public final class IOUtility {
    * Write string.
    * <p>
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
-   *
-   * @param out
-   * @param s
    */
   public static void writeBytes(OutputStream out, byte[] bytes) {
     try {
@@ -401,9 +408,6 @@ public final class IOUtility {
    * Write string in UTF8 encoding.
    * <p>
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
-   *
-   * @param out
-   * @param s
    */
   public static void writeStringUTF8(OutputStream out, String s) {
     writeString(out, StandardCharsets.UTF_8.name(), s);
@@ -413,10 +417,6 @@ public final class IOUtility {
    * Write string.
    * <p>
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
-   *
-   * @param out
-   * @param charset
-   * @param s
    */
   public static void writeString(OutputStream out, String charset, String s) {
     try {
@@ -433,9 +433,6 @@ public final class IOUtility {
    * Write string.
    * <p>
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
-   *
-   * @param out
-   * @param s
    */
   public static void writeString(Writer out, String s) {
     try {
@@ -475,7 +472,7 @@ public final class IOUtility {
   public static File createTempDirectory(String dirSuffix) {
     try {
       if (dirSuffix != null) {
-        dirSuffix = dirSuffix.replaceAll("[:*?\\\"<>|]*", "");
+        dirSuffix = dirSuffix.replaceAll("[:*?\"<>|]*", "");
       }
       File tmp = File.createTempFile("dir", dirSuffix);
       tmp.delete();
@@ -499,14 +496,31 @@ public final class IOUtility {
    * @return A new temporary file with specified content
    */
   public static File createTempFile(String fileName, byte[] content) {
+    return createTempFile(fileName, (File) null, content);
+  }
+
+  /**
+   * Convenience method for creating temporary files with content. Note, the temporary file will be automatically
+   * deleted when the virtual machine terminates.
+   *
+   * @param fileName
+   *          If no or an empty filename is given, a random fileName will be created.
+   * @param content
+   *          If no content is given, an empty file will be created
+   * @param directory
+   *          The directory in which the temporary file is to be created, or {@code null} if the default temp directory
+   *          is to be used
+   * @return A new temporary file with specified content
+   */
+  public static File createTempFile(String fileName, File directory, byte[] content) {
     try {
       if (fileName != null) {
-        fileName = fileName.replaceAll("[\\\\/:*?\\\"<>|]*", "");
+        fileName = fileName.replaceAll("[\\\\/:*?\"<>|]*", "");
       }
       if (fileName == null || fileName.isEmpty()) {
         fileName = getTempFileName(".tmp");
       }
-      File f = File.createTempFile("tmp", ".tmp");
+      File f = File.createTempFile("tmp", ".tmp", directory);
       File f2 = new File(f.getParentFile(), new File(fileName).getName());
       if (f2.exists() && !f2.delete()) {
         throw new IOException("File " + f2 + " exists and cannot be deleted");
@@ -532,19 +546,47 @@ public final class IOUtility {
   }
 
   /**
-   * Creates a temp file from an input stream.
+   * Creates a temporary file in the system temp folder from an input stream.
    * <p>
    * Content stream is closed automatically.
    *
    * @param content
+   *          data to be written to the temporary file.
    * @param filename
+   *          file name prefix (the system will automatically add an arbitrary identifier to this prefix to generate a
+   *          unique file name)
    * @param extension
-   * @return new file
+   *          file name suffix (must include the colon, e.g. {@code ".tmp"})
+   * @return newly created temporary file
    * @throws ProcessingException
+   *           if file creation failed
    */
   public static File createTempFile(InputStream content, String filename, String extension) {
+    return createTempFile(content, filename, extension, null);
+  }
+
+  /**
+   * Creates a temporary file in a certain folder from an input stream.
+   * <p>
+   * Content stream is closed automatically.
+   *
+   * @param content
+   *          data to be written to the temporary file.
+   * @param filename
+   *          file name prefix (the system will automatically add an arbitrary identifier to this prefix to generate a
+   *          unique file name)
+   * @param extension
+   *          file name suffix (must include the colon, e.g. {@code ".tmp"})
+   * @param directory
+   *          The directory in which the temporary file is to be created, or {@code null} if the default temp directory
+   *          is to be used
+   * @return newly created temporary file
+   * @throws ProcessingException
+   *           if file creation failed
+   */
+  public static File createTempFile(InputStream content, String filename, String extension, File directory) {
     try {
-      File temp = File.createTempFile(filename, extension);
+      File temp = File.createTempFile(filename, extension, directory);
       try (InputStream in = content; FileOutputStream out = new FileOutputStream(temp)) {
         writeBytes(out, readBytes(in));
       }
@@ -558,19 +600,44 @@ public final class IOUtility {
   /**
    * Convenience method for creating temporary files with content. Note, the temporary file will be automatically
    * deleted when the virtual machine terminates. The temporary file will look like this: <i>prefix</i>2093483323922923
-   * <i>.suffix</i>
+   * <i>.suffix</i> and will be located in the default temp folder.
    *
    * @param prefix
    *          The prefix of the temporary file
    * @param suffix
    *          The suffix of the temporary file. Don't forget the colon, for example <b>.tmp</b>
    * @param content
+   *          data to be written to the temporary file.
    * @return A new temporary file with the specified content
+   * @throws ProcessingException
+   *           if file creation failed
    */
   public static File createTempFile(String prefix, String suffix, byte[] content) {
+    return createTempFile(prefix, suffix, null, content);
+  }
+
+  /**
+   * Convenience method for creating temporary files with content. Note, the temporary file will be automatically
+   * deleted when the virtual machine terminates. The temporary file will look like this: <i>prefix</i>2093483323922923
+   * <i>.suffix</i> and will be located in the specified directory.
+   *
+   * @param prefix
+   *          The prefix of the temporary file
+   * @param suffix
+   *          The suffix of the temporary file. Don't forget the colon, for example <b>.tmp</b>
+   * @param directory
+   *          The directory in which the temporary file is to be created, or {@code null} if the default temp directory
+   *          is to be used
+   * @param content
+   *          data to be written to the temporary file.
+   * @return A new temporary file with the specified content
+   * @throws ProcessingException
+   *           if file creation failed
+   */
+  public static File createTempFile(String prefix, String suffix, File directory, byte[] content) {
     File f = null;
     try {
-      f = File.createTempFile(prefix, suffix);
+      f = File.createTempFile(prefix, suffix, directory);
       f.deleteOnExit();
       if (content != null) {
         try (OutputStream out = new FileOutputStream(f)) {
@@ -587,7 +654,8 @@ public final class IOUtility {
   /**
    * Delete a directory and all containing files and directories
    *
-   * @param directory
+   * @param dir
+   *          directory to be deleted
    * @return true if the directory is successfully deleted or does not exists; false otherwise
    * @throws SecurityException
    *           - If a security manager exists and its check methods deny read or delete access
@@ -620,7 +688,7 @@ public final class IOUtility {
 
   public static boolean createDirectory(String dir) {
     if (dir != null) {
-      dir = dir.replaceAll("[*?\\\"<>|]*", "");
+      dir = dir.replaceAll("[*?\"<>|]*", "");
       File f = toFile(dir);
       return f != null && f.mkdirs();
     }
@@ -821,8 +889,6 @@ public final class IOUtility {
   /**
    * The text passed to this method is tried to wellform as an URL. If the text can not be transformed into an URL the
    * method returns null.
-   *
-   * @param urlText
    */
   public static URL urlTextToUrl(String urlText) {
     String text = urlText;
@@ -876,6 +942,7 @@ public final class IOUtility {
 
   /**
    * @param file
+   *          file to read from
    * @param charsetName
    *          The name of a supported {@link Charset </code>charset<code>}
    * @return List containing all lines of the file as Strings

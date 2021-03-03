@@ -106,6 +106,21 @@ public class IOUtilityTest {
   }
 
   @Test
+  public void testCreateNewTempFileInSpecificFolder() throws Throwable {
+    File tempFolder = null;
+    try {
+      tempFolder = IOUtility.createTempDirectory("subDirectoryForTest");
+      File file1 = IOUtility.createTempFile("fileInTopLevel", ".txt", null);
+      File file2 = IOUtility.createTempFile("fileInSubFolder", ".txt", tempFolder, null);
+      assertEquals(file2.getParentFile(), tempFolder);
+      assertEquals(file2.getParentFile().getParentFile(), file1.getParentFile());
+    }
+    finally {
+      IOUtility.deleteDirectory(tempFolder);
+    }
+  }
+
+  @Test
   public void testCreateNewTempFileNoContent() throws Throwable {
     File tempFile = null;
     try {
