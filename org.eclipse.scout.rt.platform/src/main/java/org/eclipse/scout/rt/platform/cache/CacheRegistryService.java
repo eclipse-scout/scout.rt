@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,12 +22,21 @@ public class CacheRegistryService implements ICacheRegistryService {
 
   private final Map<String, ICache> m_map = new ConcurrentHashMap<>();
 
-  /**
-   * Register a cache with a given id
-   */
+  @SuppressWarnings("unchecked")
+  @Override
+  public <K, V> ICache<K, V> registerIfAbsent(ICache<K, V> cache) {
+    return (ICache<K, V>) getMap().computeIfAbsent(cache.getCacheId(), id -> cache);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <K, V> void registerAndReplace(ICache<K, V> cache) {
+    getMap().put(cache.getCacheId(), cache);
+  }
+
   @Override
   public <K, V> void register(ICache<K, V> cache) {
-    getMap().put(cache.getCacheId(), cache);
+    Assertions.assertNull(getMap().putIfAbsent(cache.getCacheId(), cache), "The cache with id '{}' is already registered. Consider calling registerIfAbsent instead.", cache.getCacheId());
   }
 
   @SuppressWarnings("unchecked")

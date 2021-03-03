@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
 import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
@@ -130,6 +131,13 @@ public class AccessControlServiceTest {
       permissions.add(new RemoteServiceAccessPermission("*.shared.*", "*"), PermissionLevel.ALL);
       permissions.setReadOnly();
       return permissions;
+    }
+
+    @Override
+    protected ICacheBuilder<String, IPermissionCollection> createCacheBuilder() {
+      return super.createCacheBuilder()
+          .withCacheId(ACCESS_CONTROL_SERVICE_CACHE_ID + ".for.test")
+          .withReplaceIfExists(true);
     }
   }
 

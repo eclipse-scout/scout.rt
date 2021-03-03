@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import static org.junit.Assert.*;
 
 import java.security.Principal;
 import java.security.PrivilegedAction;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
@@ -118,18 +120,17 @@ public class AccessControlServiceTest {
   }
 
   /**
-   * Test method for
-   * {@link org.eclipse.scout.rt.security.AbstractAccessControlService#clearCacheOfUserIds(java.util.Collection)} .
+   * Test method for {@link org.eclipse.scout.rt.security.AbstractAccessControlService#clearCache(Collection)} .
    */
   @Test
   public void testClearCacheOfUserIds() throws ProcessingException {
     IPermissionCollection p1 = m_accessControlService.getPermissions();
     IPermissionCollection p2 = m_accessControlService.getPermissions();
     assertSame(p1, p2);
-    m_accessControlService.clearCache(Collections.<String> emptyList());
+    m_accessControlService.clearCache(Collections.emptyList());
     IPermissionCollection p3 = m_accessControlService.getPermissions();
     assertSame(p1, p3);
-    m_accessControlService.clearCache(Collections.<String> singletonList(null));
+    m_accessControlService.clearCache(Collections.singletonList(null));
     IPermissionCollection p4 = m_accessControlService.getPermissions();
     assertSame(p1, p4);
     m_accessControlService.clearCache(Collections.singletonList(TEST_USER));
@@ -154,6 +155,13 @@ public class AccessControlServiceTest {
       permissions.add(new SomePermission1(), PermissionLevel.ALL);
       permissions.setReadOnly();
       return permissions;
+    }
+
+    @Override
+    protected ICacheBuilder<String, IPermissionCollection> createCacheBuilder() {
+      return super.createCacheBuilder()
+          .withCacheId(ACCESS_CONTROL_SERVICE_CACHE_ID + ".for.test")
+          .withReplaceIfExists(true);
     }
   }
 
