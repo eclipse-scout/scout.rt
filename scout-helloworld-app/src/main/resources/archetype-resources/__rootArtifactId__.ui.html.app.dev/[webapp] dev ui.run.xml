@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="[webapp] dev ui" type="Application" factoryName="Application">
+  <configuration default="false" name="[webapp] dev ui" type="Application" factoryName="Application" folderName="${simpleArtifactName}">
     <option name="MAIN_CLASS_NAME" value="org.eclipse.scout.dev.jetty.JettyServer" />
     <module name="${rootArtifactId}.ui.html.app.dev" />
     <option name="VM_PARAMETERS" value="-Dscout.jetty.port=8082 -Djandex.rebuild=true" />

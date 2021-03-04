@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="js tests" type="js.build_tools.npm">
+  <configuration default="false" name="js tests" type="js.build_tools.npm" folderName="${simpleArtifactName}">
     <package-json value="$PROJECT_DIR$/${simpleArtifactName}/${simpleArtifactName}.ui/package.json" />
     <command value="run" />
     <scripts>
