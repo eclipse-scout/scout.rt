@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.dataobject;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -23,8 +24,8 @@ import java.lang.annotation.Target;
  * Example:
  *
  * <pre>
- * &#64;TypeName("ExampleEntity")
- * &#64;TypeVersion("scout-8.0.0")
+ * &#64;TypeName("scout.ExampleEntity")
+ * &#64;TypeVersion(Scout_8_0_0.class)
  * public class ExampleEntityDo extends DoEntity {
  *   ...
  * }
@@ -34,11 +35,11 @@ import java.lang.annotation.Target;
  */
 @Documented
 @Retention(RUNTIME)
-@Target({TYPE})
+@Target(TYPE)
 public @interface TypeVersion {
 
   /**
    * Version used when serializing an instance of the annotated class
    */
-  String value();
+  Class<? extends ITypeVersion> value();
 }

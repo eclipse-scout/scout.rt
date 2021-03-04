@@ -16,9 +16,10 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0_034;
 
 @TypeName("ScoutFixture")
-@TypeVersion("scout-8.0.0.034")
+@TypeVersion(DataObjectFixture_1_0_0_034.class)
 public class ScoutFixtureDo extends DoEntity {
 
   public DoValue<String> name() {

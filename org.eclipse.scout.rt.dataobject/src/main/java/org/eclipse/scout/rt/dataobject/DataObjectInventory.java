@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -19,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -28,7 +31,8 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
-import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
+import org.eclipse.scout.rt.platform.namespace.Namespaces;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
@@ -57,7 +61,7 @@ public class DataObjectInventory {
   /**
    * Map of {@link IDoEntity} class to its compile-time annotated type version (see {@link TypeVersion} annotation).
    */
-  private final Map<Class<? extends IDoEntity>, String> m_classToTypeVersion = new HashMap<>();
+  private final Map<Class<? extends IDoEntity>, NamespaceVersion> m_classToTypeVersion = new HashMap<>();
 
   /** Map of {@link IDoEntity} class to its attributes map */
   private final Map<Class<? extends IDoEntity>, Map<String, DataObjectAttributeDescriptor>> m_classAttributeMap = new ConcurrentHashMap<>();
@@ -75,6 +79,8 @@ public class DataObjectInventory {
         .stream()
         .map(IClassInfo::resolveClass)
         .forEach(this::registerClassByTypeVersion);
+
+    validateTypeVersionImplementors();
 
     LOG.info("Registry initialized, found {} {} implementations with @{} annotation and {} implementations with @{} annotation.",
         m_typeNameToClassMap.size(), IDoEntity.class.getSimpleName(), TypeName.class.getSimpleName(),
@@ -130,7 +136,7 @@ public class DataObjectInventory {
    * @return Type version for a given {@link IDoEntity} class.
    * @see TypeVersion
    */
-  public String getTypeVersion(Class<? extends IDoEntity> clazz) {
+  public NamespaceVersion getTypeVersion(Class<? extends IDoEntity> clazz) {
     return m_classToTypeVersion.get(clazz);
   }
 
@@ -142,7 +148,7 @@ public class DataObjectInventory {
   }
 
   /**
-   * @return Optional of {@link DataObjectAttributeDescriptor} for specified {@code enttiyClass} and
+   * @return Optional of {@link DataObjectAttributeDescriptor} for specified {@code entityClass} and
    *         {@code attributeName}
    */
   public Optional<DataObjectAttributeDescriptor> getAttributeDescription(Class<? extends IDoEntity> entityClass, String attributeName) {
@@ -162,6 +168,16 @@ public class DataObjectInventory {
    * HELPER METHODS
    * *************************************************************************/
 
+  protected void validateTypeVersionImplementors() {
+    String typeVersionsWithoutNamespaceVersion = BEANS.all(ITypeVersion.class).stream()
+        .filter(typeVersion -> typeVersion.getVersion() == null)
+        .map(ITypeVersion::getClass)
+        .map(Class::getName)
+        .collect(Collectors.joining(", "));
+
+    assertTrue(StringUtility.isNullOrEmpty(typeVersionsWithoutNamespaceVersion), "Missing namespace version for implementors of {}: {}", ITypeVersion.class.getName(), typeVersionsWithoutNamespaceVersion);
+  }
+
   /**
    * Adds {@code clazz} to registry based on its {@code TypeName}
    */
@@ -176,7 +192,7 @@ public class DataObjectInventory {
         LOG.debug("Registered class {} with type name '{}'", entityClass, name);
       }
       else {
-        LOG.warn("Class {} is annotated with @{} with an empty type name value, skip registration", clazz.getName(), TypeName.class.getSimpleName(), IDoEntity.class);
+        LOG.warn("Class {} is annotated with @{} with an empty type name value, skip registration", clazz.getName(), TypeName.class.getSimpleName());
       }
     }
     else {
@@ -190,12 +206,18 @@ public class DataObjectInventory {
   protected void registerClassByTypeVersion(Class<?> clazz) {
     if (IDoEntity.class.isAssignableFrom(clazz)) {
       Class<? extends IDoEntity> entityClass = clazz.asSubclass(IDoEntity.class);
-      String version = resolveTypeVersion(clazz);
-      if (version != null) {
-        String registeredVersion = m_classToTypeVersion.put(entityClass, version);
-        Assertions.assertNull(registeredVersion, "{} was already registered with type version {}, register each class only once.", clazz, registeredVersion, TypeVersion.class.getSimpleName());
+      Class<? extends ITypeVersion> typeVersionClass = resolveTypeVersionClass(clazz);
+      if (typeVersionClass != null) {
+        ITypeVersion typeVersion = assertNotNull(BEANS.opt(typeVersionClass), "No instance found of '{}' for data object '{}'.", typeVersionClass, clazz);
+        NamespaceVersion version = typeVersion.getVersion(); // never null, validated in #validateTypeVersionImplementors
+        NamespaceVersion registeredVersion = m_classToTypeVersion.put(entityClass, version);
+        assertNull(registeredVersion, "{} was already registered with type version {}, register each class only once.", clazz, registeredVersion, TypeVersion.class.getSimpleName());
+        assertNotNull(Namespaces.get().byId(version.getNamespace()), "No registered namespace found for type version '{}' of data object '{}'.", version.unwrap(), clazz);
+        LOG.debug("Registered class {} with type version '{}'", entityClass, version);
       }
-      LOG.debug("Registered class {} with type version '{}'", entityClass, version);
+      else {
+        LOG.debug("Registered class {} without type version", entityClass);
+      }
     }
     else {
       LOG.warn("Class {} is annotated with @{} but is not an instance of {}, skip registration", clazz.getName(), TypeVersion.class.getSimpleName(), IDoEntity.class);
@@ -206,8 +228,8 @@ public class DataObjectInventory {
    * Checks for {@link IDoEntity} classes with duplicated {@link TypeName} annotation values.
    */
   protected void checkDuplicateClassMapping(Class<?> clazz, String name, String existingName, Class<? extends IDoEntity> existingClass) {
-    Assertions.assertNull(existingClass, "{} and {} have the same type '{}', use an unique @{} annotation value.", clazz, existingClass, name, TypeName.class.getSimpleName());
-    Assertions.assertNull(existingName, "{} was already registered with type name {}, register each class only once.", clazz, existingName, TypeName.class.getSimpleName());
+    assertNull(existingClass, "{} and {} have the same type '{}', use an unique @{} annotation value.", clazz, existingClass, name, TypeName.class.getSimpleName());
+    assertNull(existingName, "{} was already registered with type name {}, register each class only once.", clazz, existingName, TypeName.class.getSimpleName());
   }
 
   /**
@@ -254,12 +276,9 @@ public class DataObjectInventory {
     return null;
   }
 
-  protected String resolveTypeVersion(Class<?> c) {
+  protected Class<? extends ITypeVersion> resolveTypeVersionClass(Class<?> c) {
     TypeVersion typeVersionAnn = c.getAnnotation(TypeVersion.class);
-    if (typeVersionAnn != null && StringUtility.hasText(typeVersionAnn.value())) {
-      return typeVersionAnn.value();
-    }
-    return null;
+    return typeVersionAnn == null ? null : typeVersionAnn.value();
   }
 
   protected String resolveAttributeName(Method accessor) {

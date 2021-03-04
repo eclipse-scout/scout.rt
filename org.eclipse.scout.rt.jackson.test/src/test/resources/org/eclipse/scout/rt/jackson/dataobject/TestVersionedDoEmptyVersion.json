@@ -1,5 +1,5 @@
 {
-  "_type" : "TestVersioned",
+  "_type" : "jacksonFixture.TestVersioned",
   "_typeVersion" : "",
   "name" : "lorem"
 }

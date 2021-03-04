@@ -15,6 +15,7 @@ import java.util.Optional;
 import org.eclipse.scout.rt.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.databind.JavaType;
@@ -31,7 +32,8 @@ public class DefaultDoEntityDeserializerTypeResolver implements IDoEntityDeseria
 
   @Override
   public String resolveTypeVersion(Class<? extends IDoEntity> entityClass) {
-    return m_dataObjectInventory.get().getTypeVersion(entityClass);
+    NamespaceVersion typeVersion = m_dataObjectInventory.get().getTypeVersion(entityClass);
+    return typeVersion == null ? null : typeVersion.unwrap();
   }
 
   @Override

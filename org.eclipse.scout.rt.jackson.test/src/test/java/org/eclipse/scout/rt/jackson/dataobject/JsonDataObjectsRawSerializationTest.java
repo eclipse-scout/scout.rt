@@ -75,7 +75,7 @@ public class JsonDataObjectsRawSerializationTest {
     TestVersionedDo versioned = BEANS.get(TestVersionedDo.class).withName("lorem");
     String json = s_dataObjectMapper.writeValue(versioned);
     DoEntity rawEntity_8_0_0 = (DoEntity) s_dataObjectMapper.readValueRaw(json);
-    assertEquals("scout-8.0.0", rawEntity_8_0_0.getString(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME));
+    assertEquals("jacksonFixture-1.0.0", rawEntity_8_0_0.getString(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME));
 
     DoEntity rawEntity_a_b_c = (DoEntity) s_dataObjectMapper.readValueRaw(readResourceAsString("TestVersionedDoInvalidVersion.json"));
     assertEquals("scout-a.b.c", rawEntity_a_b_c.getString(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME));

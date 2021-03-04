@@ -25,7 +25,6 @@ import java.lang.annotation.Target;
  *
  * <pre>
  * &#64;EnumName("scout.ExampleStatus")
- * &#64;EnumVersion("scout-8.0.0.001")
  * public enum ExampleStatus implements IEnum {
  *   ...
  * }

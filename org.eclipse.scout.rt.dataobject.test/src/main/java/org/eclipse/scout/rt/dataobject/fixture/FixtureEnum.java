@@ -11,11 +11,9 @@
 package org.eclipse.scout.rt.dataobject.fixture;
 
 import org.eclipse.scout.rt.dataobject.enumeration.EnumName;
-import org.eclipse.scout.rt.dataobject.enumeration.EnumVersion;
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 
 @EnumName("scout.FixtureEnum")
-@EnumVersion("scout-8.0.0.036")
 public enum FixtureEnum implements IEnum {
 
   ONE("one", "One"),

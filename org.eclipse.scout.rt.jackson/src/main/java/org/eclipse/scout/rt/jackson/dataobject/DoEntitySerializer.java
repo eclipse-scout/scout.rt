@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.dataobject.DoNode;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -74,10 +75,10 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
   }
 
   protected void serializeTypeVersion(JsonGenerator gen, IDoEntity entity) throws IOException {
-    String typeVersion = m_dataObjectInventory.get().getTypeVersion(entity.getClass());
+    NamespaceVersion typeVersion = m_dataObjectInventory.get().getTypeVersion(entity.getClass());
     if (typeVersion != null) {
       gen.writeFieldName(m_context.getTypeVersionAttributeName());
-      gen.writeString(typeVersion);
+      gen.writeString(typeVersion.unwrap());
     }
   }
 

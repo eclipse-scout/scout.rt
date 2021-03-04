@@ -11,10 +11,15 @@
 package org.eclipse.scout.rt.dataobject;
 
 import static org.junit.Assert.*;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0_034;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_No_Version;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectProjectFixtureTypeVersions.DataObjectProjectFixture_1_2_3_004;
 import org.eclipse.scout.rt.dataobject.fixture.DateFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureInvalidTypeNameDo;
@@ -23,7 +28,10 @@ import org.eclipse.scout.rt.dataobject.fixture.ProjectFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ProjectSubFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ScoutFixtureDo;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,6 +75,19 @@ public class DataObjectInventoryTest {
     m_inventory.registerClassByTypeName(DateFixtureDo.class);
     m_inventory.registerClassByTypeName(TestFixtureEntityDo.class);
     m_inventory.registerClassByTypeName(EntityFixtureInvalidTypeNameDo.class);
+  }
+
+  @Test
+  public void testValidate() {
+    m_inventory.validateTypeVersionImplementors(); // no exception
+
+    IBean<Object> fixtureNoVersionBean = BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(DataObjectFixture_No_Version.class));
+    try {
+      assertThrows(AssertionException.class, () -> m_inventory.validateTypeVersionImplementors());
+    }
+    finally {
+      BEANS.get(BeanTestingHelper.class).unregisterBean(fixtureNoVersionBean);
+    }
   }
 
   @Test
@@ -176,17 +197,17 @@ public class DataObjectInventoryTest {
   }
 
   @Test
-  public void testResolveTypeVersion() {
-    assertNull(m_inventory.resolveTypeVersion(EntityFixtureDo.class));
-    assertEquals("scout-8.0.0", m_inventory.resolveTypeVersion(OtherEntityFixtureDo.class));
-    assertNull(m_inventory.resolveTypeVersion(Object.class));
+  public void testResolveTypeVersionClass() {
+    assertNull(m_inventory.resolveTypeVersionClass(EntityFixtureDo.class));
+    assertEquals(DataObjectFixture_1_0_0.class, m_inventory.resolveTypeVersionClass(OtherEntityFixtureDo.class));
+    assertNull(m_inventory.resolveTypeVersionClass(Object.class));
 
     m_inventory.registerClassByTypeVersion(ScoutFixtureDo.class);
-    assertEquals("scout-8.0.0.034", m_inventory.getTypeVersion(ScoutFixtureDo.class));
+    assertEquals(DataObjectFixture_1_0_0_034.VERSION, m_inventory.getTypeVersion(ScoutFixtureDo.class));
 
     m_inventory.registerClassByTypeVersion(ProjectFixtureDo.class);
-    assertEquals("project-1.2.3.004", m_inventory.getTypeVersion(ProjectFixtureDo.class));
-    assertNull( m_inventory.getTypeVersion(ProjectSubFixtureDo.class));
+    assertEquals(DataObjectProjectFixture_1_2_3_004.VERSION, m_inventory.getTypeVersion(ProjectFixtureDo.class));
+    assertNull(m_inventory.getTypeVersion(ProjectSubFixtureDo.class));
   }
 
   @Test(expected = AssertionException.class)
@@ -205,8 +226,9 @@ public class DataObjectInventoryTest {
     assertEquals("ScoutFixture", inv.toTypeName(ProjectFixtureDo.class));
     assertEquals("ScoutFixture", inv.toTypeName(ProjectSubFixtureDo.class));
 
-    assertEquals("scout-8.0.0.034", inv.getTypeVersion(ScoutFixtureDo.class));
-    assertEquals("project-1.2.3.004", inv.getTypeVersion(ProjectFixtureDo.class));
+    assertEquals(DataObjectFixture_1_0_0_034.VERSION, inv.getTypeVersion(ScoutFixtureDo.class));
+    assertEquals(DataObjectProjectFixture_1_2_3_004.VERSION, inv.getTypeVersion(ProjectFixtureDo.class));
+
     assertNull(inv.getTypeVersion(ProjectSubFixtureDo.class));
   }
 }

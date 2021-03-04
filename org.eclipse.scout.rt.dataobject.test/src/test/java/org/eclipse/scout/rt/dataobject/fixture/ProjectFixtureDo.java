@@ -14,10 +14,11 @@ import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectProjectFixtureTypeVersions.DataObjectProjectFixture_1_2_3_004;
 import org.eclipse.scout.rt.platform.Replace;
 
 @Replace
-@TypeVersion("project-1.2.3.004")
+@TypeVersion(DataObjectProjectFixture_1_2_3_004.class)
 public class ProjectFixtureDo extends ScoutFixtureDo {
 
   public DoValue<Integer> count() {

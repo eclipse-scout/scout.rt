@@ -2103,7 +2103,7 @@ public class JsonDataObjectsSerializationTest {
     // serializing data object to JSON causes version to be set to class-file annotated version (override value contained in type version attribute)
     String serialized = s_dataObjectMapper.writeValueAsString(doMarshalled);
     JsonNode rawTree = s_defaultJacksonObjectMapper.readTree(serialized);
-    assertEquals("scout-8.0.0", rawTree.get(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME).asText());
+    assertEquals("jacksonFixture-1.0.0", rawTree.get(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME).asText());
   }
 
   protected TestVersionedDo runTestVersionedDo(String resourceName) throws Exception {
@@ -2126,7 +2126,7 @@ public class JsonDataObjectsSerializationTest {
     TestVersionedDo entityDo = BEANS.get(TestVersionedDo.class);
     entityDo.withName("foo");
     String json = mapper.writeValueAsString(entityDo);
-    assertEquals("{\"_type\":\"TestVersioned\",\"_customTypeVersion\":\"scout-8.0.0\",\"name\":\"foo\"}", json);
+    assertEquals("{\"_type\":\"jacksonFixture.TestVersioned\",\"_customTypeVersion\":\"jacksonFixture-1.0.0\",\"name\":\"foo\"}", json);
 
     DoEntity marshalled = mapper.readValue(json, DoEntity.class);
     assertEquals(TestVersionedDo.class, marshalled.getClass());
