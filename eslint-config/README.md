@@ -9,12 +9,12 @@
   <a href="https://www.eclipse.org/legal/epl-v10.html" target="_blank" rel="noopener noreferrer"><img alt="NPM" src="https://img.shields.io/npm/l/@eclipse-scout/eslint-config"></a>
   <a href="https://www.npmjs.com/package/@eclipse-scout/eslint-config" target="_blank" rel="noopener noreferrer"><img alt="npm (scoped)" src="https://img.shields.io/npm/v/@eclipse-scout/eslint-config"></a>
   <a href="https://www.npmjs.com/package/@eclipse-scout/eslint-config" target="_blank" rel="noopener noreferrer"><img alt="node" src="https://img.shields.io/node/v/@eclipse-scout/eslint-config"></a>
-  <a href="https://www.eclipse.org/scout/" target="_blank" rel="noopener noreferrer"><img alt="Website" src="https://img.shields.io/website?url=https%3A%2F%2Fwww.eclipse.org%2Fscout%2F"></a>  
+  <a href="https://www.eclipse.org/scout/" target="_blank" rel="noopener noreferrer"><img alt="Website" src="https://img.shields.io/website?url=https%3A%2F%2Fwww.eclipse.org%2Fscout%2F"></a>
 </p>
 
 <p align="center"><h1>Scout ESLint config</h1></p>
 
-ESLint [shareable config](https://eslint.org/docs/developer-guide/shareable-configs.html) for the [Scout](https://www.npmjs.com/package/@eclipse-scout/core) JavaScript style.
+ESLint [shareable config](https://eslint.org/docs/developer-guide/shareable-configs.html) for the [Scout](https://www.eclipse.org/scout/) JavaScript style.
 
 
 ## Usage
