@@ -216,12 +216,32 @@ export default class SmartColumn extends Column {
   }
 
   _updateCellFromValidEditor(row, field) {
+    // The following code is only necessary to prevent flickering because the text is updated async.
+    // Instead of only calling setCellValue which itself would update the display text, we set the text manually before calling setCellValue.
+    // This works because in most of the cases the text computed by the column will be the same as the one computed by the editor field.
+
+    // Clear error status first (regular behavior)
     this.setCellErrorStatus(row, null);
-    // Always set the text even if the value will be set
-    // This prevents flickering when display text is updated async.
-    // In most of the cases the text computed by the column will be the same as the one from the field.
-    this.setCellText(row, field.displayText);
-    this.setCellValue(row, field.value);
+
+    // Update cell text
+    // We cannot use setCellText to not trigger updateRows yet -> it has to be done after the value and row.status are updated correctly.
+    let cell = this.cell(row);
+    let oldText = cell.text;
+    let newText = field.displayText;
+    cell.setText(newText);
+
+    // Update cell value
+    // We cannot use setCellValue since it would add the update event to the updateBuffer but we need the row update to be sync to prevent the flickering
+    this._setCellValue(row, field.value, cell);
+
+    // Update row -> Render row, trigger update event
+    // Only trigger update row event if text has changed (same as setCellText would do)
+    if (row.initialized && oldText !== newText && cell.text === newText) {
+      this.table.updateRow(row);
+    }
+
+    // Ensure display text is correct (for the rare case that the column computes a different text than the editor field).
+    this._updateCellText(row, cell);
   }
 
   /**
@@ -235,9 +255,8 @@ export default class SmartColumn extends Column {
     return !!value;
   }
 
-  setCellValue(row, value) {
-    super.setCellValue(row, value);
-    let cell = this.cell(row);
+  _setCellValue(row, value, cell) {
+    super._setCellValue(row, value, cell);
     cell.setSortCode(this._calculateCellSortCode(cell));
   }
 }

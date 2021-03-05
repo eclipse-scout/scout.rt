@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, keys, scout, StaticLookupCall, Status, Widget} from '../../../src/index';
+import {Cell, keys, scout, StaticLookupCall, Status, TableRow, Widget} from '../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '../../../src/testing/index';
 
 describe('CellEditor', () => {
@@ -534,6 +534,25 @@ describe('CellEditor', () => {
           done();
         });
       });
+    });
+
+    it('triggers update row event containing row with correct state', () => {
+      table.columns[0].setEditable(true);
+      table.markRowsAsNonChanged();
+      table.prepareCellEdit(table.columns[0], table.rows[0], true);
+      jasmine.clock().tick(300);
+      table.cellEditorPopup.cell.field.setValue('key1');
+      jasmine.clock().tick(300);
+      let updateRowCount = 0;
+      table.on('rowsUpdated', event => {
+        expect(event.rows[0].cells[0].value).toBe('key1');
+        expect(event.rows[0].cells[0].text).toBe('Key 1');
+        expect(event.rows[0].status).toBe(TableRow.Status.UPDATED);
+        updateRowCount++;
+      });
+      table.completeCellEdit();
+      jasmine.clock().tick(300);
+      expect(updateRowCount).toBe(1);
     });
   });
 
