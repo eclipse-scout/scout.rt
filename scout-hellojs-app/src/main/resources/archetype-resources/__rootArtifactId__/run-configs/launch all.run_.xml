@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="launch all" type="CompoundRunConfigurationType" folderName="${simpleArtifactName}">
+  <configuration default="false" name="launch all" type="CompoundRunConfigurationType">
     <toRun name="js build" type="js.build_tools.npm" />
     <toRun name="Launch ${simpleArtifactName} dev server" type="Application" />
     <method v="2" />

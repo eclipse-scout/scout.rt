@@ -23,6 +23,7 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 
@@ -32,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person extends TableImpl<PersonRecord> {
 
-    private static final long serialVersionUID = -1820569693;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>Schema.person</code>
@@ -50,33 +51,34 @@ public class Person extends TableImpl<PersonRecord> {
     /**
      * The column <code>Schema.person.person_id</code>.
      */
-    public final TableField<PersonRecord, String> PERSON_ID = createField(DSL.name("person_id"), org.jooq.impl.SQLDataType.VARCHAR(36).nullable(false), this, "");
+    public final TableField<PersonRecord, String> PERSON_ID = createField(DSL.name("person_id"), SQLDataType.VARCHAR(36).nullable(false), this, "");
 
     /**
      * The column <code>Schema.person.first_name</code>.
      */
-    public final TableField<PersonRecord, String> FIRST_NAME = createField(DSL.name("first_name"), org.jooq.impl.SQLDataType.VARCHAR(200), this, "");
+    public final TableField<PersonRecord, String> FIRST_NAME = createField(DSL.name("first_name"), SQLDataType.VARCHAR(200), this, "");
 
     /**
      * The column <code>Schema.person.last_name</code>.
      */
-    public final TableField<PersonRecord, String> LAST_NAME = createField(DSL.name("last_name"), org.jooq.impl.SQLDataType.VARCHAR(200).nullable(false), this, "");
+    public final TableField<PersonRecord, String> LAST_NAME = createField(DSL.name("last_name"), SQLDataType.VARCHAR(200).nullable(false), this, "");
 
     /**
      * The column <code>Schema.person.salary</code>.
      */
-    public final TableField<PersonRecord, Integer> SALARY = createField(DSL.name("salary"), org.jooq.impl.SQLDataType.INTEGER, this, "");
+    public final TableField<PersonRecord, Integer> SALARY = createField(DSL.name("salary"), SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>Schema.person.external</code>.
      */
-    public final TableField<PersonRecord, Boolean> EXTERNAL = createField(DSL.name("external"), org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+    public final TableField<PersonRecord, Boolean> EXTERNAL = createField(DSL.name("external"), SQLDataType.BOOLEAN, this, "");
 
-    /**
-     * Create a <code>Schema.person</code> table reference
-     */
-    public Person() {
-        this(DSL.name("person"), null);
+    private Person(Name alias, Table<PersonRecord> aliased) {
+        this(alias, aliased, null);
+    }
+
+    private Person(Name alias, Table<PersonRecord> aliased, Field<?>[] parameters) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
     }
 
     /**
@@ -93,12 +95,11 @@ public class Person extends TableImpl<PersonRecord> {
         this(alias, PERSON);
     }
 
-    private Person(Name alias, Table<PersonRecord> aliased) {
-        this(alias, aliased, null);
-    }
-
-    private Person(Name alias, Table<PersonRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    /**
+     * Create a <code>Schema.person</code> table reference
+     */
+    public Person() {
+        this(DSL.name("person"), null);
     }
 
     public <O extends Record> Person(Table<O> child, ForeignKey<O, PersonRecord> key) {

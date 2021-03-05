@@ -44,9 +44,11 @@
     <module id="parent" dir="__rootArtifactId__" name="parent">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory/>
+          <directory>run-configs</directory>
           <includes>
             <include>**/*.xml</include>
+            <include>**/*.sh</include>
+            <include>**/*.cmd</include>
             <include>**/*.launch</include>
           </includes>
         </fileSet>
@@ -176,13 +178,6 @@
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory/>
-          <includes>
-            <include>**/*.launch</include>
-            <include>**/*.xml</include>
-          </includes>
-        </fileSet>
-        <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/webapp</directory>
           <includes>
             <include>**/*.xml</include>
@@ -195,13 +190,8 @@
         <fileSet filtered="true" encoding="UTF-8">
           <directory/>
           <includes>
-            <include>**/*.gitignore</include>
-            <include>**/*.json</include>
-            <include>**/*.launch</include>
-            <include>**/*.xml</include>
+            <include>**/*gitignore</include>
             <include>**/*.js</include>
-            <include>**/*.sh</include>
-            <include>**/*.cmd</include>
           </includes>
         </fileSet>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">
@@ -215,7 +205,6 @@
           <includes>
             <include>**/*.css</include>
             <include>**/*.less</include>
-            <include>**/*.js</include>
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
@@ -224,8 +213,6 @@
             <include>**/*.css</include>
             <include>**/*.less</include>
             <include>**/*.xml</include>
-            <include>**/*.js</include>
-            <include>**/*.json</include>
             <include>**/*.html</include>
           </includes>
         </fileSet>
@@ -262,13 +249,6 @@
           <includes>
             <include>**/*.xml</include>
             <include>**/*.properties</include>
-          </includes>
-        </fileSet>
-        <fileSet filtered="true" encoding="UTF-8">
-          <directory/>
-          <includes>
-            <include>**/*.launch</include>
-            <include>**/*.xml</include>
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">

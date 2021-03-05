@@ -1,5 +1,5 @@
 {
-	"name": "My Application",
+	"name": "${displayName}",
 	"icons": [
 		{
 			"src": "android-chrome-36x36.png",

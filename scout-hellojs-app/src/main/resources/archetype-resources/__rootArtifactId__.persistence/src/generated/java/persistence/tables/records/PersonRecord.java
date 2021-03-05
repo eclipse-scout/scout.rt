@@ -17,7 +17,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PersonRecord extends UpdatableRecordImpl<PersonRecord> implements Record5<String, String, String, Integer, Boolean> {
 
-    private static final long serialVersionUID = -39570988;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Setter for <code>Schema.person.person_id</code>.
@@ -244,10 +244,10 @@ public class PersonRecord extends UpdatableRecordImpl<PersonRecord> implements R
     public PersonRecord(String personId, String firstName, String lastName, Integer salary, Boolean external) {
         super(Person.PERSON);
 
-        set(0, personId);
-        set(1, firstName);
-        set(2, lastName);
-        set(3, salary);
-        set(4, external);
+        setPersonId(personId);
+        setFirstName(firstName);
+        setLastName(lastName);
+        setSalary(salary);
+        setExternal(external);
     }
 }

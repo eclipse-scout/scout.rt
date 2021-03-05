@@ -11,7 +11,7 @@ import ${package}.persistence.tables.Person;
 
 
 /**
- * Convenience access to all tables in Schema
+ * Convenience access to all tables in Schema.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {

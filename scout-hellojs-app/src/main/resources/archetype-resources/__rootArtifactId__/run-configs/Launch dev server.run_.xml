@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Launch ${rootArtifactId} dev server" type="Application" factoryName="Application" folderName="${simpleArtifactName}">
+  <configuration default="false" name="Launch ${rootArtifactId} dev server" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="org.eclipse.scout.dev.jetty.JettyServer" />
     <module name="${rootArtifactId}.app.dev" />
     <option name="VM_PARAMETERS" value="-Dscout.jetty.port=8084" />
-    <option name="WORKING_DIRECTORY" value="${symbol_dollar}MODULE_DIR${symbol_dollar}" />
+    <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

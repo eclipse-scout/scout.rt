@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="js tests" type="js.build_tools.npm" folderName="${simpleArtifactName}">
+  <configuration default="false" name="js tests" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/${simpleArtifactName}/${simpleArtifactName}.ui/package.json" />
     <command value="run" />
     <scripts>
@@ -8,7 +8,7 @@
     <node-interpreter value="project" />
     <envs />
     <method v="2">
-      <option name="RunConfigurationTask" enabled="true" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="pnpm-install" run_configuration_type="js.build_tools.npm" />
     </method>
   </configuration>
 </component>

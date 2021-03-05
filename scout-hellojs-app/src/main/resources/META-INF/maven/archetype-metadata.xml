@@ -45,10 +45,12 @@
     <module id="parent" dir="__rootArtifactId__" name="parent">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory/>
+          <directory>run-configs</directory>
           <includes>
-            <include>**/*.launch</include>
             <include>**/*.xml</include>
+            <include>**/*.sh</include>
+            <include>**/*.cmd</include>
+            <include>**/*.launch</include>
           </includes>
         </fileSet>
       </fileSets>
@@ -72,26 +74,19 @@
     <module id="app" dir="__rootArtifactId__.app" name="app">
       <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory>src/main/resources</directory>
+          <directory/>
           <includes>
-            <include>**/*.xml</include>
-            <include>**/*.html</include>
+            <include>**/*gitignore</include>
             <include>**/*.js</include>
-            <include>**/*.json</include>
             <include>**/*.less</include>
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
-          <directory/>
+          <directory>src/main/resources</directory>
           <includes>
-            <include>**/*.gitignore</include>
-            <include>**/*.js</include>
-            <include>**/*.launch</include>
+            <include>**/*.html</include>
             <include>**/*.xml</include>
             <include>**/*.json</include>
-            <include>**/*.less</include>
-            <include>**/*.sh</include>
-            <include>**/*.cmd</include>
           </includes>
         </fileSet>
         <fileSet encoding="UTF-8">
@@ -105,13 +100,6 @@
     </module>
     <module id="app.dev" dir="__rootArtifactId__.app.dev" name="app.dev">
       <fileSets>
-        <fileSet filtered="true" encoding="UTF-8">
-          <directory/>
-          <includes>
-            <include>**/*.launch</include>
-            <include>**/*.xml</include>
-          </includes>
-        </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/resources</directory>
           <includes>
@@ -210,13 +198,6 @@
     </module>
     <module id="db" dir="__rootArtifactId__.db" name="db">
       <fileSets>
-        <fileSet filtered="true" encoding="UTF-8">
-          <directory/>
-          <includes>
-            <include>**/*.launch</include>
-            <include>**/*.xml</include>
-          </includes>
-        </fileSet>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">
           <directory>src/main/java</directory>
           <includes>
@@ -275,19 +256,13 @@
         <fileSet filtered="true" encoding="UTF-8">
           <directory/>
           <includes>
-            <include>**/*.launch</include>
-            <include>**/*.xml</include>
-            <include>**/*.gitignore</include>
-            <include>**/*.json</include>
+            <include>**/*gitignore</include>
             <include>**/*.js</include>
-            <include>**/*.sh</include>
-            <include>**/*.cmd</include>
           </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
           <directory>src/main/js</directory>
           <includes>
-            <include>**/*.js</include>
             <include>**/*.less</include>
           </includes>
         </fileSet>
@@ -300,7 +275,6 @@
         <fileSet filtered="true" encoding="UTF-8">
           <directory>src/test/js</directory>
           <includes>
-            <include>**/*.js</include>
             <include>**/*.less</include>
           </includes>
         </fileSet>

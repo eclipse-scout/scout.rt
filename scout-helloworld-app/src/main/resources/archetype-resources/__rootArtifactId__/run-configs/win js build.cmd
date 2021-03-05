@@ -25,7 +25,7 @@ if %errorlevel% neq 0 (
   exit /b 1
 )
 
-:: Install all JavaScript dependencies => creates the node_modules folders
+:: Install all JavaScript dependencies defined in the package.json => creates the node_modules folder
 cd ..
 echo Running 'pnpm install' in %cd%
 call pnpm install --ignore-scripts

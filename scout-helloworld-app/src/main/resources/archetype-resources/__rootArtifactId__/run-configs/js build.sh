@@ -18,14 +18,14 @@ set -e
 PATH=$PATH:/usr/local/bin
 
 # Check if node is available
-command -v node >/dev/null 2>&1 || { echo >&2 "node cannot be found. Make sure Node.js is installed and the PATH variable correctly set. See the content of this script for details."; exit 1; }
+command -v node >/dev/null 2>&1 || { echo >&2 "npm cannot be found. Make sure Node.js is installed and the PATH variable correctly set. See the content of this script for details."; exit 1; }
 
 # Check if pnpm is available
 command -v pnpm >/dev/null 2>&1 || { echo >&2 "pnpm cannot be found. Make sure pnpm is installed. See the content of this script for details."; exit 1; }
 
-# Install all JavaScript dependencies => creates the node_modules folders
+# Install all JavaScript dependencies defined in the package.json => creates the node_modules folder
 cd ..
-echo "Running 'pnpm install' in ${symbol_dollar}{PWD}"
+echo "Running 'pnpm install' in ${PWD}"
 pnpm install --ignore-scripts
 echo "pnpm install finished successfully!\n"
 

@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Setup local dev database" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="${package}.db.setup.DbSetup" />
+    <module name="${rootArtifactId}.db" />
+    <option name="VM_PARAMETERS" value="-Dscout.jandex.rebuild=true -Dconfig.properties=$MODULE_DIR$/../${rootArtifactId}.app.dev/src/main/resources/dev.db.config.properties -Dpersistence.sql.jdbc.mapping.name=jdbc:derby:$MODULE_DIR$/../${rootArtifactId}.app.dev/db;create=true" />
+    <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
