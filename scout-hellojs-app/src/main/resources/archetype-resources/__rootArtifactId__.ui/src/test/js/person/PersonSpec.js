@@ -1,10 +1,10 @@
 import {scout} from '@eclipse-scout/core';
 
-describe('Person', function() {
+describe('Person', () => {
 
-  it('stores values correctly', function() {
-    var person = scout.create('${simpleArtifactName}.Person');
-    var values = ['first', 'last', 'id'];
+  it('stores values correctly', () => {
+    let person = scout.create('${simpleArtifactName}.Person');
+    let values = ['first', 'last', 'id'];
     person.setFirstName(values[0]);
     person.setLastName(values[1]);
     person.setPersonId(values[2]);
@@ -15,14 +15,14 @@ describe('Person', function() {
     expect(person.resourceType).toBe('Person');
   });
 
-  it('initializes correctly from model', function() {
-    var values = ['first', 'last', 'id'];
-    var model = {
+  it('initializes correctly from model', () => {
+    let values = ['first', 'last', 'id'];
+    let model = {
       personId: values[2],
       firstName: values[0],
       lastName: values[1]
     };
-    var person = scout.create('${simpleArtifactName}.Person', model);
+    let person = scout.create('${simpleArtifactName}.Person', model);
 
     expect(person.firstName).toBe(values[0]);
     expect(person.lastName).toBe(values[1]);

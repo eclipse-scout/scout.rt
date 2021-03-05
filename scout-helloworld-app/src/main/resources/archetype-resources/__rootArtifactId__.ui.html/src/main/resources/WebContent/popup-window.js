@@ -2,7 +2,7 @@
 // to either the window or the document are not reliable.
 
 // When window is opened by main-window the popupWindow instance is always set
-var url, eventData = {
+let url, eventData = {
   window: window
 };
 if (window.popupWindow) {

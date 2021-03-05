@@ -1,9 +1,9 @@
 import {scout} from '@eclipse-scout/core';
 
-describe('PersonForm', function() {
-  var session;
+describe('PersonForm', () => {
+  let session;
 
-  beforeEach(function() {
+  beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession({
       desktop: {
@@ -14,20 +14,20 @@ describe('PersonForm', function() {
     });
   });
 
-  describe('open with person', function() {
+  describe('open with person', () => {
 
-    it('shows firstName and LastName', function(done) {
-      var personForm = scout.create('${simpleArtifactName}.PersonForm', {
+    it('shows firstName and LastName', done => {
+      let personForm = scout.create('${simpleArtifactName}.PersonForm', {
         parent: session.desktop
       });
 
-      var person = scout.create('${simpleArtifactName}.Person', {
+      let person = scout.create('${simpleArtifactName}.Person', {
         firstName: 'first',
         lastName: 'last'
       });
       personForm.setData(person);
       personForm.open()
-        .then(function() {
+        .then(() => {
           expect(personForm.firstNameField.rendered).toBe(true);
           expect(personForm.lastNameField.rendered).toBe(true);
           expect(personForm.firstNameField.value).toBe(person.firstName);

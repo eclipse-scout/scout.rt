@@ -60,20 +60,20 @@ export default class Repository {
    * @returns {Repository}
    */
   static register(objectName) {
-    var repository = scout.create(objectName);
+    let repository = scout.create(objectName);
     Repository.repositories[repository.entityType] = repository;
     return repository;
   }
 
   static map(promise) {
     return promise
-      .then(function(response) {
+      .then(response => {
         if (!response || !response.items) {
           return response;
         }
 
         return response.items
-          .map(function(item) {
+          .map(item => {
             return scout.create(item, {
               ensureUniqueId: false
             });
@@ -87,7 +87,7 @@ export default class Repository {
    * @returns {Repository} a repository for the given resourceType
    */
   static get(resourceType) {
-    var repository = Repository.repositories[resourceType];
+    let repository = Repository.repositories[resourceType];
     if (!repository) {
       throw new Error('no repository found for resourceType ' + resourceType);
     }

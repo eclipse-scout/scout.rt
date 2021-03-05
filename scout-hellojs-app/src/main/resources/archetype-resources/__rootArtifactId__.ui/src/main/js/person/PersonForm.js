@@ -35,7 +35,7 @@ export default class PersonForm extends Form {
   }
 
   exportData() {
-    var person = this.data;
+    let person = this.data;
     person.setFirstName(this.firstNameField.value);
     person.setLastName(this.lastNameField.value);
     person.setSalary(this.salaryField.value);
@@ -44,7 +44,7 @@ export default class PersonForm extends Form {
   }
 
   importData() {
-    var person = this.data;
+    let person = this.data;
     this.firstNameField.setValue(person.firstName);
     this.lastNameField.setValue(person.lastName);
     this.salaryField.setValue(person.salary);

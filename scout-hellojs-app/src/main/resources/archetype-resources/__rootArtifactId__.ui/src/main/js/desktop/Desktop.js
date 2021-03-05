@@ -14,13 +14,13 @@ export default class Desktop extends ScoutDesktop {
   _init(model) {
     super._init(model);
 
-    var aboutMenu = this.widget('AboutMenu');
+    let aboutMenu = this.widget('AboutMenu');
     aboutMenu.on('action', this._onAboutMenuAction.bind(this));
 
-    var defaultThemeMenu = this.widget('DefaultThemeMenu');
+    let defaultThemeMenu = this.widget('DefaultThemeMenu');
     defaultThemeMenu.on('action', this._onDefaultThemeMenuAction.bind(this));
 
-    var darkThemeMenu = this.widget('DarkThemeMenu');
+    let darkThemeMenu = this.widget('DarkThemeMenu');
     darkThemeMenu.on('action', this._onDarkThemeMenuAction.bind(this));
 
     if (this.theme === 'dark') {
@@ -39,7 +39,7 @@ export default class Desktop extends ScoutDesktop {
   }
 
   _onAboutMenuAction(event) {
-    var form = scout.create('Form', {
+    let form = scout.create('Form', {
       parent: this,
       resizable: false,
       title: this.session.text('ApplicationTitle'),

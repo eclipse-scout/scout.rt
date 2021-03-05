@@ -33,7 +33,10 @@
       <directory/>
       <includes>
         <include>**/*.yaml</include>
-        <include>**/*.editorconfig</include>
+        <include>**/.editorconfig</include>
+        <include>**/.eslintignore</include>
+        <include>**/.eslintrc.js</include>
+        <include>**/package.json</include>
       </includes>
     </fileSet>
   </fileSets>

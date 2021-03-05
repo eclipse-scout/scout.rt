@@ -1,3 +1,4 @@
 packages:
+- '.'
 - '${artifactId}.ui'
 - '${artifactId}.app'

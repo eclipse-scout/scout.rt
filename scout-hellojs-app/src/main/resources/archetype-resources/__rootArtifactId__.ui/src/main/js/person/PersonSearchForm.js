@@ -17,7 +17,7 @@ export default class PersonSearchForm extends Form {
   }
 
   _initListeners() {
-    var parentTable = this.parent.table;
+    let parentTable = this.parent.table;
     this.widget('SearchButton').on('action', parentTable.reload.bind(parentTable));
   }
 

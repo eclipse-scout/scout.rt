@@ -1,2 +1,3 @@
 packages:
+- '.'
 - '${artifactId}.ui.html'

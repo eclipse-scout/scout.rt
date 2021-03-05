@@ -16,7 +16,7 @@ export default class PersonTablePage extends PageWithTable {
   }
 
   _init(model) {
-    var m = ${symbol_dollar}.extend({}, this._jsonModel(), model);
+    let m = ${symbol_dollar}.extend({}, this._jsonModel(), model);
     super._init(m);
     this._initListeners();
   }
@@ -28,13 +28,13 @@ export default class PersonTablePage extends PageWithTable {
     this._dataChangeListener = this._onDataChange.bind(this);
     this.session.desktop.on('dataChange', this._dataChangeListener);
 
-    var editPersonMenu = this.detailTable.widget('EditPersonMenu');
+    let editPersonMenu = this.detailTable.widget('EditPersonMenu');
     editPersonMenu.on('action', this._onEditPersonMenuAction.bind(this));
 
-    var deletePersonMenu = this.detailTable.widget('DeletePersonMenu');
+    let deletePersonMenu = this.detailTable.widget('DeletePersonMenu');
     deletePersonMenu.on('action', this._onDeletePersonMenuAction.bind(this));
 
-    var createPersonMenu = this.detailTable.widget('CreatePersonMenu');
+    let createPersonMenu = this.detailTable.widget('CreatePersonMenu');
     createPersonMenu.on('action', this._onCreatePersonMenuAction.bind(this));
   }
 
@@ -50,7 +50,7 @@ export default class PersonTablePage extends PageWithTable {
   }
 
   _loadTableData(searchFilter) {
-    var restriction = scout.create('${simpleArtifactName}.PersonRestriction', searchFilter, {
+    let restriction = scout.create('${simpleArtifactName}.PersonRestriction', searchFilter, {
       ensureUniqueId: false
     });
     return PersonRepository.get().list(restriction);
@@ -58,7 +58,7 @@ export default class PersonTablePage extends PageWithTable {
 
   _transformTableDataToTableRows(tableData) {
     return tableData
-      .map(function(person) {
+      .map(person => {
         return {
           person: person,
           cells: [
@@ -73,7 +73,7 @@ export default class PersonTablePage extends PageWithTable {
   }
 
   _getSelectedPerson() {
-    var selection = this.detailTable.selectedRow();
+    let selection = this.detailTable.selectedRow();
     if (selection) {
       return selection.person;
     }
@@ -81,28 +81,28 @@ export default class PersonTablePage extends PageWithTable {
   }
 
   _createPersonForm() {
-    var outline = this.getOutline();
-    var personForm = scout.create('${simpleArtifactName}.PersonForm', {
+    let outline = this.getOutline();
+    let personForm = scout.create('${simpleArtifactName}.PersonForm', {
       parent: outline
     });
     return personForm;
   }
 
   _onEditPersonMenuAction(event) {
-    var personForm = this._createPersonForm();
+    let personForm = this._createPersonForm();
     personForm.setData(this._getSelectedPerson());
     personForm.open();
   }
 
   _onDeletePersonMenuAction(event) {
     MessageBoxes.openYesNo(this.session.desktop, this.session.text('DeleteConfirmationTextNoItemList'))
-      .then(function(button) {
+      .then(button => {
         if (button === MessageBox.Buttons.YES) {
           PersonRepository.get()
             .remove(this._getSelectedPerson().personId)
             .then(this._onPersonDeleted.bind(this));
         }
-      }.bind(this));
+      });
   }
 
   _onPersonDeleted() {
@@ -112,8 +112,8 @@ export default class PersonTablePage extends PageWithTable {
   }
 
   _onCreatePersonMenuAction(event) {
-    var personForm = this._createPersonForm();
-    var emptyPerson = scout.create('${simpleArtifactName}.Person', {}, {
+    let personForm = this._createPersonForm();
+    let emptyPerson = scout.create('${simpleArtifactName}.Person', {}, {
       ensureUniqueId: false
     });
     personForm.setData(emptyPerson);

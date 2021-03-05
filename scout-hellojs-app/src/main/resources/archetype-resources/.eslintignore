@@ -1,0 +1,10 @@
+.git
+.idea
+dist
+node_modules
+target
+**/src/main/resources
+**/src/test/resources
+**/src/main/java
+**/src/test/java
+**/*.war/externalfiles

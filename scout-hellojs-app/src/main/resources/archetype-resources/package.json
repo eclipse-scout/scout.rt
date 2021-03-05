@@ -1,0 +1,13 @@
+{
+  "name": "@${simpleArtifactName}/root",
+  "version": "${version}",
+  "scripts": {
+    "pnpm-install": "pnpm install --ignore-scripts"
+  },
+  "dependencies": {
+    "eslint": "7.9.0",
+    "babel-eslint": "10.1.0",
+    "eslint-plugin-babel": "5.3.1",
+    "@eclipse-scout/eslint-config": ">=11.0.0-snapshot <11.0.0"
+  }
+}
