@@ -1,5 +1,8 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.ui.externaltools.ProgramLaunchConfigurationType">
-    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${symbol_dollar}{workspace_loc:/${rootArtifactId}.ui.html/js build.cmd}"/>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${symbol_dollar}{workspace_loc:/${rootArtifactId}/run-configs/js build.cmd}"/>
     <stringAttribute key="org.eclipse.ui.externaltools.ATTR_WORKING_DIRECTORY" value="${symbol_dollar}{workspace_loc:/${rootArtifactId}.ui.html}"/>
 </launchConfiguration>
