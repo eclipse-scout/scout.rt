@@ -119,12 +119,11 @@ h2 {
   white-space: nowrap;
 }
 
-.path>.method {
+.path > .method {
   color: tomato;
 }
 
 .body {
-  flex: 0 0 100%;
   margin-top: 1.5em;
 }
 
