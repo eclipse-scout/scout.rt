@@ -15,6 +15,7 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiFunction;
 
 import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -56,13 +57,25 @@ public class RestRequestCancellationRegistry {
   }
 
   public boolean cancel(String requestId, Object userId) {
+    return cancel(requestId, userId, this::handleCancellationInfoNotExists);
+  }
+
+  /**
+   * @param requestId
+   *          id of the request
+   * @param userId
+   *          id of the user that submits the cancellation request
+   * @param requestNotExistsHandler
+   *          handler that is executed in the case the request could not be found
+   * @return {@code true} if the cancellation request was successful, {@code false} otherwise
+   */
+  public boolean cancel(String requestId, Object userId, BiFunction<String, Object, Boolean> requestNotExistsHandler) {
     if (requestId == null) {
       return false;
     }
     RequestCancellationInfo cancellationInfo = getRequestCancellationInfos().get(requestId);
     if (cancellationInfo == null) {
-      LOG.debug("Cancellation item does not exist [requestId={}]", requestId);
-      return false;
+      return requestNotExistsHandler.apply(requestId, userId);
     }
 
     if (!checkAccess(userId, cancellationInfo)) {
@@ -76,6 +89,11 @@ public class RestRequestCancellationRegistry {
   protected boolean checkAccess(Object requestingUserId, RequestCancellationInfo cancellationInfo) {
     return cancellationInfo.getUserId() == null
         || Objects.equals(cancellationInfo.getUserId(), requestingUserId);
+  }
+
+  protected boolean handleCancellationInfoNotExists(String requestId, Object userId) {
+    LOG.debug("Cancellation item does not exist [requestId={}]", requestId);
+    return false;
   }
 
   public static class RequestCancellationInfo {
