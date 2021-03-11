@@ -1809,6 +1809,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   // Temporary logging to analyze non-reproducible bug
   protected void logContextColumnInconsistency(Object value) {
     String debugInfo = "\nAdapterId : " + getId();
+    debugInfo += "\nParent    : " + getParent();
+    debugInfo += "\nDisposed  : " + isDisposed();
     debugInfo += "\nModel     : " + getModel();
     debugInfo += "\nValue     : " + (value instanceof IColumn ? toDebugInfo((IColumn<?>) value) : value);
     debugInfo += "\nCtxColumn : " + toDebugInfo(getModel().getContextColumn());
@@ -1818,6 +1820,16 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     debugInfo += "\nAdapters:\n" + m_jsonColumns.entrySet().stream()
         .map(entry -> "  " + Integer.toHexString(entry.getKey().hashCode()) + " = " + toDebugInfo(entry.getValue()))
         .collect(Collectors.joining("\n"));
+    debugInfo += "\nEvent Buffer";
+    if (m_eventBuffer.isEmpty()) {
+      debugInfo += " is empty";
+    }
+    else {
+      debugInfo += " contains " + m_eventBuffer.size() + " events:\n- ";
+      debugInfo += m_eventBuffer.getBufferInternal().stream()
+          .map(event -> StringUtility.substring(StringUtility.removeNewLines(event.toString()), 0, 250))
+          .collect(Collectors.joining("\n  -"));
+    }
     LOG.info("Could not resolve context column, assuming null.\n--- DEBUG INFO --- {}", debugInfo);
   }
 
@@ -1829,7 +1841,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     return column.getClass().getName() + "@" + Integer.toHexString(column.hashCode()) +
         " [" + (text == null ? "null" : "\"" + text + "\"") +
         " viewIndexHint=" + column.getVisibleColumnIndexHint() +
-        " visible=" + column.isVisible() + "]";
+        " visible=" + column.isVisible() +
+        " table=" + column.getTable() + "]";
   }
 
   protected String toDebugInfo(JsonColumn<?> jsonColumn) {
