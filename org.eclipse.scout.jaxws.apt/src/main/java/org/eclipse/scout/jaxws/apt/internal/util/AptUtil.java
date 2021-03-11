@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,10 +20,10 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 
+import org.eclipse.scout.jaxws.apt.internal.codemodel.JCodeModelWrapper;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 import com.sun.codemodel.CodeWriter;
-import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDocCommentable;
 import com.sun.codemodel.JPackage;
 
@@ -42,7 +42,7 @@ public final class AptUtil {
   /**
    * Builds and persists the compilation unit.
    */
-  public static void buildAndPersist(final JCodeModel jCodeModel, final Filer filer) throws IOException {
+  public static void buildAndPersist(final JCodeModelWrapper jCodeModel, final Filer filer) throws IOException {
     jCodeModel.build(new CodeWriter() {
 
       @Override
@@ -82,9 +82,9 @@ public final class AptUtil {
     // replace new lines before 'extends'
     content = content.replaceAll("\\s*extends", " extends");
     // change indent space two 2 spaces
-    content = content.replaceAll("    ", "  ");
+    content = content.replace("    ", "  ");
     // Remove redundant Callable imports (Generics bug in JCodeModel)
-    content = content.replaceAll("(import\\s+java\\.util\\.concurrent\\.Callable\\;\\s+){2,}", "$1");
+    content = content.replaceAll("(import\\s+java\\.util\\.concurrent\\.Callable;\\s+){2,}", "$1");
 
     return content;
   }

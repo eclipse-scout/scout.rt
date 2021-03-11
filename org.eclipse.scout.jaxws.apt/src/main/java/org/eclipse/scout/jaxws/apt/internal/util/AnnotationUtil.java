@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,12 +29,12 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+import org.eclipse.scout.jaxws.apt.internal.codemodel.JCodeModelWrapper;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Clazz;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Clazz.NullClazz;
 
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClass;
-import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
@@ -74,7 +74,7 @@ public final class AnnotationUtil {
   /**
    * Annotates the given target class with a copy of the given annotations.
    */
-  public static void addAnnotations(final JCodeModel model, final JDefinedClass targetClazz, final List<AnnotationMirror> _annotations) {
+  public static void addAnnotations(final JCodeModelWrapper model, final JDefinedClass targetClazz, final List<AnnotationMirror> _annotations) {
     for (final AnnotationMirror _annotation : _annotations) {
       final JAnnotationUse targetAnnotation = targetClazz.annotate(model.ref(_annotation.getAnnotationType().toString()));
 
@@ -91,7 +91,7 @@ public final class AnnotationUtil {
    * Creates an expression for the given annotation value. Thereby, all annotation member types as specified by JLS are
    * supported: primitive, String, Class, Enum, annotation, 1-dimensional array.
    */
-  public static JExpression createExpression(final JCodeModel model, final AnnotationValue _paramValue) {
+  public static JExpression createExpression(final JCodeModelWrapper model, final AnnotationValue _paramValue) {
     final Object _rawParamValue = _paramValue.getValue();
 
     // Class member type.
