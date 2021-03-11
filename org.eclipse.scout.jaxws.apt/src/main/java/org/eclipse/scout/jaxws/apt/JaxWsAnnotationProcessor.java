@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,9 +48,9 @@ import javax.xml.ws.WebServiceContext;
 import org.eclipse.scout.jaxws.apt.internal.EntryPointDefinition;
 import org.eclipse.scout.jaxws.apt.internal.EntryPointDefinition.HandlerDefinition;
 import org.eclipse.scout.jaxws.apt.internal.HandlerArtifactProcessor;
+import org.eclipse.scout.jaxws.apt.internal.codemodel.JCodeModelWrapper;
 import org.eclipse.scout.jaxws.apt.internal.codemodel.JConditionalEx;
 import org.eclipse.scout.jaxws.apt.internal.codemodel.JExprEx;
-import org.eclipse.scout.jaxws.apt.internal.codemodel.JTypeParser;
 import org.eclipse.scout.jaxws.apt.internal.util.AnnotationUtil;
 import org.eclipse.scout.jaxws.apt.internal.util.AptLogger;
 import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;
@@ -69,7 +69,6 @@ import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JCatchBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
-import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
@@ -91,7 +90,7 @@ import com.sun.codemodel.JVar;
  * @since 5.1
  */
 @SuppressWarnings("squid:S00117")
-@SupportedSourceVersion(SourceVersion.RELEASE_7)
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes({"javax.jws.WebService", "org.eclipse.scout.rt.server.jaxws.provider.annotation.WebServiceEntryPoint"})
 public class JaxWsAnnotationProcessor extends AbstractProcessor {
 
@@ -209,7 +208,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
    * Generates the entry point and associated artifacts for the given definition.
    */
   protected void generateEntryPoint(final EntryPointDefinition entryPointDefinition, final RoundEnvironment roundEnv) throws JClassAlreadyExistsException, ClassNotFoundException, IOException {
-    final JCodeModel model = new JCodeModel();
+    final JCodeModelWrapper model = new JCodeModelWrapper();
 
     // Create EntryPoint class.
     final TypeElement _endpointInterface = entryPointDefinition.getEndpointInterface();
@@ -246,7 +245,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
       final ExecutableElement _method = (ExecutableElement) _element;
 
       final String methodName = _method.getSimpleName().toString();
-      final JType returnType = JTypeParser.parseType(model, _method.getReturnType());
+      final JType returnType = model.parseType(_method.getReturnType().toString());
 
       // Create the method.
       final JMethod method = entryPoint.method(JMod.PUBLIC, returnType, methodName);
@@ -254,7 +253,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
 
       // Add the method parameters.
       for (final VariableElement _param : _method.getParameters()) {
-        method.param(JMod.FINAL, JTypeParser.parseType(model, _param.asType()), _param.getSimpleName().toString());
+        method.param(JMod.FINAL, model.parseType(_param.asType().toString()), _param.getSimpleName().toString());
       }
 
       // Add exception throw clauses.
@@ -285,7 +284,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   /**
    * Creates the implementation of a entry point method.
    */
-  protected void addEntryPointMethodImplementation(final JCodeModel model, final JFieldVar webServiceContext, final JMethod method, final List<JClass> throwTypes, final boolean voidMethod, final String endpointInterfaceName) {
+  protected void addEntryPointMethodImplementation(final JCodeModelWrapper model, final JFieldVar webServiceContext, final JMethod method, final List<JClass> throwTypes, final boolean voidMethod, final String endpointInterfaceName) {
     final JBlock methodBody = method.body();
 
     final JInvocation runContext = JExpr.invoke(LOOKUP_RUN_CONTEXT_METHOD_NAME);
@@ -322,7 +321,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   /**
    * Creates code to invoke the port type on behalf of the RunContext.
    */
-  protected JInvocation createRunContextInvocation(final JCodeModel model, final JExpression runContext, final boolean voidMethod, final JMethod portTypeMethod, final String endpointInterfaceName) {
+  protected JInvocation createRunContextInvocation(final JCodeModelWrapper model, final JExpression runContext, final boolean voidMethod, final JMethod portTypeMethod, final String endpointInterfaceName) {
     final JType returnType;
     final JDefinedClass runContextCallable;
     final String runMethodName;
@@ -362,7 +361,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   /**
    * Adds the method to handle undeclared exceptions which are not declared in the WSDL.
    */
-  protected void addHandleUndeclaredFaultMethod(final JCodeModel model, final JDefinedClass entryPoint) {
+  protected void addHandleUndeclaredFaultMethod(final JCodeModelWrapper model, final JDefinedClass entryPoint) {
     // Create the method to handle undeclared faults.
     final JMethod method = entryPoint.method(JMod.PROTECTED, RuntimeException.class, HANDLE_UNDECLARED_FAULT_METHOD_NAME);
 
@@ -376,7 +375,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   /**
    * Adds the method to lookup the {@link RunContext}.
    */
-  protected void addLookupRunContextMethod(final JCodeModel model, final JDefinedClass entryPoint, final JFieldVar webServiceContext) {
+  protected void addLookupRunContextMethod(final JCodeModelWrapper model, final JDefinedClass entryPoint, final JFieldVar webServiceContext) {
     final JMethod method = entryPoint.method(JMod.PROTECTED, RunContext.class, LOOKUP_RUN_CONTEXT_METHOD_NAME);
 
     method.body()._return(model.ref(BEANS.class)
@@ -388,7 +387,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   /**
    * Adds annotations to the EntryPoint.
    */
-  protected void addAnnotations(final JCodeModel model, final JDefinedClass entryPoint, final EntryPointDefinition entryPointDefinition, final RoundEnvironment roundEnv) {
+  protected void addAnnotations(final JCodeModelWrapper model, final JDefinedClass entryPoint, final EntryPointDefinition entryPointDefinition, final RoundEnvironment roundEnv) {
     // Add 'Generated' annotation
     final JAnnotationUse generatedAnnotation = entryPoint.annotate(Generated.class);
     generatedAnnotation.param("value", JaxWsAnnotationProcessor.class.getName());
@@ -463,6 +462,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
   private String createJavaDocForEntryPoint(final EntryPointDefinition entryPointDefinition) {
     final StringWriter writer = new StringWriter();
+    //noinspection resource
     final PrintWriter out = new PrintWriter(writer);
 
     out.printf("This class is auto-generated by APT triggered by Maven build based on {@link %s}.", entryPointDefinition.getSimpleName()).println();
@@ -499,7 +499,9 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     out.println("<li>When running an incremental build, <em>stub</em> and <em>entry point</em> are only re-generated if either WSDL, schema or binding files change, or '/target/jaxws/wsartifact-hash' is deleted manually.</li>");
     out.println("</ul>");
 
+    //noinspection resource
     final StringWriter newLine = new StringWriter();
+    //noinspection resource
     new PrintWriter(newLine).println();
 
     return writer.toString().replace(newLine.toString(), "\n"); // remove double new-lines
