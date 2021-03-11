@@ -16,6 +16,8 @@ import static org.junit.Assert.*;
 import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.holders.ObjectHolder;
+import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -109,5 +111,36 @@ public class RestRequestCancellationRegistryTest {
     assertNotNull(m_registry.register("1", null, m_runMonitor));
     assertTrue(m_registry.cancel("1", null));
     assertTrue(m_runMonitor.isCancelled());
+  }
+
+  @Test
+  public void testCancellationInfoNotExistsHandler() {
+    assertFalse(m_runMonitor.isCancelled());
+
+    StringHolder requestIdHolder = new StringHolder();
+    ObjectHolder userIdHolder = new ObjectHolder();
+    final String expectedRequestId = "requestId";
+    final String expectedUserId = "userId";
+
+    // handler that returns false;
+    assertFalse(m_registry.cancel(expectedRequestId, expectedUserId, (requestId, userId) -> {
+      requestIdHolder.setValue(requestId);
+      userIdHolder.setValue(userId);
+      return false;
+    }));
+    assertEquals(expectedRequestId, requestIdHolder.getValue());
+    assertEquals(expectedUserId, userIdHolder.getValue());
+
+    // handler that returns true;
+    assertTrue(m_registry.cancel(expectedRequestId, expectedUserId, (requestId, userId) -> {
+      requestIdHolder.setValue(requestId);
+      userIdHolder.setValue(userId);
+      return true;
+    }));
+
+    assertEquals(expectedRequestId, requestIdHolder.getValue());
+    assertEquals(expectedUserId, userIdHolder.getValue());
+
+    assertFalse(m_runMonitor.isCancelled());
   }
 }
