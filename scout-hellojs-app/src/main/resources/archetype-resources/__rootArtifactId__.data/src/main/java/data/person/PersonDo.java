@@ -3,74 +3,87 @@
 #set( $symbol_escape = '\' )
 package ${package}.data.person;
 
+import javax.annotation.Generated;
+
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
 @TypeName("${simpleArtifactName}.Person")
 public class PersonDo extends DoEntity {
+
   public DoValue<String> firstName() {
     return doValue("firstName");
-  }
-
-  public PersonDo withFirstName(String firstName) {
-    firstName().set(firstName);
-    return this;
-  }
-
-  public String getFirstName() {
-    return firstName().get();
   }
 
   public DoValue<String> lastName() {
     return doValue("lastName");
   }
 
-  public PersonDo withLastName(String lastName) {
-    lastName().set(lastName);
-    return this;
-  }
-
-  public String getLastName() {
-    return lastName().get();
-  }
-
   public DoValue<String> personId() {
     return doValue("personId");
-  }
-
-  public PersonDo withPersonId(String personId) {
-    personId().set(personId);
-    return this;
-  }
-
-  public String getPersonId() {
-    return personId().get();
   }
 
   public DoValue<Integer> salary() {
     return doValue("salary");
   }
 
+  public DoValue<Boolean> external() {
+    return doValue("external");
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public PersonDo withFirstName(String firstName) {
+    firstName().set(firstName);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getFirstName() {
+    return firstName().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public PersonDo withLastName(String lastName) {
+    lastName().set(lastName);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getLastName() {
+    return lastName().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public PersonDo withPersonId(String personId) {
+    personId().set(personId);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getPersonId() {
+    return personId().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public PersonDo withSalary(Integer salary) {
     salary().set(salary);
     return this;
   }
 
+  @Generated("DoConvenienceMethodsGenerator")
   public Integer getSalary() {
     return salary().get();
   }
 
-  public DoValue<Boolean> external() {
-    return doValue("external");
-  }
-
-  public PersonDo withExternal(boolean external) {
+  @Generated("DoConvenienceMethodsGenerator")
+  public PersonDo withExternal(Boolean external) {
     external().set(external);
     return this;
   }
 
-  public Boolean getExternal() {
+  @Generated("DoConvenienceMethodsGenerator")
+  public Boolean isExternal() {
     return external().get();
   }
 }

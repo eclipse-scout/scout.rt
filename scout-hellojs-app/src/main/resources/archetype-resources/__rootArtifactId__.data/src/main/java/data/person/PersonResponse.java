@@ -3,11 +3,11 @@
 #set( $symbol_escape = '\' )
 package ${package}.data.person;
 
-import static java.util.Arrays.asList;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
+
+import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
@@ -32,18 +32,20 @@ public class PersonResponse extends DoEntity {
     return this;
   }
 
-  public PersonResponse withItems(Collection<? extends PersonDo> persons) {
-    items().clear();
-    items().get().addAll(persons);
+  @Generated("DoConvenienceMethodsGenerator")
+  public PersonResponse withItems(Collection<? extends PersonDo> items) {
+    items().updateAll(items);
     return this;
   }
 
-  public PersonResponse withItems(PersonDo... persons) {
-    return withItems(asList(persons));
+  @Generated("DoConvenienceMethodsGenerator")
+  public PersonResponse withItems(PersonDo... items) {
+    items().updateAll(items);
+    return this;
   }
 
+  @Generated("DoConvenienceMethodsGenerator")
   public List<PersonDo> getItems() {
     return items().get();
   }
-
 }
