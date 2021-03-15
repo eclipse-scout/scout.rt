@@ -16,6 +16,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -498,6 +499,18 @@ public class JsonDataObjectsSerializationTest {
     entity.put("locale", Locale.GERMANY);
     String jsonEntity = s_dataObjectMapper.writeValueAsString(entity);
     assertJsonEquals("TestLocale.json", jsonEntity);
+  }
+
+  @Test
+  public void testSerializeDeserialize_URI() throws Exception {
+    URI uri = new URI("https://www.example.org/path/page?q=query");
+    String jsonPlainUri = s_dataObjectMapper.writeValueAsString(uri);
+    assertEquals("\"https://www.example.org/path/page?q=query\"", jsonPlainUri);
+
+    DoEntity entity = BEANS.get(DoEntity.class);
+    entity.put("uri", uri);
+    String jsonEntity = s_dataObjectMapper.writeValueAsString(entity);
+    assertJsonEquals("TestURI.json", jsonEntity);
   }
 
   // ------------------------------------ plain POJO test cases ------------------------------------

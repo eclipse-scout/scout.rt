@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.dataobject.enumeration;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,8 +25,8 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.Assertions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +52,7 @@ public class EnumResolver {
 
   public <ENUM extends IEnum> ENUM resolve(Class<ENUM> enumClass, String value) {
     assertNotNull(enumClass, "enumClass is required");
-    assertTrue(enumClass.isEnum(), "enumClass is reqired to be an enum");
+    assertTrue(enumClass.isEnum(), "enumClass is required to be an enum");
     try {
       Method resolveMethod = m_resolveMethodsByEnumType.computeIfAbsent(enumClass, this::findResolveMethodInternal);
       if (ObjectUtility.notEquals(resolveMethod, m_sentinelMethod)) {

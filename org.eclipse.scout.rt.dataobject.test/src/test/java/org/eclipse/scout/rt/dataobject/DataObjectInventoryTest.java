@@ -78,7 +78,7 @@ public class DataObjectInventoryTest {
   }
 
   @Test
-  public void testValidate() {
+  public void testValidateTypeVersionImplementors() {
     m_inventory.validateTypeVersionImplementors(); // no exception
 
     IBean<Object> fixtureNoVersionBean = BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(DataObjectFixture_No_Version.class));

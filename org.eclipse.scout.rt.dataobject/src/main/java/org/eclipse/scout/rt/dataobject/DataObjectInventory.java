@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
+import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 import org.eclipse.scout.rt.platform.namespace.Namespaces;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -81,6 +83,7 @@ public class DataObjectInventory {
         .forEach(this::registerClassByTypeVersion);
 
     validateTypeVersionImplementors();
+    validateTypeVersionRequired();
 
     LOG.info("Registry initialized, found {} {} implementations with @{} annotation and {} implementations with @{} annotation.",
         m_typeNameToClassMap.size(), IDoEntity.class.getSimpleName(), TypeName.class.getSimpleName(),
@@ -173,9 +176,25 @@ public class DataObjectInventory {
         .filter(typeVersion -> typeVersion.getVersion() == null)
         .map(ITypeVersion::getClass)
         .map(Class::getName)
-        .collect(Collectors.joining(", "));
+        .collect(Collectors.joining("\n"));
 
-    assertTrue(StringUtility.isNullOrEmpty(typeVersionsWithoutNamespaceVersion), "Missing namespace version for implementors of {}: {}", ITypeVersion.class.getName(), typeVersionsWithoutNamespaceVersion);
+    assertTrue(StringUtility.isNullOrEmpty(typeVersionsWithoutNamespaceVersion), "Missing namespace version for implementors of {}:\n{}", ITypeVersion.class.getName(), typeVersionsWithoutNamespaceVersion);
+  }
+
+  protected void validateTypeVersionRequired() {
+    IClassInventory classInventory = ClassInventory.get();
+    String classesWithoutRequiredTypeVersion = classInventory
+        .getKnownAnnotatedTypes(TypeVersionRequired.class)
+        .stream()
+        .map(classInventory::getAllKnownSubClasses)
+        .flatMap(Set::stream)
+        .filter(ci -> (ci.isInstanciable() && !ci.hasAnnotation(TypeVersion.class))) // only data objects (instanciable) are relevant (ignore other interfaces or abstract classes)
+        .map(IClassInfo::name)
+        .distinct()
+        .collect(Collectors.joining("\n"));
+
+    assertTrue(StringUtility.isNullOrEmpty(classesWithoutRequiredTypeVersion), "Missing @{} annotation for data objects due to {} on parent class/implementing interface:\n{}",
+        TypeVersion.class.getSimpleName(), TypeVersionRequired.class.getSimpleName(), classesWithoutRequiredTypeVersion);
   }
 
   /**
@@ -270,10 +289,7 @@ public class DataObjectInventory {
 
   protected String resolveTypeName(Class<?> c) {
     TypeName typeNameAnn = c.getAnnotation(TypeName.class);
-    if (typeNameAnn != null) {
-      return typeNameAnn.value();
-    }
-    return null;
+    return typeNameAnn == null ? null : typeNameAnn.value();
   }
 
   protected Class<? extends ITypeVersion> resolveTypeVersionClass(Class<?> c) {
