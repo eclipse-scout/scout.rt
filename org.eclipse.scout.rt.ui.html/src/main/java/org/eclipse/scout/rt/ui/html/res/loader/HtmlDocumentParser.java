@@ -57,7 +57,9 @@ public class HtmlDocumentParser {
   protected static final Pattern PATTERN_VERSION_TAG = Pattern.compile("<scout:version\\s*/?>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   protected static final Pattern PATTERN_UNKNOWN_TAG = Pattern.compile("<scout:(\"[^\"]*\"|[^>]*?)*>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
   protected static final Pattern PATTERN_KEY_VALUE = Pattern.compile("([^\\s]+)=\"([^\"]*)\"");
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public static final String SCRIPT_TAG_PREFIX = "<script src=\"";
+  @SuppressWarnings("bsiRulesDefinition:htmlInString")
   public static final String SCRIPT_TAG_SUFFIX = "\"></script>";
   public static final String STYLESHEET_TAG_PREFIX = "<link rel=\"stylesheet\" type=\"text/css\" href=\"";
   public static final String STYLESHEET_TAG_SUFFIX = "\">";

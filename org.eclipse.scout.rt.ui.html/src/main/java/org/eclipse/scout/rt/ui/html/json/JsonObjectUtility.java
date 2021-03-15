@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -220,6 +220,7 @@ public final class JsonObjectUtility {
    *          The {@link JSONObject} to unwrap or {@code null}.
    * @return A {@link LinkedHashMap} holding all attributes of the given {@link JSONObject}.
    */
+  @SuppressWarnings("findbugs:EC_UNRELATED_TYPES_USING_POINTER_EQUALITY")
   public static Map<String, Object> unwrap(JSONObject obj) {
     if (obj == null || obj == JSONObject.NULL) {
       return null;
@@ -237,6 +238,7 @@ public final class JsonObjectUtility {
    *          The {@link JSONArray} to unwrap or {@code null}.
    * @return An {@link Object} array holding all items of the given {@link JSONArray}.
    */
+  @SuppressWarnings("findbugs:EC_UNRELATED_TYPES_USING_POINTER_EQUALITY")
   public static Object[] unwrap(JSONArray jsonArr) {
     if (jsonArr == null || jsonArr == JSONObject.NULL) {
       return null;

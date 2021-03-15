@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,6 +28,7 @@ import java.util.stream.Stream;
  *
  * @see DoEntity#doList(String) creator method
  */
+@SuppressWarnings("squid:S2333") // redundant final
 public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Iterable<V> {
 
   public DoList() {
@@ -136,7 +137,8 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
    *
    * @return {@code true} if this list changed as a result of the call
    */
-  public boolean removeAll(@SuppressWarnings("unchecked") V... items) {
+  @SafeVarargs
+  public final boolean removeAll(@SuppressWarnings("unchecked") V... items) {
     if (items != null) {
       return removeAll(Arrays.asList(items));
     }
@@ -156,7 +158,8 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
    * Replaces all items in this list with the given array of new {@code items}. If {@code items} is {@code null}, the
    * list is cleared without adding any items.
    */
-  public void updateAll(@SuppressWarnings("unchecked") V... items) {
+  @SafeVarargs
+  public final void updateAll(@SuppressWarnings("unchecked") V... items) {
     clear();
     addAll(items);
   }
