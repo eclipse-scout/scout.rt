@@ -8,5 +8,6 @@
   "dateOnlyList" : [ "1990-10-20 00:00:00.000" ],
   "dateWithTimestamp" : "2017-11-30 17:29:12.583",
   "dateWithTimestampWithTimezone" : "2017-11-30 17:29:12.583 +0100",
+  "dateWithTimestampZulu" : "2017-11-30T17:29:12.583Z",
   "dateYearMonth" : "90-10"
 }
