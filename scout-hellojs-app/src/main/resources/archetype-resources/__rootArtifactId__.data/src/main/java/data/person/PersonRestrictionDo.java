@@ -20,6 +20,10 @@ public class PersonRestrictionDo extends DoEntity {
     return doValue("lastName");
   }
 
+  /* **************************************************************************
+   * GENERATED CONVENIENCE METHODS
+   * *************************************************************************/
+
   @Generated("DoConvenienceMethodsGenerator")
   public PersonRestrictionDo withFirstName(String firstName) {
     firstName().set(firstName);

@@ -32,6 +32,10 @@ public class PersonDo extends DoEntity {
     return doValue("external");
   }
 
+  /* **************************************************************************
+   * GENERATED CONVENIENCE METHODS
+   * *************************************************************************/
+
   @Generated("DoConvenienceMethodsGenerator")
   public PersonDo withFirstName(String firstName) {
     firstName().set(firstName);

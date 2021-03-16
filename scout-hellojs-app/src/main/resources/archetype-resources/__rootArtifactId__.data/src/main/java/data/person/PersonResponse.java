@@ -32,6 +32,10 @@ public class PersonResponse extends DoEntity {
     return this;
   }
 
+  /* **************************************************************************
+   * GENERATED CONVENIENCE METHODS
+   * *************************************************************************/
+
   @Generated("DoConvenienceMethodsGenerator")
   public PersonResponse withItems(Collection<? extends PersonDo> items) {
     items().updateAll(items);
