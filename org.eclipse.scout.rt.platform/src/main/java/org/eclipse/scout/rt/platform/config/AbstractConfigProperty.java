@@ -10,8 +10,8 @@
  */
 package org.eclipse.scout.rt.platform.config;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 @SuppressWarnings("findbugs:UG_SYNC_SET_UNSYNC_GET")
 public abstract class AbstractConfigProperty<DATA_TYPE, RAW_TYPE> implements IConfigProperty<DATA_TYPE> {
 
-  private final Map<String /* namespace, may be null */, P_ParsedPropertyValueEntry<DATA_TYPE>> m_values = new HashMap<>();
+  private final Map<String /* namespace ( may be null) | key  */, P_ParsedPropertyValueEntry<DATA_TYPE>> m_values = new ConcurrentHashMap<>();
   private final FastListenerList<IConfigChangedListener> m_listeners = new FastListenerList<>();
 
   @Override
@@ -42,9 +42,14 @@ public abstract class AbstractConfigProperty<DATA_TYPE, RAW_TYPE> implements ICo
   }
 
   @Override
-  public synchronized DATA_TYPE getValue(String namespace) {
+  public DATA_TYPE getValue(String namespace) {
     String key = createKey(namespace);
-    P_ParsedPropertyValueEntry<DATA_TYPE> entry = m_values.computeIfAbsent(key, k -> read(namespace));
+    // Optimized for non-blocking read performance
+    // http://cs.oswego.edu/pipermail/concurrency-interest/2014-December/013360.html
+    P_ParsedPropertyValueEntry<DATA_TYPE> entry = m_values.get(key);
+    if (entry == null) {
+      entry = m_values.computeIfAbsent(key, k -> read(namespace));
+    }
 
     if (entry.m_exc != null) {
       throw entry.m_exc;
@@ -85,18 +90,18 @@ public abstract class AbstractConfigProperty<DATA_TYPE, RAW_TYPE> implements ICo
   }
 
   @Override
-  public synchronized void invalidate() {
-    m_values.clear();
-    fireConfigChangedEvent(new ConfigPropertyChangeEvent(this, null, null, null, ConfigPropertyChangeEvent.TYPE_INVALIDATE));
-  }
-
-  @Override
   public void setValue(DATA_TYPE newValue) {
     setValue(newValue, null);
   }
 
   @Override
-  public synchronized void setValue(DATA_TYPE newValue, String namespace) {
+  public void invalidate() {
+    m_values.clear();
+    fireConfigChangedEvent(new ConfigPropertyChangeEvent(this, null, null, null, ConfigPropertyChangeEvent.TYPE_INVALIDATE));
+  }
+
+  @Override
+  public void setValue(DATA_TYPE newValue, String namespace) {
     String key = createKey(namespace);
     P_ParsedPropertyValueEntry<DATA_TYPE> old = m_values.put(key, new P_ParsedPropertyValueEntry<>(newValue, null));
     Object oldValue = null;
