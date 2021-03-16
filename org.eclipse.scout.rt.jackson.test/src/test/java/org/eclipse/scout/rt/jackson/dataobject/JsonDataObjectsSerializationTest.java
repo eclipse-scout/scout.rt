@@ -254,6 +254,8 @@ public class JsonDataObjectsSerializationTest {
     final String dateWithTimeZoneString = "2017-11-30 17:29:12.583 +0100";
     final Date dateWithTimezone = DateUtility.parse(dateWithTimeZoneString, IValueFormatConstants.TIMESTAMP_WITH_TIMEZONE_PATTERN);
     final String dateWithTimeZoneFormattedLocal = DateUtility.format(dateWithTimezone, IValueFormatConstants.TIMESTAMP_WITH_TIMEZONE_PATTERN);
+    final String dateWithTimeZoneZuluString = "2017-11-30T17:29:12.583Z";
+    final Date dateWithTimezoneZulu = DateUtility.parse(dateWithTimeZoneZuluString, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     TestDateDo testDo = BEANS.get(TestDateDo.class);
     testDo.withDateDefault(DATE)
@@ -262,6 +264,7 @@ public class JsonDataObjectsSerializationTest {
         .withDateOnlyList(Arrays.asList(DATE_TRUNCATED))
         .withDateWithTimestamp(DATE)
         .withDateWithTimestampWithTimezone(dateWithTimezone)
+        .withDateWithTimestampZulu(dateWithTimezoneZulu)
         .withDateYearMonth(DATE_TRUNCATED)
         .withCustomDateFormat(DATE)
         .withCustomDateDoList(DATE, DATE_2);
@@ -280,6 +283,7 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(DATE_TRUNCATED, testDoMarshalled.dateOnlyList().get().get(0));
     assertEquals(DATE, testDoMarshalled.dateWithTimestamp().get());
     assertEquals(dateWithTimezone, testDoMarshalled.dateWithTimestampWithTimezone().get());
+    assertEquals(dateWithTimezoneZulu, testDoMarshalled.dateWithTimestampZulu().get());
     assertEquals(DateUtility.truncDateToMonth(DATE_TRUNCATED), testDoMarshalled.getDateYearMonth());
   }
 

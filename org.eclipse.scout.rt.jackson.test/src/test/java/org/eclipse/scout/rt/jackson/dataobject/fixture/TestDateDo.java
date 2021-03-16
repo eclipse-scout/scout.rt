@@ -57,6 +57,11 @@ public class TestDateDo extends DoEntity {
     return doValue("dateWithTimestampWithTimezone");
   }
 
+  @ValueFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") // timestamp with UTC/Zulu timezone, without white spaces
+  public DoValue<Date> dateWithTimestampZulu() {
+    return doValue("dateWithTimestampZulu");
+  }
+
   @ValueFormat(pattern = "yy-MM")
   public DoValue<Date> dateYearMonth() {
     return doValue("dateYearMonth");
@@ -160,6 +165,17 @@ public class TestDateDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Date getDateWithTimestampWithTimezone() {
     return dateWithTimestampWithTimezone().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestDateDo withDateWithTimestampZulu(Date dateWithTimestampZulu) {
+    dateWithTimestampZulu().set(dateWithTimestampZulu);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Date getDateWithTimestampZulu() {
+    return dateWithTimestampZulu().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
