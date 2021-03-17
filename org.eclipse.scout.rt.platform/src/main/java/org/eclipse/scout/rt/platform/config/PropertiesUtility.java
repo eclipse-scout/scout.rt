@@ -47,13 +47,16 @@ public class PropertiesUtility {
    * </ol>
    *
    * @param properties
+   *          {@link Properties} object
    * @param failOnProblems
    *          true to throw {@link IllegalArgumentException} on problems, false to just log as debug
    */
   public static void resolveVariables(Properties properties, boolean failOnProblems) {
     BinaryOperator<String> variableReplacer = (key, variableName) -> {
       String value = defaultReplaceSystemPropertyAndEnv(variableName);
-      if (value != null) return value;
+      if (value != null) {
+        return value;
+      }
       return properties.getProperty(variableName);
     };
     for (String key : properties.stringPropertyNames()) {
@@ -71,13 +74,16 @@ public class PropertiesUtility {
    * </ol>
    *
    * @param properties
+   *          properties map (key -> value)
    * @param failOnProblems
    *          true to throw {@link IllegalArgumentException} on problems, false to just log as debug
    */
   public static void resolveVariables(Map<String, String> properties, boolean failOnProblems) {
     BinaryOperator<String> variableReplacer = (key, variableName) -> {
       String value = defaultReplaceSystemPropertyAndEnv(variableName);
-      if (value != null) return value;
+      if (value != null) {
+        return value;
+      }
       return properties.get(variableName);
     };
     properties.replaceAll((key, value) -> resolveKeyOverride(key, variableReplacer));
@@ -103,6 +109,7 @@ public class PropertiesUtility {
    * application context.
    *
    * @param propertyKey
+   *          The key of the property to resolve.
    * @param value
    *          The expression to resolve.
    * @param variablePattern
@@ -169,7 +176,6 @@ public class PropertiesUtility {
   }
 
   /**
-   * @param variableName
    * @return the replacement or null if there was no replacement
    */
   public static String defaultReplaceSystemPropertyAndEnv(String variableName) {
@@ -184,7 +190,7 @@ public class PropertiesUtility {
       return value;
     }
     return null;
-  };
+  }
 
   /**
    * Returns the environment variable value corresponding to the property specified by the key, or <code>null</code>.
@@ -217,18 +223,18 @@ public class PropertiesUtility {
     // Applications may define environment variable names with lower case, but only upper case is POSIX compliant for the environment.
     // To override from a shell, we should also check for upper case.
     // 3. In Uppercase, original periods
-    String uppercasedKey = variableName.toUpperCase();
-    value = getenv(uppercasedKey);
+    String uppercaseKey = variableName.toUpperCase();
+    value = getenv(uppercaseKey);
     if (value != null) {
-      logInexactEnvNameMatch(variableName, uppercasedKey);
+      logInexactEnvNameMatch(variableName, uppercaseKey);
       return value;
     }
 
     // 4. In Uppercase, with periods replaced
-    String keyWithoutDotsUppercased = keyWithoutDots.toUpperCase();
-    value = getenv(keyWithoutDotsUppercased);
+    String keyWithoutDotsUppercase = keyWithoutDots.toUpperCase();
+    value = getenv(keyWithoutDotsUppercase);
     if (value != null) {
-      logInexactEnvNameMatch(variableName, keyWithoutDotsUppercased);
+      logInexactEnvNameMatch(variableName, keyWithoutDotsUppercase);
       return value;
     }
 
@@ -238,12 +244,6 @@ public class PropertiesUtility {
   private static void logInexactEnvNameMatch(String variableName, String actualEnvVariableName) {
     if (LOG.isDebugEnabled()) {
       LOG.debug("Property '{}' resolved to environment variable '{}' by inexact match.", variableName, actualEnvVariableName);
-    }
-  }
-
-  private static void logVariableNotFound(String key, String value, String variableName) {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Property '{}={}' uses undefined variable '{}'.", key, value, variableName);
     }
   }
 
