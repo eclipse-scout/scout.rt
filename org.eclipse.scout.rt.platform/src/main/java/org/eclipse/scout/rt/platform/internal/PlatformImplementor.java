@@ -35,6 +35,8 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDev
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.slf4j.Logger;
@@ -45,10 +47,11 @@ import org.slf4j.LoggerFactory;
  */
 public class PlatformImplementor implements IPlatform {
 
-  private static final Logger LOG = LoggerFactory.getLogger(PlatformImplementor.class);
-
   public static final String SCOUT_HEADLESS_PROPERTY = "scout.headless";
   public static final String AWT_HEADLESS_PROPERTY = "java.awt.headless";
+
+  private static final LazyValue<Boolean> IN_DEVELOPMENT_MODE = new LazyValue<>(() -> BooleanUtility.nvl(CONFIG.getPropertyValue(PlatformDevModeProperty.class)));
+  private static final Logger LOG = LoggerFactory.getLogger(PlatformImplementor.class);
 
   private final ReentrantReadWriteLock m_platformLock = new ReentrantReadWriteLock(true);
   private volatile CountDownLatch m_platformStarted = new CountDownLatch(1);
@@ -341,6 +344,6 @@ public class PlatformImplementor implements IPlatform {
 
   @Override
   public boolean inDevelopmentMode() {
-    return CONFIG.getPropertyValue(PlatformDevModeProperty.class); // cannot be null
+    return IN_DEVELOPMENT_MODE.get(); // cannot be null
   }
 }
