@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ export default class LogoutBox extends Box {
 
   init(opts) {
     let defaultOpts = {
-      loginUrl: webstorage.getItem(sessionStorage, 'scout:loginUrl') || './',
+      loginUrl: webstorage.getItemFromSessionStorage('scout:loginUrl') || './',
       logoUrl: 'logo.png'
     };
     this.options = $.extend({}, defaultOpts, opts);

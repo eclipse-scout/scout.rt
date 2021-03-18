@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1339,13 +1339,13 @@ export default class Desktop extends Widget {
   }
 
   _loadCachedSplitterPosition() {
-    return webstorage.getItem(sessionStorage, 'scout:desktopSplitterPosition') ||
-      webstorage.getItem(localStorage, 'scout:desktopSplitterPosition:' + window.location.pathname);
+    return webstorage.getItemFromSessionStorage('scout:desktopSplitterPosition') ||
+      webstorage.getItemFromLocalStorage('scout:desktopSplitterPosition:' + window.location.pathname);
   }
 
   _storeCachedSplitterPosition(splitterPosition) {
-    webstorage.setItem(sessionStorage, 'scout:desktopSplitterPosition', splitterPosition);
-    webstorage.setItem(localStorage, 'scout:desktopSplitterPosition:' + window.location.pathname, splitterPosition);
+    webstorage.setItemToSessionStorage('scout:desktopSplitterPosition', splitterPosition);
+    webstorage.setItemToLocalStorage('scout:desktopSplitterPosition:' + window.location.pathname, splitterPosition);
   }
 
   _onNotificationRemove(notification) {
