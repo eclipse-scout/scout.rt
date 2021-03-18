@@ -202,9 +202,6 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     if (op == null) {
       return;
     }
-    if (values == null && getSelectedField() != null) {
-      values = getSelectedField().getValues();
-    }
     m_attribute = attribute;
     //
     int dataType = op.getType();
@@ -217,6 +214,9 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
       typeToFieldMap = m_operatorTypeToFieldMap.get(0);
     }
     IComposerValueField valueField = typeToFieldMap.get(dataType);
+    if (values == null && m_selectedField != null && valueField != null && m_selectedField.getClass().equals(valueField.getClass())) {
+      values = m_selectedField.getValues();
+    }
     //clear old
     if (m_selectedField != null) {
       m_selectedField.removeValueChangeListenerFromTarget(m_valueChangedListener);
