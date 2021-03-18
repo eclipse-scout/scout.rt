@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -395,7 +395,7 @@ export default class Session {
       return;
     }
 
-    webstorage.removeItem(sessionStorage, 'scout:versionMismatch');
+    webstorage.removeItemFromSessionStorage('scout:versionMismatch');
 
     if (!data.startupData) {
       throw new Error('Missing startupData');
@@ -479,20 +479,22 @@ export default class Session {
   }
 
   _storeClientSessionIdInStorage(clientSessionId) {
-    webstorage.removeItem(sessionStorage, 'scout:clientSessionId');
-    webstorage.removeItem(localStorage, 'scout:clientSessionId');
-    let storage = sessionStorage;
+    let key = 'scout:clientSessionId';
+    webstorage.removeItemFromSessionStorage(key);
+    webstorage.removeItemFromLocalStorage(key);
     if (this.persistent) {
-      storage = localStorage;
+      webstorage.setItemToLocalStorage(key, clientSessionId);
+    } else {
+      webstorage.setItemToSessionStorage(key, clientSessionId);
     }
-    webstorage.setItem(storage, 'scout:clientSessionId', clientSessionId);
   }
 
   _getClientSessionIdFromStorage() {
-    let id = webstorage.getItem(sessionStorage, 'scout:clientSessionId');
+    let key = 'scout:clientSessionId';
+    let id = webstorage.getItemFromSessionStorage(key);
     if (!id) {
       // If the session is persistent it was stored in the local storage (cannot check for this.persistent here because it is not known yet)
-      id = webstorage.getItem(localStorage, 'scout:clientSessionId');
+      id = webstorage.getItemFromLocalStorage(key);
     }
     return id;
   }
@@ -999,14 +1001,14 @@ export default class Session {
 
   _processErrorJsonResponse(jsonError) {
     if (jsonError.code === Session.JsonResponseError.VERSION_MISMATCH) {
-      let loopDetection = webstorage.getItem(sessionStorage, 'scout:versionMismatch');
+      let loopDetection = webstorage.getItemFromSessionStorage('scout:versionMismatch');
       if (!loopDetection) {
-        webstorage.setItem(sessionStorage, 'scout:versionMismatch', 'yes');
+        webstorage.setItemToSessionStorage('scout:versionMismatch', 'yes');
         // Reload page -> everything should then be up to date
         scout.reloadPage();
         return;
       }
-      webstorage.removeItem(sessionStorage, 'scout:versionMismatch');
+      webstorage.removeItemFromSessionStorage('scout:versionMismatch');
     }
 
     if (this.loggedOut) {
@@ -1557,7 +1559,7 @@ export default class Session {
       let url = new URL();
       url.removeParameter('dl'); // deeplink
       url.removeParameter('i'); // deeplink info
-      webstorage.setItem(sessionStorage, 'scout:loginUrl', url.toString());
+      webstorage.setItemToSessionStorage('scout:loginUrl', url.toString());
       // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
       setTimeout(() => {
         scout.reloadPage({
@@ -1612,7 +1614,7 @@ export default class Session {
       this._sendUnloadRequest();
     }
     if (this.loggedOut && this.persistent) {
-      webstorage.removeItem(localStorage, 'scout:clientSessionId');
+      webstorage.removeItemFromLocalStorage('scout:clientSessionId');
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -133,7 +133,7 @@ export default class App {
   }
 
   _bootstrapDone(options) {
-    webstorage.removeItem(sessionStorage, 'scout:timeoutPageReload');
+    webstorage.removeItemFromSessionStorage('scout:timeoutPageReload');
     this.trigger('bootstrap', {
       options: options
     });
@@ -179,13 +179,13 @@ export default class App {
 
   _handleBootstrapTimeoutError(error, url) {
     $.log.isInfoEnabled() && $.log.info('Timeout error for resource ' + url + '. Reloading page...');
-    if (webstorage.getItem(sessionStorage, 'scout:timeoutPageReload')) {
+    if (webstorage.getItemFromSessionStorage('scout:timeoutPageReload')) {
       // Prevent loop in case a reload did not solve the problem
       $.log.isWarnEnabled() && $.log.warn('Prevented automatic reload, startup will likely fail', error, url);
-      webstorage.removeItem(sessionStorage, 'scout:timeoutPageReload');
+      webstorage.removeItemFromSessionStorage('scout:timeoutPageReload');
       throw new Error('Resource ' + url + ' could not be loaded due to a session timeout, even after a page reload');
     }
-    webstorage.setItem(sessionStorage, 'scout:timeoutPageReload', true);
+    webstorage.setItemToSessionStorage('scout:timeoutPageReload', true);
 
     // See comment in _bootstrapFail for the reasons why to reload here
     scout.reloadPage();

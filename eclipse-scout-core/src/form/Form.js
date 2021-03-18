@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1147,7 +1147,7 @@ export default class Form extends Widget {
   storeCacheBounds(bounds) {
     if (this.cacheBounds) {
       let storageKey = 'scout:formBounds:' + this.cacheBoundsKey;
-      webstorage.setItem(localStorage, storageKey, JSON.stringify(bounds));
+      webstorage.setItemToLocalStorage(storageKey, JSON.stringify(bounds));
     }
   }
 
@@ -1157,7 +1157,7 @@ export default class Form extends Widget {
     }
 
     let storageKey = 'scout:formBounds:' + this.cacheBoundsKey;
-    let bounds = webstorage.getItem(localStorage, storageKey);
+    let bounds = webstorage.getItemFromLocalStorage(storageKey);
     if (!bounds) {
       return null;
     }
