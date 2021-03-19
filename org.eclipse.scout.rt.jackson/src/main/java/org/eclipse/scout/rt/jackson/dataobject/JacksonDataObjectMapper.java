@@ -135,7 +135,7 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
     om.registerModule(scoutDataObjectModule);
     om.setDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN)); // FIXME [9.0] pbz: [JSON] check if it can be moved to ScoutDataObjectModule class
     om.deactivateDefaultTyping(); // disabled for security reasons
-    om.disable(MapperFeature.BLOCK_UNSAFE_POLYMORPHIC_BASE_TYPES);  // disabled for security reasons
+    om.enable(MapperFeature.BLOCK_UNSAFE_POLYMORPHIC_BASE_TYPES); // enabled block-unsafe for security reasons
     return om;
   }
 
