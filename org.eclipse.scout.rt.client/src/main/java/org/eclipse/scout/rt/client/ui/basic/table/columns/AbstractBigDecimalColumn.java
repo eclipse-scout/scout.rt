@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.DECIMAL;
 
 @ClassId("cf4984e1-7ec9-4442-a9d8-23145b0e1614")
 public abstract class AbstractBigDecimalColumn extends AbstractDecimalColumn<BigDecimal> implements IBigDecimalColumn {
@@ -85,4 +86,9 @@ public abstract class AbstractBigDecimalColumn extends AbstractDecimalColumn<Big
     return new LocalBigDecimalColumnExtension<>(this);
   }
 
+  @Override
+  protected String formatValueInternal(ITableRow row, BigDecimal value) {
+    value = DECIMAL.round(value, getMaxFractionDigits());
+    return super.formatValueInternal(row, value);
+  }
 }

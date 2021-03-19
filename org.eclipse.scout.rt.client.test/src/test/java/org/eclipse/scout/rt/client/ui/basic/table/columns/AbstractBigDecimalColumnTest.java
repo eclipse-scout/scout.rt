@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -34,11 +33,12 @@ public class AbstractBigDecimalColumnTest extends AbstractBigDecimalColumn {
     Cell cell = new Cell();
     BigDecimal testValue = new BigDecimal("-123456789.12345");
     cell.setValue(testValue);
+    setMaxFractionDigits(4);
 
     for (Locale locale : DecimalFormat.getAvailableLocales()) {
       DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance(locale);
       df.applyPattern(getFormat().toPattern());
-      df.setMaximumFractionDigits(4);
+      df.setMaximumFractionDigits(getMaxFractionDigits());
       df.setRoundingMode(RoundingMode.HALF_UP);
       setFormat(df);
 
