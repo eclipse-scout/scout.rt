@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.dataobject.lookup.fixture;
 
+import javax.annotation.Generated;
+
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureEnum;
@@ -21,5 +23,42 @@ public class FixtureEnumLookupRowDo extends AbstractLookupRowDo<FixtureEnumLooku
   @Override
   public DoValue<FixtureEnum> id() {
     return createIdAttribute(this);
+  }
+
+  /* **************************************************************************
+   * GENERATED CONVENIENCE METHODS
+   * *************************************************************************/
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureEnumLookupRowDo withId(FixtureEnum id) {
+    id().set(id);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureEnumLookupRowDo withText(String text) {
+    text().set(text);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureEnumLookupRowDo withEnabled(Boolean enabled) {
+    enabled().set(enabled);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureEnumLookupRowDo withActive(Boolean active) {
+    active().set(active);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureEnumLookupRowDo withParentId(FixtureEnum parentId) {
+    parentId().set(parentId);
+    return this;
   }
 }

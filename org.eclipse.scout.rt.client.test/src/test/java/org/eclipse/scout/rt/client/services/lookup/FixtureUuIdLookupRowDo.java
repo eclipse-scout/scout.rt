@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.client.services.lookup;
+
+import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
@@ -21,5 +23,42 @@ public class FixtureUuIdLookupRowDo extends AbstractLookupRowDo<FixtureUuIdLooku
   @Override
   public DoValue<FixtureUuId> id() {
     return createIdAttribute(this);
+  }
+
+  /* **************************************************************************
+   * GENERATED CONVENIENCE METHODS
+   * *************************************************************************/
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureUuIdLookupRowDo withId(FixtureUuId id) {
+    id().set(id);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureUuIdLookupRowDo withText(String text) {
+    text().set(text);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureUuIdLookupRowDo withEnabled(Boolean enabled) {
+    enabled().set(enabled);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureUuIdLookupRowDo withActive(Boolean active) {
+    active().set(active);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureUuIdLookupRowDo withParentId(FixtureUuId parentId) {
+    parentId().set(parentId);
+    return this;
   }
 }

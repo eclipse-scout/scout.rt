@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.rt.dataobject.lookup;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,15 +40,15 @@ public class LookupResponse<T extends AbstractLookupRowDo<?, ?>> extends DoEntit
    * *************************************************************************/
 
   @Generated("DoConvenienceMethodsGenerator")
-  public LookupResponse<T> withRows(Collection<T> rows) {
-    rows().clear();
-    rows().get().addAll(rows);
+  public LookupResponse<T> withRows(Collection<? extends T> rows) {
+    rows().updateAll(rows);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public LookupResponse<T> withRows(T... rows) {
-    return withRows(Arrays.asList(rows));
+    rows().updateAll(rows);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")

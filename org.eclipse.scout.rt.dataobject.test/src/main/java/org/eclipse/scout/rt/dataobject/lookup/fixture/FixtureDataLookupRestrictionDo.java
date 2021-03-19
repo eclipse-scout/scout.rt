@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.dataobject.lookup.fixture;
 
+import java.util.Collection;
+
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoList;
@@ -33,6 +35,19 @@ public class FixtureDataLookupRestrictionDo extends AbstractLookupRestrictionDo<
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureDataLookupRestrictionDo withIds(Collection<? extends Long> ids) {
+    ids().updateAll(ids);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureDataLookupRestrictionDo withIds(Long... ids) {
+    ids().updateAll(ids);
+    return this;
+  }
+
   @Generated("DoConvenienceMethodsGenerator")
   public FixtureDataLookupRestrictionDo withStartsWith(String startsWith) {
     startsWith().set(startsWith);
@@ -42,5 +57,26 @@ public class FixtureDataLookupRestrictionDo extends AbstractLookupRestrictionDo<
   @Generated("DoConvenienceMethodsGenerator")
   public String getStartsWith() {
     return startsWith().get();
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureDataLookupRestrictionDo withText(String text) {
+    text().set(text);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureDataLookupRestrictionDo withActive(Boolean active) {
+    active().set(active);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureDataLookupRestrictionDo withMaxRowCount(Integer maxRowCount) {
+    maxRowCount().set(maxRowCount);
+    return this;
   }
 }

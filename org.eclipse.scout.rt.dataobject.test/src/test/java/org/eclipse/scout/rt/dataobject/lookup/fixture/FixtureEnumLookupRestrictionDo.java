@@ -10,6 +10,10 @@
  */
 package org.eclipse.scout.rt.dataobject.lookup.fixture;
 
+import java.util.Collection;
+
+import javax.annotation.Generated;
+
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureEnum;
@@ -21,5 +25,43 @@ public class FixtureEnumLookupRestrictionDo extends AbstractLookupRestrictionDo<
   @Override
   public DoList<FixtureEnum> ids() {
     return createIdsAttribute(this);
+  }
+
+  /* **************************************************************************
+   * GENERATED CONVENIENCE METHODS
+   * *************************************************************************/
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureEnumLookupRestrictionDo withIds(Collection<? extends FixtureEnum> ids) {
+    ids().updateAll(ids);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureEnumLookupRestrictionDo withIds(FixtureEnum... ids) {
+    ids().updateAll(ids);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureEnumLookupRestrictionDo withText(String text) {
+    text().set(text);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureEnumLookupRestrictionDo withActive(Boolean active) {
+    active().set(active);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureEnumLookupRestrictionDo withMaxRowCount(Integer maxRowCount) {
+    maxRowCount().set(maxRowCount);
+    return this;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.dataobject.lookup;
+
+import java.util.Collection;
+
+import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.TypeName;
@@ -28,5 +32,43 @@ public class StringLookupRestrictionDo extends AbstractLookupRestrictionDo<Strin
    */
   public static StringLookupRestrictionDo ensure(StringLookupRestrictionDo restriction) {
     return ObjectUtility.nvl(restriction, BEANS.get(StringLookupRestrictionDo.class));
+  }
+
+  /* **************************************************************************
+   * GENERATED CONVENIENCE METHODS
+   * *************************************************************************/
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public StringLookupRestrictionDo withIds(Collection<? extends String> ids) {
+    ids().updateAll(ids);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public StringLookupRestrictionDo withIds(String... ids) {
+    ids().updateAll(ids);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public StringLookupRestrictionDo withText(String text) {
+    text().set(text);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public StringLookupRestrictionDo withActive(Boolean active) {
+    active().set(active);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public StringLookupRestrictionDo withMaxRowCount(Integer maxRowCount) {
+    maxRowCount().set(maxRowCount);
+    return this;
   }
 }

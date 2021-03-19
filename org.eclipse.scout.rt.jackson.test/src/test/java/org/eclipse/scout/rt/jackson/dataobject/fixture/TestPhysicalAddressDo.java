@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,11 +17,6 @@ import org.eclipse.scout.rt.dataobject.TypeName;
 
 @TypeName("TestPhysicalAddress")
 public class TestPhysicalAddressDo extends AbstractTestAddressDo {
-
-  @Override
-  public TestPhysicalAddressDo withId(String id) {
-    return (TestPhysicalAddressDo) super.withId(id);
-  }
 
   public DoValue<String> street() {
     return doValue("street");
@@ -70,5 +65,12 @@ public class TestPhysicalAddressDo extends AbstractTestAddressDo {
   @Generated("DoConvenienceMethodsGenerator")
   public String getZipCode() {
     return zipCode().get();
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestPhysicalAddressDo withId(String id) {
+    id().set(id);
+    return this;
   }
 }

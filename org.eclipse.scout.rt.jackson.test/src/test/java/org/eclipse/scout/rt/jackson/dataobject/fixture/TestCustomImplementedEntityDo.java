@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
@@ -107,5 +109,20 @@ public class TestCustomImplementedEntityDo implements IDoEntity {
   @Override
   public String toString() {
     return TestCustomImplementedEntityDo.class.getSimpleName() + " [m_attributes=" + m_attributes + "]";
+  }
+
+  /* **************************************************************************
+   * GENERATED CONVENIENCE METHODS
+   * *************************************************************************/
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCustomImplementedEntityDo withDateAttribute(Date dateAttribute) {
+    dateAttribute().set(dateAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Date getDateAttribute() {
+    return dateAttribute().get();
   }
 }
