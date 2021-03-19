@@ -16,6 +16,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.UUID;
 
 import org.eclipse.scout.rt.server.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.jdbc.style.AbstractSqlStyle;
@@ -61,6 +62,9 @@ public class PostgreSqlStyle extends AbstractSqlStyle {
   protected SqlBind createBindFor(Object o, Class c) {
     if (Boolean.class.isAssignableFrom(c)) {
       return new SqlBind(Types.BOOLEAN, o);
+    }
+    if (UUID.class.isAssignableFrom(c)) {
+      return new SqlBind(Types.OTHER, o);
     }
 
     return super.createBindFor(o, c);
