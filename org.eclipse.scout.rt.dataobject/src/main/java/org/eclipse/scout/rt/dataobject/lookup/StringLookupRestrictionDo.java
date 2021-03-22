@@ -45,6 +45,7 @@ public class StringLookupRestrictionDo extends AbstractLookupRestrictionDo<Strin
     return this;
   }
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
   public StringLookupRestrictionDo withIds(String... ids) {
     ids().updateAll(ids);

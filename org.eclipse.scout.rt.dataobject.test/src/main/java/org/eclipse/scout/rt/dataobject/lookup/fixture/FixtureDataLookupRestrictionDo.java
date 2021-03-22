@@ -42,6 +42,7 @@ public class FixtureDataLookupRestrictionDo extends AbstractLookupRestrictionDo<
     return this;
   }
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
   public FixtureDataLookupRestrictionDo withIds(Long... ids) {
     ids().updateAll(ids);

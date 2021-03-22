@@ -27,6 +27,7 @@ public class StringLookupRowDo extends AbstractLookupRowDo<StringLookupRowDo, St
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
   public StringLookupRowDo withId(String id) {
     id().set(id);
@@ -54,6 +55,7 @@ public class StringLookupRowDo extends AbstractLookupRowDo<StringLookupRowDo, St
     return this;
   }
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
   public StringLookupRowDo withParentId(String parentId) {
     parentId().set(parentId);

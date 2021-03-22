@@ -38,6 +38,7 @@ public class FixtureUuIdLookupRestrictionDo extends AbstractLookupRestrictionDo<
     return this;
   }
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
   public FixtureUuIdLookupRestrictionDo withIds(FixtureUuId... ids) {
     ids().updateAll(ids);

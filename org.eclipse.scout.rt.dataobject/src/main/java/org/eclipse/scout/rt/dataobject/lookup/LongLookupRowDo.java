@@ -27,6 +27,7 @@ public class LongLookupRowDo extends AbstractLookupRowDo<LongLookupRowDo, Long> 
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
   public LongLookupRowDo withId(Long id) {
     id().set(id);
@@ -54,6 +55,7 @@ public class LongLookupRowDo extends AbstractLookupRowDo<LongLookupRowDo, Long> 
     return this;
   }
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
   public LongLookupRowDo withParentId(Long parentId) {
     parentId().set(parentId);

@@ -29,6 +29,7 @@ public class FixtureEnumLookupRowDo extends AbstractLookupRowDo<FixtureEnumLooku
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
   public FixtureEnumLookupRowDo withId(FixtureEnum id) {
     id().set(id);
@@ -56,6 +57,7 @@ public class FixtureEnumLookupRowDo extends AbstractLookupRowDo<FixtureEnumLooku
     return this;
   }
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
   public FixtureEnumLookupRowDo withParentId(FixtureEnum parentId) {
     parentId().set(parentId);

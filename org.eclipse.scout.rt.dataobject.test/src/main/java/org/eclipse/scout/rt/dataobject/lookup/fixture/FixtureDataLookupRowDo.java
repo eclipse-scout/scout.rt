@@ -32,6 +32,7 @@ public class FixtureDataLookupRowDo extends AbstractLookupRowDo<FixtureDataLooku
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
   public FixtureDataLookupRowDo withId(Long id) {
     id().set(id);
@@ -70,6 +71,7 @@ public class FixtureDataLookupRowDo extends AbstractLookupRowDo<FixtureDataLooku
     return this;
   }
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
   public FixtureDataLookupRowDo withParentId(Long parentId) {
     parentId().set(parentId);

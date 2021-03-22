@@ -38,6 +38,7 @@ public class FixtureEnumLookupRestrictionDo extends AbstractLookupRestrictionDo<
     return this;
   }
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
   public FixtureEnumLookupRestrictionDo withIds(FixtureEnum... ids) {
     ids().updateAll(ids);

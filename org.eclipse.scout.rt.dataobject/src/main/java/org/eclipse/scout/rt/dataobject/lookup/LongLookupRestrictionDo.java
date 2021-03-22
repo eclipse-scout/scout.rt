@@ -45,6 +45,7 @@ public class LongLookupRestrictionDo extends AbstractLookupRestrictionDo<LongLoo
     return this;
   }
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
   public LongLookupRestrictionDo withIds(Long... ids) {
     ids().updateAll(ids);
