@@ -10,11 +10,16 @@
  */
 package org.eclipse.scout.rt.server.jdbc.db2;
 
+import java.nio.ByteBuffer;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
+import java.util.UUID;
 
+import org.eclipse.scout.rt.server.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.jdbc.style.AbstractSqlStyle;
 
 public class DB2SqlStyle extends AbstractSqlStyle {
@@ -49,6 +54,43 @@ public class DB2SqlStyle extends AbstractSqlStyle {
   @Override
   public boolean isClobEnabled() {
     return true;
+  }
+
+  @Override
+  protected SqlBind createBindFor(Object o, Class c) {
+    if (UUID.class.isAssignableFrom(c)) {
+      return new SqlBind(Types.OTHER, o);
+    }
+
+    return super.createBindFor(o, c);
+  }
+
+  @Override
+  public void writeBind(PreparedStatement ps, int jdbcBindIndex, SqlBind bind) throws SQLException {
+    switch (bind.getSqlType()) {
+      case Types.OTHER: {
+        if (bind.getValue() instanceof UUID) {
+          ps.setBytes(jdbcBindIndex, unwrapUuid((UUID) bind.getValue()));
+        }
+        else {
+          super.writeBind(ps, jdbcBindIndex, bind);
+        }
+        break;
+      }
+      default: {
+        super.writeBind(ps, jdbcBindIndex, bind);
+      }
+    }
+  }
+
+  public byte[] unwrapUuid(UUID javaValue) {
+    if (javaValue == null) {
+      return null;
+    }
+    ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
+    bb.putLong(javaValue.getMostSignificantBits());
+    bb.putLong(javaValue.getLeastSignificantBits());
+    return bb.array();
   }
 
   @Override
