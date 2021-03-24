@@ -117,14 +117,14 @@ public abstract class AbstractDataObjectSignatureTest {
   protected void compareSignatures(DataObjectSignatureDo currentSignature) {
     IDataObjectMapper dataObjectMapper = BEANS.get(IPrettyPrintDataObjectMapper.class);
 
-    DataObjectSignatureDo previousSignature = null;
     File referenceFile = new File(getApiSignatureJsonDirectory(), getFilename());
     if (!referenceFile.exists()) {
       writeCurrentSignature(referenceFile, currentSignature);
-      fail("No previous signature file available. Initial data object signature file was created");
+      fail("No previous signature file available. Initial signature file was created");
     }
 
     // Read previous signature file for comparison
+    DataObjectSignatureDo previousSignature = null;
     try (FileInputStream fis = new FileInputStream(referenceFile)) {
       previousSignature = dataObjectMapper.readValue(fis, DataObjectSignatureDo.class);
     }
@@ -143,7 +143,7 @@ public abstract class AbstractDataObjectSignatureTest {
     if (differentDataObjects || !comparator.getDifferences().isEmpty()) {
       writeCurrentSignature(referenceFile, currentSignature);
       String details = comparator.getDifferences().isEmpty() ? "Comparator was unable to detect the differences, please review file changes manually." : StringUtility.join("\n", comparator.getDifferences());
-      fail("Review all API signature differences and create corresponding migrations if necessary before committing any changes in file " + getFilename() + ":\n" + details);
+      fail("Review all signature differences and create corresponding migrations if necessary before committing any changes in file " + getFilename() + ":\n" + details);
     }
   }
 

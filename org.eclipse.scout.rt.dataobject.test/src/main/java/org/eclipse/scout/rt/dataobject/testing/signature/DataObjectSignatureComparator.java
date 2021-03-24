@@ -117,8 +117,13 @@ public class DataObjectSignatureComparator {
       String currentTypeName = m_typeNameRenamings.getOrDefault(previousTypeName, previousTypeName);
 
       if (!currentEntities.containsKey(currentTypeName)) {
-        m_differences.add(String.format("[TASK] DO Entity '%s' is missing in new version", currentTypeName));
+        m_differences.add(String.format("[ACTION] DO Entity '%s' is missing in new version", currentTypeName));
         continue;
+      }
+
+      if (ObjectUtility.notEquals(previousTypeName, currentTypeName)) {
+        // Add difference due to type name renaming
+        m_differences.add(String.format("[ACTION] DO Entity '%s' has a new type name '%s'", previousTypeName, currentTypeName));
       }
 
       remainingCurrentEntities.remove(currentTypeName);
@@ -133,7 +138,7 @@ public class DataObjectSignatureComparator {
           // Same names
           if (NamespaceVersion.compareVersion(previousTypeVersionValue, currentTypeVersionValue) < 0) {
             // Common case
-            m_differences.add(String.format("[TASK] DO Entity '%s' has a higher type version than before. Old: '%s', new: '%s'", currentTypeName, previousEntity.getTypeVersion(), currentEntity.getTypeVersion()));
+            m_differences.add(String.format("[ACTION] DO Entity '%s' has a higher type version than before. Old: '%s', new: '%s'", currentTypeName, previousEntity.getTypeVersion(), currentEntity.getTypeVersion()));
           }
           else {
             // Invalid, new type version must always be higher than old type version.
@@ -142,17 +147,17 @@ public class DataObjectSignatureComparator {
         }
         else {
           // Different names, versions are not comparable (rare case that type version name changes)
-          m_differences.add(String.format("[TASK] DO Entity '%s' has a changed type version namespace. Old: '%s', new: '%s'", currentTypeName, previousEntity.getTypeVersion(), currentEntity.getTypeVersion()));
+          m_differences.add(String.format("[ACTION] DO Entity '%s' has a changed type version namespace. Old: '%s', new: '%s'", currentTypeName, previousEntity.getTypeVersion(), currentEntity.getTypeVersion()));
         }
       }
 
       if (ObjectUtility.notEquals(previousEntity.getParentTypeVersion(), currentEntity.getParentTypeVersion())) {
         // Requires to apply migration from replaced data object to own data object
-        m_differences.add(String.format("[TASK] DO Entity '%s' has a changed parent type version. Old: '%s', new: '%s'", currentTypeName, previousEntity.getParentTypeVersion(), currentEntity.getParentTypeVersion()));
+        m_differences.add(String.format("[ACTION] DO Entity '%s' has a changed parent type version. Old: '%s', new: '%s'", currentTypeName, previousEntity.getParentTypeVersion(), currentEntity.getParentTypeVersion()));
       }
     }
 
-    remainingCurrentEntities.forEach(typeName -> m_differences.add(String.format("[INFO] New DO entity '%s' available", typeName)));
+    remainingCurrentEntities.forEach(typeName -> m_differences.add(String.format("[VERIFY] New DO entity '%s' available", typeName)));
   }
 
   protected void compareAttributes(EntityDataObjectSignatureDo previousEntity, EntityDataObjectSignatureDo currentEntity) {
@@ -165,7 +170,7 @@ public class DataObjectSignatureComparator {
     for (AttributeDataObjectSignatureDo previousAttribute : previousEntity.getAttributes()) {
       String previousAttributeName = previousAttribute.getName();
       if (!currentAttributes.containsKey(previousAttributeName)) {
-        m_differences.add(String.format("[TASK] DO Entity '%s' is missing attribute '%s' in new version", currentTypeName, previousAttributeName));
+        m_differences.add(String.format("[ACTION] DO Entity '%s' is missing attribute '%s' in new version", currentTypeName, previousAttributeName));
         continue;
       }
 
@@ -178,7 +183,7 @@ public class DataObjectSignatureComparator {
     for (AttributeDataObjectSignatureDo currentAttribute : currentEntity.getAttributes()) {
       String currentAttributeName = currentAttribute.getName();
       if (!processedAttributeNames.contains(currentAttributeName)) {
-        m_differences.add(String.format("[TASK] DO Entity '%s' has new attribute '%s'", currentTypeName, currentAttributeName));
+        m_differences.add(String.format("[VERIFY] DO Entity '%s' has new attribute '%s'", currentTypeName, currentAttributeName));
       }
     }
   }
@@ -189,13 +194,13 @@ public class DataObjectSignatureComparator {
     boolean previousList = BooleanUtility.nvl(previousAttribute.isList());
     boolean currentList = BooleanUtility.nvl(currentAttribute.isList());
     if (previousList != currentList) {
-      m_differences.add(String.format("[TASK] DO Entity '%s' attribute '%s' has change list/non-list. Old: '%s', new: '%s'", currentTypeName, currentAttributeName, previousList, currentList));
+      m_differences.add(String.format("[ACTION] DO Entity '%s' attribute '%s' has change list/non-list. Old: '%s', new: '%s'", currentTypeName, currentAttributeName, previousList, currentList));
     }
 
     String previousFormatPattern = previousAttribute.getFormatPattern();
     String currentFormatPattern = currentAttribute.getFormatPattern();
     if (ObjectUtility.notEquals(previousFormatPattern, currentFormatPattern)) {
-      m_differences.add(String.format("[TASK] DO Entity '%s' attribute '%s' has a different format pattern. Old: '%s', new: '%s'", currentTypeName, currentAttributeName, previousFormatPattern, currentFormatPattern));
+      m_differences.add(String.format("[ACTION] DO Entity '%s' attribute '%s' has a different format pattern. Old: '%s', new: '%s'", currentTypeName, currentAttributeName, previousFormatPattern, currentFormatPattern));
     }
 
     String previousValueType = previousAttribute.getValueType();
@@ -203,12 +208,12 @@ public class DataObjectSignatureComparator {
     String currentValueType = currentAttribute.getValueType();
     if (ObjectUtility.notEquals(normalizedPreviousValueType, currentValueType)) {
       // Comparison with normalized value type failed
-      m_differences.add(String.format("[TASK] DO Entity '%s' attribute '%s' has a different type. Old: '%s', new: '%s'", currentTypeName, currentAttributeName, normalizedPreviousValueType, currentValueType));
+      m_differences.add(String.format("[ACTION] DO Entity '%s' attribute '%s' has a different type. Old: '%s', new: '%s'", currentTypeName, currentAttributeName, normalizedPreviousValueType, currentValueType));
     }
     else if (ObjectUtility.notEquals(previousValueType, currentValueType)) {
       // Comparison with value type failed but comparison with normalized value type was a success
       // -> renamings were added, no need to do something -> INFO
-      m_differences.add(String.format("[INFO] DO Entity '%s' attribute '%s' has changed type due to applied renamings. Old: '%s', new: '%s'", currentTypeName, currentAttributeName, previousValueType, currentValueType));
+      m_differences.add(String.format("[VERIFY] DO Entity '%s' attribute '%s' has changed type due to applied renamings. Old: '%s', new: '%s'", currentTypeName, currentAttributeName, previousValueType, currentValueType));
     }
   }
 
@@ -223,9 +228,12 @@ public class DataObjectSignatureComparator {
 
       String currentEnumName = m_enumNameRenamings.getOrDefault(previousEnumName, previousEnumName);
       if (!currentEnums.containsKey(currentEnumName)) {
-        m_differences.add(String.format("[TASK] Enum '%s' is missing in new version", currentEnumName));
+        m_differences.add(String.format("[ACTION] Enum '%s' is missing in new version", currentEnumName));
         continue;
       }
+
+      // As compared to type name renaming, there is no need to add a difference for a renamed enum name (based on m_enumNameRenamings)
+      // because the enum was referenced in at least one attribute and a difference was already inserted.
 
       remainingCurrentEnums.remove(currentEnumName);
 
@@ -233,15 +241,15 @@ public class DataObjectSignatureComparator {
 
       Set<String> newEnumValues = new HashSet<>(currentEnum.getValues());
       newEnumValues.removeAll(previousEnum.getValues());
-      newEnumValues.forEach(enumValue -> m_differences.add(String.format("[INFO] Enum '%s' has new enum value '%s'", currentEnumName, enumValue)));
+      newEnumValues.forEach(enumValue -> m_differences.add(String.format("[VERIFY] Enum '%s' has new enum value '%s'", currentEnumName, enumValue)));
 
       Set<String> previousEnumValues = new HashSet<>(previousEnum.getValues());
       previousEnumValues.removeAll(currentEnum.getValues());
 
-      previousEnumValues.forEach(enumValue -> m_differences.add(String.format("[TASK] Enum '%s' is missing value '%s' in new version", currentEnumName, enumValue)));
+      previousEnumValues.forEach(enumValue -> m_differences.add(String.format("[ACTION] Enum '%s' is missing value '%s' in new version", currentEnumName, enumValue)));
     }
 
-    remainingCurrentEnums.forEach(enumName -> m_differences.add(String.format("[INFO] New enum '%s' available", enumName)));
+    remainingCurrentEnums.forEach(enumName -> m_differences.add(String.format("[VERIFY] New enum '%s' available", enumName)));
   }
 
   /**
