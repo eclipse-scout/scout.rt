@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, arrays, QueryBy, scout} from '../index';
+import {arrays, objects, QueryBy, scout} from '../index';
 import $ from 'jquery';
 
 /**
@@ -132,6 +132,7 @@ export default class LookupCall {
 
   /**
    * Override this method to implement.
+   * @returns {Promise}
    */
   _getAll() {
     throw new Error('getAll() not implemented');
@@ -152,6 +153,7 @@ export default class LookupCall {
 
   /**
    * Override this method to implement.
+   * @returns {Promise}
    */
   _getByText(text) {
     throw new Error('getByText() not implemented');
@@ -172,6 +174,7 @@ export default class LookupCall {
 
   /**
    * Override this method to implement.
+   * @returns {Promise}
    */
   _getByKey(key) {
     throw new Error('getByKey() not implemented');
@@ -192,6 +195,7 @@ export default class LookupCall {
 
   /**
    * Override this method to implement.
+   * @returns {Promise}
    */
   _getByKeys(keys) {
     throw new Error('getByKeys() not implemented');
@@ -210,11 +214,24 @@ export default class LookupCall {
   getByRec(parentKey) {
     this.queryBy = QueryBy.REC;
     this.parentKey = parentKey;
+    if (objects.isNullOrUndefined(parentKey)) {
+      // Lookup rows with key = null cannot act as parent since lookup rows with parentKey = null are always top level
+      return this._emptyRecResult(parentKey);
+    }
     return this._getByRec(parentKey);
+  }
+
+  _emptyRecResult(rec) {
+    return $.resolvedPromise({
+      queryBy: QueryBy.REC,
+      rec: rec,
+      lookupRows: []
+    });
   }
 
   /**
    * Override this method to implement.
+   * @returns {Promise}
    */
   _getByRec(rec) {
     throw new Error('getByRec() not implemented');
@@ -238,6 +255,10 @@ export default class LookupCall {
       return this._getByText(this.searchText);
     }
     if (QueryBy.REC === this.queryBy) {
+      if (objects.isNullOrUndefined(this.parentKey)) {
+        // Lookup rows with key = null cannot act as parent since lookup rows with parentKey = null are always top level
+        return this._emptyRecResult(this.parentKey);
+      }
       return this._getByRec(this.parentKey);
     }
     throw new Error('cannot execute a non-clone LookupCall. Use one of the cloneFor*-methods before executing.');
@@ -315,4 +336,19 @@ export default class LookupCall {
     }
     return result.lookupRows[0];
   }
+
+  /**
+   * @typedef LookupResult
+   * @property {LookupRow[]} lookupRows
+   * @property {string} queryBy a value of the QueryBy object
+   * @property {boolean} byAll
+   * @property {boolean} byText
+   * @property {boolean} byKey
+   * @property {boolean} byKeys
+   * @property {boolean} byRec
+   * @property {boolean} rec
+   * @property {boolean} appendResult
+   * @property {boolean} uniqueMatch
+   * @property {number} seqNo
+   */
 }

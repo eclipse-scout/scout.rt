@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, LookupRow, objects, ProposalChooser, scout, Tree} from '../../../index';
+import {arrays, objects, ProposalChooser, scout, Tree} from '../../../index';
 
 export default class TreeProposalChooser extends ProposalChooser {
 
@@ -57,8 +57,7 @@ export default class TreeProposalChooser extends ProposalChooser {
   }
 
   /**
-   * @param {LookupRow[]} lookupRows
-   * @param {boolean} appendResult whether or not we must delete the tree
+   * @param {LookupResult} result
    */
   setLookupResult(result) {
     let treeNodes, treeNodesFlat,
@@ -198,7 +197,9 @@ export default class TreeProposalChooser extends ProposalChooser {
     // 1. put all nodes with the same parent in a map (key=parentId, value=[nodes])
     let nodesMap = {};
     treeNodesFlat.forEach(treeNode => {
-      nodesMap[treeNode.id] = treeNode;
+      if (!objects.isNullOrUndefined(treeNode.id)) {
+        nodesMap[treeNode.id] = treeNode;
+      }
     });
 
     let rootNodes = [];
@@ -206,6 +207,9 @@ export default class TreeProposalChooser extends ProposalChooser {
     // 2. based on this map, set the childNodes references on the treeNodes
     treeNodesFlat.forEach(treeNode => {
       let parentNode = nodesMap[treeNode.parentId];
+      if (parentNode === treeNode) {
+        throw new Error('Cannot link a node to itself. Id: ' + treeNode.parentId);
+      }
       if (parentNode) {
         this._appendChildNode(parentNode, treeNode);
       } else {

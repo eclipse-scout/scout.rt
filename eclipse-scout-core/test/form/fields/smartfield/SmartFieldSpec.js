@@ -45,14 +45,6 @@ describe('SmartField', () => {
     return scout.create('SmartField', model);
   }
 
-  function createSmartFieldWithAdapter() {
-    let model = helper.createFieldModel('SmartField');
-    let smartField = new SmartField();
-    smartField.init(model);
-    linkWidgetAndAdapter(smartField, 'SmartFieldAdapter');
-    return smartField;
-  }
-
   function findTableProposals() {
     let proposals = [];
     session.desktop.$container.find('.table-row').each(function() {
@@ -582,7 +574,7 @@ describe('SmartField', () => {
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.setSearchRequired(true);
       field.setDisplayText('Fo'); // DummyLookupCall contains row named 'Foo'.
-      let result = field.openPopup();
+      field.openPopup();
       jasmine.clock().tick(500);
 
       expect(field.isPopupOpen()).toBe(true);
@@ -594,7 +586,7 @@ describe('SmartField', () => {
       let field = createFieldWithLookupCall();
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
-      let result = field.openPopup();
+      field.openPopup();
       jasmine.clock().tick(500);
 
       expect(field.isPopupOpen()).toBe(true);
@@ -606,7 +598,7 @@ describe('SmartField', () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.setSearchRequired(true);
-      let result = field.openPopup();
+      field.openPopup();
       jasmine.clock().tick(500);
 
       expect(field.isPopupOpen()).toBe(false);
@@ -619,7 +611,7 @@ describe('SmartField', () => {
       });
       field.render();
       field.setSearchRequired(true);
-      let result = field.openPopup();
+      field.openPopup();
       jasmine.clock().tick(500);
 
       expect(field.isPopupOpen()).toBe(true);
@@ -700,7 +692,7 @@ describe('SmartField', () => {
     });
 
     it('must update flag _userWasTyping', () => {
-      // intial-state
+      // initial-state
       expect(field._userWasTyping).toBe(false);
 
       // send a regular key-press (no navigation)
