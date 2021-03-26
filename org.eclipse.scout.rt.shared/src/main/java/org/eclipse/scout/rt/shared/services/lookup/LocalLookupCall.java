@@ -168,13 +168,9 @@ public class LocalLookupCall<T> extends LookupCall<T> {
 
   /**
    * add all lookup rows found in {@code nodeMap} with {@code key} as their parent to {@code children} recursively.
-   *
-   * @param nodeMap
-   * @param key
-   * @param children
    */
   protected void collectChildrenRec(Map<T, Set<ILookupRow<T>>> nodeMap, T key, List<ILookupRow<T>> children) {
-    if (nodeMap.get(key) == null) {
+    if (key == null || nodeMap.get(key) == null) {
       return;
     }
     for (ILookupRow<T> var : nodeMap.get(key)) {

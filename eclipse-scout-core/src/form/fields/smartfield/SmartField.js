@@ -162,14 +162,14 @@ export default class SmartField extends ValueField {
   _renderGridData() {
     super._renderGridData();
     this.updateInnerAlignment({
-      useHorizontalAlignment: (this.browseHierarchy ? false : true)
+      useHorizontalAlignment: !this.browseHierarchy
     });
   }
 
   _renderGridDataHints() {
     super._renderGridDataHints();
     this.updateInnerAlignment({
-      useHorizontalAlignment: (this.browseHierarchy ? false : true)
+      useHorizontalAlignment: !this.browseHierarchy
     });
   }
 
