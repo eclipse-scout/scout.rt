@@ -214,7 +214,7 @@ export default class BrowserField extends ValueField {
     }
 
     if (!this._popupWindow || (reopenIfClosed && this._popupWindow.closed)) {
-      let popupBlockerHandler = new PopupBlockerHandler(this.session);
+      let popupBlockerHandler = scout.create('PopupBlockerHandler', {session: this.session});
       let popupBounds = this._calcPopupBounds();
       // (b) window specifications
       let windowSpecs = strings.join(',',
