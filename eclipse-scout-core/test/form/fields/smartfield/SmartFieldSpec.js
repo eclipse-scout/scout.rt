@@ -45,14 +45,6 @@ describe('SmartField', function() {
     return scout.create('SmartField', model);
   }
 
-  function createSmartFieldWithAdapter() {
-    var model = helper.createFieldModel('SmartField');
-    var smartField = new SmartField();
-    smartField.init(model);
-    linkWidgetAndAdapter(smartField, 'SmartFieldAdapter');
-    return smartField;
-  }
-
   function findTableProposals() {
     var proposals = [];
     session.desktop.$container.find('.table-row').each(function() {
@@ -584,7 +576,7 @@ describe('SmartField', function() {
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.setSearchRequired(true);
       field.setDisplayText('Fo'); // DummyLookupCall contains row named 'Foo'.
-      var result = field.openPopup();
+      field.openPopup();
       jasmine.clock().tick(500);
 
       expect(field.isPopupOpen()).toBe(true);
@@ -596,7 +588,7 @@ describe('SmartField', function() {
       var field = createFieldWithLookupCall();
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
-      var result = field.openPopup();
+      field.openPopup();
       jasmine.clock().tick(500);
 
       expect(field.isPopupOpen()).toBe(true);
@@ -608,7 +600,7 @@ describe('SmartField', function() {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.setSearchRequired(true);
-      var result = field.openPopup();
+      field.openPopup();
       jasmine.clock().tick(500);
 
       expect(field.isPopupOpen()).toBe(false);
@@ -621,7 +613,7 @@ describe('SmartField', function() {
       });
       field.render();
       field.setSearchRequired(true);
-      var result = field.openPopup();
+      field.openPopup();
       jasmine.clock().tick(500);
 
       expect(field.isPopupOpen()).toBe(true);
@@ -701,8 +693,8 @@ describe('SmartField', function() {
       field = createFieldWithLookupCall();
     });
 
-    it('must update flag _userWasTyping', function() {
-      // intial-state
+    it('must update flag _userWasTyping', () => {
+      // initial-state
       expect(field._userWasTyping).toBe(false);
 
       // send a regular key-press (no navigation)

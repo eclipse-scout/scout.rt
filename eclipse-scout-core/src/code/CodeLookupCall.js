@@ -61,11 +61,10 @@ export default class CodeLookupCall extends StaticLookupCall {
     if (!code) {
       return null;
     }
-    var lookupRow = scout.create('LookupRow', {
+    return scout.create('LookupRow', {
       key: code.id,
       text: code.text(this.session.locale),
       parentKey: code.parent && code.parent.id
     });
-    return lookupRow;
   }
 }

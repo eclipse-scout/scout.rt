@@ -190,12 +190,11 @@ export default class StaticLookupCall extends LookupCall {
    * Implement this function to convert a single data array into an instance of LookupRow.
    */
   _dataToLookupRow(data) {
-    var lookupRow = scout.create('LookupRow', {
+    return scout.create('LookupRow', {
       key: data[0],
       text: data[1],
       parentKey: data[2]
     });
-    return lookupRow;
   }
 
   /**

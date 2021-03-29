@@ -49,11 +49,11 @@ export default class TableProposalChooser extends ProposalChooser {
     if (descriptor.width && descriptor.width > 0) { // 0 = default
       width = descriptor.width;
     }
-    var column = scout.create('Column', {
+    return scout.create('Column', {
       session: this.session,
       text: descriptor.text,
       cssClass: scout.nvl(descriptor.cssClass, null),
-      width: width, // needs to be passed here to make sure initialWidth is also set, if set using setWidth() autoResizeColumn won't work because initalWidth would still be NARROW_MIN_WIDTH
+      width: width, // needs to be passed here to make sure initialWidth is also set, if set using setWidth() autoResizeColumn won't work because initialWidth would still be NARROW_MIN_WIDTH
       autoOptimizeWidth: scout.nvl(descriptor.autoOptimizeWidth, false),
       fixedWidth: scout.nvl(descriptor.fixedWidth, false),
       fixedPosition: scout.nvl(descriptor.fixedPosition, false),
@@ -61,7 +61,6 @@ export default class TableProposalChooser extends ProposalChooser {
       visible: scout.nvl(descriptor.visible, true),
       htmlEnabled: scout.nvl(descriptor.htmlEnabled, false)
     });
-    return column;
   }
 
   _createTable(columns, headerVisible) {
