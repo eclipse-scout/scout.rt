@@ -14,10 +14,15 @@ import $ from 'jquery';
 export default class PopupBlockerHandler {
   /**
    * @param {boolean} [preserveOpener] A boolean indicating if the popup-window should have a back reference to the origin window. By default this parameter is false because of security reasons. Only trusted sites may be allowed to access the opener window and potentially modify the origin web application! See https://mathiasbynens.github.io/rel-noopener/ for more details.
+   * @deprecated use scout.create to create an instance of this class
    */
   constructor(session, preserveOpener) {
     this.session = session;
     this.preserveOpener = preserveOpener;
+  }
+
+  init(options) {
+    $.extend(this, options);
   }
 
   /**

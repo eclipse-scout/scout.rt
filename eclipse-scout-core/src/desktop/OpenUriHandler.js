@@ -110,7 +110,7 @@ export default class OpenUriHandler {
   }
 
   openUriAsNewWindow(uri) {
-    let popupBlockerHandler = new PopupBlockerHandler(this.session);
+    let popupBlockerHandler = scout.create('PopupBlockerHandler', {session: this.session});
     if (Device.get().isInternetExplorer()) {
       popupBlockerHandler.openWindow(uri, null, 'location=yes,toolbar=yes,menubar=yes,resizable=yes,scrollbars=yes');
     } else {
@@ -119,7 +119,7 @@ export default class OpenUriHandler {
   }
 
   openUriAsPopupWindow(uri) {
-    let popupBlockerHandler = new PopupBlockerHandler(this.session);
+    let popupBlockerHandler = scout.create('PopupBlockerHandler', {session: this.session});
     popupBlockerHandler.openWindow(uri, null, 'location=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes');
   }
 }

@@ -103,11 +103,51 @@ export default class Desktop extends Widget {
     COMPACT: 'compact'
   };
 
+  /**
+   * The action that should be performed when handling an "open URI" event.
+   */
   static UriAction = {
+    /**
+     * The object represented by the URI should be downloaded rather then be handled by the browser's rendering engine.
+     * It should make the "Save as..." dialog appear which allows the user to store the resource to his local file system.<br>
+     * The application's location does not change, and no browser windows or tabs are opened.<br>
+     * <br>
+     *<b>Important:</b> This action only works if the HTTP header <i>Content-Disposition: attachment</i> is present on the response of the object to be downloaded.<br>
+     */
     DOWNLOAD: 'download',
+    /**
+     * The object represented by the URI should be opened by the browser rather than just be downloaded.
+     * This will only work if the browser knows how to handle the given URI.
+     * E.g. if it points to a pdf file, most browsers will be able to display it using their pdf viewer. Other files may just be downloaded.
+     * If the URI points to a website, it will be opened in a separate window or tab.
+     * <br>
+     * This is also the preferred action to open URIs with <b>special protocols</b> that are registered in the user's system and delegated to some "protocol
+     * handler". This handler may then perform actions in a third party application (e.g. <i>mailto:xyz@example.com</i>
+     * would open the system's mail application).<br>
+     * Note that this action may open the object in a new window or tab tab which may be prevented by
+     * the browser's popup blocker mechanism.
+     */
     OPEN: 'open',
+    /**
+     * The content represented by the URI should be rendered by the browser and displayed in a new window or tab.<br>
+     * The application's location does not change. Note that this action may be prevented by the browser's popup blocker mechanism.
+     */
     NEW_WINDOW: 'newWindow',
+    /**
+     * The content represented by the URI should be rendered by the browser and displayed in a new non-modal popup
+     * window.
+     * Unlike {@link UriAction.NEW_WINDOW} the newly opened window is limited, i.e. it does not contain the location, the toolbar and the menubar.
+     * This may not work on every browser (e.g. on a mobile browser the action {@link UriAction.POPUP_WINDOW} will likely behave the same way as {@link UriAction.NEW_WINDOW}).<br>
+     * The application's location does not change. Note that this action may be prevented by the browser's popup blocker
+     * mechanism.
+     */
     POPUP_WINDOW: 'popupWindow',
+    /**
+     * The content represented by the URI should be opened in the same window.
+     * This will mainly just replace the location of the current window.
+     * If the URI points to another website, the current application will be unloaded and replaced.
+     * If it points to a file or uses a special protocol, the handling depends on the used browser.
+     */
     SAME_WINDOW: 'sameWindow'
   };
 
@@ -857,6 +897,11 @@ export default class Desktop extends Widget {
     });
   }
 
+  /**
+   * Opens the uri using {@link OpenUriHandler}
+   * @param {string} uri the uri to open
+   * @param {Desktop.UriAction} [action] the action to be performed on the given uri. Default is Desktop.UriAction.OPEN.
+   */
   openUri(uri, action) {
     if (!this.rendered) {
       this._postRenderActions.push(this.openUri.bind(this, uri, action));
