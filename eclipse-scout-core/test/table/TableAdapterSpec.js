@@ -240,7 +240,7 @@ describe('TableAdapter', () => {
     });
 
     describe('allRowsDeleted event', () => {
-      let model, table, adapter, row0, row1, row2;
+      let model, table, adapter;
 
       function createAllRowsDeletedEvent(model, rowIds) {
         return {
@@ -425,7 +425,7 @@ describe('TableAdapter', () => {
     });
 
     describe('rowsUpdated event', () => {
-      let model, table, adapter, row0;
+      let model, table, adapter;
 
       function createRowsUpdatedEvent(model, rows) {
         return {
@@ -652,7 +652,7 @@ describe('TableAdapter', () => {
     it('should not coalesce remove and \'add\' events', () => {
       let model = helper.createModelFixture(1, 2);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      adapter.createWidget(model, session.desktop);
       adapter._sendFilter(['1', '2']); // should create a remove event, because number of rows is equals to the length of rowIds
       adapter._sendFilter(['1']); // should create an 'add' event
       adapter._sendFilter(['2']); // should be coalesced with previous add event

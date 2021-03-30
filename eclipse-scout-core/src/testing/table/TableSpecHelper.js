@@ -231,6 +231,56 @@ export default class TableSpecHelper {
     return filter;
   }
 
+
+  createTableTextFilter(table, text) {
+    return scout.create('TableTextUserFilter', {
+      session: this.session,
+      table: table,
+      text: text
+    });
+  }
+
+  createTextColumnFilter(table, column, text) {
+    return scout.create('TextColumnUserFilter', {
+      session: this.session,
+      table: table,
+      column: column,
+      freeText: text
+    });
+  }
+
+  createColumnStructureChangedEvent(model, columns) {
+    return {
+      target: model.id,
+      columns: columns,
+      type: 'columnStructureChanged'
+    };
+  }
+
+  createRowsInsertedEvent(model, rows) {
+    return {
+      target: model.id,
+      rows: rows,
+      type: 'rowsInserted'
+    };
+  }
+
+  createAllRowsDeletedEvent(model) {
+    return {
+      target: model.id,
+      type: 'allRowsDeleted'
+    };
+  }
+
+  createFiltersChangedEvent(model, filters) {
+    return {
+      target: model.id,
+      filters: filters,
+      type: 'filtersChanged'
+    };
+  }
+
+
   /**
    * Applies display style on rows and cells so that cells are positioned correctly in a row.<br>
    * Necessary because the stylesheet is not applied when running the specs.

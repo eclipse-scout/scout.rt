@@ -14,8 +14,11 @@ export default class OutlineAdapter extends TreeAdapter {
 
   constructor() {
     super();
+    this._filterDirty = false;
     this._nodeIdToRowMap = {};
     this._detailTableRowInitHandler = this._onDetailTableRowInit.bind(this);
+    this._detailTableRowsInsertedHandler = this._onDetailTableRowsInserted.bind(this);
+    this._detailTableFilterRemoved = this._onDetailTableFilterRemoved.bind(this);
   }
 
   _onPageChanged(event) {
@@ -57,12 +60,16 @@ export default class OutlineAdapter extends TreeAdapter {
     page.detailTable.rows.forEach(this._linkNodeWithRow.bind(this));
     // rows which are inserted later are linked by _onDetailTableRowInit
     page.detailTable.on('rowInit', this._detailTableRowInitHandler);
+    page.detailTable.on('rowsInserted', this._detailTableRowsInsertedHandler);
+    page.detailTable.on('filterRemoved', this._detailTableFilterRemoved);
   }
 
   _destroyDetailTable(page) {
     this._nodeIdToRowMap = {};
     page.detailTable.rows.forEach(this._unlinkNodeWithRow.bind(this));
     page.detailTable.off('rowInit', this._detailTableRowInitHandler);
+    page.detailTable.off('rowsInserted', this._detailTableRowsInsertedHandler);
+    page.detailTable.off('filterRemoved', this._detailTableFilterRemoved);
   }
 
   _linkNodeWithRow(row) {
@@ -93,23 +100,33 @@ export default class OutlineAdapter extends TreeAdapter {
   }
 
   _onDetailTableRowInit(event) {
-    let node,
-      outline = this.widget,
-      nodeId = event.row.nodeId;
     this._linkNodeWithRow(event.row);
-    node = this.widget.nodesMap[nodeId];
 
-    // If a row, which was already linked to a node, gets initialized again, re-apply the filter to make sure the node has the correct state
-    if (outline.rendered && node && outline._applyFiltersForNode(node)) {
-      if (node.isFilterAccepted()) {
-        outline._addToVisibleFlatList(node, false);
-      } else {
-        outline._removeFromFlatList(node, false);
-      }
-    }
+    let node = this.widget.nodesMap[event.row.nodeId];
     if (this.widget.isSelectedNode(node) && !this.widget.detailContent) {
       // Table row detail could not be created because the link from page to row was missing at the time the node got selected -> do it now
       this.widget.updateDetailContent();
+    }
+  }
+
+  _onDetailTableRowsInserted(event) {
+    let table = event.source;
+
+    if (this._filterDirty ||
+      (table._filterCount() > 0 && event.rows.some(row => !row.filterAccepted))) {
+      this._filterDirty = false;
+      // Explicitly call filter if some of the new rows are not accepted.
+      // If they are accepted, table.insertRows() will trigger a filter event by itself that will be mediated to the outline by OutlineMediator.js
+      this.widget.filter(true);
+    }
+  }
+
+  _onDetailTableFilterRemoved(event) {
+    let table = event.source;
+    if (table.modelAdapter && table.modelAdapter._rebuildingTable) {
+      // If a column is removed, the tableAdapter prevents filtering because the flag _rebuildingTable is true
+      // -> the outline does not get informed, hence the nodes stay invisible.
+      this._filterDirty = true;
     }
   }
 
