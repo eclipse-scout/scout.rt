@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateColumnUserFilter, dates, FilterFieldsGroupBox, scout} from '../../../src/index';
+import {DateColumnUserFilter, dates, FilterFieldsGroupBox} from '../../../src/index';
 import {TableSpecHelper} from '../../../src/testing/index';
 
 describe('DateColumnUserFilter', () => {
@@ -24,13 +24,6 @@ describe('DateColumnUserFilter', () => {
   afterEach(() => {
     session = null;
   });
-
-  function createFilter(table) {
-    return scout.create('TableTextUserFilter', {
-      session: session,
-      table: table
-    });
-  }
 
   it('acceptByFields works', () => {
     let filter = new DateColumnUserFilter(),
