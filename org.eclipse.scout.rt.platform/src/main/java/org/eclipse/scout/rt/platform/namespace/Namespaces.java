@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +42,14 @@ public class Namespaces {
         .sorted(Comparator.comparing(INamespace::getOrder).thenComparing(namespace -> namespace.getClass().getName())) // FQN fallback in case of identical orders
         .collect(Collectors.toList());
 
+    // Validate presence of ID
+    namespaces.stream()
+        .filter(namespace -> StringUtility.isNullOrEmpty(namespace.getId()))
+        .forEach(namespace -> LOG.error("Namespace without an ID detected: {}", namespace.getClass()));
+
     // Validate ID uniqueness
     namespaces.stream()
+        .filter(namespace -> !StringUtility.isNullOrEmpty(namespace.getId())) // ignore those logged before
         .collect(Collectors.groupingBy(INamespace::getId))
         .entrySet()
         .stream()

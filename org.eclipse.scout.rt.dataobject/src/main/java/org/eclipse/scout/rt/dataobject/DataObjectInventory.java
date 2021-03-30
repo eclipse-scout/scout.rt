@@ -179,6 +179,24 @@ public class DataObjectInventory {
         .collect(Collectors.joining("\n"));
 
     assertTrue(StringUtility.isNullOrEmpty(typeVersionsWithoutNamespaceVersion), "Missing namespace version for implementors of {}:\n{}", ITypeVersion.class.getName(), typeVersionsWithoutNamespaceVersion);
+
+    String typeVersionsWithUnknownNamespace = BEANS.all(ITypeVersion.class).stream()
+        .filter(typeVersion -> Namespaces.get().byId(typeVersion.getVersion().getNamespace()) == null)
+        .map(ITypeVersion::getClass)
+        .map(Class::getName)
+        .collect(Collectors.joining("\n"));
+
+    assertTrue(StringUtility.isNullOrEmpty(typeVersionsWithUnknownNamespace), "No registered namespaces found for type versions:\n{}", typeVersionsWithUnknownNamespace);
+
+    String duplicateTypeVersions = BEANS.all(ITypeVersion.class).stream()
+        .collect(Collectors.groupingBy(ITypeVersion::getVersion))
+        .entrySet()
+        .stream()
+        .filter(entry -> entry.getValue().size() > 1)
+        .map(entry -> entry.getKey().unwrap() + ": " + entry.getValue().stream().map(typeVersion -> typeVersion.getClass().getName()).collect(Collectors.joining(", ")))
+        .collect(Collectors.joining("\n"));
+
+    assertTrue(StringUtility.isNullOrEmpty(duplicateTypeVersions), "Multiple type version classes for the same namespace version detected:\n{}", duplicateTypeVersions);
   }
 
   protected void validateTypeVersionRequired() {
@@ -231,7 +249,6 @@ public class DataObjectInventory {
         NamespaceVersion version = typeVersion.getVersion(); // never null, validated in #validateTypeVersionImplementors
         NamespaceVersion registeredVersion = m_classToTypeVersion.put(entityClass, version);
         assertNull(registeredVersion, "{} was already registered with type version {}, register each class only once.", clazz, registeredVersion, TypeVersion.class.getSimpleName());
-        assertNotNull(Namespaces.get().byId(version.getNamespace()), "No registered namespace found for type version '{}' of data object '{}'.", version.unwrap(), clazz);
         LOG.debug("Registered class {} with type version '{}'", entityClass, version);
       }
       else {

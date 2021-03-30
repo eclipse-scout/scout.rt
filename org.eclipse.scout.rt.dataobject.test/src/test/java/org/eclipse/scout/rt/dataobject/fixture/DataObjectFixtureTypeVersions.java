@@ -55,4 +55,40 @@ public final class DataObjectFixtureTypeVersions {
       return Collections.emptyList();
     }
   }
+
+  /**
+   * Manually registered in {@link DataObjectInventoryTest}.
+   */
+  @IgnoreBean
+  public static final class NonRegisteredNamespaceFixture_1_0_0 implements ITypeVersion {
+
+    public static final NamespaceVersion VERSION = NamespaceVersion.of("noRegisteredNamespace", "1.0.0");
+
+    @Override
+    public NamespaceVersion getVersion() {
+      return VERSION;
+    }
+
+    @Override
+    public Collection<NamespaceVersion> getDependencies() {
+      return Collections.emptyList();
+    }
+  }
+
+  /**
+   * Manually registered in {@link DataObjectInventoryTest}.
+   */
+  @IgnoreBean
+  public static final class DataObjectFixture_1_0_0_Duplicate implements ITypeVersion {
+
+    @Override
+    public NamespaceVersion getVersion() {
+      return DataObjectFixture_1_0_0.VERSION;
+    }
+
+    @Override
+    public Collection<NamespaceVersion> getDependencies() {
+      return Collections.emptyList();
+    }
+  }
 }

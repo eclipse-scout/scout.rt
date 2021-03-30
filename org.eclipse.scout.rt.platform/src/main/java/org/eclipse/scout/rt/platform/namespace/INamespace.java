@@ -24,7 +24,7 @@ public interface INamespace {
   /**
    * Namespace IDs should be lowercase.
    *
-   * @return Unique ID for the namespace.
+   * @return non-empty unique ID for the namespace.
    */
   String getId();
 

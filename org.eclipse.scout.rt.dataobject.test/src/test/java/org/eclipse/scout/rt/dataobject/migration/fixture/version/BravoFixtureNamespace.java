@@ -8,15 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.jackson.dataobject.fixture;
+package org.eclipse.scout.rt.dataobject.migration.fixture.version;
 
-import org.eclipse.scout.rt.dataobject.AbstractTypeVersion;
+import org.eclipse.scout.rt.platform.namespace.INamespace;
 
-public final class JacksonFixtureTypeVersions {
+public final class BravoFixtureNamespace implements INamespace {
 
-  private JacksonFixtureTypeVersions() {
+  public static final String ID = "bravoFixture";
+  public static final double ORDER = 9100;
+
+  @Override
+  public String getId() {
+    return ID;
   }
 
-  public static final class JacksonFixture_1_0_0 extends AbstractTypeVersion {
+  @Override
+  public double getOrder() {
+    return ORDER;
   }
 }

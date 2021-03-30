@@ -10,25 +10,19 @@
  */
 package org.eclipse.scout.rt.dataobject.testing.signature;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.Set;
-import java.util.regex.Matcher;
 
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
+import org.eclipse.scout.rt.dataobject.testing.TestingResourceHelper;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -62,7 +56,7 @@ public abstract class AbstractDataObjectSignatureTest {
   /**
    * Only data object with matching package name prefixes are added to signature.
    */
-  protected abstract Set<String> getPackageNamePrefixes();
+  protected abstract String getPackageNamePrefix();
 
   /**
    * @return Full filename of signature file.
@@ -110,16 +104,16 @@ public abstract class AbstractDataObjectSignatureTest {
 
   @Test
   public void testStructure() {
-    DataObjectSignatureDo signature = BEANS.get(DataObjectSignatureGenerator.class).createSignature(getPackageNamePrefixes(), this::acceptDataObject, this::acceptAttribut);
+    DataObjectSignatureDo signature = BEANS.get(DataObjectSignatureGenerator.class).createSignature(CollectionUtility.hashSet(getPackageNamePrefix()), this::acceptDataObject, this::acceptAttribut);
     compareSignatures(signature);
   }
 
   protected void compareSignatures(DataObjectSignatureDo currentSignature) {
     IDataObjectMapper dataObjectMapper = BEANS.get(IPrettyPrintDataObjectMapper.class);
 
-    File referenceFile = new File(getApiSignatureJsonDirectory(), getFilename());
+    File referenceFile = new File(BEANS.get(TestingResourceHelper.class).getTestResourceDirectory(getResourceBaseClass()), getFilename());
     if (!referenceFile.exists()) {
-      writeCurrentSignature(referenceFile, currentSignature);
+      writeCurrentSignature(currentSignature);
       fail("No previous signature file available. Initial signature file was created");
     }
 
@@ -129,7 +123,7 @@ public abstract class AbstractDataObjectSignatureTest {
       previousSignature = dataObjectMapper.readValue(fis, DataObjectSignatureDo.class);
     }
     catch (IOException | RuntimeException e) { // runtime exception possible due to data object mapper
-      writeCurrentSignature(referenceFile, currentSignature);
+      writeCurrentSignature(currentSignature);
       LOG.warn("Failed to read previous signature file", e);
       fail("Failed to read previous signature file.");
     }
@@ -141,60 +135,22 @@ public abstract class AbstractDataObjectSignatureTest {
     // This is more a sanity check. If the data objects are not equal but there are no differences detected by the comparator, the comparator doesn't detect all differences yet.
     boolean differentDataObjects = !ObjectUtility.equals(previousSignature, currentSignature);
     if (differentDataObjects || !comparator.getDifferences().isEmpty()) {
-      writeCurrentSignature(referenceFile, currentSignature);
+      writeCurrentSignature(currentSignature);
       String details = comparator.getDifferences().isEmpty() ? "Comparator was unable to detect the differences, please review file changes manually." : StringUtility.join("\n", comparator.getDifferences());
       fail("Review all signature differences and create corresponding migrations if necessary before committing any changes in file " + getFilename() + ":\n" + details);
     }
   }
 
-  protected File getApiSignatureJsonDirectory() {
-    File moduleDirectory = getModuleDirectory();
-
-    String modulePath = getResourceBaseClass().getPackage().getName().replaceAll("\\.", Matcher.quoteReplacement(File.separator));
-    return new File(moduleDirectory, "src/test/resources/" + modulePath + "/");
-  }
-
-  protected File getModuleDirectory() {
-    // Replace the content of the out file when failing
-    URL location = getClass().getProtectionDomain().getCodeSource().getLocation();
-    if (!"file".equalsIgnoreCase(location.getProtocol())) {
-      fail(String.format("not a file location (%s)", location));
-    }
-
-    try {
-      File moduleDirectory = new File(location.toURI()).getParentFile().getParentFile();
-      assertTrue("Module directory doesn't exist: " + moduleDirectory.getAbsolutePath(), moduleDirectory.exists());
-      return moduleDirectory;
-    }
-    catch (URISyntaxException e) {
-      throw new PlatformException("Failed to create URI from location {}", location, e);
-    }
-  }
-
-  protected void writeCurrentSignature(File referenceFile, DataObjectSignatureDo signature) {
+  protected void writeCurrentSignature(DataObjectSignatureDo signature) {
     // Test by default creates a new file to prevent accidental self-healing of test.
     // This behavior can be changed by setting the appropriate system property (not recommended).
-    File outputFile;
+    String filename;
     if (System.getProperty("dataObjectSignatureTest.overwriteReferenceFile") != null) {
-      outputFile = referenceFile;
+      filename = getFilename();
     }
     else {
-      outputFile = new File(getApiSignatureJsonDirectory(), FileUtility.getFilenameParts(getFilename())[0] + "-to-be-reviewed.json");
+      filename = FileUtility.getFilenameParts(getFilename())[0] + "-to-be-reviewed.json";
     }
-
-    if (!outputFile.getParentFile().exists() && !outputFile.getParentFile().mkdirs()) {
-      fail("Unable to create target directory for reference file: " + outputFile.getParentFile()); // in case directory doesn't exist yet and couldn't be created (e.g. initial test execution)
-      return;
-    }
-
-    String currentSignatureJson = BEANS.get(IPrettyPrintDataObjectMapper.class).writeValue(signature);
-    currentSignatureJson = currentSignatureJson.replaceAll("\\r\\n", "\\\n").trim(); // only use \n
-
-    try (OutputStream out = new FileOutputStream(outputFile)) {
-      out.write(currentSignatureJson.getBytes(StandardCharsets.UTF_8));
-    }
-    catch (IOException e) {
-      throw new PlatformException("Failed to write new signature file", e);
-    }
+    BEANS.get(TestingResourceHelper.class).writeTestResource(getResourceBaseClass(), filename, signature);
   }
 }

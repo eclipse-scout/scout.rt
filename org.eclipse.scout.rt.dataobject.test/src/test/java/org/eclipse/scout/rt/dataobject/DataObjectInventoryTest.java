@@ -18,7 +18,9 @@ import java.util.Optional;
 
 import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0;
 import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0_034;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0_Duplicate;
 import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_No_Version;
+import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.NonRegisteredNamespaceFixture_1_0_0;
 import org.eclipse.scout.rt.dataobject.fixture.DataObjectProjectFixtureTypeVersions.DataObjectProjectFixture_1_2_3_004;
 import org.eclipse.scout.rt.dataobject.fixture.DateFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
@@ -81,12 +83,29 @@ public class DataObjectInventoryTest {
   public void testValidateTypeVersionImplementors() {
     m_inventory.validateTypeVersionImplementors(); // no exception
 
-    IBean<Object> fixtureNoVersionBean = BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(DataObjectFixture_No_Version.class));
+    BeanTestingHelper beanTestingHelper = BEANS.get(BeanTestingHelper.class);
+    IBean<Object> fixtureNoVersionBean = beanTestingHelper.registerBean(new BeanMetaData(DataObjectFixture_No_Version.class));
     try {
       assertThrows(AssertionException.class, () -> m_inventory.validateTypeVersionImplementors());
     }
     finally {
-      BEANS.get(BeanTestingHelper.class).unregisterBean(fixtureNoVersionBean);
+      beanTestingHelper.unregisterBean(fixtureNoVersionBean);
+    }
+
+    IBean<Object> fixtureNoRegisteredNamespaceBean = beanTestingHelper.registerBean(new BeanMetaData(NonRegisteredNamespaceFixture_1_0_0.class));
+    try {
+      assertThrows(AssertionException.class, () -> m_inventory.validateTypeVersionImplementors());
+    }
+    finally {
+      beanTestingHelper.unregisterBean(fixtureNoRegisteredNamespaceBean);
+    }
+
+    IBean<Object> fixtureDuplicateVersionBean = beanTestingHelper.registerBean(new BeanMetaData(DataObjectFixture_1_0_0_Duplicate.class));
+    try {
+      assertThrows(AssertionException.class, () -> m_inventory.validateTypeVersionImplementors());
+    }
+    finally {
+      beanTestingHelper.unregisterBean(fixtureDuplicateVersionBean);
     }
   }
 

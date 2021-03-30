@@ -300,6 +300,16 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
   }
 
   /**
+   * This method retrieves all items. The items are ordered according to their dependencies.
+   *
+   * @return non null {@link VersionedItems}
+   */
+  public VersionedItems<T> getItems() {
+    Set<T> allItemsUnordered = m_items.values().stream().flatMap(List::stream).collect(Collectors.toSet());
+    return orderByDependencies(sortByName(allItemsUnordered), null);
+  }
+
+  /**
    * This method retrieves all items which are in the given version range. The items are ordered according to their
    * dependencies. Even if the from- and to-versions are not equal, no item at all might be returned.
    * <p>
@@ -374,11 +384,14 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
         if (items.contains(dep)) {
           return true;
         }
-        NamespaceVersion depVersion = dep.getVersion();
-        Optional<NamespaceVersion> fromVersion = fromVersions.stream().filter(depVersion::namespaceEquals).findFirst();
-        // if from version has no version for given name dependency is satisfied implicit; see also getItemsUnordered
-        if (fromVersion.isPresent() && compareVersion(depVersion, fromVersion.get()) > 0) {
-          unsatisfiedDependencies.add(dep);
+
+        if (fromVersions != null) {
+          NamespaceVersion depVersion = dep.getVersion();
+          Optional<NamespaceVersion> fromVersion = fromVersions.stream().filter(depVersion::namespaceEquals).findFirst();
+          // if from version has no version for given name dependency is satisfied implicit; see also getItemsUnordered
+          if (fromVersion.isPresent() && compareVersion(depVersion, fromVersion.get()) > 0) {
+            unsatisfiedDependencies.add(dep);
+          }
         }
         return false;
       }).collect(Collectors.toSet()));

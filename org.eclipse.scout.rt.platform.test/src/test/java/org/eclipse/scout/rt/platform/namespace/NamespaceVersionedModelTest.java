@@ -42,6 +42,9 @@ public class NamespaceVersionedModelTest {
     assertItems(
         Arrays.asList(item("alfa-5")),
         inventory.getItems(versions(version("alfa-3")), versions(version("alfa-5"), version("bravo-0"))));
+    assertItems(
+        Arrays.asList(item("alfa-5")),
+        inventory.getItems());
   }
 
   @Test
@@ -56,6 +59,10 @@ public class NamespaceVersionedModelTest {
     assertItems(
         Arrays.asList(item("alfa-4"), item("charlie-8"), item("charlie-9"), item("alfa-5"), item("charlie-10")),
         inventory.getItems(versions(version("alfa-3"), version("charlie-7")), versions(version("alfa-5"), version("charlie-10"))));
+
+    assertItems(
+        Arrays.asList(item("alfa-4"), item("charlie-8"), item("charlie-9"), item("alfa-5"), item("charlie-10")),
+        inventory.getItems());
   }
 
   @Test
@@ -72,6 +79,10 @@ public class NamespaceVersionedModelTest {
     assertItems(
         Arrays.asList(item("alfa-4"), item("bravo-15"), item("charlie-8"), item("charlie-9"), item("alfa-5"), item("bravo-18"), item("charlie-10")),
         inventory.getItems(versions(version("alfa-3"), version("bravo-14"), version("charlie-7")), versions(version("alfa-5"), version("bravo-18"), version("charlie-10"))));
+
+    assertItems(
+        Arrays.asList(item("alfa-4"), item("bravo-15"), item("charlie-8"), item("charlie-9"), item("alfa-5"), item("bravo-18"), item("charlie-10")),
+        inventory.getItems());
   }
 
   @Test

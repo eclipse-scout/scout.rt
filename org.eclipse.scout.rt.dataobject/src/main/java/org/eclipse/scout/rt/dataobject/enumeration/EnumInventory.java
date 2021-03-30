@@ -16,7 +16,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.scout.rt.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
@@ -31,7 +30,7 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class EnumInventory {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DataObjectInventory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(EnumInventory.class);
 
   /**
    * <b>NOTE:</b> These from/to class maps contains the static, compile-time "class" to "enum name" mapping as defined

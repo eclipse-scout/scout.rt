@@ -17,6 +17,9 @@ import java.util.Collection;
  */
 public interface INamespaceVersioned {
 
+  /**
+   * @return non-null namespace version.
+   */
   NamespaceVersion getVersion();
 
   /**

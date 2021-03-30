@@ -15,6 +15,9 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 
 public final class DataObjectProjectFixtureTypeVersions {
 
+  private DataObjectProjectFixtureTypeVersions() {
+  }
+
   public static final class DataObjectProjectFixture_1_2_3_004 extends AbstractTypeVersion {
 
     public static final NamespaceVersion VERSION = NamespaceVersion.of(DataObjectProjectFixtureNamespace.ID, "1.2.3.004");
