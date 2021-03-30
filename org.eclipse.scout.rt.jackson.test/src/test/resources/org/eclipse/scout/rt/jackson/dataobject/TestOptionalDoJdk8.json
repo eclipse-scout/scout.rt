@@ -1,0 +1,11 @@
+{
+  "_type" : "TestOptional",
+  "optString" : {
+    "present" : false
+  },
+  "optStringList" : [ {
+    "present" : false
+  }, {
+    "present" : true
+  } ]
+}

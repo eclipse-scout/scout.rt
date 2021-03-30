@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
 import static org.junit.Assert.*;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -30,6 +29,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -73,6 +73,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo2;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestMapDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestMixedRawBigIntegerDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestOptionalDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestPersonDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestPhysicalAddressDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestPhysicalAddressExDo;
@@ -114,6 +115,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 /**
  * Various test cases serializing and deserializing Scout data objects from/to JSON
@@ -1314,18 +1316,18 @@ public class JsonDataObjectsSerializationTest {
 
     // set of TestItemDo must be unordered equals
     List<TestItemDo> expected = new ArrayList<>(setDo.getItemDoSetAttribute());
-    Collections.sort(expected, Comparator.comparing(TestItemDo::getId));
+    expected.sort(Comparator.comparing(TestItemDo::getId));
     List<TestItemDo> actual = new ArrayList<>(marshalled.getItemDoSetAttribute());
-    Collections.sort(actual, Comparator.comparing(TestItemDo::getId));
+    actual.sort(Comparator.comparing(TestItemDo::getId));
     for (int i = 0; i < expected.size(); i++) {
       assertEqualsWithComparisonFailure(expected.get(i), actual.get(i));
     }
 
     // set of TestItemPojo must be unordered equals
     List<TestItemPojo> expectedPojo = new ArrayList<>(setDo.getItemPojoSetAttribute());
-    Collections.sort(expectedPojo, Comparator.comparing(TestItemPojo::getId));
+    expectedPojo.sort(Comparator.comparing(TestItemPojo::getId));
     List<TestItemPojo> actualPojo = new ArrayList<>(marshalled.getItemPojoSetAttribute());
-    Collections.sort(actualPojo, Comparator.comparing(TestItemPojo::getId));
+    actualPojo.sort(Comparator.comparing(TestItemPojo::getId));
     for (int i = 0; i < expectedPojo.size(); i++) {
       assertEquals(expectedPojo.get(i).getId(), actualPojo.get(i).getId());
       assertEquals(expectedPojo.get(i).getStringAttribute(), actualPojo.get(i).getStringAttribute());
@@ -1786,6 +1788,7 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("foo-id", marshalled.getGenericAttribute().getId());
 
     // read value with incomplete generic type definition
+    @SuppressWarnings("unchecked")
     TestGenericDo<TestItemDo> marshalled2 = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDo>() {
     });
     assertEqualsWithComparisonFailure(itemValueDo, marshalled2);
@@ -1857,6 +1860,7 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("foo-id-1", marshalled.getGenericListAttribute().get(0).getId());
 
     // read value with incomplete generic type definition
+    @SuppressWarnings("unchecked")
     TestGenericDo<TestItemDo> marshalled2 = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDo>() {
     });
     assertEqualsWithComparisonFailure(itemsDo, marshalled2);
@@ -1977,11 +1981,11 @@ public class JsonDataObjectsSerializationTest {
   public void testSerializeDeserialize_EmptyIDataObject() throws Exception {
     IDataObject marshalledEntity = s_dataObjectMapper.readValue("{}", IDataObject.class);
     assertEquals(DoEntity.class, marshalledEntity.getClass());
-    assertTrue(DoEntity.class.cast(marshalledEntity).allNodes().isEmpty());
+    assertTrue(((DoEntity) marshalledEntity).allNodes().isEmpty());
 
     IDataObject marshalledList = s_dataObjectMapper.readValue("[]", IDataObject.class);
     assertEquals(DoList.class, marshalledList.getClass());
-    assertTrue(DoList.class.cast(marshalledList).isEmpty());
+    assertTrue(((DoList) marshalledList).isEmpty());
   }
 
   @Test
@@ -2043,11 +2047,11 @@ public class JsonDataObjectsSerializationTest {
 
     IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
     assertEqualsWithComparisonFailure(list, marshalled);
-    DoList marshalledList = DoList.class.cast(marshalled);
+    DoList marshalledList = (DoList) marshalled;
     assertEquals("foo", marshalledList.get(0));
-    assertEqualsWithComparisonFailure(item1, TestItemDo.class.cast(marshalledList.get(1)));
+    assertEqualsWithComparisonFailure(item1, marshalledList.get(1));
     assertEquals("bar", marshalledList.get(2));
-    assertEqualsWithComparisonFailure(item2, TestItemDo.class.cast(marshalledList.get(3)));
+    assertEqualsWithComparisonFailure(item2, marshalledList.get(3));
   }
 
   // ------------------------------------ tests with custom JSON type property name -----------------------------------
@@ -2262,6 +2266,27 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(exception.getMessage(), marshalled.getException().getMessage());
     assertArrayEquals(throwable.getStackTrace(), marshalled.getThrowable().getStackTrace());
     assertArrayEquals(exception.getStackTrace(), marshalled.getException().getStackTrace());
+  }
+
+  @Test
+  public void testSerializeDeserializeOptionalDo() throws Exception {
+    @SuppressWarnings("unchecked")
+    TestOptionalDo optional = BEANS.get(TestOptionalDo.class)
+        .withOptString(Optional.ofNullable(null))
+        .withOptStringList(Optional.empty(), Optional.ofNullable("foo"));
+    String json = s_dataObjectMapper.writeValueAsString(optional);
+
+    // TODO [22.0] pbz remove when JDK 8 is no longer supported
+    if ("1.8".equals(System.getProperty("java.specification.version"))) {
+      // currently serializable using Scout Jackson implementation, but without values, e.g. useless!
+      assertJsonEquals("TestOptionalDoJdk8.json", json);
+    } else {
+      // currently serializable using Scout Jackson implementation, but without values, e.g. useless!
+      assertJsonEquals("TestOptionalDo.json", json);
+    }
+
+    // currently not deserializable using Scout Jackson implementation
+    assertThrows(UnrecognizedPropertyException.class, () -> s_dataObjectMapper.readValue(json, TestOptionalDo.class));
   }
 
   // ------------------------------------ common test helper methods ------------------------------------
