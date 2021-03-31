@@ -12,14 +12,26 @@ package org.eclipse.scout.rt.mom.api.marshaller;
 
 import java.util.Map;
 
+import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 
 /**
- * This marshaller allows to transport an object's JSON representation as textual data across the network. It uses the
- * Scout {@link IDataObjectMapper} to serialize the content to a string representation.
+ * This marshaller allows to transport any object's JSON representation as textual data across the network. It uses the
+ * Scout {@link IDataObjectMapper} to serialize/deserialize the content to/from a string representation.
+ * <p>
+ * <b>Important:</b> If the object to be transferred is an {@link IDataObject}s annotated with a &#64;{@link TypeName},
+ * use the {@link JsonDataObjectMarshaller} instead. The {@link JsonMarshaller} is only intended to transport objects as
+ * JSON that do not conform to the {@link IDataObject} interface and should only be necessary in special cases.
+ * <p>
+ * Unlike {@link JsonDataObjectMarshaller}, this marshaller accepts any value that can be handled by the
+ * {@link IDataObjectMapper}. This includes literals ({@code String}, {@code Boolean} etc.) and objects following the
+ * <i>JavaBeans</i> convention. The full name of the source class is transferred in a custom context property
+ * {@link #CTX_PROP_OBJECT_TYPE} along the the marshalled data. When unmarshalling the JSON back into its object form,
+ * the exact same class with that name must exist and be resolvable by the current class loader.
  *
  * @see IMarshaller#MESSAGE_TYPE_TEXT
  * @since 6.1
@@ -65,9 +77,6 @@ public class JsonMarshaller implements IMarshaller {
     return MESSAGE_TYPE_TEXT;
   }
 
-  /**
-   * Resolves {@link IDataObjectMapper} instance.
-   */
   protected IDataObjectMapper createDataObjectMapper() {
     return BEANS.get(IDataObjectMapper.class);
   }

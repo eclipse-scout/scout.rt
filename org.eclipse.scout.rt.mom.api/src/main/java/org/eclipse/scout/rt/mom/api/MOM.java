@@ -17,8 +17,10 @@ import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
 import org.eclipse.scout.rt.mom.api.IDestination.IDestinationType;
 import org.eclipse.scout.rt.mom.api.IDestination.IResolveMethod;
 import org.eclipse.scout.rt.mom.api.IDestination.ResolveMethod;
+import org.eclipse.scout.rt.mom.api.IMom.DefaultMarshallerProperty;
 import org.eclipse.scout.rt.mom.api.marshaller.BytesMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
+import org.eclipse.scout.rt.mom.api.marshaller.JsonDataObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
@@ -145,7 +147,7 @@ public final class MOM {
    * @param transferObject
    *          specifies the transfer object to be sent to the destination.<br>
    *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
-   *          that destination. By default, {@link JsonMarshaller} is used.
+   *          that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
    * @param <DTO>
    *          the type of the transfer object to be published.
    * @see #subscribe(Class, IDestination, IMessageListener)
@@ -166,7 +168,7 @@ public final class MOM {
    * @param transferObject
    *          specifies the transfer object to be sent to the destination.<br>
    *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
-   *          that destination. By default, {@link JsonMarshaller} is used.
+   *          that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
    * @param input
    *          specifies how to publish the message.
    * @param <DTO>
@@ -272,7 +274,7 @@ public final class MOM {
    * @param requestObject
    *          specifies the transfer object to be sent to the destination.<br>
    *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
-   *          that destination. By default, {@link JsonMarshaller} is used.
+   *          that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
    * @return the reply of the consumer.
    * @throws ThreadInterruptedError
    *           if interrupted while waiting for the reply to receive.
@@ -315,7 +317,7 @@ public final class MOM {
    * @param requestObject
    *          specifies the transfer object to be sent to the destination.<br>
    *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
-   *          that destination. By default, {@link JsonMarshaller} is used.
+   *          that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
    * @param input
    *          specifies how to publish the message. Transacted publish of the request is not supported.
    * @return the reply of the consumer.
@@ -399,11 +401,13 @@ public final class MOM {
    * <p>
    * A marshaller transforms a transfer object into its transport representation to be sent across the network.
    * <p>
-   * By default, if a destination does not specify a marshaller, {@link JsonMarshaller} is used.
+   * By default, if a destination does not specify a marshaller, the marshaller specified by
+   * {@link DefaultMarshallerProperty} is used.
    *
    * @return registration handle to unregister the marshaller from the destination.
    * @see TextMarshaller
    * @see BytesMarshaller
+   * @see JsonDataObjectMarshaller
    * @see JsonMarshaller
    * @see ObjectMarshaller
    */

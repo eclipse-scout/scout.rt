@@ -58,7 +58,7 @@ public interface IMom {
   /**
    * Indicates the order of the MOM's {@link IPlatformListener} to shutdown itself upon entering platform state
    * {@link State#PlatformStopping}. Any listener depending on MOM facility must be configured with an order less than
-   * {@value DESTROY_ORDER}.
+   * this value.
    */
   long DESTROY_ORDER = 5_700;
 
@@ -71,7 +71,7 @@ public interface IMom {
    * @param transferObject
    *          specifies the transfer object to be sent to the destination.<br>
    *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
-   *          that destination. By default, {@link JsonMarshaller} is used.
+   *          that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
    * @param input
    *          specifies how to publish the message.
    * @param <DTO>
@@ -120,7 +120,7 @@ public interface IMom {
    * @param requestObject
    *          specifies the transfer object to be sent to the destination.<br>
    *          The object is marshalled into its transport representation using the {@link IMarshaller} registered for
-   *          that destination. By default, {@link JsonMarshaller} is used.
+   *          that destination or the default marshaller specified by {@link DefaultMarshallerProperty}.
    * @param input
    *          specifies how to publish the message. Transacted publish of the request is not supported.
    * @return the reply of the consumer.
@@ -182,11 +182,13 @@ public interface IMom {
    * <p>
    * A marshaller transforms a transfer object into its transport representation to be sent across the network.
    * <p>
-   * By default, if a destination does not specify a marshaller, {@link JsonMarshaller} is used.
+   * By default, if a destination does not specify a marshaller, the marshaller specified by
+   * {@link DefaultMarshallerProperty} is used.
    *
    * @return registration handle to unregister the marshaller from the destination.
    * @see TextMarshaller
    * @see BytesMarshaller
+   * @see JsonDataObjectMarshaller
    * @see JsonMarshaller
    * @see ObjectMarshaller
    */
@@ -327,8 +329,8 @@ public interface IMom {
   }
 
   /**
-   * If {@link IMom.ConnectionRetryCountProperty} is set then every call to a method in {@link IJmsSessionProvider} is
-   * tried a second time after an Exception. This is the interval to wait inbetween these two attempts.
+   * If {@link IMom.ConnectionRetryCountProperty} is set then every call to a method in the scout mom wrapper is tried a
+   * second time after an Exception. This is the interval to wait in-between these two attempts.
    * <p>
    * The default interval is <code>5</code> seconds.
    * <p>
@@ -340,7 +342,7 @@ public interface IMom {
    * call to the listener is relevant in defining the value for this property. A good value is double the expected
    * latency time.
    * <p>
-   * Example: A subscriber calls Consumer.recevice. The connection has just dropped. This leads to an exception in the
+   * Example: A subscriber calls Consumer.receive. The connection has just dropped. This leads to an exception in the
    * driver code. The driver code throws an exception to the scout jms wrapper code and <em>after some latency time</em>
    * informs the listener set by Connection.setExceptionListener(). Therefore the scout jms wrapper code should wait
    * before its second attempt to get a new connection until the old connection in the connection wrapper was marked
