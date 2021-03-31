@@ -25,10 +25,10 @@ import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 @ClassId("759627bb-02e5-4db2-812c-aac00b80cdb6")
 public class Notification extends AbstractWidget implements INotification {
 
-  private final IStatus m_status;
-  private final boolean m_closable;
-  private final boolean m_htmlEnabled;
-  private final Consumer<String> m_appLinkConsumer;
+  private IStatus m_status;
+  private boolean m_closable;
+  private boolean m_htmlEnabled;
+  private Consumer<String> m_appLinkConsumer;
   private final FastListenerList<NotificationListener> m_listenerList = new FastListenerList<>();
   private final INotificationUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
 
@@ -88,8 +88,20 @@ public class Notification extends AbstractWidget implements INotification {
   }
 
   @Override
+  public Notification withStatus(IStatus status) {
+    m_status = status;
+    return this;
+  }
+
+  @Override
   public IStatus getStatus() {
     return m_status;
+  }
+
+  @Override
+  public Notification withClosable(boolean closable) {
+    m_closable = closable;
+    return this;
   }
 
   @Override
@@ -98,8 +110,19 @@ public class Notification extends AbstractWidget implements INotification {
   }
 
   @Override
+  public Notification withHtmlEnabled(boolean htmlEnabled) {
+    m_htmlEnabled = htmlEnabled;
+    return this;
+  }
+
+  @Override
   public boolean isHtmlEnabled() {
     return m_htmlEnabled;
+  }
+
+  public Notification withAppLinkConsumer(Consumer<String> appLinkConsumer) {
+    m_appLinkConsumer = appLinkConsumer;
+    return this;
   }
 
   protected Consumer<String> getAppLinkConsumer() {
@@ -115,6 +138,7 @@ public class Notification extends AbstractWidget implements INotification {
     notificationListeners().add(listener);
   }
 
+  @Override
   public void removeNotificationListener(NotificationListener listener) {
     notificationListeners().remove(listener);
   }

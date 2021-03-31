@@ -728,6 +728,16 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public String getNativeNotificationVisibility() {
+    return null;
+  }
+
+  @Override
+  public void setNativeNotificationVisibility(String nativeNotificationVisibility) {
+    // NOP
+  }
+
+  @Override
   public BrowserHistoryEntry getBrowserHistoryEntry() {
     return null;
   }

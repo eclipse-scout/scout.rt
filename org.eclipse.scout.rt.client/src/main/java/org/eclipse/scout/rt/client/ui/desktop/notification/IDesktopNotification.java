@@ -33,9 +33,43 @@ public interface IDesktopNotification extends INotification {
   long INFINITE_DURATION = -1;
 
   /**
+   * No native notification is shown.
+   */
+  String NATIVE_NOTIFICATION_VISIBILITY_NONE = "none";
+
+  /**
+   * The native notification is only shown if the application is in background.
+   */
+  String NATIVE_NOTIFICATION_VISIBILITY_BACKGROUND = "background";
+
+  /**
+   * The native notification is always shown.
+   */
+  String NATIVE_NOTIFICATION_VISIBILITY_ALWAYS = "always";
+
+  DesktopNotification withDuration(long duration);
+
+  /**
    * Duration in milliseconds while the notification is displayed.
    * <p>
    * A value <= 0 indicates an infinite duration, i.e. the notification is never closed automatically.
    */
   long getDuration();
+
+  DesktopNotification withNativeOnly(boolean nativeOnly);
+
+  /**
+   * @return True, to only show the native desktop notification. False, to show both, the regular and the native
+   *         notification. If and when a native desktop notification is shown is controlled by
+   *         {@link #getNativeNotificationVisibility()}.
+   */
+  boolean isNativeOnly();
+
+  DesktopNotification withNativeNotificationVisibility(String nativeNotificationVisibility);
+
+  /**
+   * see {@link #NATIVE_NOTIFICATION_VISIBILITY_NONE}, {@link #NATIVE_NOTIFICATION_VISIBILITY_ALWAYS} and
+   * {@link #NATIVE_NOTIFICATION_VISIBILITY_BACKGROUND}
+   */
+  String getNativeNotificationVisibility();
 }

@@ -118,6 +118,8 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   String PROP_DISPLAY_STYLE = "displayStyle";
 
+  String PROP_NATIVE_NOTIFICATION_VISIBILITY = "nativeNotificationVisibility";
+
   String PROP_ACTIVE_FORM = "activeForm";
 
   String PROP_FOCUSED_ELEMENT = "focusedElement";
@@ -1024,5 +1026,15 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * @since 9.0
    */
   boolean isDense();
+
+  /**
+   * @since 22.0
+   */
+  void setNativeNotificationVisibility(String notificationVisibility);
+
+  /**
+   * @since 22.0
+   */
+  String getNativeNotificationVisibility();
 
 }

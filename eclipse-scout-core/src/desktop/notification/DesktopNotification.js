@@ -8,17 +8,35 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, Notification} from '../../index';
+import {Device, Notification as ScoutNotification, strings} from '../../index';
 
-export default class DesktopNotification extends Notification {
+export default class DesktopNotification extends ScoutNotification {
 
   constructor() {
     super();
     this.closable = true;
     this.duration = 5000;
-    this.removeTimeout;
+    this.removeTimeout = null;
     this._removing = false;
+    this.nativeOnly = false;
+    this.nativeNotificationVisibility = DesktopNotification.NativeNotificationVisibility.NONE;
+    this.nativeNotification = null;
   }
+
+  static NativeNotificationVisibility = {
+    /**
+     * No native notification is shown.
+     */
+    NONE: 'none',
+    /**
+     * The native notification is only shown if the application is in background.
+     */
+    BACKGROUND: 'background',
+    /**
+     * The native notification is always shown.
+     */
+    ALWAYS: 'always'
+  };
 
   /**
    * When duration is set to INFINITE, the notification is not removed automatically.
@@ -30,6 +48,7 @@ export default class DesktopNotification extends Notification {
   }
 
   _render() {
+    this._initNativeNotification();
     this.$container = this.$parent.prependDiv('desktop-notification');
     this.$content = this.$container.appendDiv('desktop-notification-content');
     this.$messageText = this.$content.appendDiv('desktop-notification-message');
@@ -38,18 +57,81 @@ export default class DesktopNotification extends Notification {
     if (Device.get().supportsCssAnimation()) {
       this.$loader.addClass('animated');
     }
-  }
-
-  _renderProperties() {
-    super._renderProperties();
+    if (this.nativeOnly) {
+      this.setVisible(false);
+    }
   }
 
   /**
-   * @override
+   *  @override
    */
   _renderLoading() {
     this.$container.toggleClass('loading', this.loading);
     this.$loader.setVisible(this.loading);
+  }
+
+  _isDocumentHidden() {
+    return document.hidden;
+  }
+
+  _showNativeNotification(permission) {
+    if (permission === 'denied' || permission === 'default') {
+      return;
+    }
+    const message = scout.nvl(strings.nl2br(this.status.message), '');
+    this.nativeNotification = new Notification(this.session.desktop.title, {
+      body: message,
+      icon: this.session.desktop.logoUrl
+    });
+
+    this.nativeNotification.onclick = event => {
+      window.focus();
+    };
+
+    this.nativeNotification.onclose = event => {
+      if (this.nativeOnly) {
+        this.destroy();
+      }
+    };
+
+    // if nativeOnly and duration = forever, remove notification
+    if (this.nativeOnly && this.duration <= 0) {
+      this.hide();
+      this.destroy();
+    }
+    if (this.duration > 0) {
+      setTimeout(this.nativeNotification.close.bind(this.nativeNotification), this.duration);
+    }
+  }
+
+  _initNativeNotification() {
+    if (this.nativeNotificationVisibility === DesktopNotification.NativeNotificationVisibility.NONE) {
+      return;
+    }
+
+    if (this.nativeNotificationVisibility === DesktopNotification.NativeNotificationVisibility.BACKGROUND && !this._isDocumentHidden()) {
+      return;
+    }
+
+    if (window.Notification && Notification.permission !== 'denied') {
+      if (this._checkNotificationPromise()) {
+        Notification.requestPermission().then(this._showNativeNotification.bind(this));
+      } else {
+        Notification.requestPermission(this._showNativeNotification.bind(this));
+      }
+    }
+  }
+
+  /**
+   * check if browser supports the promise-based version of the method requestPermission. Safari only supports the older callback version.
+   */
+  _checkNotificationPromise() {
+    try {
+      Notification.requestPermission().then();
+    } catch (e) {
+      return false;
+    }
+    return true;
   }
 
   _onCloseIconClick() {

@@ -37,5 +37,19 @@ public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotifi
         return getModel().getDuration();
       }
     });
+
+    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>("nativeOnly", model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isNativeOnly();
+      }
+    });
+
+    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>("nativeNotificationVisibility", model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getNativeNotificationVisibility();
+      }
+    });
   }
 }

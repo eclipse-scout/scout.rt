@@ -20,12 +20,18 @@ import org.eclipse.scout.rt.platform.status.IStatus;
  */
 public interface INotification extends IWidget {
 
+  Notification withStatus(IStatus status);
+
   IStatus getStatus();
+
+  Notification withClosable(boolean closable);
 
   /**
    * Whether or not the notification can be closed by the user.
    */
   boolean isClosable();
+
+  Notification withHtmlEnabled(boolean htmlEnabled);
 
   /**
    * @return true, if the notification may contain html that needs to be rendered. false otherwise.

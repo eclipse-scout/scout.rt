@@ -25,7 +25,9 @@ import org.eclipse.scout.rt.platform.status.Status;
 @ClassId("cd82392d-609d-44c2-ac41-87fca7a78646")
 public class DesktopNotification extends Notification implements IDesktopNotification {
 
-  private final long m_duration;
+  private long m_duration;
+  private boolean m_nativeOnly = false;
+  private String m_nativeNotificationVisibility = IDesktopNotification.NATIVE_NOTIFICATION_VISIBILITY_NONE;
   private final INotificationUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
 
   /**
@@ -48,6 +50,7 @@ public class DesktopNotification extends Notification implements IDesktopNotific
    * Creates a notification with the given attributes.
    *
    * @param status
+   *          see {@link #getStatus()}
    * @param duration
    *          see {@link #getDuration()}
    * @param closable
@@ -61,6 +64,7 @@ public class DesktopNotification extends Notification implements IDesktopNotific
    * Creates a notification with the given attributes.
    *
    * @param status
+   *          see {@link #getStatus()}
    * @param duration
    *          see {@link #getDuration()}
    * @param closable
@@ -68,15 +72,48 @@ public class DesktopNotification extends Notification implements IDesktopNotific
    * @param htmlEnabled
    *          see {@link #isHtmlEnabled()}
    * @param appLinkConsumer
+   *          see {@link #getAppLinkConsumer()}
    */
   public DesktopNotification(IStatus status, long duration, boolean closable, boolean htmlEnabled, Consumer<String> appLinkConsumer) {
     super(status, closable, htmlEnabled, appLinkConsumer);
     m_duration = duration;
+    String nativeNotificationVisibility = IDesktop.CURRENT.get().getNativeNotificationVisibility();
+    if (nativeNotificationVisibility != null) {
+      m_nativeNotificationVisibility = nativeNotificationVisibility;
+    }
+  }
+
+  @Override
+  public DesktopNotification withDuration(long duration) {
+    m_duration = duration;
+    return this;
   }
 
   @Override
   public long getDuration() {
     return m_duration;
+  }
+
+  @Override
+  public DesktopNotification withNativeOnly(boolean nativeOnly) {
+    m_nativeOnly = nativeOnly;
+    return this;
+  }
+
+  @Override
+  public boolean isNativeOnly() {
+    return m_nativeOnly;
+  }
+
+  @Override
+  public DesktopNotification withNativeNotificationVisibility(String nativeNotificationVisibility) {
+    m_nativeNotificationVisibility = nativeNotificationVisibility;
+    return this;
+  }
+
+  @Override
+  public String getNativeNotificationVisibility() {
+    return m_nativeNotificationVisibility;
   }
 
   @Override

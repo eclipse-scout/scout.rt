@@ -2854,6 +2854,16 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     propertySupport.setProperty(PROP_THEME, theme);
   }
 
+  @Override
+  public String getNativeNotificationVisibility() {
+    return propertySupport.getPropertyString(PROP_NATIVE_NOTIFICATION_VISIBILITY);
+  }
+
+  @Override
+  public void setNativeNotificationVisibility(String notificationVisibility) {
+    propertySupport.setProperty(PROP_NATIVE_NOTIFICATION_VISIBILITY, notificationVisibility);
+  }
+
   /**
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
