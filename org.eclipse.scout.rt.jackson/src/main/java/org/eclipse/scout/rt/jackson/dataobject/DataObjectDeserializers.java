@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.util.Date;
+import java.util.Locale;
 
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoValue;
@@ -82,6 +83,9 @@ public class DataObjectDeserializers extends Deserializers.Base {
     }
     else if (IDataObject.class.isAssignableFrom(rawClass)) {
       return new DataObjectDeserializer(type.getRawClass());
+    }
+    else if (Locale.class.isAssignableFrom(rawClass)) {
+      return new DoLocaleDeserializer();
     }
     else if (BinaryResource.class.isAssignableFrom(rawClass)) {
       return new DoBinaryResourceDeserializer();

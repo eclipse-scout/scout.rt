@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import java.util.Locale;
+
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.jackson.dataobject.enumeration.EnumMapKeyDeserializer;
@@ -47,6 +49,9 @@ public class DataObjectMapKeyDeserializers implements KeyDeserializers {
   @Override
   public KeyDeserializer findKeyDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
     Class<?> rawClass = type.getRawClass();
+    if (Locale.class.isAssignableFrom(rawClass)) {
+      return new LocaleMapKeyDeserializer();
+    }
     if (IId.class.isAssignableFrom(rawClass)) {
       @SuppressWarnings("unchecked")
       Class<? extends IId<?>> idClass = (Class<? extends IId<?>>) rawClass.asSubclass(IId.class);
