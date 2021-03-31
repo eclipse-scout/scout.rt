@@ -15,9 +15,10 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertInstance;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 /**
- * This marshaller allows to transport a series of bytes across the network.
+ * This marshaller allows to transport an array of bytes across the network. It does not support other data types.
  * <p>
  * This marshaller does not support serialization of exceptions.
  *
@@ -27,12 +28,17 @@ import org.eclipse.scout.rt.platform.Bean;
 @Bean
 public class BytesMarshaller implements IMarshaller {
 
+  /**
+   * @param transferObject
+   *          object to marshal, must be of type {@code byte[]} (or {@code null})
+   * @throws AssertionException
+   *           if the given object is not of the expected type
+   */
   @Override
   public Object marshall(final Object transferObject, final Map<String, String> context) {
     if (transferObject == null) {
       return null;
     }
-
     return assertInstance(transferObject, byte[].class, "bytes array expected [actual={}]", transferObject.getClass().getSimpleName());
   }
 

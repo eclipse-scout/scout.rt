@@ -19,11 +19,14 @@ import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 /**
- * This marshaller allows to transport an object's JSON representation as textual data across the network. It uses the
- * Scout {@link IDataObjectMapper} to serialize the content to a string representation. <b>The content data must be an
- * instance of {@link IDataObject} annotated with a {@link TypeName}.</b>
+ * This marshaller allows to transport an {@link IDataObject} in its JSON form as textual data across the network. It
+ * uses the Scout {@link IDataObjectMapper} to serialize/deserialize the content to/from a string representation.
+ * <p>
+ * <b>Important:</b> The content data <i>must</i> be an instance of {@link IDataObject} annotated with a
+ * &#64;{@link TypeName}. For other object types, consider using {@link JsonMarshaller} instead.
  *
  * @see IMarshaller#MESSAGE_TYPE_TEXT
  * @see JsonMarshaller for simple type content objects (e.g. String or Boolean)
@@ -38,6 +41,12 @@ public class JsonDataObjectMarshaller implements IMarshaller {
     m_dataObjectMapper = createDataObjectMapper();
   }
 
+  /**
+   * @param transferObject
+   *          object to marshal, must be of type {@code IDataObject} (or {@code null})
+   * @throws AssertionException
+   *           if the given object is not of the expected type
+   */
   @Override
   public Object marshall(final Object transferObject, final Map<String, String> context) {
     return m_dataObjectMapper.writeValue(assertType(transferObject, IDataObject.class));
@@ -53,9 +62,6 @@ public class JsonDataObjectMarshaller implements IMarshaller {
     return MESSAGE_TYPE_TEXT;
   }
 
-  /**
-   * Resolves {@link IDataObjectMapper} instance.
-   */
   protected IDataObjectMapper createDataObjectMapper() {
     return BEANS.get(IDataObjectMapper.class);
   }
