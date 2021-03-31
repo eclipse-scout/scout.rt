@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,9 +10,9 @@
  */
 package org.eclipse.scout.rt.platform.nls;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.Locale;
 import java.util.Map;
@@ -27,10 +27,20 @@ public class DynamicNlsTest {
 
   @Test
   public void testMissingResourceBundles() {
-    assertEquals(null, MissingResourceBundleTexts.get("anyKey"));
+    assertNull(MissingResourceBundleTexts.get("anyKey"));
     Map<String, String> textMap = MissingResourceBundleTexts.getInstance().getTextMap(Locale.ENGLISH);
     assertNotNull(textMap);
     assertTrue(textMap.isEmpty());
+  }
+
+  @Test
+  public void testTextPostProcessing() {
+    DynamicNls nls = spy(new DynamicNls().withTextPostProcessor(new DefaultTextPostProcessor()));
+    String streetGerman = "Straße";
+    when(nls.getTextInternal(any(), anyString())).thenReturn(streetGerman);
+
+    assertEquals(streetGerman, nls.getText(Locale.GERMAN, "whatever"));
+    assertEquals("Strasse", nls.getText(new Locale("de", "CH"), "whatever"));
   }
 
   @Ignore("Performance Test: Not reliable")

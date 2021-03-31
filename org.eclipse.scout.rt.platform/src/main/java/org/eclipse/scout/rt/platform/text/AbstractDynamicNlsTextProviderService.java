@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,11 +15,13 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.nls.DynamicNls;
+import org.eclipse.scout.rt.platform.nls.ITextPostProcessor;
 
 public abstract class AbstractDynamicNlsTextProviderService implements ITextProviderService {
 
-  private final DynamicNls m_instance = new DynamicNls();
+  private final DynamicNls m_instance = createDynamicNls();
 
   /**
    * Gets the base name where the <code>DynamicNls</code> instance searches for .properties files.<br>
@@ -36,18 +38,26 @@ public abstract class AbstractDynamicNlsTextProviderService implements ITextProv
    */
   public abstract String getDynamicNlsBaseName();
 
+  public DynamicNls getDynamicNls() {
+    return m_instance;
+  }
+
+  protected DynamicNls createDynamicNls() {
+    return BEANS.get(DynamicNls.class).withTextPostProcessors(BEANS.all(ITextPostProcessor.class));
+  }
+
   @PostConstruct
   protected void registerResourceBundle() {
-    m_instance.registerResourceBundle(getDynamicNlsBaseName(), getClass());
+    getDynamicNls().registerResourceBundle(getDynamicNlsBaseName(), getClass());
   }
 
   @Override
   public String getText(Locale locale, String key, String... messageArguments) {
-    return m_instance.getText(locale, key, messageArguments);
+    return getDynamicNls().getText(locale, key, messageArguments);
   }
 
   @Override
   public Map<String, String> getTextMap(Locale locale) {
-    return m_instance.getTextMap(locale);
+    return getDynamicNls().getTextMap(locale);
   }
 }

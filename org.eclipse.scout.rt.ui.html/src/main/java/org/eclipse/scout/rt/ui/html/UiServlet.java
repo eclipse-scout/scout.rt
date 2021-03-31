@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -129,12 +129,10 @@ public class UiServlet extends AbstractHttpServlet {
 
   protected Locale getPreferredLocale(HttpServletRequest req) {
     Cookie cookie = CookieUtility.getCookieByName(req, IUiSession.PREFERRED_LOCALE_COOKIE_NAME);
-    if (cookie == null) {
-      return req.getLocale();
-    }
-    else {
+    if (cookie != null) {
       return Locale.forLanguageTag(cookie.getValue());
     }
+    return req.getLocale();
   }
 
   @Override
