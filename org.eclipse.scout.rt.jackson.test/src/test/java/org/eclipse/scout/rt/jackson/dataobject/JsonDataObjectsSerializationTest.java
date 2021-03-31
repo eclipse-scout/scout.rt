@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -79,6 +81,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestPersonDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestPhysicalAddressDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestPhysicalAddressExDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestPojoWithJacksonAnnotations;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestPojoWithLocaleProperties;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestProjectExample1Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestProjectExample2Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestProjectExample3Do;
@@ -99,6 +102,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.platform.util.date.StrictSimpleDateFormat;
@@ -522,6 +526,40 @@ public class JsonDataObjectsSerializationTest {
     entity.put("locale", Locale.GERMANY);
     String jsonEntity = s_dataObjectMapper.writeValueAsString(entity);
     assertJsonEquals("TestLocale.json", jsonEntity);
+  }
+
+  @Test
+  public void testSerializeDeserialize_ROOT_Locale() throws Exception {
+    try {
+      HashMap<Locale, String> localeMap = CollectionUtility.hashMap(
+          new ImmutablePair<>(Locale.ROOT, "Root"),
+          new ImmutablePair<>(Locale.forLanguageTag("de-CH"), "German, Switzerland"));
+      TestPojoWithLocaleProperties pojo = new TestPojoWithLocaleProperties();
+      pojo.setLocale1(Locale.ROOT);
+      pojo.setLocale2(Locale.forLanguageTag("de-CH"));
+      pojo.setLocaleStringMap(localeMap);
+
+      // disable ordering map entries by keys for the default jackson serializer as it expects
+      // the key object to implement java.lang.Comparable (which java.util.Locale does not).
+      s_defaultJacksonObjectMapper.disable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+
+      String serializedDefaultJackson = s_defaultJacksonObjectMapper.writeValueAsString(pojo);
+      TestPojoWithLocaleProperties deserializedDefaultJackson = s_defaultJacksonObjectMapper.readValue(serializedDefaultJackson, TestPojoWithLocaleProperties.class);
+      assertJsonEquals("TestSerializeDeserialize_ROOT_Locale_defaultJackson.json", serializedDefaultJackson);
+      assertThat(deserializedDefaultJackson.getLocale1(), is(Locale.ROOT));
+      assertThat(deserializedDefaultJackson.getLocale2(), is(Locale.forLanguageTag("de-CH")));
+      assertThat(deserializedDefaultJackson.getLocaleStringMap(), is(localeMap));
+
+      String serializedScout = s_dataObjectMapper.writeValueAsString(pojo);
+      TestPojoWithLocaleProperties deserializedScout = s_dataObjectMapper.readValue(serializedScout, TestPojoWithLocaleProperties.class);
+      assertJsonEquals("TestSerializeDeserialize_ROOT_Locale_scout.json", serializedScout);
+      assertThat(deserializedScout.getLocale1(), is(Locale.ROOT));
+      assertThat(deserializedScout.getLocale2(), is(Locale.forLanguageTag("de-CH")));
+      assertThat(deserializedScout.getLocaleStringMap(), is(localeMap));
+    }
+    finally {
+      s_defaultJacksonObjectMapper.enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+    }
   }
 
   @Test
@@ -2314,7 +2352,8 @@ public class JsonDataObjectsSerializationTest {
     if ("1.8".equals(System.getProperty("java.specification.version"))) {
       // currently serializable using Scout Jackson implementation, but without values, e.g. useless!
       assertJsonEquals("TestOptionalDoJdk8.json", json);
-    } else {
+    }
+    else {
       // currently serializable using Scout Jackson implementation, but without values, e.g. useless!
       assertJsonEquals("TestOptionalDo.json", json);
     }

@@ -1,0 +1,9 @@
+{
+  "_type" : "pojo-with-locale-property",
+  "locale1" : "und",
+  "locale2" : "de-CH",
+  "localeStringMap" : {
+    "und" : "Root",
+    "de-CH" : "German, Switzerland"
+  }
+}
