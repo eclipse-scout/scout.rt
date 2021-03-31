@@ -15,7 +15,7 @@ import java.util.Map;
 import org.eclipse.scout.rt.platform.Bean;
 
 /**
- * This marshaller indicates that no payload is transfered and nothing has to be marshalled.
+ * This marshaller indicates that no payload is transferred and nothing has to be marshalled.
  * <p>
  * This marshaller does not support the serialization of exceptions.
  *
