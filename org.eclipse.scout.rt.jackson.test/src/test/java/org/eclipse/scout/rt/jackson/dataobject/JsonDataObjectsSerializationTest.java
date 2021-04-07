@@ -346,6 +346,27 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
+  public void testSerializeDeserialize_NullDateDo() throws Exception {
+    TestDateDo date = BEANS.get(TestDateDo.class).withDateDefault(null);
+    String json = s_dataObjectMapper.writeValueAsString(date);
+    assertJsonEquals("TestNullDateDo.json", json);
+  }
+
+  @Test
+  public void testSerializeDeserialize_NullStringDateDo() throws Exception {
+    String expectedJson = readResourceAsString("TestNullStringDateDo.json");
+    TestDateDo date = s_dataObjectMapper.readValue(expectedJson, TestDateDo.class);
+    assertNull(date.getDateDefault());
+  }
+
+  @Test
+  public void testDeserialize_EmptyDateDo() throws Exception {
+    String expectedJson = readResourceAsString("TestEmptyDateDo.json");
+    TestDateDo date = s_dataObjectMapper.readValue(expectedJson, TestDateDo.class);
+    assertNull(date.getDateDefault());
+  }
+
+  @Test
   public void testSerialize_BinaryResource() throws Exception {
     TestBinaryResourceDo testDo = BEANS.get(TestBinaryResourceDo.class).withBrDefault(BINARY_RESOURCE);
     String json = s_dataObjectMapper.writeValueAsString(testDo);
