@@ -29,7 +29,8 @@
     "@eclipse-scout/releng": "^10.0.0"
   },
   "dependencies": {
-    "jquery": "3.5.1"
+    "jquery": "3.5.1",
+    "sourcemapped-stacktrace": "1.1.11"
   },
   "keywords": [
     "karma",
