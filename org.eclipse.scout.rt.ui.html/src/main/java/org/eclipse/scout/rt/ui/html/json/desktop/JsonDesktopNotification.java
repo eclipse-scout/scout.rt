@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.notification.JsonNotification;
+import org.json.JSONObject;
 
 public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotification> extends JsonNotification<DESKTOP_NOTIFICATION> {
 
@@ -51,5 +52,23 @@ public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotifi
         return getModel().getNativeNotificationVisibility();
       }
     });
+
+    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>(IDesktopNotification.PROP_NATIVE_NOTIFICATION_SHOWN, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isNativeNotificationShown();
+      }
+    });
+  }
+
+  @Override
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (IDesktopNotification.PROP_NATIVE_NOTIFICATION_SHOWN.equals(propertyName)) {
+      boolean shown = data.getBoolean(propertyName);
+      addPropertyEventFilterCondition(IDesktopNotification.PROP_NATIVE_NOTIFICATION_SHOWN, shown);
+      getModel().getUIFacade().setNativeNotificationShownFromUI(shown);
+    } else {
+      super.handleUiPropertyChange(propertyName, data);
+    }
   }
 }

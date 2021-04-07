@@ -21,6 +21,7 @@ export default class DesktopNotification extends ScoutNotification {
     this.nativeOnly = false;
     this.nativeNotificationVisibility = DesktopNotification.NativeNotificationVisibility.NONE;
     this.nativeNotification = null;
+    this.nativeNotificationShown = false;
   }
 
   static NativeNotificationVisibility = {
@@ -42,10 +43,6 @@ export default class DesktopNotification extends ScoutNotification {
    * When duration is set to INFINITE, the notification is not removed automatically.
    */
   static INFINITE = -1;
-
-  _init(model) {
-    super._init(model);
-  }
 
   _render() {
     this._initNativeNotification();
@@ -70,12 +67,24 @@ export default class DesktopNotification extends ScoutNotification {
     this.$loader.setVisible(this.loading);
   }
 
+  _destroy() {
+    if (this.nativeNotification) {
+      // No need to keep the native notification open if the regular one is closed (relevant if the user actively closes it)
+      this.nativeNotification.close();
+    }
+    super._destroy();
+  }
+
   _isDocumentHidden() {
     return document.hidden;
   }
 
   _showNativeNotification(permission) {
     if (permission === 'denied' || permission === 'default') {
+      if (this.nativeOnly) {
+        // See comment in _initNativeNotification
+        this.hide();
+      }
       return;
     }
     const message = scout.nvl(strings.nl2br(this.status.message), '');
@@ -84,27 +93,31 @@ export default class DesktopNotification extends ScoutNotification {
       icon: this.session.desktop.logoUrl
     });
 
-    this.nativeNotification.onclick = event => {
+    this.nativeNotification.addEventListener('show', event => {
+      this._setNativeNotificationShown(true);
+    });
+
+    this.nativeNotification.addEventListener('click', event => {
       window.focus();
-    };
+    });
 
-    this.nativeNotification.onclose = event => {
+    // Native notifications are closed when the regular notification is closed (either by the user, the timeout or programmatically)
+    this.nativeNotification.addEventListener('close', event => {
       if (this.nativeOnly) {
-        this.destroy();
+        // Only close it if nativeOnly is true.
+        // If nativeOnly is false, clicking the notification should reveal the app incl. the original notification which could contain more information (e.g. a link).
+        this.hide();
       }
-    };
-
-    // if nativeOnly and duration = forever, remove notification
-    if (this.nativeOnly && this.duration <= 0) {
-      this.hide();
-      this.destroy();
-    }
-    if (this.duration > 0) {
-      setTimeout(this.nativeNotification.close.bind(this.nativeNotification), this.duration);
-    }
+      this.nativeNotification = null;
+      this._setNativeNotificationShown(false);
+    });
   }
 
   _initNativeNotification() {
+    if (this.nativeNotificationShown) {
+      // Don't show the same notification twice (could happen if the user reloads the page and the notification is still open. Especially important for nativeOnly with infinite duration).
+      return;
+    }
     if (this.nativeNotificationVisibility === DesktopNotification.NativeNotificationVisibility.NONE) {
       return;
     }
@@ -113,17 +126,23 @@ export default class DesktopNotification extends ScoutNotification {
       return;
     }
 
-    if (window.Notification && Notification.permission !== 'denied') {
-      if (this._checkNotificationPromise()) {
-        Notification.requestPermission().then(this._showNativeNotification.bind(this));
-      } else {
-        Notification.requestPermission(this._showNativeNotification.bind(this));
+    if (window.Notification && Notification.permission === 'denied') {
+      if (this.nativeOnly) {
+        // If native notifications are not allowed, there is no need to keep the (invisible) desktop notification open
+        this.hide();
       }
+      return;
+    }
+    if (this._checkNotificationPromise()) {
+      Notification.requestPermission().then(this._showNativeNotification.bind(this));
+    } else {
+      // noinspection JSIgnoredPromiseFromCall
+      Notification.requestPermission(this._showNativeNotification.bind(this));
     }
   }
 
   /**
-   * check if browser supports the promise-based version of the method requestPermission. Safari only supports the older callback version.
+   * Checks if browser supports the promise-based version of the method requestPermission. Safari only supports the older callback version.
    */
   _checkNotificationPromise() {
     try {
@@ -138,10 +157,16 @@ export default class DesktopNotification extends ScoutNotification {
     this.hide();
   }
 
+  /**
+   * Displays the notification by adding it to the desktop and rendering it.
+   */
   show() {
     this.session.desktop.addNotification(this);
   }
 
+  /**
+   * Closes the notification by removing it from the desktop and destroying it. Also triggers a close event.
+   */
   hide() {
     if (this._removing) {
       return;
@@ -159,19 +184,20 @@ export default class DesktopNotification extends ScoutNotification {
   }
 
   fadeOut() {
-    if (!Device.get().supportsCssAnimation()) {
-      this.destroy();
-      return;
-    }
-
-    if (!this.rendered) {
-      return;
-    }
     // prevent fadeOut from running more than once (for instance from the click of a user).
     if (this._removing) {
       return;
     }
     this._removing = true;
+    if (!Device.get().supportsCssAnimation() || !this.rendered) {
+      this.destroy();
+      return;
+    }
+    if (!this.$container.isVisible()) {
+      // Destroy immediately if it is invisible because the animationend event would not be triggered (is the case if nativeOnly is true)
+      this.destroy();
+      return;
+    }
     this.$container.addClass('desktop-notification-fade-out');
     this.$container.oneAnimationEnd(() => {
       this.destroy();
@@ -184,4 +210,9 @@ export default class DesktopNotification extends ScoutNotification {
   invalidateLayoutTree() {
     // called by notification.js. Since desktop notification has no htmlComp, no need to invalidate
   }
+
+  _setNativeNotificationShown(shown) {
+    this._setProperty('nativeNotificationShown', shown);
+  }
+
 }

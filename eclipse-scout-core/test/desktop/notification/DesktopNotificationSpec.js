@@ -21,11 +21,9 @@ describe('DesktopNotification', () => {
     parent.session = session;
   });
 
-  it('will fade in, be added to the desktop and be renderd upon show() ', () => {
+  it('will fade in, be added to the desktop and be rendered upon show() ', () => {
     let notification = scout.create('DesktopNotification', {
-      parent: parent,
-      id: 'foo',
-      duration: -1
+      parent: parent
     });
     spyOn(notification, 'fadeIn').and.callThrough();
     notification.show();
@@ -34,11 +32,9 @@ describe('DesktopNotification', () => {
     expect(session.desktop.notifications[0]).toBe(notification);
   });
 
-  it('will fade out and be removed from the dektop upon hide()', () => {
+  it('will fade out and be removed from the desktop upon hide()', () => {
     let notification = scout.create('DesktopNotification', {
-      parent: parent,
-      id: 'foo',
-      duration: -1
+      parent: parent
     });
     spyOn(notification, 'fadeOut').and.callThrough();
     notification.show();
@@ -69,8 +65,6 @@ describe('DesktopNotification', () => {
   it('has close-icon when notification is closable', () => {
     let notification = scout.create('DesktopNotification', {
       parent: parent,
-      id: 'foo',
-      duration: 123,
       closable: true,
       status: {
         message: 'bar',
@@ -85,33 +79,34 @@ describe('DesktopNotification', () => {
   });
 
   describe('native notification', () => {
+
+    function grantPermission() {
+      spyOn(Notification, 'requestPermission').and.returnValue(new Promise((resolve, reject) => {
+        resolve('granted');
+      }));
+      spyOnProperty(Notification, 'permission', 'get').and.returnValue('granted');
+    }
+
     describe('nativeNotificationVisibility', () => {
+
+      beforeEach(() => {
+        grantPermission();
+      });
 
       it('background: shows native notification only when document is hidden', done => {
         let notification = scout.create('DesktopNotification', {
           parent: parent,
-          id: 'foo',
-          duration: -1,
-          nativeOnly: false,
           nativeNotificationVisibility: 'background',
-          closable: true,
-          status: {
-            message: 'bar',
-            severity: Status.Severity.OK
-          }
+          message: 'bar'
         });
-
-        spyOn(Notification, 'requestPermission').and.returnValue(new Promise((resolve, reject) => {
-          resolve('granted');
-        }));
 
         spyOn(notification, '_isDocumentHidden').and.returnValue(true);
 
         notification.render($sandbox);
-
         setTimeout(() => {
           expect(notification.nativeNotification).not.toBeNull();
           expect(notification.nativeNotification.body).toBe('bar');
+          notification.hide();
           done();
         }, 10);
       });
@@ -119,43 +114,30 @@ describe('DesktopNotification', () => {
       it('background: dont show native notification when document is not hidden', () => {
         let notification = scout.create('DesktopNotification', {
           parent: parent,
-          id: 'foo',
-          duration: 123,
-          nativeOnly: false,
           nativeNotificationVisibility: 'background',
-          closable: true,
-          status: {
-            message: 'bar',
-            severity: Status.Severity.OK
-          }
+          message: 'bar'
         });
 
         spyOn(notification, '_isDocumentHidden').and.returnValue(false);
 
         notification.render($sandbox);
-        expect(notification.nativeNotification).toBeNull();
+        setTimeout(() => {
+          expect(notification.nativeNotification).toBeNull();
+          notification.hide();
+          done();
+        }, 10);
       });
 
       it('always: shows native notification even when document is focused', done => {
         let notification = scout.create('DesktopNotification', {
           parent: parent,
-          id: 'foo',
-          duration: -1,
-          nativeOnly: true,
           nativeNotificationVisibility: 'always',
-          closable: true,
-          status: {
-            message: 'bar',
-            severity: Status.Severity.OK
-          }
+          message: 'bar'
         });
 
-        spyOn(Notification, 'requestPermission').and.returnValue(new Promise((resolve, reject) => {
-          resolve('granted');
-        }));
+        spyOn(notification, '_isDocumentHidden').and.returnValue(false);
 
         notification.render($sandbox);
-
         setTimeout(() => {
           expect(notification.nativeNotification).not.toBeNull();
           expect(notification.nativeNotification.body).toBe('bar');
@@ -166,45 +148,41 @@ describe('DesktopNotification', () => {
       it('none: never shows native notification', () => {
         let notification = scout.create('DesktopNotification', {
           parent: parent,
-          id: 'foo',
-          duration: -1,
-          nativeOnly: false,
           nativeNotificationVisibility: 'none',
-          closable: true,
-          status: {
-            message: 'bar',
-            severity: Status.Severity.OK
-          }
+          message: 'bar'
         });
         notification.render($sandbox);
-        expect(notification.nativeNotification).toBeNull();
-        expect(notification.isVisible()).toBeTruthy();
+
+        spyOn(notification, '_isDocumentHidden').and.returnValue(true);
+
+        setTimeout(() => {
+          expect(notification.nativeNotification).toBeNull();
+          expect(notification.isVisible()).toBeTruthy();
+          done();
+        }, 10);
       });
     });
+
     describe('nativeOnly', () => {
+
+      beforeEach(() => {
+        grantPermission();
+      });
+
       it('true shows only the native notification', done => {
         let notification = scout.create('DesktopNotification', {
           parent: parent,
-          id: 'foo',
-          duration: -1,
           nativeOnly: true,
           nativeNotificationVisibility: 'always',
-          closable: true,
-          status: {
-            message: 'bar',
-            severity: Status.Severity.OK
-          }
+          message: 'bar'
         });
-
-        spyOn(Notification, 'requestPermission').and.returnValue(new Promise((resolve, reject) => {
-          resolve('granted');
-        }));
 
         notification.render($sandbox);
         setTimeout(() => {
           expect(notification.isVisible()).toBeFalsy();
           expect(notification.nativeNotification).not.toBeNull();
           expect(notification.nativeNotification.body).toBe('bar');
+          notification.hide();
           done();
         }, 10);
       });
@@ -212,20 +190,10 @@ describe('DesktopNotification', () => {
       it('false shows both, the desktop and the native notification', done => {
         let notification = scout.create('DesktopNotification', {
           parent: parent,
-          id: 'foo',
-          duration: -1,
           nativeOnly: false,
           nativeNotificationVisibility: 'always',
-          closable: true,
-          status: {
-            message: 'bar',
-            severity: Status.Severity.OK
-          }
+          message: 'bar'
         });
-
-        spyOn(Notification, 'requestPermission').and.returnValue(new Promise((resolve, reject) => {
-          resolve('granted');
-        }));
 
         notification.render($sandbox);
 
@@ -233,99 +201,91 @@ describe('DesktopNotification', () => {
           expect(notification.isVisible()).toBeTruthy();
           expect(notification.nativeNotification).not.toBeNull();
           expect(notification.nativeNotification.body).toBe('bar');
+          notification.hide();
           done();
         }, 10);
       });
     });
 
-    it('is disposed immediately if duration is set to infinite', done => {
-      let notification = scout.create('DesktopNotification', {
-        parent: parent,
-        id: 'foo',
-        duration: -1,
-        nativeOnly: true,
-        nativeNotificationVisibility: 'always',
-        closable: true,
-        status: {
-          message: 'bar',
-          severity: Status.Severity.OK
-        }
+    describe('destroy', () => {
+
+      beforeEach(() => {
+        grantPermission();
       });
 
-      spyOn(Notification, 'requestPermission').and.returnValue(new Promise((resolve, reject) => {
-        resolve('granted');
-      }));
+      it('destroying the notification also destroys the native one', done => {
+        let notification = scout.create('DesktopNotification', {
+          parent: parent,
+          nativeNotificationVisibility: 'always',
+          message: 'bar'
+        });
 
-      spyOn(notification, 'fadeOut').and.callThrough();
-      notification.show();
+        notification.show();
 
-      setTimeout(() => {
-        expect(notification.destroyed).toBeTruthy();
-        expect(notification.session.desktop.notifications.length).toBe(0);
-        expect(notification.isVisible()).toBeFalsy();
-        expect(notification.nativeNotification).not.toBeNull();
-        done();
-      }, 10);
-    });
+        setTimeout(() => {
+          expect(notification.destroyed).toBe(false);
+          expect(notification.session.desktop.notifications.length).toBe(1);
+          expect(notification.nativeNotification).not.toBeNull();
+          expect(notification.nativeNotification.body).toBe('bar');
 
-    it('is disposed later if duration is > 0', done => {
-      let notification = scout.create('DesktopNotification', {
-        parent: parent,
-        id: 'foo',
-        duration: 100,
-        nativeOnly: true,
-        nativeNotificationVisibility: 'always',
-        closable: true,
-        status: {
-          message: 'bar',
-          severity: Status.Severity.OK
-        }
+          spyOn(notification.nativeNotification, 'close').and.callThrough();
+          notification.hide();
+          notification.$container.trigger('animationend');
+        }, 10);
+
+        setTimeout(() => {
+          expect(notification.destroyed).toBe(true);
+          expect(notification.session.desktop.notifications.length).toBe(0);
+          // Close event handler is not triggered on Chrome Headless, so notification.nativeNotification won't be set to null. Looks like a Chrome bug
+          expect(notification.nativeNotification.close).toHaveBeenCalled();
+          done();
+        }, 20);
       });
 
-      spyOn(Notification, 'requestPermission').and.returnValue(new Promise((resolve, reject) => {
-        resolve('granted');
-      }));
+      it('native notification is destroyed later if duration is > 0, along with the regular notification', done => {
+        let notification = scout.create('DesktopNotification', {
+          parent: parent,
+          duration: 100,
+          nativeOnly: true,
+          nativeNotificationVisibility: 'always',
+          message: 'bar'
+        });
 
-      spyOn(notification, 'fadeOut').and.callThrough();
-      notification.show();
+        notification.show();
 
-      setTimeout(() => {
-        expect(notification.destroyed).toBeFalsy();
-        expect(session.desktop.notifications[0]).toBe(notification);
-        expect(notification.isVisible()).toBeFalsy();
-        expect(notification.nativeNotification).not.toBeNull();
-      }, 10);
+        setTimeout(() => {
+          expect(notification.destroyed).toBeFalsy();
+          expect(notification.session.desktop.notifications[0]).toBe(notification);
+          expect(notification.isVisible()).toBeFalsy();
+          expect(notification.nativeNotification).not.toBeNull();
+          spyOn(notification.nativeNotification, 'close').and.callThrough();
+        }, 10);
 
-      setTimeout(() => {
-        expect(notification.session.desktop.notifications.length).toBe(0);
-        done();
-      }, 200);
+        setTimeout(() => {
+          expect(notification.destroyed).toBe(true);
+          expect(notification.session.desktop.notifications.length).toBe(0);
+          expect(notification.nativeNotification.close).toHaveBeenCalled();
+          done();
+        }, 200);
+      });
     });
 
-    it('show no native notification if permission is denied', done => {
+    it('shows no native notification if permission is denied', done => {
       let notification = scout.create('DesktopNotification', {
         parent: parent,
-        id: 'foo',
-        duration: -1,
-        nativeOnly: true,
         nativeNotificationVisibility: 'always',
-        closable: true,
-        status: {
-          message: 'bar',
-          severity: Status.Severity.OK
-        }
+        message: 'bar'
       });
 
       spyOn(Notification, 'requestPermission').and.returnValue(new Promise((resolve, reject) => {
         resolve('denied');
       }));
 
-      spyOn(notification, 'fadeOut').and.callThrough();
       notification.show();
 
       setTimeout(() => {
-        expect(notification.isVisible()).toBeFalsy();
         expect(notification.nativeNotification).toBeNull();
+        notification.hide();
         done();
       }, 10);
     });

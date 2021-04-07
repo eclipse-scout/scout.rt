@@ -15,7 +15,6 @@ import java.util.function.Consumer;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.notification.INotificationUIFacade;
 import org.eclipse.scout.rt.client.ui.notification.Notification;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -28,7 +27,7 @@ public class DesktopNotification extends Notification implements IDesktopNotific
   private long m_duration;
   private boolean m_nativeOnly = false;
   private String m_nativeNotificationVisibility = IDesktopNotification.NATIVE_NOTIFICATION_VISIBILITY_NONE;
-  private final INotificationUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
+  private final IDesktopNotificationUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
 
   /**
    * Creates a closable, simple info notification with a text and the {@linkplain IDesktopNotification#DEFAULT_DURATION
@@ -116,16 +115,33 @@ public class DesktopNotification extends Notification implements IDesktopNotific
     return m_nativeNotificationVisibility;
   }
 
+  /**
+   * Internal method used by the ui to update the state. Not intended to be used from model code.
+   */
+  private void setNativeNotificationShown(boolean shown) {
+    propertySupport.setPropertyBool(PROP_NATIVE_NOTIFICATION_SHOWN, shown);
+  }
+
   @Override
-  public INotificationUIFacade getUIFacade() {
+  public boolean isNativeNotificationShown() {
+    return propertySupport.getPropertyBool(PROP_NATIVE_NOTIFICATION_SHOWN);
+  }
+
+  @Override
+  public IDesktopNotificationUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
-  protected class P_UIFacade implements INotificationUIFacade {
+  protected class P_UIFacade implements IDesktopNotificationUIFacade {
 
     @Override
     public void fireClosedFromUI() {
       IDesktop.CURRENT.get().getUIFacade().removedNotificationFromUI(DesktopNotification.this);
+    }
+
+    @Override
+    public void setNativeNotificationShownFromUI(boolean shown) {
+      setNativeNotificationShown(shown);
     }
 
     @Override

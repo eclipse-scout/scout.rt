@@ -47,6 +47,8 @@ public interface IDesktopNotification extends INotification {
    */
   String NATIVE_NOTIFICATION_VISIBILITY_ALWAYS = "always";
 
+  String PROP_NATIVE_NOTIFICATION_SHOWN = "nativeNotificationShown";
+
   DesktopNotification withDuration(long duration);
 
   /**
@@ -56,6 +58,13 @@ public interface IDesktopNotification extends INotification {
    */
   long getDuration();
 
+  /**
+   * If true, only the native notification will be shown. The desktop notification will be kept open invisibly until the
+   * native notification is closed. If you use an infinite duration, consider to close the desktop notification
+   * automatically when you don't need it anymore to help the user keep its notification center clean, and to clean up
+   * the references on the desktop. This may be necessary in case the user does not close it manually or the
+   * notification won't be shown at all due to missing permissions.
+   */
   DesktopNotification withNativeOnly(boolean nativeOnly);
 
   /**
@@ -72,4 +81,14 @@ public interface IDesktopNotification extends INotification {
    * {@link #NATIVE_NOTIFICATION_VISIBILITY_BACKGROUND}
    */
   String getNativeNotificationVisibility();
+
+  /**
+   * Indicates, whether the native notification is shown. Once it is closed, the property will be set to false.
+   *
+   * @return true, if it is shown, false if not.
+   */
+  boolean isNativeNotificationShown();
+
+  @Override
+  IDesktopNotificationUIFacade getUIFacade();
 }

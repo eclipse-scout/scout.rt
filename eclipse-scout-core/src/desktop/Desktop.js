@@ -850,7 +850,7 @@ export default class Desktop extends Widget {
 
   /**
    * Removes the given notification.
-   * @param notification Either an instance of DesktopNavigation or a String containing an ID of a notification instance.
+   * @param {DesktopNotification|string} notification Either an instance of DesktopNavigation or a String containing an ID of a notification instance.
    */
   removeNotification(notification) {
     if (typeof notification === 'string') {
@@ -869,10 +869,10 @@ export default class Desktop extends Widget {
     if (!this.rendered) {
       return;
     }
-    if (this.$notifications) {
-      notification.fadeOut();
+    if (notification.rendered) {
       notification.one('remove', this._onNotificationRemove.bind(this, notification));
     }
+    notification.fadeOut();
   }
 
   getPopupsFor(widget) {
