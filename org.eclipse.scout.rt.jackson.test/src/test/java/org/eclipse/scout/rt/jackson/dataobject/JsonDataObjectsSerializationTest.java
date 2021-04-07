@@ -343,6 +343,27 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
+  public void testSerializeDeserialize_NullDateDo() throws Exception {
+    TestDateDo date = BEANS.get(TestDateDo.class).withDateDefault(null);
+    String json = s_dataObjectMapper.writeValueAsString(date);
+    assertJsonEquals("TestNullDateDo.json", json);
+  }
+
+  @Test
+  public void testSerializeDeserialize_NullStringDateDo() throws Exception {
+    String expectedJson = readResourceAsString("TestNullStringDateDo.json");
+    TestDateDo date = s_dataObjectMapper.readValue(expectedJson, TestDateDo.class);
+    assertNull(date.getDateDefault());
+  }
+
+  @Test
+  public void testDeserialize_EmptyDateDo() throws Exception {
+    String expectedJson = readResourceAsString("TestEmptyDateDo.json");
+    TestDateDo date = s_dataObjectMapper.readValue(expectedJson, TestDateDo.class);
+    assertNull(date.getDateDefault());
+  }
+
+  @Test
   public void testSerialize_BinaryResource() throws Exception {
     TestBinaryResourceDo testDo = BEANS.get(TestBinaryResourceDo.class).withBrDefault(BINARY_RESOURCE);
     String json = s_dataObjectMapper.writeValueAsString(testDo);
@@ -1313,18 +1334,18 @@ public class JsonDataObjectsSerializationTest {
 
     // set of TestItemDo must be unordered equals
     List<TestItemDo> expected = new ArrayList<>(setDo.getItemDoSetAttribute());
-    Collections.sort(expected, Comparator.comparing(TestItemDo::getId));
+    expected.sort(Comparator.comparing(TestItemDo::getId));
     List<TestItemDo> actual = new ArrayList<>(marshalled.getItemDoSetAttribute());
-    Collections.sort(actual, Comparator.comparing(TestItemDo::getId));
+    actual.sort(Comparator.comparing(TestItemDo::getId));
     for (int i = 0; i < expected.size(); i++) {
       assertEqualsWithComparisonFailure(expected.get(i), actual.get(i));
     }
 
     // set of TestItemPojo must be unordered equals
     List<TestItemPojo> expectedPojo = new ArrayList<>(setDo.getItemPojoSetAttribute());
-    Collections.sort(expectedPojo, Comparator.comparing(TestItemPojo::getId));
+    expectedPojo.sort(Comparator.comparing(TestItemPojo::getId));
     List<TestItemPojo> actualPojo = new ArrayList<>(marshalled.getItemPojoSetAttribute());
-    Collections.sort(actualPojo, Comparator.comparing(TestItemPojo::getId));
+    actualPojo.sort(Comparator.comparing(TestItemPojo::getId));
     for (int i = 0; i < expectedPojo.size(); i++) {
       assertEquals(expectedPojo.get(i).getId(), actualPojo.get(i).getId());
       assertEquals(expectedPojo.get(i).getStringAttribute(), actualPojo.get(i).getStringAttribute());
@@ -1976,11 +1997,11 @@ public class JsonDataObjectsSerializationTest {
   public void testSerializeDeserialize_EmptyIDataObject() throws Exception {
     IDataObject marshalledEntity = s_dataObjectMapper.readValue("{}", IDataObject.class);
     assertEquals(DoEntity.class, marshalledEntity.getClass());
-    assertTrue(DoEntity.class.cast(marshalledEntity).allNodes().isEmpty());
+    assertTrue(((DoEntity) marshalledEntity).allNodes().isEmpty());
 
     IDataObject marshalledList = s_dataObjectMapper.readValue("[]", IDataObject.class);
     assertEquals(DoList.class, marshalledList.getClass());
-    assertTrue(DoList.class.cast(marshalledList).isEmpty());
+    assertTrue(((DoList) marshalledList).isEmpty());
   }
 
   @Test
@@ -2042,11 +2063,11 @@ public class JsonDataObjectsSerializationTest {
 
     IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
     assertEqualsWithComparisonFailure(list, marshalled);
-    DoList marshalledList = DoList.class.cast(marshalled);
+    DoList marshalledList = (DoList) marshalled;
     assertEquals("foo", marshalledList.get(0));
-    assertEqualsWithComparisonFailure(item1, TestItemDo.class.cast(marshalledList.get(1)));
+    assertEqualsWithComparisonFailure(item1, marshalledList.get(1));
     assertEquals("bar", marshalledList.get(2));
-    assertEqualsWithComparisonFailure(item2, TestItemDo.class.cast(marshalledList.get(3)));
+    assertEqualsWithComparisonFailure(item2, marshalledList.get(3));
   }
 
   // ------------------------------------ tests with custom JSON type property name -----------------------------------
