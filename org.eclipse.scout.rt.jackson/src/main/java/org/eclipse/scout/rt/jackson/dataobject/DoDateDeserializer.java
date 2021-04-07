@@ -52,7 +52,12 @@ public class DoDateDeserializer extends DateDeserializer {
       // using om.setDateFormat(...), would also have to set om.setTimeZone(TimeZone.getDefault()). As this requires
       // adjustments to existing code, it should only be considered in a future major release.
       // Note: The same issue exist in DoDateSerializer.
+
       String str = p.getText().trim();
+      // Treat empty string and 'null' string as null value (as default Jackson date deserializer)
+      if (_isEmptyOrTextualNull(str)) {
+        return getNullValue(ctxt);
+      }
       try {
         return formatter.parse(str);
       }
