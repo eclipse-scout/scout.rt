@@ -109,7 +109,7 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
     else {
       IJsonAdapter<?> adapter = getParentJsonAdapter().attachAdapter(model, m_filter); // result may be null due to filter
       // Only track owned adapters, only those may be disposed
-      if (adapter != null && adapter.getParent() == getParentJsonAdapter()) {
+      if (m_disposeOnChange && adapter != null && adapter.getParent() == getParentJsonAdapter()) {
         m_ownedAdapters.add(adapter);
       }
     }
