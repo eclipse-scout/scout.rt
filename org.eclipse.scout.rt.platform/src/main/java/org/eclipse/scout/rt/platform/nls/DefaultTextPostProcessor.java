@@ -20,10 +20,12 @@ public class DefaultTextPostProcessor implements ITextPostProcessor {
 
   @Override
   public String apply(Locale textLocale, String text) {
-    if (StringUtility.isNullOrEmpty(text)) {
+    if (textLocale == null || StringUtility.isNullOrEmpty(text)) {
       return text;
     }
-    if (DE_CH.equals(textLocale)) {
+
+    // check for language and country to allow variants
+    if (DE_CH.getLanguage().equals(textLocale.getLanguage()) && DE_CH.getCountry().equals(textLocale.getCountry())) {
       text = text.replace("ß", "ss");
     }
     return text;
