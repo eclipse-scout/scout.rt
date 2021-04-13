@@ -10,9 +10,11 @@
  */
 package org.eclipse.scout.rt.ui.html.json.form.fields.filechooserfield;
 
+import java.beans.PropertyChangeEvent;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -78,6 +80,20 @@ public class JsonFileChooserField<M extends IFileChooserField> extends JsonValue
   public void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties) {
     if (!CollectionUtility.isEmpty(binaryResources)) {
       getModel().setValue(CollectionUtility.firstElement(binaryResources));
+    }
+  }
+
+  @Override
+  protected void handleModelPropertyChange(PropertyChangeEvent event) {
+    if (IValueField.PROP_VALUE.equals(event.getPropertyName()) && getModel().getValue() == null) {
+      // If model value is cleared, remove it in the corresponding UI widget as well. Otherwise,
+      // the same document could not be re-uploaded again, even when the model value is null again.
+      // Note that we only synchronize the case "value -> no value", but not "no value -> value"
+      // or "value -> another value", because BinaryResources cannot be serialized.
+      addPropertyChangeEvent(IValueField.PROP_VALUE, null);
+    }
+    else {
+      super.handleModelPropertyChange(event);
     }
   }
 
