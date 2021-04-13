@@ -26,6 +26,7 @@ import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.junit.Test;
 
 /**
@@ -289,6 +291,51 @@ public class IOUtilityTest {
     }
     catch (ProcessingException expected) {
     }
+  }
+
+  @Test
+  public void testReadBinaryResource() {
+    URL url;
+    BinaryResource br;
+
+    // null case
+    br = IOUtility.readBinaryResource(null);
+    assertNull(br);
+
+    // Standard case with automatic file name
+    url = getClass().getClassLoader().getResource(PLATFORM_PATH + "ioUtilityTestUtf8.txt");
+    br = IOUtility.readBinaryResource(url);
+    assertNotNull(br);
+    assertTrue(br.getContentLength() > 0);
+    assertEquals("ioUtilityTestUtf8.txt", br.getFilename());
+
+    // Standard case with custom file name
+    br = IOUtility.readBinaryResource(url, "foo/bar.ext");
+    assertNotNull(br);
+    assertTrue(br.getContentLength() > 0);
+    assertEquals("foo/bar.ext", br.getFilename());
+
+    // Invalid URL
+    url = UriUtility.toUrl("http://does.not.exist");
+    try {
+      br = IOUtility.readBinaryResource(url);
+      fail("Missing expected exception");
+    }
+    catch (ProcessingException e) {
+      // expected
+    }
+
+    // Directory
+    url = getClass().getClassLoader().getResource(PLATFORM_PATH);
+    br = IOUtility.readBinaryResource(url);
+    assertNotNull(br);
+    assertTrue(br.getContentLength() > 0);
+    assertEquals("platform", br.getFilename());
+
+    // URL to non-existing file (url will be null, so this is essentially the "null case" from above)
+    url = getClass().getClassLoader().getResource(PLATFORM_PATH + "thisFileDoesNotExist.txt");
+    br = IOUtility.readBinaryResource(url);
+    assertNull(br);
   }
 
   @Test
