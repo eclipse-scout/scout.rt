@@ -275,14 +275,14 @@ public final class IOUtility {
   }
 
   public static byte[] uncompressGzip(byte[] b) throws IOException {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    try (BufferedInputStream in = new BufferedInputStream(new GZIPInputStream(new ByteArrayInputStream(b)))) {
+    try (BufferedInputStream in = new BufferedInputStream(new GZIPInputStream(new ByteArrayInputStream(b)));
+        ByteArrayOutputStream out = new ByteArrayOutputStream()) {
       int val;
       while ((val = in.read()) >= 0) {
         out.write(val);
       }
+      return out.toByteArray();
     }
-    return out.toByteArray();
   }
 
   /**
@@ -345,6 +345,52 @@ public final class IOUtility {
   public static List<String> readAllLinesFromUrl(URL url, Charset charset) throws IOException {
     try (BufferedReader in = new BufferedReader(new InputStreamReader(assertNotNull(url).openConnection().getInputStream(), charset))) {
       return in.lines().collect(toList());
+    }
+  }
+
+  /**
+   * Reads the content of the file specified by the given URL and returns it as a {@link BinaryResource}. The name of
+   * the binary resource is extracted from the "file" part of the given URL. Use
+   * {@link #readBinaryResource(URL, String)} to specify a different name.
+   *
+   * @param url
+   *          URL pointing to the file's location
+   * @return a {@link BinaryResource} with the content of the file specified by the given URL or {@code null} if the URL
+   *         is {@code null}.
+   * @throws ProcessingException
+   *           if reading the file content failed for some reason.
+   */
+  public static BinaryResource readBinaryResource(URL url) {
+    if (url == null) {
+      return null;
+    }
+    String targetName = new File(url.getPath()).getName();
+    return readBinaryResource(url, targetName);
+  }
+
+  /**
+   * Reads the content of the file specified by the given URL and returns it as a {@link BinaryResource}. The name of
+   * the binary resource is set to the given "targetName".
+   *
+   * @param url
+   *          URL pointing to the file's location
+   * @param targetName
+   *          File name to be used for the resulting binary resource, i.e. {@link BinaryResource#getFilename()}.
+   * @return a {@link BinaryResource} with the content of the file specified by the given URL or {@code null} if the URL
+   *         is {@code null}.
+   * @throws ProcessingException
+   *           if reading the file content failed for some reason.
+   */
+  public static BinaryResource readBinaryResource(URL url, String targetName) {
+    if (url == null) {
+      return null;
+    }
+    try (InputStream in = url.openStream()) {
+      byte[] content = readBytes(in);
+      return new BinaryResource(targetName, content);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Error while reading from URL {}", url, e);
     }
   }
 
@@ -419,8 +465,7 @@ public final class IOUtility {
    * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
    */
   public static void writeString(OutputStream out, String charset, String s) {
-    try {
-      OutputStreamWriter w = new OutputStreamWriter(out, charset);
+    try (OutputStreamWriter w = new OutputStreamWriter(out, charset)) {
       w.write(s);
       w.flush();
     }
@@ -469,6 +514,7 @@ public final class IOUtility {
   /**
    * creates a temporary directory with a random name and the given suffix
    */
+  @SuppressWarnings("ResultOfMethodCallIgnored")
   public static File createTempDirectory(String dirSuffix) {
     try {
       if (dirSuffix != null) {
@@ -536,6 +582,7 @@ public final class IOUtility {
         }
       }
       else {
+        // noinspection ResultOfMethodCallIgnored
         f2.createNewFile();
       }
       return f2;
@@ -668,6 +715,7 @@ public final class IOUtility {
           deleteDirectory(a[i]);
         }
         else {
+          // noinspection ResultOfMethodCallIgnored
           a[i].delete();
         }
       }
@@ -822,6 +870,7 @@ public final class IOUtility {
   public static String getTempFileName(String fileExtension) {
     try {
       File f = File.createTempFile("tmp", fileExtension);
+      // noinspection ResultOfMethodCallIgnored
       f.delete();
       return f.getAbsolutePath();
     }
