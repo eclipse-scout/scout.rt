@@ -41,9 +41,7 @@ export default class SimpleTab extends Widget {
 
     this._viewPropertyChangeListener = this._onViewPropertyChange.bind(this);
     this._viewRemoveListener = this._onViewRemove.bind(this);
-    this._glassPaneContribution = function(element) {
-      return this.$statusContainer;
-    }.bind(this);
+    this._glassPaneContribution = element => this.$statusContainer;
   }
 
   _init(model) {

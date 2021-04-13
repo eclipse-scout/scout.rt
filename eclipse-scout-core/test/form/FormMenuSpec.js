@@ -11,7 +11,6 @@
 import {FormSpecHelper} from '../../src/testing/index';
 import {FormMenu, menus, scout} from '../../src/index';
 
-/* global linkWidgetAndAdapter */
 describe('FormMenu', () => {
   let session, desktop, helper;
 
@@ -43,6 +42,7 @@ describe('FormMenu', () => {
       menu.setSelected(true);
       expect(findPopup()).toBeVisible();
 
+      menu.popup.animateRemoval = false;
       menu.setSelected(false);
       expect(findPopup()).not.toExist();
     });
@@ -120,6 +120,7 @@ describe('FormMenu', () => {
 
       // Popup#_renderOnDetach will remove the popup and eventually the form.
       // As soon as the form is removed, the FormMenu will unselected the menu which closes the popup (FormMenu#_onFormRemove).
+      menu.popup.animateRemoval = false;
       menuBar.detach();
       expect(menu.popup).toBe(null);
     });

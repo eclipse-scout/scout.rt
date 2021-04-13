@@ -30,7 +30,7 @@
     box-shadow: @x @y @blur @spread rgba(0, 0, 0, @alpha);
   }
 
-  .drop-shadow-large(@x: 4px, @y: 10px, @blur: 18px, @spread: -6px, @alpha: @drop-shadow-large-alpha) {
+  .drop-shadow-large(@x: 0px, @y: 8px, @blur: 32px, @spread: 0px, @alpha: @drop-shadow-large-alpha) {
     #scout.drop-shadow(@x, @y, @blur, @spread, @alpha);
   }
 
@@ -57,6 +57,28 @@
     border-bottom-width: 2px;
     box-shadow: none;
     padding-bottom: 0;
+  }
+
+  .inverted-bottom-round-edge(@border-radius: 12px, @width: 24px, @color: #ffffff) {
+    position: absolute;
+    pointer-events: none;
+    background-color: transparent;
+    bottom: 0;
+    height: 2 * @width;
+    width: @width;
+    box-shadow: 0 @width 0 0 @color;
+    // Cut the leftover on the bottom to only get the edge. Use 110%/-10% because with 100%/0% there are drawing issues, at least with Chrome (a very thin line won't be colored)
+    clip-path: polygon(-10% 0, 110% 0, 110% 100%, -10% 100%);
+
+    &.left {
+      left: -@width;
+      border-bottom-right-radius: @border-radius;
+    }
+
+    &.right {
+      right: -@width;
+      border-bottom-left-radius: @border-radius;
+    }
   }
 
   .transform(@args) {

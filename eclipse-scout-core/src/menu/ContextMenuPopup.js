@@ -8,16 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, ContextMenuPopupLayout, HtmlComponent, MenuDestinations, menuNavigationKeyStrokes, Popup, PopupWithHead, RowLayout, scrollbars} from '../index';
+import {Action, arrays, ContextMenuPopupLayout, HtmlComponent, MenuDestinations, menuNavigationKeyStrokes, Popup, RowLayout, scrollbars} from '../index';
 import $ from 'jquery';
 
-export default class ContextMenuPopup extends PopupWithHead {
+export default class ContextMenuPopup extends Popup {
 
   constructor() {
     super();
 
-    // Make sure head won't be rendered, there is a css selector which is applied only if there is a head
-    this._headVisible = false;
     this.menuItems = [];
     this.cloneMenuItems = true;
     this._toggleSubMenuQueue = [];
@@ -48,6 +46,9 @@ export default class ContextMenuPopup extends PopupWithHead {
     return new ContextMenuPopupLayout(this);
   }
 
+  /**
+   * @return {RowLayout}
+   */
   _createBodyLayout() {
     return new RowLayout({
       pixelBasedSizing: false
@@ -56,8 +57,17 @@ export default class ContextMenuPopup extends PopupWithHead {
 
   _render() {
     super._render();
+    this.$container.addClass('context-menu-popup');
+    this._renderBody();
     this._installScrollbars();
     this._renderMenuItems();
+  }
+
+  _renderBody() {
+    this.$body = this.$container.appendDiv('context-menu');
+    // Complete the layout hierarchy between the popup and the menu items
+    let htmlBody = HtmlComponent.install(this.$body, this.session);
+    htmlBody.setLayout(this._createBodyLayout());
   }
 
   /**
@@ -75,6 +85,10 @@ export default class ContextMenuPopup extends PopupWithHead {
    */
   get$Scrollable() {
     return this.$body;
+  }
+
+  _bounds() {
+    return this.htmlComp.bounds().subtractFromDimension(this.htmlComp.insets());
   }
 
   removeSubMenuItems(parentMenu, animated) {
@@ -95,7 +109,7 @@ export default class ContextMenuPopup extends PopupWithHead {
       parentMenu.__originalParent._doActionTogglesSubMenu();
     }
 
-    let actualBounds = this.htmlComp.offsetBounds().subtractFromDimension(this.htmlComp.insets());
+    let actualBounds = this._bounds();
 
     this.revalidateLayout();
     this.position();
@@ -108,7 +122,7 @@ export default class ContextMenuPopup extends PopupWithHead {
         width: 'auto',
         height: 'auto'
       });
-      let targetBounds = this.htmlComp.offsetBounds().subtractFromDimension(this.htmlComp.insets());
+      let targetBounds = this._bounds();
       parentMenu.$subMenuBody.css('box-shadow', 'none');
       this.htmlComp.setBounds(actualBounds);
       if (this.verticalAlignment !== Popup.Alignment.TOP) {
@@ -185,7 +199,7 @@ export default class ContextMenuPopup extends PopupWithHead {
       return;
     }
 
-    let actualBounds = this.htmlComp.offsetBounds().subtractFromDimension(this.htmlComp.insets());
+    let actualBounds = this._bounds();
 
     parentMenu.__originalParent.$subMenuBody = this.$body;
 
@@ -193,7 +207,7 @@ export default class ContextMenuPopup extends PopupWithHead {
     $all.removeClass('next-to-selected');
 
     if (!parentMenu.$subMenuBody) {
-      this._$createBody();
+      this._renderBody();
       parentMenu.$subMenuBody = this.$body;
       this._renderMenuItems(menus, initialSubMenuRendering);
     } else {
@@ -227,7 +241,7 @@ export default class ContextMenuPopup extends PopupWithHead {
         width: 'auto',
         height: 'auto'
       });
-      let targetBounds = this.htmlComp.offsetBounds().subtractFromDimension(this.htmlComp.insets());
+      let targetBounds = this._bounds();
 
       this._animateTopAndLeft(this.htmlComp.$comp, actualBounds, targetBounds, duration);
 
@@ -287,15 +301,6 @@ export default class ContextMenuPopup extends PopupWithHead {
           duration: duration,
           queue: false
         }).css('overflow', 'visible');
-        // ajust top of head and deco
-        this.$head.cssTopAnimated(actualBounds.height, targetBounds.height, {
-          duration: duration,
-          queue: false
-        });
-        this.$deco.cssTopAnimated(actualBounds.height - 1, targetBounds.height - 1, {
-          duration: duration,
-          queue: false
-        });
       }
     } else {
       if (!initialSubMenuRendering) {
@@ -411,13 +416,6 @@ export default class ContextMenuPopup extends PopupWithHead {
       menu.off('action', menuItemActionHandler);
       menu.off('propertyChange', menuItemPropertyChange);
     });
-  }
-
-  /**
-   * @override PopupWithHead.js
-   */
-  _modifyBody() {
-    this.$body.addClass('context-menu');
   }
 
   updateMenuItems(menuItems) {

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, graphics, HtmlComponent, icons, KeyStrokeContext, scout, ViewMenuOpenKeyStroke, Widget} from '../../index';
+import {arrays, HtmlComponent, icons, KeyStrokeContext, scout, ViewMenuOpenKeyStroke, Widget} from '../../index';
 
 /**
  * Shows a list of view buttons with displayStyle=MENU
@@ -23,21 +23,30 @@ export default class ViewMenuTab extends Widget {
     this.viewButtons = [];
     this.selected = false;
     this.selectedButton = null;
-    this.viewTabVisible = true;
+    this.selectedButtonVisible = true;
     this.defaultIconId = icons.FOLDER;
+    this._desktopInBackgroundHandler = this._onDesktopInBackgroundChange.bind(this);
     this._addWidgetProperties(['selectedButton']);
+    this._addPreserveOnPropertyChangeProperties(['selectedButton']);
   }
 
   _init(model) {
     super._init(model);
-    this.dropdown = scout.create('Menu', {
+    this.dropdown = scout.create('Action', {
       parent: this,
       iconId: icons.ANGLE_DOWN,
       tabbable: false,
-      cssClass: 'view-menu'
+      cssClass: 'view-menu',
+      toggleAction: true
     });
     this.dropdown.on('action', this.togglePopup.bind(this));
     this._setViewButtons(this.viewButtons);
+    this.session.desktop.on('propertyChange:inBackground', this._desktopInBackgroundHandler);
+  }
+
+  _destroy() {
+    this.session.desktop.off('propertyChange:inBackground', this._desktopInBackgroundHandler);
+    super._destroy();
   }
 
   _initKeyStrokeContext() {
@@ -54,10 +63,11 @@ export default class ViewMenuTab extends Widget {
   }
 
   _render() {
-    this.$container = this.$parent.appendDiv('view-tab');
+    this.$container = this.$parent.appendDiv('view-tab view-menu-tab');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.dropdown.render(this.$container);
     this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
+    this.$container.appendDiv('edge right');
   }
 
   _remove() {
@@ -70,7 +80,9 @@ export default class ViewMenuTab extends Widget {
 
   _renderProperties() {
     super._renderProperties();
-    this._updateSelectedButton();
+    this._renderSelectedButtonVisible();
+    this._renderSelected();
+    this._renderInBackground();
   }
 
   setViewButtons(viewButtons) {
@@ -101,32 +113,55 @@ export default class ViewMenuTab extends Widget {
   _setSelectedButton(viewButton) {
     this.viewButtons.forEach(vb => vb.setSelectedAsMenu(vb === viewButton));
 
-    viewButton = viewButton.clone({
-      parent: this,
-      displayStyle: 'TAB'
-    }, {
+    // The selectedViewButton is a fake ViewButton but reflects the state of the actually selected one.
+    // The fake button is created only once and must not be destroyed when the selected view button changes.
+    // This is important to not break the CSS transition (e.g. when desktop is in background and another view selected using ViewMenuPopup).
+    let clone = this.selectedButton;
+    if (!clone) {
+      clone = scout.create('OutlineViewButton', {
+        parent: this,
+        displayStyle: 'TAB'
+      });
+    }
+    if (clone.cloneOf) {
+      clone.cloneOf.unmirror(clone);
+    }
+
+    // Link our fake button with the original and apply all the relevant properties (which are stored in cloneProperties, e.g. outline, cssClass, enabled, etc.)
+    clone.cloneOf = viewButton;
+    viewButton._cloneProperties.forEach(property => clone.callSetter(property, viewButton[property]));
+
+    // Use default icon if outline does not define one.
+    clone.setIconId(viewButton.iconId || this.defaultIconId);
+
+    // Mirror the events and property changes
+    viewButton.mirror({
       delegateEventsToOriginal: ['acceptInput', 'action'],
       delegateAllPropertiesToClone: true,
       delegateAllPropertiesToOriginal: true,
       excludePropertiesToOriginal: ['selected']
-    });
+    }, clone);
 
-    // use default icon if outline does not define one.
-    viewButton.iconId = viewButton.iconId || this.defaultIconId;
-    this._setProperty('selectedButton', viewButton);
+    this._setProperty('selectedButton', clone);
   }
 
   _renderSelectedButton() {
-    this._updateSelectedButton();
+    this._renderSelectedButtonVisible();
   }
 
-  _updateSelectedButton() {
+  setSelectedButtonVisible(selectedButtonVisible) {
+    this.setProperty('selectedButtonVisible', selectedButtonVisible);
+  }
+
+  _renderSelectedButtonVisible() {
+    this.$container.toggleClass('selected-button-invisible', !this.selectedButtonVisible);
     if (!this.selectedButton) {
       return;
     }
-    if (this.viewTabVisible) {
+    if (this.selectedButtonVisible) {
       if (!this.selectedButton.rendered) {
-        this.selectedButton.render(this.$container);
+        this.selectedButton.render();
+        this.selectedButton.$container.prependTo(this.$container);
         this.invalidateLayoutTree();
       }
     } else {
@@ -137,11 +172,8 @@ export default class ViewMenuTab extends Widget {
     }
   }
 
-  setViewTabVisible(viewTabVisible) {
-    this.setProperty('viewTabVisible', viewTabVisible);
-    if (this.rendered) {
-      this._updateSelectedButton();
-    }
+  setSelected(selected) {
+    this.setProperty('selected', selected);
   }
 
   _renderSelected() {
@@ -168,19 +200,15 @@ export default class ViewMenuTab extends Widget {
       // already open
       return;
     }
-    let naviBounds = graphics.bounds(this.$container.parent(), true);
     this.popup = scout.create('ViewMenuPopup', {
       parent: this,
-      $tab: this.dropdown.$container,
       viewMenus: this.viewButtons,
-      naviBounds: naviBounds
+      defaultIconId: this.defaultIconId,
+      $anchor: this.$parent // use view button box as parent for better alignment
     });
-    // The class needs to be added to the container before the popup gets opened so that the modified style may be copied to the head.
-    this.$container.addClass('popup-open');
-    this.popup.headText = this.text;
     this.popup.open();
-    this.popup.on('remove', event => {
-      this.$container.removeClass('popup-open');
+    this.popup.one('destroy', event => {
+      this.dropdown.setSelected(false);
       this.popup = null;
     });
   }
@@ -191,16 +219,15 @@ export default class ViewMenuTab extends Widget {
     }
   }
 
-  setSelected(selected) {
-    this.setProperty('selected', selected);
-  }
-
-  sendToBack() {
-    this._closePopup();
-  }
-
-  bringToFront() {
-    // NOP
+  _renderInBackground() {
+    if (!this.rendering) {
+      if (this.session.desktop.inBackground) {
+        this.$container.addClassForAnimation('animate-bring-to-back');
+      } else {
+        this.$container.addClassForAnimation('animate-bring-to-front');
+      }
+    }
+    this.$container.toggleClass('in-background', this.session.desktop.inBackground);
   }
 
   onViewButtonSelected() {
@@ -210,5 +237,11 @@ export default class ViewMenuTab extends Widget {
     }
     this.setSelected(!!viewButton);
     this._closePopup();
+  }
+
+  _onDesktopInBackgroundChange() {
+    if (this.rendered) {
+      this._renderInBackground();
+    }
   }
 }

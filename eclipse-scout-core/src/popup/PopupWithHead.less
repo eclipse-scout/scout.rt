@@ -1,0 +1,71 @@
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+
+.popup-head {
+  position: absolute;
+  padding: 0 13px;
+  white-space: nowrap;
+  background-color: @popup-background-color;
+  border: 1px solid @popup-border-color;
+  border-top-width: 0;
+  border-bottom-width: 0;
+  color: @active-color;
+
+  .popup.bottom > & {
+    padding-top: 10px;
+    border-top-width: 1px;
+    #scout.drop-shadow();
+  }
+
+  .popup.top > & {
+    padding-bottom: 3px;
+    border-bottom-width: 1px;
+    #scout.drop-shadow(@y: -6px;);
+  }
+
+  /* Enable submenu */
+
+  & > .submenu-icon,
+  & > .text > .submenu-icon {
+    #scout.transform(rotateX(180deg));
+    top: 0;
+  }
+
+  & > .font-icon {
+    font-size: 18px;
+    color: @active-color;
+  }
+
+  &.in-main-menubar > .font-icon {
+    font-size: 22px;
+  }
+}
+
+.popup-deco {
+  position: absolute;
+  height: 1px;
+  left: 1px;
+  background-color: @popup-background-color;
+}
+
+.popup-body {
+  position: relative;
+  border: 1px solid @popup-border-color;
+  background-color: @popup-background-color;
+
+  &.bottom {
+    #scout.drop-shadow();
+  }
+
+  &.top {
+    #scout.drop-shadow(@y: -6px;);
+  }
+}

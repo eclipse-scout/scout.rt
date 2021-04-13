@@ -12,38 +12,20 @@
   position: absolute;
   top: 0;
   height: @desktop-header-height;
+  color: @desktop-header-color;
   background-color: @desktop-header-background-color;
-
-  /* jquery sets overflow to hidden while animating which makes bench-drop-shadow invisible -> prevent it */
-  overflow: visible !important; /* NOSONAR (see comment above) */
-
-  /* Has the same effect as "border-bottom: 1px solid @border-color", but is over-drawable by child */
-  /* elements (such as the selected view-tab). The border would not be, because of "overflow: hidden". */
-
-  &::before {
-    content: '';
-    background-color: @desktop-header-border-color;
-    width: 100%;
-    height: 1px;
-    position: absolute;
-    top: calc(~'100% - 1px');
-    left: 0;
-  }
 
   & > .simple-tab-area {
     height: @desktop-header-height;
 
-    & > .simple-tab.selected {
+    .navigation-invisible > :not(.has-view-button-box)& {
+      margin-left: 6px;
+    }
 
-      &::before {
-        .desktop-bench-drop-shadow();
-        top: 0;
-        width: 20px;
-        height: 110%;
-      }
+    & > .desktop-tab.selected {
 
-      &:not(:first-child)::before {
-        box-shadow: -7px 0 10px 0 rgba(0, 0, 0, 0.4);
+      .navigation-invisible > & > .edge.left {
+        display: block;
       }
     }
   }
@@ -52,52 +34,78 @@
     #scout.animation-name(slideout-right);
     #scout.animation-duration(0.5s);
   }
-}
 
-.desktop-header > .view-button-box {
-  height: 100%;
+  & > .view-button-box {
 
-  & > .view-tab {
-    height: 100%;
-  }
-
-  & > .view-button-tab,
-  & > .view-tab > .view-button-tab,
-  & > .view-tab > .view-menu {
-    /* 1px smaller than the header because of the bottom border (see .selected rule for .simple-tab) */
-    height: calc(~'100% - 1px');
-    vertical-align: top;
-    background-color: @header-view-button-tab-background-color;
-    color: @header-view-button-tab-color;
-
-    &.last {
-      border-right-color: @border-color;
-    }
-
-    &:hover {
-      &:not(.selected) > .font-icon {
-        color: @header-view-button-tab-color;
+    & > .view-tab-wrapper > .view-tab {
+      &.animate-bring-to-front,
+      &.animate-bring-to-back {
+        animation-duration: 0s;
       }
     }
-  }
-}
 
-.desktop-header:not(.in-background) > .view-button-box {
-  & > .view-button-tab,
-  & > .view-tab > .view-button-tab,
-  & > .view-tab > .view-menu {
-    &.selected {
-      background-color: @header-view-button-tab-active-background-color;
-      color: @header-view-button-tab-active-color;
-      height: 100%;
-      padding-bottom: 1px;
+    .in-background&{
 
-      &.popup-open {
-        height: calc(~'100% - 1px');
+      & > .view-menu-tab {
+        &.selected {
+          background-color: @view-menu-tab-background-color;
+          color: inherit;
+        }
+
+        & > .view-button,
+        & > .view-menu {
+          &:hover {
+            background-color: @view-menu-tab-hover-background-color;
+          }
+        }
+
+        & > .view-menu {
+          &::before {
+            height: 100%;
+            border-color: @desktop-header-background-color;
+            top: 0;
+          }
+
+          &:hover > .icon {
+            background-color: transparent;
+          }
+
+          &.selected {
+            background-color: @view-menu-tab-menu-selected-background-color;
+
+            & > .icon {
+              background-color: transparent;
+            }
+          }
+        }
       }
 
-      .outline-content-has-menubar& {
-        background-color: @main-menubar-background-color;
+      & > .view-tab-wrapper > .view-tab {
+        &.selected {
+          color: inherit;
+          background-color: transparent;
+        }
+
+        &:hover {
+          background-color: @view-tab-hover-background-color;
+        }
+
+        &.disabled {
+          background-color: transparent;
+        }
+      }
+    }
+
+    :not(.in-background)& {
+
+      & > .view-tab-wrapper > .view-tab,
+      & > .view-menu-tab {
+        &.selected {
+
+          .outline-content-has-menubar& {
+            background-color: @main-menubar-background-color;
+          }
+        }
       }
     }
   }

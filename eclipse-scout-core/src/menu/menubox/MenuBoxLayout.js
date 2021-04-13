@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, graphics, menus} from '../../index';
+import {AbstractLayout, graphics, menus as menuUtil} from '../../index';
 
 export default class MenuBoxLayout extends AbstractLayout {
 
@@ -81,7 +81,7 @@ export default class MenuBoxLayout extends AbstractLayout {
     return this.actualPrefSize();
   }
 
-  compact(argMenus) {
+  compact(menus) {
     if (this.menuBox.compactOrig === undefined) {
       this.menuBox.compactOrig = this.menuBox.compact;
       this.menuBox.htmlComp.suppressInvalidate = true;
@@ -89,10 +89,10 @@ export default class MenuBoxLayout extends AbstractLayout {
       this.menuBox.htmlComp.suppressInvalidate = false;
     }
 
-    this.compactMenus(argMenus);
+    this.compactMenus(menus);
   }
 
-  undoCompact(argMenus) {
+  undoCompact(menus) {
     if (this.menuBox.compactOrig !== undefined) {
       this.menuBox.htmlComp.suppressInvalidate = true;
       this.menuBox.setCompact(this.menuBox.compactOrig);
@@ -100,15 +100,15 @@ export default class MenuBoxLayout extends AbstractLayout {
       this.menuBox.compactOrig = undefined;
     }
 
-    this.undoCompactMenus(argMenus);
+    this.undoCompactMenus(menus);
   }
 
   /**
    * Sets all menus into compact mode.
    */
-  compactMenus(argMenus) {
-    argMenus = argMenus || this.visibleMenus();
-    argMenus.forEach(menu => {
+  compactMenus(menus) {
+    menus = menus || this.visibleMenus();
+    menus.forEach(menu => {
       if (menu.compactOrig !== undefined) {
         // already done
         return;
@@ -117,7 +117,7 @@ export default class MenuBoxLayout extends AbstractLayout {
       menu.htmlComp.suppressInvalidate = true;
       menu.setCompact(true);
       menu.htmlComp.suppressInvalidate = false;
-    }, this);
+    });
 
     if (this._ellipsis) {
       this._ellipsis.setCompact(true);
@@ -127,9 +127,9 @@ export default class MenuBoxLayout extends AbstractLayout {
   /**
    * Restores to the previous state of the compact property.
    */
-  undoCompactMenus(argMenus) {
-    argMenus = argMenus || this.visibleMenus();
-    argMenus.forEach(menu => {
+  undoCompactMenus(menus) {
+    menus = menus || this.visibleMenus();
+    menus.forEach(menu => {
       if (menu.compactOrig === undefined) {
         return;
       }
@@ -138,23 +138,23 @@ export default class MenuBoxLayout extends AbstractLayout {
       menu.setCompact(menu.compactOrig);
       menu.htmlComp.suppressInvalidate = false;
       menu.compactOrig = undefined;
-    }, this);
+    });
 
     if (this._ellipsis) {
       this._ellipsis.setCompact(false);
     }
   }
 
-  shrink(argMenus) {
-    this.shrinkMenus(argMenus);
+  shrink(menus) {
+    this.shrinkMenus(menus);
   }
 
   /**
    * Makes the text invisible of all menus with an icon.
    */
-  shrinkMenus(argMenus) {
-    argMenus = argMenus || this.visibleMenus();
-    argMenus.forEach(menu => {
+  shrinkMenus(menus) {
+    menus = menus || this.visibleMenus();
+    menus.forEach(menu => {
       if (menu.textVisibleOrig !== undefined) {
         // already done
         return;
@@ -165,16 +165,16 @@ export default class MenuBoxLayout extends AbstractLayout {
         menu.setTextVisible(false);
         menu.htmlComp.suppressInvalidate = false;
       }
-    }, this);
+    });
   }
 
-  undoShrink(argMenus) {
-    this.undoShrinkMenus(argMenus);
+  undoShrink(menus) {
+    this.undoShrinkMenus(menus);
   }
 
-  undoShrinkMenus(argMenus) {
-    argMenus = argMenus || this.visibleMenus();
-    argMenus.forEach(menu => {
+  undoShrinkMenus(menus) {
+    menus = menus || this.visibleMenus();
+    menus.forEach(menu => {
       if (menu.textVisibleOrig === undefined) {
         return;
       }
@@ -183,10 +183,10 @@ export default class MenuBoxLayout extends AbstractLayout {
       menu.setTextVisible(menu.textVisibleOrig);
       menu.htmlComp.suppressInvalidate = false;
       menu.textVisibleOrig = undefined;
-    }, this);
+    });
   }
 
-  collapse(argMenus, containerSize, menusWidth) {
+  collapse(menus, containerSize, menusWidth) {
     this._createAndRenderEllipsis(this.menuBox.$container);
     let collapsedMenus = this._moveOverflowMenusIntoEllipsis(containerSize, menusWidth);
     this.updateFirstAndLastMenuMarker(collapsedMenus);
@@ -195,14 +195,14 @@ export default class MenuBoxLayout extends AbstractLayout {
   /**
    * Undoes the collapsing by removing ellipsis and rendering non rendered menus.
    */
-  undoCollapse(argMenus) {
-    argMenus = argMenus || this.visibleMenus();
+  undoCollapse(menus) {
+    menus = menus || this.visibleMenus();
     this._destroyEllipsis();
-    this._removeMenusFromEllipsis(argMenus);
+    this._removeMenusFromEllipsis(menus);
   }
 
   _createAndRenderEllipsis($container) {
-    let ellipsis = menus.createEllipsisMenu({
+    let ellipsis = menuUtil.createEllipsisMenu({
       parent: this.menuBox,
       horizontalAlignment: 1,
       compact: this.menuBox.compact
@@ -227,91 +227,83 @@ export default class MenuBoxLayout extends AbstractLayout {
     let collapsedMenus = [this._ellipsis];
     let ellipsisSize = graphics.size(this._ellipsis.$container, true);
     menusWidth += ellipsisSize.width;
-    this.visibleMenus().slice().reverse().forEach(function(menu) {
-      let menuSize;
+    this.visibleMenus().slice().reverse().forEach(menu => {
       if (menusWidth > containerSize.width) {
         // Menu does not fit -> move to ellipsis menu
-        menuSize = graphics.size(menu.$container, true);
+        let menuSize = graphics.size(menu.$container, true);
         menusWidth -= menuSize.width;
-        menus.moveMenuIntoEllipsis(menu, this._ellipsis);
+        menuUtil.moveMenuIntoEllipsis(menu, this._ellipsis);
       } else {
         collapsedMenus.unshift(menu); // add as first element
       }
-    }, this);
+    });
     return collapsedMenus;
   }
 
-  _removeMenusFromEllipsis(argMenus) {
-    argMenus = argMenus || this.visibleMenus();
-    argMenus.forEach(function(menu) {
-      menus.removeMenuFromEllipsis(menu, this.menuBox.$container);
-    }, this);
+  _removeMenusFromEllipsis(menus) {
+    menus = menus || this.visibleMenus();
+    menus.forEach(menu => menuUtil.removeMenuFromEllipsis(menu, this.menuBox.$container));
   }
 
-  actualPrefSize(argMenus) {
-    let menusWidth, prefSize;
-
-    argMenus = argMenus || this.visibleMenus();
-    menusWidth = this._menusWidth(argMenus);
-    prefSize = graphics.prefSize(this.menuBox.$container, {
-      includeMargin: true,
-      useCssSize: true
-    });
+  actualPrefSize(menus) {
+    menus = menus || this.visibleMenus();
+    let menusWidth = this._menusWidth(menus);
+    let prefSize = graphics.prefSize(this.menuBox.$container);
     prefSize.width = menusWidth + this.menuBox.htmlComp.insets().horizontal();
-
     return prefSize;
   }
 
   /**
-   * @return the current width of all menus incl. the ellipsis
+   * @return {number} the current width of all menus incl. the ellipsis
    */
-  _menusWidth(argMenus) {
+  _menusWidth(menus) {
     let menusWidth = 0;
-    argMenus = argMenus || this.visibleMenus();
-    argMenus.forEach(menu => {
+    let size = menu => graphics.size(menu.htmlComp.$comp, {includeMargin: true, exact: true});
+
+    menus = menus || this.visibleMenus();
+    menus.forEach(menu => {
       if (menu.rendered) {
-        menusWidth += menu.$container.outerWidth(true);
+        menusWidth += size(menu).width;
       }
-    }, this);
+    });
     if (this._ellipsis) {
-      menusWidth += this._ellipsis.$container.outerWidth(true);
+      menusWidth += size(this._ellipsis).width;
     }
+
     return menusWidth;
   }
 
-  compactPrefSize(argMenus) {
-    argMenus = argMenus || this.visibleMenus();
+  compactPrefSize(menus) {
+    menus = menus || this.visibleMenus();
 
-    this.updateFirstAndLastMenuMarker(argMenus);
-    this.undoCollapse(argMenus);
-    this.undoShrink(argMenus);
-    this.compact(argMenus);
+    this.updateFirstAndLastMenuMarker(menus);
+    this.undoCollapse(menus);
+    this.undoShrink(menus);
+    this.compact(menus);
 
     return this.actualPrefSize();
   }
 
-  shrinkPrefSize(argMenus) {
-    argMenus = argMenus || this.visibleMenus();
+  shrinkPrefSize(menus) {
+    menus = menus || this.visibleMenus();
 
-    this.updateFirstAndLastMenuMarker(argMenus);
-    this.undoCollapse(argMenus);
-    this.compact(argMenus);
-    this.shrink(argMenus);
+    this.updateFirstAndLastMenuMarker(menus);
+    this.undoCollapse(menus);
+    this.compact(menus);
+    this.shrink(menus);
 
     return this.actualPrefSize();
   }
 
   visibleMenus() {
-    return this.menuBox.menus.filter(menu => {
-      return menu.visible;
-    }, this);
+    return this.menuBox.menus.filter(menu => menu.visible);
   }
 
-  updateFirstAndLastMenuMarker(argMenus) {
+  updateFirstAndLastMenuMarker(menus) {
     // Find first and last rendered menu
     let firstMenu = null;
     let lastMenu = null;
-    (argMenus || []).forEach(menu => {
+    (menus || []).forEach(menu => {
       if (menu.rendered) {
         if (!firstMenu) {
           firstMenu = menu;

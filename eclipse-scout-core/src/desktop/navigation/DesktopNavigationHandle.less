@@ -11,20 +11,19 @@
 .desktop-navigation-handle.collapse-handle {
   position: absolute;
 
-  &:active > .collapse-handle-body,
-  &.active > .collapse-handle-body {
-    background-color: @desktop-navigation-handle-active-background-color;
-  }
-
   & > .collapse-handle-body {
     background-color: @desktop-navigation-handle-background-color;
-    border-color: fade(@desktop-navigation-handle-border-color, 75%);
-    color: fade(@desktop-navigation-handle-color, 75%);
-  }
+    border-color: @desktop-navigation-handle-border-color;
+    color: @desktop-navigation-handle-color;
 
-  &.navigation-closed > .collapse-handle-body {
-    /* increase border radius a little, otherwise it is barely visible */
-    border-radius: 4px;
+    &:hover {
+      background-color: @desktop-navigation-handle-hover-background-color;
+    }
+
+    &:active,
+    &.active {
+      background-color: @desktop-navigation-handle-active-background-color;
+    }
   }
 
   &.right-aligned {
@@ -50,7 +49,6 @@
       border-top-left-radius: 0;
     }
   }
-
 }
 
 .navigation-handle-key-box {

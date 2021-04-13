@@ -14,22 +14,12 @@ export default class ViewButtonActionKeyStroke extends ActionKeyStroke {
 
   constructor(action) {
     super(action);
-
   }
 
   _postRenderKeyBox($drawingArea) {
-    if (this.field.iconId && !this.field._isMenuItem) {
-      let width = $drawingArea.outerWidth();
-      let wKeybox = $drawingArea.find('.key-box').outerWidth();
-      let leftKeyBox = width / 2 - wKeybox / 2;
-      $drawingArea.find('.key-box').cssLeft(leftKeyBox);
-    }
-  }
-
-  renderKeyBox($drawingArea, event) {
-    if (this.field._isMenuItem) {
-      this.renderingHints.hAlign = HAlign.RIGHT;
-    }
-    return super.renderKeyBox($drawingArea, event);
+    let width = $drawingArea.outerWidth();
+    let keyBoxWidth = $drawingArea.find('.key-box').outerWidth();
+    let left = width / 2 - keyBoxWidth / 2;
+    $drawingArea.find('.key-box').cssLeft(left);
   }
 }

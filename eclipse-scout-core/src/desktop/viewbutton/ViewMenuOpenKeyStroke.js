@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke} from '../../index';
+import {HAlign, keys, KeyStroke} from '../../index';
 
 /**
  * Keystroke to open the 'ViewMenuPopup' on 'F2'.
@@ -21,10 +21,12 @@ export default class ViewMenuOpenKeyStroke extends KeyStroke {
 
     this.which = [keys.F2];
     this.stopPropagation = true;
-
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
-      return this.field.$container;
-    }.bind(this);
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
+      if (this.field.selected && !this.field.inBackground) {
+        return this.field.dropdown.$container;
+      }
+      return this.field.selectedButton.$container;
+    };
   }
 
   /**
@@ -39,15 +41,9 @@ export default class ViewMenuOpenKeyStroke extends KeyStroke {
   }
 
   _postRenderKeyBox($drawingArea) {
-    let wKeybox = $drawingArea.find('.key-box').outerWidth(),
-      left = this.field.dropdown.$container.outerWidth();
-
-    if (this.field.selected && !this.field.inBackground) {
-      left = left / 2;
-    } else if (this.field.selectedButton) {
-      left = left + this.field.selectedButton.$container.outerWidth() / 2;
-    }
-    left -= wKeybox / 2;
+    let width = $drawingArea.outerWidth();
+    let keyBoxWidth = $drawingArea.find('.key-box').outerWidth();
+    let left = width / 2 - keyBoxWidth / 2;
     $drawingArea.find('.key-box').cssLeft(left);
   }
 }

@@ -9,11 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .view-button-box {
-  display: inline-block;
-  vertical-align: top;
-  height: @view-button-box-height;
+  display: inline-flex;
+  min-height: @desktop-header-height;
   white-space: nowrap;
   #scout.font-text-large();
-  overflow: hidden;
+  overflow: visible; /* necessary if it is in the header to make rounded corner overlap into tab area */
   position: relative; /* if covered by glass pane */
+  background-color: @desktop-header-background-color;
+  color: @desktop-header-color;
 }

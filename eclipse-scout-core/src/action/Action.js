@@ -357,6 +357,9 @@ export default class Action extends Widget {
     this.setProperty('horizontalAlignment', horizontalAlignment);
   }
 
+  /**
+   * @return {ActionKeyStroke}
+   */
   _createActionKeyStroke() {
     return new ActionKeyStroke(this);
   }

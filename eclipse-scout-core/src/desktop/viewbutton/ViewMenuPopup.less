@@ -8,75 +8,84 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-.view-menu-popup-body {
-  position: relative;
-  background-color: @view-menu-popup-background-color;
-  border-right: solid 1px @border-color;
-  border-top: solid 1px @border-color;
+.view-menu-popup.widget-popup {
+  #scout.drop-shadow-large();
+  border-radius: @border-radius-large;
+  border: 0;
+  margin: 5px;
   overflow: hidden;
-  #scout.drop-shadow();
-}
 
-.view-menu-popup-head {
-  & > .icon {
-    transform: rotate(180deg);
+  & > .tile-grid.scrollable {
+    padding: 24px;
+  }
+
+  & > .tile-grid.no-icons > .view-menu-tile {
+    min-height: 66px; // Min height to ensure all tiles have equal height, at least the ones with 1 or 2 lines
   }
 }
 
-.view-menu-item {
-  padding: 0 15px 0 15px;
-  height: @desktop-header-height - 1px;
-  border-top: solid 1px @border-color;
+.view-menu-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  text-align: center;
+  color: @link-color;
+  background-color: @view-menu-tile-background-color;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  padding: 16px 10px;
   cursor: pointer;
-  color: @text-color;
-  font-size: 16px;
-  #scout.overflow-ellipsis-nowrap();
-  position: relative;
-  #scout.vertical-align-helper-before();
+  min-height: 130px;
 
-  &:first-child {
-    border-top-color: transparent;
+  &.text-only {
+    justify-content: center;
+  }
+
+  & > .icon {
+    font-size: @font-size-icon-large;
+    padding-top: 16px;
+    padding-bottom: 18px;
+  }
+
+  & > .label {
+    font-weight: bold;
+    #scout.overflow-ellipsis();
+  }
+
+  &.selected {
+
+    &::before {
+      content: '';
+      border: 2px solid @view-menu-tile-selected-border-color;
+      width: calc(100% + 12px);
+      height: calc(100% + 12px);
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      border-radius: 15px;
+    }
   }
 
   &:hover {
-    color: @hover-color;
+    background-color: @view-menu-tile-hover-background-color;
+  }
+
+  &.checked {
+    color: @active-inverted-color;
+    background-color: @active-inverted-background-color;
   }
 
   &.disabled {
     color: @disabled-color;
     cursor: default;
-  }
 
-  &.selected {
-    border-top: 1px solid @item-selection-border-color;
-    background-color: @item-selection-background-color;
-    border-color: @item-selection-border-color;
-  }
+    &:hover {
+      background-color: @view-menu-tile-background-color;
+    }
 
-  &.selected + .view-menu-item {
-    border-top-color: @item-selection-border-color;
-  }
-
-  &.selected.last {
-    border-color: @item-selection-border-color;
-  }
-
-  &.last {
-    border-bottom: 1px solid @border-color;
-  }
-
-  & > .key-box {
-    top: 14px;
-  }
-
-  & > .icon {
-    position: relative;
-    font-size: 20px;
-    margin-right: 10px;
-    vertical-align: middle;
-  }
-
-  & > .content {
-    vertical-align: middle;
+    &.checked {
+      background-color: @active-inverted-background-color;
+      color: @disabled-inverted-color;
+    }
   }
 }

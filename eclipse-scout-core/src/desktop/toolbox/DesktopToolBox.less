@@ -11,79 +11,60 @@
 .desktop-tool-box {
   position: absolute;
   top: 0;
+  margin: 0 @desktop-tool-box-item-margin;
+  min-height: @desktop-header-height;
+  display: inline-flex;
+  justify-content: flex-end;
   white-space: nowrap;
-  padding-right: 20px;
-
-  &.compact {
-    padding-right: 15px;
-  }
+  color: @desktop-header-color;
 }
 
 .desktop-tool-box-item.menu-item {
-  height: @desktop-header-height - 1px;
-  #scout.font-text-plus();
-  border-left: 1px solid transparent;
-  border-right: 1px solid transparent;
-  margin-left: 20px;
-  margin-right: 20px;
-
-  &.last {
-    margin-right: 0;
-  }
+  font-size: @font-size-plus;
+  margin: @desktop-tool-box-item-margin-top @desktop-tool-box-item-margin;
+  padding: 0 14px;
+  border-radius: @desktop-tool-box-item-border-radius;
+  color: inherit;
 
   &.compact {
-    margin-left: 10px;
-    margin-right: 10px;
-
-    &.last {
-      margin-right: 0;
-    }
+    padding-left: 10px;
+    padding-right: 10px;
 
     & > .submenu-icon {
       display: none;
     }
   }
 
+  &:not(.menu-button) > .icon {
+    top: 0; // TODO BrushUp remove when -1 hack is removed from menu.less
+  }
+
   & > .font-icon {
-    font-size: 17px;
+    font-size: @desktop-tool-box-item-font-size;
   }
 
   & > .icon.image-icon {
-    /* Increase max image height, no need to limit it to 16px. 33px is the desktop logo height */
-    max-height: 33px;
+    /* Increase max image height, no need to limit it to 16px */
+    max-height: @desktop-logo-height;
   }
 
-  &.menu-textandicon > .icon {
-    padding-right: @header-menu-textandicon-padding-right;
-  }
-}
-
-/* header: tools popup */
-
-.desktop-tool-box-item.popup-head {
-  height: @desktop-header-height - 1px;
-  border-left: 1px solid @border-color;
-  border-right: 1px solid @border-color;
-  cursor: pointer;
-  box-shadow: none;
-  border-top: none;
-  /* OVERRIDE .desktop-tool-box-item.menu-item */
-  margin-left: 0;
-  margin-right: 0;
-  position: absolute;
-
-  .popup.down > & {
-    /* above selector is too less specific */
-    padding-top: 0;
+  &:hover {
+    background-color: @desktop-tool-box-item-hover-background-color;
+    color: inherit;
   }
 
-  &.selected > .font-icon {
-    font-size: 17px;
+  &.selected {
+    background-color: @desktop-tool-box-item-selected-background-color;
+  }
+
+  &.disabled {
+    background-color: transparent;
+    color: @desktop-header-disabled-color;
   }
 }
 
 /* key boxes */
 
 .desktop-tool-box-item.menu-item .key-box {
-  bottom: 4px;
+  bottom: 6px;
 }

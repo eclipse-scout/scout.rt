@@ -16,19 +16,10 @@
   }
 
   & > .tree-data {
+    padding-top: @outline-data-padding-top;
 
     & > .scrollbar {
-
       #scout.scrollbar-y-padding(2px, 0);
-
-      & > .scrollbar-thumb > .scrollbar-thumb-handle {
-        background-color: @outline-scrollbar-thumb-color;
-      }
-
-      & > .scrollbar-thumb-move > .scrollbar-thumb-handle,
-      & > .scrollbar-thumb:hover > .scrollbar-thumb-handle {
-        background-color: @outline-scrollbar-thumb-hover-color;
-      }
     }
 
     & > .key-box {
@@ -37,7 +28,6 @@
 
     & > .tree-node,
     & > .animation-wrapper > .tree-node {
-      color: @navigation-color;
       background-color: transparent;
       cursor: pointer;
       border: 0;
@@ -50,19 +40,7 @@
       }
 
       & > .text {
-        font-size: @font-size-plus;
-
-        & > .compact-cell-header > .compact-cell-title > .right {
-          color: @outline-compact-cell-content-color;
-        }
-
-        & > .compact-cell-content {
-          color: @navigation-color;
-
-          &.has-header {
-            color: @outline-compact-cell-content-color;
-          }
-        }
+        font-size: @outline-font-size;
       }
 
       & > .image-icon {
@@ -98,10 +76,6 @@
         color: @outline-selection-color;
         background-color: @outline-selection-background-color;
         border: 0;
-
-        & > .text > .compact-cell-content {
-          color: @table-compact-cell-content-color;
-        }
       }
     }
   }
@@ -109,17 +83,17 @@
 
 .outline-title {
   cursor: pointer;
-  #scout.font-text-large();
+  color: @outline-title-color;
+  font-size: 19px;
   #scout.overflow-ellipsis-nowrap();
-  margin: 0 @outline-title-margin-right @outline-title-margin-bottom @outline-title-margin-left;
+  padding: 0 @outline-title-padding-right 0 @outline-title-padding-left;
   border-bottom: 1px solid @outline-title-border-color;
-  #scout.vertical-align-helper-before();
+  font-weight: @font-weight-bold;
+  display: flex;
+  align-items: center;
+  height: @outline-title-height;
 
   & > .icon {
-    display: inline-block;
-    position: relative;
-    vertical-align: middle;
-    font-size: @outline-title-icon-font-size;
     padding-right: @outline-title-icon-padding-right;
   }
 
@@ -127,49 +101,16 @@
     top: 19px;
   }
 
-  & > .menubar {
-    display: block;
-    background-color: transparent;
-    width: auto;
-    position: absolute;
-    right: @outline-title-margin-right;
-    top: @outline-title-menubar-top;
-    border: none;
-    color: @navigation-color;
-
-    & > .menubox {
-
-      & > .menu-item:not(.disabled) {
-        color: @navigation-color;
-
-        &:hover,
-        &:active {
-          color: @navigation-color;
-        }
-
-        &:focus,
-        &:not(.menu-button):focus {
-          color: @navigation-color;
-
-          &::after {
-            border-color: @navigation-color;
-            #scout.glow(@navigation-color);
-          }
-        }
-      }
-
-      & > .menu-item:not(.menu-textandicon):focus::after {
-        #scout.focus-border-inverted();
-      }
-    }
+  & > .text {
+    flex-grow: 1;
   }
-}
 
-.outline-title-text {
-  /* outline title height should be the same as main menubar and desktop header height (if there are no view buttons visible) */
-  padding: 20px 2px 12px @outline-title-text-padding-left;
-  display: inline-block;
-  vertical-align: middle;
+  & > .menubar {
+    background-color: transparent;
+    border: none;
+    width: auto;
+    flex-grow: 0;
+  }
 }
 
 /* bread crumb style (different colors and bigger font and arrow than original breadcrumb style) */
@@ -182,10 +123,6 @@
     &.touch:active {
       background-color: @outline-breadcrumb-node-active-background-color;
     }
-
-    & > .outline-title-text {
-      padding-left: @outline-breadcrumb-node-padding-x;
-    }
   }
 
   &.node-selected > .outline-title {
@@ -193,6 +130,7 @@
   }
 
   & > .tree-data {
+    padding-top: 0;
 
     & > .tree-node,
     & > .animation-wrapper > .tree-node {
@@ -239,7 +177,7 @@
         }
 
         &::after {
-          border: 0;
+          border-width: 0;
           border-top-color: @outline-selection-background-color;
         }
       }
@@ -286,9 +224,8 @@
 
 .compact.outline.breadcrumb {
   & > .outline-title {
-    & > .outline-title-text {
-      padding-left: @compact-outline-node-padding-x;
-    }
+    padding-left: @compact-outline-title-padding-x;
+    padding-right: @compact-outline-title-padding-x;
   }
 
   & > .tree-data {
@@ -328,6 +265,27 @@
         }
       }
 
+      &.selected {
+        background-color: transparent;
+        color: @desktop-navigation-color;
+
+        & > .text {
+          font-weight: bold;
+        }
+
+        &::before {
+          border-top-color: @outline-breadcrumb-border-color;
+          border-width: 6px 12px 0 12px;
+          bottom: -7px;
+        }
+
+        &::after {
+          border-top-color: @desktop-navigation-body-background-color;
+          border-width: 6px 12px 0 12px;
+          bottom: -6px;
+        }
+      }
+
       &.child-of-selected.animate-prev-selected {
         #scout.animation-name(tree-node-prev-selection);
         #scout.animation-duration(0.6s);
@@ -353,7 +311,7 @@
     }
 
     background-color: transparent;
-    color: @navigation-color;
+    color: @desktop-navigation-color;
     border-bottom: 0;
 
     &::before,
@@ -378,16 +336,7 @@
     }
 
     & .menu-item {
-      color: @navigation-color;
-    }
-
-    & .tile {
-      border-color: @outline-breadcrumb-ancestor-border-color;
-      background-color: @outline-breadcrumb-child-background-color;
-
-      &:active {
-        background-color: @outline-breadcrumb-child-active-background-color;
-      }
+      color: @desktop-navigation-color;
     }
 
     & ~ .child-of-selected {

@@ -29,10 +29,8 @@ export default class WidgetPopupLayout extends PopupLayout {
     let htmlComp = this.popup.htmlComp;
     let htmlWidget = this.popup.widget.htmlComp;
 
-    let prefSize = htmlWidget.prefSize(options)
+    return htmlWidget.prefSize(options)
       .add(htmlComp.insets())
       .add(htmlWidget.margins());
-
-    return prefSize;
   }
 }

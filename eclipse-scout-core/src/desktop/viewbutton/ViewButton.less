@@ -8,71 +8,130 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+@view-tab-transition-duration: 200ms;
+@view-tab-transition: margin @view-tab-transition-duration ease-out, padding @view-tab-transition-duration ease-out, width @view-tab-transition-duration ease-out, border-radius @view-tab-transition-duration ease-out;
+
+// The wrapper is necessary to make sure the view tabs don't change their size when one of them is selected.
+// Without a wrapper this would not be possible because an unselected view tab has a margin, a selected one does not.
+// When the tabs are shrinking, flex box distributes the size based on their widths (which is different). It should actually distribute it based on width + margin.
+// So, if the items were static (no shrink or grow), it would work without a wrapper.
+// A programmatic layout would not make it easier because we are using transitions.
+// When the inBackground property changes, the items need to be layouted considering the margin, but reading the margin would return the wrong value while the transition is running.
+.view-tab-wrapper {
+  display: flex;
+  width: @view-tab-selected-width;
+}
+
 .view-tab {
-  display: inline-block;
   position: relative;
-  height: @view-button-box-height;
+  border-radius: @view-tab-border-radius;
+  margin: @view-tab-margin-top @view-tab-margin @view-tab-margin;
 
   & > .key-box {
-    bottom: 4px;
+    bottom: @view-tab-key-box-bottom;
+  }
+
+  &.in-background {
+    border-radius: @view-tab-selected-border-radius;
+  }
+
+  &.selected:not(.in-background) {
+    margin: @view-tab-selected-margin-top 0 0;
+    border-radius: @view-tab-selected-border-radius @view-tab-selected-border-radius 0 0;
+
+    & > .edge {
+      #scout.inverted-bottom-round-edge(@border-radius: @view-tab-selected-border-radius, @color: @view-tab-selected-background-color);
+    }
+
+    & > .key-box {
+      bottom: @view-tab-key-box-bottom + @view-tab-margin;
+    }
+  }
+
+  &.animate-bring-to-front,
+  &.animate-bring-to-back {
+    // Transition should only be active when desktop changes from back to front and back, not when outline is changed
+    // The classes animate-* are only set while the animation is running, thus, we need an animation, even if it does nothing (nop)
+    transition: @view-tab-transition;
+    animation: nop @view-tab-transition-duration ease-out;
+
+    &:not(.in-background) {
+
+      & > .edge {
+
+        &.left {
+          visibility: hidden;
+          left: 0;
+          animation: show-view-tab-left-edge @view-tab-transition-duration ease-out 0s forwards;
+        }
+
+        &.right {
+          visibility: hidden;
+          right: 0;
+          animation: show-view-tab-right-edge @view-tab-transition-duration ease-out 0s forwards;
+        }
+      }
+    }
   }
 }
 
 .view-button-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   white-space: nowrap;
-  border-right: solid 1px @border-color;
-  text-align: center;
-  #scout.vertical-align-helper-before();
-  min-width: 50px;
-  background-color: @view-button-tab-background-color;
-  color: @view-button-tab-color;
+  width: calc(~'100% - ' 2 * @view-tab-margin);
 
   &:hover {
     cursor: pointer;
-
-    &:not(.selected) > .font-icon {
-      color: @hover-color;
-    }
-  }
-
-  &:active {
-    &:not(.selected) > .font-icon {
-      color: @active-color;
-    }
+    background-color: @view-tab-hover-background-color;
   }
 
   &.selected {
-    background-color: @view-button-tab-active-background-color;
-    color: @view-button-tab-active-color;
+    background-color: @view-tab-selected-background-color;
+    color: @view-tab-selected-color;
 
-    &.last {
-      border-right-color: transparent;
+    &.in-background {
+      background-color: @view-tab-in-background-selected-background-color;
+    }
+
+    &:not(.in-background) {
+      width: 100%;
     }
   }
 
   &.disabled {
-    color: @text-disabled-color;
+    color: @desktop-header-disabled-color;;
 
     &:hover {
       cursor: default;
-      color: @text-disabled-color;
-
-      &:not(.selected) > .font-icon {
-        color: @text-disabled-color;
-      }
+      color: @desktop-header-disabled-color;
+      background-color: transparent;
     }
-  }
 
-  &.view-menu-popup-head {
-    position: absolute;
-    background-color: @active-inverted-color;
-    color: @active-color;
+    &.selected {
+      color: @text-disabled-color;
+    }
   }
 
   & > .icon {
     display: inline-block;
     position: relative;
     vertical-align: middle;
-    font-size: 20px;
+    font-size: @view-tab-icon-font-size;
+  }
+}
+
+@keyframes show-view-tab-left-edge {
+  to {
+    visibility: visible;
+    transform: translateX(-24px);
+  }
+}
+
+@keyframes show-view-tab-right-edge {
+  to {
+    visibility: visible;
+    transform: translateX(24px);
   }
 }

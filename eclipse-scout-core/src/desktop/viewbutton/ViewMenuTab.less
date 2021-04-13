@@ -8,57 +8,161 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-.view-tab {
+.view-menu-tab {
+  display: flex;
+  background-color: @view-menu-tab-background-color;
+  flex-shrink: 0;
 
-  & > .menu-item {
-    height: @view-button-box-height;
-    display: inline-block;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-right: solid 1px @border-color;
+  & > .view-button,
+  & > .view-menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
 
-    & > .icon {
-      top: 0;
+    &:hover {
+      background-color: @view-menu-tab-hover-background-color;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    &.disabled {
+      color: @desktop-header-disabled-color;
+      background-color: transparent;
+      cursor: default;
+    }
+
+    .animate-bring-to-front&,
+    .animate-bring-to-back& {
+      transition: @view-tab-transition;
     }
   }
 
-  & > .view-button-tab {
-    display: inline-block;
-    height: @view-button-box-height;
+  & > .view-button {
+    border-top-left-radius: @view-tab-border-radius;
+    border-bottom-left-radius: @view-tab-border-radius;
+    width: @view-tab-selected-width - @view-tab-margin;
+
+    & > .icon {
+      font-size: 26px;
+    }
   }
 
-  & > .submenu-icon {
-    #scout.submenu-icon();
+  & > .view-menu {
     position: relative;
-    vertical-align: middle;
-    display: inline-block;
-    line-height: normal;
-    height: auto;
+    border-top-right-radius: @view-tab-border-radius;
+    border-bottom-right-radius: @view-tab-border-radius;
+    width: @view-tab-selected-width - @view-tab-margin * 2;
 
-    /* Make IE trigger the :active state if the text or icon is pressed */
-    pointer-events: none;
+    .selected-button-invisible& {
+      border-radius: @view-tab-border-radius;
+    }
+
+    & > .icon {
+      font-size: 24px;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      height: 100%;
+      border-left: 1px solid @desktop-header-background-color;
+      left: 0;
+
+      .selected-button-invisible&{
+        display: none
+      }
+    }
+
+    &.selected {
+      background-color: @view-menu-tab-menu-selected-background-color;
+    }
   }
-}
 
-.view-menu {
-  padding-left: 10px;
-  padding-right: 10px;
-  border-right: solid 1px @border-color;
-  background-color: @view-button-tab-background-color;
-  color: @view-button-tab-color;
+  &.in-background {
+    & > .view-button {
+      border-top-left-radius: @view-tab-selected-border-radius;
+      border-bottom-left-radius: @view-tab-selected-border-radius;
+    }
 
-  &.view-menu-popup-head {
-    position: absolute;
-    background-color: @view-menu-popup-background-color;
-    color: @active-color;
+    & > .view-menu {
+      border-top-right-radius: @view-tab-selected-border-radius;
+      border-bottom-right-radius: @view-tab-selected-border-radius;
+
+      .selected-button-invisible& {
+        border-radius: @view-tab-selected-border-radius;
+      }
+    }
   }
 
   &.selected {
-    background-color: @view-button-tab-active-background-color;
-    color: @view-button-tab-active-color;
+    color: @view-tab-selected-color;
+    background-color: @view-tab-selected-background-color;
 
-    &.last {
-      border-right-color: transparent;
+    & > .view-button,
+    & > .view-menu {
+      &.selected,
+      &:hover {
+        background-color: transparent;
+      }
+
+      &.disabled {
+        color: @text-disabled-color;
+      }
+    }
+
+    & > .view-menu {
+      width: @view-tab-selected-width - @view-tab-margin * 2;
+
+      & > .icon {
+        font-size: 26px;
+        padding: 7px;
+        border-radius: 8px;
+      }
+
+      &:hover > .icon {
+        background-color: @hover-background-color;
+      }
+
+      &.disabled > .icon {
+        background-color: transparent;
+      }
+
+      &.selected > .icon {
+        background-color: @view-menu-tab-selected-menu-selected-background-color;
+      }
+
+      &::before {
+        top: 10px;
+        height: calc(100% - 20px);
+        border-color: @border-color;
+      }
+    }
+
+    &.in-background {
+      background-color: @view-tab-in-background-selected-background-color;
+
+      & > .view-menu {
+        & > .icon {
+          padding-top: 2px;
+          padding-bottom: 2px;
+        }
+      }
+    }
+
+    &:not(.in-background) {
+      border-top-left-radius: 0;
+      margin-left: 0;
+      margin-right: @view-tab-margin;
+
+      & > .view-button {
+        padding-left: @view-tab-margin;
+        width: @view-tab-selected-width;
+      }
+
+      .selected-button-invisible& > .view-menu {
+        width: @view-tab-selected-width - @view-tab-margin;
+      }
     }
   }
 }

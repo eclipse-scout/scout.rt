@@ -9,14 +9,177 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .desktop-tab.simple-tab {
-  width: 220px;
-  padding: 6px 10px 0 20px;
-
-  &.small {
-    width: 130px;
-  }
+  width: @desktop-tab-width;
+  min-width: @desktop-tab-min-width;
+  padding: @desktop-tab-padding @desktop-tab-padding 0 @desktop-tab-padding-left;
+  margin: @desktop-tab-margin-top @desktop-tab-margin @desktop-tab-margin;
+  border-radius: @desktop-tab-border-radius;
+  border-right-width: 0;
+  background-color: @desktop-tab-background-color;
 
   & > .title {
-    #scout.font-text-large();
+    font-size: @font-size-plus;
+    font-weight: @font-weight-bold;
   }
+
+  & > .sub-title {
+    color: @desktop-tab-sub-title-color;
+    font-size: @font-size-small;
+    padding-top: 2px;
+  }
+
+  & > .status-container > .save-needer {
+    color: @desktop-tab-sub-title-color;
+  }
+
+  & > .key-box {
+    bottom: @desktop-tab-key-box-bottom;
+  }
+
+  &.animate-modality-highlight {
+    .animation-flash-desktop-tab(flash-desktop-tab);
+  }
+
+  &:hover,
+  &:active {
+    background-color: @desktop-tab-hover-background-color;
+
+    & > .title {
+      color: inherit;
+    }
+  }
+
+  &.disabled {
+    background-color: transparent;
+
+    & > .title {
+      color: @desktop-header-disabled-color;
+    }
+  }
+
+  &.selected {
+    width: @desktop-tab-selected-width;
+    min-width: @desktop-tab-selected-min-width;
+    background-color: @simple-tab-selected-background-color;
+    margin: @desktop-tab-selected-margin-top 0 0;
+    padding: @desktop-tab-selected-padding @desktop-tab-selected-padding 0 @desktop-tab-selected-padding-left;
+    border-radius: @desktop-tab-selected-border-radius @desktop-tab-selected-border-radius 0 0;
+
+    & > .title {
+      color: @simple-tab-selected-color;
+    }
+
+    & > .sub-title {
+      color: @desktop-tab-selected-sub-title-color;
+    }
+
+    & > .status-container > .save-needer {
+      color: @desktop-tab-selected-save-needer-color;
+    }
+
+    & > .key-box {
+      bottom: @desktop-tab-key-box-bottom + @desktop-tab-margin;
+    }
+
+    & > .edge {
+      #scout.inverted-bottom-round-edge(@border-radius: @desktop-tab-selected-border-radius, @color: @simple-tab-selected-background-color);
+    }
+
+    &.first > .edge.left {
+      display: none;
+    }
+
+    &.animate-modality-highlight {
+      .animation-flash-desktop-tab(flash-desktop-tab-selected);
+
+      & > .edge {
+        .animation-flash-desktop-tab(flash-desktop-tab-selected-edge);
+      }
+    }
+  }
+}
+
+.animation-flash-desktop-tab(@keyframes-name) {
+  #scout.animation-name(@keyframes-name);
+  #scout.animation-duration(0.4s);
+  #scout.animation-iteration-count(1);
+  #scout.animation-timing-function(linear);
+}
+
+.keyframes-flash-desktop-tab() {
+  0% {
+    background-color: @desktop-tab-background-color;
+  }
+  25% {
+    background-color: @desktop-tab-flash-background-color;
+  }
+  50% {
+    background-color: @desktop-tab-background-color;
+  }
+  75% {
+    background-color: @desktop-tab-flash-background-color;
+  }
+  100% {
+    background-color: @desktop-tab-background-color;
+  }
+}
+
+@-webkit-keyframes flash-desktop-tab {
+  .keyframes-flash-desktop-tab();
+}
+
+@keyframes flash-desktop-tab {
+  .keyframes-flash-desktop-tab();
+}
+
+.keyframes-flash-desktop-tab-selected() {
+  0% {
+    background-color: @simple-tab-selected-background-color;
+  }
+  25% {
+    background-color: @desktop-tab-selected-flash-background-color;
+  }
+  50% {
+    background-color: @simple-tab-selected-background-color;
+  }
+  75% {
+    background-color: @desktop-tab-selected-flash-background-color;
+  }
+  100% {
+    background-color: @simple-tab-selected-background-color;
+  }
+}
+
+@-webkit-keyframes flash-desktop-tab-selected {
+  .keyframes-flash-desktop-tab-selected();
+}
+
+@keyframes flash-desktop-tab-selected {
+  .keyframes-flash-desktop-tab-selected();
+}
+
+.keyframes-flash-desktop-tab-selected-edge() {
+  0% {
+    box-shadow: 0 @desktop-tab-selected-border-radius 0 0 @simple-tab-selected-background-color;
+  }
+  25% {
+    box-shadow: 0 @desktop-tab-selected-border-radius 0 0 @desktop-tab-selected-flash-background-color;
+  }
+  50% {
+    box-shadow: 0 @desktop-tab-selected-border-radius 0 0 @simple-tab-selected-background-color;
+  }
+  75% {
+    box-shadow: 0 @desktop-tab-selected-border-radius 0 0 @desktop-tab-selected-flash-background-color;
+  }
+  100% {
+    box-shadow: 0 @desktop-tab-selected-border-radius 0 0 @simple-tab-selected-background-color;
+  }
+}
+
+@-webkit-keyframes flash-desktop-tab-selected-edge {
+  .keyframes-flash-desktop-tab-selected-edge();
+}
+
+@keyframes flash-desktop-tab-selected-edge {
+  .keyframes-flash-desktop-tab-selected-edge();
 }

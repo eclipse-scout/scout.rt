@@ -58,6 +58,7 @@ export default class SimpleTabArea extends Widget {
       .forEach(tab => {
         this._renderTab(tab);
       });
+    widgets.updateFirstLastMarker(this.tabs);
   }
 
   _renderTab(tab) {
@@ -65,28 +66,8 @@ export default class SimpleTabArea extends Widget {
   }
 
   _renderVisible() {
-    if (this.visible && this.tabs.length > 0) {
-      this.attach();
-    } else {
-      this.detach();
-    }
+    this.$container.setVisible(this.visible && this.tabs.length > 0);
     this.invalidateLayoutTree();
-  }
-
-  _attach() {
-    this.$parent.prepend(this.$container);
-    // If the parent was resized while this view was detached, the view has a wrong size.
-    this.invalidateLayoutTree(false);
-    super._attach();
-  }
-
-  /**
-   * @override Widget.js
-   */
-  _detach() {
-    this.$container.detach();
-    super._detach();
-    this.invalidateLayoutTree(false);
   }
 
   _onTabClick(event) {

@@ -32,7 +32,7 @@ export default class DesktopHeader extends Widget {
   }
 
   _createTabArea() {
-    return scout.create('SimpleTabArea', $.extend({
+    return scout.create('DesktopTabArea', $.extend({
       parent: this
     }, this.tabArea));
   }
@@ -41,17 +41,21 @@ export default class DesktopHeader extends Widget {
     this.$container = this.$parent.appendDiv('desktop-header');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new DesktopHeaderLayout(this));
-    this._renderViewButtonBoxVisible();
-    this._renderViewTabs();
-    this._renderToolBoxVisible();
-    this._renderLogoUrl();
-    this._renderInBackground();
     this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
     this.desktop.on('animationEnd', this._desktopAnimationEndHandler);
     if (this.desktop.bench) {
       this.outlineContent = this.desktop.bench.outlineContent;
     }
     this._attachOutlineContentMenuBarHandler();
+  }
+
+  _renderProperties() {
+    super._renderProperties();
+    this._renderViewButtonBoxVisible();
+    this._renderViewTabs();
+    this._renderToolBoxVisible();
+    this._renderLogoUrl();
+    this._renderInBackground();
   }
 
   _remove() {
@@ -143,16 +147,14 @@ export default class DesktopHeader extends Widget {
     this.viewButtonBox.on('propertyChange', this._viewButtonBoxPropertyChangeHandler);
     this.viewButtonBox.render();
     this.viewButtonBox.$container.prependTo(this.$container);
-    if (this.desktop.inBackground) {
-      this.viewButtonBox.sendToBack();
-    }
     this.updateViewButtonStyling();
   }
 
   _createViewButtonBox() {
     return scout.create('ViewButtonBox', {
       parent: this,
-      viewButtons: this.desktop.viewButtons
+      viewButtons: this.desktop.viewButtons,
+      selectedMenuButtonAlwaysVisible: true
     });
   }
 
@@ -171,22 +173,17 @@ export default class DesktopHeader extends Widget {
     } else {
       this._removeViewButtonBox();
     }
+    this.$container.toggleClass('has-view-button-box', this.viewButtonBoxVisible);
     this.invalidateLayoutTree();
   }
 
   sendToBack() {
-    if (this.viewButtonBox) {
-      this.viewButtonBox.sendToBack();
-    }
     if (this.rendered) {
       this._renderInBackground();
     }
   }
 
   bringToFront() {
-    if (this.viewButtonBox) {
-      this.viewButtonBox.bringToFront();
-    }
     if (this.rendered) {
       this._renderInBackground();
     }
@@ -218,7 +215,7 @@ export default class DesktopHeader extends Widget {
     // View buttons are visible in the header if the navigation is not visible
     // If there are no view buttons at all, don't show the box
     // With displayStyle is set to compact, the view buttons should never be visible in the header
-    this.setViewButtonBoxVisible(this.desktop.viewButtons.length > 0 && !this.desktop.navigationVisible && this.desktop.displayStyle !== Desktop.DisplayStyle.COMPACT);
+    this.setViewButtonBoxVisible(this.desktop.viewButtons.some(button => button.visible) && !this.desktop.navigationVisible && this.desktop.displayStyle !== Desktop.DisplayStyle.COMPACT);
   }
 
   _attachOutlineContentMenuBarHandler() {

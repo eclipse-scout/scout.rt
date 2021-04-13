@@ -31,12 +31,12 @@ export default class KeyStroke {
 
     // Hints to control rendering of the key(s).
     this.renderingHints = {
-      render: function() {
+      render: () => {
         if (this.field && this.field.rendered !== undefined) {
           return this.field.rendered; // only render key if associated field is visible.
         }
         return true; // by default, keystrokes are rendered
-      }.bind(this),
+      },
       gap: 4,
       offset: 4,
       hAlign: HAlign.LEFT,

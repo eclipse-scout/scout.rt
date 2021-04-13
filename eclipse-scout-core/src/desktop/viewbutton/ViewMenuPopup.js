@@ -8,120 +8,90 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, graphics, menuNavigationKeyStrokes, Point, PopupWithHead, ViewMenuPopupLayout} from '../../index';
+import {StringFieldCtrlEnterKeyStroke, StringFieldEnterKeyStroke, Tile, ViewMenuPopupEnterKeyStroke, WidgetPopup} from '../../index';
 
 /**
  * Popup menu to switch between outlines.
  */
-export default class ViewMenuPopup extends PopupWithHead {
+export default class ViewMenuPopup extends WidgetPopup {
 
   constructor() {
     super();
-    this.$tab;
-    this.$headBlueprint;
-    this.viewMenus;
-    this.viewButtonBoxBounds;
-    this._addWidgetProperties('viewMenus');
-    this._viewMenuActionHandler = this._onViewMenuAction.bind(this);
+    this.cssClass = 'view-menu-popup';
+    this.defaultIconId = null;
+    this.viewMenus = [];
+    this.trimWidth = true;
   }
-
-  static MAX_MENU_WIDTH = 300;
 
   _init(options) {
-    options.focusableContainer = true;
     super._init(options);
-
-    this.$tab = options.$tab;
-    this.$headBlueprint = this.$tab;
-    this.viewButtonBoxBounds = options.naviBounds;
+    let tiles = this._createTiles();
+    let noIcons = tiles.every(tile => !tile.widgets[0].visible);
+    this.widget = scout.create('TileGrid', {
+      parent: this,
+      tiles: tiles,
+      cssClass: noIcons ? 'no-icons' : '',
+      selectable: true,
+      multiSelect: false,
+      gridColumnCount: tiles.length > 4 ? 3 : 2,
+      layoutConfig: {
+        columnWidth: 120,
+        rowHeight: 130,
+        vgap: 18,
+        hgap: 18
+      }
+    });
+    let tile = this.widget.tiles.find(tile => tile.viewMenu.selected);
+    if (tile) {
+      this.widget.selectTile(tile);
+    }
   }
 
-  _createLayout() {
-    return new ViewMenuPopupLayout(this);
+  _createTiles() {
+    return this.viewMenus.map(menu => ({
+      objectType: 'CompositeTile',
+      displayStyle: Tile.DisplayStyle.PLAIN,
+      cssClass: scout.nvl(menu.cssClass, '') + ' view-menu-tile ' + (menu.selected ? 'checked ' : '') + (!menu.iconId ? 'text-only' : ''),
+      modelClass: menu.modelClass,
+      classId: menu.classId,
+      viewMenu: menu,
+      enabled: menu.enabled,
+      gridDataHints: {
+        useUiHeight: true
+      },
+      widgets: [
+        {
+          objectType: 'Icon',
+          iconDesc: menu.iconId,
+          visible: !!menu.iconId
+        },
+        {
+          objectType: 'Label',
+          value: menu.text,
+          cssClass: 'label'
+        }
+      ]
+    }));
   }
 
-  /**
-   * @override Popup.js
-   */
   _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
-    menuNavigationKeyStrokes.registerKeyStrokes(this.keyStrokeContext, this, 'view-menu-item');
+    this.keyStrokeContext.registerKeyStroke([
+      new ViewMenuPopupEnterKeyStroke(this)
+    ]);
   }
 
-  _render() {
-    super._render();
-
-    this.viewMenus.forEach(function(viewMenu) {
-      viewMenu.renderAsMenuItem(this.$body);
-      viewMenu.on('action', this._viewMenuActionHandler);
-    }, this);
-
-    // Add last marker to last visible item
-    let lastVisibleMenu = arrays.findFromReverse(this.viewMenus, this.viewMenus.length - 1, viewMenu => {
-      return viewMenu.visible;
-    }, this);
-    lastVisibleMenu.$container.addClass('last');
-
-    this._installScrollbars({
-      axis: 'y'
-    });
+  _renderWidget() {
+    super._renderWidget();
+    this.widget.$container.on('click', '.tile', event => this.activateTile(scout.widget(event.target)));
   }
 
-  _remove() {
-    this.viewMenus.forEach(function(viewMenu) {
-      viewMenu.off('action', this._viewMenuActionHandler);
-    }, this);
-
-    super._remove();
-  }
-
-  /**
-   * @override
-   */
-  get$Scrollable() {
-    return this.$body;
-  }
-
-  /**
-   * @override PopupWithHead.js
-   */
-  _renderHead() {
-    super._renderHead();
-
-    this._copyCssClassToHead('view-menu');
-    this._copyCssClassToHead('unfocusable');
-    this.$head.removeClass('popup-head');
-    this.$head.addClass('view-menu-popup-head');
-  }
-
-  /**
-   * @override PopupWithHead.js
-   */
-  _modifyBody() {
-    this.$body.removeClass('popup-body');
-    this.$body.addClass('view-menu-popup-body');
-  }
-
-  position() {
-    let pos = this.$tab.offset(),
-      headSize = graphics.size(this.$tab, true),
-      bodyTop = headSize.height;
-
-    graphics.setBounds(this.$head, pos.left, pos.top, headSize.width, headSize.height);
-
-    this.$deco.cssLeft(pos.left);
-    this.$deco.cssTop(0);
-    this.$deco.cssWidth(headSize.width - 1);
-
-    this.$head.cssTop(-bodyTop);
-    this.$body.cssTop(0);
-    this.$container.cssMarginTop(headSize.height);
-
-    this.setLocation(new Point(0, 0));
-  }
-
-  _onViewMenuAction(event) {
+  activateTile(tile) {
+    if (!tile || !tile.viewMenu.enabledComputed) {
+      return;
+    }
+    tile.viewMenu.doAction();
     this.close();
   }
 }

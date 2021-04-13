@@ -12,34 +12,32 @@
   position: absolute;
   top: 0;
   white-space: nowrap;
+  display: flex;
 
   & > .simple-overflow-tab-item {
     border-right: 1px solid @border-color;
-    display: inline-block;
-    width: 30px;
-    /* 1px smaller than the header because of the bottom border */
-    height: calc(~'100% - 1px');
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 30px;
     background-color: @simple-tab-background-color;
-    padding-top: @simple-overflow-tab-item-padding-top;
     text-align: center;
     cursor: pointer;
-    vertical-align: top;
 
     &::after {
       #scout.font-icon();
-      color: @icon-color;
       content: @icon-angle-down;
-    }
-
-    &.animate-modality-highlight {
-      #scout.animation-flash-gray();
     }
   }
 
   &.spread-even {
     &:not(.overflown) {
-      & > .simple-tab.last {
-        border-right-width: 0;
+      & > .simple-tab {
+        flex-grow: 1;
+
+        &.last {
+          border-right-width: 0;
+        }
       }
     }
 

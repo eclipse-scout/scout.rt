@@ -22,6 +22,11 @@
   &.has-navigation-handle > .splitter {
     height: calc(~'100% - 50px');
   }
+
+  &.in-background {
+    // Necessary for the rounded top left border of the bench
+    background-color: @desktop-navigation-body-in-background-background-color;
+  }
 }
 
 /* "Open URI" related rules */

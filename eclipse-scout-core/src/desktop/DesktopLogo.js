@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../index';
+import {HtmlComponent, Widget} from '../index';
 
 export default class DesktopLogo extends Widget {
 
@@ -16,6 +16,7 @@ export default class DesktopLogo extends Widget {
     super();
     this.desktop = null;
     this.clickable = false;
+    this.image = null;
     this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
     this._clickHandler = this._onClick.bind(this);
   }
@@ -25,26 +26,27 @@ export default class DesktopLogo extends Widget {
     this.desktop = this.session.desktop;
     this.clickable = this.desktop.logoActionEnabled;
     this.url = model.url;
+    this.image = scout.create('Image', {
+      parent: this,
+      imageUrl: this.url
+    });
   }
 
   _render() {
     this.$container = this.$parent.appendDiv('desktop-logo');
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    this.image.render();
     this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
   }
 
   _renderProperties() {
     super._renderProperties();
-    this._renderUrl();
     this._renderClickable();
   }
 
   _remove() {
     this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
     super._remove();
-  }
-
-  _renderUrl() {
-    this.$container.css('backgroundImage', 'url(' + this.url + ')');
   }
 
   _renderClickable() {
@@ -58,6 +60,7 @@ export default class DesktopLogo extends Widget {
 
   setUrl(url) {
     this.setProperty('url', url);
+    this.image.setImageUrl(url);
   }
 
   setClickable(clickable) {

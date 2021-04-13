@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CollapseHandle, Desktop, DesktopNavigationLayout, HtmlComponent, scout, SingleLayout, styles, Tree, Widget} from '../../index';
+import {CollapseHandle, DesktopNavigationLayout, HtmlComponent, scout, SingleLayout, styles, Tree, Widget} from '../../index';
 
 export default class DesktopNavigation extends Widget {
 
@@ -37,11 +37,9 @@ export default class DesktopNavigation extends Widget {
     this._setOutline(model.outline);
     this.viewButtonBox = scout.create('ViewButtonBox', {
       parent: this,
-      viewButtons: this.desktop.viewButtons,
-      singleViewButton: this.singleViewButton
+      viewButtons: this.desktop.viewButtons
     });
     this.viewButtonBox.on('propertyChange', this._viewButtonBoxPropertyChangeHandler);
-    this._updateSingleViewButton();
   }
 
   _render() {
@@ -66,14 +64,20 @@ export default class DesktopNavigation extends Widget {
   _renderProperties() {
     super._renderProperties();
     this._renderViewButtonBox();
+    this._renderViewButtonBoxVisible();
     this._renderToolBoxVisible();
     this._renderOutline();
     this._renderHandleVisible();
-    this._renderSingleViewButton();
+    this._renderInBackground();
+  }
+
+  _renderInBackground() {
+    this.$container.toggleClass('in-background', this.desktop.inBackground);
   }
 
   _renderViewButtonBox() {
     this.viewButtonBox.render();
+    this.viewButtonBox.$container.insertBefore(this.$body);
   }
 
   _removeOutline() {
@@ -111,7 +115,6 @@ export default class DesktopNavigation extends Widget {
     }
     this.outline = newOutline;
     if (this.outline) {
-      this.outline.setIconVisible(this.singleViewButton);
       this.outline.setParent(this);
       this.outline.setBreadcrumbTogglingThreshold(DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
       // if both have breadcrumb-toggling enabled: make sure new outline uses same display style as old
@@ -125,53 +128,25 @@ export default class DesktopNavigation extends Widget {
     }
   }
 
-  _updateSingleViewButton() {
-    if (this.desktop.displayStyle === Desktop.DisplayStyle.COMPACT) {
-      // There is not enough space to move the title up due to the toolbar -> Never switch to that mode in compact mode
-      this.setSingleViewButton(false);
-      return;
-    }
-
-    let menuCount = this.viewButtonBox.menuButtons.length,
-      tabCount = this.viewButtonBox.tabButtons.length;
-    if ((menuCount + tabCount) > 1) {
-      if (menuCount > 0) {
-        tabCount++;
-      }
-      this.setSingleViewButton(tabCount < 2);
-    } else {
-      this.setSingleViewButton(false);
-    }
-  }
-
-  setSingleViewButton(singleViewButton) {
-    this.setProperty('singleViewButton', singleViewButton);
-    if (this.outline) {
-      this.outline.setIconVisible(this.singleViewButton);
-    }
-    this.viewButtonBox.setMenuTabVisible(!singleViewButton);
-  }
-
-  _renderSingleViewButton() {
-    this.$container.toggleClass('single-view-button', this.singleViewButton);
-    this.invalidateLayoutTree();
+  _renderViewButtonBoxVisible() {
+    this.$container.toggleClass('view-button-box-invisible', !this.viewButtonBox.visible);
   }
 
   sendToBack() {
-    if (this.viewButtonBox) {
-      this.viewButtonBox.sendToBack();
-    }
     if (this.outline) {
       this.outline.sendToBack();
+    }
+    if (this.rendered) {
+      this._renderInBackground();
     }
   }
 
   bringToFront() {
-    if (this.viewButtonBox) {
-      this.viewButtonBox.bringToFront();
-    }
     if (this.outline) {
       this.outline.bringToFront();
+    }
+    if (this.rendered) {
+      this._renderInBackground();
     }
   }
 
@@ -262,8 +237,10 @@ export default class DesktopNavigation extends Widget {
   }
 
   _onViewButtonBoxPropertyChange(event) {
-    if (event.propertyName === 'menuButtons' || event.propertyName === 'tabButtons') {
-      this._updateSingleViewButton();
+    if (event.propertyName === 'visible') {
+      if (this.rendered) {
+        this._renderViewButtonBoxVisible();
+      }
     }
   }
 

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, OutlineViewButton, scout, ViewButtonBoxLayout, Widget} from '../../index';
+import {Desktop, HtmlComponent, OutlineViewButton, scout, Widget, widgets} from '../../index';
 
 export default class ViewButtonBox extends Widget {
 
@@ -20,7 +20,8 @@ export default class ViewButtonBox extends Widget {
     this.tabButtons = [];
     this._desktopOutlineChangeHandler = this._onDesktopOutlineChange.bind(this);
     this._viewButtonPropertyChangeHandler = this._onViewButtonPropertyChange.bind(this);
-    this._addWidgetProperties(['tabButtons']);
+    this.selectedMenuButtonAlwaysVisible = false;
+    this._addWidgetProperties(['viewButtons']);
   }
 
   _init(model) {
@@ -36,7 +37,6 @@ export default class ViewButtonBox extends Widget {
   _render() {
     this.$container = this.$parent.appendDiv('view-button-box');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
-    this.htmlComp.setLayout(new ViewButtonBoxLayout(this));
 
     this.viewMenuTab.render();
     this._onDesktopOutlineChange();
@@ -49,16 +49,21 @@ export default class ViewButtonBox extends Widget {
 
   _remove() {
     this.desktop.off('outlineChange', this._desktopOutlineChangeHandler);
-    this.viewButtons.forEach(function(viewButton) {
-      viewButton.off('selected', this._viewButtonPropertyChangeHandler);
-    }, this);
+    this.viewButtons.forEach(viewButton => viewButton.off('selected', this._viewButtonPropertyChangeHandler));
 
     super._remove();
   }
 
-  setMenuTabVisible(menuTabVisible) {
-    this.viewMenuTab.setViewTabVisible(menuTabVisible);
-    this.invalidateLayoutTree();
+  setSelectedMenuButtonVisible(selectedMenuButtonVisible) {
+    this.viewMenuTab.setSelectedButtonVisible(selectedMenuButtonVisible);
+  }
+
+  setSelectedMenuButtonAlwaysVisible(selectedMenuButtonAlwaysVisible) {
+    this.setProperty('selectedMenuButtonAlwaysVisible', selectedMenuButtonAlwaysVisible);
+  }
+
+  _setSelectedMenuButtonAlwaysVisible(selectedMenuButtonAlwaysVisible) {
+    this._updateSelectedMenuButtonVisibility();
   }
 
   setViewButtons(viewButtons) {
@@ -67,44 +72,33 @@ export default class ViewButtonBox extends Widget {
 
   _setViewButtons(viewButtons) {
     if (this.viewButtons) {
-      this.viewButtons.forEach(function(viewButton) {
-        viewButton.off('propertyChange', this._viewButtonPropertyChangeHandler);
-      }, this);
+      this.viewButtons.forEach(viewButton => viewButton.off('propertyChange', this._viewButtonPropertyChangeHandler));
     }
     this._setProperty('viewButtons', viewButtons);
-    this.viewButtons.forEach(function(viewButton) {
-      viewButton.on('propertyChange', this._viewButtonPropertyChangeHandler);
-    }, this);
+    this.viewButtons.forEach(viewButton => viewButton.on('propertyChange', this._viewButtonPropertyChangeHandler));
     this._updateViewButtons();
   }
 
-  setTabButtons(tabButtons) {
-    this.setProperty('tabButtons', tabButtons);
+  _setTabButtons(tabButtons) {
+    this._setProperty('tabButtons', tabButtons);
+  }
+
+  _removeTabButtons() {
+    this.tabButtons.forEach(button => button.remove());
   }
 
   _renderTabButtons() {
-    this.tabButtons.forEach(function(viewTab, i) {
-      viewTab.renderAsTab();
-      viewTab.tab();
-      if (i === this.tabButtons.length - 1) {
-        viewTab.last();
-      }
-    }, this);
+    this.tabButtons.forEach((viewTab, i) => viewTab.renderAsTab(this.$container));
+    widgets.updateFirstLastMarker(this.tabButtons);
   }
 
   _updateViewButtons() {
-    let viewButtons = this.viewButtons.filter(b => {
-        return b.visible;
-      }),
-      menuButtons = viewButtons.filter(b => {
-        return b.displayStyle === 'MENU';
-      }),
-      tabButtons = null;
+    let viewButtons = this.viewButtons.filter(b => b.visible);
+    let menuButtons = viewButtons.filter(b => b.displayStyle === 'MENU');
+    let tabButtons = null;
     // render as tab if length is < 1
     if (menuButtons.length > 1) {
-      tabButtons = viewButtons.filter(b => {
-        return b.displayStyle === 'TAB';
-      });
+      tabButtons = viewButtons.filter(b => b.displayStyle === 'TAB');
     } else {
       // all visible view buttons are rendered as tab
       tabButtons = viewButtons;
@@ -112,18 +106,19 @@ export default class ViewButtonBox extends Widget {
     }
 
     this._setMenuButtons(menuButtons);
-
-    this.setTabButtons(tabButtons);
+    if (this.rendered) {
+      this._removeTabButtons();
+    }
+    this._setTabButtons(tabButtons);
+    if (this.rendered) {
+      this._renderTabButtons();
+    }
     this._updateVisibility();
+    this._updateSelectedMenuButtonVisibility();
   }
 
   _updateVisibility(menuButtons) {
     this.setVisible((this.tabButtons.length + this.menuButtons.length) > 1);
-  }
-
-  setMenuButtons(menuButtons) {
-    this.setProperty('menuButtons', menuButtons);
-    this._updateVisibility();
   }
 
   _setMenuButtons(menuButtons) {
@@ -131,12 +126,8 @@ export default class ViewButtonBox extends Widget {
     this.viewMenuTab.setViewButtons(this.menuButtons);
   }
 
-  sendToBack() {
-    this.viewMenuTab.sendToBack();
-  }
-
-  bringToFront() {
-    this.viewMenuTab.bringToFront();
+  _updateSelectedMenuButtonVisibility() {
+    this.setSelectedMenuButtonVisible(this.selectedMenuButtonAlwaysVisible || (this.tabButtons.length >= 1 && this.menuButtons.length >= 1));
   }
 
   /**
@@ -153,12 +144,12 @@ export default class ViewButtonBox extends Widget {
   }
 
   _onViewButtonSelected(event) {
-    // Deselect other togglable view buttons
+    // Deselect other toggleable view buttons
     this.viewButtons.forEach(viewButton => {
       if (viewButton !== event.source && viewButton.isToggleAction()) {
         viewButton.setSelected(false);
       }
-    }, this);
+    });
 
     // Inform viewMenu tab about new selection
     this.viewMenuTab.onViewButtonSelected();

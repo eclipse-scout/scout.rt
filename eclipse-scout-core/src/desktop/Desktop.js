@@ -436,6 +436,7 @@ export default class Desktop extends Widget {
     this.navigation = this._createNavigation();
     this.navigation.render();
     this.navigation.$container.prependTo(this.$container);
+    this.$container.removeClass('navigation-invisible');
     this.invalidateLayoutTree();
   }
 
@@ -451,6 +452,7 @@ export default class Desktop extends Widget {
   }
 
   _removeNavigation() {
+    this.$container.addClass('navigation-invisible');
     if (!this.navigation) {
       return;
     }
@@ -563,6 +565,7 @@ export default class Desktop extends Widget {
   }
 
   _renderInBackground() {
+    this.$container.toggleClass('in-background', this.inBackground);
     if (this.bench) {
       this.bench.$container.toggleClass('drop-shadow', this.inBackground);
     }
@@ -1106,7 +1109,7 @@ export default class Desktop extends Widget {
           // Workaround for javascript not being able to prevent hover event propagation:
           // In case of tabs, the hover selector is defined on the element that is the direct parent
           // of the glass pane. Under these circumstances, the hover style isn't be prevented by the glass pane.
-          tab.$container.addClass('no-hover');
+          tab.$container.addClass('glasspane-parent');
         }
       });
     }

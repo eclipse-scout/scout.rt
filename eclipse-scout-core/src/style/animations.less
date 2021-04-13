@@ -620,38 +620,22 @@
   @keyframes shake {
     .keyframes-shake();
   }
+}
 
-  /*** Flash-Gray ***/
+/*** NOP (no operation, may be used to temporarily set css properties while the animation runs, e.g. using a transition) ***/
 
-  .animation-flash-gray(@keyframes-name: flash-gray) {
-    #scout.animation-name(@keyframes-name);
-    #scout.animation-duration(0.4s);
-    #scout.animation-iteration-count(1);
-    #scout.animation-timing-function(linear);
+.keyframes-nop () {
+  0% {
+    opacity: 1;
   }
+  100% {
+    opacity: 1;
+  }
+}
 
-  .keyframes-flash-gray() {
-    0% {
-      background-color: @simple-tab-background-color;
-    }
-    25% {
-      background-color: @simple-tab-flash-background-color;
-    }
-    50% {
-      background-color: @simple-tab-background-color;
-    }
-    75% {
-      background-color: @simple-tab-flash-background-color;
-    }
-    100% {
-      background-color: @simple-tab-background-color;
-    }
-  }
-
-  @-webkit-keyframes flash-gray {
-    .keyframes-flash-gray();
-  }
-  @keyframes flash-gray {
-    .keyframes-flash-gray();
-  }
+@-webkit-keyframes nop {
+  .keyframes-nop();
+}
+@keyframes nop {
+  .keyframes-nop();
 }

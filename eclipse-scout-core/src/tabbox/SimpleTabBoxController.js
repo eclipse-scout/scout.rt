@@ -37,7 +37,10 @@ export default class SimpleTabBoxController {
   install(tabBox, tabArea) {
     this.uninstall();
     this.tabBox = scout.assertParameter('tabBox', tabBox);
-    this.tabArea = scout.assertParameter('tabArea', tabArea || this.tabBox.tabArea);
+    this.tabArea = scout.nvl(tabArea, this.tabBox.tabArea);
+    if (!this.tabArea) {
+      this.tabArea = this.createTabArea();
+    }
     this._installListeners();
   }
 
@@ -63,6 +66,12 @@ export default class SimpleTabBoxController {
     if (this.tabArea) {
       this.tabArea.off('tabSelect', this._viewTabSelectHandler);
     }
+  }
+
+  createTabArea() {
+    return scout.create('SimpleTabArea', {
+      parent: this.tabBox
+    });
   }
 
   _onViewAdd(event) {

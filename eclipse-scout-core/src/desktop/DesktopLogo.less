@@ -10,16 +10,20 @@
  */
 .desktop-logo {
   position: absolute;
-  right: 0;
   top: 0;
-  margin-top: 8px;
-  margin-right: @bench-padding-x;
-  width: 33px;
-  height: 33px;
-  background-size: contain;
-  background-repeat: no-repeat;
+  right: 0;
+  margin: 16px;
+  background-color: @palette-white;
 
   &.clickable {
     cursor: pointer;
+  }
+
+  & > .image {
+    height: @desktop-logo-height;
+    // If logo is larger than @desktop-logo-width, the items on the left will be moved correctly, but only after logo is loaded, so the shift may be visible to the user.
+    // In order to have a proper layout from the beginning, set the @desktop-logo-width to the actual logo with
+    min-width: @desktop-logo-min-width;
+    border: 1px solid @palette-white;
   }
 }

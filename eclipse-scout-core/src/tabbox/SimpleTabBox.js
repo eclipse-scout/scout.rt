@@ -27,18 +27,13 @@ export default class SimpleTabBox extends Widget {
     super._init(model);
     this.cssClass = model.cssClass;
 
-    if (!this.tabArea) {
-      // default tab area
-      this.tabArea = scout.create('SimpleTabArea', {
-        parent: this
-      });
-    }
     if (!this.controller) {
       // default controller
       this.controller = scout.create('SimpleTabBoxController');
     }
     // link
     this.controller.install(this, this.tabArea);
+    this.tabArea = this.controller.tabArea;
 
     this._viewDestroyedHandler = this._onViewDestroyed.bind(this);
   }

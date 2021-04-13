@@ -26,7 +26,7 @@ export default class DesktopToolBox extends MenuBox {
    */
   _initMenu(menu) {
     super._initMenu(menu);
-    menu.popupHorizontalAlignment = Popup.Alignment.RIGHTEDGE;
+    menu.popupHorizontalAlignment = Popup.Alignment.CENTER;
   }
 
   /**

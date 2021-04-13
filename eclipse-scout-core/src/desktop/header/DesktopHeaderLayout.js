@@ -40,32 +40,32 @@ export default class DesktopHeaderLayout extends AbstractLayout {
     }
 
     if (viewButtonBox) {
-      viewButtonBoxPrefSize = viewButtonBox.htmlComp.prefSize();
+      viewButtonBoxPrefSize = viewButtonBox.htmlComp.prefSize(true);
       viewButtonBoxWidth = viewButtonBoxPrefSize.width;
       viewButtonBox.htmlComp.setSize(viewButtonBoxPrefSize.subtract(viewButtonBox.htmlComp.margins()));
     }
     tabArea.htmlComp.$comp.cssLeft(viewButtonBoxWidth);
 
     if (toolBox) {
-      toolBoxPrefSize = toolBox.htmlComp.prefSize();
+      toolBoxPrefSize = toolBox.htmlComp.prefSize(true);
       toolBoxWidth = toolBoxPrefSize.width;
       setToolBoxSize();
       setToolBoxLocation();
     }
 
     tabsWidth = calcTabsWidth();
-    smallTabsPrefSize = tabArea.htmlComp.layout.smallPrefSize({widthHint: tabsWidth});
-    tabsPrefSize = tabArea.htmlComp.prefSize({widthHint: tabsWidth});
+    smallTabsPrefSize = getTabsSmallPrefSize();
+    tabsPrefSize = tabArea.htmlComp.prefSize({widthHint: tabsWidth, includeMargin: true});
     if (tabsWidth >= smallTabsPrefSize.width) {
       // All tabs fit when they have small size -> use available size but max the pref size -> prefSize = size of maximum tabs if tabs use their large (max) size
       tabsWidth = Math.min(tabsPrefSize.width, tabsWidth);
-      tabArea.htmlComp.setSize(new Dimension(tabsWidth, tabsPrefSize.height));
+      setTabsSize();
       return;
     }
 
     // 1st try to minimize padding around tool-bar items -> compact mode
     if (toolBox) {
-      toolBoxPrefSize = toolBox.htmlComp.layout.compactPrefSize();
+      toolBoxPrefSize = getToolBoxCompactPrefSize();
       toolBoxWidth = toolBoxPrefSize.width;
       setToolBoxSize();
       setToolBoxLocation();
@@ -73,14 +73,13 @@ export default class DesktopHeaderLayout extends AbstractLayout {
 
     tabsWidth = calcTabsWidth();
     if (tabsWidth >= smallTabsPrefSize.width) {
-      tabArea.htmlComp.setSize(smallTabsPrefSize);
       setTabsSize();
       return;
     }
 
     // 2nd remove text from tool-bar items, only show icon
     if (toolBox) {
-      toolBoxPrefSize = toolBox.htmlComp.layout.shrinkPrefSize();
+      toolBoxPrefSize = getToolBoxShrinkPrefSize();
       toolBoxWidth = toolBoxPrefSize.width;
       setToolBoxSize();
       setToolBoxLocation();
@@ -90,18 +89,15 @@ export default class DesktopHeaderLayout extends AbstractLayout {
     if (tabArea.displayStyle !== SimpleTabArea.DisplayStyle.SPREAD_EVEN) {
       tabsWidth = Math.min(smallTabsPrefSize.width, tabsWidth);
     }
-    // Ensure minimum with for the the overflow menu - expect if there are no tabs at all (in that case ensure min width of 0)
-    tabsWidth = Math.max(tabsWidth, (tabArea.tabs.length ? SimpleTabAreaLayout.OVERFLOW_MENU_WIDTH : 0));
+    // Ensure minimum width for the the overflow menu - expect if there are no tabs at all (in that case ensure min width of 0)
+    let overflowTabItemWidth = tabArea.htmlComp.layout.overflowTabItemWidth;
+    tabsWidth = Math.max(tabsWidth, (tabArea.tabs.length ? overflowTabItemWidth : 0));
     setTabsSize();
 
     // 3rd if only the overflow menu is shown make toolBox smaller so that ellipsis may be displayed
-    if (toolBox && tabsWidth <= SimpleTabAreaLayout.OVERFLOW_MENU_WIDTH) {
+    if (toolBox && tabsWidth <= overflowTabItemWidth) {
       // layout toolBox, now an ellipsis menu may be shown
       toolBoxWidth = containerSize.width - tabsWidth - logoWidth - viewButtonBoxWidth;
-      setToolBoxSize();
-
-      // update size of the toolBox again with the actual width to make it correctly right aligned
-      toolBoxWidth = toolBox.htmlComp.layout.actualPrefSize().width;
       setToolBoxSize();
       setToolBoxLocation();
     }
@@ -111,11 +107,27 @@ export default class DesktopHeaderLayout extends AbstractLayout {
     }
 
     function setTabsSize() {
-      tabArea.htmlComp.setSize(new Dimension(tabsWidth, tabsPrefSize.height));
+      tabArea.htmlComp.setSize(new Dimension(tabsWidth, tabsPrefSize.height).subtract(tabArea.htmlComp.margins()));
+    }
+
+    function getTabsSmallPrefSize() {
+      return tabArea.htmlComp.layout.smallPrefSize({widthHint: tabsWidth}).add(tabArea.htmlComp.margins());
     }
 
     function setToolBoxSize() {
       toolBox.htmlComp.setSize(new Dimension(toolBoxWidth, toolBoxPrefSize.height).subtract(toolBox.htmlComp.margins()));
+    }
+
+    function getToolBoxCompactPrefSize() {
+      return toolBox.htmlComp.layout.compactPrefSize().add(toolBox.htmlComp.margins());
+    }
+
+    function getToolBoxShrinkPrefSize() {
+      return toolBox.htmlComp.layout.shrinkPrefSize().add(toolBox.htmlComp.margins());
+    }
+
+    function getToolBoxActualPrefSize() {
+      return toolBox.htmlComp.layout.actualPrefSize().add(toolBox.htmlComp.margins());
     }
 
     function setToolBoxLocation() {

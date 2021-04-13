@@ -360,7 +360,7 @@ export default class TableSpecHelper {
   }
 
   getDisplayingContextMenu(table) {
-    return $('body').find('.popup-body');
+    return $('body').find('.context-menu');
   }
 
   /**

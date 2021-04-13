@@ -12,23 +12,15 @@
   position: relative;
   display: inline-block;
   vertical-align: top;
-  /* 1px smaller than the header because of the bottom border (see .selected rule below) */
-  height: calc(~'100% - 1px');
   padding: 5px;
   background-color: @simple-tab-background-color;
-  color: @text-color;
   border-right: 1px solid @border-color;
+  cursor: pointer;
+  width: 120px;
+  min-width: 60px;
 
-  &:not(.no-hover) {
-    cursor: pointer;
-  }
-
-  &:not(.no-hover):hover > .title {
+  &:hover > .title {
     color: @hover-color;
-  }
-
-  &.small {
-    width: 130px;
   }
 
   &:active > .title {
@@ -36,23 +28,20 @@
   }
 
   &.disabled {
-    color: @disabled-color;
     cursor: default;
+
+    & > .title {
+      color: @disabled-color;
+    }
   }
 
   &.selected {
     cursor: default;
-    background-color: @simple-tab-active-background-color;
-    /* full size of header to draw over the border-bottom */
-    height: 100%;
+    background-color: @simple-tab-selected-background-color;
 
     & > .title {
-      color: @simple-tab-active-color;
+      color: @simple-tab-selected-color;
     }
-  }
-
-  &.animate-modality-highlight {
-    #scout.animation-flash-gray();
   }
 
   & > .title,
@@ -62,6 +51,7 @@
 
   & > .sub-title {
     padding-top: 2px;
+    color: @simple-tab-sub-title-color;
   }
 
   & > .icon {
@@ -106,8 +96,6 @@
   }
 }
 
-/* key boxes */
-
-.simple-tab .key-box {
+.simple-tab > .key-box {
   bottom: 4px;
 }

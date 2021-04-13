@@ -64,19 +64,19 @@
     top: -1px;
   }
 
+  & > .font-icon {
+    font-size: 18px;
+  }
+
+  & > .image-icon {
+    /* Prevent large image icons from overlapping the menu item */
+    max-height: @menu-item-max-image-icon-height;
+    /* Ensure the default image icon size is taken from the beginning, so that the text does not "jump" when */
+    /* the image loading is complete. (For larger icons, the width will be increased afterwards.) */
+    min-width: @menu-item-min-image-icon-width;
+  }
+
   & > .icon {
-
-    &.font-icon {
-      font-size: 18px;
-    }
-
-    &.image-icon {
-      /* Prevent large image icons from overlapping the menu item */
-      max-height: @menu-item-max-image-icon-height;
-      /* Ensure the default image icon size is taken from the beginning, so that the text does not "jump" when */
-      /* the image loading is complete. (For larger icons, the width will be increased afterwards.) */
-      min-width: @menu-item-min-image-icon-width;
-    }
 
     &.with-label {
       margin-right: 8px;

@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, PopupWithHeadLayout} from '../index';
+import {graphics, HtmlComponent, PopupLayout} from '../index';
 import $ from 'jquery';
 
-export default class ContextMenuPopupLayout extends PopupWithHeadLayout {
+export default class ContextMenuPopupLayout extends PopupLayout {
 
   constructor(popup) {
     super(popup);
@@ -23,6 +23,44 @@ export default class ContextMenuPopupLayout extends PopupWithHeadLayout {
     this._resetMaxWidthFor($menuItems);
     super.layout($container);
     this._setMaxWidthFor($menuItems);
+  }
+
+  _setSize(prefSize) {
+    super._setSize(prefSize);
+
+    if (this.popup.bodyAnimating) {
+      return;
+    }
+    let htmlPopup = this.popup.htmlComp;
+    let htmlBody = HtmlComponent.get(this.popup.$body);
+    let bodySize = prefSize.subtract(htmlPopup.insets());
+    htmlBody.setSize(bodySize.subtract(htmlBody.margins()));
+  }
+
+  preferredLayoutSize($container, options) {
+    let htmlComp = this.popup.htmlComp;
+    let htmlBody = HtmlComponent.get(this.popup.$body);
+    let prefSize;
+    if (this.popup.bodyAnimating) {
+      prefSize = graphics.size(this.popup.$body, options);
+    } else {
+      let popupStyleBackup = this.popup.$container.attr('style');
+      let $siblingBodies = this.popup.$body.siblings('.context-menu');
+      $siblingBodies.addClass('hidden');
+      this.popup.$container.css({
+        width: 'auto',
+        height: 'auto'
+      });
+
+      htmlBody = HtmlComponent.get(this.popup.$body);
+      prefSize = htmlBody.prefSize(options);
+
+      $siblingBodies.removeClass('hidden');
+      this.popup.$container.attr('style', popupStyleBackup);
+    }
+    return prefSize
+      .add(htmlComp.insets())
+      .add(htmlBody.margins());
   }
 
   _adjustTextAlignment($menuItems) {

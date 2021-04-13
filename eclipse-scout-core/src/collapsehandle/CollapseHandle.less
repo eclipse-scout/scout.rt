@@ -13,16 +13,7 @@
   display: table;
   z-index: 10;
   bottom: 0;
-  margin-bottom: 9px;
-  border-radius: @button-border-radius;
-
-  &.one-visible {
-    cursor: pointer;
-
-    &:active > .collapse-handle-body {
-      background-color: @collapse-handle-active-background-color;
-    }
-  }
+  margin-bottom: 10px;
 
   &.right-aligned {
     right: 0;
@@ -36,16 +27,17 @@
 .collapse-handle-body {
   position: relative;
   display: table-cell;
-  padding: 8px 6px;
+  padding: 7px 8px;
   background-color: @collapse-handle-background-color;
   color: @collapse-handle-color;
   border: 1px solid @collapse-handle-border-color;
-  border-radius: @button-border-radius;
+  border-radius: @collapse-handle-border-radius;
   cursor: pointer;
 
   &::before {
     #scout.font-icon();
     display: block;
+    font-size: 16px;
   }
 
   &.left {
@@ -71,8 +63,12 @@
     }
   }
 
-  .collapse-handle:active > & {
-    color: @collapse-handle-active-color;
+  &:hover {
+    background-color: @collapse-handle-hover-background-color;
+  }
+
+  &:active,
+  &.active {
     background-color: @collapse-handle-active-background-color;
   }
 }

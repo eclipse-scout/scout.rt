@@ -9,6 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .context-menu {
+  position: relative;
+  border: 1px solid @popup-border-color;
+  background-color: @popup-background-color;
+  #scout.drop-shadow-large();
 
   & > .menu-item {
     border-top: solid 1px @border-color;
@@ -61,13 +65,5 @@
       bottom: auto;
       top: 7px;
     }
-  }
-
-  .popup-head ~ &.bottom > .menu-item.selected.context-menu-item-first {
-    border-color: @item-selection-border-color;
-  }
-
-  .popup-head ~ &.top > .menu-item.selected.context-menu-item-last {
-    border-color: @item-selection-border-color;
   }
 }

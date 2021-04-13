@@ -12,7 +12,7 @@ import {MenuSpecHelper} from '../../src/testing/index';
 
 describe('MenuBarPopup', () => {
 
-  let helper, session, $sandbox, modelMenu1, modelMenu2, menu1, menu2;
+  let helper, session;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -34,20 +34,5 @@ describe('MenuBarPopup', () => {
     menu.doAction();
     expect(menu.popup).toBeDefined();
     expect(menu.popup.rendered).toBe(true);
-  });
-
-  it('rerenders the head on a menu property change', () => {
-    let childMenu = helper.createMenu({text: 'child menu'});
-    let menu = helper.createMenu({
-      text: 'the menu',
-      childActions: [childMenu]
-    });
-    menu.render();
-    menu.doAction();
-    expect(menu.popup.$head.children('.text').text()).toEqual('the menu');
-
-    menu.setText('new text');
-    session.layoutValidator.validate();
-    expect(menu.popup.$head.children('.text').text()).toEqual('new text');
   });
 });

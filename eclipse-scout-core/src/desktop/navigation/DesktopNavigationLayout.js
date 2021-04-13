@@ -18,68 +18,62 @@ export default class DesktopNavigationLayout extends AbstractLayout {
   }
 
   layout($container) {
-    let bodySize, viewButtonBoxSize, viewButtonBoxPrefSize,
-      htmlContainer = this.navigation.htmlComp,
-      containerSize = htmlContainer.size({
-        exact: true
-      }),
-      htmlBody = this.navigation.htmlCompBody,
-      toolBox = this.navigation.toolBox,
-      viewButtonBox = this.navigation.viewButtonBox,
-      viewButtonBoxHeight = 0,
-      viewButtonBoxWidth = 0;
+    let htmlContainer = this.navigation.htmlComp;
+    let containerSize = htmlContainer.size({exact: true})
+      .subtract(htmlContainer.insets());
 
-    containerSize = containerSize.subtract(htmlContainer.insets());
-
+    let toolBox = this.navigation.toolBox;
+    let viewButtonBoxHeight = 0;
+    let viewButtonBoxWidth = 0;
+    let viewButtonBox = this.navigation.viewButtonBox;
     if (viewButtonBox.visible) {
-      viewButtonBoxPrefSize = viewButtonBox.htmlComp.prefSize();
+      let viewButtonBoxPrefSize = viewButtonBox.htmlComp.prefSize(true);
       viewButtonBoxHeight = viewButtonBoxPrefSize.height;
       viewButtonBoxWidth = containerSize.width;
       if (toolBox) {
         viewButtonBoxWidth = viewButtonBoxPrefSize.width;
       }
 
-      viewButtonBoxSize = new Dimension(viewButtonBoxWidth, viewButtonBoxHeight)
+      let viewButtonBoxSize = new Dimension(viewButtonBoxWidth, viewButtonBoxHeight)
         .subtract(viewButtonBox.htmlComp.margins());
       viewButtonBox.htmlComp.setSize(viewButtonBoxSize);
     }
 
     if (toolBox) {
       toolBox.$container.cssLeft(viewButtonBoxWidth);
-      toolBox.htmlComp.setSize(new Dimension(containerSize.width - viewButtonBoxWidth, viewButtonBoxHeight));
+      let toolBoxSize = new Dimension(containerSize.width - viewButtonBoxWidth, viewButtonBoxHeight)
+        .subtract(toolBox.htmlComp.margins());
+      toolBox.htmlComp.setSize(toolBoxSize);
     }
 
-    bodySize = new Dimension(containerSize.width, containerSize.height)
+    let htmlBody = this.navigation.htmlCompBody;
+    let bodySize = new Dimension(containerSize.width, containerSize.height)
       .subtract(htmlBody.margins());
-    if (this.navigation.singleViewButton) {
-      htmlBody.$comp.cssTop(0);
-    } else {
-      htmlBody.$comp.cssTop(viewButtonBoxHeight);
-      bodySize.height -= viewButtonBoxHeight;
-    }
+    htmlBody.$comp.cssTop(viewButtonBoxHeight);
+    bodySize.height -= viewButtonBoxHeight;
     htmlBody.setSize(bodySize);
   }
 
-  preferredLayoutSize($container) {
-    let htmlContainer = this.navigation.htmlComp,
-      htmlBody = this.navigation.htmlCompBody,
-      toolBox = this.navigation.toolBox,
-      viewButtonBox = this.navigation.viewButtonBox;
-
-    let prefSize = htmlBody.prefSize();
+  preferredLayoutSize($container, options) {
+    let htmlBody = this.navigation.htmlCompBody;
+    let prefSize = htmlBody.prefSize(options)
+      .add(htmlBody.margins());
 
     let prefSizeBoxes = new Dimension(0, 0);
+    let viewButtonBox = this.navigation.viewButtonBox;
     if (viewButtonBox) {
-      let prefSizeViewButtonBox = viewButtonBox.htmlComp.prefSize();
+      let prefSizeViewButtonBox = viewButtonBox.htmlComp.prefSize(true);
       prefSizeBoxes.width += prefSizeViewButtonBox.width;
       prefSizeBoxes.height = Math.max(prefSizeBoxes.height, prefSizeViewButtonBox.height);
     }
+    let toolBox = this.navigation.toolBox;
     if (toolBox) {
-      let prefSizeToolBox = toolBox.htmlComp.prefSize();
+      let prefSizeToolBox = toolBox.htmlComp.prefSize(true);
       prefSizeBoxes.width += prefSizeToolBox.width;
       prefSizeBoxes.height = Math.max(prefSizeBoxes.height, prefSizeToolBox.height);
     }
 
+    let htmlContainer = this.navigation.htmlComp;
     prefSize.height += prefSizeBoxes.height;
     prefSize.width = Math.max(prefSize.width, prefSizeBoxes.width);
     prefSize = prefSize.add(htmlContainer.insets());

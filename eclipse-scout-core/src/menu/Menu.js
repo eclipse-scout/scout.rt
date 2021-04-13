@@ -480,7 +480,7 @@ export default class Menu extends Action {
     }
     this.popup = this._createPopup();
     this.popup.open();
-    this.popup.on('remove', event => {
+    this.popup.one('destroy', event => {
       this.popup = null;
     });
     // Reason for separating remove and close event:
@@ -501,7 +501,6 @@ export default class Menu extends Action {
       parent: this,
       menu: this,
       menuFilter: this.menuFilter,
-      ignoreEvent: event,
       horizontalAlignment: this.popupHorizontalAlignment,
       verticalAlignment: this.popupVerticalAlignment
     };

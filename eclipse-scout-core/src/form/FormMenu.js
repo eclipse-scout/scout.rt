@@ -129,9 +129,12 @@ export default class FormMenu extends Menu {
       });
     }
 
-    return scout.create('FormMenuPopup', {
+    return scout.create('WidgetPopup', {
       parent: this,
-      formMenu: this,
+      widget: this.form,
+      anchor: this,
+      closeOnAnchorMouseDown: false,
+      cssClass: 'form-menu-popup',
       horizontalAlignment: this.popupHorizontalAlignment,
       verticalAlignment: this.popupVerticalAlignment
     });
@@ -152,6 +155,9 @@ export default class FormMenu extends Menu {
     super._handleSelectedInEllipsis();
   }
 
+  /**
+   * @return {FormMenuActionKeyStroke}
+   */
   _createActionKeyStroke() {
     return new FormMenuActionKeyStroke(this);
   }

@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.ui.html.selenium.junit.AbstractSeleniumTest;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 public final class GoToUtil {
@@ -30,17 +31,10 @@ public final class GoToUtil {
   public static void goToOutline(AbstractSeleniumTest test, Class<? extends IOutlineViewButton> outlineViewButtonClass, Class<? extends IOutline> outlineClass) {
     test.waitUntilDataRequestPendingDone();
     test.waitUntilElementClickable(By.className("view-menu")).click();
-    SeleniumUtil.shortPause();
-    test.waitUntilDataRequestPendingDone();
+    WebElement popup = test.waitUntilElementClickable(By.className("view-menu-popup"));
 
-    // When popup is not open yet - click again on the outline-switcher tab
-    if (test.findElements(By.className("popup")).isEmpty()) {
-      test.waitUntilElementClickable(By.className("view-menu")).click();
-      SeleniumUtil.shortPause();
-      test.waitUntilDataRequestPendingDone();
-    }
-
-    test.waitUntilElementClickable(byModelClass(outlineViewButtonClass)).click();
+    test.waitUntilElementClickable(popup.findElement(byModelClass(outlineViewButtonClass))).click();
+    test.waitUntilElementStaleness(popup);
     SeleniumUtil.shortPause();
     test.waitUntilDataRequestPendingDone();
 
@@ -55,7 +49,8 @@ public final class GoToUtil {
   public static WebElement goToView(AbstractSeleniumTest test, int viewTabIndex) {
     test.waitUntilDataRequestPendingDone();
     WebElement viewTab = test.waitUntilElementClickable(By.cssSelector(String.format(".simple-tab:nth-child(%s)", viewTabIndex)));
-    test.clickAtOffset(viewTab, 15, 2); // cannot click in the middle of the view-tab because its sometimes overlaid with a dialog
+    // Selecting by mouse may not always work (e.g. if a dialog covers the tab) -> select by keyboard
+    test.switchTo().activeElement().sendKeys(Keys.chord(Keys.CONTROL, viewTabIndex + ""));
     test.waitUntilDataRequestPendingDone();
     test.assertCssClass(viewTab, "selected");
     return test.waitUntilView();

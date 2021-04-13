@@ -15,20 +15,29 @@
   left: 0;
   width: 10px;
   height: calc(~'100% - ' @desktop-bench-drop-shadow-top);
-  box-shadow: -10px 0 10px 0 rgba(0, 0, 0, 0.4);
-  clip-path: polygon(0 -100%, 0 200%, -100px 200%, -100px -100%);
+  box-shadow: -8px 0 10px 0 rgba(0, 0, 0, 0.1);
+  clip-path: polygon(-100% 0, 200% 0, 200% 200%, -100% 200%);
 }
 
 .desktop-bench {
   position: absolute;
   top: 0;
-  background-color: @background-color;
+  background-color: @desktop-bench-background-color;
+  border-left: @desktop-bench-border-left-width solid @border-color;
 
-  /* jquery sets overflow to hidden while animating which makes bench-drop-shadow invisible -> prevent it */
-  overflow: visible !important; /* NOSONAR */
+  .navigation-invisible > & {
+    border-left: 0;
+  }
 
-  &.drop-shadow::before {
+  &.drop-shadow {
+    border-left: 0;
+
     .desktop-bench-drop-shadow();
+
+    .desktop:not(.first-tab-selected):not(.navigation-invisible) > & {
+      border-top-left-radius: @desktop-bench-drop-shadow-border-top-left-radius;
+      overflow: hidden;
+    }
   }
 
   &.animate-remove {
@@ -36,11 +45,30 @@
     #scout.animation-duration(0.5s);
   }
 
+  & > .bench-column > .simple-tab-box > .simple-tab-area {
+    background-color: @desktop-bench-tab-area-background-color;
+
+    &::before {
+      // Hide line on the bottom because tab itself does not have a border
+      display: none;
+    }
+
+    & > .desktop-tab {
+      & > .sub-title {
+        color: @simple-tab-sub-title-color;
+      }
+
+      & > .status-container > .save-needer {
+        color: @desktop-tab-selected-save-needer-color;
+      }
+    }
+  }
+
   /* Make some space for the navigation handle (when the navigation is closed */
   /* Only do it if detail-table is at the bottom left corner */
 
   &.has-navigation-handle > .bench-column.first > .view-tab-box.last > .tab-content > .detail-table > .table-footer > .table-controls {
-    margin-left: 25px;
+    margin-left: @detail-table-footer-with-handle-margin-left;
 
     & > .table-control.selected {
       border-left-color: @border-color;

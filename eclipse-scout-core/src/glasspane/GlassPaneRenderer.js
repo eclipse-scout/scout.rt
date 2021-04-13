@@ -139,7 +139,7 @@ export default class GlassPaneRenderer {
     $glassPane.remove();
     arrays.$remove(this._$glassPanes, $glassPane);
 
-    $glassPaneTarget.removeClass('no-hover');
+    $glassPaneTarget.removeClass('glasspane-parent');
     this.session.focusManager.unregisterGlassPaneTarget($glassPaneTarget);
   }
 

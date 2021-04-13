@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, ViewButtonActionKeyStroke} from '../../index';
+import {Action, HtmlComponent, ViewButtonActionKeyStroke} from '../../index';
 
 export default class ViewButton extends Action {
 
@@ -26,56 +26,66 @@ export default class ViewButton extends Action {
      * @type {boolean}
      */
     this.selectedAsMenu = false;
-    this._renderedAsMenu = false;
+    this._desktopInBackgroundHandler = this._onDesktopInBackgroundChange.bind(this);
   }
 
-  renderAsMenuItem($parent) {
-    this._renderedAsMenu = true;
-    super.render($parent);
+  _init(model) {
+    super._init(model);
+    this.session.desktop.on('propertyChange:inBackground', this._desktopInBackgroundHandler);
+  }
+
+  _destroy() {
+    this.session.desktop.off('propertyChange:inBackground', this._desktopInBackgroundHandler);
+    super._destroy();
   }
 
   renderAsTab($parent) {
-    this._renderedAsMenu = false;
-    super.render($parent);
+    let $wrapper = $parent.appendDiv('view-tab-wrapper');
+    this.render($wrapper);
+    this.$container.addClass('view-tab view-button-tab');
   }
 
   _render() {
-    if (this._renderedAsMenu) {
-      this._renderAsMenuItem();
-    } else {
-      this._renderAsTab();
-    }
-  }
-
-  _renderAsMenuItem() {
-    this.$container = this.$parent.appendDiv('view-menu-item')
-      .on('click', this._onMouseEvent.bind(this));
-  }
-
-  _renderAsTab() {
-    this.$container = this.$parent.appendDiv('view-button-tab')
+    this.$container = this.$parent.appendDiv('view-button')
       .on('mousedown', this._onMouseEvent.bind(this));
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    this.$container.prependDiv('edge left');
+    this.$container.appendDiv('edge right');
+  }
+
+  _remove() {
+    let $wrapper = this.$container.parent();
+    if ($wrapper.hasClass('view-tab-wrapper')) {
+      $wrapper.remove();
+    }
+    super._remove();
+  }
+
+  _renderProperties() {
+    super._renderProperties();
+    this._renderInBackground();
+  }
+
+  _renderInBackground() {
+    if (!this.rendering) {
+      if (this.session.desktop.inBackground) {
+        this.$container.addClassForAnimation('animate-bring-to-back');
+      } else {
+        this.$container.addClassForAnimation('animate-bring-to-front');
+      }
+    }
+    this.$container.toggleClass('in-background', this.session.desktop.inBackground);
   }
 
   /**
-   * @override Action.js
+   * @override
    */
   _renderText() {
-    if (this._renderedAsMenu) {
-      super._renderText();
-    }
+    // No text
   }
 
   setDisplayStyle(displayStyle) {
     this.setProperty('displayStyle', displayStyle);
-  }
-
-  last() {
-    this.$container.addClass('last');
-  }
-
-  tab() {
-    this.$container.addClass('view-tab');
   }
 
   _onMouseEvent(event) {
@@ -91,5 +101,11 @@ export default class ViewButton extends Action {
 
   setSelectedAsMenu(selectedAsMenu) {
     this.selectedAsMenu = selectedAsMenu;
+  }
+
+  _onDesktopInBackgroundChange() {
+    if (this.rendered) {
+      this._renderInBackground();
+    }
   }
 }

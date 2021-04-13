@@ -19,7 +19,7 @@
   position: relative;
   border-bottom: 1px solid @outline-title-border-color;
   padding-bottom: @search-outline-panel-padding-bottom;
-  margin: 0 @outline-title-margin-right @outline-title-margin-bottom @outline-title-margin-left;
+  margin: 0 @outline-title-padding-right 0 @outline-title-padding-left;
 
   & ~ .tree {
     height: calc(~'100% - ' 70px);
@@ -27,14 +27,13 @@
 }
 
 .search-outline-field {
-  border: 1px solid @search-outline-field-border-color;
+  border: 1px solid @border-color;
   height: 35px;
   border-radius: 5px;
   width: 100%;
 
   &:focus {
-    border-color: @search-outline-field-focus-border-color;
-    #scout.glow(@search-outline-field-focus-glow-color);
+    #scout.focus-border();
   }
 
   &.has-text {
@@ -84,12 +83,12 @@
   }
 
   & > .search-outline-field {
-    margin-right: @outline-title-margin-right;
-    margin-left: @outline-title-margin-left;
-    width: calc(~'100% - ' @outline-title-margin-left ~'-' @outline-title-margin-right);
+    margin-right: @outline-title-padding-right;
+    margin-left: @outline-title-padding-left;
+    width: calc(~'100% - ' @outline-title-padding-left ~'-' @outline-title-padding-right);
 
     & ~ .clear-icon {
-      margin-right: @outline-title-margin-right;
+      margin-right: @outline-title-padding-right;
       padding-right: @text-field-padding-x;
     }
   }
