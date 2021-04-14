@@ -18,6 +18,8 @@ public interface IBrowserFieldUIFacade {
 
   void firePostMessageFromUI(String data, String origin);
 
+  void firePostMessageFromUI(Object data, String origin);
+
   BinaryResource requestBinaryResourceFromUI(String filename);
 
   void setLocationFromUI(String location);

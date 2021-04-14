@@ -40,6 +40,18 @@ export default class BrowserFieldAdapter extends ValueFieldAdapter {
     }
   }
 
+  _onModelPostMessage(event) {
+    this.widget.postMessage(event.message, event.targetOrigin);
+  }
+
+  onModelAction(event) {
+    if (event.type === 'postMessage') {
+      this._onModelPostMessage(event);
+    } else {
+      super.onModelAction(event);
+    }
+  }
+
   _orderPropertyNamesOnSync(newProperties) {
     // IE won't show scrollbars if the location is set before scrollBarEnabled is set to true.
     // Rendering the location again after setting the scrollBarEnabled property as done in IFrame.js doesn't seem to work.

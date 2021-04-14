@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.Browser
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldPostMessageChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.IBrowserFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
@@ -92,6 +94,15 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   }
 
   /**
+   * @return a list of origin URIs from which this field will receive messages posted via <i>postMessage</i>. If this is
+   *         {@code null} or empty, messages from all origins are accepted. The default is empty.
+   * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">window.postMessage (MDN)</a>
+   */
+  protected List<String> getConfiguredTrustedMessageOrigins() {
+    return Collections.emptyList();
+  }
+
+  /**
    * Configures the browser field general behavior. By default the content of the browser field is shown inline or in an
    * inline container (e.g. an &lt;iframe&gt; for the HTML5 UI layer), some very specific web pages (e.g. using
    * plug-ins, complex frames within the webpage) might not be displayed well or may even lead to a browser crash.
@@ -150,8 +161,11 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   }
 
   /**
-   * This callback is invoked when the application has received a post-message from the embedded browser (IFRAME) or
-   * external window.
+   * This callback is invoked when the field has received a message from the embedded page ({@code iframe}) or external
+   * window.
+   * <p>
+   * The {@code data} is always a {@link String}. To receive objects and arrays as {@link IDataObject} use
+   * {@link #execPostMessage(Object, String)} instead. This method will be removed in release 22.0.
    * <p>
    * The default does nothing.
    * <p>
@@ -172,6 +186,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
    * </pre>
    *
    * @param data
+   *          String representation of the message received from the {@code iframe}
    * @param origin
    *          The origin of the window that sent the message at the time postMessage was called
    * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">Window.postMessage()</a>
@@ -179,6 +194,39 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   @ConfigOperation
   @Order(260)
   protected void execPostMessage(String data, String origin) {
+  }
+
+  /**
+   * This callback is invoked when the field has received a message from the embedded page ({@code iframe}) or external
+   * window.
+   * <p>
+   * The {@code data} can either be a {@link String}, a {@link Number}, a {@link Boolean} or an {@link IDataObject}.
+   * <p>
+   * If {@link #getTrustedMessageOrigins()} is set, the UI should already have checked that the sender is one of the
+   * trusted origins. However, for security reasons, the {@code origin} should be checked again here.
+   * <p>
+   * The default does nothing.
+   * <p>
+   * Possible reasons why this method is not called:
+   * <ul>
+   * <li>The embedded page use the wrong target {@code window}.
+   * <li>The browser blocked the message for some unknown reason (check the F12 developer console).
+   * <li>The sandbox is enabled and does not allow sending messages.
+   * <li>The embedded page specified the wrong {@code targetOrigin} when calling <i>postMessage</i>.
+   * <li>The sender origin does not match the list {@link #getTrustedMessageOrigins()}.
+   * <li>The browser field is disabled.
+   * </ul>
+   *
+   * @param data
+   *          Message received from the {@code iframe}. Can be a {@link String}, a {@link Number}, a {@link Boolean} or
+   *          an {@link IDataObject}
+   * @param origin
+   *          The origin of the window that sent the message.
+   * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">window.postMessage (MDN)</a>
+   */
+  @ConfigOperation
+  @Order(261)
+  protected void execPostMessage(Object data, String origin) {
   }
 
   /**
@@ -202,6 +250,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
     setSandboxEnabled(getConfiguredSandboxEnabled());
     setSandboxPermissions(getConfiguredSandboxPermissions());
+    setTrustedMessageOrigins(getConfiguredTrustedMessageOrigins());
     setShowInExternalWindow(getConfiguredShowInExternalWindow());
     setExternalWindowButtonText(getConfiguredExternalWindowButtonText());
     setExternalWindowFieldText(getConfiguredExternalWindowFieldText());
@@ -347,6 +396,17 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     return (Set<BinaryResource>) propertySupport.getProperty(PROP_ATTACHMENTS);
   }
 
+  protected void firePostMessage(Object message, String targetOrigin) {
+    fireBrowserFieldEvent(new BrowserFieldEvent(this, BrowserFieldEvent.TYPE_POST_MESSAGE)
+        .withMessage(message)
+        .withTargetOrigin(targetOrigin));
+  }
+
+  @Override
+  public void postMessage(Object message, String targetOrigin) {
+    firePostMessage(message, targetOrigin);
+  }
+
   @Override
   public void setScrollBarEnabled(boolean scrollBarEnabled) {
     propertySupport.setProperty(PROP_SCROLL_BAR_ENABLED, scrollBarEnabled);
@@ -390,6 +450,16 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   @Override
   public void setSandboxPermissions(EnumSet<SandboxPermission> sandboxPermission) {
     propertySupport.setProperty(PROP_SANDBOX_PERMISSIONS, sandboxPermission);
+  }
+
+  @Override
+  public List<String> getTrustedMessageOrigins() {
+    return propertySupport.getPropertyList(PROP_TRUSTED_MESSAGE_ORIGINS);
+  }
+
+  @Override
+  public void setTrustedMessageOrigins(List<String> trustedMessageOrigins) {
+    propertySupport.setPropertyList(PROP_TRUSTED_MESSAGE_ORIGINS, trustedMessageOrigins);
   }
 
   @SuppressWarnings("unchecked")
@@ -464,6 +534,14 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     }
 
     @Override
+    public void firePostMessageFromUI(Object data, String origin) {
+      if (!isEnabledIncludingParents() || !isVisibleIncludingParents()) {
+        return;
+      }
+      interceptPostMessage(data, origin);
+    }
+
+    @Override
     public BinaryResource requestBinaryResourceFromUI(String filename) {
       return resolveBinaryResource(filename);
     }
@@ -475,6 +553,12 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   }
 
   protected final void interceptPostMessage(String data, String origin) {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    BrowserFieldPostMessageChain chain = new BrowserFieldPostMessageChain(extensions);
+    chain.execPostMessage(data, origin);
+  }
+
+  protected final void interceptPostMessage(Object data, String origin) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     BrowserFieldPostMessageChain chain = new BrowserFieldPostMessageChain(extensions);
     chain.execPostMessage(data, origin);
@@ -494,6 +578,11 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
 
     @Override
     public void execPostMessage(BrowserFieldPostMessageChain chain, String data, String origin) {
+      getOwner().execPostMessage(data, origin);
+    }
+
+    @Override
+    public void execPostMessage(BrowserFieldPostMessageChain chain, Object data, String origin) {
       getOwner().execPostMessage(data, origin);
     }
 

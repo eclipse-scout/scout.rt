@@ -44,6 +44,16 @@ public final class BrowserFieldChains {
       };
       callChain(methodInvocation, data, origin);
     }
+
+    public void execPostMessage(final Object data, final String origin) {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IBrowserFieldExtension<? extends AbstractBrowserField> next) {
+          next.execPostMessage(BrowserFieldPostMessageChain.this, data, origin);
+        }
+      };
+      callChain(methodInvocation, data, origin);
+    }
   }
 
   public static class BrowserFieldExternalWindowStateChangedChain extends AbstractBrowserFieldChain {

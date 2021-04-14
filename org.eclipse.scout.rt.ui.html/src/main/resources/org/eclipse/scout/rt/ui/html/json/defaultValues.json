@@ -354,7 +354,9 @@
       "autoCloseExternalWindow": false,
       "sandboxEnabled": true,
       "scrollBarEnabled": false,
-      "showInExternalWindow": false
+      "showInExternalWindow": false,
+      "trustedMessageOrigins": [],
+      "trackLocation": false
     },
     "BeanField": {
       "preventInitialFocus": true

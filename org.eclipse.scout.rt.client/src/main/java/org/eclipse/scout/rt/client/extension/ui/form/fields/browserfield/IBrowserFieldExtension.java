@@ -19,6 +19,8 @@ public interface IBrowserFieldExtension<OWNER extends AbstractBrowserField> exte
 
   void execPostMessage(BrowserFieldPostMessageChain chain, String data, String origin);
 
+  void execPostMessage(BrowserFieldPostMessageChain chain, Object data, String origin);
+
   void execExternalWindowStateChanged(BrowserFieldExternalWindowStateChangedChain chain, boolean state);
 
 }
