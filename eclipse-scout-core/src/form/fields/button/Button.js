@@ -393,6 +393,11 @@ export default class Button extends FormField {
       return; // More than one consecutive click --> nop
     }
 
+    // When the action is clicked the user wants to execute the action and not see the tooltip -> cancel the task
+    // If it is already displayed it will stay
+    tooltips.cancel(this.$buttonLabel);
+    tooltips.cancel(this.$fieldContainer);
+
     if (this.enabledComputed) {
       this.doAction();
     }

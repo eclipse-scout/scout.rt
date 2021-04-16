@@ -51,6 +51,9 @@ export default class Switch extends Widget {
     if (!event.defaultPrevented) {
       this.setActivated(!this.activated);
     }
+    // When the action is clicked the user wants to execute the action and not see the tooltip -> cancel the task
+    // If it is already displayed it will stay
+    tooltips.cancel(this.$container);
   }
 
   setLabel(label) {
