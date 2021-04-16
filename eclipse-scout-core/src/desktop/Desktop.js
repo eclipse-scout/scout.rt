@@ -765,7 +765,7 @@ export default class Desktop extends Widget {
   enlargeNavigation() {
     if (this.outline && this.navigationVisible && this.outlineDisplayStyle() === Tree.DisplayStyle.BREADCRUMB) {
       this.outline.setDisplayStyle(Tree.DisplayStyle.DEFAULT);
-      if (this.cacheSplitterPosition) {
+      if (this.cacheSplitterPosition && this.splitter) {
         this.validateLayoutTree();
         this._storeCachedSplitterPosition(this.splitter.position);
       }
