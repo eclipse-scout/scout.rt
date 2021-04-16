@@ -14,7 +14,7 @@ import $ from 'jquery';
 const DEFAULT_TOOLTIP_DELAY = 600; // ms
 
 // Quite long tooltip delay for cases where the normal delay would be annoying
-const LONG_TOOLTIP_DELAY = 2000; // ms
+const LONG_TOOLTIP_DELAY = 1000; // ms
 
 export function install($comp, options) {
   let support = $comp.data('tooltipSupport');
