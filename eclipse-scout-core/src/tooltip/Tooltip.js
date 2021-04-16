@@ -221,6 +221,11 @@ export default class Tooltip extends Widget {
     }
 
     if (!this.rendering) {
+      // New text might be shorter or longer -> recompute position.
+      // Resetting the current position first ensures that the position is computed the
+      // same as if the tooltip was opened initially with the new text, even when the tooltip
+      // is at the right side of the screen. Otherwise, text wrapping might occur.
+      this.$container.cssLeft('').cssTop('');
       this.position();
     }
   }
