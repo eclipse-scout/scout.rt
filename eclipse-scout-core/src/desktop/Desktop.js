@@ -765,6 +765,10 @@ export default class Desktop extends Widget {
   enlargeNavigation() {
     if (this.outline && this.navigationVisible && this.outlineDisplayStyle() === Tree.DisplayStyle.BREADCRUMB) {
       this.outline.setDisplayStyle(Tree.DisplayStyle.DEFAULT);
+      if (this.cacheSplitterPosition) {
+        this.validateLayoutTree();
+        this._storeCachedSplitterPosition(this.splitter.position);
+      }
     } else {
       this.setNavigationVisible(true);
       // Layout immediately to have view tabs positioned correctly before animation starts
@@ -1373,7 +1377,9 @@ export default class Desktop extends Widget {
           this.resizing = true;
           this.splitter.setPosition();
           // Store size
-          this._storeCachedSplitterPosition(this.splitter.position);
+          if (this.cacheSplitterPosition) {
+            this._storeCachedSplitterPosition(this.splitter.position);
+          }
           this.revalidateLayout();
           this.resizing = false;
         }.bind(this)
