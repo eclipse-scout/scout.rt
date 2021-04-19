@@ -37,9 +37,8 @@ export default class Icon extends Widget {
     this._setIconDesc(this.iconDesc);
   }
 
-  _renderProperties() {
-    super._renderProperties();
-    this._renderIconDesc();
+  _render() {
+    this._renderIconDesc(); // Must not be in _renderProperties because it creates $container -> properties like visible etc. need to be rendered afterwards
   }
 
   /**
@@ -64,7 +63,9 @@ export default class Icon extends Widget {
     } else {
       this._renderImageIcon();
     }
-
+    if (!this.rendering) {
+      this._renderProperties();
+    }
     this.invalidateLayoutTree();
   }
 
