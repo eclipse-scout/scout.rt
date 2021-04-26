@@ -470,20 +470,6 @@
         <scope>provided</scope>
       </dependency>
 
-      <dependency>
-        <groupId>com.yahoo.platform.yui</groupId>
-        <artifactId>yuicompressor</artifactId>
-        <version>2.4.9-BSI-1</version>
-        <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>com.asual.lesscss</groupId>
-        <artifactId>lesscss-engine</artifactId>
-        <version>1.7.4.bsiR02</version>
-        <scope>provided</scope>
-      </dependency>
-
       <!-- Test Dependencies -->
       <dependency>
         <groupId>junit</groupId>
@@ -789,15 +775,6 @@
       <name>eclipse-snapshot-repo</name>
       <url>https://repo.eclipse.org/content/groups/snapshots/</url>
     </repository>
-    <!-- Bintray Repository for com.asual.lesscss:lesscss-engine dependency -->
-    <repository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>bintray-bsi-business-systems-integration-ag-scout-eclipse-org</id>
-      <name>bintray</name>
-      <url>https://dl.bintray.com/bsi-business-systems-integration-ag/scout-eclipse-org</url>
-    </repository>
   </repositories>
 
   <pluginRepositories>
@@ -814,15 +791,6 @@
       <id>eclipse.snapshot</id>
       <name>eclipse-snapshot-repo</name>
       <url>https://repo.eclipse.org/content/groups/snapshots/</url>
-    </pluginRepository>
-    <!-- Bintray Repository for yui-compressor -->
-    <pluginRepository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>bintray-bsi-business-systems-integration-ag-scout-eclipse-org</id>
-      <name>bintray-plugins</name>
-      <url>https://dl.bintray.com/bsi-business-systems-integration-ag/scout-eclipse-org</url>
     </pluginRepository>
   </pluginRepositories>
 
