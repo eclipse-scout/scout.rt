@@ -235,11 +235,12 @@ public class ServletFilterHelper {
   }
 
   /**
-   * forward the request to the login.html
-   * <p>
-   * Detects if the request is a POST. For json send a timeout message, otherwise log a warning
+   * Forwards the request to the login.html. In case forwarding would not work, the request will be redirected, see {@link #redirectToLoginFormIfNecessary(HttpServletRequest, HttpServletResponse)}.
    */
   public void forwardToLoginForm(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    if (!acceptForwardOrRedirect(req, resp, req.getPathInfo(), true)) {
+      return;
+    }
     if (redirectToLoginFormIfNecessary(req, resp)) {
       return;
     }
@@ -288,9 +289,7 @@ public class ServletFilterHelper {
   }
 
   /**
-   * Forwards the request to the logout.html
-   * <p>
-   * Detects if the request is a POST. For json send a timeout message, otherwise log a warning
+   * Forwards the request to the logout.html.
    */
   public void forwardToLogoutForm(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
     forwardTo(req, resp, "/logout.html");
@@ -319,18 +318,7 @@ public class ServletFilterHelper {
    * (forbidden) returned.
    */
   protected void forwardOrRedirectTo(HttpServletRequest req, HttpServletResponse resp, String targetLocation, boolean redirect) throws IOException, ServletException {
-    String acceptedMimeTypes = req.getHeader("Accept");
-    if (StringUtility.containsString(acceptedMimeTypes, "application/json")) {
-      // Since the client expects JSON as response don't forward to the login page, instead send a json based timeout error
-      LOG.debug("Returning session timeout error as json for path {}, based on Accept header {}.", req.getPathInfo(), acceptedMimeTypes);
-      sendJsonSessionTimeout(resp);
-      return;
-    }
-    if ("POST".equals(req.getMethod())) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("The request for '{}' is a POST request. " + (redirect ? "Redirecting" : "Forwarding") + " to '{}' will most likely fail. Sending HTTP status '403 Forbidden' instead.", req.getPathInfo(), targetLocation);
-      }
-      resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+    if (!acceptForwardOrRedirect(req, resp, targetLocation, redirect)) {
       return;
     }
 
@@ -343,6 +331,28 @@ public class ServletFilterHelper {
     else {
       req.getRequestDispatcher(targetLocation).forward(req, resp);
     }
+  }
+
+  /**
+   * Doesn't accept POST requests or requests with an Accept header containing application/json. For such json requests
+   * a timeout message is returned.
+   */
+  protected boolean acceptForwardOrRedirect(HttpServletRequest req, HttpServletResponse resp, String targetLocation, boolean redirect) throws IOException {
+    String acceptedMimeTypes = req.getHeader("Accept");
+    if (StringUtility.containsString(acceptedMimeTypes, "application/json")) {
+      // Since the client expects JSON as response don't forward to the login page, instead send a json based timeout error
+      LOG.debug("Returning session timeout error as json for path {}, based on Accept header {}.", req.getPathInfo(), acceptedMimeTypes);
+      sendJsonSessionTimeout(resp);
+      return false;
+    }
+    if ("POST".equals(req.getMethod())) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("The request for '{}' is a POST request. " + (redirect ? "Redirecting" : "Forwarding") + " to '{}' will most likely fail. Sending HTTP status '403 Forbidden' instead.", req.getPathInfo(), targetLocation);
+      }
+      resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+      return false;
+    }
+    return true;
   }
 
   protected void sendJsonSessionTimeout(HttpServletResponse resp) throws IOException {
