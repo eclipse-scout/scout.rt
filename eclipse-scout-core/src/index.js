@@ -581,6 +581,7 @@ export {default as TileGridGridConfig} from './tile/TileGridGridConfig';
 export {default as TileGridLayout} from './tile/TileGridLayout';
 export {default as TileGridLayoutConfig} from './tile/TileGridLayoutConfig';
 export {default as TileGridSelectionHandler} from './tile/TileGridSelectionHandler';
+export {default as CompositeTile} from './tile/CompositeTile';
 export {default as HtmlTile} from './tile/HtmlTile';
 export {default as HtmlTileAdapter} from './tile/HtmlTileAdapter';
 export {default as BeanTile} from './tile/BeanTile';

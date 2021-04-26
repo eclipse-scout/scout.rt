@@ -11,8 +11,7 @@
 import {Tile, Widget} from '../index';
 
 /**
- * A tile containing a widget. The widget will be rendered and its $container used as $container for the tile.
- * If the widget has gridDataHints, they will be used as gridDataHints for the tile.
+ * A tile containing a widget.
  */
 export default class WidgetTile extends Tile {
 
