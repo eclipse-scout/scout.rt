@@ -35,6 +35,8 @@
     <dependency>
       <groupId>com.yahoo.platform.yui</groupId>
       <artifactId>yuicompressor</artifactId>
+      <!-- hosted at github.com/bsi-software/yuicompressor -->
+      <version>2.4.9-BSI-2</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -46,6 +48,8 @@
     <dependency>
       <groupId>com.asual.lesscss</groupId>
       <artifactId>lesscss-engine</artifactId>
+      <!-- hosted at github.com/bsi-software/lesscss-engine -->
+      <version>1.7.4.bsiR03</version>
       <scope>provided</scope>
       <!-- Do not exclude commons-logging because it is used within sandboxes (see ScriptProcessor). -->
     </dependency>
@@ -95,4 +99,15 @@
 
   <!-- primarily for license header generation -->
   <inceptionYear>2014</inceptionYear>
+
+  <repositories>
+    <repository>
+      <id>yuicompressor</id>
+      <url>https://bsi-software.github.io/yuicompressor/</url>
+    </repository>
+    <repository>
+      <id>lesscss-engine</id>
+      <url>https://bsi-software.github.io/lesscss-engine/</url>
+    </repository>
+  </repositories>
 </project>
