@@ -44,12 +44,14 @@ describe('WidgetPopup', () => {
   describe('withFocusContext', () => {
     it('focuses the first focusable element when opened', () => {
       let popup = createPopupWithFormAnd2Fields();
+      popup.animateOpening = false;
       popup.open();
       expect(popup.widget.widget('First Field').isFocused()).toBe(true);
     });
 
     it('focuses the element specified by an inner element', () => {
       let popup = createPopupWithFormAnd2Fields('Second Field');
+      popup.animateOpening = false;
       popup.open();
       expect(popup.widget.widget('Second Field').isFocused()).toBe(true);
     });
@@ -67,6 +69,7 @@ describe('WidgetPopup', () => {
 
       let popup = createPopupWithFormAnd2Fields('Second Field');
       popup.animateRemoval = false;
+      popup.animateOpening = false;
       popup.open();
       expect(popup.widget.widget('Second Field').isFocused()).toBe(true);
 
