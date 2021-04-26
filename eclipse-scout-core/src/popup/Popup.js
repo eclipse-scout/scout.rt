@@ -199,21 +199,23 @@ export default class Popup extends Widget {
       return;
     }
 
-    // Focus the popup
-    // It is important that this happens after layouting and positioning, otherwise we'd focus an element
+    if (!this.animateOpening) {
+    // It is important that focusing happens after layouting and positioning, otherwise we'd focus an element
     // that is currently not on the screen. Which would cause the whole desktop to
     // be shifted for a few pixels.
-    this.validateFocus();
-    if (this.animateOpening) {
-      this.$container.addClass('invisible');
-      setTimeout(() => {
-        if (!this.rendered || this.removing) {
-          return;
-        }
-        this.$container.removeClass('invisible');
-        this.$container.addClassForAnimation('animate-open');
-      });
+      this.validateFocus();
+      return;
     }
+    // Give the browser time to layout properly before starting the animation to make sure it will be smooth.
+    this.$container.addClass('invisible');
+    setTimeout(() => {
+      if (!this.rendered || this.removing) {
+        return;
+      }
+      this.$container.removeClass('invisible');
+      this.validateFocus(); // Need to be done after popup is visible again because focus cannot be set on invisible elements.
+      this.$container.addClassForAnimation('animate-open');
+    });
   }
 
   validateFocus() {
