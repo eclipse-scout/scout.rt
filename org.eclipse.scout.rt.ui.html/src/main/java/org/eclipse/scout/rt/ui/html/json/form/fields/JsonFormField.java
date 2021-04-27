@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,28 +11,42 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IStatusMenuMapping;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
+import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonGridData;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
+import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("squid:S00118")
-public abstract class JsonFormField<FORM_FIELD extends IFormField> extends AbstractJsonWidget<FORM_FIELD> {
+public abstract class JsonFormField<FORM_FIELD extends IFormField> extends AbstractJsonWidget<FORM_FIELD> implements IJsonContextMenuOwner {
 
   private static final Logger LOG = LoggerFactory.getLogger(JsonFormField.class);
+
+  private PropertyChangeListener m_contextMenuListener;
+  private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
   public JsonFormField(FORM_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -227,6 +241,75 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
         return getModel().getDisabledStyle();
       }
     });
+    putJsonProperty(new JsonAdapterProperty<FORM_FIELD>(IFormField.PROP_STATUS_MENU_MAPPINGS, model, getUiSession()) {
+      @Override
+      protected List<IStatusMenuMapping> modelValue() {
+        return getModel().getStatusMenuMappings();
+      }
+    });
+  }
+
+  @Override
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
+    m_jsonContextMenu = new JsonContextMenu<>(getModel().getContextMenu(), this);
+    m_jsonContextMenu.init();
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    m_jsonContextMenu.dispose();
+    super.disposeChildAdapters();
+  }
+
+  @Override
+  protected void attachModel() {
+    super.attachModel();
+    if (m_contextMenuListener != null) {
+      throw new IllegalStateException();
+    }
+    m_contextMenuListener = evt -> {
+      if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
+        handleModelContextMenuVisibleChanged((Boolean) evt.getNewValue());
+      }
+      else if (IContextMenu.PROP_CURRENT_MENU_TYPES.equals(evt.getPropertyName())) {
+        @SuppressWarnings("unchecked")
+        Set<? extends IMenuType> newValue = (Set<? extends IMenuType>) evt.getNewValue();
+        handleModelContextMenuCurrentMenuTypesChanged(newValue);
+      }
+    };
+    getModel().getContextMenu().addPropertyChangeListener(m_contextMenuListener);
+  }
+
+  @Override
+  protected void detachModel() {
+    super.detachModel();
+    if (m_contextMenuListener == null) {
+      throw new IllegalStateException();
+    }
+    getModel().getContextMenu().removePropertyChangeListener(m_contextMenuListener);
+    m_contextMenuListener = null;
+  }
+
+  @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    json.put(PROP_MENUS, m_jsonContextMenu.childActionsToJson());
+    json.put(PROP_MENUS_VISIBLE, getModel().getContextMenu().isVisible());
+    json.put(PROP_CURRENT_MENU_TYPES, menuTypesToJson(getModel().getContextMenu().getCurrentMenuTypes()));
+    return json;
+  }
+
+  protected JSONArray menuTypesToJson(Set<? extends IMenuType> menuTypes) {
+    JSONArray array = new JSONArray();
+    if (menuTypes == null) {
+      return array;
+    }
+    for (IMenuType menuType : menuTypes) {
+      String prefix = menuType.getClass().getSimpleName().replace("MenuType", "");
+      array.put(prefix + "." + menuType);
+    }
+    return array;
   }
 
   @Override
@@ -247,4 +330,18 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
     }
     super.handleModelPropertyChange(event);
   }
+
+  @Override
+  public void handleModelContextMenuChanged(FilteredJsonAdapterIds<?> filteredAdapters) {
+    addPropertyChangeEvent(PROP_MENUS, filteredAdapters);
+  }
+
+  protected void handleModelContextMenuVisibleChanged(boolean visible) {
+    addPropertyChangeEvent(PROP_MENUS_VISIBLE, visible);
+  }
+
+  protected void handleModelContextMenuCurrentMenuTypesChanged(Set<? extends IMenuType> currentMenuTypes) {
+    addPropertyChangeEvent(PROP_CURRENT_MENU_TYPES, menuTypesToJson(currentMenuTypes));
+  }
+
 }

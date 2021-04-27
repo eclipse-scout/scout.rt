@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.sequencebox;
 
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
@@ -19,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
  * A {@link IFormField} that contains an ordered sequence of {@link IFormField}s.<br>
  * E.g. a range with start and end date.
  */
-public interface ISequenceBox extends ICompositeField, IContextMenuOwner {
+public interface ISequenceBox extends ICompositeField {
 
   String PROP_LAYOUT_CONFIG = "layoutConfig";
 

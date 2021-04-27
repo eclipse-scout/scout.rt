@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,6 @@ export default class TabBox extends CompositeField {
 
     this.gridDataHints.useUiHeight = true;
     this.gridDataHints.w = FormField.FULL_WIDTH;
-    this.menusVisible = false; // TabBox shows its menus in the tab box header -> don't draw an ellipsis status icon
     this.selectedTab = null;
     this.tabItems = [];
     this.tabAreaStyle = TabArea.DisplayStyle.DEFAULT;
@@ -86,7 +85,7 @@ export default class TabBox extends CompositeField {
     this._removeSelectedTab();
   }
 
-  _getCurrentMenus() {
+  getContextMenuItems() {
     // handled by the menubar
     return [];
   }

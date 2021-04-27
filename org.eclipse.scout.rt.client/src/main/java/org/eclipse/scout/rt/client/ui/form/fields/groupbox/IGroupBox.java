@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.groupbox;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.IPreferenceField;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -23,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.notification.INotification;
 import org.eclipse.scout.rt.platform.util.TriState;
 
-public interface IGroupBox extends ICompositeField, IContextMenuOwner, IPreferenceField {
+public interface IGroupBox extends ICompositeField, IPreferenceField {
 
   /**
    * {@link String}
@@ -82,11 +80,6 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner, IPreferen
    * </ul>
    */
   String BORDER_DECORATION_AUTO = "auto";
-
-  /**
-   * {@link IContextMenu}
-   */
-  String PROP_CONTEXT_MENU = "contextMenu";
 
   /**
    * Only implemented for groupboxes inside a tabbox.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,7 @@ import {
   HtmlComponent,
   KeyStrokeContext,
   LoadingSupport,
+  menus as menuUtil,
   objects,
   scout,
   Status,
@@ -61,6 +62,7 @@ export default class FormField extends Widget {
     this.statusMenuMappings = [];
     this.menus = [];
     this.menusVisible = true;
+    this.currentMenuTypes = [];
     this.preventInitialFocus = false;
     this.requiresSave = false;
     this.statusPosition = FormField.StatusPosition.DEFAULT;
@@ -639,11 +641,11 @@ export default class FormField extends Widget {
       });
       // If there are menus, show them in the tooltip. But only if there is a tooltipText, don't do it if there is an error status.
       // Menus make most likely no sense if an error status is displayed
-      menus = this._getCurrentMenus();
+      menus = this.getContextMenuItems();
     } else {
       // If there are menus, show them in the tooltip. But only if there is a tooltipText, don't do it if there is an error status.
       // Menus make most likely no sense if an error status is displayed
-      menus = this._getCurrentMenus();
+      menus = this.getContextMenuItems();
     }
 
     this.fieldStatus.update(status, menus, autoRemove, this._isInitialShowStatus());
@@ -855,10 +857,11 @@ export default class FormField extends Widget {
     }
   }
 
-  _getCurrentMenus() {
-    return this.menus.filter(menu => {
-      return menu.visible;
-    });
+  getContextMenuItems() {
+    if (this.currentMenuTypes.length) {
+      return menuUtil.filter(this.menus, this.currentMenuTypes, true);
+    }
+    return this.menus.filter(menu => menu.visible);
   }
 
   _getMenusForStatus(status) {
@@ -875,7 +878,7 @@ export default class FormField extends Widget {
   }
 
   _hasMenus() {
-    return !!(this.menus && this._getCurrentMenus().length > 0);
+    return !!(this.menus && this.getContextMenuItems().length > 0);
   }
 
   _updateMenus() {
@@ -906,6 +909,15 @@ export default class FormField extends Widget {
     this._updateMenus();
   }
 
+  setCurrentMenuTypes(currentMenuTypes) {
+    this.setProperty('currentMenuTypes', currentMenuTypes);
+  }
+
+  _renderCurrentMenuTypes() {
+    // If a tooltip is shown, update it with the new menus
+    this._updateFieldStatus();
+  }
+
   _setKeyStrokes(keyStrokes) {
     this.updateKeyStrokes(keyStrokes, this.keyStrokes);
     this._setProperty('keyStrokes', keyStrokes);
@@ -926,7 +938,7 @@ export default class FormField extends Widget {
   }
 
   _showContextMenu() {
-    let menus = this._getCurrentMenus();
+    let menus = this.getContextMenuItems();
     if (menus.length === 0) {
       // at least one menu item must be visible
       return;

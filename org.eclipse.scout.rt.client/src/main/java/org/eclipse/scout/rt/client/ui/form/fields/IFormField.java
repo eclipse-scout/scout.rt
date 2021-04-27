@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeObserver;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -65,7 +66,7 @@ import org.w3c.dom.Element;
  *
  * @see IForm
  */
-public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimension, IDataChangeObserver {
+public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimension, IDataChangeObserver, IContextMenuOwner {
 
   String PROP_VISIBLE = "visible";
   String PROP_MANDATORY = "mandatory";
@@ -92,6 +93,8 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
   String PROP_STATUS_POSITION = "statusPosition";
   String PROP_GRID_DATA = "gridData";
   String PROP_GRID_DATA_HINTS = "gridDataHints";
+  String PROP_CONTEXT_MENU = "contextMenu";
+  String PROP_STATUS_MENU_MAPPINGS = "statusMenuMappings";
 
   /**
    * if the field can get the initial focus when the form is opened, value is of type {@link Boolean}
@@ -856,4 +859,16 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    * @return the disabled style. One of {@link #DISABLED_STYLE_DEFAULT}, {@link #DISABLED_STYLE_READ_ONLY}.
    */
   int getDisabledStyle();
+
+  /**
+   * @return the mappings between menu and status. The mappings may be set explicitly using
+   *         {@link #setStatusMenuMappings(List)} or by defining an inner class at the form field extending from
+   *         {@link AbstractStatusMenuMapping}.
+   */
+  List<IStatusMenuMapping> getStatusMenuMappings();
+
+  /**
+   * Defines which menus should be displayed when an error status is shown. If the list is empty no menus are displayed.
+   */
+  void setStatusMenuMappings(List<IStatusMenuMapping> mappings);
 }

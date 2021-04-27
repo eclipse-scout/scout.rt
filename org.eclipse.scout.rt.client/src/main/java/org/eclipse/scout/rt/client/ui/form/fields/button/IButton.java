@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 import java.util.Collection;
 import java.util.Set;
 
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
@@ -27,13 +26,12 @@ import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
  * Process buttons are normally placed on dialogs button bar on the lower dialog bar
  * </ol>
  */
-public interface IButton extends IFormField, IContextMenuOwner {
+public interface IButton extends IFormField {
   /*
    * Properties
    */
   String PROP_ICON_ID = "iconId";
   String PROP_SELECTED = "selected";
-  String PROP_CONTEXT_MENU = "contextMenu";
   String PROP_KEY_STROKE = "keyStroke";
   String PROP_KEY_STROKE_SCOPE_CLASS = "keyStrokeScopeClass";
   String PROP_KEY_STROKE_SCOPE = "keyStrokeScope";

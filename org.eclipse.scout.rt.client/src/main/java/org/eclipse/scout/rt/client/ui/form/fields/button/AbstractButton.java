@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,18 +16,12 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
-import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.button.ButtonChains.ButtonClickActionChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.button.ButtonChains.ButtonSelectionChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.button.IButtonExtension;
 import org.eclipse.scout.rt.client.res.AttachmentSupport;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
-import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -37,10 +31,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
-import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
@@ -259,13 +250,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   protected void execSelectionChanged(boolean selection) {
   }
 
-  protected List<Class<? extends IMenu>> getDeclaredMenus() {
-    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<IMenu>> menuClasses = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    List<Class<? extends IMenu>> a = ConfigurationUtility.removeReplacedClasses(menuClasses);
-    return a;
-  }
-
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -281,36 +265,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     setPreventDoubleClick(getConfiguredPreventDoubleClick());
     setStackable(getConfiguredStackable());
     setShrinkable(getConfiguredShrinkable());
-
-    // menus
-    List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
-    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-    OrderedCollection<IMenu> menus = new OrderedCollection<>();
-    for (Class<? extends IMenu> menuClazz : declaredMenus) {
-      IMenu menu;
-      menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
-      menus.addOrdered(menu);
-    }
-    menus.addAllOrdered(contributedMenus);
-    injectMenusInternal(menus);
-    new MoveActionNodesHandler<>(menus).moveModelObjects();
-    setContextMenu(new FormFieldContextMenu<IButton>(this, menus.getOrderedList()));
-  }
-
-  @Override
-  public List<? extends IWidget> getChildren() {
-    return CollectionUtility.flatten(super.getChildren(), getMenus());
-  }
-
-  /**
-   * Override this internal method only in order to make use of dynamic menus<br>
-   * Used to add and/or remove menus<br>
-   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
-   *
-   * @param menus
-   *          live and mutable collection of configured menus
-   */
-  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
 
   /*
@@ -381,25 +335,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   @Override
   public void setDefaultButton(Boolean defaultButton) {
     propertySupport.setProperty(PROP_DEFAULT_BUTTON, defaultButton);
-  }
-
-  @Override
-  public List<IMenu> getMenus() {
-    return getContextMenu().getChildActions();
-  }
-
-  protected void setContextMenu(IContextMenu contextMenu) {
-    propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
-  }
-
-  @Override
-  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
-    return MenuUtility.getMenuByClass(this, menuType);
-  }
-
-  @Override
-  public IContextMenu getContextMenu() {
-    return (IContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
   }
 
   @Override

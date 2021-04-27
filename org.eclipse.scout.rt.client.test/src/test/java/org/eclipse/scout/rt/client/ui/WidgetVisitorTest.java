@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,6 +81,8 @@ public class WidgetVisitorTest {
     root.visit(visitor);
     visitor.expectCollectedWidgets(FixtureWidget.class,
         MainBox.class,
+        FormFieldMenuMenu.class,
+        BigDecimalField.class,
         StringField.class,
         TreeBoxField.class,
         TreeBoxFilterBox.class,
@@ -109,9 +111,7 @@ public class WidgetVisitorTest {
         DateField.class,
         WrappedFormField.class,
         FixtureForm.class,
-        MainBoxInWrappedForm.class,
-        FormFieldMenuMenu.class,
-        BigDecimalField.class);
+        MainBoxInWrappedForm.class);
   }
 
   @Test
@@ -132,7 +132,9 @@ public class WidgetVisitorTest {
     });
 
     assertEquals(asList(
-        StringField.class.getName() + " 2 0",
+        BigDecimalField.class.getName() + " 3 0",
+        FormFieldMenuMenu.class.getName() + " 2 0",
+        StringField.class.getName() + " 2 1",
         org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBoxFilterBox.CheckedStateRadioButtonGroup.CheckedButton.class.getName() + " 5 0",
         org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBoxFilterBox.CheckedStateRadioButtonGroup.AllButton.class.getName() + " 5 1",
         org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBoxFilterBox.CheckedStateRadioButtonGroup.class.getName() + " 4 0",
@@ -142,7 +144,7 @@ public class WidgetVisitorTest {
         org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBoxFilterBox.ActiveStateRadioButtonGroup.class.getName() + " 4 1",
         TreeBoxFilterBox.class.getName() + " 3 0",
         DefaultTreeBoxTree.class.getName() + " 3 1",
-        TreeBoxField.class.getName() + " 2 1",
+        TreeBoxField.class.getName() + " 2 2",
         CheckedButton.class.getName() + " 5 0",
         AllButton.class.getName() + " 5 1",
         CheckedStateRadioButtonGroup.class.getName() + " 4 0",
@@ -153,16 +155,14 @@ public class WidgetVisitorTest {
         ListBoxFilterBox.class.getName() + " 3 0",
         OrganizeColumnsMenu.class.getName() + " 4 0",
         DefaultListBoxTable.class.getName() + " 3 1",
-        ListBox.class.getName() + " 2 2",
+        ListBox.class.getName() + " 2 3",
         LongField.class.getName() + " 4 0",
         LastBox.class.getName() + " 3 0",
         DateField.class.getName() + " 3 1",
-        InnerGroupBox.class.getName() + " 2 3",
+        InnerGroupBox.class.getName() + " 2 4",
         MainBoxInWrappedForm.class.getName() + " 4 0",
         FixtureForm.class.getName() + " 3 0",
-        WrappedFormField.class.getName() + " 2 4",
-        BigDecimalField.class.getName() + " 3 0",
-        FormFieldMenuMenu.class.getName() + " 2 5",
+        WrappedFormField.class.getName() + " 2 5",
         MainBox.class.getName() + " 1 0",
         FixtureWidget.class.getName() + " 0 0"), visitedWidgets);
   }
@@ -172,7 +172,7 @@ public class WidgetVisitorTest {
     FixtureWidget root = new FixtureWidget();
     CollectingVisitorWrapper<IActionNode> visitor = new CollectingVisitorWrapper<>(action -> TreeVisitResult.CONTINUE);
     root.visit(visitor, IActionNode.class);
-    visitor.expectCollectedWidgets(OrganizeColumnsMenu.class, FormFieldMenuMenu.class);
+    visitor.expectCollectedWidgets(FormFieldMenuMenu.class, OrganizeColumnsMenu.class);
   }
 
   @Test
@@ -187,6 +187,7 @@ public class WidgetVisitorTest {
     root.visit(visitor, IFormField.class);
     visitor.expectCollectedWidgets(
         MainBox.class,
+        BigDecimalField.class,
         StringField.class,
         TreeBoxField.class,
         TreeBoxFilterBox.class,
@@ -206,12 +207,13 @@ public class WidgetVisitorTest {
     assertEquals(asList(
         FixtureWidget.class,
         MainBox.class,
+        FormFieldMenuMenu.class,
         StringField.class,
         TreeBoxField.class,
         ListBox.class,
         InnerGroupBox.class,
         WrappedFormField.class,
-        FormFieldMenuMenu.class,
+        BigDecimalField.class,
         TreeBoxFilterBox.class,
         DefaultTreeBoxTree.class,
         ListBoxFilterBox.class,
@@ -219,7 +221,6 @@ public class WidgetVisitorTest {
         LastBox.class,
         DateField.class,
         FixtureForm.class,
-        BigDecimalField.class,
         org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBoxFilterBox.CheckedStateRadioButtonGroup.class,
         org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBoxFilterBox.ActiveStateRadioButtonGroup.class,
         CheckedStateRadioButtonGroup.class,
@@ -261,12 +262,13 @@ public class WidgetVisitorTest {
     assertEquals(asList(
         FixtureWidget.class,
         MainBox.class,
+        FormFieldMenuMenu.class,
         StringField.class,
         TreeBoxField.class,
         ListBox.class,
         InnerGroupBox.class,
         WrappedFormField.class,
-        FormFieldMenuMenu.class,
+        BigDecimalField.class,
         TreeBoxFilterBox.class), visitedWidgets);
   }
 
@@ -281,16 +283,16 @@ public class WidgetVisitorTest {
     assertEquals(asList(
         FixtureWidget.class,
         MainBox.class,
+        FormFieldMenuMenu.class,
         StringField.class,
         TreeBoxField.class,
         ListBox.class,
         InnerGroupBox.class,
         WrappedFormField.class,
-        FormFieldMenuMenu.class,
+        BigDecimalField.class,
         LastBox.class,
         DateField.class,
         FixtureForm.class,
-        BigDecimalField.class,
         LongField.class,
         MainBoxInWrappedForm.class), visitedWidgets);
   }
@@ -312,7 +314,7 @@ public class WidgetVisitorTest {
       }
     }, IFormField.class);
 
-    assertEquals(asList(MainBox.class, StringField.class), visitedWidgets);
+    assertEquals(asList(MainBox.class, BigDecimalField.class), visitedWidgets);
   }
 
   @Test
@@ -326,12 +328,13 @@ public class WidgetVisitorTest {
     assertEquals(asList(
         FixtureWidget.class,
         MainBox.class,
+        FormFieldMenuMenu.class,
         StringField.class,
         TreeBoxField.class,
         ListBox.class,
         InnerGroupBox.class,
         WrappedFormField.class,
-        FormFieldMenuMenu.class,
+        BigDecimalField.class,
         TreeBoxFilterBox.class,
         DefaultTreeBoxTree.class,
         ListBoxFilterBox.class,
@@ -339,7 +342,6 @@ public class WidgetVisitorTest {
         LastBox.class,
         DateField.class,
         FixtureForm.class,
-        BigDecimalField.class,
         org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBoxFilterBox.CheckedStateRadioButtonGroup.class,
         org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBoxFilterBox.ActiveStateRadioButtonGroup.class,
         CheckedStateRadioButtonGroup.class,
@@ -370,12 +372,13 @@ public class WidgetVisitorTest {
     assertEquals(asList(
         FixtureWidget.class,
         MainBox.class,
+        FormFieldMenuMenu.class,
         StringField.class,
         TreeBoxField.class,
         ListBox.class,
         InnerGroupBox.class,
         WrappedFormField.class,
-        FormFieldMenuMenu.class,
+        BigDecimalField.class,
         TreeBoxFilterBox.class,
         DefaultTreeBoxTree.class,
         ListBoxFilterBox.class,
@@ -383,7 +386,6 @@ public class WidgetVisitorTest {
         LastBox.class,
         DateField.class,
         FixtureForm.class,
-        BigDecimalField.class,
         org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBoxFilterBox.CheckedStateRadioButtonGroup.class,
         org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBoxFilterBox.ActiveStateRadioButtonGroup.class,
         CheckedStateRadioButtonGroup.class,
@@ -414,12 +416,13 @@ public class WidgetVisitorTest {
     assertEquals(asList(
         FixtureWidget.class,
         MainBox.class,
+        FormFieldMenuMenu.class,
         StringField.class,
         TreeBoxField.class,
         ListBox.class,
         InnerGroupBox.class,
         WrappedFormField.class,
-        FormFieldMenuMenu.class,
+        BigDecimalField.class,
         TreeBoxFilterBox.class,
         DefaultTreeBoxTree.class,
         ListBoxFilterBox.class,
@@ -427,7 +430,6 @@ public class WidgetVisitorTest {
         LastBox.class,
         DateField.class,
         FixtureForm.class,
-        BigDecimalField.class,
         org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBoxFilterBox.CheckedStateRadioButtonGroup.class,
         org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBoxFilterBox.ActiveStateRadioButtonGroup.class,
         CheckedStateRadioButtonGroup.class,
@@ -455,6 +457,7 @@ public class WidgetVisitorTest {
     root.visit(visitor, IFormField.class);
     visitor.expectCollectedWidgets(
         MainBox.class,
+        BigDecimalField.class,
         StringField.class,
         TreeBoxField.class,
         TreeBoxFilterBox.class,
@@ -465,8 +468,7 @@ public class WidgetVisitorTest {
         LongField.class,
         DateField.class,
         WrappedFormField.class,
-        MainBoxInWrappedForm.class,
-        BigDecimalField.class);
+        MainBoxInWrappedForm.class);
   }
 
   @Test
@@ -482,6 +484,8 @@ public class WidgetVisitorTest {
     visitor.expectCollectedWidgets(
         FixtureWidget.class,
         MainBox.class,
+        FormFieldMenuMenu.class,
+        BigDecimalField.class,
         StringField.class,
         TreeBoxField.class,
         TreeBoxFilterBox.class,
@@ -508,9 +512,7 @@ public class WidgetVisitorTest {
         DateField.class,
         WrappedFormField.class,
         FixtureForm.class,
-        MainBoxInWrappedForm.class,
-        FormFieldMenuMenu.class,
-        BigDecimalField.class);
+        MainBoxInWrappedForm.class);
   }
 
   @Test

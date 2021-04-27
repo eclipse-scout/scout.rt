@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,16 +14,13 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
-import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.IImageFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldChains.ImageFieldDragRequestChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldChains.ImageFieldDropRequestChain;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
-import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.ImageFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
@@ -33,7 +30,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
@@ -45,7 +41,6 @@ import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 public abstract class AbstractImageField extends AbstractFormField implements IImageField {
   private IImageFieldUIFacade m_uiFacade;
   private final FastListenerList<ImageFieldListener> m_listenerList = new FastListenerList<>();
-  private IContextMenu m_contextMenu;
   private double m_zoomDelta;
   private double m_panDelta;
   private double m_rotateDelta;
@@ -206,12 +201,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   protected void execDropRequest(TransferObject transferObject) {
   }
 
-  protected List<Class<? extends IMenu>> getDeclaredMenus() {
-    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    return ConfigurationUtility.removeReplacedClasses(filtered);
-  }
-
   @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
@@ -229,29 +218,11 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
     setUploadEnabled(getConfiguredUploadEnabled());
     setFileExtensions(getConfiguredFileExtensions());
-
-    // menus
-    List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
-    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-    OrderedCollection<IMenu> menus = new OrderedCollection<>();
-    for (Class<? extends IMenu> menuClazz : declaredMenus) {
-      menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
-    }
-    menus.addAllOrdered(contributedMenus);
-    injectMenusInternal(menus);
-    new MoveActionNodesHandler<>(menus).moveModelObjects();
-    m_contextMenu = new ImageFieldContextMenu(this, menus.getOrderedList());
   }
 
-  /**
-   * Override this internal method only in order to make use of dynamic menus<br>
-   * Used to add and/or remove menus<br>
-   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
-   *
-   * @param menus
-   *          live and mutable collection of configured menus
-   */
-  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
+  @Override
+  protected IFormFieldContextMenu createContextMenu(OrderedCollection<IMenu> menus) {
+    return new ImageFieldContextMenu(this, menus.getOrderedList());
   }
 
   @Override
@@ -299,21 +270,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   @Override
   public void setImageId(String imageId) {
     propertySupport.setPropertyString(PROP_IMAGE_ID, imageId);
-  }
-
-  @Override
-  public IContextMenu getContextMenu() {
-    return m_contextMenu;
-  }
-
-  @Override
-  public List<IMenu> getMenus() {
-    return getContextMenu().getChildActions();
-  }
-
-  @Override
-  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
-    return MenuUtility.getMenuByClass(this, menuType);
   }
 
   @Override
@@ -519,11 +475,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   @Override
   public IImageFieldUIFacade getUIFacade() {
     return m_uiFacade;
-  }
-
-  @Override
-  public List<? extends IWidget> getChildren() {
-    return CollectionUtility.flatten(super.getChildren(), getMenus());
   }
 
   protected class P_UIFacade implements IImageFieldUIFacade {

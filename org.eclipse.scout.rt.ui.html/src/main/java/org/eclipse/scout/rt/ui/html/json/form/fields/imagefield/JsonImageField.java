@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,13 +10,10 @@
  */
 package org.eclipse.scout.rt.ui.html.json.form.fields.imagefield;
 
-import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.Adler32;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
@@ -26,13 +23,10 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.basic.filechooser.JsonFileChooserAcceptAttributeBuilder;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
-import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
@@ -40,13 +34,10 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormField<IMAGE_FIELD> implements IBinaryResourceProvider, IBinaryResourceConsumer, IJsonContextMenuOwner {
+public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormField<IMAGE_FIELD> implements IBinaryResourceProvider, IBinaryResourceConsumer {
 
   public static final String PROP_IMAGE_URL = "imageUrl";
   public static final String PROP_ACCEPT_TYPES = "acceptTypes";
-
-  private PropertyChangeListener m_contextMenuListener;
-  private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
   public JsonImageField(IMAGE_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -113,48 +104,9 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
   }
 
   @Override
-  protected void attachChildAdapters() {
-    super.attachChildAdapters();
-    m_jsonContextMenu = new JsonContextMenu<>(getModel().getContextMenu(), this);
-    m_jsonContextMenu.init();
-  }
-
-  @Override
-  protected void disposeChildAdapters() {
-    m_jsonContextMenu.dispose();
-    super.disposeChildAdapters();
-  }
-
-  @Override
-  protected void attachModel() {
-    super.attachModel();
-    if (m_contextMenuListener != null) {
-      throw new IllegalStateException();
-    }
-    m_contextMenuListener = evt -> {
-      if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
-        handleModelContextMenuVisibleChanged((Boolean) evt.getNewValue());
-      }
-    };
-    getModel().getContextMenu().addPropertyChangeListener(m_contextMenuListener);
-  }
-
-  @Override
-  protected void detachModel() {
-    super.detachModel();
-    if (m_contextMenuListener == null) {
-      throw new IllegalStateException();
-    }
-    getModel().getContextMenu().removePropertyChangeListener(m_contextMenuListener);
-    m_contextMenuListener = null;
-  }
-
-  @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     json.put(PROP_IMAGE_URL, getImageUrl());
-    json.put(PROP_MENUS, m_jsonContextMenu.childActionsToJson());
-    json.put(PROP_MENUS_VISIBLE, getModel().getContextMenu().isVisible());
     return json;
   }
 
@@ -173,15 +125,6 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
 
   protected void handleModelImageSourceChanged() {
     addPropertyChangeEvent(PROP_IMAGE_URL, getImageUrl());
-  }
-
-  @Override
-  public void handleModelContextMenuChanged(FilteredJsonAdapterIds<?> filteredAdapters) {
-    addPropertyChangeEvent(PROP_MENUS, filteredAdapters);
-  }
-
-  protected void handleModelContextMenuVisibleChanged(boolean visible) {
-    addPropertyChangeEvent(PROP_MENUS_VISIBLE, visible);
   }
 
   /**

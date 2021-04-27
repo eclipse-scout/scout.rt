@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,16 +15,10 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
-import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.ITabBoxExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.TabBoxChains.TabBoxTabSelectedChain;
-import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -35,11 +29,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,11 +85,6 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   }
 
   @Override
-  public List<? extends IWidget> getChildren() {
-    return CollectionUtility.flatten(super.getChildren(), getMenus());
-  }
-
-  @Override
   public int getMarkStrategy() {
     return propertySupport.getPropertyInt(PROP_MARK_STRATEGY);
   }
@@ -127,7 +111,6 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     setMarkStrategy(getConfiguredMarkStrategy());
     setTabAreaStyle(getConfiguredTabAreaStyle());
     super.initConfig();
-    initMenus();
   }
 
   @Override
@@ -135,29 +118,6 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     super.initConfigInternal();
     // add listener after init-config has been executed to ensure no events are fired during init-config.
     addPropertyChangeListener(PROP_SELECTED_TAB, e -> interceptTabSelected(getSelectedTab()));
-  }
-
-  private void initMenus() {
-    List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
-    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-    OrderedCollection<IMenu> menus = new OrderedCollection<>();
-    for (Class<? extends IMenu> menuClazz : declaredMenus) {
-      try {
-        menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
-      }
-    }
-    menus.addAllOrdered(contributedMenus);
-    try {
-      injectMenusInternal(menus);
-    }
-    catch (Exception e) {
-      LOG.error("error occured while dynamically contributing menus.", e);
-    }
-    new MoveActionNodesHandler<>(menus).moveModelObjects();
-    setContextMenu(new FormFieldContextMenu<ITabBox>(this, menus.getOrderedList()));
   }
 
   /*
@@ -249,42 +209,6 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   @Override
   public IGroupBox getSelectedTab() {
     return (IGroupBox) propertySupport.getProperty(PROP_SELECTED_TAB);
-  }
-
-  /**
-   * Override this internal method only in order to make use of dynamic menus<br>
-   * Used to add and/or remove menus<br>
-   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
-   *
-   * @param menus
-   *          live and mutable collection of configured menus
-   */
-  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
-  }
-
-  protected void setContextMenu(IFormFieldContextMenu contextMenu) {
-    propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
-  }
-
-  @Override
-  public IFormFieldContextMenu getContextMenu() {
-    return (IFormFieldContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
-  }
-
-  @Override
-  public List<IMenu> getMenus() {
-    return getContextMenu().getChildActions();
-  }
-
-  @Override
-  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
-    return MenuUtility.getMenuByClass(this, menuType);
-  }
-
-  protected List<Class<? extends IMenu>> getDeclaredMenus() {
-    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    return ConfigurationUtility.removeReplacedClasses(filtered);
   }
 
   @Override

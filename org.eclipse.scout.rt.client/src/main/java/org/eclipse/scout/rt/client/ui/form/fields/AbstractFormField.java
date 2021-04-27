@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,7 @@ import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
+import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldCalculateVisibleChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldChangedMasterValueChain;
@@ -38,6 +39,10 @@ import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -63,6 +68,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.MultiStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
+import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.visitor.IBreadthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.security.ACCESS;
@@ -237,7 +243,8 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * @return One of the <code>LABEL_HORIZONTAL_*</code> constants. Default is {@link #LABEL_HORIZONTAL_ALIGNMENT_DEFAULT}.
+   * @return One of the <code>LABEL_HORIZONTAL_*</code> constants. Default is
+   *         {@link #LABEL_HORIZONTAL_ALIGNMENT_DEFAULT}.
    */
   @Order(18)
   @ConfigProperty(ConfigProperty.LABEL_HORIZONTAL_ALIGNMENT)
@@ -458,7 +465,8 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * It is not necessary to explicitly set a column count by {@link AbstractGroupBox#getConfiguredGridColumnCount()}.
    * <p>
    * This property only has an effect if every field inside the group box has a fix position which means every field
-   * inside the group box need to have x and y to be set which can be configured by this method and {@link #getConfiguredGridY()}.
+   * inside the group box need to have x and y to be set which can be configured by this method and
+   * {@link #getConfiguredGridY()}.
    * <p>
    * Subclasses can override this method. Default is -1.
    *
@@ -548,8 +556,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Subclasses can override this method. Default is 1.
    *
    * @return the number of rows to span
-   * @see #getConfiguredGridWeightY() comment about weightY logic which depends on the gridH value configured
-   * here
+   * @see #getConfiguredGridWeightY() comment about weightY logic which depends on the gridH value configured here
    * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -700,8 +707,8 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   /**
    * @return <code>false</code> if this field can get the initial focus when the form is opened (default). Set to
-   * <code>true</code> to prevent this field from getting the initial focus. In both cases, the field will still
-   * be manually focusable by the user.
+   *         <code>true</code> to prevent this field from getting the initial focus. In both cases, the field will still
+   *         be manually focusable by the user.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(195)
@@ -742,7 +749,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   @Override
   public List<? extends IWidget> getChildren() {
-    return CollectionUtility.flatten(super.getChildren(), getKeyStrokesInternal());
+    return CollectionUtility.flatten(super.getChildren(), getMenus(), getKeyStrokesInternal());
   }
 
   @ConfigOperation
@@ -888,6 +895,21 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     setMasterRequired(getConfiguredMasterRequired());
     // private listener for subtree property change events
     addPropertyChangeListener(this::fireSubtreePropertyChange);
+    initMenus();
+  }
+
+  protected void initMenus() {
+    List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
+    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
+    for (Class<? extends IMenu> menuClazz : declaredMenus) {
+      menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
+    }
+    menus.addAllOrdered(contributedMenus);
+    injectMenusInternal(menus);
+    new MoveActionNodesHandler<>(menus).moveModelObjects();
+    setContextMenu(createContextMenu(menus));
+    setStatusMenuMappings(createStatusMenuMappings());
   }
 
   /**
@@ -978,10 +1000,10 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * In this scenario this method would return field A and D.
    *
    * @param limitToSameFieldTree
-   *     Specifies if only the same-field-tree should be considered. A same-field-tree is a tree that only consists
-   *     of {@link IFormField}s and {@link IForm}s. So if this parameter is {@code true}, {@link IFormField}s in
-   *     e.g. menus are not returned because they don't belong to the same-field-tree according to the
-   *     specification above.
+   *          Specifies if only the same-field-tree should be considered. A same-field-tree is a tree that only consists
+   *          of {@link IFormField}s and {@link IForm}s. So if this parameter is {@code true}, {@link IFormField}s in
+   *          e.g. menus are not returned because they don't belong to the same-field-tree according to the
+   *          specification above.
    * @return A {@link List} with the child {@link IFormField}s. Is never {@code null}.
    */
   protected List<IFormField> getFirstChildFormFields(boolean limitToSameFieldTree) {
@@ -1007,6 +1029,9 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   protected void initFieldInternal() {
     checkSaveNeeded();
     checkEmpty();
+    for (IStatusMenuMapping mapping : getStatusMenuMappings()) {
+      mapping.init();
+    }
   }
 
   @Override
@@ -2055,6 +2080,75 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   @Override
   public void setValidateContentDescriptor(IValidateContentDescriptor validateContentDescriptor) {
     m_validateContentDescriptor = validateContentDescriptor;
+  }
+
+  protected IFormFieldContextMenu createContextMenu(OrderedCollection<IMenu> menus) {
+    return new FormFieldContextMenu<IFormField>(this, menus.getOrderedList());
+  }
+
+  protected List<Class<? extends IMenu>> getDeclaredMenus() {
+    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
+    return ConfigurationUtility.removeReplacedClasses(filtered);
+  }
+
+  /**
+   * Override this internal method only in order to make use of dynamic menus<br>
+   * Used to add and/or remove menus<br>
+   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
+   *
+   * @param menus
+   *          live and mutable collection of configured menus
+   */
+  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
+  }
+
+  protected void setContextMenu(IFormFieldContextMenu contextMenu) {
+    propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
+  }
+
+  @Override
+  public IFormFieldContextMenu getContextMenu() {
+    return (IFormFieldContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
+  }
+
+  @Override
+  public List<IMenu> getMenus() {
+    return getContextMenu().getChildActions();
+  }
+
+  @Override
+  public <M extends IMenu> M getMenuByClass(Class<M> menuType) {
+    return MenuUtility.getMenuByClass(this, menuType);
+  }
+
+  protected List<IStatusMenuMapping> createStatusMenuMappings() {
+    List<Class<IStatusMenuMapping>> configuredMappings = getConfiguredStatusMenuMappings();
+    List<IStatusMenuMapping> mappings = new ArrayList<>();
+    for (Class<? extends IStatusMenuMapping> clazz : configuredMappings) {
+      IStatusMenuMapping mapping = ConfigurationUtility.newInnerInstance(this, clazz);
+      mappings.add(mapping);
+    }
+    for (IStatusMenuMapping mapping : mappings) {
+      mapping.setParentFieldInternal(this);
+    }
+    return mappings;
+  }
+
+  protected List<Class<IStatusMenuMapping>> getConfiguredStatusMenuMappings() {
+    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    return ConfigurationUtility.filterClasses(dca, IStatusMenuMapping.class);
+  }
+
+  @Override
+  public void setStatusMenuMappings(List<IStatusMenuMapping> mappings) {
+    propertySupport.setProperty(PROP_STATUS_MENU_MAPPINGS, new ArrayList<>(mappings));
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<IStatusMenuMapping> getStatusMenuMappings() {
+    return (List<IStatusMenuMapping>) propertySupport.getProperty(PROP_STATUS_MENU_MAPPINGS);
   }
 
   private final class FindClassIdVisitor implements IBreadthFirstTreeVisitor<IFormField> {

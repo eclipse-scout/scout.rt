@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,22 +11,18 @@
 package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
-import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IValueFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldChangedValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldFormatValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldParseValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldValidateValueChain;
-import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.ValueFieldContextMenu;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -39,11 +35,9 @@ import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.IHolder;
-import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -113,111 +107,11 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     setClearable(getConfiguredClearable());
     m_listeningSlaves = new FastListenerList<>();
     setAutoAddDefaultMenus(getConfiguredAutoAddDefaultMenus());
-
-    // menus
-    List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
-    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-    OrderedCollection<IMenu> menus = new OrderedCollection<>();
-    for (Class<? extends IMenu> menuClazz : declaredMenus) {
-      menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
-    }
-
-    menus.addAllOrdered(contributedMenus);
-
-    try {
-      injectMenusInternal(menus);
-    }
-    catch (Exception e) {
-      LOG.error("error occured while dynamically contributing menus.", e);
-    }
-    new MoveActionNodesHandler<>(menus).moveModelObjects();
-    setContextMenu(createContextMenu(menus));
-    setStatusMenuMappings(createStatusMenuMappings());
   }
 
-  protected List<IStatusMenuMapping> createStatusMenuMappings() {
-    List<Class<IStatusMenuMapping>> configuredMappings = getConfiguredStatusMenuMappings();
-    List<IStatusMenuMapping> mappings = new ArrayList<>();
-    for (Class<? extends IStatusMenuMapping> clazz : configuredMappings) {
-      IStatusMenuMapping mapping = ConfigurationUtility.newInnerInstance(this, clazz);
-      mappings.add(mapping);
-    }
-    for (IStatusMenuMapping mapping : mappings) {
-      mapping.setParentFieldInternal(this);
-    }
-    return mappings;
-  }
-
-  protected List<Class<IStatusMenuMapping>> getConfiguredStatusMenuMappings() {
-    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, IStatusMenuMapping.class);
-  }
-
+  @Override
   protected IValueFieldContextMenu createContextMenu(OrderedCollection<IMenu> menus) {
     return new ValueFieldContextMenu(this, menus.getOrderedList());
-  }
-
-  /**
-   * Override this internal method only in order to make use of dynamic menus<br>
-   * Used to add and/or remove menus<br>
-   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
-   *
-   * @param menus
-   *          live and mutable collection of configured menus
-   */
-  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
-  }
-
-  protected void setContextMenu(IValueFieldContextMenu contextMenu) {
-    propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
-  }
-
-  @Override
-  public IValueFieldContextMenu getContextMenu() {
-    return (IValueFieldContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
-  }
-
-  @Override
-  public List<IMenu> getMenus() {
-    return getContextMenu().getChildActions();
-  }
-
-  @Override
-  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
-    return MenuUtility.getMenuByClass(this, menuType);
-  }
-
-  @Override
-  public List<? extends IWidget> getChildren() {
-    return CollectionUtility.flatten(super.getChildren(), getMenus());
-  }
-
-  @Override
-  protected void initFieldInternal() {
-    super.initFieldInternal();
-    for (IStatusMenuMapping mapping : getStatusMenuMappings()) {
-      mapping.init();
-    }
-    for (IStatusMenuMapping mapping : getStatusMenuMappings()) {
-      mapping.init();
-    }
-  }
-
-  protected List<Class<? extends IMenu>> getDeclaredMenus() {
-    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    return ConfigurationUtility.removeReplacedClasses(filtered);
-  }
-
-  @Override
-  public void setStatusMenuMappings(List<IStatusMenuMapping> mappings) {
-    propertySupport.setProperty(PROP_STATUS_MENU_MAPPINGS, new ArrayList<>(mappings));
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<IStatusMenuMapping> getStatusMenuMappings() {
-    return (List<IStatusMenuMapping>) propertySupport.getProperty(PROP_STATUS_MENU_MAPPINGS);
   }
 
   /*

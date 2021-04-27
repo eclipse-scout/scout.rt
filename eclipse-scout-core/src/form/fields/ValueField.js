@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Event, focusUtils, FormField, menus as menus_1, objects, ParsingFailedStatus, scout, Status, strings, ValidationFailedStatus} from '../../index';
+import {arrays, Event, focusUtils, FormField, objects, ParsingFailedStatus, scout, Status, strings, ValidationFailedStatus} from '../../index';
 import $ from 'jquery';
 
 /**
@@ -581,25 +581,6 @@ export default class ValueField extends FormField {
   addField($field) {
     super.addField($field);
     this.$field.data('valuefield', this);
-  }
-
-  setCurrentMenuTypes(currentMenuTypes) {
-    this.setProperty('currentMenuTypes', currentMenuTypes);
-  }
-
-  _renderCurrentMenuTypes() {
-    // If a tooltip is shown, update it with the new menus
-    this._updateFieldStatus();
-  }
-
-  _getCurrentMenus() {
-    if (this.currentMenuTypes) {
-      let menuTypes = this.currentMenuTypes.map(elem => {
-        return 'ValueField.' + elem;
-      });
-      return menus_1.filter(this.menus, menuTypes);
-    }
-    return super._getCurrentMenus();
   }
 
   markAsSaved() {

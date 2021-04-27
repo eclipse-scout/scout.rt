@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.imagefield;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
@@ -34,7 +33,7 @@ import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
  * <li>The ZoomOutKeyStroke reacts on '-' and calls doRelativeZoom(1.0/getZoomDeltaValue(),1.0/getZoomDeltaValue())
  * </ul>
  */
-public interface IImageField extends IFormField, IDNDSupport, IContextMenuOwner {
+public interface IImageField extends IFormField, IDNDSupport {
   String PROP_IMAGE_URL = "imageUrl";
   String PROP_IMAGE_ID = "imageId";
   String PROP_IMAGE = "image";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,11 +12,9 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.tabbox;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.DisplayableFormFieldFilter;
@@ -24,12 +22,9 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
-import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
-import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONObject;
 
-public class JsonTabBox<TAB_BOX extends ITabBox> extends JsonCompositeField<TAB_BOX, IGroupBox> implements IJsonContextMenuOwner {
-  private JsonContextMenu<IContextMenu> m_jsonContextMenu;
+public class JsonTabBox<TAB_BOX extends ITabBox> extends JsonCompositeField<TAB_BOX, IGroupBox> {
 
   public JsonTabBox(TAB_BOX model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -69,19 +64,6 @@ public class JsonTabBox<TAB_BOX extends ITabBox> extends JsonCompositeField<TAB_
   }
 
   @Override
-  protected void attachChildAdapters() {
-    super.attachChildAdapters();
-    m_jsonContextMenu = new JsonContextMenu<>(getModel().getContextMenu(), this);
-    m_jsonContextMenu.init();
-  }
-
-  @Override
-  protected void disposeChildAdapters() {
-    m_jsonContextMenu.dispose();
-    super.disposeChildAdapters();
-  }
-
-  @Override
   protected List<IGroupBox> getModelFields() {
     return getModel().getGroupBoxes();
   }
@@ -89,18 +71,6 @@ public class JsonTabBox<TAB_BOX extends ITabBox> extends JsonCompositeField<TAB_
   @Override
   protected String getModelFieldsPropertyName() {
     return "tabItems";
-  }
-
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    json.put(PROP_MENUS, m_jsonContextMenu.childActionsToJson());
-    return json;
-  }
-
-  @Override
-  public void handleModelContextMenuChanged(FilteredJsonAdapterIds<?> filteredAdapters) {
-    addPropertyChangeEvent(PROP_MENUS, filteredAdapters);
   }
 
   @Override

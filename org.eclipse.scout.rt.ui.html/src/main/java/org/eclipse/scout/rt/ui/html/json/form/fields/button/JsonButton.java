@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,31 +12,25 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.button;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
-import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONObject;
 
-public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> implements IJsonContextMenuOwner, IBinaryResourceProvider {
+public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> implements IBinaryResourceProvider {
 
   public static final String PROP_SYSTEM_TYPE = "systemType";
   public static final String PROP_PROCESS_BUTTON = "processButton";
   public static final String PROP_DEFAULT_BUTTON = "defaultButton";
   public static final String PROP_DISPLAY_STYLE = "displayStyle";
-
-  private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
   public JsonButton(BUTTON model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -132,7 +126,6 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    json.put(PROP_MENUS, m_jsonContextMenu.childActionsToJson());
     IJsonAdapter<?> adapter = null;
     if (getModel().getKeyStrokeScope() != null) {
       List<?> adapterList = getUiSession().getJsonAdapters(getModel().getKeyStrokeScope());
@@ -144,24 +137,6 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
       json.put(IButton.PROP_KEY_STROKE_SCOPE, adapter.getId());
     }
     return json;
-  }
-
-  @Override
-  public void handleModelContextMenuChanged(FilteredJsonAdapterIds<?> filteredAdapters) {
-    addPropertyChangeEvent(PROP_MENUS, filteredAdapters);
-  }
-
-  @Override
-  protected void attachChildAdapters() {
-    super.attachChildAdapters();
-    m_jsonContextMenu = new JsonContextMenu<>(getModel().getContextMenu(), this);
-    m_jsonContextMenu.init();
-  }
-
-  @Override
-  protected void disposeChildAdapters() {
-    m_jsonContextMenu.dispose();
-    super.disposeChildAdapters();
   }
 
   @Override

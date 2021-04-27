@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,11 +10,6 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import java.util.List;
-
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
@@ -24,17 +19,13 @@ import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
  * @see ITextField, ISmartField, INumberField, IDateField, IFileChooser, IListBox, ITreeBox, ICheckBox, IRadioButton,
  *      IToogleButton
  */
-public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContextMenuOwner {
+public interface IValueField<VALUE> extends IFormField, IHolder<VALUE> {
   /*
    * Properties
    */
   String PROP_DISPLAY_TEXT = "displayText";
   String PROP_VALUE = "value";
   String PROP_AUTO_ADD_DEFAULT_MENUS = "autoAddDefaultMenus";
-  /**
-   * {@link IContextMenu}
-   */
-  String PROP_CONTEXT_MENU = "contextMenu";
 
   String PROP_CLEARABLE = "clearable";
 
@@ -56,8 +47,6 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
    * @see IValueField#setClearable(String)
    */
   String CLEARABLE_ALWAYS = "always";
-
-  String PROP_STATUS_MENU_MAPPINGS = "statusMenuMappings";
 
   /**
    * set field value to initValue and clear all error flags
@@ -137,9 +126,6 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
    */
   void fireValueChanged();
 
-  @Override
-  IValueFieldContextMenu getContextMenu();
-
   /**
    * Gets if the default system menus (cut, copy, paste) should be added automatically to the menus of this field.
    *
@@ -176,16 +162,4 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
    * </ul>
    */
   void setClearable(String clearableStyle);
-
-  /**
-   * @return the mappings between menu and status. The mappings may be set explicitly using
-   *         {@link #setStatusMenuMappings(List)} or by defining an inner class at the form field extending from
-   *         {@link AbstractStatusMenuMapping}.
-   */
-  List<IStatusMenuMapping> getStatusMenuMappings();
-
-  /**
-   * Defines which menus should be displayed when an error status is shown. If the list is empty no menus are displayed.
-   */
-  void setStatusMenuMappings(List<IStatusMenuMapping> mappings);
 }

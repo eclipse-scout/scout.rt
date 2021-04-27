@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,11 +15,6 @@ export default class TabItem extends GroupBox {
   constructor() {
     super();
     this.marked = false;
-  }
-
-  _init(model) {
-    super._init(model);
-    this._setMenusVisible(this.menusVisible);
   }
 
   _createLayout() {
@@ -57,12 +52,8 @@ export default class TabItem extends GroupBox {
     this.setProperty('marked', marked);
   }
 
-  _setMenusVisible() {
-    // Always invisible because menus are displayed in menu bar and not with status icon
-    // Actually not needed at the moment because only value fields have menus (at least at the java model).
-    // But actually we should change this so that menus are possible for every form field
-    // TODO [7.0] cgu: remove this comment if java model supports form field menus
-    this._setProperty('menusVisible', false);
+  getContextMenuItems() {
+    return [];
   }
 
   /**

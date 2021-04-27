@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -167,10 +167,10 @@ export default class SequenceBox extends CompositeField {
       this._isTooltipTextOverwritten = false;
     }
 
-    if (this._lastVisibleField.menus && this._lastVisibleField.menus.length > 0) {
+    if (this._lastVisibleField.getContextMenuItems() && this._lastVisibleField.getContextMenuItems().length > 0) {
       // Change owner to make sure menu won't be destroyed when setMenus is called
       this._updateBoxMenuOwner(this.fieldStatus);
-      this.setMenus(this._lastVisibleField.menus);
+      this.setMenus(this._lastVisibleField.getContextMenuItems());
       this.setMenusVisible(this._lastVisibleField.menusVisible);
       this._isMenusOverwritten = true;
     } else {

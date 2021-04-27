@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 
 public abstract class AbstractStatusMenuMapping extends AbstractPropertyObserver implements IStatusMenuMapping {
   private Class<? extends IMenu> m_menuClass;
-  private IValueField<?> m_parentField;
+  private IFormField m_parentField;
 
   public AbstractStatusMenuMapping() {
     this(true);
@@ -42,7 +42,7 @@ public abstract class AbstractStatusMenuMapping extends AbstractPropertyObserver
   }
 
   @Override
-  public void setParentFieldInternal(IValueField<?> parentField) {
+  public void setParentFieldInternal(IFormField parentField) {
     m_parentField = parentField;
   }
 

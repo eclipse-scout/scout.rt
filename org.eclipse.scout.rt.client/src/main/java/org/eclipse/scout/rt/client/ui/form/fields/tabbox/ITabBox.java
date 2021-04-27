@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,13 +12,11 @@ package org.eclipse.scout.rt.client.ui.form.fields.tabbox;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 
-public interface ITabBox extends ICompositeField, IContextMenuOwner {
+public interface ITabBox extends ICompositeField {
 
   /**
    * {@link IGroupBox}
@@ -26,11 +24,6 @@ public interface ITabBox extends ICompositeField, IContextMenuOwner {
   String PROP_SELECTED_TAB = "selectedTab";
 
   String PROP_MARK_STRATEGY = "markStrategy";
-
-  /**
-   * {@link IContextMenu}
-   */
-  String PROP_CONTEXT_MENU = "contextMenu";
 
   String PROP_TAB_AREA_STYLE = "tabAreaStyle";
 

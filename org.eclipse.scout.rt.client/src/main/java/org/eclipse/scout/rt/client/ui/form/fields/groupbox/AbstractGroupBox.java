@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,15 +16,9 @@ import java.util.Optional;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
-import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox.IGroupBoxExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
-import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
@@ -42,10 +36,8 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 @ClassId("6a093505-c2b1-4df2-84d6-e799f91e6e7c")
 public abstract class AbstractGroupBox extends AbstractCompositeField implements IGroupBox {
@@ -389,24 +381,10 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     setMenuBarPosition(getConfiguredMenuBarPosition());
     setMenuBarEllipsisPosition(getConfiguredMenuBarEllipsisPosition());
     setResponsive(getConfiguredResponsive());
-    initMenus();
 
     if (isCacheExpanded()) {
       Optional.ofNullable(ClientUIPreferences.getInstance().isFieldCollapsed(this)).ifPresent(b -> setExpanded(!b));
     }
-  }
-
-  private void initMenus() {
-    List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
-    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-    OrderedCollection<IMenu> menus = new OrderedCollection<>();
-    for (Class<? extends IMenu> menuClazz : declaredMenus) {
-      menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
-    }
-    menus.addAllOrdered(contributedMenus);
-    injectMenusInternal(menus);
-    new MoveActionNodesHandler<>(menus).moveModelObjects();
-    setContextMenu(new FormFieldContextMenu<IGroupBox>(this, menus.getOrderedList()));
   }
 
   @Override
@@ -463,47 +441,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     m_groupBoxes = null;
     m_customButtons = null;
     m_systemButtons = null;
-  }
-
-  /**
-   * Override this internal method only in order to make use of dynamic menus<br>
-   * Used to add and/or remove menus<br>
-   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
-   *
-   * @param menus
-   *          live and mutable collection of configured menus
-   */
-  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
-  }
-
-  @Override
-  public List<? extends IWidget> getChildren() {
-    return CollectionUtility.flatten(super.getChildren(), getMenus());
-  }
-
-  protected void setContextMenu(IFormFieldContextMenu contextMenu) {
-    propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
-  }
-
-  @Override
-  public IFormFieldContextMenu getContextMenu() {
-    return (IFormFieldContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
-  }
-
-  @Override
-  public List<IMenu> getMenus() {
-    return getContextMenu().getChildActions();
-  }
-
-  @Override
-  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
-    return MenuUtility.getMenuByClass(this, menuType);
-  }
-
-  protected List<Class<? extends IMenu>> getDeclaredMenus() {
-    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    return ConfigurationUtility.removeReplacedClasses(filtered);
   }
 
   @Override
