@@ -147,6 +147,44 @@ export function insertSorted(arr, element, compareFunc) {
 }
 
 /**
+ * Inserts to given element into the array directly BEFORE the first array element that matches the given predicate.
+ * If no such element can be found, the new element is inserted at the BEGIN of the array.
+ *
+ * @template T
+ * @param {T[]} arr
+ * @param {T} elementToInsert
+ * @param {function(T): boolean} predicate
+ * @param [*] thisArg optional "this" binding for predicate function
+ */
+export function insertBefore(arr, elementToInsert, predicate, thisArg) {
+  var index = findIndex(arr, predicate, thisArg);
+  if (index === -1) {
+    arr.unshift(elementToInsert);
+  } else {
+    insert(arr, elementToInsert, index);
+  }
+}
+
+/**
+ * Inserts to given element into the array directly AFTER the first array element that matches the given predicate.
+ * If no such element can be found, the new element is inserted at the END of the array.
+ *
+ * @template T
+ * @param {T[]} arr
+ * @param {T} elementToInsert
+ * @param {function(T): boolean} predicate
+ * @param [*] thisArg optional "this" binding for predicate function
+ */
+export function insertAfter(arr, elementToInsert, predicate) {
+  var index = findIndex(arr, predicate);
+  if (index === -1) {
+    arr.push(elementToInsert);
+  } else {
+    insert(arr, elementToInsert, index + 1);
+  }
+}
+
+/**
  * This function uses insert() which relies on Array.prototype.splice(). Check its js-doc for details.
  */
 export function move(arr, fromIndex, toIndex) {
@@ -519,6 +557,8 @@ export default {
   insertAll,
   insertArray,
   insertSorted,
+  insertBefore,
+  insertAfter,
   last,
   max,
   min,

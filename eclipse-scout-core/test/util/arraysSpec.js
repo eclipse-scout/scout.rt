@@ -195,6 +195,50 @@ describe('scout.arrays', function() {
 
   });
 
+  describe('insertBefore', function() {
+
+    it('inserts element before another element', function() {
+      var flat = arr => arr.map(el => el.text).join(', ');
+
+      var arr = [];
+      arrays.insertBefore(arr, {id: 1, text: 'A'}, el => true);
+      arrays.insertBefore(arr, {id: 2, text: 'B'}, el => true);
+      arrays.insertBefore(arr, {id: 3, text: 'C'}, el => true);
+      expect(flat(arr)).toBe('C, B, A');
+
+      arrays.insertBefore(arr, {id: 4, text: 'D'}, el => false);
+      expect(flat(arr)).toBe('D, C, B, A'); // inserted at begin of array, because predicate does not match
+
+      arrays.insertBefore(arr, {id: 4, text: 'D2'}, el => el.id === 2);
+      expect(flat(arr)).toBe('D, C, D2, B, A'); // insert before an element that matches
+      arrays.insertBefore(arr, {id: 5, text: 'E'}, el => el.id === 4);
+      expect(flat(arr)).toBe('E, D, C, D2, B, A'); // inserted before first element that matches
+    });
+
+  });
+
+  describe('insertAfter', function() {
+
+    it('inserts element after another element', function() {
+      var flat = arr => arr.map(el => el.text).join(', ');
+
+      var arr = [];
+      arrays.insertAfter(arr, {id: 1, text: 'A'}, el => true);
+      arrays.insertAfter(arr, {id: 2, text: 'B'}, el => true);
+      arrays.insertAfter(arr, {id: 3, text: 'C'}, el => true);
+      expect(flat(arr)).toBe('A, C, B');
+
+      arrays.insertAfter(arr, {id: 4, text: 'D'}, el => false);
+      expect(flat(arr)).toBe('A, C, B, D'); // inserted at end of array, because predicate does not match
+
+      arrays.insertAfter(arr, {id: 4, text: 'D2'}, el => el.id === 2);
+      expect(flat(arr)).toBe('A, C, B, D2, D'); // insert after an element that matches
+      arrays.insertAfter(arr, {id: 5, text: 'E'}, el => el.id === 4);
+      expect(flat(arr)).toBe('A, C, B, D2, E, D'); // inserted after first element that matches
+    });
+
+  });
+
   describe('max', function() {
     it('returns 0 iff input contains 0', function() {
       expect(arrays.max([null, 5])).toBe(5);
