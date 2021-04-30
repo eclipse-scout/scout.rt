@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.notification.JsonNotification;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
 public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotification> extends JsonNotification<DESKTOP_NOTIFICATION> {
@@ -39,14 +40,33 @@ public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotifi
       }
     });
 
-    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>("nativeOnly", model) {
+    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>(IDesktopNotification.PROP_NATIVE_ONLY, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isNativeOnly();
       }
     });
 
-    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>("nativeNotificationVisibility", model) {
+    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>(IDesktopNotification.PROP_NATIVE_NOTIFICATION_TITLE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getNativeNotificationTitle();
+      }
+    });
+
+    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>(IDesktopNotification.PROP_NATIVE_NOTIFICATION_ICON_ID, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getNativeNotificationIconId();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return BinaryResourceUrlUtility.createIconUrl((String) value);
+      }
+    });
+
+    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>(IDesktopNotification.PROP_NATIVE_NOTIFICATION_VISIBILITY, model) {
       @Override
       protected String modelValue() {
         return getModel().getNativeNotificationVisibility();

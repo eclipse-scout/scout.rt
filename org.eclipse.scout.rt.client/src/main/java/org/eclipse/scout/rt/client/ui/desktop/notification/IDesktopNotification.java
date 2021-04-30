@@ -47,6 +47,14 @@ public interface IDesktopNotification extends INotification {
    */
   String NATIVE_NOTIFICATION_VISIBILITY_ALWAYS = "always";
 
+  String PROP_NATIVE_ONLY = "nativeOnly";
+
+  String PROP_NATIVE_NOTIFICATION_VISIBILITY = "nativeNotificationVisibility";
+
+  String PROP_NATIVE_NOTIFICATION_TITLE = "nativeNotificationTitle";
+
+  String PROP_NATIVE_NOTIFICATION_ICON_ID = "nativeNotificationIconId";
+
   String PROP_NATIVE_NOTIFICATION_SHOWN = "nativeNotificationShown";
 
   DesktopNotification withDuration(long duration);
@@ -81,6 +89,20 @@ public interface IDesktopNotification extends INotification {
    * {@link #NATIVE_NOTIFICATION_VISIBILITY_BACKGROUND}
    */
   String getNativeNotificationVisibility();
+
+  DesktopNotification withNativeNotificationTitle(String nativeNotificationTitle);
+
+  /**
+   * The title displayed on the native notification.
+   */
+  String getNativeNotificationTitle();
+
+  DesktopNotification withNativeNotificationIconId(String nativeNotificationIconId);
+
+  /**
+   * The icon displayed on the native notification.
+   */
+  String getNativeNotificationIconId();
 
   /**
    * Indicates, whether the native notification is shown. Once it is closed, the property will be set to false.

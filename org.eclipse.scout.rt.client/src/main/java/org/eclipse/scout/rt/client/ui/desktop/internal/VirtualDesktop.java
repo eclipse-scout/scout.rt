@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.client.ui.desktop.bench.layout.BenchLayoutData;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeManager;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
+import org.eclipse.scout.rt.client.ui.desktop.notification.NativeNotificationDefaults;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -728,12 +729,12 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public String getNativeNotificationVisibility() {
+  public NativeNotificationDefaults getNativeNotificationDefaults() {
     return null;
   }
 
   @Override
-  public void setNativeNotificationVisibility(String nativeNotificationVisibility) {
+  public void setNativeNotificationDefaults(NativeNotificationDefaults nativeNotificationDefaults) {
     // NOP
   }
 

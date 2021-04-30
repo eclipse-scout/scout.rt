@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.notification.NativeNotificationDefaults;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
@@ -47,6 +48,11 @@ public class Desktop extends AbstractDesktop {
   @Override
   protected String getConfiguredLogoId() {
     return Icons.AppLogo;
+  }
+
+  @Override
+  protected NativeNotificationDefaults getConfiguredNativeNotificationDefaults() {
+    return super.getConfiguredNativeNotificationDefaults().withIconId("application_logo.png");
   }
 
   @Override

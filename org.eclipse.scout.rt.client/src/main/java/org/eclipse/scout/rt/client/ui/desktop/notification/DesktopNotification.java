@@ -20,13 +20,12 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 @ClassId("cd82392d-609d-44c2-ac41-87fca7a78646")
 public class DesktopNotification extends Notification implements IDesktopNotification {
 
   private long m_duration;
-  private boolean m_nativeOnly = false;
-  private String m_nativeNotificationVisibility = IDesktopNotification.NATIVE_NOTIFICATION_VISIBILITY_NONE;
   private final IDesktopNotificationUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
 
   /**
@@ -76,9 +75,11 @@ public class DesktopNotification extends Notification implements IDesktopNotific
   public DesktopNotification(IStatus status, long duration, boolean closable, boolean htmlEnabled, Consumer<String> appLinkConsumer) {
     super(status, closable, htmlEnabled, appLinkConsumer);
     m_duration = duration;
-    String nativeNotificationVisibility = IDesktop.CURRENT.get().getNativeNotificationVisibility();
-    if (nativeNotificationVisibility != null) {
-      m_nativeNotificationVisibility = nativeNotificationVisibility;
+    NativeNotificationDefaults nativeNotificationDefaults = IDesktop.CURRENT.get().getNativeNotificationDefaults();
+    if (nativeNotificationDefaults != null) {
+      withNativeNotificationTitle(nativeNotificationDefaults.getTitle());
+      withNativeNotificationIconId(nativeNotificationDefaults.getIconId());
+      withNativeNotificationVisibility(ObjectUtility.nvl(nativeNotificationDefaults.getVisibility(), NATIVE_NOTIFICATION_VISIBILITY_NONE));
     }
   }
 
@@ -95,24 +96,46 @@ public class DesktopNotification extends Notification implements IDesktopNotific
 
   @Override
   public DesktopNotification withNativeOnly(boolean nativeOnly) {
-    m_nativeOnly = nativeOnly;
+    propertySupport.setPropertyBool(PROP_NATIVE_ONLY, nativeOnly);
     return this;
   }
 
   @Override
   public boolean isNativeOnly() {
-    return m_nativeOnly;
+    return propertySupport.getPropertyBool(PROP_NATIVE_ONLY);
   }
 
   @Override
   public DesktopNotification withNativeNotificationVisibility(String nativeNotificationVisibility) {
-    m_nativeNotificationVisibility = nativeNotificationVisibility;
+    propertySupport.setPropertyString(PROP_NATIVE_NOTIFICATION_VISIBILITY, nativeNotificationVisibility);
     return this;
   }
 
   @Override
   public String getNativeNotificationVisibility() {
-    return m_nativeNotificationVisibility;
+    return propertySupport.getPropertyString(PROP_NATIVE_NOTIFICATION_VISIBILITY);
+  }
+
+  @Override
+  public DesktopNotification withNativeNotificationTitle(String nativeNotificationTitle) {
+    propertySupport.setPropertyString(PROP_NATIVE_NOTIFICATION_TITLE, nativeNotificationTitle);
+    return this;
+  }
+
+  @Override
+  public String getNativeNotificationTitle() {
+    return propertySupport.getPropertyString(PROP_NATIVE_NOTIFICATION_TITLE);
+  }
+
+  @Override
+  public DesktopNotification withNativeNotificationIconId(String nativeNotificationIconId) {
+    propertySupport.setPropertyString(PROP_NATIVE_NOTIFICATION_ICON_ID, nativeNotificationIconId);
+    return this;
+  }
+
+  @Override
+  public String getNativeNotificationIconId() {
+    return propertySupport.getPropertyString(PROP_NATIVE_NOTIFICATION_ICON_ID);
   }
 
   /**

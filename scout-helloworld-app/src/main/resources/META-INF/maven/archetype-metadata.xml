@@ -129,6 +129,8 @@
           <includes>
             <include>**/*.gif</include>
             <include>**/*.png</include>
+            <include>**/*.jpg</include>
+            <include>**/*.svg</include>
           </includes>
         </fileSet>
         <fileSet encoding="UTF-8">

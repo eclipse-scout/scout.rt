@@ -2,7 +2,10 @@ export default () => ({
   id: '${simpleArtifactName}.Desktop',
   title: '${symbol_dollar}{textKey:ApplicationTitle}',
   objectType: 'Desktop',
-  logoUrl: 'img/eclipse_scout_logo.png',
+  logoUrl: 'img/eclipse_scout_logo.svg',
+  nativeNotificationDefaults: {
+    iconId: 'img/eclipse_scout_logo.png'
+  },
   outline: {
     objectType: '${simpleArtifactName}.DataOutline'
   },

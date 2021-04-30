@@ -19,6 +19,8 @@ export default class DesktopNotification extends ScoutNotification {
     this.removeTimeout = null;
     this._removing = false;
     this.nativeOnly = false;
+    this.nativeNotificationTitle = null;
+    this.nativeNotificationIconId = null;
     this.nativeNotificationVisibility = DesktopNotification.NativeNotificationVisibility.NONE;
     this.nativeNotification = null;
     this.nativeNotificationShown = false;
@@ -43,6 +45,24 @@ export default class DesktopNotification extends ScoutNotification {
    * When duration is set to INFINITE, the notification is not removed automatically.
    */
   static INFINITE = -1;
+
+  /**
+   * @typedef NativeNotificationDefaults
+   * @property {string} title
+   * @property {string} iconId
+   * @property {NativeNotificationVisibility} visibility
+   */
+
+  _init(model) {
+    super._init(model);
+    let defaults = this.session.desktop.nativeNotificationDefaults;
+    if (defaults) {
+      this.nativeNotificationTitle = model.nativeNotificationTitle !== undefined ? model.nativeNotificationTitle : defaults.title;
+      this.nativeNotificationIconId = model.nativeNotificationIconId !== undefined ? model.nativeNotificationIconId : defaults.iconId;
+      this.nativeNotificationVisibility = scout.nvl(model.nativeNotificationVisibility !== undefined ? model.nativeNotificationVisibility : defaults.visibility, DesktopNotification.NativeNotificationVisibility.NONE);
+    }
+    this.resolveTextKeys(['nativeNotificationTitle']);
+  }
 
   _render() {
     this._initNativeNotification();
@@ -87,10 +107,11 @@ export default class DesktopNotification extends ScoutNotification {
       }
       return;
     }
-    const message = scout.nvl(strings.nl2br(this.status.message), '');
-    this.nativeNotification = new Notification(this.session.desktop.title, {
-      body: message,
-      icon: this.session.desktop.logoUrl
+    let title = scout.nvl(this.nativeNotificationTitle, '');
+    let body = scout.nvl(strings.nl2br(this.status.message), '');
+    this.nativeNotification = new Notification(title, {
+      body: body,
+      icon: this.nativeNotificationIconId
     });
 
     this.nativeNotification.addEventListener('show', event => {
@@ -215,4 +236,15 @@ export default class DesktopNotification extends ScoutNotification {
     this._setProperty('nativeNotificationShown', shown);
   }
 
+  setNativeNotificationTitle(title) {
+    this.setProperty('nativeNotificationTitle', title);
+  }
+
+  setNativeNotificationIconId(iconId) {
+    this.setProperty('nativeNotificationIconId', iconId);
+  }
+
+  setNativeNotificationVisibility(visibility) {
+    this.setProperty('nativeNotificationVisibility', visibility);
+  }
 }

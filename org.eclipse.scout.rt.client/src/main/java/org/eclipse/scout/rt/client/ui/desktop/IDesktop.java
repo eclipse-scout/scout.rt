@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeManager;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
+import org.eclipse.scout.rt.client.ui.desktop.notification.NativeNotificationDefaults;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -118,7 +119,7 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   String PROP_DISPLAY_STYLE = "displayStyle";
 
-  String PROP_NATIVE_NOTIFICATION_VISIBILITY = "nativeNotificationVisibility";
+  String PROP_NATIVE_NOTIFICATION_DEFAULTS = "nativeNotificationDefaults";
 
   String PROP_ACTIVE_FORM = "activeForm";
 
@@ -1030,11 +1031,11 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   /**
    * @since 22.0
    */
-  void setNativeNotificationVisibility(String notificationVisibility);
+  void setNativeNotificationDefaults(NativeNotificationDefaults notificationDefaults);
 
   /**
    * @since 22.0
    */
-  String getNativeNotificationVisibility();
+  NativeNotificationDefaults getNativeNotificationDefaults();
 
 }

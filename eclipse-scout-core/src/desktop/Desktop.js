@@ -59,6 +59,8 @@ export default class Desktop extends Widget {
     this.headerVisible = true;
     this.geolocationServiceAvailable = Device.get().supportsGeolocation();
     this.benchLayoutData = null;
+    /** @type NativeNotificationDefaults|null */
+    this.nativeNotificationDefaults = null;
 
     this.menus = [];
     this.addOns = [];
@@ -165,6 +167,9 @@ export default class Desktop extends Widget {
     let session = model.session || model.parent.session;
     session.desktop = this;
 
+    // Needs to be initialized before notifications are created because notifications read this value during init
+    model.nativeNotificationDefaults = this._createNativeNotificationDefaults(model);
+
     super._init(model);
     this.url = new URL();
     this._initTheme();
@@ -214,6 +219,24 @@ export default class Desktop extends Widget {
       new DisableBrowserF5ReloadKeyStroke(this),
       new DisableBrowserTabSwitchingKeyStroke(this)
     ]);
+  }
+
+  /**
+   * @param {object} model desktop model
+   * @return {NativeNotificationDefaults}
+   */
+  _createNativeNotificationDefaults(model) {
+    return $.extend({
+      title: model.title,
+      iconId: model.logoId
+    }, model.nativeNotificationDefaults);
+  }
+
+  /**
+   * @param {NativeNotificationDefaults} defaults
+   */
+  setNativeNotificationDefaults(defaults) {
+    this.setProperty('nativeNotificationDefaults', defaults);
   }
 
   _onBenchActivateViewChanged(event) {

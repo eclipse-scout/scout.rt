@@ -70,6 +70,7 @@ import org.eclipse.scout.rt.client.ui.desktop.bench.layout.BenchLayoutData;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeManager;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
+import org.eclipse.scout.rt.client.ui.desktop.notification.NativeNotificationDefaults;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -390,6 +391,27 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     return false;
   }
 
+  /**
+   * Configures the default settings for native notifications. A specific notification can override these settings if
+   * desired.
+   * <p>
+   * The default object is initialized with the desktop's title and logo id. If these values change the defaults won't
+   * be adjusted automatically. If you want them to be aligned you need to update the native notification defaults
+   * whenever the title or logo changes. <br>
+   * Note: SVG icons may not work with every browser, you may have to use a bitmap icon.
+   * </p>
+   *
+   * @see IDesktopNotification
+   */
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(110)
+  protected NativeNotificationDefaults getConfiguredNativeNotificationDefaults() {
+    return new NativeNotificationDefaults()
+        .withTitle(getTitle())
+        .withIconId(getLogoId())
+        .withVisibility(IDesktopNotification.NATIVE_NOTIFICATION_VISIBILITY_NONE);
+  }
+
   private List<Class<? extends IAction>> getConfiguredActions() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IAction>> fca = ConfigurationUtility.filterClasses(dca, IAction.class);
@@ -627,6 +649,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     initDisplayStyle(getDisplayStyle());
     setCacheSplitterPosition(getConfiguredCacheSplitterPosition());
     setLogoActionEnabled(getConfiguredLogoActionEnabled());
+    setNativeNotificationDefaults(getConfiguredNativeNotificationDefaults());
     List<IDesktopExtension> extensions = getDesktopExtensions();
     m_contributionHolder = new ContributionComposite(this);
 
@@ -694,9 +717,9 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * The default list contains only the {@link #getLocalDesktopExtension()}
    * </p>
    * <p>
-   * The extension that are held by this desktop must call {@link IDesktopExtension#setCoreDesktop(IDesktop)}
-   * passing <code>this</code> as argument, before using the extension. That way the extension can use and access
-   * this desktop's methods.
+   * The extension that are held by this desktop must call {@link IDesktopExtension#setCoreDesktop(IDesktop)} passing
+   * <code>this</code> as argument, before using the extension. That way the extension can use and access this desktop's
+   * methods.
    * </p>
    *
    * @param desktopExtensions
@@ -2132,12 +2155,10 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   /**
-   * How many times the attachGui() method has been called. Some behavior like URL or deep-link handling
-   * may be different the first time a desktop is attached. If the attached count is 1 it means the desktop
-   * has been created. If attached count is > 1 it means an existing desktop is re-used (probably by a
-   * reload with Ctrl + R in the browser).
-   *
-   * @return
+   * How many times the attachGui() method has been called. Some behavior like URL or deep-link handling may be
+   * different the first time a desktop is attached. If the attached count is 1 it means the desktop has been created.
+   * If attached count is > 1 it means an existing desktop is re-used (probably by a reload with Ctrl + R in the
+   * browser).
    */
   protected int getAttachedCount() {
     return m_attachedCount;
@@ -2195,7 +2216,8 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       try {
         m_activatingDefaultView = true;
         interceptDefaultView();
-      } finally {
+      }
+      finally {
         m_activatingDefaultView = false;
       }
     }
@@ -2855,13 +2877,13 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
-  public String getNativeNotificationVisibility() {
-    return propertySupport.getPropertyString(PROP_NATIVE_NOTIFICATION_VISIBILITY);
+  public NativeNotificationDefaults getNativeNotificationDefaults() {
+    return (NativeNotificationDefaults) propertySupport.getProperty(PROP_NATIVE_NOTIFICATION_DEFAULTS);
   }
 
   @Override
-  public void setNativeNotificationVisibility(String notificationVisibility) {
-    propertySupport.setProperty(PROP_NATIVE_NOTIFICATION_VISIBILITY, notificationVisibility);
+  public void setNativeNotificationDefaults(NativeNotificationDefaults nativeNotificationDefaults) {
+    propertySupport.setProperty(PROP_NATIVE_NOTIFICATION_DEFAULTS, nativeNotificationDefaults);
   }
 
   /**

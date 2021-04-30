@@ -93,6 +93,8 @@
           <directory>src/main/resources</directory>
           <includes>
             <include>**/*.png</include>
+            <include>**/*.jpg</include>
+            <include>**/*.svg</include>
             <include>**/*.ico</include>
           </includes>
         </fileSet>
