@@ -89,9 +89,9 @@ public class ScoutInfoForm extends AbstractForm {
   }
 
   protected IHtmlElement createLogoHtml() {
-    IconSpec logo = IconLocator.instance().getIconSpec(AbstractIcons.ApplicationLogo);
+    IconSpec logo = IconLocator.instance().getIconSpec(getProductLogoId());
     if (logo != null) {
-      return HTML.div(HTML.imgByIconId(AbstractIcons.ApplicationLogo).cssClass("scout-info-form-logo")).cssClass("scout-info-form-logo-container");
+      return HTML.div(HTML.imgByIconId(getProductLogoId()).cssClass("scout-info-form-logo")).cssClass("scout-info-form-logo-container");
     }
     return null;
   }
@@ -111,6 +111,10 @@ public class ScoutInfoForm extends AbstractForm {
 
   protected String getProductVersion() {
     return CONFIG.getPropertyValue(ApplicationVersionProperty.class);
+  }
+
+  protected String getProductLogoId() {
+    return getDesktop().getLogoId();
   }
 
   protected Map<String, Object> getProperties() {
