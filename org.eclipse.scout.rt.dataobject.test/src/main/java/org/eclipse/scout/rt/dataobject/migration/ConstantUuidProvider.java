@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.util.uuid.IUuidProvider;
 @IgnoreBean
 public class ConstantUuidProvider implements IUuidProvider {
 
+  @SuppressWarnings("squid:S2245")
   private final Random m_random = new Random(42); // initialize with a constant seed so that output is predictable over different runs
 
   @Override

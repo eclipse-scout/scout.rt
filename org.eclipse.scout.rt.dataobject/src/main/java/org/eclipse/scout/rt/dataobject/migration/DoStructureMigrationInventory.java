@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.dataobject.migration;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,7 +34,6 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
@@ -50,7 +50,6 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  * classes).
  */
 @ApplicationScoped
-@CreateImmediately // apply validations at startup
 public class DoStructureMigrationInventory {
 
   protected final LinkedHashSet<String> m_namespaces = new LinkedHashSet<>();
@@ -499,7 +498,9 @@ public class DoStructureMigrationInventory {
    * This comparator can only be used if the versions to compare are known, i.e. part of the ones provided in the
    * constructor.
    */
-  protected static class ByNamespaceVersionComparator implements Comparator<NamespaceVersion> {
+  protected static class ByNamespaceVersionComparator implements Comparator<NamespaceVersion>, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final Map<NamespaceVersion, Integer> m_ordering;
 
