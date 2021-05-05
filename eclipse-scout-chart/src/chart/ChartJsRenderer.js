@@ -632,8 +632,15 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         yAxisLabel = yAxis.scaleLabel.labelString;
       xAxisLabel = xAxisLabel ? (xAxisLabel + ':') : ChartJsRenderer.ARROW_LEFT_RIGHT;
       yAxisLabel = yAxisLabel ? (yAxisLabel + ':') : ' ' + ChartJsRenderer.ARROW_UP_DOWN + ' ';
-      title = [xAxisLabel + ' ' + xAxis.ticks.callback(tooltipItem.xLabel),
-        yAxisLabel + ' ' + yAxis.ticks.callback(tooltipItem.yLabel)];
+      title = [];
+      let xTickLabel = xAxis.ticks.callback(tooltipItem.xLabel);
+      if (xTickLabel) {
+        title.push(xAxisLabel + ' ' + xTickLabel);
+      }
+      let yTickLabel = yAxis.ticks.callback(tooltipItem.yLabel);
+      if (yTickLabel) {
+        title.push(yAxisLabel + ' ' + yTickLabel);
+      }
     } else {
       let defaultTypeTooltipTitle;
       if (defaultTypeTooltips.callbacks) {
