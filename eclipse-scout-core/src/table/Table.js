@@ -5177,6 +5177,7 @@ export default class Table extends Widget {
    * @override Widget.js
    */
   _postAttach() {
+    this._rerenderViewportAfterAttach();
     let htmlParent = this.htmlComp.getParent();
     this.htmlComp.setSize(htmlParent.size());
     super._postAttach();
@@ -5187,12 +5188,20 @@ export default class Table extends Widget {
    */
   _renderOnAttach() {
     super._renderOnAttach();
-    // this is an "if... else if..." to avoid rendering the viewport multiple
-    // times in case all ...afterAttach flags are set to true.
+    this._rerenderViewportAfterAttach();
+    this._renderViewportAfterAttach();
+  }
+
+  _rerenderViewportAfterAttach() {
     if (this._rerenderViewPortAfterAttach) {
       this._rerenderViewport();
       this._rerenderViewPortAfterAttach = false;
-    } else if (this._renderViewPortAfterAttach) {
+      this._renderViewPortAfterAttach = false;
+    }
+  }
+
+  _renderViewportAfterAttach() {
+    if (this._renderViewPortAfterAttach) {
       this._renderViewport();
       this._renderViewPortAfterAttach = false;
     }

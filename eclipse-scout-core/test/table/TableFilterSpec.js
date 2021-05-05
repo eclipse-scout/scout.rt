@@ -22,7 +22,6 @@ describe('TableFilter', () => {
     $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
-
   });
 
   afterEach(() => {
@@ -327,6 +326,21 @@ describe('TableFilter', () => {
       expect(table.$rows().length).toBe(7);
     });
 
+    it('does not fail if rows are filtered while table is detached', () => {
+      let model = helper.createModelFixture(2, 7);
+      let table = helper.createTable(model);
+
+      table.render();
+      table.addFilter(helper.createTableTextFilter(table, 'asdf'));
+      table.detach();
+      table.filter();
+      table.attach();
+
+      expect(table.rows.length).toBe(7);
+      expect(table.filteredRows().length).toBe(0);
+      expect(table.viewRangeRendered.size()).toBe(0);
+      expect(table.$rows().length).toBe(0);
+    });
   });
 
   describe('selection', () => {
