@@ -232,6 +232,14 @@ export default class TableSpecHelper {
     return filter;
   }
 
+  createTableTextFilter(table, text) {
+    return scout.create('TableTextUserFilter', {
+      session: this.session,
+      table: table,
+      text: text
+    });
+  }
+
   /**
    * Applies display style on rows and cells so that cells are positioned correctly in a row.<br>
    * Necessary because the stylesheet is not applied when running the specs.
