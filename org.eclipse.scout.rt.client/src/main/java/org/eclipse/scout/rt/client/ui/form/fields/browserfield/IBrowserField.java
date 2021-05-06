@@ -11,9 +11,11 @@
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
@@ -63,6 +65,7 @@ public interface IBrowserField extends IFormField {
   String PROP_SCROLL_BAR_ENABLED = "scrollBarEnabled";
   String PROP_SANDBOX_ENABLED = "sandboxEnabled";
   String PROP_SANDBOX_PERMISSIONS = "sandboxPermissions";
+  String PROP_TRUSTED_MESSAGE_ORIGINS = "trustedMessageOrigins";
   String PROP_SHOW_IN_EXTERNAL_WINDOW = "showInExternalWindow";
   String PROP_EXTERNAL_WINDOW_FIELD_TEXT = "externalWindowFieldText";
   String PROP_EXTERNAL_WINDOW_BUTTON_TEXT = "externalWindowButtonText";
@@ -119,6 +122,21 @@ public interface IBrowserField extends IFormField {
    * @see #setAttachments(Set)
    */
   Set<BinaryResource> getAttachments();
+
+  /**
+   * Sends a message to the embedded web page ({@code iframe}).
+   *
+   * @param message
+   *          The message to send. Can be a {@link String}, a {@link Number}, a {@link Boolean} or an
+   *          {@link IDataObject}. All other objects are ignored.
+   * @param targetOrigin
+   *          The expected origin of the receiving {@code window}. If the origin does not match, the browser will not
+   *          dispatch the message for security reasons. See the
+   *          <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">documentation</a> for
+   *          details.
+   * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">window.postMessage (MDN)</a>
+   */
+  void postMessage(Object message, String targetOrigin);
 
   void setScrollBarEnabled(boolean scrollBarEnabled);
 
@@ -178,6 +196,21 @@ public interface IBrowserField extends IFormField {
   EnumSet<SandboxPermission> getSandboxPermissions();
 
   /**
+   * @return a list of origin URIs from which this field will receive messages posted via <i>postMessage</i>. If this is
+   *         {@code null} or empty, messages from all origins are accepted.
+   * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">window.postMessage (MDN)</a>
+   */
+  List<String> getTrustedMessageOrigins();
+
+  /**
+   * @param trustedMessageOrigins
+   *          A list of origin URIs from which this field will receive messages posted via <i>postMessage</i>. If this
+   *          is {@code null} or empty, messages from all origins are accepted.
+   * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">window.postMessage (MDN)</a>
+   */
+  void setTrustedMessageOrigins(List<String> trustedMessageOrigins);
+
+  /**
    * Configures the browser field general behavior. By default the content of the browser field is shown inline or in an
    * inline container (e.g. an &lt;iframe&gt; for the HTML5 UI layer), some very specific web pages (e.g. using
    * plug-ins, complex frames within the webpage) might not be displayed well or may even lead to a browser crash.
@@ -188,9 +221,9 @@ public interface IBrowserField extends IFormField {
    * <p>
    * Property can only be changed during initialization, it can not be changed during runtime.
    *
-   * @param <code>false</code>
-   *          to disable &lt;iframe&gt; usage, <code>true</code> otherwise.
-   * @see #isShowContentInIFrameEnabled()
+   * @param showInExternalWindow
+   *          <code>false</code> to disable &lt;iframe&gt; usage, <code>true</code> otherwise.
+   * @see #isShowInExternalWindow()
    */
   void setShowInExternalWindow(boolean showInExternalWindow);
 
@@ -198,7 +231,7 @@ public interface IBrowserField extends IFormField {
    * Returns whether content should be shown inline.
    *
    * @return <code>false</code> to disable &lt;iframe&gt; usage, <code>true</code> otherwise.
-   * @see #setShowContentInIFrameEnabled(boolean)
+   * @see #setShowInExternalWindow(boolean)
    */
   boolean isShowInExternalWindow();
 

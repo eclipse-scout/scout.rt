@@ -16,7 +16,7 @@ public interface IBrowserFieldUIFacade {
 
   void firePostExternalWindowStateFromUI(boolean windowState);
 
-  void firePostMessageFromUI(String data, String origin);
+  void firePostMessageFromUI(Object data, String origin);
 
   BinaryResource requestBinaryResourceFromUI(String filename);
 

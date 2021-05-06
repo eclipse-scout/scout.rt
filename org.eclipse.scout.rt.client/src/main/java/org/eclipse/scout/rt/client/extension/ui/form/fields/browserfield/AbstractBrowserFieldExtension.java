@@ -22,7 +22,7 @@ public abstract class AbstractBrowserFieldExtension<OWNER extends AbstractBrowse
   }
 
   @Override
-  public void execPostMessage(BrowserFieldPostMessageChain chain, String data, String origin) {
+  public void execPostMessage(BrowserFieldPostMessageChain chain, Object data, String origin) {
     chain.execPostMessage(data, origin);
   }
 

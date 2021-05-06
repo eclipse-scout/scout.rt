@@ -31,28 +31,24 @@ import org.junit.runner.RunWith;
  */
 @RunWith(PlatformTestRunner.class)
 public class JsonBrowserFieldTest extends BaseFormFieldTest {
-  /**
-   * <ul>
-   * <li>0: origin</li>
-   * <li>1: data</li>
-   * </ul>
-   */
-  private String[] m_lastPostMessage;
+
+  private Object m_lastPostMessageData;
+  private String m_lastPostMessageOrigin;
 
   private Boolean m_lastExternalWindowState;
 
   private AbstractBrowserField m_model = new AbstractBrowserField() {
 
     @Override
-    protected void execPostMessage(String data, String origin) {
-      m_lastPostMessage = new String[]{origin, data};
+    protected void execPostMessage(Object data, String origin) {
+      m_lastPostMessageData = data;
+      m_lastPostMessageOrigin = origin;
     }
 
     @Override
     protected void execExternalWindowStateChanged(boolean windowState) {
       m_lastExternalWindowState = windowState;
     }
-
   };
 
   private JsonBrowserField<IBrowserField> m_browserField = new JsonBrowserField<>(m_model, m_session, m_session.createUniqueId(), new JsonAdapterMock());
@@ -75,9 +71,8 @@ public class JsonBrowserFieldTest extends BaseFormFieldTest {
     map.put("origin", origin);
     map.put("data", data);
     m_browserField.handleUiEvent(new JsonEvent("xyz", "postMessage", new JSONObject(map)));
-    Assert.assertNotNull(m_lastPostMessage);
-    Assert.assertEquals(origin, m_lastPostMessage[0]);
-    Assert.assertEquals(data, m_lastPostMessage[1]);
+    Assert.assertEquals(data, m_lastPostMessageData);
+    Assert.assertEquals(origin, m_lastPostMessageOrigin);
   }
 
   @Test
@@ -89,5 +84,4 @@ public class JsonBrowserFieldTest extends BaseFormFieldTest {
     Assert.assertNotNull(m_lastExternalWindowState);
     Assert.assertEquals(true, m_lastExternalWindowState);
   }
-
 }

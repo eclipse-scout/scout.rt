@@ -35,7 +35,7 @@ public final class BrowserFieldChains {
       super(extensions);
     }
 
-    public void execPostMessage(final String data, final String origin) {
+    public void execPostMessage(final Object data, final String origin) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IBrowserFieldExtension<? extends AbstractBrowserField> next) {

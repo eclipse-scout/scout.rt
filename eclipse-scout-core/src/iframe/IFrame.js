@@ -28,7 +28,7 @@ export default class IFrame extends Widget {
   }
 
   _render() {
-    var cssClass = 'iframe ' + Device.get().cssClassForIphone();
+    let cssClass = 'iframe ' + Device.get().cssClassForIphone();
     if (this.wrapIframe) {
       this.$container = this.$parent.appendDiv('iframe-wrapper');
       this.$iframe = this.$container.appendElement('<iframe>', cssClass);
@@ -143,5 +143,12 @@ export default class IFrame extends Widget {
     if (this.rendered) {
       this._renderLocation();
     }
+  }
+
+  postMessage(message, targetOrigin) {
+    if (!this.rendered) {
+      return;
+    }
+    this.$iframe[0].contentWindow.postMessage(message, targetOrigin);
   }
 }

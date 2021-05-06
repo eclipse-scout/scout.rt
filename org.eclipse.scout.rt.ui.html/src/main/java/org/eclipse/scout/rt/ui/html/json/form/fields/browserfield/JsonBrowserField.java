@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.ui.html.json.form.fields.browserfield;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -17,6 +19,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.browserfield.BrowserFieldEvent
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.BrowserFieldListener;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField.SandboxPermission;
+import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.IDataObject;
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -26,6 +32,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonFormField<BROWSER_FIELD> implements IBinaryResourceProvider {
@@ -79,6 +86,20 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
         }
         sb.deleteCharAt(sb.length() - 1); // delete last space
         return sb.toString();
+      }
+    });
+    putJsonProperty(new JsonProperty<IBrowserField>(IBrowserField.PROP_TRUSTED_MESSAGE_ORIGINS, model) {
+      @Override
+      protected List<String> modelValue() {
+        return getModel().getTrustedMessageOrigins();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        if (value == null) {
+          return JSONObject.NULL;
+        }
+        return new JSONArray((Collection<?>) value); // Do NOT remove the cast! It is required to use the correct constructor.
       }
     });
     putJsonProperty(new JsonProperty<IBrowserField>(IBrowserField.PROP_SHOW_IN_EXTERNAL_WINDOW, model) {
@@ -151,9 +172,38 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
     addPropertyChangeEvent(IBrowserField.PROP_LOCATION, getLocation());
   }
 
+  protected void handleModelPostMessage(Object message, String targetOrigin) {
+    JSONObject eventData = new JSONObject();
+    eventData.put("message", messageToJson(message));
+    eventData.put("targetOrigin", targetOrigin);
+    addActionEvent(EVENT_POST_MESSAGE, eventData);
+  }
+
+  protected Object messageToJson(Object message) {
+    if (message == null) {
+      return JSONObject.NULL;
+    }
+    if (message instanceof IDataObject) {
+      IDataObjectMapper mapper = BEANS.get(IDataObjectMapper.class);
+      String str = mapper.writeValue(message);
+      if (message instanceof DoList) {
+        return new JSONArray(str);
+      }
+      return new JSONObject(str);
+    }
+    if (message instanceof String || message instanceof Number || message instanceof Boolean) {
+      return message;
+    }
+    // Unsupported (subclasses may override this method to change that)
+    throw new IllegalArgumentException("Unsupported message type: " + message);
+  }
+
   protected void handleModelBrowserFieldEvent(BrowserFieldEvent event) {
     if (BrowserFieldEvent.TYPE_CONTENT_CHANGED == event.getType()) {
       handleModelContentChanged();
+    }
+    else if (BrowserFieldEvent.TYPE_POST_MESSAGE == event.getType()) {
+      handleModelPostMessage(event.getMessage(), event.getTargetOrigin());
     }
   }
 
@@ -187,8 +237,20 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
   }
 
   protected void handleUiPostMessage(JsonEvent event) {
-    String data = event.getData().optString("data", null);
+    Object data = event.getData().opt("data");
     String origin = event.getData().optString("origin", null);
+
+    // Support for arbitrary objects (optional support, requires object mapper implementation)
+    if (data instanceof JSONObject || data instanceof JSONArray) {
+      // Convert "org.json" object to IDataObject
+      IDataObjectMapper mapper = BEANS.opt(IDataObjectMapper.class);
+      if (mapper != null) {
+        data = mapper.readValue(data.toString(), IDataObject.class);
+      }
+      else {
+        data = data.toString();
+      }
+    }
     getModel().getUIFacade().firePostMessageFromUI(data, origin);
   }
 

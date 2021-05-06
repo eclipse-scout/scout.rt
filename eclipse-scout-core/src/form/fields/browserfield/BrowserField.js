@@ -23,6 +23,7 @@ export default class BrowserField extends ValueField {
     this.trackLocation = false;
     this.sandboxEnabled = true;
     this.sandboxPermissions = null;
+    this.trustedMessageOrigins = [];
     this.scrollBarEnabled = true;
     this.showInExternalWindow = false;
     this._messageListener = null;
@@ -264,15 +265,26 @@ export default class BrowserField extends ValueField {
   }
 
   _onMessage(event) {
+    // Only handle event originating form "our" iframe
     if (event.source !== this.$field[0].contentWindow) {
-      $.log.isTraceEnabled() && $.log.trace('skipped post-message, because different source. data=' + event.data + ' origin=' + event.origin);
       return;
     }
-    $.log.isDebugEnabled() && $.log.debug('received post-message data=' + event.data + ' origin=' + event.origin);
+    // Check if the origin is trusted before we do anything else with the data
+    if (this.trustedMessageOrigins && this.trustedMessageOrigins.length &&
+      !this.trustedMessageOrigins.some(origin => origin === event.origin)) {
+      $.log.warn('blocked message from untrusted origin ' + event.origin);
+      return;
+    }
+    $.log.isDebugEnabled() && $.log.debug('received post-message: data=' + event.data + ', origin=' + event.origin);
     this.trigger('message', {
       data: event.data,
       origin: event.origin
     });
+  }
+
+  postMessage(message, targetOrigin) {
+    $.log.isDebugEnabled() && $.log.debug('send post-message: message=' + message + ', targetOrigin=' + targetOrigin);
+    this.iframe && this.iframe.postMessage(message, targetOrigin);
   }
 
   setTrackLocation(trackLocation) {

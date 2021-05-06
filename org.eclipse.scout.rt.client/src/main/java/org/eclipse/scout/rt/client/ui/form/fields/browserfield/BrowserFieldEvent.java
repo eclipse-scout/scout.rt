@@ -18,10 +18,13 @@ import org.eclipse.scout.rt.client.ui.IModelEvent;
 
 public class BrowserFieldEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
-  // state
+
   public static final int TYPE_CONTENT_CHANGED = 900;
+  public static final int TYPE_POST_MESSAGE = 901;
 
   private final int m_type;
+  private Object m_message;
+  private String m_targetOrigin;
 
   public BrowserFieldEvent(IBrowserField browserField, int type) {
     super(browserField);
@@ -35,6 +38,24 @@ public class BrowserFieldEvent extends EventObject implements IModelEvent {
   @Override
   public int getType() {
     return m_type;
+  }
+
+  public Object getMessage() {
+    return m_message;
+  }
+
+  public BrowserFieldEvent withMessage(Object message) {
+    m_message = message;
+    return this;
+  }
+
+  public String getTargetOrigin() {
+    return m_targetOrigin;
+  }
+
+  public BrowserFieldEvent withTargetOrigin(String targetOrigin) {
+    m_targetOrigin = targetOrigin;
+    return this;
   }
 
   @Override

@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserFi
 
 public interface IBrowserFieldExtension<OWNER extends AbstractBrowserField> extends IFormFieldExtension<OWNER> {
 
-  void execPostMessage(BrowserFieldPostMessageChain chain, String data, String origin);
+  void execPostMessage(BrowserFieldPostMessageChain chain, Object data, String origin);
 
   void execExternalWindowStateChanged(BrowserFieldExternalWindowStateChangedChain chain, boolean state);
 
