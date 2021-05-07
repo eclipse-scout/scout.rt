@@ -27,6 +27,10 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
       return false;
     }
 
+    if (!this.field.visibleRows.length) {
+      return false;
+    }
+
     let activeElement = this.field.$container.activeElement(true),
       elementType = activeElement.tagName.toLowerCase();
     if (activeElement.className !== 'table-text-filter' &&

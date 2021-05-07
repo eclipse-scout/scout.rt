@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorTabKeyStroke, events, FormField, graphics, Point, Popup, scout} from '../../index';
+import {CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorTabKeyStroke, events, FormField, graphics, keys, Point, Popup, scout} from '../../index';
 import $ from 'jquery';
 
 export default class CellEditorPopup extends Popup {
@@ -45,6 +45,15 @@ export default class CellEditorPopup extends Popup {
       new CellEditorCompleteEditKeyStroke(this),
       new CellEditorTabKeyStroke(this)
     ]);
+
+    // Don't propagate up/down key strokes to the table, because the table
+    // would call event.preventDefault() in its own "stop propagation
+    // interceptor" and the cursor would not move in multi line string fields.
+    this.keyStrokeContext.registerStopPropagationInterceptor(event => {
+      if (scout.isOneOf(event.which, keys.UP, keys.DOWN)) {
+        event.stopPropagation();
+      }
+    });
   }
 
   /**
