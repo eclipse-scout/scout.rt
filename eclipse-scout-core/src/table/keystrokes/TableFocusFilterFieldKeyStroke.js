@@ -45,10 +45,10 @@ export default class TableFocusFilterFieldKeyStroke extends KeyStroke {
       return false;
     }
 
-    let activeElement = this.field.$container.activeElement(true),
-      activeElementType = activeElement.tagName.toLowerCase(),
-      focusOnInputField = (activeElementType === 'textarea' || activeElementType === 'input');
-    if (activeElement.className !== 'table-text-filter' || !focusOnInputField) {
+    let $activeElement = this.field.$container.activeElement();
+    let activeElementType = $activeElement[0].tagName.toLowerCase();
+    let focusOnInputField = (activeElementType === 'textarea' || activeElementType === 'input');
+    if (!$activeElement.hasClass('table-text-filter') || !focusOnInputField) {
       event._$filterInput = $filterInput;
       this._isKeyStrokeInRange(event);
       return true;

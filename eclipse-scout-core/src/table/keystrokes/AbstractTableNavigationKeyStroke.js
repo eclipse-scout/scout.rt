@@ -27,9 +27,13 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
       return false;
     }
 
-    let activeElement = this.field.$container.activeElement(true),
-      elementType = activeElement.tagName.toLowerCase();
-    if (activeElement.className !== 'table-text-filter' &&
+    if (!this.field.visibleRows.length) {
+      return false;
+    }
+
+    let $activeElement = this.field.$container.activeElement();
+    let elementType = $activeElement[0].tagName.toLowerCase();
+    if (!$activeElement.hasClass('table-text-filter') &&
       (elementType === 'textarea' || elementType === 'input') &&
       (!event.originalEvent || (event.originalEvent && !event.originalEvent.smartFieldEvent))) {
       return false;
