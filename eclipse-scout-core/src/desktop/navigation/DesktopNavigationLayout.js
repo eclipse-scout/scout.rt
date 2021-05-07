@@ -35,7 +35,7 @@ export default class DesktopNavigationLayout extends AbstractLayout {
       viewButtonBoxPrefSize = viewButtonBox.htmlComp.prefSize();
       viewButtonBoxHeight = viewButtonBoxPrefSize.height;
       viewButtonBoxWidth = containerSize.width;
-      if (toolBox) {
+      if (toolBox || this.navigation.singleViewButton) {
         viewButtonBoxWidth = viewButtonBoxPrefSize.width;
       }
 
