@@ -204,8 +204,8 @@ describe('Desktop', () => {
       expect(desktop.benchVisible).toBe(false);
       desktop.hideForm(form);
       // Not removed yet and still linked, will be done after animation
-      expect(desktop.bench.rendered).toBe(true);
-      expect(form.rendered).toBe(true);
+      expect(desktop.bench._rendered).toBe(true);
+      expect(form._rendered).toBe(true);
       expect(form.parent).toBe(tabBox);
 
       // trigger actual remove

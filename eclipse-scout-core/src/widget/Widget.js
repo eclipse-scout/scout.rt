@@ -73,7 +73,7 @@ export default class Widget {
     /**
      * The 'rendered' flag is set the true when initial rendering of the widget is completed.
      */
-    this.rendered = false;
+    this._rendered = false;
     this.attached = false;
     this.destroyed = false;
     this.destroying = false;
@@ -105,9 +105,11 @@ export default class Widget {
      */
     this.htmlComp = null;
 
-    // If set to true, remove won't remove the element immediately but after the animation has been finished
-    // This expects a css animation which may be triggered by the class 'animate-remove'
-    // If browser does not support css animation, remove will be executed immediately
+    /**
+     * If set to true, remove won't remove the element immediately but after the animation has been finished
+     * This expects a css animation which may be triggered by the class 'animate-remove'
+     * If browser does not support css animation, remove will be executed immediately
+     */
     this.animateRemoval = false;
     this.animateRemovalClass = 'animate-remove';
 
@@ -276,7 +278,7 @@ export default class Widget {
       return;
     }
     this.destroying = true;
-    if (this.rendered && (this.animateRemoval || this._isRemovalPrevented())) {
+    if (this._rendered && (this.animateRemoval || this._isRemovalPrevented())) {
       // Do not destroy yet if the removal happens animated
       // Also don't destroy if the removal is pending to keep the parent / child link until removal finishes
       this.one('remove', () => {
@@ -333,16 +335,16 @@ export default class Widget {
   }
 
   /**
-   * @param [$parent] The jQuery element which is used as $parent when rendering this widget.
-   * It will be put onto the widget and is therefore accessible as this.$parent in the _render method.
-   * If not specified, the $container of the parent is used.
+   * @param [$parent] The jQuery element which is used as {@link Widget.$parent} when rendering this widget.
+   * It will be put onto the widget and is therefore accessible as this.$parent in the {@link _render} method.
+   * If not specified, the {@link Widget.$container} of the parent is used.
    */
   render($parent) {
     $.log.isTraceEnabled() && $.log.trace('Rendering widget: ' + this);
     if (!this.initialized) {
       throw new Error('Not initialized: ' + this);
     }
-    if (this.rendered) {
+    if (this._rendered) {
       throw new Error('Already rendered: ' + this);
     }
     if (this.destroyed) {
@@ -364,18 +366,45 @@ export default class Widget {
   }
 
   /**
-   * This method creates the UI through DOM manipulation. At this point we should not apply model
-   * properties on the UI, since sub-classes may need to contribute to the DOM first. You must not
-   * apply model values to the UI here, since this is done in the _renderProperties method later.
-   * The default impl. does nothing.
+   * Creates the UI by creating html elements and appending them to the DOM.
+   * <p>
+   * A typical widget creates exactly one container element and stores it to {@link Widget.$container}.
+   * If it needs JS based layouting, it creates a {@link HtmlComponent} for that container and stores it to {@link Widget.htmlComp}.
+   * <p>
+   * The rendering of individual properties should be done in the corresponding render methods of the properties, called by {@link _renderProperties} instead of doing it here.
+   * This has the advantage that the render methods can also be called on property changes, allowing individual widget parts to be dynamically re-rendered.
+   * <p>
+   * The default implementation does nothing.
    */
   _render() {
     // NOP
   }
 
   /**
-   * This method calls the UI setter methods after the _render method has been executed.
-   * Here values of the model are applied to the DOM / UI.
+   * Returns whether it is allowed to render something on the widget.
+   * Rendering is only possible if the widget itself is rendered and not about to be removed.
+   * <p>
+   * While the removal is pending, no rendering must happen to get a smooth remove animation.
+   * It also prevents errors on property changes because {@link remove} won't be executed as well.
+   * Preventing removal but allowing rendering could result in already rendered exceptions.
+   *
+   * @return {boolean} true if the widget is rendered and not being removed by an animation
+   *
+   * @see isRemovalPending
+   */
+  get rendered() {
+    return this._rendered && !this.isRemovalPending();
+  }
+
+  set rendered(rendered) {
+    this._rendered = rendered;
+  }
+
+  /**
+   * Calls the render methods for each property that needs to be rendered during the rendering process initiated by {@link render}.
+   * Each widget has to override this method and call the render methods for its own properties, after doing the super call.
+   * <p>
+   * This method is called right after {@link _render} has been executed.
    */
   _renderProperties() {
     this._renderCssClass();
@@ -400,8 +429,17 @@ export default class Widget {
     });
   }
 
+  /**
+   * Removes the widget and all its children from the DOM.
+   * <p>
+   * It traverses down the widget hierarchy and calls {@link _remove} for each widget from the bottom up (depth first search).
+   * <p>
+   * If the property {@link Widget.animateRemoval} is set to true, the widget won't be removed immediately.
+   * Instead it waits for the remove animation to complete so it's content is still visible while the animation runs.
+   * During that time, {@link isRemovalPending} returns true.
+   */
   remove() {
-    if (!this.rendered || this._isRemovalPrevented()) {
+    if (!this._rendered || this._isRemovalPrevented()) {
       return;
     }
     if (this.animateRemoval) {
@@ -442,7 +480,7 @@ export default class Widget {
   }
 
   _removeInternal() {
-    if (!this.rendered) {
+    if (!this._rendered) {
       return;
     }
 
@@ -467,7 +505,7 @@ export default class Widget {
         }
       }, this);
 
-    if (!this.rendered) {
+    if (!this._rendered) {
       // The widget may have been removed already by one of the above remove() calls (e.g. by a remove listener)
       // -> don't try to do it again, it might fail
       return;
@@ -499,7 +537,7 @@ export default class Widget {
     // Don't execute immediately to make sure nothing interferes with the animation (e.g. layouting) which could make it laggy
     setTimeout(() => {
       // check if the container has been removed in the meantime
-      if (!this.rendered) {
+      if (!this._rendered) {
         return;
       }
       if (!this.animateRemovalClass) {
@@ -1239,7 +1277,7 @@ export default class Widget {
       // Defer the execution of detach. If it was detached while rendering the attached flag would be wrong.
       this._postRenderActions.push(this.detach.bind(this));
     }
-    if (!this.attached || !this.rendered || this._isRemovalPending()) {
+    if (!this.attached || !this.rendered) {
       return;
     }
 

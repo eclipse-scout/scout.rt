@@ -13,7 +13,7 @@ import $ from 'jquery';
 
 /**
  * Abstract layout class with functions used by all layout algorithms.
- * Subclasses of AbstactLayout.js must implement the following functions:
+ * Subclasses of AbstractLayout.js must implement the following functions:
  * - layout
  * - preferredLayoutSize
  */
