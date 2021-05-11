@@ -549,8 +549,10 @@ export default class Widget {
         return;
       }
       this.$container.addClass(this.animateRemovalClass);
-      this.$container.oneAnimationEnd(() => {
-        this._removeInternal();
+      this.$container.oneAnimationEnd(event => {
+        if (this._rendered && event.target === this.$container[0]) {
+          this._removeInternal();
+        }
       });
     });
 

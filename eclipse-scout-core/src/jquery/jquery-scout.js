@@ -1033,7 +1033,11 @@ $.fn.addClassForAnimation = function(className, options) {
   };
   options = $.extend({}, defaultOptions, options);
   this.addClass(className);
-  this.oneAnimationEnd(() => {
+  this.oneAnimationEnd(event => {
+    if (event.target !== this[0]) {
+      // An animation on a sub element ended, ignore it
+      return;
+    }
     // remove class, otherwise animation will be executed each time the element changes it's visibility (attach/rerender),
     // and even each time when the css classes change
     this.removeClass(options.classesToRemove);
