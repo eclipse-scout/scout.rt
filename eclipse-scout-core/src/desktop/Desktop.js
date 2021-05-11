@@ -26,7 +26,7 @@ import {
   KeyStrokeContext,
   MessageBoxController,
   objects,
-  Outline,
+  Outline, Popup,
   scout,
   SimpleTabArea,
   strings,
@@ -905,17 +905,20 @@ export default class Desktop extends Widget {
     notification.fadeOut();
   }
 
-  getPopupsFor(widget) {
+  getPopups() {
     let popups = [];
     this.$container.children('.popup').each((i, elem) => {
-      let $popup = $(elem),
-        popup = widgets.get($popup);
-
-      if (widget.has(popup)) {
+      let $popup = $(elem);
+      let popup = widgets.get($popup);
+      if (popup instanceof Popup) {
         popups.push(popup);
       }
     });
     return popups;
+  }
+
+  getPopupsFor(widget) {
+    return this.getPopups().filter(popup => widget.has(popup));
   }
 
   /**

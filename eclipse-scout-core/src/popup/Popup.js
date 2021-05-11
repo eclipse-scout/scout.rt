@@ -200,9 +200,9 @@ export default class Popup extends Widget {
     }
 
     if (!this.animateOpening) {
-    // It is important that focusing happens after layouting and positioning, otherwise we'd focus an element
-    // that is currently not on the screen. Which would cause the whole desktop to
-    // be shifted for a few pixels.
+      // It is important that focusing happens after layouting and positioning, otherwise we'd focus an element
+      // that is currently not on the screen. Which would cause the whole desktop to
+      // be shifted for a few pixels.
       this.validateFocus();
       return;
     }
@@ -286,13 +286,19 @@ export default class Popup extends Widget {
     super._onAttach();
     if (this._openLater && !this.rendered) {
       this._openLater = false;
+      // Don't animate the opening when parent is attached. It doesn't look right if popups "pop up" when they are not really opening but only displayed again.
+      // The same applies for detaching, see _renderOnDetach
+      let currentAnimateOpening = this.animateOpening;
+      this.animateOpening = false;
       this.open();
+      this.animateOpening = currentAnimateOpening;
     }
   }
 
   _renderOnDetach() {
     this._openLater = true;
-    this.remove();
+    // If parent is detached, popup should be removed immediately, otherwise animation would still be visible even though parent has already gone.
+    super.removeImmediately();
     super._renderOnDetach();
   }
 
@@ -416,11 +422,16 @@ export default class Popup extends Widget {
   }
 
   _isRemovalPrevented() {
-    // Never prevent. Default returns true if removal is pending by an animation, but popups should be closed before the animation starts
-    return false;
+    // If removal of a parent is pending due to an animation then don't return true to make sure popups are closed before the parent animation starts.
+    // However, if the popup itself is removed by an animation, removal should be prevented to ensure remove() won't run multiple times.
+    return this.removalPending;
   }
 
   close() {
+    if (this.destroyed || this.destroying) {
+      // Already closed, do nothing
+      return;
+    }
     let event = new Event();
     this.trigger('close', event);
     if (!event.defaultPrevented) {
@@ -579,8 +590,7 @@ export default class Popup extends Widget {
     // Use case: Opening of a context menu or cell editor in a form popup
     // Also, popups covered by a glass pane (a modal dialog is open) must never be closed
     // Use case: popup opens a modal dialog. User clicks on a smartfield on this dialog -> underlying popup must not get closed
-    let closable = !this.isOrHas(event.popup) &&
-      !event.popup.isOrHas(this);
+    let closable = !this.isOrHas(event.popup) && !event.popup.isOrHas(this);
     if (this.rendered) {
       closable = closable && !this.session.focusManager.isElementCovertByGlassPane(this.$container[0]);
     }

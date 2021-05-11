@@ -120,7 +120,6 @@ export default class FieldStatus extends Widget {
       this.trigger('hideTooltip', event);
       if (!event.defaultPrevented) {
         this.tooltip.destroy();
-        this.tooltip = null;
         this._removeParentListeners();
       }
     }
@@ -180,17 +179,16 @@ export default class FieldStatus extends Widget {
         autoRemove: this.autoRemove,
         menus: this.menus
       });
-      this.tooltip.one('destroy', () => {
-        this.hideTooltip();
-      });
       this.tooltip.render();
+      this.tooltip.one('destroy', () => {
+        this.tooltip = null;
+      });
     }
   }
 
   hideContextMenu() {
     if (this.contextMenu) {
-      this.contextMenu.destroy();
-      this.contextMenu = null;
+      this.contextMenu.close();
     }
   }
 
@@ -202,6 +200,11 @@ export default class FieldStatus extends Widget {
     // close both contextMenu and status tooltip
     this.hidePopup();
 
+    // Context menu must be removed immediately before it can be opened because cloneMenuItems is false
+    if (this.contextMenu && this.contextMenu.isRemovalPending()) {
+      this.contextMenu.removeImmediately();
+    }
+
     this.contextMenu = scout.create('ContextMenuPopup', {
       parent: this,
       $anchor: this.$container,
@@ -209,10 +212,10 @@ export default class FieldStatus extends Widget {
       cloneMenuItems: false,
       closeOnAnchorMouseDown: false
     });
-    this.contextMenu.one('destroy', () => {
-      this.hideContextMenu();
-    });
     this.contextMenu.open();
+    this.contextMenu.one('destroy', () => {
+      this.contextMenu = null;
+    });
   }
 
   hidePopup() {
@@ -224,32 +227,37 @@ export default class FieldStatus extends Widget {
     if (this.status) {
       // ensure context menu closed
       this.hideContextMenu();
-      if (this.tooltip) {
-        this.hideTooltip();
-      } else {
-        this.showTooltip();
-      }
+      this.toggleTooltip();
       return;
     }
     if (!arrays.empty(this.menus)) {
       this.hideTooltip();
-      let func = function func() {
+      this.session.onRequestsDone(() => {
         if (!this.rendered) { // check needed because function is called asynchronously
           return;
         }
-        // Toggle menu
-        if (this.contextMenu) {
-          this.hideContextMenu();
-        } else {
-          this.showContextMenu();
-        }
-      }.bind(this);
-
-      this.session.onRequestsDone(func);
+        this.toggleContextMenu();
+      });
 
     } else {
       // close all
       this.hidePopup();
+    }
+  }
+
+  toggleTooltip() {
+    if (this.tooltip) {
+      this.hideTooltip();
+    } else {
+      this.showTooltip();
+    }
+  }
+
+  toggleContextMenu() {
+    if (this.contextMenu) {
+      this.hideContextMenu();
+    } else {
+      this.showContextMenu();
     }
   }
 

@@ -9,6 +9,17 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
+.popup-animate-open {
+  #scout.animation-name(fadein-zoom-bounce);
+  #scout.animation-duration(0.4s);
+}
+
+.popup-animate-remove {
+  #scout.animation-name(fadeout-shrink-blur);
+  #scout.animation-duration(0.15s);
+  #scout.animation-fill-mode(forwards);
+}
+
 .widget-popup {
   background-color: @popup-background-color;
   border-radius: @popup-border-radius;
@@ -16,14 +27,11 @@
   margin: @widget-popup-margin;
 
   &.animate-open {
-    #scout.animation-name(fadein-zoom-bounce);
-    #scout.animation-duration(0.4s);
+    .popup-animate-open();
   }
 
   &.animate-remove {
-    #scout.animation-name(fadeout-shrink-blur);
-    #scout.animation-duration(0.15s);
-    #scout.animation-fill-mode(forwards);
+    .popup-animate-remove();
   }
 
   & > .popup-arrow {

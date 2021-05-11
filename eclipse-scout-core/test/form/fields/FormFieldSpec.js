@@ -451,7 +451,7 @@ describe('FormField', () => {
   });
 
   function createVisitStructure() {
-    let groupBox = scout.create('GroupBox', {
+    return scout.create('GroupBox', {
       parent: session.desktop,
       fields: [{
         objectType: 'StringField'
@@ -479,7 +479,6 @@ describe('FormField', () => {
       }],
       responsive: true
     });
-    return groupBox;
   }
 
   function expectVisited(field) {

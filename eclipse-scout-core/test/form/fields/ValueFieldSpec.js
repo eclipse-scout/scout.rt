@@ -729,7 +729,6 @@ describe('ValueField', () => {
         menu2 = menuHelper.createMenu(menuModel2);
       menu2.visible = false;
       formField.menus = [menu1, menu2];
-      formField.menusVisible = true;
       formField.render();
 
       formField.$status.triggerContextMenu();
@@ -739,38 +738,34 @@ describe('ValueField', () => {
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
     });
 
-    it('context menu only shows only menus of specific type', () => {
+    it('context menu only shows menus of specific type', () => {
       let menuModel1 = menuHelper.createModel('menu'),
         menu1 = menuHelper.createMenu(menuModel1),
         menuModel2 = menuHelper.createModel('menu'),
         menu2 = menuHelper.createMenu(menuModel2);
       menu1.menuTypes = ['ValueField.Null', 'ValueField.NotNull'];
       menu2.menuTypes = ['ValueField.Null'];
-      formField.menus = [menu1, menu2];
-      formField.menusVisible = true;
+      formField.setMenus([menu1, menu2]);
       formField.render();
 
-      formField.currentMenuTypes = ['ValueField.Null'];
-      formField.$status.triggerContextMenu();
+      formField.setCurrentMenuTypes(['ValueField.Null']);
+      formField.fieldStatus.showContextMenu();
 
       let $menu = $('body').find('.context-menu');
       expect($menu.find('.menu-item').length).toBe(2);
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
       expect($menu.find('.menu-item').eq(1).isVisible()).toBe(true);
 
-      // close menu
-      formField.$status.triggerContextMenu();
+      formField.fieldStatus.hideContextMenu();
 
       // open again and change current menu types
       formField.setValue('abc');
       formField.setCurrentMenuTypes(['ValueField.NotNull']);
-      formField.$status.triggerContextMenu();
+      formField.fieldStatus.showContextMenu();
 
       $menu = $('body').find('.context-menu');
       expect($menu.find('.menu-item').length).toBe(1);
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
     });
-
   });
-
 });

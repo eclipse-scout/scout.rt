@@ -8,6 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+
+.context-menu-popup {
+
+  &.animate-open {
+    .popup-animate-open();
+  }
+
+  &.animate-remove {
+    .popup-animate-remove();
+  }
+}
+
 .context-menu {
   position: relative;
   border: 1px solid @popup-border-color;

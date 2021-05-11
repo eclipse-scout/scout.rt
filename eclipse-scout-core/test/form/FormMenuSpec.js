@@ -19,13 +19,19 @@ describe('FormMenu', () => {
     session = sandboxSession();
     helper = new FormSpecHelper(session);
     desktop = session.desktop;
+
+    $(`<style>
+      @keyframes nop { 0% { opacity: 1; } 100% { opacity: 1; } }
+      .popup.animate-remove { animation: nop; animation-duration: 1s;}
+      </style>`).appendTo($('#sandbox'));
   });
 
-  function createMenu(modelProperties) {
-    let menu = helper.createField('FormMenu', desktop, modelProperties);
-    menu.form = helper.createFormWithOneField();
-    menu.desktop = desktop;
-    return menu;
+  function createMenu(model) {
+    return scout.create('FormMenu', $.extend({
+      parent: desktop,
+      text: 'Menu',
+      form: helper.createFormWithOneField()
+    }, model));
   }
 
   function findPopup() {
@@ -44,6 +50,21 @@ describe('FormMenu', () => {
 
       menu.popup.animateRemoval = false;
       menu.setSelected(false);
+      expect(findPopup()).not.toExist();
+    });
+
+    it('unselects the menu and closes the popup if the form closes', () => {
+      let menu = createMenu();
+      menu.render();
+      expect(findPopup()).not.toExist();
+
+      menu.setSelected(true);
+      expect(findPopup()).toBeVisible();
+
+      menu.popup.animateRemoval = false;
+      menu.form.close();
+      expect(menu.selected).toBe(false);
+      expect(menu.form).toBe(null);
       expect(findPopup()).not.toExist();
     });
 
@@ -68,6 +89,139 @@ describe('FormMenu', () => {
       // cleanup
       menu.setSelected(false);
       ellipsisMenu.setSelected(false);
+    });
+
+    it('closes immediately when selected again during remove animation', () => {
+      let menu = createMenu();
+      menu.render();
+      expect(findPopup()).not.toExist();
+
+      menu.setSelected(true);
+      expect(findPopup()).toBeVisible();
+
+      menu.setSelected(false);
+      // Still visible, remove animation started
+      expect(findPopup()).toBeVisible();
+      expect(menu.popup.isRemovalPending()).toBe(true);
+
+      let $popup = menu.popup.$container;
+      menu.setSelected(true);
+      // Old popup is removed immediately, new one is rendered
+      expect($popup.isAttached()).toBe(false);
+      expect(findPopup()).toBeVisible();
+      expect(menu.popup.rendered).toBe(true);
+      expect(menu.popup.isRemovalPending()).toBe(false);
+    });
+
+    it('closes immediately when another form is opened in a context menu during remove animation', () => {
+      let menu = createMenu();
+      menu.render();
+      expect(findPopup()).not.toExist();
+
+      menu.setSelected(true);
+      expect(findPopup()).toBeVisible();
+
+      menu.setSelected(false);
+      // Still visible, remove animation started
+      let $popup = menu.popup.$container;
+      expect($popup).toBeVisible();
+      expect(menu.popup.isRemovalPending()).toBe(true);
+
+      let contextMenu = scout.create('ContextMenuPopup', {
+        parent: session.desktop,
+        menuItems: [menu] // will be cloned, but form won't
+      });
+      contextMenu.open();
+      let menuInContextMenu = contextMenu.$menuItems(0).data('widget');
+      menuInContextMenu.setSelected(true);
+      // Old popup is removed immediately, context menu is rendered
+      expect($popup.isAttached()).toBe(false);
+      expect(menuInContextMenu.popup.$container).toBeVisible();
+      expect(contextMenu.rendered).toBe(true);
+    });
+
+    it('closes immediately when another form is opened in a context menu during remove animation after closing form', () => {
+      let menu = createMenu();
+      menu.on('propertyChange:selected', event => {
+        // When menu is unselected, form is set to null.
+        // Probably the form menu should create a new form automatically, once the menu is selected again. But that doesn't happen (yet) so we do it manually
+        if (event.newValue && !menu.form) {
+          menu.setForm(helper.createFormWithOneField());
+        }
+      });
+      menu.render();
+      expect(findPopup()).not.toExist();
+
+      menu.setSelected(true);
+      expect(findPopup()).toBeVisible();
+
+      // This is the difference to the above test case: form is closed instead of menu unselected
+      menu.form.close();
+
+      // Still visible, remove animation started
+      let $popup = menu.popup.$container;
+      expect($popup).toBeVisible();
+      expect(menu.popup.isRemovalPending()).toBe(true);
+
+      let contextMenu = scout.create('ContextMenuPopup', {
+        parent: session.desktop,
+        menuItems: [menu] // will be cloned, but form won't
+      });
+      contextMenu.open();
+      let menuInContextMenu = contextMenu.$menuItems(0).data('widget');
+      menuInContextMenu.setSelected(true);
+      // Old popup is removed immediately, context menu is rendered
+      expect($popup.isAttached()).toBe(false);
+      expect(menuInContextMenu.popup.$container).toBeVisible();
+      expect(contextMenu.rendered).toBe(true);
+    });
+
+    it('closes immediately when opened in a context menu and another menu is opened during remove animation', () => {
+      let menu = createMenu();
+      let contextMenu = scout.create('ContextMenuPopup', {
+        parent: session.desktop,
+        menuItems: [menu]
+      });
+      contextMenu.open();
+      let menuInContextMenu = contextMenu.$menuItems(0).data('widget');
+      menuInContextMenu.setSelected(true);
+      expect(menuInContextMenu.popup.$container).toBeVisible();
+      expect(contextMenu.rendered).toBe(true);
+
+      // Menu (e.g. in menubar) is selected
+      menu.render();
+      menu.setSelected(true);
+      expect(findPopup()).toBeVisible();
+      // Context menu and popup are removed immediately, popup of menu is opened
+      expect(contextMenu.rendered).toBe(false);
+      expect(menuInContextMenu.popup).toBe(null);
+      expect(menu.popup.$container).toBeVisible();
+    });
+
+    it('closes immediately when opened in a context menu and another form is opened in another context menu during remove animation', () => {
+      let menu = createMenu();
+      let contextMenu = scout.create('ContextMenuPopup', {
+        parent: session.desktop,
+        menuItems: [menu]
+      });
+      contextMenu.open();
+      let menuInContextMenu = contextMenu.$menuItems(0).data('widget');
+      menuInContextMenu.setSelected(true);
+      expect(menuInContextMenu.popup.$container).toBeVisible();
+      expect(contextMenu.rendered).toBe(true);
+
+      let contextMenu2 = scout.create('ContextMenuPopup', {
+        parent: session.desktop,
+        menuItems: [menu]
+      });
+      contextMenu2.open();
+      let menuInContextMenu2 = contextMenu2.$menuItems(0).data('widget');
+      menuInContextMenu2.setSelected(true);
+      // Old context menu and popup are removed immediately, new context menu is rendered
+      expect(contextMenu.rendered).toBe(false);
+      expect(menuInContextMenu.popup).toBe(null);
+      expect(menuInContextMenu2.popup.$container).toBeVisible();
+      expect(contextMenu2.rendered).toBe(true);
     });
 
     describe('with mobile popup style', () => {
@@ -119,10 +273,8 @@ describe('FormMenu', () => {
       expect(menu.popup.rendered).toBe(true);
 
       // Popup#_renderOnDetach will remove the popup and eventually the form.
-      // As soon as the form is removed, the FormMenu will unselected the menu which closes the popup (FormMenu#_onFormRemove).
-      menu.popup.animateRemoval = false;
       menuBar.detach();
-      expect(menu.popup).toBe(null);
+      expect(menu.popup.rendered).toBe(false);
     });
   });
 
@@ -144,9 +296,6 @@ describe('FormMenu', () => {
         menu.modelAdapter.onModelPropertyChange(event);
         expect(menu.setSelected).toHaveBeenCalled();
       });
-
     });
-
   });
-
 });

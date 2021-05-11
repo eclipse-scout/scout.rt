@@ -16,6 +16,8 @@ export default class ContextMenuPopup extends Popup {
   constructor() {
     super();
 
+    this.animateOpening = true;
+    this.animateRemoval = true;
     this.menuItems = [];
     this.cloneMenuItems = true;
     this._toggleSubMenuQueue = [];
@@ -95,9 +97,13 @@ export default class ContextMenuPopup extends Popup {
     if (!this.rendered && !this.rendering) {
       return;
     }
-    if (this.bodyAnimating) {
+    let openingAnimationRunning = this.isOpeningAnimationRunning();
+    if (this.bodyAnimating || openingAnimationRunning) {
       // Let current animation finish and execute afterwards to prevent an unpredictable behavior and inconsistent state
       this._toggleSubMenuQueue.push(this.removeSubMenuItems.bind(this, parentMenu, animated));
+      if (openingAnimationRunning) {
+        this.$container.oneAnimationEnd(() => this._processSubMenuQueue());
+      }
       return;
     }
 
@@ -144,26 +150,24 @@ export default class ContextMenuPopup extends Popup {
       parentMenu.$subMenuBody.cssTopAnimated(startTopposition, endTopposition, {
         duration: duration,
         queue: false,
-        complete: function() {
-          if (parentMenu.$container) { // check if $container is not removed before by closing operation.
-            scrollbars.uninstall(parentMenu.$subMenuBody, this.session);
-            parentMenu.$placeHolder.replaceWith(parentMenu.$container);
-            parentMenu.$container.toggleClass('expanded', false);
-            this._updateFirstLastClass();
-            this.updateNextToSelected('menu-item', parentMenu.$container);
-
-            parentMenu.$subMenuBody.detach();
-            this._installScrollbars();
-            this.$body.css('box-shadow', '');
-            this.bodyAnimating = false;
-            // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
-            this._invalidateLayoutTreeAndRepositionPopup();
-            let next = this._toggleSubMenuQueue.shift();
-            if (next) {
-              next();
-            }
+        complete: () => {
+          this.bodyAnimating = false;
+          if (!this.rendered || !parentMenu.$container) {
+            return;
           }
-        }.bind(this)
+          scrollbars.uninstall(parentMenu.$subMenuBody, this.session);
+          parentMenu.$placeHolder.replaceWith(parentMenu.$container);
+          parentMenu.$container.toggleClass('expanded', false);
+          this._updateFirstLastClass();
+          this.updateNextToSelected('menu-item', parentMenu.$container);
+
+          parentMenu.$subMenuBody.detach();
+          this._installScrollbars();
+          this.$body.css('box-shadow', '');
+          // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
+          this._invalidateLayoutTreeAndRepositionPopup();
+          this._processSubMenuQueue();
+        }
       });
 
       this.$body.cssWidthAnimated(actualBounds.width, targetBounds.width, {
@@ -182,6 +186,13 @@ export default class ContextMenuPopup extends Popup {
     }
   }
 
+  _processSubMenuQueue() {
+    let next = this._toggleSubMenuQueue.shift();
+    if (next) {
+      next();
+    }
+  }
+
   renderSubMenuItems(parentMenu, menus, animated, initialSubMenuRendering) {
     if (!this.session.desktop.rendered && !initialSubMenuRendering) {
       this.initialSubMenusToRender = {
@@ -193,9 +204,13 @@ export default class ContextMenuPopup extends Popup {
     if (!this.rendered && !this.rendering) {
       return;
     }
-    if (this.bodyAnimating) {
+    let openingAnimationRunning = this.isOpeningAnimationRunning();
+    if (this.bodyAnimating || openingAnimationRunning) {
       // Let current animation finish and execute afterwards to prevent an unpredictable behavior and inconsistent state
       this._toggleSubMenuQueue.push(this.renderSubMenuItems.bind(this, parentMenu, menus, animated, initialSubMenuRendering));
+      if (openingAnimationRunning) {
+        this.$container.oneAnimationEnd(() => this._processSubMenuQueue());
+      }
       return;
     }
 
@@ -267,8 +282,11 @@ export default class ContextMenuPopup extends Popup {
       this.$body.cssTopAnimated(startTopposition, endTopposition, {
         duration: duration,
         queue: false,
-        complete: function() {
+        complete: () => {
           this.bodyAnimating = false;
+          if (!this.rendered) {
+            return;
+          }
           if (parentMenu.__originalParent.$subMenuBody) {
             scrollbars.uninstall(parentMenu.__originalParent.$subMenuBody, this.session);
             parentMenu.__originalParent.$subMenuBody.detach();
@@ -279,11 +297,8 @@ export default class ContextMenuPopup extends Popup {
           }
           // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
           this._invalidateLayoutTreeAndRepositionPopup();
-          let next = this._toggleSubMenuQueue.shift();
-          if (next) {
-            next();
-          }
-        }.bind(this)
+          this._processSubMenuQueue();
+        }
       });
 
       if (actualBounds.height !== targetBounds.height) {

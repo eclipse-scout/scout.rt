@@ -60,7 +60,6 @@ describe('ContextMenuPopup', () => {
         popup.render();
 
         let menuClone = findClone(popup, menu);
-        let childMenuClone = menuClone.childActions[0];
         // clone is rendered in the popup
         expect(menuClone.rendered).toBe(true);
         expect(menuClone.$container.parent()[0]).toBe(popup.$body[0]);
@@ -86,6 +85,7 @@ describe('ContextMenuPopup', () => {
 
         let menuClone = findClone(popup, menu);
         let childMenuClone = menuClone.childActions[0];
+        popup.animateRemoval = false;
         popup.destroy();
 
         expect(menuClone.destroyed).toBe(true);
@@ -125,7 +125,8 @@ describe('ContextMenuPopup', () => {
           parent: session.desktop,
           session: session,
           menuItems: menuItems,
-          cloneMenuItems: false
+          cloneMenuItems: false,
+          animateRemoval: false
         });
         popup.render();
 
@@ -151,9 +152,7 @@ describe('ContextMenuPopup', () => {
         popup.render();
         popup.destroy();
       });
-
     });
-
   });
 
   describe('renderMenuItems', () => {
@@ -194,7 +193,6 @@ describe('ContextMenuPopup', () => {
       popup.render();
 
       let menu0Clone = findClone(popup, menu0);
-      let menu1Clone = findClone(popup, menu1);
       let menu2Clone = findClone(popup, menu2);
       expect(menu0Clone.$container).toHaveClass('context-menu-item-first');
       expect(menu2Clone.$container).toHaveClass('context-menu-item-last');

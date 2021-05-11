@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ContextMenuPopup, Device, FormMenuActionKeyStroke, GroupBox, Menu, scout} from '../index';
+import {ContextMenuPopup, Device, Form, FormMenuActionKeyStroke, GroupBox, Menu, scout, WidgetPopup} from '../index';
 
 export default class FormMenu extends Menu {
 
@@ -18,6 +18,7 @@ export default class FormMenu extends Menu {
     this.toggleAction = true;
     this.popupStyle = null;
     this._addWidgetProperties('form');
+    this._formDestroyHandler = this._onFormDestroy.bind(this);
   }
 
   static PopupStyle = {
@@ -36,6 +37,7 @@ export default class FormMenu extends Menu {
       }
     }
     this._setSelected(this.selected);
+    this._setForm(this.form);
   }
 
   _renderForm() {
@@ -58,31 +60,39 @@ export default class FormMenu extends Menu {
     return super.clone(modelOverride, options);
   }
 
-  _addFormRemoveHandler() {
-    if (!this.form) {
-      return;
-    }
+  setForm(form) {
+    this.setProperty('form', form);
+  }
 
-    this.form.one('remove', event => {
-      this._onFormRemove(event);
-    });
+  _setForm(form) {
+    if (this.form) {
+      this.form.off('destroy', this._formDestroyHandler)
+    }
+    this._setProperty('form', form);
+    if (this.form) {
+      this._adaptForm(this.form);
+      this.form.one('destroy', this._formDestroyHandler);
+    }
+  }
+
+  _adaptForm(form) {
+    form.setDisplayHint(Form.DisplayHint.VIEW);
+    form.setModal(false);
   }
 
   /**
-   * Called when the popup form is removed (closed). Either by clicking the FormMenu again (toggle), the menu closed or if the Form closed itself.
+   * Called when the popup form is destroyed (e.g. form.close() was called) -> ensure menu is unselected and popup closed.
    */
-  _onFormRemove(event) {
-    if (!this.selected) {
-      return; // the menu is no longer selected. It was closed by the user (toggle). There is no need to unselect and close the popups
-    }
-    if (!this.destroying && !this.removing) {
-      // no need to change the selection state if the widget is destroying.
+  _onFormDestroy(event) {
+    if (!this.popup || !this.popup.destroying) {
+      // Unselect if form is closed (e.g. if a close button on the form itself is pressed. Mainly necessary for Scout JS only)
+      // Don't interfere with regular popup lifecycle. If popup is being closed already it will be or is already unselected anyway.
+      // Maybe the user already selected the menu again while the close animation runs -> the menu must not be unselected because the user selected it.
       this.setSelected(false);
     }
+    this.setForm(null);
 
-    let parentContextMenuPopup = this.findParent(p => {
-      return p instanceof ContextMenuPopup;
-    });
+    let parentContextMenuPopup = this.findParent(p => p instanceof ContextMenuPopup);
     if (parentContextMenuPopup && !(parentContextMenuPopup.destroying || parentContextMenuPopup.removing)) {
       // only explicitly close the popup if it is not already being closed. Otherwise it is removed twice.
       parentContextMenuPopup.close();
@@ -102,16 +112,51 @@ export default class FormMenu extends Menu {
     }
   }
 
-  /**
-   * @override Menu.js
-   */
-  _openPopup() {
-    if (this.popup) {
-      // already open
-      return;
+  _canOpenPopup() {
+    // A menu can be opened in the menu bar but also in a context menu, where it will be cloned.
+    // The form itself won't be cloned, so there can always be only one rendered form.
+    // If the menus use a remove animation and a new menu is opened while the other one is still removing, the form rendering will fail
+    // (either by an exception if its already open, or it may be rendered into the wrong menu).
+    // To prevent that, we ensure the other popup is really closed before opening the new one.
+    this._closeOtherPopupsForSameMenu();
+    return super._canOpenPopup();
+  }
+
+  _closeOtherPopupsForSameMenu() {
+    this._findOtherPopupsForSameMenu().forEach(popup => {
+      if (popup.isRemovalPending()) {
+        popup.removeImmediately();
+        return;
+      }
+      // If popup is open but remove animation has not started yet (can only be triggered programmatically, see test FormMenuSpec.js)
+      if (popup._rendered) {
+        let currentAnimateRemoval = popup.animateRemoval;
+        popup.animateRemoval = false;
+        popup.close();
+        popup.animateRemoval = currentAnimateRemoval;
+      }
+    });
+  }
+
+  _findOtherPopupsForSameMenu() {
+    return this.session.desktop.getPopups().filter(popup => {
+      if (popup === this.popup || popup.has(this)) {
+        return false;
+      }
+      return this._popupBelongsToMenu(popup);
+    });
+  }
+
+  _popupBelongsToMenu(popup) {
+    // Check if the widget popup containing the form is open (parent is always the form menu, if it's in a context menu the parent is a clone)
+    if (popup.parent.original() === this.original()) {
+      return true;
     }
-    super._openPopup();
-    this._addFormRemoveHandler();
+    // Check if the context menu containing this menu is open (context menus contain clones of the original)
+    if (popup.findChild(w => w.original() === this.original())) {
+      return true;
+    }
+    return false;
   }
 
   /**

@@ -450,18 +450,36 @@ export default class Widget {
   }
 
   /**
+   * Removes the element without starting the remove animation or waiting for the remove animation to complete.
+   * If the remove animation is running it will stop immediately because the element is removed. There will no animationend event be triggered.
+   *<p>
+   * <b>Important</b>: You should only use this method if your widget uses remove animations (this.animateRemoval = true)
+   * and you deliberately want to not execute or abort it. Otherwise you should use the regular {@link remove} method.
+   */
+  removeImmediately() {
+    this._removeInternal();
+  }
+
+  /**
    * Will be called by {@link #remove()}. If true is returned, the widget won't be removed.<p>
-   * By default it just delegates to {@link #_isRemovalPending}. May be overridden to customize it.
+   * By default it just delegates to {@link #isRemovalPending}. May be overridden to customize it.
    */
   _isRemovalPrevented() {
-    return this._isRemovalPending();
+    return this.isRemovalPending();
+  }
+
+  /**
+   * @deprecated use isRemovalPending instead. Will be removed with 23.0
+   */
+  _isRemovalPending() {
+    return this.isRemovalPending();
   }
 
   /**
    * Returns true if the removal of this or an ancestor widget is pending. Checking the ancestor is omitted if the parent is being removed.
    * This may be used to prevent a removal if an ancestor will be removed (e.g by an animation)
    */
-  _isRemovalPending() {
+  isRemovalPending() {
     if (this.removalPending) {
       return true;
     }
@@ -634,7 +652,7 @@ export default class Widget {
       // After the animation the parent will remove its children.
       // If they are already linked to a new parent, removing the children is not possible anymore.
       // This may lead to an "Already rendered" exception if the new parent wants to render its children.
-      if (this.parent._isRemovalPending()) {
+      if (this.parent.isRemovalPending()) {
         this.parent.one('remove', () => {
           this.setParent(parent);
         });

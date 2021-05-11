@@ -178,21 +178,20 @@ export default class Menu extends Action {
   }
 
   _renderSubMenuItems(parentMenu, menus) {
-    if (this.parent instanceof ContextMenuPopup) {
-      this.parent.renderSubMenuItems(parentMenu, menus, true);
-      let closeHandler = event => {
-        parentMenu.setSelected(false);
-      };
-      let propertyChangeHandler = event => {
-        if (event.propertyName === 'selected' && event.newValue === false) {
-          this.parent.off('close', closeHandler);
-          parentMenu.off('propertyChange', propertyChangeHandler);
+    let parent = this.parent;
+    if (parent instanceof ContextMenuPopup) {
+      parent.renderSubMenuItems(parentMenu, menus, true);
+      let closeHandler = event => parentMenu.setSelected(false);
+      let selectedChangeChangeHandler = event => {
+        if (event.newValue === false) {
+          parent.off('destroy', closeHandler);
+          parentMenu.off('propertyChange:selected', selectedChangeChangeHandler);
         }
       };
-      this.parent.on('close', closeHandler);
-      parentMenu.on('propertyChange', propertyChangeHandler);
-    } else if (this.parent instanceof Menu) {
-      this.parent._renderSubMenuItems(parentMenu, menus);
+      parent.one('destroy', closeHandler);
+      parentMenu.on('propertyChange:selected', selectedChangeChangeHandler);
+    } else if (parent instanceof Menu) {
+      parent._renderSubMenuItems(parentMenu, menus);
     }
   }
 
@@ -468,14 +467,33 @@ export default class Menu extends Action {
   }
 
   _closePopup() {
-    if (this.popup && !this.popup._isRemovalPending()) {
+    if (this.popup && !this.popup.isRemovalPending()) {
       this.popup.close();
     }
   }
 
-  _openPopup() {
+  _canOpenPopup() {
+    if (this.popup && this.popup.isRemovalPending()) {
+      // If the popup should be opened while it is being removed, the popup needs to be removed immediately before it can be opened (the remove animation won't complete).
+      // This is necessary to always have a consistent state between menu and popup (e.g. if menu is selected while the popup is removed).
+      // The popup will be null afterwards (due to the destroy handler added by openPopup)
+      this.popup.removeImmediately();
+    }
+
     if (this.popup) {
       // already open
+      return false;
+    }
+
+    // Recheck if opening is still possible (maybe destroying the popup changed that, e.g. form of form menu was set to null)
+    if (!this._doActionTogglesPopup()) {
+      return false;
+    }
+    return true;
+  }
+
+  _openPopup() {
+    if (!this._canOpenPopup()) {
       return;
     }
     this.popup = this._createPopup();
@@ -483,10 +501,7 @@ export default class Menu extends Action {
     this.popup.one('destroy', event => {
       this.popup = null;
     });
-    // Reason for separating remove and close event:
-    // Remove may be called if parent (menubar) gets removed or rebuilt.
-    // In that case, we do not want to change the selected state because after rebuilding the popup should still be open
-    // In every other case the state of the menu needs to be reset if the popup closes
+    // Unselect on close which comes earlier than destroy (before the animation), to give more immediate feedback
     this.popup.on('close', event => {
       this.setSelected(false);
     });

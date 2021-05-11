@@ -151,8 +151,9 @@ export default class Tooltip extends Widget {
   }
 
   _isRemovalPrevented() {
-    // Never prevent. Default returns true if removal is pending by an animation, but tooltips should be closed before the animation starts
-    return false;
+    // If removal of a parent is pending due to an animation then don't return true to make sure tooltips are closed before the parent animation starts.
+    // However, if the tooltip itself is removed by an animation, removal should be prevented to ensure remove() won't run multiple times.
+    return this.removalPending;
   }
 
   setText(text) {
