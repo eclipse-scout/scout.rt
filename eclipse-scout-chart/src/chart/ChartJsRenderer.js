@@ -334,6 +334,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         transferProperty(sourceDataset, targetDataset, 'hoverBorderColor', true);
         transferProperty(sourceDataset, targetDataset, 'legendColor', true);
         transferProperty(sourceDataset, targetDataset, 'pointHoverBackgroundColor', true);
+        transferProperty(sourceDataset, targetDataset, 'lineTension', true);
       }
       let targetLength = targetData.datasets.length,
         sourceLength = sourceData.datasets.length;
@@ -1163,6 +1164,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         pointHoverBackgroundColor = colors.pointHoverColor;
 
       let setProperty = (identifier, value) => {
+        if (typeof elem[identifier] === 'function') {
+          return;
+        }
         if (value && value.length) {
           elem[identifier] = Array.isArray(value) ? [...value] : value;
         }
