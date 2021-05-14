@@ -48,6 +48,7 @@ public class JsonFormMenuTest {
     FormWithOneField form = new FormWithOneField();
     form.start();
     button.setForm(form);
+    button.setSelected(true);
 
     JsonFormMenu<IFormMenu<IForm>> jsonFormMenu = m_uiSession.createJsonAdapter(button, null);
 
