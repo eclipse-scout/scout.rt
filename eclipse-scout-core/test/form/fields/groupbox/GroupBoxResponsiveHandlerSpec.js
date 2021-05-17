@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,14 +21,6 @@ describe('GroupBoxResponsiveHandler', () => {
     helper = new FormSpecHelper(session);
   });
 
-  function createField(model, parent) {
-    let field = new GroupBox();
-    model.session = session;
-    model.parent = parent || session.desktop;
-    field.init(model);
-    return field;
-  }
-
   function createGroupBox(fields) {
     fields = fields || [{
       objectType: 'StringField'
@@ -37,17 +29,23 @@ describe('GroupBoxResponsiveHandler', () => {
     }, {
       objectType: 'LabelField'
     }, {
+      objectType: 'RadioButtonGroup',
+      fields: [{
+        objectType: 'RadioButton'
+      }, {
+        objectType: 'RadioButton'
+      }]
+    }, {
       objectType: 'GroupBox',
       fields: [{
         objectType: 'StringField'
       }]
     }];
-    let groupBox = scout.create('GroupBox', {
+    return scout.create('GroupBox', {
       parent: session.desktop,
       fields: fields,
       responsive: true
     });
-    return groupBox;
   }
 
   let normalWidth = HtmlEnvironment.get().formColumnWidth * 2 + 10;
@@ -59,9 +57,10 @@ describe('GroupBoxResponsiveHandler', () => {
     expect(groupBox.fields[1].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
     expect(groupBox.fields[1].labelVisible).toBe(true);
     expect(groupBox.fields[2].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
+    expect(groupBox.fields[3].gridDataHints.useUiHeight).toBe(false);
     expect(groupBox.gridColumnCount).toBe(2);
 
-    let innerGroupBox = groupBox.fields[3];
+    let innerGroupBox = groupBox.fields[4];
     if (innerGroupBox.responsive === null || innerGroupBox.responsive === false) {
       expect(innerGroupBox.fields[0].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
       expect(innerGroupBox.gridColumnCount).toBe(2);
@@ -73,9 +72,10 @@ describe('GroupBoxResponsiveHandler', () => {
     expect(groupBox.fields[1].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
     expect(groupBox.fields[1].labelVisible).toBe(false);
     expect(groupBox.fields[2].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
+    expect(groupBox.fields[3].gridDataHints.useUiHeight).toBe(true);
     expect(groupBox.gridColumnCount).toBe(2);
 
-    let innerGroupBox = groupBox.fields[3];
+    let innerGroupBox = groupBox.fields[4];
     if (innerGroupBox.responsive === null || innerGroupBox.responsive === true) {
       expect(innerGroupBox.fields[0].labelPosition).toBe(FormField.LabelPosition.TOP);
       expect(innerGroupBox.gridColumnCount).toBe(2);
@@ -92,9 +92,10 @@ describe('GroupBoxResponsiveHandler', () => {
     expect(groupBox.fields[1].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
     expect(groupBox.fields[1].labelVisible).toBe(false);
     expect(groupBox.fields[2].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
+    expect(groupBox.fields[3].gridDataHints.useUiHeight).toBe(true);
     expect(groupBox.gridColumnCount).toBe(1);
 
-    let innerGroupBox = groupBox.fields[3];
+    let innerGroupBox = groupBox.fields[4];
     if (innerGroupBox.responsive === null || innerGroupBox.responsive === true) {
       expect(innerGroupBox.fields[0].labelPosition).toBe(FormField.LabelPosition.TOP);
       expect(innerGroupBox.gridColumnCount).toBe(1);
@@ -159,7 +160,7 @@ describe('GroupBoxResponsiveHandler', () => {
     });
 
     it('does not switch inner group box to condensed mode if inner group box is not responsive', () => {
-      groupBox.fields[3].setResponsive(false);
+      groupBox.fields[4].setResponsive(false);
 
       // normal state
       groupBox.render($('#sandbox'));
@@ -182,7 +183,7 @@ describe('GroupBoxResponsiveHandler', () => {
     });
 
     it('reacts to dynamically inserted field', () => {
-      groupBox.fields[3].setResponsive(false);
+      groupBox.fields[4].setResponsive(false);
 
       // normal state
       groupBox.render($('#sandbox'));
@@ -236,7 +237,7 @@ describe('GroupBoxResponsiveHandler', () => {
       expectCondensed(groupBox);
 
       // disable responsiveness for inner group box
-      groupBox.fields[3].setResponsive(false);
+      groupBox.fields[4].setResponsive(false);
       expectCondensed(groupBox);
 
       // back to normal
