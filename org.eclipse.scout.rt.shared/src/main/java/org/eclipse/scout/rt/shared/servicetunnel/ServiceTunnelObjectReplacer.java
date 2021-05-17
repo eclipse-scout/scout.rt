@@ -14,6 +14,7 @@ import java.security.Permission;
 import java.security.Permissions;
 import java.util.Date;
 
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.serialization.IObjectReplacer;
 import org.eclipse.scout.rt.platform.util.date.UTCDate;
 
@@ -38,6 +39,9 @@ public class ServiceTunnelObjectReplacer implements IObjectReplacer {
     if (obj != null && obj.getClass() == Permissions.class) {
       return new LenientPermissionsWrapper((Permissions) obj);
     }
+    if (obj instanceof IDoEntity) {
+      return new DoEntityWrapper((IDoEntity) obj);
+    }
     return obj;
   }
 
@@ -48,6 +52,9 @@ public class ServiceTunnelObjectReplacer implements IObjectReplacer {
     }
     if (obj instanceof LenientPermissionsWrapper) {
       return ((LenientPermissionsWrapper) obj).getPermissions();
+    }
+    if (obj instanceof DoEntityWrapper) {
+      return ((DoEntityWrapper) obj).getDoEntity();
     }
     return obj;
   }
