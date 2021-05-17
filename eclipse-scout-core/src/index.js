@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 export {default as scout} from './scout';
 export {default as App} from './App';
 export {default as ErrorHandler} from './ErrorHandler';
@@ -678,6 +688,16 @@ import * as self from './index.js';
 
 export default self;
 
+/**
+ * @typedef {Group|Form|TileOverviewForm|UnsavedFormChangesForm|FieldStatus|StatusMenuMapping|FormField|CompositeField|WidgetField|ValueField|Button|WizardProgressField|CarouselField|TileField|TreeField|ImageField|TableField
+ * |PlaceholderField|WrappedFormField|PlannerField|CalendarField|AccordionField|BreadcrumbBarField|OutlineTileField|TabArea|TabBoxHeader|Tab|ProposalChooser|TreeProposalChooser|TableProposalChooser|MenuBar|MenubarBox|MenuBox
+ * |DesktopToolBox|Tile|PlaceholderTile|HtmlTile|WidgetTile|BeanTile|TileGrid|PageTileGrid|Tree|CompactTree|Outline|Group|Icon|Image|Label|Popup|TagChooserPopup|SmartFieldPopup|PopupWithHead|MobilePopup|WidgetPopup|TouchPopup
+ * |TableHeaderMenu|CellEditorPopup|DatePickerPopup|TimePickerPopup|PopupManager|TableHeaderMenuGroup|Table|TableTileGridMediator|TableRowDetail|TableHeader|TableFooter|TableRowTileMapping|Action|Menu|TableHeaderMenuButton|TableControl
+ * |ViewButton|Mode|BreadcrumbItem|IFrame|Slider|Switch|SimpleTabArea|SimpleTabBox|SimpleTab|DesktopTab|TagBar|NullWidget|Composite|DesktopLogo|Desktop|DesktopBench|BenchColumn|DesktopHeader|OutlineOverview|TileOutlineOverview
+ * |DesktopNavigation|ViewButtonBox|ViewMenuTab|PlannerHeader|Planner|BusyIndicator|Tooltip|TableInfoFilterTooltip|TableInfoLoadTooltip|TableTooltip|TableInfoSelectionTooltip|WidgetTooltip|CalendarComponent|YearPanel|Calendar
+ * |Carousel|Splitter|Accordion|TileAccordion|GlassPane|Scrollbar|DatePicker|MessageBox|TimePicker|FileChooser|FileInput|ModeSelector|Notification|DesktopNotification|BreadcrumbBar|CollapseHandle|DesktopNavigationHandle|any} AnyWidget
+ */
+
 // Add all functions from the scout object to the scout object on the window
 // Note: the scout object on the window still needs its own scout object (window.scout.scout).
 // It is required when the eclipse-core/scout is mapped as external webpack library to window.scout
@@ -685,3 +705,4 @@ var windowScout = {...self, ...scout};
 
 // Add the scout object to the window
 window.scout = Object.assign(window.scout || {}, windowScout);
+

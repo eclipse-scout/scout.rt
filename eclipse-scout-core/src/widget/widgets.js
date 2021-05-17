@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ let uniqueIdSeqNo = 0;
 
 /**
  * @param {(HTMLElement|$)} a HTML or jQuery element to find the corresponding widget for
- * @returns {Widget} the widget for the given element. If the element is not linked with a widget directly, it searches its ancestors for the widget.
+ * @returns {AnyWidget} the widget for the given element. If the element is not linked with a widget directly, it searches its ancestors for the widget.
  */
 export function get($elem) {
   $elem = $.ensure($elem);

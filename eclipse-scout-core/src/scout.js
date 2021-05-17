@@ -175,8 +175,7 @@ export function installSyntheticActiveStateHandler(myDocument) {
  * @param [partId]
  *          partId of the session the widget belongs to (optional, only relevant if the
  *          argument is a widget ID). If omitted, the first session is used.
- * @returns
- *          the widget for the given element or id
+ * @returns {AnyWidget} the widget for the given element or id
  */
 export function widget(widgetIdOrElement, partId) {
   if (objects.isNullOrUndefined(widgetIdOrElement)) {
