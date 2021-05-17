@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import {
   HtmlEnvironment,
   LabelField,
   PlaceholderField,
+  RadioButtonGroup,
   ResponsiveHandler,
   ResponsiveManager,
   SequenceBox,
@@ -48,7 +49,8 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     VERTICAL_ALIGNMENT: 'verticalAlignment',
     GRID_COLUMN_COUNT: 'gridColumnCount',
     HIDE_PLACE_HOLDER_FIELD: 'hidePlaceHolderField',
-    FIELD_SCALABLE: 'fieldScalable'
+    FIELD_SCALABLE: 'fieldScalable',
+    RADIO_BUTTON_GROUP_USE_UI_HEIGHT: 'radioButtonGroupUseUiHeight'
   };
 
   _initDefaults() {
@@ -77,10 +79,12 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     this._registerTransformation(transformationType.GRID_COLUMN_COUNT, this._transformGridColumnCount);
     this._registerTransformation(transformationType.HIDE_PLACE_HOLDER_FIELD, this._transformHidePlaceHolderField);
     this._registerTransformation(transformationType.FIELD_SCALABLE, this._transformFieldScalable);
+    this._registerTransformation(transformationType.RADIO_BUTTON_GROUP_USE_UI_HEIGHT, this._transformRadioButtonGroupUseUiHeight);
 
     this._enableTransformation(responsiveState.CONDENSED, transformationType.LABEL_POSITION_ON_TOP);
     this._enableTransformation(responsiveState.CONDENSED, transformationType.LABEL_VISIBILITY);
     this._enableTransformation(responsiveState.CONDENSED, transformationType.VERTICAL_ALIGNMENT);
+    this._enableTransformation(responsiveState.CONDENSED, transformationType.RADIO_BUTTON_GROUP_USE_UI_HEIGHT);
 
     this._enableTransformation(responsiveState.COMPACT, transformationType.LABEL_POSITION_ON_TOP);
     this._enableTransformation(responsiveState.COMPACT, transformationType.LABEL_VISIBILITY);
@@ -90,6 +94,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     this._enableTransformation(responsiveState.COMPACT, transformationType.GRID_COLUMN_COUNT);
     this._enableTransformation(responsiveState.COMPACT, transformationType.HIDE_PLACE_HOLDER_FIELD);
     this._enableTransformation(responsiveState.COMPACT, transformationType.FIELD_SCALABLE);
+    this._enableTransformation(responsiveState.COMPACT, transformationType.RADIO_BUTTON_GROUP_USE_UI_HEIGHT);
 
     HtmlEnvironment.get().on('propertyChange', this._htmlPropertyChangeHandler);
     this.widget.visitFields(field => {
@@ -362,6 +367,24 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     } else if (!apply) {
       if (this._hasFieldProperty(field, 'weightX')) {
         gridData.weightX = this._getFieldProperty(field, 'weightX');
+      }
+    }
+
+    this.setGridData(field, gridData);
+  }
+
+  _transformRadioButtonGroupUseUiHeight(field, apply) {
+    if (!(field instanceof RadioButtonGroup)) {
+      return;
+    }
+
+    let gridData = this.getGridData(field);
+    if (apply && !gridData.useUiHeight) {
+      this._storeFieldProperty(field, 'useUiHeight', gridData.useUiHeight);
+      gridData.useUiHeight = true;
+    } else if (!apply) {
+      if (this._hasFieldProperty(field, 'useUiHeight')) {
+        gridData.useUiHeight = this._getFieldProperty(field, 'useUiHeight');
       }
     }
 

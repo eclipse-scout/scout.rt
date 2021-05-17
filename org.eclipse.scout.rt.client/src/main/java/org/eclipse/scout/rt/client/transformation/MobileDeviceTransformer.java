@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
+import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.platform.Order;
@@ -72,6 +73,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     enableTransformation(MobileDeviceTransformation.SET_SEQUENCEBOX_UI_HEIGHT);
     enableTransformation(MobileDeviceTransformation.USE_DIALOG_STYLE_FOR_VIEW);
     enableTransformation(MobileDeviceTransformation.AVOID_DETAIL_FORM_AS_DISPLAY_PARENT);
+    enableTransformation(MobileDeviceTransformation.SET_RADIO_BUTTON_GROUP_UI_HEIGHT);
   }
 
   @Override
@@ -285,6 +287,9 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     else if (field instanceof ISequenceBox) {
       transformSequenceBox((ISequenceBox) field);
     }
+    else if (field instanceof IRadioButtonGroup) {
+      transformRadioButtonGroup((IRadioButtonGroup) field);
+    }
   }
 
   /**
@@ -391,20 +396,34 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     }
   }
 
-  /**
-   * Make the sequence box use its UI height. This is necessary if the labels of the containing fields are moved to top
-   * because in that case a logical row height of 1 is not sufficient anymore.
-   */
   protected void transformSequenceBox(ISequenceBox box) {
     if (!isTransformationEnabled(MobileDeviceTransformation.SET_SEQUENCEBOX_UI_HEIGHT, box)) {
       return;
     }
-    GridData gridDataHints = box.getGridDataHints();
-    if (!gridDataHints.useUiHeight) {
-      gridDataHints.useUiHeight = true;
-      box.setGridDataHints(gridDataHints);
-      rebuildParentGrid(box);
-    }
+    transformUseUiHeight(box);
   }
 
+  protected void transformRadioButtonGroup(IRadioButtonGroup box) {
+    if (!isTransformationEnabled(MobileDeviceTransformation.SET_RADIO_BUTTON_GROUP_UI_HEIGHT, box)) {
+      return;
+    }
+    transformUseUiHeight(box);
+  }
+
+  /**
+   * Make the form field use its UI height. This is necessary for e.g. sequence boxes or radio button groups if the
+   * labels of the containing fields are moved to top because in that case a logical row height of 1 is not sufficient
+   * anymore.
+   */
+  protected void transformUseUiHeight(IFormField field) {
+    if (field == null) {
+      return;
+    }
+    GridData gridDataHints = field.getGridDataHints();
+    if (!gridDataHints.useUiHeight) {
+      gridDataHints.useUiHeight = true;
+      field.setGridDataHints(gridDataHints);
+      rebuildParentGrid(field);
+    }
+  }
 }
