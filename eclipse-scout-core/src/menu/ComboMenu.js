@@ -14,6 +14,15 @@ export default class ComboMenu extends Menu {
 
   constructor() {
     super();
+    this.childSelected = false;
+    this._childSelectedHandler = this._onChildSelected.bind(this);
+  }
+
+  _setChildActions(childActions) {
+    this.childActions.forEach(child => child.off('propertyChange:selected', this._childSelectedHandler));
+    super._setChildActions(childActions);
+    this.childActions.forEach(child => child.on('propertyChange:selected', this._childSelectedHandler));
+    this._updateChildSelected();
   }
 
   _render() {
@@ -23,6 +32,16 @@ export default class ComboMenu extends Menu {
     }
     this.$container.unfocusable();
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  }
+
+  _renderProperties() {
+    super._renderProperties();
+    this._renderChildSelected();
+    this._renderChildActions();
+  }
+
+  _renderChildActions() {
+    super._renderChildActions();
 
     this.childActions.forEach(childAction => {
       childAction.addCssClass('combo-menu-child');
@@ -33,5 +52,17 @@ export default class ComboMenu extends Menu {
   // @override
   _togglesSubMenu() {
     return false;
+  }
+
+  _onChildSelected(event) {
+    this._updateChildSelected();
+  }
+
+  _updateChildSelected() {
+    this.setProperty('childSelected', this.childActions.some(child => child.selected));
+  }
+
+  _renderChildSelected() {
+    this.$container.toggleClass('child-selected', this.childSelected);
   }
 }

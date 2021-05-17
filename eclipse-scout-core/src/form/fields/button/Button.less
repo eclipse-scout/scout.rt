@@ -8,25 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-.button-field > .button {
-
-  /* The 18px min-height is required because in Chrome the height of the ::after element
-   * is not calculated properly when height is set to 100%. This has the effect that buttons
-   * change their size when a button changes its focus state. See ticket 194111.
-   */
-  #scout.vertical-align-helper-after(18px);
-
-  & > .button-label {
-    padding: @text-field-padding-y - @button-padding-y - @button-margin-top 0;
-  }
-
-  &.selected {
-    border-style: inset;
-    border-right-color: @border-color;
-    border-bottom-color: @border-color;
-  }
-}
-
 .button-field > .field {
   margin-left: @mandatory-indicator-width;
 
@@ -35,67 +16,22 @@
   }
 }
 
-.button-field > .field.link-button {
-  /* add a transparent border to align text with normal buttons which also have a border */
-  border-top: 1px solid transparent;
-  border-bottom: 1px solid transparent;
+.button-field > .button {
+  // Ensure button height remains the same if fill vertical = false
+  min-height: @logical-grid-row-height;
+}
 
-  .logical-grid-layout > & {
-    /* make sure link is centered when button has a fixed height (which is the case with logical grid layout) */
-    #scout.vertical-align-helper-before();
-    white-space: nowrap;
-  }
+.button-field > .link-button {
+  padding-left: 0;
+  padding-right: 0;
 
-  & > .link.menu-item {
-    /* Draw underline in child element, otherwise the position would not be correct in FF */
-    text-decoration: none;
-    vertical-align: middle;
-    color: @link-color;
-
-    & > .text {
-      text-decoration: underline;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    & > .text,
-    & > .submenu-icon,
-    & > .icon {
-      /* Reset IE hack for link buttons because it breaks ellipsis tooltip */
-      pointer-events: auto;
-
-      /* Make sure button is not clickable if it is covered by a glass pane */
-
-      .glasspane-parent&,
-      .glasspane-parent & {
-        pointer-events: none;
-      }
-    }
-
-    &:hover {
-      color: @link-hover-color;
-    }
-
-    &:active, &.active {
-      color: @link-active-color;
-    }
-
-    &.disabled {
-      color: @disabled-color;
-    }
+  &:hover,
+  &:active, &.active {
+    background-color: transparent;
   }
 
   &:focus {
-    outline: none;
-
-    & > .link.menu-item::after {
-      #scout.button-focus();
-    }
-  }
-
-  & > .link.menu-item > .icon.image-icon {
-    /* override hack in Menu.css */
-    top: 0;
+    #scout.box-shadow-focus();
   }
 }
 

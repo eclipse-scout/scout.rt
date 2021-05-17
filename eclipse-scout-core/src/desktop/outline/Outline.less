@@ -85,7 +85,6 @@
   cursor: pointer;
   color: @outline-title-color;
   font-size: 19px;
-  #scout.overflow-ellipsis-nowrap();
   padding: 0 @outline-title-padding-right 0 @outline-title-padding-left;
   border-bottom: 1px solid @outline-title-border-color;
   font-weight: @font-weight-bold;
@@ -103,6 +102,7 @@
 
   & > .text {
     flex-grow: 1;
+    #scout.overflow-ellipsis-nowrap();
   }
 
   & > .menubar {
@@ -110,6 +110,11 @@
     border: none;
     width: auto;
     flex-grow: 0;
+    margin-right: -10px;
+
+    & > .menubar-box > .menu-item.last {
+      margin-right: 0;
+    }
   }
 }
 
@@ -226,6 +231,10 @@
   & > .outline-title {
     padding-left: @compact-outline-title-padding-x;
     padding-right: @compact-outline-title-padding-x;
+
+    & > .menubar {
+      margin-right: -@menubar-item-icononly-padding-x;
+    }
   }
 
   & > .tree-data {
@@ -247,11 +256,27 @@
         right: 0;
         top: 0;
         width: auto;
-        padding: @compact-outline-node-padding-y - 7px @compact-outline-node-padding-x 0 0;
+        padding: @compact-outline-node-padding-y - 7px @compact-outline-node-padding-x - @menubar-item-icononly-padding-x 0 0;
       }
 
       & > .detail-menubar {
         padding: 0 @compact-outline-node-padding-x @compact-outline-node-padding-y @compact-outline-node-padding-x;
+        margin-left: -@menubar-item-icononly-padding-x;
+
+        & > .menubar-box > .menu-item {
+          padding-left: @menubar-item-icononly-padding-x;
+          padding-right: @menubar-item-icononly-padding-x;
+          margin-left: @menubar-item-icononly-margin-x;
+          margin-right: @menubar-item-icononly-margin-x;
+
+          &.first {
+            margin-left: 0;
+          }
+
+          &.last {
+            margin-right: 0;
+          }
+        }
       }
 
       & > .form {

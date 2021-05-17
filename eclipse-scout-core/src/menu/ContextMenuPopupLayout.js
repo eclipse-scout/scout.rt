@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics, HtmlComponent, PopupLayout} from '../index';
-import $ from 'jquery';
+import {graphics, HtmlComponent, PopupLayout, scrollbars} from '../index';
 
 export default class ContextMenuPopupLayout extends PopupLayout {
 
@@ -17,24 +16,37 @@ export default class ContextMenuPopupLayout extends PopupLayout {
     super(popup);
   }
 
-  layout($container) {
-    let $menuItems = this.popup.$visibleMenuItems();
-    this._adjustTextAlignment($menuItems);
-    this._resetMaxWidthFor($menuItems);
-    super.layout($container);
-    this._setMaxWidthFor($menuItems);
-  }
-
   _setSize(prefSize) {
-    super._setSize(prefSize);
-
     if (this.popup.bodyAnimating) {
+      scrollbars.update(this.popup.get$Scrollable());
       return;
     }
-    let htmlPopup = this.popup.htmlComp;
+    super._setSize(prefSize);
+    scrollbars.update(this.popup.get$Scrollable());
     let htmlBody = HtmlComponent.get(this.popup.$body);
-    let bodySize = prefSize.subtract(htmlPopup.insets());
-    htmlBody.setSize(bodySize.subtract(htmlBody.margins()));
+    htmlBody.pack();
+  }
+
+  invalidate(htmlSource) {
+    // If a child triggers a layout invalidation, the popup needs to be resized.
+    // This will happen for sure if a child is an image which will be loaded during the animation.
+    // Ideally, the running animations would be stopped, the popup layouted, the animations adjusted to the new bounds and then continued.
+    // This is currently too complicated to implement, so instead we let the animations finish and resize the popup at the end (but before other resize animations start).
+    if (this.popup.bodyAnimating && htmlSource && htmlSource.isDescendantOf(this.popup.htmlComp)) {
+      this.popup._toggleSubMenuQueue.unshift(() => {
+        if (!this.popup.rendered) {
+          return;
+        }
+        let oldOffset = this.popup.$body.data('text-offset');
+        this.popup._adjustTextAlignment();
+        this.popup.animateResize = true;
+        this.resizeAnimationDuration = this.popup.animationDuration;
+        this.popup.revalidateLayoutTree();
+        this.popup.animateResize = false;
+        this.popup._animateTextOffset(this.popup.$body, oldOffset);
+        this.popup.$container.promise().done(() => this.popup._processSubMenuQueue());
+      });
+    }
   }
 
   preferredLayoutSize($container, options) {
@@ -47,7 +59,7 @@ export default class ContextMenuPopupLayout extends PopupLayout {
       let popupStyleBackup = this.popup.$container.attr('style');
       let $siblingBodies = this.popup.$body.siblings('.context-menu');
       $siblingBodies.addClass('hidden');
-      this.popup.$container.css({
+      this.popup.$body.css({
         width: 'auto',
         height: 'auto'
       });
@@ -61,93 +73,5 @@ export default class ContextMenuPopupLayout extends PopupLayout {
     return prefSize
       .add(htmlComp.insets())
       .add(htmlBody.margins());
-  }
-
-  _adjustTextAlignment($menuItems) {
-    // Calculate the text offset (= max icon width)
-    let textOffset = 0;
-    $menuItems.each((index, menuItem) => {
-      let $menuItem = $(menuItem);
-      let $icon = $menuItem.children('.icon');
-      let iconWidth = 0;
-
-      if ($icon.length > 0) {
-        iconWidth = $icon.outerWidth(true);
-      }
-      textOffset = Math.max(textOffset, iconWidth);
-    });
-
-    // Update the padding of each text such that the sum of icon width and the padding
-    // are the same for all items. This ensures that the texts are all aligned.
-    $menuItems.each((index, menuItem) => {
-      let $menuItem = $(menuItem);
-      let $icon = $menuItem.children('.icon');
-      let $text = $menuItem.children('.text');
-      let iconWidth = 0;
-
-      if ($icon.length > 0) {
-        iconWidth = $icon.outerWidth(true);
-      }
-      $text.css('padding-left', textOffset - iconWidth);
-      let htmlComp = HtmlComponent.optGet($menuItem);
-      if (htmlComp) {
-        htmlComp.invalidateLayout();
-      }
-    });
-  }
-
-  _resetMaxWidthFor($menuItems) {
-    $menuItems.each((pos, item) => {
-      let $menu = $(item),
-        menu = $menu.data('widget');
-
-      if (!menu) {
-        // After closing a submenu the link to the widget gets lost
-        return;
-      }
-
-      if (menu.$text) {
-        menu.$text.css('max-width', '');
-      }
-    });
-  }
-
-  _setMaxWidthFor($menuItems) {
-    $menuItems.each((pos, item) => {
-      let $menu = $(item),
-        menu = $menu.data('widget');
-
-      if (!menu) {
-        // After closing a submenu the link to the widget gets lost
-        return;
-      }
-
-      if (menu.$text) {
-        // Submenu icon is on the right side of the text.
-        // If there is not enough space to show the whole menu item (icon, text and submenu icon), the text is truncated.
-        // Icon and submenu icon are always shown.
-        let textMaxWidth = this._calcTextMaxWidth(menu);
-        menu.$text.cssPxValue('max-width', textMaxWidth);
-      }
-    });
-  }
-
-  _calcTextMaxWidth(menu) {
-    let containerWidth = menu.$container.width(),
-      $icon = menu.get$Icon(),
-      $text = menu.$text,
-      $submenuIcon = menu.$submenuIcon,
-      textWidth = containerWidth + 1; // add 1px to make it work even if containerWidth is a float
-
-    if ($text && $text.isVisible()) {
-      textWidth -= $text.cssMarginX();
-    }
-    if ($icon && $icon.isVisible()) {
-      textWidth -= $icon.outerWidth(true);
-    }
-    if ($submenuIcon && $submenuIcon.isVisible()) {
-      textWidth -= $submenuIcon.outerWidth(true);
-    }
-    return textWidth;
   }
 }

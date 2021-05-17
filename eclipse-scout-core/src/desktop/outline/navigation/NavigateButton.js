@@ -27,10 +27,6 @@ export default class NavigateButton extends Menu {
     this.node = null;
     this.outline = null;
     this.actionStyle = Action.ActionStyle.BUTTON;
-    /**
-     * Additional CSS class to be applied in _render method.
-     */
-    this._additionalCssClass = '';
     this._addCloneProperties(['node', 'outline', 'altKeyStrokeContext']);
     this.inheritAccessibility = false;
   }
@@ -49,7 +45,6 @@ export default class NavigateButton extends Menu {
     this.updateEnabled();
     super._render();
     this.$container.addClass('navigate-button small');
-    this.$container.addClass(this._additionalCssClass);
     this.altKeyStrokeContext.registerKeyStroke(this);
   }
 

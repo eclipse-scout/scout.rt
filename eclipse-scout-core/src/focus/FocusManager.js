@@ -361,7 +361,7 @@ export default class FocusManager {
         firstElement = candidate;
       }
 
-      if (!firstDefaultButton && $candidate.is('.default-menu')) {
+      if (!firstDefaultButton && $candidate.is('.default')) {
         firstDefaultButton = candidate;
       }
 

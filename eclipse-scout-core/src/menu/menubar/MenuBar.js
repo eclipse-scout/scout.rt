@@ -70,12 +70,12 @@ export default class MenuBar extends Widget {
       this.menuFilter = (menus, destination, onlyVisible, enableDisableKeyStroke) => options.menuFilter(menus, MenuDestinations.MENU_BAR, onlyVisible, enableDisableKeyStroke);
     }
 
-    this.menuboxLeft = scout.create('MenubarBox', {
+    this.menuboxLeft = scout.create('MenuBarBox', {
       parent: this,
       cssClass: 'left',
       tooltipPosition: this._oppositePosition()
     });
-    this.menuboxRight = scout.create('MenubarBox', {
+    this.menuboxRight = scout.create('MenuBarBox', {
       parent: this,
       cssClass: 'right',
       tooltipPosition: this._oppositePosition()

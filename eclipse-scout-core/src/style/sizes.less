@@ -34,6 +34,7 @@
 @field-label-width: 140px;
 @field-status-width: 20px;
 @field-status-margin-left: 10px;
+@focus-box-shadow-size: 3px;
 @text-field-padding-x: 10px;
 @text-field-padding-y: 7px;
 @text-field-padding-top-compensation: 1px;
@@ -89,6 +90,7 @@
 @busyindicator-large-size: 100px;
 @busyindicator-large-border-width: 2px;
 @button-border-radius: @border-radius;
+@button-focus-border-radius: 6px;
 @button-padding-x: 7px;
 @button-padding-y: 2px;
 @button-margin-top: 1px; /* Necessary to align icon with text */
@@ -109,6 +111,8 @@
 @compact-outline-node-padding-x: 16px;
 @compact-outline-node-padding-y: @outline-breadcrumb-node-padding-y;
 @compact-outline-title-padding-x: @compact-outline-node-padding-x;
+@context-menu-item-padding-y: 8px;
+@context-menu-item-padding-left: 16px;
 @dashboard-tile-label-padding-bottom: 5px;
 @dashboard-tile-label-large-padding-bottom: 10px;
 @date-picker-header-height: @logical-grid-row-height;
@@ -164,15 +168,23 @@
 @group-box-title-padding-top: 12px;
 @group-box-title-with-sub-label-padding-bottom: 6px;
 @login-box-font-size: 16px;
-@menu-item-height: 39px;
-@menu-item-margin-right-between-buttons: 10px;
-@menu-item-margin-right: 20px;
-@menu-item-max-image-icon-height: 18px;
-@menu-item-min-image-icon-width: 18px;
-@menu-item-text-padding-top: 1px;
 @main-menubar-height: @desktop-header-height;
+@main-menubar-item-margin-x: 5px;
+@main-menubar-first-menu-item-margin-left: @bench-padding-x - @menu-item-padding-x;
+@main-menubar-last-menu-item-margin-right: @main-menubar-first-menu-item-margin-left;
+@main-menubar-first-menu-item-icononly-margin-left: @bench-padding-x - @menubar-item-icononly-padding-x;
+@main-menubar-last-menu-item-icononly-margin-right: @main-menubar-first-menu-item-icononly-margin-left;
+@menubar-button-margin: @menubar-field-menu-margin-y;
 @menubar-field-menu-margin-y: 4px;
-@menubar-item-padding-y: 6px;
+@menubar-item-icononly-padding-x: 8px;
+@menubar-item-icononly-margin-x: 2px;
+@menubar-item-margin-x: 2px;
+@menubar-item-margin-y: 2px;
+@menu-item-height: 39px;
+@menu-item-min-image-icon-width: 18px;
+@menu-item-max-image-icon-height: 18px;
+@menu-item-padding-x: 10px;
+@menu-item-padding-y: 6px;
 @messagebox-label-padding: 20px;
 @messagebox-max-width: 330px;
 @mobile-popup-title-margin-right: 30px;

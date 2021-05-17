@@ -32,7 +32,6 @@
 
   & > .menubar {
     margin-left: @mandatory-indicator-width;
-    margin-right: 0;
     background-color: inherit;
     #scout.menubar-background-color-inherit;
   }
@@ -76,6 +75,13 @@
       display: inline-block;
       border: none;
       background-color: transparent;
+      vertical-align: middle;
+      padding-left: 10px;
+
+      & > .menubar-box > .menu-item {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
     }
   }
 

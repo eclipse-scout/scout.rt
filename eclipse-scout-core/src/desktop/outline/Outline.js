@@ -20,7 +20,7 @@ import {
   HtmlComponent,
   keyStrokeModifier,
   MenuBar,
-  menus as menus_1,
+  menus as menuUtil,
   MessageBoxController,
   NavigateButton,
   NavigateDownButton,
@@ -899,7 +899,7 @@ export default class Outline extends Tree {
       // DetailContent can be null or it is the tableRowDetail. Don't show menus on OutlineOverview.
       if (selectedPage.detailTable) {
         detailTable = selectedPage.detailTable;
-        menuItems = menus_1.filter(detailTable.menus, ['Table.EmptySpace'], false, true);
+        menuItems = menuUtil.filter(detailTable.menus, ['Table.EmptySpace'], false, true);
         tableControls = detailTable.tableControls;
         detailTable.setMenuBarVisible(false);
         this._attachDetailMenusListener(detailTable);
@@ -908,7 +908,7 @@ export default class Outline extends Tree {
       let parentPage = selectedPage.parentNode;
       if (parentPage && parentPage.detailTable) {
         detailTable = parentPage.detailTable;
-        menuItems = menuItems.concat(menus_1.filter(detailTable.menus, ['Table.SingleSelection'], false, true));
+        menuItems = menuItems.concat(menuUtil.filter(detailTable.menus, ['Table.SingleSelection'], false, true));
         detailTable.setMenuBarVisible(false);
         this._attachDetailMenusListener(detailTable);
       }
@@ -1196,7 +1196,7 @@ export default class Outline extends Tree {
     this.updateKeyStrokes(menus, oldMenus);
     this._setProperty('menus', menus);
     if (this.titleMenuBar) { // _setMenus is called by parent class Tree.js, at this time titleMenuBar is not yet initialized
-      let menuItems = menus_1.filter(this.menus, ['Tree.Header']);
+      let menuItems = menuUtil.filter(this.menus, ['Tree.Header']);
       this.titleMenuBar.setMenuItems(menuItems);
     }
   }

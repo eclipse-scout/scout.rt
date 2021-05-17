@@ -48,15 +48,14 @@
 
   /* MenuBar.less */
 
-  .menubar {
-    & > .menubox {
+  .menubar:not(.main-menubar) {
+    & > .menubar-box {
       & > .menu-item {
         padding-top: 3px; /* @menubar-item-padding-y; */
         padding-bottom: 3px; /* @menubar-item-padding-y; */
 
         /* By making sure menu items are always at least the same height as form fields, it is easier to align them with each other, especially when zoomed */
         min-height: @logical-grid-row-height-dense; /* @logical-grid-row-height; */
-
       }
     }
   }

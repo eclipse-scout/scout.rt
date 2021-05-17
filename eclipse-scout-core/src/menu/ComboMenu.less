@@ -1,0 +1,93 @@
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+
+.combo-menu {
+  padding: 0;
+  cursor: default;
+  align-items: stretch;
+
+  &:active, &.active, &:hover {
+    background-color: transparent;
+  }
+
+  & > .menu-item:not(:first-child) {
+    margin-left: 3px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -1px;
+      top: 7px;
+      height: calc(100% - 14px);
+      width: 1px;
+      background-color: @border-color;
+    }
+  }
+
+  &:not(.disabled).child-selected,
+  &:not(.disabled):hover {
+    & > .menu-item:not(:first-child)::before {
+      display: none;
+    }
+  }
+}
+
+.combo-menu.menu-button {
+  border: 0;
+
+  & > .menu-item {
+    border: 1px solid @button-border-color;
+
+    &:not(:last-child) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      border-right: 0;
+    }
+
+    &:not(:first-child) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-left: 0;
+      margin-left: 0;
+    }
+
+    .disabled& {
+      border-color: @button-disabled-color;
+    }
+  }
+
+  &.default {
+    & > .menu-item {
+      .button.default();
+
+      &.selected {
+        background-color: @default-button-active-background-color;
+        border-color: @default-button-active-background-color;
+      }
+    }
+  }
+}
+
+.context-menu {
+  & > .combo-menu {
+    padding: 0;
+
+    & > .menu-item {
+      color: @context-menu-item-color;
+      padding-top: @context-menu-item-padding-y;
+      padding-bottom: @context-menu-item-padding-y;
+
+      &:first-child {
+        margin-left: @context-menu-item-padding-left - @menu-item-padding-x;
+      }
+    }
+  }
+}

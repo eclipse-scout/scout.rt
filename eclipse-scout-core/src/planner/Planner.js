@@ -124,7 +124,8 @@ export default class Planner extends Widget {
     this.menuBar = scout.create('MenuBar', {
       parent: this,
       position: MenuBar.Position.BOTTOM,
-      menuOrder: new PlannerMenuItemsOrder(this.session, 'Planner')
+      menuOrder: new PlannerMenuItemsOrder(this.session, 'Planner'),
+      cssClass: 'bounded'
     });
     for (let i = 0; i < this.resources.length; i++) {
       this._initResource(this.resources[i]);

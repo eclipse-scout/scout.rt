@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, HtmlComponent, MenuBar, MenubarBoxLayout, Widget} from '../../index';
+import {arrays, HtmlComponent, MenuBar, MenuBarBoxLayout, Widget} from '../../index';
 
-export default class MenubarBox extends Widget {
+export default class MenuBarBox extends Widget {
 
   constructor() {
     super();
@@ -26,10 +26,10 @@ export default class MenubarBox extends Widget {
   }
 
   _render() {
-    this.$container = this.$parent.appendDiv('menubox');
+    this.$container = this.$parent.appendDiv('menubar-box');
 
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
-    this.htmlComp.setLayout(new MenubarBoxLayout(this));
+    this.htmlComp.setLayout(new MenuBarBoxLayout(this));
   }
 
   _renderProperties() {

@@ -76,7 +76,10 @@
 
 @active-color: @palette-blue-6;
 @active-inverted-background-color: @palette-blue-5;
+@active-inverted-hover-background-color: @palette-blue-6;
+@active-inverted-active-background-color: darken(@active-inverted-hover-background-color, 10%);
 @active-inverted-color: @palette-white;
+@active-background-color: fade(@palette-black, 14%);
 @application-loading-background-color: @palette-white;
 @application-loading01-color: fade(@palette-blue-5, 90%);
 @application-loading02-color: @palette-cyan-4;
@@ -99,6 +102,7 @@
 @error-color: @palette-red-3;
 @error-glow-color: @palette-red-3;
 @focus-border-color: @palette-blue-6;
+@focus-box-shadow-color: darken(@palette-blue-1, 10%);
 @focus-color: @palette-blue-6;
 @focus-glow-color: fade(@focus-border-color, 50%);
 @focus-border-color-inverted: @active-inverted-color;
@@ -122,7 +126,7 @@
 @loading-indicator-knight-rider-color: @palette-blue-3;
 @panel-background-color: @palette-gray-2;
 @read-only-color: @text-color;
-@selected-background-color: fade(@palette-black, 14%);
+@selected-background-color: @active-background-color;
 @selected-intense-background-color: fade(@palette-black, 30%);
 @sub-title-color: @palette-gray-7;
 @text-color: @palette-gray-10;
@@ -148,15 +152,13 @@
 @boxbutton-border-color: @border-color;
 @browser-field-background-color: @palette-white; /* always white to not change the look of the website */
 @button-active-color: @active-color;
-@button-active-background-color: @palette-gray-3;
+@button-active-background-color: @active-background-color;
 @button-background-color: @control-background-color;
 @button-border-color: @button-color;
 @button-color: @palette-blue-6;
-@button-disabled-background-color: @control-disabled-background-color;
+@button-disabled-background-color: transparent;
 @button-disabled-border-color: @border-color;
 @button-disabled-color: @disabled-color;
-@button-font-icon-color: @button-color;
-@button-font-icon-disabled-color: @button-disabled-border-color;
 @button-hover-color: @button-color;
 @busyindicator-active-color: @palette-blue-6;
 @busyindicator-border-color: @border-color;
@@ -194,6 +196,8 @@
 @command-button-active-color: @active-inverted-color;
 @command-button-active-border-color: @active-inverted-background-color;
 @command-button-active-background-color: @active-inverted-background-color;
+@context-menu-item-color: @text-color;
+@context-menu-item-icon-color: @link-color;
 @date-picker-background-color: @control-popup-background-color;
 @date-picker-header-background-color: @panel-background-color;
 @date-picker-day-hover-border-color: @item-selection-border-color;
@@ -213,10 +217,10 @@
 @date-picker-weekend-color: @palette-blue-6;
 @date-picker-day-preselected-border-color: @item-selection-border-color;
 @date-picker-now-preselected-border-color: @highlight-color;
-@default-button-active-background-color: @palette-blue-6;
-@default-button-background-color: @palette-blue-4;
-@default-button-color: @palette-white;
-@default-button-hover-background-color: @default-button-background-color;
+@default-button-active-background-color: @active-inverted-active-background-color;
+@default-button-background-color: @active-inverted-background-color;
+@default-button-color: @active-inverted-color;
+@default-button-hover-background-color: @active-inverted-hover-background-color;
 @desktop-bench-background-color: @background-color;
 @desktop-bench-tab-area-background-color: @palette-gray-3;
 @desktop-navigation-handle-active-background-color: @collapse-handle-active-background-color;
@@ -260,24 +264,15 @@
 @link-hover-color: lighten(@link-color, 10%);
 @main-menubar-background-color: @menubar-background-color;
 @menubar-background-color: @palette-white;
-@menubar-button-active-background-color: @button-active-background-color;
-@menubar-button-background-color: @button-background-color;
-@menubar-button-border-color: @button-border-color;
-@menubar-button-color: @button-color;
-@menubar-button-disabled-background-color: @button-disabled-background-color;
-@menubar-button-disabled-border-color: @palette-gray-5;
-@menubar-button-disabled-color: @button-disabled-color;
-@menubar-button-font-icon-color: @menubar-button-color;
-@menubar-button-font-icon-disabled-color: @menubar-button-disabled-border-color;
-@menubar-item-color: @text-color;
+@menu-item-color: @link-color;
 @menu-item-disabled-color: @disabled-color;
 @messagebox-background-color: @popup-background-color;
 @mode-hover-text-color: @hover-color;
 @mode-selected-background-color: @active-inverted-background-color;
 @mode-selected-text-color: @active-inverted-color;
 @mode-alternative-selected-color: @mode-selected-background-color;
-@navigate-up-button-border-color: @menubar-button-border-color;
-@navigate-up-button-color: @menubar-button-color;
+@navigate-up-button-border-color: @button-border-color;
+@navigate-up-button-color: @button-color;
 @desktop-navigation-background-color: @desktop-header-background-color;
 @desktop-navigation-body-background-color: @palette-white;
 @desktop-navigation-color: @palette-gray-10;

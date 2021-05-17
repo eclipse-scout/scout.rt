@@ -40,7 +40,7 @@ export default class Menu extends Action {
     this.menuFilter = null;
     this.$submenuIcon = null;
     this.$subMenuBody = null;
-    this._addCloneProperties(['defaultMenu', 'menuTypes', 'overflow', 'stackable', 'separator', 'shrinkable', 'parentMenu', 'menuFilter']);
+    this._addCloneProperties(['defaultMenu', 'menuTypes', 'overflow', 'stackable', 'separator', 'shrinkable', 'parentMenu', 'menuFilter', 'subMenuVisibility']);
     this._addWidgetProperties('childActions');
   }
 
@@ -158,6 +158,7 @@ export default class Menu extends Action {
         this._closeSubMenues();
       }
     }
+    this.$container.toggleClass('has-popup', this._doActionTogglesSubMenu() || this._doActionTogglesPopup());
   }
 
   _closeSubMenues() {
@@ -253,18 +254,11 @@ export default class Menu extends Action {
     return this.childActions.length > 0;
   }
 
-  /**
-   * Only render child actions if the sub-menu popup is open.
-   */
   _renderChildActions() {
-    if (objects.optProperty(this.popup, 'rendered')) {
-      let $popup = this.popup.$container;
-      this.childActions.forEach(menu => {
-        menu.render($popup);
-      });
+    // Child action in a sub menu cannot be replaced dynamically, popup has to be closed first.
+    if (!this.rendering) {
+      this._renderSubMenuIcon();
     }
-
-    this._renderSubMenuIcon();
   }
 
   setSubMenuVisibility(subMenuVisibility) {
@@ -311,16 +305,16 @@ export default class Menu extends Action {
         this.invalidateLayoutTree();
       }
     }
-    if (this.rendered) {
+    if (!this.rendering) {
       this._renderTextPosition();
+      this._updateIconAndTextStyle();
     }
   }
 
   _renderText(text) {
     super._renderText(text);
     this.$container.toggleClass('has-text', strings.hasText(this.text) && this.textVisible);
-    if (this.rendered) {
-      this._updateIconAndTextStyle();
+    if (!this.rendering) {
       this._renderSubMenuIcon();
     }
     this.invalidateLayoutTree();
@@ -342,8 +336,7 @@ export default class Menu extends Action {
   _renderIconId() {
     super._renderIconId();
     this.$container.toggleClass('has-icon', !!this.iconId);
-    if (this.rendered) {
-      this._updateIconAndTextStyle();
+    if (!this.rendering) {
       this._renderSubMenuIcon();
     }
     this.invalidateLayoutTree();
@@ -462,8 +455,11 @@ export default class Menu extends Action {
   _updateIconAndTextStyle() {
     let hasText = this._hasText();
     let hasTextAndIcon = !!(hasText && this.iconId);
+    let hasIcon = !!this.iconId;
+    let hasSubMenuIcon = !!this.$submenuIcon;
+    let hasOneIcon = (hasIcon && !hasSubMenuIcon) || (!hasIcon && hasSubMenuIcon);
     this.$container.toggleClass('menu-textandicon', hasTextAndIcon);
-    this.$container.toggleClass('menu-icononly', !hasText);
+    this.$container.toggleClass('menu-icononly', !hasText && hasOneIcon);
   }
 
   _closePopup() {
@@ -679,7 +675,7 @@ export default class Menu extends Action {
   }
 
   _renderMenuStyle() {
-    this.$container.toggleClass('default-menu', this.menuStyle === Menu.MenuStyle.DEFAULT);
+    this.$container.toggleClass('default', this.menuStyle === Menu.MenuStyle.DEFAULT);
   }
 
   setDefaultMenu(defaultMenu) {

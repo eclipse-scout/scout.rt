@@ -18,6 +18,9 @@ export default class PopupLayout extends AbstractLayout {
     this.doubleCalcPrefSize = true; // enables popups with a height which depends on the width (= popups with wrapping content)
     this.autoPosition = true;
     this.autoSize = true;
+    this.resizeAnimationRunning = false;
+    this.resizeAnimationDuration = null; // default
+    this._autoPositionOrig = null;
   }
 
   layout($container) {
@@ -69,6 +72,7 @@ export default class PopupLayout extends AbstractLayout {
       // Bounds did not change -> do nothing
       return;
     }
+    this.resizeAnimationRunning = true;
     htmlComp.$comp
       .stop(true)
       .cssHeight(currentBounds.height)
@@ -81,13 +85,15 @@ export default class PopupLayout extends AbstractLayout {
         left: prefPosition.left,
         top: prefPosition.top
       }, {
-        complete: function() {
+        duration: this.resizeAnimationDuration,
+        complete: () => {
+          this.resizeAnimationRunning = false;
           if (!this.popup.rendered) {
             return;
           }
           // Ensure the arrow is at the correct position after the animation
           this._position();
-        }.bind(this)
+        }
       });
   }
 
@@ -129,10 +135,8 @@ export default class PopupLayout extends AbstractLayout {
    * @returns {Dimension}
    */
   _calcMaxSize() {
-    if (this.popup.repositionEnabled) {
-      // Position the popup at the desired location before doing any calculations to consider the preferred bounds
-      this._position(false);
-    }
+    // Position the popup at the desired location before doing any calculations to consider the preferred bounds
+    this._position(false);
 
     let maxWidth, maxHeight,
       htmlComp = this.popup.htmlComp,
@@ -222,10 +226,8 @@ export default class PopupLayout extends AbstractLayout {
    * @returns {Insets}
    */
   _calcMaxSizeAroundAnchor() {
-    if (this.popup.repositionEnabled) {
-      // Position the popup at the desired location before doing any calculations because positioning adds CSS classes which might change margins
-      this._position(false);
-    }
+    // Position the popup at the desired location before doing any calculations because positioning adds CSS classes which might change margins
+    this._position(false);
 
     let maxWidthLeft, maxWidthRight, maxHeightDown, maxHeightUp,
       htmlComp = this.popup.htmlComp,
@@ -255,5 +257,17 @@ export default class PopupLayout extends AbstractLayout {
     }
 
     return new Insets(maxHeightUp, maxWidthRight, maxHeightDown, maxWidthLeft);
+  }
+
+  disableAutoPosition() {
+    if (this._autoPositionOrig === null) {
+      this._autoPositionOrig = this.autoPosition;
+      this.autoPosition = false;
+    }
+  }
+
+  resetAutoPosition() {
+    this.autoPosition = this._autoPositionOrig;
+    this._autoPositionOrig = null;
   }
 }

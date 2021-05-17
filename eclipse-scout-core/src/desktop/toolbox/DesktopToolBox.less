@@ -25,6 +25,8 @@
   padding: 0 14px;
   border-radius: @desktop-tool-box-item-border-radius;
   color: inherit;
+  display: inline-flex;
+  align-items: center;
 
   &.compact {
     padding-left: 10px;
@@ -33,10 +35,6 @@
     & > .submenu-icon {
       display: none;
     }
-  }
-
-  &:not(.menu-button) > .icon {
-    top: 0; // TODO BrushUp remove when -1 hack is removed from menu.less
   }
 
   & > .font-icon {
@@ -53,7 +51,8 @@
     color: inherit;
   }
 
-  &.selected {
+  &.selected.has-popup {
+    color: inherit;
     background-color: @desktop-tool-box-item-selected-background-color;
   }
 

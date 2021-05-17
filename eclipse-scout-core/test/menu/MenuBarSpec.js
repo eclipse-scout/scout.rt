@@ -397,8 +397,8 @@ describe('MenuBar', () => {
       expect(menuBar.menuItems[0]).toBe(menu1);
       expect(menuBar.menuItems[1]).toBe(menu2);
 
-      expect(menu1.$container).not.toHaveClass('default-menu');
-      expect(menu2.$container).toHaveClass('default-menu');
+      expect(menu1.$container).not.toHaveClass('default');
+      expect(menu2.$container).toHaveClass('default');
     });
 
     it('marks ButtonAdapterMenu that reacts to ENTER keystroke as default menu', () => {
@@ -426,7 +426,7 @@ describe('MenuBar', () => {
       expect(menuBar.menuItems.length).toBe(1);
       expect(menuBar.menuItems[0]).toBe(adapterMenu);
 
-      expect(adapterMenu.$container).toHaveClass('default-menu');
+      expect(adapterMenu.$container).toHaveClass('default');
     });
 
     it('marks first visible and enabled menu that has the "defaultMenu" flag set as default menu', () => {
@@ -469,12 +469,12 @@ describe('MenuBar', () => {
       expect(menuBar.menuItems[4]).toBe(menu5);
       expect(menuBar.menuItems[5]).toBe(menu6);
 
-      expect(menu1.$container).not.toHaveClass('default-menu');
-      expect(menu2.$container).not.toHaveClass('default-menu');
-      expect(menu3.$container).not.toHaveClass('default-menu');
-      expect(menu4.$container).toHaveClass('default-menu');
-      expect(menu5.$container).not.toHaveClass('default-menu');
-      expect(menu6.$container).not.toHaveClass('default-menu');
+      expect(menu1.$container).not.toHaveClass('default');
+      expect(menu2.$container).not.toHaveClass('default');
+      expect(menu3.$container).not.toHaveClass('default');
+      expect(menu4.$container).toHaveClass('default');
+      expect(menu5.$container).not.toHaveClass('default');
+      expect(menu6.$container).not.toHaveClass('default');
       expect(menu4).toBe(menuBar.defaultMenu);
     });
 
@@ -496,18 +496,18 @@ describe('MenuBar', () => {
       menuBar.setMenuItems(menusItems);
       menuBar.render();
       expect(menu1.rendered).toBe(true);
-      expect(menu1.$container).not.toHaveClass('default-menu');
+      expect(menu1.$container).not.toHaveClass('default');
       expect(menu2.rendered).toBe(true);
       expect(menuBar.defaultMenu).toBe(menu2);
-      expect(menu2.$container).toHaveClass('default-menu');
+      expect(menu2.$container).toHaveClass('default');
 
       menu2.setProperty('enabled', false);
       expect(menuBar.defaultMenu).toBe(null);
-      expect(menu2.$container).not.toHaveClass('default-menu');
+      expect(menu2.$container).not.toHaveClass('default');
 
       menu2.setProperty('enabled', true);
       expect(menuBar.defaultMenu).toBe(menu2);
-      expect(menu2.$container).toHaveClass('default-menu');
+      expect(menu2.$container).toHaveClass('default');
     });
 
     it('updates state if keyStroke or defaultMenu property of menu changes', () => {
@@ -530,35 +530,35 @@ describe('MenuBar', () => {
       expect(menu1.rendered).toBe(true);
       expect(menu2.rendered).toBe(true);
       expect(menuBar.defaultMenu).toBe(menu2);
-      expect(menu1.$container).not.toHaveClass('default-menu');
-      expect(menu2.$container).toHaveClass('default-menu');
+      expect(menu1.$container).not.toHaveClass('default');
+      expect(menu2.$container).toHaveClass('default');
 
       menu2.setProperty('keyStroke', null);
       expect(menuBar.defaultMenu).toBe(null);
-      expect(menu1.$container).not.toHaveClass('default-menu');
-      expect(menu2.$container).not.toHaveClass('default-menu');
+      expect(menu1.$container).not.toHaveClass('default');
+      expect(menu2.$container).not.toHaveClass('default');
 
       menu1.setProperty('keyStroke', 'enter');
       expect(menuBar.defaultMenu).toBe(menu1);
-      expect(menu1.$container).toHaveClass('default-menu');
-      expect(menu2.$container).not.toHaveClass('default-menu');
+      expect(menu1.$container).toHaveClass('default');
+      expect(menu2.$container).not.toHaveClass('default');
 
       menu2.setProperty('defaultMenu', true);
       expect(menuBar.defaultMenu).toBe(menu2);
-      expect(menu1.$container).not.toHaveClass('default-menu');
-      expect(menu2.$container).toHaveClass('default-menu');
+      expect(menu1.$container).not.toHaveClass('default');
+      expect(menu2.$container).toHaveClass('default');
 
       menu1.setProperty('defaultMenu', false);
       menu2.setProperty('defaultMenu', false);
       expect(menuBar.defaultMenu).toBe(null);
-      expect(menu1.$container).not.toHaveClass('default-menu');
-      expect(menu2.$container).not.toHaveClass('default-menu');
+      expect(menu1.$container).not.toHaveClass('default');
+      expect(menu2.$container).not.toHaveClass('default');
 
       menu1.setProperty('defaultMenu', undefined);
       menu2.setProperty('defaultMenu', undefined);
       expect(menuBar.defaultMenu).toBe(menu1);
-      expect(menu1.$container).toHaveClass('default-menu');
-      expect(menu2.$container).not.toHaveClass('default-menu');
+      expect(menu1.$container).toHaveClass('default');
+      expect(menu2.$container).not.toHaveClass('default');
     });
 
     it('considers rendered state of default menu', () => {
@@ -579,16 +579,16 @@ describe('MenuBar', () => {
       menuBar.setMenuItems(menuItems);
       menuBar.render();
       expect(menu1.rendered).toBe(true);
-      expect(menu1.$container).not.toHaveClass('default-menu');
+      expect(menu1.$container).not.toHaveClass('default');
       expect(menu2.rendered).toBe(true);
       expect(menuBar.defaultMenu).toBe(menu2);
-      expect(menu2.$container).toHaveClass('default-menu');
+      expect(menu2.$container).toHaveClass('default');
 
       // Move default menu into ellipsis and call updateDefaultMenu explicitly to recalculate state
       menus.moveMenuIntoEllipsis(menu2, ellipsisMenu);
       menuBar.updateDefaultMenu();
       expect(menu1.rendered).toBe(true);
-      expect(menu1.$container).not.toHaveClass('default-menu');
+      expect(menu1.$container).not.toHaveClass('default');
       expect(menu2.rendered).toBe(false);
       expect(menuBar.defaultMenu).toBe(menu2);
 

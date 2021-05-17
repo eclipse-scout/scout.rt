@@ -194,8 +194,8 @@ describe('ContextMenuPopup', () => {
 
       let menu0Clone = findClone(popup, menu0);
       let menu2Clone = findClone(popup, menu2);
-      expect(menu0Clone.$container).toHaveClass('context-menu-item-first');
-      expect(menu2Clone.$container).toHaveClass('context-menu-item-last');
+      expect(menu0Clone.$container).toHaveClass('first');
+      expect(menu2Clone.$container).toHaveClass('last');
       popup.remove();
     });
 
@@ -212,9 +212,9 @@ describe('ContextMenuPopup', () => {
       let menu0Clone = findClone(popup, menu0);
       let menu1Clone = findClone(popup, menu1);
       let menu2Clone = findClone(popup, menu2);
-      expect(menu0Clone.$container).toHaveClass('context-menu-item-first');
-      expect(menu1Clone.$container).toHaveClass('context-menu-item-last');
-      expect(menu2Clone.$container).not.toHaveClass('context-menu-item-last');
+      expect(menu0Clone.$container).toHaveClass('first');
+      expect(menu1Clone.$container).toHaveClass('last');
+      expect(menu2Clone.$container).not.toHaveClass('last');
       popup.remove();
     });
 

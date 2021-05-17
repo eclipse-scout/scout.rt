@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, ContextMenuPopupLayout, HtmlComponent, MenuDestinations, menuNavigationKeyStrokes, Popup, RowLayout, scrollbars} from '../index';
+import {Action, arrays, ContextMenuPopupLayout, HtmlComponent, MenuDestinations, menuNavigationKeyStrokes, Popup, RowLayout, Rectangle, graphics} from '../index';
 import $ from 'jquery';
 
 export default class ContextMenuPopup extends Popup {
@@ -20,8 +20,9 @@ export default class ContextMenuPopup extends Popup {
     this.animateRemoval = true;
     this.menuItems = [];
     this.cloneMenuItems = true;
+    this.bodyAnimating = false;
     this._toggleSubMenuQueue = [];
-    this.repositionEnabled = true;
+    this.animationDuration = 300;
   }
 
   _init(options) {
@@ -65,6 +66,11 @@ export default class ContextMenuPopup extends Popup {
     this._renderMenuItems();
   }
 
+  _remove() {
+    this._toggleSubMenuQueue = [];
+    super._remove();
+  }
+
   _renderBody() {
     this.$body = this.$container.appendDiv('context-menu');
     // Complete the layout hierarchy between the popup and the menu items
@@ -72,41 +78,33 @@ export default class ContextMenuPopup extends Popup {
     htmlBody.setLayout(this._createBodyLayout());
   }
 
-  /**
-   * @param [options]
-   * @override
-   */
   _installScrollbars(options) {
     super._installScrollbars({
       axis: 'y'
     });
   }
 
-  /**
-   * @override
-   */
-  get$Scrollable() {
-    return this.$body;
-  }
-
-  _bounds() {
-    return this.htmlComp.bounds().subtractFromDimension(this.htmlComp.insets());
-  }
-
-  removeSubMenuItems(parentMenu, animated) {
+  _checkRemoveSubMenuItemsPossible(parentMenu, animated) {
     if (!this.rendered && !this.rendering) {
-      return;
+      return false;
     }
     let openingAnimationRunning = this.isOpeningAnimationRunning();
-    if (this.bodyAnimating || openingAnimationRunning) {
+    let resizeAnimationRunning = this.htmlComp.layout.resizeAnimationRunning;
+    if (this.bodyAnimating || openingAnimationRunning || resizeAnimationRunning) {
       // Let current animation finish and execute afterwards to prevent an unpredictable behavior and inconsistent state
       this._toggleSubMenuQueue.push(this.removeSubMenuItems.bind(this, parentMenu, animated));
       if (openingAnimationRunning) {
         this.$container.oneAnimationEnd(() => this._processSubMenuQueue());
       }
-      return;
+      return false;
     }
+    return true;
+  }
 
+  removeSubMenuItems(parentMenu, animated) {
+    if (!this._checkRemoveSubMenuItemsPossible(parentMenu, animated)) {
+      return false;
+    }
     this.$body = parentMenu.__originalParent.$subMenuBody;
     // move new body to back
     this.$body.insertBefore(parentMenu.$subMenuBody);
@@ -115,75 +113,74 @@ export default class ContextMenuPopup extends Popup {
       parentMenu.__originalParent._doActionTogglesSubMenu();
     }
 
-    let actualBounds = this._bounds();
+    let popupBounds = this.htmlComp.bounds();
 
-    this.revalidateLayout();
+    this._adjustTextAlignment();
+    HtmlComponent.get(this.$body).invalidateLayoutTree();
+    this.validateLayoutTree();
     this.position();
 
     if (animated) {
-      this.bodyAnimating = true;
-      let duration = 300;
-      let position = parentMenu.$placeHolder.position();
-      parentMenu.$subMenuBody.css({
-        width: 'auto',
-        height: 'auto'
-      });
-      let targetBounds = this._bounds();
-      parentMenu.$subMenuBody.css('box-shadow', 'none');
-      this.htmlComp.setBounds(actualBounds);
-      if (this.verticalAlignment !== Popup.Alignment.TOP) {
-        // set container to element
-        parentMenu.$subMenuBody.cssTop();
-      }
-
-      this._animateTopAndLeft(this.htmlComp.$comp, actualBounds, targetBounds, duration);
-
-      // move new body to top of popup
-      parentMenu.$subMenuBody.cssHeightAnimated(actualBounds.height, parentMenu.$container.cssHeight(), {
-        duration: duration,
-        queue: false
-      });
-
-      let endTopposition = position.top - this.$body.cssHeight(),
-        startTopposition = 0 - actualBounds.height;
-
-      parentMenu.$subMenuBody.cssTopAnimated(startTopposition, endTopposition, {
-        duration: duration,
-        queue: false,
-        complete: () => {
-          this.bodyAnimating = false;
-          if (!this.rendered || !parentMenu.$container) {
-            return;
-          }
-          scrollbars.uninstall(parentMenu.$subMenuBody, this.session);
-          parentMenu.$placeHolder.replaceWith(parentMenu.$container);
-          parentMenu.$container.toggleClass('expanded', false);
-          this._updateFirstLastClass();
-          this.updateNextToSelected('menu-item', parentMenu.$container);
-
-          parentMenu.$subMenuBody.detach();
-          this._installScrollbars();
-          this.$body.css('box-shadow', '');
-          // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
-          this._invalidateLayoutTreeAndRepositionPopup();
-          this._processSubMenuQueue();
-        }
-      });
-
-      this.$body.cssWidthAnimated(actualBounds.width, targetBounds.width, {
-        duration: duration,
-        start: this.revalidateLayout.bind(this, true),
-        progress: this.revalidateLayout.bind(this, false),
-        queue: false
-      });
-
-      if (targetBounds.height !== actualBounds.height) {
-        this.$body.cssHeightAnimated(actualBounds.height, targetBounds.height, {
-          duration: duration,
-          queue: false
-        });
-      }
+      this._animateRemoveSubmenuItems(parentMenu, popupBounds);
     }
+  }
+
+  _animateRemoveSubmenuItems(parentMenu, popupBounds) {
+    let parentMenuPosition = parentMenu.$placeHolder.position();
+    let popupInsets = this.htmlComp.insets();
+    let endPopupBounds = this.htmlComp.bounds();
+    let oldBodyBounds = HtmlComponent.get(parentMenu.$subMenuBody).bounds();
+    let bodyBounds = HtmlComponent.get(this.$body).bounds();
+    let startBodyBounds = new Rectangle(0, popupInsets.top, oldBodyBounds.width, oldBodyBounds.height);
+    let endBodyBounds = new Rectangle(0, popupInsets.top + parentMenuPosition.top, bodyBounds.width, parentMenu.$container.cssHeight());
+
+    this.bodyAnimating = true;
+    this.htmlComp.layout.disableAutoPosition();
+    this._animateResizePopup(this.htmlComp.$comp, popupBounds, endPopupBounds);
+    this._animateTextOffset(parentMenu.$subMenuBody, parentMenu.$subMenuBody.data('text-offset'));
+
+    // Collapse old body
+    parentMenu.$subMenuBody
+      .cssWidthAnimated(startBodyBounds.width, endBodyBounds.width, {
+        duration: this.animationDuration,
+        progress: this.revalidateLayout.bind(this),
+        complete: () => this._completeAnimateRemoveSubMenuItems(parentMenu),
+        queue: false
+      })
+      .cssHeightAnimated(startBodyBounds.height, endBodyBounds.height, {
+        duration: this.animationDuration,
+        queue: false
+      })
+      .cssTopAnimated(startBodyBounds.y, endBodyBounds.y, {
+        duration: this.animationDuration,
+        queue: false
+      });
+
+    // Resize new body so that it doesn't increase the popup height and shows unnecessary scrollbars if new body will be bigger
+    // It also ensures correct text ellipsis during animation, position is already correct
+    this.$body
+      .cssWidthAnimated(oldBodyBounds.width, bodyBounds.width, {
+        duration: this.animationDuration,
+        queue: false
+      })
+      .cssHeightAnimated(oldBodyBounds.height, bodyBounds.height, {
+        duration: this.animationDuration,
+        queue: false
+      });
+  }
+
+  _completeAnimateRemoveSubMenuItems(parentMenu) {
+    this.bodyAnimating = false;
+    if (!this.rendered || !parentMenu.$container) {
+      return;
+    }
+    parentMenu.$placeHolder.replaceWith(parentMenu.$container);
+    parentMenu.$container.toggleClass('expanded', false);
+    this._updateFirstLastClass();
+    this.updateNextToSelected('menu-item', parentMenu.$container);
+
+    parentMenu.$subMenuBody.detach();
+    this._processSubMenuQueue();
   }
 
   _processSubMenuQueue() {
@@ -193,33 +190,40 @@ export default class ContextMenuPopup extends Popup {
     }
   }
 
-  renderSubMenuItems(parentMenu, menus, animated, initialSubMenuRendering) {
+  _checkRenderSubMenuItemsPossible(parentMenu, menus, animated, initialSubMenuRendering) {
     if (!this.session.desktop.rendered && !initialSubMenuRendering) {
       this.initialSubMenusToRender = {
         parentMenu: parentMenu,
         menus: menus
       };
-      return;
+      return false;
     }
     if (!this.rendered && !this.rendering) {
-      return;
+      return false;
     }
     let openingAnimationRunning = this.isOpeningAnimationRunning();
-    if (this.bodyAnimating || openingAnimationRunning) {
+    let resizeAnimationRunning = this.htmlComp.layout.resizeAnimationRunning;
+    if (this.bodyAnimating || openingAnimationRunning || resizeAnimationRunning) {
       // Let current animation finish and execute afterwards to prevent an unpredictable behavior and inconsistent state
       this._toggleSubMenuQueue.push(this.renderSubMenuItems.bind(this, parentMenu, menus, animated, initialSubMenuRendering));
       if (openingAnimationRunning) {
         this.$container.oneAnimationEnd(() => this._processSubMenuQueue());
       }
-      return;
+      return false;
+    }
+    return true;
+  }
+
+  renderSubMenuItems(parentMenu, menus, animated, initialSubMenuRendering) {
+    if (!this._checkRenderSubMenuItemsPossible(parentMenu, menus, animated, initialSubMenuRendering)) {
+      return false;
     }
 
-    let actualBounds = this._bounds();
-
-    parentMenu.__originalParent.$subMenuBody = this.$body;
-
-    let $all = this.$body.find('.' + 'menu-item');
-    $all.removeClass('next-to-selected');
+    let popupBounds = this.htmlComp.bounds();
+    let $oldBody = this.$body;
+    parentMenu.__originalParent.$subMenuBody = $oldBody;
+    let $menuItems = this.$body.find('.menu-item');
+    $menuItems.removeClass('next-to-selected');
 
     if (!parentMenu.$subMenuBody) {
       this._renderBody();
@@ -230,117 +234,114 @@ export default class ContextMenuPopup extends Popup {
       this.$body = parentMenu.$subMenuBody;
     }
     let $insertAfterElement = parentMenu.$container.prev();
-    let position = parentMenu.$container.position();
+    let parentMenuPosition = parentMenu.$container.position();
     parentMenu.$placeHolder = parentMenu.$container.clone();
     // HtmlComponent is necessary for the row layout (it would normally be installed by Menu.js, but $placeholder is just a jquery clone of parentMenu.$container and is not managed by a real widget)
     HtmlComponent.install(parentMenu.$placeHolder, this.session);
     if ($insertAfterElement.length) {
       parentMenu.$placeHolder.insertAfter($insertAfterElement);
     } else {
-      parentMenu.__originalParent.$subMenuBody.prepend(parentMenu.$placeHolder);
+      $oldBody.prepend(parentMenu.$placeHolder);
     }
 
-    this.$body.insertAfter(parentMenu.__originalParent.$subMenuBody);
+    this.$body.insertAfter($oldBody);
     this.$body.prepend(parentMenu.$container);
     parentMenu.$container.toggleClass('expanded');
+    this._adjustTextAlignment();
 
-    this.revalidateLayout();
+    HtmlComponent.get(this.$body).invalidateLayoutTree();
+    this.validateLayoutTree();
     this.position();
-
     this.updateNextToSelected();
 
     if (animated) {
-      this.bodyAnimating = true;
-      let duration = 300;
-      parentMenu.__originalParent.$subMenuBody.css({
-        width: 'auto',
-        height: 'auto'
-      });
-      let targetBounds = this._bounds();
-
-      this._animateTopAndLeft(this.htmlComp.$comp, actualBounds, targetBounds, duration);
-
-      this.$body.css('box-shadow', 'none');
-      // set container to element
-      this.$body.cssWidthAnimated(actualBounds.width, targetBounds.width, {
-        duration: duration,
-        start: this.revalidateLayout.bind(this, true),
-        progress: this.revalidateLayout.bind(this, false),
-        queue: false
-      });
-
-      this.$body.cssHeightAnimated(parentMenu.$container.cssHeight(), targetBounds.height, {
-        duration: duration,
-        queue: false
-      });
-
-      let endTopposition = 0 - targetBounds.height,
-        startTopposition = position.top - parentMenu.__originalParent.$subMenuBody.cssHeight(),
-        topMargin = 0;
-
-      // move new body to top of popup.
-      this.$body.cssTopAnimated(startTopposition, endTopposition, {
-        duration: duration,
-        queue: false,
-        complete: () => {
-          this.bodyAnimating = false;
-          if (!this.rendered) {
-            return;
-          }
-          if (parentMenu.__originalParent.$subMenuBody) {
-            scrollbars.uninstall(parentMenu.__originalParent.$subMenuBody, this.session);
-            parentMenu.__originalParent.$subMenuBody.detach();
-            this.$body.cssTop(topMargin);
-            this._installScrollbars();
-            this._updateFirstLastClass();
-            this.$body.css('box-shadow', '');
-          }
-          // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
-          this._invalidateLayoutTreeAndRepositionPopup();
-          this._processSubMenuQueue();
-        }
-      });
-
-      if (actualBounds.height !== targetBounds.height) {
-        parentMenu.__originalParent.$subMenuBody.cssHeightAnimated(actualBounds.height, targetBounds.height, {
-          duration: duration,
-          queue: false
-        });
-        this.$container.cssHeight(actualBounds.height, targetBounds.height, {
-          duration: duration,
-          queue: false
-        });
-      }
-      if (this.verticalAlignment === Popup.Alignment.TOP) {
-        this.$container.cssTopAnimated(actualBounds.y, targetBounds.y, {
-          duration: duration,
-          queue: false
-        }).css('overflow', 'visible');
-      }
+      this._animateRenderSubMenuItems(parentMenu, popupBounds, parentMenuPosition);
     } else {
-      if (!initialSubMenuRendering) {
-        scrollbars.uninstall(parentMenu.__originalParent.$subMenuBody, this.session);
-      }
-      parentMenu.__originalParent.$subMenuBody.detach();
-      this._installScrollbars();
+      $oldBody.detach();
       this._updateFirstLastClass();
     }
   }
 
-  _animateTopAndLeft($comp, actualBounds, targetBounds, duration) {
+  _animateRenderSubMenuItems(parentMenu, popupBounds, parentMenuPosition) {
+    let $oldBody = parentMenu.__originalParent.$subMenuBody;
+    let endPopupBounds = this.htmlComp.bounds();
+    let popupInsets = this.htmlComp.insets();
+    let oldBodyBounds = graphics.bounds($oldBody);
+    let bodyBounds = HtmlComponent.get(this.$body).bounds();
+    let startBodyBounds = new Rectangle(0, popupInsets.top + parentMenuPosition.top, oldBodyBounds.width, parentMenu.$container.cssHeight());
+    let endBodyBounds = new Rectangle(0, popupInsets.top, bodyBounds.width, bodyBounds.height);
+
+    this.bodyAnimating = true;
+    this.htmlComp.layout.disableAutoPosition();
+    this._animateResizePopup(this.htmlComp.$comp, popupBounds, endPopupBounds);
+    this._animateTextOffset(this.$body, $oldBody.data('text-offset'));
+
+    // Expand new body
+    this.$body
+      .cssWidthAnimated(startBodyBounds.width, endBodyBounds.width, {
+        duration: this.animationDuration,
+        progress: this.revalidateLayout.bind(this),
+        complete: () => this._completeAnimateRenderSubMenuItems($oldBody),
+        queue: false
+      })
+      .cssHeightAnimated(startBodyBounds.height, endBodyBounds.height, {
+        duration: this.animationDuration,
+        queue: false
+      })
+      .cssTopAnimated(startBodyBounds.y, endBodyBounds.y, {
+        duration: this.animationDuration,
+        queue: false
+      });
+
+    // Resize old body so that it doesn't increase the popup height and shows unnecessary scrollbars if new body will be smaller
+    // It also ensures correct text ellipsis during animation, position is already correct
+    $oldBody
+      .cssWidthAnimated(oldBodyBounds.width, endBodyBounds.width, {
+        duration: this.animationDuration,
+        queue: false
+      })
+      .cssHeightAnimated(oldBodyBounds.height, endBodyBounds.height, {
+        duration: this.animationDuration,
+        queue: false
+      });
+  }
+
+  _completeAnimateRenderSubMenuItems($oldBody) {
+    this.bodyAnimating = false;
+    if (!this.rendered) {
+      return;
+    }
+    if ($oldBody) {
+      $oldBody.detach();
+      this.$body.cssTop('');
+      this._updateFirstLastClass();
+    }
+    this.htmlComp.layout.resetAutoPosition();
+    this._processSubMenuQueue();
+  }
+
+  _animateResizePopup($comp, popupBounds, targetBounds) {
     let options = {
-      duration: duration,
+      duration: this.animationDuration,
       queue: false
     };
     $comp
-      .cssTopAnimated(actualBounds.y, targetBounds.y, options)
-      .cssLeftAnimated(actualBounds.x, targetBounds.x, options);
+      .cssTopAnimated(popupBounds.y, targetBounds.y, options)
+      .cssLeftAnimated(popupBounds.x, targetBounds.x, options)
+      .cssWidthAnimated(popupBounds.width, targetBounds.width, options)
+      .cssHeightAnimated(popupBounds.height, targetBounds.height, options);
   }
 
-  revalidateLayout(repositionEnabled) {
-    this.repositionEnabled = scout.nvl(repositionEnabled, true);
-    super.revalidateLayout();
-    this.repositionEnabled = true;
+  _animateTextOffset($body, textOffset, targetOffset) {
+    targetOffset = scout.nvl(targetOffset, this.$body.data('text-offset'));
+    let $menuItems = this.$visibleMenuItems($body);
+    $menuItems.each((index, menuItem) => {
+      let $menuItem = $(menuItem);
+      let $text = $menuItem.children('.text');
+      let padding = this._calcTextPaddingLeft($menuItem, textOffset);
+      let targetPadding = this._calcTextPaddingLeft($menuItem, targetOffset);
+      $text.cssAnimated({paddingLeft: padding}, {paddingLeft: targetPadding}, {duration: this.animationDuration});
+    });
   }
 
   _renderMenuItems(menus, initialSubMenuRendering) {
@@ -382,19 +383,13 @@ export default class ContextMenuPopup extends Popup {
         menu.__originalParent = originalParent;
       }
       menu.render(this.$body);
+      menu.$container.removeClass('menu-button');
       this._attachMenuListeners(menu);
-
-      // Invalidate popup layout after images icons have been loaded, because the
-      // correct size might not be known yet. If the layout would not be revalidated, the popup
-      // size will be wrong (text is cut off after image has been loaded).
-      // The menu item actually does it by itself, but the popup needs to be repositioned too.
-      if (menu.icon) {
-        menu.icon.on('load error', this._invalidateLayoutTreeAndRepositionPopup.bind(this));
-      }
     }, this);
 
     this._handleInitialSubMenus(initialSubMenuRendering);
     this._updateFirstLastClass();
+    this._adjustTextAlignment();
   }
 
   _attachCloneMenuListeners(menu) {
@@ -456,8 +451,9 @@ export default class ContextMenuPopup extends Popup {
     return this.$body.children('.menu-item');
   }
 
-  $visibleMenuItems() {
-    return this.$body.children('.menu-item:visible');
+  $visibleMenuItems($body) {
+    $body = $body || this.$body;
+    return $body.children('.menu-item:visible');
   }
 
   /**
@@ -469,7 +465,7 @@ export default class ContextMenuPopup extends Popup {
 
     this.$body.children('.menu-item').each(function() {
       let $menuItem = $(this);
-      $menuItem.removeClass('context-menu-item-first context-menu-item-last');
+      $menuItem.removeClass('first last');
 
       if ($menuItem.isVisible()) {
         if (!$firstMenuItem) {
@@ -479,10 +475,10 @@ export default class ContextMenuPopup extends Popup {
       }
     });
     if ($firstMenuItem) {
-      $firstMenuItem.addClass('context-menu-item-first');
+      $firstMenuItem.addClass('first');
     }
     if ($lastMenuItem) {
-      $lastMenuItem.addClass('context-menu-item-last');
+      $lastMenuItem.addClass('last');
     }
   }
 
@@ -530,13 +526,52 @@ export default class ContextMenuPopup extends Popup {
     }, this);
   }
 
-  _invalidateLayoutTreeAndRepositionPopup() {
-    this.invalidateLayoutTree();
-    this.session.layoutValidator.schedulePostValidateFunction(() => {
-      if (!this.rendered) { // check needed because this is an async callback
-        return;
+  _adjustTextAlignment($body) {
+    $body = $body || this.$body;
+    let $menuItems = this.$visibleMenuItems($body);
+    let textOffset = this._calcTextOffset($menuItems);
+    $body.data('text-offset', textOffset);
+    this._updateTextOffset(textOffset, $menuItems);
+  }
+
+  _calcTextOffset($menuItems) {
+    let textOffset = 0;
+    $menuItems = $menuItems || this.$visibleMenuItems();
+    $menuItems.each((index, menuItem) => {
+      let $menuItem = $(menuItem);
+      let $icon = $menuItem.children('.icon');
+      let iconWidth = 0;
+
+      if ($icon.length > 0) {
+        iconWidth = $icon.outerWidth(true);
       }
-      this.position();
+      textOffset = Math.max(textOffset, iconWidth);
     });
+    return textOffset;
+  }
+
+  _updateTextOffset(textOffset, $menuItems) {
+    // Update the padding of each text such that the sum of icon width and the padding
+    // are the same for all items. This ensures that the texts are all aligned.
+    $menuItems = $menuItems || this.$visibleMenuItems();
+    $menuItems.each((index, menuItem) => {
+      let $menuItem = $(menuItem);
+      let $text = $menuItem.children('.text');
+      $text.css('padding-left', this._calcTextPaddingLeft($menuItem, textOffset));
+      let htmlComp = HtmlComponent.optGet($menuItem);
+      if (htmlComp) {
+        htmlComp.invalidateLayout();
+      }
+    });
+  }
+
+  _calcTextPaddingLeft($menuItem, textOffset) {
+    let $icon = $menuItem.children('.icon');
+    let iconWidth = 0;
+
+    if ($icon.length > 0) {
+      iconWidth = $icon.outerWidth(true);
+    }
+    return textOffset - iconWidth;
   }
 }

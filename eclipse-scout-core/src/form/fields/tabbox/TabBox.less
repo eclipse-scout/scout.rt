@@ -64,11 +64,6 @@
       & > .tab-item > .title > .sub-label {
         display: block;
       }
-
-      & > .overflow-tab-item.menu-item {
-        padding-top: 12px;
-        padding-bottom: 20px;
-      }
     }
 
     &.spread-even {
@@ -90,8 +85,7 @@
   & > .menubar {
     position: absolute;
     #scout.menubar-background-color-inherit();
-    border-bottom: none;
-    padding-left: 12px;
+    border-bottom-color: transparent;
   }
 
   & > .status {
@@ -221,28 +215,16 @@
 }
 
 .overflow-tab-item.menu-item {
-  padding: @tab-item-title-padding-top @tab-item-padding-x - 8px @tab-item-title-padding-bottom;
-  /* Reduce padding a little and compensate with margin to make popup header a little smaller */
-  margin: 0 8px;
-
   font-weight: bold;
-
-  /* This makes sure the overflow menu item is not larger than a tab item (especially if a larger font is used).
-  It also prevents the popup from jumping. */
-  line-height: 1;
+  vertical-align: middle;
+  color: @tab-item-color;
 
   &::before {
     display: none;
   }
 
-  & > .text {
-    padding: 0;
-
-  }
-
   & > .submenu-icon {
     padding-left: 4px;
-    line-height: 15px;
   }
 
   &:focus {

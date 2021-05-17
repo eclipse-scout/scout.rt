@@ -10,7 +10,7 @@
  */
 import {AbstractLayout, Dimension} from '../../index';
 
-export default class MenubarBoxLayout extends AbstractLayout {
+export default class MenuBarBoxLayout extends AbstractLayout {
 
   constructor(menubox) {
     super();

@@ -207,12 +207,13 @@ export default class Popup extends Widget {
       return;
     }
     // Give the browser time to layout properly before starting the animation to make sure it will be smooth.
-    this.$container.addClass('invisible');
+    // The before-animate-open class will make the popup invisible (cannot use the invisible class because it is already used by _validateVisibility)
+    this.$container.addClass('before-animate-open');
     setTimeout(() => {
       if (!this.rendered || this.removing) {
         return;
       }
-      this.$container.removeClass('invisible');
+      this.$container.removeClass('before-animate-open');
       this.validateFocus(); // Need to be done after popup is visible again because focus cannot be set on invisible elements.
       this.$container.addClassForAnimation('animate-open');
     });

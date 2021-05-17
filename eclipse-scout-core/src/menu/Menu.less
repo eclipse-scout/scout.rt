@@ -10,12 +10,17 @@
  */
 .menu-item {
   position: relative;
-  display: inline-block;
-  vertical-align: middle;
-  white-space: nowrap;
-  color: @text-color;
+  display: inline-flex;
+  align-items: center;
+  color: @menu-item-color;
   cursor: pointer;
-  #scout.vertical-align-helper-before();
+  padding: @menu-item-padding-y @menu-item-padding-x;
+  border-radius: @border-radius;
+
+  &.menu-icononly {
+    padding-left: @menubar-item-icononly-padding-x;
+    padding-right: @menubar-item-icononly-padding-x;
+  }
 
   & > .key-box {
     bottom: -3px;
@@ -23,49 +28,57 @@
 
   &:hover {
     color: @hover-color;
+    background-color: @hover-background-color;
   }
 
   &:active, &.active {
-    color: @active-color;
+    background-color: @active-background-color;
+  }
+
+  &.selected {
+    color: @active-inverted-color;
+    background-color: @active-inverted-background-color;
+
+    &:hover {
+      background-color: @active-inverted-hover-background-color;
+    }
+
+    &.active, &:active {
+      background-color: @active-inverted-active-background-color;
+    }
+
+    &.has-popup {
+      color: @menu-item-color;
+      background-color: @selected-background-color;
+    }
+  }
+
+  #scout.box-shadow-focus-transition();
+
+  &:focus {
+    #scout.box-shadow-focus-inset();
   }
 
   &.disabled {
     color: @menu-item-disabled-color;
+    background-color: transparent;
     cursor: default;
+
+    &:hover, &.active, &:active {
+      background-color: transparent;
+    }
   }
 
   &.menu-textandicon > .icon {
     margin-right: 8px;
   }
 
-  & > .icon,
-  & > .text,
-  & > .submenu-icon,
-  & > .text > .submenu-icon {
-    position: relative;
-    vertical-align: middle;
-    display: inline-block;
-    line-height: normal;
-    height: auto;
-
-    /* Make IE trigger the :active state if the text or icon is pressed */
-    pointer-events: none;
-  }
-
   & > .text {
-    /* Icon is bigger than the text -> increase text size to make menu items with and without font icons about equal height. */
-    /* Otherwise menu items in context menus have a different size, and the popup of a menu with submenus may not be positioned correctly. */
-    padding-top: @menu-item-text-padding-top;
-    padding-bottom: 1px;
-  }
-
-  &:not(.menu-button) > .icon {
-    /* Move "a bit" towards the top, because the icon would not look centered with the text's baseline otherwise. */
-    top: -1px;
+    #scout.overflow-ellipsis-nowrap();
   }
 
   & > .font-icon {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   & > .image-icon {
@@ -92,31 +105,18 @@
   & > .text > .submenu-icon {
     #scout.submenu-icon();
     padding-left: 8px;
-    top: -1px;
-  }
 
-  & > .font-icon {
-    font-size: 18px;
-  }
-
-  &.menu-open {
-    color: @active-color;
-  }
-
-  &.combo-menu-child.menu-icononly:not(:first-child) {
-    margin-left: 8px;
-
-    & > .submenu-icon {
+    .menu-icononly& {
       padding-left: 0;
+    }
+
+    .selected& {
+      #scout.submenu-icon-open();
     }
   }
 
   &.bottom-text.menu-textandicon {
-    text-align: center;
-
-    &::before {
-      display: none;
-    }
+    flex-direction: column;
 
     & > .icon {
       display: block;
@@ -124,22 +124,21 @@
       padding-bottom: 3px;
     }
 
-    &:not(.menu-button) > .icon {
-      top: 0; // reset
-    }
-
     & > .text {
-      display: block;
+      display: flex;
+      align-items: center;
       font-size: @font-size-extra-small;
-      padding-bottom: 0; // reset
 
       & > .submenu-icon {
         font-size: 12px;
         padding-left: 4px;
-        top: 0; // reset
         // Make sure the icon does not increase the height and therefore the whole menu
         line-height: 0;
       }
     }
   }
+}
+
+.menu-button {
+  .button();
 }

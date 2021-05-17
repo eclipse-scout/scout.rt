@@ -10,6 +10,10 @@
  */
 
 .context-menu-popup {
+  background-color: @popup-background-color;
+  border-radius: @border-radius-medium;
+  overflow: hidden;
+  #scout.drop-shadow-large();
 
   &.animate-open {
     .popup-animate-open();
@@ -21,16 +25,20 @@
 }
 
 .context-menu {
-  position: relative;
-  border: 1px solid @popup-border-color;
+  position: absolute;
   background-color: @popup-background-color;
-  #scout.drop-shadow-large();
+  margin: 6px 0;
 
   & > .menu-item {
-    border-top: solid 1px @border-color;
-    display: block;
-    width: 100%;
-    padding: 11px 15px;
+    display: flex;
+    padding: @context-menu-item-padding-y 24px @context-menu-item-padding-y @context-menu-item-padding-left;
+    color: @context-menu-item-color;
+    border-radius: 0;
+    font-weight: normal;
+
+    & > .font-icon {
+      color: @context-menu-item-icon-color;
+    }
 
     & > .text {
       #scout.overflow-ellipsis();
@@ -39,43 +47,36 @@
     }
 
     &.menu-textandicon > .icon {
-      margin-right: 10px;
+      margin-right: 14px;
     }
 
     &.selected {
-      border-top: 1px solid @item-selection-border-color;
-      border-color: @item-selection-border-color;
       background-color: @item-selection-background-color;
+
+      & > .submenu-icon {
+        transform: none;
+      }
     }
 
-    &.next-to-selected {
-      border-top-color: @item-selection-border-color;
+    &.expanded {
+      color: @active-color;
+
+      & > .submenu-icon {
+        #scout.submenu-icon-open();
+      }
     }
 
-    &.context-menu-item-first {
-      border-top: 1px solid transparent;
-    }
+    &.disabled {
+      color: @menu-item-disabled-color;
 
-    &.context-menu-item-last {
-      border-bottom: 1px solid transparent;
-    }
-
-    &.selected.context-menu-item-first {
-      border-top: 1px solid @item-selection-border-color;
-    }
-
-    &.selected.context-menu-item-last {
-      border-color: @item-selection-border-color;
-    }
-
-    &.expanded > .submenu-icon {
-      #scout.transform(rotateX(180deg));
-      top: 0;
+      & > .font-icon {
+        color: @menu-item-disabled-color;
+      }
     }
 
     & > .key-box {
       bottom: auto;
-      top: 7px;
+      top: 5px;
     }
   }
 }

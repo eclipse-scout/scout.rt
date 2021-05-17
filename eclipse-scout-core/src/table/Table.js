@@ -4325,7 +4325,8 @@ export default class Table extends Widget {
       parent: this,
       position: MenuBar.Position.BOTTOM,
       menuOrder: new MenuItemsOrder(this.session, 'Table'),
-      menuFilter: this._filterMenusHandler
+      menuFilter: this._filterMenusHandler,
+      cssClass: 'bounded'
     });
   }
 

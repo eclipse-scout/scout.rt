@@ -162,7 +162,8 @@ export default class Tree extends Widget {
       parent: this,
       position: MenuBar.Position.BOTTOM,
       menuOrder: new MenuItemsOrder(this.session, 'Tree'),
-      menuFilter: this._filterMenusHandler
+      menuFilter: this._filterMenusHandler,
+      cssClass: 'bounded'
     });
     this._updateItemPath(true);
     this._setDisplayStyle(this.displayStyle);

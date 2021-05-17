@@ -112,6 +112,13 @@ export default class FormMenu extends Menu {
     }
   }
 
+  _renderSelected() {
+    super._renderSelected();
+
+    // Form menu always has a popup (form could be set later, so super call cannot set the class correctly)
+    this.$container.addClass('has-popup');
+  }
+
   _canOpenPopup() {
     // A menu can be opened in the menu bar but also in a context menu, where it will be cloned.
     // The form itself won't be cloned, so there can always be only one rendered form.

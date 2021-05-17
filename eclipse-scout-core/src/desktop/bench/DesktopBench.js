@@ -410,7 +410,8 @@ export default class DesktopBench extends Widget {
     }
     if (content) {
       if (content instanceof Table) {
-        content.menuBar.setCssClass('main-menubar');
+        content.menuBar.addCssClass('main-menubar');
+        content.menuBar.removeCssClass('bounded');
       }
       content.displayViewId = 'C';
     }

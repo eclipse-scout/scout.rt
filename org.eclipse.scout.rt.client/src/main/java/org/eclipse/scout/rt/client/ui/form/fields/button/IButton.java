@@ -57,6 +57,7 @@ public interface IButton extends IFormField {
   int DISPLAY_STYLE_TOGGLE = 1;
   int DISPLAY_STYLE_RADIO = 2;
   int DISPLAY_STYLE_LINK = 3;
+  int DISPLAY_STYLE_BORDERLESS = 4;
 
   void doClick();
 

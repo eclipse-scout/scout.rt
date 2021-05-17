@@ -17,7 +17,6 @@ export default class NavigateUpButton extends NavigateButton {
     super();
     this._defaultIconId = icons.ANGLE_UP;
     this._defaultText = 'ui.Up';
-    this._additionalCssClass = 'small-gap';
     this.iconId = this._defaultIconId;
     this.keyStroke = 'backspace';
   }

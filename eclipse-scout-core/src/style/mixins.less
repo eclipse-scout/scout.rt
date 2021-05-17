@@ -40,12 +40,6 @@
     #scout.glow(@focus-glow-color);
   }
 
-  .focus-border-inverted(@bordersize: 1px) {
-    outline: none;
-    border: @bordersize solid @focus-border-color-inverted;
-    #scout.glow(@focus-glow-color-inverted);
-  }
-
   .no-focus-border() {
     outline: none;
     border: 0;
@@ -380,9 +374,22 @@
   }
 
   .button-focus() {
-    #scout.overlay(-3px, -3px, 6px, 6px);
-    #scout.focus-border();
-    border-radius: @button-border-radius;
+    #scout.box-shadow-focus();
+    border-color: mix(@button-border-color, @focus-box-shadow-color, 25%);
+  }
+
+  .box-shadow-focus() {
+    outline: none;
+    box-shadow: 0 0 0 @focus-box-shadow-size @focus-box-shadow-color;
+  }
+
+  .box-shadow-focus-inset() {
+    outline: none;
+    box-shadow: inset 0 0 0 @focus-box-shadow-size @focus-box-shadow-color;
+  }
+
+  .box-shadow-focus-transition() {
+    transition: box-shadow 0.3s ease;
   }
 
   .triangle-top-left(@size, @color) {
@@ -435,6 +442,10 @@
   .submenu-icon() {
     #scout.font-icon();
     font-size: 16px;
+  }
+
+  .submenu-icon-open() {
+    #scout.transform(rotateX(180deg) translateY(-1px));
   }
 
   /* Invisible pseudo element that enables vertical-align if container has height set */

@@ -50,7 +50,8 @@ export default class Button extends FormField {
     DEFAULT: 0,
     TOGGLE: 1,
     RADIO: 2,
-    LINK: 3
+    LINK: 3,
+    BORDERLESS: 4
   };
 
   static SUBMENU_ICON = icons.ANGLE_DOWN_BOLD;
@@ -122,19 +123,17 @@ export default class Button extends FormField {
   _render() {
     let $button;
     if (this.displayStyle === Button.DisplayStyle.LINK) {
-      // Render as link-button/ menu-item.
-      // This is a bit weird: the model defines a button, but in the UI it behaves like a menu-item.
-      // Probably it would be more reasonable to change the configuration (which would lead to additional
-      // effort required to change an existing application).
-      $button = this.$parent.makeDiv('link-button');
-      // Separate $link element to have a smaller focus border
-      this.$link = $button.appendDiv('menu-item link');
-      this.$buttonLabel = this.$link.appendSpan('button-label text');
+      // Render as link-button
+      $button = this.$parent.makeDiv('link-button menu-item');
+      this.$buttonLabel = $button.appendSpan('button-label text');
     } else {
       // render as button
       $button = this.$parent.makeElement('<button>')
         .addClass('button');
-      this.$buttonLabel = $button.appendSpan('button-label');
+      if (this.displayStyle === Button.DisplayStyle.BORDERLESS) {
+        $button.addClass('borderless');
+      }
+      this.$buttonLabel = $button.appendSpan('button-label text');
 
       if (Device.get().supportsOnlyTouch()) {
         $button.setTabbable(false);
@@ -156,7 +155,7 @@ export default class Button extends FormField {
       }, this);
       if (this.label || !this.iconId) { // no indicator when _only_ the icon is visible
         let icon = icons.parseIconId(Button.SUBMENU_ICON);
-        this.$submenuIcon = (this.$link || $button)
+        this.$submenuIcon = $button
           .appendSpan('submenu-icon')
           .text(icon.iconCharacter);
       }
@@ -269,7 +268,6 @@ export default class Button extends FormField {
   _renderEnabled() {
     super._renderEnabled();
     if (this.displayStyle === Button.DisplayStyle.LINK) {
-      this.$link.setEnabled(this.enabledComputed);
       this.$field.setTabbable(this.enabledComputed && !Device.get().supportsOnlyTouch());
     }
   }
@@ -303,7 +301,7 @@ export default class Button extends FormField {
    * Adds an image or font-based icon to the button by adding either an IMG or SPAN element to the button.
    */
   _renderIconId() {
-    let $iconTarget = this.$link || this.$fieldContainer;
+    let $iconTarget = this.$fieldContainer;
     $iconTarget.icon(this.iconId);
     let $icon = $iconTarget.data('$icon');
     if ($icon) {
@@ -337,7 +335,7 @@ export default class Button extends FormField {
   }
 
   get$Icon() {
-    let $iconTarget = this.$link || this.$fieldContainer;
+    let $iconTarget = this.$fieldContainer;
     return $iconTarget.children('.icon');
   }
 

@@ -319,27 +319,23 @@ button {
 
 .button {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: @button-color;
   background-color: @button-background-color;
   border: 1px solid @button-border-color;
   border-radius: @button-border-radius;
   cursor: pointer;
-  white-space: nowrap;
   padding: @button-padding-y @button-padding-x;
-  /* Note: no vertical align helper here! this is very dependent on the content of the button */
-  /* (only text or other DOM nodes), therefore it has to be added manually when desired. */
 
-  & > .button-label,
-  & > .submenu-icon,
-  & > .icon {
-    vertical-align: middle;
-    display: inline-block;
+  &.borderless {
+    background-color: transparent;
+    border: 0;
   }
 
-  & > .button-label {
-    margin-top: @button-margin-top;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  & > .text {
+    #scout.overflow-ellipsis-nowrap();
   }
 
   & > .icon {
@@ -362,13 +358,16 @@ button {
   }
 
   & > .font-icon {
-    color: @button-font-icon-color;
     font-size: @button-font-icon-size;
   }
 
   & > .submenu-icon {
     #scout.submenu-icon();
     padding-left: 8px;
+
+    .selected& {
+      #scout.submenu-icon-open();
+    }
   }
 
   & > .button-label,
@@ -380,39 +379,43 @@ button {
 
   &:hover {
     color: @button-hover-color;
+    background-color: @hover-background-color;
+  }
+
+  &:active, &.active {
+    color: @button-active-color;
+    background-color: @button-active-background-color;
+  }
+
+  &.selected {
+    color: @active-inverted-color;
+    background-color: @active-inverted-background-color;
+    border-color: @active-inverted-background-color;
+
+    &:hover {
+      background-color: @active-inverted-hover-background-color;
+      border-color: @active-inverted-hover-background-color;
+    }
+
+    &.active, &:active {
+      background-color: @active-inverted-active-background-color;
+      border-color: @active-inverted-active-background-color;
+    }
   }
 
   &:focus {
-    outline: none;
-    overflow: visible; /* without this, IE would cut off the focus glow */
-
-    &::before {
-      #scout.button-focus();
-    }
+    #scout.button-focus();
   }
 
-  &:active,
-  &.active {
-    color: @button-active-color;
-    background-color: @button-active-background-color;
-
-    & > .font-icon {
-      color: @button-active-color;
-    }
-  }
-
-  &.default:not(.disabled) {
+  &.default {
     background-color: @default-button-background-color;
     /* border is necessary to align the text with text from buttons with a real border */
     border-color: @default-button-background-color;
     color: @default-button-color;
 
-    &:focus {
-      color: @default-button-color;
-    }
-
     &:hover {
       background-color: @default-button-hover-background-color;
+      border-color: @default-button-hover-background-color;
     }
 
     &:active, &.active {
@@ -420,20 +423,21 @@ button {
       border-color: @default-button-active-background-color;
     }
 
-    & > .font-icon {
-      font-weight: normal;
-      color: @icon-inverted-color;
+    &:focus {
+      #scout.button-focus();
     }
   }
 
-  &:disabled {
+  &:disabled,
+  &.disabled {
     background-color: @button-disabled-background-color;
     border-color: @button-disabled-border-color;
     color: @button-disabled-color;
     cursor: default;
 
-    & > .font-icon {
-      color: @button-font-icon-disabled-color;
+    &:hover, &.active, &:active {
+      background-color: @button-disabled-background-color;
+      border-color: @button-disabled-border-color;
     }
   }
 

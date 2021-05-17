@@ -9,10 +9,19 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .form-field-menu {
+  // Remove y padding but keep x padding to have the same gap between form field menus and regular menus.
+  padding-top: 0;
+  padding-bottom: 0;
   cursor: default;
+  color: @text-color;
 
   &:hover {
     color: @text-color;
+    background-color: transparent;
+  }
+
+  &:active, &.active {
+    background-color: transparent;
   }
 
   &:not(.has-text):not(.has-icon) {
@@ -26,8 +35,6 @@
     position: relative;
     vertical-align: middle;
 
-    /* remove margin left since the menu-item already has a padding */
-
     & > label {
       margin-left: 8px;
     }
@@ -38,6 +45,12 @@
     }
   }
 
+  &:not(.has-icon) > .form-field:not(.no-mandatory-indicator) {
+    // Remove margin left since the menu-item already has a padding
+    // This reduces the gap between form field menus in the menu bar, but also improves the alignment in the context menu
+    margin-left: -@mandatory-indicator-width;
+  }
+
   & > .check-box-field.disabled:not(.read-only) > .field > .label,
   & > .radiobutton-group > .radiobutton-group-body > .radio-button.disabled:not(.read-only) > .field > .label,
   & > .radio-button.disabled:not(.read-only) > .field > .label {
@@ -46,11 +59,30 @@
   }
 }
 
-/* Inside context menu popup -> set preferred size */
-.context-menu > .menu-item.form-field-menu {
-  display: flex;
-  align-items: center;
+.menubar-box > .form-field-menu {
+  & > .string-field,
+  & > .smart-field,
+  & > .number-field,
+  & > .date-field,
+  & > .tag-field,
+  & > .file-chooser-field {
+    margin-top: @menubar-field-menu-margin-y - @menubar-item-margin-y;
+    margin-bottom: @menubar-field-menu-margin-y - @menubar-item-margin-y;
+  }
+}
 
+:not(.main-menubar):not(.bounded) > .menubar-box > .form-field-menu {
+  &.first {
+    padding-left: 0;
+  }
+
+  &.last {
+    padding-right: 0;
+  }
+}
+
+/* Inside context menu popup -> set preferred size */
+.context-menu > .form-field-menu {
   & > .text,
   & > .icon {
     flex: none;

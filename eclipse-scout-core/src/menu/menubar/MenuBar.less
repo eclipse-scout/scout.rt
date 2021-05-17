@@ -13,66 +13,23 @@
 #scout {
   .main-menubar-background-color-standard() {
     background-color: @main-menubar-background-color;
-
-    & > .menu-button.disabled {
-      background-color: @menubar-button-disabled-background-color;
-    }
   }
 
   .menubar-background-color-inherit() {
     background-color: inherit;
-
-    & > .menu-button.disabled {
-      /* use regular button color since menubar has no color */
-      background-color: @button-disabled-background-color;
-    }
   }
 
   /* standard main-menubar */
   .main-menubar-standard() {
     #scout.main-menubar-background-color-standard();
-    padding-left: @bench-padding-x;
-    padding-right: @bench-padding-x;
     min-height: @main-menubar-height;
     margin-left: inherit;
     margin-right: inherit;
   }
 
-  /* a transparent main-menubar with a smaller bottom border */
+  /* a transparent main-menubar */
   .main-menubar-light() {
     #scout.menubar-background-color-inherit();
-    padding-left: 0;
-    padding-right: 0;
-    margin-left: @bench-padding-x;
-    margin-right: @bench-padding-x;
-  }
-
-  .menubar-focus() {
-    &:focus {
-      outline: none;
-
-      &:not(.disabled) {
-        color: @hover-color;
-
-        &:not(.menu-button) {
-          color: @focus-color;
-
-          &::after {
-            color: @focus-color;
-          }
-        }
-
-        /* Draw border for icon only items */
-
-        &.menu-icononly::after {
-          #scout.button-focus();
-        }
-
-        &:not(.menu-icononly):not(.menu-button) > .text {
-          text-decoration: underline;
-        }
-      }
-    }
   }
 }
 
@@ -83,184 +40,76 @@
   width: 100%;
   background-color: @menubar-background-color;
   border-bottom: 1px solid @border-color;
-  /* default style is 'top' */
-  vertical-align: middle;
   white-space: nowrap;
 
   &.bottom {
     border-bottom: 0;
     border-top: 1px solid @border-color;
   }
+}
 
-  & > .menubox {
-    display: inline-block;
-    height: 100%;
-    #scout.vertical-align-helper-before();
+.menubar-box {
+  display: inline-flex;
+  height: 100%;
+  align-items: center;
 
-    &.right {
-      float: right;
+  &.right {
+    float: right;
+  }
+
+  & > .menu-separator {
+    width: 1px;
+    margin: 0 @menu-item-padding-x;
+    background-color: @border-color;
+    height: 15px;
+
+    &.overflown {
+      display: none;
+    }
+  }
+
+  & > .menu-item {
+    margin: @menubar-item-margin-y @menubar-item-margin-x;
+    /* By making sure menu items are always at least the same height as form fields, it is easier to align them with each other, especially when zoomed */
+    min-height: @logical-grid-row-height;
+
+    &.menu-icononly {
+      margin-left: @menubar-item-icononly-margin-x;
+      margin-right: @menubar-item-icononly-margin-x;
+      min-width: @logical-grid-row-height; // Make it square
+      justify-content: center;
     }
 
-    & > .menu-separator {
-      display: inline-block;
-      vertical-align: middle;
-      width: 1px;
-      margin-right: @menu-item-margin-right;
-      background-color: @border-color;
-      height: 15px;
-
-      &.overflown {
-        display: none;
-      }
+    &.overflown {
+      display: none;
     }
 
-    /* child menus of combo-menu must have the same padding, but not the all the other styles of > .menu-item */
-    & > .combo-menu > .menu-item {
-      padding-top: @menubar-item-padding-y;
-      padding-bottom: @menubar-item-padding-y;
+    &.first {
+      margin-left: 0;
     }
 
-    & > .menu-item {
-      display: inline-block;
-      padding-top: @menubar-item-padding-y;
-      padding-bottom: @menubar-item-padding-y;
+    &.last {
+      margin-right: 0;
+    }
+  }
 
-      /* By making sure menu items are always at least the same height as form fields, it is easier to align them with each other, especially when zoomed */
-      min-height: @logical-grid-row-height;
+  & > .menu-button {
+    min-width: 110px;
+    margin: @menubar-button-margin;
 
-      &.overflown {
-        display: none;
-      }
+    &.small {
+      min-width: 53px;
+    }
+  }
 
-      #scout.menubar-focus();
-
-      &:not(.last) {
-        margin-right: @menu-item-margin-right;
-      }
-
-      &.form-field-menu {
-        padding-top: @menubar-field-menu-margin-y;
-        padding-bottom: @menubar-field-menu-margin-y;
-      }
-
-      /* ---------------------------------- */
-
-      &.menu-button {
-        text-align: center;
-        color: @menubar-button-color;
-        background-color: @menubar-button-background-color;
-        border: 1px solid @menubar-button-border-color;
-        border-radius: @button-border-radius;
-        min-width: 110px;
-        margin-top: @menubar-field-menu-margin-y;
-        margin-bottom: @menubar-field-menu-margin-y;
-        padding-left: @button-padding-x;
-        padding-right: @button-padding-x;
-
-        &:not(.bottom-text) {
-          height: @logical-grid-row-height;
-          padding-top: @button-padding-y;
-          padding-bottom: @button-padding-y;
-        }
-
-        /* TODO [7.0] cgu/BSH: Actually, we wanted to use .overflow-ellipsis-nowrap to support */
-        /* ellipsis, but this breaks the focus, because the ::before inline element gets */
-        /* cut off. We should find a better solution for this. */
-        /*white-space: nowrap;*/
-
-        &:hover {
-          color: @button-hover-color;
-
-          & > .font-icon {
-            color: @button-hover-color;
-          }
-        }
-
-        &:active, &.active {
-          color: @button-active-color;
-          background-color: @menubar-button-active-background-color;
-
-          & > .font-icon {
-            color: @button-active-color;
-          }
-        }
-
-        &:focus::after {
-          #scout.button-focus();
-        }
-
-        & > .font-icon {
-          color: @menubar-button-font-icon-color;
-        }
-
-        &.default-menu:not(.disabled) {
-          #scout.font-text-normal(@font-weight-bold);
-          background-color: @default-button-background-color;
-          /* border is necessary to align the text with text from buttons with a real border */
-          border-color: transparent;
-          color: @default-button-color;
-
-          &:focus {
-            color: @default-button-color;
-          }
-
-          &:hover {
-            background-color: @default-button-hover-background-color;
-          }
-
-          &:active, &.active {
-            background-color: @default-button-active-background-color;
-            border-color: @default-button-active-background-color;
-          }
-
-          & > .font-icon {
-            font-weight: normal;
-            color: @icon-inverted-color;
-          }
-        }
-
-        &.disabled {
-          background-color: @menubar-button-disabled-background-color;
-          border-color: @menubar-button-disabled-border-color;
-          color: @menubar-button-disabled-color;
-          cursor: default;
-
-          & > .font-icon {
-            color: @menubar-button-font-icon-disabled-color;
-          }
-        }
-
-        &.selected {
-          border-style: inset;
-          border-right-color: @border-color;
-          border-bottom-color: @border-color;
-        }
-
-        &:not(.last) {
-          margin-right: @menu-item-margin-right;
-        }
-
-        &.left-of-button {
-          margin-right: @menu-item-margin-right-between-buttons;
-        }
-
-        &.small-gap {
-          margin-right: 6px;
-        }
-
-        &.small {
-          min-width: 53px;
-
-          & > .font-icon {
-            font-size: 18px;
-          }
-        }
-      }
+  /* If the menubar has a border left and right, the first and last items need to be adjusted */
+  .bounded > & > .menu-item {
+    &.first {
+      margin-left: @menubar-item-margin-y;
     }
 
-    /* Menu items within a top-level combo-menu should have a focus-border too */
-    & > .combo-menu > .menu-item {
-      #scout.menubar-focus();
+    &.last {
+      margin-right: @menubar-item-margin-y;
     }
   }
 }
@@ -268,47 +117,48 @@
 .main-menubar {
   #scout.main-menubar-standard;
 
-  & > .menubox {
-
-    & > .menu-item, & > .combo-menu > .menu-item {
-      margin-top: 8px;
-      margin-bottom: 7px;
-
-      &.bottom-text.menu-textandicon {
-        margin-top: 0;
-        margin-bottom: 0;
-      }
-
-      &.menu-button {
-        margin-top: 8px;
-        margin-bottom: 7px;
-      }
-
-      &.form-field-menu {
-        padding-top: 0;
-        padding-bottom: 0;
-      }
-
-      &.small > .font-icon {
-        font-size: 18px;
-      }
-
-      &.last {
-        margin-right: 0;
-      }
-    }
+  & > .menubar-box {
 
     & > .menu-separator {
       height: @logical-grid-row-height - 12px;
     }
 
-    /* combo-menu itself should have no margins and no padding so its child menus
-     * can render a focus border like regular top-level menus.  */
-    & > .combo-menu.menu-item {
-      margin-top: 0;
-      margin-bottom: 0;
-      padding-top: 0;
-      padding-bottom: 0;
+    & > .menu-item {
+      margin-left: @main-menubar-item-margin-x;
+      margin-right: @main-menubar-item-margin-x;
+
+      &.first {
+        margin-left: @main-menubar-first-menu-item-margin-left;
+      }
+
+      &.last {
+        margin-right: @main-menubar-last-menu-item-margin-right;
+      }
+
+      &.menu-icononly {
+        margin-left: @menubar-item-icononly-margin-x;
+        margin-right: @menubar-item-icononly-margin-x;
+
+        &.first {
+          margin-left: @main-menubar-first-menu-item-icononly-margin-left;
+        }
+
+        &.last {
+          margin-right: @main-menubar-last-menu-item-icononly-margin-right;
+        }
+      }
+    }
+
+    & > .menu-button {
+      &.first,
+      &.first.menu-icononly {
+        margin-left: @bench-padding-x;
+      }
+
+      &.last,
+      &.last.menu-icononly {
+        margin-right: @bench-padding-x;
+      }
     }
   }
 }
