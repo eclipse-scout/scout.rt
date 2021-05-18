@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ import {arrays, Device, Dimension, events, IconDesc, icons, objects, scout, stri
 /**
  * By using $ in jsdoc all the functions is this file are recognized as part of $.
  * By additionally defining $ as jQuery all default jQuery functions are recognized as well.
- * @typedef {jQuery} $
+ * @typedef {JQuery|jQuery} $
  */
 
 // === internal methods ===
@@ -559,7 +559,7 @@ $.fn.makeSpan = function(cssClass, text) {
 
 /**
  * @param {boolean} [domElement] (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
- * @returns HTML document reference (ownerDocument) of the HTML element.
+ * @returns {Document} document reference (ownerDocument) of the HTML element.
  */
 $.fn.document = function(domElement) {
   let myDocument = this.length ? (this[0] instanceof Document ? this[0] : this[0].ownerDocument) : null;
@@ -568,7 +568,7 @@ $.fn.document = function(domElement) {
 
 /**
  * @param {boolean} [domElement] (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
- * @returns HTML window reference (defaultView) of the HTML element
+ * @returns {Window} window reference (defaultView) of the HTML element
  */
 $.fn.window = function(domElement) {
   let myDocument = this.document(true),
