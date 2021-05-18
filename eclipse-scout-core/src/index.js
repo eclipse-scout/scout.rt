@@ -703,6 +703,16 @@ import * as self from './index.js';
 
 export default self;
 
+/**
+ * @typedef {Group|Form|TileOverviewForm|UnsavedFormChangesForm|FieldStatus|StatusMenuMapping|FormField|CompositeField|WidgetField|ValueField|Button|WizardProgressField|CarouselField|TileField|TreeField|ImageField|TableField
+ * |PlaceholderField|WrappedFormField|PlannerField|CalendarField|AccordionField|BreadcrumbBarField|OutlineTileField|TabArea|TabBoxHeader|Tab|ProposalChooser|TreeProposalChooser|TableProposalChooser|MenuBar|MenubarBox|MenuBox
+ * |DesktopToolBox|Tile|PlaceholderTile|WidgetTile|HtmlTile|BeanTile|TileGrid|PageTileGrid|Tree|CompactTree|Outline|Icon|Image|Label|PopupManager|Popup|TagChooserPopup|SmartFieldPopup|WidgetPopup|TouchPopup|PopupWithHead
+ * |TableHeaderMenu|CellEditorPopup|DatePickerPopup|TimePickerPopup|TableHeaderMenuGroup|Table|TableTileGridMediator|TableRowDetail|TableHeader|TableFooter|TableRowTileMapping|Action|Menu|TableHeaderMenuButton|TableControl|ViewButton
+ * |Mode|BreadcrumbItem|IFrame|Slider|Switch|SimpleTabArea|SimpleTabBox|SimpleTab|DesktopTab|TagBar|NullWidget|Composite|DesktopLogo|Desktop|DesktopBench|BenchColumn|DesktopHeader|OutlineOverview|TileOutlineOverview|DesktopNavigation
+ * |ViewButtonBox|ViewMenuTab|PlannerHeader|Planner|BusyIndicator|Tooltip|TableInfoFilterTooltip|TableInfoLoadTooltip|TableTooltip|TableInfoSelectionTooltip|WidgetTooltip|CalendarComponent|YearPanel|Calendar|Carousel|Splitter|Accordion
+ * |TileAccordion|GlassPane|Scrollbar|DatePicker|MessageBox|TimePicker|FileChooser|FileInput|ModeSelector|Notification|DesktopNotification|BreadcrumbBar|CollapseHandle|DesktopNavigationHandle|any} AnyWidget
+ */
+
 // Add all functions from the scout object to the scout object on the window
 // Note: the scout object on the window still needs its own scout object (window.scout.scout).
 // It is required when the eclipse-core/scout is mapped as external webpack library to window.scout
