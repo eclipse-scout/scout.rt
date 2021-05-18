@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -242,7 +242,7 @@ export default class Widget {
    * Calls {@link scout.create} for the given model, or if model is already a Widget simply returns the widget.
    *
    * @param model {Object|Widget}
-   * @returns {Widget}
+   * @returns {AnyWidget}
    */
   _createChild(model) {
     if (model instanceof Widget) {
@@ -1733,7 +1733,7 @@ export default class Widget {
   }
 
   /**
-   * @returns {Widget} the original widget from which this one was cloned. If it is not a clone, itself is returned.
+   * @returns {AnyWidget} the original widget from which this one was cloned. If it is not a clone, itself is returned.
    */
   original() {
     let original = this;
@@ -1900,7 +1900,7 @@ export default class Widget {
    * Returns the widget with the requested ID or null if no widget has been found.
    *
    * @param widgetId
-   * @returns {Widget} the found widget for the given id
+   * @returns {AnyWidget} the found widget for the given id
    */
   widget(widgetId) {
     if (predicate(this)) {
@@ -1977,7 +1977,7 @@ export default class Widget {
   }
 
   /**
-   * @returns {Widget} the first parent for which the given function returns true.
+   * @returns {AnyWidget} the first parent for which the given function returns true.
    */
   findParent(predicate) {
     let parent = this.parent;
@@ -1991,7 +1991,7 @@ export default class Widget {
   }
 
   /**
-   * @returns {Widget} the first child for which the given function returns true.
+   * @returns {AnyWidget} the first child for which the given function returns true.
    */
   findChild(predicate) {
     let foundChild = null;
