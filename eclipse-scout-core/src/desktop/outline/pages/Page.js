@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons, inspector, MenuBar, Outline, TableRow, TileOutlineOverview, TreeNode} from '../../../index';
+import {Event, EventSupport, Form, icons, inspector, MenuBar, Outline, TableRow, scout, TileOutlineOverview, TileOverviewForm, TreeNode, Widget} from '../../../index';
 import $ from 'jquery';
 
 /**
@@ -38,10 +38,6 @@ export default class Page extends TreeNode {
     this.detailFormVisibleByUi = true;
     this.navigateButtonsVisible = true;
 
-    /**
-     * This property contains the class-name of the form to be instantiated, when createDetailForm() is called.
-     */
-    this.detailFormType = null;
     this.tableStatusVisible = true;
     /**
      * True to select the page linked with the selected row when the row was selected. May be useful on touch devices.
@@ -52,6 +48,14 @@ export default class Page extends TreeNode {
      */
     this.overviewIconId = null;
     this.showTileOverview = false;
+    this.events = new EventSupport();
+    this.events.registerSubTypePredicate('propertyChange', (event, propertyName) => {
+      return event.propertyName === propertyName;
+    });
+    this._tableFilterHandler = this._onTableFilter.bind(this);
+    this._tableRowClickHandler = this._onTableRowClick.bind(this);
+    this._detailTableModel = null;
+    this._detailFormModel = null;
   }
 
   /**
@@ -67,21 +71,34 @@ export default class Page extends TreeNode {
   };
 
   /**
-   * Override this function to return a detail form which is displayed in the outline when this page is selected.
-   * The default impl. returns null.
-   */
-  createDetailForm() {
-    return null;
-  }
-
-  /**
    * @override TreeNode.js
    */
   _init(model) {
+    this._detailTableModel = Page._removePropertyIfLazyLoading(model, 'detailTable');
+    this._detailFormModel = Page._removePropertyIfLazyLoading(model, 'detailForm');
+
     super._init(model);
     icons.resolveIconProperty(this, 'overviewIconId');
+
+    // init necessary if the properties are still available (e.g. Scout classic)
     this._internalInitTable();
     this._internalInitDetailForm();
+  }
+
+  static _removePropertyIfLazyLoading(object, name) {
+    let prop = object[name];
+    if (typeof prop === 'string') {
+      // Scout Classic: it is an object id -> do not remove it. directly create the widget. lazy loading is done on backend
+      return null;
+    }
+    if (prop instanceof Widget) {
+      // it already is a widget. directly use it.
+      return null;
+    }
+
+    // otherwise: remove the property and return it
+    delete object[name];
+    return prop;
   }
 
   /**
@@ -98,55 +115,139 @@ export default class Page extends TreeNode {
   }
 
   _internalInitTable() {
-    let table = this.detailTable;
-    if (table) {
+    let tableModel = this.detailTable;
+    if (tableModel) {
       // this case is used for Scout classic
-      table = this.getOutline()._createChild(table);
-    } else {
-      table = this._createTable();
+      let newDetailTable = this.getOutline()._createChild(tableModel);
+      this._setDetailTable(newDetailTable);
     }
-
-    this.setDetailTable(table);
   }
 
   _internalInitDetailForm() {
-    let detailForm = this.detailForm;
-    if (detailForm) {
-      detailForm = this.getOutline()._createChild(detailForm);
+    let formModel = this.detailForm;
+    if (formModel) {
+      let newDetailForm = this.getOutline()._createChild(formModel);
+      this._setDetailForm(newDetailForm);
     }
+  }
 
-    this.setDetailForm(detailForm);
+  ensureDetailTable() {
+    if (this.detailTable) {
+      return;
+    }
+    this.setDetailTable(this.createDetailTable());
+  }
+
+  /**
+   * Creates the detail table
+   * @returns {Table} the created table or null
+   */
+  createDetailTable() {
+    let detailTable = this._createDetailTable();
+    if (!detailTable && this._detailTableModel) {
+      detailTable = this.getOutline()._createChild(this._detailTableModel);
+      this._detailTableModel = null; // no longer needed
+    }
+    return detailTable;
   }
 
   /**
    * Override this function to create the internal table. Default impl. returns null.
+   *
+   * @returns {Table}
    */
-  _createTable() {
+  _createDetailTable() {
+    return null;
+  }
+
+  ensureDetailForm() {
+    if (this.detailForm) {
+      return;
+    }
+    this.setDetailForm(this.createDetailForm());
+  }
+
+  /**
+   * Creates the detail form
+   * @returns {Form|*} the created form or null
+   */
+  createDetailForm() {
+    let detailForm = this._createDetailForm();
+    if (!detailForm && this._detailFormModel) {
+      detailForm = this.getOutline()._createChild(this._detailFormModel);
+      this._detailFormModel = null; // no longer needed
+    }
+    return detailForm;
+  }
+
+  /**
+   * Override this function to return a detail form which is displayed in the outline when this page is selected.
+   * The default implementation returns null.
+   *
+   * @returns {Form|*}
+   */
+  _createDetailForm() {
     return null;
   }
 
   /**
-   * Override this function to initialize the internal (detail) table. Default impl. delegates
-   * <code>filter</code> events to the outline mediator.
+   * Override this function to initialize the internal detail form.
+   * @param {Form} form the form to initialize.
    */
-  _initTable(table) {
-    table.menuBar.setPosition(MenuBar.Position.TOP);
-    table.on('filter', this._onTableFilter.bind(this));
-    if (this.drillDownOnRowClick) {
-      table.on('rowClick', this._onTableRowClick.bind(this));
-      table.setMultiSelect(false);
+  _initDetailForm(form) {
+    if (form instanceof Form) {
+      form.setModal(false);
+    }
+    if (!form.displayParent && form.setDisplayParent) {
+      form.setDisplayParent(this.getOutline());
+    }
+    if (form instanceof TileOverviewForm) {
+      form.setPage(this);
     }
   }
 
-  _ensureDetailForm() {
-    if (this.detailForm) {
-      return;
+  /**
+   * Override this function to destroy the internal (detail) form.
+   * @param {Form} form the form to destroy.
+   */
+  _destroyDetailForm(form) {
+    if (form instanceof TileOverviewForm) {
+      form.setPage(null);
     }
-    let form = this.createDetailForm();
-    if (form && !form.displayParent) {
-      form.setDisplayParent(this.getOutline());
+    if (form.owner === this.getOutline()) {
+      // in Scout classic the owner is not an outline but the NullWidget.
+      // Then the destroy is controlled by the backend
+      form.destroy();
     }
-    this.setDetailForm(form);
+  }
+
+  /**
+   * Override this function to initialize the internal (detail) table.
+   * Default impl. delegates filter events to the outline mediator.
+   * @param {Table} table The table to initialize.
+   */
+  _initDetailTable(table) {
+    table.menuBar.setPosition(MenuBar.Position.TOP);
+    table.on('filter', this._tableFilterHandler);
+    if (this.drillDownOnRowClick) {
+      table.on('rowClick', this._tableRowClickHandler);
+      table.setMultiSelect(false);
+    }
+    table.setTableStatusVisible(this.tableStatusVisible);
+  }
+
+  /**
+   * Override this function to destroy the internal (detail) table.
+   * @param {Table} table the table to destroy.
+   */
+  _destroyDetailTable(table) {
+    table.off('filter', this._tableFilterHandler);
+    table.off('rowClick', this._tableRowClickHandler);
+    if (table.owner === this.getOutline()) {
+      // in Scout classic the owner is not an outline but the NullWidget.
+      // Then the destroy is controlled by the backend
+      table.destroy();
+    }
   }
 
   /**
@@ -167,7 +268,8 @@ export default class Page extends TreeNode {
 
   // see Java: AbstractPage#pageActivatedNotify
   activate() {
-    this._ensureDetailForm();
+    this.ensureDetailTable();
+    this.ensureDetailForm();
   }
 
   // see Java: AbstractPage#pageDeactivatedNotify
@@ -197,22 +299,50 @@ export default class Page extends TreeNode {
     return row.page;
   }
 
+  /**
+   * @param {Form} form The new form
+   */
   setDetailForm(form) {
-    this.detailForm = form;
-    if (this.detailForm) {
-      this.detailForm.setModal(false);
+    if (form === this.detailForm) {
+      return;
     }
-    if (this.detailForm instanceof scout.TileOverviewForm) {
-      this.detailForm.setPage(this);
-    }
+    this._setDetailForm(form);
   }
 
+  _setDetailForm(form) {
+    let oldDetailForm = this.detailForm;
+    if (oldDetailForm !== form && oldDetailForm instanceof Widget) {
+      // must be a widget to be destroyed. At startup in Scout Classic it might be a string (the widget id)
+      this._destroyDetailForm(oldDetailForm);
+    }
+    this.detailForm = form;
+    if (form) {
+      this._initDetailForm(form);
+    }
+    this.triggerPropertyChange('detailForm', oldDetailForm, form);
+  }
+
+  /**
+   * @param {Table} table The new table
+   */
   setDetailTable(table) {
-    if (table) {
-      this._initTable(table);
-      table.setTableStatusVisible(this.tableStatusVisible);
+    if (table === this.detailTable) {
+      return;
+    }
+    this._setDetailTable(table);
+  }
+
+  _setDetailTable(table) {
+    let oldDetailTable = this.detailTable;
+    if (oldDetailTable !== table && oldDetailTable instanceof Widget) {
+      // must be a widget to be destroyed. At startup in Scout Classic it might be a string (the widget id)
+      this._destroyDetailTable(oldDetailTable);
     }
     this.detailTable = table;
+    if (table) {
+      this._initDetailTable(table);
+    }
+    this.triggerPropertyChange('detailTable', oldDetailTable, table);
   }
 
   /**
@@ -305,5 +435,37 @@ export default class Page extends TreeNode {
     let drillNode = this.pageForTableRow(row);
     this.getOutline().selectNode(drillNode);
     this.detailTable.deselectRow(row);
+  }
+
+  /**
+   * Triggers a property change for a single property.
+   */
+  triggerPropertyChange(propertyName, oldValue, newValue) {
+    scout.assertParameter('propertyName', propertyName);
+    let event = new Event({
+      propertyName: propertyName,
+      oldValue: oldValue,
+      newValue: newValue
+    });
+    this.trigger('propertyChange', event);
+    return event;
+  }
+
+  trigger(type, event) {
+    event = event || {};
+    event.source = this;
+    this.events.trigger(type, event);
+  }
+
+  one(type, func) {
+    this.events.one(type, func);
+  }
+
+  on(type, func) {
+    return this.events.on(type, func);
+  }
+
+  off(type, func) {
+    this.events.off(type, func);
   }
 }

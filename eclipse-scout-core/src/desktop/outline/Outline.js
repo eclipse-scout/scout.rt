@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -602,8 +602,10 @@ export default class Outline extends Tree {
   }
 
   _appendNavigateButtonsForDetailForm(node) {
-    let menus = this._createNavigateButtons(node, node.detailForm.rootGroupBox);
-    node.detailForm.rootGroupBox.setStaticMenus(menus);
+    if (node.detailForm.rootGroupBox) {
+      let menus = this._createNavigateButtons(node, node.detailForm.rootGroupBox);
+      node.detailForm.rootGroupBox.setStaticMenus(menus);
+    }
   }
 
   _appendNavigateButtonsForDetailTable(node) {
@@ -612,10 +614,12 @@ export default class Outline extends Tree {
   }
 
   _removeNavigateButtonsForDetailForm(node) {
-    let staticMenus = node.detailForm.rootGroupBox.staticMenus.filter(menu => {
-      return !(menu instanceof NavigateButton);
-    });
-    node.detailForm.rootGroupBox.setStaticMenus(staticMenus);
+    if (node.detailForm.rootGroupBox) {
+      let staticMenus = node.detailForm.rootGroupBox.staticMenus.filter(menu => {
+        return !(menu instanceof NavigateButton);
+      });
+      node.detailForm.rootGroupBox.setStaticMenus(staticMenus);
+    }
   }
 
   _removeNavigateButtonsForDetailTable(node) {
@@ -885,9 +889,11 @@ export default class Outline extends Tree {
     if (this.detailContent && this.detailContent instanceof Form) {
       // Get menus from detail form
       let rootGroupBox = this.detailContent.rootGroupBox;
-      menuItems = rootGroupBox.processMenus.concat(rootGroupBox.menus);
-      rootGroupBox.setMenuBarVisible(false);
-      this._attachDetailMenusListener(rootGroupBox);
+      if (rootGroupBox) {
+        menuItems = rootGroupBox.processMenus.concat(rootGroupBox.menus);
+        rootGroupBox.setMenuBarVisible(false);
+        this._attachDetailMenusListener(rootGroupBox);
+      }
     } else if (selectedPage && !(this.detailContent instanceof OutlineOverview)) {
       // Get empty space menus and table controls from detail table
       // DetailContent can be null or it is the tableRowDetail. Don't show menus on OutlineOverview.

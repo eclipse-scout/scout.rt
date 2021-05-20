@@ -18,6 +18,10 @@ export default class PersonTablePage extends PageWithTable {
   _init(model) {
     let m = ${symbol_dollar}.extend({}, this._jsonModel(), model);
     super._init(m);
+  }
+
+  _initDetailTable(table) {
+    super._initDetailTable(table);
     this._initListeners();
   }
 
@@ -82,10 +86,9 @@ export default class PersonTablePage extends PageWithTable {
 
   _createPersonForm() {
     let outline = this.getOutline();
-    let personForm = scout.create('${simpleArtifactName}.PersonForm', {
+    return scout.create('${simpleArtifactName}.PersonForm', {
       parent: outline
     });
-    return personForm;
   }
 
   _onEditPersonMenuAction(event) {

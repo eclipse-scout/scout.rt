@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ export default class PageWithNodes extends Page {
   /**
    * @override Page.js
    */
-  _createTable() {
+  _createDetailTable() {
     let nodeColumn = scout.create('Column', {
       id: 'NodeColumn',
       session: this.session
@@ -49,6 +49,9 @@ export default class PageWithNodes extends Page {
 
   _rebuildDetailTable(childPages) {
     let table = this.detailTable;
+    if (!table) {
+      return;
+    }
     this._unlinkAllTableRows(table.rows);
     table.deleteAllRows();
     let rows = this._createTableRowsForChildPages(childPages);

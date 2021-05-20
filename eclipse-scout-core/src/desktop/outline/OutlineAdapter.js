@@ -27,9 +27,7 @@ export default class OutlineAdapter extends TreeAdapter {
 
     page.detailFormVisible = event.detailFormVisible;
     let detailForm = this.session.getOrCreateWidget(event.detailForm, this.widget);
-    if (detailForm !== page.detailForm) {
-      page.setDetailForm(detailForm);
-    }
+    page.setDetailForm(detailForm);
 
     page.navigateButtonsVisible = event.navigateButtonsVisible;
     page.detailTableVisible = event.detailTableVisible;

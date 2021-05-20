@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,20 +22,40 @@ export default class PageWithTable extends Page {
 
     this.nodeType = Page.NodeType.TABLE;
     this.alwaysCreateChildPage = false;
+
+    this._tableRowDeleteHandler = this._onTableRowsDeleted.bind(this);
+    this._tableRowInsertHandler = this._onTableRowsInserted.bind(this);
+    this._tableRowUpdateHandler = this._onTableRowsUpdated.bind(this);
+    this._tableRowActionHandler = this._onTableRowAction.bind(this);
+    this._tableRowOrderChangeHandler = this._onTableRowOrderChanged.bind(this);
+    this._tableDataLoadHandler = this.loadTableData.bind(this);
   }
 
   /**
    * @override Page
    */
-  _initTable(table) {
-    super._initTable(table);
-    table.on('rowsDeleted allRowsDeleted', this._onTableRowsDeleted.bind(this));
-    table.on('rowsInserted', this._onTableRowsInserted.bind(this));
-    table.on('rowsUpdated', this._onTableRowsUpdated.bind(this));
-    table.on('rowAction', this._onTableRowAction.bind(this));
-    table.on('rowOrderChanged', this._onTableRowOrderChanged.bind(this));
-    table.on('reload', this.loadTableData.bind(this));
+  _initDetailTable(table) {
+    super._initDetailTable(table);
+    table.on('rowsDeleted allRowsDeleted', this._tableRowDeleteHandler);
+    table.on('rowsInserted', this._tableRowInsertHandler);
+    table.on('rowsUpdated', this._tableRowUpdateHandler);
+    table.on('rowAction', this._tableRowActionHandler);
+    table.on('rowOrderChanged', this._tableRowOrderChangeHandler);
+    table.on('reload', this._tableDataLoadHandler);
     table.hasReloadHandler = true;
+  }
+
+  /**
+   * @override Page
+   */
+  _destroyDetailTable(table) {
+    table.off('rowsDeleted allRowsDeleted', this._tableRowDeleteHandler);
+    table.off('rowsInserted', this._tableRowInsertHandler);
+    table.off('rowsUpdated', this._tableRowUpdateHandler);
+    table.off('rowAction', this._tableRowActionHandler);
+    table.off('rowOrderChanged', this._tableRowOrderChangeHandler);
+    table.off('reload', this._tableDataLoadHandler);
+    super._destroyDetailTable(table);
   }
 
   _onTableRowsDeleted(event) {
@@ -135,6 +155,7 @@ export default class PageWithTable extends Page {
    * @returns {$.Deferred}
    */
   loadTableData() {
+    this.ensureDetailTable();
     this.detailTable.deleteAllRows();
     this.detailTable.setLoading(true);
     return this._loadTableData(this._createSearchFilter())

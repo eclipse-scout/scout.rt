@@ -1388,8 +1388,7 @@ export default class Widget {
   }
 
   /**
-   * Triggers a property change for a single property. The event is only triggered when
-   * old and new value are the same.
+   * Triggers a property change for a single property.
    */
   triggerPropertyChange(propertyName, oldValue, newValue) {
     scout.assertParameter('propertyName', propertyName);
