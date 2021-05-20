@@ -14,8 +14,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.Generated;
-
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoValue;
@@ -30,6 +28,13 @@ import org.eclipse.scout.rt.dataobject.DoValue;
  */
 public abstract class AbstractLookupRestrictionDo<SELF extends AbstractLookupRestrictionDo<SELF, ID>, ID> extends DoEntity {
 
+  public static final String IDS = "ids";
+  public static final String TEXT = "text";
+  public static final String PARENT_IDS = "parentIds";
+  public static final String ACTIVE = "active";
+  public static final String ENABLED = "enabled";
+  public static final String MAX_ROW_COUNT = "maxRowCount";
+
   /**
    * A subclass should implement this method to specify the concrete attribute type.
    *
@@ -38,15 +43,19 @@ public abstract class AbstractLookupRestrictionDo<SELF extends AbstractLookupRes
   public abstract DoList<ID> ids();
 
   public DoValue<String> text() {
-    return doValue("text");
+    return doValue(TEXT);
   }
 
   public DoValue<Boolean> active() {
-    return doValue("active");
+    return doValue(ACTIVE);
+  }
+
+  public DoValue<Boolean> enabled() {
+    return doValue(ENABLED);
   }
 
   public DoValue<Integer> maxRowCount() {
-    return doValue("maxRowCount");
+    return doValue(MAX_ROW_COUNT);
   }
 
   /* **************************************************************************
@@ -59,7 +68,7 @@ public abstract class AbstractLookupRestrictionDo<SELF extends AbstractLookupRes
   }
 
   protected static <ID> DoList<ID> createIdsAttribute(AbstractLookupRestrictionDo<?, ID> self) {
-    return self.doList("ids");
+    return self.doList(IDS);
   }
 
   /* **************************************************************************
@@ -70,8 +79,20 @@ public abstract class AbstractLookupRestrictionDo<SELF extends AbstractLookupRes
     return ids().get();
   }
 
+  public String getText() {
+    return text().get();
+  }
+
   public Boolean getActive() {
     return active().get();
+  }
+
+  public Boolean getEnabled() {
+    return enabled().get();
+  }
+
+  public Integer getMaxRowCount() {
+    return maxRowCount().get();
   }
 
   public SELF withIds(Collection<? extends ID> ids) {
@@ -94,22 +115,13 @@ public abstract class AbstractLookupRestrictionDo<SELF extends AbstractLookupRes
     return self();
   }
 
-  public SELF withMaxRowCount(Integer maxRowCount) {
-    maxRowCount().set(maxRowCount);
+  public SELF withEnabled(Boolean enabled) {
+    enabled().set(enabled);
     return self();
   }
 
-  /* **************************************************************************
-   * GENERATED CONVENIENCE METHODS
-   * *************************************************************************/
-
-  @Generated("DoConvenienceMethodsGenerator")
-  public String getText() {
-    return text().get();
-  }
-
-  @Generated("DoConvenienceMethodsGenerator")
-  public Integer getMaxRowCount() {
-    return maxRowCount().get();
+  public SELF withMaxRowCount(Integer maxRowCount) {
+    maxRowCount().set(maxRowCount);
+    return self();
   }
 }

@@ -25,6 +25,12 @@ import org.eclipse.scout.rt.dataobject.DoValue;
  */
 public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF, ID>, ID> extends DoEntity {
 
+  public static final String ID = "id";
+  public static final String TEXT = "text";
+  public static final String ENABLED = "enabled";
+  public static final String ACTIVE = "active";
+  public static final String PARENT_ID = "parentId";
+
   protected AbstractLookupRowDo() {
     withEnabled(true); // lookup rows are enabled by default
     withActive(true); // lookup rows are active by default
@@ -38,19 +44,19 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
   public abstract DoValue<ID> id();
 
   public DoValue<String> text() {
-    return doValue("text");
+    return doValue(TEXT);
   }
 
   public DoValue<Boolean> enabled() {
-    return doValue("enabled");
+    return doValue(ENABLED);
   }
 
   public DoValue<Boolean> active() {
-    return doValue("active");
+    return doValue(ACTIVE);
   }
 
   public DoValue<ID> parentId() {
-    return doValue("parentId");
+    return doValue(PARENT_ID);
   }
 
   /* **************************************************************************
@@ -63,7 +69,7 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
   }
 
   protected static <ID> DoValue<ID> createIdAttribute(AbstractLookupRowDo<?, ID> self) {
-    return self.doValue("id");
+    return self.doValue(ID);
   }
 
   /* **************************************************************************
