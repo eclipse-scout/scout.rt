@@ -32,6 +32,8 @@ import org.mockito.Mockito;
 public class AbstractJsonPropertyObserverTest {
 
   private static final String PROP_FOOBAR = "fooBar";
+  private static final String PROP_CUSTOM = "custom";
+  private static final String CUSTOM = "customValue";
   private static final String ID = "fooId";
 
   private IUiSession m_session = new UiSessionMock();
@@ -47,6 +49,7 @@ public class AbstractJsonPropertyObserverTest {
 
     @Override
     public void initJsonProperties(IPropertyObserver model) {
+      super.initJsonProperties(model);
       putJsonProperty(new JsonProperty<IPropertyObserver>(PROP_FOOBAR, model) {
         @Override
         protected Object modelValue() {
@@ -76,6 +79,14 @@ public class AbstractJsonPropertyObserverTest {
 
   @Before
   public void setUp() {
+    // register custom property before observer gets initialized
+    m_observer.addCustomJsonProperty(new JsonProperty<IPropertyObserver>(PROP_CUSTOM, m_model) {
+      @Override
+      protected Object modelValue() {
+        return CUSTOM;
+      }
+    });
+
     m_observer.init();
   }
 
@@ -102,6 +113,16 @@ public class AbstractJsonPropertyObserverTest {
     Assert.assertTrue("handlePropertyChange must be called", m_observer.m_handled);
     String foobar = JsonTestUtility.extractProperty(m_session.currentJsonResponse(), ID, PROP_FOOBAR);
     Assert.assertNull(foobar);
+  }
+
+  /**
+   * Test registration of custom property
+   */
+  @Test
+  public void testCustomPropertyRegistration() {
+    JsonProperty<?> property = m_observer.getJsonProperty(PROP_CUSTOM);
+    Assert.assertNotNull(property);
+    Assert.assertEquals(property.modelValue(), CUSTOM);
   }
 
 }
