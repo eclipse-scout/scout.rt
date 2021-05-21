@@ -1632,12 +1632,17 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
    * @param {number} items._datasetIndex
    */
   _onClick(event, items) {
-    if (!items.length || this._isMaxSegmentsExceeded(this.chartJs.config, items[0]._index)) {
+    if (!items.length) {
+      return;
+    }
+    let relevantItem = this._selectRelevantItem(items);
+
+    if (this._isMaxSegmentsExceeded(this.chartJs.config, relevantItem._index)) {
       return;
     }
 
-    let itemIndex = items[0]._index,
-      datasetIndex = items[0]._datasetIndex,
+    let itemIndex = relevantItem._index,
+      datasetIndex = relevantItem._datasetIndex,
       clickObject = {
         datasetIndex: datasetIndex,
         dataIndex: itemIndex
@@ -1654,6 +1659,30 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     e.data = clickObject;
     e.originalEvent = event;
     this.chart._onValueClick(e);
+  }
+
+  /**
+   * Selects the most relevant item. Default is the first item.
+   *
+   * @param {object[]} items
+   * @param {number} items._index
+   * @param {number} items._datasetIndex
+   * @private
+   */
+  _selectRelevantItem(items) {
+    let chartDatasets = this.chartJs.config.data.datasets;
+    let relevantItem = items[0];
+
+    if (this.chartJs.config.type === Chart.Type.BUBBLE) {
+      // The smallest bubble, which is drawn in the foreground, is the most relevant item for the bubble chart.
+      // If two bubbles are the same size, we choose the one which comes later in the array (bubble with array index n + 1 is draw in front of bubble with array index n)
+      items.forEach(item => {
+        if (chartDatasets[item._datasetIndex].data[item._index].z <= chartDatasets[relevantItem._datasetIndex].data[relevantItem._index].z) {
+          relevantItem = item;
+        }
+      });
+    }
+    return relevantItem;
   }
 
   _onHover(event, items) {
