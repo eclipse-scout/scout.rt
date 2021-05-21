@@ -12,7 +12,10 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -33,11 +36,13 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
    * Key = propertyName.
    */
   private final Map<String, JsonProperty<?>> m_jsonProperties;
+  private final List<JsonProperty<?>> m_customJsonProperties;
 
   public AbstractJsonPropertyObserver(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
     m_propertyEventFilter = new PropertyEventFilter();
     m_jsonProperties = new HashMap<>();
+    m_customJsonProperties = new ArrayList<>();
   }
 
   @Override
@@ -49,6 +54,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   }
 
   protected void initJsonProperties(T model) {
+    m_customJsonProperties.forEach(prop -> putJsonProperty(prop));
   }
 
   /**
@@ -73,6 +79,24 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
 
   protected JsonProperty<?> getJsonProperty(String name) {
     return m_jsonProperties.get(name);
+  }
+
+  /**
+   * Adds a custom property which is sent to the browser-side. Each custom JSON property will be added to the list of
+   * regular JSON properties in {@link #initJsonProperties(IPropertyObserver)}. This means custom JSON properties need
+   * to be added before {@link #init()} is called.
+   */
+  public final boolean addCustomJsonProperty(JsonProperty<?> property) {
+    return m_customJsonProperties.add(property);
+  }
+
+  public final boolean removeCustomJsonProperty(JsonProperty<?> property) {
+    removeJsonProperty(property.getPropertyName());
+    return m_customJsonProperties.remove(property);
+  }
+
+  public final List<JsonProperty<?>> getCustomJsonProperties() {
+    return Collections.unmodifiableList(m_customJsonProperties);
   }
 
   /**
