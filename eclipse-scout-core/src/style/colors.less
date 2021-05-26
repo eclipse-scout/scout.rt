@@ -75,10 +75,6 @@
 /* -------------------------------- */
 
 @active-color: @palette-blue-6;
-@active-inverted-background-color: @palette-blue-5;
-@active-inverted-hover-background-color: @palette-blue-6;
-@active-inverted-active-background-color: darken(@active-inverted-hover-background-color, 10%);
-@active-inverted-color: @palette-white;
 @active-background-color: fade(@palette-black, 14%);
 @application-loading-background-color: @palette-white;
 @application-loading01-color: fade(@palette-blue-5, 90%);
@@ -105,8 +101,8 @@
 @focus-box-shadow-color: darken(@palette-blue-1, 10%);
 @focus-color: @palette-blue-6;
 @focus-glow-color: fade(@focus-border-color, 50%);
-@focus-border-color-inverted: @active-inverted-color;
-@focus-glow-color-inverted: fade(@active-inverted-color, 50%);
+@focus-border-color-inverted: @selected-color;
+@focus-glow-color-inverted: fade(@selected-color, 50%);
 @highlight-color: @palette-orange-4;
 @highlight-inverted-background-color: @highlight-color;
 @hover-color: @palette-blue-6;
@@ -126,8 +122,11 @@
 @loading-indicator-knight-rider-color: @palette-blue-3;
 @panel-background-color: @palette-gray-2;
 @read-only-color: @text-color;
-@selected-background-color: @active-background-color;
-@selected-intense-background-color: fade(@palette-black, 30%);
+@selected-active-background-color: darken(@selected-hover-background-color, 10%);
+@selected-background-color: @palette-blue-5;
+@selected-color: @palette-white;
+@selected-hover-background-color: @palette-blue-6;
+@selected-with-popup-background-color: @active-background-color;
 @sub-title-color: @palette-gray-7;
 @text-color: @palette-gray-10;
 @text-disabled-color: @palette-gray-7;
@@ -165,7 +164,7 @@
 @calendar-component-color: @palette-black;
 @calendar-component-intro-color: @palette-gray-7;
 @calendar-day-color: @palette-gray-7;
-@calendar-day-selected-background-color: @active-inverted-background-color;
+@calendar-day-selected-background-color: @selected-background-color;
 @calendar-day-selected-color: @palette-white;
 @calendar-mode-selected-background-color: @item-selection-background-color;
 @calendar-mode-selected-color: @palette-blue-7;
@@ -193,9 +192,9 @@
 @column-background-effect-gradient2-end-background-color: @palette-red-2;
 @column-background-effect-bar-chart-background-color: @palette-cyan-2;
 @command-button-border-color: @border-color;
-@command-button-active-color: @active-inverted-color;
-@command-button-active-border-color: @active-inverted-background-color;
-@command-button-active-background-color: @active-inverted-background-color;
+@command-button-selected-color: @selected-color;
+@command-button-selected-border-color: @selected-background-color;
+@command-button-selected-background-color: @selected-background-color;
 @context-menu-item-color: @text-color;
 @context-menu-item-icon-color: @link-color;
 @date-picker-background-color: @control-popup-background-color;
@@ -204,7 +203,7 @@
 @date-picker-day-hover-background-color: @item-selection-background-color;
 @date-picker-day-hover-selected-background-color: @palette-blue-4;
 @date-picker-day-selected-color: @palette-white;
-@date-picker-day-selected-background-color: @active-inverted-background-color;
+@date-picker-day-selected-background-color: @selected-background-color;
 @date-picker-day-disabled-color: @palette-gray-5;
 @date-picker-now-color: @highlight-color;
 @date-picker-now-hover-selected-background-color: @palette-orange-3;
@@ -217,10 +216,10 @@
 @date-picker-weekend-color: @palette-blue-6;
 @date-picker-day-preselected-border-color: @item-selection-border-color;
 @date-picker-now-preselected-border-color: @highlight-color;
-@default-button-active-background-color: @active-inverted-active-background-color;
-@default-button-background-color: @active-inverted-background-color;
-@default-button-color: @active-inverted-color;
-@default-button-hover-background-color: @active-inverted-hover-background-color;
+@default-button-active-background-color: @selected-active-background-color;
+@default-button-background-color: @selected-background-color;
+@default-button-color: @selected-color;
+@default-button-hover-background-color: @selected-hover-background-color;
 @desktop-bench-background-color: @background-color;
 @desktop-bench-tab-area-background-color: @palette-gray-3;
 @desktop-navigation-handle-active-background-color: @collapse-handle-active-background-color;
@@ -246,7 +245,7 @@
 @desktop-tab-selected-flash-background-color: darken(@simple-tab-selected-background-color, 20%);
 @desktop-tab-hover-background-color: @view-tab-hover-background-color;
 @desktop-tool-box-item-hover-background-color: @view-tab-hover-background-color;
-@desktop-tool-box-item-selected-background-color: @selected-intense-background-color;
+@desktop-tool-box-item-selected-background-color: fade(@palette-black, 30%);
 @detail-table-header-background-color: @table-header-background-color;
 @detail-table-header-border-color: @table-header-border-color;
 @detail-table-footer-background-color: @table-footer-background-color;
@@ -268,8 +267,8 @@
 @menu-item-disabled-color: @disabled-color;
 @messagebox-background-color: @popup-background-color;
 @mode-hover-text-color: @hover-color;
-@mode-selected-background-color: @active-inverted-background-color;
-@mode-selected-text-color: @active-inverted-color;
+@mode-selected-background-color: @selected-background-color;
+@mode-selected-text-color: @selected-color;
 @mode-alternative-selected-color: @mode-selected-background-color;
 @navigate-up-button-border-color: @button-border-color;
 @navigate-up-button-color: @button-color;
@@ -357,9 +356,9 @@
 @table-header-item-state-color: @palette-gray-7;
 @table-header-menu-background-color: @popup-background-color;
 @table-header-menu-cmd-active-border-color: @hover-color;
-@table-header-menu-cmd-selected-background-color: @active-inverted-background-color;
-@table-header-menu-cmd-selected-border-color: @active-inverted-background-color;
-@table-header-menu-cmd-selected-color: @active-inverted-color;
+@table-header-menu-cmd-selected-background-color: @selected-background-color;
+@table-header-menu-cmd-selected-border-color: @selected-background-color;
+@table-header-menu-cmd-selected-color: @selected-color;
 @table-header-menu-cmd-border-color: @border-color;
 @table-header-menu-cmd-disabled-color: @palette-gray-5;
 @table-header-menu-link-color: @link-color;
@@ -384,8 +383,9 @@
 @tab-item-active-color: @active-color;
 @tab-item-focus-color: @palette-blue-4;
 @tab-item-hover-color: @hover-color;
+@tab-item-selected-color: @tab-item-active-color;
 @tab-item-marked-border-color: @palette-gray-6;
-@tab-item-selection-marker-color: @tab-item-active-color;
+@tab-item-selection-marker-color: @tab-item-selected-color;
 @tab-item-selection-marker-focus-color: @tab-item-focus-color;
 @tag-element-background-color: @palette-cyan-2;
 @tag-element-background-color-hover: @palette-cyan-3;
@@ -476,7 +476,7 @@
 @view-tab-hover-background-color: @hover-intense-background-color;
 @view-menu-tab-hover-background-color: fade(@palette-black, 10%);
 @view-menu-tab-menu-selected-background-color: fade(@palette-black, 20%);
-@view-menu-tab-selected-menu-selected-background-color: @selected-background-color;
+@view-menu-tab-selected-menu-selected-background-color: @selected-with-popup-background-color;
 @view-menu-tab-background-color: @hover-intense-background-color;
 @view-menu-tile-background-color: fade(@palette-blue-5, 5%);
 @view-menu-tile-hover-background-color: fade(@palette-blue-5, 10%);
@@ -510,6 +510,6 @@
 @wizard-step-default-color: @wizard-step-default-border-color;
 @year-panel-range-background-color: @item-selection-background-color;
 @year-panel-range-hover-background-color: @item-selection-background-color;
-@year-panel-range-day-background-color: @active-inverted-background-color;
+@year-panel-range-day-background-color: @selected-background-color;
 @year-panel-title-item-color: @palette-gray-6;
 @year-panel-weekend-background-color: @palette-gray-7;
