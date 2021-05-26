@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
-import {Dimension, Form, NullWidget, Rectangle, scout, Status, webstorage} from '../../src/index';
+import {Dimension, fields, Form, NullWidget, Rectangle, scout, Status, webstorage} from '../../src/index';
 
 describe('Form', () => {
   let session, helper, outlineHelper;
@@ -878,6 +878,76 @@ describe('Form', () => {
           expect(form.$container.data('resizable')).toBeFalsy();
           form.setMaximized(false);
           expect(form.$container.data('resizable')).toBeTruthy();
+          form.close();
+        })
+        .catch(fail)
+        .always(done);
+    });
+  });
+
+  describe('reveal invalid element', () => {
+    it('revealInvalidElement selects all parent tabs of field', done => {
+      let form = helper.createFormWithFieldsAndTabBoxes();
+
+      let field2 = form.widget('Field2'),
+        tabBox = form.widget('TabBox'),
+        tabA = form.widget('TabA'),
+        fieldA1 = form.widget('FieldA1'),
+        tabBoxA = form.widget('TabBoxA'),
+        tabAA = form.widget('TabAA'),
+        fieldAA2 = form.widget('FieldAA2'),
+        tabAB = form.widget('TabAB'),
+        fieldAB1 = form.widget('FieldAB1'),
+        tabAC = form.widget('TabAC'),
+        fieldAC1 = form.widget('FieldAC1'),
+        tabB = form.widget('TabB'),
+        fieldB3 = form.widget('FieldB3'),
+        createValidationResult = field => ({
+          valid: false,
+          validByErrorStatus: true,
+          validByMandatory: true,
+          field: field,
+          reveal: () => {
+            fields.selectAllParentTabsOf(field);
+            field.focus();
+          }
+        });
+
+      form.open()
+        .then(() => {
+          expect(tabBox.selectedTab).toBe(tabA);
+          expect(tabBoxA.selectedTab).toBe(tabAA);
+
+          form.revealInvalidField(createValidationResult(field2));
+
+          expect(tabBox.selectedTab).toBe(tabA);
+          expect(tabBoxA.selectedTab).toBe(tabAA);
+
+          form.revealInvalidField(createValidationResult(fieldAC1));
+
+          expect(tabBox.selectedTab).toBe(tabA);
+          expect(tabBoxA.selectedTab).toBe(tabAC);
+
+          form.revealInvalidField(createValidationResult(fieldB3));
+
+          expect(tabBox.selectedTab).toBe(tabB);
+          expect(tabBoxA.selectedTab).toBe(tabAC);
+
+          form.revealInvalidField(createValidationResult(fieldA1));
+
+          expect(tabBox.selectedTab).toBe(tabA);
+          expect(tabBoxA.selectedTab).toBe(tabAC);
+
+          form.revealInvalidField(createValidationResult(fieldAA2));
+
+          expect(tabBox.selectedTab).toBe(tabA);
+          expect(tabBoxA.selectedTab).toBe(tabAA);
+
+          form.revealInvalidField(createValidationResult(fieldAB1));
+
+          expect(tabBox.selectedTab).toBe(tabA);
+          expect(tabBoxA.selectedTab).toBe(tabAB);
+
           form.close();
         })
         .catch(fail)

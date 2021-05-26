@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventSupport, MessageBox, MessageBoxes, objects, scout, Status} from '../index';
+import {arrays, EventSupport, MessageBox, MessageBoxes, objects, scout, Status} from '../index';
 import $ from 'jquery';
 
 /**
@@ -308,8 +308,13 @@ export default class Lifecycle {
     } else {
       status.severity = Status.Severity.ERROR;
       status.message = this._createInvalidElementsMessageHtml(elements.missingElements, elements.invalidElements);
+      this._revealInvalidElement(arrays.first(elements.missingElements) || arrays.first(elements.invalidElements));
     }
     return status;
+  }
+
+  _revealInvalidElement(invalidElement) {
+    // NOP
   }
 
   /**
@@ -329,7 +334,6 @@ export default class Lifecycle {
    * saving of the parent.(eg. check if all mandatory elements contain a value)
    *
    * @returns Object with
-   * valid: (true or false)
    * missingElements: Elements which should have a value
    * invalidElements: Elements which have an invalid value
    */

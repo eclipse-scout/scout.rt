@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -105,6 +105,31 @@ describe('TabItem', () => {
       tabItem.setProperty('tooltipText', null);
       expect(tab.$container.hasClass('has-tooltip')).toBe(false);
       expect(tab.tooltipText).toBe(null);
+    });
+  });
+
+  describe('select', () => {
+    it('TabItem.select sets selectedTab on parent TabBox', () => {
+      let tabItem1 = helper.createTabItem({
+          label: 'Foo 1'
+        }),
+        tabItem2 = helper.createTabItem({
+          label: 'Foo 2'
+        }),
+        tabItem3 = helper.createTabItem({
+          label: 'Foo 3'
+        }),
+        tabBox = helper.createTabBoxWith([tabItem1, tabItem2, tabItem3]);
+      tabBox.render();
+      expect(tabBox.selectedTab).toBe(tabItem1);
+      tabItem1.select();
+      expect(tabBox.selectedTab).toBe(tabItem1);
+      tabItem3.select();
+      expect(tabBox.selectedTab).toBe(tabItem3);
+      tabItem2.select();
+      expect(tabBox.selectedTab).toBe(tabItem2);
+      tabItem1.select();
+      expect(tabBox.selectedTab).toBe(tabItem1);
     });
   });
 });

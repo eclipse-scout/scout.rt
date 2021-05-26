@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, FormField, scout, strings, Widget, widgets} from '../../index';
+import {Device, FormField, scout, strings, TabItem, widgets} from '../../index';
 
 /**
  * @param $parent used to determine which HTML document is used to create the new HTML element
@@ -148,6 +148,31 @@ export function eventOutsideProposalField(field, target) {
   }
 }
 
+/**
+ * Selects the tab containing the given {@link FormField} for all parent tabBoxes.
+ * This ensures that the given field could be seen (if visible itself).
+ *
+ * @param {FormField} field The field whose parent tabs should be selected.
+ */
+export function selectAllParentTabsOf(field) {
+  if (!field || !(field instanceof FormField)) {
+    return;
+  }
+  field.visitParentFields(selectIfIsTab);
+}
+
+/**
+ * Selects the given tabItem if it is a {@link TabItem}.
+ *
+ * @param {TabItem} tabItem The tab to be selected.
+ */
+export function selectIfIsTab(tabItem) {
+  if (!tabItem || !(tabItem instanceof TabItem)) {
+    return;
+  }
+  tabItem.select(tabItem);
+}
+
 export default {
   activateFirstField,
   appendIcon,
@@ -158,5 +183,7 @@ export default {
   makeInputDiv,
   makeInputOrDiv,
   makeTextField,
+  selectAllParentTabsOf,
+  selectIfIsTab,
   valOrText
 };

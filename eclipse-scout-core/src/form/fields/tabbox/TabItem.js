@@ -60,14 +60,18 @@ export default class TabItem extends GroupBox {
    * @override FormField.js
    */
   focus() {
-    if (this.parent.selectedTab !== this) {
-      this.parent.setSelectedTab(this);
-    }
+    this.select();
     // ensure the focus is on the tab
     this.parent.focusTabItem(this);
   }
 
   isFocused() {
     return this.parent.isTabItemFocused(this);
+  }
+
+  select() {
+    if (this.parent.selectedTab !== this) {
+      this.parent.setSelectedTab(this);
+    }
   }
 }

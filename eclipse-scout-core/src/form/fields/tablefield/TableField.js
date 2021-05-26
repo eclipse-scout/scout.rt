@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -168,11 +168,22 @@ export default class TableField extends FormField {
     // check cells
     let rows = arrays.ensure(this.table.rows);
     let columns = arrays.ensure(this.table.columns);
+    let reveal = () => {
+    };
+    let label = this.label || '';
 
     rows.some(function(row) {
       return columns.some(column => {
         let ret = column.isContentValid(row);
         if (!ret.valid) {
+          reveal = () => {
+            desc.reveal();
+            this.table.focusCell(column, row);
+          };
+          if (label) {
+            label += ': ';
+          }
+          label += column.text;
           validByErrorStatus = validByErrorStatus && ret.validByErrorStatus;
           validByMandatory = validByMandatory && ret.validByMandatory;
           return !(validByErrorStatus || validByMandatory);
@@ -184,7 +195,10 @@ export default class TableField extends FormField {
     return {
       valid: validByErrorStatus && validByMandatory,
       validByErrorStatus: validByErrorStatus,
-      validByMandatory: validByMandatory
+      validByMandatory: validByMandatory,
+      field: this,
+      label: label,
+      reveal: reveal
     };
   }
 

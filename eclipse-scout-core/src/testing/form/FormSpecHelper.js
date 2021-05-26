@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, scout} from '../../index';
+import {arrays, Form, scout} from '../../index';
 import $ from 'jquery';
 
 export default class FormSpecHelper {
@@ -30,6 +30,94 @@ export default class FormSpecHelper {
     let form = scout.create('Form', model);
     let rootGroupBox = this.createGroupBoxWithFields(form, 1);
     form._setRootGroupBox(rootGroupBox);
+    return form;
+  }
+
+  createFormWithFieldsAndTabBoxes(model) {
+    let fieldModelPart = (id, mandatory) => ({
+        id: id,
+        objectType: 'StringField',
+        label: id,
+        mandatory: mandatory
+      }),
+      tabBoxModelPart = (id, tabItems) => ({
+        id: id,
+        objectType: 'TabBox',
+        tabItems: tabItems
+      }),
+      tabItemModelPart = (id, fields) => ({
+        id: id,
+        objectType: 'TabItem',
+        label: 'id',
+        fields: fields
+      }),
+      tableFieldModelPart = (id, columns) => ({
+        id: id,
+        objectType: 'TableField',
+        label: id,
+        table: {
+          id: id + 'Table',
+          objectType: 'Table',
+          columns: columns
+        }
+      }),
+      columnModelPart = (id, mandatory) => ({
+        id: id,
+        objectType: 'Column',
+        text: id,
+        editable: true,
+        mandatory: mandatory
+      });
+
+    let defaults = {
+      parent: this.session.desktop,
+      id: 'Form',
+      title: 'Form',
+      rootGroupBox: {
+        id: 'RootGroupBox',
+        objectType: 'GroupBox',
+        fields: [
+          fieldModelPart('Field1', false),
+          fieldModelPart('Field2', false),
+          fieldModelPart('Field3', true),
+          fieldModelPart('Field4', true),
+          tabBoxModelPart('TabBox', [
+            tabItemModelPart('TabA', [
+              fieldModelPart('FieldA1', false),
+              fieldModelPart('FieldA2', true),
+              tabBoxModelPart('TabBoxA', [
+                tabItemModelPart('TabAA', [
+                  fieldModelPart('FieldAA1', false),
+                  fieldModelPart('FieldAA2', true)
+                ]),
+                tabItemModelPart('TabAB', [
+                  fieldModelPart('FieldAB1', false),
+                  fieldModelPart('FieldAB2', true)
+                ]),
+                tabItemModelPart('TabAC', [
+                  fieldModelPart('FieldAC1', false),
+                  fieldModelPart('FieldAC2', true)
+                ])
+              ])
+            ]),
+            tabItemModelPart('TabB', [
+              fieldModelPart('FieldB1', false),
+              fieldModelPart('FieldB2', false),
+              fieldModelPart('FieldB3', true),
+              fieldModelPart('FieldB4', true),
+              tableFieldModelPart('TableFieldB5', [
+                columnModelPart('ColumnB51', false),
+                columnModelPart('ColumnB52', true)
+              ])
+            ])
+          ])
+        ]
+      }
+    };
+
+    model = $.extend({}, defaults, model);
+    let form = scout.create('Form', model);
+    form.widget('TableFieldB5').table.insertRows([{cells: arrays.init(2)}, {cells: arrays.init(2)}]);
     return form;
   }
 

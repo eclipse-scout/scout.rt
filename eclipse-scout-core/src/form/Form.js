@@ -512,6 +512,35 @@ export default class Form extends Widget {
     }
   }
 
+  /**
+   * @param {ValidationResult} validationResult
+   */
+  revealInvalidField(validationResult) {
+    if (!validationResult) {
+      return;
+    }
+    this._revealInvalidField(validationResult);
+  }
+
+  /**
+   * @param {ValidationResult} validationResult
+   */
+  _revealInvalidField(validationResult) {
+    let event = this._createRevealInvalidFieldEvent(validationResult);
+    this.trigger('revealInvalidField', event);
+    if (event.defaultPrevented) {
+      return;
+    }
+    validationResult.reveal();
+  }
+
+  /**
+   * @param {ValidationResult} validationResult
+   */
+  _createRevealInvalidFieldEvent(validationResult) {
+    return new Event({validationResult: validationResult});
+  }
+
   setClosable(closable) {
     this.setProperty('closable', closable);
   }

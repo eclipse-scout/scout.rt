@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -110,12 +110,14 @@ describe('FormLifecycle', () => {
       runTestWithLifecycleOk(form2, true);
     });
 
-    function runTestWithLifecycleOk(form2, expected) {
+    function runTestWithLifecycleOk(form2, expected, render = true) {
       let lifecycleComplete = false;
       form2.lifecycle.on('close', () => {
         lifecycleComplete = true;
       });
-      form2.render();
+      if (render) {
+        form2.render();
+      }
       form2.lifecycle.ok();
       jasmine.clock().tick();
       expectMessageBox(true);
@@ -147,6 +149,88 @@ describe('FormLifecycle', () => {
       expect(validateCalled).toBe(false);
     });
 
+    it('should focus first invalid element', () => {
+      let formWithFieldsAndTabBoxes = helper.createFormWithFieldsAndTabBoxes();
+      formWithFieldsAndTabBoxes.lifecycle = scout.create('FormLifecycle', {
+        widget: formWithFieldsAndTabBoxes
+      });
+
+      let field3 = formWithFieldsAndTabBoxes.widget('Field3'),
+        field4 = formWithFieldsAndTabBoxes.widget('Field4'),
+        tabBox = formWithFieldsAndTabBoxes.widget('TabBox'),
+        tabA = formWithFieldsAndTabBoxes.widget('TabA'),
+        fieldA2 = formWithFieldsAndTabBoxes.widget('FieldA2'),
+        tabBoxA = formWithFieldsAndTabBoxes.widget('TabBoxA'),
+        tabAA = formWithFieldsAndTabBoxes.widget('TabAA'),
+        fieldAA2 = formWithFieldsAndTabBoxes.widget('FieldAA2'),
+        tabAB = formWithFieldsAndTabBoxes.widget('TabAB'),
+        fieldAB2 = formWithFieldsAndTabBoxes.widget('FieldAB2'),
+        fieldAC2 = formWithFieldsAndTabBoxes.widget('FieldAC2'),
+        tabB = formWithFieldsAndTabBoxes.widget('TabB'),
+        fieldB3 = formWithFieldsAndTabBoxes.widget('FieldB3'),
+        fieldB4 = formWithFieldsAndTabBoxes.widget('FieldB4'),
+        tableFieldB5 = formWithFieldsAndTabBoxes.widget('TableFieldB5'),
+        tableFieldB5Table = tableFieldB5.table,
+        columnB52 = tableFieldB5Table.columns.filter(col => col.id === 'ColumnB52')[0],
+        tableFieldB5TableRows = tableFieldB5Table.rows;
+
+      field3.setValue('something');
+      fieldAA2.setValue('something');
+      fieldAC2.setValue('something');
+      fieldB3.setValue('something');
+      tableFieldB5Table.cell(columnB52, tableFieldB5TableRows[0]).setValue('something');
+
+      expect(tabBox.selectedTab).toBe(tabA);
+      expect(tabBoxA.selectedTab).toBe(tabAA);
+
+      runTestWithLifecycleOk(formWithFieldsAndTabBoxes, false);
+
+      expect(field4.focused).toBe(true);
+      expect(tabBox.selectedTab).toBe(tabA);
+      expect(tabBoxA.selectedTab).toBe(tabAA);
+
+      field4.setValue('something');
+
+      runTestWithLifecycleOk(formWithFieldsAndTabBoxes, false, false);
+
+      expect(fieldA2.focused).toBe(true);
+      expect(tabBox.selectedTab).toBe(tabA);
+      expect(tabBoxA.selectedTab).toBe(tabAA);
+
+      fieldA2.setValue('something');
+
+      runTestWithLifecycleOk(formWithFieldsAndTabBoxes, false, false);
+
+      expect(fieldAB2.focused).toBe(true);
+      expect(tabBox.selectedTab).toBe(tabA);
+      expect(tabBoxA.selectedTab).toBe(tabAB);
+
+      fieldAB2.setValue('something');
+
+      runTestWithLifecycleOk(formWithFieldsAndTabBoxes, false, false);
+
+      expect(fieldB4.focused).toBe(true);
+      expect(tabBox.selectedTab).toBe(tabB);
+      expect(tabBoxA.selectedTab).toBe(tabAB);
+
+      fieldB4.setValue('something');
+
+      runTestWithLifecycleOk(formWithFieldsAndTabBoxes, false, false);
+
+      let cell = tableFieldB5Table.cell(columnB52, tableFieldB5TableRows[1]);
+      expect(cell.value).toBeNull();
+      expect(cell.field).not.toBeNull();
+      expect(cell.field.value).toBeNull();
+      expect(tabBox.selectedTab).toBe(tabB);
+      expect(tabBoxA.selectedTab).toBe(tabAB);
+
+      cell.field.setValue('something');
+      tableFieldB5Table.completeCellEdit();
+
+      formWithFieldsAndTabBoxes.lifecycle.ok();
+      jasmine.clock().tick();
+      expectMessageBox(false);
+    });
   });
 
   describe('load', () => {
@@ -196,15 +280,30 @@ describe('FormLifecycle', () => {
 
     it('should list labels of missing and invalid fields', () => {
       field.setLabel('FooField');
-      let missingFields = [field];
+      let missingFields = [{
+        valid: false,
+        validByErrorStatus: false,
+        validByMandatory: true,
+        field: field,
+        label: field.label,
+        reveal: () => {
+        }
+      }];
       let invalidField = helper.createField('StringField', session.desktop);
       invalidField.setLabel('BarField');
-      let invalidFields = [invalidField];
+      let invalidFields = [{
+        valid: false,
+        validByErrorStatus: true,
+        validByMandatory: false,
+        field: invalidField,
+        label: invalidField.label,
+        reveal: () => {
+        }
+      }];
       let html = form.lifecycle._createInvalidElementsMessageHtml(missingFields, invalidFields);
       expect(html).toContain('FooField');
       expect(html).toContain('BarField');
     });
 
   });
-
 });

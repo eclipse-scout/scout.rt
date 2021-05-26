@@ -1404,7 +1404,7 @@ export default class FormField extends Widget {
   /**
    * Visit all parent form fields. The visit stops if the parent is no form field anymore (e.g. a form, desktop or session).
    */
-  visitParents(visitor) {
+  visitParentFields(visitor) {
     let curParent = this.parent;
     while (curParent instanceof FormField) {
       visitor(curParent);
@@ -1443,16 +1443,33 @@ export default class FormField extends Widget {
   }
 
   /**
-   * @returns {object} which contains 3 properties: valid, validByErrorStatus and validByMandatory
+   * @typedef ValidationResult
+   * @property {boolean} valid
+   * @property {boolean} validByErrorStatus
+   * @property {boolean} validByMandatory
+   * @property {FormField} field
+   * @property {String} label
+   * @property {function} reveal
+   */
+
+  /**
+   * @returns {ValidationResult}
    */
   getValidationResult() {
     let validByErrorStatus = !this._errorStatus();
     let validByMandatory = !this.mandatory || !this.empty;
     let valid = validByErrorStatus && validByMandatory;
+    // noinspection JSValidateTypes
     return {
       valid: valid,
       validByErrorStatus: validByErrorStatus,
-      validByMandatory: validByMandatory
+      validByMandatory: validByMandatory,
+      field: this,
+      label: this.label,
+      reveal: () => {
+        fields.selectAllParentTabsOf(this);
+        this.focus();
+      }
     };
   }
 
