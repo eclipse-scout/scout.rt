@@ -435,6 +435,12 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     return 0 < changed;
   }
 
+  stopAnimations() {
+    if (this.chartJs) {
+      this.chartJs.stop();
+    }
+  }
+
   _adjustConfig(config) {
     if (!config || !config.type) {
       return;
