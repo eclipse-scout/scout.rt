@@ -28,11 +28,14 @@ import org.eclipse.scout.rt.platform.Bean;
  * <p>
  * NOTE: This utility was added to the platform for the lack of a better place. May be moved to a more suitable place in
  * future versions.
- *
- * @see https://stackoverflow.com/questions/93551/how-to-encode-the-filename-parameter-of-content-disposition-header-in-http
- * @see https://stackoverflow.com/questions/18337630/what-is-x-content-type-options-nosniff
- * @see https://tools.ietf.org/html/rfc6266#section-5
- * @see https://tools.ietf.org/html/rfc6266#appendix-D
+ * <p>
+ * References:
+ * <ul>
+ * <li>https://stackoverflow.com/questions/93551/how-to-encode-the-filename-parameter-of-content-disposition-header-in-http</li>
+ * <li>https://stackoverflow.com/questions/18337630/what-is-x-content-type-options-nosniff</li>
+ * <li>https://tools.ietf.org/html/rfc6266#section-5</li>
+ * <li>https://tools.ietf.org/html/rfc6266#appendix-D</li>
+ * </ul>
  */
 @Bean
 public class DownloadResponseHelper {
@@ -66,7 +69,7 @@ public class DownloadResponseHelper {
    * Creates the value of the {@value #HEADER_CONTENT_DISPOSITION} header for an HTTP response that contains a download
    * of a file with the provided name.
    *
-   * @param filename
+   * @param originalFilename
    *          The name of the downloaded file. The filename is sanitized to conform to the relevant RFCs. In case it
    *          does not contain any usable characters (or is null), the default value of {@value #DEFAULT_FILENAME} is
    *          used.
