@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,6 +41,7 @@ import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Collections;
+import java.util.Date;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
@@ -55,7 +56,14 @@ import javax.crypto.spec.SecretKeySpec;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
-import org.eclipse.scout.rt.platform.util.Assertions.*;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+
+import sun.security.x509.CertificateExtensions;
+import sun.security.x509.DNSName;
+import sun.security.x509.GeneralName;
+import sun.security.x509.GeneralNames;
+import sun.security.x509.IPAddressName;
+import sun.security.x509.SubjectAlternativeNameExtension;
 
 /**
  * Utility class for encryption/decryption, hashing, random number generation and digital signatures.<br>
@@ -474,7 +482,15 @@ public class SunSecurityProvider implements ISecurityProvider {
       certGen.generate(keyBits);
       sun.security.x509.X500Name name = new sun.security.x509.X500Name(x500Name);
       long validSecs = (long) validDays * 24L * 3600L;
-      X509Certificate cert = certGen.getSelfCertificate(name, validSecs);
+      GeneralNames generalNames = new GeneralNames()
+          .add(new GeneralName(new DNSName("localhost")))
+          .add(new GeneralName(new IPAddressName("127.0.0.1")));
+      if (!StringUtility.isNullOrEmpty(name.getCommonName())) {
+        generalNames.add(new GeneralName(new DNSName(name.getCommonName())));
+      }
+      CertificateExtensions extensions = new CertificateExtensions();
+      extensions.set(SubjectAlternativeNameExtension.NAME, new SubjectAlternativeNameExtension(generalNames));
+      X509Certificate cert = certGen.getSelfCertificate(name, new Date(), validSecs, extensions);
       PrivateKey privateKey = certGen.getPrivateKey();
 
       KeyStore ks = KeyStore.getInstance("jks");
