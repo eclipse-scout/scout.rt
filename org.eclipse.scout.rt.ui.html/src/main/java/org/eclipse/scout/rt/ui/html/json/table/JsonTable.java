@@ -1825,10 +1825,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       debugInfo += " is empty";
     }
     else {
-      debugInfo += " contains " + m_eventBuffer.size() + " events:\n- ";
+      debugInfo += " contains " + m_eventBuffer.size() + " events:\n  - ";
       debugInfo += m_eventBuffer.getBufferInternal().stream()
           .map(event -> StringUtility.substring(StringUtility.removeNewLines(event.toString()), 0, 250))
-          .collect(Collectors.joining("\n  -"));
+          .collect(Collectors.joining("\n  - "));
     }
     LOG.info("Could not resolve context column, assuming null.\n--- DEBUG INFO --- {}", debugInfo);
   }
