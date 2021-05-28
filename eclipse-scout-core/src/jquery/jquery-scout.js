@@ -17,6 +17,7 @@ import {arrays, Device, Dimension, events, IconDesc, icons, objects, scout, stri
 /**
  * By using $ in jsdoc all the functions is this file are recognized as part of $.
  * By additionally defining $ as jQuery all default jQuery functions are recognized as well.
+ * "JQuery" (with a capital J) refers to the the type definitions "@types/jquery".
  * @typedef {JQuery|jQuery} $
  */
 
@@ -1034,10 +1035,6 @@ $.fn.addClassForAnimation = function(className, options) {
   options = $.extend({}, defaultOptions, options);
   this.addClass(className);
   this.oneAnimationEnd(event => {
-    if (event.target !== this[0]) {
-      // An animation on a sub element ended, ignore it
-      return;
-    }
     // remove class, otherwise animation will be executed each time the element changes it's visibility (attach/rerender),
     // and even each time when the css classes change
     this.removeClass(options.classesToRemove);
@@ -1045,8 +1042,28 @@ $.fn.addClassForAnimation = function(className, options) {
   return this;
 };
 
-$.fn.oneAnimationEnd = function(selector, data, handler) {
-  return this.one('animationend webkitAnimationEnd', selector, data, handler);
+/**
+ * Adds a handler that is executed when a CSS animation ends on the current element. It will be executed
+ * only once when the 'animationend' event is triggered on the current element. Bubbling events from child
+ * elements are ignored.
+ *
+ * @param {function} handler - A function to execute when the 'animationend' event is triggered
+ * @return {$}
+ */
+$.fn.oneAnimationEnd = function(handler) {
+  if (!handler) {
+    return this;
+  }
+  return this.on('animationend webkitAnimationEnd', event => {
+    if (event.target !== this[0]) {
+      // Ignore events that bubble up from child elements
+      return;
+    }
+    // Unregister listener to implement "one" semantics
+    this.off(event);
+    // Notify actual event handler
+    handler(event);
+  });
 };
 
 $.fn.hasAnimationClass = function() {
