@@ -13,6 +13,9 @@ package org.eclipse.scout.rt.platform.util.date;
 import static org.junit.Assert.*;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
@@ -977,6 +980,27 @@ public class DateUtilityTest {
     TimeZone.setDefault(TimeZone.getTimeZone(ZoneId.of("Europe/Paris")));
     assertDateEquals("2016-03-29 02:00:00.000", dateOf("2016-03-29 02:00:00.000")); // valid, does not fail
     assertDateEquals("2015-03-29 02:00:00.000", dateOf("2015-03-29 02:00:00.000")); // fails with exception
+  }
+
+  @Test
+  public void testToLocalDate() {
+    Date date = dateOf("2021-05-28 00:00:00.000");
+    assertEquals(LocalDate.of(2021, Month.MAY, 28), DateUtility.toLocalDate(date));
+  }
+
+  @Test
+  public void testToLocalDateTime() {
+    Date date = dateOf("2021-05-28 10:58:25.000");
+    assertEquals(LocalDateTime.of(2021, Month.MAY, 28, 10, 58, 25), DateUtility.toLocalDateTime(date));
+  }
+
+  @Test
+  public void testToDate() {
+    LocalDate localDate = LocalDate.of(2021, Month.MAY, 28);
+    assertEquals(dateOf("2021-05-28 00:00:00.000"), DateUtility.toUtilDate(localDate));
+
+    LocalDateTime localDateTime = LocalDateTime.of(2021, Month.MAY, 28, 10, 58, 25);
+    assertEquals(dateOf("2021-05-28 10:58:25.000"), DateUtility.toUtilDate(localDateTime));
   }
 
   public static void assertDateEquals(String expectedDate, Date date) {
