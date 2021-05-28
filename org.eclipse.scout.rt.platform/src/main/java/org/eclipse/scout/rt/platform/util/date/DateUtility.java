@@ -14,6 +14,9 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -776,6 +779,55 @@ public final class DateUtility {
       d = 1d;
     }
     return d;
+  }
+
+  /**
+   * Converts a {@link Date} to a {@link LocalDate} using the default time-zone of the system.
+   */
+  public static LocalDate toLocalDate(Date d) {
+    if (d == null) {
+      return null;
+    }
+    return d.toInstant()
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate();
+  }
+
+  /**
+   * Converts a {@link Date} to a {@link LocalDateTime} using the default time-zone of the system.
+   */
+  public static LocalDateTime toLocalDateTime(Date d) {
+    if (d == null) {
+      return null;
+    }
+    return d.toInstant()
+        .atZone(ZoneId.systemDefault())
+        .toLocalDateTime();
+  }
+
+  /**
+   * Converts a {@link LocalDate} to a {@link Date} using the default time-zone of the system. The time will be set to
+   * midnight.
+   */
+  public static Date toUtilDate(LocalDate localDate) {
+    if (localDate == null) {
+      return null;
+    }
+    return Date.from(localDate.atStartOfDay()
+        .atZone(ZoneId.systemDefault())
+        .toInstant());
+  }
+
+  /**
+   * Converts a {@link LocalDateTime} to a {@link Date} using the default time-zone of the system.
+   */
+  public static Date toUtilDate(LocalDateTime localDateTime) {
+    if (localDateTime == null) {
+      return null;
+    }
+    return Date.from(localDateTime
+        .atZone(ZoneId.systemDefault())
+        .toInstant());
   }
 
   /**
