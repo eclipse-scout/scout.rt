@@ -34,6 +34,7 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.UriUtility;
 import org.slf4j.Logger;
@@ -345,9 +346,9 @@ public class ServletFilterHelper {
       sendJsonSessionTimeout(resp);
       return false;
     }
-    if ("POST".equals(req.getMethod())) {
+    if (!ObjectUtility.isOneOf(req.getMethod(), "GET", "HEAD")) {
       if (LOG.isDebugEnabled()) {
-        LOG.debug("The request for '{}' is a POST request. " + (redirect ? "Redirecting" : "Forwarding") + " to '{}' will most likely fail. Sending HTTP status '403 Forbidden' instead.", req.getPathInfo(), targetLocation);
+        LOG.debug("The request for '{}' is a {} request. " + (redirect ? "Redirecting" : "Forwarding") + " to '{}' will most likely fail. Sending HTTP status '403 Forbidden' instead.", req.getPathInfo(), req.getMethod(), targetLocation);
       }
       resp.sendError(HttpServletResponse.SC_FORBIDDEN);
       return false;
