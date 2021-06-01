@@ -72,10 +72,15 @@ export default class StringField extends BasicField {
   }
 
   /**
-   * @override Widget.js
+   * @override
    */
   _createKeyStrokeContext() {
     return new InputFieldKeyStrokeContext();
+  }
+
+  _init(model) {
+    super._init(model);
+    this._setMultilineText(this.multilineText);
   }
 
   _render() {
@@ -416,6 +421,11 @@ export default class StringField extends BasicField {
 
   _renderTrimText() {
     // nop, property used in _validateDisplayText()
+  }
+
+  _setMultilineText(multilineText) {
+    this._setProperty('multilineText', multilineText);
+    this.keyStrokeContext.setMultiline(this.multilineText);
   }
 
   _renderGridData() {

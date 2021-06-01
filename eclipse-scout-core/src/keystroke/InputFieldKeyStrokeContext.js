@@ -16,45 +16,29 @@ import $ from 'jquery';
  */
 export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
 
-  constructor() {
+  constructor(multiline) {
     super();
 
     this.invokeAcceptInputOnActiveValueField = true;
 
+    let navigationKeys = [
+      keys.RIGHT,
+      keys.LEFT,
+      keys.HOME,
+      keys.END,
+      keys.NUMPAD_4,
+      keys.NUMPAD_6
+    ];
     this.registerStopPropagationKeys(keyStrokeModifier.CTRL, [
       keys.A,
       keys.C,
       keys.Y,
       keys.V,
       keys.Z,
-      keys.RIGHT,
-      keys.BACKSPACE,
-      keys.LEFT,
-      keys.HOME,
-      keys.END,
-      keys.NUMPAD_4,
-      keys.NUMPAD_6
-    ]);
-
-    this.registerStopPropagationKeys(keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT, [ // NOSONAR
-      keys.RIGHT,
-      keys.BACKSPACE,
-      keys.LEFT,
-      keys.HOME,
-      keys.END,
-      keys.NUMPAD_4,
-      keys.NUMPAD_6
-    ]);
-
-    this.registerStopPropagationKeys(keyStrokeModifier.SHIFT, [
-      keys.RIGHT,
-      keys.BACKSPACE,
-      keys.LEFT,
-      keys.HOME,
-      keys.END,
-      keys.NUMPAD_4,
-      keys.NUMPAD_6
-    ]);
+      keys.BACKSPACE
+    ].concat(navigationKeys));
+    this.registerStopPropagationKeys(keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT, navigationKeys);
+    this.registerStopPropagationKeys(keyStrokeModifier.SHIFT, navigationKeys);
     this.registerStopPropagationKeys(keyStrokeModifier.NONE, [
       keys.SEMICOLON,
       keys.DASH,
@@ -81,14 +65,31 @@ export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
       keys.NUMPAD_8,
       keys.NUMPAD_9,
       keys.MULTIPLY,
-      keys.END,
-      keys.HOME,
-      keys.RIGHT,
       keys.BACKSPACE,
-      keys.LEFT,
       keys.DELETE,
       keys.SPACE
-    ]);
+    ].concat(navigationKeys));
+    this.setMultiline(multiline);
+  }
+
+  setMultiline(multiline) {
+    let multilineNavigationKeys = [
+      keys.UP,
+      keys.DOWN,
+      keys.NUMPAD_2,
+      keys.NUMPAD_8
+    ];
+    if (multiline) {
+      this.registerStopPropagationKeys(keyStrokeModifier.CTRL, multilineNavigationKeys);
+      this.registerStopPropagationKeys(keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT, multilineNavigationKeys);
+      this.registerStopPropagationKeys(keyStrokeModifier.SHIFT, multilineNavigationKeys);
+      this.registerStopPropagationKeys(keyStrokeModifier.NONE, multilineNavigationKeys);
+    } else {
+      this.unregisterStopPropagationKeys(keyStrokeModifier.CTRL, multilineNavigationKeys);
+      this.unregisterStopPropagationKeys(keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT, multilineNavigationKeys);
+      this.unregisterStopPropagationKeys(keyStrokeModifier.SHIFT, multilineNavigationKeys);
+      this.unregisterStopPropagationKeys(keyStrokeModifier.NONE, multilineNavigationKeys);
+    }
   }
 
   _applyPropagationFlags(event) {

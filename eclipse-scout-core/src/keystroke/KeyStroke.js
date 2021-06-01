@@ -313,6 +313,6 @@ export default class KeyStroke {
   }
 
   static _acceptModifier(modifier, eventModifier) {
-    return modifier === undefined || modifier === eventModifier;
+    return modifier === undefined || eventModifier === undefined || modifier === eventModifier;
   }
 }

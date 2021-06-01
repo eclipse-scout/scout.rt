@@ -28,6 +28,9 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
     }
 
     if (!this.field.visibleRows.length) {
+      // Key stroke is accepted but currently not executable because there are no rows.
+      // Apply propagation flags to prevent bubbling, a focused table should always swallow the navigation keys even if there are no rows.
+      this._applyPropagationFlags(event);
       return false;
     }
 

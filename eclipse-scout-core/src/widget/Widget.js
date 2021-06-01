@@ -264,12 +264,8 @@ export default class Widget {
     if (!this.keyStrokeContext) {
       return;
     }
-    this.keyStrokeContext.$scopeTarget = function() {
-      return this.$container;
-    }.bind(this);
-    this.keyStrokeContext.$bindTarget = function() {
-      return this.$container;
-    }.bind(this);
+    this.keyStrokeContext.$scopeTarget = () => this.$container;
+    this.keyStrokeContext.$bindTarget = () => this.$container;
   }
 
   destroy() {

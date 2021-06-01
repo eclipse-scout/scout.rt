@@ -50,12 +50,25 @@ export default class KeyStrokeContext {
   /**
    * Registers the given keys as 'stopPropagation' keys, meaning that any keystroke event with that key and matching the modifier bit mask is prevented from bubbling the DOM tree up.
    *
-   * @param modifierBitMask bitwise OR'ing together modifier constants to match a keystroke event. (KeyStrokeModifier.js)
-   * @param keys the keys to match a keystroke event.
+   * @param {number} modifierBitMask bitwise OR'ing together modifier constants to match a keystroke event. (KeyStrokeModifier.js)
+   * @param {[number]} keys the keys to match a keystroke event.
    */
   registerStopPropagationKeys(modifierBitMask, keys) {
     this._stopPropagationKeys[modifierBitMask] = this._stopPropagationKeys[modifierBitMask] || [];
     arrays.pushAll(this._stopPropagationKeys[modifierBitMask], keys);
+  }
+
+  /**
+   * Unregisters the given keys as 'stopPropagation' keys.
+   *
+   * @param {number} modifierBitMask bitwise OR'ing together modifier constants to match a keystroke event. (KeyStrokeModifier.js)
+   * @param {[number]} keys the keys to match a keystroke event.
+   */
+  unregisterStopPropagationKeys(modifierBitMask, keys) {
+    if (!this._stopPropagationKeys[modifierBitMask]) {
+      return;
+    }
+    arrays.removeAll(this._stopPropagationKeys[modifierBitMask], keys);
   }
 
   /**
