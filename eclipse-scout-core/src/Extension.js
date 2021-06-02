@@ -51,7 +51,7 @@ export default class Extension {
   /**
    * Calls scout.create for each extension class in the given extensions array.
    *
-   * @param extensions an Array of strings containing extension class names
+   * @param {[string]} extensions an array of strings containing extension class names
    * @static
    */
   static install(extensions) {

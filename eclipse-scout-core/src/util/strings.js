@@ -15,7 +15,7 @@ let plainTextEncoder = null;
 
 /**
  * @param text
- * @param encodeHtml defaults to true
+ * @param {boolean} [encodeHtml] defaults to true
  */
 export function nl2br(text, encodeHtml) {
   if (!text) {

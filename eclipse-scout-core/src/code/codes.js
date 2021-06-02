@@ -146,7 +146,7 @@ export function generateTextKey(code) {
  *
  * @param code the code to register the text for
  * @param textsArg an object with the languageTag as key and the translated text as value
- * @return the generated text key
+ * @return {string} the generated text key
  */
 export function registerTexts(code, textsArg) {
   let key = generateTextKey(code);

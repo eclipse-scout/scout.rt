@@ -171,7 +171,7 @@ export default class Widget {
   }
 
   /**
-   * @param options
+   * @param {object} options
    * - parent (required): The parent widget
    * - session (optional): If not specified the session of the parent is used
    */
@@ -220,7 +220,7 @@ export default class Widget {
 
   /**
    * Creates the widgets using the given models, or returns the widgets if the given models already are widgets.
-   * @returns {Widget[]|Widget}an array of created widgets if models was an array. Or the created widget if models is not an array.
+   * @returns {Widget[]|Widget} an array of created widgets if models was an array. Or the created widget if models is not an array.
    */
   _createChildren(models) {
     if (!models) {
@@ -314,7 +314,7 @@ export default class Widget {
   }
 
   /**
-   * @param widgets may be an object or array of objects
+   * @param {Widget[]|Widget} widgets may be an object or array of objects
    */
   _destroyChildren(widgets) {
     if (!widgets) {
@@ -1172,16 +1172,37 @@ export default class Widget {
     this.events.trigger(type, event);
   }
 
-  one(type, func) {
-    this.events.one(type, func);
+  /**
+   * Registers the given event handler for the event specified by the type param.
+   * The function will only be called once. After that it is automatically de-registered using {@link off}.
+   *
+   * @param {string} type One or more event names separated by space.
+   * @param {function} handler Event handler executed when the event is triggered. An event object is passed to the function as first parameter
+   */
+  one(type, handler) {
+    this.events.one(type, handler);
   }
 
-  on(type, func) {
-    return this.events.on(type, func);
+  /**
+   * Registers the given event handler for the event specified by the type param.
+   *
+   * @param {string} type One or more event names separated by space.
+   * @param {function} handler Event handler executed when the event is triggered. An event object is passed to the function as first parameter.
+   **/
+  on(type, handler) {
+    return this.events.on(type, handler);
   }
 
-  off(type, func) {
-    this.events.off(type, func);
+  /**
+   * De-registers the given event handler for the event specified by the type param.
+   *
+   * @param {string} type One or more event names separated by space.<br/>
+   *      Important: the string must be equal to the one used for {@link on} or {@link one}. This also applies if a string containing multiple types separated by space was used.
+   * @param {function} [handler] The exact same event handler that was used for registration using {@link on} or {@link one}.
+   *      If no handler is specified, all handlers are de-registered for the given type.
+   */
+  off(type, handler) {
+    this.events.off(type, handler);
   }
 
   addListener(listener) {
@@ -1193,8 +1214,9 @@ export default class Widget {
   }
 
   /**
-   * Adds an event handler using {@link #one()} and returns a promise.
+   * Adds an event handler using {@link one} and returns a promise.
    * The promise is resolved as soon as the event is triggered.
+   * @returns {Promise}
    */
   when(type) {
     return this.events.when(type);
@@ -1241,11 +1263,6 @@ export default class Widget {
   /**
    * Override this method to do something when Widget is attached again. Typically
    * you will append this.$container to this.$parent.
-   *
-   * @param the event.target property is used to decide if a Widget must attach
-   *   its $container. When the parent of the Widget already attaches, the Widget
-   *   itself must _not_ attach its own $container. That's why we should only
-   *   attach when event.target is === this.
    */
   _attach() {
     // NOP
@@ -1523,7 +1540,7 @@ export default class Widget {
   /**
    * Sets this widget as parent of the given widget(s).
    *
-   * @param widgets may be a widget or array of widgets
+   * @param {Widget[]|Widget} widgets may be a widget or array of widgets
    */
   link(widgets) {
     if (!widgets) {
@@ -1601,7 +1618,7 @@ export default class Widget {
 
   /**
    * Returns the ancestors as string delimited by '\n'.
-   * @param [count] the number of ancestors to be processed. Default is -1 which means all.
+   * @param {number} [count] the number of ancestors to be processed. Default is -1 which means all.
    */
   ancestorsToString(count) {
     let str = '',
@@ -1896,7 +1913,7 @@ export default class Widget {
    * Traverses the object-tree (children) of this widget and searches for a widget with the given ID.
    * Returns the widget with the requested ID or null if no widget has been found.
    *
-   * @param widgetId
+   * @param {string} widgetId
    * @returns {AnyWidget} the found widget for the given id
    */
   widget(widgetId) {
@@ -2068,7 +2085,7 @@ export default class Widget {
   }
 
   /**
-   * @returns whether the widget is the currently active element
+   * @returns {boolean} whether the widget is the currently active element
    */
   isFocused() {
     return this.rendered && focusUtils.isActiveElement(this.getFocusableElement());

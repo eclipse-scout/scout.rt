@@ -198,7 +198,7 @@ export function shiftDecimalPoint(number, move) {
  * If it already is a number, the number will be returned.
  * Otherwise a Number is created.
  *
- * @param number may be of type number or string.
+ * @param {number|string} number may be of type number or string.
  */
 export function ensure(number) {
   if (objects.isNullOrUndefined(number)) {

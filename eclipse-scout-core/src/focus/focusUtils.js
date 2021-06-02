@@ -23,7 +23,7 @@ export function isFocusableByMouse(element) {
 }
 
 /**
- * @return whether the given element has a parent which is focusable by mouse.
+ * @return {boolean} whether the given element has a parent which is focusable by mouse.
  */
 export function containsParentFocusableByMouse(element, entryPoint) {
   let $focusableParentElements = $(element)
@@ -36,7 +36,7 @@ export function containsParentFocusableByMouse(element, entryPoint) {
 }
 
 /**
- * @return whether the given element contains content which is selectable to the user, e.g. to be copied into clipboard.
+ * @return {boolean} whether the given element contains content which is selectable to the user, e.g. to be copied into clipboard.
  * It also returns true for disabled text-fields, because the user must be able to select and copy text from these text-fields.
  */
 export function isSelectableText(element) {

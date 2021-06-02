@@ -52,8 +52,8 @@ export function assertParameter(parameterName, value, type) {
 /**
  * Use this method to assert that a mandatory property is set. Throws an error when value is not set.
  *
- * @param type (optional) if this parameter is set, the value must be of this type (instanceof check)
- * @return the value (for direct assignment)
+ * @param [type] if this parameter is set, the value must be of this type (instanceof check)
+ * @return {any} the value (for direct assignment)
  */
 export function assertProperty(object, propertyName, type) {
   let value = object[propertyName];

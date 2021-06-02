@@ -150,15 +150,15 @@ export function readFromDOM() {
 }
 
 /**
- * @param key to convert into a string with the form '${textKey:AKey}'.
- * @return text containing the text key like like '${textKey:AKey}'.
+ * @param {string} key to convert into a string with the form '${textKey:AKey}'.
+ * @return {string} text containing the text key like like '${textKey:AKey}'.
  */
 export function buildKey(key) {
   return '${textKey:' + key + '}';
 }
 
 /**
- * @param value text which contains a text key like '${textKey:AKey}'.
+ * @param {string} value text which contains a text key like '${textKey:AKey}'.
  * @return {string} the resolved key or the unchanged value if the text key could not be extracted.
  */
 export function resolveKey(value) {
@@ -170,9 +170,9 @@ export function resolveKey(value) {
 }
 
 /**
- * @param value text which contains a text key like '${textKey:AKey}'.
- * @param languageTag the languageTag to use for the text lookup with the resolved key.
- * @return the resolved text in the language of the given session or the unchanged text if the text key could not be extracted.
+ * @param {string} value text which contains a text key like '${textKey:AKey}'.
+ * @param {string} languageTag the languageTag to use for the text lookup with the resolved key.
+ * @return {string} the resolved text in the language of the given session or the unchanged text if the text key could not be extracted.
  */
 export function resolveText(value, languageTag) {
   let key = resolveKey(value);
@@ -185,9 +185,9 @@ export function resolveText(value, languageTag) {
 /**
  * Utility function to easily replace an object property which contains a text key like '${textKey:AKey}'.
  *
- * @param object object having a text property which contains a text-key
- * @param textProperty (optional) name of the property where a text-key should be replaced by a text. By default 'text' is used as property name.
- * @param session (optional) can be undefined when given 'object' has a session property, otherwise mandatory
+ * @param {object} object object having a text property which contains a text-key
+ * @param {string} [textProperty] name of the property where a text-key should be replaced by a text. By default 'text' is used as property name.
+ * @param {Session} [session] can be undefined when given 'object' has a session property, otherwise mandatory
  */
 export function resolveTextProperty(object, textProperty, session) {
   textProperty = textProperty || 'text';

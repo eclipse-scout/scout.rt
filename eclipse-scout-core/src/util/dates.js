@@ -107,7 +107,7 @@ export function shiftToNextOrPrevMonday(date, direction) {
  * If it already is a date, the date will be returned.
  * Otherwise parseJsonDate is used to create a Date.
  *
- * @param date may be of type date or string.
+ * @param {Date|string} date may be of type date or string.
  */
 export function ensure(date) {
   if (!date) {
@@ -259,7 +259,6 @@ export function weekInYear(date, option) {
   return 1 + Math.round(diffInDays / 7);
 }
 
-// private
 export function _thursdayOfWeek(date, firstDayOfWeekArg) {
   if (!date || typeof firstDayOfWeekArg !== 'number') {
     return undefined;
@@ -470,7 +469,7 @@ export function create(dateString) {
  * you can replace this function with a function that provides a fixed date. Don't forget to restore the
  * original function when you cleanup/tear-down the test.
  *
- * @returns Date
+ * @returns {Date}
  */
 export function newDate() {
   return new Date();
@@ -549,9 +548,9 @@ export function isLeapYear(year) {
 /**
  * Returns the given date with time set to midnight (hours, minutes, seconds, milliseconds = 0).
  *
- * @param date (required)
+ * @param {Date} date (required)
  *          The date to truncate.
- * @param createCopy (optional)
+ * @param {boolean} [createCopy] (optional)
  *          If this flag is true, a copy of the given date is returned (the input date is not
  *          altered). If the flag is false, the given object is changed and then returned.
  *          The default value for this flag is "true".
@@ -569,13 +568,13 @@ export function trunc(date, createCopy) {
 /**
  * Returns the given date with time set to midnight (hours, minutes, seconds, milliseconds = 0).
  *
- * @param date (required)
+ * @param {Date} date
  *          The date to truncate.
- * @param minutesResolution (optional) default 30
+ * @param {number} [minutesResolution] default is 30
  *          The amount of minutes added to every full hour XX:00 until > XX+1:00. The given date will ceiled to the next valid time.
  *          e.g. time:15:05, resolution 40  -> 15:40
  *               time: 15:41 resolution 40 -> 16:00
- * @param createCopy (optional)
+ * @param {boolean} [createCopy]
  *          If this flag is true, a copy of the given date is returned (the input date is not
  *          altered). If the flag is false, the given object is changed and then returned.
  *          The default value for this flag is "true".

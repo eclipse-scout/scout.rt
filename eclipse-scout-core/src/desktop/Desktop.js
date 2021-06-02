@@ -1079,7 +1079,7 @@ export default class Desktop extends Widget {
    * This filter should be used primarily for elements like the help-popup which stand outside
    * of the regular modality hierarchy.
    *
-   * @param filter a function with the parameter target and element. Target is the element which
+   * @param {function} filter a function with the parameter target and element. Target is the element which
    *     would be covered by a glass pane, element is the element the user interacts with (e.g. the modal dialog).
    * @see _glassPaneTargets
    */

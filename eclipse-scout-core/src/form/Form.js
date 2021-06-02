@@ -299,7 +299,7 @@ export default class Form extends Widget {
    * This function is called when an error occurs while the <code>_load</code> function is called or when the <code>_load</code> function returns with a rejected promise.
    * By default the Form is destroyed and the error re-thrown so a caller of <code>Form.load()</code> may catch the error.
    *
-   * @param error
+   * @param {Error} error
    */
   _handleLoadError(error) {
     this.destroy();
@@ -387,7 +387,7 @@ export default class Form extends Widget {
    * <p>
    * You should return a Status object with severity ERROR in case the validation fails.
    *
-   * @return Status
+   * @return {Status}
    */
   _validate() {
     return Status.ok();
@@ -1139,7 +1139,7 @@ export default class Form extends Widget {
   /**
    * Function required for objects that act as 'displayParent'.
    *
-   * @return 'true' if this Form is currently accessible to the user
+   * @return {boolean} 'true' if this Form is currently accessible to the user
    */
   inFront() {
     return this.rendered && this.attached;

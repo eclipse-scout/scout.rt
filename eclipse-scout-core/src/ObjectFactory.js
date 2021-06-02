@@ -62,8 +62,8 @@ export default class ObjectFactory {
    * the variant to the type ("VariantType"). If no such type can be found and the option "variantLenient"
    * is set to true, a second attempt is made without the variant.
    *
-   * @param objectType (mandatory) String describing the type of the object to be created.
-   * @param options    (optional)  Options object, currently supporting the following two options:
+   * @param {string} objectType (mandatory) String describing the type of the object to be created.
+   * @param {object} [options]  (optional)  Options object, currently supporting the following two options:
    *                               - model = Model object to be passed to the constructor or create function
    *                               - variantLenient = Flag to allow a second attempt to resolve the class
    *                                 without variant (see description above).
@@ -91,31 +91,24 @@ export default class ObjectFactory {
    * Creates and initializes a new Scout object. When the created object has an init function, the
    * model object is passed to that function. Otherwise the init call is omitted.
    *
-   * @param objectType A string with the requested objectType. This argument is optional, but if it
-   *                   is omitted, the argument "model" becomes mandatory and MUST contain a
-   *                   property named "objectType". If both, objectType and model, are set, the
-   *                   objectType parameter always wins before the model.objectType property.
-   * @param model      The model object passed to the constructor function and to the init() method.
-   *                   This argument is mandatory if it is the first argument, otherwise it is
-   *                   optional (see above). This function may set/overwrite the properties 'id' and
-   *                   'objectType' on the model object.
-   * @param options    Options object, see table below. This argument is optional.
-   *
-   * An error is thrown if the argument list does not match this definition.
-   *
-   * List of options:
-   *
-   * OPTION                   DEFAULT VALUE   DESCRIPTION
-   * ------------------------------------------------------------------------------------------------------
-   * variantLenient           false           Controls if the object factory may try to resolve the
-   *                                          scoutClass without the model variant part if the initial
-   *                                          objectType could not be resolved.
-   *
-   * ensureUniqueId           true            Controls if the resulting object should be assigned the
-   *                                          attribute "id" if it is not defined. If the created object has an
-   *                                          init() function, we also set the property 'id' on the model object
-   *                                          to allow the init() function to copy the attribute from the model
-   *                                          to the scoutObject.
+   * @param {string|object} objectType A string with the requested objectType. This argument is optional, but if it
+   *        is omitted, the argument "model" becomes mandatory and MUST contain a
+   *        property named "objectType". If both, objectType and model, are set, the
+   *        objectType parameter always wins before the model.objectType property.
+   * @param {object} [model] The model object passed to the constructor function and to the init() method.
+   *        This argument is mandatory if it is the first argument, otherwise it is
+   *        optional (see above). This function may set/overwrite the properties 'id' and
+   *        'objectType' on the model object.
+   * @param {object} [options] Options object, see table below. This argument is optional.
+   * @param {boolean} [options.variantLenient] Controls if the object factory may try to resolve the
+   *        scoutClass without the model variant part if the initial objectType could not be resolved. Default is false.
+   * @param {boolean} [options.ensureUniqueId] Controls if the resulting object should be assigned the
+   *        attribute "id" if it is not defined. If the created object has an
+   *        init() function, we also set the property 'id' on the model object
+   *        to allow the init() function to copy the attribute from the model
+   *        to the scoutObject.
+   *        Default is true.
+   * @throws Error if the argument list does not match the definition.
    */
   create(objectType, model, options) {
     // Normalize arguments
@@ -131,6 +124,7 @@ export default class ObjectFactory {
     } else {
       throw new Error('Invalid arguments');
     }
+    // noinspection JSUndefinedPropertyAssignment
     options.model = model;
 
     // Create object
@@ -159,7 +153,7 @@ export default class ObjectFactory {
   /**
    * Returns a new unique ID to be used for Widgets/Adapters created by the UI
    * without a model delivered by the server-side client.
-   * @return string ID with prefix 'ui'
+   * @return {string} ID with prefix 'ui'
    */
   createUniqueId() {
     return 'ui' + (++this.uniqueIdSeqNo).toString();

@@ -139,7 +139,7 @@ export default class DateFormatPatternDefinition {
   }
 
   /**
-   * @return the accepted term (if is accepted) or null (if it is not accepted)
+   * @return {string|null} the accepted term (if is accepted) or null (if it is not accepted)
    */
   accept(term) {
     if (term) {

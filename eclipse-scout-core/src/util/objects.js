@@ -534,8 +534,8 @@ export function checkFunctionOverrides() {
 }
 
 /**
- * @param value text which contains a constant reference like '${const:FormField.LabelPosition.RIGHT}'.
- * @return the resolved constant value or the unchanged input value if the constant could not be resolved.
+ * @param {string} value text which contains a constant reference like '${const:FormField.LabelPosition.RIGHT}'.
+ * @return {any} the resolved constant value or the unchanged input value if the constant could not be resolved.
  */
 export function resolveConst(value, constType) {
   if (!isString(value)) {

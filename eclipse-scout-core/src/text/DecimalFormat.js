@@ -129,9 +129,9 @@ export default class DecimalFormat {
 
   /**
    * Converts the numberString into a number and applies the multiplier.
-   * @param numberString
-   * @param evaluateNumberFunction optional function for custom evaluation. The function gets a normalized string and has to return a Number
-   * @return Returns a number for the given numberString, if the string can be converted into a number. Throws an Error otherwise
+   * @param {string} numberString
+   * @param {function} [evaluateNumberFunction] optional function for custom evaluation. The function gets a normalized string and has to return a Number
+   * @return {number|null} A number for the given numberString, if the string can be converted into a number. Throws an Error otherwise
    */
   parse(numberString, evaluateNumberFunction) {
     if (strings.empty(numberString)) {

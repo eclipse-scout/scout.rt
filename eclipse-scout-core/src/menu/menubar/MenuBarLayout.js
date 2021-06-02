@@ -123,7 +123,7 @@ export default class MenuBarLayout extends AbstractLayout {
   /**
    * Moves menu items into _overflowMenuItems until prefSize.width is smaller than prefWidth.
    * The moved menu items will be removed from the given visibleMenuItems parameter.
-   * @returns the calculated preferred size
+   * @returns {number} the calculated preferred size
    */
   _prefSizeWithOverflow(visibleMenuItems, prefWidth) {
     let overflowableIndexes = [];

@@ -25,10 +25,10 @@ export default class EventSupport {
   }
 
   /**
-   * Registers the given func for the event specified by the type param.
+   * Registers the given event handler for the event specified by the type param.
    *
-   * @param {string} type event-name
-   * @param {function} func callback function executed when event is triggered. An event object is passed to the func as first parameter
+   * @param {string} type One or more event names separated by space.
+   * @param {function} func Event handler executed when the event is triggered. An event object is passed to the function as first parameter.
    * @param {function} [origFunc] (optional) used internally when func is registered with one(). The property is set on the listener
    *   object so the event-handler can be de-registered by using the original function.
    */
@@ -44,11 +44,11 @@ export default class EventSupport {
   }
 
   /**
-   * Registers the given func for the event specified by the type param.
-   * The event is only triggered one time, and after that it is automatically de-registered by calling the off() function.
+   * Registers the given event handler for the event specified by the type param.
+   * The function will only be called once. After that it is automatically de-registered using {@link off}.
    *
-   * @param {string} type event-name
-   * @param {function} func callback function executed when event is triggered. An event object is passed to the func as first parameter
+   * @param {string} type One or more event names separated by space.
+   * @param {function} func Event handler executed when the event is triggered. An event object is passed to the function as first parameter
    */
   one(type, func) {
     this._assertFunc(func);
@@ -59,6 +59,14 @@ export default class EventSupport {
     return this.on(type, offFunc, func);
   }
 
+  /**
+   * De-registers the given event handler for the event specified by the type param.
+   *
+   * @param {string} type One or more event names separated by space.<br/>
+   *      Important: the string must be equal to the one used for {@link on} or {@link one}. This also applies if a string containing multiple types separated by space was used.
+   * @param {function} [func] The exact same event handler that was used for registration using {@link on} or {@link one}.
+   *      If no handler is specified, all handlers are de-registered for the given type.
+   */
   off(type, func) {
     if (!type && !func) {
       return;
