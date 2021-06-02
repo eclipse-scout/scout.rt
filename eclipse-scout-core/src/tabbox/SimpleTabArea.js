@@ -131,9 +131,11 @@ export default class SimpleTabArea extends Widget {
       this.tabs.splice(index, 1);
       tab.destroy();
       tab.off('click', this._tabClickHandler);
-      this._renderVisible();
-      widgets.updateFirstLastMarker(this.getTabs());
-      this.invalidateLayoutTree();
+      if (this.rendered) {
+        this._renderVisible();
+        widgets.updateFirstLastMarker(this.getTabs());
+        this.invalidateLayoutTree();
+      }
     }
   }
 }

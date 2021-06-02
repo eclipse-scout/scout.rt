@@ -64,7 +64,7 @@ export default class SimpleTabBox extends Widget {
 
   _renderProperties() {
     super._renderProperties();
-    // render tabArea
+
     this._renderTabArea();
     this._renderView(this.currentView);
   }
@@ -72,9 +72,7 @@ export default class SimpleTabBox extends Widget {
   _renderTabArea() {
     this.tabArea.render();
     this.$tabArea = this.tabArea.$container;
-    if (this.tabArea.attached) {
-      this.$tabArea.insertBefore(this.$viewContent);
-    }
+    this.$tabArea.insertBefore(this.$viewContent);
   }
 
   _renderView(view) {
@@ -143,9 +141,8 @@ export default class SimpleTabBox extends Widget {
   }
 
   /**
-   *
-   * @param view
-   * @param bringToTop whether the view should be placed on top of the view stack. the view tab will be selected.
+   * @param {Widget} view
+   * @param {boolean} bringToTop whether the view should be placed on top of the view stack. the view tab will be selected.
    */
   addView(view, bringToTop) {
     let activate = scout.nvl(bringToTop, true);
@@ -165,8 +162,8 @@ export default class SimpleTabBox extends Widget {
   }
 
   /**
-   * @param view
-   * @return the view which is gonna be the sibling to insert the new view tab after.
+   * @param {Widget} view
+   * @return {Widget} the view which is gonna be the sibling to insert the new view tab after.
    */
   _addToViewStack(view, bringToTop) {
     let sibling;
@@ -274,9 +271,7 @@ export default class SimpleTabBox extends Widget {
   }
 
   hasView(view) {
-    return this.viewStack.filter(v => {
-      return v === view;
-    }).length > 0;
+    return this.viewStack.filter(v => v === view).length > 0;
   }
 
   getViews(displayViewId) {
