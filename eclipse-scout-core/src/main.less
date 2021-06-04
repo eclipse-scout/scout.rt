@@ -401,6 +401,11 @@ button {
       background-color: @selected-active-background-color;
       border-color: @selected-active-background-color;
     }
+
+    &.has-popup {
+      color: @button-color;
+      background-color: @selected-with-popup-background-color;
+    }
   }
 
   &:focus {
@@ -419,8 +424,15 @@ button {
     }
 
     &:active, &.active {
+      color: @default-button-color;
       background-color: @default-button-active-background-color;
       border-color: @default-button-active-background-color;
+    }
+
+    &.selected {
+      color: @default-button-color;
+      background-color: @default-button-selected-background-color;
+      border-color: @default-button-selected-background-color;
     }
 
     &:focus {
@@ -435,7 +447,7 @@ button {
     color: @button-disabled-color;
     cursor: default;
 
-    &:hover, &.active, &:active {
+    &:hover, &.active, &:active, &.selected {
       background-color: @button-disabled-background-color;
       border-color: @button-disabled-border-color;
     }
