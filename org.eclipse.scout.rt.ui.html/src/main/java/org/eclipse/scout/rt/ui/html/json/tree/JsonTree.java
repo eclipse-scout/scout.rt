@@ -894,6 +894,9 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
 
   protected List<ITreeNode> getTopLevelNodes() {
     ITreeNode rootNode = getModel().getRootNode();
+    if (rootNode == null) {
+      return new ArrayList<>();
+    }
     if (getModel().isRootNodeVisible()) {
       return CollectionUtility.arrayList(rootNode);
     }

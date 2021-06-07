@@ -1208,7 +1208,10 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
-    m_outline.setNodeExpanded(m_outline.getRootNode(), true);
+    if (m_outline.getRootNode() != null) {
+      // XXX CGU Wieso macht man das hier und nicht in activate?
+      m_outline.setNodeExpanded(m_outline.getRootNode(), true);
+    }
     setPageDetailForm(m_outline.getDetailForm());
     setPageDetailTable(m_outline.getDetailTable());
     setPageSearchForm(m_outline.getSearchForm(), true);

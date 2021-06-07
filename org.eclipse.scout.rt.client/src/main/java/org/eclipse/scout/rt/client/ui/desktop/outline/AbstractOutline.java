@@ -112,6 +112,14 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   @Override
+  protected void initInternal() {
+    if (getRootNode() == null) {
+      return;
+    }
+    super.initInternal();
+  }
+
+  @Override
   public ClientRunContext createDisplayParentRunContext() {
     return ClientRunContexts
         .copyCurrent()
@@ -301,14 +309,11 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         TreeEvent.TYPE_NODES_CHECKED);
     addNodeFilter(new P_TableFilterBasedTreeNodeFilter());
     super.initConfig();
-    IPage<?> rootPage = interceptCreateRootPage();
-    setRootNode(rootPage);
+    setRootNode(null);
     setVisible(getConfiguredVisible());
     setOrder(calculateViewOrder());
     setNavigateButtonsVisible(getConfiguredNavigateButtonsVisible());
     setOutlineOverviewVisible(getConfiguredOutlineOverviewVisible());
-    ensureDefaultDetailFormCreated();
-    ensureDefaultDetailFormStarted();
   }
 
   @Override
@@ -814,6 +819,13 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public void activate() {
+    if (getRootNode() == null) {
+      IPage<?> rootPage = interceptCreateRootPage();
+      setRootNode(rootPage);
+      ensureDefaultDetailFormCreated();
+      ensureDefaultDetailFormStarted();
+      initInternal();
+    }
     interceptActivated();
   }
 

@@ -707,7 +707,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
    * Runtime
    */
   @Override
-  protected final void initInternal() {
+  protected void initInternal() {
     super.initInternal();
     initTreeInternal();
     interceptInitTree();
@@ -1097,7 +1097,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     if (m_rootNode != null) {
       m_rootNode.setTreeInternal(null, true);
       // inform root of remove
-      root.nodeRemovedNotify();
+      m_rootNode.nodeRemovedNotify();
     }
     m_rootNode = root;
     if (m_rootNode != null) {
