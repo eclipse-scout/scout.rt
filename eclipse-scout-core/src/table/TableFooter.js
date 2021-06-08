@@ -242,7 +242,6 @@ export default class TableFooter extends Widget {
         $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.computeCountInfo(numRows)));
       }
       if (this.table.hasReloadHandler) {
-        $info.appendBr();
         if (estRows && maxRows && numRows < estRows && numRows < maxRows) {
           if (estRows < maxRows) {
             $info.appendSpan('table-info-button').text(this.session.text('ui.LoadAllData')).appendTo($info);
@@ -259,7 +258,6 @@ export default class TableFooter extends Widget {
       } else {
         $info.appendSpan().text(this.session.text('ui.NumRowsLoadedMin'));
       }
-      $info.appendBr();
       $info.appendSpan('table-info-button').text(this.computeCountInfo(numRows));
     }
     $info.setEnabled(this.table.hasReloadHandler);
@@ -290,7 +288,6 @@ export default class TableFooter extends Widget {
         }
       }
       if (this.table.hasUserFilter()) {
-        $info.appendBr();
         $info.appendSpan('table-info-button').text(this.session.text('ui.RemoveFilter')).appendTo($info);
       }
     } else {
@@ -299,7 +296,6 @@ export default class TableFooter extends Widget {
       } else {
         $info.appendSpan().text(this.session.text('ui.NumRowsFilteredMin'));
       }
-      $info.appendBr();
       $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsFiltered));
     }
 
@@ -321,7 +317,6 @@ export default class TableFooter extends Widget {
       } else {
         $info.appendSpan().text(this.session.text('ui.NumRowsSelected', this.computeCountInfo(numRowsSelected)));
       }
-      $info.appendBr();
       $info.appendSpan('table-info-button').text(this.session.text(all ? 'ui.SelectNone' : 'ui.SelectAll')).appendTo($info);
     } else {
       if (numRowsSelected <= 1) {
@@ -329,7 +324,6 @@ export default class TableFooter extends Widget {
       } else {
         $info.appendSpan().text(this.session.text('ui.NumRowsSelectedMin'));
       }
-      $info.appendBr();
       $info.appendSpan('table-info-button').text(this.computeCountInfo(numRowsSelected));
     }
 
@@ -392,7 +386,7 @@ export default class TableFooter extends Widget {
   }
 
   _setInfoVisible($info, visible, complete) {
-    if ($info.isVisible() === visible && !(visible && $info.data('hiding'))) {
+    if ($info.isVisible() === visible && !(visible && $info.hasClass('hiding'))) {
       if (complete) {
         complete();
       }
@@ -418,16 +412,16 @@ export default class TableFooter extends Widget {
       if ($info[0].style.width === '') {
         $info.cssWidth(0);
       }
-      $info.stop().removeData('hiding').setVisible(true).widthToContent(animationOpts);
+      $info.stop().removeClass('hiding').setVisible(true).widthToContent(animationOpts);
     } else {
       // Mark element as hiding so that the layout does not try to resize it
-      $info.data('hiding', true);
+      $info.addClass('hiding');
       $info.stop().animate({
         width: 0
       }, {
         progress: this.revalidateLayout.bind(this),
         complete: () => {
-          $info.removeData('hiding');
+          $info.removeClass('hiding');
           $info.setVisible(false);
         }
       });

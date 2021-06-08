@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, Form, FormField, FormTableControlLayout, GroupBox, TabBox, TableControl} from '../../index';
+import {Form, FormTableControlLayout, GroupBox, TabBox, TableControl} from '../../index';
 
 export default class FormTableControl extends TableControl {
 
@@ -24,6 +24,9 @@ export default class FormTableControl extends TableControl {
     this._setForm(this.form);
   }
 
+  /**
+   * @return {FormTableControlLayout}
+   */
   _createLayout() {
     return new FormTableControlLayout(this);
   }
@@ -81,10 +84,6 @@ export default class FormTableControl extends TableControl {
     form.setDisplayHint(Form.DisplayHint.VIEW);
     form.setModal(false);
     form.setAskIfNeedSave(false);
-    if (this.session.userAgent.deviceType !== Device.Type.MOBILE && form.rootGroupBox.fieldStyle === FormField.FieldStyle.ALTERNATIVE) {
-      // Use default style because alternative style does not look as good with a background color
-      form.rootGroupBox.setFieldStyle(FormField.FieldStyle.CLASSIC);
-    }
   }
 
   onControlContainerOpened() {

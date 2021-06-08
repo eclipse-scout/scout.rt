@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
+   * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
@@ -10,54 +10,43 @@
  */
 .table-control {
   position: relative;
-  display: inline-block;
-  padding: 0 @table-control-padding;
+  color: @table-control-color;
   cursor: pointer;
-  border-left: 1px solid transparent;
-  border-right: 1px solid transparent;
-  /* draw over border-top of .table-footer */
-  height: calc(~'100% + 1px');
-  margin-top: -1px;
-  padding-top: 1px;
-  #scout.vertical-align-helper-before();
+  border-radius: @border-radius-medium;
+  margin-right: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: @table-control-size;
+  height: @table-control-size;
 
   & > .font-icon {
     font-size: 22px;
-    color: @table-control-color;
-    vertical-align: middle;
   }
 
-  &:hover > .font-icon {
+  &:hover {
     color: @table-control-hover-color;
+    background-color: @hover-background-color;
   }
 
-  &:active > .font-icon {
+  &:active {
     color: @table-control-active-color;
-  }
-
-  &.disabled:hover,
-  &.disabled > .font-icon,
-  &.disabled.selected > .font-icon {
-    cursor: default;
-    color: @table-control-disabled-color;
-  }
-
-  &.selected > .font-icon {
-    color: @table-control-selected-color;
+    background-color: @active-background-color;
   }
 
   &.selected {
-    border-left-color: @border-color;
-    border-right-color: @border-color;
+    color: @table-control-selected-color;
     background-color: @table-control-selected-background-color;
+  }
 
-    &:first-child {
-      border-left-color: transparent;
-    }
+  &.disabled {
+    cursor: default;
+    color: @table-control-disabled-color;
+    background-color: transparent;
   }
 }
 
 .tooltip.table-control-tooltip {
   /* move tooltip a little down, make sure it is on the same height as other table footer tooltips (table-info, table-status) */
-  margin-top: 7px;
+  margin-top: 8px;
 }

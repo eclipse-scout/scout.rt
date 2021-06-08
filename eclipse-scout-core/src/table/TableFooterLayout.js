@@ -22,20 +22,20 @@ export default class TableFooterLayout extends AbstractLayout {
    * @override
    */
   layout($container) {
-    let contentFits, controlsWidth, infoWidth,
+    let contentFits,
       $controls = this._tableFooter._$controls,
       $info = this._tableFooter._$info,
       $infoItems = $info.find('.table-info-item'),
       containerWidth = graphics.size($container).width;
 
-    controlsWidth = graphics.size($controls, true).width;
-    infoWidth = graphics.size($info).width;
+    let controlsWidth = graphics.size($controls, true).width;
+    let infoWidth = graphics.size($info, true).width;
 
     // Remove width to make sure elements are as width as they want to be
     $infoItems.each(function() {
       let $item = $(this);
       // Do not touch items which are being hidden to make sure they can properly animate width to 0
-      if ($item.isVisible() && !$item.data('hiding')) {
+      if ($item.isVisible() && !$item.hasClass('hiding')) {
         $item.data('oldWidth', $item.outerWidth());
         $item.css('width', 'auto');
       }
@@ -47,7 +47,7 @@ export default class TableFooterLayout extends AbstractLayout {
       this._tableFooter._compactStyle = false;
       this._tableFooter._renderInfo();
     }
-    infoWidth = graphics.size($info).width;
+    infoWidth = graphics.size($info, true).width;
     if (controlsWidth + infoWidth <= containerWidth) {
       // Make sure table info tooltip is not shown anymore (only available in compact style)
       if (this._tableFooter._tableInfoTooltip) {
@@ -61,12 +61,12 @@ export default class TableFooterLayout extends AbstractLayout {
       this._tableFooter._compactStyle = true;
       this._tableFooter._renderInfo();
 
-      infoWidth = graphics.size($info).width;
+      infoWidth = graphics.size($info, true).width;
       if (controlsWidth + infoWidth <= containerWidth) {
         contentFits = true;
       }
       // Make sure info section does not overlap controls
-      $info.css('max-width', Math.max(containerWidth - controlsWidth, 0));
+      $info.css('max-width', Math.max(containerWidth - controlsWidth - $info.cssMarginX(), 0));
     }
 
     // don't animate on the first layouting -> only animate on user interactions
@@ -89,7 +89,7 @@ export default class TableFooterLayout extends AbstractLayout {
   _setInfoItemsSize($infoItems, animated) {
     $infoItems.each(function() {
       let $item = $(this);
-      if ($item.isVisible() && !$item.data('hiding')) {
+      if ($item.isVisible() && !$item.hasClass('hiding')) {
         // Make sure complete function of already scheduled animation will be executed
         let existingComplete = $item.data('animationComplete');
         if (animated) {

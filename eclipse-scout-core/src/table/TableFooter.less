@@ -58,7 +58,7 @@
   width: 100%;
 
   & > .form {
-    background-color: @table-control-form-background-color;
+    background-color: @table-control-container-background-color;
 
     & > .root-group-box {
 
@@ -69,45 +69,7 @@
 
       & > .main-menubar {
         #scout.main-menubar-light;
-      }
-    }
-  }
-
-  & .tab-box > .tab-box-header {
-    margin-top: 0;
-    margin-left: 0;
-
-    & > .bottom-border {
-      display: none;
-    }
-
-    & .tab-area {
-      & > .selection-marker {
-        z-index: 2;
-        height: 3px;
-        bottom: auto;
-        top: 0;
-        margin-bottom: 0;
-      }
-
-      & > .tab-item {
-        z-index: 2;
-
-        & > .title {
-          padding-top: @table-control-tab-item-title-padding-top;
-          padding-bottom: @table-control-tab-item-title-padding-bottom;
-        }
-
-        &.first {
-          /* align with the form fields */
-          padding-left: @mandatory-indicator-width;
-        }
-
-        &::after {
-          top: 0;
-          height: 3px;
-          margin-bottom: auto;
-        }
+        border-color: transparent;
       }
     }
   }
@@ -116,28 +78,28 @@
 .table-controls {
   position: absolute;
   height: 100%;
-
-  .table-footer > & ~ & {
-    margin-left: -1px;
-  }
+  margin-left: @bench-padding-x;
+  display: flex;
+  align-items: center;
 }
 
 .table-info {
   position: absolute;
   right: 0;
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  margin-right: @bench-padding-x - @table-info-margin-x;
 }
 
 .table-filter {
-  display: inline-block;
   position: relative;
-  vertical-align: top;
-  margin-top: (@table-footer-height - 26px) / 2;
-  margin-right: @table-control-padding;
+  margin-right: @table-info-margin-x;
 }
 
 .table-text-filter {
-  min-height: 26px;
-  width: 200px;
+  min-height: @table-footer-text-filter-height;
+  width: @table-footer-text-filter-width;
   font-size: 13px;
 
   &:focus {
@@ -155,8 +117,8 @@
     position: absolute;
     right: 0;
     top: 0;
-    min-height: 26px;
-    line-height: 26px;
+    min-height: @table-footer-text-filter-height;
+    line-height: @table-footer-text-filter-height;
     padding-right: @text-field-padding-x;
     cursor: pointer;
 
@@ -169,35 +131,27 @@
   }
 }
 
+.table-info-item.hiding {
+  visibility: hidden;
+}
+
 .table-info-load,
 .table-info-status,
 .table-info-filter,
 .table-info-selection {
-  position: relative;
-  display: inline-block;
-  vertical-align: top;
-  padding-top: @table-control-padding / 2;
-  padding-bottom: 0;
-  height: @table-footer-height - 1px; /* subtract border-top of .table-footer */
+  flex-shrink: 0;
+  flex-grow: 0;
   color: @table-info-color;
   cursor: pointer;
   line-height: 19px;
+  font-size: @font-size-smaller;
   #scout.overflow-nowrap();
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: @table-control-padding / 2  + 2px;
-    left: 0;
-    height: @table-footer-height - @table-control-padding - 4px;
-    border-right: 1px solid @border-color;
-  }
 
   /* margins are used instead of paddings for a better animation */
 
   & > span {
-    margin-left: @table-control-padding;
-    margin-right: @table-control-padding - 1px; /* because left padding includes the ::before border */
+    display: block;
+    margin: 0 @table-info-margin-x
   }
 
   &.disabled {
@@ -221,7 +175,7 @@
   }
 
   &:active > .table-info-button {
-    color: @active-color;
+    color: @link-active-color;
   }
 }
 

@@ -49,12 +49,8 @@ export default class TableControl extends Action {
 
   _createKeyStrokeContextForTableControl() {
     let keyStrokeContext = new KeyStrokeContext();
-    keyStrokeContext.$scopeTarget = function() {
-      return this.tableFooter.$controlContent;
-    }.bind(this);
-    keyStrokeContext.$bindTarget = function() {
-      return this.tableFooter.$controlContent;
-    }.bind(this);
+    keyStrokeContext.$scopeTarget = () => this.tableFooter.$controlContent;
+    keyStrokeContext.$bindTarget = () => this.tableFooter.$controlContent;
     keyStrokeContext.registerKeyStroke(new TableControlCloseKeyStroke(this));
     return keyStrokeContext;
   }

@@ -696,12 +696,12 @@ export default class TableHeaderMenu extends Popup {
       .appendDiv('table-header-menu-filter-actions');
 
     this.$filterSortOrder = $filterActions
-      .appendDiv('table-header-menu-toggle-sort-order')
+      .appendDiv('link table-header-menu-toggle-sort-order')
       .on('click', this._onSortModeClick.bind(this))
       .addClass(this.filterSortMode.cssClass);
 
     this.$filterToggleChecked = $filterActions
-      .appendDiv('table-header-menu-filter-toggle-checked')
+      .appendDiv('link table-header-menu-filter-toggle-checked')
       .text(this.session.text(this.filterCheckedMode.text))
       .on('click', this._onFilterCheckedModeClick.bind(this));
 

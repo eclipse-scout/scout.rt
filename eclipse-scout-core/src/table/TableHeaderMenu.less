@@ -91,9 +91,8 @@
 }
 
 .table-header-menu-group-text {
-  #scout.font-text-normal(@font-weight-bold);
   font-weight: bold;
-  color: @text-color;
+  color: @label-color;
   line-height: 24px;
   height: 24px;
   #scout.overflow-ellipsis-nowrap();
@@ -367,17 +366,16 @@
 }
 
 .table-header-menu-filter-toggle-checked {
-  cursor: pointer;
-  color: @table-header-menu-link-color;
   display: inline;
 }
 
 .table-header-menu-toggle-sort-order {
-  #scout.font-icon();
   float: left;
-  cursor: pointer;
-  color: @table-header-menu-link-color;
   padding-right: @table-header-menu-padding;
+
+  &::before {
+    #scout.font-icon();
+  }
 }
 
 .table-header-menu-toggle-sort-order-alphabetically::before {

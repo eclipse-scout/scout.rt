@@ -13,10 +13,8 @@
   white-space: nowrap;
   overflow: hidden;
   background-color: @table-header-background-color;
-  border-bottom: 1px solid @table-header-border-color;
+  border-bottom: 2px solid @table-header-border-color;
   z-index: 0; /* begin new stacking context */
-  /* Make it the same height as the menu bar */
-  min-height: @logical-grid-row-height - 1px; /* -1px border-width. Header-items itself must not get a min-height otherwise bottom alignment with multi line header items break */
 
   &.disabled:not(.read-only) {
     color: @text-disabled-color;
@@ -26,9 +24,8 @@
 .table-header > .menubar-container {
   position: absolute;
   right: 0;
-  /* make menubar a little smaller than header (but still center it). Otherwise browsers may draw the menu bar over the bottom border of the table header when the page is zoomed */
-  top: 1px;
-  height: calc(~'100% - 2px');
+  top: 0;
+  height: 100%;
   /* Do not use transparent color here, because otherwise header items would be visible behind */
   background-color: inherit;
   z-index: 1;
@@ -40,6 +37,9 @@
 
     & > .menubar-box > .menu-item {
       border-radius: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+      height: 100%;
     }
   }
 }
@@ -47,8 +47,10 @@
 .table-header-item {
   position: relative;
   display: inline-block;
-  #scout.font-text-normal(@font-weight-bold);
-  padding: @table-header-padding-y @table-header-padding-right @table-header-padding-y @table-header-padding-left;
+  font-weight: @font-weight-bold;
+  font-size: @font-size-smaller;
+  color: @table-header-item-color;
+  padding: @table-header-padding-top @table-header-padding-right @table-header-padding-bottom @table-header-padding-left;
   #scout.overflow-ellipsis-nowrap();
   /* Vertical align is necessary for 2 things: */
   /* 1. Alignment in case of multiline headers. */
@@ -152,18 +154,17 @@
 
 .table-header-item-state {
   position: absolute;
+  display: flex;
+  align-items: center;
   right: 3px;
-  top: 4px;
+  top: 0;
   font-weight: normal;
   font-size: @font-size-extra-small;
   color: @table-header-item-state-color;
-  display: table-row;
+  height: 100%;
 
   & > .left {
-    display: table-cell;
-    padding-top: 5px;
     padding-left: 3px;
-    text-align: center;
   }
 
   &.grouped.filtered > .left {
@@ -171,12 +172,11 @@
   }
 
   & > .right {
-    display: table-cell;
     color: @table-header-sort-color;
+    margin-top: -3px;
     font-size: 16px;
     padding-left: 3px;
     padding-right: 3px;
-    vertical-align: top;
   }
 
   &.sort-desc > .right::after {
@@ -194,7 +194,7 @@
   top: 0;
   height: 100%;
   width: 17px;
-  padding: 8px 8px;
+  padding: 10px 8px;
   margin-left: -8px;
   background-color: @table-header-resize-color;
   background-clip: content-box;

@@ -103,19 +103,19 @@
     border-bottom-color: @detail-table-header-border-color;
 
     & > .table-header-item {
-      padding-top: @detail-table-header-padding-y;
-      padding-bottom: @detail-table-header-padding-y;
-
-      & > .table-header-item-state {
-        top: 9px;
-      }
+      padding-top: @detail-table-header-padding-top;
+      padding-bottom: @detail-table-header-padding-bottom;
     }
 
     & > .menubar-container {
 
       & > .menubar > .menubar-box > .menu-item {
-        margin-right: 12px;
         border-radius: @border-radius;
+        height: auto;
+
+        &.last {
+          margin-right: 12px;
+        }
       }
     }
   }

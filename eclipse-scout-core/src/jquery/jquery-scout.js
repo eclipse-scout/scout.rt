@@ -588,7 +588,7 @@ $.fn.activeElement = function(domElement) {
 };
 
 /**
- * @param {boolean} domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
+ * @param {boolean} [domElement] (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
  * @returns {$|HTMLElement} the BODY element of the HTML document in which the current HTML element is placed.
  */
 $.fn.body = function(domElement) {
