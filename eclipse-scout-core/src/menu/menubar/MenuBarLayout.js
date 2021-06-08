@@ -158,11 +158,11 @@ export default class MenuBarLayout extends AbstractLayout {
   }
 
   _prefSize(menuItems, considerEllipsis) {
-    let prefSize = new Dimension(0, 0),
-      itemSize = new Dimension(0, 0);
+    let prefSize = new Dimension(0, 0);
     considerEllipsis = scout.nvl(considerEllipsis, this._overflowMenuItems.length > 0);
-    menuItems.forEach(function(menuItem) {
-      itemSize = new Dimension(0, 0);
+    this._setFirstLastMenuMarker(menuItems, considerEllipsis);
+    menuItems.forEach(menuItem => {
+      let itemSize = new Dimension(0, 0);
       if (menuItem.ellipsis) {
         if (considerEllipsis) {
           itemSize = this._menuItemSize(menuItem);
@@ -172,19 +172,18 @@ export default class MenuBarLayout extends AbstractLayout {
       }
       prefSize.height = Math.max(prefSize.height, itemSize.height);
       prefSize.width += itemSize.width;
-    }, this);
+    });
     return prefSize;
   }
 
   _menuItemSize(menuItem) {
-    let prefSize,
-      classList = menuItem.$container.attr('class');
+    let classList = menuItem.$container.attr('class');
 
     menuItem.$container.removeClass('overflown');
     menuItem.$container.removeClass('hidden');
 
     menuItem.htmlComp.invalidateLayout();
-    prefSize = menuItem.htmlComp.prefSize({
+    let prefSize = menuItem.htmlComp.prefSize({
       useCssSize: true,
       exact: true
     }).add(graphics.margins(menuItem.$container));

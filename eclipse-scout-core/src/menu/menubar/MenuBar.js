@@ -21,7 +21,7 @@ import {
   MenuDestinations,
   menus,
   scout,
-  Widget
+  Widget, widgets
 } from '../../index';
 import ComboMenu from '../ComboMenu';
 
@@ -217,6 +217,7 @@ export default class MenuBar extends Widget {
   }
 
   _renderMenuItems() {
+    widgets.updateFirstLastMarker(this.menuItems);
     this.updateLeftOfButtonMarker();
     this.invalidateLayoutTree();
   }
