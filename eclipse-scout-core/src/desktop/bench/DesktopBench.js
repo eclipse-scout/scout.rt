@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,8 @@ export default class DesktopBench extends Widget {
     this._outlineNodesSelectedHandler = this._onOutlineNodesSelected.bind(this);
     this._outlinePageChangedHandler = this._onOutlinePageChanged.bind(this);
     this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
-    this._outlineContentDestroyHandler = this._onoutlineContentDestroy.bind(this);
+    this._outlineContentDestroyHandler = this._onOutlineContentDestroy.bind(this);
+    this._outlineContentCssClassChangeHandler = this._onOutlineContentCssClassChange.bind(this);
 
     // event listener functions
     this._viewAddHandler = this._onViewAdd.bind(this);
@@ -339,6 +340,7 @@ export default class DesktopBench extends Widget {
     }
     if (oldContent) {
       oldContent.off('destroy', this._outlineContentDestroyHandler);
+      oldContent.off('propertyChange:cssClass', this._outlineContentCssClassChangeHandler);
     }
     if (this.rendered) {
       this._removeOutlineContent();
@@ -348,6 +350,7 @@ export default class DesktopBench extends Widget {
     // bench with the outline-content.
     if (content) {
       content.one('destroy', this._outlineContentDestroyHandler);
+      content.on('propertyChange:cssClass', this._outlineContentCssClassChangeHandler);
     }
 
     this._setProperty('outlineContent', content);
@@ -357,6 +360,9 @@ export default class DesktopBench extends Widget {
     if (this.desktop.header) {
       this.desktop.header.onBenchOutlineContentChange(content, oldContent);
     }
+
+    this._updateOutlineContentHasDimmedBackground();
+
     this._renderOutlineContent();
   }
 
@@ -377,6 +383,17 @@ export default class DesktopBench extends Widget {
 
   sendToBack() {
     // nop
+  }
+
+  _updateOutlineContentHasDimmedBackground() {
+    if (!this.outlineContent) {
+      return;
+    }
+    let hasDimmedBackground = false;
+    if (this.outlineContent.cssClass) {
+      hasDimmedBackground = this.outlineContent.cssClass.indexOf('dimmed-background') > -1;
+    }
+    this.toggleCssClass('outline-content-has-dimmed-background', hasDimmedBackground);
   }
 
   _computeDetailContentForPage(node) {
@@ -436,8 +453,12 @@ export default class DesktopBench extends Widget {
     this.updateNavigationHandleVisibility();
   }
 
-  _onoutlineContentDestroy(event) {
+  _onOutlineContentDestroy(event) {
     this.setOutlineContent(null);
+  }
+
+  _onOutlineContentCssClassChange(event) {
+    this._updateOutlineContentHasDimmedBackground();
   }
 
   _onOutlineNodesSelected(event) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,8 +26,12 @@
     box-shadow: inset 0 0 @radius @color;
   }
 
-  .drop-shadow(@x: 2px, @y: 6px, @blur: 14px, @spread: -6px, @alpha: @drop-shadow-alpha) {
+  .drop-shadow(@x: 0px, @y: 6px, @blur: 13px, @spread: 0px, @alpha: @drop-shadow-alpha) {
     box-shadow: @x @y @blur @spread rgba(0, 0, 0, @alpha);
+  }
+
+  .double-drop-shadow(@x1: 0, @y1: 0, @blur1: 0, @spread1: 0, @color1: @palette-black, @x2: 0px, @y2: 6px, @blur2: 13px, @spread2: 0px, @alpha2: @drop-shadow-alpha) {
+    box-shadow: @x1 @y1 @blur1 @spread1 @color1, @x2 @y2 @blur2 @spread2 rgba(0, 0, 0, @alpha2);
   }
 
   .drop-shadow-large(@x: 0px, @y: 8px, @blur: 32px, @spread: 0px, @alpha: @drop-shadow-large-alpha) {

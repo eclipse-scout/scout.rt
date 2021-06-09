@@ -35,7 +35,7 @@ describe('DesktopHeader', () => {
   });
 
   describe('onBenchOutlineContentChange', () => {
-    let outline, bench, model, node0, node1;
+    let outline, header, bench, model, node0, node1, cssClassChangeHandler;
 
     beforeEach(() => {
       model = helper.createModelFixture(3, 2, true);
@@ -53,45 +53,63 @@ describe('DesktopHeader', () => {
         parent: node1.detailForm
       }));
       bench = desktop.bench;
+      header = desktop.header;
+      cssClassChangeHandler = header._outlineContentCssClassChangeHandler;
       desktop.setOutline(outline);
     });
 
     it('attaches listener to new outline content', () => {
-      let detailForm0MenuBar = node0.detailForm.rootGroupBox.menuBar;
-      let detailForm1MenuBar = node1.detailForm.rootGroupBox.menuBar;
-      let listenerCount0 = detailForm0MenuBar.events.count('propertyChange');
-      let listenerCount1 = detailForm1MenuBar.events.count('propertyChange');
+      let detailForm0 = node0.detailForm;
+      let detailForm0MenuBar = detailForm0.rootGroupBox.menuBar;
+      let detailForm1 = node1.detailForm;
+      let detailForm1MenuBar = detailForm1.rootGroupBox.menuBar;
+      let listenerCount0 = detailForm0.events.count('propertyChange:cssClass', cssClassChangeHandler);
+      let menuBarListenerCount0 = detailForm0MenuBar.events.count('propertyChange:visible');
+      let listenerCount1 = detailForm1.events.count('propertyChange:cssClass', cssClassChangeHandler);
+      let menuBarListenerCount1 = detailForm1MenuBar.events.count('propertyChange:visible');
       outline.selectNodes(node0);
-      expect(detailForm0MenuBar.events.count('propertyChange')).toBe(listenerCount0 + 1);
-      expect(detailForm1MenuBar.events.count('propertyChange')).toBe(listenerCount1);
+      expect(detailForm0.events.count('propertyChange:cssClass', cssClassChangeHandler)).toBe(listenerCount0 + 1);
+      expect(detailForm0MenuBar.events.count('propertyChange:visible')).toBe(menuBarListenerCount0 + 1);
+      expect(detailForm1.events.count('propertyChange:cssClass', cssClassChangeHandler)).toBe(listenerCount1);
+      expect(detailForm1MenuBar.events.count('propertyChange:visible')).toBe(menuBarListenerCount1);
     });
 
     it('removes listener from old outline content', () => {
-      let detailForm0MenuBar = node0.detailForm.rootGroupBox.menuBar;
-      let detailForm1MenuBar = node1.detailForm.rootGroupBox.menuBar;
-      let listenerCount0 = detailForm0MenuBar.events.count('propertyChange');
-      let listenerCount1 = detailForm1MenuBar.events.count('propertyChange');
+      let detailForm0 = node0.detailForm;
+      let detailForm0MenuBar = detailForm0.rootGroupBox.menuBar;
+      let detailForm1 = node1.detailForm;
+      let detailForm1MenuBar = detailForm1.rootGroupBox.menuBar;
+      let listenerCount0 = detailForm0.events.count('propertyChange:cssClass', cssClassChangeHandler);
+      let menuBarListenerCount0 = detailForm0MenuBar.events.count('propertyChange:visible');
+      let listenerCount1 = detailForm1.events.count('propertyChange:cssClass', cssClassChangeHandler);
+      let menuBarListenerCount1 = detailForm1MenuBar.events.count('propertyChange:visible');
       outline.selectNodes(node0);
-      expect(detailForm0MenuBar.events.count('propertyChange')).toBe(listenerCount0 + 1);
-      expect(detailForm1MenuBar.events.count('propertyChange')).toBe(listenerCount1);
+      expect(detailForm0.events.count('propertyChange:cssClass', cssClassChangeHandler)).toBe(listenerCount0 + 1);
+      expect(detailForm0MenuBar.events.count('propertyChange:visible')).toBe(menuBarListenerCount0 + 1);
+      expect(detailForm1.events.count('propertyChange:cssClass', cssClassChangeHandler)).toBe(listenerCount1);
+      expect(detailForm1MenuBar.events.count('propertyChange:visible')).toBe(menuBarListenerCount1);
 
       outline.selectNodes(node1);
-      expect(detailForm0MenuBar.events.count('propertyChange')).toBe(listenerCount0);
-      expect(detailForm1MenuBar.events.count('propertyChange')).toBe(listenerCount1 + 1);
+      expect(detailForm0.events.count('propertyChange:cssClass', cssClassChangeHandler)).toBe(listenerCount0);
+      expect(detailForm0MenuBar.events.count('propertyChange:visible')).toBe(menuBarListenerCount0);
+      expect(detailForm1.events.count('propertyChange:cssClass', cssClassChangeHandler)).toBe(listenerCount1 + 1);
+      expect(detailForm1MenuBar.events.count('propertyChange:visible')).toBe(menuBarListenerCount1 + 1);
 
       outline.selectNodes(node0);
-      expect(detailForm0MenuBar.events.count('propertyChange')).toBe(listenerCount0 + 1);
-      expect(detailForm1MenuBar.events.count('propertyChange')).toBe(listenerCount1);
+      expect(detailForm0.events.count('propertyChange:cssClass', cssClassChangeHandler)).toBe(listenerCount0 + 1);
+      expect(detailForm0MenuBar.events.count('propertyChange:visible')).toBe(menuBarListenerCount0 + 1);
+      expect(detailForm1.events.count('propertyChange:cssClass', cssClassChangeHandler)).toBe(listenerCount1);
+      expect(detailForm1MenuBar.events.count('propertyChange:visible')).toBe(menuBarListenerCount1);
     });
 
     it('removes listener when getting removed', () => {
       let detailForm0MenuBar = node0.detailForm.rootGroupBox.menuBar;
-      let listenerCount0 = detailForm0MenuBar.events.count('propertyChange');
+      let menuBarListenerCount0 = detailForm0MenuBar.events.count('propertyChange:visible');
       outline.selectNodes(node0);
-      expect(detailForm0MenuBar.events.count('propertyChange')).toBe(listenerCount0 + 1);
+      expect(detailForm0MenuBar.events.count('propertyChange:visible')).toBe(menuBarListenerCount0 + 1);
 
       desktop.setHeaderVisible(false);
-      expect(detailForm0MenuBar.events.count('propertyChange')).toBe(listenerCount0);
+      expect(detailForm0MenuBar.events.count('propertyChange:visible')).toBe(menuBarListenerCount0);
     });
 
   });

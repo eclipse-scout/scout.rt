@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,8 @@ export default class TileOverviewForm extends Form {
 
     this.$content = null;
     this.$title = null;
+
+    this._desktopNavigationVisibilityChangeHandler = this._onDesktopNavigationVisibilityChange.bind(this);
   }
 
   _init(model) {
@@ -30,6 +32,7 @@ export default class TileOverviewForm extends Form {
     if (!this.pageTileGrid) {
       this.pageTileGrid = this._createPageTileGrid();
     }
+    this.addCssClass('dimmed-background');
   }
 
   _renderForm() {
@@ -40,6 +43,18 @@ export default class TileOverviewForm extends Form {
     this.contentHtmlComp.setLayout(new RowLayout({stretch: this.outline.compact}));
     this.$title = this.$content.appendDiv('tile-overview-title').text(this.tileOverviewTitle);
     HtmlComponent.install(this.$title, this.session);
+    this.$title.cssMaxHeight(this.$title.cssHeight());
+    this._updateTitle(false);
+    this.findDesktop().on('propertyChange:navigationVisible', this._desktopNavigationVisibilityChangeHandler);
+  }
+
+  _remove() {
+    this.$content = null;
+    this.$title = null;
+
+    this.findDesktop().off('propertyChange:navigationVisible', this._desktopNavigationVisibilityChangeHandler);
+
+    super._remove();
   }
 
   _renderProperties() {
@@ -89,10 +104,15 @@ export default class TileOverviewForm extends Form {
     this.pageTileGrid.setNodes(this.nodes);
   }
 
-  _remove() {
-    this.$content = null;
-    this.$title = null;
+  _updateTitle(animated = true) {
+    if (!this.$title) {
+      return;
+    }
+    this.$title.toggleClass('animated', animated);
+    this.$title.toggleClass('removed', this.findDesktop().navigationVisible);
+  }
 
-    super._remove();
+  _onDesktopNavigationVisibilityChange(event) {
+    this._updateTitle();
   }
 }

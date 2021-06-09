@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,6 @@ export default class PageTileGrid extends TileGrid {
     this.outline = null;
     this.page = null;
     this.nodes = null;
-    this.withPlaceholders = true;
     this.scrollable = false;
     this.renderAnimationEnabled = true;
     this.startupAnimationEnabled = true;
@@ -97,7 +96,6 @@ export default class PageTileGrid extends TileGrid {
       // Initially, don't set layout config so that it can be passed by model. If compact is changed later, reset compact layout config to a default one
       this.setLayoutConfig(new TileGridLayoutConfig());
     }
-    this.setWithPlaceholders(!this.compact);
     this.setGridColumnCount(this.compact ? 3 : 4);
     this.startupAnimationEnabled = !this.compact;
     if (this.initialized) {
@@ -135,7 +133,6 @@ export default class PageTileGrid extends TileGrid {
     });
     let tile = scout.create('FormFieldTile', {
       parent: this,
-      colorScheme: 'default-inverted',
       cssClass: this.compact ? 'compact' : null,
       tileWidget: button
     });

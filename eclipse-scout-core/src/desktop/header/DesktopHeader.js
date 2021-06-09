@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,9 +18,12 @@ export default class DesktopHeader extends Widget {
     this.toolBoxVisible = true;
     this.viewButtonBox = null;
     this.viewButtonBoxVisible = false;
+    this.outlineContent = null;
+
     this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
     this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
-    this._outlineContentMenuBarPropertyChangeHandler = this._onOutlineContentMenuBarPropertyChange.bind(this);
+    this._outlineContentMenuBarVisibleChangeHandler = this._onOutlineContentMenuBarVisibleChange.bind(this);
+    this._outlineContentCssClassChangeHandler = this._onOutlineContentCssClassChange.bind(this);
     this._viewButtonBoxPropertyChangeHandler = this._onViewButtonBoxPropertyChange.bind(this);
   }
 
@@ -44,9 +47,8 @@ export default class DesktopHeader extends Widget {
     this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
     this.desktop.on('animationEnd', this._desktopAnimationEndHandler);
     if (this.desktop.bench) {
-      this.outlineContent = this.desktop.bench.outlineContent;
+      this._setOutlineContent(this.desktop.bench.outlineContent);
     }
-    this._attachOutlineContentMenuBarHandler();
   }
 
   _renderProperties() {
@@ -61,8 +63,7 @@ export default class DesktopHeader extends Widget {
   _remove() {
     this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
     this.desktop.off('animationEnd', this._desktopAnimationEndHandler);
-    this._detachOutlineContentMenuBarHandler();
-    this.outlineContent = null;
+    this._setOutlineContent(null);
     super._remove();
   }
 
@@ -211,11 +212,26 @@ export default class DesktopHeader extends Widget {
     }
   }
 
+  _setOutlineContent(outlineContent) {
+    if (this.outlineContent === outlineContent) {
+      return;
+    }
+    this._detachOutlineContentHandlers();
+    this._setProperty('outlineContent', outlineContent);
+    this._attachOutlineContentHandlers();
+    this.updateViewButtonStyling();
+  }
+
   updateViewButtonBoxVisibility() {
     // View buttons are visible in the header if the navigation is not visible
     // If there are no view buttons at all, don't show the box
     // With displayStyle is set to compact, the view buttons should never be visible in the header
     this.setViewButtonBoxVisible(this.desktop.viewButtons.some(button => button.visible) && !this.desktop.navigationVisible && this.desktop.displayStyle !== Desktop.DisplayStyle.COMPACT);
+  }
+
+  _attachOutlineContentHandlers() {
+    this._attachOutlineContentMenuBarHandler();
+    this._attachOutlineContentCssClassHandler();
   }
 
   _attachOutlineContentMenuBarHandler() {
@@ -224,8 +240,20 @@ export default class DesktopHeader extends Widget {
     }
     let menuBar = this._outlineContentMenuBar(this.outlineContent);
     if (menuBar) {
-      menuBar.on('propertyChange', this._outlineContentMenuBarPropertyChangeHandler);
+      menuBar.on('propertyChange:visible', this._outlineContentMenuBarVisibleChangeHandler);
     }
+  }
+
+  _attachOutlineContentCssClassHandler() {
+    if (!this.outlineContent) {
+      return;
+    }
+    this.outlineContent.on('propertyChange:cssClass', this._outlineContentCssClassChangeHandler);
+  }
+
+  _detachOutlineContentHandlers() {
+    this._detachOutlineContentMenuBarHandler();
+    this._detachOutlineContentCssClassHandler();
   }
 
   _detachOutlineContentMenuBarHandler() {
@@ -234,8 +262,15 @@ export default class DesktopHeader extends Widget {
     }
     let menuBar = this._outlineContentMenuBar(this.outlineContent);
     if (menuBar) {
-      menuBar.off('propertyChange', this._outlineContentMenuBarPropertyChangeHandler);
+      menuBar.off('propertyChange:visible', this._outlineContentMenuBarVisibleChangeHandler);
     }
+  }
+
+  _detachOutlineContentCssClassHandler() {
+    if (!this.outlineContent) {
+      return;
+    }
+    this.outlineContent.off('propertyChange:cssClass', this._outlineContentCssClassChangeHandler);
   }
 
   _outlineContentMenuBar(outlineContent) {
@@ -246,12 +281,20 @@ export default class DesktopHeader extends Widget {
   }
 
   updateViewButtonStyling() {
-    if (!this.viewButtonBoxVisible || !this.desktop.bench || !this.desktop.bench.outlineContentVisible) {
+    this._updateOutlineContentHasMenuBar();
+    this._updateOutlineContentHasDimmedBackground();
+  }
+
+  _getOutlineContentForViewButtonStyling() {
+    if (!this.viewButtonBoxVisible || !this.outlineContent || !this.outlineContent.visible) {
       return;
     }
-    let outlineContent = this.desktop.bench.outlineContent;
+    return this.outlineContent;
+  }
+
+  _updateOutlineContentHasMenuBar() {
+    let outlineContent = this._getOutlineContentForViewButtonStyling();
     if (!outlineContent) {
-      // Outline content not available yet (-> needs to be loaded first)
       return;
     }
     let hasMenuBar = false;
@@ -262,6 +305,18 @@ export default class DesktopHeader extends Widget {
       hasMenuBar = outlineContent.menuBar && outlineContent.menuBar.visible;
     }
     this.$container.toggleClass('outline-content-has-menubar', !!hasMenuBar);
+  }
+
+  _updateOutlineContentHasDimmedBackground() {
+    let outlineContent = this._getOutlineContentForViewButtonStyling();
+    if (!outlineContent) {
+      return;
+    }
+    let hasDimmedBackground = false;
+    if (outlineContent.cssClass) {
+      hasDimmedBackground = outlineContent.cssClass.indexOf('dimmed-background') > -1;
+    }
+    this.$container.toggleClass('outline-content-has-dimmed-background', hasDimmedBackground);
   }
 
   _onDesktopNavigationVisibleChange(event) {
@@ -277,10 +332,7 @@ export default class DesktopHeader extends Widget {
   }
 
   onBenchOutlineContentChange(content) {
-    this._detachOutlineContentMenuBarHandler();
-    this.outlineContent = content;
-    this.updateViewButtonStyling();
-    this._attachOutlineContentMenuBarHandler();
+    this._setOutlineContent(content);
   }
 
   _onDesktopPropertyChange(event) {
@@ -289,10 +341,12 @@ export default class DesktopHeader extends Widget {
     }
   }
 
-  _onOutlineContentMenuBarPropertyChange(event) {
-    if (event.propertyName === 'visible') {
-      this.updateViewButtonStyling();
-    }
+  _onOutlineContentMenuBarVisibleChange(event) {
+    this._updateOutlineContentHasMenuBar();
+  }
+
+  _onOutlineContentCssClassChange(event) {
+    this._updateOutlineContentHasDimmedBackground();
   }
 
   _onViewButtonBoxPropertyChange(event) {

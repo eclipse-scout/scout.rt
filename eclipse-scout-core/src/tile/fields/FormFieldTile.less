@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,11 +9,29 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .tile.dashboard {
-  border: 1px solid @tile-default-border-color;
-  border-radius: @border-radius;
-  background-color: @tile-default-background-color;
+  border: none;
+  border-radius: @dashboard-tile-border-radius;
   color: @tile-default-color;
+  background-color: @tile-default-background-color;
   overflow: hidden;
+
+  #scout.double-drop-shadow(@spread1: 1px, @color1: @dashboard-tile-border-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
+
+  &.inverted {
+    #scout.double-drop-shadow(@spread1: 1px, @color1: @tile-default-inverted-background-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
+  }
+
+  &.inverted.color-alternative {
+    #scout.double-drop-shadow(@spread1: 1px, @color1: @tile-alternative-inverted-background-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
+  }
+
+  .dimmed-background & {
+    #scout.drop-shadow(@alpha: @dashboard-tile-drop-shadow-light-alpha);
+
+    &.inverted {
+      #scout.drop-shadow(@alpha: @dashboard-tile-drop-shadow-dark-alpha);
+    }
+  }
 
   & > .form-field {
     padding: 12px @tile-field-padding @tile-field-padding;
@@ -144,8 +162,6 @@
   }
 
   &.loading {
-    border-style: dashed;
-
     & > .form-field > label,
     & > .form-field > .mandatory-indicator,
     & > .form-field > .field,
@@ -160,8 +176,6 @@
   }
 
   &.inverted {
-    border-color: transparent;
-    border-radius: @border-radius;
     background-color: @tile-default-inverted-background-color;
     color: @tile-default-inverted-color;
 
@@ -213,11 +227,9 @@
         }
       }
     }
-
   }
 
   &.color-alternative {
-    border-color: @tile-alternative-border-color;
     background-color: @tile-alternative-background-color;
     color: @tile-alternative-color;
 
@@ -246,7 +258,6 @@
   }
 
   &.inverted.color-alternative {
-    border-color: transparent;
     background-color: @tile-alternative-inverted-background-color;
     color: @tile-alternative-inverted-color;
 
@@ -298,52 +309,27 @@
   }
 
   &.selected {
-    /* Use mix() instead of fade(), because the background is opaque */
-    background-color: mix(@control-background-color, @item-selection-background-color, 35%);
-
-    /* For selection we want a wider border but changing the border width would cause the content box to change.
-    To avoid this we create a pseudo element with a border as well. Then we have the border of the main element
-    plus the pseudo element's border leading to a 2px border. */
-    border: 1px solid @item-selection-border-color;
+    #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
 
     &.inverted {
-      background-color: mix(@tile-default-inverted-background-color, @tile-default-inverted-selection-background-color, 35%);
-      border-color: @tile-default-inverted-background-color;
-
-      &::before {
-        border-color: @tile-default-inverted-background-color;
-      }
+      #scout.double-drop-shadow(@spread1: 2px, @color1: @tile-default-inverted-background-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
     }
 
     &.color-alternative {
-      background-color: mix(@tile-alternative-background-color, @item-selection-background-color, 35%);
-      border-color: @item-selection-border-color;
-
-      &::before {
-        border-color: @item-selection-border-color;
-      }
+      #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
     }
 
     &.inverted.color-alternative {
-      background-color: mix(@tile-alternative-inverted-background-color, @tile-alternative-inverted-selection-background-color, 35%);
-      border-color: @tile-alternative-inverted-background-color;
-
-      &::before {
-        border-color: @tile-alternative-inverted-background-color;
-      }
+      #scout.double-drop-shadow(@spread1: 2px, @color1: @tile-alternative-inverted-background-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
     }
 
-    &::before {
-      content: '';
-      pointer-events: none;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: 1px solid @item-selection-border-color;
-      border-radius: @border-radius;
-      z-index: 1;
+
+    .dimmed-background & {
+      #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-light-alpha);
+
+      &.color-alternative {
+        #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-light-alpha);
+      }
     }
   }
 }
