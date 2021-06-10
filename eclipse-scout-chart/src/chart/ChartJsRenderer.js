@@ -55,6 +55,10 @@ let chartJsGlobalsInitialized = false;
 
 /**
  * @typedef Dataset
+ * @property {array|string} [backgroundColor]
+ * @property {array|string} [backgroundColorBackup]
+ * @property {array|string} [hoverBackgroundColor]
+ *
  * @property {array|string} [pointBackgroundColor]
  * @property {array|string} [pointHoverBackgroundColor]
  * @property {array|number} [pointRadius]
@@ -1704,14 +1708,14 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
     let update = false;
     if (this.resetDatasetAfterHover) {
-      this._adjustColors(config);
+      this._restoreBackgroundColor();
       this.resetDatasetAfterHover = false;
       update = true;
     }
     items.forEach(item => {
       let dataset = config.data.datasets[item._datasetIndex];
       if (scout.isOneOf((dataset.type || type), Chart.Type.LINE, Chart.Type.RADAR)) {
-        dataset.backgroundColor = dataset.hoverBackgroundColor;
+        this._setHoverBackgroundColor(dataset);
         this.resetDatasetAfterHover = true;
         update = true;
       }
@@ -1761,7 +1765,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let dataset = config.data.datasets[index],
       datasetType = dataset ? dataset.type : null;
     if ((datasetType || type) === Chart.Type.LINE) {
-      dataset.backgroundColor = dataset.hoverBackgroundColor;
+      this._setHoverBackgroundColor(dataset);
       this.chartJs.update();
     }
     this._updateHoverStyle(index, true);
@@ -1793,12 +1797,43 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let dataset = config.data.datasets[index],
       datasetType = dataset ? dataset.type : null;
     if ((datasetType || type) === Chart.Type.LINE) {
-      this._adjustColors(config);
+      this._restoreBackgroundColor(dataset);
       this.chartJs.update();
     }
     this._updateHoverStyle(index, false);
     this.chartJs.render();
     this.legendHoverDatasets.splice(this.legendHoverDatasets.indexOf(index), 1);
+  }
+
+  /**
+   * Sets the hover background color as the datasets background color.
+   * This little workaround is necessary for the line chart, which does not support a native hover effect.
+   * The previous background color will be backuped on the dataset property "backgroundColorBackup"
+   * and can be restored with {@link _restoreBackgroundColor}.
+   * @param {Dataset} dataset
+   */
+  _setHoverBackgroundColor(dataset) {
+    if (!dataset) {
+      return;
+    }
+    // backup the old background color first
+    dataset.backgroundColorBackup = dataset.backgroundColor;
+    // overwrite the current background color with the hover color
+    dataset.backgroundColor = dataset.hoverBackgroundColor;
+  }
+
+  /**
+   * Restores the background color of a dataset or of all datasets,
+   * if they were previously overwritten by {@link _setHoverBackgroundColor}.
+   * @param {Dataset} [dataset]
+   */
+  _restoreBackgroundColor(dataset) {
+    if (dataset) {
+      dataset.backgroundColor = dataset.backgroundColorBackup || dataset.backgroundColor;
+      delete dataset.backgroundColorBackup;
+    } else {
+      this.chartJs.config.data.datasets.forEach(dataset => this._restoreBackgroundColor(dataset));
+    }
   }
 
   _onLegendLeavePointer(event, item) {
