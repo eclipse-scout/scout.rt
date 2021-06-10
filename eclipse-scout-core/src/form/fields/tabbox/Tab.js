@@ -98,6 +98,7 @@ export default class Tab extends Widget {
 
   _renderLabel(label) {
     this.$label.textOrNbsp(this.label);
+    this.$label.attr('data-text', this.label);
     this.invalidateLayoutTree();
   }
 
@@ -219,7 +220,7 @@ export default class Tab extends Widget {
 
     // ensure to focus the selected tab before selecting the new tab.
     // The selection of a tab will remove the content of the previous selected tab.
-    // Problem: If the previous is the focus owner the focus will be transfered to body what ends in a scroll top.
+    // Problem: If the previous is the focus owner the focus will be transferred to body what ends in a scroll top.
     this.setTabbable(true);
     this.$container.focus();
 

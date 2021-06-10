@@ -45,8 +45,8 @@ export default class GroupBoxLayout extends AbstractLayout {
       htmlGbBody = this._htmlGbBody(),
       htmlMenuBar = this._htmlMenuBar(),
       tooltip = this.groupBox._tooltip(),
-      $groupBoxTitle = this.groupBox.$title,
-      $label = this.groupBox.$label,
+      $header = this.groupBox.$header,
+      $title = this.groupBox.$title,
       containerSize = htmlContainer.availableSize()
         .subtract(htmlContainer.insets());
 
@@ -69,24 +69,27 @@ export default class GroupBoxLayout extends AbstractLayout {
         menuBarSize = htmlMenuBar.prefSize({
           exact: true
         });
-        let titleSize = graphics.prefSize(this.groupBox.$title);
-        let titleLabelWidth = Math.ceil(graphics.prefSize(this.groupBox.$label, true).width) + 1;
+        let headerSize = graphics.prefSize($header);
+        let headerWidth = headerSize.width - statusWidth;
+        let $control = $header.children('.group-box-control');
+        if ($control.length > 0) {
+          headerWidth -= graphics.size($control, true).width;
+        }
+        let titleWidth = Math.ceil(graphics.prefSize($title, true).width) + 1;
         let menuBarWidth = menuBarSize.width;
-        let titleWidth = titleSize.width - statusWidth;
 
-        if ((titleLabelWidth + menuBarWidth) < titleWidth) {
-          // label and menu-bar both fit into the title
+        if ((titleWidth + menuBarWidth) < headerWidth) {
+          // title and menu-bar both fit into the title
           // let menu-bar use all the available width
-          menuBarWidth = Math.floor(titleWidth - titleLabelWidth);
+          menuBarWidth = Math.floor(headerWidth - titleWidth);
           menuBarSize.width = menuBarWidth;
-          $label.cssWidth('');
-
+          $title.cssWidth('');
         } else {
-          // label and menu-bar don't fit into the title
+          // title and menu-bar don't fit into the title
           // scale down until both fit into the title, try to keep the same width-ratio (r)
-          let scaleFactor = (titleLabelWidth + menuBarWidth) / titleWidth;
-          let rLabel = (titleLabelWidth / titleWidth) / scaleFactor;
-          let rMenuBar = (menuBarWidth / titleWidth) / scaleFactor;
+          let scaleFactor = (titleWidth + menuBarWidth) / headerWidth;
+          let rLabel = (titleWidth / headerWidth) / scaleFactor;
+          let rMenuBar = (menuBarWidth / headerWidth) / scaleFactor;
 
           if (rLabel < rMenuBar) {
             rLabel = Math.max(0.33, rLabel);
@@ -96,31 +99,27 @@ export default class GroupBoxLayout extends AbstractLayout {
             rLabel = 1.0 - rMenuBar;
           }
 
-          titleLabelWidth = rLabel * titleWidth;
-          menuBarWidth = rMenuBar * titleWidth;
+          titleWidth = rLabel * headerWidth;
+          menuBarWidth = rMenuBar * headerWidth;
 
           menuBarSize.width = Math.floor(menuBarWidth);
-          $label.cssWidth(Math.floor(titleLabelWidth));
+          $title.cssWidth(Math.floor(titleWidth));
         }
       } else {
         // position: TOP and BOTTOM
         menuBarSize = this._menuBarSize(htmlMenuBar, containerSize, statusWidth);
         menuBarHeight = menuBarSize.height;
-        setWidthForStatus($label);
+        setWidthForStatus($title);
       }
       htmlMenuBar.setSize(menuBarSize);
     } else {
-      setWidthForStatus($label);
+      setWidthForStatus($title);
     }
 
-    // Position of label and title
-    setWidthForStatus($groupBoxTitle);
-    if (statusPosition === FormField.StatusPosition.TOP) {
-      if (this.groupBox.menuBarPosition !== GroupBox.MenuBarPosition.TITLE) {
-        setWidthForStatus($label, statusWidth);
-      }
+    if (statusPosition !== FormField.StatusPosition.TOP) {
+      setWidthForStatus($header, statusWidth);
     } else {
-      setWidthForStatus($groupBoxTitle, statusWidth);
+      setWidthForStatus($header);
     }
 
     if (this.groupBox.notification) {
@@ -128,7 +127,7 @@ export default class GroupBoxLayout extends AbstractLayout {
     }
 
     gbBodySize = containerSize.subtract(htmlGbBody.margins());
-    gbBodySize.height -= this._titleHeight();
+    gbBodySize.height -= this._headerHeight();
     gbBodySize.height -= this._notificationHeight();
     gbBodySize.height -= menuBarHeight;
     $.log.isTraceEnabled() && $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
@@ -165,20 +164,22 @@ export default class GroupBoxLayout extends AbstractLayout {
       }),
       top = containerPadding.top,
       right = containerPadding.right,
-      $groupBoxTitle = this.groupBox.$title,
-      titleInnerHeight = $groupBoxTitle.innerHeight(),
+      $header = this.groupBox.$header,
+      headerInnerHeight = $header.innerHeight(),
       $status = this._$status(),
       statusMargins = graphics.margins($status),
       statusPosition = this.groupBox.statusPosition;
 
     $status.cssWidth(this._statusWidth);
     if (statusPosition === FormField.StatusPosition.DEFAULT) {
-      $status
-        .cssTop(top + $groupBoxTitle.cssMarginTop())
-        .cssRight(right)
-        .cssHeight(titleInnerHeight - statusMargins.vertical())
-        .cssLineHeight(titleInnerHeight - statusMargins.vertical());
+      top += $header.cssMarginTop();
     }
+
+    $status
+      .cssTop(top)
+      .cssRight(right)
+      .cssHeight(headerInnerHeight - statusMargins.vertical())
+      .cssLineHeight(headerInnerHeight - statusMargins.vertical());
   }
 
   preferredLayoutSize($container, options) {
@@ -226,7 +227,7 @@ export default class GroupBoxLayout extends AbstractLayout {
       prefSize = new Dimension(0, 0);
     }
     prefSize = prefSize.add(htmlContainer.insets());
-    prefSize.height += this._titleHeight();
+    prefSize.height += this._headerHeight();
     prefSize.height += this._notificationHeight(options);
 
     // predefined height or width in pixel override other values
@@ -244,8 +245,8 @@ export default class GroupBoxLayout extends AbstractLayout {
     return prefSize;
   }
 
-  _titleHeight() {
-    return graphics.prefSize(this.groupBox.$title, true).height;
+  _headerHeight() {
+    return graphics.prefSize(this.groupBox.$header, true).height;
   }
 
   _notificationHeight(options) {

@@ -35,12 +35,12 @@ export default class TabBoxLayout extends AbstractLayout {
   }
 
   layout($container) {
-    let containerSize, tabContentSize, tabAreaMargins, innerTabAreaSize,
+    let containerSize, tabContentSize, headerMargins, innerHeaderSize,
       htmlContainer = HtmlComponent.get($container),
       htmlTabContent = HtmlComponent.get(this._tabBox._$tabContent),
-      htmlTabArea = HtmlComponent.get(this._tabBox.header.$container),
-      tabAreaWidthHint = 0,
-      tabAreaSize = new Dimension(),
+      htmlHeader = HtmlComponent.get(this._tabBox.header.$container),
+      headerWidthHint = 0,
+      headerSize = new Dimension(),
       tooltip = this._tabBox._tooltip(),
       $status = this._tabBox.$status,
       statusPosition = this._tabBox.statusPosition;
@@ -48,30 +48,30 @@ export default class TabBoxLayout extends AbstractLayout {
     containerSize = htmlContainer.availableSize()
       .subtract(htmlContainer.insets());
 
-    if (htmlTabArea.isVisible()) {
-      tabAreaMargins = htmlTabArea.margins();
-      tabAreaWidthHint = containerSize.subtract(tabAreaMargins).width;
+    if (htmlHeader.isVisible()) {
+      headerMargins = htmlHeader.margins();
+      headerWidthHint = containerSize.subtract(headerMargins).width;
       if ($status && $status.isVisible()) {
         this._layoutStatus();
         if (statusPosition === FormField.StatusPosition.DEFAULT) {
-          tabAreaWidthHint -= (this._statusWidth + graphics.margins($status).horizontal());
+          headerWidthHint -= (this._statusWidth + graphics.margins($status).horizontal());
         }
       }
-      innerTabAreaSize = htmlTabArea.prefSize({
-        widthHint: tabAreaWidthHint
+      innerHeaderSize = htmlHeader.prefSize({
+        widthHint: headerWidthHint
       });
 
       if ($status && $status.isVisible()) {
-        this._layoutStatus(innerTabAreaSize.height);
+        this._layoutStatus(innerHeaderSize.height);
       }
 
-      innerTabAreaSize.width = tabAreaWidthHint;
-      htmlTabArea.setSize(innerTabAreaSize);
-      tabAreaSize = innerTabAreaSize.add(tabAreaMargins);
+      innerHeaderSize.width = headerWidthHint;
+      htmlHeader.setSize(innerHeaderSize);
+      headerSize = innerHeaderSize.add(headerMargins);
     }
 
     tabContentSize = containerSize.subtract(htmlTabContent.margins());
-    tabContentSize.height -= tabAreaSize.height;
+    tabContentSize.height -= headerSize.height;
     htmlTabContent.setSize(tabContentSize);
 
     // Make sure tooltip is at correct position after layouting, if there is one
@@ -87,7 +87,7 @@ export default class TabBoxLayout extends AbstractLayout {
       }),
       top = containerPadding.top,
       right = containerPadding.right,
-      $tabArea = this._tabBox.header.$container,
+      $header = this._tabBox.header.$container,
       $status = this._tabBox.$status,
       statusMargins = graphics.margins($status),
       statusTop = top,
@@ -95,7 +95,7 @@ export default class TabBoxLayout extends AbstractLayout {
       statusHeight = height - statusMargins.vertical();
 
     if (statusPosition === FormField.StatusPosition.DEFAULT) {
-      statusTop += $tabArea.cssMarginTop();
+      statusTop += $header.cssMarginTop();
     } else {
       statusHeight -= $status.cssBorderWidthY(); // status has a transparent border to align icon with text
     }
@@ -114,8 +114,8 @@ export default class TabBoxLayout extends AbstractLayout {
     options = options || {};
     let htmlContainer = HtmlComponent.get($container),
       htmlTabContent = HtmlComponent.get(this._tabBox._$tabContent),
-      htmlTabArea = HtmlComponent.get(this._tabBox.header.$container),
-      tabAreaSize = new Dimension(),
+      htmlHeader = HtmlComponent.get(this._tabBox.header.$container),
+      headerSize = new Dimension(),
       tabContentSize = new Dimension(),
       $status = this._tabBox.$status,
       statusPosition = this._tabBox.statusPosition,
@@ -124,16 +124,16 @@ export default class TabBoxLayout extends AbstractLayout {
     // HeightHint not supported
     options.heightHint = null;
 
-    if (htmlTabArea.isVisible()) {
+    if (htmlHeader.isVisible()) {
       if ($status && $status.isVisible()) {
         if (statusPosition === FormField.StatusPosition.DEFAULT) {
           headerWidthHint -= $status.outerWidth(true);
         }
       }
-      tabAreaSize = htmlTabArea.prefSize({
+      headerSize = htmlHeader.prefSize({
         widthHint: headerWidthHint
       })
-        .add(htmlTabArea.margins());
+        .add(htmlHeader.margins());
     }
 
     tabContentSize = htmlTabContent.prefSize(options)
@@ -141,7 +141,7 @@ export default class TabBoxLayout extends AbstractLayout {
       .add(htmlTabContent.margins());
 
     return new Dimension(
-      Math.max(tabAreaSize.width, tabContentSize.width),
-      tabContentSize.height + tabAreaSize.height);
+      Math.max(headerSize.width, tabContentSize.width),
+      tabContentSize.height + headerSize.height);
   }
 }

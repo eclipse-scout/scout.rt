@@ -68,6 +68,7 @@ export default class GroupBox extends CompositeField {
     this.staticMenus = [];
     this.responsive = null;
 
+    this.$header = null;
     this.$body = null;
     this.$title = null;
     this.$subLabel = null;
@@ -185,7 +186,7 @@ export default class GroupBox extends CompositeField {
       hAlign: HAlign.RIGHT,
       $drawingArea: function($drawingArea, event) {
         if (this.labelVisible) {
-          return this.$title;
+          return this.$header;
         }
         return this.$body;
       }.bind(this)
@@ -216,7 +217,9 @@ export default class GroupBox extends CompositeField {
   _render() {
     this.addContainer(this.$parent, this.mainBox ? 'root-group-box' : 'group-box');
 
-    this.$title = this.$container.appendDiv('group-box-title');
+    this.$header = this.$container.appendDiv('group-box-header');
+    this.$title = this.$header.appendDiv('title');
+    this.$borderBottom = this.$header.appendDiv('bottom-border');
     this.addLabel();
     this.addSubLabel();
     this.addStatus();
@@ -405,8 +408,8 @@ export default class GroupBox extends CompositeField {
       return;
     }
     if (this.statusPosition === FormField.StatusPosition.TOP) {
-      // move into title
-      this.$status.appendTo(this.$title);
+      // move into header
+      this.$status.appendTo(this.$header);
     } else {
       this.$status.appendTo(this.$container);
     }
@@ -547,10 +550,15 @@ export default class GroupBox extends CompositeField {
     this.menuBar.render();
     if (this.menuBarPosition === GroupBox.MenuBarPosition.TITLE) {
       // move right of title
-      this.menuBar.$container.insertAfter(this.$subLabel);
+      let $control = this.$header.children('.group-box-control');
+      if ($control.length > 0) {
+        this.menuBar.$container.insertAfter($control);
+      } else {
+        this.menuBar.$container.insertAfter(this.$title);
+      }
     } else if (this.menuBar.position === MenuBar.Position.TOP) {
-      // move below title
-      this.menuBar.$container.insertAfter(this.$title);
+      // move below header
+      this.menuBar.$container.insertAfter(this.$header);
     }
   }
 
@@ -565,7 +573,7 @@ export default class GroupBox extends CompositeField {
     }
 
     let hasMenubar = position === GroupBox.MenuBarPosition.TITLE;
-    this.$title.toggleClass('has-menubar', hasMenubar);
+    this.$header.toggleClass('has-menubar', hasMenubar);
 
     if (position === GroupBox.MenuBarPosition.BOTTOM) {
       this.menuBar.setPosition(MenuBar.Position.BOTTOM);
@@ -616,24 +624,25 @@ export default class GroupBox extends CompositeField {
 
   _renderExpandable() {
     let expandable = this.expandable;
-    let $control = this.$title.children('.group-box-control');
+    let $control = this.$header.children('.group-box-control');
 
     if (expandable) {
       if ($control.length === 0) {
         // Create control if necessary
         this.$container.makeDiv('group-box-control')
           .on('click', this._onControlClick.bind(this))
-          .insertAfter(this.$label);
+          .insertAfter(this.$title);
       }
-      this.$title
+      this.$header
         .addClass('expandable')
         .on('click.group-box-control', this._onControlClick.bind(this));
     } else {
       $control.remove();
-      this.$title
+      this.$header
         .removeClass('expandable')
         .off('.group-box-control');
     }
+    this.invalidateLayoutTree();
   }
 
   setExpanded(expanded) {
@@ -697,7 +706,7 @@ export default class GroupBox extends CompositeField {
    * @override FormField.js
    */
   _renderLabelVisible(labelVisible) {
-    this.$title.setVisible(this._computeTitleVisible(labelVisible));
+    this.$header.setVisible(this._computeTitleVisible(labelVisible));
     this._updateFieldStatus();
     if (this.menuBarPosition === GroupBox.MenuBarPosition.TITLE) {
       this.invalidateLayoutTree();

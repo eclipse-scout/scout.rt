@@ -55,7 +55,7 @@ describe('GroupBox', () => {
       let groupBox = createField(model);
       groupBox.render($('#sandbox'));
       expect($('#sandbox')).toContainElement('div.group-box');
-      expect($('#sandbox')).toContainElement('div.group-box-title');
+      expect($('#sandbox')).toContainElement('div.group-box-header');
     });
 
     it('renders controls initially if expanded', () => {
@@ -82,16 +82,16 @@ describe('GroupBox', () => {
 
       expect(groupBox.labelVisible).toBe(true);
       expect(groupBox._computeTitleVisible()).toBe(false);
-      expect(groupBox.$title.isVisible()).toBe(false);
+      expect(groupBox.$header.isVisible()).toBe(false);
       groupBox.setLabel('test');
       expect(groupBox.labelVisible).toBe(true);
       expect(groupBox._computeTitleVisible()).toBe(true);
-      expect(groupBox.$title.isVisible()).toBe(true);
+      expect(groupBox.$header.isVisible()).toBe(true);
       expect(groupBox.$title.text().trim()).toBe('test');
       groupBox.setLabelVisible(false);
       expect(groupBox.labelVisible).toBe(false);
       expect(groupBox._computeTitleVisible()).toBe(false);
-      expect(groupBox.$title.isVisible()).toBe(false);
+      expect(groupBox.$header.isVisible()).toBe(false);
       expect(groupBox.$title.text().trim()).toBe('test');
 
       // Test 2: render later
@@ -102,7 +102,7 @@ describe('GroupBox', () => {
       expect(groupBox2.labelVisible).toBe(true);
       expect(groupBox2._computeTitleVisible()).toBe(true);
       groupBox2.render();
-      expect(groupBox2.$title.isVisible()).toBe(true);
+      expect(groupBox2.$header.isVisible()).toBe(true);
       expect(groupBox2.$title.text().trim()).toBe('test2');
 
       // Cleanup

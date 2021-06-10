@@ -13,7 +13,7 @@
   overflow: hidden;
 
   & > .group-box-body,
-  & > .group-box-title {
+  & > .group-box-header {
     /* group-box-body may be scrollable. */
     /* that's why the body has a padding instead of the root-group-box (to place the scrollbars inside the body) */
     padding-left: @root-group-box-padding-left;
@@ -54,22 +54,26 @@
   }
 }
 
-.group-box-title {
+.group-box-header {
   width: calc(~'100% - ' @mandatory-indicator-width);
-  margin-top: @group-box-title-margin-top;
+  margin-top: @group-box-header-margin-top;
   margin-left: @mandatory-indicator-width;
-  border-bottom: @group-box-title-border-width solid @group-box-title-border-color;
-  #scout.overflow-ellipsis-nowrap();
-  padding: @group-box-title-padding-top 0 @group-box-title-padding-bottom 0;
   position: relative;
+  white-space: nowrap;
+  margin-bottom: @tab-area-border-width;
 
-  .group-box.has-sub-label > & {
-    padding-bottom: @group-box-title-with-sub-label-padding-bottom;
+  & > .bottom-border {
+    // Use element with background color instead of a bottom border to align it with tab box correctly (borders are drawn slightly different when zoomed)
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    margin-bottom: -@group-box-header-border-width;
+    width: 100%;
+    height: @group-box-header-border-width;
+    background-color: @border-color;
   }
 
   &.has-menubar {
-    padding-top: 6.25px;
-    padding-bottom: 6.25px;
 
     & > .menubar {
       display: inline-block;
@@ -89,10 +93,7 @@
     display: inline-block;
     color: @title-color;
     cursor: pointer;
-    /* adjust control position (use absolute positioning, otherwise the layout would be disturbed, */
-    /* because the control div is higher than the title span */
-    position: absolute;
-    padding-left: 15px;
+    padding-left: 10px;
     text-align: center;
     vertical-align: middle;
     width: @group-box-control-width;
@@ -100,36 +101,40 @@
     &::before {
       #scout.font-icon();
       font-size: @group-box-control-font-size;
-      line-height: @group-box-control-line-height;
-      font-weight: bold;
       content: @icon-angle-down-bold;
 
       .group-box.collapsed > & {
-        content: @icon-angle-up;
+        content: @icon-angle-up-bold;
       }
     }
   }
 
-  & > .label {
+  & > .title {
     display: inline-block;
     vertical-align: middle;
-    font-weight: bold;
-    color: @title-color;
-    #scout.overflow-ellipsis();
-    max-width: calc(~'100% - ' @group-box-control-width);
-  }
+    padding: @group-box-title-padding-top 0 @group-box-title-padding-bottom 0;
 
-  & > .sub-label {
-    font-size: @font-size-extra-small;
-    color: @text-disabled-color;
-    padding-top: 3px;
+    .group-box.has-sub-label > & {
+      padding-bottom: @group-box-title-with-sub-label-padding-bottom;
+    }
+
+    & > .label {
+      font-weight: @title-font-weight;
+      color: @title-color;
+      #scout.overflow-ellipsis();
+    }
+
+    & > .sub-label {
+      padding-top: 1px;
+      font-size: @sub-title-font-size;
+      letter-spacing: @sub-title-letter-spacing;
+      color: @sub-title-color;
+    }
   }
 
   & > .status {
+    position: absolute;
     margin-left: @field-status-margin-left;
-    padding: 4px 0;
-    display: inline-block;
-    vertical-align: middle;
     #scout.status();
   }
 

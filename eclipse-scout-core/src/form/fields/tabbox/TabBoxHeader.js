@@ -46,7 +46,7 @@ export default class TabBoxHeader extends Widget {
 
   _render() {
     this.$container = this.$parent.appendDiv('tab-box-header');
-    this.$borderBottom = this.$container.appendDiv('tab-box-header-bottom-border');
+    this.$borderBottom = this.$container.appendDiv('bottom-border');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new TabBoxHeaderLayout(this));
     this.tabArea.render(this.$container);

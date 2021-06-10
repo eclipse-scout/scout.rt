@@ -31,6 +31,9 @@
 @loading-fade-duration: 250ms;
 @mandatory-indicator-width: 10px;
 @mandatory-indicator-font-size: 15px;
+@field-label-font-size: @font-size-smaller;
+@field-label-padding-top: @borderless-field-padding-y + 1; // +1 Because label font is a little smaller than input font
+@field-label-padding-bottom: @borderless-field-padding-y;
 @field-label-width: 140px;
 @field-status-width: 20px;
 @field-status-margin-left: 10px;
@@ -158,15 +161,14 @@
 @form-title-margin-top: 10px;
 @group-collapse-icon-margin-top: -1px;
 @group-box-control-font-size: 16px;
-@group-box-control-line-height: 15px;
 @group-box-control-width: 25px;
 @group-box-body-padding-bottom: 16px;
-@group-box-body-padding-top: 14px;
-@group-box-title-border-width: 3px;
-@group-box-title-margin-top: 8px;
+@group-box-body-padding-top: 18px;
+@group-box-header-border-width: 1px;
+@group-box-header-margin-top: 8px;
 @group-box-title-padding-bottom: 12px;
 @group-box-title-padding-top: 12px;
-@group-box-title-with-sub-label-padding-bottom: 6px;
+@group-box-title-with-sub-label-padding-bottom: 7px;
 @login-box-font-size: 16px;
 @main-menubar-height: @desktop-header-height;
 @main-menubar-item-margin-x: 5px;
@@ -231,13 +233,16 @@
 @splitter-line-size: 2px;
 @splitter-size: 16px;
 @status-font-icon-size: 16px;
-@tab-area-border-width: 3px;
+@sub-title-letter-spacing: 0.5px;
+@sub-title-font-size: 11px;
+@tab-area-border-width: @group-box-header-border-width;
 @tab-item-focus-arrow-width: 15px;
 @tab-item-focus-arrow-padding-top: @tab-item-title-padding-top;
 @tab-item-padding-x: 20px;
+@tab-area-selection-marker-height: 3px;
 @tab-item-title-padding-bottom: @group-box-title-padding-bottom;
 @tab-item-title-padding-top: @group-box-title-padding-top;
-@tab-item-title-margin-top: @group-box-title-margin-top;
+@tab-item-title-margin-top: @group-box-header-margin-top;
 @table-cell-padding-left: 8px; /* also used in scout.Column.prototype.buildCell */
 @table-cell-padding-right: 4px; /* also used in scout.Column.prototype.buildCell */
 @table-cell-padding-right-last: @scrollbar-size;
@@ -269,6 +274,7 @@
 @tag-field-tag-margin-right: @tag-field-tag-margin-y;
 @tile-padding-y: 6px; /* Optimized for a tile height of 30px (logical-grid-height) */
 @tile-padding-x: 8px;
+@title-font-weight: @font-weight-bold;
 @tile-field-padding: 20px;
 @tile-field-compact-padding-y: 10px;
 @tile-field-compact-padding-x: 15px;

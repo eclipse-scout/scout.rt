@@ -91,10 +91,7 @@
 
   & > .field > .multiline-input {
     border-bottom-color: @border-color;
-    border-top-left-radius: @control-border-radius;
-    border-top-right-radius: @control-border-radius;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
+    border-radius: @control-border-radius @control-border-radius 0 0;
     width: 100%;
     padding-left: @text-field-padding-x;
 
@@ -106,22 +103,22 @@
       border-bottom-color: @error-border-color;
     }
 
-    &.alternative,
-    &.read-only {
-      border-bottom-color: @border-color;
-
-      &.has-error {
-        border-bottom-color: @error-border-color;
-      }
-    }
-
     &.alternative {
+      border-bottom-color: @text-field-alternative-border-color;
       padding-left: @text-field-alternative-padding-left;
       padding-right: @text-field-alternative-padding-right;
 
       &:focus {
         border-bottom-color: @focus-color;
       }
+
+      &.has-error {
+        border-bottom-color: @error-border-color;
+      }
+    }
+
+    &.read-only {
+      border-bottom-color: @border-color;
 
       &.has-error {
         border-bottom-color: @error-border-color;
@@ -134,10 +131,7 @@
   & > .field > .multiline-lines {
     background-color: @control-background-color;
     border: solid 1px @border-color;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: @control-border-radius;
-    border-bottom-left-radius: @control-border-radius;
+    border-radius: 0 0 @control-border-radius @control-border-radius;
     border-top: none;
     padding: 3px @text-field-padding-x;
     #scout.overflow-ellipsis-nowrap();

@@ -8,22 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-@tab-box-focus-arrow-margin-left: -4px; /* arrow-width / 2 */
-
-.tab-box {
-  & > .status {
-    margin-bottom: @tab-area-border-width;
-  }
-}
 
 .tab-box-header {
-  margin-top: @group-box-title-margin-top;
+  margin-top: @group-box-header-margin-top;
   margin-left: @mandatory-indicator-width;
   white-space: nowrap;
   position: relative;
   margin-bottom: @tab-area-border-width;
 
-  & > .tab-box-header-bottom-border {
+  & > .bottom-border {
     position: absolute;
     left: 0;
     bottom: 0;
@@ -34,25 +27,21 @@
   }
 
   & > .tab-area {
-    position: absolute;
-    #scout.vertical-align-helper-before();
+    position: relative;
 
     & > .selection-marker {
       position: absolute;
-      bottom: 0;
+      bottom: -1px;
       margin-bottom: -@tab-area-border-width;
-      height: @tab-area-border-width;
+      height: @tab-area-selection-marker-height;
       background-color: @tab-item-selection-marker-color;
       transition: left 0.3s, width 0.3s;
+      border-radius: @tab-area-selection-marker-height / 2;
     }
 
     &.focused {
       & > .tab-item.selected {
         color: @tab-item-focus-color;
-      }
-
-      & > .selection-marker {
-        background: @tab-item-selection-marker-focus-color;
       }
     }
 
@@ -114,8 +103,7 @@
 .tab-item {
   position: relative;
   display: inline-block;
-  vertical-align: bottom;
-  #scout.font-text-normal(@font-weight-bold);
+  vertical-align: middle;
   color: @tab-item-color;
   background-color: transparent;
   padding: 0 @tab-item-padding-x;
@@ -166,20 +154,32 @@
     vertical-align: middle;
     padding: @tab-item-title-padding-top 0 @tab-item-title-padding-bottom;
 
+    .tab-area.has-sub-label > & {
+      padding-bottom: @group-box-title-with-sub-label-padding-bottom;
+    }
+
     & > .label {
       vertical-align: middle;
+
+      // Before element is needed to enlarge the label so that the other tabs won't move when the tab is getting bold because it is selected
+      &::before {
+        content: attr(data-text);
+        display: block;
+        font-weight: @title-font-weight;
+        visibility: hidden;
+        height: 0;
+      }
+
+      .selected& {
+        font-weight: @title-font-weight;
+      }
     }
 
     & > .sub-label {
-      padding-top: 3px;
-      font-size: @font-size-extra-small;
-      color: @text-disabled-color;
-    }
-  }
-
-  .tab-area.has-sub-label > & {
-    & > .title {
-      padding-bottom: @group-box-title-with-sub-label-padding-bottom;
+      padding-top: 1px;
+      font-size: @sub-title-font-size;
+      letter-spacing: @sub-title-letter-spacing;
+      color: @sub-title-color;
     }
   }
 
@@ -215,7 +215,6 @@
 }
 
 .overflow-tab-item.menu-item {
-  font-weight: bold;
   vertical-align: middle;
   color: @tab-item-color;
 
@@ -225,14 +224,5 @@
 
   & > .submenu-icon {
     padding-left: 4px;
-  }
-
-  &:focus {
-    outline: none;
-    color: @focus-color;
-
-    & > .text {
-      text-decoration: underline;
-    }
   }
 }

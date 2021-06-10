@@ -62,10 +62,13 @@
 
   /* GroupBox.less */
 
-  .group-box-title {
+  .group-box-header {
     margin-top: 2px; /* @group-box-title-margin-top; */
-    padding-top: 4px; /* padding: @group-box-title-padding-top 0 @group-box-title-padding-bottom 0; */
-    padding-bottom: 4px;
+
+    & > .title {
+      padding-top: 4px; /* padding: @group-box-title-padding-top 0 @group-box-title-padding-bottom 0; */
+      padding-bottom: 4px;
+    }
   }
 
   .group-box-body {

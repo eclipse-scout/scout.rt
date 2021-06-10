@@ -17,6 +17,7 @@ body {
   overflow: hidden;
   cursor: default;
   color: @text-color;
+  letter-spacing: @letter-spacing;
   #scout.user-select(none);
   //noinspection CssInvalidPropertyValue
   -moz-user-select: -moz-none;
@@ -142,6 +143,7 @@ input,
 textarea,
 button {
   #scout.font-text-normal();
+  letter-spacing: @letter-spacing;
 }
 
 input,
@@ -196,7 +198,7 @@ input.alternative,
 .input-field.alternative {
   background-color: @text-field-alternative-background-color;
   border-color: transparent;
-  border-bottom-color: @border-color;
+  border-bottom-color: @text-field-alternative-border-color;
   border-radius: @control-alternative-border-radius;
   border-left-width: 0;
   border-right-width: 0;
@@ -599,7 +601,7 @@ a,
 .link,
 .app-link {
   color: @link-color;
-  text-decoration: underline;
+  text-decoration: none;
   cursor: pointer;
 
   &:hover {
@@ -612,6 +614,7 @@ a,
 
   &:focus {
     outline-color: @link-color;
+    #scout.box-shadow-focus();
   }
 }
 

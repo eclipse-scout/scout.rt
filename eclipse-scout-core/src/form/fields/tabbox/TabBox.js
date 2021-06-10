@@ -204,7 +204,7 @@ export default class TabBox extends CompositeField {
       return;
     }
     if (this.statusPosition === FormField.StatusPosition.TOP) {
-      // move into title
+      // move into header
       this.$status.appendTo(this.header.$container);
     } else {
       this.$status.appendTo(this.$container);

@@ -44,16 +44,17 @@
 
 @palette-gray-0: #FEFEFE;
 @palette-gray-1: #FAFAFA;
-@palette-gray-2: #F6F6F6;
+@palette-gray-2: #F5F5F5;
 @palette-gray-3: #EFEFEF;
-@palette-gray-4: #DDDDDD;
-@palette-gray-5: #CCCCCC;
+@palette-gray-4: #DADADA;
+@palette-gray-5: #CFCFCF;
+@palette-gray-5-1: #BABABA;
 @palette-gray-6: #999999;
 @palette-gray-6-1: #888888;
-@palette-gray-7: #666666;
+@palette-gray-7: #666666; // Minimal Accessible Gray
 @palette-gray-8: #5C5C5C;
-@palette-gray-9: #4C4C4C;
-@palette-gray-10: #333333;
+@palette-gray-9: #4C4C4C; // Dark Font
+@palette-gray-10: #262626;
 
 @palette-cyan-0: #DDFFF9;
 @palette-cyan-1: #BAF3E8;
@@ -79,7 +80,7 @@
 @application-loading-background-color: @palette-white;
 @application-loading01-color: fade(@palette-blue-5, 90%);
 @application-loading02-color: @palette-cyan-4;
-@background-color: @palette-gray-0;
+@background-color: @palette-white;
 @body-background-color: transparent;
 @border-color: @palette-gray-5;
 @control-background-color: @palette-white;
@@ -118,6 +119,8 @@
 @item-selection-nonfocus-background-color: @palette-gray-2;
 @item-selection-nonfocus-border-color: @palette-gray-5;
 @item-active-background-color: @palette-gray-2;
+@label-color: @palette-gray-7;
+@label-disabled-color: @palette-gray-6-1;
 @loading-indicator-knight-rider-color: @palette-blue-3;
 @panel-background-color: @palette-gray-2;
 @read-only-color: @text-color;
@@ -126,20 +129,21 @@
 @selected-color: @palette-white;
 @selected-hover-background-color: @palette-blue-6;
 @selected-with-popup-background-color: @active-background-color;
-@sub-title-color: @palette-gray-7;
-@text-color: @palette-gray-10;
+@sub-title-color: @label-color;
+@text-color: @palette-black;
 @text-disabled-color: @palette-gray-7;
 @text-selection-background-color: @palette-blue-6;
 @text-selection-color: @palette-white;
 @text-selection-disabled-background-color: @palette-gray-7;
 @text-selection-disabled-color: @palette-gray-3;
 @text-field-alternative-background-color: transparent;
+@text-field-alternative-border-color: @border-color;
 @text-field-alternative-disabled-border-color: @palette-gray-5;
 @text-field-icon-color: @palette-gray-6;
 @text-field-icon-error-color: @error-border-color;
 @text-field-icon-focus-color: @focus-border-color;
 @text-field-placeholder-color: @palette-gray-6;
-@title-color: @palette-gray-10;
+@title-color: @palette-black;
 
 /* -------------------------------- */
 /* Component specific colors        */
@@ -240,6 +244,7 @@
 @desktop-tab-background-color: transparent;
 @desktop-tab-flash-background-color: fade(@palette-black, 40%);
 @desktop-tab-sub-title-color: fade(@desktop-header-color, 70%);
+@desktop-tab-selected-color: @title-color;
 @desktop-tab-selected-sub-title-color: @sub-title-color;
 @desktop-tab-selected-save-needer-color: fade(@palette-black, 23%);
 @desktop-tab-selected-flash-background-color: darken(@simple-tab-selected-background-color, 20%);
@@ -252,7 +257,6 @@
 @filechooser-background-color: @control-background-color;
 @form-background-color: @background-color;
 @form-menu-popup-main-menubar-background-color: @menubar-background-color;
-@group-box-title-border-color: @border-color;
 @key-box-background-color: @palette-orange-2;
 @key-box-border-color: @key-box-background-color;
 @key-box-background-disabled-color: @palette-gray-5;
@@ -379,14 +383,13 @@
 @table-row-checked-selected-background-color: greyscale(@table-row-checked-selected-focus-background-color);
 @table-row-control-color: @tree-node-control-color;
 @tab-area-border-color: @border-color;
-@tab-item-color: @title-color;
-@tab-item-active-color: @active-color;
+@tab-item-color: @text-color;
+@tab-item-active-color: @tab-item-hover-color;
 @tab-item-focus-color: @palette-blue-4;
 @tab-item-hover-color: @hover-color;
-@tab-item-selected-color: @tab-item-active-color;
+@tab-item-selected-color: @title-color;
 @tab-item-marked-border-color: @palette-gray-6;
-@tab-item-selection-marker-color: @tab-item-selected-color;
-@tab-item-selection-marker-focus-color: @tab-item-focus-color;
+@tab-item-selection-marker-color: @selected-background-color;
 @tag-element-background-color: @palette-cyan-2;
 @tag-element-background-color-hover: @palette-cyan-3;
 @tag-icon-color: @palette-cyan-5;
@@ -467,7 +470,8 @@
 @tooltip-error-background-color: @error-background-color;
 @tooltip-error-border-color: @error-color;
 @tooltip-error-color: @error-color;
-@top-label-color: @palette-gray-6-1;
+@top-label-color: @label-color;
+@top-label-disabled-color: @label-disabled-color;
 @tree-node-active-background-color: @item-active-background-color;
 @tree-node-control-color: inherit;
 @view-tab-selected-color: @active-color;

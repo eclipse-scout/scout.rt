@@ -19,13 +19,13 @@
 
   & > .title {
     font-size: @font-size-plus;
-    font-weight: @font-weight-bold;
   }
 
   & > .sub-title {
     color: @desktop-tab-sub-title-color;
-    font-size: @font-size-small;
-    padding-top: 2px;
+    font-size: @font-size-smaller;
+    letter-spacing: 0.5px;
+    padding-top: 1px;
   }
 
   & > .status-container > .save-needer {
@@ -66,7 +66,8 @@
     border-radius: @desktop-tab-selected-border-radius @desktop-tab-selected-border-radius 0 0;
 
     & > .title {
-      color: @simple-tab-selected-color;
+      color: @desktop-tab-selected-color;
+      font-weight: @font-weight-bold;
     }
 
     & > .sub-title {

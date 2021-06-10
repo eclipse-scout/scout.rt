@@ -32,7 +32,7 @@ export default class TabItemLayout extends GroupBoxLayout {
     return menuBarSize;
   }
 
-  _titleHeight() {
+  _headerHeight() {
     return 0;
   }
 }

@@ -101,13 +101,10 @@ export default class TabBoxHeaderLayout extends AbstractLayout {
       statusSizeLarge = new Dimension(),
       tabArea = this.tabBoxHeader.tabArea,
       tabAreaMargins = tabArea.htmlComp.margins(),
-      tabAreaPrefSize,
       menuBar = this.tabBoxHeader.menuBar,
-      menuBarMargins = menuBar.htmlComp.margins(),
-      menuBarMinumumSize,
-      menuBarPrefSize;
+      menuBarMargins = menuBar.htmlComp.margins();
 
-    menuBarMinumumSize = menuBar.htmlComp.prefSize({
+    let menuBarMinSize = menuBar.htmlComp.prefSize({
       widthHint: 0
     });
 
@@ -119,14 +116,14 @@ export default class TabBoxHeaderLayout extends AbstractLayout {
       prefSize.height = Math.max(prefSize.height, statusSizeLarge.height);
     }
 
-    tabAreaPrefSize = tabArea.htmlComp.prefSize({
-      widthHint: wHint - menuBarMinumumSize.width - menuBarMargins.horizontal() - tabAreaMargins.horizontal() - statusSizeLarge.width
+    let tabAreaPrefSize = tabArea.htmlComp.prefSize({
+      widthHint: wHint - menuBarMinSize.width - menuBarMargins.horizontal() - tabAreaMargins.horizontal() - statusSizeLarge.width
     });
 
     prefSize.width += tabAreaPrefSize.width + tabAreaMargins.horizontal();
     prefSize.height = Math.max(prefSize.height, tabAreaPrefSize.height + tabAreaMargins.vertical());
 
-    menuBarPrefSize = menuBar.htmlComp.prefSize({
+    let menuBarPrefSize = menuBar.htmlComp.prefSize({
       widthHint: wHint - tabAreaPrefSize.width - tabAreaMargins.horizontal() - menuBarMargins.horizontal() - statusSizeLarge.width
     });
 
