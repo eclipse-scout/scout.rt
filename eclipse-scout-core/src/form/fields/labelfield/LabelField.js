@@ -17,6 +17,7 @@ export default class LabelField extends ValueField {
     this.htmlEnabled = false;
     this.selectable = true;
     this.wrapText = false;
+    this.preventInitialFocus = true;
   }
 
   /**
@@ -38,7 +39,14 @@ export default class LabelField extends ValueField {
   _renderProperties() {
     super._renderProperties();
     this._renderWrapText();
-    // TODO [7.0] cgu: render selectable
+    this._renderSelectable();
+  }
+
+  /**
+   * @override
+   */
+  _renderFocused() {
+    // NOP, don't add "focused" class. It doesn't look good when the label is highlighted but no cursor is visible.
   }
 
   /**
@@ -84,6 +92,19 @@ export default class LabelField extends ValueField {
   _renderWrapText() {
     this.$field.toggleClass('white-space-nowrap', !this.wrapText);
     this.invalidateLayoutTree();
+  }
+
+  setSelectable(selectable) {
+    this.setProperty('selectable', selectable);
+  }
+
+  _renderSelectable() {
+    this.$container.toggleClass('selectable', !!this.selectable);
+    // Allow this field to receive the focus when selecting text with the mouse. Otherwise, form
+    // keystrokes would no longer work because the focus would automatically be set to the desktop
+    // for lack of alternatives. The value -1 ensures the field is skipped when tabbing through
+    // all form fields.
+    this.$field.toggleAttr('tabindex', !!this.selectable, '-1');
   }
 
   _renderGridData() {

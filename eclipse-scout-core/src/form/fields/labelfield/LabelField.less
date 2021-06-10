@@ -8,11 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+.label-field {
+
+  &.selectable {
+    // The whole label-field must be selectable, otherwise focusUtils.js would bail out
+    // if a user starts a selection on the padding of the .label-field element and
+    // not exactly on the .field child element.
+    #scout.user-select(text);
+  }
+}
+
 .label-field > .field {
   padding-top: @borderless-field-padding-y;
   padding-bottom: @borderless-field-padding-y;
   margin-left: @mandatory-indicator-width;
-  #scout.user-select(text);
   #scout.overflow-ellipsis();
 
   &[placeholder]:empty::before {
@@ -33,6 +42,10 @@
 
   .bottom-padding-invisible& {
     padding-bottom: 0;
+  }
+
+  &:focus {
+    outline: none;
   }
 
   &.has-inner-alignment {

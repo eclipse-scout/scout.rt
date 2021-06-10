@@ -33,9 +33,14 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
  */
 public interface IHtmlField extends IValueField<String>, IAppLinkCapable, IHtmlCapable {
 
+  String PROP_SELECTABLE = "selectable";
   String PROP_SCROLL_BAR_ENABLED = "scrollBarEnabled";
   String PROP_SCROLL_TO_END = "scrollToEnd";
   String PROP_SCROLL_TO_ANCHOR = "scrollToAnchor";
+
+  void setSelectable(boolean selectable);
+
+  boolean isSelectable();
 
   void setScrollToAnchor(String anchorName);
 

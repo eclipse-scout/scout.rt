@@ -17,6 +17,7 @@ export default class HtmlField extends ValueField {
     super();
     this.scrollBarEnabled = false;
     this.preventInitialFocus = true;
+    this.selectable = true;
   }
 
   /**
@@ -41,6 +42,7 @@ export default class HtmlField extends ValueField {
 
     this._renderScrollBarEnabled();
     this._renderScrollToAnchor();
+    this._renderSelectable();
   }
 
   _readDisplayText() {
@@ -80,6 +82,13 @@ export default class HtmlField extends ValueField {
     this.invalidateLayoutTree();
   }
 
+  /**
+   * @override
+   */
+  _renderFocused() {
+    // NOP, don't add "focused" class. It doesn't look good when the label is highlighted but no cursor is visible.
+  }
+
   setScrollBarEnabled(scrollBarEnabled) {
     this.setProperty('scrollBarEnabled', scrollBarEnabled);
   }
@@ -104,6 +113,19 @@ export default class HtmlField extends ValueField {
         scrollbars.scrollTo(this.$field, anchorElem);
       }
     }
+  }
+
+  setSelectable(selectable) {
+    this.setProperty('selectable', selectable);
+  }
+
+  _renderSelectable() {
+    this.$container.toggleClass('selectable', !!this.selectable);
+    // Allow this field to receive the focus when selecting text with the mouse. Otherwise, form
+    // keystrokes would no longer work because the focus would automatically be set to the desktop
+    // for lack of alternatives. The value -1 ensures the field is skipped when tabbing through
+    // all form fields.
+    this.$field.toggleAttr('tabindex', !!this.selectable, '-1');
   }
 
   _onAppLinkAction(event) {

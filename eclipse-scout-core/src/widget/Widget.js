@@ -2092,17 +2092,25 @@ export default class Widget {
   }
 
   /**
-   * @return {boolean} true if the element is focusable, false if not.
+   * @param {boolean} [checkTabbable=true] if true, the widget has to be tabbable, not only focusable.
+   * @return {boolean} true if the element is focusable (and tabbable, unless checkTabbable is set to false), false if not.
    */
-  isFocusable() {
+  isFocusable(checkTabbable) {
     if (!this.rendered || !this.visible) {
       return false;
     }
     let elem = this.getFocusableElement();
-    if (elem) {
-      return $.ensure(elem).is(':focusable');
+    if (!elem) {
+      return false;
     }
-    return false;
+    let $elem = $.ensure(elem);
+    if (!$elem.is(':focusable')) {
+      return false;
+    }
+    if (scout.nvl(checkTabbable, true)) {
+      return $elem.is(':tabbable');
+    }
+    return true;
   }
 
   /**

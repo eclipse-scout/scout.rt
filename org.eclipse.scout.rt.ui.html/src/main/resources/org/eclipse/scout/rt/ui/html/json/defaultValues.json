@@ -168,7 +168,8 @@
     "LabelField": {
       "htmlEnabled": false,
       "selectable": true,
-      "wrapText": false
+      "wrapText": false,
+      "preventInitialFocus": true
     },
     "RadioButton": {
       "wrapText": false
@@ -352,6 +353,7 @@
     },
     "HtmlField": {
       "scrollBarEnabled": false,
+      "selectable": true,
       "preventInitialFocus": true
     },
     "BrowserField": {

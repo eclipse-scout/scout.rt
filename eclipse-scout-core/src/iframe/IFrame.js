@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, HtmlComponent, scout, Widget} from '../index';
+import {Device, events, HtmlComponent, keys, scout, Widget} from '../index';
 
 export default class IFrame extends Widget {
 
@@ -24,7 +24,6 @@ export default class IFrame extends Widget {
     // Don't wrap it when running in the chrome emulator (in that case isIosPlatform returns false)
     this.wrapIframe = Device.get().isIosPlatform();
     this.$iframe = null;
-    this._loadHandler = this._onLoad.bind(this);
   }
 
   _render() {
@@ -37,6 +36,8 @@ export default class IFrame extends Widget {
       this.$container = this.$iframe;
     }
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
+
+    this.$iframe.on('load', this._onLoad.bind(this));
   }
 
   /**
@@ -47,7 +48,6 @@ export default class IFrame extends Widget {
     this._renderScrollBarEnabled();
     this._renderSandboxEnabled(); // includes _renderSandboxPermissions()
     this._renderLocation(); // Needs to be after _renderScrollBarEnabled and _renderSandboxEnabled, see comment in _renderScrollBarEnabled
-    this._renderTrackLocation();
   }
 
   setLocation(location) {
@@ -65,31 +65,52 @@ export default class IFrame extends Widget {
     this.setProperty('trackLocation', trackLocation);
   }
 
-  _renderTrackLocation(trackLocation) {
-    if (this.trackLocation) {
-      this.$iframe.on('load', this._loadHandler);
-    } else {
-      this.$iframe.off('load', this._loadHandler);
+  _contentDocument() {
+    if (this.$iframe && this.$iframe[0]) {
+      return this.$iframe[0].contentDocument;
     }
+    return null;
   }
 
   _onLoad(event) {
     if (!this.rendered) { // check needed, because this is an async callback
       return;
     }
-
     if (this.trackLocation) {
-      let doc = this.$iframe[0].contentDocument;
-      if (!doc) {
-        // Doc can be null if website cannot be loaded or if website is not from same origin
-        return;
-      }
-      let location = doc.location.href;
-      if (location === 'about:blank') {
-        location = null;
-      }
-      this._setProperty('location', location);
+      this._updateLocation();
     }
+    this._propagateKeyEvents();
+  }
+
+  _updateLocation() {
+    let doc = this._contentDocument();
+    if (!doc) {
+      // Doc can be null if website cannot be loaded or if website is not from same origin
+      return;
+    }
+    let location = doc.location.href;
+    if (location === 'about:blank') {
+      location = null;
+    }
+    this._setProperty('location', location);
+  }
+
+  /**
+   * Make key strokes work even if pressed in the iframe
+   */
+  _propagateKeyEvents() {
+    let source = this._contentDocument();
+    if (!source) {
+      return;
+    }
+    let target = (this.wrapIframe ? this.$container[0] : this.$parent[0]);
+    if (!target) {
+      return;
+    }
+    events.addPropagationListener(source, target, ['keydown', 'keyup', 'keypress'], event => {
+      // Don't propagate TAB key strokes otherwise it would break tabbing inside the document.
+      return event.which !== keys.TAB;
+    });
   }
 
   setScrollBarEnabled(scrollBarEnabled) {

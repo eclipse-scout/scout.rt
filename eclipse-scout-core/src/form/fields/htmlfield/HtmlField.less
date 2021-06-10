@@ -9,13 +9,20 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .html-field {
-  /* whole html-field must be selectable, otherwise focusUtils.js would bail out
-     if a user starts a selection on the padding of the .html-field element and
-     not exactly on the .field child element. */
-  #scout.user-select(text);
+
+  &.selectable {
+    // The whole html-field must be selectable, otherwise focusUtils.js would bail out
+    // if a user starts a selection on the padding of the .html-field element and
+    // not exactly on the .field child element.
+    #scout.user-select(text);
+  }
 
   & > .field {
     margin-left: @mandatory-indicator-width;
     overflow: hidden;
+
+    &:focus {
+      outline: none;
+    }
   }
 }

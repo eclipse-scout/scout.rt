@@ -60,6 +60,12 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     return false;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(200)
+  protected boolean getConfiguredSelectable() {
+    return true;
+  }
+
   @Override
   protected boolean getConfiguredPreventInitialFocus() {
     return true;
@@ -79,6 +85,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     super.initConfig();
+    setSelectable(getConfiguredSelectable());
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
     setHtmlEnabled(true);
   }
@@ -162,6 +169,16 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   @Override
   public void removeAttachment(BinaryResource attachment) {
     m_attachmentSupport.removeAttachment(attachment);
+  }
+
+  @Override
+  public void setSelectable(boolean selectable) {
+    propertySupport.setPropertyBool(PROP_SELECTABLE, selectable);
+  }
+
+  @Override
+  public boolean isSelectable() {
+    return propertySupport.getPropertyBool(PROP_SELECTABLE);
   }
 
   @Override

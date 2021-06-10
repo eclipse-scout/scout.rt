@@ -70,6 +70,12 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
   }
 
   @Override
+  protected boolean getConfiguredPreventInitialFocus() {
+    // Selectable label fields can receive the focus, but this should only happen when the user selects text
+    return true;
+  }
+
+  @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     super.initConfig();

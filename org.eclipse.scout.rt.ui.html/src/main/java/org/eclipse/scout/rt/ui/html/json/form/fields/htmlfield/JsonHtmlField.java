@@ -54,7 +54,12 @@ public class JsonHtmlField<HTML_FIELD extends IHtmlField> extends JsonValueField
         return BinaryResourceUrlUtility.replaceImageUrls(JsonHtmlField.this, (String) value);
       }
     });
-
+    putJsonProperty(new JsonProperty<IHtmlField>(IHtmlField.PROP_SELECTABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isSelectable();
+      }
+    });
     putJsonProperty(new JsonProperty<IHtmlField>(IHtmlField.PROP_SCROLL_BAR_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
