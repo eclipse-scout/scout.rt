@@ -11,17 +11,10 @@
 package org.eclipse.scout.rt.dataobject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Wrapper for a generic list of values of type {@code V} inside a {@link DoEntity} object.
@@ -29,7 +22,7 @@ import java.util.stream.Stream;
  * @see DoEntity#doList(String) creator method
  */
 @SuppressWarnings("squid:S2333") // redundant final
-public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Iterable<V> {
+public final class DoList<V> extends AbstractDoCollection<V, List<V>> implements IDataObject {
 
   public DoList() {
     this(null, null);
@@ -43,15 +36,6 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
     DoList<V> doList = new DoList<>();
     doList.set(list);
     return doList;
-  }
-
-  /**
-   * @return modifiable list of all items, never {@code null}.
-   */
-  @Override
-  public List<V> get() {
-    create(); // DoList needs to be marked as created on first access, since list can be modified using getter
-    return super.get();
   }
 
   /**
@@ -73,105 +57,12 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
   }
 
   /**
-   * Appends the specified element to the end of this list.
-   */
-  public void add(V item) {
-    get().add(item);
-  }
-
-  /**
-   * Appends all of the elements in the specified collection to the end of this list, in the order that they are
-   * returned by the specified collection's iterator. Does not append any values if {@code items} is null.
-   */
-  public void addAll(Collection<? extends V> items) {
-    if (items != null) {
-      get().addAll(items);
-    }
-  }
-
-  /**
-   * Appends all of the elements in the specified array to the end of this list, in the order that they are contained in
-   * the array. Does not append any values if {@code items} is null.
-   */
-  @SafeVarargs
-  public final void addAll(@SuppressWarnings("unchecked") V... items) {
-    if (items != null) {
-      addAll(Arrays.asList(items));
-    }
-  }
-
-  /**
    * Removes the element at the specified position in this list.
    *
    * @return the element previously at the specified position
    */
   public V remove(int index) {
     return get().remove(index);
-  }
-
-  /**
-   * Removes the first occurrence of the specified element from this list, if it is present.
-   *
-   * @return {@code true} if this list changed as a result of the call
-   */
-  public boolean remove(V item) {
-    return get().remove(item);
-  }
-
-  /**
-   * Removes from this list all of its elements that are contained in the specified collection. Does not remove any
-   * values if {@code items} is null.
-   *
-   * @return {@code true} if this list changed as a result of the call
-   */
-  public boolean removeAll(Collection<? extends V> items) {
-    if (items != null) {
-      return get().removeAll(items);
-    }
-    return false;
-  }
-
-  /**
-   * Removes from this list all of its elements that are contained in the specified array. Does not remove any values if
-   * {@code items} is null.
-   *
-   * @return {@code true} if this list changed as a result of the call
-   */
-  @SafeVarargs
-  public final boolean removeAll(@SuppressWarnings("unchecked") V... items) {
-    if (items != null) {
-      return removeAll(Arrays.asList(items));
-    }
-    return false;
-  }
-
-  /**
-   * Replaces all items in this list with the given collection of new {@code items}. If {@code items} is {@code null},
-   * the list is cleared without adding any items.
-   */
-  public void updateAll(Collection<? extends V> items) {
-    clear();
-    addAll(items);
-  }
-
-  /**
-   * Replaces all items in this list with the given array of new {@code items}. If {@code items} is {@code null}, the
-   * list is cleared without adding any items.
-   */
-  @SafeVarargs
-  public final void updateAll(@SuppressWarnings("unchecked") V... items) {
-    clear();
-    addAll(items);
-  }
-
-  /**
-   * Removes all elements from this list.
-   */
-  public void clear() {
-    if (get().isEmpty()) {
-      return;
-    }
-    get().clear();
   }
 
   /**
@@ -186,39 +77,6 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
    */
   public V last() {
     return get().size() == 0 ? null : get(get().size() - 1);
-  }
-
-  /**
-   * @return the number of elements in this list
-   */
-  public int size() {
-    return get().size();
-  }
-
-  /**
-   * @return {@code true} if this list contains no elements, else {@code false}.
-   */
-  public boolean isEmpty() {
-    return get().isEmpty();
-  }
-
-  /**
-   * @return a sequential {@code Stream} with this list as its source.
-   */
-  public Stream<V> stream() {
-    return get().stream();
-  }
-
-  /**
-   * @return a possibly parallel {@code Stream} with this list as its source.
-   */
-  public Stream<V> parallelStream() {
-    return get().parallelStream();
-  }
-
-  @Override
-  public Iterator<V> iterator() {
-    return get().iterator();
   }
 
   /**
@@ -237,42 +95,7 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
     return list;
   }
 
-  /**
-   * @return the first list element which attribute given by the method reference is equal to the given value.
-   *         <code>null</code> is returned if there is no such list element.
-   */
-  public <VALUE> V findFirst(Function<V, DoValue<VALUE>> accessor, VALUE value) {
-    return findFirst(DoPredicates.eq(accessor, value));
-  }
-
-  /**
-   * @return the first list element that evaluates to <code>true</code> when applied to the given {@link Predicate}.
-   *         <code>null</code> is returned if there is no such list element.
-   */
-  public V findFirst(Predicate<V> predicate) {
-    return stream()
-        .filter(predicate)
-        .findFirst()
-        .orElse(null);
-  }
-
-  /**
-   * @return all list elements which attribute given by the method reference is equal to the given value. An empty list
-   *         is returned if there are no such elements.
-   */
-  public <VALUE> List<V> find(Function<V, DoValue<VALUE>> accessor, VALUE value) {
-    return find(DoPredicates.eq(accessor, value));
-  }
-
-  /**
-   * @return all list elements that are evaluating to <code>true</code> when applied to the given {@link Predicate}. An
-   *         empty list is returned if there are no such elements.
-   */
-  public List<V> find(Predicate<V> predicate) {
-    return stream()
-        .filter(predicate)
-        .collect(Collectors.toList());
-  }
+  // ArrayList already implemented hashCode/equals with considering element position, thus no need to override valueHashCode/valueEquals.
 
   @Override
   public String toString() {

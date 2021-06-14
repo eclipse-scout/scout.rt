@@ -10,12 +10,7 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,9 +24,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.rt.dataobject.DoList;
-import org.eclipse.scout.rt.dataobject.DoNode;
-import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Before;
 import org.junit.Test;
@@ -113,6 +105,14 @@ public class DoListTest {
     assertEquals(Collections.emptyList(), m_testDoList.get());
     assertTrue(m_testDoList.isEmpty());
     assertNotNull(m_testDoList.get());
+  }
+
+  @Test
+  public void testContains() {
+    assertTrue(m_testDoList.contains("foo"));
+    assertTrue(m_testDoList.contains("bar"));
+    assertTrue(m_testDoList.contains("baz"));
+    assertFalse(m_testDoList.contains("no"));
   }
 
   @Test
@@ -204,11 +204,11 @@ public class DoListTest {
     intList.add(1);
     intList.add(2);
     intList.add(3);
-    intList.remove(1);
+    intList.remove(1); // by index, 2 is removed
     assertEquals(Arrays.asList(1, 3), intList.get());
-    intList.remove(Integer.valueOf(3));
+    intList.remove(Integer.valueOf(3)); // by value
     assertEquals(Arrays.asList(1), intList.get());
-    intList.remove(Integer.valueOf(1));
+    intList.remove(Integer.valueOf(1)); // by value
     assertTrue(intList.isEmpty());
   }
 
@@ -394,7 +394,7 @@ public class DoListTest {
 
   @Test
   public void testParallelStream() {
-    CollectionUtility.equalsCollection(Arrays.asList("foo", "bar", "baz"), m_testDoList.parallelStream().collect(Collectors.toSet()), false);
+    assertTrue(CollectionUtility.equalsCollection(Arrays.asList("foo", "bar", "baz"), m_testDoList.parallelStream().collect(Collectors.toSet()), false));
   }
 
   @Test
@@ -430,14 +430,14 @@ public class DoListTest {
 
   @Test
   public void testFindFirst() {
-    assertEquals("bar", m_testDoList.findFirst((input) -> input.equals("bar")));
-    assertEquals(null, m_testDoList.findFirst((input) -> input.equals("myCustomSearchTerm")));
+    assertEquals("bar", m_testDoList.findFirst("bar"::equals));
+    assertNull(m_testDoList.findFirst("myCustomSearchTerm"::equals));
   }
 
   @Test
   public void testFind() {
-    assertEquals(Arrays.asList("bar"), m_testDoList.find((input) -> input.equals("bar")));
-    assertEquals(Arrays.asList("bar", "baz"), m_testDoList.find((input) -> input.equals("bar") || input.equals("baz")));
+    assertEquals(Arrays.asList("bar"), m_testDoList.find("bar"::equals));
+    assertEquals(Arrays.asList("bar", "baz"), m_testDoList.find((input) -> "bar".equals(input) || "baz".equals(input)));
   }
 
   @Test
@@ -467,7 +467,43 @@ public class DoListTest {
     assertEquals(list1, list2);
     assertEquals(list1.hashCode(), list2.hashCode());
 
-    assertFalse(list1.equals(null));
-    assertFalse(list1.equals(new Object()));
+    assertNotEquals(null, list1);
+    assertNotEquals(list1, new Object());
+
+    list1 = new DoList<>();
+    list1.add("foo");
+    list1.add("bar");
+
+    list2 = new DoList<>();
+    list2.add("bar");
+    list2.add("foo");
+
+    assertNotEquals(list1, list2); // order of elements is relevant for equality
+  }
+
+  @Test
+  public void testListBehavior() {
+    DoList<String> list = new DoList<>();
+    list.add("foo");
+    list.add("bar");
+    list.add("bar");
+    list.add("baz");
+
+    assertEquals(4, list.size());
+    assertEquals("foo", list.get(0));
+    assertEquals("bar", list.get(1));
+    assertEquals("bar", list.get(2));
+    assertEquals("baz", list.get(3));
+
+    list.remove("bar"); // remove first instance
+    assertEquals(3, list.size());
+    assertEquals("foo", list.get(0));
+    assertEquals("bar", list.get(1));
+    assertEquals("baz", list.get(2));
+
+    list.remove("bar"); // remove second instance
+    assertEquals(2, list.size());
+    assertEquals("foo", list.get(0));
+    assertEquals("baz", list.get(1));
   }
 }

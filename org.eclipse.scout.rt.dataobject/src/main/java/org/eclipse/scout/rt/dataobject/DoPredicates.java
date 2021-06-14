@@ -30,7 +30,6 @@ public final class DoPredicates {
    *
    * @param accessor
    *          method reference that resolves the {@link DoValue} of a {@link DoNode} (e.g. <code>MyEntity::id</code>).
-   * @param value
    */
   public static <VALUE, DO_NODE> Predicate<DO_NODE> eq(Function<DO_NODE, DoValue<VALUE>> accessor, VALUE value) {
     assertNotNull(accessor, "accessor must not be null");
@@ -42,7 +41,6 @@ public final class DoPredicates {
    *
    * @param accessor
    *          method reference that resolves the {@link DoValue} of a {@link DoNode} (e.g. <code>MyEntity::id</code>).
-   * @param value
    */
   public static <VALUE, DO_NODE> Predicate<DO_NODE> ne(Function<DO_NODE, DoValue<VALUE>> accessor, VALUE value) {
     return eq(accessor, value).negate();
@@ -53,7 +51,6 @@ public final class DoPredicates {
    *
    * @param accessor
    *          method reference that resolves the {@link DoValue} of a {@link DoNode} (e.g. <code>MyEntity::id</code>).
-   * @param value
    */
   public static <VALUE, DO_NODE> Predicate<DO_NODE> in(Function<DO_NODE, DoValue<VALUE>> accessor, Collection<VALUE> values) {
     assertNotNull(accessor, "accessor must not be null");
@@ -66,56 +63,59 @@ public final class DoPredicates {
    *
    * @param accessor
    *          method reference that resolves the {@link DoValue} of a {@link DoNode} (e.g. <code>MyEntity::id</code>).
-   * @param value
    */
   public static <VALUE, DO_NODE> Predicate<DO_NODE> notIn(Function<DO_NODE, DoValue<VALUE>> accessor, Collection<VALUE> values) {
     return in(accessor, values).negate();
   }
 
   /**
-   * Predicate testing the existence of a {@link DoNode} within a {@link DoList} which satisfies the given predicate.
+   * Predicate testing the existence of a {@link DoNode} within a DO collection ({@link DoList}, {@link DoSet},
+   * {@link DoCollection}) which satisfies the given predicate.
    *
-   * @param accessor
-   *          method reference that resolves the {@link DoList} of a {@link DoNode} (e.g. <code>MyEntity::items</code>).
-   * @param predicate
+   * @param collectionAccessor
+   *          method reference that resolves the DO collection ({@link DoList}, {@link DoSet}, {@link DoCollection}) of
+   *          a {@link DoNode} (e.g. <code>MyEntity::items</code>).
    */
-  public static <DO_NODE, LIST_NODE> Predicate<DO_NODE> exists(Function<DO_NODE, DoList<LIST_NODE>> listAccessor, Predicate<LIST_NODE> predicate) {
-    assertNotNull(listAccessor, "list accessor must not be null");
+  public static <DO_NODE, COLLECTION_ITEM> Predicate<DO_NODE> exists(Function<DO_NODE, IDoCollection<COLLECTION_ITEM, ?>> collectionAccessor, Predicate<COLLECTION_ITEM> predicate) {
+    assertNotNull(collectionAccessor, "collection accessor must not be null");
     assertNotNull(predicate, "predicate must not be null");
-    return n -> listAccessor.apply(n).findFirst(predicate) != null;
+    return n -> collectionAccessor.apply(n).findFirst(predicate) != null;
   }
 
   /**
-   * Predicate testing the absence of a {@link DoNode} within a {@link DoList} which satisfies the given predicate.
+   * Predicate testing the absence of a {@link DoNode} within a DO collection ({@link DoList}, {@link DoSet},
+   * {@link DoCollection}) which satisfies the given predicate.
    *
-   * @param accessor
-   *          method reference that resolves the {@link DoList} of a {@link DoNode} (e.g. <code>MyEntity::items</code>).
-   * @param predicate
+   * @param collectionAccessor
+   *          method reference that resolves the DO collection ({@link DoList}, {@link DoSet}, {@link DoCollection}) of
+   *          a {@link DoNode} (e.g. <code>MyEntity::items</code>).
    */
-  public static <DO_NODE, LIST_NODE> Predicate<DO_NODE> notExists(Function<DO_NODE, DoList<LIST_NODE>> listAccessor, Predicate<LIST_NODE> predicate) {
-    return exists(listAccessor, predicate).negate();
+  public static <DO_NODE, COLLECTION_ITEM> Predicate<DO_NODE> notExists(Function<DO_NODE, IDoCollection<COLLECTION_ITEM, ?>> collectionAccessor, Predicate<COLLECTION_ITEM> predicate) {
+    return exists(collectionAccessor, predicate).negate();
   }
 
   /**
-   * Predicate testing if the value of a particular {@link DoList} is empty.
+   * Predicate testing if the value of a particular DO collection ({@link DoList}, {@link DoSet}, {@link DoCollection})
+   * is empty.
    *
-   * @param accessor
-   *          method reference that resolves the {@link DoList} of a {@link DoNode} (e.g. <code>MyEntity::items</code>).
-   * @param predicate
+   * @param collectionAccessor
+   *          method reference that resolves the DO collection ({@link DoList}, {@link DoSet}, {@link DoCollection}) of
+   *          a {@link DoNode} (e.g. <code>MyEntity::items</code>).
    */
-  public static <DO_NODE, LIST_NODE> Predicate<DO_NODE> empty(Function<DO_NODE, DoList<LIST_NODE>> listAccessor) {
-    assertNotNull(listAccessor, "list accessor must not be null");
-    return n -> listAccessor.apply(n).get().isEmpty();
+  public static <DO_NODE, COLLECTION_ITEM> Predicate<DO_NODE> empty(Function<DO_NODE, IDoCollection<COLLECTION_ITEM, ?>> collectionAccessor) {
+    assertNotNull(collectionAccessor, "collection accessor must not be null");
+    return n -> collectionAccessor.apply(n).get().isEmpty();
   }
 
   /**
-   * Predicate testing if the value of a particular {@link DoList} is not empty.
+   * Predicate testing if the value of a particular DO collection ({@link DoList}, {@link DoSet}, {@link DoCollection})
+   * is not empty.
    *
-   * @param accessor
-   *          method reference that resolves the {@link DoList} of a {@link DoNode} (e.g. <code>MyEntity::items</code>).
-   * @param predicate
+   * @param collectionAccessor
+   *          method reference that resolves the DO collection ({@link DoList}, {@link DoSet}, {@link DoCollection}) of
+   *          a {@link DoNode} (e.g. <code>MyEntity::items</code>).
    */
-  public static <DO_NODE, LIST_NODE> Predicate<DO_NODE> notEmpty(Function<DO_NODE, DoList<LIST_NODE>> listAccessor) {
-    return empty(listAccessor).negate();
+  public static <DO_NODE, COLLECTION_ITEM> Predicate<DO_NODE> notEmpty(Function<DO_NODE, IDoCollection<COLLECTION_ITEM, ?>> collectionAccessor) {
+    return empty(collectionAccessor).negate();
   }
 }

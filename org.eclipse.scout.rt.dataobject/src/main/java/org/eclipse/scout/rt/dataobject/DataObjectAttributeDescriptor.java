@@ -38,7 +38,7 @@ public final class DataObjectAttributeDescriptor {
   }
 
   /**
-   * @return {@link DoValue<T>} or {@link DoList<T>} parameterized type of attribute.
+   * @return {@link DoValue}, {@link DoList}, {@link DoSet} or {@link DoCollection} parameterized type of attribute.
    */
   public ParameterizedType getType() {
     return m_type;

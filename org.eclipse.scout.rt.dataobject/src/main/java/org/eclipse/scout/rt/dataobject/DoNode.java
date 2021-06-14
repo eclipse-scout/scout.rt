@@ -16,7 +16,8 @@ import java.util.function.Consumer;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
- * This is the base type for all building blocks of of a data object such as {@link DoValue} and {@link DoList}.
+ * This is the base type for all building blocks of of a data object such as {@link DoValue}, {@link DoList},
+ * {@link DoSet} and {@link DoCollection}.
  */
 public class DoNode<T> {
 
@@ -56,7 +57,7 @@ public class DoNode<T> {
   }
 
   /**
-   * @return set value of this node
+   * Set value of this node.
    */
   public void set(T newValue) {
     create();
@@ -97,8 +98,18 @@ public class DoNode<T> {
     // treat exists() (e.g. member variable m_lazyCreate) as boolean value (null/not null) for hash code
     result = prime * result + (exists() ? 1231 : 1237);
     result = prime * result + ((m_attributeName == null) ? 0 : m_attributeName.hashCode());
-    result = prime * result + ((m_value == null) ? 0 : m_value.hashCode());
+    result = prime * result + valueHashCode();
     return result;
+  }
+
+  /**
+   * Returns a hash code value for {@link #m_value}.
+   * <p>
+   * Subclasses might need to override this method in order to provide a more suitable hashcode implementation then the
+   * default one. If overridden, make sure to override {@link #valueEquals(DoNode)} too.
+   */
+  protected int valueHashCode() {
+    return (m_value == null) ? 0 : m_value.hashCode();
   }
 
   @Override
@@ -125,6 +136,16 @@ public class DoNode<T> {
     else if (!m_attributeName.equals(other.m_attributeName)) {
       return false;
     }
+    return valueEquals(other);
+  }
+
+  /**
+   * Indicates whether {@link #m_value} is equal to the value of the other node.
+   * <p>
+   * Subclasses might need to override this method in order to provide a more suitable equals implementation then the
+   * default one. If overridden, make sure to override {@link #valueHashCode()} too.
+   */
+  protected boolean valueEquals(DoNode other) {
     return ObjectUtility.equals(m_value, other.m_value);
   }
 }

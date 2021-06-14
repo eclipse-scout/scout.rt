@@ -31,7 +31,9 @@ import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.dataobject.DataObjectAttributeDescriptor;
 import org.eclipse.scout.rt.dataobject.DataObjectInventory;
+import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
@@ -52,6 +54,7 @@ import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -331,7 +334,8 @@ public class DataObjectSignatureGenerator {
       type = attributeType.getActualTypeArguments()[0];
       list = false;
     }
-    else if (DoList.class.equals(rawType)) {
+    else if (ObjectUtility.isOneOf(rawType, DoList.class, DoSet.class, DoCollection.class)) {
+      // handling DoList, DoSet and DoCollection the same (no distinction) because serialized output is compatible (semantic changes only)
       type = attributeType.getActualTypeArguments()[0];
       list = true;
     }

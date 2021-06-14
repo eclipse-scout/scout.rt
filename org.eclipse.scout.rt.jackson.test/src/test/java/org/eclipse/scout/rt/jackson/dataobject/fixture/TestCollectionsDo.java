@@ -12,11 +12,14 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
+import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
@@ -48,8 +51,8 @@ public class TestCollectionsDo extends DoEntity {
 
   // collection of items attributes
 
-  public DoValue<Collection<TestItemDo>> itemDoCollectionAttribute() {
-    return doValue("itemDoCollectionAttribute");
+  public DoValue<Collection<TestItemDo>> itemCollectionAttribute() {
+    return doValue("itemCollectionAttribute");
   }
 
   public DoValue<Collection<TestItemPojo>> itemPojoCollectionAttribute() {
@@ -68,6 +71,34 @@ public class TestCollectionsDo extends DoEntity {
 
   public DoList<TestItemPojo2> itemPojo2DoListAttribute() {
     return doList("itemPojo2DoListAttribute");
+  }
+
+  // DoSet of items attributes
+
+  public DoSet<TestItemDo> itemDoSetAttribute() {
+    return doSet("itemDoSetAttribute");
+  }
+
+  public DoSet<TestItemPojo> itemPojoDoSetAttribute() {
+    return doSet("itemPojoDoSetAttribute");
+  }
+
+  public DoSet<TestItemPojo2> itemPojo2DoSetAttribute() {
+    return doSet("itemPojo2DoSetAttribute");
+  }
+
+  // DoCollection of items attributes
+
+  public DoCollection<TestItemDo> itemDoCollectionAttribute() {
+    return doCollection("itemDoCollectionAttribute");
+  }
+
+  public DoCollection<TestItemPojo> itemPojoDoCollectionAttribute() {
+    return doCollection("itemPojoDoCollectionAttribute");
+  }
+
+  public DoCollection<TestItemPojo2> itemPojo2DoCollectionAttribute() {
+    return doCollection("itemPojo2DoCollectionAttribute");
   }
 
   /* **************************************************************************
@@ -119,14 +150,14 @@ public class TestCollectionsDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public TestCollectionsDo withItemDoCollectionAttribute(Collection<TestItemDo> itemDoCollectionAttribute) {
-    itemDoCollectionAttribute().set(itemDoCollectionAttribute);
+  public TestCollectionsDo withItemCollectionAttribute(Collection<TestItemDo> itemCollectionAttribute) {
+    itemCollectionAttribute().set(itemCollectionAttribute);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public Collection<TestItemDo> getItemDoCollectionAttribute() {
-    return itemDoCollectionAttribute().get();
+  public Collection<TestItemDo> getItemCollectionAttribute() {
+    return itemCollectionAttribute().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
@@ -189,5 +220,107 @@ public class TestCollectionsDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public List<TestItemPojo2> getItemPojo2DoListAttribute() {
     return itemPojo2DoListAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemDoSetAttribute(Collection<? extends TestItemDo> itemDoSetAttribute) {
+    itemDoSetAttribute().updateAll(itemDoSetAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemDoSetAttribute(TestItemDo... itemDoSetAttribute) {
+    itemDoSetAttribute().updateAll(itemDoSetAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Set<TestItemDo> getItemDoSetAttribute() {
+    return itemDoSetAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemPojoDoSetAttribute(Collection<? extends TestItemPojo> itemPojoDoSetAttribute) {
+    itemPojoDoSetAttribute().updateAll(itemPojoDoSetAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemPojoDoSetAttribute(TestItemPojo... itemPojoDoSetAttribute) {
+    itemPojoDoSetAttribute().updateAll(itemPojoDoSetAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Set<TestItemPojo> getItemPojoDoSetAttribute() {
+    return itemPojoDoSetAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemPojo2DoSetAttribute(Collection<? extends TestItemPojo2> itemPojo2DoSetAttribute) {
+    itemPojo2DoSetAttribute().updateAll(itemPojo2DoSetAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemPojo2DoSetAttribute(TestItemPojo2... itemPojo2DoSetAttribute) {
+    itemPojo2DoSetAttribute().updateAll(itemPojo2DoSetAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Set<TestItemPojo2> getItemPojo2DoSetAttribute() {
+    return itemPojo2DoSetAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemDoCollectionAttribute(Collection<? extends TestItemDo> itemDoCollectionAttribute) {
+    itemDoCollectionAttribute().updateAll(itemDoCollectionAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemDoCollectionAttribute(TestItemDo... itemDoCollectionAttribute) {
+    itemDoCollectionAttribute().updateAll(itemDoCollectionAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Collection<TestItemDo> getItemDoCollectionAttribute() {
+    return itemDoCollectionAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemPojoDoCollectionAttribute(Collection<? extends TestItemPojo> itemPojoDoCollectionAttribute) {
+    itemPojoDoCollectionAttribute().updateAll(itemPojoDoCollectionAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemPojoDoCollectionAttribute(TestItemPojo... itemPojoDoCollectionAttribute) {
+    itemPojoDoCollectionAttribute().updateAll(itemPojoDoCollectionAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Collection<TestItemPojo> getItemPojoDoCollectionAttribute() {
+    return itemPojoDoCollectionAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemPojo2DoCollectionAttribute(Collection<? extends TestItemPojo2> itemPojo2DoCollectionAttribute) {
+    itemPojo2DoCollectionAttribute().updateAll(itemPojo2DoCollectionAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestCollectionsDo withItemPojo2DoCollectionAttribute(TestItemPojo2... itemPojo2DoCollectionAttribute) {
+    itemPojo2DoCollectionAttribute().updateAll(itemPojo2DoCollectionAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Collection<TestItemPojo2> getItemPojo2DoCollectionAttribute() {
+    return itemPojo2DoCollectionAttribute().get();
   }
 }

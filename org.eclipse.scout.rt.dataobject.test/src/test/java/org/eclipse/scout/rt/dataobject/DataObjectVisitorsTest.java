@@ -212,7 +212,20 @@ public class DataObjectVisitorsTest {
 
   @Test
   public void testReplaceEach_replaceAll_DoList() {
-    DoList<OtherEntityFixtureDo> entites = new DoList<>();
+    testReplaceEach_replaceAll_IDoCollection(new DoList<>());
+  }
+
+  @Test
+  public void testReplaceEach_replaceAll_DoSet() {
+    testReplaceEach_replaceAll_IDoCollection(new DoSet<>());
+  }
+
+  @Test
+  public void testReplaceEach_replaceAll_DoCollection() {
+    testReplaceEach_replaceAll_IDoCollection(new DoCollection<>());
+  }
+
+  protected void testReplaceEach_replaceAll_IDoCollection(IDoCollection<OtherEntityFixtureDo, ?> entites) {
     entites.add(BEANS.get(OtherEntityFixtureDo.class).withId("id1"));
     entites.add(BEANS.get(OtherEntityFixtureDo.class).withId("id2"));
 

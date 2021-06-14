@@ -13,7 +13,9 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.util.Date;
 import java.util.Locale;
 
+import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
@@ -76,7 +78,13 @@ public class DataObjectDeserializers extends Deserializers.Base {
       return new DoEntityDeserializer(m_moduleContext, type);
     }
     else if (DoList.class.isAssignableFrom(rawClass)) {
-      return new DoListDeserializer(type);
+      return new DoCollectionDeserializer<>(type, DoList::new);
+    }
+    else if (DoSet.class.isAssignableFrom(rawClass)) {
+      return new DoCollectionDeserializer<>(type, DoSet::new);
+    }
+    else if (DoCollection.class.isAssignableFrom(rawClass)) {
+      return new DoCollectionDeserializer<>(type, DoCollection::new);
     }
     else if (Date.class.isAssignableFrom(rawClass)) {
       return new DoDateDeserializer();

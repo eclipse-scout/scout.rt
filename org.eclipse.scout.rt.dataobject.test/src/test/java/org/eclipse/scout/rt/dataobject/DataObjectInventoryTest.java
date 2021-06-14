@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
+import org.eclipse.scout.rt.dataobject.fixture.CollectionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0;
 import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0_034;
 import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0_Duplicate;
@@ -29,6 +30,7 @@ import org.eclipse.scout.rt.dataobject.fixture.OtherEntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ProjectFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ProjectSubFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ScoutFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.SimpleFixtureDo;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -181,6 +183,22 @@ public class DataObjectInventoryTest {
     assertEquals(DoList.class, attributeDescription.get().getType().getRawType());
     assertEquals(Integer.class, attributeDescription.get().getType().getActualTypeArguments()[0]);
     assertEquals(DateFixtureDo.class.getMethod("_list"), attributeDescription.get().getAccessor());
+    assertFalse(attributeDescription.get().getFormatPattern().isPresent());
+
+    attributeDescription = m_inventory.getAttributeDescription(CollectionFixtureDo.class, "simpleDoSet");
+    assertTrue(attributeDescription.isPresent());
+    assertEquals("simpleDoSet", attributeDescription.get().getName());
+    assertEquals(DoSet.class, attributeDescription.get().getType().getRawType());
+    assertEquals(SimpleFixtureDo.class, attributeDescription.get().getType().getActualTypeArguments()[0]);
+    assertEquals(CollectionFixtureDo.class.getMethod("simpleDoSet"), attributeDescription.get().getAccessor());
+    assertFalse(attributeDescription.get().getFormatPattern().isPresent());
+
+    attributeDescription = m_inventory.getAttributeDescription(CollectionFixtureDo.class, "simpleDoCollection");
+    assertTrue(attributeDescription.isPresent());
+    assertEquals("simpleDoCollection", attributeDescription.get().getName());
+    assertEquals(DoCollection.class, attributeDescription.get().getType().getRawType());
+    assertEquals(SimpleFixtureDo.class, attributeDescription.get().getType().getActualTypeArguments()[0]);
+    assertEquals(CollectionFixtureDo.class.getMethod("simpleDoCollection"), attributeDescription.get().getAccessor());
     assertFalse(attributeDescription.get().getFormatPattern().isPresent());
 
     assertFalse(m_inventory.getAttributeDescription(EntityFixtureDo.class, "foo").isPresent());

@@ -13,9 +13,12 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -26,11 +29,11 @@ public final class TypeFactoryUtility {
   }
 
   /**
-   * @return Jackson {@link JavaType} representing the declared {@link ParameterizedType} of {@link DoValue} or
-   *         {@link DoList} type.
+   * @return Jackson {@link JavaType} representing the declared {@link ParameterizedType} of {@link DoValue},
+   *         {@link DoList}, {@link DoSet} or a {@link DoCollection} type.
    */
   public static JavaType toJavaType(ParameterizedType parametrizedType) {
-    if (DoList.class == parametrizedType.getRawType()) {
+    if (ObjectUtility.isOneOf(parametrizedType.getRawType(), DoList.class, DoSet.class, DoCollection.class)) {
       JavaType listItemsType = TypeFactory.defaultInstance().constructType(parametrizedType.getActualTypeArguments()[0]);
       return TypeFactory.defaultInstance().constructParametricType((Class<?>) parametrizedType.getRawType(), listItemsType);
     }
@@ -38,6 +41,6 @@ public final class TypeFactoryUtility {
       Type typeArg = parametrizedType.getActualTypeArguments()[0];
       return TypeFactory.defaultInstance().constructType(typeArg);
     }
-    throw new PlatformException("Could not convert type {}, only DoValue<?> and DoList<?> supported", parametrizedType);
+    throw new PlatformException("Could not convert type {}, only DoValue<?>, DoList<?>, DoSet<?> and DoCollection<?> supported", parametrizedType);
   }
 }

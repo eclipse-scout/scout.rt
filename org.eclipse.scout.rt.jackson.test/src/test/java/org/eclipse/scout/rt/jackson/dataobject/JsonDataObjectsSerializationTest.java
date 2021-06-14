@@ -14,6 +14,7 @@ import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqual
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -37,10 +38,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.scout.rt.dataobject.DataObjectHelper;
+import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDataObject;
+import org.eclipse.scout.rt.dataobject.IDoCollection;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo;
@@ -113,6 +117,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -1033,54 +1038,140 @@ public class JsonDataObjectsSerializationTest {
 
   @Test
   public void testSerialize_EmptyDoList() throws Exception {
-    DoList<String> list = new DoList<>();
-    String json = s_dataObjectMapper.writeValueAsString(list);
-    assertJsonEquals("TestEmptyDoList.json", json);
+    testSerialize_EmptyDoCollection(new DoList<>());
+  }
+
+  @Test
+  public void testSerialize_EmptyDoSet() throws Exception {
+    testSerialize_EmptyDoCollection(new DoSet<>());
+  }
+
+  @Test
+  public void testSerialize_EmptyDoCollection() throws Exception {
+    testSerialize_EmptyDoCollection(new DoCollection<>());
+  }
+
+  protected void testSerialize_EmptyDoCollection(IDoCollection<String, ?> collection) throws JsonProcessingException {
+    String json = s_dataObjectMapper.writeValueAsString(collection);
+    assertJsonEquals("TestEmptyDoCollection.json", json);
   }
 
   @Test
   public void testDeserialize_EmptyDoList() throws Exception {
-    String json = readResourceAsString("TestEmptyDoList.json");
-    DoList<?> testDo = s_dataObjectMapper.readValue(json, DoList.class);
+    testDeserialize_EmptyIDoCollection(DoList.class);
+  }
+
+  @Test
+  public void testDeserialize_EmptyDoSet() throws Exception {
+    testDeserialize_EmptyIDoCollection(DoSet.class);
+  }
+
+  @Test
+  public void testDeserialize_EmptyDoCollection() throws Exception {
+    testDeserialize_EmptyIDoCollection(DoCollection.class);
+  }
+
+  protected <DO_COLLECTION extends IDoCollection> void testDeserialize_EmptyIDoCollection(Class<DO_COLLECTION> doCollectionClass) throws IOException {
+    String json = readResourceAsString("TestEmptyDoCollection.json");
+    DO_COLLECTION testDo = s_dataObjectMapper.readValue(json, doCollectionClass);
     assertTrue(testDo.isEmpty());
   }
 
   @Test
   public void testSerialize_StringDoList() throws Exception {
-    DoList<String> list = new DoList<>();
-    list.add("foo");
-    String json = s_dataObjectMapper.writeValueAsString(list);
-    assertJsonEquals("TestStringDoList.json", json);
+    testSerialize_StringIDoCollection(new DoList<>());
+  }
+
+  @Test
+  public void testSerialize_StringDoSet() throws Exception {
+    testSerialize_StringIDoCollection(new DoSet<>());
+  }
+
+  @Test
+  public void testSerialize_StringDoCollection() throws Exception {
+    testSerialize_StringIDoCollection(new DoCollection<>());
+  }
+
+  protected void testSerialize_StringIDoCollection(IDoCollection<String, ?> collection) throws JsonProcessingException {
+    collection.add("foo");
+    String json = s_dataObjectMapper.writeValueAsString(collection);
+    assertJsonEquals("TestStringDoCollection.json", json);
   }
 
   @Test
   public void testDeserialize_StringDoList() throws Exception {
-    String json = readResourceAsString("TestStringDoList.json");
-    @SuppressWarnings("unchecked")
-    DoList<String> testDo = s_dataObjectMapper.readValue(json, DoList.class);
-    assertEquals("foo", testDo.get(0));
+    testDeserialize_StringIDoCollection(DoList.class);
+  }
+
+  @Test
+  public void testDeserialize_StringDoSet() throws Exception {
+    testDeserialize_StringIDoCollection(DoSet.class);
+  }
+
+  @Test
+  public void testDeserialize_StringDoCollection() throws Exception {
+    testDeserialize_StringIDoCollection(DoCollection.class);
+  }
+
+  protected <DO_COLLECTION extends IDoCollection> void testDeserialize_StringIDoCollection(Class<DO_COLLECTION> doCollectionClass) throws IOException {
+    String json = readResourceAsString("TestStringDoCollection.json");
+    DO_COLLECTION testDo = s_dataObjectMapper.readValue(json, doCollectionClass);
+    assertEquals(1, testDo.size());
+    assertEquals("foo", testDo.iterator().next());
   }
 
   @Test
   public void testSerialize_TestItemDoList() throws Exception {
-    DoList<TestItemDo> list = new DoList<>();
-    list.add(createTestItemDo("foo", "bar"));
-    String json = s_dataObjectMapper.writeValueAsString(list);
-    assertJsonEquals("TestItemDoList.json", json);
+    testSerialize_TestItemIDoCollection(new DoList<>());
+  }
+
+  @Test
+  public void testSerialize_TestItemDoSet() throws Exception {
+    testSerialize_TestItemIDoCollection(new DoSet<>());
+  }
+
+  @Test
+  public void testSerialize_TestItemDoCollection() throws Exception {
+    testSerialize_TestItemIDoCollection(new DoCollection<>());
+  }
+
+  protected void testSerialize_TestItemIDoCollection(IDoCollection<TestItemDo, ?> collection) throws JsonProcessingException {
+    collection.add(createTestItemDo("foo", "bar"));
+    String json = s_dataObjectMapper.writeValueAsString(collection);
+    assertJsonEquals("TestItemDoCollection.json", json);
   }
 
   @Test
   public void testDeserialize_TestItemDoList() throws Exception {
-    String json = readResourceAsString("TestItemDoList.json");
+    //noinspection unchecked
+    testDeserialize_TestItemIDoCollection(DoList.class);
+  }
+
+  @Test
+  public void testDeserialize_TestItemDoSet() throws Exception {
+    //noinspection unchecked
+    testDeserialize_TestItemIDoCollection(DoSet.class);
+  }
+
+  @Test
+  public void testDeserialize_TestItemDoCollection() throws Exception {
+    //noinspection unchecked
+    testDeserialize_TestItemIDoCollection(DoCollection.class);
+  }
+
+  protected <DO_COLLECTION extends IDoCollection<TestItemDo, ?>> void testDeserialize_TestItemIDoCollection(Class<DO_COLLECTION> doCollectionClass) throws IOException {
+    String json = readResourceAsString("TestItemDoCollection.json");
     @SuppressWarnings("unchecked")
-    DoList<TestItemDo> testDo = s_dataObjectMapper.readValue(json, DoList.class);
-    assertEquals("foo", testDo.get(0).getId());
-    assertEquals("bar", testDo.get(0).getStringAttribute());
+    DO_COLLECTION testDo = s_dataObjectMapper.readValue(json, doCollectionClass);
+    assertEquals(1, testDo.size());
+    TestItemDo item = testDo.iterator().next();
+    assertEquals("foo", item.getId());
+    assertEquals("bar", item.getStringAttribute());
   }
 
   @Test
   public void testDeserialize_TestItemDoListAsObjectList() throws Exception {
-    String json = readResourceAsString("TestItemDoList.json");
+    String json = readResourceAsString("TestItemDoCollection.json");
     // read value as raw DoList without concrete bind type information
     DoList<TestItemDo> testDo = s_dataObjectMapper.readValue(json, new TypeReference<DoList<TestItemDo>>() {
     });
@@ -1134,7 +1225,7 @@ public class JsonDataObjectsSerializationTest {
   public void testSerialize_TestCollectionsDoNullValues() throws Exception {
     TestCollectionsDo testDo = BEANS.get(TestCollectionsDo.class)
         .withItemDoAttribute(null)
-        .withItemDoCollectionAttribute(null)
+        .withItemCollectionAttribute(null)
         .withItemListAttribute(null)
         .withItemPojoAttribute(null)
         .withItemPojoCollectionAttribute(null)
@@ -1142,6 +1233,12 @@ public class JsonDataObjectsSerializationTest {
     testDo.itemDoListAttribute().set(null);
     testDo.itemPojoDoListAttribute().set(null);
     testDo.itemPojo2DoListAttribute().set(null);
+    testDo.itemDoSetAttribute().set(null);
+    testDo.itemPojoDoSetAttribute().set(null);
+    testDo.itemPojo2DoSetAttribute().set(null);
+    testDo.itemDoCollectionAttribute().set(null);
+    testDo.itemPojoDoCollectionAttribute().set(null);
+    testDo.itemPojo2DoCollectionAttribute().set(null);
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     assertJsonEquals("TestCollectionsDoNullValuesEmptyDoList.json", json);
@@ -1161,7 +1258,7 @@ public class JsonDataObjectsSerializationTest {
     TestCollectionsDo doMarhalled = s_dataObjectMapper.readValue(json, TestCollectionsDo.class);
 
     assertNull(doMarhalled.getItemDoAttribute());
-    assertNull(doMarhalled.getItemDoCollectionAttribute());
+    assertNull(doMarhalled.getItemCollectionAttribute());
     assertNull(doMarhalled.getItemListAttribute());
     assertNull(doMarhalled.getItemPojoAttribute());
     assertNull(doMarhalled.getItemPojoCollectionAttribute());
@@ -1169,6 +1266,12 @@ public class JsonDataObjectsSerializationTest {
     assertTrue(doMarhalled.getItemDoListAttribute().isEmpty());
     assertTrue(doMarhalled.getItemPojoDoListAttribute().isEmpty());
     assertTrue(doMarhalled.getItemPojo2DoListAttribute().isEmpty());
+    assertTrue(doMarhalled.getItemDoSetAttribute().isEmpty());
+    assertTrue(doMarhalled.getItemPojoDoSetAttribute().isEmpty());
+    assertTrue(doMarhalled.getItemPojo2DoSetAttribute().isEmpty());
+    assertTrue(doMarhalled.getItemDoCollectionAttribute().isEmpty());
+    assertTrue(doMarhalled.getItemPojoDoCollectionAttribute().isEmpty());
+    assertTrue(doMarhalled.getItemPojo2DoCollectionAttribute().isEmpty());
 
     json = s_dataObjectMapper.writeValueAsString(doMarhalled);
     assertJsonEquals("TestCollectionsDoNullValuesEmptyDoList.json", json);
@@ -1194,9 +1297,11 @@ public class JsonDataObjectsSerializationTest {
 
     // setup TestItemDo attributes
     testDo.withItemDoAttribute(createTestItemDo("d1", "itemDo-as-attribute"));
-    testDo.withItemDoCollectionAttribute(Arrays.asList(createTestItemDo("d2", "itemDo-as-collection-item-1"), createTestItemDo("d3", "itemDo-as-collection-item-2")));
+    testDo.withItemCollectionAttribute(Arrays.asList(createTestItemDo("d2", "itemDo-as-collection-item-1"), createTestItemDo("d3", "itemDo-as-collection-item-2")));
     testDo.withItemListAttribute(Arrays.asList(createTestItemDo("d4", "itemDo-as-list-item-1"), createTestItemDo("d5", "itemDo-as-list-item-2")));
     testDo.withItemDoListAttribute(createTestItemDo("d8", "itemDo-as-DoList-item-1"), createTestItemDo("d9", "itemDo-as-DoList-item-2"));
+    testDo.withItemDoSetAttribute(createTestItemDo("d10", "itemDo-as-DoSet-item-1"), createTestItemDo("d11", "itemDo-as-DoSet-item-2"));
+    testDo.withItemDoCollectionAttribute(createTestItemDo("d12", "itemDo-as-DoCollection-item-1"), createTestItemDo("d13", "itemDo-as-DoCollection-item-2"));
 
     // setup TestItemPojo attributes
     testDo.withItemPojoAttribute(createTestItemPojo("p1", "itemPojo-as-attribute"));
@@ -1204,6 +1309,10 @@ public class JsonDataObjectsSerializationTest {
     testDo.withItemPojoListAttribute(Arrays.asList(createTestItemPojo("p4", "itemPojo-as-list-item-1"), createTestItemPojo("p5", "itemPojo-as-list-item-2")));
     testDo.withItemPojoDoListAttribute(createTestItemPojo("p8", "itemPojo-as-DoList-item-1"), createTestItemPojo("p9", "itemPojo-as-DoList-item-2"));
     testDo.withItemPojo2DoListAttribute(createTestItemPojo2("p10", "itemPojo2-as-DoList-item-1"), createTestItemPojo2("p11", "itemPojo2-as-DoList-item-2"));
+    testDo.withItemPojoDoSetAttribute(createTestItemPojo("p12", "itemPojo-as-DoSet-item-1"), createTestItemPojo("p13", "itemPojo-as-DoSet-item-2"));
+    testDo.withItemPojo2DoSetAttribute(createTestItemPojo2("p14", "itemPojo2-as-DoSet-item-1"), createTestItemPojo2("p15", "itemPojo2-as-DoSet-item-2"));
+    testDo.withItemPojoDoCollectionAttribute(createTestItemPojo("p16", "itemPojo-as-DoCollection-item-1"), createTestItemPojo("p17", "itemPojo-as-DoCollection-item-2"));
+    testDo.withItemPojo2DoCollectionAttribute(createTestItemPojo2("p18", "itemPojo2-as-DoCollection-item-1"), createTestItemPojo2("p19", "itemPojo2-as-DoCollection-item-2"));
 
     return testDo;
   }

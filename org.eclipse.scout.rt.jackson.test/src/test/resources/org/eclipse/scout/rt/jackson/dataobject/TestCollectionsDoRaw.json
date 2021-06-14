@@ -1,15 +1,15 @@
 {
-  "itemDoAttribute" : {
-    "id" : "d1",
-    "stringAttribute" : "itemDo-as-attribute"
-  },
-  "itemDoCollectionAttribute" : [ {
+  "itemCollectionAttribute" : [ {
     "id" : "d2",
     "stringAttribute" : "itemDo-as-collection-item-1"
   }, {
     "id" : "d3",
     "stringAttribute" : "itemDo-as-collection-item-2"
   } ],
+  "itemDoAttribute" : {
+    "id" : "d1",
+    "stringAttribute" : "itemDo-as-attribute"
+  },
   "itemDoListAttribute" : [ {
     "id" : "d4",
     "stringAttribute" : "itemDo-as-list-item-1"

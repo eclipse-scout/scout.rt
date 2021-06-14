@@ -39,6 +39,12 @@ public abstract class AbstractDataObjectVisitor {
     else if (o instanceof DoList) {
       caseNode((DoList<?>) o, this::caseDoList);
     }
+    else if (o instanceof DoSet) {
+      caseNode((DoSet<?>) o, this::caseDoSet);
+    }
+    else if (o instanceof DoCollection) {
+      caseNode((DoCollection<?>) o, this::caseDoCollection);
+    }
     else {
       caseNode(o, this::caseObject);
     }
@@ -63,12 +69,36 @@ public abstract class AbstractDataObjectVisitor {
 
   protected void caseDoEntity(IDoEntity entity) {
     for (DoNode<?> node : entity.allNodes().values()) {
-      visit(node.get());
+      if (node instanceof DoList) {
+        caseDoList((DoList<?>) node);
+      }
+      else if (node instanceof DoSet) {
+        caseDoSet((DoSet<?>) node);
+      }
+      else if (node instanceof DoCollection) {
+        caseDoCollection((DoCollection<?>) node);
+      }
+      else {
+        // DoValue
+        visit(node.get());
+      }
     }
   }
 
   protected void caseDoList(DoList<?> doList) {
     for (Object o : doList) {
+      visit(o);
+    }
+  }
+
+  protected void caseDoSet(DoSet<?> doSet) {
+    for (Object o : doSet) {
+      visit(o);
+    }
+  }
+
+  protected void caseDoCollection(DoCollection<?> doCollection) {
+    for (Object o : doCollection) {
       visit(o);
     }
   }

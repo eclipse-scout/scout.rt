@@ -1,7 +1,7 @@
 {
   "_type" : "TestCollections",
   "itemDoAttribute" : null,
-  "itemDoCollectionAttribute" : null,
+  "itemCollectionAttribute" : null,
   "itemDoListAttribute" : null,
   "itemListAttribute" : null,
   "itemPojo2DoListAttribute" : null,

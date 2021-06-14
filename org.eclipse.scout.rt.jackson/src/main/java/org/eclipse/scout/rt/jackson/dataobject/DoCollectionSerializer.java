@@ -12,7 +12,10 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
 
+import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoSet;
+import org.eclipse.scout.rt.dataobject.IDoCollection;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JavaType;
@@ -21,27 +24,27 @@ import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
- * Serializer for {@link DoList}
+ * Serializer for {@link IDoCollection} subclasses ({@link DoList}, {@link DoSet} and {@link DoCollection}).
  */
-public class DoListSerializer extends StdSerializer<DoList<?>> {
+public class DoCollectionSerializer<COLLECTION_NODE extends IDoCollection<?, ?>> extends StdSerializer<COLLECTION_NODE> {
   private static final long serialVersionUID = 1L;
 
-  public DoListSerializer(JavaType type) {
+  public DoCollectionSerializer(JavaType type) {
     super(type);
   }
 
   @Override
-  public void serialize(DoList<?> value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+  public void serialize(COLLECTION_NODE value, JsonGenerator gen, SerializerProvider provider) throws IOException {
     serializeList(value, gen);
   }
 
   @Override
-  public void serializeWithType(DoList<?> value, JsonGenerator gen, SerializerProvider serializers, TypeSerializer typeSer) throws IOException {
+  public void serializeWithType(COLLECTION_NODE value, JsonGenerator gen, SerializerProvider serializers, TypeSerializer typeSer) throws IOException {
     serializeList(value, gen);
   }
 
-  protected void serializeList(DoList<?> value, JsonGenerator gen) throws IOException {
-    // serialize DoList as array using default jackson serializer (includes types if necessary according to actual chosen serializer for each object type)
+  protected void serializeList(IDoCollection<?, ?> value, JsonGenerator gen) throws IOException {
+    // serialize AbstractDoCollection as array using default jackson serializer (includes types if necessary according to actual chosen serializer for each object type)
     gen.writeStartArray();
     gen.setCurrentValue(value);
     for (Object item : value.get()) {
@@ -51,7 +54,7 @@ public class DoListSerializer extends StdSerializer<DoList<?>> {
   }
 
   @Override
-  public boolean isEmpty(SerializerProvider provider, DoList<?> value) {
+  public boolean isEmpty(SerializerProvider provider, COLLECTION_NODE value) {
     return value.get().isEmpty();
   }
 }

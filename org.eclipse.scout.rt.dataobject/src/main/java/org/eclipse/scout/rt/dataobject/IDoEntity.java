@@ -11,9 +11,11 @@
 package org.eclipse.scout.rt.dataobject;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -35,7 +37,8 @@ public interface IDoEntity extends IDataObject {
   /**
    * @return Node of attribute {@code attributeName} or {@code null}, if attribute is not available.
    *         <p>
-   *         The attribute node is either a {@link DoValue<T>} or a {@link DoList<T>} wrapper object.
+   *         The attribute node is either a {@link DoValue}, {@link DoList}, {@link DoSet} or a {@link DoCollection}
+   *         wrapper object.
    */
   DoNode<?> getNode(String attributeName);
 
@@ -45,8 +48,8 @@ public interface IDoEntity extends IDataObject {
   Map<String, DoNode<?>> allNodes();
 
   /**
-   * Adds new {@link DoValue} or {@link DoList} node to attributes map and assigns attribute name to specified
-   * attribute.
+   * Adds new {@link DoValue}, {@link DoList}, {@link DoSet} or {@link DoCollection} node to attributes map and assigns
+   * attribute name to specified attribute.
    */
   default void putNode(String attributeName, DoNode<?> attribute) {
     Assertions.assertNotNull(attributeName, "attribute name cannot be null");
@@ -89,15 +92,26 @@ public interface IDoEntity extends IDataObject {
   <V> void putList(String attributeName, List<V> value);
 
   /**
-   * Removes {@link DoValue} or {@link DoList} attribute from attributes map.
+   * Adds new set value to attribute map. The value is wrapped within a {@link DoSet}.
+   */
+  <V> void putSet(String attributeName, Set<V> value);
+
+  /**
+   * Adds new collection value to attribute map. The value is wrapped within a {@link DoCollection}.
+   */
+  <V> void putCollection(String attributeName, Collection<V> value);
+
+  /**
+   * Removes {@link DoValue}, {@link DoList}, {@link DoSet} or {@link DoCollection} attribute from attributes map.
    *
    * @return {@code true} if an element was removed
    */
   boolean remove(String attributeName);
 
   /**
-   * Removes all {@link DoValue} or {@link DoList} attribute from attributes map that satisfy the given predicate.
-   * Errors or runtime exceptions thrown during iteration or by the predicate are relayed to the caller.
+   * Removes all {@link DoValue}, {@link DoList}, {@link DoSet} or {@link DoCollection} attribute from attributes map
+   * that satisfy the given predicate. Errors or runtime exceptions thrown during iteration or by the predicate are
+   * relayed to the caller.
    *
    * @return {@code true} if any element were removed
    */
@@ -114,7 +128,8 @@ public interface IDoEntity extends IDataObject {
    * @return {@link Optional} of node with attribute {@code attributeName} or empty {@link Optional}, if attribute is
    *         not available.
    *         <p>
-   *         The attribute node is either a {@link DoValue<T>} or a {@link DoList<T>} wrapper object.
+   *         The attribute node is either a {@link DoValue}, {@link DoList}, {@link DoSet} or a {@link DoCollection}
+   *         wrapper object.
    */
   default Optional<DoNode<?>> optNode(String attributeName) {
     return Optional.ofNullable(getNode(attributeName));
@@ -175,7 +190,7 @@ public interface IDoEntity extends IDataObject {
       // create the attribute with default value (empty list) if not available
       putList(attributeName, null);
     }
-    return Assertions.assertType(getNode(attributeName), DoList.class).get();
+    return ((DoList<T>) Assertions.assertType(getNode(attributeName), DoList.class)).get();
   }
 
   /**
@@ -207,7 +222,7 @@ public interface IDoEntity extends IDataObject {
   @SuppressWarnings("unchecked")
   default <T> Optional<List<T>> optList(String attributeName, Class<T> type) {
     return optNode(attributeName)
-        .map(n -> Assertions.assertType(n, DoList.class).get());
+        .map(n -> ((DoList<T>) Assertions.assertType(n, DoList.class)).get());
   }
 
   /**
@@ -271,7 +286,7 @@ public interface IDoEntity extends IDataObject {
   }
 
   /**
-   * Removes {@link DoValue} or {@link DoList} attribute from attributes map.
+   * Removes {@link DoValue}, {@link DoList}, {@link DoSet} or {@link DoCollection} attribute from attributes map.
    * <p>
    * Example:
    *
@@ -286,7 +301,7 @@ public interface IDoEntity extends IDataObject {
   }
 
   /**
-   * Removes {@link DoValue} or {@link DoList} attribute node from attributes map.
+   * Removes {@link DoValue}, {@link DoList}, {@link DoSet} or {@link DoCollection} attribute node from attributes map.
    * <p>
    * Example:
    *

@@ -13,7 +13,9 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.util.Date;
 import java.util.Locale;
 
+import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
@@ -24,6 +26,7 @@ import org.eclipse.scout.rt.jackson.dataobject.id.IIdSerializer;
 import org.eclipse.scout.rt.jackson.dataobject.id.TypedIdSerializer;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
@@ -67,8 +70,8 @@ public class DataObjectSerializers extends Serializers.Base {
     if (IDoEntity.class.isAssignableFrom(rawClass)) {
       return new DoEntitySerializer(m_moduleContext, type);
     }
-    else if (DoList.class.isAssignableFrom(rawClass)) {
-      return new DoListSerializer(type);
+    else if (ObjectUtility.isOneOf(rawClass, DoList.class, DoSet.class, DoCollection.class)) {
+      return new DoCollectionSerializer<>(type);
     }
     else if (Date.class.isAssignableFrom(rawClass)) {
       return new DoDateSerializer();

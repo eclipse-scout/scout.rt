@@ -10,13 +10,18 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -50,7 +55,8 @@ public class DoEntity implements IDoEntity {
   /**
    * @return Node of attribute {@code attributeName} or {@code null}, if attribute is not available.
    *         <p>
-   *         The attribute node is either a {@link DoValue<T>} or a {@link DoList<T>} wrapper object.
+   *         The attribute node is either a {@link DoValue}, a {@link DoList}, a {@link DoSet} or a {@link DoCollection}
+   *         wrapper object.
    */
   @Override
   public DoNode<?> getNode(String attributeName) {
@@ -67,7 +73,7 @@ public class DoEntity implements IDoEntity {
   }
 
   /**
-   * Adds new {@link DoValue} or {@link DoList} node to attributes map.
+   * Adds new {@link DoValue}, {@link DoList}, {@link DoSet} or {@link DoCollection} node to attributes map.
    */
   @Override
   public void putNode(String attributeName, DoNode<?> attribute) {
@@ -93,7 +99,25 @@ public class DoEntity implements IDoEntity {
   }
 
   /**
-   * Removes {@link DoValue} or {@link DoList} attribute from attributes map.
+   * Adds new set value to attribute map. The value is wrapped within a {@link DoSet}.
+   */
+  @Override
+  public <V> void putSet(String attributeName, Set<V> value) {
+    DoSet<V> doSet = doSet(attributeName);
+    doSet.set(value);
+  }
+
+  /**
+   * Adds new collection value to attribute map. The value is wrapped within a {@link DoCollection}.
+   */
+  @Override
+  public <V> void putCollection(String attributeName, Collection<V> value) {
+    DoCollection<V> doCollection = doCollection(attributeName);
+    doCollection.set(value);
+  }
+
+  /**
+   * Removes {@link DoValue}, {@link DoList}, {@link DoSet} or {@link DoCollection} attribute from attributes map.
    */
   @Override
   public boolean remove(String attributeName) {
@@ -101,8 +125,9 @@ public class DoEntity implements IDoEntity {
   }
 
   /**
-   * Removes all {@link DoValue} or {@link DoList} attribute from attributes map that satisfy the given predicate.
-   * Errors or runtime exceptions thrown during iteration or by the predicate are relayed to the caller.
+   * Removes all {@link DoValue}, {@link DoList}, {@link DoSet} or {@link DoCollection} attribute from attributes map
+   * that satisfy the given predicate. Errors or runtime exceptions thrown during iteration or by the predicate are
+   * relayed to the caller.
    */
   @Override
   public boolean removeIf(Predicate<? super DoNode<?>> filter) {
@@ -131,30 +156,43 @@ public class DoEntity implements IDoEntity {
    * Creates a new {@link DoValue} value attribute node wrapping a value of type {@code V}
    */
   protected <V> DoValue<V> doValue(String attributeName) {
-    Assertions.assertNotNull(attributeName, "attribute name cannot be null");
-    DoNode<?> node = getNode(attributeName);
-    if (node != null) {
-      Assertions.assertInstance(node, DoValue.class, "Existing node {} is not of type {}, cannot change the node type!", node, DoValue.class);
-      @SuppressWarnings("unchecked")
-      DoValue<V> valueNode = (DoValue<V>) node;
-      return valueNode;
-    }
-    return new DoValue<>(attributeName, attribute -> putNode(attributeName, attribute));
+    //noinspection unchecked
+    return doNode(attributeName, DoValue.class, () -> new DoValue<V>(attributeName, attribute -> putNode(attributeName, attribute)));
   }
 
   /**
    * Creates a new {@link DoList} list value attribute node wrapping a list of type {@code List<V>}
    */
   protected <V> DoList<V> doList(String attributeName) {
-    Assertions.assertNotNull(attributeName, "attribute name cannot be null");
+    //noinspection unchecked
+    return doNode(attributeName, DoList.class, () -> new DoList<V>(attributeName, attribute -> putNode(attributeName, attribute)));
+  }
+
+  /**
+   * Creates a new {@link DoSet} set value attribute node wrapping a list of type {@code Set<V>}
+   */
+  protected <V> DoSet<V> doSet(String attributeName) {
+    //noinspection unchecked
+    return doNode(attributeName, DoSet.class, () -> new DoSet<V>(attributeName, attribute -> putNode(attributeName, attribute)));
+  }
+
+  /**
+   * Creates a new {@link DoCollection} collection value attribute node wrapping a list of type {@code Collection<V>}
+   */
+  protected <V> DoCollection<V> doCollection(String attributeName) {
+    //noinspection unchecked
+    return doNode(attributeName, DoCollection.class, () -> new DoCollection<V>(attributeName, attribute -> putNode(attributeName, attribute)));
+  }
+
+  protected <NODE> NODE doNode(String attributeName, Class<NODE> clazz, Supplier<NODE> nodeSupplier) {
+    assertNotNull(attributeName, "attribute name cannot be null");
     DoNode<?> node = getNode(attributeName);
     if (node != null) {
-      Assertions.assertInstance(node, DoList.class, "Existing node {} is not of type {}, cannot change the node type!", node, DoList.class);
-      @SuppressWarnings("unchecked")
-      DoList<V> listNode = (DoList<V>) node;
-      return listNode;
+      Assertions.assertInstance(node, clazz, "Existing node {} is not of type {}, cannot change the node type!", node, clazz);
+      //noinspection unchecked
+      return (NODE) node;
     }
-    return new DoList<>(attributeName, attribute -> putNode(attributeName, attribute));
+    return nodeSupplier.get();
   }
 
   @Override

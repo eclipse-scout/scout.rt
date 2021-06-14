@@ -10,20 +10,24 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.annotation.Generated;
 
+import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoNode;
+import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
@@ -79,6 +83,20 @@ public class TestCustomImplementedEntityDo implements IDoEntity {
     DoList<V> doList = new DoList<>();
     doList.set(value);
     putNode(attributeName, doList);
+  }
+
+  @Override
+  public <V> void putSet(String attributeName, Set<V> value) {
+    DoSet<V> doSet = new DoSet<>();
+    doSet.set(value);
+    putNode(attributeName, doSet);
+  }
+
+  @Override
+  public <V> void putCollection(String attributeName, Collection<V> value) {
+    DoCollection<V> doCollection = new DoCollection<>();
+    doCollection.set(value);
+    putNode(attributeName, doCollection);
   }
 
   @Override

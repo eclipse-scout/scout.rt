@@ -288,7 +288,7 @@ public class DataObjectInventory {
         if (returnType instanceof ParameterizedType) {
           ParameterizedType pt = (ParameterizedType) returnType;
           // return type must be DoList or DoValue
-          if (ObjectUtility.isOneOf(pt.getRawType(), DoValue.class, DoList.class)) {
+          if (ObjectUtility.isOneOf(pt.getRawType(), DoValue.class, DoList.class, DoSet.class, DoCollection.class)) {
             addAttribute(attributes, pt, method);
           }
         }

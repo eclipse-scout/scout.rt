@@ -17,8 +17,10 @@ import java.net.URL;
 
 import org.eclipse.scout.rt.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.dataobject.DataObjectVisitors;
+import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
@@ -112,7 +114,7 @@ public class JsonDataObjectsRawSerializationTest {
 
   /**
    * Asserts given {@code dataObject} contains no concrete data object instances except {@link DoEntity} and
-   * {@link DoList}.
+   * {@link DoList}. Raw data objects will never contain {@link DoSet} or {@link DoCollection}.
    */
   protected void assertNoTypes(IDataObject dataObject) {
     DataObjectVisitors.forEach(dataObject, IDataObject.class, this::assertType);

@@ -23,8 +23,8 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 
 /**
- * Generic Deserializer for {@link IDataObject} delegating to {@link DoEntityDeserializer} / {@link DoListDeserializer}
- * according to content.
+ * Generic Deserializer for {@link IDataObject} delegating to {@link DoEntityDeserializer} /
+ * {@link DoCollectionDeserializer} according to content.
  */
 public class DataObjectDeserializer extends StdDeserializer<IDataObject> {
   private static final long serialVersionUID = 1L;
@@ -48,7 +48,7 @@ public class DataObjectDeserializer extends StdDeserializer<IDataObject> {
       case START_OBJECT:
         return p.getCodec().readValue(p, IDoEntity.class); // delegate to DoEntityDeserializer for object-like structure
       case START_ARRAY:
-        return p.getCodec().readValue(p, DoList.class); // delegate to DoListDeserializer for collection-like structure
+        return p.getCodec().readValue(p, DoList.class); // delegate to DoCollectionDeserializer for collection-like structure (using DoList as generic structure instead of DoSet or DoCollection)
       default:
         throw ctxt.wrongTokenException(p, handledType(), JsonToken.START_OBJECT, "expected start object or start array token");
     }

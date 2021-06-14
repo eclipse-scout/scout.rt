@@ -11,7 +11,11 @@
 package org.eclipse.scout.rt.dataobject;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
@@ -20,6 +24,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
@@ -57,8 +62,7 @@ public class DataObjectHelper {
   /**
    * Returns attribute {@code attributeName} converted to a {@link Date} value.
    *
-   * @see {@link IValueFormatConstants#parseDefaultDate} for default parse method for string-formatted using default
-   *      format
+   * @see IValueFormatConstants#parseDefaultDate for default parse method for string-formatted using default format
    */
   public Date getDateAttribute(IDoEntity entity, String attributeName) {
     Object value = entity.get(attributeName);
@@ -79,7 +83,7 @@ public class DataObjectHelper {
       return null;
     }
     if (value instanceof UUID) {
-      return UUID.class.cast(value);
+      return (UUID) value;
     }
     else if (value instanceof String) {
       return UUID.fromString((String) value);
@@ -96,10 +100,10 @@ public class DataObjectHelper {
       return null;
     }
     if (value instanceof Locale) {
-      return Locale.class.cast(value);
+      return (Locale) value;
     }
     else if (value instanceof String) {
-      return Locale.forLanguageTag(String.class.cast(value));
+      return Locale.forLanguageTag((String) value);
     }
     throw new IllegalArgumentException("Cannot convert value '" + value + "' to Locale");
   }
@@ -180,5 +184,60 @@ public class DataObjectHelper {
     String value = assertValue(doValue);
     Assertions.assertTrue(StringUtility.hasText(value), "Value of property '{}' must have text", doValue.getAttributeName());
     return value;
+  }
+
+  /**
+   * Normalize the data object, i.e. applies a deterministic sorting to collections of type {@link DoSet} and
+   * {@link DoCollection}. This is useful to have a comparable output if the same data object is serialized twice.
+   *
+   * @param dataObject
+   *          Data object to normalize.
+   */
+  public void normalize(IDataObject dataObject) {
+    new P_NormalizationDataObjectVisitor().normalize(dataObject);
+  }
+
+  protected static class P_NormalizationDataObjectVisitor extends AbstractDataObjectVisitor {
+
+    public void normalize(IDataObject dataObject) {
+      visit(dataObject);
+    }
+
+    @Override
+    protected void caseDoSet(DoSet<?> doSet) {
+      super.caseDoSet(doSet); // deep first
+      normalizeInternal(doSet);
+    }
+
+    @Override
+    protected void caseDoCollection(DoCollection<?> doCollection) {
+      super.caseDoCollection(doCollection); // deep first
+      normalizeInternal(doCollection);
+    }
+
+    protected <V, COLLECTION extends Collection<V>> void normalizeInternal(IDoCollection<V, COLLECTION> doCollectionNode) {
+      if (doCollectionNode.isEmpty()) {
+        return;
+      }
+
+      List<V> list = new ArrayList<>(doCollectionNode.get());
+      boolean comparable = list.stream().allMatch(item -> item instanceof Comparable);
+      if (comparable) {
+        // Directly comparable
+        list.sort(null);
+      }
+      else {
+        // Not comparable, use string representation
+        IDataObjectMapper mapper = BEANS.get(IDataObjectMapper.class);
+        IdentityHashMap<V, String> jsons = new IdentityHashMap<>();
+        list.sort((o1, o2) -> {
+          String o1Json = jsons.computeIfAbsent(o1, mapper::writeValue);
+          String o2Json = jsons.computeIfAbsent(o2, mapper::writeValue);
+          return ObjectUtility.compareTo(o1Json, o2Json);
+        });
+      }
+
+      doCollectionNode.updateAll(list); // replace
+    }
   }
 }

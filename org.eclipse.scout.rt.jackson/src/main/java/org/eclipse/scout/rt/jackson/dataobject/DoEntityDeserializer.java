@@ -12,9 +12,12 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
 
+import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoMapEntity;
+import org.eclipse.scout.rt.dataobject.DoNode;
+import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.slf4j.Logger;
@@ -138,9 +141,9 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       boolean isArray = p.getCurrentToken() == JsonToken.START_ARRAY;
       boolean isObject = p.getCurrentToken() == JsonToken.START_OBJECT;
       ResolvedType attributeType = findResolvedAttributeType(entity, attributeName, isObject, isArray);
-      if (attributeType.hasRawClass(DoList.class)) {
-        DoList<?> listValue = p.getCodec().readValue(p, attributeType);
-        entity.putNode(attributeName, listValue);
+      if (attributeType.hasRawClass(DoList.class) || attributeType.hasRawClass(DoSet.class) || attributeType.hasRawClass(DoCollection.class)) {
+        DoNode<?> nodeValue = p.getCodec().readValue(p, attributeType);
+        entity.putNode(attributeName, nodeValue);
       }
       else {
         Object value = p.getCodec().readValue(p, attributeType);
@@ -205,7 +208,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       return TypeFactory.defaultInstance().constructType(DoEntity.class);
     }
     else if (isArray) {
-      // array-like JSON structure is deserialized as raw DoList
+      // array-like JSON structure is deserialized as raw DoList (using DoList as generic structure instead of DoSet or DoCollection)
       return TypeFactory.defaultInstance().constructType(DoList.class);
     }
     else {

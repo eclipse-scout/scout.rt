@@ -14,10 +14,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -146,6 +148,16 @@ public final class DataObjectVisitors {
       updateList(doList.get());
     }
 
+    @Override
+    protected void caseDoSet(DoSet<?> doSet) {
+      updateSet(doSet.get());
+    }
+
+    @Override
+    protected void caseDoCollection(DoCollection<?> doCollection) {
+      updateCollection(doCollection.get());
+    }
+
     private <LT> void updateList(List<LT> list) {
       ListIterator<LT> it = list.listIterator();
       while (it.hasNext()) {
@@ -174,6 +186,25 @@ public final class DataObjectVisitors {
       }
       if (newValues != null) {
         collection.addAll(newValues);
+      }
+    }
+
+    private <SET> void updateSet(Set<SET> set) {
+      Set<SET> newValues = null;
+      Iterator<SET> it = set.iterator();
+      while (it.hasNext()) {
+        SET value = it.next();
+        SET newValue = applyOperatorOrVisit(value);
+        if (value != newValue) {
+          it.remove();
+          if (newValues == null) {
+            newValues = new LinkedHashSet<>();
+          }
+          newValues.add(newValue);
+        }
+      }
+      if (newValues != null) {
+        set.addAll(newValues);
       }
     }
 
