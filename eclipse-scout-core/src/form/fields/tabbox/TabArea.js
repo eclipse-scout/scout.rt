@@ -17,6 +17,8 @@ export default class TabArea extends Widget {
     this.tabBox = null;
     this.tabs = [];
     this.displayStyle = TabArea.DisplayStyle.DEFAULT;
+    this.hasSubLabel = false;
+    this.selectedTab = null;
 
     this._tabItemPropertyChangeHandler = this._onTabItemPropertyChange.bind(this);
     this._tabPropertyChangeHandler = this._onTabPropertyChange.bind(this);
@@ -92,9 +94,7 @@ export default class TabArea extends Widget {
   }
 
   getTabForItem(tabItem) {
-    return arrays.find(this.tabs, tab => {
-      return tab.tabItem === tabItem;
-    }, this);
+    return arrays.find(this.tabs, tab => tab.tabItem === tabItem);
   }
 
   setSelectedTab(tab) {
@@ -139,7 +139,7 @@ export default class TabArea extends Widget {
 
   _setTabs(tabItems) {
     let tabsToRemove = this.tabs.slice(),
-      tabs = tabItems.map(function(tabItem) {
+      tabs = tabItems.map(tabItem => {
         let tab = this.getTabForItem(tabItem);
         if (!tab) {
           tab = scout.create('Tab', {
@@ -152,7 +152,7 @@ export default class TabArea extends Widget {
           arrays.remove(tabsToRemove, tab);
         }
         return tab;
-      }, this);
+      });
 
     // un-register model listeners
     tabsToRemove.forEach(function(tab) {
@@ -164,7 +164,7 @@ export default class TabArea extends Widget {
   }
 
   _renderTabs() {
-    this.tabs.slice().reverse().forEach(function(tab, index, items) {
+    this.tabs.slice().reverse().forEach((tab, index, items) => {
       if (!tab.rendered) {
         tab.render();
       }
@@ -175,7 +175,7 @@ export default class TabArea extends Widget {
       tab.$container
         .on('blur', this._onTabItemBlur.bind(this))
         .on('focus', this._onTabItemFocus.bind(this));
-    }, this);
+    });
   }
 
   _removeTabs(tabs) {
@@ -203,10 +203,14 @@ export default class TabArea extends Widget {
   }
 
   _updateHasSubLabel() {
-    let items = this.tabs || [];
+    let items = this.visibleTabs();
     this._setHasSubLabel(items.some(item => {
       return strings.hasText(item.subLabel);
     }));
+  }
+
+  visibleTabs() {
+    return this.tabs.filter(tab => tab.isVisible());
   }
 
   _setHasSubLabel(hasSubLabel) {
@@ -221,6 +225,8 @@ export default class TabArea extends Widget {
 
   _renderHasSubLabel() {
     this.$container.toggleClass('has-sub-label', this.hasSubLabel);
+    // Invalidate other tabs as well because the class has an impact on their size, too
+    this.visibleTabs().forEach(tab => tab.invalidateLayout());
     this.invalidateLayoutTree();
   }
 
@@ -284,6 +290,7 @@ export default class TabArea extends Widget {
 
   _onTabItemPropertyChange(event) {
     if (event.propertyName === 'visible') {
+      this._updateHasSubLabel();
       this.invalidateLayoutTree();
     }
     if (event.propertyName === 'subLabel') {

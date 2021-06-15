@@ -120,9 +120,8 @@ export default class TabBox extends CompositeField {
   _setTabItems(tabItems) {
     tabItems = tabItems || [];
     let tabsToRemove = this.tabItems || [];
-    tabsToRemove.filter(tabItem => {
-      return tabItems.indexOf(tabItem) < 0;
-    }, this).forEach(tabItem => {
+    tabsToRemove.filter(tabItem => tabItems.indexOf(tabItem) < 0
+    ).forEach(tabItem => {
       tabItem.remove();
     });
 

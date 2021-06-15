@@ -13,6 +13,9 @@ import $ from 'jquery';
 
 export default class TabAreaLayout extends AbstractLayout {
 
+  /**
+   * @param {TabArea} tabArea
+   */
   constructor(tabArea) {
     super();
     this.tabArea = tabArea;
@@ -93,17 +96,13 @@ export default class TabAreaLayout extends AbstractLayout {
     let htmlComp = HtmlComponent.get($container),
       prefSize = new Dimension(0, 0),
       prefWidth = Number.MAX_VALUE,
-      visibleTabItems = this.tabArea.tabs.filter(tabItem => {
-        return tabItem.isVisible();
-      }),
+      visibleTabItems = this.tabArea.visibleTabs(),
       overflowableIndexes = visibleTabItems.map((tabItem, index) => {
         if (tabItem.selected) {
           return -1;
         }
         return index;
-      }).filter(index => {
-        return index >= 0;
-      });
+      }).filter(index => index >= 0);
 
     this.overflowTabs = [];
 
@@ -157,9 +156,8 @@ export default class TabAreaLayout extends AbstractLayout {
   }
 
   _prefSize(tabItems, considerEllipsis) {
-    let prefSize = tabItems.map(function(tabItem) {
-        return this._tabItemSize(tabItem.htmlComp);
-      }, this).reduce((prefSize, itemSize) => {
+    let prefSize = tabItems.map(tabItem => this._tabItemSize(tabItem.htmlComp)
+      ).reduce((prefSize, itemSize) => {
         prefSize.height = Math.max(prefSize.height, itemSize.height);
         prefSize.width += itemSize.width;
         return prefSize;
