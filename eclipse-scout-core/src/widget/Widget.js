@@ -938,6 +938,10 @@ export default class Widget {
       return;
     }
     this.$container.addClass(this.cssClass);
+    if (this.htmlComp) {
+      // Replacing css classes may enlarge or shrink the widget (e.g. setting the font weight to bold makes the text bigger) -> invalidate layout
+      this.invalidateLayoutTree();
+    }
   }
 
   setCssClass(cssClass) {
