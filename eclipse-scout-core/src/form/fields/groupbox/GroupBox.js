@@ -520,11 +520,11 @@ export default class GroupBox extends CompositeField {
     this._renderBorderVisible();
   }
 
-  getContextMenuItems() {
+  getContextMenuItems(onlyVisible = true) {
     if (this.menuBarVisible) {
       return [];
     }
-    return super.getContextMenuItems();
+    return super.getContextMenuItems(onlyVisible);
   }
 
   setMenuBarVisible(visible) {

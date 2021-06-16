@@ -167,10 +167,11 @@ export default class SequenceBox extends CompositeField {
       this._isTooltipTextOverwritten = false;
     }
 
-    if (this._lastVisibleField.getContextMenuItems() && this._lastVisibleField.getContextMenuItems().length > 0) {
+    let menuItems = this._lastVisibleField.getContextMenuItems(false);
+    if (menuItems && menuItems.length > 0) {
       // Change owner to make sure menu won't be destroyed when setMenus is called
       this._updateBoxMenuOwner(this.fieldStatus);
-      this.setMenus(this._lastVisibleField.getContextMenuItems());
+      this.setMenus(menuItems);
       this.setMenusVisible(this._lastVisibleField.menusVisible);
       this._isMenusOverwritten = true;
     } else {

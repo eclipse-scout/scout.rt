@@ -52,7 +52,7 @@ export default class TabItem extends GroupBox {
     this.setProperty('marked', marked);
   }
 
-  getContextMenuItems() {
+  getContextMenuItems(onlyVisible = true) {
     return [];
   }
 

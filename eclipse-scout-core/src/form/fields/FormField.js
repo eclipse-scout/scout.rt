@@ -856,11 +856,13 @@ export default class FormField extends Widget {
     }
   }
 
-  getContextMenuItems() {
+  getContextMenuItems(onlyVisible = true) {
     if (this.currentMenuTypes.length) {
-      return menuUtil.filter(this.menus, this.currentMenuTypes, true);
+      return menuUtil.filter(this.menus, this.currentMenuTypes, onlyVisible);
+    } else if (onlyVisible) {
+      return this.menus.filter(menu => menu.visible);
     }
-    return this.menus.filter(menu => menu.visible);
+    return this.menus;
   }
 
   _getMenusForStatus(status) {

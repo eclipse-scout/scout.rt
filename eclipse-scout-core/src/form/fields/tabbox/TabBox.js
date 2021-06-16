@@ -85,7 +85,7 @@ export default class TabBox extends CompositeField {
     this._removeSelectedTab();
   }
 
-  getContextMenuItems() {
+  getContextMenuItems(onlyVisible = true) {
     // handled by the menubar
     return [];
   }

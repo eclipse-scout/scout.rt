@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -778,6 +778,46 @@ describe('SequenceBox', () => {
       expect(field.fieldStatus.contextMenu.$visibleMenuItems().eq(0).text()).toBe('field menu');
       field.fieldStatus.hideContextMenu();
 
+      field.fields[1].deleteMenu(field.fields[1].menus[0]);
+      expect(field.fieldStatus.menus).toEqual(field.menus);
+      field.fieldStatus.showContextMenu();
+      expect(field.fieldStatus.contextMenu.$visibleMenuItems().eq(0).text()).toBe('seq menu');
+      field.fieldStatus.hideContextMenu();
+    });
+
+    it('adds all menus to sequence-box even if they are invisible', () => {
+      let field = createField({
+        menus: [{
+          objectType: 'Menu',
+          text: 'seq menu'
+        }]
+      });
+      field.fields[1].insertMenus([
+        {objectType: 'Menu', text: 'visible menu'},
+        {objectType: 'Menu', text: 'invisible menu', visible: false}]);
+      field.render();
+
+      // ensure both menus are added to field
+      expect(field.menus).toEqual(field.fields[1].menus);
+
+      // only visible menu on fieldStatus
+      expect(field.fieldStatus.menus).toEqual([field.menus[0]]);
+      field.fieldStatus.showContextMenu();
+      expect(field.fieldStatus.contextMenu.$visibleMenuItems().length).toBe(1);
+      expect(field.fieldStatus.contextMenu.$visibleMenuItems().eq(0).text()).toBe('visible menu');
+      field.fieldStatus.hideContextMenu();
+
+      field.menus[1].setVisible(true);
+      // both menus on fieldStatus
+      expect(field.fieldStatus.menus).toEqual(field.menus);
+      field.fieldStatus.showContextMenu();
+      expect(field.fieldStatus.contextMenu.$visibleMenuItems().length).toBe(2);
+      expect(field.fieldStatus.contextMenu.$visibleMenuItems().eq(0).text()).toBe('visible menu');
+      expect(field.fieldStatus.contextMenu.$visibleMenuItems().eq(1).text()).toBe('invisible menu');
+      field.fieldStatus.hideContextMenu();
+
+      // cleanup
+      field.fields[1].deleteMenu(field.fields[1].menus[1]);
       field.fields[1].deleteMenu(field.fields[1].menus[0]);
       expect(field.fieldStatus.menus).toEqual(field.menus);
       field.fieldStatus.showContextMenu();

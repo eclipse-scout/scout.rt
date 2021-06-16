@@ -64,7 +64,7 @@ export default class Button extends FormField {
     this._setInheritAccessibility(this.inheritAccessibility && !this._isIgnoreAccessibilityFlags());
   }
 
-  getContextMenuItems() {
+  getContextMenuItems(onlyVisible = true) {
     return [];
   }
 
