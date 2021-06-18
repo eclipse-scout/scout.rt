@@ -354,8 +354,11 @@ public final class StreamUtility {
   }
 
   /**
-   * Returns a merge function which always throws {@code IllegalStateException}.
+   * Use this method together with <code>Collectors.toMap(keyMapper, valueMapper, mergeFunction, hashMapType)</code>
+   * as argument for the 'mergeFunction'. It does the same thing as the JRE, when the same method with two parameters
+   * is used.
    *
+   * @return a merge function which always throws {@code IllegalStateException}.
    * @see Collectors#throwingMerger
    */
   public static <T> BinaryOperator<T> throwingMerger() {

@@ -720,15 +720,6 @@ public final class CollectionUtility {
     return new LinkedHashMap<>(0);
   }
 
-  /**
-   * Use this method together with <code>Collectors.toMap(keyMapper, valueMapper, mergeFunction, hashMapType)</code>
-   * as argument for the 'mergeFunction'. It does the same thing as the JRE, when the same method with two parameters
-   * is used.
-   */
-  public static <T> BinaryOperator<T> throwingMerger() {
-    return (u,v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); };
-  }
-
   @SafeVarargs
   public static <T, U> HashMap<T, U> hashMap(Pair<T, U>... entries) {
     if (entries == null || entries.length < 1) {

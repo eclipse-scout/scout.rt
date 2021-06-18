@@ -47,6 +47,9 @@ public class DataObjectInventoryTest {
   public static class TestFixtureSubclass2Do extends TestBaseFixtureEntityDo {
   }
 
+  public static class TestFixtureWithoutTypeName extends DoEntity {
+  }
+
   @TypeName("TestFixtureEntity")
   public static abstract class TestFixtureEntityDo extends DoEntity {
     public DoValue<String> id() {
@@ -77,6 +80,7 @@ public class DataObjectInventoryTest {
 
     assertNull(m_inventory.toTypeName(EntityFixtureInvalidTypeNameDo.class));
     assertNull(m_inventory.toTypeName(TestFixtureSubclass1Do.class));
+    assertNull(m_inventory.toTypeName(TestFixtureWithoutTypeName.class));
     assertNull(m_inventory.toTypeName(null));
     assertNull(m_inventory.toTypeName(Object.class));
     assertNull(m_inventory.toTypeName(String.class));
