@@ -181,4 +181,14 @@ public class DataObjectHelper {
     Assertions.assertTrue(StringUtility.hasText(value), "Value of property '{}' must have text", doValue.getAttributeName());
     return value;
   }
+
+  /**
+   * @return the value of the <code>TypeName</code> annotation from a class.
+   * @see TypeName
+   */
+  public String getTypeName(Class<? extends IDoEntity> clazz) {
+    TypeName typeName = clazz.getAnnotation(TypeName.class);
+    return typeName == null ? null : typeName.value();
+  }
+
 }

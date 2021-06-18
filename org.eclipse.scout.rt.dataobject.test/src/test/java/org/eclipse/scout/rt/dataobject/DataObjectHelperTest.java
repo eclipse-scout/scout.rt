@@ -201,4 +201,20 @@ public class DataObjectHelperTest {
     Assert.assertThrows(AssertionException.class, () -> m_helper.assertValueHasText(dummyDoValue));
     assertEquals("Hugo", m_helper.assertValueHasText(testObj.name1()));
   }
+
+  @Test
+  public void testGetTypeName() {
+    assertNull(m_helper.getTypeName(P_DoEntityWithoutTypeNameDo.class));
+    assertEquals("DoEntityWithTypeName", m_helper.getTypeName(P_DoEntityWithTypeNameDo.class));
+  }
+
+  @TypeName("DoEntityWithTypeName")
+  class P_DoEntityWithTypeNameDo extends DoEntity {
+
+  }
+
+  class P_DoEntityWithoutTypeNameDo extends DoEntity {
+
+  }
+
 }

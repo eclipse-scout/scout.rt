@@ -28,6 +28,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BinaryOperator;
 
 public final class CollectionUtility {
   private CollectionUtility() {
@@ -717,6 +718,15 @@ public final class CollectionUtility {
 
   public static <T, U> LinkedHashMap<T, U> emptyOrderedHashMap() {
     return new LinkedHashMap<>(0);
+  }
+
+  /**
+   * Use this method together with <code>Collectors.toMap(keyMapper, valueMapper, mergeFunction, hashMapType)</code>
+   * as argument for the 'mergeFunction'. It does the same thing as the JRE, when the same method with two parameters
+   * is used.
+   */
+  public static <T> BinaryOperator<T> throwingMerger() {
+    return (u,v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); };
   }
 
   @SafeVarargs
