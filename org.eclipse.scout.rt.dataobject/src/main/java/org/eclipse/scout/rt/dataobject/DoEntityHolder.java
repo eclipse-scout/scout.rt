@@ -10,21 +10,18 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
-import java.io.IOException;
-import java.io.Serializable;
-
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.holders.IHolder;
-import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 /**
- * Serializable {@link IHolder} implementation for {@link DoEntity} subclasses
+ * Serializable {@link IHolder} implementation for {@link DoEntity} subclasses.
+ * <p>
+ * To hold less specific types like <code>DoList</code>, use the base class.
+ *
+ * @see DataObjectHolder
  */
-public class DoEntityHolder<T extends IDoEntity> implements IHolder<T>, Serializable {
-  private static final long serialVersionUID = 1L;
+public class DoEntityHolder<T extends IDoEntity> extends DataObjectHolder<T> {
 
-  private transient T m_value;
-  private final Class<T> m_clazz;
+  private static final long serialVersionUID = 1L;
 
   public DoEntityHolder() {
     this(null);
@@ -35,47 +32,7 @@ public class DoEntityHolder<T extends IDoEntity> implements IHolder<T>, Serializ
   }
 
   public DoEntityHolder(Class<T> clazz, T value) {
-    m_clazz = clazz;
-    m_value = value;
+    super(clazz, value);
   }
 
-  @Override
-  public T getValue() {
-    return m_value;
-  }
-
-  @Override
-  public void setValue(T value) {
-    m_value = value;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<T> getHolderType() {
-    Class<T> clazz = m_clazz;
-    if (clazz == null) {
-      clazz = TypeCastUtility.getGenericsParameterClass(this.getClass(), DoEntityHolder.class);
-    }
-    return clazz;
-  }
-
-  /**
-   * Custom java object deserialization method using {@link IDataObjectMapper} to serialize {@link DoEntity} to a string
-   * value instead of relying on default java object serialization (which would require {@link DoEntity} to implement
-   * the {@link Serializable} interface).
-   */
-  private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
-    String text = (String) stream.readObject();
-    @SuppressWarnings("unchecked")
-    T value = (T) BEANS.get(IDataObjectMapper.class).readValue(text, IDoEntity.class);
-    setValue(value);
-  }
-
-  /**
-   * Custom java serialization method based on {@link IDataObjectMapper} instead of default java object serialization.
-   */
-  private void writeObject(java.io.ObjectOutputStream stream) throws IOException {
-    String text = BEANS.get(IDataObjectMapper.class).writeValue(getValue());
-    stream.writeObject(text);
-  }
 }
