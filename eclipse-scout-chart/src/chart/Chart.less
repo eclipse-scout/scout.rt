@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -361,7 +361,7 @@
       fill: @chart-legend-label-color;
 
       .inverted > & {
-        fill: @palette-white;
+        fill: @chart-legend-label-inverted-color;
       }
     }
 
@@ -373,12 +373,17 @@
       fill: @chart-axis-label-color;
 
       .inverted > & {
-        fill: @palette-white;
+        fill: @chart-axis-label-color-inverted;
       }
     }
 
-    > .grid {
+    > .grid,
+    > .scale-ticks {
       fill: @chart-axis-line-color;
+
+      .inverted > & {
+        fill: @chart-axis-line-color-inverted;
+      }
     }
 
     > .tooltip-background {
@@ -426,12 +431,6 @@
   #scout.chart-auto-stroke-colors-schemes();
   #scout.chart-auto-colors-schemes(@darken: 10, @additional-classes: ~".hover");
   #scout.chart-auto-stroke-colors-schemes(@darken: 10, @additional-classes: ~".hover");
-
-  > .point {
-    &.hover {
-      fill: @palette-white;
-    }
-  }
 }
 
 .bar-chart,
@@ -476,8 +475,12 @@
   & > .elements {
     #scout.chart-label-grid-colors();
 
-    :not(.inverted) > & > .grid {
+    & > .grid {
       fill: darken(@chart-axis-line-color, 15);
+
+      .inverted > & {
+        fill: lighten(@chart-axis-line-color-inverted, 25);
+      }
     }
 
     #scout.chart-auto-colors-schemes(@opacity: 70);
@@ -498,17 +501,20 @@
 
   & > .elements {
     #scout.chart-label-grid-colors();
+
+    & > .scale-ticks {
+      fill: darken(@chart-axis-line-color, 15);
+
+      .inverted > & {
+        fill: lighten(@chart-axis-line-color-inverted, 25);
+      }
+    }
+
     #scout.chart-auto-colors-schemes(@opacity: 20);
     #scout.chart-auto-stroke-colors-schemes();
     #scout.chart-auto-colors-schemes(@opacity: 35, @additional-classes: ~".hover");
 
     #scout.chart-auto-colors-schemes(@additional-classes: ~".legend");
-
-    > .point {
-      &.hover {
-        fill: @palette-white;
-      }
-    }
   }
 }
 
@@ -560,7 +566,7 @@ text.line-label-background {
 
 line.label-line {
   stroke-width: 1px;
-  stroke: @chart-axis-line-color;
+  stroke: @palette-gray-7;
 }
 
 /* --- Wire labels default ---*/
@@ -689,7 +695,7 @@ path.speedo-chart-arc, path.pointer {
 /* --- Salesfunnel --- */
 
 line.label-separator {
-  stroke: @chart-axis-line-color;
+  stroke: @palette-gray-7;
 
   .inverted & {
     stroke: @palette-white;
@@ -753,11 +759,7 @@ text.salesfunnel-bar-label {
 }
 
 text.salesfunnel-label {
-  fill: @salesfunnel-label-color;
-
-  .color-alternative & {
-    fill: @salesfunnel-alternative-label-color;
-  }
+  fill: @chart-axis-text-color;
 
   text-anchor: end;
   dominant-baseline: central;

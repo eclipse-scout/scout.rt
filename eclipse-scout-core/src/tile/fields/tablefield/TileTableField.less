@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,8 +49,12 @@
       background-color: transparent;
       border-bottom-width: 2px;
 
-      & > .table-header-item > .table-header-item-state {
-        display: none;
+      & > .table-header-item {
+        color: @tile-table-default-color;
+
+        & > .table-header-item-state {
+          display: none;
+        }
       }
 
       & > .table-header-resize {
@@ -89,6 +93,11 @@
         border-right-width: 1px;
         padding-left: 0;
         padding-right: 0;
+      }
+
+      & > .table-cell,
+      & > .table-cell > .font-icon {
+        color: @tile-table-default-color;
       }
     }
 

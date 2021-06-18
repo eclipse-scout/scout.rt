@@ -28,13 +28,14 @@
   .dimmed-background & {
     #scout.drop-shadow(@alpha: @dashboard-tile-drop-shadow-light-alpha);
 
+    &.disabled,
     &.inverted {
       #scout.drop-shadow(@alpha: @dashboard-tile-drop-shadow-dark-alpha);
     }
   }
 
   & > .form-field {
-    padding: 12px @tile-field-padding @tile-field-padding;
+    padding: 16px @tile-field-padding @tile-field-padding;
 
     &.label-hidden {
       padding-top: @tile-field-padding;
@@ -64,7 +65,8 @@
     & > label {
       color: @tile-default-label-color;
       margin: 0;
-      font-size: 18px;
+      font-size: 12px;
+      font-weight: bold;
       padding-top: 0;
       padding-bottom: @dashboard-tile-label-padding-bottom;
       padding-right: 0;
@@ -139,26 +141,6 @@
     &.bean-field > label {
       padding-bottom: @dashboard-tile-label-large-padding-bottom;
     }
-
-    /* Don't show underline decoration for links inside certain tiles */
-
-    &.html-field .app-link,
-    &.tile-list-field .app-link,
-    &.tile-attributes-field .app-link,
-    &.html-field a,
-    &.tile-list-field a,
-    &.tile-attributes-field a {
-      text-decoration: none;
-      color: @tile-default-link-color;
-
-      &:hover {
-        color: @tile-default-link-hover-color;
-      }
-
-      &:active {
-        color: @tile-default-link-active-color;
-      }
-    }
   }
 
   &.loading {
@@ -193,7 +175,6 @@
       & .app-link,
       & a {
         color: @tile-default-inverted-color;
-        text-decoration: underline;
 
         &:hover {
           color: @tile-default-inverted-link-hover-color;

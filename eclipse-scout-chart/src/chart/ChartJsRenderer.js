@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,27 +29,61 @@ import ChartJsTooltipDelay from './ChartJsTooltipDelay';
  * @property {object} [defaults.global.elements.rectangle]
  * @property {object} [defaults.global.tooltips]
  */
-ChartJs.defaults.global.maintainAspectRatio = false;
-ChartJs.defaults.global.legend.labels.usePointStyle = true;
-ChartJs.defaults.global.legend.labels.boxWidth = 7;
-ChartJs.defaults.global.elements.line.tension = 0;
-ChartJs.defaults.global.elements.line.fill = false;
-ChartJs.defaults.global.elements.line.borderWidth = 2;
-ChartJs.defaults.global.elements.point.radius = 0;
-ChartJs.defaults.global.elements.point.hitRadius = 10;
-ChartJs.defaults.global.elements.point.hoverRadius = 5;
-ChartJs.defaults.global.elements.point.hoverBorderWidth = 2;
-ChartJs.defaults.global.elements.arc.borderWidth = 1;
-ChartJs.defaults.global.elements.rectangle.borderWidth = 1;
-ChartJs.defaults.global.elements.rectangle.borderSkipped = '';
-ChartJs.defaults.horizontalBar.elements.rectangle.borderSkipped = '';
-ChartJs.defaults.global.tooltips.borderWidth = 1;
-ChartJs.defaults.global.tooltips.cornerRadius = 4;
-ChartJs.defaults.global.tooltips.xPadding = 8;
-ChartJs.defaults.global.tooltips.yPadding = 8;
-ChartJs.defaults.global.tooltips.titleSpacing = 4;
-ChartJs.defaults.global.tooltips.titleMarginBottom = 8;
-ChartJs.defaults.global.tooltips.bodySpacing = 4;
+$.extend(true, ChartJs.defaults, {
+  global: {
+    maintainAspectRatio: false,
+    legend: {
+      labels: {
+        usePointStyle: true,
+        boxWidth: 7
+      }
+    },
+    elements: {
+      line: {
+        tension: 0,
+        fill: false,
+        borderWidth: 2
+      },
+      point: {
+        radius: 0,
+        hitRadius: 10,
+        hoverRadius: 7,
+        borderWidth: 1,
+        hoverBorderWidth: 2
+      },
+      arc: {
+        borderWidth: 1
+      },
+      rectangle: {
+        borderWidth: 1,
+        borderSkipped: ''
+      }
+    },
+    tooltips: {
+      borderWidth: 1,
+      cornerRadius: 4,
+      xPadding: 8,
+      yPadding: 8,
+      titleSpacing: 4,
+      titleMarginBottom: 8,
+      bodySpacing: 4
+    }
+  },
+  line: {
+    elements: {
+      point: {
+        borderWidth: 2
+      }
+    }
+  },
+  horizontalBar: {
+    elements: {
+      rectangle: {
+        borderSkipped: ''
+      }
+    }
+  }
+});
 
 let chartJsGlobalsInitialized = false;
 
@@ -772,9 +806,6 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         angleLines: {
           display: false
         },
-        gridLines: {
-          borderDash: [2, 4]
-        },
         ticks: {
           beginAtZero: true,
           callback: this._labelFormatter
@@ -820,9 +851,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           offset: type === Chart.Type.BUBBLE,
           gridLines: {
             drawBorder: false,
-            drawTicks: false,
-            zeroLineBorderDash: [2, 4],
-            borderDash: [2, 4]
+            drawTicks: false
           },
           ticks: {
             padding: 5,
@@ -867,9 +896,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         yAxes[i] = $.extend(true, {}, {
           gridLines: {
             drawBorder: false,
-            drawTicks: false,
-            zeroLineBorderDash: [2, 4],
-            borderDash: [2, 4]
+            drawTicks: false
           },
           ticks: {
             padding: 5,
@@ -1160,7 +1187,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         checkedBackgroundColors: [],
         checkedHoverBackgroundColors: [],
         legendColors: [],
-        pointHoverColor: this._computePointHoverColor(type)
+        pointHoverColors: []
       };
 
     colors = $.extend(true, colors, this._computeDatasetColors(config, multipleColorsPerDataset));
@@ -1171,7 +1198,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         hoverBackgroundColor = (multipleColorsPerDataset ? colors.hoverBackgroundColors : colors.hoverBackgroundColors[idx]),
         hoverBorderColor = (multipleColorsPerDataset ? colors.hoverBorderColors : colors.hoverBorderColors[idx]),
         legendColor = (multipleColorsPerDataset ? colors.legendColors : colors.legendColors[idx]),
-        pointHoverBackgroundColor = colors.pointHoverColor;
+        pointHoverBackgroundColor = (multipleColorsPerDataset ? colors.pointHoverColors : colors.legendColors[idx]);
 
       let setProperty = (identifier, value) => {
         if (typeof elem[identifier] === 'function') {
@@ -1187,6 +1214,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       setProperty('hoverBorderColor', hoverBorderColor);
       setProperty('legendColor', legendColor);
       setProperty('pointHoverBackgroundColor', pointHoverBackgroundColor);
+      setProperty('pointBorderColor', this.firstOpaqueBackgroundColor);
+      setProperty('pointHoverBorderColor', this.firstOpaqueBackgroundColor);
       if (checkable) {
         let datasetLength = elem.data.length;
         if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.BAR_HORIZONTAL, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.BUBBLE) || (type === Chart.Type.BAR && (elem.type || Chart.Type.BAR) === Chart.Type.BAR)) {
@@ -1217,7 +1246,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           setProperty('pointHoverBackgroundColor', elem.uncheckedPointHoverBackgroundColor);
 
           let uncheckedPointRadius = arrays.init(datasetLength, ((config.options.elements || {}).point || {}).radius || ChartJs.defaults.global.elements.point.radius),
-            checkedPointRadius = arrays.init(datasetLength, ((config.options.elements || {}).point || {}).hoverRadius || ChartJs.defaults.global.elements.point.hoverRadius);
+            checkedPointRadius = arrays.init(datasetLength, (((config.options.elements || {}).point || {}).hoverRadius || ChartJs.defaults.global.elements.point.hoverRadius) - 1);
           setProperty('uncheckedPointRadius', uncheckedPointRadius);
           setProperty('checkedPointRadius', checkedPointRadius);
 
@@ -1228,10 +1257,6 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (checkable) {
       this._checkItems(config);
     }
-  }
-
-  _computePointHoverColor(type) {
-    return styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'point hover'], 'fill').fill;
   }
 
   _computeDatasetColors(config, multipleColorsPerDataset) {
@@ -1273,7 +1298,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         hoverBorderColors: [],
         checkedBackgroundColors: [],
         checkedHoverBackgroundColors: [],
-        legendColors: []
+        legendColors: [],
+        pointHoverColors: []
       };
 
     let types = [];
@@ -1292,6 +1318,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       colors.checkedHoverBackgroundColors.push(this._computeCheckedHoverBackgroundColor(type, index, checkable));
 
       colors.legendColors.push(this._computeLegendColor(type, index));
+
+      colors.pointHoverColors.push(this._computePointHoverColor(type, index));
     });
 
     return colors;
@@ -1333,6 +1361,10 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     return styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'color' + (index % this.numSupportedColors) + ' legend'], 'fill').fill;
   }
 
+  _computePointHoverColor(type, index) {
+    return styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'color' + (index % this.numSupportedColors) + ' point hover'], 'fill').fill;
+  }
+
   _computeDatasetColorsChartValueGroups(config, multipleColorsPerDataset) {
     if (!config || !config.type || !this.chart.data) {
       return {};
@@ -1348,7 +1380,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         hoverBorderColors: [],
         checkedBackgroundColors: [],
         checkedHoverBackgroundColors: [],
-        legendColors: []
+        legendColors: [],
+        pointHoverColors: []
       };
 
     this.chart.data.chartValueGroups.forEach(elem => {
@@ -1407,6 +1440,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       colors.checkedHoverBackgroundColors.push(adjustColor(checkedHoverBackgroundOpacity, checkedHoverBackgroundDarker));
 
       colors.legendColors.push(adjustColor(1, 0));
+
+      colors.pointHoverColors.push(adjustColor(1, 0));
     });
     colors.datalabelColor = this._computeDatalabelColor(type);
 
@@ -1530,10 +1565,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
     let labelColor = this._computeLabelColor(config.type),
       labelBackdropColor = this._computeLabelBackdropColor(config.type),
-      gridColor = this._computeGridColor(config.type);
+      gridColor = this._computeGridColor(config.type),
+      scaleTicksColor = this._computeScaleTicksColor(config.type);
 
     config.options.scale.ticks = $.extend(true, {}, config.options.scale.ticks, {
-      fontColor: gridColor,
+      fontColor: scaleTicksColor,
       backdropColor: labelBackdropColor
     });
     config.options.scale.pointLabels = $.extend(true, {}, config.options.scale.pointLabels, {
@@ -1550,6 +1586,10 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _computeGridColor(type) {
     return styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'grid'], 'fill').fill;
+  }
+
+  _computeScaleTicksColor(type) {
+    return styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'scale-ticks'], 'fill').fill;
   }
 
   _adjustScalesColors(config) {

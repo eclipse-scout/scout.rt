@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -582,7 +582,7 @@ export default class TableTileGridMediator extends Widget {
       // Make groups invisible if a tile filter is active and no tiles match (= no tiles are visible)
       let groupEmpty = group.body.filters.length > 0 && group.body.filteredTiles.length === 0;
       group.setVisible(!groupEmpty);
-      group.setTitleSuffix('(' + group.body.filteredTiles.length + ')');
+      group.setTitleSuffix(group.body.filteredTiles.length);
     });
   }
 
