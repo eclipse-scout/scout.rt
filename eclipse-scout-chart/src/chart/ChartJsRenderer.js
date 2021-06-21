@@ -60,9 +60,9 @@ $.extend(true, ChartJs.defaults, {
       }
     },
     tooltips: {
-      borderWidth: 1,
-      cornerRadius: 4,
-      xPadding: 8,
+      borderWidth: 0,
+      cornerRadius: 3,
+      xPadding: 12,
       yPadding: 8,
       titleSpacing: 4,
       titleMarginBottom: 8,
@@ -1578,13 +1578,10 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       return;
     }
 
-    let tooltipBackgroundColor = this._computeTooltipBackgroundColor(config.type),
-      tooltipBorderColor = this._computeTooltipBorderColor(config.type);
-
+    let tooltipBackgroundColor = this._computeTooltipBackgroundColor(config.type);
     config.options = $.extend(true, {}, config.options, {
       tooltips: {
         backgroundColor: tooltipBackgroundColor,
-        borderColor: tooltipBorderColor,
         multiKeyBackground: tooltipBackgroundColor
       }
     });
@@ -1592,10 +1589,6 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _computeTooltipBackgroundColor(type) {
     return styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'tooltip-background'], 'fill').fill;
-  }
-
-  _computeTooltipBorderColor(type) {
-    return styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'tooltip-border'], 'fill').fill;
   }
 
   _adjustScaleColors(config) {

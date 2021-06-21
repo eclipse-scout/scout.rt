@@ -18,6 +18,8 @@ export default class Notification extends Widget {
     this.status = Status.info();
     this.closable = false;
     this.htmlEnabled = false;
+    this.iconId = null;
+    this._icon = null;
   }
 
   _init(model) {
@@ -34,6 +36,7 @@ export default class Notification extends Widget {
     }
     texts.resolveTextProperty(this.status, 'message', this.session);
     this._setStatus(this.status);
+    this._setIconId(this.iconId);
   }
 
   _render() {
@@ -46,11 +49,13 @@ export default class Notification extends Widget {
   _remove() {
     super._remove();
     this._removeCloser();
+    this._removeIcon();
   }
 
   _renderProperties() {
     super._renderProperties();
     this._renderStatus();
+    this._renderIconId();
     this._renderClosable();
   }
 
@@ -90,6 +95,49 @@ export default class Notification extends Widget {
       this.$messageText.html(strings.nl2br(message));
     }
     this.invalidateLayoutTree();
+  }
+
+  setIconId(iconId) {
+    this.setProperty('iconId', iconId);
+  }
+
+  _setIconId(iconId) {
+    this._setProperty('iconId', iconId);
+  }
+
+  _renderIconId() {
+    let hasIcon = !!this.iconId;
+    this.$container.toggleClass('has-icon', hasIcon);
+    this.$container.toggleClass('no-icon', !hasIcon);
+    if (hasIcon) {
+      this._renderIcon();
+    } else {
+      this._removeIcon();
+    }
+  }
+
+  _renderIcon() {
+    if (this._icon) {
+      this._icon.setIconDesc(this.iconId);
+      return;
+    }
+
+    this._icon = scout.create('Icon', {
+      parent: this,
+      iconDesc: this.iconId,
+      prepend: true
+    });
+    this._icon.one('destroy', () => {
+      this._icon = null;
+    });
+    this._icon.render();
+    this._icon.$container.addClass('notification-icon');
+  }
+
+  _removeIcon() {
+    if (this._icon) {
+      this._icon.destroy();
+    }
   }
 
   setClosable(closable) {

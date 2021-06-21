@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,19 +18,19 @@ export default class TableInfoLoadTooltip extends Tooltip {
 
   _init(options) {
     super._init(options);
-
     this.tableFooter = options.tableFooter;
+    let reloadDataMenu = scout.create('Menu', {
+      parent: this,
+      text: this.session.text('ui.ReloadData')
+    });
+    reloadDataMenu.on('action', this._onReloadClick.bind(this));
+    this.setMenus(reloadDataMenu);
   }
 
   _renderText() {
     let table = this.tableFooter.table,
       numRows = table.rows.length;
-
-    this.$content.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.tableFooter.computeCountInfo(numRows)));
-    this.$content.appendBr();
-    this.$content.appendSpan('link')
-      .text(this.session.text('ui.ReloadData'))
-      .on('click', this._onReloadClick.bind(this));
+    this.$content.text(this.session.text('ui.NumRowsLoaded', this.tableFooter.computeCountInfo(numRows)));
   }
 
   _onReloadClick() {

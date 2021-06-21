@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,8 +44,6 @@ public class Status implements IStatus, Serializable {
 
   /**
    * Creates a status with severity {@link #ERROR} and a given message
-   *
-   * @param message
    */
   public Status(String message) {
     this(message, IStatus.ERROR);
@@ -54,7 +52,6 @@ public class Status implements IStatus, Serializable {
   /**
    * Status with error message and severity.
    *
-   * @param message
    * @param severity
    *          {@link #ERROR}, {@link #WARNING}, {@link #INFO}
    */
@@ -65,7 +62,6 @@ public class Status implements IStatus, Serializable {
   /**
    * Status with error message and severity, error code
    *
-   * @param message
    * @param severity
    *          {@link #ERROR}, {@link #WARNING}, {@link #INFO}
    */
@@ -94,7 +90,6 @@ public class Status implements IStatus, Serializable {
     return m_severity;
   }
 
-  // TODO [7.0] aho: deprecate use fluent api
   public void setSeverity(int severity) {
     withSeverity(severity);
   }
@@ -129,7 +124,6 @@ public class Status implements IStatus, Serializable {
     return m_code;
   }
 
-  // TODO [7.0] aho: deprecate use fluent api
   public void setCode(int code) {
     m_code = code;
   }

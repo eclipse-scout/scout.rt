@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-@desktop-notification-width: 250px;
+@desktop-notification-width: 300px;
+@desktop-notification-margin-bottom: 10px;
 
 .desktop-notifications {
   position: fixed;
@@ -16,7 +17,7 @@
   top: 0;
   height: 100%;
   width: @desktop-notification-width;
-  margin-top: @desktop-notifications-margin-top;
+  margin-top: @desktop-header-height + 8px;
   pointer-events: none; /* Don't block access to the elements in the background */
 }
 
@@ -45,7 +46,7 @@
   }
   100% {
     left: 0;
-    margin-bottom: 20px;
+    margin-bottom: @desktop-notification-margin-bottom;
   }
 }
 
@@ -73,11 +74,9 @@
 .keyframes-desktop-notification-fade-out() {
   0% {
     opacity: 1.0;
-    margin-bottom: 20px;
   }
   100% {
     opacity: 0;
-    margin-bottom: -37px;
   }
 }
 
@@ -95,50 +94,104 @@
 .desktop-notification {
   position: relative;
   width: @desktop-notification-width;
-  float: right;
-  border-left: 3px solid @active-color;
+  display: flex;
+  align-items: center;
   background-color: @desktop-notification-background-color;
-  margin-bottom: 20px;
+  margin-bottom: @desktop-notification-margin-bottom;
+  padding: 8px 0 8px 10px;
+  border-radius: @border-radius-medium;
   pointer-events: auto;
-  #scout.drop-shadow();
+  #scout.drop-shadow-large();
 
-  &.ok {
-    border-left-color: @desktop-notification-ok-border-color;
-  }
-
-  &.info {
-    border-left-color: @desktop-notification-info-border-color;
-  }
-
-  &.warning {
-    border-left-color: @desktop-notification-warning-border-color;
-  }
-
-  &.error {
-    border-left-color: @desktop-notification-error-border-color;
+  &.no-icon {
+    padding: @desktop-notification-no-icon-padding-y 12px @desktop-notification-no-icon-padding-y 23px;
   }
 }
 
 .desktop-notification-content {
-  border: 1px solid @border-color;
-  border-left-width: 0;
-  padding: 10px;
+  max-width: 100%;
+
+  .has-icon > & {
+    max-width: calc(~'100% - 40px');
+    margin-left: 10px;
+  }
+
+  .ok > & {
+    color: @ok-color;
+    font-weight: @font-weight-bold;
+
+    .no-icon& {
+      &::before {
+        .notification-severity-marker(@desktop-notification-ok-border-color);
+      }
+    }
+  }
+
+  .info > & {
+    // info uses default font weight and color
+
+    .no-icon& {
+      &::before {
+        .notification-severity-marker(@desktop-notification-info-border-color);
+      }
+    }
+  }
+
+  .warning > & {
+    color: @warning-color;
+    font-weight: @font-weight-bold;
+
+    .no-icon& {
+      &::before {
+        .notification-severity-marker(@desktop-notification-warning-border-color);
+      }
+    }
+  }
+
+  .error > & {
+    color: @error-color;
+    font-weight: @font-weight-bold;
+
+    .no-icon& {
+      &::before {
+        .notification-severity-marker(@desktop-notification-error-border-color);
+      }
+    }
+  }
 
   /* Prevent overlay of text and close icon */
-
   &.closable {
-    padding-right: 25px;
+    padding-right: 35px;
   }
 
   & > .closer {
     position: absolute;
-    right: 10px;
-    top: 10px;
+    padding: 4px;
+    margin: 2px;
+    right: 9px;
+    top: 9px;
+    border-radius: @border-radius;
+
+    &:hover {
+      background-color: @hover-background-color;
+    }
+
+    .ok > & {
+      color: @ok-color;
+    }
+
+    .warning > & {
+      color: @warning-color;
+    }
+
+    .error > & {
+      color: @error-color;
+    }
   }
 }
 
 .desktop-notification-message {
-  display: inline-block;
+  #scout.overflow-ellipsis();
 }
 
 .desktop-notification-loader {

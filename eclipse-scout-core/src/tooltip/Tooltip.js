@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,9 +20,9 @@ export default class Tooltip extends Widget {
      * Either a String or a function which returns a String
      */
     this.text = null;
-
-    this.arrowPosition = 25;
-    this.arrowPositionUnit = '%';
+    this.severity = Status.Severity.INFO;
+    this.arrowPosition = 16;
+    this.arrowPositionUnit = 'px';
     this.windowPaddingX = 10;
     this.windowPaddingY = 5;
     this.origin = null;
@@ -221,6 +221,8 @@ export default class Tooltip extends Widget {
       }, this);
     }
 
+    this.$container.toggleClass('has-menus', menus.length > 0);
+
     if (!this.rendering) {
       // New text might be shorter or longer -> recompute position.
       // Resetting the current position first ensures that the position is computed the
@@ -232,8 +234,8 @@ export default class Tooltip extends Widget {
   }
 
   position() {
-    let top, left, arrowSize, overlapX, overlapY, x, y, origin,
-      tooltipWidth, tooltipHeight, arrowDivWidth, arrowPosition, inView;
+    let top, left, arrowSizeX, arrowSizeY, overlapX, overlapY, x, y, origin,
+      tooltipWidth, tooltipHeight, arrowPosition, inView;
 
     if (this.origin) {
       origin = this.origin;
@@ -257,9 +259,8 @@ export default class Tooltip extends Widget {
       y -= parentOffset.top;
     }
 
-    arrowDivWidth = this.$arrow.outerWidth();
-    // Arrow is a div rotated by 45 deg -> visible height is half the div
-    arrowSize = Tooltip.computeHypotenuse(arrowDivWidth) / 2;
+    arrowSizeX = 7;
+    arrowSizeY = 4;
 
     tooltipHeight = this.$container.outerHeight();
     tooltipWidth = this.$container.outerWidth();
@@ -270,7 +271,7 @@ export default class Tooltip extends Widget {
       arrowPosition = tooltipWidth * this.arrowPosition / 100;
     }
 
-    top = y - tooltipHeight - arrowSize;
+    top = y - tooltipHeight - arrowSizeY;
     left = x - arrowPosition;
     overlapX = left + tooltipWidth + this.windowPaddingX - this.$parent.width();
     overlapY = top - this.windowPaddingY;
@@ -285,15 +286,15 @@ export default class Tooltip extends Widget {
     this.$arrow.removeClass('arrow-top arrow-bottom');
     if (this.tooltipPosition === 'bottom' || overlapY < 0) {
       this.$arrow.addClass('arrow-top');
-      top = y + origin.height + arrowSize;
+      top = y + origin.height + arrowSizeY;
     } else {
       this.$arrow.addClass('arrow-bottom');
     }
 
     // Make sure arrow is never positioned outside of the tooltip
-    arrowPosition = Math.min(arrowPosition, this.$container.outerWidth() - arrowSize);
-    arrowPosition = Math.max(arrowPosition, arrowSize);
-    this.$arrow.cssLeft(arrowPosition);
+    arrowPosition = Math.min(arrowPosition, this.$container.outerWidth() - arrowSizeX);
+    arrowPosition = Math.max(arrowPosition, arrowSizeX);
+    this.$arrow.cssLeft(arrowPosition - 1);
     this.$container
       .cssLeft(left)
       .cssTop(top);
@@ -355,14 +356,5 @@ export default class Tooltip extends Widget {
     }
 
     this.destroy();
-  }
-
-  /* --- STATIC HELPERS ------------------------------------------------------------- */
-
-  /**
-   * @memberOf Tooltip
-   */
-  static computeHypotenuse(x) {
-    return Math.sqrt(Math.pow(x, 2) + Math.pow(x, 2));
   }
 }

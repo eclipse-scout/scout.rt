@@ -636,7 +636,7 @@ export default class FormField extends Widget {
     } else if (this.hasStatusTooltip()) {
       status = scout.create('Status', {
         message: this.tooltipText,
-        severity: Status.Severity.OK
+        severity: Status.Severity.INFO
       });
       // If there are menus, show them in the tooltip. But only if there is a tooltipText, don't do it if there is an error status.
       // Menus make most likely no sense if an error status is displayed

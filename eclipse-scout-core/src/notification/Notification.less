@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,32 +8,84 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+
+.notification-severity-marker(@color, @margin-left: 8px) {
+  content: '';
+  position: absolute;
+  border: 2px solid @color;
+  margin: 7px 0 7px @margin-left;
+  border-radius: 2px;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: calc(~'100% - '(7px * 2));
+}
+
+.notification-font-icon-style(@color) {
+  color: @background-color;
+  background-color: @color;
+  font-size: 16px;
+  border-radius: 50%;
+}
+
 .notification {
   position: relative;
-  padding: 10px;
+  display: flex;
+  align-items: center;
   margin: 10px 0 0 10px;
+  padding: 8px;
   border: 1px solid transparent;
+  border-radius: @border-radius-medium;
   color: @text-color;
   pointer-events: auto;
+  font-weight: @font-weight-bold;
+
+  &.no-icon {
+    padding: @notification-no-icon-padding-y 12px @notification-no-icon-padding-y 23px;
+  }
 
   &.ok {
-    background-color: @notification-ok-background-color;
     border-color: @notification-ok-border-color;
+    color: @ok-color;
+
+    &.no-icon {
+      &::before {
+        .notification-severity-marker(@notification-ok-border-color, 9px);
+      }
+    }
   }
 
   &.info {
-    background-color: @notification-info-background-color;
     border-color: @notification-info-border-color;
+    font-weight: @font-weight-normal;
+
+    &.no-icon {
+      &::before {
+        .notification-severity-marker(@info-color, 9px);
+      }
+    }
   }
 
   &.warning {
-    background-color: @notification-warning-background-color;
     border-color: @notification-warning-border-color;
+    color: @warning-color;
+
+    &.no-icon {
+      &::before {
+        .notification-severity-marker(@notification-warning-border-color, 9px);
+      }
+    }
   }
 
   &.error {
-    background-color: @notification-error-background-color;
     border-color: @notification-error-border-color;
+    color: @error-color;
+
+    &.no-icon {
+      &::before {
+        .notification-severity-marker(@notification-error-border-color, 9px);
+      }
+    }
   }
 
   /* When notification is a direct child of the main group-box: use different margins */
@@ -44,8 +96,40 @@
   }
 }
 
+.notification-icon {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &.font-icon {
+    .ok > & {
+      .notification-font-icon-style(@ok-color);
+    }
+
+    .info > & {
+      .notification-font-icon-style(@info-color);
+    }
+
+    .warning > & {
+      .notification-font-icon-style(@warning-color);
+    }
+
+    .error > & {
+      .notification-font-icon-style(@error-color);
+    }
+  }
+}
+
 .notification-content {
-  /* Prevent overlay of text and close icon */
+  max-width: 100%;
+
+  .has-icon > & {
+    max-width: calc(~'100% - 40px');
+    margin-left: 10px;
+  }
 
   &.closable {
     padding-right: 25px;
@@ -53,15 +137,41 @@
 
   & > .closer {
     position: absolute;
-    right: 2px;
-    top: 2px;
-    // Enlarge region to click
-    padding: 8px;
+    right: 6px;
+    top: 6px;
+    padding: 6px;
+    border-radius: @border-radius;
+
+    .has-icon > & {
+      right: 9px;
+      top: 9px;
+    }
+
+    &:hover {
+      background-color: @hover-background-color;
+    }
+
+    .ok > & {
+      color: @ok-color;
+    }
+
+    .info > & {
+      color: @closer-color;
+    }
+
+    .warning > & {
+      color: @warning-color;
+    }
+
+    .error > & {
+      color: @error-color;
+    }
   }
 }
 
 .notification-message {
-  // display: inline-block;
+  padding-right: 12px;
+
   #scout.user-select(text);
   #scout.overflow-ellipsis();
 }

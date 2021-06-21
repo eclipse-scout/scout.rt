@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,23 +10,30 @@
  */
 .tooltip {
   position: absolute;
-  background-color: @tooltip-background-color;
-  border: @tooltip-border;
-  color: @tooltip-color;
-  #scout.drop-shadow();
+  background-color: @tooltip-info-background-color;
+  border-radius: @tooltip-border-radius;
+  color: @tooltip-info-color;
+  #scout.drop-shadow-large();
   max-width: 300px;
   white-space: normal;
+
+  &.has-menus {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
 }
 
 .tooltip-content {
-  background-color: inherit;
   padding: @tooltip-padding-y @tooltip-padding-x;
   position: relative;
   min-width: 60px; /* Prevents tooltips with very short text from looking "strange" */
   #scout.overflow-ellipsis();
+  font-weight: @tooltip-font-weight;
 
-  & .bold {
-    font-weight: bold;
+  .has-menus > & {
+    font-weight: @font-weight-bold;
+    padding-left: @context-menu-item-padding-left;
+    padding-right: @context-menu-item-padding-right;
   }
 
   & .small {
@@ -36,25 +43,35 @@
 }
 
 .tooltip-menus {
-  background-color: inherit;
-  padding: 0 @tooltip-padding-x 5px @tooltip-padding-x;
   position: relative;
 
-  .tooltip.no-text > & {
-    padding-top: 3px;
-  }
-
   & > .menu-item {
-    display: block;
-    padding-top: @tooltip-menu-padding-y;
-    padding-bottom: @tooltip-menu-padding-y;
+    display: flex;
+    border-radius: 0;
+    padding: @tooltip-padding-y @context-menu-item-padding-right @tooltip-padding-y @context-menu-item-padding-left;
 
-    & > .text {
-      text-decoration: underline;
+    &:hover {
+      background-color: @tooltip-menu-hover-background-color;
     }
 
     & > .submenu-icon {
       padding-left: 5px;
+    }
+
+    .ok > & {
+      color: @tooltip-ok-color;
+    }
+
+    .info > & {
+      color: @palette-gray-1;
+    }
+
+    .warning > & {
+      color: @tooltip-warning-color;
+    }
+
+    .error > & {
+      color: @tooltip-error-color;
     }
   }
 }
@@ -66,62 +83,41 @@
   background-color: inherit;
   border: inherit;
   #scout.transform(rotate(45deg));
-  #scout.drop-shadow();
 }
 
 .tooltip-arrow.arrow-bottom {
-  bottom: -(@tooltip-arrow-size / 2);
-  margin-left: -(@tooltip-arrow-size / 2) - @tooltip-border-size;
+  bottom: -2px;
+  margin-left: -(@tooltip-arrow-size / 2);
 }
 
 .tooltip-arrow.arrow-top {
-  top: -(@tooltip-arrow-size / 2);
-  margin-left: -(@tooltip-arrow-size / 2) - @tooltip-border-size;
+  top: -2px;
+  margin-left: -(@tooltip-arrow-size / 2);
 }
 
 .tooltip.error {
   background-color: @tooltip-error-background-color;
-  border-color: @tooltip-error-color;
+  color: @tooltip-error-color;
 
   & > .tooltip-arrow {
-    background-color: @tooltip-error-background-color;
-    border-color: @tooltip-error-border-color;
-  }
-
-  & > .tooltip-content,
-  & > .tooltip-menus {
     background-color: @tooltip-error-background-color;
   }
 }
 
 .tooltip.warning {
   background-color: @tooltip-warning-background-color;
-  border-color: @tooltip-warning-border-color;
   color: @tooltip-warning-color;
 
   & > .tooltip-arrow {
     background-color: @tooltip-warning-background-color;
-    border-color: @tooltip-warning-border-color;
-  }
-
-  & > .tooltip-content,
-  & > .tooltip-menus {
-    background-color: @tooltip-warning-background-color;
   }
 }
 
-.tooltip.info {
-  background-color: @tooltip-info-background-color;
-  border-color: @tooltip-info-border-color;
-  color: @tooltip-info-color;
+.tooltip.ok {
+  background-color: @tooltip-ok-background-color;
+  color: @tooltip-ok-color;
 
   & > .tooltip-arrow {
-    background-color: @tooltip-info-background-color;
-    border-color: @tooltip-info-border-color;
-  }
-
-  & > .tooltip-content,
-  & > .tooltip-menus {
-    background-color: @tooltip-info-background-color;
+    background-color: @tooltip-ok-background-color;
   }
 }

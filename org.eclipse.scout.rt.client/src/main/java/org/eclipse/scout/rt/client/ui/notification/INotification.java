@@ -38,6 +38,18 @@ public interface INotification extends IWidget {
    */
   boolean isHtmlEnabled();
 
+  /**
+   * @return The icon id of the notification or {@code null}.
+   */
+  String getIconId();
+
+  /**
+   * Sets the new icon id of this notification.
+   * @param iconId The new icon Id. May be {@code null}.
+   * @return this instance
+   */
+  Notification withIconId(String iconId);
+
   void addNotificationListener(NotificationListener listener);
 
   void removeNotificationListener(NotificationListener listener);

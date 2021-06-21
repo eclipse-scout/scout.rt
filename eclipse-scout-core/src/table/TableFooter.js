@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -435,7 +435,6 @@ export default class TableFooter extends Widget {
       this._tableInfoTooltip = scout.create(tooltipType, {
         parent: this,
         tableFooter: this,
-        cssClass: 'table-info-tooltip',
         arrowPosition: 50,
         arrowPositionUnit: '%',
         $anchor: $info

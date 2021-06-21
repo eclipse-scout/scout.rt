@@ -116,6 +116,7 @@
 @compact-outline-title-padding-x: @compact-outline-node-padding-x;
 @context-menu-item-padding-y: 8px;
 @context-menu-item-padding-left: 16px;
+@context-menu-item-padding-right: 16px;
 @dashboard-tile-label-padding-bottom: 5px;
 @dashboard-tile-label-large-padding-bottom: 10px;
 @dashboard-tile-drop-shadow-light-alpha: 0.05;
@@ -134,7 +135,7 @@
 @desktop-navigation-breadcrumb-width: 240px;
 @desktop-navigation-min-width: 49px; /* not 50px because last pixel is the border (would not look good)*/
 @desktop-navigation-width: 290px;
-@desktop-notifications-margin-top: 57px;
+@desktop-notification-no-icon-padding-y: 16px;
 @desktop-tab-border-radius: @view-tab-border-radius;
 @desktop-tab-key-box-bottom: @view-tab-key-box-bottom;
 @desktop-tab-margin: @view-tab-margin;
@@ -197,6 +198,7 @@
 @mobile-popup-title-margin-top: 10px;
 @mode-padding: 5px;
 @mode-padding-dense: 3px;
+@notification-no-icon-padding-y: 13px;
 @outline-breadcrumb-node-padding-x: @outline-title-padding-left;
 @outline-breadcrumb-node-padding-y: 12px;
 @outline-data-padding-top: 16px;
@@ -286,12 +288,10 @@
 @tile-field-compact-padding-y: 10px;
 @tile-field-compact-padding-x: 15px;
 @tile-field-small-compact-padding-x: @tile-field-compact-padding-y;
-@tooltip-arrow-size: 14px;
-@tooltip-border-size: 1px;
-@tooltip-border: @tooltip-border-size solid @tooltip-border-color;
-@tooltip-menu-padding-y: 5px;
+@tooltip-arrow-size: 11px;
+@tooltip-border-radius: @border-radius;
 @tooltip-padding-x: 12px;
-@tooltip-padding-y: 8px;
+@tooltip-padding-y: @context-menu-item-padding-y;
 @tree-node-icon-width: 16px;
 @tree-node-bitmap-icon-size: @tree-node-icon-width;
 @tree-node-bitmap-icon-margin-top: -2px;

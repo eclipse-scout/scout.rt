@@ -34,8 +34,8 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   public static final int TEXT_BIT = 2;
   public static final int ICON_ID_BIT = 3;
   public static final int TOOLTIP_BIT = 4;
-  public static final int BACKGROUD_COLOR_BIT = 5;
-  public static final int FOREGROUD_COLOR_BIT = 6;
+  public static final int BACKGROUND_COLOR_BIT = 5;
+  public static final int FOREGROUND_COLOR_BIT = 6;
   public static final int FONT_BIT = 7;
   public static final int ENABLED_BIT = 8;
   public static final int PARENT_KEY_BIT = 9;
@@ -205,12 +205,12 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
 
   @Override
   public String getForegroundColor() {
-    return (String) getValueInternal(FOREGROUD_COLOR_BIT);
+    return (String) getValueInternal(FOREGROUND_COLOR_BIT);
   }
 
   @Override
   public LookupRow<ID_TYPE> withForegroundColor(String foregroundColor) {
-    setValueInternal(FOREGROUD_COLOR_BIT, StringUtility.intern(foregroundColor));
+    setValueInternal(FOREGROUND_COLOR_BIT, StringUtility.intern(foregroundColor));
     return this;
   }
 
@@ -227,12 +227,12 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
 
   @Override
   public String getBackgroundColor() {
-    return (String) getValueInternal(BACKGROUD_COLOR_BIT);
+    return (String) getValueInternal(BACKGROUND_COLOR_BIT);
   }
 
   @Override
   public LookupRow<ID_TYPE> withBackgroundColor(String backgroundColor) {
-    setValueInternal(BACKGROUD_COLOR_BIT, StringUtility.intern(backgroundColor));
+    setValueInternal(BACKGROUND_COLOR_BIT, StringUtility.intern(backgroundColor));
     return this;
   }
 

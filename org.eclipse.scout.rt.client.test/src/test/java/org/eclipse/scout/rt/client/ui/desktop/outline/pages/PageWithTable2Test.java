@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -55,7 +55,7 @@ public class PageWithTable2Test {
     assertEquals("row count", 1, table.getRowCount());
     assertEquals("IColumn value", I1, table.getIColumn().getValue(0));
     assertEquals("SColumn value", S1, table.getSColumn().getValue(0));
-    assertEquals("Status", null, page.getTableStatus());
+    assertNull("Status", page.getTableStatus());
   }
 
   /**
@@ -68,7 +68,7 @@ public class PageWithTable2Test {
 
     Table table = page.getTable();
     assertEquals("row count", 3, table.getRowCount());
-    assertEquals("Status - severity", IStatus.WARNING, page.getTableStatus().getSeverity());
+    assertEquals("Status - severity", IStatus.INFO, page.getTableStatus().getSeverity());
     assertEquals("Status - message", TEXTS.get("MaxOutlineRowWarning", "3"), page.getTableStatus().getMessage());
   }
 

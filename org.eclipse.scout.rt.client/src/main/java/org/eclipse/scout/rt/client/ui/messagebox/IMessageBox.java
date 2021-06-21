@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -83,7 +83,7 @@ public interface IMessageBox extends IWidget {
   IMessageBox withIconId(String iconId);
 
   /**
-   * @see {@link #withSeverity(int)}
+   * @see #withSeverity(int)
    */
   int getSeverity();
 
@@ -92,12 +92,11 @@ public interface IMessageBox extends IWidget {
    *
    * @param severity
    *          One of the {@link IStatus} constants.
-   * @return
    */
   IMessageBox withSeverity(int severity);
 
   /**
-   * @see {@link #withHeader(String)}
+   * @see #withHeader(String)
    */
   String getHeader();
 
@@ -109,7 +108,7 @@ public interface IMessageBox extends IWidget {
   IMessageBox withHeader(String header);
 
   /**
-   * @see {@link #withBody(String)}
+   * @see #withBody(String)
    */
   String getBody();
 
@@ -121,7 +120,7 @@ public interface IMessageBox extends IWidget {
   IMessageBox withBody(String body);
 
   /**
-   * @see {@link #withHtml(IHtmlContent)}
+   * @see #withHtml(IHtmlContent)
    */
   IHtmlContent getHtml();
 
@@ -133,7 +132,7 @@ public interface IMessageBox extends IWidget {
   IMessageBox withHtml(IHtmlContent html);
 
   /**
-   * @see {@link #withHiddenText(String)}
+   * @see #withHiddenText(String)
    */
   String getHiddenText();
 
@@ -141,12 +140,12 @@ public interface IMessageBox extends IWidget {
    * Sets the hidden text.
    * <p>
    * The hidden text is used for the default copy paste text, thus not visible in the UI directly.<br/>
-   * Examples usages are stacktraces or more detailed information that should not be directly presented to the user.
+   * Examples usages are stack-traces or more detailed information that should not be directly presented to the user.
    */
   IMessageBox withHiddenText(String hiddenText);
 
   /**
-   * @see {@link #withYesButtonText(String)}
+   * @see #withYesButtonText(String)
    */
   String getYesButtonText();
 
@@ -156,7 +155,7 @@ public interface IMessageBox extends IWidget {
   IMessageBox withYesButtonText(String yesButtonText);
 
   /**
-   * @see {@link #withNoButtonText(String)}
+   * @see #withNoButtonText(String)
    */
   String getNoButtonText();
 
@@ -166,7 +165,7 @@ public interface IMessageBox extends IWidget {
   IMessageBox withNoButtonText(String noButtonText);
 
   /**
-   * @see {@link #withCancelButtonText(String)}
+   * @see #withCancelButtonText(String)
    */
   String getCancelButtonText();
 
@@ -176,7 +175,7 @@ public interface IMessageBox extends IWidget {
   IMessageBox withCancelButtonText(String cancelButtonText);
 
   /**
-   * @see {@link #withAutoCloseMillis(long)}
+   * @see #withAutoCloseMillis(long)
    */
   long getAutoCloseMillis();
 
@@ -191,7 +190,7 @@ public interface IMessageBox extends IWidget {
   IMessageBox withAutoCloseMillis(long autoCloseMillis);
 
   /**
-   * @see {@link #withCopyPasteText(String)}
+   * @see #withCopyPasteText(String)
    */
   String getCopyPasteText();
 

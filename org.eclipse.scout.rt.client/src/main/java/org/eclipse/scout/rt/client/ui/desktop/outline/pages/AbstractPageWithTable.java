@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -95,8 +95,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * activation. this is a performance-optimization and especially recommended for tablepages where the parent is
    * directly another table page (and no folder- or plain page) in this case the parent page can have a huge amount of
    * child pages with a lot of tables to be constructed but never used.
-   *
-   * @param callInitializer
    */
   public AbstractPageWithTable(boolean callInitializer) {
     this(callInitializer, null);
@@ -229,8 +227,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * }
    * </pre>
    * <p/>
-   * This default implementation invokes {@link #interceptLoadTableData(SearchFilter)} to fetch the tabular data and
-   * loads it into the table using {@link ITable#replaceRowsByMatrix(Object)}.
+   * This default implementation invokes {@link #interceptLoadData(SearchFilter)} to fetch the tabular data and loads it
+   * into the table using {@link ITable#replaceRowsByMatrix(Object)}.
    *
    * @param filter
    *          a search filter, guaranteed not to be {@code null}
@@ -249,7 +247,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * only marked as dirty. The subtree is lazily reloaded when the user clicks next time on a child node.
    * <p>
    * Subclasses can override this method. In most cases it is sufficient to override
-   * {@link #interceptLoadData(SearchFilter)} or {@link #interceptLoadTableData(SearchFilter)} instead.<br/>
+   * {@link #interceptLoadData(SearchFilter)} or {@link #interceptLoadData(SearchFilter)} instead.<br/>
    * This default implementation does the following: It queries methods {@link #isSearchActive()} and
    * {@link #isSearchRequired()} and then calls {@link #interceptLoadData(SearchFilter)} if appropriate.
    */
@@ -271,7 +269,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
     //update table data status
     if (isSearchActive() && getSearchFilter() != null && (!getSearchFilter().isCompleted()) && isSearchRequired()) {
-      setTableStatus(new Status(TEXTS.get("TooManyRows"), IStatus.WARNING));
+      setTableStatus(new Status(TEXTS.get("TooManyRows"), IStatus.INFO));
     }
     else {
       setTableStatus(null);
@@ -314,7 +312,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         message = TEXTS.get("MaxOutlineRowWarning", showingRowCountText);
       }
     }
-    return new Status(message, IStatus.WARNING);
+    return new Status(message, IStatus.INFO);
   }
 
   /**
@@ -725,7 +723,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   /**
    * Import the content of the tablePageData in the table of the page.
    *
-   * @param tablePageData
    * @since 3.10.0-M3
    */
   protected void importPageData(AbstractTablePageData tablePageData) {
@@ -744,7 +741,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * Import data (Object[][]) in the table page. Object arrays are not type safe. The preferred way is to use a
    * bean-based table page data and {@link #importPageData(AbstractTablePageData)}
    *
-   * @param data
    * @since 4.2.0 (Mars-M4)
    */
   protected void importTableData(Object[][] data) {

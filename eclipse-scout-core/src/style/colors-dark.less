@@ -40,20 +40,17 @@
 @palette-blue-1: #98c4ec;
 @palette-red-0: #ffb3b1;
 @palette-red-1: #fd9d9b;
-@palette-red-2: #fa8784;
+@palette-red-2: #FF8888;
 @palette-green-0: #a2eac9;
 @palette-green-1: #85e0b6;
 @palette-green-2: #53cf95;
+@palette-green-3: #48C3AD;
 @palette-cyan-0: #cefff5;
 @palette-cyan-1: #aaf8ea;
 @palette-cyan-2: #7ff2dd;
 @palette-orange-0: #ffe8bf;
 @palette-orange-1: #ffdda0;
-@palette-orange-2: #ffd07e;
-
-/* This is a new orange color used only in dark theme.
-   If orange-4 is used as background it is extremely shiny, this new darker color has better contrast. */
-@palette-orange-5: #cd6906;
+@palette-orange-2: #FFBE6B;
 
 /* -------------------------------- */
 /* Global colors                    */
@@ -74,6 +71,10 @@
 @disabled-color: @palette-gray-2;
 @drop-shadow-alpha: 0.7;
 @drop-shadow-large-alpha: 0.8;
+@error-color: @palette-red-2;
+@warning-color: @palette-orange-2;
+@info-color: @palette-blue-1-1;
+@ok-color: @palette-green-3;
 @error-background-color: @background-color;
 @focus-border-color: @focus-color;
 @focus-color: @palette-blue-1-1;
@@ -101,7 +102,6 @@
 @text-selection-background-color: @palette-blue-1-1;
 @text-selection-color: @text-color;
 @title-color: @palette-blue-1-1;
-@warning-color: @palette-orange-3;
 @warning-hover-color: @palette-orange-4;
 
 /* -------------------------------- */
@@ -156,14 +156,7 @@
 @desktop-navigation-body-in-background-background-color: @palette-black;
 @desktop-navigation-color: @text-color;
 @desktop-navigation-handle-background-color: @desktop-navigation-body-background-color;
-@notification-error-background-color: @notification-ok-background-color;
-@notification-error-border-color: @error-color;
-@notification-info-background-color: @notification-ok-background-color;
 @notification-info-border-color: @palette-blue-1-1;
-@notification-ok-background-color: @palette-gray-4;
-@notification-ok-border-color: @palette-green-3;
-@notification-warning-background-color: @notification-ok-background-color;
-@notification-warning-border-color: @warning-color;
 @outline-compact-cell-content-color: @palette-gray-2-1;
 @outline-breadcrumb-border-color: @border-color;
 @outline-group-background-color: @palette-gray-7;
@@ -192,7 +185,7 @@
 @slider-track-color: @palette-gray-3;
 @slider-thumb-focus-border-color: @palette-blue-4;
 @slider-thumb-focus-color: lighten(@palette-blue-0, 5%);
-@status-info-color: @text-color;
+@status-info-color: @info-color;
 @status-menu-color: @text-color;
 @status-warning-color: @warning-color;
 @status-warning-hover-color: @warning-hover-color;
@@ -244,12 +237,11 @@
 @tile-overview-color: @palette-blue-1-1;
 @tile-placeholder-background-color: @palette-gray-5;
 @tile-scrollbar-thumb-inverted-main-color: @palette-white;
-@tooltip-background-color: @background-color;
-@tooltip-border-color: @palette-blue-1-1;
-@tooltip-error-background-color: @tooltip-background-color;
-@tooltip-error-border-color: @error-color;
-@tooltip-warning-background-color: @tooltip-background-color;
-@tooltip-warning-border-color: @warning-color;
+@tooltip-info-background-color: @palette-gray-6;
+@tooltip-info-color: @text-color;
+@tooltip-error-color: @palette-black;
+@tooltip-warning-color: @palette-black;
+@tooltip-ok-color: @palette-black;
 @wizard-step-active-step-background-color: @button-active-background-color;
 @wizard-step-active-step-text-color: @active-color;
 @wizard-step-default-border-color: @button-border-color;

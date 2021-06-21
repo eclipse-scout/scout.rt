@@ -55,7 +55,21 @@ public class DesktopNotification extends Notification implements IDesktopNotific
    *          see {@link #isClosable()}
    */
   public DesktopNotification(IStatus status, long duration, boolean closable) {
-    this(status, duration, closable, false, null);
+    this(status, duration, closable, null);
+  }
+
+  /**
+   * Creates a notification with the given attributes.
+   *
+   * @param status
+   *          see {@link #getStatus()}
+   * @param duration
+   *          see {@link #getDuration()}
+   * @param closable
+   *          see {@link #isClosable()}
+   */
+  public DesktopNotification(IStatus status, long duration, boolean closable, String iconId) {
+    this(status, duration, closable, false, iconId, null);
   }
 
   /**
@@ -73,7 +87,27 @@ public class DesktopNotification extends Notification implements IDesktopNotific
    *          see {@link #getAppLinkConsumer()}
    */
   public DesktopNotification(IStatus status, long duration, boolean closable, boolean htmlEnabled, Consumer<String> appLinkConsumer) {
-    super(status, closable, htmlEnabled, appLinkConsumer);
+    this(status, duration, closable, htmlEnabled, null, appLinkConsumer);
+  }
+
+  /**
+   * Creates a notification with the given attributes.
+   *
+   * @param status
+   *          see {@link #getStatus()}
+   * @param duration
+   *          see {@link #getDuration()}
+   * @param closable
+   *          see {@link #isClosable()}
+   * @param htmlEnabled
+   *          see {@link #isHtmlEnabled()}
+   * @param iconId
+   *          see {@link #getIconId()}
+   * @param appLinkConsumer
+   *          see {@link #getAppLinkConsumer()}
+   */
+  public DesktopNotification(IStatus status, long duration, boolean closable, boolean htmlEnabled, String iconId, Consumer<String> appLinkConsumer) {
+    super(status, closable, htmlEnabled, iconId, appLinkConsumer);
     m_duration = duration;
     NativeNotificationDefaults nativeNotificationDefaults = IDesktop.CURRENT.get().getNativeNotificationDefaults();
     if (nativeNotificationDefaults != null) {

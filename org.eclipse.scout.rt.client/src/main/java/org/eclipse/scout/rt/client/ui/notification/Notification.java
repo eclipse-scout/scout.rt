@@ -28,6 +28,7 @@ public class Notification extends AbstractWidget implements INotification {
   private IStatus m_status;
   private boolean m_closable;
   private boolean m_htmlEnabled;
+  private String m_iconId;
   private Consumer<String> m_appLinkConsumer;
   private final FastListenerList<NotificationListener> m_listenerList = new FastListenerList<>();
   private final INotificationUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
@@ -43,47 +44,66 @@ public class Notification extends AbstractWidget implements INotification {
    * Creates a notification with a status.
    */
   public Notification(IStatus status) {
-    this(status, false, false, null);
+    this(status, false, false, (String) null);
   }
 
   /**
    * Creates a notification with the given attributes.
    *
-   * @param status
    * @param closable
    *          see {@link #isClosable()}
    */
   public Notification(IStatus status, boolean closable) {
-    this(status, closable, false, null);
+    this(status, closable, false, (String) null);
   }
 
   /**
    * Creates a notification with the given attributes.
    *
-   * @param status
    * @param closable
    *          see {@link #isClosable()}
    * @param htmlEnabled
    *          see {@link #isHtmlEnabled()}
    */
   public Notification(IStatus status, boolean closable, boolean htmlEnabled) {
-    this(status, closable, htmlEnabled, null);
+    this(status, closable, htmlEnabled, (String) null);
   }
 
   /**
    * Creates a notification with the given attributes.
    *
    * @param status
+   *          see {@link #getStatus()}
    * @param closable
    *          see {@link #isClosable()}
    * @param htmlEnabled
    *          see {@link #isHtmlEnabled()}
-   * @param appLinkConsumer
+   * @param iconId
+   *          see {@link #getIconId()}
    */
+  public Notification(IStatus status, boolean closable, boolean htmlEnabled, String iconId) {
+    this(status, closable, htmlEnabled, iconId, null);
+  }
+
   public Notification(IStatus status, boolean closable, boolean htmlEnabled, Consumer<String> appLinkConsumer) {
+    this(status, closable, htmlEnabled, null, appLinkConsumer);
+  }
+
+  /**
+   * Creates a notification with the given attributes.
+   *
+   * @param closable
+   *          see {@link #isClosable()}
+   * @param htmlEnabled
+   *          see {@link #isHtmlEnabled()}
+   * @param iconId
+   *          see {@link #getIconId()}
+   */
+  public Notification(IStatus status, boolean closable, boolean htmlEnabled, String iconId, Consumer<String> appLinkConsumer) {
     m_status = status;
     m_closable = closable;
     m_htmlEnabled = htmlEnabled;
+    m_iconId = iconId;
     m_appLinkConsumer = appLinkConsumer;
   }
 
@@ -118,6 +138,17 @@ public class Notification extends AbstractWidget implements INotification {
   @Override
   public boolean isHtmlEnabled() {
     return m_htmlEnabled;
+  }
+
+  @Override
+  public String getIconId() {
+    return m_iconId;
+  }
+
+  @Override
+  public Notification withIconId(String iconId) {
+    m_iconId = iconId;
+    return this;
   }
 
   public Notification withAppLinkConsumer(Consumer<String> appLinkConsumer) {
