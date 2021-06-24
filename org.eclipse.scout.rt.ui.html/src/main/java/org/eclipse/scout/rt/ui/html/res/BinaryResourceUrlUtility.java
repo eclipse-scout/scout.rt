@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,9 +10,12 @@
  */
 package org.eclipse.scout.rt.ui.html.res;
 
+import static org.eclipse.scout.rt.platform.util.StringUtility.join;
+
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.Adler32;
 
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
@@ -188,4 +191,15 @@ public final class BinaryResourceUrlUtility {
     return attachment == null ? null : new BinaryResourceHolder(attachment);
   }
 
+  public static BinaryResource extractBinaryResource(Object raw, String prefix, String fileExtension) {
+    if (raw instanceof BinaryResource) {
+      return (BinaryResource) raw;
+    }
+    if (raw instanceof byte[]) {
+      Adler32 crc = new Adler32();
+      crc.update((byte[]) raw);
+      return new BinaryResource(join("-", prefix, crc.getValue(), ((byte[]) raw).length) + "." + fileExtension, (byte[]) raw);
+    }
+    return null;
+  }
 }

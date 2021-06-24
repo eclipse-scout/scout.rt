@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.imagefield;
 
 import java.util.List;
 import java.util.Map;
-import java.util.zip.Adler32;
 
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
@@ -135,8 +134,8 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
     if (getModel().getImage() != null) {
       // We don't send the image via JSON to the client, we only set a flag that this adapter has an image
       // The client will request the image in a separate http request. See: ResourceRequestHandler
-      BinaryResource imageResource = extractBinaryResource(getModel().getImage());
-      if (imageResource != null) {
+      BinaryResource imageResource = BinaryResourceUrlUtility.extractBinaryResource(getModel().getImage(), "image", "jpg");
+      if (imageResource != null && imageResource.getContent() != null) {
         return BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, imageResource);
       }
     }
@@ -162,24 +161,12 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
     return imageId.startsWith("font:");
   }
 
-  protected BinaryResource extractBinaryResource(Object raw) {
-    if (raw instanceof BinaryResource) {
-      return (BinaryResource) raw;
-    }
-    if (raw instanceof byte[]) {
-      Adler32 crc = new Adler32();
-      crc.update((byte[]) raw);
-      return new BinaryResource("image-" + (crc.getValue()) + "-" + (((byte[]) raw).length) + ".jpg", (byte[]) raw);
-    }
-    return null;
-  }
-
   // When an adapter has multiple images, it must deal itself with that case. For instance it could
   // add a sequence-number to the contentId to distinct between different images.
   @Override
   public BinaryResourceHolder provideBinaryResource(String requestFilename) {
-    BinaryResource image = extractBinaryResource(getModel().getImage());
-    if (image == null) {
+    BinaryResource image = BinaryResourceUrlUtility.extractBinaryResource(getModel().getImage(), "image", "jpg");
+    if (image == null || image.getContent() == null) {
       return null;
     }
 

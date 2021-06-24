@@ -95,11 +95,43 @@
       opacity: 1;
     }
 
+    &.has-menus > .status {
+      // These properties are set by FormFieldLayout.js depending on StatusPosition, Label, etc.
+      // In order to fix these values for the FormFieldTile we need !important.
+      height: 24px !important;
+      width: 24px !important;
+      top: 12px !important;
+      right: 12px !important;
+      line-height: unset !important;
+      border-radius: @border-radius;
+
+      &::before {
+        vertical-align: middle;
+        color: @dashboard-tile-menu-color;
+      }
+
+      &:hover {
+        background-color: @hover-background-color;
+
+        &::before {
+          color: @dashboard-tile-menu-hover-color;
+        }
+      }
+
+      &:active {
+        background-color: @active-background-color;
+
+        &::before {
+          color: @dashboard-tile-menu-active-color;
+        }
+      }
+    }
+
     /* Move part of the tile's padding (@offset) to the inner div. */
     /* This makes it possible to draw the scrollbar (seemingly) outside the field. */
 
     &.scrollbar-y-outside {
-      @offset: 10px;
+      @offset: 17px;
       padding-right: @tile-field-padding - @offset;
 
       .compact& {
@@ -189,11 +221,15 @@
       &.has-menus > .status {
 
         &::before {
-          color: @icon-inverted-color;
+          color: @tile-default-inverted-color;
         }
 
-        &:hover::before {
-          color: @palette-blue-2;
+        &:hover {
+          background-color: @tile-button-default-inverted-hover-background-color;
+        }
+
+        &:active {
+          background-color: @tile-button-default-inverted-active-background-color;
         }
       }
 
@@ -206,6 +242,25 @@
         &:hover::before {
           color: @palette-red-2;
         }
+      }
+
+      .scrollbar-thumb-handle {
+        background-color: @tile-scrollbar-thumb-inverted-color;
+      }
+
+      .scrollbar-thumb.scrollbar-thumb-move > .scrollbar-thumb-handle,
+      .scrollbar-thumb:hover > .scrollbar-thumb-handle {
+        background-color: @tile-scrollbar-thumb-inverted-hover-color;
+      }
+
+      .container-too-small-for-thumb > .scrollbar-thumb-handle {
+        border-radius: 0;
+        background-color: @tile-scrollbar-thumb-inverted-small-color;
+      }
+
+      .container-too-small-for-thumb.scrollbar-thumb-move > .scrollbar-thumb-handle,
+      .container-too-small-for-thumb.scrollbar-thumb:hover > .scrollbar-thumb-handle {
+        background-color: @tile-scrollbar-thumb-inverted-small-hover-color;
       }
     }
   }
@@ -266,13 +321,12 @@
 
       &.has-tooltip > .status,
       &.has-menus > .status {
-
-        &::before {
-          color: @icon-inverted-color;
+        &:hover {
+          background-color: @tile-button-alternative-inverted-hover-background-color;
         }
 
-        &:hover::before {
-          color: @palette-cyan-0;
+        &:active {
+          background-color: @tile-button-alternative-inverted-active-background-color;
         }
       }
 
@@ -293,15 +347,17 @@
     #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
 
     &.inverted {
+      background-color: mix(@tile-default-inverted-background-color, @tile-default-inverted-selection-background-color, 35%);
       #scout.double-drop-shadow(@spread1: 2px, @color1: @tile-default-inverted-background-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
     }
 
     &.color-alternative {
-      #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
+      #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-alternative-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
     }
 
     &.inverted.color-alternative {
-      #scout.double-drop-shadow(@spread1: 2px, @color1: @tile-alternative-inverted-background-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
+      background-color: mix(@tile-alternative-inverted-background-color, @tile-alternative-inverted-selection-background-color, 65%);
+      #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-alternative-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
     }
 
 
@@ -309,7 +365,7 @@
       #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-light-alpha);
 
       &.color-alternative {
-        #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-light-alpha);
+        #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-alternative-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-light-alpha);
       }
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ public interface IAction extends IWidget, IOrdered, IStyleable, IVisibleDimensio
 
   String PROP_CONTAINER = "container";
   String PROP_ICON_ID = "iconId";
+  String PROP_IMAGE = "image";
   String PROP_TEXT = "text";
   String PROP_TEXT_POSITION = "textPosition";
   String PROP_TOOLTIP_TEXT = "tooltipText";
@@ -79,6 +80,10 @@ public interface IAction extends IWidget, IOrdered, IStyleable, IVisibleDimensio
   String getIconId();
 
   void setIconId(String iconId);
+
+  Object getImage();
+
+  void setImage(Object imgObj);
 
   String getText();
 

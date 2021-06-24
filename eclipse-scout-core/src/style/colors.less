@@ -185,7 +185,7 @@
 @check-box-disabled-color: @disabled-color;
 @check-box-checked-color: @palette-blue-6;
 @closer-color: @icon-light-color;
-@collapse-handle-active-background-color:  darken(@collapse-handle-hover-background-color, 5%);
+@collapse-handle-active-background-color: darken(@collapse-handle-hover-background-color, 5%);
 @collapse-handle-background-color: @button-background-color;
 @collapse-handle-border-color: @palette-gray-4;
 @collapse-handle-color: @palette-gray-8;
@@ -203,6 +203,10 @@
 @context-menu-item-icon-color: @link-color;
 @dashboard-tile-border-color: darken(@palette-gray-3, 5%);
 @dashboard-tile-selected-border-color: @palette-blue-6;
+@dashboard-tile-alternative-selected-border-color: @tile-alternative-inverted-background-color;
+@dashboard-tile-menu-color: @palette-gray-6;
+@dashboard-tile-menu-hover-color: @palette-gray-7;
+@dashboard-tile-menu-active-color: @palette-gray-9;
 @date-picker-background-color: @control-popup-background-color;
 @date-picker-header-background-color: @panel-background-color;
 @date-picker-day-hover-border-color: @item-selection-border-color;
@@ -318,6 +322,8 @@
 @popup-border-color: @border-color;
 @control-popup-border-color: @palette-blue-6;
 @control-popup-background-color: @popup-background-color;
+@profile-menu-icon-background: linear-gradient(180deg, @palette-blue-6 -145%, @palette-blue-2 56%);
+@profile-menu-icon-color: @icon-inverted-color;
 @proposal-chooser-status-background-color: @panel-background-color;
 @radio-button-border-color: @border-color;
 @radio-button-checked-color: @palette-blue-6;
@@ -417,13 +423,11 @@
 @tile-alternative-inverted-label-color: @tile-alternative-inverted-color;
 @tile-alternative-inverted-link-hover-color: fade(@tile-alternative-inverted-color, 85%);
 @tile-alternative-inverted-link-active-color: fade(@tile-alternative-inverted-color, 75%);
-@tile-button-alternative-hover-color: @tile-button-default-hover-color;
 @tile-button-alternative-inverted-active-background-color: darken(@palette-cyan-5, 5);
 @tile-button-alternative-inverted-hover-background-color: @palette-cyan-5;
 @tile-button-alternative-inverted-color: @tile-button-default-inverted-color;
 @tile-button-default-active-background-color: @button-active-background-color;
 @tile-button-default-hover-background-color: @hover-background-color;
-@tile-button-default-hover-color: @hover-color;
 @tile-button-default-icon-color: @palette-gray-5-1;
 @tile-button-default-inverted-hover-background-color: @default-button-hover-background-color;
 @tile-button-default-inverted-active-background-color: @default-button-active-background-color;
@@ -445,6 +449,11 @@
 @tile-default-inverted-link-active-color: fade(@tile-default-inverted-color, 75%);
 @tile-overview-color: @tile-default-inverted-background-color;
 @tile-placeholder-background-color: @palette-gray-3;
+@tile-scrollbar-thumb-inverted-main-color: @palette-gray-4;
+@tile-scrollbar-thumb-inverted-color: fade(@tile-scrollbar-thumb-inverted-main-color, 30%);
+@tile-scrollbar-thumb-inverted-hover-color: fade(@tile-scrollbar-thumb-inverted-main-color, 45%);
+@tile-scrollbar-thumb-inverted-small-color: fade(@tile-scrollbar-thumb-inverted-main-color, 15%);
+@tile-scrollbar-thumb-inverted-small-hover-color: fade(@tile-scrollbar-thumb-inverted-main-color, 15%);
 @tile-table-default-color: @palette-gray-9;
 @tile-table-default-inverted-selection-background-color: @palette-blue-5;
 @tile-table-default-inverted-selection-border-color: @palette-white;

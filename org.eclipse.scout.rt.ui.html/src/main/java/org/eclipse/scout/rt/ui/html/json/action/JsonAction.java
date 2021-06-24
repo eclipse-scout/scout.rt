@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,8 @@ import java.beans.PropertyChangeEvent;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -23,13 +25,15 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
+import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("squid:S00118")
-public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonWidget<ACTION> {
+public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonWidget<ACTION> implements IBinaryResourceProvider {
 
   private static final Logger LOG = LoggerFactory.getLogger(JsonAction.class);
 
@@ -58,18 +62,6 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonWid
       @Override
       protected String modelValue() {
         return getModel().getTextPosition();
-      }
-    });
-
-    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_ICON_ID, model) {
-      @Override
-      protected String modelValue() {
-        return getModel().getIconId();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        return BinaryResourceUrlUtility.createIconUrl((String) value);
       }
     });
 
@@ -146,6 +138,13 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonWid
   }
 
   @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    json.put(IAction.PROP_ICON_ID, getIconDesc());
+    return json;
+  }
+
+  @Override
   public void handleUiEvent(JsonEvent event) {
     if (EVENT_ACTION.equals(event.getType())) {
       handleUiAction(event);
@@ -188,5 +187,52 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonWid
       LOG.warn("Setting visibleGranted=false has no effect, because JsonAdapter {} ({}) is already sent to the UI.", getId(), getModel());
     }
     super.handleModelPropertyChange(event);
+  }
+
+  @Override
+  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
+    if (ObjectUtility.isOneOf(propertyName,
+        IAction.PROP_ICON_ID,
+        IAction.PROP_IMAGE)) {
+      handleModelIIconSourceChanged();
+    }
+    else {
+      super.handleModelPropertyChange(propertyName, oldValue, newValue);
+    }
+  }
+
+  protected void handleModelIIconSourceChanged() {
+    addPropertyChangeEvent(IAction.PROP_ICON_ID, getIconDesc());
+  }
+
+  /**
+   * Returns an URL for the image or iconId, respectively (first one that is not <code>null</code>). If no image is set,
+   * <code>null</code> is returned.
+   */
+  protected String getIconDesc() {
+    if (getModel().getImage() != null) {
+      // We don't send the image via JSON to the client, we only set a flag that this adapter has an image
+      // The client will request the image in a separate http request. See: ResourceRequestHandler
+      BinaryResource imageResource = BinaryResourceUrlUtility.extractBinaryResource(getModel().getImage(), "image", "jpg");
+      if (imageResource != null && imageResource.getContent() != null) {
+        return BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, imageResource);
+      }
+    }
+    return BinaryResourceUrlUtility.createIconUrl(getModel().getIconId());
+  }
+
+  @Override
+  public BinaryResourceHolder provideBinaryResource(String requestFilename) {
+    BinaryResource image = BinaryResourceUrlUtility.extractBinaryResource(getModel().getImage(), "image", "jpg");
+    if (image == null || image.getContent() == null) {
+      return null;
+    }
+
+    String imageFilenameWithFingerprint = BinaryResourceUrlUtility.getFilenameWithFingerprint(image);
+    if (imageFilenameWithFingerprint.equals(requestFilename)) {
+      return new BinaryResourceHolder(image);
+    }
+
+    return null;
   }
 }
