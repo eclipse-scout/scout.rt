@@ -14,13 +14,8 @@ import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqual
 import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
-import org.eclipse.scout.rt.dataobject.IDataObject;
-import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
-import org.eclipse.scout.rt.dataobject.migration.fixture.house.CharlieCustomerFixtureDo;
-import org.eclipse.scout.rt.dataobject.migration.fixture.house.CustomerFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDo;
-import org.eclipse.scout.rt.dataobject.migration.fixture.house.PostalAddressFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_1;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_2;
@@ -100,33 +95,63 @@ public class DoStructureMigrationHelperTest {
     // Single data object
     Assert.assertEquals(CollectionUtility.hashMap(
         new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION)),
-        helper.collectRawDataObjectTypeVersions(rawDataObject(BEANS.get(HouseFixtureDo.class))));
+        helper.collectRawDataObjectTypeVersions(
+            BEANS.get(DoEntityBuilder.class)
+                .put("_type", "charlieFixture.HouseFixture")
+                .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+                .build()));
 
     // Data object containing another data objects (house owner attribute not set here)
     Assert.assertEquals(CollectionUtility.hashMap(
         new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
         new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_5.VERSION),
         new ImmutablePair<>("charlieFixture.PostalAddressFixture", CharlieFixture_2.VERSION)),
-        helper.collectRawDataObjectTypeVersions(rawDataObject(
-            BEANS.get(HouseFixtureDo.class)
-                .withRooms(BEANS.get(RoomFixtureDo.class))
-                .withPostalAddress(BEANS.get(PostalAddressFixtureDo.class)))));
+        helper.collectRawDataObjectTypeVersions(
+            BEANS.get(DoEntityBuilder.class)
+                .put("_type", "charlieFixture.HouseFixture")
+                .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+                .putList("rooms",
+                    BEANS.get(DoEntityBuilder.class)
+                        .put("_type", "charlieFixture.RoomFixture")
+                        .put("_typeVersion", CharlieFixture_5.VERSION.unwrap())
+                        .build())
+                .put("postalAddress",
+                    BEANS.get(DoEntityBuilder.class)
+                        .put("_type", "charlieFixture.PostalAddressFixture")
+                        .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+                        .build())
+                .build()));
 
-    // Data object with a subclass but using origin class (thus no BEANS.get) [not a real case]
+    // Data object with a subclass but using origin class (different type version) [not a real case]
     Assert.assertEquals(CollectionUtility.hashMap(
         new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
         new ImmutablePair<>("alfaFixture.CustomerFixture", AlfaFixture_3.VERSION)),
-        helper.collectRawDataObjectTypeVersions(rawDataObject(
-            BEANS.get(HouseFixtureDo.class)
-                .withOwner(new CustomerFixtureDo()))));
+        helper.collectRawDataObjectTypeVersions(
+            BEANS.get(DoEntityBuilder.class)
+                .put("_type", "charlieFixture.HouseFixture")
+                .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+                .put("owner",
+                    BEANS.get(DoEntityBuilder.class)
+                        .put("_type", "alfaFixture.CustomerFixture")
+                        .put("_typeVersion", AlfaFixture_3.VERSION.unwrap()) // CustomerFixtureDo
+                        .build())
+                .build()));
 
     // Data object with a subclass using replaced class
     Assert.assertEquals(CollectionUtility.hashMap(
         new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION),
         new ImmutablePair<>("alfaFixture.CustomerFixture", CharlieFixture_3.VERSION)),
-        helper.collectRawDataObjectTypeVersions(rawDataObject(
-            BEANS.get(HouseFixtureDo.class)
-                .withOwner(BEANS.get(CharlieCustomerFixtureDo.class)))));
+
+        helper.collectRawDataObjectTypeVersions(
+            BEANS.get(DoEntityBuilder.class)
+                .put("_type", "charlieFixture.HouseFixture")
+                .put("_typeVersion", CharlieFixture_2.VERSION.unwrap())
+                .put("owner",
+                    BEANS.get(DoEntityBuilder.class)
+                        .put("_type", "alfaFixture.CustomerFixture")
+                        .put("_typeVersion", CharlieFixture_3.VERSION.unwrap()) // CharlieCustomerFixtureDo
+                        .build())
+                .build()));
 
     // Must not find any type versions because a typed data object is used. When requesting type versions of raw data object,
     // typed data object must not be returned (only raw objects are relevant for migration).
@@ -217,10 +242,5 @@ public class DoStructureMigrationHelperTest {
     assertTrue(s_helper.renameAttribute(actual, "lorem", "sid"));
     expected = BEANS.get(DoEntityBuilder.class).put("sid", null).build();
     assertEqualsWithComparisonFailure(expected, actual);
-  }
-
-  protected IDataObject rawDataObject(IDataObject dataObject) {
-    IDataObjectMapper mapper = BEANS.get(IDataObjectMapper.class);
-    return mapper.readValueRaw(mapper.writeValue(dataObject));
   }
 }

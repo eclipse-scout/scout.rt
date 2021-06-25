@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.dataobject;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -25,6 +26,7 @@ import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StreamUtility;
 
 /**
@@ -51,6 +53,7 @@ import org.eclipse.scout.rt.platform.util.StreamUtility;
 public class DoEntity implements IDoEntity {
 
   private final Map<String, DoNode<?>> m_attributes = new LinkedHashMap<>();
+  private final List<IDoEntityContribution> m_contributions = new ArrayList<>();
 
   /**
    * @return Node of attribute {@code attributeName} or {@code null}, if attribute is not available.
@@ -196,26 +199,35 @@ public class DoEntity implements IDoEntity {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + m_attributes.hashCode();
-    return result;
+  public Collection<IDoEntityContribution> getContributions() {
+    return m_contributions;
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
+  public boolean equals(Object o) {
+    if (this == o) {
       return true;
     }
-    if (obj == null) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    if (getClass() != obj.getClass()) {
+
+    DoEntity doEntity = (DoEntity) o;
+    if (m_attributes != null ? !m_attributes.equals(doEntity.m_attributes) : doEntity.m_attributes != null) {
       return false;
     }
-    DoEntity other = (DoEntity) obj;
-    return m_attributes.equals(other.m_attributes);
+    if (!CollectionUtility.equalsCollection(m_contributions, doEntity.m_contributions, false)) { // element order is not relevant
+      return false;
+    }
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = m_attributes != null ? m_attributes.hashCode() : 0;
+    result = 31 * result + CollectionUtility.hashCodeCollection(m_contributions); // element order is not relevant
+    return result;
   }
 
   @Override

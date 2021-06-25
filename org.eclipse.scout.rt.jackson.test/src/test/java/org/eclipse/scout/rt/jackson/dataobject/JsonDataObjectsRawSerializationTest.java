@@ -14,11 +14,13 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 import org.eclipse.scout.rt.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.dataobject.DataObjectVisitors;
 import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.IDataObject;
@@ -73,6 +75,44 @@ public class JsonDataObjectsRawSerializationTest {
   }
 
   @Test
+  public void testDoEntityWithContributions() {
+    DoEntity doEntity = (DoEntity) testRawDataObjectMapper("TestDoEntityWithContributions.json");
+    assertTrue(doEntity.getContributions().isEmpty()); // in raw mode, contributions are just a regular node
+    List<IDoEntity> contributions = doEntity.getList(ScoutDataObjectModule.DEFAULT_CONTRIBUTIONS_ATTRIBUTE_NAME, IDoEntity.class);
+    assertNotNull(contributions);
+    assertEquals(2, contributions.size());
+    assertEquals("scout.TestItemContributionOne", contributions.get(0).getString(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME));
+    assertEquals("scout.TestItemContributionTwo", contributions.get(1).getString(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME));
+  }
+
+  /**
+   * @see DoEntitySerializerAttributeNameComparator
+   */
+  @Test
+  public void testAttributeSerializationOrder() {
+    // Manual creation of raw entity with random order of attributes
+    IDoEntity entity = BEANS.get(DoEntityBuilder.class)
+        .put("bravo", "bravo-value")
+        .putList(ScoutDataObjectModule.DEFAULT_CONTRIBUTIONS_ATTRIBUTE_NAME,
+            BEANS.get(DoEntityBuilder.class)
+                .put(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME, "TestItemContributionBravo")
+                .put("name", "bravo")
+                .build(),
+            BEANS.get(DoEntityBuilder.class)
+                .put(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME, "TestItemContributionAlfa")
+                .put("name", "alfa")
+                .build())
+        .put(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME, "TestItem")
+        .put(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME, "scout-11.0.0")
+        .put("alfa", "alfa-value")
+        .build();
+
+    // Contributions are serialized in insertion order
+    String json = s_dataObjectMapper.writeValue(entity);
+    assertJsonEquals("TestAttributeSerializationOrder.json", json);
+  }
+
+  @Test
   public void testVersionedDo() {
     TestVersionedDo versioned = BEANS.get(TestVersionedDo.class).withName("lorem");
     String json = s_dataObjectMapper.writeValue(versioned);
@@ -106,10 +146,11 @@ public class JsonDataObjectsRawSerializationTest {
     assertEquals("str2", ((DoEntity) item).get("stringAttribute"));
   }
 
-  protected void testRawDataObjectMapper(String jsonFileName) {
+  protected IDataObject testRawDataObjectMapper(String jsonFileName) {
     String json = readResourceAsString(jsonFileName);
     IDataObject object = s_dataObjectMapper.readValueRaw(json);
     assertNoTypes(object);
+    return object;
   }
 
   /**

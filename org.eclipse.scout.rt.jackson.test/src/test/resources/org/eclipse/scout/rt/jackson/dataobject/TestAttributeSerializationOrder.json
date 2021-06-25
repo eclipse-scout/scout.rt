@@ -1,0 +1,13 @@
+{
+  "_type" : "TestItem",
+  "_typeVersion" : "scout-11.0.0",
+  "alfa" : "alfa-value",
+  "bravo" : "bravo-value",
+  "_contributions" : [ {
+    "_type" : "TestItemContributionBravo",
+    "name" : "bravo"
+  }, {
+    "_type" : "TestItemContributionAlfa",
+    "name" : "alfa"
+  } ]
+}

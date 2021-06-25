@@ -44,13 +44,21 @@ public class ScoutDataObjectModule extends Module {
    */
   protected static final String DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME = "_typeVersion";
 
+  /**
+   * Default name of contributions attribute used for serialization.
+   *
+   * @see ScoutDataObjectModuleContext#getContributionsAttributeName()
+   */
+  protected static final String DEFAULT_CONTRIBUTIONS_ATTRIBUTE_NAME = "_contributions";
+
   private ScoutDataObjectModuleContext m_moduleContext;
 
   @PostConstruct
   protected void init() {
     m_moduleContext = BEANS.get(ScoutDataObjectModuleContext.class)
         .withTypeAttributeName(DEFAULT_TYPE_ATTRIBUTE_NAME)
-        .withTypeVersionAttributeName(DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME);
+        .withTypeVersionAttributeName(DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME)
+        .withContributionsAttributeName(DEFAULT_CONTRIBUTIONS_ATTRIBUTE_NAME);
   }
 
   public ScoutDataObjectModuleContext getModuleContext() {
@@ -79,6 +87,15 @@ public class ScoutDataObjectModule extends Module {
    */
   public ScoutDataObjectModule withIgnoreTypeAttribute(boolean ignoreTypeAttribute) {
     m_moduleContext.withIgnoreTypeAttribute(ignoreTypeAttribute);
+    return this;
+  }
+
+  /**
+   * Setup {@link ScoutDataObjectModule} to use given {@code contributionsAttributeName} as contributions attribute
+   * name.
+   */
+  public ScoutDataObjectModule withContributionsAttributeName(String contributionsAttributeName) {
+    m_moduleContext.withContributionsAttributeName(contributionsAttributeName);
     return this;
   }
 

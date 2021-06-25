@@ -18,6 +18,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -35,6 +36,7 @@ import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 import org.eclipse.scout.rt.platform.namespace.Namespaces;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
@@ -68,6 +70,12 @@ public class DataObjectInventory {
   /** Map of {@link IDoEntity} class to its attributes map */
   private final Map<Class<? extends IDoEntity>, Map<String, DataObjectAttributeDescriptor>> m_classAttributeMap = new ConcurrentHashMap<>();
 
+  /**
+   * Map of {@link IDoEntityContribution} class to its compile-time annotated containers (see {@link ContributesTo}
+   * annotation).
+   */
+  private final Map<Class<? extends IDoEntity>, Set<Class<? extends IDoEntity>>> m_contributionClassToContainers = new HashMap<>();
+
   @PostConstruct
   protected void init() {
     ClassInventory.get()
@@ -81,6 +89,12 @@ public class DataObjectInventory {
         .stream()
         .map(IClassInfo::resolveClass)
         .forEach(this::registerClassByTypeVersion);
+
+    ClassInventory.get()
+        .getKnownAnnotatedTypes(ContributesTo.class)
+        .stream()
+        .map(IClassInfo::resolveClass)
+        .forEach(this::registerClassByContributesTo);
 
     validateTypeVersionImplementors();
     validateTypeVersionRequired();
@@ -141,6 +155,14 @@ public class DataObjectInventory {
    */
   public NamespaceVersion getTypeVersion(Class<? extends IDoEntity> clazz) {
     return m_classToTypeVersion.get(clazz);
+  }
+
+  /**
+   * @return Container classes for a given {@link IDoEntityContribution} class.
+   * @see ContributesTo
+   */
+  public Set<Class<? extends IDoEntity>> getContributionContainers(Class<? extends IDoEntityContribution> contributionClass) {
+    return Collections.unmodifiableSet(m_contributionClassToContainers.computeIfAbsent(contributionClass, k -> new HashSet<>()));
   }
 
   /**
@@ -261,6 +283,27 @@ public class DataObjectInventory {
   }
 
   /**
+   * Adds {@code contributionClass} to registry with it's containers.
+   */
+  protected void registerClassByContributesTo(Class<?> clazz) {
+    if (IDoEntityContribution.class.isAssignableFrom(clazz)) {
+      Class<? extends IDoEntityContribution> contributionClass = clazz.asSubclass(IDoEntityContribution.class);
+      ContributesTo contributesToAnn = contributionClass.getAnnotation(ContributesTo.class);
+      Set<Class<? extends IDoEntity>> containerClasses = contributesToAnn == null ? Collections.emptySet() : CollectionUtility.hashSet(contributesToAnn.value());
+      if (!containerClasses.isEmpty()) {
+        m_contributionClassToContainers.put(contributionClass, containerClasses);
+        LOG.debug("Registered class {} with containers '{}'", contributionClass, containerClasses);
+      }
+      else {
+        LOG.warn("Class {} is annotated with @{} but doesn't contain any containers, skip registration", clazz.getName(), ContributesTo.class.getSimpleName());
+      }
+    }
+    else {
+      LOG.warn("Class {} is annotated with @{} but is not an instance of {}, skip registration", clazz.getName(), ContributesTo.class.getSimpleName(), IDoEntityContribution.class);
+    }
+  }
+
+  /**
    * Checks for {@link IDoEntity} classes with duplicated {@link TypeName} annotation values.
    */
   protected void checkDuplicateClassMapping(Class<?> clazz, String name, String existingName, Class<? extends IDoEntity> existingClass) {
@@ -287,7 +330,7 @@ public class DataObjectInventory {
         Type returnType = method.getGenericReturnType();
         if (returnType instanceof ParameterizedType) {
           ParameterizedType pt = (ParameterizedType) returnType;
-          // return type must be DoList or DoValue
+          // return type must be DoList, DoValue, DoSet or DoCollection
           if (ObjectUtility.isOneOf(pt.getRawType(), DoValue.class, DoList.class, DoSet.class, DoCollection.class)) {
             addAttribute(attributes, pt, method);
           }

@@ -30,7 +30,7 @@ public interface IDoCollection<V, COLLECTION extends Collection<V>> extends Iter
   /**
    * @return modifiable collection of all items, never {@code null}.
    */
-  public COLLECTION get();
+  COLLECTION get();
 
   /**
    * Returns <code>true</code> if this collection contains the item, <code>false</code> otherwise.

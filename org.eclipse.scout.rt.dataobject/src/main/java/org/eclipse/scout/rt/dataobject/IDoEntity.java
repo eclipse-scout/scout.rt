@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -52,8 +55,8 @@ public interface IDoEntity extends IDataObject {
    * attribute name to specified attribute.
    */
   default void putNode(String attributeName, DoNode<?> attribute) {
-    Assertions.assertNotNull(attributeName, "attribute name cannot be null");
-    Assertions.assertNotNull(attribute, "attribute node cannot be null for attribute name {}", attributeName);
+    assertNotNull(attributeName, "attribute name cannot be null");
+    assertNotNull(attribute, "attribute node cannot be null for attribute name {}", attributeName);
     attribute.setAttributeName(attributeName);
   }
 
@@ -153,7 +156,7 @@ public interface IDoEntity extends IDataObject {
    * @see IDoEntity#getNode(String) to get the wrapped {@link DoNode} attribute
    */
   default <T> T get(String attributeName, Class<T> type) {
-    Assertions.assertNotNull(type, "provided type is null");
+    assertNotNull(type, "provided type is null");
     return type.cast(get(attributeName));
   }
 
@@ -162,7 +165,7 @@ public interface IDoEntity extends IDataObject {
    *         {@code null} if attribute is not available.
    */
   default <T> T get(String attributeName, Function<Object, T> mapper) {
-    Assertions.assertNotNull(mapper, "provided mapper function is null");
+    assertNotNull(mapper, "provided mapper function is null");
     return mapper.apply(get(attributeName));
   }
 
@@ -201,7 +204,7 @@ public interface IDoEntity extends IDataObject {
    *      is not available
    */
   default <T> List<T> getList(String attributeName, Function<Object, T> mapper) {
-    Assertions.assertNotNull(mapper, "provided mapper function is null");
+    assertNotNull(mapper, "provided mapper function is null");
     return getList(attributeName).stream().map(mapper).collect(Collectors.toList());
   }
 
@@ -322,5 +325,63 @@ public interface IDoEntity extends IDataObject {
    */
   default boolean isEmpty() {
     return allNodes().isEmpty();
+  }
+
+  /**
+   * @return An mutable collection of DO entity contributions (never <code>null</code>).
+   */
+  Collection<IDoEntityContribution> getContributions();
+
+  /**
+   * @return Existing DO entity contribution for this contribution class if available, otherwise creates a new DO entity
+   *         contribution instance, adds it to the contributions and returns it.
+   */
+  default <CONTRIBUTION extends IDoEntityContribution> CONTRIBUTION contribution(Class<CONTRIBUTION> contributionClass) {
+    if (!hasContribution(contributionClass)) {
+      CONTRIBUTION contribution = BEANS.get(contributionClass);
+      putContribution(contribution);
+      return contribution;
+    }
+
+    return getContribution(contributionClass);
+  }
+
+  /**
+   * @return DO entity contribution for this contribution class if available, <code>null</code> otherwise.
+   */
+  default <CONTRIBUTION extends IDoEntityContribution> CONTRIBUTION getContribution(Class<CONTRIBUTION> contributionClass) {
+    assertNotNull(contributionClass, "contributionClass is required");
+    return getContributions().stream()
+        .filter(contribution -> contributionClass.equals(contribution.getClass()))
+        .findFirst()
+        .map(contributionClass::cast)
+        .orElse(null);
+  }
+
+  /**
+   * @return <code>true</code> if the DO entity contribution for this contribution class is available,
+   *         <code>false</code> otherwise.
+   */
+  default boolean hasContribution(Class<? extends IDoEntityContribution> contributionClass) {
+    return getContribution(contributionClass) != null;
+  }
+
+  /**
+   * Adds a new DO entity contribution. An existing contribution for the same contribution class is overridden.
+   *
+   * @param contribution
+   *          Contribution to add.
+   */
+  default void putContribution(IDoEntityContribution contribution) {
+    assertNotNull(contribution, "contribution is required");
+    removeContribution(contribution.getClass());
+    getContributions().add(contribution);
+  }
+
+  /**
+   * @return <code>true</code> if the DO entity contribution was available and removed, <code>false</code> otherwise.
+   */
+  default boolean removeContribution(Class<? extends IDoEntityContribution> contributionClass) {
+    return getContributions().removeIf(contribution -> contributionClass.equals(contribution.getClass()));
   }
 }

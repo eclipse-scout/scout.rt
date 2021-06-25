@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.dataobject;
+package org.eclipse.scout.rt.jackson.dataobject;
 
 import static org.junit.Assert.*;
 
@@ -16,10 +16,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.scout.rt.dataobject.fixture.AnotherCollectionFixtureDo;
-import org.eclipse.scout.rt.dataobject.fixture.CollectionFixtureDo;
-import org.eclipse.scout.rt.dataobject.fixture.ObjectCollectionFixtureDo;
-import org.eclipse.scout.rt.dataobject.fixture.SimpleFixtureDo;
+import org.eclipse.scout.rt.dataobject.DataObjectHelper;
+import org.eclipse.scout.rt.dataobject.DoCollection;
+import org.eclipse.scout.rt.dataobject.DoSet;
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.IDoEntityContribution;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.AnotherCollectionFixtureDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.CollectionAlfaContributionFixtureDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.CollectionBravoContributionFixtureDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.CollectionFixtureDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.ObjectCollectionFixtureDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample1Do;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
@@ -27,8 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Separated from {@link DataObjectHelperTest} because requiring a real implementation of {@link IDataObjectMapper} and
- * not the mocked one.
+ * In .jackson. module because requiring a real implementation of {@link IDataObjectMapper}.
  */
 @RunWith(PlatformTestRunner.class)
 public class DataObjectHelperNormalizeTest {
@@ -55,27 +61,35 @@ public class DataObjectHelperNormalizeTest {
             "string-doCollection-charlie",
             "string-doCollection-alfa",
             "string-doCollection-bravo")
-        .withSimpleDoList(
-            simpleFixture("simple-doList-charlie"),
-            simpleFixture("simple-doList-alfa"),
-            simpleFixture("simple-doList-bravo"))
-        .withSimpleDoSet(
-            simpleFixture("simple-doSet-charlie"),
-            simpleFixture("simple-doSet-alfa"),
-            simpleFixture("simple-doSet-bravo"))
-        .withSimpleDoCollection(
-            simpleFixture("simple-doCollection-charlie"),
-            simpleFixture("simple-doCollection-alfa"),
-            simpleFixture("simple-doCollection-bravo"));
+        .withExampleDoList(
+            exampleFixture("example-doList-charlie"),
+            exampleFixture("example-doList-alfa"),
+            exampleFixture("example-doList-bravo"))
+        .withExampleDoSet(
+            exampleFixture("example-doSet-charlie"),
+            exampleFixture("example-doSet-alfa"),
+            exampleFixture("example-doSet-bravo"))
+        .withExampleDoCollection(
+            exampleFixture("example-doCollection-charlie"),
+            exampleFixture("example-doCollection-alfa"),
+            exampleFixture("example-doCollection-bravo"));
+
+    doEntity.contribution(CollectionBravoContributionFixtureDo.class).withValue("bravo");
+    doEntity.contribution(CollectionAlfaContributionFixtureDo.class).withValue("alfa");
 
     // Unchanged order before normalization
     assertEquals(Arrays.asList("string-doList-charlie", "string-doList-alfa", "string-doList-bravo"), new ArrayList<>(doEntity.getStringDoList()));
     assertEquals(Arrays.asList("string-doSet-charlie", "string-doSet-alfa", "string-doSet-bravo"), new ArrayList<>(doEntity.getStringDoSet()));
     assertEquals(Arrays.asList("string-doCollection-charlie", "string-doCollection-alfa", "string-doCollection-bravo"), new ArrayList<>(doEntity.getStringDoCollection()));
 
-    assertEquals(Arrays.asList(simpleFixture("simple-doList-charlie"), simpleFixture("simple-doList-alfa"), simpleFixture("simple-doList-bravo")), new ArrayList<>(doEntity.getSimpleDoList()));
-    assertEquals(Arrays.asList(simpleFixture("simple-doSet-charlie"), simpleFixture("simple-doSet-alfa"), simpleFixture("simple-doSet-bravo")), new ArrayList<>(doEntity.getSimpleDoSet()));
-    assertEquals(Arrays.asList(simpleFixture("simple-doCollection-charlie"), simpleFixture("simple-doCollection-alfa"), simpleFixture("simple-doCollection-bravo")), new ArrayList<>(doEntity.getSimpleDoCollection()));
+    assertEquals(Arrays.asList(exampleFixture("example-doList-charlie"), exampleFixture("example-doList-alfa"), exampleFixture("example-doList-bravo")), new ArrayList<>(doEntity.getExampleDoList()));
+    assertEquals(Arrays.asList(exampleFixture("example-doSet-charlie"), exampleFixture("example-doSet-alfa"), exampleFixture("example-doSet-bravo")), new ArrayList<>(doEntity.getExampleDoSet()));
+    assertEquals(Arrays.asList(exampleFixture("example-doCollection-charlie"), exampleFixture("example-doCollection-alfa"), exampleFixture("example-doCollection-bravo")), new ArrayList<>(doEntity.getExampleDoCollection()));
+
+    // Contribution order is by insertion order (not API though)
+    List<IDoEntityContribution> contributions = new ArrayList<>(doEntity.getContributions());
+    assertTrue(contributions.get(0) instanceof CollectionBravoContributionFixtureDo);
+    assertTrue(contributions.get(1) instanceof CollectionAlfaContributionFixtureDo);
 
     m_helper.normalize(doEntity);
 
@@ -85,9 +99,14 @@ public class DataObjectHelperNormalizeTest {
     assertEquals(Arrays.asList("string-doCollection-alfa", "string-doCollection-bravo", "string-doCollection-charlie"), new ArrayList<>(doEntity.getStringDoCollection()));
 
     // DoSet and DoCollection are sorted by serialized output
-    assertEquals(Arrays.asList(simpleFixture("simple-doList-charlie"), simpleFixture("simple-doList-alfa"), simpleFixture("simple-doList-bravo")), new ArrayList<>(doEntity.getSimpleDoList())); // DoList keeps order
-    assertEquals(Arrays.asList(simpleFixture("simple-doSet-alfa"), simpleFixture("simple-doSet-bravo"), simpleFixture("simple-doSet-charlie")), new ArrayList<>(doEntity.getSimpleDoSet()));
-    assertEquals(Arrays.asList(simpleFixture("simple-doCollection-alfa"), simpleFixture("simple-doCollection-bravo"), simpleFixture("simple-doCollection-charlie")), new ArrayList<>(doEntity.getSimpleDoCollection()));
+    assertEquals(Arrays.asList(exampleFixture("example-doList-charlie"), exampleFixture("example-doList-alfa"), exampleFixture("example-doList-bravo")), new ArrayList<>(doEntity.getExampleDoList())); // DoList keeps order
+    assertEquals(Arrays.asList(exampleFixture("example-doSet-alfa"), exampleFixture("example-doSet-bravo"), exampleFixture("example-doSet-charlie")), new ArrayList<>(doEntity.getExampleDoSet()));
+    assertEquals(Arrays.asList(exampleFixture("example-doCollection-alfa"), exampleFixture("example-doCollection-bravo"), exampleFixture("example-doCollection-charlie")), new ArrayList<>(doEntity.getExampleDoCollection()));
+
+    // Contributions are normalized the same way as DoCollection
+    contributions = new ArrayList<>(doEntity.getContributions());
+    assertTrue(contributions.get(0) instanceof CollectionAlfaContributionFixtureDo);
+    assertTrue(contributions.get(1) instanceof CollectionBravoContributionFixtureDo);
   }
 
   /**
@@ -148,7 +167,7 @@ public class DataObjectHelperNormalizeTest {
     assertThrows(ClassCastException.class, () -> m_helper.normalize(doEntity));
   }
 
-  protected SimpleFixtureDo simpleFixture(String name) {
-    return BEANS.get(SimpleFixtureDo.class).withName1(name);
+  protected TestCoreExample1Do exampleFixture(String name) {
+    return BEANS.get(TestCoreExample1Do.class).withName(name);
   }
 }

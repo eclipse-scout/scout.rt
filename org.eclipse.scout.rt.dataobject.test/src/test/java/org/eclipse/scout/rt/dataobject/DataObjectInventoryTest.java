@@ -26,15 +26,18 @@ import org.eclipse.scout.rt.dataobject.fixture.DataObjectProjectFixtureTypeVersi
 import org.eclipse.scout.rt.dataobject.fixture.DateFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureInvalidTypeNameDo;
+import org.eclipse.scout.rt.dataobject.fixture.FirstSimpleContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.OtherEntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ProjectFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ProjectSubFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ScoutFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.SecondSimpleContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.SimpleFixtureDo;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
@@ -271,5 +274,8 @@ public class DataObjectInventoryTest {
     assertEquals(DataObjectProjectFixture_1_2_3_004.VERSION, inv.getTypeVersion(ProjectFixtureDo.class));
 
     assertNull(inv.getTypeVersion(ProjectSubFixtureDo.class));
+
+    assertEquals(CollectionUtility.hashSet(SimpleFixtureDo.class), inv.getContributionContainers(FirstSimpleContributionFixtureDo.class));
+    assertEquals(CollectionUtility.hashSet(SimpleFixtureDo.class), inv.getContributionContainers(SecondSimpleContributionFixtureDo.class));
   }
 }

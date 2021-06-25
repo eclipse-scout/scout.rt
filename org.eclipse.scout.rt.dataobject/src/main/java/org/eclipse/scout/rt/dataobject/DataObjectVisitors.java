@@ -137,10 +137,15 @@ public final class DataObjectVisitors {
     }
 
     @Override
-    protected void caseDoEntity(IDoEntity entity) {
-      for (DoNode<?> node : entity.allNodes().values()) {
+    protected void caseDoEntityNodes(Collection<DoNode<?>> nodes) {
+      for (DoNode<?> node : nodes) {
         updateDoNode(node);
       }
+    }
+
+    @Override
+    protected void caseDoEntityContributions(Collection<IDoEntityContribution> contributions) {
+      updateCollection(contributions);
     }
 
     @Override
@@ -157,6 +162,7 @@ public final class DataObjectVisitors {
     protected void caseDoCollection(DoCollection<?> doCollection) {
       updateCollection(doCollection.get());
     }
+
 
     private <LT> void updateList(List<LT> list) {
       ListIterator<LT> it = list.listIterator();

@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -30,10 +31,11 @@ import org.eclipse.scout.rt.dataobject.DoNode;
 import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.IDoEntityContribution;
 import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.ValueFormat;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * Custom test implementation of {@link IDoEntity}, without extending {@link DoEntity}.
@@ -42,6 +44,7 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 public class TestCustomImplementedEntityDo implements IDoEntity {
 
   private final Map<String, DoNode<?>> m_attributes = new LinkedHashMap<>();
+  private final List<IDoEntityContribution> m_contributions = new ArrayList<>();
 
   // attributes
   private static final String DATE_ATTRIBUTE = "dateAttribute";
@@ -120,8 +123,35 @@ public class TestCustomImplementedEntityDo implements IDoEntity {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    return ObjectUtility.equals(m_attributes, ((TestCustomImplementedEntityDo) obj).m_attributes);
+  public Collection<IDoEntityContribution> getContributions() {
+    return m_contributions;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    TestCustomImplementedEntityDo that = (TestCustomImplementedEntityDo) o;
+    if (m_attributes != null ? !m_attributes.equals(that.m_attributes) : that.m_attributes != null) {
+      return false;
+    }
+    if (!CollectionUtility.equalsCollection(m_contributions, that.m_contributions, false)) { // element order is not relevant
+      return false;
+    }
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = m_attributes != null ? m_attributes.hashCode() : 0;
+    result = 31 * result + CollectionUtility.hashCodeCollection(m_contributions); // element order is not relevant
+    return result;
   }
 
   @Override

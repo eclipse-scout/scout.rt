@@ -78,6 +78,15 @@ public class DoNode<T> {
   }
 
   /**
+   * Calls {@link Consumer#accept(Object)} if node exists.
+   */
+  public final void ifPresent(Consumer<T> consumer) {
+    if (exists()) {
+      consumer.accept(get());
+    }
+  }
+
+  /**
    * Internal method used to set attribute name when the node is added to a {@link DoEntity} object.
    */
   protected final void setAttributeName(String attributeName) {

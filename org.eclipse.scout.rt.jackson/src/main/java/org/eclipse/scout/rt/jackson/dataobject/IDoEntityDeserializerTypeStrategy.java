@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import java.util.Collection;
 import java.util.Optional;
 
 import org.eclipse.scout.rt.dataobject.IDoEntity;
@@ -21,7 +22,7 @@ import com.fasterxml.jackson.databind.JavaType;
 /**
  * Type resolver used for type resolution by {@link DoEntityDeserializer}.
  */
-public interface IDoEntityDeserializerTypeResolver {
+public interface IDoEntityDeserializerTypeStrategy {
 
   /**
    * Resolves {@link IDoEntity} class for given {@code entityType}
@@ -41,4 +42,9 @@ public interface IDoEntityDeserializerTypeResolver {
    * Resolves attribute type class for given {@code entityClass} and {@code attributeName}
    */
   Optional<JavaType> resolveAttributeType(Class<? extends IDoEntity> entityClass, String attributeName);
+
+  /**
+   * Adds the contributions to the given DO entity.
+   */
+  void putContributions(IDoEntity doEntity, String attributeName, Collection<?> contributions);
 }

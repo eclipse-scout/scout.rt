@@ -206,21 +206,31 @@ public class DataObjectHelper {
     @Override
     protected void caseDoSet(DoSet<?> doSet) {
       super.caseDoSet(doSet); // deep first
-      normalizeInternal(doSet);
+      if (doSet.exists()) {
+        normalizeInternal(doSet.get());
+      }
     }
 
     @Override
     protected void caseDoCollection(DoCollection<?> doCollection) {
       super.caseDoCollection(doCollection); // deep first
-      normalizeInternal(doCollection);
+      if (doCollection.exists()) {
+        normalizeInternal(doCollection.get());
+      }
     }
 
-    protected <V, COLLECTION extends Collection<V>> void normalizeInternal(IDoCollection<V, COLLECTION> doCollectionNode) {
-      if (doCollectionNode.isEmpty()) {
+    @Override
+    protected void caseDoEntityContributions(Collection<IDoEntityContribution> contributions) {
+      super.caseDoEntityContributions(contributions); // deep first
+      normalizeInternal(contributions);
+    }
+
+    protected <V> void normalizeInternal(Collection<V> collection) {
+      if (collection.isEmpty()) {
         return;
       }
 
-      List<V> list = new ArrayList<>(doCollectionNode.get());
+      List<V> list = new ArrayList<>(collection);
       boolean comparable = list.stream().allMatch(item -> item instanceof Comparable);
       if (comparable) {
         // Directly comparable
@@ -237,7 +247,8 @@ public class DataObjectHelper {
         });
       }
 
-      doCollectionNode.updateAll(list); // replace
+      collection.clear();
+      collection.addAll(list); // replace
     }
   }
 }

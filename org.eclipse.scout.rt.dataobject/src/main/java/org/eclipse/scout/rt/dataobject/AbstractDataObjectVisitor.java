@@ -27,7 +27,8 @@ public abstract class AbstractDataObjectVisitor {
     if (o == null) {
       return;
     }
-    else if (o instanceof Collection) {
+
+    if (o instanceof Collection) {
       caseNode((Collection<?>) o, this::caseCollection);
     }
     else if (o instanceof Map) {
@@ -68,7 +69,12 @@ public abstract class AbstractDataObjectVisitor {
   }
 
   protected void caseDoEntity(IDoEntity entity) {
-    for (DoNode<?> node : entity.allNodes().values()) {
+    caseDoEntityNodes(entity.allNodes().values());
+    caseDoEntityContributions(entity.getContributions());
+  }
+
+  protected void caseDoEntityNodes(Collection<DoNode<?>> nodes) {
+    for (DoNode<?> node : nodes) {
       if (node instanceof DoList) {
         caseDoList((DoList<?>) node);
       }
@@ -82,6 +88,12 @@ public abstract class AbstractDataObjectVisitor {
         // DoValue
         visit(node.get());
       }
+    }
+  }
+
+  protected void caseDoEntityContributions(Collection<IDoEntityContribution> contributions) {
+    for (IDoEntityContribution contribution : contributions) {
+      visit(contribution);
     }
   }
 

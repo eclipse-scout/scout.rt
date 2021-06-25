@@ -46,7 +46,9 @@ import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDoCollection;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.IDoEntityContribution;
 import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.DoubleContributionFixtureDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBigIntegerDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBinaryDo;
@@ -55,6 +57,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCollectionsDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestComplexEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestComplexEntityPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample1Do;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample1DoContributionFixtureDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample2Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample3Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCustomImplementedEntityDo;
@@ -74,6 +77,8 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithNestedEntit
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestGenericDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestGenericDoEntityMapDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItem3Do;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemContributionOneDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemContributionTwoDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemExDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo;
@@ -86,6 +91,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestPhysicalAddressDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestPhysicalAddressExDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestPojoWithJacksonAnnotations;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestPojoWithLocaleProperties;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestProjectExample1ContributionFixtureDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestProjectExample1Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestProjectExample2Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestProjectExample3Do;
@@ -2090,6 +2096,66 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("foo-id-1", marshalled.genericMapAttribute().get().get("foo-1").getId());
   }
 
+  @Test
+  public void testSerializeDeserialize_DoEntityWithContributions() throws Exception {
+    TestItemDo doEntity = BEANS.get(TestItemDo.class).withId("123456789");
+    TestItemContributionOneDo contributionOne = doEntity.contribution(TestItemContributionOneDo.class).withName("one");
+    TestItemContributionTwoDo contributionTwo = doEntity.contribution(TestItemContributionTwoDo.class).withName("two");
+
+    String json = s_dataObjectMapper.writeValueAsString(doEntity);
+    assertJsonEquals("TestDoEntityWithContributions.json", json);
+
+    TestItemDo marshalledDoEntity = s_dataObjectMapper.readValue(json, TestItemDo.class);
+    assertEquals("123456789", marshalledDoEntity.getId());
+
+    // no node for contributions in typed mode
+    assertFalse(marshalledDoEntity.has(ScoutDataObjectModule.DEFAULT_CONTRIBUTIONS_ATTRIBUTE_NAME));
+    assertEquals(2, marshalledDoEntity.getContributions().size());
+    assertEquals(contributionOne, marshalledDoEntity.getContribution(TestItemContributionOneDo.class));
+    assertEquals(contributionTwo, marshalledDoEntity.getContribution(TestItemContributionTwoDo.class));
+    assertEqualsWithComparisonFailure(doEntity, marshalledDoEntity);
+  }
+
+  @Test
+  public void testDeserialize_DoEntityWithUnknownContribution() throws Exception {
+    String json = readResourceAsString("TestDoEntityWithUnknownContribution.json");
+    TestItemDo marshalledDoEntity = s_dataObjectMapper.readValue(json, TestItemDo.class);
+    assertEquals("123456789", marshalledDoEntity.getId());
+
+    // no node for contributions in typed mode
+    assertFalse(marshalledDoEntity.has(ScoutDataObjectModule.DEFAULT_CONTRIBUTIONS_ATTRIBUTE_NAME));
+    // doesn't fail even if internal instance is of type IDoEntity instead of IDoEntityContribution due to unknown type name
+    assertEquals(1, marshalledDoEntity.getContributions().size());
+    // throws due to tried casting
+    assertThrows(ClassCastException.class, () -> CollectionUtility.firstElement(marshalledDoEntity.getContributions()).getString("name"));
+  }
+
+  @Test
+  public void testSerializationValidation_DoEntityWithContribution() throws JsonProcessingException {
+    serializeContribution(TestItemDo.class, TestItemContributionOneDo.class);
+    serializeContribution(TestItemDo.class, TestItemContributionTwoDo.class);
+
+    assertThrows(JsonMappingException.class, () -> serializeContribution(TestItemDo.class, TestCoreExample1DoContributionFixtureDo.class));
+    assertThrows(JsonMappingException.class, () -> serializeContribution(TestItemDo.class, TestCoreExample1DoContributionFixtureDo.class));
+    assertThrows(JsonMappingException.class, () -> serializeContribution(TestItemDo.class, TestProjectExample1ContributionFixtureDo.class));
+
+    // not using BEANS.get because bean is replaced by ProjectFixtureDo (only for validation, not a real case this way)
+    assertThrows(JsonMappingException.class, () -> serializeContribution(new TestCoreExample1Do(), TestItemContributionOneDo.class));
+    assertThrows(JsonMappingException.class, () -> serializeContribution(new TestCoreExample1Do(), TestItemContributionTwoDo.class));
+    assertThrows(JsonMappingException.class, () -> serializeContribution(new TestCoreExample1Do(), TestProjectExample1ContributionFixtureDo.class));
+    serializeContribution(new TestCoreExample1Do(), TestCoreExample1DoContributionFixtureDo.class);
+
+    // using subclasses data object
+    assertThrows(JsonMappingException.class, () -> serializeContribution(TestProjectExample1Do.class, TestItemContributionOneDo.class));
+    assertThrows(JsonMappingException.class, () -> serializeContribution(TestProjectExample1Do.class, TestItemContributionTwoDo.class));
+    serializeContribution(TestProjectExample1Do.class, TestCoreExample1DoContributionFixtureDo.class);
+    serializeContribution(TestProjectExample1Do.class, TestProjectExample1ContributionFixtureDo.class);
+
+    // verify contribution DO with two containers
+    serializeContribution(TestItemDo.class, DoubleContributionFixtureDo.class);
+    serializeContribution(TestDateDo.class, DoubleContributionFixtureDo.class);
+  }
+
   // ------------------------------------ entity with IDoEntity interface definition tests -----------------------------
 
   @Test
@@ -2565,5 +2631,14 @@ public class JsonDataObjectsSerializationTest {
 
   protected URL getResource(String expectedResourceName) {
     return JsonDataObjectsSerializationTest.class.getResource(expectedResourceName);
+  }
+
+  protected void serializeContribution(Class<? extends IDoEntity> doEntityClass, Class<? extends IDoEntityContribution> contributionClass) throws JsonProcessingException {
+    serializeContribution(BEANS.get(doEntityClass), contributionClass);
+  }
+
+  protected void serializeContribution(IDoEntity doEntity, Class<? extends IDoEntityContribution> contributionClass) throws JsonProcessingException {
+    doEntity.contribution(contributionClass);
+    s_dataObjectMapper.writeValueAsString(doEntity);
   }
 }

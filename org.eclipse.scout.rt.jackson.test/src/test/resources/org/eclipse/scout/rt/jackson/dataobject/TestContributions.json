@@ -1,0 +1,11 @@
+{
+  "_type" : "TestCoreExample1",
+  "_contributions" : [ {
+    "_type" : "FirstExampleContributionFixtureDo",
+    "firstValue" : "first-value"
+  }, {
+    "_type" : "SecondExampleContributionFixture",
+    "secondValue" : "second-value"
+  } ],
+  "name" : "name"
+}

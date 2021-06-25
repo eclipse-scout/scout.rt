@@ -10,16 +10,12 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import org.eclipse.scout.rt.dataobject.DoNode;
+import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.junit.Test;
 
 /**
@@ -66,6 +62,23 @@ public class DoNodeTest {
     optValue = node.toOptional();
     assertFalse(optValue.isPresent());
     assertEquals("else-value", optValue.orElseGet(() -> "else-value"));
+  }
+
+  @Test
+  public void testIfPresent() {
+    FixtureDoNode<String> node = new FixtureDoNode<>();
+    assertFalse(node.exists());
+    node.ifPresent(value -> fail("node exists"));
+
+    node.create(); // node with null value
+    StringHolder holder = new StringHolder("other");
+    node.ifPresent(holder::setValue);
+    assertNull(holder.getValue()); // value was set
+
+    node.set("foo"); // node was created and contains a value
+    holder = new StringHolder("other");
+    node.ifPresent(holder::setValue);
+    assertEquals("foo", holder.getValue());
   }
 
   @Test

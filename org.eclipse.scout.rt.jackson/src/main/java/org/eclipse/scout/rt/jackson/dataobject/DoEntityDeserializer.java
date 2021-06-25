@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.util.Collection;
 
+import org.eclipse.scout.rt.dataobject.AbstractDoCollection;
 import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
@@ -46,21 +48,21 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   protected final ScoutDataObjectModuleContext m_moduleContext;
   protected final JavaType m_handledType;
   protected final Class<? extends IDoEntity> m_handledClass;
-  protected final IDoEntityDeserializerTypeResolver m_doEntityDeserializerTypeResolver;
+  protected final IDoEntityDeserializerTypeStrategy m_doEntityDeserializerTypeStrategy;
 
   public DoEntityDeserializer(ScoutDataObjectModuleContext moduleContext, JavaType type) {
     super(type);
     m_moduleContext = moduleContext;
     m_handledType = type;
     m_handledClass = type.getRawClass().asSubclass(IDoEntity.class);
-    m_doEntityDeserializerTypeResolver = initDoEntityTypeResolver(moduleContext);
+    m_doEntityDeserializerTypeStrategy = initDoEntityTypeStrategy(moduleContext);
   }
 
-  protected IDoEntityDeserializerTypeResolver initDoEntityTypeResolver(ScoutDataObjectModuleContext moduleContext) {
+  protected IDoEntityDeserializerTypeStrategy initDoEntityTypeStrategy(ScoutDataObjectModuleContext moduleContext) {
     if (moduleContext.isIgnoreTypeAttribute()) {
-      return BEANS.get(RawDoEntityDeserializerTypeResolver.class);
+      return BEANS.get(RawDoEntityDeserializerTypeStrategy.class);
     }
-    return BEANS.get(DefaultDoEntityDeserializerTypeResolver.class);
+    return BEANS.get(DefaultDoEntityDeserializerTypeStrategy.class);
   }
 
   @Override
@@ -105,7 +107,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
           p = JsonParserSequence.createFlattened(false, tb.asParser(p), p);
         }
         p.nextToken(); // skip type field value
-        return derializeDoEntityAttributes(p, ctxt, entity);
+        return deserializeDoEntityAttributes(p, ctxt, entity);
       }
 
       // lazy create token buffer to cache other fields
@@ -130,10 +132,10 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     IDoEntity entity = resolveEntityType(ctxt, null);
     p.setCurrentValue(entity); // set current value after new parser instance was created out of token buffer
 
-    return derializeDoEntityAttributes(p, ctxt, entity);
+    return deserializeDoEntityAttributes(p, ctxt, entity);
   }
 
-  protected IDoEntity derializeDoEntityAttributes(JsonParser p, DeserializationContext ctxt, IDoEntity entity) throws IOException {
+  protected IDoEntity deserializeDoEntityAttributes(JsonParser p, DeserializationContext ctxt, IDoEntity entity) throws IOException {
     // read and deserialize all fields of entity
     for (JsonToken t = p.currentToken(); t == JsonToken.FIELD_NAME; t = p.nextToken()) {
       String attributeName = p.getCurrentName();
@@ -143,7 +145,15 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       ResolvedType attributeType = findResolvedAttributeType(entity, attributeName, isObject, isArray);
       if (attributeType.hasRawClass(DoList.class) || attributeType.hasRawClass(DoSet.class) || attributeType.hasRawClass(DoCollection.class)) {
         DoNode<?> nodeValue = p.getCodec().readValue(p, attributeType);
-        entity.putNode(attributeName, nodeValue);
+
+        // check if reading the 'contributions' property
+        if (m_moduleContext.getContributionsAttributeName().equals(attributeName)) {
+          //noinspection unchecked
+          m_doEntityDeserializerTypeStrategy.putContributions(entity, attributeName, ((AbstractDoCollection<?, Collection<?>>) nodeValue).get());
+        }
+        else {
+          entity.putNode(attributeName, nodeValue);
+        }
       }
       else {
         Object value = p.getCodec().readValue(p, attributeType);
@@ -161,7 +171,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   }
 
   protected void deserializeDoEntityVersionAttribute(IDoEntity entity, String attributeName, Object version) {
-    String dataObjectTypeVersion = m_doEntityDeserializerTypeResolver.resolveTypeVersion(entity.getClass());
+    String dataObjectTypeVersion = m_doEntityDeserializerTypeStrategy.resolveTypeVersion(entity.getClass());
     if (dataObjectTypeVersion != null) {
       // entity class type has a type version, check deserialized type version against entity class type version
       if (!dataObjectTypeVersion.equals(version)) {
@@ -178,7 +188,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   protected IDoEntity resolveEntityType(DeserializationContext ctxt, String entityType) throws IOException {
     if (entityType != null) {
       // try to lookup DoEntity with specified entityType
-      Class<? extends IDoEntity> clazz = m_doEntityDeserializerTypeResolver.resolveTypeName(entityType);
+      Class<? extends IDoEntity> clazz = m_doEntityDeserializerTypeStrategy.resolveTypeName(entityType);
       if (clazz != null) {
         return newObject(ctxt, clazz);
       }
@@ -194,11 +204,11 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   }
 
   protected JavaType findResolvedAttributeType(IDoEntity entityInstance, String attributeName, boolean isObject, boolean isArray) {
-    return m_doEntityDeserializerTypeResolver.resolveAttributeType(entityInstance.getClass(), attributeName)
-        .orElseGet(() -> findResolvedFallbackAttributeType(isObject, isArray));
+    return m_doEntityDeserializerTypeStrategy.resolveAttributeType(entityInstance.getClass(), attributeName)
+        .orElseGet(() -> findResolvedFallbackAttributeType(attributeName, isObject, isArray));
   }
 
-  protected JavaType findResolvedFallbackAttributeType(boolean isObject, boolean isArray) {
+  protected JavaType findResolvedFallbackAttributeType(String attributeName, boolean isObject, boolean isArray) {
     if (DoMapEntity.class.isAssignableFrom(m_handledClass)) {
       // DoMapEntity<T> structure is deserialized as typed Map<String, T>
       return findResolvedDoMapEntityType();

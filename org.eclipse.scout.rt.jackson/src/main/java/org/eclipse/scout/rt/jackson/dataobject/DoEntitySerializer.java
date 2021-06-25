@@ -10,17 +10,22 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.scout.rt.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.dataobject.DoNode;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.IDoEntityContribution;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
@@ -42,10 +47,12 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
   protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
 
   protected final ScoutDataObjectModuleContext m_context;
+  protected final DoEntitySerializerAttributeNameComparator m_comparator;
 
   public DoEntitySerializer(ScoutDataObjectModuleContext context, JavaType type) {
     super(type);
     m_context = context;
+    m_comparator = BEANS.get(DoEntitySerializerAttributeNameComparator.class).init(context);
   }
 
   @Override
@@ -67,11 +74,13 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
    */
   protected void serializeAttributes(IDoEntity entity, JsonGenerator gen, SerializerProvider provider) throws IOException {
     serializeTypeVersion(gen, entity);
-    TreeMap<String, DoNode<?>> sortedMap = new TreeMap<>(entity.allNodes());
+    TreeMap<String, DoNode<?>> sortedMap = new TreeMap<>(m_comparator);
+    sortedMap.putAll(entity.allNodes());
     for (Map.Entry<String, DoNode<?>> e : sortedMap.entrySet()) {
       gen.setCurrentValue(entity);
       serializeAttributes(e.getKey(), e.getValue(), gen, provider);
     }
+    serializeContributions(gen, entity, provider);
   }
 
   protected void serializeTypeVersion(JsonGenerator gen, IDoEntity entity) throws IOException {
@@ -79,6 +88,14 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
     if (typeVersion != null) {
       gen.writeFieldName(m_context.getTypeVersionAttributeName());
       gen.writeString(typeVersion.unwrap());
+    }
+  }
+
+  protected void serializeContributions(JsonGenerator gen, IDoEntity entity, SerializerProvider provider) throws IOException {
+    Collection<IDoEntityContribution> contributions = entity.getContributions();
+    if (!contributions.isEmpty()) {
+      validateContributions(entity, contributions);
+      serializeCollection(m_context.getContributionsAttributeName(), contributions, gen, provider);
     }
   }
 
@@ -104,7 +121,7 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
   protected void serializeCollection(String attributeName, Collection<?> collection, JsonGenerator gen, SerializerProvider provider) throws IOException {
     Optional<JavaType> type = getJavaType(attributeName);
     if (type.isPresent()) {
-      serializeTypedAttribute(attributeName, collection, gen, provider, type);
+      serializeTypedAttribute(attributeName, collection, gen, provider, type.get());
     }
     else {
       // If no type definition is available, serialize all collection-like types (e.g. all {@link List} and {@link Set} implementations) as array using default jackson serializer.
@@ -125,7 +142,7 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
   protected void serializeMap(String attributeName, Map<?, ?> map, JsonGenerator gen, SerializerProvider provider) throws IOException {
     Optional<JavaType> type = getJavaType(attributeName);
     if (type.isPresent()) {
-      serializeTypedAttribute(attributeName, map, gen, provider, type);
+      serializeTypedAttribute(attributeName, map, gen, provider, type.get());
     }
     else {
       // If no type definition is available, serialize all {@link Map} types as object  using default jackson serializer
@@ -151,8 +168,8 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
   /**
    * Serialize single attribute using appropriate typed value serializer
    */
-  protected void serializeTypedAttribute(String attributeName, Object obj, JsonGenerator gen, SerializerProvider provider, Optional<JavaType> type) throws IOException {
-    JsonSerializer<Object> ser = provider.findTypedValueSerializer(type.get(), true, null);
+  protected void serializeTypedAttribute(String attributeName, Object obj, JsonGenerator gen, SerializerProvider provider, JavaType type) throws IOException {
+    JsonSerializer<Object> ser = provider.findTypedValueSerializer(type, true, null);
     gen.writeFieldName(attributeName);
     ser.serialize(obj, gen, provider);
   }
@@ -161,5 +178,13 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
     return m_dataObjectInventory.get().getAttributeDescription(handledType(), attributeName)
         .map(a -> TypeFactoryUtility.toJavaType(a.getType()))
         .filter(t -> t.getRawClass() != Object.class); // filter completely unknown types, forcing to use the default behavior for unknown types
+  }
+
+  protected void validateContributions(IDoEntity doEntity, Collection<IDoEntityContribution> contributions) {
+    for (IDoEntityContribution contribution : contributions) {
+      Set<Class<? extends IDoEntity>> containerClasses = m_dataObjectInventory.get().getContributionContainers(contribution.getClass());
+      Class<? extends IDoEntityContribution> contributionClass = contribution.getClass();
+      assertTrue(containerClasses.stream().anyMatch(containerClass -> containerClass.isInstance(doEntity)), "{} is not a valid container class of {}", doEntity.getClass().getSimpleName(), contributionClass.getSimpleName());
+    }
   }
 }

@@ -21,7 +21,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+import org.eclipse.scout.rt.dataobject.fixture.EntityContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.OtherEntityContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.OtherEntityFixtureDo;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
@@ -42,20 +44,34 @@ public class DataObjectVisitorsTest {
   @Before
   public void before() {
     Map<String, OtherEntityFixtureDo> map = new LinkedHashMap<>();
-    map.put("map1", BEANS.get(OtherEntityFixtureDo.class)
+
+    OtherEntityFixtureDo otherEntityMap1 = BEANS.get(OtherEntityFixtureDo.class)
         .withId("m1")
-        .withActive(true));
-    map.put("map2", BEANS.get(OtherEntityFixtureDo.class)
+        .withActive(true);
+    otherEntityMap1.contribution(OtherEntityContributionFixtureDo.class).withId("m1-contribution");
+
+    OtherEntityFixtureDo otherEntityMap2 = BEANS.get(OtherEntityFixtureDo.class)
         .withId("m2")
-        .withActive(false));
+        .withActive(false);
+    otherEntityMap2.contribution(OtherEntityContributionFixtureDo.class).withId("m2-contribution");
+
+    map.put("map1", otherEntityMap1);
+    map.put("map2", otherEntityMap2);
 
     List<OtherEntityFixtureDo> list = new ArrayList<>();
-    list.add(BEANS.get(OtherEntityFixtureDo.class)
+
+    OtherEntityFixtureDo otherEntityList1 = BEANS.get(OtherEntityFixtureDo.class)
         .withId("l1")
-        .withActive(true));
-    list.add(BEANS.get(OtherEntityFixtureDo.class)
+        .withActive(true);
+    otherEntityList1.contribution(OtherEntityContributionFixtureDo.class).withId("l1-contribution");
+
+    OtherEntityFixtureDo otherEntityList2 = BEANS.get(OtherEntityFixtureDo.class)
         .withId("l2")
-        .withActive(false));
+        .withActive(false);
+    otherEntityList2.contribution(OtherEntityContributionFixtureDo.class).withId("l2-contribution");
+
+    list.add(otherEntityList1);
+    list.add(otherEntityList2);
 
     // setup fixtureEntity used as test entity for various test methods
     fixtureEntity = BEANS.get(EntityFixtureDo.class)
@@ -75,6 +91,8 @@ public class DataObjectVisitorsTest {
                         .withId("n2")))
         .withOtherEntitiesList(list)
         .withOtherEntitiesMap(map);
+
+    fixtureEntity.contribution(EntityContributionFixtureDo.class).withId("myId-contribution");
   }
 
   @Test
@@ -83,6 +101,18 @@ public class DataObjectVisitorsTest {
     DataObjectVisitors.forEach(fixtureEntity, EntityFixtureDo.class, visited::add);
     assertEquals(1, visited.size());
     assertEquals(fixtureEntity, visited.get(0));
+  }
+
+  @Test
+  public void testForEachContribution() {
+    List<EntityContributionFixtureDo> visited1 = new ArrayList<>();
+    DataObjectVisitors.forEach(fixtureEntity, EntityContributionFixtureDo.class, visited1::add);
+    assertEquals(1, visited1.size());
+    assertEquals(fixtureEntity.getContribution(EntityContributionFixtureDo.class), visited1.get(0));
+
+    List<OtherEntityContributionFixtureDo> visited2 = new ArrayList<>();
+    DataObjectVisitors.forEachRec(fixtureEntity, OtherEntityContributionFixtureDo.class, visited2::add);
+    assertEquals(4, visited2.size());
   }
 
   @Test
@@ -111,7 +141,7 @@ public class DataObjectVisitorsTest {
 
     List<String> visitedStrings = new ArrayList<>();
     DataObjectVisitors.forEachRec(fixtureEntity, String.class, visitedStrings::add);
-    assertEquals(11, visitedStrings.size());
+    assertEquals(16, visitedStrings.size()); // 2 map keys, 9 from regular entities, 5 from contributions
   }
 
   @Test
@@ -211,6 +241,13 @@ public class DataObjectVisitorsTest {
   }
 
   @Test
+  public void testReplaceEach_replaceAll_DoEntityContribution() {
+    EntityContributionFixtureDo entityOtherContribution = BEANS.get(EntityContributionFixtureDo.class).withId("other-entity-contribution");
+    DataObjectVisitors.replaceEach(fixtureEntity, EntityContributionFixtureDo.class, o -> entityOtherContribution);
+    assertEquals(entityOtherContribution, fixtureEntity.getContribution(EntityContributionFixtureDo.class));
+  }
+
+  @Test
   public void testReplaceEach_replaceAll_DoList() {
     testReplaceEach_replaceAll_IDoCollection(new DoList<>());
   }
@@ -225,13 +262,13 @@ public class DataObjectVisitorsTest {
     testReplaceEach_replaceAll_IDoCollection(new DoCollection<>());
   }
 
-  protected void testReplaceEach_replaceAll_IDoCollection(IDoCollection<OtherEntityFixtureDo, ?> entites) {
-    entites.add(BEANS.get(OtherEntityFixtureDo.class).withId("id1"));
-    entites.add(BEANS.get(OtherEntityFixtureDo.class).withId("id2"));
+  protected void testReplaceEach_replaceAll_IDoCollection(IDoCollection<OtherEntityFixtureDo, ?> entities) {
+    entities.add(BEANS.get(OtherEntityFixtureDo.class).withId("id1"));
+    entities.add(BEANS.get(OtherEntityFixtureDo.class).withId("id2"));
 
     OtherEntityFixtureDo otherEntity = BEANS.get(OtherEntityFixtureDo.class).withId("otherId");
-    DataObjectVisitors.replaceEach(entites, OtherEntityFixtureDo.class, o -> otherEntity);
-    entites.forEach(o -> assertEquals(otherEntity, o));
+    DataObjectVisitors.replaceEach(entities, OtherEntityFixtureDo.class, o -> otherEntity);
+    entities.forEach(o -> assertEquals(otherEntity, o));
   }
 
   protected void addAllRecIf(List<OtherEntityFixtureDo> entityList, Collection<OtherEntityFixtureDo> entities, Predicate<OtherEntityFixtureDo> nestedEntityPredicate) {

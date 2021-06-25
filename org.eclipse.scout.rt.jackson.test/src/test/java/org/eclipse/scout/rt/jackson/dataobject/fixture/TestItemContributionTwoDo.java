@@ -8,21 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.dataobject.fixture;
-
-import java.util.Collection;
+package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import javax.annotation.Generated;
 
-import org.eclipse.scout.rt.dataobject.DoCollection;
+import org.eclipse.scout.rt.dataobject.ContributesTo;
 import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDoEntityContribution;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
-@TypeName("scout.AnotherCollectionFixture")
-public class AnotherCollectionFixtureDo extends DoEntity {
+@TypeName("scout.TestItemContributionTwo")
+@ContributesTo(TestItemDo.class)
+public class TestItemContributionTwoDo extends DoEntity implements IDoEntityContribution {
 
-  public DoCollection<String> anotherDoCollection() {
-    return doCollection("anotherDoCollection");
+  public DoValue<String> name() {
+    return doValue("name");
   }
 
   /* **************************************************************************
@@ -30,19 +31,13 @@ public class AnotherCollectionFixtureDo extends DoEntity {
    * *************************************************************************/
 
   @Generated("DoConvenienceMethodsGenerator")
-  public AnotherCollectionFixtureDo withAnotherDoCollection(Collection<? extends String> anotherDoCollection) {
-    anotherDoCollection().updateAll(anotherDoCollection);
+  public TestItemContributionTwoDo withName(String name) {
+    name().set(name);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public AnotherCollectionFixtureDo withAnotherDoCollection(String... anotherDoCollection) {
-    anotherDoCollection().updateAll(anotherDoCollection);
-    return this;
-  }
-
-  @Generated("DoConvenienceMethodsGenerator")
-  public Collection<String> getAnotherDoCollection() {
-    return anotherDoCollection().get();
+  public String getName() {
+    return name().get();
   }
 }

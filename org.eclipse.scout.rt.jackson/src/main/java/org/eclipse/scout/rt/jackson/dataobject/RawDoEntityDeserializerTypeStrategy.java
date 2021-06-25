@@ -10,36 +10,35 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import java.util.Collection;
 import java.util.Optional;
 
-import org.eclipse.scout.rt.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
-import org.eclipse.scout.rt.platform.util.LazyValue;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 import com.fasterxml.jackson.databind.JavaType;
 
 @Bean
-public class DefaultDoEntityDeserializerTypeResolver implements IDoEntityDeserializerTypeResolver {
-
-  protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
+public class RawDoEntityDeserializerTypeStrategy implements IDoEntityDeserializerTypeStrategy {
 
   @Override
   public Class<? extends IDoEntity> resolveTypeName(String entityType) {
-    return m_dataObjectInventory.get().fromTypeName(entityType);
+    return null;
   }
 
   @Override
   public String resolveTypeVersion(Class<? extends IDoEntity> entityClass) {
-    NamespaceVersion typeVersion = m_dataObjectInventory.get().getTypeVersion(entityClass);
-    return typeVersion == null ? null : typeVersion.unwrap();
+    return null;
   }
 
   @Override
   public Optional<JavaType> resolveAttributeType(Class<? extends IDoEntity> entityClass, String attributeName) {
-    return m_dataObjectInventory.get().getAttributeDescription(entityClass, attributeName)
-        .map(a -> TypeFactoryUtility.toJavaType(a.getType()))
-        .filter(type -> type.getRawClass() != Object.class);
+    return Optional.empty();
+  }
+
+  @Override
+  public void putContributions(IDoEntity doEntity, String attributeName, Collection<?> contributions) {
+    doEntity.putList(attributeName, CollectionUtility.arrayList(contributions)); // for raw do entity, handle contributions as regular node (DoList)
   }
 }
