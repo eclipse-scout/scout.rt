@@ -165,8 +165,30 @@ const ALPHANUMERIC = {
   }
 };
 
+/**
+ * Applies the comparator to each pair until one pair doesn't return 0 or all pairs are compared.
+ * @param {function(*, *): number} comparator a function that takes 2 parameters and returns -1, 0 or 1.
+ * @param [[*]] pairs array of pairs, where a pair is an array with 2 values.
+ * @return {number}
+ */
+export function compare(comparator, ...pairs) {
+  let result = 0;
+  pairs.some(pair => {
+    if (pair.length !== 2) {
+      throw new Error('The pair must have exactly 2 elements');
+    }
+    result = comparator(pair[0], pair[1]);
+    if (result !== 0) {
+      return true;
+    }
+    return false;
+  });
+  return result;
+}
+
 export default {
   ALPHANUMERIC,
   NUMERIC,
-  TEXT
+  TEXT,
+  compare
 };

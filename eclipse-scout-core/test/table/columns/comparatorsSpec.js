@@ -10,7 +10,7 @@
  */
 import {comparators} from '../../../src/index';
 
-describe('scout.comparators', () => {
+describe('comparators', () => {
 
   beforeEach(() => {
     // ensure before each test that it runs without a collator.
@@ -149,6 +149,24 @@ describe('scout.comparators', () => {
     expect(comparator.compareIgnoreCase('doc\n9', 'DOC 9')).toBe(-1);
     expect(comparator.compareIgnoreCase('doc\n9', 'DOC-9')).toBe(-1);
     expect(comparator.compareIgnoreCase('doc\n9', 'DOC\n\n9')).toBe(-1);
+  });
+
+  describe('compare', () => {
+    it('compares each pair until one is not equal', () => {
+      let comparator = comparators.TEXT;
+      comparator.install(createSession());
+      expect(comparators.compare(comparator.compare.bind(comparator),
+        ['b', 'a'],
+        ['c', 'd'])).toBe(1);
+
+      expect(comparators.compare(comparator.compare.bind(comparator),
+        ['a', 'a'],
+        ['c', 'd'])).toBe(-1);
+
+      expect(comparators.compare(comparator.compare.bind(comparator),
+        ['a', 'a'],
+        ['c', 'c'])).toBe(0);
+    });
   });
 
   function createSession(userAgent) {
