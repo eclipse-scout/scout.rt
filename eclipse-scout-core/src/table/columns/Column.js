@@ -308,7 +308,7 @@ export default class Column {
       }
     }
 
-    return text;
+    return '<span class="text">' + text + '</span>';
   }
 
   _cellCssClass(cell, tableNode) {
