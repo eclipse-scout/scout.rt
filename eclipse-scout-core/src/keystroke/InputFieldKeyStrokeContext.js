@@ -25,9 +25,7 @@ export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
       keys.RIGHT,
       keys.LEFT,
       keys.HOME,
-      keys.END,
-      keys.NUMPAD_4,
-      keys.NUMPAD_6
+      keys.END
     ];
     this.registerStopPropagationKeys(keyStrokeModifier.CTRL, [
       keys.A,
@@ -75,9 +73,7 @@ export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
   setMultiline(multiline) {
     let multilineNavigationKeys = [
       keys.UP,
-      keys.DOWN,
-      keys.NUMPAD_2,
-      keys.NUMPAD_8
+      keys.DOWN
     ];
     if (multiline) {
       this.registerStopPropagationKeys(keyStrokeModifier.CTRL, multilineNavigationKeys);
