@@ -666,7 +666,7 @@ export default class Popup extends Widget {
     horizontalAlignment = horizontalAlignment || this.horizontalAlignment;
     verticalAlignment = verticalAlignment || this.verticalAlignment;
     let anchorBounds = this.getAnchorBounds();
-    let size = graphics.size($container);
+    let size = graphics.size($container, {exact: true});
     let margins = graphics.margins($container);
     let Alignment = Popup.Alignment;
 
@@ -791,8 +791,9 @@ export default class Popup extends Widget {
       return null;
     }
     includeMargin = scout.nvl(includeMargin, true);
-    let height = $container.outerHeight(includeMargin);
-    let width = $container.outerWidth(includeMargin);
+    let containerSize = graphics.size($container, {exact: true, includeMargin: includeMargin});
+    let width = containerSize.width;
+    let height = containerSize.height;
     let popupBounds = new Rectangle(location.x, location.y, width, height);
     let bounds = graphics.offsetBounds($container.entryPoint(), true);
 
@@ -819,7 +820,10 @@ export default class Popup extends Widget {
     }
 
     location = location.clone();
-    if (overlap.y !== 0) {
+    // Ignore very small overlaps (e.g. 0.3px). This could happen if anchor position is fractional and popup has a margin that is not
+    // Example: anchor has top: 10px and margin-top: 10px, browser renders it at 9.984px (due to zoom) but margin stays at 10px
+    // -> location.y would be -0.16px resulting in a popup switch so that the popup will be displayed outside of the window
+    if (Math.abs(overlap.y) >= 1) {
       let verticalSwitch = scout.nvl(switchIfNecessary, this.verticalSwitch);
       if (verticalSwitch) {
         // Switch vertical alignment
@@ -830,7 +834,8 @@ export default class Popup extends Widget {
         location.y -= overlap.y;
       }
     }
-    if (overlap.x !== 0) {
+    // Reason for >= 1 see above
+    if (Math.abs(overlap.x) >= 1) {
       let horizontalSwitch = scout.nvl(switchIfNecessary, this.horizontalSwitch);
       if (horizontalSwitch) {
         // Switch horizontal alignment

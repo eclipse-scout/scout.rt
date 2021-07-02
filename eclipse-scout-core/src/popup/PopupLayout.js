@@ -159,13 +159,6 @@ export default class PopupLayout extends AbstractLayout {
       horizontalAlignment = this.popup.horizontalAlignment,
       verticalAlignment = this.popup.verticalAlignment;
 
-    // Compared to $comp.height() and width(), $comp.offset() may return fractional values. This means the maxSizes may be fractional as well.
-    // The popup sizes must be integers, otherwise reading the height/width later on might result in wrong calculations.
-    // This is especially important for the position calculation.
-    // Popup.position() uses popup.overlap(), if the popup height is lets say 90.5, overlapY would be 0.5 because height returned 91
-    // -> the popup switches its direction unnecessarily
-    maxSize = maxSize.floor();
-
     // Decide whether the prefSize can be used or the popup needs to be shrinked so that it fits into the viewport
     // The decision is based on the preferred opening direction
     // Example: The popup would like to be opened leftedge and bottom
