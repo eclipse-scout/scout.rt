@@ -26,6 +26,61 @@ describe('SmartColumn', () => {
     jasmine.clock().uninstall();
   });
 
+  it('rows with object key can be resolved', () => {
+    const table = helper.createTable({
+      columns: [{
+        objectType: 'SmartColumn'
+      }]
+    });
+
+    const lookupCall = scout.create('LookupCall', {session: session, batch: true});
+    table.columns[0].setLookupCall(lookupCall);
+
+    const key1 = {a: 1, b: 1};
+    const key2 = {a: 1, b: 2};
+    const key3 = {a: 2, b: 2};
+    const valueMap = {};
+    // ensureValidKey will stringify an object key
+    valueMap[lookupCall.ensureValidKey(key1)] = 'Value 1';
+    valueMap[lookupCall.ensureValidKey(key2)] = 'Value 2';
+    valueMap[lookupCall.ensureValidKey(key3)] = 'Value 3';
+    spyOn(lookupCall, 'textsByKeys').and.returnValue($.resolvedPromise(valueMap));
+    spyOn(lookupCall, 'textByKey').and.callFake(key => {
+      return $.resolvedPromise(valueMap[key]);
+    });
+
+    // insert 6 rows
+    table.insertRows(Object.keys(valueMap).concat(Object.keys(valueMap)).map(getRow));
+    table.render();
+    jasmine.clock().tick(500);
+
+    // text should get resolved with a single batch lookup call
+    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(1);
+
+    // textsByKeys should be called with unique keys
+    expect(lookupCall.textsByKeys).toHaveBeenCalledWith(arrayEqualsIgnoreOrder(Object.keys(valueMap)));
+
+    table.insertRow(getRow(lookupCall.ensureValidKey(key1)));
+    jasmine.clock().tick(500);
+    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(2);
+
+    table.insertRow(getRow(lookupCall.ensureValidKey(key2)));
+    jasmine.clock().tick(500);
+    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(3);
+
+    // disable batch mode, now textByKey should be called instead
+    lookupCall.setBatch(false);
+
+    table.insertRows(Object.keys(valueMap).map(getRow));
+    jasmine.clock().tick(500);
+
+    expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(3);
+    expect(lookupCall.textByKey).toHaveBeenCalledTimes(3);
+
+    // rows have texts returned by lookup call
+    checkTableRowTexts(table, valueMap);
+  });
+
   // SmartColumn must deal with values of type number or string
   it('isContentValid', () => {
     let table = helper.createTable({
@@ -95,8 +150,6 @@ describe('SmartColumn', () => {
     spyOn(lookupCall, 'textsByKeys').and.returnValue($.resolvedPromise(valueMap));
     spyOn(lookupCall, 'textByKey').and.callFake(key => $.resolvedPromise(valueMap[key]));
 
-    const getRow = key => ({cells: [key]});
-
     // insert 6 rows
     table.insertRows(Object.keys(valueMap).concat(Object.keys(valueMap)).map(getRow));
     table.render();
@@ -105,12 +158,6 @@ describe('SmartColumn', () => {
     // text should get resolved with a single batch lookup call
     expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(1);
 
-    const arrayEqualsIgnoreOrder = arr => {
-      return {
-        asymmetricMatch: compareTo => arrays.equalsIgnoreOrder(arr, compareTo),
-        jasmineToString: () => '<arrayWithEqualElements: [' + arr.toString() + ']>'
-      };
-    };
     // textsByKeys should be called with unique keys
     expect(lookupCall.textsByKeys).toHaveBeenCalledWith(arrayEqualsIgnoreOrder(Object.keys(valueMap)));
 
@@ -135,7 +182,7 @@ describe('SmartColumn', () => {
     expect(lookupCall.textByKey).toHaveBeenCalledTimes(3);
 
     // rows have texts returned by lookup call
-    table.rows.forEach(row => expect(row.cells[0].text).toEqual(valueMap[row.cells[0].value]));
+    checkTableRowTexts(table, valueMap);
   });
 
   /**
@@ -226,4 +273,16 @@ describe('SmartColumn', () => {
     expect(counter).toBe(1); // Only one prepareLookup event should be triggered when doing batch lookups
     expect(rowAvailable).toBe(undefined);
   });
+
+  const checkTableRowTexts = (table, valueMap) => table.rows.forEach(row => expect(row.cells[0].text).toEqual(valueMap[row.cells[0].value]));
+
+  const getRow = key => ({cells: [key]});
+
+  const arrayEqualsIgnoreOrder = arr => {
+    return {
+      asymmetricMatch: compareTo => arrays.equalsIgnoreOrder(arr, compareTo),
+      jasmineToString: () => '<arrayWithEqualElements: [' + arr.toString() + ']>'
+    };
+  };
+
 });

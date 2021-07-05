@@ -143,7 +143,7 @@ export default class SmartColumn extends Column {
       // create new batch context for this column
       const batchResult = $.Deferred();
       currentBatchContext = {
-        keySet: {},
+        keySet: new Set(),
         result: batchResult.promise()
       };
       this._lookupCallBatchContext = currentBatchContext;
@@ -158,17 +158,17 @@ export default class SmartColumn extends Column {
         });
 
         // batch lookup texts
-        lookupCall.textsByKeys(Object.keys(currentBatchContext.keySet))
+        lookupCall.textsByKeys([...currentBatchContext.keySet])
           .then(textMap => batchResult.resolve(textMap)) // resolve result in current batch context
           .catch(e => batchResult.reject(e)); // reject any errors
       });
     }
 
     // add key to current batch
-    currentBatchContext.keySet[key] = true;
+    currentBatchContext.keySet.add(key);
 
     // return text for current key
-    return currentBatchContext.result.then(textMap => textMap[key] || '');
+    return currentBatchContext.result.then(textMap => textMap[this.lookupCall.ensureValidKey(key)] || '');
   }
 
   /**

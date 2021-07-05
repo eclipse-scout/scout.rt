@@ -111,11 +111,21 @@ export default class LookupCall {
 
         const textMap = {};
         result.lookupRows.forEach(row => {
-          textMap[row.key] = row.text;
+          textMap[this.ensureValidKey(row.key)] = row.text;
         });
 
         return textMap;
       });
+  }
+
+  /**
+   * Ensures the given key can be used as an object property or array index.
+   */
+  ensureValidKey(key) {
+    if (typeof key === 'object') {
+      return JSON.stringify(key);
+    }
+    return key;
   }
 
   /**
