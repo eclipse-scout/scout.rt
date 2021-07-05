@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractNumberColumnTest.P_PropertyTracker;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
