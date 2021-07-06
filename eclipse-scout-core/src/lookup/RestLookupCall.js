@@ -145,9 +145,43 @@ export default class RestLookupCall extends LookupCall {
     return this.resourceUrl;
   }
 
+  _getRestrictionForAjaxCall() {
+    if (!this.restriction && !this._restriction) {
+      return null;
+    }
+
+    let resolveValue = value => {
+      if (typeof value === 'function') {
+        // Dynamic evaluation of the restriction value
+        return value(this);
+      }
+      return value;
+    };
+
+    let newRestrictions = {};
+    let restriction = $.extend({}, this.restriction, this._restriction);
+    Object.keys(restriction).forEach(key => {
+      let value = restriction[key];
+      let newValue;
+      if (Array.isArray(value)) {
+        // Resolve each array element individually, remove null values
+        newValue = value.map(resolveValue).filter(Boolean);
+        newValue = newValue.length ? newValue : null;
+      } else {
+        newValue = resolveValue(value);
+      }
+      // Only add non-null restrictions
+      if (newValue) {
+        newRestrictions[key] = newValue;
+      }
+    });
+    return newRestrictions;
+  }
+
   _createAjaxCall() {
     let url = this._getCallUrl();
-    let data = this.restriction || this._restriction ? JSON.stringify($.extend({}, this.restriction, this._restriction)) : null;
+    let restriction = this._getRestrictionForAjaxCall();
+    let data = restriction ? JSON.stringify(restriction) : null;
     let ajaxOptions = {
       type: 'POST',
       data: data,
