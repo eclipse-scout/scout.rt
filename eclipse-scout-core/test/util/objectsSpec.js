@@ -388,6 +388,105 @@ describe('scout.objects', () => {
     });
   });
 
+  describe('getByPath', () => {
+    it('throws on invalid arguments', () => {
+      expect(() => objects.getByPath()).toThrowError('Missing required parameter \'object\'');
+      expect(() => objects.getByPath('')).toThrowError('Parameter \'object\' has wrong type');
+      expect(() => objects.getByPath({})).toThrowError('Missing required parameter \'path\'');
+    });
+
+    it('rejects malformed path expressions', () => {
+      expect(() => objects.getByPath({}, 'foo.')).toThrowError('Malformed path expression "foo."');
+      expect(() => objects.getByPath({}, 'foo bar')).toThrowError('Malformed path expression "foo bar"');
+      expect(() => objects.getByPath({}, 'foo..bar')).toThrowError('Malformed path expression "foo..bar"');
+      expect(() => objects.getByPath({}, 'foo[bar')).toThrowError('Malformed path expression "foo[bar"');
+      expect(() => objects.getByPath({}, 'foobar]')).toThrowError('Malformed path expression "foobar]"');
+      expect(() => objects.getByPath({}, 'foo[bar].')).toThrowError('Malformed path expression "foo[bar]."');
+      expect(() => objects.getByPath({}, 'foo[bar]..baz')).toThrowError('Malformed path expression "foo[bar]..baz"');
+    });
+
+    let testObject = {
+      foo: {
+        value: 'val3',
+        isNull: null,
+        isUndefined: undefined
+      },
+      bar: [
+        {
+          id: 'bar1',
+          bazbar: {
+            value: 'val4'
+          },
+          baz: [
+            {
+              id: 'baz1',
+              value: 'val1'
+            },
+            {
+              id: 'baz99'
+            },
+            {
+              id: 'baz99'
+            }
+          ]
+        },
+        {
+          id: 'test.bar'
+        },
+        {
+          id: 'test-bar'
+        },
+        {
+          id: 'bar99'
+        },
+        {
+          id: 'bar99'
+        }
+      ],
+      foobar: {
+        barbaz: {
+          value: 'val2'
+        }
+      }
+    };
+
+    it('throws when pathElement contains array filter but property is not an array', () => {
+      expect(() => objects.getByPath(testObject, 'foo[bar]')).toThrowError('Path element "foo[bar]" contains array filter but property "foo" does not contain an array at the root level of the provided object.');
+      expect(() => objects.getByPath(testObject, 'foobar.barbaz[bar]')).toThrowError('Path element "barbaz[bar]" contains array filter but property "barbaz" does not contain an array at the matched path "foobar".');
+    });
+
+    it('throws when property denoted by path could not be found', () => {
+      expect(() => objects.getByPath(testObject, 'doesNotExist')).toThrowError('Property "doesNotExist" does not exist at the root level of the provided object.');
+      expect(() => objects.getByPath(testObject, 'foo.childDoesNotExist')).toThrowError('Property "childDoesNotExist" does not exist at the matched path "foo".');
+      expect(() => objects.getByPath(testObject, 'bar[bar1].childDoesNotExist')).toThrowError('Property "childDoesNotExist" does not exist at the matched path "bar[bar1]".');
+      expect(() => objects.getByPath(testObject, 'bar[bar1].baz[baz1].childDoesNotExist')).toThrowError('Property "childDoesNotExist" does not exist at the matched path "bar[bar1].baz[baz1]".');
+      expect(() => objects.getByPath(testObject, 'bar[bar1].baz[baz1].childDoesNotExist[withFilter]')).toThrowError('Property "childDoesNotExist" does not exist at the matched path "bar[bar1].baz[baz1]".');
+    });
+
+    it('throws when array property does not contain or contains more than one object with specified filter', () => {
+      expect(() => objects.getByPath(testObject, 'bar[bar0]')).toThrowError('No object found with id property "bar0" in array property "bar" at the root level of the provided object.');
+      expect(() => objects.getByPath(testObject, 'bar[bar1].baz[baz0]')).toThrowError('No object found with id property "baz0" in array property "baz" at the matched path "bar[bar1]".');
+      expect(() => objects.getByPath(testObject, 'bar[bar99]')).toThrowError('More than one object found with id property "bar99" in array property "bar" at the root level of the provided object.');
+      expect(() => objects.getByPath(testObject, 'bar[bar1].baz[baz99]')).toThrowError('More than one object found with id property "baz99" in array property "baz" at the matched path "bar[bar1]".');
+    });
+
+    it('throws when property alongside path (all except the last one) is null or undefined', () => {
+      expect(() => objects.getByPath(testObject, 'foo.isNull.someProp')).toThrowError('Value selected by matched path "foo.isNull" is null or undefined. Further traversal not possible.');
+      expect(() => objects.getByPath(testObject, 'foo.isUndefined.someProp')).toThrowError('Value selected by matched path "foo.isUndefined" is null or undefined. Further traversal not possible.');
+    });
+
+    it('selects the correct properties', () => {
+      expect(objects.getByPath(testObject, 'foo')).toBe(testObject.foo);
+      expect(objects.getByPath(testObject, 'foo.isNull')).toBe(testObject.foo.isNull);
+      expect(objects.getByPath(testObject, 'foo.isUndefined')).toBe(testObject.foo.isUndefined);
+      expect(objects.getByPath(testObject, 'bar[bar1]')).toBe(testObject.bar[0]);
+      expect(objects.getByPath(testObject, 'bar[test.bar]')).toBe(testObject.bar[1]);
+      expect(objects.getByPath(testObject, 'bar[test-bar]')).toBe(testObject.bar[2]);
+      expect(objects.getByPath(testObject, 'bar[bar1].bazbar')).toBe(testObject.bar[0].bazbar);
+      expect(objects.getByPath(testObject, 'bar[bar1].baz[baz1]')).toBe(testObject.bar[0].baz[0]);
+    });
+  });
+
   describe('isPlainObject', () => {
 
     it('works as expected', () => {
