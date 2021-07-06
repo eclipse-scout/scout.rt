@@ -186,6 +186,111 @@ export function findChildObjectByKey(parentObj, property, propertyValue) {
 }
 
 /**
+ * This function returns the value of a property from the provided object specified by the second path parameter.
+ * The path consists of a dot separated series of property names (e.g. foo, foo.bar, foo.bar.baz).
+ * In addition, traversing into array properties is possible by specifying a suitable filter for the element's id property in square brackets (e.g. foo[bar], foo.bar[baz]).
+ *
+ * Example:
+ *
+ * let obj = {
+ *   foo: {
+ *     bar: {
+ *       foobar: 'val1'
+ *     }
+ *   },
+ *   baz: [
+ *     {
+ *       id: 'baz1',
+ *       value: 'val2'
+ *     },
+ *     {
+ *       id: 'baz2',
+ *       value: 'val3'
+ *     }
+ *   ]
+ * }
+ *
+ * objects.getByPath(obj, 'foo') === obj.foo;
+ * objects.getByPath(obj, 'foo.bar') === obj.foo.bar;
+ * objects.getByPath(obj, 'baz[baz1]') → { id: 'baz1', value: 'val2' }
+ * objects.getByPath(obj, 'baz[baz2].value') → 'val3'
+ *
+ * @param object The object to select a property from.
+ * @param path The path for the selection.
+ * @return Object Returns the selected object.
+ * @throws Throws an error, if the provided parameters are malformed, or a property could not be found/a id property filter does not find any elements.
+ */
+function getByPath(object, path) {
+  scout.assertParameter('object', object, Object);
+  scout.assertParameter('path', path);
+
+  const pathElementRegexString = '(\\w+)(?:\\[((?:\\w|\\.|-)+)\\])?';
+  const pathValidationRegex = new RegExp('^' + pathElementRegexString + '(?:\\.' + pathElementRegexString + ')*$');
+
+  if (!pathValidationRegex.test(path)) {
+    throw new Error('Malformed path expression "' + path + '"');
+  }
+
+  const pathElementRegex = new RegExp(pathElementRegexString);
+  let pathMatchedSoFar = '';
+  let currentContext = object;
+
+  // Split by dot, but only if the dot is not followed by a string containing a ] that is not preceded by a [.
+  // That excludes dots, that are part of an array filter (e.g. foo[foo.bar]).
+  // Explanation: The regular expression matches dots literally, (\.), that are not followed (negative lookahead: (?!...)
+  // by any mount of "not opening square brackets" ([^[]*) followed by a closing square bracket (last closing square bracket: ])
+  path.split(/\.(?![^[]*])/).forEach(pathElement => {
+    // After the first iteration, the current context may be null or undefined. In this case, further traversal is not possible.
+    if (isNullOrUndefined(currentContext)) {
+      throw new Error('Value selected by matched path "' + pathMatchedSoFar + '" is null or undefined. Further traversal not possible.');
+    }
+
+    // match path element to retrieve property name and optional array property index
+    let pathElementMatch = pathElementRegex.exec(pathElement);
+    let propertyName = pathElementMatch[1];
+    let arrayPropertyFilter = pathElementMatch[2];
+
+    let pathMatchedErrorContext = pathMatchedSoFar.length === 0 ? 'root level of the provided object.' : 'matched path "' + pathMatchedSoFar + '".';
+
+    // check if property 'propertyName' exists
+    if (!currentContext.hasOwnProperty(propertyName)) {
+      throw new Error('Property "' + propertyName + '" does not exist at the ' + pathMatchedErrorContext);
+    }
+
+    let property = currentContext[propertyName];
+
+    // check if we are trying to match an array property or not
+    if (arrayPropertyFilter) {
+      // check for correct type of property
+      if (!Array.isArray(property)) {
+        throw new Error('Path element "' + pathElement + '" contains array filter but property "' + propertyName + '" does not contain an array at the ' + pathMatchedErrorContext);
+      }
+      // find elements matching criteria and make sure that exactly one object was found
+      let matchedElements = property.filter(element => {
+        return element['id'] === arrayPropertyFilter;
+      });
+      if (matchedElements.length === 0) {
+        throw new Error('No object found with id property "' + arrayPropertyFilter + '" in array property "' + propertyName + '" at the ' + pathMatchedErrorContext);
+      } else if (matchedElements.length > 1) {
+        throw new Error('More than one object found with id property "' + arrayPropertyFilter + '" in array property "' + propertyName + '" at the ' + pathMatchedErrorContext);
+      }
+      // reassign current context to found element
+      currentContext = matchedElements[0];
+    } else {
+      // reassign current context to found property
+      currentContext = property;
+    }
+
+    if (pathMatchedSoFar) {
+      pathMatchedSoFar += '.';
+    }
+    pathMatchedSoFar += pathElement;
+  });
+
+  return currentContext;
+}
+
+/**
  * Returns true if the given object is an object, _not_ an array and not null or undefined.
  */
 export function isPlainObject(obj) {
@@ -614,6 +719,7 @@ export default {
   equalsRecursive,
   extractProperties,
   findChildObjectByKey,
+  getByPath,
   forEachArgument,
   isArray,
   isEmpty,
