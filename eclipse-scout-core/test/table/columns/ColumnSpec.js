@@ -222,7 +222,7 @@ describe('Column', () => {
       let $rows = table.$rows();
       let $cells0 = $rows.eq(0).find('.table-cell');
 
-      expect($cells0.eq(0).html()).toBe('&lt;br&gt;hello<br>you');
+      expect($cells0.eq(0).html()).toBe('<span class="text">&lt;br&gt;hello<br>you</span>');
       // No replacement, provided html should be left untouched
       expect($cells0.eq(1).html()).toBe('<br>hello\nyou');
     });

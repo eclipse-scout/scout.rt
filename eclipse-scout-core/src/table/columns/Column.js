@@ -306,9 +306,14 @@ export default class Column {
       if (this.table.multilineText) {
         text = strings.nl2br(text, false);
       }
+      if (text) {
+        // Wrap in a span to make customization using css easier.
+        // An empty text will be replaced with nbsp later on. To make that work, only wrap it if there is text.
+        text = '<span class="text">' + text + '</span>';
+      }
     }
 
-    return '<span class="text">' + text + '</span>';
+    return text;
   }
 
   _cellCssClass(cell, tableNode) {

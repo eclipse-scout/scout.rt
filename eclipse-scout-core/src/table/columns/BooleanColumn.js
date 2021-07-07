@@ -84,7 +84,7 @@ export default class BooleanColumn extends Column {
     }
     content = content + '<div class="' + checkBoxCssClass + '"></div>';
 
-    return '<div class="' + cssClass + '" style="' + style + '">' + content + '</div>';
+    return this._buildCell(content, style, cssClass);
   }
 
   $checkBox($row) {
