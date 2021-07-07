@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {TableSpecHelper} from '../../../src/testing/index';
-import Cell from '../../../src/cell/Cell';
-import arrays from '../../../src/util/arrays';
+import {arrays, Cell, objects} from '../../../src';
 
 describe('SmartColumn', () => {
   let session, helper;
@@ -41,9 +40,9 @@ describe('SmartColumn', () => {
     const key3 = {a: 2, b: 2};
     const valueMap = {};
     // ensureValidKey will stringify an object key
-    valueMap[lookupCall.ensureValidKey(key1)] = 'Value 1';
-    valueMap[lookupCall.ensureValidKey(key2)] = 'Value 2';
-    valueMap[lookupCall.ensureValidKey(key3)] = 'Value 3';
+    valueMap[objects.ensureValidKey(key1)] = 'Value 1';
+    valueMap[objects.ensureValidKey(key2)] = 'Value 2';
+    valueMap[objects.ensureValidKey(key3)] = 'Value 3';
     spyOn(lookupCall, 'textsByKeys').and.returnValue($.resolvedPromise(valueMap));
     spyOn(lookupCall, 'textByKey').and.callFake(key => {
       return $.resolvedPromise(valueMap[key]);
@@ -60,11 +59,11 @@ describe('SmartColumn', () => {
     // textsByKeys should be called with unique keys
     expect(lookupCall.textsByKeys).toHaveBeenCalledWith(arrayEqualsIgnoreOrder(Object.keys(valueMap)));
 
-    table.insertRow(getRow(lookupCall.ensureValidKey(key1)));
+    table.insertRow(getRow(objects.ensureValidKey(key1)));
     jasmine.clock().tick(500);
     expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(2);
 
-    table.insertRow(getRow(lookupCall.ensureValidKey(key2)));
+    table.insertRow(getRow(objects.ensureValidKey(key2)));
     jasmine.clock().tick(500);
     expect(lookupCall.textsByKeys).toHaveBeenCalledTimes(3);
 
@@ -279,6 +278,7 @@ describe('SmartColumn', () => {
   const getRow = key => ({cells: [key]});
 
   const arrayEqualsIgnoreOrder = arr => {
+    // noinspection HtmlUnknownAttribute
     return {
       asymmetricMatch: compareTo => arrays.equalsIgnoreOrder(arr, compareTo),
       jasmineToString: () => '<arrayWithEqualElements: [' + arr.toString() + ']>'

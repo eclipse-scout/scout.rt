@@ -246,6 +246,23 @@ describe('scout.objects', () => {
     });
   });
 
+  describe('isString', () => {
+    it('returns true iff argument is a string', () => {
+      expect(objects.isString()).toBe(false);
+      expect(objects.isString(null)).toBe(false);
+      expect(objects.isString(123)).toBe(false);
+      expect(objects.isString(['foo'])).toBe(false);
+      expect(objects.isString('foo')).toBe(true);
+      expect(objects.isString(String('foo'))).toBe(true);
+      expect(objects.isString(String(null))).toBe(true);
+      expect(objects.isString(JSON.stringify({a: 1}))).toBe(true);
+
+      /* eslint-disable no-new-wrappers */
+      // noinspection JSPrimitiveTypeWrapperUsage
+      expect(objects.isString(new String('foo'))).toBe(true); // typeof 'object'
+    });
+  });
+
   describe('isArray', () => {
     it('returns true when argument is an array', () => {
       expect(objects.isArray([])).toBe(true);
@@ -498,6 +515,7 @@ describe('scout.objects', () => {
     it('resolveConst', () => {
       expect(objects.resolveConst('${const:scout.FormField.LabelPosition.RIGHT}')).toBe(FormField.LabelPosition.RIGHT);
       expect(objects.resolveConst('${const:myConst}')).toBe(6);
+      // noinspection JSCheckFunctionSignatures
       expect(objects.resolveConst(3)).toBe(3); // everything that is not a string, should be returned unchanged
       expect(objects.resolveConst('foo')).toBe('foo'); // a string that is not a constant should be returned unchanged too
 
@@ -577,6 +595,30 @@ describe('scout.objects', () => {
       expect(objects.isEmpty(42)).toBe(undefined);
       expect(objects.isEmpty(['test'])).toBe(undefined);
       expect(objects.isEmpty([42])).toBe(undefined);
+    });
+  });
+
+  describe('ensureValidKey', () => {
+    it('always returns a string', () => {
+      expect(objects.ensureValidKey()).toBe('undefined');
+      expect(objects.ensureValidKey(null)).toBe('null');
+      expect(objects.ensureValidKey(true)).toBe('true');
+      expect(objects.ensureValidKey([])).toBe('[]');
+      expect(objects.ensureValidKey(1.5)).toBe('1.5');
+      expect(objects.ensureValidKey(.1)).toBe('0.1');
+      expect(objects.ensureValidKey(2.0)).toBe('2');
+      expect(objects.ensureValidKey(' abc ')).toBe(' abc ');
+      expect(objects.ensureValidKey('')).toBe('');
+      expect(objects.ensureValidKey('.')).toBe('.');
+      expect(objects.ensureValidKey('\u2013')).toBe('\u2013');
+      expect(objects.ensureValidKey([42, 100, 999])).toBe('[42,100,999]');
+
+      let o = {
+        b: 17,
+        a: [-6.0, 23, {valid: false}],
+        z: {':{! ': '{type: \'none\'}'}
+      };
+      expect(objects.ensureValidKey(o)).toBe('{"b":17,"a":[-6,23,{"valid":false}],"z":{":{! ":"{type: \'none\'}"}}');
     });
   });
 

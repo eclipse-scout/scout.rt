@@ -168,7 +168,7 @@ export default class SmartColumn extends Column {
     currentBatchContext.keySet.add(key);
 
     // return text for current key
-    return currentBatchContext.result.then(textMap => textMap[this.lookupCall.ensureValidKey(key)] || '');
+    return currentBatchContext.result.then(textMap => textMap[objects.ensureValidKey(key)] || '');
   }
 
   /**

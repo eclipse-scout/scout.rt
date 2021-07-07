@@ -245,7 +245,7 @@ export function isNumber(obj) {
 }
 
 export function isString(obj) {
-  return typeof obj === 'string';
+  return typeof obj === 'string' || obj instanceof String;
 }
 
 export function isNullOrUndefined(obj) {
@@ -586,6 +586,21 @@ export function isEmpty(obj) {
   return Object.keys(obj).length === 0;
 }
 
+/**
+ * Converts any non-string argument to a string that can be used as an object property name.
+ * Complex objects are converted to their JSON representation (instead of returning something
+ * non-descriptive such as '[Object object]').
+ */
+export function ensureValidKey(key) {
+  if (key === undefined) {
+    return 'undefined';
+  }
+  if (isString(key)) {
+    return key;
+  }
+  return JSON.stringify(key);
+}
+
 export default {
   CONST_REGEX,
   argumentsToArray,
@@ -594,6 +609,7 @@ export default {
   copyProperties,
   countOwnProperties,
   createMap,
+  ensureValidKey,
   equals,
   equalsRecursive,
   extractProperties,
