@@ -53,7 +53,7 @@ public abstract class AbstractSeleniumTest {
   /**
    * Wrap screenshot rule by session rule to make sure, screenshot is taken BEFORE the session is logged out.
    *
-   * @see https://github.com/junit-team/junit/issues/906
+   * @see "https://github.com/junit-team/junit/issues/906"
    */
   @Rule
   public final TestRule m_mainRule = RuleChain
@@ -163,9 +163,6 @@ public abstract class AbstractSeleniumTest {
   /**
    * Finds the first <code>input</code> {@link WebElement} that is found in the hierarchy referenced by the given
    * locator (by).
-   *
-   * @param by
-   * @return
    */
   public WebElement findInputField(By by) {
     return findElement(by).findElement(By.tagName("input"));
@@ -383,7 +380,7 @@ public abstract class AbstractSeleniumTest {
   }
 
   public WebElement waitUntilTableCellClickable(WebElement parent, String cellText) {
-    return waitUntilElementClickable(parent, By.xpath("//div[contains(@class, 'table-row')]/div[contains(@class, 'table-cell') and contains(text(), '" + cellText + "')]"));
+    return waitUntilElementClickable(parent, By.xpath("//div[contains(@class, 'table-row')]/div[contains(@class, 'table-cell')]/span[contains(@class, 'text') and contains(text(), '" + cellText + "')]"));
   }
 
   public WebElement waitUntilTableCellClickable(String cellText) {
@@ -503,7 +500,7 @@ public abstract class AbstractSeleniumTest {
    * Performs select all on the given element. Since command-key + A does not work with ChromeDriver on OSX we execute
    * JavaScript on that platform. ChromeDriver developers don't seem to be motivated to fix that bug.
    *
-   * @see https://bugs.chromium.org/p/chromedriver/issues/detail?id=30
+   * @see "https://bugs.chromium.org/p/chromedriver/issues/detail?id=30"
    */
   public void selectAll(WebElement element) {
     if (SeleniumUtil.isMacOS()) {
@@ -595,7 +592,6 @@ public abstract class AbstractSeleniumTest {
    * Note: you can still use WebElement#clear if focus loss doesn't matter. But for a lot of widgets, especially
    * SmartFields it makes a difference.
    *
-   * @param input
    * @param withPause
    *          whether or not a short pause should be made after the field has been cleared, this may be necessary for
    *          some SmartFields
@@ -611,7 +607,6 @@ public abstract class AbstractSeleniumTest {
   /**
    * Fails when the given element does not contain all of the given CSS classes.
    *
-   * @param element
    * @param expectedCssClass
    *          A single CSS class-name or multiple CSS class-names separated by space. Example: <code>'menu-item'</code>
    *          or <code>'menu-item selected'</code>. If multiple CSS class-names are given, the given element must have
@@ -623,9 +618,6 @@ public abstract class AbstractSeleniumTest {
 
   /**
    * Fails when the given element contains at least one of the given CSS classes.
-   *
-   * @param element
-   * @param expectedCssClass
    */
   public void assertCssClassNotExists(WebElement element, String expectedCssClass) {
     waitUntil(SeleniumExpectedConditions.elementNotToHaveCssClass(element, expectedCssClass));

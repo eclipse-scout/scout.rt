@@ -269,7 +269,6 @@ public final class SeleniumExpectedConditions {
    *          if not null, findElement below the given parent, if null, findElements in document
    * @param divClass
    *          css class of child div
-   * @param numDivs
    * @return Number of child divs found by the expected condition
    */
   public static ExpectedCondition<List<WebElement>> containerToHaveNumberOfChildDivs(final WebElement parentElement, final String divClass, final int numDivs) {
@@ -299,7 +298,6 @@ public final class SeleniumExpectedConditions {
   /**
    * @param parentElement
    *          if not null, findElement below the given parent, if null, findElements in document
-   * @param numRows
    * @return The table-rows found by the expected condition
    */
   public static ExpectedCondition<List<WebElement>> tableToHaveNumberOfRows(final WebElement parentElement, final int numRows) {
