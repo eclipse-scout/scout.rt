@@ -61,9 +61,6 @@ public abstract class AbstractIcons implements Serializable {
   public static final String Target = "font:\uE020";
   public static final String World = "font:\uE021";
   public static final String Chart = "font:\uE022";
-  public static final String GraphBold = "font:\uE023";
-  public static final String Category = "font:\uE059";
-  public static final String CategoryBold = "font:\uE024";
   public static final String Gear = "font:\uE031";
   public static final String Star = "font:\uE02D";
   public static final String StarMarked = "font:\uE02E";
@@ -75,28 +72,18 @@ public abstract class AbstractIcons implements Serializable {
   public static final String CollapseAll = "font:\uE037";
   public static final String Min = "font:\uE038";
   public static final String Max = "font:\uE039";
-  public static final String EllipsisVBold = "font:\uE040";
   public static final String EllipsisV = "font:\uE041";
   public static final String Search = "font:\uE02A";
   public static final String SearchBold = "font:\uE042";
   public static final String Folder = "font:\uE02B";
   public static final String FolderBold = "font:\uE043";
-  public static final String Spinner = "font:\uE044";
   public static final String RemoveBold = "font:\uE045";
   public static final String Sum = "font:\ue02C";
   public static final String SumBold = "font:\ue025";
   public static final String Pencil = "font:\uE02F";
   public static final String PencilBold = "font:\uE04B";
   public static final String PencilSolid = "font:\uE04F";
-  public static final String Bold = "font:\uE051";
-  public static final String Italic = "font:\uE052";
-  public static final String Underline = "font:\uE053";
-  public static final String Strikethrough = "font:\uE054";
-  public static final String ListUl = "font:\uE055";
-  public static final String ListOl = "font:\uE056";
-  public static final String LightbulbOff = "font:\uE057";
-  public static final String LightbulbOn = "font:\uE058";
-  public static final String ExclamationMark = "font:\uE060";
+  public static final String ExclamationMarkBold = "font:\uE060";
 
   /* awesome font icons */
   public static final String RotateLeftBold = "font:\uF0E2";
@@ -110,17 +97,10 @@ public abstract class AbstractIcons implements Serializable {
   public static final String ChevronDownBold = "font:\uF078";
   public static final String SquareSolid = "font:\uF0C8";
   public static final String CircleSolid = "font:\uF111";
-  public static final String MenuBold = "font:\uF0C9";
-  public static final String ListUlBold = "font:\uF0CA";
-  public static final String ListOlBold = "font:\uF0CB";
   public static final String CaretDown = "font:\uF0D7";
   public static final String CaretUp = "font:\uF0D8";
   public static final String CaretLeft = "font:\uF0D9";
   public static final String CaretRight = "font:\uF0DA";
-  public static final String AngleDoubleLeftBold = "font:\uF100";
-  public static final String AngleDoubleRightBold = "font:\uF101";
-  public static final String AngleDoubleUpBold = "font:\uF102";
-  public static final String AngleDoubleDownBold = "font:\uF103";
   public static final String AngleLeftBold = "font:\uF104";
   public static final String AngleRightBold = "font:\uF105";
   public static final String AngleUpBold = "font:\uF106";

@@ -19,7 +19,7 @@ const TABLE_SORT_ASC = 'font:\u2191';
 const TABLE_SORT_DESC = 'font:\u2193';
 
 /* scoutIcons: custom icons */
-const EXCLAMATION_MARK = 'font:\uE060';
+const EXCLAMATION_MARK_BOLD = 'font:\uE060';
 const EXCLAMATION_MARK_CIRCLE = 'font:\uE001';
 const INFO = 'font:\uE002';
 const CALENDAR = 'font:\uE029';
@@ -44,16 +44,12 @@ const LIST = 'font:\uE01C';
 const TARGET = 'font:\uE020';
 const WORLD = 'font:\uE021';
 const CHART = 'font:\uE022';
-const GRAPH_SOLID = 'font:\uE023';
-const CATEGORY = 'font:\uE059';
-const CATEGORY_SOLID = 'font:\uE024';
 const GEAR = 'font:\uE031';
 const STAR = 'font:\uE02D';
 const STAR_MARKED = 'font:\uE02E';
 const STAR_BOLD = 'font:\uE032';
 const STAR_SOLID = 'font:\uE033';
 const PERSON_SOLID = 'font:\uE034';
-const VERTICAL_DOTS = 'font:\uE040';
 const SEARCH = 'font:\uE02A';
 const SEARCH_BOLD = 'font:\uE042';
 const FOLDER = 'font:\uE02B';
@@ -69,21 +65,12 @@ const MIN_BOLD = 'font:\uE028';
 const EXPAND_ALL = 'font:\uE036';
 const COLLAPSE_ALL = 'font:\uE037';
 const COLLAPSE = 'font:\uE600';
-const ELLIPSIS_V_BOLD = 'font:\uE040';
 const ELLIPSIS_V = 'font:\uE041';
 const REMOVE = 'font:\uE035';
 const REMOVE_BOLD = 'font:\uE045';
 const PENCIL = 'font:\uE02F';
 const PENCIL_BOLD = 'font:\uE04B';
 const PENCIL_SOLID = 'font:\uE04F';
-const BOLD = 'font:\uE051';
-const ITALIC = 'font:\uE052';
-const UNDERLINE = 'font:\uE053';
-const STRIKETHROUGH = 'font:\uE054';
-const LIST_UL = 'font:\uE055';
-const LIST_OL = 'font:\uE056';
-const LIGHTBULB_OFF = 'font:\uE057';
-const LIGHTBULB_ON = 'font:\uE058';
 
 /* font awesome icons */
 const ROTATE_LEFT_BOLD = 'font:\uF0E2';
@@ -96,17 +83,10 @@ const ARROW_RIGHT_BOLD = 'font:\uF061';
 const PLUS_BOLD = 'font:\uF067';
 const MINUS_BOLD = 'font:\uF068';
 const SQUARE_BOLD = 'font:\uF0C8';
-const MENU_BOLD = 'font:\uF0C9';
-const LIST_UL_BOLD = 'font:\uF0CA';
-const LIST_OL_BOLD = 'font:\uF0CB';
 const CARET_DOWN = 'font:\uF0D7';
 const CARET_UP = 'font:\uF0D8';
 const CARET_LEFT = 'font:\uF0D9';
 const CARET_RIGHT = 'font:\uF0DA';
-const ANGLE_DOUBLE_LEFT_BOLD = 'font:\uF100';
-const ANGLE_DOUBLE_RIGHT_BOLD = 'font:\uF101';
-const ANGLE_DOUBLE_UP_BOLD = 'font:\uF102';
-const ANGLE_DOUBLE_DOWN_BOLD = 'font:\uF103';
 const ANGLE_LEFT_BOLD = 'font:\uF104';
 const ANGLE_RIGHT_BOLD = 'font:\uF105';
 const ANGLE_UP_BOLD = 'font:\uF106';
@@ -197,12 +177,8 @@ export function resolveIconProperty(object, iconProperty) {
 }
 
 export default {
-  ANGLE_DOUBLE_DOWN_BOLD,
   ANGLE_DOUBLE_LEFT,
-  ANGLE_DOUBLE_LEFT_BOLD,
   ANGLE_DOUBLE_RIGHT,
-  ANGLE_DOUBLE_RIGHT_BOLD,
-  ANGLE_DOUBLE_UP_BOLD,
   ANGLE_DOWN,
   ANGLE_DOWN_BOLD,
   ANGLE_LEFT,
@@ -214,15 +190,12 @@ export default {
   ARROW_RIGHT_BOLD,
   AVG,
   AVG_BOLD,
-  BOLD,
   CALENDAR,
   CALENDAR_BOLD,
   CARET_DOWN,
   CARET_LEFT,
   CARET_RIGHT,
   CARET_UP,
-  CATEGORY,
-  CATEGORY_SOLID,
   CHART,
   CHECKED_BOLD,
   CHEVRON_DOWN_BOLD,
@@ -233,26 +206,17 @@ export default {
   CLOCK_BOLD,
   COLLAPSE,
   ELLIPSIS_V,
-  ELLIPSIS_V_BOLD,
-  EXCLAMATION_MARK,
+  EXCLAMATION_MARK_BOLD,
   EXCLAMATION_MARK_CIRCLE,
   FILE_SOLID,
   FOLDER,
   FOLDER_BOLD,
   GEAR,
-  GRAPH_SOLID,
   GROUP,
   GROUP_PLUS,
   ICON_ID_REGEX,
   INFO,
-  ITALIC,
-  LIGHTBULB_OFF,
-  LIGHTBULB_ON,
   LIST,
-  LIST_OL,
-  LIST_OL_BOLD,
-  LIST_UL,
-  LIST_UL_BOLD,
   LONG_ARROW_DOWN,
   LONG_ARROW_DOWN_BOLD,
   LONG_ARROW_DOWN_PLUS,
@@ -263,7 +227,6 @@ export default {
   LONG_ARROW_UP_PLUS,
   MAX,
   MAX_BOLD,
-  MENU_BOLD,
   MIN,
   MINUS,
   MINUS_BOLD,
@@ -287,14 +250,11 @@ export default {
   STAR_BOLD,
   STAR_MARKED,
   STAR_SOLID,
-  STRIKETHROUGH,
   SUM,
   SUM_BOLD,
   TABLE_SORT_ASC,
   TABLE_SORT_DESC,
   TARGET,
-  UNDERLINE,
-  VERTICAL_DOTS,
   WORLD,
   parseIconId,
   resolveIconId,

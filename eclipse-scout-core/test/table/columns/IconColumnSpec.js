@@ -27,16 +27,16 @@ describe('IconColumn', () => {
 
   describe('setCellValue', () => {
     it('updates the icon', () => {
-      let model = helper.createModelSingleColumnByValues([icons.CATEGORY], 'IconColumn');
+      let model = helper.createModelSingleColumnByValues([icons.FOLDER], 'IconColumn');
       let table = helper.createTable(model);
       let column0 = table.columns[0];
       let updateRowCount = 0;
       table.render();
 
       expect(column0.cell(table.rows[0]).text).toBe(null);
-      expect(column0.cell(table.rows[0]).value).toBe(icons.CATEGORY);
-      expect(column0.cell(table.rows[0]).iconId).toBe(icons.CATEGORY);
-      expect(table.$cell(column0, table.rows[0].$row).text()).toBe(icons.CATEGORY.replace('font:', ''));
+      expect(column0.cell(table.rows[0]).value).toBe(icons.FOLDER);
+      expect(column0.cell(table.rows[0]).iconId).toBe(icons.FOLDER);
+      expect(table.$cell(column0, table.rows[0].$row).text()).toBe(icons.FOLDER.replace('font:', ''));
 
       table.on('rowsUpdated', event => updateRowCount++);
       column0.setCellValue(table.rows[0], icons.CALENDAR);
