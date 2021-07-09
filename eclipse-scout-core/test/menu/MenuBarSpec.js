@@ -475,7 +475,9 @@ describe('MenuBar', () => {
       expect(menu4.$container).toHaveClass('default');
       expect(menu5.$container).not.toHaveClass('default');
       expect(menu6.$container).not.toHaveClass('default');
-      expect(menu4).toBe(menuBar.defaultMenu);
+
+      expect(menuBar.defaultMenu).toBe(menu4);
+      expect(menuBar.tabbableMenu).toBe(menu4);
     });
 
     it('updates state if menu gets enabled or disabled', () => {
@@ -500,14 +502,17 @@ describe('MenuBar', () => {
       expect(menu2.rendered).toBe(true);
       expect(menuBar.defaultMenu).toBe(menu2);
       expect(menu2.$container).toHaveClass('default');
+      expect(menuBar.tabbableMenu).toBe(menu2);
 
       menu2.setProperty('enabled', false);
       expect(menuBar.defaultMenu).toBe(null);
       expect(menu2.$container).not.toHaveClass('default');
+      expect(menuBar.tabbableMenu).toBe(menu1);
 
       menu2.setProperty('enabled', true);
       expect(menuBar.defaultMenu).toBe(menu2);
       expect(menu2.$container).toHaveClass('default');
+      expect(menuBar.tabbableMenu).toBe(menu2);
     });
 
     it('updates state if keyStroke or defaultMenu property of menu changes', () => {

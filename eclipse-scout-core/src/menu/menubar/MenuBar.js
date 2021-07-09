@@ -21,7 +21,8 @@ import {
   MenuDestinations,
   menus,
   scout,
-  Widget, widgets
+  Widget,
+  widgets
 } from '../../index';
 import ComboMenu from '../ComboMenu';
 
@@ -211,7 +212,6 @@ export default class MenuBar extends Widget {
 
     this.updateVisibility();
     this.updateDefaultMenu();
-    this._updateTabbableMenu();
 
     this._setProperty('menuItems', menuItems);
   }
@@ -299,7 +299,7 @@ export default class MenuBar extends Widget {
     // Make first valid MenuItem tabbable so that it can be focused. All other items
     // are not tabbable. But they can be selected with the arrow keys.
     if (this.tabbable) {
-      if (this.defaultMenu && this.defaultMenu.enabledComputed) {
+      if (this.defaultMenu && this.defaultMenu.isTabTarget()) {
         this.setTabbableMenu(this.defaultMenu);
       } else {
         this.setTabbableMenu(arrays.find(this.orderedMenuItems.all, item => {
@@ -342,12 +342,13 @@ export default class MenuBar extends Widget {
 
   /**
    * First rendered item that is enabled and reacts to ENTER keystroke shall be marked as 'defaultMenu'
+   *
+   * @param {boolean} [updateTabbableMenu] if true (default), the "tabbable menu" is updated at the end of this method.
    */
-  updateDefaultMenu() {
-    let i, item;
+  updateDefaultMenu(updateTabbableMenu) {
     let defaultMenu = null;
-    for (i = 0; i < this.orderedMenuItems.all.length; i++) {
-      item = this.orderedMenuItems.all[i];
+    for (let i = 0; i < this.orderedMenuItems.all.length; i++) {
+      let item = this.orderedMenuItems.all[i];
 
       if (!item.visible || !item.enabled || item.defaultMenu === false) {
         // Invisible or disabled menus and menus that explicitly have the "defaultMenu"
@@ -364,8 +365,8 @@ export default class MenuBar extends Widget {
     }
 
     this.setDefaultMenu(defaultMenu);
-    if (defaultMenu && defaultMenu.isTabTarget()) {
-      this.setTabbableMenu(defaultMenu);
+    if (scout.nvl(updateTabbableMenu, true)) {
+      this._updateTabbableMenu();
     }
   }
 
@@ -420,7 +421,7 @@ export default class MenuBar extends Widget {
     // user request (because many menus change one or more properties). Therefore, we just invalidate
     // the MenuBarLayout. It will be updated automatically after the user request has finished,
     // because the layout calls rebuildItemsInternal().
-    if (event.propertyName === 'overflown' || event.propertyName === 'enabled' || event.propertyName === 'visible' || event.propertyName === 'hidden') {
+    if (event.propertyName === 'overflown' || event.propertyName === 'enabledComputed' || event.propertyName === 'visible' || event.propertyName === 'hidden') {
       if (!this.tabbableMenu || event.source === this.tabbableMenu) {
         this._updateTabbableMenu();
       }
@@ -451,7 +452,7 @@ export default class MenuBar extends Widget {
         this.reorderMenus();
       }
     }
-    if (event.propertyName === 'keyStroke' || event.propertyName === 'enabled' || event.propertyName === 'defaultMenu' || event.propertyName === 'visible') {
+    if (event.propertyName === 'keyStroke' || event.propertyName === 'enabledComputed' || event.propertyName === 'defaultMenu' || event.propertyName === 'visible') {
       this.updateDefaultMenu();
     }
   }
