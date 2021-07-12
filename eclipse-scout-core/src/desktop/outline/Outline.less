@@ -49,6 +49,8 @@
 
       & > .font-icon {
         line-height: @outline-node-font-icon-line-height;
+        font-size: @outline-node-font-icon-size;
+        color: @outline-node-font-icon-color;
       }
 
       & > .menubar {
@@ -60,14 +62,13 @@
         padding-top: @outline-node-control-padding-y;
         padding-left: @outline-node-control-padding-left;
         line-height: @outline-node-control-line-height;
+        color: @outline-node-control-color;
 
         &::before {
           font-size: @outline-node-control-size;
-          /* always use same color as the tree-node label */
-          color: inherit;
         }
 
-        &:hover::before {
+        &:hover {
           color: @highlight-color;
         }
       }
@@ -76,6 +77,11 @@
         color: @outline-selection-color;
         background-color: @outline-selection-background-color;
         border: 0;
+
+        & > .font-icon,
+        & > .tree-node-control {
+          color: fade(@outline-selection-color, 70%);
+        }
       }
     }
   }

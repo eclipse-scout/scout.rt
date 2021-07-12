@@ -112,8 +112,10 @@
 
   & > .icon {
     vertical-align: top;
-    padding-right: 7px;
+    padding-right: 9px;
     display: inline-block;
+    text-align: center;
+    min-width: @tree-node-icon-width;
     /* Use content-box for images because it leads to wrong behavior when someone sets a min-width/height
      * on an IMG element that has padding and the available space for the image is 'min-width' - 'padding'
      * See ticket 208111 */
@@ -127,7 +129,6 @@
     }
 
     &.font-icon {
-      padding-right: 10px;
       /* Necessary to align with the text, depends on the used font size */
       line-height: @tree-node-font-icon-line-height;
     }
@@ -199,6 +200,7 @@
   padding: @tree-node-padding-y 8px @tree-node-padding-y @tree-node-control-padding-left;
   height: 100%;
   line-height: @tree-node-control-line-height; /* Necessary to align with the text, depends on the used font size */
+  color: @tree-node-control-color;
 
   &::before {
     display: block;
@@ -206,7 +208,6 @@
     #scout.font-icon();
     font-size: @tree-node-control-size;
     content: @icon-angle-right;
-    color: @tree-node-control-color;
 
     .tree-node.lazy > & {
       font-family: @font-default-family;
@@ -224,7 +225,7 @@
 
   }
 
-  &:hover::before {
+  &:hover {
     color: @highlight-color;
   }
 }
