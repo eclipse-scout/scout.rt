@@ -30,7 +30,6 @@ public final class DoPredicates {
    *
    * @param accessor
    *          method reference that resolves the {@link DoValue} of a {@link DoNode} (e.g. <code>MyEntity::id</code>).
-   * @param value
    */
   public static <VALUE, DO_NODE> Predicate<DO_NODE> eq(Function<DO_NODE, DoValue<VALUE>> accessor, VALUE value) {
     assertNotNull(accessor, "accessor must not be null");
@@ -42,7 +41,6 @@ public final class DoPredicates {
    *
    * @param accessor
    *          method reference that resolves the {@link DoValue} of a {@link DoNode} (e.g. <code>MyEntity::id</code>).
-   * @param value
    */
   public static <VALUE, DO_NODE> Predicate<DO_NODE> ne(Function<DO_NODE, DoValue<VALUE>> accessor, VALUE value) {
     return eq(accessor, value).negate();
@@ -53,7 +51,6 @@ public final class DoPredicates {
    *
    * @param accessor
    *          method reference that resolves the {@link DoValue} of a {@link DoNode} (e.g. <code>MyEntity::id</code>).
-   * @param value
    */
   public static <VALUE, DO_NODE> Predicate<DO_NODE> in(Function<DO_NODE, DoValue<VALUE>> accessor, Collection<VALUE> values) {
     assertNotNull(accessor, "accessor must not be null");
@@ -66,7 +63,6 @@ public final class DoPredicates {
    *
    * @param accessor
    *          method reference that resolves the {@link DoValue} of a {@link DoNode} (e.g. <code>MyEntity::id</code>).
-   * @param value
    */
   public static <VALUE, DO_NODE> Predicate<DO_NODE> notIn(Function<DO_NODE, DoValue<VALUE>> accessor, Collection<VALUE> values) {
     return in(accessor, values).negate();
@@ -75,9 +71,8 @@ public final class DoPredicates {
   /**
    * Predicate testing the existence of a {@link DoNode} within a {@link DoList} which satisfies the given predicate.
    *
-   * @param accessor
+   * @param listAccessor
    *          method reference that resolves the {@link DoList} of a {@link DoNode} (e.g. <code>MyEntity::items</code>).
-   * @param predicate
    */
   public static <DO_NODE, LIST_NODE> Predicate<DO_NODE> exists(Function<DO_NODE, DoList<LIST_NODE>> listAccessor, Predicate<LIST_NODE> predicate) {
     assertNotNull(listAccessor, "list accessor must not be null");
@@ -88,9 +83,8 @@ public final class DoPredicates {
   /**
    * Predicate testing the absence of a {@link DoNode} within a {@link DoList} which satisfies the given predicate.
    *
-   * @param accessor
+   * @param listAccessor
    *          method reference that resolves the {@link DoList} of a {@link DoNode} (e.g. <code>MyEntity::items</code>).
-   * @param predicate
    */
   public static <DO_NODE, LIST_NODE> Predicate<DO_NODE> notExists(Function<DO_NODE, DoList<LIST_NODE>> listAccessor, Predicate<LIST_NODE> predicate) {
     return exists(listAccessor, predicate).negate();
@@ -99,9 +93,8 @@ public final class DoPredicates {
   /**
    * Predicate testing if the value of a particular {@link DoList} is empty.
    *
-   * @param accessor
+   * @param listAccessor
    *          method reference that resolves the {@link DoList} of a {@link DoNode} (e.g. <code>MyEntity::items</code>).
-   * @param predicate
    */
   public static <DO_NODE, LIST_NODE> Predicate<DO_NODE> empty(Function<DO_NODE, DoList<LIST_NODE>> listAccessor) {
     assertNotNull(listAccessor, "list accessor must not be null");
@@ -111,9 +104,8 @@ public final class DoPredicates {
   /**
    * Predicate testing if the value of a particular {@link DoList} is not empty.
    *
-   * @param accessor
+   * @param listAccessor
    *          method reference that resolves the {@link DoList} of a {@link DoNode} (e.g. <code>MyEntity::items</code>).
-   * @param predicate
    */
   public static <DO_NODE, LIST_NODE> Predicate<DO_NODE> notEmpty(Function<DO_NODE, DoList<LIST_NODE>> listAccessor) {
     return empty(listAccessor).negate();
