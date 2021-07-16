@@ -4930,7 +4930,10 @@ export default class Table extends Widget {
       var firstRow = rows[this.viewRangeRendered.from];
       var lastRow = rows[this.viewRangeRendered.to - 1];
       if (!firstRow.$row || !lastRow.$row) {
-        throw new Error('Rows not rendered as expected. ' + this.viewRangeRendered + '. First: ' + firstRow.$row + '. Last: ' + lastRow.$row);
+        throw new Error('Rows not rendered as expected. ' + this.viewRangeRendered +
+          '. First: ' + graphics.debugOutput(firstRow.$row) +
+          '. Last: ' + graphics.debugOutput(lastRow.$row) +
+          '. Length: visibleRows=' + this.visibleRows.length + ' rows=' + this.rows.length);
       }
     }
 

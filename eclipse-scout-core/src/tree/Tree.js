@@ -15,6 +15,7 @@ import {
   Device,
   DoubleClickSupport,
   dragAndDrop,
+  graphics,
   HtmlComponent,
   keys,
   KeyStrokeContext,
@@ -706,13 +707,16 @@ export default class Tree extends Widget {
       var lastNode = nodes[this.viewRangeRendered.to - 1];
       if (this.viewRangeDirty) {
         // cleanup nodes before range and after
-        var $nodesBeforFirstNode = firstNode.$node.prevAll('.tree-node');
+        var $nodesBeforeFirstNode = firstNode.$node.prevAll('.tree-node');
         var $nodesAfterLastNode = lastNode.$node.nextAll('.tree-node');
-        this._cleanupNodes($nodesBeforFirstNode);
+        this._cleanupNodes($nodesBeforeFirstNode);
         this._cleanupNodes($nodesAfterLastNode);
       }
       if (!firstNode.attached || !lastNode.attached) {
-        throw new Error('Nodes not rendered as expected. ' + this.viewRangeRendered + '. First: ' + firstNode.$node + '. Last: ' + lastNode.$node);
+        throw new Error('Nodes not rendered as expected. ' + this.viewRangeRendered +
+          '. First: ' + graphics.debugOutput(firstNode.$node) +
+          '. Last: ' + graphics.debugOutput(lastNode.$node) +
+          '. Length: visibleNodesFlat=' + this.visibleNodesFlat.length + ' nodes=' + this.nodes.length + ' nodesMap=' + Object.keys(this.nodesMap).length);
       }
     }
 
