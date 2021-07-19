@@ -38,8 +38,16 @@ Try these to switch between fonts:
 
 @letter-spacing: 0.5px;
 
+@icon-font-weight-light: 300;
+
 @font-face {
   font-family: scoutIcons;
   font-weight: normal;
   src: url('fonts/scoutIcons.woff') format('woff');
+}
+
+@font-face {
+  font-family: scoutIcons;
+  font-weight: @icon-font-weight-light;
+  src: url('fonts/scoutIcons-light.woff') format('woff');
 }
