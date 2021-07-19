@@ -222,6 +222,10 @@
       "trimText": true,
       "wrapText": false
     },
+    "WidgetField": {
+      "scrollable": true,
+      "fieldWidget": null
+    },
     "WrappedFormField": {
       "initialFocusEnabled": false
     },
@@ -568,6 +572,7 @@
           "SliderField": null,
           "RadioButtonGroup": null
         },
+        "WidgetField": null,
         "WizardProgressField": null,
         "WrappedFormField": null
       },

@@ -58,6 +58,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormMenu;
 import org.eclipse.scout.rt.client.ui.form.ITileOverviewForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IStatusMenuMapping;
+import org.eclipse.scout.rt.client.ui.form.fields.IWidgetField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.accordionfield.IAccordionField;
@@ -146,6 +147,7 @@ import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.JsonTileOverviewForm;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonDateField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonStatusMenuMapping;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonWidgetField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.accordionfield.JsonAccordionField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.beanfield.JsonBeanField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.breadcrumbbarfield.JsonBreadcrumbBarField;
@@ -351,6 +353,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IBreadcrumbBarField) {
       return new JsonBreadcrumbBarField<>((IBreadcrumbBarField) model, session, id, parent);
+    }
+    if (model instanceof IWidgetField) {
+      return new JsonWidgetField<>((IWidgetField) model, session, id, parent);
     }
 
     // --- other model objects ---
