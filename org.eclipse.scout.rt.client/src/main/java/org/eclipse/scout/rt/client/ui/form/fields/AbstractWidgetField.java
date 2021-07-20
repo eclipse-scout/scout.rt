@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 @ClassId("74955146-e592-4dfa-ab58-25b0acf1c355")
-public class AbstractWidgetField<WIDGET extends IWidget> extends AbstractFormField implements IWidgetField<WIDGET> {
+public abstract class AbstractWidgetField<WIDGET extends IWidget> extends AbstractFormField implements IWidgetField<WIDGET> {
 
   public AbstractWidgetField() {
   }
