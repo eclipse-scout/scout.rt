@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIconColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
@@ -268,6 +269,10 @@ public abstract class AbstractTileTableHeader extends AbstractGroupBox implement
         || col instanceof AbstractBooleanColumn;
   }
 
+  protected boolean isColumnTypeAllowedForSorting(IColumn col) {
+    return !(col instanceof AbstractIconColumn);
+  }
+
   @ClassId("dbf260be-ee6c-4f6f-99c6-9b7bcbdf7d61")
   protected class P_GroupByLookupCall extends LocalLookupCall<IColumn> {
     private static final long serialVersionUID = 1L;
@@ -301,7 +306,7 @@ public abstract class AbstractTileTableHeader extends AbstractGroupBox implement
       final List<LookupRow<ImmutablePair<IColumn, Boolean>>> lookupRows = new ArrayList<>();
 
       for (IColumn col : getTable().getColumns()) {
-        if (col.isVisible()) {
+        if (col.isVisible() && isColumnTypeAllowedForSorting(col)) {
           String colLabel = ObjectUtility.nvl(col.getHeaderCell().getText(), col.getHeaderCell().getTooltipText());
           lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, true), colLabel + " \u2191"));
           lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, false), colLabel + " \u2193"));
