@@ -28,6 +28,7 @@ public class ScoutDataObjectSignatureTestCustomizer implements IDataObjectSignat
   private static final Set<Class<?>> SUPPORTED_TYPES = new HashSet<>(Arrays.asList(
       // Java basic types
       Long.class,
+      Character.class,
       String.class,
       Date.class,
       Boolean.class,
