@@ -81,6 +81,10 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
     // NOOP
   }
 
+  public boolean isEnabled() {
+    return m_enabled;
+  }
+
   protected void fail(HttpServletResponse resp) throws IOException {
     resp.sendError(HttpServletResponse.SC_FORBIDDEN);
   }

@@ -47,9 +47,7 @@ public class DefaultAuthTokenVerifier {
       return token != null && verifyUser(token) && verifyValidUntil(token) && verifySignature(token);
     }
     catch (RuntimeException e) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Failed verifying signature of token {}", token, e);
-      }
+      LOG.info("Failed verifying signature of token {}", token, e);
       return false;
     }
   }
