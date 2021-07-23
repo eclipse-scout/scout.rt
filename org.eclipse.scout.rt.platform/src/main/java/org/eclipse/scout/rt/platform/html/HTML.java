@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -293,7 +293,7 @@ public final class HTML {
         return span(matcher.group(1)).cssClass("font-icon"); // icon from Scout font
       }
       else {
-        return span(matcher.group(2)).cssClass("font-" + matcher.group(1)); // icon from custom font
+        return span(matcher.group(2)).cssClass("font-icon font-" + matcher.group(1)); // icon from custom font
       }
     }
     else {
