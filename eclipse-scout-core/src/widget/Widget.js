@@ -2303,6 +2303,8 @@ export default class Widget {
    * (in that case the widget would be in the children list of the owner and of the parent).
    * <p>
    * In order to abort visiting, the visitor can return true.
+   *
+   * @param {function(AnyWidget):boolean|TreeVisitResult|null} visitor
    * @returns {boolean} true if the visitor aborted the visiting, false if the visiting completed without aborting
    */
   visitChildren(visitor) {

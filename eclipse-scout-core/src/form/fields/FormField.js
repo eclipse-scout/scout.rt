@@ -1395,8 +1395,9 @@ export default class FormField extends Widget {
   }
 
   /**
-   * Visits this field and all child formfields in pre-order (top-down).
+   * Visits this field and all child form fields in pre-order (top-down).
    *
+   * @param {function(FormField):string|TreeVisitResult|null} visitor
    * @returns {string} the TreeVisitResult, or nothing to continue.
    */
   visitFields(visitor) {
@@ -1405,6 +1406,8 @@ export default class FormField extends Widget {
 
   /**
    * Visit all parent form fields. The visit stops if the parent is no form field anymore (e.g. a form, desktop or session).
+   *
+   * @param {function(FormField)} visitor
    */
   visitParentFields(visitor) {
     let curParent = this.parent;
