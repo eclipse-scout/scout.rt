@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {colorSchemes, GridData, HtmlComponent, LoadingSupport, SingleLayout, Widget} from '../index';
+import {colorSchemes, GridData, HtmlComponent, LoadingSupport, scrollbars, SingleLayout, Widget} from '../index';
 import $ from 'jquery';
 
 export default class Tile extends Widget {
@@ -158,6 +158,9 @@ export default class Tile extends Widget {
       this.$container.oneAnimationEnd(() => {
         // Make the element invisible after the animation (but only if visibility has not changed again in the meantime)
         this.$container.setVisible(this.isVisible());
+        // Layout is invalidated before the animation starts and the TileGridLayout does not listen for visible-animations to update the scrollbar -> do it here
+        // It is mainly necessary if every tile is made invisible / visible. If only some tiles are affected, the TileGridLayout animation change will trigger the scrollbar update
+        scrollbars.update(this.parent.get$Scrollable());
       });
     } else {
       this.$container.addClass('invisible'); // Don't show it until it has the correct size and position to prevent flickering (Scout JS, non virtual)
@@ -169,6 +172,10 @@ export default class Tile extends Widget {
         }
         this.$container.removeClass('invisible animate-invisible');
         this.$container.addClassForAnimation('animate-visible');
+        this.$container.oneAnimationEnd(() => {
+          // See comment above on why this is done here
+          scrollbars.update(this.parent.get$Scrollable());
+        });
       });
     }
     this.invalidateParentLogicalGrid();
