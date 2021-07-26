@@ -15,6 +15,7 @@ import java.io.IOException;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoMapEntity;
+import org.eclipse.scout.rt.dataobject.DoNode;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.slf4j.Logger;
@@ -131,8 +132,10 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
 
   protected IDoEntity derializeDoEntityAttributes(JsonParser p, DeserializationContext ctxt, IDoEntity entity) throws IOException {
 
-//    Object val = ctxt.getAttribute("foo");
-//    System.out.println(val);
+/*
+Object val = ctxt.getAttribute("foo");
+System.out.println(val);
+*/
 
     // read and deserialize all fields of entity
     for (JsonToken t = p.currentToken(); t == JsonToken.FIELD_NAME; t = p.nextToken()) {
@@ -141,12 +144,28 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       boolean isArray = p.getCurrentToken() == JsonToken.START_ARRAY;
       boolean isObject = p.getCurrentToken() == JsonToken.START_OBJECT;
       JavaType attributeType = findResolvedAttributeType(entity, attributeName, isObject, isArray);
+
       if (attributeType.hasRawClass(DoList.class)) {
-        DoList<?> listValue = ctxt.readValue(p, attributeType);
-        entity.putNode(attributeName, listValue);
+        DoNode<?> nodeValue;
+        if (p.getCurrentToken() == JsonToken.VALUE_NULL) {
+          nodeValue = (DoNode<?>) ctxt.findRootValueDeserializer(attributeType).getNullValue(ctxt);
+//          p.clearCurrentToken();
+        }
+        else {
+          nodeValue = ctxt.readValue(p, attributeType);
+        }
+        entity.putNode(attributeName, nodeValue);
       }
       else {
-        Object value = ctxt.readValue(p, attributeType);
+        Object value;
+        if (p.getCurrentToken() == JsonToken.VALUE_NULL) {
+          value = ctxt.findRootValueDeserializer(attributeType).getNullValue(ctxt);
+          //p.clearCurrentToken();
+        }
+        else {
+          value = ctxt.readValue(p, attributeType);
+        }
+        //Object value = p.getCodec().readValue(p, attributeType);
 
         // check if reading the 'type version' property
         if (m_moduleContext.getTypeVersionAttributeName().equals(attributeName)) {
@@ -159,6 +178,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     }
     return entity;
   }
+
 
   protected void deserializeDoEntityVersionAttribute(IDoEntity entity, String attributeName, Object version) {
     String dataObjectTypeVersion = m_doEntityDeserializerTypeResolver.resolveTypeVersion(entity.getClass());

@@ -20,6 +20,7 @@ import java.util.TreeMap;
 import org.eclipse.scout.rt.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.dataobject.DoNode;
 import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper.IMapperFeatures;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
@@ -56,9 +57,21 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
 
   @Override
   public void serializeWithType(IDoEntity entity, JsonGenerator gen, SerializerProvider provider, TypeSerializer typeSer) throws IOException {
-    WritableTypeId typeIdDef = typeSer.writeTypePrefix(gen, typeSer.typeId(entity, JsonToken.START_OBJECT));
+    boolean type = provider.getAttribute(IMapperFeatures.NO_TYPE_NAME.getKey()) == null;
+    WritableTypeId typeIdDef = null;
+    if (type) {
+      typeIdDef = typeSer.writeTypePrefix(gen, typeSer.typeId(entity, JsonToken.START_OBJECT));
+    }
+    else {
+      gen.writeStartObject();
+    }
     serializeAttributes(entity, gen, provider);
-    typeSer.writeTypeSuffix(gen, typeIdDef);
+    if (type) {
+      typeSer.writeTypeSuffix(gen, typeIdDef);
+    }
+    else {
+      gen.writeEndObject();
+    }
   }
 
   /**
@@ -93,7 +106,43 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
       serializeMap(attributeName, (Map<?, ?>) obj, gen, provider);
     }
     else {
-      gen.writeObjectField(attributeName, obj);
+      gen.writeFieldName(attributeName);
+
+      JsonSerializer<Object> serializer;
+      if (obj == null) {
+        gen.writeNull();
+        //serializer = provider.findNullValueSerializer(null);
+      }
+      else {
+        serializer = provider.findTypedValueSerializer(obj.getClass(), true, null);
+        serializer.serialize(obj, gen, provider);
+      }
+
+/*
+if (serializer != null) {
+
+} else {
+  System.out.println("null");
+}
+*/
+
+/*
+Class<?> cc = elem.getClass();
+JsonSerializer<Object> serializer = serializers.serializerFor(cc);
+*/
+
+/*
+provider.defaultSerializeValue(
+    serializeValue
+);
+*/
+
+/*
+provider.serializeValue();
+provider.getGenerator().writeObjectField(attributeName, obj);
+*/
+      //gen.writeObjectField(attributeName, obj);
+      //provider.getGenerator();
     }
   }
 

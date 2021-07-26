@@ -26,6 +26,41 @@ import org.eclipse.scout.rt.platform.Bean;
 @Bean
 public interface IDataObjectMapper {
 
+  interface IMapperFeature {
+    String getKey();
+
+    String getValue();
+  }
+
+  interface IMapperFeatures {
+
+    IMapperFeature NO_TYPE_NAME = new IMapperFeature() {
+      @Override
+      public String getKey() {
+        return "scout.data.objectmapper.feature.noTypeName";
+      }
+
+      @Override
+      public String getValue() {
+        return Boolean.TRUE.toString();
+      }
+    };
+
+    static IMapperFeature TYPE_ATTRIBUTE_NAME(String typeAttributeName) {
+      return new IMapperFeature() {
+        @Override
+        public String getKey() {
+          return "scout.data.objectmapper.feature.typeAttributeName";
+        }
+
+        @Override
+        public String getValue() {
+          return typeAttributeName;
+        }
+      };
+    }
+  }
+
   /**
    * Deserialize from input stream into a data object.
    */
@@ -50,10 +85,10 @@ public interface IDataObjectMapper {
   /**
    * Serializes a data object into the given output stream.
    */
-  void writeValue(OutputStream outputStream, Object value);
+  void writeValue(OutputStream outputStream, Object value, IMapperFeature... features);
 
   /**
    * Serializes a data object into its string representation.
    */
-  String writeValue(Object value);
+  String writeValue(Object value, IMapperFeature... features);
 }

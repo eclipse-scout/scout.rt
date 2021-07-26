@@ -224,12 +224,12 @@ public class DataObjectJsonPropertyReaderTest {
     }
 
     @Override
-    public void writeValue(OutputStream outputStream, Object value) {
+    public void writeValue(OutputStream outputStream, Object value, IMapperFeature... features) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public String writeValue(Object value) {
+    public String writeValue(Object value, IMapperFeature... features) {
       throw new UnsupportedOperationException();
     }
   }

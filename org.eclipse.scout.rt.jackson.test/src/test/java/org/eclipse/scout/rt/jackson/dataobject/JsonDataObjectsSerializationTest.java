@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.*;
-import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
@@ -35,12 +34,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDataObject;
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper.IMapperFeature;
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper.IMapperFeatures;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo;
@@ -2421,4 +2423,29 @@ public class JsonDataObjectsSerializationTest {
   protected URL getResource(String expectedResourceName) {
     return JsonDataObjectsSerializationTest.class.getResource(expectedResourceName);
   }
+
+  @Test
+  public void testMapperFeatures() throws Exception {
+    TestItemDo item = createTestItemDo("foo", "attribValue");
+/*
+String json = s_dataObjectMapper.writer().withAttributes(toAttributes(IMapperFeatures.NO_TYPE_NAME)).writeValueAsString(item);
+System.out.println(json);
+*/
+
+/*
+TestComplexEntityDo testDo = createTestDo();
+String json2 = s_dataObjectMapper.writer().withAttributes(toAttributes(IMapperFeatures.NO_TYPE_NAME)).writeValueAsString(testDo);
+System.out.println(json2);
+*/
+
+    TestCollectionsDo expectedDo = createTestCollectionsDo();
+    String json3 = s_dataObjectMapper.writer().withAttributes(toAttributes(IMapperFeatures.NO_TYPE_NAME)).writeValueAsString(expectedDo);
+    System.out.println(json3);
+
+  }
+
+  protected Map<?, ?> toAttributes(IMapperFeature... features) {
+    return Arrays.stream(features).collect(Collectors.toMap(IMapperFeature::getKey, IMapperFeature::getValue));
+  }
+
 }

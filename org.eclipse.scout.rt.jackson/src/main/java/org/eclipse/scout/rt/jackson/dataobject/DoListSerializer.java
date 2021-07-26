@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.dataobject.DoList;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -32,20 +33,24 @@ public class DoListSerializer extends StdSerializer<DoList<?>> {
 
   @Override
   public void serialize(DoList<?> value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-    serializeList(value, gen);
+    serializeList(value, gen, provider);
   }
 
   @Override
   public void serializeWithType(DoList<?> value, JsonGenerator gen, SerializerProvider serializers, TypeSerializer typeSer) throws IOException {
-    serializeList(value, gen);
+    serializeList(value, gen, serializers);
   }
 
-  protected void serializeList(DoList<?> value, JsonGenerator gen) throws IOException {
+  protected void serializeList(DoList<?> value, JsonGenerator gen, SerializerProvider provider) throws IOException {
     // serialize DoList as array using default jackson serializer (includes types if necessary according to actual chosen serializer for each object type)
     gen.writeStartArray();
     gen.setCurrentValue(value);
     for (Object item : value.get()) {
-      gen.writeObject(item);
+      //gen.writeObject(item);
+
+      JsonSerializer<Object> ser = provider.findTypedValueSerializer(item.getClass(), true, null);
+      ser.serialize(item, gen, provider);
+
     }
     gen.writeEndArray();
   }

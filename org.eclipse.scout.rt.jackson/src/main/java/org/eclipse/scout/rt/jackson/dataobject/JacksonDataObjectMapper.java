@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
@@ -54,9 +57,9 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
       return null;
     }
     try {
-//      return m_objectMapper.get().readValue(value, valueType);
+      return m_objectMapper.get().readValue(value, valueType);
 
-      return m_objectMapper.get().readerFor(valueType).withAttribute("foo", "bar").readValue(value);
+      //return m_objectMapper.get().readerFor(valueType).withAttribute("foo", "bar").readValue(value);
 
     }
     catch (IOException e) {
@@ -89,26 +92,30 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
   }
 
   @Override
-  public void writeValue(OutputStream outputStream, Object value) {
+  public void writeValue(OutputStream outputStream, Object value, IMapperFeature... features) {
     Assertions.assertNotNull(outputStream, "Output stream must not be null");
     if (value == null) {
       return;
     }
     try {
-      m_objectMapper.get().writeValue(outputStream, value);
+      m_objectMapper.get().writer().withAttributes(toAttributes(features)).writeValue(outputStream, value);
     }
     catch (IOException e) {
       throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
     }
   }
 
+  protected Map<?, ?> toAttributes(IMapperFeature... features) {
+    return Arrays.stream(features).collect(Collectors.toMap(IMapperFeature::getKey, IMapperFeature::getValue));
+  }
+
   @Override
-  public String writeValue(Object value) {
+  public String writeValue(Object value, IMapperFeature... features) {
     if (value == null) {
       return null;
     }
     try {
-      return m_objectMapper.get().writeValueAsString(value);
+      return m_objectMapper.get().writer().withAttributes(toAttributes(features)).writeValueAsString(value);
     }
     catch (JsonProcessingException e) {
       throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
