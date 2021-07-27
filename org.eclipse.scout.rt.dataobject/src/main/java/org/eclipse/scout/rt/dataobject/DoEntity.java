@@ -213,7 +213,8 @@ public class DoEntity implements IDoEntity {
     }
 
     DoEntity doEntity = (DoEntity) o;
-    if (m_attributes != null ? !m_attributes.equals(doEntity.m_attributes) : doEntity.m_attributes != null) {
+
+    if (!m_attributes.equals(doEntity.m_attributes)) {
       return false;
     }
     if (!CollectionUtility.equalsCollection(m_contributions, doEntity.m_contributions, false)) { // element order is not relevant
@@ -225,7 +226,7 @@ public class DoEntity implements IDoEntity {
 
   @Override
   public int hashCode() {
-    int result = m_attributes != null ? m_attributes.hashCode() : 0;
+    int result = m_attributes.hashCode();
     result = 31 * result + CollectionUtility.hashCodeCollection(m_contributions); // element order is not relevant
     return result;
   }

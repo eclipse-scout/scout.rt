@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +34,9 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
  * </ol>
  */
 @ApplicationScoped
-public class DoEntitySerializerAttributeNameComparator implements Comparator<String> {
+public class DoEntitySerializerAttributeNameComparator implements Comparator<String>, Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   protected Map<String, Integer> m_orders = new HashMap<>();
 
