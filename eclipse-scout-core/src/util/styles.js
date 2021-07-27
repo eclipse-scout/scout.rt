@@ -374,7 +374,7 @@ export function legacyForegroundColor(obj, $element, propertyPrefix) {
 
   let cssColor = '';
   if (obj) {
-    let foregroundColorProperty = strings.lowercaseFirstLetter(propertyPrefix + 'ForegroundColor');
+    let foregroundColorProperty = strings.toLowerCaseFirstLetter(propertyPrefix + 'ForegroundColor');
     cssColor = modelToCssColor(obj[foregroundColorProperty]);
   }
   if ($element) {
@@ -392,7 +392,7 @@ export function legacyBackgroundColor(obj, $element, propertyPrefix) {
 
   let cssBackgroundColor = '';
   if (obj) {
-    let backgroundColorProperty = strings.lowercaseFirstLetter(propertyPrefix + 'BackgroundColor');
+    let backgroundColorProperty = strings.toLowerCaseFirstLetter(propertyPrefix + 'BackgroundColor');
     cssBackgroundColor = modelToCssColor(obj[backgroundColorProperty]);
   }
   if ($element) {
@@ -413,7 +413,7 @@ export function legacyFont(obj, $element, propertyPrefix) {
   let cssFontSize = '';
   let cssFontFamily = '';
   if (obj) {
-    let fontProperty = strings.lowercaseFirstLetter(propertyPrefix + 'Font');
+    let fontProperty = strings.toLowerCaseFirstLetter(propertyPrefix + 'Font');
     let fontSpec = parseFontSpec(obj[fontProperty]);
     if (fontSpec.bold) {
       cssFontWeight = 'bold';
