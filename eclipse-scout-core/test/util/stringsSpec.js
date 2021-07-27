@@ -193,6 +193,100 @@ describe('strings', () => {
 
   });
 
+  describe('length', () => {
+
+    it('counts the length', () => {
+      expect(strings.length()).toBe(0);
+      expect(strings.length(null)).toBe(0);
+      expect(strings.length('')).toBe(0);
+      expect(strings.length(0)).toBe(1); // "0"
+      expect(strings.length(true)).toBe(4); // "true"
+      expect(strings.length({})).toBe(15); // "[object Object]"
+      expect(strings.length(' ')).toBe(1);
+      expect(strings.length(' xyz ')).toBe(5);
+      expect(strings.length('äöü')).toBe(3);
+    });
+
+  });
+
+  describe('trim', () => {
+
+    it('trims white space', () => {
+      expect(strings.trim()).toBe(undefined);
+      expect(strings.trim(null)).toBe(null);
+      expect(strings.trim('')).toBe('');
+      expect(strings.trim(0)).toBe('0');
+      expect(strings.trim(true)).toBe('true');
+      expect(strings.trim({})).toBe('[object Object]');
+      expect(strings.trim('0')).toBe('0');
+      expect(strings.trim(' ')).toBe('');
+      expect(strings.trim(' xyz ')).toBe('xyz');
+      expect(strings.trim('  abc  def')).toBe('abc  def');
+    });
+
+  });
+
+  describe('toLowerCase', () => {
+
+    it('converts text to lower case', () => {
+      expect(strings.toLowerCase()).toBe(undefined);
+      expect(strings.toLowerCase(null)).toBe(null);
+      expect(strings.toLowerCase('')).toBe('');
+      expect(strings.toLowerCase(0)).toBe('0');
+      expect(strings.toLowerCase(true)).toBe('true');
+      expect(strings.toLowerCase({})).toBe('[object object]');
+      expect(strings.toLowerCase('0')).toBe('0');
+      expect(strings.toLowerCase(' ')).toBe(' ');
+      expect(strings.toLowerCase(' XYZ ')).toBe(' xyz ');
+      expect(strings.toLowerCase('Abc deF')).toBe('abc def');
+      expect(strings.toLowerCase('$TEST')).toBe('$test');
+      expect(strings.toLowerCase('Äöü sind Umlaute')).toBe('äöü sind umlaute');
+    });
+
+  });
+
+  describe('toUpperCaseFirstLetter', () => {
+
+    it('converts first letter to upper case', () => {
+      expect(strings.toUpperCaseFirstLetter()).toBe(undefined);
+      expect(strings.toUpperCaseFirstLetter(null)).toBe(null);
+      expect(strings.toUpperCaseFirstLetter('')).toBe('');
+      expect(strings.toUpperCaseFirstLetter(0)).toBe('0');
+      expect(strings.toUpperCaseFirstLetter(true)).toBe('True');
+      expect(strings.toUpperCaseFirstLetter({})).toBe('[object Object]');
+      expect(strings.toUpperCaseFirstLetter('0')).toBe('0');
+      expect(strings.toUpperCaseFirstLetter(' ')).toBe(' ');
+      expect(strings.toUpperCaseFirstLetter(' xyz ')).toBe(' xyz ');
+      expect(strings.toUpperCaseFirstLetter('abc def')).toBe('Abc def');
+      expect(strings.toUpperCaseFirstLetter('ABC DEF')).toBe('ABC DEF');
+      expect(strings.toUpperCaseFirstLetter('aBC dEF')).toBe('ABC dEF');
+      expect(strings.toUpperCaseFirstLetter('$test')).toBe('$test');
+      expect(strings.toUpperCaseFirstLetter('äöü sind Umlaute')).toBe('Äöü sind Umlaute');
+    });
+
+  });
+
+  describe('toLowerCaseFirstLetter', () => {
+
+    it('converts first letter to lower case', () => {
+      expect(strings.toLowerCaseFirstLetter()).toBe(undefined);
+      expect(strings.toLowerCaseFirstLetter(null)).toBe(null);
+      expect(strings.toLowerCaseFirstLetter('')).toBe('');
+      expect(strings.toLowerCaseFirstLetter(0)).toBe('0');
+      expect(strings.toLowerCaseFirstLetter(true)).toBe('true');
+      expect(strings.toLowerCaseFirstLetter({})).toBe('[object Object]');
+      expect(strings.toLowerCaseFirstLetter('0')).toBe('0');
+      expect(strings.toLowerCaseFirstLetter(' ')).toBe(' ');
+      expect(strings.toLowerCaseFirstLetter(' XYZ ')).toBe(' XYZ ');
+      expect(strings.toLowerCaseFirstLetter('ABC DEF')).toBe('aBC DEF');
+      expect(strings.toLowerCaseFirstLetter('abc def')).toBe('abc def');
+      expect(strings.toLowerCaseFirstLetter('Abc Def')).toBe('abc Def');
+      expect(strings.toLowerCaseFirstLetter('$TEST')).toBe('$TEST');
+      expect(strings.toLowerCaseFirstLetter('ÄÖÜ sind Umlaute')).toBe('äÖÜ sind Umlaute');
+    });
+
+  });
+
   describe('lowercaseFirstLetter', () => {
 
     it('converts first letter to lowercase', () => {
@@ -283,7 +377,7 @@ describe('strings', () => {
 
   describe('countCodePoints', () => {
 
-    it('returns the number of codepoints in a string', () => {
+    it('returns the number of code points in a string', () => {
       expect(strings.countCodePoints('')).toBe(0);
       expect(strings.countCodePoints('foo')).toBe(3);
       expect(strings.countCodePoints('\uD83D\uDC4D')).toBe(1); // \uD83D\uDC4D is Unicode Character 'THUMBS UP SIGN' (U+1F44D)
@@ -327,9 +421,9 @@ describe('strings', () => {
   describe('truncateText', () => {
     it('returns the truncated text', () => {
       let measureText = text => ({
-          width: (text || '').length
-        }),
-        loremIpsum = 'Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.';
+        width: (text || '').length
+      });
+      let loremIpsum = 'Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.';
       expect(strings.truncateText(loremIpsum, 120, measureText)).toBe(loremIpsum);
       expect(strings.truncateText(loremIpsum + ' ', 117, measureText)).toBe(loremIpsum);
       expect(strings.truncateText(' ' + loremIpsum, 117, measureText)).toBe(loremIpsum);

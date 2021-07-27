@@ -215,32 +215,22 @@ export function box(prefix, string, suffix) {
 /**
  * If the given 'string' has text, its first letter is returned in lower case,
  * the remainder is unchanged. Otherwise, the empty string is returned.
+ *
+ * @deprecated use {@link toLowerCaseFirstLetter} instead
  */
 export function lowercaseFirstLetter(string) {
-  return _changeFirstLetter(string, 'toLowerCase');
+  return toLowerCaseFirstLetter(string);
 }
 
 /**
  * If the given 'string' has text, its first letter is returned in upper case,
  * the remainder is unchanged. Otherwise, the empty string is returned.
+ *
+ * @deprecated use {@link toUpperCaseFirstLetter} instead
  */
 export function uppercaseFirstLetter(string) {
-  return _changeFirstLetter(string, 'toUpperCase');
+  return toUpperCaseFirstLetter(string);
 }
-
-export function _changeFirstLetter(string, funcName) {
-  if (string === undefined || string === null) {
-    return string;
-  }
-  string = asString(string);
-  let s = '';
-  if (hasText(string)) {
-    // noinspection JSValidateTypes
-    s = string.charAt(0)[funcName]() + string.slice(1);
-  }
-  return s;
-}
-
 /**
  * Quotes a string for use in a regular expression, i.e. escapes all characters with special meaning.
  */
@@ -279,17 +269,82 @@ export function nvl(string) {
   return scout.nvl(string, '');
 }
 
+/**
+ * Null-safe version of <code>String.prototype.length</code>.
+ * If the argument is null or undefined, 0 will be returned.
+ * A non-string argument will be converted to a string.
+ * @return {number}
+ */
+export function length(string) {
+  string = asString(string);
+  return (string ? string.length : 0);
+}
+
+/**
+ * Null-safe version of <code>String.prototype.trim</code>.
+ * If the argument is null or undefined, the same value will be returned.
+ * A non-string argument will be converted to a string.
+ */
+export function trim(string) {
+  string = asString(string);
+  return (string ? string.trim() : string);
+}
+
+/**
+ * Null-safe version of <code>String.prototype.toUpperCase</code>.
+ * If the argument is null or undefined, the same value will be returned.
+ * A non-string argument will be converted to a string.
+ */
+export function toUpperCase(string) {
+  string = asString(string);
+  return (string ? string.toUpperCase() : string);
+}
+
+/**
+ * Null-safe version of <code>String.prototype.toLowerCase</code>.
+ * If the argument is null or undefined, the same value will be returned.
+ * A non-string argument will be converted to a string.
+ */
+export function toLowerCase(string) {
+  string = asString(string);
+  return (string ? string.toLowerCase() : string);
+}
+
+/**
+ * Returns the given string, with the first character converted to upper case and the remainder unchanged.
+ * If the argument is null or undefined, the same value will be returned.
+ * A non-string argument will be converted to a string.
+ */
 export function toUpperCaseFirstLetter(string) {
+  string = asString(string);
+  if (!string) {
+    return string;
+  }
   return string.substring(0, 1).toUpperCase() + string.substring(1);
+}
+
+/**
+ * Returns the given string, with the first character converted to lower case and the remainder unchanged.
+ * If the argument is null or undefined, the same value will be returned.
+ * A non-string argument will be converted to a string.
+ */
+export function toLowerCaseFirstLetter(string) {
+  string = asString(string);
+  if (!string) {
+    return string;
+  }
+  return string.substring(0, 1).toLowerCase() + string.substring(1);
 }
 
 /**
  * Returns the number of unicode characters in the given string.
  * As opposed to the string.length property, astral symbols are
  * counted as one single character.
+ *
  * Example: <code>'\uD83D\uDC4D'.length</code> returns 2, whereas
- * <code>countCharpoints('\uD83D\uDC4D')</code> returns 1.
- * (\uD83D\uDC4D is Unicode Character 'THUMBS UP SIGN' (U+1F44D))
+ * <code>countCodePoints('\uD83D\uDC4D')</code> returns 1.
+ *
+ * (\uD83D\uDC4D = unicode character U+1F44D 'THUMBS UP SIGN')
  */
 export function countCodePoints(string) {
   return string
@@ -305,8 +360,10 @@ export function countCodePoints(string) {
  * 'limit' elements are found. Instead, the surplus elements are joined with the last element.
  *
  * Example:
- *   'a-b-c'.split('-', 2)                     ==>   ['a', 'b']
- *   splitMax('a-b-c', '-', 2)   ==>   ['a', 'b-c']
+ * <ul>
+ * <li>'a-b-c'.split('-', 2)       ==>   ['a', 'b']
+ * <li>splitMax('a-b-c', '-', 2)   ==>   ['a', 'b-c']
+ * </ul>
  */
 export function splitMax(string, separator, limit) {
   if (string === null || string === undefined) {
@@ -413,6 +470,7 @@ export default {
   hasText,
   insertAt,
   join,
+  /** @deprecated */
   lowercaseFirstLetter,
   nl2br,
   nullIfEmpty,
@@ -425,7 +483,9 @@ export default {
   repeat,
   splitMax,
   startsWith,
+  toLowerCaseFirstLetter,
   toUpperCaseFirstLetter,
   truncateText,
+  /** @deprecated */
   uppercaseFirstLetter
 };
