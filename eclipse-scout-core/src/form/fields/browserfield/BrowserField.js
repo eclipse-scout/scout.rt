@@ -266,7 +266,7 @@ export default class BrowserField extends ValueField {
 
   _onMessage(event) {
     // Only handle event originating form "our" iframe
-    if (event.source !== this.$field[0].contentWindow) {
+    if (!this._isValidMessageSource(event.source)) {
       return;
     }
     // Check if the origin is trusted before we do anything else with the data
@@ -280,6 +280,27 @@ export default class BrowserField extends ValueField {
       data: event.data,
       origin: event.origin
     });
+  }
+
+  /**
+   * @param w Window of event
+   */
+  _isValidMessageSource(w) {
+    let iframeWindow = this.$field[0].contentWindow;
+    if (w === iframeWindow) {
+      return true; // same source
+    }
+
+    // Check parents of window in case event source is an inner iframe
+    // parent window of topmost window is itself (https://developer.mozilla.org/en-US/docs/Web/API/Window/parent)
+    while (w && w !== w.parent) {
+      w = w.parent;
+      if (w === iframeWindow) {
+        return true;
+      }
+    }
+
+    return false; // no valid parent window found
   }
 
   postMessage(message, targetOrigin) {
