@@ -89,6 +89,8 @@ let chartJsGlobalsInitialized = false;
 
 /**
  * @typedef Dataset
+ * @property {string} [datasetId]
+ *
  * @property {array|string} [backgroundColor]
  * @property {array|string} [backgroundColorBackup]
  * @property {array|string} [hoverBackgroundColor]
@@ -276,65 +278,68 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let config = $.extend(true, {}, this.chart.config);
     this._adjustConfig(config);
 
-    let hiddenDataIndices = [],
-      applyHiddenDatasetIndices = [];
+    let hiddenDataIndices = [];
 
     let targetData = this.chartJs.config.data,
       sourceData = config.data;
 
-    if (targetData && sourceData) {
-      // Transfer property from source object to target object:
-      // 1. If the property is not set on the target object, copy it from source.
-      // 2. If the property is not set on the source object, set it to undefined if setToUndefined = true. Otherwise empty the array if it is an array property or set it to undefined.
-      // 3. If the property is not an array on the source or the target object, copy the property from the source to the target object.
-      // 4. If the property is an array on both objects, do not update the array, but transfer the elements (update elements directly, use pop(), push() or splice() if one array is longer than the other).
-      //    This needs to be done to have a smooth animation from the old to the new state and not a complete rebuild of the chart.
-      let transferProperty = (source, target, property, setToUndefined) => {
-        if (!source || !target || !property) {
-          return;
-        }
-        // 1. Property not set on target
-        if (!target[property]) {
-          target[property] = source[property];
-          return;
-        }
-        // 2. Property not set on source
-        if (!source[property]) {
-          if (setToUndefined) {
-            // Set to undefined if setToUndefined = true
-            target[property] = undefined;
-            return;
-          }
-          // Empty array
-          if (Array.isArray(target[property])) {
-            target[property].splice(0);
-            return;
-          }
-          // Otherwise set to undefined
+    // Transfer property from source object to target object:
+    // 1. If the property is not set on the target object, copy it from source.
+    // 2. If the property is not set on the source object, set it to undefined if setToUndefined = true. Otherwise empty the array if it is an array property or set it to undefined.
+    // 3. If the property is not an array on the source or the target object, copy the property from the source to the target object.
+    // 4. If the property is an array on both objects, do not update the array, but transfer the elements (update elements directly, use pop(), push() or splice() if one array is longer than the other).
+    let transferProperty = (source, target, property, setToUndefined) => {
+      if (!source || !target || !property) {
+        return;
+      }
+      // 1. Property not set on target
+      if (!target[property]) {
+        target[property] = source[property];
+        return;
+      }
+      // 2. Property not set on source
+      if (!source[property]) {
+        if (setToUndefined) {
+          // Set to undefined if setToUndefined = true
           target[property] = undefined;
           return;
         }
-        // 3. Property is not an array on the source or the target object
-        if (!Array.isArray(source[property]) || !Array.isArray(target[property])) {
-          target[property] = source[property];
+        // Empty array
+        if (Array.isArray(target[property])) {
+          target[property].splice(0);
           return;
         }
-        // 4. Property is an array on the source and the target object
-        for (let i = 0; i < Math.min(source[property].length, target[property].length); i++) {
-          // Update elements directly
-          target[property][i] = source[property][i];
-        }
-        let targetLength = target[property].length,
-          sourceLength = source[property].length;
-        if (targetLength > sourceLength) {
-          // Target array is longer than source array
-          target[property].splice(sourceLength);
-        } else if (targetLength < sourceLength) {
-          // Source array is longer than target array
-          target[property].push(...source[property].splice(targetLength));
-        }
-      };
+        // Otherwise set to undefined
+        target[property] = undefined;
+        return;
+      }
+      // 3. Property is not an array on the source or the target object
+      if (!Array.isArray(source[property]) || !Array.isArray(target[property])) {
+        target[property] = source[property];
+        return;
+      }
+      // 4. Property is an array on the source and the target object
+      for (let i = 0; i < Math.min(source[property].length, target[property].length); i++) {
+        // Update elements directly
+        target[property][i] = source[property][i];
+      }
+      let targetLength = target[property].length,
+        sourceLength = source[property].length;
+      if (targetLength > sourceLength) {
+        // Target array is longer than source array
+        target[property].splice(sourceLength);
+      } else if (targetLength < sourceLength) {
+        // Source array is longer than target array
+        target[property].push(...source[property].splice(targetLength));
+      }
+    };
 
+    let findDataset = (datasets, datasetId) => arrays.find(datasets, dataset => dataset.datasetId === datasetId);
+    let findDatasetIndex = (datasets, datasetId) => arrays.findIndex(datasets, dataset => dataset.datasetId === datasetId);
+
+    if (targetData && sourceData) {
+      // Transfer properties from source to target, instead of overwriting the whole data object.
+      // This needs to be done to have a smooth animation from the old to the new state and not a complete rebuild of the chart.
       transferProperty(sourceData, targetData, 'labels');
 
       if (!targetData.datasets) {
@@ -357,34 +362,69 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         }
       }
 
-      for (let i = 0; i < Math.min(sourceData.datasets.length, targetData.datasets.length); i++) {
-        let targetDataset = targetData.datasets[i],
-          sourceDataset = sourceData.datasets[i];
-
-        targetDataset.label = sourceDataset.label;
-        targetDataset.type = sourceDataset.type;
-
-        transferProperty(sourceDataset, targetDataset, 'data');
-
-        transferProperty(sourceDataset, targetDataset, 'backgroundColor', true);
-        transferProperty(sourceDataset, targetDataset, 'borderColor', true);
-        transferProperty(sourceDataset, targetDataset, 'hoverBackgroundColor', true);
-        transferProperty(sourceDataset, targetDataset, 'hoverBorderColor', true);
-        transferProperty(sourceDataset, targetDataset, 'legendColor', true);
-        transferProperty(sourceDataset, targetDataset, 'pointHoverBackgroundColor', true);
-        transferProperty(sourceDataset, targetDataset, 'lineTension', true);
+      // if all datasets have no id set, add artificial dataset ids
+      if (sourceData.datasets.every(dataset => objects.isNullOrUndefined(dataset.datasetId))) {
+        sourceData.datasets.forEach((dataset, idx) => {
+          dataset.datasetId = '' + idx;
+        });
+        targetData.datasets.forEach((dataset, idx) => {
+          dataset.datasetId = '' + idx;
+        });
       }
-      let targetLength = targetData.datasets.length,
-        sourceLength = sourceData.datasets.length;
-      if (targetLength > sourceLength) {
-        targetData.datasets.splice(sourceLength);
-      } else if (targetLength < sourceLength) {
-        targetData.datasets.push(...sourceData.datasets.splice(targetLength));
-        applyHiddenDatasetIndices = arrays.init(sourceLength - targetLength).map((elem, idx) => targetLength + idx);
+
+      // update existing datasets
+      // Important: Update existing datasets first, before removing obsolete datasets
+      // (the dataset object has listeners from Chart.js, which do not work well on a partially updated chart (updated datasets, but not yet updated chart)
+      targetData.datasets.forEach(targetDataset => {
+        let sourceDataset = findDataset(sourceData.datasets, targetDataset.datasetId);
+
+        if (sourceDataset) {
+          targetDataset.label = sourceDataset.label;
+          targetDataset.type = sourceDataset.type;
+
+          transferProperty(sourceDataset, targetDataset, 'data');
+
+          transferProperty(sourceDataset, targetDataset, 'backgroundColor', true);
+          transferProperty(sourceDataset, targetDataset, 'borderColor', true);
+          transferProperty(sourceDataset, targetDataset, 'hoverBackgroundColor', true);
+          transferProperty(sourceDataset, targetDataset, 'hoverBorderColor', true);
+          transferProperty(sourceDataset, targetDataset, 'legendColor', true);
+          transferProperty(sourceDataset, targetDataset, 'pointHoverBackgroundColor', true);
+          transferProperty(sourceDataset, targetDataset, 'lineTension', true);
+        }
+      });
+
+      // remove deleted datasets, loop backwards to not compromise the loop when modifying the array
+      // datasets without an id get deleted anyway (replaced in every update, because a correct identification is not possible)
+      for (let i = targetData.datasets.length - 1; i >= 0; i--) {
+        let datasetId = targetData.datasets[i].datasetId;
+        let deleted = objects.isNullOrUndefined(datasetId) || findDatasetIndex(sourceData.datasets, datasetId) === -1;
+        if (deleted) {
+          targetData.datasets.splice(i, 1);
+        }
       }
+
+      // sort existing, updated datasets
+      targetData.datasets.sort((a, b) => {
+        return findDatasetIndex(sourceData.datasets, a.datasetId) - findDatasetIndex(sourceData.datasets, b.datasetId);
+      });
+
+      // add all new datasets
+      sourceData.datasets.forEach((sourceDataset, idx) => {
+        let targetDataset = targetData.datasets[idx];
+        // exclude datasets without an id here, to ensure that multiple datasets without an id do not overwrite each other
+        if (targetDataset && targetDataset.datasetId && sourceDataset.datasetId === targetDataset.datasetId) {
+          return;
+        }
+        targetData.datasets.splice(idx, 0, sourceDataset);
+      });
     } else {
       this.chartJs.config.data = sourceData;
     }
+
+    // update label maps for scales (the label maps, despite being part of the config, can be updated, without redrawing the whole chart)
+    transferProperty(config.options.scales, this.chartJs.config.options.scales, 'xLabelMap', true);
+    transferProperty(config.options.scales, this.chartJs.config.options.scales, 'yLabelMap', true);
 
     $.extend(true, this.chartJs.config, {
       options: {
@@ -396,8 +436,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this.chartJs.update();
 
     // Apply hidden data indices (only set for pie-, doughnut- or polar-area-chart)
-    if (hiddenDataIndices.length && applyHiddenDatasetIndices.length) {
-      applyHiddenDatasetIndices.forEach(datasetIndex => {
+    if (hiddenDataIndices.length) {
+      targetData.datasets.forEach((dataset, datasetIndex) => {
         let meta = this.chartJs.getDatasetMeta(datasetIndex);
         if (meta && meta.data && Array.isArray(meta.data)) {
           hiddenDataIndices

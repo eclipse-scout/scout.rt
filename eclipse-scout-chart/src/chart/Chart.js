@@ -161,7 +161,38 @@ export default class Chart extends Widget {
 
     // check if only data has changed
     let oldConfigWithNewData = $.extend(true, {}, this.config);
-    oldConfigWithNewData.data = config.data;
+    if (config.data) {
+      oldConfigWithNewData.data = config.data;
+    } else {
+      delete oldConfigWithNewData.data;
+    }
+
+    // the label map is technically part of the config, but it is handled as data. Therefore it is excluded from this check.
+    let transferLabelMap = (source, target, identifier) => {
+      if (!source || !target || !identifier) {
+        return;
+      }
+      // Property not set on source -> remove from target
+      if (!source.options || !source.options.scales || !source.options.scales[identifier]) {
+        if (target.options && target.options.scales) {
+          delete target.options.scales[identifier];
+        }
+        if (target.options && objects.isEmpty(target.options.scales) && !(source.options && source.options.scales)) {
+          delete target.options.scales;
+        }
+        if (objects.isEmpty(target.options) && !source.options) {
+          delete target.options;
+        }
+        return;
+      }
+      target.options = $.extend(true, {
+        scales: {}
+      }, target.options);
+      target.options.scales[identifier] = source.options.scales[identifier];
+    };
+    transferLabelMap(config, oldConfigWithNewData, 'xLabelMap');
+    transferLabelMap(config, oldConfigWithNewData, 'yLabelMap');
+
     if (objects.equalsRecursive(oldConfigWithNewData, config)) {
       this._setProperty('config', config);
       if (this.rendered) {
