@@ -264,7 +264,7 @@ export default class BrowserField extends ValueField {
   }
 
   _onMessage(event) {
-    if (event.source !== this.$field[0].contentWindow) {
+    if (!this._isValidMessageSource(event.source)) {
       $.log.isTraceEnabled() && $.log.trace('skipped post-message, because different source. data=' + event.data + ' origin=' + event.origin);
       return;
     }
@@ -273,6 +273,27 @@ export default class BrowserField extends ValueField {
       data: event.data,
       origin: event.origin
     });
+  }
+
+  /**
+   * @param w Window of event
+   */
+  _isValidMessageSource(w) {
+    let iframeWindow = this.$field[0].contentWindow;
+    if (w === iframeWindow) {
+      return true; // same source
+    }
+
+    // Check parents of window in case event source is an inner iframe
+    // parent window of topmost window is itself (https://developer.mozilla.org/en-US/docs/Web/API/Window/parent)
+    while (w && w !== w.parent) {
+      w = w.parent;
+      if (w === iframeWindow) {
+        return true;
+      }
+    }
+
+    return false; // no valid parent window found
   }
 
   setTrackLocation(trackLocation) {
