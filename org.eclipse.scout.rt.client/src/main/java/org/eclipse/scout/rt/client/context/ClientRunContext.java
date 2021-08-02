@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,10 @@
  */
 package org.eclipse.scout.rt.client.context;
 
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.security.auth.Subject;
 
@@ -26,6 +28,7 @@ import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
+import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
@@ -118,6 +121,30 @@ public class ClientRunContext extends RunContext {
   @Override
   public <THREAD_LOCAL> ClientRunContext withThreadLocal(final ThreadLocal<THREAD_LOCAL> threadLocal, final THREAD_LOCAL value) {
     super.withThreadLocal(threadLocal, value);
+    return this;
+  }
+
+  @Override
+  public ClientRunContext withDiagnostic(IDiagnosticContextValueProvider provider) {
+    super.withDiagnostic(provider);
+    return this;
+  }
+
+  @Override
+  public ClientRunContext withDiagnostics(Collection<? extends IDiagnosticContextValueProvider> diagnosticContextValueProviders) {
+    super.withDiagnostics(diagnosticContextValueProviders);
+    return this;
+  }
+
+  @Override
+  public ClientRunContext withParentRunMonitor(RunMonitor parentRunMonitor) {
+    super.withParentRunMonitor(parentRunMonitor);
+    return this;
+  }
+
+  @Override
+  public ClientRunContext withNewTransactionSupplier(Supplier<ITransaction> newTransactionSupplier) {
+    super.withNewTransactionSupplier(newTransactionSupplier);
     return this;
   }
 

@@ -126,7 +126,7 @@ public final class NlsUtility {
    * @see #postProcessText(String)
    */
   public static String postProcessText(Locale textLocale, String text, Collection<? extends ITextPostProcessor> postProcessors) {
-    if (postProcessors == null || postProcessors.isEmpty()) {
+    if (text == null || postProcessors == null || postProcessors.isEmpty()) {
       return text;
     }
 
