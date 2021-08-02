@@ -14,13 +14,15 @@ import static org.junit.Assert.*;
 
 import java.util.function.Function;
 
+import org.eclipse.scout.rt.dataobject.fixture.FixtureHierarchicalLookupRowDo;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.lookup.AbstractLookupRowDo;
 import org.eclipse.scout.rt.dataobject.lookup.LookupResponse;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.util.TriState;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,7 +39,7 @@ public class AbstractRestLookupCallTest {
     P_FixtureUuIdLookupCall call2 = (P_FixtureUuIdLookupCall) call.copy();
     assertNotSame(call, call2);
     assertNotSame(call.getRestriction(), call2.getRestriction());
-    Assert.assertEquals("ABC", call2.getText());
+    assertEquals("ABC", call2.getText());
   }
 
   @Test
@@ -45,49 +47,91 @@ public class AbstractRestLookupCallTest {
     P_FixtureUuIdLookupCall call = new P_FixtureUuIdLookupCall();
 
     call.setText("ABC");
-    Assert.assertEquals("ABC", call.getText());
+    assertEquals("ABC", call.getText());
 
     call.setKey(TEST_SETTING_ID_1);
-    Assert.assertEquals(1, call.getKeys().size());
-    Assert.assertEquals(TEST_SETTING_ID_1, call.getKey());
+    assertEquals(1, call.getKeys().size());
+    assertEquals(TEST_SETTING_ID_1, call.getKey());
 
     call.setKey(TEST_SETTING_ID_2);
-    Assert.assertEquals(1, call.getKeys().size());
-    Assert.assertEquals(TEST_SETTING_ID_2, call.getKey());
+    assertEquals(1, call.getKeys().size());
+    assertEquals(TEST_SETTING_ID_2, call.getKey());
 
     call.setKeys(TEST_SETTING_ID_1, TEST_SETTING_ID_2);
-    Assert.assertEquals(2, call.getKeys().size());
-    Assert.assertEquals(TEST_SETTING_ID_1, call.getKey());
+    assertEquals(2, call.getKeys().size());
+    assertEquals(TEST_SETTING_ID_1, call.getKey());
 
     call.setKey(TEST_SETTING_ID_2);
-    Assert.assertEquals(1, call.getKeys().size());
-    Assert.assertEquals(TEST_SETTING_ID_2, call.getKey());
+    assertEquals(1, call.getKeys().size());
+    assertEquals(TEST_SETTING_ID_2, call.getKey());
 
     call.setKey(null);
     assertNull(call.getKey());
-    Assert.assertEquals(0, call.getKeys().size());
+    assertEquals(0, call.getKeys().size());
 
     assertFalse(call.getRestriction().active().exists());
     call.setActive(null);
-    Assert.assertEquals(TriState.UNDEFINED, call.getActive());
+    assertEquals(TriState.UNDEFINED, call.getActive());
     assertTrue(call.getRestriction().active().exists());
     assertNull(call.getRestriction().active().get());
     call.setActive(TriState.TRUE);
-    Assert.assertEquals(TriState.TRUE, call.getActive());
+    assertEquals(TriState.TRUE, call.getActive());
     assertTrue(call.getRestriction().active().exists());
-    Assert.assertEquals(Boolean.TRUE, call.getRestriction().active().get());
+    assertEquals(Boolean.TRUE, call.getRestriction().active().get());
     call.setActive(TriState.FALSE);
-    Assert.assertEquals(TriState.FALSE, call.getActive());
+    assertEquals(TriState.FALSE, call.getActive());
     assertTrue(call.getRestriction().active().exists());
-    Assert.assertEquals(Boolean.FALSE, call.getRestriction().active().get());
+    assertEquals(Boolean.FALSE, call.getRestriction().active().get());
     call.setActive(TriState.UNDEFINED);
-    Assert.assertEquals(TriState.UNDEFINED, call.getActive());
+    assertEquals(TriState.UNDEFINED, call.getActive());
     assertTrue(call.getRestriction().active().exists());
     assertNull(call.getRestriction().active().get());
   }
 
+  @Test
+  public void testTransformRows() {
+    P_FixtureUuIdLookupCall call = new P_FixtureUuIdLookupCall();
+    FixtureHierarchicalLookupRowDo parentRow = createRow();
+    FixtureHierarchicalLookupRowDo childRow = createRow().withParentId(parentRow.getId());
+
+    ILookupRow<FixtureUuId> parentLookupRow = call.transformLookupRow(parentRow);
+    assertLookupRow(parentRow, parentLookupRow, null);
+
+    ILookupRow<FixtureUuId> childLookupRow = call.transformLookupRow(childRow);
+    assertLookupRow(childRow, childLookupRow, childRow.getParentId());
+
+    FixtureUuIdLookupRowDo fixtureRow = BEANS.get(FixtureUuIdLookupRowDo.class).withId(FixtureUuId.create());
+    ILookupRow<FixtureUuId> nonHierarchicalRow = call.transformLookupRow(fixtureRow);
+    assertLookupRow(fixtureRow, nonHierarchicalRow, null);
+  }
+
+  protected <ID> void assertLookupRow(AbstractLookupRowDo<?, ID> expected, ILookupRow<ID> actual, ID expectedParentId) {
+    assertEquals(expected.getId(), actual.getKey());
+    assertEquals(expected.getText(), actual.getText());
+    assertEquals(expected.isActive(), actual.isActive());
+    assertEquals(expected.isEnabled(), actual.isEnabled());
+    assertEquals(expectedParentId, actual.getParentKey());
+  }
+
+  protected FixtureHierarchicalLookupRowDo createRow() {
+    return BEANS.get(FixtureHierarchicalLookupRowDo.class)
+        .withId(FixtureUuId.create())
+        .withText("Mock");
+  }
+
   @IgnoreBean
   static class P_FixtureUuIdLookupCall extends AbstractRestLookupCall<FixtureUuIdLookupRestrictionDo, FixtureUuId> {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    protected Function<FixtureUuIdLookupRestrictionDo, LookupResponse<? extends AbstractLookupRowDo<?, FixtureUuId>>> remoteCall() {
+      // Not used in this test
+      return null;
+    }
+  }
+
+  @IgnoreBean
+  static class P_FixtureUuIdHierachicalLookupCall extends AbstractRestLookupCall<FixtureUuIdLookupRestrictionDo, FixtureUuId> {
     private static final long serialVersionUID = 1L;
 
     @Override

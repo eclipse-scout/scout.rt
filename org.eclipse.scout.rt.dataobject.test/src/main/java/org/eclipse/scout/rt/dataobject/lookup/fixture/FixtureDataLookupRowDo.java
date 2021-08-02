@@ -70,11 +70,4 @@ public class FixtureDataLookupRowDo extends AbstractLookupRowDo<FixtureDataLooku
     active().set(active);
     return this;
   }
-
-  @Override
-  @Generated("DoConvenienceMethodsGenerator")
-  public FixtureDataLookupRowDo withParentId(Long parentId) {
-    parentId().set(parentId);
-    return this;
-  }
 }
