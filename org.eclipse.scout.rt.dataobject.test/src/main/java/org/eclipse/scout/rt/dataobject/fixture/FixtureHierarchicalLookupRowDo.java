@@ -8,26 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.dataobject.lookup;
+package org.eclipse.scout.rt.dataobject.fixture;
 
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.lookup.AbstractHierarchicalLookupRowDo;
 
-/**
- * Generic lookup row implementation for objects using a {@code String} as identifier.
- */
-@TypeName("scout.StringLookupRow")
-public class StringLookupRowDo extends AbstractHierarchicalLookupRowDo<StringLookupRowDo, String> {
+@TypeName("scout.FixtureHierarchicalLookupRow")
+public class FixtureHierarchicalLookupRowDo extends AbstractHierarchicalLookupRowDo<FixtureHierarchicalLookupRowDo, FixtureUuId> {
 
   @Override
-  public DoValue<String> id() {
+  public DoValue<FixtureUuId> id() {
     return createIdAttribute(this);
   }
 
   @Override
-  public DoValue<String> parentId() {
+  public DoValue<FixtureUuId> parentId() {
     return createParentIdAttribute(this);
   }
 
@@ -37,36 +35,36 @@ public class StringLookupRowDo extends AbstractHierarchicalLookupRowDo<StringLoo
 
   @Override
   @Generated("DoConvenienceMethodsGenerator")
-  public StringLookupRowDo withId(String id) {
+  public FixtureHierarchicalLookupRowDo withId(FixtureUuId id) {
     id().set(id);
     return this;
   }
 
   @Override
   @Generated("DoConvenienceMethodsGenerator")
-  public StringLookupRowDo withText(String text) {
+  public FixtureHierarchicalLookupRowDo withParentId(FixtureUuId parentId) {
+    parentId().set(parentId);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureHierarchicalLookupRowDo withText(String text) {
     text().set(text);
     return this;
   }
 
   @Override
   @Generated("DoConvenienceMethodsGenerator")
-  public StringLookupRowDo withEnabled(Boolean enabled) {
+  public FixtureHierarchicalLookupRowDo withEnabled(Boolean enabled) {
     enabled().set(enabled);
     return this;
   }
 
   @Override
   @Generated("DoConvenienceMethodsGenerator")
-  public StringLookupRowDo withActive(Boolean active) {
+  public FixtureHierarchicalLookupRowDo withActive(Boolean active) {
     active().set(active);
-    return this;
-  }
-
-  @Override
-  @Generated("DoConvenienceMethodsGenerator")
-  public StringLookupRowDo withParentId(String parentId) {
-    parentId().set(parentId);
     return this;
   }
 }

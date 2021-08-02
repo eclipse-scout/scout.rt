@@ -48,6 +48,9 @@ import org.eclipse.scout.rt.dataobject.IDoCollection;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntityContribution;
 import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureHierarchicalLookupRowDo;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
+import org.eclipse.scout.rt.dataobject.lookup.LookupResponse;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.DoubleContributionFixtureDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBigIntegerDo;
@@ -2535,6 +2538,28 @@ public class JsonDataObjectsSerializationTest {
 
     // currently not deserializable using Scout Jackson implementation
     assertThrows(UnrecognizedPropertyException.class, () -> s_dataObjectMapper.readValue(json, TestOptionalDo.class));
+  }
+
+  @Test
+  public void testSerializeDeserializeHierarchicalLookupCall() throws Exception {
+    FixtureHierarchicalLookupRowDo parent = createRow(FixtureUuId.create());
+    FixtureHierarchicalLookupRowDo rowA = createRow(FixtureUuId.create());
+    FixtureHierarchicalLookupRowDo rowB = createRow(FixtureUuId.create()).withParentId(parent.getId());
+    LookupResponse<FixtureHierarchicalLookupRowDo> response = LookupResponse.create(Arrays.asList(parent, rowA, rowB));
+    String json = s_dataObjectMapper.writeValueAsString(response);
+
+    LookupResponse<FixtureHierarchicalLookupRowDo> marshalled = s_dataObjectMapper.readValue(json, new TypeReference<LookupResponse<FixtureHierarchicalLookupRowDo>>() {
+    });
+    assertEquals(parent, marshalled.getRows().get(0));
+    assertEquals(rowA, marshalled.getRows().get(1));
+    assertEquals(rowB, marshalled.getRows().get(2));
+    assertEquals(parent.getId(), marshalled.getRows().get(2).getParentId());
+  }
+
+  protected FixtureHierarchicalLookupRowDo createRow(FixtureUuId id) {
+    return BEANS.get(FixtureHierarchicalLookupRowDo.class)
+        .withId(id)
+        .withText("Mock");
   }
 
   // ------------------------------------ common test helper methods ------------------------------------
