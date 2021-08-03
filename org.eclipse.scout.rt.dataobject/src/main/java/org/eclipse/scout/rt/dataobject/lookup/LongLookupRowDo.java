@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.dataobject.lookup;
 
+import javax.annotation.Generated;
+
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
@@ -19,5 +21,49 @@ public class LongLookupRowDo extends AbstractLookupRowDo<LongLookupRowDo, Long> 
   @Override
   public DoValue<Long> id() {
     return createIdAttribute(this);
+  }
+
+  @Override
+  public DoValue<Long> parentId() {
+    return createParentIdAttribute(this);
+  }
+
+  /* **************************************************************************
+   * GENERATED CONVENIENCE METHODS
+   * *************************************************************************/
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public LongLookupRowDo withId(Long id) {
+    id().set(id);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public LongLookupRowDo withParentId(Long parentId) {
+    parentId().set(parentId);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public LongLookupRowDo withText(String text) {
+    text().set(text);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public LongLookupRowDo withEnabled(Boolean enabled) {
+    enabled().set(enabled);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public LongLookupRowDo withActive(Boolean active) {
+    active().set(active);
+    return this;
   }
 }

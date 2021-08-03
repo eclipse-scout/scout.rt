@@ -49,8 +49,9 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
     return doValue("active");
   }
 
+  // TODO 22.0 pbz Move to new AbstractHierachicalLoopkupRowDo and remove here
   public DoValue<ID> parentId() {
-    return doValue("parentId");
+    return createParentIdAttribute(this);
   }
 
   /* **************************************************************************
@@ -64,6 +65,10 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
 
   protected static <ID> DoValue<ID> createIdAttribute(AbstractLookupRowDo<?, ID> self) {
     return self.doValue("id");
+  }
+
+  protected static <ID> DoValue<ID> createParentIdAttribute(AbstractLookupRowDo<?, ID> self) {
+    return self.doValue("parentId");
   }
 
   /* **************************************************************************
