@@ -29,6 +29,7 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
   public static final String TEXT = "text";
   public static final String ENABLED = "enabled";
   public static final String ACTIVE = "active";
+  public static final String PARENT_ID = "parentId";
 
   protected AbstractLookupRowDo() {
     withEnabled(true); // lookup rows are enabled by default
@@ -52,6 +53,10 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
 
   public DoValue<Boolean> active() {
     return doValue(ACTIVE);
+  }
+
+  public DoValue<ID> parentId() {
+    return doValue(PARENT_ID);
   }
 
   /* **************************************************************************
@@ -91,6 +96,11 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
     return self();
   }
 
+  public SELF withParentId(ID parentId) {
+    parentId().set(parentId);
+    return self();
+  }
+
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
@@ -113,5 +123,10 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
   @Generated("DoConvenienceMethodsGenerator")
   public Boolean isActive() {
     return active().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public ID getParentId() {
+    return parentId().get();
   }
 }

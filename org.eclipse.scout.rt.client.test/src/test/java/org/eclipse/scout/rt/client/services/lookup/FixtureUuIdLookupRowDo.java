@@ -56,4 +56,11 @@ public class FixtureUuIdLookupRowDo extends AbstractLookupRowDo<FixtureUuIdLooku
     active().set(active);
     return this;
   }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureUuIdLookupRowDo withParentId(FixtureUuId parentId) {
+    parentId().set(parentId);
+    return this;
+  }
 }

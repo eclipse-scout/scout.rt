@@ -18,7 +18,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.dataobject.DataObjectHelper;
-import org.eclipse.scout.rt.dataobject.lookup.AbstractHierarchicalLookupRowDo;
 import org.eclipse.scout.rt.dataobject.lookup.AbstractLookupRestrictionDo;
 import org.eclipse.scout.rt.dataobject.lookup.AbstractLookupRowDo;
 import org.eclipse.scout.rt.dataobject.lookup.LookupResponse;
@@ -271,18 +270,7 @@ public abstract class AbstractRestLookupCall<RESTRICTION extends AbstractLookupR
     return new LookupRow<>(row.getId(), row.getText())
         .withActive(row.isActive())
         .withEnabled(row.isEnabled())
-        .withParentKey(extractParentKey(row));
-  }
-
-  /**
-   * @return parent key if row is a {@link AbstractHierarchicalLookupRowDo}, {@code null} otherwise.
-   */
-  protected ID extractParentKey(AbstractLookupRowDo<?, ID> row) {
-    if (row instanceof AbstractHierarchicalLookupRowDo) {
-      //noinspection unchecked
-      return ((AbstractHierarchicalLookupRowDo<?, ID>) row).getParentId();
-    }
-    return null;
+        .withParentKey(row.getParentId());
   }
 
   @Override

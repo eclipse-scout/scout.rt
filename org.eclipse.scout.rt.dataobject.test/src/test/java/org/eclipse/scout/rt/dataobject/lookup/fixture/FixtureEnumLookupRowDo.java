@@ -56,4 +56,11 @@ public class FixtureEnumLookupRowDo extends AbstractLookupRowDo<FixtureEnumLooku
     active().set(active);
     return this;
   }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureEnumLookupRowDo withParentId(FixtureEnum parentId) {
+    parentId().set(parentId);
+    return this;
+  }
 }

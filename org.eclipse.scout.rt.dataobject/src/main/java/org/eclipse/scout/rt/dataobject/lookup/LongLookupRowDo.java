@@ -15,20 +15,12 @@ import javax.annotation.Generated;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
-/**
- * Generic lookup row implementation for objects using a {@code long} as identifier.
- */
 @TypeName("scout.LongLookupRow")
-public class LongLookupRowDo extends AbstractHierarchicalLookupRowDo<LongLookupRowDo, Long> {
+public class LongLookupRowDo extends AbstractLookupRowDo<LongLookupRowDo, Long> {
 
   @Override
   public DoValue<Long> id() {
     return createIdAttribute(this);
-  }
-
-  @Override
-  public DoValue<Long> parentId() {
-    return createParentIdAttribute(this);
   }
 
   /* **************************************************************************
