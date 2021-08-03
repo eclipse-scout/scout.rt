@@ -1294,6 +1294,11 @@ describe('Widget', () => {
         expect(widget.$container).toHaveClass('custom-class');
         expect(widget.$container).toHaveClass('another-class1');
         expect(widget.$container).toHaveClass('another-class2');
+
+        widget.addCssClass('   class-with-whitespace-1   class-with-whitespace-2   ');
+        expect(widget.$container).toHaveClass('class-with-whitespace-1');
+        expect(widget.$container).toHaveClass('class-with-whitespace-2');
+        expect(widget.$container).not.toHaveClass('   class-with-whitespace-1   ');
       });
 
       it('does not add the same class multiple times', () => {

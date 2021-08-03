@@ -622,7 +622,6 @@ export default class Widget {
     if (owner === this.owner) {
       return;
     }
-
     if (this.owner) {
       // Remove from old owner
       this.owner._removeChild(this);
@@ -718,7 +717,6 @@ export default class Widget {
       }
       widget = widget.parent;
     }
-
     return false;
   }
 
@@ -899,7 +897,6 @@ export default class Widget {
       }
       parent = parent.parent;
     }
-
     return true;
   }
 
@@ -1447,7 +1444,6 @@ export default class Widget {
     if (objects.equals(this[propertyName], value)) {
       return;
     }
-
     value = this._prepareProperty(propertyName, value);
     if (this.rendered) {
       this._callRemoveProperty(propertyName);
@@ -1465,18 +1461,18 @@ export default class Widget {
     return this._prepareWidgetProperty(propertyName, value);
   }
 
-  _prepareWidgetProperty(propertyName, widgets) {
+  _prepareWidgetProperty(propertyName, value) {
     // Create new child widget(s)
-    widgets = this._createChildren(widgets);
-
-    let oldWidgets = this[propertyName];
-    if (oldWidgets && Array.isArray(widgets)) {
-      // If new value is an array, old value has to be one as well
-      // Only destroy those which are not in the new array
-      oldWidgets = arrays.diff(oldWidgets, widgets);
-    }
+    let widgets = this._createChildren(value);
 
     if (!this.isPreserveOnPropertyChangeProperty(propertyName)) {
+      let oldWidgets = this[propertyName];
+      if (oldWidgets && Array.isArray(widgets)) {
+        // If new value is an array, old value has to be one as well
+        // Only destroy those which are not in the new array
+        oldWidgets = arrays.diff(oldWidgets, widgets);
+      }
+
       // Destroy old child widget(s)
       this._destroyChildren(oldWidgets);
 
@@ -1546,11 +1542,10 @@ export default class Widget {
     if (!widgets) {
       return;
     }
-
     widgets = arrays.ensure(widgets);
-    widgets.forEach(function(child, i) {
+    widgets.forEach(child => {
       child.setParent(this);
-    }, this);
+    });
   }
 
   /**
@@ -1572,20 +1567,19 @@ export default class Widget {
       });
       return targets.concat(this._glassPaneTargets(element));
     }.bind(this);
+
     if (this.rendered) {
       return resolveGlassPanes(element);
     }
-
     return DeferredGlassPaneTarget.createFor(this, resolveGlassPanes.bind(this, element));
   }
 
   _glassPaneTargets(element) {
     // since popups are rendered outside the DOM of the widget parent-child hierarchy, get glassPaneTargets of popups belonging to this widget separately.
-    return [this.$container].concat(
-      this.session.desktop.getPopupsFor(this)
-        .reduce((acc, popup) => {
-          return acc.concat(popup.glassPaneTargets());
-        }, []));
+    let popupGlassPaneTargets = this.session.desktop.getPopupsFor(this).reduce((acc, popup) => {
+      return acc.concat(popup.glassPaneTargets());
+    }, []);
+    return [this.$container].concat(popupGlassPaneTargets);
   }
 
   addGlassPaneContribution(contribution) {
@@ -1621,10 +1615,10 @@ export default class Widget {
    * @param {number} [count] the number of ancestors to be processed. Default is -1 which means all.
    */
   ancestorsToString(count) {
-    let str = '',
-      ancestors = this.ancestors();
-
     count = scout.nvl(count, -1);
+
+    let str = '';
+    let ancestors = this.ancestors();
     ancestors.some((ancestor, i) => {
       if (count > -1 && i >= count) {
         return true;
@@ -1650,10 +1644,9 @@ export default class Widget {
     }, this);
   }
 
+  // noinspection SpellCheckingInspection
   resolveConsts(configs) {
-    configs.forEach(function(config) {
-      objects.resolveConstProperty(this, config);
-    }, this);
+    configs.forEach(config => objects.resolveConstProperty(this, config));
   }
 
   /**
@@ -1705,28 +1698,28 @@ export default class Widget {
     }, this);
   }
 
+  /**
+   * @param func - a function with three arguments: propertyName, value, isWidgetProperty
+   */
   _eachProperty(model, func) {
-    let propertyName, value, i;
-
     // Loop through primitive properties
-    for (propertyName in model) {
+    for (let propertyName in model) {
       if (this._widgetProperties.indexOf(propertyName) > -1) {
         continue; // will be handled below
       }
-      value = model[propertyName];
-      func(propertyName, value);
+      let value = model[propertyName];
+      if (value !== undefined) {
+        func(propertyName, value);
+      }
     }
 
     // Loop through adapter properties (any order will do).
-    for (i = 0; i < this._widgetProperties.length; i++) {
-      propertyName = this._widgetProperties[i];
-      value = model[propertyName];
-      if (value === undefined) {
-        continue;
+    this._widgetProperties.forEach(propertyName => {
+      let value = model[propertyName];
+      if (value !== undefined) {
+        func(propertyName, value, true);
       }
-
-      func(propertyName, value, true);
-    }
+    });
   }
 
   _removeWidgetProperties(properties) {
@@ -1772,12 +1765,11 @@ export default class Widget {
    * @param {boolean} [options.delegateAllPropertiesToOriginal] True to delegate all property changes from the clone to the original. Default is false.
    */
   clone(model, options) {
-    let clone, cloneModel;
     model = model || {};
     options = options || {};
 
-    cloneModel = objects.extractProperties(this, model, this._cloneProperties);
-    clone = scout.create(this.objectType, cloneModel);
+    let cloneModel = objects.extractProperties(this, model, this._cloneProperties);
+    let clone = scout.create(this.objectType, cloneModel);
     clone.cloneOf = this;
     this._mirror(clone, options);
 
@@ -1867,6 +1859,7 @@ export default class Widget {
     });
   }
 
+  // noinspection SpellCheckingInspection
   unmirror(target) {
     target = target || this.cloneOf;
     if (!target) {
@@ -1875,11 +1868,10 @@ export default class Widget {
     this._unmirror(target);
   }
 
+  // noinspection SpellCheckingInspection
   _unmirror(target) {
-    let eventDelegatorIndex = arrays.findIndex(this.eventDelegators, eventDelegator => {
-        return eventDelegator.clone === target;
-      }),
-      eventDelegator = eventDelegatorIndex > -1 ? this.eventDelegators.splice(eventDelegatorIndex, 1)[0] : null;
+    let eventDelegatorIndex = arrays.findIndex(this.eventDelegators, delegator => delegator.clone === target);
+    let eventDelegator = eventDelegatorIndex > -1 ? this.eventDelegators.splice(eventDelegatorIndex, 1)[0] : null;
     if (!eventDelegator) {
       return;
     }
@@ -2335,13 +2327,10 @@ export default class Widget {
   /* --- STATIC HELPERS ------------------------------------------------------------- */
 
   static cssClassAsArray(cssClass) {
-    let cssClasses = [],
-      cssClassesStr = cssClass || '';
-
-    cssClassesStr = cssClassesStr.trim();
-    if (cssClassesStr.length > 0) {
-      cssClasses = cssClassesStr.split(' ');
+    let cssClassesStr = (cssClass || '').trim();
+    if (cssClassesStr) {
+      return cssClassesStr.split(/\s+/);
     }
-    return cssClasses;
+    return [];
   }
 }
