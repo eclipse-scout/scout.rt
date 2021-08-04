@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -100,10 +100,12 @@ export default class FocusContext {
         return;
       }
 
+      let $focusableElement = $(focusedElement);
+      $focusableElement.addClass('keyboard-navigation');
+
       // Check if new focused element is currently visible, otherwise scroll the container
-      let $focusableElement = $(focusedElement),
-        containerBounds = graphics.offsetBounds($focusableElement),
-        $scrollable = $focusableElement.scrollParent();
+      let containerBounds = graphics.offsetBounds($focusableElement);
+      let $scrollable = $focusableElement.scrollParent();
       if (!scrollbars.isLocationInView(new Point(containerBounds.x, containerBounds.y), $scrollable)) {
         scrollbars.scrollTo($scrollable, $focusableElement);
       }
@@ -135,6 +137,7 @@ export default class FocusContext {
    */
   _onFocusOut(event) {
     $(event.target).off('remove', this._removeListener);
+    $(this.focusedElement).removeClass('keyboard-navigation');
     this.focusedElement = null;
     event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event. Otherwise, that 'parent context' would be activated as well.
   }
