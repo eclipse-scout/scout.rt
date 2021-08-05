@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -504,7 +504,7 @@ export default class TableHeader extends Widget {
       $header = column.$header,
       $headers = this.findHeaderItems(),
       $moveHeader = $headers.eq(oldPos),
-      $moveResize = $moveHeader.next(),
+      $moveResize = $moveHeader.next('.table-header-resize'),
       visibleColumns = this._visibleColumns(),
       lastColumnPos = visibleColumns.length - 1;
 
@@ -516,11 +516,12 @@ export default class TableHeader extends Widget {
     // change order in dom of header
     if (newPos < oldPos) {
       $headers.eq(newPos).before($moveHeader);
-      $headers.eq(newPos).before($moveResize);
     } else {
       $headers.eq(newPos).after($moveHeader);
-      $headers.eq(newPos).after($moveResize);
+      $moveHeader.before($moveHeader.next('.table-header-resize'));
     }
+    // The resizer belongs to a column which is especially relevant for fixed width columns where resizer is disabled -> ensure it is always positioned after the header
+    $moveHeader.after($moveResize);
 
     // Update first/last markers
     if ($headers.length > 0) {
