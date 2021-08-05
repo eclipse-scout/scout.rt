@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -95,10 +95,6 @@ export default class TableHeaderMenuLayout extends PopupLayout {
     this._setMaxWidth();
     actionColumnSize = graphics.size(this.popup.$columnActions);
     this._setMaxWidth(actionColumnSize.width);
-
-    // IE hack: IE adds some invisible space to the left box which causes unecessary scrollbars to appear. Setting the vertical align flags the following way seems to fix it...
-    this.popup.$columnActions.css('vertical-align', actionColumnSize.height >= filterColumnSize.height ? 'middle' : 'top');
-    $filterColumn.css('vertical-align', 'middle');
   }
 
   _adjustSizeWithAnchor(prefSize) {

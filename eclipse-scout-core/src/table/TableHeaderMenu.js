@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,9 @@ export default class TableHeaderMenu extends Popup {
     this.filterSortMode = TableHeaderMenu.SortMode.ALPHABETICALLY;
     this.hasFilterTable = false;
     this.hasFilterFields = false;
+    this.animateOpening = true;
+    this.animateRemoval = true;
+    this.focusableContainer = true;
 
     this.leftGroups = [];
     this.moveGroup = null;
@@ -125,7 +128,7 @@ export default class TableHeaderMenu extends Popup {
 
     this.$headerItem.select(true);
 
-    this.$container = this.$parent.appendDiv('table-header-menu');
+    this.$container = this.$parent.appendDiv('popup table-header-menu');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(this._createLayout());
     this.$body = this.$container.appendDiv('table-header-menu-body');
@@ -143,11 +146,6 @@ export default class TableHeaderMenu extends Popup {
     }
 
     this.tableHeader.$container.on('scroll', this._tableHeaderScrollHandler);
-    this.$whiter = this.$container.appendDiv('table-header-menu-whiter');
-
-    if (this.withFocusContext && this.focusableContainer) {
-      this.$container.attr('tabindex', -1);
-    }
 
     // -- Left column -- //
     // Moving
@@ -199,6 +197,14 @@ export default class TableHeaderMenu extends Popup {
     if (this.table.enabled) {
       this.table.$container.addClass('focused');
     }
+  }
+
+  validateFocus() {
+    if (this.filterFieldsGroupBox) {
+      this.filterFieldsGroupBox.focus();
+    }
+    // Super call will focus container if no element has been focused yet
+    super.validateFocus();
   }
 
   /**
@@ -754,19 +760,23 @@ export default class TableHeaderMenu extends Popup {
       multiSelect: false,
       autoResizeColumns: true,
       checkable: true,
+      cssClass: 'table-header-menu-filter-table',
       checkableStyle: Table.CheckableStyle.TABLE_ROW,
       // column-texts are not visible since header is not visible
       columns: [{
         objectType: objectType,
         text: 'filter-value',
-        width: 160,
+        width: 120,
         sortActive: true,
         sortIndex: 1,
         horizontalAlignment: -1
       }, {
         objectType: 'NumberColumn',
         text: 'aggregate-count',
-        width: 40
+        cssClass: 'table-header-menu-filter-number-column',
+        width: 50,
+        minWidth: 32,
+        autoOptimizeWidth: true
       }, {
         objectType: 'NumberColumn',
         displayable: false,
@@ -878,23 +888,6 @@ export default class TableHeaderMenu extends Popup {
     return this._countColumns('grouped');
   }
 
-  _computeWhitherWidth() {
-    let $tableHeaderContainer = this.tableHeader.$container,
-      headerItemWidth = this.$headerItem.outerWidth() - this.$headerItem.cssBorderWidthX(),
-      containerWidth = this.$container.outerWidth() - this.$container.cssBorderWidthX(),
-      tableHeaderWidth = $tableHeaderContainer.outerWidth() - this.tableHeader.menuBar.$container.outerWidth();
-
-    // if container is wider than header item -> use header item width, otherwise use container width
-    let whitherWidth = Math.min(headerItemWidth, containerWidth);
-    // if container is positioned at the right side, header item may not be fully visible (under the menubar or partly invisible due to scrolling)
-    whitherWidth = Math.min(whitherWidth, tableHeaderWidth - this.$headerItem.position().left);
-    let clipLeft = $tableHeaderContainer.offset().left - this.$headerItem.offset().left - this.tableHeader.table.$container.cssBorderLeftWidth();
-    if (clipLeft > 0) {
-      whitherWidth -= clipLeft;
-    }
-    return whitherWidth;
-  }
-
   _renderCompact() {
     this.$body.toggleClass('compact', this.compact);
     this.invalidateLayoutTree();
@@ -924,14 +917,6 @@ export default class TableHeaderMenu extends Popup {
       inView = inView && isLocationInView(new Point(containerBounds.x + containerBounds.width, containerBounds.y), $tableHeaderContainer);
     }
     this.$container.setVisible(inView);
-
-    // make sure whither is correctly positioned and sized
-    // (bounds must be computed after setVisible, if it was hidden before bounds are not correct)
-    containerBounds = graphics.offsetBounds(this.$container);
-    this.$whiter
-      // if header is clipped on the left side, position whither at the left of the visible part of the header (same applies for width, see _computeWhitherWidth)
-      .cssLeft(Math.max(headerItemBounds.x - containerBounds.x, $tableHeaderContainer.offset().left - containerBounds.x - this.tableHeader.table.$container.cssBorderLeftWidth()))
-      .width(this._computeWhitherWidth());
   }
 
   _onAnchorScroll(event) {
@@ -970,13 +955,5 @@ export default class TableHeaderMenu extends Popup {
       return;
     }
     this.close();
-  }
-
-  /**
-   * Called by table header
-   */
-  onColumnResized() {
-    // Adjust whiter with if size gets changed while menu is open (may caused by TableHeader._adjustColumnMinWidth)
-    this.$whiter.width(this._computeWhitherWidth());
   }
 }

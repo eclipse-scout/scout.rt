@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,22 +9,18 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .table-header-menu {
-  position: absolute;
-  width: 447px;
   background-color: @table-header-menu-background-color;
-  border: 1px solid @border-color;
+  border-radius: @border-radius-medium;
+  #scout.drop-shadow-large();
   white-space: nowrap;
+  margin: @widget-popup-margin;
 
-  &:focus {
-    outline: 0;
+  &.animate-open {
+    .popup-animate-open();
   }
 
-  &.bottom {
-    #scout.drop-shadow();
-  }
-
-  &.top {
-    #scout.drop-shadow(@y: -3px);
+  &.animate-remove {
+    .popup-animate-remove();
   }
 }
 
@@ -36,14 +32,14 @@
 
 .table-header-menu-actions {
   display: inline-block;
-  vertical-align: bottom; // necessary, to fix wrong height in IE.
+  vertical-align: top;
   padding: @table-header-menu-padding;
 }
 
 .table-header-menu-filters {
   display: inline-block;
-  width: 222px;
-  border-left: solid 1px @border-color;
+  vertical-align: top;
+  width: 250px;
   padding: 0 @table-header-menu-padding 0 @table-header-menu-padding;
   margin: @table-header-menu-padding 0 @table-header-menu-padding 0;
 
@@ -51,7 +47,6 @@
     display: block;
     height: auto;
     margin-top: 5px;
-    border-left: 0;
   }
 
   & > .table-header-menu-group > .form-field {
@@ -59,26 +54,16 @@
   }
 }
 
-.table-header-menu-whiter {
-  height: 1px;
-  position: absolute;
-  left: 0;
-  background-color: @table-header-menu-background-color;
-
-  .table-header-menu.bottom & {
-    top: -1px;
-  }
-
-  .table-header-menu.top & {
-    bottom: -1px;
-  }
-}
-
 .table-header-menu-group {
   padding-top: @table-header-menu-group-padding-top;
+  padding-bottom: 5px;
 
   &.first {
     padding-top: 0;
+  }
+
+  &.last {
+    padding-bottom: 0;
   }
 
   &.buttons {
@@ -93,8 +78,7 @@
 .table-header-menu-group-text {
   font-weight: bold;
   color: @label-color;
-  line-height: 24px;
-  height: 24px;
+  padding-bottom: 4px;
   #scout.overflow-ellipsis-nowrap();
 }
 
@@ -103,45 +87,19 @@
   width: @table-header-menu-cmd-width;
   margin-right: 10px;
   height: @table-header-menu-cmd-height;
-  #scout.font-icon();
-  font-size: 18px;
-  color: @icon-color;
-  border: 1px solid @table-header-menu-cmd-border-color;
-  background-color: @control-background-color;
-  cursor: pointer;
-  text-align: center;
-  display: table;
 
   &:focus {
-    border-color: @focus-color;
+    #scout.box-shadow-focus();
     outline: none;
+  }
 
-    & > .icon::before,
-    & > .icon::after {
-      color: @focus-color;
-    }
+  &.selected:hover {
+    // Override Action.less
+    color: @selected-color;
   }
 
   &.last {
     margin-right: 0;
-  }
-
-  &:hover {
-    color: @hover-color;
-    border-color: @hover-color;
-  }
-
-  &:active, &.active {
-    color: @button-active-color;
-    background-color: @button-active-background-color;
-    border-color: @table-header-menu-cmd-active-border-color;
-  }
-
-  &.disabled {
-    background-color: @control-background-color;
-    border-color: @palette-gray-4;
-    color: @table-header-menu-cmd-disabled-color;
-    cursor: default;
   }
 
   & > .icon::after {
@@ -149,36 +107,6 @@
     left: 3px;
     top: -3px;
     font-size: 13px;
-  }
-
-  &.selected {
-    background-color: @table-header-menu-cmd-selected-background-color;
-    border: 1px solid @table-header-menu-cmd-selected-border-color;
-
-    & > .icon::before,
-    & > .icon::after {
-      color: @table-header-menu-cmd-selected-color;
-    }
-
-    &:focus {
-      background-color: @control-background-color;
-
-      & > .icon::before,
-      & > .icon::after {
-        color: @focus-color;
-      }
-    }
-
-    &:active:not(.disabled),
-    &.active:not(.disabled) {
-      background-color: darken(@table-header-menu-cmd-selected-background-color, 10%);
-      border-color: darken(@table-header-menu-cmd-selected-border-color, 10%);
-    }
-  }
-
-  & > .icon {
-    vertical-align: middle;
-    display: table-cell;
   }
 
   &.move-top > .icon::before {
@@ -234,8 +162,6 @@
   }
 
   &.togglable.selected:hover {
-    border-width: 0;
-
     & > .icon::before {
       content: @icon-remove;
     }
@@ -308,65 +234,63 @@
   }
 
   &.color {
+    &:hover {
+      border-width: 2px;
+    }
+
     &.selected {
       border-width: 2px;
 
       &.togglable:hover {
-        background-color: @table-header-menu-cmd-selected-background-color;
         background-image: none;
       }
     }
   }
 }
 
-.table-header-menu-filter {
-  position: relative;
-  width: 200px;
-  float: left;
-  clear: both;
-  height: @table-header-menu-cmd-height;
-  line-height: 30px;
-  cursor: pointer;
-  padding: 0 20px 0 8px;
-  #scout.overflow-ellipsis-nowrap();
-  border-top: 1px solid @table-header-menu-cmd-border-color;
-
-  &.last {
-    border-bottom: 1px solid @table-header-menu-cmd-border-color;
-  }
-
-  &:hover {
-    color: @hover-color;
-  }
-
-  &::after {
-    position: absolute;
-    right: 14px;
-    content: attr(data-value);
-  }
-
-  &.selected {
-    background-color: @table-header-menu-cmd-selected-background-color;
-    border-top-color: @table-header-menu-cmd-selected-border-color;
-    color: @table-header-menu-cmd-selected-color;
-  }
-
-  &.selected + .table-header-menu-filter {
-    border-top: 1px solid @table-header-menu-background-color;
-  }
-
-  &.selected:last-child {
-    border-bottom-color: @table-header-menu-cmd-selected-border-color;
-  }
-}
-
 .table-header-menu-filter-actions {
   float: right;
-  line-height: 24px;
 }
 
 .table-header-menu-filter-toggle-checked {
   display: inline;
+}
+
+.table-header-menu-filter-table.table-row-check {
+  border: 1px solid @border-color;
+  border-radius: @border-radius;
+
+  & > .table-data {
+    margin-top: 0;
+    padding: 2px 4px;
+
+    & > .table-row {
+      border: 0;
+      border-radius: @border-radius;
+      border-top: 1px solid @table-header-menu-background-color;
+
+      &.select-single,
+      &.select-top,
+      &.selected {
+        border-top: 1px solid @table-header-menu-background-color;
+        margin-top: 0;
+      }
+
+      &.first {
+        border-top: 0;
+      }
+
+      & > .table-cell.halign-right {
+        padding-right: 12px;
+      }
+    }
+  }
+}
+
+.table-header-menu-filter-number-column {
+  font-size: @font-size-small;
+  color: @table-header-menu-filter-number-column-color;
+  vertical-align: middle;
 }
 
 .table-header-menu-toggle-sort-order {

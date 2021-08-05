@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,9 @@
   border-bottom: 2px solid @table-header-border-color;
   z-index: 0; /* begin new stacking context */
 
+  // TableHeader.js will set a border width if the row has one for the selection
+  border-left: 0 solid transparent;
+
   &.disabled:not(.read-only) {
     color: @text-disabled-color;
   }
@@ -29,6 +32,7 @@
   /* Do not use transparent color here, because otherwise header items would be visible behind */
   background-color: inherit;
   z-index: 1;
+  margin-left: @table-header-item-margin-x;
 
   & > .menubar {
     height: 100%;
@@ -36,59 +40,71 @@
     border: none;
 
     & > .menubar-box > .menu-item {
-      border-radius: 0;
       margin-top: 0;
       margin-bottom: 0;
-      height: 100%;
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-right: @table-header-item-margin-x;
+      min-height: @table-header-item-min-height;
+
+      & > .font-icon {
+        font-size: @table-header-icon-font-size;
+      }
+
+      &.menu-icononly {
+        padding: 0;
+        min-width: @table-header-item-min-height;
+      }
     }
   }
 }
 
 .table-header-item {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   font-weight: @font-weight-bold;
   font-size: @font-size-smaller;
   color: @table-header-item-color;
-  padding: @table-header-padding-top @table-header-padding-right @table-header-padding-bottom @table-header-padding-left;
-  #scout.overflow-ellipsis-nowrap();
+  padding: @table-header-item-padding-y @table-header-item-padding-right @table-header-item-padding-y @table-header-item-padding-left;
+  // + 1px because resizer takes 1px on the right
+  margin: @table-header-item-margin-y @table-header-item-margin-x + 1 @table-header-item-margin-y @table-header-item-margin-x;
+  min-height: @table-header-item-min-height;
+
   /* Vertical align is necessary for 2 things: */
   /* 1. Alignment in case of multiline headers. */
   /* 2. A correct header height, see http://stackoverflow.com/questions/20566710/overflowhidden-displayinline-block-moves-text-upwards */
-  vertical-align: bottom;
+  vertical-align: middle;
   cursor: pointer;
-  /* Transparent border required for .selected state */
-  border-left: 1px solid transparent;
-  border-right: 1px solid transparent;
+  border-radius: @border-radius;
 
-  &.disabled {
-    cursor: default;
-    /* Override default disabled text color, because "disabled" in the table header means something different */
-    color: @text-color;
+  &.last {
+    // Resizer is also moved 1px to the left, see resize rule below
+    margin-right: @table-header-item-margin-x;
   }
 
   &.halign-right {
-    text-align: right;
-    padding-right: @table-cell-padding-left;
-    padding-left: @table-cell-padding-right;
+    justify-content: flex-end;
+    padding-right: @table-header-item-padding-left;
+    padding-left: @table-header-item-padding-right;
   }
 
   &.halign-center {
-    text-align: center;
-    padding-right: @table-cell-padding-left;
+    justify-content: center;
+    padding-right: @table-header-item-padding-left;
   }
 
   &.last.halign-left,
   &.last.halign-center,
   &.last.halign-right {
-    padding-right: @table-cell-padding-right-last;
+    padding-right: @table-header-item-padding-right-last;
   }
 
   &.sorted,
   &.grouped,
   &.filtered {
     /* make room for icon */
-    padding-right: @table-header-padding-right + @table-header-sort-icon-size-1;
+    padding-right: @table-header-item-padding-right + @table-header-sort-icon-size-1;
 
     &.halign-right,
     &.halign-center {
@@ -99,7 +115,7 @@
   &.sorted.grouped,
   &.sorted.filtered {
     /* make some more room */
-    padding-right: @table-header-padding-right + @table-header-sort-icon-size-2;
+    padding-right: @table-header-item-padding-right + @table-header-sort-icon-size-2;
 
     &.halign-right,
     &.halign-center {
@@ -107,26 +123,37 @@
     }
   }
 
-  &:not(.disabled):hover {
-    color: @hover-color;
-  }
-
-  &:not(.disabled):active,
-  &:not(.disabled).active,
-  &.moving {
-    color: @active-color;
+  &.moving,
+  &.releasing {
+    // Don't show hover state of underlying item
+    z-index: 1;
   }
 
   &.moving > .table-header-item-state {
     display: none;
   }
 
+  &:hover {
+    color: @hover-color;
+    background-color: @hover-background-color;
+  }
+
+  &.active, &:active,
+  &.moving {
+    background-color: @active-background-color;
+  }
+
   &.selected {
-    border-left-color: @border-color;
-    border-right-color: @border-color;
-    background-color: @table-header-menu-background-color;
+    background-color: @selected-with-popup-background-color;
     color: @active-color;
     z-index: 1;
+  }
+
+  &.disabled {
+    cursor: default;
+    /* Override default disabled text color, because "disabled" in the table header means something different */
+    color: @table-header-item-color;
+    background-color: inherit;
   }
 
   &.filler {
@@ -136,27 +163,31 @@
     cursor: default;
   }
 
-  & > .icon.with-text {
-    margin-right: 8px;
+  & > .icon {
+    &.font-icon {
+      font-size: @table-header-icon-font-size;
+    }
+
+    &.with-text {
+      margin-right: 8px;
+    }
   }
 }
 
 .table-header-item-text {
+  #scout.overflow-ellipsis-nowrap();
+
   &.empty {
     /* explicitly disable ellipsis, because IE would display it for very narrow columns even if content is '&nbsp;' */
     text-overflow: clip;
   }
 }
 
-.table-header-item-icon-only {
-  text-overflow: clip;
-}
-
 .table-header-item-state {
   position: absolute;
   display: flex;
   align-items: center;
-  right: 3px;
+  right: 0;
   top: 0;
   font-weight: normal;
   font-size: @font-size-extra-small;
@@ -195,7 +226,7 @@
   height: 100%;
   width: 17px;
   padding: 10px 8px;
-  margin-left: -8px;
+  margin-left: -9px;
   background-color: @table-header-resize-color;
   background-clip: content-box;
   z-index: 1;
@@ -208,12 +239,12 @@
     }
   }
 
-  .table-header.moving > & {
-    /* Hide separators while moving, because their position will not be updated until the move-end event */
-    visibility: hidden;
+  .table-header-item.last + & {
+    margin-left: -8px; // Ensure resizer of the last column is not visible when columns use the whole width
   }
 
-  .table-header-item.selected + &.table-header-resize {
+  .table-header.moving > & {
+    /* Hide separators while moving, because their position will not be updated until the move-end event */
     visibility: hidden;
   }
 }

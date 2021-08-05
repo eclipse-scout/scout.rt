@@ -104,8 +104,9 @@
   /* TableHeader.less */
 
   .table-header-item {
-    padding-top: 7px; /* padding: @table-header-padding-top @table-header-padding-right @table-header-padding-bottom @table-header-padding-left; */
-    padding-bottom: 6px;
+    margin-top: 2px; /* margin: @table-header-item-margin-y @table-header-item-margin-x  */
+    margin-bottom: 2px;
+    min-height: 24px; /* min-height: @table-header-item-min-height; */
   }
 
   .table-header-resize {
@@ -140,8 +141,9 @@
   .detail-table.table {
     & > .table-header {
       & > .table-header-item {
-        padding-top: 7px; /* @detail-table-header-padding-y; */
-        padding-bottom: 6px; /* @detail-table-header-padding-y; */
+        margin-top: 2px;
+        margin-bottom: 2px;
+        min-height: 24px;
       }
     }
 

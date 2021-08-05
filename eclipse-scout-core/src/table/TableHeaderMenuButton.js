@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,11 +29,11 @@ export default class TableHeaderMenuButton extends Action {
 
   _render() {
     super._render();
-    this.$container = this.$container.addClass('table-header-menu-command')
+    this.$container = this.$container.addClass('table-header-menu-command button')
       .unfocusable()
       .on('mouseenter', this._onMouseOver.bind(this))
       .on('mouseleave', this._onMouseOut.bind(this));
-    this.$icon = this.$container.appendSpan('icon');
+    this.$icon = this.$container.appendSpan('icon font-icon');
   }
 
   _renderProperties() {

@@ -715,8 +715,7 @@ export default class Column {
       parent: tableHeader,
       column: $header.data('column'),
       tableHeader: tableHeader,
-      $anchor: $header,
-      focusableContainer: true
+      $anchor: $header
     });
   }
 

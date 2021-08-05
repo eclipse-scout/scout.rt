@@ -157,9 +157,10 @@
 @detail-table-border-radius: 4px;
 @detail-table-data-padding-x: @bench-padding-x - @table-cell-padding-left;
 @detail-table-header-menubar-padding-right: 10px;
-@detail-table-header-padding-x: @bench-padding-x - @table-header-padding-left;
-@detail-table-header-padding-top: 12px;
-@detail-table-header-padding-bottom: 11px;
+@detail-table-header-item-padding-x: @bench-padding-x - @table-header-item-padding-left;
+@detail-table-header-item-padding-y: @table-header-item-padding-y;
+@detail-table-header-item-margin-top: 6px;
+@detail-table-header-item-margin-bottom: 6px;
 @detail-table-row-padding-y: 11px;
 @detail-table-footer-with-handle-margin-left: 30px;
 @dialog-border-top-size: 5px;
@@ -250,8 +251,8 @@
 @tab-item-title-padding-bottom: @group-box-title-padding-bottom;
 @tab-item-title-padding-top: @group-box-title-padding-top;
 @tab-item-title-margin-top: @group-box-header-margin-top;
-@table-cell-padding-left: 8px; /* also used in scout.Column.prototype.buildCell */
-@table-cell-padding-right: 4px; /* also used in scout.Column.prototype.buildCell */
+@table-cell-padding-left: 8px;
+@table-cell-padding-right: @table-cell-padding-left;
 @table-cell-padding-right-last: @scrollbar-size;
 @table-control-content-padding: 10px;
 @table-control-container-height: 360px;
@@ -263,12 +264,16 @@
 @table-footer-text-filter-width: 180px;
 @table-header-menu-cmd-height: 30px;
 @table-header-menu-cmd-width: 43px;
-@table-header-menu-group-padding-top: 10px;
-@table-header-menu-padding: 10px;
-@table-header-padding-left: @table-cell-padding-left;
-@table-header-padding-right: @table-cell-padding-right;
-@table-header-padding-top: 9px;
-@table-header-padding-bottom: 8px;
+@table-header-menu-group-padding-top: 12px;
+@table-header-menu-padding: 16px;
+@table-header-item-padding-left: @table-cell-padding-left - @table-header-item-margin-x;
+@table-header-item-padding-right: @table-cell-padding-right - @table-header-item-margin-x;
+@table-header-item-padding-right-last: @table-cell-padding-right-last - @table-header-item-margin-x;
+@table-header-item-padding-y: 5px;
+@table-header-item-margin-y: 3px;
+@table-header-item-margin-x: 3px;
+@table-header-item-min-height: 27px; // not 28 because of 2px bottom border (to make it equal height as menubar)
+@table-header-icon-font-size: 15px; // not 16 because of 2px bottom border (to really center it)
 @table-header-sort-icon-size-1: 12px;
 @table-header-sort-icon-size-2: @table-header-sort-icon-size-1 + 12px; /* bigger space when multiple icons are displayed */
 @table-info-margin-x: 15px;

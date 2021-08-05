@@ -101,26 +101,20 @@
   }
 
   & > .table-header {
-    padding-left: @detail-table-header-padding-x;
-    padding-right: @detail-table-header-padding-x;
+    padding-left: @detail-table-data-padding-x;
+    padding-right: @detail-table-data-padding-x;
     background-color: @detail-table-header-background-color;
     border-bottom-color: @detail-table-header-border-color;
 
     & > .table-header-item {
-      padding-top: @detail-table-header-padding-top;
-      padding-bottom: @detail-table-header-padding-bottom;
+      padding-top: @detail-table-header-item-padding-y;
+      padding-bottom: @detail-table-header-item-padding-y;
+      margin-top: @detail-table-header-item-margin-top;
+      margin-bottom: @detail-table-header-item-margin-bottom;
     }
 
-    & > .menubar-container {
-
-      & > .menubar > .menubar-box > .menu-item {
-        border-radius: @border-radius;
-        height: auto;
-
-        &.last {
-          margin-right: 12px;
-        }
-      }
+    & > .menubar-container > .menubar > .menubar-box > .menu-item.last {
+      margin-right: 12px;
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -344,16 +344,17 @@ export default class Popup extends Widget {
   }
 
   _renderWithFocusContext() {
-    if (this.withFocusContext) {
-      // Don't allow an element to be focused while the popup is opened.
-      // The popup will focus the element as soon as the opening is finished (see open());
-      // The context needs to be already installed so that child elements don't try to focus an element outside of this context
-      this.session.focusManager.installFocusContext(this.$container, FocusRule.PREPARE);
+    if (!this.withFocusContext) {
+      return;
     }
     // Add programmatic 'tabindex' if the $container itself should be focusable (used by context menu popups with no focusable elements)
-    if (this.withFocusContext && this.focusableContainer) {
+    if (this.focusableContainer) {
       this.$container.attr('tabindex', -1);
     }
+    // Don't allow an element to be focused while the popup is opened.
+    // The popup will focus the element as soon as the opening is finished (see open());
+    // The context needs to be already installed so that child elements don't try to focus an element outside of this context
+    this.session.focusManager.installFocusContext(this.$container, FocusRule.PREPARE);
   }
 
   _renderWithGlassPane() {

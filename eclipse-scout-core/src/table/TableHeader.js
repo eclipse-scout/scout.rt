@@ -40,7 +40,8 @@ export default class TableHeader extends Widget {
   }
 
   _render() {
-    this.$container = this.table.$data.beforeDiv('table-header');
+    this.$container = this.table.$data.beforeDiv('table-header')
+      .cssBorderLeftWidth(this.table.rowBorderLeftWidth);
 
     // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly
     this.$filler = this.$container.appendDiv('table-header-item filler').css('visibility', 'hidden');
@@ -92,25 +93,18 @@ export default class TableHeader extends Widget {
 
   _renderColumn(column, index) {
     let columnWidth = column._realWidthIfAvailable(),
-      marginLeft = '',
-      marginRight = '',
       visibleColumns = this._visibleColumns(),
       isFirstColumn = (index === 0),
       isLastColumn = (index === visibleColumns.length - 1);
 
-    if (isFirstColumn) {
-      marginLeft = this.table.rowBorderLeftWidth;
-    } else if (isLastColumn) {
-      marginRight = this.table.rowBorderRightWidth;
-    }
-
     let $header = this.$filler.beforeDiv('table-header-item')
       .setEnabled(this.enabled) // enabledComputed not used on purpose
-      .data('column', column)
-      .cssMinWidth(columnWidth)
-      .cssMaxWidth(columnWidth)
-      .cssMarginLeft(marginLeft)
-      .cssMarginRight(marginRight);
+      .data('column', column);
+
+    let margins = graphics.margins($header);
+    columnWidth -= margins.horizontal();
+    $header.cssMinWidth(columnWidth).cssMaxWidth(columnWidth);
+
     $header.appendSpan('table-header-item-text');
     if (this.enabled) { // enabledComputed not used on purpose
       $header
@@ -180,18 +174,15 @@ export default class TableHeader extends Widget {
     let remainingHeaderSpace, adjustment,
       $header = column.$header,
       columnWidth = column._realWidthIfAvailable(),
-      marginLeft = '',
-      marginRight = '',
+      margins = graphics.margins($header),
       menuBarWidth = (this.menuBar.visible ? this.$menuBarContainer.outerWidth(true) : 0),
       visibleColumns = this._visibleColumns(),
       visibleColumnIndex = visibleColumns.indexOf(column),
-      isFirstColumn = visibleColumnIndex === 0,
       isLastColumn = visibleColumnIndex === visibleColumns.length - 1;
 
-    if (isFirstColumn) {
-      marginLeft = this.table.rowBorderLeftWidth;
-    } else if (isLastColumn) {
-      marginRight = this.table.rowBorderRightWidth;
+    columnWidth -= margins.horizontal();
+
+    if (isLastColumn) {
       remainingHeaderSpace = this.$container.width() - this.table.rowWidth + graphics.insets(this.table.$data).right;
 
       if (remainingHeaderSpace < menuBarWidth) {
@@ -210,14 +201,8 @@ export default class TableHeader extends Widget {
     }
 
     $header
-      .css('min-width', columnWidth)
-      .css('max-width', columnWidth)
-      .css('margin-left', marginLeft)
-      .css('margin-right', marginRight);
-
-    if (this.tableHeaderMenu && this.tableHeaderMenu.rendered && this.tableHeaderMenu.column === column) {
-      this.tableHeaderMenu.onColumnResized();
-    }
+      .cssMinWidth(columnWidth)
+      .cssMaxWidth(columnWidth);
   }
 
   /**
@@ -290,9 +275,9 @@ export default class TableHeader extends Widget {
     let column = $col.data('column');
     if (column && strings.hasText(column.headerTooltipText)) {
       return column.headerTooltipText;
-    } else if ($col.isContentTruncated() || ($col.width() + $col.position().left) > $col.parent().width()) {
-      $col = $col.clone();
-      $col.children('.table-header-item-state').remove();
+    }
+    let $text = $col.children('.table-header-item-text');
+    if ($text.isContentTruncated() || ($col.width() + $col.position().left) > $col.parent().width()) {
       let text = strings.plainText($col.html(), {
         trim: true
       });
@@ -558,7 +543,8 @@ export default class TableHeader extends Widget {
     // move to old position and then animate
     if (event.dragged) {
       $header.css('left', parseInt($header.css('left'), 0) + $header.data('old-pos') - $header.offset().left)
-        .animateAVCSD('left', 0);
+        .addClass('releasing')
+        .animateAVCSD('left', 0, () => $header.removeClass('releasing'));
     } else {
       this._arrangeHeaderItems($headers);
     }
@@ -671,14 +657,14 @@ export default class TableHeader extends Widget {
       let middle = realMiddle($header);
 
       $otherHeaders.each(function(i) {
-        let m = realMiddle($(this));
-
+        let $otherHeader = $(this);
+        let m = realMiddle($otherHeader);
         if (middle < m && i < oldPos) {
-          $(this).css('left', move);
+          $otherHeader.css('left', move);
         } else if (middle > m && i >= oldPos) {
-          $(this).css('left', -move);
+          $otherHeader.css('left', -move);
         } else {
-          $(this).css('left', 0);
+          $otherHeader.css('left', 0);
         }
       });
 
@@ -699,6 +685,9 @@ export default class TableHeader extends Widget {
       return width;
     }
 
+    /**
+     * @return {number} the middle of the text (not the middle of the whole header item)
+     */
     function realMiddle($div) {
       if ($div.hasClass('halign-right')) {
         return $div.offset().left + $div.outerWidth() - realWidth($div) / 2;
@@ -729,8 +718,10 @@ export default class TableHeader extends Widget {
         that.dragging = false;
         that.columnMoved = true;
       } else {
+        $header.addClass('releasing');
         $header.animateAVCSD('left', '', () => {
           that.dragging = false;
+          $header.removeClass('releasing');
         });
       }
 
