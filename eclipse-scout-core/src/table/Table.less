@@ -42,11 +42,6 @@
 
     & > .table-data > .table-row {
 
-      & > .table-cell.first {
-        /* Increase padding of first cell to make room for "selection" marker */
-        padding-left: 14px;
-      }
-
       &.selected {
         /* Don't draw selection */
         background-color: transparent;
@@ -68,23 +63,14 @@
       }
     }
 
-    &:focus,
-    &.focused {
+    &.keyboard-navigation:focus,
+    &.keyboard-navigation.focused {
       & > .table-data > .table-row {
         &.selected {
-          /* "Selection" marker */
+          background-color: @hover-background-color;
 
-          &::before {
-            #scout.font-icon();
-            content: @icon-angle-right;
-            position: absolute;
-            top: 8px;
-            left: 5px;
-            color: @text-color;
-          }
-
-          &.checked::before {
-            color: @text-selection-color;
+          &.checked {
+            background-color: @selected-hover-background-color;
           }
         }
       }
