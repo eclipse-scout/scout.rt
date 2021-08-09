@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.rest.jersey.JerseyTestRestClientHelper;
 import org.eclipse.scout.rt.rest.jersey.RequestSynchronizer;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
-import org.glassfish.jersey.apache.connector.RestEnsureHttpHeaderConnectionCloseProperty;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;

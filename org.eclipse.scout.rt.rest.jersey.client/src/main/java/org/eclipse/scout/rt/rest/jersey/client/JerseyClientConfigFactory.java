@@ -32,6 +32,7 @@ import org.apache.http.impl.conn.DefaultHttpResponseParserFactory;
 import org.apache.http.impl.conn.ManagedHttpClientConnectionFactory;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.io.DefaultHttpRequestWriterFactory;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.rest.IRestHttpRequestUriEncoder;
@@ -112,7 +113,7 @@ public class JerseyClientConfigFactory implements IRestClientConfigFactory {
 
   /**
    * Max number of total concurrent connections managed by the {@link HttpClientConnectionManager} returned by
-   * {@link #createConnectionManager()}. Default is 128.
+   * {@link #createConnectionManager(ClientConfig)} ()}. Default is 128.
    */
   protected int getMaxConnectionsTotal() {
     return 128;
@@ -120,7 +121,7 @@ public class JerseyClientConfigFactory implements IRestClientConfigFactory {
 
   /**
    * Max number of concurrent connections per route managed by the {@link HttpClientConnectionManager} returned by
-   * {@link #createConnectionManager()}. Default is 32.
+   * {@link #createConnectionManager(ClientConfig)} ()}. Default is 32.
    */
   protected int getMaxConnectionsPerRoute() {
     return 32;
@@ -164,9 +165,14 @@ public class JerseyClientConfigFactory implements IRestClientConfigFactory {
    * in {@code clientConfig}, allowing for consumers to provide their own connection manager.
    */
   protected void initConnectionProvider(ClientConfig clientConfig) {
-    clientConfig.connectorProvider(new ClosingApacheConnectorProvider());
-    if (clientConfig.getProperty(ApacheClientProperties.CONNECTION_MANAGER) == null) {
-      clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, createConnectionManager(clientConfig));
+    if ("true".equals(clientConfig.getProperty(RestClientProperties.USE_SCOUT_APACHE_CONNECTOR) != null)) {
+      clientConfig.connectorProvider(new ClosingApacheConnectorProvider());
+      if (clientConfig.getProperty(ApacheClientProperties.CONNECTION_MANAGER) == null) {
+        clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, createConnectionManager(clientConfig));
+      }
+    }
+    else {
+      clientConfig.connectorProvider(BEANS.get(ScoutApacheConnectorProvider.class));
     }
   }
 

@@ -116,4 +116,12 @@ public final class RestClientProperties {
    * The name of the configuration property is <tt>{@value}</tt>.
    */
   public static final String REQUEST_URI_ENCODER = "scout.rest.client.requestUriEncoder";
+
+  /**
+   * XXX The name of the configuration property is <tt>{@value}</tt>.
+   *
+   * @deprecated will be removed with release 22.0.
+   */
+  @Deprecated
+  public static final String USE_SCOUT_APACHE_CONNECTOR = "scout.rest.client.useScoutApacheConnector";
 }
