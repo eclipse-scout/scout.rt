@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventSupport, Form, icons, inspector, MenuBar, Outline, TableRow, scout, TileOutlineOverview, TileOverviewForm, TreeNode, Widget} from '../../../index';
+import {Event, EventSupport, Form, icons, inspector, MenuBar, scout, TileOutlineOverview, TileOverviewForm, TreeNode, Widget} from '../../../index';
 import $ from 'jquery';
 
 /**
@@ -197,9 +197,6 @@ export default class Page extends TreeNode {
   _initDetailForm(form) {
     if (form instanceof Form) {
       form.setModal(false);
-    }
-    if (!form.displayParent && form.setDisplayParent) {
-      form.setDisplayParent(this.getOutline());
     }
     if (form instanceof TileOverviewForm) {
       form.setPage(this);
