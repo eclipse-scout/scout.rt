@@ -31,7 +31,9 @@ public abstract class AbstractHierarchicalLookupRowDo<SELF extends AbstractHiera
    *
    * @see AbstractHierarchicalLookupRowDo#createParentIdAttribute(AbstractHierarchicalLookupRowDo)
    */
-  public abstract DoValue<ID> parentId();
+  public DoValue<ID> parentId() {
+    return doValue(PARENT_ID);
+  }
 
   /* **************************************************************************
    * HELPER METHODS

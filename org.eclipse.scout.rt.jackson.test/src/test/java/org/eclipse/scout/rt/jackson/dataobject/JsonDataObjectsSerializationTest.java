@@ -16,6 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -117,6 +118,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.platform.util.date.StrictSimpleDateFormat;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
@@ -2542,6 +2544,14 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(rowA, marshalled.getRows().get(1));
     assertEquals(rowB, marshalled.getRows().get(2));
     assertEquals(parent.getId(), marshalled.getRows().get(2).getParentId());
+  }
+
+  @Test
+  public void testGenericTypeing() {
+
+    Type type = TypeCastUtility.getGenericsParameterClass(FixtureHierarchicalLookupRowDo.class, Object.class, 1);
+    System.out.println(type);
+
   }
 
   protected FixtureHierarchicalLookupRowDo createRow(FixtureUuId id) {

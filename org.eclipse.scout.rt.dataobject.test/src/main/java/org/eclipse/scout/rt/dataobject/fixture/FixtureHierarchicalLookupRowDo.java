@@ -24,11 +24,6 @@ public class FixtureHierarchicalLookupRowDo extends AbstractHierarchicalLookupRo
     return createIdAttribute(this);
   }
 
-  @Override
-  public DoValue<FixtureUuId> parentId() {
-    return createParentIdAttribute(this);
-  }
-
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
