@@ -277,7 +277,6 @@ export default class Popup extends Widget {
   _postRender() {
     super._postRender();
 
-    this.size();
     this._attachCloseHandlers();
     this._attachAnchorHandlers();
     this._handleGlassPanes();
@@ -867,18 +866,6 @@ export default class Popup extends Widget {
     }
 
     return location;
-  }
-
-  size() {
-    let size = this.prefSize(this.$container);
-    if (!size) {
-      return;
-    }
-    graphics.setSize(this.$container, size);
-  }
-
-  prefSize($container) {
-    return null;
   }
 
   position(switchIfNecessary) {
