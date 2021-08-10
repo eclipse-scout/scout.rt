@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,14 +18,14 @@ describe('scout.icons', () => {
     icon = icons.parseIconId('foo.png');
     expect(icon.isBitmap()).toBe(true);
     expect(icon.iconUrl).toBe('foo.png');
-    expect(icon.iconCharacter).toBe(undefined);
-    expect(icon.font).toBe(undefined);
+    expect(icon.iconCharacter).toBeNull();
+    expect(icon.font).toBeNull();
   });
 
   it('parses font icons (scoutIcons font)', () => {
     icon = icons.parseIconId('font:x');
     expect(icon.isFontIcon()).toBe(true);
-    expect(icon.iconUrl).toBe(undefined);
+    expect(icon.iconUrl).toBeNull();
     expect(icon.iconCharacter).toBe('x');
     expect(icon.font).toBe('scoutIcons');
   });
@@ -33,7 +33,7 @@ describe('scout.icons', () => {
   it('parses font icons (custom font)', () => {
     icon = icons.parseIconId('font:widgetIcons x');
     expect(icon.isFontIcon()).toBe(true);
-    expect(icon.iconUrl).toBe(undefined);
+    expect(icon.iconUrl).toBeNull();
     expect(icon.iconCharacter).toBe('x');
     expect(icon.font).toBe('widgetIcons');
   });
