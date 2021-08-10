@@ -34,7 +34,7 @@ public class ScriptRequestTest {
 
   @Test
   public void testTryParseWithValidInput() {
-    String[] tests = {"path/basename.js", "path/basename.min.js", "path/basename-34fce3bc.min.js", "path/subpath/basename-34fce3bc.min.css", "path/subpath/entry1~entry2-34fce3bc.min.css", "/res/lib-1.10.88/lib.js", "base.css"};
+    String[] tests = {"path/basename.js", "path/basename.min.js", "path/basename-34fce3bc.min.js", "path/subpath/basename-34fce3bc.min.css", "path/subpath/entry1~entry2-34fce3bc.min.css", "/res/lib-1.10.11/lib.js", "base.css"};
     for (String test : tests) {
       assertEquals("invalid input: " + test, test, ScriptRequest.tryParse(test).orElseThrow(() -> new IllegalArgumentException("invalid input: " + test)).toString());
     }
