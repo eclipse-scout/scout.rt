@@ -56,6 +56,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
   String PROP_COLUMN_DESCRIPTORS = "columnDescriptors";
   String PROP_LOOKUP_ROW = "lookupRow";
   String PROP_LOAD_PARENT_NODES = "loadParentNodes";
+  String PROP_MAX_LENGTH = "maxLength";
 
   String DISPLAY_STYLE_DEFAULT = "default";
   String DISPLAY_STYLE_DROPDOWN = "dropdown";
@@ -141,6 +142,17 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
   boolean isLoadParentNodes();
 
   void setLoadParentNodes(boolean loadParentNodes);
+
+  /**
+   * @param maxLength
+   *          of the text in this field. Negative values are automatically converted to 0.
+   */
+  void setMaxLength(int maxLength);
+
+  /**
+   * @return the maximum length of text
+   */
+  int getMaxLength();
 
   /**
    * Filter selection of hierarchy browse tree. The level reported here is different than the one used in {@link AbstractTree}

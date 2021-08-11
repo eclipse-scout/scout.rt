@@ -23,17 +23,10 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
  * <p>
  * There's no validation logic that checks for duplicates between manually entered text and the proposal list.
  *
- * @param VALUE
+ * @param <VALUE>
  *          generic parameter type of lookup key
  */
 public interface IProposalField<VALUE> extends ISmartField<VALUE> {
-
-  /**
-   * {@link Integer}
-   *
-   * @since 6.1
-   */
-  String PROP_MAX_LENGTH = "maxLength";
 
   /**
    * {@link Boolean}
@@ -43,21 +36,7 @@ public interface IProposalField<VALUE> extends ISmartField<VALUE> {
   String PROP_TRIM_TEXT_ON_VALIDATE = "trimText";
 
   String getValueAsString();
-
   void setValueAsString(String value);
-
-  /**
-   * @param maxLength
-   *          of the text in this field. Negative values are automatically converted to 0.
-   * @since 6.1
-   */
-  void setMaxLength(int maxLength);
-
-  /**
-   * @return the maximum length of text, default is 4000
-   * @since 6.1
-   */
-  int getMaxLength();
 
   /**
    * @param b

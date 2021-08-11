@@ -34,12 +34,6 @@ public class JsonProposalField<VALUE, MODEL extends IProposalField<VALUE>> exten
   @Override
   protected void initJsonProperties(MODEL model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<IProposalField<VALUE>>(IProposalField.PROP_MAX_LENGTH, model) {
-      @Override
-      protected Integer modelValue() {
-        return getModel().getMaxLength();
-      }
-    });
     putJsonProperty(new JsonProperty<IProposalField<VALUE>>(IProposalField.PROP_TRIM_TEXT_ON_VALIDATE, model) {
       @Override
       protected Boolean modelValue() {

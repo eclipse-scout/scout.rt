@@ -37,6 +37,8 @@ export default class TagField extends ValueField {
     this.lookupCall = null;
     this._currentLookupCall = null;
     this.tagBar = null;
+    this.maxLength = 500;
+    this.maxLengthHandler = scout.create('MaxLengthHandler', {target: this});
   }
 
   _init(model) {
@@ -85,12 +87,14 @@ export default class TagField extends ValueField {
       .on('input', this._onFieldInput.bind(this));
     this.addFieldContainer($fieldContainer);
     this.addField($field);
+    this.maxLengthHandler.install($field);
     this.addStatus();
   }
 
   _renderProperties() {
     super._renderProperties();
     this._renderValue();
+    this._renderMaxLength();
   }
 
   _renderValue() {
@@ -153,6 +157,14 @@ export default class TagField extends ValueField {
     if (this.rendered) {
       this.fieldHtmlComp.invalidateLayoutTree();
     }
+  }
+
+  setMaxLength(maxLength) {
+    this.setProperty('maxLength', maxLength);
+  }
+
+  _renderMaxLength() {
+    this.maxLengthHandler.render();
   }
 
   _updateInputVisible() {
