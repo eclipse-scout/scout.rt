@@ -18,8 +18,6 @@ export default class PrepopulatedLookupCall extends LookupCall {
     this.lookupRows = [];
   }
 
-  static MAX_ROW_COUNT = 100;
-
   setLookupRows(lookupRows) {
     this.lookupRows = arrays.ensure(lookupRows);
   }
@@ -46,7 +44,7 @@ export default class PrepopulatedLookupCall extends LookupCall {
   _lookupRowsByAll() {
     return this.lookupRows
       .filter(this._filterActiveLookupRow, this)
-      .slice(0, PrepopulatedLookupCall.MAX_ROW_COUNT + 1);
+      .slice(0, this.maxRowCount);
   }
 
   // --- TEXT ---
@@ -72,7 +70,7 @@ export default class PrepopulatedLookupCall extends LookupCall {
         return strings.startsWith(scout.nvl(lookupRow.text, '').toLowerCase(), filterText);
       })
       .filter(this._filterActiveLookupRow, this)
-      .slice(0, PrepopulatedLookupCall.MAX_ROW_COUNT + 1);
+      .slice(0, this.maxRowCount);
   }
 
   // --- KEY ---
@@ -126,6 +124,6 @@ export default class PrepopulatedLookupCall extends LookupCall {
         return aggr;
       }, [])
       .filter(this._filterActiveLookupRow, this)
-      .slice(0, PrepopulatedLookupCall.MAX_ROW_COUNT + 1);
+      .slice(0, this.maxRowCount);
   }
 }
