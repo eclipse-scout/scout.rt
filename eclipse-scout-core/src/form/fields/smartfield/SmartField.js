@@ -589,6 +589,7 @@ export default class SmartField extends ValueField {
 
   _setLookupCall(lookupCall) {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
+    this._syncBrowseMaxRowCountWithLookupCall();
   }
 
   _setCodeType(codeType) {
@@ -1292,6 +1293,14 @@ export default class SmartField extends ValueField {
 
   setBrowseMaxRowCount(browseMaxRowCount) {
     this.setProperty('browseMaxRowCount', browseMaxRowCount);
+    this._syncBrowseMaxRowCountWithLookupCall();
+  }
+
+  _syncBrowseMaxRowCountWithLookupCall() {
+    if (this.lookupCall) {
+      // sync max rows with lookup call => request one more row to detect if there would be more rows than browseMaxRowCount.
+      this.lookupCall.setMaxRowCount(this.browseMaxRowCount + 1);
+    }
   }
 
   setBrowseAutoExpandAll(browseAutoExpandAll) {
