@@ -51,7 +51,7 @@ import org.mockito.ArgumentMatcher;
 public class SmartFieldLookupTest {
 
   @BeanMock
-  private ITestLookupService m_mock_service;
+  private ITestLookupService m_mockService;
 
   private ISmartField<Long> m_field;
 
@@ -60,7 +60,7 @@ public class SmartFieldLookupTest {
   @Before
   public void setup() {
     testMasterValue = 10;
-    m_field = new AbstractSmartField<Long>() {
+    m_field = new AbstractSmartField<>() {
     };
     List<ILookupRow<Long>> childRows = new ArrayList<>();
     childRows.add(new LookupRow<>(0L, "Alice"));
@@ -70,10 +70,10 @@ public class SmartFieldLookupTest {
     inactiveRows.add(new LookupRow<>(2L, "B"));
     inactiveRows.add(null);
 
-    when(m_mock_service.getDataByRec(argThat(hasRec(1L)))).thenReturn(childRows);
-    when(m_mock_service.getDataByRec(argThat(isInactive()))).thenReturn(inactiveRows);
-    when(m_mock_service.getDataByRec(argThat(hasMaxRowCount(2)))).thenReturn(inactiveRows);
-    when(m_mock_service.getDataByRec(argThat(hasMaster(testMasterValue)))).thenReturn(inactiveRows);
+    when(m_mockService.getDataByRec(argThat(hasRec(1L)))).thenReturn(childRows);
+    when(m_mockService.getDataByRec(argThat(isInactive()))).thenReturn(inactiveRows);
+    when(m_mockService.getDataByRec(argThat(hasMaxRowCount(2)))).thenReturn(inactiveRows);
+    when(m_mockService.getDataByRec(argThat(hasMaster(testMasterValue)))).thenReturn(inactiveRows);
   }
 
   /**
@@ -129,7 +129,7 @@ public class SmartFieldLookupTest {
 
   @Test
   public void testSubtreeLookup_WithMasterField() {
-    IValueField<Long> masterField = new AbstractValueField<Long>() {
+    IValueField<Long> masterField = new AbstractValueField<>() {
     };
     masterField.setValue(testMasterValue);
     m_field.setLookupCall(new TestLookupCall());
@@ -140,7 +140,7 @@ public class SmartFieldLookupTest {
 
   @Test
   public void testSubtreeLookup_InBackground() {
-    IValueField<Long> masterField = new AbstractValueField<Long>() {
+    IValueField<Long> masterField = new AbstractValueField<>() {
     };
     masterField.setValue(testMasterValue);
     m_field.setLookupCall(new TestLookupCall());
@@ -179,7 +179,7 @@ public class SmartFieldLookupTest {
   @Test(expected = PlatformException.class)
   public void testTextLookupWithExceptions() {
     m_field.setLookupCall(new TestLookupCall());
-    when(m_mock_service.getDataByText(any(ILookupCall.class))).thenThrow(new PlatformException("lookup error"));
+    when(m_mockService.getDataByText(any(ILookupCall.class))).thenThrow(new PlatformException("lookup error"));
     m_field.callTextLookup("test", 10);
   }
 
@@ -188,13 +188,13 @@ public class SmartFieldLookupTest {
   public void testSubtreeLookupExceptions_InBackground() {
     final IBlockingCondition bc = Jobs.newBlockingCondition(true);
     m_field.setLookupCall(new TestLookupCall());
-    when(m_mock_service.getDataByRec(any(ILookupCall.class))).thenThrow(new PlatformException("lookup error"));
+    when(m_mockService.getDataByRec(any(ILookupCall.class))).thenThrow(new PlatformException("lookup error"));
 
     IFuture<List<ILookupRow<Long>>> rows = m_field.callSubTreeLookupInBackground(1L, TriState.TRUE, false);
 
     rows.whenDone(event -> {
       assertTrue(event.getException() instanceof RuntimeException);
-      assertEquals("lookup error", event.getException().getMessage());
+      assertTrue(event.getException().getMessage().startsWith("lookup error"));
       bc.setBlocking(false);
     }, ClientRunContexts.copyCurrent());
     bc.waitFor();
@@ -205,7 +205,7 @@ public class SmartFieldLookupTest {
   public void testTextLookupExceptions_InBackground() {
     m_field.setLookupCall(new TestLookupCall());
     final String errorText = "lookup error";
-    when(m_mock_service.getDataByText(any(ILookupCall.class))).thenThrow(new PlatformException(errorText));
+    when(m_mockService.getDataByText(any(ILookupCall.class))).thenThrow(new PlatformException(errorText));
     final IBlockingCondition bc = Jobs.newBlockingCondition(true);
     ILookupRowFetchedCallback callback = new ILookupRowFetchedCallback<Long>() {
 
@@ -229,7 +229,7 @@ public class SmartFieldLookupTest {
 
   @Test
   public void testSubteeLookup_WithPrepare() {
-    ISmartField<Long> field = new AbstractSmartField<Long>() {
+    ISmartField<Long> field = new AbstractSmartField<>() {
 
       @Override
       protected void execPrepareLookup(ILookupCall<Long> call) {
@@ -243,7 +243,7 @@ public class SmartFieldLookupTest {
 
   @Test
   public void testSubteeLookup_WithPrepareRec() {
-    ISmartField<Long> field = new AbstractSmartField<Long>() {
+    ISmartField<Long> field = new AbstractSmartField<>() {
 
       @Override
       protected void execPrepareRecLookup(ILookupCall<Long> call, Long parentKey) {
@@ -258,7 +258,7 @@ public class SmartFieldLookupTest {
 
   @Test
   public void testSubtreeLookup_FilterResult() {
-    ISmartField<Long> field = new AbstractSmartField<Long>() {
+    ISmartField<Long> field = new AbstractSmartField<>() {
 
       @Override
       protected void execFilterRecLookupResult(ILookupCall<Long> call, List<ILookupRow<Long>> result) {
@@ -273,7 +273,7 @@ public class SmartFieldLookupTest {
 
   @SuppressWarnings("unchecked")
   private void throwOnRecLookup() {
-    when(m_mock_service.getDataByRec(any(ILookupCall.class))).thenThrow(new PlatformException("lookup error"));
+    when(m_mockService.getDataByRec(any(ILookupCall.class))).thenThrow(new PlatformException("lookup error"));
   }
 
   /**

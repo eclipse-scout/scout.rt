@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeVisitor;
@@ -156,21 +155,6 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> {
         .withEnabled(c.isEnabled())
         .withParentKey(c.getParentCode() != null ? c.getParentCode().getId() : null)
         .withActive(c.isActive());
-  }
-
-  @Override
-  protected Pattern createSearchPattern(String s) {
-    if (s == null) {
-      s = "";
-    }
-    s = s.replace(getWildcard(), "@wildcard@");
-    s = s.toLowerCase();
-    s = StringUtility.escapeRegexMetachars(s);
-    s = s.replace("@wildcard@", ".*");
-    if (!s.endsWith(".*")) {
-      s = s + ".*";
-    }
-    return Pattern.compile(s, Pattern.DOTALL);
   }
 
   /**

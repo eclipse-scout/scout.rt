@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -49,10 +50,24 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
     super.initConfig();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
 
+    setMaxLength(getConfiguredMaxLength());
     Class<? extends ILookupCall<String>> lookupCallClass = getConfiguredLookupCall();
     if (lookupCallClass != null) {
       setLookupCall(BEANS.get(lookupCallClass));
     }
+  }
+
+  /**
+   * Configures the initial value of {@link AbstractTagField#getMaxLength()
+   * <p>
+   * Subclasses can override this method
+   * <p>
+   * Default is 500
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(330)
+  protected int getConfiguredMaxLength() {
+    return 500;
   }
 
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
@@ -127,6 +142,19 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
   }
 
   @Override
+  public void setMaxLength(int maxLength) {
+    boolean changed = propertySupport.setPropertyInt(PROP_MAX_LENGTH, Math.max(0, maxLength));
+    if (changed && isInitConfigDone()) {
+      setValue(getValue());
+    }
+  }
+
+  @Override
+  public int getMaxLength() {
+    return propertySupport.getPropertyInt(PROP_MAX_LENGTH);
+  }
+
+  @Override
   public void lookupByText(String text) {
     if (m_lookupCall == null) {
       return;
@@ -169,7 +197,10 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
       if (!isEnabledIncludingParents() || !isVisibleIncludingParents()) {
         return;
       }
-      setValue(value);
+      Set<String> ensuredValue = value.stream()
+          .map(this::ensureMaxLength)
+          .collect(Collectors.toSet());
+      setValue(ensuredValue);
     }
 
     @Override
@@ -177,7 +208,11 @@ public abstract class AbstractTagField extends AbstractValueField<Set<String>> i
       if (!isEnabledIncludingParents() || !isVisibleIncludingParents()) {
         return;
       }
-      lookupByText(text);
+      lookupByText(ensureMaxLength(text));
+    }
+
+    protected String ensureMaxLength(String value) {
+      return StringUtility.substring(value, 0, getMaxLength());
     }
   }
 

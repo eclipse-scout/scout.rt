@@ -8,20 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  arrays,
-  BasicField,
-  fields,
-  InputFieldKeyStrokeContext,
-  objects,
-  scout,
-  Status,
-  StringFieldCtrlEnterKeyStroke,
-  StringFieldEnterKeyStroke,
-  StringFieldLayout,
-  strings,
-  texts
-} from '../../../index';
+import {BasicField, fields, InputFieldKeyStrokeContext, objects, scout, Status, StringFieldCtrlEnterKeyStroke, StringFieldEnterKeyStroke, StringFieldLayout, strings, texts} from '../../../index';
 
 export default class StringField extends BasicField {
   constructor() {
@@ -32,6 +19,7 @@ export default class StringField extends BasicField {
     this.inputMasked = false;
     this.inputObfuscated = false;
     this.maxLength = 4000;
+    this.maxLengthHandler = scout.create('MaxLengthHandler', {target: this});
     this.multilineText = false;
     this.selectionStart = 0;
     this.selectionEnd = 0;
@@ -95,9 +83,9 @@ export default class StringField extends BasicField {
     } else {
       $field = fields.makeTextField(this.$parent);
     }
-    $field.on('paste', this._onFieldPaste.bind(this));
 
     this.addField($field);
+    this.maxLengthHandler.install($field);
     this.addStatus();
   }
 
@@ -188,35 +176,6 @@ export default class StringField extends BasicField {
    */
   isClearable() {
     return super.isClearable() && !this.multilineText;
-  }
-
-  setMaxLength(maxLength) {
-    this.setProperty('maxLength', maxLength);
-  }
-
-  _renderMaxLength() {
-    // Check if "maxLength" attribute is supported by browser
-    if (this.$field[0].maxLength) {
-      this.$field.attr('maxlength', this.maxLength);
-    } else {
-      // Fallback for IE9
-      this.$field.on('keyup paste', e => {
-        setTimeout(truncate.bind(this), 0);
-      });
-    }
-
-    // Make sure current text does not exceed max length
-    truncate.call(this);
-    if (!this.rendering) {
-      this.parseAndSetValue(this._readDisplayText());
-    }
-
-    function truncate() {
-      let text = this.$field.val();
-      if (text.length > this.maxLength) {
-        this.$field.val(text.slice(0, this.maxLength));
-      }
-    }
   }
 
   setSelectionStart(selectionStart) {
@@ -443,6 +402,14 @@ export default class StringField extends BasicField {
     });
   }
 
+  setMaxLength(maxLength) {
+    this.setProperty('maxLength', maxLength);
+  }
+
+  _renderMaxLength() {
+    this.maxLengthHandler.render();
+  }
+
   _onIconClick(event) {
     this.acceptInput();
     this.$field.focus();
@@ -570,51 +537,6 @@ export default class StringField extends BasicField {
         $field.selectionEnd = 0;
       });
     }
-  }
-
-  /**
-   * Get clipboard data, different strategies for browsers.
-   * Must use a callback because this is required by Chrome's clipboard API.
-   */
-  _getClipboardData(event, doneHandler) {
-    let data = event.originalEvent.clipboardData || this.$container.window(true).clipboardData;
-    if (data) {
-      // Chrome, Firefox
-      if (data.items && data.items.length) {
-        let item = arrays.find(data.items, item => {
-          return item.type === 'text/plain';
-        });
-        if (item) {
-          item.getAsString(doneHandler);
-        }
-        return;
-      }
-
-      // IE, Safari
-      if (data.getData) {
-        doneHandler(data.getData('Text'));
-      }
-    }
-
-    // Can't access clipboard -> don't call done handler
-  }
-
-  _onFieldPaste(event) {
-    // must store text and selection because when the callback is executed, the clipboard content has already been applied to the input field
-    let text = this.$field.val();
-    let selection = this._getSelection();
-
-    this._getClipboardData(event, pastedText => {
-      if (!pastedText) {
-        return;
-      }
-
-      // Make sure the user is notified about pasted text which is cut off because of maxlength constraints
-      text = this._applyTextToSelection(text, pastedText, selection);
-      if (text.length > this.maxLength) {
-        this._showNotification('ui.PastedTextTooLong');
-      }
-    });
   }
 
   _showNotification(textKey) {

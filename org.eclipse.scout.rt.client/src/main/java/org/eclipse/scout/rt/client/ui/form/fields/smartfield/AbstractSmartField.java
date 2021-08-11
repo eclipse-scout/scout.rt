@@ -258,6 +258,19 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   /**
+   * Configures the initial value of {@link AbstractSmartField#getMaxLength()
+   * <p>
+   * Subclasses can override this method
+   * <p>
+   * Default is 500
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(330)
+  protected int getConfiguredMaxLength() {
+    return 500;
+  }
+
+  /**
    * called before any lookup is performed (key, text, browse)
    */
   @ConfigOperation
@@ -390,6 +403,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
       setLookupCall(call);
     }
     setWildcard(getConfiguredWildcard());
+    setMaxLength(getConfiguredMaxLength());
   }
 
   private void initLookupRowFetcher() {
@@ -442,7 +456,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
 
   @Override
   public TriState getInitActiveFilter() {
-    return (TriState)  propertySupport.getProperty(PROP_INIT_ACTIVE_FILTER);
+    return (TriState) propertySupport.getProperty(PROP_INIT_ACTIVE_FILTER);
   }
 
   @Override
@@ -561,6 +575,19 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   @Override
+  public void setMaxLength(int maxLength) {
+    boolean changed = propertySupport.setPropertyInt(PROP_MAX_LENGTH, Math.max(0, maxLength));
+    if (changed && isInitConfigDone()) {
+      setValue(getValue());
+    }
+  }
+
+  @Override
+  public int getMaxLength() {
+    return propertySupport.getPropertyInt(PROP_MAX_LENGTH);
+  }
+
+  @Override
   public Class<? extends ICodeType<?, VALUE>> getCodeTypeClass() {
     return m_codeTypeClass;
   }
@@ -591,7 +618,8 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   /**
-   * @param wildcard Wildcard character used in lookup calls
+   * @param wildcard
+   *          Wildcard character used in lookup calls
    */
   @Override
   public void setWildcard(String wildcard) {
@@ -675,7 +703,8 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   /**
-   * @param lookupRow Lookup row used to resolve the value
+   * @param lookupRow
+   *          Lookup row used to resolve the value
    * @return a property from the lookup row which is used as value (usually this is the key of the lookup row)
    */
   protected VALUE getValueFromLookupRow(ILookupRow<VALUE> lookupRow) {
@@ -838,6 +867,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   protected void lookupByTextInternal(String text, boolean synchronous) {
+    text = StringUtility.substring(text, 0, getMaxLength());
     doSearch(QueryParam.createByText(text), synchronous);
   }
 
