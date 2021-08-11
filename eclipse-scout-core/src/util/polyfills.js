@@ -13,6 +13,7 @@
 
 export function install(window) {
   _installPolyfillMath(window);
+  _installPolyfillSafeInteger(window);
 }
 
 export function _installPolyfillMath(window) {
@@ -25,6 +26,22 @@ export function _installPolyfillMath(window) {
         }
         return x > 0 ? 1 : -1;
       }
+    });
+  }
+}
+
+/**
+ * IE support for Number.MAX_SAFE_INTEGER and Number.MIN_SAFE_INTEGER
+ */
+export function _installPolyfillSafeInteger(window) {
+  if (!window.Number.MAX_SAFE_INTEGER) {
+    Object.defineProperty(window.Number, 'MAX_SAFE_INTEGER', {
+      value: 9007199254740991 // Math.pow(2, 53) - 1;
+    });
+  }
+  if (!window.Number.MIN_SAFE_INTEGER) {
+    Object.defineProperty(window.Number, 'MIN_SAFE_INTEGER', {
+      value: -9007199254740991 // −(Math.pow(2, 53) - 1);
     });
   }
 }
