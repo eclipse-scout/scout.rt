@@ -40,12 +40,6 @@
       border-radius: @tab-area-selection-marker-height / 2;
     }
 
-    &.focused {
-      & > .tab-item.selected {
-        color: @tab-item-focus-color;
-      }
-    }
-
     & > .tab-item > .title > .sub-label {
       display: none;
     }
@@ -148,6 +142,10 @@
 
   &:focus {
     outline: none;
+
+    &.keyboard-navigation {
+      color: @tab-item-focus-color;
+    }
   }
 
   & > .title {

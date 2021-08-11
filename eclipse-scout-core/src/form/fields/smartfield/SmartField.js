@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -441,6 +441,8 @@ export default class SmartField extends ValueField {
       if (objects.isFunction($nextElement[0].select)) {
         $nextElement[0].select();
       }
+      // This is normally done by FocusManager, but since propagation is stopped, we need to do it here as well
+      $nextElement.addClass('keyboard-navigation');
       this._tabPrevented = null;
     }
   }
