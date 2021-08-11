@@ -71,7 +71,6 @@ public class CodeLookupCallTest {
   public void testGetDataByTextFiltered() {
     runGetDataByTextFiltered(null);
     runGetDataByTextFiltered("*or*");
-    runGetDataByTextFiltered("*or");
     runGetDataByTextFiltered("ip");
     runGetDataByTextFiltered("foo");
     runGetDataByTextFiltered("ipi");
@@ -80,7 +79,6 @@ public class CodeLookupCallTest {
   }
 
   private void runGetDataByTextFiltered(String text) {
-
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
     oldLc.setText(text);
     List<ILookupRow<Integer>> oldRows = oldLc.getDataByText();
@@ -94,13 +92,13 @@ public class CodeLookupCallTest {
 
   @Test
   public void testGetDataByKey() {
-    runGetDataByKey(0, null);
-    runGetDataByKey(1, ROW10_KEY);
-    runGetDataByKey(1, ROW31_KEY);
-    runGetDataByKey(0, Integer.valueOf(0));
+    runGetDataByKey(null);
+    runGetDataByKey(ROW10_KEY);
+    runGetDataByKey(ROW31_KEY);
+    runGetDataByKey(Integer.valueOf(0));
   }
 
-  private void runGetDataByKey(int expectedLength, Integer key) {
+  private void runGetDataByKey(Integer key) {
 
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
     oldLc.setKey(key);
@@ -115,15 +113,14 @@ public class CodeLookupCallTest {
 
   @Test
   public void testGetDataByRec() {
-    runGetDataByRec(3, null);
-    runGetDataByRec(2, ROW10_KEY);
-    runGetDataByRec(0, ROW20_KEY);
-    runGetDataByRec(1, ROW30_KEY);
-    runGetDataByRec(0, ROW11_KEY);
-
+    runGetDataByRec(null);
+    runGetDataByRec(ROW10_KEY);
+    runGetDataByRec(ROW20_KEY);
+    runGetDataByRec(ROW30_KEY);
+    runGetDataByRec(ROW11_KEY);
   }
 
-  private void runGetDataByRec(int expectedLength, Integer parent) {
+  private void runGetDataByRec(Integer parent) {
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
     oldLc.setRec(parent);
     List<ILookupRow<Integer>> oldRows = oldLc.getDataByRec();
@@ -149,7 +146,6 @@ public class CodeLookupCallTest {
 
   @Test
   public void testGetFilteredData() {
-
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
     oldLc.setFilter((call, code, treeLevel) -> true);
     List<ILookupRow<Integer>> oldRows = oldLc.getDataByAll();
@@ -167,9 +163,6 @@ public class CodeLookupCallTest {
     }
     if (rows1 == null || rows2 == null) {
       return false;
-    }
-    else {
-
     }
     if (rows1.size() != rows2.size()) {
       return false;

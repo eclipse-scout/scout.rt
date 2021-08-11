@@ -42,6 +42,7 @@ export {default as fonts} from './util/fonts';
 export {default as icons} from './util/icons';
 export {default as inspector} from './util/inspector';
 export {default as locales} from './util/locales';
+export {default as MaxLengthHandler} from './util/MaxLengthHandler';
 export {default as logging} from './logging/logging';
 export {default as NullLogger} from './logging/NullLogger';
 export {default as mimeTypes} from './util/mimeTypes';

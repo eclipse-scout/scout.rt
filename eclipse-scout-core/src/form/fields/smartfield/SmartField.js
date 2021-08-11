@@ -63,6 +63,8 @@ export default class SmartField extends ValueField {
     // only when the result is up-to-date, we can use the selected lookup row
     this.initActiveFilter = null;
     this.disabledCopyOverlay = true;
+    this.maxLength = 500;
+    this.maxLengthHandler = scout.create('MaxLengthHandler', {target: this});
 
     this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
       'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental', 'searchRequired', 'columnDescriptors',
@@ -150,6 +152,7 @@ export default class SmartField extends ValueField {
         .on('input', this._onFieldInput.bind(this));
     }
     this.addField($field);
+    this.maxLengthHandler.install($field);
 
     if (!this.embedded) {
       this.addMandatoryIndicator();
@@ -157,6 +160,11 @@ export default class SmartField extends ValueField {
     this.addIcon();
     this.$icon.addClass('needsclick');
     this.addStatus();
+  }
+
+  _renderProperties() {
+    super._renderProperties();
+    this._renderMaxLength();
   }
 
   _renderGridData() {
@@ -586,6 +594,14 @@ export default class SmartField extends ValueField {
   _renderEnabled() {
     super._renderEnabled();
     this.$field.setTabbable(this.enabledComputed);
+  }
+
+  setMaxLength(maxLength) {
+    this.setProperty('maxLength', maxLength);
+  }
+
+  _renderMaxLength() {
+    this.maxLengthHandler.render();
   }
 
   setLookupCall(lookupCall) {

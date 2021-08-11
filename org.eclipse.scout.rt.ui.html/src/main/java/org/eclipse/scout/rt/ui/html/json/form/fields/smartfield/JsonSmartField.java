@@ -159,6 +159,12 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
         return columnDescriptorsToJson((ColumnDescriptor[]) value);
       }
     });
+    putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_MAX_LENGTH, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getMaxLength();
+      }
+    });
   }
 
   @Override
