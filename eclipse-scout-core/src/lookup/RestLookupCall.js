@@ -101,7 +101,7 @@ export default class RestLookupCall extends LookupCall {
       }
     }
 
-    return scout.create('LookupRow', clonedLookupRowDo);
+    return scout.create('LookupRow', clonedLookupRowDo, {ensureUniqueId: false});
   }
 
   _call() {
