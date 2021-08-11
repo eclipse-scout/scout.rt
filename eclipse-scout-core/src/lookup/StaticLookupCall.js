@@ -32,8 +32,6 @@ export default class StaticLookupCall extends LookupCall {
     this.active = true;
   }
 
-  static MAX_ROW_COUNT = 100;
-
   _init(model) {
     super._init(model);
     if (!this.data) {
@@ -64,7 +62,7 @@ export default class StaticLookupCall extends LookupCall {
   }
 
   _lookupRowsByAll() {
-    var datas = this.data.slice(0, StaticLookupCall.MAX_ROW_COUNT + 1);
+    var datas = this.data.slice(0, this.maxRowCount);
     return datas
       .map(this._dataToLookupRow, this)
       .filter(this._filterActiveLookupRow, this);

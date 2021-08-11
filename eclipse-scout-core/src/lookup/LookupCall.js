@@ -29,6 +29,7 @@ export default class LookupCall {
     this.keys = null; // used on QueryBy.KEYS
     this.parentKey = null; // used on QueryBy.REC
     this.active = null;
+    this.maxRowCount = 100; // this variable will not be used by the base class but a child class my use it to limit the returned row count
   }
 
   init(model) {
@@ -50,6 +51,10 @@ export default class LookupCall {
 
   setBatch(batch) {
     this.batch = batch;
+  }
+
+  setMaxRowCount(maxRowCount) {
+    this.maxRowCount = maxRowCount;
   }
 
   /**
