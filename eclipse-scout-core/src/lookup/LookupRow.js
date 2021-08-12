@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
+import objects from '../util/objects';
 
 export default class LookupRow {
 
@@ -69,6 +70,10 @@ export default class LookupRow {
 
   setFont(font) {
     this.font = font;
+  }
+
+  equals(other) {
+    return objects.propertiesEquals(this, other, Object.keys(this));
   }
 
   toString() {
