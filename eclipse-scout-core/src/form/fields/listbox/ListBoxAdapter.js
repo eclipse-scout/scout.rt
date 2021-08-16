@@ -16,4 +16,12 @@ export default class ListBoxAdapter extends ValueFieldAdapter {
     super();
   }
 
+  _onWidgetEvent(event) {
+    if (event.type === 'decorateTableRow') {
+      event.preventDefault();
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
+
 }

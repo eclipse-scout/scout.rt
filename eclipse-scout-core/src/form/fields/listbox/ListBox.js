@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ListBoxLayout, LookupBox, scout, Table, ValueField} from '../../../index';
+import {arrays, ListBoxLayout, LookupBox, scout, Table, ValueField, Event} from '../../../index';
 
 export default class ListBox extends LookupBox {
 
@@ -180,8 +180,29 @@ export default class ListBox extends LookupBox {
     if (lookupRow.cssClass) {
       row.cssClass = lookupRow.cssClass;
     }
-
+    this._triggerDecorateTableRow(lookupRow, row, cell);
     return row;
+  }
+
+  _triggerDecorateTableRow(lookupRow, tableRow, tableCell) {
+    let event = new Event({
+      lookupRow: lookupRow,
+      tableRow: tableRow,
+      tableCell: tableCell
+    });
+    this.trigger('decorateTableRow', event);
+    if (!event.defaultPrevented) {
+      this._decorateTableRow(lookupRow, tableRow, tableCell);
+    }
+  }
+
+  _decorateTableRow(lookupRow, tableRow, tableCell) {
+    if (lookupRow.active === false) {
+      if (!tableCell.font) {
+        tableCell.font = 'italic';
+      }
+      tableCell.text = tableCell.text + ' (' + this.session.text('InactiveState') + ')';
+    }
   }
 
   _createDefaultListBoxTable() {
