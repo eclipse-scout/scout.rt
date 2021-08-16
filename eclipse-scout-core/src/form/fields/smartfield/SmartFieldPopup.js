@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ export default class SmartFieldPopup extends Popup {
   constructor() {
     super();
     this.animateRemoval = SmartFieldPopup.hasPopupAnimation();
+    this.tileMode = false;
   }
 
   _init(options) {
@@ -34,7 +35,8 @@ export default class SmartFieldPopup extends Popup {
   _createProposalChooser() {
     let objectType = this.smartField.browseHierarchy ? 'TreeProposalChooser' : 'TableProposalChooser';
     return scout.create(objectType, {
-      parent: this
+      parent: this,
+      tileMode: this.tileMode
     });
   }
 
@@ -78,6 +80,11 @@ export default class SmartFieldPopup extends Popup {
 
   selectLookupRow() {
     this.proposalChooser.triggerLookupRowSelected();
+  }
+
+  setTileMode(tileMode) {
+    this.setProperty('tileMode', tileMode);
+    this.proposalChooser.setTileMode(tileMode);
   }
 
   /**

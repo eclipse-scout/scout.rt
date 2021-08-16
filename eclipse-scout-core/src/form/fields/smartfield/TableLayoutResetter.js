@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,8 +30,10 @@ export default class TableLayoutResetter {
       .css('display', 'inline-block')
       .css('width', 'auto')
       .css('height', 'auto');
-    this._table.$data
-      .css('display', 'inline-block');
+    if (this._table.$data) {
+      this._table.$data
+        .css('display', 'inline-block');
+    }
 
     this._modifyFiller(this._table.$fillBefore);
     this._modifyFiller(this._table.$fillAfter);
@@ -43,8 +45,10 @@ export default class TableLayoutResetter {
       .css('display', 'block')
       .css('width', '100%')
       .css('height', '100%');
-    this._table.$data
-      .css('display', 'block');
+    if (this._table.$data) {
+      this._table.$data
+        .css('display', 'block');
+    }
 
     this._restoreFiller(this._table.$fillBefore);
     this._restoreFiller(this._table.$fillAfter);
@@ -75,15 +79,17 @@ export default class TableLayoutResetter {
    */
   _modifyTableData(modifyFunc) {
     let that = this;
-    this._table.$rows().each(function() {
-      let $row = $(this);
-      modifyFunc($row, 'width');
-      that._table.$cellsForRow($row).each(function() {
-        let $cell = $(this);
-        modifyFunc($cell, 'min-width');
-        modifyFunc($cell, 'max-width');
+    if (this._table.$data) {
+      this._table.$rows().each(function() {
+        let $row = $(this);
+        modifyFunc($row, 'width');
+        that._table.$cellsForRow($row).each(function() {
+          let $cell = $(this);
+          modifyFunc($cell, 'min-width');
+          modifyFunc($cell, 'max-width');
+        });
       });
-    });
+    }
   }
 
   _modifyFiller($filler) {

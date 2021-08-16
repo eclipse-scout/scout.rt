@@ -22,9 +22,6 @@ import {
   graphics,
   icons,
   inspector,
-  KeyStrokeContext,
-  LoadingSupport,
-  LogicalGrid,
   objects,
   scout,
   scrollbars,
@@ -2284,6 +2281,7 @@ export default class Widget {
    */
   reveal(options) {
     if (!this.rendered) {
+      this.session.layoutValidator.schedulePostValidateFunction(this.reveal.bind(this, options));
       return;
     }
     let $scrollParent = this.$container.scrollParent();

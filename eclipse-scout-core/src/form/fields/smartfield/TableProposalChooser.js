@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Column, lookupField, objects, ProposalChooser, scout} from '../../../index';
+import {arrays, Column, lookupField, objects, ProposalChooser, scout, styles, TileGridLayoutConfig} from '../../../index';
 
 export default class TableProposalChooser extends ProposalChooser {
 
   constructor() {
     super();
+    this.table = null;
+    this.smartField = null;
+  }
+
+  _init(model) {
+    super._init(model);
+    this.smartField = this.parent.smartField;
   }
 
   _createModel() {
@@ -30,10 +37,10 @@ export default class TableProposalChooser extends ProposalChooser {
       columns.push(this._createColumn());
     }
 
-    let table = this._createTable(columns, headerVisible);
-    table.on('rowClick', this._onRowClick.bind(this));
+    this.table = this._createTable(columns, headerVisible);
+    this.table.on('rowClick', this._onRowClick.bind(this));
 
-    return table;
+    return this.table;
   }
 
   _createColumn() {
@@ -64,7 +71,7 @@ export default class TableProposalChooser extends ProposalChooser {
   }
 
   _createTable(columns, headerVisible) {
-    return scout.create('Table', {
+    let table = scout.create('Table', {
       parent: this,
       headerVisible: headerVisible,
       autoResizeColumns: true,
@@ -72,8 +79,69 @@ export default class TableProposalChooser extends ProposalChooser {
       multilineText: true,
       scrollToSelection: true,
       columns: columns,
-      headerMenusEnabled: false
+      headerMenusEnabled: false,
+      cssClass: 'table-proposal-chooser',
+      tileMode: this.tileMode,
+      createTileForRow: row => {
+        let model = {
+          parent: this,
+          cssClass: 'table-proposal-chooser-tile',
+          selectable: false,
+          gridDataHints: {
+            weightX: -1
+          }
+        };
+        if (!arrays.empty(columns)) {
+          let cell = columns[0].cell(row),
+            icon = columns[0]._icon(cell.iconId, false) || '',
+            text = columns[0]._text(cell) || '',
+            contentParts = [icon, text];
+
+          for (let i = 1; i < columns.length; i++) {
+            cell = columns[i].cell(row);
+            contentParts.push(columns[i]._text(cell) || '');
+          }
+
+          let content = contentParts.join('');
+          if (!content) {
+            content = '&nbsp;';
+          }
+
+          model.content = content;
+        }
+        return scout.create('HtmlTile', model);
+      },
+      _adaptTile: tile => {
+      }
     });
+    this._updateTableTileGridLayoutConfig(table);
+
+    return table;
+  }
+
+  _updateTableTileGridLayoutConfig(table) {
+    if (!table || !table.tileMode || !table.tableTileGridMediator) {
+      return;
+    }
+
+    let height = styles.getSize([this.smartField.cssClass, 'table-proposal-chooser', 'tile-grid-layout-config'], 'height', 'height', -1),
+      width = styles.getSize([this.smartField.cssClass, 'table-proposal-chooser', 'tile-grid-layout-config'], 'width', 'width', -1),
+      horizontalGap = styles.getSize([this.smartField.cssClass, 'table-proposal-chooser', 'tile-grid-layout-config'], 'margin-left', 'marginLeft', -1),
+      verticalGap = styles.getSize([this.smartField.cssClass, 'table-proposal-chooser', 'tile-grid-layout-config'], 'margin-top', 'marginTop', -1),
+      tileGridLayoutConfig = new TileGridLayoutConfig({
+        rowHeight: height,
+        columnWidth: width,
+        hgap: horizontalGap,
+        vgap: verticalGap,
+        minWidth: 0
+      });
+    table.tableTileGridMediator.setTileGridLayoutConfig(tileGridLayoutConfig);
+  }
+
+  setTileMode(tileMode) {
+    super.setTileMode(tileMode);
+    this.table.setTileMode(tileMode);
+    this._updateTableTileGridLayoutConfig(this.table);
   }
 
   _onRowClick(event) {

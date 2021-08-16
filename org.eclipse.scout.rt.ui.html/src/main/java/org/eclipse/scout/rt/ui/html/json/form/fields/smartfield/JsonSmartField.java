@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -157,6 +157,12 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
       @Override
       public Object prepareValueForToJson(Object value) {
         return columnDescriptorsToJson((ColumnDescriptor[]) value);
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField<VALUE>>(ISmartField.PROP_TILE_MODE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isTileMode();
       }
     });
   }

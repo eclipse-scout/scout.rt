@@ -63,6 +63,7 @@ export default class SmartField extends ValueField {
     // only when the result is up-to-date, we can use the selected lookup row
     this.initActiveFilter = null;
     this.disabledCopyOverlay = true;
+    this.tileMode = false;
 
     this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
       'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental', 'searchRequired', 'columnDescriptors',
@@ -900,7 +901,8 @@ export default class SmartField extends ValueField {
       closeOnAnchorMouseDown: false,
       field: this,
       lookupResult: result,
-      status: status
+      status: status,
+      tileMode: this.tileMode
     });
 
     this.popup.open();
@@ -1320,6 +1322,13 @@ export default class SmartField extends ValueField {
 
   setSearchRequired(searchRequired) {
     this.setProperty('searchRequired', searchRequired);
+  }
+
+  setTileMode(tileMode) {
+    this.setProperty('tileMode', tileMode);
+    if (this.popup) {
+      this.popup.setTileMode(tileMode);
+    }
   }
 
   /**

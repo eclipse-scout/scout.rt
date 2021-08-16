@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ export default class SmartFieldTouchPopup extends TouchPopup {
 
   constructor() {
     super();
+    this.tileMode = false;
   }
 
   _init(options) {
@@ -42,7 +43,8 @@ export default class SmartFieldTouchPopup extends TouchPopup {
     return scout.create(objectType, {
       parent: this,
       touch: true,
-      smartField: this._field
+      smartField: this._field,
+      tileMode: this.tileMode
     });
   }
 
@@ -81,6 +83,11 @@ export default class SmartFieldTouchPopup extends TouchPopup {
 
   setStatus(status) {
     this._widget.setStatus(status);
+  }
+
+  setTileMode(tileMode) {
+    this.setProperty('tileMode', tileMode);
+    this.proposalChooser.setTileMode(tileMode);
   }
 
   clearLookupRows() {

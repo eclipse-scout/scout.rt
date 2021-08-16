@@ -563,6 +563,13 @@ export default class TableTileGridMediator extends Widget {
   _syncSelectionFromTableToTile() {
     if (this.tileAccordion) {
       this.tileAccordion.selectTiles(this.getTilesForRows(this.table.selectedRows));
+      if (!this.table.scrollToSelection) {
+        return;
+      }
+      let selectedTile = this.tileAccordion.getSelectedTile();
+      if (selectedTile) {
+        selectedTile.reveal();
+      }
     }
   }
 

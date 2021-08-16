@@ -1,0 +1,54 @@
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+.table-proposal-chooser {
+  & > .tile-table-header {
+    .hidden();
+  }
+
+  & > .accordion.tile-accordion {
+    padding-top: 10px;
+    padding-left: 10px;
+  }
+
+  & > .tile-grid-layout-config {
+    width: 115px;
+    height: 75px;
+    margin-left: 10px; /* horizontal gap */
+    margin-top: 10px; /* vertical gap */
+  }
+}
+
+.table-proposal-chooser-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  overflow: hidden;
+  min-width: 110px;
+
+  & > .font-icon {
+    flex: 1;
+    min-height: 0;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+  }
+
+  & > .text {
+    #scout.user-select(text);
+    #scout.overflow-ellipsis-nowrap();
+    max-width: 100%;
+    color: @label-color;
+  }
+}

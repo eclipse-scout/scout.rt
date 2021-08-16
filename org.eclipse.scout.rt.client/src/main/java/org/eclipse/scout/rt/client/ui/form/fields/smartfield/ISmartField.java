@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,6 +40,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
   String PROP_STATUS = "status";
   String PROP_STATUS_VISIBLE = "statusVisible";
   String PROP_INIT_ACTIVE_FILTER = "initActiveFilter";
+  String PROP_TILE_MODE = "tileMode";
 
   /**
    * Hint to mark the {@link IFuture} used to load the field's initial lookup rows. Typically, this future must not be
@@ -143,10 +144,10 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
   void setLoadParentNodes(boolean loadParentNodes);
 
   /**
-   * Filter selection of hierarchy browse tree. The level reported here is different than the one used in {@link AbstractTree}
-   * such as this level is one smaller. This is because a tree smart field assumes its tree to have multiple roots, but the ITree
-   * model is built as single-root tree with invisible root node. level=-1 is the invisible (anonymous) root level=0 are
-   * the multiple roots of the smart tree ...
+   * Filter selection of hierarchy browse tree. The level reported here is different than the one used in
+   * {@link AbstractTree} such as this level is one smaller. This is because a tree smart field assumes its tree to have
+   * multiple roots, but the ITree model is built as single-root tree with invisible root node. level=-1 is the
+   * invisible (anonymous) root level=0 are the multiple roots of the smart tree ...
    */
   boolean acceptBrowseHierarchySelection(VALUE value, int level, boolean leaf);
 
@@ -334,7 +335,8 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
   /**
    * Sets the value by using the key of the given lookup row. The property <code>lookupRow</code> will be set too.
    *
-   * @param lookupRow Lookup row to resolve the value to be set
+   * @param lookupRow
+   *          Lookup row to resolve the value to be set
    */
   void setValueByLookupRow(ILookupRow<VALUE> lookupRow);
 
@@ -354,4 +356,7 @@ public interface ISmartField<VALUE> extends IValueField<VALUE> {
    */
   void setSearchRequired(boolean searchRequired);
 
+  boolean isTileMode();
+
+  void setTileMode(boolean tileMode);
 }

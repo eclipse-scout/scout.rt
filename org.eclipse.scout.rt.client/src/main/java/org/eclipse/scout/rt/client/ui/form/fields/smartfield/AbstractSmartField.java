@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -258,6 +258,16 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   /**
+   * This property has only an effect when the smart field has a table proposal chooser. When the returned value is
+   * {@code true}, the table proposal chooser is displayed in tile mode.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(330)
+  protected boolean getConfiguredTileMode() {
+    return false;
+  }
+
+  /**
    * called before any lookup is performed (key, text, browse)
    */
   @ConfigOperation
@@ -377,6 +387,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
     setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
     setColumnDescriptors(getConfiguredColumnDescriptors());
     setDisplayStyle(getConfiguredDisplayStyle());
+    setTileMode(getConfiguredTileMode());
 
     initLookupRowFetcher();
     // code type
@@ -1187,6 +1198,16 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   @Override
   public void setDisplayStyle(String displayStlye) {
     propertySupport.setPropertyString(PROP_DISPLAY_STYLE, displayStlye);
+  }
+
+  @Override
+  public boolean isTileMode() {
+    return propertySupport.getPropertyBool(PROP_TILE_MODE);
+  }
+
+  @Override
+  public void setTileMode(boolean tileMode) {
+    propertySupport.setPropertyBool(PROP_TILE_MODE, tileMode);
   }
 
   // ==== Lookup row fetching strategies ==== //
