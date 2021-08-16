@@ -31,6 +31,11 @@ export default class RestLookupCall extends LookupCall {
     this.batch = true;
   }
 
+  setMaxRowCount(maxRowCount) {
+    super.setMaxRowCount(maxRowCount);
+    this.addRestriction('maxRowCount', this.maxRowCount);
+  }
+
   /**
    * Use this function with caution! Added restrictions will be shared among cloned instances
    * and the current instance if this function was also called before cloning!
