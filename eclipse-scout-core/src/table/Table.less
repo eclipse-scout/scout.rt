@@ -244,8 +244,10 @@
     color: @text-selection-color;
   }
 
-  &.empty {
-    /* explicitly disable ellipsis, because IE would display it for very narrow columns even if content is '&nbsp;' */
+  &.empty,
+  &.icon-only {
+    // Disable ellipsis if only icon is shown.
+    // Also disable it on empty cells, because IE would display it for very narrow columns even if content is '&nbsp;'
     text-overflow: clip;
   }
 
@@ -366,10 +368,6 @@
     text-align: center;
     padding-right: @table-cell-padding-left;
   }
-}
-
-.table-icon-cell {
-  text-overflow: clip;
 }
 
 .table-cell-icon {

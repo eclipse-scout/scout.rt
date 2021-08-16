@@ -330,6 +330,9 @@ export default class Column {
     if (cell.errorStatus) {
       cssClass += ' has-error';
     }
+    if (cell.iconId && !cell.text) {
+      cssClass += ' icon-only';
+    }
     cssClass += ' halign-' + Table.parseHorizontalAlignment(cell.horizontalAlignment);
     let visibleColumns = this.table.visibleColumns();
     let overAllColumnPosition = visibleColumns.indexOf(this);
