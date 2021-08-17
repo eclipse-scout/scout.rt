@@ -17,6 +17,7 @@ import $ from 'jquery';
  * The lookup call must _always_ return a result, otherwise the SmartField cannot work properly.
  */
 export default class LookupCall {
+
   constructor() {
     this.session = null;
     this.hierarchical = false;
@@ -29,7 +30,7 @@ export default class LookupCall {
     this.keys = null; // used on QueryBy.KEYS
     this.parentKey = null; // used on QueryBy.REC
     this.active = null;
-    this.maxRowCount = 100; // this variable will not be used by the base class but a child class my use it to limit the returned row count
+    this.maxRowCount = 100; // A positive number, _not_ null or undefined! This value is not directly used by this class but a child class my use it to limit the returned row count.
   }
 
   init(model) {
@@ -53,6 +54,9 @@ export default class LookupCall {
     this.batch = batch;
   }
 
+  /**
+   * @param {number} maxRowCount - a positive number, _not_ null or undefined!
+   */
   setMaxRowCount(maxRowCount) {
     this.maxRowCount = maxRowCount;
   }
