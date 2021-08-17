@@ -25,6 +25,8 @@ import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.res.loader.BinaryRefResourceInfo;
+import org.eclipse.scout.rt.ui.html.res.loader.BinaryRefResourceLoader;
 import org.eclipse.scout.rt.ui.html.res.loader.DynamicResourceInfo;
 import org.eclipse.scout.rt.ui.html.res.loader.DynamicResourceLoader;
 import org.slf4j.Logger;
@@ -53,6 +55,16 @@ public final class BinaryResourceUrlUtility {
    * <li>2. Icon name, in the example <b>some_res</b>
    */
   public static final Pattern BINARY_RESOURCE_REGEX_PATTERN = Pattern.compile("([\"'])binaryResource:([^\"']+)\\1", Pattern.CASE_INSENSITIVE);
+
+  /**
+   * Regular expression pattern to find binaryRefs, e.g. to find &lt;img src="binref:some_ref"&gt;.
+   * <p>
+   * Pattern does a search for binref:some_ref (in quotation marks) and has three groups:
+   * <li>1. Type of quotation mark, either " or '.
+   * <li>2. BinaryRef name, in the example <b>some_ref</b>
+   * <li>3. Type of quotation mark, same as 1.
+   */
+  public static final Pattern BINARY_REF_REGEX_PATTERN = Pattern.compile("([\"'])binref:([^\"']+)\\1", Pattern.CASE_INSENSITIVE);
 
   /**
    * @return a relative URL for a configured logical icon-name or a font-based icon. For instance:
@@ -117,6 +129,20 @@ public final class BinaryResourceUrlUtility {
   }
 
   /**
+   * @return a relative URL for a binaryRef resource, see {@link BinaryRefResourceLoader}.
+   */
+  public static String createBinaryRefResourceUrl(String binaryRef) {
+    if (!checkBinaryRefResourceUrlArguments(binaryRef)) {
+      return null;
+    }
+    return new BinaryRefResourceInfo(binaryRef).toPath();
+  }
+
+  private static boolean checkBinaryRefResourceUrlArguments(Object arg) {
+    return arg != null;
+  }
+
+  /**
    * @param jsonAdapter
    * @param path
    *          decoded path (non URL encoded)
@@ -169,6 +195,23 @@ public final class BinaryResourceUrlUtility {
   }
 
   /**
+   * Helper method for {@link #BINARY_RESOURCE_REGEX_PATTERN} to replace all occurrences with the proper URL.
+   */
+  public static String replaceBinaryRefHandlerWithUrl(String str) {
+    if (str == null) {
+      return null;
+    }
+    Matcher m = BINARY_REF_REGEX_PATTERN.matcher(str);
+    @SuppressWarnings("squid:S1149")
+    StringBuffer ret = new StringBuffer();
+    while (m.find()) {
+      m.appendReplacement(ret, m.group(1) + createBinaryRefResourceUrl(m.group(2)) + m.group(1));
+    }
+    m.appendTail(ret);
+    return ret.toString();
+  }
+
+  /**
    * Helper method to replace all common placeholders for images in the given string.
    * <ol>
    * <li>Icon IDs in the format: <code>iconId:star</code></li>
@@ -177,6 +220,7 @@ public final class BinaryResourceUrlUtility {
    */
   public static String replaceImageUrls(IJsonAdapter<?> jsonAdapter, String str) {
     str = replaceIconIdHandlerWithUrl(str);
+    str = replaceBinaryRefHandlerWithUrl(str);
     return replaceBinaryResourceHandlerWithUrl(jsonAdapter, str);
   }
 

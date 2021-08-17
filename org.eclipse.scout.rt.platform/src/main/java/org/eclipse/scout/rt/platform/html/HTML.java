@@ -32,7 +32,9 @@ import org.eclipse.scout.rt.platform.html.internal.HtmlTableDataBuilder;
 import org.eclipse.scout.rt.platform.html.internal.HtmlTableHeadBuilder;
 import org.eclipse.scout.rt.platform.html.internal.HtmlTableRowBuilder;
 import org.eclipse.scout.rt.platform.html.internal.StyleElementBuilder;
+import org.eclipse.scout.rt.platform.resource.BinaryRefs;
 import org.eclipse.scout.rt.platform.resource.BinaryResourceUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Convenience for building a HTML document or parts of it with encoded text.
@@ -263,6 +265,22 @@ public final class HTML {
    */
   public static IHtmlElement imgByBinaryResource(CharSequence binaryResource) {
     return new HtmlImageBuilder(BinaryResourceUtility.createUrl(binaryResource.toString()));
+  }
+
+  /**
+   * Creates a <code>&lt;img src="binref:..."&gt</code> element.
+   * <p>
+   * <i>Example:</i><br>
+   * <code>String encodedHtml = HTML.imgByBinaryRef("/crm/customer/image/1234").toHtml();</code>
+   *
+   * @param binaryRef
+   *          base path plus id
+   */
+  public static IHtmlElement imgByBinaryRef(CharSequence binaryRef) {
+    if (binaryRef != null && StringUtility.startsWith(binaryRef.toString(), BinaryRefs.URI_SCHEME + ":")) {
+      return new HtmlImageBuilder(binaryRef);
+    }
+    return new HtmlImageBuilder(BinaryRefs.URI_SCHEME + ":" + binaryRef);
   }
 
   /**
