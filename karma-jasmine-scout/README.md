@@ -12,12 +12,11 @@
   <a href="https://www.eclipse.org/scout/" target="_blank" rel="noopener noreferrer"><img alt="Website" src="https://img.shields.io/website?url=https%3A%2F%2Fwww.eclipse.org%2Fscout%2F"></a>
 </p>
 
+# Eclipse Scout - Karma Jasmine Scout
 
-<p align="center"><h1>Eclipse Scout karma-jasmine-scout support</h1></p>
-
-[Karma](https://karma-runner.github.io) plugin for [Scout](https://www.eclipse.org/scout/).
+This is the [Karma](https://karma-runner.github.io) plugin for [Eclipse Scout](https://www.npmjs.com/package/@eclipse-scout/core).
 
 
 ## License
 
-[EPL-1.0](https://www.eclipse.org/legal/epl-v10.html)
+[Eclipse Public License (EPL) v1.0](https://www.eclipse.org/legal/epl-v10.html)

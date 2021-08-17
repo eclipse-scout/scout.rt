@@ -13,32 +13,30 @@
 </p>
 
 
-<p align="center"><h1>Eclipse Scout</h1></p>
+# Eclipse Scout - Core
 
-[https://www.eclipse.org/scout/](https://www.eclipse.org/scout/)
+[Eclipse Scout](https://www.eclipse.org/scout/) is a mature and open framework for modern business applications on the web. It substantially boosts developer productivity and is simple to learn.
 
-## Getting started
+This module contains the web runtime components running in the browser.
 
-Visit the [Eclipse Scout documentation](https://eclipsescout.github.io/) for beginner guides, technical documentation, release notes and migration guides.
+## Getting Started
 
-Check out the demo applications [JS Widgets](https://scout.bsi-software.com/jswidgets/), [Java Widgets](https://scout.bsi-software.com/widgets/) or [Contacts](https://scout.bsi-software.com/contacts/).
+If you are completely new and wondering what Eclipse Scout is, please visit our [website](https://www.eclipse.org/scout/).
 
-## Stay in Touch
+To get started with Scout, follow our [Get Started Guide](https://eclipsescout.github.io/stable/getstarted.html).
 
-For questions visit our [Forum](https://www.eclipse.org/forums/index.php?t=thread&frm_id=174) or use [Stack Overflow](https://stackoverflow.com/tags/eclipse-scout)
+## Documentation
 
-## Issues
+To learn more about Scout and how to use it, you should have a look at our [documentation platform](https://eclipsescout.github.io/). There you will find tutorials, best practices and architecture details.
 
-For Issues visit the [Scout Bugzilla](https://bugs.eclipse.org/bugs/buglist.cgi?bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&bug_status=RESOLVED&bug_status=VERIFIED&columnlist=bug_id%2Cbug_severity%2Cpriority%2Ctarget_milestone%2Cbug_status%2Cresolution%2Ccomponent%2Cassigned_to%2Cshort_desc&list_id=19084396&product=Scout&query_format=advanced).
+## Contributing
 
-## Contribution
+Please see our [contribution guide](https://github.com/eclipse-scout/scout.rt#contributing) on how to contribute.
 
-* [Contribution Guide](https://wiki.eclipse.org/Scout/Contribution)
-* [Source on Eclipse.org](https://git.eclipse.org/c/scout/org.eclipse.scout.rt.git?h=releases%2F11.0)
-* [Source on GitHub](https://github.com/eclipse/scout.rt/tree/releases/11.0) (Mirror)
+## Get in Touch
 
-Thank you to all the people who already contributed to Scout!
+To get in touch with the Eclipse Scout community, please open a thread in the [Eclipse Scout Forum](https://www.eclipse.org/forums/index.php?t=thread&frm_id=174) or on [Stack Overflow](https://stackoverflow.com/tags/eclipse-scout).
 
 ## License
 
-[EPL-1.0](https://www.eclipse.org/legal/epl-v10.html)
+[Eclipse Public License (EPL) v1.0](https://wiki.eclipse.org/Eclipse_Public_License)

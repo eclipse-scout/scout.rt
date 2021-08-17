@@ -1001,9 +1001,9 @@
             <id>dual-report</id>
             <reports/><!-- Empty tag necessary with maven 3.6.1 because of bug https://issues.apache.org/jira/browse/MNG-6636 -->
             <configuration>
-              <displayFileDetailUrl>https://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/tree/%FILE%</displayFileDetailUrl>
-              <displayFileRevDetailUrl>https://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/tree/%FILE%?id=%REV%</displayFileRevDetailUrl>
-              <displayChangeSetDetailUrl>https://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/commit/?id=%REV%</displayChangeSetDetailUrl>
+              <displayFileDetailUrl>https://github.com/eclipse-scout/scout.rt/blob/releases/11.0/%FILE%</displayFileDetailUrl>
+              <displayFileRevDetailUrl>https://github.com/eclipse-scout/scout.rt/blob/%REV%/%FILE%</displayFileRevDetailUrl>
+              <displayChangeSetDetailUrl>https://github.com/eclipse-scout/scout.rt/commit/%REV%</displayChangeSetDetailUrl>
             </configuration>
           </reportSet>
         </reportSets>
@@ -1048,12 +1048,12 @@
   </mailingLists>
 
   <scm>
-    <url>http://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/</url>
+    <url>https://github.com/eclipse-scout/scout.rt.git/</url>
   </scm>
 
   <issueManagement>
-    <system>Bugzilla</system>
-    <url>https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced;product=Scout;classification=Technology</url>
+    <system>GitHub</system>
+    <url>https://github.com/eclipse-scout/scout.rt/issues</url>
   </issueManagement>
 
   <repositories>
