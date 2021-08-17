@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,6 +28,7 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
   String PROP_TOOLTIP_HTML_ENABLED = "tooltipHtmlEnabled";
   String PROP_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
   String PROP_HTML_ENABLED = "htmlEnabled";
+  String PROP_MENU_ENABLED = "menuEnabled";
   String PROP_BACKGROUND_COLOR = "backgroundColor";
   String PROP_FOREGROUND_COLOR = "foregroundColor";
   String PROP_FONT = "font";
@@ -175,6 +176,18 @@ public interface IHeaderCell extends IStyleable, IPropertyObserver {
    * @see #setText(String)
    */
   boolean setHtmlEnabled(boolean htmlEnabled);
+
+  /**
+   * @return If menu is enabled for the header cell.
+   */
+  boolean isMenuEnabled();
+
+  /**
+   * @param menuEnabled
+   *          If menu is enabled for the header cell.
+   * @return @return {@code true} if the value has been changed, {@code false} otherwise.
+   */
+  boolean setMenuEnabled(boolean menuEnabled);
 
   /**
    * @return The background color of the header
