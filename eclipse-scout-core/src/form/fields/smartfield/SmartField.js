@@ -41,7 +41,7 @@ export default class SmartField extends ValueField {
     this._tabPrevented = null;
     this.lookupRow = null;
     this.browseHierarchy = false;
-    this.browseMaxRowCount = SmartField.DEFAULT_BROWSE_MAX_COUNT;
+    this.browseMaxRowCount = SmartField.DEFAULT_BROWSE_MAX_COUNT; // a positive number, _not_ null or undefined!
     this.browseAutoExpandAll = true;
     this.browseLoadIncremental = false;
     this.searchRequired = false;
@@ -1289,6 +1289,9 @@ export default class SmartField extends ValueField {
     this._lookupByTextOrAll(browse, searchText, true);
   }
 
+  /**
+   * @param {number} browseMaxRowCount - a positive number, _not_ null or undefined!
+   */
   setBrowseMaxRowCount(browseMaxRowCount) {
     this.setProperty('browseMaxRowCount', browseMaxRowCount);
     this._syncBrowseMaxRowCountWithLookupCall();
