@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.ui.html.UiThemeHelper;
 public class ResourceLoaders {
 
   protected static final Pattern ICON_PATTERN = Pattern.compile("^/icon/(.*)");
+  protected static final Pattern BINARY_REF_PATTERN = Pattern.compile("^/binref/(.*)");
   protected static final Pattern DYNAMIC_RESOURCES_PATTERN = Pattern.compile("^/" + DynamicResourceInfo.PATH_PREFIX + "/.*");
   protected static final Pattern DEFAULT_VALUES_PATTERN = Pattern.compile("^/defaultValues$");
 
@@ -32,6 +33,9 @@ public class ResourceLoaders {
 
     if (ICON_PATTERN.matcher(resourcePath).matches()) {
       return new IconLoader();
+    }
+    if (BINARY_REF_PATTERN.matcher(resourcePath).matches()) {
+      return new BinaryRefResourceLoader(req);
     }
     if (DYNAMIC_RESOURCES_PATTERN.matcher(resourcePath).matches()) {
       return new DynamicResourceLoader(req);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -100,6 +100,13 @@ public class BinaryResourceUrlUtilityTest {
   public void testGetFilenameWithFingerprint_WithoutContent_NonAsciiFilename() {
     BinaryResource binaryResource = new BinaryResource("fäé.txt", null);
     assertEquals("fäé.txt", BinaryResourceUrlUtility.getFilenameWithFingerprint(binaryResource));
+  }
+
+  @Test
+  public void testReplaceBinaryRefHandlerWithUrl() {
+    assertEquals("\"binref/test/some/123\"", BinaryResourceUrlUtility.replaceBinaryRefHandlerWithUrl("\"binref:/test/some/123\""));
+    assertEquals("\"binref/test/some/123\"", BinaryResourceUrlUtility.replaceBinaryRefHandlerWithUrl("\"binref:test/some/123\""));
+    assertEquals("\"binref/test/f%C3%A4%C3%A9/123\"", BinaryResourceUrlUtility.replaceBinaryRefHandlerWithUrl("\"binref:/test/fäé/123\""));
   }
 
   protected IJsonAdapter<Long> createJsonAdapterMock(String adapterId, String uiSessionId) {
