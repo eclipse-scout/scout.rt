@@ -66,8 +66,7 @@ For Issues checkout our [Bugzilla](https://bugs.eclipse.org/bugs/buglist.cgi?bug
 
 * [BSI Software](https://www.bsi-software.com/): The contributing organization
 * [Contribution Guide](https://wiki.eclipse.org/Scout/Contribution)
-* [Source on Eclipse.org](https://git.eclipse.org/c/scout/org.eclipse.scout.rt.git?h=releases%2F10.0)
-* [Source on GitHub](https://github.com/eclipse/scout.rt/tree/releases/10.0) (Mirror)
+* [Source](https://github.com/eclipse-scout/scout.rt)
 
 Thank you to all the people who already contributed to Scout!
 

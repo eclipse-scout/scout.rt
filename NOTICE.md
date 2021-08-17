@@ -26,9 +26,9 @@ SPDX-License-Identifier: EPL-1.0
 
 The project maintains the following source code repositories:
 
-* https://git.eclipse.org/r/plugins/gitiles/scout/org.eclipse.scout.rt
-* https://git.eclipse.org/r/plugins/gitiles/scout/org.eclipse.scout.sdk
-* https://git.eclipse.org/r/plugins/gitiles/scout/maven-master
+* https://github.com/eclipse-scout/scout.rt.git
+* https://github.com/eclipse-scout/scout.sdk.git
+* https://github.com/eclipse-scout/scout.maven-master.git
 * https://git.eclipse.org/r/plugins/gitiles/scout/oomph
 * https://git.eclipse.org/r/plugins/gitiles/scout/scout.rt.incubator
 * https://git.eclipse.org/r/plugins/gitiles/scout/org.eclipse.scout-aggregator
@@ -203,7 +203,7 @@ Batik animation library (1.7)
 
 Batik animation library (1.10)
 
-* License: Apache-2.0 
+* License: Apache-2.0
 * Project: https://xmlgraphics.apache.org/batik/
 * Source: http://svn.apache.org/repos/asf/xmlgraphics/batik/trunk/
 
@@ -213,7 +213,7 @@ Batik AWT utility library (1.7)
 
 Batik AWT utility library (1.10)
 
-* License: Apache-2.0 
+* License: Apache-2.0
 * Project: https://xmlgraphics.apache.org/batik/
 * Source: http://svn.apache.org/repos/asf/xmlgraphics/batik/trunk/
 
@@ -223,7 +223,7 @@ Batik bridge library (1.7)
 
 Batik bridge library (1.10)
 
-* License: Apache-2.0 
+* License: Apache-2.0
 * Project: https://xmlgraphics.apache.org/batik/
 * Source: http://svn.apache.org/repos/asf/xmlgraphics/batik/trunk/
 
@@ -255,7 +255,7 @@ Batik external code library (1.7)
 
 Batik external code library (1.10)
 
-* License: Apache-2.0 
+* License: Apache-2.0
 * Project: https://xmlgraphics.apache.org/batik/
 * Source: http://svn.apache.org/repos/asf/xmlgraphics/batik/trunk/
 
@@ -265,7 +265,7 @@ Batik GUI utility library (1.7)
 
 Batik GUI utility library (1.10)
 
-* License: Apache-2.0 
+* License: Apache-2.0
 * Project: https://xmlgraphics.apache.org/batik/
 * Source: http://svn.apache.org/repos/asf/xmlgraphics/batik/trunk/
 
@@ -275,7 +275,7 @@ Batik GVT library (1.7)
 
 Batik GVT library (1.10)
 
-* License: Apache-2.0 
+* License: Apache-2.0
 * Project: https://xmlgraphics.apache.org/batik/
 * Source: http://svn.apache.org/repos/asf/xmlgraphics/batik/trunk/
 
@@ -289,7 +289,7 @@ Batik parser library (1.7)
 
 Batik parser library (1.10)
 
-* License: Apache-2.0 
+* License: Apache-2.0
 * Project: https://xmlgraphics.apache.org/batik/
 * Source: http://svn.apache.org/repos/asf/xmlgraphics/batik/trunk/
 
@@ -299,7 +299,7 @@ Batik script library (1.7)
 
 Batik script library (1.10)
 
-* License: Apache-2.0 
+* License: Apache-2.0
 * Project: https://xmlgraphics.apache.org/batik/
 * Source: http://svn.apache.org/repos/asf/xmlgraphics/batik/trunk/
 
@@ -324,7 +324,7 @@ Batik Swing components library (1.7)
 
 Batik Swing components library (1.10)
 
-* License: Apache-2.0 
+* License: Apache-2.0
 * Project: https://xmlgraphics.apache.org/batik/
 * Source: http://svn.apache.org/repos/asf/xmlgraphics/batik/trunk/
 
@@ -346,7 +346,7 @@ Batik XML utility library (1.7)
 
 Batik XML utility library (1.10)
 
-* License: Apache-2.0 
+* License: Apache-2.0
 * Project: https://xmlgraphics.apache.org/batik/
 * Source: http://svn.apache.org/repos/asf/xmlgraphics/batik/trunk/
 
@@ -484,7 +484,7 @@ HK2 javax.inject (2.5.0)
 
 HK2 javax.inject (2.5.0)
 
-* License: Apache-2.0 
+* License: Apache-2.0
 * Project: https://javaee.github.io/hk2/
 * Source: https://github.com/javaee/hk2/tree/2.5.0-b32
 
@@ -594,7 +594,7 @@ jasmine-maven-plugin (1.3.1.4)
 
 Java Servlet API (3.1)
 
-* License: CDDL, Apache 2.0 
+* License: CDDL, Apache 2.0
 
 javassist (3.20.0)
 
@@ -622,7 +622,7 @@ javax.jws-api (1.1)
 
 javax.mail (1.5.5)
 
-* License: CDDL-1.0 OR GPL-2.0 
+* License: CDDL-1.0 OR GPL-2.0
 * Project: https://java.net/projects/javamail/pages/Home
 * Source: https://java.net/projects/javamail/sources/mercurial/show
 
@@ -896,7 +896,7 @@ maven-model (3.3.3)
 
 mockito (1.9.5)
 
-* License: Apache License, 2.0, New BSD license, MIT license 
+* License: Apache License, 2.0, New BSD license, MIT license
 * Project: http://mockito.org/
 * Source: https://github.com/mockito/mockito.git
 
@@ -1055,7 +1055,7 @@ wagon-provider-api (2.10)
 
 wsdl4j-1.5.1.jar (for Apache Axis (1.4)
 
-* License: Common Public License 1.0 
+* License: Common Public License 1.0
 
 wsdl4j-1.5.1.jar (for Apache Axis (1.4)
 
@@ -1097,11 +1097,11 @@ XML Graphics Commons (2.2)
 
 xml-apis.jar (1.3.04)
 
-* License: Apache License, 2.0, Public Domain, W3C 
+* License: Apache License, 2.0, Public Domain, W3C
 
 xml-apis.jar (1.3.04)
 
-* License: Apache License, 2.0, Public Domain, W3C 
+* License: Apache License, 2.0, Public Domain, W3C
 
 yuicompressor (2.4.8)
 
