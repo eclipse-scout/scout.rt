@@ -64,12 +64,21 @@ export default class RestLookupCall extends LookupCall {
   cloneForAll() {
     let clone = super.cloneForAll();
     clone.addRestriction('active', true);
+    clone.addRestriction('maxRowCount', this.maxRowCount);
     return clone;
   }
 
   cloneForText(text) {
     let clone = super.cloneForText(text);
     clone.addRestriction('active', true);
+    clone.addRestriction('maxRowCount', this.maxRowCount);
+    return clone;
+  }
+
+  cloneForRec(parentKey) {
+    let clone = super.cloneForRec(parentKey);
+    clone.addRestriction('active', true);
+    clone.addRestriction('maxRowCount', this.maxRowCount);
     return clone;
   }
 
