@@ -6,7 +6,7 @@
   "homepage": "https://www.eclipse.org/scout",
   "repository": {
     "type": "git",
-    "url": "ssh://git.eclipse.org:29418/scout/org.eclipse.scout.rt"
+    "url": "https://github.com/eclipse-scout/scout.rt.git"
   },
   "license": "EPL-1.0",
   "engines": {

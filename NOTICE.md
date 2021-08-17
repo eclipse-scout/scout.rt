@@ -26,13 +26,13 @@ SPDX-License-Identifier: EPL-1.0
 
 The project maintains the following source code repositories:
 
-* https://git.eclipse.org/r/plugins/gitiles/scout/org.eclipse.scout.rt
-* https://git.eclipse.org/r/plugins/gitiles/scout/org.eclipse.scout.sdk
-* https://git.eclipse.org/r/plugins/gitiles/scout/maven-master
+* https://github.com/eclipse-scout/scout.rt
+* https://github.com/eclipse-scout/scout.sdk
+* https://github.com/eclipse-scout/scout.maven-master
+* https://github.com/eclipse-scout/scout.ci
 * https://git.eclipse.org/r/plugins/gitiles/scout/oomph
 * https://git.eclipse.org/r/plugins/gitiles/scout/scout.rt.incubator
 * https://git.eclipse.org/r/plugins/gitiles/scout/org.eclipse.scout-aggregator
-* https://github.com/eclipse/org.eclipse.scout.docs
 
 ## Third-party Content
 
