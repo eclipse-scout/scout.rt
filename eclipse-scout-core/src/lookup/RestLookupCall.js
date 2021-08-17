@@ -31,11 +31,6 @@ export default class RestLookupCall extends LookupCall {
     this.batch = true;
   }
 
-  setMaxRowCount(maxRowCount) {
-    super.setMaxRowCount(maxRowCount);
-    this.addRestriction('maxRowCount', this.maxRowCount);
-  }
-
   /**
    * Use this function with caution! Added restrictions will be shared among cloned instances
    * and the current instance if this function was also called before cloning!
@@ -69,12 +64,21 @@ export default class RestLookupCall extends LookupCall {
   cloneForAll() {
     let clone = super.cloneForAll();
     clone.addRestriction('active', true);
+    clone.addRestriction('maxRowCount', this.maxRowCount);
     return clone;
   }
 
   cloneForText(text) {
     let clone = super.cloneForText(text);
     clone.addRestriction('active', true);
+    clone.addRestriction('maxRowCount', this.maxRowCount);
+    return clone;
+  }
+
+  cloneForRec(parentKey) {
+    let clone = super.cloneForRec(parentKey);
+    clone.addRestriction('active', true);
+    clone.addRestriction('maxRowCount', this.maxRowCount);
     return clone;
   }
 
