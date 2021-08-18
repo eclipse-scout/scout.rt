@@ -12,9 +12,9 @@
   <a href="https://www.eclipse.org/scout/" target="_blank" rel="noopener noreferrer"><img alt="Website" src="https://img.shields.io/website?url=https%3A%2F%2Fwww.eclipse.org%2Fscout%2F"></a>
 </p>
 
-# Eclipse Scout - CLI
+# Eclipse Scout - Chart
 
-Command Line Interface for the [Eclipse Scout](https://www.eclipse.org/scout/) framework.
+Extends the [Eclipse Scout](https://www.eclipse.org/scout/) framework with charts based on [Chart.js](https://www.chartjs.org/).
 
 ## License
 
