@@ -88,13 +88,14 @@ public class ClientTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
+    final Statement s5 = new CleanupDesktopStatement(next);
     final Statement s4;
     if (hasNoTimeout(testMethod)) {
-      s4 = new RunInModelJobStatement(next);
+      s4 = new RunInModelJobStatement(s5);
     }
     else {
       // Three different model jobs are scheduled for all @Before methods, the @Test-annotated method and all @After methods.
-      s4 = next;
+      s4 = s5;
     }
     final Statement s3 = new AddBlockingConditionTimeoutStatement(s4);
     final Statement s2 = new ClientRunContextStatement(s3, ReflectionUtility.getAnnotation(RunWithClientSession.class, testMethod, testClass));
