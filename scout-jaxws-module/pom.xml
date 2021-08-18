@@ -105,11 +105,6 @@
     <url>https://github.com/eclipse-scout/scout.rt.git</url>
   </scm>
 
-  <issueManagement>
-    <system>Bugzilla</system>
-    <url>https://bugs.eclipse.org/bugs/buglist.cgi?classification=Technology;component=Scout SDK;product=Scout;query_format=advanced</url>
-  </issueManagement>
-
   <repositories>
     <repository>
       <snapshots>

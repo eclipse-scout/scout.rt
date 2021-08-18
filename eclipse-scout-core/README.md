@@ -32,9 +32,7 @@ To learn more about Scout and how to use it, you should have a look at our [docu
 
 ## Contributing
 
-We welcome any kind of contributions (bug report, documentation improvement, code contribution...). Just open a GitHub issue and / or create a Pull Request.
-
-Many thanks to all the people who have already contributed to Scout!
+Please see our [contribution guide](https://github.com/eclipse-scout/scout.rt#contributing) on how to contribute.
 
 ## Get in Touch
 

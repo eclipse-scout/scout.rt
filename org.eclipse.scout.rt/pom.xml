@@ -1056,8 +1056,8 @@
   </scm>
 
   <issueManagement>
-    <system>Bugzilla</system>
-    <url>https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced;product=Scout;classification=Technology</url>
+    <system>GitHub</system>
+    <url>https://github.com/eclipse-scout/scout.rt/issues</url>
   </issueManagement>
 
   <repositories>
