@@ -23,8 +23,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
@@ -47,18 +49,24 @@ public class DeferredOperationQueue<E> {
   private final int m_batchSize;
   private final long m_maxDelayMillis;
   private final Consumer<List<E>> m_batchOperation;
+  private final Supplier<RunContext> m_runContextSupplier;
   private final BlockingQueue<E> m_queue;
   private final AtomicBoolean m_flushJobScheduled;
   private final ReadWriteLock m_lock;
   private volatile IFuture<?> m_flushJobFuture;
 
   public DeferredOperationQueue(String transactionMemberId, int batchSize, long maxDelayMillis, Consumer<List<E>> batchOperation) {
+    this(transactionMemberId, batchSize, maxDelayMillis, batchOperation, null);
+  }
+
+  public DeferredOperationQueue(String transactionMemberId, int batchSize, long maxDelayMillis, Consumer<List<E>> batchOperation, Supplier<RunContext> runContextSupplier) {
     m_transactionMemberId = assertNotNull(transactionMemberId, "transactionMemberId is required");
     assertTrue(batchSize > 0, "batchSize must be greater than 0 [given value:{}]", batchSize);
     assertTrue(maxDelayMillis >= 0, "maxDelayMillis must be positive [given value:{}]", batchSize);
     m_batchSize = batchSize;
     m_maxDelayMillis = maxDelayMillis;
     m_batchOperation = assertNotNull(batchOperation, "batchOperation is required");
+    m_runContextSupplier = runContextSupplier != null ? runContextSupplier : RunContexts::empty;
     m_queue = new LinkedBlockingQueue<>();
     m_flushJobScheduled = new AtomicBoolean();
     m_lock = new ReentrantReadWriteLock();
@@ -105,10 +113,14 @@ public class DeferredOperationQueue<E> {
     return m_batchOperation;
   }
 
+  protected Supplier<RunContext> getRunContextSupplier() {
+    return m_runContextSupplier;
+  }
+
   protected void scheduleFlushJob() {
     m_flushJobFuture = Jobs.schedule(
         () -> flushDeferred(false),
-        Jobs.newInput().withRunContext(RunContexts.empty()));
+        Jobs.newInput().withRunContext(getRunContextSupplier().get()));
   }
 
   /**
