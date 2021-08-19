@@ -20,6 +20,7 @@ import {
   files as fileUtil,
   FocusManager,
   fonts,
+  icons,
   LayoutValidator,
   Locale,
   MessageBox,
@@ -991,10 +992,8 @@ export default class Session {
       header: this.optText('ui.NetworkError', 'Network error'),
       body: strings.join(' ', jqXHR.status || '', errorThrown),
       yesButtonText: this.optText('ui.Reload', 'Reload'),
-      yesButtonAction: () => {
-        scout.reloadPage();
-      },
-      noButtonText: this.ready ? this.optText('ui.Ignore', 'Ignore') : null
+      yesButtonAction: () => scout.reloadPage(),
+      iconId: icons.SLIPPERY
     };
     this.showFatalMessage(boxOptions, jqXHR.status + '.net');
   }
@@ -1033,15 +1032,17 @@ export default class Session {
       boxOptions.header = jsonError.message;
       boxOptions.body = null;
       boxOptions.yesButtonText = 'Retry';
+      boxOptions.iconId = icons.SLIPPERY;
     } else if (jsonError.code === Session.JsonResponseError.SESSION_TIMEOUT) {
       boxOptions.header = this.optText('ui.SessionTimeout', boxOptions.header);
       boxOptions.body = this.optText('ui.SessionExpiredMsg', boxOptions.body);
+      boxOptions.iconId = icons.SLIPPERY;
     } else if (jsonError.code === Session.JsonResponseError.UI_PROCESSING) {
       boxOptions.header = this.optText('ui.UnexpectedProblem', boxOptions.header);
       boxOptions.body = strings.join('\n\n',
         this.optText('ui.InternalProcessingErrorMsg', boxOptions.body, ' (' + this.optText('ui.ErrorCodeX', 'Code 20', '20') + ')'),
         this.optText('ui.UiInconsistentMsg', ''));
-      boxOptions.noButtonText = this.optText('ui.Ignore', 'Ignore');
+      boxOptions.iconId = icons.SLIPPERY;
     } else if (jsonError.code === Session.JsonResponseError.UNSAFE_UPLOAD) {
       boxOptions.header = this.optText('ui.UnsafeUpload', boxOptions.header);
       boxOptions.body = this.optText('ui.UnsafeUploadMsg', boxOptions.body);

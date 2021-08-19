@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.AbstractInterruptionError;
+import org.eclipse.scout.rt.shared.AbstractIcons;
 
 /**
  * Popup to visualize an error.
@@ -68,11 +69,19 @@ public class ErrorPopup {
         .withYesButtonText(m_yesButtonText)
         .withNoButtonText(m_noButtonText)
         .withSeverity(m_status.getSeverity())
+        .withIconId(computeIconId())
         .show();
 
     if (m_reloadOnYesClick && result == IMessageBox.YES_OPTION) {
       ClientSessionProvider.currentSession().getDesktop().reloadGui();
     }
+  }
+
+  protected String computeIconId() {
+    if (m_status != null && m_status.getSeverity() == IStatus.ERROR) {
+      return AbstractIcons.Slippery;
+    }
+    return null;
   }
 
   /**
@@ -112,7 +121,7 @@ public class ErrorPopup {
 
   /**
    * Returns {@link Throwable} parsed out of given error
-   * 
+   *
    * @see #ensureErrorParsed(Throwable)
    */
   protected Throwable getParsedError() {
@@ -249,7 +258,6 @@ public class ErrorPopup {
         TEXTS.get("InternalProcessingErrorMsg", (errorCode == null ? "" : " (" + TEXTS.get("ErrorCodeX", errorCode) + ")")),
         TEXTS.get("UiInconsistentMsg"));
     m_yesButtonText = TEXTS.get("Reload");
-    m_noButtonText = TEXTS.get("Ignore");
     m_reloadOnYesClick = true;
   }
 }

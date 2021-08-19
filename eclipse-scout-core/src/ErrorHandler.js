@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxError, App, arrays, NullLogger, scout, strings} from './index';
+import {AjaxError, App, arrays, icons, NullLogger, scout, strings} from './index';
 import $ from 'jquery';
 import sourcemappedStacktrace from 'sourcemapped-stacktrace';
 
@@ -314,8 +314,8 @@ export default class ErrorHandler {
         session.optText('ui.UiInconsistentMsg', '')),
       yesButtonText: session.optText('ui.Reload', 'Reload'),
       yesButtonAction: scout.reloadPage,
-      noButtonText: session.optText('ui.Ignore', 'Ignore'),
-      hiddenText: logMessage
+      hiddenText: logMessage,
+      iconId: icons.SLIPPERY
     };
 
     session.showFatalMessage(options, errorCode);

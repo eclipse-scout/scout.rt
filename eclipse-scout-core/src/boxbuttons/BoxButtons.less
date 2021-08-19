@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,63 +10,14 @@
  */
 .box-buttons {
 
-  &.empty {
-    border-bottom: 1px solid @boxbutton-border-color;
-  }
-
   & > .box-button {
-    position: relative;
-    padding: 12px;
-    background-color: @boxbutton-background-color;
-    border: 1px solid @boxbutton-border-color;
-    cursor: pointer;
-    text-align: center;
+    padding: 6px 16px;
     #scout.overflow-ellipsis-nowrap();
-    display: inline-block;
-    vertical-align: bottom;
-  }
-
-  & > .box-button.disabled {
-    cursor: default;
-    color: @disabled-color;
-  }
-
-  & > .box-button:not(.disabled):active {
-    background-color: @boxbutton-active-background-color;
-  }
-
-  & > .box-button:first-child {
-    border-bottom-left-radius: @border-radius;
+    margin-right: 16px;
+    min-width: 104px;
   }
 
   & > .box-button:last-child {
-    border-bottom-right-radius: @border-radius;
-  }
-
-  & > .box-button:first-child ~ .box-button {
-    border-left-width: 0;
-  }
-
-  & > .box-button:focus {
-    outline: none;
-  }
-
-  & > .box-button:focus::before {
-    #scout.focus-border();
-    #scout.overlay(2px, 2px, -4px, -4px);
-    z-index: 1;
-  }
-
-  & > .box-button:first-child:focus::before {
-    border-bottom-left-radius: @border-radius;
-  }
-
-  & > .box-button:last-child:focus::before {
-    border-bottom-right-radius: @border-radius;
-  }
-
-  .severity-error & > .box-button:focus::before {
-    border-color: @error-border-color;
-    #scout.glow(@error-glow-color);
+    margin-right: 0;
   }
 }

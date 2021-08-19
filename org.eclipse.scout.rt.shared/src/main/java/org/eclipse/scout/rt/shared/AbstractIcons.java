@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -84,6 +84,7 @@ public abstract class AbstractIcons implements Serializable {
   public static final String PencilBold = "font:\uE04B";
   public static final String PencilSolid = "font:\uE04F";
   public static final String ExclamationMarkBold = "font:\uE060";
+  public static final String Slippery = "font:\uE044";
 
   /* awesome font icons */
   public static final String RotateLeftBold = "font:\uF0E2";

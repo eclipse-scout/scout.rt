@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,7 @@ import {
   KeyStrokeContext,
   MessageBoxLayout,
   objects,
+  scout,
   Status,
   strings,
   Widget
@@ -34,23 +35,31 @@ export default class MessageBox extends Widget {
   constructor() {
     super();
 
-    this.severity = null;
+    this.severity = Status.Severity.INFO;
     this.body = null;
-    this.cancelButtonText = null;
+    this.iconId = null;
     this.header = null;
     this.hiddenText = null;
     this.html = null;
-    this.noButtonText = null;
     this.yesButtonText = null;
+    this.noButtonText = null;
+    this.cancelButtonText = null;
+    this.displayParent = null;
+
+    this.buttons = [];
+    this.boxButtons = null;
+    this.yesButton = null;
+    this.noButton = null;
+    this.cancelButton = null;
+    this.abortButton = null; // button to be executed when abort() is called, e.g. when ESCAPE is pressed. points to the last (most right) button in the list (one of yes, no or cancel)
+
     this.$content = null;
     this.$header = null;
     this.$body = null;
     this.$buttons = null;
-    this.$yesButton = null;
-    this.$noButton = null;
-    this.$cancelButton = null;
-    this._$abortButton = null;
-    this.displayParent = null;
+    this._icon = null;
+
+    this._addWidgetProperties(['buttons', 'boxButtons', 'yesButton', 'noButton', 'cancelButton', 'abortButton']);
   }
 
   static Buttons = {
@@ -62,6 +71,12 @@ export default class MessageBox extends Widget {
   _init(model) {
     super._init(model);
     this._setDisplayParent(this.displayParent);
+    this._setIconId(this.iconId);
+
+    this.boxButtons = scout.create('BoxButtons', {parent: this});
+    this.yesButton = this._createMessageBoxButton(this.yesButtonText, MessageBox.Buttons.YES);
+    this.noButton = this._createMessageBoxButton(this.noButtonText, MessageBox.Buttons.NO);
+    this.cancelButton = this._createMessageBoxButton(this.cancelButtonText, MessageBox.Buttons.CANCEL);
   }
 
   /**
@@ -83,10 +98,24 @@ export default class MessageBox extends Widget {
       new ClickActiveElementKeyStroke(this, [
         keys.SPACE, keys.ENTER
       ]),
-      new AbortKeyStroke(this, (() => {
-        return this._$abortButton;
-      }))
+      new AbortKeyStroke(this, () => {
+        if (this.abortButton) {
+          return this.abortButton.$container;
+        }
+        return null;
+      })
     ]);
+  }
+
+  _createMessageBoxButton(text, option) {
+    if (!text) {
+      return null;
+    }
+    let button = this.boxButtons.addButton({text: text});
+    button.one('action', event => this._onButtonClick(event, option));
+    this.buttons.push(button);
+    this.abortButton = button;
+    return button;
   }
 
   _render() {
@@ -101,60 +130,31 @@ export default class MessageBox extends Widget {
     this.$header = this.$content.appendDiv('messagebox-label messagebox-header');
     this.$body = this.$content.appendDiv('messagebox-label messagebox-body');
     this.$html = this.$content.appendDiv('messagebox-label messagebox-html prevent-initial-focus');
-    this.$buttons = this.$container.appendDiv('messagebox-buttons')
-      .on('copy', this._onCopy.bind(this));
 
-    let boxButtons = new BoxButtons(this.$buttons, this._onButtonClick.bind(this));
-    this._$abortButton = null; // button to be executed when abort() is called, e.g. when ESCAPE is pressed
-    if (this.yesButtonText) {
-      this.$yesButton = boxButtons.addButton({
-        text: this.yesButtonText,
-        option: MessageBox.Buttons.YES
-      });
-      this._$abortButton = this.$yesButton;
-    }
-    if (this.noButtonText) {
-      this.$noButton = boxButtons.addButton({
-        text: this.noButtonText,
-        option: MessageBox.Buttons.NO
-      });
-      this._$abortButton = this.$noButton;
-    }
-    if (this.cancelButtonText) {
-      this.$cancelButton = boxButtons.addButton({
-        text: this.cancelButtonText,
-        option: MessageBox.Buttons.CANCEL
-      });
-      this._$abortButton = this.$cancelButton;
-    }
+    this.boxButtons.render();
+    this.$buttons = this.boxButtons.$container;
+    this.$buttons.addClass('messagebox-buttons');
+    this.$buttons.on('copy', this._onCopy.bind(this));
 
     this._installScrollbars({
       axis: 'y'
     });
 
     // Render properties
-    this._renderIconId();
     this._renderSeverity();
     this._renderHeader();
+    this._renderIconId();
     this._renderBody();
     this._renderHtml();
     this._renderHiddenText();
-
-    // Prevent resizing when message-box is dragged off the viewport
-    this.$container.addClass('calc-helper');
-    let naturalWidth = this.$container.width();
-    this.$container.removeClass('calc-helper');
-    this.$container.css('min-width', Math.max(naturalWidth, boxButtons.buttonCount() * 100));
-    boxButtons.updateButtonWidths(this.$container.width());
 
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new MessageBoxLayout(this));
     this.htmlComp.validateLayout();
 
     this.$container.addClassForAnimation('animate-open');
-    this.$container.select();
 
-    // Render modality glasspanes
+    // Render modality glass-panes
     this._glassPaneRenderer = new GlassPaneRenderer(this);
     this._glassPaneRenderer.renderGlassPanes();
   }
@@ -183,19 +183,23 @@ export default class MessageBox extends Widget {
   }
 
   _renderIconId() {
-    // TODO [7.0] bsh: implement
+    let hasIcon = !!this._icon;
+    this.$container.toggleClass('has-icon', hasIcon);
+    this.$container.toggleClass('no-icon', !hasIcon);
+    if (hasIcon) {
+      this._icon.render(this.$header);
+      this._icon.$container.addClass('messagebox-icon');
+    }
   }
 
   _renderSeverity() {
-    this.$container.removeClass('severity-error');
-    if (this.severity === Status.Severity.ERROR) {
-      this.$container.addClass('severity-error');
-    }
+    this.$container.removeClass(Status.SEVERITY_CSS_CLASSES);
+    this.$container.addClass(Status.cssClassForSeverity(this.severity));
   }
 
   _renderHeader() {
     this.$header.html(strings.nl2br(this.header));
-    this.$header.setVisible(this.header);
+    this.$header.setVisible(this.header || this.iconId);
   }
 
   _renderBody() {
@@ -294,6 +298,30 @@ export default class MessageBox extends Widget {
     }
   }
 
+  setIconId(iconId) {
+    this.setProperty('iconId', iconId);
+  }
+
+  _setIconId(iconId) {
+    this._setProperty('iconId', iconId);
+    if (iconId) {
+      if (this._icon) {
+        this._icon.setIconDesc(iconId);
+      } else {
+        this._icon = scout.create('Icon', {
+          parent: this,
+          iconDesc: iconId,
+          prepend: true
+        });
+        this._icon.one('destroy', () => {
+          this._icon = null;
+        });
+      }
+    } else if (this._icon) {
+      this._icon.destroy();
+    }
+  }
+
   /**
    * Renders the message box and links it with the display parent.
    */
@@ -316,8 +344,8 @@ export default class MessageBox extends Widget {
    * Aborts the message box by using the default abort button. Used by the ESC key stroke.
    */
   abort() {
-    if (this._$abortButton && this.session.focusManager.requestFocus(this._$abortButton)) {
-      this._$abortButton.click();
+    if (this.abortButton && this.abortButton.$container && this.session.focusManager.requestFocus(this.abortButton.$container)) {
+      this.abortButton.doAction();
     }
   }
 

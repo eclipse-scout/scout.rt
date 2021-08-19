@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,20 +16,94 @@
   max-width: @messagebox-max-width;
   #scout.drop-shadow-large();
   background-color: @messagebox-background-color;
-  border-top: @dialog-border-top-size solid @active-color;
-  border-radius: @border-radius;
-  margin: 10px; /* minimum padding to desktop */
-  margin-bottom: 15px;
+  border-radius: @border-radius-medium;
+  margin: 10px /* minimum padding to desktop */ 10px 15px;
 
-  &.severity-error {
-    border-top-color: @error-border-color;
+  .severity-button(@color) {
+    & > .box-buttons > .box-button {
+      border-color: @color;
+      font-weight: @font-weight-bold;
+      color: @color;
+
+      &:focus {
+        box-shadow: none; /* remove default behavior of buttons. Here the keyboard-navigation class is used instead */
+      }
+
+      &.keyboard-navigation {
+        box-shadow: 0 0 0 @focus-box-shadow-size fade(@color, 50%);
+      }
+
+      &.disabled {
+        cursor: default;
+        color: @disabled-color;
+        border-color: @disabled-color;
+      }
+
+      &.selected {
+        color: @button-selected-color;
+
+        &:hover {
+          background-color: darken(@color, 5%);
+        }
+
+        background-color: @color;
+
+        &.disabled {
+          cursor: default;
+          color: @disabled-color;
+          border-color: @disabled-color;
+          background-color: @palette-white;
+        }
+      }
+    }
   }
 
-  /* Helper class used during width calculation - required on very narrow screens (e.g. Word AddIn) */
+  &.info {
+    & > .messagebox-content > .messagebox-header {
+      color: @info-color;
 
-  &.calc-helper {
-    top: 0;
-    left: 0;
+      & > .font-icon.messagebox-icon {
+        .notification-font-icon-style(@info-color, @font-size-smaller);
+      }
+    }
+
+    .severity-button(@info-color);
+  }
+
+  &.error {
+    & > .messagebox-content > .messagebox-header {
+      color: @error-color;
+
+      & > .font-icon.messagebox-icon {
+        .notification-font-icon-style(@error-color, @font-size-smaller);
+      }
+    }
+
+    .severity-button(@error-color);
+  }
+
+  &.warning {
+    & > .messagebox-content > .messagebox-header {
+      color: @warning-color;
+
+      & > .font-icon.messagebox-icon {
+        .notification-font-icon-style(@warning-color, @font-size-smaller);
+      }
+    }
+
+    .severity-button(@warning-color);
+  }
+
+  &.ok {
+    & > .messagebox-content > .messagebox-header {
+      color: @ok-color;
+
+      & > .font-icon.messagebox-icon {
+        .notification-font-icon-style(@ok-color, @font-size-smaller);
+      }
+    }
+
+    .severity-button(@ok-color);
   }
 
   &.animate-open {
@@ -40,36 +114,13 @@
   &.animate-modality-highlight {
     #scout.animation-shake();
   }
-
-  /* remove border and rounded corners in full screen mode */
-
-  &.full-width,
-  &.full-height {
-    border-radius: 0;
-
-    & > .box-buttons > .box-button {
-      border-radius: 0;
-    }
-  }
-
-  &.full-width {
-    border-right: 0;
-    border-left: 0;
-  }
-
-  &.full-height {
-    & > .box-buttons > .box-button {
-      border-bottom: 0;
-    }
-  }
 }
 
 .messagebox-content {
   min-height: 30px;
-  border-left: 1px solid @boxbutton-border-color;
-  border-right: 1px solid @boxbutton-border-color;
   background-color: @messagebox-background-color;
-  padding: (26px - @messagebox-label-padding) / 2 26px 26px 26px;
+  padding: @messagebox-label-padding 26px 21px 26px;
+  border-radius: @border-radius-medium;
 
   /* add a bit of extra space to the scrollbar on the right */
 
@@ -78,9 +129,30 @@
   }
 }
 
+.messagebox-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  font-size: @font-size-smaller;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+
 .messagebox-label {
-  padding-top: @messagebox-label-padding;
   word-wrap: break-word;
+  text-align: center;
+
+  &.messagebox-html {
+    & > ul {
+      display: flex;
+      text-align: left;
+      flex-direction: column;
+      flex-wrap: wrap;
+      align-content: center;
+    }
+  }
 }
 
 .copyable {
@@ -88,12 +160,41 @@
 }
 
 .messagebox-header {
-  font-weight: bold;
+  font-size: @font-size-large;
+  font-weight: @font-weight-bold;
+  padding-bottom: 20px;
+}
+
+.messagebox-body {
+  color: @messagebox-body-color;
+}
+
+.messagebox-buttons {
+  display: flex;
+  justify-content: center;
+  padding: 0 26px 25px 26px;
 }
 
 @media (max-width: @messagebox-max-width) {
   .messagebox {
+    /* reduce message box width on small screens */
+    max-width: 330px;
     /* no need to have a margin on small screens */
     margin: 0;
+
+    & > .box-buttons {
+      & > .box-button {
+        min-width: 70px; /* less min width for buttons on small screens */
+        margin-right: 4px;
+      }
+
+      & > .messagebox-buttons {
+        padding: 0 10px 20px 10px;
+      }
+    }
+
+    & > .messagebox-content {
+      padding: 10px; /* loose less space on small screens */
+    }
   }
 }

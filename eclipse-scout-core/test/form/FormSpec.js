@@ -14,12 +14,6 @@ import {Dimension, fields, Form, NullWidget, Rectangle, scout, Status, webstorag
 describe('Form', () => {
   let session, helper, outlineHelper;
 
-  function closeMessageBox() {
-    if (session && session.$entryPoint) {
-      session.$entryPoint.find('.messagebox .box-button').click();
-    }
-  }
-
   beforeEach(() => {
     setFixtures(sandbox());
     jasmine.Ajax.install();
@@ -215,7 +209,7 @@ describe('Form', () => {
         .catch(fail)
         .always(done);
       jasmine.clock().tick(1000);
-      closeMessageBox();
+      helper.closeMessageBoxes();
       jasmine.clock().tick(1000);
       jasmine.clock().uninstall();
     });

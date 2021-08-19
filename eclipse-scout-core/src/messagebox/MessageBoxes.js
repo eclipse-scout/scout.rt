@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,7 @@ export default class MessageBoxes {
     this.bodyText = null;
     this.severity = Status.Severity.INFO;
     this.headerText = null;
+    this.iconId = null;
     this.closeOnClick = true;
     this.html = false;
   }
@@ -48,6 +49,11 @@ export default class MessageBoxes {
   withBody(bodyText, html) {
     this.bodyText = bodyText;
     this.html = scout.nvl(html, false);
+    return this;
+  }
+
+  withIconId(iconId) {
+    this.iconId = iconId;
     return this;
   }
 
@@ -78,6 +84,9 @@ export default class MessageBoxes {
       body: this.bodyText,
       severity: this.severity
     };
+    if (strings.hasText(this.iconId)) {
+      options.iconId = this.iconId;
+    }
     if (strings.hasText(this.yesText)) {
       options.yesButtonText = this.yesText;
     }

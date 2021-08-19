@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,20 +28,33 @@ export default class FocusAdjacentElementKeyStroke extends KeyStroke {
 
     switch (event.which) { // NOSONAR
       case keys.RIGHT:
-        if (activeElement === $focusableElements.last()[0]) {
-          this.session.focusManager.requestFocus($focusableElements.first());
-        } else {
-          this.session.focusManager.requestFocus($focusableElements[$focusableElements.index(activeElement) + 1]);
-        }
-
+        this._handleNext(activeElement, $focusableElements);
         break;
       case keys.LEFT:
-        if (activeElement === $focusableElements.first()[0]) {
-          this.session.focusManager.requestFocus($focusableElements.last());
-        } else {
-          this.session.focusManager.requestFocus($focusableElements[$focusableElements.index(activeElement) - 1]);
-        }
+        this._handlePrevious(activeElement, $focusableElements);
         break;
     }
+  }
+
+  _handleNext(activeElement, $focusableElements) {
+    let $newFocusElement;
+    if (activeElement === $focusableElements.last()[0]) {
+      $newFocusElement = $focusableElements.first();
+    } else {
+      $newFocusElement = $($focusableElements[$focusableElements.index(activeElement) + 1]);
+    }
+    this.session.focusManager.requestFocus($newFocusElement);
+    $newFocusElement.addClass('keyboard-navigation');
+  }
+
+  _handlePrevious(activeElement, $focusableElements) {
+    let $newFocusElement;
+    if (activeElement === $focusableElements.first()[0]) {
+      $newFocusElement = $focusableElements.last();
+    } else {
+      $newFocusElement = $($focusableElements[$focusableElements.index(activeElement) - 1]);
+    }
+    this.session.focusManager.requestFocus($newFocusElement);
+    $newFocusElement.addClass('keyboard-navigation');
   }
 }

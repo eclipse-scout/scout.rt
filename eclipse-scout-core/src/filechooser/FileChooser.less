@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,11 +12,11 @@
   position: absolute;
   top: 25%;
   left: 50%;
-  width: 400px;
+  width: @filechooser-max-width;
   #scout.drop-shadow-large();
-  border-top: @dialog-border-top-size solid @active-color;
-  border-radius: @border-radius;
+  border-radius: @border-radius-medium;
   background-color: @filechooser-background-color;
+  .messagebox.severity-button(@info-color);
 
   & > .closable {
     position: absolute;
@@ -55,10 +55,8 @@
 
 .file-chooser-content {
   border: 0 solid @border-color;
-  border-left-width: 1px;
-  border-right-width: 1px;
-  background-color: @filechooser-background-color;
-  padding: 10px 20px;
+  border-radius: @border-radius-medium;
+  padding: 26px;
 
   & > .legacy-upload-form {
     & > .legacy-upload-file-input {
@@ -70,15 +68,22 @@
 }
 
 .file-chooser-title {
-  margin-right: 30px; /* Leave space for 'x' closable */
+  text-align: center;
   word-wrap: break-word;
-  #scout.font-text-large();
+  #scout.font-text-large(@font-weight-bold);
   color: @active-color;
 }
 
 .file-chooser-label {
   padding-top: @borderless-field-padding-y;
   padding-bottom: @borderless-field-padding-y;
+  text-align: center;
+}
+
+.file-chooser-buttons {
+  display: flex;
+  justify-content: center;
+  padding: 0 26px 26px 26px;
 }
 
 .file-chooser-files {
@@ -87,7 +92,7 @@
   min-height: 100px;
   max-height: 100px;
   border-top: 1px solid @border-color;
-  padding-top: 10px;
+  padding-top: 16px;
   margin-top: 10px;
   list-style-type: none;
   padding-left: @file-list-indent;
@@ -111,6 +116,20 @@
       & > .remove-link {
         text-decoration: underline;
       }
+    }
+  }
+}
+
+@media (max-width: @filechooser-max-width) {
+  .file-chooser {
+    /* reduce message box width on small screens */
+    max-width: 330px;
+    /* no need to have a margin on small screens */
+    margin: 0;
+
+    & > .box-buttons > .box-button {
+      margin-right: 4px;
+      min-width: 70px; /* less min width for buttons on small screens */
     }
   }
 }

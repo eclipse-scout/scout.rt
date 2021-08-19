@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,8 +14,10 @@
   left: 50%;
   max-width: 300px;
   #scout.drop-shadow-large();
-  border-top: @dialog-border-top-size solid @busyindicator-active-color;
-  border-radius: @border-radius;
+  background-color: @popup-background-color;
+  border-radius: @border-radius-medium;
+
+  .messagebox.severity-button(@info-color);
 
   /* Helper class used during width calculation - required on very narrow screens (e.g. Word AddIn) */
 
@@ -35,16 +37,8 @@
 }
 
 .busyindicator-content {
-  border-left: 1px solid @busyindicator-border-color;
-  border-right: 1px solid @busyindicator-border-color;
-  background-color: @control-background-color;
+  border-radius: @border-radius-medium;
   padding: 26px;
-
-  &.no-buttons {
-    border-bottom: 1px solid @busyindicator-border-color;
-    border-bottom-left-radius: @border-radius;
-    border-bottom-right-radius: @border-radius;
-  }
 }
 
 .busyindicator-label {
@@ -68,6 +62,12 @@
   &.cancelled::before {
     #scout.animation(pulsate-reverse 2s cubic-bezier(0.5, 0.1, 0.1, 0.5) infinite);
   }
+}
+
+.busyindicator-buttons {
+  display: flex;
+  justify-content: center;
+  padding: 0 26px 26px 26px;
 }
 
 .busyindicator-details {

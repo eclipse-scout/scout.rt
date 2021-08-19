@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1863,7 +1863,7 @@ describe('Desktop', () => {
         jasmine.clock().tick();
         // validation message should be displayed since view2 is in invalid state
         expect(session.$entryPoint.find('.messagebox').length).toBe(1);
-        desktop.messageBoxes[0].$yesButton.click();
+        desktop.messageBoxes[0].yesButton.doAction();
         jasmine.clock().tick();
         // untick all entries to not save the unsaved changes
         openFormsField.setValue(null);
@@ -1917,7 +1917,7 @@ describe('Desktop', () => {
         jasmine.clock().tick();
         // validation message should be displayed since view2 is in invalid state
         expect(session.$entryPoint.find('.messagebox').length).toBe(1);
-        desktop.messageBoxes[0].$yesButton.click();
+        desktop.messageBoxes[0].yesButton.doAction();
         jasmine.clock().tick();
         // untick all entries to not save the unsaved changes
         openFormsField.setValue(null);

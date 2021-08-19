@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -71,6 +71,7 @@ const REMOVE_BOLD = 'font:\uE045';
 const PENCIL = 'font:\uE02F';
 const PENCIL_BOLD = 'font:\uE04B';
 const PENCIL_SOLID = 'font:\uE04F';
+const SLIPPERY = 'font:\uE044';
 
 /* font awesome icons */
 const ROTATE_LEFT_BOLD = 'font:\uF0E2';
@@ -256,6 +257,7 @@ export default {
   TABLE_SORT_DESC,
   TARGET,
   WORLD,
+  SLIPPERY,
   parseIconId,
   resolveIconId,
   resolveIconProperty

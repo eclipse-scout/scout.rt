@@ -16,6 +16,16 @@ export default class FormSpecHelper {
     this.session = session;
   }
 
+  closeMessageBoxes() {
+    if (!this.session || !this.session.$entryPoint) {
+      return;
+    }
+    let $messageBoxes = this.session.$entryPoint.find('.messagebox .box-button');
+    for (let i = 0; i < $messageBoxes.length; i++) {
+      scout.widget($messageBoxes[i]).doAction();
+    }
+  }
+
   createViewWithOneField(model) {
     let form = this.createFormWithOneField(model);
     form.displayHint = Form.DisplayHint.VIEW;

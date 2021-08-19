@@ -19,10 +19,6 @@ describe('FormLifecycle', () => {
     expect(session.$entryPoint.find('.messagebox').length).toBe(shown ? 1 : 0);
   }
 
-  function closeMessageBox() {
-    session.$entryPoint.find('.messagebox .box-button').click();
-  }
-
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
@@ -121,7 +117,7 @@ describe('FormLifecycle', () => {
       form2.lifecycle.ok();
       jasmine.clock().tick();
       expectMessageBox(true);
-      closeMessageBox();
+      helper.closeMessageBoxes();
       jasmine.clock().tick(1000); // <- important, otherwise the promise will not be resolved somehow (?)
       expect(lifecycleComplete).toBe(expected);
     }

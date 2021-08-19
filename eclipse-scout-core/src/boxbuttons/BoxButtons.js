@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,119 +8,75 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, scout} from '../index';
-import $ from 'jquery';
+import {Action, scout, Widget} from '../index';
 
 /**
- * Button utility class for a set of buttons, where each button has an option value.
- *
- * Constructor arguments:
- *
- * @param $parent
- *          required
- * @param onClickHandler
- *          optional, global onClickHandler to attach to each button without a specific clickHandler
+ * Widget to render a set of Actions that look like Buttons.
  */
-export default class BoxButtons {
+export default class BoxButtons extends Widget {
 
-  constructor($parent, onClickHandler) {
-    if (!$parent) {
-      throw new Error('Missing $parent');
-    }
-    $parent.addClass('box-buttons');
+  constructor() {
+    super();
+    this._addWidgetProperties(['buttons']);
+    this._addPreserveOnPropertyChangeProperties(['defaultButtonIndex']);
 
-    this._$parent = $parent;
-    this._onClickHandler = onClickHandler;
-
-    this._$buttons = [];
+    this.$container = null;
+    this.buttons = [];
+    this.defaultButtonIndex = 0;
   }
 
   /**
-   * @param opts
-   *          [text]     required,  text of button to add
-   *          [tabIndex] optional,  tabindex to assign (default '0')
-   *          [enabled]  optional,  if button should be enabled or not (default true)
-   *          [onClick]  optional,  function to be executed when button is clicked.
-   *                                This function does _not_ have to check by itself if the button is
-   *                                enabled. If this argument is omitted, the global onClickHandler is
-   *                                used (see constructor).
-   *          [needsClick] optional true or false, default is false. This is a hint for the fastclick
-   *                                library. It sets an additional CSS class on the DIV element of the
-   *                                button. This class prevents fastclick from messing with click events
-   *                                which are sometimes required to programatically trigger an action on
-   *                                a HTML element such as the input type=file element.
-   *          [option]   optional,  a string that is assigned to be button and is passed
-   *                                to the global onClickHandler as an argument.
+   * @override
    */
-  addButton(opts) {
-    opts = opts || {};
-
-    let $button = this._$parent.appendDiv()
-      .text(opts.text)
-      .addClass('box-button')
-      .unfocusable()
-      .setEnabled(scout.nvl(opts.enabled, true));
-
-    if (opts.needsClick) {
-      $button.addClass('needsclick');
-    }
-
-    if (!Device.get().supportsOnlyTouch()) {
-      $button.attr('tabindex', opts.tabIndex || '0');
-    }
-
-    if (opts.onClick) {
-      let onClick = opts.onClick;
-      $button.on('click', event => {
-        if ($.suppressEventIfDisabled(event)) {
-          return;
-        }
-        onClick(event);
-      });
-    } else if (this._onClickHandler) {
-      $button.on('click', this._onClick.bind(this));
-    }
-    $button.data('buttonOption', opts.option);
-
-    this._$buttons.push($button);
-    return $button;
+  _render() {
+    this.$container = this.$parent.appendDiv('box-buttons');
   }
 
-  _onClick(event) {
-    let $button = $(event.target);
-    if ($.suppressEventIfDisabled(event, $button)) {
-      return;
-    }
-    this._onClickHandler(event, $button.data('buttonOption'));
+  /**
+   * @override
+   */
+  _renderProperties() {
+    super._renderProperties();
+    this._renderButtons();
+    this._renderDefaultButtonIndex();
   }
 
-  updateButtonWidths(availableWidth) {
-    // Find all visible buttons
-    let $visibleButtons = [];
-    this._$buttons.forEach($button => {
-      if ($button.isVisible()) {
-        $visibleButtons.push($button);
-      }
-    });
+  _renderButtons() {
+    this.buttons
+      .filter(button => !button.rendered)
+      .forEach(button => {
+        button.render();
+        button.$container.unfocusable().addClass('button box-button');
+      }, this);
+  }
 
-    let hasVisibleButtons = $visibleButtons.length > 0;
-    this._$parent.toggleClass('empty', !hasVisibleButtons);
+  _renderDefaultButtonIndex() {
+    for (let i = 0; i < this.buttons.length; i++) {
+      let button = this.buttons[i];
+      button.setSelected(button.isVisible() && button.enabledComputed && this.isDefaultButtonIndex(i));
+    }
+  }
 
-    // Manually calculate equal width fore each button, adding remaining pixels to last button.
-    // (We don't use CSS percentage values, because sometimes browser calculations lead to wrong results.)
-    availableWidth = availableWidth || this._$parent.width();
-    let w = Math.floor(availableWidth / $visibleButtons.length);
-    $visibleButtons.forEach(($button, index) => {
-      if (index === $visibleButtons.length - 1) {
-        w = availableWidth;
-      } else {
-        availableWidth -= w;
-      }
-      $button.outerWidth(w);
-    });
+  isDefaultButtonIndex(index) {
+    return index === this.defaultButtonIndex;
+  }
+
+  addButton(model, options) {
+    model = model || {};
+    model.parent = this;
+    model.tabbable = true;
+    model.actionStyle = Action.ActionStyle.BUTTON;
+    model.preventDoubleClick = true;
+    let button = scout.create('Action', model, options);
+    this.buttons.push(button);
+    return button;
+  }
+
+  setDefaultButtonIndex(index) {
+    this.setProperty('defaultButtonIndex', index);
   }
 
   buttonCount() {
-    return this._$buttons.length;
+    return this.buttons.length;
   }
 }

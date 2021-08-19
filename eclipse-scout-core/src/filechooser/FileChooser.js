@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,12 +41,17 @@ export default class FileChooser extends Widget {
     this.files = [];
     this._glassPaneRenderer = null;
     this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
+    this.boxButtons = null;
+    this.uploadButton = null;
+    this.cancelButton = null;
+    this._addWidgetProperties(['boxButtons', 'uploadButton', 'cancelButton']);
   }
 
   _init(model) {
     super._init(model);
     this._setDisplayParent(this.displayParent);
     this._glassPaneRenderer = new GlassPaneRenderer(this);
+
     this.fileInput = scout.create('FileInput', {
       parent: this,
       acceptTypes: this.acceptTypes,
@@ -55,6 +60,21 @@ export default class FileChooser extends Widget {
       visible: !Device.get().supportsFile()
     });
     this.fileInput.on('change', this._onFileChange.bind(this));
+
+    this.boxButtons = scout.create('BoxButtons', {parent: this});
+    if (!this.fileInput.legacy) {
+      let addFileButton = this.boxButtons.addButton({text: this.session.text('ui.Browse')});
+      addFileButton.on('action', event => this._onAddFileButtonClicked(event));
+    }
+
+    this.uploadButton = this.boxButtons.addButton({
+      text: this.session.text('ui.Upload'),
+      enabled: false
+    });
+    this.uploadButton.on('action', event => this._onUploadButtonClicked(event));
+
+    this.cancelButton = this.boxButtons.addButton({text: this.session.text('Cancel')});
+    this.cancelButton.on('action', event => this._onCancelButtonClicked(event));
   }
 
   /**
@@ -76,7 +96,10 @@ export default class FileChooser extends Widget {
         keys.SPACE, keys.ENTER
       ]),
       new CloseKeyStroke(this, (() => {
-        return this.$cancelButton;
+        if (!this.cancelButton) {
+          return null;
+        }
+        return this.cancelButton.$container;
       }))
     ]);
   }
@@ -111,24 +134,8 @@ export default class FileChooser extends Widget {
     }
 
     // Buttons
-    this.$buttons = this.$container.appendDiv('file-chooser-buttons');
-    let boxButtons = new BoxButtons(this.$buttons);
-    if (!this.fileInput.legacy) {
-      this.$addFileButton = boxButtons.addButton({
-        text: this.session.text('ui.Browse'),
-        onClick: this._onAddFileButtonClicked.bind(this),
-        needsClick: true
-      });
-    }
-    this.$uploadButton = boxButtons.addButton({
-      text: this.session.text('ui.Upload'),
-      onClick: this._onUploadButtonClicked.bind(this),
-      enabled: false
-    });
-    this.$cancelButton = boxButtons.addButton({
-      text: this.session.text('Cancel'),
-      onClick: this._onCancelButtonClicked.bind(this)
-    });
+    this.boxButtons.render();
+    this.boxButtons.$container.addClass('file-chooser-buttons');
 
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new FormLayout(this));
@@ -142,9 +149,8 @@ export default class FileChooser extends Widget {
     this.$container.css('min-width', w);
     this.$container.css('max-width', w);
     this.$container.removeClass('calc-helper');
-    boxButtons.updateButtonWidths(this.$container.width());
 
-    // Render modality glasspanes
+    // Render modality glass-panes
     this._glassPaneRenderer.renderGlassPanes();
 
     // Now that all texts, paddings, widths etc. are set, we can calculate the position
@@ -266,8 +272,8 @@ export default class FileChooser extends Widget {
       this.cancel();
       return;
     }
-    if (this.$cancelButton && this.session.focusManager.requestFocus(this.$cancelButton)) {
-      this.$cancelButton.click();
+    if (this.cancelButton && this.cancelButton.$container && this.session.focusManager.requestFocus(this.cancelButton.$container)) {
+      this.cancelButton.doAction();
     }
   }
 
@@ -370,7 +376,7 @@ export default class FileChooser extends Widget {
       }, this);
       scrollbars.update(this.$files);
     }
-    this.$uploadButton.setEnabled(files.length > 0);
+    this.uploadButton.setEnabled(files.length > 0);
   }
 
   _onUploadButtonClicked(event) {
