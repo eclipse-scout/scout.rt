@@ -67,6 +67,37 @@ export function assertProperty(object, propertyName, type) {
 }
 
 /**
+ * Throws an error if the given value is null or undefined. Otherwise, the value is returned.
+ *
+ * @template T
+ * @param {T} value - value to check
+ * @param {string} [msg] - optional error message when the assertion fails
+ * @return {T}
+ */
+export function assertValue(value, msg) {
+  if (objects.isNullOrUndefined(value)) {
+    throw new Error(msg || 'Missing value');
+  }
+  return value;
+}
+
+/**
+ * Throws an error if the given value is not an instance of the given type. Otherwise, the value is returned.
+ *
+ * @template T
+ * @param {T} value - value to check
+ * @param {*} type - type to check against with "instanceof"
+ * @param {string} [msg] - optional error message when the assertion fails
+ * @return {T}
+ */
+export function assertInstance(value, type, msg) {
+  if (!(value instanceof type)) {
+    throw new Error(msg || 'Value has wrong type');
+  }
+  return value;
+}
+
+/**
  * Checks if one of the arguments from 1-n is equal to the first argument.
  * @param value
  * @param args to check against the value, may be an array or a variable argument list.
@@ -355,6 +386,8 @@ export default {
   nvl,
   assertParameter,
   assertProperty,
+  assertValue,
+  assertInstance,
   isOneOf,
   create,
   prepareDOM,
