@@ -147,7 +147,7 @@ export function insertSorted(arr, element, compareFunc) {
  * @param {T[]} arr
  * @param {T} elementToInsert
  * @param {function(T): boolean} predicate
- * @param [*] thisArg optional "this" binding for predicate function
+ * @param {*} [thisArg] optional "this" binding for predicate function
  */
 export function insertBefore(arr, elementToInsert, predicate, thisArg) {
   let index = findIndex(arr, predicate, thisArg);
@@ -166,7 +166,7 @@ export function insertBefore(arr, elementToInsert, predicate, thisArg) {
  * @param {T[]} arr
  * @param {T} elementToInsert
  * @param {function(T): boolean} predicate
- * @param [*] thisArg optional "this" binding for predicate function
+ * @param {*} [thisArg] optional "this" binding for predicate function
  */
 export function insertAfter(arr, elementToInsert, predicate) {
   let index = findIndex(arr, predicate);
@@ -341,7 +341,7 @@ export function eachSibling(arr, element, func) {
  * @template T
  * @param {T[]} arr
  * @param {function(T): boolean} predicate
- * @param [*] thisArg
+ * @param {*} [thisArg] optional "this" binding for predicate function
  * @returns {number}
  */
 export function findIndex(arr, predicate, thisArg) {
@@ -360,7 +360,7 @@ export function findIndex(arr, predicate, thisArg) {
  * @template T
  * @param {T[]} arr
  * @param {function(T): boolean} predicate
- * @param [*] thisArg
+ * @param {*} [thisArg]
  * @returns {T|null}
  */
 export function find(arr, predicate, thisArg) {
