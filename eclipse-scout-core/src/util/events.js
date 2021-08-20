@@ -167,7 +167,7 @@ export function propagateEvent(target, event) {
  * @param source {HTMLElement} the element for which the event listener should be added.
  * @param target {HTMLElement} the element which should receive the event.
  * @param types {string[]} an array of event types.
- * @param [filter] {function} an optional filter function which can return false if the event should not be propagated.
+ * @param {function} [filter] an optional filter function which can return false if the event should not be propagated.
  */
 export function addPropagationListener(source, target, types, filter) {
   types = arrays.ensure(types);

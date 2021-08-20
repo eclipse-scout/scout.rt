@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, NullWidget, ObjectFactory, objects, scout, Status, Tooltip} from '../src/index';
+import {Menu, NullWidget, ObjectFactory, objects, scout, Session, Status, Tooltip} from '../src/index';
 
 describe('main', function() {
   var session;
@@ -74,6 +74,66 @@ describe('main', function() {
       foo = new Status();
       func = scout.assertParameter.bind(scout, 'foo', foo, Status);
       expect(func).not.toThrowError();
+    });
+
+  });
+
+  describe('assertValue', () => {
+
+    it('throws Error when value is not set', () => {
+      // noinspection JSCheckFunctionSignatures
+      expect(() => scout.assertValue()).toThrowError();
+      expect(() => scout.assertValue(null)).toThrowError();
+      expect(() => scout.assertValue(undefined)).toThrowError();
+
+      const arr = [];
+      const obj = {};
+      expect(scout.assertValue('null')).toBe('null');
+      expect(scout.assertValue(0)).toBe(0);
+      expect(scout.assertValue(false)).toBe(false);
+      expect(scout.assertValue(arr)).toBe(arr);
+      expect(scout.assertValue(obj)).toBe(obj);
+
+      // Check that the given message is thrown
+      expect(() => scout.assertValue(null, 'not-good')).toThrowError('not-good');
+    });
+
+  });
+
+  describe('assertInstance', () => {
+
+    it('throws Error when value has wrong type', () => {
+      // noinspection JSCheckFunctionSignatures
+      expect(() => scout.assertInstance()).toThrowError();
+      expect(() => scout.assertInstance(null, null)).toThrowError();
+      expect(() => scout.assertInstance(undefined, null)).toThrowError();
+      expect(() => scout.assertInstance(null, Array)).toThrowError();
+      expect(() => scout.assertInstance(undefined, Array)).toThrowError();
+
+      const arr = [];
+      const obj = {};
+      const re = /a+b/;
+
+      // noinspection JSCheckFunctionSignatures
+      expect(() => scout.assertInstance(re)).toThrowError();
+      expect(() => scout.assertInstance(re, null)).toThrowError();
+      expect(() => scout.assertInstance(re, undefined)).toThrowError();
+      expect(() => scout.assertInstance(re, Array)).toThrowError();
+      expect(() => scout.assertInstance(re, Array)).toThrowError();
+
+      expect(scout.assertInstance(arr, Array)).toBe(arr);
+      expect(scout.assertInstance(obj, Object)).toBe(obj);
+      expect(scout.assertInstance(re, RegExp)).toBe(re);
+      expect(scout.assertInstance(session, Session)).toBe(session);
+
+      // Special behavior for primitive types
+      expect(() => scout.assertInstance('123', String)).toThrowError();
+      // noinspection JSPrimitiveTypeWrapperUsage
+      const str = new String('123'); // eslint-disable-line
+      expect(scout.assertInstance(str, String)).toEqual('123');
+
+      // Check that the given message is thrown
+      expect(() => scout.assertInstance(obj, Session, 'not-good')).toThrowError('not-good');
     });
 
   });
