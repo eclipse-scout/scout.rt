@@ -329,6 +329,18 @@ public class DoSetTest {
     assertEquals(CollectionUtility.hashSet("foo", "bar", "baz"), m_testDoSet.parallelStream().collect(Collectors.toSet()));
   }
 
+  /**
+   * Methods from {@link DoSet} must not create the node if it's not necessary.
+   */
+  @Test
+  public void testIdempotentMethodCalls() {
+    DoSet<String> set = new DoSet<>(null, m_lazyCreate);
+    assertFalse(set.exists());
+
+    assertNotNull(set.toString());
+    assertFalse(set.exists());
+  }
+
   @Test
   public void testAttributeName() {
     assertNull(new DoSet<>().getAttributeName());
