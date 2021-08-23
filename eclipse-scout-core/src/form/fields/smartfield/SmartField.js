@@ -293,15 +293,22 @@ export default class SmartField extends ValueField {
    */
   _acceptInput(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
 
-    // Do nothing when search text is equals to the text of the current lookup row
-    if (!selectedLookupRow && this.lookupRow) {
+    let unchanged = false;
+    if (this.removing) {
+      // Rare case: _acceptInput may be called when the field is being removed. In that case
+      // we do nothing and leave the lookupRow unchanged.
+      unchanged = true;
+    } else if (!selectedLookupRow && this.lookupRow) {
+      // Do nothing when search text is equals to the text of the current lookup row
       let lookupRowText = strings.nvl(this.lookupRow.text);
-      if (lookupRowText === searchText) {
-        $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptInput) unchanged: text is equals. Close popup');
-        this._clearLookupStatus();
-        this._inputAccepted(false);
-        return;
-      }
+      unchanged = lookupRowText === searchText;
+    }
+
+    if (unchanged) {
+      $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptInput) unchanged: widget is removing or searchText is equals. Close popup');
+      this._clearLookupStatus();
+      this._inputAccepted(false);
+      return;
     }
 
     // Don't show the not-unique error when the search-text becomes empty while typing (see ticket #229775)
