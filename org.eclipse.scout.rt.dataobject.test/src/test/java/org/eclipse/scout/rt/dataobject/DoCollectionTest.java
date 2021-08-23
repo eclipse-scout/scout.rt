@@ -321,6 +321,79 @@ public class DoCollectionTest {
     assertCollectionEquals(Arrays.asList("foo", "bar", "baz"), actual);
   }
 
+  /**
+   * Methods from {@link DoCollection} must not create the node if it's not necessary.
+   */
+  @Test
+  public void testIdempotentMethodCalls() {
+    DoCollection<String> collection = new DoCollection<>(null, m_lazyCreate);
+    assertFalse(collection.exists());
+
+    assertFalse(collection.contains("value"));
+    assertFalse(collection.exists());
+
+    // add method has a side effect
+
+    collection.addAll((Collection<String>) null);
+    assertFalse(collection.exists());
+
+    collection.addAll((String[]) null);
+    assertFalse(collection.exists());
+
+    assertFalse(collection.remove("value"));
+    assertFalse(collection.exists());
+
+    assertFalse(collection.removeAll(Collections.singletonList("value")));
+    assertFalse(collection.exists());
+
+    assertFalse(collection.removeAll("value"));
+    assertFalse(collection.exists());
+
+    collection.updateAll((Collection<String>) null);
+    assertFalse(collection.exists());
+
+    collection.updateAll((String[]) null);
+    assertFalse(collection.exists());
+
+    collection.clear();
+    assertFalse(collection.exists());
+
+    assertEquals(0, collection.size());
+    assertFalse(collection.exists());
+
+    assertTrue(collection.isEmpty());
+    assertFalse(collection.exists());
+
+    assertEquals(0, collection.stream().count());
+    assertFalse(collection.exists());
+
+    assertFalse(collection.exists());
+    assertFalse(collection.exists());
+
+    assertEquals(0, collection.parallelStream().count());
+    assertFalse(collection.exists());
+
+    assertFalse(collection.iterator().hasNext());
+    assertFalse(collection.exists());
+
+    // findFirst(Function,VALUE) calls findFirst(Predicate)
+    assertNull(collection.findFirst(x -> true));
+    assertFalse(collection.exists());
+
+    // find(Function,VALUE) calls find(Predicate)
+    assertTrue(collection.find(x -> true).isEmpty());
+    assertFalse(collection.exists());
+
+    collection.valueHashCode();
+    assertFalse(collection.exists());
+
+    DoCollection<String> otherCollection = new DoCollection<>(null, m_lazyCreate);
+    assertFalse(otherCollection.exists());
+    assertTrue(collection.valueEquals(otherCollection));
+    assertFalse(collection.exists());
+    assertFalse(otherCollection.exists());
+  }
+
   @Test
   public void testStream() {
     assertCollectionEquals(Arrays.asList("foo", "bar", "baz"), m_testDoCollection.stream().collect(Collectors.toSet()));

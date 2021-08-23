@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.dataobject;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -38,6 +39,9 @@ public abstract class AbstractDoCollection<V, COLLECTION extends Collection<V>> 
 
   @Override
   public boolean contains(V item) {
+    if (!exists()) {
+      return false;
+    }
     return get().contains(item);
   }
 
@@ -63,11 +67,17 @@ public abstract class AbstractDoCollection<V, COLLECTION extends Collection<V>> 
 
   @Override
   public boolean remove(V item) {
+    if (!exists()) {
+      return false;
+    }
     return get().remove(item);
   }
 
   @Override
   public boolean removeAll(Collection<? extends V> items) {
+    if (!exists()) {
+      return false;
+    }
     if (items != null) {
       return get().removeAll(items);
     }
@@ -77,6 +87,9 @@ public abstract class AbstractDoCollection<V, COLLECTION extends Collection<V>> 
   @Override
   @SafeVarargs
   public final boolean removeAll(@SuppressWarnings("unchecked") V... items) {
+    if (!exists()) {
+      return false;
+    }
     if (items != null) {
       return removeAll(Arrays.asList(items));
     }
@@ -98,31 +111,49 @@ public abstract class AbstractDoCollection<V, COLLECTION extends Collection<V>> 
 
   @Override
   public void clear() {
+    if (!exists()) {
+      return;
+    }
     get().clear();
   }
 
   @Override
   public int size() {
+    if (!exists()) {
+      return 0;
+    }
     return get().size();
   }
 
   @Override
   public boolean isEmpty() {
+    if (!exists()) {
+      return true;
+    }
     return get().isEmpty();
   }
 
   @Override
   public Stream<V> stream() {
+    if (!exists()) {
+      return Stream.empty();
+    }
     return get().stream();
   }
 
   @Override
   public Stream<V> parallelStream() {
+    if (!exists()) {
+      return Stream.empty();
+    }
     return get().parallelStream();
   }
 
   @Override
   public Iterator<V> iterator() {
+    if (!exists()) {
+      return Collections.emptyIterator();
+    }
     return get().iterator();
   }
 
