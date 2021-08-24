@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, BasicField, Device, Dimension, FormField, graphics, HtmlComponent, HtmlEnvironment, Insets, Rectangle, scout, scrollbars} from '../../index';
+import {AbstractLayout, BasicField, Device, Dimension, FormField, graphics, GroupBox, HtmlComponent, HtmlEnvironment, Insets, Rectangle, scout, scrollbars} from '../../index';
 
 /**
  * Form-Field Layout, for a form-field with label, status, mandatory-indicator and a field.
@@ -21,13 +21,23 @@ export default class FormFieldLayout extends AbstractLayout {
   constructor(formField) {
     super();
     this.formField = formField;
+    this.parentGroupBox = this.formField.findParent(parent => {
+      return parent instanceof GroupBox;
+    });
+
     this._initDefaults();
 
-    this.htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);
-    HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
+    this.resetDefaultsHandler = this._resetDefaults.bind(this);
+    HtmlEnvironment.get().on('propertyChange', this.resetDefaultsHandler);
     this.formField.one('remove', () => {
-      HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
+      HtmlEnvironment.get().off('propertyChange', this.resetDefaultsHandler);
     });
+    if (this.parentGroupBox) {
+      this.parentGroupBox.on('propertyChange:bodyLayoutConfig', this.resetDefaultsHandler);
+      this.formField.one('remove', () => {
+        this.parentGroupBox.off('propertyChange:bodyLayoutConfig', this.resetDefaultsHandler);
+      });
+    }
   }
 
   // Minimum field with to normal state, for smaller widths the "compact" style is applied.
@@ -38,9 +48,13 @@ export default class FormFieldLayout extends AbstractLayout {
     this.statusWidth = HtmlEnvironment.get().fieldStatusWidth;
     this.rowHeight = HtmlEnvironment.get().formRowHeight;
     this.compactFieldWidth = FormFieldLayout.COMPACT_FIELD_WIDTH;
+
+    if (this.parentGroupBox && this.parentGroupBox.bodyLayoutConfig) {
+      this.rowHeight = this.parentGroupBox.bodyLayoutConfig.rowHeight || this.rowHeight;
+    }
   }
 
-  _onHtmlEnvironmentPropertyChange() {
+  _resetDefaults() {
     this._initDefaults();
     this.formField.invalidateLayoutTree();
   }
