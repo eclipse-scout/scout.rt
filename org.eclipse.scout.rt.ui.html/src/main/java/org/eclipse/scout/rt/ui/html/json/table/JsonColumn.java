@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -97,6 +97,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     json.put(IColumn.PROP_CSS_CLASS, getColumn().getCssClass());
     json.put("headerCssClass", getColumn().getHeaderCell().getCssClass());
     json.put("headerHtmlEnabled", getColumn().getHeaderCell().isHtmlEnabled());
+    json.put("headerMenuEnabled", getColumn().getHeaderCell().isMenuEnabled());
     json.put("headerBackgroundColor", getColumn().getHeaderCell().getBackgroundColor());
     json.put("headerForegroundColor", getColumn().getHeaderCell().getForegroundColor());
     json.put("headerFont", getColumn().getHeaderCell().getFont() != null ? getColumn().getHeaderCell().getFont().toPattern() : null);

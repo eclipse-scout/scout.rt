@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -250,6 +250,20 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Order(110)
   protected boolean getConfiguredHeaderHtmlEnabled() {
     return false;
+  }
+
+  /**
+   * Configures, if the header menu is enabled for this column header. When header menu is disabled, a click on the
+   * header will toggle between ascending and descending sorting instead of opening the header popup.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   *
+   * @return {@code true} if header menu is enabled, {@code false} otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(110)
+  protected boolean getConfiguredHeaderMenuEnabled() {
+    return true;
   }
 
   /**
@@ -945,6 +959,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     m_headerCell.setIconId(getConfiguredHeaderIconId());
     m_headerCell.setCssClass(getConfiguredHeaderCssClass());
     m_headerCell.setHtmlEnabled(getConfiguredHeaderHtmlEnabled());
+    m_headerCell.setMenuEnabled(getConfiguredHeaderMenuEnabled());
     if (getConfiguredHeaderForegroundColor() != null) {
       m_headerCell.setForegroundColor((getConfiguredHeaderForegroundColor()));
     }
