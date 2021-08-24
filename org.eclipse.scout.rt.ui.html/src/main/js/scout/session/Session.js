@@ -1049,7 +1049,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
 
 scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, maxTotalSize, allowedTypes) {
   var formData = new FormData(),
-    totalSize = 0;
+  acceptedFiles = [];
 
   if (uploadProperties) {
     $.each(uploadProperties, function(key, value) {
@@ -1059,7 +1059,6 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
 
   $.each(files, function(index, value) {
     if (!allowedTypes || allowedTypes.length === 0 || scout.isOneOf(value.type, allowedTypes)) {
-      totalSize += value.size;
       /*
        * - see ClipboardField for comments on "scoutName"
        * - Some Browsers (e.g. Edge) handle an empty string as filename as if the filename is not set and therefore introduce a default filename like 'blob'.
@@ -1067,6 +1066,7 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
        */
       var filename = scout.nvl(value.scoutName, value.name, scout.Session.EMPTY_UPLOAD_FILENAME);
       formData.append('files', value, filename);
+      acceptedFiles.push(value);
     }
   }.bind(this));
 
@@ -1074,7 +1074,7 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
   maxTotalSize = scout.nvl(maxTotalSize, scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE);
 
   // very large files must not be sent to server otherwise the whole system might crash (for all users).
-  if (totalSize > maxTotalSize) {
+  if (!scout.files.validateMaximumUploadSize(acceptedFiles, maxTotalSize)) {
     var boxOptions = {
       header: this.text('ui.FileSizeLimitTitle'),
       body: this.text('ui.FileSizeLimit', (maxTotalSize / 1024 / 1024)),

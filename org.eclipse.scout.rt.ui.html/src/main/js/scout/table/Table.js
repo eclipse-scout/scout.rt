@@ -447,7 +447,6 @@ scout.Table.prototype._renderProperties = function() {
   this._renderTableHeader();
   this._renderMenuBarVisible();
   this._renderFooterVisible();
-  this._renderDropType();
   this._renderCheckableStyle();
   this._renderHierarchicalStyle();
 };
@@ -4457,6 +4456,7 @@ scout.Table.prototype._removeFooter = function() {
 scout.Table.prototype._renderEnabled = function() {
   scout.Table.parent.prototype._renderEnabled.call(this);
 
+  this._installOrUninstallDragAndDropHandler();
   var enabled = this.enabled;
   this.$data.setEnabled(enabled);
   this.$container.setTabbable(enabled);
@@ -4504,20 +4504,24 @@ scout.Table.prototype._renderMultilineText = function() {
   this.invalidateLayoutTree();
 };
 
-scout.Table.prototype._renderDropType = function() {
-  if (this.dropType) {
-    this._installDragAndDropHandler();
-  } else {
-    this._uninstallDragAndDropHandler();
-  }
+scout.Table.prototype.setDropType = function(dropType) {
+  this.setProperty('dropType', dropType);
 };
 
-scout.Table.prototype._installDragAndDropHandler = function(event) {
-  if (this.dragAndDropHandler) {
-    return;
-  }
-  this.dragAndDropHandler = scout.dragAndDrop.handler(this, {
+scout.Table.prototype._renderDropType = function() {
+  this._installOrUninstallDragAndDropHandler();
+};
+
+scout.Table.prototype.setDropMaximumSize = function(dropMaximumSize) {
+  this.setProperty('dropMaximumSize', dropMaximumSize);
+};
+
+scout.Table.prototype._createDragAndDropHandler = function() {
+  return scout.dragAndDrop.handler(this, {
     supportedScoutTypes: scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    onDrop: function(event) {
+      this.trigger('drop', event);
+    }.bind(this),
     dropType: function() {
       return this.dropType;
     }.bind(this),
@@ -4534,12 +4538,30 @@ scout.Table.prototype._installDragAndDropHandler = function(event) {
         properties.rowId = row.id;
       }
       return properties;
-    }.bind(this)
+    }
   });
+};
+
+scout.Table.prototype._installOrUninstallDragAndDropHandler = function() {
+  if (this.dropType && this.enabledComputed) {
+    this._installDragAndDropHandler();
+  } else {
+    this._uninstallDragAndDropHandler();
+  }
+};
+
+scout.Table.prototype._installDragAndDropHandler = function() {
+  if (this.dragAndDropHandler) {
+    return;
+  }
+  this.dragAndDropHandler = this._createDragAndDropHandler();
+  if (!this.dragAndDropHandler) {
+    return;
+  }
   this.dragAndDropHandler.install(this.$container, '.table-data,.table-row');
 };
 
-scout.Table.prototype._uninstallDragAndDropHandler = function(event) {
+scout.Table.prototype._uninstallDragAndDropHandler = function() {
   if (!this.dragAndDropHandler) {
     return;
   }

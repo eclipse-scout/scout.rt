@@ -75,11 +75,6 @@ scout.FileChooser.prototype._render = function() {
   // DnD and Multiple files are only supported with the new file api
   if (!this.fileInput.legacy) {
 
-    // Install DnD support
-    this.$container.on('dragenter', this._onDragEnterOrOver.bind(this))
-      .on('dragover', this._onDragEnterOrOver.bind(this))
-      .on('drop', this._onDrop.bind(this));
-
     // explanation for file chooser
     this.$content.appendDiv('file-chooser-label')
       .text(this.session.text('ui.FileChooserHint'));
@@ -140,6 +135,11 @@ scout.FileChooser.prototype._renderProperties = function() {
   this._renderFiles();
 };
 
+scout.FileChooser.prototype._renderEnabled = function() {
+  scout.FileChooser.parent.prototype._renderEnabled.call(this);
+  this._installOrUninstallDragAndDropHandler();
+};
+
 scout.FileChooser.prototype._postRender = function() {
   scout.FileChooser.parent.prototype._postRender.call(this);
   this._installFocusContext();
@@ -149,6 +149,50 @@ scout.FileChooser.prototype._remove = function() {
   this._glassPaneRenderer.removeGlassPanes();
   this._uninstallFocusContext();
   scout.FileChooser.parent.prototype._remove.call(this);
+};
+
+scout.FileChooser.prototype._createDragAndDropHandler = function() {
+  return scout.dragAndDrop.handler(this, {
+    supportedScoutTypes: scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    validateFiles: function(event) {
+    },
+    onDrop: function(event) {
+      this.addFiles(event.files);
+    }.bind(this),
+    dropType: function() {
+      return scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER;
+    },
+    dropMaximumSize: function() {
+      return this.maximumUploadSize;
+    }.bind(this)
+  });
+};
+
+scout.FileChooser.prototype._installOrUninstallDragAndDropHandler = function() {
+  if (this.enabledComputed) {
+    this._installDragAndDropHandler();
+  } else {
+    this._uninstallDragAndDropHandler();
+  }
+};
+
+scout.FileChooser.prototype._installDragAndDropHandler = function() {
+  if (this.dragAndDropHandler) {
+    return;
+  }
+  this.dragAndDropHandler = this._createDragAndDropHandler();
+  if (!this.dragAndDropHandler) {
+    return;
+  }
+  this.dragAndDropHandler.install(this.$container);
+};
+
+scout.FileChooser.prototype._uninstallDragAndDropHandler = function() {
+  if (!this.dragAndDropHandler) {
+    return;
+  }
+  this.dragAndDropHandler.uninstall();
+  this.dragAndDropHandler = null;
 };
 
 scout.FileChooser.prototype._installFocusContext = function() {
@@ -309,16 +353,6 @@ scout.FileChooser.prototype._renderFiles = function() {
   this.$uploadButton.setEnabled(files.length > 0);
 };
 
-scout.FileChooser.prototype._onDragEnterOrOver = function(event) {
-  scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER);
-};
-
-scout.FileChooser.prototype._onDrop = function(event) {
-  if (scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
-    $.suppressEvent(event);
-    this.addFiles(event.originalEvent.dataTransfer.files);
-  }
-};
 
 scout.FileChooser.prototype._onUploadButtonClicked = function(event) {
   this.trigger('upload');

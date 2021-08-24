@@ -383,11 +383,6 @@ scout.Tree.prototype._remove = function() {
   scout.Tree.parent.prototype._remove.call(this);
 };
 
-scout.Tree.prototype._renderProperties = function() {
-  scout.Tree.parent.prototype._renderProperties.call(this);
-  this._renderDropType();
-};
-
 scout.Tree.prototype.isHorizontalScrollingEnabled = function() {
   return this._scrolldirections === 'both' || this._scrolldirections === 'x';
 };
@@ -939,6 +934,7 @@ scout.Tree.prototype._filterMenus = function(menus, destination, onlyVisible, en
 scout.Tree.prototype._renderEnabled = function() {
   scout.Tree.parent.prototype._renderEnabled.call(this);
 
+  this._installOrUninstallDragAndDropHandler();
   var enabled = this.enabled;
   this.$data.setEnabled(enabled);
   this.$container.setTabbable(enabled);
@@ -1170,20 +1166,24 @@ scout.Tree.prototype._removeNodeSelection = function(node) {
   }
 };
 
-scout.Tree.prototype._renderDropType = function() {
-  if (this.dropType) {
-    this._installDragAndDropHandler();
-  } else {
-    this._uninstallDragAndDropHandler();
-  }
+scout.Tree.prototype.setDropType = function(dropType) {
+  this.setProperty('dropType', dropType);
 };
 
-scout.Tree.prototype._installDragAndDropHandler = function(event) {
-  if (this.dragAndDropHandler) {
-    return;
-  }
-  this.dragAndDropHandler = scout.dragAndDrop.handler(this, {
+scout.Tree.prototype._renderDropType = function() {
+  this._installOrUninstallDragAndDropHandler();
+};
+
+scout.Tree.prototype.setDropMaximumSize = function(dropMaximumSize) {
+  this.setProperty('dropMaximumSize', dropMaximumSize);
+};
+
+scout.Tree.prototype._createDragAndDropHandler = function() {
+  return scout.dragAndDrop.handler(this, {
     supportedScoutTypes: scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    onDrop: function(event) {
+      this.trigger('drop', event);
+    }.bind(this),
     dropType: function() {
       return this.dropType;
     }.bind(this),
@@ -1200,8 +1200,26 @@ scout.Tree.prototype._installDragAndDropHandler = function(event) {
         properties.nodeId = node.id;
       }
       return properties;
-    }.bind(this)
+    }
   });
+};
+
+scout.Tree.prototype._installOrUninstallDragAndDropHandler = function() {
+  if (this.dropType && this.enabledComputed) {
+    this._installDragAndDropHandler();
+  } else {
+    this._uninstallDragAndDropHandler();
+  }
+};
+
+scout.Tree.prototype._installDragAndDropHandler = function() {
+  if (this.dragAndDropHandler) {
+    return;
+  }
+  this.dragAndDropHandler = this._createDragAndDropHandler();
+  if (!this.dragAndDropHandler) {
+    return;
+  }
   this.dragAndDropHandler.install(this.$container, '.tree-data,.tree-node');
 };
 

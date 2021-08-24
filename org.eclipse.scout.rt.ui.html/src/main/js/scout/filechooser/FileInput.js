@@ -52,10 +52,7 @@ scout.FileInput.prototype._render = function() {
     .on('change', this._onFileChange.bind(this));
 
   if (!this.legacy) {
-    this.$container = this.$parent.appendDiv('file-input input-field')
-      .on('dragenter', this._onDragEnterOrOver.bind(this))
-      .on('dragover', this._onDragEnterOrOver.bind(this))
-      .on('drop', this._onDrop.bind(this));
+    this.$container = this.$parent.appendDiv('file-input input-field');
     this.$fileInput.appendTo(this.$container);
     this.$container.on('mousedown', this._onMouseDown.bind(this));
     this.$text = this.$container.appendDiv('file-input-text');
@@ -108,6 +105,7 @@ scout.FileInput.prototype._renderProperties = function() {
 
 scout.FileInput.prototype._renderEnabled = function() {
   scout.FileInput.parent.prototype._renderEnabled.call(this);
+  this._installOrUninstallDragAndDropHandler();
 
   if (this.legacy) {
     this.$fileInput.setEnabled(this.enabled);
@@ -118,6 +116,52 @@ scout.FileInput.prototype._renderEnabled = function() {
 
 scout.FileInput.prototype.setText = function(text) {
   this.setProperty('text', text);
+};
+
+scout.FileInput.prototype._createDragAndDropHandler = function() {
+  return scout.dragAndDrop.handler(this, {
+    supportedScoutTypes: scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    validateFiles: function() {
+    },
+    onDrop: function(event) {
+      if (event.files.length >= 1) {
+        this._setFiles(event.files);
+      }
+    }.bind(this),
+    dropType: function() {
+      return scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER;
+    },
+    dropMaximumSize: function() {
+      return this.maximumUploadSize;
+    }.bind(this)
+  });
+};
+
+scout.FileInput.prototype._installOrUninstallDragAndDropHandler = function() {
+  if (this.enabledComputed) {
+    this._installDragAndDropHandler();
+  } else {
+    this._uninstallDragAndDropHandler();
+  }
+};
+
+scout.FileInput.prototype._installDragAndDropHandler = function() {
+  if (this.dragAndDropHandler) {
+    return;
+  }
+  this.dragAndDropHandler = this._createDragAndDropHandler();
+  if (!this.dragAndDropHandler) {
+    return;
+  }
+  this.dragAndDropHandler.install(this.$container);
+};
+
+scout.FileInput.prototype._uninstallDragAndDropHandler = function() {
+  if (!this.dragAndDropHandler) {
+    return;
+  }
+  this.dragAndDropHandler.uninstall();
+  this.dragAndDropHandler = null;
 };
 
 scout.FileInput.prototype._renderText = function() {
@@ -221,22 +265,6 @@ scout.FileInput.prototype._onMouseDown = function() {
   this.browse();
 };
 
-scout.FileInput.prototype._onDragEnterOrOver = function(event) {
-  scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER);
-};
-
-scout.FileInput.prototype._onDrop = function(event) {
-  if (scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
-    event.stopPropagation();
-    event.preventDefault();
-
-    var files = event.originalEvent.dataTransfer.files;
-    if (files.length >= 1) {
-      this._setFiles(files);
-    }
-  }
-};
-
 scout.FileInput.fileListToArray = function(fileList) {
   var files = [],
     i;
@@ -247,16 +275,7 @@ scout.FileInput.fileListToArray = function(fileList) {
 };
 
 scout.FileInput.prototype.validateMaximumUploadSize = function(files) {
-  files = scout.arrays.ensure(files);
-  if (files.length === 0) {
-    return;
-  }
-
-  var totalSize = files.reduce(function(total, file) {
-    return total + file.size;
-  }, 0);
-
-  if (this.maximumUploadSize !== null && totalSize > this.maximumUploadSize) {
+  if (!scout.files.validateMaximumUploadSize(files, this.maximumUploadSize)) {
     throw this.session.text('ui.FileSizeLimit', (this.maximumUploadSize / 1024 / 1024));
   }
 };

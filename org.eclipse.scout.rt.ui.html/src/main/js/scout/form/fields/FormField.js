@@ -511,6 +511,7 @@ scout.FormField.prototype._renderEnabled = function() {
     this.$field.setEnabled(this.enabledComputed);
   }
   this._updateDisabledCopyOverlay();
+  this._installOrUninstallDragAndDropHandler();
 };
 
 /**
@@ -1046,17 +1047,24 @@ scout.FormField.prototype.prepareForCellEdit = function(opts) {
   }
 };
 
+scout.FormField.prototype.setDropType = function(dropType) {
+  this.setProperty('dropType', dropType);
+};
+
 scout.FormField.prototype._renderDropType = function() {
-  if (this.dropType) {
-    this._installDragAndDropHandler();
-  } else {
-    this._uninstallDragAndDropHandler();
-  }
+  this._installOrUninstallDragAndDropHandler();
+};
+
+scout.FormField.prototype.setDropMaximumSize = function(dropMaximumSize) {
+  this.setProperty('dropMaximumSize', dropMaximumSize);
 };
 
 scout.FormField.prototype._createDragAndDropHandler = function() {
   return scout.dragAndDrop.handler(this, {
     supportedScoutTypes: scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    onDrop: function(event) {
+      this.trigger('drop', event);
+    }.bind(this),
     dropType: function() {
       return this.dropType;
     }.bind(this),
@@ -1066,12 +1074,23 @@ scout.FormField.prototype._createDragAndDropHandler = function() {
   });
 };
 
+scout.FormField.prototype._installOrUninstallDragAndDropHandler = function() {
+  if (this.dropType && this.enabledComputed) {
+    this._installDragAndDropHandler();
+  } else {
+    this._uninstallDragAndDropHandler();
+  }
+};
+
 scout.FormField.prototype._installDragAndDropHandler = function(event) {
   if (this.dragAndDropHandler) {
     return;
   }
   this.dragAndDropHandler = this._createDragAndDropHandler();
-  this.dragAndDropHandler.install(this.$field);
+  if (!this.dragAndDropHandler) {
+    return;
+  }
+  this.dragAndDropHandler.install(this.$field || this.$container);
 };
 
 scout.FormField.prototype._uninstallDragAndDropHandler = function(event) {

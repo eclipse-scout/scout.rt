@@ -46,11 +46,10 @@ scout.ImageField.prototype._render = function() {
 scout.ImageField.prototype._renderProperties = function() {
   scout.ImageField.parent.prototype._renderProperties.call(this);
   this._renderScrollBarEnabled();
-  this._renderDropType();
   this._renderImageUrl();
 };
 
-scout.ImageField.prototype._installDragAndDropHandler = function(event) {
+scout.ImageField.prototype._installDragAndDropHandler = function() {
   if (this.dragAndDropHandler) {
     return;
   }

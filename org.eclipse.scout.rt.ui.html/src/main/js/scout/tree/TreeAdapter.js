@@ -84,6 +84,8 @@ scout.TreeAdapter.prototype._onWidgetEvent = function(event) {
     this._onWidgetNodeExpanded(event);
   } else if (event.type === 'nodesChecked') {
     this._onWidgetNodesChecked(event);
+  } else if (event.type === 'drop' && this.widget.dragAndDropHandler) {
+    this.widget.dragAndDropHandler.uploadFiles(event.files);
   } else {
     scout.TreeAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }

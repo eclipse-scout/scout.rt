@@ -34,9 +34,11 @@
   __include("scout/util/dates.js");
   __include("scout/util/defaultValues.js");
   __include("scout/util/events.js");
+  __include("scout/util/files.js");
   __include("scout/util/Device.js");
   __include("scout/util/DoubleClickSupport.js");
   __include("scout/util/dragAndDrop.js");
+  __include("scout/util/DragAndDropHandler.js");
   __include("scout/util/Event.js");
   __include("scout/util/EventSupport.js");
   __include("scout/util/fonts.js");

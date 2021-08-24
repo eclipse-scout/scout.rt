@@ -11,8 +11,6 @@
 scout.ClipboardField = function() {
   scout.ClipboardField.parent.call(this);
 
-  this.dropType = 0;
-  this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
   this._fileUploadWaitRetryCountTimeout = 99;
   this._fullSelectionLength = 0;
 };
@@ -81,14 +79,12 @@ scout.ClipboardField.prototype._render = function() {
     .on('cut', this._onCopy.bind(this));
 };
 
-scout.ClipboardField.prototype._renderProperties = function() {
-  scout.ClipboardField.parent.prototype._renderProperties.call(this);
-  this._renderDropType();
-};
-
 scout.ClipboardField.prototype._createDragAndDropHandler = function() {
   return scout.dragAndDrop.handler(this, {
     supportedScoutTypes: scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    onDrop: function(event) {
+      this.trigger('drop', event);
+    }.bind(this),
     dropType: function() {
       return this.dropType;
     }.bind(this),
