@@ -21,7 +21,7 @@
 
   <groupId>org.eclipse.scout.rt</groupId>
   <artifactId>org.eclipse.scout.rt</artifactId>
-  <version>11.0-SNAPSHOT</version>
+  <version>11.0.29</version>
   <packaging>pom</packaging>
   <name>Eclipse Scout RT</name>
   <description>Eclipse Scout RT</description>
@@ -268,113 +268,113 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.json</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html.selenium</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.platform</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.platform.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.dataobject</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.dataobject.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.security</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.security.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.dataformat</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.mom.api</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.mom.api.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.mom.jms</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.mom.jms.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.mail</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.mail.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.rest</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.rest.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.jackson</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.jackson.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.rest.jackson</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
         <exclusions>
           <exclusion>
             <groupId>jakarta.activation</groupId>
@@ -386,83 +386,83 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.rest.jersey.client</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.rest.jersey.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.shared</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.shared.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.commons</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.jaxws</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.jaxws.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.jdbc</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.server.jdbc.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.client</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.client.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
         <exclusions>
           <exclusion>
             <groupId>xml-apis</groupId>
@@ -474,30 +474,30 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.serverbridge</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.jaxws.apt</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.ui.html.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.svg.ui.html</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
         <exclusions>
           <exclusion>
             <groupId>xml-apis</groupId>
@@ -509,58 +509,58 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.dev.jetty</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.dev.jetty.test</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.dev.jetty.test.affix</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.chart.client</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.chart.shared</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.chart.ui.html</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>eclipse-scout-cli</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>eclipse-scout-core</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>eslint-config</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>karma-jasmine-scout</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>eclipse-scout-chart</artifactId>
-        <version>11.0-SNAPSHOT</version>
+        <version>11.0.29</version>
       </dependency>
 
       <dependency>

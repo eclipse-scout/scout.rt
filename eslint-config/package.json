@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/eslint-config",
-  "version": "11.0.0-snapshot",
+  "version": "11.0.29",
   "description": "ESLint shareable config for the Scout style",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",

@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/core",
-  "version": "11.0.0-snapshot",
+  "version": "11.0.29",
   "description": "Eclipse Scout runtime",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
@@ -40,7 +40,7 @@
     "release-postdependency": "releng-scripts release-publish-dependency"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": "11.0.0-snapshot",
+    "@eclipse-scout/cli": "11.0.29",
     "@eclipse-scout/releng": "^10.0.0",
     "jasmine-core": "3.6.0",
     "jasmine-ajax": "4.0.0",
