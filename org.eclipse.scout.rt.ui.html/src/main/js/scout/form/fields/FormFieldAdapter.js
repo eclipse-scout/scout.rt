@@ -34,3 +34,12 @@ scout.FormFieldAdapter.prototype._goOnline = function() {
   }
   this.widget.setEnabled(this._enabledBeforeOffline);
 };
+
+
+scout.FormFieldAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'drop' && this.widget.dragAndDropHandler) {
+    this.widget.dragAndDropHandler.uploadFiles(event.files);
+  } else {
+    scout.FormFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
+};
